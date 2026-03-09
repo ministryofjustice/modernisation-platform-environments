@@ -1,0 +1,749 @@
+schemaVersion: '2.2'
+description: Install Trend AV agent on Linux and Windows instances
+
+mainSteps:
+  - name: InstallAVLinux
+    action: aws:runShellScript
+    precondition:
+      StringEquals:
+        - platformType
+        - Linux
+    inputs:
+      runCommand:
+        - echo "Creating Trend install script..."
+        - |
+          cat > /tmp/trend_install.sh << 'EOF'
+          #!/bin/bash
+          
+          dsmUrl="dummy-value"
+          package="XDR_Sensor_Linux64.tgz"
+          
+          #----DSM Agent Downnload variables
+          MANAGERURL='https://workload.de-1.cloudone.trendmicro.com:443'
+          CURLOPTIONS='--silent --tlsv1.2'
+          linuxPlatform='';
+          isRPM='';
+          
+          #----DSM Agent Activation to console variables
+          ACTIVATIONURL="dsm://agents.workload.de-1.cloudone.trendmicro.com:443/"
+          TRENDID="tenantID:dummy-value"
+          TOKEN="token:dummy-value"
+          POLICY="policyid:232"
+          GROUP="groupid:909"
+          
+          #GLOBAL VARIABLES PROXIES
+          #Gateway option currently turned off, as its not possible to donwnload DSM package from.
+          GATEWAY=("172.29.100.99:8080x" "10.102.160.99:8080x")
+          IPS=("10.102.160.19:8080x" "10.102.123.101:8080x" "10.102.123.101:8080x" "152.114.119.247:8080x"    "trendproxy:8080x" "fp_proxy:3128x")
+          
+          choice=""
+          # ---------------------------------------------------------- 
+          function checkHostname(){
+          clear
+          echo -e "\e[31m  - * . - * . - * . . - * - * .  - * . - * . - * . . - * - * .  - * . - * . - * .\e[0m"
+          echo -e "\e[31m  - * . - * . - * . . - * - * . [Important Notice] - * . - * . - * . . - * - * . \e[0m"
+          echo ""
+          echo "If this Server was cloned, you need to RE-NAME the Server?"
+          hostname | xargs -I {} echo -e "Current Name:\e[32m {}\e[0m"
+          echo ""
+          echo "Is the Server name above correct? - Type yes or no"
+          read  choice
+          return $choice &> /dev/null
+          }
+          
+          
+          function checkServices(){
+          echo "[INFO] Checking ds_agent installation and status"
+          if systemctl is-active --quiet ds_agent; then
+              echo "[INFO] ds_agent is installed and running"
+              echo "[INFO] If you need to re-install, please first uninstall ds_agent service"
+              exit 0
+          elif systemctl status ds_agent >/dev/null 2>&1; then
+              echo "[ERROR] ds_agent is installed but NOT running. Marking step as failed."
+              echo "[INFO] If you need to re-install please first uninstall ds_agent service"
+          exit 1
+          fi
+          echo "[INFO] ds_agent not installed. Continuing to installation"
+          }
+          #Checks if can reach gateway
+          
+          function checkGateway(){
+          #Checks if can reach gateway
+          echo "[INFO] - Attempting to reach Trend Service Gateway"
+          	#Checks if can reach one of the gateways
+          	for IP in "${GATEWAY[@]}";do
+          		GATEWAY_IP="$IP"
+          		if curl -m 15 $GATEWAY_IP | grep "<div"  &> /dev/null ;then
+          
+          		echo -e "[INFO] - Server can reach Service Gateway  \e[32m $GATEWAY_IP \e[0m"
+          		GTRES="true"
+          		break
+          		else
+          		echo -e "\e[33m [INFO] - Skipping Service Gateway check as not yet possible to download XDR agent from it...\e[0m"
+          		echo -e "[INFO] - Server cannot yet connect directly to Service Gateway \e[33m $GATEWAY_IP\e[0m"
+          		GTRES="false"
+          	fi
+          done
+          }
+          #---------------------------------------------------------------- Pickup Policy to use
+          
+          
+          function pickupPolicy(){
+          echo ""
+          echo -e "\e[32m Please type the number of which policy to use"
+          echo "-----------------------------"
+          echo "1 - UK Production Policy"
+          echo "2 - Development Policy"
+          echo "3 - Mumbai Production Policy"
+          echo "4 - OCI Policy"
+          echo "5 - Azure Policy"
+          echo "6 - AWS Policy"
+          echo -e "----------------------------\e[0m"
+          
+          
+          read selection
+          policy1="UK Production Policy"
+          policy2="Development Policy"
+          policy3="Mumbai Production Policy"
+          policy4="OCI Policy"
+          policy5="Azure Policy"
+          policy6="AWS Policy"
+          policydefault="Deployment Policy"
+          
+          case "$selection" in 
+          	1)
+          	echo "Selected: $policy1" #UK production
+          	policyChoice=155
+          	;;
+          	2)
+          	echo "Selected: $policy2" #Development
+          	policyChoice=36
+          	;;
+          	3)
+          	echo "Selected: $policy3" #Mumbai Production
+          	policyChoice=40
+          	;;
+          	4)
+          	echo "Selected: $policy4" #OCI
+          	policyChoice=72
+          	;;
+          	5)
+          	echo "Selected: $policy5" #Azure
+          	policyChoice=71
+          	;;
+          	6)
+          	echo "mSelected: $policy6" #AWS
+          	policyChoice=74	
+          	;;
+          	*)
+          	echo "Selected: $policydefault" #Deployment (default)
+          	policyChoice=232
+          	;;
+          esac
+          echo -e "-------\e[0m"
+          return $policyChoice
+          }
+          
+          
+          
+          
+          
+          #---------------------------------------------------------------- Check Proxy
+          function checkProxy(){
+          #attempts to ping proxy, if failed reaching to gateways
+          	echo "[INFO] - Starting Proxy Connection test"
+          	echo "[INFO] - Test will attempt to identify the correct proxy to use for installation, please wait..."
+          	
+          	for IP in "${IPS[@]}";do
+          	echo "[INFO] - Checking connection to $IP..."
+          		if  curl -m 6 "$IP" | grep "<div" &> /dev/null ;then
+          			PROXY="$IP"
+          			echo -e "[SUCCESS] - Following Proxy Server will be used: \e[32m $PROXY \e[0m"
+          			echo -e "[INFO] - Installation will be done using \e[32m Proxy Server\e[0m"
+          			break	
+          		fi
+          	done
+          }
+          #---------------------------------------------------------------- Download DSM and  Install
+          function downloadDSM() {
+          if [[ $(/usr/bin/id -u) -ne 0 ]]; then
+              echo You are not running as the root user.  Please try again with root privileges.;
+              logger -t You are not running as the root user.  Please try again with root privileges.;
+              exit 1;
+          fi;
+          
+          if ! type curl >/dev/null 2>&1; then
+              echo "[INFO] - Please install CURL before running this script."
+              logger -t Please install CURL before running this script
+              exit 1
+          fi
+          
+          
+          if [[ -n "$PROXY" ]] ;then
+          	echo -e "\e[32m[SUCCESS] - PROXY Server connection established \e[0m"
+          	echo -e "[INFO] - Installing DSM Trend AV using Proxy: \e[32m $PROXY \e[0m"
+          curl -x $PROXY -L $MANAGERURL/software/deploymentscript/platform/linuxdetectscriptv1/ -o /tmp/PlatformDetection $CURLOPTIONS --insecure
+          else
+          echo "[INFO] - Server not able to reach Proxy Server or Service Gateway"
+          echo "[INFO] - Attempting to download throught direct connection"
+          curl -L $MANAGERURL/software/deploymentscript/platform/linuxdetectscriptv1/ -o /tmp/PlatformDetection $CURLOPTIONS --insecure
+          fi
+          
+          
+          if [ -s /tmp/PlatformDetection ]; then
+              . /tmp/PlatformDetection
+          else
+              echo -e "\e[31mFAILED] Failed to download the agent installation support script\e[0m"
+              logger -t Failed to download the Deep Security Agent installation support script
+              exit 1
+          fi
+          
+          platform_detect
+          if [[ -z "${linuxPlatform}" ]] || [[ -z "${isRPM}" ]]; then
+              echo Unsupported platform is detected
+              logger -t Unsupported platform is detected
+              exit 1
+          fi
+          
+          if [[ ${linuxPlatform} == *"SuSE_15"* ]]; then
+              if ! type pidof &> /dev/null || ! type start_daemon &> /dev/null || ! type killproc &> /dev/null; then
+                  echo Please install sysvinit-tools before running this script
+                  logger -t Please install sysvinit-tools before running this script
+                  exit 1
+              fi
+          fi
+          
+          #INSTALL DSM
+          if [[ $isRPM == 1 ]]; then package='agent.rpm'
+              else package='agent.deb'
+          fi
+          
+          if [[ -n "$PROXY" ]] ;then
+          	echo -e "\e[32m[SUCCESS] - PROXY Server connection established \e[0m"
+          	echo -e "[INFO] - Downloading & Installing DSM Trend AV using Proxy: \e[32m $PROXY \e[0m"
+          	echo -e "\e[33m~ . ~  ~ . ~  ~ . ~  ~ . ~  ~ . ~  PLEASE WAIT MAX 5 MINS  ~ . ~  ~ . ~  ~ . ~  ~ . ~ ~ . ~ \e[0m"
+          		echo -e "\e[33m~ . ~  ~ . ~  ~ . ~ ~  ~ . ~ IF TAKES LONGER CANCEL and TRY AGAIN  ~ . ~  ~ . ~  ~ . ~  ~ . ~ ~ . ~ \e[0m"
+          curl -x $PROXY -H "Agent-Version-Control: on" -L $MANAGERURL/software/agent/${runningPlatform}${majorVersion}/${archType}/$package?tenantID=26905 -o /tmp/$package $CURLOPTIONS --insecure
+          else
+          echo "[INFO] - Attempting to download directly from the internet using local network gateway, without proxies"
+          curl -H "Agent-Version-Control: on" -L $MANAGERURL/software/agent/${runningPlatform}${majorVersion}/${archType}/$package?tenantID=26905 -o /tmp/$package $CURLOPTIONS --insecure
+          fi
+          
+          rc=1
+          if [[ $isRPM == 1 && -s /tmp/agent.rpm ]]; then
+              echo -e "\e[32m[INFO] - Installing Trend DSM Agent..."
+              echo -e "\e[32m[INFO] - Installation completed"
+              rpm -ihv /tmp/agent.rpm
+              rc=$?
+          elif [[ -s /tmp/agent.deb ]]; then
+              echo -e "\e[32m[INFO] - Installing Trend DSM Agent..."
+              dpkg -i /tmp/agent.deb
+              echo -e "\e[32m[INFO] - Installation completed"
+              rc=$?
+          else
+              echo -e "\e[31m[FAILED] Failed to download the agent package. Please make sure the package is imported in the Workload Security Manager\e[0m"
+              logger -t Failed to download the agent package. Please make sure the package is imported in the Workload Security Manager
+              exit 1
+          fi
+          if [[ ${rc} != 0 ]]; then
+              echo -e "\e[31m[FALED] Failed to install the agent package\e[0m"
+              logger -t Failed to install the agent package
+              exit 1
+          
+          fi
+          echo -e "\e[0m"
+          }
+          
+          #--------------------------------------------------------------------------- Activate DSM
+          function activateDSM() {
+          #Select the policy user has selected
+          POLICY="policyid:$policyChoice"
+          
+          #If Proxy variable has been set, install using proxy, otherwise install using gateway
+          if [[ $GTRES = "true" ]] ;then
+          	echo "[INFO] - Trend Service Gateway connection established"
+          	echo "[INFO] - Activating DSM Trend AV using Service gateway"
+          
+          	 #ACTIVATING DSM Agent using Service Gateway
+          	sudo /opt/ds_agent/dsa_control -r
+          	sudo /opt/ds_agent/dsa_control -x dsm_proxy://$GATEWAY_IP/
+          	sudo /opt/ds_agent/dsa_control -y relay_proxy://$GATEWAY_IP/
+          	sudo /opt/ds_agent/dsa_control -a $ACTIVATIONURL $TRENDID $TOKEN $POLICY $GROUP
+          	echo -e "\e[32m [INFO] - Deep Security Agent activation completed \e[0m"
+          	echo -e "\e[32m [INFO] - Initiating XDR Sensor download and activation \e[0m"
+          
+          elif [[ -n "$PROXY" ]] ;then
+          	echo -e "\e[32m[INFO] - PROXY Server connection established \e[0m"
+          	echo -e "[INFO] - Activating DSM Trend AV using Proxy: \e[32m $PROXY \e[0m"
+          	
+          	# ACTIVATING DSM Agent using Proxy
+          	sudo /opt/ds_agent/dsa_control -r
+          	sudo /opt/ds_agent/dsa_control -x dsm_proxy://$PROXY/
+          	sudo /opt/ds_agent/dsa_control -y relay_proxy://$PROXY/
+          	sudo /opt/ds_agent/dsa_control -a $ACTIVATIONURL $TRENDID $TOKEN $POLICY $GROUP
+          	echo -e "\e[32m [INFO] - Deep Security Agent activation completed \e[0m"
+          
+          else
+          	echo "Acivating DSM Agent without any proxy settings"
+          	sudo /opt/ds_agent/dsa_control -r
+          	sudo /opt/ds_agent/dsa_control -a $ACTIVATIONURL $TRENDID $TOKEN $POLICY $GROUP
+          	echo -e "\e[32m [INFO] - Deep Security Agent activation completed \e[0m"
+          
+          fi
+          
+          
+          sleep 5
+          }
+          
+          #----------------------------------------------------------------------- Download XDR Sensor
+          function downloadXDR(){
+          rm ./$package &> /dev/null
+          
+          
+          
+          if [[ -n "$PROXY" ]] ;then
+          	echo "[INFO] - Downloading XDR Sensor package throught Proxy Server..."
+          	curl -x $PROXY $dsmUrl -o ./$package --insecure
+          		if ls ./$package;then
+          		echo -e "\e[32m[INFO] - Download completed Successful \e[0m"
+          		tar -xvf $package
+          		chmod +x tmxbc
+          		else
+          			echo "[FAIL] - Failed to download XDR Package, please download manually from Trend portal"
+          			echo "[FAIL] - Script is  not ableee to continue with XDR Installation without package"
+          			echo "Exiting..."
+          		exit
+          		fi
+          
+          else
+          	echo -e "[INFO] - Attepting to downloading XDR Sensor package \e[32m directly from the internet using local gateway e[0m"	
+          
+          	curl $dsmUrl -o ./$package --insecure
+          		if ls ./$package;then
+          			echo -e "\e[32m[INFO] - Download completed Successful \e[0m"
+          		tar -xvf $package
+          		chmod +x tmxbc
+          
+          		else
+          			echo "[FAIL] - Failed to download XDR Package, please download manually from Trend portal"
+          			echo "[FAIL] - Script is  not ableee to continue with XDR Installation without package"
+          			echo "Exiting..."
+          		exit
+          		fi
+          
+          fi
+          }
+          #---------------------------------------------------------------- Uninstall XDR (not being used)
+          function uninstallXDR(){
+          sleep 2
+          if ls /opt/TrendMicro/EndpointBasecamp/bin/tmxbc &> /dev/null ;then
+          	echo -e "[INFO] - XDR already installed, initiating re-installation \e[0m"
+          	/opt/TrendMicro/EndpointBasecamp/bin/tmxbc uninstall
+          	echo -e "\e[32m[INFO] - XDR Uninstall completed, initiating re-installation... \e[0m"
+          else
+          	echo -e "\e[33m[INFO] - XDR not yet installed, starting installation \e[0m"
+          fi
+          }
+          
+          #--------------------------------------------------------------- Re-activate XDR Sensor
+          function reActivateXDR(){
+          sleep 2
+          if ls /opt/TrendMicro/EndpointBasecamp/bin/tmxbc &> /dev/null ;then
+          	echo -e "[INFO] - XDR already installed, initiating re-installation \e[0m"
+          	sudo /opt/TrendMicro/EndpointBasecamp/bin/tmxbc config set --proxyURL "http://$PROXY"
+          sleep 1
+          	echo "[INFO] XDR Sensors settings updated"
+          	sudo /opt/TrendMicro/EndpointBasecamp/bin/tmxbc show 
+          else
+          	echo -e "\e[33m[INFO] - XDR not yet installed, starting installation \e[0m"
+          fi
+          }
+          
+          
+          
+          
+          #---------------------------------------------------------------- Install XDR Sensor
+          function installXDR(){
+          echo "[INFO] - Initializing XDR Sensor Installation"
+          
+          
+          if [[ $GTRES == "true" ]] ; then
+          	#not able to reach the Service Gateway nor contact any of the proxies on list
+          	echo -e "[INFO] - Installing XDR Sensor with \e[32m Direct connection using Service Gateway $GATEWAY_IP \e[0m"
+          	echo -e "[INFO] Attempting to install XDR Sensor using default settings"	
+          	sudo ./tmxbc install --proxyURL "http://$GATEWAY_IP/"
+          	echo -e "\e[32m [INFO] - Deep Security Agent Activatated \e[0m"
+          	echo -e "\e[32m [INFO] - XDR Sensor installation completed \e[0m"
+          
+          elif [[ -n "$PROXY" ]]; then
+          	echo -e "[INFO] - Installing XDR Sensor using  \e[32m Proxy Server $PROXY \e[0m"
+          	sudo ./tmxbc install --proxyURL "http://$PROXY/"
+          	echo -e "\e[32m[INFO] - Deep Security Agent Installed and Acivated \e[0m"
+          	echo -e "\e[32m[INFO] - XDR Sensor Installed and Acivated \e[0m"
+          	
+          else
+          	
+          	echo "[INFO] - Server not able to communicate to none of proxies on list, or Service Gateway"	
+          	echo "[INFO] - Attempting to install using direct connection to the internet, if you have issues please raise a ticket to SWG Team "
+          	sudo ./tmxbc install
+          
+          fi
+          
+          }
+          
+          #---------------------------------- CHECK IF SUDO
+          function checkSudo() {
+          if [[ $(/usr/bin/id -u) -ne 0 ]]; then
+              echo -e "\e[31m[INFO] - You are not running as the root user.  Please try again with root privileges\e[0m"
+              echo -e "\e[31m[INFO] - You are not running as the root user.  Please try again with root privileges\e[0m"
+              exit 1;
+          fi;
+          }
+          
+          function checkServicesRunning(){
+          sleep 5
+          if systemctl is-active --quiet ds_agent; then
+          echo -e "\e[32m[INFO] - Deep Security Agent Installed and Acivated \e[0m"
+          fi
+          if systemctl is-active --quiet tmxbc; then
+          echo -e "\e[32m[INFO] - XDR Sensor Installed and Acivated \e[0m"
+          fi
+          }
+          
+          
+          function main(){
+          
+          	echo "[INFO] - Script START"
+                  policyChoice=74
+          #	pickupPolicy
+          #	checkGateway
+          	checkProxy
+          	downloadDSM
+          	sleep 10
+          	activateDSM
+          	downloadXDR
+          	uninstallXDR
+          	installXDR
+          	checkServicesRunning
+          	echo -e "\e[33m[INFO] - Script END\e[0m"
+          
+          }
+          
+          
+          # checkSudo
+          checkServices
+          #checkHostname
+          main
+
+          EOF
+        - chmod +x /tmp/trend_install.sh
+        - sudo /tmp/trend_install.sh
+
+  - name: InstallAVWindows
+    action: aws:runPowerShellScript
+    precondition:
+      StringEquals:
+        - platformType
+        - Windows
+    inputs:
+      runCommand:
+        - Write-Output "Starting Trend install..."
+        - New-Item -Path "C:\Temp" -ItemType Directory -Force
+        - |
+          # Require PowerShell 5.0 or later
+          
+          Write-Output "[INFO] Checking ds_agent installation and status"
+          $service = Get-Service -Name "ds_agent" -ErrorAction SilentlyContinue
+          if ($null -ne $service) {
+              if ($service.Status -eq 'Running') {
+                  Write-Output "[INFO] ds_agent is installed and running"
+                  exit 0
+              } else {
+                  Write-Output "[ERROR] ds_agent is installed but NOT running. Marking step as failed."
+                  exit 1
+              }
+          }
+          Write-Output "[INFO] ds_agent not installed. Continuing to installation"
+
+          clear-host
+          $scriptVersion = 1.9
+          [string]$hostname = hostname ; $hostname.ToUpper()
+          
+          
+          $wd = $env:TEMP
+          ##$wd = "C:\Users\Public"
+          #Check if Folder exist, if not create it.
+          Get-ChildItem $wd  -ErrorAction SilentlyContinue
+          if(!($?)){mkdir test -ErrorAction SilentlyContinue ; write-host "Creating Trend Installer Folder on $wd " -ForegroundColor Gray}
+          
+          
+          $dsmAgent = "$wd\Windows_TrendDSM.msi"
+          $logPath = "$wd\Trend Micro\Deep Security Agent\installer\dsa_install.log"
+          
+          $ociProxy = ("fp_proxy")
+          $proxyList = ("152.114.119.247", "10.102.123.101", "10.102.160.19", "trendproxy", "10.173.8.238")
+          $global:proxyIP =""
+          
+          #TREMD DSM VARIABLES
+          $tennantId = "tenantID:dummy-value"
+          $token = "token:dummy-value"
+          #$policy =  "policyid:147"
+          $group = "groupid:909"
+          $ACTIVATIONURL="dsm://agents.workload.de-1.cloudone.trendmicro.com:443/"
+          $relay = "relaygroupid:1"
+          #TREND XDR VARIABLES
+          $xdrSourceUrl="dummy-value"
+          $xdrAgent = "$wd\EndpointBasecamp.exe"
+          
+          
+          
+           #------------------------------------------------------------------------------------------------- END GLOBAL VARIABLES
+           #sub Function of CheckProxy and checkOci
+           #----------------------------------------- SUB-FUNCTIONS
+           function cleanupAfterUninstall {
+          $check = Get-ChildItem 'C:\Program Files\Trend Micro' -ErrorAction SilentlyContinue
+              #check if folder exist, if exsit take ownership, move file and delete folder, if dont exist do nothing
+              $file = "C:\Program Files\Trend Micro\Deep Security Agent\netagent\pattern\ptn_1.0.235-194fba\tmext_1.0.1.114\TMExtractor64.dll"
+             $fileExist =  Test-Path $file
+          Try{
+              if($?){
+              Move-Item $file "$env:temp" -ErrorAction SilentlyContinue
+              takeown /R /A /F 'C:\Program Files\Trend Micro'
+              Remove-Item -Recurse 'C:\Program Files\Trend Micro' -ErrorAction SilentlyContinue
+          
+          
+              if($fileExist)
+                 #check if folder was delete successful, if does move to next function, otherwise exit script
+                  { Write-Host "[INFO] - Please move the below file to a different location and run the script again"
+                    Write-Host $file -ForegroundColor Yellow
+          }
+          }
+          }#cls try
+          Catch{Write-Host "$(Get-Date -format T) [INFO] - CleanupAfterUninstall Catch" -ForegroundColor Gray}
+          }
+          
+          function innerCheck_new ($list,$port,$timeout=200) {
+          
+          forEach($ip in $list){
+          
+            $requestCallback = $state = $null
+            $client = New-Object System.Net.Sockets.TcpClient
+            $beginConnect = $client.BeginConnect($ip,$port,$requestCallback,$state)
+            Start-Sleep -milli $timeOut
+            if ($client.Connected) {  $global:proxyIp = "$ip" + ":$port" ; 
+                                      break  } 
+            else { #closed
+             }
+            
+            $client.Close()
+          
+          
+          }
+          
+          }
+          
+          function innerCheck($list,$port){
+          forEach($x in $list){
+          write-host "Checking connection to Proxy server: $x"
+          $check = Test-NetConnection $x -Port $port 
+          
+          if ($check.TcpTestSucceeded -eq $true) {Write-Host "$(Get-Date -format T) [SUCCESS] - Pinging $x successfull" -ForegroundColor Green
+                 $global:proxyIp= "$x"+":8080"
+                 break
+              } else {}#-close if   
+          }
+          
+          }
+          #------------------------------------------ END SUB-FUNCTIONS
+          function checkProxy{
+                  Write-Host "$(Get-Date -format T) [INFO] - Starting Proxy check..." -ForegroundColor Gray
+                  innerCheck -list $proxyList -port 8080
+          
+          }
+          function checkOciProxy{
+              if($proxyIP -eq $null -or $proxyIp -eq ""){
+                  Write-Host "$(Get-Date -format T) [INFO] - Starting OCI Proxy check..." -ForegroundColor Gray
+                  innerCheck -list $ociProxy -port 3128
+              }
+          }
+          function choosePolicy{
+          
+          $deploymentpolicy = 147
+          $mumbai = 148
+          $development = 152
+          $devConnect = 267
+          $production = 147
+          $domainController = 143
+          $aws              = 76
+          $azure            = 70
+          $oracle           = 73
+          $userOptions = @"
+          1 : Deployment Policy
+          2 : Mumbai Servers Policy
+          3 : Development Policy
+          4 : Connect Development Policy
+          5 : Production Policy
+          6 : Domain Controller
+          7 : AWS Policy
+          8 : Azure Policy
+          9 : Oracle Policy
+          "@
+          Write-Host "Select the policy that will be used on this server,if you are not sure pelase contact a member of the SWG Team" -ForegroundColor Yellow
+          Write-Host $userOptions -ForegroundColor Yellow
+          Write-Host ""
+          $choice = Read-Host "Policy Choice"
+          
+          $policy = switch($choice){
+          1{$deploymentPolicy}
+          2{$mumbai}
+          3{$development}
+          4{$devConnect}
+          5{$production}
+          6{$domainController}
+          7{$aws}
+          8{$azure}
+          default{$deploymentpolicy}
+          }
+          return $policy
+          }
+          
+          
+          #----------------------------------------- START DSM FUNCTIONS
+          function downloadDSM{
+          $managerUrl="https://workload.de-1.cloudone.trendmicro.com:443/"
+          
+          
+          if ( [intptr]::Size -eq 8 ) { 
+             $sourceUrl=-join($managerUrl, "software/agent/Windows/x86_64/agent.msi") }
+          else {
+             $sourceUrl=-join($managerUrl, "software/agent/Windows/i386/agent.msi") }
+          Write-Host "$(Get-Date -format T) [INFO] - Download Deep Security Agent Package" $sourceUrl -ForegroundColor Gray
+          
+          
+          
+          
+          
+              $WebClient = New-Object System.Net.WebClient
+          
+              if ($proxyIP -eq "" -or $proxyIP -eq $null){
+                  sleep -Seconds 2
+                  Write-Host "$(Get-Date -format T) [INFO] - Attempting to download directly from the internet"  -ForegroundColor Gray
+          
+              }
+              elseif($proxyIP -ne ""){
+                  sleep -Seconds 2
+                  Write-Host "$(Get-Date -format T) [SUCCESS] - ProxyIP is $proxyIP" -ForegroundColor Green
+                  Write-Host "$(Get-Date -format T) [INFO] - Downloading DSM agent using Proxy Server: $proxyIp" -ForegroundColor Gray
+                  $WebProxy = New-Object System.Net.WebProxy($proxyIP, $true)
+                  $WebClient.Proxy = $WebProxy
+              }
+          # Add agent version control info
+          $WebClient.Headers.Add("Agent-Version-Control", "on")
+          $WebClient.QueryString.Add("tenantID", "26905")
+          $WebClient.QueryString.Add("windowsVersion", (Get-CimInstance Win32_OperatingSystem).Version)
+          $WebClient.QueryString.Add("windowsProductType", (Get-CimInstance Win32_OperatingSystem).ProductType)
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12;
+          [Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
+          Write-Host "$(Get-Date -format T) [INFO] - Downloading DSM Agent..." -ForegroundColor Gray
+          $WebClient.DownloadFile($sourceUrl,  $dsmAgent)
+          Write-Host "$(Get-Date -format T) [INFO] - Downloading XDR Agent..." -ForegroundColor Gray
+          $WebClient.DownloadFile($xdrSourceUrl,  $xdrAgent)
+          } # not used for golden image (already done)
+          function checkDownloadDSM{
+          $size = $dsmAgent.Length
+              if ( $size -eq 0 ) {
+                  echo "$(Get-Date -format T) [FAILED] - to download the Deep Security Agent. Please check if the package is imported into the Workload Security Manager. "
+               exit 1
+              }
+              else{Write-Host "$(Get-Date -format T) [SUCCESS] - DSM agent download completed successfully" -ForegroundColor Green}
+          } # not used for golden image (already done)
+          function checkDownloadXDR{
+          $size = $xdrAgent.Length
+              if ( $size -eq 0 ) {
+                  echo "$(Get-Date -format T) [FAILED] - to download the XDR Sensor component. Please contact a member of SWG Team to finish the adding the XDR component to the server."
+               exit 1
+              }
+              else{Write-Host "$(Get-Date -format T) [SUCCESS] - XDR Sensor Download completed successfully" -ForegroundColor Green}
+          } # not used for golden image (already done)
+          
+          function installDSM{
+          echo "$(Get-Date -format T) - DSA install started"
+          echo "$(Get-Date -format T) - Installer Exit Code:" (Start-Process -FilePath msiexec -ArgumentList "/i $dsmAgent /qn ADDLOCAL=ALL /l*v `"$env:LogPath\dsa_install.log`"" -Wait -PassThru).ExitCode 
+          } # not used for golden image (already done)
+          
+          function activateDSM{
+          Start-Sleep -s 50
+          
+          if ($proxyIP -eq "" -or $proxyIP -eq $null) {
+              Write-Host "$(Get-Date -format T) [INFO] - Activating DSM with direct connection to the internet" -ForegroundColor Gray
+              & $Env:ProgramFiles"\Trend Micro\Deep Security Agent\dsa_control" -r
+              & $Env:ProgramFiles"\Trend Micro\Deep Security Agent\dsa_control" -a $ACTIVATIONURL $tennantId $token $policy $group
+          
+              }
+          
+          elseif($proxyIP -ne ""){
+              Write-Host "$(Get-Date -format T) [INFO] - Activating DSM Agent using Proxy Server $proxyIP" -ForegroundColor Gray
+              Start-Sleep -s 50
+              & $Env:ProgramFiles"\Trend Micro\Deep Security Agent\dsa_control" -r
+              & $Env:ProgramFiles"\Trend Micro\Deep Security Agent\dsa_control" -x ([string]::Format("dsm_proxy://{0}/", $proxyIP))
+              & $Env:ProgramFiles"\Trend Micro\Deep Security Agent\dsa_control" -y ([string]::Format("relay_proxy://{0}/", $proxyIP))
+              & $Env:ProgramFiles"\Trend Micro\Deep Security Agent\dsa_control" -a $ACTIVATIONURL $tennantId $token $policy $group $relay
+          
+              }
+          
+          }
+          
+          
+          #----------------------------------------- END DSM FUNCTIONS
+          
+          
+          
+          #----------------------------------------- START XDR FUNCTIONS
+          function install_and_ActivateXDR{
+          $command = "/proxy_server_port " + $proxyIP
+          Write-Host "$(Get-Date -format T) [INFO] - Acttivating XDR Sensor with $(Get-Date -format T)$command"
+              if($proxyIP -eq "" -or $proxyIP -eq $null){
+                  Write-Host "$(Get-Date -format T) [INFO] - Initializing XDR Sensor installer with direct connection to internet" -ForegroundColor Gray
+                  Start-Process -FilePath $xdrAgent
+                  Write-Host "$(Get-Date -format T) [INFO] - Installation completed." -ForegroundColor Gray
+          
+              }
+              elseif($proxyIP -ne "" -or $proxyIP -ne $null){
+                  Write-Host "$(Get-Date -format T) [INFO] - Initializing XDR Sensor installer using Proxy Server settings" -ForegroundColor Gray
+                  Start-Process -FilePath $xdrAgent -ArgumentList $command
+                  Write-Host "$(Get-Date -format T) [INFO] - Installation completed." -ForegroundColor Gray
+              }
+          }
+          function checkXDRInstallation{
+              Start-Sleep -Seconds 1
+              $xdrExe =  'C:\Program Files (x86)\Trend Micro\Endpoint Basecamp\EndpointBasecamp.exe'
+              $size =  $xdrExe.length
+              if($size -eq 0){Write-Host "[FAILED] - XDR Installation or Activation failed, please contact a member of the SWG Team to continue the installation." -ForegroundColor Red }
+              else{ Write-Host "$(Get-Date -format T) [SUCCESS] - XDR installation completed successfull, server should appear on Trend Management console over next 5 minutes" -ForegroundColor green}
+          }
+          
+          #----------------------------------------- END XDR FUNCTIONS
+          
+          
+          
+          
+          
+          #---------------------------------------------------------SCRIPT MAIN
+          Write-Host "$(Get-Date -format T) [INFO]----------------------SCRIPT START----------------------" -ForegroundColor Gray;Start-Sleep -Milliseconds 50
+          Write-Host "$(Get-Date -format T) [INFO] Trend Installation $scriptVersion starting on $hostname" -ForegroundColor Yellow
+          
+          $policyNumber = choosePolicy
+          $policy = "policyid:$policyNumber"
+          #$policy = "policyid:147" # Production 152 / Development 152
+          cleanupAfterUninstall
+          checkProxy
+          checkOciProxy
+          downloadDSM
+          checkDownloadDSM
+          checkDownloadXDR
+          installDSM
+          activateDSM
+          install_and_ActivateXDR
+          checkXDRInstallation
+          Write-host "$(Get-Date -format T) Log file can be found at $wd" -ForegroundColor Yellow
+          Write-Host "$(Get-Date -format T) Script END" -ForegroundColor Yellow
