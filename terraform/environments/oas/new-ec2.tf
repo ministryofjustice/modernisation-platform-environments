@@ -51,7 +51,7 @@ resource "tls_private_key" "kali_ssh_key" {
 resource "aws_key_pair" "kali_key_pair" {
   count     = local.environment == "preproduction" ? 1 : 0
   key_name   = "${local.application_name}-kali-key"
-  public_key = tls_private_key.kali_ssh_key.public_key_openssh
+  public_key = tls_private_key.kali_ssh_key[0].public_key_openssh
 }
 
 resource "aws_secretsmanager_secret" "kali_ssh_private_key" {
@@ -62,10 +62,10 @@ resource "aws_secretsmanager_secret" "kali_ssh_private_key" {
 
 resource "aws_secretsmanager_secret_version" "kali_ssh_private_key_version" {
   count     = local.environment == "preproduction" ? 1 : 0
-  secret_id     = aws_secretsmanager_secret.kali_ssh_private_key.id
+  secret_id     = aws_secretsmanager_secret.kali_ssh_private_key[0].id
   secret_string = jsonencode({
-    private_key = tls_private_key.kali_ssh_key.private_key_openssh
-    public_key  = tls_private_key.kali_ssh_key.public_key_openssh
+    private_key = tls_private_key.kali_ssh_key[0].private_key_openssh
+    public_key  = tls_private_key.kali_ssh_key[0].public_key_openssh
   })
 }
 
