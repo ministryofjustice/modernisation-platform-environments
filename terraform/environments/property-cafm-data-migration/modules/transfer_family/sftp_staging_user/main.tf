@@ -45,7 +45,6 @@ resource "aws_transfer_user" "this" {
   }
 }
 
-# --- User-specific Resources ---
 data "aws_iam_policy_document" "sftp_user_policy" {
   statement {
     sid       = "ListBucket"
@@ -60,34 +59,22 @@ data "aws_iam_policy_document" "sftp_user_policy" {
   }
 
   statement {
-    sid    = "FullAccessToUserFolder"
+    sid    = "ReadOnlyAccessToUserFolder"
     effect = "Allow"
     actions = [
       "s3:GetObject",
-      "s3:PutObject",
-      "s3:DeleteObject",
-      "s3:GetObjectTagging",
-      "s3:PutObjectTagging",
-      "s3:AbortMultipartUpload",
-      "s3:ListMultipartUploadParts",
-      "s3:PutObjectAcl"
+      "s3:GetObjectTagging"
     ]
     resources = ["arn:aws:s3:::${var.s3_bucket}/${var.user_name}/*"]
   }
 
   statement {
-    sid    = "KMSAccessForEncryptedS3"
+    sid    = "KMSDecryptForEncryptedS3"
     effect = "Allow"
     actions = [
-      "kms:Encrypt",
       "kms:Decrypt",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*",
       "kms:DescribeKey"
     ]
-    resources = [
-      var.kms_key_arn
-    ]
+    resources = [var.kms_key_arn]
   }
 }
-

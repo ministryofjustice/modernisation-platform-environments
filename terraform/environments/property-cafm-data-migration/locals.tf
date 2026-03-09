@@ -42,6 +42,40 @@ locals {
       if user.environment == local.environment
     }
   }
+  # Staging SFTP users — scoped to a specific directory on the staging bucket, read-only
+  sftp_staging_user_list = [
+    {
+      environment  = "development"
+      user_name    = "LotTest"
+      s3_bucket    = "property-datahub-staging-development"
+      ssm_key_name = "/sftp/keys/LotTest"
+    },
+    {
+      environment  = "preproduction"
+      user_name    = "LotTest"
+      s3_bucket    = "property-datahub-staging-preproduction"
+      ssm_key_name = "/sftp/keys/LotTest"
+    },
+    {
+      environment  = "production"
+      user_name    = "LotTest"
+      s3_bucket    = "property-datahub-staging-production"
+      ssm_key_name = "/sftp/keys/LotTest"
+    }
+  ]
+
+  environment_configuration_staging = {
+    transfer_server_sftp_users = {
+      for user in local.sftp_staging_user_list :
+      user.user_name => {
+        user_name    = user.user_name
+        s3_bucket    = user.s3_bucket
+        ssm_key_name = user.ssm_key_name
+      }
+      if user.environment == local.environment
+    }
+  }
+
   environment_map = {
     "production"    = "prod"
     "preproduction" = "preprod"

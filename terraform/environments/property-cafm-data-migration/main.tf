@@ -84,7 +84,7 @@ module "server" {
 # Transfer User
 # ------------------------
 module "sftp_user" {
-  source   = "./modules/transfer_family/users"
+  source   = "./modules/transfer_family/sftp_user"
   for_each = local.environment_configuration.transfer_server_sftp_users
 
   user_name   = each.value.user_name
@@ -96,6 +96,24 @@ module "sftp_user" {
 
 data "aws_ssm_parameter" "ssh_keys" {
   for_each = local.environment_configuration.transfer_server_sftp_users
+  name     = each.value.ssm_key_name
+}
+
+# ------------------------
+# Staging SFTP User (read-only, scoped to LotTest directory)
+# ------------------------
+module "sftp_staging_user" {
+  source   = "./modules/transfer_family/sftp_staging_user"
+  for_each = local.environment_configuration_staging.transfer_server_sftp_users
+
+  user_name   = each.value.user_name
+  server_id   = module.server.id
+  s3_bucket   = each.value.s3_bucket
+  kms_key_arn = aws_kms_key.shared_kms_key.arn
+}
+
+data "aws_ssm_parameter" "staging_ssh_keys" {
+  for_each = local.environment_configuration_staging.transfer_server_sftp_users
   name     = each.value.ssm_key_name
 }
 
