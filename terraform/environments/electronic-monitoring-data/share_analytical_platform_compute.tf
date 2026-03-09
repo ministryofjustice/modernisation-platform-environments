@@ -25,6 +25,10 @@ locals {
     "validation",
     "metrics",
     "check",
+    "acquisitive_crime_data_science",
+    "acquisitive_crime_developer",
+    "data_insights_data_science",
+    "data_insights_developer",
   ]
   live_feeds_dbs = [
     "allied_mdss",
