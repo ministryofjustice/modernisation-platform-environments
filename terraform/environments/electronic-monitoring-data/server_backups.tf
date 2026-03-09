@@ -9,7 +9,7 @@ resource "aws_secretsmanager_secret" "db_password" {
 }
 
 resource "aws_secretsmanager_secret_version" "db_password" {
-  count         = local.is-production || local.is-development ? 1 : 0
+  count         = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
   secret_id     = aws_secretsmanager_secret.db_password[0].id
   secret_string = random_password.random_password.result
 }
