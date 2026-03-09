@@ -4,7 +4,7 @@ locals {
 
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "rds_bastion" {
-  count  = local.is-production || local.is-development ? 1 : 0
+  count  = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
   source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=1eaf3c9"
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -39,7 +39,7 @@ module "rds_bastion" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "access_ms_sql_server" {
-  count = local.is-production || local.is-development ? 1 : 0
+  count = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
 
   security_group_id = module.rds_bastion[0].bastion_security_group
   description       = "EC2 MSSQL Access"
@@ -50,7 +50,7 @@ resource "aws_vpc_security_group_egress_rule" "access_ms_sql_server" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "vpc_access" {
-  count = local.is-production || local.is-development ? 1 : 0
+  count = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
 
   security_group_id = module.rds_bastion[0].bastion_security_group
   description       = "Reach vpc endpoints"
@@ -61,7 +61,7 @@ resource "aws_vpc_security_group_egress_rule" "vpc_access" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "rds_via_vpc_access" {
-  count = local.is-production || local.is-development ? 1 : 0
+  count = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
 
   security_group_id            = aws_security_group.db[0].id
   description                  = "EC2 instance connection to RDS"
@@ -95,7 +95,7 @@ data "aws_iam_policy_document" "ec2_s3_policy" {
 }
 
 resource "aws_iam_role_policy" "ec2_s3_policy" {
-  count = local.is-production || local.is-development ? 1 : 0
+  count = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
 
   name   = "ec2-s3-policy"
   role   = module.rds_bastion[0].bastion_iam_role.name
