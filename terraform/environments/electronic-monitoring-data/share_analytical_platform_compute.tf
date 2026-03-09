@@ -46,7 +46,7 @@ locals {
     "g4s_lcm_archive",
     "g4s_tasking",
     "scram_alcohol_monitoring",
-  ] : local.is-preproduction ? [
+    ] : local.is-preproduction ? [
     "g4s_cap_dw",
   ] : local.is-development ? ["test"] : []
 
