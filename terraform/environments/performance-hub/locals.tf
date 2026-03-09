@@ -1,4 +1,5 @@
 locals {
+  
   domain_types = try({ for dvo in aws_acm_certificate.external[0].domain_validation_options : dvo.domain_name => {
     name   = dvo.resource_record_name
     record = dvo.resource_record_value
