@@ -44,7 +44,8 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
           # EU inference profiles (routes only within EU regions)
           "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/eu.anthropic.claude-opus-4-6-v1",
           "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/eu.anthropic.claude-sonnet-4-6",
-          "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/eu.anthropic.claude-opus-4-5-20251101-v1:0"
+          "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/eu.anthropic.claude-opus-4-5-20251101-v1:0",
+          "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/eu.anthropic.claude-haiku-4-5-20251001-v1:0"
         ]
       },
       {
