@@ -83,26 +83,26 @@ resource "aws_lb_listener" "ssogen_internal_app_listener" {
 }
 
 
-resource "aws_lb_listener" "ssogen_internal_console_listener" {
-  count             = local.is-development || local.is-test ? 1 : 0
-  load_balancer_arn = aws_lb.ssogen_alb[count.index].arn
-  port              = "7001"
-  protocol          = "HTTP"
-  # ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-  # certificate_arn   = aws_acm_certificate.external.arn
+# resource "aws_lb_listener" "ssogen_internal_console_listener" {
+#   count             = local.is-development || local.is-test ? 1 : 0
+#   load_balancer_arn = aws_lb.ssogen_alb[count.index].arn
+#   port              = "7001"
+#   protocol          = "HTTP"
+#   # ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+#   # certificate_arn   = aws_acm_certificate.external.arn
 
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.ssogen_internal_tg_ssogen_console[count.index].arn
-  }
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.ssogen_internal_tg_ssogen_console[count.index].arn
+#   }
 
-  # depends_on = [aws_acm_certificate_validation.external_nonprod]
-}
+#   # depends_on = [aws_acm_certificate_validation.external_nonprod]
+# }
 
 resource "aws_lb_listener_rule" "ssogen_internal_console_listener_encrypted" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count        = local.is-development || local.is-test ? 1 : 0
   listener_arn = aws_lb_listener.ssogen_internal_app_listener[count.index].arn
-  priority          = 10
+  priority     = 10
 
   action {
     type             = "forward"
