@@ -111,7 +111,7 @@ resource "aws_lb_listener_rule" "ssogen_internal_console_listener_encrypted" {
 
   condition {
     path_pattern {
-      values = ["/console*"]
+      values = ["/console/*"]
     }
   }
 }
