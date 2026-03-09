@@ -25,7 +25,7 @@ locals {
     "validation",
     "metrics",
     "check",
-    "acquisitive_crime,
+    "acquisitive_crime",
     "data_insights",
   ]
   live_feeds_dbs = [
