@@ -48,6 +48,7 @@ locals {
     "scram_alcohol_monitoring",
   ] : local.is-preproduction ? [
     "g4s_cap_dw",
+    "g4s_emsys_tpims",
   ] : local.is-development ? ["test"] : []
 
   prod_dbs_to_grant = [
