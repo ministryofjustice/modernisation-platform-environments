@@ -13,12 +13,12 @@ data "aws_iam_policy_document" "genesys_ap_airflow" {
       "s3:PutObjectTagging"
     ]
     resources = [
-      module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket.arn,
-      "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket.arn}/*",
-      module.s3_bucket_landing_archive_ingestion_curated["call-centre-archive-"].bucket.arn,
-      "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-archive-"].bucket.arn}/*",
-      module.s3_bucket_staging.bucket.arn,
-      "${module.s3_bucket_staging.bucket.arn}/*",
+      module.rawhist_curated["raw-hist"].bucket.arn,
+      "${module.rawhist_curated["raw-hist"].bucket.arn}/*",
+      module.rawhist_curated["curated"].bucket.arn,
+      "${module.rawhist_curated["curated"].bucket.arn}/*",
+      module.s3_bucket_land.bucket.arn,
+      "${module.s3_bucket_land.bucket.arn}/*",
     ]
   }
 }
@@ -61,11 +61,12 @@ data "aws_iam_policy_document" "p1_export_airflow" {
       "s3:CopyObject"
     ]
     resources = [
-      module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket.arn,
-      "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket.arn}/bronze/*",
-      "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket.arn}/silver/*",
-      module.s3_bucket_landing_archive_ingestion_curated["call-centre-archive-"].bucket.arn,
-      "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-archive-"].bucket.arn}/*"
+      module.rawhist_curated["raw-hist"].bucket.arn,
+      "${module.rawhist_curated["raw-hist"].bucket.arn}/*",
+      module.rawhist_curated["curated"].bucket.arn,
+      "${module.rawhist_curated["curated"].bucket.arn}/*",
+      module.rawhist_curated["curated"].bucket.arn,
+      "${module.rawhist_curated["curated"].bucket.arn}/*"
     ]
   }
   statement {
@@ -87,10 +88,12 @@ data "aws_iam_policy_document" "p1_export_airflow" {
       "s3:CopyObject"
     ]
     resources = [
-      module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket.arn,
-      "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket.arn}/*",
-      module.s3_bucket_landing_archive_ingestion_curated["call-centre-archive-"].bucket.arn,
-      "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-archive-"].bucket.arn}/*",
+      module.rawhist_curated["raw-hist"].bucket.arn,
+      "${module.rawhist_curated["raw-hist"].bucket.arn}/*",
+      module.rawhist_curated["curated"].bucket.arn,
+      "${module.rawhist_curated["curated"].bucket.arn}/*",
+      module.rawhist_curated["curated"].bucket.arn,
+      "${module.rawhist_curated["curated"].bucket.arn}/*",
     ]
   }
   statement {
@@ -128,9 +131,9 @@ module "load_genesys_opg_database" {
   environment        = local.environment
   database_name      = "genesys-opg"
   path_to_data       = "/genesys_opg"
-  source_data_bucket = module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket
+  source_data_bucket = module.rawhist_curated["curated"].bucket
   secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
-  athena_dump_bucket = module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket
-  cadt_bucket        = module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket
+  athena_dump_bucket = module.rawhist_curated["curated"].bucket
+  cadt_bucket        = module.rawhist_curated["curated"].bucket
 }
