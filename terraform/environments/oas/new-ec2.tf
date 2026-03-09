@@ -148,7 +148,7 @@ resource "aws_instance" "kali_app_instance_new" {
   subnet_id                   = data.aws_subnet.data_subnets_a.id
 
   instance_type               = "t2.micro"
-  key_name                    = aws_key_pair.kali_key_pair.key_name
+  key_name                    = aws_key_pair.kali_key_pair[0].key_name
   monitoring                  = true
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile_new[0].id
   user_data_replace_on_change = true
