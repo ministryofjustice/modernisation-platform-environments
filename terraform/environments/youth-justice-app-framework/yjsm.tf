@@ -83,6 +83,7 @@ module "yjsm" {
     for s in [
     module.aurora.app_rotated_postgres_secret_arn,
     aws_secretsmanager_secret.auto_admit_secret.arn,
+    aws_secretsmanager_secret.jwt_secret.arn,
     try(aws_secretsmanager_secret.yjsm_hub_doc_gateway_auth[0].arn, null)
     ] : s if s != null
   ])
