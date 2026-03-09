@@ -176,15 +176,15 @@ resource "helm_release" "karpenter" {
 #   }
 # }
 
-data "kubectl_path_documents" "manifests" {
-  pattern = "${path.module}/templates/*.yaml"
-  vars = {
-    alias_version = "v20260304"
-    cluster_name = module.eks[0].cluster_name
-  }
-}
+# data "kubectl_path_documents" "manifests" {
+#   pattern = "${path.module}/templates/*.yaml"
+#   vars = {
+#     alias_version = "v20260304"
+#     cluster_name = module.eks[0].cluster_name
+#   }
+# }
 
-resource "kubectl_manifest" "test" {
-    for_each  = data.kubectl_path_documents.manifests.manifests
-    yaml_body = each.value
-}
+# resource "kubectl_manifest" "test" {
+#     for_each  = data.kubectl_path_documents.manifests.manifests
+#     yaml_body = each.value
+# }
