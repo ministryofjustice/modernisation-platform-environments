@@ -9,7 +9,6 @@ import logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-
 secrets_client = boto3.client("secretsmanager")
 
 
@@ -38,7 +37,9 @@ def _pick_webhooks(secret_json: Dict[str, Any]) -> List[str]:
     if preferred_key:
         v = (secret_json.get(preferred_key) or "").strip()
         if not v:
-            raise ValueError(f"SLACK_WEBHOOK_KEY is set to '{preferred_key}' but the value is empty/missing in the secret.")
+            raise ValueError(
+                f"SLACK_WEBHOOK_KEY is set to '{preferred_key}' but the value is empty/missing in the secret."
+            )
         return [v]
 
     # First, grab known keys in stable order (so logs are predictable)
@@ -188,20 +189,20 @@ def lambda_handler(event, context):
 
     results = []
     for url in webhook_urls:
-      results.append(_post_to_slack(url, slack_text))
+        results.append(_post_to_slack(url, slack_text))
 
     logger.info(
-    "Slack notification results",
-    extra={
-        "slack_post_results": results,
-        "message_id": info.get("message_id"),
-        "timestamp": info.get("timestamp"),
-        "parsed": info.get("parsed"),
-    },
- )
+        "Slack notification results",
+        extra={
+            "slack_post_results": results,
+            "message_id": info.get("message_id"),
+            "timestamp": info.get("timestamp"),
+            "parsed": info.get("parsed"),
+        },
+    )
 
     # Fail only if ALL posts failed
     if not any(r.get("ok") for r in results):
-      raise RuntimeError(f"Slack post failed for all webhooks: {results}")
+        raise RuntimeError(f"Slack post failed for all webhooks: {results}")
 
     return {"statusCode": 200, "body": "Notification sent to Slack (all configured webhooks)"}
