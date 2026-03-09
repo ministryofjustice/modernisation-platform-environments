@@ -93,6 +93,7 @@ module "ecs" {
 
   secret_kms_key_arn = module.kms.key_arn
   ecs_secrets_access_policy_secret_arns = jsonencode([
+    for s in [
     module.aurora.app_rotated_postgres_secret_arn,
     aws_secretsmanager_secret.LDAP_administration_secret.arn,
     aws_secretsmanager_secret.LDAP_DC_secret.arn,
@@ -105,11 +106,12 @@ module "ecs" {
     aws_secretsmanager_secret.ordnance_survey_api.arn,
     aws_secretsmanager_secret.yjaf_credentials.arn,
     aws_secretsmanager_secret.jwt_secret.arn,
-    aws_secretsmanager_secret.document_gateway[0].arn,
-    aws_secretsmanager_secret.yjsm_hub_doc_gateway_auth[0].arn,
+    try(aws_secretsmanager_secret.document_gateway[0].arn, null),
+    try(aws_secretsmanager_secret.yjsm_hub_doc_gateway_auth[0].arn, null),
     module.redshift.returns_secret_arn,
     module.datadog.datadog_api_key_secret_arn,
     module.datadog.datadog_api_key_plain_secret_arn
+    ] : s if s != null
   ])
   ecs_role_additional_policies_arns = [
     aws_iam_policy.s3-access.arn,
