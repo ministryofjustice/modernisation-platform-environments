@@ -20,9 +20,9 @@ data "aws_iam_policy_document" "logging_bucket_policy" {
 
 # bucket names for landing, archive, ingestion annd curated
 variable "bucket_prefixes" {
-  description = "List of some genesys call centre related bucket prefixes"
+  description = "Bucket prefixes for raw-hist and curated buckets"
   type        = list(string)
-  default     = ["call-centre-landing-", "call-centre-archive-", "call-centre-ingestion-", "call-centre-curated-"]
+  default     = ["raw-hist", "curated"]
 }
 
 # tfsec:ignore:aws-s3-enable-logging - This is the logging bucket where logs are sent to
@@ -33,7 +33,7 @@ module "s3_bucket_logs" {
   providers = {
     aws.bucket-replication = aws
   }
-  bucket_prefix      = "call-centre-logs-"
+  bucket_prefix      = "logs"
   versioning_enabled = true
   ownership_controls = "BucketOwnerEnforced"
   bucket_policy      = [data.aws_iam_policy_document.logging_bucket_policy.json]
@@ -42,13 +42,13 @@ module "s3_bucket_logs" {
 }
 
 # tfsec:ignore:aws-s3-enable-logging - Logging is enabled on the bucket in the next resource
-module "s3_bucket_staging" {
+module "s3_bucket_land" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=11707a540d9ced11f8df4a8ed1547753dd3a0b7d"
 
   providers = {
     aws.bucket-replication = aws
   }
-  bucket_prefix      = "call-centre-staging-"
+  bucket_prefix      = "land"
   versioning_enabled = true
   ownership_controls = "BucketOwnerEnforced"
 
@@ -56,7 +56,7 @@ module "s3_bucket_staging" {
 }
 
 #tfsec:ignore:aws-s3-enable-logging - Logging is enabled on the bucket in the next resource
-module "s3_bucket_landing_archive_ingestion_curated" {
+module "s3_bucket_rawhist_curated" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=11707a540d9ced11f8df4a8ed1547753dd3a0b7d"
 
   for_each = toset(var.bucket_prefixes)
@@ -72,12 +72,12 @@ module "s3_bucket_landing_archive_ingestion_curated" {
   tags = local.tags
 }
 
-# Enable bucket server logging for the staging bucket
-resource "aws_s3_bucket_logging" "staging_bucket_logging" {
-  bucket = module.s3_bucket_staging.bucket.id
+# Enable bucket server logging for the land bucket
+resource "aws_s3_bucket_logging" "land_bucket_logging" {
+  bucket = module.s3_bucket_land.bucket.id
 
   target_bucket = module.s3_bucket_logs.bucket.id
-  target_prefix = "call-centre-staging"
+  target_prefix = "land"
 }
 
 # Data source for the member-access IAM role
@@ -86,13 +86,13 @@ data "aws_iam_role" "guardduty_malware_protection_role" {
   name = "GuardDutyS3MalwareProtectionRole"
 }
 
-# Create guardduty malware protection plan for the staging bucket
-resource "aws_guardduty_malware_protection_plan" "s3_bucket_staging" {
+# Create guardduty malware protection plan for the land bucket
+resource "aws_guardduty_malware_protection_plan" "s3_bucket_land" {
   role = data.aws_iam_role.guardduty_malware_protection_role.arn
 
   protected_resource {
     s3_bucket {
-      bucket_name = module.s3_bucket_staging.bucket.id
+      bucket_name = module.s3_bucket_land.bucket.id
     }
   }
 

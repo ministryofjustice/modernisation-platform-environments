@@ -117,17 +117,17 @@ data "aws_iam_policy_document" "p1_export_airflow" {
   }
 }
 
-module "load_genesys_laa_database" {
+module "load_genesys_opg_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
   # data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   # de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
 
-  name               = "genesys_laa"
+  name               = "genesys_opg"
   environment        = local.environment
-  database_name      = "genesys-laa"
-  path_to_data       = "/genesys_laa"
+  database_name      = "genesys-opg"
+  path_to_data       = "/genesys_opg"
   source_data_bucket = module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket
   secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
