@@ -388,6 +388,19 @@ resource "aws_vpc_security_group_ingress_rule" "ing_7777_from_alb" {
 }
 
 # #########################################
+# # SSOGEN Security Group — Allow inbound 4443 from ALB
+# #########################################
+
+resource "aws_vpc_security_group_ingress_rule" "ing_4443_from_alb" {
+  count                        = local.is-development || local.is-test ? 1 : 0
+  security_group_id            = aws_security_group.ssogen_sg[0].id
+  description                  = "Allow inbound HTTPS (4443) from SSOGEN internal ALB"
+  from_port                    = 4443
+  to_port                      = 4443
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
+}
+# #########################################
 # # SSOGEN Security Group — Allow inbound 7001 from ALB
 # #########################################
 
