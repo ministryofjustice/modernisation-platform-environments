@@ -67,6 +67,10 @@ resource "aws_api_gateway_method" "get_status" {
   resource_id   = aws_api_gateway_resource.execution_id[0].id
   http_method   = "GET"
   authorization = "AWS_IAM"
+  request_validator_id = aws_api_gateway_request_validator.request_validator.id
+  request_parameters = {
+    "method.request.path.execution_id" = true
+  }
 }
 
 # --------------------------------------------------------
