@@ -122,9 +122,16 @@ resource "aws_acm_certificate_validation" "external" {
   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
 }
 
-# original
-# resource "aws_acm_certificate_validation" "external" {
-#   count                   = local.is-production ? 0 : 1
-#   certificate_arn         = aws_acm_certificate.external[0].arn
+# resource "aws_acm_certificate_validation" "external_preprod" {
+#   count                   = local.is-preproduction ? 1 : 0
+#   certificate_arn         = aws_acm_certificate.external_preprod[0].cert_arn
+#   # what goes here?
+#   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+# }
+
+# resource "aws_acm_certificate_validation" "external_prod" {
+#   count                   = local.is-production ? 1 : 0
+#   certificate_arn         = aws_acm_certificate.external_prod[0].cert_arn
+#   # what goes here?
 #   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
 # }
