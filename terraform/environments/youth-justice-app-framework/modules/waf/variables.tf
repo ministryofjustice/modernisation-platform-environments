@@ -101,6 +101,7 @@ variable "kms_key_id" {
 variable "private_subnet_cidrs" {
   type        = list(string)
   description = "List of private subnet CIDR blocks."
+  default     = []
 }
 
 
