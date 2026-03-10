@@ -31,7 +31,18 @@ resource "aws_security_group_rule" "ecs_to_yjsm_external" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.yjsm_service.id
   source_security_group_id = var.ecs_service_external_sg_id
-  description              = "ECS external to YJSMHub"
+  description              = "ECS external to YJSM-Hub"
+}
+
+# (ECS external to YJSMhub)
+resource "aws_security_group_rule" "ecs_to_yjsm_external" {
+  type                     = "ingress"
+  from_port                = 8401
+  to_port                  = 8401
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.yjsm_service.id
+  source_security_group_id = var.ecs_service_external_sg_id
+  description              = "ECS external to YJSM-Hub-Admin"
 }
 
 # (ECS internal to YJSM)
@@ -53,7 +64,7 @@ resource "aws_security_group_rule" "ecs_to_yjsmhub_internal" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.yjsm_service.id
   source_security_group_id = var.ecs_service_internal_sg_id
-  description              = "ECS internal to YJSMHub"
+  description              = "ECS internal to YJSM-Hub"
 }
 
 # (ECS internal to YJSMhub-admin)
@@ -64,7 +75,7 @@ resource "aws_security_group_rule" "ecs_to_yjsmhub_admin" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.yjsm_service.id
   source_security_group_id = var.ecs_service_internal_sg_id
-  description              = "ECS internal to YJSMHub-admin"
+  description              = "ECS internal to YJSM-Hub-admin"
 }
 
 # (ECS internal to ASSETS)
