@@ -29,7 +29,7 @@ resource "aws_instance" "kali_app_instance_new" {
   root_block_device {
     delete_on_termination = true
     encrypted             = true
-    volume_size           = 20
+    volume_size           = 30
     volume_type           = "gp3"
 
     tags = merge(
