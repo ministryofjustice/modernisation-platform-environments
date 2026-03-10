@@ -81,7 +81,7 @@
       "friendly_name": "HMPPS Performance Hub",
       "app_db_name": "NomsPMU_Live",
       "memebership_db_name": "Membership_Live",
-      "cert_arn": "e0485248-782a-40b6-8f73-e4f641b577bd",
+      "cert_arn": "525ea8e7-c847-4e8a-bfe4-ad4fc413932f",
       "hub_wwwroot": "C:/inetpub/wwwroot"
     }
   }
