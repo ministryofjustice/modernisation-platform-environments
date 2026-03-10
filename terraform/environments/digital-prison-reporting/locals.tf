@@ -73,7 +73,8 @@ locals {
 
   # Glue Job parameters
   glue_placeholder_script_location = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
-  glue_jobs_latest_jar_location    = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
+  glue_job_jar_name                = local.application_data.accounts[local.environment].glue_job_jar_name
+  glue_jobs_jar_location           = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/${local.glue_job_jar_name}"
   glue_log_retention_in_days       = local.application_data.accounts[local.environment].glue_log_retention_in_days
 
   # Common Maintenance Job settings
@@ -446,6 +447,17 @@ locals {
     db_name            = "dps"
     password           = "placeholder"
     user               = "placeholder"
+    endpoint           = "0.0.0.0"
+    port               = "5432"
+    heartbeat_endpoint = "0.0.0.0"
+  }
+
+  probation_domains_list = local.application_data.accounts[local.environment].probation_domains
+  probation_secrets_placeholder = {
+    db_name            = "dps"
+    password           = "placeholder"
+    user               = "placeholder"
+    username           = "placeholder"
     endpoint           = "0.0.0.0"
     port               = "5432"
     heartbeat_endpoint = "0.0.0.0"

@@ -3,8 +3,8 @@ resource "aws_datasync_task" "opg" {
   count = local.environment == "production" ? 1 : 0
 
   name                     = "opg"
-  source_location_arn      = aws_datasync_location_smb.opg.arn
-  destination_location_arn = aws_datasync_location_s3.opg.arn
+  source_location_arn      = aws_datasync_location_smb.opg[0].arn
+  destination_location_arn = aws_datasync_location_s3.opg[0].arn
   cloudwatch_log_group_arn = module.datasync_task_logs.cloudwatch_log_group_arn
 
   options {
@@ -33,7 +33,7 @@ resource "aws_datasync_task" "opg" {
     s3_object_versioning = "INCLUDE"
 
     s3_destination {
-      bucket_access_role_arn = module.datasync_iam_role.iam_role_arn
+      bucket_access_role_arn = module.datasync_iam_role.arn
       s3_bucket_arn          = module.datasync_opg_bucket.s3_bucket_arn
     }
   }

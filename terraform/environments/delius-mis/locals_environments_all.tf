@@ -27,7 +27,15 @@ locals {
       general_shared = data.aws_kms_key.general_shared.arn
       rds_shared     = data.aws_kms_key.rds_shared.arn
     }
-    dns_suffix = "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+    dns_suffix                 = "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+    security_group_cidrs_staff = module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public
+    security_group_cidrs_mojo  = module.ip_addresses.moj_cidrs.trusted_mojo_public
+    security_group_cidrs_infrastructure = distinct(flatten([
+      module.ip_addresses.moj_cidr.ark_dc_external_internet,
+      module.ip_addresses.moj_cidr.vodafone_dia_networks,
+      module.ip_addresses.moj_cidr.palo_alto_prisma_access_corporate,
+      module.ip_addresses.moj_cidr.mojo_azure_landing_zone_egress,
+    ]))
   }
 
   platform_vars = {

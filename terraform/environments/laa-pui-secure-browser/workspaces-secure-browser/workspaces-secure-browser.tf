@@ -237,6 +237,7 @@ resource "aws_workspacesweb_browser_settings" "main" {
           "loginex.microsoftonline.com",
           "lsconline.legalservices.gov.uk",
           "map001_adfs.accessmycloudpc.com",
+          "ms-sso.copilot.microsoft.com",
           "mysignins.microsoft.com",
           "myworkspace.leighday.co.uk",
           "nexus.microsoftonline-p.com",

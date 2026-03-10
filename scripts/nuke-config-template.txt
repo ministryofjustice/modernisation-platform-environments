@@ -54,6 +54,7 @@ resource-types:
     - IAMUserPolicyAttachment
     - IAMUserSSHPublicKey
     - IAMVirtualMFADevice
+    - Inspector2
     - KMSAlias
     - KMSKey
     - OSPackage
@@ -65,6 +66,7 @@ resource-types:
     - S3Object
     - SecretsManagerSecret
     - SecurityHub
+    - SSMResourceDataSync
     - Transfer
     - WAFv2WebACL
     - WAFv2IPSet

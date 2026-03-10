@@ -25,6 +25,8 @@ locals {
     "validation",
     "metrics",
     "check",
+    "acquisitive_crime",
+    "data_insights",
   ]
   live_feeds_dbs = [
     "allied_mdss",
@@ -46,9 +48,12 @@ locals {
     "g4s_lcm_archive",
     "g4s_tasking",
     "scram_alcohol_monitoring",
+  ] : local.is-preproduction ? [
+    "g4s_cap_dw",
+    "g4s_emsys_tpims",
   ] : local.is-development ? ["test"] : []
 
-  prod_dbs_to_grant = local.is-production ? [
+  prod_dbs_to_grant = [
     "am_stg",
     "buddi_stg",
     "buddi_buddi",
@@ -84,12 +89,13 @@ locals {
     "staged_emsys_mvp",
     "staged_emsys_tpims",
     "staged_scram_alcohol_monitoring",
-  ] : []
+  ]
 
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
+  prod_dbt_dbs_to_grant  = flatten([[for db in local.prod_dbs_to_grant : "${db}${local.dbt_suffix}"], local.dev_dbs_to_grant])
   dbt_dbs_to_grant       = [for db in local.dbt_dbs : "${db}${local.dbt_suffix}"]
   live_feed_dbs_to_grant = [for db in local.live_feeds_dbs : "${db}${local.db_suffix}"]
-  dbs_to_grant           = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant, local.dbt_dbs_to_grant]))
+  dbs_to_grant           = toset(flatten([local.prod_dbt_dbs_to_grant, local.dbt_dbs_to_grant]))
 
 
   existing_dbs_to_grant = toset(flatten([local.live_feed_dbs_to_grant, local.historic_source_dbs]))
@@ -641,7 +647,6 @@ resource "aws_iam_role_policy_attachment" "analytical_platform_share_policy_atta
 }
 
 module "share_dbs_with_roles" {
-  count                   = local.is-development ? 0 : 1
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = local.dbs_to_grant
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
