@@ -48,7 +48,7 @@ resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_app" {
 
 resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_enc_app" {
   count       = local.is-development || local.is-test ? 1 : 0
-  name        = lower(format("tg-%s-app", local.application_name_ssogen))
+  name        = lower(format("tg-%s-enc-app", local.application_name_ssogen))
   port        = local.application_data.accounts[local.environment].tg_ssogen_apps_enc_port
   protocol    = "HTTPS"
   vpc_id      = data.aws_vpc.shared.id
