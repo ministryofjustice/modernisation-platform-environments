@@ -39,11 +39,11 @@ resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_app" {
     unhealthy_threshold = 3
   }
 
-  stickiness {
-    enabled         = true
-    type            = "lb_cookie"
-    cookie_duration = 3600
-  }
+  # stickiness {
+  #   enabled         = true
+  #   type            = "lb_cookie"
+  #   cookie_duration = 3600
+  # }
 }
 
 resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_enc_app" {
@@ -65,11 +65,11 @@ resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_enc_app" {
     unhealthy_threshold = 3
   }
 
-  stickiness {
-    enabled         = true
-    type            = "lb_cookie"
-    cookie_duration = 3600
-  }
+  # stickiness {
+  #   enabled         = true
+  #   type            = "lb_cookie"
+  #   cookie_duration = 3600
+  # }
 }
 
 resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_console" {
@@ -101,7 +101,7 @@ resource "aws_lb_listener" "ssogen_internal_app_listener" {
   certificate_arn   = data.aws_acm_certificate.external_ssogen[count.index].arn
 
   default_action {
-    type             = "forward"
+    type = "forward"
 
     forward {
       target_group {
@@ -111,6 +111,10 @@ resource "aws_lb_listener" "ssogen_internal_app_listener" {
       target_group {
         arn    = aws_lb_target_group.ssogen_internal_tg_ssogen_enc_app[count.index].arn
         weight = 50
+      }
+      stickiness {
+        enabled  = true
+        duration = 3600
       }
     }
   }
@@ -147,7 +151,7 @@ resource "aws_lb_listener_rule" "ssogen_internal_console_listener_encrypted" {
 
   condition {
     path_pattern {
-      values = ["/console*","/console/","/console/*"]
+      values = ["/console*", "/console/", "/console/*"]
     }
   }
 }
