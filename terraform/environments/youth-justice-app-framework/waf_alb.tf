@@ -65,3 +65,9 @@ module "waf" {
     }
   ]
 }
+
+variable "private_subnet_cidrs" {
+  type        = list(string)
+  description = "List of private subnet CIDR blocks."
+  default     = []
+}
