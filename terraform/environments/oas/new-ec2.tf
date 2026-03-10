@@ -83,9 +83,7 @@ locals {
 
 
 locals {
-  userdata_kali = replace(
-    file("${path.module}/files/kali-userdata.sh")
-  )
+  userdata_kali = file("${path.module}/files/kali-userdata.sh")
 }
 
 
