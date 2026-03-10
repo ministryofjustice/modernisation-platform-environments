@@ -2,7 +2,7 @@ locals {
   camel_case_api_name  = join("", [for word in split("_", var.api_name) : title(word)])
   # Set some vars based on if sfn is standard or express type
   sync              = lower(var.sfn_type) == "express" ? "Sync" : ""
-  status_int_get    = lower(var.sfn_type) == "express" ? "express" : "execution"
+  sfn_arn_type      = lower(var.sfn_type) == "express" ? "express" : "execution"
   express_response  = <<EOF
 #set ($parsedPayload = $util.parseJson($input.json('$.output')))
 $parsedPayload
@@ -118,7 +118,7 @@ data "aws_iam_policy_document" "trigger_step_function_policy" {
     effect    = "Allow"
     resources = [
       var.step_function.arn,
-      "${replace(var.step_function.arn, "stateMachine", local.status_int_get)}:*"
+      "${replace(var.step_function.arn, "stateMachine", local.sfn_arn_type)}:*"
     ]
   }
 }
@@ -175,7 +175,7 @@ resource "aws_api_gateway_integration" "status_integration" {
   request_templates = {
     "application/json" = <<EOF
 {
-  "executionArn": "${replace(var.step_function.arn, "stateMachine", local.status_int_get)}:$input.params('execution_id')"
+  "executionArn": "${replace(var.step_function.arn, "stateMachine", local.sfn_arn_type)}:$input.params('execution_id')"
 }
 EOF
   }
@@ -280,7 +280,8 @@ resource "aws_api_gateway_integration_response" "status_integration_response" {
   response_templates = {
     "application/json" = <<EOF
 #set($input = $input.path('$'))
-#if($input.get("__type").contains("ExecutionDoesNotExist"))
+#set($type = $input.get("__type"))
+#if($type && $type.contains("ExecutionDoesNotExist"))
     #set($context.responseOverride.status = 404)
     {
       "error": "NotFound",
