@@ -4,7 +4,7 @@ locals {
   sync              = lower(var.sfn_type) == "express" ? "Sync" : ""
   sfn_arn_type      = lower(var.sfn_type) == "express" ? "express" : "execution"
   express_response  = <<EOF
-#set ($parsedPayload = $util.parseJson($input.json('$.output')))
+#set ($parsedPayload = $util.parseJson($input.json('$..output')))
 $parsedPayload
 EOF
   standard_response = <<EOF
