@@ -152,6 +152,7 @@ resource "aws_glue_catalog_table_optimizer" "standard_orphan_file_deletion" {
 data "aws_iam_policy_document" "glue_table_optimizer_assume_role_policy" {
     statement {
         effect = "Allow"
+        actions = ["sts:AssumeRole"]
         principals {
             type        = "Service"
             identifiers = ["glue.amazonaws.com"]
