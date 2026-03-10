@@ -1,5 +1,5 @@
 resource "aws_macie2_account" "macie_unstructured_spike" {
-  status = "ENABLED"
+  status = "PAUSED"
 }
 
 
