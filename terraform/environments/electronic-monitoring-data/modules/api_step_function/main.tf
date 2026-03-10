@@ -285,14 +285,13 @@ resource "aws_api_gateway_integration_response" "status_integration_response" {
     #set($context.responseOverride.status = 404)
     {
       "error": "NotFound",
-      "cause": "The Step Function execution with the provided ID does not exist.",
-      "execution_id": "$input.params('execution_id')"
+      "cause": "Step Function execution with the provided ID does not exist."
     }
 #else
     {
       "execution_id": "$input.name",
       "status": "$input.status",
-      "startDate": "$input.startDate",
+      "startDate": "$util.formatDate($input.startDate, 'yyyy-MM-dd HH:mm:ss')",
       #if($input.status == "SUCCEEDED")
         "output": $input.output
       #elseif($input.status == "FAILED")
