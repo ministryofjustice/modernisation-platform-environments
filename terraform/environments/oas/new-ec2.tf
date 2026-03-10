@@ -83,7 +83,7 @@ locals {
 
 
 locals {
-  userdata_kali = file("${path.module}/files/kali-userdata.sh")
+  userdata_kali = file("${path.module}/files/kali-ec2-update.sh")
 }
 
 
