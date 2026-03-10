@@ -290,8 +290,7 @@ resource "aws_api_gateway_integration_response" "status_integration_response" {
 #else
     {
       "execution_id": "$input.name",
-      "status": "$input.status",
-      "startDate": "$util.formatDate($input.startDate, 'yyyy-MM-dd HH:mm:ss')",
+      "status": "$input.status"
       #if($input.status == "SUCCEEDED")
         "output": $input.output
       #elseif($input.status == "FAILED")
