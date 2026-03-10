@@ -3,7 +3,7 @@ module "tableau_sg" {
   # checkov:skip=CKV_TF_1
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "4.13.0"
+  version = "5.3.1"
 
   vpc_id      = var.vpc_id
   name        = "Tableau Server"
@@ -75,7 +75,7 @@ module "directory_service_sg" {
   # checkov:skip=CKV_TF_1
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "4.13.0"
+  version = "5.3.1"
 
   vpc_id            = var.vpc_id
   security_group_id = var.directory_service_sg_id
@@ -97,7 +97,7 @@ module "management_service_sg" {
   # checkov:skip=CKV_TF_1
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "4.13.0"
+  version = "5.3.1"
 
   vpc_id            = var.vpc_id
   security_group_id = var.management_server_sg_id
