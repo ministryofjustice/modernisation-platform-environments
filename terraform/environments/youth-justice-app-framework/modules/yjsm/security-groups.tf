@@ -23,7 +23,7 @@ resource "aws_security_group_rule" "yjsm_allow_all_internal_group" {
 }
 
 
-# (ECS external to YJSMhub)
+# (ECS external to YJSM-hub)
 resource "aws_security_group_rule" "ecs_to_yjsm_external" {
   type                     = "ingress"
   from_port                = 9091
@@ -34,8 +34,8 @@ resource "aws_security_group_rule" "ecs_to_yjsm_external" {
   description              = "ECS external to YJSM-Hub"
 }
 
-# (ECS external to YJSMhub)
-resource "aws_security_group_rule" "ecs_to_yjsm_external" {
+# (ECS external to YJSM-hub-admin)
+resource "aws_security_group_rule" "ecs_to_yjsm_hub_admin_external" {
   type                     = "ingress"
   from_port                = 8401
   to_port                  = 8401
@@ -56,7 +56,7 @@ resource "aws_security_group_rule" "ecs_to_yjsm_internal" {
   description              = "ECS internal to YJSM"
 }
 
-# (ECS internal to YJSMhub)
+# (ECS internal to YJSM-hub)
 resource "aws_security_group_rule" "ecs_to_yjsmhub_internal" {
   type                     = "ingress"
   from_port                = 9091
@@ -67,7 +67,7 @@ resource "aws_security_group_rule" "ecs_to_yjsmhub_internal" {
   description              = "ECS internal to YJSM-Hub"
 }
 
-# (ECS internal to YJSMhub-admin)
+# (ECS internal to YJSM-hub-admin)
 resource "aws_security_group_rule" "ecs_to_yjsmhub_admin" {
   type                     = "ingress"
   from_port                = 8401
