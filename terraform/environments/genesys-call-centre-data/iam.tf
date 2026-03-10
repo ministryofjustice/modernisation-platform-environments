@@ -47,8 +47,8 @@ resource "aws_iam_policy" "cross_account_assume_role_policy" {
           "s3:PutObject",
         ]
         Resource = [
-          module.s3_bucket_land.bucket.arn,
-          "${module.s3_bucket_land.bucket.arn}/*"
+          module.s3_bucket_staging.bucket.arn,
+          "${module.s3_bucket_staging.bucket.arn}/*"
         ]
       }
     ]
