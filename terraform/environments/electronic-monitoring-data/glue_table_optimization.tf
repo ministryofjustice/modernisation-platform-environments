@@ -85,7 +85,7 @@ resource "aws_glue_catalog_table_optimizer" "standard_compaction" {
         ]
     ]))
     catalog_id    = data.aws_caller_identity.current.account_id
-    database_name = split(".", each.key)[0]
+    database_name = "${split(".", each.key)[0]}${local.dbt_suffix}"
     table_name    = split(".", each.key)[1]
 
     configuration {
@@ -103,7 +103,7 @@ resource "aws_glue_catalog_table_optimizer" "standard_retention" {
         ]
     ]))
     catalog_id    = data.aws_caller_identity.current.account_id
-    database_name = split(".", each.key)[0]
+    database_name = "${split(".", each.key)[0]}${local.dbt_suffix}"
     table_name    = split(".", each.key)[1]
 
   configuration {
@@ -130,7 +130,7 @@ resource "aws_glue_catalog_table_optimizer" "standard_orphan_file_deletion" {
         ]
     ]))
   catalog_id    = data.aws_caller_identity.current.account_id
-  database_name = split(".", each.key)[0]
+  database_name = "${split(".", each.key)[0]}${local.dbt_suffix}"
   table_name    = split(".", each.key)[1]
 
   configuration {
@@ -140,7 +140,7 @@ resource "aws_glue_catalog_table_optimizer" "standard_orphan_file_deletion" {
     orphan_file_deletion_configuration {
       iceberg_configuration {
         orphan_file_retention_period_in_days = 7
-        location                             = "s3://${module.s3-create-a-derived-table-bucket.bucket.id}/staging/${split(".", each.key)[0]}_pipeline/${split(".", each.key)[0]}/${split(".", each.key)[1]}/"
+        location                             = "s3://${module.s3-create-a-derived-table-bucket.bucket.id}/staging/${split(".", each.key)[0]}${local.dbt_suffix}_pipeline/${split(".", each.key)[0]}${local.dbt_suffix}/${split(".", each.key)[1]}/"
       }
     }
 
