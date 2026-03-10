@@ -81,6 +81,14 @@ locals {
   )
 }
 
+
+locals {
+  userdata_kali = replace(
+    file("${path.module}/files/kali-userdata.sh")
+  )
+}
+
+
 ######################################
 ### EC2 Network Interface (ENI)
 ######################################
@@ -152,7 +160,7 @@ resource "aws_instance" "kali_app_instance_new" {
   monitoring                  = true
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile_new[0].id
   user_data_replace_on_change = true
- 
+  user_data                   = base64encode(local.userdata_kali)
 
 
 
