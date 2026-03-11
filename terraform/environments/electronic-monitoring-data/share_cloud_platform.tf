@@ -339,7 +339,7 @@ resource "aws_lakeformation_permissions" "ac_derived_db" {
   principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
   permissions = ["DESCRIBE"]
   database {
-    name = "acquisitive_crime_${local.dbt_suffix}"
+    name = "acquisitive_crime${local.dbt_suffix}"
   }
 }
 
@@ -348,7 +348,7 @@ resource "aws_lakeformation_permissions" "ac_derived_tables" {
   principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
   permissions = ["SELECT", "DESCRIBE"]
   table {
-    database_name = "acquisitive_crime_${local.dbt_suffix}"
+    database_name = "acquisitive_crime${local.dbt_suffix}"
     wildcard      = true
   }
 }
