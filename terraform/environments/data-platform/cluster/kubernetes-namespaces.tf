@@ -75,10 +75,3 @@ module "keda_namespace" {
   name     = "keda"
   workload = "system"
 }
-
-module "velero_namespace" {
-  source = "./modules/kubernetes/namespace"
-
-  name     = "velero"
-  workload = "system"
-}

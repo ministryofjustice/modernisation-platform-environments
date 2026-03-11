@@ -7,6 +7,12 @@ serviceAccount:
 serviceMonitor:
   enabled: true
 
+webhook:
+  # Required on EKS with custom CNI so the control plane can reach the webhook.
+  hostNetwork: true
+  # Avoid conflict with kubelet's 10250 when hostNetwork is enabled.
+  port: 10260
+
 global:
   nodeSelector:
     compute.data-platform.service.justice.gov.uk/node: system

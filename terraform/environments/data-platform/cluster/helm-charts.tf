@@ -315,6 +315,14 @@ resource "helm_release" "external_secrets" {
   ]
 }
 
+resource "helm_release" "external_secrets_secret_stores" {
+  name      = "external-secrets-secret-stores"
+  chart     = "./src/helm/charts/external-secrets-secret-stores"
+  namespace = module.external_secrets_namespace.name
+
+  depends_on = [helm_release.external_secrets]
+}
+
 resource "helm_release" "shared_services_gateway" {
   name      = "shared-services-gateway"
   chart     = "./src/helm/charts/shared-services-gateway"
@@ -347,31 +355,6 @@ resource "helm_release" "shared_services_gateway" {
 #     templatefile(
 #       "${path.module}/configuration/helm/keda/values.yml.tftpl",
 #       {}
-#     )
-#   ]
-# }
-
-# Velero CRD installation is failing due to changes with Bitnami's kubectl image https://github.com/vmware-tanzu/helm-charts/issues/698
-# TODO: Look at https://aws.amazon.com/about-aws/whats-new/2025/11/aws-backup-supports-amazon-eks/
-# resource "helm_release" "velero" {
-#   /* https://artifacthub.io/packages/helm/vmware-tanzu/velero */
-
-#   name       = "velero"
-#   repository = "https://vmware-tanzu.github.io/helm-charts"
-#   chart      = "velero"
-#   version    = local.cluster_configuration.helm_chart_versions.velero
-#   namespace  = module.velero_namespace.name
-#   values = [
-#     templatefile(
-#       "${path.module}/configuration/helm/velero/values.yml.tftpl",
-#       {
-#         aws_region                = data.aws_region.current.region
-#         eks_role_arn              = module.velero_iam_role.arn
-#         kubectl_version           = local.cluster_configuration.extra_versions.velero_kubectl
-#         velero_aws_plugin_version = local.cluster_configuration.extra_versions.velero_plugin_aws
-#         velero_bucket             = module.velero_s3_bucket.s3_bucket_id
-#         velero_prefix             = module.eks.cluster_name
-#       }
 #     )
 #   ]
 # }

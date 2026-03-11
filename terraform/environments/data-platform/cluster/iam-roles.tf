@@ -144,23 +144,3 @@ module "external_secrets_iam_role" {
     }
   }
 }
-
-module "velero_iam_role" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
-
-  name = "velero"
-
-  attach_velero_policy  = true
-  velero_s3_bucket_arns = [module.velero_s3_bucket.s3_bucket_arn]
-
-  policies = {
-    VeleroKMSAccessPolicy = module.velero_kms_iam_policy.arn
-  }
-
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["${module.velero_namespace.name}:velero-server"]
-    }
-  }
-}
