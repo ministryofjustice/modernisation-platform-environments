@@ -41,8 +41,6 @@ module "eks_logs_kms_iam_policy" {
   name_prefix = "eks-logs-kms"
 
   policy = data.aws_iam_policy_document.eks_logs_kms.json
-
-  tags = local.tags
 }
 
 data "aws_iam_policy_document" "karpenter_sqs_kms" {

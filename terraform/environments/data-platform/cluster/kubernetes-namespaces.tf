@@ -12,10 +12,10 @@ module "cluster_autoscaler_namespace" {
   workload = "system"
 }
 
-module "cloudwatch_metrics_namespace" {
+module "aws_cloudwatch_observability_namespace" {
   source = "./modules/kubernetes/namespace"
 
-  name     = "cloudwatch-metrics"
+  name     = "aws-cloudwatch-observability"
   workload = "system"
 }
 

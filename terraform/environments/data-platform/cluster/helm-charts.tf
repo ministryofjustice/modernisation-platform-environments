@@ -175,21 +175,27 @@ resource "helm_release" "karpenter_configuration" {
   depends_on = [helm_release.karpenter]
 }
 
-resource "helm_release" "cloudwatch_metrics" {
-  /* https://artifacthub.io/packages/helm/aws/aws-cloudwatch-metrics */
+resource "helm_release" "aws_cloudwatch_observability" {
+  /* https://github.com/aws-observability/helm-charts/releases */
 
-  name       = "cloudwatch-metrics"
-  repository = "https://aws.github.io/eks-charts"
-  chart      = "aws-cloudwatch-metrics"
-  version    = local.cluster_configuration.helm_chart_versions.cloudwatch_metrics
-  namespace  = module.cloudwatch_metrics_namespace.name
+  name       = "aws-cloudwatch-observability"
+  repository = "https://aws-observability.github.io/helm-charts"
+  chart      = "amazon-cloudwatch-observability"
+  version    = local.cluster_configuration.helm_chart_versions.aws_cloudwatch_observability
+  namespace  = module.aws_cloudwatch_observability_namespace.name
   values = [
     templatefile(
-      "${path.module}/configuration/helm/cloudwatch-metrics/values.yml.tftpl",
+      "${path.module}/configuration/helm/aws-cloudwatch-observability/values.yml.tftpl",
       {
+        aws_region   = data.aws_region.current.region
         cluster_name = module.eks.cluster_name
       }
     )
+  ]
+
+  depends_on = [
+    module.aws_cloudwatch_observability_eks_pod_identity,
+    module.container_insights_log_group
   ]
 }
 
@@ -328,21 +334,22 @@ resource "helm_release" "shared_services_gateway" {
   ]
 }
 
-resource "helm_release" "keda" {
-  /* https://artifacthub.io/packages/helm/kedacore/keda */
+# Disabling KEDA. When enabling we need to switch the external metrics API server to use hostNetwork as the cluster needs to connect to it, same as cert-manager
+# resource "helm_release" "keda" {
+#   /* https://artifacthub.io/packages/helm/kedacore/keda */
 
-  name       = "keda"
-  repository = "https://kedacore.github.io/charts"
-  chart      = "keda"
-  version    = local.cluster_configuration.helm_chart_versions.keda
-  namespace  = module.keda_namespace.name
-  values = [
-    templatefile(
-      "${path.module}/configuration/helm/keda/values.yml.tftpl",
-      {}
-    )
-  ]
-}
+#   name       = "keda"
+#   repository = "https://kedacore.github.io/charts"
+#   chart      = "keda"
+#   version    = local.cluster_configuration.helm_chart_versions.keda
+#   namespace  = module.keda_namespace.name
+#   values = [
+#     templatefile(
+#       "${path.module}/configuration/helm/keda/values.yml.tftpl",
+#       {}
+#     )
+#   ]
+# }
 
 # Velero CRD installation is failing due to changes with Bitnami's kubectl image https://github.com/vmware-tanzu/helm-charts/issues/698
 # TODO: Look at https://aws.amazon.com/about-aws/whats-new/2025/11/aws-backup-supports-amazon-eks/

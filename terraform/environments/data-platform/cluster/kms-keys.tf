@@ -28,7 +28,8 @@ module "eks_logs_kms_key" {
           variable = "kms:EncryptionContext:aws:logs:arn"
           values = [
             "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:${local.eks_cluster_logs_log_group_name}*",
-            "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:${local.eks_application_logs_log_group_name}*"
+            "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:${local.eks_application_logs_log_group_name}*",
+            "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:${local.container_insights_log_group_name}*"
           ]
         }
       ]

@@ -94,8 +94,6 @@ module "fluent_bit_iam_role" {
       namespace_service_accounts = ["${module.fluent_bit_namespace.name}:fluent-bit"]
     }
   }
-
-  tags = local.tags
 }
 
 module "cert_manager_iam_role" {
@@ -145,8 +143,6 @@ module "external_secrets_iam_role" {
       namespace_service_accounts = ["${module.external_secrets_namespace.name}:external-secrets"]
     }
   }
-
-  tags = local.tags
 }
 
 module "velero_iam_role" {

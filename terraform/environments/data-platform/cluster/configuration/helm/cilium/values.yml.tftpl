@@ -62,22 +62,13 @@ hubble:
         enabled: true
   ui:
     enabled: true
-    frontend:
-      nodeSelector:
-        compute.data-platform.service.justice.gov.uk/node: system
-      tolerations:
-        - key: compute.data-platform.service.justice.gov.uk/node
-          operator: Equal
-          value: system
-          effect: NoSchedule
-    backend:
-      nodeSelector:
-        compute.data-platform.service.justice.gov.uk/node: system
-      tolerations:
-        - key: compute.data-platform.service.justice.gov.uk/node
-          operator: Equal
-          value: system
-          effect: NoSchedule
+    nodeSelector:
+      compute.data-platform.service.justice.gov.uk/node: system
+    tolerations:
+      - key: compute.data-platform.service.justice.gov.uk/node
+        operator: Equal
+        value: system
+        effect: NoSchedule
   # Commenting out for later
   # export:
   #   static:
