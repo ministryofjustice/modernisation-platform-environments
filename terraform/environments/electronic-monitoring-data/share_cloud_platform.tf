@@ -77,7 +77,7 @@ locals {
     "arn:aws:iam::${local.account_ids["cloud_platform"]}:role/${var.cloud-platform-crime-matching-algorithm-iam-dev}",
   ] : local.is-preproduction ? [
     "arn:aws:iam::${local.account_ids["cloud_platform"]}:role/${var.cloud-platform-crime-matching-api-iam-preprod}",
-  ]
+  ] : []
 }
 
 variable "cloud-platform-iam-dev" {
