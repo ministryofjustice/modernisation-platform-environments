@@ -73,10 +73,10 @@ locals {
     "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_fms_${local.env_}dbt/*"
   ]
   ac_cloud_platform_iam_roles = local.is-development || local.is-test ? [
-    "arn:aws:iam::${local.account_ids["cloud_platform"]}:role/${var.cloud-platform-crime-matching-api-iam-dev}",
-    "arn:aws:iam::${local.account_ids["cloud_platform"]}:role/${var.cloud-platform-crime-matching-algorithm-iam-dev}",
+    "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-api-iam-dev}",
+    "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-algorithm-iam-dev}",
   ] : local.is-preproduction ? [
-    "arn:aws:iam::${local.account_ids["cloud_platform"]}:role/${var.cloud-platform-crime-matching-api-iam-preprod}",
+    "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-api-iam-preprod}",
   ] : []
 }
 
