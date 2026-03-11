@@ -20,31 +20,31 @@ resource "aws_lb" "ssogen_alb" {
   )
 }
 
-resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_app" {
-  count       = local.is-development || local.is-test ? 1 : 0
-  name        = lower(format("tg-%s-app", local.application_name_ssogen))
-  port        = local.application_data.accounts[local.environment].tg_ssogen_apps_port
-  protocol    = "HTTP"
-  vpc_id      = data.aws_vpc.shared.id
-  target_type = "instance"
-  # deregistration_delay = 60
-  health_check {
-    enabled             = true
-    path                = "/"
-    protocol            = "HTTP"
-    matcher             = "200"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 3
-    unhealthy_threshold = 3
-  }
+# resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_app" {
+#   count       = local.is-development || local.is-test ? 1 : 0
+#   name        = lower(format("tg-%s-app", local.application_name_ssogen))
+#   port        = local.application_data.accounts[local.environment].tg_ssogen_apps_port
+#   protocol    = "HTTP"
+#   vpc_id      = data.aws_vpc.shared.id
+#   target_type = "instance"
+#   # deregistration_delay = 60
+#   health_check {
+#     enabled             = true
+#     path                = "/"
+#     protocol            = "HTTP"
+#     matcher             = "200"
+#     interval            = 30
+#     timeout             = 5
+#     healthy_threshold   = 3
+#     unhealthy_threshold = 3
+#   }
 
-  # stickiness {
-  #   enabled         = true
-  #   type            = "lb_cookie"
-  #   cookie_duration = 3600
-  # }
-}
+#   # stickiness {
+#   #   enabled         = true
+#   #   type            = "lb_cookie"
+#   #   cookie_duration = 3600
+#   # }
+# }
 
 resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_enc_app" {
   count       = local.is-development || local.is-test ? 1 : 0
@@ -101,23 +101,23 @@ resource "aws_lb_listener" "ssogen_internal_app_listener" {
   certificate_arn   = data.aws_acm_certificate.external_ssogen[count.index].arn
 
   default_action {
-    type = "forward"
-
-    forward {
-      target_group {
-        arn    = aws_lb_target_group.ssogen_internal_tg_ssogen_app[count.index].arn
-        weight = 50
-      }
-      target_group {
-        arn    = aws_lb_target_group.ssogen_internal_tg_ssogen_enc_app[count.index].arn
-        weight = 50
-      }
-      stickiness {
-        enabled  = true
-        duration = 3600
-      }
-    }
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.ssogen_internal_tg_ssogen_enc_app[count.index].arn
   }
+    # forward {
+    #   target_group {
+    #     arn    = aws_lb_target_group.ssogen_internal_tg_ssogen_app[count.index].arn
+    #     weight = 50
+    #   }
+    #   target_group {
+    #     arn    = aws_lb_target_group.ssogen_internal_tg_ssogen_enc_app[count.index].arn
+    #     weight = 50
+    #   }
+    #   stickiness {
+    #     enabled  = true
+    #     duration = 3600
+    #   }
+    # }
 
   depends_on = [aws_acm_certificate_validation.external_nonprod]
 }
