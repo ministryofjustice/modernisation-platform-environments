@@ -34,25 +34,13 @@ resource "aws_iam_policy" "rekognition_s3_policy" {
   policy = data.aws_iam_policy_document.rekognition_s3_policy_document.json
 }
 
-# custom rekognition policy: read-only actions plus liveness session management
-data "aws_iam_policy_document" "rekognition_access" {
-  statement {
-    sid    = "RekognitionReadOnly"
-    effect = "Allow"
-    actions = [
-      "rekognition:CompareFaces",
-      "rekognition:DetectFaces",
-      "rekognition:DetectLabels",
-      "rekognition:DetectModerationLabels",
-      "rekognition:DetectText",
-      "rekognition:ListCollections",
-      "rekognition:ListFaces",
-      "rekognition:SearchFaces",
-      "rekognition:SearchFacesByImage",
-    ]
-    resources = ["*"]
-  }
+# find managed policy for read-only rekognition access
+data "aws_iam_policy" "rekognition_read" {
+  name = "AmazonRekognitionReadOnlyAccess"
+}
 
+# additional rekognition actions not covered by the read-only managed policy
+data "aws_iam_policy_document" "rekognition_liveness" {
   statement {
     sid    = "RekognitionLiveness"
     effect = "Allow"
@@ -65,9 +53,9 @@ data "aws_iam_policy_document" "rekognition_access" {
   }
 }
 
-resource "aws_iam_policy" "rekognition_access" {
-  name   = "rekognition-access"
-  policy = data.aws_iam_policy_document.rekognition_access.json
+resource "aws_iam_policy" "rekognition_liveness" {
+  name   = "rekognition-liveness"
+  policy = data.aws_iam_policy_document.rekognition_liveness.json
 }
 
 # grant configured principals permission to assume the rekognition role
@@ -101,7 +89,12 @@ resource "aws_iam_role_policy_attachment" "rekognition_s3" {
 
 resource "aws_iam_role_policy_attachment" "rekognition_rekognition" {
   role       = aws_iam_role.rekognition_role.name
-  policy_arn = aws_iam_policy.rekognition_access.arn
+  policy_arn = data.aws_iam_policy.rekognition_read.arn
+}
+
+resource "aws_iam_role_policy_attachment" "rekognition_liveness" {
+  role       = aws_iam_role.rekognition_role.name
+  policy_arn = aws_iam_policy.rekognition_liveness.arn
 }
 
 # Policy to allow Rekognition role to read from Cloud Platform S3 buckets
