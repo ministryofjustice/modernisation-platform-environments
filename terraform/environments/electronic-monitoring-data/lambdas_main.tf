@@ -22,7 +22,7 @@ module "output_file_structure_as_json_from_zip" {
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   security_group_ids      = [aws_security_group.lambda_generic.id]
-  subnet_ids              = data.aws_subnets.private_subnet_c.ids
+  subnet_ids              = ["subnet-073947539c44734e7"]
   environment_variables = {
     OUTPUT_BUCKET = module.s3-json-directory-structure-bucket.bucket.id
     SOURCE_BUCKET = module.s3-data-bucket.bucket.id
@@ -42,7 +42,7 @@ module "unzip_single_file" {
   memory_size             = 2048
   timeout                 = 900
   security_group_ids      = [aws_security_group.lambda_generic.id]
-  subnet_ids              = data.aws_subnets.private_subnet_c.ids
+  subnet_ids              = ["subnet-073947539c44734e7"]
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
@@ -64,7 +64,7 @@ module "unzipped_presigned_url" {
   memory_size             = 2048
   timeout                 = 900
   security_group_ids      = [aws_security_group.lambda_generic.id]
-  subnet_ids              = data.aws_subnets.private_subnet_c.ids
+  subnet_ids              = ["subnet-073947539c44734e7"]
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
 }
@@ -100,7 +100,7 @@ module "virus_scan_definition_upload" {
   memory_size   = 2048
   timeout       = 900
   # security_group_ids      = [aws_security_group.lambda_generic.id]
-  # subnet_ids              = data.aws_subnets.private_subnet_c.ids
+  # subnet_ids              = ["subnet-073947539c44734e7"]
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   environment_variables = {
     MODE                         = "definition-upload",
@@ -132,7 +132,7 @@ module "virus_scan_file" {
   memory_size                    = 2048
   timeout                        = 900
   security_group_ids             = [aws_security_group.lambda_generic.id]
-  subnet_ids                     = data.aws_subnets.private_subnet_c.ids
+  subnet_ids                     = ["subnet-073947539c44734e7"]
   reserved_concurrent_executions = 1000
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   environment_variables = {
@@ -157,7 +157,7 @@ module "format_json_fms_data" {
   memory_size                    = 1024
   timeout                        = 900
   security_group_ids             = [aws_security_group.lambda_generic.id]
-  subnet_ids                     = data.aws_subnets.private_subnet_c.ids
+  subnet_ids                     = ["subnet-073947539c44734e7"]
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : "dev"
   reserved_concurrent_executions = 1000
@@ -176,7 +176,7 @@ module "copy_mdss_data" {
   memory_size                    = 1024
   timeout                        = 900
   security_group_ids             = [aws_security_group.lambda_generic.id]
-  subnet_ids                     = data.aws_subnets.private_subnet_c.ids
+  subnet_ids                     = ["subnet-073947539c44734e7"]
   reserved_concurrent_executions = 1000
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : "dev"
@@ -203,7 +203,7 @@ module "clean_after_dlt_load" {
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
-  subnet_ids                     = data.aws_subnets.private_subnet_c.ids
+  subnet_ids                     = ["subnet-073947539c44734e7"]
 
   environment_variables = {
     CATALOG_ID      = data.aws_caller_identity.current.account_id
@@ -231,7 +231,7 @@ module "calculate_checksum" {
   memory_size             = 4096
   timeout                 = 900
   security_group_ids      = [aws_security_group.lambda_generic.id]
-  subnet_ids              = data.aws_subnets.private_subnet_c.ids
+  subnet_ids              = ["subnet-073947539c44734e7"]
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
@@ -262,7 +262,7 @@ module "dms_retrieve_metadata" {
   }
 
   security_group_ids = [aws_security_group.dms_validation_lambda_sg[0].id]
-  subnet_ids         = data.aws_subnets.private_subnet_c.ids
+  subnet_ids         = ["subnet-073947539c44734e7"]
 }
 
 
@@ -288,7 +288,7 @@ module "dms_validation" {
   }
 
   security_group_ids = [aws_security_group.dms_validation_lambda_sg[0].id]
-  subnet_ids         = data.aws_subnets.private_subnet_c.ids
+  subnet_ids         = ["subnet-073947539c44734e7"]
 }
 
 #-----------------------------------------------------------------------------------
@@ -308,7 +308,7 @@ module "process_fms_metadata" {
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
-  subnet_ids                     = data.aws_subnets.private_subnet_c.ids
+  subnet_ids                     = ["subnet-073947539c44734e7"]
   environment_variables = {
     SQS_QUEUE_URL                = aws_sqs_queue.format_fms_json_event_queue.id
     POWERTOOLS_METRICS_NAMESPACE = "FMSLiveFeed"
@@ -336,7 +336,7 @@ module "load_dms_output" {
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
-  subnet_ids                     = data.aws_subnets.private_subnet_c.ids
+  subnet_ids                     = ["subnet-073947539c44734e7"]
   environment_variables = {
     ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
     ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
@@ -391,7 +391,7 @@ module "load_fms_lambda" {
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
-  subnet_ids                     = data.aws_subnets.private_subnet_c.ids
+  subnet_ids                     = ["subnet-073947539c44734e7"]
   cloudwatch_retention_days      = 7
   environment_variables = {
     ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
@@ -422,7 +422,7 @@ module "load_historic_csv" {
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
-  subnet_ids                     = data.aws_subnets.private_subnet_c.ids
+  subnet_ids                     = ["subnet-073947539c44734e7"]
   environment_variables = {
     ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
     ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
@@ -449,7 +449,7 @@ module "glue_db_count_metrics" {
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.env_name
   security_group_ids             = [aws_security_group.lambda_generic.id]
-  subnet_ids                     = data.aws_subnets.private_subnet_c.ids
+  subnet_ids                     = ["subnet-073947539c44734e7"]
 
   environment_variables = {
     METRIC_NAMESPACE = "EMDS/Glue"
@@ -522,7 +522,7 @@ module "mdss_daily_failure_digest" {
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
 
   security_group_ids = [aws_security_group.lambda_generic.id]
-  subnet_ids         = data.aws_subnets.private_subnet_c.ids
+  subnet_ids         = ["subnet-073947539c44734e7"]
 
   environment_variables = {
     SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
@@ -628,7 +628,7 @@ module "cloudwatch_alarm_threader" {
   production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
 
   security_group_ids = [aws_security_group.lambda_generic.id]
-  subnet_ids         = data.aws_subnets.private_subnet_c.ids
+  subnet_ids         = ["subnet-073947539c44734e7"]
 
   environment_variables = {
     SNS_TOPIC_ARN         = aws_sns_topic.emds_alerts.arn
@@ -684,7 +684,7 @@ module "fan_out_tags" {
   production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
 
   security_group_ids = [aws_security_group.lambda_generic.id]
-  subnet_ids         = data.aws_subnets.private_subnet_c.ids
+  subnet_ids         = ["subnet-073947539c44734e7"]
 
   environment_variables = {
     SQS_QUEUE_ARN = module.load_fms_event_queue.sqs_queue.url
