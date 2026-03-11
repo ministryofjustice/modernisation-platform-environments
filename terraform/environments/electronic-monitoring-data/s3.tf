@@ -1513,7 +1513,7 @@ module "s3-ears-sars-bucket" {
 
   lifecycle_rule = [
     {
-      id      = "main"
+      id      = "14-day-retention-rule"
       enabled = "Enabled"
       prefix  = ""
 
@@ -1523,8 +1523,7 @@ module "s3-ears-sars-bucket" {
       }
 
       expiration = {
-        days                         = 14,
-        expired_object_delete_marker = true
+        days = 13
       }
 
       noncurrent_version_expiration = {
