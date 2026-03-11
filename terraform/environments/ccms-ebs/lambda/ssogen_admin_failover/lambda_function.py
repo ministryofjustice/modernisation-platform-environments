@@ -1,6 +1,14 @@
+"""
+AWS Lambda function to pull CloudWatch Alarm from SNS Topic and
+update the route 53 dnsname record for ssogen admin to secondary private ip
+"""
 import socket
 import boto3
 import os
+import logging
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 PRIMARY_IP = os.environ['PRIMARY_IP']
 SECONDARY_IP = os.environ['SECONDARY_IP']
