@@ -98,12 +98,6 @@ variable "kms_key_id" {
   default     = null
 }
 
-variable "private_subnet_cidrs" {
-  type        = list(string)
-  description = "List of private subnet CIDR blocks."
-  default     = []
-}
-
 
 #variable "multi_region_replica" {
 #  type        = string

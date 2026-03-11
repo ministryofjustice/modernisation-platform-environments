@@ -8,9 +8,6 @@ module "waf" {
   kms_key_id   = module.kms.key_id
   #  multi_region_replica = aws_kms_replica_key.multi_region_replica.arn # WAF multi-region key
 
-  #Network details
-  private_subnet_cidrs   = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-
   providers = {
     aws           = aws
     aws.us-east-1 = aws.us-east-1
@@ -51,7 +48,11 @@ module "waf" {
       name         = "whitelist-ip"
       priority     = 2
       description  = "Whitelisted IP addresses"
-      ip_addresses = concat(["66.103.29.115/32"], var.private_subnet_cidrs) #whitelist IP address and ECS subnet CIDR blocks for internal access
+      ip_addresses = concat(["66.103.29.115/32"], [
+        data.aws_subnet.private_subnets_a.cidr_block,
+        data.aws_subnet.private_subnets_b.cidr_block,
+        data.aws_subnet.private_subnets_c.cidr_block
+      ])
     }
   }
 
@@ -64,10 +65,4 @@ module "waf" {
       }
     }
   ]
-}
-
-variable "private_subnet_cidrs" {
-  type        = list(string)
-  description = "List of private subnet CIDR blocks."
-  default     = []
 }
