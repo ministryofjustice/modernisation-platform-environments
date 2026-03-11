@@ -4,6 +4,11 @@ resource "aws_ssm_document" "trend_av_installer" {
   document_format = "YAML"
 
   content = file("${path.module}/ssm-document.yaml")
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [content] 
+  }
 }
 
 
