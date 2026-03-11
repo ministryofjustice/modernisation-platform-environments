@@ -42,6 +42,9 @@ operator:
       operator: Equal
       value: system
       effect: NoSchedule
+  prometheus:
+    serviceMonitor:
+      enabled: true
 
 hubble:
   relay:
@@ -53,6 +56,10 @@ hubble:
         operator: Equal
         value: system
         effect: NoSchedule
+    prometheus:
+      enabled: true
+      serviceMonitor:
+        enabled: true
   ui:
     enabled: true
     frontend:
@@ -100,6 +107,9 @@ envoy:
       effect: NoSchedule
     - operator: Exists
       effect: NoExecute
+  prometheus:
+    serviceMonitor:
+      enabled: true
 
 # Resources
 resources:
@@ -115,6 +125,12 @@ enableEndpointRoutes: true
 
 # Routing mode for VXLAN overlay
 routingMode: tunnel
+
+# Enable Cilium agent metrics and ServiceMonitor
+prometheus:
+  enabled: true
+  serviceMonitor:
+    enabled: true
 
 # Monitoring CRDs - allow longer wait time for large clusters
 crdWaitTimeout: 15m

@@ -2,7 +2,7 @@
 admissionController:
   replicas: 3
   serviceMonitor:
-    enabled: false
+    enabled: true
   nodeSelector:
     compute.data-platform.service.justice.gov.uk/node: system
   tolerations:
@@ -13,7 +13,7 @@ admissionController:
 backgroundController:
   replicas: 2
   serviceMonitor:
-    enabled: false
+    enabled: true
   nodeSelector:
     compute.data-platform.service.justice.gov.uk/node: system
   tolerations:
@@ -24,7 +24,7 @@ backgroundController:
 cleanupController:
   replicas: 2
   serviceMonitor:
-    enabled: false
+    enabled: true
   nodeSelector:
     compute.data-platform.service.justice.gov.uk/node: system
   tolerations:
@@ -35,7 +35,7 @@ cleanupController:
 reportsController:
   replicas: 2
   serviceMonitor:
-    enabled: false
+    enabled: true
   nodeSelector:
     compute.data-platform.service.justice.gov.uk/node: system
   tolerations:
@@ -43,6 +43,16 @@ reportsController:
       operator: Equal
       value: system
       effect: NoSchedule
+
+crds:
+  migration:
+    nodeSelector:
+      compute.data-platform.service.justice.gov.uk/node: system
+    tolerations:
+      - key: compute.data-platform.service.justice.gov.uk/node
+        operator: Equal
+        value: system
+        effect: NoSchedule
 
 webhooksCleanup:
   nodeSelector:

@@ -7,4 +7,6 @@ locals {
   eks_application_logs_log_group_name = "/aws/eks/${local.eks_cluster_name}/application"
 
   aps_log_group_name = "/aws/aps/${local.eks_cluster_name}"
+
+  container_insights_log_group_name = "/aws/containerinsights/${local.eks_cluster_name}/performance"
 }

@@ -309,7 +309,6 @@ resource "helm_release" "external_secrets" {
   ]
 }
 
-
 resource "helm_release" "shared_services_gateway" {
   name      = "shared-services-gateway"
   chart     = "./src/helm/charts/shared-services-gateway"

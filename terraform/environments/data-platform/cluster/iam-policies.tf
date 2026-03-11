@@ -13,7 +13,7 @@ data "aws_iam_policy_document" "prometheus" {
 }
 
 module "prometheus_iam_policy" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-policy?ref=581bec52db8ad843eeb8e6ae1103aaeec9787c41" # v6.3.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-policy?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
 
   name_prefix = "prometheus"
 
@@ -36,7 +36,7 @@ data "aws_iam_policy_document" "eks_logs_kms" {
 }
 
 module "eks_logs_kms_iam_policy" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-policy?ref=581bec52db8ad843eeb8e6ae1103aaeec9787c41" # v6.3.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-policy?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
 
   name_prefix = "eks-logs-kms"
 
@@ -61,7 +61,7 @@ data "aws_iam_policy_document" "karpenter_sqs_kms" {
 }
 
 module "karpenter_sqs_kms_iam_policy" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-policy?ref=581bec52db8ad843eeb8e6ae1103aaeec9787c41" # v6.3.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-policy?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
 
   name_prefix = "karpenter-sqs-kms"
 
@@ -84,7 +84,7 @@ data "aws_iam_policy_document" "velero_kms" {
 }
 
 module "velero_kms_iam_policy" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-policy?ref=581bec52db8ad843eeb8e6ae1103aaeec9787c41" # v6.3.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-policy?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
 
   name_prefix = "velero-kms"
 

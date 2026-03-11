@@ -1,5 +1,5 @@
 module "aws_network_flow_monitor_iam_role" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=581bec52db8ad843eeb8e6ae1103aaeec9787c41" # v6.3.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
 
   name = "aws-network-flow-monitor"
 
@@ -16,7 +16,7 @@ module "aws_network_flow_monitor_iam_role" {
 }
 
 module "ebs_csi_driver_iam_role" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=581bec52db8ad843eeb8e6ae1103aaeec9787c41" # v6.3.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
 
   name = "ebs-csi-driver"
 
@@ -31,7 +31,7 @@ module "ebs_csi_driver_iam_role" {
 }
 
 module "efs_csi_driver_iam_role" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=581bec52db8ad843eeb8e6ae1103aaeec9787c41" # v6.3.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
 
   name = "efs-csi-driver"
 
@@ -46,7 +46,7 @@ module "efs_csi_driver_iam_role" {
 }
 
 module "cluster_autoscaler_iam_role" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=581bec52db8ad843eeb8e6ae1103aaeec9787c41" # v6.3.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
 
   name = "cluster-autoscaler"
 
@@ -62,7 +62,7 @@ module "cluster_autoscaler_iam_role" {
 }
 
 module "prometheus_iam_role" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=581bec52db8ad843eeb8e6ae1103aaeec9787c41" # v6.3.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
 
   name = "prometheus"
 
@@ -79,7 +79,7 @@ module "prometheus_iam_role" {
 }
 
 module "fluent_bit_iam_role" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=581bec52db8ad843eeb8e6ae1103aaeec9787c41" # v6.3.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
 
   name = "fluent-bit"
 
@@ -99,7 +99,7 @@ module "fluent_bit_iam_role" {
 }
 
 module "cert_manager_iam_role" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=581bec52db8ad843eeb8e6ae1103aaeec9787c41" # v6.3.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
 
   name = "cert-manager"
 
@@ -115,7 +115,7 @@ module "cert_manager_iam_role" {
 }
 
 module "external_dns_iam_role" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=581bec52db8ad843eeb8e6ae1103aaeec9787c41" # v6.3.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
 
   name = "external-dns"
 
@@ -132,7 +132,7 @@ module "external_dns_iam_role" {
 }
 
 module "external_secrets_iam_role" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=581bec52db8ad843eeb8e6ae1103aaeec9787c41" # v6.3.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
 
   name = "external-secrets"
 
@@ -150,7 +150,7 @@ module "external_secrets_iam_role" {
 }
 
 module "velero_iam_role" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=581bec52db8ad843eeb8e6ae1103aaeec9787c41" # v6.3.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
 
   name = "velero"
 
