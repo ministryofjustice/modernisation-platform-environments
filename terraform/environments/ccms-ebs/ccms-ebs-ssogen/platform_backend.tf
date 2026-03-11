@@ -9,6 +9,6 @@ terraform {
     key                  = "terraform.tfstate"
     region               = "eu-west-2"
     use_lockfile         = true
-    workspace_key_prefix = "environments/members/analytical-platform-compute/internal-airflow" # This will store the object as environments/members/<application>/<component>/${workspace}/terraform.tfstate
+    workspace_key_prefix = "environments/members/ccms-ebs/ccms-ebs-ssogen" # This will store the object as environments/members/<application>/<component>/${workspace}/terraform.tfstate
   }
 }

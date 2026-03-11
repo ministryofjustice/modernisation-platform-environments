@@ -28,7 +28,6 @@ locals {
     "athena",            # Athena
     "backup",            # AWS Backup
     "cloudtrail",        # CloudTrail
-    "comprehend",        # AWS Comprehend
     "config",            # AWS Config
     "detective",         # AWS Detective
     "dms",               # AWS Database Migration Service
@@ -41,14 +40,12 @@ locals {
     "email",             # SES (API)
     "email-smtp",        # SES (SMTP)
     "events",            # CloudWatch Events
-    "glue",              # AWS Glue
     "guardduty-data",    # GuardDuty
     "inspector2",        # Inspector
     "kinesis-firehose",  # Kinesis Firehose
     "kms",               # KMS
     "lambda",            # Lambda
     "logs",              # CloudWatch Logs
-    "macie2",            # AWS Macie
     "rds",               # RDS
     "rds-data",          # RDS Data
     "secretsmanager",    # Secrets Manager
@@ -58,7 +55,6 @@ locals {
     "ssm",               # AWS Systems Manager
     "sts",               # STS
     "transcribe",        # AWS Transcribe
-    "translate",         # AWS Translate
     "wafv2"              # WAF
   ]
 }
