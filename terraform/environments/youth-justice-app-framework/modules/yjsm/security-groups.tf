@@ -29,7 +29,7 @@ resource "aws_security_group_rule" "ecs_autoscaling_to_yjsmhub" {
   to_port                  = 9091
   protocol                 = "tcp"
   security_group_id        = aws_security_group.yjsm_service.id
-  source_security_group_id = module.autoscaling_sg.security_group_id
+  source_security_group_id = var.ecs_autoscaling_sg_id
   description              = "ECS external to YJSM-Hub"
 }
 
@@ -40,7 +40,7 @@ resource "aws_security_group_rule" "ecs_autoscaling_to_yjsm_hub_admin" {
   to_port                  = 8401
   protocol                 = "tcp"
   security_group_id        = aws_security_group.yjsm_service.id
-  source_security_group_id = module.autoscaling_sg.security_group_id
+  source_security_group_id = var.ecs_autoscaling_sg_id
   description              = "ECS external to YJSM-Hub-Admin"
 }
 

@@ -35,6 +35,11 @@ variable "ecs_service_external_sg_id" {
   type        = string
 }
 
+variable "ecs_autoscaling_sg_id" {
+  type        = string
+  description = "The security group ID of the ECS autoscaling group"
+}
+
 variable "esb_service_sg_id" {
   description = "Security Group ID for ESB"
   type        = string
