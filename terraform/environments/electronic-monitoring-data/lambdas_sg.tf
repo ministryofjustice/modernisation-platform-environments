@@ -9,7 +9,6 @@ resource "aws_security_group" "lambda_generic" {
   }
 }
 
-# get s3 endpoint
 data "aws_vpc_endpoint" "s3" {
   provider     = aws.core-vpc
   service_name = "com.amazonaws.${data.aws_region.current.name}.s3"
@@ -23,15 +22,15 @@ data "aws_prefix_list" "s3" {
   name = "com.amazonaws.${data.aws_region.current.name}.s3"
 }
 
-resource "aws_security_group_rule" "lambda_ingress_generic" {
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, ]
-  type              = "ingress"
-  description       = "allow all"
-  from_port         = 0
-  to_port           = 65535
-  protocol          = "tcp"
-  security_group_id = aws_security_group.lambda_generic.id
-}
+# resource "aws_security_group_rule" "lambda_ingress_generic" {
+#   cidr_blocks       = [data.aws_vpc.shared.cidr_block, ]
+#   type              = "ingress"
+#   description       = "allow all"
+#   from_port         = 0
+#   to_port           = 65535
+#   protocol          = "tcp"
+#   security_group_id = aws_security_group.lambda_generic.id
+# }
 
 resource "aws_security_group_rule" "lambda_ingress_s3" {
   type              = "ingress"
@@ -43,15 +42,15 @@ resource "aws_security_group_rule" "lambda_ingress_s3" {
   security_group_id = aws_security_group.lambda_generic.id
 }
 
-resource "aws_security_group_rule" "lambda_egress_generic" {
-  type              = "egress"
-  description       = "allow all"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, ]
-  security_group_id = aws_security_group.lambda_generic.id
-}
+# resource "aws_security_group_rule" "lambda_egress_generic" {
+#   type              = "egress"
+#   description       = "allow all"
+#   from_port         = 0
+#   to_port           = 0
+#   protocol          = "-1"
+#   cidr_blocks       = [data.aws_vpc.shared.cidr_block, ]
+#   security_group_id = aws_security_group.lambda_generic.id
+# }
 
 resource "aws_security_group_rule" "lambda_egress_s3" {
   type              = "egress"
@@ -107,24 +106,24 @@ resource "aws_vpc_security_group_ingress_rule" "dms_validation_lambda_ingress_RD
   description                  = "RDS Database +-----[mssql]----- Lambda"
 }
 
-resource "aws_security_group_rule" "dms_validation_lambda_ingress_generic" {
-  count             = local.is-production || local.is-development ? 1 : 0
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, ]
-  type              = "ingress"
-  description       = "allow all"
-  from_port         = 0
-  to_port           = 65535
-  protocol          = "tcp"
-  security_group_id = aws_security_group.dms_validation_lambda_sg[0].id
-}
+# resource "aws_security_group_rule" "dms_validation_lambda_ingress_generic" {
+#   count             = local.is-production || local.is-development ? 1 : 0
+#   cidr_blocks       = [data.aws_vpc.shared.cidr_block, ]
+#   type              = "ingress"
+#   description       = "allow all"
+#   from_port         = 0
+#   to_port           = 65535
+#   protocol          = "tcp"
+#   security_group_id = aws_security_group.dms_validation_lambda_sg[0].id
+# }
 
-resource "aws_security_group_rule" "dms_validation_lambda_egress_generic" {
-  count             = local.is-production || local.is-development ? 1 : 0
-  type              = "egress"
-  description       = "allow all"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, ]
-  security_group_id = aws_security_group.dms_validation_lambda_sg[0].id
-}
+# resource "aws_security_group_rule" "dms_validation_lambda_egress_generic" {
+#   count             = local.is-production || local.is-development ? 1 : 0
+#   type              = "egress"
+#   description       = "allow all"
+#   from_port         = 0
+#   to_port           = 0
+#   protocol          = "-1"
+#   cidr_blocks       = [data.aws_vpc.shared.cidr_block, ]
+#   security_group_id = aws_security_group.dms_validation_lambda_sg[0].id
+# }
