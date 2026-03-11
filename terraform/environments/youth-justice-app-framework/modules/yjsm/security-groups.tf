@@ -33,7 +33,7 @@ resource "aws_security_group_rule" "ecs_autoscaling_to_yjsmhub" {
   description              = "ECS external to YJSM-Hub"
 }
 
-# (ECS external to YJSM-hub-admin)
+# (ECS auto-scaling to YJSM-hub-admin)
 resource "aws_security_group_rule" "ecs_autoscaling_to_yjsm_hub_admin" {
   type                     = "ingress"
   from_port                = 8401
@@ -42,6 +42,17 @@ resource "aws_security_group_rule" "ecs_autoscaling_to_yjsm_hub_admin" {
   security_group_id        = aws_security_group.yjsm_service.id
   source_security_group_id = var.ecs_autoscaling_sg_id
   description              = "ECS external to YJSM-Hub-Admin"
+}
+
+# (ECS auto-scaling to YJSM)
+resource "aws_security_group_rule" "ecs_autoscaling_to_yjsm" {
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.yjsm_service.id
+  source_security_group_id = var.ecs_autoscaling_sg_id
+  description              = "ECS auto-scaling to YJSM"
 }
 
 
