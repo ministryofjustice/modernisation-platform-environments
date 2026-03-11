@@ -52,6 +52,18 @@ resource "aws_kms_key_policy" "shared_kms_key_policy" {
           "kms:Encrypt"
         ],
         "Resource" : "*"
+      },
+      {
+        Sid    = "AllowCloudTrailEncryption",
+        Effect = "Allow",
+        Principal = {
+          Service = "cloudtrail.amazonaws.com"
+        },
+        Action = [
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ],
+        Resource = "*"
       }
     ]
   })
