@@ -371,7 +371,7 @@ module "load_mdss_lambda" {
     ENVIRONMENT_NAME                       = local.environment_shorthand
     CLEANUP_QUEUE_URL                      = aws_sqs_queue.clean_dlt_load_queue.id
     MAX_RECEIVE_COUNT                      = tostring(local.load_mdss_sqs_max_receive_count)
-    MDSS_MANIFEST_BUCKET                   = module.s3-logging-bucket.bucket.id
+    MDSS_MANIFEST_BUCKET                   = module.s3-metadata-bucket.bucket.id
     MDSS_MANIFEST_PREFIX                   = "mdss-manifest/current"
     STUCK_STARTED_MINUTES                  = "60"
     AUTO_REDRIVE_TRANSIENT_COOLDOWN_MINUTES = "60"
@@ -721,7 +721,7 @@ module "mdss_reconciler" {
     ENVIRONMENT_NAME                        = local.environment_shorthand
     SOURCE_BUCKET                           = module.s3-raw-formatted-data-bucket.bucket.id
     LOAD_MDSS_QUEUE_URL                     = module.load_mdss_event_queue.sqs_queue.id
-    MDSS_MANIFEST_BUCKET                    = module.s3-logging-bucket.bucket.id
+    MDSS_MANIFEST_BUCKET                    = module.s3-metadata-bucket.bucket.id
     MDSS_MANIFEST_PREFIX                    = "mdss-manifest/current"
     LOOKBACK_DAYS                           = "2"
     MIN_OBJECT_AGE_MINUTES                  = "10"

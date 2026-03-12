@@ -889,7 +889,7 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
       "s3:GetObject",
     ]
     resources = [
-      "${module.s3-logging-bucket.bucket.arn}/mdss-manifest/*",
+      "${module.s3-metadata-bucket.bucket.arn}/mdss-manifest/*",
     ]
   }
 }
@@ -1813,17 +1813,6 @@ data "aws_iam_policy_document" "mdss_reconciler_lambda_role_policy_document" {
   }
 
   statement {
-    sid    = "ListManifestBucket"
-    effect = "Allow"
-    actions = [
-      "s3:ListBucket",
-    ]
-    resources = [
-      module.s3-logging-bucket.bucket.arn,
-    ]
-  }
-
-  statement {
     sid    = "ReadWriteManifestMarkers"
     effect = "Allow"
     actions = [
@@ -1831,7 +1820,7 @@ data "aws_iam_policy_document" "mdss_reconciler_lambda_role_policy_document" {
       "s3:PutObject",
     ]
     resources = [
-      "${module.s3-logging-bucket.bucket.arn}/mdss-manifest/*",
+      "${module.s3-metadata-bucket.bucket.arn}/mdss-manifest/*",
     ]
   }
 
