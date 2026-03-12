@@ -16,7 +16,7 @@ resource "aws_instance" "kali_app_instance_new" {
   monitoring                  = true
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile_new[0].id
   user_data_replace_on_change = true
-  user_data                   = base64encode(local.userdata_kali)
+  user_data                   = local.userdata_kali
 
   vpc_security_group_ids = [
     aws_security_group.kali_sg[0].id
