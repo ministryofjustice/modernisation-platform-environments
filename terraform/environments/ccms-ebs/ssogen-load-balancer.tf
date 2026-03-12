@@ -104,20 +104,20 @@ resource "aws_lb_listener" "ssogen_internal_app_listener" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.ssogen_internal_tg_ssogen_enc_app[count.index].arn
   }
-    # forward {
-    #   target_group {
-    #     arn    = aws_lb_target_group.ssogen_internal_tg_ssogen_app[count.index].arn
-    #     weight = 50
-    #   }
-    #   target_group {
-    #     arn    = aws_lb_target_group.ssogen_internal_tg_ssogen_enc_app[count.index].arn
-    #     weight = 50
-    #   }
-    #   stickiness {
-    #     enabled  = true
-    #     duration = 3600
-    #   }
-    # }
+  # forward {
+  #   target_group {
+  #     arn    = aws_lb_target_group.ssogen_internal_tg_ssogen_app[count.index].arn
+  #     weight = 50
+  #   }
+  #   target_group {
+  #     arn    = aws_lb_target_group.ssogen_internal_tg_ssogen_enc_app[count.index].arn
+  #     weight = 50
+  #   }
+  #   stickiness {
+  #     enabled  = true
+  #     duration = 3600
+  #   }
+  # }
 
   depends_on = [aws_acm_certificate_validation.external_nonprod]
 }
