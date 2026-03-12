@@ -162,8 +162,8 @@ resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_admin" {
   actions_enabled     = true
   # alarm_actions       = [aws_sns_topic.cw_alerts.arn]
   # ok_actions          = [aws_sns_topic.cw_alerts.arn]
-  alarm_actions       = [aws_sns_topic.cw_alerts.arn, aws_sns_topic.ssogen_admin_dns_flip_topic.arn]
-  ok_actions          = [aws_sns_topic.cw_alerts.arn, aws_sns_topic.ssogen_admin_dns_flip_topic.arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn, aws_sns_topic.ssogen_admin_dns_flip_topic[count.index].arn]
+  ok_actions          = [aws_sns_topic.cw_alerts.arn, aws_sns_topic.ssogen_admin_dns_flip_topic[count.index].arn]
   dimensions = {
     TargetGroup  = aws_lb_target_group.ssogen_internal_tg_ssogen_console[count.index].arn_suffix
     LoadBalancer = aws_lb.ssogen_alb[count.index].arn_suffix

@@ -107,6 +107,7 @@ data "archive_file" "ssogen_lambda_zip" {
 }
 
 resource "aws_lambda_function" "ssogen_lambda_dns_admin_failover" {
+  count       = local.is-development || local.is-test ? 1 : 0
   filename         = data.archive_file.ssogen_lambda_zip[count.index].output_path
   source_code_hash = base64sha256(join("", local.lambda_source_hashes_ssogen_admin_failover))
   function_name    = "${local.application_name_ssogen}-${local.environment}-dns-failover"
