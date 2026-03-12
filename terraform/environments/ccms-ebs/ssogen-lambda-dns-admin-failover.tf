@@ -57,7 +57,7 @@ resource "aws_iam_role_policy" "ssogen_lambda_dns_failover_policy" {
           "kms:GenerateDataKey*",
           "kms:Decrypt"
         ]
-        Resource = [aws_kms_key.ssogen_kms_key.arn]
+        Resource = [aws_kms_key.ssogen_kms_key[count.index].arn]
       }
     ]
   })
@@ -107,7 +107,7 @@ data "archive_file" "ssogen_lambda_zip" {
 }
 
 resource "aws_lambda_function" "ssogen_lambda_dns_admin_failover" {
-  filename         = data.archive_file.ssogen_lambda_zip.output_path
+  filename         = data.archive_file.ssogen_lambda_zip[count.index].output_path
   source_code_hash = base64sha256(join("", local.lambda_source_hashes_ssogen_admin_failover))
   function_name    = "${local.application_name_ssogen}-${local.environment}-dns-failover"
   role             = aws_iam_role.ssogen_lambda_role[count.index].arn
@@ -117,8 +117,8 @@ resource "aws_lambda_function" "ssogen_lambda_dns_admin_failover" {
   publish          = true
 
   vpc_config {
-    subnet_ids         = data.aws_subnets.shared_private.ids
-    security_group_ids = [aws_security_group.ssogen_lambda_sg.id]
+    subnet_ids         = data.aws_subnets.shared-private.ids
+    security_group_ids = [aws_security_group.ssogen_lambda_sg[count.index].id]
   }
 
   environment {
@@ -127,7 +127,7 @@ resource "aws_lambda_function" "ssogen_lambda_dns_admin_failover" {
       SECONDARY_IP   = data.aws_instance.ssogen_secondary_details[count.index].private_ip
       PORT           = local.application_data.accounts[local.environment].tg_ssogen_admin_port
       HOSTED_ZONE_ID = data.aws_route53_zone.external.zone_id
-      RECORD_NAME    = aws_route53_record.ssogen_admin_primary.name
+      RECORD_NAME    = aws_route53_record.ssogen_admin_primary[count.index].name
     }
   }
 }
