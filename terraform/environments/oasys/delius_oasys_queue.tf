@@ -79,6 +79,7 @@ resource "aws_iam_policy" "delius_oasys" {
         Effect = "Allow"
         Action = [
           "sqs:ReceiveMessage",
+          "sqs:SendMessage",
           "sqs:DeleteMessage",
           "sqs:GetQueueAttributes",
           "sqs:GetQueueUrl",
