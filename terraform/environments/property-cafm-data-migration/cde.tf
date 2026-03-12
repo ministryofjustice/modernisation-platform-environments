@@ -23,7 +23,7 @@ data "aws_iam_policy_document" "airflow_assume_role" {
 }
 
 resource "aws_iam_role" "airflow_cde" {
-  name                  = "airflow"
+  name                  = "airflow-cde"
   description           = "Role to allow Airflow to run CDE jobs"
   assume_role_policy    = data.aws_iam_policy_document.airflow_assume_role.json
   force_detach_policies = true
