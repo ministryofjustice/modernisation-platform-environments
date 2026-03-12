@@ -13,7 +13,7 @@
 
 4. Cert validation will automatically proceed once the DNS change is merged and applied
 
-5. Validated certs can be added as cert_arn in application_variables
+5. Validated certs can be added as cert_arn in application_variables.json
 */
 
 resource "aws_route53_record" "external" {
