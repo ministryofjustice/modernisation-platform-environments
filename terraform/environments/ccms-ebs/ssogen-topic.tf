@@ -38,7 +38,7 @@ resource "aws_sns_topic_subscription" "ssogen_admin_dns_flip_subscription" {
   count = local.is-development || local.is-test ? 1 : 0
   topic_arn = aws_sns_topic.ssogen_admin_dns_flip_topic[count.index].arn
   protocol  = "lambda"
-  endpoint  = aws_lambda_function.ssogen_admin_dns_flip[count.index].arn
+  endpoint  = aws_lambda_function.ssogen_lambda_dns_admin_failover[count.index].arn
 }
 
 data "aws_iam_policy_document" "ssogen_admin_dns_flip_topic_policy" {
@@ -51,7 +51,7 @@ data "aws_iam_policy_document" "ssogen_admin_dns_flip_topic_policy" {
       "sns:Publish",
     ]
     resources = [
-      aws_sns_topic.ssogen_admin_dns_flip_topic.arn
+      aws_sns_topic.ssogen_admin_dns_flip_topic[count.index].arn
     ]
     principals {
       type = "Service"
