@@ -79,7 +79,7 @@ resource "aws_route53_record" "yjsm_hub_svc_alb" {
   name    = "yjsm-hub-svc-lb"
   type    = "CNAME"
   ttl     = 300
-  records = [module.yjsm_hub_svc_alb.dns_name]
+  records = [module.yjsm_hub_svc_alb[0].dns_name]
 }
 
 

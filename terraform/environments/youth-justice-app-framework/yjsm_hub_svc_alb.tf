@@ -18,7 +18,12 @@ module "yjsm_hub_svc_alb" {
   internal = false
   
   alb_route53_record_name    = "yjsm-hub-svc-lb"
-  alb_route53_record_zone_id = data.aws_route53_zone.yjaf-inner.id
+  alb_route53_record_zone_id = data.aws_route53_zone.yjaf-inner.
+  
+  #pass in provider for creating records on central route53
+  providers = {
+    aws.core-network-services = aws.core-network-services
+  }
 
   listeners              = local.yjsm_hub_svc_listeners
   existing_target_groups = module.internal_alb.target_group_arns
