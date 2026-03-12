@@ -16,6 +16,12 @@ locals {
         vendor_name = "AWS"
         rule_action_override = [
           {
+            name = "NoUserAgent_HEADER"
+            action_to_use = {
+              count = {}
+          }
+          },
+          {
             name = "SizeRestrictions_QUERYSTRING"
             action_to_use = {
               count = {}
