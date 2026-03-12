@@ -13,6 +13,23 @@ resource "aws_security_group" "ssogen_sg" {
 ##### TEMP REMOVED RULES FOR SSOGEN IN AND WILL REVISIT TO ADD ONLY WHAT IS NEEDED LATER #####
 
 # ############################################
+# # INGRESS — 7001 from Lambda (private)
+# ############################################
+resource "aws_vpc_security_group_ingress_rule" "ing_console_workspaces" {
+  count             = local.is-development || local.is-test ? 1 : 0
+  ip_protocol       = "tcp"
+  description       = "admin port from Lambda SG"
+  security_group_id = aws_security_group.ssogen_sg[count.index].id
+  from_port         = 7001
+  to_port           = 7001
+  referenced_security_group_id = aws_security_group.ssogen_lambda_sg[count.index].id
+  #     data.aws_vpc.shared.cidr_block,
+  #     local.application_data.accounts[local.environment].lz_aws_subnet_env,
+  #     local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env,
+  #     local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env,
+}
+
+# ############################################
 # # INGRESS — SSH (22) from WorkSpaces subnets (private)
 # ############################################
 resource "aws_vpc_security_group_ingress_rule" "ing_console_workspaces" {
