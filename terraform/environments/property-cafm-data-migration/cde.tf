@@ -53,3 +53,27 @@ resource "aws_iam_role_policy_attachment" "airflow_cde_s3" {
   role       = aws_iam_role.airflow_cde.name
   policy_arn = aws_iam_policy.airflow_cde_s3.arn
 }
+
+data "aws_iam_policy_document" "airflow_cde_bedrock" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "bedrock:InvokeModel",
+      "bedrock:InvokeModelWithResponseStream"
+    ]
+    resources = [
+      "arn:aws:bedrock:*:*:inference-profile/*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "airflow_cde_bedrock" {
+  name        = "airflow-cde-bedrock-policy"
+  description = "Policy to allow Airflow to invoke Bedrock models with cross-region inference"
+  policy      = data.aws_iam_policy_document.airflow_cde_bedrock.json
+}
+
+resource "aws_iam_role_policy_attachment" "airflow_cde_bedrock" {
+  role       = aws_iam_role.airflow_cde.name
+  policy_arn = aws_iam_policy.airflow_cde_bedrock.arn
+}
