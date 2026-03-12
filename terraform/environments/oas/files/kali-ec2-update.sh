@@ -1,19 +1,35 @@
 #!/bin/bash
-set -euxo pipefail
+set -e
+exec > >(tee /var/log/user-data.log | logger -t user-data) 2>&1
 
 export DEBIAN_FRONTEND=noninteractive
 
-# Update package lists
-apt-get update
+echo "Updating and upgrading system packages..."
+apt-get update -y
+apt-get upgrade -y
 
-# Upgrade installed packages
-apt-get -y upgrade
+echo "Installing required packages and Kali default tools..."
+apt-get install -y wget git sudo kali-linux-default
 
-# Ensure SSM agent is installed (usually already present on AWS Kali AMI)
-if ! systemctl list-unit-files | grep -q amazon-ssm-agent; then
-    snap install amazon-ssm-agent --classic || true
+echo "Downloading and installing Amazon SSM Agent..."
+cd /tmp
+wget -O amazon-ssm-agent.deb https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb
+dpkg -i amazon-ssm-agent.deb || apt-get install -f -y
+
+echo "Enabling and starting Amazon SSM Agent..."
+systemctl enable amazon-ssm-agent
+systemctl start amazon-ssm-agent
+
+echo "Checking whether user 'kali' exists..."
+if id "kali" >/dev/null 2>&1; then
+  echo "User 'kali' exists. Creating tooling directory..."
+  mkdir -p /home/kali/tooling
+  chown -R kali:kali /home/kali
+
+  echo "Cloning gotestwaf into /home/kali/tooling..."
+  sudo -u kali git clone https://github.com/wallarm/gotestwaf.git /home/kali/tooling
+else
+  echo "User 'kali' does not exist. Skipping tooling setup."
 fi
 
-# Enable and start SSM agent
-systemctl enable amazon-ssm-agent || true
-systemctl restart amazon-ssm-agent || true
+echo "User data script completed successfully."
