@@ -44,18 +44,6 @@ resource "aws_security_group_rule" "ingress_rds_from_workspaces" {
   description       = "SQL Developer from Workspaces"
 }
 
-resource "aws_security_group_rule" "ingress_rds_from_mp_vpc_for_edw" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "ingress"
-  security_group_id = aws_security_group.rds_sg[0].id
-  from_port         = 1521
-  to_port           = 1521
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  description       = "allow EDW to connect to RDS for OAS"
-}
-
 ######################################
 ### RDS SG Egress Rules
 ######################################
@@ -81,16 +69,4 @@ resource "aws_security_group_rule" "rds_sg_egress_workspaces" {
   protocol          = "tcp"
   cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
   description       = "SQL Developer to Workspaces"
-}
-
-resource "aws_security_group_rule" "egress_rds_to_mp_vpc_for_edw" {
-  count = local.environment == "preproduction" ? 1 : 0
-
-  type              = "egress"
-  security_group_id = aws_security_group.rds_sg[0].id
-  from_port         = 1521
-  to_port           = 1521
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  description       = "allow EDW to connect to RDS for OAS"
 }
