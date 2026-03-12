@@ -139,22 +139,22 @@ resource "aws_lb_listener" "ssogen_internal_console_listener" {
   # depends_on = [aws_acm_certificate_validation.external_nonprod]
 }
 
-resource "aws_lb_listener_rule" "ssogen_internal_console_listener_encrypted" {
-  count        = local.is-development || local.is-test ? 1 : 0
-  listener_arn = aws_lb_listener.ssogen_internal_app_listener[count.index].arn
-  priority     = 10
+# resource "aws_lb_listener_rule" "ssogen_internal_console_listener_encrypted" {
+#   count        = local.is-development || local.is-test ? 1 : 0
+#   listener_arn = aws_lb_listener.ssogen_internal_app_listener[count.index].arn
+#   priority     = 10
 
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.ssogen_internal_tg_ssogen_console[count.index].arn
-  }
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.ssogen_internal_tg_ssogen_console[count.index].arn
+#   }
 
-  condition {
-    path_pattern {
-      values = ["/console*", "/console/", "/console/*"]
-    }
-  }
-}
+#   condition {
+#     path_pattern {
+#       values = ["/console*", "/console/", "/console/*"]
+#     }
+#   }
+# }
 
 # resource "aws_lb_target_group_attachment" "ssogen_internal" {
 #   count            = local.is-development ? local.application_data.accounts[local.environment].ssogen_no_instances : 0
