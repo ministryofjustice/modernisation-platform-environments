@@ -48,3 +48,8 @@ data "aws_iam_roles" "platform_engineer_admin_sso_role" {
 #   name         = trimprefix(terraform.workspace, "cloud-platform-") + ".temp.cloud-platform.service.justice.gov.uk"
 #   private_zone = false
 # }
+
+data "aws_eks_cluster_auth" "cluster" {
+  count = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
+  name  = local.cluster_name
+}
