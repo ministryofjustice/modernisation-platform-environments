@@ -88,6 +88,16 @@ resource "aws_vpc_security_group_egress_rule" "ssogen_lambda_https_out" {
   description       = "Allow HTTPS to AWS APIs (requires NAT if in private subnets)"
 }
 
+# Egress: HTTPS to the internet (Route 53 API via NAT)
+resource "aws_vpc_security_group_egress_rule" "ssogen_lambda_to_ec2_out" {
+  count             = local.is-development || local.is-test ? 1 : 0
+  security_group_id = aws_security_group.ssogen_lambda_sg[count.index].id
+  ip_protocol       = "tcp"
+  from_port         = 7001
+  to_port           = 7001
+  referenced_security_group_id = aws_security_group.ssogen_sg[count.index].id
+  description       = "Allow HTTPS to AWS APIs (requires NAT if in private subnets)"
+}
 # OPTIONAL & preferred: Egress only to the target instances' SG on the app port
 # Replace aws_security_group.targets.id with your EC2s' SG ID.
 # resource "aws_vpc_security_group_egress_rule" "lambda_to_app_sg" {
