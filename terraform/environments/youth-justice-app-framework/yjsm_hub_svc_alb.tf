@@ -17,7 +17,8 @@ module "yjsm_hub_svc_alb" {
   alb_name = "yjsm-hub-svc-ext"
   internal = false
   
-  #alb_route53_record_zone_id = module.private_dns_zone.aws_route53_zone_id #data.aws_route53_zone_id.inner.id
+  alb_route53_record_name    = "yjsm-hub-svc-lb"
+  alb_route53_record_zone_id = data.aws_route53_zone.yjaf-inner.id
 
   listeners              = local.yjsm_hub_svc_listeners
   existing_target_groups = module.internal_alb.target_group_arns
