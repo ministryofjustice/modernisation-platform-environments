@@ -8,8 +8,11 @@ echo "Updating and upgrading system packages..."
 apt-get update -y
 apt-get upgrade -y
 
-echo "Installing required packages and Kali default tools..."
-apt-get install -y wget git sudo kali-linux-default
+echo "Installing required packages..."
+apt-get install -y wget git sudo || true
+
+echo "Installing Kali default tools..."
+apt-get install -y kali-linux-default || true
 
 echo "Downloading and installing Amazon SSM Agent..."
 cd /tmp
@@ -19,15 +22,13 @@ dpkg -i amazon-ssm-agent.deb || apt-get install -f -y
 echo "Enabling and starting Amazon SSM Agent..."
 systemctl enable amazon-ssm-agent
 systemctl start amazon-ssm-agent
+systemctl status amazon-ssm-agent --no-pager || true
 
 echo "Checking whether user 'kali' exists..."
 if id "kali" >/dev/null 2>&1; then
-  echo "User 'kali' exists. Creating tooling directory..."
   mkdir -p /home/kali/tooling
   chown -R kali:kali /home/kali
-
-  echo "Cloning gotestwaf into /home/kali/tooling..."
-  sudo -u kali git clone https://github.com/wallarm/gotestwaf.git /home/kali/tooling
+  sudo -u kali git clone https://github.com/wallarm/gotestwaf.git /home/kali/tooling || true
 else
   echo "User 'kali' does not exist. Skipping tooling setup."
 fi
