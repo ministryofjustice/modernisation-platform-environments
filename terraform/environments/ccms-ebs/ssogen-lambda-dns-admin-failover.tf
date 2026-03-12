@@ -136,7 +136,7 @@ resource "aws_lambda_function" "ssogen_lambda_dns_admin_failover" {
 resource "aws_lambda_permission" "lambda_allow_events" {
   statement_id  = "AllowExecutionFromEvents"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.ssogen_lambda_dns_admin_failover.function_name
+  function_name = aws_lambda_function.ssogen_lambda_dns_admin_failover[count.index].function_name
   principal     = "sns.amazonaws.com"
-  source_arn    = aws_sns_topic.ssogen_admin_dns_flip_topic.arn
+  source_arn    = aws_sns_topic.ssogen_admin_dns_flip_topic[count.index].arn
 }
