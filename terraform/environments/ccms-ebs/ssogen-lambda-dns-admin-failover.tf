@@ -96,7 +96,7 @@ resource "aws_vpc_security_group_egress_rule" "ssogen_lambda_to_ec2_out" {
   from_port         = 7001
   to_port           = 7001
   referenced_security_group_id = aws_security_group.ssogen_sg[count.index].id
-  description       = "Allow HTTPS to AWS APIs (requires NAT if in private subnets)"
+  description       = "Allow 7001 to EC2 instances"
 }
 # OPTIONAL & preferred: Egress only to the target instances' SG on the app port
 # Replace aws_security_group.targets.id with your EC2s' SG ID.
