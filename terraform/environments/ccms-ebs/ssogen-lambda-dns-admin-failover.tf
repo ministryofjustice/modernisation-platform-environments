@@ -40,7 +40,7 @@ resource "aws_iam_role_policy" "ssogen_lambda_dns_failover_policy" {
           "route53:ListHostedZones",
           "route53:ListResourceRecordSets"
         ],
-        Resource = "arn:aws:route53:::hostedzone/{data.aws_route53_zone.external.zone_id}",
+        Resource = "arn:aws:route53:::hostedzone/${data.aws_route53_zone.external.zone_id}",
       },
       {
         Effect = "Allow"
