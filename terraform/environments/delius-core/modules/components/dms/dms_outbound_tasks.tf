@@ -45,7 +45,7 @@ resource "aws_dms_replication_task" "audited_interaction_outbound_replication" {
 # User outbound replication only happens in repository environments
 # This replicates records from the USER_ and PROBATION_AREA_USER tables
 resource "aws_dms_replication_task" "user_outbound_replication" {
-  for_each            = local.client_account_map
+  for_each            = var.env_name == "test" ? {} : local.client_account_map
   replication_task_id = "${var.env_name}-user-outbound-replication-task-for-${lower(var.dms_config.user_source_endpoint.read_database)}-to-${each.key}"
   # We do not support a full load since this would require a cascading delete of multiple
   # records; instead we only CDC user and probation records.  If this task is

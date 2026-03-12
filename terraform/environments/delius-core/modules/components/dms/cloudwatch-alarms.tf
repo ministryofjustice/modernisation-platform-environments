@@ -66,7 +66,7 @@ locals {
         replication_task_id  = aws_dms_replication_task.audited_interaction_outbound_replication[0].replication_task_id
       }
     },
-    { for k in keys(local.client_account_map) :
+    var.env_name == "test" ? {} : { for k in keys(local.client_account_map) :
       "user_outbound_replication_to_${k}" => {
         replication_task_arn = aws_dms_replication_task.user_outbound_replication[k].replication_task_arn
         replication_task_id  = aws_dms_replication_task.user_outbound_replication[k].replication_task_id
