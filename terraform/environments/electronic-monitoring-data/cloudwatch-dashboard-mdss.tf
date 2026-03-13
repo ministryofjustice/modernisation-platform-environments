@@ -88,8 +88,8 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           stat   = "Sum"
           period = 60
           metrics = [
-            ["AWS/Lambda", "Errors", "FunctionName", module.mdss_reconciler.lambda_function_name],
-            [".", "Throttles", ".", module.mdss_reconciler.lambda_function_name]
+            ["AWS/Lambda", "Errors", "FunctionName", try(module.mdss_reconciler[0].lambda_function_name, "mdss_reconciler_not_deployed")],
+            [".", "Throttles", ".", try(module.mdss_reconciler[0].lambda_function_name, "mdss_reconciler_not_deployed")]
           ]
         }
       },
@@ -104,8 +104,8 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           region = "eu-west-2"
           period = 300
           metrics = [
-            ["AWS/Lambda", "Duration", "FunctionName", module.mdss_reconciler.lambda_function_name, { stat = "p95" }],
-            [".", "Invocations", ".", module.mdss_reconciler.lambda_function_name, { stat = "Sum" }]
+            ["AWS/Lambda", "Duration", "FunctionName", try(module.mdss_reconciler[0].lambda_function_name, "mdss_reconciler_not_deployed"), { stat = "p95" }],
+            [".", "Invocations", ".", try(module.mdss_reconciler[0].lambda_function_name, "mdss_reconciler_not_deployed"), { stat = "Sum" }]
           ]
         }
       },
@@ -148,7 +148,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT
-            SOURCE '${module.mdss_reconciler.cloudwatch_log_group.name}'
+            SOURCE '${try(module.mdss_reconciler[0].cloudwatch_log_group.name, "/aws/lambda/mdss_reconciler_not_deployed")}'
             | filter message.event = "MDSS_RECONCILE_COMPLETE"
             | fields
                 @timestamp,

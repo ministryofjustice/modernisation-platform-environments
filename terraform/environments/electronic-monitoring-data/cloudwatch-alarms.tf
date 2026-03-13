@@ -49,6 +49,7 @@ resource "aws_cloudwatch_metric_alarm" "clean_dlt_dlq_alarm" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "mdss_reconciler_errors_alarm" {
+  count               = local.is-preproduction || local.is-production ? 0 : 1
   alarm_name          = "mdss_reconciler_errors"
   alarm_description   = "Triggered when the mdss_reconciler Lambda records errors"
   comparison_operator = "GreaterThanThreshold"
@@ -64,7 +65,7 @@ resource "aws_cloudwatch_metric_alarm" "mdss_reconciler_errors_alarm" {
   statistic   = "Sum"
 
   dimensions = {
-    FunctionName = module.mdss_reconciler.lambda_function_name
+    FunctionName = module.mdss_reconciler[0].lambda_function_name
   }
 
   alarm_actions = [
