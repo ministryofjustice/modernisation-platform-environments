@@ -1,7 +1,7 @@
 resource "aws_iam_role" "ssogen_lambda_role" {
   count = local.is-development || local.is-test ? 1 : 0
   name  = "${local.application_name_ssogen}-${local.environment}-dns-failover-role"
-  provider = aws.core-vpc
+  # provider = aws.core-vpc
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
