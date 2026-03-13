@@ -16,7 +16,6 @@ resource "local_file" "dns_change" {
 
 resource "null_resource" "conditional_dns_update" {
   count    = local.is-development || local.is-test ? 1 : 0
-#   provider = aws.core-vpc
   provisioner "local-exec" {
     command = <<EOF
 CREDS=$(aws sts assume-role --role-arn arn:aws:iam::${data.aws_caller_identity.current.id}:role/MemberInfrastructureAccess --role-session-name github-actions-session)
@@ -24,12 +23,15 @@ export AWS_ACCESS_KEY_ID=$(echo $CREDS | jq -r '.Credentials.AccessKeyId')
 export AWS_SECRET_ACCESS_KEY=$(echo $CREDS | jq -r '.Credentials.SecretAccessKey')
 export AWS_SESSION_TOKEN=$(echo $CREDS | jq -r '.Credentials.SessionToken')
 chmod u+x ${path.module}/scripts/update_dns_ssogen_admin.sh
-./scripts/update_dns_ssogen_admin.sh \
+aws ssm send-command \
+--document-name AWS-RunShellScript \
+--instance-ids ${data.aws_instance.ssogen_primary_details[count.index].instance_id} \
+--parameters commands=['./scripts/update_dns_ssogen_admin.sh \
 ${data.aws_instance.ssogen_primary_details[count.index].private_ip} \
 ${local.application_data.accounts[local.environment].tg_ssogen_admin_port} \
 ${data.aws_instance.ssogen_secondary_details[count.index].private_ip} \
 ${data.aws_route53_zone.external.zone_id} \
-${local_file.dns_change[count.index].filename}
+${local_file.dns_change[count.index].filename}']
 EOF
   }
   depends_on = [local_file.dns_change]
