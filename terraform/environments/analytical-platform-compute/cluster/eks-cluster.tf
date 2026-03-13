@@ -73,6 +73,49 @@ module "eks" {
     eks-node-monitoring-agent = {
       addon_version = local.environment_configuration.eks_cluster_addon_versions.eks_node_monitoring_agent
     }
+    amazon-cloudwatch-observability = {
+      addon_version            = local.environment_configuration.eks_cluster_addon_versions.amazon_cloudwatch_observability
+      service_account_role_arn = module.cloudwatch_observability_iam_role.arn
+      configuration_values = jsonencode({
+        containerLogs = {
+          fluentBit = {
+            config = {
+              outputs = <<-EOT
+                [OUTPUT]
+                    Name cloudwatch_logs
+                    Match *
+                    region ${data.aws_region.current.name}
+                    log_group_name ${local.eks_cloudwatch_log_group_name}
+                    log_stream_prefix fluentbit-
+                    auto_create_group false
+              EOT
+            }
+          }
+        }
+        agent = {
+          config = {
+            logs = {
+              metrics_collected = {
+                application_signals = {
+                  enabled = false
+                }
+                kubernetes = {
+                  enhanced_container_insights = false
+                  accelerated_compute_metrics = true
+                }
+              }
+            }
+            traces = {
+              traces_collected = {
+                xray = {
+                  enabled = false
+                }
+              }
+            }
+          }
+        }
+      })
+    }
     vpc-cni = {
       addon_version            = local.environment_configuration.eks_cluster_addon_versions.vpc_cni
       service_account_role_arn = module.vpc_cni_iam_role.arn
@@ -125,7 +168,6 @@ module "eks" {
       iam_role_additional_policies = {
         AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
         AmazonSSMManagedInstanceCore       = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-        CloudWatchAgentServerPolicy        = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
         ECRPullThroughCachePolicy          = module.ecr_pull_through_cache_iam_policy.arn
         EKSClusterLogsKMSAccessPolicy      = module.eks_cluster_logs_kms_access_iam_policy.arn
       }
@@ -180,7 +222,6 @@ module "eks" {
       iam_role_additional_policies = {
         AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
         AmazonSSMManagedInstanceCore       = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-        CloudWatchAgentServerPolicy        = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
         ECRPullThroughCachePolicy          = module.ecr_pull_through_cache_iam_policy.arn
         EKSClusterLogsKMSAccessPolicy      = module.eks_cluster_logs_kms_access_iam_policy.arn
       }
@@ -283,7 +324,6 @@ module "karpenter" {
   node_iam_role_name = "karpenter"
   node_iam_role_additional_policies = {
     AmazonSSMManagedInstanceCore  = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-    CloudWatchAgentServerPolicy   = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
     EKSClusterLogsKMSAccessPolicy = module.eks_cluster_logs_kms_access_iam_policy.arn
   }
 
