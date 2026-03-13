@@ -9,7 +9,7 @@ resource "aws_security_group" "load_balancer_external" {
 }
 
 # EGRESS
-resource "aws_vpc_security_group_egress_rule" "lb_sg_egress_all_0_0_cidr" {
+resource "aws_vpc_security_group_egress_rule" "lb_ext_egress_all_0_0_cidr" {
   security_group_id = aws_security_group.load_balancer_external.id
   description       = "Allow all outbound traffic"
   ip_protocol       = "-1"
@@ -21,7 +21,7 @@ resource "aws_vpc_security_group_egress_rule" "lb_sg_egress_all_0_0_cidr" {
 }
 
 # INGRESS
-resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_443_443_cidr_1" {
+resource "aws_vpc_security_group_ingress_rule" "lb_ext_ingress_tcp_443_443_cidr_1" {
   security_group_id = aws_security_group.load_balancer_external.id
   description       = "HTTPS access from shared VPC"
   ip_protocol       = "tcp"
@@ -34,7 +34,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_443_443_cidr_1
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_443_443_cidr_2" {
+resource "aws_vpc_security_group_ingress_rule" "lb_ext_ingress_tcp_443_443_cidr_2" {
   security_group_id = aws_security_group.load_balancer_external.id
   description       = "HTTPS access from non-prod workspaces"
   ip_protocol       = "tcp"
@@ -47,7 +47,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_443_443_cidr_2
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_443_443_cidr_3" {
+resource "aws_vpc_security_group_ingress_rule" "lb_ext_ingress_tcp_443_443_cidr_3" {
   security_group_id = aws_security_group.load_balancer_external.id
   description       = "HTTPS access from prod workspaces"
   ip_protocol       = "tcp"
@@ -60,7 +60,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_443_443_cidr_3
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_3872_3872_cidr_1" {
+resource "aws_vpc_security_group_ingress_rule" "lb_ext_ingress_tcp_3872_3872_cidr_1" {
   security_group_id = aws_security_group.load_balancer_external.id
   description       = "Oracle EM Console HTTP from shared VPC"
   ip_protocol       = "tcp"
@@ -73,7 +73,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_3872_3872_cidr
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_3872_3872_cidr_2" {
+resource "aws_vpc_security_group_ingress_rule" "lb_ext_ingress_tcp_3872_3872_cidr_2" {
   security_group_id = aws_security_group.load_balancer_external.id
   description       = "Oracle EM Console HTTP from non-prod workspaces"
   ip_protocol       = "tcp"
@@ -86,7 +86,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_3872_3872_cidr
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_3872_3872_cidr_3" {
+resource "aws_vpc_security_group_ingress_rule" "lb_ext_ingress_tcp_3872_3872_cidr_3" {
   security_group_id = aws_security_group.load_balancer_external.id
   description       = "Oracle EM Console HTTP from prod workspaces"
   ip_protocol       = "tcp"
@@ -99,7 +99,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_3872_3872_cidr
   }
 }
 
-# resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_3872_3872_cidr_any" {
+# resource "aws_vpc_security_group_ingress_rule" "lb_ext_ingress_tcp_3872_3872_cidr_any" {
 #   security_group_id = aws_security_group.load_balancer_external.id
 #   description       = "Oracle EM Console HTTP from internet (public access)"
 #   ip_protocol       = "tcp"
@@ -112,7 +112,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_3872_3872_cidr
 #   }
 # }
 
-resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_4903_4903_cidr_1" {
+resource "aws_vpc_security_group_ingress_rule" "lb_ext_ingress_tcp_4903_4903_cidr_1" {
   security_group_id = aws_security_group.load_balancer_external.id
   description       = "Oracle EM Console HTTPS from shared VPC"
   ip_protocol       = "tcp"
@@ -125,7 +125,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_4903_4903_cidr
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_4903_4903_cidr_2" {
+resource "aws_vpc_security_group_ingress_rule" "lb_ext_ingress_tcp_4903_4903_cidr_2" {
   security_group_id = aws_security_group.load_balancer_external.id
   description       = "Oracle EM Console HTTPS from non-prod workspaces"
   ip_protocol       = "tcp"
@@ -138,7 +138,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_4903_4903_cidr
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_4903_4903_cidr_3" {
+resource "aws_vpc_security_group_ingress_rule" "lb_ext_ingress_tcp_4903_4903_cidr_3" {
   security_group_id = aws_security_group.load_balancer_external.id
   description       = "Oracle EM Console HTTPS from prod workspaces"
   ip_protocol       = "tcp"
@@ -151,7 +151,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_4903_4903_cidr
   }
 }
 
-# resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_4903_4903_cidr_any" {
+# resource "aws_vpc_security_group_ingress_rule" "lb_ext_ingress_tcp_4903_4903_cidr_any" {
 #   security_group_id = aws_security_group.load_balancer_external.id
 #   description       = "Oracle EM Console HTTPS from internet (public access)"
 #   ip_protocol       = "tcp"
@@ -164,7 +164,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_4903_4903_cidr
 #   }
 # }
 
-resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_7102_7102_cidr_1" {
+resource "aws_vpc_security_group_ingress_rule" "lb_ext_ingress_tcp_7102_7102_cidr_1" {
   security_group_id = aws_security_group.load_balancer_external.id
   description       = "Oracle EM OMS port from shared VPC"
   ip_protocol       = "tcp"
@@ -177,7 +177,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_7102_7102_cidr
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_7102_7102_cidr_2" {
+resource "aws_vpc_security_group_ingress_rule" "lb_ext_ingress_tcp_7102_7102_cidr_2" {
   security_group_id = aws_security_group.load_balancer_external.id
   description       = "Oracle EM OMS port from non-prod workspaces"
   ip_protocol       = "tcp"
@@ -190,7 +190,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_7102_7102_cidr
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_7102_7102_cidr_3" {
+resource "aws_vpc_security_group_ingress_rule" "lb_ext_ingress_tcp_7102_7102_cidr_3" {
   security_group_id = aws_security_group.load_balancer_external.id
   description       = "Oracle EM OMS port from prod workspaces"
   ip_protocol       = "tcp"
@@ -203,7 +203,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_7102_7102_cidr
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_7803_7803_cidr_1" {
+resource "aws_vpc_security_group_ingress_rule" "lb_ext_ingress_tcp_7803_7803_cidr_1" {
   security_group_id = aws_security_group.load_balancer_external.id
   description       = "Oracle EM additional port from shared VPC"
   ip_protocol       = "tcp"
@@ -216,7 +216,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_7803_7803_cidr
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_7803_7803_cidr_2" {
+resource "aws_vpc_security_group_ingress_rule" "lb_ext_ingress_tcp_7803_7803_cidr_2" {
   security_group_id = aws_security_group.load_balancer_external.id
   description       = "Oracle EM additional port from non-prod workspaces"
   ip_protocol       = "tcp"
@@ -229,7 +229,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_7803_7803_cidr
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_7803_7803_cidr_3" {
+resource "aws_vpc_security_group_ingress_rule" "lb_ext_ingress_tcp_7803_7803_cidr_3" {
   security_group_id = aws_security_group.load_balancer_external.id
   description       = "Oracle EM additional port from prod workspaces"
   ip_protocol       = "tcp"
@@ -242,7 +242,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_7803_7803_cidr
   }
 }
 
-# resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_7803_7803_cidr_any" {
+# resource "aws_vpc_security_group_ingress_rule" "lb_ext_ingress_tcp_7803_7803_cidr_any" {
 #   security_group_id = aws_security_group.load_balancer_external.id
 #   description       = "Oracle EM additional port from internet (public access)"
 #   ip_protocol       = "tcp"
