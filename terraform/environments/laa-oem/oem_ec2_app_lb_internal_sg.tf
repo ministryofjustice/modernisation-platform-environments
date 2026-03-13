@@ -1,3 +1,7 @@
+# DO NOT:
+# - Change the resource name -> destroy/create.
+# - Change the description -> destroy/create.
+
 resource "aws_security_group" "load_balancer_internal" {
   name_prefix = "${local.application_name}-lb-int-sg-"
   description = "Access to the EBS App server"
@@ -8,19 +12,19 @@ resource "aws_security_group" "load_balancer_internal" {
   ), local.tags)
 }
 
-# # Egress Rules for load_balancer_internal
-# resource "aws_vpc_security_group_egress_rule" "lb_int_egress_all_0_0_cidr" {
-#   security_group_id = aws_security_group.load_balancer_internal.id
-#   description       = "Allow all outbound traffic"
-#   ip_protocol       = "-1"
-#   cidr_ipv4         = "0.0.0.0/0"
-# 
-#   tags = {
-#     Name = "Allow all outbound traffic"
-#   }
-# }
+# EGRESS
+resource "aws_vpc_security_group_egress_rule" "lb_int_egress_all_0_0_cidr" {
+  security_group_id = aws_security_group.load_balancer_internal.id
+  description       = "Allow all outbound traffic"
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
 
-# Ingress Rules for load_balancer_internal - HTTPS (443)
+  tags = {
+    Name = "Allow all outbound traffic"
+  }
+}
+
+# INGRESS
 resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_443_443_cidr_1" {
   security_group_id = aws_security_group.load_balancer_internal.id
   description       = "HTTPS access from shared VPC"
@@ -60,7 +64,6 @@ resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_443_443_cidr_
   }
 }
 
-# Ingress Rules for load_balancer_internal - Oracle EM Console HTTP (3872)
 resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_3872_3872_cidr_1" {
   security_group_id = aws_security_group.load_balancer_internal.id
   description       = "Oracle EM Console HTTP from shared VPC"
@@ -113,7 +116,6 @@ resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_3872_3872_cid
   }
 }
 
-# Ingress Rules for load_balancer_internal - Oracle EM Console HTTPS (4903)
 resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_4903_4903_cidr_1" {
   security_group_id = aws_security_group.load_balancer_internal.id
   description       = "Oracle EM Console HTTPS from shared VPC"
@@ -166,7 +168,6 @@ resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_4903_4903_cid
   }
 }
 
-# Ingress Rules for load_balancer_internal - Oracle EM OMS (7102)
 resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_7102_7102_cidr_1" {
   security_group_id = aws_security_group.load_balancer_internal.id
   description       = "Oracle EM OMS port from shared VPC"
@@ -206,7 +207,6 @@ resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_7102_7102_cid
   }
 }
 
-# Ingress Rules for load_balancer_internal - Oracle EM additional port (7803)
 resource "aws_vpc_security_group_ingress_rule" "lb_int_ingress_tcp_7803_7803_cidr_1" {
   security_group_id = aws_security_group.load_balancer_internal.id
   description       = "Oracle EM additional port from shared VPC"
