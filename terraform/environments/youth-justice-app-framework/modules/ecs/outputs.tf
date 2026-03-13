@@ -28,3 +28,8 @@ output "ecs_task_execution_role_arn" {
   description = "The ARN of the ECS task execution role"
   value       = aws_iam_role.ecs_task_execution_role.arn
 }
+
+output "autoscaling_sg_id" {
+  value       = module.autoscaling_sg.security_group_id
+  description = "The security group ID for the ECS autoscaling group"
+}

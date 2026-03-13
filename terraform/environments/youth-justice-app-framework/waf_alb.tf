@@ -48,7 +48,11 @@ module "waf" {
       name         = "whitelist-ip"
       priority     = 2
       description  = "Whitelisted IP addresses"
-      ip_addresses = ["66.103.29.115/32"]
+      ip_addresses = concat(["66.103.29.115/32"], [
+        data.aws_subnet.private_subnets_a.cidr_block,
+        data.aws_subnet.private_subnets_b.cidr_block,
+        data.aws_subnet.private_subnets_c.cidr_block
+      ])
     }
   }
 

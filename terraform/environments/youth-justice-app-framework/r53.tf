@@ -41,7 +41,7 @@ resource "aws_route53_record" "private_alb" {
 
 locals {
   dns_a_records = {
-    assets = [module.yjsm.yjsm_instance_private_ip]
+    yjsm = [module.yjsm.yjsm_instance_private_ip]
     mule   = [module.esb.esb_instance_private_ip]
     ldap   = module.ds.dns_ip_addresses
   }
@@ -72,6 +72,15 @@ resource "aws_route53_record" "connectivity_alb" {
   records = [module.connectivity_alb.dns_name]
 }
 
+resource "aws_route53_record" "yjsm_hub_svc_alb" {
+  provider = aws.core-network-services
+  count    = local.application_data.accounts[local.environment].create_svc_pilot ? 1 : 0
+  zone_id  = data.aws_route53_zone.yjaf-inner.id
+  name     = "yjsm-hub-svc-lb"
+  type     = "CNAME"
+  ttl      = 300
+  records  = [module.yjsm_hub_svc_alb[0].dns_name]
+}
 
 
 
