@@ -16,6 +16,7 @@ resource "local_file" "dns_change" {
 
 resource "null_resource" "conditional_dns_update" {
   count    = local.is-development || local.is-test ? 1 : 0
+  provider = aws.core-vpc
   provisioner "local-exec" {
     command = <<EOF
 CREDS=$(aws sts assume-role --role-arn arn:aws:iam::${data.aws_caller_identity.current.id}:role/MemberInfrastructureAccess --role-session-name github-actions-session)
