@@ -18,7 +18,7 @@ resource "null_resource" "conditional_dns_update" {
   count    = local.is-development || local.is-test ? 1 : 0
   provisioner "local-exec" {
     environment = {
-      AWS_PROFILE = "core-vpc"
+      AWS_PROFILE = "aws.core-vpc"
       AWS_REGION  = "eu-west-2"
     }
     command = <<EOF
