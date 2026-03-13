@@ -18,6 +18,8 @@ resource "aws_instance" "tariff_app_dev_poc_clone" {
   vpc_security_group_ids = [module.tariff_app_security_group[0].security_group_id]
   #vpc_security_group_ids = [aws_security_group.temp_dev_ssm_only[0].id] # TEMPORARY ASSIGNMENT
 
+  private_ip = "10.26.32.62"
+
   tags = merge(tomap({
     "Name"     = lower(format("ec2-%s-%s-app-clone", local.application_name, local.environment)),
     "hostname" = "${local.application_name}-app-poc-clone",
