@@ -23,9 +23,11 @@ export AWS_ACCESS_KEY_ID=$(echo $CREDS | jq -r '.Credentials.AccessKeyId')
 export AWS_SECRET_ACCESS_KEY=$(echo $CREDS | jq -r '.Credentials.SecretAccessKey')
 export AWS_SESSION_TOKEN=$(echo $CREDS | jq -r '.Credentials.SessionToken')
 chmod u+x ${path.module}/scripts/update_dns_ssogen_admin.sh
+value=${data.aws_instance.ssogen_primary_details[count.index].ids}
+echo "Running DNS update script on instance ${value}"
 aws ssm send-command \
 --document-name AWS-RunShellScript \
---instance-ids ${data.aws_instance.ssogen_primary_details[count.index].instance_id} \
+--instance-ids ${data.aws_instance.ssogen_primary_details[count.index].ids} \
 --parameters commands=['./scripts/update_dns_ssogen_admin.sh \
 ${data.aws_instance.ssogen_primary_details[count.index].private_ip} \
 ${local.application_data.accounts[local.environment].tg_ssogen_admin_port} \
