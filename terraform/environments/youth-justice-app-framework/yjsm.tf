@@ -44,9 +44,9 @@ module "yjsm" {
   ami = lookup(
     {
       development   = "ami-020f796d0dec4ed4c"
-      test          = "ami-0b84f8ede56f98adf"
+      test          = "ami-00e714c8277811e57"
       preproduction = "ami-0d79a6afc87dfa388"
-      production    = "ami-08e24cb718917177b"
+      production    = "ami-0be9396f2bf4f21c1"
       # Add more environments when AMIs are known
     },
     local.environment,
@@ -65,6 +65,7 @@ module "yjsm" {
   esb_service_sg_id             = module.esb.esb_security_group_id
   rds_cluster_security_group_id = module.aurora.rds_cluster_security_group_id
   alb_security_group_id         = module.internal_alb.alb_security_group_id
+  connectivity_alb_sg_id        = module.connectivity_alb.alb_security_group_id
   management_server_sg_id       = module.ds.management_server_sg_id
   #Keep until prod images are done
   tableau_sg_id = module.tableau.tableau_sg_id

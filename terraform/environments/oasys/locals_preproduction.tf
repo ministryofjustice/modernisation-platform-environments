@@ -1,5 +1,7 @@
 locals {
 
+  delius_oasys_queues_preproduction = {}
+
   baseline_presets_preproduction = {
     options = {
       enable_xsiam_cloudwatch_integration = true
@@ -18,13 +20,12 @@ locals {
     # If your DNS records are in Fix 'n' Go, setup will be a 2 step process, see the acm_certificate module readme
     # if making changes, comment out the listeners that use the cert, edit the cert, recreate the listeners
     acm_certificates = {
-      pp_oasys_cert = {
+      pp_oasys_cert_v2 = {
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         domain_name                         = "pp.oasys.service.justice.gov.uk"
         external_validation_records_created = true
         subject_alternate_names = [
           "pp-int.oasys.service.justice.gov.uk",
-          "bridge-pp-oasys.az.justice.gov.uk",
           "pp-oasys.az.justice.gov.uk",
           "*.pp-oasys.az.justice.gov.uk",
         ]
@@ -50,6 +51,13 @@ locals {
 
     ec2_autoscaling_groups = {
       pp-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
+          desired_capacity = 1 # setting to 0 leaves in a stopped state because of the warm_pool config below ####
+          warm_pool = {
+            min_size          = 0
+            reuse_on_scale_in = true
+          }
+        })
         autoscaling_schedules = {
           scale_up   = { recurrence = "0 5 * * Mon-Fri" }
           scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
@@ -229,7 +237,7 @@ locals {
 
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
-            certificate_names_or_arns = ["pp_oasys_cert"]
+            certificate_names_or_arns = ["pp_oasys_cert_v2"]
 
             rules = {
               pp-web-http-8080 = {
@@ -244,7 +252,6 @@ locals {
                       values = [
                         "pp.oasys.service.justice.gov.uk",
                         "pp-a.oasys.service.justice.gov.uk",
-                        "bridge-pp-oasys.az.justice.gov.uk"
                       ]
                     }
                   }
@@ -266,7 +273,7 @@ locals {
 
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
-            certificate_names_or_arns = ["pp_oasys_cert"]
+            certificate_names_or_arns = ["pp_oasys_cert_v2"]
 
             default_action = {
               type = "redirect"
@@ -290,9 +297,6 @@ locals {
                     host_header = {
                       values = [
                         "pp-int.oasys.service.justice.gov.uk",
-                        "pp-a-int.oasys.service.justice.gov.uk",
-                        "pp-oasys.az.justice.gov.uk",
-                        "oasys-ukwest.pp-oasys.az.justice.gov.uk",
                       ]
                     }
                   }
@@ -318,6 +322,14 @@ locals {
         records = [
           { name = "db.pp.oasys", type = "CNAME", ttl = "3600", records = ["pp-oasys-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] },
           { name = "db.pp.onr", type = "CNAME", ttl = "3600", records = ["pp-onr-db-a.oasys.hmpps-preproduction.modernisation-platform.internal"] },
+        ]
+      }
+      "pp-oasys.az.justice.gov.uk" = {
+        records = [
+          { name = "onr", type = "A", ttl = "300", records = ["10.40.40.210"] }
+        ]
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "private" }
         ]
       }
     }

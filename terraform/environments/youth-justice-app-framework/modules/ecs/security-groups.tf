@@ -96,6 +96,40 @@ resource "aws_security_group_rule" "ecs_gateway_to_alb_rule" {
   description              = "ALB to ECS gateway service communication"
 }
 
+
+#now add rule to alb connectivity internal security group
+resource "aws_security_group_rule" "ecs_to_connectivity_alb_rule" {
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  security_group_id        = var.connectivity_alb_security_group_id
+  source_security_group_id = aws_security_group.common_ecs_service_internal.id
+  description              = "ALB to ECS service communication"
+}
+
+resource "aws_security_group_rule" "ecs_gateway_to_connectivity_alb_rule" {
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  security_group_id        = var.connectivity_alb_security_group_id
+  source_security_group_id = aws_security_group.common_ecs_service_external.id
+  description              = "connectivity ALB to ECS gateway service communication"
+}
+
+resource "aws_security_group_rule" "connectivity_alb_to_ecs_internal_rule" {
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.common_ecs_service_internal.id
+  source_security_group_id = var.connectivity_alb_security_group_id
+  description              = "ECS to connectivity ALB service communication"
+}
+
+
+
 #allow each ecs sg to talk to eachother
 resource "aws_security_group_rule" "ecsext_to_ecsint_rule" {
   type                     = "ingress"
@@ -177,4 +211,46 @@ resource "aws_security_group_rule" "ecsint_toecs_ecsext_datadog_rule_udp" {
   security_group_id        = aws_security_group.common_ecs_service_internal.id
   source_security_group_id = aws_security_group.common_ecs_service_external.id
   description              = "Datadog from ECS Internal to ECS External"
+}
+
+###Additional rules for ECS services can be added below as needed
+
+resource "aws_security_group_rule" "autoscaling_toecs_ecsext" {
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.common_ecs_service_external.id
+  source_security_group_id = module.autoscaling_sg.security_group_id
+  description              = "Inbound from Autoscaling to ECS External"
+}
+
+resource "aws_security_group_rule" "ecsint_toecs_autoscaling_datadog_rule_udp" {
+  type                     = "ingress"
+  from_port                = 8125
+  to_port                  = 8125
+  protocol                 = "udp"
+  security_group_id        = module.autoscaling_sg.security_group_id
+  source_security_group_id = aws_security_group.common_ecs_service_internal.id
+  description              = "Datadog from ECS Internal to ECS External"
+}
+
+resource "aws_security_group_rule" "ecsext_toecs_autoscaling_datadog_rule" {
+  type                     = "ingress"
+  from_port                = 8126
+  to_port                  = 8126
+  protocol                 = "tcp"
+  security_group_id        = module.autoscaling_sg.security_group_id
+  source_security_group_id = aws_security_group.common_ecs_service_external.id
+  description              = "Datadog from ECS External to Autoscaling"
+}
+
+resource "aws_security_group_rule" "ecsint_toecs_autoscaling_datadog_rule" {
+  type                     = "ingress"
+  from_port                = 8126
+  to_port                  = 8126
+  protocol                 = "tcp"
+  security_group_id        = module.autoscaling_sg.security_group_id
+  source_security_group_id = aws_security_group.common_ecs_service_internal.id
+  description              = "Datadog from ECS Internal to Autoscaling"
 }

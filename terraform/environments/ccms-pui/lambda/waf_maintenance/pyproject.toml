@@ -1,0 +1,13 @@
+[project]
+name = "maintenance-announcements-lambda"
+version = "0.1.0"
+description = "Lambda function for turning on/off maintenance mode via WAF."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "boto3>=1.42.30",
+    "mypy>=1.19.1",
+    "mypy-boto3-wafv2>=1.42.3",
+    "pyright>=1.1.408",
+    "types-boto3>=1.42.30",
+]

@@ -64,6 +64,21 @@
       }
     },
     {
+      "id": 6,
+      "type": "text",
+      "title": "",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 11
+      },
+      "options": {
+        "mode": "html",
+        "content": "<div style=\"display:flex; justify-content:center; align-items:center; height:100%;\">\n  <a href=\"/d/dfcwtr9nm2cxsb/security-hub-findings-for-core-accounts?orgId=1\"\n     style=\"\n       display:block;\n       width: 100%;\n       min-width: 0;\n       text-decoration:none;\n       background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 55%, #fb7185 100%);\n       color:#ffffff;\n       padding:44px 70px;\n       border-radius:18px;\n       box-shadow: 0 12px 35px rgba(220, 38, 38, 0.28);\n       transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;\n       text-align:center;\n       box-sizing: border-box;\n     \"\n     onmouseover=\"\n       this.style.transform='translateY(-6px)';\n       this.style.boxShadow='0 18px 45px rgba(220, 38, 38, 0.38)';\n       this.style.filter='brightness(1.05)';\n     \"\n     onmouseout=\"\n       this.style.transform='translateY(0)';\n       this.style.boxShadow='0 12px 35px rgba(220, 38, 38, 0.28)';\n       this.style.filter='brightness(1)';\n     \"\n  >\n    <div style=\"font-size:52px; margin-bottom:14px;\">🛡️</div>\n\n    <div style=\"\n      font-size:28px;\n      font-weight:900;\n      letter-spacing:-0.4px;\n      margin-bottom:12px;\n      line-height:1.1;\n    \"\n    >\n      Security Hub Findings\n    </div>\n\n    <div style=\"\n      font-size:16px;\n      opacity:0.95;\n      line-height:1.45;\n    \"\n    >\n      HIGH and CRITICAL findings across core AWS accounts\n    </div>\n  </a>\n</div>\n"
+      }
+    },
+    {
       "id": 4,
       "type": "dashlist",
       "title": "📊 Modernisation Platform Dashboards",
@@ -71,7 +86,7 @@
         "h": 20,
         "w": 24,
         "x": 0,
-        "y": 11
+        "y": 19
       },
       "options": {
         "includeVars": false,

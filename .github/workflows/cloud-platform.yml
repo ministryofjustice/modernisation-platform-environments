@@ -7,6 +7,7 @@ on:
     paths:
       - 'terraform/environments/cloud-platform/**'
       - '.github/workflows/cloud-platform.yml'
+      - '.github/workflows/cloud-platform-reusable.yml'
 
   pull_request:
     branches:
@@ -14,59 +15,60 @@ on:
     paths:
       - 'terraform/environments/cloud-platform/**'
       - '.github/workflows/cloud-platform.yml'
-
-  workflow_dispatch:
-    inputs:
-      action:
-        description: 'Set either [deploy|destroy].'
-        default: 'deploy'
-        required: true
-        type: string
-        options:
-          - deploy
-          - destroy
-      component:
-        description: "Optional: Target a specific component for destroy. Defaults to 'root' to destroy the root or <application> folder."
-        required: false
-        default: "root"
-        type: string
+      - '.github/workflows/cloud-platform-reusable.yml'
 
 permissions:
   id-token: write  # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
 
 jobs:
-  strategy:
-    uses: ./.github/workflows/reusable_terraform_components_strategy.yml
-    if: inputs.action != 'destroy'
-    with:
-      application: "${{ github.workflow }}"
-
-  terraform:
-    needs: strategy
-    if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
+  terraform-pr:
+    if: github.event_name == 'pull_request'
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
-    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+      matrix:
+        include:
+          - application: cloud-platform
+            environment: development
+            action: "plan_apply"
+          - application: cloud-platform
+            environment: preproduction
+            action: "plan"
+          - application: cloud-platform
+            environment: nonlive
+            action: "plan"
+          - application: cloud-platform
+            environment: live
+            action: "plan"
+    uses: ./.github/workflows/cloud-platform-reusable.yml
     with:
-      application: "${{ github.workflow }}"
-      environment: "${{ matrix.target }}"
+      application: "${{ matrix.application }}"
+      environment: "${{ matrix.environment }}"
       action: "${{ matrix.action }}"
-      component: "${{ matrix.component }}"     # If your strategy workflow also outputs "matrix.component"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
-  destroy-development:
-    if: inputs.action == 'destroy'
-    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+  terraform-main:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - application: cloud-platform
+            environment: preproduction
+            action: "plan_apply"
+          - application: cloud-platform
+            environment: nonlive
+            action: "plan_apply"
+          - application: cloud-platform
+            environment: live
+            action: "plan_apply"
+    uses: ./.github/workflows/cloud-platform-reusable.yml
     with:
-      application: "${{ github.workflow }}"
-      environment: "development"
-      action: "plan_apply"
-      plan_apply_tfargs: "-destroy"
-      component: "${{ inputs.component }}"  # Targets a specific component for the destroy operation; defaults to 'root' if not specified.
+      application: "${{ matrix.application }}"
+      environment: "${{ matrix.environment }}"
+      action: "${{ matrix.action }}"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}

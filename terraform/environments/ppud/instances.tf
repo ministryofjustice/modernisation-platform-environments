@@ -816,7 +816,7 @@ resource "aws_instance" "s266316rgsl200" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0f43890c2b4907c29"
   instance_type          = "m5.large"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
@@ -844,7 +844,7 @@ resource "aws_instance" "s265903rgsl400-non-cjsm" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0f43890c2b4907c29"
   instance_type          = "m5.large"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server-2[0].id]
   subnet_id              = data.aws_subnet.public_subnets_b.id
@@ -871,7 +871,7 @@ resource "aws_instance" "s265903rgsl401-cjsm" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0f43890c2b4907c29"
   instance_type          = "m5.large"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server-2[0].id]
   subnet_id              = data.aws_subnet.public_subnets_c.id
@@ -898,7 +898,7 @@ resource "aws_instance" "docker-build-server" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-050d499cfdd1ff7d4"
   instance_type          = "m5.large"
-  source_dest_check      = false
+  source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.docker-build-server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id

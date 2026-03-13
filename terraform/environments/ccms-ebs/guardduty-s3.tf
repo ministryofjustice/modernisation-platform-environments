@@ -1,24 +1,6 @@
-resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket1" {
-  role = data.aws_iam_role.guardduty_s3_scan.arn
-
-  protected_resource {
-    s3_bucket {
-      bucket_name = module.s3-bucket.bucket.id
-    }
-  }
-
-  actions {
-    tagging {
-      status = "ENABLED"
-    }
-  }
-
-  tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_name}", local.environment)) }
-  )
-
-  depends_on = [module.s3-bucket]
-}
+# ---------------------------------------------
+# GuardDuty Malware Protection Plans
+# ---------------------------------------------
 
 resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket2" {
   role = data.aws_iam_role.guardduty_s3_scan.arn
@@ -129,7 +111,6 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket6" {
   )
 
   depends_on = [aws_s3_bucket.red_button_data]
-
 }
 
 resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket7" {

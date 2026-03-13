@@ -83,8 +83,18 @@ locals {
         source_arn_suffix = "*"
       }]
     }
-    securityhub_report = {
+    securityhub_critical_report = {
       description  = "Function to email a summary of critical CVEs found in AWS Security Hub."
+      role_key     = "get_securityhub_data"
+      environments = ["development", "preproduction", "production"]
+      vpc_config   = { production = true }
+      permissions = [{
+        principal         = "securityhub.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
+    securityhub_monthly_report = {
+      description  = "Function to email a summary of all AWS Security Hub CVEs created, resolved and suppressed in a given month."
       role_key     = "get_securityhub_data"
       environments = ["development", "preproduction", "production"]
       vpc_config   = { production = true }
@@ -212,6 +222,16 @@ locals {
       vpc_config   = { production = true }
       permissions = [{
         principal         = "cloudwatch.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
+    ssm_patch_notification = {
+      description  = "Function to send email notification when SSM patching completes."
+      role_key     = "ssm_patch_notification"
+      environments = ["development", "preproduction", "production"]
+      runtime      = "python3.13"
+      permissions = [{
+        principal         = "events.amazonaws.com"
         source_arn_suffix = "*"
       }]
     }

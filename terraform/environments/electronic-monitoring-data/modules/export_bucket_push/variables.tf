@@ -37,7 +37,7 @@ variable "logging_bucket" {
   })
 }
 
-variable "production_dev" {
+variable "environment_shorthand" {
   description = "The environment the lambda is being deployed to"
   type        = string
 }

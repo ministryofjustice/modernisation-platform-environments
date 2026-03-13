@@ -57,3 +57,27 @@ resource "aws_cloudwatch_log_metric_filter" "mdss_timeout_fail" {
     value     = "1"
   }
 }
+
+resource "aws_cloudwatch_log_metric_filter" "mdss_file_retry" {
+  name           = "mdss-file-retry"
+  log_group_name = module.load_mdss_lambda.cloudwatch_log_group.name
+  pattern        = "{ $.message.event = \"MDSS_FILE_RETRY\" }"
+
+  metric_transformation {
+    name      = "MdssFileRetryCount"
+    namespace = "EMDS/MDSS"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "mdss_file_ok_after_retry" {
+  name           = "mdss-file-ok-after-retry"
+  log_group_name = module.load_mdss_lambda.cloudwatch_log_group.name
+  pattern        = "{ $.message.event = \"MDSS_FILE_OK_AFTER_RETRY\" }"
+
+  metric_transformation {
+    name      = "MdssFileOkAfterRetryCount"
+    namespace = "EMDS/MDSS"
+    value     = "1"
+  }
+}

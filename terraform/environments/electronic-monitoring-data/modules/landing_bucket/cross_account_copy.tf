@@ -1,10 +1,10 @@
 locals {
-  replication_enabled = var.production_dev == "prod" || var.production_dev == "test"
+  replication_enabled = var.production_dev == "prod" || (var.production_dev == "test" && var.data_feed == "mdss")
 }
 
 resource "aws_iam_role" "replication_role" {
   count              = local.replication_enabled ? 1 : 0
-  name               = "AWSS3BucketReplication"
+  name               = "AWSS3BucketReplication${var.data_feed}${var.order_type}"
   assume_role_policy = data.aws_iam_policy_document.s3-assume-role-policy.json
   tags               = var.local_tags
 }
@@ -19,14 +19,14 @@ data "aws_iam_policy_document" "s3-assume-role-policy" {
 
     principals {
       type        = "Service"
-      identifiers = ["s3.amazonaws.com"]
+      identifiers = ["s3.amazonaws.com", "batchoperations.s3.amazonaws.com"]
     }
   }
 }
 resource "aws_iam_policy" "replication_policy" {
-  count    = local.replication_enabled ? 1 : 0
-  name     = "AWSS3BucketReplication${var.production_dev}"
-  policy   = data.aws_iam_policy_document.replication-policy.json
+  count  = local.replication_enabled ? 1 : 0
+  name   = "AWSS3BucketReplication${var.data_feed}${var.order_type}"
+  policy = data.aws_iam_policy_document.replication-policy.json
 }
 
 # S3 bucket replication: role policy
@@ -41,16 +41,15 @@ data "aws_iam_policy_document" "replication-policy" {
       "kms:GenerateDataKey"
     ]
     resources = [
-      local.replication_enabled ? "arn:aws:kms:eu-west-2:${var.replication_details["account_id"]}:key/${var.replication_details["${var.data_feed}_${var.order_type}_kms_id"]}" : "",
-      module.kms_key.key_arn
+      "*"
     ]
   }
   statement {
     effect = "Allow"
     actions = [
       "s3:GetReplicationConfiguration",
-      "s3:ListBucket"
-
+      "s3:ListBucket",
+      "s3:PutInventoryConfiguration",
     ]
     resources = [module.this-bucket.bucket.arn]
   }
@@ -67,7 +66,8 @@ data "aws_iam_policy_document" "replication-policy" {
       "s3:ReplicateObject",
       "s3:ReplicateDelete",
       "s3:ReplicateTags",
-      "s3:ObjectOwnerOverrideToBucketOwner"
+      "s3:ObjectOwnerOverrideToBucketOwner",
+      "s3:InitiateReplication",
     ]
     resources = ["${module.this-bucket.bucket.arn}/*"]
   }
@@ -81,11 +81,26 @@ data "aws_iam_policy_document" "replication-policy" {
       "s3:GetObjectVersionTagging",
       "s3:ObjectOwnerOverrideToBucketOwner"
     ]
-
     resources = [local.replication_enabled ? "arn:aws:s3:::${var.replication_details["${var.data_feed}_${var.order_type}_bucket"]}/*" : ""]
-
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:GetObjectVersion"
+    ]
+    resources = ["${var.metadata_bucket}/*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [var.metadata_bucket]
   }
 }
+
 
 resource "aws_iam_role_policy_attachment" "replication" {
   count      = local.replication_enabled ? 1 : 0
@@ -103,8 +118,8 @@ resource "aws_s3_bucket_replication_configuration" "default" {
     priority = 0
 
     destination {
-      account       = var.replication_details["account_id"]
-      bucket        = local.replication_enabled ? "arn:aws:s3:::${var.replication_details["${var.data_feed}_${var.order_type}_bucket"]}" : ""
+      account = var.replication_details["account_id"]
+      bucket  = local.replication_enabled ? "arn:aws:s3:::${var.replication_details["${var.data_feed}_${var.order_type}_bucket"]}" : ""
       encryption_configuration {
         replica_kms_key_id = local.replication_enabled != "" ? "arn:aws:kms:eu-west-2:${var.replication_details["account_id"]}:key/${var.replication_details["${var.data_feed}_${var.order_type}_kms_id"]}" : ""
       }
@@ -125,6 +140,26 @@ resource "aws_s3_bucket_replication_configuration" "default" {
       sse_kms_encrypted_objects {
         status = (local.replication_enabled != false) ? "Enabled" : "Disabled"
       }
+    }
+  }
+}
+
+resource "aws_s3_bucket_inventory" "this" {
+  count  = local.replication_enabled ? 1 : 0
+  bucket = module.this-bucket.bucket.id
+  name   = "daily-inventory"
+
+  included_object_versions = "All"
+
+  schedule {
+    frequency = "Daily"
+  }
+
+  destination {
+    bucket {
+      bucket_arn = var.metadata_bucket
+      format     = "CSV"
+      prefix     = "${var.data_feed}/${var.order_type}"
     }
   }
 }

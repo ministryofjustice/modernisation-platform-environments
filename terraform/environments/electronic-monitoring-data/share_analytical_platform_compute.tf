@@ -22,6 +22,11 @@ locals {
     "staging_fms",
     "staging_mdss",
     "test_results",
+    "validation",
+    "metrics",
+    "check",
+    "acquisitive_crime",
+    "data_insights",
   ]
   live_feeds_dbs = [
     "allied_mdss",
@@ -43,16 +48,22 @@ locals {
     "g4s_lcm_archive",
     "g4s_tasking",
     "scram_alcohol_monitoring",
+  ] : local.is-preproduction ? [
+    "g4s_cap_dw",
+    "g4s_emsys_tpims",
   ] : local.is-development ? ["test"] : []
 
-  prod_dbs_to_grant = local.is-production ? [
+  prod_dbs_to_grant = [
     "am_stg",
     "buddi_stg",
     "buddi_buddi",
     "cap_dw_stg",
+    "curated_alcohol_monitoring",
+    "curated_cap_dw",
     "curated_emsys_mvp",
     "curated_emsys_tpims",
     "curated_fep",
+    "curated_scram_alcohol_monitoring",
     "emd_historic_int",
     "emsys_mvp_stg",
     "emsys_tpims_stg",
@@ -78,12 +89,13 @@ locals {
     "staged_emsys_mvp",
     "staged_emsys_tpims",
     "staged_scram_alcohol_monitoring",
-  ] : []
+  ]
 
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
+  prod_dbt_dbs_to_grant  = flatten([[for db in local.prod_dbs_to_grant : "${db}${local.dbt_suffix}"], local.dev_dbs_to_grant])
   dbt_dbs_to_grant       = [for db in local.dbt_dbs : "${db}${local.dbt_suffix}"]
   live_feed_dbs_to_grant = [for db in local.live_feeds_dbs : "${db}${local.db_suffix}"]
-  dbs_to_grant           = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant, local.dbt_dbs_to_grant]))
+  dbs_to_grant           = toset(flatten([local.prod_dbt_dbs_to_grant, local.dbt_dbs_to_grant]))
 
 
   existing_dbs_to_grant = toset(flatten([local.live_feed_dbs_to_grant, local.historic_source_dbs]))
@@ -635,7 +647,6 @@ resource "aws_iam_role_policy_attachment" "analytical_platform_share_policy_atta
 }
 
 module "share_dbs_with_roles" {
-  count                   = local.is-development ? 0 : 1
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = local.dbs_to_grant
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
@@ -708,4 +719,110 @@ resource "aws_secretsmanager_secret" "airflow_ssh_secret" {
   tags = merge(
     local.tags
   )
+}
+
+resource "aws_lakeformation_permissions" "cadt_runner_quicksight_s3" {
+  count = local.is-development ? 0 : 1
+
+  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table"
+  permissions = ["DATA_LOCATION_ACCESS"]
+  data_location {
+    arn = aws_lakeformation_resource.data_bucket.arn
+  }
+}
+
+resource "aws_lakeformation_permissions" "cadt_runner_quicksight_check_db" {
+  count = local.is-development ? 0 : 1
+
+  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table"
+  permissions = ["DESCRIBE"]
+  database {
+    name = "check${local.dbt_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "cadt_runner_quicksight_check_tables" {
+  count = local.is-development ? 0 : 1
+
+  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table"
+  permissions = ["DESCRIBE", "SELECT"]
+  table {
+    database_name = "check${local.dbt_suffix}"
+    wildcard      = true
+  }
+}
+
+resource "aws_lakeformation_permissions" "cadt_runner_quicksight_validation_db" {
+  count = local.is-development ? 0 : 1
+
+  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table"
+  permissions = ["DESCRIBE"]
+  database {
+    name = "validation${local.dbt_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "cadt_runner_quicksight_validation_tables" {
+  count = local.is-development ? 0 : 1
+
+  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table"
+  permissions = ["DESCRIBE", "SELECT"]
+  table {
+    database_name = "validation${local.dbt_suffix}"
+    wildcard      = true
+  }
+}
+
+
+
+resource "aws_lakeformation_permissions" "apde_runner_quicksight_s3" {
+  count = local.is-development ? 0 : 1
+
+  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
+  permissions = ["DATA_LOCATION_ACCESS"]
+  data_location {
+    arn = aws_lakeformation_resource.data_bucket.arn
+  }
+}
+
+resource "aws_lakeformation_permissions" "apde_runner_quicksight_check_db" {
+  count = local.is-development ? 0 : 1
+
+  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
+  permissions = ["DESCRIBE"]
+  database {
+    name = "check${local.dbt_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "apde_runner_quicksight_check_tables" {
+  count = local.is-development ? 0 : 1
+
+  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
+  permissions = ["DESCRIBE", "SELECT"]
+  table {
+    database_name = "check${local.dbt_suffix}"
+    name          = "unique_device_wearer_id"
+  }
+}
+
+resource "aws_lakeformation_permissions" "apde_runner_quicksight_validation_db" {
+  count = local.is-development ? 0 : 1
+
+  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
+  permissions = ["DESCRIBE"]
+  database {
+    name = "validation${local.dbt_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "apdes_runner_quicksight_validation_tables" {
+  count = local.is-development ? 0 : 1
+
+  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
+  permissions = ["DESCRIBE", "SELECT"]
+  table {
+    database_name = "validation${local.dbt_suffix}"
+    name          = "delius_id"
+  }
 }

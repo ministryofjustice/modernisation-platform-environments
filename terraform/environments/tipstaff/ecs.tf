@@ -247,12 +247,24 @@ resource "aws_iam_role_policy" "app_task" {
    "Statement": [
      {
         "Action": [
+          "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
+          "logs:DescribeLogStreams",
           "logs:DescribeLogGroups"
         ],
         "Resource": "arn:aws:logs:*:${local.environment_management.account_ids[terraform.workspace]}:*",
         "Effect": "Allow"
+     },
+     {
+       "Effect": "Allow",
+       "Action": [
+         "ssmmessages:CreateControlChannel",
+         "ssmmessages:CreateDataChannel",
+         "ssmmessages:OpenControlChannel",
+         "ssmmessages:OpenDataChannel"
+       ],
+       "Resource": "*"
      }
    ]
   }
@@ -425,7 +437,7 @@ module "pagerduty_core_alerts_non_prod" {
   depends_on = [
     aws_sns_topic.tipstaff_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=0179859e6fafc567843cd55c0b05d325d5012dc4"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
   sns_topics                = [aws_sns_topic.tipstaff_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["tipstaff_non_prod_alarms"]
 }
@@ -436,7 +448,7 @@ module "pagerduty_core_alerts_prod" {
   depends_on = [
     aws_sns_topic.tipstaff_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=0179859e6fafc567843cd55c0b05d325d5012dc4"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
   sns_topics                = [aws_sns_topic.tipstaff_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["tipstaff_prod_alarms"]
 }

@@ -39,6 +39,25 @@ data "aws_iam_policy" "rekognition_read" {
   name = "AmazonRekognitionReadOnlyAccess"
 }
 
+# additional rekognition actions not covered by the read-only managed policy
+data "aws_iam_policy_document" "rekognition_liveness" {
+  statement {
+    sid    = "RekognitionLiveness"
+    effect = "Allow"
+    actions = [
+      "rekognition:CreateFaceLivenessSession",
+      "rekognition:StartFaceLivenessSession",
+      "rekognition:GetFaceLivenessSessionResults",
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "rekognition_liveness" {
+  name   = "rekognition-liveness"
+  policy = data.aws_iam_policy_document.rekognition_liveness.json
+}
+
 # grant configured principals permission to assume the rekognition role
 data "aws_iam_policy_document" "assume_rekognition_role_policy" {
   dynamic "statement" {
@@ -71,6 +90,11 @@ resource "aws_iam_role_policy_attachment" "rekognition_s3" {
 resource "aws_iam_role_policy_attachment" "rekognition_rekognition" {
   role       = aws_iam_role.rekognition_role.name
   policy_arn = data.aws_iam_policy.rekognition_read.arn
+}
+
+resource "aws_iam_role_policy_attachment" "rekognition_liveness" {
+  role       = aws_iam_role.rekognition_role.name
+  policy_arn = aws_iam_policy.rekognition_liveness.arn
 }
 
 # Policy to allow Rekognition role to read from Cloud Platform S3 buckets

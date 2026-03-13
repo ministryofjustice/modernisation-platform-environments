@@ -61,6 +61,20 @@ resource "aws_route53_record" "type_a" {
   records = each.value
 }
 
+
+resource "aws_route53_record" "connectivity_alb" {
+  provider = aws.core-network-services
+
+  zone_id = data.aws_route53_zone.yjaf-inner.id
+  name    = "connectivity-lb"
+  type    = "CNAME"
+  ttl     = 300
+  records = [module.connectivity_alb.dns_name]
+}
+
+
+
+
 /*
 resource "aws_route53_record" "assets" {
   provider = aws.core-network-services
