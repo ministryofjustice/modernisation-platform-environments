@@ -1329,8 +1329,12 @@ data "aws_iam_policy_document" "data_cutback_iam_role_policy_document" {
     resources = [
       "arn:aws:s3:::emds-preprod-dms-rds-to-parquet-*",
       "arn:aws:s3:::emds-preprod-dms-rds-to-parquet-*/*",
+      "arn:aws:s3:::emds-preprod-data-*",
+      "arn:aws:s3:::emds-preprod-data-*/*",
       "arn:aws:s3:::emds-prod-dms-rds-to-parquet-*",
-      "arn:aws:s3:::emds-prod-dms-rds-to-parquet-*/*"
+      "arn:aws:s3:::emds-prod-dms-rds-to-parquet-*/*",
+      "arn:aws:s3:::emds-prod-data-*",
+      "arn:aws:s3:::emds-prod-data-*/*"
     ]
   }
 }
