@@ -85,6 +85,18 @@ data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
   }
 
   statement {
+    sid    = "allowAccessToOracleDbImmutableBackupBucket"
+    effect = "Allow"
+    actions = [
+      "s3:*"
+    ]
+    resources = [
+      module.s3_bucket_oracledb_immutable_backups.bucket.arn,
+      "${module.s3_bucket_oracledb_immutable_backups.bucket.arn}/*"
+    ]
+  }
+
+  statement {
     sid    = "allowAccessToOracleDbBackupInventoryBucket"
     effect = "Allow"
     actions = [
@@ -264,33 +276,15 @@ data "aws_iam_policy_document" "oracledb_backups_inventory" {
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values   = [module.s3_bucket_oracledb_backups.bucket.arn]
+      values   = [
+        module.s3_bucket_oracledb_backups.bucket.arn,
+        module.s3_bucket_oracledb_immutable_backups.bucket.arn
+      ]
     }
 
     principals {
       type        = "Service"
       identifiers = ["s3.amazonaws.com"]
-    }
-  }
-}
-
-resource "aws_s3_bucket_inventory" "oracledb_backup_pieces" {
-
-  bucket = module.s3_bucket_oracledb_backups.bucket.id
-  name   = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-backup-pieces"
-
-  included_object_versions = "Current"
-
-  optional_fields = ["Size", "LastModifiedDate"]
-
-  schedule {
-    frequency = "Daily"
-  }
-
-  destination {
-    bucket {
-      format     = "CSV"
-      bucket_arn = module.s3_bucket_oracledb_backups_inventory.bucket.arn
     }
   }
 }
