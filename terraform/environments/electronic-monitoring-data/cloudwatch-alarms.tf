@@ -48,6 +48,31 @@ resource "aws_cloudwatch_metric_alarm" "clean_dlt_dlq_alarm" {
   ]
 }
 
+resource "aws_cloudwatch_metric_alarm" "mdss_reconciler_errors_alarm" {
+  count               = local.is-preproduction || local.is-production ? 0 : 1
+  alarm_name          = "mdss_reconciler_errors"
+  alarm_description   = "Triggered when the mdss_reconciler Lambda records errors"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_name = "Errors"
+  namespace   = "AWS/Lambda"
+  period      = 60
+  statistic   = "Sum"
+
+  dimensions = {
+    FunctionName = module.mdss_reconciler[0].lambda_function_name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
 resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
   alarm_name          = "glue_database_count_high"
   alarm_description   = "Triggered when Glue database count is above 8000 (approaching 10k limit)"
@@ -70,17 +95,4 @@ resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
   alarm_actions = [
     aws_sns_topic.emds_alerts.arn
   ]
-}
-
-resource "aws_cloudwatch_log_metric_filter" "mdss_fatal_failures" {
-  name           = "mdss-fatal-failures-unstructured"
-  log_group_name = module.load_mdss_lambda.cloudwatch_log_group.name
-
-  pattern = "{ ($.level = \"ERROR\") || ($.message = \"*Pipeline execution failed*\") || ($.message = \"*LoadClientJobFailed*\") || ($.message = \"*DatabaseTerminalException*\") || ($.message = \"*Terminal exception*\") }"
-
-  metric_transformation {
-    name      = "FatalFailures"
-    namespace = "EMDS/MDSS"
-    value     = "1"
-  }
 }

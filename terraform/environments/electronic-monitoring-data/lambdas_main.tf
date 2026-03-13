@@ -363,13 +363,19 @@ module "load_mdss_lambda" {
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   cloudwatch_retention_days      = 7
+
   environment_variables = {
-    ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
-    ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
-    STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
-    ENVIRONMENT_NAME    = local.environment_shorthand
-    CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
-    MAX_RECEIVE_COUNT   = tostring(local.load_mdss_sqs_max_receive_count)
+    ATHENA_QUERY_BUCKET                    = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER                         = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET                         = module.s3-create-a-derived-table-bucket.bucket.id
+    ENVIRONMENT_NAME                       = local.environment_shorthand
+    CLEANUP_QUEUE_URL                      = aws_sqs_queue.clean_dlt_load_queue.id
+    MAX_RECEIVE_COUNT                      = tostring(local.load_mdss_sqs_max_receive_count)
+    MDSS_MANIFEST_BUCKET                   = module.s3-metadata-bucket.bucket.id
+    MDSS_MANIFEST_PREFIX                   = "mdss-manifest/current"
+    STUCK_STARTED_MINUTES                  = "60"
+    AUTO_REDRIVE_TRANSIENT_COOLDOWN_MINUTES = "60"
+    AUTO_REDRIVE_UNKNOWN_COOLDOWN_MINUTES   = "60"
   }
 }
 
@@ -688,5 +694,42 @@ module "fan_out_tags" {
 
   environment_variables = {
     SQS_QUEUE_ARN = module.load_fms_event_queue.sqs_queue.url
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# MDSS reconciler (scheduled redrive backstop)
+#-----------------------------------------------------------------------------------
+
+module "mdss_reconciler" {
+  count = local.is-preproduction || local.is-production ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "mdss_reconciler"
+  role_name                      = aws_iam_role.mdss_reconciler.name
+  role_arn                       = aws_iam_role.mdss_reconciler.arn
+  memory_size                    = 512
+  timeout                        = 300
+  reserved_concurrent_executions = 1
+
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    ENVIRONMENT_NAME                        = local.environment_shorthand
+    SOURCE_BUCKET                           = module.s3-raw-formatted-data-bucket.bucket.id
+    LOAD_MDSS_QUEUE_URL                     = module.load_mdss_event_queue.sqs_queue.id
+    MDSS_MANIFEST_BUCKET                    = module.s3-metadata-bucket.bucket.id
+    MDSS_MANIFEST_PREFIX                    = "mdss-manifest/current"
+    LOOKBACK_DAYS                           = "2"
+    MIN_OBJECT_AGE_MINUTES                  = "10"
+    STUCK_STARTED_MINUTES                   = "60"
+    AUTO_REDRIVE_TRANSIENT_COOLDOWN_MINUTES = "60"
+    AUTO_REDRIVE_UNKNOWN_COOLDOWN_MINUTES   = "60"
+    AUTO_REDRIVE_TRANSIENT_MAX_ATTEMPTS     = "2"
+    AUTO_REDRIVE_UNKNOWN_MAX_ATTEMPTS       = "1"
   }
 }

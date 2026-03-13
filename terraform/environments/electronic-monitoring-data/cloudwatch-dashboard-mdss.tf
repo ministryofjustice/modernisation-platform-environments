@@ -76,32 +76,59 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           ]
         }
       },
-
-      # --------------------------
-      # Logs Insights widgets
-      # --------------------------
-
-      # Fatal failures (retry + final) - DEDUPED by file (s3path)
+      {
+        type   = "metric",
+        x      = 0,
+        y      = 12,
+        width  = 12,
+        height = 6,
+        properties = {
+          title  = "Lambda: mdss_reconciler Errors / Throttles"
+          region = "eu-west-2"
+          stat   = "Sum"
+          period = 60
+          metrics = [
+            ["AWS/Lambda", "Errors", "FunctionName", try(module.mdss_reconciler[0].lambda_function_name, "mdss_reconciler_not_deployed")],
+            [".", "Throttles", ".", try(module.mdss_reconciler[0].lambda_function_name, "mdss_reconciler_not_deployed")]
+          ]
+        }
+      },
+      {
+        type   = "metric",
+        x      = 12,
+        y      = 12,
+        width  = 12,
+        height = 6,
+        properties = {
+          title  = "Lambda: mdss_reconciler Duration (p95) + Invocations"
+          region = "eu-west-2"
+          period = 300
+          metrics = [
+            ["AWS/Lambda", "Duration", "FunctionName", try(module.mdss_reconciler[0].lambda_function_name, "mdss_reconciler_not_deployed"), { stat = "p95" }],
+            [".", "Invocations", ".", try(module.mdss_reconciler[0].lambda_function_name, "mdss_reconciler_not_deployed"), { stat = "Sum" }]
+          ]
+        }
+      },
       {
         type   = "log",
         x      = 0,
-        y      = 12,
+        y      = 18,
         width  = 24,
         height = 8,
         properties = {
-          title  = "FATAL: load_mdss failures (retry + final, deduped)"
+          title  = "Final failures: load_mdss (deduped by file)"
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT
             SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
             | filter ispresent(message.event)
-            | filter message.event in ["MDSS_FILE_RETRY","MDSS_FILE_FAIL"]
-            | filter message.error_type = "fatal"
+            | filter message.event = "MDSS_FILE_FAIL"
             | stats
                 latest(@timestamp) as ts,
-                latest(message.event) as last_event,
                 max(message.attempt) as max_attempt,
                 latest(message.max_receive_count) as max_receive_count,
+                latest(message.error_type) as error_type,
+                latest(message.retry_policy) as retry_policy,
                 latest(message.exception_class) as exception_class,
                 latest(message.reason) as reason
               by message.s3path, message.dataset, message.pipeline, message.table
@@ -110,16 +137,81 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           EOT
         }
       },
-
-      # Warnings only
       {
         type   = "log",
         x      = 0,
-        y      = 20,
+        y      = 26,
+        width  = 24,
+        height = 8,
+        properties = {
+          title  = "Automatic redrive summary: mdss_reconciler"
+          region = "eu-west-2"
+          view   = "table"
+          query  = <<-EOT
+            SOURCE '${try(module.mdss_reconciler[0].cloudwatch_log_group.name, "/aws/lambda/mdss_reconciler_not_deployed")}'
+            | filter message.event = "MDSS_RECONCILE_COMPLETE"
+            | fields
+                @timestamp,
+                message.redriven_missing,
+                message.redriven_stale_started,
+                message.redriven_failed_auto_retry,
+                message.redriven_failed_retry_once,
+                message.skipped_no_retry,
+                message.skipped_cooldown,
+                message.skipped_max_redrives
+            | sort @timestamp desc
+            | limit 100
+          EOT
+        }
+      },
+      {
+        type   = "log",
+        x      = 0,
+        y      = 34,
+        width  = 12,
+        height = 6,
+        properties = {
+          title  = "Final failures by error type"
+          region = "eu-west-2"
+          view   = "table"
+          query  = <<-EOT
+            SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
+            | filter ispresent(message.event)
+            | filter message.event = "MDSS_FILE_FAIL"
+            | stats count_distinct(message.s3path) as failed_files by message.error_type
+            | sort failed_files desc
+            | limit 50
+          EOT
+        }
+      },
+      {
+        type   = "log",
+        x      = 12,
+        y      = 34,
+        width  = 12,
+        height = 6,
+        properties = {
+          title  = "Final failures by retry policy"
+          region = "eu-west-2"
+          view   = "table"
+          query  = <<-EOT
+            SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
+            | filter ispresent(message.event)
+            | filter message.event = "MDSS_FILE_FAIL"
+            | stats count_distinct(message.s3path) as failed_files by message.retry_policy
+            | sort failed_files desc
+            | limit 50
+          EOT
+        }
+      },
+      {
+        type   = "log",
+        x      = 0,
+        y      = 40,
         width  = 24,
         height = 6,
         properties = {
-          title  = "WARNINGS: load_mdss (non-fatal signals)"
+          title  = "Warnings: load_mdss"
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT
@@ -131,62 +223,10 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           EOT
         }
       },
-
-      # Errors by type (retry vs final) - FIXED (no count_if)
       {
         type   = "log",
         x      = 0,
-        y      = 26,
-        width  = 12,
-        height = 6,
-        properties = {
-          title  = "Errors by type (retry vs final)"
-          region = "eu-west-2"
-          view   = "table"
-          query  = <<-EOT
-            SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
-            | filter ispresent(message.event)
-            | filter message.event in ["MDSS_FILE_RETRY","MDSS_FILE_FAIL"]
-            | stats
-                sum(if(message.event="MDSS_FILE_RETRY", 1, 0)) as retries,
-                sum(if(message.event="MDSS_FILE_FAIL", 1, 0)) as final_fails
-              by coalesce(message.error_type, "UNKNOWN")
-            | sort final_fails desc, retries desc
-            | limit 50
-          EOT
-        }
-      },
-
-      # Errors by table (retry vs final) - FIXED (no count_if)
-      {
-        type   = "log",
-        x      = 12,
-        y      = 26,
-        width  = 12,
-        height = 6,
-        properties = {
-          title  = "Errors by table (retry vs final)"
-          region = "eu-west-2"
-          view   = "table"
-          query  = <<-EOT
-            SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
-            | filter ispresent(message.event)
-            | filter message.event in ["MDSS_FILE_RETRY","MDSS_FILE_FAIL"]
-            | stats
-                sum(if(message.event="MDSS_FILE_RETRY", 1, 0)) as retries,
-                sum(if(message.event="MDSS_FILE_FAIL", 1, 0)) as final_fails
-              by coalesce(message.table, "UNKNOWN")
-            | sort final_fails desc, retries desc
-            | limit 50
-          EOT
-        }
-      },
-
-      # Per-file load duration by table (seconds)
-      {
-        type   = "log",
-        x      = 0,
-        y      = 32,
+        y      = 46,
         width  = 24,
         height = 6,
         properties = {
@@ -216,48 +256,14 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           EOT
         }
       },
-
-      # Failing files (final only) - DEDUPED by file (s3path)
       {
         type   = "log",
         x      = 0,
-        y      = 38,
+        y      = 52,
         width  = 24,
         height = 6,
         properties = {
-          title  = "Failing files (final only, deduped)"
-          region = "eu-west-2"
-          view   = "table"
-          query  = <<-EOT
-            SOURCE '${module.load_mdss_lambda.cloudwatch_log_group.name}'
-            | filter ispresent(message.event)
-            | filter message.event = "MDSS_FILE_FAIL"
-            | stats
-                latest(@timestamp) as ts,
-                max(message.attempt) as attempt,
-                latest(message.max_receive_count) as max_receive_count,
-                latest(message.error_type) as error_type,
-                latest(message.exception_class) as exception_class,
-                latest(message.reason) as reason,
-                latest(message.exception_chain) as exception_chain,
-                latest(message.bucket) as bucket,
-                latest(message.key) as key
-              by message.s3path, message.dataset, message.pipeline, message.table
-            | sort ts desc
-            | limit 200
-          EOT
-        }
-      },
-
-      # Retries (transient) - DEDUPED by file (s3path)
-      {
-        type   = "log",
-        x      = 0,
-        y      = 44,
-        width  = 24,
-        height = 6,
-        properties = {
-          title  = "Retries: load_mdss (transient, deduped)"
+          title  = "Retries: load_mdss (deduped by file)"
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT
@@ -269,6 +275,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
                 max(message.attempt) as attempt,
                 latest(message.max_receive_count) as max_receive_count,
                 latest(message.error_type) as error_type,
+                latest(message.retry_policy) as retry_policy,
                 latest(message.exception_class) as exception_class,
                 latest(message.reason) as reason
               by message.s3path, message.table
@@ -277,12 +284,10 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           EOT
         }
       },
-
-      # OK after retry (recovered)
       {
         type   = "log",
         x      = 0,
-        y      = 50,
+        y      = 58,
         width  = 24,
         height = 6,
         properties = {
@@ -299,16 +304,14 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
           EOT
         }
       },
-
-      # Outcome summary by table
       {
         type   = "log",
         x      = 0,
-        y      = 56,
+        y      = 64,
         width  = 24,
         height = 6,
         properties = {
-          title  = "Outcome summary by table (final fails vs recovered)"
+          title  = "Outcome summary by table"
           region = "eu-west-2"
           view   = "table"
           query  = <<-EOT

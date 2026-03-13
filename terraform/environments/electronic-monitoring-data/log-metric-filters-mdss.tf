@@ -10,49 +10,49 @@ resource "aws_cloudwatch_log_metric_filter" "mdss_file_fail" {
   }
 }
 
-resource "aws_cloudwatch_log_metric_filter" "mdss_fatal_fail" {
-  name           = "mdss-fatal-fail"
+resource "aws_cloudwatch_log_metric_filter" "mdss_retryable_transient_fail" {
+  name           = "mdss-retryable-transient-fail"
   log_group_name = module.load_mdss_lambda.cloudwatch_log_group.name
-  pattern        = "{ ($.message.event = \"MDSS_FILE_FAIL\") && ($.message.error_type = \"fatal\") }"
+  pattern        = "{ ($.message.event = \"MDSS_FILE_FAIL\") && ($.message.error_type = \"retryable_transient\") }"
 
   metric_transformation {
-    name      = "MdssFatalFailCount"
+    name      = "MdssRetryableTransientFailCount"
     namespace = "EMDS/MDSS"
     value     = "1"
   }
 }
 
-resource "aws_cloudwatch_log_metric_filter" "mdss_type_mismatch_fail" {
-  name           = "mdss-type-mismatch-fail"
+resource "aws_cloudwatch_log_metric_filter" "mdss_non_retryable_data_fail" {
+  name           = "mdss-non-retryable-data-fail"
   log_group_name = module.load_mdss_lambda.cloudwatch_log_group.name
-  pattern        = "{ ($.message.event = \"MDSS_FILE_FAIL\") && ($.message.error_type = \"type_mismatch\") }"
+  pattern        = "{ ($.message.event = \"MDSS_FILE_FAIL\") && ($.message.error_type = \"non_retryable_data\") }"
 
   metric_transformation {
-    name      = "MdssTypeMismatchFailCount"
+    name      = "MdssNonRetryableDataFailCount"
     namespace = "EMDS/MDSS"
     value     = "1"
   }
 }
 
-resource "aws_cloudwatch_log_metric_filter" "mdss_access_denied_fail" {
-  name           = "mdss-access-denied-fail"
+resource "aws_cloudwatch_log_metric_filter" "mdss_non_retryable_config_fail" {
+  name           = "mdss-non-retryable-config-fail"
   log_group_name = module.load_mdss_lambda.cloudwatch_log_group.name
-  pattern        = "{ ($.message.event = \"MDSS_FILE_FAIL\") && ($.message.error_type = \"access_denied\") }"
+  pattern        = "{ ($.message.event = \"MDSS_FILE_FAIL\") && ($.message.error_type = \"non_retryable_config\") }"
 
   metric_transformation {
-    name      = "MdssAccessDeniedFailCount"
+    name      = "MdssNonRetryableConfigFailCount"
     namespace = "EMDS/MDSS"
     value     = "1"
   }
 }
 
-resource "aws_cloudwatch_log_metric_filter" "mdss_timeout_fail" {
-  name           = "mdss-timeout-fail"
+resource "aws_cloudwatch_log_metric_filter" "mdss_unknown_fail" {
+  name           = "mdss-unknown-fail"
   log_group_name = module.load_mdss_lambda.cloudwatch_log_group.name
-  pattern        = "{ ($.message.event = \"MDSS_FILE_FAIL\") && ($.message.error_type = \"timeout\") }"
+  pattern        = "{ ($.message.event = \"MDSS_FILE_FAIL\") && ($.message.error_type = \"unknown\") }"
 
   metric_transformation {
-    name      = "MdssTimeoutFailCount"
+    name      = "MdssUnknownFailCount"
     namespace = "EMDS/MDSS"
     value     = "1"
   }
