@@ -42,7 +42,7 @@
 #     from_port       = 4443
 #     to_port         = 4443
 #     cidr_blocks     = [data.aws_vpc.shared.cidr_block]
-#     security_groups = [aws_security_group.load_balancer_security_group.id]
+#     security_groups = [aws_security_group.load_balancer_external.id]
 #   }
 
 #   ingress {
@@ -50,7 +50,7 @@
 #     from_port       = 5556
 #     to_port         = 5556
 #     cidr_blocks     = [data.aws_vpc.shared.cidr_block]
-#     security_groups = [aws_security_group.load_balancer_security_group.id]
+#     security_groups = [aws_security_group.load_balancer_external.id]
 #   }
 
 #   ingress {
@@ -58,7 +58,7 @@
 #     from_port       = 7001
 #     to_port         = 7001
 #     cidr_blocks     = [data.aws_vpc.shared.cidr_block]
-#     security_groups = [aws_security_group.load_balancer_security_group.id]
+#     security_groups = [aws_security_group.load_balancer_external.id]
 #   }
 
 #   ingress {
@@ -66,7 +66,7 @@
 #     from_port       = 7002
 #     to_port         = 7002
 #     cidr_blocks     = [data.aws_vpc.shared.cidr_block]
-#     security_groups = [aws_security_group.load_balancer_security_group.id]
+#     security_groups = [aws_security_group.load_balancer_external.id]
 #   }
 
 #   ingress {
@@ -74,6 +74,6 @@
 #     from_port       = 8001
 #     to_port         = 8001
 #     cidr_blocks     = [data.aws_vpc.shared.cidr_block]
-#     security_groups = [aws_security_group.load_balancer_security_group.id]
+#     security_groups = [aws_security_group.load_balancer_external.id]
 #   }
 # }

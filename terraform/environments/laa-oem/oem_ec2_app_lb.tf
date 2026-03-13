@@ -2,7 +2,7 @@ resource "aws_lb" "oem_app" {
   name               = "lb-${local.application_name}-app"
   load_balancer_type = "application"
   internal           = false
-  security_groups    = [aws_security_group.load_balancer_security_group.id]
+  security_groups    = [aws_security_group.load_balancer_external.id]
   subnets            = data.aws_subnets.shared-public.ids
 
   tags = local.tags
@@ -182,7 +182,7 @@ resource "aws_lb_target_group" "oem_app_7803" {
   target_type = "instance"
 
   health_check {
-    path                = "/em"
+    path                = "/em/faces/logon/core-uifwk-console-login"
     healthy_threshold   = "5"
     interval            = "60"
     protocol            = "HTTPS"

@@ -110,7 +110,7 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_1159_1159
   ip_protocol                  = "tcp"
   from_port                    = 1159
   to_port                      = 1159
-  referenced_security_group_id = aws_security_group.load_balancer_security_group.id
+  referenced_security_group_id = aws_security_group.load_balancer_external.id
 
   tags = {
     Name = "Oracle EM Agent port from LB"
@@ -134,7 +134,7 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_1521_1521
   ip_protocol                  = "tcp"
   from_port                    = 1521
   to_port                      = 1521
-  referenced_security_group_id = aws_security_group.load_balancer_security_group.id
+  referenced_security_group_id = aws_security_group.load_balancer_external.id
 
   tags = {
     Name = "Oracle DB listener from LB"
@@ -158,7 +158,7 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_1830_1849
   ip_protocol                  = "tcp"
   from_port                    = 1830
   to_port                      = 1849
-  referenced_security_group_id = aws_security_group.load_balancer_security_group.id
+  referenced_security_group_id = aws_security_group.load_balancer_external.id
 
   tags = {
     Name = "Oracle EM Upload ports from LB"
@@ -182,7 +182,7 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_2049_2049
   ip_protocol                  = "tcp"
   from_port                    = 2049
   to_port                      = 2049
-  referenced_security_group_id = aws_security_group.load_balancer_security_group.id
+  referenced_security_group_id = aws_security_group.load_balancer_external.id
 
   tags = {
     Name = "NFS from LB"
@@ -206,7 +206,7 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_3872_3872
   ip_protocol                  = "tcp"
   from_port                    = 3872
   to_port                      = 3872
-  referenced_security_group_id = aws_security_group.load_balancer_security_group.id
+  referenced_security_group_id = aws_security_group.load_balancer_external.id
 
   tags = {
     Name = "Oracle EM Console HTTP from LB"
@@ -230,7 +230,7 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_4889_4889
   ip_protocol                  = "tcp"
   from_port                    = 4889
   to_port                      = 4889
-  referenced_security_group_id = aws_security_group.load_balancer_security_group.id
+  referenced_security_group_id = aws_security_group.load_balancer_external.id
 
   tags = {
     Name = "Oracle EM Secure Upload from LB"
@@ -254,7 +254,7 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_4903_4903
   ip_protocol                  = "tcp"
   from_port                    = 4903
   to_port                      = 4903
-  referenced_security_group_id = aws_security_group.load_balancer_security_group.id
+  referenced_security_group_id = aws_security_group.load_balancer_external.id
 
   tags = {
     Name = "Oracle EM Console HTTPS from LB"
@@ -278,7 +278,7 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_7101_7102
   ip_protocol                  = "tcp"
   from_port                    = 7101
   to_port                      = 7102
-  referenced_security_group_id = aws_security_group.load_balancer_security_group.id
+  referenced_security_group_id = aws_security_group.load_balancer_external.id
 
   tags = {
     Name = "Oracle EM OMS ports from LB"
@@ -314,7 +314,7 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_7202_7202
   ip_protocol                  = "tcp"
   from_port                    = 7202
   to_port                      = 7202
-  referenced_security_group_id = aws_security_group.load_balancer_security_group.id
+  referenced_security_group_id = aws_security_group.load_balancer_external.id
 
   tags = {
     Name = "Oracle EM additional port from LB"
@@ -338,7 +338,7 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_7301_7301
   ip_protocol                  = "tcp"
   from_port                    = 7301
   to_port                      = 7301
-  referenced_security_group_id = aws_security_group.load_balancer_security_group.id
+  referenced_security_group_id = aws_security_group.load_balancer_external.id
 
   tags = {
     Name = "Oracle EM additional port from LB"
@@ -362,7 +362,7 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_7403_7403
   ip_protocol                  = "tcp"
   from_port                    = 7403
   to_port                      = 7403
-  referenced_security_group_id = aws_security_group.load_balancer_security_group.id
+  referenced_security_group_id = aws_security_group.load_balancer_external.id
 
   tags = {
     Name = "Oracle EM additional port from LB"
@@ -386,7 +386,7 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_7788_7788
   ip_protocol                  = "tcp"
   from_port                    = 7788
   to_port                      = 7788
-  referenced_security_group_id = aws_security_group.load_balancer_security_group.id
+  referenced_security_group_id = aws_security_group.load_balancer_external.id
 
   tags = {
     Name = "Oracle EM additional port from LB"
@@ -410,7 +410,7 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_7799_7799
   ip_protocol                  = "tcp"
   from_port                    = 7799
   to_port                      = 7799
-  referenced_security_group_id = aws_security_group.load_balancer_security_group.id
+  referenced_security_group_id = aws_security_group.load_balancer_external.id
 
   tags = {
     Name = "Oracle EM additional port from LB"
@@ -434,7 +434,19 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_7803_7803
   ip_protocol                  = "tcp"
   from_port                    = 7803
   to_port                      = 7803
-  referenced_security_group_id = aws_security_group.load_balancer_security_group.id
+  referenced_security_group_id = aws_security_group.load_balancer_external.id
+
+  tags = {
+    Name = "Oracle EM additional port from LB"
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_7803_7803_sg_lb_int" {
+  security_group_id            = aws_security_group.oem_app_security_group.id
+  ip_protocol                  = "tcp"
+  from_port                    = 7803
+  to_port                      = 7803
+  referenced_security_group_id = aws_security_group.load_balancer_internal.id
 
   tags = {
     Name = "Oracle EM additional port from LB"
@@ -458,7 +470,7 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_9788_9788
   ip_protocol                  = "tcp"
   from_port                    = 9788
   to_port                      = 9788
-  referenced_security_group_id = aws_security_group.load_balancer_security_group.id
+  referenced_security_group_id = aws_security_group.load_balancer_external.id
 
   tags = {
     Name = "Oracle EM additional port from LB"
@@ -482,7 +494,7 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_9851_9851
   ip_protocol                  = "tcp"
   from_port                    = 9851
   to_port                      = 9851
-  referenced_security_group_id = aws_security_group.load_balancer_security_group.id
+  referenced_security_group_id = aws_security_group.load_balancer_external.id
 
   tags = {
     Name = "Oracle EM additional port from LB"
