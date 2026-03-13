@@ -11,6 +11,7 @@ locals {
     "project"           = var.project_name
     "AzImpairmentPower" = "IceAsg"
     "Patch Group"       = "Linux2"
+    "install-trend-av"  = "true"
   }
 
 

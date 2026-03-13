@@ -13,6 +13,7 @@ locals {
     "Name"              = "YJSM"
     "AzImpairmentPower" = "StopInstances"
     "Patch Group"       = "Linux2"
+    "install-trend-av"  = "true"
   }
 
 
