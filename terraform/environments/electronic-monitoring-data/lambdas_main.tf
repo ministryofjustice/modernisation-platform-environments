@@ -702,6 +702,7 @@ module "fan_out_tags" {
 #-----------------------------------------------------------------------------------
 
 module "mdss_reconciler" {
+  count = local.is-preproduction || local.is-production ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "mdss_reconciler"
