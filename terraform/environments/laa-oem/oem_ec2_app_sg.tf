@@ -285,7 +285,7 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_7101_7102
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_7101_7102_cidr" {
+resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_7101_7102_db" {
   security_group_id            = aws_security_group.oem_app_security_group.id
   ip_protocol                  = "tcp"
   from_port                    = 7101
