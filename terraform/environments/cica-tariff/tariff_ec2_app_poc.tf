@@ -1,10 +1,11 @@
 # Clone of Development App server for POC CDI-295
 resource "aws_instance" "tariff_app_dev_poc_clone" {
   count = local.environment == "development" ? 1 : 0
-  ami   = "ami-079bedd5037ad8609"
+  # ami   = "ami-079bedd5037ad8609"
+  ami = "ami-044bcc0b671b75b6e" # CDI-319: restore from backup
   #Ignore changes to most recent ami from data filter, as this would destroy existing instance.
   lifecycle {
-    ignore_changes = [ami, user_data]
+    ignore_changes = [user_data] # ami removed to allow restore
   }
   associate_public_ip_address = false
   ebs_optimized               = true
@@ -16,6 +17,8 @@ resource "aws_instance" "tariff_app_dev_poc_clone" {
   subnet_id              = data.aws_subnet.private_subnets_a.id
   vpc_security_group_ids = [module.tariff_app_security_group[0].security_group_id]
   #vpc_security_group_ids = [aws_security_group.temp_dev_ssm_only[0].id] # TEMPORARY ASSIGNMENT
+
+  private_ip = "10.26.32.62"
 
   tags = merge(tomap({
     "Name"     = lower(format("ec2-%s-%s-app-clone", local.application_name, local.environment)),
