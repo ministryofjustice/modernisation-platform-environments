@@ -182,7 +182,7 @@ resource "aws_lb_target_group" "oem_app_7803_internal" {
   target_type = "instance"
 
   health_check {
-    path                = "/em"
+    path                = "/em/faces/logon/core-uifwk-console-login"
     healthy_threshold   = "5"
     interval            = "60"
     protocol            = "HTTPS"
