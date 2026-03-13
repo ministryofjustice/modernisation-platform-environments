@@ -4,8 +4,8 @@ set -euo pipefail
 HOST_1="$1"
 PORT="$2"
 HOST_2="$3"
-HOSTED_ZONE_ID="$5"
-CHANGE_FILE="$6"
+HOSTED_ZONE_ID="$4"
+CHANGE_FILE="$5"
 
 function check_port() {
     host=$1
