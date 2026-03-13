@@ -57,4 +57,9 @@ locals {
     "transcribe",        # AWS Transcribe
     "wafv2"              # WAF
   ]
+
+  vpc_gateway_endpoint_service_names = [
+    "s3",       # S3
+    "dynamodb" # DynamoDB
+  ]
 }
