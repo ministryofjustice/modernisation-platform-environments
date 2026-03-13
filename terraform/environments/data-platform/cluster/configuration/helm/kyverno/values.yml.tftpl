@@ -1,0 +1,81 @@
+---
+admissionController:
+  replicas: 3
+  serviceMonitor:
+    enabled: true
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+backgroundController:
+  replicas: 2
+  serviceMonitor:
+    enabled: true
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+cleanupController:
+  replicas: 2
+  serviceMonitor:
+    enabled: true
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+reportsController:
+  replicas: 2
+  serviceMonitor:
+    enabled: true
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+
+crds:
+  migration:
+    nodeSelector:
+      compute.data-platform.service.justice.gov.uk/node: system
+    tolerations:
+      - key: compute.data-platform.service.justice.gov.uk/node
+        operator: Equal
+        value: system
+        effect: NoSchedule
+
+webhooksCleanup:
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+
+config:
+  resourceFiltersExcludeNamespaces:
+    # Default
+    - kube-system
+    # Cilium
+    - cilium-secrets
+    # AWS GuardDuty EKS addon
+    - amazon-guardduty
+    # AWS Network Flow Monitor EKS addon
+    - amazon-network-flow-monitor
+    # Cluster Autoscaler
+    - cluster-autoscaler
+    # Prometheus
+    - prometheus
+    # Fluent bit
+    - fluent-bit

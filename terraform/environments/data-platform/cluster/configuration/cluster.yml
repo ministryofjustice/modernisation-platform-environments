@@ -1,0 +1,125 @@
+environment:
+  development:
+    kubernetes_version: "1.35"
+    bottlerocket_version: "1.56.0-36151b8b"
+    addon_versions:
+      aws_ebs_csi_driver: "v1.56.0-eksbuild.1"
+      aws_efs_csi_driver: "v2.3.0-eksbuild.2"
+      aws_guardduty_agent: "v1.12.1-eksbuild.2"
+      aws_network_flow_monitoring_agent: "v1.1.3-eksbuild.2"
+      eks_node_monitoring_agent: "v1.5.2-eksbuild.1"
+      eks_pod_identity_agent: "v1.3.10-eksbuild.2"
+    crd_versions:
+      gateway_api: "v1.4.1" # https://docs.cilium.io/en/v1.19/network/servicemesh/gateway-api/gateway-api/#cilium-gateway-api-support
+      prometheus: "v0.89.0"
+    helm_chart_versions:
+      cilium: "1.19.1"
+      coredns: "1.45.2"
+      kyverno: "3.7.1"
+      cluster_autoscaler: "9.55.1"
+      aws_cloudwatch_observability: "4.10.0"
+      kube_prometheus_stack: "82.4.0"
+      fluent_bit: "0.2.0"
+      cert_manager: "1.19.4"
+      external_dns: "1.20.0"
+      external_secrets: "2.0.1"
+      karpenter_crd: "1.9.0"
+      karpenter: "1.9.0"
+      keda: "2.19.0"
+    route53_zones:
+      - "development.data-platform.service.justice.gov.uk"
+      - "development.ai-gateway.justice.gov.uk"
+    shared_services_gateway_hostname: "*.development.data-platform.service.justice.gov.uk"
+  test:
+    kubernetes_version: "1.35"
+    bottlerocket_version: "1.56.0-36151b8b"
+    addon_versions:
+      aws_ebs_csi_driver: "v1.56.0-eksbuild.1"
+      aws_efs_csi_driver: "v2.3.0-eksbuild.2"
+      aws_guardduty_agent: "v1.12.1-eksbuild.2"
+      aws_network_flow_monitoring_agent: "v1.1.3-eksbuild.2"
+      eks_node_monitoring_agent: "v1.5.2-eksbuild.1"
+      eks_pod_identity_agent: "v1.3.10-eksbuild.2"
+    crd_versions:
+      gateway_api: "v1.4.1" # https://docs.cilium.io/en/v1.19/network/servicemesh/gateway-api/gateway-api/#cilium-gateway-api-support
+      prometheus: "v0.89.0"
+    helm_chart_versions:
+      cilium: "1.19.1"
+      coredns: "1.45.2"
+      kyverno: "3.7.1"
+      cluster_autoscaler: "9.55.1"
+      aws_cloudwatch_observability: "4.10.0"
+      kube_prometheus_stack: "82.4.0"
+      fluent_bit: "0.2.0"
+      cert_manager: "1.19.4"
+      external_dns: "1.20.0"
+      external_secrets: "2.0.1"
+      karpenter_crd: "1.9.0"
+      karpenter: "1.9.0"
+      keda: "2.19.0"
+    route53_zones:
+      - "test.data-platform.service.justice.gov.uk"
+      - "test.ai-gateway.justice.gov.uk"
+    shared_services_gateway_hostname: "*.test.data-platform.service.justice.gov.uk"
+  preproduction:
+    kubernetes_version: "1.35"
+    bottlerocket_version: "1.56.0-36151b8b"
+    addon_versions:
+      aws_ebs_csi_driver: "v1.56.0-eksbuild.1"
+      aws_efs_csi_driver: "v2.3.0-eksbuild.2"
+      aws_guardduty_agent: "v1.12.1-eksbuild.2"
+      aws_network_flow_monitoring_agent: "v1.1.3-eksbuild.2"
+      eks_node_monitoring_agent: "v1.5.2-eksbuild.1"
+      eks_pod_identity_agent: "v1.3.10-eksbuild.2"
+    crd_versions:
+      gateway_api: "v1.4.1" # https://docs.cilium.io/en/v1.19/network/servicemesh/gateway-api/gateway-api/#cilium-gateway-api-support
+      prometheus: "v0.89.0"
+    helm_chart_versions:
+      cilium: "1.19.1"
+      coredns: "1.45.2"
+      kyverno: "3.7.1"
+      cluster_autoscaler: "9.55.1"
+      aws_cloudwatch_observability: "4.10.0"
+      kube_prometheus_stack: "82.4.0"
+      fluent_bit: "0.2.0"
+      cert_manager: "1.19.4"
+      external_dns: "1.20.0"
+      external_secrets: "2.0.1"
+      karpenter_crd: "1.9.0"
+      karpenter: "1.9.0"
+      keda: "2.19.0"
+    route53_zones:
+      - "preproduction.data-platform.service.justice.gov.uk"
+      - "preproduction.ai-gateway.justice.gov.uk"
+    shared_services_gateway_hostname: "*.preproduction.data-platform.service.justice.gov.uk"
+  production:
+    kubernetes_version: "1.35"
+    bottlerocket_version: "1.56.0-36151b8b"
+    addon_versions:
+      aws_ebs_csi_driver: "v1.56.0-eksbuild.1"
+      aws_efs_csi_driver: "v2.3.0-eksbuild.2"
+      aws_guardduty_agent: "v1.12.1-eksbuild.2"
+      aws_network_flow_monitoring_agent: "v1.1.3-eksbuild.2"
+      eks_node_monitoring_agent: "v1.5.2-eksbuild.1"
+      eks_pod_identity_agent: "v1.3.10-eksbuild.2"
+    crd_versions:
+      gateway_api: "v1.4.1" # https://docs.cilium.io/en/v1.19/network/servicemesh/gateway-api/gateway-api/#cilium-gateway-api-support
+      prometheus: "v0.89.0"
+    helm_chart_versions:
+      cilium: "1.19.1"
+      coredns: "1.45.2"
+      kyverno: "3.7.1"
+      cluster_autoscaler: "9.55.1"
+      aws_cloudwatch_observability: "4.10.0"
+      kube_prometheus_stack: "82.4.0"
+      fluent_bit: "0.2.0"
+      cert_manager: "1.19.4"
+      external_dns: "1.20.0"
+      external_secrets: "2.0.1"
+      karpenter_crd: "1.9.0"
+      karpenter: "1.9.0"
+      keda: "2.19.0"
+    route53_zones:
+      - "data-platform.service.justice.gov.uk"
+      - "ai-gateway.justice.gov.uk"
+    shared_services_gateway_hostname: "*.data-platform.service.justice.gov.uk"

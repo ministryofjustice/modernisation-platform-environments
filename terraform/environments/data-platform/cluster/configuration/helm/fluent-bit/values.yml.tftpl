@@ -1,0 +1,23 @@
+---
+serviceMonitor:
+  enabled: true
+
+cloudWatchLogs:
+  enabled: true
+  region: ${aws_region}
+  logGroupName: ${cloudwatch_log_group_name}
+
+input:
+  extraInputs: |
+    Read_from_Head On
+
+serviceAccount:
+  create: true
+  name: fluent-bit
+  annotations:
+    eks.amazonaws.com/role-arn: ${eks_role_arn}
+
+priorityClassName: system-node-critical
+
+tolerations:
+  - operator: Exists
