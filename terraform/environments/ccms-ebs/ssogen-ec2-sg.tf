@@ -26,15 +26,32 @@ resource "aws_vpc_security_group_ingress_rule" "ing_console_lambda" {
 }
 
 # ############################################
-# # INGRESS — SSH (22) from WorkSpaces subnets (private)
+# # INGRESS — 7001 from WorkSpaces subnets (private)
 # ############################################
 resource "aws_vpc_security_group_ingress_rule" "ing_console_workspaces" {
   count             = local.is-development || local.is-test ? 1 : 0
   ip_protocol       = "tcp"
-  description       = "SSH from WorkSpaces subnets"
+  description       = "7001 from WorkSpaces subnets"
   security_group_id = aws_security_group.ssogen_sg[count.index].id
   from_port         = 7001
   to_port           = 7001
+  cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
+  #     data.aws_vpc.shared.cidr_block,
+  #     local.application_data.accounts[local.environment].lz_aws_subnet_env,
+  #     local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env,
+  #     local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env,
+}
+
+# ############################################
+# # INGRESS — 4443 from WorkSpaces subnets (private)
+# ############################################
+resource "aws_vpc_security_group_ingress_rule" "ing_4443_workspaces" {
+  count             = local.is-development || local.is-test ? 1 : 0
+  ip_protocol       = "tcp"
+  description       = "4443 from WorkSpaces subnets"
+  security_group_id = aws_security_group.ssogen_sg[count.index].id
+  from_port         = 4443
+  to_port           = 4443
   cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
   #     data.aws_vpc.shared.cidr_block,
   #     local.application_data.accounts[local.environment].lz_aws_subnet_env,
