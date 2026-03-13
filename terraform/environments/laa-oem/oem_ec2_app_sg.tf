@@ -285,6 +285,18 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_7101_7102
   }
 }
 
+resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_7101_7102_cidr" {
+  security_group_id            = aws_security_group.oem_app_security_group.id
+  ip_protocol                  = "tcp"
+  from_port                    = 7101
+  to_port                      = 7102
+  referenced_security_group_id = aws_security_group.oem_db_security_group.id
+
+  tags = {
+    Name = "Oracle EM OMS ports from OEM DB"
+  }
+}
+
 resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_7202_7202_cidr" {
   security_group_id = aws_security_group.oem_app_security_group.id
   ip_protocol       = "tcp"
