@@ -1824,6 +1824,25 @@ data "aws_iam_policy_document" "mdss_reconciler_lambda_role_policy_document" {
   }
 
   statement {
+    sid    = "ListMetadataBucketForManifestMarkers"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [
+      module.s3-metadata-bucket.bucket.arn,
+    ]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+      values = [
+        "mdss-manifest/current/${local.environment_shorthand}/*",
+      ]
+    }
+  }
+
+  statement {
     sid    = "ReadWriteManifestMarkers"
     effect = "Allow"
     actions = [
@@ -1845,6 +1864,7 @@ data "aws_iam_policy_document" "mdss_reconciler_lambda_role_policy_document" {
       module.load_mdss_event_queue.sqs_queue.arn,
     ]
   }
+
   statement {
     sid    = "AllowUseOfMetadataBucketKmsKey"
     effect = "Allow"
