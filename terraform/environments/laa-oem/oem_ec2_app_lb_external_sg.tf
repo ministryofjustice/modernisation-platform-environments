@@ -1,6 +1,10 @@
+# DO NOT:
+# - Change the resource name -> destroy/create.
+# - Change the description -> destroy/create.
+
 resource "aws_security_group" "load_balancer_security_group" {
   name_prefix = "${local.application_name}-lb-pub-sg-"
-  description = "LB External Security Group"
+  description = "Access to the EBS App server"
   vpc_id      = data.aws_vpc.shared.id
 
   tags = merge(tomap(
