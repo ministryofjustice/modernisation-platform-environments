@@ -89,7 +89,7 @@ resource "aws_s3_bucket_inventory" "oracledb_immutable_backup_pieces" {
 }
 
 resource "aws_s3_bucket_object_lock_configuration" "oracledb_immutable_backup_lock_configuration" {
-  bucket = module.s3_bucket_oracledb_immutable_backups.bucket.id
+  bucket = module.s3_bucket_oracledb_backups.bucket.id
 
   rule {
     default_retention {
