@@ -4,7 +4,7 @@ data "template_file" "dns_change" {
   template = file("${path.module}/templates/dns-change.json.tpl")
 
   vars = {
-    record_name = data.aws_route53_record.ssogen_admin_primary[count.index].name
+    record_name = aws_route53_record.ssogen_admin_primary[count.index].name
   }
 }
 
