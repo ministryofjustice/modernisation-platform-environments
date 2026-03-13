@@ -8,7 +8,7 @@ resource "aws_security_group" "oem_app_security_group" {
   ), local.tags)
 }
 
-# Egress Rules for oem_app_security_group
+# EGRESS
 resource "aws_vpc_security_group_egress_rule" "oem_app_sg_egress_all_0_0_cidr" {
   security_group_id = aws_security_group.oem_app_security_group.id
   ip_protocol       = "-1"
@@ -19,7 +19,7 @@ resource "aws_vpc_security_group_egress_rule" "oem_app_sg_egress_all_0_0_cidr" {
   }
 }
 
-# Ingress Rules for oem_app_security_group - Management Access
+# INGRESS
 resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_22_22_cidr_1" {
   security_group_id = aws_security_group.oem_app_security_group.id
   ip_protocol       = "tcp"
@@ -92,7 +92,6 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_icmp_neg1_neg
   }
 }
 
-# Ingress Rules for oem_app_security_group - Application Ports
 resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_1159_1159_cidr" {
   security_group_id = aws_security_group.oem_app_security_group.id
   ip_protocol       = "tcp"
@@ -435,6 +434,18 @@ resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_7803_7803
   from_port                    = 7803
   to_port                      = 7803
   referenced_security_group_id = aws_security_group.load_balancer_security_group.id
+
+  tags = {
+    Name = "Oracle EM additional port from LB"
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "oem_app_sg_ingress_tcp_7803_7803_sg_lb_int" {
+  security_group_id            = aws_security_group.oem_app_security_group.id
+  ip_protocol                  = "tcp"
+  from_port                    = 7803
+  to_port                      = 7803
+  referenced_security_group_id = aws_security_group.load_balancer_internal.id
 
   tags = {
     Name = "Oracle EM additional port from LB"
