@@ -17,6 +17,10 @@ resource "local_file" "dns_change" {
 resource "null_resource" "conditional_dns_update" {
   count    = local.is-development || local.is-test ? 1 : 0
   provisioner "local-exec" {
+    environment = {
+      AWS_PROFILE = "core-vpc"
+      AWS_REGION  = "eu-west-2"
+    }
     command = <<EOF
 CREDS=$(aws sts assume-role --role-arn arn:aws:iam::${data.aws_caller_identity.current.id}:role/MemberInfrastructureAccess --role-session-name github-actions-session)
 export AWS_ACCESS_KEY_ID=$(echo $CREDS | jq -r '.Credentials.AccessKeyId')
