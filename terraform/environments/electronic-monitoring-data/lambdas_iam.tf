@@ -892,6 +892,17 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
       "${module.s3-metadata-bucket.bucket.arn}/mdss-manifest/*",
     ]
   }
+  statement {
+    sid    = "AllowUseOfMetadataBucketKmsKey"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt",
+    ]
+    resources = [
+      module.kms_metadata_key.key_arn,
+    ]
+  }  
 }
 
 resource "aws_iam_role" "load_mdss" {
@@ -1832,6 +1843,17 @@ data "aws_iam_policy_document" "mdss_reconciler_lambda_role_policy_document" {
     ]
     resources = [
       module.load_mdss_event_queue.sqs_queue.arn,
+    ]
+  }
+  statement {
+    sid    = "AllowUseOfMetadataBucketKmsKey"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt",
+    ]
+    resources = [
+      module.kms_metadata_key.key_arn,
     ]
   }
 }
