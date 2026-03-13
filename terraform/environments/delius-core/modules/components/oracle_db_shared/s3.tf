@@ -27,7 +27,7 @@ module "s3_bucket_oracledb_backups" {
   #checkov:skip=CKV_TF_1 "ignore"
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
   bucket_name         = local.oracle_backup_bucket_prefix
-  versioning_enabled  = false
+  versioning_enabled  = true
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
   custom_kms_key      = var.account_config.kms_keys.general_shared
