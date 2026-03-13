@@ -25,18 +25,18 @@ function check_port() {
 
 echo "=== Starting backend checks ==="
 
-if check_port "$HOST_1" "$PORT"; then
-    echo "Backend 1 healthy → Updating DNS to backend 1"
-    sed -i "s|REPLACE_IP|$HOST_1|" "$CHANGE_FILE"
+# if check_port "$HOST_1" "$PORT"; then
+#     echo "Backend 1 healthy → Updating DNS to backend 1"
+#     sed -i "s|REPLACE_IP|$HOST_1|" "$CHANGE_FILE"
 
-elif check_port "$HOST_2" "$PORT"; then
-    echo "Backend 2 healthy → Updating DNS to backend 2"
-    sed -i "s|REPLACE_IP|$HOST_2|" "$CHANGE_FILE"
+# elif check_port "$HOST_2" "$PORT"; then
+#     echo "Backend 2 healthy → Updating DNS to backend 2"
+#     sed -i "s|REPLACE_IP|$HOST_2|" "$CHANGE_FILE"
 
-else
-    echo "ERROR: Neither backend is reachable. Aborting DNS update."
-    exit 1
-fi
+# else
+#     echo "ERROR: Neither backend is reachable. Aborting DNS update."
+#     exit 1
+# fi
 
 echo "Applying DNS update..."
 aws route53 change-resource-record-sets \
