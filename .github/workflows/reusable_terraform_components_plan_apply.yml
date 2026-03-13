@@ -51,7 +51,7 @@
     env:
       ACCOUNT_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
       WORKSPACE_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
-      SKIP_PLAN_EVALUATOR: '["cloud-platform-development", "data-platform-development", "data-platform-test", "data-platform-preproduction", "data-platform-production"]'
+      SKIP_PLAN_EVALUATOR: '["cloud-platform-development", "cloud-platform-preproduction", "cloud-platform-nonlive", "cloud-platform-live", "data-platform-development", "data-platform-test", "data-platform-preproduction", "data-platform-production"]'
     concurrency:
       group: ${{ inputs.application }}-${{ inputs.environment }}-${{ inputs.component }}
     jobs:
@@ -109,7 +109,7 @@
               aws-region: "eu-west-2"
 
           - name: Setup Terraform
-            uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd  # v3.1.2
+            uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85  # v4.0.0
             with:
               terraform_version: "${{ inputs.terraform_version }}"
               terraform_wrapper: false
@@ -311,7 +311,7 @@
               aws-region: "eu-west-2"
 
           - name: Setup Terraform
-            uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd  # v3.1.2
+            uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85  # v4.0.0
             with:
               terraform_version: "${{ inputs.terraform_version }}"
               terraform_wrapper: false

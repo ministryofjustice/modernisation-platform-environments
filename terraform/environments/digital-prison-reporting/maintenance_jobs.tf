@@ -47,7 +47,7 @@ module "glue_compact_job" {
   )
 
   arguments = {
-    "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--extra-jars"                          = local.glue_jobs_jar_location
     "--extra-files"                         = local.shared_log4j_properties_path
     "--class"                               = local.compact_job_class
     "--dpr.config.s3.bucket"                = module.s3_glue_job_bucket.bucket_id
@@ -96,7 +96,7 @@ module "glue_retention_job" {
   )
 
   arguments = {
-    "--extra-jars"                          = local.glue_jobs_latest_jar_location
+    "--extra-jars"                          = local.glue_jobs_jar_location
     "--extra-files"                         = local.shared_log4j_properties_path
     "--class"                               = local.retention_job_class
     "--dpr.config.s3.bucket"                = module.s3_glue_job_bucket.bucket_id
