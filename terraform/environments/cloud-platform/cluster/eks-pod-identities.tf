@@ -2,7 +2,7 @@ module "aws_vpc_cni_pod_identity" {
   count = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
 
   source  = "terraform-aws-modules/eks-pod-identity/aws"
-  version = "2.5.0"
+  version = "2.7.0"
 
   name = "aws-vpc-cni"
 
