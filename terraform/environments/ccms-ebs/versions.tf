@@ -28,6 +28,10 @@ terraform {
       version = "~> 2.2"
       source  = "hashicorp/template"
     }
+    local = {
+      version = "~> 2.7"
+      source  = "hashicorp/local"
+    }
   }
   required_version = "~> 1.10"
 }
