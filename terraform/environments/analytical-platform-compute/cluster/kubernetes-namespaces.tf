@@ -57,3 +57,9 @@ resource "kubernetes_namespace" "velero" {
     name = "velero"
   }
 }
+
+resource "kubernetes_namespace" "headlamp" {
+  metadata {
+    name = "headlamp"
+  }
+}

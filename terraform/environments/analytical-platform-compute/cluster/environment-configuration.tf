@@ -34,6 +34,7 @@ locals {
         kube_prometheus_stack  = "81.1.0"
         kyverno                = "3.6.2"
         velero                 = "11.3.2"
+        headlamp               = "0.40.0"
       }
 
       /* Data Engineering Airflow */
@@ -74,6 +75,7 @@ locals {
         kube_prometheus_stack  = "81.1.0"
         kyverno                = "3.6.2"
         velero                 = "11.3.2"
+        headlamp               = "0.40.0"
       }
 
       /* Data Engineering Airflow */
@@ -114,6 +116,7 @@ locals {
         kube_prometheus_stack  = "81.1.0"
         kyverno                = "3.6.2"
         velero                 = "11.3.2"
+        headlamp               = "0.40.0"
       }
 
       /* Data Engineering Airflow */

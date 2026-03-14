@@ -341,3 +341,22 @@ resource "helm_release" "velero" {
     )
   ]
 }
+
+/* Headlamp */
+resource "helm_release" "headlamp" {
+  /* https://artifacthub.io/packages/helm/headlamp/headlamp */
+  name       = "headlamp"
+  repository = "https://kubernetes-sigs.github.io/headlamp/"
+  chart      = "headlamp"
+  version    = local.environment_configuration.helm_chart_version.headlamp
+  namespace  = kubernetes_namespace.headlamp.metadata[0].name
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/headlamp/values.yml.tftpl",
+      {
+        headlamp_hostname = "headlamp.${local.environment_configuration.route53_zone}"
+      }
+    )
+  ]
+  depends_on = [helm_release.ingress_nginx]
+}
