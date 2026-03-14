@@ -34,7 +34,7 @@ resource "null_resource" "ssm_pick_backend" {
       "--comment", "tf select backend",
       "--parameters",
       "'commands=[\"bash\",\"-lc\",\"set -euo pipefail",
-      "check_tcp() { timeout 3 bash -c 'cat < /dev/null > /dev/tcp/$1/$2' 2>/dev/null; }",
+      "check_tcp() { nc -z -w2 $1 $2; }",
       "HOST_A=${self.triggers.host_a}",
       "PORT_A=${self.triggers.port_a}",
       "HOST_B=${self.triggers.host_b}",
