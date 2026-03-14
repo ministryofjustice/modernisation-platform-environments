@@ -1,39 +1,43 @@
 # Render DNS change template
-data "template_file" "dns_change" {
-  count    = local.is-development || local.is-test ? 1 : 0
-  template = file("${path.module}/templates/dns-change.json.tpl")
+# data "template_file" "dns_change" {
+#   count    = local.is-development || local.is-test ? 1 : 0
+#   template = file("${path.module}/templates/select-active-console.json.tpl")
 
-  vars = {
-    record_name = aws_route53_record.ssogen_admin_primary[count.index].name
+#   vars = {
+#     record_name = aws_route53_record.ssogen_admin_primary[count.index].name
+#   }
+# }
+
+# resource "local_file" "dns_change" {
+#   count    = local.is-development || local.is-test ? 1 : 0
+#   filename = "${path.module}/select_active_console_admin.sh"
+#   content  = data.template_file.dns_change[count.index].rendered
+# }
+
+
+resource "null_resource" "ssm_pick_backend" {
+  triggers = {
+    host_a = "${data.aws_instance.ssogen_primary_details[0].private_ip}"
+    port_a = tostring(7001)
+    host_b = "${data.aws_instance.ssogen_secondary_details[0].private_ip}"
+    port_b = tostring(7001)
+    ts     = timestamp()
   }
-}
 
-resource "local_file" "dns_change" {
-  count    = local.is-development || local.is-test ? 1 : 0
-  filename = "${path.module}/dns-change.json"
-  content  = data.template_file.dns_change[count.index].rendered
-}
-
-resource "null_resource" "conditional_dns_update" {
-  count    = local.is-development || local.is-test ? 1 : 0
   provisioner "local-exec" {
-    environment = {
-      AWS_PROFILE = "aws.core-vpc"
-      AWS_REGION  = "eu-west-2"
-    }
-    command = <<EOF
-CREDS=$(aws sts assume-role --role-arn arn:aws:iam::${data.aws_caller_identity.current.id}:role/MemberInfrastructureAccess --role-session-name github-actions-session)
-export AWS_ACCESS_KEY_ID=$(echo $CREDS | jq -r '.Credentials.AccessKeyId')
-export AWS_SECRET_ACCESS_KEY=$(echo $CREDS | jq -r '.Credentials.SecretAccessKey')
-export AWS_SESSION_TOKEN=$(echo $CREDS | jq -r '.Credentials.SessionToken')
-chmod u+x ${path.module}/scripts/update_dns_ssogen_admin.sh
-./scripts/update_dns_ssogen_admin.sh \
-${data.aws_instance.ssogen_primary_details[count.index].private_ip} \
-${local.application_data.accounts[local.environment].tg_ssogen_admin_port} \
-${data.aws_instance.ssogen_secondary_details[count.index].private_ip} \
-${data.aws_route53_zone.external.zone_id} \
-${local_file.dns_change[count.index].filename}
-EOF
+    command = join(" ", [
+      "aws ssm send-command",
+      "--document-name", "AWS-RunShellScript",
+      "--instance-ids", "${triggers.host_a}",
+      "--parameters", "'commands=[\"./select_backend_and_store.sh ${triggers.host_a} ${triggers.port_a} ${triggers.host_b} ${triggers.port_b} SELECTED_BACKEND ${data.aws_region.current.id}\"]'",
+      "--region", "${data.aws_region.current.id}",
+      "--comment", "'tf select backend'"
+    ])
   }
-  depends_on = [local_file.dns_change]
+}
+
+# Wait/poll logic is often added; for brevity we assume script is quick and parameter is available.
+data "aws_ssm_parameter" "selected_backend" {
+  depends_on = [null_resource.ssm_pick_backend]
+  name       = "SELECTED_BACKEND"
 }

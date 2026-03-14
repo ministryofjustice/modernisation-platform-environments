@@ -100,7 +100,7 @@ resource "aws_route53_record" "ssogen_admin_primary" {
   # }
   # health_check_id = aws_route53_health_check.primary_hc[count.index].id
   ttl     = 300
-  records = [data.aws_instance.ssogen_primary_details[count.index].private_ip]
+  records = [data.aws_ssm_parameter.selected_backend.value]
 }
 
 # resource "aws_route53_record" "ssogen_admin_secondary" {
