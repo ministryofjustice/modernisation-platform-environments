@@ -33,18 +33,14 @@ resource "null_resource" "ssm_pick_backend" {
       "--region", "${data.aws_region.current.id}",
       "--comment", "tf select backend",
       "--parameters",
-      "'commands=[\"bash\",\"-lc\",",
-      "\"set -euo pipefail",
-      "",
+      "'commands=[\"bash\",\"-lc\",\"set -euo pipefail",
       "check_tcp() { timeout 3 bash -c 'cat < /dev/null > /dev/tcp/$1/$2' 2>/dev/null; }",
-      "",
       "HOST_A=${self.triggers.host_a}",
       "PORT_A=${self.triggers.port_a}",
       "HOST_B=${self.triggers.host_b}",
       "PORT_B=${self.triggers.port_b}",
       "PARAM=${self.triggers.param}",
       "REGION=${data.aws_region.current.name}",
-      "",
       "SELECTED=''",
       "if check_tcp $HOST_A $PORT_A; then",
       "  SELECTED=$HOST_A",
@@ -53,10 +49,8 @@ resource "null_resource" "ssm_pick_backend" {
       "else",
       "  echo 'No backend is responsive' >&2; exit 1",
       "fi",
-      "",
       "aws ssm put-parameter --name $PARAM --value $SELECTED --type String --overwrite --region $REGION",
-      "echo Stored $SELECTED in $PARAM",
-      "\" ]'",
+      "echo Stored $SELECTED in $PARAM\" ]'"
     ])
   }
 }
