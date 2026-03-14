@@ -43,12 +43,11 @@ resource "null_resource" "ssm_pick_backend" {
       "REGION=${data.aws_region.current.name}",
       "SELECTED=''",
       "if check_tcp $HOST_A $PORT_A; then SELECTED=$HOST_A; elif check_tcp $HOST_B $PORT_B; then SELECTED=$HOST_B; else echo 'No backend is responsive' && exit 1; fi",
-      "aws ssm put-parameter --name $PARAM --value $SELECTED --type String --overwrite --region $REGION",
       "echo Stored $SELECTED in $PARAM\" ]'"
     ])
   }
 }
-
+      # "aws ssm put-parameter --name $PARAM --value $SELECTED --type String --overwrite --region $REGION",
 # Wait/poll logic is often added; for brevity we assume script is quick and parameter is available.
 data "aws_ssm_parameter" "selected_backend" {
   depends_on = [null_resource.ssm_pick_backend]
