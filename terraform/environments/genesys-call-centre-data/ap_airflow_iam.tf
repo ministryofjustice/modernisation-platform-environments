@@ -17,6 +17,10 @@ data "aws_iam_policy_document" "genesys_ap_airflow" {
       "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket.arn}/*",
       module.s3_bucket_landing_archive_ingestion_curated["call-centre-archive-"].bucket.arn,
       "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-archive-"].bucket.arn}/*",
+      module.s3_bucket_landing_archive_ingestion_curated["call-centre-landing-"].bucket.arn,
+      "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-landing-"].bucket.arn}/*",
+      module.s3_bucket_landing_archive_ingestion_curated["call-centre-curated-"].bucket.arn,
+      "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-curated-"].bucket.arn}/*",
       module.s3_bucket_staging.bucket.arn,
       "${module.s3_bucket_staging.bucket.arn}/*",
     ]
@@ -34,11 +38,11 @@ module "genesys_ap_airflow" {
   oidc_arn            = aws_iam_openid_connect_provider.analytical_platform_compute.arn
 }
 
-data "aws_iam_policy_document" "p1_export_airflow" {
+data "aws_iam_policy_document" "airflow" {
   #checkov:skip=CKV_AWS_356
   #checkov:skip=CKV_AWS_111
   statement {
-    sid    = "AthenaPermissionsForP1Export"
+    sid    = "AthenaPermissionsForAirflow"
     effect = "Allow"
     actions = [
       "athena:StartQueryExecution",
@@ -52,7 +56,7 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     resources = ["*"]
   }
   statement {
-    sid    = "S3AthenaQueryBucketPermissionsForP1Export"
+    sid    = "S3AthenaQueryBucketPermissionsForExport"
     effect = "Allow"
     actions = [
       "s3:GetObject",
@@ -69,7 +73,7 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     ]
   }
   statement {
-    sid    = "GluePermissionsForP1Export"
+    sid    = "GluePermissionsForExport"
     effect = "Allow"
     actions = [
       "glue:GetDatabase",
@@ -79,7 +83,7 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     resources = ["*"]
   }
   statement {
-    sid    = "S3ExportBucketPermissionsForP1Export"
+    sid    = "S3ExportBucketPermissionsForExport"
     effect = "Allow"
     actions = [
       "s3:PutObject",
@@ -94,19 +98,19 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     ]
   }
   statement {
-    sid       = "GetDataAccessForLakeFormationForP1Export"
+    sid       = "GetDataAccessForLakeFormationForExport"
     effect    = "Allow"
     actions   = ["lakeformation:GetDataAccess"]
     resources = ["*"]
   }
   statement {
-    sid       = "ListAccountAliasForP1Export"
+    sid       = "ListAccountAliasForExport"
     effect    = "Allow"
     actions   = ["iam:ListAccountAliases"]
     resources = ["*"]
   }
   statement {
-    sid    = "ListAllBuckesForP1Export"
+    sid    = "ListAllBuckesForExport"
     effect = "Allow"
     actions = [
       "s3:ListAllMyBuckets",
@@ -117,17 +121,17 @@ data "aws_iam_policy_document" "p1_export_airflow" {
   }
 }
 
-module "load_genesys_laa_database" {
+module "load_genesys_opg_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
   # data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   # de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
 
-  name               = "genesys_laa"
+  name               = "genesys_opg"
   environment        = local.environment
-  database_name      = "genesys-laa"
-  path_to_data       = "/genesys_laa"
+  database_name      = "genesys-opg"
+  path_to_data       = "/genesys_opg"
   source_data_bucket = module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket
   secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn

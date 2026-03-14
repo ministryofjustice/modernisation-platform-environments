@@ -18,9 +18,9 @@ data "aws_iam_policy_document" "logging_bucket_policy" {
   }
 }
 
-# bucket names for landing, archive, ingestion annd curated
+# bucket names for landing, archive, ingestion and curated
 variable "bucket_prefixes" {
-  description = "List of some genesys call centre related bucket prefixes"
+  description = "Bucket prefixes for landing, archive, ingestion and curated buckets"
   type        = list(string)
   default     = ["call-centre-landing-", "call-centre-archive-", "call-centre-ingestion-", "call-centre-curated-"]
 }
