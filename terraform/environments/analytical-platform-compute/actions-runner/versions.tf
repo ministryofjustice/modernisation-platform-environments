@@ -9,7 +9,7 @@ terraform {
       source  = "hashicorp/dns"
     }
     external = {
-      version = "~> 2.0"
+      version = "~> 3.1"
       source  = "hashicorp/external"
     }
     http = {
