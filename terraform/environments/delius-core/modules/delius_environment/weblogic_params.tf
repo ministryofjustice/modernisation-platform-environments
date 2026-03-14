@@ -70,102 +70,42 @@ data "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
 }
 
 locals {
-  weblogic_ssm = {
-    vars = [
-      "API_CLIENT_ID",
-      "AWS_REGION",
+  weblogic_secrets = [
+    "ADMIN_PASSWORD",
+    "ANALYTICS_TAG",
+    "API_CLIENT_SECRET",
+    "APPLICATIONINSIGHTS_CONNECTION_STRING",
+    "AWS_ACCESS_KEY_ID",
+    "AWS_SECRET_ACCESS_KEY",
 
-      "BREACH_NOTICE_API_URL",
-      "BREACH_NOTICE_UI_URL_FORMAT",
+    "JDBC_PASSWORD",
 
-      "COOKIE_SECURE",
+    "LDAP_CREDENTIAL",
 
-      "DELIUS_API_URL",
-      "DMS_HOST",
-      "DMS_OFFICE_URI_HOST",
-      "DMS_OFFICE_URI_PORT",
-      "DMS_PORT",
-      "DMS_PROTOCOL",
+    "MERGE_SECRET",
 
-      "EIS_USER_CONTEXT",
-      "ELASTICSEARCH_URL",
+    "NOTIFICATION_API_KEY",
 
-      "GDPR_URL",
+    "OAUTH_CLIENT_SECRET",
 
-      "JDBC_CONNECTION_POOL_MAX_CAPACITY",
-      "JDBC_CONNECTION_POOL_MIN_CAPACITY",
-      "JDBC_URL",
-      "JDBC_USERNAME",
+    "PDFCREATION_SECRET",
 
-      "LDAP_HOST",
-      "LDAP_PRINCIPAL",
-      "LOG_LEVEL_NDELIUS",
+    "TOPIC_ARN",
 
-      "MERGE_API_URL",
-      "MERGE_OAUTH_URL",
-      "MERGE_URL",
-
-      "NDELIUS_CLIENT_ID",
-
-      "OAUTH_CALLBACK_URL",
-      "OAUTH_CLIENT_ID",
-      "OAUTH_DEFAULT_SCOPE",
-      "OAUTH_LOGIN_ENABLED",
-      "OAUTH_LOGIN_NAME",
-      "OAUTH_TOKEN_VERIFICATION_URL",
-      "OAUTH_URL",
-      "OFFENDER_SEARCH_API_URL",
-
-      "PASSWORD_RESET_URL",
-      "PDFCREATION_TEMPLATES",
-      "PDFCREATION_URL",
-      "PREPARE_CASE_FOR_SENTENCE_URL",
-      "PSR_SERVICE_URL",
-
-      "TRAINING_MODE_APP_NAME",
-      "TZ",
-
-      "USER_CONTEXT",
-      "USER_MEM_ARGS",
-      "USERMANAGEMENT_URL"
-    ]
-    secrets = [
-      "ADMIN_PASSWORD",
-      "ANALYTICS_TAG",
-      "API_CLIENT_SECRET",
-      "APPLICATIONINSIGHTS_CONNECTION_STRING",
-      "AWS_ACCESS_KEY_ID",
-      "AWS_SECRET_ACCESS_KEY",
-
-      "JDBC_PASSWORD",
-
-      "LDAP_CREDENTIAL",
-
-      "MERGE_SECRET",
-
-      "NOTIFICATION_API_KEY",
-
-      "OAUTH_CLIENT_SECRET",
-
-      "PDFCREATION_SECRET",
-
-      "TOPIC_ARN",
-
-      "USERMANAGEMENT_SECRET"
-    ]
-  }
+    "USERMANAGEMENT_SECRET"
+  ]
 }
 
 module "weblogic_ssm" {
   source           = "../helpers/ssm_params"
   application_name = "weblogic"
   environment_name = "${var.account_info.application_name}-${var.env_name}"
-  params_plain     = local.weblogic_ssm.vars
-  params_secure    = local.weblogic_ssm.secrets
+  params_plain     = var.delius_microservice_configs.weblogic_params
+  params_secure    = local.weblogic_secrets
 }
 
 data "aws_ssm_parameter" "weblogic_ssm" {
-  for_each = toset(local.weblogic_ssm.vars)
+  for_each = var.delius_microservice_configs.weblogic_params
   name     = "/${var.account_info.application_name}-${var.env_name}/weblogic/${each.key}"
 
   depends_on = [module.weblogic_ssm] # ensure module runs first before reading params.
