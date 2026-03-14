@@ -45,7 +45,6 @@ resource "aws_iam_policy" "cross_account_assume_role_policy" {
         Effect = "Allow"
         Action = [
           "s3:PutObject",
-          "s3:ListBucket"
         ]
         Resource = [
           module.s3_bucket_staging.bucket.arn,
