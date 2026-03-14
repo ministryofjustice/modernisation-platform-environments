@@ -21,6 +21,7 @@ resource "null_resource" "ssm_pick_backend" {
     port_a = tostring(7001)
     host_b = "${data.aws_instance.ssogen_secondary_details[0].private_ip}"
     port_b = tostring(7001)
+    param  = "/tf/ssogen/selected_backend/ip"
     ts     = timestamp()
   }
 
@@ -28,10 +29,22 @@ resource "null_resource" "ssm_pick_backend" {
     command = join(" ", [
       "aws ssm send-command",
       "--document-name", "AWS-RunShellScript",
-      "--instance-ids", "${triggers.host_a}",
-      "--parameters", "'commands=[\"./select_backend_and_store.sh ${triggers.host_a} ${triggers.port_a} ${triggers.host_b} ${triggers.port_b} SELECTED_BACKEND ${data.aws_region.current.id}\"]'",
+      "--instance-ids", "${data.aws_instance.ssogen_primary_details[0].id}",
       "--region", "${data.aws_region.current.id}",
-      "--comment", "'tf select backend'"
+      "--comment", "tf select backend",
+      "--parameters",
+        "commands=[\"set -euo pipefail\",",
+        "\"check_tcp() { timeout 3 bash -c 'cat < /dev/null > /dev/tcp/$1/$2' 2>/dev/null; }\",",
+        "\"HOST_A=${self.triggers.host_a}\",",
+        "\"PORT_A=${self.triggers.port_a}\",",
+        "\"HOST_B=${self.triggers.host_b}\",",
+        "\"PORT_B=${self.triggers.port_b}\",",
+        "\"PARAM=${self.triggers.param}\",",
+        "\"REGION=${data.aws_region.current.name}\",",
+        "\"SELECTED=''\",",
+        "\"if check_tcp $HOST_A $PORT_A; then SELECTED=$HOST_A; elif check_tcp $HOST_B $PORT_B; then SELECTED=$HOST_B; else echo 'No backend is responsive'; exit 1; fi\",",
+        "\"aws ssm put-parameter --name $PARAM --value $SELECTED --type String --overwrite --region $REGION\"",
+        "]"
     ])
   }
 }
@@ -39,5 +52,5 @@ resource "null_resource" "ssm_pick_backend" {
 # Wait/poll logic is often added; for brevity we assume script is quick and parameter is available.
 data "aws_ssm_parameter" "selected_backend" {
   depends_on = [null_resource.ssm_pick_backend]
-  name       = "SELECTED_BACKEND"
+  name       = "/tf/ssogen/selected_backend/ip"
 }
