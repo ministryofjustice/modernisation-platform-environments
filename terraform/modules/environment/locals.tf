@@ -32,7 +32,8 @@ locals {
   ])
 
   subnets_type_by_vpc = {
-    "hmpps-production" : "with_secondary"
+    # secondary subnets were temporarily added for hmpps to provide additional IPs
+    # "hmpps-production" : "with_secondary"
   }
   subnets_type = lookup(local.subnets_type_by_vpc, local.vpc_name, "default")
   subnet_names_by_type = {
