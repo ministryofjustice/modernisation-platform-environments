@@ -417,10 +417,10 @@ locals {
     route53_zones = {
       "onr.oasys.az.justice.gov.uk" = {
         records = [
-          { name = "", type = "A", ttl = "300", records = ["10.40.6.210"] }
+          # { name = "", type = "A", ttl = "300", records = ["10.40.6.210"] }
         ]
         lb_alias_records = [
-          # { name = "", type = "A", lbs_map_key = "public" },
+          { name = "", type = "A", lbs_map_key = "public" },
         ]
       }
       "reporting.oasys.service.justice.gov.uk" = {
