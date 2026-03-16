@@ -75,6 +75,23 @@ resource "aws_kms_key" "ssogen_kms_key" {
         "Resource" : "*"
       },
       {
+        "Sid" : "Allow ec2 instance role use of the customer managed key",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : [
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.ssogen_ec2[count.index].name}"
+          ]
+        },
+        "Action" : [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ],
+        "Resource" : "*"
+      },
+      {
         "Sid" : "Allow attachment of persistent resources",
         "Effect" : "Allow",
         "Principal" : {
