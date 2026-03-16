@@ -62,7 +62,8 @@ data "aws_iam_policy_document" "airflow_cde_bedrock" {
       "bedrock:InvokeModelWithResponseStream"
     ]
     resources = [
-      "arn:aws:bedrock:*:*:inference-profile/*"
+      "arn:aws:bedrock:*:*:inference-profile/*",
+      "arn:aws:bedrock:*::foundation-model/*"
     ]
   }
 }
