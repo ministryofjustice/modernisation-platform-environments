@@ -365,14 +365,14 @@ resource "aws_instance" "ec2_ssogen" {
   }
 
   # user_data_replace_on_change = true
-  user_data = base64encode(templatefile("./templates/ec2_user_data_ssogen_test.sh", {
-    hostname = "ssogen-${count.index + 1}"
-    efs_id                = aws_efs_file_system.storage[count.index].id
-    mp_fqdn               = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-    deploy_environment    = local.environment
-    DISKSARRAY            = local.disksmount_joined
-    EFS_MOUNT_POINT_ARRAY = local.efs_mount_points_joined
-  }))
+  # user_data = base64encode(templatefile("./templates/ec2_user_data_ssogen_test.sh", {
+  #   hostname = "ssogen-${count.index + 1}"
+  #   efs_id                = aws_efs_file_system.storage[count.index].id
+  #   mp_fqdn               = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  #   deploy_environment    = local.environment
+  #   DISKSARRAY            = local.disksmount_joined
+  #   EFS_MOUNT_POINT_ARRAY = local.efs_mount_points_joined
+  # }))
 
   metadata_options {
     http_endpoint = "enabled"

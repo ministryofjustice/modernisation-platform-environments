@@ -11,10 +11,10 @@ nmcli con up "System eth0"
 # === Base updates and packages ===
 yum update -y
 
-systemctl enable amazon-ssm-agent
-systemctl start amazon-ssm-agent
+# systemctl enable amazon-ssm-agent
+# systemctl start amazon-ssm-agent
 
-/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:cloud-watch-config
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:ssogen-cloud-watch-config
 
 # nvme1n1 = first attached volume goes to root
 # nvme2n1 = second attached volume, etc.
