@@ -113,5 +113,5 @@ done
 
 # Fix /tmp mount uuid in /etc/fstab
 uuid=$(blkid -s UUID -o value /dev/nvme3n1)
-sed -i "s/\/dev\/nvme3n1/UUID=${uuid}/g" /etc/fstab
+sed -i "s/\/dev\/nvme3n1/UUID=$${uuid}/g" /etc/fstab
 echo "SSOGEN instance bootstrap completed" >> /var/log/user-data.log
