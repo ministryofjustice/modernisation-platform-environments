@@ -357,7 +357,7 @@ resource "aws_instance" "ec2_ssogen" {
     encrypted   = true
     tags = merge(
       local.tags,
-      { Name = "ec2-ccms-ebs-development-ssogen-${count.index + 1}" },
+      { Name = "ec2-ccms-ebs-test-ssogen-${count.index + 1}" },
       { "instance-role" = "${aws_iam_role.ssogen_ec2[count.index].name}" },
       { "instance-scheduling" = local.application_data.accounts[local.environment]["instance-scheduling"] }
       # { backup = "true" }
@@ -381,7 +381,7 @@ resource "aws_instance" "ec2_ssogen" {
 
   tags = merge(
     local.tags,
-    { Name = "ec2-ccms-ebs-development-ssogen-${count.index + 1}" },
+    { Name = "ec2-ccms-ebs-test-ssogen-${count.index + 1}" },
     { "instance-role" = local.application_data.accounts[local.environment].instance_role_ssogen },
     { "instance-scheduling" = local.application_data.accounts[local.environment]["instance-scheduling"] },
     { backup = "true" }
