@@ -5,7 +5,7 @@
 #   name     = "ccmsebs-sso-cf"
 #   type     = "CNAME"
 #   ttl      = 300
-#   records  = [aws_cloudfront_distribution.transfer_family[0].domain_name]
+#   records  = [aws_cloudfront_distribution.ssogen_cloudfront[0].domain_name]
 # }
 
 # #--Certs need to be created in us-east-1 as they are associated with Cloudfront
@@ -103,7 +103,7 @@
 #   }
 # }
 
-# resource "aws_cloudfront_distribution" "transfer_family" {
+# resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
 #   count           = (local.is-preproduction || local.is-production) ? 1 : 0
 #   enabled         = true
 #   comment         = "CloudFront Distribution: cashoffice"
