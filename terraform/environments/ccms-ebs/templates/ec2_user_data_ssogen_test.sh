@@ -82,6 +82,16 @@ if [[ "${deploy_environment}" = "production" ]]; then
 fi
 
 #--Configure EFS
+cmake --version
+/root/.cargo/bin/rustc --version
+/root/.cargo/bin/cargo --version
+cd /root
+git clone https://github.com/aws/efs-utils
+cd efs-utils
+sed -i 's/--with system_rust --noclean/--without system_rust --noclean/g' /root/efs-utils/Makefile
+env
+make rpm
+sudo yum -y install build/amazon-efs-utils*rpm
 mkdir -p /mnt/efs
 mount -t efs -o tls ${efs_id}:/ /mnt/efs
 IFS=',' read -r -a EFS_MP_ARRAY <<< "${EFS_MOUNT_POINT_ARRAY}"
