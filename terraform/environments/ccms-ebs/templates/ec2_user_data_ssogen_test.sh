@@ -85,8 +85,8 @@ fi
 mkdir -p /mnt/efs
 mount -t efs -o tls ${efs_id}:/ /mnt/efs
 IFS=',' read -r -a EFS_MP_ARRAY <<< "${EFS_MOUNT_POINT_ARRAY}"
-echo ${EFS_MOUNT_POINT_ARRAY[@]}
-echo ${EFS_MP_ARRAY[@]}
+echo $${EFS_MOUNT_POINT_ARRAY[@]}
+echo $${EFS_MP_ARRAY[@]}
 for var in "$${EFS_MP_ARRAY[@]}"; do
   IFS=":" read -r efsmount localmount <<< "$var"
   mkdir -p /mnt/efs/$efsmount
