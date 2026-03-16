@@ -58,10 +58,35 @@ for entry in "$${DISKS_ARRAY[@]}"; do
   fi
 done
 
+deploy_cortex() {
+  CORTEX_DIR=/tmp/CortexAgent
+  CORTEX_VERSION=linux_8_8_0_133595_rpm
+
+  #--Prep
+  mkdir -p $CORTEX_DIR/linux_8_8_0_133595_rpm
+  mkdir /etc/panw
+  aws s3 sync s3://ccms-shared/CortexAgent/ $CORTEX_DIR #--ccms-shared is in the EBS dev account 767123802783. Bucket is shared at the ORG LEVEL.
+  tar zxf $CORTEX_DIR/$CORTEX_VERSION.tar.gz -C $CORTEX_DIR/$CORTEX_VERSION
+  cp $CORTEX_DIR/$CORTEX_VERSION/cortex.conf /etc/panw/cortex.conf
+  sed -i -e '$a\' /etc/panw/cortex.conf && echo "--endpoint-tags ccms,ssogen" >> /etc/panw/cortex.conf
+
+  #--Installs
+  yum install -y selinux-policy-devel
+  rpm -Uvh $CORTEX_DIR/$CORTEX_VERSION/cortex-*.rpm
+  systemctl status traps_pmd
+  echo "Cortex Install Routine Complete. Installation Is NOT GUARANTEED -- Check Logs For Success"
+}
+
+if [[ "${deploy_environment}" = "production" ]]; then
+  deploy_cortex
+fi
+
+#--Configure EFS
 mkdir -p /mnt/efs
 mount -t efs -o tls ${efs_id}:/ /mnt/efs
 IFS=',' read -r -a EFS_MP_ARRAY <<< "${EFS_MOUNT_POINT_ARRAY}"
-
+echo ${EFS_MOUNT_POINT_ARRAY[@]}
+echo ${EFS_MP_ARRAY[@]}
 for var in "$${EFS_MP_ARRAY[@]}"; do
   IFS=":" read -r efsmount localmount <<< "$var"
   mkdir -p /mnt/efs/$efsmount
