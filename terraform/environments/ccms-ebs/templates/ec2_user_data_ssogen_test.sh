@@ -2,7 +2,7 @@
 set -exuo pipefail
 
 # === Set hostname ===
-hostnamectl set-hostname test-ssogen-manual
+hostnamectl set-hostname "${hostname}"
 
 # === Configure resolv.conf ===
 nmcli con modify "System eth0" ipv4.ignore-auto-dns no
@@ -83,21 +83,10 @@ if [[ "${deploy_environment}" = "production" ]]; then
 fi
 
 #--Configure EFS
-cmake --version
-/root/.cargo/bin/rustc --version
-/root/.cargo/bin/cargo --version
-cd /root
-git clone https://github.com/aws/efs-utils
-cd efs-utils
-sed -i 's/--with system_rust --noclean/--without system_rust --noclean/g' /root/efs-utils/Makefile
-env
-make rpm
-sudo yum -y install build/amazon-efs-utils*rpm
 mkdir -p /mnt/efs
 mount -t efs -o tls ${efs_id}:/ /mnt/efs
 IFS=',' read -r -a EFS_MP_ARRAY <<< "${EFS_MOUNT_POINT_ARRAY}"
-echo $${EFS_MOUNT_POINT_ARRAY[@]}
-echo $${EFS_MP_ARRAY[@]}
+
 for var in "$${EFS_MP_ARRAY[@]}"; do
   IFS=":" read -r efsmount localmount <<< "$var"
   mkdir -p /mnt/efs/$efsmount
@@ -111,6 +100,7 @@ for var in "$${EFS_MP_ARRAY[@]}"; do
   echo "${efs_id}:/$efsmount $localmount efs _netdev,tls,nofail 0 0" >> /etc/fstab
 done
 
+umount /mnt/efs
 # Fix /tmp mount uuid in /etc/fstab
 uuid=$(blkid -s UUID -o value /dev/nvme3n1)
 sed -i "s/\/dev\/nvme3n1/UUID=$${uuid}/g" /etc/fstab
