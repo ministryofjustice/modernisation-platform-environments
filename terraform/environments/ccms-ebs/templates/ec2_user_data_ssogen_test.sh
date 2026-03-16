@@ -26,37 +26,38 @@ systemctl start amazon-ssm-agent
 
 # Wait for disks to appear
 sleep 25
-IFS=',' read -r -a DISKS_ARRAY <<< "${DISKSARRAY}"
 
-for entry in "$${DISKS_ARRAY[@]}"; do
-  IFS=":" read -r disk mount <<< "$entry"
-  echo "Processing $disk -> $mount"
-  # Ensure directory exists
-  mkdir -p "$mount"
+# IFS=',' read -r -a DISKS_ARRAY <<< "${DISKSARRAY}"
 
-  # Check if disk already has a filesystem
-  if ! file -s "$disk" | grep -q "data"; then
-    echo "Filesystem already exists on $disk"
-  else
-    echo "Creating filesystem on $disk"
-    mkfs.xfs "$disk"
-  fi
+# for entry in "$${DISKS_ARRAY[@]}"; do
+#   IFS=":" read -r disk mount <<< "$entry"
+#   echo "Processing $disk -> $mount"
+#   # Ensure directory exists
+#   mkdir -p "$mount"
 
-  # Mount disk
-  echo "Mounting $disk to $mount"
-  mount "$disk" "$mount"
+#   # Check if disk already has a filesystem
+#   if ! file -s "$disk" | grep -q "data"; then
+#     echo "Filesystem already exists on $disk"
+#   else
+#     echo "Creating filesystem on $disk"
+#     mkfs.xfs "$disk"
+#   fi
 
-  # Get UUID for persistent mount
-  uuid=$(blkid -s UUID -o value "$${disk}")
+#   # Mount disk
+#   echo "Mounting $disk to $mount"
+#   mount "$disk" "$mount"
+
+#   # Get UUID for persistent mount
+#   uuid=$(blkid -s UUID -o value "$${disk}")
   
-  # Add to fstab if not already present
-  if ! grep -q "$uuid" /etc/fstab; then
-    echo "Adding to /etc/fstab"
-    echo "UUID=$uuid $mount xfs defaults,nofail 0 2" >> /etc/fstab
-  else
-    echo "Entry already exists in /etc/fstab"
-  fi
-done
+#   # Add to fstab if not already present
+#   if ! grep -q "$uuid" /etc/fstab; then
+#     echo "Adding to /etc/fstab"
+#     echo "UUID=$uuid $mount xfs defaults,nofail 0 2" >> /etc/fstab
+#   else
+#     echo "Entry already exists in /etc/fstab"
+#   fi
+# done
 
 deploy_cortex() {
   CORTEX_DIR=/tmp/CortexAgent
@@ -110,4 +111,7 @@ for var in "$${EFS_MP_ARRAY[@]}"; do
   echo "${efs_id}:/$efsmount $localmount efs _netdev,tls,nofail 0 0" >> /etc/fstab
 done
 
+# Fix /tmp mount uuid in /etc/fstab
+uuid=$(blkid -s UUID -o value /dev/nvme3n1)
+sed -i "s/\/dev\/nvme3n1/UUID=${uuid}/g" /etc/fstab
 echo "SSOGEN instance bootstrap completed" >> /var/log/user-data.log
