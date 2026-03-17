@@ -5,7 +5,7 @@ resource "aws_route53_record" "ssogen_cloudfront" {
   name     = "ccmsebs-sso-cf"
   type     = "CNAME"
   ttl      = 300
-  records  = [aws_cloudfront_distribution.ssogen_cloudfront[0].domain_name]
+  records  = [aws_cloudfront_distribution.ssogen_cloudfront_distribution[count.index].domain_name]
 }
 
 # #--Certs need to be created in us-east-1 as they are associated with Cloudfront
