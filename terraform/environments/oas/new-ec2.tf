@@ -37,6 +37,12 @@ resource "aws_secretsmanager_secret_version" "ec2_ssh_private_key_version" {
   })
 }
 
+
+
+
+
+
+
 ######################################
 ### EC2 INSTANCE Userdata File
 ######################################
@@ -47,6 +53,10 @@ locals {
     data.aws_route53_zone.external.name
   )
 }
+
+
+
+
 
 ######################################
 ### EC2 Network Interface (ENI)
@@ -102,4 +112,5 @@ resource "aws_instance" "oas_app_instance_new" {
     { "snapshot-with-daily-7-day-retention" = "yes" }
   )
 }
+
 

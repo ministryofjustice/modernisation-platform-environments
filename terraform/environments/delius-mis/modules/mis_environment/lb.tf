@@ -172,6 +172,32 @@ resource "aws_vpc_security_group_ingress_rule" "mis_alb_https_infrastructure" {
   tags = local.tags
 }
 
+# HTTP rules for staff access
+resource "aws_vpc_security_group_ingress_rule" "mis_alb_http_additional" {
+  for_each          = var.lb_config != null ? toset(var.environment_config.lb_additional_allowed_public_cidrs) : []
+  security_group_id = aws_security_group.mis_alb_staff[0].id
+  cidr_ipv4         = each.value
+  ip_protocol       = "tcp"
+  from_port         = 80
+  to_port           = 80
+  description       = "Allow HTTP traffic from ${each.value}"
+
+  tags = local.tags
+}
+
+# HTTPS rules for staff access
+resource "aws_vpc_security_group_ingress_rule" "mis_alb_https_additional" {
+  for_each          = var.lb_config != null ? toset(var.environment_config.lb_additional_allowed_public_cidrs) : []
+  security_group_id = aws_security_group.mis_alb_staff[0].id
+  cidr_ipv4         = each.value
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  description       = "Allow HTTPS traffic from ${each.value}"
+
+  tags = local.tags
+}
+
 # Application Load Balancer - shared by DFI and DIS services
 resource "aws_lb" "mis" {
   count              = var.lb_config != null ? 1 : 0

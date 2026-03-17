@@ -781,6 +781,7 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
       "${module.s3-athena-bucket.bucket.arn}/*",
     ]
   }
+
   statement {
     sid    = "S3GetPermissions"
     effect = "Allow"
@@ -792,6 +793,7 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
       "${module.s3-raw-formatted-data-bucket.bucket.arn}/allied/mdss/*"
     ]
   }
+
   statement {
     sid    = "S3ListingPermissions"
     effect = "Allow"
@@ -802,6 +804,7 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
       module.s3-create-a-derived-table-bucket.bucket.arn
     ]
   }
+
   statement {
     sid    = "AthenaPermissionsForLoadData"
     effect = "Allow"
@@ -815,6 +818,7 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
       "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
     ]
   }
+
   statement {
     sid    = "GluePermissionsForLoad"
     effect = "Allow"
@@ -839,6 +843,7 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
       "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
     ]
   }
+
   statement {
     sid    = "GetDataAccessAndTagsForLakeFormation"
     effect = "Allow"
@@ -848,18 +853,21 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
     ]
     resources = ["*"]
   }
+
   statement {
     sid       = "ListAccountAlias"
     effect    = "Allow"
     actions   = ["iam:ListAccountAliases"]
     resources = ["*"]
   }
+
   statement {
     sid       = "ListAllBucket"
     effect    = "Allow"
     actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
     resources = ["*"]
   }
+
   statement {
     sid    = "AllowCleanupQueueAccess"
     effect = "Allow"
@@ -872,6 +880,29 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
     ]
     resources = [aws_sqs_queue.clean_dlt_load_queue.arn]
   }
+
+  statement {
+    sid    = "S3ManifestMarkers"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+    ]
+    resources = [
+      "${module.s3-metadata-bucket.bucket.arn}/mdss-manifest/*",
+    ]
+  }
+  statement {
+    sid    = "AllowUseOfMetadataBucketKmsKey"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt",
+    ]
+    resources = [
+      module.kms_metadata_key.key_arn,
+    ]
+  }  
 }
 
 resource "aws_iam_role" "load_mdss" {
@@ -1329,8 +1360,12 @@ data "aws_iam_policy_document" "data_cutback_iam_role_policy_document" {
     resources = [
       "arn:aws:s3:::emds-preprod-dms-rds-to-parquet-*",
       "arn:aws:s3:::emds-preprod-dms-rds-to-parquet-*/*",
+      "arn:aws:s3:::emds-preprod-data-*",
+      "arn:aws:s3:::emds-preprod-data-*/*",
       "arn:aws:s3:::emds-prod-dms-rds-to-parquet-*",
-      "arn:aws:s3:::emds-prod-dms-rds-to-parquet-*/*"
+      "arn:aws:s3:::emds-prod-dms-rds-to-parquet-*/*",
+      "arn:aws:s3:::emds-prod-data-*",
+      "arn:aws:s3:::emds-prod-data-*/*"
     ]
   }
 }
@@ -1745,6 +1780,7 @@ data "aws_iam_policy_document" "fan_out_tags_policy_document" {
     effect = "Allow"
     actions = [
       "s3:GetObjectTagging",
+       "s3:ListBucket",
     ]
     resources = [
       "${module.s3-raw-formatted-data-bucket.bucket.arn}/*"
@@ -1771,3 +1807,88 @@ resource "aws_iam_role_policy_attachment" "fan_out_tags_attach" {
   policy_arn = aws_iam_policy.fan_out_tags.arn
 }
 
+#-----------------------------------------------------------------------------------
+# MDSS reconciler IAM Role
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "mdss_reconciler" {
+  name               = "mdss_reconciler_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "mdss_reconciler_lambda_role_policy_document" {
+  statement {
+    sid    = "ListRawFormattedBucket"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [
+      module.s3-raw-formatted-data-bucket.bucket.arn,
+    ]
+  }
+
+  statement {
+    sid    = "ListMetadataBucketForManifestMarkers"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [
+      module.s3-metadata-bucket.bucket.arn,
+    ]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+      values = [
+        "mdss-manifest/current/${local.environment_shorthand}/*",
+      ]
+    }
+  }
+
+  statement {
+    sid    = "ReadWriteManifestMarkers"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+    resources = [
+      "${module.s3-metadata-bucket.bucket.arn}/mdss-manifest/*",
+    ]
+  }
+
+  statement {
+    sid    = "SendRedriveMessagesToLoadMdssQueue"
+    effect = "Allow"
+    actions = [
+      "sqs:SendMessage",
+    ]
+    resources = [
+      module.load_mdss_event_queue.sqs_queue.arn,
+    ]
+  }
+
+  statement {
+    sid    = "AllowUseOfMetadataBucketKmsKey"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt",
+    ]
+    resources = [
+      module.kms_metadata_key.key_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "mdss_reconciler_lambda_role_policy" {
+  name   = "mdss_reconciler_lambda_policy"
+  policy = data.aws_iam_policy_document.mdss_reconciler_lambda_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "mdss_reconciler_lambda_policy_attachment" {
+  role       = aws_iam_role.mdss_reconciler.name
+  policy_arn = aws_iam_policy.mdss_reconciler_lambda_role_policy.arn
+}

@@ -1,7 +1,20 @@
 locals {
   camel_case_api_name = join("", [for word in split("_", var.api_name) : title(word)])
-  synced              = var.sync ? "Sync" : ""
-  output              = var.sync ? ".output" : ""
+  # Set some vars based on if sfn is standard or express type
+  sync              = lower(var.sfn_type) == "express" ? "Sync" : ""
+  sfn_arn_type      = lower(var.sfn_type) == "express" ? "express" : "execution"
+  express_response  = <<EOF
+#set ($parsedPayload = $util.parseJson($input.json('$..output')))
+$parsedPayload
+EOF
+  standard_response = <<EOF
+#set($body = $input.path('$'))
+{
+  "id": "$body.executionArn",
+  "status": "ACCEPTED",
+  "message": "Workflow started successfully"
+}
+EOF
 }
 
 # --------------------------------------------------------
@@ -23,6 +36,20 @@ resource "aws_api_gateway_resource" "resource" {
   path_part   = var.api_path
 }
 
+resource "aws_api_gateway_resource" "status" {
+  count       = var.enable_status_check ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+  parent_id   = aws_api_gateway_resource.resource.id
+  path_part   = "status"
+}
+
+resource "aws_api_gateway_resource" "execution_id" {
+  count       = var.enable_status_check ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+  parent_id   = aws_api_gateway_resource.status[0].id
+  path_part   = "{execution_id}"
+}
+
 resource "aws_api_gateway_method" "method" {
   rest_api_id          = aws_api_gateway_rest_api.api_gateway.id
   resource_id          = aws_api_gateway_resource.resource.id
@@ -31,6 +58,18 @@ resource "aws_api_gateway_method" "method" {
   request_validator_id = aws_api_gateway_request_validator.request_validator.id
   request_models = {
     "application/json" = aws_api_gateway_model.model.name
+  }
+}
+
+resource "aws_api_gateway_method" "get_status" {
+  count                = var.enable_status_check ? 1 : 0
+  rest_api_id          = aws_api_gateway_rest_api.api_gateway.id
+  resource_id          = aws_api_gateway_resource.execution_id[0].id
+  http_method          = "GET"
+  authorization        = "AWS_IAM"
+  request_validator_id = aws_api_gateway_request_validator.request_validator.id
+  request_parameters = {
+    "method.request.path.execution_id" = true
   }
 }
 
@@ -79,9 +118,12 @@ resource "aws_iam_role" "api_gateway_role" {
 
 data "aws_iam_policy_document" "trigger_step_function_policy" {
   statement {
-    actions   = ["states:StartExecution", "states:StartSyncExecution"]
-    effect    = "Allow"
-    resources = [var.step_function.arn]
+    actions = ["states:StartExecution", "states:StartSyncExecution", "states:DescribeExecution"]
+    effect  = "Allow"
+    resources = [
+      var.step_function.arn,
+      "${replace(var.step_function.arn, "stateMachine", local.sfn_arn_type)}:*"
+    ]
   }
 }
 
@@ -109,7 +151,7 @@ resource "aws_api_gateway_integration" "step_function_integration" {
   http_method             = aws_api_gateway_method.method.http_method
   integration_http_method = "POST"
   type                    = "AWS"
-  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:states:action/Start${var.api_name}${local.synced}Execution"
+  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:states:action/Start${local.sync}Execution"
 
   credentials = aws_iam_role.api_gateway_role.arn
 
@@ -123,6 +165,26 @@ EOF
   }
 }
 
+resource "aws_api_gateway_integration" "status_integration" {
+  count                   = var.enable_status_check ? 1 : 0
+  rest_api_id             = aws_api_gateway_rest_api.api_gateway.id
+  resource_id             = aws_api_gateway_resource.execution_id[0].id
+  http_method             = aws_api_gateway_method.get_status[0].http_method
+  integration_http_method = "POST"
+  type                    = "AWS"
+  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:states:action/DescribeExecution"
+
+  credentials = aws_iam_role.api_gateway_role.arn
+
+  request_templates = {
+    "application/json" = <<EOF
+{
+  "executionArn": "${replace(var.step_function.arn, "stateMachine", local.sfn_arn_type)}:$input.params('execution_id')"
+}
+EOF
+  }
+}
+
 # -------------------------------------------------------
 # Deployment and stages
 # -------------------------------------------------------
@@ -131,11 +193,15 @@ resource "aws_api_gateway_deployment" "deployment" {
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
 
   triggers = {
-    redeployment = sha1(jsonencode([
+    redeployment = sha1(jsonencode(compact([
       aws_api_gateway_resource.resource.id,
+      var.enable_status_check ? aws_api_gateway_resource.execution_id[0].id : null,
+      var.enable_status_check ? aws_api_gateway_resource.status[0].id : null,
       aws_api_gateway_method.method.id,
+      var.enable_status_check ? aws_api_gateway_method.get_status[0].id : null,
       aws_api_gateway_integration.step_function_integration.id,
-    ]))
+      var.enable_status_check ? aws_api_gateway_integration.status_integration[0].id : null,
+    ])))
   }
 
   lifecycle {
@@ -178,6 +244,22 @@ resource "aws_api_gateway_method_response" "response_200" {
   status_code = "200"
 }
 
+resource "aws_api_gateway_method_response" "status_200" {
+  count       = var.enable_status_check ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+  resource_id = aws_api_gateway_resource.execution_id[0].id
+  http_method = aws_api_gateway_method.get_status[0].http_method
+  status_code = "200"
+}
+
+resource "aws_api_gateway_method_response" "status_404" {
+  count       = var.enable_status_check ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+  resource_id = aws_api_gateway_resource.execution_id[0].id
+  http_method = aws_api_gateway_method.get_status[0].http_method
+  status_code = "404"
+}
+
 resource "aws_api_gateway_integration_response" "integration_response_200" {
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
   resource_id = aws_api_gateway_resource.resource.id
@@ -185,13 +267,48 @@ resource "aws_api_gateway_integration_response" "integration_response_200" {
   status_code = "200"
 
   response_templates = {
-    "application/json" = <<EOF
-#set ($parsedPayload = $util.parseJson($input.json('$.${local.output}')))
-$parsedPayload
-EOF
+    "application/json" = var.sfn_type == "express" ? local.express_response : local.standard_response
   }
   depends_on = [
     aws_api_gateway_integration.step_function_integration
+  ]
+}
+
+resource "aws_api_gateway_integration_response" "status_integration_response" {
+  count       = var.enable_status_check ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+  resource_id = aws_api_gateway_resource.execution_id[0].id
+  http_method = aws_api_gateway_method.get_status[0].http_method
+  status_code = "200"
+
+  response_templates = {
+    "application/json" = <<EOF
+#set($input = $input.path('$'))
+#set($type = $input.get("__type"))
+#if($type && $type.contains("ExecutionDoesNotExist"))
+    #set($context.responseOverride.status = 404)
+    {
+      "error": "NotFound",
+      "cause": "Step Function execution with the provided ID does not exist."
+    }
+#else
+    {
+      "execution_id": "$input.name",
+      "status": "$input.status"
+      #if($input.status == "SUCCEEDED")
+        "output": $input.output
+      #elseif($input.status == "FAILED")
+        "error": "$input.error",
+        "cause": "$input.cause"
+      #else
+        "output": ""
+      #end
+    }
+#end
+EOF
+  }
+  depends_on = [
+    aws_api_gateway_integration.status_integration
   ]
 }
 

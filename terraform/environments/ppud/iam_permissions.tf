@@ -271,7 +271,7 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Resource = ["arn:aws:ses:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
         } : each.value.policy_name == "ssm_patch_notification" ? {
         Effect   = "Allow"
-        Action   = ["ssm:DescribeMaintenanceWindows"]
+        Action   = ["ssm:DescribeMaintenanceWindows", "ssm:DescribeMaintenanceWindowExecutions", "ssm:DescribeMaintenanceWindowExecutionTasks"]
         Resource = ["arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
         } : each.value.policy_name == "publish_to_sns" ? {
         Effect   = "Allow"

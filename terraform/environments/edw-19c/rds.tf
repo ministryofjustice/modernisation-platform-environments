@@ -134,7 +134,7 @@ resource "aws_db_instance" "edw_rds_instance" {
 
   # Instance identification
   identifier     = "${local.application_name}-${local.environment}"
-  db_name        = "edw19c"
+  db_name        = "EDW"
   engine         = local.application_data.accounts[local.environment].engine
   engine_version = local.application_data.accounts[local.environment].engine_version
   instance_class = local.application_data.accounts[local.environment].instance_class
@@ -153,6 +153,9 @@ resource "aws_db_instance" "edw_rds_instance" {
   character_set_name = local.application_data.accounts[local.environment].character_set_name
   username           = local.application_data.accounts[local.environment].username
   password           = random_password.rds_password_new[0].result
+
+  # Restore from snapshot
+  snapshot_identifier = "arn:aws:rds:eu-west-2:758955050340:snapshot:before-db-name-change-06-march-2026"
 
   # Network configuration
   db_subnet_group_name   = aws_db_subnet_group.appdbsubnetgroup_new[0].name
@@ -195,7 +198,7 @@ resource "aws_db_instance" "edw_rds_instance" {
 
   lifecycle {
     ignore_changes = [
-      db_name,
+      snapshot_identifier,
       password,
       final_snapshot_identifier
     ]

@@ -1,8 +1,8 @@
 locals {
 
   lb_maintenance_message_preproduction = {
-    maintenance_title   = "Prison-NOMIS Reporting LSAST and/or Pre-Production Maintenance Window"
-    maintenance_message = "Prison-NOMIS Reporting LSAST and/or Pre-Production is currently unavailable due to planned maintenance or out-of-hours shutdown (7pm-7am). Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpectedly down."
+    maintenance_title   = "Prison-NOMIS Reporting Pre-Production Maintenance Window"
+    maintenance_message = "Prison-NOMIS Reporting Pre-Production is currently unavailable due to planned maintenance or out-of-hours shutdown (7pm-7am). Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpectedly down."
   }
 
   baseline_presets_preproduction = {

@@ -37,6 +37,11 @@ resource "aws_db_parameter_group" "parameter_group_19" {
   }
 
   parameter {
+    name  = "max_string_size"
+    value = "EXTENDED"
+  }
+
+  parameter {
     name  = "db_cache_size"
     value = "2000000000"
   }
@@ -448,4 +453,8 @@ resource "aws_db_instance_role_association" "rds_s3_role_association" {
 
 output "db_instance_id" {
   value = aws_db_instance.appdb1.id
+}
+
+output "db_instance_identifier" {
+  value = aws_db_instance.appdb1.identifier
 }

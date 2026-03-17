@@ -824,8 +824,7 @@ locals {
       }
       "oasys.az.justice.gov.uk" = {
         records = [
-          { name = "_f3741832781b53d3c8d6ebd0c2f785dd.onr", type = "CNAME", ttl = 86400, records = ["_5021c8da699c0e8c8841f906c7ced90e.sdgjtdhdhz.acm-validations.aws"] },
-          { name = "onr", type = "A", ttl = "300", records = ["10.40.6.210"] }
+          { name = "onr", type = "NS", ttl = "86400", records = ["ns-1693.awsdns-19.co.uk", "ns-1432.awsdns-51.org", "ns-951.awsdns-54.net", "ns-373.awsdns-46.com"] },
         ]
         lb_alias_records = [
           { name = "", type = "A", lbs_map_key = "private" },

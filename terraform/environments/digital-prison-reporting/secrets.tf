@@ -232,6 +232,37 @@ resource "aws_secretsmanager_secret_version" "dps" {
   }
 }
 
+# Probation Source Secrets
+resource "aws_secretsmanager_secret" "probation" {
+  #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
+
+  for_each = toset(local.probation_domains_list)
+  name     = "external/${local.project}-${each.value}-source-secrets"
+
+  tags = merge(
+    local.all_tags,
+    {
+      dpr-name          = "external/${local.project}-${each.value}-source-secrets"
+      dpr-resource-type = "Secrets"
+      dpr-source        = "Probation"
+      dpr-domain        = each.value
+      dpr-jira          = "PDHD-1111"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "probation" {
+  for_each = toset(local.probation_domains_list)
+
+  secret_id     = aws_secretsmanager_secret.probation[each.key].id
+  secret_string = jsonencode(local.probation_secrets_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+}
+
 # Redshift Access Secrets
 resource "aws_secretsmanager_secret" "redshift" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"

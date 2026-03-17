@@ -29,7 +29,7 @@ locals {
       to_port         = 443
       protocol        = "tcp"
       cidr_blocks     = local.moj_cidr_blocks
-      security_groups = [aws_security_group.ec2_sg[0].id]
+      security_groups = local.environment == "preproduction" ? [aws_security_group.ec2_sg[0].id] : []
     }
     "lb_ingress_9500" = {
       description     = "Loadbalancer ingress rule for HTTP 9500 (Console/EM)"
@@ -278,7 +278,7 @@ resource "aws_lb" "oas_lb" {
   subnets                    = data.aws_subnets.shared-private.ids
   enable_deletion_protection = false
   idle_timeout               = 60
-  enable_http2               = false
+  enable_http2               = true
   drop_invalid_header_fields = false
   preserve_host_header       = false
 

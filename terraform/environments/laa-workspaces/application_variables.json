@@ -1,16 +1,17 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "ad_directory_name": "laa-workspaces.local",
+      "ad_short_name": "LAAWS",
+      "ad_edition": "Standard",
+      "workspace_bundle_id": "wsb-0q8gwp742",
+      "region": "eu-west-2",
+      "vpc_cidr": "10.200.0.0/16",
+      "private_subnet_a_cidr": "10.200.1.0/24",
+      "private_subnet_b_cidr": "10.200.2.0/24"
     },
-    "test": {
-      "example_var": "test-data"
-    },
-    "preproduction": {
-      "example_var": "preproduction-data"
-    },
-    "production": {
-      "example_var": "production-data"
-    }
+    "test": {},
+    "preproduction": {},
+    "production": {}
   }
 }

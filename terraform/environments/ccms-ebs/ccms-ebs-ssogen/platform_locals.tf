@@ -1,7 +1,7 @@
 locals {
 
-  application_name = "analytical-platform-compute"
-  component_name   = "internal-airflow"
+  application_name = "ccms-ebs"
+  component_name   = "ccms-ebs-ssogen"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
