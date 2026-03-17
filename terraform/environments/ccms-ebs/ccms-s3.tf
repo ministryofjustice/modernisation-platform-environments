@@ -308,6 +308,49 @@ resource "aws_s3_bucket_lifecycle_configuration" "lambda_payment_load_lifecycle"
 }
 
 # ---------------------------------------------
+# S3 Bucket - Object Lock test
+# ---------------------------------------------
+resource "aws_s3_bucket" "object_lock_test" {
+  bucket = "${local.application_name}-${local.environment}-object-lock-test"
+
+  tags = merge(local.tags,
+    { Name = lower(format("s3-%s-%s-object-lock-test", local.application_name, local.environment)) }
+  )
+}
+
+resource "aws_s3_bucket_versioning" "object_lock_test" {
+  bucket = aws_s3_bucket.object_lock_test.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "object_lock_test" {
+  bucket                  = aws_s3_bucket.object_lock_test.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "object_lock_test" {
+  bucket = aws_s3_bucket.object_lock_test.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_logging" "object_lock_test" {
+  bucket        = aws_s3_bucket.object_lock_test.id
+  target_bucket = local.logging_bucket_name
+  target_prefix = "s3access/${aws_s3_bucket.object_lock_test.bucket}"
+}
+
+# ---------------------------------------------
 # MOVED blocks
 # ---------------------------------------------
 
