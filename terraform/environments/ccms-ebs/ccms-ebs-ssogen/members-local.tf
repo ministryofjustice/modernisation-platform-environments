@@ -77,7 +77,7 @@ locals {
   # ]
 
   nonprod_sans = [
-    format("ccmsebs-sso.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
+    # format("ccmsebs-sso.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
     format("ccmsebs-sso-cf.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
     format("ccms-ssogen-as1.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
     format("ccms-ssogen-as2.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
