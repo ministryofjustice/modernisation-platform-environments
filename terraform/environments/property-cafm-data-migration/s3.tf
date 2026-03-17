@@ -230,25 +230,3 @@ resource "aws_s3_bucket_logging" "staging_bucket" {
   target_prefix = "staging/"
 }
 
-# CloudTrail for auditing all S3 data events on the staging bucket
-resource "aws_cloudtrail" "staging-audit" {
-  name                          = "staging-bucket-audit-${local.environment_shorthand}"
-  s3_bucket_name                = module.s3_bucket_logs.bucket.id
-  s3_key_prefix                 = "staging_access"
-  include_global_service_events = false
-  is_multi_region_trail         = false
-  enable_logging                = true
-  kms_key_id                    = aws_kms_key.shared_kms_key.arn
-
-  event_selector {
-    read_write_type           = "All"
-    include_management_events = false
-
-    data_resource {
-      type   = "AWS::S3::Object"
-      values = ["${module.aws_s3_staging.bucket.arn}/"]
-    }
-  }
-
-  tags = local.tags
-}

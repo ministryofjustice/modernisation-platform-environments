@@ -75,9 +75,14 @@ module "endpoints" {
 }
 
 module "server" {
-  source      = "./modules/transfer_family/server"
-  name        = "CAFM SFTP Server"
-  environment = local.environment
+  source = "./modules/transfer_family/server"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "sftp-server-${local.environment_shorthand}"
+    }
+  )
 }
 
 # ------------------------
