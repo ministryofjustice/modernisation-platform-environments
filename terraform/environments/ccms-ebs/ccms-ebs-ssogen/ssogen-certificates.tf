@@ -15,6 +15,9 @@ resource "aws_acm_certificate" "external" {
     export = "ENABLED"
   }
 
+  lifecycle {
+    create_before_destroy = true
+  }
   tags = merge(local.tags,
     { Name = format("%s-%s", local.application_name_ssogen, local.environment), Environment = local.environment }
   )
