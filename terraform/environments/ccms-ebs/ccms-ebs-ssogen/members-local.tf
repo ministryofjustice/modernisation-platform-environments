@@ -78,6 +78,7 @@ locals {
 
   nonprod_sans = [
     format("ccmsebs-sso.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
+    format("ccmsebs-sso-cf.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
     format("ccms-ssogen-as1.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
     format("ccms-ssogen-as2.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
     format("ccms-ssogen-admin.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
@@ -86,6 +87,7 @@ locals {
 
   prod_sans = [
     format("ccmsebs-sso.%s", local.prod_domain),
+    format("ccmsebs-sso-cf.%s", local.prod_domain),
     format("ccmsebs-sso-admin.%s", local.prod_domain),
     format("ccms-ssogen-as1.%s", local.prod_domain),
     format("ccms-ssogen-as2.%s", local.prod_domain),
