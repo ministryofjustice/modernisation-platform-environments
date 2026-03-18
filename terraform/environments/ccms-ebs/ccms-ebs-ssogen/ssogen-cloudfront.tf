@@ -117,7 +117,7 @@ resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
   aliases         = [format("ccmsebs-sso-cf.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)]
   logging_config {
     include_cookies = false
-    bucket          = data.aws_s3_bucket.logs.id
+    bucket          = data.aws_s3_bucket.logs.bucket_domain_name
     prefix          = "ssogen-cloudfront/"
   }
 
