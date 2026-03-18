@@ -166,7 +166,7 @@ resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
 resource "aws_wafv2_web_acl_association" "ssogen_cloudfront_acl_association" {
   count        = (local.is-development || local.is-test) ? 1 : 0
   provider     = aws.us-east-1
-  resource_arn = aws_cloudfront_distribution.ssogen_cloudfront_distribution[0].arn
+  resource_arn = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.ssogen_cloudfront_distribution[0].id}"
   web_acl_arn  = aws_wafv2_web_acl.ssogen_cloudfront_acl[0].arn
 
 }
