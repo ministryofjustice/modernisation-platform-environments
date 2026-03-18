@@ -344,6 +344,17 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "object_lock_test"
   }
 }
 
+resource "aws_s3_bucket_object_lock_configuration" "object_lock_test" {
+  bucket = aws_s3_bucket.object_lock_test.id
+
+  rule {
+    default_retention {
+      mode = "GOVERNANCE"
+      days = 7
+    }
+  }
+}
+
 resource "aws_s3_bucket_logging" "object_lock_test" {
   bucket        = aws_s3_bucket.object_lock_test.id
   target_bucket = local.logging_bucket_name
