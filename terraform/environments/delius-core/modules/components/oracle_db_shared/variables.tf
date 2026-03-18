@@ -17,6 +17,11 @@ variable "account_config" {
   type        = any
 }
 
+variable "db_backup_config" {
+  description = "Database S3 Backup Bucket config including lifecycle rules"
+  type = any
+}
+
 variable "account_info" {
   description = "Account info to pass to the instance"
   type        = any
@@ -103,3 +108,4 @@ variable "create_backup_role" {
   type        = bool
   default     = false
 }
+

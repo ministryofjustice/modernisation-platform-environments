@@ -7,7 +7,7 @@ data "aws_ssoadmin_instances" "main" {
 }
 
 data "aws_identitystore_group" "observability_platform_admins" {
-  for_each = toset(["observability-platform", "operations-engineering"])
+  for_each = toset(["observability-platform", "operations-engineering", "azure-aws-sso-modernisation-platform"])
 
   provider = aws.sso-readonly
 

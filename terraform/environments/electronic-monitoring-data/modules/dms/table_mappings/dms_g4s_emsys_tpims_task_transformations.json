@@ -1,0 +1,30 @@
+{
+  "rules": [
+    {
+      "rule-type": "selection",
+      "rule-id": "10",
+      "rule-name": "SelectCurfewSegment",
+      "object-locator": {
+        "schema-name": "dbo",
+        "table-name": "vw_CurfewSegment"
+      },
+      "rule-action": "include",
+      "filters": [],
+      "parallel-load": null,
+      "isAutoSegmentationChecked": false
+    },
+    {
+      "rule-type": "selection",
+      "rule-id": "20",
+      "rule-name": "SelectGPSPositionLatest",
+      "object-locator": {
+        "schema-name": "dbo",
+        "table-name": "vw_GPSPositionLatest"
+      },
+      "rule-action": "include",
+      "filters": [],
+      "parallel-load": null,
+      "isAutoSegmentationChecked": false
+    }
+  ]
+}

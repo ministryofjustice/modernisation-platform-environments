@@ -20,7 +20,7 @@ module "get_zipped_file_api" {
 # ------------------------------------------
 
 module "dms_validation_step_function" {
-  count = local.is-development || local.is-production ? 1 : 0
+  count = local.is-development || local.is-production || local.is-preproduction ? 1 : 0
 
   source       = "./modules/step_function"
   name         = "dms_validation"

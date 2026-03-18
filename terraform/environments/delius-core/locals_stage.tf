@@ -151,4 +151,10 @@ locals {
     # Auditing from the Stage environment is considered production data
     is-production = true
   }
+
+  db_backup_config_stage = {
+    object_lock_days             = 0
+    expire_current_after_days    = 90
+    expire_noncurrent_after_days = 10
+  }
 }

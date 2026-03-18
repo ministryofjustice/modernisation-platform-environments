@@ -42,6 +42,8 @@ module "environment_stage" {
   dms_config = local.dms_config_stage
 
   env_name_to_dms_config_map = local.env_name_to_dms_config_map
+
+  db_backup_config = local.db_backup_config_stage
 }
 
 module "environment_preprod" {
@@ -83,4 +85,6 @@ module "environment_preprod" {
   dms_config = local.dms_config_preprod
 
   env_name_to_dms_config_map = local.env_name_to_dms_config_map
+
+  db_backup_config = local.db_backup_config_preprod
 }
