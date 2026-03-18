@@ -116,7 +116,7 @@ resource "aws_acm_certificate_validation" "external_nonprod_cf" {
     aws_route53_record.external_validation_nonprod_cf
   ]
 
-  certificate_arn         = aws_acm_certificate.external.arn
+  certificate_arn         = aws_acm_certificate.external_cf.arn
   validation_record_fqdns = [for record in aws_route53_record.external_validation_nonprod_cf : record.fqdn]
 
   timeouts {
