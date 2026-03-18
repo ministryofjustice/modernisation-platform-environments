@@ -124,7 +124,6 @@ resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
     cloudfront_default_certificate = false
     acm_certificate_arn            = aws_acm_certificate_validation.external_nonprod_cf[0].certificate_arn
     ssl_support_method             = "sni-only"
-    minimum_protocol_version       = "TLSv1.2_2021"
   }
   web_acl_id = aws_wafv2_web_acl.ssogen_cloudfront_acl[0].arn
   tags = merge(local.tags,
