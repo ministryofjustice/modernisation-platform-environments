@@ -110,7 +110,7 @@ data "aws_s3_bucket" "logs" {
 
 resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
   count           = (local.is-development || local.is-test) ? 1 : 0
-  provider        = aws.us-east-1
+  # provider        = aws.us-east-1
   enabled         = true
   comment         = "CloudFront Distribution: ssogen-cloudfront-${local.environment}"
   is_ipv6_enabled = false
