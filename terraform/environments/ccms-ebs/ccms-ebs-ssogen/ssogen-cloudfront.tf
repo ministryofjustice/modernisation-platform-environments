@@ -41,7 +41,7 @@
 
 # #--WAF and ACL resources need to be in us-east-1 as they are associated with Cloudfront
 resource "aws_wafv2_ip_set" "ssogen_cloudfront_ips" {
-  count       = (local.is-development || local.is-test) ? 1 : 0
+  count              = (local.is-development || local.is-test) ? 1 : 0
   provider           = aws.us-east-1
   name               = "laa-ssogen-allow-list"
   description        = "Allowed Internal Ranges for LAA"
@@ -110,6 +110,7 @@ data "aws_s3_bucket" "logs" {
 
 resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
   count           = (local.is-development || local.is-test) ? 1 : 0
+  provider        = aws.us-east-1
   enabled         = true
   comment         = "CloudFront Distribution: ssogen-cloudfront-${local.environment}"
   is_ipv6_enabled = false
@@ -126,10 +127,10 @@ resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
     origin_id   = "ssogen-load-balancer-internal"
 
     custom_origin_config {
-        http_port              = 80
-        https_port             = 443
-        origin_protocol_policy = "https-only"
-        origin_ssl_protocols   = ["TLSv1.2"]
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
     }
 
   }
@@ -146,7 +147,7 @@ resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
     origin_request_policy_id = "b689b0a8-53d0-40ab-baf2-68738e2966ac" # AllViewerExceptHostHeader
     target_origin_id         = "ssogen-load-balancer-internal"
     viewer_protocol_policy   = "redirect-to-https"
-    allowed_methods          = ["GET", "HEAD","POST", "OPTIONS", "PUT","PATCH", "DELETE"]
+    allowed_methods          = ["GET", "HEAD", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"]
     cached_methods           = ["GET", "HEAD"]
     compress                 = true
   }
@@ -157,14 +158,14 @@ resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
     minimum_protocol_version       = "TLSv1.2_2021"
   }
   web_acl_id = aws_wafv2_web_acl.ssogen_cloudfront_acl[0].arn
-  tags       = merge(local.tags,
+  tags = merge(local.tags,
     { Name = format("%s-%s", local.application_name_ssogen, local.environment) }
   )
 }
 
 resource "aws_wafv2_web_acl_association" "ssogen_cloudfront_acl_association" {
-  count      = (local.is-development || local.is-test) ? 1 : 0
-  provider   = aws.us-east-1
+  count        = (local.is-development || local.is-test) ? 1 : 0
+  provider     = aws.us-east-1
   resource_arn = aws_cloudfront_distribution.ssogen_cloudfront_distribution[0].arn
   web_acl_arn  = aws_wafv2_web_acl.ssogen_cloudfront_acl[0].arn
 

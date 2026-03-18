@@ -24,7 +24,7 @@ resource "aws_acm_certificate" "external" {
 }
 
 resource "aws_acm_certificate" "external_cf" {
-  provider = aws.us-east-1
+  provider                  = aws.us-east-1
   validation_method         = "DNS"
   domain_name               = local.primary_domain
   subject_alternative_names = local.subject_alternative_names_cf
@@ -110,8 +110,8 @@ resource "aws_acm_certificate_validation" "external_nonprod" {
 }
 
 resource "aws_acm_certificate_validation" "external_nonprod_cf" {
-  count = local.is-production ? 0 : 1
-
+  count    = local.is-production ? 0 : 1
+  provider = aws.us-east-1
   depends_on = [
     aws_route53_record.external_validation_nonprod_cf
   ]
@@ -140,8 +140,8 @@ resource "aws_acm_certificate_validation" "external_prod" {
 }
 
 resource "aws_acm_certificate_validation" "external_prod_cf" {
-  count = local.is-production ? 1 : 0
-
+  count    = local.is-production ? 1 : 0
+  provider = aws.us-east-1
   depends_on = [
     aws_route53_record.external_validation_prod_cf
   ]
