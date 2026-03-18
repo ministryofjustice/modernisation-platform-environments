@@ -46,7 +46,7 @@ resource "aws_acm_certificate" "external" {
 }
 
 resource "aws_acm_certificate" "external_preprod" {
-  count             = local.is-preproduction ? 1 : 0
+  count = local.is-preproduction ? 1 : 0
   #domain_name       = "hmpps-performance-hub.service.justice.gov.uk"
   domain_name       = "staging.hmpps-performance-hub.service.justice.gov.uk"
   validation_method = "DNS"

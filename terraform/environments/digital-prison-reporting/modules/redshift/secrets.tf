@@ -21,6 +21,16 @@ resource "aws_secretsmanager_secret" "redshift_connection" {
 
   description = "Redshift connect details"
   name        = "${var.project_id}-redshift-secret-${var.env}"
+  tags = merge(
+    var.tags,
+    {
+      dpr-name          = "dpr-redshift-secret-${var.env}"
+      dpr-resource-type = "Secrets"
+      dpr-jira          = "DPR-2667"
+      dpr-service       = "redshift"
+      Redshift          = "True" # Required for Redshift Query Editor
+    }
+  )
 }
 
 resource "aws_secretsmanager_secret_version" "redshift_connection" {

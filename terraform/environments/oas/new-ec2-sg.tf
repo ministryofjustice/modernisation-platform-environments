@@ -70,13 +70,25 @@ resource "aws_security_group_rule" "ingress_from_lb_9502" {
 resource "aws_security_group_rule" "ingress_rds_from_mp_vpc_for_edw" {
   count = local.environment == "preproduction" ? 1 : 0
 
-  type                     = "ingress"
-  security_group_id        = aws_security_group.ec2_sg[0].id
-  description              = "allow EDW RDS to connect to OAS"
-  from_port                = 1521
-  to_port                  = 1521
-  protocol                 = "tcp"
-  cidr_blocks              = [data.aws_vpc.shared.cidr_block]
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "allow EDW RDS to connect to OAS"
+  from_port         = 1521
+  to_port           = 1521
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "ingress_managed_9514_workspace" {
+  count = local.environment == "preproduction" ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the managed server from workspace"
+  from_port         = 9514
+  to_port           = 9514
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
 }
 
 ######################################
@@ -97,47 +109,59 @@ resource "aws_security_group_rule" "egress_oas_db_1521" {
 resource "aws_security_group_rule" "egress_https_s3" {
   count = local.environment == "preproduction" ? 1 : 0
 
-  type                     = "egress"
-  security_group_id        = aws_security_group.ec2_sg[0].id
-  description              = "Outbound 443 to LAA VPC Endpoint SG"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  prefix_list_ids          = [local.application_data.accounts[local.environment].s3_vpc_endpoint_prefix]
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Outbound 443 to LAA VPC Endpoint SG"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  prefix_list_ids   = [local.application_data.accounts[local.environment].s3_vpc_endpoint_prefix]
 }
 
 resource "aws_security_group_rule" "egress_http_internet" {
   count = local.environment == "preproduction" ? 1 : 0
 
-  type                     = "egress"
-  security_group_id        = aws_security_group.ec2_sg[0].id
-  description              = "Outbound HTTP for yum repositories"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
-  cidr_blocks              = ["0.0.0.0/0"]
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Outbound HTTP for yum repositories"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 resource "aws_security_group_rule" "egress_https_internet" {
   count = local.environment == "preproduction" ? 1 : 0
 
-  type                     = "egress"
-  security_group_id        = aws_security_group.ec2_sg[0].id
-  description              = "Outbound HTTPS for yum repositories and SSM"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  cidr_blocks              = ["0.0.0.0/0"]
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Outbound HTTPS for yum repositories and SSM"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 resource "aws_security_group_rule" "egress_rds_to_mp_vpc_for_edw" {
   count = local.environment == "preproduction" ? 1 : 0
 
-  type                     = "egress"
-  security_group_id        = aws_security_group.ec2_sg[0].id
-  description              = "allow OAS to connect to RDS of EDW"
-  from_port                = 1521
-  to_port                  = 1521
-  protocol                 = "tcp"
-  cidr_blocks              = [data.aws_vpc.shared.cidr_block]
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "allow OAS to connect to RDS of EDW"
+  from_port         = 1521
+  to_port           = 1521
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "egress_managed_9514_workspace" {
+  count = local.environment == "preproduction" ? 1 : 0
+
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Access to the managed server from workspace"
+  from_port         = 9514
+  to_port           = 9514
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
 }

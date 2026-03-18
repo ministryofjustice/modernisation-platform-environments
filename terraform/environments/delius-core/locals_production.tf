@@ -151,4 +151,19 @@ locals {
     # Auditing from the Pre-Prod environment is considered production data
     is-production = true
   }
+
+  db_backup_config_prod = {
+    object_lock_days             = 54
+    expire_current_after_days    = 800
+    expire_noncurrent_after_days = 10
+    transition = [
+        {
+          days          = 30
+          storage_class = "STANDARD_IA"
+        },{
+          days          = 90
+          storage_class = "GLACIER"
+        }
+      ]
+  }
 }

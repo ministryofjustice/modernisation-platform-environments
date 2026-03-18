@@ -62,6 +62,10 @@ variable "dms_config" {
   type = any
 }
 
+variable "db_backup_config" {
+  type = any
+}
+
 variable "tags" {
   type = any
 }

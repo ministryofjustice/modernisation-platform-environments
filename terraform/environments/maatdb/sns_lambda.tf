@@ -65,7 +65,7 @@ data "archive_file" "lambda_zip" {
 }
 
 resource "aws_lambda_function" "dbmaintenance_sns_to_slack" {
-  filename = data.archive_file.lambda_zip.output_path
+  filename         = data.archive_file.lambda_zip.output_path
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
   function_name    = "${local.application_name}-${local.environment}-rds_maintenance_notify"
   role             = aws_iam_role.lambda_dbmaintenance_sns_role.arn

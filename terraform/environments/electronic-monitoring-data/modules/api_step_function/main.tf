@@ -1,5 +1,5 @@
 locals {
-  camel_case_api_name  = join("", [for word in split("_", var.api_name) : title(word)])
+  camel_case_api_name = join("", [for word in split("_", var.api_name) : title(word)])
   # Set some vars based on if sfn is standard or express type
   sync              = lower(var.sfn_type) == "express" ? "Sync" : ""
   sfn_arn_type      = lower(var.sfn_type) == "express" ? "express" : "execution"
@@ -62,11 +62,11 @@ resource "aws_api_gateway_method" "method" {
 }
 
 resource "aws_api_gateway_method" "get_status" {
-  count       = var.enable_status_check ? 1 : 0
-  rest_api_id   = aws_api_gateway_rest_api.api_gateway.id
-  resource_id   = aws_api_gateway_resource.execution_id[0].id
-  http_method   = "GET"
-  authorization = "AWS_IAM"
+  count                = var.enable_status_check ? 1 : 0
+  rest_api_id          = aws_api_gateway_rest_api.api_gateway.id
+  resource_id          = aws_api_gateway_resource.execution_id[0].id
+  http_method          = "GET"
+  authorization        = "AWS_IAM"
   request_validator_id = aws_api_gateway_request_validator.request_validator.id
   request_parameters = {
     "method.request.path.execution_id" = true
@@ -118,8 +118,8 @@ resource "aws_iam_role" "api_gateway_role" {
 
 data "aws_iam_policy_document" "trigger_step_function_policy" {
   statement {
-    actions   = ["states:StartExecution", "states:StartSyncExecution", "states:DescribeExecution"]
-    effect    = "Allow"
+    actions = ["states:StartExecution", "states:StartSyncExecution", "states:DescribeExecution"]
+    effect  = "Allow"
     resources = [
       var.step_function.arn,
       "${replace(var.step_function.arn, "stateMachine", local.sfn_arn_type)}:*"
@@ -173,7 +173,7 @@ resource "aws_api_gateway_integration" "status_integration" {
   integration_http_method = "POST"
   type                    = "AWS"
   uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:states:action/DescribeExecution"
-  
+
   credentials = aws_iam_role.api_gateway_role.arn
 
   request_templates = {

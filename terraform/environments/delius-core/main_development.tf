@@ -41,6 +41,8 @@ module "environment_dev" {
   dms_config = local.dms_config_dev
 
   env_name_to_dms_config_map = local.env_name_to_dms_config_map
+
+  db_backup_config = local.db_backup_config_dev
 }
 
 module "environment_poc" {
@@ -82,4 +84,6 @@ module "environment_poc" {
   dms_config = local.dms_config_poc
 
   env_name_to_dms_config_map = local.env_name_to_dms_config_map
+
+  db_backup_config = local.db_backup_config_poc
 }
