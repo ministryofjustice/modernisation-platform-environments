@@ -74,7 +74,7 @@ resource "aws_wafv2_ip_set" "ssogen_cloudfront_ips" {
 resource "aws_wafv2_web_acl" "ssogen_cloudfront_acl" {
   count       = (local.is-development || local.is-test) ? 1 : 0
   provider    = aws.us-east-1
-  name        = "cf-ssogen-ip-restriction-acl"
+  name        = "cf-ssogen-acl"
   description = "LAA Case Worker SSOGen CloudFront ACL - allows traffic only from specific IP ranges"
   scope       = "CLOUDFRONT"
   default_action {
