@@ -99,7 +99,7 @@ resource "aws_wafv2_web_acl" "ssogen_cloudfront_acl" {
   }
   visibility_config {
     cloudwatch_metrics_enabled = true
-    metric_name                = "CloudFrontIPACL"
+    metric_name                = "CloudFrontSSOGENIPACL"
     sampled_requests_enabled   = true
   }
 }
