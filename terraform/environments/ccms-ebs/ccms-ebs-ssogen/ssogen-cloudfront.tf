@@ -1,12 +1,12 @@
-resource "aws_route53_record" "ssogen_cloudfront" {
-  count    = (local.is-development || local.is-test) ? 1 : 0
-  provider = aws.core-vpc
-  zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "ccmsebs-sso-cf"
-  type     = "CNAME"
-  ttl      = 300
-  records  = [aws_cloudfront_distribution.ssogen_cloudfront_distribution[count.index].domain_name]
-}
+# resource "aws_route53_record" "ssogen_cloudfront" {
+#   count    = (local.is-development || local.is-test) ? 1 : 0
+#   provider = aws.core-vpc
+#   zone_id  = data.aws_route53_zone.external.zone_id
+#   name     = "ccmsebs-sso-cf"
+#   type     = "CNAME"
+#   ttl      = 300
+#   records  = [aws_cloudfront_distribution.ssogen_cloudfront_distribution[count.index].domain_name]
+# }
 
 # #--Certs need to be created in us-east-1 as they are associated with Cloudfront
 # resource "aws_acm_certificate" "ssogen_cloudfront_cert" {
@@ -152,7 +152,7 @@ resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
   }
   viewer_certificate {
     cloudfront_default_certificate = false
-    acm_certificate_arn            = aws_acm_certificate_validation.external_nonprod[0].certificate_arn
+    acm_certificate_arn            = aws_acm_certificate_validation.external_nonprod_cf[0].certificate_arn
     ssl_support_method             = "sni-only"
     minimum_protocol_version       = "TLSv1.2_2021"
   }
