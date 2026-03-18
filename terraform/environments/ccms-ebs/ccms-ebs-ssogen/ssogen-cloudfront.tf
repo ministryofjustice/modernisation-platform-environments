@@ -8,37 +8,6 @@ resource "aws_route53_record" "ssogen_cloudfront" {
   records  = [aws_cloudfront_distribution.ssogen_cloudfront_distribution[count.index].domain_name]
 }
 
-# #--Certs need to be created in us-east-1 as they are associated with Cloudfront
-# resource "aws_acm_certificate" "ssogen_cloudfront_cert" {
-#   count    = (local.is-development || local.is-test) ? 1 : 0
-#   provider                  = aws.us-east-1
-#   domain_name               = trim(data.aws_route53_zone.external.name, ".") #--Remove the trailing dot from the zone name
-#   subject_alternative_names = ["${local.application_data.accounts[local.environment].cash_office_upload_hostname}.${trim(data.aws_route53_zone.external.name, ".")}"]
-#   validation_method         = "DNS"
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-# }
-
-# resource "aws_acm_certificate_validation" "ssogen_cloudfront_cert_validation" {
-#   count    = (local.is-development || local.is-test) ? 1 : 0
-#   provider                = aws.us-east-1
-#   certificate_arn         = aws_acm_certificate.ssogen_cloudfront_cert[count.index].arn
-#   validation_record_fqdns = [for record in aws_route53_record.validation : record.fqdn]
-# }
-
-# #--See member_locals.tf for the validation logic underpinning this resource
-# resource "aws_route53_record" "validation" {
-#   provider        = aws.core-vpc
-#   for_each        = local.transfer_family_dvo_map
-#   allow_overwrite = true
-#   name            = each.value.name
-#   records         = [each.value.record]
-#   ttl             = 60
-#   type            = each.value.type
-#   zone_id         = data.aws_route53_zone.external.zone_id
-# }
-
 # #--WAF and ACL resources need to be in us-east-1 as they are associated with Cloudfront
 resource "aws_wafv2_ip_set" "ssogen_cloudfront_ips" {
   count              = (local.is-development || local.is-test) ? 1 : 0
@@ -161,12 +130,4 @@ resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
   tags = merge(local.tags,
     { Name = format("%s-%s", local.application_name_ssogen, local.environment) }
   )
-}
-
-resource "aws_wafv2_web_acl_association" "ssogen_cloudfront_acl_association" {
-  count        = (local.is-development || local.is-test) ? 1 : 0
-  provider     = aws.us-east-1
-  resource_arn = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.ssogen_cloudfront_distribution[0].id}"
-  web_acl_arn  = aws_wafv2_web_acl.ssogen_cloudfront_acl[0].arn
-
 }
