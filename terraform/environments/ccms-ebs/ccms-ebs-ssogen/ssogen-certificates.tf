@@ -26,7 +26,7 @@ resource "aws_acm_certificate" "external" {
 resource "aws_acm_certificate" "external_cf" {
   provider                  = aws.us-east-1
   validation_method         = "DNS"
-  domain_name               = local.primary_domain
+  domain_name               = trim(data.aws_route53_zone.external.name, ".") 
   subject_alternative_names = local.subject_alternative_names_cf
 
   options {
@@ -37,7 +37,7 @@ resource "aws_acm_certificate" "external_cf" {
     create_before_destroy = true
   }
   tags = merge(local.tags,
-    { Name = format("%s-%s", local.application_name_ssogen, local.environment), Environment = local.environment }
+    { Name = format("%s-%s", local.application_name_ssogen, local.environment) }
   )
 }
 
