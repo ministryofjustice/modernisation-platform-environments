@@ -141,7 +141,7 @@ locals {
       container_port           = 8080
       container_memory         = 4096
       container_cpu            = 2048
-      task_definition_revision = 14
+      task_definition_revision = 15
     }
 
     pwm = {
