@@ -137,7 +137,7 @@ resource "aws_cloudfront_vpc_origin" "ssogen_cloudfront_vpc_origin" {
   provider        = aws.us-east-1
   vpc_origin_endpoint_config {
     name = format("%s-cf-internal-lb", local.application_name_ssogen)
-    arn  = data.aws_lb.ssogen_load_balancer.name
+    arn  = data.aws_lb.ssogen_load_balancer.arn
     http_port             = 80
     https_port = 443
     origin_protocol_policy = "https-only"
