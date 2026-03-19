@@ -92,14 +92,12 @@ resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
   }
 
   origin {
-    domain_name = format("ccmsebs-sso.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
-    origin_id   = "ssogen-load-balancer-internal"
+    domain_name = aws_lb.ssogen_alb[0].dns_name
+    origin_id   = format("%s-load-balancer-internal", local.application_name_ssogen)
 
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "https-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
+
+    vpc_origin_config {
+      vpc_origin_id = aws_cloudfront_vpc_origin.ssogen_cloudfront_vpc_origin[count.index].origin_id
     }
 
   }
@@ -112,9 +110,9 @@ resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
 
   price_class = "PriceClass_100"
   default_cache_behavior {
+    target_origin_id         = aws.cloudfront_vpc_origin.ssogen_cloudfront_vpc_origin[count.index].origin_id
     cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # Caching Disabled
     origin_request_policy_id = "b689b0a8-53d0-40ab-baf2-68738e2966ac" # AllViewerExceptHostHeader
-    target_origin_id         = "ssogen-load-balancer-internal"
     viewer_protocol_policy   = "redirect-to-https"
     allowed_methods          = ["GET", "HEAD", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"]
     cached_methods           = ["GET", "HEAD"]
@@ -129,4 +127,23 @@ resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
   tags = merge(local.tags,
     { Name = format("%s-%s", local.application_name_ssogen, local.environment) }
   )
+}
+
+data aws_lb "ssogen_load_balancer" {
+  name     = lower(format("lb-%s-internal", local.application_name_ssogen))
+}
+resource "aws_cloudfront_vpc_origin" "ssogen_cloudfront_vpc_origin" {
+  count           = (local.is-development || local.is-test) ? 1 : 0
+  provider        = aws.us-east-1
+  vpc_origin_endpoint_config {
+    name = format("%s-cf-internal-lb", local.application_name_ssogen)
+    arn  = data.aws_lb.ssogen_load_balancer.name
+    http_port             = 80
+    https_port = 443
+    origin_protocol_policy = "https-only"
+    origin_ssl_protocols  {
+      items = ["TLSv1.2"]  
+      quantity = 1
+    }
+  }
 }
