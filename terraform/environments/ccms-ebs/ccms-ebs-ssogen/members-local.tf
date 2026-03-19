@@ -75,12 +75,12 @@ locals {
   #   format("ccmsebs-sso.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
   #   format("ccms-ebs-db-nlb.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
   # ]
-  nonprod_sans_cf = [
-    format("ccmsebs-sso-cf.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
-  ]
-  prod_sans_cf = [
-    format("ccmsebs-sso-cf.%s", local.prod_domain)
-  ]
+  # nonprod_sans_cf = [
+  #   format("ccmsebs-sso-cf.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
+  # ]
+  # prod_sans_cf = [
+  #   format("ccmsebs-sso-cf.%s", local.prod_domain)
+  # ]
 
   nonprod_sans = [
     format("ccmsebs-sso.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
@@ -103,7 +103,7 @@ locals {
   ]
 
   subject_alternative_names    = local.is-production ? local.prod_sans : local.nonprod_sans
-  subject_alternative_names_cf = local.is-production ? local.prod_sans_cf : local.nonprod_sans_cf
+  # subject_alternative_names_cf = local.is-production ? local.prod_sans_cf : local.nonprod_sans_cf
   # Domain validation options mapping (following the example pattern)
   domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
     name   = dvo.resource_record_name
@@ -113,17 +113,17 @@ locals {
   }
 
   # Domain validation options mapping for cloudfront(following the example pattern)
-  domain_types_cf = { for dvo in aws_acm_certificate.external_cf.domain_validation_options : dvo.domain_name => {
-    name   = dvo.resource_record_name
-    record = dvo.resource_record_value
-    type   = dvo.resource_record_type
-    }
-  }
+  # domain_types_cf = { for dvo in aws_acm_certificate.external_cf.domain_validation_options : dvo.domain_name => {
+  #   name   = dvo.resource_record_name
+  #   record = dvo.resource_record_value
+  #   type   = dvo.resource_record_type
+  #   }
+  # }
   # Split domain validation by domain type
   modernisation_platform_validations    = [for k, v in local.domain_types : v if strcontains(k, "modernisation-platform.service.justice.gov.uk")]
   laa_validations                       = [for k, v in local.domain_types : v if strcontains(k, "laa.service.justice.gov.uk")]
-  modernisation_platform_validations_cf = [for k, v in local.domain_types_cf : v if strcontains(k, "modernisation-platform.service.justice.gov.uk")]
-  laa_validations_cf                    = [for k, v in local.domain_types_cf : v if strcontains(k, "laa.service.justice.gov.uk")]
+  # modernisation_platform_validations_cf = [for k, v in local.domain_types_cf : v if strcontains(k, "modernisation-platform.service.justice.gov.uk")]
+  # laa_validations_cf                    = [for k, v in local.domain_types_cf : v if strcontains(k, "laa.service.justice.gov.uk")]
   #  cert_opts    = local.environment == "production" ? aws_acm_certificate.external-service[0].domain_validation_options : aws_acm_certificate.external[0].domain_validation_options
   # cert_arn     = aws_acm_certificate.external.arn
   # cert_zone_id = local.environment == "production" ? data.aws_route53_zone.application-zone.zone_id : data.aws_route53_zone.network-services.zone_id
