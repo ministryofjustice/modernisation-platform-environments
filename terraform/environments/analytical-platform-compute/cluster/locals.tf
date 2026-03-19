@@ -1,5 +1,8 @@
 locals {
 
+  /* Chainguard */
+  chainguard_credentials = jsondecode(data.aws_secretsmanager_secret_version.chainguard_pull_credentials.secret_string)
+
   /* AMP */
   amp_workspace_alias                        = "${local.application_name}-${local.environment}"
   amp_cloudwatch_log_group_name              = "/aws/amp/${local.amp_workspace_alias}"

@@ -15,12 +15,6 @@ module "route53_records" {
       records = [data.aws_lb.mwaa_alb.dns_name]
     },
     {
-      name    = "internal-airflow"
-      type    = "CNAME"
-      ttl     = 300
-      records = [data.aws_lb.mwaa_alb.dns_name]
-    },
-    {
       name    = "_amazonses"
       type    = "TXT"
       ttl     = 600

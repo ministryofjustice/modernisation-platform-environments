@@ -67,3 +67,23 @@ module "vpc_vpc-endpoints" {
     }
   }
 }
+
+module "vpc-gateway-endpoints" {
+  source   = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+  version  = "6.5.1"
+  for_each = toset(local.vpc_gateway_endpoint_service_names)
+
+  vpc_id = module.vpc.vpc_id
+
+  endpoints = {
+    (each.value) = {
+      service         = each.value
+      service_type    = "Gateway"
+      route_table_ids = module.vpc.private_route_table_ids
+      tags = merge(
+        local.tags,
+        { Name = "${module.vpc.name}-${each.value}" }
+      )
+    }
+  }
+}

@@ -21,7 +21,7 @@ locals {
       to_port         = 80
       protocol        = "tcp"
       cidr_blocks     = local.moj_cidr_blocks
-      security_groups = []
+      security_groups = local.environment == "preproduction" ? [aws_security_group.kali_sg[0].id] : []
     }
     "lb_ingress_443" = {
       description     = "Loadbalancer ingress rule for HTTPS from MOJO devices, LZ Shared-Service Workspaces and OAS EC2 Instance"
@@ -29,7 +29,7 @@ locals {
       to_port         = 443
       protocol        = "tcp"
       cidr_blocks     = local.moj_cidr_blocks
-      security_groups = [aws_security_group.ec2_sg[0].id]
+      security_groups = local.environment == "preproduction" ? [aws_security_group.ec2_sg[0].id, aws_security_group.kali_sg[0].id] : []
     }
     "lb_ingress_9500" = {
       description     = "Loadbalancer ingress rule for HTTP 9500 (Console/EM)"
@@ -37,7 +37,7 @@ locals {
       to_port         = 9500
       protocol        = "tcp"
       cidr_blocks     = local.moj_cidr_blocks
-      security_groups = []
+      security_groups = local.environment == "preproduction" ? [aws_security_group.kali_sg[0].id] : []
     }
     "lb_ingress_9502" = {
       description     = "Loadbalancer ingress rule for HTTP 9502 (Analytics/DV)"
@@ -45,7 +45,7 @@ locals {
       to_port         = 9502
       protocol        = "tcp"
       cidr_blocks     = local.moj_cidr_blocks
-      security_groups = []
+      security_groups = local.environment == "preproduction" ? [aws_security_group.kali_sg[0].id] : []
     }
   }
 
@@ -91,7 +91,17 @@ resource "aws_security_group_rule" "lb_ingress_rules" {
 
 # Additional ingress rules for when a source security group is specified in the local
 resource "aws_security_group_rule" "lb_ingress_sg_rules" {
-  for_each = local.environment == "preproduction" ? { for k, v in local.loadbalancer_ingress_rules : k => v if length(v.security_groups) > 0 } : {}
+  for_each = local.environment == "preproduction" ? merge([
+    for rule_name, rule in local.loadbalancer_ingress_rules : {
+      for sg_id in rule.security_groups : "${rule_name}-${sg_id}" => {
+        description = rule.description
+        from_port   = rule.from_port
+        to_port     = rule.to_port
+        protocol    = rule.protocol
+        sg_id       = sg_id
+      }
+    } if length(rule.security_groups) > 0
+  ]...) : {}
 
   security_group_id        = aws_security_group.lb_security_group[0].id
   type                     = "ingress"
@@ -99,7 +109,7 @@ resource "aws_security_group_rule" "lb_ingress_sg_rules" {
   from_port                = each.value.from_port
   to_port                  = each.value.to_port
   protocol                 = each.value.protocol
-  source_security_group_id = try(each.value.security_groups[0])
+  source_security_group_id = each.value.sg_id
 }
 
 resource "aws_security_group_rule" "lb_egress_rules" {
@@ -382,9 +392,6 @@ resource "aws_lb_target_group_attachment" "oas_analytics_attachment" {
   target_id        = aws_instance.oas_app_instance_new[0].id
   port             = 9502
 }
-
-
-
 
 resource "aws_lb_listener" "http_listener" {
   count = local.environment == "preproduction" ? 1 : 0

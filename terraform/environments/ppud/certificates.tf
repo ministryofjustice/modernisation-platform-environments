@@ -6,12 +6,10 @@
 # Development Environment
 #########################
 
-# Prestaged ACM Development Certificates, which expire in March 2026
-/*
 locals {
   dev_domains = local.is-development ? {
-    "internaltest"      = "internaltest.ppud.justice.gov.uk"
-    "waminternaltest"   = "waminternaltest.ppud.justice.gov.uk"
+    "internaltest"    = "internaltest.ppud.justice.gov.uk"
+    "waminternaltest" = "waminternaltest.ppud.justice.gov.uk"
   } : {}
 }
 
@@ -38,7 +36,6 @@ resource "aws_acm_certificate_validation" "dev_certificate_validation" {
     for option in each.value.domain_validation_options : option.resource_record_name
   ]
 }
-*/
 
 ###########################
 # Preproduction Environment

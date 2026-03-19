@@ -10,11 +10,8 @@
       "private_subnet_a_cidr": "10.200.1.0/24",
       "private_subnet_b_cidr": "10.200.2.0/24"
     },
-    "test": {
-    },
-    "preproduction": {
-    },
-    "production": {
-    }
+    "test": {},
+    "preproduction": {},
+    "production": {}
   }
 }

@@ -20,6 +20,23 @@ locals {
     for item in local.dps_domains_list :
     item => "jdbc:postgresql://${local.dps_endpoint[item]}:${local.dps_port[item]}/${local.dps_database[item]}"
   }
+
+  probation_endpoint = {
+    for item in local.probation_domains_list :
+    item => jsondecode(data.aws_secretsmanager_secret_version.probation[item].secret_string)["endpoint"]
+  }
+  probation_port = {
+    for item in local.probation_domains_list :
+    item => jsondecode(data.aws_secretsmanager_secret_version.probation[item].secret_string)["port"]
+  }
+  probation_database = {
+    for item in local.probation_domains_list :
+    item => jsondecode(data.aws_secretsmanager_secret_version.probation[item].secret_string)["db_name"]
+  }
+  probation_connection_string = {
+    for item in local.probation_domains_list :
+    item => "jdbc:postgresql://${local.probation_endpoint[item]}:${local.probation_port[item]}/${local.probation_database[item]}"
+  }
 }
 
 # Operational DataStore
@@ -70,6 +87,25 @@ resource "aws_glue_connection" "glue_dps_connection" {
     JDBC_CONNECTION_URL    = local.dps_connection_string[each.value]
     JDBC_DRIVER_CLASS_NAME = "org.postgresql.Driver"
     SECRET_ID              = aws_secretsmanager_secret.dps[each.value].name
+  }
+
+  physical_connection_requirements {
+    availability_zone      = data.aws_subnet.private_subnets_b.availability_zone
+    security_group_id_list = [aws_security_group.glue_job_connection_sg.id]
+    subnet_id              = data.aws_subnet.private_subnets_b.id
+  }
+}
+
+# All Probation connections
+resource "aws_glue_connection" "glue_probation_connection" {
+  for_each        = local.create_glue_connection ? toset(local.probation_domains_list) : []
+  name            = "${local.project}-${each.value}-connection"
+  connection_type = "JDBC"
+
+  connection_properties = {
+    JDBC_CONNECTION_URL    = local.probation_connection_string[each.value]
+    JDBC_DRIVER_CLASS_NAME = "org.postgresql.Driver"
+    SECRET_ID              = aws_secretsmanager_secret.probation[each.value].name
   }
 
   physical_connection_requirements {

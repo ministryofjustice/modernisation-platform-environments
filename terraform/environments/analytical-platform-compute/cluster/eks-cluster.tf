@@ -233,12 +233,6 @@ module "eks" {
       username          = "apc-mwaa"
       kubernetes_groups = ["mwaa"]
     }
-    # Internal MWAA access to Internal MWAA role in MWAA namespace
-    apc-internal-mwaa = {
-      principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/internal-mwaa-execution"
-      username          = "apc-internal-mwaa"
-      kubernetes_groups = ["mwaa"]
-    }
     # Analytical Platform Common access to MWAA ServiceAccount management role in MWAA namespace
     gha-mojap-common = {
       principal_arn     = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-common-production"]}:role/analytical-platform-github-actions"

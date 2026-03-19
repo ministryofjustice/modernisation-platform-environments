@@ -19,9 +19,9 @@ resource "random_password" "ad_admin_password" {
 }
 
 resource "aws_secretsmanager_secret" "ad_admin_password" {
-  count                  = local.environment == "development" ? 1 : 0
-  name                   = "${local.application_name}/${local.environment}/ad-admin-password"
-  description            = "Active Directory admin password for ${local.application_name}-${local.environment}"
+  count                   = local.environment == "development" ? 1 : 0
+  name                    = "${local.application_name}/${local.environment}/ad-admin-password"
+  description             = "Active Directory admin password for ${local.application_name}-${local.environment}"
   recovery_window_in_days = 0
 
   tags = merge(

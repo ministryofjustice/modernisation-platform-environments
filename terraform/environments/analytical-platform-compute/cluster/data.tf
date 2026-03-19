@@ -47,6 +47,11 @@ data "aws_iam_roles" "eks_sso_access_role" {
   path_prefix = "/aws-reserved/sso.amazonaws.com/"
 }
 
+# Chainguard
+data "aws_secretsmanager_secret_version" "chainguard_pull_credentials" {
+  secret_id = module.chainguard_pull_credentials.secret_name
+}
+
 # EKS
 data "aws_eks_cluster" "eks" {
   name = local.eks_cluster_name

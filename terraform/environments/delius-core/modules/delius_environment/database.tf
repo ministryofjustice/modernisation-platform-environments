@@ -12,6 +12,7 @@ module "oracle_db_shared" {
   source             = "../components/oracle_db_shared"
   account_config     = var.account_config
   environment_config = var.environment_config
+  db_backup_config   = var.db_backup_config
   account_info       = var.account_info
   platform_vars      = var.platform_vars
   env_name           = var.env_name

@@ -191,4 +191,10 @@ locals {
       disable_weekend = true
     }
   }
+
+  db_backup_config_test = {
+    object_lock_days             = 0
+    expire_current_after_days    = 70
+    expire_noncurrent_after_days = 10
+  }
 }
