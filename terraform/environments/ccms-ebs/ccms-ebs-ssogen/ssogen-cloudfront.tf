@@ -77,73 +77,73 @@ data "aws_s3_bucket" "logs" {
   bucket = "${local.application_name}-${local.environment}-logging"
 }
 
-resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
-  count           = (local.is-development || local.is-test) ? 1 : 0
-  enabled         = true
-  comment         = "CloudFront Distribution: ssogen-cloudfront-${local.environment}"
-  is_ipv6_enabled = false
-  http_version    = "http2" # Automatically supports http/2, http/1.1, and http/1.0
-  aliases         = [format("ccmsebs-sso-cf.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)]
-  logging_config {
-    include_cookies = false
-    bucket          = data.aws_s3_bucket.logs.bucket_domain_name
-    prefix          = "ssogen-cloudfront/"
-  }
+# resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
+#   count           = (local.is-development || local.is-test) ? 1 : 0
+#   enabled         = true
+#   comment         = "CloudFront Distribution: ssogen-cloudfront-${local.environment}"
+#   is_ipv6_enabled = false
+#   http_version    = "http2" # Automatically supports http/2, http/1.1, and http/1.0
+#   aliases         = [format("ccmsebs-sso-cf.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)]
+#   logging_config {
+#     include_cookies = false
+#     bucket          = data.aws_s3_bucket.logs.bucket_domain_name
+#     prefix          = "ssogen-cloudfront/"
+#   }
 
-  origin {
-    domain_name = data.aws_lb.ssogen_load_balancer[count.index].dns_name
-    origin_id   = format("%s-load-balancer-internal", local.application_name_ssogen)
+#   origin {
+#     domain_name = data.aws_lb.ssogen_load_balancer[count.index].dns_name
+#     origin_id   = format("%s-load-balancer-internal", local.application_name_ssogen)
 
 
-    vpc_origin_config {
-      vpc_origin_id = aws_cloudfront_vpc_origin.ssogen_cloudfront_vpc_origin[count.index].id
-    }
+#     vpc_origin_config {
+#       vpc_origin_id = aws_cloudfront_vpc_origin.ssogen_cloudfront_vpc_origin[count.index].id
+#     }
 
-  }
+#   }
 
-  restrictions {
-    geo_restriction {
-      restriction_type = "none"
-    }
-  }
+#   restrictions {
+#     geo_restriction {
+#       restriction_type = "none"
+#     }
+#   }
 
-  price_class = "PriceClass_100"
-  default_cache_behavior {
-    target_origin_id         = format("%s-load-balancer-internal", local.application_name_ssogen)
-    cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # Caching Disabled
-    origin_request_policy_id = "b689b0a8-53d0-40ab-baf2-68738e2966ac" # AllViewerExceptHostHeader
-    viewer_protocol_policy   = "redirect-to-https"
-    allowed_methods          = ["GET", "HEAD", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"]
-    cached_methods           = ["GET", "HEAD"]
-    compress                 = true
-  }
-  viewer_certificate {
-    cloudfront_default_certificate = false
-    acm_certificate_arn            = aws_acm_certificate_validation.external_nonprod_cf[0].certificate_arn
-    ssl_support_method             = "sni-only"
-  }
-  web_acl_id = aws_wafv2_web_acl.ssogen_cloudfront_acl[0].arn
-  tags = merge(local.tags,
-    { Name = format("%s-%s", local.application_name_ssogen, local.environment) }
-  )
-}
+#   price_class = "PriceClass_100"
+#   default_cache_behavior {
+#     target_origin_id         = format("%s-load-balancer-internal", local.application_name_ssogen)
+#     cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # Caching Disabled
+#     origin_request_policy_id = "b689b0a8-53d0-40ab-baf2-68738e2966ac" # AllViewerExceptHostHeader
+#     viewer_protocol_policy   = "redirect-to-https"
+#     allowed_methods          = ["GET", "HEAD", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"]
+#     cached_methods           = ["GET", "HEAD"]
+#     compress                 = true
+#   }
+#   viewer_certificate {
+#     cloudfront_default_certificate = false
+#     acm_certificate_arn            = aws_acm_certificate_validation.external_nonprod_cf[0].certificate_arn
+#     ssl_support_method             = "sni-only"
+#   }
+#   web_acl_id = aws_wafv2_web_acl.ssogen_cloudfront_acl[0].arn
+#   tags = merge(local.tags,
+#     { Name = format("%s-%s", local.application_name_ssogen, local.environment) }
+#   )
+# }
 
-data aws_lb "ssogen_load_balancer" {
-  count           = (local.is-development || local.is-test) ? 1 : 0
-  name     = local.is-development ? lower(format("lb-%s-ssogen-internal", local.application_name)) : lower(format("lb-%s-internal", local.application_name_ssogen))
-}
+# data aws_lb "ssogen_load_balancer" {
+#   count           = (local.is-development || local.is-test) ? 1 : 0
+#   name     = local.is-development ? lower(format("lb-%s-ssogen-internal", local.application_name)) : lower(format("lb-%s-internal", local.application_name_ssogen))
+# }
 
-resource "aws_cloudfront_vpc_origin" "ssogen_cloudfront_vpc_origin" {
-  count           = (local.is-development || local.is-test) ? 1 : 0
-  vpc_origin_endpoint_config {
-    name = format("%s-cf-internal-lb", local.application_name_ssogen)
-    arn  = data.aws_lb.ssogen_load_balancer[count.index].arn
-    http_port             = 80
-    https_port = 443
-    origin_protocol_policy = "https-only"
-    origin_ssl_protocols  {
-      items = ["TLSv1.2"]  
-      quantity = 1
-    }
-  }
-}
+# resource "aws_cloudfront_vpc_origin" "ssogen_cloudfront_vpc_origin" {
+#   count           = (local.is-development || local.is-test) ? 1 : 0
+#   vpc_origin_endpoint_config {
+#     name = format("%s-cf-internal-lb", local.application_name_ssogen)
+#     arn  = data.aws_lb.ssogen_load_balancer[count.index].arn
+#     http_port             = 80
+#     https_port = 443
+#     origin_protocol_policy = "https-only"
+#     origin_ssl_protocols  {
+#       items = ["TLSv1.2"]  
+#       quantity = 1
+#     }
+#   }
+# }
