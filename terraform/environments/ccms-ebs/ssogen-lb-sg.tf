@@ -29,7 +29,7 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_app_work
 }
 
 # Allow HTTPS from Cloufront
-resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_app_workspaces" {
+resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_app_cf" {
   count             = local.is-development || local.is-test ? 1 : 0
   security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
   description       = "Allow HTTPS (443) from AWS Workspaces CIDR"
