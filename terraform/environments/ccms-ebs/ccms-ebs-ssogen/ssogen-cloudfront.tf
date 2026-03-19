@@ -79,7 +79,6 @@ data "aws_s3_bucket" "logs" {
 
 resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
   count           = (local.is-development || local.is-test) ? 1 : 0
-  # provider        = aws.us-east-1
   enabled         = true
   comment         = "CloudFront Distribution: ssogen-cloudfront-${local.environment}"
   is_ipv6_enabled = false
@@ -136,7 +135,6 @@ data aws_lb "ssogen_load_balancer" {
 
 resource "aws_cloudfront_vpc_origin" "ssogen_cloudfront_vpc_origin" {
   count           = (local.is-development || local.is-test) ? 1 : 0
-  provider        = aws.us-east-1
   vpc_origin_endpoint_config {
     name = format("%s-cf-internal-lb", local.application_name_ssogen)
     arn  = data.aws_lb.ssogen_load_balancer[count.index].arn
