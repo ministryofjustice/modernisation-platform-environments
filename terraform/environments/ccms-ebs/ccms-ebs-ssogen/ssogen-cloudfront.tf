@@ -129,8 +129,8 @@ resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
 }
 
 data aws_lb "ssogen_load_balancer" {
-  count           = local.is-development ? 1 : 0
-  name     = lower(format("lb-%s-ssogen-internal", local.application_name))
+  count           = (local.is-development || local.is-test) ? 1 : 0
+  name     = local.is-development ? lower(format("lb-%s-ssogen-internal", local.application_name)) : lower(format("lb-%s-internal", local.application_name_ssogen))
 }
 
 resource "aws_cloudfront_vpc_origin" "ssogen_cloudfront_vpc_origin" {
