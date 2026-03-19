@@ -94,7 +94,8 @@ locals {
   prod_sans = [
     format("ccmsebs-sso.%s", local.prod_domain),
     # format("ccmsebs-sso-cf.%s", local.prod_domain),
-    format("ccmsebs-sso-admin.%s", local.prod_domain),
+     format("ccms-sso-admin.%s", local.prod_domain),
+    # format("ccmsebs-sso-admin.%s", local.prod_domain),
     format("ccms-ssogen-as1.%s", local.prod_domain),
     format("ccms-ssogen-as2.%s", local.prod_domain),
     format("ccms-ssogen-admin.%s", local.prod_domain)
