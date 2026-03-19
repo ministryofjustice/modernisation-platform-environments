@@ -92,7 +92,7 @@ resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
   }
 
   origin {
-    domain_name = aws_lb.ssogen_alb[0].dns_name
+    domain_name = data.aws_lb.ssogen_load_balancer.dns_name
     origin_id   = format("%s-load-balancer-internal", local.application_name_ssogen)
 
 
