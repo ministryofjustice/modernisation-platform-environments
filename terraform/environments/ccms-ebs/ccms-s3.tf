@@ -137,16 +137,21 @@ data "aws_iam_policy_document" "logging_s3_policy" {
 
   actions = ["s3:PutObject"]
 
+  # Apply deny to the WHOLE BUCKET 
   resources = [
-    "arn:aws:s3:::ccms-ebs-${local.environment}-logging/s3-access-logs/*",
-    "arn:aws:s3:::ccms-ebs-${local.environment}-logging/s3access/*"
+    "arn:aws:s3:::ccms-ebs-${local.environment}-logging/*"
   ]
 
   condition {
     test     = "StringNotEquals"
     variable = "aws:PrincipalService"
     values = [
-      "logging.s3.amazonaws.com"
+      "logging.s3.amazonaws.com",                     # S3 Server Access Logging
+      "logdelivery.elasticloadbalancing.amazonaws.com", # ALB/NLB Access Logging
+      "firehose.amazonaws.com",                       # WAF logs (delivered via Firehose)
+      "athena.amazonaws.com"                          # Athena query results
+      # Add these if used:
+      # "logging.cloudfront.amazonaws.com"
     ]
   }
 }
