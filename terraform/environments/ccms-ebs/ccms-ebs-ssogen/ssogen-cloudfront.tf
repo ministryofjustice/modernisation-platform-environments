@@ -92,7 +92,7 @@ resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
   }
 
   origin {
-    domain_name = data.aws_lb.ssogen_load_balancer.dns_name
+    domain_name = data.aws_lb.ssogen_load_balancer[count.index].dns_name
     origin_id   = format("%s-load-balancer-internal", local.application_name_ssogen)
 
 
@@ -130,14 +130,16 @@ resource "aws_cloudfront_distribution" "ssogen_cloudfront_distribution" {
 }
 
 data aws_lb "ssogen_load_balancer" {
-  name     = lower(format("lb-%s-internal", local.application_name_ssogen))
+  count           = local.is-development ? 1 : 0
+  name     = lower(format("lb-%s-ssogen-internal", local.application_name))
 }
+
 resource "aws_cloudfront_vpc_origin" "ssogen_cloudfront_vpc_origin" {
   count           = (local.is-development || local.is-test) ? 1 : 0
   provider        = aws.us-east-1
   vpc_origin_endpoint_config {
     name = format("%s-cf-internal-lb", local.application_name_ssogen)
-    arn  = data.aws_lb.ssogen_load_balancer.arn
+    arn  = data.aws_lb.ssogen_load_balancer[count.index].arn
     http_port             = 80
     https_port = 443
     origin_protocol_policy = "https-only"
