@@ -115,7 +115,15 @@ data "aws_iam_policy_document" "logging_s3_policy" {
     effect = "Allow"
     principals {
       type        = "Service"
-      identifiers = ["logging.s3.amazonaws.com"]
+      identifiers = ["logging.s3.amazonaws.com",
+                      "s3.amazonaws.com",
+                      "logdelivery.elasticloadbalancing.amazonaws.com",
+                      "elasticloadbalancing.amazonaws.com", 
+                      "firehose.amazonaws.com", 
+                      "athena.amazonaws.com",  
+                      "logging.cloudfront.amazonaws.com", 
+                      "delivery.logs.amazonaws.com",
+                      ]
     }
     actions   = ["s3:PutObject"]
     resources = ["arn:aws:s3:::ccms-ebs-${local.environment}-logging/*"]
@@ -151,7 +159,8 @@ data "aws_iam_policy_document" "logging_s3_policy" {
       "elasticloadbalancing.amazonaws.com",            # ELB Service
       "logdelivery.elasticloadbalancing.amazonaws.com", # ALB/NLB Access Logging
       "firehose.amazonaws.com",                       # WAF logs (delivered via Firehose)
-      "athena.amazonaws.com"                          # Athena query results
+      "athena.amazonaws.com",                          # Athena query results
+      "delivery.logs.amazonaws.com"                         
       # Add these if used:
       # "logging.cloudfront.amazonaws.com"
     ]
