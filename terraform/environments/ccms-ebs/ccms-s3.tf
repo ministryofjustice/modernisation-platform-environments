@@ -116,10 +116,7 @@ data "aws_iam_policy_document" "logging_s3_policy" {
     principals {
       type        = "Service"
       identifiers = ["logging.s3.amazonaws.com",
-                      "s3.amazonaws.com",
-                      "firehose.amazonaws.com", 
-                      "athena.amazonaws.com",  
-                      "logging.cloudfront.amazonaws.com"
+                      "s3.amazonaws.com"
                       ]
     }
     actions   = ["s3:PutObject"]
