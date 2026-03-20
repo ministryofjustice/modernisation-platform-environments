@@ -147,6 +147,7 @@ data "aws_iam_policy_document" "logging_s3_policy" {
     variable = "aws:PrincipalService"
     values = [
       "logging.s3.amazonaws.com",                     # S3 Server Access Logging
+      "s3.amazonaws.com",                             # S3 service
       "logdelivery.elasticloadbalancing.amazonaws.com", # ALB/NLB Access Logging
       "firehose.amazonaws.com",                       # WAF logs (delivered via Firehose)
       "athena.amazonaws.com"                          # Athena query results
