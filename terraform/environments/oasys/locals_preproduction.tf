@@ -326,7 +326,7 @@ locals {
       }
       "pp-oasys.az.justice.gov.uk" = {
         records = [
-          { name = "onr", type = "A", ttl = "300", records = ["10.40.40.210"] }
+          { name = "onr", type = "NS", ttl = "86400", records = ["ns-1445.awsdns-52.org", "ns-1929.awsdns-49.co.uk", "ns-435.awsdns-54.com", "ns-602.awsdns-11.net"] },
         ]
         lb_alias_records = [
           { name = "", type = "A", lbs_map_key = "private" }
