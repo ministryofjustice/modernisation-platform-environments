@@ -126,12 +126,12 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
-        alarm_description   = "Triggers if misload_success_status metric collected via /opt/textfile_monitoring is in error, see https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4295000327"
+        alarm_description   = "Triggers if misload_success metric collected via /opt/textfile_monitoring is in error, see https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4295000327"
         alarm_actions       = ["dba"]
         ok_actions          = ["dba"]
         dimensions = {
           type          = "gauge"
-          type_instance = "misload_success_status"
+          type_instance = "misload_success"
         }
       }
       misload-long-running = {
