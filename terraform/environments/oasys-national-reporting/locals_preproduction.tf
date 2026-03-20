@@ -422,6 +422,11 @@ locals {
     }
 
     route53_zones = {
+      "onr.pp-oasys.az.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "public" },
+        ]
+      }
       "preproduction.reporting.oasys.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "", type = "A", lbs_map_key = "public" },
