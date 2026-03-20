@@ -117,7 +117,6 @@ data "aws_iam_policy_document" "logging_s3_policy" {
       type        = "Service"
       identifiers = ["logging.s3.amazonaws.com",
                       "s3.amazonaws.com",
-                      "elasticloadbalancing.amazonaws.com", 
                       "firehose.amazonaws.com", 
                       "athena.amazonaws.com",  
                       "logging.cloudfront.amazonaws.com"
@@ -125,11 +124,6 @@ data "aws_iam_policy_document" "logging_s3_policy" {
     }
     actions   = ["s3:PutObject"]
     resources = ["arn:aws:s3:::ccms-ebs-${local.environment}-logging/*"]
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = ["${data.aws_caller_identity.current.account_id}"]
-    }
   }
 
   statement {
@@ -154,7 +148,6 @@ data "aws_iam_policy_document" "logging_s3_policy" {
     values = [
       "s3.amazonaws.com",                             # S3 service
       "logging.s3.amazonaws.com",                     # S3 Server Access Logging
-      "elasticloadbalancing.amazonaws.com",            # ELB Service
       "logdelivery.elasticloadbalancing.amazonaws.com", # ALB/NLB Access Logging
       "firehose.amazonaws.com",                       # WAF logs (delivered via Firehose)
       "athena.amazonaws.com"                          # Athena query result                        
