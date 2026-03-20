@@ -144,10 +144,11 @@ data "aws_iam_policy_document" "logging_s3_policy" {
 
   condition {
     test     = "StringNotEqualsIfExists"
-    variable = "aws:PrincipalService"
+    variable = "aws:CalledVia"
     values = [
-      "logging.s3.amazonaws.com",                     # S3 Server Access Logging
       "s3.amazonaws.com",                             # S3 service
+      "logging.s3.amazonaws.com",                     # S3 Server Access Logging
+      "elasticloadbalancing.amazonaws.com",            # ELB Service
       "logdelivery.elasticloadbalancing.amazonaws.com", # ALB/NLB Access Logging
       "firehose.amazonaws.com",                       # WAF logs (delivered via Firehose)
       "athena.amazonaws.com"                          # Athena query results
