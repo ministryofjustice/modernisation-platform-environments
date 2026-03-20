@@ -143,7 +143,7 @@ data "aws_iam_policy_document" "logging_s3_policy" {
   ]
 
   condition {
-    test     = "StringNotEquals"
+    test     = "StringNotEqualsIfExists"
     variable = "aws:PrincipalService"
     values = [
       "logging.s3.amazonaws.com",                     # S3 Server Access Logging
