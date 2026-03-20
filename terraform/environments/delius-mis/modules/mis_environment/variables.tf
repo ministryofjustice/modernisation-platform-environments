@@ -146,3 +146,7 @@ variable "create_backup_role" {
   type        = bool
   default     = false
 }
+
+variable "db_backup_config" {
+  type = any
+}

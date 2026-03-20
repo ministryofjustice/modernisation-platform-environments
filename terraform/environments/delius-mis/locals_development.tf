@@ -362,4 +362,12 @@ locals {
   datasync_config_dev = {
     source_s3_bucket_arn = "arn:aws:s3:::eu-west-2-delius-mis-dev-dfi-extracts" # differs per environment
   }
+
+  db_backup_config_dev = {
+    object_lock_days             = 3
+    expire_current_after_days    = 80
+    expire_noncurrent_after_days = 10
+  }
+
 }
+

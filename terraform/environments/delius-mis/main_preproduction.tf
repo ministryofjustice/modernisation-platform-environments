@@ -48,6 +48,8 @@ module "environment_stage" {
   create_backup_role = true
 
   tags = local.tags
+
+  db_backup_config = local.db_backup_config_stage
 }
 
 
@@ -94,4 +96,6 @@ module "environment_preproduction" {
   create_backup_role = false
 
   tags = local.tags
+
+  db_backup_config = local.db_backup_config_preprod
 }

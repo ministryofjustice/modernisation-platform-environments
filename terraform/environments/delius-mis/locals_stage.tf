@@ -442,4 +442,11 @@ locals {
   datasync_config_stage = {
     source_s3_bucket_arn = "arn:aws:s3:::eu-west-2-delius-stage-dfi-extracts"
   }
+
+  db_backup_config_stage = {
+    object_lock_days             = 0
+    expire_current_after_days    = 90
+    expire_noncurrent_after_days = 10
+  }
+
 }

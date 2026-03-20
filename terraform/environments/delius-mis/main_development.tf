@@ -49,4 +49,6 @@ module "environment_dev" {
   create_backup_role = true
 
   tags = local.tags
+
+  db_backup_config = local.db_backup_config_dev
 }

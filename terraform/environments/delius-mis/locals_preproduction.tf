@@ -411,4 +411,17 @@ locals {
   dfi_report_bucket_config_preprod = null
 
   lb_config_preprod = null
+
+  db_backup_config_preprod = {
+    object_lock_days             = 0
+    expire_current_after_days    = 200
+    expire_noncurrent_after_days = 10
+    transition = [
+        {
+          days          = 30
+          storage_class = "STANDARD_IA"
+        }
+      ]
+  }
+
 }
