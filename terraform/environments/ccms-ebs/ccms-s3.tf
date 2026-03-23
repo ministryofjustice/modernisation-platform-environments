@@ -225,7 +225,7 @@ resource "aws_s3_bucket_object_lock_configuration" "dbbackup" {
   rule {
     default_retention {
       mode = "GOVERNANCE"
-      days = 30
+      days = local.application_data.accounts[local.environment].rman_s3_lifecycle_days_expiration_current
     }
   }
 }
