@@ -2,7 +2,7 @@
 
 module "secret_cloud_platform_account_id" {
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.1.0"
 
   name        = "cloud-platform-account-id"
   description = "The AWS Account ID for the Cloud Platform environment corresponding to this environment. Populate manually."
@@ -16,7 +16,7 @@ module "secret_cloud_platform_account_id" {
 
 module "secret_ingestion_api_auth_token" {
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.1.0"
 
   name        = "ingestion-api-auth-token"
   description = "Shared secret/token used by the Lambda Authorizer to verify incoming requests. Populate manually."
