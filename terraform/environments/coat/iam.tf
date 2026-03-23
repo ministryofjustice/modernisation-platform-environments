@@ -155,7 +155,7 @@ module "cur_v2_hourly_enriched_replication_role" {
   count = local.is-development ? 0 : 1
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.60.0"
+  version = "6.4.0"
 
   create_role = true
 
@@ -247,7 +247,7 @@ module "cur_v2_hourly_enriched_replication_policy" {
   count = local.is-development ? 0 : 1
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.60.0"
+  version = "6.4.0"
   name    = "${module.cur_v2_hourly_enriched_replication_role[0].iam_role_name}-policy"
 
   policy = data.aws_iam_policy_document.cur_v2_hourly_enriched_replication[0].json
