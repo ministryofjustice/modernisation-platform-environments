@@ -27,37 +27,36 @@ yum update -y
 # Wait for disks to appear
 sleep 25
 
-# IFS=',' read -r -a DISKS_ARRAY <<< "${DISKSARRAY}"
+IFS=',' read -r -a DISKS_ARRAY <<< "${DISKSARRAY}"
 
-# for entry in "$${DISKS_ARRAY[@]}"; do
-#   IFS=":" read -r disk mount <<< "$entry"
-#   echo "Processing $disk -> $mount"
-#   # Ensure directory exists
-#   mkdir -p "$mount"
+for entry in "$${DISKS_ARRAY[@]}"; do
+  IFS=":" read -r disk mount <<< "$entry"
+  echo "Processing $disk -> $mount"
+  # Ensure directory exists
+  mkdir -p "$mount"
 
-#   # Check if disk already has a filesystem
-#   if ! file -s "$disk" | grep -q "data"; then
-#     echo "Filesystem already exists on $disk"
-#   else
-#     echo "Creating filesystem on $disk"
-#     mkfs.xfs "$disk"
-#   fi
+  # Check if disk already has a filesystem
+  if ! file -s "$disk" | grep -q "data"; then
+    echo "Filesystem already exists on $disk"
+  else
+    echo "Creating filesystem on $disk"
+    mkfs.xfs "$disk"
+  fi
 
-#   # Mount disk
-#   echo "Mounting $disk to $mount"
-#   mount "$disk" "$mount"
+  # Mount disk
+  echo "Mounting $disk to $mount"
+  mount "$disk" "$mount"
 
-#   # Get UUID for persistent mount
-#   uuid=$(blkid -s UUID -o value "$${disk}")
-  
-#   # Add to fstab if not already present
-#   if ! grep -q "$uuid" /etc/fstab; then
-#     echo "Adding to /etc/fstab"
-#     echo "UUID=$uuid $mount xfs defaults,nofail 0 2" >> /etc/fstab
-#   else
-#     echo "Entry already exists in /etc/fstab"
-#   fi
-# done
+  if [[ $mount != "/tmp" ]] ; then
+    # Get UUID for persistent mount
+    uuid=$(blkid -s UUID -o value "$${disk}")
+    # Remove from fstab 
+    sed -i "\|$mount|d" /etc/fstab
+    # Add to fstab
+    echo "Adding to /etc/fstab"
+    echo "UUID=$uuid $mount xfs defaults,nofail 0 2" >> /etc/fstab
+  fi
+done
 
 deploy_cortex() {
   CORTEX_DIR=/tmp/CortexAgent
@@ -96,6 +95,8 @@ for var in "$${EFS_MP_ARRAY[@]}"; do
   # create large file for better EFS performance 
   # https://docs.aws.amazon.com/efs/latest/ug/performance.html
   dd if=/dev/urandom of=$localmount/large_file_for_efs_performance bs=1024k count=10000
+  echo "Removing existing mount point /etc/fstab"
+  sed -i "\|$localmount|d" /etc/fstab
   echo "Adding to /etc/fstab"
   echo "${efs_id}:/$efsmount $localmount efs _netdev,tls,nofail 0 0" >> /etc/fstab
 done
