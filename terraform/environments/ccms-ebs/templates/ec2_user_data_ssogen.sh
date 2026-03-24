@@ -44,8 +44,8 @@ for entry in "$${DISKS_ARRAY[@]}"; do
   fi
 
   # Mount disk
-  echo "Mounting $disk to $mount"
-  mount "$disk" "$mount"
+  # echo "Mounting $disk to $mount"
+  # mount "$disk" "$mount"
 
   if [[ $mount != "/tmp" ]] ; then
     # Get UUID for persistent mount
