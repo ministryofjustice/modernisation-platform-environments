@@ -36,12 +36,12 @@ for entry in "$${DISKS_ARRAY[@]}"; do
   mkdir -p "$mount"
 
   # Check if disk already has a filesystem
-  if ! file -s "$disk" | grep -q "data"; then
-    echo "Filesystem already exists on $disk"
-  else
-    echo "Creating filesystem on $disk"
-    mkfs.xfs "$disk"
-  fi
+  # if ! file -s "$disk" | grep -q "data"; then
+  #   echo "Filesystem already exists on $disk"
+  # else
+  #   echo "Creating filesystem on $disk"
+  #   mkfs.xfs "$disk"
+  # fi
 
   # Mount disk
   # echo "Mounting $disk to $mount"
