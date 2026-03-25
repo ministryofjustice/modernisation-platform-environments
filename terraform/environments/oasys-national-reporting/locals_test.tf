@@ -297,6 +297,8 @@ locals {
     }
 
     lbs = {
+      onr-test-nlb = merge(local.lbs.nlb, {
+      })
       public = merge(local.lbs.public, {
         instance_target_groups = {
           t2-onr-bods-http28080 = merge(local.lbs.public.instance_target_groups.http28080, {

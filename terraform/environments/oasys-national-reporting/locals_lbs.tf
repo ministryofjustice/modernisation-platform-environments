@@ -128,7 +128,7 @@ locals {
     nlb = {
       access_logs                      = false
       enable_cross_zone_load_balancing = true
-      enable_delete_protection         = true
+      enable_delete_protection         = false
       force_destroy_bucket             = true
       internal_lb                      = false
       load_balancer_type               = "network"
