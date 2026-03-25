@@ -161,25 +161,6 @@ resource "aws_s3_bucket_policy" "s3_logs_service" {
             "s3:x-amz-acl" = "bucket-owner-full-control"
           }
         }
-      },
-      {
-        Sid       = "AllowCloudTrailWrite",
-        Effect    = "Allow",
-        Principal = { Service = "cloudtrail.amazonaws.com" },
-        Action    = "s3:PutObject",
-        Resource  = "${module.s3_bucket_logs.bucket.arn}/staging_access/*",
-        Condition = {
-          StringEquals = {
-            "s3:x-amz-acl" = "bucket-owner-full-control"
-          }
-        }
-      },
-      {
-        Sid       = "AllowCloudTrailACLCheck",
-        Effect    = "Allow",
-        Principal = { Service = "cloudtrail.amazonaws.com" },
-        Action    = "s3:GetBucketAcl",
-        Resource  = module.s3_bucket_logs.bucket.arn
       }
     ]
   })
