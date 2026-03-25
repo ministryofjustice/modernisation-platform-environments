@@ -50,18 +50,6 @@ locals {
       user_name    = "LotTest"
       s3_bucket    = "property-datahub-staging-development"
       ssm_key_name = "/sftp/keys/LotTest"
-    },
-    {
-      environment  = "preproduction"
-      user_name    = "LotTest"
-      s3_bucket    = "property-datahub-staging-preproduction"
-      ssm_key_name = "/sftp/keys/LotTest"
-    },
-    {
-      environment  = "production"
-      user_name    = "LotTest"
-      s3_bucket    = "property-datahub-staging-production"
-      ssm_key_name = "/sftp/keys/LotTest"
     }
   ]
 
