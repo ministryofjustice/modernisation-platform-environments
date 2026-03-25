@@ -297,23 +297,6 @@ locals {
     }
 
     lbs = {
-      onr-test-nlb = merge(local.lbs.nlb, {
-        instance_target_groups = {
-          t2-onr-weboidc-https-8443 = merge(local.lbs.nlb.instance_target_groups.https-8443, {
-            attachments = [
-            ]
-          })
-        }
-
-        listeners = {
-          https = merge(local.lbs.nlb.listeners.https, {
-            default_action = {
-              type              = "forward"
-              target_group_name = "t2-onr-weboidc-https-8443"
-            }
-          })
-        }
-      })
       public = merge(local.lbs.public, {
         instance_target_groups = {
           t2-onr-bods-http28080 = merge(local.lbs.public.instance_target_groups.http28080, {
