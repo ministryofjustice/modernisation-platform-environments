@@ -1,12 +1,19 @@
 
 module "certs" {
-  source = "./modules/dns/certs"
+  source            = "./modules/dns/certs"
+  project_name      = local.project_name
+  r53_zone_id       = module.public_dns_zone.aws_route53_zone_id
+  domain_name       = "yjaf.${local.application_data.accounts[local.environment].domain_name}"
+  validate_certs    = local.application_data.accounts[local.environment].validate_certs
+  tags              = local.tags
+}
 
-  project_name = local.project_name
-
-  r53_zone_id    = module.public_dns_zone.aws_route53_zone_id
-  domain_name    = "yjaf.${local.application_data.accounts[local.environment].domain_name}"
-  validate_certs = local.application_data.accounts[local.environment].validate_certs
-
-  tags = local.tags
+module "gateway_certs" {
+  source          = "./modules/dns/certs"
+  count           = local.application_data.accounts[local.environment].create_svc_pilot ? 1 : 0
+  project_name    = local.project_name
+  r53_zone_id     = module.public_dns_zone.aws_route53_zone_id
+  domain_name     = "gateway.${local.application_data.accounts[local.environment].domain_name}"
+  validate_certs  = local.application_data.accounts[local.environment].validate_certs
+  tags            = local.tags
 }

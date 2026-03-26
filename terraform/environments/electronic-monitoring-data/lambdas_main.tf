@@ -365,15 +365,15 @@ module "load_mdss_lambda" {
   cloudwatch_retention_days      = 7
 
   environment_variables = {
-    ATHENA_QUERY_BUCKET                    = module.s3-athena-bucket.bucket.id
-    ACCOUNT_NUMBER                         = data.aws_caller_identity.current.account_id
-    STAGING_BUCKET                         = module.s3-create-a-derived-table-bucket.bucket.id
-    ENVIRONMENT_NAME                       = local.environment_shorthand
-    CLEANUP_QUEUE_URL                      = aws_sqs_queue.clean_dlt_load_queue.id
-    MAX_RECEIVE_COUNT                      = tostring(local.load_mdss_sqs_max_receive_count)
-    MDSS_MANIFEST_BUCKET                   = module.s3-metadata-bucket.bucket.id
-    MDSS_MANIFEST_PREFIX                   = "mdss-manifest/current"
-    STUCK_STARTED_MINUTES                  = "60"
+    ATHENA_QUERY_BUCKET                     = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER                          = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET                          = module.s3-create-a-derived-table-bucket.bucket.id
+    ENVIRONMENT_NAME                        = local.environment_shorthand
+    CLEANUP_QUEUE_URL                       = aws_sqs_queue.clean_dlt_load_queue.id
+    MAX_RECEIVE_COUNT                       = tostring(local.load_mdss_sqs_max_receive_count)
+    MDSS_MANIFEST_BUCKET                    = module.s3-metadata-bucket.bucket.id
+    MDSS_MANIFEST_PREFIX                    = "mdss-manifest/current"
+    STUCK_STARTED_MINUTES                   = "60"
     AUTO_REDRIVE_TRANSIENT_COOLDOWN_MINUTES = "60"
     AUTO_REDRIVE_UNKNOWN_COOLDOWN_MINUTES   = "60"
   }
@@ -675,7 +675,6 @@ module "ears_sars_request" {
 # ------------------------------------------------------------------------------
 
 module "fan_out_tags" {
-  count                          = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "fan_out_tags"
@@ -702,7 +701,7 @@ module "fan_out_tags" {
 #-----------------------------------------------------------------------------------
 
 module "mdss_reconciler" {
-  count = local.is-preproduction || local.is-production ? 0 : 1
+  count                          = local.is-preproduction || local.is-production ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "mdss_reconciler"

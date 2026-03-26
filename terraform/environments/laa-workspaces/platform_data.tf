@@ -131,17 +131,17 @@ data "aws_caller_identity" "current" {}
 # }
 
 # Shared KMS keys (per business unit)
-data "aws_kms_key" "general_shared" {
-  key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/general-${var.networking[0].business-unit}"
-}
+# data "aws_kms_key" "general_shared" {
+#   key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/general-${var.networking[0].business-unit}"
+# }
 
-data "aws_kms_key" "ebs_shared" {
-  key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-${var.networking[0].business-unit}"
-}
+# data "aws_kms_key" "ebs_shared" {
+#   key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-${var.networking[0].business-unit}"
+# }
 
-data "aws_kms_key" "rds_shared" {
-  key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/rds-${var.networking[0].business-unit}"
-}
+# data "aws_kms_key" "rds_shared" {
+#   key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/rds-${var.networking[0].business-unit}"
+# }
 
 # State for core-network-services resource information
 data "terraform_remote_state" "core_network_services" {
@@ -150,6 +150,18 @@ data "terraform_remote_state" "core_network_services" {
     acl     = "bucket-owner-full-control"
     bucket  = "modernisation-platform-terraform-state"
     key     = "environments/accounts/core-network-services/core-network-services-production/terraform.tfstate"
+    region  = "eu-west-2"
+    encrypt = "true"
+  }
+}
+
+# State for workspace-components (VPC and subnets)
+data "terraform_remote_state" "workspace_components" {
+  backend = "s3"
+  config = {
+    acl     = "bucket-owner-full-control"
+    bucket  = "modernisation-platform-terraform-state"
+    key     = "environments/members/laa-workspaces/workspace-components/${terraform.workspace}/terraform.tfstate"
     region  = "eu-west-2"
     encrypt = "true"
   }

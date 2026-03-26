@@ -19,7 +19,7 @@ variable "account_config" {
 
 variable "db_backup_config" {
   description = "Database S3 Backup Bucket config including lifecycle rules"
-  type = any
+  type        = any
 }
 
 variable "account_info" {

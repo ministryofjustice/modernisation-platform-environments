@@ -288,6 +288,7 @@ locals {
           "oasys-production",
           "oasys-national-reporting-production",
           "planetfm-production",
+          "prison-retail-production",
         ]
       }
     }

@@ -116,6 +116,11 @@ resource "aws_db_option_group" "appdboptiongroup19_new" {
     option_name = "STATSPACK"
   }
 
+  option {
+    option_name = "S3_INTEGRATION"
+    version     = "1.0"
+  }
+
   tags = merge(
     local.tags,
     {
@@ -208,4 +213,16 @@ resource "aws_db_instance" "edw_rds_instance" {
     create = "60m"
     delete = "2h"
   }
+}
+
+##################################################################################################################
+### EDW RDS INSTANCE Role Association - Preproduction environment
+##################################################################################################################
+
+resource "aws_db_instance_role_association" "edw_rds_instance_role_association" {
+  count = local.environment == "preproduction" ? 1 : 0
+
+  db_instance_identifier = aws_db_instance.edw_rds_instance[0].identifier
+  role_arn               = aws_iam_role.rds_s3_access_role[0].arn
+  feature_name           = "S3_INTEGRATION"
 }

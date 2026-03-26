@@ -409,10 +409,6 @@ resource "aws_iam_role_policy" "cloudwatch" {
   policy   = data.aws_iam_policy_document.cloudwatch[each.key].json
 }
 
-resource "aws_api_gateway_account" "api_gateway_account" {
-  cloudwatch_role_arn = aws_iam_role.api_gateway_role.arn
-}
-
 # -------------------------------------------------------
 # certificate and waf
 # -------------------------------------------------------

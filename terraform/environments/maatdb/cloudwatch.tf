@@ -145,8 +145,9 @@ module "maatdb_pagerduty_core_alerts" {
 
 # create RDS maintenance notification 
 resource "aws_db_event_subscription" "rds_maintenance_notifications" {
+  count = local.is-production ? 0 : 1
   name      = "${local.application_name}-${local.environment}-rds-maintenance"
-  sns_topic = aws_sns_topic.maatdb_maintenance_topic.arn
+  sns_topic = aws_sns_topic.maatdb_maintenance_topic[0].arn
 
   # DB instance only
   source_type = "db-instance"
@@ -166,16 +167,17 @@ resource "aws_db_event_subscription" "rds_maintenance_notifications" {
 
   depends_on = [
     module.rds,
-    aws_sns_topic.maatdb_maintenance_topic
+    aws_sns_topic.maatdb_maintenance_topic[0]
   ]
 }
 
 # Create SNS topic for RDS maintenance event 
 resource "aws_sns_topic" "maatdb_maintenance_topic" {
+  count = local.is-production ? 0 : 1
   name              = "${local.application_name}-${local.environment}-maintenance-topic"
-  kms_master_key_id = aws_kms_key.sns_rds_events.arn
+  kms_master_key_id = aws_kms_key.sns_rds_events[0].arn
 
-  depends_on = [aws_kms_key.sns_rds_events]
+  depends_on = [aws_kms_key.sns_rds_events[0]]
 
   tags = merge(
     local.tags,
@@ -188,6 +190,7 @@ resource "aws_sns_topic" "maatdb_maintenance_topic" {
 # RDS to SNS publish policy (not mandatory but safe to have)
 
 data "aws_iam_policy_document" "rds_publish_to_sns" {
+  count = local.is-production ? 0 : 1
   statement {
     sid    = "AllowRDSPublish"
     effect = "Allow"
@@ -198,7 +201,7 @@ data "aws_iam_policy_document" "rds_publish_to_sns" {
     }
 
     actions   = ["sns:Publish"]
-    resources = [aws_sns_topic.maatdb_maintenance_topic.arn]
+    resources = [aws_sns_topic.maatdb_maintenance_topic[0].arn]
 
     condition {
       test     = "ArnLike"
@@ -211,12 +214,14 @@ data "aws_iam_policy_document" "rds_publish_to_sns" {
 }
 
 resource "aws_sns_topic_policy" "rds_publish_policy" {
-  arn    = aws_sns_topic.maatdb_maintenance_topic.arn
-  policy = data.aws_iam_policy_document.rds_publish_to_sns.json
+  count = local.is-production ? 0 : 1
+  arn    = aws_sns_topic.maatdb_maintenance_topic[0].arn
+  policy = data.aws_iam_policy_document.rds_publish_to_sns[0].json
 }
 
 # KMS key policy for SNS ans RDS to use the key
 resource "aws_kms_key" "sns_rds_events" {
+  count = local.is-production ? 0 : 1
   description         = "KMS key for encrypting RDS maintenance events in SNS"
   enable_key_rotation = true
 
@@ -271,16 +276,18 @@ resource "aws_kms_key" "sns_rds_events" {
 
 # KMS alias
 resource "aws_kms_alias" "sns_rds_events" {
+  count = local.is-production ? 0 : 1
   name          = "alias/${local.application_name}-${local.environment}-sns-rds-events"
-  target_key_id = aws_kms_key.sns_rds_events.key_id
+  target_key_id = aws_kms_key.sns_rds_events[0].key_id
 }
 # Create Topic subscription 
 
 resource "aws_sns_topic_subscription" "rds_to_slack_lambda" {
-  topic_arn = aws_sns_topic.maatdb_maintenance_topic.arn
+  count = local.is-production ? 0 : 1
+  topic_arn = aws_sns_topic.maatdb_maintenance_topic[0].arn
   protocol  = "lambda"
-  endpoint  = aws_lambda_function.dbmaintenance_sns_to_slack.arn
+  endpoint  = aws_lambda_function.dbmaintenance_sns_to_slack[0].arn
 
-  depends_on = [aws_lambda_permission.allow_rds_sns_invoke]
+  depends_on = [aws_lambda_permission.allow_rds_sns_invoke[0]]
 }
 

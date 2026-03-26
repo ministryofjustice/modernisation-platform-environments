@@ -257,6 +257,29 @@ locals {
           { name = "rdweb1", type = "A", lbs_map_key = "public" },
         ]
       }
+      "az.justice.gov.uk" = {
+        records = [
+          # validation records
+          # { name = "_bc45f2d6d9bf486b641716271dfbe56c.cafmtx", type = "CNAME", ttl = 86400, records = ["_1aa4c911695fe4b8da33b57c2405112d.sdgjtdhdhz.acm-validations.aws"] }, #this is auto populating
+          # cname records
+          { name = "cafmtx", type = "CNAME", ttl = "86400", records = ["cafmtx.planetfm.service.justice.gov.uk"] },
+          # NS records
+          { name = "bridge-oasys", type = "NS", ttl = "86400", records = ["ns-3.awsdns-00.com", "ns-1301.awsdns-34.org", "ns-977.awsdns-58.net", "ns-1726.awsdns-23.co.uk"] },
+          { name = "cafmtrainweb", type = "NS", ttl = "86400", records = ["ns-1710.awsdns-21.co.uk", "ns-153.awsdns-19.com", "ns-712.awsdns-25.net", "ns-1400.awsdns-47.org"] },
+          { name = "cafmwebx2", type = "NS", ttl = "86400", records = ["ns-588.awsdns-09.net", "ns-509.awsdns-63.com", "ns-1218.awsdns-24.org", "ns-1760.awsdns-28.co.uk"] },
+          { name = "csr", type = "NS", ttl = "86400", records = ["ns-1847.awsdns-38.co.uk", "ns-207.awsdns-25.com", "ns-1259.awsdns-29.org", "ns-934.awsdns-52.net"] },
+          { name = "nomis", type = "NS", ttl = "86400", records = ["ns-1694.awsdns-19.co.uk", "ns-1405.awsdns-47.org", "ns-949.awsdns-54.net", "ns-403.awsdns-50.com"] },
+          { name = "oasys", type = "NS", ttl = "86400", records = ["ns-1633.awsdns-12.co.uk", "ns-1387.awsdns-45.org", "ns-509.awsdns-63.com", "ns-800.awsdns-36.net"] },
+          { name = "p-oasys", type = "NS", ttl = "86400", records = ["ns-1956.awsdns-52.co.uk", "ns-639.awsdns-15.net", "ns-110.awsdns-13.com", "ns-1252.awsdns-28.org"] },
+          { name = "pp-nomis", type = "NS", ttl = "86400", records = ["ns-896.awsdns-48.net", "ns-1970.awsdns-54.co.uk", "ns-418.awsdns-52.com", "ns-1209.awsdns-23.org"] },
+          { name = "pp-cafmwebx", type = "NS", ttl = "86400", records = ["ns-1428.awsdns-50.org", "ns-658.awsdns-18.net", "ns-1604.awsdns-08.co.uk", "ns-73.awsdns-09.com"] },
+          { name = "pp-oasys", type = "NS", ttl = "86400", records = ["ns-360.awsdns-45.com", "ns-1408.awsdns-48.org", "ns-1717.awsdns-22.co.uk", "ns-1012.awsdns-62.net"] },
+          # A records
+          { name = "prs", type = "A", ttl = 3600, records = ["10.40.10.132"] }
+        ]
+
+        lb_alias_records = []
+      }
     }
 
     secretsmanager_secrets = {

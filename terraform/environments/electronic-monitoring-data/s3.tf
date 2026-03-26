@@ -57,7 +57,10 @@ locals {
   ]
 
   cross_account_recieve_mapping = local.is-development ? "test" : local.is-preproduction ? "production" : local.is-test ? "preproduction" : null
-  cross_env_bucket_policy       = local.is-preproduction ? [data.aws_iam_policy_document.allow_cross_env_upload[0].json] : []
+  cross_env_bucket_policy = {
+    (module.s3-dms-target-store-bucket.bucket.id) = module.s3-dms-target-store-bucket.bucket.arn
+    (module.s3-data-bucket.bucket.id)             = module.s3-data-bucket.bucket.arn
+  }
 }
 
 
@@ -587,6 +590,9 @@ module "s3-data-bucket" {
     aws.bucket-replication = aws
   }
 
+  bucket_policy = local.is-preproduction ? [
+    lookup(data.aws_iam_policy_document.allow_cross_env_upload, module.s3-data-bucket.bucket.id, { json = "{}" }).json
+  ] : []
   lifecycle_rule = [
     {
       id      = "main"
@@ -1142,7 +1148,7 @@ module "s3-glue-job-script-bucket" {
 # ------------------------------------------------------------------------
 
 data "aws_iam_policy_document" "allow_cross_env_upload" {
-  count = local.is-preproduction ? 1 : 0
+  for_each = local.is-preproduction ? local.cross_env_bucket_policy : {}
 
   statement {
     sid    = "AllowProdLambdaWrite"
@@ -1156,7 +1162,7 @@ data "aws_iam_policy_document" "allow_cross_env_upload" {
       "s3:PutObject",
       "s3:PutObjectAcl"
     ]
-    resources = ["${module.s3-dms-target-store-bucket.bucket.arn}/*"]
+    resources = ["${each.value}/*"]
   }
 }
 
@@ -1182,7 +1188,9 @@ module "s3-dms-target-store-bucket" {
     aws.bucket-replication = aws
   }
 
-  bucket_policy = local.cross_env_bucket_policy
+  bucket_policy = local.is-preproduction ? [
+    lookup(data.aws_iam_policy_document.allow_cross_env_upload, module.s3-dms-target-store-bucket.bucket.id, { json = "{}" }).json
+  ] : []
   lifecycle_rule = [
     {
       id      = "main"

@@ -33,3 +33,7 @@ data "aws_ec2_transit_gateway" "moj_tgw" {
     values = ["available"]
   }
 }
+
+data "aws_secretsmanager_secret_version" "route53_resolver_moj_blocklist" {
+  secret_id = module.route53_resolver_moj_blocklist_secret.secret_id
+}

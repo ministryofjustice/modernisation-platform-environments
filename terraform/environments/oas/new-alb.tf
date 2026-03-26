@@ -4,9 +4,9 @@
 locals {
   # Define CIDR blocks once to avoid repetition
   moj_cidr_blocks = [
-    "51.149.251.0/24",   # MOJO
-    "51.149.250.0/24",   # MOJO
-    "10.184.0.0/14",     # MOJO device IP taken from CCMS
+    # "51.149.251.0/24",   # MOJO
+    # "51.149.250.0/24",   # MOJO
+    # "10.184.0.0/14",     # MOJO device IP taken from CCMS
     "35.176.254.38/32",  # Workspace
     "52.56.212.11/32",   # Workspace
     "35.177.173.197/32", # Workspace

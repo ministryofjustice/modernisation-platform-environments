@@ -22,16 +22,71 @@ resource "aws_security_group_rule" "yjsm_allow_all_internal_group" {
   description       = "Allow all outbound from yjsm"
 }
 
+# (ECS auto-scaling to YJSM-hub)
+resource "aws_security_group_rule" "ecs_autoscaling_to_yjsmhub" {
+  type                     = "ingress"
+  from_port                = 9091
+  to_port                  = 9091
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.yjsm_service.id
+  source_security_group_id = var.ecs_autoscaling_sg_id
+  description              = "ECS external to YJSM-Hub"
+}
 
-# (ECS external to YJSMhub)
-resource "aws_security_group_rule" "ecs_to_yjsm_external" {
+# (ECS auto-scaling to YJSM-hub-admin)
+resource "aws_security_group_rule" "ecs_autoscaling_to_yjsm_hub_admin" {
+  type                     = "ingress"
+  from_port                = 8401
+  to_port                  = 8401
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.yjsm_service.id
+  source_security_group_id = var.ecs_autoscaling_sg_id
+  description              = "ECS external to YJSM-Hub-Admin"
+}
+
+# (ECS auto-scaling to YJSM)
+resource "aws_security_group_rule" "ecs_autoscaling_to_yjsm" {
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.yjsm_service.id
+  source_security_group_id = var.ecs_autoscaling_sg_id
+  description              = "ECS auto-scaling to YJSM"
+}
+
+
+# (ECS external to YJSM-hub)
+resource "aws_security_group_rule" "ecs_to_yjsmhub_external" {
   type                     = "ingress"
   from_port                = 9091
   to_port                  = 9091
   protocol                 = "tcp"
   security_group_id        = aws_security_group.yjsm_service.id
   source_security_group_id = var.ecs_service_external_sg_id
-  description              = "ECS external to YJSMHub"
+  description              = "ECS external to YJSM-Hub"
+}
+
+# (ECS external to YJSM-hub-admin)
+resource "aws_security_group_rule" "ecs_to_yjsm_hub_admin_external" {
+  type                     = "ingress"
+  from_port                = 8401
+  to_port                  = 8401
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.yjsm_service.id
+  source_security_group_id = var.ecs_service_external_sg_id
+  description              = "ECS external to YJSM-Hub-Admin"
+}
+
+# (ECS external to YJSM)
+resource "aws_security_group_rule" "ecs_to_yjsm_external" {
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.yjsm_service.id
+  source_security_group_id = var.ecs_service_external_sg_id
+  description              = "ECS external to YJSM"
 }
 
 # (ECS internal to YJSM)
@@ -45,7 +100,7 @@ resource "aws_security_group_rule" "ecs_to_yjsm_internal" {
   description              = "ECS internal to YJSM"
 }
 
-# (ECS internal to YJSMhub)
+# (ECS internal to YJSM-hub)
 resource "aws_security_group_rule" "ecs_to_yjsmhub_internal" {
   type                     = "ingress"
   from_port                = 9091
@@ -53,10 +108,10 @@ resource "aws_security_group_rule" "ecs_to_yjsmhub_internal" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.yjsm_service.id
   source_security_group_id = var.ecs_service_internal_sg_id
-  description              = "ECS internal to YJSMHub"
+  description              = "ECS internal to YJSM-Hub"
 }
 
-# (ECS internal to YJSMhub-admin)
+# (ECS internal to YJSM-hub-admin)
 resource "aws_security_group_rule" "ecs_to_yjsmhub_admin" {
   type                     = "ingress"
   from_port                = 8401
@@ -64,7 +119,7 @@ resource "aws_security_group_rule" "ecs_to_yjsmhub_admin" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.yjsm_service.id
   source_security_group_id = var.ecs_service_internal_sg_id
-  description              = "ECS internal to YJSMHub-admin"
+  description              = "ECS internal to YJSM-Hub-admin"
 }
 
 # (ECS internal to ASSETS)

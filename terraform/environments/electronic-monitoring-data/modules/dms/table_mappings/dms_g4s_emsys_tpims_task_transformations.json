@@ -37,9 +37,7 @@
       "primary-key-def": {
         "name": "PK_CurfewSegment",
         "origin": "primary-key",
-        "columns": [
-          "CurfewSegmentID"
-        ]
+        "columns": ["CurfewSegmentID"]
       }
     },
     {
@@ -79,9 +77,7 @@
       "primary-key-def": {
         "name": "PK_GPSPositionLatest",
         "origin": "primary-key",
-        "columns": [
-          "GPSPositionID"
-        ]
+        "columns": ["GPSPositionID"]
       }
     }
   ]

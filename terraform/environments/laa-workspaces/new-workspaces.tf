@@ -1,12 +1,26 @@
 ##############################################
-### WorkSpaces Directory Registration
+### WorkSpaces Directory with IAM Identity Center
+###
+### ⚠️ MANUAL CREATION + IMPORT REQUIRED
+###
+### STEP 1: Create directory manually in AWS Console with IAM Identity Center
+### STEP 2: Add the directory ID to application_variables.json: workspaces_directory_id
+### STEP 3: Import into Terraform:
+###   terraform import aws_workspaces_directory.workspaces[0] d-xxxxxxxxxx
+### STEP 4: Apply to manage the configuration
+###
+### This resource will only be created when workspaces_directory_id is set in application_variables.json
 ##############################################
 
 resource "aws_workspaces_directory" "workspaces" {
-  count = local.environment == "development" ? 1 : 0
+  count = (
+    local.environment == "development" &&
+    try(local.application_data.accounts[local.environment].workspaces_directory_id, "") != ""
+  ) ? 1 : 0
 
-  directory_id = aws_directory_service_directory.workspaces_ad[0].id
-  subnet_ids   = [aws_subnet.private_a[0].id, aws_subnet.private_b[0].id]
+  # This directory_id comes from application_variables.json after manual creation
+  directory_id = local.application_data.accounts[local.environment].workspaces_directory_id
+  subnet_ids   = try(data.terraform_remote_state.workspace_components.outputs.private_subnet_ids, [])
 
   self_service_permissions {
     change_compute_type  = false
@@ -31,7 +45,6 @@ resource "aws_workspaces_directory" "workspaces" {
     enable_internet_access              = false
     enable_maintenance_mode             = true
     user_enabled_as_local_administrator = false
-    default_ou                          = "OU=Computers,OU=${local.application_data.accounts[local.environment].ad_short_name},DC=${replace(local.application_data.accounts[local.environment].ad_directory_name, ".", ",DC=")}"
   }
 
   ip_group_ids = [aws_workspaces_ip_group.workspaces[0].id]
@@ -44,8 +57,18 @@ resource "aws_workspaces_directory" "workspaces" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-${local.environment}-workspaces-directory" }
+    {
+      "Name"               = "${local.application_name}-${local.environment}-workspaces-directory"
+      "AuthenticationType" = "IAM-Identity-Center"
+      "IdentityProvider"   = "IAMIdentityCenter"
+      "DirectoryType"      = "IAMIdentityCenter"
+    }
   )
+
+  lifecycle {
+    # Prevent replacement if directory_id is updated after import
+    ignore_changes = [directory_id]
+  }
 }
 
 ##############################################
@@ -70,18 +93,14 @@ resource "aws_workspaces_ip_group" "workspaces" {
 }
 
 ##############################################
-### WorkSpaces Instances
-### Users are defined in new-workspace-users.tf
-### AD users are auto-created by terraform_data.ad_users
-### Uncomment when ready to deploy workspaces
+### WorkSpaces Creation
 ##############################################
-
 # resource "aws_workspaces_workspace" "workspaces" {
 #   for_each = local.environment == "development" ? local.workspace_users : {}
 #
 #   directory_id = aws_workspaces_directory.workspaces[0].id
 #   bundle_id    = local.application_data.accounts[local.environment].workspace_bundle_id
-#   user_name    = each.key
+#   user_name    = each.value.email  # Use IAM Identity Center username (usually email)
 #
 #   root_volume_encryption_enabled = true
 #   user_volume_encryption_enabled = true
@@ -95,15 +114,16 @@ resource "aws_workspaces_ip_group" "workspaces" {
 #     running_mode_auto_stop_timeout_in_minutes = local.workspace_types[each.value.instance_type].running_mode_auto_stop_timeout_in_minutes
 #   }
 #
-#   depends_on = [terraform_data.ad_users]
-#
 #   tags = merge(
 #     local.tags,
 #     {
-#       "Name"  = "${local.application_name}-${local.environment}-workspace-${each.key}"
-#       "User"  = each.key
-#       "Email" = each.value.email
+#       "Name"              = "${local.application_name}-${local.environment}-workspace-${each.key}"
+#       "User"              = each.key
+#       "Email"             = each.value.email
+#       "AuthSource"        = "IAMIdentityCenter"
+#       "IAMIdentityCenter" = local.application_data.accounts[local.environment].identity_center_instance_arn
 #     }
 #   )
+# }
 # }
 

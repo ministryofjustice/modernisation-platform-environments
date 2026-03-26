@@ -7,11 +7,8 @@ export DEBIAN_FRONTEND=noninteractive
 echo "Updating package lists..."
 apt-get update -y
 
-echo "Upgrading installed packages..."
-apt-get upgrade -y
-
-echo "Installing required packages and Kali default tools..."
-apt-get install -y wget ca-certificates git kali-linux-default
+echo "Installing required packages..."
+apt-get install -y wget ca-certificates git
 
 echo "Downloading Amazon SSM Agent..."
 cd /tmp
@@ -25,4 +22,4 @@ systemctl enable amazon-ssm-agent
 systemctl restart amazon-ssm-agent
 systemctl status amazon-ssm-agent --no-pager || true
 
-echo "User data script completed successfully."
+echo "SSM bootstrap completed."

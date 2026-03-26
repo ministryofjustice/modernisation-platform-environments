@@ -63,6 +63,7 @@ module "yjsm" {
   ecs_service_internal_sg_id    = module.ecs.ecs_service_internal_sg_id
   ecs_service_external_sg_id    = module.ecs.ecs_service_external_sg_id
   esb_service_sg_id             = module.esb.esb_security_group_id
+  ecs_autoscaling_sg_id         = module.ecs.autoscaling_sg_id
   rds_cluster_security_group_id = module.aurora.rds_cluster_security_group_id
   alb_security_group_id         = module.internal_alb.alb_security_group_id
   connectivity_alb_sg_id        = module.connectivity_alb.alb_security_group_id
@@ -80,8 +81,12 @@ module "yjsm" {
   ]
 
   yjsm_secrets_access_policy_secret_arns = jsonencode([
+    for s in [
     module.aurora.app_rotated_postgres_secret_arn,
-    aws_secretsmanager_secret.auto_admit_secret.arn
+    aws_secretsmanager_secret.auto_admit_secret.arn,
+    aws_secretsmanager_secret.jwt_secret.arn,
+    try(aws_secretsmanager_secret.yjsm_hub_doc_gateway_auth[0].arn, null)
+    ] : s if s != null
   ])
 }
 

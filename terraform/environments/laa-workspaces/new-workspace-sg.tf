@@ -7,7 +7,7 @@ resource "aws_security_group" "workspaces" {
 
   name_prefix = "${local.application_name}-workspaces-"
   description = "Security group for ${local.application_name} WorkSpaces"
-  vpc_id      = aws_vpc.workspaces[0].id
+  vpc_id      = try(data.terraform_remote_state.workspace_components.outputs.vpc_id, null)
 
   tags = merge(
     local.tags,
@@ -42,7 +42,7 @@ resource "aws_security_group_rule" "workspaces_wsp_ingress" {
   from_port         = 4195
   to_port           = 4195
   protocol          = "tcp"
-  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
+  cidr_blocks       = [try(data.terraform_remote_state.workspace_components.outputs.vpc_cidr_block, local.application_data.accounts[local.environment].vpc_cidr)]
 }
 
 # Ingress - Allow PCoIP from VPC
@@ -55,7 +55,7 @@ resource "aws_security_group_rule" "workspaces_pcoip_ingress" {
   from_port         = 4172
   to_port           = 4172
   protocol          = "tcp"
-  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
+  cidr_blocks       = [try(data.terraform_remote_state.workspace_components.outputs.vpc_cidr_block, local.application_data.accounts[local.environment].vpc_cidr)]
 }
 
 resource "aws_security_group_rule" "workspaces_pcoip_udp_ingress" {
@@ -67,7 +67,7 @@ resource "aws_security_group_rule" "workspaces_pcoip_udp_ingress" {
   from_port         = 4172
   to_port           = 4172
   protocol          = "udp"
-  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
+  cidr_blocks       = [try(data.terraform_remote_state.workspace_components.outputs.vpc_cidr_block, local.application_data.accounts[local.environment].vpc_cidr)]
 }
 
 # Ingress - Allow RDP from VPC (for management)
@@ -80,6 +80,6 @@ resource "aws_security_group_rule" "workspaces_rdp_ingress" {
   from_port         = 3389
   to_port           = 3389
   protocol          = "tcp"
-  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
+  cidr_blocks       = [try(data.terraform_remote_state.workspace_components.outputs.vpc_cidr_block, local.application_data.accounts[local.environment].vpc_cidr)]
 }
 

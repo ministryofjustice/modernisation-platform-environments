@@ -16,6 +16,7 @@ locals {
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "nomis-production"
+          dba       = "nomis-production-dba" # for callouts
         }
       }
     }
@@ -341,6 +342,8 @@ locals {
           local.cloudwatch_metric_alarms.db_connected,
           local.cloudwatch_metric_alarms.db_backup,
           local.cloudwatch_metric_alarms.db_nomis_batch,
+          local.cloudwatch_metric_alarms.db_xtag_out,
+          local.cloudwatch_metric_alarms.db_textfile_metric_not_updated,
         )
         config = merge(local.ec2_instances.db.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
@@ -405,7 +408,9 @@ locals {
           local.cloudwatch_metric_alarms.db,
           local.cloudwatch_metric_alarms.db_connected,
           local.cloudwatch_metric_alarms.db_backup,
+          local.cloudwatch_metric_alarms.db_nomis_batch,
           local.cloudwatch_metric_alarms.db_misload,
+          local.cloudwatch_metric_alarms.db_textfile_metric_not_updated,
         )
         config = merge(local.ec2_instances.db.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"

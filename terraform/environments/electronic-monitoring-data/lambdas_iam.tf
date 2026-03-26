@@ -902,7 +902,7 @@ data "aws_iam_policy_document" "load_mdss_lambda_role_policy_document" {
     resources = [
       module.kms_metadata_key.key_arn,
     ]
-  }  
+  }
 }
 
 resource "aws_iam_role" "load_mdss" {
@@ -1786,8 +1786,8 @@ data "aws_iam_policy_document" "fan_out_tags_policy_document" {
     ]
   }
   statement {
-    sid     = "ListRawFormattedBucket"
-    effect  = "Allow"
+    sid    = "ListRawFormattedBucket"
+    effect = "Allow"
     actions = [
       "s3:ListBucket",
     ]

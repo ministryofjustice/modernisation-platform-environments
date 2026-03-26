@@ -67,7 +67,7 @@ module "s3_bucket_oracledb_backups" {
 }
 
 resource "aws_s3_bucket_object_lock_configuration" "oracledb_backup_lock_configuration" {
-  count = try(var.db_backup_config.object_lock_days, null) != null ? 1 : 0
+  count  = try(var.db_backup_config.object_lock_days, null) != null ? 1 : 0
   bucket = module.s3_bucket_oracledb_backups.bucket.id
 
   rule {

@@ -1,5 +1,6 @@
 module "codedeploy" {
   source           = "./modules/codedeploy"
+  create_svc_pilot = local.application_data.accounts[local.environment].create_svc_pilot  # Added to conditionally create resources for the service pilot
   project_name     = local.project_name
   tags             = local.tags
   cluster_name     = "yjaf-cluster"
@@ -30,15 +31,18 @@ module "codedeploy" {
     { "views" = "internal" },
     { "workflow" = "internal" },
     { "yp" = "internal" },
+    { "yjsm-hub-svc" = "yjsm-hub-svc" }
   ]
 
   internal_alb_name     = "yjaf-int-internal"
   external_alb_name     = "yjaf-ext-external"
   connectivity_alb_name = "yjaf-connectivity-internal"
+  yjsm_hub_svc_alb_name = "yjsm-hub-svc-ext-external"
   depends_on = [
     module.internal_alb,
     module.external_alb,
     module.connectivity_alb,
+    module.yjsm_hub_svc_alb,
     module.ecs,
     module.yjsm
   ]

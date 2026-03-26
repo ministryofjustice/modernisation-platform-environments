@@ -48,7 +48,7 @@ module "waf" {
       name         = "whitelist-ip"
       priority     = 2
       description  = "Whitelisted IP addresses"
-      ip_addresses = ["66.103.29.115/32"]
+       ip_addresses = ["66.103.29.115/32"]
     }
   }
 

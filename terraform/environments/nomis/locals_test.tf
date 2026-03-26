@@ -787,6 +787,9 @@ locals {
       "/oracle/weblogic/t1"       = local.secretsmanager_secrets.web
       "/oracle/weblogic/t2"       = local.secretsmanager_secrets.web
       "/oracle/weblogic/t3"       = local.secretsmanager_secrets.web
+      "/oracle/database/T1CNOMG"  = local.secretsmanager_secrets.db_cnom
+      "/oracle/database/T1CAUDG"  = local.secretsmanager_secrets.db
+      "/oracle/database/T1CMISG"  = local.secretsmanager_secrets.db_mis
       "/oracle/database/T1CNOM"   = local.secretsmanager_secrets.db_cnom
       "/oracle/database/T1NDH"    = local.secretsmanager_secrets.db
       "/oracle/database/T1TRDAT"  = local.secretsmanager_secrets.db

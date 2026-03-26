@@ -6,10 +6,11 @@ locals {
   module_git_hash = contains(local.head, "unknown") ? "unknown" : trim(file(local.git_hash_path), "\n")
 
   tags = {
-    "module"         = "directory-service",
-    "module_version" = local.module_version,
-    #"module_git_hash" = local.module_git_hash, #todo revisit this if we start using remote modules with tagging in github
-    "project" = var.project_name
+    "module"            = "directory-service",
+    "module_version"    = local.module_version,
+    #"module_git_hash"  = local.module_git_hash, #todo revisit this if we start using remote modules with tagging in github
+    "project"           = var.project_name
+    "install-trend-av"  = "true"
   }
 
   all_tags = merge(var.tags, local.tags)
