@@ -207,8 +207,8 @@ module "aws_s3_staging" {
           "s3:PutObjectTagging"
         ],
         Resource = [
-          module.aws_s3_landing.bucket.arn,
-          "${module.aws_s3_landing.bucket.arn}/*"
+          module.aws_s3_staging.bucket.arn,
+          "${module.aws_s3_staging.bucket.arn}/*"
         ]
       }
     ]
