@@ -83,7 +83,7 @@ locals {
       container_port           = 8080
       container_memory         = 4096
       container_cpu            = 2048
-      task_definition_revision = 16
+      task_definition_revision = 18
       ec2_instance_type        = "m5.large"
       # max_size                 = 2
       # min_size                 = 1
@@ -141,7 +141,7 @@ locals {
       container_port           = 8080
       container_memory         = 4096
       container_cpu            = 2048
-      task_definition_revision = 15
+      task_definition_revision = 18
     }
 
     pwm = {
