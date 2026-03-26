@@ -188,6 +188,28 @@ module "aws_s3_staging" {
             "aws:SecureTransport" = "false"
           }
         }
+      },
+      {
+        Sid    = "AllowAnalyticalPlatformIngestionService",
+        Effect = "Allow",
+        Principal = {
+          AWS = [
+            "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-development"]}:role/transfer",
+            "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-production"]}:role/transfer"
+          ]
+        },
+        Action = [
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:GetObjectAcl",
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:PutObjectTagging"
+        ],
+        Resource = [
+          module.aws_s3_landing.bucket.arn,
+          "${module.aws_s3_landing.bucket.arn}/*"
+        ]
       }
     ]
   })]
