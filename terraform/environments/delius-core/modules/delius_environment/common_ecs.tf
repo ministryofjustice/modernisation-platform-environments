@@ -1,5 +1,5 @@
 module "ecs" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=TM-1916-weblogic-ec2-ecs"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v6.0.1"
 
   name = "delius-core-${var.env_name}-cluster"
 
