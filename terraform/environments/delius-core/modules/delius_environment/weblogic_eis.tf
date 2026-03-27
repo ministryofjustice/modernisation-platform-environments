@@ -23,12 +23,12 @@ module "weblogic_eis" {
   container_cpu    = var.delius_microservice_configs.weblogic_eis.container_cpu
 
   container_vars_default = {
-    for name in local.weblogic_ssm.vars : name => data.aws_ssm_parameter.weblogic_ssm[name].value
+    for key, name in var.delius_microservice_configs.weblogic_params : key => data.aws_ssm_parameter.weblogic_ssm[key].value
   }
   container_vars_env_specific = try(var.delius_microservice_configs.weblogic_eis.container_vars_env_specific, {})
 
   container_secrets_default = merge({
-    for name in local.weblogic_ssm.secrets : name => module.weblogic_ssm.arn_map[name]
+    for name in local.weblogic_secrets : name => module.weblogic_ssm.arn_map[name]
     }, {
     "JDBC_PASSWORD"         = "${module.oracle_db_shared.database_application_passwords_secret_arn}:delius_pool::",
     "USERMANAGEMENT_SECRET" = data.aws_ssm_parameter.usermanagement_secret.arn

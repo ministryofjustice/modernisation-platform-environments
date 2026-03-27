@@ -666,6 +666,7 @@ module "ears_sars_request" {
 
   environment_variables = {
     SOURCE_BUCKET = module.s3-dms-target-store-bucket.bucket.id
+    LOGGING_BUCKET_NAME = module.s3-logging-bucket.bucket.id
   }
 }
 

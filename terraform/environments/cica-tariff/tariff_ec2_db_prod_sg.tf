@@ -74,7 +74,7 @@ module "tariff_db_prod_security_group" {
     },
     {
       from_port = 8400
-      to_port   = 8403
+      to_port   = 8404
       protocol  = "tcp"
       cidr_blocks = join(",", [
         local.cidr_cica_ss_a,
