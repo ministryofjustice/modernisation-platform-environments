@@ -475,7 +475,7 @@ module "s3_glue_job_bucket" {
     {
       id     = "glue-job-shuffle-data"
       prefix = "glue-job-shuffle-data/"
-      days   = 30
+      days   = 7
     }
   ]
 
