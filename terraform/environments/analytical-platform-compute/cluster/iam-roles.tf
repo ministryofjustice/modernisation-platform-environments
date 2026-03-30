@@ -14,12 +14,12 @@ module "kubernetes_access_iam_role" {
         "sts:AssumeRole",
         "sts:TagSession"
       ]
-      principals = {
+      principals = [{
         AWS = [
           "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan",
           "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply"
         ]
-      }
+      }]
     }
   }
 
