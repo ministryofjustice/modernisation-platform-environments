@@ -104,12 +104,12 @@
           - name: Set IAM Role Name
             id: set-role
             run: |
-              if [[ ("${{ inputs.environment }}" == "preproduction" || "${{ inputs.environment }}" == "nonlive" || "${{ inputs.environment }}" == "production" || "${{ inputs.environment }}" == "live") || "${{ inputs.application }}" != "analytical-platform-compute" || "${{ inputs.application }}" != "data-platform" ]]; then
-                echo "role_name=github-actions-plan" >> $GITHUB_OUTPUT
-                echo "session_name=githubactionsplanrolesession" >> $GITHUB_OUTPUT
-              else
+              if [[ ("${{ inputs.environment }}" == "development" || "${{ inputs.environment }}" == "test" || "${{ inputs.application }}" == "analytical-platform-compute" || "${{ inputs.application }}" == "data-platform") ]]; then
                 echo "role_name=github-actions" >> $GITHUB_OUTPUT
                 echo "session_name=githubactionsrolesession" >> $GITHUB_OUTPUT
+              else
+                echo "role_name=github-actions-plan" >> $GITHUB_OUTPUT
+                echo "session_name=githubactionsplanrolesession" >> $GITHUB_OUTPUT
               fi
 
           - name: Configure AWS Credentials
@@ -317,11 +317,11 @@
           - name: Set IAM Role Name
             id: set-role
             run: |
-              if [[ ("${{ inputs.environment }}" == "preproduction" || "${{ inputs.environment }}" == "nonlive" || "${{ inputs.environment }}" == "production" || "${{ inputs.environment }}" == "live") || "${{ inputs.application }}" != "analytical-platform-compute" || "${{ inputs.application }}" != "data-platform" ]]; then
-                echo "role_name=github-actions-apply" >> $GITHUB_OUTPUT
+              if [[ ("${{ inputs.environment }}" == "development" || "${{ inputs.environment }}" == "test" || "${{ inputs.application }}" == "analytical-platform-compute" || "${{ inputs.application }}" == "data-platform") ]]; then
+                echo "role_name=github-actions" >> $GITHUB_OUTPUT
                 echo "session_name=githubactionsrolesession" >> $GITHUB_OUTPUT
               else
-                echo "role_name=github-actions" >> $GITHUB_OUTPUT
+                echo "role_name=github-actions-apply" >> $GITHUB_OUTPUT
                 echo "session_name=githubactionsrolesession" >> $GITHUB_OUTPUT
               fi
 
