@@ -1,3 +1,39 @@
+module "kubernetes_access_iam_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.3.0"
+
+  name            = "kubernetes-access"
+  use_name_prefix = false
+
+  trust_policy_permissions = {
+    TrustRoleAndServiceToAssume = {
+      actions = [
+        "sts:AssumeRole",
+        "sts:TagSession"
+      ]
+      principals = {
+        AWS = [
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan",
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply"
+        ]
+      }
+    }
+  }
+
+  create_inline_policy = true
+  inline_policy_permissions = {
+    EksApiAccess = {
+      actions   = ["eks:DescribeCluster"]
+      resources = [module.eks.cluster_arn]
+    }
+  }
+
+  tags = local.tags
+}
+
 module "ebs_csi_driver_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions

@@ -4,7 +4,7 @@
 
 AWS_ACCOUNT_ID=${1}
 EKS_CLUSTER_NAME=${2}
-AWS_ROLE=${3:-MemberInfrastructureAccess}
+AWS_ROLE=${3:-"kubernetes-access"}
 
 if [[ "${GITHUB_ACTIONS}" == "true" ]]; then
 

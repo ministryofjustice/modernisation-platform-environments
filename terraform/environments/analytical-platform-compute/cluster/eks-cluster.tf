@@ -204,6 +204,18 @@ module "eks" {
         }
       }
     }
+    # Kubernetes Access
+    kubernetes-access = {
+      principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/kubernetes-access"
+      policy_associations = {
+        eks-admin = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
+    }
     # Analytical Platform Engineering access to cluster
     sso-administrator = {
       principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${one(data.aws_iam_roles.eks_sso_access_role.names)}"
