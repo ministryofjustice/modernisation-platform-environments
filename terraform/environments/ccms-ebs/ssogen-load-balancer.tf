@@ -23,7 +23,7 @@ resource "aws_lb" "ssogen_alb" {
 resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_enc_console" {
   count       = local.is-development || local.is-test ? 1 : 0
   name        = lower(format("tg-%s-console-enc", local.application_name_ssogen))
-  port        = "5443"
+  port        = "4443"
   protocol    = "HTTPS"
   vpc_id      = data.aws_vpc.shared.id
   target_type = "instance"
