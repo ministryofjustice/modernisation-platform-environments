@@ -1,24 +1,8 @@
-# variable "s3_bucket_name" {
-#   description = "The name of the S3 bucket the task will access"
-#   type        = string
-# }
-#
-variable "emds_gdpr_ecr_name" {
-  description = "The app name of the core shared services ecr repo, as listed in modernisation platform repo"
-  type        = string
-  default     = "electronic-monitoring-gdpr"
+locals {
+  emds_gdpr_ecr_name = "electronic-monitoring-gdpr"
+  shred_unstructured_image_name = "gdpr_zip_file_shredder"
+  shred_unstructured_docker_image_uri = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/${local.emds_gdpr_ecr_name}:${local.shred_unstructured_image_name}-${local.environment}"
 }
-variable "shred_unstructured_image_name" {
-  description = "The Image name of your pushed Docker image (e.g., from ECR)"
-  type        = string
-  default     = "gdpr_zip_file_shredder"
-}
-variable "shred_unstructured_docker_image_uri" {
-  description = "The URI of your pushed Docker image (e.g., from ECR)"
-  type        = string
-  default     = "${var.core_shared_services_id}.dkr.ecr.eu-west-2.amazonaws.com/${var.emds_gdpr_ecr_name}:${shred_unstructured_image_name}-${local.environment}"
-}
-
 
 # ==============================================================================
 # 1. IAM: Batch Service Role (Allows AWS Batch to manage EC2 instances)
@@ -51,7 +35,7 @@ resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_comp
   compute_environment_name = "shred-unstructured-from-zip-env"
   type                     = "MANAGED"
   service_role             = aws_iam_role.batch_service_role.arn
-  tags = merge(local.tags, { Batch_Job_Name = var.shred_unstructured_image_name })
+  tags = merge(local.tags, { Batch_Job_Name = local.shred_unstructured_image_name })
 
   compute_resources {
     type                = "SPOT"
@@ -75,13 +59,13 @@ resource "aws_batch_job_queue" "shred_unstructured_from_zip_batch_queue" {
   state                = "ENABLED"
   priority             = 1
   compute_environments = [aws_batch_compute_environment.shred_unstructured_from_zip_batch_compute_env.arn]
-  tags = merge(local.tags, { Batch_Job_Name = var.shred_unstructured_image_name })
+  tags = merge(local.tags, { Batch_Job_Name = local.shred_unstructured_image_name })
 }
 
 resource "aws_batch_job_definition" "shred_unstructured_from_zip_job" {
   name = "shred-unstructured-from-zip-job"
   type = "container"
-  tags = merge(local.tags, { Batch_Job_Name = var.shred_unstructured_image_name })
+  tags = merge(local.tags, { Batch_Job_Name = local.shred_unstructured_image_name })
 
   # Retry failed jobs once, just in case of an EC2 Spot interruption
   retry_strategy {
@@ -89,7 +73,7 @@ resource "aws_batch_job_definition" "shred_unstructured_from_zip_job" {
   }
 
   container_properties = jsonencode({
-    image            = var.shred_unstructured_docker_image_uri
+    image            = local.shred_unstructured_docker_image_uri
     executionRoleArn = aws_iam_role.gdpr_execution_role.arn
     jobRoleArn       = aws_iam_role.gdpr_job_role.arn
     
