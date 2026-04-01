@@ -23,7 +23,7 @@ resource "aws_iam_role" "gdpr_batch_service_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "gdpr_batch_service_role_attachment" {
-  role       = aws_iam_role.batch_service_role.name
+  role       = aws_iam_role.gdpr_batch_service_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole"
 }
 
@@ -34,7 +34,7 @@ resource "aws_iam_role_policy_attachment" "gdpr_batch_service_role_attachment" {
 resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_compute_env" {
   name                     = "shred-unstructured-from-zip-env"
   type                     = "MANAGED"
-  service_role             = aws_iam_role.batch_service_role.arn
+  service_role             = aws_iam_role.gdpr_batch_service_role.arn
   tags = merge(local.tags, { Batch_Job_Name = local.shred_unstructured_image_name })
 
   compute_resources {
@@ -215,6 +215,7 @@ resource "aws_iam_role_policy_attachment" "gdpr_batch_jobs_s3_access_policy_atta
 
 resource "aws_security_group" "gdpr_batch_sg" {
   #checkov:skip=CKV2_AWS_5
+  count       = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
   name_prefix = "emds-gdpr-batch-sg-"
   description = "Secuity Group for GDPR Batch Compute Environment"
   vpc_id      = data.aws_vpc.shared.id
