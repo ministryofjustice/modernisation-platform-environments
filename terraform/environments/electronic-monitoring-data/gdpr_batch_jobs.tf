@@ -120,7 +120,7 @@ data "aws_iam_policy_document" "gdpr_batch_jobs_assume_ecs_policy" {
 
 resource "aws_iam_role" "gdpr_execution_role" {
   name               = "emds-gdpr-execution-role" # STRICT NAME REQUIRED BY EXTERNAL ECR
-  assume_role_policy = data.aws_iam_policy_document.gdpr_batch_jobs_assume_ecr_policy.json
+  assume_role_policy = data.aws_iam_policy_document.gdpr_batch_jobs_assume_ecs_policy.json
 }
 
 resource "aws_iam_role_policy_attachment" "gdpr_batch_jobs_ecs_execution_role_policy" {
@@ -173,12 +173,13 @@ resource "aws_iam_role_policy_attachment" "gdpr_batch_jobs_ecr_policy_attach" {
 ##
 
 # ==============================================================================
-# 3. IAM: Job Role (For the Bash script to access S3)
+# 3. IAM: Job Role (For the code to access S3)
 # ==============================================================================
 
-resource "aws_iam_role" "gdpr_job_role" {
-  name               = "emds-gdpr-shred-job-role"
-  assume_role_policy = data.aws_iam_policy_document.gdpr_batch_jobs_s3_access_policy.json
+# Can re-use the assume ecs statement as it is the same, but want different permissions here.
+resource "aws_iam_role" "gdpr_batch_code_job_role" {
+  name               = "emds-gdpr-code-job-role"
+  assume_role_policy = data.aws_iam_policy_document.gdpr_batch_jobs_assume_ecs_policy.json
 }
 
 ## S3 Policies
@@ -199,7 +200,7 @@ resource "aws_iam_policy" "gdpr_batch_jobs_s3_access_policy" {
   policy = data.aws_iam_policy_document.gdpr_batch_jobs_s3_access_policy_document.json
 }
 resource "aws_iam_role_policy_attachment" "gdpr_batch_jobs_s3_access_policy_attach" {
-  role       = aws_iam_role.gdpr_job_role.name
+  role       = aws_iam_role.gdpr_batch_code_job_role.name
   policy_arn = aws_iam_policy.gdpr_batch_jobs_s3_access_policy.arn
 }
 ##
