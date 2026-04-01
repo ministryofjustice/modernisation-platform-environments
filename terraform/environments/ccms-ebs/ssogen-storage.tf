@@ -3,7 +3,7 @@ resource "aws_efs_file_system" "storage" {
   encrypted        = true
   performance_mode = local.application_data.accounts[local.environment].ssogen_efs_performance_mode
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s-efs", local.application_name_ssogen, local.environment)) }
+    { Name = lower(format("%s-%s-efs", local.application_name_ssogen, local.environment)), backup = "true" }
   )
 }
 
