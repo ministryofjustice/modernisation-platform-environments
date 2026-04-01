@@ -1,0 +1,221 @@
+# variable "s3_bucket_name" {
+#   description = "The name of the S3 bucket the task will access"
+#   type        = string
+# }
+#
+variable "emds_gdpr_ecr_name" {
+  description = "The app name of the core shared services ecr repo, as listed in modernisation platform repo"
+  type        = string
+  default     = "electronic-monitoring-gdpr"
+}
+variable "shred_unstructured_image_name" {
+  description = "The Image name of your pushed Docker image (e.g., from ECR)"
+  type        = string
+  default     = "gdpr_zip_file_shredder"
+}
+variable "shred_unstructured_docker_image_uri" {
+  description = "The URI of your pushed Docker image (e.g., from ECR)"
+  type        = string
+  default     = "${var.core_shared_services_id}.dkr.ecr.eu-west-2.amazonaws.com/${var.emds_gdpr_ecr_name}:${shred_unstructured_image_name}-${local.environment}"
+}
+
+
+# ==============================================================================
+# 1. IAM: Batch Service Role (Allows AWS Batch to manage EC2 instances)
+# ==============================================================================
+data "aws_iam_policy_document" "gdpr_batch_assume_role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["batch.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "gdpr_batch_service_role" {
+  name               = "emds-gdpr-batch-service-role"
+  assume_role_policy = data.aws_iam_policy_document.gdpr_batch_assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "gdpr_batch_service_role_attachment" {
+  role       = aws_iam_role.batch_service_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole"
+}
+
+# ==============================================================================
+# 1.a. AWS Batch Infrastructure - shred unstructured job
+# ==============================================================================
+
+resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_compute_env" {
+  compute_environment_name = "shred-unstructured-from-zip-env"
+  type                     = "MANAGED"
+  service_role             = aws_iam_role.batch_service_role.arn
+  tags = merge(local.tags, { Batch_Job_Name = var.shred_unstructured_image_name })
+
+  compute_resources {
+    type                = "SPOT"
+    max_vcpus           = 8
+    min_vcpus           = 0
+    security_group_ids  = [data.aws_security_group.core_vpc_protected.id]
+    subnets             = data.aws_subnet.local_account[*].id
+    
+    # Require large instances with high network/EBS bandwidth
+    instance_type       = ["m5.2xlarge", "m5.4xlarge", "r5.2xlarge"] 
+
+    launch_template {
+      launch_template_id = aws_launch_template.shred_unstructured_from_zip_batch_storage_template.id
+      version            = "$Latest"
+    }
+  }
+}
+
+resource "aws_batch_job_queue" "shred_unstructured_from_zip_batch_queue" {
+  name                 = "shred-unstructured-from-zip-processing-queue"
+  state                = "ENABLED"
+  priority             = 1
+  compute_environments = [aws_batch_compute_environment.shred_unstructured_from_zip_batch_compute_env.arn]
+  tags = merge(local.tags, { Batch_Job_Name = var.shred_unstructured_image_name })
+}
+
+resource "aws_batch_job_definition" "shred_unstructured_from_zip_job" {
+  name = "shred-unstructured-from-zip-job"
+  type = "container"
+  tags = merge(local.tags, { Batch_Job_Name = var.shred_unstructured_image_name })
+
+  # Retry failed jobs once, just in case of an EC2 Spot interruption
+  retry_strategy {
+    attempts = 2
+  }
+
+  container_properties = jsonencode({
+    image            = var.shred_unstructured_docker_image_uri
+    executionRoleArn = aws_iam_role.gdpr_execution_role.arn
+    jobRoleArn       = aws_iam_role.gdpr_job_role.arn
+    
+    resourceRequirements = [
+      { type = "VCPU", value = "8" },
+      { type = "MEMORY", value = "32768" }
+    ]
+
+    environment = [
+      { name = "S3_FILE_URI", value = "" },
+      { name = "DELETE_PATTERN", value = "" }
+    ]
+  })
+}
+
+resource "aws_launch_template" "shred_unstructured_from_zip_batch_storage_template" {
+  name_prefix   = "shred-unstructured-from-zip-"
+  
+  block_device_mappings {
+    device_name = "/dev/xvda"
+    ebs {
+      volume_size           = 1500
+      volume_type           = "gp3"
+      delete_on_termination = true
+      encrypted             = true
+    }
+  }
+}
+
+# ==============================================================================
+# 2. IAM: ECS Execution Role with all policies for other AWS services
+# ==============================================================================
+
+## ECS resources
+data "aws_iam_policy_document" "gdpr_batch_jobs_assume_ecs_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["ecs-tasks.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "gdpr_execution_role" {
+  name               = "emds-gdpr-execution-role" # STRICT NAME REQUIRED BY EXTERNAL ECR
+  assume_role_policy = data.aws_iam_policy_document.gdpr_batch_jobs_assume_ecr_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "gdpr_batch_jobs_ecs_execution_role_policy" {
+  role       = aws_iam_role.gdpr_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+## Cloudwatch resources
+data "aws_iam_policy_document" "gdpr_batch_jobs_logs_policy_document" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+    resources = ["*"]
+  }
+}
+resource "aws_iam_policy" "gdpr_batch_jobs_logs_policy" {
+  name   = "emds-gdpr-batch-jobs-logs-policy"
+  policy = data.aws_iam_policy_document.gdpr_batch_jobs_logs_policy_document.json
+}
+resource "aws_iam_role_policy_attachment" "gdpr_batch_jobs_logs_policy_attach" {
+  role       = aws_iam_role.gdpr_execution_role.name
+  policy_arn = aws_iam_policy.gdpr_batch_jobs_logs_policy.arn
+}
+##
+
+## ECR resources
+data "aws_iam_policy_document" "gdpr_batch_jobs_ecr_policy_document" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecr:GetAuthorizationToken",
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:BatchGetImage"
+    ]
+    resources = ["*"]
+  }
+}
+resource "aws_iam_policy" "gdpr_batch_jobs_ecr_policy" {
+  name   = "emds-gdpr-batch-jobs-ecr-policy"
+  policy = data.aws_iam_policy_document.gdpr_batch_jobs_ecr_policy_document.json
+}
+resource "aws_iam_role_policy_attachment" "gdpr_batch_jobs_ecr_policy_attach" {
+  role       = aws_iam_role.gdpr_execution_role.name
+  policy_arn = aws_iam_policy.gdpr_batch_jobs_ecr_policy.arn
+}
+##
+
+# ==============================================================================
+# 3. IAM: Job Role (For the Bash script to access S3)
+# ==============================================================================
+
+resource "aws_iam_role" "gdpr_job_role" {
+  name               = "emds-gdpr-shred-job-role"
+  assume_role_policy = data.aws_iam_policy_document.gdpr_batch_jobs_s3_access_policy.json
+}
+
+## S3 Policies
+data "aws_iam_policy_document" "gdpr_batch_jobs_s3_access_policy_document" {
+  statement {
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject"
+    ]
+    resources = [
+      module.s3-data-bucket.bucket.arn,
+      "${module.s3-data-bucket.bucket.arn}/*"
+    ]
+  }
+}
+resource "aws_iam_policy" "gdpr_batch_jobs_s3_access_policy" {
+  name   = "emds-gdpr-batch-jobs-s3-role-policy"
+  policy = data.aws_iam_policy_document.gdpr_batch_jobs_s3_access_policy_document.json
+}
+resource "aws_iam_role_policy_attachment" "gdpr_batch_jobs_s3_access_policy_attach" {
+  role       = aws_iam_role.gdpr_job_role.name
+  policy_arn = aws_iam_policy.gdpr_batch_jobs_s3_access_policy.arn
+}
+##
