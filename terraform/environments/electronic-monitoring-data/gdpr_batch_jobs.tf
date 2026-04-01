@@ -32,17 +32,17 @@ resource "aws_iam_role_policy_attachment" "gdpr_batch_service_role_attachment" {
 # ==============================================================================
 
 resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_compute_env" {
-  compute_environment_name = "shred-unstructured-from-zip-env"
+  name                     = "shred-unstructured-from-zip-env"
   type                     = "MANAGED"
   service_role             = aws_iam_role.batch_service_role.arn
   tags = merge(local.tags, { Batch_Job_Name = local.shred_unstructured_image_name })
 
   compute_resources {
     type                = "SPOT"
-    max_vcpus           = 8
+    max_vcpus           = 16
     min_vcpus           = 0
-    security_group_ids  = [data.aws_security_group.core_vpc_protected.id]
-    subnets             = data.aws_subnet.local_account[*].id
+    security_group_ids  = [aws_security_group.gdpr_batch_sg.id]
+    subnets             = data.aws_subnets.shared-private[*].id
     
     # Require large instances with high network/EBS bandwidth
     instance_type       = ["m5.2xlarge", "m5.4xlarge", "r5.2xlarge"] 
@@ -58,7 +58,10 @@ resource "aws_batch_job_queue" "shred_unstructured_from_zip_batch_queue" {
   name                 = "shred-unstructured-from-zip-processing-queue"
   state                = "ENABLED"
   priority             = 1
-  compute_environments = [aws_batch_compute_environment.shred_unstructured_from_zip_batch_compute_env.arn]
+  compute_environment_order {
+    order               = 1
+    compute_environment = aws_batch_compute_environment.shred_unstructured_from_zip_batch_compute_env.arn
+  }
   tags = merge(local.tags, { Batch_Job_Name = local.shred_unstructured_image_name })
 }
 
@@ -75,7 +78,7 @@ resource "aws_batch_job_definition" "shred_unstructured_from_zip_job" {
   container_properties = jsonencode({
     image            = local.shred_unstructured_docker_image_uri
     executionRoleArn = aws_iam_role.gdpr_execution_role.arn
-    jobRoleArn       = aws_iam_role.gdpr_job_role.arn
+    jobRoleArn       = aws_iam_role.gdpr_batch_code_job_role.arn
     
     resourceRequirements = [
       { type = "VCPU", value = "8" },
@@ -204,3 +207,44 @@ resource "aws_iam_role_policy_attachment" "gdpr_batch_jobs_s3_access_policy_atta
   policy_arn = aws_iam_policy.gdpr_batch_jobs_s3_access_policy.arn
 }
 ##
+
+# ==============================================================================
+# 4. Security Groups, VPNs and Rules
+# Uses aws_subnets.shared-private, data.aws_vpc.shared, and the data.aws_prefix_list.s3
+# ==============================================================================
+
+resource "aws_security_group" "gdpr_batch_sg" {
+  #checkov:skip=CKV2_AWS_5
+  name_prefix = "emds-gdpr-batch-sg-"
+  description = "Secuity Group for GDPR Batch Compute Environment"
+  vpc_id      = data.aws_vpc.shared.id
+
+  tags = merge(
+    local.tags,
+    {
+      Name          = "emds-gdpr-batch-sg"
+      Resource_Type = "Security Group for GDPR Batch Compute Environment",
+    }
+  )
+}
+
+resource "aws_security_group_rule" "gdpr_batch_egress_s3" {
+  for_each          = local.is-production || local.is-development || local.is-preproduction ? toset([for port in var.sqlserver_https_ports : tostring(port)]) : toset([])
+  security_group_id = aws_security_group.gdpr_batch_sg[0].id
+  type              = "egress"
+  cidr_blocks       = data.aws_ip_ranges.london_s3.cidr_blocks
+  protocol          = "tcp"
+  from_port         = each.value
+  to_port           = each.value
+  description       = "AWS Batch -----[tcp]-----+ London S3 Cidr"
+}
+
+resource "aws_vpc_security_group_egress_rule" "gdpr_batch_egress_vpc" {
+  count                        = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
+  security_group_id            = aws_security_group.gdpr_batch_sg[0].id
+  description                  = "AWS Batch -----[https]-----+ VPC (for Cloudwatch, ECR, and AWS Batch API)"
+  ip_protocol                  = "https"
+  from_port                    = 443
+  to_port                      = 443
+  cidr_ipv4 = data.aws_vpc.shared.cidr_block
+}
