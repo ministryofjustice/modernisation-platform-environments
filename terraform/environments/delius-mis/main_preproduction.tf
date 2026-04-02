@@ -77,6 +77,8 @@ module "environment_preproduction" {
 
   bastion_config = local.bastion_config_preprod
 
+  boe_efs_config = local.boe_efs_config_preprod
+
   bcs_config = local.bcs_config_preprod
   bps_config = local.bps_config_preprod
   bws_config = local.bws_config_preprod
@@ -90,6 +92,7 @@ module "environment_preproduction" {
   fsx_config               = local.fsx_config_preprod
   dfi_report_bucket_config = local.dfi_report_bucket_config_preprod
   lb_config                = local.lb_config_preprod
+  datasync_config          = local.datasync_config_preprod
 
   pagerduty_integration_key = local.pagerduty_integration_key
 

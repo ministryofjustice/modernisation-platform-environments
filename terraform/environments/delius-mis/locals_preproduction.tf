@@ -26,6 +26,20 @@ locals {
     extra_user_data_content = "yum install -y openldap-clients"
   }
 
+  boe_efs_config_preprod = {
+    availability_zone_name = "eu-west-2a"
+    mount_targets_subnet_ids = {
+      single-az = data.aws_subnets.shared-private-a.ids[0]
+    }
+    # For multi-az, use:
+    # availability_zone_name = null
+    # mount_targets_subnet_ids = {
+    #   multi-az-a = data.aws_subnets.shared-private-a.ids[0]
+    #   multi-az-b = data.aws_subnets.shared-private-b.ids[0]
+    #   multi-az-c = data.aws_subnets.shared-private-c.ids[0]
+    # }
+  }
+
   bcs_config_preprod = {
     instance_count = 0
     ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
@@ -411,6 +425,8 @@ locals {
   dfi_report_bucket_config_preprod = null
 
   lb_config_preprod = null
+
+  datasync_config_preprod = null
 
   db_backup_config_preprod = {
     object_lock_days             = 0
