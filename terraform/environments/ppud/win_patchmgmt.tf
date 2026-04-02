@@ -22,7 +22,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
 
     patch_filter {
       key    = "PRODUCT"
-      values = ["WindowsServer2022"]
+      values = ["WindowsServer2022", "WindowsServer2025"]
     }
     patch_filter {
       key    = "CLASSIFICATION"

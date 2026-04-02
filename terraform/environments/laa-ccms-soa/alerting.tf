@@ -139,24 +139,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Free_Storage_Space_Over_Threshold" {
   ok_actions    = [aws_sns_topic.alerts.arn]
 }
 
-resource "aws_cloudwatch_metric_alarm" "RDS_Burst_Balance_Threshold" {
-  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-BurstBalance-low-threshold-alarm"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Burst balance is below 10% for over 15 minutes"
-  comparison_operator = "LessThanOrEqualToThreshold"
-  metric_name         = "BurstBalance"
-  statistic           = "Sum"
-  namespace           = "AWS/RDS"
-  period              = 60
-  evaluation_periods  = 5
-  datapoints_to_alarm = 5
-  threshold           = 10
-  treat_missing_data  = "breaching"
-  dimensions = {
-    DBInstanceIdentifier = aws_db_instance.soa_db.identifier
-  }
-  alarm_actions = [aws_sns_topic.alerts.arn]
-  ok_actions    = [aws_sns_topic.alerts.arn]
-}
+
 
 resource "aws_cloudwatch_metric_alarm" "RDS_Write_IOPS_Threshold" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-WriteIOPS-high-threshold-alarm"

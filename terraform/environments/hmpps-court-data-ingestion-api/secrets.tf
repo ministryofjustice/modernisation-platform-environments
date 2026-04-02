@@ -18,7 +18,7 @@ module "secret_ingestion_api_auth_token" {
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "1.3.1"
 
-  name        = "ingestion-api-auth-token"
+  name        = "ingestion-api-hmac-auth-token"
   description = "Shared secret/token used by the Lambda Authorizer to verify incoming requests. Populate manually."
   kms_key_id  = module.secrets_kms.key_id
 

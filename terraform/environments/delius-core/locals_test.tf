@@ -88,11 +88,11 @@ locals {
     }
 
     weblogic_params = {
-      API_CLIENT_ID                     = "delius-ui-client"
-      AWS_REGION                        = "eu-west-2"
-      BREACH_NOTICE_API_URL             = "https://breach-notice-api-test.hmpps.service.justice.gov.uk"
-      BREACH_NOTICE_UI_URL_FORMAT       = "https://breach-notice-test.hmpps.service.justice.gov.uk/breach-notice/%s"
-      COOKIE_SECURE                     = "true"
+      API_CLIENT_ID               = "delius-ui-client"
+      AWS_REGION                  = "eu-west-2"
+      BREACH_NOTICE_API_URL       = "https://breach-notice-api-test.hmpps.service.justice.gov.uk"
+      BREACH_NOTICE_UI_URL_FORMAT = "https://breach-notice-test.hmpps.service.justice.gov.uk/breach-notice/%s"
+      COOKIE_SECURE               = "true"
       # DELIUS_API_URL                    = "" # No longer needed
       DMS_HOST                          = "https://hmpps-delius-alfresco-test.apps.live.cloud-platform.service.justice.gov.uk"
       DMS_OFFICE_URI_HOST               = "https://hmpps-delius-alfresco-test.apps.live.cloud-platform.service.justice.gov.uk"

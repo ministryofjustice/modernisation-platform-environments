@@ -69,13 +69,3 @@ module "azure_openai_secret" {
   ignore_secret_changes = true
 }
 
-module "litellm_keys_secret" {
-  for_each = terraform.workspace == "data-platform-development" ? litellm_key.keys : {}
-
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
-
-  name = "litellm/keys/${each.value.key_alias}"
-
-  secret_string = each.value.id
-}
-

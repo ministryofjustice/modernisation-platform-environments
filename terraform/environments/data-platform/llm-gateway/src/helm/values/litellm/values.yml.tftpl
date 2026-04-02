@@ -6,6 +6,14 @@ image:
 serviceAccount:
   name: ${serviceAccountName}
 
+resources:
+  requests:
+    cpu: 1
+    memory: 2Gi
+  limits:
+    cpu: 2
+    memory: 4Gi
+
 db:
   deployStandalone: false
   useExisting: true
@@ -112,5 +120,6 @@ envVars: {
     REDIS_SSL: "True",
     DOCS_TITLE: "Data Platform LLM Gateway",
     DOCS_DESCRIPTION: "This is experimental, uptime is not guaranteed.",
-    DOCS_FILTERED: "True"
+    DOCS_FILTERED: "True",
+    AUTO_REDIRECT_UI_LOGIN_TO_SSO: "True"
 }

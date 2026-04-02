@@ -16,7 +16,7 @@ module "yjsm_hub_svc_alb" {
 
   alb_name = "yjsm-hub-svc-ext"
   internal = false
-  
+
   alb_route53_record_name    = "yjsm-hub-svc-lb"
   alb_route53_record_zone_id = data.aws_route53_zone.yjaf-inner.id
 

@@ -8,7 +8,8 @@ resource "aws_scheduler_schedule" "cwa_extract_schedule" {
     mode = "OFF"
   }
 
-  schedule_expression = "cron(0 22 ? * WED *)"
+  schedule_expression          = "cron(0 22 ? * WED *)"
+  schedule_expression_timezone = "Europe/London"
 
   target {
     arn      = aws_sfn_state_machine.sfn_state_machine.arn
@@ -25,9 +26,12 @@ resource "aws_scheduler_schedule" "ccms_load_schedule" {
     mode = "OFF"
   }
 
-  schedule_expression = local.environment == "production" ? "rate(15 minutes)" : "cron(0 7-19 ? * * *)"
-  start_date          = local.environment == "production" ? "2026-03-05T07:30:00Z" : null
-  end_date            = local.environment == "production" ? "2026-03-05T09:00:00Z" : null
+  schedule_expression          = local.environment == "production" ? "rate(15 minutes)" : "cron(0 7-19 ? * * *)"
+  schedule_expression_timezone = "Europe/London"
+
+  start_date = local.environment == "production" ? "2026-03-31T07:30:00Z" : null
+  end_date   = local.environment == "production" ? "2026-03-31T09:00:00Z" : null
+
   target {
     arn      = aws_lambda_function.ccms_provider_load.arn
     role_arn = aws_iam_role.scheduler_invoke_lambda_role.arn
@@ -43,7 +47,8 @@ resource "aws_scheduler_schedule" "maat_load_schedule" {
     mode = "OFF"
   }
 
-  schedule_expression = local.environment == "production" ? "cron(45 10 * * ? *)" : "cron(0 7-19 ? * * *)"
+  schedule_expression          = local.environment == "production" ? "cron(45 10 * * ? *)" : "cron(0 7-19 ? * * *)"
+  schedule_expression_timezone = "Europe/London"
 
   target {
     arn      = aws_lambda_function.maat_provider_load.arn
@@ -60,8 +65,10 @@ resource "aws_scheduler_schedule" "ccr_load_schedule" {
     mode = "OFF"
   }
 
-  schedule_expression = local.environment == "production" ? "cron(45 10 * * ? *)" : "cron(0 7-19 ? * * *)"
-  state               = "DISABLED"
+  schedule_expression          = local.environment == "production" ? "cron(45 10 * * ? *)" : "cron(0 7-19 ? * * *)"
+  schedule_expression_timezone = "Europe/London"
+
+  state = "DISABLED"
 
   target {
     arn      = aws_lambda_function.ccr_provider_load.arn
@@ -78,8 +85,10 @@ resource "aws_scheduler_schedule" "cclf_load_schedule" {
     mode = "OFF"
   }
 
-  schedule_expression = local.environment == "production" ? "cron(45 10 * * ? *)" : "cron(0 7-19 ? * * *)"
-  state               = "DISABLED"
+  schedule_expression          = local.environment == "production" ? "cron(45 10 * * ? *)" : "cron(0 7-19 ? * * *)"
+  schedule_expression_timezone = "Europe/London"
+
+  state = "DISABLED"
 
   target {
     arn      = aws_lambda_function.cclf_provider_load.arn
@@ -97,7 +106,8 @@ resource "aws_scheduler_schedule" "purge_schedule" {
     mode = "OFF"
   }
 
-  schedule_expression = "cron(0 20 * * ? *)"
+  schedule_expression          = "cron(0 20 * * ? *)"
+  schedule_expression_timezone = "Europe/London"
 
   target {
     arn      = aws_lambda_function.purge_lambda.arn

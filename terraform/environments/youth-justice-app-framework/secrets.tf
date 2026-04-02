@@ -202,7 +202,7 @@ resource "aws_secretsmanager_secret" "yjsm_hub_doc_gateway_auth" {
   description = "Used for document gateway"
   kms_key_id  = module.kms.key_id
   tags        = local.tags
-  
+
   recovery_window_in_days = 0
 }
 

@@ -1,6 +1,6 @@
 resource "aws_iam_role" "lambda_dbmaintenance_sns_role" {
   count = local.is-production ? 0 : 1
-  name = "${local.application_name}-${local.environment}-lambda_dbmaintenance_sns_role"
+  name  = "${local.application_name}-${local.environment}-lambda_dbmaintenance_sns_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -20,8 +20,8 @@ resource "aws_iam_role" "lambda_dbmaintenance_sns_role" {
 # Inline policy for the Lambda execution role (dbmaintenance) - aligned to existing style
 resource "aws_iam_role_policy" "lambda_dbmaintenance_sns_policy" {
   count = local.is-production ? 0 : 1
-  name = "${local.application_name}-${local.environment}-lambda-dbmaintenance-sns-policy"
-  role = aws_iam_role.lambda_dbmaintenance_sns_role[0].id
+  name  = "${local.application_name}-${local.environment}-lambda-dbmaintenance-sns-policy"
+  role  = aws_iam_role.lambda_dbmaintenance_sns_role[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -56,20 +56,20 @@ resource "aws_iam_role_policy" "lambda_dbmaintenance_sns_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
-  count = local.is-production ? 0 : 1
+  count      = local.is-production ? 0 : 1
   role       = aws_iam_role.lambda_dbmaintenance_sns_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 data "archive_file" "lambda_zip" {
-  count = local.is-production ? 0 : 1
+  count       = local.is-production ? 0 : 1
   type        = "zip"
   source_file = "${path.module}/lambda/rds_maintenance_notify.py"
   output_path = "${path.module}/lambda/rds_maintenance_notify.zip"
 }
 
 resource "aws_lambda_function" "dbmaintenance_sns_to_slack" {
-  count = local.is-production ? 0 : 1
+  count            = local.is-production ? 0 : 1
   filename         = data.archive_file.lambda_zip[0].output_path
   source_code_hash = data.archive_file.lambda_zip[0].output_base64sha256
   function_name    = "${local.application_name}-${local.environment}-rds_maintenance_notify"
@@ -93,7 +93,7 @@ resource "aws_lambda_function" "dbmaintenance_sns_to_slack" {
 }
 
 resource "aws_lambda_permission" "allow_rds_sns_invoke" {
-  count = local.is-production ? 0 : 1
+  count         = local.is-production ? 0 : 1
   statement_id  = "AllowExecutionFromrdsSNSTopic"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.dbmaintenance_sns_to_slack[0].function_name

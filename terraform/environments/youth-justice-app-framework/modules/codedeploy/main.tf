@@ -110,8 +110,8 @@ resource "aws_iam_role_policy_attachment" "codedeploy_ec2_service_role_policy" {
 
 
 resource "aws_codedeploy_deployment_group" "this" {
-  for_each               = { 
-    for pair in var.services : join("", keys(pair)) => pair 
+  for_each = {
+    for pair in var.services : join("", keys(pair)) => pair
     if join("", keys(pair)) != "yjsm-hub-svc" || var.create_svc_pilot
   }
   deployment_group_name  = var.environment
@@ -150,17 +150,17 @@ resource "aws_codedeploy_deployment_group" "this" {
       prod_traffic_route {
         listener_arns = [lookup(
           merge(
-          {
-            "internal"     = data.aws_lb_listener.internal.arn
-            "external"     = data.aws_lb_listener.external.arn
-            "connectivity" = data.aws_lb_listener.connectivity.arn
-          },
-          var.create_svc_pilot ? { "yjsm-hub-svc" = data.aws_lb_listener.yjsm_hub_svc[0].arn } : {}
-        ),
-        each.value[join("", keys(each.value))],
-        data.aws_lb_listener.internal.arn
-      )]
-    }
+            {
+              "internal"     = data.aws_lb_listener.internal.arn
+              "external"     = data.aws_lb_listener.external.arn
+              "connectivity" = data.aws_lb_listener.connectivity.arn
+            },
+            var.create_svc_pilot ? { "yjsm-hub-svc" = data.aws_lb_listener.yjsm_hub_svc[0].arn } : {}
+          ),
+          each.value[join("", keys(each.value))],
+          data.aws_lb_listener.internal.arn
+        )]
+      }
 
       target_group {
         name = data.aws_lb_target_group.one[each.key].name

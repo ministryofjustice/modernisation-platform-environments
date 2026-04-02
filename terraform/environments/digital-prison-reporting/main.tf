@@ -471,6 +471,14 @@ module "s3_glue_job_bucket" {
   create_notification_queue = false # For SQS Queue
   enable_lifecycle          = true
 
+  override_expiration_rules = [
+    {
+      id     = "glue-job-shuffle-data"
+      prefix = "glue-job-shuffle-data/"
+      days   = 7
+    }
+  ]
+
   tags = merge(
     local.all_tags,
     {

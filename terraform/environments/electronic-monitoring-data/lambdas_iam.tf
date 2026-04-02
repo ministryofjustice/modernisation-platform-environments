@@ -168,9 +168,12 @@ data "aws_iam_policy_document" "place_unzipped_file_s3_policy_document" {
       "s3:ListBucket",
       "s3:GetBucketLocation"
     ]
-    resources = [
+    resources = local.is-production ? [
       "${module.s3-unzipped-files-bucket.bucket.arn}/*",
       module.s3-unzipped-files-bucket.bucket.arn,
+    ] : [
+      "${module.s3-ears-sars-bucket.bucket.arn}/*",
+      module.s3-ears-sars-bucket.bucket.arn,
     ]
   }
 }
@@ -254,9 +257,12 @@ data "aws_iam_policy_document" "get_unzipped_presigned_url_file_s3_policy_docume
       "s3:PutObject",
       "s3:GetObject"
     ]
-    resources = [
+    resources = local.is-production ? [
       "${module.s3-unzipped-files-bucket.bucket.arn}/*",
       module.s3-unzipped-files-bucket.bucket.arn,
+    ] : [
+      "${module.s3-ears-sars-bucket.bucket.arn}/*",
+      module.s3-ears-sars-bucket.bucket.arn,
     ]
   }
 }
@@ -1503,7 +1509,7 @@ resource "aws_iam_role_policy_attachment" "cross_account_copy" {
 
 data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
   count = local.is-development || local.is-preproduction ? 1 : 0
- 
+
   statement {
     sid       = "S3BucketPerms"
     effect    = "Allow"
@@ -1512,9 +1518,9 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
   }
 
   statement {
-    sid       = "S3LoggingBucketPerms"
-    effect    = "Allow"
-    actions   = ["s3:PutObject", "s3:PutObjectAcl"]
+    sid     = "S3LoggingBucketPerms"
+    effect  = "Allow"
+    actions = ["s3:PutObject", "s3:PutObjectAcl"]
     resources = [
       "${module.s3-logging-bucket.bucket.arn}/ears_sars/*",
       module.s3-logging-bucket.bucket.arn
@@ -1581,6 +1587,19 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
       "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
       "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
       "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*"
+    ]
+  }
+
+  statement {
+    sid    = "AllowZipStepFunctionExecution"
+    effect = "Allow"
+    actions = [
+      "states:StartSyncExecution",
+      "states:DescribeExecution"
+    ]
+    resources = [
+      module.get_zipped_file_api.arn,
+      "${module.get_zipped_file_api.arn}:*"
     ]
   }
 }

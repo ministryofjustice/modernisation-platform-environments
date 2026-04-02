@@ -229,7 +229,7 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
     events        = ["s3:ObjectCreated:*"]
     filter_prefix = "serco/fms"
   }
-  
+
   queue {
     queue_arn     = module.fms_fan_out_event_queue.sqs_queue.arn
     events        = ["s3:ObjectTagging:Put"]

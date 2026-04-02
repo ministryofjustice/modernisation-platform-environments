@@ -140,7 +140,7 @@ module "eks" {
 }
 
 module "karpenter" {
-  count = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
+  count  = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
   source = "terraform-aws-modules/eks/aws//modules/karpenter"
 
   cluster_name = module.eks[0].cluster_name
@@ -158,16 +158,16 @@ module "karpenter" {
 
 
 resource "helm_release" "karpenter" {
- count = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
- namespace           = "kube-system"
- name                = "karpenter"
- repository          = "oci://public.ecr.aws/karpenter"
- chart               = "karpenter"
- version             = "1.9.0"
- wait                = false
+  count      = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
+  namespace  = "kube-system"
+  name       = "karpenter"
+  repository = "oci://public.ecr.aws/karpenter"
+  chart      = "karpenter"
+  version    = "1.9.0"
+  wait       = false
 
- values = [
-   <<-EOT
+  values = [
+    <<-EOT
    nodeSelector:
      karpenter.sh/controller: 'true'
    dnsPolicy: Default
@@ -178,7 +178,7 @@ resource "helm_release" "karpenter" {
    webhook:
      enabled: false
    EOT
- ]
+  ]
   depends_on = [
     module.karpenter[0]
   ]
@@ -189,13 +189,14 @@ data "kubectl_path_documents" "manifests" {
   pattern = "${path.module}/templates/karpenter.yaml"
   vars = {
     alias_version = "v20260304"
-    cluster_name = try(module.eks[0].cluster_name, "")
+    cluster_name  = try(module.eks[0].cluster_name, "")
   }
 }
 
 resource "kubectl_manifest" "deploy_manifest" {
-  count = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
-  yaml_body = data.kubectl_path_documents.manifests.manifests.value
+  for_each = contains(local.enabled_workspaces, local.cluster_environment) ? data.kubectl_path_documents.manifests.manifests : {}
+  yaml_body = each.value
+
   depends_on = [
     helm_release.karpenter[0]
   ]

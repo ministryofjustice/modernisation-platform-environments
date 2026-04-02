@@ -410,6 +410,56 @@ resource "aws_instance" "s609693lo6vw114" {
   }
 }
 
+# Private Certificate Authority
+
+resource "aws_instance" "s609693lo6vw115" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-0bb237afb99e3a912"
+  instance_type          = "m5.large"
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s609693lo6vw115"
+    patch_group = "dev_win_patch"
+    backup      = true
+  }
+}
+
+# SQL Server 2022 Development
+
+resource "aws_instance" "s609693lo6vw116" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-0c3f4443a365b72d9"
+  instance_type          = "m5.xlarge"
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.PPUD-Database-Server[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s609693lo6vw116"
+    patch_group = "dev_win_patch"
+    backup      = true
+  }
+}
+
 #################################
 # Pre-Production (UAT Instances) 
 #################################

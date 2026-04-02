@@ -316,6 +316,17 @@ resource "aws_security_group_rule" "Dev-Servers-Ingress" {
   security_group_id = aws_security_group.Dev-Servers-Standard[0].id
 }
 
+resource "aws_security_group_rule" "Dev-Servers-Ingress-1" {
+  description       = "Rule to allow port 80 traffic inbound"
+  count             = local.is-development == true ? 1 : 0
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.Dev-Servers-Standard[0].id
+}
+
 resource "aws_security_group_rule" "Dev-Servers-Standard-Egress" {
   description       = "Rule to allow all traffic outbound"
   count             = local.is-development == true ? 1 : 0

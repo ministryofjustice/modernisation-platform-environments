@@ -129,7 +129,7 @@ resource "aws_launch_template" "weblogic" {
   image_id      = data.aws_ami.ecs_ami.id
   instance_type = var.delius_microservice_configs.weblogic.ec2_instance_type
 
-  user_data = base64encode(templatefile("${path.module}/templates/ecs-host-userdata.tpl", {ecs_cluster_name = module.ecs.ecs_cluster_name}))
+  user_data = base64encode(templatefile("${path.module}/templates/ecs-host-userdata.tpl", { ecs_cluster_name = module.ecs.ecs_cluster_name }))
 
   network_interfaces {
     associate_public_ip_address = false
@@ -146,14 +146,14 @@ resource "aws_launch_template" "weblogic" {
 # ECS IAM
 resource "aws_iam_role" "weblogic_host" {
   name               = "weblogic-${var.env_name}-ecshost-private-iam"
-  assume_role_policy = templatefile("${path.module}/templates/ecs-host-assumerole-policy.tpl",{})
+  assume_role_policy = templatefile("${path.module}/templates/ecs-host-assumerole-policy.tpl", {})
 }
 
 resource "aws_iam_role_policy" "weblogic" {
   name = "weblogic-${var.env_name}-ecshost-private-iam"
   role = aws_iam_role.weblogic_host.name
 
-  policy = templatefile("${path.module}/templates/ecs-host-role-policy.tpl",{})
+  policy = templatefile("${path.module}/templates/ecs-host-role-policy.tpl", {})
 }
 
 data "aws_iam_policy" "AmazonSSMManagedInstanceCore" {
@@ -162,7 +162,7 @@ data "aws_iam_policy" "AmazonSSMManagedInstanceCore" {
 
 resource "aws_iam_role_policy_attachment" "AmazonSSMManagedInstanceCore" {
   policy_arn = data.aws_iam_policy.AmazonSSMManagedInstanceCore.arn
-  role = aws_iam_role.weblogic_host.name
+  role       = aws_iam_role.weblogic_host.name
 }
 
 resource "aws_iam_instance_profile" "weblogic" {
@@ -187,7 +187,7 @@ resource "aws_security_group" "ecs_host_sg" {
 }
 
 resource "aws_autoscaling_group" "weblogic" {
-  name                = "weblogic-${var.env_name}-ecs-asg"
+  name = "weblogic-${var.env_name}-ecs-asg"
 
   max_size              = 2
   min_size              = 1
@@ -209,7 +209,7 @@ resource "aws_ecs_capacity_provider" "weblogic" {
     auto_scaling_group_arn = aws_autoscaling_group.weblogic.arn
 
     managed_scaling {
-      status = "ENABLED"
+      status          = "ENABLED"
       target_capacity = 100
     }
 

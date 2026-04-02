@@ -93,26 +93,26 @@ resource "aws_athena_workgroup" "cadt-historic-dev" {
 }
 
 resource "aws_glue_catalog_database" "ears_sars_audit_db" {
-  count = local.is-development || local.is-preproduction ? 1 : 0  
-  name = "ears_sars_audit"
+  count = local.is-development || local.is-preproduction ? 1 : 0
+  name  = "ears_sars_audit"
 }
 
 resource "aws_glue_catalog_table" "ears_sars_audit_table" {
-  count = local.is-development || local.is-preproduction ? 1 : 0
+  count         = local.is-development || local.is-preproduction ? 1 : 0
   name          = "reports_requested"
   database_name = aws_glue_catalog_database.ears_sars_audit_db[0].name
   table_type    = "EXTERNAL_TABLE"
 
   parameters = {
-    "classification"              = "json"
-    "projection.enabled"          = "true"
-    "projection._year.type"        = "integer"
-    "projection._year.range"       = "2025,2040"
-    "projection._month.type"       = "integer"
-    "projection._month.range"      = "1,12"
-    "projection._day.type"         = "integer"
-    "projection._day.range"        = "1,31"
-    
+    "classification"          = "json"
+    "projection.enabled"      = "true"
+    "projection._year.type"   = "integer"
+    "projection._year.range"  = "2025,2040"
+    "projection._month.type"  = "integer"
+    "projection._month.range" = "1,12"
+    "projection._day.type"    = "integer"
+    "projection._day.range"   = "1,31"
+
     "storage.location.template" = "s3://${module.s3-logging-bucket.bucket.id}/ears_sars/$${_year}/$${_month}/$${_day}/"
   }
   storage_descriptor {
@@ -123,7 +123,7 @@ resource "aws_glue_catalog_table" "ears_sars_audit_table" {
     ser_de_info {
       serialization_library = "org.openx.data.jsonserde.JsonSerDe"
     }
-   columns {
+    columns {
       name = "legacy_subject_id"
       type = "string"
     }

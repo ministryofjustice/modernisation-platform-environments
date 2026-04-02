@@ -77,106 +77,81 @@ resource "aws_lambda_function" "waf_maintenance" {
   }
 }
 
-# EventBridge scheduled rules to trigger Lambda
-resource "aws_cloudwatch_event_rule" "waf_allow_0700_uk" {
-  name                = "waf-allow-0700-${local.environment}"
+# EventBridge schedule to trigger Lambda
+resource "aws_scheduler_schedule" "waf_allow_schedule" {
+  name       = "waf-allow-schedule"
+  group_name = "default"
+
+  schedule_expression_timezone = "Europe/London"
+  flexible_time_window {
+    mode = "OFF"
+  }
+
   schedule_expression = "cron(00 07 ? * MON-SUN *)"
-  description         = "Set WAF rule to ALLOW at 07:00 UK daily"
+
+  target {
+    arn       = aws_lambda_function.waf_maintenance.arn
+    input     = jsonencode({ mode = "ALLOW" })
+    role_arn = aws_iam_role.scheduler_invoke_lambda_role.arn
+  }
 }
 
-resource "aws_cloudwatch_event_rule" "waf_block_2130_uk" {
-  name                = "waf-block-2130-${local.environment}"
+resource "aws_scheduler_schedule" "waf_block_schedule" {
+  name       = "waf-block-schedule"
+  group_name = "default"
+
+  schedule_expression_timezone = "Europe/London"
+  flexible_time_window {
+    mode = "OFF"
+  }
+
   schedule_expression = "cron(30 21 ? * MON-SUN *)"
-  description         = "Set WAF rule to BLOCK at 21:30 UK daily"
+
+  target {
+    arn       = aws_lambda_function.waf_maintenance.arn
+    input     = jsonencode({ mode = "BLOCK" })
+    role_arn = aws_iam_role.scheduler_invoke_lambda_role.arn
+  }
 }
 
-resource "aws_cloudwatch_event_target" "waf_allow_target" {
-  rule      = aws_cloudwatch_event_rule.waf_allow_0700_uk.name
-  target_id = "AllowWAF"
-  arn       = aws_lambda_function.waf_maintenance.arn
-  input     = jsonencode({ mode = "ALLOW" })
+# IAM Role and Policy for Scheduler to invoke Lambda Functions
+resource "aws_iam_role" "scheduler_invoke_lambda_role" {
+  name = "scheduler-invoke-lambda-function-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect    = "Allow",
+      Principal = { Service = "scheduler.amazonaws.com" },
+      Action    = "sts:AssumeRole"
+    }]
+  })
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-scheduler-invoke-lambda-function-role"
+    }
+  )
 }
 
-resource "aws_cloudwatch_event_target" "waf_block_target" {
-  rule      = aws_cloudwatch_event_rule.waf_block_2130_uk.name
-  target_id = "BlockWAF"
-  arn       = aws_lambda_function.waf_maintenance.arn
-  input     = jsonencode({ mode = "BLOCK" })
+# IAM Policy to allow Scheduler to invoke Lambda
+resource "aws_iam_policy" "scheduler_invoke_lambda" {
+  name = "scheduler-invoke-lambda-policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Action = "lambda:InvokeFunction",
+      Resource = [
+        aws_lambda_function.waf_maintenance.arn
+      ]
+    }]
+  })
 }
 
-# Allow Events to invoke the Lambda
-resource "aws_lambda_permission" "waf_events_allow" {
-  statement_id  = "AllowEvents0700-${local.environment}"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.waf_maintenance.arn
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.waf_allow_0700_uk.arn
-}
-
-resource "aws_lambda_permission" "waf_events_block" {
-  statement_id  = "BlockEvents2130-${local.environment}"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.waf_maintenance.arn
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.waf_block_2130_uk.arn
-}
-
-# Outputs
-output "waf_web_acl_name" {
-  description = "WAF Web ACL name"
-  value       = data.aws_wafv2_web_acl.waf_web_acl.name
-}
-
-output "waf_web_acl_id" {
-  description = "WAF Web ACL id"
-  value       = data.aws_wafv2_web_acl.waf_web_acl.id
-}
-
-output "waf_lambda_role_arn" {
-  description = "IAM role ARN used by the Lambda"
-  value       = aws_iam_role.waf_lambda_role.arn
-}
-
-output "waf_lambda_role_name" {
-  description = "IAM role name used by the Lambda"
-  value       = aws_iam_role.waf_lambda_role.name
-}
-
-output "waf_lambda_role_policy_id" {
-  description = "IAM role inline policy id attached to Lambda role"
-  value       = aws_iam_role_policy.waf_lambda_policy.id
-}
-
-output "waf_lambda_function_arn" {
-  description = "Lambda function ARN"
-  value       = aws_lambda_function.waf_maintenance.arn
-}
-
-output "waf_lambda_function_name" {
-  description = "Lambda function name"
-  value       = aws_lambda_function.waf_maintenance.function_name
-}
-
-output "waf_allow_rule_arn" {
-  description = "CloudWatch event rule ARN for allow schedule"
-  value       = aws_cloudwatch_event_rule.waf_allow_0700_uk.arn
-}
-
-output "waf_allow_rule_name" {
-  description = "CloudWatch event rule name for allow schedule"
-  value       = aws_cloudwatch_event_rule.waf_allow_0700_uk.name
-}
-
-output "waf_block_rule_arn" {
-  description = "CloudWatch event rule ARN for block schedule"
-  value       = aws_cloudwatch_event_rule.waf_block_2130_uk.arn
-}
-
-output "waf_block_rule_name" {
-  description = "CloudWatch event rule name for block schedule"
-  value       = aws_cloudwatch_event_rule.waf_block_2130_uk.name
-}
-
-output "waf_web_acl_full" {
-  value = data.aws_wafv2_web_acl.waf_web_acl
+resource "aws_iam_role_policy_attachment" "scheduler_invoke_lambda_attachment" {
+  role       = aws_iam_role.scheduler_invoke_lambda_role.name
+  policy_arn = aws_iam_policy.scheduler_invoke_lambda.arn
 }

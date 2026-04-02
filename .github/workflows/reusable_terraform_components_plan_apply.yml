@@ -52,11 +52,14 @@
       ACCOUNT_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
       WORKSPACE_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
       SKIP_PLAN_EVALUATOR: '["cloud-platform-development", "cloud-platform-preproduction", "cloud-platform-nonlive", "cloud-platform-live", "data-platform-development", "data-platform-test", "data-platform-preproduction", "data-platform-production"]'
+    permissions:
+      id-token: write
+      contents: read
     concurrency:
       group: ${{ inputs.application }}-${{ inputs.environment }}-${{ inputs.component }}
     jobs:
       fetch-secrets:
-        uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@63cbaa1433a76ff95f7433b7454915b928c1b955 # v5.0.0
+        uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@5b44b387694dfa249cfa2dcf289ca871abe9e3e2 # v5.0.1
         secrets:
           MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -66,8 +69,6 @@
         needs: fetch-secrets
         outputs:
           plan_exitcode: "${{ steps.plan.outputs.exitcode }}"
-          role_name: "${{ steps.set-role.outputs.role_name }}"
-          session_name: "${{ steps.set-role.outputs.session_name }}"
         steps:
           - name: Debug
             run: |
@@ -82,7 +83,7 @@
           - name: Checkout Repository
             uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
           - name: Decrypt Secrets
-            uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@63cbaa1433a76ff95f7433b7454915b928c1b955 # v5.0.0
+            uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5b44b387694dfa249cfa2dcf289ca871abe9e3e2 # v5.0.1
             with:
               environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
               github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -103,25 +104,11 @@
               echo "::add-mask::$BACKEND_NUMBER"
               echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
-          - name: Set IAM Role Name
-            id: set-role
-            run: |
-              if [[ ("${{ inputs.environment }}" == "preproduction" || "${{ inputs.environment }}" == "nonlive" || "${{ inputs.environment }}" == "production" || "${{ inputs.environment }}" == "live") && "${{ github.ref }}" != "refs/heads/main" ]]; then
-                echo "role_name=github-actions-plan" >> $GITHUB_OUTPUT
-                echo "session_name=githubactionsplanrolesession" >> $GITHUB_OUTPUT
-              elif [[ ("${{ inputs.environment }}" == "preproduction" || "${{ inputs.environment }}" == "nonlive" || "${{ inputs.environment }}" == "production" || "${{ inputs.environment }}" == "live") && "${{ github.ref }}" == "refs/heads/main" ]]; then
-                echo "role_name=github-actions-apply" >> $GITHUB_OUTPUT
-                echo "session_name=githubactionsrolesession" >> $GITHUB_OUTPUT
-              else
-                echo "role_name=github-actions" >> $GITHUB_OUTPUT
-                echo "session_name=githubactionsrolesession" >> $GITHUB_OUTPUT
-              fi
-
           - name: Configure AWS Credentials
             uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7  # v6.0.0
             with:
-              role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/${{ steps.set-role.outputs.role_name }}"
-              role-session-name: ${{ steps.set-role.outputs.session_name }}
+              role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-plan"
+              role-session-name: "githubactionsplanrolesession"
               aws-region: "eu-west-2"
 
           - name: Setup Terraform
@@ -302,7 +289,7 @@
             uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
           
           - name: Decrypt Secrets
-            uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@63cbaa1433a76ff95f7433b7454915b928c1b955 # v5.0.0
+            uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5b44b387694dfa249cfa2dcf289ca871abe9e3e2 # v5.0.1
             with:
               environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
               PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -322,8 +309,8 @@
           - name: Configure AWS Credentials
             uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7  # v6.0.0
             with:
-              role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/${{ needs.plan.outputs.role_name }}"
-              role-session-name: ${{ needs.plan.outputs.session_name }}
+              role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-apply"
+              role-session-name: "githubactionsrolesession"
               aws-region: "eu-west-2"
 
           - name: Setup Terraform

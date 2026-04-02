@@ -7,7 +7,7 @@ resource "aws_ssm_document" "trend_av_installer" {
 
   lifecycle {
     prevent_destroy = true
-    ignore_changes  = [content] 
+    ignore_changes  = [content]
   }
 }
 
