@@ -99,6 +99,26 @@ data "aws_ssm_parameter" "ssh_keys" {
   name     = each.value.ssm_key_name
 }
 
+# Lambda to export Athena view data as CSV into the staging bucket
+module "lambda-staging-export" {
+  source = "./modules/lambda_staging_export"
+
+  function_name               = "cafm-staging-export"
+  database_name               = "property"
+  s3_output_path              = "s3://${module.aws_s3_staging.bucket.id}"
+  s3_output_bucket_arn        = module.aws_s3_staging.bucket.arn
+  s3_athena_results_bucket_arn = module.query_results.bucket.arn
+
+  s3_source_bucket_arns = [
+    module.datalake.bucket.arn,
+    "${module.datalake.bucket.arn}/*"
+  ]
+
+  kms_key_arn           = aws_kms_key.shared_kms_key.arn
+  awswrangler_layer_arn = "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python311:26"
+  tags                  = local.tags
+}
+
 # ------------------------
 # SSH Key for SFTP Login
 # ------------------------

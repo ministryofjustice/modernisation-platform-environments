@@ -1,0 +1,45 @@
+variable "function_name" {
+  description = "Name of the Lambda function"
+  type        = string
+}
+
+variable "s3_output_path" {
+  description = "S3 URI prefix for CSV output (e.g. s3://bucket/prefix)"
+  type        = string
+}
+
+variable "s3_output_bucket_arn" {
+  description = "ARN of the S3 bucket used for CSV output"
+  type        = string
+}
+
+variable "s3_athena_results_bucket_arn" {
+  description = "ARN of the S3 bucket used for Athena query results"
+  type        = string
+}
+
+variable "s3_source_bucket_arns" {
+  description = "ARNs of source S3 buckets and prefixes Athena reads from (bucket ARN and bucket/*)"
+  type        = list(string)
+}
+
+variable "database_name" {
+  description = "Glue catalogue database containing the Athena view"
+  type        = string
+}
+
+variable "kms_key_arn" {
+  description = "ARN of the KMS key used for S3 encryption"
+  type        = string
+}
+
+variable "awswrangler_layer_arn" {
+  description = "ARN of the AWS SDK for pandas (awswrangler) Lambda layer"
+  type        = string
+}
+
+variable "tags" {
+  description = "Tags to apply to resources"
+  type        = map(string)
+  default     = {}
+}
