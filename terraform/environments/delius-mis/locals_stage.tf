@@ -444,7 +444,7 @@ locals {
   }
 
   db_backup_config_stage = {
-    object_lock_days             = 0
+    object_lock_days             = 1
     expire_current_after_days    = 90
     expire_noncurrent_after_days = 10
   }

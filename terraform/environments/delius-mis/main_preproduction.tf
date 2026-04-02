@@ -96,7 +96,7 @@ module "environment_preproduction" {
 
   pagerduty_integration_key = local.pagerduty_integration_key
 
-  create_backup_role = false
+  create_backup_role = true
 
   tags = local.tags
 
