@@ -79,7 +79,7 @@ resource "aws_batch_job_definition" "shred_unstructured_from_zip_job" {
 
   container_properties = jsonencode({
     image            = local.shred_unstructured_docker_image_uri
-    executionRoleArn = aws_iam_role.gdpr_execution_role.arn
+    executionRoleArn = aws_iam_role.ecs_gdpr_execution_role.arn
     jobRoleArn       = aws_iam_role.gdpr_batch_code_job_role.arn
     
     resourceRequirements = [
@@ -123,13 +123,13 @@ data "aws_iam_policy_document" "gdpr_batch_jobs_assume_ecs_policy" {
   }
 }
 
-resource "aws_iam_role" "gdpr_execution_role" {
+resource "aws_iam_role" "ecs_gdpr_execution_role" {
   name               = "emds-gdpr-execution-role" # STRICT NAME REQUIRED BY EXTERNAL ECR
   assume_role_policy = data.aws_iam_policy_document.gdpr_batch_jobs_assume_ecs_policy.json
 }
 
 resource "aws_iam_role_policy_attachment" "gdpr_batch_jobs_ecs_execution_role_policy" {
-  role       = aws_iam_role.gdpr_execution_role.name
+  role       = aws_iam_role.ecs_gdpr_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
@@ -149,7 +149,7 @@ resource "aws_iam_policy" "gdpr_batch_jobs_logs_policy" {
   policy = data.aws_iam_policy_document.gdpr_batch_jobs_logs_policy_document.json
 }
 resource "aws_iam_role_policy_attachment" "gdpr_batch_jobs_logs_policy_attach" {
-  role       = aws_iam_role.gdpr_execution_role.name
+  role       = aws_iam_role.ecs_gdpr_execution_role.name
   policy_arn = aws_iam_policy.gdpr_batch_jobs_logs_policy.arn
 }
 ##
@@ -172,7 +172,7 @@ resource "aws_iam_policy" "gdpr_batch_jobs_ecr_policy" {
   policy = data.aws_iam_policy_document.gdpr_batch_jobs_ecr_policy_document.json
 }
 resource "aws_iam_role_policy_attachment" "gdpr_batch_jobs_ecr_policy_attach" {
-  role       = aws_iam_role.gdpr_execution_role.name
+  role       = aws_iam_role.ecs_gdpr_execution_role.name
   policy_arn = aws_iam_policy.gdpr_batch_jobs_ecr_policy.arn
 }
 ##
@@ -246,7 +246,7 @@ resource "aws_vpc_security_group_egress_rule" "gdpr_batch_egress_vpc" {
   count                        = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
   security_group_id            = aws_security_group.gdpr_batch_sg[0].id
   description                  = "AWS Batch -----[https]-----+ VPC (for Cloudwatch, ECR, and AWS Batch API)"
-  ip_protocol                  = "https"
+  ip_protocol                  = "tcp"
   from_port                    = 443
   to_port                      = 443
   cidr_ipv4 = data.aws_vpc.shared.cidr_block
