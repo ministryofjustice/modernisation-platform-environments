@@ -403,8 +403,8 @@ locals {
   }
 
   fsx_config_preprod = {
-    storage_capacity     = 200
-    throughtput_capacity = 16
+    storage_capacity     = 1000 # temporarily increasing for prod->stage migration, was 200
+    throughtput_capacity = 128  # temporarily increasing for prod->stage migration, was 16
   }
 
   dfi_report_bucket_config_preprod = null
