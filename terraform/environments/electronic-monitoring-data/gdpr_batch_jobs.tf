@@ -56,12 +56,13 @@ resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_comp
 }
 
 resource "aws_batch_job_queue" "shred_unstructured_from_zip_batch_queue" {
+  count                = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
   name                 = "shred-unstructured-from-zip-processing-queue"
   state                = "ENABLED"
   priority             = 1
   compute_environment_order {
     order               = 1
-    compute_environment = aws_batch_compute_environment.shred_unstructured_from_zip_batch_compute_env.arn
+    compute_environment = aws_batch_compute_environment.shred_unstructured_from_zip_batch_compute_env[count.index].arn
   }
   tags = merge(local.tags, { Batch_Job_Name = local.shred_unstructured_image_name })
 }
