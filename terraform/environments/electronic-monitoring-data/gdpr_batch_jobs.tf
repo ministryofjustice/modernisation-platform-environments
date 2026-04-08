@@ -43,7 +43,7 @@ resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_comp
     max_vcpus           = 16
     min_vcpus           = 0
     security_group_ids  = [aws_security_group.gdpr_batch_sg[0].id]
-    subnets             = data.aws_subnets.shared-private[*].id
+    subnets             = data.aws_subnets.shared-private.ids
     
     # Require large instances with high network/EBS bandwidth
     instance_type       = ["m5.2xlarge", "m5.4xlarge", "r5.2xlarge"] 
