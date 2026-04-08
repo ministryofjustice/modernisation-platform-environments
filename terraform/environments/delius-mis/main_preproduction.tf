@@ -85,6 +85,8 @@ module "environment_preproduction" {
   dis_config = local.dis_config_preprod
   dfi_config = local.dfi_config_preprod
 
+  bcs_config_win = local.bcs_config_win_preprod
+
   dsd_db_config = local.dsd_db_config_preprod
   boe_db_config = local.boe_db_config_preprod
   mis_db_config = local.mis_db_config_preprod
