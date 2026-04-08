@@ -88,7 +88,7 @@ module "datasync_opg_replication_iam_role" {
 
   create = true
 
-  name            = "datasync-opg-${local.environment}-replication"
+  name            = "datasync-opg-ingress-${local.environment}-replication"
   use_name_prefix = false
 
   trust_policy_permissions = {
