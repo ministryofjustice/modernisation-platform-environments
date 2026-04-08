@@ -35,6 +35,11 @@ variable "bws_config" {
   type = any
 }
 
+variable "bcs_config_win" {
+  type    = any
+  default = null
+}
+
 variable "boe_efs_config" {
   type    = any
   default = null
