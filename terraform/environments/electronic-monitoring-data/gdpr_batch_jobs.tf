@@ -40,6 +40,7 @@ resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_comp
 
   compute_resources {
     type                = "SPOT"
+    spot_iam_fleet_role = aws_iam_role.gdpr_spot_fleet_role
     max_vcpus           = 16
     min_vcpus           = 0
     security_group_ids  = [aws_security_group.gdpr_batch_sg[0].id]
@@ -106,6 +107,29 @@ resource "aws_launch_template" "shred_unstructured_from_zip_batch_storage_templa
       encrypted             = true
     }
   }
+}
+
+# ==============================================================================
+# 1.b. IAM: Spot Fleet Role (Required ONLY because we use SPOT instances)
+# ==============================================================================
+data "aws_iam_policy_document" "gdpr_spot_fleet_assume_role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["spotfleet.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "gdpr_spot_fleet_role" {
+  name               = "emds-gdpr-spot-fleet-role"
+  assume_role_policy = data.aws_iam_policy_document.gdpr_spot_fleet_assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "gdpr_spot_fleet_role_attachment" {
+  role       = aws_iam_role.gdpr_spot_fleet_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetTaggingRole"
 }
 
 # ==============================================================================
