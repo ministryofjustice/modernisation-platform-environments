@@ -96,3 +96,54 @@ resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
     aws_sns_topic.emds_alerts.arn
   ]
 }
+
+# ------------------------------------------------------------------------------
+# FMS DLQ alarms routed to Slack via EventBridge -> cloudwatch_alarm_threader
+# ------------------------------------------------------------------------------
+
+locals {
+  additional_dlq_alarm_queue_names = toset([
+    "load_fms-dlq",
+
+    "process_landing_bucket_files_fms_general-dlq",
+    "process_landing_bucket_files_fms_ho-dlq",
+    "process_landing_bucket_files_fms_specials-dlq",
+
+    "process_landing_bucket_files_mdss_general-dlq",
+    "process_landing_bucket_files_mdss_ho-dlq",
+    "process_landing_bucket_files_mdss_specials-dlq",
+
+    "scan-dlq",
+    "process_fms_metadata-dlq",
+    "format-fms-json-dlq",
+    "push_data_export_to_p1-dlq",
+  ])
+}
+
+resource "aws_cloudwatch_metric_alarm" "additional_dlq_has_messages" {
+  for_each = local.additional_dlq_alarm_queue_names
+
+  alarm_name          = "${replace(each.value, "-", "_")}_has_messages"
+  alarm_description   = "Triggered when ${each.value} contains messages"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  # Use EventBridge -> cloudwatch_alarm_threader -> SNS custom notifications.
+  # Disable direct alarm actions to avoid duplicate Slack messages.
+  actions_enabled = false
+
+  metric_name = "ApproximateNumberOfMessagesVisible"
+  namespace   = "AWS/SQS"
+  period      = 60
+  statistic   = "Sum"
+
+  dimensions = {
+    QueueName = each.value
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
