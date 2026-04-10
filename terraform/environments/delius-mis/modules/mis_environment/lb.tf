@@ -97,6 +97,23 @@ resource "aws_vpc_security_group_egress_rule" "mis_alb_egress" {
   tags = local.tags
 }
 
+resource "aws_vpc_security_group_egress_rule" "mis_alb_egress_bcs_win" {
+  for_each = local.bcs_win_enabled ? {
+    http8080-to-bcs-win = { referenced_security_group_id = aws_security_group.bcs_ec2.id, ip_protocol = "tcp", port = 8080 }
+  } : {}
+
+  description       = each.key
+  security_group_id = resource.aws_security_group.mis_alb.id
+
+  cidr_ipv4                    = lookup(each.value, "cidr_ipv4", null)
+  ip_protocol                  = lookup(each.value, "ip_protocol", "-1")
+  from_port                    = lookup(each.value, "port", lookup(each.value, "from_port", null))
+  to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
+  referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
+
+  tags = local.tags
+}
+
 # HTTP rules for staff access
 resource "aws_vpc_security_group_ingress_rule" "mis_alb_http_staff" {
   for_each          = var.lb_config != null ? toset(var.account_config.security_group_cidrs_staff) : []
@@ -558,6 +575,14 @@ resource "aws_lb_target_group_attachment" "bws_attachment" {
   target_group_arn = aws_lb_target_group.bws[0].arn
   target_id        = module.bws_instance[count.index].aws_instance.id
   port             = 7777
+}
+
+# Attach BCS_WIN instances to the target group - only if BCS_WIN is enabled
+resource "aws_lb_target_group_attachment" "bcs_win_attachment" {
+  count            = local.bcs_win_enabled ? var.bcs_config_win.instance_count : 0
+  target_group_arn = aws_lb_target_group.bcs_win[0].arn
+  target_id        = module.bcs_win_instance[count.index].aws_instance.id
+  port             = 8080
 }
 
 # Create route53 entry for DFI - only if DFI is enabled

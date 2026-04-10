@@ -69,6 +69,24 @@ resource "aws_vpc_security_group_egress_rule" "bcs_win_ec2_to_dc" {
   tags = local.tags
 }
 
+resource "aws_vpc_security_group_ingress_rule" "bcs_win_ec2" {
+  for_each = var.bcs_config_win != null && var.bcs_config_win.instance_count > 0 ? {
+    http8080-from-alb = { referenced_security_group_id = aws_security_group.mis_alb.id, ip_protocol = "tcp", port = 7777 }
+    tcp6400-from-vpc  = { cidr_ipv4 = var.account_config.shared_vpc_cidr, ip_protocol = "tcp", from_port = 6400, to_port = 6500 } # hmpps jumpservers
+  } : {}
+
+  description       = each.key
+  security_group_id = resource.aws_security_group.bcs_ec2.id
+
+  cidr_ipv4                    = lookup(each.value, "cidr_ipv4", null)
+  ip_protocol                  = lookup(each.value, "ip_protocol", "-1")
+  from_port                    = lookup(each.value, "port", lookup(each.value, "from_port", null))
+  to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
+  referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
+
+  tags = local.tags
+}
+
 module "bcs_instance" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.2.0"
 
