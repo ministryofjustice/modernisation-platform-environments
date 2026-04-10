@@ -450,7 +450,9 @@ locals {
 
   dfi_report_bucket_config_preprod = null
 
-  lb_config_preprod = null
+  lb_config_preprod = {
+    bucket_policy_enabled = true
+  }
 
   datasync_config_preprod = null
 
