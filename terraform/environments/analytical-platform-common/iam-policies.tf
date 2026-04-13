@@ -106,6 +106,36 @@ module "snyk_analytical_platform_airflow_container_scanning_iam_policy" {
   tags = local.tags
 }
 
+module "trivy_analytical_platform_airflow_container_scanning_iam_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "6.4.0"
+
+  name_prefix = "trivy-analytical-platform-airflow-container-scanning"
+  description = "IAM Policy"
+
+  policy = data.aws_iam_policy_document.trivy_analytical_platform_airflow_container_scanning_access.json
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "trivy_analytical_platform_airflow_container_scanning_access" {
+  statement {
+    sid       = "GetTrivyArtefacts"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["${module.trivy_analytical_platform_airflow_container_scanning_bucket.s3_bucket_arn}/trivy/*"]
+  }
+  statement {
+    sid       = "DecryptObjectsWithBucketKey"
+    effect    = "Allow"
+    actions   = ["kms:Decrypt", "kms:DescribeKey"]
+    resources = [module.s3_artifacts_kms.key_arn]
+  }
+}
+
 data "aws_iam_policy_document" "analytical_platform_terraform" {
   statement {
     sid    = "AllowKMS"
