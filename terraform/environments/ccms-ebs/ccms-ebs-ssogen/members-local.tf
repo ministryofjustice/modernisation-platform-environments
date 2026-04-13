@@ -120,8 +120,8 @@ locals {
   #   }
   # }
   # Split domain validation by domain type
-  modernisation_platform_validations    = [for k, v in local.domain_types : v if strcontains(k, "modernisation-platform.service.justice.gov.uk")]
-  laa_validations                       = [for k, v in local.domain_types : v if strcontains(k, "laa.service.justice.gov.uk")]
+  # modernisation_platform_validations    = [for k, v in local.domain_types : v if strcontains(k, "modernisation-platform.service.justice.gov.uk")]
+  # laa_validations                       = [for k, v in local.domain_types : v if strcontains(k, "laa.service.justice.gov.uk")]
   # modernisation_platform_validations_cf = [for k, v in local.domain_types_cf : v if strcontains(k, "modernisation-platform.service.justice.gov.uk")]
   # laa_validations_cf                    = [for k, v in local.domain_types_cf : v if strcontains(k, "laa.service.justice.gov.uk")]
   #  cert_opts    = local.environment == "production" ? aws_acm_certificate.external-service[0].domain_validation_options : aws_acm_certificate.external[0].domain_validation_options
