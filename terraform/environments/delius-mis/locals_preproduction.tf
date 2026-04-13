@@ -26,44 +26,43 @@ locals {
     extra_user_data_content = "yum install -y openldap-clients"
   }
 
-  bcs_config_preprod = {
-    instance_count = 0
-    ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
-    ansible_branch = "main"
-    ebs_volumes = {
-      "/dev/sda1" = { label = "root", size = 150 }
-      "/dev/xvdf" = { label = "data", size = 300 }
+  boe_efs_config_preprod = {
+    availability_zone_name = "eu-west-2a"
+    mount_targets_subnet_ids = {
+      single-az = data.aws_subnets.shared-private-a.ids[0]
     }
+    # For multi-az, use:
+    # availability_zone_name = null
+    # mount_targets_subnet_ids = {
+    #   multi-az-a = data.aws_subnets.shared-private-a.ids[0]
+    #   multi-az-b = data.aws_subnets.shared-private-b.ids[0]
+    #   multi-az-c = data.aws_subnets.shared-private-c.ids[0]
+    # }
+  }
 
-    ebs_volumes_config = {
-      data = {
-        iops       = 3000
-        throughput = 125
-        type       = "gp3"
-      }
-      root = {
-        iops       = 3000
-        throughput = 125
-        type       = "gp3"
-      }
+  bcs_config_preprod = {
+    instance_count = 1
+    ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
+    ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
+    ansible_branch = "TM-2005/ndmis/preprod-initial-config"
+    ebs_volumes = {
+      "/dev/sda1" = { label = "root", size = 150, type = "gp3" } # 100GB would be OK
+      "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }
+      "/dev/sdc"  = { label = "data", size = 100, type = "gp3" }
+      "/dev/sds"  = { label = "swap", size = 8, type = "gp3" }
     }
+    ebs_volumes_config = {}
 
     instance_config = {
       associate_public_ip_address  = false
       disable_api_termination      = false
       disable_api_stop             = false
-      instance_type                = "t3.xlarge"
+      instance_type                = "m6i.xlarge"
       metadata_endpoint_enabled    = "enabled"
       key_name                     = null
       metadata_options_http_tokens = "required"
       monitoring                   = true
       ebs_block_device_inline      = true
-
-      private_dns_name_options = {
-        enable_resource_name_dns_aaaa_record = false
-        enable_resource_name_dns_a_record    = true
-        hostname_type                        = "resource-name"
-      }
 
       tags = merge(
         local.tags,
@@ -253,12 +252,53 @@ locals {
         }
       )
     }
-    # Load balancer configuration for DFI
-    lb_target_config = {
-      endpoint             = "ndl-dfi"
-      port                 = 8080
-      health_check_path    = "/DataServices/"
-      health_check_matcher = "200,302,301"
+  }
+
+  bcs_config_win_preprod = {
+    instance_count    = 1
+    ami_name          = "delius_mis_windows_server_patch_2025-10-01T13-00-02.504Z"
+    computer_name     = "NDMIS-PP-BCS" # 15 char limit
+    powershell_branch = "TM-2005/ndmis/windows-initial-config"
+
+    ebs_volumes = {
+      "/dev/sda1" = { label = "root", size = 100 }
+      "/dev/xvdf" = { label = "data", size = 300 }
+    }
+
+    ebs_volumes_config = {
+      data = {
+        iops       = 3000
+        throughput = 125
+        type       = "gp3"
+      }
+      root = {
+        iops       = 3000
+        throughput = 125
+        type       = "gp3"
+      }
+    }
+
+    instance_config = {
+      associate_public_ip_address  = false
+      disable_api_termination      = false
+      disable_api_stop             = false
+      instance_type                = "r6i.4xlarge"
+      metadata_endpoint_enabled    = "enabled"
+      key_name                     = null
+      metadata_options_http_tokens = "required"
+      monitoring                   = true
+      ebs_block_device_inline      = true
+
+      private_dns_name_options = {
+        enable_resource_name_dns_aaaa_record = false
+        enable_resource_name_dns_a_record    = true
+        hostname_type                        = "resource-name"
+      }
+
+      tags = merge(
+        local.tags,
+        { backup = true }
+      )
     }
   }
 
@@ -404,16 +444,20 @@ locals {
   }
 
   fsx_config_preprod = {
-    storage_capacity     = 200
-    throughtput_capacity = 16
+    storage_capacity     = 1000 # temporarily increasing for prod->stage migration, was 200
+    throughtput_capacity = 128  # temporarily increasing for prod->stage migration, was 16
   }
 
   dfi_report_bucket_config_preprod = null
 
-  lb_config_preprod = null
+  lb_config_preprod = {
+    bucket_policy_enabled = true
+  }
+
+  datasync_config_preprod = null
 
   db_backup_config_preprod = {
-    object_lock_days             = 0
+    object_lock_days             = 1
     expire_current_after_days    = 200
     expire_noncurrent_after_days = 10
     transition = [

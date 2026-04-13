@@ -294,12 +294,12 @@ resource "aws_api_gateway_integration_response" "status_integration_response" {
 #else
     {
       "execution_id": "$input.name",
-      "status": "$input.status"
+      "status": "$input.status",
       #if($input.status == "SUCCEEDED")
         "output": $input.output
       #elseif($input.status == "FAILED")
-        "error": "$input.error",
-        "cause": "$input.cause"
+        "error": "$util.escapeJavaScript($input.error)",
+        "cause": "$util.escapeJavaScript($input.cause)"
       #else
         "output": ""
       #end

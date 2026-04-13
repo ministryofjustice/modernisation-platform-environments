@@ -59,8 +59,8 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
   bucket = module.this-bucket.bucket.id
 
   queue {
-    queue_arn = module.push_lambda_event_queue.sqs_queue.arn
-    events    = ["s3:ObjectCreated:*"]
+    queue_arn     = module.push_lambda_event_queue.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
     filter_suffix = var.filter_suffix
   }
 }

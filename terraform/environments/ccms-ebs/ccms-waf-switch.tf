@@ -90,8 +90,8 @@ resource "aws_scheduler_schedule" "waf_allow_schedule" {
   schedule_expression = "cron(00 07 ? * MON-SUN *)"
 
   target {
-    arn       = aws_lambda_function.waf_maintenance.arn
-    input     = jsonencode({ mode = "ALLOW" })
+    arn      = aws_lambda_function.waf_maintenance.arn
+    input    = jsonencode({ mode = "ALLOW" })
     role_arn = aws_iam_role.scheduler_invoke_lambda_role.arn
   }
 }
@@ -108,8 +108,8 @@ resource "aws_scheduler_schedule" "waf_block_schedule" {
   schedule_expression = "cron(30 21 ? * MON-SUN *)"
 
   target {
-    arn       = aws_lambda_function.waf_maintenance.arn
-    input     = jsonencode({ mode = "BLOCK" })
+    arn      = aws_lambda_function.waf_maintenance.arn
+    input    = jsonencode({ mode = "BLOCK" })
     role_arn = aws_iam_role.scheduler_invoke_lambda_role.arn
   }
 }

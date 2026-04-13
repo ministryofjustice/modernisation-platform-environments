@@ -178,12 +178,6 @@ locals {
         { backup = true }
       )
     }
-    lb_target_config = {
-      endpoint             = "ndl-dis"
-      port                 = 8080
-      health_check_path    = "/BOE/CMC/"
-      health_check_matcher = "200,302,301"
-    }
   }
 
   # new DFI instance config to differentiate from DIS
@@ -228,13 +222,6 @@ locals {
         { backup = true
         }
       )
-    }
-    # Load balancer configuration for DFI
-    lb_target_config = {
-      endpoint             = "ndl-dfi"
-      port                 = 8080
-      health_check_path    = "/DataServices/"
-      health_check_matcher = "200,302,301"
     }
   }
 
@@ -444,7 +431,7 @@ locals {
   }
 
   db_backup_config_stage = {
-    object_lock_days             = 0
+    object_lock_days             = 1
     expire_current_after_days    = 90
     expire_noncurrent_after_days = 10
   }

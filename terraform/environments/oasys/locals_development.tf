@@ -25,6 +25,7 @@ locals {
       # disabling some features in development as the environment gets nuked
       cloudwatch_metric_oam_links_ssm_parameters = []
       cloudwatch_metric_oam_links                = []
+      db_backup_object_lock_days                 = 3
     }
   }
 

@@ -286,6 +286,15 @@ locals {
         source_arn_suffix = "*"
       }]
     }
+    waf_web_acl_bot_analysis = {
+      description  = "Function to analyse WAM WAF Web ACL rule AWSManagedRulesBotControlRuleSet for bot traffic and email a report."
+      role_key     = "get_waf_web_acl"
+      environments = ["development", "preproduction"]
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
   }
 
   # Flatten lambda functions with environments

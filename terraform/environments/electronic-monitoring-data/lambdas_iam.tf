@@ -171,7 +171,7 @@ data "aws_iam_policy_document" "place_unzipped_file_s3_policy_document" {
     resources = local.is-production ? [
       "${module.s3-unzipped-files-bucket.bucket.arn}/*",
       module.s3-unzipped-files-bucket.bucket.arn,
-    ] : [
+      ] : [
       "${module.s3-ears-sars-bucket.bucket.arn}/*",
       module.s3-ears-sars-bucket.bucket.arn,
     ]
@@ -260,7 +260,7 @@ data "aws_iam_policy_document" "get_unzipped_presigned_url_file_s3_policy_docume
     resources = local.is-production ? [
       "${module.s3-unzipped-files-bucket.bucket.arn}/*",
       module.s3-unzipped-files-bucket.bucket.arn,
-    ] : [
+      ] : [
       "${module.s3-ears-sars-bucket.bucket.arn}/*",
       module.s3-ears-sars-bucket.bucket.arn,
     ]

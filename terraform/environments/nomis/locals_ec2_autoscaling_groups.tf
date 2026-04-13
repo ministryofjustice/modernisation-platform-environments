@@ -236,9 +236,9 @@ locals {
 
     weblogic-12 = {
       autoscaling_group = {
-        desired_capacity          = 3
+        desired_capacity          = 1
         force_delete              = true
-        max_size                  = 3
+        max_size                  = 1
         termination_policies      = ["NewestInstance"]
         vpc_zone_identifier       = module.environment.subnets["private"].ids
         wait_for_capacity_timeout = 0

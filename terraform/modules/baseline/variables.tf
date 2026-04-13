@@ -948,6 +948,7 @@ variable "s3_buckets" {
     replication_role_arn       = optional(string, "")
     force_destroy              = optional(bool, false)
     sse_algorithm              = optional(string, "aws:kms")
+    object_lock_days           = optional(number, null)
     iam_policies = optional(map(list(object({
       sid     = optional(string, null)
       effect  = string

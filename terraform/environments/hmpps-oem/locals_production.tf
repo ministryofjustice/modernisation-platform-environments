@@ -16,6 +16,8 @@ locals {
         "ssm_command",
       ]
 
+      db_backup_object_lock_days = null
+
       sns_topics = {
         pagerduty_integrations = {
           azure-fixngo-pagerduty              = "az-noms-production-1-alerts"

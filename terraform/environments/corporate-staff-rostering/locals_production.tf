@@ -2,7 +2,8 @@ locals {
 
   baseline_presets_production = {
     options = {
-      db_backup_lifecycle_rule = "rman_backup_one_month"
+      db_backup_lifecycle_rule   = "rman_backup_one_month"
+      db_backup_object_lock_days = null
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "corporate-staff-rostering-production"

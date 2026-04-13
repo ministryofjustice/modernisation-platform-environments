@@ -133,6 +133,16 @@ locals {
         "suppress_sechub_findings"
       ]
     }
+    get_waf_web_acl = {
+      description = "Lambda Function Role for retrieving and analysing waf web acl data"
+      policies = [
+        "send_message_to_sqs",
+        "publish_to_sns",
+        "invoke_ses",
+        "get_cloudwatch_metrics",
+        "get_list_waf_web_acls"
+      ]
+    }
   }
 
   # Environment configurations
@@ -231,7 +241,8 @@ locals {
           "get_ssm_parameter",
           "update_waf_ipset",
           "describe_cloudwatch",
-          "suppress_sechub_findings"
+          "suppress_sechub_findings",
+          "get_list_waf_web_acls"
           ] : {
           key         = "${policy_name}_${env_key}"
           policy_name = policy_name
@@ -329,6 +340,10 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Effect   = "Allow"
         Action   = ["acm:DescribeCertificate", "acm:GetCertificate", "acm:ListCertificates", "acm:ListTagsForCertificate"]
         Resource = ["arn:aws:acm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:certificate/*"]
+        } : each.value.policy_name == "get_list_waf_web_acls" ? {
+        Effect   = "Allow"
+        Action   = ["wafv2:GetWebACL", "wafv2:ListWebACLs"]
+        Resource = ["arn:aws:wafv2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
         } : {
         Effect   = "Deny" # Fallback deny for any unexpected policy names
         Action   = ["*"]

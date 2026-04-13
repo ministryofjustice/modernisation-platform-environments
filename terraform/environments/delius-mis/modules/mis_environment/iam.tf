@@ -96,7 +96,8 @@ resource "aws_iam_role_policy_attachment" "restore_policy" {
 }
 
 data "aws_iam_policy_document" "business_unit_kms_key_access" {
-  count = var.create_backup_role ? 1 : 0
+  # count = var.create_backup_role ? 1 : 0
+  count = 1 # required for EC2s in environments which don't have the backup role
   statement {
     effect = "Allow"
     actions = [
@@ -116,7 +117,8 @@ data "aws_iam_policy_document" "business_unit_kms_key_access" {
 }
 
 resource "aws_iam_policy" "business_unit_kms_key_access" {
-  count  = var.create_backup_role ? 1 : 0
+  # count  = var.create_backup_role ? 1 : 0
+  count  = 1 # required for EC2s in environments which don't have the backup role
   name   = "${var.env_name}-business-unit-kms-key-access-policy"
   path   = "/"
   policy = data.aws_iam_policy_document.business_unit_kms_key_access[0].json

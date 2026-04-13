@@ -6,44 +6,48 @@ locals {
 
   s3_environments_specific = {
     development = {
-      db_backup_bucket_name    = coalesce(var.options.db_backup_bucket_name, substr("dev-${var.environment.application_name}-db-backup-bucket-", 0, 37))
-      db_backup_bucket_policy  = [local.s3_bucket_policies.DevTestEnvironmentsReadOnlyAccessBucketPolicy]
-      db_backup_lifecycle_rule = local.s3_lifecycle_rules[coalesce(var.options.db_backup_lifecycle_rule, "rman_backup_one_month")]
-      s3_bucket_name           = coalesce(var.options.s3_bucket_name, "s3-bucket")
-      s3_lifecycle_rule        = local.s3_lifecycle_rules["general_purpose_three_months"]
-      shared_bucket_name       = substr("devtest-${var.environment.application_name}-", 0, 37)
-      shared_bucket_policy     = [local.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy]
-      shared_lifecycle_rule    = local.s3_lifecycle_rules["general_purpose_three_months"]
+      db_backup_bucket_name      = coalesce(var.options.db_backup_bucket_name, substr("dev-${var.environment.application_name}-db-backup-bucket-", 0, 37))
+      db_backup_bucket_policy    = [local.s3_bucket_policies.DevTestEnvironmentsReadOnlyAccessBucketPolicy]
+      db_backup_lifecycle_rule   = local.s3_lifecycle_rules[coalesce(var.options.db_backup_lifecycle_rule, "rman_backup_one_month")]
+      db_backup_object_lock_days = var.options.db_backup_object_lock_days
+      s3_bucket_name             = coalesce(var.options.s3_bucket_name, "s3-bucket")
+      s3_lifecycle_rule          = local.s3_lifecycle_rules["general_purpose_three_months"]
+      shared_bucket_name         = substr("devtest-${var.environment.application_name}-", 0, 37)
+      shared_bucket_policy       = [local.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy]
+      shared_lifecycle_rule      = local.s3_lifecycle_rules["general_purpose_three_months"]
     }
     test = {
-      db_backup_bucket_name    = coalesce(var.options.db_backup_bucket_name, substr("devtest-${var.environment.application_name}-db-backup-bucket-", 0, 37))
-      db_backup_bucket_policy  = [local.s3_bucket_policies.DevTestEnvironmentsReadOnlyAccessBucketPolicy]
-      db_backup_lifecycle_rule = local.s3_lifecycle_rules[coalesce(var.options.db_backup_lifecycle_rule, "rman_backup_one_month")]
-      s3_bucket_name           = coalesce(var.options.s3_bucket_name, "s3-bucket")
-      s3_lifecycle_rule        = local.s3_lifecycle_rules["general_purpose_three_months"]
-      shared_bucket_name       = substr("devtest-${var.environment.application_name}-", 0, 37)
-      shared_bucket_policy     = [local.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy]
-      shared_lifecycle_rule    = local.s3_lifecycle_rules["general_purpose_three_months"]
+      db_backup_bucket_name      = coalesce(var.options.db_backup_bucket_name, substr("devtest-${var.environment.application_name}-db-backup-bucket-", 0, 37))
+      db_backup_bucket_policy    = [local.s3_bucket_policies.DevTestEnvironmentsReadOnlyAccessBucketPolicy]
+      db_backup_lifecycle_rule   = local.s3_lifecycle_rules[coalesce(var.options.db_backup_lifecycle_rule, "rman_backup_one_month")]
+      db_backup_object_lock_days = var.options.db_backup_object_lock_days
+      s3_bucket_name             = coalesce(var.options.s3_bucket_name, "s3-bucket")
+      s3_lifecycle_rule          = local.s3_lifecycle_rules["general_purpose_three_months"]
+      shared_bucket_name         = substr("devtest-${var.environment.application_name}-", 0, 37)
+      shared_bucket_policy       = [local.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy]
+      shared_lifecycle_rule      = local.s3_lifecycle_rules["general_purpose_three_months"]
     }
     preproduction = {
-      db_backup_bucket_name    = coalesce(var.options.db_backup_bucket_name, substr("preprod-${var.environment.application_name}-db-backup-bucket-", 0, 37))
-      db_backup_bucket_policy  = null
-      db_backup_lifecycle_rule = local.s3_lifecycle_rules[coalesce(var.options.db_backup_lifecycle_rule, "rman_backup_one_month")]
-      s3_bucket_name           = coalesce(var.options.s3_bucket_name, "s3-bucket")
-      s3_lifecycle_rule        = local.s3_lifecycle_rules["general_purpose_three_months"]
-      shared_bucket_name       = substr("prodpreprod-${var.environment.application_name}-", 0, 37)
-      shared_bucket_policy     = [local.s3_bucket_policies.ProdPreprodEnvironmentsWriteAccessBucketPolicy]
-      shared_lifecycle_rule    = local.s3_lifecycle_rules["general_purpose_three_months"]
+      db_backup_bucket_name      = coalesce(var.options.db_backup_bucket_name, substr("preprod-${var.environment.application_name}-db-backup-bucket-", 0, 37))
+      db_backup_bucket_policy    = null
+      db_backup_lifecycle_rule   = local.s3_lifecycle_rules[coalesce(var.options.db_backup_lifecycle_rule, "rman_backup_one_month")]
+      db_backup_object_lock_days = var.options.db_backup_object_lock_days
+      s3_bucket_name             = coalesce(var.options.s3_bucket_name, "s3-bucket")
+      s3_lifecycle_rule          = local.s3_lifecycle_rules["general_purpose_three_months"]
+      shared_bucket_name         = substr("prodpreprod-${var.environment.application_name}-", 0, 37)
+      shared_bucket_policy       = [local.s3_bucket_policies.ProdPreprodEnvironmentsWriteAccessBucketPolicy]
+      shared_lifecycle_rule      = local.s3_lifecycle_rules["general_purpose_three_months"]
     }
     production = {
-      db_backup_bucket_name    = coalesce(var.options.db_backup_bucket_name, substr("prod-${var.environment.application_name}-db-backup-bucket-", 0, 37))
-      db_backup_bucket_policy  = [var.options.db_backup_more_permissions ? local.s3_bucket_policies.ProdPreprodReadWriteDeleteBucketPolicy : local.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy]
-      db_backup_lifecycle_rule = local.s3_lifecycle_rules[coalesce(var.options.db_backup_lifecycle_rule, "rman_backup_one_year")]
-      s3_bucket_name           = coalesce(var.options.s3_bucket_name, "s3-bucket")
-      s3_lifecycle_rule        = local.s3_lifecycle_rules["general_purpose_one_year"]
-      shared_bucket_name       = substr("prodpreprod-${var.environment.application_name}-", 0, 37)
-      shared_bucket_policy     = [local.s3_bucket_policies.ProdPreprodEnvironmentsWriteAccessBucketPolicy]
-      shared_lifecycle_rule    = local.s3_lifecycle_rules["general_purpose_one_year"]
+      db_backup_bucket_name      = coalesce(var.options.db_backup_bucket_name, substr("prod-${var.environment.application_name}-db-backup-bucket-", 0, 37))
+      db_backup_bucket_policy    = [var.options.db_backup_more_permissions ? local.s3_bucket_policies.ProdPreprodReadWriteDeleteBucketPolicy : local.s3_bucket_policies.ProdPreprodEnvironmentsReadOnlyAccessBucketPolicy]
+      db_backup_lifecycle_rule   = local.s3_lifecycle_rules[coalesce(var.options.db_backup_lifecycle_rule, "rman_backup_one_year")]
+      db_backup_object_lock_days = var.options.db_backup_object_lock_days
+      s3_bucket_name             = coalesce(var.options.s3_bucket_name, "s3-bucket")
+      s3_lifecycle_rule          = local.s3_lifecycle_rules["general_purpose_one_year"]
+      shared_bucket_name         = substr("prodpreprod-${var.environment.application_name}-", 0, 37)
+      shared_bucket_policy       = [local.s3_bucket_policies.ProdPreprodEnvironmentsWriteAccessBucketPolicy]
+      shared_lifecycle_rule      = local.s3_lifecycle_rules["general_purpose_one_year"]
     }
   }
   s3_environment_specific = merge(local.s3_environments_specific[var.environment.environment], {
@@ -76,6 +80,7 @@ locals {
       iam_policies       = local.requested_s3_iam_policies
       lifecycle_rule     = [local.s3_environment_specific.db_backup_lifecycle_rule]
       ownership_controls = "BucketOwnerPreferred"
+      object_lock_days   = local.s3_environment_specific.db_backup_object_lock_days
       tags = {
         backup = "false"
       }

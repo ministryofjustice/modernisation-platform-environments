@@ -53,7 +53,7 @@ variable "subnet_ids" {
 }
 
 variable "filter_suffix" {
-  description = "String to filter the suffix of the files on."  
+  description = "String to filter the suffix of the files on."
   type        = string
   default     = ""
 }

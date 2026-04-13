@@ -2,6 +2,7 @@ locals {
 
   baseline_presets_preproduction = {
     options = {
+      db_backup_object_lock_days = null
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "corporate-staff-rostering-preproduction"

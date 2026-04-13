@@ -8,6 +8,7 @@ locals {
 
   baseline_presets_production = {
     options = {
+      db_backup_object_lock_days          = null
       enable_xsiam_cloudwatch_integration = true
       enable_xsiam_s3_integration         = true
       route53_resolver_rules = {

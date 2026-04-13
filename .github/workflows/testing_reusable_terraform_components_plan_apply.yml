@@ -105,7 +105,7 @@ jobs:
           echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7  # v6.0.0
+        uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37  # v6.1.0
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-environments-read-only"
           role-session-name: githubactionsrolesession
@@ -222,7 +222,7 @@ jobs:
       - name: Check for Approval
         id: check_approval
         if: github.event_name == 'pull_request' && steps.evaluate_terraform_plan.outputs.resources_found == 'true'
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           github-token: ${{ env.GITHUB_TOKEN }}
           script: |
@@ -260,7 +260,7 @@ jobs:
       - name: Comment if PR Requires Approval
         id: comment_if_not_approved
         if: failure() && github.event_name == 'pull_request' && steps.check_approval.outcome == 'failure'
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           github-token: ${{ env.GITHUB_TOKEN }}
           script: |
@@ -317,7 +317,7 @@ jobs:
           echo "Role to be used: ${{ env.OIDC_ROLE_NAME }}"
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7  # v6.0.0
+        uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37  # v6.1.0
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/${{ env.OIDC_ROLE_NAME }}"
           role-session-name: githubactionsrolesession

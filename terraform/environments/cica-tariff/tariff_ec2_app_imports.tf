@@ -125,6 +125,6 @@ import {
 # Required due to successful apply but failed state upload (cause: GH role changes by MP team)
 import {
   for_each = local.environment == "production" ? { prod = true } : {}
-  to = module.tariff_app_prod_security_group[0].aws_security_group_rule.ingress_with_cidr_blocks[6]
-  id = "sg-06bbc9ebcc947e58f_ingress_tcp_8400_8404_10.10.10.0/24_10.10.110.0/24"
+  to       = module.tariff_app_prod_security_group[0].aws_security_group_rule.ingress_with_cidr_blocks[6]
+  id       = "sg-06bbc9ebcc947e58f_ingress_tcp_8400_8404_10.10.10.0/24_10.10.110.0/24"
 }

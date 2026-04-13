@@ -12,6 +12,7 @@ locals {
           pagerduty = "nomis-test"
         }
       }
+      db_backup_object_lock_days = null
     }
   }
 
@@ -280,10 +281,10 @@ locals {
         })
       })
 
-      t1-nomis-db19c-1-a = merge(local.ec2_instances.db19c, {
+      t1-nomis-db19c-1-c = merge(local.ec2_instances.db19c, {
         cloudwatch_metric_alarms = {}
         config = merge(local.ec2_instances.db19c.config, {
-          availability_zone = "eu-west-2a"
+          availability_zone = "eu-west-2c"
           instance_profile_policies = concat(local.ec2_instances.db19c.config.instance_profile_policies, [
             "Ec2T1DatabasePolicy",
           ])
@@ -301,7 +302,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_instances.db19c.user_data_cloud_init, {
           args = merge(local.ec2_instances.db19c.user_data_cloud_init.args, {
-            branch = "main"
+            branch = "TM-1983/nomis/19c-11g-testing"
           })
         })
         tags = merge(local.ec2_instances.db19c.tags, {
