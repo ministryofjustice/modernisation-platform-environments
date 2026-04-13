@@ -11,9 +11,9 @@ resource "aws_acm_certificate" "external" {
   domain_name               = local.primary_domain
   subject_alternative_names = local.subject_alternative_names
 
-  options {
-    export = "ENABLED"
-  }
+  # options {
+  #   export = "ENABLED"
+  # }
 
   lifecycle {
     create_before_destroy = true
