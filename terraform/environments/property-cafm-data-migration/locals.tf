@@ -2,18 +2,18 @@ locals {
   account_name = "cafm"
   # Flat list of all users across environments
   sftp_user_list = [
-    {
-      environment  = "development"
-      user_name    = "dev_user1"
-      s3_bucket    = "property-datahub-landing-development"
-      ssm_key_name = "/sftp/keys/dev_user1"
-    },
-    {
-      environment  = "development"
-      user_name    = "dev_user2"
-      s3_bucket    = "property-datahub-landing-development"
-      ssm_key_name = "/sftp/keys/dev_user2"
-    },
+    # {
+    #   environment  = "development"
+    #   user_name    = "dev_user1"
+    #   s3_bucket    = "property-datahub-landing-development"
+    #   ssm_key_name = "/sftp/keys/dev_user1"
+    # },
+    # {
+    #   environment  = "development"
+    #   user_name    = "dev_user2"
+    #   s3_bucket    = "property-datahub-landing-development"
+    #   ssm_key_name = "/sftp/keys/dev_user2"
+    # },
     {
       environment  = "preproduction"
       user_name    = "preprod_sftp_user"
@@ -47,7 +47,6 @@ locals {
     "preproduction" = "preprod"
     "test"          = "test"
     "development"   = "dev"
-    "default"       = ""
   }
   environment_shorthand = local.environment_map[local.environment]
 }

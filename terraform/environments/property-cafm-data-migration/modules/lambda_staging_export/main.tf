@@ -20,8 +20,8 @@ resource "aws_iam_role" "lambda" {
 }
 
 resource "aws_iam_role_policy" "lambda" {
-  name = "${var.function_name}-policy"
-  role = aws_iam_role.lambda.id
+  name_prefix = "${var.function_name}-policy"
+  role        = aws_iam_role.lambda.id
 
   policy = jsonencode({
     Version = "2012-10-17"
