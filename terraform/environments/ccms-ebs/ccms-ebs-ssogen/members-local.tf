@@ -105,12 +105,12 @@ locals {
   subject_alternative_names    = local.is-production ? local.prod_sans : local.nonprod_sans
   # subject_alternative_names_cf = local.is-production ? local.prod_sans_cf : local.nonprod_sans_cf
   # Domain validation options mapping (following the example pattern)
-  domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
-    name   = dvo.resource_record_name
-    record = dvo.resource_record_value
-    type   = dvo.resource_record_type
-    }
-  }
+  # domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
+  #   name   = dvo.resource_record_name
+  #   record = dvo.resource_record_value
+  #   type   = dvo.resource_record_type
+  #   }
+  # }
 
   # Domain validation options mapping for cloudfront(following the example pattern)
   # domain_types_cf = { for dvo in aws_acm_certificate.external_cf.domain_validation_options : dvo.domain_name => {
