@@ -40,7 +40,7 @@ resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_comp
 
   compute_resources {
     type                = "SPOT"
-    spot_iam_fleet_role = aws_iam_role.gdpr_spot_fleet_role
+    spot_iam_fleet_role = aws_iam_role.gdpr_spot_fleet_role.arn
     max_vcpus           = 16
     min_vcpus           = 0
     security_group_ids  = [aws_security_group.gdpr_batch_sg[0].id]
