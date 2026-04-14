@@ -364,9 +364,9 @@ resource "aws_security_group_rule" "gdpr_batch_egress_s3" {
 resource "aws_vpc_security_group_egress_rule" "gdpr_batch_egress_vpc" {
   count                        = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
   security_group_id            = aws_security_group.gdpr_batch_sg[0].id
-  description                  = "AWS Batch -----[https]-----+ VPC (for Cloudwatch, ECR, and AWS Batch API)"
+  description                  = "AWS Batch -----[https]-----+ AWS APIs via NAT Gateway"
   ip_protocol                  = "tcp"
   from_port                    = 443
   to_port                      = 443
-  cidr_ipv4 = data.aws_vpc.shared.cidr_block
+  cidr_ipv4                    = "0.0.0.0/0"
 }
