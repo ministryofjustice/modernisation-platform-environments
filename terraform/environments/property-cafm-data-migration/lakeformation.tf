@@ -1,6 +1,6 @@
 # Role used by DE's to access AWS
 locals {
-  lf_admin_roles = local.is-development ? "sandbox" : "developer"
+  lf_admin_roles = local.is-development ? "sandbox" : "data-eng"
 }
 
 data "aws_iam_roles" "modernisation_platform" {
@@ -9,11 +9,15 @@ data "aws_iam_roles" "modernisation_platform" {
 }
 
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
-  admins = [
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.modernisation_platform.names)}",
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess",
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/lakeformation-share-role"
-  ]
+  admins = concat(
+    length(data.aws_iam_roles.modernisation_platform.names) > 0 ? [
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.modernisation_platform.names)}"
+    ] : [],
+    [
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess",
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/lakeformation-share-role"
+    ]
+  )
 
   parameters = {
     "CROSS_ACCOUNT_VERSION" = "4"
