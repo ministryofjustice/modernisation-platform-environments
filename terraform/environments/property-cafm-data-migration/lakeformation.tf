@@ -1,18 +1,42 @@
 # Role used by DE's to access AWS
+locals {
+  lf_admin_roles = local.is-development ? "sandbox" : "developer"
+}
+
 data "aws_iam_roles" "modernisation_platform" {
-  name_regex  = "AWSReservedSSO_modernisation-platform-developer_.*"
+  name_regex  = "AWSReservedSSO_modernisation-platform-${local.lf_admin_roles}_.*"
   path_prefix = "/aws-reserved/sso.amazonaws.com/"
 }
 
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   admins = [
-    #one(data.aws_iam_roles.modernisation_platform.arns),
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.modernisation_platform.names)}",
     "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess",
     "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/lakeformation-share-role"
   ]
 
   parameters = {
     "CROSS_ACCOUNT_VERSION" = "4"
+  }
+}
+
+# Grant the staging export Lambda role Lake Formation permissions on the property database
+resource "aws_lakeformation_permissions" "staging-export-database" {
+  principal   = module.lambda-staging-export.role_arn
+  permissions = ["DESCRIBE"]
+
+  database {
+    name = "property"
+  }
+}
+
+resource "aws_lakeformation_permissions" "staging-export-tables" {
+  principal   = module.lambda-staging-export.role_arn
+  permissions = ["SELECT", "DESCRIBE"]
+
+  table {
+    database_name = "property"
+    wildcard      = true
   }
 }
 
