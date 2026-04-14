@@ -190,6 +190,23 @@ module "aws_s3_staging" {
         }
       },
       {
+        Sid    = "AllowLambdaAthenaWrites",
+        Effect = "Allow",
+        Principal = {
+          AWS = "arn:aws:iam::<account-id>:role/cafm-staging-export-role"
+        },
+        Action = [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ],
+        Resource = [
+          module.aws_s3_staging.bucket.arn,
+          "${module.aws_s3_staging.bucket.arn}/*"
+        ]
+      },
+      {
         Sid    = "AllowAnalyticalPlatformIngestionService",
         Effect = "Allow",
         Principal = {

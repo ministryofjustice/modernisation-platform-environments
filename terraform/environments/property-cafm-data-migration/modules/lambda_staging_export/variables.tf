@@ -3,6 +3,12 @@ variable "function_name" {
   type        = string
 }
 
+variable "description" {
+  description = "Lambda to export the CAFM data to the staging area in S3 as CSV files."
+  type        = string
+  default     = ""
+}
+
 variable "s3_output_path" {
   description = "S3 URI prefix for CSV output (e.g. s3://bucket/prefix)"
   type        = string

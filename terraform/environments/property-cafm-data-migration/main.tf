@@ -104,6 +104,7 @@ module "lambda-staging-export" {
   source = "./modules/lambda_staging_export"
 
   function_name               = "cafm-staging-export"
+  description                 = "Exports Athena view data as CSV into the CAFM staging S3 bucket"
   database_name               = "property"
   s3_output_path              = "s3://${module.aws_s3_staging.bucket.id}"
   s3_output_bucket_arn        = module.aws_s3_staging.bucket.arn

@@ -54,18 +54,26 @@ resource "aws_iam_role_policy" "lambda" {
         ]
       },
       {
-        Sid    = "S3OutputAccess"
+        Sid    = "S3OutputBucketLevelAccess"
+        Effect = "Allow"
+        Action = [
+          "s3:GetBucketLocation",
+          "s3:ListBucket"
+        ]
+        Resource = var.s3_output_bucket_arn
+      },
+      {
+        Sid    = "S3OutputObjectLevelAccess"
         Effect = "Allow"
         Action = [
           "s3:GetObject",
           "s3:PutObject",
-          "s3:GetBucketLocation",
-          "s3:ListBucket"
+          "s3:DeleteObject",
+          "s3:AbortMultipartUpload",
+          "s3:ListBucketMultipartUploads",
+          "s3:ListMultipartUploadParts"
         ]
-        Resource = [
-          var.s3_output_bucket_arn,
-          "${var.s3_output_bucket_arn}/*"
-        ]
+        Resource = "${var.s3_output_bucket_arn}/*"
       },
       {
         Sid    = "S3AthenaResultsAccess"
@@ -128,6 +136,7 @@ data "archive_file" "lambda" {
 
 resource "aws_lambda_function" "this" {
   function_name = var.function_name
+  description   = var.description
   role          = aws_iam_role.lambda.arn
   handler       = "lambda.lambda_handler"
   runtime       = "python3.11"
