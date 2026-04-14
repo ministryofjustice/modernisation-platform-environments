@@ -29,33 +29,8 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   }
 }
 
-# Grant the SSO admin role Lake Formation permissions on the property database
-resource "aws_lakeformation_permissions" "sso-admin-database" {
-  count = length(data.aws_iam_roles.modernisation_platform.names) > 0 ? 1 : 0
-
-  principal                     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.modernisation_platform.names)}"
-  permissions                   = ["ALL"]
-  permissions_with_grant_option = ["ALL"]
-
-  database {
-    name = "property"
-  }
-}
-
-resource "aws_lakeformation_permissions" "sso-admin-tables" {
-  count = length(data.aws_iam_roles.modernisation_platform.names) > 0 ? 1 : 0
-
-  principal                     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.modernisation_platform.names)}"
-  permissions                   = ["ALL"]
-  permissions_with_grant_option = ["ALL"]
-
-  table {
-    database_name = "property"
-    wildcard      = true
-  }
-}
-
 # Grant the staging export Lambda role Lake Formation permissions on the property database
+# SSO admin grants (sandbox/data-eng) are managed via data-engineering-datalake-access YAML
 resource "aws_lakeformation_permissions" "staging-export-database" {
   principal   = module.lambda-staging-export.role_arn
   permissions = ["DESCRIBE"]
