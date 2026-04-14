@@ -37,11 +37,16 @@ resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_comp
   type         = "MANAGED"
   service_role = aws_iam_role.gdpr_batch_service_role.arn
   depends_on   = [aws_iam_role_policy_attachment.gdpr_batch_service_role_attachment]
+  state        = "ENABLED"
 
   tags = merge(local.tags, 
     { Batch_Job_Name = local.shred_unstructured_image_name },
     { env-type = "SPOT"}
   )
+
+  lifecycle {
+    create_before_destroy = true
+  }
 
   compute_resources {
     type                = "SPOT"
@@ -75,11 +80,16 @@ resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_on_d
   type          = "MANAGED"
   service_role  = aws_iam_role.gdpr_batch_service_role.arn
   depends_on    = [aws_iam_role_policy_attachment.gdpr_batch_service_role_attachment]
+  state        = "ENABLED"
 
   tags = merge(local.tags, 
     { Batch_Job_Name = local.shred_unstructured_image_name },
     { env-type = "ON-DEMAND"}
   )
+
+  lifecycle {
+    create_before_destroy = true
+  }
 
   compute_resources {
     type                = "EC2"
