@@ -37,7 +37,7 @@ resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_comp
   type                     = "MANAGED"
   service_role             = aws_iam_role.gdpr_batch_service_role.arn
   depends_on = [aws_iam_role_policy_attachment.gdpr_batch_service_role_attachment]
-  
+
   tags = merge(local.tags, { Batch_Job_Name = local.shred_unstructured_image_name })
 
   compute_resources {
@@ -49,7 +49,14 @@ resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_comp
     subnets             = data.aws_subnets.shared-private.ids
     
     # Require large instances with high network/EBS bandwidth
-    instance_type       = ["m5.2xlarge", "m5.4xlarge", "r5.2xlarge"]
+    instance_type       = [
+      "m5.xlarge", "m5a.xlarge", "m6i.xlarge", "m6a.xlarge",
+      "c5.xlarge", "c5a.xlarge", "c6i.xlarge", "c6a.xlarge",
+      "m5.2xlarge", "m5.4xlarge", "r5.2xlarge", "m5a.2xlarge", 
+      "m6i.2xlarge", "m6a.2xlarge", "c5.2xlarge", "c5a.2xlarge", 
+      "c6i.2xlarge", "c6a.2xlarge", "c5.4xlarge", "c5a.4xlarge", 
+      "c6i.4xlarge", "c6a.4xlarge", "m5.large"
+    ]
     instance_role       = aws_iam_instance_profile.gdpr_batch_instance_profile.arn
 
     launch_template {
@@ -87,8 +94,8 @@ resource "aws_batch_job_definition" "shred_unstructured_from_zip_job" {
     jobRoleArn       = aws_iam_role.gdpr_batch_code_job_role.arn
     
     resourceRequirements = [
-      { type = "VCPU", value = "8" },
-      { type = "MEMORY", value = "32768" }
+      { type = "VCPU", value = "2" },
+      { type = "MEMORY", value = "8192" }
     ]
 
     environment = [
