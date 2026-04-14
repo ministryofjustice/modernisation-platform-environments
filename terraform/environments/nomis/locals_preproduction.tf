@@ -110,7 +110,7 @@ locals {
       preprod-nomis-web-b = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
           desired_capacity = 0
-          max_size         = 0
+          max_size         = 1
 
           initial_lifecycle_hooks = {
             "ready-hook" = {
