@@ -9,6 +9,7 @@ logger.setLevel(logging.INFO)
 
 DATABASE = os.environ["DATABASE"]
 S3_OUTPUT_PATH = os.environ["S3_OUTPUT_PATH"].rstrip("/")
+S3_ATHENA_RESULTS_PATH = os.environ["S3_ATHENA_RESULTS_PATH"].rstrip("/")
 
 LOTS = ["LOT1", "LOT2", "LOT3", "LOT4", "LOT5"]
 
@@ -49,7 +50,7 @@ def run_table_export(table: str):
     df = wr.athena.read_sql_query(
         sql=sql,
         database=DATABASE,
-        s3_output=S3_OUTPUT_PATH,
+        s3_output=S3_ATHENA_RESULTS_PATH,
         ctas_approach=False,
     )
 

@@ -109,6 +109,7 @@ module "lambda-staging-export" {
   s3_output_path              = "s3://${module.aws_s3_staging.bucket.id}"
   s3_output_bucket_arn        = module.aws_s3_staging.bucket.arn
   s3_athena_results_bucket_arn = module.query_results.bucket.arn
+  s3_athena_results_path       = "s3://${module.query_results.bucket.id}/staging-export"
 
   s3_source_bucket_arns = [
     module.datalake.bucket.arn,

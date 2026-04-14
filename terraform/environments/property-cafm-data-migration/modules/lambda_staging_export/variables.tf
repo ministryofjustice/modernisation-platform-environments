@@ -24,6 +24,11 @@ variable "s3_athena_results_bucket_arn" {
   type        = string
 }
 
+variable "s3_athena_results_path" {
+  description = "S3 URI for Athena query results (e.g. s3://bucket/athena-results)"
+  type        = string
+}
+
 variable "s3_source_bucket_arns" {
   description = "ARNs of source S3 buckets and prefixes Athena reads from (bucket ARN and bucket/*)"
   type        = list(string)

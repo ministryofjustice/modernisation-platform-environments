@@ -151,8 +151,9 @@ resource "aws_lambda_function" "this" {
 
   environment {
     variables = {
-      DATABASE       = var.database_name
-      S3_OUTPUT_PATH = var.s3_output_path
+      DATABASE              = var.database_name
+      S3_OUTPUT_PATH        = var.s3_output_path
+      S3_ATHENA_RESULTS_PATH = var.s3_athena_results_path
     }
   }
 

@@ -193,7 +193,7 @@ module "aws_s3_staging" {
         Sid    = "AllowLambdaAthenaWrites",
         Effect = "Allow",
         Principal = {
-          AWS = "arn:aws:iam::<account-id>:role/cafm-staging-export-role"
+          AWS = module.lambda-staging-export.role_arn
         },
         Action = [
           "s3:PutObject",
