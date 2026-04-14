@@ -32,17 +32,57 @@ resource "aws_iam_role_policy_attachment" "gdpr_batch_service_role_attachment" {
 # ==============================================================================
 
 resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_compute_env" {
-  count                    = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
-  name                     = "shred-unstructured-from-zip-env"
-  type                     = "MANAGED"
-  service_role             = aws_iam_role.gdpr_batch_service_role.arn
-  depends_on = [aws_iam_role_policy_attachment.gdpr_batch_service_role_attachment]
+  count        = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
+  name_prefix  = "shred-unstructured-spot-env-"
+  type         = "MANAGED"
+  service_role = aws_iam_role.gdpr_batch_service_role.arn
+  depends_on   = [aws_iam_role_policy_attachment.gdpr_batch_service_role_attachment]
 
-  tags = merge(local.tags, { Batch_Job_Name = local.shred_unstructured_image_name })
+  tags = merge(local.tags, 
+    { Batch_Job_Name = local.shred_unstructured_image_name },
+    { env-type = "SPOT"}
+  )
 
   compute_resources {
     type                = "SPOT"
     spot_iam_fleet_role = aws_iam_role.gdpr_spot_fleet_role.arn
+    max_vcpus           = 16
+    min_vcpus           = 0
+    security_group_ids  = [aws_security_group.gdpr_batch_sg[0].id]
+    subnets             = data.aws_subnets.shared-private.ids
+    
+    # Require large instances with high network/EBS bandwidth
+    instance_type       = [
+      "m5.xlarge", "m5a.xlarge", "m6i.xlarge", "m6a.xlarge",
+      "c5.xlarge", "c5a.xlarge", "c6i.xlarge", "c6a.xlarge",
+      "m5.2xlarge", "m5.4xlarge", "r5.2xlarge", "m5a.2xlarge", 
+      "m6i.2xlarge", "m6a.2xlarge", "c5.2xlarge", "c5a.2xlarge", 
+      "c6i.2xlarge", "c6a.2xlarge", "c5.4xlarge", "c5a.4xlarge", 
+      "c6i.4xlarge", "c6a.4xlarge", "m5.large"
+    ]
+    instance_role       = aws_iam_instance_profile.gdpr_batch_instance_profile.arn
+
+    launch_template {
+      launch_template_id = aws_launch_template.shred_unstructured_from_zip_batch_storage_template.id
+      version            = "$Latest"
+    }
+  }
+}
+
+resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_on_demand_compute_env" {
+  count         = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
+  name_prefix   = "shred-unstructured-on-demand-env-"
+  type          = "MANAGED"
+  service_role  = aws_iam_role.gdpr_batch_service_role.arn
+  depends_on    = [aws_iam_role_policy_attachment.gdpr_batch_service_role_attachment]
+
+  tags = merge(local.tags, 
+    { Batch_Job_Name = local.shred_unstructured_image_name },
+    { env-type = "ON-DEMAND"}
+  )
+
+  compute_resources {
+    type                = "EC2"
     max_vcpus           = 16
     min_vcpus           = 0
     security_group_ids  = [aws_security_group.gdpr_batch_sg[0].id]
@@ -75,6 +115,10 @@ resource "aws_batch_job_queue" "shred_unstructured_from_zip_batch_queue" {
     order               = 1
     compute_environment = aws_batch_compute_environment.shred_unstructured_from_zip_batch_compute_env[count.index].arn
   }
+  compute_environment_order {
+    order               = 2
+    compute_environment = aws_batch_compute_environment.shred_unstructured_from_zip_batch_on_demand_compute_env[count.index].arn
+  }
   tags = merge(local.tags, { Batch_Job_Name = local.shred_unstructured_image_name })
 }
 
@@ -95,7 +139,7 @@ resource "aws_batch_job_definition" "shred_unstructured_from_zip_job" {
     
     resourceRequirements = [
       { type = "VCPU", value = "2" },
-      { type = "MEMORY", value = "8192" }
+      { type = "MEMORY", value = "4096" }
     ]
 
     environment = [
