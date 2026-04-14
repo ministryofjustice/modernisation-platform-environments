@@ -36,6 +36,8 @@ resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_comp
   name                     = "shred-unstructured-from-zip-env"
   type                     = "MANAGED"
   service_role             = aws_iam_role.gdpr_batch_service_role.arn
+  depends_on = [aws_iam_role_policy_attachment.gdpr_batch_service_role_attachment]
+  
   tags = merge(local.tags, { Batch_Job_Name = local.shred_unstructured_image_name })
 
   compute_resources {
