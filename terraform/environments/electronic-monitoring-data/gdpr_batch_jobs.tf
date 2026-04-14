@@ -47,7 +47,8 @@ resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_comp
     subnets             = data.aws_subnets.shared-private.ids
     
     # Require large instances with high network/EBS bandwidth
-    instance_type       = ["m5.2xlarge", "m5.4xlarge", "r5.2xlarge"] 
+    instance_type       = ["m5.2xlarge", "m5.4xlarge", "r5.2xlarge"]
+    instance_role       = aws_iam_instance_profile.gdpr_batch_instance_profile.arn
 
     launch_template {
       launch_template_id = aws_launch_template.shred_unstructured_from_zip_batch_storage_template.id
@@ -130,6 +131,37 @@ resource "aws_iam_role" "gdpr_spot_fleet_role" {
 resource "aws_iam_role_policy_attachment" "gdpr_spot_fleet_role_attachment" {
   role       = aws_iam_role.gdpr_spot_fleet_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetTaggingRole"
+}
+
+# ==============================================================================
+# 1.c. IAM: EC2 Instance Profile (Allows the EC2 servers to join the Batch cluster)
+# ==============================================================================
+
+data "aws_iam_policy_document" "gdpr_ec2_assume_role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "gdpr_batch_instance_role" {
+  name               = "emds-gdpr-batch-instance-role"
+  assume_role_policy = data.aws_iam_policy_document.gdpr_ec2_assume_role.json
+}
+
+# Attach the managed policy required for ECS cluster registration
+resource "aws_iam_role_policy_attachment" "gdpr_batch_instance_role_attach" {
+  role       = aws_iam_role.gdpr_batch_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+}
+
+# EC2 requires IAM roles to be wrapped in an "Instance Profile" to be attached to a server
+resource "aws_iam_instance_profile" "gdpr_batch_instance_profile" {
+  name = "emds-gdpr-batch-instance-profile"
+  role = aws_iam_role.gdpr_batch_instance_role.name
 }
 
 # ==============================================================================
