@@ -1,4 +1,7 @@
-# Role used by DE's to access AWS
+# ------------------------------------------------------------------------
+# Lake Formation - admin permissions
+# https://user-guide.modernisation-platform.service.justice.gov.uk/runbooks/adding-admin-data-lake-formation-permissions.html
+# ------------------------------------------------------------------------
 locals {
   lf_admin_roles = local.is-development ? "sandbox" : "data-eng"
 }
@@ -15,12 +18,40 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
     ] : [],
     [
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess",
-      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/lakeformation-share-role"
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/lakeformation-share-role",
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan",
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply",
     ]
   )
 
   parameters = {
     "CROSS_ACCOUNT_VERSION" = "4"
+  }
+}
+
+# Grant the SSO admin role Lake Formation permissions on the property database
+resource "aws_lakeformation_permissions" "sso-admin-database" {
+  count = length(data.aws_iam_roles.modernisation_platform.names) > 0 ? 1 : 0
+
+  principal                     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.modernisation_platform.names)}"
+  permissions                   = ["ALL"]
+  permissions_with_grant_option = ["ALL"]
+
+  database {
+    name = "property"
+  }
+}
+
+resource "aws_lakeformation_permissions" "sso-admin-tables" {
+  count = length(data.aws_iam_roles.modernisation_platform.names) > 0 ? 1 : 0
+
+  principal                     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.modernisation_platform.names)}"
+  permissions                   = ["ALL"]
+  permissions_with_grant_option = ["ALL"]
+
+  table {
+    database_name = "property"
+    wildcard      = true
   }
 }
 

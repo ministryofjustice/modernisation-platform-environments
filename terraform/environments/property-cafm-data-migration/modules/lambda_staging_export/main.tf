@@ -111,6 +111,15 @@ resource "aws_iam_role_policy" "lambda" {
         Resource = [var.kms_key_arn]
       },
       {
+        Sid    = "LakeFormationDataAccess"
+        Effect = "Allow"
+        Action = [
+          "lakeformation:GetDataAccess",
+          "lakeformation:GetResourceLFTags"
+        ]
+        Resource = "*"
+      },
+      {
         Sid    = "CloudWatchLogs"
         Effect = "Allow"
         Action = [
