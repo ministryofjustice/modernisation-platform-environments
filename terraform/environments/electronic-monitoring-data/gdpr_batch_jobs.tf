@@ -1,7 +1,7 @@
 locals {
   emds_gdpr_ecr_name = "electronic-monitoring-gdpr"
   shred_unstructured_image_name = "gdpr_zip_file_shredder"
-  shred_unstructured_docker_image_uri = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/${local.emds_gdpr_ecr_name}:${local.shred_unstructured_image_name}-${local.environment}"
+  shred_unstructured_docker_image_uri = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/${local.emds_gdpr_ecr_name}:${local.shred_unstructured_image_name}-${local.environment_shorthand}"
 }
 
 # ==============================================================================
