@@ -105,7 +105,7 @@ resource "aws_appautoscaling_target" "ccms_opa_desiredcount" {
   max_capacity = 10
 
   tags = merge(  
-      local.tags,  
+      local.tags_non_empty,
         { Name = lower(format("%s-%s-autoscaling-target", local.opa_app_name, 
       local.environment)) } 
      )
