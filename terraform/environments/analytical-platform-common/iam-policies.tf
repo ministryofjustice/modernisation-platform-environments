@@ -126,7 +126,7 @@ data "aws_iam_policy_document" "trivy_analytical_platform_airflow_container_scan
     sid       = "GetTrivyArtefacts"
     effect    = "Allow"
     actions   = ["s3:GetObject"]
-    resources = ["${module.trivy_analytical_platform_airflow_container_scanning_bucket.s3_bucket_arn}/trivy/*"]
+    resources = ["${module.artifacts_bucket.s3_bucket_arn}/trivy/*"]
   }
   statement {
     sid       = "DecryptObjectsWithBucketKey"
