@@ -104,6 +104,8 @@ resource "aws_appautoscaling_target" "ccms_opa_desiredcount" {
   min_capacity = 0
   max_capacity = 10
 
+  tags = {}
+
   lifecycle {    
     ignore_changes = [tags, tags_all] 
      }
