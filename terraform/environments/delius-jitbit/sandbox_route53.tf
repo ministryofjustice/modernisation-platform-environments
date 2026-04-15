@@ -43,7 +43,7 @@ resource "aws_route53_record" "external_sandbox_blue" {
 }
 
 resource "aws_route53_record" "external_validation_sandbox_subdomain_blue" {
-  count    = local.is-production ? 0 : 1
+  count    = local.is-development ? 1 : 0
   provider = aws.core-vpc
 
   allow_overwrite = true
@@ -71,7 +71,7 @@ resource "aws_route53_record" "external_sandbox_green" {
 }
 
 resource "aws_route53_record" "external_validation_sandbox_subdomain_green" {
-  count    = local.is-production ? 0 : 1
+  count    = local.is-development ? 1 : 0
   provider = aws.core-vpc
 
   allow_overwrite = true

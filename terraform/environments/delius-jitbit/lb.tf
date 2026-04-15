@@ -1,6 +1,21 @@
 # checkov:skip=CKV_AWS_226
 # checkov:skip=CKV2_AWS_28
 
+locals {
+  blue_green_target_groups = {
+    blue  = try(aws_lb_target_group.target_group_fargate_blue[0].id, null)
+    green = try(aws_lb_target_group.target_group_fargate_green[0].id, null)
+  }
+
+  active_colour = local.create_blue_green ? aws_ssm_parameter.active_deployment_colour[0].value : null
+
+  active_target_group_arn = local.create_blue_green ? lookup(
+    local.blue_green_target_groups,
+    local.active_colour,
+    null
+  ) : aws_lb_target_group.target_group_fargate[0].id
+}
+
 module "ip_addresses" {
   source = "../../modules/ip_addresses"
 }
@@ -82,7 +97,7 @@ resource "aws_lb_listener" "listener" {
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
 
   default_action {
-    target_group_arn = aws_lb_target_group.target_group_fargate.id
+    target_group_arn = local.active_target_group_arn
     type             = "forward"
   }
 
@@ -94,8 +109,15 @@ resource "aws_lb_listener" "listener" {
   )
 }
 
+moved {
+  from = aws_lb_target_group.target_group_fargate
+  to   = aws_lb_target_group.target_group_fargate[0]
+}
+
 resource "aws_lb_target_group" "target_group_fargate" {
   # checkov:skip=CKV_AWS_261
+
+  count = local.create_blue_green ? 0 : 1
 
   name                 = local.application_name
   port                 = local.app_port
@@ -124,4 +146,121 @@ resource "aws_lb_target_group" "target_group_fargate" {
       Name = local.application_name
     }
   )
+}
+
+# Default is blue but aws_ssm_parameter.active_deployment_colour.value will be whatever the actual parameter value is
+resource "aws_ssm_parameter" "active_deployment_colour" {
+  count = local.create_blue_green ? 1 : 0
+
+  name  = "/delius-jitbit/blue-green-active-colour"
+  type  = "String"
+  value = "blue"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_lb_target_group" "target_group_fargate_blue" {
+  # checkov:skip=CKV_AWS_261
+
+  count = local.create_blue_green ? 1 : 0
+
+  name                 = "${local.application_name}-blue"
+  port                 = local.app_port
+  protocol             = "HTTP"
+  vpc_id               = data.aws_vpc.shared.id
+  target_type          = "ip"
+  deregistration_delay = 30
+
+  stickiness {
+    type = "lb_cookie"
+  }
+
+  health_check {
+    path                = "/User/Login?ReturnUrl=%2f"
+    healthy_threshold   = "5"
+    interval            = "30"
+    protocol            = "HTTP"
+    unhealthy_threshold = "2"
+    matcher             = "200-499"
+    timeout             = "5"
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-blue"
+    }
+  )
+}
+
+resource "aws_lb_target_group" "target_group_fargate_green" {
+  # checkov:skip=CKV_AWS_261
+
+  count = local.create_blue_green ? 1 : 0
+
+  name                 = "${local.application_name}-green"
+  port                 = local.app_port
+  protocol             = "HTTP"
+  vpc_id               = data.aws_vpc.shared.id
+  target_type          = "ip"
+  deregistration_delay = 30
+
+  stickiness {
+    type = "lb_cookie"
+  }
+
+  health_check {
+    path                = "/User/Login?ReturnUrl=%2f"
+    healthy_threshold   = "5"
+    interval            = "30"
+    protocol            = "HTTP"
+    unhealthy_threshold = "2"
+    matcher             = "200-499"
+    timeout             = "5"
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-green"
+    }
+  )
+}
+
+resource "aws_lb_listener_rule" "listener_rule_blue" {
+  count = local.create_blue_green ? 1 : 0
+
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 20
+
+  action {
+    target_group_arn = aws_lb_target_group.target_group_fargate_blue[0].arn
+    type             = "forward"
+  }
+
+  condition {
+    host_header {
+      values = ["blue-${local.app_url}"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "listener_rule_green" {
+  count = local.create_blue_green ? 1 : 0
+
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 30
+
+  action {
+    target_group_arn = aws_lb_target_group.target_group_fargate_green[0].arn
+    type             = "forward"
+  }
+
+  condition {
+    host_header {
+      values = ["green-${local.app_url}"]
+    }
+  }
 }

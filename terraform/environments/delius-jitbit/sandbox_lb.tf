@@ -1,16 +1,12 @@
 locals {
   sandbox_target_groups = {
-    blue  = aws_lb_target_group.target_group_fargate_sandbox_blue[0].id
-    green = aws_lb_target_group.target_group_fargate_sandbox_green[0].id
+    blue  = try(aws_lb_target_group.target_group_fargate_sandbox_blue[0].id, null)
+    green = try(aws_lb_target_group.target_group_fargate_sandbox_green[0].id, null)
   }
 
-  active_sandbox_colour = local.is-development ? data.aws_ssm_parameter.sandbox_active_deployment_colour[0].value : null
-
-  sandbox_active_target_group_arn = lookup(
-    local.sandbox_target_groups,
-    local.active_sandbox_colour,
-    null
-  )
+  active_sandbox_colour = local.is-development ? aws_ssm_parameter.sandbox_active_deployment_colour[0].value : null
+ 
+  sandbox_active_target_group_arn = (local.is-development && local.active_sandbox_colour != null) ? lookup(local.sandbox_target_groups, local.active_sandbox_colour, null) : null
 }
 
 #tfsec:ignore:aws-elb-alb-not-public
@@ -56,6 +52,18 @@ resource "aws_lb_listener" "listener_sandbox" {
       Name = local.application_name
     }
   )
+}
+
+resource "aws_ssm_parameter" "sandbox_active_deployment_colour" {
+  count = local.is-development ? 1 : 0
+
+  name  = "/delius-jitbit/sandbox-blue-green-active-colour"
+  type  = "String"
+  value = "blue"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
 
 resource "aws_lb_listener_rule" "listener_rule_sandbox_blue" {
