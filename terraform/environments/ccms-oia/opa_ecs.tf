@@ -94,6 +94,7 @@ resource "aws_ecs_service" "opahub" {
 
 # Register ECS service as a scalable target (DEV only)
 resource "aws_appautoscaling_target" "ccms_opa_desiredcount" {
+  provider = aws.app_autoscaling
   count              = local.environment == "development" ? 1 : 0
   service_namespace  = "ecs"
   scalable_dimension = "ecs:service:DesiredCount"
