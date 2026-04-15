@@ -162,10 +162,10 @@ locals {
   }
 
   dis_config_preprod = {
-    instance_count    = 0
-    ami_name          = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
-    computer_name     = "NDMIS-PP-DIS" # 15 char limit
-    powershell_branch = "main"
+    instance_count    = 1
+    ami_name          = "delius_mis_windows_server_patch_2025-10-01T13-00-02.504Z"
+    computer_name     = "NDMIS-PRE-DIS" # 15 char limit
+    powershell_branch = "TM-2016/delius-mis/preprod-dis-build"
 
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100 }
@@ -189,7 +189,7 @@ locals {
       associate_public_ip_address  = false
       disable_api_termination      = false
       disable_api_stop             = false
-      instance_type                = "t3.xlarge"
+      instance_type                = "r6i.4xlarge" # Legacy is m5.8xlarge but AWS recommends r6i.4xlarge
       metadata_endpoint_enabled    = "enabled"
       key_name                     = null
       metadata_options_http_tokens = "required"
