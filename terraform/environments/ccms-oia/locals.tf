@@ -64,13 +64,5 @@ locals {
   # Split domain validation by domain type
   modernisation_platform_validations = [for k, v in local.domain_types : v if strcontains(k, "modernisation-platform.service.justice.gov.uk")]
   laa_validations                    = [for k, v in local.domain_types : v if strcontains(k, "laa.service.justice.gov.uk")]
-
-  # Create a new map from local.tags, but keep only the entries where the value is not null and not empty
-
   
-  tags_non_empty = {
-    for k, v in local.tags :
-    k => v
-    if v != null && trimspace(v) != ""
-  }
 }
