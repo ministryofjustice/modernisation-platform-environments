@@ -103,6 +103,12 @@ resource "aws_appautoscaling_target" "ccms_opa_desiredcount" {
 
   min_capacity = 0
   max_capacity = 10
+
+  tags = merge(  
+      local.tags,  
+        { Name = lower(format("%s-%s-autoscaling-target", local.opa_app_name, 
+      local.environment)) } 
+     )
 }
 
 # Scale DOWN to 0 at 21:00, Mon–Fri
