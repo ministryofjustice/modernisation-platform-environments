@@ -47,6 +47,11 @@ data "aws_iam_roles" "eks_sso_access_role" {
   path_prefix = "/aws-reserved/sso.amazonaws.com/"
 }
 
+# Chainguard
+data "aws_secretsmanager_secret_version" "chainguard_pull_credentials" {
+  secret_id = module.chainguard_pull_credentials.secret_name
+}
+
 # EKS
 data "aws_eks_cluster" "eks" {
   name = local.eks_cluster_name
@@ -54,16 +59,16 @@ data "aws_eks_cluster" "eks" {
 
 data "http" "prometheus_operator_crds" {
   for_each = {
-    alertmanagerconfigs = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml"
-    alertmanagers       = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml"
-    podmonitors         = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml"
-    probes              = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_probes.yaml"
-    prometheus_agents   = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_prometheusagents.yaml"
-    prometheuses        = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_prometheuses.yaml"
-    prometheusrules     = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_prometheusrules.yaml"
-    scrapeconfigs       = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_scrapeconfigs.yaml"
-    servicemonitors     = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml"
-    thanosrulers        = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_thanosrulers.yaml"
+    alertmanagerconfigs = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.environment_configuration.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml"
+    alertmanagers       = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.environment_configuration.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml"
+    podmonitors         = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.environment_configuration.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml"
+    probes              = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.environment_configuration.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_probes.yaml"
+    prometheus_agents   = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.environment_configuration.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_prometheusagents.yaml"
+    prometheuses        = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.environment_configuration.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_prometheuses.yaml"
+    prometheusrules     = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.environment_configuration.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_prometheusrules.yaml"
+    scrapeconfigs       = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.environment_configuration.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_scrapeconfigs.yaml"
+    servicemonitors     = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.environment_configuration.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml"
+    thanosrulers        = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.environment_configuration.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_thanosrulers.yaml"
   }
 
   url = each.value

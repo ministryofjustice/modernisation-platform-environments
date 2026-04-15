@@ -91,3 +91,34 @@ resource "aws_db_instance" "appdb1" {
     { "Keep" = "true" }
   )
 }
+
+resource "null_resource" "apply_oracle_rds_maintenance" {
+  triggers = {
+    db_arn = aws_db_instance.appdb1.arn
+  }
+
+  provisioner "local-exec" {
+    command = <<EOF
+echo "Checking for pending maintenance actions on ${aws_db_instance.appdb1.arn}..."
+
+PENDING=$(aws rds describe-pending-maintenance-actions \
+  --resource-identifier ${aws_db_instance.appdb1.arn} \
+  --query 'PendingMaintenanceActions[0].PendingMaintenanceActionDetails[0].Action' \
+  --output text)
+
+if [ "$PENDING" != "None" ] && [ "$PENDING" != "null" ]; then
+  echo "Pending maintenance action found: $PENDING"
+  echo "Applying maintenance immediately..."
+
+  aws rds apply-pending-maintenance-action \
+    --resource-identifier ${aws_db_instance.appdb1.arn} \
+    --apply-action $PENDING \
+    --opt-in-type immediate
+
+  echo "Maintenance triggered."
+else
+  echo "No pending maintenance actions."
+fi
+EOF
+  }
+}

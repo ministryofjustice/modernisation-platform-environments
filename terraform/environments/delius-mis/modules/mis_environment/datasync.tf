@@ -84,6 +84,13 @@ resource "aws_iam_role_policy" "datasync_password_updater_policy" {
           "datasync:DescribeLocationFsxWindows"
         ]
         Resource = aws_datasync_location_fsx_windows_file_system.dfi_fsx_destination[0].arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "fsx:DescribeFileSystems",
+        ]
+        Resource = "arn:aws:fsx:*:*:*"
       }
     ]
   })
@@ -151,7 +158,7 @@ resource "aws_lambda_function" "datasync_password_updater" {
     variables = {
       DATASYNC_LOCATION_ARN = aws_datasync_location_fsx_windows_file_system.dfi_fsx_destination[0].arn
       SECRET_ARN            = data.aws_secretsmanager_secret.datasync_ad_admin_password[0].arn
-      FSX_DOMAIN            = var.datasync_config.fsx_domain
+      FSX_DOMAIN            = local.domain_full_name
     }
   }
 
@@ -359,7 +366,7 @@ resource "aws_datasync_location_fsx_windows_file_system" "dfi_fsx_destination" {
   # The password comes from the existing AD admin secret that gets rotated automatically
   user     = local.fsx_credentials.username
   password = local.fsx_credentials.password
-  domain   = var.datasync_config.fsx_domain
+  domain   = local.domain_full_name
 
   security_group_arns = [aws_security_group.datasync_agent[0].arn]
 

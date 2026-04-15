@@ -122,6 +122,23 @@ data "aws_secretsmanager_secret_version" "dps" {
   depends_on = [aws_secretsmanager_secret.dps]
 }
 
+# Source Probation Secrets
+data "aws_secretsmanager_secret" "probation" {
+  for_each = toset(local.probation_domains_list)
+  name     = "external/${local.project}-${each.value}-source-secrets"
+
+  depends_on = [aws_secretsmanager_secret_version.probation]
+}
+
+data "aws_secretsmanager_secret_version" "probation" {
+  for_each = toset(local.probation_domains_list)
+
+  secret_id = data.aws_secretsmanager_secret.probation[each.value].id
+
+  depends_on = [aws_secretsmanager_secret.probation]
+}
+
+
 # DPR Secret
 data "aws_secretsmanager_secret" "test_db" {
   count = local.is_dev_or_test ? 1 : 0
@@ -230,4 +247,30 @@ data "aws_iam_roles" "data_engineering_roles" {
 
 data "aws_iam_roles" "developer_roles" {
   name_regex = "AWSReservedSSO_modernisation-platform-developer.*"
+}
+
+# Get latest Windows Server 2022 AMI for probation discovery
+data "aws_ami" "windows_server_2022" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["Windows_Server-2022-English-Full-Base*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
 }

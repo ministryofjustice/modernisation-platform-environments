@@ -49,8 +49,9 @@ resource "aws_instance" "yjsm" {
 
 
   metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required"
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
   }
 
 
@@ -75,8 +76,7 @@ data "aws_ami" "amazon_linux" {
 }
 
 resource "aws_network_interface" "main" {
-  subnet_id         = var.subnet_id
-  private_ip        = var.private_ip
-  private_ips_count = 1
-  security_groups   = [aws_security_group.yjsm_service.id]
+  subnet_id       = var.subnet_id
+  private_ips     = [var.private_ip, var.private_ip_secondary]
+  security_groups = [aws_security_group.yjsm_service.id]
 }

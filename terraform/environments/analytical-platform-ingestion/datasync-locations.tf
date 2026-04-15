@@ -1,22 +1,43 @@
+resource "time_sleep" "wait_for_policy_propagation" {
+  count = local.environment == "production" ? 1 : 0
+
+  create_duration = "30s"
+
+  depends_on = [
+    module.datasync_opg_bucket,
+    module.datasync_iam_role,
+    module.datasync_iam_policy,
+    module.s3_datasync_opg_kms
+  ]
+}
+
 resource "aws_datasync_location_s3" "opg" {
+  count = local.environment == "production" ? 1 : 0
+
   s3_bucket_arn = module.datasync_opg_bucket.s3_bucket_arn
   subdirectory  = "/"
 
   s3_config {
-    bucket_access_role_arn = module.datasync_iam_role.iam_role_arn
+    bucket_access_role_arn = module.datasync_iam_role.arn
   }
+
+  depends_on = [
+    time_sleep.wait_for_policy_propagation[0]
+  ]
 
   tags = local.tags
 }
 
 resource "aws_datasync_location_smb" "opg" {
+  count = local.environment == "production" ? 1 : 0
+
   server_hostname = "eucw4171nas012.dom1.infra.int"
   subdirectory    = "/mojshared002$/FITS_3635/Shared/Group/SIS Case Management/"
 
   user     = jsondecode(data.aws_secretsmanager_secret_version.datasync_dom1.secret_string)["username"]
   password = jsondecode(data.aws_secretsmanager_secret_version.datasync_dom1.secret_string)["password"]
 
-  agent_arns = [aws_datasync_agent.main.arn]
+  agent_arns = [aws_datasync_agent.main[0].arn]
 
   tags = local.tags
 }

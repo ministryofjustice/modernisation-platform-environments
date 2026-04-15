@@ -173,3 +173,13 @@ data "aws_iam_session_context" "whoami" {
 data "http" "environments_file" {
   url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
 }
+
+data "aws_ssm_parameter" "cloudfront_distribution_id" {
+  count = var.lookup_cloudfront_distribution ? 1 : 0
+  name  = "/${local.environment}/cloudfront-distribution-id"
+}
+
+data "aws_ssm_parameter" "cloudfront_distribution_compiled_id" {
+  count = var.lookup_cloudfront_distribution_compiled ? 1 : 0
+  name  = "/${local.environment}/cloudfront-distribution-compiled-id"
+}

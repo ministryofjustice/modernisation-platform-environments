@@ -245,7 +245,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_docker_400_non_cjsm" {
 
 resource "aws_cloudwatch_metric_alarm" "port_25_status_check_401_cjsm" {
   count               = local.is-production == true ? 1 : 0
-  alarm_name          = "Port-25-Status-Check-i-0e8e2a182917bcf26"
+  alarm_name          = "CJSM-Port-25-Status-Check-i-0e8e2a182917bcf26"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
   datapoints_to_alarm = "1"

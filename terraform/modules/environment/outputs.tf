@@ -105,14 +105,14 @@ output "vpc" {
 }
 
 output "subnets" {
-  description = "map of aws_subnets resources where the key is the subnet name, e.g. data, private, public"
+  description = "map of aws_subnets resources where the key is the subnet name, e.g. subnets['public'].ids or subnets['private-secondary'].ids"
   value       = data.aws_subnets.this
 }
 
 output "subnet" {
-  description = "map of individual aws_subnet resources.  first map key is subnet name, second is zone name, e.g. subnet['private']['eu-west-2a']"
+  description = "map of individual aws_subnet resources.  first map key is subnet name, second is zone name, e.g. subnet['private']['eu-west-2a'] or subnet['data-secondary']['eu-west-2b']"
   value = {
-    for subnet_name in local.subnet_names[var.subnet_set] : subnet_name => {
+    for subnet_name in local.subnet_names : subnet_name => {
       for zone_name in data.aws_availability_zones.this.names : zone_name => data.aws_subnet.this["${subnet_name}-${zone_name}"]
     }
   }

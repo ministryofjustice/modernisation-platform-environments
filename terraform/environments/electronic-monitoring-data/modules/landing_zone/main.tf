@@ -30,7 +30,7 @@ resource "random_string" "this" {
 
 #tfsec:ignore:aws-s3-enable-versioning
 module "landing-bucket" {
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
   bucket_name         = "${var.supplier}-${random_string.this.result}"
   replication_enabled = false
   providers = {

@@ -33,7 +33,7 @@ data "aws_vpc" "this" {
 }
 
 data "aws_subnets" "this" {
-  for_each = toset(local.subnet_names[var.subnet_set])
+  for_each = toset(local.subnet_names)
 
   filter {
     name   = "vpc-id"
@@ -46,7 +46,7 @@ data "aws_subnets" "this" {
 
 data "aws_subnet" "this" {
   for_each = toset(flatten([
-    for subnet_name in local.subnet_names[var.subnet_set] : [
+    for subnet_name in local.subnet_names : [
       for zone_name in data.aws_availability_zones.this.names : "${subnet_name}-${zone_name}"
     ]
   ]))

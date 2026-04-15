@@ -12,6 +12,7 @@ locals {
           pagerduty = "nomis-development"
         }
       }
+      db_backup_object_lock_days = 3
     }
   }
 
@@ -134,6 +135,10 @@ locals {
       })
 
       dev-nomis-client-a = merge(local.ec2_autoscaling_groups.client, {
+        autoscaling_schedules = {
+          "scale_up"   = { recurrence = "0 6 * * Mon-Fri" }
+          "scale_down" = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
+        }
         tags = merge(local.ec2_autoscaling_groups.client.tags, {
           domain-name = "azure.noms.root"
         })
@@ -154,6 +159,27 @@ locals {
         })
         tags = merge(local.ec2_autoscaling_groups.web12.tags, {
           nomis-environment = "qa11g"
+        })
+      })
+
+      dev-nomis-weblogic-12 = merge(local.ec2_autoscaling_groups.weblogic-12, {
+        autoscaling_schedules = {}
+        config = merge(local.ec2_autoscaling_groups.web12.config, {
+          instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
+            "Ec2Qa11GWeblogicPolicy",
+            "Ec2Qa19CWeblogicPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_autoscaling_groups.web12.tags, {
+          nomis-environment    = "qa19c"
+          oracle-db-name       = "qa19c"
+          oracle-db-hostname-a = "dev-nomis-db19c-1-a"
+          oracle-db-hostname-b = "none"
         })
       })
     }
@@ -357,6 +383,7 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/dev/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11r/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa19c/*",
             ]
           }
         ]
@@ -405,6 +432,22 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa11r/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11r/weblogic-*",
+            ]
+          }
+        ])
+      }
+      Ec2Qa19CWeblogicPolicy = {
+        description = "Permissions required for QA19C Weblogic EC2s"
+        statements = concat(local.iam_policy_statements_ec2.web, [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa19c/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa19c/weblogic-*"
             ]
           }
         ])
@@ -571,6 +614,8 @@ locals {
       "/oracle/database/qa11g" = local.secretsmanager_secrets.db_cnom
       "/oracle/weblogic/qa11r" = local.secretsmanager_secrets.web
       "/oracle/database/qa11r" = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/qa19c" = local.secretsmanager_secrets.web
+      "/oracle/database/qa19c" = local.secretsmanager_secrets.db_cnom
     }
   }
 }

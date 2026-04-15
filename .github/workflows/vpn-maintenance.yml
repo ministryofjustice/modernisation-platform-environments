@@ -14,7 +14,7 @@ permissions:
 
 jobs:
     fetch-secrets:
-            uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
+            uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@5b44b387694dfa249cfa2dcf289ca871abe9e3e2 # v5.0.1
             secrets:
                 MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
                 PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -32,10 +32,10 @@ jobs:
                     echo "VPN_ID=$vpn_id" >> $GITHUB_ENV
                     
               - name: Checkout repository
-                uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+                uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
               - name: Decrypt Secrets
-                uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
+                uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5b44b387694dfa249cfa2dcf289ca871abe9e3e2 # v5.0.1
                 with:
                     environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
                     slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }} 
@@ -48,7 +48,7 @@ jobs:
                     echo ACCOUNT_NUMBER=$ACCOUNT_NUMBER >> $GITHUB_ENV
                     
               - name: Configure AWS Credentials
-                uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5.1.0
+                uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37 # v6.1.0
                 with:
                     role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-vpn-environment-check"
                     role-session-name: githubactionsrolesession
@@ -64,7 +64,7 @@ jobs:
                     echo vpn_environment=$VPN_ENVIRONMENT >> $GITHUB_OUTPUT
                     echo "VPN Environment is $VPN_ENVIRONMENT"
               - name: Slack failure notification
-                uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a # v2.1.1
+                uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
                 with:
                   webhook-type: incoming-webhook
                   payload: |
@@ -85,10 +85,10 @@ jobs:
                     echo "VPN_ID=$vpn_id" >> $GITHUB_ENV
 
               - name: Checkout repository
-                uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+                uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
               - name: Decrypt Secrets
-                uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
+                uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5b44b387694dfa249cfa2dcf289ca871abe9e3e2 # v5.0.1
                 with:
                     environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
                     slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }}
@@ -101,7 +101,7 @@ jobs:
                     echo ACCOUNT_NUMBER=$ACCOUNT_NUMBER >> $GITHUB_ENV
                     
               - name: Configure AWS Credentials
-                uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5.1.0
+                uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37 # v6.1.0
                 with:
                     role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-vpn-maintenance"
                     role-session-name: githubactionsrolesession
@@ -112,7 +112,7 @@ jobs:
                     ./scripts/replace-vpn-tunnel.sh "${{ env.VPN_ID }}"
               
               - name: Slack failure notification
-                uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a # v2.1.1
+                uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
                 with:
                   webhook-type: incoming-webhook
                   payload: |

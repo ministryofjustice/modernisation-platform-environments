@@ -3,7 +3,7 @@ module "eks_cluster_logs_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.0.0"
+  version = "4.1.1"
 
   aliases                 = ["eks/cluster-logs"]
   description             = "EKS cluster logs KMS key"
@@ -45,7 +45,7 @@ module "eks_ebs_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.0.0"
+  version = "4.1.1"
 
   aliases                 = ["eks/ebs"]
   description             = "EKS EBS KMS key"
@@ -97,7 +97,7 @@ module "karpenter_sqs_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.0.0"
+  version = "4.1.1"
 
   aliases               = ["sqs/karpenter"]
   description           = "Karpenter SQS KMS key"
@@ -130,7 +130,7 @@ module "managed_prometheus_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.0.0"
+  version = "4.1.1"
 
   aliases                 = ["amp/default"]
   description             = "AMP KMS key"
@@ -176,7 +176,7 @@ module "common_secrets_manager_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.0.0"
+  version = "4.1.1"
 
   aliases               = ["secretsmanager/common"]
   description           = "Common Secrets Manager KMS key"
@@ -192,7 +192,7 @@ module "managed_prometheus_logs_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.0.0"
+  version = "4.1.1"
 
   aliases                 = ["amp/logs"]
   description             = "AMP logs KMS key"
@@ -234,7 +234,7 @@ module "velero_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.0.0"
+  version = "4.1.1"
 
   aliases               = ["s3/velero"]
   description           = "Velero KMS key"

@@ -42,7 +42,7 @@ moved {
 
 
 module "alfresco_efs" {
-  count  = var.env_name != "poc" ? 1 : 0
+  count  = var.env_name != "poc" ? 0 : 0
   source = "../helpers/efs"
 
   name           = "alfresco"
@@ -62,7 +62,7 @@ module "alfresco_efs" {
 }
 
 module "alfresco_sfs_ecs" {
-  count  = var.env_name != "poc" ? 1 : 0
+  count  = var.env_name != "poc" ? 0 : 0
   source = "../helpers/delius_microservice"
 
   name     = "alfresco-sfs"
@@ -238,7 +238,7 @@ module "alfresco_sfs_ecs" {
 }
 
 data "aws_iam_policy_document" "alfresco_efs_access_policy" {
-  count = var.env_name != "poc" ? 1 : 0
+  count = var.env_name != "poc" ? 0 : 0
   statement {
     actions = [
       "elasticfilesystem:ClientRootAccess",
@@ -253,7 +253,7 @@ data "aws_iam_policy_document" "alfresco_efs_access_policy" {
 }
 
 resource "aws_security_group" "alfresco_sfs_alb" {
-  count       = var.env_name != "poc" ? 1 : 0
+  count       = var.env_name != "poc" ? 0 : 0
   name        = "${var.env_name}-alf-sfs-alb"
   description = "controls access to and from alfresco sfs load balancer"
   vpc_id      = var.account_config.shared_vpc_id
@@ -264,7 +264,7 @@ resource "aws_security_group" "alfresco_sfs_alb" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "alfresco_sfs_alb" {
-  for_each          = var.env_name != "poc" ? toset([var.account_info.cp_cidr, var.account_config.shared_vpc_cidr]) : []
+  for_each          = var.env_name != "poc" ? toset([]) : toset([])
   security_group_id = aws_security_group.alfresco_sfs_alb[0].id
   description       = "Access into alb over https"
   from_port         = "443"
@@ -274,7 +274,7 @@ resource "aws_vpc_security_group_ingress_rule" "alfresco_sfs_alb" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "alfresco_sfs_alb" {
-  count             = var.env_name != "poc" ? 1 : 0
+  count             = var.env_name != "poc" ? 0 : 0
   security_group_id = aws_security_group.alfresco_sfs_alb[0].id
   description       = "egress from alb to ecs cluster"
   ip_protocol       = "-1"
@@ -283,7 +283,7 @@ resource "aws_vpc_security_group_egress_rule" "alfresco_sfs_alb" {
 
 # internal application load balancer
 resource "aws_lb" "alfresco_sfs" {
-  count              = var.env_name != "poc" ? 1 : 0
+  count              = var.env_name != "poc" ? 0 : 0
   name               = "${var.app_name}-${var.env_name}-alf-sfs-alb"
   internal           = true
   load_balancer_type = "application"
@@ -295,7 +295,7 @@ resource "aws_lb" "alfresco_sfs" {
 }
 
 resource "aws_lb_listener" "alfresco_sfs_listener_https" {
-  count             = var.env_name != "poc" ? 1 : 0
+  count             = var.env_name != "poc" ? 0 : 0
   load_balancer_arn = aws_lb.alfresco_sfs[0].id
   port              = 443
   protocol          = "HTTPS"

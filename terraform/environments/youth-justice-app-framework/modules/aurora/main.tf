@@ -61,12 +61,7 @@ module "aurora" {
   create_cloudwatch_log_group       = true
   performance_insights_enabled      = var.performance_insights_enabled
   create_db_cluster_activity_stream = false #stopped on yjaf
-
-  tags = var.create_sheduler ? merge(local.all_tags,
-    {
-      "schedule" = "lambda" #allows lambda scheduler to target this rds for overnight shutdown
-    }
-  ) : local.all_tags
+  tags                              = local.all_tags
 }
 
 #todo match yjaf production security group

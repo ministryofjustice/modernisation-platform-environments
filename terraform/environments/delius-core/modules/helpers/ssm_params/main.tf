@@ -1,8 +1,16 @@
+locals {
+  params_plain = (
+    can(tomap(var.params_plain))
+    ? tomap(var.params_plain)
+    : { for p in var.params_plain : p => "change_me" }
+  )
+}
+
 resource "aws_ssm_parameter" "plain" {
-  for_each = toset([for item in var.params_plain : item])
-  name     = "/${var.environment_name}/${var.application_name}/${each.value}"
+  for_each = local.params_plain
+  name     = "/${var.environment_name}/${var.application_name}/${each.key}"
   type     = "String"
-  value    = "change_me"
+  value    = each.value
   lifecycle {
     ignore_changes = [value]
   }

@@ -62,6 +62,7 @@ resource "aws_lb_target_group" "instance" {
 
   name                 = each.key
   port                 = each.value.port
+  preserve_client_ip   = each.value.preserve_client_ip
   protocol             = each.value.protocol
   target_type          = "instance"
   deregistration_delay = each.value.deregistration_delay
@@ -110,7 +111,7 @@ module "lb" {
 
   for_each = var.lbs
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v5.0.2"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v5.1.0"
 
   providers = {
     aws.bucket-replication = aws
@@ -142,6 +143,17 @@ module "lb" {
   security_groups = [
     for sg in each.value.security_groups : lookup(aws_security_group.this, sg, null) != null ? aws_security_group.this[sg].id : sg
   ]
+
+  cloudwatch_metric_alarms = {
+    for key, value in each.value.cloudwatch_metric_alarms : key => merge(value, {
+      alarm_actions = [
+        for item in value.alarm_actions : try(aws_sns_topic.this[item].arn, item)
+      ]
+      ok_actions = [
+        for item in value.ok_actions : try(aws_sns_topic.this[item].arn, item)
+      ]
+    })
+  }
 
   subnets = each.value.subnets
   region  = var.environment.region
@@ -195,3 +207,5 @@ module "lb_listener" {
   ]
   tags = merge(local.tags, each.value.tags)
 }
+
+

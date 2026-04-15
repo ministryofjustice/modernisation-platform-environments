@@ -188,4 +188,3 @@ The above scripts output the location of the mappings files, which will be `/var
 Repeat the Site Export and Imports activities.
 
 It is assumed that any changes to settings applied after Install and Setup of the new Taleau Server will be applied to both the old and new instances and that only site content needs to be transferred at Cutover.
-

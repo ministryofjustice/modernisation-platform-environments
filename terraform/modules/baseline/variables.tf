@@ -670,6 +670,7 @@ variable "lbs" {
     instance_target_groups = optional(map(object({
       port                 = optional(number)
       protocol             = optional(string)
+      preserve_client_ip   = optional(bool)
       deregistration_delay = optional(number)
       health_check = optional(object({
         enabled             = optional(bool)
@@ -748,6 +749,8 @@ variable "lbs" {
           status_code = string
           port        = optional(number)
           protocol    = optional(string)
+          path        = optional(string)
+          query       = optional(string)
         }))
       })
       rules = optional(map(object({
@@ -777,6 +780,8 @@ variable "lbs" {
             status_code = string
             port        = optional(number)
             protocol    = optional(string)
+            path        = optional(string)
+            query       = optional(string)
           }))
         }))
         conditions = list(object({
@@ -805,6 +810,22 @@ variable "lbs" {
         dimensions          = optional(map(string), {})
       })), {})
       tags = optional(map(string), {})
+    })), {})
+    cloudwatch_metric_alarms = optional(map(object({
+      comparison_operator = string
+      evaluation_periods  = number
+      metric_name         = string
+      namespace           = string
+      period              = number
+      statistic           = string
+      threshold           = number
+      alarm_actions       = optional(list(string), [])
+      ok_actions          = optional(list(string), [])
+      actions_enabled     = optional(bool, false)
+      alarm_description   = optional(string)
+      datapoints_to_alarm = optional(number)
+      treat_missing_data  = optional(string, "missing")
+      dimensions          = optional(map(string), {})
     })), {})
     tags = optional(map(string), {})
   }))
@@ -927,6 +948,7 @@ variable "s3_buckets" {
     replication_role_arn       = optional(string, "")
     force_destroy              = optional(bool, false)
     sse_algorithm              = optional(string, "aws:kms")
+    object_lock_days           = optional(number, null)
     iam_policies = optional(map(list(object({
       sid     = optional(string, null)
       effect  = string

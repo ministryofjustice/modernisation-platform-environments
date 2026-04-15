@@ -18,7 +18,7 @@ resource "aws_db_subnet_group" "opahub_db_subnets" {
 resource "aws_db_instance" "opahub_db" {
   identifier          = "${local.opa_app_name}-db"
   engine              = "mysql"
-  engine_version      = "8.0.40"
+  engine_version      = local.application_data.accounts[local.environment].db_instance_version
   instance_class      = local.application_data.accounts[local.environment].db_instance_type
   allocated_storage   = local.application_data.accounts[local.environment].db_storage_gb
   storage_type        = "gp3"
@@ -33,9 +33,9 @@ resource "aws_db_instance" "opahub_db" {
   db_subnet_group_name    = aws_db_subnet_group.opahub_db_subnets.id
   option_group_name       = "default:mysql-8-0"
   backup_retention_period = 30
-  #  snapshot_identifier     = local.application_data.accounts[local.environment].db_snapshot_identifier
-  maintenance_window = "Mon:00:00-Mon:03:00"
-  backup_window      = "03:00-06:00"
+  snapshot_identifier     = local.is-development ? local.application_data.accounts[local.environment].db_snapshot_identifier : null
+  maintenance_window      = "Mon:00:00-Mon:03:00"
+  backup_window           = "03:00-06:00"
 
   tags = merge(local.tags, {
     Name = "${local.opa_app_name}-db"

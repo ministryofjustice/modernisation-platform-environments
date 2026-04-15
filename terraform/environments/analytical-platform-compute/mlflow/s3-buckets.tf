@@ -1,4 +1,6 @@
 module "mlflow_bucket" {
+  count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
+
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
@@ -13,7 +15,7 @@ module "mlflow_bucket" {
     rule = {
       bucket_key_enabled = true
       apply_server_side_encryption_by_default = {
-        kms_master_key_id = module.mlflow_s3_kms.key_arn
+        kms_master_key_id = module.mlflow_s3_kms[0].key_arn
         sse_algorithm     = "aws:kms"
       }
     }

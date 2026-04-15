@@ -1,0 +1,20 @@
+{
+  "uid": "demo-json-dashboard",
+  "title": "Demo JSON Dashboard",
+  "tags": ["demo", "example"],
+  "timezone": "browser",
+  "schemaVersion": 36,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {
+      "type": "text",
+      "title": "Demo JSON Dashboard",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "options": {
+        "mode": "html",
+        "content": "<h2>This dashboard was created from a raw JSON file.</h2><p>It demonstrates how a simple JSON dashboard works.</p>"
+      }
+    }
+  ]
+}

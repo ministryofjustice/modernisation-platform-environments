@@ -4,15 +4,6 @@ resource "aws_security_group" "auto" {
   vpc_id      = var.account_info.vpc_id
 }
 
-resource "aws_vpc_security_group_egress_rule" "auto_oracle_db" {
-  description                  = "Oracle DB connection to DSD database"
-  security_group_id            = aws_security_group.auto.id
-  referenced_security_group_id = data.aws_security_group.dsd_db.id
-  ip_protocol                  = "tcp"
-  from_port                    = 1521
-  to_port                      = 1521
-}
-
 resource "aws_vpc_security_group_egress_rule" "auto_all_outbound" {
   description       = "Allow all outbound traffic"
   security_group_id = aws_security_group.auto.id
@@ -33,15 +24,18 @@ module "auto_instance" {
 
   ami_name  = var.auto_config.ami_name
   ami_owner = "self"
-  instance = merge(
-    var.auto_config.instance_config,
-    { vpc_security_group_ids = [aws_security_group.legacy.id, aws_security_group.auto.id, aws_security_group.mis_ec2_shared.id] }
-  )
+  instance = merge(var.auto_config.instance_config, {
+    vpc_security_group_ids = [
+      aws_security_group.legacy.id,
+      aws_security_group.auto.id,
+      aws_security_group.mis_ad_join.id,
+    ]
+  })
   ebs_kms_key_id                = var.account_config.kms_keys["ebs_shared"]
   ebs_volumes_copy_all_from_ami = false
   ebs_volumes                   = var.auto_config.ebs_volumes
   ebs_volume_config             = var.auto_config.ebs_volumes_config
-  ebs_volume_tags               = var.tags
+  ebs_volume_tags               = local.tags
   route53_records = {
     create_internal_record = false
     create_external_record = false
@@ -72,7 +66,7 @@ module "auto_instance" {
   region            = "eu-west-2"
   availability_zone = "eu-west-2a"
   subnet_id         = var.account_config.private_subnet_ids[count.index]
-  tags              = var.tags
+  tags              = local.tags
 
   cloudwatch_metric_alarms = {}
 }

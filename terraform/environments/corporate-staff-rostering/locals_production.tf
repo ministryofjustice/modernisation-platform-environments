@@ -2,7 +2,8 @@ locals {
 
   baseline_presets_production = {
     options = {
-      db_backup_lifecycle_rule = "rman_backup_one_month"
+      db_backup_lifecycle_rule   = "rman_backup_one_month"
+      db_backup_object_lock_days = null
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "corporate-staff-rostering-production"
@@ -25,6 +26,120 @@ locals {
           local.cloudwatch_dashboard_widget_groups.app,
           local.cloudwatch_dashboard_widget_groups.web,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+      "Region-12" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          merge(module.baseline_presets.cloudwatch_dashboard_widget_groups.network_lb, {
+            search_filter_dimension = {
+              name   = "LoadBalancer"
+              values = ["net/r12-lb/e752b3ad72a3982b"]
+            }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.all_windows_ec2, {
+            search_filter = {
+              ec2_tag = [
+                { tag_name = "Name", tag_value = "pd-csr-a-7-a" },
+                { tag_name = "Name", tag_value = "pd-csr-a-8-b" },
+                { tag_name = "Name", tag_value = "pd-csr-w-1-a" },
+                { tag_name = "Name", tag_value = "pd-csr-w-2-b" },
+              ]
+            }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.app, {
+            header_markdown = "## EC2 APP pd-csr-a-7-a"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-a-7-a" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.app, {
+            header_markdown = "## EC2 APP pd-csr-a-8-b"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-a-8-b" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.web, {
+            header_markdown = "## EC2 WEB pd-csr-w-1-a"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-w-1-a" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.web, {
+            header_markdown = "## EC2 WEB pd-csr-w-2-b"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-w-2-b" }, ] }
+          }),
+        ]
+      }
+      "Region-34" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          merge(module.baseline_presets.cloudwatch_dashboard_widget_groups.network_lb, {
+            search_filter_dimension = {
+              name   = "LoadBalancer"
+              values = ["net/r34-lb/eaf7c5256cfab30f"]
+            }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.all_windows_ec2, {
+            search_filter = {
+              ec2_tag = [
+                { tag_name = "Name", tag_value = "pd-csr-a-9-a" },
+                { tag_name = "Name", tag_value = "pd-csr-a-10-b" },
+                { tag_name = "Name", tag_value = "pd-csr-w-3-a" },
+                { tag_name = "Name", tag_value = "pd-csr-w-4-b" },
+              ]
+            }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.app, {
+            header_markdown = "## EC2 APP pd-csr-a-9-a"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-a-9-a" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.app, {
+            header_markdown = "## EC2 APP pd-csr-a-10-b"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-a-10-b" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.web, {
+            header_markdown = "## EC2 WEB pd-csr-w-3-a"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-w-3-a" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.web, {
+            header_markdown = "## EC2 WEB pd-csr-w-4-b"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-w-4-b" }, ] }
+          }),
+        ]
+      }
+      "Region-56" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          merge(module.baseline_presets.cloudwatch_dashboard_widget_groups.network_lb, {
+            search_filter_dimension = {
+              name   = "LoadBalancer"
+              values = ["net/r56-lb/4ed053adbc21b30a"]
+            }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.all_windows_ec2, {
+            search_filter = {
+              ec2_tag = [
+                { tag_name = "Name", tag_value = "pd-csr-a-11-a" },
+                { tag_name = "Name", tag_value = "pd-csr-a-12-b" },
+                { tag_name = "Name", tag_value = "pd-csr-w-5-a" },
+                { tag_name = "Name", tag_value = "pd-csr-w-6-b" },
+              ]
+            }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.app, {
+            header_markdown = "## EC2 APP pd-csr-a-11-a"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-a-11-a" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.app, {
+            header_markdown = "## EC2 APP pd-csr-a-12-b"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-a-12-b" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.web, {
+            header_markdown = "## EC2 WEB pd-csr-w-5-a"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-w-5-a" }, ] }
+          }),
+          merge(local.cloudwatch_dashboard_widget_groups.web, {
+            header_markdown = "## EC2 WEB pd-csr-w-6-b"
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-w-6-b" }, ] }
+          }),
         ]
       }
       "pd-csr-db-a" = {
@@ -172,7 +287,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.2xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami           = "pd-csr-a-7-a"
@@ -193,7 +309,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.2xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami           = "pd-csr-a-8-b"
@@ -214,7 +331,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.2xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami           = "pd-csr-a-9-a"
@@ -235,7 +353,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.2xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami           = "pd-csr-a-10-b"
@@ -256,7 +375,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.2xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami           = "pd-csr-a-11-a"
@@ -276,7 +396,8 @@ locals {
           "/dev/sdc"  = { type = "gp3", size = 112 }
         }
         instance = merge(local.ec2_instances.app.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.2xlarge"
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami           = "pd-csr-a-12-b"
@@ -297,7 +418,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami           = "pd-csr-w-1-a"
@@ -318,7 +440,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami           = "pd-csr-w-2-b"
@@ -339,7 +462,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami           = "pd-csr-w-3-a"
@@ -360,7 +484,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami           = "pd-csr-w-4-b"
@@ -381,7 +506,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 128 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami           = "pd-csr-w-5-a"
@@ -402,7 +528,8 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          instance_type = "m5.4xlarge"
+          # instance_type = "m5.4xlarge" # TM-1672
+          instance_type = "r7i.xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami           = "pd-csr-w-6-b"
@@ -410,8 +537,6 @@ locals {
           pre-migration = "PDCWW00006"
         })
       })
-
-      prisoner-retail = local.ec2_instances.prisoner-retail
     }
 
     iam_policies = {
@@ -668,6 +793,17 @@ locals {
     }
 
     route53_zones = {
+      "csr.az.justice.gov.uk" = {
+        records = [
+          { name = "r1", type = "CNAME", ttl = "1800", records = ["r1.csr.service.justice.gov.uk"] },
+          { name = "r2", type = "CNAME", ttl = "1800", records = ["r2.csr.service.justice.gov.uk"] },
+          { name = "r3", type = "CNAME", ttl = "1800", records = ["r3.csr.service.justice.gov.uk"] },
+          { name = "r4", type = "CNAME", ttl = "1800", records = ["r4.csr.service.justice.gov.uk"] },
+          { name = "r5", type = "CNAME", ttl = "1800", records = ["r5.csr.service.justice.gov.uk"] },
+          { name = "r6", type = "CNAME", ttl = "1800", records = ["r6.csr.service.justice.gov.uk"] },
+        ]
+      }
+
       "csr.service.justice.gov.uk" = {
         records = [
           { name = "test", type = "NS", ttl = "86400", records = ["ns-1332.awsdns-38.org", "ns-2038.awsdns-62.co.uk", "ns-62.awsdns-07.com", "ns-689.awsdns-22.net"] },
@@ -696,11 +832,6 @@ locals {
       "/oracle/database/DIWFM" = {
         secrets = {
           passwords = { description = "database passwords" }
-        }
-      }
-      "/prisoner-retail" = {
-        secrets = {
-          notify_emails = { description = "email list to notify about prisoner retail job outputs. Format: 'from':'some.name@domain','to':'\"<some.name@domain>\", \"<another.name@domain>\" " }
         }
       }
     }

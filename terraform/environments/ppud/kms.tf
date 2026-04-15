@@ -1,4 +1,6 @@
-# AWS Managed KMS keys
+######################
+# AWS Managed KMS Keys
+######################
 
 data "aws_kms_alias" "sns" {
   name = "alias/aws/sns"

@@ -3,4 +3,4 @@ apiVersion: v2
 name: karpenter-configuration
 description: A Helm chart to deploy Karpenter's configuration
 type: application
-version: 3.1.0
+version: 3.5.0

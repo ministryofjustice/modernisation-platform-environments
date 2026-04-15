@@ -17,7 +17,7 @@ locals {
       }
       instance = {
         disable_api_termination = false
-        instance_type           = "t3.xlarge"
+        instance_type           = "t3.large" # if too small, move to r6i.large RAM constrained, not CPU
         key_name                = "ec2-user"
         vpc_security_group_ids  = ["bip", "ec2-linux"]
         tags = {

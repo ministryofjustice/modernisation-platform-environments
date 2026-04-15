@@ -3,7 +3,8 @@
 *.tfstate*
 .DS_Store
 tmp/
-.vscode/
+.vscode/*
+!.vscode/mcp.json
 .terraform.lock.hcl
 **/node_modules
 **/package-lock.json

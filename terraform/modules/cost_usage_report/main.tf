@@ -1578,5 +1578,41 @@ resource "aws_glue_catalog_table" "report" {
       name = "resource_tags_user_source_code"
       type = "string"
     }
+    columns {
+      name = "resource_tags_dpr-resource-type"
+      type = "string"
+    }
+    columns {
+      name = "resource_tags_dpr-jira"
+      type = "string"
+    }
+    columns {
+      name = "resource_tags_dpr-resource-group"
+      type = "string"
+    }
+    columns {
+      name = "resource_tags_dpr-name"
+      type = "string"
+    }
+    columns {
+      name = "resource_tags_dpr-is-backend"
+      type = "string"
+    }
+    columns {
+      name = "resource_tags_dpr-source"
+      type = "string"
+    }
+    columns {
+      name = "resource_tags_dpr-is-service-bundle"
+      type = "string"
+    }
+    columns {
+      name = "resource_tags_dpr-domain-category"
+      type = "string"
+    }
+    columns {
+      name = "resource_tags_dpr-domain"
+      type = "string"
+    }
   }
 }

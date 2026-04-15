@@ -61,30 +61,26 @@
 
 # The policies below are not used. Saved for reference.
 
-# data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
-#   policy_id = "SnsTopicId"
-#   statement {
-#     sid = "statement1"
-#     principals {
-#       type        = "AWS"
-#       identifiers = ["*"]
-#     }
-#     effect = "Allow"
-#     actions = [
-#       "SNS:GetTopicAttributes",
-#       "SNS:SetTopicAttributes",
-#       "SNS:AddPermission",
-#       "SNS:DeleteTopic",
-#       "SNS:Subscribe",
-#       "SNS:ListSubscriptionsByTopic",
-#       "SNS:Publish",
-#       "SNS:Receive"
-#     ]
-#     resources = [
-#       aws_sns_topic.cw_alerts.arn
-#     ]
-#   }
-# }
+data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
+  version = "2012-10-17"
+  statement {
+    sid    = "EventsAllowPublishSnsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [
+      aws_sns_topic.cw_alerts.arn
+    ]
+    principals {
+      type = "Service"
+      identifiers = [
+        "cloudwatch.amazonaws.com",
+      ]
+    }
+  }
+
+}
 
 # data "aws_iam_policy_document" "sns_topic_policy_s3" {
 #   policy_id = "SnsTopicId"
@@ -161,6 +157,10 @@ data "aws_security_groups" "all_security_groups" {
   }
 }
 
+data "aws_s3_bucket" "sftp_client1_bucket" {
+  count  = local.sftp_enabled ? 1 : 0
+  bucket = "${local.application_name}-${local.environment}-barclaycard-inbound-mp"
+}
 ## S3 NOTIFICATIONS
 data "aws_iam_policy_document" "s3_topic_policy" {
   statement {
@@ -177,11 +177,15 @@ data "aws_iam_policy_document" "s3_topic_policy" {
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values = [
-        module.s3-bucket.bucket.arn,
+      values = concat([
+        try(data.aws_s3_bucket.sftp_client1_bucket[0].arn, ""),
         module.s3-bucket-logging.bucket.arn,
-        module.s3-bucket-dbbackup.bucket.arn
-      ]
+        module.s3-bucket-dbbackup.bucket.arn,
+        ],
+        [
+          for name, b in aws_s3_bucket.buckets :
+          b.arn if name == "laa-ccms-inbound-${local.environment}-mp"
+      ])
     }
   }
 }
@@ -196,6 +200,7 @@ data "aws_route53_zone" "application-zone" {
 
 ## GANDI CERT
 data "aws_acm_certificate" "gandi_cert" {
+  count    = local.is-production ? 1 : 0
   domain   = local.application_data.accounts[local.environment].lz_domain_name
   statuses = ["ISSUED"]
 }

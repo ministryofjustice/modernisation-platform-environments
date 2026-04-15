@@ -15,14 +15,10 @@ locals {
 
     acm_certificates = {
       remote_desktop_wildcard_cert = {
-        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
-        domain_name                         = "modernisation-platform.service.justice.gov.uk"
-        external_validation_records_created = true
+        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name              = "*.development.hmpps-domain.service.justice.gov.uk"
         subject_alternate_names = [
           "*.hmpps-domain-services.hmpps-development.modernisation-platform.service.justice.gov.uk",
-          "*.development.hmpps-domain.service.justice.gov.uk",
-          "hmppgw2.justice.gov.uk",
-          "*.hmppgw2.justice.gov.uk",
         ]
         tags = {
           description = "wildcard cert for hmpps domain load balancer"
@@ -95,6 +91,29 @@ locals {
       })
     }
 
+    ec2_instances = {
+
+      # To be used for ndmis-development Business Objects
+      dev-jump2022-1 = merge(local.ec2_instances.jumpserver, {
+        cloudwatch_metric_alarms = {}
+        config = merge(local.ec2_instances.jumpserver.config, {
+          ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
+          availability_zone = "eu-west-2a"
+        })
+        instance = merge(local.ec2_instances.jumpserver.instance, {
+          instance_type = "t3.large"
+          tags = {
+            patch-manager = "group1"
+          }
+        })
+        tags = merge(local.ec2_instances.jumpserver.tags, {
+          domain-name              = "azure.noms.root"
+          gha-jumpserver-startstop = "development"
+          instance-scheduling      = "skip-scheduling"
+        })
+      })
+    }
+
     lbs = {
       public = merge(local.lbs.public, {
         instance_target_groups = {
@@ -118,14 +137,14 @@ locals {
 
     patch_manager = {
       patch_schedules = {
-        group1 = "cron(00 06 ? * WED *)" # 3am wed for prod for non-prod env's we have to work around the overnight shutdown
-        group2 = "cron(00 06 ? * THU *)" # 3am thu for prod
+        group1 = "cron(50 06 ? * WED *)" # 6:50am wed to work around the overnight shutdown
+        group2 = "cron(50 06 ? * THU *)" # 6:50am thu, see patch-manager.tf for approval_days config
       }
       maintenance_window_duration = 2 # 4 for prod
       maintenance_window_cutoff   = 1 # 2 for prod
       patch_classifications = {
         # REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS = ["SecurityUpdates", "CriticalUpdates"]
+        WINDOWS = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups", "ServicePacks", "Updates"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
       }
     }
 

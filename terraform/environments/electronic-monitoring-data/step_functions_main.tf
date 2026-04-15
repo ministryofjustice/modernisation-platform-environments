@@ -20,7 +20,7 @@ module "get_zipped_file_api" {
 # ------------------------------------------
 
 module "dms_validation_step_function" {
-  count = local.is-development || local.is-production ? 1 : 0
+  count = local.is-development || local.is-production || local.is-preproduction ? 1 : 0
 
   source       = "./modules/step_function"
   name         = "dms_validation"
@@ -29,6 +29,44 @@ module "dms_validation_step_function" {
     {
       "dms_retrieve_metadata" = module.dms_retrieve_metadata[0].lambda_function_name,
       "dms_validation"        = module.dms_validation[0].lambda_function_name,
+    }
+  )
+  type = "STANDARD"
+}
+
+
+# ------------------------------------------
+# Data Cut Back Step Function
+# ------------------------------------------
+
+module "data_cutback_step_function" {
+  count = local.is-development || local.is-production ? 1 : 0
+
+  source       = "./modules/step_function"
+  name         = "data_cutback"
+  iam_policies = tomap({ "data_cutback_step_function_policy" = aws_iam_policy.data_cutback_step_function_policy[0] })
+  variable_dictionary = tomap(
+    {
+      "data_cutback" = module.data_cutback[0].lambda_function_name,
+    }
+  )
+  type = "STANDARD"
+}
+
+
+# ------------------------------------------
+# Ears and Sars Step funtion
+# ------------------------------------------
+
+module "ears_sars_step_function" {
+  count = local.is-development || local.is-preproduction ? 1 : 0
+
+  source       = "./modules/step_function"
+  name         = "ears_sars"
+  iam_policies = tomap({ "ears_sars_step_function_policy" = aws_iam_policy.ears_sars_step_function_policy[0] })
+  variable_dictionary = tomap(
+    {
+      "ears_sars_request" = module.ears_sars_request[0].lambda_function_name,
     }
   )
   type = "STANDARD"

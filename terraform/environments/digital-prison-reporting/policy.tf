@@ -667,7 +667,7 @@ data "aws_iam_policy_document" "athena_api" {
     ]
     resources = [
       "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-oracle-function",
-      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-dps-*-federated-query-function",
+      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-*-federated-query-function",
       "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-redshift-function"
     ]
   }
@@ -863,13 +863,14 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "lakeformation:ListPermissions",
       "lakeformation:DescribeResource",
 
-      # LF tag permissions (needed to create and grant tag-based access)
+      # LF tag permissions (needed to create, amend, delete and grant tag-based access)
       "lakeformation:CreateLFTag",
       "lakeformation:CreateLFTagExpression",
       "lakeformation:GetLFTagExpression",
       "lakeformation:UpdateLFTag",
       "lakeformation:UpdateLFTagExpression",
       "lakeformation:DeleteLFTag",
+      "lakeformation:DeleteLFTagExpression",
       "lakeformation:GetResourceLFTags",
       "lakeformation:ListLFTags",
       "lakeformation:GetLFTag"

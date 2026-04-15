@@ -1,5 +1,5 @@
 module "environment" {
-  source = "../../modules/environment_v6"
+  source = "../../modules/environment"
 
   providers = {
     aws.modernisation-platform = aws.modernisation-platform

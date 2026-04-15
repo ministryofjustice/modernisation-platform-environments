@@ -1,0 +1,50 @@
+######################################
+### EC2 ROUTE53 RECORD
+######################################
+resource "aws_route53_record" "oas-app_new" {
+  count = local.environment == "preproduction" ? 1 : 0
+
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "${local.application_name}.${data.aws_route53_zone.external.name}"
+  type     = "A"
+
+  alias {
+    name                   = aws_lb.oas_lb[0].dns_name
+    zone_id                = aws_lb.oas_lb[0].zone_id
+    evaluate_target_health = true
+  }
+}
+
+######################################
+### RDS Route53 Record
+######################################
+resource "aws_route53_record" "oas-rds-new" {
+  count = local.environment == "preproduction" ? 1 : 0
+
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "rds.${local.application_name}.${data.aws_route53_zone.external.name}"
+  type     = "CNAME"
+  ttl      = 60
+  records  = [aws_db_instance.oas_rds_instance[0].address]
+}
+
+######################################
+### Load Balancer Route53 Records
+######################################
+# oas-lb.* (Subject Alternative Name - 71 chars)
+resource "aws_route53_record" "oas-lb" {
+  count = local.environment == "preproduction" ? 1 : 0
+
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "${local.application_name}-lb.${data.aws_route53_zone.external.name}"
+  type     = "A"
+
+  alias {
+    name                   = aws_lb.oas_lb[0].dns_name
+    zone_id                = aws_lb.oas_lb[0].zone_id
+    evaluate_target_health = true
+  }
+}

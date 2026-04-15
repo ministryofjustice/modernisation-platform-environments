@@ -1,5 +1,5 @@
 # ESB EC2 Instance
-
+/*
 
 module "esb" {
   source = "./modules/esb"
@@ -25,9 +25,9 @@ module "esb" {
   ami = lookup(
     {
       development   = "ami-0cc0dad47bc769c08"
-      test          = "ami-0ada811b153e02322"
+      test          = "ami-03c0e3ca397f1b12d"
       preproduction = "ami-04a6fa2443473cfd5"
-      production    = "ami-0b14bd01e84f3e0a5"
+      production    = "ami-0ba359ae94e597b82"
 
       # Add more environments when AMIs are known
     },
@@ -47,3 +47,4 @@ module "esb" {
   tableau_sg_id              = module.tableau.tableau_sg_id
 
 }
+*/

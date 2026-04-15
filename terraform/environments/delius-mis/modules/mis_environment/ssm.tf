@@ -12,5 +12,5 @@ module "s3_bucket_ssm_sessions" {
     aws.bucket-replication = aws
   }
 
-  tags = var.tags
+  tags = local.tags
 }

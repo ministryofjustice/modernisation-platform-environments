@@ -383,7 +383,7 @@ data "aws_iam_policy_document" "snowflake_trust" {
     effect = "Allow"
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.snowflake_principal_account_id}:root"]
+      identifiers = [local.snowflake_principal_account_id]
     }
     actions = ["sts:AssumeRole"]
     condition {
@@ -451,10 +451,38 @@ data "aws_iam_policy_document" "snowflake_policy_doc" {
       test     = "StringLike"
       variable = "kms:EncryptionContext:aws:s3:arn"
       values = [
-        "arn:aws:s3:::${local.bucket_name}/${local.snowflake_prefix}*"
+        "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role1}/*",
+        "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role2}/*",
+        "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role3}/*",
+        "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role4}/*",
+        "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role5}/*",
+        "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role6}/*",
+        "arn:aws:s3:::${local.bucket_name}"
       ]
     }
   }
+  statement {
+    sid    = "SnowflakeS3Integration"
+    effect = "Allow"
+    actions = [
+      "s3:DeleteObject",
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:PutObject",
+      "s3:GetObjectVersion",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role1}/*",
+      "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role2}/*",
+      "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role3}/*",
+      "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role4}/*",
+      "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role5}/*",
+      "arn:aws:s3:::${local.bucket_name}/${local.genesys_prefix.role6}/*",
+      "arn:aws:s3:::${local.bucket_name}"
+    ]
+  }
+
 
 }
 

@@ -1,6 +1,8 @@
 locals {
   dms_tasks_with_transformations = {
-    g4s_emsys_mvp = true
+    g4s_emsys_mvp   = true
+    g4s_emsys_tpims = true
+    g4s_cap_dw      = true
     # Add more as needed, e.g.:
     # another_task = true
   }
@@ -30,7 +32,12 @@ module "dms_task" {
     "g4s_lcm_archive_2023",
     "g4s_lcm_archive_local_full",
     "g4s_centurion"
-  ] : local.is-development ? ["test"] : [])
+    ] : local.is-development ? [
+    "test"
+    ] : local.is-preproduction ? [
+    "g4s_emsys_tpims"
+    ] : []
+  )
 
   database_name = each.key
 
@@ -73,7 +80,12 @@ module "dms_second_task" {
     "g4s_subject_history",
     "g4s_tasking",
     "g4s_telephony"
-  ] : local.is-development ? ["test"] : [])
+    ] : local.is-development ? [
+    "test"
+    ] : local.is-preproduction ? [
+    "g4s_emsys_tpims"
+    ] : []
+  )
 
   database_name      = each.key
   dump_number_suffix = "_second_dump"

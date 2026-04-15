@@ -1,0 +1,110 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AWS Network Firewall FQDN Rules Schema",
+  "description": "Schema for network-firewall/rules/fqdn-rules.yml",
+  "type": "object",
+  "required": ["rules"],
+  "properties": {
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "sid",
+          "revision",
+          "action",
+          "protocol",
+          "source_ip",
+          "source_port",
+          "direction",
+          "destination_ip",
+          "destination_port",
+          "type",
+          "content",
+          "description"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Human-friendly identifier for the rule, it must be lower-case kebab-case (letters/numbers separated by hyphens)",
+            "examples": ["allow-vpc-api-github-com-https"]
+          },
+          "sid": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Signature ID (sid)"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Rule revision number (rev)"
+          },
+          "action": {
+            "type": "string",
+            "description": "Suricata action",
+            "enum": ["pass", "drop", "reject", "alert"]
+          },
+          "protocol": {
+            "type": "string",
+            "description": "L4 protocol",
+            "enum": ["tcp", "udp", "icmp", "ip"]
+          },
+          "source_ip": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Source IP selector",
+            "examples": ["$HOME_NET", "any"]
+          },
+          "source_port": {
+            "description": "Source port. Use 'any' or a single port number (0-65535)",
+            "oneOf": [
+              { "type": "string", "enum": ["any"] },
+              { "type": "integer", "minimum": 0, "maximum": 65535 }
+            ]
+          },
+          "direction": {
+            "type": "string",
+            "description": "Traffic direction operator",
+            "enum": ["->", "<>"]
+          },
+          "destination_ip": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Destination IP selector",
+            "examples": ["any"]
+          },
+          "destination_port": {
+            "description": "Destination port. Use 'any' or a single port number (0-65535)",
+            "oneOf": [
+              { "type": "string", "enum": ["any"] },
+              { "type": "integer", "minimum": 0, "maximum": 65535 }
+            ]
+          },
+          "type": {
+            "type": "string",
+            "description": "Match type",
+            "enum": ["tls.sni", "http.host"]
+          },
+          "content": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Value to match",
+            "examples": ["api.github.com"]
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Optional free-text description of intent",
+            "examples": ["Allow HTTPS to api.github.com"]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

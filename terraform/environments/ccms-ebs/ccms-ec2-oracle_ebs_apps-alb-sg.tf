@@ -1,5 +1,6 @@
 # Security Group for EBSAPP LB
 resource "aws_security_group" "sg_ebsapps_lb" {
+  count       = local.is-production ? 1 : 0
   name        = "sg_ebsapps_lb"
   description = "Inbound traffic control for EBSAPPS loadbalancer"
   vpc_id      = data.aws_vpc.shared.id
@@ -14,7 +15,8 @@ resource "aws_security_group" "sg_ebsapps_lb" {
 ### HTTPS
 
 resource "aws_security_group_rule" "ingress_traffic_ebslb_443" {
-  security_group_id = aws_security_group.sg_ebsapps_lb.id
+  count             = local.is-production ? 1 : 0
+  security_group_id = aws_security_group.sg_ebsapps_lb[count.index].id
   type              = "ingress"
   description       = "HTTPS"
   protocol          = "TCP"

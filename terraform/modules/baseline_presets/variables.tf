@@ -22,6 +22,7 @@ variable "options" {
     cloudwatch_metric_oam_links                  = optional(list(string))          # list of account names to send cloudwatch metrics to, creates oam link for each
     db_backup_bucket_name                        = optional(string)                # override default backup bucket name
     db_backup_lifecycle_rule                     = optional(string)                # override default backup bucket lifecycle
+    db_backup_object_lock_days                   = optional(number)                # default backup bucket object lock
     db_backup_more_permissions                   = optional(bool, false)           # allow cross-account delete access for db-backup S3 buckets
     enable_application_environment_wildcard_cert = optional(bool, false)           # create ACM cert with mod platform business unit
     enable_azure_sas_token                       = optional(bool, false)           # create /azure SSM parameter and pipeline role

@@ -1,4 +1,6 @@
 module "mlflow_iam_role" {
+  count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
+
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
@@ -8,13 +10,13 @@ module "mlflow_iam_role" {
   role_name_prefix = "mlflow"
 
   role_policy_arns = {
-    MlflowPolicy = module.mlflow_iam_policy.arn
+    MlflowPolicy = module.mlflow_iam_policy[0].arn
   }
 
   oidc_providers = {
     main = {
       provider_arn               = data.aws_iam_openid_connect_provider.eks.arn
-      namespace_service_accounts = ["${kubernetes_namespace.mlflow.metadata[0].name}:mlflow"]
+      namespace_service_accounts = ["${kubernetes_namespace.mlflow[0].metadata[0].name}:mlflow"]
     }
   }
 

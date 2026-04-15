@@ -135,7 +135,7 @@ variable "max_concurrent_runs" {
 
 variable "glue_version" {
   type        = string
-  default     = "4.0"
+  default     = "5.0"
   description = "(Optional) The version of glue to use."
 }
 
@@ -266,6 +266,10 @@ variable "log_group_retention_in_days" {
   description = "(Optional) The default number of days log events retained in the glue job log group."
 }
 
+variable "custom_metric_namespace" {
+  type        = string
+  description = "Namespace for custom metrics related to Glue, e.g. log filter metrics that parse the logs for errors"
+}
 
 variable "job_language" {
   type        = string
@@ -329,24 +333,6 @@ variable "enable_metrics" {
   type        = bool
   default     = false
   description = "(Optional) Enables the collection of metrics for job profiling for job run."
-}
-
-variable "enable_continuous_cloudwatch_log" {
-  type        = bool
-  default     = false
-  description = "(Optional) Enables real-time continuous logging for AWS Glue jobs."
-}
-
-variable "enable_continuous_log_filter" {
-  type        = bool
-  default     = true
-  description = "(Optional) Specifies a standard filter or no filter when you create or edit a job enabled for continuous logging."
-}
-
-variable "continuous_log_stream_prefix" {
-  type        = string
-  default     = null
-  description = "(Optional) Specifies a custom CloudWatch log stream prefix for a job enabled for continuous logging."
 }
 
 variable "region" {

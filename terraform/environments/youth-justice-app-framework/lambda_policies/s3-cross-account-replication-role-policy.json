@@ -30,7 +30,7 @@
     {
       "Effect": "Allow",
       "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::redshift-serverless-yjb-reporting/*"
+      "Resource": "arn:aws:s3:::yjaf-${environment}-redshift-yjb-reporting/*"
     },
     {
       "Effect": "Allow",

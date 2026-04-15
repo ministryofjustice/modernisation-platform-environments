@@ -64,3 +64,44 @@ variable "subnet_ids" {
   description = "List of subnet IDs associated with the Lambda function."
   type        = list(string)
 }
+
+variable "cross_account" {
+  description = "boolean on whether to enable cross acount copy"
+  type        = bool
+  default     = false
+}
+
+variable "cross_account_id" {
+  description = "id for cross acount copy"
+  type        = string
+  default     = null
+  nullable    = true
+}
+
+variable "replication_details" {
+  description = "kms key and name of bucket to replicate data to"
+  type = object({
+    fms_general_bucket   = optional(string)
+    fms_general_kms_id   = optional(string)
+    fms_ho_bucket        = optional(string)
+    fms_ho_kms_id        = optional(string)
+    fms_specials_bucket  = optional(string)
+    fms_specials_kms_id  = optional(string)
+    mdss_general_bucket  = optional(string)
+    mdss_general_kms_id  = optional(string)
+    mdss_specials_bucket = optional(string)
+    mdss_specials_kms_id = optional(string)
+    mdss_ho_bucket       = optional(string)
+    mdss_ho_kms_id       = optional(string)
+    account_id           = optional(string)
+  })
+  default  = null
+  nullable = true
+}
+
+variable "metadata_bucket" {
+  description = "bucket for inventory dumping"
+  type        = string
+  default     = null
+  nullable    = true
+}

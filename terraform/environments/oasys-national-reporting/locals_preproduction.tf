@@ -1,5 +1,10 @@
 locals {
 
+  lb_maintenance_message_preproduction = {
+    maintenance_title   = "OASys National Reporting Pre-Production Maintenance Window"
+    maintenance_message = "OASys National Reporting Pre-Production is currently unavailable due to planned maintenance or out-of-hours shutdown (7pm-7am). Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpectedly down."
+  }
+
   baseline_presets_preproduction = {
     options = {
       sns_topics = {
@@ -28,6 +33,21 @@ locals {
         tags = {
           description = "Wildcard certificate for the preproduction environment"
         }
+      }
+    }
+
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.all_ec2,
+          local.cloudwatch_dashboard_widget_groups.cms,
+          local.cloudwatch_dashboard_widget_groups.web,
+          local.cloudwatch_dashboard_widget_groups.bods,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
       }
     }
 
@@ -337,6 +357,46 @@ locals {
                   host_header = {
                     values = [
                       "preproduction.reporting.oasys.service.justice.gov.uk",
+                      "admin.preproduction.reporting.oasys.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              legacy-redirect = {
+                priority = 300
+                actions = [{
+                  type = "redirect"
+                  redirect = {
+                    host        = "preproduction.reporting.oasys.service.justice.gov.uk"
+                    path        = "/BOE/BI"
+                    port        = "443"
+                    protocol    = "HTTPS"
+                    query       = ""
+                    status_code = "HTTP_302"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "onr.pp-oasys.az.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_preproduction)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "preproduction.reporting.oasys.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -349,22 +409,28 @@ locals {
 
     patch_manager = {
       patch_schedules = {
-        weds1500  = "cron(00 15 ? * WED *)" # 3pm wed 
+        weds1500  = "cron(00 15 ? * WED *)" # 3pm wed
         thurs1500 = "cron(00 15 ? * THU *)" # 3pm thu
         manual    = "cron(00 21 31 2 ? *)"  # 9pm 31 feb e.g. impossible date to allow for manual patching of otherwise enrolled instances
       }
       maintenance_window_duration = 2 # 4 for prod
       maintenance_window_cutoff   = 1 # 2 for prod
       patch_classifications = {
-        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates"]
+        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"]                                  # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
+        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
       }
     }
 
     route53_zones = {
+      "onr.pp-oasys.az.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "public" },
+        ]
+      }
       "preproduction.reporting.oasys.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "", type = "A", lbs_map_key = "public" },
+          { name = "admin", type = "A", lbs_map_key = "public" },
           { name = "pp-bods", type = "A", lbs_map_key = "public" }
         ],
       }

@@ -220,6 +220,16 @@ variable "internal_alb_security_group_id" {
   type        = string
 }
 
+variable "connectivity_alb_security_group_id" {
+  description = "The security group ID for the connectivity ALB"
+  type        = string
+}
+
+variable "yjsm_hub_svc_alb_security_group_id" {
+  description = "The security group ID for the yjsm hub svc ALB"
+  type        = string
+}
+
 variable "external_alb_security_group_id" {
   description = "The security group ID for the external ALB"
   type        = string
@@ -235,8 +245,28 @@ variable "internal_alb_arn" {
   type        = string
 }
 
+variable "connectivity_alb_arn" {
+  description = "The ARN of the connectivity ALB"
+  type        = string
+}
+
+variable "yjsm_hub_svc_alb_arn" {
+  description = "The ARN of the yjsm hub svc ALB"
+  type        = string
+}
+
 variable "internal_alb_name" {
   description = "The name of the internal ALB"
+  type        = string
+}
+
+variable "connectivity_alb_name" {
+  description = "The name of the connectivity ALB"
+  type        = string
+}
+
+variable "yjsm_hub_svc_alb_name" {
+  description = "The name of the yjsm hub svc ALB"
   type        = string
 }
 
@@ -316,4 +346,16 @@ variable "list_of_target_group_arns" {
   description = "A list of target group ARNs to use for the ECS services. The key must match the name of the ecs service to be picked up"
   type        = map(string)
   default     = {}
+}
+
+variable "aws_account_id" {
+  description = "The AWS account ID"
+  type        = string
+}
+
+## YJSM Hub Svc Pilot
+variable "create_svc_pilot" {
+  description = "Create infrastructure for the hub-svc pilot, including ALB and associated resources"
+  type        = bool
+  default     = true
 }

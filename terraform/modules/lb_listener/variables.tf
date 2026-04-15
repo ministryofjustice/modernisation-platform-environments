@@ -84,6 +84,8 @@ variable "default_action" {
       status_code = string
       port        = optional(number)
       protocol    = optional(string)
+      path        = optional(string)
+      query       = optional(string)
     }))
   })
 }
@@ -117,6 +119,8 @@ variable "rules" {
         status_code = string
         port        = optional(number)
         protocol    = optional(string)
+        path        = optional(string)
+        query       = optional(string)
       }))
     }))
     conditions = list(object({

@@ -37,7 +37,7 @@ variable "logging_bucket" {
   })
 }
 
-variable "production_dev" {
+variable "environment_shorthand" {
   description = "The environment the lambda is being deployed to"
   type        = string
 }
@@ -50,4 +50,10 @@ variable "security_group_ids" {
 variable "subnet_ids" {
   description = "List of subnet IDs associated with the Lambda function."
   type        = list(string)
+}
+
+variable "filter_suffix" {
+  description = "String to filter the suffix of the files on."
+  type        = string
+  default     = ""
 }

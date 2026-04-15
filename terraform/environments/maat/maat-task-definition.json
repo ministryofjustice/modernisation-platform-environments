@@ -38,79 +38,79 @@
     "secrets": [
       {
         "name": "APP_BC_CLIENT_USER_ID",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_BC_CLIENT_USER_ID"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_BC_CLIENT_USER_ID"
       },
       {
         "name": "APP_ORCH_OAUTH_SCOPE",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ORCH_OAUTH_SCOPE"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_ORCH_OAUTH_SCOPE"
       },
       {
         "name": "APP_MAAT_GOOGLE_TAG_MANAGER_ID",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_MAAT_GOOGLE_ANALYTICS_4_TAG_ID"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_MAAT_GOOGLE_ANALYTICS_4_TAG_ID"
       },
       {
         "name": "APP_BC_CLIENT_ORIG_ID",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_BC_CLIENT_ORIG_ID"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_BC_CLIENT_ORIG_ID"
       },
       {
         "name": "APP_DB_PASSWORD",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_DB_PASSWORD"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_DB_PASSWORD"
       },
       {
         "name": "APP_CAA_CLIENT_SECRET",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_CAA_CLIENT_SECRET"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_CAA_CLIENT_SECRET"
       },
       {
         "name": "APP_ORCH_CLIENT_SECRET",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ORCH_CLIENT_SECRET"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_ORCH_CLIENT_SECRET"
       },
       {
         "name": "APP_CAA_CLIENT_ID",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_CAA_CLIENT_ID"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_CAA_CLIENT_ID"
       },
       {
         "name": "APP_ORCH_CLIENT_ID",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ORCH_CLIENT_ID"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_ORCH_CLIENT_ID"
       },
       {
         "name": "APP_DB_USERID",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_DB_USERID"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_DB_USERID"
       },
       {
         "name": "APP_ORCH_ENDPOINT",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ORCH_ENDPOINT"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_ORCH_ENDPOINT"
       },
       {
         "name": "APP_CAA_ENDPOINT",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_CAA_ENDPOINT"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_CAA_ENDPOINT"
       },
       {
         "name": "APP_BC_SERVICE_NAME",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_BC_SERVICE_NAME"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_BC_SERVICE_NAME"
       },
       {
         "name": "APP_ATS_CLIENT_SECRET",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ATS_CLIENT_SECRET"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_ATS_CLIENT_SECRET"
       },
       {
         "name": "APP_ATS_CLIENT_ID",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ATS_CLIENT_ID"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_ATS_CLIENT_ID"
       },
       {
         "name": "APP_ATS_OAUTH_SCOPE",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ATS_OAUTH_SCOPE"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_ATS_OAUTH_SCOPE"
       },
       {
         "name": "APP_MASTER_PASSWORD",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_MASTER_PASSWORD"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_MASTER_PASSWORD"
       },
       {
         "name": "APP_SALT",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_SALT"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_SALT"
       },
       {
         "name": "APP_DERIVATION_ITERATIONS",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_DERIVATION_ITERATIONS"
+        "valueFrom": "arn:aws:secretsmanager:${env_account_region}:${env_account_id}:secret:maat/APP_DERIVATION_ITERATIONS"
       }
     ],
     "environment": [

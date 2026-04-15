@@ -16,6 +16,10 @@ output "yjsm_instance_private_ip" {
   value = aws_instance.yjsm.private_ip
 }
 
+output "yjsm_instance_secondary_private_ip" {
+  value = aws_network_interface.main.private_ip_list[1]
+}
+
 output "private_key_pem" {
   value     = module.key_pair.private_key_pem
   sensitive = true

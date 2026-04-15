@@ -53,7 +53,11 @@ resource "aws_iam_policy" "ftp_policy" {
         Effect = "Allow",
         Resource = [
           "arn:aws:s3:::${var.ftp_bucket}",
-          "arn:aws:s3:::${var.ftp_bucket}/*"
+          "arn:aws:s3:::${var.ftp_bucket}/*",
+          "arn:aws:s3:::${var.s3_bucket_ftp}",
+          "arn:aws:s3:::${var.s3_bucket_ftp}/*",
+          "arn:aws:s3:::${var.s3_bucket_layer_ftp}",
+          "arn:aws:s3:::${var.s3_bucket_layer_ftp}/*"
         ]
       },
       {
@@ -81,7 +85,7 @@ resource "aws_iam_role_policy_attachment" "ftp_lambda_policy_attach" {
 resource "aws_lambda_layer_version" "ftp_layer" {
   layer_name               = "ftpclientlayer"
   compatible_runtimes      = ["python3.13"]
-  s3_bucket                = var.s3_bucket_ftp
+  s3_bucket                = var.s3_bucket_layer_ftp
   s3_key                   = var.s3_object_ftp_clientlibs
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ccms ebs ftp lambda contains pycurl and other dependencies"
@@ -132,7 +136,7 @@ resource "aws_lambda_function" "ftp_lambda" {
 resource "aws_cloudwatch_event_rule" "ftp_schedule" {
   count               = contains(var.enabled_cron_in_environments, var.env) ? 1 : 0
   name                = "${var.lambda_name}-schedule"
-  schedule_expression = var.env == "production" ? "cron(0 10 * * ? *)" : "cron(0 10 ? * MON-FRI *)"
+  schedule_expression = var.ftp_cron
 }
 ### cw event lambda target
 resource "aws_cloudwatch_event_target" "ftp_target" {

@@ -17,9 +17,10 @@ module "transfer_server_iam_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "6.4.0"
 
   name_prefix = "transfer-server"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.transfer_server.json
 }
@@ -29,11 +30,12 @@ data "aws_iam_policy_document" "datasync" {
     sid    = "AllowKMS"
     effect = "Allow"
     actions = [
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*",
-      "kms:Encrypt",
-      "kms:DescribeKey",
+      "kms:CreateGrant",
       "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:Encrypt",
+      "kms:GenerateDataKey*",
+      "kms:ReEncrypt*"
     ]
     resources = [module.s3_datasync_opg_kms.key_arn]
   }
@@ -54,11 +56,13 @@ data "aws_iam_policy_document" "datasync" {
       "s3:AbortMultipartUpload",
       "s3:DeleteObject",
       "s3:GetObject",
+      "s3:GetObjectAcl",
       "s3:GetObjectTagging",
       "s3:GetObjectVersion",
       "s3:GetObjectVersionTagging",
       "s3:ListMultipartUploadParts",
       "s3:PutObject",
+      "s3:PutObjectAcl",
       "s3:PutObjectTagging"
     ]
     resources = ["${module.datasync_opg_bucket.s3_bucket_arn}/*"]
@@ -69,9 +73,10 @@ module "datasync_iam_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "6.4.0"
 
   name_prefix = "datasync"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.datasync.json
 }
@@ -135,9 +140,10 @@ module "datasync_replication_iam_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "6.4.0"
 
   name_prefix = "datasync-replication"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.datasync_replication.json
 }
@@ -201,9 +207,10 @@ module "datasync_opg_replication_iam_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "6.4.0"
 
   name_prefix = "datasync-opg-ingress-${local.environment}-replication"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.datasync_opg_replication.json
 }
@@ -348,9 +355,10 @@ module "guard_duty_s3_malware_protection_iam_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "6.4.0"
 
   name_prefix = "guard-duty-s3-malware-protection-${local.environment}-scan"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.guard_duty_malware_protection_iam_policy.json
 }
@@ -446,9 +454,10 @@ module "laa_data_analysis_iam_policy" {
   count = local.environment == "production" ? 1 : 0
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "6.4.0"
 
   name_prefix = "laa-data-analysis"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.laa_data_analysis[0].json
 }
@@ -531,9 +540,10 @@ module "laa_data_analysis_replication_iam_policy" {
   count = local.environment == "production" ? 1 : 0
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+  version = "6.4.0"
 
   name_prefix = "laa-data-analysis-${local.environment}-replication"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.laa_data_analysis_replication[0].json
 }

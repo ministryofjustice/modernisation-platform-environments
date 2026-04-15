@@ -135,6 +135,7 @@ resource "aws_vpc_security_group_egress_rule" "allow_out_to_rds" { #allow Postgr
   ip_protocol = "tcp"
 }
 
+/*
 resource "aws_vpc_security_group_egress_rule" "allow_out_to_esb" { #allow ssh outbound to ESB
   security_group_id            = aws_security_group.mgmt_instance_sg.id
   referenced_security_group_id = var.esb_security_group_id
@@ -144,7 +145,7 @@ resource "aws_vpc_security_group_egress_rule" "allow_out_to_esb" { #allow ssh ou
   description = "Allow Management Instance to ssh to ESB"
   ip_protocol = "tcp"
 }
-
+*/
 
 
 # Retrieve the RDS SG so that a roule can be addedd to enable access from the Management instance
@@ -293,7 +294,7 @@ resource "aws_instance" "ad_instance" {
   count = var.ad_management_instance_count
 
   ami                         = data.aws_ami.windows_2022.id
-  instance_type               = "t2.xlarge"
+  instance_type               = "m6i.xlarge"
   iam_instance_profile        = aws_iam_instance_profile.ad_instance_profile.name
   key_name                    = module.key_pair.key_pair_name
   subnet_id                   = var.private_subnet_ids[count.index % length(var.private_subnet_ids)] # 1st in Subnet a, then b, c, a, etc
@@ -316,7 +317,7 @@ resource "aws_instance" "ad_instance" {
   }
   root_block_device {
     encrypted   = true
-    volume_size = 50
+    volume_size = 100
     tags = merge(local.all_tags,
       { Name = "root-device-mgmt-ad-instance" },
       { device-name = "/dev/sda1" }

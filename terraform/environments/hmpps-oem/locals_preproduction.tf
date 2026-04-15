@@ -16,6 +16,7 @@ locals {
         "ssm_command",
       ]
 
+      db_backup_object_lock_days           = 14
       enable_ec2_delius_dba_secrets_access = true
 
       sns_topics = {
@@ -137,7 +138,6 @@ locals {
             search_filter_dimension = {
               name = "type_instance"
               values = [
-                "c-lsast.preproduction.nomis.service.justice.gov.uk",
                 "c.preproduction.nomis.service.justice.gov.uk",
               ]
             }

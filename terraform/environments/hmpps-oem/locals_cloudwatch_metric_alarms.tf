@@ -8,12 +8,9 @@ locals {
     }
 
     test = {
-      # az-noms-dev-test-environments
-      offloc-stage      = ["stage.offloc.service.justice.gov.uk", true, "azure-fixngo-pagerduty"]
-      hmppgw1-rdgateway = ["hmppgw1.justice.gov.uk", true, "azure-fixngo-pagerduty"]
-
       # hmpps-domain-services
       rdgateway = ["rdgateway1.test.hmpps-domain.service.justice.gov.uk", true, "hmpps-domain-services-pagerduty"]
+      rdweb     = ["rdweb1.test.hmpps-domain.service.justice.gov.uk", true, "hmpps-domain-services-pagerduty"]
 
       # nomis
       nomis-t1 = ["c-t1.test.nomis.service.justice.gov.uk", true, "nomis-pagerduty"]
@@ -43,14 +40,14 @@ locals {
       nomis-pp    = ["c.preproduction.nomis.service.justice.gov.uk", true, "nomis-pagerduty"]
 
       # nomis-combined-reporting
-      nomis-reporting-pp-aws   = ["preproduction.reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
-      nomis-reporting-pp-admin = ["admin.preproduction.reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
+      nomis-reporting-pp-aws = ["preproduction.reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
 
       # oasys
       oasys-pp = ["pp.oasys.service.justice.gov.uk", true, "oasys-pagerduty"]
 
       # oasys-national-reporting
-      onr-pp = ["onr.pp-oasys.az.justice.gov.uk", true, "oasys-national-reporting-pagerduty"]
+      onr-pp-az-redirect = ["onr.pp-oasys.az.justice.gov.uk", true, "oasys-national-reporting-pagerduty"]
+      onr-pp             = ["preproduction.reporting.oasys.service.justice.gov.uk", true, "oasys-national-reporting-pagerduty"]
 
       # planetfm - alarms disabled on request from Glenn
       #cafmtx-pp   = ["cafmtx.pp.planetfm.service.justice.gov.uk", true, "planetfm-pagerduty"]
@@ -77,8 +74,7 @@ locals {
       nomis = ["c.nomis.az.justice.gov.uk", true, "nomis-pagerduty"]
 
       # nomis-combined-reporting
-      nomis-reporting-aws   = ["reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
-      nomis-reporting-admin = ["admin.reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
+      nomis-reporting = ["reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
 
       # oasys
       oasys          = ["oasys.service.justice.gov.uk", true, "oasys-pagerduty"]
@@ -87,7 +83,8 @@ locals {
       oasys-training = ["training.int.oasys.service.justice.gov.uk", true, "oasys-pagerduty"]
 
       # oasys-national-reporting
-      onr = ["onr.oasys.az.justice.gov.uk", true, "oasys-national-reporting-pagerduty"]
+      onr-az-redirect = ["onr.oasys.az.justice.gov.uk", true, "oasys-national-reporting-pagerduty"]
+      onr             = ["reporting.oasys.service.justice.gov.uk", true, "oasys-national-reporting-pagerduty"]
 
       # planetfm - alarms disabled on request from Glenn
       #cafmtrainweb = ["cafmtrainweb.planetfm.service.justice.gov.uk", true, "planetfm-pagerduty"]
@@ -134,14 +131,12 @@ locals {
   # e.g. src/github-workflow-monitoring/github-workflow-monitor.sh -i 3600 -n 168 -r all | grep -v all | cut -d, -f2,3 | sed 's/^/["/g' | sed 's/,/", "/g' | sed 's/$/", "dso-pipelines-pagerduty"],/g'
   gha_pipeline_alarms = [
     # [repo name, pipeline name, sns topic, optionally overwrite alarm settings]
-    ["dso-certificates", "cert-renewal-devtest", "dso-pipelines-pagerduty", {}],
     ["dso-certificates", "cert-renewal-prod", "dso-pipelines-pagerduty", {}],
     ["dso-certificates", "stale", "dso-pipelines-pagerduty", {}],
     ["dso-infra-azure-ad", "application-management", "dso-pipelines-pagerduty", {}],
     ["dso-infra-azure-ad", "application-cleanup", "dso-pipelines-pagerduty", {}],
     ["dso-infra-azure-ad", "automated-user-management", "dso-pipelines-pagerduty", {}],
     ["dso-infra-azure-ad", "send-reminders", "dso-pipelines-pagerduty", {}],
-    ["dso-infra-azure-fixngo", "appgw-fix-NOMSProduction1", "dso-pipelines-pagerduty", {}],
     ["dso-infra-azure-fixngo", "terragrunt-DigitalStudioDevTestEnvironments", "dso-pipelines-pagerduty", {}],
     ["dso-infra-azure-fixngo", "terragrunt-NOMSDigitalStudioProduction1", "dso-pipelines-pagerduty", {}],
     ["dso-infra-azure-fixngo", "terragrunt-NOMSDevTestEnvironments", "dso-pipelines-pagerduty", {}],
@@ -153,6 +148,8 @@ locals {
     ["dso-modernisation-platform-automation", "nomis_environment_start", "nomis-pagerduty", {}],
     ["dso-modernisation-platform-automation", "certificate_renewal", "dso-pipelines-pagerduty", {}],
     ["dso-modernisation-platform-automation", "azure_sas_token_refresh", "nomis-data-hub-pagerduty", {}],
+    ["dso-modernisation-platform-automation", "jump_server_start", "dso-pipelines-pagerduty", {}],
+    ["dso-modernisation-platform-automation", "jump_server_stop", "dso-pipelines-pagerduty", {}],
     ["dso-modernisation-platform-automation", "ncr_environment_start", "dso-pipelines-pagerduty", {}],
     ["dso-modernisation-platform-automation", "ncr_environment_stop", "dso-pipelines-pagerduty", {}],
     ["dso-modernisation-platform-automation", "ndh_offloc_cdecopy", "nomis-data-hub-pagerduty", {}],
@@ -160,6 +157,9 @@ locals {
     ["dso-modernisation-platform-automation", "nomis_environment_stop", "nomis-pagerduty", {}],
     ["dso-modernisation-platform-automation", "nomis_database_refresh", "nomis-pagerduty", {}],
     ["dso-modernisation-platform-automation", "oasys_database_refresh", "oasys-pagerduty", {}],
+    ["dso-modernisation-platform-automation", "onr_environment_start", "dso-pipelines-pagerduty", {}],
+    ["dso-modernisation-platform-automation", "onr_environment_stop", "dso-pipelines-pagerduty", {}],
+    ["dso-modernisation-platform-automation", "security_hub_alerting", "dso-pipelines-pagerduty", {}],
     ["dso-repositories", "stale", "dso-pipelines-pagerduty", {}],
     ["dso-useful-stuff", "stale", "dso-pipelines-pagerduty", {}],
     ["dso-useful-stuff", "dangling-dns", "dso-pipelines-pagerduty", {}],

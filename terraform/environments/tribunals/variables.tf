@@ -1,3 +1,15 @@
+variable "lookup_cloudfront_distribution" {
+  type        = bool
+  description = "Set to true after the CloudFront distribution has been created and stored in SSM"
+  default     = false
+}
+
+variable "lookup_cloudfront_distribution_compiled" {
+  type        = bool
+  description = "Set to true after the CloudFront _compiled distribution has been created and stored in SSM"
+  default     = false
+}
+
 variable "services" {
   type = map(object({
     name_prefix = string
@@ -227,7 +239,7 @@ variable "sftp_services" {
       name_prefix    = "siac"
       module_key     = "siac"
       sftp_port      = 10027
-      upload_enabled = true
+      upload_enabled = false
     },
     "tax_chancery_decisions" = {
       name_prefix    = "taxchancerydecisions"

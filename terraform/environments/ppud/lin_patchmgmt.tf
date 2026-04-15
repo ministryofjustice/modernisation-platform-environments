@@ -3,8 +3,6 @@
 # Linux instances only exist in production but using the local.environment variable allows
 # for future linux instances to be added into dev and uat with their own patch groups
 
-
-
 resource "aws_ssm_patch_group" "lin_patch_group" {
   count       = local.is-production == true ? 1 : 0
   baseline_id = aws_ssm_patch_baseline.linux_os_baseline[0].id
@@ -38,8 +36,6 @@ resource "aws_ssm_patch_baseline" "linux_os_baseline" {
     }
   }
 }
-
-
 
 # Create Maintenance Windows
 # Production Linux
@@ -121,8 +117,8 @@ resource "aws_ssm_maintenance_window_task" "pre_lin_healthcheck_maintenance_wind
 
   task_invocation_parameters {
     run_command_parameters {
-      output_s3_bucket     = aws_s3_bucket.MoJ-Health-Check-Reports.id
-      output_s3_key_prefix = "ssm_output/"
+      output_s3_bucket     = local.application_data.accounts[local.environment].ssm_health_check_reports_s3
+      output_s3_key_prefix = "health-check-reports/linux/"
       timeout_seconds      = 600
     }
   }
@@ -149,13 +145,12 @@ resource "aws_ssm_maintenance_window_task" "post_lin_healthcheck_maintenance_win
 
   task_invocation_parameters {
     run_command_parameters {
-      output_s3_bucket     = aws_s3_bucket.MoJ-Health-Check-Reports.id
-      output_s3_key_prefix = "ssm_output/"
+      output_s3_bucket     = local.application_data.accounts[local.environment].ssm_health_check_reports_s3
+      output_s3_key_prefix = "health-check-reports/linux/"
       timeout_seconds      = 600
     }
   }
 }
-
 
 # Create perform_healthcheck_S3 document
 

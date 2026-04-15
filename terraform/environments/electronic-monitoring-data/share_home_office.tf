@@ -8,7 +8,7 @@ locals {
   ho_role_arn  = "arn:aws:iam::${local.ho_acct_id}:role/DACC-DataScience-TL"
   ho_admin_arn = "arn:aws:iam::${local.ho_acct_id}:role/HO-FullAdmin"
   databases_to_share = local.is-test ? [
-    "serco_servicenow_curated${local.dbt_suffix}",
+    "serco_fms${local.dbt_suffix}",
     "allied_mdss${local.db_suffix}"
   ] : []
 }

@@ -48,7 +48,7 @@ resource "aws_iam_policy" "cwa_extract_lambda_policy" {
         Action = [
           "s3:GetObject"
         ],
-        Resource = "${aws_s3_bucket.lambda_layer_dependencies.arn}/*"
+        Resource = "arn:aws:s3:::${local.application_name_short}-${local.environment}-lambda-files/*"
       },
       {
         Effect = "Allow"

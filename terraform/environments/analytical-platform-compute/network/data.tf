@@ -15,3 +15,7 @@ data "aws_route53_resolver_query_log_config" "core_logging_s3" {
     values = ["core-logging-rlq-s3"]
   }
 }
+
+data "aws_secretsmanager_secret_version" "route53_resolver_moj_blocklist" {
+  secret_id = module.route53_resolver_moj_blocklist_secret.secret_id
+}

@@ -9,8 +9,8 @@ variable "application_name" {
 }
 
 variable "params_plain" {
-  type    = list(string)
-  default = []
+  type    = any
+  default = {}
 }
 
 variable "params_secure" {

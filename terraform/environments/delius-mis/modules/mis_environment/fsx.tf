@@ -24,6 +24,10 @@ resource "aws_security_group" "fsx" {
   name        = "${var.app_name}-${var.env_name}-fsx"
   description = "Security group for FSx"
   vpc_id      = var.account_info.vpc_id
+
+  tags = merge(local.tags, {
+    Name = "${var.app_name}-${var.env_name}-fsx"
+  })
 }
 
 #############################################
@@ -57,7 +61,7 @@ resource "aws_vpc_security_group_ingress_rule" "fsx_smb_winrm_ingress" {
 }
 
 #############################################
-### Allow DNS egress traffic 
+### Allow DNS egress traffic
 #############################################
 resource "aws_vpc_security_group_egress_rule" "fsx_dns_egress" {
   for_each = toset(["tcp", "udp"])
@@ -73,7 +77,7 @@ resource "aws_vpc_security_group_egress_rule" "fsx_dns_egress" {
 }
 
 #############################################
-### Allow AD egress traffic 
+### Allow AD egress traffic
 #############################################
 resource "aws_vpc_security_group_egress_rule" "fsx_ad_egress" {
   for_each = {

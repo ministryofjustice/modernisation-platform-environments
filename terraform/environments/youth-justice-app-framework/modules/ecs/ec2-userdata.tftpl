@@ -1,6 +1,17 @@
 #!/bin/bash
-yum install amazon-cloudwatch-agent -y
-cat >>/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<EOF
+set -e
+
+# Retry install until success
+max_attempts=5
+attempt=0
+until dnf install -y amazon-cloudwatch-agent || [ $attempt -ge $max_attempts ]; do
+    attempt=$((attempt + 1))
+    echo "Install failed, attempt $attempt of $max_attempts, retrying..."
+    sleep 5
+done
+
+mkdir -p /opt/aws/amazon-cloudwatch-agent/etc/
+cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<EOF
 {
     "agent": {
         "run_as_user": "root"
@@ -33,17 +44,20 @@ cat >>/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<EOF
     }
 }
 EOF
-systemctl enable amazon-cloudwatch-agent.service
-systemctl start amazon-cloudwatch-agent.service
-echo add config for metadata
+
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+
 echo ECS_ENABLE_CONTAINER_METADATA=true >> /etc/ecs/ecs.config
 
 #todo only for spot
-#echo ECS_ENABLE_SPOT_INSTANCE_DRAINING=true >> /etc/ecs/ecs.config 
+#echo ECS_ENABLE_SPOT_INSTANCE_DRAINING=true >> /etc/ecs/ecs.config
 echo ECS_CLUSTER=${cluster_name} >> /etc/ecs/ecs.config
 
 #set ssh key Algorithms
-echo KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256  >> /etc/ssh/sshd_config 
+echo KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256 >> /etc/ssh/sshd_config
 
 #set Ciphers
-echo  "Ciphers aes256-ctr,aes192-ctr,aes128-ctr" >> /etc/ssh/sshd_config
+echo "Ciphers aes256-ctr,aes192-ctr,aes128-ctr" >> /etc/ssh/sshd_config
+
+# restart sshd to apply the KexAlgorithms and Ciphers changes above
+systemctl restart sshd

@@ -17,7 +17,7 @@ resource "aws_directory_service_directory" "mis_ad" {
     subnet_ids = slice(var.account_config.private_subnet_ids, 0, 2)
   }
 
-  tags = var.tags
+  tags = local.tags
 
   lifecycle {
     ignore_changes = [
@@ -27,11 +27,12 @@ resource "aws_directory_service_directory" "mis_ad" {
 }
 
 resource "aws_secretsmanager_secret" "ad_admin_password" {
+  description             = "Directory service admin password"
   name                    = "${var.app_name}-${var.env_name}-ad-admin-password"
   recovery_window_in_days = 0
 
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${var.app_name}-${var.env_name}-ad-admin-password"
     }
@@ -149,4 +150,120 @@ resource "aws_route53_resolver_rule_association" "vpc_r53_fwd_to_ad" {
 
   resolver_rule_id = aws_route53_resolver_rule.r53_fwd_to_ad.id
   vpc_id           = var.account_config.shared_vpc_id
+}
+
+###
+# AD Join - Provide SG that EC2s can use if they need to join domain
+###
+
+resource "aws_security_group" "mis_ad_join" {
+  #checkov:skip=CKV2_AWS_5 "ignore"
+  name        = "${var.env_name}-mis-ad-join-sg"
+  description = "Security Group allowing Computers to join domain"
+  vpc_id      = var.account_info.vpc_id
+
+  tags = merge(local.tags, {
+    Name = "${var.env_name}-mis-ad-join-sg"
+  })
+}
+
+resource "aws_vpc_security_group_ingress_rule" "mis_ad_join" {
+  for_each = {
+    icmp-from-dc             = { ip_protocol = "ICMP", from_port = 8, to_port = 0 }
+    rpc-from-dc              = { ip_protocol = "TCP", port = 135 }
+    rpc-tcp-dynamic2-from-dc = { ip_protocol = "TCP", from_port = 49152, to_port = 65535 }
+  }
+
+  description       = each.key
+  security_group_id = resource.aws_security_group.mis_ad_join.id
+
+  ip_protocol                  = lookup(each.value, "ip_protocol", "-1")
+  from_port                    = lookup(each.value, "port", lookup(each.value, "from_port", null))
+  to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
+  referenced_security_group_id = aws_directory_service_directory.mis_ad.security_group_id
+
+  tags = local.tags
+}
+
+resource "aws_vpc_security_group_egress_rule" "mis_ad_join" {
+  description       = "Allow all egress to DC"
+  security_group_id = resource.aws_security_group.mis_ad_join.id
+
+  ip_protocol                  = "-1"
+  referenced_security_group_id = aws_directory_service_directory.mis_ad.security_group_id
+
+  tags = local.tags
+}
+
+locals {
+  # SG rules for domain trust. DNS is always needed; other ports I think only required when trust is initially configured
+  active_directory_sg_rules = [
+    # ip_protocol, from_port, to_port
+    ["TCP", 53, 53],
+    ["UDP", 53, 53],
+    ["TCP", 88, 88],
+    ["UDP", 88, 88],
+    ["UDP", 123, 123],
+    ["TCP", 135, 135],
+    ["TCP", 389, 389],
+    ["UDP", 389, 389],
+    ["TCP", 445, 445],
+    ["UDP", 445, 445],
+    ["TCP", 49152, 65535],
+  ]
+  active_directory_sg_rules_from_dcs = flatten([
+    for dc_cidr in var.environment_config.ad_trust_dc_cidrs : [
+      for sg_rule in local.active_directory_sg_rules : {
+        key = "${dc_cidr} ${sg_rule[0]} ${sg_rule[1]} ${sg_rule[2]}"
+        value = {
+          cidr_ipv4   = dc_cidr
+          ip_protocol = sg_rule[0]
+          from_port   = sg_rule[1]
+          to_port     = sg_rule[2]
+        }
+      }
+    ]
+  ])
+}
+
+resource "aws_vpc_security_group_ingress_rule" "mis_ad_sg_inbound" {
+  for_each = { for item in local.active_directory_sg_rules_from_dcs : item.key => item.value }
+
+  security_group_id = aws_directory_service_directory.mis_ad.security_group_id
+  cidr_ipv4         = each.value.cidr_ipv4
+  ip_protocol       = each.value.ip_protocol
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+
+  tags = local.tags
+}
+
+resource "aws_secretsmanager_secret" "ad_hmpp_trust_password" {
+  description             = "Directory service to hmpp AD trust password"
+  name                    = "${var.app_name}-${var.env_name}-ad-hmpp-trust-password"
+  recovery_window_in_days = 0
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${var.app_name}-${var.env_name}-ad-hmpp-trust-password"
+    }
+  )
+}
+
+data "aws_secretsmanager_secret_version" "ad_hmpp_trust_password" {
+  count     = lookup(var.environment_config, "ad_trust_domain_name", null) != null ? 1 : 0
+  secret_id = aws_secretsmanager_secret.ad_hmpp_trust_password.id
+}
+
+resource "aws_directory_service_trust" "ad_hmpp_trust" {
+  count = lookup(var.environment_config, "ad_trust_domain_name", null) != null ? 1 : 0
+
+  directory_id = aws_directory_service_directory.mis_ad.id
+
+  remote_domain_name = var.environment_config.ad_trust_domain_name
+  trust_direction    = "One-Way: Outgoing"
+  trust_password     = data.aws_secretsmanager_secret_version.ad_hmpp_trust_password[0].secret_string
+
+  conditional_forwarder_ip_addrs = var.environment_config.ad_trust_dns_ip_addrs
 }

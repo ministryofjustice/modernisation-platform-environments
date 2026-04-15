@@ -1,7 +1,7 @@
 module "cloud_platform_live_namespace_secret" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=f7fef2d8f63f1595c3e2b0ee14a6810dc7bdb9af" # v2.0.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
 
   name = "cloud-platform/live/${local.component_name}"
 
@@ -15,7 +15,7 @@ module "cloud_platform_live_namespace_secret" {
 module "litellm_license_secret" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=f7fef2d8f63f1595c3e2b0ee14a6810dc7bdb9af" # v2.0.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
 
   name = "litellm/license"
 
@@ -26,7 +26,7 @@ module "litellm_license_secret" {
 module "litellm_entra_id_secret" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=f7fef2d8f63f1595c3e2b0ee14a6810dc7bdb9af" # v2.0.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
 
   name = "litellm/entra-id"
 
@@ -42,7 +42,7 @@ module "litellm_entra_id_secret" {
 module "justiceai_azure_openai_secret" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=f7fef2d8f63f1595c3e2b0ee14a6810dc7bdb9af" # v2.0.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
 
   name = "justice-ai/azure-openai"
 
@@ -53,3 +53,19 @@ module "justiceai_azure_openai_secret" {
   })
   ignore_secret_changes = true
 }
+
+module "azure_openai_secret" {
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
+
+  name = "oai-smss-mojdp-001/azure-openai"
+
+  secret_string = jsonencode({
+    api_base = "CHANGEME"
+    api_key  = "CHANGEME"
+
+  })
+  ignore_secret_changes = true
+}
+

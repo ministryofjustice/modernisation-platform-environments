@@ -114,3 +114,10 @@ import {
   to       = aws_volume_attachment.tariffdb_attachment[each.key]
   id       = "${each.value.device_name}:${each.value.volume_id}:${each.value.instance_id}"
 }
+
+# Required due to successful apply but failed state upload (cause: GH role changes by MP team)
+import {
+  for_each = local.environment == "production" ? { prod = true } : {}
+  to       = module.tariff_db_prod_security_group[0].aws_security_group_rule.ingress_with_cidr_blocks[5]
+  id       = "sg-0a466bdf6f61d3a91_ingress_tcp_8400_8404_10.10.10.0/24_10.10.110.0/24"
+}

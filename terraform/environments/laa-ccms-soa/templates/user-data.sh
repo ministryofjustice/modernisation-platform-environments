@@ -133,6 +133,7 @@ deploy_cortex() {
   aws s3 sync s3://ccms-shared/CortexAgent/ $CORTEX_DIR #--ccms-shared is in the EBS dev account 767123802783. Bucket is shared at the ORG LEVEL.
   tar zxf $CORTEX_DIR/$CORTEX_VERSION.tar.gz -C $CORTEX_DIR/$CORTEX_VERSION
   cp $CORTEX_DIR/$CORTEX_VERSION/cortex.conf /etc/panw/cortex.conf
+  sed -i -e '$a\' /etc/panw/cortex.conf && echo "--endpoint-tags ccms,soa" >> /etc/panw/cortex.conf
 
   #--Installs
   yum install -y selinux-policy-devel

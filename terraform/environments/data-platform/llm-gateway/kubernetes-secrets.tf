@@ -65,3 +65,19 @@ resource "kubernetes_secret" "justiceai_azure_openai" {
 
   type = "Opaque"
 }
+
+resource "kubernetes_secret" "azure_openai" {
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
+  metadata {
+    namespace = jsondecode(data.aws_secretsmanager_secret_version.cloud_platform_live_namespace[0].secret_string)["namespace"]
+    name      = "azure-openai"
+  }
+
+  data = {
+    AZURE_OPENAI_API_BASE = jsondecode(data.aws_secretsmanager_secret_version.azure_openai_secret[0].secret_string)["api_base"]
+    AZURE_OPENAI_API_KEY  = jsondecode(data.aws_secretsmanager_secret_version.azure_openai_secret[0].secret_string)["api_key"]
+  }
+
+  type = "Opaque"
+}

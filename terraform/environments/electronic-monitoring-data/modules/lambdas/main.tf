@@ -139,7 +139,7 @@ resource "aws_iam_role_policy_attachment" "lambda_xray_policy_attachment" {
 
 resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
   name              = "/aws/lambda/${var.function_name}"
-  retention_in_days = 400
+  retention_in_days = var.cloudwatch_retention_days
   kms_key_id        = aws_kms_key.lambda_env_key.arn
 }
 
@@ -181,5 +181,12 @@ resource "aws_lambda_function" "this" {
     target_arn = aws_sqs_queue.lambda_dlq.arn
   }
   reserved_concurrent_executions = var.reserved_concurrent_executions
+
+  lifecycle {
+    ignore_changes = [
+      image_uri,
+      last_modified,
+    ]
+  }
 
 }

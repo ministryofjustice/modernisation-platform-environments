@@ -3,7 +3,7 @@ resource "aws_security_group" "legacy" {
   name        = "${var.env_name}-allow-legacy-traffic"
   description = "Security group to allow connectivity with resources in legacy environments. To be removed once all components have been migrated"
   vpc_id      = var.account_info.vpc_id
-  tags        = var.tags
+  tags        = local.tags
 }
 
 resource "aws_vpc_security_group_ingress_rule" "icmp" {

@@ -1,5 +1,10 @@
 locals {
 
+  lb_maintenance_message_production = {
+    maintenance_title   = "OASys National Reporting Maintenance Window"
+    maintenance_message = "OASys National Reporting is currently unavailable due to planned maintenance. Please try again later."
+  }
+
   baseline_presets_production = {
     options = {
       sns_topics = {
@@ -27,6 +32,21 @@ locals {
         tags = {
           description = "Wildcard certificate for the ${local.environment} environment"
         }
+      }
+    }
+
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.all_ec2,
+          local.cloudwatch_dashboard_widget_groups.cms,
+          local.cloudwatch_dashboard_widget_groups.web,
+          local.cloudwatch_dashboard_widget_groups.bods,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
       }
     }
 
@@ -330,6 +350,46 @@ locals {
                   host_header = {
                     values = [
                       "reporting.oasys.service.justice.gov.uk",
+                      "admin.reporting.oasys.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              legacy-redirect = {
+                priority = 300
+                actions = [{
+                  type = "redirect"
+                  redirect = {
+                    host        = "reporting.oasys.service.justice.gov.uk"
+                    path        = "/BOE/BI"
+                    port        = "443"
+                    protocol    = "HTTPS"
+                    query       = ""
+                    status_code = "HTTP_302"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "onr.oasys.az.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_production)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "reporting.oasys.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -349,12 +409,20 @@ locals {
       maintenance_window_duration = 2 # 4 for prod
       maintenance_window_cutoff   = 1 # 2 for prod
       patch_classifications = {
-        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates"]
+        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"]                                  # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
+        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
       }
     }
 
     route53_zones = {
+      "onr.oasys.az.justice.gov.uk" = {
+        records = [
+          # { name = "", type = "A", ttl = "300", records = ["10.40.6.210"] }
+        ]
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "public" },
+        ]
+      }
       "reporting.oasys.service.justice.gov.uk" = {
         ns_records = [
           # use this if NS records can be pulled from terrafrom, otherwise use records variable
@@ -366,6 +434,7 @@ locals {
         ]
         lb_alias_records = [
           { name = "", type = "A", lbs_map_key = "public" },
+          { name = "admin", type = "A", lbs_map_key = "public" },
           { name = "bods", type = "A", lbs_map_key = "public" }
         ],
       }

@@ -41,15 +41,16 @@ resource "aws_security_group_rule" "maat_provider_load_egress_https_sm" {
 
 resource "aws_lambda_function" "maat_provider_load" {
 
-  description      = "Connects to MAAT DB and invokes the Load procedure to load the provider data."
-  function_name    = "maat_provider_load_function"
-  role             = aws_iam_role.maat_provider_load_role.arn
-  handler          = "lambda_function.lambda_handler"
-  filename         = "lambda/provider_load_lambda/provider_load_package.zip"
-  source_code_hash = filebase64sha256("lambda/provider_load_lambda/provider_load_package.zip")
-  timeout          = 100
-  memory_size      = 128
-  runtime          = "python3.10"
+  description       = "Connects to MAAT DB and invokes the Load procedure to load the provider data."
+  function_name     = "maat_provider_load_function"
+  role              = aws_iam_role.maat_provider_load_role.arn
+  handler           = "lambda_function.lambda_handler"
+  s3_bucket         = data.aws_s3_object.provider_load_zip.bucket
+  s3_key            = data.aws_s3_object.provider_load_zip.key
+  s3_object_version = data.aws_s3_object.provider_load_zip.version_id
+  timeout           = 100
+  memory_size       = 128
+  runtime           = "python3.10"
 
   layers = [
     aws_lambda_layer_version.lambda_layer_oracle_python.arn

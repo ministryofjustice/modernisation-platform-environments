@@ -1,0 +1,9 @@
+# .checkov.yml
+skip-check:
+  # CKV2_AWS_57 — Secrets Manager secret rotation
+  - id: CKV2_AWS_57
+    suppress_comment: "SSH private key rotation not applicable; operationally managed and being phased out in favour of SSM Session Manager."# CKV2_AWS_57 — Secrets Manager secret rotation
+
+  # CKV2_AWS_149 — Ensure that Secrets Manager secret is encrypted using KMS CMK
+  - id: CKV2_AWS_149
+    suppress_comment: "Ensure that Secrets Manager secret is encrypted using KMS CMK"

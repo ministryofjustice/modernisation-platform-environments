@@ -2,7 +2,7 @@ resource "aws_sns_topic" "delius_mis_alarms" {
   name = "${var.app_name}-${var.env_name}-sns-topic"
 
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${var.app_name}-${var.env_name}-sns-topic"
     }

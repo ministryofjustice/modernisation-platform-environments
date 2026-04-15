@@ -18,10 +18,11 @@ resource "aws_db_option_group" "tds_oracle_19" {
 resource "aws_db_instance" "tds_db" {
   identifier                          = "${local.application_name}-tds-db"
   allocated_storage                   = local.application_data.accounts[local.environment].tds_db_storage_gb
+  iops                                = local.application_data.accounts[local.environment].tds_db_iops
   auto_minor_version_upgrade          = true
-  storage_type                        = "gp2"
+  storage_type                        = "gp3"
   engine                              = "oracle-se2"
-  engine_version                      = "19.0.0.0.ru-2025-07.rur-2025-07.r1"
+  engine_version                      = "19.0.0.0.ru-2025-10.rur-2025-10.r1"
   instance_class                      = local.application_data.accounts[local.environment].tds_db_instance_type
   multi_az                            = local.application_data.accounts[local.environment].tds_db_deploy_to_multi_azs
   db_name                             = "EDRMSTDS"

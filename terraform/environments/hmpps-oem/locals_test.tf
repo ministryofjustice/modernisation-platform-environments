@@ -16,6 +16,7 @@ locals {
         "github_workflows",
       ]
 
+      db_backup_object_lock_days           = 3
       enable_ec2_delius_dba_secrets_access = true
 
       sns_topics = {

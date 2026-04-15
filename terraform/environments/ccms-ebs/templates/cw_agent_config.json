@@ -25,7 +25,8 @@
       "disk": {
         "measurement": ["used_percent", "inodes_free", "disk_free"],
         "metrics_collection_interval": 60,
-        "resources": ["*"]
+        "resources": ["*"],
+        "drop_device": true
       },
       "diskio": {
         "measurement": ["io_time"],

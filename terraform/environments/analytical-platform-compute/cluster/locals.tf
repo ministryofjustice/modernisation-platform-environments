@@ -1,5 +1,8 @@
 locals {
 
+  /* Chainguard */
+  chainguard_credentials = jsondecode(data.aws_secretsmanager_secret_version.chainguard_pull_credentials.secret_string)
+
   /* AMP */
   amp_workspace_alias                        = "${local.application_name}-${local.environment}"
   amp_cloudwatch_log_group_name              = "/aws/amp/${local.amp_workspace_alias}"
@@ -10,8 +13,6 @@ locals {
   eks_cloudwatch_log_group_name              = "/aws/eks/${local.eks_cluster_name}/logs"
   eks_cloudwatch_log_group_retention_in_days = 400
 
-  /* Kube Prometheus Stack */
-  prometheus_operator_crd_version = "v0.83.0"
 
   /* Mapping Analytical Platform Environments to Modernisation Platform */
 
