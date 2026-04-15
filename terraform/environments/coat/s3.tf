@@ -486,12 +486,7 @@ module "cur_v2_hourly_enriched" {
 
   bucket = "coat-${local.environment}-cur-v2-hourly-enriched"
 
-  tags = merge(
-    local.tags,
-    {
-      backup = "false"
-    }
-  )
+  tags = { backup = "false" }
 
   force_destroy = true
 
