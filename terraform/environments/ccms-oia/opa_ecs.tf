@@ -94,7 +94,6 @@ resource "aws_ecs_service" "opahub" {
 
 # Register ECS service as a scalable target (DEV only)
 resource "aws_appautoscaling_target" "ccms_opa_desiredcount" {
-  provider = aws.app_autoscaling
   count              = local.environment == "development" ? 1 : 0
   service_namespace  = "ecs"
   scalable_dimension = "ecs:service:DesiredCount"
@@ -105,11 +104,9 @@ resource "aws_appautoscaling_target" "ccms_opa_desiredcount" {
   min_capacity = 0
   max_capacity = 10
 
-  tags = merge(  
-      local.tags_non_empty,
-        { Name = lower(format("%s-%s-autoscaling-target", local.opa_app_name, 
-      local.environment)) } 
-     )
+  lifecycle {    
+    ignore_changes = [tags, tags_all] 
+     }
 }
 
 # Scale DOWN to 0 at 21:00, Mon–Fri
