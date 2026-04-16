@@ -56,7 +56,7 @@ def wait_for_query(query_execution_id):
 
         if state == "SUCCEEDED":
             return response
-        
+
         if state in ("FAILED", "CANCELLED"):
             reason = response["QueryExecution"]["Status"].get(
                 "StateChangeReason", "Unknown"
@@ -128,7 +128,7 @@ def run_table_export(table):
             "OutputLocation": S3_ATHENA_RESULTS_PATH,
         },
     )
-    
+
     query_execution_id = response["QueryExecutionId"]
 
     wait_for_query(query_execution_id)
