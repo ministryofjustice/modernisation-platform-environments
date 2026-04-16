@@ -93,13 +93,6 @@ resource "aws_ecs_service" "opahub" {
 }
 
 provider "aws" {  
-  region = "eu-west-2"  
-  default_tags {    
-    tags = local.tags_non_empty 
-     }
-  }
-
-provider "aws" {  
   alias  = "app_autoscaling"  
   region = "eu-west-2"
   }
@@ -118,6 +111,10 @@ resource "aws_appautoscaling_target" "ccms_opa_desiredcount" {
   max_capacity = 10
 
   tags = {}
+
+  lifecycle {   
+     ignore_changes = [tags, tags_all] 
+      }
 }
 
 # Scale DOWN to 0 at 21:00, Mon–Fri
