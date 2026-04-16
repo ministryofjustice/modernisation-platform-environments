@@ -150,15 +150,13 @@ resource "aws_lambda_function" "this" {
   description   = var.description
   role          = aws_iam_role.lambda.arn
   handler       = "lambda.lambda_handler"
-  runtime       = "python3.11"
+  runtime       = "python3.13"
 
   filename         = data.archive_file.lambda.output_path
   source_code_hash = data.archive_file.lambda.output_base64sha256
 
   timeout     = 900
-  memory_size = 1024
-
-  layers = [var.awswrangler_layer_arn]
+  memory_size = 256
 
   environment {
     variables = {

@@ -116,9 +116,8 @@ module "lambda-staging-export" {
     "${module.datalake.bucket.arn}/*"
   ]
 
-  kms_key_arn           = aws_kms_key.shared_kms_key.arn
-  awswrangler_layer_arn = "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python311:26"
-  tags                  = local.tags
+  kms_key_arn = aws_kms_key.shared_kms_key.arn
+  tags        = local.tags
 }
 
 # ------------------------

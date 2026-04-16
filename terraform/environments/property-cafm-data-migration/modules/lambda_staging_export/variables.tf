@@ -44,11 +44,6 @@ variable "kms_key_arn" {
   type        = string
 }
 
-variable "awswrangler_layer_arn" {
-  description = "ARN of the AWS SDK for pandas (awswrangler) Lambda layer"
-  type        = string
-}
-
 variable "tags" {
   description = "Tags to apply to resources"
   type        = map(string)
