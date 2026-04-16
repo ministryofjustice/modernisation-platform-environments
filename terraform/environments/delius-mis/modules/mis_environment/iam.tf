@@ -68,17 +68,6 @@ data "aws_iam_policy_document" "ec2_automation" {
     resources = ["*"]
   }
   statement {
-    sid    = "CloudwatchAgentKms"
-    effect = "Allow"
-    actions = [
-      "kms:Encrypt",
-      "kms:GenerateDataKey"
-    ]
-    resources = [
-      var.account_config.kms_keys.general_shared
-    ]
-  }
-  statement {
     sid    = "DenyCreateLogGroup"
     effect = "Deny"
     actions = [
