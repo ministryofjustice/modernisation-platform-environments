@@ -45,7 +45,7 @@ def run_table_export(table: str):
         WHERE ptp_lot IN ({lot_list})
     """
 
-    logger.info("Running query for table=%s", table)
+    logger.info(f"Running query for table={table}")
 
     df = wr.athena.read_sql_query(
         sql=sql,
@@ -57,13 +57,9 @@ def run_table_export(table: str):
     # Write output split by lot
     for lot in LOTS:
         df_lot = df[df["ptp_lot"] == lot]
-
-        if df_lot.empty:
-            continue
-
         output_path = f"{S3_OUTPUT_PATH}/{lot}/{table}.csv"
         wr.s3.to_csv(df=df_lot, path=output_path, index=False)
-        logger.info("Exported %d rows for %s/%s", len(df_lot), lot, table)
+        logger.info(f"Exported {len(df_lot)} rows for {lot}/{table} to {output_path}")
 
     return table
 
@@ -83,7 +79,7 @@ def lambda_handler(event, context):
                 results["succeeded"].append(table)
 
             except Exception:
-                logger.exception("Failed table=%s", table)
+                logger.exception(f"Failed table={table}")
                 results["failed"].append(table)
 
     if results["failed"]:
