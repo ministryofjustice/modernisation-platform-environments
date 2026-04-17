@@ -57,3 +57,38 @@ resource "aws_athena_named_query" "http_requests_ssogen" {
     }
   )
 }
+
+
+# SQL query to creates the table in the athena db, these queries needs to be executed manually after creation
+resource "aws_athena_named_query" "main_table_ssogen_console" {
+  count     = local.is-development || local.is-test ? 1 : 0
+  name      = lower(format("%s-console-%s-create-table", local.application_name_ssogen, local.environment))
+  workgroup = aws_athena_workgroup.ssogen_lb-access-logs[count.index].id
+  database  = aws_athena_database.ssogen_lb-access-logs[count.index].name
+  query = templatefile(
+    "./templates/create_internal_ssogen_console_table.sql",
+    {
+      bucket     = module.s3-bucket-logging.bucket.id
+      key        = local.lb_log_prefix_ssogen_internal_console
+      account_id = data.aws_caller_identity.current.id
+      region     = data.aws_region.current.id
+    }
+  )
+}
+
+# SQL query to count the number of HTTP GET requests to the loadbalancer grouped by IP, these queries needs to be executed manually after creation
+resource "aws_athena_named_query" "http_requests_ssogen_console" {
+  count     = local.is-development || local.is-test ? 1 : 0
+  name      = lower(format("%s-console-%s-http-get-requests", local.application_name_ssogen, local.environment))
+  workgroup = aws_athena_workgroup.ssogen_lb-access-logs[count.index].id
+  database  = aws_athena_database.ssogen_lb-access-logs[count.index].name
+  query = templatefile(
+    "./templates/lb_internal_ssogen_console_http_gets.sql",
+    {
+      bucket     = module.s3-bucket-logging.bucket.id
+      key        = local.lb_log_prefix_ssogen_internal_console
+      account_id = data.aws_caller_identity.current.id
+      region     = data.aws_region.current.id
+    }
+  )
+}
