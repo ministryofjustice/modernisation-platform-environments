@@ -58,6 +58,28 @@ resource "aws_cloudwatch_metric_alarm" "alb_ssogen_5xx" {
   tags = local.tags
 }
 
+# Alarm for ALB 5xx Errors
+resource "aws_cloudwatch_metric_alarm" "alb_ssogen_console_5xx" {
+  count               = local.is-development || local.is-test ? 1 : 0
+  alarm_name          = "${local.application_name_ssogen}-console-${local.environment}-5xx-errors"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 3
+  metric_name         = "HTTPCode_ELB_5XX_Count"
+  namespace           = "AWS/ApplicationELB"
+  period              = 60
+  statistic           = "Sum"
+  threshold           = 10
+  alarm_description   = "Alarm when the number of 5xx errors from the ssogen console ALB exceeds 10 in a 3 minute period"
+  dimensions = {
+    LoadBalancer = aws_lb.ssogen_alb_console[count.index].name
+  }
+  treat_missing_data = "notBreaching"
+  alarm_actions      = [aws_sns_topic.cw_alerts.arn]
+  ok_actions         = [aws_sns_topic.cw_alerts.arn]
+
+  tags = local.tags
+}
+
 # Underlying EC2 Instance Status Check Failure for Primary ASG
 resource "aws_cloudwatch_metric_alarm" "Primary_Status_Check_Failure" {
   count               = local.is-development || local.is-test ? 1 : 0
@@ -128,6 +150,32 @@ resource "aws_cloudwatch_metric_alarm" "ssogen_waf_high_blocked_requests" {
   tags = local.tags
 }
 
+# Underlying waf Instance Status Check Failure
+resource "aws_cloudwatch_metric_alarm" "ssogen_console_waf_high_blocked_requests" {
+  count             = local.is-development || local.is-test ? 1 : 0
+  alarm_name        = "${local.application_name_ssogen}-console-${local.environment}-waf-high-blocked-requests"
+  alarm_description = "High number of requests blocked by WAF on console lb. Potential attack."
+
+  comparison_operator = "GreaterThanThreshold"
+  metric_name         = "BlockedRequests"
+  namespace           = "AWS/WAFV2"
+  statistic           = "Sum"
+  period              = 60
+  evaluation_periods  = 5
+  threshold           = 50 # tune for your workload
+  treat_missing_data  = "notBreaching"
+
+  dimensions = {
+    WebACL = aws_wafv2_web_acl.ssogen_console_web_acl[count.index].name
+    Scope  = "REGIONAL"
+  }
+
+  alarm_actions = [aws_sns_topic.cw_alerts.arn]
+  ok_actions    = [aws_sns_topic.cw_alerts.arn]
+
+  tags = local.tags
+}
+
 resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_app" {
   count               = local.is-development || local.is-test ? 1 : 0
   alarm_name          = "${local.application_name_ssogen}-${local.environment}-app-alb-targets-group"
@@ -166,7 +214,7 @@ resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_admin" {
   # ok_actions    = [aws_sns_topic.cw_alerts.arn, aws_sns_topic.ssogen_admin_dns_flip_topic[count.index].arn]
   dimensions = {
     TargetGroup  = aws_lb_target_group.ssogen_internal_tg_ssogen_console[count.index].arn_suffix
-    LoadBalancer = aws_lb.ssogen_alb[count.index].arn_suffix
+    LoadBalancer = aws_lb.ssogen_alb_console[count.index].arn_suffix
   }
 }
 
