@@ -33,7 +33,7 @@ resource "aws_vpc_endpoint" "ssm_endpoints" {
   service_name        = "com.amazonaws.eu-west-2.${each.key}"
   vpc_endpoint_type   = "Interface"
   subnet_ids          = var.ecs_subnet_ids
-  security_group_ids  = aws_security_group.common_ecs_service_internal.id
+  security_group_ids  = [aws_security_group.common_ecs_service_internal.id]
   private_dns_enabled = true
 
   tags = {
