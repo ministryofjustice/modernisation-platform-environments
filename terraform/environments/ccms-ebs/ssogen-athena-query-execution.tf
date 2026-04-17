@@ -27,7 +27,7 @@ EOF
   depends_on = [
     aws_athena_named_query.main_table_ssogen[0],
     aws_athena_named_query.http_requests_ssogen[0],
-    aws_athena_workgroup.ssogen_lb-access-logs[count.index],
-    aws_athena_database.ssogen_lb-access-logs[count.index]
+    aws_athena_workgroup.ssogen_lb-access-logs[0],
+    aws_athena_database.ssogen_lb-access-logs[0]
   ]
 }
