@@ -26,21 +26,6 @@ resource "aws_security_group" "common_ecs_service_external" {
   )
 }
 
-resource "aws_vpc_endpoint" "ssm_endpoints" {
-  for_each = toset(["ssm", "ssmmessages", "ec2messages"])
-
-  vpc_id              = var.vpc_id
-  service_name        = "com.amazonaws.eu-west-2.${each.key}"
-  vpc_endpoint_type   = "Interface"
-  subnet_ids          = var.ecs_subnet_ids
-  security_group_ids  = [aws_security_group.common_ecs_service_internal.id]
-  private_dns_enabled = true
-
-  tags = {
-    Name = "yjaf-${each.key}-endpoint"
-  }
-}
-
 resource "aws_security_group_rule" "external_service_rules" {
   for_each                 = { for idx, rule in local.combined_ingress_rules_external : idx => rule }
   type                     = "ingress"
