@@ -108,7 +108,7 @@ resource "aws_wafv2_web_acl_logging_configuration" "ssogen_console_waf_logging" 
 }
 
 # Associate WAF with Internal ALB for SSOGEN WAF
-resource "aws_wafv2_web_acl_association" "ssogen_internal_waf_association" {
+resource "aws_wafv2_web_acl_association" "ssogen_console_internal_waf_association" {
   count        = local.is-development || local.is-test ? 1 : 0
   resource_arn = aws_lb.ssogen_console_alb[count.index].arn
   web_acl_arn  = aws_wafv2_web_acl.ssogen_console_web_acl[count.index].arn
