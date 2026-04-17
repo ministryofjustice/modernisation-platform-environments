@@ -5,6 +5,7 @@ locals {
     "cwagent-windows-system",
     "cwagent-windows-application",
     "cwagent-windows-security",
+    "cwagent-oracle-listener-log",
   ]
 }
 
