@@ -28,8 +28,8 @@ resource "aws_route53_record" "ssogen_internal_alb_admin" {
   type    = "A"
 
   alias {
-    name                   = aws_lb.ssogen_alb[count.index].dns_name
-    zone_id                = aws_lb.ssogen_alb[count.index].zone_id
+    name                   = aws_lb.ssogen_console_alb[count.index].dns_name
+    zone_id                = aws_lb.ssogen_console_alb[count.index].zone_id
     evaluate_target_health = true
   }
 }
