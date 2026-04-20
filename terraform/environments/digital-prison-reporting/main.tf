@@ -923,7 +923,11 @@ module "datamart" {
   ]
   vpc           = data.aws_vpc.shared.id
   cidr          = [data.aws_vpc.shared.cidr_block, local.cloud_platform_cidr]
-  iam_role_arns = [aws_iam_role.redshift-role.arn, aws_iam_role.redshift-spectrum-role.arn]
+  iam_role_arns = [
+    aws_iam_role.redshift-role.arn,
+    aws_iam_role.redshift-spectrum-role.arn,
+    aws_iam_role.redshift-federated-query-role.arn
+  ]
 
   # Endpoint access - only available when using the ra3.x type, for S3 Simple Service
   create_endpoint_access = false

@@ -446,6 +446,56 @@ resource "aws_iam_role_policy" "dmsvpcpolicy" {
 EOF
 }
 
+### Iam User Role for AWS Redshift Federated Queries
+resource "aws_iam_role" "redshift-federated-query-role" {
+  name = "${local.project}-redshift-federated-query-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "sts:AssumeRole"
+        ]
+        Principal = {
+          "Service" = "redshift.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = merge(
+    local.tags,
+    {
+      dpr-name          = "redshift-federated-query-role"
+      dpr-resource-type = "IAM Role"
+      dpr-jira          = "PDHD-129"
+    }
+  )
+}
+
+data "aws_iam_policy_document" "redshift_federated_query" {
+  statement {
+    actions = [
+      "secretsmanager:GetSecretValue"
+    ]
+    resources = [for s in data.aws_secretsmanager_secret.probation : s.arn]
+  }
+}
+
+resource "aws_iam_policy" "redshift_federated_query_policy" {
+  name        = "${local.project}-redshift-federated-query-policy"
+  description = "Extra Policy for AWS Redshift federated queries"
+  policy      = data.aws_iam_policy_document.redshift_federated_query.json
+}
+
+resource "aws_iam_role_policy_attachment" "redshift_federated_query" {
+  role       = aws_iam_role.redshift-federated-query-role.name
+  policy_arn = "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.redshift_federated_query_policy.name}"
+}
+
+
 ### Iam User Role for AWS Redshift Spectrum,
 resource "aws_iam_role" "redshift-spectrum-role" {
   name = "${local.project}-redshift-spectrum-role"
