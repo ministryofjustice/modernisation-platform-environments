@@ -8,6 +8,7 @@ locals {
   suffix     = local.is-production ? "" : local.is-preproduction ? "-pp" : local.is-test ? "-test" : "-dev"
   db_suffix  = local.is-production ? "" : "_${local.environment_shorthand}"
   dbt_dbs = [
+    "analysis",
     "curated_fms",
     "datamart",
     "derived",
