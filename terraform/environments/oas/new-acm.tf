@@ -3,7 +3,7 @@
 ##############################################
 locals {
   # Extract domain validation options into a structured map
-  domain_types = local.environment == "preproduction" ? {
+  domain_types = contains(["preproduction", "development"], local.environment) ? {
     for dvo in aws_acm_certificate.external[0].domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
@@ -11,13 +11,13 @@ locals {
     }
   } : {}
 
-  # Split domains: parent (modernisation-platform) vs environment-specific (laa-test/laa-preproduction)
-  parent_domain_validation = local.environment == "preproduction" ? {
+  # Split domains: parent (modernisation-platform) vs environment-specific (laa-development/laa-preproduction)
+  parent_domain_validation = contains(["preproduction", "development"], local.environment) ? {
     for k, v in local.domain_types : k => v
     if k == "modernisation-platform.service.justice.gov.uk"
   } : {}
 
-  env_domain_validation = local.environment == "preproduction" ? {
+  env_domain_validation = contains(["preproduction", "development"], local.environment) ? {
     for k, v in local.domain_types : k => v
     if k != "modernisation-platform.service.justice.gov.uk"
   } : {}
@@ -33,10 +33,10 @@ data "aws_route53_zone" "modernisation_platform" {
 ##############################################
 ### ACM CERTIFICATE FOR LOAD BALANCER ###
 ##############################################
-# ACM Public Certificate for test, preproduction and production environments
+# ACM Public Certificate for development, preproduction and production environments
 # Using parent domain as primary (48 chars) with environment-specific SANs
 resource "aws_acm_certificate" "external" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   domain_name = "modernisation-platform.service.justice.gov.uk"
 
@@ -85,7 +85,7 @@ resource "aws_route53_record" "external_validation_env" {
 
 # ACM Certificate Validation
 resource "aws_acm_certificate_validation" "external" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   certificate_arn = aws_acm_certificate.external[0].arn
   validation_record_fqdns = concat(

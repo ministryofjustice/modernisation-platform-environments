@@ -4,7 +4,7 @@ locals {
 
   baseline_presets_test = {
     options = {
-      db_backup_object_lock_days = null
+      db_backup_object_lock_days = 3
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "oasys-test"

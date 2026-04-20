@@ -73,6 +73,13 @@ resource "aws_cloudwatch_log_group" "Windows-Defender-Logs-Preproduction" {
   retention_in_days = 365
 }
 
+resource "aws_cloudwatch_log_group" "Windows-Services-Logs-Preproduction" {
+  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
+  count             = local.is-preproduction == true ? 1 : 0
+  name              = "Windows-Services-Logs"
+  retention_in_days = 365
+}
+
 ################################
 # Windows Log Groups Development
 ################################
@@ -84,6 +91,13 @@ resource "aws_cloudwatch_log_group" "Windows-Defender-Logs-Development" {
   retention_in_days = 365
 }
 
+resource "aws_cloudwatch_log_group" "Windows-Services-Logs-Development" {
+  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
+  count             = local.is-development == true ? 1 : 0
+  name              = "Windows-Services-Logs"
+  retention_in_days = 365
+}
+
 ###################################
 # Windows Metric Filters Production
 ###################################
@@ -91,10 +105,11 @@ resource "aws_cloudwatch_log_group" "Windows-Defender-Logs-Development" {
 # Windows Services Metric Filters
 
 resource "aws_cloudwatch_log_metric_filter" "ServiceStatus-Running" {
-  count          = local.is-production == true ? 1 : 0
+  # count          = local.is-production == true ? 1 : 0
   name           = "ServiceStatus-Running"
-  log_group_name = aws_cloudwatch_log_group.Windows-Services-Logs[count.index].name
-  pattern        = "[date, time, Instance, Service, status=Running]"
+  log_group_name = local.is-preproduction ? aws_cloudwatch_log_group.Windows-Services-Logs-Preproduction[0].name : local.is-development ? aws_cloudwatch_log_group.Windows-Services-Logs-Development[0].name : aws_cloudwatch_log_group.Windows-Services-Logs[0].name
+  # log_group_name = aws_cloudwatch_log_group.Windows-Services-Logs[count.index].name
+  pattern = "[date, time, Instance, Service, status=Running]"
   metric_transformation {
     name      = "IsRunning"
     namespace = "ServiceStatus"
@@ -107,10 +122,11 @@ resource "aws_cloudwatch_log_metric_filter" "ServiceStatus-Running" {
 }
 
 resource "aws_cloudwatch_log_metric_filter" "ServiceStatus-NotRunning" {
-  count          = local.is-production == true ? 1 : 0
+  # count          = local.is-production == true ? 1 : 0
   name           = "ServiceStatus-NotRunning"
-  log_group_name = aws_cloudwatch_log_group.Windows-Services-Logs[count.index].name
-  pattern        = "[date, time, Instance, Service, status!=Running]"
+  log_group_name = local.is-preproduction ? aws_cloudwatch_log_group.Windows-Services-Logs-Preproduction[0].name : local.is-development ? aws_cloudwatch_log_group.Windows-Services-Logs-Development[0].name : aws_cloudwatch_log_group.Windows-Services-Logs[0].name
+  # log_group_name = aws_cloudwatch_log_group.Windows-Services-Logs[count.index].name
+  pattern = "[date, time, Instance, Service, status!=Running]"
   metric_transformation {
     name      = "IsRunning"
     namespace = "ServiceStatus"

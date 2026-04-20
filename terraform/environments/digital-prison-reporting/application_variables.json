@@ -94,7 +94,8 @@
         "dps-manage-pom",
         "dps-san",
         "dps-cvl",
-        "dps-adjudications"
+        "dps-adjudications",
+        "dps-acc-pro-custody"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -332,7 +333,8 @@
         "dps-manage-pom",
         "dps-san",
         "dps-cvl",
-        "dps-adjudications"
+        "dps-adjudications",
+        "dps-acc-pro-custody"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -549,7 +551,8 @@
         "dps-manage-pom",
         "dps-san",
         "dps-cvl",
-        "dps-adjudications"
+        "dps-adjudications",
+        "dps-acc-pro-custody"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -783,7 +786,8 @@
         "dps-manage-pom",
         "dps-san",
         "dps-cvl",
-        "dps-adjudications"
+        "dps-adjudications",
+        "dps-acc-pro-custody"
       ],
       "alarms": {
         "setup_cw_alarms": true,

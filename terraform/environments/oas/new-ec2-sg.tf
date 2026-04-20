@@ -2,7 +2,7 @@
 ### EC2 SG
 ######################################
 resource "aws_security_group" "ec2_sg" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   name        = "${local.application_name}-${local.environment}-ec2-security-group"
   description = "EC2 Security Group"
@@ -20,7 +20,7 @@ resource "aws_security_group" "ec2_sg" {
 ### EC2 INGRESS RULES
 ######################################
 resource "aws_security_group_rule" "ingress_oas_db_1521" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   type                     = "ingress"
   security_group_id        = aws_security_group.ec2_sg[0].id
@@ -32,7 +32,7 @@ resource "aws_security_group_rule" "ingress_oas_db_1521" {
 }
 
 resource "aws_security_group_rule" "ingress_ssh_from_bastion" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   type                     = "ingress"
   security_group_id        = aws_security_group.ec2_sg[0].id
@@ -44,7 +44,7 @@ resource "aws_security_group_rule" "ingress_ssh_from_bastion" {
 }
 
 resource "aws_security_group_rule" "ingress_from_lb_9500" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   type                     = "ingress"
   security_group_id        = aws_security_group.ec2_sg[0].id
@@ -56,7 +56,7 @@ resource "aws_security_group_rule" "ingress_from_lb_9500" {
 }
 
 resource "aws_security_group_rule" "ingress_from_lb_9502" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   type                     = "ingress"
   security_group_id        = aws_security_group.ec2_sg[0].id
@@ -68,8 +68,8 @@ resource "aws_security_group_rule" "ingress_from_lb_9502" {
 }
 
 # resource "aws_security_group_rule" "ingress_rds_from_mp_vpc_for_edw" {
-#   count = local.environment == "preproduction" ? 1 : 0
-
+#   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+#
 #   type              = "ingress"
 #   security_group_id = aws_security_group.ec2_sg[0].id
 #   description       = "allow EDW RDS to connect to OAS"
@@ -80,7 +80,7 @@ resource "aws_security_group_rule" "ingress_from_lb_9502" {
 # }
 
 resource "aws_security_group_rule" "ingress_managed_9514_workspace" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -95,7 +95,7 @@ resource "aws_security_group_rule" "ingress_managed_9514_workspace" {
 ### EC2 EGRESS RULES
 ######################################
 resource "aws_security_group_rule" "egress_oas_db_1521" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   type                     = "egress"
   security_group_id        = aws_security_group.ec2_sg[0].id
@@ -107,7 +107,7 @@ resource "aws_security_group_rule" "egress_oas_db_1521" {
 }
 
 resource "aws_security_group_rule" "egress_https_s3" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -119,7 +119,7 @@ resource "aws_security_group_rule" "egress_https_s3" {
 }
 
 resource "aws_security_group_rule" "egress_http_internet" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -131,7 +131,7 @@ resource "aws_security_group_rule" "egress_http_internet" {
 }
 
 resource "aws_security_group_rule" "egress_https_internet" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
@@ -143,8 +143,8 @@ resource "aws_security_group_rule" "egress_https_internet" {
 }
 
 # resource "aws_security_group_rule" "egress_rds_to_mp_vpc_for_edw" {
-#   count = local.environment == "preproduction" ? 1 : 0
-
+#   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+#
 #   type              = "egress"
 #   security_group_id = aws_security_group.ec2_sg[0].id
 #   description       = "allow OAS to connect to RDS of EDW"
@@ -155,7 +155,7 @@ resource "aws_security_group_rule" "egress_https_internet" {
 # }
 
 resource "aws_security_group_rule" "egress_managed_9514_workspace" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id

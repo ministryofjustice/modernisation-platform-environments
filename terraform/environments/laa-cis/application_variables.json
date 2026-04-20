@@ -1,16 +1,32 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "example_var": "dev-data",
+      "ses_environment_name": "cis-dev",
+      "ses_dkim_tokens": [
+        "cn3hj46ubipkybq7lags7szz2sb6jdk5",
+        "m7unpkilg3jsqxhpp5x7hq6qp7rr33pt",
+        "cpmyvcm6ap2rzfd7lbzwohmwx2ychtx2"
+      ],
+      "ses_mail_from_subdomain": "mail"
     },
     "test": {
-      "example_var": "test-data"
+      "example_var": "test-data",
+      "ses_environment_name": "cis-test",
+      "ses_dkim_tokens": [],
+      "ses_mail_from_subdomain": "mail"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "example_var": "preproduction-data",
+      "ses_environment_name": "cis-pp",
+      "ses_dkim_tokens": [],
+      "ses_mail_from_subdomain": "mail"
     },
     "production": {
-      "example_var": "production-data"
+      "example_var": "production-data",
+      "ses_environment_name": "cis",
+      "ses_dkim_tokens": [],
+      "ses_mail_from_subdomain": "mail"
     }
   }
 }

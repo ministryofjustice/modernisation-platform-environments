@@ -63,6 +63,9 @@ locals {
             "Ec2GFSLSecretPolicy"
           ])
         })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 120 }
+        }
         instance = merge(local.ec2_instances.jumpserver.instance, {
           instance_type = "r6i.large"
           tags = {

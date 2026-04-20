@@ -315,10 +315,14 @@ data "aws_instance" "instance_details" {
 
 # Create a map of instances with their tags for alarm creation
 locals {
-  # Filter instances that have monitoring tags and are in production
+  # Filter instances that have monitoring tags across all environments
   instances_with_alarms = {
     for id, instance in data.aws_instance.instance_details :
-    id => instance if lookup(instance.tags, "is-production", "false") == "true"
+    id => instance if(
+      (local.is-production && lookup(instance.tags, "patch_group", "") == "prod_win_patch") ||
+      (local.is-preproduction && lookup(instance.tags, "patch_group", "") == "uat_win_patch") ||
+      (local.is-development && lookup(instance.tags, "patch_group", "") == "dev_win_patch")
+    )
   }
 
   # Define alarm configurations
@@ -395,6 +399,14 @@ locals {
       description  = "SQL Server backup status"
       period       = "60"
     }
+    adcs_service = {
+      alarm_name   = "Service-Status-Active-Directory-Certificate-Services"
+      metric_name  = "IsRunning"
+      namespace    = "ServiceStatus"
+      service_name = "ActiveDirectoryCertificateServices"
+      description  = "Active Directory Certificate Services service"
+      period       = "60"
+    }
     port25_check = {
       alarm_name   = "Port-25-Status-Check"
       metric_name  = "PortStatus"
@@ -428,7 +440,7 @@ locals {
 
 # Create CloudWatch alarms dynamically
 resource "aws_cloudwatch_metric_alarm" "service_alarms" {
-  for_each = local.is-production ? {
+  for_each = (local.is-production || local.is-preproduction || local.is-development) ? {
     for alarm in local.alarm_instances :
     "${alarm.tag_key}_${alarm.instance_id}" => alarm
   } : {}
@@ -443,7 +455,11 @@ resource "aws_cloudwatch_metric_alarm" "service_alarms" {
   threshold           = "1"
   treat_missing_data  = "notBreaching"
   alarm_description   = "This metric monitors the ${each.value.config.description}. If the metric falls to 0 [not running] then the alarm will trigger."
-  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  alarm_actions = [
+    local.is-preproduction ? aws_sns_topic.cw_uat_alerts[0].arn :
+    local.is-development ? aws_sns_topic.cw_dev_alerts[0].arn :
+    aws_sns_topic.cw_alerts[0].arn
+  ]
 
   dimensions = merge(
     {

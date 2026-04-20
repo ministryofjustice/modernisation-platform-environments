@@ -16,7 +16,7 @@ locals {
         "ssm_command",
       ]
 
-      db_backup_object_lock_days           = null
+      db_backup_object_lock_days           = 14
       enable_ec2_delius_dba_secrets_access = true
 
       sns_topics = {

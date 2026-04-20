@@ -1,19 +1,19 @@
 ---
-name: justice-digital-document-hub
+name: data-factory-corporate
 on:
   push:
     branches:
       - main
     paths:
-      - 'terraform/environments/justice-digital-document-hub/**'
-      - '.github/workflows/justice-digital-document-hub.yml'
+      - 'terraform/environments/data-factory-corporate/**'
+      - '.github/workflows/data-factory-corporate.yml'
 
   pull_request:
     branches:
       - main
     paths:
-      - 'terraform/environments/justice-digital-document-hub/**'
-      - '.github/workflows/justice-digital-document-hub.yml'
+      - 'terraform/environments/data-factory-corporate/**'
+      - '.github/workflows/data-factory-corporate.yml'
 
   workflow_dispatch:
     inputs:

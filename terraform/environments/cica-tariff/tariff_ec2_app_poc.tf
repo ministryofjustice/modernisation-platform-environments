@@ -2,7 +2,8 @@
 resource "aws_instance" "tariff_app_dev_poc_clone" {
   count = local.environment == "development" ? 1 : 0
   # ami   = "ami-079bedd5037ad8609"
-  ami = "ami-044bcc0b671b75b6e" # CDI-319: restore from backup
+  # ami = "ami-044bcc0b671b75b6e" # CDI-319: restore from backup
+  ami = "ami-0b1782be4891b79a6" # CDI-323: restore from backup
   #Ignore changes to most recent ami from data filter, as this would destroy existing instance.
   lifecycle {
     ignore_changes = [user_data] # ami removed to allow restore

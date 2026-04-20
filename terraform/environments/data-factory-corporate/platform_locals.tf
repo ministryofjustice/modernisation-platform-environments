@@ -1,6 +1,6 @@
 locals {
 
-  application_name = "justice-digital-document-hub"
+  application_name = "data-factory-corporate"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 

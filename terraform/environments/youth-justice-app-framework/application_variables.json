@@ -87,7 +87,7 @@
       "tableau_blue_live": true,
       "tableau_test_active": true,
       "database_instance_class": "db.r5.xlarge",
-      "rds_engine_version": "17.7",
+      "rds_engine_version": "17.9",
       "enable_datadog_agent_apm": false,
       "create_rds_sheduler": true,
       "create_svc_pilot": true,

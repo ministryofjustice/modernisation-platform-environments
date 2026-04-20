@@ -1,15 +1,15 @@
 #!/bin/bash
-set -x  # Enable debug mode
+set -x
 exec > >(tee /var/log/userdata.log)
 exec 2>&1
 
 # Create marker file to prove userdata started
 echo "Userdata started at $(date)" > /tmp/userdata_started
 
-# Set hostname (quick operation)
+# Set hostname
 hostnamectl set-hostname oas
 
-# Update DNS resolv.conf (quick operation)
+# Update DNS resolv.conf
 sed -i '2s/.*/search $${dns_zone_name} eu-west-2.compute.internal/' /etc/resolv.conf
 
 # Function to wait for EBS volumes to be attached
@@ -17,22 +17,22 @@ wait_for_volumes() {
     echo "Waiting for EBS volumes to be attached..."
     local max_attempts=30
     local attempt=0
-    
+
     while [ $attempt -lt $max_attempts ]; do
         # Check if we have at least 3 NVMe devices (root + 2 EBS volumes)
         local nvme_count=$(ls /dev/nvme*n1 2>/dev/null | wc -l)
         echo "Attempt $attempt: Found $nvme_count NVMe devices"
-        
+
         if [ $nvme_count -ge 3 ]; then
             echo "All volumes detected!"
             ls -la /dev/nvme*n1
             return 0
         fi
-        
+
         sleep 5
         attempt=$((attempt + 1))
     done
-    
+
     echo "ERROR: Timeout waiting for EBS volumes"
     ls -la /dev/nvme* 2>/dev/null || echo "No NVMe devices found"
     return 1
@@ -60,12 +60,12 @@ STAGE=""
 
 for dev in /dev/nvme*n1; do
     if [ "$dev" == "/dev/nvme0n1" ]; then
-        continue  # Skip root volume
+        continue
     fi
-    
+
     size=$(lsblk -b -n -d -o SIZE "$dev")
     echo "Device $dev has size $size bytes"
-    
+
     # Check if size is approximately 200GB (between 190GB and 210GB)
     if [ "$size" -gt 204010946560 ] && [ "$size" -lt 225485783040 ]; then
         ORACLE_SOFTWARE="$dev"
@@ -123,9 +123,9 @@ mkswap /root/myswapfile
 swapon /root/myswapfile
 echo "/root/myswapfile swap swap defaults 0 0" >> /etc/fstab
 
-# Function to configure NTP based on RHEL version
+# Function to configure NTP based on RHEL/Oracle Linux major version
 ntp_config(){
-    local RHEL=$(cat /etc/redhat-release | cut -d. -f1 | awk '{print $NF}')
+    local RHEL=$(rpm -E %{rhel} 2>/dev/null || cat /etc/redhat-release | grep -oE '[0-9]+' | head -1)
     local SOURCE=169.254.169.123
 
     NtpD(){
@@ -136,6 +136,7 @@ ntp_config(){
             && /etc/init.d/ntpd restart || /etc/init.d/ntpd start
         ntpq -p
     }
+
     ChronyD(){
         local CONF=/etc/chrony.conf
         sed -i 's/server \S/#server \S/g' ${CONF} && \
@@ -144,12 +145,16 @@ ntp_config(){
             && systemctl restart chronyd || systemctl start chronyd
         chronyc sources
     }
+
     case ${RHEL} in
         5)
             NtpD
             ;;
-        7)
+        7|8)
             ChronyD
+            ;;
+        *)
+            echo "Unsupported RHEL/Oracle Linux version: ${RHEL}. Skipping NTP configuration."
             ;;
     esac
 }
@@ -157,7 +162,7 @@ ntp_config(){
 # Configure NTP
 ntp_config
 
-# Install required packages (moved to end to not block critical mount operations)
+# Install required packages
 echo "Installing required packages..."
 cd /tmp
 
