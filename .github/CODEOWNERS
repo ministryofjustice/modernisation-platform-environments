@@ -82,6 +82,7 @@
 /terraform/environments/oasys-national-reporting @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/oasys @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/observability-platform @ministryofjustice/observability-platform @ministryofjustice/modernisation-platform
+/terraform/environments/octo @ministryofjustice/octo @ministryofjustice/modernisation-platform
 /terraform/environments/panda-cyber-appsec-lab @ministryofjustice/octo-cyber-team @ministryofjustice/modernisation-platform
 /terraform/environments/performance-hub @ministryofjustice/azure-aws-sso-performancehub @ministryofjustice/performance-hub-developers @ministryofjustice/modernisation-platform
 /terraform/environments/planetfm @ministryofjustice/azure-aws-sso-csr-application-support @ministryofjustice/azure-aws-sso-digital-studio-operations @ministryofjustice/csr-application-support @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
