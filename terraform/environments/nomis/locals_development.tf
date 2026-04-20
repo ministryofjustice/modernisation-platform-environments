@@ -167,6 +167,7 @@ locals {
         config = merge(local.ec2_autoscaling_groups.web12.config, {
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
             "Ec2Qa11GWeblogicPolicy",
+            "Ec2Qa11G2WeblogicPolicy",
             "Ec2Qa19CWeblogicPolicy",
           ])
         })
@@ -176,8 +177,8 @@ locals {
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web12.tags, {
-          nomis-environment    = "qa19c"
-          oracle-db-name       = "qa19c"
+          nomis-environment    = "qa11g2"
+          oracle-db-name       = "qa11g2"
           oracle-db-hostname-a = "dev-nomis-db19c-1-a"
           oracle-db-hostname-b = "none"
         })
@@ -382,6 +383,7 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/dev/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g2/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11r/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa19c/*",
             ]
@@ -416,6 +418,22 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa11g/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g/weblogic-*",
+            ]
+          }
+        ])
+      }
+      Ec2Qa11G2WeblogicPolicy = {
+        description = "Permissions required for QA11G2 Weblogic EC2s"
+        statements = concat(local.iam_policy_statements_ec2.web, [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa11g2/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g2/weblogic-*",
             ]
           }
         ])
@@ -608,14 +626,16 @@ locals {
     }
 
     secretsmanager_secrets = {
-      "/oracle/weblogic/dev"   = local.secretsmanager_secrets.web
-      "/oracle/database/dev"   = local.secretsmanager_secrets.db_cnom
-      "/oracle/weblogic/qa11g" = local.secretsmanager_secrets.web
-      "/oracle/database/qa11g" = local.secretsmanager_secrets.db_cnom
-      "/oracle/weblogic/qa11r" = local.secretsmanager_secrets.web
-      "/oracle/database/qa11r" = local.secretsmanager_secrets.db_cnom
-      "/oracle/weblogic/qa19c" = local.secretsmanager_secrets.web
-      "/oracle/database/qa19c" = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/dev"    = local.secretsmanager_secrets.web
+      "/oracle/database/dev"    = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/qa11g"  = local.secretsmanager_secrets.web
+      "/oracle/database/qa11g"  = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/qa11g2" = local.secretsmanager_secrets.web
+      "/oracle/database/qa11g2" = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/qa11r"  = local.secretsmanager_secrets.web
+      "/oracle/database/qa11r"  = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/qa19c"  = local.secretsmanager_secrets.web
+      "/oracle/database/qa19c"  = local.secretsmanager_secrets.db_cnom
     }
   }
 }

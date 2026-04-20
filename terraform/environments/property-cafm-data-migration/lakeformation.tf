@@ -1,18 +1,42 @@
-# Role used by DE's to access AWS
-data "aws_iam_roles" "modernisation_platform" {
-  name_regex  = "AWSReservedSSO_modernisation-platform-developer_.*"
-  path_prefix = "/aws-reserved/sso.amazonaws.com/"
-}
+# ------------------------------------------------------------------------
+# Lake Formation - admin permissions
+# https://user-guide.modernisation-platform.service.justice.gov.uk/runbooks/adding-admin-data-lake-formation-permissions.html
+# SSO role (sandbox/data-eng) is NOT an LF admin to avoid conflicts with
+# explicit grants managed via data-engineering-datalake-access YAML.
+# See: digital-prison-reporting lake_formation.tf for reference pattern.
+# ------------------------------------------------------------------------
 
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   admins = [
-    #one(data.aws_iam_roles.modernisation_platform.arns),
     "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess",
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/lakeformation-share-role"
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/lakeformation-share-role",
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan",
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply",
   ]
 
   parameters = {
     "CROSS_ACCOUNT_VERSION" = "4"
+  }
+}
+
+# Grant the staging export Lambda role Lake Formation permissions on the property database
+# SSO admin grants (sandbox/data-eng) are managed via data-engineering-datalake-access YAML
+resource "aws_lakeformation_permissions" "staging-export-database" {
+  principal   = module.lambda-staging-export.role_arn
+  permissions = ["DESCRIBE"]
+
+  database {
+    name = "property"
+  }
+}
+
+resource "aws_lakeformation_permissions" "staging-export-tables" {
+  principal   = module.lambda-staging-export.role_arn
+  permissions = ["SELECT", "DESCRIBE"]
+
+  table {
+    database_name = "property"
+    wildcard      = true
   }
 }
 
