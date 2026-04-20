@@ -47,16 +47,16 @@ mkdir -p /stage
 
 # Mount EBS volumes
 # Use lsblk to identify volumes by size
-# 200GB volume = /oracle/software (oracle home)
-# 150GB volume = /stage
+# Larger volume = /oracle/software (oracle home)
+# Smaller volume = /stage
 
 echo "Detecting volume sizes..."
 lsblk -b -n -o NAME,SIZE,TYPE | grep disk
 
-# Find the 200GB volume (approximately 200*1024^3 = 214748364800 bytes)
-# And 150GB volume (approximately 150*1024^3 = 161061273600 bytes)
+# Find non-root volumes and assign based on size (larger = oracle, smaller = stage)
 ORACLE_SOFTWARE=""
 STAGE=""
+declare -A volumes
 
 for dev in /dev/nvme*n1; do
     if [ "$dev" == "/dev/nvme0n1" ]; then
@@ -65,19 +65,39 @@ for dev in /dev/nvme*n1; do
 
     size=$(lsblk -b -n -d -o SIZE "$dev")
     echo "Device $dev has size $size bytes"
+    volumes["$dev"]=$size
+done
 
-    # Check if size is approximately 200GB (between 190GB and 210GB)
-    if [ "$size" -gt 204010946560 ] && [ "$size" -lt 225485783040 ]; then
+# Sort volumes by size and assign (largest = oracle, smallest = stage)
+# This works for any volume sizes configured in terraform
+for dev in "${!volumes[@]}"; do
+    size=${volumes[$dev]}
+    
+    # Skip volumes smaller than 100GB to avoid conflicts
+    if [ "$size" -lt 107374182400 ]; then
+        echo "Skipping $dev (size $size) - too small to be oracle/stage volume"
+        continue
+    fi
+    
+    # Assign larger volume to ORACLE_SOFTWARE if not set or if this is larger
+    if [ -z "$ORACLE_SOFTWARE" ]; then
         ORACLE_SOFTWARE="$dev"
-        echo "Found 200GB volume for /oracle/software: $dev"
-    # Check if size is approximately 150GB (between 140GB and 160GB)
-    elif [ "$size" -gt 150323855360 ] && [ "$size" -lt 171798691840 ]; then
+        ORACLE_SIZE=$size
+    elif [ "$size" -gt "$ORACLE_SIZE" ]; then
+        # This volume is larger, so previous becomes STAGE
+        STAGE="$ORACLE_SOFTWARE"
+        ORACLE_SOFTWARE="$dev"
+        ORACLE_SIZE=$size
+    elif [ -z "$STAGE" ]; then
+        # This is smaller than ORACLE_SOFTWARE, assign to STAGE
         STAGE="$dev"
-        echo "Found 150GB volume for /stage: $dev"
     fi
 done
 
-# Mount oracle software volume (200GB)
+echo "Assigned ORACLE_SOFTWARE=$ORACLE_SOFTWARE (size: $ORACLE_SIZE bytes)"
+echo "Assigned STAGE=$STAGE"
+
+# Mount oracle software volume (larger volume)
 if [ -n "$ORACLE_SOFTWARE" ]; then
     echo "Mounting $ORACLE_SOFTWARE to /oracle/software"
     if ! grep -q "/oracle/software" /etc/fstab; then
@@ -85,10 +105,10 @@ if [ -n "$ORACLE_SOFTWARE" ]; then
     fi
     mount "$ORACLE_SOFTWARE" /oracle/software && echo "Successfully mounted /oracle/software" || echo "Failed to mount /oracle/software"
 else
-    echo "ERROR: 200GB volume not found"
+    echo "ERROR: Oracle software volume not found"
 fi
 
-# Mount stage volume (150GB)
+# Mount stage volume (smaller volume)
 if [ -n "$STAGE" ]; then
     echo "Mounting $STAGE to /stage"
     if ! grep -q "/stage" /etc/fstab; then
@@ -96,7 +116,7 @@ if [ -n "$STAGE" ]; then
     fi
     mount "$STAGE" /stage && echo "Successfully mounted /stage" || echo "Failed to mount /stage"
 else
-    echo "ERROR: 150GB volume not found"
+    echo "ERROR: Stage volume not found"
 fi
 
 # Verify mounts
