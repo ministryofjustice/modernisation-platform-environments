@@ -566,4 +566,19 @@ locals {
     username = "placeholder"
     password = "placeholder"
   }
+
+  # DPR Cross-account Secret Placeholders for Cloud Platform access
+  # Assessment View Database
+  dpr_crossaccount_assessment_view_secrets_placeholder = {
+    username     = "dpr_user"
+    password     = "placeholder"
+    engine       = "oracle"
+    host         = "127.0.0.1"
+    port         = "1521"
+    dbname       = "dprtest"
+    sid          = "dprtest"
+    service_name = "dprtest"
+  }
+
+  # Add more cross-account secret placeholders here as needed for other databases
 }

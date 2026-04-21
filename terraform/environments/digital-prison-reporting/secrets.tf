@@ -653,3 +653,139 @@ resource "aws_secretsmanager_secret_version" "dpr-test" {
     ignore_changes = [secret_string, ]
   }
 }
+
+# Cross-account secrets for Cloud Platform access
+# These secrets are shared with the Cloud Platform account (754256621582) to allow
+# CP services to access DPR database credentials without direct cross-account role assumption
+
+# KMS key for cross-account secret encryption (shared across all cross-account secrets)
+# DHS-643
+resource "aws_kms_key" "crossaccount_secret" {
+  #checkov:skip=CKV_AWS_33
+  #checkov:skip=CKV_AWS_227
+  #checkov:skip=CKV_AWS_7
+
+  description         = "Encryption key for cross-account secrets shared with Cloud Platform"
+  enable_key_rotation = true
+  key_usage           = "ENCRYPT_DECRYPT"
+  policy              = data.aws_iam_policy_document.crossaccount_secret_kms.json
+  is_enabled          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      dpr-name          = "crossaccount-secrets-kms-${local.env}"
+      dpr-resource-type = "KMS Key"
+      dpr-jira          = "DHS-643"
+    }
+  )
+}
+
+# KMS key policy - allows both MP account root and CP role to decrypt
+# DHS-643
+data "aws_iam_policy_document" "crossaccount_secret_kms" {
+  # Allow MP account root full access
+  statement {
+    #checkov:skip=CKV_AWS_111
+    #checkov:skip=CKV_AWS_109
+    #checkov:skip=CKV_AWS_110
+    #checkov:skip=CKV_AWS_358
+    #checkov:skip=CKV_AWS_107
+    #checkov:skip=CKV_AWS_1
+    #checkov:skip=CKV_AWS_283
+    #checkov:skip=CKV_AWS_49
+    #checkov:skip=CKV_AWS_108
+    #checkov:skip=CKV_AWS_356
+
+    sid       = "Enable IAM User Permissions"
+    effect    = "Allow"
+    actions   = ["kms:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+  }
+
+  # Allow Cloud Platform role to decrypt secret
+  # DHS-643
+  statement {
+    sid    = "AllowCloudPlatformRoleToDecryptSecret"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey"
+    ]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::754256621582:role/arns-${local.env}-mp-secrets-access"]
+    }
+  }
+}
+
+resource "aws_kms_alias" "crossaccount_secret_kms_alias" {
+  name          = "alias/crossaccount-secrets-kms-${local.env}"
+  target_key_id = aws_kms_key.crossaccount_secret.arn
+}
+
+# Assessment View Database Secret for Cloud Platform
+# DHS-643
+resource "aws_secretsmanager_secret" "dpr_crossaccount_assessment_view" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  count = local.is_dev_or_test ? 1 : 0
+
+  name        = "${local.env}/dpr-crossaccount-assessment-view-db"
+  description = "DPR Assessment View database credentials shared with Cloud Platform for cross-account access"
+  kms_key_id  = aws_kms_key.crossaccount_secret.arn
+
+  tags = merge(
+    local.all_tags,
+    {
+      dpr-name          = "${local.env}/dpr-crossaccount-assessment-view-db"
+      dpr-resource-type = "Secrets"
+      dpr-jira          = "DHS-643"
+      dpr-shared-with   = "Cloud Platform"
+      dpr-database      = "assessment-view"
+    }
+  )
+}
+
+# Secret version with placeholder values
+resource "aws_secretsmanager_secret_version" "dpr_crossaccount_assessment_view" {
+  count = local.is_dev_or_test ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.dpr_crossaccount_assessment_view[0].id
+  secret_string = jsonencode(local.dpr_crossaccount_assessment_view_secrets_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+}
+
+# Resource policy for the secret - allows CP role to read
+resource "aws_secretsmanager_secret_policy" "dpr_crossaccount_assessment_view" {
+  count = local.is_dev_or_test ? 1 : 0
+
+  secret_arn = aws_secretsmanager_secret.dpr_crossaccount_assessment_view[0].arn
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowCloudPlatformRoleToReadSecret"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::754256621582:role/arns-${local.env}-mp-secrets-access"
+        }
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
