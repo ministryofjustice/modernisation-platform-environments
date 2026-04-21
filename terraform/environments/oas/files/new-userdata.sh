@@ -1,15 +1,58 @@
 #!/bin/bash
-set -x  # Enable debug mode
+set -x
 exec > >(tee /var/log/userdata.log)
 exec 2>&1
 
 # Create marker file to prove userdata started
 echo "Userdata started at $(date)" > /tmp/userdata_started
 
-# Set hostname (quick operation)
+# Replace SSH keys with new Terraform-generated keys
+echo "Replacing SSH keys with new Terraform-generated keys..."
+
+# Fetch the public key from EC2 instance metadata
+TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600" 2>/dev/null)
+NEW_PUBLIC_KEY=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-keys/0/openssh-key 2>/dev/null)
+
+if [ -n "$NEW_PUBLIC_KEY" ]; then
+    echo "New public key retrieved from metadata service"
+    
+    # Update authorized_keys for ec2-user
+    if id "ec2-user" &>/dev/null; then
+        echo "Updating authorized_keys for ec2-user"
+        mkdir -p /home/ec2-user/.ssh
+        echo "$NEW_PUBLIC_KEY" > /home/ec2-user/.ssh/authorized_keys
+        chmod 700 /home/ec2-user/.ssh
+        chmod 600 /home/ec2-user/.ssh/authorized_keys
+        chown -R ec2-user:ec2-user /home/ec2-user/.ssh
+        echo "ec2-user SSH keys updated successfully"
+    fi
+    
+    # Update authorized_keys for root
+    echo "Updating authorized_keys for root"
+    mkdir -p /root/.ssh
+    echo "$NEW_PUBLIC_KEY" > /root/.ssh/authorized_keys
+    chmod 700 /root/.ssh
+    chmod 600 /root/.ssh/authorized_keys
+    echo "root SSH keys updated successfully"
+    
+    # Update authorized_keys for oracle user if it exists
+    if id "oracle" &>/dev/null; then
+        echo "Updating authorized_keys for oracle"
+        mkdir -p /home/oracle/.ssh
+        echo "$NEW_PUBLIC_KEY" > /home/oracle/.ssh/authorized_keys
+        chmod 700 /home/oracle/.ssh
+        chmod 600 /home/oracle/.ssh/authorized_keys
+        chown -R oracle:dba /home/oracle/.ssh
+        echo "oracle SSH keys updated successfully"
+    fi
+else
+    echo "WARNING: Could not retrieve public key from metadata service"
+fi
+
+# Set hostname
 hostnamectl set-hostname oas
 
-# Update DNS resolv.conf (quick operation)
+# Update DNS resolv.conf
 sed -i '2s/.*/search $${dns_zone_name} eu-west-2.compute.internal/' /etc/resolv.conf
 
 # Function to wait for EBS volumes to be attached
@@ -17,22 +60,22 @@ wait_for_volumes() {
     echo "Waiting for EBS volumes to be attached..."
     local max_attempts=30
     local attempt=0
-    
+
     while [ $attempt -lt $max_attempts ]; do
         # Check if we have at least 3 NVMe devices (root + 2 EBS volumes)
         local nvme_count=$(ls /dev/nvme*n1 2>/dev/null | wc -l)
         echo "Attempt $attempt: Found $nvme_count NVMe devices"
-        
+
         if [ $nvme_count -ge 3 ]; then
             echo "All volumes detected!"
             ls -la /dev/nvme*n1
             return 0
         fi
-        
+
         sleep 5
         attempt=$((attempt + 1))
     done
-    
+
     echo "ERROR: Timeout waiting for EBS volumes"
     ls -la /dev/nvme* 2>/dev/null || echo "No NVMe devices found"
     return 1
@@ -47,37 +90,57 @@ mkdir -p /stage
 
 # Mount EBS volumes
 # Use lsblk to identify volumes by size
-# 200GB volume = /oracle/software (oracle home)
-# 150GB volume = /stage
+# Larger volume = /oracle/software (oracle home)
+# Smaller volume = /stage
 
 echo "Detecting volume sizes..."
 lsblk -b -n -o NAME,SIZE,TYPE | grep disk
 
-# Find the 200GB volume (approximately 200*1024^3 = 214748364800 bytes)
-# And 150GB volume (approximately 150*1024^3 = 161061273600 bytes)
+# Find non-root volumes and assign based on size (larger = oracle, smaller = stage)
 ORACLE_SOFTWARE=""
 STAGE=""
+declare -A volumes
 
 for dev in /dev/nvme*n1; do
     if [ "$dev" == "/dev/nvme0n1" ]; then
-        continue  # Skip root volume
+        continue
     fi
-    
+
     size=$(lsblk -b -n -d -o SIZE "$dev")
     echo "Device $dev has size $size bytes"
+    volumes["$dev"]=$size
+done
+
+# Sort volumes by size and assign (largest = oracle, smallest = stage)
+# This works for any volume sizes configured in terraform
+for dev in "${!volumes[@]}"; do
+    size=${volumes[$dev]}
     
-    # Check if size is approximately 200GB (between 190GB and 210GB)
-    if [ "$size" -gt 204010946560 ] && [ "$size" -lt 225485783040 ]; then
+    # Skip volumes smaller than 100GB to avoid conflicts
+    if [ "$size" -lt 107374182400 ]; then
+        echo "Skipping $dev (size $size) - too small to be oracle/stage volume"
+        continue
+    fi
+    
+    # Assign larger volume to ORACLE_SOFTWARE if not set or if this is larger
+    if [ -z "$ORACLE_SOFTWARE" ]; then
         ORACLE_SOFTWARE="$dev"
-        echo "Found 200GB volume for /oracle/software: $dev"
-    # Check if size is approximately 150GB (between 140GB and 160GB)
-    elif [ "$size" -gt 150323855360 ] && [ "$size" -lt 171798691840 ]; then
+        ORACLE_SIZE=$size
+    elif [ "$size" -gt "$ORACLE_SIZE" ]; then
+        # This volume is larger, so previous becomes STAGE
+        STAGE="$ORACLE_SOFTWARE"
+        ORACLE_SOFTWARE="$dev"
+        ORACLE_SIZE=$size
+    elif [ -z "$STAGE" ]; then
+        # This is smaller than ORACLE_SOFTWARE, assign to STAGE
         STAGE="$dev"
-        echo "Found 150GB volume for /stage: $dev"
     fi
 done
 
-# Mount oracle software volume (200GB)
+echo "Assigned ORACLE_SOFTWARE=$ORACLE_SOFTWARE (size: $ORACLE_SIZE bytes)"
+echo "Assigned STAGE=$STAGE"
+
+# Mount oracle software volume (larger volume)
 if [ -n "$ORACLE_SOFTWARE" ]; then
     echo "Mounting $ORACLE_SOFTWARE to /oracle/software"
     if ! grep -q "/oracle/software" /etc/fstab; then
@@ -85,10 +148,10 @@ if [ -n "$ORACLE_SOFTWARE" ]; then
     fi
     mount "$ORACLE_SOFTWARE" /oracle/software && echo "Successfully mounted /oracle/software" || echo "Failed to mount /oracle/software"
 else
-    echo "ERROR: 200GB volume not found"
+    echo "ERROR: Oracle software volume not found"
 fi
 
-# Mount stage volume (150GB)
+# Mount stage volume (smaller volume)
 if [ -n "$STAGE" ]; then
     echo "Mounting $STAGE to /stage"
     if ! grep -q "/stage" /etc/fstab; then
@@ -96,7 +159,7 @@ if [ -n "$STAGE" ]; then
     fi
     mount "$STAGE" /stage && echo "Successfully mounted /stage" || echo "Failed to mount /stage"
 else
-    echo "ERROR: 150GB volume not found"
+    echo "ERROR: Stage volume not found"
 fi
 
 # Verify mounts
@@ -123,9 +186,9 @@ mkswap /root/myswapfile
 swapon /root/myswapfile
 echo "/root/myswapfile swap swap defaults 0 0" >> /etc/fstab
 
-# Function to configure NTP based on RHEL version
+# Function to configure NTP based on RHEL/Oracle Linux major version
 ntp_config(){
-    local RHEL=$(cat /etc/redhat-release | cut -d. -f1 | awk '{print $NF}')
+    local RHEL=$(rpm -E %{rhel} 2>/dev/null || cat /etc/redhat-release | grep -oE '[0-9]+' | head -1)
     local SOURCE=169.254.169.123
 
     NtpD(){
@@ -136,6 +199,7 @@ ntp_config(){
             && /etc/init.d/ntpd restart || /etc/init.d/ntpd start
         ntpq -p
     }
+
     ChronyD(){
         local CONF=/etc/chrony.conf
         sed -i 's/server \S/#server \S/g' ${CONF} && \
@@ -144,12 +208,16 @@ ntp_config(){
             && systemctl restart chronyd || systemctl start chronyd
         chronyc sources
     }
+
     case ${RHEL} in
         5)
             NtpD
             ;;
-        7)
+        7|8)
             ChronyD
+            ;;
+        *)
+            echo "Unsupported RHEL/Oracle Linux version: ${RHEL}. Skipping NTP configuration."
             ;;
     esac
 }
@@ -157,7 +225,7 @@ ntp_config(){
 # Configure NTP
 ntp_config
 
-# Install required packages (moved to end to not block critical mount operations)
+# Install required packages
 echo "Installing required packages..."
 cd /tmp
 

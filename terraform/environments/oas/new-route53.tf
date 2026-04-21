@@ -2,7 +2,7 @@
 ### EC2 ROUTE53 RECORD
 ######################################
 resource "aws_route53_record" "oas-app_new" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
@@ -20,7 +20,7 @@ resource "aws_route53_record" "oas-app_new" {
 ### RDS Route53 Record
 ######################################
 resource "aws_route53_record" "oas-rds-new" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
@@ -35,7 +35,7 @@ resource "aws_route53_record" "oas-rds-new" {
 ######################################
 # oas-lb.* (Subject Alternative Name - 71 chars)
 resource "aws_route53_record" "oas-lb" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id

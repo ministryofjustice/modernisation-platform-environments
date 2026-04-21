@@ -53,8 +53,8 @@ data "aws_secretsmanager_secret_version" "chainguard_pull_credentials" {
 }
 
 # EKS
-data "aws_eks_cluster" "eks" {
-  name = local.eks_cluster_name
+data "aws_eks_cluster_auth" "eks_auth" {
+  name = module.eks.cluster_name
 }
 
 data "http" "prometheus_operator_crds" {

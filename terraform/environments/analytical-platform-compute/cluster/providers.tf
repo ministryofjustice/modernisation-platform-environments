@@ -9,25 +9,16 @@ provider "aws" {
 
 # Provider for interacting with the EKS cluster
 provider "kubernetes" {
-  host = module.eks.cluster_endpoint
-  # host                   = data.aws_eks_cluster.eks.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    command     = "bash"
-    args        = ["../scripts/eks-authentication.sh", data.aws_eks_cluster.eks.id]
-  }
+  host                   = module.eks.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+  token                  = data.aws_eks_cluster_auth.eks_auth.token
 }
 
 # Provider for interacting with the EKS cluster using Helm
 provider "helm" {
   kubernetes {
-    host                   = data.aws_eks_cluster.eks.endpoint
-    cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
-    exec {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      command     = "bash"
-      args        = ["../scripts/eks-authentication.sh", data.aws_eks_cluster.eks.id]
-    }
+    host                   = module.eks.cluster_endpoint
+    cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+    token                  = data.aws_eks_cluster_auth.eks_auth.token
   }
 }

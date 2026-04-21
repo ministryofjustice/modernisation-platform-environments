@@ -3,7 +3,7 @@ locals {
   baseline_presets_production = {
     options = {
       db_backup_lifecycle_rule   = "rman_backup_one_month"
-      db_backup_object_lock_days = null
+      db_backup_object_lock_days = 14
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "corporate-staff-rostering-production"
@@ -552,21 +552,6 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*P/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/P*/*",
-            ]
-          }
-        ]
-      }
-      Ec2PrisonerRetailPolicy = {
-        description = "Permissions required for prisoner retail"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-              "secretsmanager:PutSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/prisoner-retail/*",
             ]
           }
         ]

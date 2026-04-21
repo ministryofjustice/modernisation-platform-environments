@@ -38,7 +38,7 @@ jobs:
         run: tflint --disable-rule=terraform_unused_declarations --format sarif > tflint.sarif
       - name: Upload SARIF file
         if: success() || failure()
-        uses: github/codeql-action/upload-sarif@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
+        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4.35.2
         with:
           sarif_file: tflint.sarif
   trivy:
@@ -56,11 +56,6 @@ jobs:
         run: |
           echo '{"version":"2.1.0","$schema":"https://json.schemastore.org/sarif-2.1.0.json","runs":[]}' > 'trivy-results.sarif'
           echo 'trivy-action step removed — created empty SARIF stub'
-      - name: Upload Trivy scan results to GitHub Security tab
-        if: success() || failure()
-        uses: github/codeql-action/upload-sarif@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
-        with:
-          sarif_file: 'trivy-results.sarif'
   checkov:
     name: checkov
     runs-on: ubuntu-latest
@@ -76,7 +71,7 @@ jobs:
           fetch-depth: 0
       - name: Run Checkov action
         id: checkov
-        uses: bridgecrewio/checkov-action@de2bfaecd21d58ef232e0d2a3391c33c32c460d7 # v12.3096.0
+        uses: bridgecrewio/checkov-action@5ef773c6dcc9416c0e1973045ca575493c4ce41a # v12.3097.0
         with:
           directory: ./
           framework: terraform
@@ -85,6 +80,6 @@ jobs:
           skip_check: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
       - name: Upload SARIF file
         if: success() || failure()
-        uses: github/codeql-action/upload-sarif@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
+        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4.35.2
         with:
           sarif_file: ./checkov.sarif
