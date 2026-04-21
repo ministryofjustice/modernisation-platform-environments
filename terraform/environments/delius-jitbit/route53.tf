@@ -122,7 +122,7 @@ resource "aws_route53_record" "external_validation_prod" {
 
   allow_overwrite = true
   name            = local.domain_name_main[0]
-  records         = local.domain_record_main[0]
+  records         = local.domain_record_main
   ttl             = 60
   type            = local.domain_type_main[0]
   zone_id         = data.aws_route53_zone.network-services-production[0].zone_id
