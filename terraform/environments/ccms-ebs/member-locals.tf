@@ -8,7 +8,24 @@ locals {
   lb_log_prefix_ebsapp_internal  = "ebsapps-internal-lb"
   lb_log_prefix_webgate_internal = "webgate-internal-lb"
   lb_log_prefix_ssogen_internal  = "ssogen-internal-lb"
+  lb_log_prefix_ssogen_internal_console   = "ssogen-console-internal-lb"
+  application_name_ssogen        = "ssogen"
 
+
+  disksmount = [
+    "/dev/nvme1n1:/u01/product/fmw",
+    "/dev/nvme2n1:/u01/product/runtime/Domain/mserver",
+    "/dev/nvme3n1:/tmp"
+  ]
+
+  disksmount_joined = join(",", local.disksmount)
+
+  efs_mount_points = [
+    "stage:/stage",
+    "aserver:/u01/shared/product/runtime/Domain/aserver"
+  ]
+
+  efs_mount_points_joined = join(",", local.efs_mount_points)
   sftp_enabled       = contains(["development"], local.environment)
   lambda_folder_name = ["lambda_delivery", "ftp_lambda_layer", "payment_lambda_layer", "cloudwatch_sns_layer", "payment_load_monitor_layer"]
 
@@ -20,6 +37,17 @@ locals {
   lambda_source_hashes_payment_load_monitor = [
     for f in fileset("./lambda/payment_load_monitor", "**") :
     sha256(file("${path.module}/lambda/payment_load_monitor/${f}"))
+  ]
+
+  lambda_source_hashes_ssogen_admin_failover = [
+    for f in fileset("./lambda/ssogen_admin_failover", "**") :
+    sha256(file("${path.module}/lambda/ssogen_admin_failover/${f}"))
+  ]
+
+  private_subnets_cidr_blocks = [
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block
   ]
 
   data_subnets = [
@@ -54,13 +82,22 @@ locals {
     format("ccms-ebs-db-nlb.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
   ]
 
+  nonprod_test_sans = [
+    format("ccmsebs.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
+    # format("ccmsebs-sso.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
+    format("ccms-ebs-db-nlb.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
+    # format("ccms-ssogen-as1.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
+    # format("ccms-ssogen-as2.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
+    # format("ccms-ssogen-admin.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
+  ]
+
   prod_sans = [
     format("ccmsebs.%s", local.prod_domain),
     format("ccms-ebs-db-nlb.%s", local.prod_domain),
     format("ccmsebs-sso.%s", local.prod_domain),
   ]
 
-  subject_alternative_names = local.is-production ? local.prod_sans : local.nonprod_sans
+  subject_alternative_names = local.is-test ? local.nonprod_test_sans : (local.is-production ? local.prod_sans : local.nonprod_sans)
 
   # Domain validation options mapping (following the example pattern)
   domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
