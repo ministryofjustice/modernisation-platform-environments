@@ -105,7 +105,7 @@ module "lambda-staging-export" {
 
   function_name                = "cafm-staging-export"
   description                  = "Exports Athena view data as CSV into the CAFM staging S3 bucket"
-  database_name                = "property"
+  source_database              = "property"
   s3_output_path               = "s3://${module.aws_s3_staging.bucket.id}"
   s3_output_bucket_arn         = module.aws_s3_staging.bucket.arn
   s3_athena_results_bucket_arn = module.query_results.bucket.arn
@@ -115,6 +115,9 @@ module "lambda-staging-export" {
     module.datalake.bucket.arn,
     "${module.datalake.bucket.arn}/*"
   ]
+
+  # All Glue databases the role needs access to: the source database and any databases its views resolve through
+  additional_database_names = ["property", "planetfm", "concept"]
 
   kms_key_arn = aws_kms_key.shared_kms_key.arn
   tags        = local.tags

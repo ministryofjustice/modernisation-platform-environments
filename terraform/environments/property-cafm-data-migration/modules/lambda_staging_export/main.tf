@@ -2,6 +2,20 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
+locals {
+  glue_resources = concat(
+    ["arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog"],
+    flatten([
+      for db in var.additional_database_names : [
+        "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/${db}",
+        "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/${db}_*",
+        "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${db}/*",
+        "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${db}_*/*",
+      ]
+    ])
+  )
+}
+
 resource "aws_iam_role" "lambda" {
   name = "${var.function_name}-role"
 
@@ -47,13 +61,7 @@ resource "aws_iam_role_policy" "lambda" {
           "glue:GetDatabases",
           "glue:GetPartitions"
         ]
-        Resource = [
-          "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
-          "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/${var.database_name}",
-          "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/${var.database_name}_*",
-          "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.database_name}/*",
-          "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.database_name}_*/*"
-        ]
+        Resource = local.glue_resources
       },
       {
         Sid    = "S3OutputBucketLevelAccess"
@@ -160,7 +168,7 @@ resource "aws_lambda_function" "this" {
 
   environment {
     variables = {
-      DATABASE               = var.database_name
+      DATABASE               = var.source_database
       S3_OUTPUT_PATH         = var.s3_output_path
       S3_ATHENA_RESULTS_PATH = var.s3_athena_results_path
     }

@@ -34,14 +34,20 @@ variable "s3_source_bucket_arns" {
   type        = list(string)
 }
 
-variable "database_name" {
-  description = "Glue catalogue database containing the Athena view"
+variable "source_database" {
+  description = "Glue catalogue database the Lambda queries (used as the DATABASE env var)"
   type        = string
 }
 
 variable "kms_key_arn" {
   description = "ARN of the KMS key used for S3 encryption"
   type        = string
+}
+
+variable "additional_database_names" {
+  description = "Glue database names the Lambda role needs IAM and Lake Formation access to (includes the source database and any databases its views resolve through)"
+  type        = list(string)
+  default     = []
 }
 
 variable "tags" {
