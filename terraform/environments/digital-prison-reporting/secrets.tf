@@ -708,10 +708,11 @@ data "aws_iam_policy_document" "crossaccount_secret_kms" {
     }
   }
 
-  # Allow Cloud Platform role to decrypt secret
+  # Allow Cloud Platform account to decrypt secret
+  # The IAM policy on the CP role will control which specific roles can use this key
   # DHS-643
   statement {
-    sid    = "AllowCloudPlatformRoleToDecryptSecret"
+    sid    = "AllowCloudPlatformAccountToDecryptSecret"
     effect = "Allow"
     actions = [
       "kms:Decrypt",
@@ -721,7 +722,7 @@ data "aws_iam_policy_document" "crossaccount_secret_kms" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::754256621582:role/arns-${local.env}-mp-secrets-access"]
+      identifiers = ["arn:aws:iam::754256621582:root"]
     }
   }
 }
