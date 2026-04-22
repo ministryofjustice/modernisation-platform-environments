@@ -35,7 +35,7 @@ module "ecs_policies" {
 }
 
 module "ecs_service" {
-  source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v6.0.1"
+  source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=TM-2012-add-ecs-service-capacity-provider"
   container_definitions = nonsensitive(module.container_definition.json_encoded_list)
   cluster_arn           = var.ecs_cluster_arn
   name                  = "${var.env_name}-${var.name}"
@@ -45,7 +45,8 @@ module "ecs_service" {
 
   pin_task_definition_revision = var.pin_task_definition_revision
 
-  launch_type                        = var.launch_type
+  force_new_deployment               = var.force_new_deployment
+  capacity_provider                  = var.capacity_provider
   desired_count                      = var.desired_count
   deployment_maximum_percent         = var.deployment_maximum_percent
   deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
