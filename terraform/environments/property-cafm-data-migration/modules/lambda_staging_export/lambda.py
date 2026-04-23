@@ -82,7 +82,7 @@ def get_query_result_csv(query_execution_id):
     return response["Body"].read().decode("utf-8")
 
 
-def split_csv_by_lot(csv_text, ptp_lot_index):
+def split_csv_by_lot(csv_text, lot_number_index):
     """Split CSV text into per-lot CSV strings."""
     reader = csv.reader(io.StringIO(csv_text))
     header = next(reader)
@@ -90,7 +90,7 @@ def split_csv_by_lot(csv_text, ptp_lot_index):
     lot_rows = {lot: [] for lot in LOTS}
 
     for row in reader:
-        lot_value = row[ptp_lot_index]
+        lot_value = row[lot_number_index]
 
         if lot_value in lot_rows:
             lot_rows[lot_value].append(row)
@@ -114,7 +114,7 @@ def run_table_export(table):
     sql = f"""
         SELECT *
         FROM {table}
-        WHERE ptp_lot IN ({lot_list})
+        WHERE lot_number IN ({lot_list})
     """
 
     logger.info(f"Running query for table={table}")
@@ -136,13 +136,13 @@ def run_table_export(table):
     # Read Athena's CSV result
     csv_text = get_query_result_csv(query_execution_id)
 
-    # Find ptp_lot column index from header
+    # Find lot_number column index from header
     header = csv_text.split("\n", 1)[0]
     columns = next(csv.reader(io.StringIO(header)))
-    ptp_lot_index = columns.index("ptp_lot")
+    lot_number_index = columns.index("lot_number")
 
     # Split by lot and upload
-    lot_csvs = split_csv_by_lot(csv_text, ptp_lot_index)
+    lot_csvs = split_csv_by_lot(csv_text, lot_number_index)
     output_bucket, output_prefix = parse_s3_uri(S3_OUTPUT_PATH)
 
     for lot, csv_data in lot_csvs.items():
