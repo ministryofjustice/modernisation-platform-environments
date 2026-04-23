@@ -190,6 +190,29 @@ resource "aws_security_group_rule" "ingress_traffic_ebsapps_4443" {
   local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 
+### OEM Agent Port (OMS -> EBS Apps)
+
+resource "aws_security_group_rule" "ingress_traffic_ebsapps_oem_agent_3872" {
+  security_group_id = aws_security_group.ec2_sg_ebsapps.id
+  type              = "ingress"
+  description       = "OEM OMS to EBS Apps agent port"
+  protocol          = "TCP"
+  from_port         = tonumber(local.application_data.accounts[local.environment].oem.agent_port)
+  to_port           = tonumber(local.application_data.accounts[local.environment].oem.agent_port)
+  cidr_blocks       = [local.application_data.accounts[local.environment].oem.oms_platform_cidr]
+}
+
+### OEM OMS Upload Port (OMS -> EBS Apps)
+
+resource "aws_security_group_rule" "ingress_traffic_ebsapps_oem_oms_4903" {
+  security_group_id = aws_security_group.ec2_sg_ebsapps.id
+  type              = "ingress"
+  description       = "OEM OMS to EBS Apps OMS upload port"
+  protocol          = "TCP"
+  from_port         = tonumber(local.application_data.accounts[local.environment].oem.oms_port)
+  to_port           = tonumber(local.application_data.accounts[local.environment].oem.oms_port)
+  cidr_blocks       = [local.application_data.accounts[local.environment].oem.oms_platform_cidr]
+}
 
 # EGRESS Rules
 
@@ -359,5 +382,41 @@ resource "aws_security_group_rule" "egress_traffic_ebsapps_4443" {
   from_port         = 4443
   to_port           = 4444
   cidr_blocks       = ["0.0.0.0/0"]
+}
+
+### OEM Agent Port (EBS Apps -> OMS)
+
+resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_agent_3872" {
+  security_group_id = aws_security_group.ec2_sg_ebsapps.id
+  type              = "egress"
+  description       = "EBS Apps to OEM OMS agent port"
+  protocol          = "TCP"
+  from_port         = tonumber(local.application_data.accounts[local.environment].oem.agent_port)
+  to_port           = tonumber(local.application_data.accounts[local.environment].oem.agent_port)
+  cidr_blocks       = [local.application_data.accounts[local.environment].oem.oms_platform_cidr]
+}
+
+### OEM OMS Upload Port (EBS Apps -> OMS)
+
+resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_oms_4903" {
+  security_group_id = aws_security_group.ec2_sg_ebsapps.id
+  type              = "egress"
+  description       = "EBS Apps to OEM OMS upload port"
+  protocol          = "TCP"
+  from_port         = tonumber(local.application_data.accounts[local.environment].oem.oms_port)
+  to_port           = tonumber(local.application_data.accounts[local.environment].oem.oms_port)
+  cidr_blocks       = [local.application_data.accounts[local.environment].oem.oms_platform_cidr]
+}
+
+### OEM DB Oracle Listener (EBS Apps -> OEM DB)
+
+resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_db_1521" {
+  security_group_id = aws_security_group.ec2_sg_ebsapps.id
+  type              = "egress"
+  description       = "EBS Apps to OEM DB Oracle listener"
+  protocol          = "TCP"
+  from_port         = 1521
+  to_port           = 1521
+  cidr_blocks       = [local.application_data.accounts[local.environment].oem.oem_db_platform_cidr]
 }
 
