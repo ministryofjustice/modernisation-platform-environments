@@ -164,7 +164,7 @@ data "aws_s3_bucket" "sftp_client1_bucket" {
 ## S3 NOTIFICATIONS
 data "aws_iam_policy_document" "s3_topic_policy" {
   statement {
-    sid    = "AllowS3ToPublishToSNS"
+    sid    = "AllowS3Publish"
     effect = "Allow"
 
     principals {
