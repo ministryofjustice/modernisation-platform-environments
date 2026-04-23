@@ -33,7 +33,7 @@
 /terraform/environments/coat @ministryofjustice/cloud-optimisation-and-accountability @ministryofjustice/modernisation-platform
 /terraform/environments/contract-work-administration @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-cwa-developer @ministryofjustice/laa-pcuam @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/cooker @ministryofjustice/modernisation-platform @ministryofjustice/octo-cyber-team @ministryofjustice/tvm-purple-team @ministryofjustice/modernisation-platform
-/terraform/environments/corporate-staff-rostering @ministryofjustice/azure-aws-sso-csr-application-support @ministryofjustice/azure-aws-sso-digital-studio-operations @ministryofjustice/csr-application-support @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
+/terraform/environments/corporate-staff-rostering @ministryofjustice/azure-aws-sso-csr-access @ministryofjustice/azure-aws-sso-csr-application-support @ministryofjustice/azure-aws-sso-digital-studio-operations @ministryofjustice/csr-application-support @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/syscon-devs @ministryofjustice/modernisation-platform
 /terraform/environments/dacp @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-corporate @ministryofjustice/corporate-data-factory-admins @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-laa @ministryofjustice/laa-data-factory-engineering @ministryofjustice/modernisation-platform
