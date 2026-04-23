@@ -766,7 +766,8 @@ resource "aws_secretsmanager_secret_version" "dpr_crossaccount_assessment_view" 
   }
 }
 
-# Resource policy for the secret - allows CP role to read
+# Resource policy for the secret - allows CP account to read
+# The IAM policy on the CP role will control which specific roles can read this secret
 resource "aws_secretsmanager_secret_policy" "dpr_crossaccount_assessment_view" {
   count = local.is_dev_or_test ? 1 : 0
 
@@ -776,10 +777,10 @@ resource "aws_secretsmanager_secret_policy" "dpr_crossaccount_assessment_view" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "AllowCloudPlatformRoleToReadSecret"
+        Sid    = "AllowCloudPlatformAccountToReadSecret"
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::754256621582:role/arns-${local.env}-mp-secrets-access"
+          AWS = "arn:aws:iam::754256621582:root"
         }
         Action = [
           "secretsmanager:GetSecretValue",
