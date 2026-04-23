@@ -8,6 +8,12 @@ variable "domain_name" {
   description = "Domain name for which the certificate should be issued"
 }
 
+variable "export" {
+  type        = bool
+  description = "Set to true to allow certificate can be exported. Note issuing an exportable certificate is subject to additional charges"
+  default     = null
+}
+
 variable "subject_alternate_names" {
   type        = list(string)
   description = "Set of domains that should be SANs in the issued certificate"

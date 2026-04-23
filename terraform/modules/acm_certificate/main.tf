@@ -1,3 +1,10 @@
+locals {
+  acm_cert_options = var.export == true ? {
+    certificate_transparency_logging_preference = "DISABLED"
+    export                                      = "ENABLED"
+  } : null
+}
+
 resource "aws_acm_certificate" "this" {
   domain_name               = var.domain_name
   validation_method         = "DNS"
@@ -5,6 +12,14 @@ resource "aws_acm_certificate" "this" {
   tags = merge(var.tags, {
     Name = var.name
   })
+
+  dynamic "options" {
+    for_each = local.acm_cert_options != null ? [local.acm_cert_options] : []
+    content {
+      certificate_transparency_logging_preference = options.value.certificate_transparency_logging_preference
+      export                                      = options.value.export
+    }
+  }
 
   lifecycle {
     create_before_destroy = true
