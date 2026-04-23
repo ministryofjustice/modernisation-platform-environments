@@ -1,11 +1,5 @@
 # OAS Component Flow Diagram
 
-**Version:** 1.0  
-**Last Updated:** 23 April 2026  
-**Related Documentation:** [OAS-Infrastructure-Documentation.md](OAS-Infrastructure-Documentation.md)
-
----
-
 ## Overview
 
 This diagram illustrates the data flow between different layers of the OAS application stack, showing how end-user traffic and administrative connections traverse the infrastructure components.
@@ -211,36 +205,4 @@ When infrastructure or flow changes occur:
 
 ---
 
-## Related Diagrams
 
-- [High-Level Architecture Diagram](OAS-Diagram-High-Level-Architecture.md) - Complete infrastructure overview
-- [All Diagrams Index](OAS-Infrastructure-Diagrams.md) - Complete diagram collection
-
----
-
-## Additional Flow Diagrams to Consider
-
-### Security Flow Diagram
-- Show security group rules in detail
-- IAM role assumptions and policy evaluations
-- Encryption points and key management
-
-### Deployment Flow Diagram
-- Terraform execution flow
-- Resource creation order and dependencies
-- Approval and validation gates
-
-### Monitoring Flow Diagram
-- Metric collection and aggregation
-- Log flow from sources to CloudWatch
-- Alarm evaluation and notification paths
-
----
-
-**Document Owner:** OAS DevOps Team  
-**Review Frequency:** Quarterly or when infrastructure changes  
-**Next Review Date:** July 2026
-
----
-
-**End of Diagram**

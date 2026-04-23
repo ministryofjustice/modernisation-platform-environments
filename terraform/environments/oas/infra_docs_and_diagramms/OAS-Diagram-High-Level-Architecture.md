@@ -1,11 +1,5 @@
 # OAS High-Level Architecture Diagram
 
-**Version:** 1.0  
-**Last Updated:** 23 April 2026  
-**Related Documentation:** [OAS-Infrastructure-Documentation.md](OAS-Infrastructure-Documentation.md)
-
----
-
 ## Overview
 
 This diagram shows the complete OAS infrastructure architecture including all AWS services, network layers, and user access patterns across the AWS Modernisation Platform.
@@ -192,18 +186,3 @@ When infrastructure changes occur:
 6. **Commit Changes:** Use descriptive commit message (e.g., "docs: add new CloudWatch integration to architecture diagram")
 
 ---
-
-## Related Diagrams
-
-- [Component Flow Diagram](OAS-Diagram-Component-Flow.md) - Data flow between application layers
-- [All Diagrams Index](OAS-Infrastructure-Diagrams.md) - Complete diagram collection
-
----
-
-**Document Owner:** OAS DevOps Team  
-**Review Frequency:** Quarterly or when infrastructure changes  
-**Next Review Date:** July 2026
-
----
-
-**End of Diagram**
