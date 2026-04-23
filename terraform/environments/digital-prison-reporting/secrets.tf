@@ -774,7 +774,7 @@ resource "aws_secretsmanager_secret_version" "dpr_crossaccount_assessment_view" 
 
   lifecycle {
     ignore_changes = [secret_string] 
-  }
+  } 
 }
 
 # Resource policy for the secret - allows CP account to read
