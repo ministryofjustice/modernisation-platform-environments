@@ -41,7 +41,7 @@ The Oracle Application Server (OAS) infrastructure is hosted on the AWS Modernis
 ## Architecture Overview
 
 **📊 Infrastructure Diagrams:**
-- [Diagram Index](OAS-Infrastructure-Diagrams.md) | [High-Level Architecture](OAS-Diagram-High-Level-Architecture.md) | [Component Flow](OAS-Diagram-Component-Flow.md)
+- [High-Level Architecture](OAS-Diagram-High-Level-Architecture.md) | [Component Flow](OAS-Diagram-Component-Flow.md)
 
 ### High-Level Architecture
 

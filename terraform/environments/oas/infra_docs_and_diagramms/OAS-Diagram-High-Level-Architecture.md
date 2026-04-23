@@ -68,7 +68,9 @@ flowchart RL
     style RDS fill:#3b48cc
     style SSM fill:#dd344c
     style S3 fill:#569a31
-```
+    linkStyle 0 stroke:#FF6D00,fill:none
+    linkStyle 2 stroke:#00C853,fill:none
+    linkStyle 3 stroke:#00C853
 
 ---
 
