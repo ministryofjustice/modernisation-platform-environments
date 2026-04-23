@@ -773,7 +773,7 @@ resource "aws_secretsmanager_secret_version" "dpr_crossaccount_assessment_view" 
   ))
 
   lifecycle {
-    ignore_changes = [secret_string]
+    ignore_changes = [secret_string] 
   }
 }
 
