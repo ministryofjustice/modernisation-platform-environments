@@ -738,9 +738,10 @@ resource "aws_secretsmanager_secret" "dpr_crossaccount_assessment_view" {
   #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
   count = local.is_dev_or_test ? 1 : 0
 
-  name        = "${local.env}/dpr-crossaccount-assessment-view-db"
-  description = "DPR Assessment View database credentials shared with Cloud Platform for cross-account access"
-  kms_key_id  = aws_kms_key.crossaccount_secret.arn
+  name                    = "${local.env}/dpr-crossaccount-assessment-view-db"
+  description             = "DPR Assessment View database credentials shared with Cloud Platform for cross-account access"
+  kms_key_id              = aws_kms_key.crossaccount_secret.arn
+  recovery_window_in_days = 0
 
   tags = merge(
     local.all_tags,
