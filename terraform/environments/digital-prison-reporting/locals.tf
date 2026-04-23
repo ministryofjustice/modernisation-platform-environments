@@ -568,16 +568,13 @@ locals {
   }
 
   # DPR Cross-account Secret Placeholders for Cloud Platform access
-  # Assessment View Database
+  # Assessment View Database (PostgreSQL)
   dpr_crossaccount_assessment_view_secrets_placeholder = {
-    username     = "dpr_user"
-    password     = "placeholder"
-    engine       = "oracle"
-    host         = "127.0.0.1"
-    port         = "1521"
-    dbname       = "dprtest"
-    sid          = "dprtest"
-    service_name = "dprtest"
+    engine  = "postgres"
+    db_name = "db77ebf3897b7f57e7"
+    username = "dpruser"
+    host    = "hmpps-arns-assessment-view-db-dev.cdwm328dlye6.eu-west-2.rds.amazonaws.com"
+    port    = "5432"
   }
 
   # Add more cross-account secret placeholders here as needed for other databases

@@ -755,15 +755,25 @@ resource "aws_secretsmanager_secret" "dpr_crossaccount_assessment_view" {
   )
 }
 
-# Secret version with placeholder values
+# Stable random password for the Assessment View DB secret
+# Generated once on first apply; ignore_changes on secret_string prevents it being rotated on every apply
+resource "random_password" "dpr_crossaccount_assessment_view_db" {
+  length  = 32
+  special = false
+}
+
+# Secret version - merges connection details with the generated password
 resource "aws_secretsmanager_secret_version" "dpr_crossaccount_assessment_view" {
   count = local.is_dev_or_test ? 1 : 0
 
-  secret_id     = aws_secretsmanager_secret.dpr_crossaccount_assessment_view[0].id
-  secret_string = jsonencode(local.dpr_crossaccount_assessment_view_secrets_placeholder)
+  secret_id = aws_secretsmanager_secret.dpr_crossaccount_assessment_view[0].id
+  secret_string = jsonencode(merge(
+    local.dpr_crossaccount_assessment_view_secrets_placeholder,
+    { password = random_password.dpr_crossaccount_assessment_view_db.result }
+  ))
 
   lifecycle {
-    ignore_changes = [secret_string, ]
+    ignore_changes = [secret_string]
   }
 }
 
