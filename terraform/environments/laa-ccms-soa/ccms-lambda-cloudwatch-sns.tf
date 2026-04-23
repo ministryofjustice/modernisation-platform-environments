@@ -47,7 +47,7 @@ resource "aws_iam_role_policy" "lambda_cloudwatch_sns_policy" {
           "kms:GenerateDataKey*",
           "kms:Decrypt"
         ]
-        Resource = [aws_kms_key.cloudwatch_sns_alerts_key.arn, aws_kms_key.sns_rds_events.arn]
+        Resource = [aws_kms_key.cloudwatch_sns_alerts_key.arn]
       }
     ]
   })
