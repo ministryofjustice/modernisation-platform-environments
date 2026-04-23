@@ -8,7 +8,7 @@ resource "aws_db_subnet_group" "soa" {
 }
 
 resource "aws_db_option_group" "soa_oracle_19" {
-  name_prefix          = "soa-db-option-group-v2"
+  name_prefix          = "soa-db-option-group"
   engine_name          = "oracle-ee"
   major_engine_version = "19"
 
