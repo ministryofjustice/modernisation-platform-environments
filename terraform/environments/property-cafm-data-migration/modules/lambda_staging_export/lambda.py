@@ -15,6 +15,8 @@ S3_ATHENA_RESULTS_PATH = os.environ["S3_ATHENA_RESULTS_PATH"].rstrip("/")
 
 LOTS = ["1", "2", "3", "4", "5"]
 
+LOT_DIR_MAP = {lot: f"LOT{lot}" for lot in LOTS}
+
 TABLES = [
     "property_cafm__acm_action_plan_record",
     "property_cafm__acm_inspection_record",
@@ -123,17 +125,23 @@ def run_lot_export(table, lot):
 
     # Read Athena's CSV result from S3
     bucket, prefix = parse_s3_uri(S3_ATHENA_RESULTS_PATH)
-    key = f"{prefix}/{query_execution_id}.csv" if prefix else f"{query_execution_id}.csv"
+
+    key = (
+        f"{prefix}/{query_execution_id}.csv" if prefix else f"{query_execution_id}.csv"
+    )
+    
     response = s3.get_object(Bucket=bucket, Key=key)
     csv_data = response["Body"].read()
 
     row_count = csv_data.count(b"\n") - 1  # subtract header
 
     output_bucket, output_prefix = parse_s3_uri(S3_OUTPUT_PATH)
+    lot_dir = LOT_DIR_MAP[lot]
+
     out_key = (
-        f"{output_prefix}/{lot}/{table}.csv"
+        f"{output_prefix}/{lot_dir}/{table}.csv"
         if output_prefix
-        else f"{lot}/{table}.csv"
+        else f"{lot_dir}/{table}.csv"
     )
 
     s3.put_object(Bucket=output_bucket, Key=out_key, Body=csv_data)
