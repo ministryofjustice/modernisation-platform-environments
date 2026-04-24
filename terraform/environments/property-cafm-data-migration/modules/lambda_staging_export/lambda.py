@@ -15,6 +15,8 @@ S3_ATHENA_RESULTS_PATH = os.environ["S3_ATHENA_RESULTS_PATH"].rstrip("/")
 
 LOTS = ["1", "2", "3", "4", "5"]
 
+LOT_DIR_MAP = {lot: f"LOT{lot}" for lot in LOTS}
+
 TABLES = [
     "property_cafm__acm_action_plan_record",
     "property_cafm__acm_inspection_record",
@@ -87,26 +89,15 @@ def wait_for_query(query_execution_id):
     raise TimeoutError(f"Query {query_execution_id} did not complete within timeout")
 
 
-def run_lot_export(table, lot):
+def _run_export(sql, out_key, log_label):
     """
-    Export a single lot's rows from an Athena table to S3 as a CSV file.
-
-    Executes a query filtering by lot_number, reads the resulting CSV directly
-    from the Athena results bucket, uploads it to the staging output bucket at
-    {lot}/{table}.csv, then cleans up the Athena result files.
+    Execute an Athena query, upload the CSV result to S3, then clean up.
 
     Args:
-        table: The Athena table name to query.
-        lot:   The lot number to filter on (e.g. '1').
+        sql:       The SQL string to execute.
+        out_key:   The S3 key (within the output bucket) to write the CSV to.
+        log_label: A label used in log messages (e.g. 'LOT1/property_cafm__site_record').
     """
-    sql = f"""
-        SELECT *
-        FROM {table}
-        WHERE lot_number = '{lot}'
-    """
-
-    logger.info(f"Running query for table={table} lot={lot}")
-
     results_bucket, results_prefix = parse_s3_uri(S3_ATHENA_RESULTS_PATH)
 
     response = athena.start_query_execution(
@@ -129,15 +120,9 @@ def run_lot_export(table, lot):
 
     row_count = csv_data.count(b"\n") - 1  # subtract header
 
-    output_bucket, output_prefix = parse_s3_uri(S3_OUTPUT_PATH)
-    out_key = (
-        f"{output_prefix}/{lot}/{table}.csv"
-        if output_prefix
-        else f"{lot}/{table}.csv"
-    )
-
+    output_bucket, _ = parse_s3_uri(S3_OUTPUT_PATH)
     s3.put_object(Bucket=output_bucket, Key=out_key, Body=csv_data)
-    logger.info(f"Exported {row_count} rows for {lot}/{table}")
+    logger.info(f"Exported {row_count} rows for {log_label}")
 
     # Clean up Athena result files
     for suffix in [f"{query_execution_id}.csv", f"{query_execution_id}.csv.metadata"]:
@@ -147,6 +132,49 @@ def run_lot_export(table, lot):
             s3.delete_object(Bucket=results_bucket, Key=cleanup_key)
         except Exception:
             logger.debug(f"Could not clean up {cleanup_key}")
+
+
+def run_lot_export(table, lot):
+    """
+    Export a single lot's rows from an Athena table to S3 as a CSV file.
+
+    Writes to {LOT_DIR_MAP[lot]}/{table}.csv in the staging output bucket.
+
+    Args:
+        table: The Athena table name to query.
+        lot:   The lot number to filter on (e.g. '1').
+    """
+    sql = f"""
+        SELECT *
+        FROM {table}
+        WHERE lot_number = '{lot}'
+    """
+
+    lot_dir = LOT_DIR_MAP[lot]
+    _, output_prefix = parse_s3_uri(S3_OUTPUT_PATH)
+    out_key = f"{output_prefix}/{lot_dir}/{table}.csv" if output_prefix else f"{lot_dir}/{table}.csv"
+
+    logger.info(f"Running query for table={table} lot={lot}")
+    _run_export(sql, out_key, f"{lot_dir}/{table}")
+
+
+def run_wsm_export(table):
+    """
+    Export all rows from an Athena table (across all lots) to S3 as a CSV file under WSM/.
+
+    Writes to WSM/{table}.csv in the staging output bucket.
+
+    Args:
+        table: The Athena table name to query.
+    """
+    lot_list = ",".join(f"'{lot}'" for lot in LOTS)
+    sql = f"SELECT * FROM {table} WHERE lot_number IN ({lot_list})"
+
+    _, output_prefix = parse_s3_uri(S3_OUTPUT_PATH)
+    out_key = f"{output_prefix}/WSM/{table}.csv" if output_prefix else f"WSM/{table}.csv"
+
+    logger.info(f"Running WSM query for table={table}")
+    _run_export(sql, out_key, f"WSM/{table}")
 
 
 def run_table_export(table):
@@ -164,6 +192,8 @@ def run_table_export(table):
     """
     for lot in LOTS:
         run_lot_export(table, lot)
+
+    run_wsm_export(table)
 
     return table
 
