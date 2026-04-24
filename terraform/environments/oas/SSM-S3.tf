@@ -49,6 +49,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "files_bucket" {
   }
 }
 
+
+///bucket policy to allow only EC2 role to read from the bucket
 resource "aws_s3_bucket_policy" "files_bucket" {
   count  = contains(["preproduction", "development"], local.environment) ? 1 : 0
   bucket = aws_s3_bucket.files_bucket[0].id
@@ -74,7 +76,7 @@ resource "aws_s3_bucket_policy" "files_bucket" {
 
 
 
-
+///policy for EC2 role
 resource "aws_iam_policy" "ec2_s3_reader" {
   count       = contains(["preproduction", "development"], local.environment) ? 1 : 0
   name        = "${local.application_name}-ec2-s3-reader-policy"
