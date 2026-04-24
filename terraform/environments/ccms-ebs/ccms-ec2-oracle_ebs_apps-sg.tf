@@ -214,6 +214,18 @@ resource "aws_security_group_rule" "ingress_traffic_ebsapps_oem_oms_4903" {
   cidr_blocks       = [local.application_data.accounts[local.environment].oem.oms_platform_cidr]
 }
 
+### OEM Agent HTTPS Port (OMS -> EBS Apps)
+
+resource "aws_security_group_rule" "ingress_traffic_ebsapps_oem_https_7803" {
+  security_group_id = aws_security_group.ec2_sg_ebsapps.id
+  type              = "ingress"
+  description       = "OEM OMS to EBS Apps agent HTTPS port"
+  protocol          = "TCP"
+  from_port         = 7803
+  to_port           = 7803
+  cidr_blocks       = [local.application_data.accounts[local.environment].oem.oms_platform_cidr]
+}
+
 # EGRESS Rules
 
 ### HTTP
@@ -405,6 +417,18 @@ resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_oms_4903" {
   protocol          = "TCP"
   from_port         = tonumber(local.application_data.accounts[local.environment].oem.oms_port)
   to_port           = tonumber(local.application_data.accounts[local.environment].oem.oms_port)
+  cidr_blocks       = [local.application_data.accounts[local.environment].oem.oms_platform_cidr]
+}
+
+### OEM Agent HTTPS Port (EBS Apps -> OMS)
+
+resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_https_7803" {
+  security_group_id = aws_security_group.ec2_sg_ebsapps.id
+  type              = "egress"
+  description       = "EBS Apps to OEM OMS agent HTTPS port"
+  protocol          = "TCP"
+  from_port         = 7803
+  to_port           = 7803
   cidr_blocks       = [local.application_data.accounts[local.environment].oem.oms_platform_cidr]
 }
 
