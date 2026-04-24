@@ -60,7 +60,7 @@ resource "aws_s3_bucket_policy" "files_bucket" {
         Sid       = "AllowOnlyEC2Role"
         Effect    = "Allow"
         Principal = {
-          AWS = aws_iam_role.ec2_instance_role_new[0].name
+          AWS = aws_iam_role.ec2_instance_role_new[0].arn
         }
         Action   = ["s3:GetObject", "s3:ListBucket"]
         Resource = [
