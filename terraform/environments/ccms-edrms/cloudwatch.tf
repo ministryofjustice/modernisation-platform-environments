@@ -34,7 +34,7 @@ resource "aws_cloudwatch_metric_alarm" "edrms_UnHealthy_Hosts" {
   period              = "60"
   evaluation_periods  = "5"
   threshold           = "0"
-  treat_missing_data  = "notBreaching"
+  treat_missing_data  = "breaching"
   dimensions = {
     LoadBalancer = aws_lb.edrms.arn_suffix
     TargetGroup  = aws_lb_target_group.edrms_target_group.arn_suffix
