@@ -64,3 +64,26 @@ resource "aws_sns_topic_policy" "guardduty_default" {
   arn    = aws_sns_topic.guardduty_alerts.arn
   policy = data.aws_iam_policy_document.guardduty_alerting_sns.json
 }
+
+# RDS minor upgrade notification changes 
+# SNS topic for RDS maintenance events
+
+resource "aws_sns_topic" "tds_maintenance_topic" {
+  name = "${local.application_name}-${local.environment}-tds-maintenance-topic"
+  kms_master_key_id = aws_kms_key.sns_rds_events.arn
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-${local.environment}-tds-maintenance-topic"
+  })
+}
+
+# SNS Topic policy 
+
+resource "aws_sns_topic_subscription" "rds_to_slack_lambda" {
+  topic_arn = aws_sns_topic.tds_maintenance_topic.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.cloudwatch_sns.arn
+
+  depends_on = [
+    aws_lambda_permission.allow_rds_sns_invoke
+  ]
+}

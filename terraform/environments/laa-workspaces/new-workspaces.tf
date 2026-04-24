@@ -1,26 +1,15 @@
 ##############################################
-### WorkSpaces Directory with IAM Identity Center
+### WorkSpaces Directory with Microsoft AD
 ###
-### ⚠️ MANUAL CREATION + IMPORT REQUIRED
-###
-### STEP 1: Create directory manually in AWS Console with IAM Identity Center
-### STEP 2: Add the directory ID to application_variables.json: workspaces_directory_id
-### STEP 3: Import into Terraform:
-###   terraform import aws_workspaces_directory.workspaces[0] d-xxxxxxxxxx
-### STEP 4: Apply to manage the configuration
-###
-### This resource will only be created when workspaces_directory_id is set in application_variables.json
+### This resource registers the AWS Managed Microsoft AD
+### with WorkSpaces to enable workspace provisioning.
 ##############################################
 
-resource "aws_workspaces_directory" "workspaces" {
-  count = (
-    local.environment == "development" &&
-    try(local.application_data.accounts[local.environment].workspaces_directory_id, "") != ""
-  ) ? 1 : 0
+resource "aws_workspaces_directory" "workspaces_ad" {
+  count = local.environment == "development" ? 1 : 0
 
-  # This directory_id comes from application_variables.json after manual creation
-  directory_id = local.application_data.accounts[local.environment].workspaces_directory_id
-  subnet_ids   = try(data.terraform_remote_state.workspace_components.outputs.private_subnet_ids, [])
+  directory_id = aws_directory_service_directory.workspaces_ad[0].id
+  subnet_ids   = data.terraform_remote_state.workspace_components.outputs.private_subnet_ids
 
   self_service_permissions {
     change_compute_type  = false
@@ -59,16 +48,11 @@ resource "aws_workspaces_directory" "workspaces" {
     local.tags,
     {
       "Name"               = "${local.application_name}-${local.environment}-workspaces-directory"
-      "AuthenticationType" = "IAM-Identity-Center"
-      "IdentityProvider"   = "IAMIdentityCenter"
-      "DirectoryType"      = "IAMIdentityCenter"
+      "AuthenticationType" = "ActiveDirectory"
+      "IdentityProvider"   = "MicrosoftAD"
+      "DirectoryType"      = "MicrosoftAD"
     }
   )
-
-  lifecycle {
-    # Prevent replacement if directory_id is updated after import
-    ignore_changes = [directory_id]
-  }
 }
 
 ##############################################
@@ -93,37 +77,43 @@ resource "aws_workspaces_ip_group" "workspaces" {
 }
 
 ##############################################
-### WorkSpaces Creation
+### WorkSpaces Creation with Microsoft AD
+###
+### Automatically creates WorkSpaces for users
+### defined in new-workspace-users.tf
 ##############################################
-# resource "aws_workspaces_workspace" "workspaces" {
-#   for_each = local.environment == "development" ? local.workspace_users : {}
-#
-#   directory_id = aws_workspaces_directory.workspaces[0].id
-#   bundle_id    = local.application_data.accounts[local.environment].workspace_bundle_id
-#   user_name    = each.value.email  # Use IAM Identity Center username (usually email)
-#
-#   root_volume_encryption_enabled = true
-#   user_volume_encryption_enabled = true
-#   volume_encryption_key          = data.aws_kms_key.ebs_shared.arn
-#
-#   workspace_properties {
-#     compute_type_name                         = local.workspace_types[each.value.instance_type].compute_type_name
-#     root_volume_size_gib                      = local.workspace_types[each.value.instance_type].root_volume_size_gib
-#     user_volume_size_gib                      = local.workspace_types[each.value.instance_type].user_volume_size_gib
-#     running_mode                              = local.workspace_types[each.value.instance_type].running_mode
-#     running_mode_auto_stop_timeout_in_minutes = local.workspace_types[each.value.instance_type].running_mode_auto_stop_timeout_in_minutes
-#   }
-#
-#   tags = merge(
-#     local.tags,
-#     {
-#       "Name"              = "${local.application_name}-${local.environment}-workspace-${each.key}"
-#       "User"              = each.key
-#       "Email"             = each.value.email
-#       "AuthSource"        = "IAMIdentityCenter"
-#       "IAMIdentityCenter" = local.application_data.accounts[local.environment].identity_center_instance_arn
-#     }
-#   )
-# }
-# }
 
+resource "aws_workspaces_workspace" "workspaces_ad" {
+  for_each = local.environment == "development" ? local.workspace_users : {}
+
+  directory_id = aws_workspaces_directory.workspaces_ad[0].id
+  bundle_id    = local.application_data.accounts[local.environment].workspace_bundle_id
+  user_name    = each.key  # AD username (sam-account-name)
+
+  root_volume_encryption_enabled = true
+  user_volume_encryption_enabled = true
+  volume_encryption_key          = aws_kms_key.ebs[0].arn
+
+  workspace_properties {
+    compute_type_name                         = local.workspace_types[each.value.instance_type].compute_type_name
+    root_volume_size_gib                      = local.workspace_types[each.value.instance_type].root_volume_size_gib
+    user_volume_size_gib                      = local.workspace_types[each.value.instance_type].user_volume_size_gib
+    running_mode                              = local.workspace_types[each.value.instance_type].running_mode
+    running_mode_auto_stop_timeout_in_minutes = local.workspace_types[each.value.instance_type].running_mode_auto_stop_timeout_in_minutes
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      "Name"       = "${local.application_name}-${local.environment}-workspace-${each.key}"
+      "User"       = each.key
+      "Email"      = each.value.email
+      "AuthSource" = "MicrosoftAD"
+    }
+  )
+
+  depends_on = [
+    terraform_data.ad_users,
+    aws_workspaces_directory.workspaces_ad
+  ]
+}

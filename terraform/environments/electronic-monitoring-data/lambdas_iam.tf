@@ -1930,3 +1930,70 @@ resource "aws_iam_role_policy_attachment" "mdss_reconciler_lambda_policy_attachm
   role       = aws_iam_role.mdss_reconciler.name
   policy_arn = aws_iam_policy.mdss_reconciler_lambda_role_policy.arn
 }
+
+
+# ----------------------------------------------------------------------------------------
+# create p1 export
+# ----------------------------------------------------------------------------------------
+
+module "create_p1_export_iam_policy" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+
+  name        = "create_p1_export"
+  path        = "/"
+  description = "Policy for creating P1 export"
+
+  policy = data.aws_iam_policy_document.p1_export_airflow.json
+
+  tags = local.tags
+}
+
+module "create_p1_export_iam_role" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+
+  name = "create_p1_export"
+
+  trust_policy_permissions = {
+    TrustRoleAndServiceToAssume = {
+      actions = [
+        "sts:AssumeRole",
+      ]
+      principals = [{
+        type = "Service"
+        identifiers = [
+          "lambda.amazonaws.com",
+        ]
+      }]
+    }
+  }
+
+  policies = {
+    main_policy = module.create_p1_export_iam_policy.arn
+  }
+
+  tags = local.tags
+}
+resource "aws_lakeformation_permissions" "lambda_p1_s3_access" {
+  principal   = module.create_p1_export_iam_role.arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+  data_location {
+    arn = aws_lakeformation_resource.data_bucket.arn
+  }
+}
+
+resource "aws_lakeformation_permissions" "lambda_p1_database_access" {
+  principal   = module.create_p1_export_iam_role.arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = "allied_mdss${local.db_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "lambda_p1_table_access" {
+  principal   = module.create_p1_export_iam_role.arn
+  permissions = ["SELECT"]
+  table {
+    database_name = "allied_mdss${local.db_suffix}"
+    wildcard      = true
+  }
+}

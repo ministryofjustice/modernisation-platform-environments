@@ -1,0 +1,78 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: whoami
+  labels:
+    compute.data-platform.service.justice.gov.uk/shared-gateway-enabled: "true"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whoami
+  namespace: whoami
+  labels:
+    app: whoami
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: whoami
+  template:
+    metadata:
+      labels:
+        app: whoami
+    spec:
+      nodeSelector:
+        compute.data-platform.service.justice.gov.uk/node-pool: general-spot-arm64
+      tolerations:
+        - key: "compute.data-platform.service.justice.gov.uk/node-pool"
+          operator: "Equal"
+          value: "general-spot-arm64"
+          effect: "NoSchedule"
+      containers:
+        - name: whoami
+          image: docker.io/traefik/whoami:v1.11@sha256:200689790a0a0ea48ca45992e0450bc26ccab5307375b41c84dfc4f2475937ab
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+            requests:
+              cpu: "250m"
+              memory: "128Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: whoami
+  namespace: whoami
+spec:
+  selector:
+    app: whoami
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: whoami-route
+  namespace: whoami
+spec:
+  parentRefs:
+    - name: shared-gateway
+      namespace: shared-services
+      sectionName: https
+  hostnames:
+    - whoami.development.data-platform.service.justice.gov.uk
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: whoami
+          port: 80

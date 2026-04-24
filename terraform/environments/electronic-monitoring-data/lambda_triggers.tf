@@ -299,3 +299,73 @@ resource "aws_lambda_permission" "mdss_reconciler_allow_eventbridge" {
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.mdss_reconciler_schedule[0].arn
 }
+
+#-----------------------------------------------------------------------------------
+# Create p1 exports
+#-----------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "schedule_p1_creation" {
+  name = "create-p1-export"
+  description = "Trigger the creation of P1 data export."
+
+  schedule_expression = "cron(0 7 * * ? *)"
+}
+
+resource "aws_cloudwatch_event_target" "schedule_p1_creation_target" {
+  rule = aws_cloudwatch_event_rule.schedule_p1_creation.name
+  arn  = aws_sqs_queue.p1_creation_queue.arn
+}
+
+resource "aws_sqs_queue" "p1_creation_queue_dlq" {
+  name                    = "p1-creation-queue-dlq"
+  sqs_managed_sse_enabled = true
+}
+
+resource "aws_sqs_queue" "p1_creation_queue" {
+  name                       = "p1-creation-queue"
+  visibility_timeout_seconds = 15 * 60
+  message_retention_seconds  = 1209600 # 14 days
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.p1_creation_queue_dlq.arn
+    maxReceiveCount     = 2
+  })
+  sqs_managed_sse_enabled = true
+}
+
+data "aws_iam_policy_document" "p1_create_export" {
+  statement {
+    sid    = "SendMessagesToTriggerP1Export"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+
+    actions   = ["sqs:SendMessage"]
+    resources = [aws_sqs_queue.p1_creation_queue.arn]
+
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_cloudwatch_event_rule.schedule_p1_creation.arn]
+    }
+  }
+}
+
+resource "aws_sqs_queue_policy" "p1_creation_policy" {
+  queue_url = aws_sqs_queue.p1_creation_queue.id
+  policy    = data.aws_iam_policy_document.p1_create_export.json
+}
+
+
+resource "aws_lambda_event_source_mapping" "p1_creation_trigger" {
+  event_source_arn = aws_sqs_queue.p1_creation_queue.arn
+  function_name    = module.create_p1_export.lambda_function_name
+
+  batch_size = 2
+
+  scaling_config {
+    maximum_concurrency = 2
+  }
+}

@@ -7,7 +7,7 @@ locals {
 
   baseline_presets_production = {
     options = {
-      db_backup_object_lock_days = null
+      db_backup_object_lock_days = 14
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "nomis-combined-reporting-production"

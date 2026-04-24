@@ -47,45 +47,13 @@ locals {
 
   # Define security group to security group rules with static keys
   loadbalancer_sg_ingress_rules = {
-    "lb_ingress_80_kali" = {
-      description      = "Loadbalancer ingress rule for HTTP from Kali"
-      from_port        = 80
-      to_port          = 80
-      protocol         = "tcp"
-      source_sg_name   = "kali_sg"
-      enabled_in_envs  = ["preproduction"]
-    }
     "lb_ingress_443_ec2" = {
-      description      = "Loadbalancer ingress rule for HTTPS from EC2"
-      from_port        = 443
-      to_port          = 443
-      protocol         = "tcp"
-      source_sg_name   = "ec2_sg"
-      enabled_in_envs  = ["preproduction", "development"]
-    }
-    "lb_ingress_443_kali" = {
-      description      = "Loadbalancer ingress rule for HTTPS from Kali"
-      from_port        = 443
-      to_port          = 443
-      protocol         = "tcp"
-      source_sg_name   = "kali_sg"
-      enabled_in_envs  = ["preproduction"]
-    }
-    "lb_ingress_9500_kali" = {
-      description      = "Loadbalancer ingress rule for HTTP 9500 from Kali"
-      from_port        = 9500
-      to_port          = 9500
-      protocol         = "tcp"
-      source_sg_name   = "kali_sg"
-      enabled_in_envs  = ["preproduction"]
-    }
-    "lb_ingress_9502_kali" = {
-      description      = "Loadbalancer ingress rule for HTTP 9502 from Kali"
-      from_port        = 9502
-      to_port          = 9502
-      protocol         = "tcp"
-      source_sg_name   = "kali_sg"
-      enabled_in_envs  = ["preproduction"]
+      description     = "Loadbalancer ingress rule for HTTPS from EC2"
+      from_port       = 443
+      to_port         = 443
+      protocol        = "tcp"
+      source_sg_name  = "ec2_sg"
+      enabled_in_envs = ["preproduction", "development"]
     }
   }
 
@@ -143,7 +111,7 @@ resource "aws_security_group_rule" "lb_ingress_sg_rules" {
   from_port                = each.value.from_port
   to_port                  = each.value.to_port
   protocol                 = each.value.protocol
-  source_security_group_id = each.value.source_sg_name == "ec2_sg" ? aws_security_group.ec2_sg[0].id : aws_security_group.kali_sg[0].id
+  source_security_group_id = aws_security_group.ec2_sg[0].id
 }
 
 resource "aws_security_group_rule" "lb_egress_rules" {

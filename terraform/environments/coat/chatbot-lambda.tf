@@ -23,9 +23,22 @@ data "archive_file" "rag_lambda" {
   output_path = "${path.module}/lambdas/rag-lambda/rag-lambda.zip"
 }
 
+resource "aws_security_group" "rag_lambda" {
+  name        = "${local.application_name}-${local.environment}-rag-lambda-security-group"
+  description = "RAG Lambda Security Group"
+  vpc_id      = data.aws_vpc.shared.id
+
+  egress {
+    description = "outbound access"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_lambda_function" "rag_lambda" {
   #checkov:skip=CKV_AWS_173:No sensitive information stored in Lambda environment variables
-  #checkov:skip=CKV_AWS_117:This Lambda doesn't need VPC
   #checkov:skip=CKV_AWS_116:Queue it self has DLQ so Lambda fail should redrive to DLQ
   #checkov:skip=CKV_AWS_272:Doesn't need code signing
 
@@ -42,6 +55,11 @@ resource "aws_lambda_function" "rag_lambda" {
   source_code_hash = data.archive_file.rag_lambda.output_base64sha256
 
   reserved_concurrent_executions = 10
+
+  vpc_config {
+    security_group_ids = [aws_security_group.rag_lambda.id]
+    subnet_ids         = [data.aws_subnet.private_subnets_a.id]
+  }
 
   tracing_config {
     mode = "PassThrough"
@@ -165,7 +183,7 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
     actions = ["secretsmanager:GetSecretValue"]
 
     resources = [
-      "arn:aws:secretsmanager:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:secret:llm_gateway_key-HDBjRn",
+      "arn:aws:secretsmanager:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:secret:llm_gateway_key-USBFqg",
       "arn:aws:secretsmanager:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:secret:llm_gateway_key-1biv4G"
     ]
   }
@@ -188,10 +206,13 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
   }
 }
 
+resource "aws_iam_role_policy_attachment" "rag_lambda_vpc_access" {
+  role       = aws_iam_role.rag_lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
 # Secrets
 
 resource "aws_secretsmanager_secret" "llm_gateway_key" {
-  count = local.is-development ? 0 : 1
-
   name = "llm_gateway_key"
 }

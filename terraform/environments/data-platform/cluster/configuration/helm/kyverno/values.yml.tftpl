@@ -1,0 +1,82 @@
+---
+admissionController:
+  hostNetwork: true
+  dnsPolicy: ClusterFirstWithHostNet
+  replicas: 3
+  serviceMonitor:
+    enabled: true
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+backgroundController:
+  replicas: 2
+  serviceMonitor:
+    enabled: true
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+cleanupController:
+  replicas: 2
+  serviceMonitor:
+    enabled: true
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+reportsController:
+  replicas: 2
+  serviceMonitor:
+    enabled: true
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+
+crds:
+  migration:
+    nodeSelector:
+      compute.data-platform.service.justice.gov.uk/node: system
+    tolerations:
+      - key: compute.data-platform.service.justice.gov.uk/node
+        operator: Equal
+        value: system
+        effect: NoSchedule
+
+webhooksCleanup:
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+
+config:
+  resourceFiltersExcludeNamespaces:
+    # System and platform namespaces excluded from Kyverno resource filtering.
+    - kube-system
+    - cilium-secrets
+    - amazon-guardduty
+    - amazon-network-flow-monitor
+    - cluster-autoscaler
+    - prometheus
+    - fluent-bit
+
+features:
+  controllerRuntimeMetrics:
+    # -- Bind address for controller-runtime metrics (use "0" to disable it)
+    bindAddress: ":7070"

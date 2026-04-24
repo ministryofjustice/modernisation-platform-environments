@@ -22,7 +22,7 @@ resource "aws_db_instance" "tds_db" {
   auto_minor_version_upgrade          = true
   storage_type                        = "gp3"
   engine                              = "oracle-se2"
-  engine_version                      = "19.0.0.0.ru-2025-10.rur-2025-10.r1"
+#  engine_version                      = "19.0.0.0.ru-2025-10.rur-2025-10.r1"
   instance_class                      = local.application_data.accounts[local.environment].tds_db_instance_type
   multi_az                            = local.application_data.accounts[local.environment].tds_db_deploy_to_multi_azs
   db_name                             = "EDRMSTDS"
@@ -59,4 +59,30 @@ resource "aws_db_instance" "tds_db" {
     delete = "40m"
     update = "80m"
   }
+   lifecycle {
+    ignore_changes = [engine_version]
+  }
+}
+
+# RDS Minor upgrade notification changes 
+# RDS maintenance event notification sent from DB to SNS topic
+
+resource "aws_db_event_subscription" "tds_rds_maintenance_notifications" {
+  name      = "${local.application_name}-${local.environment}-tds-rds-maintenance"
+  sns_topic = aws_sns_topic.tds_maintenance_topic.arn
+
+  source_type = "db-instance"
+  source_ids  = [aws_db_instance.tds_db.identifier]
+
+  event_categories = ["maintenance"]
+  enabled          = true
+
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-${local.environment}-tds-rds-maintenance"
+  })
+
+  depends_on = [
+    aws_db_instance.tds_db,
+    aws_sns_topic.tds_maintenance_topic
+  ]
 }

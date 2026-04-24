@@ -8,6 +8,10 @@ data "aws_eks_cluster" "apc_cluster" {
   name = local.eks_cluster_name
 }
 
+data "aws_eks_cluster_auth" "apc_cluster" {
+  name = data.aws_eks_cluster.apc_cluster.name
+}
+
 # Secrets Manager
 data "aws_secretsmanager_secret_version" "actions_runners_github_app_apc_self_hosted_runners_secret" {
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
