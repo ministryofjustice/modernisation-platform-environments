@@ -10,6 +10,7 @@ module "acm_certificate" {
 
   name                                = each.key
   domain_name                         = each.value.domain_name
+  export                              = each.value.export
   subject_alternate_names             = each.value.subject_alternate_names
   route53_zones                       = local.route53_zones
   validation                          = each.value.validation

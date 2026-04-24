@@ -15,7 +15,7 @@ DATABASE = os.environ["DATABASE"]
 S3_OUTPUT_PATH = os.environ["S3_OUTPUT_PATH"].rstrip("/")
 S3_ATHENA_RESULTS_PATH = os.environ["S3_ATHENA_RESULTS_PATH"].rstrip("/")
 
-LOTS = ["LOT1", "LOT2", "LOT3", "LOT4", "LOT5"]
+LOTS = ["1", "2", "3", "4", "5"]
 
 TABLES = [
     "property_cafm__acm_action_plan_record",
