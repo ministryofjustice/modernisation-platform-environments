@@ -10,13 +10,13 @@ resource "aws_s3_bucket" "files_bucket" {
 
 
   tags = {
-    Name        = "${local.application_name}-bucket-to-upload-ec2-files"
+    Name = "${local.application_name}-bucket-to-upload-ec2-files"
   }
 }
 
 # Block all public access (EC2 accesses via IAM role, not public URLs)
 resource "aws_s3_bucket_public_access_block" "files_bucket" {
-  count         = contains(["preproduction", "development"], local.environment) ? 1 : 0
+  count  = contains(["preproduction", "development"], local.environment) ? 1 : 0
   bucket = aws_s3_bucket.files_bucket[0].id
 
   block_public_acls       = true
@@ -29,7 +29,7 @@ resource "aws_s3_bucket_public_access_block" "files_bucket" {
 
 # Enable versioning (optional but recommended)
 resource "aws_s3_bucket_versioning" "files_bucket" {
-  count         = contains(["preproduction", "development"], local.environment) ? 1 : 0
+  count  = contains(["preproduction", "development"], local.environment) ? 1 : 0
   bucket = aws_s3_bucket.files_bucket[0].id
 
   versioning_configuration {
@@ -59,12 +59,12 @@ resource "aws_s3_bucket_policy" "files_bucket" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid       = "AllowOnlyEC2Role"
-        Effect    = "Allow"
+        Sid    = "AllowOnlyEC2Role"
+        Effect = "Allow"
         Principal = {
           AWS = aws_iam_role.ec2_instance_role_new[0].arn
         }
-        Action   = ["s3:GetObject", "s3:ListBucket"]
+        Action = ["s3:GetObject", "s3:ListBucket"]
         Resource = [
           aws_s3_bucket.files_bucket[0].arn,
           "${aws_s3_bucket.files_bucket[0].arn}/*"

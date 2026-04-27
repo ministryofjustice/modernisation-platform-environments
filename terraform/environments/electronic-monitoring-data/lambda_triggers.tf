@@ -305,7 +305,7 @@ resource "aws_lambda_permission" "mdss_reconciler_allow_eventbridge" {
 #-----------------------------------------------------------------------------------
 
 resource "aws_cloudwatch_event_rule" "schedule_p1_creation" {
-  name = "create-p1-export"
+  name        = "create-p1-export"
   description = "Trigger the creation of P1 data export."
 
   schedule_expression = "cron(0 7 * * ? *)"
