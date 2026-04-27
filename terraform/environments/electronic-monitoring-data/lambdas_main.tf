@@ -662,6 +662,7 @@ module "cloudwatch_alarm_threader" {
   subnet_ids         = data.aws_subnets.shared-private.ids
 
   environment_variables = {
+    POWERTOOLS_LOG_LEVEL             = "INFO"    
     SNS_TOPIC_ARN                    = aws_sns_topic.emds_alerts.arn
     STATE_BUCKET                     = local.alarm_thread_state_bucket
     STATE_PREFIX                     = local.alarm_thread_state_prefix
@@ -671,8 +672,8 @@ module "cloudwatch_alarm_threader" {
     GLUE_DB_JANITOR_STATE_MACHINE_ARN = (
       aws_sfn_state_machine.staging_db_janitor.arn
     )
-    GLUE_DB_JANITOR_STALE_MINUTES    = "120"
-    GLUE_DB_JANITOR_BATCH_SIZE       = "250"
+    GLUE_DB_JANITOR_STALE_MINUTES    = "60"
+    GLUE_DB_JANITOR_BATCH_SIZE       = "2000"
   }
 }
 
@@ -818,6 +819,7 @@ module "staging_db_janitor" {
   subnet_ids         = data.aws_subnets.shared-private.ids
 
   environment_variables = {
+    POWERTOOLS_LOG_LEVEL  = "INFO"    
     SNS_TOPIC_ARN         = aws_sns_topic.emds_alerts.arn
     ENVIRONMENT           = local.environment_shorthand
     STAGING_BUCKET        = module.s3-create-a-derived-table-bucket.bucket.id
