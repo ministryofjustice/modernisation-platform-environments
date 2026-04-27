@@ -22,9 +22,9 @@
       "api_server_port": "8443",
       "aws_region": "eu-west-2",
       "app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-financial-transfers",
-      "container_version": "0.0.29-test",
-      "container_cpu": "2048",
-      "container_memory": "7168",
+      "container_version": "latest",
+      "container_cpu": "512",
+      "container_memory": "1024",
       "lz_aws_workspace_nonprod_prod": "10.200.0.0/19",
       "lz_aws_appstream_subnet_a_b": "10.200.32.0/23"
     }
