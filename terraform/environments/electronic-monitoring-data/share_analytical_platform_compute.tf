@@ -63,7 +63,7 @@ locals {
     "g4s_tasking",
   ] : local.is-development ? ["test"] : []
 
-  prod_dbs_to_grant = [
+  prod_dbs_to_grant = local.is-production ? [
     "am_stg",
     "buddi_stg",
     "buddi_buddi",
@@ -99,7 +99,43 @@ locals {
     "staged_emsys_mvp",
     "staged_emsys_tpims",
     "staged_scram_alcohol_monitoring",
-  ]
+  ] : local.is-preproduction ? [
+    "am_stg",
+    "buddi_stg",
+    "buddi_buddi",
+    "cap_dw_stg",
+    "curated_alcohol_monitoring",
+    "curated_cap_dw",
+    "curated_emsys_mvp",
+    "curated_emsys_tpims",
+    "curated_fep",
+    "curated_scram_alcohol_monitoring",
+    "emd_historic_int",
+    "emsys_mvp_stg",
+    "emsys_tpims_stg",
+    "g4s_atrium_curated",
+    "g4s_centurion_curated",
+    "g4s_integrity_curated",
+    "g4s_lcm_archive_curated",
+    "g4s_lcm_curated",
+    "g4s_tasking_curated",
+    "historic_api_mart",
+    "historic_api_mart_mock",
+    "historic_ears_and_sars_int",
+    "historic_ears_and_sars_mart",
+    "intermediate_tasking",
+    "preprocessed_alcohol_monitoring",
+    "preprocessed_cap_dw",
+    "preprocessed_emsys_mvp",
+    "preprocessed_emsys_tpims",
+    "preprocessed_scram_alcohol_monitoring",
+    "sar_ear_reports_mart",
+    "staged_alcohol_monitoring",
+    "staged_cap_dw",
+    "staged_emsys_mvp",
+    "staged_emsys_tpims",
+    "staged_scram_alcohol_monitoring",
+  ] : local.is-development ? ["test"] : []
 
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
   prod_dbt_dbs_to_grant  = flatten([[for db in local.prod_dbs_to_grant : "${db}${local.dbt_suffix}"], local.dev_dbs_to_grant])
