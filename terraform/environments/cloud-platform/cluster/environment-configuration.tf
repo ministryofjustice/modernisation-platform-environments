@@ -38,10 +38,10 @@ locals {
         }
 
         labels = {
-          Terraform                                  = "true"
-          "cloud-platform.justice.gov.uk/default-ng" = "true"
+          Terraform                                      = "true"
+          "cloud-platform.justice.gov.uk/default-ng"     = "true"
           "container-platform.justice.gov.uk/default-ng" = "true"
-          Cluster                                    = local.environment
+          Cluster                                        = local.environment
         }
       }
 
@@ -67,10 +67,10 @@ locals {
         }
 
         labels = {
-          Terraform                                  = "true"
-          "cloud-platform.justice.gov.uk/default-ng" = "true"
+          Terraform                                      = "true"
+          "cloud-platform.justice.gov.uk/default-ng"     = "true"
           "container-platform.justice.gov.uk/default-ng" = "true"
-          Cluster                                    = local.environment
+          Cluster                                        = local.environment
         }
       }
 
@@ -104,10 +104,10 @@ locals {
         }
 
         labels = {
-          Terraform                                     = "true"
-          "cloud-platform.justice.gov.uk/monitoring-ng" = "true"
+          Terraform                                         = "true"
+          "cloud-platform.justice.gov.uk/monitoring-ng"     = "true"
           "container-platform.justice.gov.uk/monitoring-ng" = "true"
-          Cluster                                       = local.environment
+          Cluster                                           = local.environment
         }
       }
       system_ng = {
@@ -140,10 +140,10 @@ locals {
         }
 
         labels = {
-          Terraform                                 = "true"
-          "cloud-platform.justice.gov.uk/system-ng" = "true"
+          Terraform                                     = "true"
+          "cloud-platform.justice.gov.uk/system-ng"     = "true"
           "container-platform.justice.gov.uk/system-ng" = "true"
-          Cluster                                   = local.environment
+          Cluster                                       = local.environment
         }
       }
     }
@@ -184,10 +184,10 @@ locals {
         }
 
         labels = {
-          Terraform                                  = "true"
-          "cloud-platform.justice.gov.uk/default-ng" = "true"
+          Terraform                                      = "true"
+          "cloud-platform.justice.gov.uk/default-ng"     = "true"
           "container-platform.justice.gov.uk/default-ng" = "true"
-          Cluster                                    = local.environment
+          Cluster                                        = local.environment
         }
       }
 
@@ -221,10 +221,10 @@ locals {
         }
 
         labels = {
-          Terraform                                     = "true"
-          "cloud-platform.justice.gov.uk/monitoring-ng" = "true"
+          Terraform                                         = "true"
+          "cloud-platform.justice.gov.uk/monitoring-ng"     = "true"
           "container-platform.justice.gov.uk/monitoring-ng" = "true"
-          Cluster                                       = local.environment
+          Cluster                                           = local.environment
         }
       }
       system_ng = {
@@ -257,10 +257,10 @@ locals {
         }
 
         labels = {
-          Terraform                                 = "true"
-          "cloud-platform.justice.gov.uk/system-ng" = "true"
+          Terraform                                     = "true"
+          "cloud-platform.justice.gov.uk/system-ng"     = "true"
           "container-platform.justice.gov.uk/system-ng" = "true"
-          Cluster                                   = local.environment
+          Cluster                                       = local.environment
         }
       }
     }
@@ -301,10 +301,10 @@ locals {
         }
 
         labels = {
-          Terraform                                  = "true"
-          "cloud-platform.justice.gov.uk/default-ng" = "true"
+          Terraform                                      = "true"
+          "cloud-platform.justice.gov.uk/default-ng"     = "true"
           "container-platform.justice.gov.uk/default-ng" = "true"
-          Cluster                                    = local.environment
+          Cluster                                        = local.environment
         }
       }
 
@@ -338,10 +338,10 @@ locals {
         }
 
         labels = {
-          Terraform                                     = "true"
-          "cloud-platform.justice.gov.uk/monitoring-ng" = "true"
+          Terraform                                         = "true"
+          "cloud-platform.justice.gov.uk/monitoring-ng"     = "true"
           "container-platform.justice.gov.uk/monitoring-ng" = "true"
-          Cluster                                       = local.environment
+          Cluster                                           = local.environment
         }
       }
       system_ng = {
@@ -374,10 +374,10 @@ locals {
         }
 
         labels = {
-          Terraform                                 = "true"
-          "cloud-platform.justice.gov.uk/system-ng" = "true"
+          Terraform                                     = "true"
+          "cloud-platform.justice.gov.uk/system-ng"     = "true"
           "container-platform.justice.gov.uk/system-ng" = "true"
-          Cluster                                   = local.environment
+          Cluster                                       = local.environment
         }
       }
     }
@@ -418,10 +418,10 @@ locals {
         }
 
         labels = {
-          Terraform                                  = "true"
-          "cloud-platform.justice.gov.uk/default-ng" = "true"
+          Terraform                                      = "true"
+          "cloud-platform.justice.gov.uk/default-ng"     = "true"
           "container-platform.justice.gov.uk/default-ng" = "true"
-          Cluster                                    = local.environment
+          Cluster                                        = local.environment
         }
       }
 
@@ -455,10 +455,10 @@ locals {
         }
 
         labels = {
-          Terraform                                     = "true"
-          "cloud-platform.justice.gov.uk/monitoring-ng" = "true"
+          Terraform                                         = "true"
+          "cloud-platform.justice.gov.uk/monitoring-ng"     = "true"
           "container-platform.justice.gov.uk/monitoring-ng" = "true"
-          Cluster                                       = local.environment
+          Cluster                                           = local.environment
         }
       }
       system_ng = {
@@ -491,10 +491,10 @@ locals {
         }
 
         labels = {
-          Terraform                                 = "true"
-          "cloud-platform.justice.gov.uk/system-ng" = "true"
+          Terraform                                     = "true"
+          "cloud-platform.justice.gov.uk/system-ng"     = "true"
           "container-platform.justice.gov.uk/system-ng" = "true"
-          Cluster                                   = local.environment
+          Cluster                                       = local.environment
         }
       }
     }
@@ -535,10 +535,10 @@ locals {
         }
 
         labels = {
-          Terraform                                  = "true"
-          "cloud-platform.justice.gov.uk/default-ng" = "true"
+          Terraform                                      = "true"
+          "cloud-platform.justice.gov.uk/default-ng"     = "true"
           "container-platform.justice.gov.uk/default-ng" = "true"
-          Cluster                                    = local.environment
+          Cluster                                        = local.environment
         }
       }
 
@@ -572,10 +572,10 @@ locals {
         }
 
         labels = {
-          Terraform                                     = "true"
-          "cloud-platform.justice.gov.uk/monitoring-ng" = "true"
+          Terraform                                         = "true"
+          "cloud-platform.justice.gov.uk/monitoring-ng"     = "true"
           "container-platform.justice.gov.uk/monitoring-ng" = "true"
-          Cluster                                       = local.environment
+          Cluster                                           = local.environment
         }
       }
       system_ng = {
@@ -608,10 +608,10 @@ locals {
         }
 
         labels = {
-          Terraform                                 = "true"
-          "cloud-platform.justice.gov.uk/system-ng" = "true"
+          Terraform                                     = "true"
+          "cloud-platform.justice.gov.uk/system-ng"     = "true"
           "container-platform.justice.gov.uk/system-ng" = "true"
-          Cluster                                   = local.environment
+          Cluster                                       = local.environment
         }
       }
     }

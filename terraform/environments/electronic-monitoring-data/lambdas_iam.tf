@@ -1937,7 +1937,7 @@ resource "aws_iam_role_policy_attachment" "mdss_reconciler_lambda_policy_attachm
 # ----------------------------------------------------------------------------------------
 
 module "create_p1_export_iam_policy" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  source = "terraform-aws-modules/iam/aws//modules/iam-policy"
 
   name        = "create_p1_export"
   path        = "/"
@@ -1949,7 +1949,7 @@ module "create_p1_export_iam_policy" {
 }
 
 module "create_p1_export_iam_role" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  source = "terraform-aws-modules/iam/aws//modules/iam-role"
 
   name = "create_p1_export"
 
