@@ -460,6 +460,7 @@ def lambda_handler(event, context):
     # SNS message comes in event['Records'][0]['Sns']
     sns_message = event['Records'][0]['Sns']
     message_str = sns_message.get('Message', '{}')
+    message_str = ''.join(c for c in message_str if ord(c) >= 32 or c in '\t')
 
     # Check for SNS control message types and ignore them
     sns_type = sns_message.get('Type', '')
