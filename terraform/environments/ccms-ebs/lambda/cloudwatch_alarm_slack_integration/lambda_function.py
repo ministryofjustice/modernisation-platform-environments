@@ -352,47 +352,79 @@ class NotificationService:
             }
 
         elif type == "S3 Event":
-            records = alarmdetails.get("Records", [])
-            record = records[0] if records else {}
-
-            s3_info = record.get("s3", {})
-            bucket = s3_info.get("bucket", {})
-            obj = s3_info.get("object", {})
-
-            bucket_name = bucket.get("name", "Unknown Bucket")
-            object_key = obj.get("key", "Unknown Key")
-            object_size = obj.get("size", "Unknown Size")
-
-            user_identity = record.get("userIdentity", {})
-            principal_id = user_identity.get("principalId", "Unknown Principal")
-            if "rejected" in object_key.lower():
-                emoji = ":broken_heart:"
-            else:             
-                emoji = ":white_check_mark:"
-
-            header = f"{emoji} *S3 Object Uploaded on bucket {bucket_name}.*"
-
-            payload = {
-                "blocks": [
-                    {
-                        "type": "section",
-                        "text": {"type": "mrkdwn", "text": header}
-                    },
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": (
-                                "*Details*\n"
-                                f" • *Object:* `s3://{bucket_name}/{object_key}`\n"
-                                f" • *Size (bytes):* {object_size} bytes\n"
-                                f" • *Principal:* {principal_id}\n"
-                                f" • *Timestamp:* {timestamp}"
-                            )
+            if "Records" not in alarmdetails or not alarmdetails["Records"]:
+                s3_info = alarmdetails.get("detail", {})
+                bucket_name = s3_info.get("bucket", {}).get("name", "Unknown Bucket")
+                object_key = s3_info.get("object", {}).get("key", "Unknown Key")
+                object_size = s3_info.get("object", {}).get("size", "Unknown Size")
+                if "inbound" in object_key.lower():
+                    emoji =  ":white_check_mark:"
+                header = f"{emoji} *S3 Object Uploaded on bucket {bucket_name}.*"
+                source_ip = alarmdetails.get("detail", {}).get("source-ip-address", "Unknown Source IP")
+                payload = {
+                    "blocks": [
+                        {
+                            "type": "section",
+                            "text": {"type": "mrkdwn", "text": header}
+                        },
+                        {
+                            "type": "section",
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": (
+                                    "*Details*\n"
+                                    f" • *Object:* `s3://{bucket_name}/{object_key}`\n"
+                                    f" • *Size (bytes):* {object_size} bytes\n"
+                                    f" • *SourceIpAddress:* {source_ip}\n"
+                                    f" • *Timestamp:* {timestamp}"
+                                )
+                            }
                         }
-                    }
-                ]
-            }
+                    ]
+                }
+            if "Records" in alarmdetails and alarmdetails["Records"]:
+                records = alarmdetails.get("Records", [])
+                record = records[0] if records else {}
+
+
+                s3_info = record.get("s3", {})
+                bucket = s3_info.get("bucket", {})
+                obj = s3_info.get("object", {})
+
+                bucket_name = bucket.get("name", "Unknown Bucket")
+                object_key = obj.get("key", "Unknown Key")
+                object_size = obj.get("size", "Unknown Size")
+
+                user_identity = record.get("userIdentity", {})
+                principal_id = user_identity.get("principalId", "Unknown Principal")
+                if "rejected" in object_key.lower():
+                    emoji = ":broken_heart:"
+                else:             
+                    emoji = ":white_check_mark:"
+
+                header = f"{emoji} *S3 Object Uploaded on bucket {bucket_name}.*"
+
+                payload = {
+                    "blocks": [
+                        {
+                            "type": "section",
+                            "text": {"type": "mrkdwn", "text": header}
+                        },
+                        {
+                            "type": "section",
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": (
+                                    "*Details*\n"
+                                    f" • *Object:* `s3://{bucket_name}/{object_key}`\n"
+                                    f" • *Size (bytes):* {object_size} bytes\n"
+                                    f" • *Principal:* {principal_id}\n"
+                                    f" • *Timestamp:* {timestamp}"
+                                )
+                            }
+                        }
+                    ]
+                }
 
         # ---------------- Fallback ----------------
         else:
@@ -487,26 +519,75 @@ def lambda_handler(event, context):
     # Parse combined configuration
     logger.info("Parsing configuration from environment and secrets")
     config = parse_config_from_env_and_secrets(env_config, secrets_data)
-    
-    # SNS message for CloudWatch Alarms, GuardDuty findings and S3 events comes in event['Records'][0]['Sns']
-    if "Records" not in event or not event["Records"]:
-        message_str = json.dumps(event)
-        logger.warning("No SNS Records found in event; using entire event as message")
-        try:
-            alarm_details = json.loads(message_str)
-            logger.info("alarm_details:" + json.dumps(alarm_details, indent=2))
-            source = message_str.get('source')
-            if not source:
 
+    sns_message = event['Records'][0]['Sns']
+    message_str = sns_message.get('Message', '{}')
+    
+    # Check for SNS control message types and ignore them
+    sns_type = sns_message.get('Type', '')
+    if sns_type in ("SubscriptionConfirmation", "UnsubscribeConfirmation"):
+        logger.info(f"Ignoring SNS control message Type={sns_type}")
+        return
+
+    try:
+        alarm_details = json.loads(message_str)
+        logger.info("alarm_details:" + json.dumps(alarm_details, indent=2))
+
+        # Detect source:
+        # - GuardDuty / CloudWatch / EventBridge-style -> 'source'
+        # - S3 via SNS -> Records[0].eventSource == 'aws:s3'
+        source = alarm_details.get('source')
+        if not source and "Records" in alarm_details:
+            first_record = alarm_details["Records"][0]
+            event_source = first_record.get("eventSource")
+            if event_source == "aws:s3":
+                source = "aws.s3"
+
+        # helper to detect CloudWatch Alarm payloads (SNS -> CloudWatch Alarms often have no 'source')
+        def looks_like_cloudwatch_alarm(d: dict) -> bool:  
+            if not isinstance(d, dict):                     
+                return False                                
+            required = ("AlarmName", "NewStateValue")   
+            return all(k in d for k in required)
+
+        if not source:
+        #     # Default to CloudWatch if nothing else matches
+        #     # source = "aws.cloudwatch"
+            if looks_like_cloudwatch_alarm(alarm_details):
+                source = "aws.cloudwatch"                    
+            else:
                 logger.warning(
                     "Source not detected and payload does not look like a CloudWatch Alarm; skipping notification."
                 )
                 return
-            logger.info("S3 event detected in EventBridge event")
-            logger.info("Starting Notification to Slack for S3 Event via EventBridge Event")
+        
+        logger.info("source:" + str(source))
 
-            # S3 time is in the record
-            timestamp_str = alarm_details.get("time")
+        # ---------------- GuardDuty ----------------
+        if source == "aws.guardduty":
+            logger.info("GuardDuty finding detected in SNS message")
+            logger.info("Starting Notification to Slack for GuardDuty Alarm via SNS Topic")
+
+            timestamp_str = alarm_details.get('time')
+            if timestamp_str:
+                dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%SZ")
+                formatted = dt.strftime("%a, %d %b %Y %H:%M:%S UTC")
+
+            channelconfig = config.slack_channel_webhook_guardduty
+            alarmnotifiction = "GuardDuty Finding Notification"
+            type = "GuardDuty"
+            is_error = True  # usually "bad" findings
+
+        # ---------------- S3 Event ----------------
+        elif source == "aws.s3":
+            logger.info("S3 event detected in SNS message")
+            logger.info("Starting Notification to Slack for S3 Event via SNS Topic")
+            if "Records" not in alarm_details or not alarm_details["Records"]:
+                timestamp_str = alarm_details.get('time')
+            if "Records" in alarm_details and alarm_details["Records"]:
+                # S3 time is in the record
+                first_record = alarm_details["Records"][0]
+                timestamp_str = first_record.get("eventTime")
             if timestamp_str:
                 # Example: 2026-01-12T16:10:07.364Z
                 try:
@@ -519,191 +600,68 @@ def lambda_handler(event, context):
             alarmnotifiction = "S3 Object Event Notification"
             type = "S3 Event"
             is_error = False   # S3 put is informational
-            # Initialize services
-            notification_service = NotificationService(
-                channelconfig, context.function_name
-            )
 
-            notification_service.send_notification(
-                alarmnotifiction,
-                alarm_details,
-                formatted,
-                type,
-                is_error
-            )
+        # ---------------- CloudWatch Alarm (default) ----------------
+        else:
+            logger.info("CloudWatch Alarm detected in SNS message")
+            logger.info("Starting Notification to Slack for CloudWatch Alarm via SNS Topic")
 
-            # Prepare response
-            response = {
-                "statusCode": 200,
-                "body": {
-                    "message": "Successfully completed publishing notifications"
-                },
-            }
+            timestamp_str = sns_message.get('Timestamp')
+            if timestamp_str:
+                dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+                formatted = dt.strftime("%a, %d %b %Y %H:%M:%S UTC")
 
-            logger.info(f"Lambda execution completed successfully: {response}")
-            return response
-        except Exception as e:
-            error_msg = f"Lambda execution failed:\n{str(e)}"
-            logger.error(error_msg, exc_info=True)
+            channelconfig = config.slack_channel_webhook
+            alarmnotifiction = "CloudWatch Alarm Notification"
+            type = "CloudWatch Alarm"
 
-            # Send error notification if notification service is available
-            if notification_service is not None:
-                try:
-                    notification_service.send_notification(
-                        "Lambda Execution Failed", {"error": error_msg}, formatted, type, is_error=True
-                    )
-                except Exception as notification_error:
-                    logger.error(f"Failed to send error notification: {notification_error}")
+            new_state = alarm_details.get('NewStateValue', '')
+            if new_state == "OK":
+                is_error = False
 
-            # Return error response
-            return {"statusCode": 500, "body": {"error": error_msg}}
-        finally:
-            current, peak = tracemalloc.get_traced_memory()
-            logger.info(
-                f"Current memory usage: {current / 1024 / 1024:.2f} MB; Peak: {peak / 1024 / 1024:.2f} MB"
-            )
-            tracemalloc.stop()
-    if "Records" in event and event["Records"]:
-        sns_message = event['Records'][0]['Sns']
-        message_str = sns_message.get('Message', '{}')
-     
-        # Check for SNS control message types and ignore them
-        sns_type = sns_message.get('Type', '')
-        if sns_type in ("SubscriptionConfirmation", "UnsubscribeConfirmation"):
-            logger.info(f"Ignoring SNS control message Type={sns_type}")
-            return
+        # Initialize services
+        notification_service = NotificationService(
+            channelconfig, context.function_name
+        )
 
-        try:
-            alarm_details = json.loads(message_str)
-            logger.info("alarm_details:" + json.dumps(alarm_details, indent=2))
+        notification_service.send_notification(
+            alarmnotifiction,
+            alarm_details,
+            formatted,
+            type,
+            is_error
+        )
 
-            # Detect source:
-            # - GuardDuty / CloudWatch / EventBridge-style -> 'source'
-            # - S3 via SNS -> Records[0].eventSource == 'aws:s3'
-            source = alarm_details.get('source')
-            if not source and "Records" in alarm_details:
-                first_record = alarm_details["Records"][0]
-                event_source = first_record.get("eventSource")
-                if event_source == "aws:s3":
-                    source = "aws.s3"
+        # Prepare response
+        response = {
+            "statusCode": 200,
+            "body": {
+                "message": "Successfully completed publishing notifications"
+            },
+        }
 
-            # helper to detect CloudWatch Alarm payloads (SNS -> CloudWatch Alarms often have no 'source')
-            def looks_like_cloudwatch_alarm(d: dict) -> bool:  
-                if not isinstance(d, dict):                     
-                    return False                                
-                required = ("AlarmName", "NewStateValue")   
-                return all(k in d for k in required)
+        logger.info(f"Lambda execution completed successfully: {response}")
+        return response
 
-            if not source:
-            #     # Default to CloudWatch if nothing else matches
-            #     # source = "aws.cloudwatch"
-                if looks_like_cloudwatch_alarm(alarm_details):
-                    source = "aws.cloudwatch"                    
-                else:
-                    logger.warning(
-                        "Source not detected and payload does not look like a CloudWatch Alarm; skipping notification."
-                    )
-                    return
-            
-            logger.info("source:" + str(source))
+    except Exception as e:
+        error_msg = f"Lambda execution failed:\n{str(e)}"
+        logger.error(error_msg, exc_info=True)
 
-            # ---------------- GuardDuty ----------------
-            if source == "aws.guardduty":
-                logger.info("GuardDuty finding detected in SNS message")
-                logger.info("Starting Notification to Slack for GuardDuty Alarm via SNS Topic")
+        # Send error notification if notification service is available
+        if notification_service is not None:
+            try:
+                notification_service.send_notification(
+                    "Lambda Execution Failed", {"error": error_msg}, formatted, type, is_error=True
+                )
+            except Exception as notification_error:
+                logger.error(f"Failed to send error notification: {notification_error}")
 
-                timestamp_str = alarm_details.get('time')
-                if timestamp_str:
-                    dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%SZ")
-                    formatted = dt.strftime("%a, %d %b %Y %H:%M:%S UTC")
-
-                channelconfig = config.slack_channel_webhook_guardduty
-                alarmnotifiction = "GuardDuty Finding Notification"
-                type = "GuardDuty"
-                is_error = True  # usually "bad" findings
-
-            # ---------------- S3 Event ----------------
-            elif source == "aws.s3":
-                logger.info("S3 event detected in SNS message")
-                logger.info("Starting Notification to Slack for S3 Event via SNS Topic")
-
-                # S3 time is in the record
-                first_record = alarm_details["Records"][0]
-                timestamp_str = first_record.get("eventTime")
-                if timestamp_str:
-                    # Example: 2026-01-12T16:10:07.364Z
-                    try:
-                        dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
-                    except ValueError:
-                        dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%SZ")
-                    formatted = dt.strftime("%d %b %Y %H:%M:%S UTC")
-
-                channelconfig = config.slack_channel_webhook_s3
-                alarmnotifiction = "S3 Object Event Notification"
-                type = "S3 Event"
-                is_error = False   # S3 put is informational
-
-            # ---------------- CloudWatch Alarm (default) ----------------
-            else:
-                logger.info("CloudWatch Alarm detected in SNS message")
-                logger.info("Starting Notification to Slack for CloudWatch Alarm via SNS Topic")
-
-                timestamp_str = sns_message.get('Timestamp')
-                if timestamp_str:
-                    dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
-                    formatted = dt.strftime("%a, %d %b %Y %H:%M:%S UTC")
-
-                channelconfig = config.slack_channel_webhook
-                alarmnotifiction = "CloudWatch Alarm Notification"
-                type = "CloudWatch Alarm"
-
-                new_state = alarm_details.get('NewStateValue', '')
-                if new_state == "OK":
-                    is_error = False
-
-            # Initialize services
-            notification_service = NotificationService(
-                channelconfig, context.function_name
-            )
-
-            notification_service.send_notification(
-                alarmnotifiction,
-                alarm_details,
-                formatted,
-                type,
-                is_error
-            )
-
-            # Prepare response
-            response = {
-                "statusCode": 200,
-                "body": {
-                    "message": "Successfully completed publishing notifications"
-                },
-            }
-
-            logger.info(f"Lambda execution completed successfully: {response}")
-            return response
-
-        except Exception as e:
-            error_msg = f"Lambda execution failed:\n{str(e)}"
-            logger.error(error_msg, exc_info=True)
-
-            # Send error notification if notification service is available
-            if notification_service is not None:
-                try:
-                    notification_service.send_notification(
-                        "Lambda Execution Failed", {"error": error_msg}, formatted, type, is_error=True
-                    )
-                except Exception as notification_error:
-                    logger.error(f"Failed to send error notification: {notification_error}")
-
-            # Return error response
-            return {"statusCode": 500, "body": {"error": error_msg}}
-        finally:
-            current, peak = tracemalloc.get_traced_memory()
-            logger.info(
-                f"Current memory usage: {current / 1024 / 1024:.2f} MB; Peak: {peak / 1024 / 1024:.2f} MB"
-            )
-            tracemalloc.stop()
+        # Return error response
+        return {"statusCode": 500, "body": {"error": error_msg}}
+    finally:
+        current, peak = tracemalloc.get_traced_memory()
+        logger.info(
+            f"Current memory usage: {current / 1024 / 1024:.2f} MB; Peak: {peak / 1024 / 1024:.2f} MB"
+        )
+        tracemalloc.stop()
 
