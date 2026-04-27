@@ -1644,6 +1644,28 @@ resource "aws_lakeformation_permissions" "ears_sars_table_permissions" {
   permissions = ["SELECT", "DESCRIBE"]
 }
 
+resource "aws_lakeformation_permissions" "ears_sars_db_permissions_emd" {
+  count     = local.is-preproduction ? 1 : 0
+  principal = aws_iam_role.ears_sars_iam_role[0].arn
+
+  database {
+    name = "emd_historic_int${local.dbt_suffix}"
+  }
+
+  permissions = ["DESCRIBE"]
+}
+resource "aws_lakeformation_permissions" "ears_sars_table_permissions_emd" {
+  count     = local.is-preproduction ? 1 : 0
+  principal = aws_iam_role.ears_sars_iam_role[0].arn
+
+  table {
+    database_name = "emd_historic_int${local.dbt_suffix}"
+    wildcard      = true
+  }
+
+  permissions = ["SELECT", "DESCRIBE"]
+}
+
 resource "aws_lakeformation_permissions" "ears_sars_datalake_location" {
   count     = local.is-development || local.is-preproduction ? 1 : 0
   principal = aws_iam_role.ears_sars_iam_role[0].arn
