@@ -1649,7 +1649,7 @@ resource "aws_lakeformation_permissions" "ears_sars_db_permissions_emd" {
   principal = aws_iam_role.ears_sars_iam_role[0].arn
 
   database {
-    name = "emd_historic_int_${local.dbt_suffix}"
+    name = "emd_historic_int${local.dbt_suffix}"
   }
 
   permissions = ["DESCRIBE"]
@@ -1659,7 +1659,7 @@ resource "aws_lakeformation_permissions" "ears_sars_table_permissions_emd" {
   principal = aws_iam_role.ears_sars_iam_role[0].arn
 
   table {
-    database_name = "emd_historic_int_${local.dbt_suffix}"
+    database_name = "emd_historic_int${local.dbt_suffix}"
     wildcard      = true
   }
 
