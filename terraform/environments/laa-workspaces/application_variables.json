@@ -1,7 +1,7 @@
 {
   "accounts": {
     "development": {
-      "workspace_bundle_id": "wsb-0q8gwp742",
+      "workspace_bundle_id": "wsb-93xk71ss4",
       "region": "eu-west-2",
       "vpc_cidr": "10.200.0.0/16",
       "private_subnet_a_cidr": "10.200.1.0/24",
