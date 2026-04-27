@@ -57,6 +57,10 @@ locals {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDEjMrObnF/VouCc+6PJqd8e5RVTCIlrB7nn8J6bXUuFsA5yGHARjFGrDzXbunRyGqWeJpN3w2d7Vp1McmpkiiqySUKRXVl8KE8M15CsQkLV+M3LX1XuEeQpiXTmZvDPgxpaN8NBkBu07MaL5oAsEAhEXyrZEp9GAvjOe+X/wglaJLp1/P4oEOGiZe4QpZDMSP3Ch3w2VAJ2gpYfNJQf5J8WLaUNtqMBVe+F0QPrB9OzQ1lvtpZLZTzjS84baCHGwVG0llDkLCMqKcNSyz584nZe/vbKO9l51KHlYLtjyMegHP1j4JtGdQYZABIQrUhoUYLhPAiZvoNe6CwVoHm1M+LmChrMexv1o5MXlw6kewN42JyaXnmcDE+Ds9QDG7+7IvJU89utoPSlgBaySXLw4S9Er1XvzTTwEZcRVVcdh6x1z13nQO7foSUXYQU/SIZdNmM1SIza1xB5kjC38CgWIBuaY0H6dBDFmghjIsBfuzjVt+Q7JEunc2OfAUqJs2owp+j8aZrVrsHvqEWKY1YrgQHrXWTXMCsyRkMSNO/Gvm95hepw8409/FLPVRkqZvM5cIUCnouYwKcB3GBt3CihYZXj+5sUqv5kGDS1Lf8SpNuZk5tbLxe46P8hYGtlDG63HWBTd5R2BHfvvRCocqIzNxWdNqY4+bGkOLuAwyd2oLWsw=="
           cidr_blocks = ["157.83.144.211/32", "157.83.144.212/32", "157.83.144.213/32", "157.83.144.214/32", "157.83.144.215/32", "157.83.146.211/32", "157.83.146.212/32", "157.83.146.213/32", "157.83.146.214/32", "157.83.146.215/32"]
         }
+        "access-uk" = {
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDPMCH6zJQk6y3LxfYbWuXiOB32lu7VS2L/n5KpLHplTuebyUGOrw7QkU3BRVFG6rh0RF+rkqjL84R+08w27FgfTHyI12KJKtiHPfSojlWnZP5oIvsx5cWXfaGbG4OzdfpzY4pjgpU0lcTzcj1OIkwc5z6ntu455JMqy4WaFveLs/hkb4qtExBYS1xuOjnjHwEcsgZ3vBOjKclrq70y+rRnUnJ6VDfbbr9Bjz2LVT1s6Cm0hF3HAP7d7vqoz/u4oFJFBo5Z7Cewv6VkSQkw/Qk5Er3VqWtU7yZwh9j7xd5rj27wyY9XACtRQMEACKfX5vCWzIkR9weQ+Jm01GgxtIzt"
+          cidr_blocks = ["172.167.164.209/32"]
+        }
       }
       transfer_server_sftp_users_with_egress = {
         "essex-police" = {
