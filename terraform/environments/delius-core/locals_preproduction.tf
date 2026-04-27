@@ -39,7 +39,7 @@ locals {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
     }
     primary_instance_count = 1
-    standby_count          = 1
+    standby_count          = 2
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
       "/dev/sdc" = { label = "app", size = 100 } # /u02

@@ -27,7 +27,8 @@ locals {
       /* Target Buckets */
       target_buckets = [
         "mojap-land-dev",
-        "cloud-platform-40748c2df4b92e2dfd779a02841187ec"
+        "cloud-platform-40748c2df4b92e2dfd779a02841187ec",
+        "ccms-ebs-test-bc-inbound-mp"
       ]
       datasync_target_buckets     = ["mojap-land-dev"]
       datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-development"]
@@ -51,6 +52,10 @@ locals {
         "maat-xhibit-dev" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCuB8p8OaxeX3sILMVUQcD48XBPuVLzddUixUUbYLS1WPiEUz7XcUkozeuhulIy9CzqA9yyAa2uPWhQr3KL2bKpXo8UIJr+3n51mjJp9V+LO65kMN5ewQHzx9phpZba5UOth1aEwn4vAFQwm2q6/ydNrJtRQeaI0DT4njaf0MC9FM/nu25IvUbl2dzUn2MX7/WuMouzcYXTeiLUIMvgRoAw4pjnCmU2AuPTokC7OynFh++SiHRUw6OwNKxqORv3du7qlfcGDWx+oAHbUVOnSaTrUssUuEXPFS5ytwWEp6GpzfZpNvD7Kj7gw/7ntpdTckh+d5INJHu+2L74Ytj2RPLNoHEB9t1ptEI2d2SeKpHqPSak2uQzk4aHV2SJs4IO0omTWKHojtSxo5gxAl4B58UjdzmFn0yNr3rJbKnn2w1H7viaM/0vWRgZrtgo07pd2uJePObaUE9jf1re+woasVWJAy3v9dZszVBcJ62NK/QU3cGfUncBw2OnnDURm7z1YVAj8mrReOkZWFA7nJ4/Gzh5pR8wNhnSLsDFqsQefaQiHBi2vZzDRqaUu03eWvd8BmomWC5joT7qqY8Qv+X5boO9CI0hX9FcoJJMXJwckoVAZGuZKgOwOL4y1Y7hpCO1U5ex9mbyMy5D5r/FNf7B85d/qCxcGwesIzI1b0QRupKxDw=="
           cidr_blocks = ["20.49.168.141/32", "20.49.168.17/32", "51.11.124.149/32", "51.11.124.158/32"]
+        }
+        "ccms-transfer-bc-test" = {
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDEjMrObnF/VouCc+6PJqd8e5RVTCIlrB7nn8J6bXUuFsA5yGHARjFGrDzXbunRyGqWeJpN3w2d7Vp1McmpkiiqySUKRXVl8KE8M15CsQkLV+M3LX1XuEeQpiXTmZvDPgxpaN8NBkBu07MaL5oAsEAhEXyrZEp9GAvjOe+X/wglaJLp1/P4oEOGiZe4QpZDMSP3Ch3w2VAJ2gpYfNJQf5J8WLaUNtqMBVe+F0QPrB9OzQ1lvtpZLZTzjS84baCHGwVG0llDkLCMqKcNSyz584nZe/vbKO9l51KHlYLtjyMegHP1j4JtGdQYZABIQrUhoUYLhPAiZvoNe6CwVoHm1M+LmChrMexv1o5MXlw6kewN42JyaXnmcDE+Ds9QDG7+7IvJU89utoPSlgBaySXLw4S9Er1XvzTTwEZcRVVcdh6x1z13nQO7foSUXYQU/SIZdNmM1SIza1xB5kjC38CgWIBuaY0H6dBDFmghjIsBfuzjVt+Q7JEunc2OfAUqJs2owp+j8aZrVrsHvqEWKY1YrgQHrXWTXMCsyRkMSNO/Gvm95hepw8409/FLPVRkqZvM5cIUCnouYwKcB3GBt3CihYZXj+5sUqv5kGDS1Lf8SpNuZk5tbLxe46P8hYGtlDG63HWBTd5R2BHfvvRCocqIzNxWdNqY4+bGkOLuAwyd2oLWsw=="
+          cidr_blocks = ["157.83.144.211/32", "157.83.144.212/32", "157.83.144.213/32", "157.83.144.214/32", "157.83.144.215/32", "157.83.146.211/32", "157.83.146.212/32", "157.83.146.213/32", "157.83.146.214/32", "157.83.146.215/32"]
         }
       }
       transfer_server_sftp_users_with_egress = {

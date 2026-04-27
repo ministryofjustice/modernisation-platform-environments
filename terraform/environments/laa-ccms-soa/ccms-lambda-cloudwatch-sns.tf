@@ -127,3 +127,28 @@ resource "aws_lambda_permission" "allow_sns_invoke_guardduty" {
   principal     = "sns.amazonaws.com"
   source_arn    = aws_sns_topic.guardduty_alerts.arn
 }
+
+# SOA RDS Maintenance Notifications
+
+resource "aws_sns_topic" "soa_maintenance_topic" {
+  name              = "${local.application_name}-${local.environment}-soa-maintenance-topic"
+  kms_master_key_id = aws_kms_key.sns_rds_events.id
+
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-${local.environment}-soa-maintenance-topic"
+  })
+}
+
+resource "aws_sns_topic_subscription" "lambda_soa_rds_sns" {
+  topic_arn = aws_sns_topic.soa_maintenance_topic.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.cloudwatch_sns.arn
+}
+
+resource "aws_lambda_permission" "allow_sns_invoke_soa_rds" {
+  statement_id  = "AllowExecutionFromSOARDSSNS"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_sns.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.soa_maintenance_topic.arn
+}

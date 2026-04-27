@@ -5,7 +5,7 @@ locals {
   }
 
   active_sandbox_colour = local.is-development ? aws_ssm_parameter.sandbox_active_deployment_colour[0].value : null
- 
+
   sandbox_active_target_group_arn = (local.is-development && local.active_sandbox_colour != null) ? lookup(local.sandbox_target_groups, local.active_sandbox_colour, null) : null
 }
 
