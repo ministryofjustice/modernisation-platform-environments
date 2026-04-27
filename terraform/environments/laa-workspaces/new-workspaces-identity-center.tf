@@ -51,7 +51,7 @@ resource "aws_workspaces_directory" "workspaces_identity_center" {
   tags = merge(
     local.tags,
     {
-      "Name"               = "${local.application_name}-${local.environment}-workspaces-directory-ic"
+      "Name"               = "${local.application_name}-${local.environment}-workspaces-directory"
       "AuthenticationType" = "IdentityCenter"
       "IdentityProvider"   = "IAM_Identity_Center"
       "DirectoryType"      = "IdentityCenter"
@@ -61,22 +61,28 @@ resource "aws_workspaces_directory" "workspaces_identity_center" {
 
 ##############################################
 ### WorkSpaces IP Group for Identity Center
+###
+### This was created automatically when the WorkSpaces directory
+### was manually created. Import using:
+### terraform import 'aws_workspaces_ip_group.workspaces_identity_center[0]' wsipg-67x66y79w
+###
+### Note: Name and description match the existing resource to avoid replacement
 ##############################################
 
 resource "aws_workspaces_ip_group" "workspaces_identity_center" {
   count = local.environment == "development" ? 1 : 0
 
-  name        = "${local.application_name}-${local.environment}-ip-group-ic"
-  description = "IP access control group for Identity Center WorkSpaces"
+  name        = "${local.application_name}-${local.environment}-ip-group"
+  description = "IP access control group"
 
   rules {
     source      = "0.0.0.0/0"
-    description = "Allow all - refine based on requirements"
+    description = "Allow all"
   }
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-${local.environment}-ip-group-ic" }
+    { "Name" = "${local.application_name}-${local.environment}-ip-group" }
   )
 }
 
