@@ -19,7 +19,7 @@
       "dns": "laa-test",
       "app_name": "ccms-ebs-sftp-barclaycard",
       "app_count": "1",
-      "api_server_port": "8443",
+      "api_server_port": "8080",
       "aws_region": "eu-west-2",
       "app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-financial-transfers",
       "container_version": "latest",
