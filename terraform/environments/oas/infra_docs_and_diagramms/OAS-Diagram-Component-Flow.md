@@ -171,7 +171,7 @@ graph LR
 4. Diagram will render in preview pane
 
 ### Export as Image
-1. Visit https://mermaid.live
+1. Visit <https://mermaid.live>
 2. Copy the entire Mermaid code block above
 3. Paste into the Mermaid Live Editor
 4. Click "Export" button
