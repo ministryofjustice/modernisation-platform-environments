@@ -37,7 +37,6 @@ locals {
         certificate_transparency_logging_preference = false # this should have been set to true
         cloudwatch_metric_alarms                    = module.baseline_presets.cloudwatch_metric_alarms.acm
         domain_name                                 = "*.preproduction.hmpps-domain.service.justice.gov.uk"
-        certificate_transparency_logging_preference = false # this should have been set to true
         export                                      = true
         subject_alternate_names = [
           "*.pp.planetfm.service.justice.gov.uk",
