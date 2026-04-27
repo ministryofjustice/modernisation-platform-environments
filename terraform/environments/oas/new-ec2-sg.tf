@@ -167,13 +167,13 @@ resource "aws_security_group_rule" "egress_managed_9514_workspace" {
 }
 
 
-//wrong
+
 
 resource "aws_security_group_rule" "egress_bastion_rds" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   type                     = "egress"
-  security_group_id        = module.bastion_linux.bastion_security_group.id[0]
+  security_group_id        = module.bastion_linux.bastion_security_group.id
   description              = "Database connections to bastion"
   from_port                = 1521
   to_port                  = 1521
