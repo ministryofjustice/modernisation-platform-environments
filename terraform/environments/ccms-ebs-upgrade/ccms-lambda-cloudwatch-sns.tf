@@ -66,7 +66,7 @@ resource "aws_sns_topic_subscription" "lambda_cloudwatch_sns" {
 resource "aws_lambda_layer_version" "lambda_cloudwatch_sns_layer" {
   layer_name               = "${local.application_name}-${local.environment}-cloudwatch-sns-layer"
   s3_key                   = "lambda_delivery/cloudwatch_sns_layer/layerV1.zip"
-  s3_bucket                = aws_s3_bucket.ccms_ebs_upgrade_shared.bucket
+  s3_bucket                = aws_s3_bucket.ccms_ebs_shared.bucket
   compatible_runtimes      = ["python3.13"]
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ${local.application_name} CloudWatch/GuardDuty/S3 SNS Alerts Integration"
