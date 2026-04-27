@@ -52,19 +52,9 @@ data "aws_iam_policy_document" "s3_sftp_bc_kms_policy" {
   }
 }
 
-moved {
-  from = aws_kms_alias.s3_sftp_barclaycard_kms_alias
-  to   = aws_kms_alias.s3_sftp_bc_kms_alias
-}
-
 resource "aws_kms_alias" "s3_sftp_bc_kms_alias" {
   name          = "alias/s3-sftp-bc-alias"
   target_key_id = aws_kms_key.s3_sftp_bc_kms_key.key_id
-}
-
-moved {
-  from = aws_kms_key.s3_sftp_barclaycard_kms_key
-  to   = aws_kms_key.s3_sftp_bc_kms_key
 }
 
 resource "aws_kms_key" "s3_sftp_bc_kms_key" {

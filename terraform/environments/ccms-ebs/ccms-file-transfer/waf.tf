@@ -1,8 +1,4 @@
 # WAF FOR SFTP CLIENT 1 APP
-moved {
-  from = aws_wafv2_ip_set.sftp_barclaycard_waf_ip_set
-  to   = aws_wafv2_ip_set.sftp_bc_waf_ip_set
-}
 resource "aws_wafv2_ip_set" "sftp_bc_waf_ip_set" {
   name               = "${local.application_name}-sftp-bc-waf-ip-set"
   scope              = "REGIONAL"
@@ -20,11 +16,6 @@ resource "aws_wafv2_ip_set" "sftp_bc_waf_ip_set" {
     local.tags,
     { Name = lower(format("%s-sftp-bc-%s-ip-set", local.application_name, local.environment)) }
   )
-}
-
-moved {
-  from = aws_wafv2_web_acl.sftp_barclaycard_web_acl
-  to   = aws_wafv2_web_acl.sftp_bc_web_acl
 }
 
 resource "aws_wafv2_web_acl" "sftp_bc_web_acl" {
@@ -107,11 +98,6 @@ resource "aws_wafv2_web_acl" "sftp_bc_web_acl" {
   }
 }
 
-moved {
-  from = aws_cloudwatch_log_group.sftp_barclaycard_waf_logs
-  to   = aws_cloudwatch_log_group.sftp_bc_waf_logs
-}
-
 # WAF Logging to CloudWatch
 resource "aws_cloudwatch_log_group" "sftp_bc_waf_logs" {
   name              = "aws-waf-logs-${local.application_name}-sftp-bc/sftp-bc-waf-logs"
@@ -122,20 +108,11 @@ resource "aws_cloudwatch_log_group" "sftp_bc_waf_logs" {
   )
 }
 
-moved {
-  from = aws_wafv2_web_acl_logging_configuration.sftp_barclaycard_waf_logging
-  to   = aws_wafv2_web_acl_logging_configuration.sftp_bc_waf_logging
-}
-
 resource "aws_wafv2_web_acl_logging_configuration" "sftp_bc_waf_logging" {
   log_destination_configs = [aws_cloudwatch_log_group.sftp_bc_waf_logs.arn]
   resource_arn            = aws_wafv2_web_acl.sftp_bc_web_acl.arn
 }
 
-moved {
-  from = aws_wafv2_web_acl_association.sftp_barclaycard_waf_association
-  to   = aws_wafv2_web_acl_association.sftp_bc_waf_association
-}
 # Associate the WAF with the SFTP bc Application Load Balancer
 resource "aws_wafv2_web_acl_association" "sftp_bc_waf_association" {
   resource_arn = aws_lb.sftp_bc_load_balancer.arn

@@ -5,12 +5,6 @@
 #   *.laa.service.justice.gov.uk
 
 # Certificate
-
-moved {
-  from = aws_acm_certificate.external_sftp_barclaycard
-  to   = aws_acm_certificate.external_sftp_bc
-}
-
 resource "aws_acm_certificate" "external_sftp_bc" {
   validation_method         = "DNS"
   domain_name               = local.primary_domain
@@ -22,12 +16,6 @@ resource "aws_acm_certificate" "external_sftp_bc" {
 }
 
 ## Validation Records
-
-moved {
-  from = aws_route53_record.external_validation_sftp_barclaycard_nonprod
-  to   = aws_route53_record.external_validation_sftp_bc_nonprod
-}
-
 resource "aws_route53_record" "external_validation_sftp_bc_nonprod" {
   count    = local.is-production ? 0 : length(local.modernisation_platform_validations)
   provider = aws.core-vpc
@@ -38,11 +26,6 @@ resource "aws_route53_record" "external_validation_sftp_bc_nonprod" {
   ttl             = 60
   type            = local.modernisation_platform_validations[count.index].type
   zone_id         = data.aws_route53_zone.external.zone_id
-}
-
-moved {
-  from = aws_route53_record.external_validation_sftp_barclaycard_prod
-  to   = aws_route53_record.external_validation_sftp_bc_prod
 }
 
 resource "aws_route53_record" "external_validation_sftp_bc_prod" {
@@ -58,12 +41,6 @@ resource "aws_route53_record" "external_validation_sftp_bc_prod" {
 }
 
 ## Certificate Validation
-
-moved {
-  from = aws_acm_certificate_validation.external_sftp_barclaycard_nonprod
-  to   = aws_acm_certificate_validation.external_sftp_bc_nonprod
-}
-
 resource "aws_acm_certificate_validation" "external_sftp_bc_nonprod" {
   count = local.is-production ? 0 : 1
 
@@ -77,11 +54,6 @@ resource "aws_acm_certificate_validation" "external_sftp_bc_nonprod" {
   timeouts {
     create = "10m"
   }
-}
-
-moved {
-  from = aws_acm_certificate_validation.external_sftp_barclaycard_prod
-  to   = aws_acm_certificate_validation.external_sftp_bc_prod
 }
 
 resource "aws_acm_certificate_validation" "external_sftp_bc_prod" {

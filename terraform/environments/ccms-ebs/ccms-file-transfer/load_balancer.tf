@@ -1,8 +1,4 @@
 # API Load Balancer Configuration
-moved {
-  from = aws_lb.sftp_barclaycard_load_balancer
-  to   = aws_lb.sftp_bc_load_balancer
-}
 resource "aws_lb" "sftp_bc_load_balancer" {
   name               = "${local.application_name}-sftp-bc-lb"
   internal           = true
@@ -20,11 +16,6 @@ resource "aws_lb" "sftp_bc_load_balancer" {
   tags = merge(local.tags,
     { Name = lower(format("%s-sftp-bc-%s-lb", local.application_name, local.environment)) }
   )
-}
-
-moved {
-  from = aws_lb_target_group.sftp_barclaycard_target_group
-  to   = aws_lb_target_group.sftp_bc_target_group
 }
 
 resource "aws_lb_target_group" "sftp_bc_target_group" {
@@ -58,11 +49,6 @@ resource "aws_lb_target_group" "sftp_bc_target_group" {
   lifecycle {
     create_before_destroy = true
   }
-}
-
-moved {
-  from = aws_lb_listener.sftp_barclaycard_listener
-  to   = aws_lb_listener.sftp_bc_listener
 }
 
 # Redirect all traffic from the lb to the target group

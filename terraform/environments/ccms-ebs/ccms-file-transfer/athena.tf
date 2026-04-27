@@ -21,10 +21,7 @@ resource "aws_athena_workgroup" "lb-access-logs" {
     }
   }
 }
-moved {
-  from = aws_athena_named_query.main_table_sftp_barclaycard_internal_query
-  to   = aws_athena_named_query.main_table_sftp_bc_internal_query
-}
+
 # SQL query to creates the table in the athena db, these queries needs to be executed manually after creation
 resource "aws_athena_named_query" "main_table_sftp_bc_internal_query" {
   name      = lower(format("%s-sftp-bc-%s-create-table", local.application_name, local.environment))
@@ -41,10 +38,6 @@ resource "aws_athena_named_query" "main_table_sftp_bc_internal_query" {
   )
 }
 
-moved {
-  from = aws_athena_named_query.http_requests_sftp_barclaycard_internal_query
-  to   = aws_athena_named_query.http_requests_sftp_bc_internal_query
-}
 # SQL query to count the number of HTTP GET requests to the loadbalancer grouped by IP, these queries needs to be executed manually after creation
 resource "aws_athena_named_query" "http_requests_sftp_bc_internal_query" {
   name      = lower(format("%s-sftp-bc-%s-http-get-requests", local.application_name, local.environment))

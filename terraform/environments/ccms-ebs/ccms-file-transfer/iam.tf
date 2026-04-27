@@ -18,11 +18,6 @@ data "aws_iam_policy_document" "bc_ecs_task_execution_assume_role_policy" {
   }
 }
 
-moved {
-  from = aws_iam_role.barclaycard_ecs_task_execution_role
-  to   = aws_iam_role.bc_ecs_task_execution_role
-}
-
 # ECS task execution role
 resource "aws_iam_role" "bc_ecs_task_execution_role" {
   name               = "${local.application_name}-bc-ecs-task-execution-role"
@@ -33,20 +28,10 @@ resource "aws_iam_role" "bc_ecs_task_execution_role" {
   )
 }
 
-moved {
-  from = aws_iam_role_policy_attachment.barclaycard_ecs_task_execution_role
-  to   = aws_iam_role_policy_attachment.bc_ecs_task_execution_role
-}
-
 # ECS task execution role policy attachment
 resource "aws_iam_role_policy_attachment" "bc_ecs_task_execution_role" {
   role       = aws_iam_role.bc_ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-}
-
-moved {
-  from = aws_iam_policy.barclaycard_ecs_secrets_policy
-  to   = aws_iam_policy.bc_ecs_secrets_policy
 }
 
 # ECS Secrets Manager Policy
@@ -87,11 +72,6 @@ EOF
 }
 
 # ECS secrets role policy attachment
-moved {
-  from = aws_iam_role_policy_attachment.barclaycard_ecs_secrets_policy_attachment
-  to   = aws_iam_role_policy_attachment.bc_ecs_secrets_policy_attachment
-}
-
 resource "aws_iam_role_policy_attachment" "bc_ecs_secrets_policy_attachment" {
   role       = aws_iam_role.bc_ecs_task_execution_role.name
   policy_arn = aws_iam_policy.bc_ecs_secrets_policy.arn

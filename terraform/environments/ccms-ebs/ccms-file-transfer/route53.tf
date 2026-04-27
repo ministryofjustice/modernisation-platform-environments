@@ -1,8 +1,4 @@
 # DNS Configuration
-moved {
-  from = aws_route53_record.route53_record_sftp_barclaycard_nonprod
-  to   = aws_route53_record.route53_record_sftp_bc_nonprod
-}
 # Creates Route53 DNS records for the SFTP bc LB in Non-Prod
 resource "aws_route53_record" "route53_record_sftp_bc_nonprod" {
   count    = local.is-production ? 0 : 1
@@ -16,11 +12,6 @@ resource "aws_route53_record" "route53_record_sftp_bc_nonprod" {
     zone_id                = aws_lb.sftp_bc_load_balancer.zone_id
     evaluate_target_health = false
   }
-}
-
-moved {
-  from = aws_route53_record.route53_record_sftp_barclaycard_prod
-  to   = aws_route53_record.route53_record_sftp_bc_prod
 }
 
 # Creates Route53 DNS records for the SFTP bc LB in PROD

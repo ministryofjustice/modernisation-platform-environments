@@ -1,8 +1,4 @@
 ### Load Balancer Security Group
-moved {
-  from = aws_security_group.sftp_barclaycard_load_balancer
-  to   = aws_security_group.sftp_bc_load_balancer
-}
 resource "aws_security_group" "sftp_bc_load_balancer" {
   name_prefix = "${local.application_name}-sftp-bc-load-balancer-sg"
   description = "Controls access to ${local.application_name}-sftp-bc lb"
@@ -11,11 +7,6 @@ resource "aws_security_group" "sftp_bc_load_balancer" {
   tags = merge(local.tags,
     { Name = lower(format("%s-sftp-bc-%s-lb-sg", local.application_name, local.environment)) }
   )
-}
-
-moved {
-  from = aws_vpc_security_group_ingress_rule.sftp_barclaycard_lb_ingress_443
-  to   = aws_vpc_security_group_ingress_rule.sftp_bc_lb_ingress_443
 }
 
 resource "aws_vpc_security_group_ingress_rule" "sftp_bc_lb_ingress_443" {
@@ -28,10 +19,6 @@ resource "aws_vpc_security_group_ingress_rule" "sftp_bc_lb_ingress_443" {
   to_port     = 443
 }
 
-moved {
-  from = aws_vpc_security_group_ingress_rule.sftp_barclaycard_lb_ingress_from_lambda_443
-  to   = aws_vpc_security_group_ingress_rule.sftp_bc_lb_ingress_from_lambda_443
-}
 resource "aws_vpc_security_group_ingress_rule" "sftp_bc_lb_ingress_from_lambda_443" {
   security_group_id = aws_security_group.sftp_bc_load_balancer.id
 
@@ -40,11 +27,6 @@ resource "aws_vpc_security_group_ingress_rule" "sftp_bc_lb_ingress_from_lambda_4
   from_port                    = 443
   to_port                      = 443
   referenced_security_group_id = aws_security_group.process_file_from_bucket_lambda_sg.id
-}
-
-moved {
-  from = aws_vpc_security_group_egress_rule.sftp_barclaycard_lb_egress_api
-  to   = aws_vpc_security_group_egress_rule.sftp_bc_lb_egress_api
 }
 
 resource "aws_vpc_security_group_egress_rule" "sftp_bc_lb_egress_api" {

@@ -2,10 +2,6 @@
 # CloudWatch Alarms for PUI
 #######################################
 # Alarm for ALB 5xx Errors
-moved {
-  from = aws_cloudwatch_metric_alarm.alb_sftp_barclaycard_5xx
-  to   = aws_cloudwatch_metric_alarm.alb_sftp_bc_5xx
-}
 
 resource "aws_cloudwatch_metric_alarm" "alb_sftp_bc_5xx" {
   alarm_name          = "${local.application_name}-${local.environment}-sftp-bc-5xx-errors"
@@ -27,10 +23,6 @@ resource "aws_cloudwatch_metric_alarm" "alb_sftp_bc_5xx" {
   tags = local.tags
 }
 
-moved {
-  from = aws_cloudwatch_metric_alarm.container_sftp_barclaycard_count
-  to   = aws_cloudwatch_metric_alarm.container_sftp_bc_count
-}
 # Alarm for ECS Container Count for sftp_bc Service
 resource "aws_cloudwatch_metric_alarm" "container_sftp_bc_count" {
   alarm_name          = "${local.application_name}-${local.environment}-sftp-bc-container-count-low"
@@ -52,11 +44,6 @@ resource "aws_cloudwatch_metric_alarm" "container_sftp_bc_count" {
   insufficient_data_actions = []
 
   tags = local.tags
-}
-
-moved {
-  from = aws_cloudwatch_metric_alarm.sftp_barclaycard_waf_high_blocked_requests
-  to   = aws_cloudwatch_metric_alarm.sftp_bc_waf_high_blocked_requests
 }
 
 # Underlying waf Instance Status Check Failure
@@ -84,11 +71,6 @@ resource "aws_cloudwatch_metric_alarm" "sftp_bc_waf_high_blocked_requests" {
   tags = local.tags
 }
 
-moved {
-  from = aws_cloudwatch_metric_alarm.sftp_barclaycard_alb_healthyhosts
-  to   = aws_cloudwatch_metric_alarm.sftp_bc_alb_healthyhosts
-}
-
 resource "aws_cloudwatch_metric_alarm" "sftp_bc_alb_healthyhosts" {
   alarm_name          = "${local.application_name}-sftp-bc-${local.environment}-alb-targets-group"
   comparison_operator = "LessThanThreshold"
@@ -107,11 +89,6 @@ resource "aws_cloudwatch_metric_alarm" "sftp_bc_alb_healthyhosts" {
     TargetGroup  = aws_lb_target_group.sftp_bc_target_group.arn_suffix
     LoadBalancer = aws_lb.sftp_bc_load_balancer.arn_suffix
   }
-}
-
-moved {
-  from = aws_cloudwatch_metric_alarm.sftp_barclaycard_ecs_high_memory
-  to   = aws_cloudwatch_metric_alarm.sftp_bc_ecs_high_memory
 }
 
 resource "aws_cloudwatch_metric_alarm" "sftp_bc_ecs_high_memory" {

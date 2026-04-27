@@ -1,8 +1,4 @@
 #### This file can be used to store secrets specific to the sftp client account ####
-moved {
-  from = aws_secretsmanager_secret.sftp_barclaycard_secrets
-  to   = aws_secretsmanager_secret.sftp_bc_secrets
-}
 # SFTP BC Application Secrets
 resource "aws_secretsmanager_secret" "sftp_bc_secrets" {
   name        = "${local.application_name}-sftp-bc-secrets"
@@ -10,10 +6,6 @@ resource "aws_secretsmanager_secret" "sftp_bc_secrets" {
   kms_key_id  = aws_kms_key.s3_sftp_bc_kms_key.arn
 }
 
-moved {
-  from = aws_secretsmanager_secret_version.sftp_barclaycard_secrets
-  to   = aws_secretsmanager_secret_version.sftp_bc_secrets
-}
 resource "aws_secretsmanager_secret_version" "sftp_bc_secrets" {
   secret_id = aws_secretsmanager_secret.sftp_bc_secrets.id
   secret_string = jsonencode({

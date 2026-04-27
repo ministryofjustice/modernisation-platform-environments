@@ -9,11 +9,6 @@ resource "aws_ecs_cluster" "main_cluster" {
 }
 
 # ECS Task Definition
-moved {
-  from = aws_ecs_task_definition.sftp_barclaycard_task_definition
-  to   = aws_ecs_task_definition.sftp_bc_task_definition
-}
-
 resource "aws_ecs_task_definition" "sftp_bc_task_definition" {
   family             = "${local.application_name}-ftp-bc-task"
   execution_role_arn = aws_iam_role.bc_ecs_task_execution_role.arn
@@ -55,11 +50,6 @@ resource "aws_ecs_task_definition" "sftp_bc_task_definition" {
 }
 
 # ECS Service
-moved {
-  from = aws_ecs_service.sftp_barclaycard_ecs_service
-  to   = aws_ecs_service.sftp_bc_ecs_service
-}
-
 resource "aws_ecs_service" "sftp_bc_ecs_service" {
   name            = local.application_data.accounts[local.environment].app_name
   cluster         = aws_ecs_cluster.main_cluster.id
