@@ -250,6 +250,7 @@ resource "aws_cloudwatch_metric_alarm" "connector_alb_healthyhosts" {
   threshold           = local.application_data.accounts[local.environment].connector_app_count
   alarm_description   = "Number of healthy nodes in Target Group"
   actions_enabled     = true
+  treat_missing_data  = "breaching"
   alarm_actions       = [aws_sns_topic.cloudwatch_alerts.arn]
   ok_actions          = [aws_sns_topic.cloudwatch_alerts.arn]
   dimensions = {
@@ -269,6 +270,7 @@ resource "aws_cloudwatch_metric_alarm" "opa_alb_healthyhosts" {
   threshold           = local.application_data.accounts[local.environment].opa_app_count
   alarm_description   = "Number of healthy nodes in Target Group"
   actions_enabled     = true
+  treat_missing_data  = "breaching"
   alarm_actions       = [aws_sns_topic.cloudwatch_alerts.arn]
   ok_actions          = [aws_sns_topic.cloudwatch_alerts.arn]
   dimensions = {
@@ -288,6 +290,7 @@ resource "aws_cloudwatch_metric_alarm" "adaptor_alb_healthyhosts" {
   threshold           = local.application_data.accounts[local.environment].adaptor_app_count
   alarm_description   = "Number of healthy nodes in Target Group"
   actions_enabled     = true
+  treat_missing_data  = "breaching"
   alarm_actions       = [aws_sns_topic.cloudwatch_alerts.arn]
   ok_actions          = [aws_sns_topic.cloudwatch_alerts.arn]
   dimensions = {

@@ -40,6 +40,45 @@ resource "aws_lakeformation_permissions" "staging-export-tables" {
   }
 }
 
+# The property views chain through planetfm staging tables - grant LF access to that database too
+resource "aws_lakeformation_permissions" "staging-export-planetfm-database" {
+  principal   = module.lambda-staging-export.role_arn
+  permissions = ["DESCRIBE"]
+
+  database {
+    name = "planetfm"
+  }
+}
+
+resource "aws_lakeformation_permissions" "staging-export-planetfm-tables" {
+  principal   = module.lambda-staging-export.role_arn
+  permissions = ["SELECT", "DESCRIBE"]
+
+  table {
+    database_name = "planetfm"
+    wildcard      = true
+  }
+}
+
+resource "aws_lakeformation_permissions" "staging-export-concept-database" {
+  principal   = module.lambda-staging-export.role_arn
+  permissions = ["DESCRIBE"]
+
+  database {
+    name = "concept"
+  }
+}
+
+resource "aws_lakeformation_permissions" "staging-export-concept-tables" {
+  principal   = module.lambda-staging-export.role_arn
+  permissions = ["SELECT", "DESCRIBE"]
+
+  table {
+    database_name = "concept"
+    wildcard      = true
+  }
+}
+
 module "query_results" {
   source        = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
   bucket_prefix = "property-query-results-${local.environment}-"
