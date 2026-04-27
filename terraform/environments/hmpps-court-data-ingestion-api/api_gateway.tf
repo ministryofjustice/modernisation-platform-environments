@@ -103,7 +103,7 @@ resource "aws_api_gateway_stage" "main" {
   deployment_id = aws_api_gateway_deployment.main.id
   rest_api_id   = aws_api_gateway_rest_api.ingestion_api.id
   stage_name    = local.environment
-  depends_on = [aws_api_gateway_account.main]
+  depends_on    = [aws_api_gateway_account.main]
 
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.api_gateway_access_logs.arn

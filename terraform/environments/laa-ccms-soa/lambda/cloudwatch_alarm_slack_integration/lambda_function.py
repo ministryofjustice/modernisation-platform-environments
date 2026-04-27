@@ -389,6 +389,38 @@ class NotificationService:
                     }
                 ]
             }
+         # RDS miantenance event  
+        elif type == "RDS Maintenance":
+            database_name = alarmdetails.get('SourceArn', '').split(':')[-1]
+            event_type = ', '.join(alarmdetails.get('EventCategories', ['maintenance']))
+            event_message = alarmdetails.get('Message', 'RDS maintenance event')
+            
+            blocks = [
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": f"🔧 RDS Maintenance Notification"
+                    }
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {"type": "mrkdwn", "text": f"*Database:*\n{database_name}"},
+                        {"type": "mrkdwn", "text": f"*Event Type:*\n{event_type}"},
+                        {"type": "mrkdwn", "text": f"*Timestamp:*\n{timestamp}"},
+                        {"type": "mrkdwn", "text": f"*Source:*\nRDS Event"}
+                    ]
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f"*Details:*\n{event_message}"
+                    }
+                }
+            ]
+            payload = {"blocks": blocks}
 
         # ---------------- Fallback ----------------
         else:
@@ -543,7 +575,23 @@ def lambda_handler(event, context):
             alarmnotifiction = "S3 Object Event Notification"
             type = "S3 Event"
             is_error = False   # S3 put is informational
+         # ---------------- RDS Maintenance Event ----------------
+        elif isinstance(alarm_details, dict) and "EventCategories" in alarm_details:
+            logger.info("RDS maintenance event detected in SNS message")
+            logger.info("Starting Notification to Slack for RDS Maintenance Event via SNS Topic")
 
+            timestamp_str = sns_message.get('Timestamp')
+            if timestamp_str:
+                try:
+                    dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+                except ValueError:
+                    dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%SZ")
+                formatted = dt.strftime("%a, %d %b %Y %H:%M:%S UTC")
+
+            channelconfig = config.slack_channel_webhook    
+            alarmnotifiction = "RDS Maintenance Event Notification"
+            type = "RDS Maintenance"
+            is_error = False
         # ---------------- CloudWatch Alarm (default) ----------------
         else:
             logger.info("CloudWatch Alarm detected in SNS message")

@@ -32,6 +32,18 @@ locals {
           description = "wildcard cert for hmpps domain load balancer"
         }
       }
+
+      remote_desktop_and_planetfm_wildcard_cert_v3 = {
+        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name              = "*.preproduction.hmpps-domain.service.justice.gov.uk"
+        export                   = true
+        subject_alternate_names = [
+          "*.pp.planetfm.service.justice.gov.uk",
+        ]
+        tags = {
+          description = "wildcard cert for hmpps remote desktop services"
+        }
+      }
     }
 
     cloudwatch_dashboards = {

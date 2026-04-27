@@ -758,7 +758,6 @@ module "mdss_reconciler" {
 #-----------------------------------------------------------------------------------
 
 module "create_p1_export" {
-  count                          = 1
   source                         = "./modules/lambdas"
   is_image                       = true
   image_name                     = "export_em_data_p1"
@@ -767,7 +766,7 @@ module "create_p1_export" {
   role_arn                       = module.create_p1_export_iam_role.arn
   memory_size                    = 512
   timeout                        = 300
-  reserved_concurrent_executions = 1
+  reserved_concurrent_executions = 2
 
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"

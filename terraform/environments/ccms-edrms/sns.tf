@@ -69,7 +69,7 @@ resource "aws_sns_topic_policy" "guardduty_default" {
 # SNS topic for RDS maintenance events
 
 resource "aws_sns_topic" "tds_maintenance_topic" {
-  name = "${local.application_name}-${local.environment}-tds-maintenance-topic"
+  name              = "${local.application_name}-${local.environment}-tds-maintenance-topic"
   kms_master_key_id = aws_kms_key.sns_rds_events.arn
   tags = merge(local.tags, {
     Name = "${local.application_name}-${local.environment}-tds-maintenance-topic"
