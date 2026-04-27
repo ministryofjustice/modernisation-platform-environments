@@ -357,8 +357,10 @@ class NotificationService:
                 bucket_name = s3_info.get("bucket", {}).get("name", "Unknown Bucket")
                 object_key = s3_info.get("object", {}).get("key", "Unknown Key")
                 object_size = s3_info.get("object", {}).get("size", "Unknown Size")
-                if "inbound" in object_key.lower():
-                    emoji =  ":white_check_mark:"
+                if "rejected" in object_key.lower():
+                    emoji = ":broken_heart:"
+                else:             
+                    emoji = ":white_check_mark:"
                 header = f"{emoji} *S3 Object Uploaded on bucket {bucket_name}.*"
                 payload = {
                     "blocks": [
