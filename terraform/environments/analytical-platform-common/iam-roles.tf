@@ -15,21 +15,6 @@ module "ecr_access_iam_role" {
     "moj-analytical-services/*"
   ]
 
-  trust_policy_conditions = [
-    {
-      # https://github.com/ministryofjustice/analytical-platform-airflow-github-actions/blob/main/.github/workflows/shared-release-container.yml
-      test     = "StringLike"
-      variable = "token.actions.githubusercontent.com:job_workflow_ref"
-      values   = ["ministryofjustice/analytical-platform-airflow-github-actions/.github/workflows/shared-release-container.yml@*"]
-    },
-    {
-      # https://github.com/ministryofjustice/analytical-platform-airflow/blob/main/.github/workflows/workflow-validation.yml
-      test     = "StringLike"
-      variable = "token.actions.githubusercontent.com:workflow_ref"
-      values   = ["ministryofjustice/analytical-platform-airflow/.github/workflows/workflow-validation.yml@*"]
-    }
-  ]
-
   policies = {
     ecr_access = module.ecr_access_iam_policy.arn
   }
@@ -91,21 +76,6 @@ module "trivy_analytical_platform_airflow_container_scanning_iam_role" {
   oidc_wildcard_subjects = [
     "ministryofjustice/*",
     "moj-analytical-services/*"
-  ]
-
-  trust_policy_conditions = [
-    {
-      # https://github.com/ministryofjustice/analytical-platform-airflow-github-actions/blob/main/.github/workflows/shared-scan-container.yml
-      test     = "StringLike"
-      variable = "token.actions.githubusercontent.com:job_workflow_ref"
-      values   = ["ministryofjustice/analytical-platform-airflow-github-actions/.github/workflows/shared-scan-container.yml@*"]
-    },
-    {
-      # https://github.com/ministryofjustice/analytical-platform-airflow/blob/main/.github/workflows/workflow-validation.yml
-      test     = "StringLike"
-      variable = "token.actions.githubusercontent.com:workflow_ref"
-      values   = ["ministryofjustice/analytical-platform-airflow/.github/workflows/workflow-validation.yml@*"]
-    }
   ]
 
   policies = {
