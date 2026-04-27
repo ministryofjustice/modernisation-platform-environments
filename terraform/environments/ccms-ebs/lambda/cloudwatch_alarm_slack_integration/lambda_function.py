@@ -360,7 +360,6 @@ class NotificationService:
                 if "inbound" in object_key.lower():
                     emoji =  ":white_check_mark:"
                 header = f"{emoji} *S3 Object Uploaded on bucket {bucket_name}.*"
-                source_ip = alarmdetails.get("detail", {}).get("source-ip-address", "Unknown Source IP")
                 payload = {
                     "blocks": [
                         {
@@ -375,7 +374,6 @@ class NotificationService:
                                     "*Details*\n"
                                     f" • *Object:* `s3://{bucket_name}/{object_key}`\n"
                                     f" • *Size (bytes):* {object_size} bytes\n"
-                                    f" • *SourceIpAddress:* {source_ip}\n"
                                     f" • *Timestamp:* {timestamp}"
                                 )
                             }
