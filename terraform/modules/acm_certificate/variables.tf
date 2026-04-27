@@ -8,9 +8,15 @@ variable "domain_name" {
   description = "Domain name for which the certificate should be issued"
 }
 
+variable "certificate_transparency_logging_preference" {
+  type        = bool
+  description = "Set to false to disable the certificate transparency log. See https://docs.aws.amazon.com/acm/latest/userguide/acm-concepts.html#concept-transparency for more details"
+  default     = null
+}
+
 variable "export" {
   type        = bool
-  description = "Set to true to allow certificate can be exported. Note issuing an exportable certificate is subject to additional charges"
+  description = "Set to true to allow export of certificate private key. Note issuing an exportable certificate is subject to additional charges"
   default     = null
 }
 
