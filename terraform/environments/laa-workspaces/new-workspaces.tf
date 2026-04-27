@@ -88,7 +88,7 @@ resource "aws_workspaces_workspace" "workspaces_ad" {
 
   directory_id = aws_workspaces_directory.workspaces_ad[0].id
   bundle_id    = local.application_data.accounts[local.environment].workspace_bundle_id
-  user_name    = each.key  # AD username (sam-account-name)
+  user_name    = each.key # AD username (sam-account-name)
 
   root_volume_encryption_enabled = true
   user_volume_encryption_enabled = true

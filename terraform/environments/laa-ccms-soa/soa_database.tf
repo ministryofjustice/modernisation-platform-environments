@@ -106,3 +106,26 @@ resource "aws_db_instance" "soa_db" {
     update = "80m"
   }
 }
+
+# RDS Minor upgrade notification changes
+# RDS maintenance event notification sent from DB to SNS topic
+
+resource "aws_db_event_subscription" "soa_rds_maintenance_notifications" {
+  name      = "${local.application_name}-${local.environment}-soa-rds-maintenance"
+  sns_topic = aws_sns_topic.soa_maintenance_topic.arn
+
+  source_type = "db-instance"
+  source_ids  = [aws_db_instance.soa_db.identifier]
+
+  event_categories = ["maintenance"]
+  enabled          = true
+
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-${local.environment}-soa-rds-maintenance"
+  })
+
+  depends_on = [
+    aws_db_instance.soa_db,
+    aws_sns_topic.soa_maintenance_topic
+  ]
+}

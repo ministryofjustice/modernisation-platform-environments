@@ -79,7 +79,8 @@ locals {
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
         tags = {
-          backup-plan = "daily-and-weekly"
+          backup-plan            = "daily-and-weekly"
+          instance-access-policy = "limited"
         }
         vpc_security_group_ids = ["database", "oem-agent", "ec2-linux"]
       }

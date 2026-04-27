@@ -5,9 +5,9 @@ locals {
     "cloud-platform-nonlive",
     "cloud-platform-live",
   ]
-  enabled_workspaces        = ["development_cluster"]
-  cluster_environment       = contains(local.mp_environments, terraform.workspace) ? local.environment : "development_cluster"
-  cp_vpc_name               = terraform.workspace
+  enabled_workspaces  = ["development_cluster"]
+  cluster_environment = contains(local.mp_environments, terraform.workspace) ? local.environment : "development_cluster"
+  cp_vpc_name         = terraform.workspace
   cp_vpc_cidr = {
     development_cluster = "10.0.0.0/16"
     development         = "10.1.0.0/16"
