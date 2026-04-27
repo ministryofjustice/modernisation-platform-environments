@@ -54,7 +54,7 @@ locals {
       }
 
       # TM-2057: Oct 2026, use below to replace above 2 certs
-      # remote_desktop_wildcard_and_planetfm_cert_v3 = {
+      # remote_desktop_wildcard_and_planetfm_cert_v4 = {
       #   cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
       #   domain_name                         = "*.hmpps-domain.service.justice.gov.uk"
       #   export                              = true
