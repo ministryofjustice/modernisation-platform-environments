@@ -114,11 +114,6 @@ resource "aws_s3_bucket_notification" "sftp_bc_bucket_notification" {
   bucket      = module.s3-bucket-sftp-bc.bucket.id
   eventbridge = true
 
-  # topic {
-  #   topic_arn = data.aws_sns_topic.s3_topic.arn
-  #   events    = ["s3:ObjectCreated:*"]
-  # }
-
   lambda_function {
     lambda_function_arn = aws_lambda_function.process_file_from_bucket_lambda_function.arn
     events              = ["s3:ObjectCreated:Put"]

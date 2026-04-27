@@ -66,14 +66,6 @@ resource "aws_lambda_function" "process_file_from_bucket_lambda_function" {
   })
 }
 
-# resource "aws_lambda_permission" "allow_eventbridge_invoke" {
-#   statement_id  = "AllowExecutionFromEventBridge"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.process_file_from_bucket_lambda_function.function_name
-#   principal     = "events.amazonaws.com"
-#   source_arn    = aws_cloudwatch_event_rule.sftp_bc_bucket_event_rule.arn
-# }
-
 resource "aws_lambda_permission" "allow_s3_invoke" {
   statement_id  = "AllowExecutionFromS3"
   action        = "lambda:InvokeFunction"
