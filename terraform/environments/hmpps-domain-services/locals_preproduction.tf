@@ -183,7 +183,7 @@ locals {
               "pp-rdgw-1-http",
               "pp-rds-1-https",
             ]
-            certificate_names_or_arns = ["remote_desktop_and_planetfm_wildcard_cert"]
+            certificate_names_or_arns = ["remote_desktop_and_planetfm_wildcard_cert_v3"]
             rules = {
               pp-rdgw-1-http = {
                 priority = 100
