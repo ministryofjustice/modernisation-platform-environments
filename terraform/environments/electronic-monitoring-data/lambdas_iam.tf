@@ -1526,10 +1526,22 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
   statement {
     sid     = "S3LoggingBucketPerms"
     effect  = "Allow"
-    actions = ["s3:PutObject", "s3:PutObjectAcl"]
+    actions = ["s3:PutObject", "s3:GetObject", "s3:PutObjectAcl"]
     resources = [
       "${module.s3-logging-bucket.bucket.arn}/ears_sars/*",
-      module.s3-logging-bucket.bucket.arn
+      module.s3-logging-bucket.bucket.arn,
+      "${module.s3-athena-bucket.bucket.arn}/output/*",
+      module.s3-athena-bucket.bucket.arn,
+    ]
+  }
+
+  statement {
+    sid     = "S3OutputsBucketPerms"
+    effect  = "Allow"
+    actions = ["s3:PutObject", "s3:GetObject", "s3:PutObjectAcl"]
+    resources = [
+      "${module.s3-ears-sars-bucket.bucket.arn}/*",
+      module.s3-ears-sars-bucket.bucket.arn
     ]
   }
 
