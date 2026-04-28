@@ -19,7 +19,11 @@ resource "aws_secretsmanager_secret_version" "connector_secrets" {
     "spring_datasource_url"                     = "",
     "spring_datasource_username"                = "",
     "spring_datasource_password"                = "",
-    "opa_security_password"                     = ""
+    "opa_security_password"                     = "",
+    "ccms_bc_url"                               = "",
+    "ccms_bc_lscServiceName"                    = "",
+    "ccms_bc_clientOrgId"                       = "",
+    "ccms_bc_clientUserId"                      = ""
   })
 
   lifecycle {
