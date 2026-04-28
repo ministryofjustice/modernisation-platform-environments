@@ -494,7 +494,7 @@ resource "aws_ebs_volume" "backup_prod" {
   }
   availability_zone = "eu-west-2a"
   count             = length(local.application_data.accounts[local.environment].ebs_backup_prod_snapshot_id) > 0 ? 1 : 0
-  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_backup
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_backup_prod
   type              = local.application_data.accounts[local.environment].ebs_type_ebsdb_backup
   snapshot_id       = length(local.application_data.accounts[local.environment].ebs_backup_prod_snapshot_id) > 0 ? local.application_data.accounts[local.environment].ebs_backup_prod_snapshot_id : null
   iops              = 3000
