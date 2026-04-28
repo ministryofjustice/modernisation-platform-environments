@@ -94,7 +94,7 @@ resource "aws_ecs_service" "opahub" {
 
 # Register ECS service as a scalable target (DEV only)
 resource "aws_appautoscaling_target" "ccms_opa_desiredcount" {
-  count              = local.environment == "development" ? 1 : 0
+  count              = contains(["development", "test"], local.environment) ? 1 : 0
   service_namespace  = "ecs"
   scalable_dimension = "ecs:service:DesiredCount"
 
@@ -113,7 +113,7 @@ resource "aws_appautoscaling_target" "ccms_opa_desiredcount" {
 
 # Scale DOWN to 0 at 21:00, Mon–Fri
 resource "aws_appautoscaling_scheduled_action" "ccms_opa_scale_down_21" {
-  count              = local.environment == "development" ? 1 : 0
+  count              = contains(["development", "test"], local.environment) ? 1 : 0
   name               = "${local.opa_app_name}-dev-scale-down-21"
   service_namespace  = "ecs"
   resource_id        = aws_appautoscaling_target.ccms_opa_desiredcount[0].resource_id
@@ -130,7 +130,7 @@ resource "aws_appautoscaling_scheduled_action" "ccms_opa_scale_down_21" {
 
 # Scale UP to 1 at 06:00, Mon–Fri
 resource "aws_appautoscaling_scheduled_action" "ccms_opa_scale_up_06" {
-  count              = local.environment == "development" ? 1 : 0
+  count              = contains(["development", "test"], local.environment) ? 1 : 0
   name               = "${local.opa_app_name}-dev-scale-up-06"
   service_namespace  = "ecs"
   resource_id        = aws_appautoscaling_target.ccms_opa_desiredcount[0].resource_id
