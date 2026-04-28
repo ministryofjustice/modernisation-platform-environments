@@ -584,12 +584,15 @@ locals {
 
   # DPR Cross-account Secret Placeholders for Cloud Platform access
   # Assessment View Database (PostgreSQL)
+  # Values are intentionally set to "placeholder" - the Cloud Platform team will update them via write access
   dpr_crossaccount_assessment_view_secrets_placeholder = {
-    engine  = "postgres"
-    db_name = "db77ebf3897b7f57e7"
-    username = "dpruser"
-    host    = "hmpps-arns-assessment-view-db-dev.cdwm328dlye6.eu-west-2.rds.amazonaws.com"
-    port    = "5432"
+    engine   = "postgres"
+    source   = "cloud-platform"
+    db_name  = "placeholder"
+    username = "placeholder"
+    password = "placeholder"
+    host     = "placeholder"
+    port     = "placeholder"
   }
 
   # Add more cross-account secret placeholders here as needed for other databases
