@@ -339,7 +339,7 @@ resource "aws_cloudwatch_metric_alarm" "Admin_UnHealthy_Hosts" {
   period              = "60"
   evaluation_periods  = "3"
   threshold           = "0"
-  treat_missing_data  = "notBreaching"
+  treat_missing_data  = "breaching"
   dimensions = {
     LoadBalancer = aws_lb.admin.arn_suffix
     TargetGroup  = aws_lb_target_group.admin.arn_suffix
@@ -359,7 +359,7 @@ resource "aws_cloudwatch_metric_alarm" "Managed_UnHealthy_Hosts" {
   period              = "60"
   evaluation_periods  = "3"
   threshold           = "0"
-  treat_missing_data  = "notBreaching"
+  treat_missing_data  = "breaching"
   dimensions = {
     LoadBalancer = aws_lb.managed.arn_suffix
     TargetGroup  = aws_lb_target_group.managed.arn_suffix
