@@ -8,8 +8,7 @@
 #   GRANT SELECT_CATALOG_ROLE TO dms_user;
 #
 # Module quirks (ministryofjustice/terraform-dms-module):
-#   - Requires hashicorp/tls provider (via Lambda sub-module) — add to versions.tf
-#   - glue_catalog_arn must be set if write_metadata_to_glue_catalog = true,
+#   - Requires hashicorp/tls provider (via Lambda sub-module) — add to versions.tf - glue_catalog_arn must be set if write_metadata_to_glue_catalog = true,
 #     otherwise IAM policy ARNs are malformed (empty partition)
 #   - The dms-vpc-role takes ~30s to propagate after creation; first apply may
 #     fail on aws_dms_replication_subnet_group — re-run resolves it
