@@ -96,6 +96,14 @@ resource "aws_ecs_service" "opahub" {
     aws_autoscaling_group.cluster_scaling_group
   ]
 }
+data "aws_ecs_service" "ccms_opa" {
+  cluster = "ccms-oia-cluster"
+  name    = "ccms-opa"
+}
+
+output "ecs_service_tags" {
+  value = data.aws_ecs_service.ccms_opa.tags
+}
 
 # Register ECS service as a scalable target (DEV only)
 resource "aws_appautoscaling_target" "ccms_opa_desiredcount" {
