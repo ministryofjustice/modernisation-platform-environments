@@ -329,7 +329,7 @@ resource "aws_lakeformation_permissions" "emdi_di_tables" {
   table {
     database_name = "data_insights${local.dbt_suffix}"
     wildcard      = true
-  }fi
+  }
 }
 
 
