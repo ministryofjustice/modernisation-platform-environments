@@ -173,7 +173,7 @@ data "aws_iam_policy_document" "s3_topic_policy" {
     }
 
     actions   = ["SNS:Publish"]
-    resources = ["arn:aws:sns:*:*:s3-event-notification-topic"]
+    resources = ["arn:aws:sns:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:s3-event-notification-topic"]
 
     condition {
       test     = "ArnLike"
@@ -197,7 +197,7 @@ data "aws_iam_policy_document" "s3_topic_policy" {
       identifiers = ["events.amazonaws.com"]
     }
     actions   = ["SNS:Publish"]
-    resources = ["arn:aws:sns:*:*:s3-event-notification-topic"]
+    resources = ["arn:aws:sns:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:s3-event-notification-topic"]
   }
 }
 
