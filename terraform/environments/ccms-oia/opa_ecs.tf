@@ -66,6 +66,11 @@ resource "aws_ecs_service" "opahub" {
   desired_count   = local.application_data.accounts[local.environment].opa_app_count
   launch_type     = "EC2"
 
+  tags = {  
+      Name        = local.opa_app_name  
+        Environment = local.environment  
+          }
+
   # Ignore autoscaling changes to desired_count  
   
   lifecycle {    
