@@ -115,44 +115,16 @@ data "aws_iam_policy_document" "logging_s3_policy" {
     effect = "Allow"
     principals {
       type        = "Service"
-      identifiers = ["logging.s3.amazonaws.com",
-                      "s3.amazonaws.com"
-                      ]
+      identifiers = ["logging.s3.amazonaws.com"]
     }
     actions   = ["s3:PutObject"]
     resources = ["arn:aws:s3:::ccms-ebs-${local.environment}-logging/*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = ["${data.aws_caller_identity.current.account_id}"]
+    }
   }
-
-  statement {
-  sid    = "DenyNonAWSLoggingWrites"
-  effect = "Deny"
-
-  principals {
-    type        = "*"
-    identifiers = ["*"]
-  }
-
-  actions = ["s3:PutObject"]
-
-  # Apply deny to the WHOLE BUCKET 
-  resources = [
-    "arn:aws:s3:::ccms-ebs-${local.environment}-logging/*"
-  ]
-
-  condition {
-    test     = "StringNotEqualsIfExists"
-    variable = "aws:CalledVia"
-    values = [
-      "s3.amazonaws.com",                             # S3 service
-      "logging.s3.amazonaws.com",                     # S3 Server Access Logging
-      "logdelivery.elasticloadbalancing.amazonaws.com", # ALB/NLB Access Logging
-      "firehose.amazonaws.com",                       # WAF logs (delivered via Firehose)
-      "athena.amazonaws.com"                          # Athena query result                        
-      # Add these if used:
-      # "logging.cloudfront.amazonaws.com"
-    ]
-  }
-}
 }
 
 # ---------------------------------------------
