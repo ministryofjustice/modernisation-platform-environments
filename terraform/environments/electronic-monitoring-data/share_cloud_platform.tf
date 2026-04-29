@@ -608,7 +608,7 @@ data "aws_iam_policy_document" "emac_di_permissions" {
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/serco_fms*/",
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/allied_mdss*/",
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/serco_fms_curated*/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_mdss*/*"
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_mdss*/*",
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/acquistive_crime*/*",
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/data_insights*/*",
     ] : []
