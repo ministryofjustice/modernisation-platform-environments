@@ -55,7 +55,11 @@ echo ECS_ENABLE_CONTAINER_METADATA=true >> /etc/ecs/ecs.config
 echo ECS_CLUSTER=${cluster_name} >> /etc/ecs/ecs.config
 
 # Set dynamic hostname for Datadog
-INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id | cut -c-10)
+until TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600") && [ -n "$TOKEN" ]; do
+  echo "Waiting for metadata token..."
+  sleep 2
+done
+INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id | cut -c-10)
 hostnamectl set-hostname ${env}-ecs-$INSTANCE_ID
 
 #set ssh key Algorithms
