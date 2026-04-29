@@ -58,12 +58,6 @@ module "ecs_service_datadog_agent" {
         }
       ]
 
-      entry_point = [
-        "sh",
-        "-c",
-        "TOKEN=$(curl -s -X PUT http://169.254.169.254/latest/api/token -H 'X-aws-ec2-metadata-token-ttl-seconds: 21600') && export DD_HOSTNAME=${var.environment}-ecs-$(curl -s -H \"X-aws-ec2-metadata-token: $TOKEN\" http://169.254.169.254/latest/meta-data/instance-id | cut -c-10) && /init"
-      ]
-
       environment = [
         {
           name  = "DD_ECS_FARGATE"
@@ -76,6 +70,10 @@ module "ecs_service_datadog_agent" {
         {
           "name" : "DD_APM_ENABLED",
           "value" : var.enable_datadog_agent_apm ? "true" : "false"
+        },
+        {
+          "name"  = "DD_HOSTNAME"
+          "value" = "${var.environment}-ecs"
         },
         {
           "name" : "DD_CLUSTER_NAME",
