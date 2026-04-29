@@ -232,20 +232,9 @@ resource "aws_iam_instance_profile" "gdpr_batch_instance_profile" {
 # ==============================================================================
 
 ## ECS resources
-data "aws_iam_policy_document" "gdpr_batch_jobs_assume_ecs_policy" {
-  statement {
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "Service"
-      identifiers = ["ecs-tasks.amazonaws.com"]
-    }
-  }
-}
-
-resource "aws_iam_role" "ecs_gdpr_execution_role" {
-  name               = "emds-gdpr-execution-role" # STRICT NAME REQUIRED BY EXTERNAL ECR
-  assume_role_policy = data.aws_iam_policy_document.gdpr_batch_jobs_assume_ecs_policy.json
-}
+# The following are already covered in gdpr_jobs
+# data "aws_iam_policy_document" "ecs_gdpr_assume_policy" 
+# resource "aws_iam_role" "ecs_gdpr_execution_role" 
 
 resource "aws_iam_role_policy_attachment" "gdpr_batch_jobs_ecs_execution_role_policy" {
   role       = aws_iam_role.ecs_gdpr_execution_role.name
@@ -303,7 +292,7 @@ resource "aws_iam_role_policy_attachment" "gdpr_batch_jobs_ecr_policy_attach" {
 # Can re-use the assume ecs statement as it is the same, but want different permissions here.
 resource "aws_iam_role" "gdpr_batch_code_job_role" {
   name               = "emds-gdpr-code-job-role"
-  assume_role_policy = data.aws_iam_policy_document.gdpr_batch_jobs_assume_ecs_policy.json
+  assume_role_policy = data.aws_iam_policy_document.ecs_gdpr_assume_policy.json
 }
 
 ## S3 Policies
