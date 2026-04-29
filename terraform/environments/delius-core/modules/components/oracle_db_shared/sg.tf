@@ -220,3 +220,17 @@ resource "aws_vpc_security_group_ingress_rule" "ap_db_oracle" {
     { Name = "ap-oracle-in-${each.key}" }
   )
 }
+
+resource "aws_security_group_egress_rule" "ec2_to_nextcloud_efs_egress" {
+  for_each = try({ for env, cidr in local.efs_cidr_map : env => cidr if env == var.env_name }, {})
+
+  type              = "egress"
+  from_port         = 2049
+  to_port           = 2049
+  protocol          = "tcp"
+  security_group_id = aws_security_group.db_ec2.id
+  cidr_ipv4         = each.value
+  description       = "Allow DB to access Nextcloud EFS for ${var.env_name} environment"
+}
+
+

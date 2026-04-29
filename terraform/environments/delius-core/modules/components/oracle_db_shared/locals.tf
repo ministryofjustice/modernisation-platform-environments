@@ -87,4 +87,10 @@ locals {
     preprod = "172.26.0.0/16",
     prod    = "172.25.0.0/16"
   }
+
+  # this is for allowing outbound access to Nextcloud EFS in legacy Pre-Prod and Prod accounts.
+  efs_cidr_map = {
+    preprod = ["10.160.0.0/20"]
+    prod    = ["10.160.16.0/20"]
+  }
 }
