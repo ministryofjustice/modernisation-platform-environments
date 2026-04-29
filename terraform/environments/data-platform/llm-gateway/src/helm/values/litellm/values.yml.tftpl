@@ -24,7 +24,7 @@ db:
     usernameKey: ${databaseUserNameKey}
     passwordKey: ${databasePasswordKey}
     endpointKey: ${databaseEndpointKey}
-  
+
 masterkeySecretName: ${masterkeySecretName}
 masterkeySecretKey: ${masterkeySecretKey}
 
@@ -42,12 +42,7 @@ proxy_config:
     proxy_admin_email: "Jacob.Woffenden@justice.gov.uk"
     ui_access_mode: "admin_only"
   litellm_settings:
-    cache: false # disabling caching as per conversation with i.AI https://mojdt.slack.com/archives/C09M9BQS8LR/p1762181030355169
-    cache_params:
-      type: redis
-      host: os.environ/primary_endpoint_address
-      port: 6379
-      password: os.environ/auth_token
+    cache: false
     callbacks: ["prometheus"]
     success_callback: ["prometheus"]
     failure_callback: ["prometheus"]
@@ -64,10 +59,7 @@ proxy_config:
       models: []
   router_settings:
     routing_strategy: simple-shuffle
-    redis_host: os.environ/primary_endpoint_address
-    redis_port: 6379
-    redis_password: os.environ/auth_token
-      
+
   model_list:
 %{ for key, profile in azureModels ~}
     - model_name: azure-${key}
@@ -98,26 +90,10 @@ securityContext:
 
 ingress:
   enabled: false
-  className: default
-  annotations:
-    external-dns.alpha.kubernetes.io/set-identifier: "${ingressIdentifier}-${namespace}-${ingressColour}"
-    external-dns.alpha.kubernetes.io/aws-weight: "100"
-    external-dns.alpha.kubernetes.io/hostname: "${ingressHostname}"
-    nginx.ingress.kubernetes.io/whitelist-source-range: ${join(",", ingressAllowList)}
-  hosts:
-    - host: ${ingressHostname}
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls:
-   - secretName: ${ingressTlsSecretName}
-     hosts:
-       - ${ingressHostname}
 
 envVars: {
     LITELLM_MODE: "PRODUCTION",
     PROXY_BASE_URL: "https://${ingressHostname}",
-    REDIS_SSL: "True",
     DOCS_TITLE: "Data Platform LLM Gateway",
     DOCS_DESCRIPTION: "This is experimental, uptime is not guaranteed.",
     DOCS_FILTERED: "True",
