@@ -3,8 +3,8 @@ locals {
   environment_configurations = {
     development = {
       litellm_versions = {
-        application = "main-v1.82.3-stable.patch.2"
-        chart       = "1.82.3-stable.patch.2"
+        application = "main-v1.83.7-stable"
+        chart       = "1.83.7-stable"
       }
       llm_gateway_hostname = "llm-gateway.development.data-platform.service.justice.gov.uk"
       llm_gateway_ingress_allowlist = [
@@ -109,7 +109,10 @@ locals {
       rds_engine_version    = "17.4"
     }
     test = {
-      litellm_versions              = {}
+      litellm_versions = {
+        application = "main-v1.83.7-stable"
+        chart       = "1.83.7-stable"
+      }
       llm_gateway_hostname          = ""
       llm_gateway_ingress_allowlist = []
       llm_gateway_models            = {}
@@ -118,7 +121,10 @@ locals {
       rds_engine_version            = "17.4"
     }
     preproduction = {
-      litellm_versions              = {}
+      litellm_versions = {
+        application = "main-v1.83.7-stable"
+        chart       = "1.83.7-stable"
+      }
       llm_gateway_hostname          = ""
       llm_gateway_ingress_allowlist = []
       llm_gateway_models            = {}
@@ -127,7 +133,10 @@ locals {
       rds_engine_version            = "17.4"
     }
     production = {
-      litellm_versions              = {}
+      litellm_versions = {
+        application = "main-v1.83.7-stable"
+        chart       = "1.83.7-stable"
+      }
       llm_gateway_hostname          = ""
       llm_gateway_ingress_allowlist = []
       llm_gateway_models            = {}
