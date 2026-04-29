@@ -4,7 +4,7 @@ resource "aws_macie2_account" "macie_unstructured_spike" {
 
 resource "terraform_data" "disable_automated_discovery" {
   # This ensures the command runs again if the Macie account is recreated
-  input = aws_macie2_account.main.id
+  input = aws_macie2_account.macie_unstructured_spike.id
 
   provisioner "local-exec" {
     command = <<EOT
