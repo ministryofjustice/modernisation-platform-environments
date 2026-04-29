@@ -1,5 +1,10 @@
 #### This file can be used to store secrets specific to the member account ####
 
+import {
+  to = aws_secretsmanager_secret.ebs_cw_alerts_secrets
+  id = "ccms-ebs-upgrade-cw-alerts-secrets"
+}
+
 # Slack Channel Webhook Secret for Cloudwatch, GuardDuty & S3 Alerts via Lambda
 resource "aws_secretsmanager_secret" "ebs_cw_alerts_secrets" {
   name        = "${local.application_name}-cw-alerts-secrets"
