@@ -76,24 +76,6 @@ module "s3_bucket" {
 #}
 
 data "aws_iam_policy_document" "bucket_policy" {
-  
-
-  # Enforce TLS v1.2 or higher
-  statement {
-      sid    = "EnforceTLSv12orHigher"
-      effect = "Deny"
-      principals {
-        type        = "AWS"
-        identifiers = ["*"]
-      }
-      actions   = ["s3:*"]
-      resources = [aws_s3_bucket.default.arn, "${aws_s3_bucket.default.arn}/*"]
-      condition {
-        test     = "NumericLessThan"
-        variable = "s3:TlsVersion"
-        values   = ["1.2"]
-      }
-    }
 
   dynamic "statement" {
     for_each = length(aws_iam_role.ftp_lambda_role) > 0 ? [1] : []
