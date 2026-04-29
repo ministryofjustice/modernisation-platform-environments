@@ -79,6 +79,9 @@ locals {
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-api-iam-preprod}",
   ] : []
   iam_role_validation_db = local.is-test ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live" : local.is-production ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-a7f6cc937a0f63ce-live" : ""
+  emdi_cp_roles = local.is-development || local.is-test ? [
+    var.cloud-platform-emdi-iam-dev
+  ] : local.is-preproduction ? [var.cloud-platform-emdi-iam-preprod] : []
 }
 
 variable "cloud-platform-iam-dev" {
@@ -127,6 +130,12 @@ variable "cloud-platform-emdi-iam-dev" {
   type        = string
   description = "IAM role that the EDMI API in Cloud Platform will use to connect to this role."
   default     = "arn:aws:iam::754256621582:role/cloud-platform-irsa-18caab25332f152c-live"
+}
+
+variable "cloud-platform-emdi-iam-preprod" {
+  type        = string
+  description = "IAM role that the EDMI pp API in Cloud Platform will use to connect to this role."
+  default     = "arn:aws:iam::754256621582:role/cloud-platform-irsa-52863d2d74321cf9-live"
 }
 
 
@@ -257,13 +266,13 @@ resource "aws_iam_role_policy_attachment" "em_data_validation_permissions" {
 module "emdi_trail_maps_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-  count   = local.is-development || local.is-test ? 1 : 0
+  count   = local.is-production ? 0 : 1
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.48.0"
 
   trusted_role_arns = flatten([
     data.aws_iam_roles.mod_plat_roles.arns,
-    var.cloud-platform-emdi-iam-dev,
+    local.emdi_cp_roles,
   ])
 
   create_role       = true
@@ -584,7 +593,9 @@ data "aws_iam_policy_document" "emac_di_permissions" {
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/serco_fms*",
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/allied_mdss*",
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/serco_fms_curated*",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_mdss*"
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_mdss*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/acquistive_crime*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/data_insights*",
     ] : []
   }
   statement {
@@ -597,7 +608,9 @@ data "aws_iam_policy_document" "emac_di_permissions" {
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/serco_fms*/*",
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/allied_mdss*/*",
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/serco_fms_curated*/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_mdss*/*"
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_mdss*/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/acquistive_crime*/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/data_insights*/*",
     ] : []
   }
 }
