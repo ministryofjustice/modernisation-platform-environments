@@ -72,7 +72,7 @@
 
           - name: Validate Tags
             id: validate
-            uses: ministryofjustice/checkov-tag-validator@b4b7073cb5932d2e167e3a64cb850e23dcb5b45f #v2.0.0
+            uses: ministryofjustice/checkov-tag-validator@tf-backend-config
             with:
               terraform_directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
               soft_fail: false
