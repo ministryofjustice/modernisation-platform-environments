@@ -66,11 +66,6 @@ resource "aws_ecs_service" "opahub" {
   desired_count   = local.application_data.accounts[local.environment].opa_app_count
   launch_type     = "EC2"
 
-  tags = {  
-      Name        = local.opa_app_name  
-        Environment = local.environment  
-          }
-
   # Ignore autoscaling changes to desired_count  
   
   lifecycle {    
@@ -95,14 +90,6 @@ resource "aws_ecs_service" "opahub" {
     aws_iam_role_policy_attachment.ecs_task_execution_role,
     aws_autoscaling_group.cluster_scaling_group
   ]
-}
-data "aws_ecs_service" "ccms_opa" {
-  cluster = "ccms-oia-cluster"
-  name    = "ccms-opa"
-}
-
-output "ecs_service_tags" {
-  value = data.aws_ecs_service.ccms_opa.tags
 }
 
 # Register ECS service as a scalable target (DEV only)
