@@ -513,7 +513,7 @@ resource "aws_db_instance" "appdb1_std" {
   #checkov:skip=CKV_AWS_293:"Deletion protection is enabled but not being recognised"
   count = var.create_std_instance ? 1 : 0
 
-  identifier                            = "${var.identifier_name}-${var.std_identifier_suffix}-${var.environment}-database"
+  identifier                            = "${var.identifier_name}-${var.environment}-database-${var.std_identifier_suffix}"
   port                                  = var.port
   allocated_storage                     = var.allocated_storage
   db_name                               = var.application_name
