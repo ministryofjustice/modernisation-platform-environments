@@ -339,7 +339,7 @@ resource "aws_cloudwatch_metric_alarm" "Admin_UnHealthy_Hosts" {
   period              = "60"
   evaluation_periods  = "3"
   threshold           = "0"
-  treat_missing_data  = "notBreaching"
+  treat_missing_data  = "breaching"
   dimensions = {
     LoadBalancer = aws_lb.admin.arn_suffix
     TargetGroup  = aws_lb_target_group.admin.arn_suffix
@@ -359,7 +359,7 @@ resource "aws_cloudwatch_metric_alarm" "Managed_UnHealthy_Hosts" {
   period              = "60"
   evaluation_periods  = "3"
   threshold           = "0"
-  treat_missing_data  = "notBreaching"
+  treat_missing_data  = "breaching"
   dimensions = {
     LoadBalancer = aws_lb.managed.arn_suffix
     TargetGroup  = aws_lb_target_group.managed.arn_suffix
@@ -521,7 +521,23 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_hogging_threads" {
 
 resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_jdbc_ebs_state" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-jdbc-ebs-state"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | EBSSMS/EBS JDBC state is not running on the SOA managed servers."
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | EBS JDBC datasource state is not running on the SOA managed servers."
+  comparison_operator = "GreaterThanThreshold"
+  metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_jdbc_ebs_state.id
+  statistic           = "Sum"
+  namespace           = "CCMS-SOA-APP"
+  period              = "300"
+  evaluation_periods  = "1"
+  threshold           = "5"
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  ok_actions          = [aws_sns_topic.alerts.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_jdbc_ebssms_state" {
+  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-jdbc-ebssms-state"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | EBSSMS JDBC datasource state is not running on the SOA managed servers."
   comparison_operator = "GreaterThanThreshold"
   metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_check_jdbc_ebssms_state.id
   statistic           = "Sum"

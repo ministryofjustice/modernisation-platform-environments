@@ -54,6 +54,10 @@ data "aws_eks_cluster" "apc_cluster" {
   name = local.eks_cluster_name
 }
 
+data "aws_eks_cluster_auth" "apc_cluster" {
+  name = data.aws_eks_cluster.apc_cluster.name
+}
+
 # KMS
 data "aws_kms_key" "common_secrets_manager_kms" {
   key_id = "alias/secretsmanager/common"

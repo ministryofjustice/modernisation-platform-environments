@@ -5,7 +5,7 @@
       "port": "1521",
       "allocated_storage": 300,
       "engine": "oracle-se2",
-      "engine_version": "19.0.0.0.ru-2025-10.rur-2025-10.r1",
+      "engine_version": "19.0.0.0.ru-2026-01.rur-2026-01.r3",
       "instance_class": "db.t3.medium",
       "allow_major_version_upgrade": false,
       "auto_minor_version_upgrade": true,
@@ -48,7 +48,8 @@
       "zip_lambda_source_file": "zip_s3_objects.zip",
       "zip_lambda_source_file_version": "TevkiwEbMJttB_5X7VX03Sas1u6ONJbE",
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? 2999)",
-      "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)"
+      "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)",
+      "max_string_size": "EXTENDED"
     },
 
     "test": {
@@ -56,7 +57,7 @@
       "port": "1521",
       "allocated_storage": 300,
       "engine": "oracle-se2",
-      "engine_version": "19.0.0.0.ru-2025-10.rur-2025-10.r1",
+      "engine_version": "19.0.0.0.ru-2026-01.rur-2026-01.r3",
       "instance_class": "db.t3.medium",
       "allow_major_version_upgrade": false,
       "auto_minor_version_upgrade": true,
@@ -99,14 +100,15 @@
       "zip_lambda_source_file": "zip_s3_objects.zip",
       "zip_lambda_source_file_version": "TevkiwEbMJttB_5X7VX03Sas1u6ONJbE",
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? 2999)",
-      "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)"
+      "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)",
+      "max_string_size": "EXTENDED"
     },
     "preproduction": {
       "region": "eu-west-2",
       "port": "1521",
       "allocated_storage": 300,
       "engine": "oracle-se2",
-      "engine_version": "19.0.0.0.ru-2025-10.rur-2025-10.r1",
+      "engine_version": "19.0.0.0.ru-2026-01.rur-2026-01.r3",
       "hub20_sec_group_id": "",
       "hub20_s3_bucket": "",
       "mojfin_sec_group_id": "sg-03a86e54fd2c0fb97",
@@ -149,7 +151,8 @@
       "zip_lambda_source_file": "zip_s3_objects.zip",
       "zip_lambda_source_file_version": "TevkiwEbMJttB_5X7VX03Sas1u6ONJbE",
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? 2999)",
-      "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)"
+      "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)",
+      "max_string_size": "EXTENDED"
     },
 
     "production": {
@@ -200,7 +203,8 @@
       "zip_lambda_source_file": "zip_s3_objects.zip",
       "zip_lambda_source_file_version": "TevkiwEbMJttB_5X7VX03Sas1u6ONJbE",
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? *)",
-      "zip_lambda_eventbridge_cron": "cron(45 6 * * ? *)"
+      "zip_lambda_eventbridge_cron": "cron(45 6 * * ? *)",
+      "max_string_size": "STANDARD"
     }
   }
 }

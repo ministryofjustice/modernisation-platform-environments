@@ -173,7 +173,7 @@ module "laa_data_analysis_replication_iam_role" {
 
   create = true
 
-  name            = "laa-analysis-${local.environment}-repl"
+  name            = "laa-data-analysis-${local.environment}-replication"
   use_name_prefix = false
 
   trust_policy_permissions = {

@@ -1,0 +1,6 @@
+---
+apiVersion: v2
+name: gateway-configuration
+description: A Helm chart to deploy Gateway configurations
+type: application
+version: 1.0.0

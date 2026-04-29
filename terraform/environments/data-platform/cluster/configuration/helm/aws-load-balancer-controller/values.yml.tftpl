@@ -1,0 +1,40 @@
+---
+replicaCount: 2
+
+clusterName: ${cluster_name}
+region: ${aws_region}
+vpcId: ${vpc_id}
+
+serviceAccount:
+  create: true
+  name: aws-load-balancer-controller-sa
+
+# Required on custom CNI EKS clusters so the control plane can reach this endpoint.
+hostNetwork: true
+dnsPolicy: ClusterFirstWithHostNet
+
+# Keep AWS LBC opt-in for Service type LoadBalancer; do not mutate all Services by default.
+enableServiceMutatorWebhook: false
+
+controllerConfig:
+  featureGates:
+    ALBGatewayAPI: false
+    NLBGatewayAPI: false
+
+# Overlay-based pod networking in this cluster should use instance targets.
+defaultTargetType: instance
+
+nodeSelector:
+  compute.data-platform.service.justice.gov.uk/node: system
+
+tolerations:
+  - key: compute.data-platform.service.justice.gov.uk/node
+    operator: Equal
+    value: system
+    effect: NoSchedule
+
+podDisruptionBudget:
+  maxUnavailable: 1
+
+serviceMonitor:
+  enabled: true

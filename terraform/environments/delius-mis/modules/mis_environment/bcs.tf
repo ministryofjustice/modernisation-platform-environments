@@ -72,7 +72,6 @@ resource "aws_vpc_security_group_egress_rule" "bcs_win_ec2_to_dc" {
 resource "aws_vpc_security_group_ingress_rule" "bcs_win_ec2" {
   for_each = var.bcs_config_win != null && var.bcs_config_win.instance_count > 0 ? {
     http8080-from-alb = { referenced_security_group_id = aws_security_group.mis_alb.id, ip_protocol = "tcp", port = 8080 }
-    tcp6400-from-vpc  = { cidr_ipv4 = var.account_config.shared_vpc_cidr, ip_protocol = "tcp", from_port = 6400, to_port = 6500 } # hmpps jumpservers
   } : {}
 
   description       = each.key

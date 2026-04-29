@@ -46,6 +46,7 @@ module "rds" {
   hub20_sec_group_id                    = local.build_hub_integration ? "${local.environment_management.account_ids["laa-enterprise-service-bus-${local.environment}"]}/${local.application_data.accounts[local.environment].hub20_sec_group_id}" : ""
   hub20_s3_bucket                       = local.build_hub_integration ? local.application_data.accounts[local.environment].hub20_s3_bucket : ""
   kms_key_arn                           = local.rds_kms_key_arn
+  max_string_size                       = local.application_data.accounts[local.environment].max_string_size
 
   tags = local.tags
 }

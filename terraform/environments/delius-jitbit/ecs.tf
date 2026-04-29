@@ -1,7 +1,12 @@
+moved {
+  from = module.ecs.module.ecs_cluster.aws_ecs_cluster.default[0]
+  to   = module.ecs.aws_ecs_cluster.this
+}
+
 module "ecs" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v6.0.0"
 
-  name = local.application_name
+  name = "hmpps-${local.environment}-${local.application_name}"
 
   tags = local.tags
 }

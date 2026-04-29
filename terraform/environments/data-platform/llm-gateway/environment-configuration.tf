@@ -3,8 +3,8 @@ locals {
   environment_configurations = {
     development = {
       litellm_versions = {
-        application = "main-v1.82.3-stable.patch.2"
-        chart       = "1.82.3-stable.patch.2"
+        application = "main-v1.83.7-stable"
+        chart       = "1.83.7-stable"
       }
       llm_gateway_hostname = "llm-gateway.development.data-platform.service.justice.gov.uk"
       llm_gateway_ingress_allowlist = [
@@ -22,6 +22,13 @@ locals {
         "3.8.51.207/32",
         "35.177.252.54/32",
         "35.178.209.113/32",
+        # Modernisation Platform
+        "13.41.38.176/32",
+        "3.8.81.175/32",
+        "3.11.197.133/32",
+        "13.43.9.198/32",
+        "13.42.163.245/32",
+        "18.132.208.127/32",
       ]
       llm_gateway_models = {
         azure = {

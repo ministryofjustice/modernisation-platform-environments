@@ -288,3 +288,91 @@ data "aws_iam_policy_document" "cloudwatch_sns_encryption" {
   }
 
 }
+
+# RDS → SNS publish policy
+data "aws_iam_policy_document" "rds_publish_to_sns" {
+  statement {
+    sid    = "AllowRDSPublish"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.rds.amazonaws.com"]
+    }
+
+    actions   = ["sns:Publish"]
+    resources = [aws_sns_topic.tds_maintenance_topic.arn]
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values = [
+        "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:db:${aws_db_instance.tds_db.id}"
+      ]
+    }
+  }
+}
+
+# SNS topic policy 
+
+resource "aws_sns_topic_policy" "rds_publish_policy" {
+  arn    = aws_sns_topic.tds_maintenance_topic.arn
+  policy = data.aws_iam_policy_document.rds_publish_to_sns.json
+}
+
+# KMS key for SNS + RDS events
+
+resource "aws_kms_key" "sns_rds_events" {
+  description         = "KMS key for encrypting RDS maintenance events in SNS"
+  enable_key_rotation = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowAccountAdmins"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowSNSToUseKey"
+        Effect = "Allow"
+        Principal = {
+          Service = "sns.amazonaws.com"
+        }
+        Action = [
+          "kms:GenerateDataKey*",
+          "kms:Decrypt"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowRDSEventsToUseKey"
+        Effect = "Allow"
+        Principal = {
+          Service = "events.rds.amazonaws.com"
+        }
+        Action = [
+          "kms:GenerateDataKey*",
+          "kms:Decrypt"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-${local.environment}-sns-rds-events-kms"
+  })
+}
+
+# KMS alias
+
+resource "aws_kms_alias" "sns_rds_events" {
+  name          = "alias/${local.application_name}-${local.environment}-sns-rds-events"
+  target_key_id = aws_kms_key.sns_rds_events.key_id
+}

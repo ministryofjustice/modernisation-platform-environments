@@ -31,5 +31,19 @@
 locals {
   workspace_users = {
     # Add users here
+    # 
+    # Example (uncomment and modify):
+    # "john.smith" = {
+    #   first_name    = "John"
+    #   last_name     = "Smith"
+    #   email         = "john.smith@justice.gov.uk"
+    #   instance_type = "standard"
+    # }
+    # "jane.doe" = {
+    #   first_name    = "Jane"
+    #   last_name     = "Doe"
+    #   email         = "jane.doe@justice.gov.uk"
+    #   instance_type = "performance"
+    # }
   }
 }

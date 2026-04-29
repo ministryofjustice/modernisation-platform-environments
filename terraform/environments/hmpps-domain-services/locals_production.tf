@@ -36,6 +36,38 @@ locals {
           description = "wildcard cert for hmpps domain load balancer"
         }
       }
+
+      remote_desktop_wildcard_and_planetfm_cert_v3 = {
+        certificate_transparency_logging_preference = false # this should have been set to true
+        cloudwatch_metric_alarms                    = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name                                 = "*.hmpps-domain.service.justice.gov.uk"
+        export                                      = true
+        external_validation_records_created         = true
+        subject_alternate_names = [
+          "*.planetfm.service.justice.gov.uk",
+          "cafmtx.az.justice.gov.uk",
+          "hmpps-az-gw1.justice.gov.uk",
+        ]
+        tags = {
+          description = "wildcard cert for hmpps remote desktop services"
+        }
+      }
+
+      # TM-2057: Oct 2026, use below to replace above 2 certs
+      # remote_desktop_wildcard_and_planetfm_cert_v4 = {
+      #   cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
+      #   domain_name                         = "*.hmpps-domain.service.justice.gov.uk"
+      #   export                              = true
+      #   external_validation_records_created = true
+      #   subject_alternate_names = [
+      #     "*.planetfm.service.justice.gov.uk",
+      #     "cafmtx.az.justice.gov.uk",
+      #     "hmpps-az-gw1.justice.gov.uk",
+      #   ]
+      #   tags = {
+      #     description = "wildcard cert for hmpps remote desktop services"
+      #   }
+      # }
     }
 
     cloudwatch_dashboards = {
@@ -63,6 +95,9 @@ locals {
             "Ec2GFSLSecretPolicy"
           ])
         })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 120 }
+        }
         instance = merge(local.ec2_instances.jumpserver.instance, {
           instance_type = "r6i.large"
           tags = {

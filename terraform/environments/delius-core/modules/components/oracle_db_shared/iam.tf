@@ -146,6 +146,30 @@ data "aws_iam_policy_document" "cert_export" {
   }
 }
 
+data "aws_iam_policy_document" "cloudwatch_agent" {
+  statement {
+    sid    = "CloudwatchAgent"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:PutMetricData",
+      "logs:PutLogEvents",
+      "logs:DescribeLogStreams",
+      "logs:DescribeLogGroups",
+      "logs:CreateLogStream",
+      "logs:CreateLogGroup",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "DenyCreateLogGroup"
+    effect = "Deny"
+    actions = [
+      "logs:CreateLogGroup"
+    ]
+    resources = ["*"]
+  }
+}
+
 #trivy:ignore:AVD-AWS-0345
 data "aws_iam_policy_document" "combined_instance_policy" {
   source_policy_documents = [
@@ -158,7 +182,8 @@ data "aws_iam_policy_document" "combined_instance_policy" {
     data.aws_iam_policy_document.db_ssh_keys_s3_policy_document.json,
     data.aws_iam_policy_document.instance_ssm.json,
     data.aws_iam_policy_document.oracle_ec2_snapshot_backup_role_policy_document.json,
-    data.aws_iam_policy_document.cert_export.json
+    data.aws_iam_policy_document.cert_export.json,
+    data.aws_iam_policy_document.cloudwatch_agent.json,
   ]
 }
 

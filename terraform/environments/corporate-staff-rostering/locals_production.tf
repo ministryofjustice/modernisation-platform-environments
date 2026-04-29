@@ -3,7 +3,7 @@ locals {
   baseline_presets_production = {
     options = {
       db_backup_lifecycle_rule   = "rman_backup_one_month"
-      db_backup_object_lock_days = null
+      db_backup_object_lock_days = 14
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "corporate-staff-rostering-production"
@@ -537,10 +537,6 @@ locals {
           pre-migration = "PDCWW00006"
         })
       })
-
-      prisoner-retail = local.ec2_instances.prisoner-retail-ps-poc
-
-      prison-retail = local.ec2_instances.prison-retail
     }
 
     iam_policies = {
@@ -556,21 +552,6 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*P/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/P*/*",
-            ]
-          }
-        ]
-      }
-      Ec2PrisonerRetailPolicy = {
-        description = "Permissions required for prisoner retail"
-        statements = [
-          {
-            effect = "Allow"
-            actions = [
-              "secretsmanager:GetSecretValue",
-              "secretsmanager:PutSecretValue",
-            ]
-            resources = [
-              "arn:aws:secretsmanager:*:*:secret:/prisoner-retail/*",
             ]
           }
         ]
@@ -838,11 +819,6 @@ locals {
           passwords = { description = "database passwords" }
         }
       }
-      # "/prisoner-retail" = {
-      #   secrets = {
-      #     notify_emails = { description = "email list to notify about prisoner retail job outputs. Format: 'from':'some.name@domain','to':'\"<some.name@domain>\", \"<another.name@domain>\" " }
-      #   }
-      # }
     }
   }
 }
