@@ -102,7 +102,20 @@ module "s3_bucket" {
         identifiers = [aws_iam_user.ftp_user[0].arn]
       }
       conditions = []
-    } : null
+    } : null,
+
+    length(aws_iam_user.ftp_user) > 0 ? {
+    effect  = "Allow"
+    actions = [
+      "s3:GetBucketPolicy",
+      "s3:ListBucket"
+    ]
+    principals = {
+      type        = "AWS"
+      identifiers = [aws_iam_user.ftp_user[0].arn]
+    }
+    conditions = []
+  } : null
   ] : stmt if stmt != null
 ]
 }
