@@ -1,7 +1,21 @@
 resource "aws_macie2_account" "macie_unstructured_spike" {
-  status = "PAUSED"
+  status = "ENABLED"
 }
 
+resource "terraform_data" "disable_automated_discovery" {
+  # This ensures the command runs again if the Macie account is recreated
+  input = aws_macie2_account.macie_unstructured_spike.id
+
+  provisioner "local-exec" {
+    command = <<EOT
+      aws macie2 update-automated-discovery-configuration \
+        --status DISABLED \
+        --region ${data.aws_region.current.name}
+    EOT
+  }
+
+  depends_on = [aws_macie2_account.macie_unstructured_spike]
+}
 
 # Uses the default checks
 # resource "aws_macie2_classification_job" "unstructured_data_spike" {
@@ -10,7 +24,11 @@ resource "aws_macie2_account" "macie_unstructured_spike" {
 #   name        = "spike-unstructured-data"
 #   description = "Spike to scan unstructured data"
 
-#   job_type    = "ONE_TIME" 
+#   job_type    = "ONE_TIME"
+#   sampling_percentage = 100
+#   tags = merge(
+#     local.tags,
+#     { "spike" = "true" }
 
 #   # For custom jobs add the arn values for each custom ident
 #   # custom_ident_ids = [aws_macie2_custom_data_identifier.my_regex.id]
