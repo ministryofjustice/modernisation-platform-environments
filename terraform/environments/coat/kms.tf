@@ -15,13 +15,13 @@ module "test_kms" {
   }
 }
 
-module "test_kms" {
+module "test_two_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
   source  = "terraform-aws-modules/kms/aws"
   version = "4.0.0"
 
-  aliases               = ["s3/test"]
+  aliases               = ["s3/test_two"]
   description           = "test KMS key"
   enable_default_policy = true
 
