@@ -19,7 +19,7 @@ resource "kubernetes_manifest" "external_secret_litellm_license" {
         {
           secretKey = "license"
           remoteRef = {
-            key = module.litellm_license_secret.secret_id
+            key = tostring(module.litellm_license_secret.secret_id)
           }
         }
       ]
@@ -48,28 +48,28 @@ resource "kubernetes_manifest" "external_secret_litellm_entra_id" {
         {
           secretKey = "MICROSOFT_CLIENT_ID"
           remoteRef = {
-            key      = module.litellm_entra_id_secret.secret_id
+            key      = tostring(module.litellm_entra_id_secret.secret_id)
             property = "client_id"
           }
         },
         {
           secretKey = "MICROSOFT_CLIENT_SECRET"
           remoteRef = {
-            key      = module.litellm_entra_id_secret.secret_id
+            key      = tostring(module.litellm_entra_id_secret.secret_id)
             property = "client_secret"
           }
         },
         {
           secretKey = "MICROSOFT_TENANT"
           remoteRef = {
-            key      = module.litellm_entra_id_secret.secret_id
+            key      = tostring(module.litellm_entra_id_secret.secret_id)
             property = "tenant_id"
           }
         },
         {
           secretKey = "PROXY_ADMIN_ID"
           remoteRef = {
-            key      = module.litellm_entra_id_secret.secret_id
+            key      = tostring(module.litellm_entra_id_secret.secret_id)
             property = "proxy_admin_id"
           }
         }
@@ -99,14 +99,14 @@ resource "kubernetes_manifest" "external_secret_justiceai_azure_openai" {
         {
           secretKey = "AZURE_OPENAI_API_BASE"
           remoteRef = {
-            key      = module.justiceai_azure_openai_secret.secret_id
+            key      = tostring(module.justiceai_azure_openai_secret.secret_id)
             property = "api_base"
           }
         },
         {
           secretKey = "AZURE_OPENAI_API_KEY"
           remoteRef = {
-            key      = module.justiceai_azure_openai_secret.secret_id
+            key      = tostring(module.justiceai_azure_openai_secret.secret_id)
             property = "api_key"
           }
         }
@@ -136,14 +136,14 @@ resource "kubernetes_manifest" "external_secret_azure_openai" {
         {
           secretKey = "AZURE_OPENAI_API_BASE"
           remoteRef = {
-            key      = module.azure_openai_secret.secret_id
+            key      = tostring(module.azure_openai_secret.secret_id)
             property = "api_base"
           }
         },
         {
           secretKey = "AZURE_OPENAI_API_KEY"
           remoteRef = {
-            key      = module.azure_openai_secret.secret_id
+            key      = tostring(module.azure_openai_secret.secret_id)
             property = "api_key"
           }
         }
@@ -173,35 +173,35 @@ resource "kubernetes_manifest" "external_secret_rds" {
         {
           secretKey = "username"
           remoteRef = {
-            key      = module.rds_secret.secret_id
+            key      = tostring(module.rds_secret.secret_id)
             property = "username"
           }
         },
         {
           secretKey = "password"
           remoteRef = {
-            key      = module.rds_secret.secret_id
+            key      = tostring(module.rds_secret.secret_id)
             property = "password"
           }
         },
         {
           secretKey = "host"
           remoteRef = {
-            key      = module.rds_secret.secret_id
+            key      = tostring(module.rds_secret.secret_id)
             property = "host"
           }
         },
         {
           secretKey = "port"
           remoteRef = {
-            key      = module.rds_secret.secret_id
+            key      = tostring(module.rds_secret.secret_id)
             property = "port"
           }
         },
         {
           secretKey = "dbname"
           remoteRef = {
-            key      = module.rds_secret.secret_id
+            key      = tostring(module.rds_secret.secret_id)
             property = "dbname"
           }
         }
