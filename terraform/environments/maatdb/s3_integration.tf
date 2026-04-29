@@ -87,7 +87,7 @@ data "aws_iam_policy_document" "bucket_policy" {
         identifiers = ["*"]
       }
       actions   = ["s3:*"]
-      resources = ["${each.value.bucket.arn}/*", "${each.value.bucket.arn}"]
+      resources = [aws_s3_bucket.default.arn, "${aws_s3_bucket.default.arn}/*"]
       condition {
         test     = "NumericLessThan"
         variable = "s3:TlsVersion"
