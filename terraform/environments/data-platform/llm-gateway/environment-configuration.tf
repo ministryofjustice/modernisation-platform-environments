@@ -104,24 +104,36 @@ locals {
           }
         }
       }
+      rds_instance_class    = "db.t4g.small"
+      rds_allocated_storage = 20
+      rds_engine_version    = "17.4"
     }
     test = {
       litellm_versions              = {}
       llm_gateway_hostname          = ""
       llm_gateway_ingress_allowlist = []
       llm_gateway_models            = {}
+      rds_instance_class            = "db.t4g.small"
+      rds_allocated_storage         = 20
+      rds_engine_version            = "17.4"
     }
     preproduction = {
       litellm_versions              = {}
       llm_gateway_hostname          = ""
       llm_gateway_ingress_allowlist = []
       llm_gateway_models            = {}
+      rds_instance_class            = "db.t4g.small"
+      rds_allocated_storage         = 50
+      rds_engine_version            = "17.4"
     }
     production = {
       litellm_versions              = {}
       llm_gateway_hostname          = ""
       llm_gateway_ingress_allowlist = []
       llm_gateway_models            = {}
+      rds_instance_class            = "db.t4g.medium"
+      rds_allocated_storage         = 100
+      rds_engine_version            = "17.4"
     }
   }
 }
