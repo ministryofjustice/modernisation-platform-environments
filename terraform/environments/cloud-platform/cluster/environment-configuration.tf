@@ -38,9 +38,10 @@ locals {
         }
 
         labels = {
-          Terraform                                  = "true"
-          "cloud-platform.justice.gov.uk/default-ng" = "true"
-          Cluster                                    = local.environment
+          Terraform                                      = "true"
+          "cloud-platform.justice.gov.uk/default-ng"     = "true"
+          "container-platform.justice.gov.uk/default-ng" = "true"
+          Cluster                                        = local.environment
         }
       }
 
@@ -66,9 +67,10 @@ locals {
         }
 
         labels = {
-          Terraform                                  = "true"
-          "cloud-platform.justice.gov.uk/default-ng" = "true"
-          Cluster                                    = local.environment
+          Terraform                                      = "true"
+          "cloud-platform.justice.gov.uk/default-ng"     = "true"
+          "container-platform.justice.gov.uk/default-ng" = "true"
+          Cluster                                        = local.environment
         }
       }
 
@@ -102,8 +104,45 @@ locals {
         }
 
         labels = {
+          Terraform                                         = "true"
+          "cloud-platform.justice.gov.uk/monitoring-ng"     = "true"
+          "container-platform.justice.gov.uk/monitoring-ng" = "true"
+          Cluster                                           = local.environment
+        }
+      }
+      system_ng = {
+        min_size         = 2
+        desired_capacity = 2
+        max_size         = 4
+
+        instance_types = ["r8i.large"]
+
+        block_device_mappings = {
+          xvda = {
+            device_name = "/dev/xvda"
+            ebs = {
+              volume_size           = 140
+              volume_type           = "gp3"
+              iops                  = 0
+              encrypted             = false
+              kms_key_id            = ""
+              delete_on_termination = true
+            }
+          }
+        }
+
+        taints = {
+          monitoring = {
+            key    = "system-node"
+            value  = "true"
+            effect = "NO_SCHEDULE"
+          }
+        }
+
+        labels = {
           Terraform                                     = "true"
-          "cloud-platform.justice.gov.uk/monitoring-ng" = "true"
+          "cloud-platform.justice.gov.uk/system-ng"     = "true"
+          "container-platform.justice.gov.uk/system-ng" = "true"
           Cluster                                       = local.environment
         }
       }
@@ -145,9 +184,10 @@ locals {
         }
 
         labels = {
-          Terraform                                  = "true"
-          "cloud-platform.justice.gov.uk/default-ng" = "true"
-          Cluster                                    = local.environment
+          Terraform                                      = "true"
+          "cloud-platform.justice.gov.uk/default-ng"     = "true"
+          "container-platform.justice.gov.uk/default-ng" = "true"
+          Cluster                                        = local.environment
         }
       }
 
@@ -181,8 +221,45 @@ locals {
         }
 
         labels = {
+          Terraform                                         = "true"
+          "cloud-platform.justice.gov.uk/monitoring-ng"     = "true"
+          "container-platform.justice.gov.uk/monitoring-ng" = "true"
+          Cluster                                           = local.environment
+        }
+      }
+      system_ng = {
+        min_size         = 2
+        desired_capacity = 2
+        max_size         = 4
+
+        instance_types = ["r8i.large"]
+
+        block_device_mappings = {
+          xvda = {
+            device_name = "/dev/xvda"
+            ebs = {
+              volume_size           = 140
+              volume_type           = "gp3"
+              iops                  = 0
+              encrypted             = false
+              kms_key_id            = ""
+              delete_on_termination = true
+            }
+          }
+        }
+
+        taints = {
+          monitoring = {
+            key    = "system-node"
+            value  = "true"
+            effect = "NO_SCHEDULE"
+          }
+        }
+
+        labels = {
           Terraform                                     = "true"
-          "cloud-platform.justice.gov.uk/monitoring-ng" = "true"
+          "cloud-platform.justice.gov.uk/system-ng"     = "true"
+          "container-platform.justice.gov.uk/system-ng" = "true"
           Cluster                                       = local.environment
         }
       }
@@ -224,9 +301,10 @@ locals {
         }
 
         labels = {
-          Terraform                                  = "true"
-          "cloud-platform.justice.gov.uk/default-ng" = "true"
-          Cluster                                    = local.environment
+          Terraform                                      = "true"
+          "cloud-platform.justice.gov.uk/default-ng"     = "true"
+          "container-platform.justice.gov.uk/default-ng" = "true"
+          Cluster                                        = local.environment
         }
       }
 
@@ -260,8 +338,45 @@ locals {
         }
 
         labels = {
+          Terraform                                         = "true"
+          "cloud-platform.justice.gov.uk/monitoring-ng"     = "true"
+          "container-platform.justice.gov.uk/monitoring-ng" = "true"
+          Cluster                                           = local.environment
+        }
+      }
+      system_ng = {
+        min_size         = 2
+        desired_capacity = 2
+        max_size         = 4
+
+        instance_types = ["r8i.large"]
+
+        block_device_mappings = {
+          xvda = {
+            device_name = "/dev/xvda"
+            ebs = {
+              volume_size           = 140
+              volume_type           = "gp3"
+              iops                  = 0
+              encrypted             = false
+              kms_key_id            = ""
+              delete_on_termination = true
+            }
+          }
+        }
+
+        taints = {
+          monitoring = {
+            key    = "system-node"
+            value  = "true"
+            effect = "NO_SCHEDULE"
+          }
+        }
+
+        labels = {
           Terraform                                     = "true"
-          "cloud-platform.justice.gov.uk/monitoring-ng" = "true"
+          "cloud-platform.justice.gov.uk/system-ng"     = "true"
+          "container-platform.justice.gov.uk/system-ng" = "true"
           Cluster                                       = local.environment
         }
       }
@@ -303,9 +418,10 @@ locals {
         }
 
         labels = {
-          Terraform                                  = "true"
-          "cloud-platform.justice.gov.uk/default-ng" = "true"
-          Cluster                                    = local.environment
+          Terraform                                      = "true"
+          "cloud-platform.justice.gov.uk/default-ng"     = "true"
+          "container-platform.justice.gov.uk/default-ng" = "true"
+          Cluster                                        = local.environment
         }
       }
 
@@ -339,8 +455,45 @@ locals {
         }
 
         labels = {
+          Terraform                                         = "true"
+          "cloud-platform.justice.gov.uk/monitoring-ng"     = "true"
+          "container-platform.justice.gov.uk/monitoring-ng" = "true"
+          Cluster                                           = local.environment
+        }
+      }
+      system_ng = {
+        min_size         = 2
+        desired_capacity = 2
+        max_size         = 4
+
+        instance_types = ["r8i.large"]
+
+        block_device_mappings = {
+          xvda = {
+            device_name = "/dev/xvda"
+            ebs = {
+              volume_size           = 140
+              volume_type           = "gp3"
+              iops                  = 0
+              encrypted             = false
+              kms_key_id            = ""
+              delete_on_termination = true
+            }
+          }
+        }
+
+        taints = {
+          monitoring = {
+            key    = "system-node"
+            value  = "true"
+            effect = "NO_SCHEDULE"
+          }
+        }
+
+        labels = {
           Terraform                                     = "true"
-          "cloud-platform.justice.gov.uk/monitoring-ng" = "true"
+          "cloud-platform.justice.gov.uk/system-ng"     = "true"
+          "container-platform.justice.gov.uk/system-ng" = "true"
           Cluster                                       = local.environment
         }
       }
@@ -382,9 +535,10 @@ locals {
         }
 
         labels = {
-          Terraform                                  = "true"
-          "cloud-platform.justice.gov.uk/default-ng" = "true"
-          Cluster                                    = local.environment
+          Terraform                                      = "true"
+          "cloud-platform.justice.gov.uk/default-ng"     = "true"
+          "container-platform.justice.gov.uk/default-ng" = "true"
+          Cluster                                        = local.environment
         }
       }
 
@@ -418,8 +572,45 @@ locals {
         }
 
         labels = {
+          Terraform                                         = "true"
+          "cloud-platform.justice.gov.uk/monitoring-ng"     = "true"
+          "container-platform.justice.gov.uk/monitoring-ng" = "true"
+          Cluster                                           = local.environment
+        }
+      }
+      system_ng = {
+        min_size         = 2
+        desired_capacity = 2
+        max_size         = 4
+
+        instance_types = ["r8i.large"]
+
+        block_device_mappings = {
+          xvda = {
+            device_name = "/dev/xvda"
+            ebs = {
+              volume_size           = 140
+              volume_type           = "gp3"
+              iops                  = 0
+              encrypted             = false
+              kms_key_id            = ""
+              delete_on_termination = true
+            }
+          }
+        }
+
+        taints = {
+          monitoring = {
+            key    = "system-node"
+            value  = "true"
+            effect = "NO_SCHEDULE"
+          }
+        }
+
+        labels = {
           Terraform                                     = "true"
-          "cloud-platform.justice.gov.uk/monitoring-ng" = "true"
+          "cloud-platform.justice.gov.uk/system-ng"     = "true"
+          "container-platform.justice.gov.uk/system-ng" = "true"
           Cluster                                       = local.environment
         }
       }

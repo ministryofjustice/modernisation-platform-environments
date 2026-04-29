@@ -8,6 +8,7 @@ locals {
   suffix     = local.is-production ? "" : local.is-preproduction ? "-pp" : local.is-test ? "-test" : "-dev"
   db_suffix  = local.is-production ? "" : "_${local.environment_shorthand}"
   dbt_dbs = [
+    "analysis",
     "curated_fms",
     "datamart",
     "derived",
@@ -51,6 +52,15 @@ locals {
     ] : local.is-preproduction ? [
     "g4s_cap_dw",
     "g4s_emsys_tpims",
+    "capita_alcohol_monitoring",
+    "g4s_atrium",
+    "g4s_centurion",
+    "g4s_emsys_mvp",
+    "g4s_emsys_tpims",
+    "g4s_fep",
+    "g4s_integrity",
+    "g4s_lcm",
+    "g4s_tasking",
   ] : local.is-development ? ["test"] : []
 
   prod_dbs_to_grant = [

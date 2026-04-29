@@ -4,6 +4,11 @@ variable "environment" {
   description = "Environment of the resources"
 }
 
+variable "max_string_size" {
+  type        = string
+  description = "Oracle max_string_size parameter value"
+}
+
 variable "application_name" {
   type        = string
   description = "Name of application"

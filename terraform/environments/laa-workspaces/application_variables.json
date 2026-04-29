@@ -6,6 +6,9 @@
       "vpc_cidr": "10.200.0.0/16",
       "private_subnet_a_cidr": "10.200.1.0/24",
       "private_subnet_b_cidr": "10.200.2.0/24",
+      "ad_directory_name": "laa-workspaces.local",
+      "ad_short_name": "LAAWORKSPACES",
+      "ad_edition": "Standard",
       "identity_center_instance_arn": "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26",
       "workspaces_directory_id": ""
     },

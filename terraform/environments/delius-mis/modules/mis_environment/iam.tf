@@ -43,13 +43,35 @@ resource "aws_iam_policy" "secrets_manager" {
 
 data "aws_iam_policy_document" "ec2_automation" {
   statement {
-    sid = "EC2AutomationPermissions"
+    sid    = "EC2AutomationPermissions"
+    effect = "Allow"
     actions = [
       "ec2:DescribeInstances",
       "ec2:DescribeTags",
       "s3:GetObject",
       "s3:ListBucket",
       "kms:Decrypt",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "CloudwatchAgent"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:PutMetricData",
+      "logs:PutLogEvents",
+      "logs:DescribeLogStreams",
+      "logs:DescribeLogGroups",
+      "logs:CreateLogStream",
+      "logs:CreateLogGroup",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "DenyCreateLogGroup"
+    effect = "Deny"
+    actions = [
+      "logs:CreateLogGroup"
     ]
     resources = ["*"]
   }

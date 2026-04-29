@@ -5,7 +5,7 @@
       "ec2instancetype": "r5a.large",
       "orahomesize": "300",
       "orahome_snapshot": "snap-0ce71d391351de5c5",
-      "stageesize": "200",
+      "stageesize": "300",
       "stage_snapshot": "snap-05f2f12f265bdb020",
       "managementcidr": "10.200.0.0/20",
       "allocated_storage": "50",

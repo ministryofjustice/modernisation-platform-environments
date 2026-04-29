@@ -131,6 +131,8 @@ data "aws_caller_identity" "current" {}
 # }
 
 # Shared KMS keys (per business unit)
+# NOTE: Shared KMS keys not accessible from isolated account
+# We create our own KMS key in new-kms.tf instead
 # data "aws_kms_key" "general_shared" {
 #   key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/general-${var.networking[0].business-unit}"
 # }

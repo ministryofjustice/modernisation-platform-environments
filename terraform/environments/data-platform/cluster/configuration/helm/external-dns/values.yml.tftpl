@@ -1,0 +1,23 @@
+---
+txtOwnerId: ${txt_owner_id}
+
+domainFilters:
+%{ for domain_filter in domain_filters ~}
+  - ${domain_filter}
+%{ endfor ~}
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: ${eks_role_arn}
+
+nodeSelector:
+  compute.data-platform.service.justice.gov.uk/node: system
+
+tolerations:
+  - key: compute.data-platform.service.justice.gov.uk/node
+    operator: Equal
+    value: system
+    effect: NoSchedule
+
+serviceMonitor:
+  enabled: true

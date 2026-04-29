@@ -50,8 +50,8 @@ module "ears_sars_api" {
   schema = {
     type = "object"
     properties = {
-      legacy_subject_id      = { type = "string" }
-      legacy_order_id        = { type = "string" }
+      legacy_subject_id      = { type = ["string", "integer"] }
+      legacy_order_id        = { type = ["string", "integer"] }
       priority               = { type = "string" }
       monitoring_requirement = { type = "string" }
       request_types = {
