@@ -313,6 +313,26 @@ resource "aws_lakeformation_permissions" "emdi_mdss_tables" {
   }
 }
 
+resource "aws_lakeformation_permissions" "emdi_di_db" {
+  count       = local.is-development || local.is-test ? 1 : 0
+  principal   = module.emdi_trail_maps_role[0].iam_role_arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = "data_insights${local.dbt_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "emdi_di_tables" {
+  count       = local.is-development || local.is-test ? 1 : 0
+  principal   = module.emdi_trail_maps_role[0].iam_role_arn
+  permissions = ["SELECT", "DESCRIBE"]
+  table {
+    database_name = "data_insights${local.dbt_suffix}"
+    wildcard      = true
+  }
+}
+
+
 resource "aws_iam_role_policy_attachment" "standard_athena_access_emdi" {
   count      = local.is-development || local.is-test ? 1 : 0
   policy_arn = aws_iam_policy.standard_athena_access.arn

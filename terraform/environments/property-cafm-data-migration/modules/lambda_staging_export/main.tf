@@ -164,7 +164,7 @@ resource "aws_lambda_function" "this" {
   source_code_hash = data.archive_file.lambda.output_base64sha256
 
   timeout     = 900
-  memory_size = 256
+  memory_size = 3008
 
   environment {
     variables = {

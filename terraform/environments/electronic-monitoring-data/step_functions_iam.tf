@@ -80,3 +80,52 @@ resource "aws_iam_policy" "ears_sars_step_function_policy" {
   name   = "ears_sars_step_function_role"
   policy = data.aws_iam_policy_document.ears_sars_policy_document[0].json
 }
+
+# ------------------------------------------
+# GDPR 
+# ------------------------------------------
+
+data "aws_iam_policy_document" "gdpr_delete_policy_document" {
+  count = local.is-development || local.is-preproduction ? 1 : 0
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecs:RunTask"
+    ]
+    resources = [
+      "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task-definition/${aws_ecs_task_definition.emds-gdpr-structured-data-deletion[0].family}:*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "iam:PassRole"
+    ]
+    resources = [
+      aws_iam_role.ecs_execution_role.arn,
+      aws_iam_role.ecs_gdpr_execution_role.arn,
+      aws_iam_role.gdpr_structured_job_role[0].arn
+    ]
+    condition {
+      test     = "StringLike"
+      variable = "iam:PassedToService"
+      values   = ["ecs-tasks.amazonaws.com"]
+    }
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "events:PutTargets",
+      "events:PutRule",
+      "events:DescribeRule"
+    ]
+    resources = ["arn:aws:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rule/StepFunctionsGetEventsForECSTaskRule"]
+  }
+}
+
+resource "aws_iam_policy" "gdpr_delete_iam_policy" {
+  count  = local.is-development || local.is-preproduction ? 1 : 0
+  name   = "gdpr_deletion_step_function_role"
+  policy = data.aws_iam_policy_document.gdpr_delete_policy_document[0].json
+}
