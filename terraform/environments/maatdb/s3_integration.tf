@@ -69,20 +69,17 @@ module "s3_bucket" {
 
 # Bucket policy
 
-resource "aws_s3_bucket_policy" "ftp_user_and_lambda_access" {
-  for_each = local.build_s3 ? module.s3_bucket : {}
-  bucket   = each.value.bucket.bucket
-  policy   = data.aws_iam_policy_document.bucket_policy[each.key].json
-}
+#resource "aws_s3_bucket_policy" "ftp_user_and_lambda_access" {
+#  for_each = local.build_s3 ? module.s3_bucket : {}
+#  bucket   = each.value.bucket.bucket
+#  policy   = data.aws_iam_policy_document.bucket_policy[each.key].json
+#}
 
 data "aws_iam_policy_document" "bucket_policy" {
-  for_each = local.build_s3 ? module.s3_bucket : {}
+  
 
   # Enforce TLS v1.2 or higher
-  dynamic "statement" {
-    for_each = length(aws_iam_role.ftp_lambda_role) > 0 ? [1] : []
-
-    content {
+  "statement" {
       sid    = "EnforceTLSv12orHigher"
       effect = "Deny"
       principals {
@@ -97,7 +94,6 @@ data "aws_iam_policy_document" "bucket_policy" {
         values   = ["1.2"]
       }
     }
-  }
 
   dynamic "statement" {
     for_each = length(aws_iam_role.ftp_lambda_role) > 0 ? [1] : []
