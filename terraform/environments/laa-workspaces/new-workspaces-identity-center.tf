@@ -43,10 +43,8 @@ resource "aws_workspaces_directory" "workspaces_identity_center" {
 
   ip_group_ids = [aws_workspaces_ip_group.workspaces_identity_center[0].id]
 
-  depends_on = [
-    aws_iam_role_policy_attachment.workspaces_default_service_access,
-    aws_iam_role_policy_attachment.workspaces_default_self_service_access,
-  ]
+  # IAM roles are created in workspace-components
+  # No depends_on needed as they're created in Phase 1
 
   tags = merge(
     local.tags,
@@ -102,7 +100,7 @@ resource "aws_workspaces_workspace" "workspaces_identity_center" {
 
   root_volume_encryption_enabled = true
   user_volume_encryption_enabled = true
-  volume_encryption_key          = aws_kms_key.ebs[0].arn
+  volume_encryption_key          = data.terraform_remote_state.workspace_components.outputs.kms_ebs_key_arn
 
   workspace_properties {
     compute_type_name                         = local.workspace_types[each.value.instance_type].compute_type_name

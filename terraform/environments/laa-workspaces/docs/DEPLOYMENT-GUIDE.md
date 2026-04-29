@@ -48,7 +48,10 @@ The network infrastructure is deployed **separately** via a dedicated GitHub Act
 **What it creates:**
 - VPC for WorkSpaces
 - Private subnets across availability zones
-- Security groups
+- Security groups for WorkSpaces
+- Security group rules (WSP, PCoIP, RDP)
+- IAM roles and policies for WorkSpaces service
+- KMS keys for EBS volume encryption
 - VPC endpoints
 - S3 buckets for logging/backups
 
@@ -68,26 +71,32 @@ terraform output
 ```
 
 Expected outputs:
-- `vpc_id`
-- `private_subnet_ids`
-- Other networking details
+- `vpc_id` - VPC ID for WorkSpaces
+- `vpc_cidr_block` - VPC CIDR block
+- `private_subnet_ids` - List of private subnet IDs
+- `kms_ebs_key_arn` - KMS key ARN for EBS encryption
+- `workspaces_iam_role_arn` - IAM role ARN for WorkSpaces
+- `workspaces_iam_role_name` - IAM role name
+- `workspaces_security_group_id` - Security group ID for WorkSpaces
 
 ---
 
 ### Phase 2: Main Infrastructure Deployment
 
 After network components are deployed, the main infrastructure is created via the primary GitHub Actions workflow.
+WorkSpaces directory registration (imported from manual creation)
+- WorkSpaces IP access control group (imported from manual creation)
+- Individual WorkSpaces for users (when users are defined)
 
-**Location:** `terraform/environments/laa-workspaces/`
+**What is NOT created (Phase 1 creates these):**
+- IAM roles and policies ✅ (in workspace-components)
+- KMS keys for encryption ✅ (in workspace-components)
+- Security groups ✅ (in workspace-components)
 
-**What it creates:**
-- IAM roles and policies for WorkSpaces
-- KMS keys for encryption
-- CloudWatch log groups
-- Security groups for WorkSpaces
-- WorkSpaces-related IAM roles
-- (Directory and WorkSpaces are NOT created automatically - see Phase 3)
-
+**Deployment:**
+1. Changes to main Terraform files trigger the primary GitHub Actions pipeline
+2. Pipeline references outputs from workspace-components (Phase 1) via remote state
+3. At this stage, **WorkSpaces directory is NOT created** (manual step required in Phase 3
 **Deployment:**
 1. Changes to main Terraform files trigger the primary GitHub Actions pipeline
 2. Pipeline runs `terraform apply` for all resources
@@ -203,27 +212,28 @@ terraform state show 'aws_workspaces_ip_group.workspaces_identity_center[0]'
 
 ---
 
-## Current Deployment Status (27 April 2026)
+## Current Deployment Status (29 April 2026)
 
-### ✅ Completed
-- [x] Phase 1: Network infrastructure deployed
-- [x] Phase 2: Main infrastructure deployed
-- [x] Phase 3: WorkSpaces directory created manually (ID: `d-9c674d0524`)
-- [x] Phase 4: Directory imported into Terraform
-- [x] Phase 4: IP group imported into Terraform
+### ✅ Phase 1 Completed (workspace-components)
+- [x] VPC and private subnets deployed
+- [x] Security groups and rules created
+- [x] IAM roles and policies deployed
+- [x] KMS keys for encryption created
+- [x] S3 buckets and VPC endpoints configured
 
-### Latest Terraform Plan
+### 🔄 Phase 2 In Progress
+- [ ] Deploy main infrastructure (after Phase 1)
+- [ ] WorkSpaces directory needs manual creation (Phase 3)
 
-After import, the expected changes are:
-- **Directory:** Tag updates only (adding standard MP tags and updating metadata)
-- **IP Group:** Tag updates only
-- **No replacements or recreations**
+### 📋 Phase 3 Pending
+- [ ] Manually create WorkSpaces directory with Identity Center
+- [ ] Note directory ID and IP group ID for import
 
-```
-Plan: 0 to add, 2 to change, 0 to destroy
-```
+### 📋 Phase 4 Pending
+- [ ] Import directory into Terraform
+- [ ] Import IP group into Terraform
 
-### 🔄 Pending
+### 🔄 Future Phases
 - [ ] Phase 5: Configure Identity Center users/groups
 - [ ] Phase 6: Create individual WorkSpaces for users
 - [ ] Phase 7: Configure Azure AD SAML integration (if required)
@@ -234,14 +244,15 @@ Plan: 0 to add, 2 to change, 0 to destroy
 
 ## Configuration Files
 
-### Key Files
-
-| File | Purpose |
-|------|---------|
-| `application_variables.json` | Environment-specific configuration |
-| `new-workspaces-identity-center.tf` | WorkSpaces directory and workspace definitions |
-| `new-workspaces-iam.tf` | IAM roles for WorkSpaces service |
-| `new-workspace-users.tf` | User definitions for workspace provisioning |
+### Key Files Location |
+|------|---------|----------|
+| `application_variables.json` | Environment-specific configuration | Main folder |
+| `new-workspaces-identity-center.tf` | WorkSpaces directory and workspace definitions | Main folder |
+| `new-workspace-users.tf` | User definitions for workspace provisioning | Main folder |
+| `new-workspace-type.tf` | WorkSpace bundle/instance type definitions | Main folder |
+| `new-kms.tf` | KMS keys for encryption | workspace-components |
+| `new-workspaces-iam.tf` | IAM roles for WorkSpaces service | workspace-components |
+| `new-workspace-sg.tf` | Security groups and rules | workspace-componentstions for workspace provisioning |
 | `new-workspace-type.tf` | WorkSpace bundle/instance type definitions |
 | `new-kms.tf` | KMS keys for encryption |
 
