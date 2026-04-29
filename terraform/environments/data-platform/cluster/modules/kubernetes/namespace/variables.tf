@@ -9,3 +9,8 @@ variable "workload" {
     error_message = "workload must be one of: system, application"
   }
 }
+
+variable "labels" {
+  type    = map(string)
+  default = {}
+}
