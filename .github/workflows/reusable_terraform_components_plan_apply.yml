@@ -94,6 +94,13 @@
               echo "::add-mask::$BACKEND_NUMBER"
               echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
+          - name: Configure AWS Credentials
+            uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37  # v6.1.0
+            with:
+              role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-plan"
+              role-session-name: "githubactionsplanrolesession"
+              aws-region: "eu-west-2"
+
           - name: Validate Tags
             id: validate
             uses: ministryofjustice/checkov-tag-validator@tf-backend-config
