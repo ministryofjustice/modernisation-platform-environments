@@ -3,34 +3,14 @@ module "iam_role" {
 
   name = local.component_name
 
+  policies = {
+    llm-gateway = module.llm_gateway_iam_policy.arn
+  }
+
   oidc_providers = {
     main = {
       provider_arn               = data.aws_iam_openid_connect_provider.cluster.arn
       namespace_service_accounts = ["llm-gateway:litellm"]
     }
   }
-
-  inline_policy_statements = [
-    {
-      sid    = "AwsMarketplaceAccess"
-      effect = "Allow"
-      actions = [
-        "aws-marketplace:Subscribe",
-        "aws-marketplace:ViewSubscriptions"
-      ]
-      resources = ["*"]
-    },
-    {
-      sid       = "BedrockInferenceProfileAccess"
-      effect    = "Allow"
-      actions   = ["bedrock:InvokeModel*"]
-      resources = formatlist("arn:aws:bedrock:%s:${data.aws_caller_identity.current.account_id}:inference-profile/*", ["eu-west-1", "eu-west-2"])
-    },
-    {
-      sid       = "BedrockFoundationModelAccess"
-      effect    = "Allow"
-      actions   = ["bedrock:InvokeModel*"]
-      resources = ["arn:aws:bedrock:*::foundation-model/*"]
-    }
-  ]
 }
