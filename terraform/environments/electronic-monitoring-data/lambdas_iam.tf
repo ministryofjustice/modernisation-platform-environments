@@ -3,6 +3,12 @@ locals {
   cross_account_map_shorthand = local.is-test ? "dev" : local.is-production ? "preprod" : null
   cross_account_bucket        = local.is-test || local.is-production ? "arn:aws:s3:::emds-${local.cross_account_map_shorthand}-land-*/*" : ""
   cross_account_kms           = local.is-test || local.is-production ? "arn:aws:kms:${data.aws_region.current.name}:${local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_map}"]}:key/*" : ""
+  ears_sars_athena_dbs        = [
+    "sar_ear_reports_mart${local.dbt_suffix}",
+    "emd_historic_int${local.dbt_suffix}",
+    "am_stg${local.dbt_suffix}",
+    "intermediate_tasking${local.dbt_suffix}"
+  ]
 }
 
 # ------------------------------------------
@@ -1520,10 +1526,22 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
   statement {
     sid     = "S3LoggingBucketPerms"
     effect  = "Allow"
-    actions = ["s3:PutObject", "s3:PutObjectAcl"]
+    actions = ["s3:PutObject", "s3:GetObject", "s3:PutObjectAcl"]
     resources = [
       "${module.s3-logging-bucket.bucket.arn}/ears_sars/*",
-      module.s3-logging-bucket.bucket.arn
+      module.s3-logging-bucket.bucket.arn,
+      "${module.s3-athena-bucket.bucket.arn}/output/*",
+      module.s3-athena-bucket.bucket.arn,
+    ]
+  }
+
+  statement {
+    sid     = "S3OutputsBucketPerms"
+    effect  = "Allow"
+    actions = ["s3:PutObject", "s3:GetObject", "s3:PutObjectAcl"]
+    resources = [
+      "${module.s3-ears-sars-bucket.bucket.arn}/*",
+      module.s3-ears-sars-bucket.bucket.arn
     ]
   }
 
@@ -1555,7 +1573,6 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
       module.s3-data-bucket.bucket.arn
     ]
   }
-
 
   statement {
     sid    = "AthenaQueryExecution"
@@ -1602,6 +1619,16 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
       "${module.get_zipped_file_api.arn}:*"
     ]
   }
+
+  statement {
+    sid    = "GetDataAccessAndTagsForLakeFormation"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GetDataAccess",
+      "lakeformation:GetResourceLFTags",
+    ]
+    resources = ["*"]
+  }
 }
 
 resource "aws_iam_role" "ears_sars_iam_role" {
@@ -1623,43 +1650,21 @@ resource "aws_iam_role_policy_attachment" "ears_sars_iam_role_policy_attachment"
 }
 
 resource "aws_lakeformation_permissions" "ears_sars_db_permissions" {
-  count     = local.is-preproduction ? 1 : 0
+  for_each  = local.is-preproduction ? toset(local.ears_sars_athena_dbs) : []
   principal = aws_iam_role.ears_sars_iam_role[0].arn
 
   database {
-    name = "sar_ear_reports_mart${local.dbt_suffix}"
+    name = each.value
   }
 
   permissions = ["DESCRIBE"]
 }
 resource "aws_lakeformation_permissions" "ears_sars_table_permissions" {
-  count     = local.is-preproduction ? 1 : 0
+  for_each  = local.is-preproduction ? toset(local.ears_sars_athena_dbs) : []
   principal = aws_iam_role.ears_sars_iam_role[0].arn
 
   table {
-    database_name = "sar_ear_reports_mart${local.dbt_suffix}"
-    wildcard      = true
-  }
-
-  permissions = ["SELECT", "DESCRIBE"]
-}
-
-resource "aws_lakeformation_permissions" "ears_sars_db_permissions_emd" {
-  count     = local.is-preproduction ? 1 : 0
-  principal = aws_iam_role.ears_sars_iam_role[0].arn
-
-  database {
-    name = "emd_historic_int${local.dbt_suffix}"
-  }
-
-  permissions = ["DESCRIBE"]
-}
-resource "aws_lakeformation_permissions" "ears_sars_table_permissions_emd" {
-  count     = local.is-preproduction ? 1 : 0
-  principal = aws_iam_role.ears_sars_iam_role[0].arn
-
-  table {
-    database_name = "emd_historic_int${local.dbt_suffix}"
+    database_name = each.value
     wildcard      = true
   }
 
