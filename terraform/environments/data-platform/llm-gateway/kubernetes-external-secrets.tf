@@ -173,35 +173,35 @@ resource "kubernetes_manifest" "external_secret_rds" {
         {
           secretKey = "username"
           remoteRef = {
-            key      = tostring(module.rds_secret.secret_id)
+            key      = tostring(module.llm_gateway_rds_secret.secret_id)
             property = "username"
           }
         },
         {
           secretKey = "password"
           remoteRef = {
-            key      = tostring(module.rds_secret.secret_id)
+            key      = tostring(module.llm_gateway_rds_secret.secret_id)
             property = "password"
           }
         },
         {
           secretKey = "host"
           remoteRef = {
-            key      = tostring(module.rds_secret.secret_id)
+            key      = tostring(module.llm_gateway_rds_secret.secret_id)
             property = "host"
           }
         },
         {
           secretKey = "port"
           remoteRef = {
-            key      = tostring(module.rds_secret.secret_id)
+            key      = tostring(module.llm_gateway_rds_secret.secret_id)
             property = "port"
           }
         },
         {
           secretKey = "dbname"
           remoteRef = {
-            key      = tostring(module.rds_secret.secret_id)
+            key      = tostring(module.llm_gateway_rds_secret.secret_id)
             property = "dbname"
           }
         }

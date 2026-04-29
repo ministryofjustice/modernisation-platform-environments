@@ -20,7 +20,7 @@ resource "helm_release" "litellm" {
         databaseUserNameKey = "username"
         databasePasswordKey = "password"
         databaseEndpointKey = "host"
-        databaseName        = module.rds.db_instance_name
+        databaseName        = module.llm_gateway_rds.db_instance_name
 
         # LiteLLM
         masterkeySecretName = kubernetes_secret.litellm_master_key.metadata[0].name
