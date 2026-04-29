@@ -66,7 +66,8 @@ module "s3_bucket" {
     Name = "${local.application_name}-${local.environment}-ftp-${each.key}"
   })
 
-  bucket_policy_v2 = compact([
+  bucket_policy_v2 = [
+  for stmt in [
     length(aws_iam_role.ftp_lambda_role) > 0 ? {
       effect  = "Allow"
       actions = ["s3:GetObject", "s3:DeleteObject"]
@@ -102,7 +103,8 @@ module "s3_bucket" {
       }
       conditions = []
     } : null
-  ])
+  ] : stmt if stmt != null
+]
 }
 
 
