@@ -14,7 +14,7 @@ resource "terraform_data" "disable_automated_discovery" {
     EOT
   }
 
-  depends_on = [aws_macie2_account.main]
+  depends_on = [aws_macie2_account.macie_unstructured_spike]
 }
 
 # Uses the default checks
