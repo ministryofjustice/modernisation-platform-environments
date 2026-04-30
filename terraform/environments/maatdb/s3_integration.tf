@@ -67,57 +67,57 @@ module "s3_bucket" {
   })
 
   bucket_policy_v2 = [
-  for stmt in [
-    length(aws_iam_role.ftp_lambda_role) > 0 ? {
-      effect  = "Allow"
-      actions = ["s3:GetObject", "s3:DeleteObject"]
-      principals = {
-        type        = "AWS"
-        identifiers = [aws_iam_role.ftp_lambda_role[0].arn]
-      }
-      conditions = []
-    } : null,
+    for stmt in [
+      length(aws_iam_role.ftp_lambda_role) > 0 ? {
+        effect  = "Allow"
+        actions = ["s3:GetObject", "s3:DeleteObject"]
+        principals = {
+          type        = "AWS"
+          identifiers = [aws_iam_role.ftp_lambda_role[0].arn]
+        }
+        conditions = []
+      } : null,
 
-    length(aws_iam_role.ftp_lambda_role) > 0 ? {
-      effect  = "Allow"
-      actions = ["s3:ListBucket"]
-      principals = {
-        type        = "AWS"
-        identifiers = [aws_iam_role.ftp_lambda_role[0].arn]
-      }
-      conditions = []
-    } : null,
+      length(aws_iam_role.ftp_lambda_role) > 0 ? {
+        effect  = "Allow"
+        actions = ["s3:ListBucket"]
+        principals = {
+          type        = "AWS"
+          identifiers = [aws_iam_role.ftp_lambda_role[0].arn]
+        }
+        conditions = []
+      } : null,
 
-    length(aws_iam_user.ftp_user) > 0 ? {
-      effect  = "Allow"
-      actions = [
-        "s3:GetObject",
-        "s3:PutObject",
-        "s3:DeleteObject",
-        "s3:GetObjectVersion",
-        "s3:DeleteObjectVersion"
-      ]
-      principals = {
-        type        = "AWS"
-        identifiers = [aws_iam_user.ftp_user[0].arn]
-      }
-      conditions = []
-    } : null,
+      length(aws_iam_user.ftp_user) > 0 ? {
+        effect = "Allow"
+        actions = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:GetObjectVersion",
+          "s3:DeleteObjectVersion"
+        ]
+        principals = {
+          type        = "AWS"
+          identifiers = [aws_iam_user.ftp_user[0].arn]
+        }
+        conditions = []
+      } : null,
 
-    length(aws_iam_user.ftp_user) > 0 ? {
-    effect  = "Allow"
-    actions = [
-      "s3:GetBucketPolicy",
-      "s3:ListBucket"
-    ]
-    principals = {
-      type        = "AWS"
-      identifiers = [aws_iam_user.ftp_user[0].arn]
-    }
-    conditions = []
-  } : null
-  ] : stmt if stmt != null
-]
+      length(aws_iam_user.ftp_user) > 0 ? {
+        effect = "Allow"
+        actions = [
+          "s3:GetBucketPolicy",
+          "s3:ListBucket"
+        ]
+        principals = {
+          type        = "AWS"
+          identifiers = [aws_iam_user.ftp_user[0].arn]
+        }
+        conditions = []
+      } : null
+    ] : stmt if stmt != null
+  ]
 }
 
 
