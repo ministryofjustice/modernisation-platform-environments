@@ -154,7 +154,7 @@ resource "aws_batch_job_definition" "shred_unstructured_from_zip_job" {
 
     environment = [
       { name = "S3_FILE_URI", value = "" },
-      { name = "DELETE_PATTERN", value = "" }
+      { name = "MANIFEST_URI", value = "" }
     ]
   })
 }
