@@ -8,6 +8,11 @@ resource "aws_db_parameter_group" "mojfin" {
     value = "8"
   }
 
+  parameter {
+    name         = "nls_territory"
+    value        = "UNITED KINGDOM"
+  }
+
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}-${local.environment}-parametergroup" },
