@@ -104,7 +104,7 @@ module "s3_bucket" {
       conditions = []
     } : null,
 
-    length(aws_iam_user.ftp_user) > 0 ? {
+  length(aws_iam_user.ftp_user) > 0 ? {
       effect  = "Allow"
       actions = [
        "s3:GetBucketPolicy",
