@@ -178,13 +178,13 @@ cat > /opt/aws/amazon-cloudwatch-agent/etc/cloudwatch-config.json <<EOF
         "collect_list": [
           {
             "file_path": "/var/log/radius/radius.log",
-            "log_group_name": "/aws/ec2/laa-workspaces-${ENVIRONMENT}/radius",
+            "log_group_name": "/aws/ec2/laa-workspaces-$${ENVIRONMENT}/radius",
             "log_stream_name": "{instance_id}/freeradius",
             "timezone": "UTC"
           },
           {
             "file_path": "/var/log/radius-setup.log",
-            "log_group_name": "/aws/ec2/laa-workspaces-${ENVIRONMENT}/radius",
+            "log_group_name": "/aws/ec2/laa-workspaces-$${ENVIRONMENT}/radius",
             "log_stream_name": "{instance_id}/setup",
             "timezone": "UTC"
           }
