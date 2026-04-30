@@ -212,14 +212,12 @@ data "aws_ami" "amazon_linux_2023" {
 }
 
 ##############################################
-### RADIUS Server EC2 Instances
+### RADIUS Server EC2 Instances (FreeRADIUS)
 ###
-### NOTE: Deploy 2 instances for high availability
-### Uncomment to enable. Update user_data script
-### based on your chosen RADIUS solution.
+### Deploys 2 instances for high availability
+### using FreeRADIUS with Google Authenticator
 ##############################################
 
-/*
 resource "aws_instance" "radius_server" {
   count = local.environment == "development" ? 2 : 0  # 2 for HA
 
@@ -230,16 +228,11 @@ resource "aws_instance" "radius_server" {
   vpc_security_group_ids = [aws_security_group.radius_server[0].id]
   iam_instance_profile   = aws_iam_instance_profile.radius_server[0].name
 
-  # User data script - customize based on RADIUS solution
-  # See scripts/install-duo-proxy.sh, install-freeradius.sh, etc.
-  user_data = templatefile("${path.module}/scripts/install-radius-server.sh", {
-    region                = "eu-west-2"
-    radius_secret_arn     = aws_secretsmanager_secret.radius_shared_secret[0].arn
-    environment           = local.environment
-    # Add Duo/Azure MFA specific variables here
-    # duo_integration_key = var.duo_integration_key
-    # duo_secret_key      = var.duo_secret_key
-    # duo_api_hostname    = var.duo_api_hostname
+  # FreeRADIUS installation script with Google Authenticator
+  user_data = templatefile("${path.module}/scripts/install-freeradius.sh", {
+    region            = "eu-west-2"
+    radius_secret_arn = aws_secretsmanager_secret.radius_shared_secret[0].arn
+    environment       = local.environment
   })
 
   root_block_device {
@@ -261,6 +254,7 @@ resource "aws_instance" "radius_server" {
       "Name"       = "${local.application_name}-${local.environment}-radius-${count.index + 1}"
       "RADIUSNode" = "true"
       "Backup"     = "true"
+      "MFAType"    = "FreeRADIUS"
     }
   )
 
@@ -270,7 +264,6 @@ resource "aws_instance" "radius_server" {
     ]
   }
 }
-*/
 
 ##############################################
 ### CloudWatch Log Group for RADIUS Logs
@@ -294,7 +287,6 @@ resource "aws_cloudwatch_log_group" "radius_logs" {
 ### CloudWatch Alarms for RADIUS Servers
 ##############################################
 
-/*
 resource "aws_cloudwatch_metric_alarm" "radius_server_health" {
   count = local.environment == "development" ? 2 : 0
 
@@ -320,4 +312,3 @@ resource "aws_cloudwatch_metric_alarm" "radius_server_health" {
     }
   )
 }
-*/

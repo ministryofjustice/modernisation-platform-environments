@@ -43,15 +43,13 @@ output "radius_server_iam_role_arn" {
 }
 
 output "radius_server_private_ips" {
-  description = "Private IP addresses of RADIUS servers (empty until instances are deployed)"
-  value       = [] # Will be populated when aws_instance.radius_server is uncommented
-  # value = try([for instance in aws_instance.radius_server : instance.private_ip], [])
+  description = "Private IP addresses of RADIUS servers"
+  value       = try([for instance in aws_instance.radius_server : instance.private_ip], [])
 }
 
 output "radius_server_ids" {
-  description = "Instance IDs of RADIUS servers (empty until instances are deployed)"
-  value       = [] # Will be populated when aws_instance.radius_server is uncommented
-  # value = try([for instance in aws_instance.radius_server : instance.id], [])
+  description = "Instance IDs of RADIUS servers"
+  value       = try([for instance in aws_instance.radius_server : instance.id], [])
 }
 
 output "radius_shared_secret_arn" {
