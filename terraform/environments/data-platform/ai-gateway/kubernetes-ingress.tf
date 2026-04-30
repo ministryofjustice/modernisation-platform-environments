@@ -75,7 +75,7 @@ resource "kubernetes_manifest" "http_route_admin" {
           namespace = "shared-services"
         }
       ]
-      hostnames = [local.environment_configuration.ai_gateway_admin_hostname]
+      hostnames = ["admin.${local.environment_configuration.ai_gateway_hostname}"]
       rules = [
         {
           matches = [

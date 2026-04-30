@@ -73,7 +73,7 @@ resource "helm_release" "litellm_admin" {
         imageRepository    = "ghcr.io/berriai/litellm-non_root"
         imageTag           = local.environment_configuration.litellm_versions.application
         serviceAccountName = "litellm"
-        ingressHostname    = local.environment_configuration.ai_gateway_admin_hostname
+        ingressHostname    = "admin.${local.environment_configuration.ai_gateway_hostname}"
 
         # Database
         databaseSecret      = "rds"
