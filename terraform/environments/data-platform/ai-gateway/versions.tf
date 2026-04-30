@@ -4,17 +4,17 @@ terraform {
       version = "~> 6.0"
       source  = "hashicorp/aws"
     }
-    kubernetes = {
+    dns = {
+      version = "~> 3.0"
+      source  = "hashicorp/dns"
+    }
+    external = {
       version = "~> 2.0"
-      source  = "hashicorp/kubernetes"
+      source  = "hashicorp/external"
     }
-    helm = {
+    http = {
       version = "~> 3.0"
-      source  = "hashicorp/helm"
-    }
-    random = {
-      version = "~> 3.0"
-      source  = "hashicorp/random"
+      source  = "hashicorp/http"
     }
   }
   required_version = "~> 1.0"
