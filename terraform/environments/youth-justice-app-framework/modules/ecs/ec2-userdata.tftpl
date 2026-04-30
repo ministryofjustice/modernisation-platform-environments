@@ -55,12 +55,21 @@ echo ECS_ENABLE_CONTAINER_METADATA=true >> /etc/ecs/ecs.config
 echo ECS_CLUSTER=${cluster_name} >> /etc/ecs/ecs.config
 
 # Set dynamic hostname for Datadog
-until TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600") && [ -n "$TOKEN" ]; do
-  echo "Waiting for metadata token..."
-  sleep 2
+max_attempts=5
+attempt=0
+until TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600") && [ -n "$TOKEN" ] || [ $attempt -ge $max_attempts ]; do
+    attempt=$((attempt + 1))
+    echo "Failed to get metadata token, attempt $attempt of $max_attempts, retrying..."
+    sleep 5
 done
-INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id | cut -c-10)
-hostnamectl set-hostname ${env}-ecs-$INSTANCE_ID
+
+if [ -n "$TOKEN" ]; then
+    INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id | cut -c-10)
+    hostnamectl set-hostname ${env}-ecs-$INSTANCE_ID
+    echo "Hostname set to ${env}-ecs-$INSTANCE_ID"
+else
+    echo "Failed to retrieve metadata token after $max_attempts attempts, hostname not set"
+fi
 
 #set ssh key Algorithms
 echo KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256 >> /etc/ssh/sshd_config
