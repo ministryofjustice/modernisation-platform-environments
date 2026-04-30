@@ -72,5 +72,5 @@ module "ecs_service" {
 
   enable_execute_command = true
 
-  tags = var.tags
+  tags = merge(var.tags, {config_hash = sha1(jsonencode(local.calculated_container_vars_list))})
 }
