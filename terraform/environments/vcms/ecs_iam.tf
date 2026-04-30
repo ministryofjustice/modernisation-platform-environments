@@ -50,10 +50,29 @@ data "aws_iam_policy_document" "service_policy" {
   }
 }
 
+data "aws_iam_policy_document" "task_secrets" {
+  statement {
+    effect    = "Allow"
+    resources = [
+      "arn:aws:secretsmanager:eu-west-2:${local.modernisation_platform_account_id}:secret:vcms-test-automation-key-*"
+    ]
+
+    actions = [
+      "secretsmanager:GetSecretValue"
+    ]
+  }
+}
+
 resource "aws_iam_role_policy" "service_policy" {
   name   = "vcms-${local.environment}-service"
   policy = data.aws_iam_policy_document.service_policy.json
   role   = aws_iam_role.service.id
+}
+
+resource "aws_iam_role_policy" "task_secrets" {
+  name   = "vcms-${local.environment}-task-secrets"
+  policy = data.aws_iam_policy_document.task_secrets.json
+  role   = aws_iam_role.task.id
 }
 
 data "aws_iam_policy_document" "ssm_exec" {
