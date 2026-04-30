@@ -24,14 +24,14 @@ resource "aws_network_interface" "oas_eni_upgrade_test" {
 resource "aws_instance" "oas_app_instance_upgrade_test" {
   count = contains(["development"], local.environment) ? 1 : 0
 
-  ami                         = local.application_data.accounts[local.environment].ec2amiid
+  ami                         = "ami-02e43e2fc8a2cf14a"
   availability_zone           = "eu-west-2a"
   ebs_optimized               = true
   instance_type               = local.application_data.accounts[local.environment].ec2instancetype
   key_name                    = aws_key_pair.ec2_key_pair[0].key_name
   monitoring                  = true
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile_new[0].id
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
   user_data                   = base64encode(local.userdata_new)
 
   network_interface {

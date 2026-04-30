@@ -14,8 +14,6 @@ resource "aws_kms_key" "emds_alerts" {
 }
 
 data "aws_iam_policy_document" "emds_alerts_kms" {
-
-  # Root full admin of the key
   statement {
     sid       = "AllowAccountRootFullAccess"
     effect    = "Allow"
@@ -24,11 +22,12 @@ data "aws_iam_policy_document" "emds_alerts_kms" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+      identifiers = [
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+      ]
     }
   }
 
-  # Allow SNS to use the key
   statement {
     sid       = "AllowSNSUseOfKey"
     effect    = "Allow"
@@ -38,7 +37,7 @@ data "aws_iam_policy_document" "emds_alerts_kms" {
       "kms:Decrypt",
       "kms:ReEncrypt*",
       "kms:GenerateDataKey*",
-      "kms:DescribeKey"
+      "kms:DescribeKey",
     ]
 
     principals {
@@ -47,14 +46,13 @@ data "aws_iam_policy_document" "emds_alerts_kms" {
     }
   }
 
-  # Allow CloudWatch Alarms to use the key
   statement {
     sid       = "AllowCloudWatchUseOfKey"
     effect    = "Allow"
     resources = ["*"]
     actions = [
       "kms:Decrypt",
-      "kms:GenerateDataKey"
+      "kms:GenerateDataKey",
     ]
 
     principals {
@@ -63,7 +61,6 @@ data "aws_iam_policy_document" "emds_alerts_kms" {
     }
   }
 
-  # Allow mdss_daily_failure_digest Lambda role to publish encrypted messages (all envs)
   statement {
     sid       = "AllowMdssDailyFailureDigestUseOfKey"
     effect    = "Allow"
@@ -76,7 +73,6 @@ data "aws_iam_policy_document" "emds_alerts_kms" {
     }
   }
 
-  # Allow cloudwatch_alarm_threader Lambda role to publish encrypted messages (all envs)
   statement {
     sid       = "AllowCloudwatchAlarmThreaderUseOfKey"
     effect    = "Allow"
@@ -88,12 +84,23 @@ data "aws_iam_policy_document" "emds_alerts_kms" {
       identifiers = [aws_iam_role.cloudwatch_alarm_threader.arn]
     }
   }
+
+  statement {
+    sid       = "AllowStagingDbJanitorUseOfKey"
+    effect    = "Allow"
+    resources = ["*"]
+    actions   = ["kms:Decrypt", "kms:GenerateDataKey"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.staging_db_janitor.arn]
+    }
+  }
 }
 
 data "aws_iam_policy_document" "emds_alerts_topic_policy" {
   version = "2012-10-17"
 
-  # Allow CloudWatch alarms to publish
   statement {
     sid    = "AllowCloudWatchToPublish"
     effect = "Allow"
@@ -107,12 +114,11 @@ data "aws_iam_policy_document" "emds_alerts_topic_policy" {
     principals {
       type = "Service"
       identifiers = [
-        "cloudwatch.amazonaws.com"
+        "cloudwatch.amazonaws.com",
       ]
     }
   }
 
-  # Allow mdss_daily_failure_digest Lambda role to publish (all envs)
   statement {
     sid    = "AllowMdssDailyFailureDigestLambdaToPublish"
     effect = "Allow"
@@ -129,7 +135,6 @@ data "aws_iam_policy_document" "emds_alerts_topic_policy" {
     }
   }
 
-  # Allow cloudwatch_alarm_threader Lambda role to publish (all envs)
   statement {
     sid    = "AllowCloudwatchAlarmThreaderLambdaToPublish"
     effect = "Allow"
@@ -146,7 +151,22 @@ data "aws_iam_policy_document" "emds_alerts_topic_policy" {
     }
   }
 
-  # Allow AWS Chatbot HTTPS endpoint ingestion
+  statement {
+    sid    = "AllowStagingDbJanitorLambdaToPublish"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [aws_sns_topic.emds_alerts.arn]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.staging_db_janitor.arn]
+    }
+  }
+
   statement {
     sid    = "AllowChatbotToConsume"
     effect = "Allow"
@@ -154,7 +174,7 @@ data "aws_iam_policy_document" "emds_alerts_topic_policy" {
     actions = [
       "sns:Subscribe",
       "sns:Receive",
-      "sns:Publish"
+      "sns:Publish",
     ]
 
     resources = [aws_sns_topic.emds_alerts.arn]
@@ -164,7 +184,7 @@ data "aws_iam_policy_document" "emds_alerts_topic_policy" {
       identifiers = [
         "sns.amazonaws.com",
         "events.amazonaws.com",
-        "chatbot.amazonaws.com"
+        "chatbot.amazonaws.com",
       ]
     }
   }

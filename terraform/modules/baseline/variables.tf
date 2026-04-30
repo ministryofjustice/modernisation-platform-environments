@@ -1,8 +1,10 @@
 variable "acm_certificates" {
   description = "map of acm certificates to create where the map key is the tags.Name.  See acm_certificate module for more variable details"
   type = map(object({
-    domain_name             = string
-    subject_alternate_names = optional(list(string), [])
+    domain_name                                 = string
+    certificate_transparency_logging_preference = optional(bool)
+    export                                      = optional(bool)
+    subject_alternate_names                     = optional(list(string), [])
     validation = optional(map(object({
       account   = optional(string, "self")
       zone_name = string
