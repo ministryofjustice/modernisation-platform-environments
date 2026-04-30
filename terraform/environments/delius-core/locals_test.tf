@@ -80,13 +80,13 @@ locals {
 
   delius_microservices_configs_test = {
     weblogic = {
-      image_tag         = "6.7.4"
-      task_definition_revision = 10
-      container_port    = 8080
-      container_memory  = 4096
-      container_cpu     = 2048
-      ec2_instance_type = "r7i.2xlarge"
-      task_count        = 4
+      image_tag                = "6.7.4"
+      task_definition_revision = 12
+      container_port           = 8080
+      container_memory         = 4096
+      container_cpu            = 2048
+      ec2_instance_type        = "r7i.2xlarge"
+      task_count               = 4
     }
 
     weblogic_params = {
@@ -136,10 +136,10 @@ locals {
     }
 
     weblogic_eis = {
-      image_tag        = "6.7.4-eis"
-      container_port   = 8080
-      container_memory = 2048
-      container_cpu    = 1024
+      image_tag         = "6.7.4-eis"
+      container_port    = 8080
+      container_memory  = 2048
+      container_cpu     = 1024
       ec2_instance_type = "r7i.large"
       task_count        = 1
     }
