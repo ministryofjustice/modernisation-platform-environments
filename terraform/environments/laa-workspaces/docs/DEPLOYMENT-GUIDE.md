@@ -134,63 +134,47 @@ terraform plan
 
 After Microsoft AD is deployed, configure RADIUS for multi-factor authentication.
 
-**Location:** `terraform/environments/laa-workspaces/new-adds-radius.tf`
+**Solution:** FreeRADIUS with Google Authenticator (TOTP)
+
+**Location:** `terraform/environments/laa-workspaces/workspace-components/new-adds-radius-server.tf`
 
 **What it creates:**
+- 2x EC2 instances (t3.small) running FreeRADIUS
+- Security group for RADIUS traffic (UDP 1812/1813)
+- IAM role with Secrets Manager access
+- CloudWatch Logs and alarms
 - RADIUS shared secret (stored in Secrets Manager)
-- RADIUS settings on Microsoft AD
-- Link between AD and RADIUS server
 
-**Prerequisites:**
-1. Deploy RADIUS server infrastructure (see [RADIUS-MFA-SETUP.md](RADIUS-MFA-SETUP.md))
-2. Configure MFA provider (Duo/Azure MFA/FreeRADIUS)
-3. Note RADIUS server IP addresses
+**Deployment:**
 
-**Steps:**
+The RADIUS infrastructure is already configured and will be deployed automatically with workspace-components (Phase 1).
 
-1. **Update RADIUS Server IPs**
-   
-   Edit `new-adds-radius.tf` and replace the placeholder:
-   
-   ```hcl
-   radius_servers = [
-     "10.200.1.10",  # Primary RADIUS server IP
-     "10.200.2.10",  # Secondary RADIUS server IP
-   ]
-   ```
+```bash
+cd terraform/environments/laa-workspaces/workspace-components
+terraform apply
+```
 
-2. **Deploy RADIUS Configuration**
-   
-   ```bash
-   terraform apply
-   ```
+**Verification:**
+```bash
+terraform output radius_server_private_ips
+# Should show 2 IP addresses
+```
 
-3. **Test RADIUS Connectivity**
-   
-   From a management instance:
-   ```bash
-   # Get shared secret from Secrets Manager
-   aws secretsmanager get-secret-value --secret-id <secret-arn>
-   
-   # Test RADIUS (install radtest first)
-   radtest username password radius-server-ip:1812 1 shared-secret
-   ```
-
-4. **Verify MFA is Enabled**
-   
-   Check directory settings in AWS Console:
-   - Navigate to Directory Service
-   - Select your directory
-   - Check "MFA" section shows "Enabled"
+**Next Steps:**
+1. SSH to RADIUS servers via SSM Session Manager
+2. Configure users with Google Authenticator
+3. Test RADIUS authentication
+4. See [FREERADIUS-SETUP.md](FREERADIUS-SETUP.md) for detailed instructions
 
 **Expected result:**
-- RADIUS settings configured on Microsoft AD
-- Users prompted for MFA token during WorkSpace login
-- MFA validation routed through RADIUS server to provider
+- 2 RADIUS servers deployed across AZs
+- Shared secret created in Secrets Manager
+- Microsoft AD automatically configured with RADIUS settings
+- Ready for user MFA enrollment
 
 ---
 
-### Phase 4: User Provisioning
+### Phase 4: User Provisioning with MFA
 
 After infrastructure and MFA are configured, provision users and WorkSpaces.
 
@@ -205,7 +189,45 @@ After infrastructure and MFA are configured, provision users and WorkSpaces.
    - **Option B:** Use PowerShell on domain-joined EC2 instance
    - **Option C:** Use AWS Directory Service API
 
-2. **Define Users in Terraform**
+2. **Setup MFA for Users (FreeRADIUS + Google Authenticator)**
+   
+   Each user needs MFA configured on the RADIUS servers.
+   
+   **On each RADIUS server:**
+   ```bash
+   # SSH via Session Manager
+   aws ssm start-session --target <instance-id>
+   
+   # Create user and setup MFA
+   sudo useradd -m username
+   sudo passwd username
+   sudo -u username google-authenticator
+   
+   # Answer prompts:
+   # - Time-based tokens? y
+   # - Update .google_authenticator? y
+   # - Disallow multiple uses? y
+   # - Increase window? n
+   # - Rate limiting? y
+   
+   # Retrieve QR code for user
+   sudo cat /home/username/.google_authenticator
+   ```
+   
+   **IMPORTANT:** Run this on **both** RADIUS servers for each user!
+   
+   See [FREERADIUS-SETUP.md](FREERADIUS-SETUP.md) for detailed user setup instructions.
+
+3. **Test MFA Authentication**
+   
+   ```bash
+   # On RADIUS server, test authentication
+   # Password + token must be combined (no space)
+   radtest username 'MyPassword123456' localhost 1812 testing123
+   # (where 123456 is the 6-digit token from Google Authenticator)
+   ```
+
+4. **Define Users in Terraform**
    
    Edit `new-workspace-users.tf`:
    
@@ -224,27 +246,35 @@ After infrastructure and MFA are configured, provision users and WorkSpaces.
    }
    ```
 
-3. **Deploy WorkSpaces**
+5. **Deploy WorkSpaces**
    
    ```bash
    terraform apply
    ```
 
-4. **Distribute Registration Codes**
+6. **Distribute to Users**
    
    ```bash
    # Get registration code
    terraform output workspaces_ad_registration_code
    ```
    
-   Send registration code to users along with:
+   Send to users:
+   - Registration code
    - WorkSpaces client download link
    - AD username and initial password
-   - MFA enrollment instructions
+   - Google Authenticator QR code
+   - Emergency backup codes
+   - Login instructions: password + 6-digit token (combined)
+
+**User Login Process:**
+- Username: `john.doe`
+- Password in WorkSpaces: `<their-password><6-digit-token>`
+- Example: If password is `SecurePass123` and token is `837264`, enter: `SecurePass123837264`
 
 ---
 
-## Current Deployment Status (29 April 2026)
+## Current Deployment Status (30 April 2026)
 
 ### ✅ Phase 1 Completed (workspace-components)
 - [x] VPC and private subnets deployed
@@ -252,31 +282,33 @@ After infrastructure and MFA are configured, provision users and WorkSpaces.
 - [x] IAM roles and policies deployed
 - [x] KMS keys for encryption created
 - [x] S3 buckets and VPC endpoints configured
+- [x] **FreeRADIUS infrastructure configured (ready to deploy)**
 
 ### 📋 Phase 2 Pending
 - [ ] Deploy Microsoft AD
 - [ ] Register WorkSpaces directory with AD
 - [ ] Configure CloudWatch logging
 
-### 📋 Phase 3 Pending - RADIUS MFA
-- [ ] Deploy RADIUS server infrastructure (see RADIUS-MFA-SETUP.md)
-- [ ] Configure MFA provider (Duo/Azure MFA/FreeRADIUS)
-- [ ] Update RADIUS server IPs in new-adds-radius.tf
-- [ ] Deploy RADIUS configuration
+### 📋 Phase 3 Pending - RADIUS MFA (FreeRADIUS)
+- [x] RADIUS server EC2 configuration (in workspace-components)
+- [x] RADIUS shared secret generation
+- [x] Security groups for RADIUS traffic
+- [ ] Deploy RADIUS servers (terraform apply in workspace-components)
+- [ ] Configure users with Google Authenticator
 - [ ] Test MFA authentication flow
 
 ### 📋 Phase 4 Pending - User Provisioning
 - [ ] Create AD users
+- [ ] Setup MFA on RADIUS servers for each user
 - [ ] Define users in Terraform (new-workspace-users.tf)
 - [ ] Deploy individual WorkSpaces
-- [ ] Enroll users in MFA
+- [ ] Distribute Google Authenticator QR codes to users
 - [ ] Distribute WorkSpaces clients and registration codes
 
 ### 🔄 Future Phases
 - [ ] Phase 5: Set up monitoring and alerting
 - [ ] Phase 6: Configure backup and disaster recovery
-- [ ] Phase 7: Document user onboarding process
-- [ ] Phase 8: Implement cost optimization strategies
+- [ ] Phase 7: Implement cost optimization strategies
 
 ---
 
@@ -315,10 +347,13 @@ After infrastructure and MFA are configured, provision users and WorkSpaces.
 
 ## Additional Resources
 
-- **[RADIUS-MFA-SETUP.md](RADIUS-MFA-SETUP.md)** - Detailed RADIUS MFA configuration guide
+- **[FREERADIUS-SETUP.md](FREERADIUS-SETUP.md)** - Complete FreeRADIUS + Google Authenticator setup guide
+- **[RADIUS-MFA-SETUP.md](RADIUS-MFA-SETUP.md)** - General RADIUS MFA overview and alternatives
 - [AWS WorkSpaces Documentation](https://docs.aws.amazon.com/workspaces/)
 - [AWS Managed Microsoft AD](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/directory_microsoft_ad.html)
 - [RADIUS MFA with AWS Directory Service](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ms_ad_mfa.html)
+- [FreeRADIUS Documentation](https://freeradius.org/documentation/)
+- [Google Authenticator PAM](https://github.com/google/google-authenticator-libpam)
 
 ---
 
