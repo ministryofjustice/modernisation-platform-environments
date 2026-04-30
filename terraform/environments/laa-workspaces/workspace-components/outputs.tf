@@ -57,3 +57,25 @@ output "radius_shared_secret_arn" {
   value       = try(aws_secretsmanager_secret.radius_shared_secret[0].arn, null)
   sensitive   = true
 }
+
+output "radius_alb_dns_name" {
+  description = "DNS name of the RADIUS portal ALB"
+  value       = try(aws_lb.radius_portal[0].dns_name, null)
+}
+
+output "radius_portal_url" {
+  description = "URL of the LinOTP MFA self-service portal"
+  value       = try("https://${aws_route53_record.radius_portal[0].fqdn}", null)
+}
+
+output "linotp_admin_password_arn" {
+  description = "ARN of the LinOTP admin password in Secrets Manager"
+  value       = try(aws_secretsmanager_secret.linotp_admin_password[0].arn, null)
+  sensitive   = true
+}
+
+output "mariadb_root_password_arn" {
+  description = "ARN of the MariaDB root password in Secrets Manager"
+  value       = try(aws_secretsmanager_secret.mariadb_root_password[0].arn, null)
+  sensitive   = true
+}

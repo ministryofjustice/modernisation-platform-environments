@@ -50,8 +50,8 @@ After exploring IAM Identity Center integration, we've chosen RADIUS-based MFA b
 - ✅ GitHub Actions permissions for deployment workflows
 
 ### MFA Provider
-- Choose one: Duo Security, Azure MFA, or FreeRADIUS
-- Refer to [RADIUS-MFA-SETUP.md](RADIUS-MFA-SETUP.md) for detailed setup
+- Using: **LinOTP + FreeRADIUS** with self-service enrollment
+- Refer to [LINOTP-FREERADIUS-IMPLEMENTATION-PLAN.md](LINOTP-FREERADIUS-IMPLEMENTATION-PLAN.md) for detailed setup
 
 ---
 
@@ -161,10 +161,10 @@ terraform output radius_server_private_ips
 ```
 
 **Next Steps:**
-1. SSH to RADIUS servers via SSM Session Manager
-2. Configure users with Google Authenticator
-3. Test RADIUS authentication
-4. See [FREERADIUS-SETUP.md](FREERADIUS-SETUP.md) for detailed instructions
+1. Follow [LINOTP-FREERADIUS-IMPLEMENTATION-PLAN.md](LINOTP-FREERADIUS-IMPLEMENTATION-PLAN.md) for complete LinOTP setup
+2. Deploy LinOTP web portal for self-service MFA enrollment
+3. Configure AD integration via LDAP
+4. Users self-enroll via web interface
 
 **Expected result:**
 - 2 RADIUS servers deployed across AZs
@@ -214,9 +214,9 @@ After infrastructure and MFA are configured, provision users and WorkSpaces.
    sudo cat /home/username/.google_authenticator
    ```
    
-   **IMPORTANT:** Run this on **both** RADIUS servers for each user!
+   **Note:** With LinOTP, users self-enroll via web portal. No manual SSH setup required.
    
-   See [FREERADIUS-SETUP.md](FREERADIUS-SETUP.md) for detailed user setup instructions.
+   See [LINOTP-FREERADIUS-IMPLEMENTATION-PLAN.md](LINOTP-FREERADIUS-IMPLEMENTATION-PLAN.md) for complete implementation guide.
 
 3. **Test MFA Authentication**
    
@@ -347,8 +347,7 @@ After infrastructure and MFA are configured, provision users and WorkSpaces.
 
 ## Additional Resources
 
-- **[FREERADIUS-SETUP.md](FREERADIUS-SETUP.md)** - Complete FreeRADIUS + Google Authenticator setup guide
-- **[RADIUS-MFA-SETUP.md](RADIUS-MFA-SETUP.md)** - General RADIUS MFA overview and alternatives
+- **[LINOTP-FREERADIUS-IMPLEMENTATION-PLAN.md](LINOTP-FREERADIUS-IMPLEMENTATION-PLAN.md)** - Complete LinOTP + FreeRADIUS implementation plan with all deployment phases
 - [AWS WorkSpaces Documentation](https://docs.aws.amazon.com/workspaces/)
 - [AWS Managed Microsoft AD](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/directory_microsoft_ad.html)
 - [RADIUS MFA with AWS Directory Service](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ms_ad_mfa.html)
