@@ -30,80 +30,7 @@ locals {
         "13.42.163.245/32",
         "18.132.208.127/32",
       ]
-      ai_gateway_models = {
-        azure = {
-          gpt-4o = {
-            model_id    = "gpt-4o-mojdp"
-            api_version = "2024-12-01-preview"
-          }
-          gpt-4-1 = {
-            model_id    = "gpt-4.1-mojdp"
-            api_version = "2024-12-01-preview"
-          }
-          gpt-5 = {
-            model_id    = "gpt-5-mojdp"
-            api_version = "2024-12-01-preview"
-          }
-          gpt-5-1 = {
-            model_id    = "gpt-5.1-mojdp"
-            api_version = "2024-12-01-preview"
-          }
-          gpt-5-2 = {
-            model_id    = "gpt-5.2-mojdp"
-            api_version = "2024-12-01-preview"
-          }
-        }
-        bedrock = {
-          amazon-titan-embed-text-v2 = {
-            model_id = "amazon.titan-embed-text-v2:0"
-            region   = "eu-west-2"
-          }
-          claude-haiku-4-5 = {
-            model_id = "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
-            region   = "eu-west-2"
-          }
-          claude-opus-4-5 = {
-            model_id = "eu.anthropic.claude-opus-4-5-20251101-v1:0"
-            region   = "eu-west-2"
-          }
-          claude-opus-4-6 = {
-            model_id = "eu.anthropic.claude-opus-4-6-v1"
-            region   = "eu-west-2"
-          }
-          claude-sonnet-4 = {
-            model_id = "eu.anthropic.claude-sonnet-4-20250514-v1:0"
-            region   = "eu-west-1"
-          }
-          claude-sonnet-4-5 = {
-            model_id = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
-            region   = "eu-west-2"
-          }
-          claude-sonnet-4-6 = {
-            model_id = "eu.anthropic.claude-sonnet-4-6"
-            region   = "eu-west-2"
-          }
-          cohere-embed-english-v3 = {
-            model_id = "cohere.embed-english-v3"
-            region   = "eu-west-2"
-          }
-          cohere-embed-multilingual-v3 = {
-            model_id = "cohere.embed-multilingual-v3"
-            region   = "eu-west-2"
-          }
-          meta-llama3-8b-instruct = {
-            model_id = "meta.llama3-8b-instruct-v1:0"
-            region   = "eu-west-2"
-          }
-          meta-llama3-70b-instruct = {
-            model_id = "meta.llama3-70b-instruct-v1:0"
-            region   = "eu-west-2"
-          }
-          qwen-qwen3-coder-30b-a3b = {
-            model_id = "qwen.qwen3-coder-30b-a3b-v1:0"
-            region   = "eu-west-2"
-          }
-        }
-      }
+      ai_gateway_models = local.ai_gateway_models
       rds_instance_class    = "db.t4g.small"
       rds_allocated_storage = 20
       rds_engine_version    = "17.4"
@@ -115,7 +42,7 @@ locals {
       }
       ai_gateway_hostname          = "test.ai-gateway.data-platform.service.justice.gov.uk"
       ai_gateway_ingress_allowlist = []
-      ai_gateway_models            = {}
+      ai_gateway_models            = local.ai_gateway_models
       rds_instance_class           = "db.t4g.small"
       rds_allocated_storage        = 20
       rds_engine_version           = "17.4"
@@ -127,7 +54,7 @@ locals {
       }
       ai_gateway_hostname          = "preproduction.ai-gateway.data-platform.service.justice.gov.uk"
       ai_gateway_ingress_allowlist = []
-      ai_gateway_models            = {}
+      ai_gateway_models            = local.ai_gateway_models
       rds_instance_class           = "db.t4g.small"
       rds_allocated_storage        = 50
       rds_engine_version           = "17.4"
@@ -139,10 +66,85 @@ locals {
       }
       ai_gateway_hostname          = "ai-gateway.data-platform.service.justice.gov.uk"
       ai_gateway_ingress_allowlist = []
-      ai_gateway_models            = {}
+      ai_gateway_models            = local.ai_gateway_models
       rds_instance_class           = "db.t4g.medium"
       rds_allocated_storage        = 100
       rds_engine_version           = "17.4"
+    }
+  }
+  
+  ai_gateway_models = {
+    azure = {
+      gpt-4o = {
+        model_id    = "gpt-4o-mojdp"
+        api_version = "2024-12-01-preview"
+      }
+      gpt-4-1 = {
+        model_id    = "gpt-4.1-mojdp"
+        api_version = "2024-12-01-preview"
+      }
+      gpt-5 = {
+        model_id    = "gpt-5-mojdp"
+        api_version = "2024-12-01-preview"
+      }
+      gpt-5-1 = {
+        model_id    = "gpt-5.1-mojdp"
+        api_version = "2024-12-01-preview"
+      }
+      gpt-5-2 = {
+        model_id    = "gpt-5.2-mojdp"
+        api_version = "2024-12-01-preview"
+      }
+    }
+    bedrock = {
+      amazon-titan-embed-text-v2 = {
+        model_id = "amazon.titan-embed-text-v2:0"
+        region   = "eu-west-2"
+      }
+      claude-haiku-4-5 = {
+        model_id = "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
+        region   = "eu-west-2"
+      }
+      claude-opus-4-5 = {
+        model_id = "eu.anthropic.claude-opus-4-5-20251101-v1:0"
+        region   = "eu-west-2"
+      }
+      claude-opus-4-6 = {
+        model_id = "eu.anthropic.claude-opus-4-6-v1"
+        region   = "eu-west-2"
+      }
+      claude-sonnet-4 = {
+        model_id = "eu.anthropic.claude-sonnet-4-20250514-v1:0"
+        region   = "eu-west-1"
+      }
+      claude-sonnet-4-5 = {
+        model_id = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+        region   = "eu-west-2"
+      }
+      claude-sonnet-4-6 = {
+        model_id = "eu.anthropic.claude-sonnet-4-6"
+        region   = "eu-west-2"
+      }
+      cohere-embed-english-v3 = {
+        model_id = "cohere.embed-english-v3"
+        region   = "eu-west-2"
+      }
+      cohere-embed-multilingual-v3 = {
+        model_id = "cohere.embed-multilingual-v3"
+        region   = "eu-west-2"
+      }
+      meta-llama3-8b-instruct = {
+        model_id = "meta.llama3-8b-instruct-v1:0"
+        region   = "eu-west-2"
+      }
+      meta-llama3-70b-instruct = {
+        model_id = "meta.llama3-70b-instruct-v1:0"
+        region   = "eu-west-2"
+      }
+      qwen-qwen3-coder-30b-a3b = {
+        model_id = "qwen.qwen3-coder-30b-a3b-v1:0"
+        region   = "eu-west-2"
+      }
     }
   }
 }
