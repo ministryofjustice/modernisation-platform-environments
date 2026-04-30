@@ -25,9 +25,8 @@ module "weblogic" {
   container_memory = var.delius_microservice_configs.weblogic.container_memory
   container_cpu    = var.delius_microservice_configs.weblogic.container_cpu
 
-  container_vars_default = {
-    for key, name in var.delius_microservice_configs.weblogic_params : key => data.aws_ssm_parameter.weblogic_ssm[key].value
-  }
+  container_vars_default = var.delius_microservice_configs.weblogic_params
+  
   container_vars_env_specific = try(var.delius_microservice_configs.weblogic.container_vars_env_specific, {})
 
   container_secrets_default = merge({
