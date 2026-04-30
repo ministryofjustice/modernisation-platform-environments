@@ -6,7 +6,7 @@ locals {
         application = "main-v1.83.7-stable"
         chart       = "1.83.7-stable"
       }
-      ai_gateway_hostname = "ai-gateway.development.data-platform.service.justice.gov.uk"
+      ai_gateway_hostname = "development.ai-gateway.data-platform.service.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
@@ -113,7 +113,7 @@ locals {
         application = "main-v1.83.7-stable"
         chart       = "1.83.7-stable"
       }
-      ai_gateway_hostname          = "ai-gateway.test.data-platform.service.justice.gov.uk"
+      ai_gateway_hostname          = "test.ai-gateway.data-platform.service.justice.gov.uk"
       ai_gateway_ingress_allowlist = []
       ai_gateway_models            = {}
       rds_instance_class           = "db.t4g.small"
@@ -125,7 +125,7 @@ locals {
         application = "main-v1.83.7-stable"
         chart       = "1.83.7-stable"
       }
-      ai_gateway_hostname          = "ai-gateway.preproduction.data-platform.service.justice.gov.uk"
+      ai_gateway_hostname          = "preproduction.ai-gateway.data-platform.service.justice.gov.uk"
       ai_gateway_ingress_allowlist = []
       ai_gateway_models            = {}
       rds_instance_class           = "db.t4g.small"
