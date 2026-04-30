@@ -1,9 +1,4 @@
-resource "random_password" "rds" {
-  length  = 32
-  special = false
-}
-
-module "llm_gateway_rds" {
+module "ai_gateway_rds" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-rds.git?ref=bc8c1e240a98fd54a12c61c70de91cbabec71863" # v7.2.0
 
   identifier = local.component_name
@@ -26,7 +21,7 @@ module "llm_gateway_rds" {
 
   create_db_subnet_group = true
   subnet_ids             = data.aws_subnets.shared-data.ids
-  vpc_security_group_ids = [module.llm_gateway_rds_security_group.security_group_id]
+  vpc_security_group_ids = [module.ai_gateway_rds_security_group.security_group_id]
 
   multi_az            = local.is-production
   skip_final_snapshot = !local.is-production
@@ -40,16 +35,36 @@ module "llm_gateway_rds" {
   tags = local.tags
 }
 
-module "llm_gateway_rds_secret" {
+module "ai_gateway_rds_secret" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
 
   name = "${local.component_name}/rds"
 
   secret_string = jsonencode({
-    username = module.llm_gateway_rds.db_instance_username
+    username = module.ai_gateway_rds.db_instance_username
     password = random_password.rds.result
-    host     = module.llm_gateway_rds.db_instance_address
-    port     = tostring(module.llm_gateway_rds.db_instance_port)
-    dbname   = module.llm_gateway_rds.db_instance_name
+    host     = module.ai_gateway_rds.db_instance_address
+    port     = tostring(module.ai_gateway_rds.db_instance_port)
+    dbname   = module.ai_gateway_rds.db_instance_name
   })
+}
+
+module "ai_gateway_rds_security_group" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-security-group.git?ref=3cf4e1a48a4649179e8ea27308daf0b551cb0bfa" # v5.3.1
+
+  name            = "${local.component_name}-rds"
+  description     = "Security group for LiteLLM RDS PostgreSQL"
+  vpc_id          = data.aws_vpc.shared.id
+  use_name_prefix = false
+
+  computed_ingress_with_source_security_group_id = [
+    {
+      rule                     = "postgresql-tcp"
+      description              = "Allow PostgreSQL access from EKS cluster"
+      source_security_group_id = data.aws_eks_cluster.cluster.vpc_config[0].cluster_security_group_id
+    }
+  ]
+  number_of_computed_ingress_with_source_security_group_id = 1
+
+  tags = local.tags
 }

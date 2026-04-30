@@ -1,4 +1,4 @@
-data "aws_iam_policy_document" "llm_gateway" {
+data "aws_iam_policy_document" "ai_gateway" {
   statement {
     sid    = "AwsMarketplaceAccess"
     effect = "Allow"
@@ -24,10 +24,27 @@ data "aws_iam_policy_document" "llm_gateway" {
   }
 }
 
-module "llm_gateway_iam_policy" {
+module "ai_gateway_iam_policy" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-policy?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
 
-  name_prefix = "llm-gateway"
+  name_prefix = "ai-gateway"
 
-  policy = data.aws_iam_policy_document.llm_gateway.json
+  policy = data.aws_iam_policy_document.ai_gateway.json
+}
+
+module "iam_role" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
+
+  name = local.component_name
+
+  policies = {
+    ai-gateway = module.ai_gateway_iam_policy.arn
+  }
+
+  oidc_providers = {
+    main = {
+      provider_arn               = data.aws_iam_openid_connect_provider.cluster.arn
+      namespace_service_accounts = ["ai-gateway:litellm"]
+    }
+  }
 }

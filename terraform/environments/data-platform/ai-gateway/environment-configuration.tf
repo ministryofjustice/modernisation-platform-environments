@@ -3,11 +3,11 @@ locals {
   environment_configurations = {
     development = {
       litellm_versions = {
-        application = "main-v1.82.3-stable.patch.2"
-        chart       = "1.82.3-stable.patch.2"
+        application = "main-v1.83.7-stable"
+        chart       = "1.83.7-stable"
       }
-      llm_gateway_hostname = "llm-gateway.development.data-platform.service.justice.gov.uk"
-      llm_gateway_ingress_allowlist = [
+      ai_gateway_hostname = "ai-gateway.development.data-platform.service.justice.gov.uk"
+      ai_gateway_ingress_allowlist = [
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
         "35.176.93.186/32", # GlobalProtect (Alpha)
@@ -30,7 +30,7 @@ locals {
         "13.42.163.245/32",
         "18.132.208.127/32",
       ]
-      llm_gateway_models = {
+      ai_gateway_models = {
         azure = {
           gpt-4o = {
             model_id    = "gpt-4o-mojdp"
@@ -104,24 +104,45 @@ locals {
           }
         }
       }
+      rds_instance_class    = "db.t4g.small"
+      rds_allocated_storage = 20
+      rds_engine_version    = "17.4"
     }
     test = {
-      litellm_versions              = {}
-      llm_gateway_hostname          = ""
-      llm_gateway_ingress_allowlist = []
-      llm_gateway_models            = {}
+      litellm_versions = {
+        application = "main-v1.83.7-stable"
+        chart       = "1.83.7-stable"
+      }
+      ai_gateway_hostname          = "ai-gateway.test.data-platform.service.justice.gov.uk"
+      ai_gateway_ingress_allowlist = []
+      ai_gateway_models            = {}
+      rds_instance_class           = "db.t4g.small"
+      rds_allocated_storage        = 20
+      rds_engine_version           = "17.4"
     }
     preproduction = {
-      litellm_versions              = {}
-      llm_gateway_hostname          = ""
-      llm_gateway_ingress_allowlist = []
-      llm_gateway_models            = {}
+      litellm_versions = {
+        application = "main-v1.83.7-stable"
+        chart       = "1.83.7-stable"
+      }
+      ai_gateway_hostname          = "ai-gateway.preproduction.data-platform.service.justice.gov.uk"
+      ai_gateway_ingress_allowlist = []
+      ai_gateway_models            = {}
+      rds_instance_class           = "db.t4g.small"
+      rds_allocated_storage        = 50
+      rds_engine_version           = "17.4"
     }
     production = {
-      litellm_versions              = {}
-      llm_gateway_hostname          = ""
-      llm_gateway_ingress_allowlist = []
-      llm_gateway_models            = {}
+      litellm_versions = {
+        application = "main-v1.83.7-stable"
+        chart       = "1.83.7-stable"
+      }
+      ai_gateway_hostname          = "ai-gateway.data-platform.service.justice.gov.uk"
+      ai_gateway_ingress_allowlist = []
+      ai_gateway_models            = {}
+      rds_instance_class           = "db.t4g.medium"
+      rds_allocated_storage        = 100
+      rds_engine_version           = "17.4"
     }
   }
 }

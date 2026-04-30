@@ -4,7 +4,7 @@ resource "kubernetes_manifest" "external_secret_litellm_license" {
     kind       = "ExternalSecret"
     metadata = {
       name      = "litellm-license"
-      namespace = "llm-gateway"
+      namespace = "ai-gateway"
     }
     spec = {
       refreshInterval = "1h"
@@ -33,7 +33,7 @@ resource "kubernetes_manifest" "external_secret_litellm_entra_id" {
     kind       = "ExternalSecret"
     metadata = {
       name      = "litellm-entra-id"
-      namespace = "llm-gateway"
+      namespace = "ai-gateway"
     }
     spec = {
       refreshInterval = "1h"
@@ -84,7 +84,7 @@ resource "kubernetes_manifest" "external_secret_justiceai_azure_openai" {
     kind       = "ExternalSecret"
     metadata = {
       name      = "justiceai-azure-openai"
-      namespace = "llm-gateway"
+      namespace = "ai-gateway"
     }
     spec = {
       refreshInterval = "1h"
@@ -121,7 +121,7 @@ resource "kubernetes_manifest" "external_secret_azure_openai" {
     kind       = "ExternalSecret"
     metadata = {
       name      = "azure-openai"
-      namespace = "llm-gateway"
+      namespace = "ai-gateway"
     }
     spec = {
       refreshInterval = "1h"
@@ -158,7 +158,7 @@ resource "kubernetes_manifest" "external_secret_rds" {
     kind       = "ExternalSecret"
     metadata = {
       name      = "rds"
-      namespace = "llm-gateway"
+      namespace = "ai-gateway"
     }
     spec = {
       refreshInterval = "1h"
@@ -173,35 +173,35 @@ resource "kubernetes_manifest" "external_secret_rds" {
         {
           secretKey = "username"
           remoteRef = {
-            key      = tostring(module.llm_gateway_rds_secret.secret_id)
+            key      = tostring(module.ai_gateway_rds_secret.secret_id)
             property = "username"
           }
         },
         {
           secretKey = "password"
           remoteRef = {
-            key      = tostring(module.llm_gateway_rds_secret.secret_id)
+            key      = tostring(module.ai_gateway_rds_secret.secret_id)
             property = "password"
           }
         },
         {
           secretKey = "host"
           remoteRef = {
-            key      = tostring(module.llm_gateway_rds_secret.secret_id)
+            key      = tostring(module.ai_gateway_rds_secret.secret_id)
             property = "host"
           }
         },
         {
           secretKey = "port"
           remoteRef = {
-            key      = tostring(module.llm_gateway_rds_secret.secret_id)
+            key      = tostring(module.ai_gateway_rds_secret.secret_id)
             property = "port"
           }
         },
         {
           secretKey = "dbname"
           remoteRef = {
-            key      = tostring(module.llm_gateway_rds_secret.secret_id)
+            key      = tostring(module.ai_gateway_rds_secret.secret_id)
             property = "dbname"
           }
         }
