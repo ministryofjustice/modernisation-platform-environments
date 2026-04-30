@@ -1252,7 +1252,7 @@ resource "aws_lakeformation_permissions" "historic_csv_add_create_db" {
 }
 
 #-----------------------------------------------------------------------------------
-# Clean after MDSS load IAM Role
+# Clean after dlt load IAM Role
 #-----------------------------------------------------------------------------------
 
 data "aws_iam_policy_document" "clean_after_dlt_load_lambda_role_policy_document" {
@@ -1797,7 +1797,6 @@ data "aws_iam_policy_document" "cloudwatch_alarm_threader_policy_document" {
     resources = [aws_sns_topic.emds_alerts.arn]
   }
 
-  # Topic is KMS-encrypted; to match the pattern used by mdss_daily_failure_digest
   statement {
     sid    = "AllowUseOfAlertsKmsKey"
     effect = "Allow"
@@ -1807,6 +1806,15 @@ data "aws_iam_policy_document" "cloudwatch_alarm_threader_policy_document" {
       "kms:Decrypt",
     ]
     resources = [aws_kms_key.emds_alerts.arn]
+  }
+
+  statement {
+    sid    = "AllowStartStagingDbJanitorWorkflow"
+    effect = "Allow"
+    actions = [
+      "states:StartExecution",
+    ]
+    resources = [aws_sfn_state_machine.staging_db_janitor.arn]
   }
 }
 
@@ -1958,6 +1966,105 @@ resource "aws_iam_role_policy_attachment" "mdss_reconciler_lambda_policy_attachm
   policy_arn = aws_iam_policy.mdss_reconciler_lambda_role_policy.arn
 }
 
+#-----------------------------------------------------------------------------------
+# Staging DB janitor IAM Role
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "staging_db_janitor_policy_document" {
+  statement {
+    sid    = "GluePermissionsForCleanup"
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabases",
+      "glue:GetDatabase",
+      "glue:GetTables",
+      "glue:GetTable",
+      "glue:DeleteTable",
+      "glue:DeleteDatabase",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
+    ]
+  }
+
+  statement {
+    sid    = "S3PermissionsForCleanup"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:DeleteObject",
+      "s3:DeleteObjectVersion",
+      "s3:GetBucketLocation",
+    ]
+    resources = [
+      module.s3-create-a-derived-table-bucket.bucket.arn,
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/*",
+    ]
+  }
+
+  statement {
+    sid    = "S3StateAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+    ]
+    resources = [
+      "arn:aws:s3:::${local.alarm_thread_state_bucket}/${local.alarm_thread_state_prefix}/${local.environment_shorthand}/*"
+    ]
+  }
+
+  statement {
+    sid    = "LakeFormationGrantRevoke"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GrantPermissions",
+      "lakeformation:RevokePermissions",
+      "lakeformation:ListPermissions",
+      "lakeformation:GetDataAccess",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowPublishToAlertsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [aws_sns_topic.emds_alerts.arn]
+  }
+
+  statement {
+    sid    = "AllowUseOfAlertsKmsKey"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:GenerateDataKey*",
+      "kms:Decrypt",
+    ]
+    resources = [aws_kms_key.emds_alerts.arn]
+  }
+}
+
+resource "aws_iam_role" "staging_db_janitor" {
+  name               = "staging_db_janitor_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "staging_db_janitor" {
+  name   = "staging_db_janitor_lambda_policy"
+  policy = data.aws_iam_policy_document.staging_db_janitor_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "staging_db_janitor_attach" {
+  role       = aws_iam_role.staging_db_janitor.name
+  policy_arn = aws_iam_policy.staging_db_janitor.arn
+}
 
 # ----------------------------------------------------------------------------------------
 # create p1 export
