@@ -6,7 +6,8 @@ locals {
         application = "main-v1.83.7-stable"
         chart       = "1.83.7-stable"
       }
-      llm_gateway_hostname = "ai-gateway.development.data-platform.service.justice.gov.uk"
+      cloud_platform_hostname = "llm-gateway.development.data-platform.service.justice.gov.uk"
+      llm_gateway_hostname    = "ai-gateway.development.data-platform.service.justice.gov.uk"
       llm_gateway_ingress_allowlist = [
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
