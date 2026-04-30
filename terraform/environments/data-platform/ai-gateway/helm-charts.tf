@@ -23,7 +23,7 @@ resource "helm_release" "litellm" {
         databaseName        = module.ai_gateway_rds.db_instance_name
 
         # LiteLLM
-        masterkeySecretName = kubernetes_secret.litellm_master_key.metadata[0].name
+        masterkeySecretName = kubernetes_secret_v1.litellm_master_key.metadata[0].name
         masterkeySecretKey  = "master-key" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
         environmentSecrets = [
           "litellm-license",
@@ -44,7 +44,7 @@ resource "helm_release" "litellm" {
 
   depends_on = [
     module.iam_role,
-    kubernetes_secret.litellm_master_key,
+    kubernetes_secret_v1.litellm_master_key,
     kubernetes_manifest.external_secret_litellm_license,
     kubernetes_manifest.external_secret_litellm_entra_id,
     kubernetes_manifest.external_secret_justiceai_azure_openai,
