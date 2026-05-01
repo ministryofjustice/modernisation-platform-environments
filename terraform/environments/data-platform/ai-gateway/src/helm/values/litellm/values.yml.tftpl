@@ -6,6 +6,7 @@ image:
 nameOverride: "litellm"
 
 serviceAccount:
+  create: true
   name: ${serviceAccountName}
   annotations:
     eks.amazonaws.com/role-arn: ${iamRole}
