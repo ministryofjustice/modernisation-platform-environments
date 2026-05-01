@@ -76,6 +76,10 @@ module "ecs_service_datadog_agent" {
           "value" : "yjaf-cluster"
         },
         {
+          "name"  = "DD_HOSTNAME"
+          "value" = "/etc/hostname"
+        },
+        {
           "name" : "DD_LOGS_ENABLED",
           "value" : "true"
         },
