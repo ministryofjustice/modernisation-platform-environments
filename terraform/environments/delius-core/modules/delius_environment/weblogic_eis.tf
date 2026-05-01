@@ -121,6 +121,10 @@ resource "aws_autoscaling_group" "weblogic_eis" {
 
   vpc_zone_identifier = var.account_config.private_subnet_ids
 
+  instance_refresh {
+    strategy = "Rolling"
+  }
+
   launch_template {
     id      = aws_launch_template.weblogic.id
     version = "$Latest"
