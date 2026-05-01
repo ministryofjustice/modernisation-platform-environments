@@ -49,6 +49,7 @@ resource "helm_release" "litellm" {
 
   depends_on = [
     module.iam_role,
+    kubernetes_service_account_v1.litellm,
     kubernetes_secret_v1.litellm_master_key,
     kubernetes_manifest.external_secret_litellm_license,
     kubernetes_manifest.external_secret_litellm_entra_id,
@@ -95,6 +96,7 @@ resource "helm_release" "litellm_admin" {
 
   depends_on = [
     helm_release.litellm,
+    kubernetes_service_account_v1.litellm,
     kubernetes_secret_v1.litellm_master_key,
     kubernetes_manifest.external_secret_litellm_license,
     kubernetes_manifest.external_secret_litellm_entra_id,
