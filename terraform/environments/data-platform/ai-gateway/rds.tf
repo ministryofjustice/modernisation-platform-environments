@@ -20,7 +20,7 @@ module "ai_gateway_rds" {
   password_wo_version         = 1
 
   create_db_subnet_group = true
-  subnet_ids             = data.aws_subnets.shared-data.ids
+  subnet_ids             = data.aws_subnets.eks-data.ids
   vpc_security_group_ids = [module.ai_gateway_rds_security_group.security_group_id]
 
   multi_az            = local.is-production
@@ -54,13 +54,13 @@ module "ai_gateway_rds_security_group" {
 
   name            = "${local.component_name}-rds"
   description     = "Security group for LiteLLM RDS PostgreSQL"
-  vpc_id          = data.aws_vpc.shared.id
+  vpc_id          = data.aws_vpc.eks.id
   use_name_prefix = false
 
   computed_ingress_with_cidr_blocks = [
     {
       rule        = "postgresql-tcp"
-      description = "Allow PostgreSQL access from EKS cluster VPC"
+      description = "Allow PostgreSQL access from EKS pods"
       cidr_blocks = data.aws_vpc.eks.cidr_block
     }
   ]

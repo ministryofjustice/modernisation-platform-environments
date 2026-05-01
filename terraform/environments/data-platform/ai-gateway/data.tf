@@ -14,6 +14,18 @@ data "aws_vpc" "eks" {
   id = data.aws_eks_cluster.cluster.vpc_config[0].vpc_id
 }
 
+data "aws_subnets" "eks-data" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.eks.id]
+  }
+
+  filter {
+    name   = "tag:Name"
+    values = ["${local.application_name}-${local.environment}-data*"]
+  }
+}
+
 data "aws_secretsmanager_secret_version" "litellm_license" {
   secret_id = module.litellm_license_secret.secret_id
 }
