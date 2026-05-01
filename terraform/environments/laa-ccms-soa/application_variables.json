@@ -70,6 +70,7 @@
       "northgate_proxy": "10.120.0.147/32",
       "aws_workspace_cidr": "10.200.0.0/20",
       "cloud_platform_cidr": "172.20.0.0/16",
+      "cwa_db_port": "1571",
       "oem": {
         "agent_port": "3872",
         "oms_port": "4903",
@@ -150,6 +151,7 @@
       "aws_workspace_cidr": "10.200.0.0/20",
       "northgate_proxy": "10.120.0.147/32",
       "cloud_platform_cidr": "172.20.0.0/16",
+      "cwa_db_port": "1571",
       "oem": {
         "agent_port": "3872",
         "oms_port": "4903",
@@ -225,6 +227,7 @@
       "aws_workspace_cidr": "10.200.0.0/19",
       "northgate_proxy": "10.120.0.0/24",
       "cloud_platform_cidr": "172.20.0.0/16",
+      "cwa_db_port": "1571",
       "oem": {
         "agent_port": "3872",
         "oms_port": "4903",
@@ -301,6 +304,7 @@
       "aws_workspace_cidr": "10.200.0.0/19",
       "northgate_proxy": "10.110.0.0/24",
       "cloud_platform_cidr": "172.20.0.0/16",
+      "cwa_db_port": "2484",
       "oem": {
         "agent_port": "3872",
         "oms_port": "4903",
