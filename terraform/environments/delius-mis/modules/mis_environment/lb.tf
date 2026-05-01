@@ -540,7 +540,7 @@ resource "aws_lb_listener_rule" "bws_https" {
 }
 
 resource "aws_lb_listener_rule" "bws_sso_https" {
-  count        = local.bws_enabled ? 1 : 0
+  count        = local.bws_sso_enabled ? 1 : 0
   listener_arn = aws_lb_listener.mis_https[0].arn
   priority     = 350
 
