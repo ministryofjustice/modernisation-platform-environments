@@ -85,6 +85,14 @@ proxy_config:
         aws_region_name: ${profile.region}
 %{ endfor ~}
 
+tolerations:
+  - key: compute.data-platform.service.justice.gov.uk/node-pool
+    value: "general-on-demand-arm64"
+    effect: NoSchedule
+
+nodeSelector:
+  compute.data-platform.service.justice.gov.uk/node-pool: "general-on-demand-arm64"
+
 securityContext:
   allowPrivilegeEscalation: false
   capabilities:
