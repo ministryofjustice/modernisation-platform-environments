@@ -136,12 +136,13 @@ locals {
     }
 
     weblogic_eis = {
-      image_tag         = "6.7.4-eis"
-      container_port    = 8080
-      container_memory  = 2048
-      container_cpu     = 1024
-      ec2_instance_type = "r7i.large"
-      task_count        = 1
+      image_tag                = "6.7.4-eis"
+      task_definition_revision = 9
+      container_port           = 8080
+      container_memory         = 2048
+      container_cpu            = 1024
+      ec2_instance_type        = "r7i.large"
+      task_count               = 1
     }
 
     pwm = {
