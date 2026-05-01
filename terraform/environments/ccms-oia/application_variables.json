@@ -23,7 +23,6 @@
       "db_instance_version": "8.4.8",
       "maintenance_window": "Mon:00:00-Mon:03:00",
       "option_group_name": "default:mysql-8-4",
-      "db_snapshot_identifier": "opa23-hub-db-20260217-encrypted",
       "db_instance_type": "db.t3.large",
       "db_storage_gb": "100",
       "db_deletion_protection": "false",
