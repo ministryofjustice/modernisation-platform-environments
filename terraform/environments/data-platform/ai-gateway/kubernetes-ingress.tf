@@ -1,4 +1,6 @@
 resource "kubernetes_manifest" "http_route" {
+  depends_on = [kubernetes_namespace_v1.ai_gateway]
+
   manifest = {
     apiVersion = "gateway.networking.k8s.io/v1"
     kind       = "HTTPRoute"
@@ -61,6 +63,8 @@ resource "kubernetes_manifest" "http_route" {
 }
 
 resource "kubernetes_manifest" "http_route_admin" {
+  depends_on = [kubernetes_namespace_v1.ai_gateway]
+
   manifest = {
     apiVersion = "gateway.networking.k8s.io/v1"
     kind       = "HTTPRoute"
@@ -123,6 +127,8 @@ resource "kubernetes_manifest" "http_route_admin" {
 }
 
 resource "kubernetes_manifest" "cilium_network_policy" {
+  depends_on = [kubernetes_namespace_v1.ai_gateway]
+
   manifest = {
     apiVersion = "cilium.io/v2"
     kind       = "CiliumNetworkPolicy"
@@ -175,6 +181,8 @@ resource "kubernetes_manifest" "cilium_network_policy" {
 }
 
 resource "kubernetes_manifest" "cilium_network_policy_admin" {
+  depends_on = [kubernetes_namespace_v1.ai_gateway]
+
   manifest = {
     apiVersion = "cilium.io/v2"
     kind       = "CiliumNetworkPolicy"

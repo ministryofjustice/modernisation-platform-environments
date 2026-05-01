@@ -10,6 +10,10 @@ data "aws_iam_openid_connect_provider" "cluster" {
   url = data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer
 }
 
+data "aws_vpc" "eks" {
+  id = data.aws_eks_cluster.cluster.vpc_config[0].vpc_id
+}
+
 data "aws_secretsmanager_secret_version" "litellm_license" {
   secret_id = module.litellm_license_secret.secret_id
 }

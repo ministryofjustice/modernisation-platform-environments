@@ -1,4 +1,6 @@
 resource "kubernetes_manifest" "external_secret_litellm_license" {
+  depends_on = [kubernetes_namespace_v1.ai_gateway]
+
   manifest = {
     apiVersion = "external-secrets.io/v1"
     kind       = "ExternalSecret"
@@ -28,6 +30,8 @@ resource "kubernetes_manifest" "external_secret_litellm_license" {
 }
 
 resource "kubernetes_manifest" "external_secret_litellm_entra_id" {
+  depends_on = [kubernetes_namespace_v1.ai_gateway]
+
   manifest = {
     apiVersion = "external-secrets.io/v1"
     kind       = "ExternalSecret"
@@ -79,6 +83,8 @@ resource "kubernetes_manifest" "external_secret_litellm_entra_id" {
 }
 
 resource "kubernetes_manifest" "external_secret_justiceai_azure_openai" {
+  depends_on = [kubernetes_namespace_v1.ai_gateway]
+
   manifest = {
     apiVersion = "external-secrets.io/v1"
     kind       = "ExternalSecret"
@@ -116,6 +122,8 @@ resource "kubernetes_manifest" "external_secret_justiceai_azure_openai" {
 }
 
 resource "kubernetes_manifest" "external_secret_azure_openai" {
+  depends_on = [kubernetes_namespace_v1.ai_gateway]
+
   manifest = {
     apiVersion = "external-secrets.io/v1"
     kind       = "ExternalSecret"
@@ -153,6 +161,8 @@ resource "kubernetes_manifest" "external_secret_azure_openai" {
 }
 
 resource "kubernetes_manifest" "external_secret_rds" {
+  depends_on = [kubernetes_namespace_v1.ai_gateway]
+
   manifest = {
     apiVersion = "external-secrets.io/v1"
     kind       = "ExternalSecret"

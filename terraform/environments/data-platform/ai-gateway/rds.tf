@@ -57,14 +57,14 @@ module "ai_gateway_rds_security_group" {
   vpc_id          = data.aws_vpc.shared.id
   use_name_prefix = false
 
-  computed_ingress_with_source_security_group_id = [
+  computed_ingress_with_cidr_blocks = [
     {
-      rule                     = "postgresql-tcp"
-      description              = "Allow PostgreSQL access from EKS cluster"
-      source_security_group_id = data.aws_eks_cluster.cluster.vpc_config[0].cluster_security_group_id
+      rule        = "postgresql-tcp"
+      description = "Allow PostgreSQL access from EKS cluster VPC"
+      cidr_blocks = data.aws_vpc.eks.cidr_block
     }
   ]
-  number_of_computed_ingress_with_source_security_group_id = 1
+  number_of_computed_ingress_with_cidr_blocks = 1
 
   tags = local.tags
 }

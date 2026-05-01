@@ -3,6 +3,8 @@ locals {
 }
 
 resource "kubernetes_secret_v1" "litellm_master_key" {
+  depends_on = [kubernetes_namespace_v1.ai_gateway]
+
   metadata {
     namespace = "ai-gateway"
     name      = "litellm-master-key"
