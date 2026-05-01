@@ -108,7 +108,7 @@ locals {
       JDBC_CONNECTION_POOL_MIN_CAPACITY = "50"
       JDBC_URL                          = "jdbc:oracle:thin:@(DESCRIPTION=(LOAD_BALANCE=OFF)(FAILOVER=ON)(CONNECT_TIMEOUT=10)(RETRY_COUNT=3)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=tcp)(HOST=delius-core-test-db-1.hmpps-test.modernisation-platform.internal)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=TSTNDA_TAF)))"
       JDBC_USERNAME                     = "delius_pool"
-      LDAP_HOST                         = "https://ldap.test.delius-core.hmpps-test.modernisation-platform.service.justice.gov.uk"
+      LDAP_HOST                         = "ldap.test.delius-core.hmpps-test.modernisation-platform.service.justice.gov.uk"
       LDAP_PRINCIPAL                    = "cn=admin,dc=moj,dc=com"
       LOG_LEVEL_NDELIUS                 = "DEBUG"
       MERGE_API_URL                     = "https://delius-merge-api-test.hmpps.service.justice.gov.uk"
