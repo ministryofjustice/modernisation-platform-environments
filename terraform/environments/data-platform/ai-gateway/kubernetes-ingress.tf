@@ -36,7 +36,11 @@ resource "kubernetes_manifest" "http_route" {
             {
               type = "RequestRedirect"
               requestRedirect = {
-                statusCode = 404
+                path = {
+                  type            = "ReplaceFullPath"
+                  replaceFullPath = "/"
+                }
+                statusCode = 302
               }
             }
           ]
@@ -100,7 +104,11 @@ resource "kubernetes_manifest" "http_route_admin" {
             {
               type = "RequestRedirect"
               requestRedirect = {
-                statusCode = 404
+                path = {
+                  type            = "ReplaceFullPath"
+                  replaceFullPath = "/"
+                }
+                statusCode = 302
               }
             }
           ]
