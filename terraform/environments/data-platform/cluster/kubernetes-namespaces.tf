@@ -74,13 +74,3 @@ module "keda_namespace" {
   name     = "keda"
   workload = "system"
 }
-
-module "llm_gateway_namespace" {
-  source = "./modules/kubernetes/namespace"
-
-  name     = "llm-gateway"
-  workload = "application"
-  labels = {
-    "compute.data-platform.service.justice.gov.uk/shared-gateway-enabled" = "true"
-  }
-}
