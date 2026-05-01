@@ -4,8 +4,7 @@ resource "kubernetes_namespace_v1" "this" {
     labels = merge(
       {
         "compute.data-platform.service.justice.gov.uk/workload" = var.workload
-      },
-      var.labels
+      }
     )
   }
 }
