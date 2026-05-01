@@ -26,7 +26,7 @@ module "weblogic" {
   container_cpu    = var.delius_microservice_configs.weblogic.container_cpu
 
   container_vars_default = var.delius_microservice_configs.weblogic_params
-  
+
   container_vars_env_specific = try(var.delius_microservice_configs.weblogic.container_vars_env_specific, {})
 
   container_secrets_default = merge({
@@ -194,7 +194,7 @@ resource "aws_autoscaling_group" "weblogic" {
   max_size              = 2
   min_size              = 1
   desired_capacity      = 1
-  protect_from_scale_in = false
+  protect_from_scale_in = true
 
   vpc_zone_identifier = var.account_config.private_subnet_ids
 

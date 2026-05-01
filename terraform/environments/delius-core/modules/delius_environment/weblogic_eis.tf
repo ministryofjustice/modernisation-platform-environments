@@ -114,10 +114,10 @@ data "aws_ssm_parameter" "usermanagement_secret" {
 resource "aws_autoscaling_group" "weblogic_eis" {
   name = "weblogic-eis-${var.env_name}-ecs-asg"
 
-  max_size              = 2
+  max_size              = 1
   min_size              = 1
   desired_capacity      = 1
-  protect_from_scale_in = false
+  protect_from_scale_in = true
 
   vpc_zone_identifier = var.account_config.private_subnet_ids
 
