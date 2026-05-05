@@ -1,5 +1,8 @@
 resource "kubernetes_manifest" "http_route" {
-  depends_on = [kubernetes_namespace_v1.ai_gateway]
+  depends_on = [
+    kubernetes_namespace_v1.ai_gateway,
+    kubernetes_manifest.ai_gateway
+  ]
 
   manifest = {
     apiVersion = "gateway.networking.k8s.io/v1"
@@ -11,8 +14,8 @@ resource "kubernetes_manifest" "http_route" {
     spec = {
       parentRefs = [
         {
-          name      = "shared-gateway"
-          namespace = "shared-services"
+          name      = "ai-gateway"
+          namespace = "ai-gateway"
         }
       ]
       hostnames = [local.environment_configuration.ai_gateway_hostname]
@@ -67,7 +70,10 @@ resource "kubernetes_manifest" "http_route" {
 }
 
 resource "kubernetes_manifest" "http_route_admin" {
-  depends_on = [kubernetes_namespace_v1.ai_gateway]
+  depends_on = [
+    kubernetes_namespace_v1.ai_gateway,
+    kubernetes_manifest.ai_gateway
+  ]
 
   manifest = {
     apiVersion = "gateway.networking.k8s.io/v1"
@@ -79,8 +85,8 @@ resource "kubernetes_manifest" "http_route_admin" {
     spec = {
       parentRefs = [
         {
-          name      = "shared-gateway"
-          namespace = "shared-services"
+          name      = "ai-gateway"
+          namespace = "ai-gateway"
         }
       ]
       hostnames = ["admin.${local.environment_configuration.ai_gateway_hostname}"]
@@ -152,7 +158,7 @@ resource "kubernetes_manifest" "cilium_network_policy" {
       }
       ingress = [
         {
-          fromCIDRSet = [for cidr in local.environment_configuration.ai_gateway_ingress_allowlist : { cidr = cidr }]
+          fromCIDRSet = [{ cidr = data.aws_vpc.eks.cidr_block }]
           toPorts = [
             {
               ports = [
@@ -206,7 +212,7 @@ resource "kubernetes_manifest" "cilium_network_policy_admin" {
       }
       ingress = [
         {
-          fromCIDRSet = [for cidr in local.environment_configuration.ai_gateway_admin_ingress_allowlist : { cidr = cidr }]
+          fromCIDRSet = [{ cidr = data.aws_vpc.eks.cidr_block }]
           toPorts = [
             {
               ports = [
