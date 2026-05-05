@@ -174,10 +174,7 @@ data "aws_iam_policy_document" "place_unzipped_file_s3_policy_document" {
       "s3:ListBucket",
       "s3:GetBucketLocation"
     ]
-    resources = local.is-production ? [
-      "${module.s3-unzipped-files-bucket.bucket.arn}/*",
-      module.s3-unzipped-files-bucket.bucket.arn,
-      ] : [
+    resources = [
       "${module.s3-ears-sars-bucket.bucket.arn}/*",
       module.s3-ears-sars-bucket.bucket.arn,
     ]
@@ -263,10 +260,7 @@ data "aws_iam_policy_document" "get_unzipped_presigned_url_file_s3_policy_docume
       "s3:PutObject",
       "s3:GetObject"
     ]
-    resources = local.is-production ? [
-      "${module.s3-unzipped-files-bucket.bucket.arn}/*",
-      module.s3-unzipped-files-bucket.bucket.arn,
-      ] : [
+    resources = [
       "${module.s3-ears-sars-bucket.bucket.arn}/*",
       module.s3-ears-sars-bucket.bucket.arn,
     ]
@@ -1516,6 +1510,12 @@ resource "aws_iam_role_policy_attachment" "cross_account_copy" {
 data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
   count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
 
+  statement {
+    sid       = "ListAccountAlias"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
   statement {
     sid       = "S3BucketPerms"
     effect    = "Allow"
