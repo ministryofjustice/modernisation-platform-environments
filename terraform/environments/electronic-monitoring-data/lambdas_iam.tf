@@ -1517,6 +1517,12 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
   count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
 
   statement {
+    sid       = "ListAccountAlias"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
     sid       = "S3BucketPerms"
     effect    = "Allow"
     actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
