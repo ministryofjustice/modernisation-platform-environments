@@ -11,7 +11,7 @@ module "weblogic" {
   env_name          = var.env_name
   account_config    = var.account_config
   account_info      = var.account_info
-  capacity_provider = aws_ecs_capacity_provider.weblogic_eis.name
+  capacity_provider = aws_ecs_capacity_provider.weblogic.name
 
   desired_count = var.delius_microservice_configs.weblogic.task_count
   # desired_count = 0
