@@ -51,13 +51,12 @@ module "weblogic_eis" {
   alb_listener_rule_paths    = ["/eis"]
   alb_listener_rule_priority = 40
   alb_health_check = {
-    path                 = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
-    path                 =  "/NDelius-war/delius/javax.faces.resource/health/healthcheck.json"
+    path                 = "/NDelius-war/delius/javax.faces.resource/health/healthcheck.json"
     healthy_threshold    = 5
     interval             = 30
     protocol             = "HTTP"
     unhealthy_threshold  = 5
-    matcher              = "200-499"
+    matcher              = "200"
     timeout              = 10
     grace_period_seconds = 300
   }
@@ -70,6 +69,25 @@ module "weblogic_eis" {
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
+
+  ecs_service_ingress_security_group_ids = []
+  ecs_service_egress_security_group_ids = [
+    {
+      ip_protocol = "tcp"
+      port        = 389
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+    },
+    {
+      ip_protocol = "udp"
+      port        = 389
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+    },
+    {
+      ip_protocol = "tcp"
+      port        = 1521
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+    }
+  ]
 
   log_error_pattern       = ""
   sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn

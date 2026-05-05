@@ -48,12 +48,12 @@ module "weblogic" {
 
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   alb_health_check = {
-    path                 = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
+    path                 = "/NDelius-war/delius/javax.faces.resource/health/healthcheck.json"
     healthy_threshold    = 5
     interval             = 30
     protocol             = "HTTP"
     unhealthy_threshold  = 5
-    matcher              = "200-499"
+    matcher              = "200"
     timeout              = 5
     grace_period_seconds = 300
   }
