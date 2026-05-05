@@ -1,7 +1,22 @@
 # =============================================================================
 # DMS Oracle Test - Development only
 # Deploys terraform-dms-module against the throwaway Oracle RDS instance
-
+#
+# Oracle DMS user minimum grants for full-load:
+#   GRANT CONNECT TO dms_user;
+#   GRANT SELECT ANY TABLE TO dms_user;
+#   GRANT SELECT_CATALOG_ROLE TO dms_user;
+#
+# Module quirks (ministryofjustice/terraform-dms-module):
+#   - Requires hashicorp/tls provider (via Lambda sub-module) — add to versions.tf
+#   - glue_catalog_arn must be set if write_metadata_to_glue_catalog = true,
+#     otherwise IAM policy ARNs are malformed (empty partition)
+#   - The dms-vpc-role takes ~30s to propagate after creation; first apply may
+#     fail on aws_dms_replication_subnet_group — re-run resolves it
+#   - S3 bucket notification can fail on first apply if Lambda isn't ready
+#     (race condition) — re-run resolves it
+#   - Deprecation warnings from upstream terraform-aws-lambda module
+#     (data.aws_region.current.name → .region) — cosmetic only
 # =============================================================================
 
 # ---------------------------------------------------------------------------
@@ -172,10 +187,14 @@ module "dms_oracle" {
   }
 
   dms_source = {
-    engine_name                 = "oracle"
-    secrets_manager_arn         = data.aws_secretsmanager_secret.dms_oracle_credentials[0].arn
-    secrets_manager_kms_arn     = data.aws_kms_key.oracle_dms[0].arn
-    sid                         = "DMSTEST"
+    engine_name             = "oracle"
+    secrets_manager_arn     = data.aws_secretsmanager_secret.dms_oracle_credentials[0].arn
+    secrets_manager_kms_arn = data.aws_kms_key.oracle_dms[0].arn
+    sid                     = "DMSTEST"
+    # Oracle extra_connection_attributes:
+    #   addSupplementalLogging=N - not needed for full-load only (no CDC)
+    #   useBfile=Y              - use BFILE for reading LOBs (faster than API)
+    #   useLogminerReader=N     - not needed without CDC; avoids requiring LOGMINING grant
     extra_connection_attributes = "addSupplementalLogging=N;useBfile=Y;useLogminerReader=N;"
   }
 
