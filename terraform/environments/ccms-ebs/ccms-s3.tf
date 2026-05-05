@@ -191,6 +191,17 @@ resource "aws_s3_bucket_notification" "dbbackup_bucket_notification" {
   }
 }
 
+resource "aws_s3_bucket_object_lock_configuration" "dbbackup" {
+  bucket = module.s3-bucket-dbbackup.bucket.id
+
+  rule {
+    default_retention {
+      mode = "GOVERNANCE"
+      days = local.application_data.accounts[local.environment].rman_s3_lifecycle_days_expiration_current
+    }
+  }
+}
+
 data "aws_iam_policy_document" "dbbackup_s3_policy" {
   statement {
     principals {
