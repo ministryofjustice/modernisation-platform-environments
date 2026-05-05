@@ -23,6 +23,10 @@ data "aws_kms_key" "oracle_dms" {
 # ---------------------------------------------------------------------------
 
 #trivy:ignore:AVD-AWS-0089 No logging required for test config bucket
+#checkov:skip=CKV_AWS_18:Access logging not required for test config bucket
+#checkov:skip=CKV_AWS_144:Cross-region replication not required for test config bucket
+#checkov:skip=CKV2_AWS_61:Lifecycle configuration not required for test config bucket
+#checkov:skip=CKV2_AWS_62:Event notifications not required for test config bucket
 resource "aws_s3_bucket" "dms_config" {
   count  = local.is-development ? 1 : 0
   bucket = "${local.application_name}-${local.environment}-dms-config"
@@ -48,6 +52,7 @@ resource "aws_s3_bucket_versioning" "dms_config" {
 }
 
 #trivy:ignore:AVD-AWS-0132 Uses AES256 encryption
+#checkov:skip=CKV_AWS_145:KMS encryption not required for test config bucket
 resource "aws_s3_bucket_server_side_encryption_configuration" "dms_config" {
   count  = local.is-development ? 1 : 0
   bucket = aws_s3_bucket.dms_config[0].id
