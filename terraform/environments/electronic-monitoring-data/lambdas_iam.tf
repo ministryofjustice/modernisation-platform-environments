@@ -174,10 +174,7 @@ data "aws_iam_policy_document" "place_unzipped_file_s3_policy_document" {
       "s3:ListBucket",
       "s3:GetBucketLocation"
     ]
-    resources = local.is-production ? [
-      "${module.s3-unzipped-files-bucket.bucket.arn}/*",
-      module.s3-unzipped-files-bucket.bucket.arn,
-      ] : [
+    resources = [
       "${module.s3-ears-sars-bucket.bucket.arn}/*",
       module.s3-ears-sars-bucket.bucket.arn,
     ]
