@@ -53,6 +53,15 @@ resource "aws_api_gateway_integration_response" "response_200" {
   depends_on = [aws_api_gateway_integration.lambda_integration]
 }
 
+resource "aws_lambda_permission" "apigw" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = module.authorizer_lambda.lambda_function_arn
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_api_gateway_rest_api.ingestion_api.execution_arn}/*/*"
+}
+
 resource "aws_api_gateway_deployment" "main" {
   rest_api_id = aws_api_gateway_rest_api.ingestion_api.id
 
@@ -61,7 +70,8 @@ resource "aws_api_gateway_deployment" "main" {
       aws_api_gateway_authorizer.hmac.id,
       aws_api_gateway_authorizer.hmac.type,
       aws_api_gateway_method.post.id,
-      aws_api_gateway_integration.lambda_integration.id
+      aws_api_gateway_integration.lambda_integration.id,
+      aws_lambda_permission.apigw
     ]))
   }
 
