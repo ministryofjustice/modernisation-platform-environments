@@ -266,9 +266,9 @@ locals {
         })
       })
 
-      dev-nomis-db19c-2-a = merge(local.ec2_instances.db19c, {
+      dev-nomis-db19c-1-b = merge(local.ec2_instances.db19c, {
         config = merge(local.ec2_instances.db19c.config, {
-          availability_zone = "eu-west-2a"
+          availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.db19c.config.instance_profile_policies, [
             "Ec2DevDatabasePolicy",
           ])
