@@ -144,7 +144,7 @@ resource "aws_cloudwatch_metric_alarm" "target_group_high_4XX_error_rate" {
 
 resource "aws_cloudwatch_metric_alarm" "target_group_high_4XX_error_rate_blue" {
   count = local.create_blue_green ? 1 : 0
-  
+
   alarm_name          = "${local.application_name}-blue-target-group-high-4XX-error-rate--critical"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
@@ -165,7 +165,7 @@ resource "aws_cloudwatch_metric_alarm" "target_group_high_4XX_error_rate_blue" {
 
 resource "aws_cloudwatch_metric_alarm" "target_group_high_4XX_error_rate_green" {
   count = local.create_blue_green ? 1 : 0
-  
+
   alarm_name          = "${local.application_name}-green-target-group-high-4XX-error-rate--critical"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
@@ -207,7 +207,7 @@ resource "aws_cloudwatch_metric_alarm" "target_group_high_5XX_error_rate" {
 
 resource "aws_cloudwatch_metric_alarm" "target_group_high_5XX_error_rate_blue" {
   count = local.create_blue_green ? 1 : 0
-  
+
   alarm_name          = "${local.application_name}-blue-target-group-high-5XX-error-rate--critical"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
@@ -228,7 +228,7 @@ resource "aws_cloudwatch_metric_alarm" "target_group_high_5XX_error_rate_blue" {
 
 resource "aws_cloudwatch_metric_alarm" "target_group_high_5XX_error_rate_green" {
   count = local.create_blue_green ? 1 : 0
-  
+
   alarm_name          = "${local.application_name}-green-target-group-high-5XX-error-rate--critical"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"

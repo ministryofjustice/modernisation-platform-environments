@@ -1,7 +1,7 @@
 locals {
-  acm_cert_options = var.export == true ? {
-    certificate_transparency_logging_preference = "DISABLED"
-    export                                      = "ENABLED"
+  acm_cert_options = var.export != null || var.certificate_transparency_logging_preference != null ? {
+    certificate_transparency_logging_preference = var.certificate_transparency_logging_preference == false ? "DISABLED" : "ENABLED"
+    export                                      = var.export == true ? "ENABLED" : "DISABLED"
   } : null
 }
 

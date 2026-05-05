@@ -35,7 +35,7 @@
 /terraform/environments/cooker @ministryofjustice/modernisation-platform @ministryofjustice/octo-cyber-team @ministryofjustice/tvm-purple-team @ministryofjustice/modernisation-platform
 /terraform/environments/corporate-staff-rostering @ministryofjustice/azure-aws-sso-csr-access @ministryofjustice/azure-aws-sso-csr-application-support @ministryofjustice/azure-aws-sso-digital-studio-operations @ministryofjustice/csr-application-support @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/syscon-devs @ministryofjustice/modernisation-platform
 /terraform/environments/dacp @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
-/terraform/environments/data-factory-corporate @ministryofjustice/corporate-data-factory-admins @ministryofjustice/modernisation-platform
+/terraform/environments/data-factory-corporate @ministryofjustice/corporate-data-factory-admins @ministryofjustice/data-factory-cloud-security @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-laa @ministryofjustice/laa-data-factory-engineering @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-moj @ministryofjustice/data-engineering @ministryofjustice/data-factory-security-team @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform-governance @ministryofjustice/data-platform-engineering @ministryofjustice/modernisation-platform
@@ -50,6 +50,7 @@
 /terraform/environments/edw-19c @ministryofjustice/edw-mp-access @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/electronic-monitoring-data @ministryofjustice/azure-aws-sso-electronic-monitoring-data @ministryofjustice/azure-aws-sso-electronic-monitoring-data-non-prod @ministryofjustice/hmpps-electronic-monitoring-data-no-sc @ministryofjustice/hmpps-electronic-monitoring-data-store @ministryofjustice/modernisation-platform
 /terraform/environments/equip @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
+/terraform/environments/eucs-appstream @ministryofjustice/mojo-vds-team @ministryofjustice/modernisation-platform
 /terraform/environments/example @ministryofjustice/green-ops @ministryofjustice/modernisation-platform @ministryofjustice/octo-cyber-team @ministryofjustice/modernisation-platform
 /terraform/environments/genesys-call-centre-data @ministryofjustice/genesys-call-centre-data @ministryofjustice/modernisation-platform
 /terraform/environments/hmcts-claude-provider @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
@@ -57,6 +58,7 @@
 /terraform/environments/hmpps-domain-services @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/hmpps-esupervision @ministryofjustice/stg-pathfinders @ministryofjustice/modernisation-platform
 /terraform/environments/hmpps-oem @ministryofjustice/hmpps-dba @ministryofjustice/hmpps-migration @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
+/terraform/environments/integration-hub @ministryofjustice/integration-hub @ministryofjustice/modernisation-platform
 /terraform/environments/laa-ccms-soa @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/laa-ccms-soa/ccms-soa-sandbox @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/laa-cis @ministryofjustice/laa-sre-admins @ministryofjustice/v1-cis-mod @ministryofjustice/modernisation-platform

@@ -252,7 +252,7 @@ locals {
       memory_size  = 1024
       role_key     = "get_cloudwatch"
       environments = ["production"]
-      layers       = ["beautifulsoup", "xlsxwriter", "requests"]
+      layers       = ["xlsxwriter", "requests"]
       vpc_config   = { production = true }
       permissions = [{
         principal         = "cloudwatch.amazonaws.com"

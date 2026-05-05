@@ -3,6 +3,12 @@ locals {
   cross_account_map_shorthand = local.is-test ? "dev" : local.is-production ? "preprod" : null
   cross_account_bucket        = local.is-test || local.is-production ? "arn:aws:s3:::emds-${local.cross_account_map_shorthand}-land-*/*" : ""
   cross_account_kms           = local.is-test || local.is-production ? "arn:aws:kms:${data.aws_region.current.name}:${local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_map}"]}:key/*" : ""
+  ears_sars_athena_dbs = [
+    "sar_ear_reports_mart${local.dbt_suffix}",
+    "emd_historic_int${local.dbt_suffix}",
+    "am_stg${local.dbt_suffix}",
+    "intermediate_tasking${local.dbt_suffix}"
+  ]
 }
 
 # ------------------------------------------
@@ -1246,7 +1252,7 @@ resource "aws_lakeformation_permissions" "historic_csv_add_create_db" {
 }
 
 #-----------------------------------------------------------------------------------
-# Clean after MDSS load IAM Role
+# Clean after dlt load IAM Role
 #-----------------------------------------------------------------------------------
 
 data "aws_iam_policy_document" "clean_after_dlt_load_lambda_role_policy_document" {
@@ -1520,10 +1526,22 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
   statement {
     sid     = "S3LoggingBucketPerms"
     effect  = "Allow"
-    actions = ["s3:PutObject", "s3:PutObjectAcl"]
+    actions = ["s3:PutObject", "s3:GetObject", "s3:PutObjectAcl"]
     resources = [
       "${module.s3-logging-bucket.bucket.arn}/ears_sars/*",
-      module.s3-logging-bucket.bucket.arn
+      module.s3-logging-bucket.bucket.arn,
+      "${module.s3-athena-bucket.bucket.arn}/output/*",
+      module.s3-athena-bucket.bucket.arn,
+    ]
+  }
+
+  statement {
+    sid     = "S3OutputsBucketPerms"
+    effect  = "Allow"
+    actions = ["s3:PutObject", "s3:GetObject", "s3:PutObjectAcl"]
+    resources = [
+      "${module.s3-ears-sars-bucket.bucket.arn}/*",
+      module.s3-ears-sars-bucket.bucket.arn
     ]
   }
 
@@ -1555,7 +1573,6 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
       module.s3-data-bucket.bucket.arn
     ]
   }
-
 
   statement {
     sid    = "AthenaQueryExecution"
@@ -1602,6 +1619,16 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
       "${module.get_zipped_file_api.arn}:*"
     ]
   }
+
+  statement {
+    sid    = "GetDataAccessAndTagsForLakeFormation"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GetDataAccess",
+      "lakeformation:GetResourceLFTags",
+    ]
+    resources = ["*"]
+  }
 }
 
 resource "aws_iam_role" "ears_sars_iam_role" {
@@ -1623,21 +1650,21 @@ resource "aws_iam_role_policy_attachment" "ears_sars_iam_role_policy_attachment"
 }
 
 resource "aws_lakeformation_permissions" "ears_sars_db_permissions" {
-  count     = local.is-preproduction ? 1 : 0
+  for_each  = local.is-preproduction ? toset(local.ears_sars_athena_dbs) : []
   principal = aws_iam_role.ears_sars_iam_role[0].arn
 
   database {
-    name = "sar_ear_reports_mart${local.dbt_suffix}"
+    name = each.value
   }
 
   permissions = ["DESCRIBE"]
 }
 resource "aws_lakeformation_permissions" "ears_sars_table_permissions" {
-  count     = local.is-preproduction ? 1 : 0
+  for_each  = local.is-preproduction ? toset(local.ears_sars_athena_dbs) : []
   principal = aws_iam_role.ears_sars_iam_role[0].arn
 
   table {
-    database_name = "sar_ear_reports_mart${local.dbt_suffix}"
+    database_name = each.value
     wildcard      = true
   }
 
@@ -1770,7 +1797,6 @@ data "aws_iam_policy_document" "cloudwatch_alarm_threader_policy_document" {
     resources = [aws_sns_topic.emds_alerts.arn]
   }
 
-  # Topic is KMS-encrypted; to match the pattern used by mdss_daily_failure_digest
   statement {
     sid    = "AllowUseOfAlertsKmsKey"
     effect = "Allow"
@@ -1780,6 +1806,15 @@ data "aws_iam_policy_document" "cloudwatch_alarm_threader_policy_document" {
       "kms:Decrypt",
     ]
     resources = [aws_kms_key.emds_alerts.arn]
+  }
+
+  statement {
+    sid    = "AllowStartStagingDbJanitorWorkflow"
+    effect = "Allow"
+    actions = [
+      "states:StartExecution",
+    ]
+    resources = [aws_sfn_state_machine.staging_db_janitor.arn]
   }
 }
 
@@ -1931,13 +1966,112 @@ resource "aws_iam_role_policy_attachment" "mdss_reconciler_lambda_policy_attachm
   policy_arn = aws_iam_policy.mdss_reconciler_lambda_role_policy.arn
 }
 
+#-----------------------------------------------------------------------------------
+# Staging DB janitor IAM Role
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "staging_db_janitor_policy_document" {
+  statement {
+    sid    = "GluePermissionsForCleanup"
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabases",
+      "glue:GetDatabase",
+      "glue:GetTables",
+      "glue:GetTable",
+      "glue:DeleteTable",
+      "glue:DeleteDatabase",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/*/*",
+    ]
+  }
+
+  statement {
+    sid    = "S3PermissionsForCleanup"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:DeleteObject",
+      "s3:DeleteObjectVersion",
+      "s3:GetBucketLocation",
+    ]
+    resources = [
+      module.s3-create-a-derived-table-bucket.bucket.arn,
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/*",
+    ]
+  }
+
+  statement {
+    sid    = "S3StateAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+    ]
+    resources = [
+      "arn:aws:s3:::${local.alarm_thread_state_bucket}/${local.alarm_thread_state_prefix}/${local.environment_shorthand}/*"
+    ]
+  }
+
+  statement {
+    sid    = "LakeFormationGrantRevoke"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GrantPermissions",
+      "lakeformation:RevokePermissions",
+      "lakeformation:ListPermissions",
+      "lakeformation:GetDataAccess",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowPublishToAlertsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [aws_sns_topic.emds_alerts.arn]
+  }
+
+  statement {
+    sid    = "AllowUseOfAlertsKmsKey"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:GenerateDataKey*",
+      "kms:Decrypt",
+    ]
+    resources = [aws_kms_key.emds_alerts.arn]
+  }
+}
+
+resource "aws_iam_role" "staging_db_janitor" {
+  name               = "staging_db_janitor_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "staging_db_janitor" {
+  name   = "staging_db_janitor_lambda_policy"
+  policy = data.aws_iam_policy_document.staging_db_janitor_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "staging_db_janitor_attach" {
+  role       = aws_iam_role.staging_db_janitor.name
+  policy_arn = aws_iam_policy.staging_db_janitor.arn
+}
 
 # ----------------------------------------------------------------------------------------
 # create p1 export
 # ----------------------------------------------------------------------------------------
 
 module "create_p1_export_iam_policy" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  source = "terraform-aws-modules/iam/aws//modules/iam-policy"
 
   name        = "create_p1_export"
   path        = "/"
@@ -1949,7 +2083,7 @@ module "create_p1_export_iam_policy" {
 }
 
 module "create_p1_export_iam_role" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  source = "terraform-aws-modules/iam/aws//modules/iam-role"
 
   name = "create_p1_export"
 
