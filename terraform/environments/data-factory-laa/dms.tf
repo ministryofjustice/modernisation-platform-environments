@@ -246,5 +246,6 @@ module "dms_oracle" {
 
   depends_on = [
     aws_iam_role_policy_attachment.dms_vpc_role,
+    aws_s3_object.oracle_dms_mappings[0],
   ]
 }
