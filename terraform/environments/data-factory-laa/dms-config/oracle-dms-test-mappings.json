@@ -1,0 +1,10 @@
+{
+  "blobs": [],
+  "columns_to_exclude": [],
+  "objects": [
+    "EMPLOYEES",
+    "DEPARTMENTS",
+    "AUDIT_LOG"
+  ],
+  "schema": "ADMIN"
+}
