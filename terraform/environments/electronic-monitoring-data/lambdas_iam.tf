@@ -3,7 +3,7 @@ locals {
   cross_account_map_shorthand = local.is-test ? "dev" : local.is-production ? "preprod" : null
   cross_account_bucket        = local.is-test || local.is-production ? "arn:aws:s3:::emds-${local.cross_account_map_shorthand}-land-*/*" : ""
   cross_account_kms           = local.is-test || local.is-production ? "arn:aws:kms:${data.aws_region.current.name}:${local.environment_management.account_ids["electronic-monitoring-data-${local.cross_account_map}"]}:key/*" : ""
-  ears_sars_athena_dbs        = [
+  ears_sars_athena_dbs = [
     "sar_ear_reports_mart${local.dbt_suffix}",
     "emd_historic_int${local.dbt_suffix}",
     "am_stg${local.dbt_suffix}",
