@@ -152,7 +152,7 @@ resource "aws_wafv2_web_acl" "ssogen_web_acl" {
     priority = 1
 
     override_action {
-      none {}
+      count {}
     }
 
     statement {
