@@ -1,75 +1,111 @@
-module "ai_gateway_ip_set" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-wafv2.git//modules/ip-set?ref=2b8c16dea7b9f9bab0d1a3d34abd7f587d98bf09" # v1.1.0
-
-  name               = "ai-gateway-allowlist-${local.environment}"
-  scope              = "REGIONAL"
-  ip_address_version = "IPV4"
-  addresses          = local.environment_configuration.ai_gateway_ingress_allowlist
-}
-
-module "ai_gateway_waf" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-wafv2.git?ref=2b8c16dea7b9f9bab0d1a3d34abd7f587d98bf09" # v1.1.0
-
+resource "aws_wafv2_web_acl" "ai_gateway" {
   name  = "ai-gateway-${local.environment}"
   scope = "REGIONAL"
 
-  default_action = "allow"
+  default_action {
+    allow {}
+  }
 
-  rules = {
-    ip-allowlist = {
-      priority = 1
-      action   = "allow"
+  rule {
+    name     = "ip-allowlist"
+    priority = 1
 
-      statement = {
-        ip_set_reference_statement = {
-          arn = module.ai_gateway_ip_set.arn
-        }
+    action {
+      allow {}
+    }
+
+    statement {
+      ip_set_reference_statement {
+        arn = aws_wafv2_ip_set.ai_gateway_allowlist.arn
       }
     }
 
-    aws-managed-common-rules = {
-      priority        = 10
-      override_action = "none"
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "ai-gateway-ip-allowlist"
+      sampled_requests_enabled   = true
+    }
+  }
 
-      statement = {
-        managed_rule_group_statement = {
-          name        = "AWSManagedRulesCommonRuleSet"
-          vendor_name = "AWS"
-        }
-      }
+  rule {
+    name     = "block-all"
+    priority = 99
+
+    action {
+      block {}
     }
 
-    aws-managed-known-bad-inputs = {
-      priority        = 20
-      override_action = "none"
-
-      statement = {
-        managed_rule_group_statement = {
-          name        = "AWSManagedRulesKnownBadInputsRuleSet"
-          vendor_name = "AWS"
-        }
-      }
-    }
-
-    block-all = {
-      priority = 99
-      action   = "block"
-
-      statement = {
-        not_statement = {
-          statement = {
-            ip_set_reference_statement = {
-              arn = module.ai_gateway_ip_set.arn
-            }
+    statement {
+      not_statement {
+        statement {
+          ip_set_reference_statement {
+            arn = aws_wafv2_ip_set.ai_gateway_allowlist.arn
           }
         }
       }
     }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "ai-gateway-block-all"
+      sampled_requests_enabled   = true
+    }
   }
 
-  visibility_config = {
+  rule {
+    name     = "aws-managed-common-rules"
+    priority = 10
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "ai-gateway-common-rules"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "aws-managed-known-bad-inputs"
+    priority = 20
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesKnownBadInputsRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "ai-gateway-known-bad-inputs"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  visibility_config {
     cloudwatch_metrics_enabled = true
     metric_name                = "ai-gateway-waf"
     sampled_requests_enabled   = true
   }
+}
+
+resource "aws_wafv2_ip_set" "ai_gateway_allowlist" {
+  name               = "ai-gateway-allowlist-${local.environment}"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV4"
+  addresses          = local.environment_configuration.ai_gateway_ingress_allowlist
 }

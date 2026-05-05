@@ -31,12 +31,6 @@ resource "kubernetes_manifest" "http_route" {
           ]
           filters = [
             {
-              type = "ResponseHeaderModifier"
-              responseHeaderModifier = {
-                set = []
-              }
-            },
-            {
               type = "RequestRedirect"
               requestRedirect = {
                 path = {
@@ -101,12 +95,6 @@ resource "kubernetes_manifest" "http_route_admin" {
             }
           ]
           filters = [
-            {
-              type = "ResponseHeaderModifier"
-              responseHeaderModifier = {
-                set = []
-              }
-            },
             {
               type = "RequestRedirect"
               requestRedirect = {
