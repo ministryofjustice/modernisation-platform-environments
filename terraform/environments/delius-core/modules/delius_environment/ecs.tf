@@ -4,7 +4,7 @@ resource "aws_ecs_cluster_capacity_providers" "main" {
   capacity_providers = [
     "FARGATE",
     "FARGATE_SPOT",
-    # aws_ecs_capacity_provider.weblogic.name,
+    aws_ecs_capacity_provider.weblogic.name,
     aws_ecs_capacity_provider.weblogic_eis.name
   ]
 
