@@ -94,6 +94,54 @@ resource "aws_secretsmanager_secret_version" "dms_slack_webhook" {
 # DMS Module
 # ---------------------------------------------------------------------------
 
+# IAM role for metadata generator Lambda to access Glue catalog
+resource "aws_iam_role" "dms_glue_access" {
+  count = local.is-development ? 1 : 0
+  name  = "${local.application_name}-oracle-dms-test-glue-access"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action = ["sts:AssumeRole", "sts:TagSession"]
+      }
+    ]
+  })
+
+  tags = local.tags
+}
+
+resource "aws_iam_role_policy" "dms_glue_access" {
+  count = local.is-development ? 1 : 0
+  name  = "glue-catalog-access"
+  role  = aws_iam_role.dms_glue_access[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "glue:GetDatabase",
+          "glue:CreateDatabase",
+          "glue:GetTable",
+          "glue:CreateTable",
+          "glue:UpdateTable"
+        ]
+        Resource = [
+          "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:catalog",
+          "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:database/*",
+          "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:table/*/*"
+        ]
+      }
+    ]
+  })
+}
+
 #trivy:ignore:AVD-AWS-0066 X-Ray tracing not currently required
 module "dms_oracle" {
   # checkov:skip=CKV_TF_1: using branch ref for testing
@@ -105,6 +153,10 @@ module "dms_oracle" {
   environment = local.environment
   db          = "oracle-dms-test"
   tags        = local.tags
+
+  write_metadata_to_glue_catalog = true
+  glue_catalog_arn                = "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:catalog"
+  glue_catalog_role_arn           = aws_iam_role.dms_glue_access[0].arn
 
   dms_replication_instance = {
     replication_instance_id    = "${local.application_name}-oracle-dms-test"
