@@ -46,6 +46,10 @@ module "rds" {
   hub20_sec_group_id                    = local.build_hub_integration ? "${local.environment_management.account_ids["laa-enterprise-service-bus-${local.environment}"]}/${local.application_data.accounts[local.environment].hub20_sec_group_id}" : ""
   hub20_s3_bucket                       = local.build_hub_integration ? local.application_data.accounts[local.environment].hub20_s3_bucket : ""
   kms_key_arn                           = local.rds_kms_key_arn
+  max_string_size                       = local.application_data.accounts[local.environment].max_string_size
+  create_std_instance                   = local.environment != "production"
+  std_identifier_suffix                 = local.application_data.accounts[local.environment].rds_std_suffix
+  std_snapshot_arn                      = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.application_data.accounts[local.environment].snapshot_arn_std)
 
   tags = local.tags
 }

@@ -59,7 +59,7 @@ module "data_cutback_step_function" {
 # ------------------------------------------
 
 module "ears_sars_step_function" {
-  count = local.is-development || local.is-preproduction ? 1 : 0
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
 
   source       = "./modules/step_function"
   name         = "ears_sars"
@@ -67,6 +67,29 @@ module "ears_sars_step_function" {
   variable_dictionary = tomap(
     {
       "ears_sars_request" = module.ears_sars_request[0].lambda_function_name,
+    }
+  )
+  type = "STANDARD"
+}
+
+
+# ------------------------------------------
+# GDPR Step Function
+# ------------------------------------------
+
+module "gdpr_deletion_step_function" {
+  count        = local.is-development || local.is-preproduction ? 1 : 0
+  source       = "./modules/step_function"
+  name         = "gdpr_deletion"
+  iam_policies = tomap({ "gdpr_deletion_step_function_policy" = aws_iam_policy.gdpr_delete_iam_policy[0] })
+  variable_dictionary = tomap(
+    {
+      "cluster_arn"            = aws_ecs_cluster.emds-gdpr-cluster[0].arn
+      "task_definition_family" = aws_ecs_task_definition.emds-gdpr-structured-data-deletion[0].family
+      "container_name"         = "emds_gdpr_structured_data_deletion_job"
+      "security_groups_json"   = jsonencode([aws_security_group.ecs_generic.id])
+      "subnets_json"           = jsonencode(data.aws_subnets.shared-private.ids)
+      "athena_output_bucket"   = "s3://${module.s3-athena-bucket.bucket.id}/output/"
     }
   )
   type = "STANDARD"

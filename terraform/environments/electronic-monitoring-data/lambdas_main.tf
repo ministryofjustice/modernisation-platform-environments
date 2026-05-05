@@ -648,19 +648,29 @@ module "cloudwatch_alarm_threader" {
   timeout                        = 60
   reserved_concurrent_executions = 1
 
-  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
 
-  security_group_ids = [aws_security_group.lambda_generic.id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
 
   environment_variables = {
+    POWERTOOLS_LOG_LEVEL  = "INFO"
     SNS_TOPIC_ARN         = aws_sns_topic.emds_alerts.arn
     STATE_BUCKET          = local.alarm_thread_state_bucket
     STATE_PREFIX          = local.alarm_thread_state_prefix
     ENVIRONMENT           = local.environment_shorthand
     INCLUDE_REASON        = "true"
     ENABLE_CUSTOM_ACTIONS = "false"
+    GLUE_DB_JANITOR_STATE_MACHINE_ARN = (
+      aws_sfn_state_machine.staging_db_janitor.arn
+    )
+    GLUE_DB_JANITOR_STALE_MINUTES = "60"
+    GLUE_DB_JANITOR_BATCH_SIZE    = "2000"
   }
 }
 
@@ -669,7 +679,7 @@ module "cloudwatch_alarm_threader" {
 # Ears and Sars Request
 #-----------------------------------------------------------------------------------
 module "ears_sars_request" {
-  count                   = local.is-development || local.is-preproduction ? 1 : 0
+  count                   = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   source                  = "./modules/lambdas"
   is_image                = true
   ecr_repo_name           = "electronic-monitoring-ear-sars"
@@ -758,7 +768,6 @@ module "mdss_reconciler" {
 #-----------------------------------------------------------------------------------
 
 module "create_p1_export" {
-  count                          = 1
   source                         = "./modules/lambdas"
   is_image                       = true
   image_name                     = "export_em_data_p1"
@@ -767,7 +776,7 @@ module "create_p1_export" {
   role_arn                       = module.create_p1_export_iam_role.arn
   memory_size                    = 512
   timeout                        = 300
-  reserved_concurrent_executions = 1
+  reserved_concurrent_executions = 2
 
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
@@ -780,4 +789,46 @@ module "create_p1_export" {
     MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
   }
 
+}
+
+#-----------------------------------------------------------------------------------
+# Staging DB janitor
+#-----------------------------------------------------------------------------------
+
+module "staging_db_janitor" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "staging_db_janitor"
+  role_name                      = aws_iam_role.staging_db_janitor.name
+  role_arn                       = aws_iam_role.staging_db_janitor.arn
+  handler                        = "staging_db_janitor.handler"
+  memory_size                    = 1024
+  timeout                        = 900
+  reserved_concurrent_executions = 1
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    POWERTOOLS_LOG_LEVEL  = "INFO"
+    SNS_TOPIC_ARN         = aws_sns_topic.emds_alerts.arn
+    ENVIRONMENT           = local.environment_shorthand
+    STAGING_BUCKET        = module.s3-create-a-derived-table-bucket.bucket.id
+    CATALOG_ID            = data.aws_caller_identity.current.account_id
+    LAMBDA_ROLE_ARN       = aws_iam_role.staging_db_janitor.arn
+    STALE_MINUTES         = "60"
+    MAX_DATABASES_PER_RUN = "2000"
+    STATE_BUCKET          = local.alarm_thread_state_bucket
+    STATE_PREFIX          = local.alarm_thread_state_prefix
+  }
 }

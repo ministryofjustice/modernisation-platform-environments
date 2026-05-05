@@ -12,8 +12,8 @@ locals {
     local.sandbox_app_url,
     "blue-${local.sandbox_app_url}",
     "green-${local.sandbox_app_url}"
-  ] : [ local.app_url ]
-  blue_green_urls  = local.create_blue_green ? [
+  ] : [local.app_url]
+  blue_green_urls = local.create_blue_green ? [
     "blue-${local.app_url}",
     "green-${local.app_url}"
   ] : []

@@ -53,7 +53,6 @@ This document covers the set up of MCP servers for use within [GitHub Copilot Ch
 
 | Server                                         | Documentation                                                              |
 | ---------------------------------------------- | -------------------------------------------------------------------------- |
-| `awslabs.aws-diagram-mcp-server`               | <https://awslabs.github.io/mcp/servers/aws-diagram-mcp-server>               |
 | `awslabs.billing-cost-management-mcp-server`   | <https://awslabs.github.io/mcp/servers/billing-cost-management-mcp-server>   |
 | `awslabs.cloudtrail-mcp-server`                | <https://awslabs.github.io/mcp/servers/cloudtrail-mcp-server>                |
 | `awslabs.cloudwatch-mcp-server`                | <https://awslabs.github.io/mcp/servers/cloudwatch-mcp-server>                |

@@ -15,3 +15,13 @@ data "aws_secretsmanager_secret_version" "environment_management" {
   provider  = aws.modernisation-platform
   secret_id = data.aws_secretsmanager_secret.environment_management.id
 }
+
+resource "aws_ssm_parameter" "whitelist_ips" {
+  name  = "whitelist_ips"
+  type  = "String"   # or StringList if you prefer
+  value = "[]"       # empty JSON list (recommended)
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
