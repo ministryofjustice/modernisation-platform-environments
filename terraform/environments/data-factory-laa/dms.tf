@@ -13,10 +13,11 @@
 #     otherwise IAM policy ARNs are malformed (empty partition)
 #   - The dms-vpc-role takes ~30s to propagate after creation; first apply may
 #     fail on aws_dms_replication_subnet_group — re-run resolves it
+#   - Module creates dms-vpc-role with name_prefix, but AWS DMS requires the
+#     literal name "dms-vpc-role" — we pre-create it with the exact name below
 #   - S3 bucket notification can fail on first apply if Lambda isn't ready
 #     (race condition) — re-run resolves it
-#   - Deprecation warnings from upstream terraform-aws-lambda module
-#     (data.aws_region.current.name → .region) — cosmetic only
+
 # =============================================================================
 
 # ---------------------------------------------------------------------------
@@ -106,6 +107,40 @@ resource "aws_secretsmanager_secret_version" "dms_slack_webhook" {
 }
 
 # ---------------------------------------------------------------------------
+# DMS service-linked role (must be named exactly "dms-vpc-role")
+# AWS DMS looks up this role by literal name when creating a replication
+# subnet group. The upstream module creates one with name_prefix, which DMS
+# does NOT find — so we create the literal-named role here.
+# Refs: https://docs.aws.amazon.com/dms/latest/userguide/security-iam.APIRole.html
+# ---------------------------------------------------------------------------
+resource "aws_iam_role" "dms_vpc_role" {
+  count = local.is-development ? 1 : 0
+  name  = "dms-vpc-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "dms.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+
+  tags = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "dms_vpc_role" {
+  count      = local.is-development ? 1 : 0
+  role       = aws_iam_role.dms_vpc_role[0].name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
+
+  # IAM propagation delay; DMS will reject the role until the attachment lands
+  provisioner "local-exec" {
+    command = "sleep 30"
+  }
+}
+
+# ---------------------------------------------------------------------------
 # DMS Module
 # ---------------------------------------------------------------------------
 
@@ -170,8 +205,8 @@ module "dms_oracle" {
   tags        = local.tags
 
   write_metadata_to_glue_catalog = true
-  glue_catalog_arn                = "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:catalog"
-  glue_catalog_role_arn           = aws_iam_role.dms_glue_access[0].arn
+  glue_catalog_arn               = "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:catalog"
+  glue_catalog_role_arn          = aws_iam_role.dms_glue_access[0].arn
 
   dms_replication_instance = {
     replication_instance_id    = "${local.application_name}-oracle-dms-test"
@@ -208,4 +243,8 @@ module "dms_oracle" {
   }
 
   slack_webhook_secret_id = aws_secretsmanager_secret.dms_slack_webhook[0].id
+
+  depends_on = [
+    aws_iam_role_policy_attachment.dms_vpc_role,
+  ]
 }
