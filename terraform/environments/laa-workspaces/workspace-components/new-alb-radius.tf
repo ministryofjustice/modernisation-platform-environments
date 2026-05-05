@@ -34,15 +34,6 @@ resource "aws_security_group" "radius_alb" {
     description = "HTTP from internet (redirects to HTTPS)"
   }
 
-  # Outbound to RADIUS server (HTTPS)
-  egress {
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    security_groups = [aws_security_group.radius_server[0].id]
-    description     = "HTTPS to RADIUS servers"
-  }
-
   tags = merge(
     local.tags,
     {
@@ -53,6 +44,19 @@ resource "aws_security_group" "radius_alb" {
   lifecycle {
     create_before_destroy = true
   }
+}
+
+# Separate egress rule to avoid circular dependency
+resource "aws_security_group_rule" "radius_alb_to_radius_server" {
+  count = local.environment == "development" ? 1 : 0
+
+  type                     = "egress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.radius_alb[0].id
+  source_security_group_id = aws_security_group.radius_server[0].id
+  description              = "HTTPS to RADIUS servers"
 }
 
 ##############################################
