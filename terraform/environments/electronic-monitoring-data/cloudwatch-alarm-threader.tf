@@ -121,10 +121,10 @@ resource "aws_sfn_state_machine" "staging_db_janitor" {
           Parameters = {
             FunctionName = module.staging_db_janitor.lambda_function_arn
             Payload = {
-              "thread_id.$" = "$.thread_id"
-              "alarm_name.$" = "$.alarm_name"
-              "batch_number.$" = "$.batch_number"
-              "stale_minutes.$" = "$.stale_minutes"
+              "thread_id.$"             = "$.thread_id"
+              "alarm_name.$"            = "$.alarm_name"
+              "batch_number.$"          = "$.batch_number"
+              "stale_minutes.$"         = "$.stale_minutes"
               "max_databases_per_run.$" = "$.max_databases_per_run"
             }
           }
@@ -176,10 +176,10 @@ resource "aws_sfn_state_machine" "staging_db_janitor" {
         PrepareNextBatch = {
           Type = "Pass"
           Parameters = {
-            "thread_id.$" = "$.thread_id"
-            "alarm_name.$" = "$.alarm_name"
-            "batch_number.$" = "$.next_batch_number"
-            "stale_minutes.$" = "$.stale_minutes"
+            "thread_id.$"             = "$.thread_id"
+            "alarm_name.$"            = "$.alarm_name"
+            "batch_number.$"          = "$.next_batch_number"
+            "stale_minutes.$"         = "$.stale_minutes"
             "max_databases_per_run.$" = "$.max_databases_per_run"
           }
           Next = "JanitorBatch"
