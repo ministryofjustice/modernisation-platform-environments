@@ -2,9 +2,9 @@
 
 **Based on:** [AWS Blog - Integrating FreeRADIUS MFA with Amazon WorkSpaces](https://aws.amazon.com/blogs/desktop-and-application-streaming/integrating-freeradius-mfa-with-amazon-workspaces/)
 
-**Document Status:** � Ready to Implement  
-**Last Updated:** 30 April 2026  
-**Current Progress:** Planning Complete - 0% Implementation
+**Document Status:** ✅ Phases 1-2 Complete (Automated Installation Ready)  
+**Last Updated:** 1 May 2026  
+**Current Progress:** Infrastructure Code Complete - Ready for Deployment
 
 ---
 
@@ -50,54 +50,111 @@ workspace-mfa.laa-development.modernisation-platform.service.justice.gov.uk
 
 ## Current State vs Target State
 
-### ✅ What We Have Now
+### ✅ COMPLETED - Phases 1 & 2
 
-1. **Infrastructure (workspace-components/ - **NEEDS UPDATE** for ports 80/443
-   - ✅ IAM role with Secrets Manager access
-   - ✅ 2x t3.small EC2 instances - **WILL CHANGE TO** 1x t3.medium (Amazon Linux 2
-   - ✅ IAM role with Secrets Manager access
-   - ✅ 2x t3.small EC2 instances (Amazon Linux 2023)
-   - ✅ RADIUS shared secret in Secrets Manager
-   - ✅ CloudWatch Logs and alarms
+All infrastructure code and automated installation script are complete:
 
-2. **Installation Script (workspace-components/scripts/install-freeradius.sh):**
-   - ✅ FreeRADIUS installation
-   - ✅ Google Authenticator PAM module
-   - ✅ CloudWatch agent
-   - ✅ Basic RADIUS client configuration
+1. **Infrastructure (workspace-components/)** - ✅ COMPLETE
+   - ✅ 1x t3.medium EC2 instance (Amazon Linux 2)
+   - ✅ Security groups (HTTPS from ALB, UDP 1812/1813 from VPC)
+   - ✅ Application Load Balancer in public subnets
+   - ✅ ACM certificate with DNS validation
+   - ✅ Route 53 DNS record: workspace-mfa.laa-development.modernisation-platform.service.justice.gov.uk
+   - ✅ 3 secrets in Secrets Manager (RADIUS, LinOTP admin, MariaDB root)
+   - ✅ IAM roles with Secrets Manager and CloudWatch access
+   - ✅ Public and private subnets, IGW, route tables
 
-3. **Main Infrastructure:**
-   - ✅ Microsoft AD (laa-workspaces.local)
-   - ✅ RADIUS configuration on AD
-   - ✅ WorkSpaces directory
+2. **Installation Script** - ✅ COMPLETE
+   - ✅ `workspace-components/scripts/install-linotp-freeradius.sh` created
+   - ✅ Automated installation of MariaDB, LinOTP, Apache httpd, FreeRADIUS
+   - ✅ CloudWatch agent configuration
+   - ✅ User_data configuration in RADIUS EC2 instance
 
-### ❌ What We Need to Change
+3. **Documentation** - ✅ COMPLETE
+   - ✅ DEPLOYMENT-GUIDE.md updated with step-by-step instructions
+   - ✅ All deployment phases documented
 
-1. **EC2 Instance Configuration:**
-   - ❌ Change count: 2 → **1 instance** (simplified HA approach)
-   - ❌ Change AMI: Amazon Linux 2023 → **Amazon Linux 2** (AL2)
-   - ❌ Change size: t3.small → **t3.medium** (LinOTP requires more resources)
-   - ❌ Deploy in **private subnet** (ALB handles public access)
+### 📋 PENDING - Manual Configuration (Phase 3+)
 
-2. **Security Group:**
-   - ❌ Add ingress: **TCP 443** (HTTPS from ALB)
-   - ❌ Add ingress: **TCP 80** (HTTP from ALB)
-   - ❌ Keep existing: UDP 1812/1813 (RADIUS from VPC)
+These steps require AD to be deployed first:
 
-3. **Application Load Balancer (NEW):**
-   - ❌ Create ALB in public subnets
-   - ❌ Create target group pointing to RADIUS EC2 instance
-   - ❌ Configure HTTPS listener with ACM certificate
-   - ❌ Configure HTTP → HTTPS redirect
-   - ❌ Health checks on /manage endpoint
+- [ ] Create AD service account (MFAService) for LDAP binding
+- [ ] Configure LDAP in LinOTP web UI (requires AD DNS IPs)
+- [ ] Create realm and import policies
+- [ ] Test user enrollment
+- [ ] Test RADIUS authentication
 
-4. **ACM Certificate (NEW):**
-   - ❌ Create certificate: primary domain + SAN (following OAS pattern)
-   - ❌ DNS validation in both Route53 zones
-   - ❌ Certificate validation resource
+---
 
-5. **Route 53 DNS (NEW):**
-   - ❌ Create A record: `workspace-mfa.laa-development.modernisation-platform.service.justice.gov.uk`
+## Implementation Approach: Automated Installation
+
+### ✅ What's Automated (Phases 1-2)
+
+**Infrastructure deployed via Terraform:**
+- All network components (VPC, subnets, IGW, routes)
+- Application Load Balancer with ACM certificate
+- Route 53 DNS record
+- RADIUS EC2 instance
+- Security groups with correct ports
+
+**Software installed via user_data script:**
+When the EC2 instance launches, it automatically:
+1. Installs MariaDB and secures it
+2. Installs LinOTP 2.11.2 and creates database
+3. Installs Apache httpd with SSL (self-signed cert for ALB → EC2)
+4. Installs FreeRADIUS with LinOTP Perl module
+5. Configures all services and starts them
+6. Sets up CloudWatch agent for logging
+
+**Time to completion:** ~15-20 minutes after `terraform apply`
+
+### 📋 What's Manual (Phase 3)
+
+**LDAP configuration** (requires AD to exist):
+- Must be done via LinOTP web UI
+- Requires AD DNS IP addresses (not available until AD deployed)
+- Steps documented in DEPLOYMENT-GUIDE.md Phase 3
+
+**Why manual?**
+- AD is deployed in separate Terraform folder (main vs workspace-components)
+- AD doesn't exist when RADIUS server is created
+- LDAP details (AD DNS IPs) only available after AD deployment
+
+---
+
+## Deployment Order & Dependencies
+
+```
+Step 1: Deploy workspace-components
+├─ Creates: VPC, ALB, RADIUS EC2, secrets
+├─ Runs: install-linotp-freeradius.sh automatically
+├─ Result: LinOTP portal accessible, but no LDAP configured
+└─ Outputs: radius_server_private_ips, radius_portal_url
+
+Step 2: Deploy main folder
+├─ Creates: Microsoft AD, WorkSpaces directory
+├─ Configures: RADIUS settings on AD (points to Step 1 outputs)
+├─ Result: AD ready, RADIUS configured to point to LinOTP server
+└─ Outputs: ad_dns_ip_addresses (needed for Step 3)
+
+Step 3: Manual LDAP Configuration
+├─ Access LinOTP web UI
+├─ Configure LDAP using AD DNS IPs from Step 2
+├─ Create realm, import policies
+└─ Result: LinOTP can authenticate against AD users
+
+Step 4: Testing & User Enrollment
+├─ Create test AD user
+├─ User self-enrolls via web portal
+└─ Test RADIUS authentication end-to-end
+
+Step 5: Deploy WorkSpaces (when ready)
+├─ Users must have enrolled MFA tokens
+└─ Users login with password + token
+```
+
+---
+
    - ❌ Alias to ALB
 
 6. **IAM Permissions:**
@@ -124,173 +181,77 @@ workspace-mfa.laa-development.modernisation-platform.service.justice.gov.uk
 
 ## Detailed Implementation Plan
 
-### Phase 1: Update Infrastructure Code ⬜ NOT STARTED
+### Phase 1: Update Infrastructure Code ✅ COMPLETE
 
-**Files to Modify:**
-- `workspace-components/new-adds-radius-server.tf`
-- `workspace-components/new-adds-security-groups.tf` (or relevant SG file)
-- `workspace-components/outputs.tf`
+**Status:** All infrastructure code has been created and configured for automated deployment.
 
-**Tasks:**
+**Files Created/Modified:**
+- ✅ `workspace-components/platform_data.tf` - Uncommented Route53 data sources
+- ✅ `workspace-components/new-vpc-subnets.tf` - Added public subnets, IGW, route tables
+- ✅ `workspace-components/new-acm-radius.tf` - **NEW** - ACM certificate with DNS validation
+- ✅ `workspace-components/new-alb-radius.tf` - **NEW** - Application Load Balancer configuration
+- ✅ `workspace-components/new-route53-radius.tf` - **NEW** - DNS record for portal
+- ✅ `workspace-components/new-adds-radius-server.tf` - Updated to 1x t3.medium AL2 with user_data
+- ✅ `workspace-components/outputs.tf` - Added ALB DNS, portal URL, password ARNs
+- ✅ `application_variables.json` - Added public subnet CIDRs
 
-- [ ] **1.1 Update AMI Data Source**
-  - Change from Amazon Linux 2023 to Amazon Linux 2
-  - Location: `workspace-components/new-adds-radius-server.tf`
-  ```hcl
-  data "aws_ami" "amazon_linux_2Configuration**
-  - Change count: `2` → `1` instance
-  - Change: `t3.small` → `t3.medium`
-  - Reason: LinOTP + MariaDB + Apache requires more resources
-  - Deploy in private subnet (ALB handles public access)
+**What was implemented:**
+- ✅ Changed AMI from Amazon Linux 2023 to Amazon Linux 2
+- ✅ Changed count from 2 to 1 instance
+- ✅ Changed instance type from t3.small to t3.medium
+- ✅ Created Application Load Balancer in public subnets
+- ✅ Created ACM certificate with DNS validation (primary domain + SAN)
+- ✅ Created Route 53 DNS record: workspace-mfa.laa-development.modernisation-platform.service.justice.gov.uk
+- ✅ Updated security groups (HTTPS from ALB, RADIUS from VPC)
+- ✅ Added 3 secrets: RADIUS shared secret, LinOTP admin password, MariaDB root password
+- ✅ Updated IAM role to access all secrets
+- ✅ Added outputs for ALB DNS and portal URL
 
-- [ ] **1.3 Create Application Load Balancer**
-  - Create ALB in public subnets (eu-west-2a and eu-west-2b)
-  - Create ALB security group (allow 80/443 from internet, egress to RADIUS)
-  - Create target group (HTTPS:443, health check on /manage)
-  - Create HCreate ACM Certificate**
-  - Primary domain: `modernisation-platform.service.justice.gov.uk`
-  - SAN: `*.laa-development.modernisation-platform.service.justice.gov.uk`
-  - Validation method: DNS
-  - Create validation records in both Route53 zones:
-    - Parent zone validation (aws.core-network-services provider)
-    - Environment zone validation (aws.core-vpc provider)
-  - Certificate validation resource
-
-- [ ] **1.5 Create Route 53 DNS Record**
-  - Name: `workspace-mfa.laa-development.modernisation-platform.service.justice.gov.uk`
-  - Type: A record (Alias to ALB)
-  - Provider: aws.core-vpc
-  - Zone: laa-development.modernisation-platform.service.justice.gov.uk
-
-- [ ] **1.6 Update RADIUS Security Group**
-  - Add ingress rule: TCP 443 from ALB security group
-  - Add ingress rule: TCP 80 from ALB security group
-  - Keep existing: UDP 1812/1813 from VPC CIDR
-  - Remove any public IP/0.0.0.0/0 rules
-
-- [ ] **1.7 LinOTP + MariaDB + Apache requires more resources
-
-- [ ] **1.3 Add Public IP or EIP**
-  - **Option A:** Enable public IP on instances (simple, development)
-  - **Option B:** Create Elastic IPs (better, static IPs)
-  - **Option C:** Use ALB (best, production-ready)
-  - **Decision needed:** Which option to implement?
-
-- [ ] **1.4 Update Security Group**
-  - Add ingress rule: TCP 443 from allowed IP ranges (e.g., office IPs, VPN)
-  - Add in8 Update IAM Role Permissions**
-  - Secrets Manager read for new secrets (already has access)
-  - No additional permissions needed
-
-- [ ] **1.9 Update Outputs**
-  - Add: `radius_alb_dns_name` - ALB DNS name
-  - Add: `linotp_portal_url` - Full URL (https://workspace-mfa.laa-development...
-  resource "random_password" "linotp_admin_password" { }
-  resource "aws_secretsmanager_secret" "linotp_admin_password" { }
-  
-  # MariaDB root password
-  resource "random_password" "mariadb_root_password" { }
-  resource "aws_secretsmanager_secret" "mariadb_root_password" { }
-  
-  # AD LDAP bind user password (if not already in Secrets Manager)
-  resource "aws_secretsmanager_secret" "ad_ldap_bind_password" { }
-  ```
-
-- [ ] **1.6 Update IAM Role Permissions**
-  - Add Secrets Manager read for new secrets
-  - Consider: Directory Service read permissions if needed
-
-- [ ] **1.7 Update Outputs**
-  - Add: `radius_server_public_ips` (if using public IPs/EIPs)
-  - Add: `linotp_portal_url` (https://IP or https://DNS)
-
-**Completion Criteria:**
-- ✅ Terraform plan runs successfully
-- ✅ All new resources defined
-- ✅ Security groups properly configured
+**To deploy:**
+```bash
+cd workspace-components/
+terraform init
+terraform workspace select laa-workspaces-development
+terraform plan  # Review ~50 resources to be created
+terraform apply
+```
 
 ---
 
-### Phase 2: Create New Installation Script ⬜ NOT STARTED
+### Phase 2: Create New Installation Script ✅ COMPLETE
 
-**Files to Create/Replace:**
-- `workspace-components/scripts/install-linotp-freeradius.sh` (NEW)
-- `workspace-components/scripts/install-freeradius.sh` (ARCHIVE/DELETE)
+**Status:** Fully automated installation script created and integrated with RADIUS EC2 user_data.
 
-**Script Sections:**
+**File Created:**
+- ✅ `workspace-components/scripts/install-linotp-freeradius.sh`
 
-- [ ] **2.1 System Preparation**
-  ```bash
-  # Update system
-  sudo yum -y update
-  
-  # Enable EPEL repository
-  sudo amazon-linux-extras install epel -y
-  
-  # Install LinOTP repository
-  sudo yum localinstall http://dist.linotp.org/rpm/el7/linotp/x86_64/Packages/LinOTP_repos-1.1-1.el7.x86_64.rpm -y
-  
-  # Fix repository URLs
-  sed -i 's,http://linotp.org/rpm/el7/dependencies/x86_64, http://dist.linotp.org/rpm/el7/dependencies/x86_64,g' /etc/yum.repos.d/linotp.repo
-  sed -i 's,http://linotp.org/rpm/el7/linotp/x86_64, http://dist.linotp.org/rpm/el7/linotp/x86_64,g' /etc/yum.repos.d/linotp.repo
-  ```
+**Script Capabilities:**
+The script automatically installs and configures everything when the EC2 instance launches:
 
-- [ ] **2.2 Install and Configure MariaDB**
-  ```bash
-  # Install MariaDB
-  sudo yum install mariadb-server -y
-  
-  # Enable and start service
-  sudo systemctl enable mariadb
-  sudo systemctl start mariadb
-  
-  # Retrieve root password from Secrets Manager
-  MARIADB_ROOT_PASSWORD=$(aws secretsmanager get-secret-value \
-    --secret-id "${mariadb_root_password_arn}" \
-    --region "${region}" \
-    --query SecretString --output text)
-  
-  # Secure installation (automated)
-  mysql -e "UPDATE mysql.user SET Password=PASSWORD('$MARIADB_ROOT_PASSWORD') WHERE User='root';"
-  mysql -e "DELETE FROM mysql.user WHERE User='';"
-  mysql -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
-  mysql -e "DROP DATABASE IF EXISTS test;"
-  mysql -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';"
-  mysql -e "FLUSH PRIVILEGES;"
-  ```
+- ✅ **System preparation** - Updates system, installs EPEL, adds LinOTP repository
+- ✅ **MariaDB installation** - Installs, secures, and configures database
+- ✅ **LinOTP installation** - Installs LinOTP 2.11.2, creates database schema
+- ✅ **Apache httpd** - Installs with SSL (self-signed cert for ALB → EC2)
+- ✅ **LinOTP admin** - Creates admin user with password from Secrets Manager
+- ✅ **Policy configuration** - Creates sample policy file for later import
+- ✅ **FreeRADIUS installation** - Installs server and utilities
+- ✅ **LinOTP Perl module** - Clones and configures LinOTP integration for FreeRADIUS
+- ✅ **FreeRADIUS configuration** - Configures clients, sites, and LinOTP module
+- ✅ **CloudWatch agent** - Installs and configures for log shipping
 
-- [ ] **2.3 Install and Configure LinOTP**
-  ```bash
-  # Install LinOTP and MariaDB connector
-  sudo yum install -y LinOTP LinOTP_mariadb
-  
-  # Fix SELinux contexts
-  sudo restorecon -Rv /etc/linotp2/
-  sudo restorecon -Rv /var/log/linotp
-  
-  # Configure LinOTP with MariaDB
-  # Note: This creates the database and configures connection
-  sudo linotp-create-mariadb
-  
-  # Lock python-repoze-who version (stability)
-  sudo yum install yum-plugin-versionlock -y
-  sudo yum versionlock python-repoze-who
-  ```
+**EC2 Integration:**
+- ✅ User_data configured to run script on instance launch
+- ✅ Script retrievesall secrets from Secrets Manager
+- ✅ Logs to `/var/log/radius-install.log` for debugging
 
-- [ ] **2.4 Install and Configure Apache httpd**
-  ```bash
-  # Install Apache and LinOTP vhost config
-  sudo yum install LinOTP_apache -y
-  
-  # Enable httpd service
-  sudo systemctl enable httpd
-  
-  # Backup default SSL config
-  sudo mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.back
-  
-  # Activate LinOTP SSL config
-  sudo mv /etc/httpd/conf.d/ssl_linotp.conf.template /etc/httpd/conf.d/ssl_linotp.conf
-  
+**Installation time:** ~10-15 minutes after EC2 instance boots
+
+**What's NOT in the script** (requires AD to exist):
+- ⏸️ LDAP configuration - Must be done manually after AD deployed (Phase 3)
+- ⏸️ Realm creation - Requires LDAP configured first
+- ⏸️ Policy import - Done via web UI after realm created
+
+---
   # Generate self-signed SSL certificate
   sudo openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 \
     -subj "/C=GB/ST=London/L=London/O=LAA/CN=${instance_hostname}" \

@@ -55,433 +55,885 @@ After exploring IAM Identity Center integration, we've chosen RADIUS-based MFA b
 
 ---
 
-## Deployment Process
+## Deployment Process - Step by Step
 
-### Phase 1: Network Infrastructure (workspace-components)
+This deployment follows a **two-phase approach** with automated LinOTP installation:
 
-The network infrastructure is deployed **separately** via a dedicated GitHub Actions workflow.
+1. **Phase 1**: Deploy workspace-components (VPC, ALB, RADIUS EC2 with auto-install)
+2. **Phase 2**: Deploy main folder (Microsoft AD, WorkSpaces)
+3. **Phase 3**: Manual LDAP configuration in LinOTP web UI
+
+---
+
+## PHASE 1: Deploy Network Infrastructure & RADIUS Server
+
+### Overview
+
+This phase deploys all foundational infrastructure including the RADIUS server with **automated LinOTP installation**.
 
 **Location:** `terraform/environments/laa-workspaces/workspace-components/`
 
-**What it creates:**
-- VPC for WorkSpaces
-- Private subnets across availability zones
-- Security groups for WorkSpaces
-- Security group rules (WSP, PCoIP, RDP)
-- IAM roles and policies for WorkSpaces service
-- KMS keys for EBS volume encryption
-- VPC endpoints
-- S3 buckets for logging/backups
+### What Gets Created
 
-**Deployment:**
-1. Changes to files in `workspace-components/` folder trigger a separate GitHub Actions pipeline
-2. Pipeline creates network infrastructure first
-3. Outputs (VPC ID, subnet IDs) are consumed by main deployment
+#### Network Infrastructure
+- ✅ VPC (`10.200.0.0/16`)
+- ✅ Private subnets (2 AZs): `10.200.1.0/24`, `10.200.2.0/24`
+- ✅ Public subnets (2 AZs): `10.200.10.0/24`, `10.200.11.0/24`
+- ✅ Internet Gateway
+- ✅ Route tables (public with internet route, private isolated)
 
-**GitHub Actions Workflow:** (TBD - add workflow name/path)
+#### RADIUS Server Components
+- ✅ EC2 instance (1x t3.medium, Amazon Linux 2)
+- ✅ Security group (allows UDP 1812/1813 from VPC, HTTPS from ALB)
+- ✅ IAM role with Secrets Manager and CloudWatch access
+- ✅ **Automated installation of:**
+  - MariaDB (local database)
+  - LinOTP 2.11.2 (MFA enrollment portal)
+  - Apache httpd with SSL
+  - FreeRADIUS with LinOTP integration
+  - CloudWatch agent
 
-**Verification:**
+#### Load Balancer & SSL
+- ✅ Application Load Balancer (public, 2 AZs)
+- ✅ ACM certificate (DNS validated)
+- ✅ Route 53 DNS record: `workspace-mfa.laa-development.modernisation-platform.service.justice.gov.uk`
+- ✅ Target group pointing to RADIUS EC2 (HTTPS/443)
+- ✅ Listeners (HTTPS/443 with ACM cert, HTTP/80 redirects to HTTPS)
+
+#### Secrets & Credentials
+- ✅ RADIUS shared secret (random, 32 chars)
+- ✅ LinOTP admin password (random, 32 chars)
+- ✅ MariaDB root password (random, 32 chars)
+
+### Step-by-Step Deployment
+
+#### Step 1.1: Navigate to workspace-components Directory
+
 ```bash
-cd terraform/environments/laa-workspaces/workspace-components
-terraform init
-terraform workspace select laa-workspaces-development
-terraform output
+cd /Users/vladimirs.kovalovs/Desktop/Repos/modernisation-platform-environments/terraform/environments/laa-workspaces/workspace-components
 ```
 
-Expected outputs:
-- `vpc_id` - VPC ID for WorkSpaces
-- `vpc_cidr_block` - VPC CIDR block
-- `private_subnet_ids` - List of private subnet IDs
-- `kms_ebs_key_arn` - KMS key ARN for EBS encryption
-- `workspaces_iam_role_arn` - IAM role ARN for WorkSpaces
-- `workspaces_iam_role_name` - IAM role name
-- `workspaces_security_group_id` - Security group ID for WorkSpaces
+#### Step 1.2: Initialize Terraform
 
----
-
-**Location:** `terraform/environments/laa-workspaces/`
-
-**What it creates:**
-- AWS Managed Microsoft AD
-- CloudWatch Log Groups for AD logs
-- WorkSpaces directory registration with AD
-- WorkSpaces IP access control group
-- Secrets Manager secret for AD admin password
-- Directory Service log subscription
-- Individual WorkSpaces for users (when users are defined)
-
-**What is NOT created (Phase 1 creates these):**
-- IAM roles and policies ✅ (in workspace-components)
-- KMS keys for encryption ✅ (in workspace-components)
-- Security groups ✅ (in workspace-components)
-
-**Deployment:**
-1. Changes to main Terraform files trigger the primary GitHub Actions pipeline
-2. Pipeline references outputs from workspace-components (Phase 1) via remote state
-3. Microsoft AD directory is created automatically by Terraform
-4. WorkSpaces directory is registered with the AD
-
-**Verification:**
 ```bash
-cd terraform/environments/laa-workspaces
+terraform init
+```
+
+**Expected output:**
+```
+Initializing the backend...
+Initializing provider plugins...
+Terraform has been successfully initialized!
+```
+
+#### Step 1.3: Select Workspace
+
+```bash
 terraform workspace select laa-workspaces-development
+```
+
+Or create if it doesn't exist:
+```bash
+terraform workspace new laa-workspaces-development
+```
+
+#### Step 1.4: Review the Plan
+
+```bash
 terraform plan
 ```
 
----
+**Review for these resources:**
+- `aws_vpc.workspaces[0]`
+- `aws_subnet.private_a[0]`, `aws_subnet.private_b[0]`
+- `aws_subnet.public_a[0]`, `aws_subnet.public_b[0]`
+- `aws_internet_gateway.main[0]`
+- `aws_lb.radius_portal[0]` (Application Load Balancer)
+- `aws_acm_certificate.radius_portal[0]`
+- `aws_route53_record.radius_portal[0]`
+- `aws_instance.radius_server[0]` ⭐ **This will auto-install LinOTP**
+- `random_password` resources (3x for secrets)
+- `aws_secretsmanager_secret` resources (3x)
 
-### Phase 3: RADIUS MFA Configuration
+**Count the resources:**
+- Should be approximately 40-50 resources to create
 
-After Microsoft AD is deployed, configure RADIUS for multi-factor authentication.
-
-**Solution:** FreeRADIUS with Google Authenticator (TOTP)
-
-**Location:** `terraform/environments/laa-workspaces/workspace-components/new-adds-radius-server.tf`
-
-**What it creates:**
-- 2x EC2 instances (t3.small) running FreeRADIUS
-- Security group for RADIUS traffic (UDP 1812/1813)
-- IAM role with Secrets Manager access
-- CloudWatch Logs and alarms
-- RADIUS shared secret (stored in Secrets Manager)
-
-**Deployment:**
-
-The RADIUS infrastructure is already configured and will be deployed automatically with workspace-components (Phase 1).
+#### Step 1.5: Deploy Infrastructure
 
 ```bash
-cd terraform/environments/laa-workspaces/workspace-components
 terraform apply
 ```
 
-**Verification:**
+Type `yes` when prompted.
+
+**Deployment time:** ~15-20 minutes
+
+**What happens during deployment:**
+1. VPC and subnets created (~2 mins)
+2. Security groups created (~1 min)
+3. ACM certificate requested and DNS validation records created (~3 mins)
+4. Certificate validation completes (~5 mins)
+5. ALB created (~3 mins)
+6. Route 53 DNS record created (~1 min)
+7. **EC2 instance launched and user_data script runs** (~10-15 mins)
+   - MariaDB installed
+   - LinOTP installed and database created
+   - Apache httpd configured with SSL
+   - FreeRADIUS installed with LinOTP integration
+   - CloudWatch agent configured
+
+#### Step 1.6: Verify Deployment
+
 ```bash
-terraform output radius_server_private_ips
-# Should show 2 IP addresses
+terraform output
 ```
 
-**Next Steps:**
-1. Follow [LINOTP-FREERADIUS-IMPLEMENTATION-PLAN.md](LINOTP-FREERADIUS-IMPLEMENTATION-PLAN.md) for complete LinOTP setup
-2. Deploy LinOTP web portal for self-service MFA enrollment
-3. Configure AD integration via LDAP
-4. Users self-enroll via web interface
+**Expected outputs:**
+```hcl
+radius_alb_dns_name = "laa-workspaces-development-radius-alb-1234567890.eu-west-2.elb.amazonaws.com"
+radius_portal_url = "https://workspace-mfa.laa-development.modernisation-platform.service.justice.gov.uk"
+radius_server_private_ips = ["10.200.1.123"]
+vpc_id = "vpc-0123456789abcdef"
+# ... more outputs
+```
+
+#### Step 1.7: Monitor Installation Progress
+
+The EC2 user_data script runs automatically. Monitor progress:
+
+```bash
+# Get instance ID from outputs
+INSTANCE_ID=$(terraform output -json radius_server_ids | jq -r '.[0]')
+
+# Connect via Session Manager
+aws ssm start-session --target $INSTANCE_ID --region eu-west-2
+
+# Inside the instance, tail the installation log
+sudo tail -f /var/log/radius-install.log
+```
+
+**Expected log output:**
+```
+[1/12] Updating system and installing prerequisites...
+[2/12] Installing LinOTP repository...
+[3/12] Retrieving secrets from AWS Secrets Manager...
+✓ Secrets retrieved successfully
+[4/12] Installing and configuring MariaDB...
+✓ MariaDB installed and secured
+[5/12] Installing LinOTP...
+✓ LinOTP installed and database created
+[6/12] Installing and configuring Apache httpd...
+✓ Apache httpd installed and started
+[7/12] Configuring LinOTP admin access...
+✓ LinOTP admin user created
+[8/12] Creating LinOTP policy configuration...
+✓ Policy file created at /tmp/samplepolicy.cfg
+[9/12] Installing FreeRADIUS...
+✓ FreeRADIUS installed
+[10/12] Installing LinOTP Perl module for FreeRADIUS...
+✓ LinOTP Perl module installed and configured
+[11/12] Configuring FreeRADIUS sites...
+✓ FreeRADIUS configured and started
+[12/12] Installing CloudWatch agent...
+✓ CloudWatch agent installed and started
+========================================
+LinOTP + FreeRADIUS Installation Complete!
+========================================
+```
+
+**Installation is complete when you see "Installation Complete!" message.**
+
+#### Step 1.8: Verify Services are Running
+
+```bash
+# Still in SSM session
+sudo systemctl status mariadb
+sudo systemctl status httpd
+sudo systemctl status radiusd
+```
+
+All services should show `active (running)`.
+
+#### Step 1.9: Test LinOTP Portal Accessibility
+
+Open browser and navigate to:
+```
+https://workspace-mfa.laa-development.modernisation-platform.service.justice.gov.uk
+```
 
 **Expected result:**
-- 2 RADIUS servers deployed across AZs
-- Shared secret created in Secrets Manager
-- Microsoft AD automatically configured with RADIUS settings
-- Ready for user MFA enrollment
+- LinOTP user self-service portal loads
+- Shows login form
+
+**If you see an error:**
+- Wait 2-3 minutes for DNS propagation
+- Check ALB target health in AWS Console
+- Verify EC2 instance passed health checks
 
 ---
 
-### Phase 4: User Provisioning with MFA
+## PHASE 2: Deploy Microsoft AD & WorkSpaces
 
-After infrastructure and MFA are configured, provision users and WorkSpaces.
+### Overview
 
-**Steps:**
+This phase deploys AWS Managed Microsoft AD and configures RADIUS integration pointing to the servers created in Phase 1.
 
-1. **Create AD Users**
-   
-   Users must exist in Microsoft AD before creating WorkSpaces.
-   
-   Options:
-   - **Option A:** Create users via AWS Console (Directory Service → Users)
-   - **Option B:** Use PowerShell on domain-joined EC2 instance
-   - **Option C:** Use AWS Directory Service API
+**Location:** `terraform/environments/laa-workspaces/` (main folder)
 
-2. **Setup MFA for Users (FreeRADIUS + Google Authenticator)**
-   
-   Each user needs MFA configured on the RADIUS servers.
-   
-   **On each RADIUS server:**
-   ```bash
-   # SSH via Session Manager
-   aws ssm start-session --target <instance-id>
-   
-   # Create user and setup MFA
-   sudo useradd -m username
-   sudo passwd username
-   sudo -u username google-authenticator
-   
-   # Answer prompts:
-   # - Time-based tokens? y
-   # - Update .google_authenticator? y
-   # - Disallow multiple uses? y
-   # - Increase window? n
-   # - Rate limiting? y
-   
-   # Retrieve QR code for user
-   sudo cat /home/username/.google_authenticator
-   ```
-   
-   **Note:** With LinOTP, users self-enroll via web portal. No manual SSH setup required.
-   
-   See [LINOTP-FREERADIUS-IMPLEMENTATION-PLAN.md](LINOTP-FREERADIUS-IMPLEMENTATION-PLAN.md) for complete implementation guide.
+### What Gets Created
 
-3. **Test MFA Authentication**
-   
-   ```bash
-   # On RADIUS server, test authentication
-   # Password + token must be combined (no space)
-   radtest username 'MyPassword123456' localhost 1812 testing123
-   # (where 123456 is the 6-digit token from Google Authenticator)
-   ```
+- ✅ AWS Managed Microsoft AD
+  - Domain: `laa-workspaces.local`
+  - Short name: `LAAWORKSPACES`
+  - Edition: Standard
+  - 2 domain controllers (deployed by AWS)
+- ✅ RADIUS configuration on AD
+  - Points to RADIUS server IP from Phase 1
+  - Uses shared secret from Phase 1
+  - Protocol: PAP (required for LinOTP)
+- ✅ WorkSpaces directory registration
+- ✅ CloudWatch log groups for AD logs
+- ✅ Secrets Manager secret for AD admin password
 
-4. **Define Users in Terraform**
-   
-   Edit `new-workspace-users.tf`:
-   
-   ```hcl
-   locals {
-     workspace_users = {
-       "john.doe" = {
-         email         = "john.doe@justice.gov.uk"
-         instance_type = "standard"
-       }
-       "jane.smith" = {
-         email         = "jane.smith@justice.gov.uk"
-         instance_type = "performance"
-       }
-     }
-   }
-   ```
+### Prerequisites
 
-5. **Deploy WorkSpaces**
-   
-   ```bash
-   terraform apply
-   ```
+- ✅ Phase 1 completed successfully
+- ✅ workspace-components outputs available via remote state
 
-6. **Distribute to Users**
-   
-   ```bash
-   # Get registration code
-   terraform output workspaces_ad_registration_code
-   ```
-   
-   Send to users:
-   - Registration code
-   - WorkSpaces client download link
-   - AD username and initial password
-   - Google Authenticator QR code
-   - Emergency backup codes
-   - Login instructions: password + 6-digit token (combined)
+### Step-by-Step Deployment
 
-**User Login Process:**
-- Username: `john.doe`
-- Password in WorkSpaces: `<their-password><6-digit-token>`
-- Example: If password is `SecurePass123` and token is `837264`, enter: `SecurePass123837264`
+#### Step 2.1: Navigate to Main Directory
 
----
+```bash
+cd /Users/vladimirs.kovalovs/Desktop/Repos/modernisation-platform-environments/terraform/environments/laa-workspaces
+```
 
-## Current Deployment Status (30 April 2026)
+#### Step 2.2: Initialize Terraform
 
-### ✅ Phase 1 Completed (workspace-components)
-- [x] VPC and private subnets deployed
-- [x] Security groups and rules created
-- [x] IAM roles and policies deployed
-- [x] KMS keys for encryption created
-- [x] S3 buckets and VPC endpoints configured
-- [x] **FreeRADIUS infrastructure configured (ready to deploy)**
+```bash
+terraform init
+```
 
-### 📋 Phase 2 Pending
-- [ ] Deploy Microsoft AD
-- [ ] Register WorkSpaces directory with AD
-- [ ] Configure CloudWatch logging
+#### Step 2.3: Select Workspace
 
-### 📋 Phase 3 Pending - RADIUS MFA (FreeRADIUS)
-- [x] RADIUS server EC2 configuration (in workspace-components)
-- [x] RADIUS shared secret generation
-- [x] Security groups for RADIUS traffic
-- [ ] Deploy RADIUS servers (terraform apply in workspace-components)
-- [ ] Configure users with Google Authenticator
-- [ ] Test MFA authentication flow
+```bash
+terraform workspace select laa-workspaces-development
+```
 
-### 📋 Phase 4 Pending - User Provisioning
-- [ ] Create AD users
-- [ ] Setup MFA on RADIUS servers for each user
-- [ ] Define users in Terraform (new-workspace-users.tf)
-- [ ] Deploy individual WorkSpaces
-- [ ] Distribute Google Authenticator QR codes to users
-- [ ] Distribute WorkSpaces clients and registration codes
+#### Step 2.4: Review the Plan
 
-### 🔄 Future Phases
-- [ ] Phase 5: Set up monitoring and alerting
-- [ ] Phase 6: Configure backup and disaster recovery
-- [ ] Phase 7: Implement cost optimization strategies
+```bash
+terraform plan
+```
+
+**Review for these resources:**
+- `aws_directory_service_directory.workspaces_ad` (Microsoft AD)
+- `aws_directory_service_radius_settings.workspaces_ad_radius` ⭐ **RADIUS integration**
+- `aws_workspaces_directory.workspaces_directory`
+- `aws_secretsmanager_secret.ad_admin_password`
+
+**Verify RADIUS configuration references:**
+```hcl
+radius_servers = ["10.200.1.123"]  # From Phase 1 outputs
+authentication_protocol = "PAP"     # Required for LinOTP
+```
+
+#### Step 2.5: Deploy Microsoft AD
+
+```bash
+terraform apply
+```
+
+Type `yes` when prompted.
+
+**Deployment time:** ~30-40 minutes (Microsoft AD takes time to provision)
+
+**What happens:**
+1. AD admin password secret created (~1 min)
+2. Microsoft AD creation starts (~30-35 mins)
+3. RADIUS settings applied to AD (~2 mins)
+4. WorkSpaces directory registered (~3 mins)
+
+**Note:** Microsoft AD deployment is the longest step. AWS is creating 2 domain controllers.
+
+#### Step 2.6: Verify AD Deployment
+
+```bash
+terraform output
+```
+
+**Expected outputs:**
+```hcl
+ad_directory_id = "d-abc1234567"
+ad_dns_ip_addresses = ["10.200.1.10", "10.200.2.10"]
+workspaces_registration_code = "WSpdx+ABC123"
+```
+
+**In AWS Console:**
+1. Navigate to **Directory Service** → **Directories**
+2. Verify `laa-workspaces-development` shows status **Active**
+3. Click on the directory
+4. Go to **Networking & security** tab
+5. Verify **RADIUS server** section shows:
+   - Server IP addresses: Your RADIUS server IP
+   - Authentication protocol: **PAP**
+   - Status: **Enabled**
+
+#### Step 2.7: Note AD DNS Servers
+
+You'll need these for LinOTP LDAP configuration:
+
+```bash
+terraform output ad_dns_ip_addresses
+```
+
+**Save these IPs** - you'll use them in Phase 3.
 
 ---
 
-## Configuration Files
+## PHASE 3: Configure LinOTP LDAP Integration
 
-| File | Purpose | Location |
-|------|---------|----------|
-| `application_variables.json` | Environment-specific configuration | Main folder |
-| `new-adds.tf` | AWS Managed Microsoft AD | Main folder |
-| `new-adds-radius.tf` | RADIUS MFA configuration | Main folder |
-| `new-adds-secret.tf` | AD admin password secret | Main folder |
-| `new-workspaces.tf` | WorkSpaces directory and workspace definitions | Main folder |
-| `new-workspace-users.tf` | User definitions for workspace provisioning | Main folder |
-| `new-workspace-type.tf` | WorkSpace bundle/instance type definitions | Main folder |
-| `new-kms.tf` | KMS keys for encryption | Main folder |
-| `new-workspaces-iam.tf` | IAM roles for WorkSpaces service | Main folder |
-| `new-workspace-sg.tf` | Security groups and rules | Main folder |
+### Overview
 
-### Important Configuration Values
+Now that Microsoft AD is deployed, configure LinOTP to authenticate users against AD via LDAP.
 
-**application_variables.json:**
-```json
-{
-  "accounts": {
-    "development": {
-      "workspace_bundle_id": "wsb-0q8gwp742",
-      "ad_directory_name": "laa-workspaces.local",
-      "ad_short_name": "LAAWORKSPACES",
-      "ad_edition": "Standard"
-    }
-  }
-}
+**This step is MANUAL** - LinOTP web UI configuration required.
+
+### Prerequisites
+
+- ✅ Phase 1 completed (LinOTP installed)
+- ✅ Phase 2 completed (Microsoft AD deployed)
+- ✅ AD DNS IP addresses from Phase 2
+
+### Step 3.1: Create AD Service Account
+
+The LinOTP server needs credentials to query AD users via LDAP.
+
+**Option A: Via AWS Console**
+
+1. Navigate to **Directory Service** → **Directories**
+2. Click your directory: `laa-workspaces-development`
+3. Go to **User management** → **Users**
+4. Click **Create user**
+5. Fill in:
+   - **Username:** `MFAService`
+   - **First name:** `MFA`
+   - **Last name:** `Service`
+   - **Email:** `mfa-service@laa-workspaces.local`
+   - **Password:** Generate strong password
+   - ✅ **Uncheck:** User must change password at next login
+   - ✅ **Check:** Password never expires
+6. Click **Create user**
+
+**Option B: Via PowerShell (if you have domain-joined EC2)**
+
+```powershell
+New-ADUser -Name "MFAService" `
+  -GivenName "MFA" `
+  -Surname "Service" `
+  -UserPrincipalName "MFAService@laa-workspaces.local" `
+  -SamAccountName "MFAService" `
+  -Path "CN=Users,DC=laa-workspaces,DC=local" `
+  -AccountPassword (ConvertTo-SecureString "YourStrongPassword" -AsPlainText -Force) `
+  -Enabled $true `
+  -PasswordNeverExpires $true
+```
+
+**Step 3.1.1: Store Service Account Password**
+
+Store the password in Secrets Manager for documentation:
+
+```bash
+aws secretsmanager create-secret \
+  --name laa-workspaces-development-ad-mfa-service-password \
+  --description "AD LDAP bind user password for LinOTP" \
+  --secret-string "YourStrongPassword" \
+  --region eu-west-2
+```
+
+### Step 3.2: Retrieve LinOTP Admin Password
+
+```bash
+# Get LinOTP admin password ARN
+cd /Users/vladimirs.kovalovs/Desktop/Repos/modernisation-platform-environments/terraform/environments/laa-workspaces/workspace-components
+
+LINOTP_ADMIN_ARN=$(terraform output -raw linotp_admin_password_arn)
+
+# Retrieve password
+aws secretsmanager get-secret-value \
+  --secret-id "$LINOTP_ADMIN_ARN" \
+  --region eu-west-2 \
+  --query SecretString \
+  --output text
+```
+
+**Save this password** - you'll use it to login to LinOTP.
+
+### Step 3.3: Access LinOTP Admin Portal
+
+1. Open browser: `https://workspace-mfa.laa-development.modernisation-platform.service.justice.gov.uk/manage`
+2. Login with:
+   - **Username:** `admin`
+   - **Password:** (from Step 3.2)
+
+**Expected:** LinOTP Management Interface loads
+
+### Step 3.4: Configure LDAP UserIdResolver
+
+1. Click **LinOTP Config** → **UserIdResolvers**
+2. Click **New** → Select **LDAP**
+3. Fill in the form:
+
+| Field | Value |
+|-------|-------|
+| **Resolver name** | `LAA-AD-Users` |
+| **Server-URI** | `ldap://10.200.1.10, ldap://10.200.2.10` ⭐ Use AD DNS IPs from Phase 2 |
+| **BaseDN** | `CN=Users,DC=laa-workspaces,DC=local` |
+| **BindDN** | `CN=MFAService,CN=Users,DC=laa-workspaces,DC=local` |
+| **Bind Password** | (password from Step 3.1) |
+| **Timeout** | `5` |
+| **Network timeout** | `10` |
+
+4. Click **Test LDAP Server connection**
+   - **Expected:** Green checkmark "Connection successful"
+   - **If fails:** Check security groups allow RADIUS EC2 → AD on port 389
+
+5. Click **Preset Active Directory**
+   - This auto-fills user attribute mappings
+
+6. Click **Save**
+
+### Step 3.5: Create Realm
+
+1. Click **LinOTP Config** → **Realms**
+2. Click **New**
+3. Fill in:
+   - **Realm name:** `laa-workspaces`
+   - **Resolver:** Check `LAA-AD-Users`
+4. Click **Save**
+5. Click **Set as default** (important!)
+
+### Step 3.6: Verify User Import
+
+1. Click **User View** tab at the top
+2. You should see list of AD users
+
+**If you see users:** ✅ LDAP integration working!
+**If no users:** 
+- Check LDAP configuration
+- Verify AD service account has read permissions
+- Check BaseDN is correct
+
+### Step 3.7: Import Policies
+
+1. Click **Policies** tab
+2. Click **Import Policy**
+3. On the RADIUS server, the policy file was created at `/tmp/samplepolicy.cfg`
+
+**To import:**
+
+Option A: Copy policy content manually
+1. SSH to RADIUS server: `aws ssm start-session --target <instance-id>`
+2. View policy: `sudo cat /tmp/samplepolicy.cfg`
+3. Copy content
+4. In LinOTP UI, paste into import box
+5. Click **Import**
+
+Option B: Create policies manually via UI
+- Create policy: **Limit_to_one_token**
+  - Scope: enrollment
+  - Action: maxtoken=1
+- Create policy: **OTP_to_authenticate**
+  - Scope: authentication
+  - Action: otppin=token_pin
+
+### Step 3.8: Update FreeRADIUS Realm Configuration
+
+Since the realm is now created, verify FreeRADIUS knows about it:
+
+```bash
+# SSH to RADIUS server
+aws ssm start-session --target <instance-id>
+
+# Check FreeRADIUS LinOTP config
+sudo cat /etc/linotp2/rlm_perl.ini
+```
+
+Should show:
+```ini
+REALM=laa-workspaces
+```
+
+If different, update:
+```bash
+sudo sed -i 's/REALM=.*/REALM=laa-workspaces/' /etc/linotp2/rlm_perl.ini
+sudo systemctl restart radiusd
 ```
 
 ---
 
-## Additional Resources
+## PHASE 4: Test MFA Enrollment & Authentication
 
-- **[LINOTP-FREERADIUS-IMPLEMENTATION-PLAN.md](LINOTP-FREERADIUS-IMPLEMENTATION-PLAN.md)** - Complete LinOTP + FreeRADIUS implementation plan with all deployment phases
-- [AWS WorkSpaces Documentation](https://docs.aws.amazon.com/workspaces/)
-- [AWS Managed Microsoft AD](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/directory_microsoft_ad.html)
-- [RADIUS MFA with AWS Directory Service](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ms_ad_mfa.html)
-- [FreeRADIUS Documentation](https://freeradius.org/documentation/)
-- [Google Authenticator PAM](https://github.com/google/google-authenticator-libpam)
+### Step 4.1: Create Test AD User
 
----
+In Directory Service console:
+1. Go to your AD directory → **Users**
+2. Click **Create user**
+3. Fill in:
+   - Username: `test.user`
+   - Password: Set a password
+   - Uncheck "User must change password"
+4. Click **Create user**
 
-**Document End**
-| `application_variables.json` | Environment-specific configuration | Main folder |
-| `new-workspaces-identity-center.tf` | WorkSpaces directory and workspace definitions | Main folder |
-| `new-workspace-users.tf` | User definitions for workspace provisioning | Main folder |
-| `new-workspace-type.tf` | WorkSpace bundle/instance type definitions | Main folder |
-| `new-kms.tf` | KMS keys for encryption | workspace-components |
-| `new-workspaces-iam.tf` | IAM roles for WorkSpaces service | workspace-components |
-| `new-workspace-sg.tf` | Security groups and rules | workspace-componentstions for workspace provisioning |
-| `new-workspace-type.tf` | WorkSpace bundle/instance type definitions |
-| `new-kms.tf` | KMS keys for encryption |
+### Step 4.2: User Self-Enrollment
 
-### Important Configuration Values
+1. Open browser: `https://workspace-mfa.laa-development.modernisation-platform.service.justice.gov.uk`
+2. Login with:
+   - Username: `test.user`
+   - Password: (AD password you set)
+3. Click **Enroll TOTP token**
+4. Click **Generate Random Seed**
+5. Click **Enroll Token**
+6. **QR code appears**
+7. Open Google Authenticator or Microsoft Authenticator app
+8. Scan QR code
+9. Token appears in app showing 6-digit code
 
-From `application_variables.json`:
-```json
-{
-  "development": {
-    "identity_center_instance_arn": "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26",
-    "workspace_bundle_id": "wsb-0q8gwp742",
-    "workspaces_directory_id": "d-9c674d0524"
-  }
-}
+**Expected:** Token successfully enrolled
+
+### Step 4.3: Test RADIUS Authentication
+
+SSH to RADIUS server and test locally:
+
+```bash
+# Get current 6-digit token from authenticator app
+# Let's say it shows: 123456
+
+# Test authentication (replace with actual token)
+radtest test.user 123456 localhost:1812 10 testing123
 ```
 
+**Expected output:**
+```
+Received Access-Accept
+```
+
+**If Access-Reject:**
+- Wait for token to refresh (tokens change every 30 seconds)
+- Try again with new token
+- Check `/var/log/radius/radius.log` for errors
+
+### Step 4.4: Test from Microsoft AD
+
+The AD RADIUS configuration should send test authentications:
+
+1. In AWS Console: Directory Service → Your directory
+2. Go to **Networking & security** tab
+3. Click **Edit** in RADIUS server section
+4. Click **Test RADIUS server**
+5. Enter:
+   - Username: `test.user`
+   - Password: `<6-digit-token>`
+6. Click **Test**
+
+**Expected:** "RADIUS server test successful"
+
 ---
 
-## Adding Users and WorkSpaces
+## PHASE 5: Deploy WorkSpaces (When Ready)
 
-### Define Users
+### Prerequisites
 
-Edit: `new-workspace-users.tf`
+- ✅ All previous phases completed
+- ✅ MFA tested and working
+- ✅ Real users created in AD
+- ✅ Users enrolled in LinOTP
+
+### Step 5.1: Define Users in Terraform
+
+Edit: `terraform/environments/laa-workspaces/new-workspace-users.tf`
 
 ```hcl
 locals {
   workspace_users = {
-    "user1@example.com" = {
-      first_name    = "John"
-      last_name     = "Smith"
-      email         = "john.smith@justice.gov.uk"
+    "john.doe" = {
+      email         = "john.doe@justice.gov.uk"
       instance_type = "standard"
-    }
-    "user2@example.com" = {
-      first_name    = "Jane"
-      last_name     = "Doe"
-      email         = "jane.doe@justice.gov.uk"
-      instance_type = "performance"
     }
   }
 }
 ```
 
-### Workspace Types
-
-Defined in `new-workspace-type.tf`:
-- **standard**: Basic performance, cost-effective
-- **performance**: Higher specifications for demanding workloads
-
-### Deploy WorkSpaces
+### Step 5.2: Deploy WorkSpaces
 
 ```bash
-# Review changes
-terraform plan
+cd /Users/vladimirs.kovalovs/Desktop/Repos/modernisation-platform-environments/terraform/environments/laa-workspaces
 
-# Deploy
 terraform apply
 ```
+
+### Step 5.3: User Login Process
+
+Users will login to WorkSpaces with:
+- **Username:** `john.doe`
+- **Password:** `<AD-password><6-digit-MFA-token>` (combined, no space)
+
+**Example:**
+- AD password: `MySecurePass123`
+- MFA token from app: `837264`
+- **Enter in WorkSpaces:** `MySecurePass123837264`
 
 ---
 
 ## Troubleshooting
 
-### Issue: BYOL Not Enabled
+### Installation Issues
 
-**Error:** "Your AWS account is not enabled for Bring Your Own License (BYOL)"
+#### LinOTP Installation Script Fails
 
-**Solution:**
-1. Open AWS Support case requesting BYOL enablement
-2. Specify account ID and region (eu-west-2)
-3. Mention it's for Identity Center integration
-4. Usually approved within 24-48 hours
+**Check installation log:**
+```bash
+aws ssm start-session --target <instance-id>
+sudo cat /var/log/radius-install.log
+```
 
-### Issue: Directory Creation Fails
+**Common issues:**
+- LinOTP repository unavailable: Check internet connectivity from instance
+- Secrets Manager access denied: Verify IAM role has correct permissions
+- MariaDB fails to start: Check disk space (`df -h`)
 
-**Symptoms:** Error creating directory in console
+#### ALB Health Check Failing
+
+**Check target health:**
+1. AWS Console → EC2 → Target Groups
+2. Click on radius target group
+3. Check "Health status" tab
+
+**If unhealthy:**
+- Verify Apache httpd is running: `sudo systemctl status httpd`
+- Check security group allows 443 from ALB
+- Test health check endpoint: `curl -k https://localhost/manage`
+
+#### Cannot Access LinOTP Portal
+
+**DNS propagation:**
+- Wait 2-3 minutes after terraform apply
+- Test with ALB DNS name directly
+
+**Certificate issues:**
+- Verify ACM certificate is validated
+- Check Route 53 validation records created
+
+### LDAP Configuration Issues
+
+#### Cannot Connect to AD
+
+**Error:** "LDAP connection failed"
 
 **Checks:**
-- Verify subnets are in private subnet tier
-- Ensure Identity Center is enabled in the account
-- Confirm IAM permissions for WorkSpaces service
-- Check VPC endpoints are configured
+1. Verify AD DNS IP addresses are correct
+2. Check security group allows RADIUS EC2 → AD on port 389
+3. Test connectivity:
+   ```bash
+   telnet <AD-IP> 389
+   ```
 
-### Issue: Import Fails
+#### No Users Visible in LinOTP
 
-**Error:** "Resource not found"
+**Checks:**
+- Verify BaseDN is correct: `CN=Users,DC=laa-workspaces,DC=local`
+- Check service account has read permissions
+- Verify BindDN format: `CN=MFAService,CN=Users,DC=laa-workspaces,DC=local`
 
-**Solution:**
-- Verify directory ID is correct
-- Ensure you're in the correct region (eu-west-2)
-- Check Terraform workspace matches environment
-- Confirm AWS credentials have read access
+### RADIUS Authentication Issues
+
+#### Access-Reject from RADIUS Server
+
+**Check logs:**
+```bash
+sudo tail -f /var/log/radius/radius.log
+```
+
+**Common causes:**
+- Incorrect shared secret
+- User not enrolled in LinOTP
+- Token expired (30-second window)
+- Wrong realm configured
+
+#### WorkSpaces Login Fails with MFA
+
+**Verify:**
+1. RADIUS protocol is PAP (not MS-CHAPv2)
+2. User has enrolled token in LinOTP
+3. Token code is current
+4. Password + token are combined (no space)
+
+**Test RADIUS manually:**
+```bash
+radtest username <token> <radius-ip>:1812 10 <secret>
+```
 
 ---
 
-## Next Steps
+## Deployment Status Checklist
 
-1. **Update this document** with detailed user provisioning steps
-2. **Document Azure AD integration** (if implementing SAML SSO)
-3. **Add monitoring configuration** (CloudWatch dashboards, alarms)
-4. **Create user onboarding guide** for end users
-5. **Document backup and disaster recovery** procedures
-6. **Add cost optimization** recommendations
-7. **Security hardening** checklist
+Use this checklist to track your deployment progress:
+
+### Phase 1: Infrastructure (workspace-components)
+- [ ] Terraform init completed
+- [ ] Terraform workspace selected: laa-workspaces-development
+- [ ] Terraform plan reviewed
+- [ ] Terraform apply successful
+- [ ] VPC created
+- [ ] Public and private subnets created
+- [ ] ALB deployed
+- [ ] ACM certificate validated
+- [ ] Route 53 DNS record created
+- [ ] RADIUS EC2 instance launched
+- [ ] Installation script completed (check `/var/log/radius-install.log`)
+- [ ] All services running (mariadb, httpd, radiusd)
+- [ ] LinOTP portal accessible via browser
+
+### Phase 2: Microsoft AD (main folder)
+- [ ] Terraform init completed
+- [ ] Terraform plan reviewed (verify RADIUS settings)
+- [ ] Terraform apply successful (~40 minutes)
+- [ ] Microsoft AD status: Active
+- [ ] RADIUS configuration shows: Protocol PAP, Enabled
+- [ ] AD DNS IP addresses noted
+- [ ] WorkSpaces directory registered
+
+### Phase 3: LDAP Configuration (manual)
+- [ ] AD service account created (MFAService)
+- [ ] Service account password stored in Secrets Manager
+- [ ] LinOTP admin password retrieved
+- [ ] LinOTP admin portal accessible
+- [ ] LDAP UserIdResolver configured
+- [ ] LDAP connection test successful
+- [ ] Realm created (laa-workspaces)
+- [ ] Realm set as default
+- [ ] Users visible in User View
+- [ ] Policies imported
+
+### Phase 4: Testing
+- [ ] Test AD user created
+- [ ] User self-enrolled via web portal
+- [ ] QR code scanned in authenticator app
+- [ ] Local RADIUS test passed (radtest)
+- [ ] AD RADIUS test passed (AWS Console)
+- [ ] CloudWatch logs showing authentication events
+
+### Phase 5: WorkSpaces (when ready)
+- [ ] Real users created in AD
+- [ ] Users enrolled tokens via portal
+- [ ] WorkSpaces defined in Terraform
+- [ ] WorkSpaces deployed
+- [ ] Users able to login with MFA
 
 ---
 
-## References
+## Configuration Reference
 
+### Files Modified in This Implementation
+
+#### workspace-components/
+- ✅ `platform_data.tf` - Uncommented Route53 data sources
+- ✅ `new-vpc-subnets.tf` - Added public subnets, IGW, route tables
+- ✅ `new-acm-radius.tf` - **NEW** - ACM certificate with DNS validation
+- ✅ `new-alb-radius.tf` - **NEW** - Application Load Balancer
+- ✅ `new-route53-radius.tf` - **NEW** - DNS record for portal
+- ✅ `new-adds-radius-server.tf` - Updated to 1x t3.medium AL2, user_data added
+- ✅ `scripts/install-linotp-freeradius.sh` - **NEW** - Auto-installation script
+- ✅ `outputs.tf` - Added ALB DNS, portal URL, password ARNs
+- ✅ `application_variables.json` - Added public subnet CIDRs
+
+#### Main folder/
+- ⚠️ `new-adds-radius.tf` - **Needs update**: Change protocol to PAP
+
+### Important Configuration Values
+
+**From application_variables.json:**
+```json
+{
+  "development": {
+    "workspace_bundle_id": "wsb-0q8gwp742",
+    "region": "eu-west-2",
+    "vpc_cidr": "10.200.0.0/16",
+    "private_subnet_a_cidr": "10.200.1.0/24",
+    "private_subnet_b_cidr": "10.200.2.0/24",
+    "public_subnet_a_cidr": "10.200.10.0/24",
+    "public_subnet_b_cidr": "10.200.11.0/24",
+    "ad_directory_name": "laa-workspaces.local",
+    "ad_short_name": "LAAWORKSPACES",
+    "ad_edition": "Standard"
+  }
+}
+```
+
+### Key Secrets in Secrets Manager
+
+1. **RADIUS shared secret** - Used by AD to authenticate to RADIUS server
+2. **LinOTP admin password** - Login to `/manage` portal
+3. **MariaDB root password** - Database access
+4. **AD admin password** - Microsoft AD administrator
+5. **AD MFA service password** - LDAP bind user for LinOTP
+
+### DNS Records
+
+| Record | Type | Value |
+|--------|------|-------|
+| workspace-mfa.laa-development.modernisation-platform.service.justice.gov.uk | A (Alias) | ALB DNS name |
+| _validation.workspace-mfa.laa-development... | CNAME | ACM validation |
+
+### Network Ports
+
+| Source | Destination | Port | Protocol | Purpose |
+|--------|-------------|------|----------|---------|
+| Internet | ALB | 80 | TCP | HTTP (redirects to HTTPS) |
+| Internet | ALB | 443 | TCP | HTTPS (user portal) |
+| ALB | RADIUS EC2 | 443 | TCP | Backend HTTPS |
+| Microsoft AD | RADIUS EC2 | 1812 | UDP | RADIUS authentication |
+| Microsoft AD | RADIUS EC2 | 1813 | UDP | RADIUS accounting |
+| RADIUS EC2 | Microsoft AD | 389 | TCP | LDAP queries |
+
+---
+
+## Cost Estimation (Development Environment)
+
+| Resource | Specification | Monthly Cost |
+|----------|--------------|--------------|
+| EC2 (RADIUS) | 1x t3.medium | ~$30 |
+| EBS | 30GB gp3 | ~$2.40 |
+| ALB | Standard | ~$20 |
+| ACM | Certificate | Free |
+| Route 53 | 1M queries | ~$0.40 |
+| Microsoft AD | Standard Edition | ~$120 |
+| CloudWatch Logs | ~5GB/month | ~$2.50 |
+| Secrets Manager | 5 secrets | ~$2.00 |
+| **TOTAL (Infrastructure)** | | **~$177/month** |
+
+**Plus per-user WorkSpace costs:**
+- Standard bundle: ~$25/month per user
+- Performance bundle: ~$57/month per user
+
+---
+
+## Additional Resources
+
+- **[LINOTP-FREERADIUS-IMPLEMENTATION-PLAN.md](LINOTP-FREERADIUS-IMPLEMENTATION-PLAN.md)** - Detailed implementation plan with all phases
 - [AWS WorkSpaces Documentation](https://docs.aws.amazon.com/workspaces/)
-- [IAM Identity Center Documentation](https://docs.aws.amazon.com/singlesignon/)
-- [Modernisation Platform Standards](https://user-guide.modernisation-platform.service.justice.gov.uk/)
+- [AWS Managed Microsoft AD](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/directory_microsoft_ad.html)
+- [RADIUS MFA with AWS Directory Service](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ms_ad_mfa.html)
+- [LinOTP Documentation](https://www.linotp.org/documentation)
+- [FreeRADIUS Documentation](https://freeradius.org/documentation/)
+- [AWS Blog: Integrating FreeRADIUS MFA with Amazon WorkSpaces](https://aws.amazon.com/blogs/desktop-and-application-streaming/integrating-freeradius-mfa-with-amazon-workspaces/)
 
 ---
 
 **Document Owner:** LAA DevOps Team  
-**Last Reviewed:** 27 April 2026  
-**Next Review:** TBD
+**Last Updated:** 1 May 2026  
+**Document Version:** 3.0 - Automated LinOTP Installation  
+**Status:** Ready for Deployment
 
 ---
 

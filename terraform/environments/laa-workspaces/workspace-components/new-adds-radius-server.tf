@@ -307,8 +307,15 @@ resource "aws_instance" "radius_server" {
   vpc_security_group_ids = [aws_security_group.radius_server[0].id]
   iam_instance_profile   = aws_iam_instance_profile.radius_server[0].name
 
-  # User data will be added in Phase 2 (LinOTP installation script)
-  # user_data = templatefile("${path.module}/scripts/install-linotp-freeradius.sh", { ... })
+  # LinOTP + FreeRADIUS installation script
+  user_data = templatefile("${path.module}/scripts/install-linotp-freeradius.sh", {
+    region                       = "eu-west-2"
+    radius_secret_arn            = aws_secretsmanager_secret.radius_shared_secret[0].arn
+    linotp_admin_password_arn    = aws_secretsmanager_secret.linotp_admin_password[0].arn
+    mariadb_root_password_arn    = aws_secretsmanager_secret.mariadb_root_password[0].arn
+    environment                  = local.environment
+    vpc_cidr                     = aws_vpc.workspaces[0].cidr_block
+  })
 
   root_block_device {
     volume_type           = "gp3"
