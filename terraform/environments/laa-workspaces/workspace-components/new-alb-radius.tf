@@ -66,7 +66,7 @@ resource "aws_security_group_rule" "radius_alb_to_radius_server" {
 resource "aws_lb" "radius_portal" {
   count = local.environment == "development" ? 1 : 0
 
-  name               = "${local.application_name}-${local.environment}-radius-alb"
+  name_prefix        = "radmfa"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.radius_alb[0].id]
