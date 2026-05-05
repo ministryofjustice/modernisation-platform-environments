@@ -36,9 +36,12 @@ resource "aws_db_parameter_group" "parameter_group_19" {
     value = "10"
   }
 
-  parameter {
-    name  = "max_string_size"
-    value = "EXTENDED"
+  dynamic "parameter" {
+    for_each = var.max_string_size == "EXTENDED" ? [1] : []
+    content {
+      name  = "max_string_size"
+      value = var.max_string_size
+    }
   }
 
   parameter {

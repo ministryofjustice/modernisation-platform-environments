@@ -31,6 +31,20 @@ resource "aws_security_group_rule" "rds_sg_ingress_vpc_shared_cidr" {
   description              = "Database connections to OAS RDS"
 }
 
+resource "aws_security_group_rule" "ingress_rds_from_RDS" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  type                     = "ingress"
+  security_group_id        = aws_security_group.rds_sg[0].id
+  from_port                = 1521
+  to_port                  = 1521
+  protocol                 = "tcp"
+  source_security_group_id = module.bastion_linux.bastion_security_group
+  description              = "Database connections to OAS RDS from Bastion"
+}
+
+
+
 resource "aws_security_group_rule" "ingress_rds_from_workspaces" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 

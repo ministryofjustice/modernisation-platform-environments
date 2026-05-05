@@ -305,7 +305,7 @@ resource "aws_lambda_permission" "mdss_reconciler_allow_eventbridge" {
 #-----------------------------------------------------------------------------------
 
 resource "aws_cloudwatch_event_rule" "schedule_p1_creation" {
-  name = "create-p1-export"
+  name        = "create-p1-export"
   description = "Trigger the creation of P1 data export."
 
   schedule_expression = "cron(0 7 * * ? *)"
@@ -356,4 +356,16 @@ data "aws_iam_policy_document" "p1_create_export" {
 resource "aws_sqs_queue_policy" "p1_creation_policy" {
   queue_url = aws_sqs_queue.p1_creation_queue.id
   policy    = data.aws_iam_policy_document.p1_create_export.json
+}
+
+
+resource "aws_lambda_event_source_mapping" "p1_creation_trigger" {
+  event_source_arn = aws_sqs_queue.p1_creation_queue.arn
+  function_name    = module.create_p1_export.lambda_function_name
+
+  batch_size = 2
+
+  scaling_config {
+    maximum_concurrency = 2
+  }
 }
