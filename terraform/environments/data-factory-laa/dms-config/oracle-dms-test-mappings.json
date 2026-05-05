@@ -4,7 +4,9 @@
   "objects": [
     "EMPLOYEES",
     "DEPARTMENTS",
-    "AUDIT_LOG"
+    "AUDIT_LOG",
+    "DATA_TYPES_TEST",
+    "NULLABLE_TEST"
   ],
   "schema": "ADMIN"
 }
