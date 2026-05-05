@@ -304,7 +304,7 @@ echo "✓ LinOTP Perl module installed and configured"
 ### 11. Configure FreeRADIUS Sites
 ##############################################
 
-echo "[11/12] Configuring FreeRADIUS sites..."
+echo "[11/11] Configuring FreeRADIUS sites..."
 
 # Remove default site configs
 rm -f /etc/raddb/sites-enabled/{inner-tunnel,default}
@@ -365,64 +365,6 @@ systemctl enable radiusd
 systemctl start radiusd
 
 echo "✓ FreeRADIUS configured and started"
-
-##############################################
-### 12. Install and Configure CloudWatch Agent
-##############################################
-
-echo "[12/12] Installing CloudWatch agent..."
-
-# Download and install CloudWatch agent
-wget https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
-rpm -U ./amazon-cloudwatch-agent.rpm
-rm -f amazon-cloudwatch-agent.rpm
-
-# Configure CloudWatch agent
-cat > /opt/aws/amazon-cloudwatch-agent/etc/cloudwatch-config.json <<EOF
-{
-  "logs": {
-    "logs_collected": {
-      "files": {
-        "collect_list": [
-          {
-            "file_path": "/var/log/radius/radius.log",
-            "log_group_name": "/aws/ec2/laa-workspaces/$${ENVIRONMENT}/radius",
-            "log_stream_name": "{instance_id}/radius",
-            "timezone": "UTC"
-          },
-          {
-            "file_path": "/var/log/linotp/linotp.log",
-            "log_group_name": "/aws/ec2/laa-workspaces/$${ENVIRONMENT}/linotp",
-            "log_stream_name": "{instance_id}/linotp",
-            "timezone": "UTC"
-          },
-          {
-            "file_path": "/var/log/httpd/error_log",
-            "log_group_name": "/aws/ec2/laa-workspaces/$${ENVIRONMENT}/apache",
-            "log_stream_name": "{instance_id}/error",
-            "timezone": "UTC"
-          },
-          {
-            "file_path": "/var/log/radius-install.log",
-            "log_group_name": "/aws/ec2/laa-workspaces/$${ENVIRONMENT}/install",
-            "log_stream_name": "{instance_id}/install",
-            "timezone": "UTC"
-          }
-        ]
-      }
-    }
-  }
-}
-EOF
-
-# Start CloudWatch agent
-/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
-  -a fetch-config \
-  -m ec2 \
-  -s \
-  -c file:/opt/aws/amazon-cloudwatch-agent/etc/cloudwatch-config.json
-
-echo "✓ CloudWatch agent installed and started"
 
 ##############################################
 ### Installation Complete

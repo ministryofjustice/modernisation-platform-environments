@@ -247,14 +247,6 @@ resource "aws_iam_role_policy_attachment" "radius_server_ssm" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-# Attach CloudWatch agent policy
-resource "aws_iam_role_policy_attachment" "radius_server_cloudwatch" {
-  count = local.environment == "development" ? 1 : 0
-
-  role       = aws_iam_role.radius_server[0].name
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-}
-
 resource "aws_iam_instance_profile" "radius_server" {
   count = local.environment == "development" ? 1 : 0
 
@@ -349,52 +341,4 @@ resource "aws_instance" "radius_server" {
       ami,  # Don't replace on AMI updates
     ]
   }
-}
-
-##############################################
-### CloudWatch Log Group for RADIUS Logs
-##############################################
-
-resource "aws_cloudwatch_log_group" "radius_logs" {
-  count = local.environment == "development" ? 1 : 0
-
-  name              = "/aws/ec2/${local.application_name}-${local.environment}/radius"
-  retention_in_days = 30
-
-  tags = merge(
-    local.tags,
-    {
-      "Name" = "${local.application_name}-${local.environment}-radius-logs"
-    }
-  )
-}
-
-##############################################
-### CloudWatch Alarms for RADIUS Servers
-##############################################
-
-resource "aws_cloudwatch_metric_alarm" "radius_server_health" {
-  count = local.environment == "development" ? 2 : 0
-
-  alarm_name          = "${local.application_name}-${local.environment}-radius-${count.index + 1}-unhealthy"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 2
-  metric_name         = "StatusCheckFailed"
-  namespace           = "AWS/EC2"
-  period              = 300
-  statistic           = "Maximum"
-  threshold           = 0
-  alarm_description   = "RADIUS server ${count.index + 1} has failed status checks"
-  treat_missing_data  = "notBreaching"
-
-  dimensions = {
-    InstanceId = aws_instance.radius_server[count.index].id
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      "Name" = "${local.application_name}-${local.environment}-radius-${count.index + 1}-alarm"
-    }
-  )
 }
