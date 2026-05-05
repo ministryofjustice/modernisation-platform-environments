@@ -4,4 +4,6 @@ module "karpenter" {
 
   cluster_name = local.cluster_name
   cluster_endpoint = module.eks[0].cluster_endpoint
+
+  depends_on = [ module.eks ]
 }
