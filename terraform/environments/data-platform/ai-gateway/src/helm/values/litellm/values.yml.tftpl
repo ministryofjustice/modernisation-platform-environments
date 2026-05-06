@@ -5,6 +5,9 @@ image:
 
 nameOverride: "litellm"
 
+service:
+  type: NodePort
+
 serviceAccount:
   create: false
   name: ${serviceAccountName}
