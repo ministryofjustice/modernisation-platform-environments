@@ -29,8 +29,8 @@ resource "aws_scheduler_schedule" "ccms_load_schedule" {
   schedule_expression          = local.environment == "production" ? "rate(15 minutes)" : "cron(0 7-19 ? * * *)"
   schedule_expression_timezone = "Europe/London"
 
-  start_date = local.environment == "production" ? "2026-03-31T07:30:00Z" : null
-  end_date   = local.environment == "production" ? "2026-03-31T09:00:00Z" : null
+  start_date = local.environment == "production" ? "2026-05-07T07:30:00Z" : null
+  end_date   = local.environment == "production" ? "2026-05-07T09:00:00Z" : null
 
   target {
     arn      = aws_lambda_function.ccms_provider_load.arn
