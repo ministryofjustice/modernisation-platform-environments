@@ -85,6 +85,20 @@ resource "aws_cloudwatch_log_metric_filter" "landing_file_ok" {
   }
 }
 
+resource "aws_cloudwatch_log_metric_filter" "landing_file_manual_required" {
+  for_each = local.landing_processor_log_groups
+
+  name           = "landing-file-manual-required-${each.key}"
+  log_group_name = each.value.log_group_name
+  pattern        = "{ $.message.event = \"LANDING_FILE_MANUAL_REQUIRED\" }"
+
+  metric_transformation {
+    name      = "LandingFileManualRequiredCount${each.value.metric_suffix}"
+    namespace = "EMDS/Landing"
+    value     = "1"
+  }
+}
+
 resource "aws_cloudwatch_log_metric_filter" "landing_retryable_transient_fail" {
   for_each = local.landing_processor_log_groups
 
@@ -140,6 +154,21 @@ resource "aws_cloudwatch_log_metric_filter" "landing_unknown_fail" {
 
   metric_transformation {
     name      = "LandingUnknownFailCount${each.value.metric_suffix}"
+    namespace = "EMDS/Landing"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "landing_missing_source_fail" {
+  for_each = local.landing_processor_log_groups
+
+  name           = "landing-missing-source-fail-${each.key}"
+  log_group_name = each.value.log_group_name
+
+  pattern = "{ ($.message.event = \"LANDING_FILE_FAIL\") && ($.message.error_type = \"already_processed_or_missing_source\") }"
+
+  metric_transformation {
+    name      = "LandingMissingSourceFailCount${each.value.metric_suffix}"
     namespace = "EMDS/Landing"
     value     = "1"
   }
