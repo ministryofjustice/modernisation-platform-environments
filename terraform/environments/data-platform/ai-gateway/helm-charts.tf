@@ -8,7 +8,7 @@ resource "helm_release" "ai_gateway_configuration" {
       "${path.module}/src/helm/values/ai-gateway-configuration/values.yml.tftpl",
       {
         hostname        = local.environment_configuration.ai_gateway_hostname
-        certificate_arn = aws_acm_certificate.ai_gateway.arn
+        certificate_arn = module.acm_ai_gateway.acm_certificate_arn
       }
     )
   ]
