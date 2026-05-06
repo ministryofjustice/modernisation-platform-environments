@@ -4,7 +4,7 @@ data "aws_lb" "ai_gateway" {
 
 module "waf_ip_set_ai_gateway_allowlist" {
   source  = "terraform-aws-modules/wafv2/aws//modules/ip-set"
-  version = "1.1.0"
+  version = "1.2.0"
 
   name               = "ai-gateway-allowlist-${local.environment}"
   scope              = "REGIONAL"
@@ -26,6 +26,33 @@ module "waf_ai_gateway" {
   }
 
   rules = {
+    block-sensitive-paths = {
+      priority = 0
+      action   = "block"
+
+      statement = {
+        byte_match_statement = {
+          field_to_match = {
+            uri_path = {}
+          }
+          positional_constraint = "STARTS_WITH"
+          search_string         = "/metrics"
+          text_transformations = [
+            {
+              priority = 0
+              type     = "LOWERCASE"
+            }
+          ]
+        }
+      }
+
+      visibility_config = {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "ai-gateway-block-sensitive-paths"
+        sampled_requests_enabled   = true
+      }
+    }
+
     ip-allowlist = {
       priority = 1
       action   = "allow"
