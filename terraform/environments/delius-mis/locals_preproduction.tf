@@ -41,10 +41,10 @@ locals {
   }
 
   bcs_config_preprod = {
-    instance_count = 0
+    instance_count = 1
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
     ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
-    ansible_branch = "TM-2005/ndmis/preprod-initial-config"
+    ansible_branch = "TM-2058/delius-mis/preprod-config"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 150, type = "gp3" } # 100GB would be OK
       "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }
@@ -57,7 +57,7 @@ locals {
       associate_public_ip_address  = false
       disable_api_termination      = false
       disable_api_stop             = false
-      instance_type                = "m6i.xlarge"
+      instance_type                = "r7i.2xlarge"
       metadata_endpoint_enabled    = "enabled"
       key_name                     = null
       metadata_options_http_tokens = "required"

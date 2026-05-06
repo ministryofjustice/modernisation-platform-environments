@@ -28,7 +28,7 @@ module "get_zipped_file_api_api" {
 }
 
 module "ears_sars_api" {
-  count               = local.is-development || local.is-preproduction ? 1 : 0
+  count               = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   source              = "./modules/api_step_function"
   api_name            = "ears_sars_api"
   api_description     = "Ears and Sars API"
@@ -50,8 +50,8 @@ module "ears_sars_api" {
   schema = {
     type = "object"
     properties = {
-      legacy_subject_id      = { type = "string" }
-      legacy_order_id        = { type = "string" }
+      legacy_subject_id      = { type = ["string", "integer"] }
+      legacy_order_id        = { type = ["string", "integer"] }
       priority               = { type = "string" }
       monitoring_requirement = { type = "string" }
       request_types = {

@@ -132,6 +132,37 @@ locals {
     }
   }
 
+  bws_sso_config_stage = {
+    instance_count = 1
+    ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
+    ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
+    ansible_branch = "TM-2066/delius-mis/web-sso-config"
+    ebs_volumes = {
+      "/dev/sda1" = { label = "root", size = 100, type = "gp3" }
+      "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }
+      "/dev/sdc"  = { label = "data", size = 100, type = "gp3" }
+      "/dev/sds"  = { label = "swap", size = 8, type = "gp3" }
+    }
+    ebs_volumes_config = {}
+
+    instance_config = {
+      associate_public_ip_address  = false
+      disable_api_termination      = false
+      disable_api_stop             = false
+      instance_type                = "r6i.xlarge"
+      metadata_endpoint_enabled    = "enabled"
+      key_name                     = null
+      metadata_options_http_tokens = "required"
+      monitoring                   = true
+      ebs_block_device_inline      = true
+
+      tags = merge(
+        local.tags,
+        { backup = true }
+      )
+    }
+  }
+
   dis_config_stage = {
     instance_count    = 1
     ami_name          = "delius_mis_windows_server_patch_2025-10-01T13-00-02.504Z"
