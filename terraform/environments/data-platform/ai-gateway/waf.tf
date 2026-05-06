@@ -1,3 +1,7 @@
+data "aws_lb" "ai_gateway" {
+  name = "ai-gateway"
+}
+
 module "waf_ip_set_ai_gateway_allowlist" {
   source  = "terraform-aws-modules/wafv2/aws//modules/ip-set"
   version = "1.1.0"
@@ -10,12 +14,16 @@ module "waf_ip_set_ai_gateway_allowlist" {
 
 module "waf_ai_gateway" {
   source  = "terraform-aws-modules/wafv2/aws"
-  version = "1.1.0"
+  version = "1.2.0"
 
   name  = "ai-gateway-${local.environment}"
   scope = "REGIONAL"
 
   default_action = "allow"
+
+  association_resource_arns = {
+    alb = data.aws_lb.ai_gateway.arn
+  }
 
   rules = {
     ip-allowlist = {

@@ -126,8 +126,12 @@ locals {
         application = "main-v1.83.7-stable"
         chart       = "1.83.7-stable"
       }
-      ai_gateway_hostname                = "test.ai-gateway.justice.gov.uk"
-      ai_gateway_ingress_allowlist       = []
+      ai_gateway_hostname = "test.ai-gateway.justice.gov.uk"
+      ai_gateway_ingress_allowlist = [
+        # VPN
+        "128.77.75.64/26",  # Prisma Corporate
+        "35.176.93.186/32", # GlobalProtect (Alpha)
+      ]
       ai_gateway_admin_ingress_allowlist = []
       ai_gateway_models                  = {}
       ai_gateway_autoscaling = {
