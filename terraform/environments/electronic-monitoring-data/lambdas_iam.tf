@@ -2024,3 +2024,93 @@ resource "aws_lakeformation_permissions" "lambda_p1_table_access" {
     wildcard      = true
   }
 }
+
+
+# ------------------------------------------------------------------------------
+# Insert load lambda role
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "insert_load" {
+  name               = "insert_load_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "insert_load_policy_document" {
+  statement {
+    actions = [
+      "athena:GetDataCatalog",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:GetWorkGroup",
+      "athena:StartQueryExecution",
+      "athena:StopQueryExecution",
+      "athena:CreatePreparedStatement",
+      "athena:UpdatePreparedStatement",
+      "athena:GetPreparedStatement",
+      "athena:ListPreparedStatements",
+      "athena:DeletePreparedStatement",
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:*/*"
+    ]
+  }
+  statement {
+    actions   = ["athena:ListWorkGroups"]
+    resources = ["*"]
+  }
+  statement {
+    actions   = ["lakeformation:GetDataAccess"]
+    resources = ["*"]
+  }
+  statement {
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:ListMultipartUploadParts"
+    ]
+    resources = [module.s3-athena-bucket.bucket.arn]
+  }
+  statement {
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:ListMultipartUploadParts"
+    ]
+    resources = ["${module.s3-athena-bucket.bucket.arn}/*"]
+  }
+  statement { 
+    sid    = "GluePermissions"
+    effect = "Allow" 
+    actions = [
+          "glue:GetDatabase",
+          "glue:GetDatabases",
+          "glue:GetTable",
+          "glue:GetTables",
+          "glue:GetPartition",
+          "glue:GetPartitions"]
+    resources = "*"
+    }
+}
+# remove some of these *s - narrow
+
+resource "aws_iam_policy" "insert_load" {
+  name   = "insert_load_lambda_policy"  
+  policy = data.aws_iam_policy_document.insert_load_policy_document.json
+  }
+
+resource "aws_iam_role_policy_attachment" "insert_load_attach" {
+  role       = aws_iam_role.insert_load.name  
+  policy_arn = aws_iam_policy.insert_load.arn
+  }
+
+
+
+
+
+
+
+

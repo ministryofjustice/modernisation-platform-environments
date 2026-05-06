@@ -369,3 +369,45 @@ resource "aws_lambda_event_source_mapping" "p1_creation_trigger" {
     maximum_concurrency = 2
   }
 }
+
+#-----------------------------------------------------------------------------------
+# Schedule insert load lambda (every 3 minutes)
+#-----------------------------------------------------------------------------------
+
+  resource "aws_cloudwatch_event_rule" "insert_load_schedule" {
+    name                = "insert_load_schedule"  
+    description         = "Runs insert_load Lambdas for MDSS tables on a schedule"  
+    schedule_expression = "rate(3 minutes)"
+    }
+
+  # target staged_mdss__position
+  resource "aws_cloudwatch_event_target" "insert_load_staged_mdss__position" {
+    rule  = aws_cloudwatch_event_rule.insert_load_schedule.name
+    arn   = module.insert_load_staged_mdss__position.lambda_function_arn
+  }
+
+  resource "aws_lambda_permission" "allow_eventbridge_staged_mdss__position" {
+    count         = 1
+    statement_id  = "AllowExecutionFromEventBridgeStagedMdssPosition"
+    action        = "lambda:InvokeFunction"
+    function_name = module.insert_load_staged_mdss__position.lambda_function_name
+    principal     = "events.amazonaws.com"
+    source_arn    = aws_cloudwatch_event_rule.insert_load_schedule.arn
+  }
+
+
+  # target acquisitive_crime__position
+  resource "aws_cloudwatch_event_target" "insert_load_acquisitive_crime__position" {
+    rule  = aws_cloudwatch_event_rule.insert_load_schedule.name
+    arn   = module.insert_load_acquisitive_crime__position.lambda_function_arn
+  }
+
+  resource "aws_lambda_permission" "allow_eventbridge_acquisitive_crime__position" {
+    count         = 1
+    statement_id  = "AllowExecutionFromEventBridgeAcquisitiveCrimePosition"
+    action        = "lambda:InvokeFunction"
+    function_name = module.acquisitive_crime__position.lambda_function_name
+    principal     = "events.amazonaws.com"
+    source_arn    = aws_cloudwatch_event_rule.insert_load_schedule.arn
+  }
+
