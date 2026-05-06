@@ -1,0 +1,15 @@
+---
+apiVersion: gateway.k8s.aws/v1beta1
+kind: LoadBalancerConfiguration
+metadata:
+  name: ai-gateway
+  namespace: {{ .Release.Namespace }}
+spec:
+  loadBalancerName: ai-gateway
+  scheme: internet-facing
+  loadBalancerAttributes:
+    - key: load_balancing.cross_zone.enabled
+      value: "true"
+  listenerConfigurations:
+    - protocolPort: HTTPS:443
+      defaultCertificate: {{ .Values.certificateArn }}

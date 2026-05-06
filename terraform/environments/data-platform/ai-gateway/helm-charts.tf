@@ -1,3 +1,19 @@
+resource "helm_release" "ai_gateway_configuration" {
+  name      = "ai-gateway-configuration"
+  chart     = "${path.module}/src/helm/charts/ai-gateway-configuration"
+  namespace = "ai-gateway"
+
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/ai-gateway-configuration/values.yml.tftpl",
+      {
+        hostname        = local.environment_configuration.ai_gateway_hostname
+        certificate_arn = aws_acm_certificate.ai_gateway.arn
+      }
+    )
+  ]
+}
+
 resource "helm_release" "litellm" {
   name       = "litellm"
   repository = "oci://ghcr.io/berriai"
