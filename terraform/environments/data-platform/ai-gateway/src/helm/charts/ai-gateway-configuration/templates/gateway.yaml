@@ -16,3 +16,7 @@ spec:
       protocol: HTTPS
       port: 443
       hostname: {{ .Values.hostname }}
+    - name: https-admin
+      protocol: HTTPS
+      port: 443
+      hostname: {{ .Values.adminHostname }}

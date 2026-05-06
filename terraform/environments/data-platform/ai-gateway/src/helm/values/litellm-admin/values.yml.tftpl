@@ -7,6 +7,9 @@ image:
 
 nameOverride: "litellm-admin"
 
+service:
+  type: NodePort
+
 serviceAccount:
   create: false
   name: ${serviceAccountName}

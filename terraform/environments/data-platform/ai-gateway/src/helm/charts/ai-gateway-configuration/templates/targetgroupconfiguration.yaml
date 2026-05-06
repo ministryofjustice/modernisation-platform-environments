@@ -9,3 +9,14 @@ spec:
     name: litellm
   defaultConfiguration:
     targetType: instance
+---
+apiVersion: gateway.k8s.aws/v1beta1
+kind: TargetGroupConfiguration
+metadata:
+  name: litellm-admin
+  namespace: {{ .Release.Namespace }}
+spec:
+  targetReference:
+    name: litellm-admin
+  defaultConfiguration:
+    targetType: instance

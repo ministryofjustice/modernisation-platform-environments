@@ -1,6 +1,7 @@
 resource "helm_release" "ai_gateway_configuration" {
   name      = "ai-gateway-configuration"
   chart     = "${path.module}/src/helm/charts/ai-gateway-configuration"
+  version   = "1.2.0"
   namespace = "ai-gateway"
 
   values = [
@@ -8,6 +9,7 @@ resource "helm_release" "ai_gateway_configuration" {
       "${path.module}/src/helm/values/ai-gateway-configuration/values.yml.tftpl",
       {
         hostname        = local.environment_configuration.ai_gateway_hostname
+        admin_hostname  = "admin.${local.environment_configuration.ai_gateway_hostname}"
         certificate_arn = module.acm_ai_gateway.acm_certificate_arn
       }
     )
