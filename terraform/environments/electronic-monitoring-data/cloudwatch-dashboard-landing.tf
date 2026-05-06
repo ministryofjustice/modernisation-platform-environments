@@ -24,7 +24,7 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
         properties = {
           title  = "SQS DLQs: landing bucket processing"
           region = "eu-west-2"
-          stat   = "Sum"
+          stat   = "Maximum"
           period = 60
 
           metrics = [
@@ -79,7 +79,7 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
         height = 6
 
         properties = {
-          title  = "Landing outcomes: OK / retry / final failure"
+          title  = "Landing outcomes: OK / retry / manual / final failure"
           region = "eu-west-2"
           stat   = "Sum"
           period = 300
@@ -95,6 +95,10 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
             ],
             [
               ".",
+              "LandingFileManualRequiredCountFmsGeneral"
+            ],
+            [
+              ".",
               "LandingFileFailCountFmsGeneral"
             ],
             [
@@ -104,6 +108,10 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
             [
               ".",
               "LandingFileRetryCountFmsHo"
+            ],
+            [
+              ".",
+              "LandingFileManualRequiredCountFmsHo"
             ],
             [
               ".",
@@ -119,6 +127,10 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
             ],
             [
               ".",
+              "LandingFileManualRequiredCountFmsSpecials"
+            ],
+            [
+              ".",
               "LandingFileFailCountFmsSpecials"
             ],
             [
@@ -128,6 +140,10 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
             [
               ".",
               "LandingFileRetryCountMdssGeneral"
+            ],
+            [
+              ".",
+              "LandingFileManualRequiredCountMdssGeneral"
             ],
             [
               ".",
@@ -143,6 +159,10 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
             ],
             [
               ".",
+              "LandingFileManualRequiredCountMdssHo"
+            ],
+            [
+              ".",
               "LandingFileFailCountMdssHo"
             ],
             [
@@ -152,6 +172,10 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
             [
               ".",
               "LandingFileRetryCountMdssSpecials"
+            ],
+            [
+              ".",
+              "LandingFileManualRequiredCountMdssSpecials"
             ],
             [
               ".",
@@ -192,6 +216,10 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
             ],
             [
               ".",
+              "LandingMissingSourceFailCountFmsGeneral"
+            ],
+            [
+              ".",
               "LandingUnknownFailCountFmsGeneral"
             ],
             [
@@ -205,6 +233,10 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
             [
               ".",
               "LandingNonRetryableConfigFailCountFmsHo"
+            ],
+            [
+              ".",
+              "LandingMissingSourceFailCountFmsHo"
             ],
             [
               ".",
@@ -224,6 +256,10 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
             ],
             [
               ".",
+              "LandingMissingSourceFailCountFmsSpecials"
+            ],
+            [
+              ".",
               "LandingUnknownFailCountFmsSpecials"
             ],
             [
@@ -237,6 +273,10 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
             [
               ".",
               "LandingNonRetryableConfigFailCountMdssGeneral"
+            ],
+            [
+              ".",
+              "LandingMissingSourceFailCountMdssGeneral"
             ],
             [
               ".",
@@ -256,6 +296,10 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
             ],
             [
               ".",
+              "LandingMissingSourceFailCountMdssHo"
+            ],
+            [
+              ".",
               "LandingUnknownFailCountMdssHo"
             ],
             [
@@ -272,9 +316,55 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
             ],
             [
               ".",
+              "LandingMissingSourceFailCountMdssSpecials"
+            ],
+            [
+              ".",
               "LandingUnknownFailCountMdssSpecials"
             ]
           ]
+        }
+      },
+
+      # --------------------------
+      # Manual intervention table
+      # --------------------------
+      {
+        type   = "log"
+        x      = 0
+        y      = 18
+        width  = 24
+        height = 8
+
+        properties = {
+          title  = "Manual intervention required: landing processing"
+          region = "eu-west-2"
+          view   = "table"
+
+          query = <<-EOT
+            SOURCE '/aws/lambda/process_landing_bucket_files_fms_general'
+            | SOURCE '/aws/lambda/process_landing_bucket_files_fms_ho'
+            | SOURCE '/aws/lambda/process_landing_bucket_files_fms_specials'
+            | SOURCE '/aws/lambda/process_landing_bucket_files_mdss_general'
+            | SOURCE '/aws/lambda/process_landing_bucket_files_mdss_ho'
+            | SOURCE '/aws/lambda/process_landing_bucket_files_mdss_specials'
+            | filter ispresent(message.event)
+            | filter message.event = "LANDING_FILE_MANUAL_REQUIRED"
+            | fields
+                @timestamp,
+                message.feed,
+                message.order_type,
+                message.table,
+                message.delivery_date,
+                message.source_s3path,
+                message.destination_s3path,
+                message.error_type,
+                message.retry_policy,
+                message.will_sqs_retry,
+                message.reason
+            | sort @timestamp desc
+            | limit 200
+          EOT
         }
       },
 
@@ -284,7 +374,7 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
       {
         type   = "log"
         x      = 0
-        y      = 18
+        y      = 26
         width  = 24
         height = 8
 
@@ -326,7 +416,7 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
       {
         type   = "log"
         x      = 0
-        y      = 26
+        y      = 34
         width  = 24
         height = 8
 
@@ -368,7 +458,7 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
       {
         type   = "log"
         x      = 0
-        y      = 34
+        y      = 42
         width  = 24
         height = 8
 
@@ -388,6 +478,7 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
             | filter message.event in [
                 "LANDING_FILE_OK",
                 "LANDING_FILE_RETRY",
+                "LANDING_FILE_MANUAL_REQUIRED",
                 "LANDING_FILE_FAIL"
               ]
             | stats
@@ -400,12 +491,19 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
                   message.source_s3path, null)
                 ) as retried_files,
                 count_distinct(
+                  if(message.event = "LANDING_FILE_MANUAL_REQUIRED",
+                  message.source_s3path, null)
+                ) as manual_required_files,
+                count_distinct(
                   if(message.event = "LANDING_FILE_FAIL",
                   message.source_s3path, null)
                 ) as failed_files,
                 max(message.attempt) as max_attempt_seen
               by message.feed, message.order_type, message.table
-            | sort failed_files desc, retried_files desc, ok_files desc
+            | sort failed_files desc,
+                manual_required_files desc,
+                retried_files desc,
+                ok_files desc
             | limit 100
           EOT
         }
