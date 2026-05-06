@@ -340,7 +340,7 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Resource = ["arn:aws:securityhub:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
         } : each.value.policy_name == "get_certificate_parameters" ? {
         Effect   = "Allow"
-        Action   = ["ssm:GetParametersByPath", "GetParameter"]
+        Action   = ["ssm:GetParametersByPath", "ssm:GetParameter"]
         Resource = ["arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:parameter/certificates/*"]
         } : each.value.policy_name == "get_certificate_expiry" ? {
         Effect   = "Allow"
