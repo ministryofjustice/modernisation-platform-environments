@@ -101,6 +101,7 @@ locals {
         "send_message_to_sqs",
         "send_logs_to_cloudwatch",
         "publish_to_sns",
+        "get_certificate_parameters",
         "get_cloudwatch_metrics",
         "get_certificate_expiry"
       ]
@@ -238,6 +239,7 @@ locals {
           "get_klayers",
           "ec2_permissions",
           "get_certificate_expiry",
+          "get_certificate_parameters",
           "get_ssm_parameter",
           "update_waf_ipset",
           "describe_cloudwatch",
@@ -336,6 +338,10 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Effect   = "Allow"
         Action   = ["securityhub:GetFindings", "securityhub:BatchUpdateFindings"]
         Resource = ["arn:aws:securityhub:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        } : each.value.policy_name == "get_certificate_parameters" ? {
+        Effect   = "Allow"
+        Action   = ["ssm:GetParametersByPath", "GetParameter"]
+        Resource = ["arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:parameter/certificates/*"]
         } : each.value.policy_name == "get_certificate_expiry" ? {
         Effect   = "Allow"
         Action   = ["acm:DescribeCertificate", "acm:GetCertificate", "acm:ListCertificates", "acm:ListTagsForCertificate"]
