@@ -785,58 +785,46 @@ module "create_p1_export" {
 # insert load - staged_mdss__position and acquisitive_crime__position
 #-----------------------------------------------------------------------------------
 
-module "insert_load_staged_mdss__position" {
+module "insert_staged_position" {
+  count                          = 1
   source                         = "./modules/lambdas"
   is_image                       = true
-  function_name                  = "insert_load"
+  function_name                  = "insert_staged_position"
   role_name                      = aws_iam_role.insert_load.name
   role_arn                       = aws_iam_role.insert_load.arn
-  handler                        = "insert_load.handler"
-  memory_size                    = 10240 
-  timeout                        = 900
-  reserved_concurrent_executions = 500 # lower
+  handler                        = "insert_staged_position.handler"
+  memory_size                    = 512
+  timeout                        = 300
+  reserved_concurrent_executions = 1
   ephemeral_storage_size         = 10240
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev                 = local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  production_dev                 = local.is-test ? "test" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
   subnet_ids                     = data.aws_subnets.shared-private.ids
   cloudwatch_retention_days      = 7
   environment_variables = {
-    SOURCE_DATABASE = "allied_mdss"
-    SOURCE_TABLE = "position"
-    DESTINATION_DATABASE = "staged_mdss" #check
-    DESTINATION_TABLE = "position" #check
-    INSERT_DELTA = "minutes=3"
-    DATE_COLUMN = "position_gps_date"
-    RESULT_BUCKET = module.s3-athena-bucket.bucket.id
-    TASK_IDENTIFIER = "insert_load_staged_mdss__position"
+    TASK_IDENTIFIER = "insert_lambda_load"
   }
 }
 
-module "insert_load_acquisitive_crime__position" {
+module "insert_ac_position" {
+  count                          = 1
   source                         = "./modules/lambdas"
   is_image                       = true
-  function_name                  = "insert_load"
+  function_name                  = "insert_ac_position"
   role_name                      = aws_iam_role.insert_load.name
   role_arn                       = aws_iam_role.insert_load.arn
-  handler                        = "insert_load.handler"
-  memory_size                    = 10240 
-  timeout                        = 900
-  reserved_concurrent_executions = 500 # lower
+  handler                        = "insert_ac_position.handler"
+  memory_size                    = 512
+  timeout                        = 300
+  reserved_concurrent_executions = 1
   ephemeral_storage_size         = 10240
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev                 = local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  production_dev                 = local.is-test ? "test" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
   subnet_ids                     = data.aws_subnets.shared-private.ids
   cloudwatch_retention_days      = 7
   environment_variables = {
-    SOURCE_DATABASE = "acquisitive_crime"
-    SOURCE_TABLE = "position"
-    DESTINATION_DATABASE = "staged_mdss" #check
-    DESTINATION_TABLE = "position" #check
-    INSERT_DELTA = "minutes=3"
-    DATE_COLUMN = "position_gps_date"
-    RESULT_BUCKET = module.s3-athena-bucket.bucket.id
-    TASK_IDENTIFIER = "insert_load_staged_mdss__position"
+    TASK_IDENTIFIER = "insert_lambda_load"
   }
 }

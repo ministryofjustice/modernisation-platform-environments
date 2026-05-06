@@ -2095,7 +2095,6 @@ data "aws_iam_policy_document" "insert_load_policy_document" {
     resources = "*"
     }
 }
-# remove some of these *s - narrow
 
 resource "aws_iam_policy" "insert_load" {
   name   = "insert_load_lambda_policy"  

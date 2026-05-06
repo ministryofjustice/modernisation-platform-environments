@@ -380,33 +380,33 @@ resource "aws_lambda_event_source_mapping" "p1_creation_trigger" {
     schedule_expression = "rate(3 minutes)"
     }
 
-  # target staged_mdss__position
-  resource "aws_cloudwatch_event_target" "insert_load_staged_mdss__position" {
+  # target staged_position
+  resource "aws_cloudwatch_event_target" "insert_staged_position" {
     rule  = aws_cloudwatch_event_rule.insert_load_schedule.name
-    arn   = module.insert_load_staged_mdss__position.lambda_function_arn
+    arn   = module.insert_staged_position.lambda_function_arn
   }
 
-  resource "aws_lambda_permission" "allow_eventbridge_staged_mdss__position" {
+  resource "aws_lambda_permission" "allow_eventbridge_insert_staged_position" {
     count         = 1
     statement_id  = "AllowExecutionFromEventBridgeStagedMdssPosition"
     action        = "lambda:InvokeFunction"
-    function_name = module.insert_load_staged_mdss__position.lambda_function_name
+    function_name = module.insert_staged_position.lambda_function_name
     principal     = "events.amazonaws.com"
     source_arn    = aws_cloudwatch_event_rule.insert_load_schedule.arn
   }
 
 
-  # target acquisitive_crime__position
-  resource "aws_cloudwatch_event_target" "insert_load_acquisitive_crime__position" {
+  # target insert_ac_position
+  resource "aws_cloudwatch_event_target" "insert_ac_position" {
     rule  = aws_cloudwatch_event_rule.insert_load_schedule.name
-    arn   = module.insert_load_acquisitive_crime__position.lambda_function_arn
+    arn   = module.insert_ac_position.lambda_function_arn
   }
 
   resource "aws_lambda_permission" "allow_eventbridge_acquisitive_crime__position" {
     count         = 1
     statement_id  = "AllowExecutionFromEventBridgeAcquisitiveCrimePosition"
     action        = "lambda:InvokeFunction"
-    function_name = module.acquisitive_crime__position.lambda_function_name
+    function_name = module.insert_ac_position.lambda_function_name
     principal     = "events.amazonaws.com"
     source_arn    = aws_cloudwatch_event_rule.insert_load_schedule.arn
   }
