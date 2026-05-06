@@ -25,8 +25,7 @@ resource "aws_instance" "ec2_oracle_ebs" {
       ebs_block_device,
       ebs_optimized,
       user_data,
-      user_data_replace_on_change,
-      tags
+      user_data_replace_on_change
     ]
   }
   user_data_replace_on_change = false
@@ -97,8 +96,7 @@ resource "aws_instance" "ec2_oracle_ebs" {
 resource "aws_ebs_volume" "export_home" {
   lifecycle {
     ignore_changes = [
-      kms_key_id,
-      tags
+      kms_key_id
     ]
   }
   availability_zone = "eu-west-2a"
@@ -122,8 +120,7 @@ resource "aws_volume_attachment" "export_home_att" {
 resource "aws_ebs_volume" "u01" {
   lifecycle {
     ignore_changes = [
-      kms_key_id,
-      tags
+      kms_key_id
     ]
   }
   availability_zone = "eu-west-2a"
@@ -147,8 +144,7 @@ resource "aws_volume_attachment" "u01_att" {
 resource "aws_ebs_volume" "arch" {
   lifecycle {
     ignore_changes = [
-      kms_key_id,
-      tags
+      kms_key_id
     ]
   }
   availability_zone = "eu-west-2a"
@@ -172,8 +168,7 @@ resource "aws_volume_attachment" "arch_att" {
 resource "aws_ebs_volume" "redoA" {
   lifecycle {
     ignore_changes = [
-      kms_key_id,
-      tags
+      kms_key_id
     ]
   }
   availability_zone = "eu-west-2a"
@@ -197,8 +192,7 @@ resource "aws_volume_attachment" "redoA_att" {
 resource "aws_ebs_volume" "techst" {
   lifecycle {
     ignore_changes = [
-      kms_key_id,
-      tags
+      kms_key_id
     ]
   }
   availability_zone = "eu-west-2a"
@@ -222,8 +216,7 @@ resource "aws_volume_attachment" "techst_att" {
 resource "aws_ebs_volume" "backup" {
   lifecycle {
     ignore_changes = [
-      kms_key_id,
-      tags
+      kms_key_id
     ]
   }
   availability_zone = "eu-west-2a"
@@ -247,8 +240,7 @@ resource "aws_volume_attachment" "backup_att" {
 resource "aws_ebs_volume" "backup_clone" {
   lifecycle {
     ignore_changes = [
-      kms_key_id,
-      tags
+      kms_key_id
     ]
   }
   availability_zone = "eu-west-2a"
@@ -275,8 +267,7 @@ resource "aws_volume_attachment" "backup_clone_att" {
 resource "aws_ebs_volume" "backup_prod" {
   lifecycle {
     ignore_changes = [
-      kms_key_id,
-      tags
+      kms_key_id
     ]
   }
   availability_zone = "eu-west-2a"
@@ -303,8 +294,7 @@ resource "aws_volume_attachment" "backup_prod_att" {
 resource "aws_ebs_volume" "redoB" {
   lifecycle {
     ignore_changes = [
-      kms_key_id,
-      tags
+      kms_key_id
     ]
   }
   availability_zone = "eu-west-2a"
@@ -331,8 +321,7 @@ resource "aws_volume_attachment" "redoB_att" {
 resource "aws_ebs_volume" "diag" {
   lifecycle {
     ignore_changes = [
-      kms_key_id,
-      tags
+      kms_key_id
     ]
   }
   availability_zone = "eu-west-2a"
@@ -359,8 +348,7 @@ resource "aws_volume_attachment" "diag_att" {
 resource "aws_ebs_volume" "dbf01" {
   lifecycle {
     ignore_changes = [
-      kms_key_id,
-      tags
+      kms_key_id
     ]
   }
   availability_zone = "eu-west-2a"
@@ -387,8 +375,7 @@ resource "aws_volume_attachment" "dbf01_att" {
 resource "aws_ebs_volume" "dbf02" {
   lifecycle {
     ignore_changes = [
-      kms_key_id,
-      tags
+      kms_key_id
     ]
   }
   availability_zone = "eu-west-2a"
@@ -415,8 +402,7 @@ resource "aws_volume_attachment" "dbf02_att" {
 resource "aws_ebs_volume" "dbf03" {
   lifecycle {
     ignore_changes = [
-      kms_key_id,
-      tags
+      kms_key_id
     ]
   }
   availability_zone = "eu-west-2a"
@@ -443,8 +429,7 @@ resource "aws_volume_attachment" "dbf03_att" {
 resource "aws_ebs_volume" "dbf04" {
   lifecycle {
     ignore_changes = [
-      kms_key_id,
-      tags
+      kms_key_id
     ]
   }
   availability_zone = "eu-west-2a"
@@ -472,8 +457,7 @@ resource "aws_ebs_volume" "swap2" {
   count = local.is-development ? 1 : 0
   lifecycle {
     ignore_changes = [
-      kms_key_id,
-      tags
+      kms_key_id
     ]
   }
   availability_zone = "eu-west-2a"
