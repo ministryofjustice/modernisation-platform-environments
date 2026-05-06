@@ -4,6 +4,6 @@ resource "aws_lakeformation_data_lake_settings" "main" {
   ]
 
   parameters = {
-    "CROSS_ACCOUNT_VERSION" = "4"
+    "CROSS_ACCOUNT_VERSION" = "5"
   }
 }
