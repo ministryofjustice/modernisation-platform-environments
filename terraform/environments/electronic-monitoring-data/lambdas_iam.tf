@@ -174,10 +174,7 @@ data "aws_iam_policy_document" "place_unzipped_file_s3_policy_document" {
       "s3:ListBucket",
       "s3:GetBucketLocation"
     ]
-    resources = local.is-production ? [
-      "${module.s3-unzipped-files-bucket.bucket.arn}/*",
-      module.s3-unzipped-files-bucket.bucket.arn,
-      ] : [
+    resources = [
       "${module.s3-ears-sars-bucket.bucket.arn}/*",
       module.s3-ears-sars-bucket.bucket.arn,
     ]
@@ -263,10 +260,7 @@ data "aws_iam_policy_document" "get_unzipped_presigned_url_file_s3_policy_docume
       "s3:PutObject",
       "s3:GetObject"
     ]
-    resources = local.is-production ? [
-      "${module.s3-unzipped-files-bucket.bucket.arn}/*",
-      module.s3-unzipped-files-bucket.bucket.arn,
-      ] : [
+    resources = [
       "${module.s3-ears-sars-bucket.bucket.arn}/*",
       module.s3-ears-sars-bucket.bucket.arn,
     ]
@@ -1514,8 +1508,14 @@ resource "aws_iam_role_policy_attachment" "cross_account_copy" {
 #-----------------------------------------------------------------------------------
 
 data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
-  count = local.is-development || local.is-preproduction ? 1 : 0
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
 
+  statement {
+    sid       = "ListAccountAlias"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
   statement {
     sid       = "S3BucketPerms"
     effect    = "Allow"
@@ -1632,25 +1632,25 @@ data "aws_iam_policy_document" "ears_sars_iam_role_policy_document" {
 }
 
 resource "aws_iam_role" "ears_sars_iam_role" {
-  count              = local.is-development || local.is-preproduction ? 1 : 0
+  count              = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   name               = "ears_sars_iam_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 resource "aws_iam_policy" "ears_sars_iam_role_policy" {
-  count  = local.is-development || local.is-preproduction ? 1 : 0
+  count  = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   name   = "ears_sars_iam_policy"
   policy = data.aws_iam_policy_document.ears_sars_iam_role_policy_document[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "ears_sars_iam_role_policy_attachment" {
-  count      = local.is-development || local.is-preproduction ? 1 : 0
+  count      = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   role       = aws_iam_role.ears_sars_iam_role[0].name
   policy_arn = aws_iam_policy.ears_sars_iam_role_policy[0].arn
 }
 
 resource "aws_lakeformation_permissions" "ears_sars_db_permissions" {
-  for_each  = local.is-preproduction ? toset(local.ears_sars_athena_dbs) : []
+  for_each  = local.is-preproduction || local.is-production ? toset(local.ears_sars_athena_dbs) : []
   principal = aws_iam_role.ears_sars_iam_role[0].arn
 
   database {
@@ -1660,7 +1660,7 @@ resource "aws_lakeformation_permissions" "ears_sars_db_permissions" {
   permissions = ["DESCRIBE"]
 }
 resource "aws_lakeformation_permissions" "ears_sars_table_permissions" {
-  for_each  = local.is-preproduction ? toset(local.ears_sars_athena_dbs) : []
+  for_each  = local.is-preproduction || local.is-production ? toset(local.ears_sars_athena_dbs) : []
   principal = aws_iam_role.ears_sars_iam_role[0].arn
 
   table {
@@ -1672,7 +1672,7 @@ resource "aws_lakeformation_permissions" "ears_sars_table_permissions" {
 }
 
 resource "aws_lakeformation_permissions" "ears_sars_datalake_location" {
-  count     = local.is-development || local.is-preproduction ? 1 : 0
+  count     = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   principal = aws_iam_role.ears_sars_iam_role[0].arn
 
   data_location {

@@ -47,7 +47,7 @@ module "unzip_single_file" {
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
     BUCKET_NAME        = module.s3-data-bucket.bucket.id
-    EXPORT_BUCKET_NAME = local.is-production ? module.s3-unzipped-files-bucket.bucket.id : module.s3-ears-sars-bucket.bucket.id
+    EXPORT_BUCKET_NAME = module.s3-ears-sars-bucket.bucket.id
   }
 }
 
@@ -679,7 +679,7 @@ module "cloudwatch_alarm_threader" {
 # Ears and Sars Request
 #-----------------------------------------------------------------------------------
 module "ears_sars_request" {
-  count                   = local.is-development || local.is-preproduction ? 1 : 0
+  count                   = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   source                  = "./modules/lambdas"
   is_image                = true
   ecr_repo_name           = "electronic-monitoring-ear-sars"
