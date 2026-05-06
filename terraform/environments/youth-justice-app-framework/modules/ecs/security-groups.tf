@@ -278,3 +278,13 @@ resource "aws_security_group_rule" "ecsint_toecs_autoscaling_datadog_rule" {
   source_security_group_id = aws_security_group.common_ecs_service_internal.id
   description              = "Datadog from ECS Internal to Autoscaling"
 }
+
+resource "aws_security_group_rule" "ecs_exec_ssm" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  security_group_id = aws_security_group.common_ecs_service_internal.id
+  self              = true
+  description       = "Allow ECS Exec via SSM endpoints"
+}
