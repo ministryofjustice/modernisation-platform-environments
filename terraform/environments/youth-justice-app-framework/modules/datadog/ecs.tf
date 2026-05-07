@@ -80,6 +80,10 @@ module "ecs_service_datadog_agent" {
           "value": "true"
         },
         {
+          "name": "DD_HOSTNAME_TRUST_UTS_NAMESPACE",
+          "value": "true"
+        },
+        {
           "name" : "DD_LOGS_ENABLED",
           "value" : "true"
         },
