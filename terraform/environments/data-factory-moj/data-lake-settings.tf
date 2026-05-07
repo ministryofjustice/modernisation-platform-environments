@@ -15,6 +15,6 @@ module "data_lake_settings" {
   ]
 
   trusted_resource_owners = [
-    local.environment_management.account_ids["data-platform-governance-development"]
+    local.environment_management.account_ids["data-platform-governance-development"] // TODO: make dynamic
   ]
 }
