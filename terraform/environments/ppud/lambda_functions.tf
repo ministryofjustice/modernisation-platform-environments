@@ -25,7 +25,7 @@ locals {
   # Lambda function configurations
   lambda_functions = {
     check_certificate_expiration = {
-      description  = "Function to check certificate expiration date and send a reminder for any under 30 days."
+      description  = "Function to check ACM certificate expiration dates and send a reminder for any under 30 days."
       role_key     = "get_certificate_expiry"
       environments = ["development", "preproduction", "production"]
       runtime      = "python3.13"
@@ -36,6 +36,27 @@ locals {
       environment = {
         variables = {
           EXPIRY_DAYS = "30"
+          SNS_TOPIC_ARN = {
+            development   = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:ppud-dev-cw-alerts"
+            preproduction = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:ppud-uat-cw-alerts"
+            production    = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:ppud-prod-cw-alerts"
+          }
+        }
+      }
+    }
+    check_internal_certificate_expiration = {
+      description  = "Function to check Internal PKI certificate expiration dates and send a reminder for any under 30 days."
+      role_key     = "get_certificate_expiry"
+      environments = ["development", "preproduction", "production"]
+      runtime      = "python3.13"
+      permissions = [{
+        principal         = "lambda.alarms.cloudwatch.amazonaws.com"
+        source_arn_suffix = "alarm:*"
+      }]
+      environment = {
+        variables = {
+          EXPIRY_DAYS = "30"
+          PARAMETER_PATH = "/certificates/"
           SNS_TOPIC_ARN = {
             development   = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:ppud-dev-cw-alerts"
             preproduction = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:ppud-uat-cw-alerts"

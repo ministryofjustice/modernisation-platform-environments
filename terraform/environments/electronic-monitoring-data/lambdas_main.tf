@@ -47,7 +47,7 @@ module "unzip_single_file" {
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
     BUCKET_NAME        = module.s3-data-bucket.bucket.id
-    EXPORT_BUCKET_NAME = local.is-production ? module.s3-unzipped-files-bucket.bucket.id : module.s3-ears-sars-bucket.bucket.id
+    EXPORT_BUCKET_NAME = module.s3-ears-sars-bucket.bucket.id
   }
 }
 
@@ -659,18 +659,18 @@ module "cloudwatch_alarm_threader" {
   )
 
   environment_variables = {
-    POWERTOOLS_LOG_LEVEL             = "INFO"    
-    SNS_TOPIC_ARN                    = aws_sns_topic.emds_alerts.arn
-    STATE_BUCKET                     = local.alarm_thread_state_bucket
-    STATE_PREFIX                     = local.alarm_thread_state_prefix
-    ENVIRONMENT                      = local.environment_shorthand
-    INCLUDE_REASON                   = "true"
-    ENABLE_CUSTOM_ACTIONS            = "false"
+    POWERTOOLS_LOG_LEVEL  = "INFO"
+    SNS_TOPIC_ARN         = aws_sns_topic.emds_alerts.arn
+    STATE_BUCKET          = local.alarm_thread_state_bucket
+    STATE_PREFIX          = local.alarm_thread_state_prefix
+    ENVIRONMENT           = local.environment_shorthand
+    INCLUDE_REASON        = "true"
+    ENABLE_CUSTOM_ACTIONS = "false"
     GLUE_DB_JANITOR_STATE_MACHINE_ARN = (
       aws_sfn_state_machine.staging_db_janitor.arn
     )
-    GLUE_DB_JANITOR_STALE_MINUTES    = "60"
-    GLUE_DB_JANITOR_BATCH_SIZE       = "2000"
+    GLUE_DB_JANITOR_STALE_MINUTES = "60"
+    GLUE_DB_JANITOR_BATCH_SIZE    = "2000"
   }
 }
 
@@ -679,7 +679,7 @@ module "cloudwatch_alarm_threader" {
 # Ears and Sars Request
 #-----------------------------------------------------------------------------------
 module "ears_sars_request" {
-  count                   = local.is-development || local.is-preproduction ? 1 : 0
+  count                   = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   source                  = "./modules/lambdas"
   is_image                = true
   ecr_repo_name           = "electronic-monitoring-ear-sars"
@@ -820,7 +820,7 @@ module "staging_db_janitor" {
   subnet_ids         = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    POWERTOOLS_LOG_LEVEL  = "INFO"    
+    POWERTOOLS_LOG_LEVEL  = "INFO"
     SNS_TOPIC_ARN         = aws_sns_topic.emds_alerts.arn
     ENVIRONMENT           = local.environment_shorthand
     STAGING_BUCKET        = module.s3-create-a-derived-table-bucket.bucket.id
