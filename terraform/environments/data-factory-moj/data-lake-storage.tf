@@ -5,4 +5,6 @@ module "data_lake_storage" {
 
   governance_account_id         = local.environment_management.account_ids["data-platform-governance-development"]
   lakeformation_access_role_arn = "arn:aws:iam::${local.environment_management.account_ids["data-platform-governance-development"]}:role/lakeformation-access"
+
+  depends_on = [module.data_lake_settings]
 }
