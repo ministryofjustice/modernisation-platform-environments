@@ -65,7 +65,7 @@ module "waf_ai_gateway" {
     }
 
     ip-allowlist = {
-      priority = 1
+      priority = 3
       action   = "allow"
 
       statement = {
@@ -138,9 +138,9 @@ module "waf_ai_gateway" {
       }
     }
     }, length(local.environment_configuration.ai_gateway_admin_ingress_allowlist) > 0 ? {
-    block-admin-unauthorized = {
-      priority = 2
-      action   = "block"
+    allow-admin-authorized = {
+      priority = 1
+      action   = "allow"
 
       statement = {
         and_statement = {
@@ -163,13 +163,38 @@ module "waf_ai_gateway" {
               }
             },
             {
-              not_statement = {
-                statement = {
-                  ip_set_reference_statement = {
-                    arn = module.waf_ip_set_ai_gateway_admin_allowlist[0].arn
-                  }
-                }
+              ip_set_reference_statement = {
+                arn = module.waf_ip_set_ai_gateway_admin_allowlist[0].arn
               }
+            }
+          ]
+        }
+      }
+
+      visibility_config = {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "ai-gateway-allow-admin-authorized"
+        sampled_requests_enabled   = true
+      }
+    }
+
+    block-admin-unauthorized = {
+      priority = 2
+      action   = "block"
+
+      statement = {
+        byte_match_statement = {
+          field_to_match = {
+            single_header = {
+              name = "host"
+            }
+          }
+          positional_constraint = "STARTS_WITH"
+          search_string         = "admin."
+          text_transformations = [
+            {
+              priority = 0
+              type     = "LOWERCASE"
             }
           ]
         }
