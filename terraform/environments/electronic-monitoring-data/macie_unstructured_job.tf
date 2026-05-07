@@ -1,4 +1,5 @@
 resource "aws_macie2_account" "macie_unstructured_spike" {
+  count  = local.is-development ? 1 : 0
   status = "ENABLED"
 }
 
