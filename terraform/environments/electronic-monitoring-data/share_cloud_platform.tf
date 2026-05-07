@@ -323,7 +323,7 @@ resource "aws_lakeformation_permissions" "emdi_mdss_tables" {
 }
 
 resource "aws_lakeformation_permissions" "emdi_di_db" {
-  count       = local.is-development || local.is-test ? 1 : 0
+  count       = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   principal   = module.emdi_trail_maps_role[0].iam_role_arn
   permissions = ["DESCRIBE"]
   database {
@@ -332,7 +332,7 @@ resource "aws_lakeformation_permissions" "emdi_di_db" {
 }
 
 resource "aws_lakeformation_permissions" "emdi_di_tables" {
-  count       = local.is-development || local.is-test ? 1 : 0
+  count       = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   principal   = module.emdi_trail_maps_role[0].iam_role_arn
   permissions = ["SELECT", "DESCRIBE"]
   table {
@@ -343,14 +343,14 @@ resource "aws_lakeformation_permissions" "emdi_di_tables" {
 
 
 resource "aws_iam_role_policy_attachment" "standard_athena_access_emdi" {
-  count      = local.is-development || local.is-test ? 1 : 0
+  count      = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   policy_arn = aws_iam_policy.standard_athena_access.arn
   role       = module.emdi_trail_maps_role[0].iam_role_name
 }
 
 
 resource "aws_iam_role_policy_attachment" "emdi_glue_access" {
-  count      = local.is-development || local.is-test ? 1 : 0
+  count      = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   policy_arn = aws_iam_policy.emac_di_permissions[0].arn
   role       = module.emdi_trail_maps_role[0].iam_role_name
 }
