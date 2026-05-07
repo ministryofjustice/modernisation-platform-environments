@@ -177,7 +177,7 @@ module "waf_ai_gateway" {
         sampled_requests_enabled   = true
       }
     }
-
+    } : {}, length(local.environment_configuration.ai_gateway_admin_ingress_allowlist) > 0 ? {
     block-admin-unauthorized = {
       priority = 2
       action   = "block"
