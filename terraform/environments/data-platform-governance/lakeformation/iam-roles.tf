@@ -13,7 +13,7 @@ module "lakeformation_access_iam_role" {
         "sts:TagSession",
       ]
       principals = [{
-        type        = "service"
+        type        = "Service"
         identifiers = ["lakeformation.amazonaws.com"]
       }]
     }
