@@ -796,7 +796,7 @@ module "create_p1_export" {
 #-----------------------------------------------------------------------------------
 
 module "insert_staged_position" {
-  count                          = 1
+  count                          = local.is-preproduction || local.is-production ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "insert_staged_position"
@@ -806,9 +806,8 @@ module "insert_staged_position" {
   memory_size                    = 512
   timeout                        = 300
   reserved_concurrent_executions = 1
-  ephemeral_storage_size         = 10240
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev                 = local.is-test ? "test" : "dev"
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
   subnet_ids                     = data.aws_subnets.shared-private.ids
   cloudwatch_retention_days      = 7
@@ -818,7 +817,7 @@ module "insert_staged_position" {
 }
 
 module "insert_ac_position" {
-  count                          = 1
+  count                          = local.is-preproduction || local.is-production ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "insert_ac_position"
@@ -828,9 +827,8 @@ module "insert_ac_position" {
   memory_size                    = 512
   timeout                        = 300
   reserved_concurrent_executions = 1
-  ephemeral_storage_size         = 10240
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev                 = local.is-test ? "test" : "dev"
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   security_group_ids             = [aws_security_group.lambda_generic.id]
   subnet_ids                     = data.aws_subnets.shared-private.ids
   cloudwatch_retention_days      = 7
@@ -838,6 +836,8 @@ module "insert_ac_position" {
     TASK_IDENTIFIER = "insert_lambda_load"
   }
 }
+
+#-----------------------------------------------------------------------------------
 # Staging DB janitor
 #-----------------------------------------------------------------------------------
 
