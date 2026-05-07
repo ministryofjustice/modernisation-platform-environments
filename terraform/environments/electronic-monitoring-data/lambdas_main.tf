@@ -832,6 +832,54 @@ module "staging_db_janitor" {
     STATE_PREFIX          = local.alarm_thread_state_prefix
   }
 }
+
+# ------------------------------------------------------------------------------
+# Lambda: landing_dlq_redriver
+# ------------------------------------------------------------------------------
+
+module "landing_dlq_redriver" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "landing_dlq_redriver"
+  role_name                      = aws_iam_role.landing_dlq_redriver.name
+  role_arn                       = aws_iam_role.landing_dlq_redriver.arn
+  handler                        = "landing_dlq_redriver.handler"
+  memory_size                    = 512
+  timeout                        = 300
+  reserved_concurrent_executions = 1
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    POWERTOOLS_LOG_LEVEL = "INFO"
+
+    SNS_TOPIC_ARN = aws_sns_topic.emds_alerts.arn
+    ENVIRONMENT   = local.environment_shorthand
+    STATE_BUCKET  = local.alarm_thread_state_bucket
+    STATE_PREFIX  = local.alarm_thread_state_prefix
+
+    LANDING_DLQ_CONFIG = jsonencode(local.landing_dlq_redriver_config)
+
+    MAX_MESSAGES_PER_RUN                   = "50"
+    MAX_BATCHES_PER_EXECUTION              = "20"
+    DLQ_RECEIVE_VISIBILITY_TIMEOUT_SECONDS = "30"
+    LEGACY_UNKNOWN_RETRY_POLICY            = "retry_once"
+    AUTO_RETRY_MAX_ATTEMPTS                = "2"
+    RETRY_ONCE_MAX_ATTEMPTS                = "1"
+  }
+}
+
 # ------------------------------------------------------------------------------
 # Step Functions: landing DLQ redriver workflow
 # ------------------------------------------------------------------------------
