@@ -2131,3 +2131,107 @@ resource "aws_lakeformation_permissions" "lambda_p1_table_access" {
     wildcard      = true
   }
 }
+
+#-----------------------------------------------------------------------------------
+# Landing DLQ redriver IAM Role
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "landing_dlq_redriver" {
+  name               = "landing_dlq_redriver_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "landing_dlq_redriver_policy_document" {
+  statement {
+    sid    = "AllowQueueLookup"
+    effect = "Allow"
+
+    actions = [
+      "sqs:GetQueueUrl",
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowLandingDlqRedrive"
+    effect = "Allow"
+
+    actions = [
+      "sqs:ChangeMessageVisibility",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:ReceiveMessage",
+      "sqs:SendMessage",
+    ]
+
+    resources = local.landing_dlq_redriver_queue_arns
+  }
+
+  statement {
+    sid    = "AllowLandingFailureLogLookup"
+    effect = "Allow"
+
+    actions = [
+      "logs:DescribeLogStreams",
+      "logs:FilterLogEvents",
+      "logs:GetLogEvents",
+      "logs:GetQueryResults",
+      "logs:StartQuery",
+      "logs:StopQuery",
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowAlarmThreadStateRead"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${local.alarm_thread_state_bucket}/${local.alarm_thread_state_prefix}/${local.environment_shorthand}/*"
+    ]
+  }
+
+  statement {
+    sid    = "AllowPublishToAlertsTopic"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [
+      aws_sns_topic.emds_alerts.arn,
+    ]
+  }
+
+  statement {
+    sid    = "AllowUseOfAlertsKmsKey"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+      "kms:GenerateDataKey*",
+    ]
+
+    resources = [
+      aws_kms_key.emds_alerts.arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "landing_dlq_redriver" {
+  name   = "landing_dlq_redriver_lambda_policy"
+  policy = data.aws_iam_policy_document.landing_dlq_redriver_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "landing_dlq_redriver_attach" {
+  role       = aws_iam_role.landing_dlq_redriver.name
+  policy_arn = aws_iam_policy.landing_dlq_redriver.arn
+}
