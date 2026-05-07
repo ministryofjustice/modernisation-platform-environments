@@ -367,9 +367,9 @@ resource "aws_ebs_volume" "dbf01" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s:/CCMS/EBS/%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf02")) },
+    { Name = lower(format("%s:/CCMS/EBS/%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf01")) },
     { device-name = "/dev/sdq" },
-    { mount-point = "/CCMS/EBS/dbf02" }
+    { mount-point = "/CCMS/EBS/dbf01" }
   )
 }
 
@@ -395,9 +395,9 @@ resource "aws_ebs_volume" "dbf02" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s:/CCMS/EBS/%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf01")) },
+    { Name = lower(format("%s:/CCMS/EBS/%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf02")) },
     { device-name = "/dev/sdr" },
-    { mount-point = "/CCMS/EBS/dbf01" }
+    { mount-point = "/CCMS/EBS/dbf02" }
   )
 }
 
