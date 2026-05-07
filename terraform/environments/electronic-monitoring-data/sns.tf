@@ -96,6 +96,18 @@ data "aws_iam_policy_document" "emds_alerts_kms" {
       identifiers = [aws_iam_role.staging_db_janitor.arn]
     }
   }
+
+  statement {
+    sid       = "AllowLandingDlqRedriverUseOfKey"
+    effect    = "Allow"
+    resources = ["*"]
+    actions   = ["kms:Decrypt", "kms:GenerateDataKey"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.landing_dlq_redriver.arn]
+    }
+  }
 }
 
 data "aws_iam_policy_document" "emds_alerts_topic_policy" {
@@ -164,6 +176,22 @@ data "aws_iam_policy_document" "emds_alerts_topic_policy" {
     principals {
       type        = "AWS"
       identifiers = [aws_iam_role.staging_db_janitor.arn]
+    }
+  }
+
+  statement {
+    sid    = "AllowLandingDlqRedriverLambdaToPublish"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [aws_sns_topic.emds_alerts.arn]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.landing_dlq_redriver.arn]
     }
   }
 

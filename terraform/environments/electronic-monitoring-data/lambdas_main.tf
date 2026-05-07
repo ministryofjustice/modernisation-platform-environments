@@ -832,3 +832,224 @@ module "staging_db_janitor" {
     STATE_PREFIX          = local.alarm_thread_state_prefix
   }
 }
+
+# ------------------------------------------------------------------------------
+# Lambda: landing_dlq_redriver
+# ------------------------------------------------------------------------------
+
+module "landing_dlq_redriver" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "landing_dlq_redriver"
+  role_name                      = aws_iam_role.landing_dlq_redriver.name
+  role_arn                       = aws_iam_role.landing_dlq_redriver.arn
+  handler                        = "landing_dlq_redriver.handler"
+  memory_size                    = 512
+  timeout                        = 300
+  reserved_concurrent_executions = 1
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    POWERTOOLS_LOG_LEVEL = "INFO"
+
+    SNS_TOPIC_ARN = aws_sns_topic.emds_alerts.arn
+    ENVIRONMENT   = local.environment_shorthand
+    STATE_BUCKET  = local.alarm_thread_state_bucket
+    STATE_PREFIX  = local.alarm_thread_state_prefix
+
+    LANDING_DLQ_CONFIG = jsonencode(local.landing_dlq_redriver_config)
+
+    MAX_MESSAGES_PER_RUN                   = "50"
+    MAX_BATCHES_PER_EXECUTION              = "20"
+    DLQ_RECEIVE_VISIBILITY_TIMEOUT_SECONDS = "30"
+    LEGACY_UNKNOWN_RETRY_POLICY            = "retry_once"
+    AUTO_RETRY_MAX_ATTEMPTS                = "2"
+    RETRY_ONCE_MAX_ATTEMPTS                = "1"
+  }
+}
+
+# ------------------------------------------------------------------------------
+# Step Functions: landing DLQ redriver workflow
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "landing_dlq_redriver_sfn_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["states.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "landing_dlq_redriver_state_machine" {
+  name               = "landing_dlq_redriver_state_machine_role"
+  assume_role_policy = data.aws_iam_policy_document.landing_dlq_redriver_sfn_assume.json
+}
+
+resource "aws_iam_role_policy" "landing_dlq_redriver_state_machine_invoke" {
+  name = "landing_dlq_redriver_state_machine_invoke_policy"
+  role = aws_iam_role.landing_dlq_redriver_state_machine.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowInvokeLandingDlqRedriverLambda"
+        Effect = "Allow"
+        Action = [
+          "lambda:InvokeFunction",
+        ]
+        Resource = [
+          module.landing_dlq_redriver.lambda_function_arn,
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_sfn_state_machine" "landing_dlq_redriver" {
+  name     = "landing_dlq_redriver"
+  role_arn = aws_iam_role.landing_dlq_redriver_state_machine.arn
+
+  definition = jsonencode({
+    Comment = "Redrives landing DLQ messages after CloudWatch DLQ alarms."
+    StartAt = "WaitForThreadState"
+    States = {
+      WaitForThreadState = {
+        Type    = "Wait"
+        Seconds = 10
+        Next    = "RedriverBatch"
+      }
+
+      RedriverBatch = {
+        Type     = "Task"
+        Resource = "arn:aws:states:::lambda:invoke"
+        Parameters = {
+          FunctionName = module.landing_dlq_redriver.lambda_function_arn
+          "Payload.$" = "$"
+        }
+        OutputPath = "$.Payload"
+        Retry = [
+          {
+            ErrorEquals = [
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException",
+              "Lambda.TooManyRequestsException",
+            ]
+            IntervalSeconds = 2
+            BackoffRate     = 2
+            MaxAttempts     = 3
+          }
+        ]
+        Next = "CheckStatus"
+      }
+
+      CheckStatus = {
+        Type = "Choice"
+        Choices = [
+          {
+            Variable     = "$.status"
+            StringEquals = "continuing"
+            Next         = "WaitBeforeNextBatch"
+          },
+          {
+            Variable     = "$.status"
+            StringEquals = "ok"
+            Next         = "Complete"
+          },
+          {
+            Variable     = "$.status"
+            StringEquals = "halted"
+            Next         = "Complete"
+          },
+          {
+            Variable     = "$.status"
+            StringEquals = "ignored"
+            Next         = "Complete"
+          }
+        ]
+        Default = "UnexpectedResult"
+      }
+
+      WaitBeforeNextBatch = {
+        Type    = "Wait"
+        Seconds = 30
+        Next    = "RedriverBatch"
+      }
+
+      Complete = {
+        Type = "Succeed"
+      }
+
+      UnexpectedResult = {
+        Type  = "Fail"
+        Error = "UnexpectedLandingRedriverResult"
+        Cause = "The landing redriver returned an unexpected status."
+      }
+    }
+  })
+}
+
+# ------------------------------------------------------------------------------
+# EventBridge: alarm state changes -> landing DLQ redriver workflow
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "landing_dlq_redriver_eventbridge_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "landing_dlq_redriver_eventbridge" {
+  name               = "landing_dlq_redriver_eventbridge_role"
+  assume_role_policy = data.aws_iam_policy_document.landing_dlq_redriver_eventbridge_assume.json
+}
+
+resource "aws_iam_role_policy" "landing_dlq_redriver_eventbridge_start" {
+  name = "landing_dlq_redriver_eventbridge_start_policy"
+  role = aws_iam_role.landing_dlq_redriver_eventbridge.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowStartLandingDlqRedriverWorkflow"
+        Effect = "Allow"
+        Action = [
+          "states:StartExecution",
+        ]
+        Resource = [
+          aws_sfn_state_machine.landing_dlq_redriver.arn,
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_cloudwatch_event_target" "landing_dlq_redriver" {
+  rule     = aws_cloudwatch_event_rule.alarm_state_change_threader.name
+  arn      = aws_sfn_state_machine.landing_dlq_redriver.arn
+  role_arn = aws_iam_role.landing_dlq_redriver_eventbridge.arn
+}
