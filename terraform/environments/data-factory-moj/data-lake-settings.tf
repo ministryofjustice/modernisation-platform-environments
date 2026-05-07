@@ -1,7 +1,7 @@
 module "data_lake_settings" {
   count = local.environment == "development" ? 1 : 0
 
-  source = "git::https://github.com/ministryofjustice/terraform-aws-data-platform-lakeformation.git//modules/data-lake-settings?ref=43c73a901f630a37f55cc91516de3d41fe858e03" # v0.0.1
+  source = "git::https://github.com/ministryofjustice/terraform-aws-data-platform-lakeformation.git//modules/data-lake-storage?ref=feat/data-lake-storage"
 
   admins = [
     "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan",
