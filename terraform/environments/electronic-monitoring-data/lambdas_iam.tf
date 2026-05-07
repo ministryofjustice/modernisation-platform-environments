@@ -2158,7 +2158,8 @@ data "aws_iam_policy_document" "insert_load_policy_document" {
       "athena:DeletePreparedStatement",
     ]
     resources = [
-      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:*/*"
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:workgroup/*",
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:datacatalog/*"
     ]
   }
   statement {
@@ -2176,7 +2177,10 @@ data "aws_iam_policy_document" "insert_load_policy_document" {
       "s3:ListBucketMultipartUploads",
       "s3:ListMultipartUploadParts"
     ]
-    resources = [module.s3-athena-bucket.bucket.arn]
+    resources = [
+      module.s3-create-a-derived-table-bucket.bucket.arn,
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/*",
+      ]
   }
   statement {
     actions = [
@@ -2199,7 +2203,11 @@ data "aws_iam_policy_document" "insert_load_policy_document" {
           "glue:GetTables",
           "glue:GetPartition",
           "glue:GetPartitions"]
-    resources = "*"
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      ]
     }
 }
 
