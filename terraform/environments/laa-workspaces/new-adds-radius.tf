@@ -25,7 +25,7 @@ resource "aws_directory_service_radius_settings" "workspaces_ad_radius" {
   radius_timeout          = 5
   radius_retries          = 3
   shared_secret           = data.aws_secretsmanager_secret_version.radius_shared_secret[0].secret_string
-  authentication_protocol = "MS-CHAPv2"
+  authentication_protocol = "PAP"
   display_label           = "MFA"
   use_same_username       = true
 
