@@ -6,6 +6,6 @@ module "data_lake_settings" {
   ]
 
   trusted_resource_owners = [
-    local.environment_management.account_ids["data-platform-governance-development"]
+    for factory in local.lakeformation_configuration.factories : local.environment_management.account_ids[factory]
   ]
 }

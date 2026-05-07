@@ -1,0 +1,11 @@
+---
+environment:
+  development:
+    factories:
+      - data-factory-moj-development
+  test:
+    factories: []
+  preproduction:
+    factories: []
+  production:
+    factories: []
