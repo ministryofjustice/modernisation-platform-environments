@@ -34,7 +34,7 @@ resource "aws_lakeformation_permissions" "data_scientist_test_table_permissions"
 }
 
 
-resource "aws_lakeformation_permissions" "data_scientist_pp_db_permissions" {
+resource "aws_lakeformation_permissions" "data_scientist_db_permissions" {
   for_each = local.is-preproduction ? toset(local.read_only_dbs) : []
   principal = one(data.aws_iam_roles.mp_data_scientist.arns)
 
@@ -45,7 +45,7 @@ resource "aws_lakeformation_permissions" "data_scientist_pp_db_permissions" {
   permissions = ["DESCRIBE"]
 }
 
-resource "aws_lakeformation_permissions" "data_scientist_test_table_permissions" {
+resource "aws_lakeformation_permissions" "data_scientist_table_permissions" {
   count     = local.is-preproduction ? toset(local.read_only_dbs) : []
   principal = one(data.aws_iam_roles.mp_data_scientist.arns)
 
