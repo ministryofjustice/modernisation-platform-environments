@@ -30,7 +30,7 @@ module "waf_ai_gateway" {
   name  = "ai-gateway-${local.environment}"
   scope = "REGIONAL"
 
-  default_action = "allow"
+  default_action = "block"
 
   association_resource_arns = {
     alb = data.aws_lb.ai_gateway.arn
@@ -117,26 +117,6 @@ module "waf_ai_gateway" {
       }
     }
 
-    block-all = {
-      priority = 99
-      action   = "block"
-
-      statement = {
-        not_statement = {
-          statement = {
-            ip_set_reference_statement = {
-              arn = module.waf_ip_set_ai_gateway_allowlist.arn
-            }
-          }
-        }
-      }
-
-      visibility_config = {
-        cloudwatch_metrics_enabled = true
-        metric_name                = "ai-gateway-block-all"
-        sampled_requests_enabled   = true
-      }
-    }
     }, length(local.environment_configuration.ai_gateway_admin_ingress_allowlist) > 0 ? {
     allow-admin-authorized = {
       priority = 1
@@ -203,6 +183,23 @@ module "waf_ai_gateway" {
       visibility_config = {
         cloudwatch_metrics_enabled = true
         metric_name                = "ai-gateway-block-admin-unauthorized"
+        sampled_requests_enabled   = true
+      }
+    }
+  } : {}, length(local.environment_configuration.ai_gateway_admin_ingress_allowlist) > 0 ? {
+    ip-allowlist-admin = {
+      priority = 4
+      action   = "allow"
+
+      statement = {
+        ip_set_reference_statement = {
+          arn = module.waf_ip_set_ai_gateway_admin_allowlist[0].arn
+        }
+      }
+
+      visibility_config = {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "ai-gateway-ip-allowlist-admin"
         sampled_requests_enabled   = true
       }
     }
