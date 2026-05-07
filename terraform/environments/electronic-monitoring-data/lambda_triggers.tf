@@ -384,7 +384,7 @@ resource "aws_lambda_event_source_mapping" "p1_creation_trigger" {
   # target staged_position
   resource "aws_cloudwatch_event_target" "insert_staged_position" {
     count = local.is-preproduction || local.is-production ? 0 : 1
-    rule  = aws_cloudwatch_event_rule.insert_load_schedule.name
+    rule  = aws_cloudwatch_event_rule.insert_load_schedule[0].name
     arn   = module.insert_staged_position[0].arn 
   }
 
@@ -394,14 +394,14 @@ resource "aws_lambda_event_source_mapping" "p1_creation_trigger" {
     action        = "lambda:InvokeFunction"
     function_name = module.insert_staged_position[0].name
     principal     = "events.amazonaws.com"
-    source_arn    = aws_cloudwatch_event_rule.insert_load_schedule.arn
+    source_arn    = aws_cloudwatch_event_rule.insert_load_schedule[0].arn
   }
 
 
   # target insert_ac_position
   resource "aws_cloudwatch_event_target" "insert_ac_position" {
     count = local.is-preproduction || local.is-production ? 0 : 1
-    rule  = aws_cloudwatch_event_rule.insert_load_schedule.name
+    rule  = aws_cloudwatch_event_rule.insert_load_schedule[0].name
     arn   = module.insert_ac_position[0].arn
   }
 
@@ -411,6 +411,6 @@ resource "aws_lambda_event_source_mapping" "p1_creation_trigger" {
     action        = "lambda:InvokeFunction"
     function_name = module.insert_ac_position[0].name
     principal     = "events.amazonaws.com"
-    source_arn    = aws_cloudwatch_event_rule.insert_load_schedule.arn
+    source_arn    = aws_cloudwatch_event_rule.insert_load_schedule[0].arn
   }
 
