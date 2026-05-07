@@ -131,6 +131,9 @@ locals {
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
         "35.176.93.186/32", # GlobalProtect (Alpha)
+        # Sites
+        "213.121.161.112/28", # 102PF
+        "51.149.2.0/24",      # 10SC
       ]
       ai_gateway_admin_ingress_allowlist = []
       ai_gateway_models                  = {}
