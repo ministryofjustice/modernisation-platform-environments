@@ -716,7 +716,8 @@ data "aws_iam_policy_document" "crossaccount_secret_kms" {
     effect = "Allow"
     actions = [
       "kms:Decrypt",
-      "kms:DescribeKey"
+      "kms:DescribeKey",
+      "kms:GenerateDataKey"
     ]
     resources = ["*"]
 
@@ -799,8 +800,7 @@ resource "aws_secretsmanager_secret_policy" "dpr_crossaccount_assessment_view" {
         }
         Action = [
           "secretsmanager:PutSecretValue",
-          "secretsmanager:UpdateSecret",
-          "kms:GenerateDataKey"
+          "secretsmanager:UpdateSecret"
         ]
         Resource = "*"
       }
