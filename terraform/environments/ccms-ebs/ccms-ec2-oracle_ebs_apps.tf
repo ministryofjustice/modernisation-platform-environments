@@ -22,8 +22,7 @@ resource "aws_instance" "ec2_ebsapps" {
       ebs_block_device,
       ebs_optimized,
       user_data,
-      user_data_replace_on_change,
-      tags
+      user_data_replace_on_change
     ]
   }
   user_data_replace_on_change = false
@@ -139,8 +138,7 @@ resource "aws_ebs_volume" "stage" {
   count = local.application_data.accounts[local.environment].ebsapps_no_instances
   lifecycle {
     ignore_changes = [
-      kms_key_id,
-      tags
+      kms_key_id
     ]
   }
   availability_zone = aws_instance.ec2_ebsapps[count.index].availability_zone
@@ -150,7 +148,8 @@ resource "aws_ebs_volume" "stage" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = "stage" }
+    { Name = "apps-${count.index + 1}:/stage" },
+    { mount-point = "/stage" }
   )
 }
 

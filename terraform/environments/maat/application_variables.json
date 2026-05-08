@@ -107,7 +107,7 @@
       "region": "eu-west-2",
       "maat_orch_base_url": "https://laa-maat-orchestration-uat.apps.live.cloud-platform.service.justice.gov.uk",
       "maat_orch_oauth_url": "https://laa-crime-auth-orchestration.auth.eu-west-2.amazoncognito.com/oauth2/token",
-      "maat_db_url": "jdbc:oracle:thin:@maatdb-preproduction-database.c9ksgaq6gwn7.eu-west-2.rds.amazonaws.com:1521:MAATDB",
+      "maat_db_url": "jdbc:oracle:thin:@maatdb-preproduction-database-bvmx.c9ksgaq6gwn7.eu-west-2.rds.amazonaws.com:1521:MAATDB",
       "maat_caa_oauth_url": "https://caa-api-uat.auth.eu-west-2.amazoncognito.com/oauth2/token",
       "maat_caa_oauth_scope": "caa-api-uat/standard",
       "maat_bc_endpoint_url": "https://uat.laa-benefit-checker.service.justice.gov.uk/lsx/lsc-services/benefitChecker",

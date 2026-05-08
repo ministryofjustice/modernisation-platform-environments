@@ -272,7 +272,7 @@ locals {
       timeout      = 900
       memory_size  = 1024
       role_key     = "get_cloudwatch"
-      environments = ["production"]
+      environments = ["development", "production"]
       layers       = ["xlsxwriter", "requests"]
       vpc_config   = { production = true }
       permissions = [{

@@ -4,7 +4,7 @@ locals {
   core_shared_services_id    = local.environment_management.account_ids["core-shared-services-production"]
 }
 
-data "aws_iam_policy_document" "ecs_assume_policy" {
+data "aws_iam_policy_document" "ecs_gdpr_assume_policy" {
   statement {
     actions = ["sts:AssumeRole"]
     principals {
@@ -47,7 +47,7 @@ data "aws_iam_policy_document" "ecs_execution_policy" {
 
 resource "aws_iam_role" "ecs_execution_role" {
   name               = "ears-sars-app-execution-role"
-  assume_role_policy = data.aws_iam_policy_document.ecs_assume_policy.json
+  assume_role_policy = data.aws_iam_policy_document.ecs_gdpr_assume_policy.json
 }
 resource "aws_iam_policy" "ecs_execution_policy" {
   name   = "ears-sars-app-ecs-execution-role-policy"
@@ -60,7 +60,7 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_role_policy_attach" {
 
 resource "aws_iam_role" "ecs_gdpr_execution_role" {
   name               = "emds-gdpr-execution-role"
-  assume_role_policy = data.aws_iam_policy_document.ecs_assume_policy.json
+  assume_role_policy = data.aws_iam_policy_document.ecs_gdpr_assume_policy.json
 }
 
 resource "aws_iam_policy" "ecs_gdpr_execution_policy" {
