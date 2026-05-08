@@ -26,7 +26,8 @@ locals {
 }
 
 resource "aws_cloudwatch_metric_alarm" "rds_alarms" {
-  for_each = toset(local.rds_oracle_metrics)
+ # for_each = toset(local.rds_oracle_metrics)
+  for_each = var.create_std_instance ? toset(local.rds_oracle_metrics) : toset([]) 
 
   alarm_name          = "${local.alarm_name_prefix}-${each.key}"
   comparison_operator = local.common_rds_config.comparison_operator
@@ -41,7 +42,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_alarms" {
   ok_actions          = [aws_sns_topic.maatdb_alerting_topic.arn]
 
   dimensions = {
-    DBInstanceIdentifier = module.rds.db_instance_id
+    DBInstanceIdentifier = module.rds.db_instance_identifier_std
   }
 
   depends_on = [

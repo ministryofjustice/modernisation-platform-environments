@@ -571,3 +571,7 @@ output "db_instance_id" {
 output "db_instance_identifier" {
   value = aws_db_instance.appdb1.identifier
 }
+
+output "db_instance_identifier_std" {
+  value = try(aws_db_instance.appdb1_std[0].identifier, null)
+}
