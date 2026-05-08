@@ -628,7 +628,7 @@ resource "aws_iam_policy" "cmt_specific_access" {
 }
 
 resource "aws_iam_policy" "emac_di_permissions" {
-  count       = local.is-development || local.is-test ? 1 : 0
+  count       = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   name_prefix = "emac_di_permissions"
   description = "Access to the Glue tables required by Acquisitive Crime."
   policy      = data.aws_iam_policy_document.emac_di_permissions.json
