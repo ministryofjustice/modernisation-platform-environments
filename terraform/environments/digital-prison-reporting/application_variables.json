@@ -60,7 +60,10 @@
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
       "scheduled_dataset_lambda_version": "vLatest",
-      "probation_domains": ["prb-sentence-plan"],
+      "probation_domains": [
+        "prb-sentence-plan",
+        "prb-assessment-view"
+      ],
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -292,7 +295,10 @@
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
       "scheduled_dataset_lambda_version": "vLatest",
-      "probation_domains": ["prb-sentence-plan"],
+      "probation_domains": [
+        "prb-sentence-plan",
+        "prb-assessment-view"
+      ],
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -501,7 +507,10 @@
       "setup_redshift_schedule": true,
       "enable_redshift_health_check": true,
       "scheduled_dataset_lambda_version": "vLatest",
-      "probation_domains": ["prb-sentence-plan"],
+      "probation_domains": [
+        "prb-sentence-plan",
+        "prb-assessment-view"
+      ],
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -727,7 +736,10 @@
       "setup_scheduled_action_iam_role": false,
       "setup_redshift_schedule": false,
       "scheduled_dataset_lambda_version": "vLatest",
-      "probation_domains": ["prb-sentence-plan"],
+      "probation_domains": [
+        "prb-sentence-plan",
+        "prb-assessment-view"
+      ],
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
