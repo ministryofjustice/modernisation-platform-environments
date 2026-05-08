@@ -2175,7 +2175,7 @@ data "aws_iam_policy_document" "insert_load_policy_document" {
       "s3:GetBucketLocation",
       "s3:ListBucket",
       "s3:ListBucketMultipartUploads",
-      "s3:ListMultipartUploadParts"
+      "s3:ListMultipartUploadParts",
     ]
     resources = [
       module.s3-create-a-derived-table-bucket.bucket.arn,
@@ -2188,10 +2188,16 @@ data "aws_iam_policy_document" "insert_load_policy_document" {
       "s3:PutObject",
       "s3:DeleteObject",
       "s3:ListBucket",
-      "s3:ListBucketMultipartUploads",
+      "s3:ListAllMyBuckets",
       "s3:ListMultipartUploadParts"
     ]
     resources = ["${module.s3-athena-bucket.bucket.arn}/*"]
+  }
+  statement {
+    sid       = "S3BucketPerms"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets"]
+    resources = ["*"]
   }
   statement { 
     sid    = "GluePermissions"
