@@ -2144,6 +2144,8 @@ resource "aws_iam_role" "insert_load" {
 
 data "aws_iam_policy_document" "insert_load_policy_document" {
   statement {
+    sid    = "AthenaPermissions"
+    effect = "Allow" 
     actions = [
       "athena:GetDataCatalog",
       "athena:GetQueryExecution",
@@ -2172,26 +2174,21 @@ data "aws_iam_policy_document" "insert_load_policy_document" {
   }
   statement {
     actions = [
-      "s3:GetBucketLocation",
-      "s3:ListBucket",
-      "s3:ListBucketMultipartUploads",
-      "s3:ListMultipartUploadParts",
-    ]
-    resources = [
-      module.s3-create-a-derived-table-bucket.bucket.arn,
-      "${module.s3-create-a-derived-table-bucket.bucket.arn}/*",
-      ]
-  }
-  statement {
-    actions = [
       "s3:GetObject",
       "s3:PutObject",
       "s3:DeleteObject",
       "s3:ListBucket",
-      "s3:ListAllMyBuckets",
-      "s3:ListMultipartUploadParts"
+      "s3:ListMultipartUploadParts",
+      "s3:GetBucketLocation",
     ]
-    resources = ["${module.s3-athena-bucket.bucket.arn}/*"]
+    resources = [
+      module.s3-athena-bucket.bucket.arn,
+      "${module.s3-athena-bucket.bucket.arn}/*",
+      "${module.s3-athena-bucket.bucket.arn}/output/*",
+      module.s3-create-a-derived-table-bucket.bucket.arn,
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/*"
+      ]
+
   }
   statement {
     sid       = "S3BucketPerms"
