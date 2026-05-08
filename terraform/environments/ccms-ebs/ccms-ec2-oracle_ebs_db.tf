@@ -107,7 +107,7 @@ resource "aws_ebs_volume" "export_home" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s:/%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "export/home")) },
+    { Name = format("%s:/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), "export/home") },
     { mount-point = "/export/home" },
     { device-name = "/dev/sdh" }
   )
@@ -133,7 +133,7 @@ resource "aws_ebs_volume" "u01" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s:/%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "u01")) },
+    { Name = format("%s:/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), "u01") },
     { mount-point = "/u01" },
     { device-name = "/dev/sdi" }
   )
@@ -265,7 +265,7 @@ resource "aws_ebs_volume" "backup_clone" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "backup")) },
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "backup") },
     { device-name = "/dev/sdz" }
   )
 }
