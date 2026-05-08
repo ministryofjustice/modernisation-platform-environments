@@ -112,13 +112,16 @@ systemctl start mariadb
 # Wait for MariaDB to start
 sleep 5
 
-# Secure MariaDB installation (automated)
-mysql -e "UPDATE mysql.user SET Password=PASSWORD('$${MARIADB_ROOT_PASSWORD}') WHERE User='root';"
-mysql -e "DELETE FROM mysql.user WHERE User='';"
-mysql -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
-mysql -e "DROP DATABASE IF EXISTS test;"
-mysql -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';"
-mysql -e "FLUSH PRIVILEGES;"
+# Secure MariaDB installation (automated, non-interactive)
+# Run all commands in a single batch before setting password
+mysql <<MYSQL_COMMANDS
+DELETE FROM mysql.user WHERE User='';
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+DROP DATABASE IF EXISTS test;
+DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
+UPDATE mysql.user SET Password=PASSWORD('$${MARIADB_ROOT_PASSWORD}') WHERE User='root';
+FLUSH PRIVILEGES;
+MYSQL_COMMANDS
 
 echo "✓ MariaDB installed and secured"
 
@@ -304,7 +307,7 @@ echo "✓ LinOTP Perl module installed and configured"
 ### 11. Configure FreeRADIUS Sites
 ##############################################
 
-echo "[11/11] Configuring FreeRADIUS sites..."
+echo "[11/12] Configuring FreeRADIUS sites..."
 
 # Remove default site configs
 rm -f /etc/raddb/sites-enabled/{inner-tunnel,default}
@@ -365,6 +368,63 @@ systemctl enable radiusd
 systemctl start radiusd
 
 echo "✓ FreeRADIUS configured and started"
+
+##############################################
+### 12. Install CloudWatch Agent
+##############################################
+
+echo "[12/12] Installing CloudWatch agent..."
+
+# Download and install CloudWatch agent
+wget -q https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
+rpm -U ./amazon-cloudwatch-agent.rpm
+rm -f ./amazon-cloudwatch-agent.rpm
+
+# Create CloudWatch agent configuration
+cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<'EOF'
+{
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "/var/log/radius-install.log",
+            "log_group_name": "/aws/ec2/laa-workspaces-radius",
+            "log_stream_name": "{instance_id}/install"
+          },
+          {
+            "file_path": "/var/log/radius/radius.log",
+            "log_group_name": "/aws/ec2/laa-workspaces-radius",
+            "log_stream_name": "{instance_id}/radius"
+          },
+          {
+            "file_path": "/var/log/httpd/error_log",
+            "log_group_name": "/aws/ec2/laa-workspaces-radius",
+            "log_stream_name": "{instance_id}/httpd-error"
+          },
+          {
+            "file_path": "/var/log/linotp/linotp.log",
+            "log_group_name": "/aws/ec2/laa-workspaces-radius",
+            "log_stream_name": "{instance_id}/linotp"
+          }
+        ]
+      }
+    }
+  }
+}
+EOF
+
+# Start CloudWatch agent
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+  -a fetch-config \
+  -m ec2 \
+  -s \
+  -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+
+# Enable CloudWatch agent to start on boot
+systemctl enable amazon-cloudwatch-agent
+
+echo "✓ CloudWatch agent installed and started"
 
 ##############################################
 ### Installation Complete
