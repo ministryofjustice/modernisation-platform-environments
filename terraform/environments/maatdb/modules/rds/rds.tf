@@ -575,3 +575,7 @@ output "db_instance_identifier" {
 output "db_instance_identifier_std" {
   value = try(aws_db_instance.appdb1_std[0].identifier, null)
 }
+
+output "create_std_instance" {
+  value = var.create_std_instance
+}
