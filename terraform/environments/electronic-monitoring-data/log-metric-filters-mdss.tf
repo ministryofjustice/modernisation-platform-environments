@@ -1,3 +1,15 @@
+resource "aws_cloudwatch_log_metric_filter" "mdss_file_ok" {
+  name           = "mdss-file-ok"
+  log_group_name = module.load_mdss_lambda.cloudwatch_log_group.name
+  pattern        = "{ $.message.event = \"MDSS_FILE_OK\" }"
+
+  metric_transformation {
+    name      = "MdssFileOkCount"
+    namespace = "EMDS/MDSS"
+    value     = "1"
+  }
+}
+
 resource "aws_cloudwatch_log_metric_filter" "mdss_file_fail" {
   name           = "mdss-file-fail"
   log_group_name = module.load_mdss_lambda.cloudwatch_log_group.name
