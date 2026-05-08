@@ -35,7 +35,7 @@ module "ecs_policies" {
 }
 
 module "ecs_service" {
-  source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=TM-2012-add-ecs-service-capacity-provider" # Get MP team to merge branch and release new version
+  source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v6.0.2"
   container_definitions = nonsensitive(module.container_definition.json_encoded_list)
   cluster_arn           = var.ecs_cluster_arn
   name                  = "${var.env_name}-${var.name}"
