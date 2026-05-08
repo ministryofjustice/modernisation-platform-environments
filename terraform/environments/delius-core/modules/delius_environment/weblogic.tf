@@ -15,7 +15,7 @@ module "weblogic" {
 
   desired_count = var.delius_microservice_configs.weblogic.task_count
 
-  force_new_deployment = true # Temporarily true to update capacity providers, set to false if found
+  force_new_deployment = false
 
   pin_task_definition_revision           = try(var.delius_microservice_configs.weblogic.task_definition_revision, 0)
   ignore_changes_service_task_definition = false
@@ -220,6 +220,6 @@ resource "aws_ecs_capacity_provider" "weblogic" {
       target_capacity = 100
     }
 
-    managed_termination_protection = "DISABLED"
+    managed_termination_protection = "ENABLED"
   }
 }
