@@ -932,7 +932,7 @@ resource "aws_sfn_state_machine" "landing_dlq_redriver" {
     States = {
       WaitForThreadState = {
         Type    = "Wait"
-        Seconds = 10
+        Seconds = 600
         Next    = "RedriverBatch"
       }
 
@@ -970,7 +970,40 @@ resource "aws_sfn_state_machine" "landing_dlq_redriver" {
           },
           {
             Variable     = "$.status"
+            StringEquals = "settling"
+            Next         = "WaitAfterReplay"
+          },
+          {
+            Variable     = "$.status"
             StringEquals = "ok"
+            Next         = "Complete"
+          },
+          {
+            Variable     = "$.status"
+            StringEquals = "completed_with_manual_items"
+            Next         = "Complete"
+          },
+          {
+            Variable     = "$.status"
+            StringEquals = "completed_with_retry_limit_items"
+            Next         = "Complete"
+          },
+          {
+            Variable = "$.status"
+            StringEquals = join("", [
+              "completed_with_manual_and_retry_",
+              "limit_items",
+            ])
+            Next = "Complete"
+          },
+          {
+            Variable     = "$.status"
+            StringEquals = "completed_with_invalid_items"
+            Next         = "Complete"
+          },
+          {
+            Variable     = "$.status"
+            StringEquals = "halted_at_batch_limit"
             Next         = "Complete"
           },
           {
@@ -990,6 +1023,12 @@ resource "aws_sfn_state_machine" "landing_dlq_redriver" {
       WaitBeforeNextBatch = {
         Type    = "Wait"
         Seconds = 30
+        Next    = "RedriverBatch"
+      }
+
+      WaitAfterReplay = {
+        Type    = "Wait"
+        Seconds = 300
         Next    = "RedriverBatch"
       }
 
