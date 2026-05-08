@@ -28,6 +28,16 @@ output "private_subnet_ids" {
   value       = local.environment == "development" ? [aws_subnet.private_a[0].id, aws_subnet.private_b[0].id] : []
 }
 
+output "nat_gateway_id" {
+  description = "NAT Gateway ID"
+  value       = try(aws_nat_gateway.main[0].id, null)
+}
+
+output "nat_gateway_public_ip" {
+  description = "NAT Gateway public IP"
+  value       = try(aws_eip.nat[0].public_ip, null)
+}
+
 ##############################################
 ### RADIUS Server Outputs
 ##############################################
