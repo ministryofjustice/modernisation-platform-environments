@@ -40,8 +40,8 @@ module "guardduty_s3_plan_role" {
 data "aws_iam_policy_document" "guardduty_s3_plan_permission_policy" {
   # Guardduty event permissions
   statement {
-    effect    = "Allow"
-    actions   = [   
+    effect = "Allow"
+    actions = [
       "events:PutRule",
       "events:DeleteRule",
       "events:PutTargets",
@@ -56,7 +56,7 @@ data "aws_iam_policy_document" "guardduty_s3_plan_permission_policy" {
       "events:ListTargetsByRule"
     ]
     resources = [
-      "arn:aws:events:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:rule/DO-NOT-DELETE-AmazonGuardDutyMalwareProtectionS3*"]
+    "arn:aws:events:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:rule/DO-NOT-DELETE-AmazonGuardDutyMalwareProtectionS3*"]
   }
   # s3 read permissions
   statement {
@@ -77,7 +77,7 @@ data "aws_iam_policy_document" "guardduty_s3_plan_permission_policy" {
       "s3:GetObjectVersionTagging"
     ]
     resources = [
-      "arn:aws:s3:::${local.malware_scanning_processing_bucket_name}/*"
+      "${module.s3_bucket["processing"].s3_bucket_arn}/*"
     ]
   }
   statement {
@@ -87,7 +87,7 @@ data "aws_iam_policy_document" "guardduty_s3_plan_permission_policy" {
       "s3:GetBucketNotification"
     ]
     resources = [
-      "arn:aws:s3:::${local.malware_scanning_processing_bucket_name}"
+      "${module.s3_bucket["processing"].s3_bucket_arn}"
     ]
   }
   statement {
@@ -96,7 +96,7 @@ data "aws_iam_policy_document" "guardduty_s3_plan_permission_policy" {
       "s3:PutObject"
     ]
     resources = [
-      "arn:aws:s3:::${local.malware_scanning_processing_bucket_name}/malware-protection-resource-validation-object"
+      "${module.s3_bucket["processing"].s3_bucket_arn}/malware-protection-resource-validation-object"
     ]
   }
   statement {
@@ -106,20 +106,17 @@ data "aws_iam_policy_document" "guardduty_s3_plan_permission_policy" {
       "s3:GetObjectVersion"
     ]
     resources = [
-      "arn:aws:s3:::${local.malware_scanning_processing_bucket_name}/*"
+      "${module.s3_bucket["processing"].s3_bucket_arn}/*"
     ]
   }
   # kms permissions
-  dynamic statement {
-    for_each = length(local.iam_configuration.kms_key_arn_list) == 0 ? [] : ["this"]
-
-    content {
-      effect = "Allow"
-      actions = [
-        "kms:Decrypt",
-        "kms:GenerateDataKey"
-      ]
-      resources = local.iam_configuration.kms_key_arn_list
-    }
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:GenerateDataKey"
+    ]
+    resources = [module.kms_s3_bucket["processing"].key_arn]
   }
 }

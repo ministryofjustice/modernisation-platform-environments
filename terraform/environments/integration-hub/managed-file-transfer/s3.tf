@@ -5,7 +5,16 @@ module "s3_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "5.13.0"
 
-  bucket_prefix = each.value.bucket_prefix
+  allowed_kms_key_arn = module.kms_s3_bucket[each.key].key_arn
+  bucket_prefix       = each.value.bucket_prefix
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        kms_master_key_id = module.kms_s3_bucket[each.key].key_arn
+        sse_algorithm     = "aws:kms"
+      }
+    }
+  }
 
   block_public_acls       = true
   ignore_public_acls      = true
