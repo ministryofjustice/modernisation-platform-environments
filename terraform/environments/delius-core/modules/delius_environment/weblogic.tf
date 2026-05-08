@@ -6,14 +6,16 @@ module "weblogic" {
     aws.core-network-services = aws.core-network-services
   }
 
-  name            = "weblogic"
-  launch_type     = "EC2"
-  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic:${var.delius_microservice_configs.weblogic.image_tag}"
-  env_name        = var.env_name
-  account_config  = var.account_config
-  account_info    = var.account_info
+  name              = "weblogic"
+  container_image   = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic:${var.delius_microservice_configs.weblogic.image_tag}"
+  env_name          = var.env_name
+  account_config    = var.account_config
+  account_info      = var.account_info
+  capacity_provider = aws_ecs_capacity_provider.weblogic.name
 
-  desired_count = 1
+  desired_count = var.delius_microservice_configs.weblogic.task_count
+
+  force_new_deployment = true # Temporarily true to update capacity providers, set to false if found
 
   pin_task_definition_revision           = try(var.delius_microservice_configs.weblogic.task_definition_revision, 0)
   ignore_changes_service_task_definition = false
@@ -22,9 +24,8 @@ module "weblogic" {
   container_memory = var.delius_microservice_configs.weblogic.container_memory
   container_cpu    = var.delius_microservice_configs.weblogic.container_cpu
 
-  container_vars_default = {
-    for key, name in var.delius_microservice_configs.weblogic_params : key => data.aws_ssm_parameter.weblogic_ssm[key].value
-  }
+  container_vars_default = var.delius_microservice_configs.weblogic_params
+
   container_vars_env_specific = try(var.delius_microservice_configs.weblogic.container_vars_env_specific, {})
 
   container_secrets_default = merge({
@@ -46,12 +47,12 @@ module "weblogic" {
 
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   alb_health_check = {
-    path                 = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
+    path                 = "/NDelius-war/delius/javax.faces.resource/health/healthcheck.json"
     healthy_threshold    = 5
     interval             = 30
     protocol             = "HTTP"
     unhealthy_threshold  = 5
-    matcher              = "200-499"
+    matcher              = "200"
     timeout              = 5
     grace_period_seconds = 300
   }
@@ -200,6 +201,12 @@ resource "aws_autoscaling_group" "weblogic" {
     id      = aws_launch_template.weblogic.id
     version = "$Latest"
   }
+
+  tag {
+    key                 = "Name"
+    value               = "weblogic-${var.env_name}-ecs-asg"
+    propagate_at_launch = true
+  }
 }
 
 resource "aws_ecs_capacity_provider" "weblogic" {
@@ -213,21 +220,6 @@ resource "aws_ecs_capacity_provider" "weblogic" {
       target_capacity = 100
     }
 
-    managed_termination_protection = "ENABLED"
-  }
-}
-
-resource "aws_ecs_cluster_capacity_providers" "main" {
-  cluster_name = module.ecs.ecs_cluster_name
-
-  capacity_providers = [
-    "FARGATE",
-    "FARGATE_SPOT",
-    aws_ecs_capacity_provider.weblogic.name
-  ]
-
-  default_capacity_provider_strategy {
-    capacity_provider = "FARGATE"
-    weight            = 1
+    managed_termination_protection = "DISABLED"
   }
 }
