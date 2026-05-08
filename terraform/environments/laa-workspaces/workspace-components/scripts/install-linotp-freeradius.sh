@@ -112,18 +112,7 @@ systemctl start mariadb
 # Wait for MariaDB to start
 sleep 5
 
-# Secure MariaDB installation (automated, non-interactive)
-# Run all commands in a single batch before setting password
-mysql <<MYSQL_COMMANDS
-DELETE FROM mysql.user WHERE User='';
-DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
-DROP DATABASE IF EXISTS test;
-DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
-UPDATE mysql.user SET Password=PASSWORD('$${MARIADB_ROOT_PASSWORD}') WHERE User='root';
-FLUSH PRIVILEGES;
-MYSQL_COMMANDS
-
-echo "✓ MariaDB installed and secured"
+echo "✓ MariaDB installed (not secured yet - waiting for LinOTP setup)"
 
 ##############################################
 ### 5. Install and Configure LinOTP
@@ -139,7 +128,7 @@ restorecon -Rv /etc/linotp2/ || true
 restorecon -Rv /var/log/linotp || true
 
 # Configure LinOTP with MariaDB
-# This creates the database and tables
+# IMPORTANT: Run this BEFORE securing MariaDB (while root has no password)
 echo "$${MARIADB_ROOT_PASSWORD}" | linotp-create-mariadb
 
 # Lock python-repoze-who version for stability
@@ -147,6 +136,19 @@ yum install -y yum-plugin-versionlock
 yum versionlock python-repoze-who
 
 echo "✓ LinOTP installed and database created"
+
+# NOW secure MariaDB (after LinOTP database is created)
+echo "Securing MariaDB..."
+mysql <<MYSQL_COMMANDS
+DELETE FROM mysql.user WHERE User='';
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+DROP DATABASE IF EXISTS test;
+DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
+UPDATE mysql.user SET Password=PASSWORD('$${MARIADB_ROOT_PASSWORD}') WHERE User='root';
+FLUSH PRIVILEGES;
+MYSQL_COMMANDS
+
+echo "✓ MariaDB secured with root password"
 
 ##############################################
 ### 6. Install and Configure Apache httpd
