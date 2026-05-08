@@ -378,9 +378,9 @@ resource "aws_ebs_volume" "dbf01" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix, "dbf02") },
+    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix, "dbf01") },
     { device-name = "/dev/sdq" },
-    { mount-point = format("%s/%s", local.volume_prefix, "dbf02") }
+    { mount-point = format("%s/%s", local.volume_prefix, "dbf01") }
   )
 }
 
