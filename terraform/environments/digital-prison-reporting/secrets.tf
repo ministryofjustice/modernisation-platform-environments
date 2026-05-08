@@ -799,7 +799,8 @@ resource "aws_secretsmanager_secret_policy" "dpr_crossaccount_assessment_view" {
         }
         Action = [
           "secretsmanager:PutSecretValue",
-          "secretsmanager:UpdateSecret"
+          "secretsmanager:UpdateSecret",
+          "kms:GenerateDataKey"
         ]
         Resource = "*"
       }
