@@ -57,10 +57,10 @@ resource "aws_lambda_function" "process_file_from_bucket_lambda_function" {
   publish       = true
 
   vpc_config {
-    security_group_ids      = [aws_security_group.process_file_from_bucket_lambda_sg.id]
-    subnet_ids              = data.aws_subnets.shared-private.ids
+    security_group_ids = [aws_security_group.process_file_from_bucket_lambda_sg.id]
+    subnet_ids         = data.aws_subnets.shared-private.ids
   }
-  
+
   tags = merge(local.tags, {
     Name = "${local.application_name}-${local.environment}-process-file-from-bucket"
   })

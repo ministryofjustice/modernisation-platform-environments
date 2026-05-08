@@ -91,8 +91,9 @@ variable "metadata_options" {
 variable "db_ami" {
   description = "AMI to use for the database instance"
   type = object({
-    name_regex = string
-    owner      = string
+    name_regex    = string
+    owner         = string
+    pinned_ami_id = optional(string)
   })
 
 }
