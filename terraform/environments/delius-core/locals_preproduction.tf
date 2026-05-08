@@ -35,6 +35,10 @@ locals {
   db_config_preprod = {
     instance_type  = "r7i.4xlarge"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-06-04T11-24-58.162Z"
+    pinned_ami_id  = "ami-04286e91e4ada8f3a"
+    instance_policies = {
+      "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
+    }
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
     }

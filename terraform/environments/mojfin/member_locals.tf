@@ -16,7 +16,7 @@ locals {
   character_set_name         = "WE8MSWIN1252"
   instance_class             = "db.m5.xlarge"
   engine                     = "oracle-se2"
-  engine_version             = "19.0.0.0.ru-2025-10.rur-2025-10.r1"
+  engine_version             = "19.0.0.0.ru-2026-01.rur-2026-01.r3"
   username                   = "sysdba"
   backup_window              = "22:00-01:00"
   maintenance_window = (
