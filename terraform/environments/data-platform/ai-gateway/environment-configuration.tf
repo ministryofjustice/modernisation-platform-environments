@@ -117,9 +117,9 @@ locals {
         max_replicas                      = 3
         target_cpu_utilization_percentage = 80
       }
-      rds_instance_class    = "db.t4g.small"
-      rds_allocated_storage = 20
-      rds_engine_version    = "17.4"
+      aurora_instance_class = "db.t4g.medium"
+      aurora_engine_version = "17.4"
+      aurora_instances      = { writer = {} }
       elasticache_node_type = "cache.t4g.medium"
     }
     test = {
@@ -152,9 +152,9 @@ locals {
         max_replicas                      = 3
         target_cpu_utilization_percentage = 80
       }
-      rds_instance_class    = "db.t4g.small"
-      rds_allocated_storage = 20
-      rds_engine_version    = "17.4"
+      aurora_instance_class = "db.t4g.medium"
+      aurora_engine_version = "17.4"
+      aurora_instances      = { writer = {} }
       elasticache_node_type = "cache.t4g.medium"
     }
     preproduction = {
@@ -171,9 +171,9 @@ locals {
         max_replicas                      = 3
         target_cpu_utilization_percentage = 80
       }
-      rds_instance_class    = "db.t4g.small"
-      rds_allocated_storage = 50
-      rds_engine_version    = "17.4"
+      aurora_instance_class = "db.t4g.medium"
+      aurora_engine_version = "17.4"
+      aurora_instances      = { writer = {} }
       elasticache_node_type = "cache.t4g.medium"
     }
     production = {
@@ -190,9 +190,9 @@ locals {
         max_replicas                      = 10
         target_cpu_utilization_percentage = 80
       }
-      rds_instance_class    = "db.t4g.medium"
-      rds_allocated_storage = 100
-      rds_engine_version    = "17.4"
+      aurora_instance_class = "db.t4g.medium"
+      aurora_engine_version = "17.4"
+      aurora_instances      = { writer = {}, reader = {} }
       elasticache_node_type = "cache.t4g.medium"
     }
   }

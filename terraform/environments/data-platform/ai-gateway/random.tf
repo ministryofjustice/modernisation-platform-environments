@@ -3,7 +3,7 @@ resource "random_password" "litellm_secret_key" {
   special = false
 }
 
-resource "random_password" "rds" {
+resource "random_password" "aurora" {
   length  = 32
   special = false
 }

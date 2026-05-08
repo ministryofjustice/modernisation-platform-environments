@@ -34,11 +34,11 @@ resource "helm_release" "litellm" {
         ingressHostname    = local.environment_configuration.ai_gateway_hostname
 
         # Database
-        databaseSecret      = "rds"
+        databaseSecret      = "aurora"
         databaseUserNameKey = "username"
         databasePasswordKey = "password"
         databaseEndpointKey = "host"
-        databaseName        = module.ai_gateway_rds.db_instance_name
+        databaseName        = module.ai_gateway_aurora.cluster_database_name
 
         # LiteLLM
         masterkeySecretName = kubernetes_secret_v1.litellm_master_key.metadata[0].name
@@ -74,7 +74,7 @@ resource "helm_release" "litellm" {
     kubernetes_manifest.external_secret_litellm_entra_id,
     kubernetes_manifest.external_secret_justiceai_azure_openai,
     kubernetes_manifest.external_secret_azure_openai,
-    kubernetes_manifest.external_secret_rds,
+    kubernetes_manifest.external_secret_aurora,
     kubernetes_manifest.external_secret_elasticache
   ]
 }
@@ -97,11 +97,11 @@ resource "helm_release" "litellm_admin" {
         ingressHostname    = "admin.${local.environment_configuration.ai_gateway_hostname}"
 
         # Database
-        databaseSecret      = "rds"
+        databaseSecret      = "aurora"
         databaseUserNameKey = "username"
         databasePasswordKey = "password"
         databaseEndpointKey = "host"
-        databaseName        = module.ai_gateway_rds.db_instance_name
+        databaseName        = module.ai_gateway_aurora.cluster_database_name
 
         # LiteLLM
         masterkeySecretName = kubernetes_secret_v1.litellm_master_key.metadata[0].name
@@ -121,7 +121,7 @@ resource "helm_release" "litellm_admin" {
     kubernetes_secret_v1.litellm_master_key,
     kubernetes_manifest.external_secret_litellm_license,
     kubernetes_manifest.external_secret_litellm_entra_id,
-    kubernetes_manifest.external_secret_rds,
+    kubernetes_manifest.external_secret_aurora,
     kubernetes_manifest.external_secret_elasticache
   ]
 }

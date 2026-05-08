@@ -160,14 +160,14 @@ resource "kubernetes_manifest" "external_secret_azure_openai" {
   }
 }
 
-resource "kubernetes_manifest" "external_secret_rds" {
+resource "kubernetes_manifest" "external_secret_aurora" {
   depends_on = [kubernetes_namespace_v1.ai_gateway]
 
   manifest = {
     apiVersion = "external-secrets.io/v1"
     kind       = "ExternalSecret"
     metadata = {
-      name      = "rds"
+      name      = "aurora"
       namespace = "ai-gateway"
     }
     spec = {
@@ -177,41 +177,41 @@ resource "kubernetes_manifest" "external_secret_rds" {
         kind = "ClusterSecretStore"
       }
       target = {
-        name = "rds"
+        name = "aurora"
       }
       data = [
         {
           secretKey = "username"
           remoteRef = {
-            key      = tostring(module.ai_gateway_rds_secret.secret_id)
+            key      = tostring(module.ai_gateway_aurora_secret.secret_id)
             property = "username"
           }
         },
         {
           secretKey = "password"
           remoteRef = {
-            key      = tostring(module.ai_gateway_rds_secret.secret_id)
+            key      = tostring(module.ai_gateway_aurora_secret.secret_id)
             property = "password"
           }
         },
         {
           secretKey = "host"
           remoteRef = {
-            key      = tostring(module.ai_gateway_rds_secret.secret_id)
+            key      = tostring(module.ai_gateway_aurora_secret.secret_id)
             property = "host"
           }
         },
         {
           secretKey = "port"
           remoteRef = {
-            key      = tostring(module.ai_gateway_rds_secret.secret_id)
+            key      = tostring(module.ai_gateway_aurora_secret.secret_id)
             property = "port"
           }
         },
         {
           secretKey = "dbname"
           remoteRef = {
-            key      = tostring(module.ai_gateway_rds_secret.secret_id)
+            key      = tostring(module.ai_gateway_aurora_secret.secret_id)
             property = "dbname"
           }
         }
