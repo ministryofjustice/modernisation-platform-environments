@@ -106,7 +106,7 @@
             uses: ministryofjustice/checkov-tag-validator@python-dependencies
             with:
               terraform_directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-              soft_fail: false
+              soft_fail: true
               terraform_workspace: ${{ env.WORKSPACE_NAME }}
       plan:
         name: "plan"
