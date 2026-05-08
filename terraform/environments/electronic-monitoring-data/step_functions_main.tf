@@ -94,3 +94,239 @@ module "gdpr_deletion_step_function" {
   )
   type = "STANDARD"
 }
+
+# ------------------------------------------------------------------------------
+# Staging DB janitor Step Function
+# ------------------------------------------------------------------------------
+
+resource "aws_sfn_state_machine" "staging_db_janitor" {
+  name     = "staging_db_janitor"
+  role_arn = aws_iam_role.staging_db_janitor_state_machine.arn
+
+  definition = jsonencode(
+    {
+      Comment = "Orchestrates stale staging database cleanup in batches."
+      StartAt = "JanitorBatch"
+      States = {
+        JanitorBatch = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+          Parameters = {
+            FunctionName = module.staging_db_janitor.lambda_function_arn
+            Payload = {
+              "thread_id.$"             = "$.thread_id"
+              "alarm_name.$"            = "$.alarm_name"
+              "batch_number.$"          = "$.batch_number"
+              "stale_minutes.$"         = "$.stale_minutes"
+              "max_databases_per_run.$" = "$.max_databases_per_run"
+            }
+          }
+          OutputPath = "$.Payload"
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException"
+              ]
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+          Next = "CheckStatus"
+        }
+
+        CheckStatus = {
+          Type = "Choice"
+          Choices = [
+            {
+              Variable     = "$.status"
+              StringEquals = "continuing"
+              Next         = "WaitBeforeNextBatch"
+            },
+            {
+              Variable     = "$.status"
+              StringEquals = "ok"
+              Next         = "Complete"
+            },
+            {
+              Variable     = "$.status"
+              StringEquals = "halted"
+              Next         = "Halted"
+            }
+          ]
+          Default = "UnexpectedResult"
+        }
+
+        WaitBeforeNextBatch = {
+          Type    = "Wait"
+          Seconds = 15
+          Next    = "PrepareNextBatch"
+        }
+
+        PrepareNextBatch = {
+          Type = "Pass"
+          Parameters = {
+            "thread_id.$"             = "$.thread_id"
+            "alarm_name.$"            = "$.alarm_name"
+            "batch_number.$"          = "$.next_batch_number"
+            "stale_minutes.$"         = "$.stale_minutes"
+            "max_databases_per_run.$" = "$.max_databases_per_run"
+          }
+          Next = "JanitorBatch"
+        }
+
+        Complete = {
+          Type = "Succeed"
+        }
+
+        Halted = {
+          Type  = "Fail"
+          Error = "StagingDbCleanupHalted"
+          Cause = "The janitor made no progress and stopped safely."
+        }
+
+        UnexpectedResult = {
+          Type  = "Fail"
+          Error = "UnexpectedJanitorResult"
+          Cause = "The janitor returned an unexpected status."
+        }
+      }
+    }
+  )
+}
+
+# ------------------------------------------------------------------------------
+# Landing DLQ redriver Step Function
+# ------------------------------------------------------------------------------
+
+resource "aws_sfn_state_machine" "landing_dlq_redriver" {
+  name     = "landing_dlq_redriver"
+  role_arn = aws_iam_role.landing_dlq_redriver_state_machine.arn
+
+  definition = jsonencode({
+    Comment = "Redrives landing DLQ messages after CloudWatch DLQ alarms."
+    StartAt = "WaitForThreadState"
+    States = {
+      WaitForThreadState = {
+        Type    = "Wait"
+        Seconds = 600
+        Next    = "RedriverBatch"
+      }
+
+      RedriverBatch = {
+        Type     = "Task"
+        Resource = "arn:aws:states:::lambda:invoke"
+        Parameters = {
+          FunctionName = module.landing_dlq_redriver.lambda_function_arn
+          "Payload.$" = "$"
+        }
+        OutputPath = "$.Payload"
+        Retry = [
+          {
+            ErrorEquals = [
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException",
+              "Lambda.TooManyRequestsException",
+            ]
+            IntervalSeconds = 2
+            BackoffRate     = 2
+            MaxAttempts     = 3
+          }
+        ]
+        Next = "CheckStatus"
+      }
+
+      CheckStatus = {
+        Type = "Choice"
+        Choices = [
+          {
+            Variable     = "$.status"
+            StringEquals = "continuing"
+            Next         = "WaitBeforeNextBatch"
+          },
+          {
+            Variable     = "$.status"
+            StringEquals = "settling"
+            Next         = "WaitAfterReplay"
+          },
+          {
+            Variable     = "$.status"
+            StringEquals = "ok"
+            Next         = "Complete"
+          },
+          {
+            Variable     = "$.status"
+            StringEquals = "completed_with_manual_items"
+            Next         = "Complete"
+          },
+          {
+            Variable     = "$.status"
+            StringEquals = "completed_with_retry_limit_items"
+            Next         = "Complete"
+          },
+          {
+            Variable = "$.status"
+            StringEquals = join("", [
+              "completed_with_manual_and_retry_",
+              "limit_items",
+            ])
+            Next = "Complete"
+          },
+          {
+            Variable     = "$.status"
+            StringEquals = "completed_with_invalid_items"
+            Next         = "Complete"
+          },
+          {
+            Variable     = "$.status"
+            StringEquals = "halted_at_batch_limit"
+            Next         = "Complete"
+          },
+          {
+            Variable     = "$.status"
+            StringEquals = "halted"
+            Next         = "Complete"
+          },
+          {
+            Variable     = "$.status"
+            StringEquals = "ignored"
+            Next         = "Complete"
+          }
+        ]
+        Default = "UnexpectedResult"
+      }
+
+      WaitBeforeNextBatch = {
+        Type    = "Wait"
+        Seconds = 30
+        Next    = "RedriverBatch"
+      }
+
+      WaitAfterReplay = {
+        Type    = "Wait"
+        Seconds = 300
+        Next    = "RedriverBatch"
+      }
+
+      Complete = {
+        Type = "Succeed"
+      }
+
+      UnexpectedResult = {
+        Type  = "Fail"
+        Error = "UnexpectedLandingRedriverResult"
+        Cause = "The landing redriver returned an unexpected status."
+      }
+    }
+  })
+}
+
+resource "aws_cloudwatch_event_target" "landing_dlq_redriver" {
+  rule     = aws_cloudwatch_event_rule.alarm_state_change_threader.name
+  arn      = aws_sfn_state_machine.landing_dlq_redriver.arn
+  role_arn = aws_iam_role.landing_dlq_redriver_eventbridge.arn
+}
