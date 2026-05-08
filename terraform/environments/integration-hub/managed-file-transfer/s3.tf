@@ -14,3 +14,19 @@ module "s3_bucket" {
 
   lifecycle_rule = each.value.lifecycle_rule
 }
+
+module "s3_bucket_notification" {
+  source  = "terraform-aws-modules/s3-bucket/aws//modules/notification"
+  version = "5.13.0"
+
+  bucket     = module.s3_bucket["unscanned"].s3_bucket_id
+  bucket_arn = module.s3_bucket["unscanned"].s3_bucket_arn
+
+  sqs_notifications = {
+    unscanned = {
+      queue_arn     = module.sqs_unscanned_s3_notifications.queue_arn
+      events        = ["s3:ObjectCreated:*"]
+      filter_prefix = "incoming/"
+    }
+  }
+}

@@ -17,6 +17,10 @@
           "bucket_prefix": "integration-hub-clean-",
           "lifecycle_rule": []
         },
+        "investigation": {
+          "bucket_prefix": "integration-hub-investigation-",
+          "lifecycle_rule": []
+        },
         "processing": {
           "bucket_prefix": "integration-hub-processing-",
           "lifecycle_rule": []
