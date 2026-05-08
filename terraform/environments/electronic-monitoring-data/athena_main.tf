@@ -93,12 +93,12 @@ resource "aws_athena_workgroup" "cadt-historic-dev" {
 }
 
 resource "aws_glue_catalog_database" "ears_sars_audit_db" {
-  count = local.is-development || local.is-preproduction ? 1 : 0
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   name  = "ears_sars_audit"
 }
 
 resource "aws_glue_catalog_table" "ears_sars_audit_table" {
-  count         = local.is-development || local.is-preproduction ? 1 : 0
+  count         = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   name          = "reports_requested"
   database_name = aws_glue_catalog_database.ears_sars_audit_db[0].name
   table_type    = "EXTERNAL_TABLE"
