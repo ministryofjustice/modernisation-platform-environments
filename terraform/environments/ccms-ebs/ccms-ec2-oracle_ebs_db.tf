@@ -157,7 +157,7 @@ resource "aws_ebs_volume" "arch" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
     { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "arch") },
-    { mount-point = "/CCMS/EBS/arch" },
+    { mount-point = format("%s/%s", local.volume_prefix, "arch") },
     { device-name = "/dev/sdj" }
   )
 }
@@ -182,7 +182,7 @@ resource "aws_ebs_volume" "redoA" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
     { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "redoA") },
-    { mount-point = "/CCMS/EBS/redoA" },
+    { mount-point = format("%s/%s", local.volume_prefix, "redoA") },
     { device-name = "/dev/sdl" }
   )
 }
@@ -208,7 +208,7 @@ resource "aws_ebs_volume" "techst" {
   tags = merge(local.tags,
     { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "techst") },
     { device-name = "/dev/sdm" },
-    { mount-point = "/CCMS/EBS/techst" }
+    { mount-point = format("%s/%s", local.volume_prefix, "techst") }
   )
 }
 
@@ -286,7 +286,7 @@ resource "aws_ebs_volume" "backup_prod" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
     { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "backup-prod") },
-    { mount-point = "/CCMS/EBS/backup-prod" },
+    { mount-point = format("%s/%s", local.volume_prefix, "backup-prod") },
     { device-name = "/dev/sdy" }
   )
 }
@@ -312,7 +312,7 @@ resource "aws_ebs_volume" "redoB" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
     { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "redoB") },
-    { mount-point = "/CCMS/EBS/redoB" },
+    { mount-point = format("%s/%s", local.volume_prefix, "redoB") },
     { device-name = "/dev/sdo" }
   )
 }
@@ -341,7 +341,7 @@ resource "aws_ebs_volume" "diag" {
   tags = merge(local.tags,
     { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "diag") },
     { device-name = "/dev/sdp" },
-    { mount-point = "/CCMS/EBS/diag" }
+    { mount-point = format("%s/%s", local.volume_prefix, "diag") }
   )
 }
 
@@ -369,7 +369,7 @@ resource "aws_ebs_volume" "dbf01" {
   tags = merge(local.tags,
     { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "dbf01") },
     { device-name = "/dev/sdq" },
-    { mount-point = "/CCMS/EBS/dbf01" }
+    { mount-point = format("%s/%s", local.volume_prefix, "dbf01") }
   )
 }
 
@@ -397,7 +397,7 @@ resource "aws_ebs_volume" "dbf02" {
   tags = merge(local.tags,
     { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "dbf02") },
     { device-name = "/dev/sdr" },
-    { mount-point = "/CCMS/EBS/dbf02" }
+    { mount-point = format("%s/%s", local.volume_prefix, "dbf02") }
   )
 }
 
@@ -425,7 +425,7 @@ resource "aws_ebs_volume" "dbf03" {
   tags = merge(local.tags,
     { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "dbf03") },
     { device-name = "/dev/sds" },
-    { mount-point = "/CCMS/EBS/dbf03" }
+    { mount-point = format("%s/%s", local.volume_prefix, "dbf03") }
   )
 }
 
@@ -453,7 +453,7 @@ resource "aws_ebs_volume" "dbf04" {
   tags = merge(local.tags,
     { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "dbf04") },
     { device-name = "/dev/sdt" },
-    { mount-point = "/CCMS/EBS/dbf04" }
+    { mount-point = format("%s/%s", local.volume_prefix, "dbf04") }
   )
 }
 
@@ -482,7 +482,7 @@ resource "aws_ebs_volume" "swap2" {
   tags = merge(local.tags,
     { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "swap2") },
     { device-name = "/dev/sdx" },
-    { mount-point = "/CCMS/EBS/swap2" }
+    { mount-point = format("%s/%s", local.volume_prefix, "swap2") }
   )
 }
 
