@@ -147,9 +147,7 @@ resource "aws_ebs_volume" "stage" {
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags,
-    { Name = "apps-${count.index + 1}:/stage" },
-    { mount-point = "/stage" }
+  tags = merge(local.tags
   )
 }
 

@@ -106,8 +106,6 @@ resource "aws_ebs_volume" "export_home" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s:/%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "export/home")) },
-    { mount-point = "/export/home" },
     { device-name = "/dev/sdh" }
   )
 }
@@ -131,8 +129,6 @@ resource "aws_ebs_volume" "u01" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s:/%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "u01")) },
-    { mount-point = "/u01" },
     { device-name = "/dev/sdi" }
   )
 }
@@ -156,8 +152,6 @@ resource "aws_ebs_volume" "arch" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s:/CCMS/EBS/%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "arch")) },
-    { mount-point = "/CCMS/EBS/arch" },
     { device-name = "/dev/sdj" }
   )
 }
@@ -181,8 +175,6 @@ resource "aws_ebs_volume" "redoA" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s:/CCMS/EBS/%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "redoA")) },
-    { mount-point = "/CCMS/EBS/redoA" },
     { device-name = "/dev/sdl" }
   )
 }
@@ -206,8 +198,6 @@ resource "aws_ebs_volume" "techst" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s:/CCMS/EBS/%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "techst")) },
-    { device-name = "/dev/sdm" },
     { mount-point = "/CCMS/EBS/techst" }
   )
 }
@@ -231,8 +221,6 @@ resource "aws_ebs_volume" "backup" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s:/%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "backup")) },
-    { mount-point = "/backup" },
     { device-name = "/dev/sdn" }
   )
 }
@@ -258,7 +246,6 @@ resource "aws_ebs_volume" "backup_clone" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "backup")) },
     { device-name = "/dev/sdz" }
   )
 }
@@ -285,8 +272,6 @@ resource "aws_ebs_volume" "backup_prod" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s:/CCMS/EBS/%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "backup-prod")) },
-    { mount-point = "/CCMS/EBS/backup-prod" },
     { device-name = "/dev/sdy" }
   )
 }
@@ -311,8 +296,6 @@ resource "aws_ebs_volume" "redoB" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s:/CCMS/EBS/%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "redoB")) },
-    { mount-point = "/CCMS/EBS/redoB" },
     { device-name = "/dev/sdo" }
   )
 }
@@ -339,8 +322,6 @@ resource "aws_ebs_volume" "diag" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s:/CCMS/EBS/%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "diag")) },
-    { device-name = "/dev/sdp" },
     { mount-point = "/CCMS/EBS/diag" }
   )
 }
@@ -367,8 +348,6 @@ resource "aws_ebs_volume" "dbf01" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s:/CCMS/EBS/%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf01")) },
-    { device-name = "/dev/sdq" },
     { mount-point = "/CCMS/EBS/dbf01" }
   )
 }
@@ -395,9 +374,7 @@ resource "aws_ebs_volume" "dbf02" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s:/CCMS/EBS/%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf02")) },
-    { device-name = "/dev/sdr" },
-    { mount-point = "/CCMS/EBS/dbf02" }
+    { device-name = "/dev/sdr" }
   )
 }
 
@@ -423,9 +400,8 @@ resource "aws_ebs_volume" "dbf03" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s:/CCMS/EBS/%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf03")) },
-    { device-name = "/dev/sds" },
-    { mount-point = "/CCMS/EBS/dbf03" }
+    { device-name = "/dev/sds" }
+
   )
 }
 
@@ -451,9 +427,7 @@ resource "aws_ebs_volume" "dbf04" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s:/CCMS/EBS/%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "dbf04")) },
-    { device-name = "/dev/sdt" },
-    { mount-point = "/CCMS/EBS/dbf04" }
+    { device-name = "/dev/sdt" }
   )
 }
 
@@ -480,9 +454,7 @@ resource "aws_ebs_volume" "swap2" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s:/CCMS/EBS/%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "swap2")) },
-    { device-name = "/dev/sdx" },
-    { mount-point = "/CCMS/EBS/swap2" }
+    { device-name = "/dev/sdx" }
   )
 }
 
