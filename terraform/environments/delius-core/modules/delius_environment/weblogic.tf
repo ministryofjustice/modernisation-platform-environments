@@ -14,9 +14,8 @@ module "weblogic" {
   capacity_provider = aws_ecs_capacity_provider.weblogic.name
 
   desired_count = var.delius_microservice_configs.weblogic.task_count
-  # desired_count = 0
 
-  force_new_deployment = true
+  force_new_deployment = true # Temporarily true to update capacity providers, set to false if found
 
   pin_task_definition_revision           = try(var.delius_microservice_configs.weblogic.task_definition_revision, 0)
   ignore_changes_service_task_definition = false
