@@ -120,6 +120,7 @@ locals {
       rds_instance_class    = "db.t4g.small"
       rds_allocated_storage = 20
       rds_engine_version    = "17.4"
+      elasticache_node_type = "cache.t4g.medium"
     }
     test = {
       litellm_versions = {
@@ -154,6 +155,7 @@ locals {
       rds_instance_class    = "db.t4g.small"
       rds_allocated_storage = 20
       rds_engine_version    = "17.4"
+      elasticache_node_type = "cache.t4g.medium"
     }
     preproduction = {
       litellm_versions = {
@@ -172,6 +174,7 @@ locals {
       rds_instance_class    = "db.t4g.small"
       rds_allocated_storage = 50
       rds_engine_version    = "17.4"
+      elasticache_node_type = "cache.t4g.medium"
     }
     production = {
       litellm_versions = {
@@ -190,6 +193,7 @@ locals {
       rds_instance_class    = "db.t4g.medium"
       rds_allocated_storage = 100
       rds_engine_version    = "17.4"
+      elasticache_node_type = "cache.t4g.medium"
     }
   }
 }

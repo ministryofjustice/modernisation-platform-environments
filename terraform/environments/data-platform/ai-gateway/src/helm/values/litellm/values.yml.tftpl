@@ -55,6 +55,11 @@ proxy_config:
     ui_access_mode: "admin_only"
   litellm_settings:
     cache: false
+    cache_params:
+      type: redis
+      host: os.environ/primary_endpoint_address
+      port: 6379
+      password: os.environ/auth_token
     callbacks: ["prometheus"]
     success_callback: ["prometheus"]
     failure_callback: ["prometheus"]
@@ -71,6 +76,9 @@ proxy_config:
       models: []
   router_settings:
     routing_strategy: simple-shuffle
+    redis_host: os.environ/primary_endpoint_address
+    redis_port: 6379
+    redis_password: os.environ/auth_token
 
   model_list:
 %{ for key, profile in azureModels ~}
@@ -114,6 +122,7 @@ ingress:
 envVars: {
     LITELLM_MODE: "PRODUCTION",
     PROXY_BASE_URL: "https://${ingressHostname}",
+    REDIS_SSL: "True",
     DOCS_TITLE: "Data Platform AI Gateway",
     DOCS_DESCRIPTION: "Contact us on Slack - #data-platform-ai-gateway-users",
     DOCS_FILTERED: "True",

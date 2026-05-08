@@ -51,6 +51,16 @@ proxy_config:
     ui_access_mode: "admin_only"
   litellm_settings:
     cache: false
+    cache_params:
+      type: redis
+      host: os.environ/primary_endpoint_address
+      port: 6379
+      password: os.environ/auth_token
+  router_settings:
+    routing_strategy: simple-shuffle
+    redis_host: os.environ/primary_endpoint_address
+    redis_port: 6379
+    redis_password: os.environ/auth_token
   model_list:
     - model_name: fake-openai-endpoint
       litellm_params:
@@ -86,6 +96,7 @@ migrationJob:
 envVars: {
     LITELLM_MODE: "PRODUCTION",
     PROXY_BASE_URL: "https://${ingressHostname}",
+    REDIS_SSL: "True",
     DOCS_TITLE: "Data Platform AI Gateway Admin",
     DOCS_DESCRIPTION: "Administration interface for the AI Gateway.",
     DOCS_FILTERED: "True",

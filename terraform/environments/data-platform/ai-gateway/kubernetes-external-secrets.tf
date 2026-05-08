@@ -219,3 +219,49 @@ resource "kubernetes_manifest" "external_secret_rds" {
     }
   }
 }
+
+resource "kubernetes_manifest" "external_secret_elasticache" {
+  depends_on = [kubernetes_namespace_v1.ai_gateway]
+
+  manifest = {
+    apiVersion = "external-secrets.io/v1"
+    kind       = "ExternalSecret"
+    metadata = {
+      name      = "elasticache"
+      namespace = "ai-gateway"
+    }
+    spec = {
+      refreshInterval = "1h"
+      secretStoreRef = {
+        name = "aws-secretsmanager"
+        kind = "ClusterSecretStore"
+      }
+      target = {
+        name = "elasticache"
+      }
+      data = [
+        {
+          secretKey = "primary_endpoint_address"
+          remoteRef = {
+            key      = tostring(module.ai_gateway_elasticache_secret.secret_id)
+            property = "primary_endpoint_address"
+          }
+        },
+        {
+          secretKey = "auth_token"
+          remoteRef = {
+            key      = tostring(module.ai_gateway_elasticache_secret.secret_id)
+            property = "auth_token"
+          }
+        },
+        {
+          secretKey = "port"
+          remoteRef = {
+            key      = tostring(module.ai_gateway_elasticache_secret.secret_id)
+            property = "port"
+          }
+        }
+      ]
+    }
+  }
+}
