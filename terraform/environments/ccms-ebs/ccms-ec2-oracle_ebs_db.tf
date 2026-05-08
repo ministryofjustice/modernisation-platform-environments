@@ -198,7 +198,7 @@ resource "aws_ebs_volume" "techst" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { mount-point = "/CCMS/EBS/techst" }
+    { device-name = "/dev/sdm" }
   )
 }
 
@@ -322,7 +322,7 @@ resource "aws_ebs_volume" "diag" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { mount-point = "/CCMS/EBS/diag" }
+    { device-name = "/dev/sdp" }
   )
 }
 
@@ -348,7 +348,7 @@ resource "aws_ebs_volume" "dbf01" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { mount-point = "/CCMS/EBS/dbf01" }
+    { device-name = "/dev/sdq" }
   )
 }
 
