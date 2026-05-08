@@ -9,6 +9,10 @@ locals {
     "am_stg${local.dbt_suffix}",
     "intermediate_tasking${local.dbt_suffix}"
   ]
+  load_lambda_databases = [
+    "staged_mdss${local.dbt_suffix}_dbt", 
+    "acquisitive_crime${local.dbt_suffix}_dbt}"
+    ]
 }
 
 # ------------------------------------------
@@ -2214,6 +2218,25 @@ data "aws_iam_policy_document" "insert_load_policy_document" {
     }
 }
 
+resource "aws_lakeformation_permissions" "insert_load_lambda_database_access" {
+  for_each = toset(local.load_lambda_databases)
+  principal   = module.insert_load_lambda_role.arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = each.value
+  }
+}
+
+resource "aws_lakeformation_permissions" "insert_load_lambda_table_access" {
+  for_each = toset(local.load_lambda_databases)
+  principal   = module.insert_load_lambda_role.arn
+  permissions = ["SELECT"]
+  table {
+    database_name = each.value
+    wildcard      = true
+  }
+}
+
 resource "aws_iam_policy" "insert_load" {
   name   = "insert_load_lambda_policy"  
   policy = data.aws_iam_policy_document.insert_load_policy_document.json
@@ -2223,12 +2246,6 @@ resource "aws_iam_role_policy_attachment" "insert_load_attach" {
   role       = aws_iam_role.insert_load.name  
   policy_arn = aws_iam_policy.insert_load.arn
   }
-
-
-
-
-
-
 
 
 #-----------------------------------------------------------------------------------
