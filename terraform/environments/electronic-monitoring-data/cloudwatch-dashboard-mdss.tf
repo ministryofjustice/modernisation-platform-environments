@@ -15,7 +15,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
         properties = {
           title  = "SQS: S3 events waiting for load_mdss"
           region = "eu-west-2"
-          stat   = "Sum"
+          stat   = "Maximum"
           period = 60
           metrics = [
             ["AWS/SQS", "ApproximateNumberOfMessagesVisible", "QueueName", module.load_mdss_event_queue.sqs_queue.name],
@@ -32,7 +32,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
         properties = {
           title  = "SQS DLQ: S3 events that failed load_mdss"
           region = "eu-west-2"
-          stat   = "Sum"
+          stat   = "Maximum"
           period = 60
           metrics = [
             ["AWS/SQS", "ApproximateNumberOfMessagesVisible", "QueueName", module.load_mdss_event_queue.sqs_dlq.name]

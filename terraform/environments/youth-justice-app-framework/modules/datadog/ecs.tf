@@ -72,12 +72,16 @@ module "ecs_service_datadog_agent" {
           "value" : var.enable_datadog_agent_apm ? "true" : "false"
         },
         {
-          "name"  = "DD_HOSTNAME"
-          "value" = "${var.environment}-ecs"
-        },
-        {
           "name" : "DD_CLUSTER_NAME",
           "value" : "yjaf-cluster"
+        },
+        {
+          "name": "DD_EC2_PREFER_IMDS_V2",
+          "value": "true"
+        },
+        {
+          "name": "DD_HOSTNAME_TRUST_UTS_NAMESPACE",
+          "value": "true"
         },
         {
           "name" : "DD_LOGS_ENABLED",
