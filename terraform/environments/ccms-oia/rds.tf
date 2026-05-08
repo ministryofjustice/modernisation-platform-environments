@@ -43,9 +43,9 @@ resource "aws_db_instance" "opahub_db" {
   tags = merge(local.tags, {
     Name = "${local.opa_app_name}-db"
   })
-  lifecycle {
-    ignore_changes = [
-       username
-     ]
-   }
+  # lifecycle {
+  #   ignore_changes = [
+  #      username
+  #    ]
+  #  }
 }
