@@ -265,7 +265,7 @@ resource "aws_ebs_volume" "backup_clone" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "backup") },
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "backup")) },
     { device-name = "/dev/sdz" }
   )
 }
