@@ -75,17 +75,19 @@ locals {
       ansible_repo_basedir = "ansible"
       ansible_args         = "oracle_19c_install"
     }
-    database_name = "change_me"
+    database_name = "TSTNDA"
     database_port = local.db_port
   }
 
   delius_microservices_configs_test = {
     weblogic = {
-      image_tag         = "6.2.0.3"
-      container_port    = 8080
-      container_memory  = 4096
-      container_cpu     = 2048
-      ec2_instance_type = "r5.2xlarge"
+      image_tag                = "6.7.4"
+      task_definition_revision = 13
+      container_port           = 8080
+      container_memory         = 4096
+      container_cpu            = 2048
+      ec2_instance_type        = "r7i.2xlarge"
+      task_count               = 4
     }
 
     weblogic_params = {
@@ -102,12 +104,12 @@ locals {
       DMS_PROTOCOL                      = "https"
       EIS_USER_CONTEXT                  = "cn=EISUsers,ou=Users,dc=moj,dc=com"
       ELASTICSEARCH_URL                 = "https://probation-search-test.hmpps.service.justice.gov.uk/delius"
-      GDPR_URL                          = "/gdpr/ui/homepage" # GDPR not deployed to CP yet, <URL>/gdpr/ui/homepage
+      GDPR_URL                          = "https://ndelius.test.probation.service.justice.gov.uk/gdpr/ui/homepage" # GDPR not deployed to CP yet, <URL>/gdpr/ui/homepage
       JDBC_CONNECTION_POOL_MAX_CAPACITY = "100"
       JDBC_CONNECTION_POOL_MIN_CAPACITY = "50"
-      JDBC_URL                          = ""
+      JDBC_URL                          = "jdbc:oracle:thin:@(DESCRIPTION=(LOAD_BALANCE=OFF)(FAILOVER=ON)(CONNECT_TIMEOUT=10)(RETRY_COUNT=3)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=tcp)(HOST=delius-core-test-db-1.hmpps-test.modernisation-platform.internal)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=TSTNDA_TAF)))"
       JDBC_USERNAME                     = "delius_pool"
-      LDAP_HOST                         = "https://ldap.test.delius-core.hmpps-test.modernisation-platform.service.justice.gov.uk"
+      LDAP_HOST                         = "ldap.test.delius-core.hmpps-test.modernisation-platform.service.justice.gov.uk"
       LDAP_PRINCIPAL                    = "cn=admin,dc=moj,dc=com"
       LOG_LEVEL_NDELIUS                 = "DEBUG"
       MERGE_API_URL                     = "https://delius-merge-api-test.hmpps.service.justice.gov.uk"
@@ -135,10 +137,13 @@ locals {
     }
 
     weblogic_eis = {
-      image_tag        = "6.2.0.3"
-      container_port   = 8080
-      container_memory = 2048
-      container_cpu    = 1024
+      image_tag                = "6.7.4-eis"
+      task_definition_revision = 9
+      container_port           = 8080
+      container_memory         = 2048
+      container_cpu            = 1024
+      ec2_instance_type        = "r7i.large"
+      task_count               = 1
     }
 
     pwm = {
