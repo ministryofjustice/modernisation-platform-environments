@@ -179,7 +179,7 @@ resource "aws_transfer_user" "transfer_user" {
 
   home_directory_mappings {
     entry  = "/"
-    target = "/${module.s3_bucket["unscanned"].s3_bucket_id}/$${transfer:UserName}"
+    target = "/${module.s3_bucket["unscanned"].s3_bucket_id}/incoming/$${transfer:UserName}"
   }
 
   tags = local.tags
