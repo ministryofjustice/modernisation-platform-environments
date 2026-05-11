@@ -206,7 +206,7 @@ resource "aws_iam_role_policy" "lambda_guardduty_sns_policy" {
 resource "aws_lambda_layer_version" "guardduty_sns_layer" {
   layer_name               = "${local.application_name}-${local.environment}-guardduty-sns-layer"
   s3_key                   = "lambda_delivery/cloudwatch_sns_layer/layerV1.zip"
-  s3_bucket                = module.s3-bucket-shared.bucket.id
+  s3_bucket                = aws_s3_bucket.maatdb_shared.bucket
   compatible_runtimes      = ["python3.13"]
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ${local.application_name} GuardDuty SNS Alerts Integration"
