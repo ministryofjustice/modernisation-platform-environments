@@ -8,7 +8,7 @@ resource "aws_db_subnet_group" "soa" {
 }
 
 resource "aws_db_option_group" "soa_oracle_19" {
-  name                 = "soa-db-option-group"
+  name_prefix          = "soa-db-option-group"
   engine_name          = "oracle-ee"
   major_engine_version = "19"
 
@@ -53,6 +53,9 @@ resource "aws_db_option_group" "soa_oracle_19" {
     }
   }
 
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_db_instance" "soa_db" {
