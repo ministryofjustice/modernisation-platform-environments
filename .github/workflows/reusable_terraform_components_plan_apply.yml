@@ -36,7 +36,7 @@
             type: boolean
             required: false
             description: "Set to true to post terraform plan as a comment to the PR"
-            default: false
+            default: true
           component:
             type: string
             required: false
@@ -176,6 +176,15 @@
             run: |
               bash ${GITHUB_WORKSPACE}/scripts/terraform-plan-evaluator.sh tfplan.json
 
+          - name: Create Tag Impact PR message (Optional)
+            if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
+            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+            run: |
+              bash ${GITHUB_WORKSPACE}/scripts/terraform-plan-tag-impact.sh tfplan.json > tfplan-tag-impact.txt
+              echo 'TF_PLAN_TAG_IMPACT_OUT<<EOF' >> $GITHUB_ENV
+              cat tfplan-tag-impact.txt >> $GITHUB_ENV
+              echo 'EOF' >> $GITHUB_ENV
+
           - name: Create Plan PR message (Optional)
             if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
@@ -191,6 +200,11 @@
                 echo '```'
                 if [[ $len -gt 65476 ]]; then
                   echo "** Truncated output.  See $url for the rest **"
+                fi
+
+                if [[ -n "${TF_PLAN_TAG_IMPACT_OUT}" ]]; then
+                  echo
+                  echo "${TF_PLAN_TAG_IMPACT_OUT}"
                 fi
               }
               echo 'TF_PLAN_OUT<<EOF' >> $GITHUB_ENV
