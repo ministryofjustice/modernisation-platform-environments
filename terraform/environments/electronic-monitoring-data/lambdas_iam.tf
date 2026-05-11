@@ -2220,7 +2220,7 @@ data "aws_iam_policy_document" "insert_load_policy_document" {
 
 resource "aws_lakeformation_permissions" "insert_load_lambda_database_access" {
   for_each = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
-  principal   = module.insert_load_lambda_role.arn
+  principal   = module.insert_load.arn
   permissions = ["DESCRIBE"]
   database {
     name = each.value
@@ -2229,7 +2229,7 @@ resource "aws_lakeformation_permissions" "insert_load_lambda_database_access" {
 
 resource "aws_lakeformation_permissions" "insert_load_lambda_table_access" {
   for_each = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
-  principal   = module.insert_load_lambda_role.arn
+  principal   = module.insert_load.arn
   permissions = ["SELECT", "INSERT", "ALTER", "DESCRIBE"]
   table {
     database_name = each.value
@@ -2239,7 +2239,7 @@ resource "aws_lakeformation_permissions" "insert_load_lambda_table_access" {
 
 resource "aws_lakeformation_permissions" "insert_load_lambda_s3_access" {
   count     = local.is-development || local.is-test ? 1 : 0
-  principal   = module.insert_load_lambda_role.arn
+  principal   = module.insert_load.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
     arn = aws_lakeformation_resource.data_bucket.arn
