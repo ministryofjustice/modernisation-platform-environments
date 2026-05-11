@@ -6,8 +6,14 @@ locals {
       destination_bucket_key = "clean"
       delete_source          = true
       event_pattern = {
-        source = ["aws.guardduty"]
+        source        = ["aws.guardduty"]
+        "detail-type" = ["GuardDuty Malware Protection Object Scan Result"]
+        resources     = [aws_guardduty_malware_protection_plan.this.arn]
         detail = {
+          resourceType = ["S3_OBJECT"]
+          s3ObjectDetails = {
+            bucketName = [module.s3_bucket["processing"].s3_bucket_id]
+          }
           scanResultDetails = {
             scanResultStatus = ["NO_THREATS_FOUND"]
           }
@@ -21,8 +27,14 @@ locals {
       destination_bucket_key = "quarantine"
       delete_source          = true
       event_pattern = {
-        source = ["aws.guardduty"]
+        source        = ["aws.guardduty"]
+        "detail-type" = ["GuardDuty Malware Protection Object Scan Result"]
+        resources     = [aws_guardduty_malware_protection_plan.this.arn]
         detail = {
+          resourceType = ["S3_OBJECT"]
+          s3ObjectDetails = {
+            bucketName = [module.s3_bucket["processing"].s3_bucket_id]
+          }
           scanResultDetails = {
             scanResultStatus = ["THREATS_FOUND"]
           }
@@ -36,8 +48,14 @@ locals {
       destination_bucket_key = "investigation"
       delete_source          = true
       event_pattern = {
-        source = ["aws.guardduty"]
+        source        = ["aws.guardduty"]
+        "detail-type" = ["GuardDuty Malware Protection Object Scan Result"]
+        resources     = [aws_guardduty_malware_protection_plan.this.arn]
         detail = {
+          resourceType = ["S3_OBJECT"]
+          s3ObjectDetails = {
+            bucketName = [module.s3_bucket["processing"].s3_bucket_id]
+          }
           scanResultDetails = {
             scanResultStatus = ["UNSUPPORTED", "ACCESS_DENIED", "FAILED"]
           }
