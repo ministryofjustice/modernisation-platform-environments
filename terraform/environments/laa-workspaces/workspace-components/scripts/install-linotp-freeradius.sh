@@ -135,6 +135,12 @@ GRANT ALL PRIVILEGES ON linotp2.* TO 'linotp2'@'localhost' IDENTIFIED BY '$${MAR
 FLUSH PRIVILEGES;
 LINOTP_DB_SETUP
 
+# Create LinOTP encryption key file
+mkdir -p /etc/linotp2/
+openssl rand -hex 32 > /etc/linotp2/encKey
+chmod 600 /etc/linotp2/encKey
+chown linotp:linotp /etc/linotp2/encKey
+
 # Configure LinOTP to use the database
 cat > /etc/linotp2/linotp.ini <<EOF
 [DEFAULT]
@@ -157,7 +163,14 @@ beaker.session.key = linotp
 beaker.session.secret = $${LINOTP_ADMIN_PASSWORD}
 
 sqlalchemy.url = mysql://linotp2:$${MARIADB_ROOT_PASSWORD}@localhost/linotp2
+
+# Encryption key configuration
+linotpSecretFile = /etc/linotp2/encKey
 EOF
+
+# Create cache directory
+mkdir -p /etc/linotp2/data
+chown -R linotp:linotp /etc/linotp2
 
 # Initialize LinOTP database schema
 paster setup-app /etc/linotp2/linotp.ini
