@@ -29,7 +29,7 @@ resource "aws_instance" "ec2_gh_runner" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("github-runner-%s", local.environment)) },
+    { Name = lower(format("github-runner-%s", local.github_runner_name)) },
     { instance-role = local.application_data.accounts[local.environment].instance_role_gh_runner },
     { instance-scheduling = "skip-scheduling" },
     { backup = "true" }
