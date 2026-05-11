@@ -2,11 +2,11 @@ module "lambda_unscanned_to_processing" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.8.0"
 
-  function_name = "${local.application_name}-unscanned-to-processing"
-  description   = "Moves uploaded files from the unscanned bucket to the processing bucket"
-  handler       = "lambda_function.lambda_handler"
-  runtime       = "python3.12"
-  source_path   = "lambda/s3-file-mover"
+  function_name                = "${local.application_name}-unscanned-to-processing"
+  description                  = "Moves uploaded files from the unscanned bucket to the processing bucket"
+  handler                      = "lambda_function.lambda_handler"
+  runtime                      = "python3.12"
+  source_path                  = "lambda/s3-file-mover"
   trigger_on_package_timestamp = false
 
   event_source_mapping = {
@@ -76,11 +76,11 @@ module "lambda_processing_to_post_scan" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.8.0"
 
-  function_name = "${local.application_name}-processing-to-post-scan"
-  description   = "Moves scanned files from the processing bucket to the post-scan destination bucket"
-  handler       = "lambda_function.lambda_handler"
-  runtime       = "python3.12"
-  source_path   = "lambda/guard-duty-file-mover"
+  function_name                = "${local.application_name}-processing-to-post-scan"
+  description                  = "Moves scanned files from the processing bucket to the post-scan destination bucket"
+  handler                      = "lambda_function.lambda_handler"
+  runtime                      = "python3.12"
+  source_path                  = "lambda/guard-duty-file-mover"
   trigger_on_package_timestamp = false
 
   event_source_mapping = {
