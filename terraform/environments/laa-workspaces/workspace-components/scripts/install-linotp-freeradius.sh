@@ -235,8 +235,8 @@ echo "✓ Apache httpd installed and started"
 echo "[7/12] Configuring LinOTP admin access..."
 
 # Create admin user with password from Secrets Manager
-# htdigest requires password on stdin
-echo "$${LINOTP_ADMIN_PASSWORD}" | htdigest -c /etc/linotp2/admins "LinOTP2 admin area" admin
+# htdigest requires password twice (new password + confirmation)
+printf "%s\n%s\n" "$${LINOTP_ADMIN_PASSWORD}" "$${LINOTP_ADMIN_PASSWORD}" | htdigest -c /etc/linotp2/admins "LinOTP2 admin area" admin
 
 echo "✓ LinOTP admin user created"
 
