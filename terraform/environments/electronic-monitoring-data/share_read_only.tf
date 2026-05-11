@@ -1,8 +1,8 @@
 locals {
-    read_only_dbs = [
-        "acquisitive_crime",
-        "data_insights",
-    ]
+  read_only_dbs = [
+    "acquisitive_crime",
+    "data_insights",
+  ]
 }
 
 data "aws_iam_roles" "mp_data_scientist" {
@@ -35,7 +35,7 @@ resource "aws_lakeformation_permissions" "data_scientist_test_table_permissions"
 
 
 resource "aws_lakeformation_permissions" "data_scientist_db_permissions" {
-  for_each = local.is-preproduction ? toset(local.read_only_dbs) : []
+  for_each  = local.is-preproduction ? toset(local.read_only_dbs) : []
   principal = one(data.aws_iam_roles.mp_data_scientist.arns)
 
   database {
@@ -46,7 +46,7 @@ resource "aws_lakeformation_permissions" "data_scientist_db_permissions" {
 }
 
 resource "aws_lakeformation_permissions" "data_scientist_table_permissions" {
-  for_each = local.is-preproduction ? toset(local.read_only_dbs) : []
+  for_each  = local.is-preproduction ? toset(local.read_only_dbs) : []
   principal = one(data.aws_iam_roles.mp_data_scientist.arns)
 
   table {

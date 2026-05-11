@@ -166,8 +166,8 @@ resource "aws_autoscaling_lifecycle_hook" "ecs_draining" {
   autoscaling_group_name = module.autoscaling.autoscaling_group_name
   lifecycle_transition   = "autoscaling:EC2_INSTANCE_TERMINATING"
   default_result         = "CONTINUE"
-  heartbeat_timeout      = 300  
-}  
+  heartbeat_timeout      = 300
+}
 
 module "autoscaling_sg" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions

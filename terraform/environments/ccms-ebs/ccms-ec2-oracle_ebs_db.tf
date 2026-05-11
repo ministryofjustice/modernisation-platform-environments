@@ -96,7 +96,8 @@ resource "aws_instance" "ec2_oracle_ebs" {
 resource "aws_ebs_volume" "export_home" {
   lifecycle {
     ignore_changes = [
-      kms_key_id
+      kms_key_id,
+      tags
     ]
   }
   availability_zone = "eu-west-2a"
@@ -146,7 +147,8 @@ resource "aws_volume_attachment" "u01_att" {
 resource "aws_ebs_volume" "arch" {
   lifecycle {
     ignore_changes = [
-      kms_key_id
+      kms_key_id,
+      tags
     ]
   }
   availability_zone = "eu-west-2a"
@@ -156,7 +158,7 @@ resource "aws_ebs_volume" "arch" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "arch") },
+    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix, "arch") },
     { mount-point = format("%s/%s", local.volume_prefix, "arch") },
     { device-name = "/dev/sdj" }
   )
@@ -171,7 +173,8 @@ resource "aws_volume_attachment" "arch_att" {
 resource "aws_ebs_volume" "redoA" {
   lifecycle {
     ignore_changes = [
-      kms_key_id
+      kms_key_id,
+      tags
     ]
   }
   availability_zone = "eu-west-2a"
@@ -181,7 +184,7 @@ resource "aws_ebs_volume" "redoA" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "redoA") },
+    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix, "redoA") },
     { mount-point = format("%s/%s", local.volume_prefix, "redoA") },
     { device-name = "/dev/sdl" }
   )
@@ -196,7 +199,8 @@ resource "aws_volume_attachment" "redoA_att" {
 resource "aws_ebs_volume" "techst" {
   lifecycle {
     ignore_changes = [
-      kms_key_id
+      kms_key_id,
+      tags
     ]
   }
   availability_zone = "eu-west-2a"
@@ -206,7 +210,7 @@ resource "aws_ebs_volume" "techst" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "techst") },
+    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix, "techst") },
     { device-name = "/dev/sdm" },
     { mount-point = format("%s/%s", local.volume_prefix, "techst") }
   )
@@ -221,7 +225,8 @@ resource "aws_volume_attachment" "techst_att" {
 resource "aws_ebs_volume" "backup" {
   lifecycle {
     ignore_changes = [
-      kms_key_id
+      kms_key_id,
+      tags
     ]
   }
   availability_zone = "eu-west-2a"
@@ -246,7 +251,8 @@ resource "aws_volume_attachment" "backup_att" {
 resource "aws_ebs_volume" "backup_clone" {
   lifecycle {
     ignore_changes = [
-      kms_key_id
+      kms_key_id,
+      tags
     ]
   }
   availability_zone = "eu-west-2a"
@@ -273,7 +279,8 @@ resource "aws_volume_attachment" "backup_clone_att" {
 resource "aws_ebs_volume" "backup_prod" {
   lifecycle {
     ignore_changes = [
-      kms_key_id
+      kms_key_id,
+      tags
     ]
   }
   availability_zone = "eu-west-2a"
@@ -285,7 +292,7 @@ resource "aws_ebs_volume" "backup_prod" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "backup-prod") },
+    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix, "backup-prod") },
     { mount-point = format("%s/%s", local.volume_prefix, "backup-prod") },
     { device-name = "/dev/sdy" }
   )
@@ -301,7 +308,8 @@ resource "aws_volume_attachment" "backup_prod_att" {
 resource "aws_ebs_volume" "redoB" {
   lifecycle {
     ignore_changes = [
-      kms_key_id
+      kms_key_id,
+      tags
     ]
   }
   availability_zone = "eu-west-2a"
@@ -311,7 +319,7 @@ resource "aws_ebs_volume" "redoB" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "redoB") },
+    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix, "redoB") },
     { mount-point = format("%s/%s", local.volume_prefix, "redoB") },
     { device-name = "/dev/sdo" }
   )
@@ -329,7 +337,8 @@ resource "aws_volume_attachment" "redoB_att" {
 resource "aws_ebs_volume" "diag" {
   lifecycle {
     ignore_changes = [
-      kms_key_id
+      kms_key_id,
+      tags
     ]
   }
   availability_zone = "eu-west-2a"
@@ -339,7 +348,7 @@ resource "aws_ebs_volume" "diag" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "diag") },
+    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix, "diag") },
     { device-name = "/dev/sdp" },
     { mount-point = format("%s/%s", local.volume_prefix, "diag") }
   )
@@ -357,7 +366,8 @@ resource "aws_volume_attachment" "diag_att" {
 resource "aws_ebs_volume" "dbf01" {
   lifecycle {
     ignore_changes = [
-      kms_key_id
+      kms_key_id,
+      tags
     ]
   }
   availability_zone = "eu-west-2a"
@@ -367,7 +377,7 @@ resource "aws_ebs_volume" "dbf01" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "dbf01") },
+    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix, "dbf01") },
     { device-name = "/dev/sdq" },
     { mount-point = format("%s/%s", local.volume_prefix, "dbf01") }
   )
@@ -385,7 +395,8 @@ resource "aws_volume_attachment" "dbf01_att" {
 resource "aws_ebs_volume" "dbf02" {
   lifecycle {
     ignore_changes = [
-      kms_key_id
+      kms_key_id,
+      tags
     ]
   }
   availability_zone = "eu-west-2a"
@@ -395,7 +406,7 @@ resource "aws_ebs_volume" "dbf02" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "dbf02") },
+    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix, "dbf02") },
     { device-name = "/dev/sdr" },
     { mount-point = format("%s/%s", local.volume_prefix, "dbf02") }
   )
@@ -413,7 +424,8 @@ resource "aws_volume_attachment" "dbf02_att" {
 resource "aws_ebs_volume" "dbf03" {
   lifecycle {
     ignore_changes = [
-      kms_key_id
+      kms_key_id,
+      tags
     ]
   }
   availability_zone = "eu-west-2a"
@@ -423,7 +435,7 @@ resource "aws_ebs_volume" "dbf03" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "dbf03") },
+    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix, "dbf03") },
     { device-name = "/dev/sds" },
     { mount-point = format("%s/%s", local.volume_prefix, "dbf03") }
   )
@@ -441,7 +453,8 @@ resource "aws_volume_attachment" "dbf03_att" {
 resource "aws_ebs_volume" "dbf04" {
   lifecycle {
     ignore_changes = [
-      kms_key_id
+      kms_key_id,
+      tags
     ]
   }
   availability_zone = "eu-west-2a"
@@ -451,7 +464,7 @@ resource "aws_ebs_volume" "dbf04" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "dbf04") },
+    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix, "dbf04") },
     { device-name = "/dev/sdt" },
     { mount-point = format("%s/%s", local.volume_prefix, "dbf04") }
   )
@@ -470,7 +483,8 @@ resource "aws_ebs_volume" "swap2" {
   count = local.is-development ? 1 : 0
   lifecycle {
     ignore_changes = [
-      kms_key_id
+      kms_key_id,
+      tags
     ]
   }
   availability_zone = "eu-west-2a"
@@ -480,7 +494,7 @@ resource "aws_ebs_volume" "swap2" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix,  "swap2") },
+    { Name = format("%s:%s/%s", lower(local.application_data.accounts[local.environment].instance_role_ebsdb), local.volume_prefix, "swap2") },
     { device-name = "/dev/sdx" },
     { mount-point = format("%s/%s", local.volume_prefix, "swap2") }
   )
