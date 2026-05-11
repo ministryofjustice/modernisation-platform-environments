@@ -212,7 +212,9 @@ EOF
 mkdir -p /etc/linotp2/data
 mkdir -p /var/log/linotp
 chown -R linotp:linotp /etc/linotp2
-chown -R linotp:linotp /var/log/linotp
+# Apache runs WSGI app as 'apache' user, needs write access to log directory
+chown -R linotp:apache /var/log/linotp
+chmod -R 775 /var/log/linotp
 
 # Initialize LinOTP database schema
 paster setup-app /etc/linotp2/linotp.ini
