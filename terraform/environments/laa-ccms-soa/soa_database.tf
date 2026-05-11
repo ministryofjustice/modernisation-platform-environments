@@ -7,57 +7,6 @@ resource "aws_db_subnet_group" "soa" {
   }
 }
 
-resource "aws_db_option_group" "soa_oracle_19" {
-  name_prefix          = "soa-db-option-group"
-  engine_name          = "oracle-ee"
-  major_engine_version = "19"
-
-  option {
-    option_name = "JVM"
-  }
-
-  option {
-    option_name = "S3_INTEGRATION"
-    port        = 0
-    version     = "1.0"
-  }
-
-  option {
-    option_name = "OEM_AGENT"
-
-    port    = tonumber(local.application_data.accounts[local.environment].oem.agent_port)
-    version = "13.5.0.0.v1"
-
-    vpc_security_group_memberships = [
-      aws_security_group.soa_db.id
-    ]
-
-    option_settings {
-      name  = "MINIMUM_TLS_VERSION"
-      value = "TLSv1"
-    }
-
-    option_settings {
-      name  = "AGENT_REGISTRATION_PASSWORD"
-      value = jsondecode(data.aws_secretsmanager_secret_version.ccms_soa_quiesced_secrets_current.secret_string)["agent_registration_password"]
-    }
-
-    option_settings {
-      name  = "OMS_HOST"
-      value = local.application_data.accounts[local.environment].oem.oms_host
-    }
-
-    option_settings {
-      name  = "OMS_PORT"
-      value = local.application_data.accounts[local.environment].oem.oms_port
-    }
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 resource "aws_db_option_group" "soa_oracle_20" {
   name                 = "soa-db-option-group-oracle19"
   engine_name          = "oracle-ee"
