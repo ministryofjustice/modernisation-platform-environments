@@ -89,7 +89,9 @@ data "aws_iam_policy_document" "gdpr_structured_job_policy_document" {
     effect = "Allow"
     actions = [
       "glue:GetTable",
+      "glue:UpdateTable",
       "glue:GetDatabase",
+      "glue:GetDatabases",
       "glue:GetPartitions",
       "glue:BatchDeletePartition"
     ]
