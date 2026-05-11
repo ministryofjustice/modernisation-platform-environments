@@ -2141,7 +2141,7 @@ resource "aws_lakeformation_permissions" "lambda_p1_table_access" {
 # Insert load lambda role
 # ------------------------------------------------------------------------------
 
-resource "aws_iam_role" "insert_load_lambda_role" {
+resource "aws_iam_role" "insert_load" {
   name               = "insert_load_lambda_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
