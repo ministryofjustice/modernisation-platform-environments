@@ -10,8 +10,8 @@ locals {
     "intermediate_tasking${local.dbt_suffix}"
   ]
   load_lambda_databases = [
-    "staged_mdss${local.dbt_suffix}_dbt", 
-    "acquisitive_crime${local.dbt_suffix}_dbt}"
+    "staged_mdss${local.dbt_suffix}", 
+    "acquisitive_crime${local.dbt_suffix}"
     ]
 }
 
