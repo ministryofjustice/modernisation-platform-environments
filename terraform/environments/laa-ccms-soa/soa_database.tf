@@ -52,6 +52,10 @@ resource "aws_db_option_group" "soa_oracle_20" {
       value = local.application_data.accounts[local.environment].oem.oms_port
     }
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_db_instance" "soa_db" {
