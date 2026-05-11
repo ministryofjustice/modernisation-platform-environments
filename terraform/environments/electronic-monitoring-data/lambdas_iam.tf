@@ -2218,6 +2218,16 @@ data "aws_iam_policy_document" "insert_load_policy_document" {
     }
 }
 
+resource "aws_iam_policy" "insert_load" {
+  name   = "insert_load_lambda_policy"  
+  policy = data.aws_iam_policy_document.insert_load_policy_document.json
+  }
+
+resource "aws_iam_role_policy_attachment" "insert_load_attach" {
+  role       = aws_iam_role.insert_load.name  
+  policy_arn = aws_iam_policy.insert_load.arn
+  }
+
 resource "aws_lakeformation_permissions" "insert_load_lambda_database_access" {
   for_each = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
   principal   = module.insert_load.arn
@@ -2245,17 +2255,6 @@ resource "aws_lakeformation_permissions" "insert_load_lambda_s3_access" {
     arn = aws_lakeformation_resource.data_bucket.arn
   }
 }
-
-resource "aws_iam_policy" "insert_load" {
-  name   = "insert_load_lambda_policy"  
-  policy = data.aws_iam_policy_document.insert_load_policy_document.json
-  }
-
-resource "aws_iam_role_policy_attachment" "insert_load_attach" {
-  role       = aws_iam_role.insert_load.name  
-  policy_arn = aws_iam_policy.insert_load.arn
-  }
-
 
 #-----------------------------------------------------------------------------------
 # Landing DLQ redriver IAM Role
