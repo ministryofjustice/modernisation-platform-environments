@@ -9,11 +9,6 @@ data "aws_iam_policy_document" "task" {
     }
   }
 }
-resource "aws_iam_role" "task" {
-  name               = "vcms-${local.environment}-ecs-task"
-  assume_role_policy = data.aws_iam_policy_document.task.json
-  tags               = local.tags
-}
 
 data "aws_iam_policy_document" "ecs_service" {
   statement {
@@ -50,50 +45,12 @@ data "aws_iam_policy_document" "service_policy" {
   }
 }
 
-data "aws_iam_policy_document" "task_secrets" {
-  statement {
-    effect    = "Allow"
-    resources = [
-      "arn:aws:secretsmanager:eu-west-2:${local.modernisation_platform_account_id}:secret:vcms-test-automation-key-*"
-    ]
-
-    actions = [
-      "secretsmanager:GetSecretValue"
-    ]
-  }
-}
-
 resource "aws_iam_role_policy" "service_policy" {
   name   = "vcms-${local.environment}-service"
   policy = data.aws_iam_policy_document.service_policy.json
   role   = aws_iam_role.service.id
 }
 
-resource "aws_iam_role_policy" "task_secrets" {
-  name   = "vcms-${local.environment}-task-secrets"
-  policy = data.aws_iam_policy_document.task_secrets.json
-  role   = aws_iam_role.task.id
-}
-
-data "aws_iam_policy_document" "ssm_exec" {
-  statement {
-    effect    = "Allow"
-    resources = ["*"]
-
-    actions = [
-      "ssmmessages:CreateControlChannel",
-      "ssmmessages:CreateDataChannel",
-      "ssmmessages:OpenControlChannel",
-      "ssmmessages:OpenDataChannel"
-    ]
-  }
-}
-
-resource "aws_iam_role_policy" "ssm_exec" {
-  name   = "vcms-${local.environment}-service-ssm-exec"
-  policy = data.aws_iam_policy_document.ssm_exec.json
-  role   = aws_iam_role.task.id
-}
 
 # IAM role that the Amazon ECS container agent and the Docker daemon can assume
 data "aws_iam_policy_document" "ecs_task_exec" {
@@ -140,3 +97,68 @@ resource "aws_iam_role" "task_exec" {
   tags               = local.tags
 }
 
+
+resource "aws_iam_role" "task" {
+  name               = "vcms-${local.environment}-ecs-task"
+  assume_role_policy = data.aws_iam_policy_document.task.json
+  tags               = local.tags
+}
+
+data "aws_iam_policy_document" "task" {
+  # S3 permissions for report uploads
+  statement {
+    sid    = "AllowS3ReportUpload"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl"
+    ]
+    resources = [
+      "${module.vcms_testing_reports_bucket.bucket.arn}/*"
+    ]
+  }
+
+  # secrets manager access
+  statement {
+    sid    = "AllowSecretAccess"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue"
+    ]
+    resources = [
+      "arn:aws:secretsmanager:eu-west-2:${local.modernisation_platform_account_id}:secret:vcms-test-automation-key-*"
+    ]
+  }
+
+  # ecs exec
+  statement {
+    sid    = "AllowSSMExec"
+    effect = "Allow"
+    actions = [
+      "ssmmessages:CreateControlChannel",
+      "ssmmessages:CreateDataChannel",
+      "ssmmessages:OpenControlChannel",
+      "ssmmessages:OpenDataChannel"
+    ]
+    resources = ["*"]
+  }
+
+  # kms for encrypted S3
+  statement {
+    sid    = "AllowKMSUsage"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey"
+    ]
+    resources = [
+      local.account_config.kms_keys.general_shared
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "task" {
+  name   = "vcms-${local.environment}-task"
+  role   = aws_iam_role.task.id
+  policy = data.aws_iam_policy_document.task.json
+}
