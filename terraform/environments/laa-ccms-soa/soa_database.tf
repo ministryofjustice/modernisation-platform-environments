@@ -7,7 +7,12 @@ resource "aws_db_subnet_group" "soa" {
   }
 }
 
-resource "aws_db_option_group" "soa_oracle_20" {
+moved {
+  from = aws_db_option_group.soa_oracle_20
+  to   = aws_db_option_group.soa_oracle_19
+}
+
+resource "aws_db_option_group" "soa_oracle_19" {
   name_prefix          = "soa-db-option-group19"
   engine_name          = "oracle-ee"
   major_engine_version = "19"
@@ -87,7 +92,7 @@ resource "aws_db_instance" "soa_db" {
   character_set_name      = "AL32UTF8"
   deletion_protection     = local.application_data.accounts[local.environment].soa_db_deletion_protection
   db_subnet_group_name    = aws_db_subnet_group.soa.id
-  option_group_name       = aws_db_option_group.soa_oracle_20.id
+  option_group_name       = aws_db_option_group.soa_oracle_19.id
   apply_immediately       = true
 
   tags = merge(
