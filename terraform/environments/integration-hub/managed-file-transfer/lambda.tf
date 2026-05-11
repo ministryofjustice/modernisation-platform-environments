@@ -7,6 +7,7 @@ module "lambda_unscanned_to_processing" {
   handler       = "lambda_function.lambda_handler"
   runtime       = "python3.12"
   source_path   = "lambda/s3-file-mover"
+  trigger_on_package_timestamp = false
 
   event_source_mapping = {
     sqs = {
@@ -80,6 +81,7 @@ module "lambda_processing_to_post_scan" {
   handler       = "lambda_function.lambda_handler"
   runtime       = "python3.12"
   source_path   = "lambda/guard-duty-file-mover"
+  trigger_on_package_timestamp = false
 
   event_source_mapping = {
     sqs = {
