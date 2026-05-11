@@ -1,15 +1,3 @@
-data "aws_iam_policy_document" "task" {
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["ecs-tasks.amazonaws.com"]
-    }
-  }
-}
-
 data "aws_iam_policy_document" "ecs_service" {
   statement {
     effect  = "Allow"
@@ -105,6 +93,15 @@ resource "aws_iam_role" "task" {
 }
 
 data "aws_iam_policy_document" "task" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ecs-tasks.amazonaws.com"]
+    }
+  }
   # S3 permissions for report uploads
   statement {
     sid    = "AllowS3ReportUpload"
