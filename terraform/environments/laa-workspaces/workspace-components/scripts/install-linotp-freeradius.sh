@@ -131,8 +131,7 @@ restorecon -Rv /var/log/linotp || true
 # IMPORTANT: Do this BEFORE securing MariaDB (while root has no password)
 mysql <<LINOTP_DB_SETUP
 CREATE DATABASE IF NOT EXISTS linotp2 DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
-CREATE USER IF NOT EXISTS 'linotp2'@'localhost' IDENTIFIED BY '$${MARIADB_ROOT_PASSWORD}';
-GRANT ALL PRIVILEGES ON linotp2.* TO 'linotp2'@'localhost';
+GRANT ALL PRIVILEGES ON linotp2.* TO 'linotp2'@'localhost' IDENTIFIED BY '$${MARIADB_ROOT_PASSWORD}';
 FLUSH PRIVILEGES;
 LINOTP_DB_SETUP
 
