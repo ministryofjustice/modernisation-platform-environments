@@ -88,20 +88,21 @@ resource "aws_iam_role" "task_exec" {
 
 resource "aws_iam_role" "task" {
   name               = "vcms-${local.environment}-ecs-task"
-  assume_role_policy = data.aws_iam_policy_document.task.json
+  assume_role_policy = data.aws_iam_policy_document.task_trust.json
   tags               = local.tags
 }
 
-data "aws_iam_policy_document" "task" {
+data "aws_iam_policy_document" "task_trust" {
   statement {
-    effect  = "Allow"
     actions = ["sts:AssumeRole"]
-
     principals {
       type        = "Service"
       identifiers = ["ecs-tasks.amazonaws.com"]
     }
   }
+}
+
+data "aws_iam_policy_document" "task" {
   # S3 permissions for report uploads
   statement {
     sid    = "AllowS3ReportUpload"
