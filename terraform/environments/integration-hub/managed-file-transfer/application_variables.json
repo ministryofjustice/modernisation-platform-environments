@@ -4,6 +4,8 @@
       "iam_configuration": {
         "guardduty_role_name": "integration-hub-development-guardduty-s3-plan",
         "guardduty_policy_name": "integration-hub-development-guardduty-s3-plan",
+        "transfer_role_name": "integration-hub-development-transfer",
+        "transfer_policy_name": "integration-hub-development-transfer-policy",
         "malware_scanning_processing_bucket_key": "processing",
         "malware_scanning_object_prefix": ["incoming/"],
         "kms_key_arn_list": [
