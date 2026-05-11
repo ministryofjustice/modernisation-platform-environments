@@ -8,7 +8,7 @@ resource "aws_db_subnet_group" "soa" {
 }
 
 resource "aws_db_option_group" "soa_oracle_19" {
-  name_prefix          = "soa-db-option-group"
+  name                 = "soa-db-option-group"
   engine_name          = "oracle-ee"
   major_engine_version = "19"
 
@@ -53,9 +53,6 @@ resource "aws_db_option_group" "soa_oracle_19" {
     }
   }
 
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 resource "aws_db_instance" "soa_db" {
@@ -88,7 +85,6 @@ resource "aws_db_instance" "soa_db" {
   deletion_protection     = local.application_data.accounts[local.environment].soa_db_deletion_protection
   db_subnet_group_name    = aws_db_subnet_group.soa.id
   option_group_name       = aws_db_option_group.soa_oracle_19.id
-  apply_immediately       = true
 
   tags = merge(
     local.tags,
