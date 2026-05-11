@@ -214,13 +214,14 @@ mv /etc/httpd/conf.d/ssl_linotp.conf.template /etc/httpd/conf.d/ssl_linotp.conf
 
 # Generate self-signed SSL certificate
 # Note: ALB terminates SSL, but this is needed for ALB -> EC2 connection
+# Use localhost.crt/localhost.key to match LinOTP Apache config
 openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 \
   -subj "/C=GB/ST=London/L=London/O=LAA/CN=$${INSTANCE_HOSTNAME}" \
-  -keyout /etc/pki/tls/private/server.key \
-  -out /etc/pki/tls/certs/server.crt
+  -keyout /etc/pki/tls/private/localhost.key \
+  -out /etc/pki/tls/certs/localhost.crt
 
 # Set permissions
-chmod 600 /etc/pki/tls/private/server.key
+chmod 600 /etc/pki/tls/private/localhost.key
 
 # Start Apache
 systemctl start httpd
