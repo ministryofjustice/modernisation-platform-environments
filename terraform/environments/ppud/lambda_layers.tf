@@ -24,7 +24,7 @@ locals {
     boto3         = "boto3_layer.zip"
     pandas        = "pandas_layer.zip"
     xlsxwriter    = "xlsxwriter_layer.zip"
-    requests      = "requests_layer.zip"
+    requests      = "requests_v2.33_layer.zip"
     beautifulsoup = "beautifulsoup_layer.zip"
   }
 
