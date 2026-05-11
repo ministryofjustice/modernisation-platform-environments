@@ -422,6 +422,11 @@ server default {
   authorize {
     preprocess
     perl
+    if (ok) {
+      update control {
+        Auth-Type := Perl
+      }
+    }
   }
 
   authenticate {

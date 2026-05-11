@@ -1,7 +1,7 @@
 gpra
 # LAA WorkSpaces with RADIUS MFA - Deployment Guide
 
-**Document Version:** 2.1  
+**Document Version:** 2.2  
 **Last Updated:** 11 May 2026  
 **Environment:** AWS Modernisation Platform  
 **Status:** Active - LinOTP + FreeRADIUS Implementation
@@ -17,6 +17,13 @@ gpra
 CN=Admin,OU=Users,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local
 ```
 NOT: `CN=Admin,CN=Users,DC=laa-workspaces,DC=local`
+
+⚠️ **FreeRADIUS Auth-Type:** The installation script includes a critical fix for FreeRADIUS authentication. The site configuration sets `Auth-Type := Perl` in the authorize section to ensure LinOTP is called for authentication. Without this, RADIUS will return Access-Reject with "No Auth-Type found" error.
+
+⚠️ **LinOTP Policies Required:** Before users can enroll tokens, three policies must be created in LinOTP:
+- `selfservice_enrollment` (scope: selfservice, action: enrollTOTP, webprovisionGOOGLE)
+- `limit_one_token` (scope: enrollment, action: maxtoken=1)
+- `otp_authentication` (scope: authentication, action: otppin=1)
 
 ⚠️ **ALB Access:** If the Application Load Balancer returns 504 errors, use SSM port forwarding to access LinOTP admin portal directly.
 
@@ -593,28 +600,63 @@ If the connection test fails:
 - Verify AD service account has read permissions
 - Check BaseDN is correct
 
-### Step 3.7: Import Policies
+### Step 3.7: Create Policies for Self-Service Enrollment
+
+**IMPORTANT:** Policies must be created before users can enroll tokens via the self-service portal.
+
+**In LinOTP Admin Portal (`/manage`):**
+
+#### Policy 1: Enable Self-Service Enrollment
 
 1. Click **Policies** tab
-2. Click **Import Policy**
-3. On the RADIUS server, the policy file was created at `/tmp/samplepolicy.cfg`
+2. Click **New**
+3. Fill in:
+   - **Name:** `selfservice_enrollment`
+   - **Scope:** Select `selfservice`
+   - **Action:** `enrollTOTP, webprovisionGOOGLE`
+   - **User:** `*` (all users)
+   - **Realm:** `laa-workspaces`
+   - **Client:** Leave empty or `*`
+   - **Active:** ✅ Check the box
+4. Click **Save**
 
-**To import:**
+#### Policy 2: Limit to One Token
 
-Option A: Copy policy content manually
+1. Click **New**
+2. Fill in:
+   - **Name:** `limit_one_token`
+   - **Scope:** Select `enrollment`
+   - **Action:** `maxtoken=1`
+   - **User:** `*`
+   - **Realm:** `laa-workspaces`
+   - **Active:** ✅
+3. Click **Save**
+
+#### Policy 3: Authentication Policy
+
+1. Click **New**
+2. Fill in:
+   - **Name:** `otp_authentication`
+   - **Scope:** Select `authentication`
+   - **Action:** `otppin=1`
+   - **User:** `*`
+   - **Realm:** `laa-workspaces`
+   - **Active:** ✅
+3. Click **Save**
+
+**Verify Policies:**
+- All three policies should show as **Active**
+- If you try to access the self-service portal now, you should see enrollment options
+
+**Alternative - Import from Template File:**
+
+The installation script created a template at `/tmp/samplepolicy.cfg`. To import:
+
 1. SSH to RADIUS server: `aws ssm start-session --target <instance-id>`
 2. View policy: `sudo cat /tmp/samplepolicy.cfg`
 3. Copy content
-4. In LinOTP UI, paste into import box
-5. Click **Import**
-
-Option B: Create policies manually via UI
-- Create policy: **Limit_to_one_token**
-  - Scope: enrollment
-  - Action: maxtoken=1
-- Create policy: **OTP_to_authenticate**
-  - Scope: authentication
-  - Action: otppin=token_pin
+4. In LinOTP UI **Policies** tab, click **Import Policy**
+5. Paste content and click **Import**
 
 ### Step 3.8: Update FreeRADIUS Realm Configuration
 
@@ -846,20 +888,32 @@ RADIUS_SECRET=$(aws secretsmanager get-secret-value \
   --query SecretString \
   --output text)
 
-# Get current 6-digit token from authenticator app (e.g., 123456)
-# Test authentication (replace 123456 with actual token)
-radtest test.user 123456 localhost:1812 10 "$RADIUS_SECRET"
+# Get current 6-digit token from authenticator app (e.g., 914091)
+# Test authentication (replace 914091 with actual token from your authenticator app)
+# NOTE: Quote the secret with single quotes to handle special characters
+radtest test.user 914091 localhost:1812 10 "$RADIUS_SECRET"
 ```
 
 **Expected output:**
 ```
-Received Access-Accept
+Sending Access-Request Id 123 from 0.0.0.0:xxxxx to 127.0.0.1:1812
+        User-Name = 'test.user'
+        User-Password = '914091'
+        NAS-IP-Address = 127.0.0.1
+        NAS-Port = 10
+Received Access-Accept Id 123 from 127.0.0.1:1812 to 127.0.0.1:xxxxx length 53
+        Reply-Message = 'LinOTP access granted'
 ```
 
 **If Access-Reject:**
-- Wait for token to refresh (tokens change every 30 seconds)
-- Try again with new token
-- Check `/var/log/radius/radius.log` for errors
+- Verify the 6-digit code is current (tokens change every 30 seconds)
+- Try again with a fresh token
+- Check FreeRADIUS logs for errors:
+  ```bash
+  sudo tail -20 /var/log/radius/radius.log
+  ```
+- If you see "ERROR: No Auth-Type found", check FreeRADIUS configuration (see Troubleshooting section)
+- Verify policies are created and active in LinOTP admin portal
 
 ### Step 4.4: Test from Microsoft AD
 
@@ -979,13 +1033,56 @@ sudo cat /var/log/radius-install.log
 #### No Users Visible in LinOTP
 
 **Checks:**
-- Verify BaseDN is correct: `CN=Users,DC=laa-workspaces,DC=local`
-- Check service account has read permissions
-- Verify BindDN format: `CN=MFAService,CN=Users,DC=laa-workspaces,DC=local`
+- Verify BaseDN uses OU format: `OU=Users,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local`
+- Verify BindDN uses OU format: `CN=Admin,OU=Users,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local`
+- Check Admin account password is correct (retrieve from Secrets Manager)
+- Test LDAP manually:
+  ```bash
+  sudo yum install -y openldap-clients
+  ldapsearch -x -H ldap://<AD-IP> \
+    -D "CN=Admin,OU=Users,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local" \
+    -W \
+    -b "OU=Users,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local" \
+    "(objectClass=user)"
+  ```
+
+**IMPORTANT:** AWS Managed Microsoft AD uses Organizational Units (OUs), not Container Names (CNs) for the Users container.
 
 ### RADIUS Authentication Issues
 
 #### Access-Reject from RADIUS Server
+
+**Error:** "ERROR: No Auth-Type found: rejecting the user via Post-Auth-Type = Reject"
+
+**Solution:** Verify FreeRADIUS site configuration includes Auth-Type setting:
+
+```bash
+# Check /etc/raddb/sites-enabled/linotp contains:
+sudo cat /etc/raddb/sites-enabled/linotp | grep -A 10 "authorize {"
+```
+
+Should show:
+```
+authorize {
+  preprocess
+  perl
+  if (ok) {
+    update control {
+      Auth-Type := Perl
+    }
+  }
+}
+```
+
+**If missing:** The installation script should have added this. If deploying manually or script version is outdated, update as follows:
+
+```bash
+sudo nano /etc/raddb/sites-available/linotp
+# Add the Auth-Type block after "perl" line in authorize section
+sudo systemctl restart radiusd
+```
+
+#### Other Access-Reject Causes
 
 **Check logs:**
 ```bash
@@ -993,10 +1090,19 @@ sudo tail -f /var/log/radius/radius.log
 ```
 
 **Common causes:**
-- Incorrect shared secret
+- Incorrect shared secret (must be quoted if contains special chars: `radtest user token ip port '$secret'`)
 - User not enrolled in LinOTP
 - Token expired (30-second window)
-- Wrong realm configured
+- Wrong realm configured in `/etc/linotp2/rlm_perl.ini`
+- Policies not created/active in LinOTP
+
+**Verify LinOTP policies exist:**
+1. Login to LinOTP admin portal: `https://localhost/manage`
+2. Go to **Policies** tab
+3. Confirm these policies exist and are **Active**:
+   - `selfservice_enrollment` (scope: selfservice)
+   - `limit_one_token` (scope: enrollment)
+   - `otp_authentication` (scope: authentication)
 
 #### WorkSpaces Login Fails with MFA
 
@@ -1008,7 +1114,8 @@ sudo tail -f /var/log/radius/radius.log
 
 **Test RADIUS manually:**
 ```bash
-radtest username <token> <radius-ip>:1812 10 <secret>
+# Note: Quote the secret if it contains special characters
+radtest username <token> <radius-ip>:1812 10 '$secret'
 ```
 
 ---
