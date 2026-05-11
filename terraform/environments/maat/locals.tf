@@ -41,4 +41,6 @@ locals {
     for f in fileset("./lambda/cloudwatch_alarm_slack_integration", "**") :
     sha256(file("${path.module}/lambda/cloudwatch_alarm_slack_integration/${f}"))
   ]
+
+  lambda_folder_name = ["lambda_delivery", "cloudwatch_sns_layer"]
 }
