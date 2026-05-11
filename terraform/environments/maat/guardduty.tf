@@ -200,13 +200,13 @@ resource "aws_iam_role_policy" "lambda_guardduty_sns_policy" {
   })
 }
 
-# Lambda Layer loaded from the maat build artifacts S3 bucket
+# Lambda Layer loaded from the maat shared S3 bucket
 # Note: the zip file must be manually uploaded to the bucket at the path below
 # See: https://dsdmoj.atlassian.net/wiki/spaces/LDD/pages/5975606239/Build+Layered+Function+for+Lambda
 resource "aws_lambda_layer_version" "guardduty_sns_layer" {
   layer_name               = "${local.application_name}-${local.environment}-guardduty-sns-layer"
   s3_key                   = "lambda_delivery/cloudwatch_sns_layer/layerV1.zip"
-  s3_bucket                = module.artifacts-s3.bucket.id
+  s3_bucket                = aws_s3_bucket.maat_shared.bucket
   compatible_runtimes      = ["python3.13"]
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ${local.application_name} GuardDuty SNS Alerts Integration"
