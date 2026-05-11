@@ -127,15 +127,47 @@ yum install -y LinOTP LinOTP_mariadb
 restorecon -Rv /etc/linotp2/ || true
 restorecon -Rv /var/log/linotp || true
 
-# Configure LinOTP with MariaDB
-# IMPORTANT: Run this BEFORE securing MariaDB (while root has no password)
-echo "$${MARIADB_ROOT_PASSWORD}" | linotp-create-mariadb
+# Create LinOTP database and user manually (bypassing interactive linotp-create-mariadb)
+# IMPORTANT: Do this BEFORE securing MariaDB (while root has no password)
+mysql <<LINOTP_DB_SETUP
+CREATE DATABASE IF NOT EXISTS linotp2 DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+CREATE USER IF NOT EXISTS 'linotp2'@'localhost' IDENTIFIED BY '$${MARIADB_ROOT_PASSWORD}';
+GRANT ALL PRIVILEGES ON linotp2.* TO 'linotp2'@'localhost';
+FLUSH PRIVILEGES;
+LINOTP_DB_SETUP
+
+# Configure LinOTP to use the database
+cat > /etc/linotp2/linotp.ini <<EOF
+[DEFAULT]
+sqlalchemy.url = mysql://linotp2:$${MARIADB_ROOT_PASSWORD}@localhost/linotp2
+who.config_file = %(here)s/who.ini
+who.log_level = WARNING
+who.log_file = stdout
+
+[server:main]
+use = egg:Paste#http
+host = 127.0.0.1
+port = 5001
+
+[app:main]
+use = egg:LinOTP
+full_stack = true
+static_files = true
+cache_dir = %(here)s/data
+beaker.session.key = linotp
+beaker.session.secret = $${LINOTP_ADMIN_PASSWORD}
+
+sqlalchemy.url = mysql://linotp2:$${MARIADB_ROOT_PASSWORD}@localhost/linotp2
+EOF
+
+# Initialize LinOTP database schema
+paster setup-app /etc/linotp2/linotp.ini
 
 # Lock python-repoze-who version for stability
 yum install -y yum-plugin-versionlock
 yum versionlock python-repoze-who
 
-echo "✓ LinOTP installed and database created"
+echo "✓ LinOTP database created and configured"
 
 # NOW secure MariaDB (after LinOTP database is created)
 echo "Securing MariaDB..."
