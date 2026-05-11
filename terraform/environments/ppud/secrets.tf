@@ -32,7 +32,7 @@ resource "aws_secretsmanager_secret_version" "sversion" {
 
 resource "aws_secretsmanager_secret" "ses_access_key_secret" {
   count = local.is-production == false ? 1 : 0
-  name = "ses-user-access-key"
+  name  = format("%s-%s-ses-access-key", local.application_name, local.environment)
     lifecycle {
       ignore_changes = all
     }
@@ -40,10 +40,10 @@ resource "aws_secretsmanager_secret" "ses_access_key_secret" {
 
 resource "aws_secretsmanager_secret_version" "ses_access_key_secret_value" {
   count = local.is-production == false ? 1 : 0
-  secret_id = aws_secretsmanager_secret.ses_access_key_secret.id
+  secret_id = aws_secretsmanager_secret.ses_access_key_secret[0].id
   secret_string = jsonencode({
-  access_key_id = aws_iam_access_key.email.id
-  secret_access_key = aws_iam_access_key.email.secret
+  access_key_id = aws_iam_access_key.email[0].id
+  secret_access_key = aws_iam_access_key.email[0].secret
   })
     lifecycle {
       ignore_changes = all
