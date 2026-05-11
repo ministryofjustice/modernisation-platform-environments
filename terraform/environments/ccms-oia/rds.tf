@@ -35,10 +35,10 @@ resource "aws_db_instance" "opahub_db" {
   db_subnet_group_name    = aws_db_subnet_group.opahub_db_subnets.id
   option_group_name       = local.application_data.accounts[local.environment].option_group_name
   backup_retention_period = 30
-#  snapshot_identifier     = local.is-development ? local.application_data.accounts[local.environment].db_snapshot_identifier : null
-  snapshot_identifier   = null
-  maintenance_window      = local.application_data.accounts[local.environment].maintenance_window
-  backup_window           = "03:00-06:00"
+  #  snapshot_identifier     = local.is-development ? local.application_data.accounts[local.environment].db_snapshot_identifier : null
+  snapshot_identifier = null
+  maintenance_window  = local.application_data.accounts[local.environment].maintenance_window
+  backup_window       = "03:00-06:00"
 
   tags = merge(local.tags, {
     Name = "${local.opa_app_name}-db"

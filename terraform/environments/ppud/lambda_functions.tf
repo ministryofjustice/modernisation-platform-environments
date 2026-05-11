@@ -55,7 +55,7 @@ locals {
       }]
       environment = {
         variables = {
-          EXPIRY_DAYS = "30"
+          EXPIRY_DAYS    = "30"
           PARAMETER_PATH = "/certificates/"
           SNS_TOPIC_ARN = {
             development   = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:ppud-dev-cw-alerts"

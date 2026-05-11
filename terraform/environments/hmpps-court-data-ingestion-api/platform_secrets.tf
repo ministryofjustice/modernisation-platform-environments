@@ -18,8 +18,8 @@ data "aws_secretsmanager_secret_version" "environment_management" {
 
 resource "aws_ssm_parameter" "whitelist_ips" {
   name  = "whitelist_ips"
-  type  = "String"   # or StringList if you prefer
-  value = "[]"       # empty JSON list (recommended)
+  type  = "String" # or StringList if you prefer
+  value = "[]"     # empty JSON list (recommended)
 
   lifecycle {
     ignore_changes = [value]

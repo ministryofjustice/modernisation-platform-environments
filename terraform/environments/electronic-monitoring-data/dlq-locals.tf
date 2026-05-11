@@ -16,9 +16,9 @@ locals {
   landing_dlq_redriver_config = {
     (aws_cloudwatch_metric_alarm.sqs_dlq_has_messages[
       "process_landing_bucket_files_fms_general_dlq"
-    ].alarm_name) = {
-      feed              = "fms"
-      order_type        = "general"
+      ].alarm_name) = {
+      feed       = "fms"
+      order_type = "general"
       source_queue_name = trimsuffix(
         local.live_feed_dlq_names.process_landing_bucket_files_fms_general,
         "-dlq"
@@ -31,9 +31,9 @@ locals {
 
     (aws_cloudwatch_metric_alarm.sqs_dlq_has_messages[
       "process_landing_bucket_files_fms_ho_dlq"
-    ].alarm_name) = {
-      feed              = "fms"
-      order_type        = "ho"
+      ].alarm_name) = {
+      feed       = "fms"
+      order_type = "ho"
       source_queue_name = trimsuffix(
         local.live_feed_dlq_names.process_landing_bucket_files_fms_ho,
         "-dlq"
@@ -46,9 +46,9 @@ locals {
 
     (aws_cloudwatch_metric_alarm.sqs_dlq_has_messages[
       "process_landing_bucket_files_fms_specials_dlq"
-    ].alarm_name) = {
-      feed              = "fms"
-      order_type        = "specials"
+      ].alarm_name) = {
+      feed       = "fms"
+      order_type = "specials"
       source_queue_name = trimsuffix(
         local.live_feed_dlq_names.process_landing_bucket_files_fms_specials,
         "-dlq"
@@ -61,9 +61,9 @@ locals {
 
     (aws_cloudwatch_metric_alarm.sqs_dlq_has_messages[
       "process_landing_bucket_files_mdss_general_dlq"
-    ].alarm_name) = {
-      feed              = "mdss"
-      order_type        = "general"
+      ].alarm_name) = {
+      feed       = "mdss"
+      order_type = "general"
       source_queue_name = trimsuffix(
         local.live_feed_dlq_names.process_landing_bucket_files_mdss_general,
         "-dlq"
@@ -76,9 +76,9 @@ locals {
 
     (aws_cloudwatch_metric_alarm.sqs_dlq_has_messages[
       "process_landing_bucket_files_mdss_ho_dlq"
-    ].alarm_name) = {
-      feed              = "mdss"
-      order_type        = "ho"
+      ].alarm_name) = {
+      feed       = "mdss"
+      order_type = "ho"
       source_queue_name = trimsuffix(
         local.live_feed_dlq_names.process_landing_bucket_files_mdss_ho,
         "-dlq"
@@ -91,9 +91,9 @@ locals {
 
     (aws_cloudwatch_metric_alarm.sqs_dlq_has_messages[
       "process_landing_bucket_files_mdss_specials_dlq"
-    ].alarm_name) = {
-      feed              = "mdss"
-      order_type        = "specials"
+      ].alarm_name) = {
+      feed       = "mdss"
+      order_type = "specials"
       source_queue_name = trimsuffix(
         local.live_feed_dlq_names.process_landing_bucket_files_mdss_specials,
         "-dlq"

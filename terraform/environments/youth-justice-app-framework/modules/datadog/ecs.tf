@@ -76,12 +76,12 @@ module "ecs_service_datadog_agent" {
           "value" : "yjaf-cluster"
         },
         {
-          "name": "DD_EC2_PREFER_IMDS_V2",
-          "value": "true"
+          "name" : "DD_EC2_PREFER_IMDS_V2",
+          "value" : "true"
         },
         {
-          "name": "DD_HOSTNAME_TRUST_UTS_NAMESPACE",
-          "value": "true"
+          "name" : "DD_HOSTNAME_TRUST_UTS_NAMESPACE",
+          "value" : "true"
         },
         {
           "name" : "DD_LOGS_ENABLED",

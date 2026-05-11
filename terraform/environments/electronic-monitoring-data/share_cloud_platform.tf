@@ -596,7 +596,7 @@ data "aws_iam_policy_document" "emac_di_permissions" {
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_mdss*",
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/acquistive_crime*",
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/data_insights*",
-    ] : local.is-preproduction ? [
+      ] : local.is-preproduction ? [
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/acquistive_crime*",
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/data_insights*",
     ] : []
@@ -614,7 +614,7 @@ data "aws_iam_policy_document" "emac_di_permissions" {
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_mdss*/*",
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/acquistive_crime*/*",
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/data_insights*/*",
-    ] : local.is-preproduction ? [
+      ] : local.is-preproduction ? [
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/acquistive_crime*/*",
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/data_insights*/*",
     ] : []
