@@ -221,7 +221,7 @@ resource "aws_sfn_state_machine" "landing_dlq_redriver" {
         Resource = "arn:aws:states:::lambda:invoke"
         Parameters = {
           FunctionName = module.landing_dlq_redriver.lambda_function_arn
-          "Payload.$" = "$"
+          "Payload.$"  = "$"
         }
         OutputPath = "$.Payload"
         Retry = [
