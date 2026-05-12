@@ -120,6 +120,16 @@ data "aws_iam_policy_document" "gdpr_structured_job_policy_document" {
       "${module.s3-athena-bucket.bucket.arn}/*"
     ]
   }
+
+  statement {
+    sid    = "GetDataAccessAndTagsForLakeFormation"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GetDataAccess",
+      "lakeformation:GetResourceLFTags",
+    ]
+    resources = ["*"]
+  }
 }
 
 data "aws_iam_policy_document" "ecs_task_trust_policy" {
