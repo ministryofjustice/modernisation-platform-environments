@@ -485,11 +485,13 @@ def lambda_handler(event, context):
     type = "Unknown"
     is_error = True
 
-    # SNS message comes in event['Records'][0]['Sns']
-    sns_message = event['Records'][0]['Sns']
-    message_str = sns_message.get('Message', '{}')
-
     try:
+        if 'Records' not in event:
+            raise KeyError(f"Unexpected event format - no 'Records' key. Event keys: {list(event.keys())}")
+
+        # SNS message comes in event['Records'][0]['Sns']
+        sns_message = event['Records'][0]['Sns']
+        message_str = sns_message.get('Message', '{}')
         alarm_details = json.loads(message_str)
         logger.info("alarm_details:" + json.dumps(alarm_details, indent=2))
 
