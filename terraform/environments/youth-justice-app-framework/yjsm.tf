@@ -51,7 +51,7 @@ module "yjsm" {
 
   ami = lookup(
     {
-      development   = "ami-020f796d0dec4ed4c"
+      development   = "ami-09c8f278da046af78"
       test          = "ami-00e714c8277811e57"
       preproduction = "ami-0d79a6afc87dfa388"
       production    = "ami-0be9396f2bf4f21c1"
