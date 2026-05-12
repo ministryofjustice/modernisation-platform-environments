@@ -206,7 +206,7 @@ resource "aws_iam_role_policy" "lambda_guardduty_sns_policy" {
 resource "aws_lambda_layer_version" "guardduty_sns_layer" {
   layer_name               = "${local.application_name}-${local.environment}-guardduty-sns-layer"
   s3_key                   = "lambda_delivery/cloudwatch_sns_layer/layerV1.zip"
-  s3_bucket                = aws_s3_bucket.maatdb_shared.bucket
+  s3_bucket                = module.s3-bucket-shared.bucket.id
   compatible_runtimes      = ["python3.13"]
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ${local.application_name} GuardDuty SNS Alerts Integration"
@@ -256,4 +256,34 @@ resource "aws_sns_topic_subscription" "guardduty_lambda" {
   topic_arn = aws_sns_topic.guardduty_alerts.arn
   protocol  = "lambda"
   endpoint  = aws_lambda_function.guardduty_slack_notify.arn
+}
+
+# ---------------------------------------------
+# GuardDuty Malware Protection - S3 bucket scan
+# ---------------------------------------------
+
+data "aws_iam_role" "guardduty_s3_scan" {
+  name = "GuardDutyS3MalwareProtectionRole"
+}
+
+resource "aws_guardduty_malware_protection_plan" "s3_shared" {
+  role = data.aws_iam_role.guardduty_s3_scan.arn
+
+  protected_resource {
+    s3_bucket {
+      bucket_name = module.s3-bucket-shared.bucket.id
+    }
+  }
+
+  actions {
+    tagging {
+      status = "ENABLED"
+    }
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("s3-%s-%s-guardduty-mpp", local.application_name, local.environment)) }
+  )
+
+  depends_on = [module.s3-bucket-shared]
 }
