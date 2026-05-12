@@ -90,4 +90,11 @@ locals {
   }
 
   prod_domain_name = "laa-finance-data.service.justice.gov.uk"
+
+  lambda_folder_name = ["lambda_delivery", "cloudwatch_sns_layer"]
+
+  lambda_source_hashes = [
+    for f in fileset("./lambda/cloudwatch_alarm_slack_integration", "**") :
+    sha256(file("${path.module}/lambda/cloudwatch_alarm_slack_integration/${f}"))
+  ]
 }
