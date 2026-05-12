@@ -257,3 +257,33 @@ resource "aws_sns_topic_subscription" "guardduty_lambda" {
   protocol  = "lambda"
   endpoint  = aws_lambda_function.guardduty_slack_notify.arn
 }
+
+# ---------------------------------------------
+# GuardDuty Malware Protection - S3 bucket scan
+# ---------------------------------------------
+
+data "aws_iam_role" "guardduty_s3_scan" {
+  name = "GuardDutyS3MalwareProtectionRole"
+}
+
+resource "aws_guardduty_malware_protection_plan" "s3_shared" {
+  role = data.aws_iam_role.guardduty_s3_scan.arn
+
+  protected_resource {
+    s3_bucket {
+      bucket_name = aws_s3_bucket.maat_shared.id
+    }
+  }
+
+  actions {
+    tagging {
+      status = "ENABLED"
+    }
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("s3-%s-%s-guardduty-mpp", local.application_name, local.environment)) }
+  )
+
+  depends_on = [aws_s3_bucket.maat_shared]
+}
