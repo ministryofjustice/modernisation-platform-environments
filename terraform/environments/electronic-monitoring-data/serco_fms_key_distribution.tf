@@ -6,7 +6,7 @@ locals {
 
   # placeholder value once GOV.UK Notify template is created
   serco_fms_key_distribution_notify_template_id = (
-    "00000000-0000-0000-0000-000000000000"
+    "f547eba8-a5d4-4218-b5ff-a238bc054136"
   )
 
   serco_fms_key_distribution_state_prefix = "serco-fms-key-distribution"
