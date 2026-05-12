@@ -1,5 +1,6 @@
 resource "aws_s3_bucket" "rekognition_bucket" {
-  bucket = local.rekog_s3_bucket_name
+  bucket        = local.rekog_s3_bucket_name
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_cors_configuration" "rekognition_bucket_cors" {
@@ -62,7 +63,8 @@ resource "aws_s3_bucket_public_access_block" "rekognition_bucket_policy" {
 
 # server access logs for rekognition bucket
 resource "aws_s3_bucket" "rekognition_logs_bucket" {
-  bucket = local.rekog_logs_s3_bucket_name
+  bucket        = local.rekog_logs_s3_bucket_name
+  force_destroy = true
 }
 
 # configure server access logging for the rekognition upload bucket
