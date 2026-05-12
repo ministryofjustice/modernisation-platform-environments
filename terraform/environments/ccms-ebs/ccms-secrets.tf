@@ -84,11 +84,11 @@ resource "aws_secretsmanager_secret_version" "ebs_secrets" {
     "ebs_internal_waf_ip_set"           = ""
   })
 
-  # lifecycle {
-  #   ignore_changes = [
-  #     secret_string
-  #   ]
-  # }
+  lifecycle {
+    ignore_changes = [
+      secret_string
+    ]
+  }
 }
 
 data "aws_secretsmanager_secret_version" "ebs_secrets" {
