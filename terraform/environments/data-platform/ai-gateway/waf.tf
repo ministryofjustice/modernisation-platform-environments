@@ -186,7 +186,7 @@ module "waf_ai_gateway" {
         sampled_requests_enabled   = true
       }
     }
-  } : {}, length(local.environment_configuration.ai_gateway_admin_ingress_allowlist) > 0 ? {
+    } : {}, length(local.environment_configuration.ai_gateway_admin_ingress_allowlist) > 0 ? {
     ip-allowlist-admin = {
       priority = 4
       action   = "allow"

@@ -67,6 +67,7 @@ resource "helm_release" "litellm" {
   ]
 
   depends_on = [
+    module.ai_gateway_aurora,
     module.iam_role,
     kubernetes_service_account_v1.litellm,
     kubernetes_secret_v1.litellm_master_key,
