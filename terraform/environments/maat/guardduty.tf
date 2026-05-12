@@ -206,7 +206,7 @@ resource "aws_iam_role_policy" "lambda_guardduty_sns_policy" {
 resource "aws_lambda_layer_version" "guardduty_sns_layer" {
   layer_name               = "${local.application_name}-${local.environment}-guardduty-sns-layer"
   s3_key                   = "lambda_delivery/cloudwatch_sns_layer/layerV1.zip"
-  s3_bucket                = aws_s3_bucket.maat_shared.bucket
+  s3_bucket                = module.s3-bucket-shared.bucket.id
   compatible_runtimes      = ["python3.13"]
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ${local.application_name} GuardDuty SNS Alerts Integration"
@@ -271,7 +271,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_shared" {
 
   protected_resource {
     s3_bucket {
-      bucket_name = aws_s3_bucket.maat_shared.id
+      bucket_name = module.s3-bucket-shared.bucket.id
     }
   }
 
@@ -285,5 +285,5 @@ resource "aws_guardduty_malware_protection_plan" "s3_shared" {
     { Name = lower(format("s3-%s-%s-guardduty-mpp", local.application_name, local.environment)) }
   )
 
-  depends_on = [aws_s3_bucket.maat_shared]
+  depends_on = [module.s3-bucket-shared]
 }
