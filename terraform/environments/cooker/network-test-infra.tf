@@ -1,4 +1,4 @@
-# # Test infrastructure for network connectivity checks
+# Test infrastructure for network connectivity checks
 
 # data "aws_ami" "amazon_linux_2" {
 #   most_recent = true
