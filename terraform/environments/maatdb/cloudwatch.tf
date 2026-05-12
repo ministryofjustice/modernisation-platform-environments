@@ -19,7 +19,7 @@ locals {
     period              = 300
     evaluation_periods  = 1
     threshold           = 80
-    comparison_operator = contains(["FreeStorageSpace","FreeableMemory"], each.key) ? "LessThanThreshold" : "GreaterThanThreshold"
+    comparison_operator = "GreaterThanThreshold"
   }
 
   alarm_name_prefix = "${local.application_name}-alarm"
@@ -32,7 +32,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_alarms" {
  for_each = toset(local.rds_oracle_metrics)
 
   alarm_name          = "${local.alarm_name_prefix}-${each.key}"
-  comparison_operator = local.common_rds_config.comparison_operator
+  comparison_operator = contains(["FreeStorageSpace","FreeableMemory"], each.key) ? "LessThanThreshold" : local.common_rds_config.comparison_operator
   evaluation_periods  = local.common_rds_config.evaluation_periods
   metric_name         = each.key
   namespace           = local.common_rds_config.namespace
