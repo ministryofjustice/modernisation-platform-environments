@@ -19,10 +19,11 @@ locals {
     period              = 300
     evaluation_periods  = 1
     threshold           = 80
-    comparison_operator = "GreaterThanThreshold"
+    comparison_operator = contains(["FreeStorageSpace","FreeableMemory"], each.key) ? "LessThanThreshold" : "GreaterThanThreshold"
   }
 
   alarm_name_prefix = "${local.application_name}-alarm"
+  storage = local.application_data.accounts[local.environment].allocated_storage * 0.2 * 1.073
 }
 
 
@@ -37,7 +38,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_alarms" {
   namespace           = local.common_rds_config.namespace
   period              = local.common_rds_config.period
   statistic           = local.common_rds_config.statistic
-  threshold           = local.common_rds_config.threshold
+  threshold           = each.key == "FreeStorageSpace" ? local.storage : each.key == "FreeableMemory" ? 20 : local.common_rds_config.threshold
   alarm_description   = "Alarm for RDS Oracle metric: ${each.key}"
   alarm_actions       = [aws_sns_topic.maatdb_alerting_topic.arn]
   ok_actions          = [aws_sns_topic.maatdb_alerting_topic.arn]
