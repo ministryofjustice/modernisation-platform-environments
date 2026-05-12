@@ -17,7 +17,8 @@ module "lambda_unscanned_to_processing" {
   }
 
   environment_variables = {
-    DESTINATION_BUCKET = module.s3_bucket["processing"].s3_bucket_id
+    DESTINATION_BUCKET_NAME = module.s3_bucket["processing"].s3_bucket_id
+    IDEMPOTENCY_TABLE       = module.dynamodb_idempotency.dynamodb_table_id
   }
 
   attach_policy_statements = true
@@ -59,6 +60,18 @@ module "lambda_unscanned_to_processing" {
         module.kms_s3_bucket["processing"].key_arn,
       ]
     }
+    idempotency_table_access = {
+      effect = "Allow"
+      actions = [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+      ]
+      resources = [
+        module.dynamodb_idempotency.dynamodb_table_arn,
+      ]
+    }
   }
 
   attach_policies    = true
@@ -91,13 +104,14 @@ module "lambda_processing_to_post_scan" {
   }
 
   environment_variables = {
-    BUCKETS_BY_KEY = jsonencode({
+    BUCKET_NAMES_BY_KEY = jsonencode({
       processing    = module.s3_bucket["processing"].s3_bucket_id
       clean         = module.s3_bucket["clean"].s3_bucket_id
       quarantine    = module.s3_bucket["quarantine"].s3_bucket_id
       investigation = module.s3_bucket["investigation"].s3_bucket_id
     })
     DEFAULT_SOURCE_BUCKET_KEY = local.iam_configuration.malware_scanning_processing_bucket_key
+    IDEMPOTENCY_TABLE         = module.dynamodb_idempotency.dynamodb_table_id
   }
 
   attach_policy_statements = true
@@ -143,6 +157,18 @@ module "lambda_processing_to_post_scan" {
         module.kms_s3_bucket["investigation"].key_arn,
         module.kms_s3_bucket["processing"].key_arn,
         module.kms_s3_bucket["quarantine"].key_arn,
+      ]
+    }
+    idempotency_table_access = {
+      effect = "Allow"
+      actions = [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+      ]
+      resources = [
+        module.dynamodb_idempotency.dynamodb_table_arn,
       ]
     }
   }

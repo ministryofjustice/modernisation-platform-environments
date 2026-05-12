@@ -33,24 +33,6 @@ data "aws_iam_policy_document" "rekognition_kms_key_policy" {
     actions   = ["kms:*"]
     resources = ["*"]
   }
-
-  # Allow access to rekognition role
-  statement {
-    sid    = "RekognitionRoleKeyUser"
-    effect = "Allow"
-    principals {
-      identifiers = [aws_iam_role.rekognition_role.arn]
-      type        = "AWS"
-    }
-    actions = [
-      "kms:Decrypt",
-      "kms:DescribeKey",
-      "kms:Encrypt",
-      "kms:GenerateDataKey*",
-      "kms:ReEncrypt*"
-    ]
-    resources = ["*"]
-  }
 }
 
 resource "aws_kms_key_policy" "rekognition_encryption_key_policy" {

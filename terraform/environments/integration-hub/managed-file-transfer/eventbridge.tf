@@ -32,7 +32,7 @@ module "eventbridge_guard_duty_malware_protection_for_s3" {
           }
           input_template = <<-EOF
 					{
-					  "source_bucket": "${module.s3_bucket["processing"].s3_bucket_id}",
+            "source_bucket_name": "${module.s3_bucket["processing"].s3_bucket_id}",
 					  "destination_bucket_key": "${each.value.destination_bucket_key}",
 					  "delete_source": ${jsonencode(each.value.delete_source)},
 					  "object_key": "<object_key>",
