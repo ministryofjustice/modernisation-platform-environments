@@ -372,14 +372,14 @@ resource "aws_lambda_event_source_mapping" "p1_creation_trigger" {
 
 
 #-----------------------------------------------------------------------------------
-# Schedule merge load lambda (every 3 minutes)
+# Schedule merge load lambda (every 3 minutes) - currently only dev and test envs
 #-----------------------------------------------------------------------------------
 
   resource "aws_cloudwatch_event_rule" "merge_load_schedule" {
     count = local.is-preproduction || local.is-production ? 0 : 1
     name                = "merge_load_schedule"  
     description         = "Runs merge_load Lambdas for MDSS tables on a schedule"  
-    schedule_expression = "rate(3 minutes)"
+    schedule_expression = "rate(5 minutes)"
     }
 
   # target staged_position

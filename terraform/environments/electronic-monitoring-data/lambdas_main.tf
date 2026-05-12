@@ -900,8 +900,8 @@ module "merge_staged_position" {
   role_name                      = aws_iam_role.merge_load.name
   role_arn                       = aws_iam_role.merge_load.arn
   handler                        = "merge_staged_position.handler"
-  memory_size                    = 512
-  timeout                        = 300
+  memory_size                    = 1024
+  timeout                        = 900
   reserved_concurrent_executions = 1
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
@@ -922,8 +922,8 @@ module "merge_ac_position" {
   role_name                      = aws_iam_role.merge_load.name
   role_arn                       = aws_iam_role.merge_load.arn
   handler                        = "merge_ac_position.handler"
-  memory_size                    = 512
-  timeout                        = 300
+  memory_size                    = 1024
+  timeout                        = 900
   reserved_concurrent_executions = 1
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
