@@ -2,6 +2,8 @@ locals {
   alb_access_logs_bucket_name = "mojdp-${local.environment}-ai-gateway-alb-logs"
 }
 
+data "aws_elb_service_account" "current" {}
+
 data "aws_iam_policy_document" "alb_access_logs_bucket_policy" {
   statement {
     sid       = "AllowALBPutObject"
@@ -10,38 +12,8 @@ data "aws_iam_policy_document" "alb_access_logs_bucket_policy" {
     resources = ["arn:aws:s3:::${local.alb_access_logs_bucket_name}/ai-gateway/AWSLogs/${data.aws_caller_identity.current.account_id}/*"]
 
     principals {
-      type        = "Service"
-      identifiers = ["delivery.logs.amazonaws.com"]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "s3:x-amz-acl"
-      values   = ["bucket-owner-full-control"]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = [data.aws_caller_identity.current.account_id]
-    }
-  }
-
-  statement {
-    sid       = "AllowALBGetBucketAcl"
-    effect    = "Allow"
-    actions   = ["s3:GetBucketAcl"]
-    resources = ["arn:aws:s3:::${local.alb_access_logs_bucket_name}"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["delivery.logs.amazonaws.com"]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = [data.aws_caller_identity.current.account_id]
+      type        = "AWS"
+      identifiers = [data.aws_elb_service_account.current.arn]
     }
   }
 }
