@@ -93,7 +93,8 @@ data "aws_iam_policy_document" "gdpr_delete_policy_document" {
       "ecs:RunTask"
     ]
     resources = [
-      "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task-definition/${aws_ecs_task_definition.emds-gdpr-structured-data-deletion[0].family}:*"
+      "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task-definition/${aws_ecs_task_definition.emds-gdpr-structured-data-deletion[0].family}:*",
+      "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task-definition/${aws_ecs_task_definition.emds-gdpr-iceberg-table-maintenance[0].family}:*"
     ]
   }
 
