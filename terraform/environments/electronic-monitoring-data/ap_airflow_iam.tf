@@ -675,4 +675,3 @@ module "load_buddi_database" {
   cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
   new_airflow        = true
 }
-
