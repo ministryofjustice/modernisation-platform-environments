@@ -19,3 +19,4 @@ spec:
   listenerConfigurations:
     - protocolPort: HTTPS:443
       defaultCertificate: {{ .Values.certificateArn }}
+      sslPolicy: ELBSecurityPolicy-TLS13-1-2-2021-06
