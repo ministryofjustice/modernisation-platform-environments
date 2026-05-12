@@ -24,8 +24,8 @@ locals {
     boto3         = "boto3_layer.zip"
     pandas        = "pandas_layer.zip"
     xlsxwriter    = "xlsxwriter_layer.zip"
-    requests      = "requests_layer.zip"
-    beautifulsoup = "beautifulsoup_layer.zip"
+    requests      = "requests_v2.33_layer.zip"
+    pillow        = "pillow_v12.2.0_layer.zip"
   }
 
   layer_env_buckets = {
