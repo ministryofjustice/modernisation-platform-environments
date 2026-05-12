@@ -2,7 +2,7 @@
 environment:
   development:
     factories:
-      - data-factory-moj-development
+      data-factory-moj-development: []
   test:
     factories: []
   preproduction:
