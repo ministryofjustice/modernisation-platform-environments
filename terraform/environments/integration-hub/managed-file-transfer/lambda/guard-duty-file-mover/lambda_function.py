@@ -18,7 +18,7 @@ persistence_layer = DynamoDBPersistenceLayer(table_name=IDEMPOTENCY_TABLE)
 # Use the resolved source and destination buckets so transport-level duplicates
 # are treated as the same post-scan file move.
 idempotency_config = IdempotencyConfig(
-    event_key_jmespath='["operation", "source_bucket_name", "source_key", "source_version_id", "destination_bucket_name", "delete_source"]'
+    event_key_jmespath="[source_bucket_name, source_key, source_version_id, destination_bucket_name, delete_source]"
 )
 
 
