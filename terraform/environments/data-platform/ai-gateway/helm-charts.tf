@@ -11,6 +11,7 @@ resource "helm_release" "ai_gateway_configuration" {
         hostname        = local.environment_configuration.ai_gateway_hostname
         admin_hostname  = "admin.${local.environment_configuration.ai_gateway_hostname}"
         certificate_arn = module.acm_ai_gateway.acm_certificate_arn
+        alb_logs_bucket = module.alb_access_logs.s3_bucket_id
       }
     )
   ]

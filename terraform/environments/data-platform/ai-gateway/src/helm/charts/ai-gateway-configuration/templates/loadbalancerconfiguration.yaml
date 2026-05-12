@@ -10,6 +10,12 @@ spec:
   loadBalancerAttributes:
     - key: load_balancing.cross_zone.enabled
       value: "true"
+    - key: access_logs.s3.enabled
+      value: "true"
+    - key: access_logs.s3.bucket
+      value: {{ .Values.albLogsBucket }}
+    - key: access_logs.s3.prefix
+      value: "ai-gateway"
   listenerConfigurations:
     - protocolPort: HTTPS:443
       defaultCertificate: {{ .Values.certificateArn }}
