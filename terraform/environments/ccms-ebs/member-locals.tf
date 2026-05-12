@@ -9,6 +9,8 @@ locals {
   lb_log_prefix_webgate_internal = "webgate-internal-lb"
   lb_log_prefix_ssogen_internal  = "ssogen-internal-lb"
 
+  volume_prefix = local.environment == "production" ? "/CCMS/EBSPROD" : "/CCMS/EBS"
+
   sftp_enabled       = contains(["development", "test"], local.environment)
   lambda_folder_name = ["lambda_delivery", "ftp_lambda_layer", "payment_lambda_layer", "cloudwatch_sns_layer", "payment_load_monitor_layer"]
 

@@ -536,6 +536,9 @@ module "mdss_daily_failure_digest" {
     NAMESPACE      = "EMDS/MDSS"
     LOOKBACK_HOURS = "24"
 
+    LOAD_MDSS_QUEUE_NAME = module.load_mdss_event_queue.sqs_queue.name
+    LOAD_FMS_QUEUE_NAME  = module.load_fms_event_queue.sqs_queue.name
+
     LOAD_MDSS_DLQ_NAME = module.load_mdss_event_queue.sqs_dlq.name
     CLEAN_DLT_DLQ_NAME = aws_sqs_queue.clean_dlt_load_dlq.name
     LOAD_FMS_DLQ_NAME  = module.load_fms_event_queue.sqs_dlq.name
@@ -556,6 +559,11 @@ module "mdss_daily_failure_digest" {
     LOAD_FMS_FUNCTION_NAME             = module.load_fms_lambda.lambda_function_name
     PROCESS_FMS_METADATA_FUNCTION_NAME = module.process_fms_metadata.lambda_function_name
     FORMAT_JSON_FMS_DATA_FUNCTION_NAME = module.format_json_fms_data.lambda_function_name
+
+    LAMBDAS_PRODUCTION_RUN_URL = "https://github.com/ministryofjustice/electronic-monitoring-data-lambda-functions/actions/workflows/push-to-ecr.yaml"
+    CADT_DAILY_RUN_URL         = "https://github.com/moj-analytical-services/create-a-derived-table/actions/workflows/emds-live-workflow.yml"
+    ROTA_GUIDE_URL             = "https://jubilant-adventure-g65j3om.pages.github.io/hmpps/electronic_monitoring/data_engineering_guides/rota_duties/"
+    EARS_SARS_TALLY_URL        = "https://justiceuk.sharepoint.com/:x:/r/sites/EMExpansionProgrammeteam/_layouts/15/doc2.aspx?sourcedoc=%7B25644699-3837-4A02-9C09-020EF0ECA744%7D&file=Monthly%20Tally%20of%20EARs%20and%20SARs.xlsx&action=default&mobileredirect=true"
   }
 }
 
@@ -878,178 +886,4 @@ module "landing_dlq_redriver" {
     AUTO_RETRY_MAX_ATTEMPTS                = "2"
     RETRY_ONCE_MAX_ATTEMPTS                = "1"
   }
-}
-
-# ------------------------------------------------------------------------------
-# Step Functions: landing DLQ redriver workflow
-# ------------------------------------------------------------------------------
-
-data "aws_iam_policy_document" "landing_dlq_redriver_sfn_assume" {
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["states.amazonaws.com"]
-    }
-  }
-}
-
-resource "aws_iam_role" "landing_dlq_redriver_state_machine" {
-  name               = "landing_dlq_redriver_state_machine_role"
-  assume_role_policy = data.aws_iam_policy_document.landing_dlq_redriver_sfn_assume.json
-}
-
-resource "aws_iam_role_policy" "landing_dlq_redriver_state_machine_invoke" {
-  name = "landing_dlq_redriver_state_machine_invoke_policy"
-  role = aws_iam_role.landing_dlq_redriver_state_machine.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "AllowInvokeLandingDlqRedriverLambda"
-        Effect = "Allow"
-        Action = [
-          "lambda:InvokeFunction",
-        ]
-        Resource = [
-          module.landing_dlq_redriver.lambda_function_arn,
-        ]
-      }
-    ]
-  })
-}
-
-resource "aws_sfn_state_machine" "landing_dlq_redriver" {
-  name     = "landing_dlq_redriver"
-  role_arn = aws_iam_role.landing_dlq_redriver_state_machine.arn
-
-  definition = jsonencode({
-    Comment = "Redrives landing DLQ messages after CloudWatch DLQ alarms."
-    StartAt = "WaitForThreadState"
-    States = {
-      WaitForThreadState = {
-        Type    = "Wait"
-        Seconds = 10
-        Next    = "RedriverBatch"
-      }
-
-      RedriverBatch = {
-        Type     = "Task"
-        Resource = "arn:aws:states:::lambda:invoke"
-        Parameters = {
-          FunctionName = module.landing_dlq_redriver.lambda_function_arn
-          "Payload.$" = "$"
-        }
-        OutputPath = "$.Payload"
-        Retry = [
-          {
-            ErrorEquals = [
-              "Lambda.ServiceException",
-              "Lambda.AWSLambdaException",
-              "Lambda.SdkClientException",
-              "Lambda.TooManyRequestsException",
-            ]
-            IntervalSeconds = 2
-            BackoffRate     = 2
-            MaxAttempts     = 3
-          }
-        ]
-        Next = "CheckStatus"
-      }
-
-      CheckStatus = {
-        Type = "Choice"
-        Choices = [
-          {
-            Variable     = "$.status"
-            StringEquals = "continuing"
-            Next         = "WaitBeforeNextBatch"
-          },
-          {
-            Variable     = "$.status"
-            StringEquals = "ok"
-            Next         = "Complete"
-          },
-          {
-            Variable     = "$.status"
-            StringEquals = "halted"
-            Next         = "Complete"
-          },
-          {
-            Variable     = "$.status"
-            StringEquals = "ignored"
-            Next         = "Complete"
-          }
-        ]
-        Default = "UnexpectedResult"
-      }
-
-      WaitBeforeNextBatch = {
-        Type    = "Wait"
-        Seconds = 30
-        Next    = "RedriverBatch"
-      }
-
-      Complete = {
-        Type = "Succeed"
-      }
-
-      UnexpectedResult = {
-        Type  = "Fail"
-        Error = "UnexpectedLandingRedriverResult"
-        Cause = "The landing redriver returned an unexpected status."
-      }
-    }
-  })
-}
-
-# ------------------------------------------------------------------------------
-# EventBridge: alarm state changes -> landing DLQ redriver workflow
-# ------------------------------------------------------------------------------
-
-data "aws_iam_policy_document" "landing_dlq_redriver_eventbridge_assume" {
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["events.amazonaws.com"]
-    }
-  }
-}
-
-resource "aws_iam_role" "landing_dlq_redriver_eventbridge" {
-  name               = "landing_dlq_redriver_eventbridge_role"
-  assume_role_policy = data.aws_iam_policy_document.landing_dlq_redriver_eventbridge_assume.json
-}
-
-resource "aws_iam_role_policy" "landing_dlq_redriver_eventbridge_start" {
-  name = "landing_dlq_redriver_eventbridge_start_policy"
-  role = aws_iam_role.landing_dlq_redriver_eventbridge.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "AllowStartLandingDlqRedriverWorkflow"
-        Effect = "Allow"
-        Action = [
-          "states:StartExecution",
-        ]
-        Resource = [
-          aws_sfn_state_machine.landing_dlq_redriver.arn,
-        ]
-      }
-    ]
-  })
-}
-
-resource "aws_cloudwatch_event_target" "landing_dlq_redriver" {
-  rule     = aws_cloudwatch_event_rule.alarm_state_change_threader.name
-  arn      = aws_sfn_state_machine.landing_dlq_redriver.arn
-  role_arn = aws_iam_role.landing_dlq_redriver_eventbridge.arn
 }

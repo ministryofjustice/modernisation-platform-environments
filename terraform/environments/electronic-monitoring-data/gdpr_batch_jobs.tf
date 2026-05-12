@@ -1,6 +1,6 @@
 locals {
-  emds_gdpr_ecr_name = "electronic-monitoring-gdpr"
-  shred_unstructured_image_name = "gdpr_zip_file_shredder"
+  emds_gdpr_ecr_name                  = "electronic-monitoring-gdpr"
+  shred_unstructured_image_name       = "gdpr_zip_file_shredder"
   shred_unstructured_docker_image_uri = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/${local.emds_gdpr_ecr_name}:${local.shred_unstructured_image_name}-${local.environment_shorthand}"
 }
 
@@ -39,9 +39,9 @@ resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_comp
   depends_on   = [aws_iam_role_policy_attachment.gdpr_batch_service_role_attachment]
   state        = "ENABLED"
 
-  tags = merge(local.tags, 
+  tags = merge(local.tags,
     { Batch_Job_Name = local.shred_unstructured_image_name },
-    { env-type = "SPOT"}
+    { env-type = "SPOT" }
   )
 
   lifecycle {
@@ -55,17 +55,17 @@ resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_comp
     min_vcpus           = 0
     security_group_ids  = [aws_security_group.gdpr_batch_sg[0].id]
     subnets             = data.aws_subnets.shared-private.ids
-    
+
     # Require large instances with high network/EBS bandwidth
-    instance_type       = [
+    instance_type = [
       "m5.xlarge", "m5a.xlarge", "m6i.xlarge", "m6a.xlarge",
       "c5.xlarge", "c5a.xlarge", "c6i.xlarge", "c6a.xlarge",
-      "m5.2xlarge", "m5.4xlarge", "r5.2xlarge", "m5a.2xlarge", 
-      "m6i.2xlarge", "m6a.2xlarge", "c5.2xlarge", "c5a.2xlarge", 
-      "c6i.2xlarge", "c6a.2xlarge", "c5.4xlarge", "c5a.4xlarge", 
+      "m5.2xlarge", "m5.4xlarge", "r5.2xlarge", "m5a.2xlarge",
+      "m6i.2xlarge", "m6a.2xlarge", "c5.2xlarge", "c5a.2xlarge",
+      "c6i.2xlarge", "c6a.2xlarge", "c5.4xlarge", "c5a.4xlarge",
       "c6i.4xlarge", "c6a.4xlarge", "m5.large"
     ]
-    instance_role       = aws_iam_instance_profile.gdpr_batch_instance_profile.arn
+    instance_role = aws_iam_instance_profile.gdpr_batch_instance_profile.arn
 
     launch_template {
       launch_template_id = aws_launch_template.shred_unstructured_from_zip_batch_storage_template.id
@@ -75,16 +75,16 @@ resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_comp
 }
 
 resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_on_demand_compute_env" {
-  count         = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
-  name_prefix   = "shred-unstructured-on-demand-env-"
-  type          = "MANAGED"
-  service_role  = aws_iam_role.gdpr_batch_service_role.arn
-  depends_on    = [aws_iam_role_policy_attachment.gdpr_batch_service_role_attachment]
+  count        = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
+  name_prefix  = "shred-unstructured-on-demand-env-"
+  type         = "MANAGED"
+  service_role = aws_iam_role.gdpr_batch_service_role.arn
+  depends_on   = [aws_iam_role_policy_attachment.gdpr_batch_service_role_attachment]
   state        = "ENABLED"
 
-  tags = merge(local.tags, 
+  tags = merge(local.tags,
     { Batch_Job_Name = local.shred_unstructured_image_name },
-    { env-type = "ON-DEMAND"}
+    { env-type = "ON-DEMAND" }
   )
 
   lifecycle {
@@ -92,15 +92,15 @@ resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_on_d
   }
 
   compute_resources {
-    type                = "EC2"
-    max_vcpus           = 16
-    min_vcpus           = 0
-    security_group_ids  = [aws_security_group.gdpr_batch_sg[0].id]
-    subnets             = data.aws_subnets.shared-private.ids
-    
+    type               = "EC2"
+    max_vcpus          = 16
+    min_vcpus          = 0
+    security_group_ids = [aws_security_group.gdpr_batch_sg[0].id]
+    subnets            = data.aws_subnets.shared-private.ids
+
     # Require large instances with high network/EBS bandwidth
-    instance_type       = ["m5.large"]
-    instance_role       = aws_iam_instance_profile.gdpr_batch_instance_profile.arn
+    instance_type = ["m5.large"]
+    instance_role = aws_iam_instance_profile.gdpr_batch_instance_profile.arn
 
     launch_template {
       launch_template_id = aws_launch_template.shred_unstructured_from_zip_batch_storage_template.id
@@ -110,10 +110,10 @@ resource "aws_batch_compute_environment" "shred_unstructured_from_zip_batch_on_d
 }
 
 resource "aws_batch_job_queue" "shred_unstructured_from_zip_batch_queue" {
-  count                = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
-  name                 = "shred-unstructured-from-zip-processing-queue"
-  state                = "ENABLED"
-  priority             = 1
+  count    = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
+  name     = "shred-unstructured-from-zip-processing-queue"
+  state    = "ENABLED"
+  priority = 1
   compute_environment_order {
     order               = 1
     compute_environment = aws_batch_compute_environment.shred_unstructured_from_zip_batch_compute_env[count.index].arn
@@ -139,7 +139,7 @@ resource "aws_batch_job_definition" "shred_unstructured_from_zip_job" {
     image            = local.shred_unstructured_docker_image_uri
     executionRoleArn = aws_iam_role.ecs_gdpr_execution_role.arn
     jobRoleArn       = aws_iam_role.gdpr_batch_code_job_role.arn
-    
+
     resourceRequirements = [
       { type = "VCPU", value = "2" },
       { type = "MEMORY", value = "4096" }
@@ -153,8 +153,8 @@ resource "aws_batch_job_definition" "shred_unstructured_from_zip_job" {
 }
 
 resource "aws_launch_template" "shred_unstructured_from_zip_batch_storage_template" {
-  name_prefix   = "shred-unstructured-from-zip-"
-  
+  name_prefix = "shred-unstructured-from-zip-"
+
   block_device_mappings {
     device_name = "/dev/xvda"
     ebs {
@@ -344,11 +344,11 @@ resource "aws_security_group_rule" "gdpr_batch_egress_s3" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "gdpr_batch_egress_vpc" {
-  count                        = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
-  security_group_id            = aws_security_group.gdpr_batch_sg[0].id
-  description                  = "AWS Batch -----[https]-----+ AWS APIs via NAT Gateway"
-  ip_protocol                  = "tcp"
-  from_port                    = 443
-  to_port                      = 443
-  cidr_ipv4                    = "0.0.0.0/0"
+  count             = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
+  security_group_id = aws_security_group.gdpr_batch_sg[0].id
+  description       = "AWS Batch -----[https]-----+ AWS APIs via NAT Gateway"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = "0.0.0.0/0"
 }
