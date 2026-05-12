@@ -177,6 +177,39 @@ resource "aws_ecs_cluster_capacity_providers" "ecd-gdpr-fargate" {
   }
 }
 
+resource "aws_lakeformation_permissions" "gdpr_iceberg_table_db_permissions" {
+  count     = local.is-development ? 1 : 0
+  principal = aws_iam_role.gdpr_structured_job_role[0].arn
+
+  database {
+    name = "test"
+  }
+
+  permissions = ["DESCRIBE"]
+}
+resource "aws_lakeformation_permissions" "gdpr_iceberg_table_table_permissions" {
+  count     = local.is-development ? 1 : 0
+  principal = aws_iam_role.gdpr_structured_job_role[0].arn
+
+  table {
+    database_name = "test"
+    wildcard      = true
+  }
+
+  permissions = ["SELECT", "DESCRIBE", "ALTER", "INSERT", "DELETE"] # last three perms are required for optimising / vacuuming
+}
+
+resource "aws_lakeformation_permissions" "gdpr_iceberg_table_datalake_location" {
+  count     = local.is-development ? 1 : 0
+  principal = aws_iam_role.gdpr_structured_job_role[0].arn
+
+  data_location {
+    arn = module.s3-data-bucket.bucket.arn
+  }
+
+  permissions = ["DATA_LOCATION_ACCESS"]
+}
+
 resource "aws_ecs_task_definition" "emds-gdpr-structured-data-deletion" {
   count                    = local.is-development || local.is-preproduction ? 1 : 0
   family                   = "emds_gdpr_structured_data_deletion_family"
