@@ -8,6 +8,8 @@ module "ai_gateway_aurora" {
   cluster_instance_class = local.environment_configuration.aurora_instance_class
   instances              = local.environment_configuration.aurora_instances
 
+  serverlessv2_scaling_configuration = local.environment_configuration.aurora_serverlessv2_scaling_configuration
+
   database_name               = "litellm"
   master_username             = "litellm"
   manage_master_user_password = false

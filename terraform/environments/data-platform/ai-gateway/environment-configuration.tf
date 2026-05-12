@@ -117,9 +117,14 @@ locals {
         max_replicas                      = 3
         target_cpu_utilization_percentage = 80
       }
-      aurora_instance_class = "db.t4g.medium"
+      aurora_instance_class = "db.serverless"
       aurora_engine_version = "17.4"
       aurora_instances      = { writer = {} }
+      aurora_serverlessv2_scaling_configuration = {
+        min_capacity             = 0
+        max_capacity             = 4
+        seconds_until_auto_pause = 3600
+      }
       elasticache_node_type = "cache.t4g.medium"
     }
     test = {
@@ -152,9 +157,14 @@ locals {
         max_replicas                      = 3
         target_cpu_utilization_percentage = 80
       }
-      aurora_instance_class = "db.t4g.medium"
+      aurora_instance_class = "db.serverless"
       aurora_engine_version = "17.4"
       aurora_instances      = { writer = {} }
+      aurora_serverlessv2_scaling_configuration = {
+        min_capacity             = 0
+        max_capacity             = 4
+        seconds_until_auto_pause = 3600
+      }
       elasticache_node_type = "cache.t4g.medium"
     }
     preproduction = {
@@ -171,9 +181,14 @@ locals {
         max_replicas                      = 3
         target_cpu_utilization_percentage = 80
       }
-      aurora_instance_class = "db.t4g.medium"
+      aurora_instance_class = "db.serverless"
       aurora_engine_version = "17.4"
       aurora_instances      = { writer = {} }
+      aurora_serverlessv2_scaling_configuration = {
+        min_capacity             = 0
+        max_capacity             = 4
+        seconds_until_auto_pause = 3600
+      }
       elasticache_node_type = "cache.t4g.medium"
     }
     production = {
@@ -193,6 +208,7 @@ locals {
       aurora_instance_class = "db.t4g.medium"
       aurora_engine_version = "17.4"
       aurora_instances      = { writer = {}, reader = {} }
+      aurora_serverlessv2_scaling_configuration = null
       elasticache_node_type = "cache.t4g.medium"
     }
   }
