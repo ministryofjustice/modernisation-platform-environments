@@ -1,7 +1,7 @@
 resource "helm_release" "ai_gateway_configuration" {
   name      = "ai-gateway-configuration"
   chart     = "${path.module}/src/helm/charts/ai-gateway-configuration"
-  version   = "1.2.0"
+  version   = "1.3.0"
   namespace = "ai-gateway"
 
   values = [
