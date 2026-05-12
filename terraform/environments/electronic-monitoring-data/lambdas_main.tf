@@ -887,3 +887,51 @@ module "landing_dlq_redriver" {
     RETRY_ONCE_MAX_ATTEMPTS                = "1"
   }
 }
+
+#-----------------------------------------------------------------------------------
+# lambda loads - staged_mdss__position and acquisitive_crime__position
+#-----------------------------------------------------------------------------------
+
+module "merge_staged_position" {
+  count                          = local.is-preproduction || local.is-production ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "merge_staged_position"
+  role_name                      = aws_iam_role.merge_load.name
+  role_arn                       = aws_iam_role.merge_load.arn
+  handler                        = "merge_staged_position.handler"
+  memory_size                    = 512
+  timeout                        = 300
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+  cloudwatch_retention_days      = 7
+  environment_variables = {
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
+  }
+}
+
+module "merge_ac_position" {
+  count                          = local.is-preproduction || local.is-production ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "merge_ac_position"
+  role_name                      = aws_iam_role.merge_load.name
+  role_arn                       = aws_iam_role.merge_load.arn
+  handler                        = "merge_ac_position.handler"
+  memory_size                    = 512
+  timeout                        = 300
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+  cloudwatch_retention_days      = 7
+  environment_variables = {
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
+  }
+}

@@ -369,3 +369,48 @@ resource "aws_lambda_event_source_mapping" "p1_creation_trigger" {
     maximum_concurrency = 2
   }
 }
+
+
+#-----------------------------------------------------------------------------------
+# Schedule merge load lambda (every 3 minutes)
+#-----------------------------------------------------------------------------------
+
+  resource "aws_cloudwatch_event_rule" "merge_load_schedule" {
+    count = local.is-preproduction || local.is-production ? 0 : 1
+    name                = "merge_load_schedule"  
+    description         = "Runs merge_load Lambdas for MDSS tables on a schedule"  
+    schedule_expression = "rate(3 minutes)"
+    }
+
+  # target staged_position
+  resource "aws_cloudwatch_event_target" "merge_staged_position" {
+    count = local.is-preproduction || local.is-production ? 0 : 1
+    rule  = aws_cloudwatch_event_rule.merge_load_schedule[0].name
+    arn   = module.merge_staged_position[0].lambda_function_arn 
+  }
+
+  resource "aws_lambda_permission" "allow_eventbridge_merge_staged_position" {
+    count         = local.is-preproduction || local.is-production ? 0 : 1
+    statement_id  = "AllowExecutionFromEventBridgeStagedMdssPosition"
+    action        = "lambda:InvokeFunction"
+    function_name = module.merge_staged_position[0].lambda_function_name
+    principal     = "events.amazonaws.com"
+    source_arn    = aws_cloudwatch_event_rule.merge_load_schedule[0].arn
+  }
+
+
+  # target merge_ac_position
+  resource "aws_cloudwatch_event_target" "merge_ac_position" {
+    count = local.is-preproduction || local.is-production ? 0 : 1
+    rule  = aws_cloudwatch_event_rule.merge_load_schedule[0].name
+    arn   = module.merge_ac_position[0].lambda_function_arn
+  }
+
+  resource "aws_lambda_permission" "allow_eventbridge_acquisitive_crime_position" {
+    count = local.is-preproduction || local.is-production ? 0 : 1
+    statement_id  = "AllowExecutionFromEventBridgeAcquisitiveCrimePosition"
+    action        = "lambda:InvokeFunction"
+    function_name = module.merge_ac_position[0].lambda_function_name
+    principal     = "events.amazonaws.com"
+    source_arn    = aws_cloudwatch_event_rule.merge_load_schedule[0].arn
+  }
