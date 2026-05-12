@@ -11,7 +11,8 @@ locals {
   ]
   load_lambda_databases = [
     "staged_mdss${local.dbt_suffix}", 
-    "acquisitive_crime${local.dbt_suffix}"
+    "acquisitive_crime${local.dbt_suffix}", 
+    "allied_mdss${local.dbt_suffix}",
     ]
 }
 
