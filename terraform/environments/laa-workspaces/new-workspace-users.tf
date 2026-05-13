@@ -2,8 +2,8 @@
 ### WorkSpaces Users
 ###
 ### Add users to the map below to provision
-### WorkSpaces. AD users are created automatically
-### via the DS Data API (terraform_data.ad_users).
+### WorkSpaces. WorkSpaces will automatically create
+### AD users during provisioning and send welcome emails.
 ###
 ### Fields:
 ###   first_name    - User's first name
@@ -50,11 +50,11 @@ locals {
     #   email         = "jane.doe@justice.gov.uk"
     #   instance_type = "power"
     # }
-    "test.user" = {
-      first_name    = "Test"
-      last_name     = "User"
-      email         = "vladimirs.kovalovs1@justice.gov.uk"
-      instance_type = "standard"
-    }
+    # "test.user" = {
+    #   first_name    = "Test"
+    #   last_name     = "User"
+    #   email         = "vladimirs.kovalovs1@justice.gov.uk"
+    #   instance_type = "standard"
+    # }
   }
 }

@@ -105,12 +105,15 @@ resource "aws_workspaces_workspace" "workspaces_ad" {
       "Name"       = "${local.application_name}-${local.environment}-workspace-${each.key}"
       "User"       = each.key
       "Email"      = each.value.email
+      "FirstName"  = each.value.first_name
+      "LastName"   = each.value.last_name
       "AuthSource" = "MicrosoftAD"
     }
   )
 
+  # WorkSpaces will automatically create the AD user if it doesn't exist
+  # This enables the "Invite user" functionality and automatic welcome emails
   depends_on = [
-    terraform_data.ad_users,
     aws_workspaces_directory.workspaces_ad
   ]
 }

@@ -25,7 +25,7 @@ NOT: `CN=Admin,CN=Users,DC=laa-workspaces,DC=local`
 - `limit_one_token` (scope: enrollment, action: maxtoken=1)
 - `otp_authentication` (scope: authentication, action: otppin=1)
 
-⚠️ **No Welcome Emails:** When users are created programmatically via Terraform's `ds-data` API, AWS does **not** send welcome emails. You must manually reset passwords for all new users via AWS Console → Directory Service → Users → Reset password. See Step 4.1 for detailed instructions.
+⚠️ **Automatic User Creation:** WorkSpaces automatically creates AD users during workspace provisioning. This enables the AWS Console "Invite user" feature and automatic welcome email delivery. Users will receive an email with their temporary password and WorkSpaces setup instructions.
 
 ⚠️ **ALB Access:** If the Application Load Balancer returns 504 errors, use SSM port forwarding to access LinOTP admin portal directly.
 
@@ -805,9 +805,9 @@ In LinOTP admin portal (`https://localhost:8443/manage`):
 
 ## PHASE 4: Test MFA Enrollment & Authentication
 
-### Step 4.1: Create Test AD User via Terraform
+### Step 4.1: Create Test User & WorkSpace via Terraform
 
-AD users are created automatically via Terraform. Add a test user to the configuration:
+WorkSpaces and AD users are created automatically via Terraform.
 
 **Edit:** `terraform/environments/laa-workspaces/new-workspace-users.tf`
 
@@ -830,38 +830,45 @@ locals {
 1. Commit and push changes to a branch
 2. Create Pull Request
 3. Merge PR to trigger deployment
-4. Terraform will automatically create:
-   - AD user account (via `ds-data` API)
-   - WorkSpace instance (if not already created)
+4. Terraform will automatically create the WorkSpace
+5. **WorkSpaces automatically creates the AD user** and stores user metadata (email, first name, last name)
 
-**IMPORTANT - Post-Deployment Password Setup:**
+**Post-Deployment - Send User Invite:**
 
-When users are created programmatically via the `ds-data` API (as this Terraform does), AWS **does not send the welcome email** with password setup instructions. You must manually set passwords for new users.
+1. Go to **AWS Console** → **WorkSpaces** → Select the workspace
+2. Click **Actions** → **Invite user** (or use the "Invite user" button on the workspace details page)
+3. AWS will automatically send a welcome email to the user's email address with:
+   - Registration code
+   - Temporary password  
+   - WorkSpaces client download link
+   - Setup instructions
 
-**Steps to set user password:**
+**Why this works:**
+- WorkSpaces creates the AD user during workspace provisioning
+- WorkSpaces stores user metadata (email, name) in its database
+- Console "Invite user" button has access to email address
+- Welcome email is sent automatically with all necessary credentials
 
-1. Go to **AWS Console** → **Directory Service** → **laa-workspaces.local** → **Users**
-2. Find the user (e.g., `test.user`)
-3. Click **Actions** → **Reset password**
-4. Set a secure password (e.g., `TestPass123!`)
-5. **Uncheck** "User must change password at next login" (for testing) OR leave checked (for production)
-6. Click **Reset password**
-7. Securely communicate the password to the user (do NOT email plaintext passwords)
+**Note:** Users must register their WorkSpace using the registration code from the email before they can login.
 
-**Why this happens:**
-- AWS WorkSpaces only sends welcome emails when it **creates the user** during WorkSpace provisioning
-- Since Terraform pre-creates the AD user, the WorkSpace sees an existing user and skips the email
-- This is expected behavior when using automated user provisioning
+### Step 4.2: User Receives Welcome Email & Registers WorkSpace
 
-**Alternative for production:**
-- Consider using AWS Secrets Manager to generate and store temporary passwords
-- Send custom welcome emails via AWS SES with instructions to reset password on first login
-- Use a ticketing system to securely deliver credentials
+After you click "Invite user" in the console, the user will receive an email with:
+- **Registration code** (e.g., WSpdx+ABC123)
+- **Temporary password**
+- **WorkSpaces client download links** (Windows, macOS, iOS, Android, Web)
 
-**Future Enhancement:**
-> **Note:** A Lambda-based solution to automatically send custom welcome emails with credentials will be implemented after testing of user creation and manual password reset is completed. This will automate the invitation process for production use.
+**User registration steps:**
 
-### Step 4.2: User Self-Enrollment
+1. Download and install WorkSpaces client
+2. Launch client and enter registration code
+3. Login with temporary password
+4. Set new permanent password (if prompted)
+5. Complete WorkSpaces setup
+
+**Note:** User must complete registration before enrolling in MFA.
+
+### Step 4.3: User Self-Enrollment in MFA
 
 **Method 1: Via SSM Port Forwarding (If ALB not accessible)**
 
@@ -884,7 +891,7 @@ Open browser: `https://workspace-mfa.laa-development.modernisation-platform.serv
 
 1. Login with:
    - Username: `test.user`
-   - Password: `TestPass123!` (or password you set)
+   - Password: (use the password from the welcome email or your new password after registration)
 2. Click **Enroll TOTP token**
 3. Click **Generate Random Seed**
 4. Click **Enroll Token**
@@ -895,7 +902,7 @@ Open browser: `https://workspace-mfa.laa-development.modernisation-platform.serv
 
 **Expected:** Token successfully enrolled
 
-### Step 4.3: Test RADIUS Authentication
+### Step 4.4: Test RADIUS Authentication
 
 SSH to RADIUS server and test locally:
 
@@ -937,7 +944,7 @@ Received Access-Accept Id 123 from 127.0.0.1:1812 to 127.0.0.1:xxxxx length 53
 - If you see "ERROR: No Auth-Type found", check FreeRADIUS configuration (see Troubleshooting section)
 - Verify policies are created and active in LinOTP admin portal
 
-### Step 4.4: Test from Microsoft AD
+### Step 4.5: Test from Microsoft AD
 
 The AD RADIUS configuration should send test authentications:
 
@@ -971,6 +978,8 @@ Edit: `terraform/environments/laa-workspaces/new-workspace-users.tf`
 locals {
   workspace_users = {
     "john.doe" = {
+      first_name    = "John"
+      last_name     = "Doe"
       email         = "john.doe@justice.gov.uk"
       instance_type = "standard"
     }
@@ -986,13 +995,15 @@ cd /Users/vladimirs.kovalovs/Desktop/Repos/modernisation-platform-environments/t
 terraform apply
 ```
 
-**Post-Deployment - Set User Passwords:**
+**Post-Deployment - Send User Invites:**
 
-After Terraform creates the users and WorkSpaces, you **must manually set passwords** for each user (AWS does not send welcome emails when users are created programmatically).
+After Terraform creates the WorkSpaces:
 
-See Step 4.1 for detailed password setup instructions.
+1. Go to **AWS Console** → **WorkSpaces** → Select workspace
+2. Click **Invite user** button
+3. AWS automatically sends welcome email with registration code and temporary password
 
-> **Planned Automation:** A Lambda-based automated welcome email solution is planned for production deployment to eliminate this manual step.
+See Step 4.1 for complete user invitation workflow.
 
 ### Step 5.3: User Login Process
 
