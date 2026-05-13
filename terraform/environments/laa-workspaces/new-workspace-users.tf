@@ -50,11 +50,11 @@ locals {
     #   email         = "jane.doe@justice.gov.uk"
     #   instance_type = "power"
     # }
-    # "test.user" = {
-    #   first_name    = "Test"
-    #   last_name     = "User"
-    #   email         = "vladimirs.kovalovs1@justice.gov.uk"
-    #   instance_type = "standard"
-    # }
+    "test.user" = {
+      first_name    = "Test"
+      last_name     = "User"
+      email         = "vladimirs.kovalovs1@justice.gov.uk"
+      instance_type = "standard"
+    }
   }
 }
