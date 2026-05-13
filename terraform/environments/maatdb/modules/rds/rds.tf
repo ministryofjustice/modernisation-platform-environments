@@ -452,6 +452,116 @@ resource "aws_db_instance_role_association" "rds_s3_role_association" {
   role_arn               = aws_iam_role.rds_s3_access[0].arn
 }
 
+# Second RDS instance with max_string_size = STANDARD (non-prod only)
+
+resource "aws_db_parameter_group" "std_parameter_group_19" {
+  count       = var.create_std_instance ? 1 : 0
+  name        = "${var.identifier_name}-${var.std_identifier_suffix}-parameter-group-19"
+  family      = "oracle-se2-19"
+  description = "${var.application_name}-${var.environment}-std-parameter-group"
+
+  parameter {
+    name  = "remote_dependencies_mode"
+    value = "SIGNATURE"
+  }
+
+  parameter {
+    name  = "sqlnetora.sqlnet.allowed_logon_version_server"
+    value = "10"
+  }
+
+  parameter {
+    name  = "db_cache_size"
+    value = "2000000000"
+  }
+
+  tags = {
+    Name = "${var.application_name}-${var.environment}-std-parameter-group"
+  }
+}
+
+resource "random_password" "rds_std_password" {
+  count   = var.create_std_instance ? 1 : 0
+  length  = 12
+  special = false
+}
+
+resource "aws_secretsmanager_secret" "rds_std_password_secret" {
+  #checkov:skip=CKV2_AWS_57:"This is will be fixed at a later date"
+  #checkov:skip=CKV_AWS_149:"To be added later."
+  count = var.create_std_instance ? 1 : 0
+  name  = "${var.application_name}-${var.environment}-rds_std_password_secret"
+}
+
+resource "aws_secretsmanager_secret_version" "rds_std_password_secret_version" {
+  count     = var.create_std_instance ? 1 : 0
+  secret_id = aws_secretsmanager_secret.rds_std_password_secret[0].id
+  secret_string = jsonencode({
+    username = var.username
+    password = random_password.rds_std_password[0].result
+  })
+}
+
+resource "aws_db_instance" "appdb1_std" {
+  #checkov:skip=CKV_AWS_129:"To be addressed"
+  #checkov:skip=CKV_AWS_354:"To be addressed"
+  #checkov:skip=CKV_AWS_118:"Enhanced security not required"
+  #checkov:skip=CKV_AWS_157:"Multi-az is enabled"
+  #checkov:skip=CKV_AWS_133:"Nightly backup is enabled"
+  #checkov:skip=CKV_AWS_353:"Performance Insights are enabled"
+  #checkov:skip=CKV_AWS_226:"Minor upgrades disabled to ensure compatibility"
+  #checkov:skip=CKV_AWS_293:"Deletion protection is enabled but not being recognised"
+  count = var.create_std_instance ? 1 : 0
+
+  identifier                            = "${var.identifier_name}-${var.environment}-database-${var.std_identifier_suffix}"
+  port                                  = var.port
+  allocated_storage                     = var.allocated_storage
+  db_name                               = var.application_name
+  engine                                = var.engine
+  engine_version                        = var.engine_version
+  instance_class                        = var.instance_class
+  allow_major_version_upgrade           = var.allow_major_version_upgrade
+  auto_minor_version_upgrade            = var.auto_minor_version_upgrade
+  storage_type                          = var.storage_type
+  iops                                  = var.iops
+  backup_retention_period               = var.backup_retention_period
+  backup_window                         = var.backup_window
+  maintenance_window                    = var.maintenance_window
+  character_set_name                    = var.character_set_name
+  multi_az                              = var.multi_az
+  username                              = var.username
+  password                              = random_password.rds_std_password[0].result
+  license_model                         = var.license_model
+  performance_insights_enabled          = var.performance_insights_enabled
+  performance_insights_retention_period = var.performance_insights_retention_period
+  deletion_protection                   = var.deletion_protection
+  snapshot_identifier                   = var.std_snapshot_arn
+  parameter_group_name                  = aws_db_parameter_group.std_parameter_group_19[0].name
+  option_group_name                     = aws_db_option_group.appdboptiongroup19.name
+  db_subnet_group_name                  = aws_db_subnet_group.subnet_group.name
+  vpc_security_group_ids                = local.rds_sg_group_ids
+  skip_final_snapshot                   = false
+  final_snapshot_identifier             = "${var.application_name}-${var.std_identifier_suffix}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
+  copy_tags_to_snapshot                 = true
+  storage_encrypted                     = true
+  kms_key_id                            = var.kms_key_arn
+  apply_immediately                     = true
+
+  tags = merge(
+    { "instance-scheduling" = "skip-scheduling" },
+    var.tags
+  )
+
+  timeouts {
+    create = "60m"
+    delete = "2h"
+  }
+
+  lifecycle {
+    ignore_changes = [final_snapshot_identifier]
+  }
+}
+
 # Outputs
 
 output "db_instance_id" {
@@ -460,4 +570,12 @@ output "db_instance_id" {
 
 output "db_instance_identifier" {
   value = aws_db_instance.appdb1.identifier
+}
+
+output "db_instance_identifier_std" {
+  value = try(aws_db_instance.appdb1_std[0].identifier, null)
+}
+
+output "create_std_instance" {
+  value = var.create_std_instance
 }
