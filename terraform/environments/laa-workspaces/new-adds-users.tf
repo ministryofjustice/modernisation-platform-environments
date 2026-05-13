@@ -7,6 +7,15 @@
 resource "terraform_data" "ad_users" {
   for_each = local.environment == "development" ? local.workspace_users : {}
 
+  # Trigger replacement when user details change or version is bumped
+  # Increment version to force user recreation if needed
+  triggers_replace = [
+    each.value.first_name,
+    each.value.last_name,
+    each.value.email,
+    "v2", # Bump this to force recreation (v1 -> v2 -> v3, etc.)
+  ]
+
   input = {
     directory_id = aws_directory_service_directory.workspaces_ad[0].id
     username     = each.key
