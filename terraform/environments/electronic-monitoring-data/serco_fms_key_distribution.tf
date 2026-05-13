@@ -94,7 +94,7 @@ resource "aws_iam_role" "send_serco_fms_keys" {
 
 data "aws_iam_policy_document" "send_serco_fms_keys" {
   statement {
-    sid    = "ReadCredentialSecrets"
+    sid    = "ReadCredentialAndConfigSecrets"
     effect = "Allow"
 
     actions = [
@@ -103,31 +103,42 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
       "secretsmanager:ListSecretVersionIds",
     ]
 
-    resources = local.serco_fms_key_distribution_feed_secret_arns
+    resources = local.serco_fms_key_distribution_secret_arns
   }
 
   statement {
-    sid    = "ReadNotifyConfigSecrets"
+    sid    = "ListDistributionState"
     effect = "Allow"
 
     actions = [
-      "secretsmanager:GetSecretValue",
-    ]
-
-    resources = local.serco_fms_key_distribution_config_secret_arns
-  }
-
-  statement {
-    sid    = "WriteGeneratedPasswordState"
-    effect = "Allow"
-
-    actions = [
-      "secretsmanager:PutSecretValue",
+      "s3:ListBucket",
     ]
 
     resources = [
-      aws_secretsmanager_secret.serco_fms_password_state.arn,
+      join("", [
+        "arn:aws:s3:::",
+        module.s3-logging-bucket.bucket.id,
+      ])
     ]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+
+      values = [
+        join("", [
+          local.serco_fms_key_distribution_state_prefix,
+          "/",
+          local.environment_shorthand,
+        ]),
+        join("", [
+          local.serco_fms_key_distribution_state_prefix,
+          "/",
+          local.environment_shorthand,
+          "/*",
+        ]),
+      ]
+    }
   }
 
   statement {
