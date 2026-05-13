@@ -858,6 +858,9 @@ When users are created programmatically via the `ds-data` API (as this Terraform
 - Send custom welcome emails via AWS SES with instructions to reset password on first login
 - Use a ticketing system to securely deliver credentials
 
+**Future Enhancement:**
+> **Note:** A Lambda-based solution to automatically send custom welcome emails with credentials will be implemented after testing of user creation and manual password reset is completed. This will automate the invitation process for production use.
+
 ### Step 4.2: User Self-Enrollment
 
 **Method 1: Via SSM Port Forwarding (If ALB not accessible)**
@@ -988,6 +991,8 @@ terraform apply
 After Terraform creates the users and WorkSpaces, you **must manually set passwords** for each user (AWS does not send welcome emails when users are created programmatically).
 
 See Step 4.1 for detailed password setup instructions.
+
+> **Planned Automation:** A Lambda-based automated welcome email solution is planned for production deployment to eliminate this manual step.
 
 ### Step 5.3: User Login Process
 
