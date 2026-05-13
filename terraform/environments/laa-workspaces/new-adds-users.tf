@@ -20,22 +20,22 @@ resource "terraform_data" "ad_users" {
     command = <<-EOT
       # Try to create the user
       if aws ds-data create-user \
-        --directory-id ${self.output.directory_id} \
-        --sam-account-name ${self.output.username} \
-        --given-name "${self.output.first_name}" \
-        --surname "${self.output.last_name}" \
-        --email-address ${self.output.email} \
-        --region ${self.output.region} 2>&1; then
-        echo "User ${self.output.username} created successfully"
+        --directory-id ${self.input.directory_id} \
+        --sam-account-name ${self.input.username} \
+        --given-name "${self.input.first_name}" \
+        --surname "${self.input.last_name}" \
+        --email-address ${self.input.email} \
+        --region ${self.input.region} 2>&1; then
+        echo "User ${self.input.username} created successfully"
       else
         # Check if user already exists
         if aws ds-data describe-user \
-          --directory-id ${self.output.directory_id} \
-          --sam-account-name ${self.output.username} \
-          --region ${self.output.region} >/dev/null 2>&1; then
-          echo "User ${self.output.username} already exists, continuing..."
+          --directory-id ${self.input.directory_id} \
+          --sam-account-name ${self.input.username} \
+          --region ${self.input.region} >/dev/null 2>&1; then
+          echo "User ${self.input.username} already exists, continuing..."
         else
-          echo "ERROR: Failed to create user ${self.output.username}"
+          echo "ERROR: Failed to create user ${self.input.username}"
           exit 1
         fi
       fi
@@ -50,9 +50,9 @@ resource "terraform_data" "ad_users" {
     when    = destroy
     command = <<-EOT
       aws ds-data delete-user \
-        --directory-id ${self.output.directory_id} \
-        --sam-account-name ${self.output.username} \
-        --region ${self.output.region} 2>&1 || echo "User ${self.output.username} may not exist, continuing..."
+        --directory-id ${self.input.directory_id} \
+        --sam-account-name ${self.input.username} \
+        --region ${self.input.region} 2>&1 || echo "User ${self.input.username} may not exist, continuing..."
     EOT
   }
 }
