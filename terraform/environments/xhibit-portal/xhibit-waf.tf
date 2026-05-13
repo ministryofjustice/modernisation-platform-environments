@@ -1,5 +1,5 @@
 module "waf" {
-  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=a96a97c0cc64c14f1ee66b272e31101cce5aee61" # v2.0.0
+  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=9b74c1430f04614f1d81995ac033d4b0b9859baf" # v2.1.0
   enable_ddos_protection   = true
   ddos_rate_limit          = 3000
   block_non_uk_traffic     = true
