@@ -3,6 +3,13 @@ locals {
   iceberg_table_maint_image_name   = "gdpr-table-maintenance"
   ecr_repo_name                    = "electronic-monitoring-gdpr"
   core_shared_services_id          = local.environment_management.account_ids["core-shared-services-production"]
+  target_gdpr_dbs                  = (
+    local.is-production ? local.prod_databases_for_gdpr : (
+      local.is-preproduction ? local.preprod_databases_for_gdpr : (
+        local.is-development ? local.dev_databases_for_gdpr : []
+      )
+    )
+  )
 }
 
 data "aws_iam_policy_document" "ecs_gdpr_assume_policy" {
@@ -178,21 +185,21 @@ resource "aws_ecs_cluster_capacity_providers" "ecd-gdpr-fargate" {
 }
 
 resource "aws_lakeformation_permissions" "gdpr_iceberg_table_db_permissions" {
-  count     = local.is-development ? 1 : 0
+  for_each  = toset(local.target_gdpr_dbs)
   principal = aws_iam_role.gdpr_structured_job_role[0].arn
 
   database {
-    name = "test"
+    name = each.value
   }
 
   permissions = ["DESCRIBE"]
 }
 resource "aws_lakeformation_permissions" "gdpr_iceberg_table_table_permissions" {
-  count     = local.is-development ? 1 : 0
+  for_each  = toset(local.target_gdpr_dbs)
   principal = aws_iam_role.gdpr_structured_job_role[0].arn
 
   table {
-    database_name = "test"
+    database_name = each.value
     wildcard      = true
   }
 
@@ -200,7 +207,7 @@ resource "aws_lakeformation_permissions" "gdpr_iceberg_table_table_permissions" 
 }
 
 resource "aws_lakeformation_permissions" "gdpr_iceberg_table_datalake_location" {
-  count     = local.is-development ? 1 : 0
+  count     = local.is-development || local.is-preproduction ? 1 : 0
   principal = aws_iam_role.gdpr_structured_job_role[0].arn
 
   data_location {
