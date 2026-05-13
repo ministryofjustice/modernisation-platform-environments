@@ -6,15 +6,7 @@ resource "aws_wafv2_ip_set" "ebsapps_waf_ip_set" {
   ip_address_version = "IPV4"
   description        = "List of trusted IP Addresses allowing access via WAF for EBS Apps Internal ALB"
 
-  # addresses = [
-  #   data.aws_vpc.shared.cidr_block,
-  #   local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
-  #   local.application_data.accounts[local.environment].mojo_devices,
-  #   local.application_data.accounts[local.environment].dom1_devices,
-  #   local.application_data.accounts[local.environment].moj_wifi
-  # ]
-
-  addresses = [ jsondecode(data.aws_secretsmanager_secret_version.ebs_secrets.secret_string).ebs_internal_waf_ip_set ]
+  addresses = jsondecode(data.aws_secretsmanager_secret_version.ebs_secrets.secret_string).ebs_internal_waf_ip_set
   
   tags = merge(local.tags,
     { Name = lower(format("ebsapp-internal-ip-set")) }
