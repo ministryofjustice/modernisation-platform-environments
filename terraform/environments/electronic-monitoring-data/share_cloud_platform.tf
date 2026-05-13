@@ -275,7 +275,7 @@ data "aws_iam_policy_document" "em_dashboard_ear_sar_permissions" {
     sid = "AllowAccessToTriggerEARSARAPI"
     effect = "Allow"
     actions   = ["execute-api:Invoke"]
-    resources = ["arn:aws:execute-api:${data.aws_region.current.name}:${local.env_account_id}:${module.ears_sars_api.api_gateway_id}/*"]
+    resources = ["arn:aws:execute-api:${data.aws_region.current.name}:${local.env_account_id}:${[module.ears_sars_api[0].api_gateway_id}/*"]
   }
 }
 
