@@ -2313,7 +2313,9 @@ data "aws_iam_policy_document" "merge_load_policy_document" {
           "glue:GetTable",
           "glue:GetTables",
           "glue:GetPartition",
-          "glue:GetPartitions"]
+          "glue:GetPartitions",
+          "glue:UpdateTable",
+          ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
       "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
