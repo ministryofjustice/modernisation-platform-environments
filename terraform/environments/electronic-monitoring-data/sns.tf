@@ -95,6 +95,19 @@ data "aws_iam_policy_document" "emds_alerts_kms" {
       type        = "AWS"
       identifiers = [aws_iam_role.staging_db_janitor.arn]
     }
+  statement {
+    sid       = "AllowEventBridgeUseOfKey"
+    effect    = "Allow"
+    resources = ["*"]
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+    ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
   }
 
   statement {
