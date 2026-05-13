@@ -911,6 +911,21 @@ resource "aws_security_group_rule" "egress_all_hosts_to_domain_controller_traffi
   source_security_group_id = aws_security_group.aws_domain_security_group.id
 }
 
+# Ingress rule for port 445 from eucs-appstream private subnets
+resource "aws_security_group_rule" "ingress_port_445_from_eucs_appstream" {
+  for_each = {
+    for subnet in(local.is-development || local.is-production ? values(data.aws_subnet.eucs_appstream_private_details) : []) :
+    subnet.id => subnet.cidr_block
+  }
+  description       = "Allow port 445 inbound from eucs-appstream private subnets"
+  from_port         = 445
+  protocol          = "TCP"
+  security_group_id = aws_security_group.all_internal_groups.id
+  to_port           = 445
+  type              = "ingress"
+  cidr_blocks       = [each.value]
+}
+
 # cidr_blocks should be replaced with source_security_group_id, but open until confirmed with configuration team
 resource "aws_security_group_rule" "egress_all_hosts_to_proxies" {
   for_each          = local.application_data.host_to_proxy_rules

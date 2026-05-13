@@ -81,3 +81,38 @@ data "aws_iam_policy_document" "kms_policy" {
     resources = ["*"]
   }
 }
+
+# Data source to fetch VPC from eucs-appstream account (only for development and production environments)
+data "aws_vpc" "eucs_appstream" {
+  provider = aws.eucs-appstream
+  count    = local.is-development || local.is-production ? 1 : 0
+
+  filter {
+    name   = "tag:Name"
+    values = ["hmpps-${local.environment}"]
+  }
+}
+
+# Data source to fetch private subnets from eucs-appstream VPC
+data "aws_subnets" "eucs_appstream_private" {
+  provider = aws.eucs-appstream
+  count    = local.is-development || local.is-production ? 1 : 0
+
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.eucs_appstream[0].id]
+  }
+
+  filter {
+    name   = "tag:Name"
+    values = ["*private*"]
+  }
+}
+
+# Data source to fetch subnet details including CIDR blocks
+data "aws_subnet" "eucs_appstream_private_details" {
+  provider = aws.eucs-appstream
+  for_each = local.is-development || local.is-production ? toset(data.aws_subnets.eucs_appstream_private[0].ids) : toset([])
+
+  id = each.value
+}
