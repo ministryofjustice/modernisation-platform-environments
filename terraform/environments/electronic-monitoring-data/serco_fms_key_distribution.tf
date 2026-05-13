@@ -2,7 +2,7 @@ locals {
   serco_fms_key_distribution_enabled = false
 
   # placeholder value once UP3 confirm
-  serco_fms_key_distribution_recipient_email = "up3-team-mailbox@example.com"
+  serco_fms_key_distribution_recipient_email = "EMDataEngineering@justice.gov.uk"
 
   # placeholder value once GOV.UK Notify template is created
   serco_fms_key_distribution_notify_template_id = (
@@ -26,21 +26,19 @@ locals {
     },
   ]
 
-  serco_fms_key_distribution_secret_arns = concat(
-    [
-      for spec in local.serco_fms_key_distribution_secret_specs :
-      spec.secret_arn
-    ],
-    [
-      aws_secretsmanager_secret.serco_fms_file_password.arn,
-      aws_secretsmanager_secret.govuk_notify_serco_fms_api_key.arn,
-    ]
-  )
+  serco_fms_key_distribution_feed_secret_arns = [
+    for spec in local.serco_fms_key_distribution_secret_specs :
+    spec.secret_arn
+  ]
+
+  serco_fms_key_distribution_config_secret_arns = [
+    aws_secretsmanager_secret.govuk_notify_serco_fms_api_key.arn,
+  ]
 }
 
-resource "aws_secretsmanager_secret" "serco_fms_file_password" {
-  name        = "serco-fms-file-password"
-  description = "Password for Serco FMS encrypted fallback key file"
+resource "aws_secretsmanager_secret" "serco_fms_password_state" {
+  name        = "serco-fms-key-distribution-password-state"
+  description = "Generated passwords for Serco FMS encrypted key files"
 
   tags = merge(
     local.tags,
@@ -50,11 +48,16 @@ resource "aws_secretsmanager_secret" "serco_fms_file_password" {
   )
 }
 
-resource "aws_secretsmanager_secret_version" "serco_fms_file_password" {
-  secret_id = aws_secretsmanager_secret.serco_fms_file_password.id
+resource "aws_secretsmanager_secret_version" "serco_fms_password_state" {
+  secret_id = aws_secretsmanager_secret.serco_fms_password_state.id
 
-  # placeholder value once UP3 confirm fallback route
-  secret_string = "PLACEHOLDER"
+  # placeholder value until the first generated password is written
+  secret_string = jsonencode({
+    environment = local.environment_shorthand
+    period      = "PLACEHOLDER"
+    password    = "PLACEHOLDER"
+    created_at  = "PLACEHOLDER"
+  })
 
   lifecycle {
     ignore_changes = [secret_string]
@@ -91,7 +94,7 @@ resource "aws_iam_role" "send_serco_fms_keys" {
 
 data "aws_iam_policy_document" "send_serco_fms_keys" {
   statement {
-    sid    = "ReadCredentialAndConfigSecrets"
+    sid    = "ReadCredentialSecrets"
     effect = "Allow"
 
     actions = [
@@ -100,7 +103,31 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
       "secretsmanager:ListSecretVersionIds",
     ]
 
-    resources = local.serco_fms_key_distribution_secret_arns
+    resources = local.serco_fms_key_distribution_feed_secret_arns
+  }
+
+  statement {
+    sid    = "ReadNotifyConfigSecrets"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = local.serco_fms_key_distribution_config_secret_arns
+  }
+
+  statement {
+    sid    = "WriteGeneratedPasswordState"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:PutSecretValue",
+    ]
+
+    resources = [
+      aws_secretsmanager_secret.serco_fms_password_state.arn,
+    ]
   }
 
   statement {
@@ -163,8 +190,8 @@ module "send_serco_fms_keys" {
       local.serco_fms_key_distribution_secret_specs
     )
 
-    SERCO_FILE_PASSWORD_SECRET_ARN = (
-      aws_secretsmanager_secret.serco_fms_file_password.arn
+    SERCO_PASSWORD_STATE_SECRET_ARN = (
+      aws_secretsmanager_secret.serco_fms_password_state.arn
     )
 
     GOVUK_NOTIFY_API_KEY_SECRET_ARN = (
@@ -296,7 +323,7 @@ resource "aws_cloudwatch_event_rule" "serco_fms_rotation_failed" {
   description = "Alerts when a Secrets Manager rotation failure occurs"
 
   event_pattern = jsonencode({
-    source = ["aws.secretsmanager"]
+    source      = ["aws.secretsmanager"]
     detail-type = ["AWS Service Event via CloudTrail"]
     detail = {
       eventSource = ["secretsmanager.amazonaws.com"]
