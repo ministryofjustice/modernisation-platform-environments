@@ -18,13 +18,31 @@ resource "terraform_data" "ad_users" {
 
   provisioner "local-exec" {
     command = <<-EOT
-      aws ds-data create-user \
+      # Try to create the user
+      if aws ds-data create-user \
         --directory-id ${self.output.directory_id} \
         --sam-account-name ${self.output.username} \
         --given-name "${self.output.first_name}" \
         --surname "${self.output.last_name}" \
         --email-address ${self.output.email} \
-        --region ${self.output.region} 2>&1 || echo "User ${self.output.username} may already exist, continuing..."
+        --region ${self.output.region} 2>&1; then
+        echo "User ${self.output.username} created successfully"
+      else
+        # Check if user already exists
+        if aws ds-data describe-user \
+          --directory-id ${self.output.directory_id} \
+          --sam-account-name ${self.output.username} \
+          --region ${self.output.region} >/dev/null 2>&1; then
+          echo "User ${self.output.username} already exists, continuing..."
+        else
+          echo "ERROR: Failed to create user ${self.output.username}"
+          exit 1
+        fi
+      fi
+      
+      # Wait for AD propagation
+      echo "Waiting 10 seconds for AD propagation..."
+      sleep 10
     EOT
   }
 
