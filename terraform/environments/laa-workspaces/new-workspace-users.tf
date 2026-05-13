@@ -56,5 +56,11 @@ locals {
       email         = "vladimirs.kovalovs1@justice.gov.uk"
       instance_type = "standard"
     }
+    "test2.user2" = {
+      first_name    = "Test2"
+      last_name     = "User2"
+      email         = "vladimirs.kovalovs1@justice.gov.uk"
+      instance_type = "standard"
+    }
   }
 }

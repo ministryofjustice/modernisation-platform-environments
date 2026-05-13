@@ -111,9 +111,8 @@ resource "aws_workspaces_workspace" "workspaces_ad" {
     }
   )
 
-  # WorkSpaces will automatically create the AD user if it doesn't exist
-  # This enables the "Invite user" functionality and automatic welcome emails
   depends_on = [
-    aws_workspaces_directory.workspaces_ad
+    aws_workspaces_directory.workspaces_ad,
+    terraform_data.ad_users,
   ]
 }

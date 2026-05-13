@@ -87,6 +87,7 @@ resource "aws_iam_policy" "github_actions_ds_data_access" {
         Effect = "Allow"
         Action = [
           "ds-data:CreateUser",
+          "ds-data:UpdateUser",
           "ds-data:DeleteUser",
           "ds-data:DescribeUser",
           "ds-data:ListUsers"
