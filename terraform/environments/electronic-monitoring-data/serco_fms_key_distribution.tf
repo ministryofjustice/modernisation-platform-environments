@@ -2,7 +2,11 @@ locals {
   serco_fms_key_distribution_enabled = false
 
   # placeholder value once UP3 confirm
-  serco_fms_key_distribution_recipient_email = "EMDataEngineering@justice.gov.uk"
+  serco_fms_key_distribution_recipient_emails = [
+  "matt.heery@digital.justice.gov.uk",
+  "Matthew.Rixson@justice.gov.uk",
+  "khristiania.raihan@justice.gov.uk"
+]
 
   # placeholder value once GOV.UK Notify template is created
   serco_fms_key_distribution_notify_template_id = (
