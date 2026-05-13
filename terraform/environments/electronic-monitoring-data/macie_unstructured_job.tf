@@ -2,6 +2,12 @@ resource "aws_macie2_account" "macie_unstructured_spike" {
   status = "PAUSED"
 }
 
+resource "aws_macie2_custom_data_identifier" "subject_id" {
+  name                   = "subject-id"
+  description            = "Subject ID Regex"
+  regex                  = "^[0-9]{7}$"
+  maximum_match_distance = 50 
+}
 
 # Uses the default checks
 # resource "aws_macie2_classification_job" "unstructured_data_spike" {
