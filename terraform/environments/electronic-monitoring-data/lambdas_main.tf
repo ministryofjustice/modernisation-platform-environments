@@ -893,7 +893,7 @@ module "landing_dlq_redriver" {
 # Macie Unstrucutred Job
 #-----------------------------------------------------------------------------------
 
-module "iceberg-table-maintenance" {
+module "macie-unstructured-jobs" {
   count                   = local.is-development ? 1 : 0
   source                  = "./modules/lambdas"
   is_image                = true
