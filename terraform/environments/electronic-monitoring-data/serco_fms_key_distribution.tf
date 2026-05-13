@@ -236,7 +236,7 @@ module "send_serco_fms_keys" {
       local.serco_fms_key_distribution_notify_template_id
     )
 
-    SERCO_RECIPIENT_EMAILS = (
+    SERCO_RECIPIENT_EMAILS = jsonencode(
       local.serco_fms_key_distribution_recipient_emails
     )
 
