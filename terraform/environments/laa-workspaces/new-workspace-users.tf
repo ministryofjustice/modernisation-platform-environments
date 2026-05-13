@@ -46,8 +46,8 @@ locals {
     #   instance_type = "performance"
     # }
     "test.user" = {
-      first_name    = "test"
-      last_name     = "user"
+      first_name    = "Test"
+      last_name     = "User"
       email         = "vladimirs.kovalovs1@justice.gov.uk"
       instance_type = "standard"
     }
