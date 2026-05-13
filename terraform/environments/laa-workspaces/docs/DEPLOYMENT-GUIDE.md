@@ -1,8 +1,8 @@
 gpra
 # LAA WorkSpaces with RADIUS MFA - Deployment Guide
 
-**Document Version:** 2.2  
-**Last Updated:** 11 May 2026  
+**Document Version:** 2.3  
+**Last Updated:** 13 May 2026  
 **Environment:** AWS Modernisation Platform  
 **Status:** Active - LinOTP + FreeRADIUS Implementation
 
@@ -24,6 +24,8 @@ NOT: `CN=Admin,CN=Users,DC=laa-workspaces,DC=local`
 - `selfservice_enrollment` (scope: selfservice, action: enrollTOTP, webprovisionGOOGLE)
 - `limit_one_token` (scope: enrollment, action: maxtoken=1)
 - `otp_authentication` (scope: authentication, action: otppin=1)
+
+⚠️ **No Welcome Emails:** When users are created programmatically via Terraform's `ds-data` API, AWS does **not** send welcome emails. You must manually reset passwords for all new users via AWS Console → Directory Service → Users → Reset password. See Step 4.1 for detailed instructions.
 
 ⚠️ **ALB Access:** If the Application Load Balancer returns 504 errors, use SSM port forwarding to access LinOTP admin portal directly.
 
@@ -828,16 +830,33 @@ locals {
 1. Commit and push changes to a branch
 2. Create Pull Request
 3. Merge PR to trigger deployment
-4. Terraform will automatically create the AD user
+4. Terraform will automatically create:
+   - AD user account (via `ds-data` API)
+   - WorkSpace instance (if not already created)
 
-**Note:** The user will be created but you won't receive the password automatically. You'll need to reset it via AWS Console:
+**IMPORTANT - Post-Deployment Password Setup:**
 
-1. Go to **Directory Service** → Your directory → **Users**
-2. Find `test.user`
+When users are created programmatically via the `ds-data` API (as this Terraform does), AWS **does not send the welcome email** with password setup instructions. You must manually set passwords for new users.
+
+**Steps to set user password:**
+
+1. Go to **AWS Console** → **Directory Service** → **laa-workspaces.local** → **Users**
+2. Find the user (e.g., `test.user`)
 3. Click **Actions** → **Reset password**
-4. Set password (e.g., `TestPass123!`)
-5. Uncheck "User must change password at next login"
+4. Set a secure password (e.g., `TestPass123!`)
+5. **Uncheck** "User must change password at next login" (for testing) OR leave checked (for production)
 6. Click **Reset password**
+7. Securely communicate the password to the user (do NOT email plaintext passwords)
+
+**Why this happens:**
+- AWS WorkSpaces only sends welcome emails when it **creates the user** during WorkSpace provisioning
+- Since Terraform pre-creates the AD user, the WorkSpace sees an existing user and skips the email
+- This is expected behavior when using automated user provisioning
+
+**Alternative for production:**
+- Consider using AWS Secrets Manager to generate and store temporary passwords
+- Send custom welcome emails via AWS SES with instructions to reset password on first login
+- Use a ticketing system to securely deliver credentials
 
 ### Step 4.2: User Self-Enrollment
 
@@ -963,6 +982,12 @@ cd /Users/vladimirs.kovalovs/Desktop/Repos/modernisation-platform-environments/t
 
 terraform apply
 ```
+
+**Post-Deployment - Set User Passwords:**
+
+After Terraform creates the users and WorkSpaces, you **must manually set passwords** for each user (AWS does not send welcome emails when users are created programmatically).
+
+See Step 4.1 for detailed password setup instructions.
 
 ### Step 5.3: User Login Process
 
