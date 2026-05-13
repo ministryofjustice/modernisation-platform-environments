@@ -2,6 +2,7 @@ import logging
 import os
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timezone
 from urllib.parse import urlparse
 
 import boto3
@@ -114,7 +115,9 @@ def _run_export(sql, out_key, log_label):
 
     # Read Athena's CSV result from S3
     bucket, prefix = parse_s3_uri(S3_ATHENA_RESULTS_PATH)
-    key = f"{prefix}/{query_execution_id}.csv" if prefix else f"{query_execution_id}.csv"
+    key = (
+        f"{prefix}/{query_execution_id}.csv" if prefix else f"{query_execution_id}.csv"
+    )
     response = s3.get_object(Bucket=bucket, Key=key)
     csv_data = response["Body"].read()
 
@@ -152,7 +155,13 @@ def run_lot_export(table, lot):
 
     lot_dir = LOT_DIR_MAP[lot]
     _, output_prefix = parse_s3_uri(S3_OUTPUT_PATH)
-    out_key = f"{output_prefix}/{lot_dir}/{table}.csv" if output_prefix else f"{lot_dir}/{table}.csv"
+    export_date = datetime.now(timezone.utc).strftime("%Y%m%d")
+    
+    out_key = (
+        f"{output_prefix}/{lot_dir}/{table}_{export_date}.csv"
+        if output_prefix
+        else f"{lot_dir}/{table}_{export_date}.csv"
+    )
 
     logger.info(f"Running query for table={table} lot={lot}")
     _run_export(sql, out_key, f"{lot_dir}/{table}")
@@ -171,7 +180,12 @@ def run_wsm_export(table):
     sql = f"SELECT * FROM {table} WHERE lot_number IN ({lot_list})"
 
     _, output_prefix = parse_s3_uri(S3_OUTPUT_PATH)
-    out_key = f"{output_prefix}/WSM/{table}.csv" if output_prefix else f"WSM/{table}.csv"
+    export_date = datetime.now(timezone.utc).strftime("%Y%m%d")
+    out_key = (
+        f"{output_prefix}/WSM/{table}_{export_date}.csv"
+        if output_prefix
+        else f"WSM/{table}_{export_date}.csv"
+    )
 
     logger.info(f"Running WSM query for table={table}")
     _run_export(sql, out_key, f"WSM/{table}")

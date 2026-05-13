@@ -33,9 +33,9 @@ locals {
 
 
   db_config_stage = {
-    instance_type  = "r7i.2xlarge"
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-06-04T11-24-58.162Z"
-
+    instance_type          = "r7i.2xlarge"
+    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-06-04T11-24-58.162Z"
+    pinned_ami_id          = "ami-04286e91e4ada8f3a"
     primary_instance_count = 1
     standby_count          = 0
 
@@ -89,7 +89,8 @@ locals {
       container_port    = 8080
       container_memory  = 4096
       container_cpu     = 2048
-      ec2_instance_type = "r5.2xlarge"
+      ec2_instance_type = "r7i.2xlarge"
+      task_count        = 8
     }
 
     weblogic_params = {
@@ -139,10 +140,12 @@ locals {
     }
 
     weblogic_eis = {
-      image_tag        = "6.2.0.3"
-      container_port   = 8080
-      container_memory = 2048
-      container_cpu    = 1024
+      image_tag         = "6.2.0.3"
+      container_port    = 8080
+      container_memory  = 2048
+      container_cpu     = 1024
+      ec2_instance_type = "r7i.large"
+      task_count        = 1
     }
 
     pwm = {

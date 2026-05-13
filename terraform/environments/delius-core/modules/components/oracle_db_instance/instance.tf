@@ -30,7 +30,7 @@ module "instance" {
 
   name = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-${local.instance_name_index}" # e.g. dev-boe-db-1
 
-  ami_name                      = data.aws_ami.oracle_db.name
+  ami_name                      = local.selected_pinned_ami_name
   ami_owner                     = var.db_ami.owner
   instance                      = local.instance_config
   ebs_kms_key_id                = var.account_config.kms_keys.general_shared
