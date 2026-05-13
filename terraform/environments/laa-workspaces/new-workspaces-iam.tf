@@ -66,3 +66,46 @@ resource "aws_iam_role_policy" "workspaces_ds_access" {
     ]
   })
 }
+
+##############################################
+### GitHub Actions IAM Policy for AD User Management
+### Allows GitHub Actions to create/delete users in Microsoft AD
+##############################################
+
+# Policy for ds-data API access (AD user management)
+resource "aws_iam_policy" "github_actions_ds_data_access" {
+  count = local.environment == "development" ? 1 : 0
+
+  name        = "${local.application_name}-${local.environment}-github-ds-data-access"
+  description = "Allow GitHub Actions to manage AD users via ds-data API"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "DirectoryServiceDataAccess"
+        Effect = "Allow"
+        Action = [
+          "ds-data:CreateUser",
+          "ds-data:DeleteUser",
+          "ds-data:DescribeUser",
+          "ds-data:ListUsers"
+        ]
+        Resource = aws_directory_service_directory.workspaces_ad[0].arn
+      }
+    ]
+  })
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-github-ds-data-access" }
+  )
+}
+
+# Attach policy to GitHub Actions apply role
+resource "aws_iam_role_policy_attachment" "github_actions_ds_data_access" {
+  count = local.environment == "development" ? 1 : 0
+
+  role       = "github-actions-apply"
+  policy_arn = aws_iam_policy.github_actions_ds_data_access[0].arn
+}
