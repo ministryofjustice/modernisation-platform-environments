@@ -4,8 +4,8 @@ variable "identity_provider_arn" {
 }
 
 variable "role_name" {
-  default    = "airflow"
-  type        = string
+  default = "airflow"
+  type    = string
 }
 
 variable "data_buckets" {

@@ -10,9 +10,9 @@ locals {
     preproduction = "9FAFCA50C4DA68A8E75FD21EA53A4F2B"
     production    = "801920EDEF91E3CAB03E04C03A2DE2BB"
   }
-  _current_env      = reverse(split("-", terraform.workspace))[0]
+  _current_env = reverse(split("-", terraform.workspace))[0]
   # Fall back to development if workspace is test
-  current_env       = local._current_env == "test" ? "development" : local._current_env
+  current_env = local._current_env == "test" ? "development" : local._current_env
 
   oidc_current_env = local.analytical_platform_compute_oidc_ids[local.current_env]
 }

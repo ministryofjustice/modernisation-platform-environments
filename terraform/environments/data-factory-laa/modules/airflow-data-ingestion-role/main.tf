@@ -27,12 +27,12 @@ data "aws_iam_policy_document" "s3" {
       "s3:GetObject",
       "s3:Put*"
     ]
-     resources = flatten([
-       for bucket in var.data_buckets : [
-         "arn:aws:s3:::${bucket}",
-         "arn:aws:s3:::${bucket}/*",
-       ]
-     ])
+    resources = flatten([
+      for bucket in var.data_buckets : [
+        "arn:aws:s3:::${bucket}",
+        "arn:aws:s3:::${bucket}/*",
+      ]
+    ])
   }
 }
 
