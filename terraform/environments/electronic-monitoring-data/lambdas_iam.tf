@@ -9,6 +9,11 @@ locals {
     "am_stg${local.dbt_suffix}",
     "intermediate_tasking${local.dbt_suffix}"
   ]
+  load_lambda_databases = [
+    "staged_mdss${local.dbt_suffix}", 
+    "acquisitive_crime${local.dbt_suffix}", 
+    "allied_mdss_${local.environment_shorthand}",
+    ]
 }
 
 # ------------------------------------------
@@ -2234,4 +2239,126 @@ resource "aws_iam_policy" "landing_dlq_redriver" {
 resource "aws_iam_role_policy_attachment" "landing_dlq_redriver_attach" {
   role       = aws_iam_role.landing_dlq_redriver.name
   policy_arn = aws_iam_policy.landing_dlq_redriver.arn
+}
+
+# ------------------------------------------------------------------------------
+# Merge load lambda role
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "merge_load" {
+  name               = "merge_load_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "merge_load_policy_document" {
+  statement {
+    sid    = "AthenaPermissions"
+    effect = "Allow" 
+    actions = [
+      "athena:GetDataCatalog",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:GetWorkGroup",
+      "athena:StartQueryExecution",
+      "athena:StopQueryExecution",
+      "athena:CreatePreparedStatement",
+      "athena:UpdatePreparedStatement",
+      "athena:GetPreparedStatement",
+      "athena:ListPreparedStatements",
+      "athena:DeletePreparedStatement",
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:workgroup/*",
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:datacatalog/*"
+    ]
+  }
+  statement {
+    actions   = ["athena:ListWorkGroups"]
+    resources = ["*"]
+  }
+  statement {
+    actions   = ["lakeformation:GetDataAccess"]
+    resources = ["*"]
+  }
+  statement {
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:ListBucket",
+      "s3:ListMultipartUploadParts",
+      "s3:GetBucketLocation",
+    ]
+    resources = [
+      module.s3-athena-bucket.bucket.arn,
+      "${module.s3-athena-bucket.bucket.arn}/*",
+      "${module.s3-athena-bucket.bucket.arn}/output/*",
+      module.s3-create-a-derived-table-bucket.bucket.arn,
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/*"
+      ]
+
+  }
+  statement {
+    sid       = "S3BucketPerms"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets"]
+    resources = ["*"]
+  }
+  statement { 
+    sid    = "GluePermissions"
+    effect = "Allow" 
+    actions = [
+          "glue:GetDatabase",
+          "glue:GetDatabases",
+          "glue:GetTable",
+          "glue:GetTables",
+          "glue:GetPartition",
+          "glue:GetPartitions",
+          "glue:UpdateTable",
+          ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+      ]
+    }
+}
+
+resource "aws_iam_policy" "merge_load" {
+  name   = "merge_load_lambda_policy"  
+  policy = data.aws_iam_policy_document.merge_load_policy_document.json
+  }
+
+resource "aws_iam_role_policy_attachment" "merge_load_attach" {
+  role       = aws_iam_role.merge_load.name  
+  policy_arn = aws_iam_policy.merge_load.arn
+  }
+
+
+  resource "aws_lakeformation_permissions" "merge_load_lambda_database_access" {
+  for_each = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
+  principal   = aws_iam_role.merge_load.arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = each.value
+  }
+}
+
+resource "aws_lakeformation_permissions" "merge_load_lambda_table_access" {
+  for_each = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
+  principal   = aws_iam_role.merge_load.arn
+  permissions = ["SELECT", "INSERT", "ALTER", "DESCRIBE"]
+  table {
+    database_name = each.value
+    wildcard      = true
+  }
+}
+
+resource "aws_lakeformation_permissions" "merge_load_lambda_s3_access" {
+  count     = local.is-development || local.is-test ? 1 : 0
+  principal   = aws_iam_role.merge_load.arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+  data_location {
+    arn = aws_lakeformation_resource.data_bucket.arn
+  }
 }
