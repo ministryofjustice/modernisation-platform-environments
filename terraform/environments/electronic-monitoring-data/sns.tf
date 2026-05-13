@@ -84,17 +84,7 @@ data "aws_iam_policy_document" "emds_alerts_kms" {
       identifiers = [aws_iam_role.cloudwatch_alarm_threader.arn]
     }
   }
-
-  statement {
-    sid       = "AllowStagingDbJanitorUseOfKey"
-    effect    = "Allow"
-    resources = ["*"]
-    actions   = ["kms:Decrypt", "kms:GenerateDataKey"]
-
-    principals {
-      type        = "AWS"
-      identifiers = [aws_iam_role.staging_db_janitor.arn]
-    }
+  
   statement {
     sid       = "AllowEventBridgeUseOfKey"
     effect    = "Allow"
@@ -107,6 +97,18 @@ data "aws_iam_policy_document" "emds_alerts_kms" {
     principals {
       type        = "Service"
       identifiers = ["events.amazonaws.com"]
+    }
+  }
+
+  statement {
+    sid       = "AllowStagingDbJanitorUseOfKey"
+    effect    = "Allow"
+    resources = ["*"]
+    actions   = ["kms:Decrypt", "kms:GenerateDataKey"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.staging_db_janitor.arn]
     }
   }
 
