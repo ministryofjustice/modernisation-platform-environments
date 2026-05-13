@@ -271,6 +271,7 @@ data "aws_iam_policy_document" "em_data_validation_permissions" {
 }
 
 data "aws_iam_policy_document" "em_dashboard_ear_sar_permissions" {
+  count = local.is-preproduction ? 1 : 0 
   statement {
     sid = "AllowAccessToTriggerEARSARAPI"
     effect = "Allow"
