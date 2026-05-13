@@ -236,8 +236,8 @@ module "send_serco_fms_keys" {
       local.serco_fms_key_distribution_notify_template_id
     )
 
-    SERCO_RECIPIENT_EMAIL = (
-      local.serco_fms_key_distribution_recipient_email
+    SERCO_RECIPIENT_EMAILS = (
+      local.serco_fms_key_distribution_recipient_emails
     )
 
     STATE_BUCKET = module.s3-logging-bucket.bucket.id
