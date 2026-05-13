@@ -109,9 +109,11 @@ data "aws_iam_policy_document" "task" {
     effect = "Allow"
     actions = [
       "s3:PutObject",
-      "s3:PutObjectAcl"
+      "s3:PutObjectAcl",
+      "s3:ListBucket"
     ]
     resources = [
+      "${module.vcms_testing_reports_bucket.bucket.arn}",
       "${module.vcms_testing_reports_bucket.bucket.arn}/*"
     ]
   }
