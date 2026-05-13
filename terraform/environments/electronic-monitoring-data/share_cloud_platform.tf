@@ -284,7 +284,7 @@ resource "aws_iam_policy" "em_dashboard_ear_sar_permissions" {
   count       = local.is-preproduction ? 1 : 0
   name_prefix = "em_dashboard_ear_sar_permissions"
   description = "Permissions for ear sar tool."
-  policy      = data.aws_iam_policy_document.em_dashboard_ear_sar_permissions.json
+  policy      = data.aws_iam_policy_document.em_dashboard_ear_sar_permissions[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "em_dashboard_ear_sar_permissions" {
@@ -297,7 +297,7 @@ resource "aws_iam_policy" "em_data_validation_permissions" {
   count       = local.is-test || local.is-production ? 1 : 0
   name_prefix = "em_data_validation_permissions"
   description = "Permissions for environment class for emd tool."
-  policy      = data.aws_iam_policy_document.em_dashboard_ear_sar_permissions.json
+  policy      = data.aws_iam_policy_document.em_data_validation_permissions.json
 }
 
 resource "aws_iam_role_policy_attachment" "em_data_validation_permissions" {
