@@ -1,3 +1,8 @@
+/**
+ * This Terraform configuration defines an IAM role for Airflow with permissions to access specified S3 buckets.
+ * The role is assumed by a web identity provider, allowing Airflow to interact with AWS resources securely.
+ */
+
 data "aws_iam_policy_document" "airflow_assume_role_policy" {
   statement {
     actions = ["sts:AssumeRoleWithWebIdentity"]
