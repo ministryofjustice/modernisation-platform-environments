@@ -23,7 +23,7 @@ locals {
   }
 
   alarm_name_prefix = "${local.application_name}-alarm"
-  storage = local.application_data.accounts[local.environment].allocated_storage * 0.2 
+  storage = local.application_data.accounts[local.environment].allocated_storage * 0.2 * 1024 * 1024 * 1024
 }
 
 
