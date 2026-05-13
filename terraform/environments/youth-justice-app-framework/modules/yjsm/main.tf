@@ -58,7 +58,7 @@ resource "aws_instance" "yjsm" {
   root_block_device {
     encrypted             = true
     delete_on_termination = false
-    volume_size           = 60
+    volume_size           = 80
     volume_type           = "gp2"
   }
 
