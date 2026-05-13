@@ -14,6 +14,7 @@ resource "aws_macie2_classification_export_configuration" "results_config" {
     bucket_name = module.s3-macie-results-bucket[0].bucket
     kms_key_arn = module.kms_metadata_key.key_arn,
   }
+  key_prefix  = "macie-discovery-results/"
 }
 
 # Uses the default checks
