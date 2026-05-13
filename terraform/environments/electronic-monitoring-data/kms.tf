@@ -1,3 +1,22 @@
+locals {
+  bucket_list = local.is-production || local.is-preproduction || local.is-test ? [
+    module.s3-fms-general-landing-bucket.bucket_arn,
+    module.s3-fms-ho-landing-bucket.bucket_arn,
+    module.s3-fms-specials-landing-bucket.bucket_arn,
+    module.s3-mdss-general-landing-bucket.bucket_arn,
+    module.s3-mdss-ho-landing-bucket.bucket_arn,
+    module.s3-mdss-specials-landing-bucket.bucket_arn
+    ] : local.is-development ? [
+    module.s3-fms-general-landing-bucket.bucket_arn,
+    module.s3-fms-ho-landing-bucket.bucket_arn,
+    module.s3-fms-specials-landing-bucket.bucket_arn,
+    module.s3-mdss-general-landing-bucket.bucket_arn,
+    module.s3-mdss-ho-landing-bucket.bucket_arn,
+    module.s3-mdss-specials-landing-bucket.bucket_arn,
+    module.s3-macie-results-bucket[0].bucket_arn
+  ] : []
+}
+
 module "kms_metadata_key" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
@@ -32,14 +51,7 @@ module "kms_metadata_key" {
         {
           test     = "ArnLike"
           variable = "aws:SourceArn"
-          values = [
-            module.s3-fms-general-landing-bucket.bucket_arn,
-            module.s3-fms-ho-landing-bucket.bucket_arn,
-            module.s3-fms-specials-landing-bucket.bucket_arn,
-            module.s3-mdss-general-landing-bucket.bucket_arn,
-            module.s3-mdss-ho-landing-bucket.bucket_arn,
-            module.s3-mdss-specials-landing-bucket.bucket_arn,
-          ]
+          values   = locals.bucket_list
         }
       ]
       resources = ["*"]

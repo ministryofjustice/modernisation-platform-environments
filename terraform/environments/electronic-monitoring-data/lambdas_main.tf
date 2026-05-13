@@ -907,7 +907,7 @@ module "iceberg-table-maintenance" {
   production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
 
   environment_variables = {
-    BUCKET = module.s3-data-bucket.bucket.id
+    BUCKET      = module.s3-data-bucket.bucket.id
     IDENTIFIERS = aws_macie2_custom_data_identifier.subject_id.id
   }
 }
