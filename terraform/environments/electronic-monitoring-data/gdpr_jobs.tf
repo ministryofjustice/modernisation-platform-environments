@@ -185,8 +185,7 @@ resource "aws_ecs_cluster_capacity_providers" "ecd-gdpr-fargate" {
 }
 
 resource "aws_lakeformation_permissions" "gdpr_iceberg_table_db_permissions" {
-  count     = local.is-development || local.is-preproduction ? 1 : 0
-  for_each  = toset(local.target_gdpr_dbs)
+  for_each  = local.is-development || local.is-preproduction ? toset(local.target_gdpr_dbs) : []
   principal = aws_iam_role.gdpr_structured_job_role[0].arn
 
   database {
@@ -196,8 +195,7 @@ resource "aws_lakeformation_permissions" "gdpr_iceberg_table_db_permissions" {
   permissions = ["DESCRIBE"]
 }
 resource "aws_lakeformation_permissions" "gdpr_iceberg_table_table_permissions" {
-  count     = local.is-development || local.is-preproduction ? 1 : 0
-  for_each  = toset(local.target_gdpr_dbs)
+  for_each  = local.is-development || local.is-preproduction ? toset(local.target_gdpr_dbs) : []
   principal = aws_iam_role.gdpr_structured_job_role[0].arn
 
   table {
