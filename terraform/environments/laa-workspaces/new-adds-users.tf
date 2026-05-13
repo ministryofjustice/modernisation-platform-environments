@@ -13,7 +13,7 @@ resource "terraform_data" "ad_users" {
     each.value.first_name,
     each.value.last_name,
     each.value.email,
-    "v2", # Bump this to force recreation (v1 -> v2 -> v3, etc.)
+    "v3", # Bump this to force recreation (v1 -> v2 -> v3, etc.)
   ]
 
   input = {
@@ -25,8 +25,17 @@ resource "terraform_data" "ad_users" {
     region       = local.application_data.accounts[local.environment].region
   }
 
+  # Ensure IAM permissions are in place before attempting to create users
+  depends_on = [
+    aws_iam_role_policy_attachment.github_actions_ds_data_access
+  ]
+
   provisioner "local-exec" {
     command = <<-EOT
+      # Wait for IAM policy to propagate (only needed on first apply)
+      echo "Waiting 5 seconds for IAM policy propagation..."
+      sleep 5
+      
       # Try to create the user
       if aws ds-data create-user \
         --directory-id ${self.input.directory_id} \
