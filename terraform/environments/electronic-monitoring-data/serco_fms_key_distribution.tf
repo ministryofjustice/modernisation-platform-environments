@@ -34,6 +34,14 @@ locals {
   serco_fms_key_distribution_config_secret_arns = [
     aws_secretsmanager_secret.govuk_notify_serco_fms_api_key.arn,
   ]
+
+  serco_fms_key_distribution_secret_arns = concat(
+    local.serco_fms_key_distribution_feed_secret_arns,
+    local.serco_fms_key_distribution_config_secret_arns,
+    [
+      aws_secretsmanager_secret.serco_fms_password_state.arn,
+    ]
+  )
 }
 
 resource "aws_secretsmanager_secret" "serco_fms_password_state" {
@@ -104,6 +112,19 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
     ]
 
     resources = local.serco_fms_key_distribution_secret_arns
+  }
+
+  statement {
+    sid    = "WriteGeneratedPasswordStateSecret"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:PutSecretValue",
+    ]
+
+    resources = [
+      aws_secretsmanager_secret.serco_fms_password_state.arn,
+    ]
   }
 
   statement {
@@ -263,7 +284,9 @@ resource "aws_iam_role_policy" "send_serco_fms_keys_scheduler" {
 resource "aws_scheduler_schedule" "send_serco_fms_keys" {
   name        = "send_serco_fms_keys_quarterly"
   description = "Sends encrypted Serco FMS keys after quarterly rotation"
-  state       = local.serco_fms_key_distribution_enabled ? "ENABLED" : "DISABLED"
+  state = (
+    local.serco_fms_key_distribution_enabled ? "ENABLED" : "DISABLED"
+  )
 
   flexible_time_window {
     mode = "OFF"
@@ -285,7 +308,9 @@ resource "aws_scheduler_schedule" "send_serco_fms_keys" {
 resource "aws_scheduler_schedule" "send_serco_fms_keys_watchdog" {
   name        = "send_serco_fms_keys_watchdog"
   description = "Checks Serco FMS key distribution completed"
-  state       = local.serco_fms_key_distribution_enabled ? "ENABLED" : "DISABLED"
+  state = (
+    local.serco_fms_key_distribution_enabled ? "ENABLED" : "DISABLED"
+  )
 
   flexible_time_window {
     mode = "OFF"
