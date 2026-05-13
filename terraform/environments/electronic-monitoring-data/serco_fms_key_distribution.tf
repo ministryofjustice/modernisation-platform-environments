@@ -3,7 +3,7 @@ locals {
 
   # placeholder value once UP3 confirm
   serco_fms_key_distribution_recipient_emails = [
-  "EMDataEngineering@justice.gov.uk",
+  "Khristiania.Raihan@justice.gov.uk",
 ]
 
   # placeholder value once GOV.UK Notify template is created
