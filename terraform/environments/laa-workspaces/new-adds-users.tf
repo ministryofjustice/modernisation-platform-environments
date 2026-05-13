@@ -13,7 +13,7 @@ resource "terraform_data" "ad_users" {
     each.value.first_name,
     each.value.last_name,
     each.value.email,
-    "v3", # Bump this to force recreation (v1 -> v2 -> v3, etc.)
+    "v4", # Bump this to force recreation (v1 -> v2 -> v3, etc.)
   ]
 
   input = {
@@ -33,8 +33,8 @@ resource "terraform_data" "ad_users" {
   provisioner "local-exec" {
     command = <<-EOT
       # Wait for IAM policy to propagate (only needed on first apply)
-      echo "Waiting 5 seconds for IAM policy propagation..."
-      sleep 5
+      echo "Waiting 15 seconds for IAM policy propagation..."
+      sleep 15
       
       # Try to create the user
       if aws ds-data create-user \
