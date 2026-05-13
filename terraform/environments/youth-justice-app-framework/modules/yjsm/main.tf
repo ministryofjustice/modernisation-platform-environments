@@ -37,6 +37,7 @@ resource "aws_instance" "yjsm" {
   monitoring           = true
   ebs_optimized        = true
   iam_instance_profile = aws_iam_instance_profile.yjsm_ec2_profile.id
+  user_data            = data.template_file.userdata.rendered
   tags = merge(
     local.all_tags,
     { "OS" = "Linux" }
