@@ -52,17 +52,48 @@ resource "aws_secretsmanager_secret_version" "redshift_probation_user" {
 # Create Database User using Redshift Data API
 ###############################################################################
 
-# Create the probation user in Redshift database
+# Step 1: Create generic stored procedure to safely create any user (idempotent and reusable)
+resource "aws_redshiftdata_statement" "create_user_procedure" {
+  cluster_identifier = module.datamart.cluster_identifier
+  database           = "datamart"
+  db_user            = "dpruser"
+  statement_name     = "create-user-procedure-${local.environment}"
+
+  sql = <<-SQL
+    CREATE OR REPLACE PROCEDURE create_readonly_user_safe(
+      user_name VARCHAR(128),
+      user_pwd VARCHAR(256)
+    )
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+      -- Check if user already exists
+      IF NOT EXISTS (SELECT 1 FROM pg_user WHERE usename = user_name) THEN
+        -- Create user only if it doesn't exist
+        EXECUTE 'CREATE USER ' || user_name || ' WITH PASSWORD ''' || user_pwd || '''';
+        RAISE INFO 'User % created successfully', user_name;
+      ELSE
+        RAISE INFO 'User % already exists, skipping creation', user_name;
+      END IF;
+    END;
+    $$;
+  SQL
+
+  depends_on = [module.datamart]
+}
+
+# Step 2: Call the stored procedure to create the probation user
 resource "aws_redshiftdata_statement" "create_probation_user" {
   cluster_identifier = module.datamart.cluster_identifier
   database           = "datamart"
-  db_user            = "dpruser" # Use master user to create new user
-  statement_name     = "create-probation-user-${local.environment}"
+  db_user            = "dpruser"
+  statement_name     = "call-create-probation-user-${local.environment}"
 
-  sql = "CREATE USER probation_user WITH PASSWORD '${random_password.redshift_probation_password.result}';"
+  # Call the stored procedure with username and password
+  sql = "CALL create_readonly_user_safe('probation_user', '${random_password.redshift_probation_password.result}');"
 
   depends_on = [
-    module.datamart,
+    aws_redshiftdata_statement.create_user_procedure,
     random_password.redshift_probation_password
   ]
 }
@@ -130,3 +161,83 @@ output "probation_username" {
   value       = "probation_user"
   sensitive   = false
 }
+
+###############################################################################
+# EXAMPLE: How to add more users using the same stored procedure
+###############################################################################
+# Uncomment and modify the sections below to add additional users
+# Each user needs: password, secret, and procedure call
+###############################################################################
+
+# # Example: Finance User
+# resource "random_password" "redshift_finance_password" {
+#   length      = 16
+#   min_lower   = 1
+#   min_numeric = 1
+#   min_special = 1
+#   min_upper   = 1
+#   special     = false
+# }
+#
+# resource "aws_secretsmanager_secret" "redshift_finance_user" {
+#   description = "Redshift connect details for finance user"
+#   name        = "${local.project}-redshift-finance-secret-${local.environment}"
+#   kms_key_id  = aws_kms_key.redshift-kms-key.arn
+#   tags        = local.all_tags
+# }
+#
+# resource "aws_secretsmanager_secret_version" "redshift_finance_user" {
+#   secret_id = aws_secretsmanager_secret.redshift_finance_user.id
+#   secret_string = jsonencode({
+#     username            = "finance_user"
+#     password            = random_password.redshift_finance_password.result
+#     engine              = "redshift"
+#     host                = module.datamart.cluster_endpoint
+#     port                = "5439"
+#     dbClusterIdentifier = module.datamart.cluster_identifier
+#     database            = "datamart"
+#   })
+# }
+#
+# resource "aws_redshiftdata_statement" "create_finance_user" {
+#   cluster_identifier = module.datamart.cluster_identifier
+#   database           = "datamart"
+#   db_user            = "dpruser"
+#   statement_name     = "call-create-finance-user-${local.environment}"
+#
+#   # Reuse the same stored procedure with different username
+#   sql = "CALL create_readonly_user_safe('finance_user', '${random_password.redshift_finance_password.result}');"
+#
+#   depends_on = [
+#     aws_redshiftdata_statement.create_user_procedure,
+#     random_password.redshift_finance_password
+#   ]
+# }
+#
+# # Grant permissions for finance user
+# resource "aws_redshiftdata_statement" "grant_finance_usage" {
+#   cluster_identifier = module.datamart.cluster_identifier
+#   database           = "datamart"
+#   db_user            = "dpruser"
+#   statement_name     = "grant-finance-usage-${local.environment}"
+#   sql                = "GRANT USAGE ON SCHEMA public TO finance_user;"
+#   depends_on         = [aws_redshiftdata_statement.create_finance_user]
+# }
+#
+# resource "aws_redshiftdata_statement" "grant_finance_select" {
+#   cluster_identifier = module.datamart.cluster_identifier
+#   database           = "datamart"
+#   db_user            = "dpruser"
+#   statement_name     = "grant-finance-select-${local.environment}"
+#   sql                = "GRANT SELECT ON ALL TABLES IN SCHEMA public TO finance_user;"
+#   depends_on         = [aws_redshiftdata_statement.grant_finance_usage]
+# }
+#
+# resource "aws_redshiftdata_statement" "grant_finance_future_select" {
+#   cluster_identifier = module.datamart.cluster_identifier
+#   database           = "datamart"
+#   db_user            = "dpruser"
+#   statement_name     = "grant-finance-future-${local.environment}"
+#   sql                = "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO finance_user;"
+#   depends_on         = [aws_redshiftdata_statement.grant_finance_select]
+# }
