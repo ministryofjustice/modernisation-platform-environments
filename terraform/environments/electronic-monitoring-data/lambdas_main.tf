@@ -47,7 +47,7 @@ module "unzip_single_file" {
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
     BUCKET_NAME        = module.s3-data-bucket.bucket.id
-    EXPORT_BUCKET_NAME = local.is-production ? module.s3-unzipped-files-bucket.bucket.id : module.s3-ears-sars-bucket.bucket.id
+    EXPORT_BUCKET_NAME = module.s3-ears-sars-bucket.bucket.id
   }
 }
 
@@ -536,6 +536,9 @@ module "mdss_daily_failure_digest" {
     NAMESPACE      = "EMDS/MDSS"
     LOOKBACK_HOURS = "24"
 
+    LOAD_MDSS_QUEUE_NAME = module.load_mdss_event_queue.sqs_queue.name
+    LOAD_FMS_QUEUE_NAME  = module.load_fms_event_queue.sqs_queue.name
+
     LOAD_MDSS_DLQ_NAME = module.load_mdss_event_queue.sqs_dlq.name
     CLEAN_DLT_DLQ_NAME = aws_sqs_queue.clean_dlt_load_dlq.name
     LOAD_FMS_DLQ_NAME  = module.load_fms_event_queue.sqs_dlq.name
@@ -556,6 +559,11 @@ module "mdss_daily_failure_digest" {
     LOAD_FMS_FUNCTION_NAME             = module.load_fms_lambda.lambda_function_name
     PROCESS_FMS_METADATA_FUNCTION_NAME = module.process_fms_metadata.lambda_function_name
     FORMAT_JSON_FMS_DATA_FUNCTION_NAME = module.format_json_fms_data.lambda_function_name
+
+    LAMBDAS_PRODUCTION_RUN_URL = "https://github.com/ministryofjustice/electronic-monitoring-data-lambda-functions/actions/workflows/push-to-ecr.yaml"
+    CADT_DAILY_RUN_URL         = "https://github.com/moj-analytical-services/create-a-derived-table/actions/workflows/emds-live-workflow.yml"
+    ROTA_GUIDE_URL             = "https://jubilant-adventure-g65j3om.pages.github.io/hmpps/electronic_monitoring/data_engineering_guides/rota_duties/"
+    EARS_SARS_TALLY_URL        = "https://justiceuk.sharepoint.com/:x:/r/sites/EMExpansionProgrammeteam/_layouts/15/doc2.aspx?sourcedoc=%7B25644699-3837-4A02-9C09-020EF0ECA744%7D&file=Monthly%20Tally%20of%20EARs%20and%20SARs.xlsx&action=default&mobileredirect=true"
   }
 }
 
@@ -648,19 +656,29 @@ module "cloudwatch_alarm_threader" {
   timeout                        = 60
   reserved_concurrent_executions = 1
 
-  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
 
-  security_group_ids = [aws_security_group.lambda_generic.id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
 
   environment_variables = {
+    POWERTOOLS_LOG_LEVEL  = "INFO"
     SNS_TOPIC_ARN         = aws_sns_topic.emds_alerts.arn
     STATE_BUCKET          = local.alarm_thread_state_bucket
     STATE_PREFIX          = local.alarm_thread_state_prefix
     ENVIRONMENT           = local.environment_shorthand
     INCLUDE_REASON        = "true"
     ENABLE_CUSTOM_ACTIONS = "false"
+    GLUE_DB_JANITOR_STATE_MACHINE_ARN = (
+      aws_sfn_state_machine.staging_db_janitor.arn
+    )
+    GLUE_DB_JANITOR_STALE_MINUTES = "60"
+    GLUE_DB_JANITOR_BATCH_SIZE    = "2000"
   }
 }
 
@@ -669,7 +687,7 @@ module "cloudwatch_alarm_threader" {
 # Ears and Sars Request
 #-----------------------------------------------------------------------------------
 module "ears_sars_request" {
-  count                   = local.is-development || local.is-preproduction ? 1 : 0
+  count                   = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   source                  = "./modules/lambdas"
   is_image                = true
   ecr_repo_name           = "electronic-monitoring-ear-sars"
@@ -779,4 +797,117 @@ module "create_p1_export" {
     MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
   }
 
+}
+
+#-----------------------------------------------------------------------------------
+# Staging DB janitor
+#-----------------------------------------------------------------------------------
+
+module "staging_db_janitor" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "staging_db_janitor"
+  role_name                      = aws_iam_role.staging_db_janitor.name
+  role_arn                       = aws_iam_role.staging_db_janitor.arn
+  handler                        = "staging_db_janitor.handler"
+  memory_size                    = 1024
+  timeout                        = 900
+  reserved_concurrent_executions = 1
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    POWERTOOLS_LOG_LEVEL  = "INFO"
+    SNS_TOPIC_ARN         = aws_sns_topic.emds_alerts.arn
+    ENVIRONMENT           = local.environment_shorthand
+    STAGING_BUCKET        = module.s3-create-a-derived-table-bucket.bucket.id
+    CATALOG_ID            = data.aws_caller_identity.current.account_id
+    LAMBDA_ROLE_ARN       = aws_iam_role.staging_db_janitor.arn
+    STALE_MINUTES         = "60"
+    MAX_DATABASES_PER_RUN = "2000"
+    STATE_BUCKET          = local.alarm_thread_state_bucket
+    STATE_PREFIX          = local.alarm_thread_state_prefix
+  }
+}
+
+# ------------------------------------------------------------------------------
+# Lambda: landing_dlq_redriver
+# ------------------------------------------------------------------------------
+
+module "landing_dlq_redriver" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "landing_dlq_redriver"
+  role_name                      = aws_iam_role.landing_dlq_redriver.name
+  role_arn                       = aws_iam_role.landing_dlq_redriver.arn
+  handler                        = "landing_dlq_redriver.handler"
+  memory_size                    = 512
+  timeout                        = 300
+  reserved_concurrent_executions = 1
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    POWERTOOLS_LOG_LEVEL = "INFO"
+
+    SNS_TOPIC_ARN = aws_sns_topic.emds_alerts.arn
+    ENVIRONMENT   = local.environment_shorthand
+    STATE_BUCKET  = local.alarm_thread_state_bucket
+    STATE_PREFIX  = local.alarm_thread_state_prefix
+
+    LANDING_DLQ_CONFIG = jsonencode(local.landing_dlq_redriver_config)
+
+    MAX_MESSAGES_PER_RUN                   = "50"
+    MAX_BATCHES_PER_EXECUTION              = "20"
+    DLQ_RECEIVE_VISIBILITY_TIMEOUT_SECONDS = "30"
+    LEGACY_UNKNOWN_RETRY_POLICY            = "retry_once"
+    AUTO_RETRY_MAX_ATTEMPTS                = "2"
+    RETRY_ONCE_MAX_ATTEMPTS                = "1"
+  }
+}
+
+
+#-----------------------------------------------------------------------------------
+# Macie Unstrucutred Job
+#-----------------------------------------------------------------------------------
+
+module "macie-unstructured-jobs" {
+  count                   = local.is-development ? 1 : 0
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "macie_unstructured_jobs"
+  role_name               = aws_iam_role.macie_unstructured_job_iam_role[0].name
+  role_arn                = aws_iam_role.macie_unstructured_job_iam_role[0].arn
+  handler                 = "macie_unstructured_jobs.handler"
+  memory_size             = 1024
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    BUCKET      = module.s3-data-bucket.bucket.id
+    IDENTIFIERS = aws_macie2_custom_data_identifier.subject_id.id
+  }
 }

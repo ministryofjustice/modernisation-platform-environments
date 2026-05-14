@@ -165,3 +165,18 @@ resource "aws_security_group_rule" "egress_managed_9514_workspace" {
   protocol          = "tcp"
   cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
 }
+
+
+
+
+resource "aws_security_group_rule" "egress_bastion_rds" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  type                     = "egress"
+  security_group_id        = module.bastion_linux.bastion_security_group
+  description              = "Database connections to bastion"
+  from_port                = 1521
+  to_port                  = 1521
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.rds_sg[0].id
+}

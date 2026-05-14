@@ -80,3 +80,16 @@ resource "aws_lb_listener" "opahub_listener_7001" {
     type             = "forward"
   }
 }
+
+# Temp only for DEV OIA
+resource "aws_lb_listener" "opahub_listener__preproduction_7001" {
+  count             = local.is-preproduction ? 1 : 0
+  load_balancer_arn = aws_lb.opahub.id
+  port              = "7001"
+  protocol          = "HTTP"
+
+  default_action {
+    target_group_arn = aws_lb_target_group.opahub_target_group.id
+    type             = "forward"
+  }
+}

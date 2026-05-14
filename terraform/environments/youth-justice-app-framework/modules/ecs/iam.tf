@@ -123,3 +123,13 @@ resource "aws_iam_role_policy_attachment" "ecs_task_ses_policy" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
 }
+
+resource "aws_iam_role_policy_attachment" "ecs_task_ssm_policy" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_ssm_policy" {
+  role       = aws_iam_role.ecs_task_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMFullAccess"
+}

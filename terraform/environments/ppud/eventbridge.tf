@@ -254,6 +254,12 @@ locals {
       description  = "Trigger Lambda at 07:15 on weekdays"
       timezone     = "Europe/London"
     }
+    check_internal_certificate_expiration = {
+      environments = ["development", "preproduction", "production"]
+      schedule     = "cron(0 8 ? * MON-FRI *)"
+      description  = "Trigger Lambda at 08:00 on weekdays"
+      timezone     = "Europe/London"
+    }
     /*
     check_elb_trt_alarm = {
       environments = ["production"]
@@ -363,6 +369,10 @@ locals {
     ssm_patch_notification = local.is-development ? aws_lambda_function.lambda_functions["ssm_patch_notification_development"].arn : (
       local.is-preproduction ? aws_lambda_function.lambda_functions["ssm_patch_notification_preproduction"].arn : (
         local.is-production ? aws_lambda_function.lambda_functions["ssm_patch_notification_production"].arn : null
+    ))
+    check_internal_certificate_expiration = local.is-development ? aws_lambda_function.lambda_functions["check_internal_certificate_expiration_development"].arn : (
+      local.is-preproduction ? aws_lambda_function.lambda_functions["check_internal_certificate_expiration_preproduction"].arn : (
+        local.is-production ? aws_lambda_function.lambda_functions["check_internal_certificate_expiration_production"].arn : null
     ))
     wam_waf_analysis = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_development"].arn : (
       local.is-preproduction ? aws_lambda_function.lambda_functions["wam_waf_analysis_preproduction"].arn : null

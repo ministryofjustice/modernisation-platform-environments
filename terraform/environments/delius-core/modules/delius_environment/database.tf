@@ -43,8 +43,9 @@ module "oracle_db_primary" {
   account_config = var.account_config
   account_info   = var.account_info
   db_ami = {
-    name_regex = var.db_config.ami_name_regex
-    owner      = "self"
+    name_regex    = var.db_config.ami_name_regex
+    owner         = "self"
+    pinned_ami_id = try(var.db_config.pinned_ami_id, null)
   }
   db_type           = "primary"
   db_suffix         = "db"

@@ -84,5 +84,7 @@ locals {
     # dev and test ranges are same as they dont have test DMS task
     # and use dev to connect to TEST oracle DB instance
     # include higher envs later
+    preprod = "172.26.0.0/16",
+    prod    = "172.25.0.0/16"
   }
 }
