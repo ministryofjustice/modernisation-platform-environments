@@ -21,26 +21,20 @@ locals {
     item => "jdbc:postgresql://${local.dps_endpoint[item]}:${local.dps_port[item]}/${local.dps_database[item]}"
   }
 
-  probation_glue_connections = {
-    for key, value in local.probation_domains :
-    key => value
-    if value.create_glue_connection
-  }
-
   probation_endpoint = {
-    for key, _ in local.probation_domains :
+    for key, _ in module.probation_source_secret :
     key => jsondecode(data.aws_secretsmanager_secret_version.probation[key].secret_string)["endpoint"]
   }
   probation_port = {
-    for key, _ in local.probation_domains :
+    for key, _ in module.probation_source_secret :
     key => jsondecode(data.aws_secretsmanager_secret_version.probation[key].secret_string)["port"]
   }
   probation_database = {
-    for key, _ in local.probation_domains :
+    for key, _ in module.probation_source_secret :
     key => jsondecode(data.aws_secretsmanager_secret_version.probation[key].secret_string)["db_name"]
   }
   probation_connection_string = {
-    for key, _ in local.probation_domains :
+    for key, _ in module.probation_source_secret :
     key => "jdbc:postgresql://${local.probation_endpoint[key]}:${local.probation_port[key]}/${local.probation_database[key]}"
   }
 }
@@ -104,7 +98,7 @@ resource "aws_glue_connection" "glue_dps_connection" {
 
 # All Probation connections
 resource "aws_glue_connection" "glue_probation_connection" {
-  for_each        = local.create_glue_connection ? local.probation_glue_connections : {}
+  for_each        = local.create_glue_connection ? module.probation_source_secret : {}
   name            = "${local.project}-${each.key}-connection"
   connection_type = "JDBC"
 
