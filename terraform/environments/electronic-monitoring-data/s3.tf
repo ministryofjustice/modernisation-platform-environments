@@ -1597,7 +1597,7 @@ module "s3-gdpr-audit-bucket" {
 
 data "aws_iam_policy_document" "allow_macie_results" {
   statement {
-    sid    = "AllowMacieResults"
+    sid    = "AllowMacieToWriteResults"
     effect = "Allow"
     principals {
       type        = "Service"
@@ -1605,8 +1605,10 @@ data "aws_iam_policy_document" "allow_macie_results" {
     }
 
     actions = [
-      "macie2:*"
+      "s3:PutObject",
+      "s3:GetBucketLocation"
     ]
+
     resources = [
       module.s3-macie-results-bucket.bucket.arn,
       "${module.s3-macie-results-bucket.bucket.arn}/*",

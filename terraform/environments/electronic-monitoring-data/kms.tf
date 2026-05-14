@@ -44,6 +44,21 @@ module "kms_metadata_key" {
         }
       ]
       resources = ["*"]
+    },
+    {
+      sid    = "AllowMacieToUseKey"
+      effect = "Allow"
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["macie.amazonaws.com"]
+        }
+      ]
+      actions = [
+        "kms:GenerateDataKey*",
+        "kms:Decrypt"
+      ]
+      resources = ["*"]
     }
   ]
 
