@@ -437,7 +437,7 @@ locals {
     heartbeat_endpoint = "0.0.0.0"
   }
 
-  probation_domains_map = local.application_data.accounts[local.environment].probation_domains
+  probation_domains = local.application_data.accounts[local.environment].probation_domains
 
   # Operational DataStore Secrets PlaceHolder
   operational_datastore_secrets_placeholder = {

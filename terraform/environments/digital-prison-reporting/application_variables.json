@@ -62,10 +62,12 @@
       "scheduled_dataset_lambda_version": "vLatest",
       "probation_domains": {
         "pr-test-domain": {
-          "share_with_cloud_platform": false
+          "share_with_cloud_platform": false,
+          "create_glue_connection": true
         },
         "pr-assessment-view": {
-          "share_with_cloud_platform": true
+          "share_with_cloud_platform": true,
+          "create_glue_connection": false
         }
       },
       "dps_domains": [
@@ -309,10 +311,12 @@
       "scheduled_dataset_lambda_version": "vLatest",
       "probation_domains": {
         "pr-test-domain": {
-          "share_with_cloud_platform": false
+          "share_with_cloud_platform": false,
+          "create_glue_connection": false
         },
         "pr-assessment-view": {
-          "share_with_cloud_platform": true
+          "share_with_cloud_platform": true,
+          "create_glue_connection": false
         }
       },
       "dps_domains": [
@@ -525,10 +529,12 @@
       "scheduled_dataset_lambda_version": "vLatest",
       "probation_domains": {
         "pr-test-domain": {
-          "share_with_cloud_platform": false
+          "share_with_cloud_platform": false,
+          "create_glue_connection": false
         },
         "pr-assessment-view": {
-          "share_with_cloud_platform": true
+          "share_with_cloud_platform": true,
+          "create_glue_connection": false
         }
       },
       "dps_domains": [
@@ -764,10 +770,12 @@
       "scheduled_dataset_lambda_version": "vLatest",
       "probation_domains": {
         "pr-test-domain": {
-          "share_with_cloud_platform": false
+          "share_with_cloud_platform": false,
+          "create_glue_connection": false
         },
         "pr-assessment-view": {
-          "share_with_cloud_platform": true
+          "share_with_cloud_platform": true,
+          "create_glue_connection": false
         }
       },
       "dps_domains": [

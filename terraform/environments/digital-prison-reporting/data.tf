@@ -124,14 +124,14 @@ data "aws_secretsmanager_secret_version" "dps" {
 
 # Source Probation Secrets
 data "aws_secretsmanager_secret" "probation" {
-  for_each = local.probation_domains_map
+  for_each = local.probation_domains
   name     = "external/${local.project}-${each.key}-source-secrets"
 
   depends_on = [module.probation_source_secret]
 }
 
 data "aws_secretsmanager_secret_version" "probation" {
-  for_each = local.probation_domains_map
+  for_each = local.probation_domains
 
   secret_id = data.aws_secretsmanager_secret.probation[each.key].id
 
