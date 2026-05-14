@@ -451,8 +451,8 @@ resource "aws_iam_role_policy_attachment" "rds_s3_access_policy_attachment" {
 }
 
 resource "aws_db_instance_role_association" "rds_s3_role_association" {
-  count                  = trimspace(var.hub20_s3_bucket) != "" && !var.create_std_instance ? 1 : 0
-  db_instance_identifier = aws_db_instance.appdb1[0].identifier
+  count                  = trimspace(var.hub20_s3_bucket) != "" ? 1 : 0
+  db_instance_identifier = var.create_std_instance ? aws_db_instance.appdb1_std[0].identifier : aws_db_instance.appdb1[0].identifier
   feature_name           = "S3_INTEGRATION"
   role_arn               = aws_iam_role.rds_s3_access[0].arn
 }
