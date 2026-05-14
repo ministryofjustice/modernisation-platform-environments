@@ -60,7 +60,14 @@
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
       "scheduled_dataset_lambda_version": "vLatest",
-      "probation_domains": ["prb-sentence-plan", "prb-assessment-view"],
+      "probation_domains": {
+        "pr-sentence-plan": {
+          "share_with_cloud_platform": false
+        },
+        "pr-assessment-view": {
+          "share_with_cloud_platform": true
+        }
+      },
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -180,19 +187,27 @@
           "target_account_id": "593291632749",
           "assume_account_name": "analytical-platform-management-production",
           "assume_account_id": "042130406152",
-          "data_locations": ["dpr-structured-historical-development"],
+          "data_locations": [
+            "dpr-structured-historical-development"
+          ],
           "resource_shares": [
             {
               "glue_database": "dpr_ap_integration_test_newtag_dev_dbt",
-              "glue_tables": ["*"]
+              "glue_tables": [
+                "*"
+              ]
             },
             {
               "glue_database": "curated_prisons_history_dev_dbt",
-              "glue_tables": ["*"]
+              "glue_tables": [
+                "*"
+              ]
             },
             {
               "glue_database": "staged_prisons_history_dev_dbt",
-              "glue_tables": ["*"]
+              "glue_tables": [
+                "*"
+              ]
             }
           ]
         }
@@ -292,7 +307,14 @@
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
       "scheduled_dataset_lambda_version": "vLatest",
-      "probation_domains": ["prb-sentence-plan", "prb-assessment-view"],
+      "probation_domains": {
+        "pr-sentence-plan": {
+          "share_with_cloud_platform": false
+        },
+        "pr-assessment-view": {
+          "share_with_cloud_platform": true
+        }
+      },
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -501,7 +523,14 @@
       "setup_redshift_schedule": true,
       "enable_redshift_health_check": true,
       "scheduled_dataset_lambda_version": "vLatest",
-      "probation_domains": ["prb-sentence-plan", "prb-assessment-view"],
+      "probation_domains": {
+        "pr-sentence-plan": {
+          "share_with_cloud_platform": false
+        },
+        "pr-assessment-view": {
+          "share_with_cloud_platform": true
+        }
+      },
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -619,15 +648,21 @@
           "target_account_id": "593291632749",
           "assume_account_name": "analytical-platform-management-production",
           "assume_account_id": "042130406152",
-          "data_locations": ["dpr-structured-historical-preproduction"],
+          "data_locations": [
+            "dpr-structured-historical-preproduction"
+          ],
           "resource_shares": [
             {
               "glue_database": "staged_prisons_history_preprod_dbt",
-              "glue_tables": ["*"]
+              "glue_tables": [
+                "*"
+              ]
             },
             {
               "glue_database": "curated_prisons_history_preprod_dbt",
-              "glue_tables": ["*"]
+              "glue_tables": [
+                "*"
+              ]
             }
           ]
         }
@@ -727,7 +762,14 @@
       "setup_scheduled_action_iam_role": false,
       "setup_redshift_schedule": false,
       "scheduled_dataset_lambda_version": "vLatest",
-      "probation_domains": ["prb-sentence-plan", "prb-assessment-view"],
+      "probation_domains": {
+        "pr-sentence-plan": {
+          "share_with_cloud_platform": false
+        },
+        "pr-assessment-view": {
+          "share_with_cloud_platform": true
+        }
+      },
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -845,23 +887,33 @@
           "target_account_id": "593291632749",
           "assume_account_name": "analytical-platform-management-production",
           "assume_account_id": "042130406152",
-          "data_locations": ["dpr-structured-historical-production"],
+          "data_locations": [
+            "dpr-structured-historical-production"
+          ],
           "resource_shares": [
             {
               "glue_database": "staged_prisons_history",
-              "glue_tables": ["*"]
+              "glue_tables": [
+                "*"
+              ]
             },
             {
               "glue_database": "curated_prisons_history",
-              "glue_tables": ["*"]
+              "glue_tables": [
+                "*"
+              ]
             },
             {
               "glue_database": "prison_derived",
-              "glue_tables": ["*"]
+              "glue_tables": [
+                "*"
+              ]
             },
             {
               "glue_database": "prison_datamarts",
-              "glue_tables": ["*"]
+              "glue_tables": [
+                "*"
+              ]
             }
           ]
         }
