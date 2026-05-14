@@ -6,7 +6,7 @@ dnf install -y ruby wget tar git
 
 
 # Java - Amazon Corretto 17
-dnf install -y java-17-amazon-corretto
+dnf install -y --setopt=retries=5 java-21-amazon-corretto
 
 
 # CodeDeploy agent
