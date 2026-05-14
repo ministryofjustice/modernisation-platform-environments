@@ -20,7 +20,11 @@
       "example_var": "production-data",
       "public_dns_name_web": "equip.hmpps-development.modernisation-platform.service.justice.gov.uk",
       "instance-scheduling": "skip-scheduling",
-      "eucs_appstream_private_subnet_cidrs": []
+      "eucs_appstream_private_subnet_cidrs": [
+        "10.27.8.0/24",
+        "10.27.9.0/24",
+        "10.27.10.0/24"
+      ]
     }
   },
   "internet_to_alb_rules": {
