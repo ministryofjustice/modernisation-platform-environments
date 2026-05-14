@@ -1,5 +1,5 @@
 resource "aws_macie2_account" "macie_unstructured_spike" {
-  status = "ENABLED"
+  status = "PAUSED"
 }
 
 resource "aws_macie2_custom_data_identifier" "subject_id" {
