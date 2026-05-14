@@ -51,7 +51,7 @@ module "kms_metadata_key" {
         {
           test     = "ArnLike"
           variable = "aws:SourceArn"
-          values   = locals.bucket_list
+          values   = local.bucket_list
         }
       ]
       resources = ["*"]

@@ -53,7 +53,8 @@ locals {
     { id = module.s3-dms-target-store-bucket.bucket.id, arn = module.s3-dms-target-store-bucket.bucket.arn },
     { id = module.s3-create-a-derived-table-bucket.bucket.id, arn = module.s3-create-a-derived-table-bucket.bucket.arn },
     { id = module.s3-raw-formatted-data-bucket.bucket.id, arn = module.s3-raw-formatted-data-bucket.bucket.arn },
-    { id = module.s3-lambda-store-bucket.bucket.id, arn = module.s3-lambda-store-bucket.bucket.arn }
+    { id = module.s3-lambda-store-bucket.bucket.id, arn = module.s3-lambda-store-bucket.bucket.arn },
+    { id = module.s3-macie-results-bucket[0].bucket.id, arn = module.s3-macie-results-bucket[0].bucket.arn }
   ]
 
   cross_account_recieve_mapping = local.is-development ? "test" : local.is-preproduction ? "production" : local.is-test ? "preproduction" : null

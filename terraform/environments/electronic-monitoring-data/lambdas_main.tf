@@ -898,8 +898,8 @@ module "macie-unstructured-jobs" {
   source                  = "./modules/lambdas"
   is_image                = true
   function_name           = "macie_unstructured_jobs"
-  role_name               = aws_iam_role.macie_unstructured_jobs[0].name
-  role_arn                = aws_iam_role.macie_unstructured_jobs[0].arn
+  role_name               = aws_iam_role.macie_unstructured_job_iam_role[0].name
+  role_arn                = aws_iam_role.macie_unstructured_job_iam_role[0].arn
   handler                 = "macie_unstructured_jobs.handler"
   memory_size             = 1024
   timeout                 = 900
