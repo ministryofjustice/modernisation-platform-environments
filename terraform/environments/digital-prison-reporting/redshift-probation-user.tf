@@ -52,7 +52,7 @@ resource "aws_secretsmanager_secret_version" "redshift_probation_user" {
 # Create Database User using Redshift Data API
 ###############################################################################
 
-# Step 1: Create generic stored procedure to safely create any user (idempotent and reusable)
+# Create generic stored procedure to safely create any user (idempotent and reusable)
 resource "aws_redshiftdata_statement" "create_user_procedure" {
   cluster_identifier = module.datamart.cluster_identifier
   database           = "datamart"
@@ -82,7 +82,7 @@ resource "aws_redshiftdata_statement" "create_user_procedure" {
   depends_on = [module.datamart]
 }
 
-# Step 2: Call the stored procedure to create the probation user
+# Call the stored procedure to create the probation user
 resource "aws_redshiftdata_statement" "create_probation_user" {
   cluster_identifier = module.datamart.cluster_identifier
   database           = "datamart"
