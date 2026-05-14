@@ -169,7 +169,7 @@ resource "aws_db_instance" "appdb1" {
   #checkov:skip=CKV_AWS_353:"Performance Insights are enabled"
   #checkov:skip=CKV_AWS_226:"Minor upgrades disabled to ensure compatibility"
   #checkov:skip=CKV_AWS_293:"Deletion protection is enabled but not being recognised"
-  count = var.create_std_instance ? 0 : 1
+  count = 1
 
   port                                  = var.port
   allocated_storage                     = var.allocated_storage
@@ -198,7 +198,7 @@ resource "aws_db_instance" "appdb1" {
   license_model                         = var.license_model
   performance_insights_enabled          = var.performance_insights_enabled
   performance_insights_retention_period = var.performance_insights_retention_period
-  deletion_protection                   = var.deletion_protection
+  deletion_protection                   = var.create_std_instance ? false : var.deletion_protection
   copy_tags_to_snapshot                 = true
   storage_encrypted                     = true
   kms_key_id                            = var.kms_key_arn
