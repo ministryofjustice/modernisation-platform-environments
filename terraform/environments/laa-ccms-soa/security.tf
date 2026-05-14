@@ -183,14 +183,15 @@ resource "aws_security_group_rule" "alb_managed_ingress_nec443" {
   cidr_blocks       = [local.application_data.accounts[local.environment].northgate_proxy]
 }
 
-resource "aws_security_group_rule" "alb_managed_egress_all" {
+#-- Tightened: ALB Managed egress restricted to ECS target port only (was 0.0.0.0/0 all-protocols)
+resource "aws_security_group_rule" "alb_managed_egress_ecs_targets" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "egress"
-  description       = "All"
-  protocol          = -1
-  from_port         = 0
-  to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW
+  description       = "Egress to ECS Managed targets on WebLogic managed port (tcp/8001)"
+  protocol          = "tcp"
+  from_port         = tonumber(local.application_data.accounts[local.environment].managed_server_port)
+  to_port           = tonumber(local.application_data.accounts[local.environment].managed_server_port)
+  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
 #--ECS Tasks Admin
