@@ -21,21 +21,9 @@ locals {
     item => "jdbc:postgresql://${local.dps_endpoint[item]}:${local.dps_port[item]}/${local.dps_database[item]}"
   }
 
-  probation_endpoint = {
-    for key, _ in module.probation_source_secret :
-    key => jsondecode(data.aws_secretsmanager_secret_version.probation[key].secret_string)["endpoint"]
-  }
-  probation_port = {
-    for key, _ in module.probation_source_secret :
-    key => jsondecode(data.aws_secretsmanager_secret_version.probation[key].secret_string)["port"]
-  }
-  probation_database = {
-    for key, _ in module.probation_source_secret :
-    key => jsondecode(data.aws_secretsmanager_secret_version.probation[key].secret_string)["db_name"]
-  }
   probation_connection_string = {
-    for key, _ in module.probation_source_secret :
-    key => "jdbc:postgresql://${local.probation_endpoint[key]}:${local.probation_port[key]}/${local.probation_database[key]}"
+    for key, entity in module.probation_source_secret :
+    key => "jdbc:postgresql://${entity.secret_contents_endpoint}:${entity.secret_contents_port}/${entity.secret_contents_db_name}"
   }
 }
 
