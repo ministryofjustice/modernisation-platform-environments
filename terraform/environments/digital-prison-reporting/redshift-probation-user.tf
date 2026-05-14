@@ -41,7 +41,7 @@ resource "aws_secretsmanager_secret_version" "redshift_probation_user" {
     username            = "probation_user"
     password            = random_password.redshift_probation_password.result
     engine              = "redshift"
-    host                = module.datamart.endpoint
+    host                = module.datamart.cluster_endpoint
     port                = "5439"
     dbClusterIdentifier = module.datamart.cluster_identifier
     database            = "datamart" # Same database as dpruser
