@@ -2237,7 +2237,7 @@ resource "aws_iam_role_policy_attachment" "landing_dlq_redriver_attach" {
 }
 
 # -----------------------------------------------------------------------------------
-# Iceberg table maint
+# Macie Unstructured Job
 #-----------------------------------------------------------------------------------
 
 data "aws_iam_policy_document" "macie_unstructured_job_iam_role_policy_document" {

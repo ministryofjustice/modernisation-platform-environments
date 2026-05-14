@@ -1,3 +1,4 @@
+# If ENABLED ensure you turn off automatic discovery via the console.
 resource "aws_macie2_account" "macie_unstructured_spike" {
   status = "PAUSED"
 }
