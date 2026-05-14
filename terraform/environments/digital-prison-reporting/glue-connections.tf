@@ -105,7 +105,7 @@ resource "aws_glue_connection" "glue_probation_connection" {
   connection_properties = {
     JDBC_CONNECTION_URL    = local.probation_connection_string[each.key]
     JDBC_DRIVER_CLASS_NAME = "org.postgresql.Driver"
-    SECRET_ID              = module.probation_source_secret[each.key].name
+    SECRET_ID              = module.probation_source_secret[each.key].secret_name
   }
 
   physical_connection_requirements {
