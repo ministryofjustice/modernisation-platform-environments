@@ -28,19 +28,19 @@ locals {
   }
 
   probation_endpoint = {
-    for key, _ in local.probation_glue_connections :
+    for key, _ in local.probation_domains :
     key => jsondecode(data.aws_secretsmanager_secret_version.probation[key].secret_string)["endpoint"]
   }
   probation_port = {
-    for key, _ in local.probation_glue_connections :
+    for key, _ in local.probation_domains :
     key => jsondecode(data.aws_secretsmanager_secret_version.probation[key].secret_string)["port"]
   }
   probation_database = {
-    for key, _ in local.probation_glue_connections :
+    for key, _ in local.probation_domains :
     key => jsondecode(data.aws_secretsmanager_secret_version.probation[key].secret_string)["db_name"]
   }
   probation_connection_string = {
-    for key, _ in local.probation_glue_connections :
+    for key, _ in local.probation_domains :
     key => "jdbc:postgresql://${local.probation_endpoint[key]}:${local.probation_port[key]}/${local.probation_database[key]}"
   }
 }
