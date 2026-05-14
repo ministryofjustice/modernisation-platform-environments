@@ -22,7 +22,7 @@ resource "aws_db_subnet_group" "subnet_group" {
 # RDS Parameter group
 
 resource "aws_db_parameter_group" "parameter_group_19" {
-  count       = var.create_std_instance ? 0 : 1
+  count       = 1
   name        = "parameter-group-19"
   family      = "oracle-se2-19"
   description = "${var.application_name}-${var.environment}-parameter-group"
@@ -107,7 +107,7 @@ resource "aws_db_option_group" "appdboptiongroup19" {
 
 # tflint-ignore: terraform_required_providers
 resource "random_password" "rds_password" {
-  count   = var.create_std_instance ? 0 : 1
+  count   = 1
   length  = 12
   special = false
 }
@@ -116,13 +116,13 @@ resource "random_password" "rds_password" {
 resource "aws_secretsmanager_secret" "rds_password_secret" {
   #checkov:skip=CKV2_AWS_57:"This is will be fixed at a later date"
   #checkov:skip=CKV_AWS_149:"To be added later."
-  count = var.create_std_instance ? 0 : 1
+  count = 1
   name  = "${var.application_name}-${var.environment}-rds_password_secret"
 }
 
 
 resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
-  count     = var.create_std_instance ? 0 : 1
+  count     = 1
   secret_id = aws_secretsmanager_secret.rds_password_secret[0].id
   secret_string = jsonencode(
     {
