@@ -98,7 +98,7 @@ resource "aws_glue_connection" "glue_dps_connection" {
 
 # All Probation connections
 resource "aws_glue_connection" "glue_probation_connection" {
-  for_each        = local.create_glue_connection ? local.probation_domains_map : []
+  for_each        = local.create_glue_connection ? local.probation_domains_map : {}
   name            = "${local.project}-${each.key}-connection"
   connection_type = "JDBC"
 
