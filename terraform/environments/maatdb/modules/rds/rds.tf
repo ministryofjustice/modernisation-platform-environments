@@ -22,6 +22,7 @@ resource "aws_db_subnet_group" "subnet_group" {
 # RDS Parameter group
 
 resource "aws_db_parameter_group" "parameter_group_19" {
+  count       = 1
   name        = "parameter-group-19"
   family      = "oracle-se2-19"
   description = "${var.application_name}-${var.environment}-parameter-group"
@@ -106,6 +107,7 @@ resource "aws_db_option_group" "appdboptiongroup19" {
 
 # tflint-ignore: terraform_required_providers
 resource "random_password" "rds_password" {
+  count   = 1
   length  = 12
   special = false
 }
@@ -114,16 +116,18 @@ resource "random_password" "rds_password" {
 resource "aws_secretsmanager_secret" "rds_password_secret" {
   #checkov:skip=CKV2_AWS_57:"This is will be fixed at a later date"
   #checkov:skip=CKV_AWS_149:"To be added later."
-  name = "${var.application_name}-${var.environment}-rds_password_secret"
+  count = 1
+  name  = "${var.application_name}-${var.environment}-rds_password_secret"
 }
 
 
 resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
-  secret_id = aws_secretsmanager_secret.rds_password_secret.id
+  count     = 1
+  secret_id = aws_secretsmanager_secret.rds_password_secret[0].id
   secret_string = jsonencode(
     {
       username = var.username
-      password = random_password.rds_password.result
+      password = random_password.rds_password[0].result
     }
   )
 }
@@ -165,6 +169,7 @@ resource "aws_db_instance" "appdb1" {
   #checkov:skip=CKV_AWS_353:"Performance Insights are enabled"
   #checkov:skip=CKV_AWS_226:"Minor upgrades disabled to ensure compatibility"
   #checkov:skip=CKV_AWS_293:"Deletion protection is enabled but not being recognised"
+  count = 1
 
   port                                  = var.port
   allocated_storage                     = var.allocated_storage
@@ -183,17 +188,17 @@ resource "aws_db_instance" "appdb1" {
   character_set_name                    = var.character_set_name
   multi_az                              = var.multi_az
   username                              = var.username
-  password                              = random_password.rds_password.result
+  password                              = random_password.rds_password[0].result
   vpc_security_group_ids                = local.rds_sg_group_ids
   skip_final_snapshot                   = false
   final_snapshot_identifier             = "${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
-  parameter_group_name                  = aws_db_parameter_group.parameter_group_19.name
+  parameter_group_name                  = aws_db_parameter_group.parameter_group_19[0].name
   option_group_name                     = aws_db_option_group.appdboptiongroup19.name
   db_subnet_group_name                  = aws_db_subnet_group.subnet_group.name
   license_model                         = var.license_model
   performance_insights_enabled          = var.performance_insights_enabled
   performance_insights_retention_period = var.performance_insights_retention_period
-  deletion_protection                   = var.deletion_protection
+  deletion_protection                   = var.create_std_instance ? false : var.deletion_protection
   copy_tags_to_snapshot                 = true
   storage_encrypted                     = true
   kms_key_id                            = var.kms_key_arn
@@ -447,7 +452,7 @@ resource "aws_iam_role_policy_attachment" "rds_s3_access_policy_attachment" {
 
 resource "aws_db_instance_role_association" "rds_s3_role_association" {
   count                  = trimspace(var.hub20_s3_bucket) != "" ? 1 : 0
-  db_instance_identifier = aws_db_instance.appdb1.identifier
+  db_instance_identifier = var.create_std_instance ? aws_db_instance.appdb1_std[0].identifier : aws_db_instance.appdb1[0].identifier
   feature_name           = "S3_INTEGRATION"
   role_arn               = aws_iam_role.rds_s3_access[0].arn
 }
@@ -565,11 +570,11 @@ resource "aws_db_instance" "appdb1_std" {
 # Outputs
 
 output "db_instance_id" {
-  value = aws_db_instance.appdb1.id
+  value = var.create_std_instance ? aws_db_instance.appdb1_std[0].id : aws_db_instance.appdb1[0].id
 }
 
 output "db_instance_identifier" {
-  value = aws_db_instance.appdb1.identifier
+  value = var.create_std_instance ? aws_db_instance.appdb1_std[0].identifier : aws_db_instance.appdb1[0].identifier
 }
 
 output "db_instance_identifier_std" {

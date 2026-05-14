@@ -29,8 +29,7 @@ locals {
 
 
 resource "aws_cloudwatch_metric_alarm" "rds_alarms" {
-#  for_each = module.rds.create_std_instance ? toset(local.rds_oracle_metrics) : toset([]) 
- for_each = toset(local.rds_oracle_metrics)
+  for_each = toset(local.rds_oracle_metrics)
 
   alarm_name          = "${local.alarm_name_prefix}-${each.key}"
   comparison_operator = contains(["FreeStorageSpace","FreeableMemory"], each.key) ? "LessThanThreshold" : local.common_rds_config.comparison_operator
