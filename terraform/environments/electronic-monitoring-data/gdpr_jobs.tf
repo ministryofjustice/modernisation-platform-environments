@@ -3,6 +3,13 @@ locals {
   iceberg_table_maint_image_name   = "gdpr-table-maintenance"
   ecr_repo_name                    = "electronic-monitoring-gdpr"
   core_shared_services_id          = local.environment_management.account_ids["core-shared-services-production"]
+  target_gdpr_dbs                  = (
+    local.is-production ? local.prod_databases_for_gdpr : (
+      local.is-preproduction ? local.preprod_databases_for_gdpr : (
+        local.is-development ? local.dev_databases_for_gdpr : []
+      )
+    )
+  )
 }
 
 data "aws_iam_policy_document" "ecs_gdpr_assume_policy" {
@@ -120,6 +127,16 @@ data "aws_iam_policy_document" "gdpr_structured_job_policy_document" {
       "${module.s3-athena-bucket.bucket.arn}/*"
     ]
   }
+
+  statement {
+    sid    = "GetDataAccessAndTagsForLakeFormation"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GetDataAccess",
+      "lakeformation:GetResourceLFTags",
+    ]
+    resources = ["*"]
+  }
 }
 
 data "aws_iam_policy_document" "ecs_task_trust_policy" {
@@ -165,6 +182,39 @@ resource "aws_ecs_cluster_capacity_providers" "ecd-gdpr-fargate" {
     weight            = 100
     capacity_provider = "FARGATE"
   }
+}
+
+resource "aws_lakeformation_permissions" "gdpr_iceberg_table_db_permissions" {
+  for_each  = local.is-development || local.is-preproduction ? toset(local.target_gdpr_dbs) : []
+  principal = aws_iam_role.gdpr_structured_job_role[0].arn
+
+  database {
+    name = each.value
+  }
+
+  permissions = ["DESCRIBE"]
+}
+resource "aws_lakeformation_permissions" "gdpr_iceberg_table_table_permissions" {
+  for_each  = local.is-development || local.is-preproduction ? toset(local.target_gdpr_dbs) : []
+  principal = aws_iam_role.gdpr_structured_job_role[0].arn
+
+  table {
+    database_name = each.value
+    wildcard      = true
+  }
+
+  permissions = ["SELECT", "DESCRIBE", "ALTER", "INSERT", "DELETE"] # last three perms are required for optimising / vacuuming
+}
+
+resource "aws_lakeformation_permissions" "gdpr_iceberg_table_datalake_location" {
+  count     = local.is-development || local.is-preproduction ? 1 : 0
+  principal = aws_iam_role.gdpr_structured_job_role[0].arn
+
+  data_location {
+    arn = module.s3-data-bucket.bucket.arn
+  }
+
+  permissions = ["DATA_LOCATION_ACCESS"]
 }
 
 resource "aws_ecs_task_definition" "emds-gdpr-structured-data-deletion" {
