@@ -1,22 +1,15 @@
 #!/bin/bash
 set -euo pipefail
 
-# -------------------------------------------------------
-# AL2023 base update and packages
-# AL2023 uses dnf natively - yum is just an alias, use dnf explicitly
-# -------------------------------------------------------
 dnf update -y
 dnf install -y ruby wget tar git
 
-# -------------------------------------------------------
-# Java - Amazon Corretto 17 (AL2023 native package)
-# -------------------------------------------------------
+
+# Java - Amazon Corretto 17
 dnf install -y java-17-amazon-corretto
 
-# -------------------------------------------------------
+
 # CodeDeploy agent
-# AL2023 still uses the same installer but needs ruby3.2 not ruby2.x
-# -------------------------------------------------------
 dnf install -y ruby3.2
 cd /home/ec2-user
 wget https://aws-codedeploy-eu-west-2.s3.eu-west-2.amazonaws.com/latest/install
@@ -25,10 +18,8 @@ chmod +x ./install
 systemctl enable codedeploy-agent
 systemctl start codedeploy-agent
 
-# -------------------------------------------------------
+
 # CloudWatch agent
-# amazon-cloudwatch-agent is in AL2023 repos natively
-# -------------------------------------------------------
 dnf install -y amazon-cloudwatch-agent
 cat >>/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<CWEOF
 {
@@ -90,36 +81,33 @@ CWEOF
 systemctl enable amazon-cloudwatch-agent.service
 systemctl start amazon-cloudwatch-agent.service
 
-# -------------------------------------------------------
+
 # SSH hardening
-# AL2023 supports drop-in config files under sshd_config.d
-# which is cleaner than appending to the main config
-# -------------------------------------------------------
 cat > /etc/ssh/sshd_config.d/99-hardening.conf <<'SSHEOF'
 KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256
 Ciphers aes256-ctr,aes192-ctr,aes128-ctr
 SSHEOF
 systemctl restart sshd
 
-# -------------------------------------------------------
+
 # Create /app directory structure
-# -------------------------------------------------------
 mkdir -p /app/scripts
 
-# -------------------------------------------------------
+# Create log directories and set ownership
+mkdir -p /home/yjsm-hub/logging
+mkdir -p /home/yjsm-hub-admin/logging
+chown -R ec2-user:ec2-user /home/yjsm-hub
+chown -R ec2-user:ec2-user /home/yjsm-hub-admin
+
 # yjsm-log-purge.sh
-# Runs daily at 4am - purges archived logs older than 30 days
-# -------------------------------------------------------
 cat > /app/scripts/yjsm-log-purge.sh <<'SCRIPT'
 #!/bin/bash
 find /home/yjsm-hub/logging/archived -type f -mtime +30 -name 'yjsm-hub-[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9].*.log' -delete
 find /home/yjsm-hub-admin/logging/archived -type f -mtime +30 -name 'yjsm-hub-admin-[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9].*.log' -delete
 SCRIPT
 
-# -------------------------------------------------------
+
 # log-cleanup.sh
-# Runs weekly on Monday at 11am - bulk cleans active log files
-# -------------------------------------------------------
 cat > /app/scripts/log-cleanup.sh <<'SCRIPT'
 #!/bin/bash
 set -euo pipefail
@@ -145,10 +133,8 @@ for d in "$${LOG_DIRS[@]}"; do
 done
 SCRIPT
 
-# -------------------------------------------------------
+
 # yjsm-weekly-restart.sh
-# Runs weekly on Sunday at 9pm - restarts yjsm-hub-admin
-# -------------------------------------------------------
 cat > /app/scripts/yjsm-weekly-restart.sh <<'SCRIPT'
 #!/usr/bin/env bash
 systemctl restart yjsm-hub-admin.service
@@ -159,12 +145,69 @@ chmod +x /app/scripts/yjsm-log-purge.sh
 chmod +x /app/scripts/log-cleanup.sh
 chmod +x /app/scripts/yjsm-weekly-restart.sh
 
-# -------------------------------------------------------
 # Cron jobs
-# -------------------------------------------------------
 crontab -l 2>/dev/null | cat - <<'CRON' | crontab -
 0 4 * * * /app/scripts/yjsm-log-purge.sh
 0 5 * * * /usr/sbin/aide --check
 0 21 * * 7 /app/scripts/yjsm-weekly-restart.sh
 0 11 * * 1 /app/scripts/log-cleanup.sh
 CRON
+
+# Systemd service files
+cat > /etc/systemd/system/nginx.service << 'EOF'
+[Unit]
+Description=NGINX HTTP Server
+After=network.target
+
+[Service]
+Type=forking
+PIDFile=/run/nginx.pid
+ExecStartPre=/usr/sbin/nginx -t
+ExecStart=/usr/sbin/nginx
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s QUIT $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat > /etc/systemd/system/yjsm-hub.service << 'EOF'
+[Unit]
+Description=YJSM Hub service wrapper
+
+[Service]
+User=ec2-user
+WorkingDirectory=/app/yjsm-hub
+ExecStart=/bin/bash /app/yjsm-hub/scripts/hub
+SuccessExitStatus=143
+TimeoutStopSec=10
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat > /etc/systemd/system/yjsm-hub-admin.service << 'EOF'
+[Unit]
+Description=YJSM Hub admin service wrapper
+
+[Service]
+User=ec2-user
+WorkingDirectory=/app/yjsm-hub-admin
+ExecStart=/bin/bash /app/yjsm-hub-admin/scripts/hubadmin
+SuccessExitStatus=143
+TimeoutStopSec=10
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Reload systemd and enable services
+systemctl daemon-reload
+systemctl enable nginx
+systemctl enable yjsm-hub
+systemctl enable yjsm-hub-admin

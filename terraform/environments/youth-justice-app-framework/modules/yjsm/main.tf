@@ -31,13 +31,14 @@ data "template_file" "userdata" {
 }
 
 resource "aws_instance" "yjsm" {
-  ami                  = var.ami
-  instance_type        = "t3a.xlarge"
-  key_name             = module.key_pair.key_pair_name
-  monitoring           = true
-  ebs_optimized        = true
-  iam_instance_profile = aws_iam_instance_profile.yjsm_ec2_profile.id
-  user_data            = data.template_file.userdata.rendered
+  ami                         = var.ami
+  instance_type               = "t3a.xlarge"
+  key_name                    = module.key_pair.key_pair_name
+  monitoring                  = true
+  ebs_optimized               = true
+  iam_instance_profile        = aws_iam_instance_profile.yjsm_ec2_profile.id
+  user_data                   = data.template_file.userdata.rendered
+  user_data_replace_on_change = true
   tags = merge(
     local.all_tags,
     { "OS" = "Linux" }
