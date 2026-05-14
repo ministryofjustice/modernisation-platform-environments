@@ -16,18 +16,18 @@ output "secret_version_id" {
 
 output "secret_contents_endpoint" {
   description = "The endpoint extracted from the secret string"
-  value       = jsondecode(aws_secretsmanager_secret_version.this.secret_string)["endpoint"]
+  value       = jsondecode(data.aws_secretsmanager_secret_version.this.secret_string)["endpoint"]
   sensitive   = true
 }
 
 output "secret_contents_port" {
   description = "The port extracted from the secret string"
-  value       = jsondecode(aws_secretsmanager_secret_version.this.secret_string)["port"]
+  value       = jsondecode(data.aws_secretsmanager_secret_version.this.secret_string)["port"]
   sensitive   = true
 }
 
 output "secret_contents_db_name" {
   description = "The db_name extracted from the secret string"
-  value       = jsondecode(aws_secretsmanager_secret_version.this.secret_string)["db_name"]
+  value       = jsondecode(data.aws_secretsmanager_secret_version.this.secret_string)["db_name"]
   sensitive   = true
 }

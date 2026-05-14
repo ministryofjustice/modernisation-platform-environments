@@ -76,3 +76,7 @@ resource "aws_secretsmanager_secret_version" "this" {
     ignore_changes = [secret_string]
   }
 }
+
+data "aws_secretsmanager_secret_version" "this" {
+  secret_id = aws_secretsmanager_secret.this.id
+}
