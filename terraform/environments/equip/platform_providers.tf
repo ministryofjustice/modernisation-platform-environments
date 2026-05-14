@@ -57,11 +57,3 @@ provider "aws" {
   }
 }
 
-# AWS provider for eucs-appstream accounts, to access VPC and subnet information
-provider "aws" {
-  alias  = "eucs-appstream"
-  region = "eu-west-2"
-  assume_role {
-    role_arn = "arn:aws:iam::${local.environment_management.account_ids["eucs-appstream-${local.environment}"]}:role/member-delegation-read-only"
-  }
-}
