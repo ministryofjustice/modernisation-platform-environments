@@ -13,7 +13,7 @@ locals {
     module.s3-mdss-general-landing-bucket.bucket_arn,
     module.s3-mdss-ho-landing-bucket.bucket_arn,
     module.s3-mdss-specials-landing-bucket.bucket_arn,
-    module.s3-macie-results-bucket[0].bucket_arn
+    module.s3-macie-results-bucket.bucket_arn
   ] : []
 }
 

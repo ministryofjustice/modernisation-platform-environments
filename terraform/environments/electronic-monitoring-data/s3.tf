@@ -53,8 +53,7 @@ locals {
     { id = module.s3-dms-target-store-bucket.bucket.id, arn = module.s3-dms-target-store-bucket.bucket.arn },
     { id = module.s3-create-a-derived-table-bucket.bucket.id, arn = module.s3-create-a-derived-table-bucket.bucket.arn },
     { id = module.s3-raw-formatted-data-bucket.bucket.id, arn = module.s3-raw-formatted-data-bucket.bucket.arn },
-    { id = module.s3-lambda-store-bucket.bucket.id, arn = module.s3-lambda-store-bucket.bucket.arn },
-    { id = module.s3-macie-results-bucket[0].bucket.id, arn = module.s3-macie-results-bucket[0].bucket.arn }
+    { id = module.s3-lambda-store-bucket.bucket.id, arn = module.s3-lambda-store-bucket.bucket.arn }
   ]
 
   cross_account_recieve_mapping = local.is-development ? "test" : local.is-preproduction ? "production" : local.is-test ? "preproduction" : null
@@ -1598,7 +1597,6 @@ module "s3-gdpr-audit-bucket" {
 
 
 module "s3-macie-results-bucket" {
-  count  = local.is-development ? 1 : 0
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
   bucket_prefix      = "${local.bucket_prefix}-macie-results"
