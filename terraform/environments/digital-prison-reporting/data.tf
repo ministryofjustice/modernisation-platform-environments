@@ -122,18 +122,6 @@ data "aws_secretsmanager_secret_version" "dps" {
   depends_on = [aws_secretsmanager_secret.dps]
 }
 
-# Source Probation Secrets
-data "aws_secretsmanager_secret" "probation" {
-  for_each = { for key, instance in module.probation_source_secret : key => instance.secret_name }
-  name     = each.value
-}
-
-data "aws_secretsmanager_secret_version" "probation" {
-  for_each  = { for key, instance in module.probation_source_secret : key => instance.secret_id }
-  secret_id = each.value
-}
-
-
 # DPR Secret
 data "aws_secretsmanager_secret" "test_db" {
   count = local.is_dev_or_test ? 1 : 0

@@ -80,5 +80,4 @@ resource "aws_secretsmanager_secret_version" "this" {
 
 data "aws_secretsmanager_secret_version" "this" {
   secret_id = aws_secretsmanager_secret.this.id
-  version_id = aws_secretsmanager_secret_version.this.id
 }
