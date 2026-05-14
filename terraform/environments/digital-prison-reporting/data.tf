@@ -125,7 +125,7 @@ data "aws_secretsmanager_secret_version" "dps" {
 # Source Probation Secrets
 data "aws_secretsmanager_secret" "probation" {
   for_each = toset(local.probation_domains_list)
-  name     = "external/${local.project}-${each.name}-source-secrets"
+  name     = "external/${local.project}-${each.key}-source-secrets"
 
   depends_on = [module.probation_source_secret]
 }
@@ -133,7 +133,7 @@ data "aws_secretsmanager_secret" "probation" {
 data "aws_secretsmanager_secret_version" "probation" {
   for_each = toset(local.probation_domains_list)
 
-  secret_id = data.aws_secretsmanager_secret.probation[each.name].id
+  secret_id = data.aws_secretsmanager_secret.probation[each.key].id
 
   depends_on = [module.probation_source_secret]
 }

@@ -241,7 +241,7 @@ module "probation_source_secret" {
   cloud_platform_aws_account_id    = "754256621582"
   cloud_platform_shared_kms_key_id = aws_kms_key.crossaccount_secret.arn
   project_id                       = local.project
-  ingestion_domain_name            = each.name
+  ingestion_domain_name            = each.key
   is_cloud_platform_accessible     = each.value.share_with_cloud_platform
   tags                             = local.all_tags
 }

@@ -21,23 +21,21 @@ locals {
     item => "jdbc:postgresql://${local.dps_endpoint[item]}:${local.dps_port[item]}/${local.dps_database[item]}"
   }
 
-  probation_domains_names_list = [for item in local.probation_domains_list: item.name]
-
   probation_endpoint = {
-    for item in local.probation_domains_names_list :
-    item => jsondecode(data.aws_secretsmanager_secret_version.probation[item].secret_string)["endpoint"]
+    for item in local.probation_domains_list :
+    item => jsondecode(data.aws_secretsmanager_secret_version.probation[item.key].secret_string)["endpoint"]
   }
   probation_port = {
-    for item in local.probation_domains_names_list :
-    item => jsondecode(data.aws_secretsmanager_secret_version.probation[item].secret_string)["port"]
+    for item in local.probation_domains_list :
+    item => jsondecode(data.aws_secretsmanager_secret_version.probation[item.key].secret_string)["port"]
   }
   probation_database = {
-    for item in local.probation_domains_names_list :
-    item => jsondecode(data.aws_secretsmanager_secret_version.probation[item].secret_string)["db_name"]
+    for item in local.probation_domains_list :
+    item => jsondecode(data.aws_secretsmanager_secret_version.probation[item.key].secret_string)["db_name"]
   }
   probation_connection_string = {
-    for item in local.probation_domains_names_list :
-    item => "jdbc:postgresql://${local.probation_endpoint[item]}:${local.probation_port[item]}/${local.probation_database[item]}"
+    for item in local.probation_domains_list :
+    item => "jdbc:postgresql://${local.probation_endpoint[item.key]}:${local.probation_port[item.key]}/${local.probation_database[item.key]}"
   }
 }
 
