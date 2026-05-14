@@ -1,11 +1,12 @@
 locals {
   secret_payload_placeholder = {
-    db_name  = "placeholder"
-    username = "placeholder"
-    user     = "placeholder"
-    password = "placeholder"
-    host     = "placeholder"
-    port     = "placeholder"
+    db_name            = "placeholder"
+    username           = "placeholder"
+    user               = "placeholder"
+    password           = "placeholder"
+    endpoint           = "0.0.0.0"
+    port               = "5432"
+    heartbeat_endpoint = "0.0.0.0"
   }
 
   cloud_platform_aws_account_arn = "arn:aws:iam::${var.cloud_platform_aws_account_id}:root"
@@ -79,4 +80,5 @@ resource "aws_secretsmanager_secret_version" "this" {
 
 data "aws_secretsmanager_secret_version" "this" {
   secret_id = aws_secretsmanager_secret.this.id
+  version_id = aws_secretsmanager_secret_version.this.id
 }
