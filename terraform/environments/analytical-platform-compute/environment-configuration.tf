@@ -44,14 +44,6 @@ locals {
           destination      = "10.168.3.7"
           destination_port = 443
         }
-        mipersistentprod-blob = {
-          destination      = "10.168.5.13"
-          destination_port = 443
-        }
-        miexportprod-blob = {
-          destination      = "10.168.5.8"
-          destination_port = 443
-        }
         baisbaumojapnle-blob = {
           destination      = "10.225.251.100"
           destination_port = 443
@@ -60,22 +52,9 @@ locals {
           destination      = "10.224.251.100"
           destination_port = 443
         }
-        miadhoclandingprod-blob = {
-          destination      = "10.168.5.4"
-          destination_port = 443
-        }
       }
 
-      hmcts_sdp_onecrown_endpoints = {
-        mi-synapse-dev-sql = {
-          destination      = "10.168.1.14"
-          destination_port = 1433
-        }
-        mi-synapse-prod-sql = {
-          destination      = "10.168.5.16"
-          destination_port = 1433
-        }
-      }
+      hmcts_sdp_onecrown_endpoints = {}
     }
     production = {
 
