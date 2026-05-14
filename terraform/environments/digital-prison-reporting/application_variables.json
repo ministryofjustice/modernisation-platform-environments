@@ -61,7 +61,7 @@
       "setup_redshift_schedule": true,
       "scheduled_dataset_lambda_version": "vLatest",
       "probation_domains": {
-        "pr-sentence-plan": {
+        "pr-test-domain": {
           "share_with_cloud_platform": false
         },
         "pr-assessment-view": {
@@ -308,7 +308,7 @@
       "setup_redshift_schedule": true,
       "scheduled_dataset_lambda_version": "vLatest",
       "probation_domains": {
-        "pr-sentence-plan": {
+        "pr-test-domain": {
           "share_with_cloud_platform": false
         },
         "pr-assessment-view": {
@@ -524,7 +524,7 @@
       "enable_redshift_health_check": true,
       "scheduled_dataset_lambda_version": "vLatest",
       "probation_domains": {
-        "pr-sentence-plan": {
+        "pr-test-domain": {
           "share_with_cloud_platform": false
         },
         "pr-assessment-view": {
@@ -763,7 +763,7 @@
       "setup_redshift_schedule": false,
       "scheduled_dataset_lambda_version": "vLatest",
       "probation_domains": {
-        "pr-sentence-plan": {
+        "pr-test-domain": {
           "share_with_cloud_platform": false
         },
         "pr-assessment-view": {
