@@ -1595,6 +1595,24 @@ module "s3-gdpr-audit-bucket" {
   tags = merge(local.tags, { resource-type = "gdpr-audit" })
 }
 
+data "aws_iam_policy_document" "allow_macie_results" {
+  statement {
+    sid    = "AllowMacieResults"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["macie.amazonaws.com"]
+    }
+
+    actions = [
+      "macie2:*"
+    ]
+    resources = [
+      module.s3-macie-results-bucket.bucket.arn,
+      "${module.s3-macie-results-bucket.bucket.arn}/*",
+    ]
+  }
+}
 
 module "s3-macie-results-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
@@ -1617,6 +1635,9 @@ module "s3-macie-results-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
+  bucket_policy = [
+    data.aws_iam_policy_document.allow_macie_results.json
+  ]
 
   lifecycle_rule = [
     {
