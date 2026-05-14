@@ -887,3 +887,27 @@ module "landing_dlq_redriver" {
     RETRY_ONCE_MAX_ATTEMPTS                = "1"
   }
 }
+
+
+#-----------------------------------------------------------------------------------
+# Macie Unstrucutred Job
+#-----------------------------------------------------------------------------------
+
+module "macie-unstructured-jobs" {
+  count                   = local.is-development ? 1 : 0
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "macie_unstructured_jobs"
+  role_name               = aws_iam_role.macie_unstructured_job_iam_role[0].name
+  role_arn                = aws_iam_role.macie_unstructured_job_iam_role[0].arn
+  handler                 = "macie_unstructured_jobs.handler"
+  memory_size             = 1024
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    BUCKET      = module.s3-data-bucket.bucket.id
+    IDENTIFIERS = aws_macie2_custom_data_identifier.subject_id.id
+  }
+}
