@@ -234,7 +234,7 @@ resource "aws_secretsmanager_secret_version" "dps" {
 
 # Probation Source Secrets
 module "probation_source_secret" {
-  for_each                         = local.probation_domains_list
+  for_each                         = local.probation_domains_map
 
   source                           = "./modules/data_source_secret"
 

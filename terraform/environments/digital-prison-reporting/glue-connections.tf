@@ -22,19 +22,19 @@ locals {
   }
 
   probation_endpoint = {
-    for item in local.probation_domains_list :
+    for item in local.probation_domains_map :
     item => jsondecode(data.aws_secretsmanager_secret_version.probation[item.key].secret_string)["endpoint"]
   }
   probation_port = {
-    for item in local.probation_domains_list :
+    for item in local.probation_domains_map :
     item => jsondecode(data.aws_secretsmanager_secret_version.probation[item.key].secret_string)["port"]
   }
   probation_database = {
-    for item in local.probation_domains_list :
+    for item in local.probation_domains_map :
     item => jsondecode(data.aws_secretsmanager_secret_version.probation[item.key].secret_string)["db_name"]
   }
   probation_connection_string = {
-    for item in local.probation_domains_list :
+    for item in local.probation_domains_map :
     item => "jdbc:postgresql://${local.probation_endpoint[item.key]}:${local.probation_port[item.key]}/${local.probation_database[item.key]}"
   }
 }
@@ -98,14 +98,14 @@ resource "aws_glue_connection" "glue_dps_connection" {
 
 # All Probation connections
 resource "aws_glue_connection" "glue_probation_connection" {
-  for_each        = local.create_glue_connection ? local.probation_domains_list : []
-  name            = "${local.project}-${each.name}-connection"
+  for_each        = local.create_glue_connection ? local.probation_domains_map : []
+  name            = "${local.project}-${each.key}-connection"
   connection_type = "JDBC"
 
   connection_properties = {
-    JDBC_CONNECTION_URL    = local.probation_connection_string[each.name]
+    JDBC_CONNECTION_URL    = local.probation_connection_string[each.key]
     JDBC_DRIVER_CLASS_NAME = "org.postgresql.Driver"
-    SECRET_ID              = module.probation_source_secret[each.name].name
+    SECRET_ID              = module.probation_source_secret[each.key].name
   }
 
   physical_connection_requirements {
