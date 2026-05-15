@@ -31,8 +31,9 @@ def create_ad_user(event):
     command_id = response['Command']['CommandId']
     print(f"Command ID: {command_id}")
     
-    # Wait for 3 seconds
-    time.sleep(3)
+    # Wait for AD user creation to complete (allow time for PowerShell script execution and AD replication)
+    print("Waiting 30 seconds for AD user creation and replication...")
+    time.sleep(30)
 
 def create_workspace(event):
     """
