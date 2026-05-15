@@ -1,0 +1,21 @@
+---
+serviceAccount:
+  create: true
+  name: ${service_account_name}
+
+clusterRoleBinding:
+  create: true
+  clusterRoleName: ${cluster_role_name}
+
+config:
+  pluginsDir: /headlamp/plugins
+
+ingress:
+  enabled: false
+
+httpRoute:
+  enabled: true
+  parentRefs:
+    - name: ${gateway_name}
+      namespace: ${gateway_namespace}
+  hostnames: headlamp.${gateway_hostname}
