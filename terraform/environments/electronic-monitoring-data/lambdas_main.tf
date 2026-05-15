@@ -534,7 +534,39 @@ module "mdss_daily_failure_digest" {
   subnet_ids         = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    # keep the existing env vars exactly as they are
+    SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
+    ENVIRONMENT    = local.environment_shorthand
+    NAMESPACE      = "EMDS/MDSS"
+    LOOKBACK_HOURS = "24"
+
+    LOAD_MDSS_QUEUE_NAME = module.load_mdss_event_queue.sqs_queue.name
+    LOAD_FMS_QUEUE_NAME  = module.load_fms_event_queue.sqs_queue.name
+
+    LOAD_MDSS_DLQ_NAME = module.load_mdss_event_queue.sqs_dlq.name
+    CLEAN_DLT_DLQ_NAME = aws_sqs_queue.clean_dlt_load_dlq.name
+    LOAD_FMS_DLQ_NAME  = module.load_fms_event_queue.sqs_dlq.name
+
+    PROCESS_LANDING_BUCKET_FILES_FMS_GENERAL_DLQ_NAME  = local.live_feed_dlq_names.process_landing_bucket_files_fms_general
+    PROCESS_LANDING_BUCKET_FILES_FMS_HO_DLQ_NAME       = local.live_feed_dlq_names.process_landing_bucket_files_fms_ho
+    PROCESS_LANDING_BUCKET_FILES_FMS_SPECIALS_DLQ_NAME = local.live_feed_dlq_names.process_landing_bucket_files_fms_specials
+
+    PROCESS_LANDING_BUCKET_FILES_MDSS_GENERAL_DLQ_NAME  = local.live_feed_dlq_names.process_landing_bucket_files_mdss_general
+    PROCESS_LANDING_BUCKET_FILES_MDSS_HO_DLQ_NAME       = local.live_feed_dlq_names.process_landing_bucket_files_mdss_ho
+    PROCESS_LANDING_BUCKET_FILES_MDSS_SPECIALS_DLQ_NAME = local.live_feed_dlq_names.process_landing_bucket_files_mdss_specials
+
+    SCAN_DLQ_NAME                   = local.live_feed_dlq_names.scan
+    PROCESS_FMS_METADATA_DLQ_NAME   = local.live_feed_dlq_names.process_fms_metadata
+    FORMAT_FMS_JSON_DLQ_NAME        = aws_sqs_queue.format_fms_json_event_dlq.name
+    PUSH_DATA_EXPORT_TO_P1_DLQ_NAME = local.live_feed_dlq_names.push_data_export_to_p1
+
+    LOAD_FMS_FUNCTION_NAME             = module.load_fms_lambda.lambda_function_name
+    PROCESS_FMS_METADATA_FUNCTION_NAME = module.process_fms_metadata.lambda_function_name
+    FORMAT_JSON_FMS_DATA_FUNCTION_NAME = module.format_json_fms_data.lambda_function_name
+
+    LAMBDAS_PRODUCTION_RUN_URL = "https://github.com/ministryofjustice/electronic-monitoring-data-lambda-functions/actions/workflows/push-to-ecr.yaml"
+    CADT_DAILY_RUN_URL         = "https://github.com/moj-analytical-services/create-a-derived-table/actions/workflows/emds-live-workflow.yml"
+    ROTA_GUIDE_URL             = "https://jubilant-adventure-g65j3om.pages.github.io/hmpps/electronic_monitoring/data_engineering_guides/rota_duties/"
+    EARS_SARS_TALLY_URL        = "https://justiceuk.sharepoint.com/:x:/r/sites/EMExpansionProgrammeteam/_layouts/15/doc2.aspx?sourcedoc=%7B25644699-3837-4A02-9C09-020EF0ECA744%7D&file=Monthly%20Tally%20of%20EARs%20and%20SARs.xlsx&action=default&mobileredirect=true"
   }
 }
 
@@ -845,7 +877,21 @@ module "landing_dlq_redriver" {
   subnet_ids         = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    # keep existing env vars
+    POWERTOOLS_LOG_LEVEL = "INFO"
+
+    SNS_TOPIC_ARN = aws_sns_topic.emds_alerts.arn
+    ENVIRONMENT   = local.environment_shorthand
+    STATE_BUCKET  = local.alarm_thread_state_bucket
+    STATE_PREFIX  = local.alarm_thread_state_prefix
+
+    LANDING_DLQ_CONFIG = jsonencode(local.landing_dlq_redriver_config)
+
+    MAX_MESSAGES_PER_RUN                   = "50"
+    MAX_BATCHES_PER_EXECUTION              = "20"
+    DLQ_RECEIVE_VISIBILITY_TIMEOUT_SECONDS = "30"
+    LEGACY_UNKNOWN_RETRY_POLICY            = "retry_once"
+    AUTO_RETRY_MAX_ATTEMPTS                = "2"
+    RETRY_ONCE_MAX_ATTEMPTS                = "1"
   }
 }
 
