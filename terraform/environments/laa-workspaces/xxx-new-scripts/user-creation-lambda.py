@@ -160,8 +160,8 @@ def lambda_handler(event, context):
         create_ad_user(event)
         
         # Step 2: Wait for AD propagation
-        print("Waiting 10 seconds for AD propagation...")
-        time.sleep(10)
+        print("Waiting 60 seconds for AD replication across domain controllers...")
+        time.sleep(60)
         
         # Step 3: Create WorkSpace
         print("Step 2: Creating WorkSpace...")
