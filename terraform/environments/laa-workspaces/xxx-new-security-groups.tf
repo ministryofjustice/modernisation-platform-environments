@@ -39,7 +39,7 @@ resource "aws_vpc_security_group_ingress_rule" "user_creation_ec2_rdp" {
   ip_protocol       = "tcp"
   from_port         = 3389
   to_port           = 3389
-  cidr_ipv4         = data.terraform_remote_state.workspace_components.outputs.vpc_cidr
+  cidr_ipv4         = data.terraform_remote_state.workspace_components.outputs.vpc_cidr_block
 
   tags = merge(
     local.tags,
@@ -54,7 +54,7 @@ resource "aws_vpc_security_group_ingress_rule" "user_creation_ec2_ad" {
   security_group_id = aws_security_group.user_creation_ec2_sg[0].id
   description       = "Allow communication with Microsoft AD"
   ip_protocol       = "-1"
-  cidr_ipv4         = data.terraform_remote_state.workspace_components.outputs.vpc_cidr
+  cidr_ipv4         = data.terraform_remote_state.workspace_components.outputs.vpc_cidr_block
 
   tags = merge(
     local.tags,
