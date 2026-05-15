@@ -150,7 +150,8 @@ resource "aws_iam_role_policy" "user_creation_lambda_policy" {
         Action = [
           "workspaces:CreateWorkspaces",
           "workspaces:DescribeWorkspaces",
-          "workspaces:DescribeWorkspaceDirectories"
+          "workspaces:DescribeWorkspaceDirectories",
+          "workspaces:CreateTags"
         ]
         Resource = "*"
       },
