@@ -16,6 +16,7 @@ resource "kubernetes_cluster_role_v1" "headlamp" {
       "events",
       "persistentvolumeclaims",
       "persistentvolumes",
+      "serviceaccounts",
     ]
     verbs = ["get", "list", "watch"]
   }
@@ -41,6 +42,34 @@ resource "kubernetes_cluster_role_v1" "headlamp" {
   }
 
   rule {
+    api_groups = ["networking.k8s.io"]
+    resources = [
+      "networkpolicies",
+    ]
+    verbs = ["get", "list", "watch"]
+  }
+
+  rule {
+    api_groups = ["rbac.authorization.k8s.io"]
+    resources = [
+      "roles",
+      "clusterroles",
+      "rolebindings",
+      "clusterrolebindings",
+    ]
+    verbs = ["get", "list", "watch"]
+  }
+
+  rule {
+    api_groups = ["storage.k8s.io"]
+    resources = [
+      "storageclasses",
+      "volumeattachments",
+    ]
+    verbs = ["get", "list", "watch"]
+  }
+
+  rule {
     api_groups = ["gateway.networking.k8s.io"]
     resources = [
       "httproutes",
@@ -55,6 +84,14 @@ resource "kubernetes_cluster_role_v1" "headlamp" {
     resources = [
       "nodepools",
       "nodeclaims",
+    ]
+    verbs = ["get", "list", "watch"]
+  }
+
+  rule {
+    api_groups = ["karpenter.k8s.aws"]
+    resources = [
+      "ec2nodeclasses",
     ]
     verbs = ["get", "list", "watch"]
   }
