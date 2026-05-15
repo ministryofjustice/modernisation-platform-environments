@@ -148,7 +148,7 @@ module "virus_scan_file" {
 # Process live files
 #-----------------------------------------------------------------------------------
 
-module "format_json_fms_data" {
+module "fms_raw_file_formatter" {
   source                         = "./modules/lambdas"
   function_name                  = "fms_raw_file_formatter"
   image_name                     = "format_json_fms_data"
@@ -167,7 +167,7 @@ module "format_json_fms_data" {
   }
 }
 
-module "copy_mdss_data" {
+module "mdss_raw_file_stager" {
   source                         = "./modules/lambdas"
   function_name                  = "mdss_raw_file_stager"
   image_name                     = "copy_data"
@@ -296,7 +296,7 @@ module "dms_validation" {
 # Process FMS metadata
 #-----------------------------------------------------------------------------------
 
-module "process_fms_metadata" {
+module "fms_expected_file_processor" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "fms_expected_file_processor"
@@ -516,7 +516,7 @@ module "data_cutback" {
 # MDSS daily failure digest Lambda
 #-----------------------------------------------------------------------------------
 
-module "mdss_daily_failure_digest" {
+module "live_feed_daily_handover" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "live_feed_daily_handover"
@@ -560,8 +560,8 @@ module "mdss_daily_failure_digest" {
     PUSH_DATA_EXPORT_TO_P1_DLQ_NAME = local.live_feed_dlq_names.push_data_export_to_p1
 
     LOAD_FMS_FUNCTION_NAME             = module.load_fms_lambda.lambda_function_name
-    PROCESS_FMS_METADATA_FUNCTION_NAME = module.process_fms_metadata.lambda_function_name
-    FORMAT_JSON_FMS_DATA_FUNCTION_NAME = module.format_json_fms_data.lambda_function_name
+    PROCESS_FMS_METADATA_FUNCTION_NAME = module.fms_expected_file_processor.lambda_function_name
+    FORMAT_JSON_FMS_DATA_FUNCTION_NAME = module.fms_raw_file_formatter.lambda_function_name
 
     LAMBDAS_PRODUCTION_RUN_URL = "https://github.com/ministryofjustice/electronic-monitoring-data-lambda-functions/actions/workflows/push-to-ecr.yaml"
     CADT_DAILY_RUN_URL         = "https://github.com/moj-analytical-services/create-a-derived-table/actions/workflows/emds-live-workflow.yml"
@@ -599,7 +599,7 @@ resource "aws_iam_role_policy" "mdss_daily_failure_digest_scheduler_invoke" {
       {
         Effect   = "Allow"
         Action   = ["lambda:InvokeFunction"]
-        Resource = [module.mdss_daily_failure_digest.lambda_function_arn]
+        Resource = [module.live_feed_daily_handover.lambda_function_arn]
       }
     ]
   })
@@ -617,7 +617,7 @@ resource "aws_scheduler_schedule" "mdss_daily_failure_digest" {
   schedule_expression_timezone = "Europe/London"
 
   target {
-    arn      = module.mdss_daily_failure_digest.lambda_function_arn
+    arn      = module.live_feed_daily_handover.lambda_function_arn
     role_arn = aws_iam_role.mdss_daily_failure_digest_scheduler.arn
   }
 }
@@ -715,7 +715,7 @@ module "ears_sars_request" {
 # Fan out fms tags
 # ------------------------------------------------------------------------------
 
-module "fan_out_tags" {
+module "fms_validation_rejection_fanout" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "fms_validation_rejection_fanout"
@@ -742,7 +742,7 @@ module "fan_out_tags" {
 # MDSS reconciler (scheduled redrive backstop)
 #-----------------------------------------------------------------------------------
 
-module "mdss_reconciler" {
+module "mdss_load_redrive_controller" {
   count                          = 1
   source                         = "./modules/lambdas"
   is_image                       = true
@@ -851,7 +851,7 @@ module "staging_db_janitor" {
 # Lambda: landing_dlq_redriver
 # ------------------------------------------------------------------------------
 
-module "landing_dlq_redriver" {
+module "landing_file_dlq_redriver" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "landing_file_dlq_redriver"
