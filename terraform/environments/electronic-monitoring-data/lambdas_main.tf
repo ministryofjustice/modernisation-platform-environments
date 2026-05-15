@@ -150,7 +150,7 @@ module "virus_scan_file" {
 
 module "format_json_fms_data" {
   source                         = "./modules/lambdas"
-  function_name                  = "format_json_fms_data"
+  function_name                  = "fms_raw_file_formatter"
   is_image                       = true
   role_name                      = aws_iam_role.format_json_fms_data.name
   role_arn                       = aws_iam_role.format_json_fms_data.arn
@@ -168,7 +168,7 @@ module "format_json_fms_data" {
 
 module "copy_mdss_data" {
   source                         = "./modules/lambdas"
-  function_name                  = "copy_mdss_data"
+  function_name                  = "mdss_raw_file_stager"
   image_name                     = "copy_data"
   is_image                       = true
   role_name                      = aws_iam_role.copy_mdss_data.name
@@ -298,7 +298,7 @@ module "dms_validation" {
 module "process_fms_metadata" {
   source                         = "./modules/lambdas"
   is_image                       = true
-  function_name                  = "process_fms_metadata"
+  function_name                  = "fms_formatting_dispatcher"
   role_name                      = aws_iam_role.process_fms_metadata.name
   role_arn                       = aws_iam_role.process_fms_metadata.arn
   handler                        = "process_fms_metadata.handler"
@@ -517,7 +517,7 @@ module "data_cutback" {
 module "mdss_daily_failure_digest" {
   source                         = "./modules/lambdas"
   is_image                       = true
-  function_name                  = "mdss_daily_failure_digest"
+  function_name                  = "live_feed_daily_handover"
   role_name                      = aws_iam_role.mdss_daily_failure_digest.name
   role_arn                       = aws_iam_role.mdss_daily_failure_digest.arn
   handler                        = "mdss_daily_failure_digest.handler"
@@ -715,7 +715,7 @@ module "ears_sars_request" {
 module "fan_out_tags" {
   source                         = "./modules/lambdas"
   is_image                       = true
-  function_name                  = "fan_out_tags"
+  function_name                  = "fms_validation_rejection_fanout"
   role_name                      = aws_iam_role.fan_out_tags.name
   role_arn                       = aws_iam_role.fan_out_tags.arn
   handler                        = "fan_out_tags.handler"
@@ -742,7 +742,7 @@ module "mdss_reconciler" {
   count                          = 1
   source                         = "./modules/lambdas"
   is_image                       = true
-  function_name                  = "mdss_reconciler"
+  function_name                  = "mdss_load_redrive_controller"
   role_name                      = aws_iam_role.mdss_reconciler.name
   role_arn                       = aws_iam_role.mdss_reconciler.arn
   memory_size                    = 512
@@ -848,7 +848,7 @@ module "staging_db_janitor" {
 module "landing_dlq_redriver" {
   source                         = "./modules/lambdas"
   is_image                       = true
-  function_name                  = "landing_dlq_redriver"
+  function_name                  = "landing_file_dlq_redriver"
   role_name                      = aws_iam_role.landing_dlq_redriver.name
   role_arn                       = aws_iam_role.landing_dlq_redriver.arn
   handler                        = "landing_dlq_redriver.handler"
