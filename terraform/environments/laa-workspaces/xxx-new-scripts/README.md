@@ -57,11 +57,23 @@ WorkSpaces Console: "Invite user" button WORKS ✅
    - Password auto-generated (32 chars)
    - Stored in SSM Parameter Store: `/laa-workspaces/development/ad-service-account-password`
    - User created in `OU=Users,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local`
-   - **Automatically added to AWS Delegated Administrators group** ✅
+   - **Attempts to add to AWS Delegated Administrators group automatically**
 
-### No Manual Steps Required! 🎉
+### Verify Group Membership After Apply:
 
-Everything is fully automated via Terraform. Just run `terraform apply` and wait for completion.
+After `terraform apply`, check the output. If group membership failed, you'll see a command to run manually:
+
+```bash
+# Check Terraform output
+terraform output lambda_service_account_manual_group_add
+
+# If group add failed, run the command shown in output, or:
+aws ds-data add-group-member \
+  --directory-id d-9c674ffb8b \
+  --group-name "AWS Delegated Administrators" \
+  --member-name lambda.workspace \
+  --region eu-west-2
+```
 
 ## Deployment
 
@@ -85,7 +97,18 @@ This creates:
 
 ### Step 2: Verify Setup
 
-1. **Wait for EC2 to fully boot and join domain** (~5-10 minutes)
+1. **Check service account group membership:**
+   ```bash
+   aws ds-data list-group-members \
+     --directory-id d-9c674ffb8b \
+     --group-name "AWS Delegated Administrators" \
+     --region eu-west-2 \
+     --query 'Members[?SAMAccountName==`lambda.workspace`]'
+   ```
+   
+   If the list is empty, the user wasn't added. Run the manual command from the prerequisites section.
+
+2. **Wait for EC2 to fully boot and join domain** (~5-10 minutes)
 
 2. **Verify domain join:**
    ```bash
