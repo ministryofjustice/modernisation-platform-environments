@@ -911,22 +911,31 @@ resource "aws_security_group_rule" "egress_all_hosts_to_domain_controller_traffi
   source_security_group_id = aws_security_group.aws_domain_security_group.id
 }
 
-# Ingress rule for port 445 from eucs-appstream private subnets
-resource "aws_security_group_rule" "ingress_port_445_from_eucs_appstream" {
-  for_each = {
+
+
+# Ingress rules for DNS, Kerberos, LDAP, RPC, SMB, and RPC dynamic ports from eucs-appstream private subnets
+locals {
+  eucs_appstream_ingress_rules = flatten([
     for cidr in(
       local.is-development || local.is-production
       ? lookup(local.application_data.accounts[local.environment], "eucs_appstream_private_subnet_cidrs", [])
       : []
-    ) : cidr => cidr
-  }
-  description       = "Allow port 445 inbound from eucs-appstream private subnets"
-  from_port         = 445
-  protocol          = "TCP"
+      ) : [
+      for rule in values(local.application_data.domain_controller_internal_rules) :
+      merge(rule, { cidr = cidr })
+    ]
+  ])
+}
+
+resource "aws_security_group_rule" "ingress_eucs_appstream" {
+  for_each          = { for idx, rule in local.eucs_appstream_ingress_rules : "${rule.cidr}-${rule.protocol}-${rule.from_port}-${rule.to_port}" => rule }
+  description       = "eucs-appstream: ${each.value.protocol} ${each.value.from_port}-${each.value.to_port}"
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  protocol          = lower(each.value.protocol)
   security_group_id = aws_security_group.all_internal_groups.id
-  to_port           = 445
   type              = "ingress"
-  cidr_blocks       = [each.value]
+  cidr_blocks       = [each.value.cidr]
 }
 
 # cidr_blocks should be replaced with source_security_group_id, but open until confirmed with configuration team
