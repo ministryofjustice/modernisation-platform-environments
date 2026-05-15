@@ -86,7 +86,7 @@ resource "aws_iam_policy" "ears_sars_step_function_policy" {
 # ------------------------------------------
 
 data "aws_iam_policy_document" "gdpr_delete_policy_document" {
-  count = local.is-development || local.is-preproduction ? 1 : 0
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   statement {
     effect = "Allow"
     actions = [
@@ -126,7 +126,7 @@ data "aws_iam_policy_document" "gdpr_delete_policy_document" {
 }
 
 resource "aws_iam_policy" "gdpr_delete_iam_policy" {
-  count  = local.is-development || local.is-preproduction ? 1 : 0
+  count  = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   name   = "gdpr_deletion_step_function_role"
   policy = data.aws_iam_policy_document.gdpr_delete_policy_document[0].json
 }

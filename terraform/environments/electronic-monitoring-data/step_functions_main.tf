@@ -78,7 +78,7 @@ module "ears_sars_step_function" {
 # ------------------------------------------
 
 module "gdpr_deletion_step_function" {
-  count        = local.is-development || local.is-preproduction ? 1 : 0
+  count        = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   source       = "./modules/step_function"
   name         = "gdpr_deletion"
   iam_policies = tomap({ "gdpr_deletion_step_function_policy" = aws_iam_policy.gdpr_delete_iam_policy[0] })
@@ -101,7 +101,7 @@ module "gdpr_deletion_step_function" {
 
 
 module "iceberg_table_maintenance_step_function" {
-  count        = local.is-development || local.is-preproduction ? 1 : 0
+  count        = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   source       = "./modules/step_function"
   name         = "iceberg_table_maintenance"
   iam_policies = tomap({ "gdpr_deletion_step_function_policy" = aws_iam_policy.gdpr_delete_iam_policy[0] })
