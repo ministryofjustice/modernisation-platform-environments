@@ -84,6 +84,21 @@ data "aws_iam_policy_document" "emds_alerts_kms" {
       identifiers = [aws_iam_role.cloudwatch_alarm_threader.arn]
     }
   }
+  
+  statement {
+    sid       = "AllowEventBridgeUseOfKey"
+    effect    = "Allow"
+    resources = ["*"]
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+    ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+  }
 
   statement {
     sid       = "AllowStagingDbJanitorUseOfKey"
