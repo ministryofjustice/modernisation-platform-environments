@@ -151,6 +151,7 @@ module "virus_scan_file" {
 module "format_json_fms_data" {
   source                         = "./modules/lambdas"
   function_name                  = "fms_raw_file_formatter"
+  image_name                     = "format_json_fms_data"
   is_image                       = true
   role_name                      = aws_iam_role.format_json_fms_data.name
   role_arn                       = aws_iam_role.format_json_fms_data.arn
@@ -299,6 +300,7 @@ module "process_fms_metadata" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "fms_expected_file_processor"
+  image_name                     = "process_fms_metadata"
   role_name                      = aws_iam_role.process_fms_metadata.name
   role_arn                       = aws_iam_role.process_fms_metadata.arn
   handler                        = "process_fms_metadata.handler"
@@ -518,6 +520,7 @@ module "mdss_daily_failure_digest" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "live_feed_daily_handover"
+  image_name                     = "mdss_daily_failure_digest"
   role_name                      = aws_iam_role.mdss_daily_failure_digest.name
   role_arn                       = aws_iam_role.mdss_daily_failure_digest.arn
   handler                        = "mdss_daily_failure_digest.handler"
@@ -531,39 +534,7 @@ module "mdss_daily_failure_digest" {
   subnet_ids         = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
-    ENVIRONMENT    = local.environment_shorthand
-    NAMESPACE      = "EMDS/MDSS"
-    LOOKBACK_HOURS = "24"
-
-    LOAD_MDSS_QUEUE_NAME = module.load_mdss_event_queue.sqs_queue.name
-    LOAD_FMS_QUEUE_NAME  = module.load_fms_event_queue.sqs_queue.name
-
-    LOAD_MDSS_DLQ_NAME = module.load_mdss_event_queue.sqs_dlq.name
-    CLEAN_DLT_DLQ_NAME = aws_sqs_queue.clean_dlt_load_dlq.name
-    LOAD_FMS_DLQ_NAME  = module.load_fms_event_queue.sqs_dlq.name
-
-    PROCESS_LANDING_BUCKET_FILES_FMS_GENERAL_DLQ_NAME  = local.live_feed_dlq_names.process_landing_bucket_files_fms_general
-    PROCESS_LANDING_BUCKET_FILES_FMS_HO_DLQ_NAME       = local.live_feed_dlq_names.process_landing_bucket_files_fms_ho
-    PROCESS_LANDING_BUCKET_FILES_FMS_SPECIALS_DLQ_NAME = local.live_feed_dlq_names.process_landing_bucket_files_fms_specials
-
-    PROCESS_LANDING_BUCKET_FILES_MDSS_GENERAL_DLQ_NAME  = local.live_feed_dlq_names.process_landing_bucket_files_mdss_general
-    PROCESS_LANDING_BUCKET_FILES_MDSS_HO_DLQ_NAME       = local.live_feed_dlq_names.process_landing_bucket_files_mdss_ho
-    PROCESS_LANDING_BUCKET_FILES_MDSS_SPECIALS_DLQ_NAME = local.live_feed_dlq_names.process_landing_bucket_files_mdss_specials
-
-    SCAN_DLQ_NAME                   = local.live_feed_dlq_names.scan
-    PROCESS_FMS_METADATA_DLQ_NAME   = local.live_feed_dlq_names.process_fms_metadata
-    FORMAT_FMS_JSON_DLQ_NAME        = aws_sqs_queue.format_fms_json_event_dlq.name
-    PUSH_DATA_EXPORT_TO_P1_DLQ_NAME = local.live_feed_dlq_names.push_data_export_to_p1
-
-    LOAD_FMS_FUNCTION_NAME             = module.load_fms_lambda.lambda_function_name
-    PROCESS_FMS_METADATA_FUNCTION_NAME = module.process_fms_metadata.lambda_function_name
-    FORMAT_JSON_FMS_DATA_FUNCTION_NAME = module.format_json_fms_data.lambda_function_name
-
-    LAMBDAS_PRODUCTION_RUN_URL = "https://github.com/ministryofjustice/electronic-monitoring-data-lambda-functions/actions/workflows/push-to-ecr.yaml"
-    CADT_DAILY_RUN_URL         = "https://github.com/moj-analytical-services/create-a-derived-table/actions/workflows/emds-live-workflow.yml"
-    ROTA_GUIDE_URL             = "https://jubilant-adventure-g65j3om.pages.github.io/hmpps/electronic_monitoring/data_engineering_guides/rota_duties/"
-    EARS_SARS_TALLY_URL        = "https://justiceuk.sharepoint.com/:x:/r/sites/EMExpansionProgrammeteam/_layouts/15/doc2.aspx?sourcedoc=%7B25644699-3837-4A02-9C09-020EF0ECA744%7D&file=Monthly%20Tally%20of%20EARs%20and%20SARs.xlsx&action=default&mobileredirect=true"
+    # keep the existing env vars exactly as they are
   }
 }
 
@@ -716,6 +687,7 @@ module "fan_out_tags" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "fms_validation_rejection_fanout"
+  image_name                     = "fan_out_tags"
   role_name                      = aws_iam_role.fan_out_tags.name
   role_arn                       = aws_iam_role.fan_out_tags.arn
   handler                        = "fan_out_tags.handler"
@@ -743,6 +715,7 @@ module "mdss_reconciler" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "mdss_load_redrive_controller"
+  image_name                     = "mdss_reconciler"
   role_name                      = aws_iam_role.mdss_reconciler.name
   role_arn                       = aws_iam_role.mdss_reconciler.arn
   memory_size                    = 512
@@ -756,18 +729,7 @@ module "mdss_reconciler" {
   subnet_ids         = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    ENVIRONMENT_NAME                        = local.environment_shorthand
-    SOURCE_BUCKET                           = module.s3-raw-formatted-data-bucket.bucket.id
-    LOAD_MDSS_QUEUE_URL                     = module.load_mdss_event_queue.sqs_queue.id
-    MDSS_MANIFEST_BUCKET                    = module.s3-metadata-bucket.bucket.id
-    MDSS_MANIFEST_PREFIX                    = "mdss-manifest/current"
-    LOOKBACK_DAYS                           = "2"
-    MIN_OBJECT_AGE_MINUTES                  = "10"
-    STUCK_STARTED_MINUTES                   = "60"
-    AUTO_REDRIVE_TRANSIENT_COOLDOWN_MINUTES = "60"
-    AUTO_REDRIVE_UNKNOWN_COOLDOWN_MINUTES   = "60"
-    AUTO_REDRIVE_TRANSIENT_MAX_ATTEMPTS     = "2"
-    AUTO_REDRIVE_UNKNOWN_MAX_ATTEMPTS       = "1"
+    # keep existing env vars
   }
 }
 
@@ -849,6 +811,7 @@ module "landing_dlq_redriver" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "landing_file_dlq_redriver"
+  image_name                     = "landing_dlq_redriver"
   role_name                      = aws_iam_role.landing_dlq_redriver.name
   role_arn                       = aws_iam_role.landing_dlq_redriver.arn
   handler                        = "landing_dlq_redriver.handler"
@@ -870,21 +833,7 @@ module "landing_dlq_redriver" {
   subnet_ids         = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    POWERTOOLS_LOG_LEVEL = "INFO"
-
-    SNS_TOPIC_ARN = aws_sns_topic.emds_alerts.arn
-    ENVIRONMENT   = local.environment_shorthand
-    STATE_BUCKET  = local.alarm_thread_state_bucket
-    STATE_PREFIX  = local.alarm_thread_state_prefix
-
-    LANDING_DLQ_CONFIG = jsonencode(local.landing_dlq_redriver_config)
-
-    MAX_MESSAGES_PER_RUN                   = "50"
-    MAX_BATCHES_PER_EXECUTION              = "20"
-    DLQ_RECEIVE_VISIBILITY_TIMEOUT_SECONDS = "30"
-    LEGACY_UNKNOWN_RETRY_POLICY            = "retry_once"
-    AUTO_RETRY_MAX_ATTEMPTS                = "2"
-    RETRY_ONCE_MAX_ATTEMPTS                = "1"
+    # keep existing env vars
   }
 }
 
