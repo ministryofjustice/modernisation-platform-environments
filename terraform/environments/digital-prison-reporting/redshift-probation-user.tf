@@ -7,12 +7,12 @@
 
 # Generate random password for probation user.
 resource "random_password" "redshift_probation_password" {
-  length      = 16 # Same as dpruser
+  length      = 16 
   min_lower   = 1
   min_numeric = 1
   min_special = 1
   min_upper   = 1
-  special     = false # NO special chars - matches dpruser pattern
+  special     = false
 }
 
 # Create secret in AWS Secrets Manager
@@ -44,7 +44,7 @@ resource "aws_secretsmanager_secret_version" "redshift_probation_user" {
     host                = module.datamart.cluster_endpoint
     port                = "5439"
     dbClusterIdentifier = module.datamart.cluster_identifier
-    database            = "datamart" # Same database as dpruser
+    database            = "datamart" 
   })
 }
 
