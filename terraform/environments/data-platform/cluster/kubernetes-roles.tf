@@ -1,6 +1,4 @@
 resource "kubernetes_cluster_role_v1" "headlamp" {
-  count = terraform.workspace == "data-platform-development" ? 1 : 0
-
   metadata {
     name = "headlamp-readonly"
   }

@@ -50,8 +50,6 @@ module "karpenter_namespace" {
 module "headlamp_namespace" {
   source = "./modules/kubernetes/namespace"
 
-  count = terraform.workspace == "data-platform-development" ? 1 : 0
-
   name     = "headlamp"
   workload = "system"
 }
