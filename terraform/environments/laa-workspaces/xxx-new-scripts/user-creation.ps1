@@ -30,7 +30,8 @@ $Password = Generate-password -length 14
 # Get service account credentials from SSM Parameter Store
 Write-Host "Retrieving service account credentials..."
 try {
-    $adpasswordSecure = Get-SSMParameterValue -Name "/laa-workspaces/development/ad-service-account-password" -WithDecryption $true | Select-Object -ExpandProperty Value
+    $ssmResponse = Get-SSMParameterValue -Name "/laa-workspaces/development/ad-service-account-password" -WithDecryption $true
+    $adpasswordSecure = $ssmResponse.Parameters[0].Value
     
     # Service account details
     $adusername = 'LAAWORKSPACES\lambda.workspace'
