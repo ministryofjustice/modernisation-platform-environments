@@ -274,8 +274,9 @@ locals {
 
   # base config for each database
   base_db_config_dev = {
-    instance_type  = "m7i.large"
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    instance_type           = "m7i.large"
+    standby_instance_count  = 0
+    ami_name_regex          = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
