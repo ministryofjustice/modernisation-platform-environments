@@ -189,10 +189,6 @@
             {
               "glue_database": "curated_prisons_history_dev_dbt",
               "glue_tables": ["*"]
-            },
-            {
-              "glue_database": "staged_prisons_history_dev_dbt",
-              "glue_tables": ["*"]
             }
           ]
         }
@@ -622,10 +618,6 @@
           "data_locations": ["dpr-structured-historical-preproduction"],
           "resource_shares": [
             {
-              "glue_database": "staged_prisons_history_preprod_dbt",
-              "glue_tables": ["*"]
-            },
-            {
               "glue_database": "curated_prisons_history_preprod_dbt",
               "glue_tables": ["*"]
             }
@@ -847,10 +839,6 @@
           "assume_account_id": "042130406152",
           "data_locations": ["dpr-structured-historical-production"],
           "resource_shares": [
-            {
-              "glue_database": "staged_prisons_history",
-              "glue_tables": ["*"]
-            },
             {
               "glue_database": "curated_prisons_history",
               "glue_tables": ["*"]
