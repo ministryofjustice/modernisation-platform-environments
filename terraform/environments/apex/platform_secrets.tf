@@ -15,3 +15,44 @@ data "aws_secretsmanager_secret_version" "environment_management" {
   provider  = aws.modernisation-platform
   secret_id = data.aws_secretsmanager_secret.environment_management.id
 }
+
+
+data "aws_ssm_parameter" "app_apex_dbpassword_tad" {
+  name            = "APP_APEX_DBPASSWORD_TAD"
+  with_decryption = true
+}
+
+data "aws_ssm_parameter" "app_apex_dbpassword_admin" {
+  name            = "APP_APEX_DBPASSWORD_ADMIN"
+  with_decryption = true
+}
+
+data "aws_ssm_parameter" "ec2_ssh_key" {
+  name            = "EC2_SSH_KEY"
+  with_decryption = true
+}
+
+
+resource "aws_secretsmanager_secret" "app_apex_dbpassword_tad" {
+  name = "APP_APEX_DBPASSWORD_TAD"
+}
+resource "aws_secretsmanager_secret_version" "app_apex_dbpassword_tad" {
+  secret_id     = aws_secretsmanager_secret.app_apex_dbpassword_tad.id
+  secret_string = data.aws_ssm_parameter.app_apex_dbpassword_tad.value
+}
+
+resource "aws_secretsmanager_secret" "app_apex_dbpassword_admin" {
+  name = "APP_APEX_DBPASSWORD_ADMIN"
+}
+resource "aws_secretsmanager_secret_version" "app_apex_dbpassword_admin" {
+  secret_id     = aws_secretsmanager_secret.app_apex_dbpassword_admin.id
+  secret_string = data.aws_ssm_parameter.app_apex_dbpassword_admin.value
+}
+
+resource "aws_secretsmanager_secret" "ec2_ssh_key" {
+  name = "EC2_SSH_KEY"
+}
+resource "aws_secretsmanager_secret_version" "ec2_ssh_key" {
+  secret_id     = aws_secretsmanager_secret.ec2_ssh_key.id
+  secret_string = data.aws_ssm_parameter.ec2_ssh_key.value
+}
