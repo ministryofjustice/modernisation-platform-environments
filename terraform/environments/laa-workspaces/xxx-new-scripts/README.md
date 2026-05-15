@@ -86,11 +86,12 @@ terraform apply
 ```
 
 This creates:
-- EC2 instance (auto-joins domain)
+- Service account `lambda.workspace` in AD
+- Password stored in SSM Parameter Store
+- EC2 instance (auto-joins domain, installs AD tools, deploys PowerShell script)
 - Lambda function
-- IAM roles
+- IAM roles and policies
 - Security groups
-- Uploads PowerShell script to EC2
 
 ### Step 2: Add Service Account to Admin Group
 
@@ -117,18 +118,19 @@ This grants the service account permission to create AD users.
    # Should show: laa-workspaces.local
    ```
 
-3. **Install AD PowerShell tools on EC2:**
-   ```bash
-   aws ssm send-command \
-     --instance-ids <instance-id> \
-     --document-name "AWS-RunPowerShellScript" \
-     --parameters 'commands=["Install-WindowsFeature -Name RSAT-AD-PowerShell"]' \
-     --region eu-west-2
-   ```
-
-4. **Verify PowerShell script exists:**
+3. **Verify PowerShell script deployed:**
    ```powershell
    Test-Path C:\Windows\system32\user-creation.ps1
+   # Should return: True
+   
+   Get-Content C:\Windows\system32\user-creation.ps1 | Select-Object -First 10
+   # Should show the script content
+   ```
+
+4. **Verify AD tools installed:**
+   ```powershell
+   Get-WindowsFeature -Name RSAT-AD-PowerShell
+   # Should show: Installed
    ```
 
 ## Usage

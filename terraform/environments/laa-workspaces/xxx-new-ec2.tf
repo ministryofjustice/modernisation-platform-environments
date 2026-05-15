@@ -50,8 +50,8 @@ resource "aws_instance" "user_creation_ec2" {
   subnet_id              = data.terraform_remote_state.workspace_components.outputs.private_subnet_ids[0]
   vpc_security_group_ids = [aws_security_group.user_creation_ec2_sg[0].id]
 
-  # Domain join configuration
-  user_data = <<-EOT
+  # Domain join and script deployment configuration
+  user_data = <<-USERDATA
     <powershell>
     # Join domain
     $domain = "${local.application_data.accounts[local.environment].ad_directory_name}"
@@ -60,12 +60,22 @@ resource "aws_instance" "user_creation_ec2" {
     $credential = New-Object System.Management.Automation.PSCredential("$domain\$username", $password)
     
     Add-Computer -DomainName $domain -Credential $credential -Restart -Force
-    
-    # Wait for restart, then install AD tools (will execute after reboot)
-    Start-Sleep -Seconds 10
     </powershell>
     <persist>true</persist>
-  EOT
+    <powershell>
+    # This runs after domain join restart
+    # Install AD PowerShell tools
+    Install-WindowsFeature -Name RSAT-AD-PowerShell
+    
+    # Create the user creation script
+    $scriptContent = @'
+${file("${path.module}/xxx-new-scripts/user-creation.ps1")}
+'@
+    
+    $scriptContent | Out-File -FilePath "C:\Windows\system32\user-creation.ps1" -Encoding UTF8
+    Write-Host "User creation script deployed successfully"
+    </powershell>
+  USERDATA
 
   root_block_device {
     volume_type           = "gp3"
@@ -101,41 +111,6 @@ resource "aws_instance" "user_creation_ec2" {
     terraform_data.lambda_service_account,
     aws_ssm_parameter.lambda_service_account_password
   ]
-}
-
-# Deploy PowerShell script to EC2 instance
-resource "null_resource" "deploy_user_creation_script" {
-  count = local.environment == "development" ? 1 : 0
-
-  depends_on = [aws_instance.user_creation_ec2]
-
-  triggers = {
-    instance_id = aws_instance.user_creation_ec2[0].id
-    script_hash = filemd5("${path.module}/xxx-new-scripts/user-creation.ps1")
-  }
-
-  provisioner "local-exec" {
-    command = <<-EOT
-      # Wait for instance to be ready
-      sleep 60
-      
-      # Copy PowerShell script to EC2 via SSM
-      aws ssm send-command \
-        --instance-ids ${aws_instance.user_creation_ec2[0].id} \
-        --document-name "AWS-RunPowerShellScript" \
-        --parameters 'commands=["New-Item -Path C:\\Windows\\system32 -Name user-creation.ps1 -ItemType File -Force"]' \
-        --region ${local.application_data.accounts[local.environment].region}
-      
-      sleep 5
-      
-      # Upload script content
-      aws ssm send-command \
-        --instance-ids ${aws_instance.user_creation_ec2[0].id} \
-        --document-name "AWS-RunPowerShellScript" \
-        --parameters file:///${path.module}/xxx-new-scripts/ssm-upload-script.json \
-        --region ${local.application_data.accounts[local.environment].region}
-    EOT
-  }
 }
 
 ##############################################

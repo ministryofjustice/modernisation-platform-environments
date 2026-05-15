@@ -51,7 +51,6 @@ resource "aws_lambda_function" "user_creation" {
 
   depends_on = [
     aws_instance.user_creation_ec2,
-    null_resource.deploy_user_creation_script,
     terraform_data.lambda_service_account,
     aws_ssm_parameter.lambda_service_account_password
   ]

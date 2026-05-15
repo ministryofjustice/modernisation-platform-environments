@@ -118,3 +118,42 @@ resource "aws_iam_role_policy_attachment" "github_actions_ds_data_access" {
   role       = "github-actions-apply"
   policy_arn = aws_iam_policy.github_actions_ds_data_access[0].arn
 }
+
+# IAM policy for GitHub Actions to send SSM commands during deployment
+resource "aws_iam_policy" "github_actions_ssm_access" {
+  count = local.environment == "development" ? 1 : 0
+
+  name        = "${local.application_name}-${local.environment}-github-ssm-access"
+  description = "Allow GitHub Actions to send SSM commands for user creation EC2"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:SendCommand",
+          "ssm:GetCommandInvocation",
+          "ssm:ListCommands",
+          "ssm:ListCommandInvocations"
+        ]
+        Resource = [
+          "arn:aws:ec2:${local.application_data.accounts[local.environment].region}:${data.aws_caller_identity.current.account_id}:instance/*",
+          "arn:aws:ssm:${local.application_data.accounts[local.environment].region}::document/AWS-RunPowerShellScript"
+        ]
+      }
+    ]
+  })
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-github-ssm-access" }
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "github_actions_ssm_access" {
+  count = local.environment == "development" ? 1 : 0
+
+  role       = "github-actions-apply"
+  policy_arn = aws_iam_policy.github_actions_ssm_access[0].arn
+}
