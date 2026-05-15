@@ -5,7 +5,7 @@
 #          to the same Redshift cluster and datamart database
 ###############################################################################
 
-# Generate random password for probation user (matching dpruser pattern)
+# Generate random password for probation user.
 resource "random_password" "redshift_probation_password" {
   length      = 16 # Same as dpruser
   min_lower   = 1
@@ -15,7 +15,7 @@ resource "random_password" "redshift_probation_password" {
   special     = false # NO special chars - matches dpruser pattern
 }
 
-# Create secret in AWS Secrets Manager (matching dpruser pattern)
+# Create secret in AWS Secrets Manager
 resource "aws_secretsmanager_secret" "redshift_probation_user" {
   #checkov:skip=CKV2_AWS_57: "Ignore - Manual rotation for application user"
   #checkov:skip=CKV_AWS_149: "Using KMS encryption via kms_key_id"
@@ -34,7 +34,7 @@ resource "aws_secretsmanager_secret" "redshift_probation_user" {
   )
 }
 
-# Store credentials in secret (matching dpruser secret structure)
+# Store credentials in secret
 resource "aws_secretsmanager_secret_version" "redshift_probation_user" {
   secret_id = aws_secretsmanager_secret.redshift_probation_user.id
   secret_string = jsonencode({
@@ -161,83 +161,3 @@ output "probation_username" {
   value       = "probation_user"
   sensitive   = false
 }
-
-###############################################################################
-# EXAMPLE: How to add more users using the same stored procedure
-###############################################################################
-# Uncomment and modify the sections below to add additional users
-# Each user needs: password, secret, and procedure call
-###############################################################################
-
-# # Example: Finance User
-# resource "random_password" "redshift_finance_password" {
-#   length      = 16
-#   min_lower   = 1
-#   min_numeric = 1
-#   min_special = 1
-#   min_upper   = 1
-#   special     = false
-# }
-#
-# resource "aws_secretsmanager_secret" "redshift_finance_user" {
-#   description = "Redshift connect details for finance user"
-#   name        = "${local.project}-redshift-finance-secret-${local.environment}"
-#   kms_key_id  = aws_kms_key.redshift-kms-key.arn
-#   tags        = local.all_tags
-# }
-#
-# resource "aws_secretsmanager_secret_version" "redshift_finance_user" {
-#   secret_id = aws_secretsmanager_secret.redshift_finance_user.id
-#   secret_string = jsonencode({
-#     username            = "finance_user"
-#     password            = random_password.redshift_finance_password.result
-#     engine              = "redshift"
-#     host                = module.datamart.cluster_endpoint
-#     port                = "5439"
-#     dbClusterIdentifier = module.datamart.cluster_identifier
-#     database            = "datamart"
-#   })
-# }
-#
-# resource "aws_redshiftdata_statement" "create_finance_user" {
-#   cluster_identifier = module.datamart.cluster_identifier
-#   database           = "datamart"
-#   db_user            = "dpruser"
-#   statement_name     = "call-create-finance-user-${local.environment}"
-#
-#   # Reuse the same stored procedure with different username
-#   sql = "CALL create_readonly_user_safe('finance_user', '${random_password.redshift_finance_password.result}');"
-#
-#   depends_on = [
-#     aws_redshiftdata_statement.create_user_procedure,
-#     random_password.redshift_finance_password
-#   ]
-# }
-#
-# # Grant permissions for finance user
-# resource "aws_redshiftdata_statement" "grant_finance_usage" {
-#   cluster_identifier = module.datamart.cluster_identifier
-#   database           = "datamart"
-#   db_user            = "dpruser"
-#   statement_name     = "grant-finance-usage-${local.environment}"
-#   sql                = "GRANT USAGE ON SCHEMA public TO finance_user;"
-#   depends_on         = [aws_redshiftdata_statement.create_finance_user]
-# }
-#
-# resource "aws_redshiftdata_statement" "grant_finance_select" {
-#   cluster_identifier = module.datamart.cluster_identifier
-#   database           = "datamart"
-#   db_user            = "dpruser"
-#   statement_name     = "grant-finance-select-${local.environment}"
-#   sql                = "GRANT SELECT ON ALL TABLES IN SCHEMA public TO finance_user;"
-#   depends_on         = [aws_redshiftdata_statement.grant_finance_usage]
-# }
-#
-# resource "aws_redshiftdata_statement" "grant_finance_future_select" {
-#   cluster_identifier = module.datamart.cluster_identifier
-#   database           = "datamart"
-#   db_user            = "dpruser"
-#   statement_name     = "grant-finance-future-${local.environment}"
-#   sql                = "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO finance_user;"
-#   depends_on         = [aws_redshiftdata_statement.grant_finance_select]
-# }
