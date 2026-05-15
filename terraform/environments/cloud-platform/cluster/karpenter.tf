@@ -5,6 +5,7 @@ module "karpenter" {
   cluster_name = local.cluster_name
   cluster_endpoint = module.eks[0].cluster_endpoint
   k8s_version = local.environment_configuration.eks_cluster_version
+  max_pods_per_node = 31
 
   depends_on = [ module.eks ]
 }
