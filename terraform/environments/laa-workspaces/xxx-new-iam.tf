@@ -140,7 +140,8 @@ resource "aws_iam_role_policy" "user_creation_lambda_policy" {
         ]
         Resource = [
           "arn:aws:ec2:${local.application_data.accounts[local.environment].region}:${data.aws_caller_identity.current.account_id}:instance/*",
-          "arn:aws:ssm:${local.application_data.accounts[local.environment].region}::document/AWS-RunPowerShellScript"
+          "arn:aws:ssm:${local.application_data.accounts[local.environment].region}::document/AWS-RunPowerShellScript",
+          "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${data.aws_caller_identity.current.account_id}:*"
         ]
       },
       {
