@@ -277,6 +277,7 @@ locals {
   # BOE DB config
   boe_db_config_preprod = {
     instance_count = 0
+    standby_instance_count = 0
     instance_type  = "m7i.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
@@ -322,6 +323,7 @@ locals {
   # DSD DB config
   dsd_db_config_preprod = {
     instance_count = 0
+    standby_instance_count = 0
     instance_type  = "r7i.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
@@ -367,6 +369,7 @@ locals {
   # MIS DB config
   mis_db_config_preprod = {
     instance_count = 0
+    standby_instance_count = 0
     instance_type  = "r7i.12xlarge"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 

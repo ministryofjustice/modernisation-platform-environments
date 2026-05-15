@@ -304,6 +304,7 @@ locals {
   boe_db_config_stage = {
     instance_type  = "m7i.large"
     instance_count = 1
+    standby_instance_count = 0
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
@@ -349,6 +350,7 @@ locals {
   dsd_db_config_stage = {
     instance_type  = "m7i.large"
     instance_count = 1
+    standby_instance_count = 0
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
@@ -394,6 +396,7 @@ locals {
   mis_db_config_stage = {
     instance_type  = "r7i.4xlarge" # manually turn off when not in use to save costs
     instance_count = 1
+    standby_instance_count = 0
     # most recent 8_5 image, ami builder needs fixing after this
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2025-03-02T00-00-34.442Z"
 
