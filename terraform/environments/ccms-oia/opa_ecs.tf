@@ -85,9 +85,4 @@ resource "aws_ecs_service" "opahub" {
     aws_autoscaling_group.cluster_scaling_group
   ]
 
-  lifecycle {
-    ignore_changes = [
-      task_definition
-    ]
-  }
 }
