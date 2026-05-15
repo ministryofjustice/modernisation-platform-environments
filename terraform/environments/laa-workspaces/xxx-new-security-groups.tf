@@ -61,3 +61,26 @@ resource "aws_vpc_security_group_ingress_rule" "user_creation_ec2_ad" {
     { "Name" = "${local.application_name}-${local.environment}-user-creation-ec2-ad" }
   )
 }
+
+##############################################
+### AD Security Group Rules
+### Allow PowerShell AD cmdlets (port 9389)
+##############################################
+
+# Allow AD Web Services (ADWS) port 9389 from EC2 to AD
+# This is REQUIRED for PowerShell cmdlets like New-ADUser, Get-ADUser, etc.
+resource "aws_vpc_security_group_ingress_rule" "ad_adws_from_ec2" {
+  count = local.environment == "development" ? 1 : 0
+
+  security_group_id            = aws_directory_service_directory.workspaces_ad[0].security_group_id
+  description                  = "Allow AD Web Services (ADWS) from user creation EC2"
+  ip_protocol                  = "tcp"
+  from_port                    = 9389
+  to_port                      = 9389
+  referenced_security_group_id = aws_security_group.user_creation_ec2_sg[0].id
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-ad-adws-from-ec2" }
+  )
+}
