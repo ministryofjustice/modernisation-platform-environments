@@ -437,16 +437,7 @@ locals {
     heartbeat_endpoint = "0.0.0.0"
   }
 
-  probation_domains_list = local.application_data.accounts[local.environment].probation_domains
-  probation_secrets_placeholder = {
-    db_name            = "dps"
-    password           = "placeholder"
-    user               = "placeholder"
-    username           = "placeholder"
-    endpoint           = "0.0.0.0"
-    port               = "5432"
-    heartbeat_endpoint = "0.0.0.0"
-  }
+  probation_domains = local.application_data.accounts[local.environment].probation_domains
 
   # Operational DataStore Secrets PlaceHolder
   operational_datastore_secrets_placeholder = {
