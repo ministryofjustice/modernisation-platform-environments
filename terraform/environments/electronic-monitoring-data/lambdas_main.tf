@@ -298,7 +298,7 @@ module "dms_validation" {
 module "process_fms_metadata" {
   source                         = "./modules/lambdas"
   is_image                       = true
-  function_name                  = "fms_formatting_dispatcher"
+  function_name                  = "fms_expected_file_processor"
   role_name                      = aws_iam_role.process_fms_metadata.name
   role_arn                       = aws_iam_role.process_fms_metadata.arn
   handler                        = "process_fms_metadata.handler"
