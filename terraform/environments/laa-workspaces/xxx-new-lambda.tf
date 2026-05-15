@@ -33,19 +33,21 @@ resource "aws_lambda_function" "user_creation" {
 
   environment {
     variables = {
-      EC2_INSTANCE_ID       = aws_instance.user_creation_ec2[0].id
-      DIRECTORY_ID    = aws_directory_service_directory.workspaces_ad[0].id
+      # Must point to Windows EC2 instance for domain-joined PowerShell execution
+      EC2_INSTANCE_ID     = aws_instance.user_creation_ec2[0].id
+      DIRECTORY_ID        = aws_directory_service_directory.workspaces_ad[0].id
       WORKSPACE_BUNDLE_ID = local.workspace_types["standard"].bundle_id
-      KMS_KEY_ID      = aws_kms_key.ebs[0].arn
-      REGION          = local.application_data.accounts[local.environment].region
+      KMS_KEY_ID          = aws_kms_key.ebs[0].arn
+      REGION              = local.application_data.accounts[local.environment].region
     }
   }
 
   tags = merge(
     local.tags,
     {
-      "Name"   = "${local.application_name}-${local.environment}-user-creation-lambda"
-      "Purpose" = "User and WorkSpace creation automation"
+      "Name"        = "${local.application_name}-${local.environment}-user-creation-lambda"
+      "Purpose"     = "User and WorkSpace creation automation"
+      "EC2Instance" = aws_instance.user_creation_ec2[0].id # Tag to track dependency
     }
   )
 
