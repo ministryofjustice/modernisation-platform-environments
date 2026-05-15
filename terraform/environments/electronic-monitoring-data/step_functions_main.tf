@@ -78,7 +78,7 @@ module "ears_sars_step_function" {
 # ------------------------------------------
 
 module "gdpr_deletion_step_function" {
-  count        = local.is-development || local.is-preproduction ? 1 : 0
+  count        = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   source       = "./modules/step_function"
   name         = "gdpr_deletion"
   iam_policies = tomap({ "gdpr_deletion_step_function_policy" = aws_iam_policy.gdpr_delete_iam_policy[0] })
@@ -87,6 +87,29 @@ module "gdpr_deletion_step_function" {
       "cluster_arn"            = aws_ecs_cluster.emds-gdpr-cluster[0].arn
       "task_definition_family" = aws_ecs_task_definition.emds-gdpr-structured-data-deletion[0].family
       "container_name"         = "emds_gdpr_structured_data_deletion_job"
+      "security_groups_json"   = jsonencode([aws_security_group.ecs_generic.id])
+      "subnets_json"           = jsonencode(data.aws_subnets.shared-private.ids)
+      "athena_output_bucket"   = "s3://${module.s3-athena-bucket.bucket.id}/output/"
+    }
+  )
+  type = "STANDARD"
+}
+
+# ------------------------------------------
+# Iceberg Step Function
+# ------------------------------------------
+
+
+module "iceberg_table_maintenance_step_function" {
+  count        = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  source       = "./modules/step_function"
+  name         = "iceberg_table_maintenance"
+  iam_policies = tomap({ "gdpr_deletion_step_function_policy" = aws_iam_policy.gdpr_delete_iam_policy[0] })
+  variable_dictionary = tomap(
+    {
+      "cluster_arn"            = aws_ecs_cluster.emds-gdpr-cluster[0].arn
+      "task_definition_family" = aws_ecs_task_definition.emds-gdpr-iceberg-table-maintenance[0].family
+      "container_name"         = "emds_gdpr_iceberg_table_maintenance_job"
       "security_groups_json"   = jsonencode([aws_security_group.ecs_generic.id])
       "subnets_json"           = jsonencode(data.aws_subnets.shared-private.ids)
       "athena_output_bucket"   = "s3://${module.s3-athena-bucket.bucket.id}/output/"

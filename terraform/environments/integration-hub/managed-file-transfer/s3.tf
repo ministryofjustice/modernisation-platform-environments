@@ -22,6 +22,10 @@ module "s3_bucket" {
   restrict_public_buckets = true
 
   lifecycle_rule = each.value.lifecycle_rule
+  versioning = {
+    status     = true
+    mfa_delete = false
+  }
 }
 
 module "s3_bucket_notification" {

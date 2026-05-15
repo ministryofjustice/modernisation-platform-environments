@@ -351,8 +351,8 @@ locals {
   klayers_account_id = data.aws_ssm_parameter.klayers_account.value
 
   layer_arns = {
-    numpy  = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-numpy:14"
-    pillow = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-pillow:2"
+  # numpy  = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-numpy:14"
+  # pillow = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-pillow:2"
   }
 
 }
