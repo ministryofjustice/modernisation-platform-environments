@@ -57,6 +57,6 @@ data "aws_eks_cluster" "cluster" {
 
 data "aws_eks_cluster_auth" "cluster" {
   count      = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
-  name       = module.eks[0].cluster_name
+  name       = local.cluster_name
   depends_on = [module.eks]
 }
