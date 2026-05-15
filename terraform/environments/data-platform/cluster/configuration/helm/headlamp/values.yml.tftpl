@@ -1,4 +1,10 @@
 ---
+tolerations:
+  - operator: Exists
+    effect: NoSchedule
+  - operator: Exists
+    effect: NoExecute
+
 serviceAccount:
   create: true
   name: ${service_account_name}
@@ -18,4 +24,4 @@ httpRoute:
   parentRefs:
     - name: ${gateway_name}
       namespace: ${gateway_namespace}
-  hostnames: headlamp.${gateway_hostname}
+  hostNames: headlamp.${gateway_hostname}
