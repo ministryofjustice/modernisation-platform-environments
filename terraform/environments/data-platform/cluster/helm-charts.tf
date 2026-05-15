@@ -92,6 +92,8 @@ resource "helm_release" "cluster_autoscaler" {
 resource "helm_release" "headlamp" {
   /* https://artifacthub.io/packages/helm/headlamp/headlamp */
 
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
   name       = "headlamp"
   repository = "https://kubernetes-sigs.github.io/headlamp"
   chart      = "headlamp"
