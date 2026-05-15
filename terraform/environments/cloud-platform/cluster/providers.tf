@@ -12,15 +12,14 @@ provider "helm" {
   }
 }
 
-provider "helm" {
-  kubernetes = {
-    host                   = try(module.eks[0].cluster_endpoint, "")
-    cluster_ca_certificate = try(base64decode(module.eks[0].cluster_certificate_authority_data), "")
+provider "kubectl" {
+  host                   = try(module.eks[0].cluster_endpoint, "")
+  cluster_ca_certificate = try(base64decode(module.eks[0].cluster_certificate_authority_data), "")
+  load_config_file       = false
 
-    exec = {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      command     = "aws"
-      args        = ["eks", "get-token", "--cluster-name", local.cluster_name]
-    }
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "aws"
+    args        = ["eks", "get-token", "--cluster-name", local.cluster_name]
   }
 }
