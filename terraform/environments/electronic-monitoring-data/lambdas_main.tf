@@ -715,7 +715,8 @@ module "mdss_reconciler" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "mdss_load_redrive_controller"
-  image_name                     = "mdss_reconciler"
+  image_name                     = "mdss_load_redrive_controller"
+  handler                        = "mdss_load_redrive_controller.handler"
   role_name                      = aws_iam_role.mdss_reconciler.name
   role_arn                       = aws_iam_role.mdss_reconciler.arn
   memory_size                    = 512
@@ -729,7 +730,18 @@ module "mdss_reconciler" {
   subnet_ids         = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    # keep existing env vars
+    ENVIRONMENT_NAME                        = local.environment_shorthand
+    SOURCE_BUCKET                           = module.s3-raw-formatted-data-bucket.bucket.id
+    LOAD_MDSS_QUEUE_URL                     = module.load_mdss_event_queue.sqs_queue.id
+    MDSS_MANIFEST_BUCKET                    = module.s3-metadata-bucket.bucket.id
+    MDSS_MANIFEST_PREFIX                    = "mdss-manifest/current"
+    LOOKBACK_DAYS                           = "2"
+    MIN_OBJECT_AGE_MINUTES                  = "10"
+    STUCK_STARTED_MINUTES                   = "60"
+    AUTO_REDRIVE_TRANSIENT_COOLDOWN_MINUTES = "60"
+    AUTO_REDRIVE_UNKNOWN_COOLDOWN_MINUTES   = "60"
+    AUTO_REDRIVE_TRANSIENT_MAX_ATTEMPTS     = "2"
+    AUTO_REDRIVE_UNKNOWN_MAX_ATTEMPTS       = "1"
   }
 }
 
