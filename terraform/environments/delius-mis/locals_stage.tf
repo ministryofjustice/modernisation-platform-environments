@@ -302,10 +302,10 @@ locals {
 
   # BOE DB config
   boe_db_config_stage = {
-    instance_type  = "m7i.large"
-    instance_count = 1
+    instance_type          = "m7i.large"
+    instance_count         = 1
     standby_instance_count = 0
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -348,10 +348,10 @@ locals {
 
   # DSD DB config
   dsd_db_config_stage = {
-    instance_type  = "m7i.large"
-    instance_count = 1
+    instance_type          = "m7i.large"
+    instance_count         = 1
     standby_instance_count = 0
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -394,8 +394,8 @@ locals {
 
   # MIS DB config
   mis_db_config_stage = {
-    instance_type  = "r7i.4xlarge" # manually turn off when not in use to save costs
-    instance_count = 1
+    instance_type          = "r7i.4xlarge" # manually turn off when not in use to save costs
+    instance_count         = 1
     standby_instance_count = 0
     # most recent 8_5 image, ami builder needs fixing after this
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2025-03-02T00-00-34.442Z"

@@ -92,7 +92,7 @@ module "oracle_db_dsd" {
 }
 
 module "oracle_db_dsd_shared" {
-  source = "../../../delius-core/modules/components/oracle_db_instance"
+  source         = "../../../delius-core/modules/components/oracle_db_instance"
   account_config = var.account_config
   account_info   = var.account_info
 
@@ -105,8 +105,8 @@ module "oracle_db_dsd_shared" {
   server_type_tag     = "mis_db"
   database_tag_prefix = "dsd"
 
-  count             = try(var.dsd_db_config.standby_instance_count, 1)
-  db_count_index    = count.index + 1
+  count          = try(var.dsd_db_config.standby_instance_count, 1)
+  db_count_index = count.index + 1
 
   ec2_instance_type = var.dsd_db_config.instance_type
 
@@ -123,7 +123,7 @@ module "oracle_db_dsd_shared" {
   environment_config = var.environment_config
   subnet_id          = var.account_config.ordered_private_subnet_ids[(count.index + length(module.oracle_db_dsd)) % 3]
   availability_zone  = "eu-west-2${lookup(local.availability_zone_map, (count.index + length(module.oracle_db_dsd)) % 3, "a")}"
-  tags = local.tags
+  tags               = local.tags
   user_data = templatefile(
     "${path.module}/templates/userdata.sh.tftpl",
     var.dsd_db_config.ansible_user_data_config
@@ -199,7 +199,7 @@ module "oracle_db_boe" {
 }
 
 module "oracle_db_boe_shared" {
-  source = "../../../delius-core/modules/components/oracle_db_instance"
+  source         = "../../../delius-core/modules/components/oracle_db_instance"
   account_config = var.account_config
   account_info   = var.account_info
 
@@ -212,8 +212,8 @@ module "oracle_db_boe_shared" {
   server_type_tag     = "mis_db"
   database_tag_prefix = "boe"
 
-  count             = try(var.boe_db_config.standby_instance_count, 1)
-  db_count_index    = count.index + 1
+  count          = try(var.boe_db_config.standby_instance_count, 1)
+  db_count_index = count.index + 1
 
   ec2_instance_type = var.boe_db_config.instance_type
 
@@ -230,7 +230,7 @@ module "oracle_db_boe_shared" {
   environment_config = var.environment_config
   subnet_id          = var.account_config.ordered_private_subnet_ids[(count.index + length(module.oracle_db_boe)) % 3]
   availability_zone  = "eu-west-2${lookup(local.availability_zone_map, (count.index + length(module.oracle_db_boe)) % 3, "a")}"
-  tags = local.tags
+  tags               = local.tags
   user_data = templatefile(
     "${path.module}/templates/userdata.sh.tftpl",
     var.boe_db_config.ansible_user_data_config
@@ -306,7 +306,7 @@ module "oracle_db_mis" {
 }
 
 module "oracle_db_mis_shared" {
-  source = "../../../delius-core/modules/components/oracle_db_instance"
+  source         = "../../../delius-core/modules/components/oracle_db_instance"
   account_config = var.account_config
   account_info   = var.account_info
 
@@ -319,8 +319,8 @@ module "oracle_db_mis_shared" {
   server_type_tag     = "mis_db"
   database_tag_prefix = "mis"
 
-  count             = try(var.mis_db_config.standby_instance_count, 1)
-  db_count_index    = count.index + 1
+  count          = try(var.mis_db_config.standby_instance_count, 1)
+  db_count_index = count.index + 1
 
   ec2_instance_type = var.mis_db_config.instance_type
 
@@ -337,7 +337,7 @@ module "oracle_db_mis_shared" {
   environment_config = var.environment_config
   subnet_id          = var.account_config.ordered_private_subnet_ids[(count.index + length(module.oracle_db_mis)) % 3]
   availability_zone  = "eu-west-2${lookup(local.availability_zone_map, (count.index + length(module.oracle_db_mis)) % 3, "a")}"
-  tags = local.tags
+  tags               = local.tags
   user_data = templatefile(
     "${path.module}/templates/userdata.sh.tftpl",
     var.mis_db_config.ansible_user_data_config
