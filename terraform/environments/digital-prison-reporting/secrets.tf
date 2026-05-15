@@ -709,6 +709,29 @@ data "aws_iam_policy_document" "crossaccount_secret_kms" {
       identifiers = ["arn:aws:iam::754256621582:root"]
     }
   }
+
+  dynamic "statement" {
+    for_each = { for k, v in local.probation_domains : k => v if v.share_with_cloud_platform }
+
+    content {
+      sid    = "AllowLambdaDecrypt-${statement.key}"
+      effect = "Allow"
+
+      actions = [
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
+      ]
+
+      resources = ["*"]
+
+      principals {
+        type = "AWS"
+        identifiers = [
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/dpr-${statement.key}-federated-query-execution-role"
+        ]
+      }
+    }
+  }
 }
 
 resource "aws_kms_alias" "crossaccount_secret_kms_alias" {
