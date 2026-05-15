@@ -9,10 +9,6 @@ module "test_kms" {
   enable_default_policy = true
 
   deletion_window_in_days = 7
-
-  tags = {
-    "business-unit" = "lalala"
-  }
 }
 
 module "test_two_kms" {
@@ -26,10 +22,6 @@ module "test_two_kms" {
   enable_default_policy = true
 
   deletion_window_in_days = 7
-
-  tags = {
-    "is-production" = "lalala"
-  }
 }
 
 # COAT GitHub repositories KMS for Terraform state bucket
