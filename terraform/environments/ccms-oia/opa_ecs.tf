@@ -84,4 +84,10 @@ resource "aws_ecs_service" "opahub" {
     aws_iam_role_policy_attachment.ecs_task_execution_role,
     aws_autoscaling_group.cluster_scaling_group
   ]
+
+  lifecycle {
+    ignore_changes = [
+      task_definition
+    ]
+  }
 }
