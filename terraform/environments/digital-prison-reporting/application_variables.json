@@ -310,10 +310,6 @@
       "setup_redshift_schedule": true,
       "scheduled_dataset_lambda_version": "vLatest",
       "probation_domains": {
-        "pr-test-domain": {
-          "share_with_cloud_platform": false,
-          "create_glue_connection": false
-        },
         "pr-assessment-view": {
           "share_with_cloud_platform": true,
           "create_glue_connection": false
@@ -528,10 +524,6 @@
       "enable_redshift_health_check": true,
       "scheduled_dataset_lambda_version": "vLatest",
       "probation_domains": {
-        "pr-test-domain": {
-          "share_with_cloud_platform": false,
-          "create_glue_connection": false
-        },
         "pr-assessment-view": {
           "share_with_cloud_platform": true,
           "create_glue_connection": false
@@ -769,10 +761,6 @@
       "setup_redshift_schedule": false,
       "scheduled_dataset_lambda_version": "vLatest",
       "probation_domains": {
-        "pr-test-domain": {
-          "share_with_cloud_platform": false,
-          "create_glue_connection": false
-        },
         "pr-assessment-view": {
           "share_with_cloud_platform": true,
           "create_glue_connection": false
