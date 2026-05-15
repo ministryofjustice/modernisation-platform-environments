@@ -21,8 +21,14 @@ locals {
     item => "jdbc:postgresql://${local.dps_endpoint[item]}:${local.dps_port[item]}/${local.dps_database[item]}"
   }
 
+  probation_source_secrets_requiring_glue_connections = {
+    for key, value in local.probation_domains :
+    key => module.probation_source_secret[key]
+    if value.create_glue_connection
+  }
+
   probation_connection_string = {
-    for key, entity in module.probation_source_secret :
+    for key, entity in local.probation_source_secrets_requiring_glue_connections :
     key => "jdbc:postgresql://${entity.secret_contents_endpoint}:${entity.secret_contents_port}/${entity.secret_contents_db_name}"
   }
 }
