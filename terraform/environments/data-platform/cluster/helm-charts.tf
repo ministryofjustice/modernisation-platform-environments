@@ -89,6 +89,30 @@ resource "helm_release" "cluster_autoscaler" {
   depends_on = [module.cluster_autoscaler_iam_role]
 }
 
+resource "helm_release" "headlamp" {
+  /* https://artifacthub.io/packages/helm/headlamp/headlamp */
+
+  name       = "headlamp"
+  repository = "https://kubernetes-sigs.github.io/headlamp"
+  chart      = "headlamp"
+  version    = local.cluster_configuration.helm_chart_versions.headlamp
+  namespace  = module.headlamp_namespace.name
+
+  values = [
+    templatefile(
+      "${path.module}/configuration/helm/headlamp/values.yml.tftpl",
+      {
+        # testing for now
+        service_account_name = "headlamp-sa"
+        gateway_hostname     = trimprefix(local.cluster_configuration.shared_services_gateway_hostname, "*.")
+        cluster_role_name    = kubernetes_cluster_role_v1.headlamp.metadata[0].name
+        gateway_name         = "shared-gateway"
+        gateway_namespace    = "shared-services"
+      }
+    )
+  ]
+}
+
 resource "helm_release" "karpenter_crd" {
   /* https://github.com/aws/karpenter-provider-aws/releases */
 

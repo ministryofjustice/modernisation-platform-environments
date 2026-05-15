@@ -47,6 +47,13 @@ module "karpenter_namespace" {
   workload = "system"
 }
 
+module "headlamp_namespace" {
+  source = "./modules/kubernetes/namespace"
+
+  name     = "headlamp"
+  workload = "system"
+}
+
 module "external_dns_namespace" {
   source = "./modules/kubernetes/namespace"
 
