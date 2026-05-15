@@ -53,17 +53,44 @@ resource "aws_instance" "user_creation_ec2" {
   # Domain join and script deployment configuration
   user_data = <<-USERDATA
     <powershell>
+    # Set DNS servers to AD DNS before domain join
+    $adDnsServers = @("10.200.1.245", "10.200.2.11")
+    $interfaceAlias = (Get-NetAdapter | Where-Object {$_.Status -eq "Up"} | Select-Object -First 1).Name
+    Set-DnsClientServerAddress -InterfaceAlias $interfaceAlias -ServerAddresses $adDnsServers
+    
+    Write-Host "DNS servers configured: $adDnsServers"
+    Start-Sleep -Seconds 5
+    
+    # Verify DNS resolution
+    $dnsTest = Resolve-DnsName -Name "${local.application_data.accounts[local.environment].ad_directory_name}" -ErrorAction SilentlyContinue
+    if ($dnsTest) {
+        Write-Host "DNS resolution successful"
+    } else {
+        Write-Host "WARNING: DNS resolution failed, but continuing with domain join"
+    }
+    
     # Join domain
     $domain = "${local.application_data.accounts[local.environment].ad_directory_name}"
     $password = "${random_password.ad_admin_password[0].result}" | ConvertTo-SecureString -AsPlainText -Force
     $username = "Admin"
     $credential = New-Object System.Management.Automation.PSCredential("$domain\$username", $password)
     
-    Add-Computer -DomainName $domain -Credential $credential -Restart -Force
+    try {
+        Add-Computer -DomainName $domain -Credential $credential -Restart -Force -ErrorAction Stop
+        Write-Host "Domain join initiated, restarting..."
+    } catch {
+        Write-Host "Domain join failed: $_"
+        Write-Host "Will retry after reboot..."
+    }
     </powershell>
     <persist>true</persist>
     <powershell>
     # This runs after domain join restart
+    # Re-set DNS servers (in case they were reset)
+    $adDnsServers = @("10.200.1.245", "10.200.2.11")
+    $interfaceAlias = (Get-NetAdapter | Where-Object {$_.Status -eq "Up"} | Select-Object -First 1).Name
+    Set-DnsClientServerAddress -InterfaceAlias $interfaceAlias -ServerAddresses $adDnsServers
+    
     # Install AD PowerShell tools
     Install-WindowsFeature -Name RSAT-AD-PowerShell
     
