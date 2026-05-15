@@ -90,7 +90,8 @@ resource "aws_iam_policy" "github_actions_ds_data_access" {
           "ds-data:UpdateUser",
           "ds-data:DeleteUser",
           "ds-data:DescribeUser",
-          "ds-data:ListUsers"
+          "ds-data:ListUsers",
+          "ds-data:AddGroupMember"
         ]
         Resource = "arn:aws:ds:${local.application_data.accounts[local.environment].region}:${data.aws_caller_identity.current.account_id}:directory/${aws_directory_service_directory.workspaces_ad[0].id}"
       },

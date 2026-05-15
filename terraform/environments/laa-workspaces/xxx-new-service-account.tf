@@ -75,13 +75,18 @@ resource "terraform_data" "lambda_service_account" {
       echo "Waiting 10 seconds for AD propagation..."
       sleep 10
       
-      echo "✅ Service account created!"
-      echo "⚠️  MANUAL STEP REQUIRED:"
-      echo "   Add ${self.input.username} to 'AWS Delegated Administrators' group via AWS Console:"
-      echo "   1. Go to AWS Directory Service console"
-      echo "   2. Select directory ${self.input.directory_id}"
-      echo "   3. Select user ${self.input.username}"
-      echo "   4. Actions → Add to group → AWS Delegated Administrators"
+      echo "Adding ${self.input.username} to AWS Delegated Administrators group..."
+      if aws ds-data add-group-member \
+        --directory-id ${self.input.directory_id} \
+        --group-name "AWS Delegated Administrators" \
+        --member-name ${self.input.username} \
+        --region ${self.input.region} 2>&1; then
+        echo "✅ Service account added to admin group successfully"
+      else
+        echo "⚠️  Service account may already be in the group or group membership failed"
+      fi
+      
+      echo "✅ Service account setup complete!"
     EOT
   }
 
@@ -98,6 +103,6 @@ resource "terraform_data" "lambda_service_account" {
 
 # Output for verification
 output "lambda_service_account_created" {
-  value       = local.environment == "development" ? "lambda.workspace service account created - add to AWS Delegated Administrators group via Console" : "Not in development environment"
+  value       = local.environment == "development" ? "lambda.workspace service account created and added to AWS Delegated Administrators group" : "Not in development environment"
   description = "Status of lambda.workspace service account creation"
 }

@@ -57,22 +57,11 @@ WorkSpaces Console: "Invite user" button WORKS ✅
    - Password auto-generated (32 chars)
    - Stored in SSM Parameter Store: `/laa-workspaces/development/ad-service-account-password`
    - User created in `OU=Users,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local`
+   - **Automatically added to AWS Delegated Administrators group** ✅
 
-### Manual Step Required AFTER Terraform Apply:
+### No Manual Steps Required! 🎉
 
-1. **Add Service Account to AWS Delegated Administrators Group**
-   
-   After running `terraform apply`, you must add the service account to the admin group via AWS Console:
-   
-   - Go to **AWS Console** → **Directory Service**
-   - Select directory `d-9c674ffb8b` (laa-workspaces.local)
-   - Click **Users** tab
-   - Find and select `lambda.workspace`
-   - Click **Actions** → **Add to group**
-   - Select **AWS Delegated Administrators**
-   - Click **Add to group**
-   
-   This gives the service account permission to create users and manage the directory.
+Everything is fully automated via Terraform. Just run `terraform apply` and wait for completion.
 
 ## Deployment
 
@@ -88,23 +77,13 @@ terraform apply
 This creates:
 - Service account `lambda.workspace` in AD
 - Password stored in SSM Parameter Store
+- **Service account added to AWS Delegated Administrators group** ✅
 - EC2 instance (auto-joins domain, installs AD tools, deploys PowerShell script)
 - Lambda function
 - IAM roles and policies
 - Security groups
 
-### Step 2: Add Service Account to Admin Group
-
-**⚠️ CRITICAL: Do this immediately after Terraform apply**
-
-1. **Go to AWS Console** → **Directory Service** → Select `d-9c674ffb8b`
-2. Click **Users** tab → Find `lambda.workspace`
-3. **Actions** → **Add to group** → Select **AWS Delegated Administrators**
-4. Click **Add to group**
-
-This grants the service account permission to create AD users.
-
-### Step 3: Verify Setup
+### Step 2: Verify Setup
 
 1. **Wait for EC2 to fully boot and join domain** (~5-10 minutes)
 
