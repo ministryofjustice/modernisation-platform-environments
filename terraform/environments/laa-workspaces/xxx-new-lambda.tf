@@ -33,7 +33,7 @@ resource "aws_lambda_function" "user_creation" {
 
   environment {
     variables = {
-      EC2_INSTANCE_ID = aws_instance.user_creation_ec2[0].id
+      EC2_INSTANCE_ID       = aws_instance.user_creation_ec2[0].id
       DIRECTORY_ID    = aws_directory_service_directory.workspaces_ad[0].id
       WORKSPACE_BUNDLE_ID = local.workspace_types["standard"].bundle_id
       KMS_KEY_ID      = aws_kms_key.ebs[0].arn
