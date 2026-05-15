@@ -233,34 +233,17 @@ resource "aws_secretsmanager_secret_version" "dps" {
 }
 
 # Probation Source Secrets
-resource "aws_secretsmanager_secret" "probation" {
-  #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
-  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
+module "probation_source_secret" {
+  for_each                         = local.probation_domains
 
-  for_each = toset(local.probation_domains_list)
-  name     = "external/${local.project}-${each.value}-source-secrets"
+  source                           = "./modules/data_source_secret"
 
-  tags = merge(
-    local.all_tags,
-    {
-      dpr-name          = "external/${local.project}-${each.value}-source-secrets"
-      dpr-resource-type = "Secrets"
-      dpr-source        = "Probation"
-      dpr-domain        = each.value
-      dpr-jira          = "PDHD-1111"
-    }
-  )
-}
-
-resource "aws_secretsmanager_secret_version" "probation" {
-  for_each = toset(local.probation_domains_list)
-
-  secret_id     = aws_secretsmanager_secret.probation[each.key].id
-  secret_string = jsonencode(local.probation_secrets_placeholder)
-
-  lifecycle {
-    ignore_changes = [secret_string, ]
-  }
+  cloud_platform_aws_account_id    = "754256621582"
+  cloud_platform_shared_kms_key_id = aws_kms_key.crossaccount_secret.arn
+  project_id                       = local.project
+  ingestion_domain_name            = each.key
+  is_cloud_platform_accessible     = each.value.share_with_cloud_platform
+  tags                             = local.all_tags
 }
 
 # Redshift Access Secrets
