@@ -1,0 +1,33 @@
+##############################################
+### VPC DHCP Options for Active Directory
+###
+### Configures VPC to use AD DNS servers for domain name resolution
+##############################################
+
+resource "aws_vpc_dhcp_options" "ad_dhcp_options" {
+  count = local.environment == "development" ? 1 : 0
+
+  domain_name         = local.application_data.accounts[local.environment].ad_directory_name
+  domain_name_servers = aws_directory_service_directory.workspaces_ad[0].dns_ip_addresses
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-ad-dhcp-options" }
+  )
+}
+
+resource "aws_vpc_dhcp_options_association" "ad_dhcp_association" {
+  count = local.environment == "development" ? 1 : 0
+
+  vpc_id          = data.terraform_remote_state.workspace_components.outputs.vpc_id
+  dhcp_options_id = aws_vpc_dhcp_options.ad_dhcp_options[0].id
+}
+
+##############################################
+### Outputs
+##############################################
+
+output "ad_dns_servers" {
+  value       = local.environment == "development" ? aws_directory_service_directory.workspaces_ad[0].dns_ip_addresses : null
+  description = "AD DNS server IP addresses"
+}

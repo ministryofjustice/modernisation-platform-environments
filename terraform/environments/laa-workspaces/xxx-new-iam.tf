@@ -40,6 +40,38 @@ resource "aws_iam_role_policy_attachment" "user_creation_ec2_directory_service" 
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMDirectoryServiceAccess"
 }
 
+# Allow EC2 to read SSM parameters (for service account password and user passwords)
+resource "aws_iam_role_policy" "user_creation_ec2_ssm_parameters" {
+  count = local.environment == "development" ? 1 : 0
+
+  name = "${local.application_name}-${local.environment}-user-creation-ec2-ssm-params"
+  role = aws_iam_role.user_creation_ec2_role[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:PutParameter"
+        ]
+        Resource = [
+          "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${data.aws_caller_identity.current.account_id}:parameter/laa-workspaces/${local.environment}/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 resource "aws_iam_instance_profile" "user_creation_ec2_profile" {
   count = local.environment == "development" ? 1 : 0
 
