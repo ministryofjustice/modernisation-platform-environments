@@ -52,6 +52,9 @@ module "headlamp_namespace" {
 
   name     = "headlamp"
   workload = "system"
+  additional_labels = {
+    "compute.data-platform.service.justice.gov.uk/shared-gateway-enabled" = "true"
+  }
 }
 
 module "external_dns_namespace" {
