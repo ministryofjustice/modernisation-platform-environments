@@ -25,3 +25,23 @@ httpRoute:
     - name: ${gateway_name}
       namespace: ${gateway_namespace}
   hostNames: headlamp.${gateway_hostname}
+
+initContainers:
+  - name: karpenter-plugin
+    image: ghcr.io/headlamp-k8s/headlamp-plugin-karpenter:v0.2.0
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cp -r /plugins/* /headlamp/plugins
+    volumeMounts:
+      - name: headlamp-plugins
+        mountPath: /headlamp/plugins
+
+volumes:
+  - name: headlamp-plugins
+    emptyDir: {}
+
+volumeMounts:
+  - name: headlamp-plugins
+    mountPath: /headlamp/plugins

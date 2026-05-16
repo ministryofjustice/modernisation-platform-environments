@@ -104,4 +104,12 @@ resource "kubernetes_cluster_role_v1" "headlamp" {
     ]
     verbs = ["get", "list", "watch"]
   }
+
+  rule {
+    api_groups = ["apiextensions.k8s.io"]
+    resources = [
+      "customresourcedefinitions",
+    ]
+    verbs = ["get", "list", "watch"]
+  }
 }
