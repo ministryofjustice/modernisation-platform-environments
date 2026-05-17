@@ -82,10 +82,57 @@ locals {
   delius_microservices_configs_training = {
 
     weblogic = {
-      image_tag        = "6.2.0.3"
-      container_port   = 8080
-      container_memory = 4096
-      container_cpu    = 2048
+      image_tag         = "6.2.0.3"
+      container_port    = 8080
+      container_memory  = 4096
+      container_cpu     = 2048
+      ec2_instance_type = "r5.2xlarge"
+    }
+
+    weblogic_params = {
+      API_CLIENT_ID               = "delius-ui-client"
+      AWS_REGION                  = "eu-west-2"
+      BREACH_NOTICE_API_URL       = ""
+      BREACH_NOTICE_UI_URL_FORMAT = ""
+      COOKIE_SECURE               = "true"
+      # DELIUS_API_URL                    = "" # No longer needed
+      DMS_HOST                          = ""
+      DMS_OFFICE_URI_HOST               = ""
+      DMS_OFFICE_URI_PORT               = "443"
+      DMS_PORT                          = "443"
+      DMS_PROTOCOL                      = "https"
+      EIS_USER_CONTEXT                  = "cn=EISUsers,ou=Users,dc=moj,dc=com"
+      ELASTICSEARCH_URL                 = ""
+      GDPR_URL                          = "/gdpr/ui/homepage" # GDPR not deployed to CP yet, <URL>/gdpr/ui/homepage
+      JDBC_CONNECTION_POOL_MAX_CAPACITY = "100"
+      JDBC_CONNECTION_POOL_MIN_CAPACITY = "50"
+      JDBC_URL                          = ""
+      JDBC_USERNAME                     = "delius_pool"
+      LDAP_HOST                         = ""
+      LDAP_PRINCIPAL                    = "cn=admin,dc=moj,dc=com"
+      LOG_LEVEL_NDELIUS                 = "DEBUG"
+      MERGE_API_URL                     = ""
+      MERGE_OAUTH_URL                   = ""
+      MERGE_URL                         = ""
+      NDELIUS_CLIENT_ID                 = "migrations_client_id"
+      OAUTH_CALLBACK_URL                = ""
+      OAUTH_CLIENT_ID                   = "delius-ui"
+      OAUTH_DEFAULT_SCOPE               = "delius"
+      OAUTH_LOGIN_ENABLED               = "false"
+      OAUTH_LOGIN_NAME                  = ""
+      OAUTH_TOKEN_VERIFICATION_URL      = ""
+      OAUTH_URL                         = ""
+      OFFENDER_SEARCH_API_URL           = ""
+      PASSWORD_RESET_URL                = ""
+      PDFCREATION_TEMPLATES             = "shortFormatPreSentenceReport|paroleParom1Report|oralReport"
+      PDFCREATION_URL                   = ""
+      PREPARE_CASE_FOR_SENTENCE_URL     = ""
+      PSR_SERVICE_URL                   = ""
+      TRAINING_MODE_APP_NAME            = "National Delius - TEST USE ONLY"
+      TZ                                = "Europe/London"
+      USERMANAGEMENT_URL                = ""
+      USER_CONTEXT                      = "ou=Users,dc=moj,dc=com"
+      USER_MEM_ARGS                     = "-XX:MaxRAMPercentage=90.0"
     }
 
     weblogic_eis = {
@@ -152,4 +199,17 @@ locals {
     # Auditing from the Pre-Prod environment is considered production data
     is-production = true
   }
+
+  db_backup_config_training = {
+    object_lock_days             = 0
+    expire_current_after_days    = 200
+    expire_noncurrent_after_days = 10
+    transition = [
+      {
+        days          = 30
+        storage_class = "STANDARD_IA"
+      }
+    ]
+  }
+
 }
