@@ -1,14 +1,4 @@
 ---
-tolerations:
-  - operator: Exists
-    effect: NoSchedule
-  - operator: Exists
-    effect: NoExecute
-
-serviceAccount:
-  create: true
-  name: ${service_account_name}
-
 clusterRoleBinding:
   create: true
   clusterRoleName: ${cluster_role_name}
@@ -16,6 +6,13 @@ clusterRoleBinding:
 config:
   pluginsDir: /headlamp/plugins
   watchPlugins: true
+
+httpRoute:
+  enabled: true
+  parentRefs:
+    - name: ${gateway_name}
+      namespace: ${gateway_namespace}
+  hostNames: headlamp.${gateway_hostname}
 
 pluginsManager:
   enabled: true
@@ -28,12 +25,12 @@ pluginsManager:
       parallel: true
       maxConcurrent: 2
 
-ingress:
-  enabled: false
+serviceAccount:
+  create: true
+  name: ${service_account_name}
 
-httpRoute:
-  enabled: true
-  parentRefs:
-    - name: ${gateway_name}
-      namespace: ${gateway_namespace}
-  hostNames: headlamp.${gateway_hostname}
+tolerations:
+  - operator: Exists
+    effect: NoSchedule
+  - operator: Exists
+    effect: NoExecute
