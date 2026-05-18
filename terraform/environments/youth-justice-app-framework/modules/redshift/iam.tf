@@ -16,9 +16,16 @@ resource "aws_iam_role" "redshift" {
         ]
       },
       "Effect": "Allow"
+      },
+      {
+        "Action": "sts:AssumeRole",
+        "Principal": {
+          "AWS": "arn:aws:iam::${var.account_id}:role/reporting-operations"
+        },
+        "Effect": "Allow"
       }
-  ]
-}
+    ]
+  }
 EOF
 }
 
