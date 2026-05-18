@@ -145,8 +145,14 @@ chmod +x /app/scripts/yjsm-log-purge.sh
 chmod +x /app/scripts/log-cleanup.sh
 chmod +x /app/scripts/yjsm-weekly-restart.sh
 
+# nginx install script
+cat > /app/scripts/update-nginx.sh <<'NGINXEOF'
+${nginx_script}
+NGINXEOF
+chmod +x /app/scripts/update-nginx.sh
+
 # Cron jobs
-crontab -l 2>/dev/null | cat - <<'CRON' | crontab -
+crontab - <<'CRON'
 0 4 * * * /app/scripts/yjsm-log-purge.sh
 0 5 * * * /usr/sbin/aide --check
 0 21 * * 7 /app/scripts/yjsm-weekly-restart.sh
@@ -205,13 +211,6 @@ RestartSec=5
 [Install]
 WantedBy=multi-user.target
 EOF
-
-# nginx install script
-cat > /app/scripts/update-nginx.sh <<'NGINXEOF'
-${nginx_script}
-NGINXEOF
-chmod +x /app/scripts/update-nginx.sh
-
 
 # Reload systemd and enable services
 systemctl daemon-reload
