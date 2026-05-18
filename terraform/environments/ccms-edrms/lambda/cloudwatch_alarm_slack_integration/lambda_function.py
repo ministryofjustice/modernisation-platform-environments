@@ -1,6 +1,6 @@
 """
 AWS Lambda function to pull CloudWatch Alarm from SNS Topic and
-publish into Slack. This will also publish GuardDuty findings, EventBridge events and S3 events into Slack.
+publish into Slack. This will also publish GuardDuty findings and S3 events into Slack.
 This has also started catering for Certificate Expiry notifications from EventBridge.
 """
 
@@ -353,79 +353,76 @@ class NotificationService:
             }
 
         elif type == "S3 Event":
-            if "Records" not in alarmdetails or not alarmdetails["Records"]:
-                s3_info = alarmdetails.get("detail", {})
-                bucket_name = s3_info.get("bucket", {}).get("name", "Unknown Bucket")
-                object_key = s3_info.get("object", {}).get("key", "Unknown Key")
-                object_size = s3_info.get("object", {}).get("size", "Unknown Size")
-                if "rejected" in object_key.lower():
-                    emoji = ":broken_heart:"
-                else:             
-                    emoji = ":white_check_mark:"
-                header = f"{emoji} *S3 Object Uploaded on bucket {bucket_name}.*"
-                payload = {
-                    "blocks": [
-                        {
-                            "type": "section",
-                            "text": {"type": "mrkdwn", "text": header}
-                        },
-                        {
-                            "type": "section",
-                            "text": {
-                                "type": "mrkdwn",
-                                "text": (
-                                    "*Details*\n"
-                                    f" • *Object:* `s3://{bucket_name}/{object_key}`\n"
-                                    f" • *Size (bytes):* {object_size} bytes\n"
-                                    f" • *Timestamp:* {timestamp}"
-                                )
-                            }
+            records = alarmdetails.get("Records", [])
+            record = records[0] if records else {}
+
+            s3_info = record.get("s3", {})
+            bucket = s3_info.get("bucket", {})
+            obj = s3_info.get("object", {})
+
+            bucket_name = bucket.get("name", "Unknown Bucket")
+            object_key = obj.get("key", "Unknown Key")
+            object_size = obj.get("size", "Unknown Size")
+
+            user_identity = record.get("userIdentity", {})
+            principal_id = user_identity.get("principalId", "Unknown Principal")
+
+            header = f":white_check_mark: *S3 Object Uploaded on bucket {bucket_name}.*"
+
+            payload = {
+                "blocks": [
+                    {
+                        "type": "section",
+                        "text": {"type": "mrkdwn", "text": header}
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": (
+                                "*Details*\n"
+                                f" • *Object:* `s3://{bucket_name}/{object_key}`\n"
+                                f" • *Size (bytes):* {object_size} bytes\n"
+                                f" • *Principal:* {principal_id}\n"
+                                f" • *Timestamp:* {timestamp}"
+                            )
                         }
+                    }
+                ]
+            }
+
+        # RDS miantenance event  
+        elif type == "RDS Maintenance":
+            database_name = alarmdetails.get('SourceArn', '').split(':')[-1]
+            event_type = ', '.join(alarmdetails.get('EventCategories', ['maintenance']))
+            event_message = alarmdetails.get('Message', 'RDS maintenance event')
+            
+            blocks = [
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": f"🔧 RDS Maintenance Notification"
+                    }
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {"type": "mrkdwn", "text": f"*Database:*\n{database_name}"},
+                        {"type": "mrkdwn", "text": f"*Event Type:*\n{event_type}"},
+                        {"type": "mrkdwn", "text": f"*Timestamp:*\n{timestamp}"},
+                        {"type": "mrkdwn", "text": f"*Source:*\nRDS Event"}
                     ]
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f"*Details:*\n{event_message}"
+                    }
                 }
-            if "Records" in alarmdetails and alarmdetails["Records"]:
-                records = alarmdetails.get("Records", [])
-                record = records[0] if records else {}
-
-
-                s3_info = record.get("s3", {})
-                bucket = s3_info.get("bucket", {})
-                obj = s3_info.get("object", {})
-
-                bucket_name = bucket.get("name", "Unknown Bucket")
-                object_key = obj.get("key", "Unknown Key")
-                object_size = obj.get("size", "Unknown Size")
-
-                user_identity = record.get("userIdentity", {})
-                principal_id = user_identity.get("principalId", "Unknown Principal")
-                if "rejected" in object_key.lower():
-                    emoji = ":broken_heart:"
-                else:             
-                    emoji = ":white_check_mark:"
-
-                header = f"{emoji} *S3 Object Uploaded on bucket {bucket_name}.*"
-
-                payload = {
-                    "blocks": [
-                        {
-                            "type": "section",
-                            "text": {"type": "mrkdwn", "text": header}
-                        },
-                        {
-                            "type": "section",
-                            "text": {
-                                "type": "mrkdwn",
-                                "text": (
-                                    "*Details*\n"
-                                    f" • *Object:* `s3://{bucket_name}/{object_key}`\n"
-                                    f" • *Size (bytes):* {object_size} bytes\n"
-                                    f" • *Principal:* {principal_id}\n"
-                                    f" • *Timestamp:* {timestamp}"
-                                )
-                            }
-                        }
-                    ]
-                }
+            ]
+            payload = {"blocks": blocks}
         elif type == "Certificate Expiry":
             if "Records" not in alarmdetails or not alarmdetails["Records"]:
                 cert_info = alarmdetails.get("detail", {})
@@ -506,47 +503,15 @@ def lambda_handler(event, context):
     Main Lambda handler function. 
     
     This function gets triggered by SNS Topic subscriptions to CloudWatch Alarms,
-    GuardDuty findings, eventbridge and S3 events.
+    GuardDuty findings, eventbridge events and S3 events.
     """
-    logger.info("Incoming event:\n%s", json.dumps(event, indent=2))
+
     tracemalloc.start()
 
     notification_service = None
     formatted = datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S UTC")
     type = "Unknown"
     is_error = True
-
-    env_config = {
-        # Mandatory environment variables (currently none)
-    }
-
-    # Get secret name from environment or event
-    secret_name = os.environ.get("SECRET_NAME", event.get("secret_name"))
-    if not secret_name:
-        raise ValueError("SECRET_NAME not found in environment or event")
-    if not isinstance(secret_name, str):
-        raise ValueError(
-            f"SECRET_NAME must be a string, got: {type(secret_name).__name__}"
-        )
-
-    logger.info("Retrieving credentials from AWS Secrets Manager")
-    secrets_manager = SecretsManager()
-    secrets_data = secrets_manager.get_credentials(secret_name)
-
-    # Validate that required credentials are present
-    required_secrets = [
-        "slack_channel_webhook",
-        "slack_channel_webhook_guardduty",
-        "slack_channel_webhook_s3",
-    ]
-    missing_secrets = [key for key in required_secrets if key not in secrets_data]
-    if missing_secrets:
-        raise ValueError(f"Missing required secrets: {', '.join(missing_secrets)}")
-
-    # Parse combined configuration
-    logger.info("Parsing configuration from environment and secrets")
-    config = parse_config_from_env_and_secrets(env_config, secrets_data)
-
 
     # SNS event
     if "Records" in event and "Sns" in event["Records"][0]:
@@ -566,10 +531,6 @@ def lambda_handler(event, context):
             days_to_expiry = event["detail"].get("DaysToExpiry", "N/A")
             print(f"Certificate {common_name} expires in {days_to_expiry} days")
             message_str = json.dumps(event)
-
-
-    # sns_message = event['Records'][0]['Sns']
-    # message_str = sns_message.get('Message', '{}')
 
     try:
         alarm_details = json.loads(message_str)
@@ -591,10 +552,9 @@ def lambda_handler(event, context):
                 return False                                
             required = ("AlarmName", "NewStateValue")   
             return all(k in d for k in required)
-
+        
         if not source:
-        #     # Default to CloudWatch if nothing else matches
-        #     # source = "aws.cloudwatch"
+            # Default to CloudWatch if nothing else matches
             if looks_like_cloudwatch_alarm(alarm_details):
                 source = "aws.cloudwatch"                    
             else:
@@ -602,8 +562,39 @@ def lambda_handler(event, context):
                     "Source not detected and payload does not look like a CloudWatch Alarm; skipping notification."
                 )
                 return
-        
+
         logger.info("source:" + str(source))
+
+        env_config = {
+            # Mandatory environment variables (currently none)
+        }
+
+        # Get secret name from environment or event
+        secret_name = os.environ.get("SECRET_NAME", event.get("secret_name"))
+        if not secret_name:
+            raise ValueError("SECRET_NAME not found in environment or event")
+        if not isinstance(secret_name, str):
+            raise ValueError(
+                f"SECRET_NAME must be a string, got: {type(secret_name).__name__}"
+            )
+
+        logger.info("Retrieving credentials from AWS Secrets Manager")
+        secrets_manager = SecretsManager()
+        secrets_data = secrets_manager.get_credentials(secret_name)
+
+        # Validate that required credentials are present
+        required_secrets = [
+            "slack_channel_webhook",
+            "slack_channel_webhook_guardduty",
+            "slack_channel_webhook_s3",
+        ]
+        missing_secrets = [key for key in required_secrets if key not in secrets_data]
+        if missing_secrets:
+            raise ValueError(f"Missing required secrets: {', '.join(missing_secrets)}")
+
+        # Parse combined configuration
+        logger.info("Parsing configuration from environment and secrets")
+        config = parse_config_from_env_and_secrets(env_config, secrets_data)
 
         # ---------------- GuardDuty ----------------
         if source == "aws.guardduty":
@@ -624,12 +615,10 @@ def lambda_handler(event, context):
         elif source == "aws.s3":
             logger.info("S3 event detected in SNS message")
             logger.info("Starting Notification to Slack for S3 Event via SNS Topic")
-            if "Records" not in alarm_details or not alarm_details["Records"]:
-                timestamp_str = alarm_details.get('time')
-            if "Records" in alarm_details and alarm_details["Records"]:
-                # S3 time is in the record
-                first_record = alarm_details["Records"][0]
-                timestamp_str = first_record.get("eventTime")
+
+            # S3 time is in the record
+            first_record = alarm_details["Records"][0]
+            timestamp_str = first_record.get("eventTime")
             if timestamp_str:
                 # Example: 2026-01-12T16:10:07.364Z
                 try:
@@ -642,7 +631,6 @@ def lambda_handler(event, context):
             alarmnotifiction = "S3 Object Event Notification"
             type = "S3 Event"
             is_error = False   # S3 put is informational
-
         # ---------------- Certificate Expiry Event ----------------
         elif source == "aws.acm":
             logger.info("Certificate Expiry event detected in SNS message")
@@ -660,7 +648,23 @@ def lambda_handler(event, context):
             alarmnotifiction = "Certificate Expiry Notification"
             type = "Certificate Expiry"
             is_error = False   # Certificate expiry is informational
+        # ---------------- RDS Maintenance Event ----------------
+        elif isinstance(alarm_details, dict) and "EventCategories" in alarm_details:
+            logger.info("RDS maintenance event detected in SNS message")
+            logger.info("Starting Notification to Slack for RDS Maintenance Event via SNS Topic")
 
+            timestamp_str = sns_message.get('Timestamp')
+            if timestamp_str:
+                try:
+                    dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+                except ValueError:
+                    dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%SZ")
+                formatted = dt.strftime("%a, %d %b %Y %H:%M:%S UTC")
+
+            channelconfig = config.slack_channel_webhook    
+            alarmnotifiction = "RDS Maintenance Event Notification"
+            type = "RDS Maintenance"
+            is_error = False
         # ---------------- CloudWatch Alarm (default) ----------------
         else:
             logger.info("CloudWatch Alarm detected in SNS message")
@@ -724,3 +728,4 @@ def lambda_handler(event, context):
             f"Current memory usage: {current / 1024 / 1024:.2f} MB; Peak: {peak / 1024 / 1024:.2f} MB"
         )
         tracemalloc.stop()
+
