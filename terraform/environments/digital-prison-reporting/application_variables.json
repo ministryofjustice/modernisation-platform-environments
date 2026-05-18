@@ -890,7 +890,7 @@
           ]
         }
       ],
-      "redshift_table_expiry_days": 1,
+      "redshift_table_expiry_days": 2,
       "enable_s3_data_migrate_lambda": false,
       "create_postgres_load_generator_job": false,
       "enable_probation_discovery_node": false,
