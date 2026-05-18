@@ -727,8 +727,14 @@ data "aws_iam_policy_document" "crossaccount_secret_kms" {
       principals {
         type = "AWS"
         identifiers = [
-          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/dpr-${statement.key}-federated-query-execution-role"
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         ]
+      }
+
+      condition {
+        test     = "ArnEquals"
+        variable = "aws:PrincipalArn"
+        values   = [ "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/dpr-${statement.key}-federated-query-execution-role"]
       }
     }
   }
