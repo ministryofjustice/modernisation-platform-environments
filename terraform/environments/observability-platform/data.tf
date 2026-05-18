@@ -33,13 +33,13 @@ data "aws_identitystore_group" "all_identity_centre_teams" {
 }
 
 data "aws_secretsmanager_secret_version" "github_app_id" {
-  secret_id = "github/data-sources/app-id"
+  secret_id = "grafana/data-sources/app-id"
 }
 
 data "aws_secretsmanager_secret_version" "github_app_installation_id" {
-  secret_id = "github/data-sources/app-installation-id"
+  secret_id = "grafana/data-sources/app-installation-id"
 }
 
 data "aws_secretsmanager_secret_version" "github_app_private_key" {
-  secret_id = "github/data-sources/app-private-key"
+  secret_id = "grafana/data-sources/app-private-key"
 }
