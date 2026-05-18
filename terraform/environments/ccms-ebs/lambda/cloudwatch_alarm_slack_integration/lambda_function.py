@@ -425,6 +425,32 @@ class NotificationService:
                         }
                     ]
                 }
+        elif type == "Certificate Expiry":
+            if "Records" not in alarmdetails or not alarmdetails["Records"]:
+                cert_info = alarmdetails.get("detail", {})
+                days_to_expiry = cert_info.get("DaysToExpiry", "Unknown")
+                common_name = cert_info.get("CommonName", "Unknown")
+                emoji = ":rotating_light:"
+                header = f"{emoji} *Certificate {common_name} is expiring soon.*"
+                payload = {
+                    "blocks": [
+                        {
+                            "type": "section",
+                            "text": {"type": "mrkdwn", "text": header}
+                        },
+                        {
+                            "type": "section",
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": (
+                                    "*Details*\n"
+                                    f" • *Days to Expiry:* {days_to_expiry}\n"
+                                    f" • *Common Name:* {common_name}"
+                                )
+                            }
+                        }
+                    ]
+                }
 
         # ---------------- Fallback ----------------
         else:
@@ -481,7 +507,6 @@ def lambda_handler(event, context):
     This function gets triggered by SNS Topic subscriptions to CloudWatch Alarms,
     GuardDuty findings, eventbridge and S3 events.
     """
-
     tracemalloc.start()
 
     notification_service = None
@@ -520,14 +545,29 @@ def lambda_handler(event, context):
     logger.info("Parsing configuration from environment and secrets")
     config = parse_config_from_env_and_secrets(env_config, secrets_data)
 
-    sns_message = event['Records'][0]['Sns']
-    message_str = sns_message.get('Message', '{}')
-    
-    # Check for SNS control message types and ignore them
-    sns_type = sns_message.get('Type', '')
-    if sns_type in ("SubscriptionConfirmation", "UnsubscribeConfirmation"):
-        logger.info(f"Ignoring SNS control message Type={sns_type}")
-        return
+
+    # SNS event
+    if "Records" in event and "Sns" in event["Records"][0]:
+        sns_message = event['Records'][0]['Sns']
+        message_str = event["Records"][0]["Sns"]["Message"]
+        print("SNS message:", message_str)
+        # Check for SNS control message types and ignore them
+        sns_type = sns_message.get('Type', '')
+        if sns_type in ("SubscriptionConfirmation", "UnsubscribeConfirmation"):
+            logger.info(f"Ignoring SNS control message Type={sns_type}")
+            return
+        
+    # EventBridge event
+    if "detail" in event:
+        if "CommonName" in event["detail"]:
+            common_name = event["detail"]["CommonName"] 
+            days_to_expiry = event["detail"].get("DaysToExpiry", "N/A")
+            print(f"Certificate {common_name} expires in {days_to_expiry} days")
+            message_str = json.dumps(event)
+
+
+    # sns_message = event['Records'][0]['Sns']
+    # message_str = sns_message.get('Message', '{}')
 
     try:
         alarm_details = json.loads(message_str)
@@ -601,6 +641,24 @@ def lambda_handler(event, context):
             type = "S3 Event"
             is_error = False   # S3 put is informational
 
+        # ---------------- Certificate Expiry Event ----------------
+        elif source == "aws.acm":
+            logger.info("Certificate Expiry event detected in SNS message")
+            logger.info("Starting Notification to Slack for Certificate Expiry Event")
+            timestamp_str = alarm_details.get('time')
+            if timestamp_str:
+                # Example: 2026-01-12T16:10:07.364Z
+                try:
+                    dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+                except ValueError:
+                    dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%SZ")
+                formatted = dt.strftime("%d %b %Y %H:%M:%S UTC")
+
+            channelconfig = config.slack_channel_webhook
+            alarmnotifiction = "Certificate Expiry Notification"
+            type = "Certificate Expiry"
+            is_error = False   # Certificate expiry is informational
+
         # ---------------- CloudWatch Alarm (default) ----------------
         else:
             logger.info("CloudWatch Alarm detected in SNS message")
@@ -664,4 +722,3 @@ def lambda_handler(event, context):
             f"Current memory usage: {current / 1024 / 1024:.2f} MB; Peak: {peak / 1024 / 1024:.2f} MB"
         )
         tracemalloc.stop()
-
