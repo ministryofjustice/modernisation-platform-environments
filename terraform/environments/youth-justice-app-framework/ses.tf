@@ -9,7 +9,6 @@ module "ses" {
 
   ses_email_identities = contains(["development", "test"], local.environment) ? [
     "thomas.tipler@necsws.com",
-    "david.whitehouse@necsws.com",
     "javaid.arshad@necsws.com",
     "ryan.smith@necsws.com",
     "vasil.dimitrov@necsws.com",
