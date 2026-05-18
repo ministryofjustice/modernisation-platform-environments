@@ -213,7 +213,7 @@ resource "aws_iam_role_policy" "landing_dlq_redriver_state_machine_invoke" {
           "lambda:InvokeFunction",
         ]
         Resource = [
-          module.landing_file_dlq_redriver.lambda_function_arn,
+          module.landing_dlq_redriver.lambda_function_arn,
         ]
       }
     ]

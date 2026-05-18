@@ -111,7 +111,7 @@ resource "aws_cloudwatch_metric_alarm" "mdss_reconciler_errors_alarm" {
   statistic   = "Sum"
 
   dimensions = {
-    FunctionName = module.mdss_load_redrive_controller[0].lambda_function_name
+    FunctionName = module.mdss_reconciler[0].lambda_function_name
   }
 
   alarm_actions = [

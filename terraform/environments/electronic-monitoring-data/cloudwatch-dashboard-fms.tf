@@ -126,13 +126,13 @@ resource "aws_cloudwatch_dashboard" "fms_ops" {
               "AWS/Lambda",
               "Errors",
               "FunctionName",
-              module.fms_expected_file_processor.lambda_function_name
+              module.process_fms_metadata.lambda_function_name
             ],
             [
               ".",
               "Throttles",
               ".",
-              module.fms_expected_file_processor.lambda_function_name
+              module.process_fms_metadata.lambda_function_name
             ]
           ]
         }
@@ -152,14 +152,14 @@ resource "aws_cloudwatch_dashboard" "fms_ops" {
               "AWS/Lambda",
               "Duration",
               "FunctionName",
-              module.fms_expected_file_processor.lambda_function_name,
+              module.process_fms_metadata.lambda_function_name,
               { stat = "p95" }
             ],
             [
               ".",
               "Invocations",
               ".",
-              module.fms_expected_file_processor.lambda_function_name,
+              module.process_fms_metadata.lambda_function_name,
               { stat = "Sum" }
             ]
           ]
@@ -185,13 +185,13 @@ resource "aws_cloudwatch_dashboard" "fms_ops" {
               "AWS/Lambda",
               "Errors",
               "FunctionName",
-              module.fms_raw_file_formatter.lambda_function_name
+              module.format_json_fms_data.lambda_function_name
             ],
             [
               ".",
               "Throttles",
               ".",
-              module.fms_raw_file_formatter.lambda_function_name
+              module.format_json_fms_data.lambda_function_name
             ]
           ]
         }
@@ -211,14 +211,14 @@ resource "aws_cloudwatch_dashboard" "fms_ops" {
               "AWS/Lambda",
               "Duration",
               "FunctionName",
-              module.fms_raw_file_formatter.lambda_function_name,
+              module.format_json_fms_data.lambda_function_name,
               { stat = "p95" }
             ],
             [
               ".",
               "Invocations",
               ".",
-              module.fms_raw_file_formatter.lambda_function_name,
+              module.format_json_fms_data.lambda_function_name,
               { stat = "Sum" }
             ]
           ]

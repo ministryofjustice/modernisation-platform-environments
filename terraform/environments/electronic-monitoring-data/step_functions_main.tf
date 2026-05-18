@@ -243,7 +243,7 @@ resource "aws_sfn_state_machine" "landing_dlq_redriver" {
         Type     = "Task"
         Resource = "arn:aws:states:::lambda:invoke"
         Parameters = {
-          FunctionName = module.landing_file_dlq_redriver.lambda_function_arn
+          FunctionName = module.landing_dlq_redriver.lambda_function_arn
           "Payload.$"  = "$"
         }
         OutputPath = "$.Payload"
