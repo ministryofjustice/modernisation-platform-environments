@@ -1,6 +1,7 @@
 resource "aws_transfer_server" "this" {
   domain                 = "S3"
   identity_provider_type = "SERVICE_MANAGED"
+  logging_role           = module.iam_for_transfer.arn
   protocols              = ["SFTP"]
   security_policy_name   = "TransferSecurityPolicy-2025-03"
   structured_log_destinations = [
