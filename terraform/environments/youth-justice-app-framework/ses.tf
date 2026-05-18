@@ -12,7 +12,8 @@ module "ses" {
     "david.whitehouse@necsws.com",
     "javaid.arshad@necsws.com",
     "ryan.smith@necsws.com",
-    "vasil.dimitrov@necsws.com"
+    "vasil.dimitrov@necsws.com",
+    "Angela.Site@necsws.com"
   ] : []
 
   depends_on = [
