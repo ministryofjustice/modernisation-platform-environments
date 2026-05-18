@@ -98,11 +98,10 @@ resource "aws_iam_policy" "athena_federated_query_connector_policy" {
       },
       {
         "Action" : [
+          "kms:Decrypt",
           "kms:GenerateDataKey"
         ],
-        "Resource" : [
-          "arn:aws:kms:*:${var.account_id}:key/*"
-        ],
+        "Resource" : var.allowed_kms_key_arns,
         "Effect" : "Allow"
       }
     ]

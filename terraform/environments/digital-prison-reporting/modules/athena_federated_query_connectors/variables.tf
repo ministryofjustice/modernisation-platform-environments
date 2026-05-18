@@ -89,3 +89,9 @@ variable "athena_connector_type" {
   type        = string
   description = "The Athena connector type. Example values: oracle, postgresql "
 }
+
+variable "allowed_kms_key_arns" {
+  type        = list(string)
+  description = "ARNs of KMS keys that this lambda should be able to decrypt."
+  default     = []
+}
