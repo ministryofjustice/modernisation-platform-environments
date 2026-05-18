@@ -234,9 +234,9 @@ resource "aws_secretsmanager_secret_version" "dps" {
 
 # Probation Source Secrets
 module "probation_source_secret" {
-  for_each                         = local.probation_domains
+  for_each = local.probation_domains
 
-  source                           = "./modules/data_source_secret"
+  source = "./modules/data_source_secret"
 
   cloud_platform_aws_account_id    = "754256621582"
   cloud_platform_shared_kms_key_id = aws_kms_key.crossaccount_secret.arn

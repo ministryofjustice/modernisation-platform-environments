@@ -79,7 +79,7 @@ locals {
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-api-iam-preprod}",
   ] : []
   iam_role_validation_db = local.is-test ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live" : local.is-production ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-a7f6cc937a0f63ce-live" : ""
-  iam_role_ear_sar_db = local.is-preproduction ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live" : ""
+  iam_role_ear_sar_db    = local.is-preproduction ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live" : ""
   emdi_cp_roles = local.is-development || local.is-test ? [
     var.cloud-platform-emdi-iam-dev
   ] : local.is-preproduction ? [var.cloud-platform-emdi-iam-preprod] : []
@@ -271,10 +271,10 @@ data "aws_iam_policy_document" "em_data_validation_permissions" {
 }
 
 data "aws_iam_policy_document" "em_dashboard_ear_sar_permissions" {
-  count = local.is-preproduction ? 1 : 0 
+  count = local.is-preproduction ? 1 : 0
   statement {
-    sid = "AllowAccessToTriggerEARSARAPI"
-    effect = "Allow"
+    sid       = "AllowAccessToTriggerEARSARAPI"
+    effect    = "Allow"
     actions   = ["execute-api:Invoke"]
     resources = ["arn:aws:execute-api:${data.aws_region.current.name}:${local.env_account_id}:${module.ears_sars_api[0].api_gateway_id}/*"]
   }

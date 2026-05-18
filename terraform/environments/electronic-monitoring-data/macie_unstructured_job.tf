@@ -7,7 +7,7 @@ resource "aws_macie2_custom_data_identifier" "subject_id" {
   name                   = "subject-id"
   description            = "Subject ID Regex"
   regex                  = "^[0-9]{7}$"
-  maximum_match_distance = 50 
+  maximum_match_distance = 50
 }
 
 resource "aws_macie2_classification_export_configuration" "results_config" {

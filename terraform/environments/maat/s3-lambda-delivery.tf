@@ -5,8 +5,8 @@
 module "s3-bucket-shared" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=474f27a3f9bf542a8826c76fb049cc84b5cf136f"
 
-  bucket_name        = "${local.application_name}-${local.environment}-shared"
-  versioning_enabled = true
+  bucket_name         = "${local.application_name}-${local.environment}-shared"
+  versioning_enabled  = true
   replication_enabled = false
   replication_region  = "eu-west-2"
 

@@ -595,7 +595,7 @@ If the connection test fails:
 2. You should see list of AD users
 
 **If you see users:** ✅ LDAP integration working!
-**If no users:** 
+**If no users:**
 - Check LDAP configuration
 - Verify AD service account has read permissions
 - Check BaseDN is correct
