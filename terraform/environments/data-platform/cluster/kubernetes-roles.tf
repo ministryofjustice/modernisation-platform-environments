@@ -112,4 +112,12 @@ resource "kubernetes_cluster_role_v1" "headlamp" {
     ]
     verbs = ["get", "list", "watch"]
   }
+
+  rule {
+    api_groups = ["discovery.k8s.io"]
+    resources = [
+      "endpointslices",
+    ]
+    verbs = ["get", "list", "watch"]
+  }
 }
