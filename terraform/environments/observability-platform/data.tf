@@ -6,6 +6,7 @@ data "aws_ssoadmin_instances" "main" {
   provider = aws.sso-readonly
 }
 
+#trivy:ignore:AVD-AWS-0176: alternate_identifier requires DisplayName to be a registered unique attribute in this Identity Store, which it is not
 data "aws_identitystore_group" "observability_platform_admins" {
   for_each = toset(["observability-platform", "operations-engineering", "azure-aws-sso-modernisation-platform"])
 
@@ -13,14 +14,13 @@ data "aws_identitystore_group" "observability_platform_admins" {
 
   identity_store_id = tolist(data.aws_ssoadmin_instances.main.identity_store_ids)[0]
 
-  alternate_identifier {
-    unique_attribute {
-      attribute_path  = "DisplayName"
-      attribute_value = each.value
-    }
+  filter {
+    attribute_path  = "DisplayName"
+    attribute_value = each.value
   }
 }
 
+#trivy:ignore:AVD-AWS-0176: alternate_identifier requires DisplayName to be a registered unique attribute in this Identity Store, which it is not
 data "aws_identitystore_group" "all_identity_centre_teams" {
   for_each = { for team in local.all_identity_centre_teams : team => team }
 
@@ -28,11 +28,9 @@ data "aws_identitystore_group" "all_identity_centre_teams" {
 
   identity_store_id = tolist(data.aws_ssoadmin_instances.main.identity_store_ids)[0]
 
-  alternate_identifier {
-    unique_attribute {
-      attribute_path  = "DisplayName"
-      attribute_value = each.value
-    }
+  filter {
+    attribute_path  = "DisplayName"
+    attribute_value = each.value
   }
 }
 
