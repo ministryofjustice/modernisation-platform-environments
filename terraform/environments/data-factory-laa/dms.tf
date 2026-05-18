@@ -197,7 +197,7 @@ module "dms_oracle" {
   # checkov:skip=CKV_TF_1: using branch ref for testing
   # checkov:skip=CKV_TF_2: using branch ref for testing
   count  = local.is-development ? 1 : 0
-  source = "github.com/ministryofjustice/terraform-dms-module?ref=baf3cab"
+  source = "github.com/ministryofjustice/terraform-dms-module?ref=61a697a"
 
   vpc_id      = data.aws_vpc.shared.id
   environment = local.environment
