@@ -1007,14 +1007,23 @@ See Step 4.1 for complete user invitation workflow.
 
 ### Step 5.3: User Login Process
 
-Users will login to WorkSpaces with:
-- **Username:** `john.doe`
-- **Password:** `<AD-password><6-digit-MFA-token>` (combined, no space)
+**WorkSpaces login is a two-step process:**
 
-**Example:**
-- AD password: `MySecurePass123`
-- MFA token from app: `837264`
-- **Enter in WorkSpaces:** `MySecurePass123837264`
+**Step 1 - Initial Login:**
+- **Username:** `john.doe`
+- **Password:** Your AD password only (e.g., `MySecurePass123`)
+
+**Step 2 - Verification Password Prompt:**
+- WorkSpaces will prompt for "Verification password"
+- **Enter your 6-digit OTP code** from your authenticator app (e.g., `837264`)
+- Do NOT enter your password again, only the OTP code
+
+**Example Flow:**
+1. WorkSpaces prompts: "Enter your username and password"
+   - Username: `john.doe`
+   - Password: `MySecurePass123`
+2. WorkSpaces prompts: "Enter verification password"
+   - Verification password: `837264` (current OTP code from authenticator app)
 
 ---
 
