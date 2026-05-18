@@ -546,22 +546,9 @@ def lambda_handler(event, context):
             if event_source == "aws:s3":
                 source = "aws.s3"
 
-        # helper to detect CloudWatch Alarm payloads (SNS -> CloudWatch Alarms often have no 'source')
-        def looks_like_cloudwatch_alarm(d: dict) -> bool:  
-            if not isinstance(d, dict):                     
-                return False                                
-            required = ("AlarmName", "NewStateValue")   
-            return all(k in d for k in required)
-        
         if not source:
             # Default to CloudWatch if nothing else matches
-            if looks_like_cloudwatch_alarm(alarm_details):
-                source = "aws.cloudwatch"                    
-            else:
-                logger.warning(
-                    "Source not detected and payload does not look like a CloudWatch Alarm; skipping notification."
-                )
-                return
+            source = "aws.cloudwatch"
 
         logger.info("source:" + str(source))
 
