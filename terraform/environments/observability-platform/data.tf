@@ -1,5 +1,5 @@
 data "aws_secretsmanager_secret_version" "grafana_api_key" {
-  secret_id = aws_secretsmanager_secret.grafana_api_key.id
+  secret_id = "grafana/api-key"
 }
 
 data "aws_ssoadmin_instances" "main" {
@@ -13,9 +13,11 @@ data "aws_identitystore_group" "observability_platform_admins" {
 
   identity_store_id = tolist(data.aws_ssoadmin_instances.main.identity_store_ids)[0]
 
-  filter {
-    attribute_path  = "DisplayName"
-    attribute_value = each.value
+  alternate_identifier {
+    unique_attribute {
+      attribute_path  = "DisplayName"
+      attribute_value = each.value
+    }
   }
 }
 
@@ -26,20 +28,22 @@ data "aws_identitystore_group" "all_identity_centre_teams" {
 
   identity_store_id = tolist(data.aws_ssoadmin_instances.main.identity_store_ids)[0]
 
-  filter {
-    attribute_path  = "DisplayName"
-    attribute_value = each.value
+  alternate_identifier {
+    unique_attribute {
+      attribute_path  = "DisplayName"
+      attribute_value = each.value
+    }
   }
 }
 
 data "aws_secretsmanager_secret_version" "github_app_id" {
-  secret_id = aws_secretsmanager_secret.github_app_id.id
+  secret_id = "grafana/data-sources/github-app-id"
 }
 
 data "aws_secretsmanager_secret_version" "github_app_installation_id" {
-  secret_id = aws_secretsmanager_secret.github_app_installation_id.id
+  secret_id = "grafana/data-sources/github-app-installation-id"
 }
 
 data "aws_secretsmanager_secret_version" "github_app_private_key" {
-  secret_id = aws_secretsmanager_secret.github_app_private_key.id
+  secret_id = "grafana/data-sources/github-app-private-key"
 }
