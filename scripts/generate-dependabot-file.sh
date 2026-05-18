@@ -41,11 +41,15 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    cooldown:
+      default-days: ${dependabot_cooldown_default_days}
     open-pull-requests-limit: 50
   - package-ecosystem: "devcontainers"
     directory: "/"
     schedule:
       interval: "daily"
+    cooldown:
+      default-days: ${dependabot_cooldown_default_days}
     open-pull-requests-limit: 50
     reviewers:
       - "ministryofjustice/devcontainer-community"
@@ -65,6 +69,8 @@ if [[ -n "$tf_dirs" ]]; then
   echo "    schedule:" >> "$dependabot_file"
   echo "      interval: \"daily\"" >> "$dependabot_file"
   echo "    open-pull-requests-limit: 150" >> "$dependabot_file"
+  echo "    cooldown:" >> "$dependabot_file"
+  echo "      default-days: ${dependabot_cooldown_default_days}" >> "$dependabot_file"
 fi
 
 # Add Go module ecosystem entries (dynamically only for top-level directories containing go.mod)
@@ -81,6 +87,8 @@ if [[ -n "$gomod_dirs" ]]; then
   echo "    schedule:" >> "$dependabot_file"
   echo "      interval: \"daily\"" >> "$dependabot_file"
   echo "    open-pull-requests-limit: 50" >> "$dependabot_file"
+  echo "    cooldown:" >> "$dependabot_file"
+  echo "      default-days: ${dependabot_cooldown_default_days}" >> "$dependabot_file"
 fi
 
 echo "dependabot.yml has been successfully generated."
