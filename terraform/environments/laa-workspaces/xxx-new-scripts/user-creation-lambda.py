@@ -32,8 +32,9 @@ def create_ad_user(event):
     print(f"Command ID: {command_id}")
     
     # Wait for AD user creation to complete (allow time for PowerShell script execution and AD replication)
-    print("Waiting 30 seconds for AD user creation and replication...")
-    time.sleep(30)
+    # PowerShell New-ADUser takes ~70 seconds, plus AD replication time
+    print("Waiting 90 seconds for AD user creation and replication...")
+    time.sleep(90)
 
 def create_workspace(event):
     """
