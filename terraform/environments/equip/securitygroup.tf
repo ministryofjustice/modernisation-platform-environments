@@ -933,7 +933,7 @@ resource "aws_security_group_rule" "ingress_eucs_appstream" {
   from_port         = each.value.from_port
   to_port           = each.value.to_port
   protocol          = lower(each.value.protocol)
-  security_group_id = aws_security_group.all_internal_groups.id
+  security_group_id = aws_security_group.aws_domain_security_group.id
   type              = "ingress"
   cidr_blocks       = [each.value.cidr]
 }
