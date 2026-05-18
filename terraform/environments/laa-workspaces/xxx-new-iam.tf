@@ -166,11 +166,13 @@ resource "aws_iam_role_policy" "user_creation_lambda_policy" {
         Resource = "arn:aws:secretsmanager:${local.application_data.accounts[local.environment].region}:${data.aws_caller_identity.current.account_id}:secret:${local.application_name}/${local.environment}/user-passwords/*"
       },
       {
-        Sid    = "KMSDecrypt"
+        Sid    = "KMSAccess"
         Effect = "Allow"
         Action = [
           "kms:Decrypt",
-          "kms:DescribeKey"
+          "kms:DescribeKey",
+          "kms:CreateGrant",
+          "kms:GenerateDataKey"
         ]
         Resource = aws_kms_key.ebs[0].arn
       }
