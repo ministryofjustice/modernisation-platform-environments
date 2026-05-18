@@ -19,8 +19,20 @@ systemctl enable codedeploy-agent
 systemctl start codedeploy-agent
 
 
-# CloudWatch agent
-dnf install -y amazon-cloudwatch-agent
+# CloudWatch agent - retry on dnf cache issues
+max_attempts=5
+attempt=1
+until dnf install -y amazon-cloudwatch-agent; do
+    if [ $attempt -ge $max_attempts ]; then
+        echo "Failed to install amazon-cloudwatch-agent after $max_attempts attempts"
+        exit 1
+    fi
+    echo "Install failed, attempt $attempt of $max_attempts, retrying in 5s..."
+    dnf clean packages
+    attempt=$((attempt + 1))
+    sleep 5
+done
+
 cat >>/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<CWEOF
 {
     "agent": {
@@ -152,7 +164,7 @@ NGINXEOF
 chmod +x /app/scripts/update-nginx.sh
 
 # Cron jobs
-crontab - <<'CRON'
+crontab -l 2>/dev/null | cat - <<'CRON' | crontab -
 0 4 * * * /app/scripts/yjsm-log-purge.sh
 0 5 * * * /usr/sbin/aide --check
 0 21 * * 7 /app/scripts/yjsm-weekly-restart.sh
