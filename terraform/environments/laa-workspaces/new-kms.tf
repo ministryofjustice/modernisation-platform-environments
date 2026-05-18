@@ -59,6 +59,11 @@ resource "aws_kms_key_policy" "ebs" {
           "kms:DescribeKey"
         ]
         Resource = "*"
+        Condition = {
+          StringEquals = {
+            "kms:ViaService" = "workspaces.eu-west-2.amazonaws.com"
+          }
+        }
       },
       {
         Sid    = "Allow use of the key for EBS encryption"

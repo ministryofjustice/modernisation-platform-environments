@@ -44,7 +44,7 @@ def create_workspace(event):
     region = os.environ['REGION']
     directory_id = os.environ['DIRECTORY_ID']
     bundle_id = os.environ['WORKSPACE_BUNDLE_ID']
-    # kms_key_id = os.environ['KMS_KEY_ID']  # Temporarily disabled for testing
+    kms_key_id = os.environ['KMS_KEY_ID']
     
     firstname = event['Firstname']
     lastname = event['Lastname']
@@ -59,10 +59,9 @@ def create_workspace(event):
                     'DirectoryId': directory_id,
                     'UserName': Username,
                     'BundleId': bundle_id,
-                    # Temporarily disable encryption to test user creation
-                    # 'UserVolumeEncryptionEnabled': True,
-                    # 'RootVolumeEncryptionEnabled': True,
-                    # 'VolumeEncryptionKey': kms_key_id,
+                    'UserVolumeEncryptionEnabled': True,
+                    'RootVolumeEncryptionEnabled': True,
+                    'VolumeEncryptionKey': kms_key_id,
                     'WorkspaceProperties': {
                         'RunningMode': 'AUTO_STOP',
                         'RunningModeAutoStopTimeoutInMinutes': 60
