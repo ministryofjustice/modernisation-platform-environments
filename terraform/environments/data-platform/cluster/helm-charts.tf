@@ -104,11 +104,10 @@ resource "helm_release" "headlamp" {
     templatefile(
       "${path.module}/configuration/helm/headlamp/values.yml.tftpl",
       {
-        # testing for now
         cluster_role_name    = kubernetes_cluster_role_v1.headlamp.metadata[0].name
         gateway_hostname     = trimprefix(local.cluster_configuration.shared_services_gateway_hostname, "*.")
         gateway_name         = "shared-gateway"
-        gateway_namespace    = "shared-services"
+        gateway_namespace    = module.shared_services_namespace.name
         service_account_name = "headlamp-sa"
       }
     )
