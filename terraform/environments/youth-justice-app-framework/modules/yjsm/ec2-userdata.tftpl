@@ -206,6 +206,13 @@ RestartSec=5
 WantedBy=multi-user.target
 EOF
 
+# nginx install script
+cat > /app/scripts/update-nginx.sh <<'NGINXEOF'
+${nginx_script}
+NGINXEOF
+chmod +x /app/scripts/update-nginx.sh
+
+
 # Reload systemd and enable services
 systemctl daemon-reload
 systemctl enable nginx
