@@ -8,12 +8,14 @@ RED="\033[0;31m"
 GREEN="\033[0;32m"
 YELLOW="\033[0;33m"
 CYAN="\033[0;36m"
+WHITE="\033[1;37m"
 RESET="\033[0m"
 
 RUN_ALL=true
 RUN_DATABASE=false
 RUN_ELASTICACHE=false
 RUN_SECRETS=false
+HAS_SECRET_MISMATCH=0
 
 usage() {
   echo "Usage: $0 [OPTIONS]"
@@ -192,8 +194,28 @@ check_kubernetes_secrets() {
 
   for secret in "${expected_secrets[@]}"; do
     if kubectl get secret "$secret" -n "$NAMESPACE" &>/dev/null; then
-      check_pass "$secret"
-      kubectl get secret "$secret" -n "$NAMESPACE" -o json | jq -r '.data // {} | to_entries[] | "         \(.key) = \(.value | @base64d)"'
+      local has_placeholder=false
+      local secret_json
+      secret_json=$(kubectl get secret "$secret" -n "$NAMESPACE" -o json)
+      while IFS='=' read -r key val; do
+        if [[ "$val" == "CHANGEME" ]]; then
+          has_placeholder=true
+          break
+        fi
+      done < <(echo "$secret_json" | jq -r '.data // {} | to_entries[] | "\(.key)=\(.value | @base64d)"')
+
+      if [[ "$has_placeholder" == true ]]; then
+        check_placeholder "$secret (contains CHANGEME placeholder values)"
+      else
+        check_pass "$secret"
+      fi
+      echo "$secret_json" | jq -r '.data // {} | to_entries[] | "\(.key)=\(.value | @base64d)"' | while IFS='=' read -r key val; do
+        if [[ "$val" == "CHANGEME" ]]; then
+          echo -e "         ${YELLOW}⚠ ${key} = ${val}${RESET}"
+        else
+          echo "         ${key} = ${val}"
+        fi
+      done
     else
       check_fail "$secret — NOT FOUND"
     fi
@@ -236,11 +258,31 @@ check_aws_secrets() {
   for secret in "${expected_aws_secrets[@]}"; do
     local value
     if value=$(aws secretsmanager get-secret-value --secret-id "$secret" --query 'SecretString' --output text 2>/dev/null); then
-      check_pass "$secret"
+      local has_placeholder=false
       if echo "$value" | jq . &>/dev/null; then
-        echo "$value" | jq -r 'to_entries[] | "         \(.key) = \(.value)"'
+        if echo "$value" | jq -e 'to_entries[] | select(.value == "CHANGEME")' &>/dev/null; then
+          has_placeholder=true
+        fi
+        if [[ "$has_placeholder" == true ]]; then
+          check_placeholder "$secret (contains CHANGEME placeholder values)"
+        else
+          check_pass "$secret"
+        fi
+        echo "$value" | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while IFS='=' read -r key val; do
+          if [[ "$val" == "CHANGEME" ]]; then
+            echo -e "         ${YELLOW}⚠ ${key} = ${val}${RESET}"
+          else
+            echo "         ${key} = ${val}"
+          fi
+        done
       else
-        echo "         value = $value"
+        if [[ "$value" == "CHANGEME" ]]; then
+          check_placeholder "$secret (value is CHANGEME placeholder)"
+          echo -e "         ${YELLOW}⚠ value = ${value}${RESET}"
+        else
+          check_pass "$secret"
+          echo "         value = $value"
+        fi
       fi
     else
       check_fail "$secret — NOT FOUND or insufficient permissions"
@@ -258,11 +300,12 @@ check_database_connectivity() {
     return
   fi
 
-  local db_host db_port db_name db_user
+  local db_host db_port db_name db_user db_pass
   db_host=$(echo "$aurora_secret" | jq -r '.data.host' | base64 -d 2>/dev/null || echo "")
   db_port=$(echo "$aurora_secret" | jq -r '.data.port' | base64 -d 2>/dev/null || echo "")
   db_name=$(echo "$aurora_secret" | jq -r '.data.dbname' | base64 -d 2>/dev/null || echo "")
   db_user=$(echo "$aurora_secret" | jq -r '.data.username' | base64 -d 2>/dev/null || echo "")
+  db_pass=$(echo "$aurora_secret" | jq -r '.data.password' | base64 -d 2>/dev/null || echo "")
 
   echo "  Host:     ${db_host:-NOT SET}"
   echo "  Port:     ${db_port:-NOT SET}"
@@ -292,15 +335,81 @@ check_database_connectivity() {
 
   if [[ -z "$test_pod" ]]; then
     check_warn "No litellm pod available to test database connectivity"
-    echo "    Try manually: kubectl run pg-test --rm -it --namespace=$NAMESPACE --image=postgres:17 -- pg_isready -h $db_host -p $db_port"
     return
   fi
 
-  if kubectl exec "$test_pod" -n "$NAMESPACE" -- sh -c "pg_isready -h '$db_host' -p '$db_port' 2>/dev/null" &>/dev/null; then
-    check_pass "Database is accepting connections (pg_isready from $test_pod)"
+  local dns_result
+  dns_result=$(kubectl exec "$test_pod" -n "$NAMESPACE" -- python3 -c "
+import socket
+try:
+    ip = socket.gethostbyname('$db_host')
+    print(ip)
+except Exception as e:
+    print(f'FAILED: {e}')
+" 2>/dev/null || echo "FAILED")
+
+  if [[ "$dns_result" != FAILED* ]]; then
+    check_pass "DNS resolution: $db_host -> $dns_result"
   else
-    check_warn "pg_isready not available in pod or database not reachable"
-    echo "    Try manually: kubectl run pg-test --rm -it --namespace=$NAMESPACE --image=postgres:17 -- pg_isready -h $db_host -p $db_port"
+    check_fail "DNS resolution failed for $db_host: $dns_result"
+    return
+  fi
+
+  local tcp_result
+  tcp_result=$(kubectl exec "$test_pod" -n "$NAMESPACE" -- python3 -c "
+import socket
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.settimeout(10)
+try:
+    s.connect(('$db_host', $db_port))
+    print('OK')
+except socket.timeout:
+    print('TIMEOUT')
+except Exception as e:
+    print(f'FAILED: {e}')
+finally:
+    s.close()
+" 2>/dev/null || echo "FAILED")
+
+  if [[ "$tcp_result" == "OK" ]]; then
+    check_pass "TCP connection to $db_host:$db_port established (from $test_pod)"
+  elif [[ "$tcp_result" == "TIMEOUT" ]]; then
+    check_fail "TCP connection to $db_host:$db_port timed out (from $test_pod)"
+    return
+  else
+    check_fail "TCP connection to $db_host:$db_port failed: $tcp_result"
+    return
+  fi
+
+  local auth_output
+  auth_output=$(kubectl exec "$test_pod" -n "$NAMESPACE" -- python3 -c "
+import asyncio
+from prisma import Prisma
+
+async def test():
+    db = Prisma()
+    try:
+        await asyncio.wait_for(db.connect(), timeout=10)
+        print('PRISMA_OK')
+        await db.disconnect()
+    except asyncio.TimeoutError:
+        print('PRISMA_TIMEOUT')
+    except Exception as e:
+        print(f'PRISMA_FAILED:{e}')
+
+asyncio.run(test())
+" 2>&1 || echo "PRISMA_FAILED:exec error")
+
+  if echo "$auth_output" | grep -q "PRISMA_OK"; then
+    check_pass "PostgreSQL authentication successful via Prisma (from $test_pod)"
+  elif echo "$auth_output" | grep -q "PRISMA_TIMEOUT"; then
+    check_fail "PostgreSQL connection timed out"
+  elif echo "$auth_output" | grep -q "PRISMA_FAILED"; then
+    local err_detail
+    err_detail=$(echo "$auth_output" | grep "PRISMA_FAILED" | sed 's/PRISMA_FAILED://')
+    check_fail "PostgreSQL connection failed: $err_detail"
+  else
+    check_fail "PostgreSQL connection failed: $auth_output"
   fi
 }
 
@@ -343,25 +452,98 @@ check_elasticache_connectivity() {
 
   if [[ -z "$test_pod" ]]; then
     check_warn "No litellm pod available to test ElastiCache connectivity"
-    echo "    Try manually: kubectl run redis-test --rm -it --namespace=$NAMESPACE --image=redis:7 -- redis-cli -h $ec_host -p $ec_port --tls -a <auth_token> PING"
+    return
+  fi
+
+  local dns_result
+  dns_result=$(kubectl exec "$test_pod" -n "$NAMESPACE" -- python3 -c "
+import socket
+try:
+    ip = socket.gethostbyname('$ec_host')
+    print(ip)
+except Exception as e:
+    print(f'FAILED: {e}')
+" 2>/dev/null || echo "FAILED")
+
+  if [[ "$dns_result" != FAILED* ]]; then
+    check_pass "DNS resolution: $ec_host -> $dns_result"
+  else
+    check_fail "DNS resolution failed for $ec_host: $dns_result"
+    return
+  fi
+
+  local tcp_result
+  tcp_result=$(kubectl exec "$test_pod" -n "$NAMESPACE" -- python3 -c "
+import socket, ssl
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.settimeout(10)
+try:
+    s.connect(('$ec_host', $ec_port))
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    ss = ctx.wrap_socket(s, server_hostname='$ec_host')
+    print('OK')
+    ss.close()
+except socket.timeout:
+    print('TIMEOUT')
+except Exception as e:
+    print(f'FAILED: {e}')
+finally:
+    s.close()
+" 2>/dev/null || echo "FAILED")
+
+  if [[ "$tcp_result" == "OK" ]]; then
+    check_pass "TLS connection to $ec_host:$ec_port established (from $test_pod)"
+  elif [[ "$tcp_result" == "TIMEOUT" ]]; then
+    check_fail "TCP connection to $ec_host:$ec_port timed out (from $test_pod)"
+    return
+  else
+    check_fail "Connection to $ec_host:$ec_port failed: $tcp_result"
     return
   fi
 
   local ping_result
-  if ping_result=$(kubectl exec "$test_pod" -n "$NAMESPACE" -- sh -c "echo PING | timeout 5 openssl s_client -connect '${ec_host}:${ec_port}' -quiet 2>/dev/null" 2>/dev/null); then
-    if echo "$ping_result" | grep -q "PONG"; then
-      check_pass "ElastiCache responded with PONG (TLS connection from $test_pod)"
-    else
-      check_warn "Connected to ElastiCache but did not receive PONG (may need AUTH)"
-    fi
+  ping_result=$(kubectl exec "$test_pod" -n "$NAMESPACE" -- python3 -c "
+import socket, ssl
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.settimeout(10)
+try:
+    s.connect(('$ec_host', $ec_port))
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    ss = ctx.wrap_socket(s, server_hostname='$ec_host')
+    ss.sendall('AUTH $ec_auth\r\n'.encode())
+    auth_resp = ss.recv(1024).decode().strip()
+    if auth_resp != '+OK':
+        print(f'AUTH_FAILED:{auth_resp}')
+    else:
+        ss.sendall(b'PING\r\n')
+        ping_resp = ss.recv(1024).decode().strip()
+        if ping_resp == '+PONG':
+            print('OK')
+        else:
+            print(f'PING_FAILED:{ping_resp}')
+    ss.close()
+except socket.timeout:
+    print('TIMEOUT')
+except Exception as e:
+    print(f'FAILED:{e}')
+finally:
+    s.close()
+" 2>/dev/null || echo "FAILED")
+
+  if [[ "$ping_result" == "OK" ]]; then
+    check_pass "Redis AUTH + PING successful (from $test_pod)"
+  elif [[ "$ping_result" == AUTH_FAILED* ]]; then
+    check_fail "Redis AUTH failed: ${ping_result#AUTH_FAILED:}"
+  elif [[ "$ping_result" == PING_FAILED* ]]; then
+    check_fail "Redis PING failed after AUTH: ${ping_result#PING_FAILED:}"
+  elif [[ "$ping_result" == "TIMEOUT" ]]; then
+    check_fail "Redis AUTH + PING timed out"
   else
-    if kubectl exec "$test_pod" -n "$NAMESPACE" -- sh -c "timeout 3 sh -c 'echo > /dev/tcp/${ec_host}/${ec_port}'" &>/dev/null; then
-      check_pass "TCP connection to ElastiCache succeeded (port $ec_port is open)"
-      check_warn "Could not verify PING/PONG — AUTH or TLS handshake may be required"
-    else
-      check_fail "Cannot connect to ElastiCache at ${ec_host}:${ec_port}"
-      echo "    Try manually: kubectl run redis-test --rm -it --namespace=$NAMESPACE --image=redis:7 -- redis-cli -h $ec_host -p $ec_port --tls -a <auth_token> PING"
-    fi
+    check_fail "Redis AUTH + PING failed: $ping_result"
   fi
 }
 
@@ -469,7 +651,7 @@ compare_secrets() {
   echo "  manually modified in one location."
   echo ""
 
-  local has_mismatch=0
+  HAS_SECRET_MISMATCH=0
 
   # aurora: ai-gateway/aurora <-> k8s secret "aurora"
   compare_secret_pair "ai-gateway/aurora" "aurora" \
@@ -550,7 +732,7 @@ compare_secret_pair() {
       check_fail "$aws_key → $k8s_key: MISMATCH"
       echo -e "         AWS:  $aws_val"
       echo -e "         K8s:  $k8s_val"
-      has_mismatch=1
+      HAS_SECRET_MISMATCH=1
     fi
   done
   echo ""
@@ -595,6 +777,7 @@ compare_secret_pair_plain() {
     check_fail "value → $k8s_key: MISMATCH"
     echo -e "         AWS:  $aws_value"
     echo -e "         K8s:  $k8s_val"
+    HAS_SECRET_MISMATCH=1
   fi
   echo ""
 }
@@ -624,13 +807,14 @@ main() {
   parse_args "$@"
 
   echo ""
-  echo -e "${BOLD}╔══════════════════════════════════════════════════════════════════════════════╗${RESET}"
-  echo -e "${BOLD}║              AI Gateway (LiteLLM) — Troubleshooting Report                  ║${RESET}"
-  echo -e "${BOLD}╠══════════════════════════════════════════════════════════════════════════════╣${RESET}"
-  echo -e "${BOLD}║  Namespace:  ${NAMESPACE}                                                        ║${RESET}"
-  echo -e "${BOLD}║  Timestamp:  $(date -u '+%Y-%m-%d %H:%M:%S UTC')                              ║${RESET}"
-  echo -e "${BOLD}║  Context:    $(kubectl config current-context 2>/dev/null | cut -c1-50 || echo "unknown")${RESET}"
-  echo -e "${BOLD}╚══════════════════════════════════════════════════════════════════════════════╝${RESET}"
+  echo -e "${GREEN}━━━━━━━━${WHITE}━━━━━━━━${GREEN}━━━━━━━━${WHITE}━━━━━━━━${GREEN}━━━━━━━━${WHITE}━━━━━━━━${GREEN}━━━━━━━━${WHITE}━━━━━━━━${GREEN}━━━━━━━━${WHITE}━━━━━━━━${RESET}"
+  echo -e "${BOLD}AI Gateway (LiteLLM) - Troubleshooting Report${RESET}"
+  echo -e "${GREEN}━━━━━━━━${WHITE}━━━━━━━━${GREEN}━━━━━━━━${WHITE}━━━━━━━━${GREEN}━━━━━━━━${WHITE}━━━━━━━━${GREEN}━━━━━━━━${WHITE}━━━━━━━━${GREEN}━━━━━━━━${WHITE}━━━━━━━━${RESET}"
+  echo ""
+  echo "  Namespace:  $NAMESPACE"
+  echo "  Timestamp:  $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+  echo "  Context:    $(kubectl config current-context 2>/dev/null || echo "unknown")"
+  echo ""
 
   check_prerequisites
 
@@ -663,6 +847,26 @@ main() {
       check_aws_secrets
       compare_secrets
     fi
+  fi
+
+  if [[ "$HAS_SECRET_MISMATCH" -eq 1 ]]; then
+    divider "Remediation: Force Sync Kubernetes Secrets from AWS"
+
+    echo "  Secrets are out of sync. Force the ExternalSecret operator to re-fetch"
+    echo "  values from AWS Secrets Manager by annotating the ExternalSecrets:"
+    echo ""
+    echo '    # Force sync a single secret:'
+    echo '    kubectl annotate externalsecret <name> -n ai-gateway force-sync=$(date +%s) --overwrite'
+    echo ""
+    echo '    # Force sync all secrets in the namespace:'
+    echo '    kubectl annotate externalsecret --all -n ai-gateway force-sync=$(date +%s) --overwrite'
+    echo ""
+    echo "  After syncing, verify the Kubernetes secrets have updated:"
+    echo "    kubectl get externalsecrets -n ai-gateway"
+    echo ""
+    echo "  If pods are still using stale values, restart the deployments:"
+    echo "    kubectl rollout restart deployment -n ai-gateway"
+    echo ""
   fi
 
   divider "End of Report"
