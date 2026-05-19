@@ -14,6 +14,9 @@ httpRoute:
       namespace: ${gateway_namespace}
   hostNames: headlamp.${gateway_hostname}
 
+nodeSelector:
+  compute.data-platform.service.justice.gov.uk/node: system
+
 pluginsManager:
   enabled: true
   configContent: |
@@ -36,7 +39,7 @@ serviceAccount:
   name: ${service_account_name}
 
 tolerations:
-  - operator: Exists
+  - key: compute.data-platform.service.justice.gov.uk/node
+    operator: Equal
+    value: system
     effect: NoSchedule
-  - operator: Exists
-    effect: NoExecute
