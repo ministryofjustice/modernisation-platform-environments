@@ -482,6 +482,18 @@ data "aws_iam_policy_document" "redshift_federated_query" {
     ]
     resources = [for s in module.probation_source_secret : s.secret_arn]
   }
+
+  statement {
+    sid = "AllowKMSDecryptForCrossPlatformSecrets"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey"
+    ]
+    resources = [
+      aws_kms_key.crossaccount_secret.arn
+    ]
+  }
 }
 
 resource "aws_iam_policy" "redshift_federated_query_policy" {
