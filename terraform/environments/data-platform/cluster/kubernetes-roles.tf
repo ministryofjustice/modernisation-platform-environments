@@ -120,4 +120,24 @@ resource "kubernetes_cluster_role_v1" "headlamp" {
     ]
     verbs = ["get", "list", "watch"]
   }
+
+  rule {
+    api_groups = ["cert-manager.io"]
+    resources = [
+      "certificates",
+      "certificaterequests",
+      "issuers",
+      "clusterissuers",
+    ]
+    verbs = ["get", "list", "watch"]
+  }
+
+  rule {
+    api_groups = ["keda.sh"]
+    resources = [
+      "scaledobjects",
+      "scaledjobs",
+    ]
+    verbs = ["get", "list", "watch"]
+  }
 }
