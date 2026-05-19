@@ -6,6 +6,11 @@ clusterRoleBinding:
 config:
   pluginsDir: /headlamp/plugins
   watchPlugins: true
+  oidc:
+    clientID: ${client_id}
+    clientSecret: ${client_secret}
+    issuerURL: https://login.microsoftonline.com/${tenant_id}/v2.0
+    scopes: "openid profile email User.Read offline_access"
 
 httpRoute:
   enabled: true
