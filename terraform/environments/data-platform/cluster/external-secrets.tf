@@ -42,6 +42,13 @@ resource "kubernetes_manifest" "headlamp_oidc_external_secret" {
             key      = "headlamp/headlamp-entra-id"
             property = "issuer_url"
           }
+        },
+        {
+          secretKey = "OIDC_SCOPES"
+          remoteRef = {
+            key      = "headlamp/headlamp-entra-id"
+            property = "scopes"
+          }
         }
       ]
     }

@@ -7,6 +7,7 @@ module "headlamp_entra_id_secret" {
     client_id     = "CHANGEME"
     client_secret = "CHANGEME"
     issuer_url    = "CHANGEME"
+    scopes        = "CHANGEME"
   })
   ignore_secret_changes = true
 }
