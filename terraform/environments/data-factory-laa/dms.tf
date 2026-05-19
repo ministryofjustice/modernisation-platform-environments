@@ -82,7 +82,7 @@ resource "aws_kms_key" "oracle_dms" {
 resource "aws_kms_alias" "oracle_dms" {
   count = local.is-development ? 1 : 0
 
-  name          = "alias/laa-df-dev-dms-test"
+  name          = "alias/${local.application_name}-${local.environment}-dms-test"
   target_key_id = aws_kms_key.oracle_dms[0].key_id
 }
 
@@ -256,6 +256,8 @@ module "dms_oracle" {
   db          = "oracle-dms-test"
   tags        = local.tags
 
+  validation_sqs_kms_key_arn = aws_kms_key.oracle_dms[0].arn
+
   write_metadata_to_glue_catalog = true
   glue_catalog_arn               = "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:catalog"
   glue_catalog_role_arn          = aws_iam_role.dms_glue_access[0].arn
@@ -266,7 +268,7 @@ module "dms_oracle" {
     allocated_storage          = 50
     availability_zone          = "eu-west-2a"
     engine_version             = "3.5.4"
-    kms_key_arn                = data.aws_kms_key.oracle_dms[0].arn
+    kms_key_arn                = aws_kms_key.oracle_dms[0].arn
     multi_az                   = false
     replication_instance_class = "dms.t3.medium"
     inbound_cidr               = data.aws_vpc.shared.cidr_block
@@ -276,7 +278,7 @@ module "dms_oracle" {
   dms_source = {
     engine_name             = "oracle"
     secrets_manager_arn     = data.aws_secretsmanager_secret.dms_oracle_credentials[0].arn
-    secrets_manager_kms_arn = data.aws_kms_key.oracle_dms[0].arn
+    secrets_manager_kms_arn = aws_kms_key.oracle_dms[0].arn
     sid                     = "DMSTEST"
     # Oracle extra_connection_attributes:
     #   addSupplementalLogging=N - not needed for full-load only (no CDC)
