@@ -319,9 +319,9 @@ locals {
 
     qa12c-nomis-web = {
       autoscaling_group = {
-        desired_capacity          = 0
+        desired_capacity          = 2
         force_delete              = true
-        max_size                  = 0
+        max_size                  = 2
         termination_policies      = ["OldestInstance"]
         vpc_zone_identifier       = module.environment.subnets["private"].ids
         wait_for_capacity_timeout = 0
