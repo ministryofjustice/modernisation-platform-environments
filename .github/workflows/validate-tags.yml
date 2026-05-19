@@ -128,7 +128,7 @@ jobs:
             });
       
       - name: Hide Previous PR comment
-        if: ${{ github.event_name == 'pull_request' }}
+        if: always() && github.event_name == 'pull_request'
         working-directory: "scripts/minimise-comments"
         env:
           COMMENT_BODY_CONTAINS: "**`Tag Validation`**"
