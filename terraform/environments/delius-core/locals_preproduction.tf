@@ -89,12 +89,15 @@ locals {
   delius_microservices_configs_preprod = {
 
     weblogic = {
-      image_tag         = "6.2.0.3"
-      container_port    = 8080
-      container_memory  = 4096
-      container_cpu     = 2048
-      ec2_instance_type = "r7i.2xlarge"
-      task_count        = 8
+      image_tag                = "6.7.4"
+      task_definition_revision = 5
+      container_port           = 8080
+      container_memory         = 4096
+      container_cpu            = 2048
+      ec2_instance_type        = "r7i.2xlarge"
+      task_count               = 25
+      asg_min_size             = 8
+      asg_max_size             = 15
     }
 
     weblogic_params = {
@@ -111,17 +114,17 @@ locals {
       DMS_PROTOCOL                      = "https"
       EIS_USER_CONTEXT                  = "cn=EISUsers,ou=Users,dc=moj,dc=com"
       ELASTICSEARCH_URL                 = "https://probation-search-preprod.hmpps.service.justice.gov.uk/delius"
-      GDPR_URL                          = "/gdpr/ui/homepage" # GDPR not deployed to CP yet, <URL>/gdpr/ui/homepage
+      GDPR_URL                          = "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io/gdpr/ui/homepage" # GDPR not deployed to CP yet, <URL>/gdpr/ui/homepage
       JDBC_CONNECTION_POOL_MAX_CAPACITY = "100"
       JDBC_CONNECTION_POOL_MIN_CAPACITY = "50"
-      JDBC_URL                          = ""
+      JDBC_URL                          = "jdbc:oracle:thin:@(DESCRIPTION=(LOAD_BALANCE=OFF)(FAILOVER=ON)(CONNECT_TIMEOUT=10)(RETRY_COUNT=3)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=tcp)(HOST=delius-core-preprod-db-1.hmpps-preproduction.modernisation-platform.internal)(PORT=1521))(ADDRESS=(PROTOCOL=tcp)(HOST=delius-core-preprod-db-2.hmpps-preproduction.modernisation-platform.internal)(PORT=1521))(ADDRESS=(PROTOCOL=tcp)(HOST=delius-core-preprod-db-3.hmpps-preproduction.modernisation-platform.internal)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=PRENDA_TAF)))"
       JDBC_USERNAME                     = "delius_pool"
-      LDAP_HOST                         = "https://ldap.preprod.delius-core.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"
+      LDAP_HOST                         = "ldap.preprod.delius-core.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"
       LDAP_PRINCIPAL                    = "cn=admin,dc=moj,dc=com"
       LOG_LEVEL_NDELIUS                 = "DEBUG"
-      MERGE_API_URL                     = "https://delius-merge-api-preprod.hmpps.service.justice.gov.uk"
-      MERGE_OAUTH_URL                   = "https://delius-user-management-preprod.hmpps.service.justice.gov.uk/umt/oauth/"
-      MERGE_URL                         = "https://delius-merge-ui-preprod.hmpps.service.justice.gov.uk"
+      MERGE_API_URL                     = "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io/merge/api/"
+      MERGE_OAUTH_URL                   = "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io/umt/oauth/"
+      MERGE_URL                         = "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io/merge/ui/"
       NDELIUS_CLIENT_ID                 = "migrations_client_id"
       OAUTH_CALLBACK_URL                = "https://ndelius.preprod.delius-core.hmpps-preproduction.modernisation-platform.service.justice.gov.uk/NDelius-war/delius/JSP/auth/token.jsp"
       OAUTH_CLIENT_ID                   = "delius-ui"
@@ -138,18 +141,18 @@ locals {
       PSR_SERVICE_URL                   = "https://pre-sentence-service-preprod.hmpps.service.justice.gov.uk"
       TRAINING_MODE_APP_NAME            = "National Delius - TEST USE ONLY"
       TZ                                = "Europe/London"
-      USERMANAGEMENT_URL                = "https://delius-user-management-preprod.hmpps.service.justice.gov.uk/umt/"
+      USERMANAGEMENT_URL                = "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io/umt/"
       USER_CONTEXT                      = "ou=Users,dc=moj,dc=com"
       USER_MEM_ARGS                     = "-XX:MaxRAMPercentage=90.0"
     }
 
     weblogic_eis = {
-      image_tag         = "6.2.0.3"
+      image_tag         = "6.7.4-eis"
       container_port    = 8080
       container_memory  = 2048
       container_cpu     = 1024
       ec2_instance_type = "r7i.large"
-      task_count        = 1
+      task_count        = 2
     }
 
     pwm = {
