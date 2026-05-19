@@ -105,7 +105,7 @@ jobs:
         id: validate
         uses: ministryofjustice/coat-tag-validator@716f30ebd82b1ab87df7fbeb64d876fe6395eaff #v2.1.4
         with:
-          terraform_directory: ./terraform
+          terraform_directory: "terraform/environments/${{ matrix.application }}"
           soft_fail: false
           terraform_workspace: ${{ env.WORKSPACE_NAME }}
 
