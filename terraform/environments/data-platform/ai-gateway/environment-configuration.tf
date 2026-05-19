@@ -129,8 +129,8 @@ locals {
     }
     test = {
       litellm_versions = {
-        application = "main-v1.83.7-stable"
-        chart       = "1.83.7-stable"
+        application = "v1.85.0"
+        chart       = "1.85.0"
       }
       ai_gateway_hostname = "test.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
@@ -149,7 +149,7 @@ locals {
         "213.121.161.112/28", # 102PF
         "51.149.2.0/24",      # 10SC
         # Hoose
-        "51.179.195.141/32",
+        "51.179.193.117/32",
       ]
       ai_gateway_models = {}
       ai_gateway_autoscaling = {
@@ -205,11 +205,11 @@ locals {
         max_replicas                      = 10
         target_cpu_utilization_percentage = 80
       }
-      aurora_instance_class = "db.t4g.medium"
-      aurora_engine_version = "17.4"
-      aurora_instances      = { writer = {}, reader = {} }
+      aurora_instance_class                     = "db.t4g.medium"
+      aurora_engine_version                     = "17.4"
+      aurora_instances                          = { writer = {}, reader = {} }
       aurora_serverlessv2_scaling_configuration = null
-      elasticache_node_type = "cache.t4g.medium"
+      elasticache_node_type                     = "cache.t4g.medium"
     }
   }
 }
