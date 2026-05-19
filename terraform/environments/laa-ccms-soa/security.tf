@@ -233,6 +233,7 @@ resource "aws_security_group_rule" "ecs_tasks_admin_egress_oracle" {
 }
 
 resource "aws_security_group_rule" "ecs_tasks_admin_egress_cwa_db_nonprod" {
+  count             = local.is-production ? 0 : 1
   security_group_id = aws_security_group.ecs_tasks_admin.id
   type              = "egress"
   description       = "Egress to CWA DB (non-prod external host) on tcp/1571"
@@ -243,6 +244,7 @@ resource "aws_security_group_rule" "ecs_tasks_admin_egress_cwa_db_nonprod" {
 }
 
 resource "aws_security_group_rule" "ecs_tasks_admin_egress_cwa_db_prod" {
+  count             = local.is-production ? 1 : 0
   security_group_id = aws_security_group.ecs_tasks_admin.id
   type              = "egress"
   description       = "Egress to CWA DB (prod external host) on tcp/2484 TCPS"
