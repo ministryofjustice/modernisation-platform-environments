@@ -92,7 +92,7 @@ resource "aws_lb_target_group" "instance" {
     }
   }
 
-  tags = merge(var.tags, {
+  tags = merge(local.tags, {
     Name = each.key
   })
 }
