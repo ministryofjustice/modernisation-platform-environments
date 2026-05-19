@@ -3,7 +3,7 @@ module "kms_metadata_key" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
+  version = "4.2.0"
 
   aliases     = ["s3/metadata_bucket"]
   description = "Metadata bucket KMS key"
