@@ -33,33 +33,33 @@ jobs:
           echo "Detected: $applications"
 
       - name: Get environment list for each application
-      id: envs
-      run: |
-        set -x                       # trace every command
-        apps='${{ steps.apps.outputs.applications }}'
-        if [ -z "$apps" ] || [ "$apps" = "[]" ]; then
-          echo "environments=[]" >> "$GITHUB_OUTPUT"
-          exit 0
-        fi
-        result='[]'
-        for app in $(echo "$apps" | jq -r '.[]'); do
-          echo "Fetching environments for $app"
-          url="https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${app}.json"
+        id: envs
+        run: |
+          set -x                       # trace every command
+          apps='${{ steps.apps.outputs.applications }}'
+          if [ -z "$apps" ] || [ "$apps" = "[]" ]; then
+            echo "environments=[]" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          result='[]'
+          for app in $(echo "$apps" | jq -r '.[]'); do
+            echo "Fetching environments for $app"
+            url="https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${app}.json"
 
-          # Separate curl + jq so we can see which one is failing
-          raw=$(curl -sSL -w "HTTP %{http_code}\n" "$url")
-          echo "----- raw response -----"
-          echo "$raw"
-          echo "------------------------"
+            # Separate curl + jq so we can see which one is failing
+            raw=$(curl -sSL -w "HTTP %{http_code}\n" "$url")
+            echo "----- raw response -----"
+            echo "$raw"
+            echo "------------------------"
 
-          envs=$(curl -sSL "$url" | jq -c --arg app "$app" \
-            '[.environments[].name | {application: $app, environment: .}]')
-          echo "envs=$envs"
+            envs=$(curl -sSL "$url" | jq -c --arg app "$app" \
+              '[.environments[].name | {application: $app, environment: .}]')
+            echo "envs=$envs"
 
-          result=$(jq -c -s 'add' <<< "$result"$'\n'"$envs")
-          echo "result=$result"
-        done
-        echo "environments=$result" >> "$GITHUB_OUTPUT"
+            result=$(jq -c -s 'add' <<< "$result"$'\n'"$envs")
+            echo "result=$result"
+          done
+          echo "environments=$result" >> "$GITHUB_OUTPUT"
 
   validate-tags:
     name: Tag Validation
