@@ -22,7 +22,7 @@ resource "aws_db_subnet_group" "subnet_group" {
 # RDS Parameter group
 
 resource "aws_db_parameter_group" "parameter_group_19" {
-  count       = 1
+  count       = var.create_std_instance ? 0 : 1
   name        = "parameter-group-19"
   family      = "oracle-se2-19"
   description = "${var.application_name}-${var.environment}-parameter-group"
@@ -107,7 +107,7 @@ resource "aws_db_option_group" "appdboptiongroup19" {
 
 # tflint-ignore: terraform_required_providers
 resource "random_password" "rds_password" {
-  count   = 1
+  count   = var.create_std_instance ? 0 : 1
   length  = 12
   special = false
 }
@@ -116,13 +116,13 @@ resource "random_password" "rds_password" {
 resource "aws_secretsmanager_secret" "rds_password_secret" {
   #checkov:skip=CKV2_AWS_57:"This is will be fixed at a later date"
   #checkov:skip=CKV_AWS_149:"To be added later."
-  count = 1
+  count = var.create_std_instance ? 0 : 1
   name  = "${var.application_name}-${var.environment}-rds_password_secret"
 }
 
 
 resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
-  count     = 1
+  count     = var.create_std_instance ? 0 : 1
   secret_id = aws_secretsmanager_secret.rds_password_secret[0].id
   secret_string = jsonencode(
     {
@@ -169,7 +169,7 @@ resource "aws_db_instance" "appdb1" {
   #checkov:skip=CKV_AWS_353:"Performance Insights are enabled"
   #checkov:skip=CKV_AWS_226:"Minor upgrades disabled to ensure compatibility"
   #checkov:skip=CKV_AWS_293:"Deletion protection is enabled but not being recognised"
-  count = 1
+  count = var.create_std_instance ? 0 : 1
 
   port                                  = var.port
   allocated_storage                     = var.allocated_storage
@@ -198,7 +198,7 @@ resource "aws_db_instance" "appdb1" {
   license_model                         = var.license_model
   performance_insights_enabled          = var.performance_insights_enabled
   performance_insights_retention_period = var.performance_insights_retention_period
-  deletion_protection                   = var.create_std_instance ? false : var.deletion_protection
+  deletion_protection                   = var.deletion_protection
   copy_tags_to_snapshot                 = true
   storage_encrypted                     = true
   kms_key_id                            = var.kms_key_arn
