@@ -294,19 +294,19 @@ locals {
     }
     ebs_volume_config = {
       app = {
-        iops       = 3000
-        throughput = 125
+        iops       = 6400
+        throughput = 400
         type       = "gp3"
       }
       data = {
-        iops       = 3000
-        throughput = 500
+        iops       = 6400
+        throughput = 400
         type       = "gp3"
         total_size = 200
       }
       flash = {
-        iops       = 3000
-        throughput = 500
+        iops       = 6400
+        throughput = 400
         type       = "gp3"
         total_size = 200
       }
@@ -340,19 +340,19 @@ locals {
     }
     ebs_volume_config = {
       app = {
-        iops       = 3000
-        throughput = 125
+        iops       = 6400
+        throughput = 400
         type       = "gp3"
       }
       data = {
-        iops       = 3000
-        throughput = 500
+        iops       = 6400
+        throughput = 400
         type       = "gp3"
         total_size = 200
       }
       flash = {
-        iops       = 3000
-        throughput = 500
+        iops       = 6400
+        throughput = 400
         type       = "gp3"
         total_size = 200
       }
@@ -393,19 +393,19 @@ locals {
     }
     ebs_volume_config = {
       app = {
-        iops       = 3000
-        throughput = 125
+        iops       = 6400
+        throughput = 400
         type       = "gp3"
       }
       data = {
-        iops       = 5000
-        throughput = 500
+        iops       = 6400
+        throughput = 400
         type       = "gp3"
-        total_size = 6000
+        total_size = 7000
       }
       flash = {
-        iops       = 3000
-        throughput = 500
+        iops       = 6400
+        throughput = 400
         type       = "gp3"
         total_size = 4000
       }
