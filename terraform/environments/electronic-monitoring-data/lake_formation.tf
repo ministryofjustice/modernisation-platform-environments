@@ -16,6 +16,11 @@ data "aws_iam_roles" "mod_plat_roles" {
   path_prefix = "/aws-reserved/sso.amazonaws.com/"
 }
 
+data "aws_iam_roles" "mp_data_scientist" {
+  name_regex  = "AWSReservedSSO_mp-data-scientist_.*"
+  path_prefix = "/aws-reserved/sso.amazonaws.com/"
+}
+
 resource "aws_lakeformation_data_lake_settings" "settings" {
   admins = flatten(
     [
@@ -76,6 +81,29 @@ resource "aws_lakeformation_permissions" "sensitive_grant" {
     key    = aws_lakeformation_lf_tag.sensitive_tag.key
     values = aws_lakeformation_lf_tag.sensitive_tag.values
   }
+}
+
+resource "aws_lakeformation_permissions" "data_scientist_test_db_permissions" {
+  count     = local.is-test ? 1 : 0
+  principal = one(data.aws_iam_roles.mp_data_scientist.arns)
+
+  database {
+    name = "curated_fms_test_dbt"
+  }
+
+  permissions = ["DESCRIBE"]
+}
+
+resource "aws_lakeformation_permissions" "data_scientist_test_table_permissions" {
+  count     = local.is-test ? 1 : 0
+  principal = one(data.aws_iam_roles.mp_data_scientist.arns)
+
+  table {
+    database_name = "curated_fms_test_dbt"
+    wildcard      = true
+  }
+
+  permissions = ["SELECT", "DESCRIBE"]
 }
 
 # ------------------------------------------------------------------------
