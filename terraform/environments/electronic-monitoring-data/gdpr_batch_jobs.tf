@@ -220,6 +220,49 @@ resource "aws_iam_instance_profile" "gdpr_batch_instance_profile" {
   role = aws_iam_role.gdpr_batch_instance_role.name
 }
 
+# =========================================================
+# 1.d Permissions to trigger and manage the AWS batch jobs
+# =========================================================
+
+data "aws_iam_policy_document" "gdpr_step_function_batch_sync_policy_document" {
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "batch:SubmitJob",
+      "batch:DescribeJobs",
+      "batch:TerminateJob"
+    ]
+    resources = [
+      aws_batch_job_queue.shred_unstructured_from_zip_batch_queue.arn,
+      aws_batch_job_definition.shred_unstructured_from_zip_job.arn
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "events:PutTargets",
+      "events:PutRule",
+      "events:DescribeRule"
+    ]
+    resources = [
+      "arn:aws:events:eu-west-2:*:rule/StepFunctionsGetEventsForBatchJobsRule"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "gdpr_step_function_batch_sync_policy_document" {
+  name   = "gdpr-step-function-batch-sync-policy"
+  policy = data.aws_iam_policy_document.gdpr_step_function_batch_sync_policy_document.json
+}
+resource "aws_iam_role_policy_attachment" "gdpr_step_function_batch_sync_policy_attach" {
+  role       = aws_iam_role.gdpr_deletion_step_function.name
+  policy_arn = aws_iam_policy.gdpr_step_function_batch_sync_policy.arn
+}
+
+# (Attach this policy document to your aws_iam_role for the Step Function)
+
 # ==============================================================================
 # 2. IAM: ECS Execution Role with all policies for other AWS services
 # ==============================================================================
