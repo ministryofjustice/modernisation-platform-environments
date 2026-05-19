@@ -29,9 +29,61 @@ data "aws_secretsmanager_secret" "dms_oracle_credentials" {
   name  = "laa-df-dev/oracle-dms-test/dms-user"
 }
 
-data "aws_kms_key" "oracle_dms" {
-  count  = local.is-development ? 1 : 0
-  key_id = "alias/laa-df-dev-dms-test"
+data "aws_iam_policy_document" "oracle_dms_kms" {
+  count = local.is-development ? 1 : 0
+
+  statement {
+    sid    = "AllowAccountRootFullAccess"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowS3ToUseKeyForQueueNotifications"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt",
+    ]
+
+    resources = ["*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+}
+
+resource "aws_kms_key" "oracle_dms" {
+  count = local.is-development ? 1 : 0
+
+  description         = "KMS key for Oracle DMS test resources"
+  enable_key_rotation = true
+  policy              = data.aws_iam_policy_document.oracle_dms_kms[0].json
+
+  tags = local.tags
+}
+
+resource "aws_kms_alias" "oracle_dms" {
+  count = local.is-development ? 1 : 0
+
+  name          = "alias/laa-df-dev-dms-test"
+  target_key_id = aws_kms_key.oracle_dms[0].key_id
 }
 
 # ---------------------------------------------------------------------------
