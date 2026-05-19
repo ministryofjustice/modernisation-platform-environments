@@ -723,7 +723,7 @@ data "aws_iam_policy_document" "crossaccount_secret_kms" {
 
     principals {
       type        = "AWS"
-      identifiers = [aws_iam_role.redshift-federated-query-role]
+      identifiers = [aws_iam_role.redshift-federated-query-role.arn]
     }
   }
 
