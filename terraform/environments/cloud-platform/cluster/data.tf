@@ -51,7 +51,13 @@ data "aws_iam_roles" "platform_engineer_admin_sso_role" {
 
 data "aws_eks_cluster" "cluster" {
   count      = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
-  name       = module.eks[0].cluster_name
+  name       = local.cluster_name
+  depends_on = [module.eks]
+}
+
+data "external" "eks_token" {
+  count   = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
+  program = ["bash", "-c", "aws eks get-token --cluster-name ${local.cluster_name} --output json | jq '{token: .status.token}'"]
   depends_on = [module.eks]
 }
 
