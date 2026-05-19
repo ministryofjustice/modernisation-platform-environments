@@ -8,7 +8,7 @@ resource "aws_db_subnet_group" "soa" {
 }
 
 resource "aws_db_option_group" "soa_oracle_19" {
-  name_prefix          = "soa-db-option-group"
+  name_prefix          = local.environment == "development" ? "soa-db-option-group19" : "soa-db-option-group"
   engine_name          = "oracle-ee"
   major_engine_version = "19"
 
@@ -105,4 +105,27 @@ resource "aws_db_instance" "soa_db" {
     delete = "40m"
     update = "80m"
   }
+}
+
+# RDS Minor upgrade notification changes
+# RDS maintenance event notification sent from DB to SNS topic
+
+resource "aws_db_event_subscription" "soa_rds_maintenance_notifications" {
+  name      = "${local.application_name}-${local.environment}-soa-rds-maintenance"
+  sns_topic = aws_sns_topic.soa_maintenance_topic.arn
+
+  source_type = "db-instance"
+  source_ids  = [aws_db_instance.soa_db.identifier]
+
+  event_categories = ["maintenance"]
+  enabled          = true
+
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-${local.environment}-soa-rds-maintenance"
+  })
+
+  depends_on = [
+    aws_db_instance.soa_db,
+    aws_sns_topic.soa_maintenance_topic
+  ]
 }

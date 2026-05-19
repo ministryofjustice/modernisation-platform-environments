@@ -70,19 +70,6 @@ module "eks" {
       taints                 = local.environment_configuration.system_ng.taints
       labels                 = local.environment_configuration.system_ng.labels
     }
-    # karpenter = {
-    #   ami_type       = "BOTTLEROCKET_x86_64"
-    #   instance_types = ["m5.large"]
-
-    #   min_size     = 2
-    #   max_size     = 3
-    #   desired_size = 2
-
-    #   labels = {
-    #     # Used to ensure Karpenter runs on nodes that it does not manage
-    #     "karpenter.sh/controller" = "true"
-    #   }
-    # }
   }
 
   addons = {
@@ -179,72 +166,4 @@ module "eks" {
   }
 
   tags = local.tags
-}
-
-module "karpenter" {
-  count  = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
-  source = "terraform-aws-modules/eks/aws//modules/karpenter"
-
-  cluster_name = module.eks[0].cluster_name
-
-  # Name needs to match role name passed to the EC2NodeClass
-  node_iam_role_use_name_prefix   = false
-  node_iam_role_name              = local.cluster_name
-  create_pod_identity_association = true
-
-  # Used to attach additional IAM policies to the Karpenter node IAM role
-  node_iam_role_additional_policies = {
-    AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-  }
-}
-
-
-resource "helm_release" "karpenter" {
-  count      = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
-  namespace  = "kube-system"
-  name       = "karpenter"
-  repository = "oci://public.ecr.aws/karpenter"
-  chart      = "karpenter"
-  version    = "1.9.0"
-  wait       = false
-
-  values = [
-    <<-EOT
-   nodeSelector:
-     cloud-platform.justice.gov.uk/system-ng: 'true'
-   tolerations:
-     - key: system-node
-       operator: Equal
-       value: "true"
-       effect: NoSchedule
-   dnsPolicy: Default
-   settings:
-     clusterName: ${module.eks[0].cluster_name}
-     clusterEndpoint: ${module.eks[0].cluster_endpoint}
-     interruptionQueue: ${module.karpenter[0].queue_name}
-   webhook:
-     enabled: false
-   EOT
-  ]
-  depends_on = [
-    module.karpenter[0]
-  ]
-}
-
-
-data "kubectl_path_documents" "manifests" {
-  pattern = "${path.module}/templates/karpenter.yaml"
-  vars = {
-    alias_version = "v20260304"
-    cluster_name  = try(module.eks[0].cluster_name, "")
-  }
-}
-
-resource "kubectl_manifest" "deploy_manifest" {
-  for_each  = contains(local.enabled_workspaces, local.cluster_environment) ? data.kubectl_path_documents.manifests.manifests : {}
-  yaml_body = each.value
-
-  depends_on = [
-    helm_release.karpenter[0]
-  ]
 }

@@ -4,6 +4,11 @@ variable "environment" {
   description = "Environment of the resources"
 }
 
+variable "max_string_size" {
+  type        = string
+  description = "Oracle max_string_size parameter value"
+}
+
 variable "application_name" {
   type        = string
   description = "Name of application"
@@ -193,6 +198,24 @@ variable "tags" {
 variable "hub20_s3_bucket" {
   type        = string
   description = "HUB 2.0 S3 Bucket name"
+  default     = ""
+}
+
+variable "create_std_instance" {
+  type        = bool
+  description = "Whether to create a second RDS instance with max_string_size = STANDARD (non-prod only)"
+  default     = false
+}
+
+variable "std_identifier_suffix" {
+  type        = string
+  description = "Suffix appended to the identifier of the std RDS instance to keep it unique"
+  default     = ""
+}
+
+variable "std_snapshot_arn" {
+  type        = string
+  description = "ARN of the snapshot to restore the std RDS instance from"
   default     = ""
 }
 

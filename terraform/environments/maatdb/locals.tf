@@ -26,4 +26,11 @@ locals {
   zip_lambda_source_file_version = local.application_data.accounts[local.environment].zip_lambda_source_file_version
 
   laa_general_kms_arn = data.aws_kms_key.general_shared.arn
+
+  lambda_source_hashes = [
+    for f in fileset("./lambda/cloudwatch_alarm_slack_integration", "**") :
+    sha256(file("${path.module}/lambda/cloudwatch_alarm_slack_integration/${f}"))
+  ]
+
+  lambda_folder_name = ["lambda_delivery", "cloudwatch_sns_layer"]
 }
