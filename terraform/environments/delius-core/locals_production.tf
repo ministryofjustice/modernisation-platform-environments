@@ -113,7 +113,7 @@ locals {
       JDBC_CONNECTION_POOL_MIN_CAPACITY = "50"
       JDBC_URL                          = ""
       JDBC_USERNAME                     = "delius_pool"
-      LDAP_HOST                         = "https://ldap.prod.delius-core.hmpps-production.modernisation-platform.service.justice.gov.uk"
+      LDAP_HOST                         = "ldap.prod.delius-core.hmpps-production.modernisation-platform.service.justice.gov.uk"
       LDAP_PRINCIPAL                    = "cn=admin,dc=moj,dc=com"
       LOG_LEVEL_NDELIUS                 = "DEBUG"
       MERGE_API_URL                     = "https://delius-merge-api-prod.hmpps.service.justice.gov.uk"
