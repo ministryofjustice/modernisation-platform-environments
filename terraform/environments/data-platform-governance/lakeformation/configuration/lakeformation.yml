@@ -2,7 +2,11 @@
 environment:
   development:
     factories:
-      data-factory-moj-development: []
+      data-factory-moj-development:
+        domain: moj
+        products:
+          court_locations:
+            project: prj-1234567890
   test:
     factories: []
   preproduction:
