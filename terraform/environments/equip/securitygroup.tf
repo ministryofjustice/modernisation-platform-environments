@@ -938,6 +938,25 @@ resource "aws_security_group_rule" "ingress_eucs_appstream" {
   cidr_blocks       = [each.value.cidr]
 }
 
+# SMB (port 445) rule for eucs-appstream to all_internal_groups
+locals {
+  eucs_appstream_smb_rules = [
+    for rule in local.eucs_appstream_ingress_rules :
+    rule if rule.from_port == 445
+  ]
+}
+
+resource "aws_security_group_rule" "ingress_eucs_appstream_smb_to_all_internal" {
+  for_each          = { for idx, rule in local.eucs_appstream_smb_rules : "${rule.cidr}-${rule.protocol}-${rule.from_port}-${rule.to_port}" => rule }
+  description       = "eucs-appstream SMB: ${each.value.protocol} ${each.value.from_port}-${each.value.to_port}"
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  protocol          = lower(each.value.protocol)
+  security_group_id = aws_security_group.all_internal_groups.id
+  type              = "ingress"
+  cidr_blocks       = [each.value.cidr]
+}
+
 # cidr_blocks should be replaced with source_security_group_id, but open until confirmed with configuration team
 resource "aws_security_group_rule" "egress_all_hosts_to_proxies" {
   for_each          = local.application_data.host_to_proxy_rules
