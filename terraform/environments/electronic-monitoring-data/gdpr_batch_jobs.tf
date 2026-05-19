@@ -234,7 +234,7 @@ data "aws_iam_policy_document" "gdpr_step_function_batch_sync_policy_document" {
       "batch:TerminateJob"
     ]
     resources = [
-      aws_batch_job_queue.shred_unstructured_from_zip_batch_queue.arn,
+      aws_batch_job_queue.shred_unstructured_from_zip_batch_queue[0].arn,
       aws_batch_job_definition.shred_unstructured_from_zip_job.arn
     ]
   }
@@ -257,7 +257,7 @@ resource "aws_iam_policy" "gdpr_step_function_batch_sync_policy_document" {
   policy = data.aws_iam_policy_document.gdpr_step_function_batch_sync_policy_document.json
 }
 resource "aws_iam_role_policy_attachment" "gdpr_step_function_batch_sync_policy_attach" {
-  role       = aws_iam_role.gdpr_deletion_step_function.name
+  role       = aws_iam_role.gdpr_delete_iam_policy.name
   policy_arn = aws_iam_policy.gdpr_step_function_batch_sync_policy.arn
 }
 
