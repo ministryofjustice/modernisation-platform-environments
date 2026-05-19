@@ -146,11 +146,3 @@ resource "aws_lambda_permission" "allow_eventbridge_invoke" {
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.certificate_expiration_warning.arn
 }
-
-resource "aws_lambda_permission" "allow_eventbridge_invoke" {
-  statement_id  = "AllowExecutionFromEventBridge"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.cloudwatch_sns.function_name
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.certificate_expiration_warning.arn
-}
