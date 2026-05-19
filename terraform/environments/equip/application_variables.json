@@ -5,9 +5,7 @@
       "public_dns_name_web": "equip.hmpps-development.modernisation-platform.service.justice.gov.uk",
       "instance-scheduling": "skip-auto-start",
       "eucs_appstream_private_subnet_cidrs": [
-        "10.26.25.0/24",
-        "10.26.26.0/24",
-        "10.26.24.0/24"
+        "10.26.24.0/22"
       ]
     },
     "test": {
@@ -21,9 +19,7 @@
       "public_dns_name_web": "equip.hmpps-development.modernisation-platform.service.justice.gov.uk",
       "instance-scheduling": "skip-scheduling",
       "eucs_appstream_private_subnet_cidrs": [
-        "10.27.8.0/24",
-        "10.27.9.0/24",
-        "10.27.10.0/24"
+        "10.27.8.0/22"
       ]
     }
   },
