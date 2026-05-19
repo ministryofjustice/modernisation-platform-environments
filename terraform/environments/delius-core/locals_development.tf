@@ -86,9 +86,8 @@ locals {
       task_definition_revision = 18
       ec2_instance_type        = "r7i.large"
       task_count               = 1
-      # max_size                 = 2
-      # min_size                 = 1
-      # desired_capacity         = 1
+      asg_min_size             = 1
+      asg_max_size             = 2
     }
 
     weblogic_params = {
@@ -110,7 +109,7 @@ locals {
       JDBC_CONNECTION_POOL_MIN_CAPACITY = "50"
       JDBC_URL                          = "jdbc:oracle:thin:@(DESCRIPTION=(LOAD_BALANCE=OFF)(FAILOVER=ON)(CONNECT_TIMEOUT=10)(RETRY_COUNT=3)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=tcp)(HOST=delius-core-dev-db-1.hmpps-development.modernisation-platform.internal)(PORT=1521))(ADDRESS=(PROTOCOL=tcp)(HOST=delius-core-dev-db-2.hmpps-development.modernisation-platform.internal)(PORT=1521))(ADDRESS=(PROTOCOL=tcp)(HOST=delius-core-dev-db-3.hmpps-development.modernisation-platform.internal)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=DMDNDA_TAF)))"
       JDBC_USERNAME                     = "delius_pool"
-      LDAP_HOST                         = "https://ldap.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk"
+      LDAP_HOST                         = "ldap.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk"
       LDAP_PRINCIPAL                    = "cn=admin,dc=moj,dc=com"
       LOG_LEVEL_NDELIUS                 = "DEBUG"
       MERGE_API_URL                     = "https://delius-merge-api-dev.hmpps.service.justice.gov.uk"
