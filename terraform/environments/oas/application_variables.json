@@ -39,7 +39,7 @@
       "stage_snapshot": "snap-0859b31fc100812e0",
       "allocated_storage": "50",
       "engine": "oracle-ee",
-      "engine_version": "19.0.0.0.ru-2021-10.rur-2021-10.r1",
+      "engine_version": "19.0.0.0.ru-2026-01.rur-2026-01.r3",
       "instance_class": "db.t3.medium",
       "ec2instancetype": "r5a.large",
       "allow_major_version_upgrade": true,
