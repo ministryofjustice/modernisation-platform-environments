@@ -1,5 +1,6 @@
 resource "aws_transfer_server" "this" {
   domain                 = "S3"
+  endpoint_type          = "VPC"
   identity_provider_type = "SERVICE_MANAGED"
   logging_role           = module.iam_for_transfer.arn
   protocols              = ["SFTP"]
