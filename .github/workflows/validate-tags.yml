@@ -126,3 +126,13 @@ jobs:
               repo: context.repo.repo,
               body: `## 🏷️ Tag Validation ${icon}\n\n${summary}`
             });
+      
+      - name: Hide Previous PR comment
+        if: ${{ github.event_name == 'pull_request' }}
+        working-directory: "scripts/minimise-comments"
+        env:
+          COMMENT_BODY_CONTAINS: "**`Tag Validation`**"
+          PR_NUMBER: "${{ github.event.pull_request.number }}"
+        run: |
+          go build
+          ./minimise-comments
