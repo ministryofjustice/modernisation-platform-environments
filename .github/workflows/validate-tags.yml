@@ -8,6 +8,7 @@ on:
 permissions:
   contents: read
   pull-requests: write
+  id-token: write  
 
 jobs:
   generate-matrix:
@@ -34,10 +35,16 @@ jobs:
       - name: Get environment list for each application
         id: envs
         run: |
+          apps='${{ steps.apps.outputs.applications }}'
+          if [ -z "$apps" ] || [ "$apps" = "[]" ]; then
+            echo "No applications detected — skipping."
+            echo "environments=[]" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           result='[]'
-          for app in $(echo '${{ steps.apps.outputs.applications }}' | jq -r '.[]'); do
-            envs=$(curl -s "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${app}.json" \
-              | jq -c "[.environments[].name | {application: \"$app\", environment: .}]")
+          for app in $(echo "$apps" | jq -r '.[]'); do
+            envs=$(curl -sf "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${app}.json" \
+              | jq -c --arg app "$app" '[.environments[].name | {application: $app, environment: .}]')
             result=$(echo "$result $envs" | jq -c -s 'add')
           done
           echo "environments=$result" >> "$GITHUB_OUTPUT"
