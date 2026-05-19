@@ -43,6 +43,7 @@ jobs:
           fi
           result='[]'
           for app in $(echo "$apps" | jq -r '.[]'); do
+            echo "Fetching environments for $app"
             envs=$(curl -sf "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${app}.json" \
               | jq -c --arg app "$app" '[.environments[].name | {application: $app, environment: .}]')
             result=$(echo "$result $envs" | jq -c -s 'add')
