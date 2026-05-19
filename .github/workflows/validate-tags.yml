@@ -10,20 +10,58 @@ permissions:
   pull-requests: write
 
 jobs:
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      environments: ${{ steps.envs.outputs.environments }}
+    steps:
+      - name: Get changed applications
+        id: apps
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          applications=$(gh pr view ${{ github.event.pull_request.number }} \
+              --repo ${{ github.repository }} \
+              --json files --jq '
+                [.files[].path
+                  | capture("^terraform/environments/(?<app>[^/]+)/")
+                  | .app
+                ] | unique
+              ')
+          echo "applications=$applications" >> "$GITHUB_OUTPUT"
+          echo "Detected: $applications"
+
+      - name: Get environment list for each application
+        id: envs
+        run: |
+          result='[]'
+          for app in $(echo '${{ steps.apps.outputs.applications }}' | jq -r '.[]'); do
+            envs=$(curl -s "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${app}.json" \
+              | jq -c "[.environments[].name | {application: \"$app\", environment: .}]")
+            result=$(echo "$result $envs" | jq -c -s 'add')
+          done
+          echo "environments=$result" >> "$GITHUB_OUTPUT"
+
   validate-tags:
     name: Tag Validation
+    needs: generate-matrix
     runs-on: ubuntu-latest
-    with:
-      application: "${{ github.workflow }}"
-      environment: "${{ matrix.target }}"
-      action: "${{ matrix.action }}"
-      component: "${{ matrix.component }}"     # If your strategy workflow also outputs "matrix.component"
-    secrets:
-      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
-      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.generate-matrix.outputs.environments) }}
+    env:
+      ACCOUNT_NAME: "${{ matrix.application }}-${{ matrix.environment }}"
+      WORKSPACE_NAME: "${{ matrix.application }}-${{ matrix.environment }}"
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Get AWS Account Number
+        run: |
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "::add-mask::$ACCOUNT_NUMBER"
+          echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885  # v6.1.1
