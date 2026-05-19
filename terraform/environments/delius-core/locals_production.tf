@@ -35,6 +35,7 @@ locals {
   db_config_prod = {
     instance_type  = "r7i.4xlarge"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-06-04T11-24-58.162Z"
+    pinned_ami_id  = "ami-02fea771e141d2b76"
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
     }
@@ -89,7 +90,8 @@ locals {
       container_port    = 8080
       container_memory  = 4096
       container_cpu     = 2048
-      ec2_instance_type = "r5.2xlarge"
+      ec2_instance_type = "r7i.2xlarge"
+      task_count        = 8
     }
 
     weblogic_params = {
@@ -139,10 +141,12 @@ locals {
     }
 
     weblogic_eis = {
-      image_tag        = "6.2.0.3"
-      container_port   = 8080
-      container_memory = 2048
-      container_cpu    = 1024
+      image_tag         = "6.2.0.3"
+      container_port    = 8080
+      container_memory  = 2048
+      container_cpu     = 1024
+      ec2_instance_type = "r7i.large"
+      task_count        = 1
     }
 
     pwm = {

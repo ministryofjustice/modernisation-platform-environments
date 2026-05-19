@@ -259,6 +259,17 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-2" {
   security_group_id = aws_security_group.SCR-Team-Foundation-Server[0].id
 }
 
+resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-3" {
+  description       = "Rule to allow port 443 traffic inbound"
+  count             = local.is-development == true ? 1 : 0
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.SCR-Team-Foundation-Server[0].id
+}
+
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Egress" {
   description       = "Rule to allow all traffic outbound"
   count             = local.is-development == true ? 1 : 0

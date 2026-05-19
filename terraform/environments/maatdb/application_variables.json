@@ -4,8 +4,9 @@
       "region": "eu-west-2",
       "port": "1521",
       "allocated_storage": 300,
+      "ram_size": 4,
       "engine": "oracle-se2",
-      "engine_version": "19.0.0.0.ru-2025-10.rur-2025-10.r1",
+      "engine_version": "19.0.0.0.ru-2026-01.rur-2026-01.r3",
       "instance_class": "db.t3.medium",
       "allow_major_version_upgrade": false,
       "auto_minor_version_upgrade": true,
@@ -22,6 +23,8 @@
       "performance_insights_enabled": true,
       "performance_insights_retention_period": 7,
       "snapshot_arn": "maatdb-dev-rds-kms",
+      "snapshot_arn_std": "snap-maatdb-beforeparameterchange-cc-4266-1203",
+      "rds_std_suffix": "wkpz",
       "deletion_protection": true,
       "cloud_platform_cidr": "172.20.0.0/16",
       "manual_added_cidr": "10.221.0.0/16",
@@ -48,15 +51,17 @@
       "zip_lambda_source_file": "zip_s3_objects.zip",
       "zip_lambda_source_file_version": "TevkiwEbMJttB_5X7VX03Sas1u6ONJbE",
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? 2999)",
-      "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)"
+      "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)",
+      "max_string_size": "EXTENDED"
     },
 
     "test": {
       "region": "eu-west-2",
       "port": "1521",
       "allocated_storage": 300,
+      "ram_size": 4,
       "engine": "oracle-se2",
-      "engine_version": "19.0.0.0.ru-2025-10.rur-2025-10.r1",
+      "engine_version": "19.0.0.0.ru-2026-01.rur-2026-01.r3",
       "instance_class": "db.t3.medium",
       "allow_major_version_upgrade": false,
       "auto_minor_version_upgrade": true,
@@ -73,6 +78,8 @@
       "performance_insights_enabled": true,
       "performance_insights_retention_period": 7,
       "snapshot_arn": "maatdb-test-kms",
+      "snapshot_arn_std": "maatdb-cc-4266-beforeparachange-13-march",
+      "rds_std_suffix": "fnjq",
       "deletion_protection": true,
       "cloud_platform_cidr": "172.20.0.0/16",
       "manual_added_cidr": "10.221.0.0/16",
@@ -99,14 +106,16 @@
       "zip_lambda_source_file": "zip_s3_objects.zip",
       "zip_lambda_source_file_version": "TevkiwEbMJttB_5X7VX03Sas1u6ONJbE",
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? 2999)",
-      "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)"
+      "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)",
+      "max_string_size": "EXTENDED"
     },
     "preproduction": {
       "region": "eu-west-2",
       "port": "1521",
       "allocated_storage": 300,
+      "ram_size": 4,
       "engine": "oracle-se2",
-      "engine_version": "19.0.0.0.ru-2025-10.rur-2025-10.r1",
+      "engine_version": "19.0.0.0.ru-2026-01.rur-2026-01.r3",
       "hub20_sec_group_id": "",
       "hub20_s3_bucket": "",
       "mojfin_sec_group_id": "sg-03a86e54fd2c0fb97",
@@ -126,6 +135,8 @@
       "performance_insights_enabled": true,
       "performance_insights_retention_period": 7,
       "snapshot_arn": "maatdb-preprod-backup-03102025",
+      "snapshot_arn_std": "maatdb-cc-4266-beforeparachange-bk-1304",
+      "rds_std_suffix": "bvmx",
       "deletion_protection": true,
       "cloud_platform_cidr": "172.20.0.0/16",
       "manual_added_cidr": "10.221.0.0/16",
@@ -149,13 +160,15 @@
       "zip_lambda_source_file": "zip_s3_objects.zip",
       "zip_lambda_source_file_version": "TevkiwEbMJttB_5X7VX03Sas1u6ONJbE",
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? 2999)",
-      "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)"
+      "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)",
+      "max_string_size": "EXTENDED"
     },
 
     "production": {
       "region": "eu-west-2",
       "port": "1521",
       "allocated_storage": 600,
+      "ram_size": 16,
       "engine": "oracle-se2",
       "engine_version": "19.0.0.0.ru-2025-10.rur-2025-10.r1",
       "hub20_sec_group_id": "sg-07369f468604d33c6",
@@ -177,6 +190,8 @@
       "performance_insights_enabled": true,
       "performance_insights_retention_period": 31,
       "snapshot_arn": "maatdb-22may20250936-finalsnapshot-withkms",
+      "snapshot_arn_std": "",
+      "rds_std_suffix": "",
       "deletion_protection": true,
       "cloud_platform_cidr": "172.20.0.0/16",
       "manual_added_cidr": "10.221.0.0/16",
@@ -200,7 +215,8 @@
       "zip_lambda_source_file": "zip_s3_objects.zip",
       "zip_lambda_source_file_version": "TevkiwEbMJttB_5X7VX03Sas1u6ONJbE",
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? *)",
-      "zip_lambda_eventbridge_cron": "cron(45 6 * * ? *)"
+      "zip_lambda_eventbridge_cron": "cron(45 6 * * ? *)",
+      "max_string_size": "STANDARD"
     }
   }
 }

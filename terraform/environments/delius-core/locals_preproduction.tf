@@ -35,6 +35,10 @@ locals {
   db_config_preprod = {
     instance_type  = "r7i.4xlarge"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-06-04T11-24-58.162Z"
+    pinned_ami_id  = "ami-04286e91e4ada8f3a"
+    instance_policies = {
+      "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
+    }
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
     }
@@ -89,7 +93,8 @@ locals {
       container_port    = 8080
       container_memory  = 4096
       container_cpu     = 2048
-      ec2_instance_type = "r5.2xlarge"
+      ec2_instance_type = "r7i.2xlarge"
+      task_count        = 8
     }
 
     weblogic_params = {
@@ -139,10 +144,12 @@ locals {
     }
 
     weblogic_eis = {
-      image_tag        = "6.2.0.3"
-      container_port   = 8080
-      container_memory = 2048
-      container_cpu    = 1024
+      image_tag         = "6.2.0.3"
+      container_port    = 8080
+      container_memory  = 2048
+      container_cpu     = 1024
+      ec2_instance_type = "r7i.large"
+      task_count        = 1
     }
 
     pwm = {
@@ -200,7 +207,7 @@ locals {
   }
 
   db_backup_config_preprod = {
-    object_lock_days             = 0
+    object_lock_days             = 10
     expire_current_after_days    = 200
     expire_noncurrent_after_days = 10
     transition = [

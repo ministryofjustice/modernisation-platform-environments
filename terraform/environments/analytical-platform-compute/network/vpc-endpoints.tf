@@ -119,10 +119,87 @@ module "vpc_endpoints" {
         { Name = format("%s-aps-workspaces", module.vpc.name) }
       )
     },
-    /* Gateways */
-    /*
-      Removing the S3 VPC endpoint while we investigate how APC Airflow workloads can do cross-region actions.
-      Destination buckets are in eu-west-1.
+    ec2 = {
+      service             = "ec2"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-ec2", module.vpc.name) }
+      )
+    },
+    ssm = {
+      service             = "ssm"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-ssm", module.vpc.name) }
+      )
+    },
+    ssmmessages = {
+      service             = "ssmmessages"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-ssmmessages", module.vpc.name) }
+      )
+    },
+    ec2messages = {
+      service             = "ec2messages"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-ec2messages", module.vpc.name) }
+      )
+    },
+    ecr-api = {
+      service             = "ecr.api"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-ecr-api", module.vpc.name) }
+      )
+    },
+    ecr-dkr = {
+      service             = "ecr.dkr"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-ecr-dkr", module.vpc.name) }
+      )
+    },
+    glue = {
+      service             = "glue"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-glue", module.vpc.name) }
+      )
+    },
+    autoscaling = {
+      service             = "autoscaling"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-autoscaling", module.vpc.name) }
+      )
+    },
+    lakeformation = {
+      service             = "lakeformation"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      tags = merge(
+        local.tags,
+        { Name = format("%s-lakeformation", module.vpc.name) }
+      )
+    },
     s3 = {
       service      = "s3"
       service_type = "Gateway"
@@ -136,7 +213,6 @@ module "vpc_endpoints" {
         { Name = format("%s-s3", module.vpc.name) }
       )
     }
-    */
   }
 
   tags = local.tags

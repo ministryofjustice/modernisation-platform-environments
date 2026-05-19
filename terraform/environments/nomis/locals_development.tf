@@ -183,6 +183,28 @@ locals {
           oracle-db-hostname-b = "none"
         })
       })
+
+      qa12c-nomis-web-a = merge(local.ec2_autoscaling_groups.qa12c-nomis-web, {
+        autoscaling_schedules = {}
+        config = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.config, {
+          instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
+            "Ec2Qa11GWeblogicPolicy",
+            "Ec2Qa11G2WeblogicPolicy",
+            "Ec2Qa19CWeblogicPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.user_data_cloud_init.args, {
+            branch = "TM-2061"
+          })
+        })
+        tags = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.tags, {
+          nomis-environment    = "qa19c"
+          oracle-db-name       = "qa19c"
+          oracle-db-hostname-a = "dev-nomis-db19c-1-b"
+          oracle-db-hostname-b = "none"
+        })
+      })
     }
 
     ec2_instances = {
@@ -238,6 +260,37 @@ locals {
       dev-nomis-db19c-1-a = merge(local.ec2_instances.db19c, {
         config = merge(local.ec2_instances.db19c.config, {
           availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.db19c.config.instance_profile_policies, [
+            "Ec2DevDatabasePolicy",
+          ])
+        })
+        ebs_volumes = merge(local.ec2_instances.db19c.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 100 }
+        })
+        ebs_volume_config = merge(local.ec2_instances.db19c.ebs_volume_config, {
+          data  = { total_size = 500 }
+          flash = { total_size = 50 }
+        })
+        instance = merge(local.ec2_instances.db19c.instance, {
+          # disable_api_termination = true
+        })
+        user_data_cloud_init = merge(local.ec2_instances.db19c.user_data_cloud_init, {
+          args = merge(local.ec2_instances.db19c.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.db19c.tags, {
+          description         = "syscon nomis dev and qa Oracle 19c databases"
+          instance-scheduling = "skip-scheduling"
+          nomis-environment   = "dev"
+          oracle-sids         = ""
+        })
+      })
+
+      dev-nomis-db19c-1-b = merge(local.ec2_instances.db19c, {
+        config = merge(local.ec2_instances.db19c.config, {
+          availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.db19c.config.instance_profile_policies, [
             "Ec2DevDatabasePolicy",
           ])

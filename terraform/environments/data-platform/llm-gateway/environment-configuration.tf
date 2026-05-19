@@ -3,8 +3,8 @@ locals {
   environment_configurations = {
     development = {
       litellm_versions = {
-        application = "main-v1.82.3-stable.patch.2"
-        chart       = "1.82.3-stable.patch.2"
+        application = "1.84.0-rc.1"
+        chart       = "1.84.0-rc.1"
       }
       llm_gateway_hostname = "llm-gateway.development.data-platform.service.justice.gov.uk"
       llm_gateway_ingress_allowlist = [
@@ -68,6 +68,10 @@ locals {
           }
           claude-opus-4-6 = {
             model_id = "eu.anthropic.claude-opus-4-6-v1"
+            region   = "eu-west-2"
+          }
+          claude-opus-4-7 = {
+            model_id = "eu.anthropic.claude-opus-4-7"
             region   = "eu-west-2"
           }
           claude-sonnet-4 = {
