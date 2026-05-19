@@ -2235,3 +2235,40 @@ resource "aws_iam_role_policy_attachment" "landing_dlq_redriver_attach" {
   role       = aws_iam_role.landing_dlq_redriver.name
   policy_arn = aws_iam_policy.landing_dlq_redriver.arn
 }
+
+# -----------------------------------------------------------------------------------
+# Macie Unstructured Job
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "macie_unstructured_job_iam_role_policy_document" {
+  count = local.is-development ? 1 : 0
+  statement {
+    sid    = "MacieJobManagement"
+    effect = "Allow"
+    actions = [
+      "macie2:ListClassificationJobs",
+      "macie2:CreateClassificationJob"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+resource "aws_iam_role" "macie_unstructured_job_iam_role" {
+  count              = local.is-development ? 1 : 0
+  name               = "macie_unstructured_job_iam_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "macie_unstructured_job_iam_role_policy" {
+  count  = local.is-development ? 1 : 0
+  name   = "macie_unstructured_job_iam_policy"
+  policy = data.aws_iam_policy_document.macie_unstructured_job_iam_role_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "macie_unstructured_job_iam_role_policy_attachment" {
+  count      = local.is-development ? 1 : 0
+  role       = aws_iam_role.macie_unstructured_job_iam_role[0].name
+  policy_arn = aws_iam_policy.macie_unstructured_job_iam_role_policy[0].arn
+}

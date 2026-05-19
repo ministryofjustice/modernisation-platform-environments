@@ -60,7 +60,16 @@
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
       "scheduled_dataset_lambda_version": "vLatest",
-      "probation_domains": ["prb-sentence-plan", "prb-assessment-view"],
+      "probation_domains": {
+        "pr-test-domain": {
+          "share_with_cloud_platform": false,
+          "create_glue_connection": true
+        },
+        "pr-assessment-view": {
+          "share_with_cloud_platform": true,
+          "create_glue_connection": false
+        }
+      },
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -189,10 +198,6 @@
             {
               "glue_database": "curated_prisons_history_dev_dbt",
               "glue_tables": ["*"]
-            },
-            {
-              "glue_database": "staged_prisons_history_dev_dbt",
-              "glue_tables": ["*"]
             }
           ]
         }
@@ -220,7 +225,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "aurora-postgresql",
-        "engine_version": "16.8",
+        "engine_version": "16.11",
         "init_size": "158",
         "max_size": "1000",
         "name": "missingreportsubmissions",
@@ -292,7 +297,12 @@
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
       "scheduled_dataset_lambda_version": "vLatest",
-      "probation_domains": ["prb-sentence-plan", "prb-assessment-view"],
+      "probation_domains": {
+        "pr-assessment-view": {
+          "share_with_cloud_platform": true,
+          "create_glue_connection": false
+        }
+      },
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -412,7 +422,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "postgres",
-        "engine_version": "16.8",
+        "engine_version": "16.11",
         "init_size": "158",
         "max_size": "1000",
         "name": "testdatabase",
@@ -427,7 +437,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "aurora-postgresql",
-        "engine_version": "16.8",
+        "engine_version": "16.11",
         "init_size": "158",
         "max_size": "1000",
         "name": "missingreportsubmissions",
@@ -501,7 +511,12 @@
       "setup_redshift_schedule": true,
       "enable_redshift_health_check": true,
       "scheduled_dataset_lambda_version": "vLatest",
-      "probation_domains": ["prb-sentence-plan", "prb-assessment-view"],
+      "probation_domains": {
+        "pr-assessment-view": {
+          "share_with_cloud_platform": true,
+          "create_glue_connection": false
+        }
+      },
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -622,10 +637,6 @@
           "data_locations": ["dpr-structured-historical-preproduction"],
           "resource_shares": [
             {
-              "glue_database": "staged_prisons_history_preprod_dbt",
-              "glue_tables": ["*"]
-            },
-            {
               "glue_database": "curated_prisons_history_preprod_dbt",
               "glue_tables": ["*"]
             }
@@ -640,7 +651,7 @@
         "enable": false,
         "create_replica": false,
         "engine": "postgres",
-        "engine_version": "16.8",
+        "engine_version": "16.11",
         "init_size": "158",
         "max_size": "1000",
         "name": "testdatabase",
@@ -655,7 +666,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "aurora-postgresql",
-        "engine_version": "16.8",
+        "engine_version": "16.11",
         "init_size": "158",
         "max_size": "1000",
         "name": "missingreportsubmissions",
@@ -727,7 +738,12 @@
       "setup_scheduled_action_iam_role": false,
       "setup_redshift_schedule": false,
       "scheduled_dataset_lambda_version": "vLatest",
-      "probation_domains": ["prb-sentence-plan", "prb-assessment-view"],
+      "probation_domains": {
+        "pr-assessment-view": {
+          "share_with_cloud_platform": true,
+          "create_glue_connection": false
+        }
+      },
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -848,10 +864,6 @@
           "data_locations": ["dpr-structured-historical-production"],
           "resource_shares": [
             {
-              "glue_database": "staged_prisons_history",
-              "glue_tables": ["*"]
-            },
-            {
               "glue_database": "curated_prisons_history",
               "glue_tables": ["*"]
             },
@@ -874,7 +886,7 @@
         "enable": false,
         "create_replica": false,
         "engine": "postgres",
-        "engine_version": "16.8",
+        "engine_version": "16.11",
         "init_size": "158",
         "max_size": "1000",
         "name": "testdatabase",
@@ -889,7 +901,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "aurora-postgresql",
-        "engine_version": "16.8",
+        "engine_version": "16.11",
         "init_size": "158",
         "max_size": "1000",
         "name": "missingreportsubmissions",

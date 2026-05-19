@@ -166,11 +166,55 @@ sqlalchemy.url = mysql://linotp2:$${MARIADB_ROOT_PASSWORD}@localhost/linotp2
 
 # Encryption key configuration
 linotpSecretFile = /etc/linotp2/encKey
+
+# Logging configuration
+[loggers]
+keys = root, linotp, sqlalchemy
+
+[handlers]
+keys = file, console
+
+[formatters]
+keys = generic
+
+[logger_root]
+level = WARNING
+handlers = file, console
+
+[logger_linotp]
+level = INFO
+handlers = file
+qualname = linotp
+
+[logger_sqlalchemy]
+level = WARNING
+handlers = file
+qualname = sqlalchemy.engine
+
+[handler_console]
+class = StreamHandler
+args = (sys.stderr,)
+level = NOTSET
+formatter = generic
+
+[handler_file]
+class = handlers.RotatingFileHandler
+args = ('/var/log/linotp/linotp.log', 'a', 10000000, 4)
+level = INFO
+formatter = generic
+
+[formatter_generic]
+format = %(asctime)s %(levelname)-5.5s [%(name)s][%(funcName)s #%(lineno)d] %(message)s
+datefmt = %Y/%m/%d - %H:%M:%S
 EOF
 
-# Create cache directory
+# Create cache and log directories
 mkdir -p /etc/linotp2/data
+mkdir -p /var/log/linotp
 chown -R linotp:linotp /etc/linotp2
+# Apache runs WSGI app as 'apache' user, needs write access to log directory
+chown -R linotp:apache /var/log/linotp
+chmod -R 775 /var/log/linotp
 
 # Initialize LinOTP database schema
 paster setup-app /etc/linotp2/linotp.ini
@@ -378,6 +422,11 @@ server default {
   authorize {
     preprocess
     perl
+    if (ok) {
+      update control {
+        Auth-Type := Perl
+      }
+    }
   }
 
   authenticate {

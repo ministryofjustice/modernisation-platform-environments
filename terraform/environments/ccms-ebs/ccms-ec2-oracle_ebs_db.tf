@@ -122,7 +122,8 @@ resource "aws_volume_attachment" "export_home_att" {
 resource "aws_ebs_volume" "u01" {
   lifecycle {
     ignore_changes = [
-      kms_key_id
+      kms_key_id,
+      tags
     ]
   }
   availability_zone = "eu-west-2a"
