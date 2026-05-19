@@ -39,7 +39,7 @@ resource "aws_cloudwatch_event_rule" "certificate_expiration_warning" {
   })
 }
 
-resource "aws_cloudwatch_event_target" "certificate_expiration_warning_to_sns" {
+resource "aws_cloudwatch_event_target" "certificate_expiration_warning_to_lambda_target" {
   rule = aws_cloudwatch_event_rule.certificate_expiration_warning.name
   target_id = "certificate-expiration-warning-target"
   arn  = aws_lambda_function.cloudwatch_sns.arn
