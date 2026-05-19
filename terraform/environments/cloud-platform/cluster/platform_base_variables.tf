@@ -10,5 +10,5 @@ variable "collaborator_access" {
 
 variable "karpenter_enabled" {
   type    = bool
-  default = false
+  default = true
 }
