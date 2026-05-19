@@ -18,9 +18,15 @@ pluginsManager:
   enabled: true
   configContent: |
     plugins:
+      - name: cert-manager
+        source: https://artifacthub.io/packages/headlamp/headlamp-plugins/headlamp_cert-manager
+        version: 0.1.0
       - name: karpenter
         source: https://artifacthub.io/packages/headlamp/headlamp-plugins/headlamp_karpenter
         version: 0.2.0
+      - name: keda
+        source: https://artifacthub.io/packages/headlamp/headlamp-plugins/headlamp_keda
+        version: 0.1.1-beta
     installOptions:
       parallel: true
       maxConcurrent: 2
