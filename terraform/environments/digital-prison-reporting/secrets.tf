@@ -710,6 +710,23 @@ data "aws_iam_policy_document" "crossaccount_secret_kms" {
     }
   }
 
+  statement {
+    sid    = "AllowRedshiftToDecryptSecret"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey"
+    ]
+
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.redshift-federated-query-role]
+    }
+  }
+
   dynamic "statement" {
     for_each = { for k, v in local.probation_domains : k => v if v.share_with_cloud_platform }
 

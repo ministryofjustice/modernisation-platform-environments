@@ -488,7 +488,8 @@ data "aws_iam_policy_document" "redshift_federated_query" {
     effect = "Allow"
     actions = [
       "kms:Decrypt",
-      "kms:GenerateDataKey"]
+      "kms:GenerateDataKey"
+    ]
     resources = [
       aws_kms_key.crossaccount_secret.arn
     ]
