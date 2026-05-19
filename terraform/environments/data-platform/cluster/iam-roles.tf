@@ -134,8 +134,9 @@ module "external_secrets_iam_role" {
 
   name = "external-secrets"
 
-  attach_external_secrets_policy = true
-  external_secrets_kms_key_arns  = [module.secrets_manager_common_kms_key.key_arn]
+  attach_external_secrets_policy        = true
+  external_secrets_secrets_manager_arns = [module.headlamp_entra_id_secret.secret_arn]
+  external_secrets_kms_key_arns         = [module.secrets_manager_common_kms_key.key_arn]
 
   oidc_providers = {
     main = {

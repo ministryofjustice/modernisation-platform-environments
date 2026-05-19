@@ -6,7 +6,7 @@ module "headlamp_entra_id_secret" {
   secret_string = jsonencode({
     client_id     = "CHANGEME"
     client_secret = "CHANGEME"
-    tenant_id     = "CHANGEME"
+    issuer_url    = "CHANGEME"
   })
   ignore_secret_changes = true
 }

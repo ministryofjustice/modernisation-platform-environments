@@ -105,13 +105,10 @@ resource "helm_release" "headlamp" {
       "${path.module}/configuration/helm/headlamp/values.yml.tftpl",
       {
         cluster_role_name    = kubernetes_cluster_role_v1.headlamp.metadata[0].name
-        client_id            = jsondecode(module.headlamp_entra_id_secret.secret_string).client_id
-        client_secret        = jsondecode(module.headlamp_entra_id_secret.secret_string).client_secret
         gateway_hostname     = trimprefix(local.cluster_configuration.shared_services_gateway_hostname, "*.")
         gateway_name         = "shared-gateway"
         gateway_namespace    = module.shared_services_namespace.name
         service_account_name = "headlamp-sa"
-        tenant_id            = jsondecode(module.headlamp_entra_id_secret.secret_string).tenant_id
       }
     )
   ]
