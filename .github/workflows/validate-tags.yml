@@ -107,6 +107,7 @@ jobs:
         with:
           terraform_directory: ./terraform
           soft_fail: false
+          terraform_workspace: ${{ env.WORKSPACE_NAME }}
 
       - name: Post Results to PR
         if: always() && github.event_name == 'pull_request'
