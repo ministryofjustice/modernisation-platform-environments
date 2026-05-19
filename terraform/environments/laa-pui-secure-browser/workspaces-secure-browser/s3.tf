@@ -5,7 +5,7 @@ module "s3_bucket_workspacesweb_session_logs" {
 
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "~> 4.0"
+  version = "~> 5.10"
 
   bucket        = "laa-workspacesweb-session-logs-${random_string.bucket_suffix[0].result}"
   force_destroy = true
