@@ -80,10 +80,10 @@ locals {
   delius_microservices_configs_dev = {
     weblogic = {
       image_tag                = "6.5.15"
+      task_definition_revision = 20
       container_port           = 8080
       container_memory         = 4096
       container_cpu            = 2048
-      task_definition_revision = 18
       ec2_instance_type        = "r7i.large"
       task_count               = 1
       asg_min_size             = 1
