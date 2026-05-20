@@ -94,6 +94,10 @@ resource "aws_iam_policy" "delius_oasys" {
       },
     ]
   })
+
+  tags = merge(local.tags, {
+    Name = "${each.key}-delius-oasys-sqs-poll-policy"
+  })
 }
 
 resource "aws_iam_user_policy_attachment" "delius_oasys" {

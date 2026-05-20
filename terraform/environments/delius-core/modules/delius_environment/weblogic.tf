@@ -190,8 +190,9 @@ resource "aws_security_group" "ecs_host_sg" {
 resource "aws_autoscaling_group" "weblogic" {
   name = "weblogic-${var.env_name}-ecs-asg"
 
-  max_size              = 2
-  min_size              = 1
+  min_size              = var.delius_microservice_configs.weblogic.asg_min_size
+  max_size              = var.delius_microservice_configs.weblogic.asg_max_size
+  
   protect_from_scale_in = true
 
   vpc_zone_identifier = var.account_config.private_subnet_ids
