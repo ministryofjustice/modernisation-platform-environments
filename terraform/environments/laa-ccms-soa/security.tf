@@ -212,47 +212,47 @@ resource "aws_security_group_rule" "ecs_tasks_admin_server" {
 }
 
 #-- Tightened: ECS Admin egress (was 0.0.0.0/0 all-protocols)
-resource "aws_security_group_rule" "ecs_tasks_admin_egress_vpc_endpoints" {
-  security_group_id = aws_security_group.ecs_tasks_admin.id
-  type              = "egress"
-  description       = "Egress to VPC endpoints and EBS NLB (ECR, CloudWatch, SSM, EBS) via tcp/443"
-  protocol          = "tcp"
-  from_port         = 443
-  to_port           = 443
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-}
+# resource "aws_security_group_rule" "ecs_tasks_admin_egress_vpc_endpoints" {
+#   security_group_id = aws_security_group.ecs_tasks_admin.id
+#   type              = "egress"
+#   description       = "Egress to VPC endpoints"
+#   protocol          = "tcp"
+#   from_port         = 443
+#   to_port           = 443
+#   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+# }
 
 resource "aws_security_group_rule" "ecs_tasks_admin_egress_oracle" {
   security_group_id = aws_security_group.ecs_tasks_admin.id
   type              = "egress"
-  description       = "Egress to SOA Oracle DB and EBS DB (prod) on tcp/1521"
+  description       = "Egress to SOA Oracle DB" 
   protocol          = "tcp"
   from_port         = 1521
   to_port           = 1521
   cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
 }
 
-resource "aws_security_group_rule" "ecs_tasks_admin_egress_cwa_db_nonprod" {
-  count             = local.is-production ? 0 : 1
-  security_group_id = aws_security_group.ecs_tasks_admin.id
-  type              = "egress"
-  description       = "Egress to CWA DB (non-prod external host) on tcp/1571"
-  protocol          = "tcp"
-  from_port         = 1571
-  to_port           = 1571
-  cidr_blocks       = ["0.0.0.0/0"] #-- External host outside VPC - cannot scope to subnet CIDR
-}
+# resource "aws_security_group_rule" "ecs_tasks_admin_egress_cwa_db_nonprod" {
+#   count             = local.is-production ? 0 : 1
+#   security_group_id = aws_security_group.ecs_tasks_admin.id
+#   type              = "egress"
+#   description       = "Egress to CWA DB (non-prod external host) on tcp/1571"
+#   protocol          = "tcp"
+#   from_port         = 1571
+#   to_port           = 1571
+#   cidr_blocks       = ["0.0.0.0/0"] #-- External host outside VPC - cannot scope to subnet CIDR
+# }
 
-resource "aws_security_group_rule" "ecs_tasks_admin_egress_cwa_db_prod" {
-  count             = local.is-production ? 1 : 0
-  security_group_id = aws_security_group.ecs_tasks_admin.id
-  type              = "egress"
-  description       = "Egress to CWA DB (prod external host) on tcp/2484 TCPS"
-  protocol          = "tcp"
-  from_port         = 2484
-  to_port           = 2484
-  cidr_blocks       = ["0.0.0.0/0"] #-- External host outside VPC - cannot scope to subnet CIDR
-}
+# resource "aws_security_group_rule" "ecs_tasks_admin_egress_cwa_db_prod" {
+#   count             = local.is-production ? 1 : 0
+#   security_group_id = aws_security_group.ecs_tasks_admin.id
+#   type              = "egress"
+#   description       = "Egress to CWA DB (prod external host) on tcp/2484 TCPS"
+#   protocol          = "tcp"
+#   from_port         = 2484
+#   to_port           = 2484
+#   cidr_blocks       = ["0.0.0.0/0"] #-- External host outside VPC - cannot scope to subnet CIDR
+# }
 
 resource "aws_security_group_rule" "ecs_tasks_admin_egress_admin_t3" {
   security_group_id = aws_security_group.ecs_tasks_admin.id
@@ -281,7 +281,7 @@ resource "aws_security_group_rule" "ecs_tasks_admin_egress_efs" {
   protocol          = "tcp"
   from_port         = 2049
   to_port           = 2049
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+  cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
 }
 
 #--ECS Tasks Managed
