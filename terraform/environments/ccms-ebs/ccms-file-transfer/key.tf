@@ -46,7 +46,10 @@ data "aws_iam_policy_document" "s3_sftp_bc_kms_policy" {
     }
     actions = [
       "kms:GenerateDataKey",
-      "kms:Encrypt"
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:DescribeKey"
     ]
     resources = ["*"]
   }
