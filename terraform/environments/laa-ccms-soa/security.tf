@@ -281,7 +281,7 @@ resource "aws_security_group_rule" "ecs_tasks_admin_egress_efs" {
   protocol          = "tcp"
   from_port         = 2049
   to_port           = 2049
-  cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
+  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
 #--ECS Tasks Managed
