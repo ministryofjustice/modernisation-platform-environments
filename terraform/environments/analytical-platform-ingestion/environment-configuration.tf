@@ -28,7 +28,7 @@ locals {
       target_buckets = [
         "mojap-land-dev",
         "cloud-platform-40748c2df4b92e2dfd779a02841187ec",
-        "ccms-ebs-test-bc-inbound-mp/inbound"
+        "ccms-ebs-test-bc-inbound-mp"
       ]
       datasync_target_buckets     = ["mojap-land-dev"]
       datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-development"]
