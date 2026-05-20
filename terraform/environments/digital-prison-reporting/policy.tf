@@ -480,7 +480,7 @@ data "aws_iam_policy_document" "redshift_federated_query" {
     actions = [
       "secretsmanager:GetSecretValue"
     ]
-    resources = [for s in data.aws_secretsmanager_secret.probation : s.arn]
+    resources = [for s in module.probation_source_secret : s.secret_arn]
   }
 }
 
