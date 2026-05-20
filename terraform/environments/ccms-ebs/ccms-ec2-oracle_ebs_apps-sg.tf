@@ -193,6 +193,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsapps_4443" {
 ### OEM Agent Port (OMS -> EBS Apps)
 
 resource "aws_security_group_rule" "ingress_traffic_ebsapps_oem_agent_3872" {
+  count             = local.environment == "development" ? 1 : 0
   security_group_id = aws_security_group.ec2_sg_ebsapps.id
   type              = "ingress"
   description       = "OEM OMS to EBS Apps agent port"
@@ -205,6 +206,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsapps_oem_agent_3872" {
 ### OEM OMS Upload Port (OMS -> EBS Apps)
 
 resource "aws_security_group_rule" "ingress_traffic_ebsapps_oem_oms_4903" {
+  count             = local.environment == "development" ? 1 : 0
   security_group_id = aws_security_group.ec2_sg_ebsapps.id
   type              = "ingress"
   description       = "OEM OMS to EBS Apps OMS upload port"
@@ -217,6 +219,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsapps_oem_oms_4903" {
 ### OEM Agent HTTPS Port (OMS -> EBS Apps)
 
 resource "aws_security_group_rule" "ingress_traffic_ebsapps_oem_https_7803" {
+  count             = local.environment == "development" ? 1 : 0
   security_group_id = aws_security_group.ec2_sg_ebsapps.id
   type              = "ingress"
   description       = "OEM OMS to EBS Apps agent HTTPS port"
@@ -399,6 +402,7 @@ resource "aws_security_group_rule" "egress_traffic_ebsapps_4443" {
 ### OEM Agent Port (EBS Apps -> OMS)
 
 resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_agent_3872" {
+  count             = local.environment == "development" ? 1 : 0
   security_group_id = aws_security_group.ec2_sg_ebsapps.id
   type              = "egress"
   description       = "EBS Apps to OEM OMS agent port"
@@ -411,6 +415,7 @@ resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_agent_3872" {
 ### OEM OMS Upload Port (EBS Apps -> OMS)
 
 resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_oms_4903" {
+  count             = local.environment == "development" ? 1 : 0
   security_group_id = aws_security_group.ec2_sg_ebsapps.id
   type              = "egress"
   description       = "EBS Apps to OEM OMS upload port"
@@ -423,6 +428,7 @@ resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_oms_4903" {
 ### OEM Agent HTTPS Port (EBS Apps -> OMS)
 
 resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_https_7803" {
+  count             = local.environment == "development" ? 1 : 0
   security_group_id = aws_security_group.ec2_sg_ebsapps.id
   type              = "egress"
   description       = "EBS Apps to OEM OMS agent HTTPS port"
@@ -435,6 +441,7 @@ resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_https_7803" {
 ### OEM DB Oracle Listener (EBS Apps -> OEM DB)
 
 resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_db_1521" {
+  count             = local.environment == "development" ? 1 : 0
   security_group_id = aws_security_group.ec2_sg_ebsapps.id
   type              = "egress"
   description       = "EBS Apps to OEM DB Oracle listener"
