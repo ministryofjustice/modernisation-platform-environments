@@ -170,7 +170,7 @@
       "allocated_storage": 600,
       "ram_size": 16,
       "engine": "oracle-se2",
-      "engine_version": "19.0.0.0.ru-2025-10.rur-2025-10.r1",
+      "engine_version": "19.0.0.0.ru-2026-01.rur-2026-01.r3",
       "hub20_sec_group_id": "sg-07369f468604d33c6",
       "hub20_s3_bucket": "hub20-production-cwa-extract-data",
       "mojfin_sec_group_id": "sg-036d95b37acd2c42e",
