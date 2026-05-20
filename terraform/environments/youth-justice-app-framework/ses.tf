@@ -8,7 +8,11 @@ module "ses" {
   private_subnets       = local.private_subnet_list[*].cidr_block
 
   ses_email_identities = contains(["development", "test"], local.environment) ? [
-    "thomas.tipler@necsws.com"
+    "thomas.tipler@necsws.com",
+    "javaid.arshad@necsws.com",
+    "ryan.smith@necsws.com",
+    "vasil.dimitrov@necsws.com",
+    "Angela.Site@necsws.com"
   ] : []
 
   depends_on = [
