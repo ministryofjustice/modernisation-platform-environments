@@ -11,6 +11,17 @@ spec:
     - name: ai-gateway
       sectionName: https-admin
   rules:
+    - matches:
+        - path:
+            type: Exact
+            value: /
+      filters:
+        - type: RequestRedirect
+          requestRedirect:
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: /ui
+            statusCode: 302
     - backendRefs:
         - name: litellm-admin
           port: 4000
