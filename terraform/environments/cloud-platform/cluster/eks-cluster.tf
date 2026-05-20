@@ -15,6 +15,12 @@ module "eks" {
 
   cloudwatch_log_group_retention_in_days = 30
 
+  # Enable Auto Mode compute
+  compute_config = {
+    enabled    = true
+    node_pools = ["general-purpose"]
+  }
+
   eks_managed_node_groups = {
     default_ng = {
       ami_type               = local.environment_configuration.ami_type
