@@ -103,7 +103,7 @@ resource "aws_db_option_group" "appdboptiongroup19_new" {
 
   name                     = "appdboptiongroup19"
   option_group_description = "${local.application_name}-${local.environment}-optiongroup"
-  engine_name              = local.application_data.accounts[local.environment].engine
+  engine_name              = "oracle-ee"
   major_engine_version     = "19"
   skip_destroy             = true
 
