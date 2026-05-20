@@ -66,8 +66,20 @@ resource "aws_workspaces_ip_group" "workspaces" {
   description = "IP access control group"
 
   rules {
-    source      = "0.0.0.0/0"
-    description = "Allow all"
+    source      = "35.176.93.186/32"
+    description = "Global Protect Gateway"
+  }
+  rules {
+    source      = "18.130.148.126/32"
+    description = "Global Protect 3rd Gateway"
+  }
+  rules {
+    source      = "35.176.148.126/32"
+    description = "Global Protect 4th Gateway"
+  }
+  rules {
+    source      = "18.169.147.172/32"
+    description = "Global Protect 2nd Gateway"
   }
 
   tags = merge(
