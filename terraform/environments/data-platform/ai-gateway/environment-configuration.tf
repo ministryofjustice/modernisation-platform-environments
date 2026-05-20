@@ -70,10 +70,6 @@ locals {
             model_id = "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
             region   = "eu-west-2"
           }
-          claude-opus-4-5 = {
-            model_id = "eu.anthropic.claude-opus-4-5-20251101-v1:0"
-            region   = "eu-west-2"
-          }
           claude-opus-4-6 = {
             model_id = "eu.anthropic.claude-opus-4-6-v1"
             region   = "eu-west-2"
@@ -151,7 +147,58 @@ locals {
         # Hoose
         "51.179.193.117/32",
       ]
-      ai_gateway_models = {}
+      ai_gateway_models = {
+        bedrock = {
+          amazon-titan-embed-text-v2 = {
+            model_id = "amazon.titan-embed-text-v2:0"
+            region   = "eu-west-2"
+          }
+          claude-haiku-4-5 = {
+            model_id = "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
+            region   = "eu-west-2"
+          }
+          claude-opus-4-6 = {
+            model_id = "eu.anthropic.claude-opus-4-6-v1"
+            region   = "eu-west-2"
+          }
+          claude-opus-4-7 = {
+            model_id = "eu.anthropic.claude-opus-4-7"
+            region   = "eu-west-2"
+          }
+          claude-sonnet-4 = {
+            model_id = "eu.anthropic.claude-sonnet-4-20250514-v1:0"
+            region   = "eu-west-1"
+          }
+          claude-sonnet-4-5 = {
+            model_id = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+            region   = "eu-west-2"
+          }
+          claude-sonnet-4-6 = {
+            model_id = "eu.anthropic.claude-sonnet-4-6"
+            region   = "eu-west-2"
+          }
+          cohere-embed-english-v3 = {
+            model_id = "cohere.embed-english-v3"
+            region   = "eu-west-2"
+          }
+          cohere-embed-multilingual-v3 = {
+            model_id = "cohere.embed-multilingual-v3"
+            region   = "eu-west-2"
+          }
+          meta-llama3-8b-instruct = {
+            model_id = "meta.llama3-8b-instruct-v1:0"
+            region   = "eu-west-2"
+          }
+          meta-llama3-70b-instruct = {
+            model_id = "meta.llama3-70b-instruct-v1:0"
+            region   = "eu-west-2"
+          }
+          qwen-qwen3-coder-30b-a3b = {
+            model_id = "qwen.qwen3-coder-30b-a3b-v1:0"
+            region   = "eu-west-2"
+          }
+        }
+      }
       ai_gateway_autoscaling = {
         min_replicas                      = 1
         max_replicas                      = 3

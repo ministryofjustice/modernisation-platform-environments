@@ -19,7 +19,7 @@ resource "kubernetes_manifest" "external_secret_litellm_license" {
       }
       data = [
         {
-          secretKey = "license"
+          secretKey = "LITELLM_LICENSE"
           remoteRef = {
             key = tostring(module.litellm_license_secret.secret_id)
           }
