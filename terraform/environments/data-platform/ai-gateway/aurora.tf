@@ -1,10 +1,9 @@
 module "ai_gateway_aurora" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-rds-aurora.git?ref=2c3946c8191278ad974bbb077da5e03986e24f4d" # v10.2.0
 
-  name           = local.component_name
-  engine         = "aurora-postgresql"
-  engine_version = local.environment_configuration.aurora_engine_version
-
+  name                   = local.component_name
+  engine                 = "aurora-postgresql"
+  engine_version         = local.environment_configuration.aurora_engine_version
   cluster_instance_class = local.environment_configuration.aurora_instance_class
   instances              = local.environment_configuration.aurora_instances
 
@@ -37,6 +36,11 @@ module "ai_gateway_aurora" {
 
   create_cloudwatch_log_group     = true
   enabled_cloudwatch_logs_exports = ["postgresql"]
+
+  cluster_monitoring_interval = local.is-production ? 60 : 0
+  create_monitoring_role      = local.is-production
+  iam_role_name               = "${local.component_name}-monitoring"
+  iam_role_use_name_prefix    = true
 
   tags = local.tags
 }
