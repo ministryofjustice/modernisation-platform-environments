@@ -1,5 +1,6 @@
 locals {
   environment_configuration = local.environment_configurations[local.environment]
+  ai_gateway_models         = yamldecode(file("${path.module}/configuration/models.yml"))
   environment_configurations = {
     development = {
       litellm_versions = {
@@ -38,83 +39,14 @@ locals {
         "213.121.161.112/28", # 102PF
         "51.149.2.0/24",      # 10SC
       ]
-      ai_gateway_models = {
-        azure = {
-          gpt-4o = {
-            model_id    = "gpt-4o-mojdp"
-            api_version = "2024-12-01-preview"
-          }
-          gpt-4-1 = {
-            model_id    = "gpt-4.1-mojdp"
-            api_version = "2024-12-01-preview"
-          }
-          gpt-5 = {
-            model_id    = "gpt-5-mojdp"
-            api_version = "2024-12-01-preview"
-          }
-          gpt-5-1 = {
-            model_id    = "gpt-5.1-mojdp"
-            api_version = "2024-12-01-preview"
-          }
-          gpt-5-2 = {
-            model_id    = "gpt-5.2-mojdp"
-            api_version = "2024-12-01-preview"
-          }
-        }
-        bedrock = {
-          amazon-titan-embed-text-v2 = {
-            model_id = "amazon.titan-embed-text-v2:0"
-            region   = "eu-west-2"
-          }
-          claude-haiku-4-5 = {
-            model_id = "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
-            region   = "eu-west-2"
-          }
-          claude-opus-4-6 = {
-            model_id = "eu.anthropic.claude-opus-4-6-v1"
-            region   = "eu-west-2"
-          }
-          claude-sonnet-4 = {
-            model_id = "eu.anthropic.claude-sonnet-4-20250514-v1:0"
-            region   = "eu-west-1"
-          }
-          claude-sonnet-4-5 = {
-            model_id = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
-            region   = "eu-west-2"
-          }
-          claude-sonnet-4-6 = {
-            model_id = "eu.anthropic.claude-sonnet-4-6"
-            region   = "eu-west-2"
-          }
-          cohere-embed-english-v3 = {
-            model_id = "cohere.embed-english-v3"
-            region   = "eu-west-2"
-          }
-          cohere-embed-multilingual-v3 = {
-            model_id = "cohere.embed-multilingual-v3"
-            region   = "eu-west-2"
-          }
-          meta-llama3-8b-instruct = {
-            model_id = "meta.llama3-8b-instruct-v1:0"
-            region   = "eu-west-2"
-          }
-          meta-llama3-70b-instruct = {
-            model_id = "meta.llama3-70b-instruct-v1:0"
-            region   = "eu-west-2"
-          }
-          qwen-qwen3-coder-30b-a3b = {
-            model_id = "qwen.qwen3-coder-30b-a3b-v1:0"
-            region   = "eu-west-2"
-          }
-        }
-      }
+      ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
         min_replicas                      = 1
         max_replicas                      = 3
         target_cpu_utilization_percentage = 80
       }
       aurora_instance_class = "db.serverless"
-      aurora_engine_version = "17.4"
+      aurora_engine_version = "17.7"
       aurora_instances      = { writer = {} }
       aurora_serverlessv2_scaling_configuration = {
         min_capacity             = 0
@@ -147,65 +79,14 @@ locals {
         # Hoose
         "51.179.193.117/32",
       ]
-      ai_gateway_models = {
-        bedrock = {
-          amazon-titan-embed-text-v2 = {
-            model_id = "amazon.titan-embed-text-v2:0"
-            region   = "eu-west-2"
-          }
-          claude-haiku-4-5 = {
-            model_id = "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
-            region   = "eu-west-2"
-          }
-          claude-opus-4-6 = {
-            model_id = "eu.anthropic.claude-opus-4-6-v1"
-            region   = "eu-west-2"
-          }
-          claude-opus-4-7 = {
-            model_id = "eu.anthropic.claude-opus-4-7"
-            region   = "eu-west-2"
-          }
-          claude-sonnet-4 = {
-            model_id = "eu.anthropic.claude-sonnet-4-20250514-v1:0"
-            region   = "eu-west-1"
-          }
-          claude-sonnet-4-5 = {
-            model_id = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
-            region   = "eu-west-2"
-          }
-          claude-sonnet-4-6 = {
-            model_id = "eu.anthropic.claude-sonnet-4-6"
-            region   = "eu-west-2"
-          }
-          cohere-embed-english-v3 = {
-            model_id = "cohere.embed-english-v3"
-            region   = "eu-west-2"
-          }
-          cohere-embed-multilingual-v3 = {
-            model_id = "cohere.embed-multilingual-v3"
-            region   = "eu-west-2"
-          }
-          meta-llama3-8b-instruct = {
-            model_id = "meta.llama3-8b-instruct-v1:0"
-            region   = "eu-west-2"
-          }
-          meta-llama3-70b-instruct = {
-            model_id = "meta.llama3-70b-instruct-v1:0"
-            region   = "eu-west-2"
-          }
-          qwen-qwen3-coder-30b-a3b = {
-            model_id = "qwen.qwen3-coder-30b-a3b-v1:0"
-            region   = "eu-west-2"
-          }
-        }
-      }
+      ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
         min_replicas                      = 1
         max_replicas                      = 3
         target_cpu_utilization_percentage = 80
       }
       aurora_instance_class = "db.serverless"
-      aurora_engine_version = "17.4"
+      aurora_engine_version = "17.7"
       aurora_instances      = { writer = {} }
       aurora_serverlessv2_scaling_configuration = {
         min_capacity             = 0
@@ -229,7 +110,7 @@ locals {
         target_cpu_utilization_percentage = 80
       }
       aurora_instance_class = "db.serverless"
-      aurora_engine_version = "17.4"
+      aurora_engine_version = "17.7"
       aurora_instances      = { writer = {} }
       aurora_serverlessv2_scaling_configuration = {
         min_capacity             = 0
@@ -253,7 +134,7 @@ locals {
         target_cpu_utilization_percentage = 80
       }
       aurora_instance_class                     = "db.t4g.medium"
-      aurora_engine_version                     = "17.4"
+      aurora_engine_version                     = "17.7"
       aurora_instances                          = { writer = {}, reader = {} }
       aurora_serverlessv2_scaling_configuration = null
       elasticache_node_type                     = "cache.t4g.medium"

@@ -685,7 +685,7 @@ compare_secrets() {
     "api_key:AZURE_OPENAI_API_KEY"
 
   # litellm-license: ai-gateway/litellm-license <-> k8s secret "litellm-license"
-  compare_secret_pair_plain "ai-gateway/litellm-license" "litellm-license" "license"
+  compare_secret_pair_plain "ai-gateway/litellm-license" "litellm-license" "LITELLM_LICENSE"
 }
 
 compare_secret_pair() {
