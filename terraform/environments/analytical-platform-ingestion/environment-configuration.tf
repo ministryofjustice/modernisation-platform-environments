@@ -35,7 +35,7 @@ locals {
 
       /* Target KMS */
       target_kms_keys = [
-        "arn:aws:kms:eu-west-2:767123802783:key/8237e60f-1680-4111-b305-b48211ddcb57" # s3/ccms-ebs-test-bc-inbound-mp
+        "arn:aws:kms:eu-west-2:249362002469:key/31da4df0-a5cf-46b8-8805-0eca0a4f8152" # s3/ccms-ebs-test-bc-inbound-mp
       ]
       mojap_land_kms_key             = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/8c53fbac-3106-422a-8f3d-409bb3b0c94d"
       datasync_opg_target_bucket_kms = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/38cf3d55-b36d-43e8-b91b-6b239a60cbea"
