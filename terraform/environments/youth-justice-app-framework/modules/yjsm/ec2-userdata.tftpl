@@ -1,14 +1,44 @@
 #!/bin/bash
-yum update -y
-yum install -y ruby wget
+set -euo pipefail
+
+# Helper function to retry dnf installs on cache failures
+dnf_install() {
+    local max_attempts=5
+    local attempt=1
+    until dnf install -y "$@"; do
+        if [ $attempt -ge $max_attempts ]; then
+            echo "Failed to install $* after $max_attempts attempts"
+            exit 1
+        fi
+        echo "Install failed, attempt $attempt of $max_attempts, retrying in 5s..."
+        dnf clean packages
+        attempt=$((attempt + 1))
+        sleep 5
+    done
+}
+
+dnf update -y
+dnf_install ruby wget tar git
+
+
+# Java - Amazon Corretto 21
+dnf_install --setopt=retries=5 java-21-amazon-corretto
+
+
+# CodeDeploy agent
+dnf_install ruby3.2
 cd /home/ec2-user
 wget https://aws-codedeploy-eu-west-2.s3.eu-west-2.amazonaws.com/latest/install
 chmod +x ./install
-sudo ./install auto
-sudo systemctl enable codedeploy-agent
-sudo systemctl start codedeploy-agent
-yum install amazon-cloudwatch-agent -y
-cat >>/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<EOF
+./install auto
+systemctl enable codedeploy-agent
+systemctl start codedeploy-agent
+
+
+# CloudWatch agent
+dnf_install amazon-cloudwatch-agent
+
+cat >>/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<CWEOF
 {
     "agent": {
         "run_as_user": "root"
@@ -18,58 +48,215 @@ cat >>/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<EOF
             "files": {
                 "collect_list": [
                     {
-                                                "file_path": "/var/log/messages",
-                                                "log_group_name": "${project}-${env}/OSSystem",
-                                                "log_stream_name": "{instance_id}",
-                                                "retention_in_days": 90
-                                        },
-                                        {
-                                                "file_path": "/var/log/clamav/clamav.log",
-                                                "log_group_name": "${project}-${env}/clamav",
-                                                "log_stream_name": "{instance_id}",
-                                                "retention_in_days": 90
-                                        },
-                                        {
-                                                "file_path": "/home/yjsm-hub/logging/yjsm-hub.log",
-                                                "log_group_name": "${project}-${env}/yjsm",
-                                                "log_stream_name": "{instance_id}",
-                                                "retention_in_days": 90
-                                        },
-                                        {
-                                                "file_path": "/home/yjsm-hub-admin/logging/yjsm-hub-admin.log",
-                                                "log_group_name": "${project}-${env}/yjsm-hub-admin",
-                                                "log_stream_name": "{instance_id}",
-                                                "retention_in_days": 90
-                                        },
-                                        {
-                                                "file_path": "/home/assets/logging/asset.log",
-                                                "log_group_name": "${project}-${env}/asset",
-                                                "log_stream_name": "{instance_id}",
-                                                "retention_in_days": 90
-                                        },
-                                        {
-                                                "file_path": "/var/log/nginx/error.log",
-                                                "log_group_name": "${project}-${env}/yjsm-ui-error",
-                                                "log_stream_name": "{instance_id}",
-                                                "retention_in_days": 90
-                                        },
-                                        {
-                                                "file_path": "/var/log/nginx/access.log",
-                                                "log_group_name": "${project}-${env}/yjsm-ui-access",
-                                                "log_stream_name": "{instance_id}",
-                                                "retention_in_days": 90
-                                        }
+                        "file_path": "/var/log/messages",
+                        "log_group_name": "${project}-${env}/OSSystem",
+                        "log_stream_name": "{instance_id}",
+                        "retention_in_days": 90
+                    },
+                    {
+                        "file_path": "/var/log/clamav/clamav.log",
+                        "log_group_name": "${project}-${env}/clamav",
+                        "log_stream_name": "{instance_id}",
+                        "retention_in_days": 90
+                    },
+                    {
+                        "file_path": "/home/yjsm-hub/logging/yjsm-hub.log",
+                        "log_group_name": "${project}-${env}/yjsm",
+                        "log_stream_name": "{instance_id}",
+                        "retention_in_days": 90
+                    },
+                    {
+                        "file_path": "/home/yjsm-hub-admin/logging/yjsm-hub-admin.log",
+                        "log_group_name": "${project}-${env}/yjsm-hub-admin",
+                        "log_stream_name": "{instance_id}",
+                        "retention_in_days": 90
+                    },
+                    {
+                        "file_path": "/home/assets/logging/asset.log",
+                        "log_group_name": "${project}-${env}/asset",
+                        "log_stream_name": "{instance_id}",
+                        "retention_in_days": 90
+                    },
+                    {
+                        "file_path": "/var/log/nginx/error.log",
+                        "log_group_name": "${project}-${env}/yjsm-ui-error",
+                        "log_stream_name": "{instance_id}",
+                        "retention_in_days": 90
+                    },
+                    {
+                        "file_path": "/var/log/nginx/access.log",
+                        "log_group_name": "${project}-${env}/yjsm-ui-access",
+                        "log_stream_name": "{instance_id}",
+                        "retention_in_days": 90
+                    }
                 ]
             }
         }
     }
 }
-EOF
+CWEOF
 systemctl enable amazon-cloudwatch-agent.service
 systemctl start amazon-cloudwatch-agent.service
 
-#set ssh key Algorithms
-echo KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256 >>/etc/ssh/sshd_config
 
-#set Ciphers
-echo "Ciphers aes256-ctr,aes192-ctr,aes128-ctr" >>/etc/ssh/sshd_config
+# SSH hardening
+cat > /etc/ssh/sshd_config.d/99-hardening.conf <<'SSHEOF'
+KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256
+Ciphers aes256-ctr,aes192-ctr,aes128-ctr
+SSHEOF
+systemctl restart sshd
+
+# Systemd service files
+cat > /etc/systemd/system/nginx.service << 'EOF'
+[Unit]
+Description=NGINX HTTP Server
+After=network.target
+
+[Service]
+Type=forking
+PIDFile=/run/nginx.pid
+ExecStartPre=/usr/sbin/nginx -t
+ExecStart=/usr/sbin/nginx
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s QUIT $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat > /etc/systemd/system/yjsm-hub.service << 'EOF'
+[Unit]
+Description=YJSM Hub service wrapper
+
+[Service]
+User=ec2-user
+WorkingDirectory=/app/yjsm-hub
+ExecStart=/bin/bash /app/yjsm-hub/scripts/hub
+SuccessExitStatus=143
+TimeoutStopSec=10
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat > /etc/systemd/system/yjsm-hub-admin.service << 'EOF'
+[Unit]
+Description=YJSM Hub admin service wrapper
+
+[Service]
+User=ec2-user
+WorkingDirectory=/app/yjsm-hub-admin
+ExecStart=/bin/bash /app/yjsm-hub-admin/scripts/hubadmin
+SuccessExitStatus=143
+TimeoutStopSec=10
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Reload systemd and enable services
+systemctl daemon-reload
+systemctl enable nginx
+systemctl enable yjsm-hub
+systemctl enable yjsm-hub-admin
+
+
+# Create /app directory structure
+mkdir -p /app/scripts
+
+# Create log directories and set ownership
+mkdir -p /home/yjsm-hub/logging
+mkdir -p /home/yjsm-hub-admin/logging
+chown -R ec2-user:ec2-user /home/yjsm-hub
+chown -R ec2-user:ec2-user /home/yjsm-hub-admin
+
+# yjsm-log-purge.sh
+cat > /app/scripts/yjsm-log-purge.sh <<'SCRIPT'
+#!/bin/bash
+find /home/yjsm-hub/logging/archived -type f -mtime +30 -name 'yjsm-hub-[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9].*.log' -delete
+find /home/yjsm-hub-admin/logging/archived -type f -mtime +30 -name 'yjsm-hub-admin-[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9].*.log' -delete
+SCRIPT
+
+
+# log-cleanup.sh
+cat > /app/scripts/log-cleanup.sh <<'SCRIPT'
+#!/bin/bash
+set -euo pipefail
+
+LOG_DIRS=(
+  "/home/yjsm-hub/logging"
+  "/home/yjsm-hub-admin/logging"
+)
+
+PAT_HUB='yjsm-hub-????-??-??.*.log'
+PAT_ADMIN='yjsm-hubadmin-????-??-??.*.log'
+
+echo "Files that match (dry-run):"
+for d in "$${LOG_DIRS[@]}"; do
+  echo "Directory: $d"
+  find "$d" -maxdepth 1 -type f -name "$$PAT_HUB" -print
+  find "$d" -maxdepth 1 -type f -name "$$PAT_ADMIN" -print
+done
+
+for d in "$${LOG_DIRS[@]}"; do
+  find "$d" -maxdepth 1 -type f -name "$$PAT_HUB" -delete
+  find "$d" -maxdepth 1 -type f -name "$$PAT_ADMIN" -delete
+done
+SCRIPT
+
+
+# yjsm-weekly-restart.sh
+cat > /app/scripts/yjsm-weekly-restart.sh <<'SCRIPT'
+#!/usr/bin/env bash
+systemctl restart yjsm-hub-admin.service
+SCRIPT
+
+# app-backup.sh
+cat > /app/scripts/app-backup.sh <<'SCRIPT'
+#!/bin/bash
+set -euo pipefail
+
+BUCKET="your-bucket-name"
+DATE=$(date +%Y-%m-%d)
+BACKUP_FILE="/tmp/app-backup-$DATE.tar.gz"
+
+echo "Starting /app backup - $DATE"
+
+tar -czf "$BACKUP_FILE" /app \
+  --exclude='/app/scripts' \
+  --exclude='/app/yjsm-hub/logging' \
+  --exclude='/app/yjsm-hub-admin/logging'
+
+aws s3 cp "$BACKUP_FILE" "s3://$BUCKET/backups/app-backup-$DATE.tar.gz"
+
+rm -f "$BACKUP_FILE"
+
+echo "Backup complete - s3://$BUCKET/backups/app-backup-$DATE.tar.gz"
+SCRIPT
+chmod +x /app/scripts/app-backup.sh
+
+# Make all scripts executable
+chmod +x /app/scripts/yjsm-log-purge.sh
+chmod +x /app/scripts/log-cleanup.sh
+chmod +x /app/scripts/yjsm-weekly-restart.sh
+
+# nginx install script
+cat > /app/scripts/update-nginx.sh <<'NGINXEOF'
+${nginx_script}
+NGINXEOF
+chmod +x /app/scripts/update-nginx.sh
+
+# Cron jobs
+(crontab -l 2>/dev/null || true; cat <<'CRON'
+0 4 * * * /app/scripts/yjsm-log-purge.sh
+0 5 * * * /usr/sbin/aide --check
+0 21 * * 7 /app/scripts/yjsm-weekly-restart.sh
+0 11 * * 1 /app/scripts/log-cleanup.sh
+0 2 1 * * /app/scripts/app-backup.sh
+CRON
+) | crontab -

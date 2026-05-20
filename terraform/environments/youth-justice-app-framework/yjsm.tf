@@ -8,7 +8,8 @@ locals {
     "arn:aws:s3:::yjaf-${local.environment}-bedunlock",
     "arn:aws:s3:::yjaf-${local.environment}-yjsm-artefact",
     "arn:aws:s3:::yjaf-${local.environment}-bands",
-    "arn:aws:s3:::yjaf-${local.environment}-cmm"
+    "arn:aws:s3:::yjaf-${local.environment}-cmm",
+    "arn:aws:s3:::yjaf-${local.environment}-yjsm-backup/*"
   ])
   yjsm_buckets_wildcarded = jsonencode([
     "arn:aws:s3:::yjaf-${local.environment}-cms/*",
@@ -17,7 +18,8 @@ locals {
     "arn:aws:s3:::yjaf-${local.environment}-bedunlock/*",
     "arn:aws:s3:::yjaf-${local.environment}-bands/*",
     "arn:aws:s3:::yjaf-${local.environment}-yjsm-artefact/*",
-    "arn:aws:s3:::yjaf-${local.environment}-cmm/*"
+    "arn:aws:s3:::yjaf-${local.environment}-cmm/*",
+    "arn:aws:s3:::yjaf-${local.environment}-yjsm-backup/*"
   ])
 }
 
@@ -51,8 +53,8 @@ module "yjsm" {
 
   ami = lookup(
     {
-      development   = "ami-020f796d0dec4ed4c"
-      test          = "ami-00e714c8277811e57"
+      development   = "ami-078b41f5b9f1cd570"
+      test          = "ami-078b41f5b9f1cd570"
       preproduction = "ami-0d79a6afc87dfa388"
       production    = "ami-0be9396f2bf4f21c1"
       # Add more environments when AMIs are known
