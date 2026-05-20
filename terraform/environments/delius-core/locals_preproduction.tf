@@ -92,8 +92,8 @@ locals {
       image_tag                = "6.7.4"
       task_definition_revision = 6
       container_port           = 8080
-      container_memory         = 4096
-      container_cpu            = 2048
+      container_memory         = 16384
+      container_cpu            = 1024
       ec2_instance_type        = "r7i.2xlarge"
       task_count               = 25
       asg_min_size             = 8
