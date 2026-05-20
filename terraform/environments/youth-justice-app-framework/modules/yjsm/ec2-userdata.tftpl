@@ -1,16 +1,32 @@
 #!/bin/bash
 set -euo pipefail
 
+# Helper function to retry dnf installs on cache failures
+dnf_install() {
+    local max_attempts=5
+    local attempt=1
+    until dnf install -y "$@"; do
+        if [ $attempt -ge $max_attempts ]; then
+            echo "Failed to install $* after $max_attempts attempts"
+            exit 1
+        fi
+        echo "Install failed, attempt $attempt of $max_attempts, retrying in 5s..."
+        dnf clean packages
+        attempt=$((attempt + 1))
+        sleep 5
+    done
+}
+
 dnf update -y
-dnf install -y ruby wget tar git
+dnf_install ruby wget tar git
 
 
-# Java - Amazon Corretto 17
-dnf install -y --setopt=retries=5 java-21-amazon-corretto
+# Java - Amazon Corretto 21
+dnf_install --setopt=retries=5 java-21-amazon-corretto
 
 
 # CodeDeploy agent
-dnf install -y ruby3.2
+dnf_install ruby3.2
 cd /home/ec2-user
 wget https://aws-codedeploy-eu-west-2.s3.eu-west-2.amazonaws.com/latest/install
 chmod +x ./install
@@ -19,19 +35,8 @@ systemctl enable codedeploy-agent
 systemctl start codedeploy-agent
 
 
-# CloudWatch agent - retry on dnf cache issues
-max_attempts=5
-attempt=1
-until dnf install -y amazon-cloudwatch-agent; do
-    if [ $attempt -ge $max_attempts ]; then
-        echo "Failed to install amazon-cloudwatch-agent after $max_attempts attempts"
-        exit 1
-    fi
-    echo "Install failed, attempt $attempt of $max_attempts, retrying in 5s..."
-    dnf clean packages
-    attempt=$((attempt + 1))
-    sleep 5
-done
+# CloudWatch agent
+dnf_install amazon-cloudwatch-agent
 
 cat >>/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<CWEOF
 {
