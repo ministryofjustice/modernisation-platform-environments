@@ -19,6 +19,7 @@ module "lambda_unscanned_to_processing" {
   environment_variables = {
     DESTINATION_BUCKET_NAME = module.s3_bucket["processing"].s3_bucket_id
     IDEMPOTENCY_TABLE       = module.dynamodb_idempotency.dynamodb_table_id
+    SOURCE_BUCKET_NAME      = module.s3_bucket["unscanned"].s3_bucket_id
   }
 
   attach_policy_statements = true

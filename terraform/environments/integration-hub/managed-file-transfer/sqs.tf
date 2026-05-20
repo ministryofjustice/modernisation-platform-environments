@@ -5,7 +5,30 @@ module "sqs_unscanned_s3_notifications" {
   name            = "${local.application_name}-unscanned-s3-notifications"
   use_name_prefix = false
 
-  create_queue_policy = false
+  create_queue_policy = true
+  queue_policy_statements = {
+    eventbridge = {
+      sid     = "AllowTransferEventBridgeSendMessage"
+      actions = ["sqs:SendMessage"]
+
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["events.amazonaws.com"]
+        }
+      ]
+
+      condition = [
+        {
+          test     = "ArnEquals"
+          variable = "aws:SourceArn"
+          values = [
+            for rule_key, rule in local.eventbridge_transfer_sftp_upload_rules : module.eventbridge_transfer_sftp_upload[rule_key].eventbridge_rule_arns[rule.name]
+          ]
+        }
+      ]
+    }
+  }
 
   create_dlq = true
   dlq_name   = "${local.application_name}-unscanned-s3-notifications-dlq"
