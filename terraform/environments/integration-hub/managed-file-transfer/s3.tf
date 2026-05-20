@@ -39,7 +39,6 @@ module "s3_bucket_notification" {
     unscanned = {
       queue_arn     = module.sqs_unscanned_s3_notifications.queue_arn
       events        = ["s3:ObjectCreated:*"]
-      filter_prefix = "incoming/"
     }
   }
 }
