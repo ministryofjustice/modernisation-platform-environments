@@ -7,3 +7,8 @@ variable "collaborator_access" {
   default     = "developer"
   description = "Collaborators must specify which access level they are using, eg set an environment variable of export TF_VAR_collaborator_access=migration"
 }
+
+variable "karpenter_enabled" {
+  type    = bool
+  default = true
+}
