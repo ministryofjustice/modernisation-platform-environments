@@ -117,6 +117,8 @@ resource "helm_release" "headlamp" {
 resource "helm_release" "opencost" {
   /* https://artifacthub.io/packages/helm/opencost/opencost */
 
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
   name       = "opencost"
   repository = "https://opencost.github.io/opencost-helm-chart"
   chart      = "opencost"
