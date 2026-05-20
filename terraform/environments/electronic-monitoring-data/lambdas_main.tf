@@ -148,10 +148,9 @@ module "virus_scan_file" {
 # Process live files
 #-----------------------------------------------------------------------------------
 
-module "fms_raw_file_formatter" {
+module "format_json_fms_data" {
   source                         = "./modules/lambdas"
-  function_name                  = "fms_raw_file_formatter"
-  image_name                     = "format_json_fms_data"
+  function_name                  = "format_json_fms_data"
   is_image                       = true
   role_name                      = aws_iam_role.format_json_fms_data.name
   role_arn                       = aws_iam_role.format_json_fms_data.arn
@@ -167,9 +166,9 @@ module "fms_raw_file_formatter" {
   }
 }
 
-module "mdss_raw_file_stager" {
+module "copy_mdss_data" {
   source                         = "./modules/lambdas"
-  function_name                  = "mdss_raw_file_stager"
+  function_name                  = "copy_mdss_data"
   image_name                     = "copy_data"
   is_image                       = true
   role_name                      = aws_iam_role.copy_mdss_data.name
@@ -296,11 +295,10 @@ module "dms_validation" {
 # Process FMS metadata
 #-----------------------------------------------------------------------------------
 
-module "fms_expected_file_processor" {
+module "process_fms_metadata" {
   source                         = "./modules/lambdas"
   is_image                       = true
-  function_name                  = "fms_expected_file_processor"
-  image_name                     = "process_fms_metadata"
+  function_name                  = "process_fms_metadata"
   role_name                      = aws_iam_role.process_fms_metadata.name
   role_arn                       = aws_iam_role.process_fms_metadata.arn
   handler                        = "process_fms_metadata.handler"
@@ -516,11 +514,10 @@ module "data_cutback" {
 # MDSS daily failure digest Lambda
 #-----------------------------------------------------------------------------------
 
-module "live_feed_daily_handover" {
+module "mdss_daily_failure_digest" {
   source                         = "./modules/lambdas"
   is_image                       = true
-  function_name                  = "live_feed_daily_handover"
-  image_name                     = "mdss_daily_failure_digest"
+  function_name                  = "mdss_daily_failure_digest"
   role_name                      = aws_iam_role.mdss_daily_failure_digest.name
   role_arn                       = aws_iam_role.mdss_daily_failure_digest.arn
   handler                        = "mdss_daily_failure_digest.handler"
@@ -560,8 +557,8 @@ module "live_feed_daily_handover" {
     PUSH_DATA_EXPORT_TO_P1_DLQ_NAME = local.live_feed_dlq_names.push_data_export_to_p1
 
     LOAD_FMS_FUNCTION_NAME             = module.load_fms_lambda.lambda_function_name
-    PROCESS_FMS_METADATA_FUNCTION_NAME = module.fms_expected_file_processor.lambda_function_name
-    FORMAT_JSON_FMS_DATA_FUNCTION_NAME = module.fms_raw_file_formatter.lambda_function_name
+    PROCESS_FMS_METADATA_FUNCTION_NAME = module.process_fms_metadata.lambda_function_name
+    FORMAT_JSON_FMS_DATA_FUNCTION_NAME = module.format_json_fms_data.lambda_function_name
 
     LAMBDAS_PRODUCTION_RUN_URL = "https://github.com/ministryofjustice/electronic-monitoring-data-lambda-functions/actions/workflows/push-to-ecr.yaml"
     CADT_DAILY_RUN_URL         = "https://github.com/moj-analytical-services/create-a-derived-table/actions/workflows/emds-live-workflow.yml"
@@ -599,7 +596,7 @@ resource "aws_iam_role_policy" "mdss_daily_failure_digest_scheduler_invoke" {
       {
         Effect   = "Allow"
         Action   = ["lambda:InvokeFunction"]
-        Resource = [module.live_feed_daily_handover.lambda_function_arn]
+        Resource = [module.mdss_daily_failure_digest.lambda_function_arn]
       }
     ]
   })
@@ -617,7 +614,7 @@ resource "aws_scheduler_schedule" "mdss_daily_failure_digest" {
   schedule_expression_timezone = "Europe/London"
 
   target {
-    arn      = module.live_feed_daily_handover.lambda_function_arn
+    arn      = module.mdss_daily_failure_digest.lambda_function_arn
     role_arn = aws_iam_role.mdss_daily_failure_digest_scheduler.arn
   }
 }
@@ -715,11 +712,10 @@ module "ears_sars_request" {
 # Fan out fms tags
 # ------------------------------------------------------------------------------
 
-module "fms_validation_rejection_fanout" {
+module "fan_out_tags" {
   source                         = "./modules/lambdas"
   is_image                       = true
-  function_name                  = "fms_validation_rejection_fanout"
-  image_name                     = "fan_out_tags"
+  function_name                  = "fan_out_tags"
   role_name                      = aws_iam_role.fan_out_tags.name
   role_arn                       = aws_iam_role.fan_out_tags.arn
   handler                        = "fan_out_tags.handler"
@@ -742,13 +738,11 @@ module "fms_validation_rejection_fanout" {
 # MDSS reconciler (scheduled redrive backstop)
 #-----------------------------------------------------------------------------------
 
-module "mdss_load_redrive_controller" {
+module "mdss_reconciler" {
   count                          = 1
   source                         = "./modules/lambdas"
   is_image                       = true
-  function_name                  = "mdss_load_redrive_controller"
-  image_name                     = "mdss_load_redrive_controller"
-  handler                        = "mdss_load_redrive_controller.handler"
+  function_name                  = "mdss_reconciler"
   role_name                      = aws_iam_role.mdss_reconciler.name
   role_arn                       = aws_iam_role.mdss_reconciler.arn
   memory_size                    = 512
@@ -851,11 +845,10 @@ module "staging_db_janitor" {
 # Lambda: landing_dlq_redriver
 # ------------------------------------------------------------------------------
 
-module "landing_file_dlq_redriver" {
+module "landing_dlq_redriver" {
   source                         = "./modules/lambdas"
   is_image                       = true
-  function_name                  = "landing_file_dlq_redriver"
-  image_name                     = "landing_dlq_redriver"
+  function_name                  = "landing_dlq_redriver"
   role_name                      = aws_iam_role.landing_dlq_redriver.name
   role_arn                       = aws_iam_role.landing_dlq_redriver.arn
   handler                        = "landing_dlq_redriver.handler"
