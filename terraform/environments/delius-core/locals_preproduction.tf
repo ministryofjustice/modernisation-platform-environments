@@ -115,8 +115,8 @@ locals {
       EIS_USER_CONTEXT                  = "cn=EISUsers,ou=Users,dc=moj,dc=com"
       ELASTICSEARCH_URL                 = "https://probation-search-preprod.hmpps.service.justice.gov.uk/delius"
       GDPR_URL                          = "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io/gdpr/ui/homepage" # GDPR not deployed to CP yet, <URL>/gdpr/ui/homepage
-      JDBC_CONNECTION_POOL_MAX_CAPACITY = "100"
-      JDBC_CONNECTION_POOL_MIN_CAPACITY = "50"
+      JDBC_CONNECTION_POOL_MAX_CAPACITY = "40"
+      JDBC_CONNECTION_POOL_MIN_CAPACITY = "20"
       JDBC_URL                          = "jdbc:oracle:thin:@(DESCRIPTION=(LOAD_BALANCE=OFF)(FAILOVER=ON)(CONNECT_TIMEOUT=10)(RETRY_COUNT=3)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=tcp)(HOST=delius-core-preprod-db-1.hmpps-preproduction.modernisation-platform.internal)(PORT=1521))(ADDRESS=(PROTOCOL=tcp)(HOST=delius-core-preprod-db-2.hmpps-preproduction.modernisation-platform.internal)(PORT=1521))(ADDRESS=(PROTOCOL=tcp)(HOST=delius-core-preprod-db-3.hmpps-preproduction.modernisation-platform.internal)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=PRENDA_TAF)))"
       JDBC_USERNAME                     = "delius_pool"
       LDAP_HOST                         = "ldap.preprod.delius-core.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"
