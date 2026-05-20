@@ -68,7 +68,7 @@ resource "helm_release" "litellm" {
   ]
 
   depends_on = [
-    module.ai_gateway_aurora,
+    helm_release.litellm_admin,
     module.iam_role,
     kubernetes_service_account_v1.litellm,
     kubernetes_secret_v1.litellm_master_key,
@@ -118,7 +118,7 @@ resource "helm_release" "litellm_admin" {
   ]
 
   depends_on = [
-    helm_release.litellm,
+    module.ai_gateway_aurora,
     kubernetes_service_account_v1.litellm,
     kubernetes_secret_v1.litellm_master_key,
     kubernetes_manifest.external_secret_litellm_license,
