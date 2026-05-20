@@ -8,6 +8,10 @@ environment:
           court_locations:
             project: prj-1234567890
             principals: []
+              # dbt:
+              #   permissions:
+              #     - DESCRIBE
+              #     - CREATE_TABLE
   test:
     factories: []
   preproduction:
