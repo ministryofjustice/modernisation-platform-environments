@@ -47,7 +47,8 @@ data "aws_iam_policy_document" "transfer_user_session" {
     sid    = "AllowListOwnIncomingDirectory"
     effect = "Allow"
     actions = [
-      "s3:ListBucket",
+      "s3:GetBucketLocation",
+      "s3:ListBucket"
     ]
 
     resources = [
@@ -57,8 +58,9 @@ data "aws_iam_policy_document" "transfer_user_session" {
       test     = "StringLike"
       variable = "s3:prefix"
       values = [
-        "&{transfer:UserName}",
-        "&{transfer:UserName}/*",
+        "$${transfer:UserName}",
+        "$${transfer:UserName}/",
+        "$${transfer:UserName}/*",
       ]
     }
   }
@@ -71,7 +73,7 @@ data "aws_iam_policy_document" "transfer_user_session" {
       "s3:AbortMultipartUpload",
     ]
     resources = [
-      "${module.s3_bucket["unscanned"].s3_bucket_arn}/&{transfer:UserName}/*",
+      "${module.s3_bucket["unscanned"].s3_bucket_arn}/$${transfer:UserName}/*",
     ]
   }
 }
