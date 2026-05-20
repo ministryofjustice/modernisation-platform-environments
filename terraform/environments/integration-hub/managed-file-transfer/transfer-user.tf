@@ -116,7 +116,8 @@ module "transfer_user_role" {
 }
 
 # POC user based on my GitHub username
-resource "aws_transfer_user" "dms1981" {
+resource "aws_transfer_user" "this" {
+  for_each            = toset(["dms1981"])
   role                = module.transfer_user_role.arn
   server_id           = aws_transfer_server.this.id
   user_name           = "dms1981"
@@ -124,13 +125,14 @@ resource "aws_transfer_user" "dms1981" {
   home_directory      = "/"
   home_directory_mappings {
     entry  = "/"
-    target = "/${module.s3_bucket["unscanned"].s3_bucket_id}/$${transfer:UserName}"
+    target = "/${module.s3_bucket["unscanned"].s3_bucket_id}/${each.key}"
   }
   policy = data.aws_iam_policy_document.transfer_user_session.json
 }
 
-resource "aws_transfer_ssh_key" "dms1981" {
+resource "aws_transfer_ssh_key" "this" {
+  for_each            = toset(["dms1981"])
   body      = data.aws_secretsmanager_secret_version.secrets_transfer_user_ssh.secret_string
   server_id = aws_transfer_server.this.id
-  user_name = aws_transfer_user.dms1981.user_name
+  user_name = aws_transfer_user.this[each.key].user_name
 }
