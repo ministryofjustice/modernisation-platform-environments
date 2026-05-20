@@ -106,76 +106,6 @@ Ciphers aes256-ctr,aes192-ctr,aes128-ctr
 SSHEOF
 systemctl restart sshd
 
-
-# Create /app directory structure
-mkdir -p /app/scripts
-
-# Create log directories and set ownership
-mkdir -p /home/yjsm-hub/logging
-mkdir -p /home/yjsm-hub-admin/logging
-chown -R ec2-user:ec2-user /home/yjsm-hub
-chown -R ec2-user:ec2-user /home/yjsm-hub-admin
-
-# yjsm-log-purge.sh
-cat > /app/scripts/yjsm-log-purge.sh <<'SCRIPT'
-#!/bin/bash
-find /home/yjsm-hub/logging/archived -type f -mtime +30 -name 'yjsm-hub-[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9].*.log' -delete
-find /home/yjsm-hub-admin/logging/archived -type f -mtime +30 -name 'yjsm-hub-admin-[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9].*.log' -delete
-SCRIPT
-
-
-# log-cleanup.sh
-cat > /app/scripts/log-cleanup.sh <<'SCRIPT'
-#!/bin/bash
-set -euo pipefail
-
-LOG_DIRS=(
-  "/home/yjsm-hub/logging"
-  "/home/yjsm-hub-admin/logging"
-)
-
-PAT_HUB='yjsm-hub-????-??-??.*.log'
-PAT_ADMIN='yjsm-hubadmin-????-??-??.*.log'
-
-echo "Files that match (dry-run):"
-for d in "$${LOG_DIRS[@]}"; do
-  echo "Directory: $d"
-  find "$d" -maxdepth 1 -type f -name "$$PAT_HUB" -print
-  find "$d" -maxdepth 1 -type f -name "$$PAT_ADMIN" -print
-done
-
-for d in "$${LOG_DIRS[@]}"; do
-  find "$d" -maxdepth 1 -type f -name "$$PAT_HUB" -delete
-  find "$d" -maxdepth 1 -type f -name "$$PAT_ADMIN" -delete
-done
-SCRIPT
-
-
-# yjsm-weekly-restart.sh
-cat > /app/scripts/yjsm-weekly-restart.sh <<'SCRIPT'
-#!/usr/bin/env bash
-systemctl restart yjsm-hub-admin.service
-SCRIPT
-
-# Make all scripts executable
-chmod +x /app/scripts/yjsm-log-purge.sh
-chmod +x /app/scripts/log-cleanup.sh
-chmod +x /app/scripts/yjsm-weekly-restart.sh
-
-# nginx install script
-cat > /app/scripts/update-nginx.sh <<'NGINXEOF'
-${nginx_script}
-NGINXEOF
-chmod +x /app/scripts/update-nginx.sh
-
-# Cron jobs
-crontab -l 2>/dev/null | cat - <<'CRON' | crontab -
-0 4 * * * /app/scripts/yjsm-log-purge.sh
-0 5 * * * /usr/sbin/aide --check
-0 21 * * 7 /app/scripts/yjsm-weekly-restart.sh
-0 11 * * 1 /app/scripts/log-cleanup.sh
-CRON
-
 # Systemd service files
 cat > /etc/systemd/system/nginx.service << 'EOF'
 [Unit]
@@ -234,3 +164,99 @@ systemctl daemon-reload
 systemctl enable nginx
 systemctl enable yjsm-hub
 systemctl enable yjsm-hub-admin
+
+
+# Create /app directory structure
+mkdir -p /app/scripts
+
+# Create log directories and set ownership
+mkdir -p /home/yjsm-hub/logging
+mkdir -p /home/yjsm-hub-admin/logging
+chown -R ec2-user:ec2-user /home/yjsm-hub
+chown -R ec2-user:ec2-user /home/yjsm-hub-admin
+
+# yjsm-log-purge.sh
+cat > /app/scripts/yjsm-log-purge.sh <<'SCRIPT'
+#!/bin/bash
+find /home/yjsm-hub/logging/archived -type f -mtime +30 -name 'yjsm-hub-[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9].*.log' -delete
+find /home/yjsm-hub-admin/logging/archived -type f -mtime +30 -name 'yjsm-hub-admin-[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9].*.log' -delete
+SCRIPT
+
+
+# log-cleanup.sh
+cat > /app/scripts/log-cleanup.sh <<'SCRIPT'
+#!/bin/bash
+set -euo pipefail
+
+LOG_DIRS=(
+  "/home/yjsm-hub/logging"
+  "/home/yjsm-hub-admin/logging"
+)
+
+PAT_HUB='yjsm-hub-????-??-??.*.log'
+PAT_ADMIN='yjsm-hubadmin-????-??-??.*.log'
+
+echo "Files that match (dry-run):"
+for d in "$${LOG_DIRS[@]}"; do
+  echo "Directory: $d"
+  find "$d" -maxdepth 1 -type f -name "$$PAT_HUB" -print
+  find "$d" -maxdepth 1 -type f -name "$$PAT_ADMIN" -print
+done
+
+for d in "$${LOG_DIRS[@]}"; do
+  find "$d" -maxdepth 1 -type f -name "$$PAT_HUB" -delete
+  find "$d" -maxdepth 1 -type f -name "$$PAT_ADMIN" -delete
+done
+SCRIPT
+
+
+# yjsm-weekly-restart.sh
+cat > /app/scripts/yjsm-weekly-restart.sh <<'SCRIPT'
+#!/usr/bin/env bash
+systemctl restart yjsm-hub-admin.service
+SCRIPT
+
+# app-backup.sh
+cat > /app/scripts/app-backup.sh <<'SCRIPT'
+#!/bin/bash
+set -euo pipefail
+
+BUCKET="your-bucket-name"
+DATE=$(date +%Y-%m-%d)
+BACKUP_FILE="/tmp/app-backup-$DATE.tar.gz"
+
+echo "Starting /app backup - $DATE"
+
+tar -czf "$BACKUP_FILE" /app \
+  --exclude='/app/scripts' \
+  --exclude='/app/yjsm-hub/logging' \
+  --exclude='/app/yjsm-hub-admin/logging'
+
+aws s3 cp "$BACKUP_FILE" "s3://$BUCKET/backups/app-backup-$DATE.tar.gz"
+
+rm -f "$BACKUP_FILE"
+
+echo "Backup complete - s3://$BUCKET/backups/app-backup-$DATE.tar.gz"
+SCRIPT
+chmod +x /app/scripts/app-backup.sh
+
+# Make all scripts executable
+chmod +x /app/scripts/yjsm-log-purge.sh
+chmod +x /app/scripts/log-cleanup.sh
+chmod +x /app/scripts/yjsm-weekly-restart.sh
+
+# nginx install script
+cat > /app/scripts/update-nginx.sh <<'NGINXEOF'
+${nginx_script}
+NGINXEOF
+chmod +x /app/scripts/update-nginx.sh
+
+# Cron jobs
+(crontab -l 2>/dev/null || true; cat <<'CRON'
+0 4 * * * /app/scripts/yjsm-log-purge.sh
+0 5 * * * /usr/sbin/aide --check
+0 21 * * 7 /app/scripts/yjsm-weekly-restart.sh
+0 11 * * 1 /app/scripts/log-cleanup.sh
+0 2 1 * * /app/scripts/app-backup.sh
+CRON
+) | crontab -
