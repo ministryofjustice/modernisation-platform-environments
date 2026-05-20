@@ -8,7 +8,8 @@ locals {
     "arn:aws:s3:::yjaf-${local.environment}-bedunlock",
     "arn:aws:s3:::yjaf-${local.environment}-yjsm-artefact",
     "arn:aws:s3:::yjaf-${local.environment}-bands",
-    "arn:aws:s3:::yjaf-${local.environment}-cmm"
+    "arn:aws:s3:::yjaf-${local.environment}-cmm",
+    "arn:aws:s3:::yjaf-${local.environment}-yjsm-backup/*"
   ])
   yjsm_buckets_wildcarded = jsonencode([
     "arn:aws:s3:::yjaf-${local.environment}-cms/*",
@@ -17,7 +18,8 @@ locals {
     "arn:aws:s3:::yjaf-${local.environment}-bedunlock/*",
     "arn:aws:s3:::yjaf-${local.environment}-bands/*",
     "arn:aws:s3:::yjaf-${local.environment}-yjsm-artefact/*",
-    "arn:aws:s3:::yjaf-${local.environment}-cmm/*"
+    "arn:aws:s3:::yjaf-${local.environment}-cmm/*",
+    "arn:aws:s3:::yjaf-${local.environment}-yjsm-backup/*"
   ])
 }
 
