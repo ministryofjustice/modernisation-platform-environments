@@ -114,6 +114,31 @@ resource "helm_release" "headlamp" {
   ]
 }
 
+resource "helm_release" "opencost" {
+  /* https://artifacthub.io/packages/helm/opencost/opencost */
+
+  name       = "opencost"
+  repository = "https://opencost.github.io/opencost-helm-chart"
+  chart      = "opencost"
+  version    = local.cluster_configuration.helm_chart_versions.opencost
+  namespace  = module.opencost_namespace.name
+
+  values = [
+    templatefile(
+      "${path.module}/configuration/helm/opencost/values.yml.tftpl",
+      {
+        amp_workspace_id  = module.prometheus.workspace_id
+        aws_region        = data.aws_region.current.region
+        cluster_name      = module.eks.cluster_name
+        gateway_hostname  = trimprefix(local.cluster_configuration.shared_services_gateway_hostname, "*.")
+        gateway_name      = "shared-gateway"
+        gateway_namespace = module.shared_services_namespace.name
+        opencost_role_arn = module.opencost_iam_role.arn
+      }
+    )
+  ]
+}
+
 resource "helm_release" "karpenter_crd" {
   /* https://github.com/aws/karpenter-provider-aws/releases */
 

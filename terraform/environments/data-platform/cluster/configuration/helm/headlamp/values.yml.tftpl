@@ -20,7 +20,8 @@ httpRoute:
   parentRefs:
     - name: ${gateway_name}
       namespace: ${gateway_namespace}
-  hostNames: headlamp.${gateway_hostname}
+  hostNames:
+    - headlamp.${gateway_hostname}
 
 nodeSelector:
   compute.data-platform.service.justice.gov.uk/node: system

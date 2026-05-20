@@ -29,6 +29,7 @@ environment:
       keda: "2.19.0"
       kube_prometheus_stack: "83.4.0"
       kyverno: "3.7.1"
+      opencost: "2.5.20"
     route53_zones:
       - "development.data-platform.service.justice.gov.uk"
       - "development.ai-gateway.justice.gov.uk"
