@@ -23,6 +23,6 @@ resource "aws_transfer_server" "this" {
 }
 
 resource "aws_eip" "this" {
-  count = length(module.isolated_vpc.public_subnets)
+  count  = length(module.isolated_vpc.public_subnets)
   domain = "vpc"
 }
