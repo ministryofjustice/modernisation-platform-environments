@@ -4,19 +4,67 @@
       "bucket_configuration": {
         "clean": {
           "bucket_prefix": "integration-hub-clean-",
-          "lifecycle_rule": []
+          "lifecycle_rule": [
+            {
+              "id": "rule-one-day",
+              "status": "Enabled",
+              "filter": {},
+              "expiration": {
+                "days": 1
+              },
+              "abort_incomplete_multipart_upload": {
+                "days_after_initiation": 1
+              }
+            }
+          ]
         },
         "investigation": {
           "bucket_prefix": "integration-hub-investigation-",
-          "lifecycle_rule": []
+          "lifecycle_rule": [
+            {
+              "id": "rule-one-day",
+              "status": "Enabled",
+              "filter": {},
+              "expiration": {
+                "days": 1
+              },
+              "abort_incomplete_multipart_upload": {
+                "days_after_initiation": 1
+              }
+            }
+          ]
         },
         "processing": {
           "bucket_prefix": "integration-hub-processing-",
-          "lifecycle_rule": []
+          "lifecycle_rule": [
+            {
+              "id": "rule-one-day",
+              "status": "Enabled",
+              "filter": {},
+              "expiration": {
+                "days": 1
+              },
+              "abort_incomplete_multipart_upload": {
+                "days_after_initiation": 1
+              }
+            }
+          ]
         },
         "quarantine": {
           "bucket_prefix": "integration-hub-quarantine-",
-          "lifecycle_rule": []
+          "lifecycle_rule": [
+            {
+              "id": "rule-one-day",
+              "status": "Enabled",
+              "filter": {},
+              "expiration": {
+                "days": 1
+              },
+              "abort_incomplete_multipart_upload": {
+                "days_after_initiation": 1
+              }
+            }
+          ]
         },
         "unscanned": {
           "bucket_prefix": "integration-hub-unscanned-",

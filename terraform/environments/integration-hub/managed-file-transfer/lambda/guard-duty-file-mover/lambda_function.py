@@ -13,6 +13,7 @@ s3 = boto3.client("s3")
 BUCKET_NAMES_BY_KEY = json.loads(os.environ["BUCKET_NAMES_BY_KEY"])
 DEFAULT_SOURCE_BUCKET_KEY = os.environ["DEFAULT_SOURCE_BUCKET_KEY"]
 IDEMPOTENCY_TABLE = os.environ["IDEMPOTENCY_TABLE"]
+GUARDDUTY_MALWARE_SCAN_STATUS_TAG = "GuardDutyMalwareScanStatus"
 
 persistence_layer = DynamoDBPersistenceLayer(table_name=IDEMPOTENCY_TABLE)
 # Use the resolved source and destination buckets so transport-level duplicates
@@ -41,6 +42,13 @@ def get_object_details(event):
         return unquote_plus(object_details["objectKey"]), object_details.get("versionId")
 
     return unquote_plus(event["object_key"]), event.get("version_id")
+
+
+def get_scan_result_status(event):
+    if "detail" in event and "scanResultDetails" in event["detail"]:
+        return event["detail"]["scanResultDetails"].get("scanResultStatus")
+
+    return event.get("scan_result_status")
 
 
 def as_bool(value):
@@ -74,7 +82,44 @@ def normalise_payload(payload):
         "source_version_id": version_id,
         "destination_bucket_name": destination_bucket_name,
         "delete_source": as_bool(payload.get("delete_source", False)),
+        "scan_result_status": get_scan_result_status(payload),
     }
+
+
+def get_source_tags(operation):
+    tagging_kwargs = {
+        "Bucket": operation["source_bucket_name"],
+        "Key": operation["source_key"],
+    }
+
+    if operation["source_version_id"]:
+        tagging_kwargs["VersionId"] = operation["source_version_id"]
+
+    tag_set = s3.get_object_tagging(**tagging_kwargs).get("TagSet", [])
+    return {tag["Key"]: tag["Value"] for tag in tag_set}
+
+
+def put_destination_tags(operation, destination_version_id):
+    tags = get_source_tags(operation)
+
+    if operation["scan_result_status"]:
+        tags[GUARDDUTY_MALWARE_SCAN_STATUS_TAG] = operation["scan_result_status"]
+
+    tagging_kwargs = {
+        "Bucket": operation["destination_bucket_name"],
+        "Key": operation["source_key"],
+        "Tagging": {
+            "TagSet": [
+                {"Key": key, "Value": value}
+                for key, value in sorted(tags.items())
+            ]
+        },
+    }
+
+    if destination_version_id:
+        tagging_kwargs["VersionId"] = destination_version_id
+
+    s3.put_object_tagging(**tagging_kwargs)
 
 
 @idempotent_function(
@@ -92,13 +137,14 @@ def process_record(*, operation):
     if operation["source_version_id"]:
         copy_source["VersionId"] = operation["source_version_id"]
 
-    s3.copy_object(
+    copy_response = s3.copy_object(
         Bucket=operation["destination_bucket_name"],
         Key=operation["source_key"],
         CopySource=copy_source,
         MetadataDirective="COPY",
         TaggingDirective="COPY",
     )
+    put_destination_tags(operation, copy_response.get("VersionId"))
 
     if operation["delete_source"]:
         delete_kwargs = {
@@ -117,6 +163,7 @@ def process_record(*, operation):
         "source_bucket_name": operation["source_bucket_name"],
         "source_key": operation["source_key"],
         "source_version_id": operation["source_version_id"],
+        "scan_result_status": operation["scan_result_status"],
     }
 
 
