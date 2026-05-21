@@ -29,4 +29,12 @@ module "bastion_linux" {
   # Tags
   tags_common = local.tags
   tags_prefix = terraform.workspace
+
+  lifecycle {
+    ignore_changes = [
+      latest_version,
+      default_version,
+      image_id
+    ]
+  }
 }
