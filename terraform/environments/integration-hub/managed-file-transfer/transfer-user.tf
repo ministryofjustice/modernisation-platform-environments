@@ -44,7 +44,7 @@ data "aws_iam_policy_document" "transfer_user_session" {
     resources = [module.kms_s3_bucket["unscanned"].key_arn]
   }
   statement {
-    sid    = "AllowListOwnIncomingDirectory"
+    sid    = "AllowListOwnHomeDirectory"
     effect = "Allow"
     actions = [
       "s3:GetBucketLocation",
