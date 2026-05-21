@@ -16,7 +16,7 @@ else
   BASE_URL="https://${ENV}.ai-gateway.justice.gov.uk"
 fi
 
-curl ${BASE_URL}/chat/completions \
+curl -s ${BASE_URL}/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${API_KEY}" \
-  -d '{"model":"bedrock-claude-opus-4-7","messages":[{"role":"user","content":"This is a test script. Please ignore."}]}'
+  -d '{"model":"bedrock-claude-opus-4-7","messages":[{"role":"user","content":"This is a test script. Please ignore."}]}' | jq .
