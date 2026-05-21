@@ -43,7 +43,7 @@ locals {
       ai_gateway_autoscaling = {
         min_replicas                      = 1
         max_replicas                      = 3
-        target_cpu_utilization_percentage = 80
+        target_cpu_utilization_percentage = 60
       }
       aurora_instance_class = "db.serverless"
       aurora_engine_version = "17.7"
@@ -83,7 +83,7 @@ locals {
       ai_gateway_autoscaling = {
         min_replicas                      = 1
         max_replicas                      = 3
-        target_cpu_utilization_percentage = 80
+        target_cpu_utilization_percentage = 60
       }
       aurora_instance_class = "db.serverless"
       aurora_engine_version = "17.7"
@@ -107,7 +107,7 @@ locals {
       ai_gateway_autoscaling = {
         min_replicas                      = 1
         max_replicas                      = 3
-        target_cpu_utilization_percentage = 80
+        target_cpu_utilization_percentage = 60
       }
       aurora_instance_class = "db.serverless"
       aurora_engine_version = "17.7"
@@ -131,7 +131,7 @@ locals {
       ai_gateway_autoscaling = {
         min_replicas                      = 2
         max_replicas                      = 10
-        target_cpu_utilization_percentage = 80
+        target_cpu_utilization_percentage = 60
       }
       aurora_instance_class                     = "db.t4g.medium"
       aurora_engine_version                     = "17.7"

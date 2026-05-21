@@ -29,6 +29,37 @@ resource "kubernetes_manifest" "external_secret_litellm_license" {
   }
 }
 
+resource "kubernetes_manifest" "external_secret_litellm_salt_key" {
+  depends_on = [kubernetes_namespace_v1.ai_gateway]
+
+  manifest = {
+    apiVersion = "external-secrets.io/v1"
+    kind       = "ExternalSecret"
+    metadata = {
+      name      = "litellm-salt-key"
+      namespace = "ai-gateway"
+    }
+    spec = {
+      refreshInterval = "1h"
+      secretStoreRef = {
+        name = "aws-secretsmanager"
+        kind = "ClusterSecretStore"
+      }
+      target = {
+        name = "litellm-salt-key"
+      }
+      data = [
+        {
+          secretKey = "LITELLM_SALT_KEY"
+          remoteRef = {
+            key = tostring(module.litellm_salt_key_secret.secret_id)
+          }
+        }
+      ]
+    }
+  }
+}
+
 resource "kubernetes_manifest" "external_secret_litellm_entra_id" {
   depends_on = [kubernetes_namespace_v1.ai_gateway]
 

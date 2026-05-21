@@ -70,6 +70,7 @@ resource "helm_release" "litellm" {
     kubernetes_service_account_v1.litellm,
     kubernetes_secret_v1.litellm_master_key,
     kubernetes_manifest.external_secret_litellm_license,
+    kubernetes_manifest.external_secret_litellm_salt_key,
     kubernetes_manifest.external_secret_litellm_entra_id,
     kubernetes_manifest.external_secret_aurora,
     kubernetes_manifest.external_secret_elasticache
@@ -124,6 +125,7 @@ resource "helm_release" "litellm_admin" {
     kubernetes_service_account_v1.litellm,
     kubernetes_secret_v1.litellm_master_key,
     kubernetes_manifest.external_secret_litellm_license,
+    kubernetes_manifest.external_secret_litellm_salt_key,
     kubernetes_manifest.external_secret_litellm_entra_id,
     kubernetes_manifest.external_secret_aurora,
     kubernetes_manifest.external_secret_elasticache

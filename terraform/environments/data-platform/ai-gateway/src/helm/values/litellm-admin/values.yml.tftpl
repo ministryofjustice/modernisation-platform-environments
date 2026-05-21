@@ -40,6 +40,7 @@ environmentSecrets:
 %{ for secret in environmentSecrets ~}
   - ${secret}
 %{ endfor ~}
+  - litellm-salt-key
 
 proxyConfigMap:
   create: true
@@ -49,7 +50,11 @@ proxy_config:
     master_key: os.environ/PROXY_MASTER_KEY
     proxy_admin_email: "Jacob.Woffenden@justice.gov.uk"
     ui_access_mode: "admin_only"
+    proxy_batch_write_at: 60
+    database_connection_pool_limit: 10
   litellm_settings:
+    request_timeout: 600
+    json_logs: true
     cache: false
     cache_params:
       type: redis
@@ -97,6 +102,7 @@ migrationJob:
 
 envVars: {
     LITELLM_MODE: "PRODUCTION",
+    LITELLM_LOG: "ERROR",
     PROXY_BASE_URL: "https://${ingressHostname}",
     REDIS_SSL: "True",
     DOCS_TITLE: "Data Platform AI Gateway Admin",
