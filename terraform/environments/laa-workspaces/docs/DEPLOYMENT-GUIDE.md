@@ -1,8 +1,8 @@
 gpra
 # LAA WorkSpaces with RADIUS MFA - Deployment Guide
 
-**Document Version:** 2.2  
-**Last Updated:** 11 May 2026  
+**Document Version:** 2.3  
+**Last Updated:** 13 May 2026  
 **Environment:** AWS Modernisation Platform  
 **Status:** Active - LinOTP + FreeRADIUS Implementation
 
@@ -24,6 +24,8 @@ NOT: `CN=Admin,CN=Users,DC=laa-workspaces,DC=local`
 - `selfservice_enrollment` (scope: selfservice, action: enrollTOTP, webprovisionGOOGLE)
 - `limit_one_token` (scope: enrollment, action: maxtoken=1)
 - `otp_authentication` (scope: authentication, action: otppin=1)
+
+⚠️ **Automatic User Creation:** WorkSpaces automatically creates AD users during workspace provisioning. This enables the AWS Console "Invite user" feature and automatic welcome email delivery. Users will receive an email with their temporary password and WorkSpaces setup instructions.
 
 ⚠️ **ALB Access:** If the Application Load Balancer returns 504 errors, use SSM port forwarding to access LinOTP admin portal directly.
 
@@ -803,9 +805,9 @@ In LinOTP admin portal (`https://localhost:8443/manage`):
 
 ## PHASE 4: Test MFA Enrollment & Authentication
 
-### Step 4.1: Create Test AD User via Terraform
+### Step 4.1: Create Test User & WorkSpace via Terraform
 
-AD users are created automatically via Terraform. Add a test user to the configuration:
+WorkSpaces and AD users are created automatically via Terraform.
 
 **Edit:** `terraform/environments/laa-workspaces/new-workspace-users.tf`
 
@@ -828,18 +830,45 @@ locals {
 1. Commit and push changes to a branch
 2. Create Pull Request
 3. Merge PR to trigger deployment
-4. Terraform will automatically create the AD user
+4. Terraform will automatically create the WorkSpace
+5. **WorkSpaces automatically creates the AD user** and stores user metadata (email, first name, last name)
 
-**Note:** The user will be created but you won't receive the password automatically. You'll need to reset it via AWS Console:
+**Post-Deployment - Send User Invite:**
 
-1. Go to **Directory Service** → Your directory → **Users**
-2. Find `test.user`
-3. Click **Actions** → **Reset password**
-4. Set password (e.g., `TestPass123!`)
-5. Uncheck "User must change password at next login"
-6. Click **Reset password**
+1. Go to **AWS Console** → **WorkSpaces** → Select the workspace
+2. Click **Actions** → **Invite user** (or use the "Invite user" button on the workspace details page)
+3. AWS will automatically send a welcome email to the user's email address with:
+   - Registration code
+   - Temporary password  
+   - WorkSpaces client download link
+   - Setup instructions
 
-### Step 4.2: User Self-Enrollment
+**Why this works:**
+- WorkSpaces creates the AD user during workspace provisioning
+- WorkSpaces stores user metadata (email, name) in its database
+- Console "Invite user" button has access to email address
+- Welcome email is sent automatically with all necessary credentials
+
+**Note:** Users must register their WorkSpace using the registration code from the email before they can login.
+
+### Step 4.2: User Receives Welcome Email & Registers WorkSpace
+
+After you click "Invite user" in the console, the user will receive an email with:
+- **Registration code** (e.g., WSpdx+ABC123)
+- **Temporary password**
+- **WorkSpaces client download links** (Windows, macOS, iOS, Android, Web)
+
+**User registration steps:**
+
+1. Download and install WorkSpaces client
+2. Launch client and enter registration code
+3. Login with temporary password
+4. Set new permanent password (if prompted)
+5. Complete WorkSpaces setup
+
+**Note:** User must complete registration before enrolling in MFA.
+
+### Step 4.3: User Self-Enrollment in MFA
 
 **Method 1: Via SSM Port Forwarding (If ALB not accessible)**
 
@@ -862,7 +891,7 @@ Open browser: `https://workspace-mfa.laa-development.modernisation-platform.serv
 
 1. Login with:
    - Username: `test.user`
-   - Password: `TestPass123!` (or password you set)
+   - Password: (use the password from the welcome email or your new password after registration)
 2. Click **Enroll TOTP token**
 3. Click **Generate Random Seed**
 4. Click **Enroll Token**
@@ -873,7 +902,7 @@ Open browser: `https://workspace-mfa.laa-development.modernisation-platform.serv
 
 **Expected:** Token successfully enrolled
 
-### Step 4.3: Test RADIUS Authentication
+### Step 4.4: Test RADIUS Authentication
 
 SSH to RADIUS server and test locally:
 
@@ -915,7 +944,7 @@ Received Access-Accept Id 123 from 127.0.0.1:1812 to 127.0.0.1:xxxxx length 53
 - If you see "ERROR: No Auth-Type found", check FreeRADIUS configuration (see Troubleshooting section)
 - Verify policies are created and active in LinOTP admin portal
 
-### Step 4.4: Test from Microsoft AD
+### Step 4.5: Test from Microsoft AD
 
 The AD RADIUS configuration should send test authentications:
 
@@ -949,6 +978,8 @@ Edit: `terraform/environments/laa-workspaces/new-workspace-users.tf`
 locals {
   workspace_users = {
     "john.doe" = {
+      first_name    = "John"
+      last_name     = "Doe"
       email         = "john.doe@justice.gov.uk"
       instance_type = "standard"
     }
@@ -964,16 +995,35 @@ cd /Users/vladimirs.kovalovs/Desktop/Repos/modernisation-platform-environments/t
 terraform apply
 ```
 
+**Post-Deployment - Send User Invites:**
+
+After Terraform creates the WorkSpaces:
+
+1. Go to **AWS Console** → **WorkSpaces** → Select workspace
+2. Click **Invite user** button
+3. AWS automatically sends welcome email with registration code and temporary password
+
+See Step 4.1 for complete user invitation workflow.
+
 ### Step 5.3: User Login Process
 
-Users will login to WorkSpaces with:
-- **Username:** `john.doe`
-- **Password:** `<AD-password><6-digit-MFA-token>` (combined, no space)
+**WorkSpaces login is a two-step process:**
 
-**Example:**
-- AD password: `MySecurePass123`
-- MFA token from app: `837264`
-- **Enter in WorkSpaces:** `MySecurePass123837264`
+**Step 1 - Initial Login:**
+- **Username:** `john.doe`
+- **Password:** Your AD password only (e.g., `MySecurePass123`)
+
+**Step 2 - Verification Password Prompt:**
+- WorkSpaces will prompt for "Verification password"
+- **Enter your 6-digit OTP code** from your authenticator app (e.g., `837264`)
+- Do NOT enter your password again, only the OTP code
+
+**Example Flow:**
+1. WorkSpaces prompts: "Enter your username and password"
+   - Username: `john.doe`
+   - Password: `MySecurePass123`
+2. WorkSpaces prompts: "Enter verification password"
+   - Verification password: `837264` (current OTP code from authenticator app)
 
 ---
 
