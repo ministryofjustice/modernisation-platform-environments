@@ -927,8 +927,8 @@ module "gdpr_unstructured_control_lambda" {
   source                  = "./modules/lambdas"
   is_image                = true
   function_name           = "gdpr_unstructured_control_lambda"
-  role_name               = aws_iam_role.gdpr_unstructured_control_lambda_iam_role.name
-  role_arn                = aws_iam_role.gdpr_unstructured_control_lambda_iam_role.arn
+  role_name               = aws_iam_role.gdpr_unstructured_control_lambda_iam_role[0].name
+  role_arn                = aws_iam_role.gdpr_unstructured_control_lambda_iam_role[0].arn
   handler                 = "gdpr_unstructured_control_lambda.handler"
   memory_size             = 10240
   timeout                 = 900

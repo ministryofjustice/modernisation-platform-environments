@@ -2325,6 +2325,6 @@ resource "aws_iam_policy" "gdpr_unstructured_control_lambda_iam_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "gdpr_unstructured_control_lambda_iam_role_attach" {
-  role       = aws_iam_role.gdpr_unstructured_control_lambda_iam_role.name
+  role       = aws_iam_role.gdpr_unstructured_control_lambda_iam_role[0].name
   policy_arn = aws_iam_policy.gdpr_unstructured_control_lambda_iam_policy.arn
 }
