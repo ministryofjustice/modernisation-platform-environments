@@ -3,6 +3,7 @@ import os
 from urllib.parse import unquote_plus
 
 import boto3
+from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.idempotency import (
     DynamoDBPersistenceLayer,
     IdempotencyConfig,
@@ -14,6 +15,7 @@ BUCKET_NAMES_BY_KEY = json.loads(os.environ["BUCKET_NAMES_BY_KEY"])
 DEFAULT_SOURCE_BUCKET_KEY = os.environ["DEFAULT_SOURCE_BUCKET_KEY"]
 IDEMPOTENCY_TABLE = os.environ["IDEMPOTENCY_TABLE"]
 GUARDDUTY_MALWARE_SCAN_STATUS_TAG = "GuardDutyMalwareScanStatus"
+logger = Logger(service="managed-file-transfer-processing-to-post-scan")
 
 persistence_layer = DynamoDBPersistenceLayer(table_name=IDEMPOTENCY_TABLE)
 # Use the resolved source and destination buckets so transport-level duplicates
@@ -122,6 +124,14 @@ def put_destination_tags(operation, destination_version_id):
     s3.put_object_tagging(**tagging_kwargs)
 
 
+def get_log_fields(operation):
+    return {
+        "object_key": operation["source_key"],
+        "source_bucket_name": operation["source_bucket_name"],
+        "destination_bucket_name": operation["destination_bucket_name"],
+    }
+
+
 @idempotent_function(
     data_keyword_argument="operation",
     persistence_store=persistence_layer,
@@ -129,6 +139,8 @@ def put_destination_tags(operation, destination_version_id):
     key_prefix="managed-file-transfer/processing-to-post-scan",
 )
 def process_record(*, operation):
+    logger.info("Moving S3 object", extra=get_log_fields(operation))
+
     copy_source = {
         "Bucket": operation["source_bucket_name"],
         "Key": operation["source_key"],
@@ -145,6 +157,8 @@ def process_record(*, operation):
         TaggingDirective="COPY",
     )
     put_destination_tags(operation, copy_response.get("VersionId"))
+
+    logger.info("Moved S3 object", extra=get_log_fields(operation))
 
     if operation["delete_source"]:
         delete_kwargs = {
@@ -167,8 +181,19 @@ def process_record(*, operation):
     }
 
 
+@logger.inject_lambda_context(clear_state=True, log_event=False)
 def lambda_handler(event, context):
     idempotency_config.register_lambda_context(context)
 
     for payload in iter_events(event):
-        process_record(operation=normalise_payload(payload))
+        operation = None
+
+        try:
+            operation = normalise_payload(payload)
+            process_record(operation=operation)
+        except Exception:
+            logger.exception(
+                "Failed to move S3 object",
+                extra=get_log_fields(operation) if operation else {},
+            )
+            raise

@@ -3,6 +3,7 @@ import os
 from urllib.parse import unquote_plus
 
 import boto3
+from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.idempotency import (
     DynamoDBPersistenceLayer,
     IdempotencyConfig,
@@ -13,6 +14,7 @@ s3 = boto3.client("s3")
 DESTINATION_BUCKET_NAME = os.environ["DESTINATION_BUCKET_NAME"]
 IDEMPOTENCY_TABLE = os.environ["IDEMPOTENCY_TABLE"]
 SOURCE_BUCKET_NAME = os.getenv("SOURCE_BUCKET_NAME")
+logger = Logger(service="managed-file-transfer-unscanned-to-processing")
 
 persistence_layer = DynamoDBPersistenceLayer(table_name=IDEMPOTENCY_TABLE)
 # Use object identity rather than transport metadata so duplicate SQS deliveries
@@ -92,6 +94,14 @@ def normalise_record(record):
     }
 
 
+def get_log_fields(operation):
+    return {
+        "object_key": operation["source_key"],
+        "source_bucket_name": operation["source_bucket_name"],
+        "destination_bucket_name": operation["destination_bucket_name"],
+    }
+
+
 @idempotent_function(
     data_keyword_argument="operation",
     persistence_store=persistence_layer,
@@ -99,6 +109,8 @@ def normalise_record(record):
     key_prefix="managed-file-transfer/unscanned-to-processing",
 )
 def process_record(*, operation):
+    logger.info("Moving S3 object", extra=get_log_fields(operation))
+
     copy_source = {
         "Bucket": operation["source_bucket_name"],
         "Key": operation["source_key"],
@@ -115,6 +127,8 @@ def process_record(*, operation):
         TaggingDirective="COPY",
     )
 
+    logger.info("Moved S3 object", extra=get_log_fields(operation))
+
     return {
         "destination_bucket_name": operation["destination_bucket_name"],
         "source_bucket_name": operation["source_bucket_name"],
@@ -123,8 +137,19 @@ def process_record(*, operation):
     }
 
 
+@logger.inject_lambda_context(clear_state=True, log_event=False)
 def lambda_handler(event, context):
     idempotency_config.register_lambda_context(context)
 
     for record in iter_records(event):
-        process_record(operation=normalise_record(record))
+        operation = None
+
+        try:
+            operation = normalise_record(record)
+            process_record(operation=operation)
+        except Exception:
+            logger.exception(
+                "Failed to move S3 object",
+                extra=get_log_fields(operation) if operation else {},
+            )
+            raise
