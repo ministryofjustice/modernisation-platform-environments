@@ -2,17 +2,17 @@
 environment:
   development:
     factories:
-      data-platform-development: []
+      data-platform-development:
       data-factory-moj-development:
         domain: moj
         databases:
           court_locations:
             project: prj-1234567890
-            principals: []
-              # dbt:
-              #   permissions:
-              #     - DESCRIBE
-              #     - CREATE_TABLE
+            principals:
+              dbt-access:
+                permissions:
+                  - DESCRIBE
+                  - CREATE_TABLE
   test:
     factories: []
   preproduction:
