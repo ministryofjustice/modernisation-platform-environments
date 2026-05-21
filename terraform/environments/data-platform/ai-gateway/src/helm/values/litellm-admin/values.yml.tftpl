@@ -1,0 +1,104 @@
+---
+replicaCount: 1
+
+image:
+  repository: ${imageRepository}
+  tag: ${imageTag}
+
+nameOverride: "litellm-admin"
+
+service:
+  type: NodePort
+
+serviceAccount:
+  create: false
+  name: ${serviceAccountName}
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 1Gi
+  limits:
+    cpu: 500m
+    memory: 2Gi
+
+db:
+  deployStandalone: false
+  useExisting: true
+  url: postgresql://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST)/$(DATABASE_NAME)
+  database: ${databaseName}
+  secret:
+    name: ${databaseSecret}
+    usernameKey: ${databaseUserNameKey}
+    passwordKey: ${databasePasswordKey}
+    endpointKey: ${databaseEndpointKey}
+
+masterkeySecretName: ${masterkeySecretName}
+masterkeySecretKey: ${masterkeySecretKey}
+
+environmentSecrets:
+%{ for secret in environmentSecrets ~}
+  - ${secret}
+%{ endfor ~}
+
+proxyConfigMap:
+  create: true
+proxy_config:
+  general_settings:
+    litellm_license: os.environ/LITELLM_LICENSE
+    master_key: os.environ/PROXY_MASTER_KEY
+    proxy_admin_email: "Jacob.Woffenden@justice.gov.uk"
+    ui_access_mode: "admin_only"
+  litellm_settings:
+    cache: false
+    cache_params:
+      type: redis
+      host: os.environ/primary_endpoint_address
+      port: 6379
+      password: os.environ/auth_token
+  router_settings:
+    routing_strategy: simple-shuffle
+    redis_host: os.environ/primary_endpoint_address
+    redis_port: 6379
+    redis_password: os.environ/auth_token
+  model_list:
+    - model_name: fake-openai-endpoint
+      litellm_params:
+        model: openai/fake
+        api_key: fake-key
+        api_base: https://exampleopenaiendpoint-production.up.railway.app/
+
+tolerations:
+  - key: compute.data-platform.service.justice.gov.uk/node-pool
+    value: "general-on-demand-arm64"
+    effect: NoSchedule
+
+nodeSelector:
+  compute.data-platform.service.justice.gov.uk/node-pool: "general-on-demand-arm64"
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 65534
+  seccompProfile:
+    type: RuntimeDefault
+
+ingress:
+  enabled: false
+
+migrationJob:
+  enabled: true
+
+envVars: {
+    LITELLM_MODE: "PRODUCTION",
+    PROXY_BASE_URL: "https://${ingressHostname}",
+    REDIS_SSL: "True",
+    DOCS_TITLE: "Data Platform AI Gateway Admin",
+    DOCS_DESCRIPTION: "Administration interface for the AI Gateway.",
+    DOCS_FILTERED: "True",
+    AUTO_REDIRECT_UI_LOGIN_TO_SSO: "True"
+}

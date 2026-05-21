@@ -1,0 +1,143 @@
+locals {
+  environment_configuration = local.environment_configurations[local.environment]
+  ai_gateway_models         = yamldecode(file("${path.module}/configuration/models.yml"))
+  environment_configurations = {
+    development = {
+      litellm_versions = {
+        application = "main-v1.83.7-stable"
+        chart       = "1.83.7-stable"
+      }
+      ai_gateway_hostname = "development.ai-gateway.justice.gov.uk"
+      ai_gateway_ingress_allowlist = [
+        # VPN
+        "128.77.75.64/26",  # Prisma Corporate
+        "35.176.93.186/32", # GlobalProtect (Alpha)
+        # Sites
+        "213.121.161.112/28", # 102PF
+        "51.149.2.0/24",      # 10SC
+        # Analytical Platform Tooling Production
+        "54.195.74.96/32",
+        "79.125.36.56/32",
+        "63.35.122.32/32",
+        # Cloud Platform Live
+        "3.8.51.207/32",
+        "35.177.252.54/32",
+        "35.178.209.113/32",
+        # Modernisation Platform
+        "13.41.38.176/32",
+        "3.8.81.175/32",
+        "3.11.197.133/32",
+        "13.43.9.198/32",
+        "13.42.163.245/32",
+        "18.132.208.127/32",
+      ]
+      ai_gateway_admin_ingress_allowlist = [
+        # VPN
+        "128.77.75.64/26",  # Prisma Corporate
+        "35.176.93.186/32", # GlobalProtect (Alpha)
+        # Sites
+        "213.121.161.112/28", # 102PF
+        "51.149.2.0/24",      # 10SC
+      ]
+      ai_gateway_models = local.ai_gateway_models
+      ai_gateway_autoscaling = {
+        min_replicas                      = 1
+        max_replicas                      = 3
+        target_cpu_utilization_percentage = 80
+      }
+      aurora_instance_class = "db.serverless"
+      aurora_engine_version = "17.7"
+      aurora_instances      = { writer = {} }
+      aurora_serverlessv2_scaling_configuration = {
+        min_capacity             = 0
+        max_capacity             = 4
+        seconds_until_auto_pause = 3600
+      }
+      elasticache_node_type = "cache.t4g.medium"
+    }
+    test = {
+      litellm_versions = {
+        application = "v1.85.0"
+        chart       = "1.85.0"
+      }
+      ai_gateway_hostname = "test.ai-gateway.justice.gov.uk"
+      ai_gateway_ingress_allowlist = [
+        # VPN
+        "128.77.75.64/26",  # Prisma Corporate
+        "35.176.93.186/32", # GlobalProtect (Alpha)
+        # Sites
+        "213.121.161.112/28", # 102PF
+        "51.149.2.0/24",      # 10SC
+      ]
+      ai_gateway_admin_ingress_allowlist = [
+        # VPN
+        "128.77.75.64/26",  # Prisma Corporate
+        "35.176.93.186/32", # GlobalProtect (Alpha)
+        # Sites
+        "213.121.161.112/28", # 102PF
+        "51.149.2.0/24",      # 10SC
+        # Hoose
+        "51.179.193.117/32",
+      ]
+      ai_gateway_models = local.ai_gateway_models
+      ai_gateway_autoscaling = {
+        min_replicas                      = 1
+        max_replicas                      = 3
+        target_cpu_utilization_percentage = 80
+      }
+      aurora_instance_class = "db.serverless"
+      aurora_engine_version = "17.7"
+      aurora_instances      = { writer = {} }
+      aurora_serverlessv2_scaling_configuration = {
+        min_capacity             = 0
+        max_capacity             = 4
+        seconds_until_auto_pause = 3600
+      }
+      elasticache_node_type = "cache.t4g.medium"
+    }
+    preproduction = {
+      litellm_versions = {
+        application = "main-v1.83.7-stable"
+        chart       = "1.83.7-stable"
+      }
+      ai_gateway_hostname                = "preproduction.ai-gateway.justice.gov.uk"
+      ai_gateway_ingress_allowlist       = []
+      ai_gateway_admin_ingress_allowlist = []
+      ai_gateway_models                  = {}
+      ai_gateway_autoscaling = {
+        min_replicas                      = 1
+        max_replicas                      = 3
+        target_cpu_utilization_percentage = 80
+      }
+      aurora_instance_class = "db.serverless"
+      aurora_engine_version = "17.7"
+      aurora_instances      = { writer = {} }
+      aurora_serverlessv2_scaling_configuration = {
+        min_capacity             = 0
+        max_capacity             = 4
+        seconds_until_auto_pause = 3600
+      }
+      elasticache_node_type = "cache.t4g.medium"
+    }
+    production = {
+      litellm_versions = {
+        application = "main-v1.83.7-stable"
+        chart       = "1.83.7-stable"
+      }
+      ai_gateway_hostname                = "ai-gateway.justice.gov.uk"
+      ai_gateway_ingress_allowlist       = []
+      ai_gateway_admin_ingress_allowlist = []
+      ai_gateway_models                  = {}
+      ai_gateway_autoscaling = {
+        min_replicas                      = 2
+        max_replicas                      = 10
+        target_cpu_utilization_percentage = 80
+      }
+      aurora_instance_class                     = "db.t4g.medium"
+      aurora_engine_version                     = "17.7"
+      aurora_instances                          = { writer = {}, reader = {} }
+      aurora_serverlessv2_scaling_configuration = null
+      elasticache_node_type                     = "cache.t4g.medium"
+    }
+  }
+}
