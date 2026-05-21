@@ -144,6 +144,16 @@ locals {
         "get_list_waf_web_acls"
       ]
     }
+    rotate_ses_access_key = {
+      description = "Lambda Function Role for rotating ses access key and secret key and then derive the new smtp password"
+      policies = [
+        "send_message_to_sqs",
+        "send_logs_to_cloudwatch",
+        "publish_to_sns",
+        "update_ses_access_key",
+        "update_ses_secrets_value"
+      ]
+    }
   }
 
   # Environment configurations
@@ -244,7 +254,9 @@ locals {
           "update_waf_ipset",
           "describe_cloudwatch",
           "suppress_sechub_findings",
-          "get_list_waf_web_acls"
+          "get_list_waf_web_acls",
+          "update_ses_access_key",
+		      "update_ses_secrets_value"
           ] : {
           key         = "${policy_name}_${env_key}"
           policy_name = policy_name
@@ -350,6 +362,14 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Effect   = "Allow"
         Action   = ["wafv2:GetWebACL", "wafv2:ListWebACLs"]
         Resource = ["arn:aws:wafv2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        } : each.value.policy_name == "update_ses_access_key" ? {
+        Effect   = "Allow"
+        Action   = ["iam:CreateAccessKey", "iam:DeleteAccessKey", "iam:ListAccessKeys", "iam:UpdateAccessKey"]
+        Resource = ["arn:aws:iam::${local.environment_management.account_ids[each.value.env_config.account_key]}:user/${local.ses_iam_user}"]
+        } : each.value.policy_name == "update_ses_secrets_value" ? {
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue", "secretsmanager:PutSecretValue", "secretsmanager:UpdateSecret"]
+        Resource = ["arn:aws:secretsmanager:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:secret:${local.ses_secret_name}-*"]
         } : {
         Effect   = "Deny" # Fallback deny for any unexpected policy names
         Action   = ["*"]
