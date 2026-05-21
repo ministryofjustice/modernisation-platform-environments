@@ -12,7 +12,7 @@ module "sqs_transfer_notifications" {
   source  = "terraform-aws-modules/sqs/aws"
   version = "5.2.1"
 
-  name            = "${local.application_name}-unscanned-s3-notifications"
+  name            = "${local.application_name}-transfer-notifications"
   use_name_prefix = false
 
   create_queue_policy = true
@@ -39,7 +39,7 @@ module "sqs_transfer_notifications" {
   }
 
   create_dlq = true
-  dlq_name   = "${local.application_name}-unscanned-s3-notifications-dlq"
+  dlq_name   = "${local.application_name}-transfer-notifications-dlq"
 
   message_retention_seconds     = 1209600
   visibility_timeout_seconds    = 180
