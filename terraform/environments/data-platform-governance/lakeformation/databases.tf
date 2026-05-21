@@ -36,11 +36,10 @@ resource "aws_lakeformation_permissions" "database" {
             factory_name  = factory_name
             domain        = factory.domain
             principal     = principal_name
-            permissions   = try(principal.permissions, [])
-            database      = database
+            permissions   = try(principal.permissions.database, [])
             database_name = database_name
             name          = "${factory.domain}-${database_name}"
-          }
+          } if length(try(principal.permissions.database, [])) > 0
         ]
       ]
     ]) : "${grant.name}-${grant.principal}" => grant
@@ -51,5 +50,30 @@ resource "aws_lakeformation_permissions" "database" {
 
   database {
     name = aws_glue_catalog_database.main[each.value.name].name
+  }
+}
+
+resource "aws_lakeformation_permissions" "tables" {
+  for_each = tomap({
+    for grant in flatten([
+      for factory_name, factory in try(local.lakeformation_configuration.factories, {}) : [
+        for database_name, database in try(factory.databases, {}) : [
+          for principal_name, principal in try(database.principals, {}) : {
+            factory_name  = factory_name
+            principal     = principal_name
+            database_name = "${factory.domain}-${database_name}"
+            permissions   = try(principal.permissions.tables, [])
+          } if length(try(principal.permissions.tables, [])) > 0
+        ]
+      ]
+    ]) : "${grant.database_name}-${grant.principal}" => grant
+  })
+
+  principal   = "arn:aws:iam::${local.environment_management.account_ids[each.value.factory_name]}:role/${each.value.principal}"
+  permissions = each.value.permissions
+
+  table {
+    database_name = aws_glue_catalog_database.main[each.value.database_name].name
+    wildcard      = true
   }
 }

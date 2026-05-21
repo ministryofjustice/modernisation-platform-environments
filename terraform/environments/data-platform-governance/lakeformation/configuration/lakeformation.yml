@@ -11,10 +11,12 @@ environment:
             principals:
               dbt-access:
                 permissions:
-                  - DESCRIBE
-                  - CREATE_TABLE
-                  - ALTER
-                  - DROP
+                  database:
+                    - ALTER
+                    - CREATE_TABLE
+                    - DESCRIBE
+                  tables:
+                    - ALL
   test:
     factories: []
   preproduction:

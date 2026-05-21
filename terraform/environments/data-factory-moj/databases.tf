@@ -25,10 +25,10 @@ resource "aws_lakeformation_permissions" "database" {
       for database_name, database in try(local.data_platform_lakeformation_configuration.databases, {}) : [
         for principal_name, principal in try(database.principals, {}) : {
           database_name = database_name
-          name          = "${local.data_platform_lakeformation_configuration.domain}-${database_name}"
-          permissions   = try(principal.permissions, [])
+          name          = database_name
+          permissions   = try(principal.permissions.database, [])
           principal     = principal_name
-        }
+        } if length(try(principal.permissions.database, [])) > 0
       ]
     ]) : "${grant.name}-${grant.principal}" => grant
   })
@@ -38,5 +38,27 @@ resource "aws_lakeformation_permissions" "database" {
 
   database {
     name = aws_glue_catalog_database.main[each.value.database_name].name
+  }
+}
+
+resource "aws_lakeformation_permissions" "tables" {
+  for_each = tomap({
+    for grant in flatten([
+      for database_name, database in try(local.data_platform_lakeformation_configuration.databases, {}) : [
+        for principal_name, principal in try(database.principals, {}) : {
+          database_name = database_name
+          permissions   = try(principal.permissions.tables, [])
+          principal     = principal_name
+        } if length(try(principal.permissions.tables, [])) > 0
+      ]
+    ]) : "${grant.database_name}-${grant.principal}" => grant
+  })
+
+  principal   = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${each.value.principal}"
+  permissions = each.value.permissions
+
+  table {
+    database_name = aws_glue_catalog_database.main[each.value.database_name].name
+    wildcard      = true
   }
 }
