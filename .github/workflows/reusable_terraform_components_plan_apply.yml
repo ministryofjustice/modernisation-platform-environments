@@ -103,7 +103,7 @@
 
           - name: Validate Tags
             id: validate
-            uses: ministryofjustice/checkov-tag-validator@716f30ebd82b1ab87df7fbeb64d876fe6395eaff # v2.1.4
+            uses: ministryofjustice/checkov-tag-validator@missing-all-tags
             with:
               terraform_directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
               terraform_workspace: ${{ env.WORKSPACE_NAME }}
