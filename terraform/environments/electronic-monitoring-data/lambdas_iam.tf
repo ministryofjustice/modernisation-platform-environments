@@ -2313,9 +2313,15 @@ data "aws_iam_policy_document" "gdpr_unstructured_control_lambda_iam_role_policy
   }
 }
 
+resource "aws_iam_role" "gdpr_unstructured_control_lambda_iam_role" {
+  count              = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  name               = "gdpr-unstructured-control-lambda-iam-role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
 resource "aws_iam_policy" "gdpr_unstructured_control_lambda_iam_policy" {
   name   = "gdpr_unstructured_control_lambda_policy"
-  policy = data.aws_iam_policy_document.gdpr_unstructured_control_lambda_iam_role_policy_document.json
+  policy = data.aws_iam_policy_document.gdpr_unstructured_control_lambda_iam_role_policy_document[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "gdpr_unstructured_control_lambda_iam_role_attach" {
