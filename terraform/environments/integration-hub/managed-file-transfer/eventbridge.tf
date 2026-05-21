@@ -73,7 +73,7 @@ module "eventbridge_transfer_upload" {
     (each.value.name) = [
       {
         name = "${each.value.name}-to-sqs"
-        arn  = module.sqs_unscanned_s3_notifications.queue_arn
+        arn  = module.sqs_transfer_notifications.queue_arn
         input_transformer = {
           input_paths = {
             file_path   = "$.detail.file-path"

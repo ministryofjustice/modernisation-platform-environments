@@ -1,4 +1,14 @@
-module "sqs_unscanned_s3_notifications" {
+locals {
+  sqs_transfer_notifications_source_arns = [
+    for rule_key, rule in local.eventbridge_transfer_sftp_upload_rules : module.eventbridge_transfer_upload[rule_key].eventbridge_rule_arns[rule.name]
+  ]
+
+  sqs_guard_duty_malware_protection_for_s3_source_arns = [
+    for rule_key, rule in local.eventbridge_guard_duty_malware_protection_for_s3_rules : module.eventbridge_guard_duty_malware_protection_for_s3[rule_key].eventbridge_rule_arns[rule.name]
+  ]
+}
+
+module "sqs_transfer_notifications" {
   source  = "terraform-aws-modules/sqs/aws"
   version = "5.2.1"
 
@@ -22,9 +32,7 @@ module "sqs_unscanned_s3_notifications" {
         {
           test     = "ArnEquals"
           variable = "aws:SourceArn"
-          values = [
-            for rule_key, rule in local.eventbridge_transfer_sftp_upload_rules : module.eventbridge_transfer_sftp_upload[rule_key].eventbridge_rule_arns[rule.name]
-          ]
+          values   = local.sqs_transfer_notifications_source_arns
         }
       ]
     }
@@ -69,9 +77,7 @@ module "sqs_guard_duty_malware_protection_for_s3_events" {
         {
           test     = "ArnEquals"
           variable = "aws:SourceArn"
-          values = [
-            for rule_key, rule in local.eventbridge_guard_duty_malware_protection_for_s3_rules : module.eventbridge_guard_duty_malware_protection_for_s3[rule_key].eventbridge_rule_arns[rule.name]
-          ]
+          values   = local.sqs_guard_duty_malware_protection_for_s3_source_arns
         }
       ]
     }

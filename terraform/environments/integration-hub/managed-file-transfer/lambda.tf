@@ -11,7 +11,7 @@ module "lambda_unscanned_to_processing" {
 
   event_source_mapping = {
     sqs = {
-      event_source_arn = module.sqs_unscanned_s3_notifications.queue_arn
+      event_source_arn = module.sqs_transfer_notifications.queue_arn
       batch_size       = 1
     }
   }
