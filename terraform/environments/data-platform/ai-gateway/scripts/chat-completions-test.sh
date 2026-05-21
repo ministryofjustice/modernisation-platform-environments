@@ -10,7 +10,13 @@ fi
 API_KEY="$1"
 ENV="$2"
 
-curl https://${ENV}.ai-gateway.justice.gov.uk/chat/completions \
+if [[ "${ENV}" == "production" ]]; then
+  BASE_URL="https://ai-gateway.justice.gov.uk"
+else
+  BASE_URL="https://${ENV}.ai-gateway.justice.gov.uk"
+fi
+
+curl ${BASE_URL}/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${API_KEY}" \
   -d '{"model":"bedrock-claude-opus-4-7","messages":[{"role":"user","content":"This is a test script. Please ignore."}]}'
