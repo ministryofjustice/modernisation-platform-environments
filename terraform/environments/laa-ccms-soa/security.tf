@@ -222,15 +222,6 @@ resource "aws_security_group_rule" "ecs_tasks_admin_egress_http" {
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
-resource "aws_security_group_rule" "ecs_tasks_admin_egress_vpc_endpoints" {
-  security_group_id = aws_security_group.ecs_tasks_admin.id
-  type              = "egress"
-  description       = "Egress to VPC endpoints and EBS NLB (SSM, Secrets Manager, EBS) via tcp/443"
-  protocol          = "tcp"
-  from_port         = 443
-  to_port           = 443
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-}
 
 resource "aws_security_group_rule" "ecs_tasks_admin_egress_oracle" {
   security_group_id = aws_security_group.ecs_tasks_admin.id
@@ -291,7 +282,7 @@ resource "aws_security_group_rule" "ecs_tasks_admin_egress_efs" {
   protocol          = "tcp"
   from_port         = 2049
   to_port           = 2049
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+  cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
 }
 
 #--ECS Tasks Managed
