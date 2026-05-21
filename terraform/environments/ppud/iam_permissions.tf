@@ -148,6 +148,7 @@ locals {
       description = "Lambda Function Role for rotating ses access key and secret key and then derive the new smtp password"
       policies = [
         "send_message_to_sqs",
+        "send_logs_to_cloudwatch",
         "publish_to_sns",
         "update_ses_access_key",
         "update_ses_secrets_value"
@@ -364,11 +365,11 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         } : each.value.policy_name == "update_ses_access_key" ? {
         Effect   = "Allow"
         Action   = ["iam:CreateAccessKey", "iam:DeleteAccessKey", "iam:ListAccessKeys", "iam:UpdateAccessKey"]
-        Resource = ["arn:aws:iam::${local.environment_management.account_ids[each.value.env_config.account_key]}:user/${coalesce(local.ses_iam_user, "unused")}"]
-        } : each.value.policy_name == "update_secrets_value" ? {
+        Resource = ["arn:aws:iam::${local.environment_management.account_ids[each.value.env_config.account_key]}:user/${local.ses_iam_user}"]
+        } : each.value.policy_name == "update_ses_secrets_value" ? {
         Effect   = "Allow"
         Action   = ["secretsmanager:GetSecretValue", "secretsmanager:PutSecretValue", "secretsmanager:UpdateSecret"]
-        Resource = ["arn:aws:secretsmanager:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:secret:${coalesce(local.ses_secret_name, "unused")}-*"]
+        Resource = ["arn:aws:secretsmanager:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:secret:${local.ses_secret_name}-*"]
         } : {
         Effect   = "Deny" # Fallback deny for any unexpected policy names
         Action   = ["*"]
