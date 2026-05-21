@@ -57,8 +57,6 @@ data "aws_iam_policy_document" "transfer_user_session" {
       test     = "StringLike"
       variable = "s3:prefix"
       values = [
-        "",
-        "/",
         "$${transfer:UserName}",
         "$${transfer:UserName}/",
         "$${transfer:UserName}/*",
