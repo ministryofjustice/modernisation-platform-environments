@@ -433,6 +433,8 @@ resource "aws_lambda_function" "lambda_functions" {
     }
   }
 
+  depends_on = [aws_iam_role_policy_attachment.attach_lambda_policies_v2]
+
   # Tags
   tags = {
     Function    = each.value.func_name
