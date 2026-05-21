@@ -50,7 +50,6 @@ data "aws_iam_policy_document" "transfer_user_session" {
       "s3:GetBucketLocation",
       "s3:ListBucket"
     ]
-
     resources = [
       module.s3_bucket["unscanned"].s3_bucket_arn,
     ]
@@ -58,6 +57,8 @@ data "aws_iam_policy_document" "transfer_user_session" {
       test     = "StringLike"
       variable = "s3:prefix"
       values = [
+        "",
+        "/",
         "$${transfer:UserName}",
         "$${transfer:UserName}/",
         "$${transfer:UserName}/*",
