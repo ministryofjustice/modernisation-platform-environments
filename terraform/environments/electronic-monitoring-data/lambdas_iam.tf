@@ -2272,3 +2272,53 @@ resource "aws_iam_role_policy_attachment" "macie_unstructured_job_iam_role_polic
   role       = aws_iam_role.macie_unstructured_job_iam_role[0].name
   policy_arn = aws_iam_policy.macie_unstructured_job_iam_role_policy[0].arn
 }
+
+# ---------------------------------
+# GDPR Unstructured Control Lambda
+# ---------------------------------
+
+data "aws_iam_policy_document" "gdpr_unstructured_control_lambda_iam_role_policy_document" {
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+
+  statement {
+    sid    = "AthenaQueryPermissions"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:GetDataCatalog",
+      "athena:GetWorkGroup"
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:workgroup/*",
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:datacatalog/*"
+    ]
+  }
+
+  statement {
+    sid     = "S3BucketPerms"
+    effect  = "Allow"
+    actions = ["s3:PutObject", "s3:GetObject", "s3:PutObjectAcl"]
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/gdpr/*",
+      module.s3-logging-bucket.bucket.arn,
+      "${module.s3-athena-bucket.bucket.arn}/output/*",
+      module.s3-athena-bucket.bucket.arn,
+      "${module.s3-gdpr-audit-bucket.arn}/*",
+      module.s3-gdpr-audit-bucket.arn,
+      "${module.s3-data-bucket.bucket.arn}/*",
+      module.s3-data-bucket.bucket.arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "gdpr_unstructured_control_lambda_iam_policy" {
+  name   = "gdpr_unstructured_control_lambda_policy"
+  policy = data.aws_iam_policy_document.gdpr_unstructured_control_lambda_iam_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "gdpr_unstructured_control_lambda_iam_role_attach" {
+  role       = aws_iam_role.gdpr_unstructured_control_lambda_iam_role.name
+  policy_arn = aws_iam_policy.gdpr_unstructured_control_lambda_iam_policy.arn
+}
