@@ -123,7 +123,7 @@ locals {
       LDAP_PRINCIPAL                    = "cn=admin,dc=moj,dc=com"
       LOG_LEVEL_NDELIUS                 = "DEBUG"
       MERGE_API_URL                     = "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io/merge/api/"
-      MERGE_OAUTH_URL                   = "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io/umt/oauth/"
+      MERGE_OAUTH_URL                   = "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io/umt/"
       MERGE_URL                         = "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io/merge/ui/"
       NDELIUS_CLIENT_ID                 = "migrations_client_id"
       OAUTH_CALLBACK_URL                = "https://ndelius.preprod.delius-core.hmpps-preproduction.modernisation-platform.service.justice.gov.uk/NDelius-war/delius/JSP/auth/token.jsp"
