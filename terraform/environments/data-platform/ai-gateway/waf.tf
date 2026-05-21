@@ -1,3 +1,11 @@
+locals {
+  waf_blocked_paths = [
+    "/metrics",
+    "/test",
+    "/config/yaml",
+  ]
+}
+
 data "aws_lb" "ai_gateway" {
   name = "ai-gateway"
 }
@@ -39,18 +47,22 @@ module "waf_ai_gateway" {
       action   = "block"
 
       statement = {
-        byte_match_statement = {
-          field_to_match = {
-            uri_path = {}
-          }
-          positional_constraint = "STARTS_WITH"
-          search_string         = "/metrics"
-          text_transformations = [
-            {
-              priority = 0
-              type     = "LOWERCASE"
+        or_statement = {
+          statements = [for path in local.waf_blocked_paths : {
+            byte_match_statement = {
+              field_to_match = {
+                uri_path = {}
+              }
+              positional_constraint = "STARTS_WITH"
+              search_string         = path
+              text_transformations = [
+                {
+                  priority = 0
+                  type     = "LOWERCASE"
+                }
+              ]
             }
-          ]
+          }]
         }
       }
 
@@ -129,8 +141,8 @@ module "waf_ai_gateway" {
                     name = "host"
                   }
                 }
-                positional_constraint = "STARTS_WITH"
-                search_string         = "admin."
+                positional_constraint = "EXACTLY"
+                search_string         = "admin.${local.environment_configuration.ai_gateway_hostname}"
                 text_transformations = [
                   {
                     priority = 0
@@ -166,8 +178,8 @@ module "waf_ai_gateway" {
               name = "host"
             }
           }
-          positional_constraint = "STARTS_WITH"
-          search_string         = "admin."
+          positional_constraint = "EXACTLY"
+          search_string         = "admin.${local.environment_configuration.ai_gateway_hostname}"
           text_transformations = [
             {
               priority = 0
