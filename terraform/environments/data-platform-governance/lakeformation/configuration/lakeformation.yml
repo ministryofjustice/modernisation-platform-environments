@@ -17,6 +17,8 @@ environment:
                     - DESCRIBE
                   tables:
                     - ALL
+                  resource_link:
+                    - DESCRIBE
   test:
     factories: []
   preproduction:
