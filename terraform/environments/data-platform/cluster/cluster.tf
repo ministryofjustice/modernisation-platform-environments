@@ -7,6 +7,9 @@ module "eks" {
   endpoint_private_access = true
   endpoint_public_access  = true
 
+  # uncomment the below line to restrict API server access to specified CIDR blocks (e.g. corporate VPN)
+  #endpoint_public_access_cidrs = local.environment_configuration.endpoint_public_access_cidrs
+
   vpc_id                   = data.aws_vpc.main.id
   control_plane_subnet_ids = data.aws_subnets.private.ids
   subnet_ids               = data.aws_subnets.private.ids
