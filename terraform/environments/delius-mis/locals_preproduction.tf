@@ -398,8 +398,8 @@ locals {
         type       = "gp3"
       }
       data = {
-        iops       = 6400
-        throughput = 400
+        iops       = 7680
+        throughput = 480
         type       = "gp3"
         total_size = 7000
       }
