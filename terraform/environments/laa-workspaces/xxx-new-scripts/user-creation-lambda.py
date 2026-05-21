@@ -3,38 +3,62 @@ import boto3
 import time
 import os
 
+def wait_for_ssm_command(ssm_client, command_id, instance_id, max_wait=300):
+    """Poll SSM command status until it reaches a terminal state."""
+    terminal_statuses = {'Success', 'Failed', 'TimedOut', 'Cancelled', 'DeliveryTimedOut'}
+    elapsed = 0
+    poll_interval = 10
+
+    while elapsed < max_wait:
+        try:
+            result = ssm_client.get_command_invocation(
+                CommandId=command_id,
+                InstanceId=instance_id
+            )
+            status = result['Status']
+            print(f"SSM command status: {status} ({elapsed}s elapsed)")
+            if status in terminal_statuses:
+                return status, result
+        except ssm_client.exceptions.InvocationDoesNotExist:
+            print("SSM invocation not yet registered, retrying...")
+
+        time.sleep(poll_interval)
+        elapsed += poll_interval
+
+    return 'TimedOut', {}
+
+
 def create_ad_user(event):
     """
     Create a user in Active Directory via PowerShell script on EC2
     """
-    # The EC2 instance hosting the AD
     instance_id = os.environ['EC2_INSTANCE_ID']
     region = os.environ['REGION']
-    
-    # Variables to pass to the PowerShell script
+
     firstname = event['Firstname']
     lastname = event['Lastname']
     email = event['Email']
-    
-    # Construct the PowerShell script command with variables
+
     powershell_command = f"powershell.exe -File 'C:\\Windows\\system32\\user-creation.ps1' -Firstname '{firstname}' -Lastname '{lastname}' -Email '{email}'"
-    
-    # Execute the PowerShell script on the EC2 instance
+
     ssm_client = boto3.client('ssm', region_name=region)
     response = ssm_client.send_command(
         InstanceIds=[instance_id],
         DocumentName='AWS-RunPowerShellScript',
         Parameters={'commands': [powershell_command]}
     )
-    
-    # Retrieve the command invocation ID
+
     command_id = response['Command']['CommandId']
     print(f"Command ID: {command_id}")
-    
-    # Wait for AD user creation to complete (allow time for PowerShell script execution and AD replication)
-    # PowerShell New-ADUser takes ~70 seconds, plus AD replication time
-    print("Waiting 90 seconds for AD user creation and replication...")
-    time.sleep(90)
+
+    status, result = wait_for_ssm_command(ssm_client, command_id, instance_id)
+
+    if status != 'Success':
+        output = result.get('StandardErrorContent', '') or result.get('StandardOutputContent', '')
+        raise Exception(f"PowerShell script failed with status '{status}': {output}")
+
+    print(f"PowerShell script completed successfully. Waiting 30 seconds for AD replication...")
+    time.sleep(30)
 
 def create_workspace(event):
     """
@@ -109,10 +133,25 @@ def lambda_handler(event, context):
     Lambda handler - creates AD user and WorkSpace
     """
     print(f"Received event: {json.dumps(event)}")
-    
+
     try:
         create_ad_user(event)
-        create_workspace(event)
+
+        # Retry workspace creation in case AD replication hasn't fully propagated
+        last_error = None
+        for attempt in range(1, 4):
+            try:
+                create_workspace(event)
+                break
+            except Exception as e:
+                if 'ResourceNotFound.User' in str(e) and attempt < 3:
+                    print(f"User not yet visible in directory (attempt {attempt}/3), waiting 30s...")
+                    time.sleep(30)
+                    last_error = e
+                else:
+                    raise
+        else:
+            raise last_error
         
         firstname = event['Firstname']
         lastname = event['Lastname']
