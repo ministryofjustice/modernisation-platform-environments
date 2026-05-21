@@ -27,7 +27,7 @@ locals {
           ami_name                      = "prison-retail-0"
           ami_owner                     = "self"
           availability_zone             = "eu-west-2a"
-          ebs_volumes_copy_all_from_ami = true
+          ebs_volumes_copy_all_from_ami = false
           iam_resource_names_prefix     = "ec2-instance"
           instance_profile_policies = [
             "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
