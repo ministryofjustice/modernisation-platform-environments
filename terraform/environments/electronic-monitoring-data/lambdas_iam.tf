@@ -2305,8 +2305,8 @@ data "aws_iam_policy_document" "gdpr_unstructured_control_lambda_iam_role_policy
       module.s3-logging-bucket.bucket.arn,
       "${module.s3-athena-bucket.bucket.arn}/output/*",
       module.s3-athena-bucket.bucket.arn,
-      "${module.s3-gdpr-audit-bucket.arn}/*",
-      module.s3-gdpr-audit-bucket.arn,
+      "${module.s3-gdpr-audit-bucket.bucket.arn}/*",
+      module.s3-gdpr-audit-bucket.bucket.arn,
       "${module.s3-data-bucket.bucket.arn}/*",
       module.s3-data-bucket.bucket.arn
     ]
