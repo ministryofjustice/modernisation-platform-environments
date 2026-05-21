@@ -4,8 +4,7 @@ data "aws_route53_zone" "ai_gateway" {
 }
 
 module "acm_ai_gateway" {
-  source  = "terraform-aws-modules/acm/aws"
-  version = "6.3.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-acm.git?ref=5d113fa07675fc42237907a621b68ac97109043e" # v6.3.0
 
   domain_name               = local.environment_configuration.ai_gateway_hostname
   zone_id                   = data.aws_route53_zone.ai_gateway.zone_id

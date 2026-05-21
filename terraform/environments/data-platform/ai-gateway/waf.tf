@@ -3,7 +3,7 @@ data "aws_lb" "ai_gateway" {
 }
 
 module "waf_ip_set_ai_gateway_allowlist" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-wafv2.git//modules/ip-set?ref=bed73e086b6dae6418a8f178b822ca6d042e32fc" # v2.0.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-wafv2.git//modules/ip-set?ref=36eceb918a237a80b69ce98e50b6f83fe17d2401" # v2.1.0
 
   name               = "ai-gateway-allowlist-${local.environment}"
   scope              = "REGIONAL"
@@ -13,7 +13,7 @@ module "waf_ip_set_ai_gateway_allowlist" {
 
 module "waf_ip_set_ai_gateway_admin_allowlist" {
   count   = length(local.environment_configuration.ai_gateway_admin_ingress_allowlist) > 0 ? 1 : 0
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-wafv2.git//modules/ip-set?ref=bed73e086b6dae6418a8f178b822ca6d042e32fc" # v2.0.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-wafv2.git//modules/ip-set?ref=36eceb918a237a80b69ce98e50b6f83fe17d2401" # v2.1.0
 
   name               = "ai-gateway-admin-allowlist-${local.environment}"
   scope              = "REGIONAL"
@@ -22,7 +22,7 @@ module "waf_ip_set_ai_gateway_admin_allowlist" {
 }
 
 module "waf_ai_gateway" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-wafv2.git?ref=bed73e086b6dae6418a8f178b822ca6d042e32fc" # v2.0.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-wafv2.git?ref=36eceb918a237a80b69ce98e50b6f83fe17d2401" # v2.1.0
 
   name  = "ai-gateway-${local.environment}"
   scope = "REGIONAL"

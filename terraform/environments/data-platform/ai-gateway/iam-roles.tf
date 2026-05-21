@@ -1,5 +1,5 @@
 module "iam_role" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=1d73bcb359419e1b41872ac5ccaf8808b8f1150e" # v6.6.0
 
   name = local.component_name
 
