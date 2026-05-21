@@ -90,7 +90,7 @@ locals {
 
     weblogic = {
       image_tag                = "6.7.4"
-      task_definition_revision = 7
+      task_definition_revision = 8
       container_port           = 8080
       container_memory         = 16384
       container_cpu            = 1024
@@ -107,8 +107,8 @@ locals {
       BREACH_NOTICE_UI_URL_FORMAT = "https://breach-notice-preprod.hmpps.service.justice.gov.uk/breach-notice/%s"
       COOKIE_SECURE               = "true"
       # DELIUS_API_URL                    = "" # No longer needed
-      DMS_HOST                          = "https://hmpps-delius-alfresco-preprod.apps.live.cloud-platform.service.justice.gov.uk"
-      DMS_OFFICE_URI_HOST               = "https://hmpps-delius-alfresco-preprod.apps.live.cloud-platform.service.justice.gov.uk"
+      DMS_HOST                          = "hmpps-delius-alfresco-preprod.apps.live.cloud-platform.service.justice.gov.uk"
+      DMS_OFFICE_URI_HOST               = "hmpps-delius-alfresco-preprod.apps.live.cloud-platform.service.justice.gov.uk"
       DMS_OFFICE_URI_PORT               = "443"
       DMS_PORT                          = "443"
       DMS_PROTOCOL                      = "https"
@@ -123,7 +123,7 @@ locals {
       LDAP_PRINCIPAL                    = "cn=admin,dc=moj,dc=com"
       LOG_LEVEL_NDELIUS                 = "DEBUG"
       MERGE_API_URL                     = "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io/merge/api/"
-      MERGE_OAUTH_URL                   = "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io/umt/oauth/"
+      MERGE_OAUTH_URL                   = "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io/umt/"
       MERGE_URL                         = "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io/merge/ui/"
       NDELIUS_CLIENT_ID                 = "migrations_client_id"
       OAUTH_CALLBACK_URL                = "https://ndelius.preprod.delius-core.hmpps-preproduction.modernisation-platform.service.justice.gov.uk/NDelius-war/delius/JSP/auth/token.jsp"
