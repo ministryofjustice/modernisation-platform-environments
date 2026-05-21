@@ -99,13 +99,32 @@ data "aws_iam_policy_document" "gdpr_delete_policy_document" {
   }
 
   statement {
+    sid       = "BatchDescribeJobsGlobal"
+    effect    = "Allow"
+    actions   = ["batch:DescribeJobs"]
+    resources = ["*"] 
+  }
+
+  statement {
+    sid       = "BatchSubmitJobScoped"
+    effect    = "Allow"
+    actions   = ["batch:SubmitJob"]
+    
+    resources = [
+      aws_batch_job_queue.shred_unstructured_from_zip_batch_queue[0].arn,
+      "${aws_batch_job_definition.shred_unstructured_from_zip_job.arn}:*",
+      "arn:aws:batch:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:job/*"
+    ]
+  }
+
+  statement {
     effect = "Allow"
     actions = [
       "batch:SubmitJob",
       "batch:DescribeJobs",
       "batch:TerminateJob"
     ]
-    resources = ["*"]
+    resources = ["arn:aws:batch:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:job-definition/shred-unstructured-from-zip-job:*"]
   }
 
   statement {
