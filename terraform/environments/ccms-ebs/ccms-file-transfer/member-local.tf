@@ -1,5 +1,5 @@
 locals {
-  sftp_bc_folder_name = ["inbound", "archive", "error"]
+  sftp_bc_folder_name = ["ccms-transfer-bc-${local.environment}/inbound", "ccms-transfer-bc-${local.environment}/archive", "ccms-transfer-bc-${local.environment}/error"]
   sftp_bc_bucket_name = "${local.application_name}-${local.environment}-bc-inbound-mp"
   logging_bucket_name = "${local.application_name}-${local.environment}-logging"
 
