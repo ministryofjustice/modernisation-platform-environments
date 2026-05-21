@@ -212,15 +212,25 @@ resource "aws_security_group_rule" "ecs_tasks_admin_server" {
 }
 
 #-- Tightened: ECS Admin egress (was 0.0.0.0/0 all-protocols)
-# resource "aws_security_group_rule" "ecs_tasks_admin_egress_vpc_endpoints" {
-#   security_group_id = aws_security_group.ecs_tasks_admin.id
-#   type              = "egress"
-#   description       = "Egress to VPC endpoints"
-#   protocol          = "tcp"
-#   from_port         = 443
-#   to_port           = 443
-#   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-# }
+resource "aws_security_group_rule" "ecs_tasks_admin_egress_http" {
+  security_group_id = aws_security_group.ecs_tasks_admin.id
+  type              = "egress"
+  description       = "Egress HTTP to private subnets on tcp/80"
+  protocol          = "tcp"
+  from_port         = 80
+  to_port           = 80
+  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+}
+
+resource "aws_security_group_rule" "ecs_tasks_admin_egress_vpc_endpoints" {
+  security_group_id = aws_security_group.ecs_tasks_admin.id
+  type              = "egress"
+  description       = "Egress to VPC endpoints and EBS NLB (SSM, Secrets Manager, EBS) via tcp/443"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+}
 
 resource "aws_security_group_rule" "ecs_tasks_admin_egress_oracle" {
   security_group_id = aws_security_group.ecs_tasks_admin.id
