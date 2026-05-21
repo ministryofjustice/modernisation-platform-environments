@@ -39,7 +39,6 @@
         "guardduty_role_name": "integration-hub-development-guardduty-s3-plan",
         "guardduty_policy_name": "integration-hub-development-guardduty-s3-plan",
         "malware_scanning_processing_bucket_key": "processing",
-        "malware_scanning_object_prefix": ["incoming/"],
         "kms_key_arn_list": [
           "arn:aws:kms:eu-west-2:111111111111:key/00000000-0000-0000-0000-000000000000"
         ]
