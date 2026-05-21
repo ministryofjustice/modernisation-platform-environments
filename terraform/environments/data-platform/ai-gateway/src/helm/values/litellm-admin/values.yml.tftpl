@@ -88,22 +88,68 @@ securityContext:
   capabilities:
     drop:
       - ALL
-  readOnlyRootFilesystem: false
+  readOnlyRootFilesystem: true
   runAsNonRoot: true
   runAsUser: 65534
   seccompProfile:
     type: RuntimeDefault
 
-ingress:
-  enabled: false
+volumes:
+  - name: ui
+    emptyDir:
+      sizeLimit: 100Mi
+  - name: assets
+    emptyDir:
+      sizeLimit: 10Mi
+  - name: migrations
+    emptyDir:
+      sizeLimit: 64Mi
+
+volumeMounts:
+  - name: ui
+    mountPath: /app/var/litellm/ui
+  - name: assets
+    mountPath: /app/var/litellm/assets
+  - name: migrations
+    mountPath: /app/migrations
 
 migrationJob:
   enabled: true
+  extraInitContainers:
+    - name: copy-ui
+      image: ${imageRepository}:${imageTag}
+      command: ["sh", "-c"]
+      args:
+        - |
+          cp -r /var/lib/litellm/ui/* /app/var/litellm/ui/
+          cp -r /var/lib/litellm/assets/* /app/var/litellm/assets/
+          touch /app/var/litellm/ui/.litellm_ui_ready
+      volumeMounts:
+        - name: ui
+          mountPath: /app/var/litellm/ui
+        - name: assets
+          mountPath: /app/var/litellm/assets
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 65534
+
+ingress:
+  enabled: false
 
 envVars: {
     LITELLM_MODE: "PRODUCTION",
     LITELLM_LOG: "ERROR",
     USE_PRISMA_MIGRATE: "True",
+    LITELLM_UI_PATH: "/app/var/litellm/ui",
+    LITELLM_ASSETS_PATH: "/app/var/litellm/assets",
+    LITELLM_MIGRATION_DIR: "/app/migrations",
+    XDG_CACHE_HOME: "/.cache",
+    PRISMA_BINARY_CACHE_DIR: "/.cache/prisma-python/binaries",
     PROXY_BASE_URL: "https://${ingressHostname}",
     REDIS_SSL: "True",
     DOCS_TITLE: "Data Platform AI Gateway Admin",

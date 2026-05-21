@@ -107,11 +107,20 @@ securityContext:
   capabilities:
     drop:
       - ALL
-  readOnlyRootFilesystem: false
+  readOnlyRootFilesystem: true
   runAsNonRoot: true
   runAsUser: 65534
   seccompProfile:
     type: RuntimeDefault
+
+volumes:
+  - name: migrations
+    emptyDir:
+      sizeLimit: 64Mi
+
+volumeMounts:
+  - name: migrations
+    mountPath: /app/migrations
 
 migrationJob:
   enabled: false
@@ -122,6 +131,9 @@ ingress:
 envVars: {
     LITELLM_MODE: "PRODUCTION",
     LITELLM_LOG: "ERROR",
+    LITELLM_MIGRATION_DIR: "/app/migrations",
+    XDG_CACHE_HOME: "/.cache",
+    PRISMA_BINARY_CACHE_DIR: "/.cache/prisma-python/binaries",
     PROXY_BASE_URL: "https://${ingressHostname}",
     REDIS_SSL: "True",
     DOCS_TITLE: "Data Platform AI Gateway",
