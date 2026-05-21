@@ -47,8 +47,6 @@ resource "helm_release" "litellm" {
         environmentSecrets = [
           "litellm-license",
           "litellm-entra-id",
-          "justiceai-azure-openai",
-          "azure-openai",
           "elasticache"
         ]
 
@@ -61,7 +59,6 @@ resource "helm_release" "litellm" {
         targetCPUUtilizationPercentage = local.environment_configuration.ai_gateway_autoscaling.target_cpu_utilization_percentage
 
         # LiteLLM Models
-        azureModels   = try(local.environment_configuration.ai_gateway_models.azure, {})
         bedrockModels = try(local.environment_configuration.ai_gateway_models.bedrock, {})
       }
     )
@@ -74,8 +71,6 @@ resource "helm_release" "litellm" {
     kubernetes_secret_v1.litellm_master_key,
     kubernetes_manifest.external_secret_litellm_license,
     kubernetes_manifest.external_secret_litellm_entra_id,
-    kubernetes_manifest.external_secret_justiceai_azure_openai,
-    kubernetes_manifest.external_secret_azure_openai,
     kubernetes_manifest.external_secret_aurora,
     kubernetes_manifest.external_secret_elasticache
   ]

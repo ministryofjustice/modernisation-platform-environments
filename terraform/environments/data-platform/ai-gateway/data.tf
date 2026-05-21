@@ -34,10 +34,3 @@ data "aws_secretsmanager_secret_version" "litellm_entra_id" {
   secret_id = module.litellm_entra_id_secret.secret_id
 }
 
-data "aws_secretsmanager_secret_version" "justiceai_azure_openai" {
-  secret_id = module.justiceai_azure_openai_secret.secret_id
-}
-
-data "aws_secretsmanager_secret_version" "azure_openai_secret" {
-  secret_id = module.azure_openai_secret.secret_id
-}

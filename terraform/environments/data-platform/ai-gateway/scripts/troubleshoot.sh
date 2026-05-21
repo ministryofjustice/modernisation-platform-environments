@@ -186,8 +186,6 @@ check_kubernetes_secrets() {
     "litellm-master-key"
     "litellm-license"
     "litellm-entra-id"
-    "justiceai-azure-openai"
-    "azure-openai"
     "aurora"
     "elasticache"
   )
@@ -249,8 +247,6 @@ check_aws_secrets() {
   local expected_aws_secrets=(
     "ai-gateway/litellm-license"
     "ai-gateway/litellm-entra-id"
-    "ai-gateway/justiceai-azure-openai"
-    "ai-gateway/azure-openai"
     "ai-gateway/aurora"
     "ai-gateway/elasticache"
   )
@@ -674,15 +670,6 @@ compare_secrets() {
     "tenant_id:MICROSOFT_TENANT" \
     "proxy_admin_id:PROXY_ADMIN_ID"
 
-  # justiceai-azure-openai: ai-gateway/justiceai-azure-openai <-> k8s secret "justiceai-azure-openai"
-  compare_secret_pair "ai-gateway/justiceai-azure-openai" "justiceai-azure-openai" \
-    "api_base:AZURE_OPENAI_API_BASE" \
-    "api_key:AZURE_OPENAI_API_KEY"
-
-  # azure-openai: ai-gateway/azure-openai <-> k8s secret "azure-openai"
-  compare_secret_pair "ai-gateway/azure-openai" "azure-openai" \
-    "api_base:AZURE_OPENAI_API_BASE" \
-    "api_key:AZURE_OPENAI_API_KEY"
 
   # litellm-license: ai-gateway/litellm-license <-> k8s secret "litellm-license"
   compare_secret_pair_plain "ai-gateway/litellm-license" "litellm-license" "LITELLM_LICENSE"

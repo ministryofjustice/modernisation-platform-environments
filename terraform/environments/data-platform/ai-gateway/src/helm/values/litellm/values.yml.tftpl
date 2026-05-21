@@ -81,14 +81,6 @@ proxy_config:
     redis_password: os.environ/auth_token
 
   model_list:
-%{ for key, profile in azureModels ~}
-    - model_name: azure-${key}
-      litellm_params:
-        model: azure/${profile.model_id}
-        api_base: os.environ/AZURE_OPENAI_API_BASE
-        api_key: os.environ/AZURE_OPENAI_API_KEY
-        api_version: ${profile.api_version}
-%{ endfor ~}
 %{ for key, profile in bedrockModels ~}
     - model_name: bedrock-${key}
       litellm_params:
