@@ -5,7 +5,7 @@ resource "aws_glue_catalog_database" "main" {
 
   target_database {
     catalog_id    = local.environment_management.account_ids["data-platform-governance-${local.environment_configuration.data_lake_environment}"]
-    database_name = each.key
+    database_name = "${local.data_platform_lakeformation_configuration.domain}-${each.key}"
   }
 
   tags = merge(
