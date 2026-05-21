@@ -3,6 +3,6 @@ module "data_lake_storage" {
 
   source = "git::https://github.com/ministryofjustice/terraform-aws-data-platform-lakeformation.git//modules/data-lake-storage?ref=feat/data-lake-storage"
 
-  governance_account_id         = local.environment_management.account_ids["data-platform-governance-development"]
-  lakeformation_access_role_arn = "arn:aws:iam::${local.environment_management.account_ids["data-platform-governance-development"]}:role/lakeformation-access"
+  data_platform_governance_account_id = local.environment_management.account_ids["data-platform-governance-development"]
+  data_platform_account_id            = local.environment_management.account_ids["data-platform-development"]
 }

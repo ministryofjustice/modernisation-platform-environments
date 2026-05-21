@@ -2,6 +2,7 @@
 environment:
   development:
     factories:
+      data-platform-development: []
       data-factory-moj-development:
         domain: moj
         databases:
