@@ -316,6 +316,18 @@ locals {
         source_arn_suffix = "*"
       }]
     }
+    rotate_ses_access_key = {
+      description  = "Function to rotate ses access key, secret key and derive new smtp password."
+      role_key     = "rotate_ses_access_key"
+      environments = ["development", "preproduction"]
+      permissions  = []
+      environment = {
+        variables = {
+          SES_IAM_USER    = local.ses_iam_user
+          SES_SECRET_NAME = local.ses_secret_name
+        }
+      }
+    }
   }
 
   # Flatten lambda functions with environments
@@ -413,10 +425,10 @@ resource "aws_lambda_function" "lambda_functions" {
     for_each = try(each.value.config.environment, null) != null ? [each.value.config.environment] : []
     content {
       variables = merge(
-        environment.value.variables,
-        {
+        { for k, v in environment.value.variables : k => v if !can(v[each.value.env]) },
+        try(environment.value.variables.SNS_TOPIC_ARN, null) != null ? {
           SNS_TOPIC_ARN = environment.value.variables.SNS_TOPIC_ARN[each.value.env]
-        }
+        } : {}
       )
     }
   }

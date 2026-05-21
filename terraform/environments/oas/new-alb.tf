@@ -731,6 +731,25 @@ resource "aws_lb_listener_rule" "biinfer_login_https_rule" {
   }
 }
 
+# Listener rule for /bi-sac-config-mgr on HTTPS
+resource "aws_lb_listener_rule" "bi_sac_config_mgr_https_rule" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.https_listener[0].arn
+  priority     = 251
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/bi-sac-config-mgr*"]
+    }
+  }
+}
+
 # Listener rule for /static on HTTPS
 resource "aws_lb_listener_rule" "static_https_rule" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
