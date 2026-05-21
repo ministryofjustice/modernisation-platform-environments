@@ -115,11 +115,12 @@ resource "aws_launch_template" "ec2-launch-template" {
   monitoring {
     enabled = true
   }
-  
+
   lifecycle {
     ignore_changes = [
       latest_version,
-      default_version
+      default_version,
+      image_id
     ]
   }
   metadata_options {
