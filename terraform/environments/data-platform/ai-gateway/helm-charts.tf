@@ -108,12 +108,19 @@ resource "helm_release" "litellm_admin" {
           "litellm-entra-id",
           "elasticache"
         ]
+
+        # AWS
+        iamRole = module.iam_role.arn
+
+        # LiteLLM Models
+        bedrockModels = try(local.environment_configuration.ai_gateway_models.bedrock, {})
       }
     )
   ]
 
   depends_on = [
     module.ai_gateway_aurora,
+    module.iam_role,
     kubernetes_service_account_v1.litellm,
     kubernetes_secret_v1.litellm_master_key,
     kubernetes_manifest.external_secret_litellm_license,

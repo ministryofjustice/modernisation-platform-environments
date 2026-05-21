@@ -62,11 +62,13 @@ proxy_config:
     redis_port: 6379
     redis_password: os.environ/auth_token
   model_list:
-    - model_name: fake-openai-endpoint
+%{ for key, profile in bedrockModels ~}
+    - model_name: bedrock-${key}
       litellm_params:
-        model: openai/fake
-        api_key: fake-key
-        api_base: https://exampleopenaiendpoint-production.up.railway.app/
+        model: bedrock/${profile.model_id}
+        aws_role_name: ${iamRole}
+        aws_region_name: ${profile.region}
+%{ endfor ~}
 
 tolerations:
   - key: compute.data-platform.service.justice.gov.uk/node-pool
