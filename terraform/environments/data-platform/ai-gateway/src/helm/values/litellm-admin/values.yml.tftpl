@@ -101,6 +101,9 @@ volumes:
   - name: assets
     emptyDir:
       sizeLimit: 10Mi
+  - name: cache
+    emptyDir:
+      sizeLimit: 500Mi
   - name: migrations
     emptyDir:
       sizeLimit: 64Mi
@@ -110,33 +113,35 @@ volumeMounts:
     mountPath: /app/var/litellm/ui
   - name: assets
     mountPath: /app/var/litellm/assets
+  - name: cache
+    mountPath: /app/cache
   - name: migrations
     mountPath: /app/migrations
 
+extraInitContainers:
+  - name: setup-ui
+    image: ${imageRepository}:${imageTag}
+    command: ["sh", "-c"]
+    args:
+      - |
+        cp -r /var/lib/litellm/ui/* /app/var/litellm/ui/ && \
+        cp -r /var/lib/litellm/assets/* /app/var/litellm/assets/
+    volumeMounts:
+      - name: ui
+        mountPath: /app/var/litellm/ui
+      - name: assets
+        mountPath: /app/var/litellm/assets
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 65534
+
 migrationJob:
   enabled: true
-  extraInitContainers:
-    - name: copy-ui
-      image: ${imageRepository}:${imageTag}
-      command: ["sh", "-c"]
-      args:
-        - |
-          cp -r /var/lib/litellm/ui/* /app/var/litellm/ui/
-          cp -r /var/lib/litellm/assets/* /app/var/litellm/assets/
-          touch /app/var/litellm/ui/.litellm_ui_ready
-      volumeMounts:
-        - name: ui
-          mountPath: /app/var/litellm/ui
-        - name: assets
-          mountPath: /app/var/litellm/assets
-      securityContext:
-        allowPrivilegeEscalation: false
-        capabilities:
-          drop:
-            - ALL
-        readOnlyRootFilesystem: true
-        runAsNonRoot: true
-        runAsUser: 65534
 
 ingress:
   enabled: false
@@ -148,8 +153,8 @@ envVars: {
     LITELLM_UI_PATH: "/app/var/litellm/ui",
     LITELLM_ASSETS_PATH: "/app/var/litellm/assets",
     LITELLM_MIGRATION_DIR: "/app/migrations",
-    XDG_CACHE_HOME: "/.cache",
-    PRISMA_BINARY_CACHE_DIR: "/.cache/prisma-python/binaries",
+    XDG_CACHE_HOME: "/app/cache",
+    PRISMA_BINARY_CACHE_DIR: "/app/cache/prisma-python/binaries",
     PROXY_BASE_URL: "https://${ingressHostname}",
     REDIS_SSL: "True",
     DOCS_TITLE: "Data Platform AI Gateway Admin",
