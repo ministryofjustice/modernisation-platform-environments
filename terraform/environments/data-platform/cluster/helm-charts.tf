@@ -89,6 +89,58 @@ resource "helm_release" "cluster_autoscaler" {
   depends_on = [module.cluster_autoscaler_iam_role]
 }
 
+resource "helm_release" "headlamp" {
+  /* https://artifacthub.io/packages/helm/headlamp/headlamp */
+
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
+  name       = "headlamp"
+  repository = "https://kubernetes-sigs.github.io/headlamp"
+  chart      = "headlamp"
+  version    = local.cluster_configuration.helm_chart_versions.headlamp
+  namespace  = module.headlamp_namespace.name
+
+  values = [
+    templatefile(
+      "${path.module}/configuration/helm/headlamp/values.yml.tftpl",
+      {
+        cluster_role_name    = kubernetes_cluster_role_v1.headlamp.metadata[0].name
+        gateway_hostname     = trimprefix(local.cluster_configuration.shared_services_gateway_hostname, "*.")
+        gateway_name         = "shared-gateway"
+        gateway_namespace    = module.shared_services_namespace.name
+        service_account_name = "headlamp-sa"
+      }
+    )
+  ]
+}
+
+resource "helm_release" "opencost" {
+  /* https://artifacthub.io/packages/helm/opencost/opencost */
+
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
+
+  name       = "opencost"
+  repository = "https://opencost.github.io/opencost-helm-chart"
+  chart      = "opencost"
+  version    = local.cluster_configuration.helm_chart_versions.opencost
+  namespace  = module.opencost_namespace.name
+
+  values = [
+    templatefile(
+      "${path.module}/configuration/helm/opencost/values.yml.tftpl",
+      {
+        amp_workspace_id  = module.prometheus.workspace_id
+        aws_region        = data.aws_region.current.region
+        cluster_name      = module.eks.cluster_name
+        gateway_hostname  = trimprefix(local.cluster_configuration.shared_services_gateway_hostname, "*.")
+        gateway_name      = "shared-gateway"
+        gateway_namespace = module.shared_services_namespace.name
+        opencost_role_arn = module.opencost_iam_role.arn
+      }
+    )
+  ]
+}
+
 resource "helm_release" "karpenter_crd" {
   /* https://github.com/aws/karpenter-provider-aws/releases */
 

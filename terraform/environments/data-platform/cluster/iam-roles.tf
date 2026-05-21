@@ -78,6 +78,23 @@ module "prometheus_iam_role" {
   }
 }
 
+module "opencost_iam_role" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
+
+  name = "opencost"
+
+  policies = {
+    OpenCost = module.opencost_iam_policy.arn
+  }
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["${module.opencost_namespace.name}:opencost"]
+    }
+  }
+}
+
 module "fluent_bit_iam_role" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role-for-service-accounts?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
 
@@ -134,8 +151,9 @@ module "external_secrets_iam_role" {
 
   name = "external-secrets"
 
-  attach_external_secrets_policy = true
-  external_secrets_kms_key_arns  = [module.secrets_manager_common_kms_key.key_arn]
+  attach_external_secrets_policy        = true
+  external_secrets_secrets_manager_arns = [module.headlamp_entra_id_secret.secret_arn]
+  external_secrets_kms_key_arns         = [module.secrets_manager_common_kms_key.key_arn]
 
   oidc_providers = {
     main = {

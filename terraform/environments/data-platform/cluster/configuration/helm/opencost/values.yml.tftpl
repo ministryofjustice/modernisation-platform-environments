@@ -1,0 +1,51 @@
+clusterName: ${cluster_name}
+
+serviceAccount:
+  create: true
+  name: opencost
+  annotations:
+    eks.amazonaws.com/role-arn: ${opencost_role_arn}
+
+opencost:
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+  cloudCost:
+    enabled: true
+
+  prometheus:
+    internal:
+      enabled: false
+    external:
+      enabled: false
+    amp:
+      enabled: true
+      workspaceId: ${amp_workspace_id}
+
+  sigV4Proxy:
+    region: ${aws_region}
+    host: aps-workspaces.${aws_region}.amazonaws.com
+
+  exporter:
+    defaultClusterId: ${cluster_name}
+    apiHttpRoute:
+      enabled: true
+      parentRefs:
+        - name: ${gateway_name}
+          namespace: ${gateway_namespace}
+      hostnames:
+        - opencost-api.${gateway_hostname}
+
+  ui:
+    enabled: true
+    httpRoute:
+      enabled: true
+      parentRefs:
+        - name: ${gateway_name}
+          namespace: ${gateway_namespace}
+      hostnames:
+        - opencost.${gateway_hostname}

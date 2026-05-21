@@ -1,3 +1,8 @@
+variable "additional_labels" {
+  type    = map(any)
+  default = {}
+}
+
 variable "name" {
   type = string
 }

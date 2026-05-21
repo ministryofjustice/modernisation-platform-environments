@@ -20,6 +20,28 @@ module "prometheus_iam_policy" {
   policy = data.aws_iam_policy_document.prometheus.json
 }
 
+data "aws_iam_policy_document" "opencost" {
+  statement {
+    sid    = "AllowAPSQuery"
+    effect = "Allow"
+    actions = [
+      "aps:QueryMetrics",
+      "aps:GetSeries",
+      "aps:GetLabels",
+      "aps:GetMetricMetadata"
+    ]
+    resources = [module.prometheus.workspace_arn]
+  }
+}
+
+module "opencost_iam_policy" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-policy?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
+
+  name_prefix = "opencost"
+
+  policy = data.aws_iam_policy_document.opencost.json
+}
+
 data "aws_iam_policy_document" "eks_logs_kms" {
   statement {
     sid    = "AllowKMS"

@@ -47,6 +47,26 @@ module "karpenter_namespace" {
   workload = "system"
 }
 
+module "headlamp_namespace" {
+  source = "./modules/kubernetes/namespace"
+
+  name     = "headlamp"
+  workload = "system"
+  additional_labels = {
+    "compute.data-platform.service.justice.gov.uk/shared-gateway-enabled" = "true"
+  }
+}
+
+module "opencost_namespace" {
+  source = "./modules/kubernetes/namespace"
+
+  name     = "opencost"
+  workload = "system"
+  additional_labels = {
+    "compute.data-platform.service.justice.gov.uk/shared-gateway-enabled" = "true"
+  }
+}
+
 module "external_dns_namespace" {
   source = "./modules/kubernetes/namespace"
 

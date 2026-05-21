@@ -1,0 +1,57 @@
+---
+clusterRoleBinding:
+  create: true
+  clusterRoleName: ${cluster_role_name}
+
+config:
+  pluginsDir: /headlamp/plugins
+  watchPlugins: true
+  oidc:
+    secret:
+      create: false
+      name: oidc
+    externalSecret:
+      enabled: true
+      name: oidc
+      hasScopes: true
+
+httpRoute:
+  enabled: true
+  parentRefs:
+    - name: ${gateway_name}
+      namespace: ${gateway_namespace}
+  hostNames:
+    - headlamp.${gateway_hostname}
+
+nodeSelector:
+  compute.data-platform.service.justice.gov.uk/node: system
+
+pluginsManager:
+  enabled: true
+  configContent: |
+    plugins:
+      - name: cert-manager
+        source: https://artifacthub.io/packages/headlamp/headlamp-plugins/headlamp_cert-manager
+        version: 0.1.0
+      - name: karpenter
+        source: https://artifacthub.io/packages/headlamp/headlamp-plugins/headlamp_karpenter
+        version: 0.2.0
+      - name: keda
+        source: https://artifacthub.io/packages/headlamp/headlamp-plugins/headlamp_keda
+        version: 0.1.1-beta
+      - name: opencost
+        source: https://artifacthub.io/packages/headlamp/headlamp-plugins/headlamp_opencost
+        version: 0.1.3
+    installOptions:
+      parallel: true
+      maxConcurrent: 2
+
+serviceAccount:
+  create: true
+  name: ${service_account_name}
+
+tolerations:
+  - key: compute.data-platform.service.justice.gov.uk/node
+    operator: Equal
+    value: system
+    effect: NoSchedule
