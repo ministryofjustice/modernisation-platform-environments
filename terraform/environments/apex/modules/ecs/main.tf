@@ -115,7 +115,13 @@ resource "aws_launch_template" "ec2-launch-template" {
   monitoring {
     enabled = true
   }
-
+  
+  lifecycle {
+    ignore_changes = [
+      latest_version,
+      default_version
+    ]
+  }
   metadata_options {
     http_endpoint               = "enabled"
     http_tokens                 = "optional"
