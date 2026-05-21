@@ -15,10 +15,24 @@ module "eks" {
 
   cloudwatch_log_group_retention_in_days = 30
 
-  # Enable Auto Mode compute
+  bootstrap_self_managed_addons = false
+
+  # Enable EKS Auto Mode
   compute_config = {
     enabled    = true
     node_pools = ["general-purpose"]
+  }
+
+  kubernetes_network_config {
+    elastic_load_balancing {
+      enabled = true
+    }
+  }
+
+  storage_config {
+    block_storage {
+      enabled = true
+    }
   }
 
   eks_managed_node_groups = {
