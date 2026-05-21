@@ -1,7 +1,7 @@
 resource "aws_glue_catalog_database" "main" {
   for_each = tomap(try(local.data_platform_lakeformation_configuration.databases, {}))
 
-  name = each.key
+  name = "${local.data_platform_lakeformation_configuration.domain}-${each.key}"
 
   target_database {
     catalog_id    = local.environment_management.account_ids["data-platform-governance-${local.environment_configuration.data_lake_environment}"]
