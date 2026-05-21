@@ -108,8 +108,6 @@ def create_workspace(event):
             ]
         )
         
-        print(response)
-        
         if 'FailedRequests' in response:
             for failed_request in response['FailedRequests']:
                 error_message = f"Failed to create workspace for user: {failed_request['WorkspaceRequest']['UserName']}. Error: {failed_request['ErrorMessage']}"
