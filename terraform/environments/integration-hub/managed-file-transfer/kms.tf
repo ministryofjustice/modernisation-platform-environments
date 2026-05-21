@@ -5,7 +5,7 @@ module "kms_s3_bucket" {
   source  = "terraform-aws-modules/kms/aws"
   version = "4.2.0"
 
-  aliases             = ["transfer/s3/${each.key}"]
+  aliases             = ["s3/${each.key}"]
   description         = "Key for cryptographic functions on ${trimsuffix(each.value.bucket_prefix, "-")} S3 bucket"
   multi_region        = false
   is_enabled          = true

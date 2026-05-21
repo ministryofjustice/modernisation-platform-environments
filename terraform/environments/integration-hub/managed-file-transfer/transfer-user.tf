@@ -50,7 +50,6 @@ data "aws_iam_policy_document" "transfer_user_session" {
       "s3:GetBucketLocation",
       "s3:ListBucket"
     ]
-
     resources = [
       module.s3_bucket["unscanned"].s3_bucket_arn,
     ]
@@ -131,7 +130,7 @@ resource "aws_transfer_user" "this" {
 }
 
 resource "aws_transfer_ssh_key" "this" {
-  for_each            = toset(["dms1981"])
+  for_each  = toset(["dms1981"])
   body      = data.aws_secretsmanager_secret_version.secrets_transfer_user_ssh.secret_string
   server_id = aws_transfer_server.this.id
   user_name = aws_transfer_user.this[each.key].user_name
