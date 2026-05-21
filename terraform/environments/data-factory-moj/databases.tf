@@ -19,24 +19,24 @@ resource "aws_glue_catalog_database" "main" {
   )
 }
 
-# resource "aws_lakeformation_permissions" "database" {
-#   for_each = tomap({
-#     for grant in flatten([
-#       for database_name, database in try(local.data_platform_lakeformation_configuration.databases, {}) : [
-#         for principal_name, principal in try(database.principals, {}) : {
-#           database_name = database_name
-#           name          = "${local.data_platform_lakeformation_configuration.domain}-${database_name}"
-#           permissions   = try(principal.permissions, [])
-#           principal     = principal_name
-#         }
-#       ]
-#     ]) : "${grant.name}-${grant.principal}" => grant
-#   })
+resource "aws_lakeformation_permissions" "database" {
+  for_each = tomap({
+    for grant in flatten([
+      for database_name, database in try(local.data_platform_lakeformation_configuration.databases, {}) : [
+        for principal_name, principal in try(database.principals, {}) : {
+          database_name = database_name
+          name          = "${local.data_platform_lakeformation_configuration.domain}-${database_name}"
+          permissions   = try(principal.permissions, [])
+          principal     = principal_name
+        }
+      ]
+    ]) : "${grant.name}-${grant.principal}" => grant
+  })
 
-#   principal   = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${each.value.principal}"
-#   permissions = each.value.permissions
+  principal   = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${each.value.principal}"
+  permissions = each.value.permissions
 
-#   database {
-#     name = aws_glue_catalog_database.main[each.value.database_name].name
-#   }
-# }
+  database {
+    name = aws_glue_catalog_database.main[each.value.database_name].name
+  }
+}

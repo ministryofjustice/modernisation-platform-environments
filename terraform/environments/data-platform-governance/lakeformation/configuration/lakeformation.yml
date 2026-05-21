@@ -13,6 +13,8 @@ environment:
                 permissions:
                   - DESCRIBE
                   - CREATE_TABLE
+                  - ALTER
+                  - DROP
   test:
     factories: []
   preproduction:
