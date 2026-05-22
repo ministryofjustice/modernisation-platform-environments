@@ -382,18 +382,18 @@ resource "aws_lambda_event_source_mapping" "p1_creation_trigger" {
     schedule_expression = "rate(5 minutes)"
     }
 
-  # target staged_position
-  resource "aws_cloudwatch_event_target" "merge_staged_position" {
+  # target mdss_staged
+  resource "aws_cloudwatch_event_target" "merge_mdss_staged" {
     count = local.is-preproduction || local.is-production ? 0 : 1
     rule  = aws_cloudwatch_event_rule.merge_load_schedule[0].name
-    arn   = module.merge_staged_position[0].lambda_function_arn 
+    arn   = module.merge_mdss_staged[0].lambda_function_arn 
   }
 
-  resource "aws_lambda_permission" "allow_eventbridge_merge_staged_position" {
+  resource "aws_lambda_permission" "allow_eventbridge_merge_mdss_staged" {
     count         = local.is-preproduction || local.is-production ? 0 : 1
-    statement_id  = "AllowExecutionFromEventBridgeStagedMdssPosition"
+    statement_id  = "AllowExecutionFromEventBridgeStagedMdssStaged"
     action        = "lambda:InvokeFunction"
-    function_name = module.merge_staged_position[0].lambda_function_name
+    function_name = module.merge_mdss_staged[0].lambda_function_name
     principal     = "events.amazonaws.com"
     source_arn    = aws_cloudwatch_event_rule.merge_load_schedule[0].arn
   }

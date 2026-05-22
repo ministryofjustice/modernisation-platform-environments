@@ -899,14 +899,14 @@ module "landing_file_dlq_redriver" {
 # lambda loads - staged_mdss__position and acquisitive_crime__position
 #-----------------------------------------------------------------------------------
 
-module "merge_staged_position" {
+module "merge_mdss_staged" {
   count                          = local.is-preproduction || local.is-production ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
-  function_name                  = "merge_staged_position"
+  function_name                  = "merge_mdss_staged"
   role_name                      = aws_iam_role.merge_load.name
   role_arn                       = aws_iam_role.merge_load.arn
-  handler                        = "merge_staged_position.handler"
+  handler                        = "merge_mdss_staged.handler"
   memory_size                    = 1024
   timeout                        = 900
   reserved_concurrent_executions = 1
