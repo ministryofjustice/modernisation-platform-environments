@@ -22,6 +22,24 @@ data "aws_iam_policy_document" "ai_gateway" {
     actions   = ["bedrock:InvokeModel*"]
     resources = ["arn:aws:bedrock:*::foundation-model/*"]
   }
+
+  statement {
+    sid    = "DenyClaudeCodeCLI"
+    effect = "Deny"
+    actions = [
+      "bedrock:InvokeModel",
+      "bedrock:InvokeModelWithResponseStream"
+    ]
+    resources = ["*"]
+    condition {
+      test     = "StringLike"
+      variable = "aws:UserAgent"
+      values = [
+        "claude-cli*",
+        "claude-cli/*"
+      ]
+    }
+  }
 }
 
 module "ai_gateway_iam_policy" {
