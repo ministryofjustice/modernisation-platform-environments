@@ -148,11 +148,6 @@ resource "aws_cloudtrail" "secrets_manager" {
   event_selector {
     read_write_type           = "WriteOnly"
     include_management_events = true
-
-    data_resource {
-      type   = "AWS::SecretsManager::Secret"
-      values = [aws_secretsmanager_secret.user_list[0].arn]
-    }
   }
 
   depends_on = [aws_s3_bucket_policy.cloudtrail]
