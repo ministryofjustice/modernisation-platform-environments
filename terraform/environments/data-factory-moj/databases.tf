@@ -48,7 +48,7 @@ resource "aws_glue_catalog_database" "test" {
 }
 
 resource "aws_lakeformation_permissions" "share_database" {
-  principal   = local.environment_management.account_ids[each.value.factory_name]
+  principal   = local.environment_management.account_ids["data-platform-governance-${local.environment_configuration.data_lake_environment}"]
   permissions = ["DESCRIBE"]
 
   database {
@@ -58,7 +58,7 @@ resource "aws_lakeformation_permissions" "share_database" {
 
 resource "aws_lakeformation_permissions" "tables" {
 
-  principal   = local.environment_management.account_ids[each.value.factory_name]
+  principal   = local.environment_management.account_ids["data-platform-governance-${local.environment_configuration.data_lake_environment}"]
   permissions = ["DESCRIBE", "SELECT"]
 
   table {
