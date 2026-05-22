@@ -24,13 +24,15 @@ module "lambda_unscanned_to_processing" {
 
   attach_policy_statements = true
   policy_statements = {
-    source_bucket_read = {
+    source_bucket_get_delete = {
       effect = "Allow"
       actions = [
         "s3:GetObject",
         "s3:GetObjectVersion",
         "s3:GetObjectTagging",
         "s3:GetObjectVersionTagging",
+        "s3:DeleteObject",
+        "s3:DeleteObjectVersion",
       ]
       resources = [
         "${module.s3_bucket["unscanned"].s3_bucket_arn}/*",
