@@ -146,7 +146,7 @@ def get_log_fields(operation):
     key_prefix="managed-file-transfer/processing-to-post-scan",
 )
 def process_record(*, operation):
-    logger.info("Moving S3 object", extra=get_log_fields(operation))
+    logger.info("Processing S3 object", extra=get_log_fields(operation))
 
     copy_source = {
         "Bucket": operation["source_bucket_name"],
@@ -165,7 +165,7 @@ def process_record(*, operation):
     )
     put_destination_tags(operation, copy_response.get("VersionId"))
 
-    logger.info("Moved S3 object", extra=get_log_fields(operation))
+    logger.info("Copied S3 object", extra=get_log_fields(operation))
 
     if operation["delete_source"]:
         delete_kwargs = {
@@ -177,6 +177,7 @@ def process_record(*, operation):
             delete_kwargs["VersionId"] = operation["source_version_id"]
 
         s3.delete_object(**delete_kwargs)
+        logger.info("Moved S3 object", extra=get_log_fields(operation))
 
     return {
         "delete_source": operation["delete_source"],
