@@ -32,7 +32,7 @@ resource "aws_secretsmanager_secret" "guardduty_slack_secret" {
   })
 }
 
-resource "aws_secretsmanager_secret_version" "guardduty_slack_secret" {
+resource "aws_secretsmanager_secret_version" "guardduty_slack_secret_version" {
   secret_id = aws_secretsmanager_secret.guardduty_slack_secret.id
   secret_string = jsonencode({
     "slack_channel_webhook"           = ""
