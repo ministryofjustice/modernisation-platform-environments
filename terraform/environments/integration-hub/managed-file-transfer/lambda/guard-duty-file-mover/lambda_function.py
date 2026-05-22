@@ -17,6 +17,8 @@ DEFAULT_SOURCE_BUCKET_KEY = os.environ["DEFAULT_SOURCE_BUCKET_KEY"]
 IDEMPOTENCY_TABLE = os.environ["IDEMPOTENCY_TABLE"]
 GUARDDUTY_MALWARE_SCAN_STATUS_TAG = "GuardDutyMalwareScanStatus"
 logger = Logger(service="managed-file-transfer-processing-to-post-scan")
+# Keep the truncated hash short enough for readable logs while still providing
+# a stable discriminator for same-named objects under different prefixes.
 LOG_KEY_PATH_HASH_LENGTH = 12
 
 persistence_layer = DynamoDBPersistenceLayer(table_name=IDEMPOTENCY_TABLE)
