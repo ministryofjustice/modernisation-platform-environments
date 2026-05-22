@@ -136,6 +136,12 @@ resource "aws_iam_role_policy" "user_lifecycle_lambda_policy" {
         Resource = "*"
       },
       {
+        Sid    = "DirectoryServiceDataAccess"
+        Effect = "Allow"
+        Action = ["ds:AccessDSData"]
+        Resource = "arn:aws:ds:${local.application_data.accounts[local.environment].region}:${data.aws_caller_identity.current.account_id}:directory/${aws_directory_service_directory.workspaces_ad[0].id}"
+      },
+      {
         Sid    = "DirectoryServiceDataDelete"
         Effect = "Allow"
         Action = [
