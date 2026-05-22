@@ -1594,3 +1594,73 @@ module "s3-gdpr-audit-bucket" {
 
   tags = merge(local.tags, { resource-type = "gdpr-audit" })
 }
+
+data "aws_iam_policy_document" "allow_macie_results" {
+  statement {
+    sid    = "AllowMacieToWriteResults"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["macie.amazonaws.com"]
+    }
+
+    actions = [
+      "s3:PutObject",
+      "s3:GetBucketLocation"
+    ]
+
+    resources = [
+      module.s3-macie-results-bucket.bucket.arn,
+      "${module.s3-macie-results-bucket.bucket.arn}/*",
+    ]
+  }
+}
+
+module "s3-macie-results-bucket" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
+
+  bucket_prefix      = "${local.bucket_prefix}-macie-results"
+  versioning_enabled = true
+
+  # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
+  ownership_controls = "BucketOwnerEnforced"
+  acl                = "private"
+
+  # Refer to the below section "Replication" before enabling replication
+  replication_enabled = false
+  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
+  # replication_region                       = "eu-west-2"
+  providers = {
+    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
+    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
+    # Platform team to add a new provider for the additional Region.
+    # Leave this provider block in even if you are not using replication
+    aws.bucket-replication = aws
+  }
+  bucket_policy = [
+    data.aws_iam_policy_document.allow_macie_results.json
+  ]
+
+  lifecycle_rule = [
+    {
+      id      = "14-day-retention-rule"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      expiration = {
+        days = 13
+      }
+
+      noncurrent_version_expiration = {
+        days = 1
+      }
+    }
+  ]
+
+  tags = local.tags
+}

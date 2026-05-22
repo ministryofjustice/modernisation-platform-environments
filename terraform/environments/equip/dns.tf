@@ -104,11 +104,11 @@ resource "aws_route53_resolver_rule" "fwd" {
   resolver_endpoint_id = aws_route53_resolver_endpoint.equip-domain.id
 
   target_ip {
-    ip = module.win2016_multiple["COR-A-DC01"].private_ip[0]
+    ip = module.win2022_STD_Datacenter["COR-A-DC03"].private_ip[0]
   }
 
   target_ip {
-    ip = module.win2016_multiple["COR-A-DC02"].private_ip[0]
+    ip = module.win2022_STD_Datacenter["COR-A-DC04"].private_ip[0]
   }
 }
 
