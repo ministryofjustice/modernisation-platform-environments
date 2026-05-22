@@ -40,6 +40,7 @@ resource "aws_lambda_function" "user_creation" {
       KMS_KEY_ID          = aws_kms_key.ebs[0].arn
       REGION              = local.application_data.accounts[local.environment].region
       SES_SENDER          = data.terraform_remote_state.workspace_components.outputs.ses_sender_email
+      SELFSERVICE_URL     = "${data.terraform_remote_state.workspace_components.outputs.radius_portal_url}/selfservice/login"
     }
   }
 

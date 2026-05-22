@@ -70,7 +70,8 @@ else
             -EmailAddress $Email `
             -Description "$Firstname $Lastname - Created $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" `
             -AccountPassword (ConvertTo-SecureString $Password -AsPlainText -Force) `
-            -PasswordNeverExpires $True
+            -PasswordNeverExpires $False `
+            -ChangePasswordAtLogon $True
 
         Write-Host -ForegroundColor Green "User account created successfully!"
         Write-Host -ForegroundColor Cyan "Username: $username"

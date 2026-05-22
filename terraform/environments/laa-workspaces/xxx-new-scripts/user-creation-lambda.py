@@ -70,25 +70,85 @@ def create_ad_user(event):
     return password
 
 
-def send_credentials_email(username, password, email, region):
+def get_registration_code(directory_id, region):
+    workspaces = boto3.client('workspaces', region_name=region)
+    response = workspaces.describe_workspace_directories(DirectoryIds=[directory_id])
+    return response['Directories'][0]['RegistrationCode']
+
+
+def send_credentials_email(username, password, email, region, registration_code):
     ses = boto3.client('ses', region_name=region)
+    selfservice_url = os.environ['SELFSERVICE_URL']
+    client_download_url = 'https://clients.amazonworkspaces.com/'
+    support_email = 'laa_ops@digital.justice.gov.uk'
+
+    text_body = (
+        f"Your LAA WorkSpaces account has been created.\n\n"
+        f"USERNAME: {username}\n"
+        f"TEMPORARY PASSWORD: {password}\n"
+        f"You will be required to change your password on first login.\n\n"
+        f"--- SETTING UP WORKSPACES ---\n"
+        f"1. Download the WorkSpaces client: {client_download_url}\n"
+        f"2. Enter registration code: {registration_code}\n"
+        f"3. Sign in with your username and temporary password\n"
+        f"4. You will be prompted to set a new password\n\n"
+        f"--- SETTING UP MULTI-FACTOR AUTHENTICATION (OTP) ---\n"
+        f"Complete this after changing your password.\n"
+        f"1. Go to: {selfservice_url}\n"
+        f"2. Log in with your username and new password\n"
+        f"3. Click 'Enroll Token'\n"
+        f"4. Scan the QR code with Microsoft Authenticator or Google Authenticator\n"
+        f"5. Enter the 6-digit code shown in the app to verify\n\n"
+        f"For support contact: {support_email}"
+    )
+
+    html_body = f"""
+    <html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+    <h2 style="color: #1d70b8;">Your LAA WorkSpaces Account</h2>
+
+    <h3>Login Details</h3>
+    <table style="border-collapse: collapse; width: 100%;">
+      <tr><td style="padding: 8px; font-weight: bold;">Username</td>
+          <td style="padding: 8px;">{username}</td></tr>
+      <tr style="background-color: #f3f2f1;">
+          <td style="padding: 8px; font-weight: bold;">Temporary Password</td>
+          <td style="padding: 8px; font-family: monospace;">{password}</td></tr>
+    </table>
+    <p style="color: #d4351c;"><strong>You will be required to change your password on first login.</strong></p>
+
+    <h3>Step 1 — Set Up WorkSpaces</h3>
+    <ol>
+      <li>Download the WorkSpaces client: <a href="{client_download_url}">{client_download_url}</a></li>
+      <li>Enter your registration code: <strong style="font-family: monospace;">{registration_code}</strong></li>
+      <li>Sign in with your username and temporary password</li>
+      <li>You will be prompted to set a new password</li>
+    </ol>
+
+    <h3>Step 2 — Set Up Multi-Factor Authentication (OTP)</h3>
+    <p>Complete this step after you have changed your password.</p>
+    <ol>
+      <li>Go to the MFA self-service portal: <a href="{selfservice_url}">{selfservice_url}</a></li>
+      <li>Log in with your username and <strong>new</strong> password</li>
+      <li>Click <strong>Enroll Token</strong></li>
+      <li>Scan the QR code with <strong>Microsoft Authenticator</strong> or <strong>Google Authenticator</strong></li>
+      <li>Enter the 6-digit code shown in the app to verify enrolment</li>
+    </ol>
+
+    <hr style="margin: 24px 0;">
+    <p style="color: #505a5f; font-size: 14px;">
+      For support contact <a href="mailto:{support_email}">{support_email}</a>
+    </p>
+    </body></html>
+    """
+
     ses.send_email(
         Source=os.environ['SES_SENDER'],
         Destination={'ToAddresses': [email]},
         Message={
             'Subject': {'Data': 'Your LAA WorkSpaces account has been created'},
             'Body': {
-                'Text': {
-                    'Data': (
-                        f"Your LAA WorkSpaces account has been created.\n\n"
-                        f"Username: {username}\n"
-                        f"Temporary password: {password}\n\n"
-                        f"Please change your password after your first login.\n\n"
-                        f"Download the WorkSpaces client from:\n"
-                        f"https://clients.amazonworkspaces.com/\n\n"
-                        f"If you have any issues, contact laa_ops@digital.justice.gov.uk"
-                    )
-                }
+                'Text': {'Data': text_body},
+                'Html': {'Data': html_body}
             }
         }
     )
@@ -175,7 +235,8 @@ def lambda_handler(event, context):
         password = create_ad_user(event)
 
         if password:
-            send_credentials_email(username, password, email, os.environ['REGION'])
+            registration_code = get_registration_code(os.environ['DIRECTORY_ID'], os.environ['REGION'])
+            send_credentials_email(username, password, email, os.environ['REGION'], registration_code)
         else:
             print(f"No password extracted from PS1 output — user may already exist, skipping email")
 
