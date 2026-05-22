@@ -2340,8 +2340,8 @@ resource "aws_iam_policy" "merge_load" {
   }
 
 resource "aws_iam_role_policy_attachment" "merge_load_position_attach" {
-  role       = aws_iam_role.merge_load.name  
-  policy_arn = aws_iam_policy.merge_load_position.arn
+  role       = aws_iam_role.merge_load_position.name  
+  policy_arn = aws_iam_policy.merge_load.arn
   }
 
 
@@ -2374,8 +2374,8 @@ resource "aws_lakeformation_permissions" "merge_load_position_lambda_s3_access" 
 }
 
 resource "aws_iam_role_policy_attachment" "merge_load_ac_attach" {
-  role       = aws_iam_role.merge_load.name  
-  policy_arn = aws_iam_policy.merge_load_ac.arn
+  role       = aws_iam_role.merge_load_ac.name  
+  policy_arn = aws_iam_policy.merge_load.arn
   }
 
 
@@ -2408,8 +2408,8 @@ resource "aws_lakeformation_permissions" "merge_load_ac_lambda_s3_access" {
 }
 
 resource "aws_iam_role_policy_attachment" "merge_load_event_attach" {
-  role       = aws_iam_role.merge_load.name  
-  policy_arn = aws_iam_policy.merge_load_event.arn
+  role       = aws_iam_role.merge_load_event.name  
+  policy_arn = aws_iam_policy.merge_load.arn
   }
 
 
