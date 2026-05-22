@@ -1,5 +1,6 @@
 import json
 import os
+import hashlib
 from urllib.parse import unquote_plus
 
 import boto3
@@ -16,6 +17,7 @@ DEFAULT_SOURCE_BUCKET_KEY = os.environ["DEFAULT_SOURCE_BUCKET_KEY"]
 IDEMPOTENCY_TABLE = os.environ["IDEMPOTENCY_TABLE"]
 GUARDDUTY_MALWARE_SCAN_STATUS_TAG = "GuardDutyMalwareScanStatus"
 logger = Logger(service="managed-file-transfer-processing-to-post-scan")
+LOG_KEY_PATH_HASH_LENGTH = 12
 
 persistence_layer = DynamoDBPersistenceLayer(table_name=IDEMPOTENCY_TABLE)
 # Use the resolved source and destination buckets so transport-level duplicates
@@ -125,8 +127,11 @@ def put_destination_tags(operation, destination_version_id):
 
 
 def get_log_fields(operation):
+    source_key = operation["source_key"]
+
     return {
-        "object_key": operation["source_key"],
+        "object_key": source_key.rsplit("/", 1)[-1],
+        "object_key_path_hash": hashlib.sha256(source_key.encode("utf-8")).hexdigest()[:LOG_KEY_PATH_HASH_LENGTH],
         "source_bucket_name": operation["source_bucket_name"],
         "destination_bucket_name": operation["destination_bucket_name"],
     }

@@ -1,5 +1,6 @@
 import json
 import os
+import hashlib
 from urllib.parse import unquote_plus
 
 import boto3
@@ -15,6 +16,7 @@ DESTINATION_BUCKET_NAME = os.environ["DESTINATION_BUCKET_NAME"]
 IDEMPOTENCY_TABLE = os.environ["IDEMPOTENCY_TABLE"]
 SOURCE_BUCKET_NAME = os.getenv("SOURCE_BUCKET_NAME")
 logger = Logger(service="managed-file-transfer-unscanned-to-processing")
+LOG_KEY_PATH_HASH_LENGTH = 12
 
 persistence_layer = DynamoDBPersistenceLayer(table_name=IDEMPOTENCY_TABLE)
 # Use object identity rather than transport metadata so duplicate SQS deliveries
@@ -95,8 +97,11 @@ def normalise_record(record):
 
 
 def get_log_fields(operation):
+    source_key = operation["source_key"]
+
     return {
-        "object_key": operation["source_key"],
+        "object_key": source_key.rsplit("/", 1)[-1],
+        "object_key_path_hash": hashlib.sha256(source_key.encode("utf-8")).hexdigest()[:LOG_KEY_PATH_HASH_LENGTH],
         "source_bucket_name": operation["source_bucket_name"],
         "destination_bucket_name": operation["destination_bucket_name"],
     }
