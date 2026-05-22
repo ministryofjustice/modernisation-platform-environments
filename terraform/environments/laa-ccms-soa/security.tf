@@ -214,7 +214,7 @@ resource "aws_security_group_rule" "ecs_tasks_admin_server" {
 resource "aws_security_group_rule" "ecs_tasks_admin_egress_all" {
   security_group_id = aws_security_group.ecs_tasks_admin.id
   type              = "egress"
-  description       = "Temporary rollback - tighten again after investigation"
+  description       = "All"
   protocol          = -1
   from_port         = 0
   to_port           = 0
