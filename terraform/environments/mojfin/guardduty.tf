@@ -153,7 +153,7 @@ resource "aws_iam_role_policy" "lambda_guardduty_sns_policy" {
           "secretsmanager:DescribeSecret",
           "secretsmanager:ListSecretVersionIds"
         ]
-        Resource = [aws_secretsmanager_secret.guardduty_slack_secret.arn]
+        Resource = [aws_secretsmanager_secret.mojfin_secret.arn]
       },
       {
         Effect = "Allow"
@@ -207,7 +207,7 @@ resource "aws_lambda_function" "guardduty_slack_notify" {
 
   environment {
     variables = {
-      SECRET_NAME = aws_secretsmanager_secret.guardduty_slack_secret.name
+      SECRET_NAME = aws_secretsmanager_secret.mojfin_secret.name
     }
   }
 
