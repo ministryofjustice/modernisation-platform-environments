@@ -87,6 +87,8 @@ resource "aws_vpc_security_group_ingress_rule" "db_lambda" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_bastion" {
+ # Apex plan cleanup
+  count = contains(["test", "preproduction"], local.environment) ? 0 : 1 
   security_group_id            = aws_security_group.database.id
   description                  = "Allow Bastion SSH access"
   referenced_security_group_id = module.bastion_linux.bastion_security_group

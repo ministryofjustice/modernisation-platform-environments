@@ -53,6 +53,15 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
       propagate_at_launch = true
     }
   }
+# Apex plan cleanup 
+   lifecycle {
+    ignore_changes = [
+      desired_capacity,
+      max_size,
+      min_size
+    ]
+  }
+ 
 }
 
 # EC2 Security Group
@@ -115,7 +124,7 @@ resource "aws_launch_template" "ec2-launch-template" {
   monitoring {
     enabled = true
   }
-
+# Apex plan cleanup
   lifecycle {
     ignore_changes = [
       latest_version,
