@@ -17,21 +17,6 @@ module "s3-bucket-shared" {
     aws.bucket-replication = aws
   }
 
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      abort_incomplete_multipart_upload_days = 7
-    }
-  ]
-
   tags = merge(local.tags,
     { Name = "${local.application_name}-${local.environment}-shared" }
   )
