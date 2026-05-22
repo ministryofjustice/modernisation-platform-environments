@@ -1,7 +1,6 @@
 {
   "keys": {
     "development": {},
-    "test": {},
     "preproduction": {},
     "production": {}
   }
