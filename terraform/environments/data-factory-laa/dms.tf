@@ -29,9 +29,61 @@ data "aws_secretsmanager_secret" "dms_oracle_credentials" {
   name  = "laa-df-dev/oracle-dms-test/dms-user"
 }
 
-data "aws_kms_key" "oracle_dms" {
-  count  = local.is-development ? 1 : 0
-  key_id = "alias/laa-df-dev-dms-test"
+data "aws_iam_policy_document" "oracle_dms_kms" {
+  count = local.is-development ? 1 : 0
+
+  statement {
+    sid    = "AllowAccountRootFullAccess"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowS3ToUseKeyForQueueNotifications"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt",
+    ]
+
+    resources = ["*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+}
+
+resource "aws_kms_key" "oracle_dms" {
+  count = local.is-development ? 1 : 0
+
+  description         = "KMS key for Oracle DMS test resources"
+  enable_key_rotation = true
+  policy              = data.aws_iam_policy_document.oracle_dms_kms[0].json
+
+  tags = local.tags
+}
+
+resource "aws_kms_alias" "oracle_dms" {
+  count = local.is-development ? 1 : 0
+
+  name          = "alias/${local.application_name}-${local.environment}-dms-test"
+  target_key_id = aws_kms_key.oracle_dms[0].key_id
 }
 
 # ---------------------------------------------------------------------------
@@ -197,12 +249,14 @@ module "dms_oracle" {
   # checkov:skip=CKV_TF_1: using branch ref for testing
   # checkov:skip=CKV_TF_2: using branch ref for testing
   count  = local.is-development ? 1 : 0
-  source = "github.com/ministryofjustice/terraform-dms-module?ref=baf3cab"
+  source = "github.com/ministryofjustice/terraform-dms-module?ref=bc5a588"
 
   vpc_id      = data.aws_vpc.shared.id
   environment = local.environment
   db          = "oracle-dms-test"
   tags        = local.tags
+
+  validation_sqs_kms_key_arn = aws_kms_key.oracle_dms[0].arn
 
   write_metadata_to_glue_catalog = true
   glue_catalog_arn               = "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:catalog"
@@ -214,7 +268,7 @@ module "dms_oracle" {
     allocated_storage          = 50
     availability_zone          = "eu-west-2a"
     engine_version             = "3.5.4"
-    kms_key_arn                = data.aws_kms_key.oracle_dms[0].arn
+    kms_key_arn                = aws_kms_key.oracle_dms[0].arn
     multi_az                   = false
     replication_instance_class = "dms.t3.medium"
     inbound_cidr               = data.aws_vpc.shared.cidr_block
@@ -224,7 +278,7 @@ module "dms_oracle" {
   dms_source = {
     engine_name             = "oracle"
     secrets_manager_arn     = data.aws_secretsmanager_secret.dms_oracle_credentials[0].arn
-    secrets_manager_kms_arn = data.aws_kms_key.oracle_dms[0].arn
+    secrets_manager_kms_arn = aws_kms_key.oracle_dms[0].arn
     sid                     = "DMSTEST"
     # Oracle extra_connection_attributes:
     #   addSupplementalLogging=N - not needed for full-load only (no CDC)
