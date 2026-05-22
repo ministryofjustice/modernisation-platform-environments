@@ -76,13 +76,6 @@ else
         Write-Host -ForegroundColor Cyan "Username: $username"
         Write-Host -ForegroundColor Cyan "Password: $Password"
         
-        # Store password in SSM Parameter Store for Lambda to retrieve
-        Write-Host "Storing password in Parameter Store..."
-        $passwordParamName = "/laa-workspaces/development/user-passwords/$username"
-        Write-SSMParameter -Name $passwordParamName -Value $Password -Type "SecureString" -Overwrite $true -Region eu-west-2
-        Write-Host "Password stored successfully in $passwordParamName"
-        
-        # Return success indicator
         Write-Host "SUCCESS"
     }
     catch {

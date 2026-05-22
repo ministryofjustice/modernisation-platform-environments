@@ -57,8 +57,42 @@ def create_ad_user(event):
         output = result.get('StandardErrorContent', '') or result.get('StandardOutputContent', '')
         raise Exception(f"PowerShell script failed with status '{status}': {output}")
 
+    # Extract password from PS1 stdout — line reads "Password: <value>"
+    stdout = result.get('StandardOutputContent', '')
+    password = None
+    for line in stdout.splitlines():
+        if line.startswith('Password:'):
+            password = line.split(':', 1)[1].strip()
+            break
+
     print(f"PowerShell script completed successfully. Waiting 30 seconds for AD replication...")
     time.sleep(30)
+    return password
+
+
+def send_credentials_email(username, password, email, region):
+    ses = boto3.client('ses', region_name=region)
+    ses.send_email(
+        Source=os.environ['SES_SENDER'],
+        Destination={'ToAddresses': [email]},
+        Message={
+            'Subject': {'Data': 'Your LAA WorkSpaces account has been created'},
+            'Body': {
+                'Text': {
+                    'Data': (
+                        f"Your LAA WorkSpaces account has been created.\n\n"
+                        f"Username: {username}\n"
+                        f"Temporary password: {password}\n\n"
+                        f"Please change your password after your first login.\n\n"
+                        f"Download the WorkSpaces client from:\n"
+                        f"https://clients.amazonworkspaces.com/\n\n"
+                        f"If you have any issues, contact laa_ops@digital.justice.gov.uk"
+                    )
+                }
+            }
+        }
+    )
+    print(f"Sent credentials email to {email}")
 
 def create_workspace(event):
     """
@@ -133,7 +167,17 @@ def lambda_handler(event, context):
     print(f"Received event: {json.dumps(event)}")
 
     try:
-        create_ad_user(event)
+        firstname = event['Firstname']
+        lastname = event['Lastname']
+        email = event['Email']
+        username = f"{firstname}.{lastname}"
+
+        password = create_ad_user(event)
+
+        if password:
+            send_credentials_email(username, password, email, os.environ['REGION'])
+        else:
+            print(f"No password extracted from PS1 output — user may already exist, skipping email")
 
         # Retry workspace creation in case AD replication hasn't fully propagated
         last_error = None
@@ -151,13 +195,9 @@ def lambda_handler(event, context):
         else:
             raise last_error
         
-        firstname = event['Firstname']
-        lastname = event['Lastname']
-        Username = f"{firstname}.{lastname}"
-        
         return {
             'statusCode': 200,
-            'body': json.dumps(f'Lambda ran Successfully! Workspace created for user: {Username}. Check the AWS Console for the workspace status.')
+            'body': json.dumps(f'Lambda ran Successfully! Workspace created for user: {username}. Check the AWS Console for the workspace status.')
         }
     except Exception as e:
         return {
