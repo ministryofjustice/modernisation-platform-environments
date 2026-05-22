@@ -220,7 +220,7 @@ resource "aws_lambda_function" "guardduty_slack_notify" {
   })
 }
 
-resource "aws_lambda_permission" "allow_sns_invoke_guardduty" {
+resource "aws_lambda_permission" "guardduty_lambda_permission" {
   statement_id  = "AllowExecutionFromGuardDutySNS"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.guardduty_slack_notify.function_name
@@ -228,7 +228,7 @@ resource "aws_lambda_permission" "allow_sns_invoke_guardduty" {
   source_arn    = aws_sns_topic.guardduty_alerts.arn
 }
 
-resource "aws_sns_topic_subscription" "guardduty_lambda" {
+resource "aws_sns_topic_subscription" "guardduty_lambda_subscription" {
   topic_arn = aws_sns_topic.guardduty_alerts.arn
   protocol  = "lambda"
   endpoint  = aws_lambda_function.guardduty_slack_notify.arn
