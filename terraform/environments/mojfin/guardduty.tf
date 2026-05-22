@@ -120,30 +120,6 @@ resource "aws_cloudwatch_event_target" "guardduty_to_sns" {
   arn  = aws_sns_topic.guardduty_alerts.arn
 }
 
-# Secret containing Slack webhook URLs for GuardDuty alerts
-resource "aws_secretsmanager_secret" "guardduty_slack_secret" {
-  name                    = "${local.application_name}-${local.environment}-guardduty-slack"
-  description             = "Slack webhook URLs for GuardDuty and CloudWatch alerts (laa-alerts-guardduty-nonprod or laa-alerts-guardduty-prod)"
-  recovery_window_in_days = local.is-production ? 30 : 0
-
-  tags = merge(local.tags, {
-    Name = "${local.application_name}-${local.environment}-guardduty-slack"
-  })
-}
-
-resource "aws_secretsmanager_secret_version" "guardduty_slack_secret" {
-  secret_id = aws_secretsmanager_secret.guardduty_slack_secret.id
-  secret_string = jsonencode({
-    "slack_channel_webhook"           = ""
-    "slack_channel_webhook_guardduty" = ""
-    "slack_channel_webhook_s3"        = ""
-  })
-
-  lifecycle {
-    ignore_changes = [secret_string]
-  }
-}
-
 # IAM role for the GuardDuty Slack notify Lambda
 resource "aws_iam_role" "lambda_guardduty_sns_role" {
   name = "${local.application_name}-${local.environment}-lambda-guardduty-sns-role"
