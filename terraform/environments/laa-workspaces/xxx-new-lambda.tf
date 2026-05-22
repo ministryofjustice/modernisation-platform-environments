@@ -39,7 +39,7 @@ resource "aws_lambda_function" "user_creation" {
       WORKSPACE_BUNDLE_ID = local.workspace_types["standard"].bundle_id
       KMS_KEY_ID          = aws_kms_key.ebs[0].arn
       REGION              = local.application_data.accounts[local.environment].region
-      SES_SENDER          = "no-reply@${aws_ses_domain_identity.workspaces[0].domain}"
+      SES_SENDER          = data.terraform_remote_state.workspace_components.outputs.ses_sender_email
     }
   }
 
