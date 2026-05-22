@@ -116,7 +116,7 @@ resource "aws_iam_role_policy" "user_creation_ds_lambda_policy" {
           "ds-data:DescribeUser",
           "ds-data:DeleteUser"
         ]
-        Resource = aws_directory_service_directory.workspaces_ad[0].arn
+        Resource = "arn:aws:ds:${local.application_data.accounts[local.environment].region}:${data.aws_caller_identity.current.account_id}:directory/${aws_directory_service_directory.workspaces_ad[0].id}"
       },
       {
         Sid      = "SESEmailDelivery"
