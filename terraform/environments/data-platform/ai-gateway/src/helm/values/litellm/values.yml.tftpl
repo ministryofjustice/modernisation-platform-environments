@@ -134,15 +134,17 @@ ingress:
   enabled: false
 
 envVars: {
-    LITELLM_MODE: "PRODUCTION",
+    AUTO_REDIRECT_UI_LOGIN_TO_SSO: "True",
+    DISABLE_ADMIN_ENDPOINTS: "True",
+    DISABLE_ADMIN_UI: "True",
+    DOCS_DESCRIPTION: "Contact us on Slack - #data-platform-ai-gateway-users",
+    DOCS_FILTERED: "True",
+    DOCS_TITLE: "Data Platform AI Gateway",
     LITELLM_LOG: "ERROR",
     LITELLM_MIGRATION_DIR: "/app/migrations",
-    XDG_CACHE_HOME: "/app/cache",
+    LITELLM_MODE: "PRODUCTION",
     PRISMA_BINARY_CACHE_DIR: "/app/cache/prisma-python/binaries",
     PROXY_BASE_URL: "https://${ingressHostname}",
     REDIS_SSL: "True",
-    DOCS_TITLE: "Data Platform AI Gateway",
-    DOCS_DESCRIPTION: "Contact us on Slack - #data-platform-ai-gateway-users",
-    DOCS_FILTERED: "True",
-    AUTO_REDIRECT_UI_LOGIN_TO_SSO: "True"
+    XDG_CACHE_HOME: "/app/cache"
 }
