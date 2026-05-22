@@ -82,23 +82,26 @@ def send_credentials_email(username, password, email, region, registration_code)
     client_download_url = 'https://clients.amazonworkspaces.com/'
     support_email = 'laa_ops@digital.justice.gov.uk'
 
+    web_access_url = 'https://clients.amazonworkspaces.com/webclient'
+
     text_body = (
         f"Your LAA WorkSpaces account has been created.\n\n"
         f"USERNAME: {username}\n"
         f"TEMPORARY PASSWORD: {password}\n"
-        f"You will be required to change your password on first login.\n\n"
-        f"--- SETTING UP WORKSPACES ---\n"
-        f"1. Download the WorkSpaces client: {client_download_url}\n"
-        f"2. Enter registration code: {registration_code}\n"
-        f"3. Sign in with your username and temporary password\n"
-        f"4. You will be prompted to set a new password\n\n"
-        f"--- SETTING UP MULTI-FACTOR AUTHENTICATION (OTP) ---\n"
-        f"Complete this after changing your password.\n"
+        f"REGISTRATION CODE: {registration_code}\n\n"
+        f"IMPORTANT: You must complete Step 1 (OTP setup) before you can log in to WorkSpaces.\n\n"
+        f"--- STEP 1: SET UP MULTI-FACTOR AUTHENTICATION (OTP) ---\n"
         f"1. Go to: {selfservice_url}\n"
-        f"2. Log in with your username and new password\n"
+        f"2. Log in with your username and temporary password\n"
         f"3. Click 'Enroll Token'\n"
         f"4. Scan the QR code with Microsoft Authenticator or Google Authenticator\n"
         f"5. Enter the 6-digit code shown in the app to verify\n\n"
+        f"--- STEP 2: LOG IN TO WORKSPACES ---\n"
+        f"1. Go to: {web_access_url}\n"
+        f"2. Enter registration code: {registration_code}\n"
+        f"3. Sign in with your username and temporary password\n"
+        f"4. Enter your OTP code when prompted\n"
+        f"5. You will be prompted to set a new password when your WorkSpace loads\n\n"
         f"For support contact: {support_email}"
     )
 
@@ -113,25 +116,29 @@ def send_credentials_email(username, password, email, region, registration_code)
       <tr style="background-color: #f3f2f1;">
           <td style="padding: 8px; font-weight: bold;">Temporary Password</td>
           <td style="padding: 8px; font-family: monospace;">{password}</td></tr>
+      <tr><td style="padding: 8px; font-weight: bold;">Registration Code</td>
+          <td style="padding: 8px; font-family: monospace;">{registration_code}</td></tr>
     </table>
-    <p style="color: #d4351c;"><strong>You will be required to change your password on first login.</strong></p>
+    <p style="color: #d4351c; background-color: #fff4f4; padding: 12px; border-left: 4px solid #d4351c;">
+      <strong>Important:</strong> You must complete Step 1 (OTP setup) before you can log in to WorkSpaces.
+    </p>
 
-    <h3>Step 1 — Set Up WorkSpaces</h3>
-    <ol>
-      <li>Download the WorkSpaces client: <a href="{client_download_url}">{client_download_url}</a></li>
-      <li>Enter your registration code: <strong style="font-family: monospace;">{registration_code}</strong></li>
-      <li>Sign in with your username and temporary password</li>
-      <li>You will be prompted to set a new password</li>
-    </ol>
-
-    <h3>Step 2 — Set Up Multi-Factor Authentication (OTP)</h3>
-    <p>Complete this step after you have changed your password.</p>
+    <h3>Step 1 — Set Up Multi-Factor Authentication (OTP) first</h3>
     <ol>
       <li>Go to the MFA self-service portal: <a href="{selfservice_url}">{selfservice_url}</a></li>
-      <li>Log in with your username and <strong>new</strong> password</li>
+      <li>Log in with your username and temporary password</li>
       <li>Click <strong>Enroll Token</strong></li>
       <li>Scan the QR code with <strong>Microsoft Authenticator</strong> or <strong>Google Authenticator</strong></li>
       <li>Enter the 6-digit code shown in the app to verify enrolment</li>
+    </ol>
+
+    <h3>Step 2 — Log In to WorkSpaces</h3>
+    <ol>
+      <li>Go to AWS WorkSpaces Web Access: <a href="{web_access_url}">{web_access_url}</a></li>
+      <li>Enter your registration code: <strong style="font-family: monospace;">{registration_code}</strong></li>
+      <li>Sign in with your username and temporary password</li>
+      <li>Enter your OTP code from the authenticator app when prompted</li>
+      <li>You will be asked to set a new password when your WorkSpace loads</li>
     </ol>
 
     <hr style="margin: 24px 0;">
