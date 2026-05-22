@@ -1,23 +1,56 @@
 ##############################################
-### SES Email Identity
+### SES Domain Identity + DKIM
 ###
-### Verifies the sender email address for WorkSpaces
-### user credential delivery.
+### Verifies the sending domain so emails pass
+### DMARC alignment. Uses the existing Route53
+### hosted zone (same domain as the ALB record).
 ###
-### After terraform apply, AWS sends a verification
-### email to the address. Click the link to activate it.
-###
-### Note: SES starts in sandbox mode — both sender AND
-### recipient must be verified identities until a
-### production access request is submitted to AWS Support.
-### For initial testing this is fine as both sender and
-### test recipient will be the same verified address.
+### Sender address: no-reply@<domain>
+### e.g. no-reply@laa-development.modernisation-platform.service.justice.gov.uk
 ##############################################
 
-resource "aws_ses_email_identity" "user_creation_sender" {
+resource "aws_ses_domain_identity" "workspaces" {
   count = local.environment == "development" ? 1 : 0
 
-  email = local.application_data.accounts[local.environment].ses_sender_email
+  domain = trimsuffix(data.aws_route53_zone.external.name, ".")
+}
+
+resource "aws_ses_domain_dkim" "workspaces" {
+  count = local.environment == "development" ? 1 : 0
+
+  domain = aws_ses_domain_identity.workspaces[0].domain
+}
+
+# Route53 TXT record for SES domain ownership verification
+resource "aws_route53_record" "ses_verification" {
+  count = local.environment == "development" ? 1 : 0
+
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "_amazonses.${aws_ses_domain_identity.workspaces[0].domain}"
+  type     = "TXT"
+  ttl      = 600
+  records  = [aws_ses_domain_identity.workspaces[0].verification_token]
+}
+
+resource "aws_ses_domain_identity_verification" "workspaces" {
+  count = local.environment == "development" ? 1 : 0
+
+  domain = aws_ses_domain_identity.workspaces[0].domain
+
+  depends_on = [aws_route53_record.ses_verification]
+}
+
+# Route53 CNAME records for DKIM signing (3 records required)
+resource "aws_route53_record" "ses_dkim" {
+  count = local.environment == "development" ? 3 : 0
+
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "${aws_ses_domain_dkim.workspaces[0].dkim_tokens[count.index]}._domainkey.${aws_ses_domain_identity.workspaces[0].domain}"
+  type     = "CNAME"
+  ttl      = 600
+  records  = ["${aws_ses_domain_dkim.workspaces[0].dkim_tokens[count.index]}.dkim.amazonses.com"]
 }
 
 ##############################################
@@ -25,11 +58,6 @@ resource "aws_ses_email_identity" "user_creation_sender" {
 ##############################################
 
 output "ses_sender_email" {
-  value       = local.environment == "development" ? aws_ses_email_identity.user_creation_sender[0].email : null
+  value       = local.environment == "development" ? "no-reply@${aws_ses_domain_identity.workspaces[0].domain}" : null
   description = "SES verified sender email address"
-}
-
-output "ses_verification_status" {
-  value       = local.environment == "development" ? "Check AWS Console → SES → Verified identities to confirm verification status after applying" : null
-  description = "Reminder to verify the email after apply"
 }
