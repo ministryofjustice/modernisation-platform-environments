@@ -9,7 +9,8 @@
       "public_subnet_b_cidr": "10.200.11.0/24",
       "ad_directory_name": "laa-workspaces.local",
       "ad_short_name": "LAAWORKSPACES",
-      "ad_edition": "Standard"
+      "ad_edition": "Standard",
+      "ses_sender_email": "vladimirs.kovalovs1@justice.gov.uk"
     },
     "test": {},
     "preproduction": {},
