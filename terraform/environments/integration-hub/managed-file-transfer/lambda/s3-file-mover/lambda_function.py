@@ -134,6 +134,18 @@ def process_record(*, operation):
         TaggingDirective="COPY",
     )
 
+    if operation["source_version_id"]:
+        s3.delete_object(
+            Bucket=operation["source_bucket_name"],
+            Key=operation["source_key"],
+            VersionId=operation["source_version_id"],
+        )
+    else:
+        s3.delete_object(
+            Bucket=operation["source_bucket_name"],
+            Key=operation["source_key"],
+        )
+
     logger.info("Moved S3 object", extra=get_log_fields(operation))
 
     return {
