@@ -88,7 +88,7 @@ module "s3-bucket-sftp-bc" {
     {
       id      = "delete-archive-folder-file-after-7-days"
       enabled = "Enabled"
-      prefix  = "archive/"
+      prefix  = "ccms-transfer-bc-${local.environment}/archive/"
 
       expiration = {
         days = 7
