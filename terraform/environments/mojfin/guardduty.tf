@@ -211,10 +211,6 @@ resource "aws_lambda_function" "guardduty_slack_notify" {
     }
   }
 
-  tracing_config {
-    mode = "PassThrough"
-  }
-
   tags = merge(local.tags, {
     Name = "${local.application_name}-${local.environment}-guardduty-slack-notify"
   })
