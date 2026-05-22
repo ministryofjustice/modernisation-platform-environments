@@ -41,6 +41,28 @@
 #   }
 # }
 
+## JW and JHP TESTING
+
 resource "aws_glue_catalog_database" "test" {
   name = "test"
+}
+
+resource "aws_lakeformation_permissions" "share_database" {
+  principal   = local.environment_management.account_ids[each.value.factory_name]
+  permissions = ["DESCRIBE"]
+
+  database {
+    name = aws_glue_catalog_database.test.name
+  }
+}
+
+resource "aws_lakeformation_permissions" "tables" {
+
+  principal   = local.environment_management.account_ids[each.value.factory_name]
+  permissions = ["DESCRIBE", "SELECT"]
+
+  table {
+    database_name = aws_glue_catalog_database.test.name
+    wildcard      = true
+  }
 }
