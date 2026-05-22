@@ -212,7 +212,7 @@ resource "aws_lambda_function" "guardduty_slack_notify" {
   }
 
   tracing_config {
-    mode = "Active"
+    mode = "PassThrough"
   }
 
   tags = merge(local.tags, {
@@ -238,12 +238,12 @@ resource "aws_sns_topic_subscription" "guardduty_lambda_subscription" {
 # GuardDuty Malware Protection - S3 bucket scan
 # ---------------------------------------------
 
-data "aws_iam_role" "guardduty_s3_scan" {
+data "aws_iam_role" "guardduty_s3_malware_role" {
   name = "GuardDutyS3MalwareProtectionRole"
 }
 
-resource "aws_guardduty_malware_protection_plan" "s3_shared" {
-  role = data.aws_iam_role.guardduty_s3_scan.arn
+resource "aws_guardduty_malware_protection_plan" "mojfin_s3_malware_plan" {
+  role = data.aws_iam_role.guardduty_s3_malware_role.arn
 
   protected_resource {
     s3_bucket {
