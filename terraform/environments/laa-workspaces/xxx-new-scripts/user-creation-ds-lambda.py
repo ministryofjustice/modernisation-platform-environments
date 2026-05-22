@@ -37,11 +37,18 @@ def create_ad_user(directory_id, firstname, lastname, email, region):
     ds_data.create_user(
         DirectoryId=directory_id,
         SAMAccountName=username,
-        Password=password,
         GivenName=firstname,
         Surname=lastname,
-        DisplayName=f"{firstname} {lastname}",
-        EmailAddress=email
+        EmailAddress=email,
+        OtherAttributes={
+            'displayName': {'S': f"{firstname} {lastname}"}
+        }
+    )
+
+    ds_data.reset_user_password(
+        DirectoryId=directory_id,
+        SAMAccountName=username,
+        NewPassword=password
     )
 
     print(f"Created AD user {username} via DS Data API")
