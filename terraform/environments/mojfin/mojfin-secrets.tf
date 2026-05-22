@@ -44,13 +44,3 @@ resource "aws_secretsmanager_secret_version" "mojfin_secret_version" {
     ignore_changes = [secret_string]
   }
 }
-
-moved {
-  from = aws_secretsmanager_secret.guardduty_slack_secret
-  to   = aws_secretsmanager_secret.mojfin_secret
-}
-
-moved {
-  from = aws_secretsmanager_secret_version.guardduty_slack_secret_version
-  to   = aws_secretsmanager_secret_version.mojfin_secret_version
-}
