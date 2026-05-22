@@ -68,8 +68,8 @@ data "aws_iam_policy_document" "transfer_user_session" {
     sid    = "AllowUploadOnlyToHomeDirectory"
     effect = "Allow"
     actions = [
-      "s3:PutObject",
       "s3:AbortMultipartUpload",
+      "s3:PutObject",
     ]
     resources = [
       "${module.s3_bucket["unscanned"].s3_bucket_arn}/$${transfer:UserName}/*",
