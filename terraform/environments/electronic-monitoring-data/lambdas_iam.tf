@@ -2245,8 +2245,18 @@ resource "aws_iam_role_policy_attachment" "landing_dlq_redriver_attach" {
 # Merge load lambda role
 # ------------------------------------------------------------------------------
 
-resource "aws_iam_role" "merge_load" {
-  name               = "merge_load_lambda_role"
+resource "aws_iam_role" "merge_load_position" {
+  name               = "merge_load_position_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_role" "merge_load_event" {
+  name               = "merge_load_event_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_role" "merge_load_ac" {
+  name               = "merge_load_ac_lambda_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
@@ -2329,24 +2339,24 @@ resource "aws_iam_policy" "merge_load" {
   policy = data.aws_iam_policy_document.merge_load_policy_document.json
   }
 
-resource "aws_iam_role_policy_attachment" "merge_load_attach" {
+resource "aws_iam_role_policy_attachment" "merge_load_position_attach" {
   role       = aws_iam_role.merge_load.name  
-  policy_arn = aws_iam_policy.merge_load.arn
+  policy_arn = aws_iam_policy.merge_load_position.arn
   }
 
 
-  resource "aws_lakeformation_permissions" "merge_load_lambda_database_access" {
+  resource "aws_lakeformation_permissions" "merge_load_position_lambda_database_access" {
   for_each = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
-  principal   = aws_iam_role.merge_load.arn
+  principal   = aws_iam_role.merge_load_position.arn
   permissions = ["DESCRIBE"]
   database {
     name = each.value
   }
 }
 
-resource "aws_lakeformation_permissions" "merge_load_lambda_table_access" {
+resource "aws_lakeformation_permissions" "merge_load_position_lambda_table_access" {
   for_each = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
-  principal   = aws_iam_role.merge_load.arn
+  principal   = aws_iam_role.merge_load_position.arn
   permissions = ["SELECT", "INSERT", "ALTER", "DESCRIBE"]
   table {
     database_name = each.value
@@ -2354,14 +2364,84 @@ resource "aws_lakeformation_permissions" "merge_load_lambda_table_access" {
   }
 }
 
-resource "aws_lakeformation_permissions" "merge_load_lambda_s3_access" {
+resource "aws_lakeformation_permissions" "merge_load_position_lambda_s3_access" {
   count     = local.is-development || local.is-test ? 1 : 0
-  principal   = aws_iam_role.merge_load.arn
+  principal   = aws_iam_role.merge_load_position.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
     arn = aws_lakeformation_resource.data_bucket.arn
   }
 }
+
+resource "aws_iam_role_policy_attachment" "merge_load_ac_attach" {
+  role       = aws_iam_role.merge_load.name  
+  policy_arn = aws_iam_policy.merge_load_ac.arn
+  }
+
+
+  resource "aws_lakeformation_permissions" "merge_load_ac_lambda_database_access" {
+  for_each = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
+  principal   = aws_iam_role.merge_load_ac.arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = each.value
+  }
+}
+
+resource "aws_lakeformation_permissions" "merge_load_ac_lambda_table_access" {
+  for_each = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
+  principal   = aws_iam_role.merge_load_ac.arn
+  permissions = ["SELECT", "INSERT", "ALTER", "DESCRIBE"]
+  table {
+    database_name = each.value
+    wildcard      = true
+  }
+}
+
+resource "aws_lakeformation_permissions" "merge_load_ac_lambda_s3_access" {
+  count     = local.is-development || local.is-test ? 1 : 0
+  principal   = aws_iam_role.merge_load_ac.arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+  data_location {
+    arn = aws_lakeformation_resource.data_bucket.arn
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "merge_load_event_attach" {
+  role       = aws_iam_role.merge_load.name  
+  policy_arn = aws_iam_policy.merge_load_event.arn
+  }
+
+
+  resource "aws_lakeformation_permissions" "merge_load_event_lambda_database_access" {
+  for_each = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
+  principal   = aws_iam_role.merge_load_event.arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = each.value
+  }
+}
+
+resource "aws_lakeformation_permissions" "merge_load_event_lambda_table_access" {
+  for_each = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
+  principal   = aws_iam_role.merge_load_event.arn
+  permissions = ["SELECT", "INSERT", "ALTER", "DESCRIBE"]
+  table {
+    database_name = each.value
+    wildcard      = true
+  }
+}
+
+resource "aws_lakeformation_permissions" "merge_load_event_lambda_s3_access" {
+  count     = local.is-development || local.is-test ? 1 : 0
+  principal   = aws_iam_role.merge_load_event.arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+  data_location {
+    arn = aws_lakeformation_resource.data_bucket.arn
+  }
+}
+
+
 # -----------------------------------------------------------------------------------
 # Macie Unstructured Job
 #-----------------------------------------------------------------------------------

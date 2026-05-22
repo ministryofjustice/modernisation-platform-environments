@@ -904,8 +904,8 @@ module "merge_mdss_staged_event" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_mdss_staged_event"
-  role_name                      = aws_iam_role.merge_load.name
-  role_arn                       = aws_iam_role.merge_load.arn
+  role_name                      = aws_iam_role.merge_load_event.name
+  role_arn                       = aws_iam_role.merge_load_event.arn
   handler                        = "merge_mdss_staged_event.handler"
   memory_size                    = 1024
   timeout                        = 900
@@ -926,8 +926,8 @@ module "merge_mdss_staged_position" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_mdss_staged_position"
-  role_name                      = aws_iam_role.merge_load.name
-  role_arn                       = aws_iam_role.merge_load.arn
+  role_name                      = aws_iam_role.merge_load_position.name
+  role_arn                       = aws_iam_role.merge_load_position.arn
   handler                        = "merge_mdss_staged_position.handler"
   memory_size                    = 1024
   timeout                        = 900
@@ -948,8 +948,8 @@ module "merge_ac_position" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_ac_position"
-  role_name                      = aws_iam_role.merge_load.name
-  role_arn                       = aws_iam_role.merge_load.arn
+  role_name                      = aws_iam_role.merge_load_ac.name
+  role_arn                       = aws_iam_role.merge_load_ac.arn
   handler                        = "merge_ac_position.handler"
   memory_size                    = 1024
   timeout                        = 900
