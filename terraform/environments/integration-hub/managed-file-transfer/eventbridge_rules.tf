@@ -1,4 +1,21 @@
 locals {
+  eventbridge_transfer_sftp_upload_rules = {
+    sftp_upload_completed = {
+      name        = "${local.application_name}-transfer-sftp-upload-completed"
+      description = "Forward completed Transfer Family uploads to the unscanned file mover queue"
+      event_pattern = {
+        source        = ["aws.transfer"]
+        "detail-type" = ["SFTP Server File Upload Completed"]
+        resources     = [aws_transfer_server.this.arn]
+        detail = {
+          protocol      = ["SFTP"]
+          "server-id"   = [aws_transfer_server.this.id]
+          "status-code" = ["COMPLETED"]
+        }
+      }
+    }
+  }
+
   eventbridge_guard_duty_malware_protection_for_s3_rules = {
     no_threats_found = {
       name                   = "${local.application_name}-guardduty-no-threats-found"
