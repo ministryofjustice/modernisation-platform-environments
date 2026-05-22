@@ -211,54 +211,14 @@ resource "aws_security_group_rule" "ecs_tasks_admin_server" {
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
-#-- Tightened: ECS Admin egress - all required outbound rules
-#-- 1) VPC Interface Endpoints: ECR (api+dkr), CloudWatch Logs, SSM, SecretsManager (all tcp/443)
-#--    S3 is a Gateway endpoint - no SG rule needed, handled via route table.
-#--    EBS NLB (tcp/443, private subnets) is also covered by this rule.
-resource "aws_vpc_security_group_egress_rule" "ecs_tasks_admin_egress_vpc_endpoints" {
-  count             = length(local.private_subnets_cidr_blocks)
+resource "aws_security_group_rule" "ecs_tasks_admin_egress_all" {
   security_group_id = aws_security_group.ecs_tasks_admin.id
-  description       = "VPC Interface Endpoints + EBS NLB - ECR, CloudWatch, SSM, SecretsManager (tcp/443)"
-  ip_protocol       = "tcp"
-  from_port         = 443
-  to_port           = 443
-  cidr_ipv4         = local.private_subnets_cidr_blocks[count.index]
-}
-
-#-- 2) Oracle DB connections: SOA DB (data subnets, this VPC) and TDS DB (EDRMS account, cross-account).
-#--    Using 0.0.0.0/0 as interim because EDRMS data subnet CIDRs are in a separate account.
-#--    TODO: once EDRMS data subnet CIDRs are confirmed via VPC peering config, replace 0.0.0.0/0
-#--    with two separate rules: one for local data_subnets_cidr_blocks and one for EDRMS CIDRs.
-resource "aws_vpc_security_group_egress_rule" "ecs_tasks_admin_egress_oracle" {
-  security_group_id = aws_security_group.ecs_tasks_admin.id
-  description       = "Oracle DB (tcp/1521) - SOA DB and TDS DB. TODO: tighten CIDR when EDRMS data subnets confirmed"
-  ip_protocol       = "tcp"
-  from_port         = 1521
-  to_port           = 1521
-  cidr_ipv4         = "0.0.0.0/0"
-}
-
-#-- 3) WebLogic Admin→Managed Server communication (T3 protocol on managed_server_port/8001).
-resource "aws_vpc_security_group_egress_rule" "ecs_tasks_admin_egress_managed_server" {
-  count             = length(local.private_subnets_cidr_blocks)
-  security_group_id = aws_security_group.ecs_tasks_admin.id
-  description       = "WebLogic Admin to Managed Server T3 comms (tcp/8001)"
-  ip_protocol       = "tcp"
-  from_port         = tonumber(local.application_data.accounts[local.environment].managed_server_port)
-  to_port           = tonumber(local.application_data.accounts[local.environment].managed_server_port)
-  cidr_ipv4         = local.private_subnets_cidr_blocks[count.index]
-}
-
-#-- 4) CWA (ECP) DB datasource - external Oracle DB used for the EBS SMS composites.
-#--    Port is environment-specific: 1571 (non-prod) / 2484 (prod, TCPS).
-#--    Using 0.0.0.0/0 as interim. TODO: tighten to specific CWA DB IP from VPC Flow Logs.
-resource "aws_vpc_security_group_egress_rule" "ecs_tasks_admin_egress_cwa_db" {
-  security_group_id = aws_security_group.ecs_tasks_admin.id
-  description       = "CWA (ECP) Oracle DB - EBS SMS datasource. TODO: tighten to specific IP from VPC flow logs"
-  ip_protocol       = "tcp"
-  from_port         = tonumber(local.application_data.accounts[local.environment].cwa_db_port)
-  to_port           = tonumber(local.application_data.accounts[local.environment].cwa_db_port)
-  cidr_ipv4         = "0.0.0.0/0"
+  type              = "egress"
+  description       = "Temporary rollback - tighten again after investigation"
+  protocol          = -1
+  from_port         = 0
+  to_port           = 0
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 #--ECS Tasks Managed
