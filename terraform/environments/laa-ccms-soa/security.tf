@@ -211,78 +211,14 @@ resource "aws_security_group_rule" "ecs_tasks_admin_server" {
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
-#-- Tightened: ECS Admin egress (was 0.0.0.0/0 all-protocols)
-resource "aws_security_group_rule" "ecs_tasks_admin_egress_http" {
+resource "aws_security_group_rule" "ecs_tasks_admin_egress_all" {
   security_group_id = aws_security_group.ecs_tasks_admin.id
   type              = "egress"
-  description       = "Egress HTTP to private subnets on tcp/80"
-  protocol          = "tcp"
-  from_port         = 80
-  to_port           = 80
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-}
-
-
-resource "aws_security_group_rule" "ecs_tasks_admin_egress_oracle" {
-  security_group_id = aws_security_group.ecs_tasks_admin.id
-  type              = "egress"
-  description       = "Egress to SOA Oracle DB" 
-  protocol          = "tcp"
-  from_port         = 1521
-  to_port           = 1521
-  cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
-}
-
-# resource "aws_security_group_rule" "ecs_tasks_admin_egress_cwa_db_nonprod" {
-#   count             = local.is-production ? 0 : 1
-#   security_group_id = aws_security_group.ecs_tasks_admin.id
-#   type              = "egress"
-#   description       = "Egress to CWA DB (non-prod external host) on tcp/1571"
-#   protocol          = "tcp"
-#   from_port         = 1571
-#   to_port           = 1571
-#   cidr_blocks       = ["0.0.0.0/0"] #-- External host outside VPC - cannot scope to subnet CIDR
-# }
-
-# resource "aws_security_group_rule" "ecs_tasks_admin_egress_cwa_db_prod" {
-#   count             = local.is-production ? 1 : 0
-#   security_group_id = aws_security_group.ecs_tasks_admin.id
-#   type              = "egress"
-#   description       = "Egress to CWA DB (prod external host) on tcp/2484 TCPS"
-#   protocol          = "tcp"
-#   from_port         = 2484
-#   to_port           = 2484
-#   cidr_blocks       = ["0.0.0.0/0"] #-- External host outside VPC - cannot scope to subnet CIDR
-# }
-
-resource "aws_security_group_rule" "ecs_tasks_admin_egress_admin_t3" {
-  security_group_id = aws_security_group.ecs_tasks_admin.id
-  type              = "egress"
-  description       = "Egress to WebLogic Admin Server via T3 on tcp/7001"
-  protocol          = "tcp"
-  from_port         = tonumber(local.application_data.accounts[local.environment].admin_server_port)
-  to_port           = tonumber(local.application_data.accounts[local.environment].admin_server_port)
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-}
-
-resource "aws_security_group_rule" "ecs_tasks_admin_egress_managed_t3" {
-  security_group_id = aws_security_group.ecs_tasks_admin.id
-  type              = "egress"
-  description       = "Egress to WebLogic Managed Servers via T3 on tcp/8001"
-  protocol          = "tcp"
-  from_port         = tonumber(local.application_data.accounts[local.environment].managed_server_port)
-  to_port           = tonumber(local.application_data.accounts[local.environment].managed_server_port)
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-}
-
-resource "aws_security_group_rule" "ecs_tasks_admin_egress_efs" {
-  security_group_id = aws_security_group.ecs_tasks_admin.id
-  type              = "egress"
-  description       = "Egress to EFS mount targets on tcp/2049"
-  protocol          = "tcp"
-  from_port         = 2049
-  to_port           = 2049
-  cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
+  description       = "Temporary rollback - tighten again after investigation"
+  protocol          = -1
+  from_port         = 0
+  to_port           = 0
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 #--ECS Tasks Managed
