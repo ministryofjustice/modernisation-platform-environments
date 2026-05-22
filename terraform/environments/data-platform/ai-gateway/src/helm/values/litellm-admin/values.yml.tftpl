@@ -139,6 +139,8 @@ extraInitContainers:
       readOnlyRootFilesystem: true
       runAsNonRoot: true
       runAsUser: 65534
+      seccompProfile:
+        type: RuntimeDefault
 
 migrationJob:
   enabled: true
