@@ -32,11 +32,11 @@
       "example_var": "test-data"
     },
     "preproduction": {
-      "ec2amiid": "ami-0a2128d7b4dd8a56c",
+      "ec2amiid": "ami-0bd4cc2986cfb002b",
       "orahomesize": "300",
-      "orahome_snapshot": "snap-0685fb3a76969ad0b",
-      "stageesize": "200",
-      "stage_snapshot": "snap-0859b31fc100812e0",
+      "orahome_snapshot": "snap-0043a8fc4ce449b52",
+      "stageesize": "300",
+      "stage_snapshot": "snap-0574b5be2ca64158b",
       "allocated_storage": "50",
       "engine": "oracle-ee",
       "engine_version": "19.0.0.0.ru-2021-10.rur-2021-10.r1",
