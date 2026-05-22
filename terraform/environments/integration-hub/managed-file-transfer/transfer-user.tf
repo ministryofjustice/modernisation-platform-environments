@@ -19,11 +19,13 @@ data "aws_iam_policy_document" "transfer_user" {
       module.s3_bucket["unscanned"].s3_bucket_arn
     ]
   }
+  # s3:GetObject is required to so that AWS Transfer can issue HeadObject
   statement {
     sid    = "AllowS3LandingBucketObjectActions"
     effect = "Allow"
     actions = [
       "s3:AbortMultipartUpload",
+      "s3:GetObject",
       "s3:PutObject"
     ]
     resources = ["${module.s3_bucket["unscanned"].s3_bucket_arn}/*"]
@@ -64,12 +66,14 @@ data "aws_iam_policy_document" "transfer_user_session" {
     }
   }
 
+  # s3:GetObject is required to so that AWS Transfer can issue HeadObject
   statement {
     sid    = "AllowUploadOnlyToHomeDirectory"
     effect = "Allow"
     actions = [
-      "s3:PutObject",
       "s3:AbortMultipartUpload",
+      "s3:GetObject",
+      "s3:PutObject",
     ]
     resources = [
       "${module.s3_bucket["unscanned"].s3_bucket_arn}/$${transfer:UserName}/*",
