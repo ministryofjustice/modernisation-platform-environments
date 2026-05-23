@@ -2,7 +2,6 @@ import json
 import boto3
 import os
 import time
-from concurrent.futures import ThreadPoolExecutor
 
 
 def lambda_handler(event, context):
@@ -68,12 +67,8 @@ def lambda_handler(event, context):
         print(f"DRY RUN: would create {len(to_create)}, delete {len(to_delete)}")
         return {'created': 0, 'deleted': 0, 'failed': 0, 'dry_run': True}
 
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        create_futures = {executor.submit(create_user, user, region): user for user in to_create}
-        delete_futures = {executor.submit(delete_user, user, region): user for user in to_delete}
-
-    create_results = [f.result() for f in create_futures]
-    delete_results = [f.result() for f in delete_futures]
+    create_results = [create_user(user, region) for user in to_create]
+    delete_results = [delete_user(user, region) for user in to_delete]
 
     summary = {
         'created': len([r for r in create_results if r['success']]),
@@ -95,37 +90,23 @@ def create_user(user, region):
     username = user['username']
     lambda_client = boto3.client('lambda', region_name=region)
 
-    for attempt in range(1, 4):
-        try:
-            print(f"Creating user {username} (attempt {attempt}/3)...")
-            response = lambda_client.invoke(
-                FunctionName=os.environ['USER_CREATION_LAMBDA'],
-                InvocationType='RequestResponse',
-                Payload=json.dumps({
-                    'Firstname': user['firstname'],
-                    'Lastname': user['lastname'],
-                    'Email': user['email'],
-                    'WorkspaceType': user.get('workspace_type', 'standard')
-                })
-            )
-
-            payload = json.loads(response['Payload'].read())
-            if response['StatusCode'] == 200 and payload.get('statusCode') == 200:
-                print(f"Created user {username} successfully")
-                return {'success': True, 'action': 'create', 'username': username}
-
-            error = payload.get('body', 'Unknown error')
-            raise Exception(error)
-
-        except Exception as e:
-            if attempt < 3:
-                print(f"Attempt {attempt} failed for {username}: {e}. Retrying in 10s...")
-                time.sleep(10)
-            else:
-                print(f"Failed to create user {username} after 3 attempts: {e}")
-                return {'success': False, 'action': 'create', 'username': username, 'error': str(e)}
-
-    return {'success': False, 'action': 'create', 'username': username, 'error': 'Max retries exceeded'}
+    try:
+        print(f"Dispatching async creation for user {username}...")
+        lambda_client.invoke(
+            FunctionName=os.environ['USER_CREATION_LAMBDA'],
+            InvocationType='Event',
+            Payload=json.dumps({
+                'Firstname': user['firstname'],
+                'Lastname': user['lastname'],
+                'Email': user['email'],
+                'WorkspaceType': user.get('workspace_type', 'standard')
+            })
+        )
+        print(f"Dispatched creation for {username} — check user-creation Lambda logs for result")
+        return {'success': True, 'action': 'create', 'username': username}
+    except Exception as e:
+        print(f"Failed to dispatch creation for {username}: {e}")
+        return {'success': False, 'action': 'create', 'username': username, 'error': str(e)}
 
 
 def delete_user(user, region):
