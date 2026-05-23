@@ -104,7 +104,8 @@ def create_user(user, region):
                 Payload=json.dumps({
                     'Firstname': user['firstname'],
                     'Lastname': user['lastname'],
-                    'Email': user['email']
+                    'Email': user['email'],
+                    'WorkspaceType': user.get('workspace_type', 'standard')
                 })
             )
 

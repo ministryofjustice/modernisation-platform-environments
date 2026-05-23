@@ -165,12 +165,19 @@ def create_workspace(event):
     """
     Create a WorkSpace for the user
     """
-    # Get configuration from environment variables
     region = os.environ['REGION']
     directory_id = os.environ['DIRECTORY_ID']
-    bundle_id = os.environ['WORKSPACE_BUNDLE_ID']
     kms_key_id = os.environ['KMS_KEY_ID']
-    
+
+    workspace_type = event.get('WorkspaceType', 'standard').lower()
+    bundle_map = {
+        'standard':    os.environ['BUNDLE_ID_STANDARD'],
+        'performance': os.environ['BUNDLE_ID_PERFORMANCE'],
+        'power':       os.environ['BUNDLE_ID_POWER']
+    }
+    bundle_id = bundle_map.get(workspace_type, os.environ['BUNDLE_ID_STANDARD'])
+    print(f"Using workspace type: {workspace_type} (bundle: {bundle_id})")
+
     firstname = event['Firstname']
     lastname = event['Lastname']
     Username = f"{firstname}.{lastname}"
