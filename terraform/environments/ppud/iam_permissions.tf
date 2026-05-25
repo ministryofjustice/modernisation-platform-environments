@@ -256,7 +256,7 @@ locals {
           "suppress_sechub_findings",
           "get_list_waf_web_acls",
           "update_ses_access_key",
-		      "update_ses_secrets_value"
+          "update_ses_secrets_value"
           ] : {
           key         = "${policy_name}_${env_key}"
           policy_name = policy_name

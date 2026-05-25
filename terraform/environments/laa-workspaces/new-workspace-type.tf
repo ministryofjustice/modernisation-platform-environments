@@ -14,17 +14,17 @@
 locals {
   workspace_types = {
     standard = {
-      bundle_id                                 = "wsb-82dpmqfgh"  # Standard with Windows Server 2025
+      bundle_id                                 = "wsb-82dpmqfgh" # Standard with Windows Server 2025
       running_mode                              = "AUTO_STOP"
       running_mode_auto_stop_timeout_in_minutes = 60
     }
     performance = {
-      bundle_id                                 = "wsb-vz2zm0x4t"  # Performance with Windows Server 2025
+      bundle_id                                 = "wsb-vz2zm0x4t" # Performance with Windows Server 2025
       running_mode                              = "AUTO_STOP"
       running_mode_auto_stop_timeout_in_minutes = 60
     }
     power = {
-      bundle_id                                 = "wsb-379lp03xq"  # Power with Windows Server 2025
+      bundle_id                                 = "wsb-379lp03xq" # Power with Windows Server 2025
       running_mode                              = "AUTO_STOP"
       running_mode_auto_stop_timeout_in_minutes = 60
     }
