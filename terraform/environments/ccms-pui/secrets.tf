@@ -58,6 +58,12 @@ resource "aws_secretsmanager_secret_version" "pui_waf_ip_set" {
     "${data.aws_subnet.private_subnets_c.cidr_block}",
     "${local.application_data.accounts[local.environment].sb_vpc}"]
   })
+
+  lifecycle {
+    ignore_changes = [
+      secret_string
+    ]
+  }
 }
 
 
