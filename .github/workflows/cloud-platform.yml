@@ -29,9 +29,6 @@ jobs:
       matrix:
         include:
           - application: cloud-platform
-            environment: development
-            action: "plan_apply"
-          - application: cloud-platform
             environment: preproduction
             action: "plan"
           - application: cloud-platform
