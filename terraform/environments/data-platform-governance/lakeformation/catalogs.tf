@@ -32,16 +32,6 @@ resource "aws_glue_catalog" "main" {
   name        = each.value.name
   description = "Lake Formation catalog for ${each.key}"
 
-  # Enable Lake Formation hybrid access mode so the catalog and the databases
-  # it contains can be governed by Lake Formation permissions and shared with
-  # other accounts via RAM.
-  catalog_properties {
-    data_lake_access_properties {
-      data_lake_access = true
-      catalog_type     = "aws:glue:datacatalog"
-    }
-  }
-
   tags = merge(
     local.tags,
     {
