@@ -36,7 +36,7 @@ resource "aws_vpc_security_group_ingress_rule" "preprod_alb_legacy_natgw_ing" {
   } : {}
 
   description       = "allow ingress from codebuilder to delius core frontend alb for testing purposes"
-  security_group_id = aws_security_group.ancillary_alb_security_group.id
+  security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   cidr_ipv4         = each.value
   from_port         = "443"
   to_port           = "443"
