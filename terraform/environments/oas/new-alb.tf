@@ -687,7 +687,7 @@ resource "aws_lb_listener_rule" "em_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_ec2_https_9501_target_group[0].arn
   }
 
   condition {
