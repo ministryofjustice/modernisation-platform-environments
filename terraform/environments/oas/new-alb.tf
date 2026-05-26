@@ -371,7 +371,7 @@ resource "aws_lb_target_group_attachment" "oas_ec2_attachment" {
 resource "aws_lb_target_group" "oas_ec2_https_9501_target_group" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
-  name_prefix          = "oas-9501"
+  name_prefix          = "oas-2"
   port                 = 9501
   protocol             = "HTTPS"
   vpc_id               = data.aws_vpc.shared.id
