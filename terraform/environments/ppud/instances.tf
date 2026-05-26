@@ -27,6 +27,7 @@ resource "aws_instance" "PPUDWEBSERVER2" {
   tags = {
     Name        = "PPUDWEBSERVER2"
     patch_group = "dev_win_patch"
+    role        = "ses_config"
     backup      = true
   }
 }
@@ -52,6 +53,7 @@ resource "aws_instance" "s609693lo6vw100" {
   tags = {
     Name        = "s609693lo6vw100"
     patch_group = "dev_win_patch"
+    role        = "ses_config"
     backup      = true
   }
 }
@@ -77,6 +79,7 @@ resource "aws_instance" "s609693lo6vw101" {
   tags = {
     Name        = "s609693lo6vw101"
     patch_group = "dev_win_patch"
+    role        = "ses_config"
     backup      = true
   }
 }
@@ -277,6 +280,7 @@ resource "aws_instance" "s609693lo6vw109" {
   tags = {
     Name        = "s609693lo6vw109"
     patch_group = "dev_win_patch"
+    role        = "ses_config"
     backup      = true
   }
 }
@@ -302,6 +306,7 @@ resource "aws_instance" "s609693lo6vw110" {
   tags = {
     Name        = "s609693lo6vw110"
     patch_group = "dev_win_patch"
+    role        = "ses_config"
     lse_server  = "true"
     backup      = true
   }
@@ -488,6 +493,7 @@ resource "aws_instance" "s618358rgvw023" {
   tags = {
     Name        = "s618358rgvw023"
     patch_group = "uat_win_patch"
+    role        = "ses_config"
     backup      = true
     cpu_alarm   = true
   }
@@ -514,6 +520,7 @@ resource "aws_instance" "s618358rgvw024" {
   tags = {
     Name               = "s618358rgvw024"
     patch_group        = "uat_win_patch"
+    role               = "ses_config"
     backup             = true
     cpu_alarm          = true
     cpu_lambda_trigger = true
