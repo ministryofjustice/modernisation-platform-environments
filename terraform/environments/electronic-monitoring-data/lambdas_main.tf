@@ -918,3 +918,22 @@ module "macie-unstructured-jobs" {
     IDENTIFIERS = aws_macie2_custom_data_identifier.subject_id.id
   }
 }
+
+#-----------------------------------------------------------------------------------
+# Specials Ingestion
+#-----------------------------------------------------------------------------------
+
+module "specials-ingestion" {
+  count                   = local.is-development ? 1 : 0
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "specials_ingestion"
+  role_name               = aws_iam_role.macie_unstructured_job_iam_role[0].name
+  role_arn                = aws_iam_role.macie_unstructured_job_iam_role[0].arn
+  handler                 = "specials_ingestion.handler"
+  memory_size             = 1024
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+}
+
