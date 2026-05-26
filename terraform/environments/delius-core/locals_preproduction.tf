@@ -90,7 +90,7 @@ locals {
 
     weblogic = {
       image_tag                = "6.7.4"
-      task_definition_revision = 8
+      task_definition_revision = 10
       container_port           = 8080
       container_memory         = 16384
       container_cpu            = 1024
@@ -122,9 +122,6 @@ locals {
       LDAP_HOST                         = "ldap.preprod.delius-core.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"
       LDAP_PRINCIPAL                    = "cn=admin,dc=moj,dc=com"
       LOG_LEVEL_NDELIUS                 = "DEBUG"
-      MERGE_API_URL                     = "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io/merge/api/"
-      MERGE_OAUTH_URL                   = "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io/umt/"
-      MERGE_URL                         = "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io/merge/ui/"
       NDELIUS_CLIENT_ID                 = "migrations_client_id"
       OAUTH_CALLBACK_URL                = "https://ndelius.preprod.delius-core.hmpps-preproduction.modernisation-platform.service.justice.gov.uk/NDelius-war/delius/JSP/auth/token.jsp"
       OAUTH_CLIENT_ID                   = "delius-ui"
