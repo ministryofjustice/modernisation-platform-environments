@@ -2327,6 +2327,23 @@ data "aws_iam_policy_document" "gdpr_unstructured_control_lambda_iam_role_policy
     ]
     resources = ["*"]
   }
+
+  statement {
+    sid    = "GlueMetadataAccess"
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetTables",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:GetPartitions"
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/*/*"
+    ]
+  }
 }
 
 resource "aws_iam_role" "gdpr_unstructured_control_lambda_iam_role" {
