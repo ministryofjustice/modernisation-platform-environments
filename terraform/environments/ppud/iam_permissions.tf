@@ -394,6 +394,7 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Effect   = "Deny" # Fallback deny for any unexpected policy names
         Action   = ["*"]
         Resource = ["*"]
+        Condition = {} 
       }
     ]
   })
