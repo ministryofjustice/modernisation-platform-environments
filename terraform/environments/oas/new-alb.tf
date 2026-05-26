@@ -36,7 +36,6 @@ locals {
       protocol    = "tcp"
       cidr_blocks = local.moj_cidr_blocks
     }
-    }
     "lb_ingress_9501" = {
       description = "Loadbalancer ingress rule for HTTP 9501 (Console/EM)"
       from_port   = 9501
