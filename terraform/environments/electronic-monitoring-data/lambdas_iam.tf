@@ -2567,3 +2567,12 @@ resource "aws_iam_role_policy_attachment" "gdpr_unstructured_control_lambda_iam_
   role       = aws_iam_role.gdpr_unstructured_control_lambda_iam_role[0].name
   policy_arn = aws_iam_policy.gdpr_unstructured_control_lambda_iam_policy.arn
 }
+
+module "share_dbs_with_control_lambda_role" {
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = toset(local.historic_source_dbs)
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = aws_iam_role.gdpr_unstructured_control_lambda_iam_role[0].arn
+  db_exists               = true
+  de_role_arn             = null
+}
