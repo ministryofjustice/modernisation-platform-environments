@@ -11,6 +11,15 @@ data "aws_iam_policy_document" "ssogen_kms_policy" {
     resources = ["*"]
   }
   statement {
+    sid = "AllowRootAccountAdmin"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::jsondecode(data.aws_secretsmanager_secret_version.dev_account_secret.secret_string).dev_account_id:root"]
+    }
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+  statement {
     sid = "AllowUseForSecretsManagerInThisAccount"
     principals {
       type        = "AWS"
