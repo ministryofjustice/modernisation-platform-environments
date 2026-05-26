@@ -14,14 +14,15 @@ resource "aws_lb_target_group" "frontend" {
   count = var.microservice_lb != null ? 1 : 0
   #checkov:skip=CKV_AWS_261 "ignore"
   # https://github.com/hashicorp/terraform-provider-aws/issues/16889
-  name                 = "${var.env_name}-${var.name}-${random_id.suffix[0].hex}"
-  port                 = random_id.suffix[0].keepers.port
-  protocol             = random_id.suffix[0].keepers.protocol
-  protocol_version     = random_id.suffix[0].keepers.protocol_version
-  vpc_id               = var.account_config.shared_vpc_id
-  target_type          = "ip"
-  deregistration_delay = 30
-  tags                 = var.tags
+  name                          = "${var.env_name}-${var.name}-${random_id.suffix[0].hex}"
+  port                          = random_id.suffix[0].keepers.port
+  protocol                      = random_id.suffix[0].keepers.protocol
+  protocol_version              = random_id.suffix[0].keepers.protocol_version
+  vpc_id                        = var.account_config.shared_vpc_id
+  target_type                   = "ip"
+  deregistration_delay          = 60
+  load_balancing_algorithm_type = var.name == "weblogic" ? "least_outstanding_requests" : null
+  tags                          = var.tags
 
   stickiness {
     enabled = var.alb_stickiness_enabled

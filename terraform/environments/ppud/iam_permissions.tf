@@ -42,8 +42,7 @@ locals {
         "send_logs_to_cloudwatch",
         "get_cloudwatch_metrics",
         "invoke_ses",
-        "get_data_s3",
-        "get_klayers"
+        "get_data_s3"
       ]
       prod_policies = [
         "ec2_permissions"
@@ -144,6 +143,18 @@ locals {
         "get_list_waf_web_acls"
       ]
     }
+    rotate_ses_access_key = {
+      description = "Lambda Function Role for rotating ses access key and secret key and then derive the new smtp password"
+      policies = [
+        "send_message_to_sqs",
+        "send_logs_to_cloudwatch",
+        "publish_to_sns",
+        "update_ses_access_key",
+        "update_ses_secrets_value",
+        "ssm_send_command",
+        # ssm_ec2_send_command is attached separately via aws_iam_role_policy_attachment.attach_ssm_ec2_send_command
+      ]
+    }
   }
 
   # Environment configurations
@@ -236,7 +247,6 @@ locals {
           "get_securityhub_data",
           "get_data_s3",
           "put_data_s3",
-          "get_klayers",
           "ec2_permissions",
           "get_certificate_expiry",
           "get_certificate_parameters",
@@ -244,7 +254,10 @@ locals {
           "update_waf_ipset",
           "describe_cloudwatch",
           "suppress_sechub_findings",
-          "get_list_waf_web_acls"
+          "get_list_waf_web_acls",
+          "update_ses_access_key",
+		      "update_ses_secrets_value",
+          "ssm_send_command"
           ] : {
           key         = "${policy_name}_${env_key}"
           policy_name = policy_name
@@ -314,10 +327,6 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Effect   = "Allow"
         Action   = ["s3:PutObject", "s3:PutObjectAcl", "s3:ListBucket"]
         Resource = [data.aws_s3_bucket.log_file_buckets[each.value.env_key].arn, "${data.aws_s3_bucket.log_file_buckets[each.value.env_key].arn}/*"]
-        } : each.value.policy_name == "get_klayers" ? {
-        Effect   = "Allow"
-        Action   = ["ssm:GetParameter"]
-        Resource = ["arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:parameter/klayers-account"]
         } : each.value.policy_name == "ec2_permissions" ? {
         Effect   = "Allow"
         Action   = ["ec2:CreateNetworkInterface", "ec2:DescribeNetworkInterface"]
@@ -350,12 +359,52 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Effect   = "Allow"
         Action   = ["wafv2:GetWebACL", "wafv2:ListWebACLs"]
         Resource = ["arn:aws:wafv2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+         } : each.value.policy_name == "update_ses_access_key" ? {
+        Effect   = "Allow"
+        Action   = ["iam:CreateAccessKey", "iam:DeleteAccessKey", "iam:ListAccessKeys", "iam:UpdateAccessKey"]
+        Resource = ["arn:aws:iam::${local.environment_management.account_ids[each.value.env_config.account_key]}:user/${local.ses_iam_user}"]
+        } : each.value.policy_name == "update_ses_secrets_value" ? {
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue", "secretsmanager:PutSecretValue", "secretsmanager:UpdateSecret"]
+        Resource = ["arn:aws:secretsmanager:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:secret:${local.ses_secret_name}-*"]
+        } : each.value.policy_name == "ssm_send_command" ? {
+        Effect   = "Allow"
+        Action   = ["ssm:SendCommand"]
+        Resource = [
+                  "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript",
+                  "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:command/*",
+        ]
         } : {
         Effect   = "Deny" # Fallback deny for any unexpected policy names
         Action   = ["*"]
         Resource = ["*"]
       }
     ]
+  })
+}
+
+# Separate statement for this IAM policy due to the condition reference
+
+resource "aws_iam_policy" "ssm_ec2_send_command" {
+  for_each = {
+    for env_key, env_config in local.iam_environments : env_key => env_config
+    if env_config.condition
+  }
+
+  name        = "aws_iam_policy_ssm_ec2_send_command_${each.key}_v2"
+  path        = "/"
+  description = "Lambda policy for ssm_ec2_send_command in ${each.key} environment"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["ssm:SendCommand"]
+      Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.account_key]}:instance/*"]
+      Condition = {
+        StringEquals = { "ssm:resourceTag/role" = "ses_config" }
+      }
+    }]
   })
 }
 
@@ -387,6 +436,16 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policies_v2" {
 
   role       = aws_iam_role.lambda_role_v2[each.value.role_key].name
   policy_arn = aws_iam_policy.lambda_policies_v2[each.value.policy_key].arn
+}
+
+resource "aws_iam_role_policy_attachment" "attach_ssm_ec2_send_command" {
+  for_each = {
+    for role_key, role_instance in local.lambda_role_instances_map : role_key => role_instance
+    if role_instance.role_key == "rotate_ses_access_key"
+  }
+
+  role       = aws_iam_role.lambda_role_v2[each.key].name
+  policy_arn = aws_iam_policy.ssm_ec2_send_command[each.value.env_key].arn
 }
 
 # Managed policy attachments

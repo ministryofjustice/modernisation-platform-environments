@@ -37,11 +37,10 @@ resource "aws_vpc_security_group_egress_rule" "bcs_ec2" {
     smtp-to-internal     = { ip_protocol = "TCP", port = 25, cidr_ipv4 = "10.0.0.0/8" }
     http-to-all          = { ip_protocol = "TCP", port = 80, cidr_ipv4 = "0.0.0.0/0" }
     ntp-to-all           = { ip_protocol = "UDP", port = 123, cidr_ipv4 = "0.0.0.0/0" }
-    ldap-tcp-to-vpc      = { ip_protocol = "TCP", port = 389, cidr_ipv4 = var.account_config.shared_vpc_cidr }
-    ldap-udp-to-vpc      = { ip_protocol = "UDP", port = 389, cidr_ipv4 = var.account_config.shared_vpc_cidr }
+    ldap-tcp-to-internal = { ip_protocol = "TCP", port = 389, cidr_ipv4 = "10.0.0.0/8" }
+    ldap-udp-to-internal = { ip_protocol = "UDP", port = 389, cidr_ipv4 = "10.0.0.0/8" }
     https-to-all         = { ip_protocol = "TCP", port = 443, cidr_ipv4 = "0.0.0.0/0" }
-    smb-to-fsx           = { ip_protocol = "TCP", port = 445, referenced_security_group_id = aws_security_group.fsx.id }
-    smb-to-core-vpc      = { ip_protocol = "TCP", port = 445, cidr_ipv4 = var.environment_config.core_shared_services_vpc_cidr }
+    smb-to-internal      = { ip_protocol = "TCP", port = 445, cidr_ipv4 = "10.0.0.0/8" }
     oracle1521-to-vpc    = { ip_protocol = "TCP", port = 1521, cidr_ipv4 = var.account_config.shared_vpc_cidr }
     oracle1521-to-legacy = { ip_protocol = "TCP", port = 1521, cidr_ipv4 = var.environment_config.legacy_counterpart_vpc_cidr }
     nfs-to-efs           = { ip_protocol = "TCP", port = 2049, referenced_security_group_id = aws_security_group.efs.id }
