@@ -39,8 +39,6 @@ resource "aws_iam_role_policy" "service_policy" {
   role   = aws_iam_role.service.id
 }
 
-
-# IAM role that the Amazon ECS container agent and the Docker daemon can assume
 data "aws_iam_policy_document" "ecs_task_exec" {
   statement {
     actions = ["sts:AssumeRole"]
