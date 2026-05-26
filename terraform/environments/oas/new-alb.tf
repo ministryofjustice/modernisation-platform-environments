@@ -409,7 +409,7 @@ resource "aws_lb_target_group_attachment" "oas_ec2_https_9501_attachment" {
 
   target_group_arn = aws_lb_target_group.oas_ec2_https_9501_target_group[0].arn
   target_id        = aws_instance.oas_app_instance_new[0].id
-  port             = 9500
+  port             = 9501
 }
 
 
