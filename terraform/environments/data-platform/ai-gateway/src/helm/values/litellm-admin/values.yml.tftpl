@@ -48,7 +48,7 @@ proxy_config:
   general_settings:
     litellm_license: os.environ/LITELLM_LICENSE
     master_key: os.environ/PROXY_MASTER_KEY
-    proxy_admin_email: "Jacob.Woffenden@justice.gov.uk"
+    proxy_admin_email: "Muhammad.Ahmad@justice.gov.uk, Jeremy.Collins@justice.gov.uk, Gary.Henderson1@justice.gov.uk, Lauren.Taylor-Brown@justice.gov.uk, Jacob.Woffenden@justice.gov.uk"
     ui_access_mode: "admin_only"
     proxy_batch_write_at: 60
     database_connection_pool_limit: 10
@@ -101,7 +101,7 @@ volumes:
   - name: assets
     emptyDir:
       sizeLimit: 10Mi
-  - name: cache
+  - name: app-cache
     emptyDir:
       sizeLimit: 500Mi
   - name: migrations
@@ -113,7 +113,7 @@ volumeMounts:
     mountPath: /app/var/litellm/ui
   - name: assets
     mountPath: /app/var/litellm/assets
-  - name: cache
+  - name: app-cache
     mountPath: /app/cache
   - name: migrations
     mountPath: /app/migrations
