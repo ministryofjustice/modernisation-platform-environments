@@ -2299,7 +2299,13 @@ data "aws_iam_policy_document" "gdpr_unstructured_control_lambda_iam_role_policy
   statement {
     sid     = "S3BucketPerms"
     effect  = "Allow"
-    actions = ["s3:PutObject", "s3:GetObject", "s3:PutObjectAcl"]
+    actions = [
+      "s3:PutObject", 
+      "s3:GetObject", 
+      "s3:PutObjectAcl", 
+      "s3:GetBucketLocation", 
+      "s3:ListBucket"
+    ]
     resources = [
       "${module.s3-logging-bucket.bucket.arn}/gdpr/*",
       module.s3-logging-bucket.bucket.arn,
