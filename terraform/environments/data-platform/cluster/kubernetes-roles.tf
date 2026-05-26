@@ -14,6 +14,12 @@ resource "kubernetes_cluster_role_v1" "headlamp" {
   }
 
   rule {
+    api_groups = [""]
+    resources  = ["services/proxy"]
+    verbs      = ["get"]
+  }
+
+  rule {
     api_groups = ["apps"]
     resources  = ["deployments", "statefulsets", "daemonsets", "replicasets"]
     verbs      = ["get", "list", "watch"]

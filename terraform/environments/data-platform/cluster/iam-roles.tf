@@ -84,7 +84,8 @@ module "opencost_iam_role" {
   name = "opencost"
 
   policies = {
-    OpenCost = module.opencost_iam_policy.arn
+    OpenCost         = module.opencost_prometheus_query_iam_policy.arn
+    OpenCostSpotData = module.opencost_spot_data_iam_policy.arn
   }
 
   oidc_providers = {

@@ -10,6 +10,8 @@ locals {
 
   container_insights_log_group_name = "/aws/containerinsights/${local.eks_cluster_name}/performance"
 
+  opencost_spot_data_bucket_name = "mojdp-${local.environment}-opencost-spot-data"
+
   kyverno_privileged_policies = [
     {
       name        = "cloudwatch-agent"

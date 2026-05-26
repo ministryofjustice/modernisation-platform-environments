@@ -20,9 +20,9 @@ module "prometheus_iam_policy" {
   policy = data.aws_iam_policy_document.prometheus.json
 }
 
-data "aws_iam_policy_document" "opencost" {
+data "aws_iam_policy_document" "opencost_prometheus_query" {
   statement {
-    sid    = "AllowAPSQuery"
+    sid    = "AllowPrometheusQuery"
     effect = "Allow"
     actions = [
       "aps:QueryMetrics",
@@ -34,12 +34,36 @@ data "aws_iam_policy_document" "opencost" {
   }
 }
 
-module "opencost_iam_policy" {
+module "opencost_prometheus_query_iam_policy" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-policy?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
 
-  name_prefix = "opencost"
+  name_prefix = "opencost-prometheus-query"
 
-  policy = data.aws_iam_policy_document.opencost.json
+  policy = data.aws_iam_policy_document.opencost_prometheus_query.json
+}
+
+data "aws_iam_policy_document" "opencost_spot_instance_data_feed" {
+  statement {
+    sid    = "SpotDataAccess"
+    effect = "Allow"
+    actions = [
+      "s3:ListAllMyBuckets",
+      "s3:ListBucket",
+      "s3:HeadBucket",
+      "s3:HeadObject",
+      "s3:List*",
+      "s3:Get*"
+    ]
+    resources = [module.opencost_spot_data_bucket.s3_bucket_arn, "${module.opencost_spot_data_bucket.s3_bucket_arn}/*"]
+  }
+}
+
+module "opencost_spot_data_iam_policy" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-policy?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
+
+  name_prefix = "opencost-spot-data"
+
+  policy = data.aws_iam_policy_document.opencost_spot_instance_data_feed.json
 }
 
 data "aws_iam_policy_document" "eks_logs_kms" {
