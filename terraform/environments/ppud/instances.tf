@@ -54,7 +54,7 @@ resource "aws_instance" "s609693lo6vw100" {
   tags = {
     Name              = "s609693lo6vw100"
     patch_group       = "dev_win_patch"
-    role              = "ses_sql_config"
+    role              = "ses_sql_config"  
     backup            = true
   }
 }
