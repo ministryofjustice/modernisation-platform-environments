@@ -78,6 +78,7 @@ locals {
         "51.149.2.0/24",      # 10SC
         # Hoose
         "51.179.193.117/32",
+        "85.255.237.89/32"
       ]
       ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
@@ -97,13 +98,30 @@ locals {
     }
     preproduction = {
       litellm_versions = {
-        application = "main-v1.83.7-stable"
-        chart       = "1.83.7-stable"
+        application = "v1.85.0"
+        chart       = "1.85.0"
       }
-      ai_gateway_hostname                = "preproduction.ai-gateway.justice.gov.uk"
-      ai_gateway_ingress_allowlist       = []
-      ai_gateway_admin_ingress_allowlist = []
-      ai_gateway_models                  = {}
+      ai_gateway_hostname = "preproduction.ai-gateway.justice.gov.uk"
+      ai_gateway_ingress_allowlist = [
+        # VPN
+        "128.77.75.64/26",  # Prisma Corporate
+        "35.176.93.186/32", # GlobalProtect (Alpha)
+        # Sites
+        "213.121.161.112/28", # 102PF
+        "51.149.2.0/24",      # 10SC
+      ]
+      ai_gateway_admin_ingress_allowlist = [
+        # VPN
+        "128.77.75.64/26",  # Prisma Corporate
+        "35.176.93.186/32", # GlobalProtect (Alpha)
+        # Sites
+        "213.121.161.112/28", # 102PF
+        "51.149.2.0/24",      # 10SC
+        # Hoose
+        "51.179.193.117/32",
+        "85.255.237.89/32"
+      ]
+      ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
         min_replicas                      = 1
         max_replicas                      = 3
@@ -121,13 +139,30 @@ locals {
     }
     production = {
       litellm_versions = {
-        application = "main-v1.83.7-stable"
-        chart       = "1.83.7-stable"
+        application = "v1.85.0"
+        chart       = "1.85.0"
       }
-      ai_gateway_hostname                = "ai-gateway.justice.gov.uk"
-      ai_gateway_ingress_allowlist       = []
-      ai_gateway_admin_ingress_allowlist = []
-      ai_gateway_models                  = {}
+      ai_gateway_hostname = "ai-gateway.justice.gov.uk"
+      ai_gateway_ingress_allowlist = [
+        # VPN
+        "128.77.75.64/26",  # Prisma Corporate
+        "35.176.93.186/32", # GlobalProtect (Alpha)
+        # Sites
+        "213.121.161.112/28", # 102PF
+        "51.149.2.0/24",      # 10SC
+      ]
+      ai_gateway_admin_ingress_allowlist = [
+        # VPN
+        "128.77.75.64/26",  # Prisma Corporate
+        "35.176.93.186/32", # GlobalProtect (Alpha)
+        # Sites
+        "213.121.161.112/28", # 102PF
+        "51.149.2.0/24",      # 10SC
+        # Hoose
+        "51.179.193.117/32",
+        "85.255.237.89/32"
+      ]
+      ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
         min_replicas                      = 2
         max_replicas                      = 10
