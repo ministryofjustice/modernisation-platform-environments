@@ -11,6 +11,6 @@ module "data_lake_settings" {
   ]
 
   trusted_resource_owners = [
-    for factory in try(tolist(local.lakeformation_configuration.factories), keys(local.lakeformation_configuration.factories)) : local.environment_management.account_ids[factory]
+    for factory in keys(local.lakeformation_configuration.factories) : local.environment_management.account_ids[factory]
   ]
 }
