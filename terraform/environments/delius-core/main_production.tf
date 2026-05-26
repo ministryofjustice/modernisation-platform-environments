@@ -42,4 +42,6 @@ module "environment_prod" {
   dms_config = local.dms_config_prod
 
   env_name_to_dms_config_map = local.env_name_to_dms_config_map
+
+  db_backup_config = local.db_backup_config_prod
 }

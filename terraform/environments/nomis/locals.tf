@@ -61,7 +61,7 @@ locals {
       maintenance_window_cutoff   = 2
       patch_classifications = {
         # REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
+        WINDOWS = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups", "ServicePacks", "Updates"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
       }
     }
   }

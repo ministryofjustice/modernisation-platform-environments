@@ -7,13 +7,16 @@ module "weblogic_eis" {
     aws.core-network-services = aws.core-network-services
   }
 
-  name            = "weblogic-eis"
-  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic:${var.delius_microservice_configs.weblogic_eis.image_tag}"
-  env_name        = var.env_name
-  account_config  = var.account_config
-  account_info    = var.account_info
+  name              = "weblogic-eis"
+  container_image   = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic:${var.delius_microservice_configs.weblogic_eis.image_tag}"
+  env_name          = var.env_name
+  account_config    = var.account_config
+  account_info      = var.account_info
+  capacity_provider = aws_ecs_capacity_provider.weblogic_eis.name
 
-  desired_count = 1
+  force_new_deployment = false
+
+  desired_count = var.delius_microservice_configs.weblogic_eis.task_count
 
   pin_task_definition_revision           = try(var.delius_microservice_configs.weblogic_eis.task_definition_revision, 0)
   ignore_changes_service_task_definition = false
@@ -22,13 +25,12 @@ module "weblogic_eis" {
   container_memory = var.delius_microservice_configs.weblogic_eis.container_memory
   container_cpu    = var.delius_microservice_configs.weblogic_eis.container_cpu
 
-  container_vars_default = {
-    for name in local.weblogic_ssm.vars : name => data.aws_ssm_parameter.weblogic_ssm[name].value
-  }
+  container_vars_default = var.delius_microservice_configs.weblogic_params
+
   container_vars_env_specific = try(var.delius_microservice_configs.weblogic_eis.container_vars_env_specific, {})
 
   container_secrets_default = merge({
-    for name in local.weblogic_ssm.secrets : name => module.weblogic_ssm.arn_map[name]
+    for name in local.weblogic_secrets : name => module.weblogic_ssm.arn_map[name]
     }, {
     "JDBC_PASSWORD"         = "${module.oracle_db_shared.database_application_passwords_secret_arn}:delius_pool::",
     "USERMANAGEMENT_SECRET" = data.aws_ssm_parameter.usermanagement_secret.arn
@@ -49,12 +51,12 @@ module "weblogic_eis" {
   alb_listener_rule_paths    = ["/eis"]
   alb_listener_rule_priority = 40
   alb_health_check = {
-    path                 = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
+    path                 = "/NDelius-war/delius/javax.faces.resource/health/healthcheck.json"
     healthy_threshold    = 5
     interval             = 30
     protocol             = "HTTP"
     unhealthy_threshold  = 5
-    matcher              = "200-499"
+    matcher              = "200"
     timeout              = 10
     grace_period_seconds = 300
   }
@@ -67,6 +69,25 @@ module "weblogic_eis" {
   microservice_lb_https_listener_arn = aws_lb_listener.listener_https.arn
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
+
+  ecs_service_ingress_security_group_ids = []
+  ecs_service_egress_security_group_ids = [
+    {
+      ip_protocol = "tcp"
+      port        = 389
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+    },
+    {
+      ip_protocol = "udp"
+      port        = 389
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+    },
+    {
+      ip_protocol = "tcp"
+      port        = 1521
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+    }
+  ]
 
   log_error_pattern       = ""
   sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn
@@ -106,4 +127,44 @@ resource "aws_ssm_parameter" "usermanagement_secret" {
 
 data "aws_ssm_parameter" "usermanagement_secret" {
   name = aws_ssm_parameter.usermanagement_secret.name
+}
+
+resource "aws_autoscaling_group" "weblogic_eis" {
+  name = "weblogic-eis-${var.env_name}-ecs-asg"
+
+  max_size              = 1
+  min_size              = 1
+  protect_from_scale_in = true
+
+  vpc_zone_identifier = var.account_config.private_subnet_ids
+
+  instance_refresh {
+    strategy = "Rolling"
+  }
+
+  launch_template {
+    id      = aws_launch_template.weblogic.id
+    version = "$Latest"
+  }
+
+  tag {
+    key                 = "Name"
+    value               = "weblogic-eis-${var.env_name}-ecs-asg"
+    propagate_at_launch = true
+  }
+}
+
+resource "aws_ecs_capacity_provider" "weblogic_eis" {
+  name = "weblogic-eis-${var.env_name}-ec2-cp"
+
+  auto_scaling_group_provider {
+    auto_scaling_group_arn = aws_autoscaling_group.weblogic_eis.arn
+
+    managed_scaling {
+      status          = "ENABLED"
+      target_capacity = 100
+    }
+
+    managed_termination_protection = "ENABLED"
+  }
 }

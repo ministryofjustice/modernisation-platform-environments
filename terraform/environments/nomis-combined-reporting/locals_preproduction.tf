@@ -1,12 +1,13 @@
 locals {
 
   lb_maintenance_message_preproduction = {
-    maintenance_title   = "Prison-NOMIS Reporting LSAST and/or Pre-Production Maintenance Window"
-    maintenance_message = "Prison-NOMIS Reporting LSAST and/or Pre-Production is currently unavailable due to planned maintenance or out-of-hours shutdown (7pm-7am). Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpectedly down."
+    maintenance_title   = "Prison-NOMIS Reporting Pre-Production Maintenance Window"
+    maintenance_message = "Prison-NOMIS Reporting Pre-Production is currently unavailable due to planned maintenance or out-of-hours shutdown (7pm-7am). Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpectedly down."
   }
 
   baseline_presets_preproduction = {
     options = {
+      db_backup_object_lock_days = 14
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "nomis-combined-reporting-preproduction"
@@ -78,6 +79,9 @@ locals {
           instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
             "Ec2PPReportingPolicy",
           ])
+        })
+        instance = merge(local.ec2_instances.bip_app.instance, {
+          instance_type = "r6i.2xlarge"
         })
         tags = merge(local.ec2_instances.bip_app.tags, {
           instance-scheduling                  = "skip-scheduling"

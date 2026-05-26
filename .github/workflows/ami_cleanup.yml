@@ -63,7 +63,7 @@ jobs:
 
   fetch-secrets:
     name: Fetch ENV management secrets
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@5c713c93eea694829b1bd3f410d0b235053318ce # v4.0.0
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@d2d07632db53d17c9760c0c2c06f22a37bd3f0a1 # v6.0.1
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -94,7 +94,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5c713c93eea694829b1bd3f410d0b235053318ce # v4.0.0
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@d2d07632db53d17c9760c0c2c06f22a37bd3f0a1 # v6.0.1
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -116,7 +116,7 @@ jobs:
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials (github-actions role)
-        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885 # v6.1.1
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "cleanup-preview-${{ matrix.account_name }}"
@@ -237,7 +237,7 @@ jobs:
 
       - name: Upload AMI Preview Artifacts
         if: ${{ always() && (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ami' || github.event.inputs.cleanup_type == 'both') }}
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ami-preview-${{ matrix.account_name }}
           path: |
@@ -295,7 +295,7 @@ jobs:
 
       - name: Upload EBS Preview Artifacts
         if: ${{ always() && (github.event_name == 'push' || github.event.inputs.cleanup_type == 'ebs' || github.event.inputs.cleanup_type == 'both') }}
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ebs-preview-${{ matrix.account_name }}
           path: |
@@ -305,7 +305,7 @@ jobs:
 
       - name: Upload Unified Preview Artifact
         if: always()
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: cleanup-report-preview-${{ matrix.account_name }}
           path: reports/cleanup_report.csv
@@ -338,7 +338,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5c713c93eea694829b1bd3f410d0b235053318ce # v4.0.0
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@d2d07632db53d17c9760c0c2c06f22a37bd3f0a1 # v6.0.1
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -353,7 +353,7 @@ jobs:
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials (github-actions role)
-        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885 # v6.1.1
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "ami-delete-${{ matrix.account_name }}"
@@ -526,7 +526,7 @@ jobs:
 
       - name: Upload AMI Live Artifacts (reports only)
         if: always()
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ami-live-${{ matrix.account_name }}
           path: |
@@ -595,7 +595,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@5c713c93eea694829b1bd3f410d0b235053318ce # v4.0.0
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@d2d07632db53d17c9760c0c2c06f22a37bd3f0a1 # v6.0.1
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -610,7 +610,7 @@ jobs:
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials (github-actions role)
-        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885 # v6.1.1
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: "ebs-delete-${{ matrix.account_name }}"
@@ -659,7 +659,7 @@ jobs:
 
       - name: Upload EBS Live Artifacts (reports only)
         if: always()
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ebs-live-${{ matrix.account_name }}
           path: reports/ebs_cleanup_report.csv

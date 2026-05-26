@@ -39,3 +39,19 @@ module "airflow_github_app_secret" {
     { "credential-expiration" = "none" }
   )
 }
+
+module "snyk_analytical_platform_airflow_container_scanning_secret" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/secrets-manager/aws"
+  version = "2.1.0"
+
+  name        = "snyk/analytical-platform-airflow-container-scanning"
+  description = "https://app.snyk.io/org/hq-bf2/manage/service-accounts/b868b874-13e8-423a-88ae-90e63f1df318"
+
+  secret_string         = "CHANGEME"
+  ignore_secret_changes = true
+
+  tags = local.tags
+}

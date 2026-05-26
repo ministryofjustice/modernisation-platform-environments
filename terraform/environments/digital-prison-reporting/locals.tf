@@ -73,23 +73,9 @@ locals {
 
   # Glue Job parameters
   glue_placeholder_script_location = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
-  glue_jobs_latest_jar_location    = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
+  glue_job_jar_name                = local.application_data.accounts[local.environment].glue_job_jar_name
+  glue_jobs_jar_location           = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/${local.glue_job_jar_name}"
   glue_log_retention_in_days       = local.application_data.accounts[local.environment].glue_log_retention_in_days
-
-  # Common Maintenance Job settings
-  maintenance_job_retry_max_attempts    = local.application_data.accounts[local.environment].maintenance_job_retry_max_attempts
-  maintenance_job_retry_min_wait_millis = local.application_data.accounts[local.environment].maintenance_job_retry_min_wait_millis
-  maintenance_job_retry_max_wait_millis = local.application_data.accounts[local.environment].maintenance_job_retry_max_wait_millis
-
-  # Compact Job
-  compact_job_worker_type = local.application_data.accounts[local.environment].compact_job_worker_type
-  compact_job_num_workers = local.application_data.accounts[local.environment].compact_job_num_workers
-  compact_job_log_level   = local.application_data.accounts[local.environment].compact_job_log_level
-
-  # Retention (vacuum) Job
-  retention_job_worker_type = local.application_data.accounts[local.environment].retention_job_worker_type
-  retention_job_num_workers = local.application_data.accounts[local.environment].retention_job_num_workers
-  retention_job_log_level   = local.application_data.accounts[local.environment].retention_job_log_level
 
   # Hive Table Creation Job
   hive_table_creation_job_schema_cache_max_size = local.application_data.accounts[local.environment].hive_table_creation_job_schema_cache_max_size
@@ -451,6 +437,8 @@ locals {
     heartbeat_endpoint = "0.0.0.0"
   }
 
+  probation_domains = local.application_data.accounts[local.environment].probation_domains
+
   # Operational DataStore Secrets PlaceHolder
   operational_datastore_secrets_placeholder = {
     username = "placeholder"
@@ -562,11 +550,26 @@ locals {
   create_postgres_load_generator_job = local.application_data.accounts[local.environment].create_postgres_load_generator_job
 
   # Probation Discovery
-  probation_discovery_windows_ami_id = "ami-03c8cd9ad2f2d6256"
+  probation_discovery_windows_ami_id = data.aws_ami.windows_server_2022.id
   enable_probation_discovery_node    = local.application_data.accounts[local.environment].enable_probation_discovery_node
 
   dpr_windows_rdp_credentials_placeholder = {
     username = "placeholder"
     password = "placeholder"
   }
+
+  # DPR Cross-account Secret Placeholders for Cloud Platform access
+  # Assessment View Database (PostgreSQL)
+  # Values are intentionally set to "placeholder" - the Cloud Platform team will update them via write access
+  dpr_crossaccount_assessment_view_secrets_placeholder = {
+    engine   = "postgres"
+    source   = "cloud-platform"
+    db_name  = "placeholder"
+    username = "placeholder"
+    password = "placeholder"
+    host     = "placeholder"
+    port     = "placeholder"
+  }
+
+  # Add more cross-account secret placeholders here as needed for other databases
 }

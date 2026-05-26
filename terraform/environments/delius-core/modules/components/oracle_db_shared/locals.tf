@@ -72,8 +72,7 @@ locals {
     }
   }
 
-  oracle_backup_bucket_prefix     = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-backups"
-  oracle_backup_bucket_expiration = var.env_name == "prod" ? 373 : 365
+  oracle_backup_bucket_prefix = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-backups"
 
   db_port = 1521
 
@@ -85,5 +84,7 @@ locals {
     # dev and test ranges are same as they dont have test DMS task
     # and use dev to connect to TEST oracle DB instance
     # include higher envs later
+    preprod = "172.26.0.0/16",
+    prod    = "172.25.0.0/16"
   }
 }

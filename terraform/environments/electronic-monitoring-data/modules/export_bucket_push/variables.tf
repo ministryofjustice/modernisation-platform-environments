@@ -51,3 +51,9 @@ variable "subnet_ids" {
   description = "List of subnet IDs associated with the Lambda function."
   type        = list(string)
 }
+
+variable "filter_suffix" {
+  description = "String to filter the suffix of the files on."
+  type        = string
+  default     = ""
+}

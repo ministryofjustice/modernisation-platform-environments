@@ -182,6 +182,28 @@ locals {
           oasys-national-reporting-environment = "t2"
         })
       })
+
+      t2-onr-websso-1 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2T2ReportingPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bip_web.instance, {
+          instance_type = "r6i.large"
+        })
+        user_data_cloud_init = merge(local.ec2_instances.bip_web.user_data_cloud_init, {
+          args = merge(local.ec2_instances.bip_web.user_data_cloud_init.args, {
+            branch = "TM-1865/onr/web-oidc-v1"
+          })
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          oasys-national-reporting-environment = "t2"
+          server-type                          = "onr-websso"
+        })
+      })
     }
 
     fsx_windows = {
@@ -281,6 +303,11 @@ locals {
               { ec2_instance_name = "t2-onr-web-1" },
             ]
           })
+          t2-onr-websso-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
+            attachments = [
+              { ec2_instance_name = "t2-onr-websso-1" },
+            ]
+          })
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
@@ -310,6 +337,21 @@ locals {
                   host_header = {
                     values = [
                       "t2.test.reporting.oasys.service.justice.gov.uk",
+                      "t2-admin.test.reporting.oasys.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t2-onr-websso-http-7777 = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-onr-websso-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t2-sso.test.reporting.oasys.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -328,7 +370,7 @@ locals {
                   host_header = {
                     values = [
                       "t2.test.reporting.oasys.service.justice.gov.uk",
-                      "maintenance-int.test.reporting.oasys.service.justice.gov.uk",
+                      "t2-sso.test.reporting.oasys.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -357,7 +399,9 @@ locals {
       "test.reporting.oasys.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "t2", type = "A", lbs_map_key = "public" },
+          { name = "t2-admin", type = "A", lbs_map_key = "public" },
           { name = "t2-bods", type = "A", lbs_map_key = "public" },
+          { name = "t2-sso", type = "A", lbs_map_key = "public" },
         ],
       }
     }

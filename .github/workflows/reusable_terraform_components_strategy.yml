@@ -13,10 +13,13 @@ on:
         description: "Matrix JSON string to feed that can be used as strategy in a separate terraform job"
         value: ${{ jobs.strategy.outputs.matrix }}
 
+permissions: {}
 jobs:
   strategy:
     name: "strategy"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       matrix: "${{ steps.strategy.outputs.matrix }}"
     steps:

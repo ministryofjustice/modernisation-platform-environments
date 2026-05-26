@@ -1,0 +1,24 @@
+---
+serviceAccount:
+  create: true
+  annotations:
+    eks.amazonaws.com/role-arn: ${eks_role_arn}
+
+serviceMonitor:
+  enabled: true
+
+webhook:
+  # Required on custom CNI EKS clusters so the control plane can reach this endpoint.
+  hostNetwork: true
+  # Avoid conflict with kubelet's 10250 when hostNetwork is enabled.
+  port: 10260
+
+global:
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule

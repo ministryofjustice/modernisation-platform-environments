@@ -1,10 +1,8 @@
 locals {
 
   lb_maintenance_message_production = {
-    maintenance_title   = "OASys National Reporting Environment Not Started"
-    maintenance_message = "OASys National Reporting Production environment is powered down until we are ready for final configuration. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if you need the environment starting."
-    # maintenance_title   = "OASys National Reporting Maintenance Window"
-    # maintenance_message = "OASys National Reporting is currently unavailable due to planned maintenance. Please try again later."
+    maintenance_title   = "OASys National Reporting Maintenance Window"
+    maintenance_message = "OASys National Reporting is currently unavailable due to planned maintenance. Please try again later."
   }
 
   baseline_presets_production = {
@@ -352,6 +350,28 @@ locals {
                   host_header = {
                     values = [
                       "reporting.oasys.service.justice.gov.uk",
+                      "admin.reporting.oasys.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              legacy-redirect = {
+                priority = 300
+                actions = [{
+                  type = "redirect"
+                  redirect = {
+                    host        = "reporting.oasys.service.justice.gov.uk"
+                    path        = "/BOE/BI"
+                    port        = "443"
+                    protocol    = "HTTPS"
+                    query       = ""
+                    status_code = "HTTP_302"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "onr.oasys.az.justice.gov.uk",
                     ]
                   }
                 }]
@@ -395,6 +415,14 @@ locals {
     }
 
     route53_zones = {
+      "onr.oasys.az.justice.gov.uk" = {
+        records = [
+          # { name = "", type = "A", ttl = "300", records = ["10.40.6.210"] }
+        ]
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "public" },
+        ]
+      }
       "reporting.oasys.service.justice.gov.uk" = {
         ns_records = [
           # use this if NS records can be pulled from terrafrom, otherwise use records variable
@@ -406,6 +434,7 @@ locals {
         ]
         lb_alias_records = [
           { name = "", type = "A", lbs_map_key = "public" },
+          { name = "admin", type = "A", lbs_map_key = "public" },
           { name = "bods", type = "A", lbs_map_key = "public" }
         ],
       }

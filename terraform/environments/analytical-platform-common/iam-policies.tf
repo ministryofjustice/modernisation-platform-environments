@@ -72,13 +72,68 @@ module "ecr_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.60.0"
+  version = "6.4.0"
 
   name_prefix = "ecr-access"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.ecr_access.json
 
   tags = local.tags
+}
+
+data "aws_iam_policy_document" "snyk_analytical_platform_airflow_container_scanning_access" {
+  statement {
+    sid       = "AllowSecretsManagerAccess"
+    effect    = "Allow"
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = [module.snyk_analytical_platform_airflow_container_scanning_secret.secret_arn]
+  }
+}
+
+module "snyk_analytical_platform_airflow_container_scanning_iam_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "6.4.0"
+
+  name_prefix = "snyk-analytical-platform-airflow-container-scanning"
+  description = "IAM Policy"
+
+  policy = data.aws_iam_policy_document.snyk_analytical_platform_airflow_container_scanning_access.json
+
+  tags = local.tags
+}
+
+module "trivy_analytical_platform_airflow_container_scanning_iam_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "6.4.0"
+
+  name_prefix = "trivy-analytical-platform-airflow-container-scanning"
+  description = "IAM Policy"
+
+  policy = data.aws_iam_policy_document.trivy_analytical_platform_airflow_container_scanning_access.json
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "trivy_analytical_platform_airflow_container_scanning_access" {
+  statement {
+    sid       = "GetTrivyArtefacts"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["${module.artifacts_bucket.s3_bucket_arn}/trivy/*"]
+  }
+  statement {
+    sid       = "DecryptObjectsWithBucketKey"
+    effect    = "Allow"
+    actions   = ["kms:Decrypt", "kms:DescribeKey"]
+    resources = [module.s3_artifacts_kms.key_arn]
+  }
 }
 
 data "aws_iam_policy_document" "analytical_platform_terraform" {
@@ -115,9 +170,10 @@ module "analytical_platform_terraform_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.60.0"
+  version = "6.4.0"
 
   name_prefix = "analytical-platform-terraform"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.analytical_platform_terraform.json
 
@@ -130,7 +186,7 @@ data "aws_iam_policy_document" "analytical_platform_github_actions" {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
     resources = [
-      module.analytical_platform_terraform_iam_role.iam_role_arn,
+      module.analytical_platform_terraform_iam_role.arn,
       "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/analytical-platform-infrastructure-access"
     ]
   }
@@ -176,9 +232,10 @@ module "analytical_platform_github_actions_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.60.0"
+  version = "6.4.0"
 
   name_prefix = "analytical-platform-github-actions"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.analytical_platform_github_actions.json
 
@@ -191,7 +248,7 @@ data "aws_iam_policy_document" "data_engineering_datalake_access_github_actions"
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
     resources = [
-      module.data_engineering_datalake_access_terraform_iam_role.iam_role_arn,
+      module.data_engineering_datalake_access_terraform_iam_role.arn,
       "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/data-engineering-datalake-access",
       "arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-test"]}:role/analytical-platform-data-production-share-role",
       "arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-preproduction"]}:role/analytical-platform-data-production-share-role",
@@ -212,9 +269,10 @@ module "data_engineering_datalake_access_github_actions_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.60.0"
+  version = "6.4.0"
 
   name_prefix = "data-engineering-datalake-access-github-actions"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.data_engineering_datalake_access_github_actions.json
 
@@ -255,9 +313,10 @@ module "data_engineering_datalake_access_terraform_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.60.0"
+  version = "6.4.0"
 
   name_prefix = "data-engineering-datalake-access-terraform"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.data_engineering_datalake_access_terraform.json
 

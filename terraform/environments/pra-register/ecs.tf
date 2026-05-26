@@ -153,8 +153,7 @@ EOF
   )
 }
 
-# This is the role ECS uses to manage the task
-# needed by the ECS agent / Fargate to Pull container images from ECR, Write logs, fetch secrets
+
 resource "aws_iam_role_policy" "app_execution" {
   name = "execution-${var.networking[0].application}"
   role = aws_iam_role.app_execution.id

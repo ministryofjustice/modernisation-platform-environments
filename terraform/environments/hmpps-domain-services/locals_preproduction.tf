@@ -32,6 +32,32 @@ locals {
           description = "wildcard cert for hmpps domain load balancer"
         }
       }
+
+      remote_desktop_and_planetfm_wildcard_cert_v3 = {
+        certificate_transparency_logging_preference = false # this should have been set to true
+        cloudwatch_metric_alarms                    = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name                                 = "*.preproduction.hmpps-domain.service.justice.gov.uk"
+        export                                      = true
+        subject_alternate_names = [
+          "*.pp.planetfm.service.justice.gov.uk",
+        ]
+        tags = {
+          description = "wildcard cert for hmpps remote desktop services"
+        }
+      }
+
+      # TM-2057: Oct 2026, use below to replace above 2 certs
+      # remote_desktop_and_planetfm_wildcard_cert_v4 = {
+      #   cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
+      #   domain_name              = "*.preproduction.hmpps-domain.service.justice.gov.uk"
+      #   export                   = true
+      #   subject_alternate_names = [
+      #     "*.pp.planetfm.service.justice.gov.uk",
+      #   ]
+      #   tags = {
+      #     description = "wildcard cert for hmpps remote desktop services"
+      #   }
+      # }
     }
 
     cloudwatch_dashboards = {
@@ -237,7 +263,7 @@ locals {
       maintenance_window_cutoff   = 1 # 2 for prod
       patch_classifications = {
         # REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
+        WINDOWS = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups", "ServicePacks", "Updates"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
       }
     }
 

@@ -40,14 +40,14 @@ locals {
       nomis-pp    = ["c.preproduction.nomis.service.justice.gov.uk", true, "nomis-pagerduty"]
 
       # nomis-combined-reporting
-      nomis-reporting-pp-aws   = ["preproduction.reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
-      nomis-reporting-pp-admin = ["admin.preproduction.reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
+      nomis-reporting-pp-aws = ["preproduction.reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
 
       # oasys
       oasys-pp = ["pp.oasys.service.justice.gov.uk", true, "oasys-pagerduty"]
 
       # oasys-national-reporting
-      onr-pp = ["onr.pp-oasys.az.justice.gov.uk", true, "oasys-national-reporting-pagerduty"]
+      onr-pp-az-redirect = ["onr.pp-oasys.az.justice.gov.uk", true, "oasys-national-reporting-pagerduty"]
+      onr-pp             = ["preproduction.reporting.oasys.service.justice.gov.uk", true, "oasys-national-reporting-pagerduty"]
 
       # planetfm - alarms disabled on request from Glenn
       #cafmtx-pp   = ["cafmtx.pp.planetfm.service.justice.gov.uk", true, "planetfm-pagerduty"]
@@ -74,8 +74,7 @@ locals {
       nomis = ["c.nomis.az.justice.gov.uk", true, "nomis-pagerduty"]
 
       # nomis-combined-reporting
-      nomis-reporting-aws   = ["reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
-      nomis-reporting-admin = ["admin.reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
+      nomis-reporting = ["reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
 
       # oasys
       oasys          = ["oasys.service.justice.gov.uk", true, "oasys-pagerduty"]
@@ -84,7 +83,8 @@ locals {
       oasys-training = ["training.int.oasys.service.justice.gov.uk", true, "oasys-pagerduty"]
 
       # oasys-national-reporting
-      onr = ["onr.oasys.az.justice.gov.uk", true, "oasys-national-reporting-pagerduty"]
+      onr-az-redirect = ["onr.oasys.az.justice.gov.uk", true, "oasys-national-reporting-pagerduty"]
+      onr             = ["reporting.oasys.service.justice.gov.uk", true, "oasys-national-reporting-pagerduty"]
 
       # planetfm - alarms disabled on request from Glenn
       #cafmtrainweb = ["cafmtrainweb.planetfm.service.justice.gov.uk", true, "planetfm-pagerduty"]

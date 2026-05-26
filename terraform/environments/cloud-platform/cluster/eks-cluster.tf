@@ -56,11 +56,38 @@ module "eks" {
       taints                 = local.environment_configuration.monitoring_ng.taints
       labels                 = local.environment_configuration.monitoring_ng.labels
     }
+    system_ng = {
+      ami_type               = local.environment_configuration.ami_type
+      desired_size           = local.environment_configuration.system_ng.desired_capacity
+      max_size               = local.environment_configuration.system_ng.max_size
+      min_size               = local.environment_configuration.system_ng.min_size
+      instance_types         = local.environment_configuration.system_ng.instance_types
+      block_device_mappings  = local.environment_configuration.system_ng.block_device_mappings
+      subnet_ids             = data.aws_subnets.eks_private.ids
+      name                   = "${local.cluster_name}-sys-ng"
+      create_security_group  = true
+      create_launch_template = true
+      taints                 = local.environment_configuration.system_ng.taints
+      labels                 = local.environment_configuration.system_ng.labels
+    }
   }
 
   addons = {
     coredns = {
       #   addon_version = local.environment_configuration.eks_cluster_addon_versions.coredns
+      configuration_values = jsonencode({
+        nodeSelector = {
+          "cloud-platform.justice.gov.uk/system-ng" = "true"
+        }
+        tolerations = [
+          {
+            key      = "system-node"
+            value    = "true"
+            effect   = "NoSchedule"
+            operator = "Equal"
+          }
+        ]
+      })
     }
     kube-proxy = {
       #   addon_version = local.environment_configuration.eks_cluster_addon_versions.kube_proxy
@@ -77,6 +104,21 @@ module "eks" {
     }
 
     aws-ebs-csi-driver = {
+      configuration_values = jsonencode({
+        controller = {
+          nodeSelector = {
+            "cloud-platform.justice.gov.uk/system-ng" = "true"
+          }
+          tolerations = [
+            {
+              key      = "system-node"
+              value    = "true"
+              effect   = "NoSchedule"
+              operator = "Equal"
+            }
+          ]
+        }
+      })
     }
 
   }

@@ -4,8 +4,15 @@ locals {
   environment_config_preprod = {
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
     legacy_counterpart_vpc_cidr            = "10.160.0.0/20"
+    legacy_ad_domain_name                  = "delius-pre-prod.local"
+    legacy_dns_ip_addrs                    = ["10.160.0.163", "10.160.6.66"]
     ad_domain_name                         = "delius-mis-preprod.internal"
+    ad_trust_domain_name                   = "azure.hmpp.root"
+    ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
+    ad_trust_dns_ip_addrs                  = module.ip_addresses.mp_ips.ad_fixngo_hmpp_domain_controllers
+    core_shared_services_vpc_cidr          = module.ip_addresses.mp_cidr["core-shared-services-live-data-additional"]
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
+    lb_additional_allowed_public_cidrs     = module.ip_addresses.mp_cidrs.live_eu_west_nat
     migration_environment_full_name        = "del-pre-prod"
     migration_environment_abbreviated_name = "del"
     migration_environment_short_name       = "pre-prod"
@@ -21,44 +28,43 @@ locals {
     extra_user_data_content = "yum install -y openldap-clients"
   }
 
-  bcs_config_preprod = {
-    instance_count = 0
-    ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
-    ansible_branch = "main"
-    ebs_volumes = {
-      "/dev/sda1" = { label = "root", size = 150 }
-      "/dev/xvdf" = { label = "data", size = 300 }
+  boe_efs_config_preprod = {
+    availability_zone_name = "eu-west-2a"
+    mount_targets_subnet_ids = {
+      single-az = data.aws_subnets.shared-private-a.ids[0]
     }
+    # For multi-az, use:
+    # availability_zone_name = null
+    # mount_targets_subnet_ids = {
+    #   multi-az-a = data.aws_subnets.shared-private-a.ids[0]
+    #   multi-az-b = data.aws_subnets.shared-private-b.ids[0]
+    #   multi-az-c = data.aws_subnets.shared-private-c.ids[0]
+    # }
+  }
 
-    ebs_volumes_config = {
-      data = {
-        iops       = 3000
-        throughput = 125
-        type       = "gp3"
-      }
-      root = {
-        iops       = 3000
-        throughput = 125
-        type       = "gp3"
-      }
+  bcs_config_preprod = {
+    instance_count = 2
+    ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
+    ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
+    ansible_branch = "TM-2058/delius-mis/preprod-config"
+    ebs_volumes = {
+      "/dev/sda1" = { label = "root", size = 150, type = "gp3" } # 100GB would be OK
+      "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }
+      "/dev/sdc"  = { label = "data", size = 100, type = "gp3" }
+      "/dev/sds"  = { label = "swap", size = 8, type = "gp3" }
     }
+    ebs_volumes_config = {}
 
     instance_config = {
       associate_public_ip_address  = false
       disable_api_termination      = false
       disable_api_stop             = false
-      instance_type                = "t3.xlarge"
+      instance_type                = "r7i.2xlarge"
       metadata_endpoint_enabled    = "enabled"
       key_name                     = null
       metadata_options_http_tokens = "required"
       monitoring                   = true
       ebs_block_device_inline      = true
-
-      private_dns_name_options = {
-        enable_resource_name_dns_aaaa_record = false
-        enable_resource_name_dns_a_record    = true
-        hostname_type                        = "resource-name"
-      }
 
       tags = merge(
         local.tags,
@@ -68,42 +74,28 @@ locals {
   }
 
   bps_config_preprod = {
-    instance_count = 0
-    ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
+    instance_count = 4
+    ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
+    ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
+    ansible_branch = "TM-2058/delius-mis/preprod-config"
     ebs_volumes = {
-      "/dev/sda1" = { label = "root", size = 150 }
-      "/dev/xvdf" = { label = "data", size = 300 }
+      "/dev/sda1" = { label = "root", size = 100, type = "gp3" }
+      "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }
+      "/dev/sdc"  = { label = "data", size = 100, type = "gp3" }
+      "/dev/sds"  = { label = "swap", size = 8, type = "gp3" }
     }
-
-    ebs_volumes_config = {
-      data = {
-        iops       = 3000
-        throughput = 125
-        type       = "gp3"
-      }
-      root = {
-        iops       = 3000
-        throughput = 125
-        type       = "gp3"
-      }
-    }
+    ebs_volumes_config = {}
 
     instance_config = {
       associate_public_ip_address  = false
       disable_api_termination      = false
       disable_api_stop             = false
-      instance_type                = "t3.xlarge"
+      instance_type                = "r7i.2xlarge"
       metadata_endpoint_enabled    = "enabled"
       key_name                     = null
       metadata_options_http_tokens = "required"
       monitoring                   = true
       ebs_block_device_inline      = true
-
-      private_dns_name_options = {
-        enable_resource_name_dns_aaaa_record = false
-        enable_resource_name_dns_a_record    = true
-        hostname_type                        = "resource-name"
-      }
 
       tags = merge(
         local.tags,
@@ -113,42 +105,28 @@ locals {
   }
 
   bws_config_preprod = {
-    instance_count = 0
-    ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
+    instance_count = 1
+    ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
+    ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
+    ansible_branch = "TM-2058/delius-mis/preprod-config"
     ebs_volumes = {
-      "/dev/sda1" = { label = "root", size = 150 }
-      "/dev/xvdf" = { label = "data", size = 300 }
+      "/dev/sda1" = { label = "root", size = 100, type = "gp3" }
+      "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }
+      "/dev/sdc"  = { label = "data", size = 100, type = "gp3" }
+      "/dev/sds"  = { label = "swap", size = 8, type = "gp3" }
     }
-
-    ebs_volumes_config = {
-      data = {
-        iops       = 3000
-        throughput = 125
-        type       = "gp3"
-      }
-      root = {
-        iops       = 3000
-        throughput = 125
-        type       = "gp3"
-      }
-    }
+    ebs_volumes_config = {}
 
     instance_config = {
       associate_public_ip_address  = false
       disable_api_termination      = false
       disable_api_stop             = false
-      instance_type                = "t3.xlarge"
+      instance_type                = "r7i.xlarge"
       metadata_endpoint_enabled    = "enabled"
       key_name                     = null
       metadata_options_http_tokens = "required"
       monitoring                   = true
       ebs_block_device_inline      = true
-
-      private_dns_name_options = {
-        enable_resource_name_dns_aaaa_record = false
-        enable_resource_name_dns_a_record    = true
-        hostname_type                        = "resource-name"
-      }
 
       tags = merge(
         local.tags,
@@ -158,10 +136,10 @@ locals {
   }
 
   dis_config_preprod = {
-    instance_count    = 0
-    ami_name          = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
-    computer_name     = "NDMIS-PP-DIS" # 15 char limit
-    powershell_branch = "main"
+    instance_count    = 1
+    ami_name          = "delius_mis_windows_server_patch_2025-10-01T13-00-02.504Z"
+    computer_name     = "NDMIS-PRE-DIS" # 15 char limit
+    powershell_branch = "TM-2016/delius-mis/preprod-dis-build"
 
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100 }
@@ -185,7 +163,7 @@ locals {
       associate_public_ip_address  = false
       disable_api_termination      = false
       disable_api_stop             = false
-      instance_type                = "t3.xlarge"
+      instance_type                = "r6i.4xlarge"
       metadata_endpoint_enabled    = "enabled"
       key_name                     = null
       metadata_options_http_tokens = "required"
@@ -248,20 +226,62 @@ locals {
         }
       )
     }
-    # Load balancer configuration for DFI
-    lb_target_config = {
-      endpoint             = "ndl-dfi"
-      port                 = 8080
-      health_check_path    = "/DataServices/"
-      health_check_matcher = "200,302,301"
+  }
+
+  bcs_config_win_preprod = {
+    instance_count    = 1
+    ami_name          = "delius_mis_windows_server_patch_2025-10-01T13-00-02.504Z"
+    computer_name     = "NDMIS-PP-BCS" # 15 char limit
+    powershell_branch = "TM-2005/ndmis/windows-initial-config"
+
+    ebs_volumes = {
+      "/dev/sda1" = { label = "root", size = 100 }
+      "/dev/xvdf" = { label = "data", size = 300 }
+    }
+
+    ebs_volumes_config = {
+      data = {
+        iops       = 3000
+        throughput = 125
+        type       = "gp3"
+      }
+      root = {
+        iops       = 3000
+        throughput = 125
+        type       = "gp3"
+      }
+    }
+
+    instance_config = {
+      associate_public_ip_address  = false
+      disable_api_termination      = false
+      disable_api_stop             = false
+      instance_type                = "r6i.4xlarge"
+      metadata_endpoint_enabled    = "enabled"
+      key_name                     = null
+      metadata_options_http_tokens = "required"
+      monitoring                   = true
+      ebs_block_device_inline      = true
+
+      private_dns_name_options = {
+        enable_resource_name_dns_aaaa_record = false
+        enable_resource_name_dns_a_record    = true
+        hostname_type                        = "resource-name"
+      }
+
+      tags = merge(
+        local.tags,
+        { backup = true }
+      )
     }
   }
 
   # BOE DB config
   boe_db_config_preprod = {
-    instance_count = 0
-    instance_type  = "m7i.large"
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    primary_instance_count = 0
+    standby_instance_count = 0
+    instance_type          = "m7i.large"
+    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -304,9 +324,10 @@ locals {
 
   # DSD DB config
   dsd_db_config_preprod = {
-    instance_count = 0
-    instance_type  = "r7i.large"
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    primary_instance_count = 0
+    standby_instance_count = 0
+    instance_type          = "r7i.large"
+    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -349,9 +370,10 @@ locals {
 
   # MIS DB config
   mis_db_config_preprod = {
-    instance_count = 0
-    instance_type  = "r7i.12xlarge"
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    primary_instance_count = 1
+    standby_instance_count = 1
+    instance_type          = "r7i.12xlarge"
+    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -378,10 +400,10 @@ locals {
         type       = "gp3"
       }
       data = {
-        iops       = 5000
-        throughput = 500
+        iops       = 7680
+        throughput = 480
         type       = "gp3"
-        total_size = 6000
+        total_size = 7000
       }
       flash = {
         iops       = 3000
@@ -399,11 +421,28 @@ locals {
   }
 
   fsx_config_preprod = {
-    storage_capacity     = 200
-    throughtput_capacity = 16
+    storage_capacity     = 1000 # temporarily increasing for prod->stage migration, was 200
+    throughtput_capacity = 128  # temporarily increasing for prod->stage migration, was 16
   }
 
   dfi_report_bucket_config_preprod = null
 
-  lb_config_preprod = null
+  lb_config_preprod = {
+    bucket_policy_enabled = true
+  }
+
+  datasync_config_preprod = null
+
+  db_backup_config_preprod = {
+    object_lock_days             = 1
+    expire_current_after_days    = 200
+    expire_noncurrent_after_days = 10
+    transition = [
+      {
+        days          = 30
+        storage_class = "STANDARD_IA"
+      }
+    ]
+  }
+
 }

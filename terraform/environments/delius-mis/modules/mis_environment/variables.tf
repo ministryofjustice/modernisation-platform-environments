@@ -35,6 +35,16 @@ variable "bws_config" {
   type = any
 }
 
+variable "bws_sso_config" {
+  type    = any
+  default = null
+}
+
+variable "bcs_config_win" {
+  type    = any
+  default = null
+}
+
 variable "boe_efs_config" {
   type    = any
   default = null
@@ -145,4 +155,8 @@ variable "create_backup_role" {
   description = "Role used to run AWS Backups i.e. AWSBackupDefaultServiceRole"
   type        = bool
   default     = false
+}
+
+variable "db_backup_config" {
+  type = any
 }

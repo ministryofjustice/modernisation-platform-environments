@@ -4,8 +4,15 @@ locals {
   environment_config_dev = {
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
     legacy_counterpart_vpc_cidr            = "10.162.32.0/20"
+    legacy_ad_domain_name                  = null
+    legacy_dns_ip_addrs                    = []
     ad_domain_name                         = "delius-mis-dev.internal"
+    ad_trust_domain_name                   = "azure.noms.root"
+    ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.azure.domain_controllers
+    ad_trust_dns_ip_addrs                  = module.ip_addresses.mp_ips.ad_fixngo_azure_domain_controllers
+    core_shared_services_vpc_cidr          = module.ip_addresses.mp_cidr["core-shared-services-non-live-data"]
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
+    lb_additional_allowed_public_cidrs     = module.ip_addresses.mp_cidrs.non_live_eu_west_nat
     migration_environment_full_name        = "dmd-mis-dev"
     migration_environment_abbreviated_name = "dmd"
     migration_environment_short_name       = "mis-dev"
@@ -175,13 +182,6 @@ locals {
         }
       )
     }
-    # Load balancer configuration for DIS
-    lb_target_config = {
-      endpoint             = "ndl-dis"
-      port                 = 8080
-      health_check_path    = "/BOE/CMC/"
-      health_check_matcher = "200,302,301"
-    }
   }
   # automation test instance only - do not use
   auto_config_dev = {
@@ -272,19 +272,14 @@ locals {
         }
       )
     }
-    # Load balancer configuration for DFI
-    lb_target_config = {
-      endpoint             = "ndl-dfi"
-      port                 = 8080
-      health_check_path    = "/DataServices/"
-      health_check_matcher = "200,302,301"
-    }
   }
 
   # base config for each database
   base_db_config_dev = {
-    instance_type  = "m7i.large"
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    instance_type           = "m7i.large"
+    primary_instance_count  = 1
+    standby_instance_count  = 0
+    ami_name_regex          = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -357,4 +352,12 @@ locals {
   datasync_config_dev = {
     source_s3_bucket_arn = "arn:aws:s3:::eu-west-2-delius-mis-dev-dfi-extracts" # differs per environment
   }
+
+  db_backup_config_dev = {
+    object_lock_days             = 3
+    expire_current_after_days    = 80
+    expire_noncurrent_after_days = 10
+  }
+
 }
+

@@ -14,6 +14,12 @@ locals {
 
   bws_enabled = var.lb_config != null && var.bws_config != null && var.bws_config.instance_count > 0
   bws_fqdn    = "${var.env_name}.${var.account_config.dns_suffix}"
+
+  bws_sso_enabled = var.lb_config != null && var.bws_sso_config != null && var.bws_sso_config.instance_count > 0
+  bws_sso_fqdn    = "sso.${var.env_name}.${var.account_config.dns_suffix}"
+
+  bcs_win_enabled = var.lb_config != null && var.bcs_config_win != null && var.bcs_config_win.instance_count > 0
+  bcs_win_fqdn    = "ndl-bcs.${var.env_name}.${var.account_config.dns_suffix}"
 }
 
 # Main security group for ALB
@@ -94,9 +100,26 @@ resource "aws_vpc_security_group_egress_rule" "mis_alb_egress" {
   tags = local.tags
 }
 
+resource "aws_vpc_security_group_egress_rule" "mis_alb_egress_bcs_win" {
+  for_each = local.bcs_win_enabled ? {
+    http8080-to-bcs-win = { referenced_security_group_id = aws_security_group.bcs_ec2.id, ip_protocol = "tcp", port = 8080 }
+  } : {}
+
+  description       = each.key
+  security_group_id = resource.aws_security_group.mis_alb.id
+
+  cidr_ipv4                    = lookup(each.value, "cidr_ipv4", null)
+  ip_protocol                  = lookup(each.value, "ip_protocol", "-1")
+  from_port                    = lookup(each.value, "port", lookup(each.value, "from_port", null))
+  to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
+  referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
+
+  tags = local.tags
+}
+
 # HTTP rules for staff access
 resource "aws_vpc_security_group_ingress_rule" "mis_alb_http_staff" {
-  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_staff) > 0 ? toset(local.internal_security_group_cidrs_staff) : []
+  for_each          = var.lb_config != null ? toset(var.account_config.security_group_cidrs_staff) : []
   security_group_id = aws_security_group.mis_alb_staff[0].id
   cidr_ipv4         = each.value
   ip_protocol       = "tcp"
@@ -109,7 +132,7 @@ resource "aws_vpc_security_group_ingress_rule" "mis_alb_http_staff" {
 
 # HTTPS rules for staff access
 resource "aws_vpc_security_group_ingress_rule" "mis_alb_https_staff" {
-  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_staff) > 0 ? toset(local.internal_security_group_cidrs_staff) : []
+  for_each          = var.lb_config != null ? toset(var.account_config.security_group_cidrs_staff) : []
   security_group_id = aws_security_group.mis_alb_staff[0].id
   cidr_ipv4         = each.value
   ip_protocol       = "tcp"
@@ -122,7 +145,7 @@ resource "aws_vpc_security_group_ingress_rule" "mis_alb_https_staff" {
 
 # HTTP rules for MOJO access
 resource "aws_vpc_security_group_ingress_rule" "mis_alb_http_mojo" {
-  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_mojo) > 0 ? toset(local.internal_security_group_cidrs_mojo) : []
+  for_each          = var.lb_config != null ? toset(var.account_config.security_group_cidrs_mojo) : []
   security_group_id = aws_security_group.mis_alb_mojo[0].id
   cidr_ipv4         = each.value
   ip_protocol       = "tcp"
@@ -135,7 +158,7 @@ resource "aws_vpc_security_group_ingress_rule" "mis_alb_http_mojo" {
 
 # HTTPS rules for MOJO access
 resource "aws_vpc_security_group_ingress_rule" "mis_alb_https_mojo" {
-  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_mojo) > 0 ? toset(local.internal_security_group_cidrs_mojo) : []
+  for_each          = var.lb_config != null ? toset(var.account_config.security_group_cidrs_mojo) : []
   security_group_id = aws_security_group.mis_alb_mojo[0].id
   cidr_ipv4         = each.value
   ip_protocol       = "tcp"
@@ -148,7 +171,7 @@ resource "aws_vpc_security_group_ingress_rule" "mis_alb_https_mojo" {
 
 # HTTP rules for infrastructure access
 resource "aws_vpc_security_group_ingress_rule" "mis_alb_http_infrastructure" {
-  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_infrastructure) > 0 ? toset(local.internal_security_group_cidrs_infrastructure) : []
+  for_each          = var.lb_config != null ? toset(var.account_config.security_group_cidrs_infrastructure) : []
   security_group_id = aws_security_group.mis_alb_infrastructure[0].id
   cidr_ipv4         = each.value
   ip_protocol       = "tcp"
@@ -161,13 +184,39 @@ resource "aws_vpc_security_group_ingress_rule" "mis_alb_http_infrastructure" {
 
 # HTTPS rules for infrastructure access
 resource "aws_vpc_security_group_ingress_rule" "mis_alb_https_infrastructure" {
-  for_each          = var.lb_config != null && length(local.internal_security_group_cidrs_infrastructure) > 0 ? toset(local.internal_security_group_cidrs_infrastructure) : []
+  for_each          = var.lb_config != null ? toset(var.account_config.security_group_cidrs_infrastructure) : []
   security_group_id = aws_security_group.mis_alb_infrastructure[0].id
   cidr_ipv4         = each.value
   ip_protocol       = "tcp"
   from_port         = 443
   to_port           = 443
   description       = "Allow HTTPS traffic from infrastructure networks: ${each.value}"
+
+  tags = local.tags
+}
+
+# HTTP rules for staff access
+resource "aws_vpc_security_group_ingress_rule" "mis_alb_http_additional" {
+  for_each          = var.lb_config != null ? toset(var.environment_config.lb_additional_allowed_public_cidrs) : []
+  security_group_id = aws_security_group.mis_alb_staff[0].id
+  cidr_ipv4         = each.value
+  ip_protocol       = "tcp"
+  from_port         = 80
+  to_port           = 80
+  description       = "Allow HTTP traffic from ${each.value}"
+
+  tags = local.tags
+}
+
+# HTTPS rules for staff access
+resource "aws_vpc_security_group_ingress_rule" "mis_alb_https_additional" {
+  for_each          = var.lb_config != null ? toset(var.environment_config.lb_additional_allowed_public_cidrs) : []
+  security_group_id = aws_security_group.mis_alb_staff[0].id
+  cidr_ipv4         = each.value
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  description       = "Allow HTTPS traffic from ${each.value}"
 
   tags = local.tags
 }
@@ -315,6 +364,80 @@ resource "aws_lb_target_group" "bws" {
   )
 }
 
+# Target Group for BWS SSO instances - only created if BWS SSO instances exist
+resource "aws_lb_target_group" "bws_sso" {
+  count    = local.bws_sso_enabled ? 1 : 0
+  name     = "${local.lb_name}-bws-sso-tg"
+  port     = 7777
+  protocol = "HTTP"
+  vpc_id   = var.account_config.shared_vpc_id
+
+  # Deregistration delay - how long to wait before deregistering targets
+  deregistration_delay = 30
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+    timeout             = 10
+    interval            = 30
+    path                = "/BOE/CMC/"
+    matcher             = "200,302,301"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+  }
+
+  stickiness {
+    type            = "lb_cookie"
+    enabled         = true
+    cookie_duration = 86400 # 1 day
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.lb_name}-bws-sso-tg"
+    },
+  )
+}
+
+# Target Group for BCS_WIN instances - only created if BCS_WIN instances exist
+resource "aws_lb_target_group" "bcs_win" {
+  count    = local.bcs_win_enabled ? 1 : 0
+  name     = "${local.lb_name}-bcs-win-tg"
+  port     = 8080
+  protocol = "HTTP"
+  vpc_id   = var.account_config.shared_vpc_id
+
+  # Deregistration delay - how long to wait before deregistering targets
+  deregistration_delay = 30
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+    timeout             = 10
+    interval            = 30
+    path                = "/BOE/CMC/"
+    matcher             = "200,302,301"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+  }
+
+  stickiness {
+    type            = "lb_cookie"
+    enabled         = true
+    cookie_duration = 86400 # 1 day
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.lb_name}-bcs-win-tg"
+    },
+  )
+}
+
 # HTTP listener - redirect to HTTPS
 resource "aws_lb_listener" "mis_http" {
   count = var.lb_config != null ? 1 : 0
@@ -416,6 +539,44 @@ resource "aws_lb_listener_rule" "bws_https" {
   tags = local.tags
 }
 
+resource "aws_lb_listener_rule" "bws_sso_https" {
+  count        = local.bws_sso_enabled ? 1 : 0
+  listener_arn = aws_lb_listener.mis_https[0].arn
+  priority     = 350
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.bws_sso[0].arn
+  }
+
+  condition {
+    host_header {
+      values = [local.bws_sso_fqdn]
+    }
+  }
+
+  tags = local.tags
+}
+
+resource "aws_lb_listener_rule" "bcs_win_https" {
+  count        = local.bcs_win_enabled ? 1 : 0
+  listener_arn = aws_lb_listener.mis_https[0].arn
+  priority     = 400
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.bcs_win[0].arn
+  }
+
+  condition {
+    host_header {
+      values = [local.bcs_win_fqdn]
+    }
+  }
+
+  tags = local.tags
+}
+
 # ACM certificate using the modernisation platform pattern - dynamically includes SANs based on enabled services
 module "acm_certificate" {
   count  = var.lb_config != null ? 1 : 0
@@ -475,6 +636,22 @@ resource "aws_lb_target_group_attachment" "bws_attachment" {
   port             = 7777
 }
 
+# Attach BWS SSO instances to the target group - only if BWS SSO is enabled
+resource "aws_lb_target_group_attachment" "bws_sso_attachment" {
+  count            = local.bws_sso_enabled ? var.bws_sso_config.instance_count : 0
+  target_group_arn = aws_lb_target_group.bws_sso[0].arn
+  target_id        = module.bws_sso_instance[count.index].aws_instance.id
+  port             = 7777
+}
+
+# Attach BCS_WIN instances to the target group - only if BCS_WIN is enabled
+resource "aws_lb_target_group_attachment" "bcs_win_attachment" {
+  count            = local.bcs_win_enabled ? var.bcs_config_win.instance_count : 0
+  target_group_arn = aws_lb_target_group.bcs_win[0].arn
+  target_id        = module.bcs_win_instance[count.index].aws_instance.id
+  port             = 8080
+}
+
 # Create route53 entry for DFI - only if DFI is enabled
 resource "aws_route53_record" "dfi_entry" {
   count    = local.dfi_enabled ? 1 : 0
@@ -514,6 +691,38 @@ resource "aws_route53_record" "bws_entry" {
 
   zone_id = var.account_config.route53_external_zone.zone_id
   name    = local.bws_fqdn
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.mis[0].dns_name
+    zone_id                = aws_lb.mis[0].zone_id
+    evaluate_target_health = false
+  }
+}
+
+# Create route53 entry for BWS SSO - only if BWS SSO is enabled
+resource "aws_route53_record" "bws_sso_entry" {
+  count    = local.bws_sso_enabled ? 1 : 0
+  provider = aws.core-vpc
+
+  zone_id = var.account_config.route53_external_zone.zone_id
+  name    = local.bws_sso_fqdn
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.mis[0].dns_name
+    zone_id                = aws_lb.mis[0].zone_id
+    evaluate_target_health = false
+  }
+}
+
+# Create route53 entry for BCS_WIN - only if BCS_WIN is enabled
+resource "aws_route53_record" "bcs_win_entry" {
+  count    = local.bcs_win_enabled ? 1 : 0
+  provider = aws.core-vpc
+
+  zone_id = var.account_config.route53_external_zone.zone_id
+  name    = local.bcs_win_fqdn
   type    = "A"
 
   alias {

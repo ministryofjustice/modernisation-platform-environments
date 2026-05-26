@@ -1,9 +1,12 @@
 # ------------------------------------------------------------------------------
-# Incident-threaded Slack notifications for CloudWatch alarms (Amazon Q/Chatbot)
+# Incident-threaded Slack notifications for CloudWatch alarms
 #
 # - Triggered by EventBridge "CloudWatch Alarm State Change"
-# - Uses S3 as state store: alarm-threading/current/<env>/<alarm_name>.json
+# - Uses S3 as state store:
+#   alarm-threading/current/<env>/<alarm_name>.json
 # - Publishes Amazon Q custom notifications to the existing emds_alerts SNS topic
+# - Starts the staged DB janitor Step Functions workflow only for the
+#   glue_database_count_high alarm
 # ------------------------------------------------------------------------------
 
 locals {
@@ -19,20 +22,28 @@ locals {
 # ------------------------------------------------------------------------------
 
 resource "aws_cloudwatch_event_rule" "alarm_state_change_threader" {
-  name        = "emds-alarm-state-change-threader-${local.environment_shorthand}"
+  name = "emds-alarm-state-change-threader-${local.environment_shorthand}"
+
   description = "Routes CloudWatch ALARM/OK state changes to cloudwatch_alarm_threader for incident-threaded Slack notifications"
 
-  event_pattern = jsonencode({
-    "source" : ["aws.cloudwatch"],
-    "detail-type" : ["CloudWatch Alarm State Change"],
-    "detail" : {
-      "alarmName" : [
-        aws_cloudwatch_metric_alarm.load_mdss_dlq_alarm.alarm_name,
-        aws_cloudwatch_metric_alarm.clean_dlt_dlq_alarm.alarm_name,
-        aws_cloudwatch_metric_alarm.glue_database_count_high.alarm_name
-      ]
+  event_pattern = jsonencode(
+    {
+      "source" : ["aws.cloudwatch"],
+      "detail-type" : ["CloudWatch Alarm State Change"],
+      "detail" : {
+        "alarmName" : concat(
+          [
+            aws_cloudwatch_metric_alarm.glue_database_count_high.alarm_name,
+            aws_cloudwatch_metric_alarm.mdss_reconciler_errors_alarm[0].alarm_name
+          ],
+          [
+            for _, alarm in aws_cloudwatch_metric_alarm.sqs_dlq_has_messages :
+            alarm.alarm_name
+          ]
+        )
+      }
     }
-  })
+  )
 }
 
 resource "aws_cloudwatch_event_target" "alarm_state_change_threader" {

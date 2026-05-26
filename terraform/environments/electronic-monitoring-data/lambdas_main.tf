@@ -1,8 +1,9 @@
 locals {
-  lambda_path                = "lambdas"
-  env_name                   = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
-  db_name                    = local.is-production ? "g4s_cap_dw" : "test"
-  load_sqs_max_receive_count = 2
+  lambda_path                     = "lambdas"
+  env_name                        = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  db_name                         = local.is-production ? "g4s_cap_dw" : "test"
+  load_sqs_max_receive_count      = 2
+  load_mdss_sqs_max_receive_count = 8
 }
 
 
@@ -46,7 +47,7 @@ module "unzip_single_file" {
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
     BUCKET_NAME        = module.s3-data-bucket.bucket.id
-    EXPORT_BUCKET_NAME = module.s3-unzipped-files-bucket.bucket.id
+    EXPORT_BUCKET_NAME = module.s3-ears-sars-bucket.bucket.id
   }
 }
 
@@ -147,9 +148,10 @@ module "virus_scan_file" {
 # Process live files
 #-----------------------------------------------------------------------------------
 
-module "format_json_fms_data" {
+module "fms_raw_file_formatter" {
   source                         = "./modules/lambdas"
-  function_name                  = "format_json_fms_data"
+  function_name                  = "fms_raw_file_formatter"
+  image_name                     = "format_json_fms_data"
   is_image                       = true
   role_name                      = aws_iam_role.format_json_fms_data.name
   role_arn                       = aws_iam_role.format_json_fms_data.arn
@@ -165,9 +167,9 @@ module "format_json_fms_data" {
   }
 }
 
-module "copy_mdss_data" {
+module "mdss_raw_file_stager" {
   source                         = "./modules/lambdas"
-  function_name                  = "copy_mdss_data"
+  function_name                  = "mdss_raw_file_stager"
   image_name                     = "copy_data"
   is_image                       = true
   role_name                      = aws_iam_role.copy_mdss_data.name
@@ -243,7 +245,7 @@ module "calculate_checksum" {
 # DMS Validation Lambdas
 #-----------------------------------------------------------------------------------
 module "dms_retrieve_metadata" {
-  count = local.is-development || local.is-production ? 1 : 0
+  count = local.is-development || local.is-production || local.is-preproduction ? 1 : 0
 
   source                  = "./modules/lambdas"
   is_image                = true
@@ -266,7 +268,7 @@ module "dms_retrieve_metadata" {
 
 
 module "dms_validation" {
-  count = local.is-development || local.is-production ? 1 : 0
+  count = local.is-development || local.is-production || local.is-preproduction ? 1 : 0
 
   source                  = "./modules/lambdas"
   is_image                = true
@@ -294,10 +296,11 @@ module "dms_validation" {
 # Process FMS metadata
 #-----------------------------------------------------------------------------------
 
-module "process_fms_metadata" {
+module "fms_expected_file_processor" {
   source                         = "./modules/lambdas"
   is_image                       = true
-  function_name                  = "process_fms_metadata"
+  function_name                  = "fms_expected_file_processor"
+  image_name                     = "process_fms_metadata"
   role_name                      = aws_iam_role.process_fms_metadata.name
   role_arn                       = aws_iam_role.process_fms_metadata.arn
   handler                        = "process_fms_metadata.handler"
@@ -312,8 +315,8 @@ module "process_fms_metadata" {
     SQS_QUEUE_URL                = aws_sqs_queue.format_fms_json_event_queue.id
     POWERTOOLS_METRICS_NAMESPACE = "FMSLiveFeed"
     POWERTOOLS_SERVICE_NAME      = "process-fms-metadata-lambda"
-    SNS_TOPIC_ARN  = aws_sns_topic.emds_alerts.arn
-    ENVIRONMENT_NAME    = local.environment_shorthand
+    SNS_TOPIC_ARN                = aws_sns_topic.emds_alerts.arn
+    ENVIRONMENT_NAME             = local.environment_shorthand
   }
 }
 
@@ -361,16 +364,20 @@ module "load_mdss_lambda" {
   ephemeral_storage_size         = 10240
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
-  security_group_ids             = [aws_security_group.lambda_generic.id]
-  subnet_ids                     = data.aws_subnets.shared-private.ids
   cloudwatch_retention_days      = 7
+
   environment_variables = {
-    ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
-    ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
-    STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
-    ENVIRONMENT_NAME    = local.environment_shorthand
-    CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
-    MAX_RECEIVE_COUNT   = tostring(local.load_sqs_max_receive_count)
+    ATHENA_QUERY_BUCKET                     = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER                          = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET                          = module.s3-create-a-derived-table-bucket.bucket.id
+    ENVIRONMENT_NAME                        = local.environment_shorthand
+    CLEANUP_QUEUE_URL                       = aws_sqs_queue.clean_dlt_load_queue.id
+    MAX_RECEIVE_COUNT                       = tostring(local.load_mdss_sqs_max_receive_count)
+    MDSS_MANIFEST_BUCKET                    = module.s3-metadata-bucket.bucket.id
+    MDSS_MANIFEST_PREFIX                    = "mdss-manifest/current"
+    STUCK_STARTED_MINUTES                   = "60"
+    AUTO_REDRIVE_TRANSIENT_COOLDOWN_MINUTES = "60"
+    AUTO_REDRIVE_UNKNOWN_COOLDOWN_MINUTES   = "60"
   }
 }
 
@@ -509,10 +516,11 @@ module "data_cutback" {
 # MDSS daily failure digest Lambda
 #-----------------------------------------------------------------------------------
 
-module "mdss_daily_failure_digest" {
+module "live_feed_daily_handover" {
   source                         = "./modules/lambdas"
   is_image                       = true
-  function_name                  = "mdss_daily_failure_digest"
+  function_name                  = "live_feed_daily_handover"
+  image_name                     = "mdss_daily_failure_digest"
   role_name                      = aws_iam_role.mdss_daily_failure_digest.name
   role_arn                       = aws_iam_role.mdss_daily_failure_digest.arn
   handler                        = "mdss_daily_failure_digest.handler"
@@ -531,8 +539,34 @@ module "mdss_daily_failure_digest" {
     NAMESPACE      = "EMDS/MDSS"
     LOOKBACK_HOURS = "24"
 
+    LOAD_MDSS_QUEUE_NAME = module.load_mdss_event_queue.sqs_queue.name
+    LOAD_FMS_QUEUE_NAME  = module.load_fms_event_queue.sqs_queue.name
+
     LOAD_MDSS_DLQ_NAME = module.load_mdss_event_queue.sqs_dlq.name
     CLEAN_DLT_DLQ_NAME = aws_sqs_queue.clean_dlt_load_dlq.name
+    LOAD_FMS_DLQ_NAME  = module.load_fms_event_queue.sqs_dlq.name
+
+    PROCESS_LANDING_BUCKET_FILES_FMS_GENERAL_DLQ_NAME  = local.live_feed_dlq_names.process_landing_bucket_files_fms_general
+    PROCESS_LANDING_BUCKET_FILES_FMS_HO_DLQ_NAME       = local.live_feed_dlq_names.process_landing_bucket_files_fms_ho
+    PROCESS_LANDING_BUCKET_FILES_FMS_SPECIALS_DLQ_NAME = local.live_feed_dlq_names.process_landing_bucket_files_fms_specials
+
+    PROCESS_LANDING_BUCKET_FILES_MDSS_GENERAL_DLQ_NAME  = local.live_feed_dlq_names.process_landing_bucket_files_mdss_general
+    PROCESS_LANDING_BUCKET_FILES_MDSS_HO_DLQ_NAME       = local.live_feed_dlq_names.process_landing_bucket_files_mdss_ho
+    PROCESS_LANDING_BUCKET_FILES_MDSS_SPECIALS_DLQ_NAME = local.live_feed_dlq_names.process_landing_bucket_files_mdss_specials
+
+    SCAN_DLQ_NAME                   = local.live_feed_dlq_names.scan
+    PROCESS_FMS_METADATA_DLQ_NAME   = local.live_feed_dlq_names.process_fms_metadata
+    FORMAT_FMS_JSON_DLQ_NAME        = aws_sqs_queue.format_fms_json_event_dlq.name
+    PUSH_DATA_EXPORT_TO_P1_DLQ_NAME = local.live_feed_dlq_names.push_data_export_to_p1
+
+    LOAD_FMS_FUNCTION_NAME             = module.load_fms_lambda.lambda_function_name
+    PROCESS_FMS_METADATA_FUNCTION_NAME = module.fms_expected_file_processor.lambda_function_name
+    FORMAT_JSON_FMS_DATA_FUNCTION_NAME = module.fms_raw_file_formatter.lambda_function_name
+
+    LAMBDAS_PRODUCTION_RUN_URL = "https://github.com/ministryofjustice/electronic-monitoring-data-lambda-functions/actions/workflows/push-to-ecr.yaml"
+    CADT_DAILY_RUN_URL         = "https://github.com/moj-analytical-services/create-a-derived-table/actions/workflows/emds-live-workflow.yml"
+    ROTA_GUIDE_URL             = "https://jubilant-adventure-g65j3om.pages.github.io/hmpps/electronic_monitoring/data_engineering_guides/rota_duties/"
+    EARS_SARS_TALLY_URL        = "https://justiceuk.sharepoint.com/:x:/r/sites/EMExpansionProgrammeteam/_layouts/15/doc2.aspx?sourcedoc=%7B25644699-3837-4A02-9C09-020EF0ECA744%7D&file=Monthly%20Tally%20of%20EARs%20and%20SARs.xlsx&action=default&mobileredirect=true"
   }
 }
 
@@ -565,7 +599,7 @@ resource "aws_iam_role_policy" "mdss_daily_failure_digest_scheduler_invoke" {
       {
         Effect   = "Allow"
         Action   = ["lambda:InvokeFunction"]
-        Resource = [module.mdss_daily_failure_digest.lambda_function_arn]
+        Resource = [module.live_feed_daily_handover.lambda_function_arn]
       }
     ]
   })
@@ -583,7 +617,7 @@ resource "aws_scheduler_schedule" "mdss_daily_failure_digest" {
   schedule_expression_timezone = "Europe/London"
 
   target {
-    arn      = module.mdss_daily_failure_digest.lambda_function_arn
+    arn      = module.live_feed_daily_handover.lambda_function_arn
     role_arn = aws_iam_role.mdss_daily_failure_digest_scheduler.arn
   }
 }
@@ -625,6 +659,74 @@ module "cloudwatch_alarm_threader" {
   timeout                        = 60
   reserved_concurrent_executions = 1
 
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+
+  environment_variables = {
+    POWERTOOLS_LOG_LEVEL  = "INFO"
+    SNS_TOPIC_ARN         = aws_sns_topic.emds_alerts.arn
+    STATE_BUCKET          = local.alarm_thread_state_bucket
+    STATE_PREFIX          = local.alarm_thread_state_prefix
+    ENVIRONMENT           = local.environment_shorthand
+    INCLUDE_REASON        = "true"
+    ENABLE_CUSTOM_ACTIONS = "false"
+    GLUE_DB_JANITOR_STATE_MACHINE_ARN = (
+      aws_sfn_state_machine.staging_db_janitor.arn
+    )
+    GLUE_DB_JANITOR_STALE_MINUTES = "60"
+    GLUE_DB_JANITOR_BATCH_SIZE    = "2000"
+  }
+}
+
+
+#-----------------------------------------------------------------------------------
+# Ears and Sars Request
+#-----------------------------------------------------------------------------------
+module "ears_sars_request" {
+  count                   = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  source                  = "./modules/lambdas"
+  is_image                = true
+  ecr_repo_name           = "electronic-monitoring-ear-sars"
+  function_name           = "ears_sars_request"
+  role_name               = aws_iam_role.ears_sars_iam_role[0].name
+  role_arn                = aws_iam_role.ears_sars_iam_role[0].arn
+  handler                 = "ears_sars_request.handler"
+  memory_size             = 1024
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+
+  environment_variables = {
+    SOURCE_BUCKET         = module.s3-dms-target-store-bucket.bucket.id
+    LOGGING_BUCKET_NAME   = module.s3-logging-bucket.bucket.id
+    UNSTRUCTURED_DATA_SFN = module.get_zipped_file_api.arn
+  }
+}
+
+
+# ------------------------------------------------------------------------------
+# Fan out fms tags
+# ------------------------------------------------------------------------------
+
+module "fms_validation_rejection_fanout" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "fms_validation_rejection_fanout"
+  image_name                     = "fan_out_tags"
+  role_name                      = aws_iam_role.fan_out_tags.name
+  role_arn                       = aws_iam_role.fan_out_tags.arn
+  handler                        = "fan_out_tags.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 100
+
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
 
@@ -632,11 +734,187 @@ module "cloudwatch_alarm_threader" {
   subnet_ids         = data.aws_subnets.shared-private.ids
 
   environment_variables = {
+    SQS_QUEUE_ARN = module.load_fms_event_queue.sqs_queue.url
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# MDSS reconciler (scheduled redrive backstop)
+#-----------------------------------------------------------------------------------
+
+module "mdss_load_redrive_controller" {
+  count                          = 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "mdss_load_redrive_controller"
+  image_name                     = "mdss_load_redrive_controller"
+  handler                        = "mdss_load_redrive_controller.handler"
+  role_name                      = aws_iam_role.mdss_reconciler.name
+  role_arn                       = aws_iam_role.mdss_reconciler.arn
+  memory_size                    = 512
+  timeout                        = 300
+  reserved_concurrent_executions = 1
+
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    ENVIRONMENT_NAME                        = local.environment_shorthand
+    SOURCE_BUCKET                           = module.s3-raw-formatted-data-bucket.bucket.id
+    LOAD_MDSS_QUEUE_URL                     = module.load_mdss_event_queue.sqs_queue.id
+    MDSS_MANIFEST_BUCKET                    = module.s3-metadata-bucket.bucket.id
+    MDSS_MANIFEST_PREFIX                    = "mdss-manifest/current"
+    LOOKBACK_DAYS                           = "2"
+    MIN_OBJECT_AGE_MINUTES                  = "10"
+    STUCK_STARTED_MINUTES                   = "60"
+    AUTO_REDRIVE_TRANSIENT_COOLDOWN_MINUTES = "60"
+    AUTO_REDRIVE_UNKNOWN_COOLDOWN_MINUTES   = "60"
+    AUTO_REDRIVE_TRANSIENT_MAX_ATTEMPTS     = "2"
+    AUTO_REDRIVE_UNKNOWN_MAX_ATTEMPTS       = "1"
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# Create P1 Export
+#-----------------------------------------------------------------------------------
+
+module "create_p1_export" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  image_name                     = "export_em_data_p1"
+  function_name                  = "create_p1_export"
+  role_name                      = module.create_p1_export_iam_role.name
+  role_arn                       = module.create_p1_export_iam_role.arn
+  memory_size                    = 512
+  timeout                        = 300
+  reserved_concurrent_executions = 2
+
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
+  }
+
+}
+
+#-----------------------------------------------------------------------------------
+# Staging DB janitor
+#-----------------------------------------------------------------------------------
+
+module "staging_db_janitor" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "staging_db_janitor"
+  role_name                      = aws_iam_role.staging_db_janitor.name
+  role_arn                       = aws_iam_role.staging_db_janitor.arn
+  handler                        = "staging_db_janitor.handler"
+  memory_size                    = 1024
+  timeout                        = 900
+  reserved_concurrent_executions = 1
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    POWERTOOLS_LOG_LEVEL  = "INFO"
     SNS_TOPIC_ARN         = aws_sns_topic.emds_alerts.arn
+    ENVIRONMENT           = local.environment_shorthand
+    STAGING_BUCKET        = module.s3-create-a-derived-table-bucket.bucket.id
+    CATALOG_ID            = data.aws_caller_identity.current.account_id
+    LAMBDA_ROLE_ARN       = aws_iam_role.staging_db_janitor.arn
+    STALE_MINUTES         = "60"
+    MAX_DATABASES_PER_RUN = "2000"
     STATE_BUCKET          = local.alarm_thread_state_bucket
     STATE_PREFIX          = local.alarm_thread_state_prefix
-    ENVIRONMENT           = local.environment_shorthand
-    INCLUDE_REASON        = "true"
-    ENABLE_CUSTOM_ACTIONS = "false"
+  }
+}
+
+# ------------------------------------------------------------------------------
+# Lambda: landing_dlq_redriver
+# ------------------------------------------------------------------------------
+
+module "landing_file_dlq_redriver" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "landing_file_dlq_redriver"
+  image_name                     = "landing_dlq_redriver"
+  role_name                      = aws_iam_role.landing_dlq_redriver.name
+  role_arn                       = aws_iam_role.landing_dlq_redriver.arn
+  handler                        = "landing_dlq_redriver.handler"
+  memory_size                    = 512
+  timeout                        = 300
+  reserved_concurrent_executions = 1
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    POWERTOOLS_LOG_LEVEL = "INFO"
+
+    SNS_TOPIC_ARN = aws_sns_topic.emds_alerts.arn
+    ENVIRONMENT   = local.environment_shorthand
+    STATE_BUCKET  = local.alarm_thread_state_bucket
+    STATE_PREFIX  = local.alarm_thread_state_prefix
+
+    LANDING_DLQ_CONFIG = jsonencode(local.landing_dlq_redriver_config)
+
+    MAX_MESSAGES_PER_RUN                   = "50"
+    MAX_BATCHES_PER_EXECUTION              = "20"
+    DLQ_RECEIVE_VISIBILITY_TIMEOUT_SECONDS = "30"
+    LEGACY_UNKNOWN_RETRY_POLICY            = "retry_once"
+    AUTO_RETRY_MAX_ATTEMPTS                = "2"
+    RETRY_ONCE_MAX_ATTEMPTS                = "1"
+  }
+}
+
+
+#-----------------------------------------------------------------------------------
+# Macie Unstrucutred Job
+#-----------------------------------------------------------------------------------
+
+module "macie-unstructured-jobs" {
+  count                   = local.is-development ? 1 : 0
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "macie_unstructured_jobs"
+  role_name               = aws_iam_role.macie_unstructured_job_iam_role[0].name
+  role_arn                = aws_iam_role.macie_unstructured_job_iam_role[0].arn
+  handler                 = "macie_unstructured_jobs.handler"
+  memory_size             = 1024
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    BUCKET      = module.s3-data-bucket.bucket.id
+    IDENTIFIERS = aws_macie2_custom_data_identifier.subject_id.id
   }
 }

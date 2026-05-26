@@ -31,6 +31,9 @@ locals {
   is_live       = [substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" || substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction" ? "live" : "non-live"]
   provider_name = "core-vpc-${local.environment}"
 
+  whitelist_ips = jsondecode(aws_ssm_parameter.whitelist_ips.value)
+
+
   # environment specfic variables
   # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var

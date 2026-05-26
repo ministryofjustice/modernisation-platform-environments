@@ -43,13 +43,35 @@ resource "aws_iam_policy" "secrets_manager" {
 
 data "aws_iam_policy_document" "ec2_automation" {
   statement {
-    sid = "EC2AutomationPermissions"
+    sid    = "EC2AutomationPermissions"
+    effect = "Allow"
     actions = [
       "ec2:DescribeInstances",
       "ec2:DescribeTags",
       "s3:GetObject",
       "s3:ListBucket",
       "kms:Decrypt",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "CloudwatchAgent"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:PutMetricData",
+      "logs:PutLogEvents",
+      "logs:DescribeLogStreams",
+      "logs:DescribeLogGroups",
+      "logs:CreateLogStream",
+      "logs:CreateLogGroup",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "DenyCreateLogGroup"
+    effect = "Deny"
+    actions = [
+      "logs:CreateLogGroup"
     ]
     resources = ["*"]
   }
@@ -96,7 +118,8 @@ resource "aws_iam_role_policy_attachment" "restore_policy" {
 }
 
 data "aws_iam_policy_document" "business_unit_kms_key_access" {
-  count = var.create_backup_role ? 1 : 0
+  # count = var.create_backup_role ? 1 : 0
+  count = 1 # required for EC2s in environments which don't have the backup role
   statement {
     effect = "Allow"
     actions = [
@@ -116,7 +139,8 @@ data "aws_iam_policy_document" "business_unit_kms_key_access" {
 }
 
 resource "aws_iam_policy" "business_unit_kms_key_access" {
-  count  = var.create_backup_role ? 1 : 0
+  # count  = var.create_backup_role ? 1 : 0
+  count  = 1 # required for EC2s in environments which don't have the backup role
   name   = "${var.env_name}-business-unit-kms-key-access-policy"
   path   = "/"
   policy = data.aws_iam_policy_document.business_unit_kms_key_access[0].json

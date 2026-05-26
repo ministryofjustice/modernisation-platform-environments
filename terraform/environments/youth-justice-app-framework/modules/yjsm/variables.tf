@@ -35,10 +35,17 @@ variable "ecs_service_external_sg_id" {
   type        = string
 }
 
+variable "ecs_autoscaling_sg_id" {
+  type        = string
+  description = "The security group ID of the ECS autoscaling group"
+}
+
+/*
 variable "esb_service_sg_id" {
   description = "Security Group ID for ESB"
   type        = string
 }
+*/
 
 variable "rds_cluster_security_group_id" {
   description = "Security Group ID for RDS"
@@ -58,6 +65,11 @@ variable "connectivity_alb_sg_id" {
 variable "private_ip" {
   description = "Private IP for the instance"
   type        = string
+}
+
+variable "private_ip_secondary" {
+  description = "Secondary private IP for the instance"
+  default     = null
 }
 
 variable "ami" {

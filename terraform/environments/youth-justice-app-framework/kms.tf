@@ -41,6 +41,35 @@ module "kms" {
       ]
     },
     {
+      sid    = "AllowCloudFrontServiceAccess"
+      effect = "Allow"
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey"
+      ]
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["cloudfront.amazonaws.com"]
+        }
+      ]
+
+      conditions = [
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["s3.${data.aws_region.current.name}.amazonaws.com"]
+        },
+        {
+          test     = "StringEquals"
+          variable = "kms:CallerAccount"
+          values   = [data.aws_caller_identity.current.account_id]
+        }
+      ]
+    },
+    {
       sid = "AllowLambdaFunctionAccess"
       actions = [
         "kms:Decrypt",

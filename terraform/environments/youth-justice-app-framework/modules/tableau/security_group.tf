@@ -63,10 +63,6 @@ module "tableau_sg" {
     {
       rule                     = "ssh-tcp"
       source_security_group_id = var.yjsm_sg_id
-    },
-    {
-      rule                     = "ssh-tcp"
-      source_security_group_id = var.esb_sg_id
     }
   ]
 }

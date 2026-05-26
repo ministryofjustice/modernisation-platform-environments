@@ -72,6 +72,17 @@ locals {
     "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_fms_${local.env_}dbt",
     "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_fms_${local.env_}dbt/*"
   ]
+  ac_cloud_platform_iam_roles = local.is-development || local.is-test ? [
+    "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-api-iam-dev}",
+    "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-algorithm-iam-dev}",
+    ] : local.is-preproduction ? [
+    "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-api-iam-preprod}",
+  ] : []
+  iam_role_validation_db = local.is-test ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live" : local.is-production ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-a7f6cc937a0f63ce-live" : ""
+  iam_role_ear_sar_db = local.is-preproduction ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live" : ""
+  emdi_cp_roles = local.is-development || local.is-test ? [
+    var.cloud-platform-emdi-iam-dev
+  ] : local.is-preproduction ? [var.cloud-platform-emdi-iam-preprod] : []
 }
 
 variable "cloud-platform-iam-dev" {
@@ -95,13 +106,25 @@ variable "cloud-platform-iam-prod" {
 variable "cloud-platform-crime-matching-api-iam-dev" {
   type        = string
   description = "IAM role that the crime matching API in Cloud Platform will use to connect to this role."
-  default     = "arn:aws:iam::754256621582:role/cloud-platform-irsa-6e3937460af175fd-live"
+  default     = "cloud-platform-irsa-6e3937460af175fd-live"
 }
 
 variable "cloud-platform-crime-matching-algorithm-iam-dev" {
   type        = string
   description = "IAM role that the crime matching algorithm in Cloud Platform will use to connect to this role."
-  default     = "arn:aws:iam::754256621582:role/cloud-platform-irsa-65e2e0ef1e64c470-live"
+  default     = "cloud-platform-irsa-65e2e0ef1e64c470-live"
+}
+
+variable "cloud-platform-crime-matching-api-iam-preprod" {
+  type        = string
+  description = "IAM role that the crime matching API in Cloud Platform will use to connect to this role."
+  default     = "cloud-platform-irsa-42e2b12480318007-live"
+}
+
+variable "cloud-platform-crime-matching-algorithm-iam-preprod" {
+  type        = string
+  description = "IAM role that the crime matching algorithm in Cloud Platform will use to connect to this role."
+  default     = "cloud-platform-irsa-65e2e0ef1e64c470-live"
 }
 
 variable "cloud-platform-emdi-iam-dev" {
@@ -110,23 +133,205 @@ variable "cloud-platform-emdi-iam-dev" {
   default     = "arn:aws:iam::754256621582:role/cloud-platform-irsa-18caab25332f152c-live"
 }
 
+variable "cloud-platform-emdi-iam-preprod" {
+  type        = string
+  description = "IAM role that the EDMI pp API in Cloud Platform will use to connect to this role."
+  default     = "arn:aws:iam::754256621582:role/cloud-platform-irsa-52863d2d74321cf9-live"
+}
+
 
 resource "aws_lakeformation_resource" "data_bucket" {
   arn      = module.s3-create-a-derived-table-bucket.bucket.arn
   role_arn = module.lakeformation_registration_iam_role.arn
 }
 
-
-module "emdi_trail_maps_role" {
+module "emd_ears_sars_cp_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-  count   = local.is-development || local.is-test ? 1 : 0
+  count   = local.is-preproduction ? 1 : 0
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.48.0"
 
   trusted_role_arns = flatten([
     data.aws_iam_roles.mod_plat_roles.arns,
-    var.cloud-platform-emdi-iam-dev,
+    local.iam_role_ear_sar_db,
+  ])
+
+  create_role       = true
+  role_requires_mfa = false
+
+  role_name = "emd_ear_sars_${local.environment_shorthand}"
+
+  tags = local.tags
+}
+
+module "emd_validation_db_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  count   = local.is-test || local.is-production ? 1 : 0
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.48.0"
+
+  trusted_role_arns = flatten([
+    data.aws_iam_roles.mod_plat_roles.arns,
+    local.iam_role_validation_db,
+  ])
+
+  create_role       = true
+  role_requires_mfa = false
+
+  role_name = "emd_validation_db_read_data_${local.environment_shorthand}"
+
+  tags = local.tags
+}
+
+resource "aws_lakeformation_permissions" "em_data_validation_db" {
+  count       = local.is-test || local.is-production ? 1 : 0
+  principal   = module.emd_validation_db_role[0].iam_role_arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = "validation${local.dbt_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "em_data_validation_table" {
+  count       = local.is-test || local.is-production ? 1 : 0
+  principal   = module.emd_validation_db_role[0].iam_role_arn
+  permissions = ["DESCRIBE", "SELECT"]
+  table {
+    database_name = "validation${local.dbt_suffix}"
+    wildcard      = true
+  }
+}
+
+resource "aws_lakeformation_permissions" "em_data_validation_s3" {
+  count       = local.is-test || local.is-production ? 1 : 0
+  principal   = module.emd_validation_db_role[0].iam_role_arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+  data_location {
+    arn = module.s3-create-a-derived-table-bucket.bucket.arn
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "standard_athena_access_em_data_validation" {
+  count      = local.is-test || local.is-production ? 1 : 0
+  policy_arn = aws_iam_policy.standard_athena_access.arn
+  role       = module.emd_validation_db_role[0].iam_role_name
+}
+
+data "aws_iam_policy_document" "em_data_validation_permissions" {
+  statement {
+    sid       = "ListAccountAliasForEnvironmentClass"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "ListAllBucketsForEnvironmentClass"
+    effect = "Allow"
+    actions = [
+      "s3:ListAllMyBuckets",
+      "s3:GetBucketLocation"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabases",
+      "glue:GetDatabase",
+      "glue:GetTables",
+      "glue:GetTable",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabase",
+      "glue:GetTables",
+      "glue:GetTable",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/validation${local.dbt_suffix}",
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetTables",
+      "glue:GetTable",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/validation${local.dbt_suffix}/*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "em_dashboard_ear_sar_permissions" {
+  count = local.is-preproduction ? 1 : 0 
+  statement {
+    sid = "AllowAccessToTriggerEARSARAPI"
+    effect = "Allow"
+    actions   = ["execute-api:Invoke"]
+    resources = ["arn:aws:execute-api:${data.aws_region.current.name}:${local.env_account_id}:${module.ears_sars_api[0].api_gateway_id}/*"]
+  }
+  statement {
+    sid       = "ListAccountAliasForEnvironmentClass"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "ListAllBucketsForEnvironmentClass"
+    effect = "Allow"
+    actions = [
+      "s3:ListAllMyBuckets",
+      "s3:GetBucketLocation"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "em_dashboard_ear_sar_permissions" {
+  count       = local.is-preproduction ? 1 : 0
+  name_prefix = "em_dashboard_ear_sar_permissions"
+  description = "Permissions for ear sar tool."
+  policy      = data.aws_iam_policy_document.em_dashboard_ear_sar_permissions[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "em_dashboard_ear_sar_permissions" {
+  count      = local.is-preproduction ? 1 : 0
+  policy_arn = aws_iam_policy.em_dashboard_ear_sar_permissions[0].arn
+  role       = module.emd_ears_sars_cp_role[0].iam_role_name
+}
+
+resource "aws_iam_policy" "em_data_validation_permissions" {
+  count       = local.is-test || local.is-production ? 1 : 0
+  name_prefix = "em_data_validation_permissions"
+  description = "Permissions for environment class for emd tool."
+  policy      = data.aws_iam_policy_document.em_data_validation_permissions.json
+}
+
+resource "aws_iam_role_policy_attachment" "em_data_validation_permissions" {
+  count      = local.is-test || local.is-production ? 1 : 0
+  policy_arn = aws_iam_policy.em_data_validation_permissions[0].arn
+  role       = module.emd_validation_db_role[0].iam_role_name
+}
+
+
+module "emdi_trail_maps_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  count   = local.is-production ? 0 : 1
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.48.0"
+
+  trusted_role_arns = flatten([
+    data.aws_iam_roles.mod_plat_roles.arns,
+    local.emdi_cp_roles,
   ])
 
   create_role       = true
@@ -143,7 +348,7 @@ resource "aws_lakeformation_permissions" "emdi_fms_db" {
   principal   = module.emdi_trail_maps_role[0].iam_role_arn
   permissions = ["DESCRIBE"]
   database {
-    name = "serco_fms_${local.environment_shorthand}"
+    name = "serco_fms_curated${local.dbt_suffix}"
   }
 }
 
@@ -152,7 +357,7 @@ resource "aws_lakeformation_permissions" "emdi_fms_tables" {
   principal   = module.emdi_trail_maps_role[0].iam_role_arn
   permissions = ["SELECT", "DESCRIBE"]
   table {
-    database_name = "serco_fms_${local.environment_shorthand}"
+    database_name = "serco_fms_curated${local.dbt_suffix}"
     wildcard      = true
   }
 }
@@ -162,7 +367,7 @@ resource "aws_lakeformation_permissions" "emdi_mdss_db" {
   principal   = module.emdi_trail_maps_role[0].iam_role_arn
   permissions = ["DESCRIBE"]
   database {
-    name = "allied_mdss_${local.environment_shorthand}"
+    name = "staged_mdss${local.dbt_suffix}"
   }
 }
 
@@ -171,20 +376,40 @@ resource "aws_lakeformation_permissions" "emdi_mdss_tables" {
   principal   = module.emdi_trail_maps_role[0].iam_role_arn
   permissions = ["SELECT", "DESCRIBE"]
   table {
-    database_name = "allied_mdss_${local.environment_shorthand}"
+    database_name = "staged_mdss${local.dbt_suffix}"
     wildcard      = true
   }
 }
 
+resource "aws_lakeformation_permissions" "emdi_di_db" {
+  count       = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
+  principal   = module.emdi_trail_maps_role[0].iam_role_arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = "data_insights${local.dbt_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "emdi_di_tables" {
+  count       = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
+  principal   = module.emdi_trail_maps_role[0].iam_role_arn
+  permissions = ["SELECT", "DESCRIBE"]
+  table {
+    database_name = "data_insights${local.dbt_suffix}"
+    wildcard      = true
+  }
+}
+
+
 resource "aws_iam_role_policy_attachment" "standard_athena_access_emdi" {
-  count      = local.is-development || local.is-test ? 1 : 0
+  count      = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   policy_arn = aws_iam_policy.standard_athena_access.arn
   role       = module.emdi_trail_maps_role[0].iam_role_name
 }
 
 
 resource "aws_iam_role_policy_attachment" "emdi_glue_access" {
-  count      = local.is-development || local.is-test ? 1 : 0
+  count      = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   policy_arn = aws_iam_policy.emac_di_permissions[0].arn
   role       = module.emdi_trail_maps_role[0].iam_role_name
 }
@@ -212,16 +437,13 @@ module "cmt_front_end_assumable_role" {
 module "acquisitive_crime_assumable_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-  count   = local.is-development || local.is-test ? 1 : 0
+  count   = local.is-production ? 0 : 1
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.48.0"
 
   trusted_role_arns = flatten([
     data.aws_iam_roles.mod_plat_roles.arns,
-    [
-      var.cloud-platform-crime-matching-api-iam-dev,
-      var.cloud-platform-crime-matching-algorithm-iam-dev,
-    ],
+    local.ac_cloud_platform_iam_roles,
   ])
 
   create_role       = true
@@ -319,6 +541,25 @@ resource "aws_lakeformation_permissions" "ac_fms_tables" {
   }
 }
 
+resource "aws_lakeformation_permissions" "ac_derived_db" {
+  count       = local.is-production ? 0 : 1
+  principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = "acquisitive_crime${local.dbt_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "ac_derived_tables" {
+  count       = local.is-production ? 0 : 1
+  principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
+  permissions = ["SELECT", "DESCRIBE"]
+  table {
+    database_name = "acquisitive_crime${local.dbt_suffix}"
+    wildcard      = true
+  }
+}
+
 
 data "aws_iam_policy_document" "standard_athena_access" {
   statement {
@@ -409,7 +650,14 @@ data "aws_iam_policy_document" "emac_di_permissions" {
     ]
     resources = local.is-development || local.is-test ? [
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/serco_fms*",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/allied_mdss*"
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/allied_mdss*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/serco_fms_curated*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_mdss*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/acquisitive_crime*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/data_insights*",
+      ] : local.is-preproduction ? [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/acquisitive_crime*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/data_insights*",
     ] : []
   }
   statement {
@@ -420,7 +668,14 @@ data "aws_iam_policy_document" "emac_di_permissions" {
     ]
     resources = local.is-development || local.is-test ? [
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/serco_fms*/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/allied_mdss*/*"
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/allied_mdss*/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/serco_fms_curated*/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_mdss*/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/acquisitive_crime*/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/data_insights*/*",
+      ] : local.is-preproduction ? [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/acquisitive_crime*/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/data_insights*/*",
     ] : []
   }
 }
@@ -438,7 +693,7 @@ resource "aws_iam_policy" "cmt_specific_access" {
 }
 
 resource "aws_iam_policy" "emac_di_permissions" {
-  count       = local.is-development || local.is-test ? 1 : 0
+  count       = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   name_prefix = "emac_di_permissions"
   description = "Access to the Glue tables required by Acquisitive Crime."
   policy      = data.aws_iam_policy_document.emac_di_permissions.json

@@ -61,14 +61,14 @@ resource "aws_s3_bucket_notification" "data_bucket_triggers" {
 module "process_fms_metadata_sqs" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-data-bucket.bucket
-  lambda_function_name = module.process_fms_metadata.lambda_function_name
+  lambda_function_name = module.fms_expected_file_processor.lambda_function_name
   bucket_prefix        = local.bucket_prefix
 }
 
 module "copy_mdss_data_sqs" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-data-bucket.bucket
-  lambda_function_name = module.copy_mdss_data.lambda_function_name
+  lambda_function_name = module.mdss_raw_file_stager.lambda_function_name
   bucket_prefix        = local.bucket_prefix
 }
 
@@ -135,7 +135,7 @@ data "aws_iam_policy_document" "allow_lambda_to_write" {
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values   = [module.process_fms_metadata.lambda_function_arn]
+      values   = [module.fms_expected_file_processor.lambda_function_arn]
     }
     condition {
       test     = "StringEquals"
@@ -153,7 +153,7 @@ resource "aws_sqs_queue_policy" "allow_lambda_to_write" {
 
 resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   event_source_arn = aws_sqs_queue.format_fms_json_event_queue.arn
-  function_name    = module.format_json_fms_data.lambda_function_name
+  function_name    = module.fms_raw_file_formatter.lambda_function_name
   batch_size       = 10
   scaling_config {
     maximum_concurrency = 1000
@@ -193,13 +193,22 @@ module "load_mdss_event_queue" {
   lambda_function_name = module.load_mdss_lambda.lambda_function_name
   bucket_prefix        = local.bucket_prefix
   maximum_concurrency  = 100
-  max_receive_count    = local.load_sqs_max_receive_count
+  max_receive_count    = local.load_mdss_sqs_max_receive_count
 }
 
 module "load_fms_event_queue" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-raw-formatted-data-bucket.bucket
   lambda_function_name = module.load_fms_lambda.lambda_function_name
+  bucket_prefix        = local.bucket_prefix
+  maximum_concurrency  = 100
+  max_receive_count    = local.load_sqs_max_receive_count
+}
+
+module "fms_fan_out_event_queue" {
+  source               = "./modules/sqs_s3_lambda_trigger"
+  bucket               = module.s3-raw-formatted-data-bucket.bucket
+  lambda_function_name = module.fms_validation_rejection_fanout.lambda_function_name
   bucket_prefix        = local.bucket_prefix
   maximum_concurrency  = 100
   max_receive_count    = local.load_sqs_max_receive_count
@@ -219,6 +228,12 @@ resource "aws_s3_bucket_notification" "load_mdss_event" {
     queue_arn     = module.load_fms_event_queue.sqs_queue.arn
     events        = ["s3:ObjectCreated:*"]
     filter_prefix = "serco/fms"
+  }
+
+  queue {
+    queue_arn     = module.fms_fan_out_event_queue.sqs_queue.arn
+    events        = ["s3:ObjectTagging:Put"]
+    filter_prefix = "serco/fms/validation_rejected"
   }
 
   depends_on = [module.load_mdss_event_queue, module.load_fms_event_queue]
@@ -256,5 +271,101 @@ resource "aws_lambda_event_source_mapping" "mdss_cleanup_sqs_trigger" {
 
   scaling_config {
     maximum_concurrency = 100
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# Schedule MDSS reconciler (every 5 minutes)
+#-----------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "mdss_reconciler_schedule" {
+  count               = 1
+  name                = "mdss_reconciler_schedule"
+  description         = "Runs mdss_reconciler on a schedule to backstop missed MDSS loads"
+  schedule_expression = "rate(5 minutes)"
+}
+
+resource "aws_cloudwatch_event_target" "mdss_reconciler_target" {
+  count = 1
+  rule  = aws_cloudwatch_event_rule.mdss_reconciler_schedule[0].name
+  arn   = module.mdss_load_redrive_controller[0].lambda_function_arn
+}
+
+resource "aws_lambda_permission" "mdss_reconciler_allow_eventbridge" {
+  count         = 1
+  statement_id  = "AllowExecutionFromEventBridgeMdssReconciler"
+  action        = "lambda:InvokeFunction"
+  function_name = module.mdss_load_redrive_controller[0].lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.mdss_reconciler_schedule[0].arn
+}
+
+#-----------------------------------------------------------------------------------
+# Create p1 exports
+#-----------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "schedule_p1_creation" {
+  name        = "create-p1-export"
+  description = "Trigger the creation of P1 data export."
+
+  schedule_expression = "cron(0 7 * * ? *)"
+}
+
+resource "aws_cloudwatch_event_target" "schedule_p1_creation_target" {
+  rule = aws_cloudwatch_event_rule.schedule_p1_creation.name
+  arn  = aws_sqs_queue.p1_creation_queue.arn
+}
+
+resource "aws_sqs_queue" "p1_creation_queue_dlq" {
+  name                    = "p1-creation-queue-dlq"
+  sqs_managed_sse_enabled = true
+}
+
+resource "aws_sqs_queue" "p1_creation_queue" {
+  name                       = "p1-creation-queue"
+  visibility_timeout_seconds = 15 * 60
+  message_retention_seconds  = 1209600 # 14 days
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.p1_creation_queue_dlq.arn
+    maxReceiveCount     = 2
+  })
+  sqs_managed_sse_enabled = true
+}
+
+data "aws_iam_policy_document" "p1_create_export" {
+  statement {
+    sid    = "SendMessagesToTriggerP1Export"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+
+    actions   = ["sqs:SendMessage"]
+    resources = [aws_sqs_queue.p1_creation_queue.arn]
+
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_cloudwatch_event_rule.schedule_p1_creation.arn]
+    }
+  }
+}
+
+resource "aws_sqs_queue_policy" "p1_creation_policy" {
+  queue_url = aws_sqs_queue.p1_creation_queue.id
+  policy    = data.aws_iam_policy_document.p1_create_export.json
+}
+
+
+resource "aws_lambda_event_source_mapping" "p1_creation_trigger" {
+  event_source_arn = aws_sqs_queue.p1_creation_queue.arn
+  function_name    = module.create_p1_export.lambda_function_name
+
+  batch_size = 2
+
+  scaling_config {
+    maximum_concurrency = 2
   }
 }

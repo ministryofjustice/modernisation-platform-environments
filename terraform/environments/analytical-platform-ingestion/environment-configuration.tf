@@ -20,20 +20,23 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.2.3"
-      transfer_image_version = "0.0.25"
-      notify_image_version   = "0.0.26"
+      scan_image_version     = "0.2.4"
+      transfer_image_version = "0.0.26"
+      notify_image_version   = "0.0.27"
 
       /* Target Buckets */
       target_buckets = [
         "mojap-land-dev",
-        "cloud-platform-40748c2df4b92e2dfd779a02841187ec"
+        "cloud-platform-40748c2df4b92e2dfd779a02841187ec",
+        "ccms-ebs-test-bc-inbound-mp"
       ]
       datasync_target_buckets     = ["mojap-land-dev"]
       datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-development"]
 
       /* Target KMS */
-      target_kms_keys                = []
+      target_kms_keys = [
+        "arn:aws:kms:eu-west-2:249362002469:key/31da4df0-a5cf-46b8-8805-0eca0a4f8152" # s3/ccms-ebs-test-bc-inbound-mp
+      ]
       mojap_land_kms_key             = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/8c53fbac-3106-422a-8f3d-409bb3b0c94d"
       datasync_opg_target_bucket_kms = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/38cf3d55-b36d-43e8-b91b-6b239a60cbea"
 
@@ -51,6 +54,14 @@ locals {
         "maat-xhibit-dev" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCuB8p8OaxeX3sILMVUQcD48XBPuVLzddUixUUbYLS1WPiEUz7XcUkozeuhulIy9CzqA9yyAa2uPWhQr3KL2bKpXo8UIJr+3n51mjJp9V+LO65kMN5ewQHzx9phpZba5UOth1aEwn4vAFQwm2q6/ydNrJtRQeaI0DT4njaf0MC9FM/nu25IvUbl2dzUn2MX7/WuMouzcYXTeiLUIMvgRoAw4pjnCmU2AuPTokC7OynFh++SiHRUw6OwNKxqORv3du7qlfcGDWx+oAHbUVOnSaTrUssUuEXPFS5ytwWEp6GpzfZpNvD7Kj7gw/7ntpdTckh+d5INJHu+2L74Ytj2RPLNoHEB9t1ptEI2d2SeKpHqPSak2uQzk4aHV2SJs4IO0omTWKHojtSxo5gxAl4B58UjdzmFn0yNr3rJbKnn2w1H7viaM/0vWRgZrtgo07pd2uJePObaUE9jf1re+woasVWJAy3v9dZszVBcJ62NK/QU3cGfUncBw2OnnDURm7z1YVAj8mrReOkZWFA7nJ4/Gzh5pR8wNhnSLsDFqsQefaQiHBi2vZzDRqaUu03eWvd8BmomWC5joT7qqY8Qv+X5boO9CI0hX9FcoJJMXJwckoVAZGuZKgOwOL4y1Y7hpCO1U5ex9mbyMy5D5r/FNf7B85d/qCxcGwesIzI1b0QRupKxDw=="
           cidr_blocks = ["20.49.168.141/32", "20.49.168.17/32", "51.11.124.149/32", "51.11.124.158/32"]
+        }
+        "ccms-transfer-bc-test" = {
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDEjMrObnF/VouCc+6PJqd8e5RVTCIlrB7nn8J6bXUuFsA5yGHARjFGrDzXbunRyGqWeJpN3w2d7Vp1McmpkiiqySUKRXVl8KE8M15CsQkLV+M3LX1XuEeQpiXTmZvDPgxpaN8NBkBu07MaL5oAsEAhEXyrZEp9GAvjOe+X/wglaJLp1/P4oEOGiZe4QpZDMSP3Ch3w2VAJ2gpYfNJQf5J8WLaUNtqMBVe+F0QPrB9OzQ1lvtpZLZTzjS84baCHGwVG0llDkLCMqKcNSyz584nZe/vbKO9l51KHlYLtjyMegHP1j4JtGdQYZABIQrUhoUYLhPAiZvoNe6CwVoHm1M+LmChrMexv1o5MXlw6kewN42JyaXnmcDE+Ds9QDG7+7IvJU89utoPSlgBaySXLw4S9Er1XvzTTwEZcRVVcdh6x1z13nQO7foSUXYQU/SIZdNmM1SIza1xB5kjC38CgWIBuaY0H6dBDFmghjIsBfuzjVt+Q7JEunc2OfAUqJs2owp+j8aZrVrsHvqEWKY1YrgQHrXWTXMCsyRkMSNO/Gvm95hepw8409/FLPVRkqZvM5cIUCnouYwKcB3GBt3CihYZXj+5sUqv5kGDS1Lf8SpNuZk5tbLxe46P8hYGtlDG63HWBTd5R2BHfvvRCocqIzNxWdNqY4+bGkOLuAwyd2oLWsw=="
+          cidr_blocks = ["157.83.144.211/32", "157.83.144.212/32", "157.83.144.213/32", "157.83.144.214/32", "157.83.144.215/32", "157.83.146.211/32", "157.83.146.212/32", "157.83.146.213/32", "157.83.146.214/32", "157.83.146.215/32", "157.83.145.201/32", "157.83.145.202/32", "157.83.145.203/32", "157.83.145.204/32", "157.83.145.205/32", "157.83.147.201/32", "157.83.147.202/32", "157.83.147.203/32", "157.83.147.204/32", "157.83.147.205/32"]
+        }
+        "access-uk" = {
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDMRvtIhxI+k3AXkGpZe6242VucffThflI3PCezvNYhjHVCfaMvNjt0yAXOO7hrzqY8TMOwH2LXsM1yGhUrL2Qe2WBl5gebqsKsR0H6eKypdT6GJhWg81AAf2Zckzk2ibdHqs3w8ZmjGblSv6ReAfg4l/VYeAqdBCfY7m6r+jbgcRtRbsM75GGz0Ts1rgGYF9jrKglF0SKDxT2rvzX+mUB13oxjzWW+C8lGw7aVrtL+hDgXB7gRAa5hqnDIij4rdhd4xt/PzvFZ1FoeutnvEzNMvvtaC/0Iu6IdBdOk3ay/wG7Q6w9pb5BCvKYMUz3MXUbqRSUg8Ed/UHAs6kGBRS9h"
+          cidr_blocks = ["172.167.164.209/32"]
         }
       }
       transfer_server_sftp_users_with_egress = {
@@ -84,9 +95,9 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.2.3"
-      transfer_image_version = "0.0.25"
-      notify_image_version   = "0.0.26"
+      scan_image_version     = "0.2.4"
+      transfer_image_version = "0.0.26"
+      notify_image_version   = "0.0.27"
 
       /* Target Buckets */
       target_buckets = [

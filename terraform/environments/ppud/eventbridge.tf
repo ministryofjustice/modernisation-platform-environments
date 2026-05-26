@@ -117,9 +117,9 @@ locals {
 }
 
 resource "aws_cloudwatch_event_rule" "ssm_patch_completion" {
-  for_each    = local.ssm_patch_notification_envs
-  name        = "SSM-Patch-Completion-${each.value.env}"
-  description = "Triggers when SSM patch maintenance window completes"
+  for_each      = local.ssm_patch_notification_envs
+  name          = "SSM-Patch-Completion-${each.value.env}"
+  description   = "Triggers when SSM patch maintenance window completes"
   event_pattern = <<EOF
 {
   "source": ["aws.ssm"],
@@ -158,10 +158,16 @@ resource "aws_lambda_permission" "allow_eventbridge_ssm_patch_completion" {
 locals {
   # EventBridge Scheduler configurations
   lambda_schedules = {
-    securityhub_report = {
+    securityhub_critical_report = {
       environments = ["development", "preproduction", "production"]
       schedule     = "cron(0 7 ? * MON-FRI *)"
       description  = "Trigger Lambda at 07:00 each Monday through Friday"
+      timezone     = "Europe/London"
+    }
+    securityhub_monthly_report = {
+      environments = ["development", "preproduction", "production"]
+      schedule     = "cron(0 1 1 * ? *)"
+      description  = "Trigger Lambda at 01:00 on the 1st day of every month"
       timezone     = "Europe/London"
     }
     disable_cpu_alarms = {
@@ -246,6 +252,12 @@ locals {
       environments = ["development", "preproduction", "production"]
       schedule     = "cron(15 7 ? * MON-FRI *)"
       description  = "Trigger Lambda at 07:15 on weekdays"
+      timezone     = "Europe/London"
+    }
+    check_internal_certificate_expiration = {
+      environments = ["development", "preproduction", "production"]
+      schedule     = "cron(0 8 ? * MON-FRI *)"
+      description  = "Trigger Lambda at 08:00 on weekdays"
       timezone     = "Europe/London"
     }
     /*
@@ -338,9 +350,13 @@ resource "aws_scheduler_schedule" "lambda_schedules" {
 # Lambda function ARN mapping
 locals {
   lambda_function_arns = {
-    securityhub_report = local.is-development ? aws_lambda_function.lambda_functions["securityhub_report_development"].arn : (
-      local.is-preproduction ? aws_lambda_function.lambda_functions["securityhub_report_preproduction"].arn : (
-        local.is-production ? aws_lambda_function.lambda_functions["securityhub_report_production"].arn : null
+    securityhub_critical_report = local.is-development ? aws_lambda_function.lambda_functions["securityhub_critical_report_development"].arn : (
+      local.is-preproduction ? aws_lambda_function.lambda_functions["securityhub_critical_report_preproduction"].arn : (
+        local.is-production ? aws_lambda_function.lambda_functions["securityhub_critical_report_production"].arn : null
+    ))
+    securityhub_monthly_report = local.is-development ? aws_lambda_function.lambda_functions["securityhub_monthly_report_development"].arn : (
+      local.is-preproduction ? aws_lambda_function.lambda_functions["securityhub_monthly_report_preproduction"].arn : (
+        local.is-production ? aws_lambda_function.lambda_functions["securityhub_monthly_report_production"].arn : null
     ))
     suppress_securityhub_findings = local.is-development ? aws_lambda_function.lambda_functions["suppress_securityhub_findings_development"].arn : (
       local.is-preproduction ? aws_lambda_function.lambda_functions["suppress_securityhub_findings_preproduction"].arn : (
@@ -353,6 +369,10 @@ locals {
     ssm_patch_notification = local.is-development ? aws_lambda_function.lambda_functions["ssm_patch_notification_development"].arn : (
       local.is-preproduction ? aws_lambda_function.lambda_functions["ssm_patch_notification_preproduction"].arn : (
         local.is-production ? aws_lambda_function.lambda_functions["ssm_patch_notification_production"].arn : null
+    ))
+    check_internal_certificate_expiration = local.is-development ? aws_lambda_function.lambda_functions["check_internal_certificate_expiration_development"].arn : (
+      local.is-preproduction ? aws_lambda_function.lambda_functions["check_internal_certificate_expiration_preproduction"].arn : (
+        local.is-production ? aws_lambda_function.lambda_functions["check_internal_certificate_expiration_production"].arn : null
     ))
     wam_waf_analysis = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_development"].arn : (
       local.is-preproduction ? aws_lambda_function.lambda_functions["wam_waf_analysis_preproduction"].arn : null

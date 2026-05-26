@@ -376,3 +376,14 @@ resource "aws_security_group_rule" "egress_traffic_ebsdb_2525" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
+### SES:587
+resource "aws_security_group_rule" "egress_traffic_ebsdb_587" {
+  count             = local.is-production ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "egress"
+  description       = "SES:587"
+  protocol          = "TCP"
+  from_port         = 587
+  to_port           = 587
+  cidr_blocks       = ["0.0.0.0/0"]
+}

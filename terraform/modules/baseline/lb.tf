@@ -62,6 +62,7 @@ resource "aws_lb_target_group" "instance" {
 
   name                 = each.key
   port                 = each.value.port
+  preserve_client_ip   = each.value.preserve_client_ip
   protocol             = each.value.protocol
   target_type          = "instance"
   deregistration_delay = each.value.deregistration_delay
@@ -91,7 +92,7 @@ resource "aws_lb_target_group" "instance" {
     }
   }
 
-  tags = merge(var.tags, {
+  tags = merge(local.tags, {
     Name = each.key
   })
 }
@@ -110,7 +111,7 @@ module "lb" {
 
   for_each = var.lbs
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v5.1.0"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=4d29aaf30e88ef37e951e8065cf1fb8db23a7d6d" # v5.1.1
 
   providers = {
     aws.bucket-replication = aws

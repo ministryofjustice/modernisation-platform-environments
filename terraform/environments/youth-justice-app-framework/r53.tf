@@ -41,9 +41,10 @@ resource "aws_route53_record" "private_alb" {
 
 locals {
   dns_a_records = {
-    assets = [module.yjsm.yjsm_instance_private_ip]
-    mule   = [module.esb.esb_instance_private_ip]
-    ldap   = module.ds.dns_ip_addresses
+    yjsm         = [module.yjsm.yjsm_instance_private_ip]
+    yjsmhubadmin = [module.yjsm.yjsm_instance_secondary_private_ip]
+    #    mule          = [module.esb.esb_instance_private_ip]
+    ldap = module.ds.dns_ip_addresses
   }
 }
 
@@ -71,7 +72,6 @@ resource "aws_route53_record" "connectivity_alb" {
   ttl     = 300
   records = [module.connectivity_alb.dns_name]
 }
-
 
 
 

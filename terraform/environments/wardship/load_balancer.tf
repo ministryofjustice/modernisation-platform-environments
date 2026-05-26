@@ -270,7 +270,6 @@ resource "aws_lb_target_group" "wardship_target_group" {
     matcher             = "200-302"
     timeout             = "10"
   }
-
 }
 
 resource "aws_lb_listener" "wardship_lb" {

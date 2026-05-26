@@ -9,8 +9,9 @@ locals {
     "module"         = "tableau",
     "module_version" = local.module_version,
     #"module_git_hash"  = local.module_git_hash, #todo revisit this if we start using remote modules with tagging in github
-    "project"     = var.project_name
-    "Patch Group" = "Linux2"
+    "project"          = var.project_name
+    "Patch Group"      = "Linux2"
+    "install-trend-av" = "true"
   }
 
 

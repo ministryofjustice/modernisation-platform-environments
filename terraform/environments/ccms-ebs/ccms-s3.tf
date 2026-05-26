@@ -10,8 +10,9 @@ module "s3-bucket-logging" {
   versioning_enabled = true
   bucket_policy      = [data.aws_iam_policy_document.logging_s3_policy.json]
 
-  log_bucket = local.logging_bucket_name
-  log_prefix = "s3access/${local.logging_bucket_name}"
+  log_bucket    = local.logging_bucket_name
+  log_prefix    = "s3access/${local.logging_bucket_name}"
+  sse_algorithm = "AES256"
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
@@ -72,6 +73,7 @@ module "s3-bucket-logging" {
     { Name = lower(format("s3-%s-%s-logging", local.application_name, local.environment)) }
   )
 }
+
 
 resource "aws_s3_bucket_notification" "logging_bucket_notification" {
   bucket      = module.s3-bucket-logging.bucket.id
@@ -162,35 +164,15 @@ module "s3-bucket-dbbackup" {
         autoclean = "true"
       }
 
-      transition = [
-        {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_standard
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_glacier
-          storage_class = "GLACIER"
-        }
-      ]
-
       expiration = {
-        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
+        days = local.application_data.accounts[local.environment].rman_s3_lifecycle_days_expiration_current
       }
-
-      noncurrent_version_transition = [
-        {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_standard
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_glacier
-          storage_class = "GLACIER"
-        }
-      ]
 
       noncurrent_version_expiration = {
-        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
+        days = local.application_data.accounts[local.environment].rman_s3_lifecycle_days_expiration_noncurrent
       }
 
-      abort_incomplete_multipart_upload_days = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
+      abort_incomplete_multipart_upload_days = local.application_data.accounts[local.environment].rman_s3_lifecycle_days_abort_incomplete_multipart_upload_days
     }
   ]
 

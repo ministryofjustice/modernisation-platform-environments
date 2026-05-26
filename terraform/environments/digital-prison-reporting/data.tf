@@ -231,3 +231,29 @@ data "aws_iam_roles" "data_engineering_roles" {
 data "aws_iam_roles" "developer_roles" {
   name_regex = "AWSReservedSSO_modernisation-platform-developer.*"
 }
+
+# Get latest Windows Server 2022 AMI for probation discovery
+data "aws_ami" "windows_server_2022" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["Windows_Server-2022-English-Full-Base*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+}

@@ -27,6 +27,22 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
   cidr_ipv4         = each.key # Global Protect VPN
 }
 
+# temporary rule to allow traffic from legacy preprod nat gateway for testing
+# to be removed once testing is over and nat gateway removed
+resource "aws_vpc_security_group_ingress_rule" "preprod_alb_legacy_natgw_ing" {
+  #checkov:skip=CKV_AWS_23 "ignore"
+  for_each = var.env_name == "preprod" ? {
+    for cidr in local.legacy_preprod_natgw_ips : cidr => cidr
+  } : {}
+
+  description       = "allow ingress from codebuilder to delius core frontend alb for testing purposes"
+  security_group_id = aws_security_group.ancillary_alb_security_group.id
+  cidr_ipv4         = each.value
+  from_port         = "443"
+  to_port           = "443"
+  ip_protocol       = "tcp"
+}
+
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_to_ecs_cluster" {
   security_group_id            = aws_security_group.delius_frontend_alb_security_group.id
   description                  = "egress from delius core frontend alb to ecs cluster"

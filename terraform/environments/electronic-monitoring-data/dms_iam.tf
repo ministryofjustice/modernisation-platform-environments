@@ -2,7 +2,7 @@
 
 # Define IAM role for DMS S3 Endpoint
 resource "aws_iam_role" "dms_endpoint_role" {
-  count              = local.is-production || local.is-development ? 1 : 0
+  count              = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
   name               = "dms-endpoint-access-role-tf"
   assume_role_policy = data.aws_iam_policy_document.dms_assume_role[0].json
 
@@ -17,7 +17,7 @@ resource "aws_iam_role" "dms_endpoint_role" {
 
 # Define S3 IAM policy for DMS S3 Endpoint
 resource "aws_iam_policy" "dms_ep_s3_role_policy" {
-  count = local.is-production || local.is-development ? 1 : 0
+  count = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
   name  = "dms-s3-target-ep-policy"
   policy = jsonencode(
     {
@@ -92,7 +92,7 @@ resource "aws_iam_policy" "dms_ep_s3_role_policy" {
 
 # Attach predefined IAM Policy to the Role for DMS S3 Endpoint
 resource "aws_iam_role_policy_attachment" "dms_ep_s3_role_policy_attachment" {
-  count      = local.is-production || local.is-development ? 1 : 0
+  count      = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
   role       = aws_iam_role.dms_endpoint_role[0].name
   policy_arn = aws_iam_policy.dms_ep_s3_role_policy[0].arn
 }
@@ -100,7 +100,7 @@ resource "aws_iam_role_policy_attachment" "dms_ep_s3_role_policy_attachment" {
 # -------------------------------------------------------------
 
 resource "aws_iam_role" "dms_cloudwatch_logs_role" {
-  count              = local.is-production || local.is-development ? 1 : 0
+  count              = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
   name               = "dms-cloudwatch-logs-role"
   assume_role_policy = data.aws_iam_policy_document.dms_assume_role[0].json
   tags = merge(
@@ -112,7 +112,7 @@ resource "aws_iam_role" "dms_cloudwatch_logs_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "dms_cloudwatch_logs_role_attachment" {
-  count      = local.is-production || local.is-development ? 1 : 0
+  count      = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
   role       = aws_iam_role.dms_cloudwatch_logs_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
 }
@@ -121,7 +121,7 @@ resource "aws_iam_role_policy_attachment" "dms_cloudwatch_logs_role_attachment" 
 
 # Error: creating DMS Replication Subnet Group (rds-replication-subnet-group-tf): AccessDeniedFault: The IAM Role arn:aws:iam::############:role/dms-vpc-role is not configured properly.
 resource "aws_iam_role" "dms_vpc_role" {
-  count              = local.is-production || local.is-development ? 1 : 0
+  count              = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
   name               = "dms-vpc-role"
   assume_role_policy = data.aws_iam_policy_document.dms_assume_role[0].json
   tags = merge(
@@ -133,13 +133,13 @@ resource "aws_iam_role" "dms_vpc_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "dms_vpc_role_attachment" {
-  count      = local.is-production || local.is-development ? 1 : 0
+  count      = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
   role       = aws_iam_role.dms_vpc_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
 }
 
 resource "aws_iam_role" "dms_validation_event_bridge_invoke_sfn_role" {
-  count = local.is-production || local.is-development ? 1 : 0
+  count = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
   name  = "dms_validation_trigger_role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -153,7 +153,7 @@ resource "aws_iam_role" "dms_validation_event_bridge_invoke_sfn_role" {
 }
 
 resource "aws_iam_role_policy" "event_bridge_invoke_sfn_policy" {
-  count = local.is-production || local.is-development ? 1 : 0
+  count = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
   role  = aws_iam_role.dms_validation_event_bridge_invoke_sfn_role[0].name
   policy = jsonencode({
     Version = "2012-10-17"

@@ -28,8 +28,8 @@ resource "aws_instance" "oem_db" {
   root_block_device {
     delete_on_termination = true
     encrypted             = true
-    kms_key_id            = data.aws_kms_key.ebs_shared.arn
     iops                  = 3100
+    kms_key_id            = data.aws_kms_key.ebs_shared.arn
     volume_size           = 12
     volume_type           = "gp3"
   }
@@ -81,12 +81,12 @@ resource "aws_volume_attachment" "oem_db_volume_swap" {
 }
 
 resource "aws_ebs_volume" "oem_db_volume_opt_oem_app" {
+  snapshot_id       = length(local.application_data.accounts[local.environment].snapshot_id_db_opt_oem_app) > 0 ? local.application_data.accounts[local.environment].snapshot_id_db_opt_oem_app : null
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
   kms_key_id        = data.aws_kms_key.ebs_shared.arn
-  size              = 50
-  snapshot_id       = data.aws_ebs_snapshot.oem_db_volume_opt_oem_app.id
+  size              = local.application_data.accounts[local.environment].ebs_size_db_app
   type              = "gp3"
   depends_on        = [resource.aws_instance.oem_db]
 
@@ -112,12 +112,12 @@ resource "aws_volume_attachment" "oem_db_volume_opt_oem_app" {
 }
 
 resource "aws_ebs_volume" "oem_db_volume_opt_oem_inst" {
+  snapshot_id       = length(local.application_data.accounts[local.environment].snapshot_id_db_opt_oem_inst) > 0 ? local.application_data.accounts[local.environment].snapshot_id_db_opt_oem_inst : null
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
   kms_key_id        = data.aws_kms_key.ebs_shared.arn
-  size              = 50
-  snapshot_id       = data.aws_ebs_snapshot.oem_db_volume_opt_oem_inst.id
+  size              = local.application_data.accounts[local.environment].ebs_size_db_inst
   type              = "gp3"
   depends_on        = [resource.aws_instance.oem_db]
 
@@ -143,12 +143,12 @@ resource "aws_volume_attachment" "oem_db_volume_opt_oem_inst" {
 }
 
 resource "aws_ebs_volume" "oem_db_volume_opt_oem_dbf" {
+  snapshot_id       = length(local.application_data.accounts[local.environment].snapshot_id_db_opt_oem_dbf) > 0 ? local.application_data.accounts[local.environment].snapshot_id_db_opt_oem_dbf : null
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
   kms_key_id        = data.aws_kms_key.ebs_shared.arn
-  size              = 200
-  snapshot_id       = data.aws_ebs_snapshot.oem_db_volume_opt_oem_dbf.id
+  size              = local.application_data.accounts[local.environment].ebs_size_db_dbf
   type              = "io2"
   depends_on        = [resource.aws_instance.oem_db]
 
@@ -174,12 +174,12 @@ resource "aws_volume_attachment" "oem_db_volume_opt_oem_dbf" {
 }
 
 resource "aws_ebs_volume" "oem_db_volume_opt_oem_redo" {
+  snapshot_id       = length(local.application_data.accounts[local.environment].snapshot_id_db_opt_oem_redo) > 0 ? local.application_data.accounts[local.environment].snapshot_id_db_opt_oem_redo : null
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
   kms_key_id        = data.aws_kms_key.ebs_shared.arn
-  size              = 20
-  snapshot_id       = data.aws_ebs_snapshot.oem_db_volume_opt_oem_redo.id
+  size              = local.application_data.accounts[local.environment].ebs_size_db_redo
   type              = "io2"
   depends_on        = [resource.aws_instance.oem_db]
 
@@ -205,12 +205,12 @@ resource "aws_volume_attachment" "oem_db_volume_opt_oem_redo" {
 }
 
 resource "aws_ebs_volume" "oem_db_volume_opt_oem_arch" {
+  snapshot_id       = length(local.application_data.accounts[local.environment].snapshot_id_db_opt_oem_arch) > 0 ? local.application_data.accounts[local.environment].snapshot_id_db_opt_oem_arch : null
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
   kms_key_id        = data.aws_kms_key.ebs_shared.arn
-  size              = 200
-  snapshot_id       = data.aws_ebs_snapshot.oem_db_volume_opt_oem_arch.id
+  size              = local.application_data.accounts[local.environment].ebs_size_db_arch
   type              = "io2"
   depends_on        = [resource.aws_instance.oem_db]
 

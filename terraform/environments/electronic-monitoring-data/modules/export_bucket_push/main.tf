@@ -59,8 +59,9 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
   bucket = module.this-bucket.bucket.id
 
   queue {
-    queue_arn = module.push_lambda_event_queue.sqs_queue.arn
-    events    = ["s3:ObjectCreated:*"]
+    queue_arn     = module.push_lambda_event_queue.sqs_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = var.filter_suffix
   }
 }
 
@@ -70,7 +71,6 @@ module "push_lambda_event_queue" {
   lambda_function_name = module.push_lambda.lambda_function_name
   bucket_prefix        = "emds-${var.environment_shorthand}"
   maximum_concurrency  = 100
-  enabled              = false
 }
 
 

@@ -135,6 +135,7 @@ resource "aws_vpc_security_group_egress_rule" "allow_out_to_rds" { #allow Postgr
   ip_protocol = "tcp"
 }
 
+/*
 resource "aws_vpc_security_group_egress_rule" "allow_out_to_esb" { #allow ssh outbound to ESB
   security_group_id            = aws_security_group.mgmt_instance_sg.id
   referenced_security_group_id = var.esb_security_group_id
@@ -144,7 +145,7 @@ resource "aws_vpc_security_group_egress_rule" "allow_out_to_esb" { #allow ssh ou
   description = "Allow Management Instance to ssh to ESB"
   ip_protocol = "tcp"
 }
-
+*/
 
 
 # Retrieve the RDS SG so that a roule can be addedd to enable access from the Management instance

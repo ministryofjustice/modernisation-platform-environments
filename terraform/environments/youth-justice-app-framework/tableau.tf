@@ -3,9 +3,9 @@ module "tableau_cert" {
 
   project_name = local.project_name
 
-  r53_zone_id      = module.public_dns_zone.aws_route53_zone_id
-  domain_name      = "${local.application_data.accounts[local.environment].tableau_website_name}.${local.application_data.accounts[local.environment].domain_name}"
-  validate_certs   = local.application_data.accounts[local.environment].validate_certs
+  r53_zone_id    = module.public_dns_zone.aws_route53_zone_id
+  domain_name    = "${local.application_data.accounts[local.environment].tableau_website_name}.${local.application_data.accounts[local.environment].domain_name}"
+  validate_certs = local.application_data.accounts[local.environment].validate_certs
 
   tags = local.tags
 }
@@ -18,7 +18,7 @@ module "tableau_test_cert" {
   project_name = local.project_name
 
   r53_zone_id    = module.public_dns_zone.aws_route53_zone_id
-  domain_name    ="${local.application_data.accounts[local.environment].tableau_test_website_name}.${local.application_data.accounts[local.environment].domain_name}"
+  domain_name    = "${local.application_data.accounts[local.environment].tableau_test_website_name}.${local.application_data.accounts[local.environment].domain_name}"
   validate_certs = local.application_data.accounts[local.environment].validate_certs
 
   tags = local.tags
@@ -33,7 +33,7 @@ module "tableau" {
   environment = local.environment
   test_mode   = local.test_mode
 
-  tableau_blue_live = local.application_data.accounts[local.environment].tableau_blue_live
+  tableau_blue_live   = local.application_data.accounts[local.environment].tableau_blue_live
   tableau_test_active = local.application_data.accounts[local.environment].tableau_test_active
 
   #Network details
@@ -47,10 +47,10 @@ module "tableau" {
 
 
   # ALB Details
-  certificate_arn      = module.tableau_cert.domain_cert_arn
-  test_certificate_arn = local.application_data.accounts[local.environment].tableau_test_active ? module.tableau_test_cert[0].domain_cert_arn : null
-  r53_zone_id          = module.public_dns_zone.aws_route53_zone_id
-  tableau_website_name = local.application_data.accounts[local.environment].tableau_website_name
+  certificate_arn           = module.tableau_cert.domain_cert_arn
+  test_certificate_arn      = local.application_data.accounts[local.environment].tableau_test_active ? module.tableau_test_cert[0].domain_cert_arn : null
+  r53_zone_id               = module.public_dns_zone.aws_route53_zone_id
+  tableau_website_name      = local.application_data.accounts[local.environment].tableau_website_name
   tableau_test_website_name = local.application_data.accounts[local.environment].tableau_test_website_name
 
 
@@ -60,7 +60,7 @@ module "tableau" {
   directory_service_sg_id = module.ds.directory_service_sg_id
   management_server_sg_id = module.ds.management_server_sg_id
   yjsm_sg_id              = module.yjsm.yjsm_security_group_id
-  esb_sg_id               = module.esb.esb_security_group_id
+  #  esb_sg_id               = module.esb.esb_security_group_id
 
   datadog_api_key_arn   = module.datadog.datadog_api_key_arn
   availability_schedule = ""

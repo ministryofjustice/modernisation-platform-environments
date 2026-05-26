@@ -35,10 +35,18 @@ module "yjsm" {
       test          = "10.26.152.172"
       preproduction = "10.27.144.83"
       production    = "10.27.152.21"
-      # Add more environments when IP is known
     },
     local.environment,
     null # Default to null, allowing AWS to auto-assign an IP
+  )
+  private_ip_secondary = lookup(
+    {
+      development   = "10.26.144.104"
+      test          = "10.26.152.145"
+      preproduction = "10.27.144.18"
+      production    = "10.27.152.34"
+    },
+    local.environment, null
   )
 
   ami = lookup(
@@ -60,9 +68,10 @@ module "yjsm" {
 
   secret_kms_key_arn = module.kms.key_arn
   # Security Group IDs
-  ecs_service_internal_sg_id    = module.ecs.ecs_service_internal_sg_id
-  ecs_service_external_sg_id    = module.ecs.ecs_service_external_sg_id
-  esb_service_sg_id             = module.esb.esb_security_group_id
+  ecs_service_internal_sg_id = module.ecs.ecs_service_internal_sg_id
+  ecs_service_external_sg_id = module.ecs.ecs_service_external_sg_id
+  #  esb_service_sg_id             = module.esb.esb_security_group_id
+  ecs_autoscaling_sg_id         = module.ecs.autoscaling_sg_id
   rds_cluster_security_group_id = module.aurora.rds_cluster_security_group_id
   alb_security_group_id         = module.internal_alb.alb_security_group_id
   connectivity_alb_sg_id        = module.connectivity_alb.alb_security_group_id
@@ -80,8 +89,12 @@ module "yjsm" {
   ]
 
   yjsm_secrets_access_policy_secret_arns = jsonencode([
-    module.aurora.app_rotated_postgres_secret_arn,
-    aws_secretsmanager_secret.auto_admit_secret.arn
+    for s in [
+      module.aurora.app_rotated_postgres_secret_arn,
+      aws_secretsmanager_secret.auto_admit_secret.arn,
+      aws_secretsmanager_secret.jwt_secret.arn,
+      try(aws_secretsmanager_secret.yjsm_hub_doc_gateway_auth[0].arn, null)
+    ] : s if s != null
   ])
 }
 

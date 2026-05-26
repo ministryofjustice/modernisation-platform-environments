@@ -234,6 +234,48 @@ module "bold_egress_bucket" {
 
 data "aws_iam_policy_document" "datasync_opg_policy" {
   statement {
+    sid    = "AllowDataSyncRoleBucketActions"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = [module.datasync_iam_role.arn]
+    }
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads"
+    ]
+    resources = [
+      "arn:aws:s3:::mojap-ingestion-${local.environment}-datasync-opg"
+    ]
+  }
+
+  statement {
+    sid    = "AllowDataSyncRoleObjectActions"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = [module.datasync_iam_role.arn]
+    }
+    actions = [
+      "s3:AbortMultipartUpload",
+      "s3:DeleteObject",
+      "s3:GetObject",
+      "s3:GetObjectAcl",
+      "s3:GetObjectTagging",
+      "s3:GetObjectVersion",
+      "s3:GetObjectVersionTagging",
+      "s3:ListMultipartUploadParts",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:PutObjectTagging"
+    ]
+    resources = [
+      "arn:aws:s3:::mojap-ingestion-${local.environment}-datasync-opg/*"
+    ]
+  }
+
+  statement {
     sid    = "DenyS3AccessSandbox"
     effect = "Deny"
     principals {
@@ -267,7 +309,7 @@ module "datasync_opg_bucket" {
   }
 
   replication_configuration = {
-    role = module.datasync_opg_replication_iam_role.iam_role_arn
+    role = module.datasync_opg_replication_iam_role.arn
     rules = [
       {
         id                        = "datasync-opg-replication"
@@ -350,7 +392,7 @@ module "laa_data_analysis_bucket" {
   }
 
   replication_configuration = {
-    role = module.laa_data_analysis_replication_iam_role[0].iam_role_arn
+    role = module.laa_data_analysis_replication_iam_role[0].arn
     rules = [
       {
         id     = "laa-data-analysis-replication"

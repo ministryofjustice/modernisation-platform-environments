@@ -16,7 +16,7 @@ locals {
     cloudwatch_dashboards = {}
 
     ec2_instances = {
-      pd-pr-retail-b = { # 15 char limit on name as domain joined
+      pd-pr-retail-a = { # 15 char limit on name as domain joined
         # TODO: enable alarms when commissioned
         # cloudwatch_metric_alarms = merge(
         #   module.baseline_presets.cloudwatch_metric_alarms.ec2,
@@ -24,9 +24,9 @@ locals {
         #    module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
         # )
         config = {
-          ami_name                      = "Windows_Server-2019-English-Full-SQL_2019_Standard-2026.01.14"
-          ami_owner                     = "801119661308"
-          availability_zone             = "eu-west-2b"
+          ami_name                      = "prison-retail-0"
+          ami_owner                     = "self"
+          availability_zone             = "eu-west-2a"
           ebs_volumes_copy_all_from_ami = false
           iam_resource_names_prefix     = "ec2-instance"
           instance_profile_policies = [
@@ -44,7 +44,18 @@ locals {
           ))
         }
         ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 100 }
+          "/dev/sda1" = { type = "gp3", size = 128 }
+          "/dev/sdb" = { type = "gp3", size = 50 }
+          "/dev/sdc" = { type = "gp3", size = 50 }
+          "/dev/sdd" = { type = "gp3", size = 150 }
+          "/dev/sde" = { type = "gp3", size = 50 }
+          "/dev/sdf" = { type = "gp3", size = 20 }
+          "/dev/sdg" = { type = "gp3", size = 250 }
+          "/dev/sdh" = { type = "gp3", size = 50 }
+          "/dev/sdi" = { type = "gp3", size = 20 }
+          "/dev/sdj" = { type = "gp3", size = 112 }
+          "/dev/sdk" = { type = "gp3", size = 20 }
+          "/dev/sdl" = { type = "gp3", size = 200 }
         }
         instance = {
           disable_api_termination      = false

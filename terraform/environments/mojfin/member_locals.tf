@@ -6,6 +6,7 @@ locals {
   # RDS
   appstream_cidr             = "10.200.32.0/19"
   cidr_ire_workspace         = "10.200.96.0/19"
+  mojo_vpc_cidr              = "10.184.0.0/14"
   workspaces_cidr            = local.application_data.accounts[local.environment].london_workspace_cidr
   cp_vpc_cidr                = local.application_data.accounts[local.environment].cp_vpc_cidr
   analytic_platform_cidr     = local.application_data.accounts[local.environment].analytic_platform_cidr
@@ -15,19 +16,19 @@ locals {
   character_set_name         = "WE8MSWIN1252"
   instance_class             = "db.m5.xlarge"
   engine                     = "oracle-se2"
-  engine_version             = "19.0.0.0.ru-2025-10.rur-2025-10.r1"
+  engine_version             = "19.0.0.0.ru-2026-01.rur-2026-01.r3"
   username                   = "sysdba"
   backup_window              = "22:00-01:00"
   maintenance_window = (
-    local.environment == "development"   ? "wed:02:00-wed:05:00" :
+    local.environment == "development" ? "wed:02:00-wed:05:00" :
     local.environment == "preproduction" ? "thu:02:00-thu:05:00" :
-    local.environment == "production"    ? "fri:02:00-fri:05:00" :
+    local.environment == "production" ? "fri:02:00-fri:05:00" :
     "sun:02:00-sun:05:00" # fallback default
   )
-  storage_type               = "gp2"
-  rds_snapshot_name          = "laws3169-mojfin-migration-v1"
-  deletion_production        = local.application_data.accounts[local.environment].deletion_protection
-  ca_cert_identifier         = "rds-ca-rsa4096-g1"
+  storage_type        = "gp2"
+  rds_snapshot_name   = "laws3169-mojfin-migration-v1"
+  deletion_production = local.application_data.accounts[local.environment].deletion_protection
+  ca_cert_identifier  = "rds-ca-rsa4096-g1"
 
 
   # CloudWatch Alarms
@@ -89,4 +90,11 @@ locals {
   }
 
   prod_domain_name = "laa-finance-data.service.justice.gov.uk"
+
+  lambda_source_hashes = [
+    for f in fileset("./lambda/cloudwatch_alarm_slack_integration", "**") :
+    sha256(file("${path.module}/lambda/cloudwatch_alarm_slack_integration/${f}"))
+  ]
+
+  lambda_folder_name = ["lambda_delivery", "cloudwatch_sns_layer"]
 }

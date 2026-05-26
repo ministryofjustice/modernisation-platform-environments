@@ -43,6 +43,23 @@ locals {
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.enduserclient
         }
+        TCP_1500 = {
+          description = "Allow aws mgn replication"
+          from_port   = 1500
+          to_port     = 1500
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
       }
     }
   }

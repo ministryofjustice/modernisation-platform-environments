@@ -27,6 +27,7 @@ resource "aws_instance" "PPUDWEBSERVER2" {
   tags = {
     Name        = "PPUDWEBSERVER2"
     patch_group = "dev_win_patch"
+    role        = "ses_config"
     backup      = true
   }
 }
@@ -52,6 +53,7 @@ resource "aws_instance" "s609693lo6vw100" {
   tags = {
     Name        = "s609693lo6vw100"
     patch_group = "dev_win_patch"
+    role        = "ses_config"
     backup      = true
   }
 }
@@ -77,6 +79,7 @@ resource "aws_instance" "s609693lo6vw101" {
   tags = {
     Name        = "s609693lo6vw101"
     patch_group = "dev_win_patch"
+    role        = "ses_config"
     backup      = true
   }
 }
@@ -162,7 +165,7 @@ resource "aws_instance" "s609693lo6vw105" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-0edd8d3e58d106f40"
+  ami                    = "ami-03ae7bafd3430076e"
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -277,6 +280,7 @@ resource "aws_instance" "s609693lo6vw109" {
   tags = {
     Name        = "s609693lo6vw109"
     patch_group = "dev_win_patch"
+    role        = "ses_config"
     backup      = true
   }
 }
@@ -302,6 +306,7 @@ resource "aws_instance" "s609693lo6vw110" {
   tags = {
     Name        = "s609693lo6vw110"
     patch_group = "dev_win_patch"
+    role        = "ses_config"
     lse_server  = "true"
     backup      = true
   }
@@ -410,6 +415,59 @@ resource "aws_instance" "s609693lo6vw114" {
   }
 }
 
+# Certificate Authority
+
+resource "aws_instance" "s609693lo6vw115" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-0bb237afb99e3a912"
+  instance_type          = "m5.large"
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name             = "s609693lo6vw115"
+    patch_group      = "dev_win_patch"
+    backup           = true
+    adcs_service     = "true"
+    iisadmin_service = "true"
+    wwwpub_service   = "true"
+  }
+}
+
+# SQL Server 2022 Development
+
+resource "aws_instance" "s609693lo6vw116" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-0c3f4443a365b72d9"
+  instance_type          = "m5.xlarge"
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.PPUD-Database-Server[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s609693lo6vw116"
+    patch_group = "dev_win_patch"
+    backup      = true
+  }
+}
+
 #################################
 # Pre-Production (UAT Instances) 
 #################################
@@ -435,6 +493,7 @@ resource "aws_instance" "s618358rgvw023" {
   tags = {
     Name        = "s618358rgvw023"
     patch_group = "uat_win_patch"
+    role        = "ses_config"
     backup      = true
     cpu_alarm   = true
   }
@@ -461,6 +520,7 @@ resource "aws_instance" "s618358rgvw024" {
   tags = {
     Name               = "s618358rgvw024"
     patch_group        = "uat_win_patch"
+    role               = "ses_config"
     backup             = true
     cpu_alarm          = true
     cpu_lambda_trigger = true
@@ -489,6 +549,34 @@ resource "aws_instance" "s618358rgsw025" {
     Name        = "s618358rgsw025"
     patch_group = "uat_win_patch"
     backup      = true
+  }
+}
+
+# Certificate Authority
+
+resource "aws_instance" "s618358rgvw026" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-preproduction == true ? 1 : 0
+  ami                    = "ami-0bb237afb99e3a912"
+  instance_type          = "m5.large"
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+  subnet_id              = data.aws_subnet.data_subnets_b.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name             = "s618358rgvw026"
+    patch_group      = "uat_win_patch"
+    backup           = true
+    adcs_service     = "true"
+    iisadmin_service = "true"
+    wwwpub_service   = "true"
   }
 }
 
@@ -753,6 +841,34 @@ resource "aws_instance" "s618358rgvw027" {
     f_volume        = "true"
     g_volume        = "true"
     h_volume        = "true"
+  }
+}
+
+# Certificate Authority
+
+resource "aws_instance" "s618358rgvw030" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-0bb237afb99e3a912"
+  instance_type          = "m5.large"
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name             = "s618358rgvw030"
+    patch_group      = "prod_win_patch"
+    is-production    = true
+    adcs_service     = "true"
+    iisadmin_service = "true"
+    wwwpub_service   = "true"
   }
 }
 

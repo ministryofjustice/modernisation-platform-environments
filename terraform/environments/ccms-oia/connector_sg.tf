@@ -38,6 +38,15 @@ resource "aws_vpc_security_group_ingress_rule" "connector_alb_ingress_443_c" {
   description       = "HTTPS from private subnet C"
 }
 
+resource "aws_vpc_security_group_ingress_rule" "connector_alb_ingress_workspace" {
+  security_group_id = aws_security_group.connector_load_balancer.id
+  cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  description       = "AWS Workspace"
+}
+
 # Allow all outbound (to be restricted later)
 resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_all" {
   security_group_id = aws_security_group.connector_load_balancer.id

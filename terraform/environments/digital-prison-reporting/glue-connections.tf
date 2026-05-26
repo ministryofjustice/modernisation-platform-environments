@@ -20,6 +20,17 @@ locals {
     for item in local.dps_domains_list :
     item => "jdbc:postgresql://${local.dps_endpoint[item]}:${local.dps_port[item]}/${local.dps_database[item]}"
   }
+
+  probation_source_secrets_requiring_glue_connections = {
+    for key, value in local.probation_domains :
+    key => module.probation_source_secret[key]
+    if value.create_glue_connection
+  }
+
+  probation_connection_string = {
+    for key, entity in local.probation_source_secrets_requiring_glue_connections :
+    key => "jdbc:postgresql://${entity.secret_contents_endpoint}:${entity.secret_contents_port}/${entity.secret_contents_db_name}"
+  }
 }
 
 # Operational DataStore
@@ -35,9 +46,9 @@ resource "aws_glue_connection" "glue_operational_datastore_connection" {
   }
 
   physical_connection_requirements {
-    availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
+    availability_zone      = data.aws_subnet.private_subnets_b.availability_zone
     security_group_id_list = [aws_security_group.glue_job_connection_sg.id]
-    subnet_id              = data.aws_subnet.private_subnets_a.id
+    subnet_id              = data.aws_subnet.private_subnets_b.id
   }
 }
 
@@ -54,9 +65,9 @@ resource "aws_glue_connection" "glue_nomis_connection" {
   }
 
   physical_connection_requirements {
-    availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
+    availability_zone      = data.aws_subnet.private_subnets_c.availability_zone
     security_group_id_list = [aws_security_group.glue_job_connection_sg.id]
-    subnet_id              = data.aws_subnet.private_subnets_a.id
+    subnet_id              = data.aws_subnet.private_subnets_c.id
   }
 }
 
@@ -73,9 +84,28 @@ resource "aws_glue_connection" "glue_dps_connection" {
   }
 
   physical_connection_requirements {
-    availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
+    availability_zone      = data.aws_subnet.private_subnets_b.availability_zone
     security_group_id_list = [aws_security_group.glue_job_connection_sg.id]
-    subnet_id              = data.aws_subnet.private_subnets_a.id
+    subnet_id              = data.aws_subnet.private_subnets_b.id
+  }
+}
+
+# All Probation connections
+resource "aws_glue_connection" "glue_probation_connection" {
+  for_each        = local.create_glue_connection ? local.probation_source_secrets_requiring_glue_connections : {}
+  name            = "${local.project}-${each.key}-connection"
+  connection_type = "JDBC"
+
+  connection_properties = {
+    JDBC_CONNECTION_URL    = local.probation_connection_string[each.key]
+    JDBC_DRIVER_CLASS_NAME = "org.postgresql.Driver"
+    SECRET_ID              = module.probation_source_secret[each.key].secret_name
+  }
+
+  physical_connection_requirements {
+    availability_zone      = data.aws_subnet.private_subnets_b.availability_zone
+    security_group_id_list = [aws_security_group.glue_job_connection_sg.id]
+    subnet_id              = data.aws_subnet.private_subnets_b.id
   }
 }
 
@@ -91,9 +121,9 @@ resource "aws_glue_connection" "glue_dpr_test_connection" {
   }
 
   physical_connection_requirements {
-    availability_zone      = data.aws_subnet.private_subnets_a.availability_zone
+    availability_zone      = data.aws_subnet.private_subnets_c.availability_zone
     security_group_id_list = [aws_security_group.glue_job_connection_sg.id]
-    subnet_id              = data.aws_subnet.private_subnets_a.id
+    subnet_id              = data.aws_subnet.private_subnets_c.id
   }
 }
 

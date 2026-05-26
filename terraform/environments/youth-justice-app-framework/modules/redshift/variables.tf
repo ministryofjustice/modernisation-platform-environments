@@ -60,3 +60,13 @@ variable "reports_admin_role" {
   type        = string
   description = "The arn of a role that is used to administer Redshift."
 }
+
+variable "lambda_arn" {
+  type        = string
+  description = "The ARN of the lambda function that is used to replicate S3 objects across accounts."
+}
+
+variable "account_id" {
+  description = "The AWS account ID"
+  type        = string
+}

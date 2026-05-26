@@ -66,7 +66,7 @@ resource "aws_security_group_rule" "lambda_egress_s3" {
 # DMS Validation 
 
 resource "aws_security_group" "dms_validation_lambda_sg" {
-  count       = local.is-production || local.is-development ? 1 : 0
+  count       = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
   name_prefix = "${local.bucket_prefix}-dms-validation-lambda-sg"
   description = "DMS Validation Lambda Security Group"
   vpc_id      = data.aws_vpc.shared.id

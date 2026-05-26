@@ -35,11 +35,15 @@ locals {
   db_config_preprod = {
     instance_type  = "r7i.4xlarge"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-06-04T11-24-58.162Z"
+    pinned_ami_id  = "ami-04286e91e4ada8f3a"
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
     }
-    primary_instance_count = 0
-    standby_count          = 0
+    instance_policies = {
+      "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
+    }
+    primary_instance_count = 1
+    standby_count          = 2
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
       "/dev/sdc" = { label = "app", size = 100 } # /u02
@@ -85,17 +89,67 @@ locals {
   delius_microservices_configs_preprod = {
 
     weblogic = {
-      image_tag        = "6.2.0.3"
-      container_port   = 8080
-      container_memory = 4096
-      container_cpu    = 2048
+      image_tag                = "6.7.4"
+      task_definition_revision = 10
+      container_port           = 8080
+      container_memory         = 16384
+      container_cpu            = 1024
+      ec2_instance_type        = "r7i.2xlarge"
+      task_count               = 25
+      asg_min_size             = 8
+      asg_max_size             = 15
+    }
+
+    weblogic_params = {
+      API_CLIENT_ID               = "delius-ui-client"
+      AWS_REGION                  = "eu-west-2"
+      BREACH_NOTICE_API_URL       = "https://breach-notice-api-preprod.hmpps.service.justice.gov.uk"
+      BREACH_NOTICE_UI_URL_FORMAT = "https://breach-notice-preprod.hmpps.service.justice.gov.uk/breach-notice/%s"
+      COOKIE_SECURE               = "true"
+      # DELIUS_API_URL                    = "" # No longer needed
+      DMS_HOST                          = "hmpps-delius-alfresco-preprod.apps.live.cloud-platform.service.justice.gov.uk"
+      DMS_OFFICE_URI_HOST               = "hmpps-delius-alfresco-preprod.apps.live.cloud-platform.service.justice.gov.uk"
+      DMS_OFFICE_URI_PORT               = "443"
+      DMS_PORT                          = "443"
+      DMS_PROTOCOL                      = "https"
+      EIS_USER_CONTEXT                  = "cn=EISUsers,ou=Users,dc=moj,dc=com"
+      ELASTICSEARCH_URL                 = "https://probation-search-preprod.hmpps.service.justice.gov.uk/delius"
+      GDPR_URL                          = "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io/gdpr/ui/homepage" # GDPR not deployed to CP yet, <URL>/gdpr/ui/homepage
+      JDBC_CONNECTION_POOL_MAX_CAPACITY = "40"
+      JDBC_CONNECTION_POOL_MIN_CAPACITY = "20"
+      JDBC_URL                          = "jdbc:oracle:thin:@(DESCRIPTION=(LOAD_BALANCE=OFF)(FAILOVER=ON)(CONNECT_TIMEOUT=10)(RETRY_COUNT=3)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=tcp)(HOST=delius-core-preprod-db-1.hmpps-preproduction.modernisation-platform.internal)(PORT=1521))(ADDRESS=(PROTOCOL=tcp)(HOST=delius-core-preprod-db-2.hmpps-preproduction.modernisation-platform.internal)(PORT=1521))(ADDRESS=(PROTOCOL=tcp)(HOST=delius-core-preprod-db-3.hmpps-preproduction.modernisation-platform.internal)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=PRENDA_TAF)))"
+      JDBC_USERNAME                     = "delius_pool"
+      LDAP_HOST                         = "ldap.preprod.delius-core.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"
+      LDAP_PRINCIPAL                    = "cn=admin,dc=moj,dc=com"
+      LOG_LEVEL_NDELIUS                 = "DEBUG"
+      NDELIUS_CLIENT_ID                 = "migrations_client_id"
+      OAUTH_CALLBACK_URL                = "https://ndelius.preprod.delius-core.hmpps-preproduction.modernisation-platform.service.justice.gov.uk/NDelius-war/delius/JSP/auth/token.jsp"
+      OAUTH_CLIENT_ID                   = "delius-ui"
+      OAUTH_DEFAULT_SCOPE               = "delius"
+      OAUTH_LOGIN_ENABLED               = "false"
+      OAUTH_LOGIN_NAME                  = ""
+      OAUTH_TOKEN_VERIFICATION_URL      = "https://token-verification-api-preprod.prison.service.justice.gov.uk/token/verify"
+      OAUTH_URL                         = "https://sign-in-preprod.hmpps.service.justice.gov.uk/auth"
+      OFFENDER_SEARCH_API_URL           = "https://probation-offender-search-preprod.hmpps.service.justice.gov.uk"
+      PASSWORD_RESET_URL                = "https://pwm.preprod.delius-core.hmpps-preproduction.modernisation-platform.service.justice.gov.uk/public/forgottenpassword"
+      PDFCREATION_TEMPLATES             = "shortFormatPreSentenceReport|paroleParom1Report|oralReport"
+      PDFCREATION_URL                   = "https://ndelius-new-tech-pdf-generator-preprod.hmpps.service.justice.gov.uk/newTech"
+      PREPARE_CASE_FOR_SENTENCE_URL     = "https://prepare-a-case-preprod.apps.live-1.cloud-platform.service.justice.gov.uk"
+      PSR_SERVICE_URL                   = "https://pre-sentence-service-preprod.hmpps.service.justice.gov.uk"
+      TRAINING_MODE_APP_NAME            = "National Delius - TEST USE ONLY"
+      TZ                                = "Europe/London"
+      USERMANAGEMENT_URL                = "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io/umt/"
+      USER_CONTEXT                      = "ou=Users,dc=moj,dc=com"
+      USER_MEM_ARGS                     = "-XX:MaxRAMPercentage=90.0"
     }
 
     weblogic_eis = {
-      image_tag        = "6.2.0.3"
-      container_port   = 8080
-      container_memory = 2048
-      container_cpu    = 1024
+      image_tag         = "6.7.4-eis"
+      container_port    = 8080
+      container_memory  = 2048
+      container_cpu     = 1024
+      ec2_instance_type = "r7i.large"
+      task_count        = 2
     }
 
     pwm = {
@@ -150,5 +204,17 @@ locals {
     }
     # Auditing from the Pre-Prod environment is considered production data
     is-production = true
+  }
+
+  db_backup_config_preprod = {
+    object_lock_days             = 10
+    expire_current_after_days    = 200
+    expire_noncurrent_after_days = 10
+    transition = [
+      {
+        days          = 30
+        storage_class = "STANDARD_IA"
+      }
+    ]
   }
 }

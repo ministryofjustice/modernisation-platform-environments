@@ -222,6 +222,24 @@ variable "ecs_cluster_arn" {
   type        = string
 }
 
+variable "launch_type" {
+  type        = string
+  description = "Launch typ required by the task e.g. EC2, FARGATE etc"
+  default     = "FARGATE"
+}
+
+variable "capacity_provider" {
+  type        = string
+  description = "Capacity provider to host the task"
+  default     = null
+}
+
+variable "force_new_deployment" {
+  type        = bool
+  description = "Force a new service deployment"
+  default     = false
+}
+
 variable "container_port_config" {
   description = "The port configuration for the container. First in list is used for Load Balancer Configuration"
   type = list(object({

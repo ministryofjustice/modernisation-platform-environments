@@ -141,4 +141,8 @@ resource "aws_lambda_function" "athena_federated_query_lambda" {
       spill_prefix = var.spill_bucket_prefix
     }, local.connection_strings)
   }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.athena_federated_query_lambda_role_policy_attachment
+  ]
 }

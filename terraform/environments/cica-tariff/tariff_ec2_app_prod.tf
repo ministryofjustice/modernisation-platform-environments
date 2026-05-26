@@ -21,7 +21,7 @@ resource "aws_instance" "tariff_app_2" {
   root_block_device {
     delete_on_termination = true
     encrypted             = true
-    volume_size           = 20
+    volume_size           = 30 # CDI-322
     tags = merge(tomap({
       "Name"               = "${local.application_name}-app2-root",
       "volume-attach-host" = "app2",

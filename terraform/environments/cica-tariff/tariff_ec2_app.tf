@@ -29,7 +29,7 @@ resource "aws_instance" "tariff_app" {
   root_block_device {
     delete_on_termination = true
     encrypted             = true
-    volume_size           = 20
+    volume_size           = local.environment == "production" ? 30 : 20 # CDI-322
     tags = merge(tomap({
       "Name"               = "${local.application_name}-app-root",
       "volume-attach-host" = "app",

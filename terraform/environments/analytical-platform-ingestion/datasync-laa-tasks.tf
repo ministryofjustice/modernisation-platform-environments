@@ -17,7 +17,7 @@ resource "aws_datasync_location_s3" "laa_bucket_locations" {
   subdirectory  = "/${each.key}"
 
   s3_config {
-    bucket_access_role_arn = module.datasync_laa_data_analysis_iam_role[0].iam_role_arn
+    bucket_access_role_arn = module.datasync_laa_data_analysis_iam_role[0].arn
   }
 }
 
@@ -29,7 +29,7 @@ resource "aws_datasync_location_s3" "source_bucket_locations_eu_west_1" {
   subdirectory  = "/"
 
   s3_config {
-    bucket_access_role_arn = module.datasync_laa_data_analysis_iam_role[0].iam_role_arn
+    bucket_access_role_arn = module.datasync_laa_data_analysis_iam_role[0].arn
   }
 }
 
@@ -40,7 +40,7 @@ resource "aws_datasync_location_s3" "source_bucket_locations" {
   subdirectory  = "/"
 
   s3_config {
-    bucket_access_role_arn = module.datasync_laa_data_analysis_iam_role[0].iam_role_arn
+    bucket_access_role_arn = module.datasync_laa_data_analysis_iam_role[0].arn
   }
 }
 

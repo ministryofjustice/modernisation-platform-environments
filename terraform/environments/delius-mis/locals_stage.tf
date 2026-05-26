@@ -4,8 +4,15 @@ locals {
   environment_config_stage = {
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
     legacy_counterpart_vpc_cidr            = "10.160.32.0/20"
+    legacy_ad_domain_name                  = "delius-stage.local"
+    legacy_dns_ip_addrs                    = ["10.160.35.243", "10.160.38.128"]
     ad_domain_name                         = "delius-mis-stage.internal"
+    ad_trust_domain_name                   = "azure.hmpp.root"
+    ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
+    ad_trust_dns_ip_addrs                  = module.ip_addresses.mp_ips.ad_fixngo_hmpp_domain_controllers
+    core_shared_services_vpc_cidr          = module.ip_addresses.mp_cidr["core-shared-services-live-data-additional"]
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
+    lb_additional_allowed_public_cidrs     = module.ip_addresses.mp_cidrs.live_eu_west_nat
     migration_environment_full_name        = "del-stage"
     migration_environment_abbreviated_name = "del"
     migration_environment_short_name       = "stage"
@@ -127,6 +134,37 @@ locals {
     }
   }
 
+  bws_sso_config_stage = {
+    instance_count = 1
+    ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
+    ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
+    ansible_branch = "TM-2066/delius-mis/web-sso-config"
+    ebs_volumes = {
+      "/dev/sda1" = { label = "root", size = 100, type = "gp3" }
+      "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }
+      "/dev/sdc"  = { label = "data", size = 100, type = "gp3" }
+      "/dev/sds"  = { label = "swap", size = 8, type = "gp3" }
+    }
+    ebs_volumes_config = {}
+
+    instance_config = {
+      associate_public_ip_address  = false
+      disable_api_termination      = false
+      disable_api_stop             = false
+      instance_type                = "r6i.xlarge"
+      metadata_endpoint_enabled    = "enabled"
+      key_name                     = null
+      metadata_options_http_tokens = "required"
+      monitoring                   = true
+      ebs_block_device_inline      = true
+
+      tags = merge(
+        local.tags,
+        { backup = true }
+      )
+    }
+  }
+
   dis_config_stage = {
     instance_count    = 1
     ami_name          = "delius_mis_windows_server_patch_2025-10-01T13-00-02.504Z"
@@ -173,12 +211,6 @@ locals {
         { backup = true }
       )
     }
-    lb_target_config = {
-      endpoint             = "ndl-dis"
-      port                 = 8080
-      health_check_path    = "/BOE/CMC/"
-      health_check_matcher = "200,302,301"
-    }
   }
 
   # new DFI instance config to differentiate from DIS
@@ -223,13 +255,6 @@ locals {
         { backup = true
         }
       )
-    }
-    # Load balancer configuration for DFI
-    lb_target_config = {
-      endpoint             = "ndl-dfi"
-      port                 = 8080
-      health_check_path    = "/DataServices/"
-      health_check_matcher = "200,302,301"
     }
   }
 
@@ -279,9 +304,10 @@ locals {
 
   # BOE DB config
   boe_db_config_stage = {
-    instance_type  = "m7i.large"
-    instance_count = 1
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    instance_type          = "m7i.large"
+    primary_instance_count = 1
+    standby_instance_count = 0
+    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -324,9 +350,10 @@ locals {
 
   # DSD DB config
   dsd_db_config_stage = {
-    instance_type  = "m7i.large"
-    instance_count = 1
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    instance_type          = "m7i.large"
+    primary_instance_count = 1
+    standby_instance_count = 0
+    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -369,8 +396,9 @@ locals {
 
   # MIS DB config
   mis_db_config_stage = {
-    instance_type  = "r7i.4xlarge" # manually turn off when not in use to save costs
-    instance_count = 1
+    instance_type          = "r7i.4xlarge" # manually turn off when not in use to save costs
+    primary_instance_count = 1
+    standby_instance_count = 0
     # most recent 8_5 image, ami builder needs fixing after this
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2025-03-02T00-00-34.442Z"
 
@@ -437,4 +465,11 @@ locals {
   datasync_config_stage = {
     source_s3_bucket_arn = "arn:aws:s3:::eu-west-2-delius-stage-dfi-extracts"
   }
+
+  db_backup_config_stage = {
+    object_lock_days             = 1
+    expire_current_after_days    = 90
+    expire_noncurrent_after_days = 10
+  }
+
 }

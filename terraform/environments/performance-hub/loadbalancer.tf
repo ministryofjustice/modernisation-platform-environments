@@ -73,20 +73,6 @@ resource "aws_lb_target_group" "target_group" {
   )
 }
 
-#tfsec:ignore:AWS004
-resource "aws_lb_listener" "listener" {
-  #checkov:skip=CKV_AWS_2
-  #checkov:skip=CKV_AWS_103
-  load_balancer_arn = aws_lb.external.id
-  port              = local.app_data.accounts[local.environment].server_port
-  protocol          = "HTTP"
-
-  default_action {
-    target_group_arn = aws_lb_target_group.target_group.id
-    type             = "forward"
-  }
-}
-
 resource "aws_lb_listener" "https_listener" {
   #checkov:skip=CKV_AWS_103
   depends_on = [aws_acm_certificate_validation.external]

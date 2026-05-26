@@ -1,8 +1,10 @@
 variable "acm_certificates" {
   description = "map of acm certificates to create where the map key is the tags.Name.  See acm_certificate module for more variable details"
   type = map(object({
-    domain_name             = string
-    subject_alternate_names = optional(list(string), [])
+    domain_name                                 = string
+    certificate_transparency_logging_preference = optional(bool)
+    export                                      = optional(bool)
+    subject_alternate_names                     = optional(list(string), [])
     validation = optional(map(object({
       account   = optional(string, "self")
       zone_name = string
@@ -670,6 +672,7 @@ variable "lbs" {
     instance_target_groups = optional(map(object({
       port                 = optional(number)
       protocol             = optional(string)
+      preserve_client_ip   = optional(bool)
       deregistration_delay = optional(number)
       health_check = optional(object({
         enabled             = optional(bool)
@@ -748,6 +751,8 @@ variable "lbs" {
           status_code = string
           port        = optional(number)
           protocol    = optional(string)
+          path        = optional(string)
+          query       = optional(string)
         }))
       })
       rules = optional(map(object({
@@ -777,6 +782,8 @@ variable "lbs" {
             status_code = string
             port        = optional(number)
             protocol    = optional(string)
+            path        = optional(string)
+            query       = optional(string)
           }))
         }))
         conditions = list(object({
@@ -943,6 +950,7 @@ variable "s3_buckets" {
     replication_role_arn       = optional(string, "")
     force_destroy              = optional(bool, false)
     sse_algorithm              = optional(string, "aws:kms")
+    object_lock_days           = optional(number, null)
     iam_policies = optional(map(list(object({
       sid     = optional(string, null)
       effect  = string

@@ -165,3 +165,87 @@ resource "aws_s3_bucket_policy" "s3_logs_service" {
     ]
   })
 }
+
+# Staging bucket module
+module "aws_s3_staging" {
+  source      = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
+  bucket_name = "property-datahub-staging-${local.environment}"
+
+  bucket_policy = [jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid       = "RequireSSLRequests",
+        Effect    = "Deny",
+        Principal = "*",
+        Action    = "s3:*",
+        Resource = [
+          module.aws_s3_staging.bucket.arn,
+          "${module.aws_s3_staging.bucket.arn}/*"
+        ],
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      },
+      {
+        Sid    = "AllowLambdaAthenaWrites",
+        Effect = "Allow",
+        Principal = {
+          AWS = module.lambda-staging-export.role_arn
+        },
+        Action = [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ],
+        Resource = [
+          module.aws_s3_staging.bucket.arn,
+          "${module.aws_s3_staging.bucket.arn}/*"
+        ]
+      },
+      {
+        Sid    = "AllowAnalyticalPlatformIngestionService",
+        Effect = "Allow",
+        Principal = {
+          AWS = [
+            "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-development"]}:role/transfer",
+            "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-ingestion-production"]}:role/transfer"
+          ]
+        },
+        Action = [
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:GetObjectAcl",
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:PutObjectTagging"
+        ],
+        Resource = [
+          module.aws_s3_staging.bucket.arn,
+          "${module.aws_s3_staging.bucket.arn}/*"
+        ]
+      }
+    ]
+  })]
+
+  custom_kms_key      = aws_kms_key.shared_kms_key.arn
+  versioning_enabled  = true
+  ownership_controls  = "BucketOwnerEnforced"
+  replication_enabled = false
+
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  tags = local.tags
+}
+
+# Enable AWS S3 server access logging for the staging bucket
+resource "aws_s3_bucket_logging" "staging_bucket" {
+  bucket        = module.aws_s3_staging.bucket.id
+  target_bucket = module.s3_bucket_logs.bucket.id
+  target_prefix = "staging/"
+}

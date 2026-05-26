@@ -53,6 +53,7 @@ variable "ecs_services" {
       start_period = 60
     })
     desired_count                          = optional(number, 2)
+    enable_execute_command                 = optional(bool, true)
     autoscaling_min_capacity               = optional(number, 2)
     autoscaling_max_capacity               = optional(number, 4)
     health_check_grace_period_seconds      = optional(number, 360)
@@ -225,6 +226,11 @@ variable "connectivity_alb_security_group_id" {
   type        = string
 }
 
+variable "yjsm_hub_svc_alb_security_group_id" {
+  description = "The security group ID for the yjsm hub svc ALB"
+  type        = string
+}
+
 variable "external_alb_security_group_id" {
   description = "The security group ID for the external ALB"
   type        = string
@@ -245,6 +251,11 @@ variable "connectivity_alb_arn" {
   type        = string
 }
 
+variable "yjsm_hub_svc_alb_arn" {
+  description = "The ARN of the yjsm hub svc ALB"
+  type        = string
+}
+
 variable "internal_alb_name" {
   description = "The name of the internal ALB"
   type        = string
@@ -252,6 +263,11 @@ variable "internal_alb_name" {
 
 variable "connectivity_alb_name" {
   description = "The name of the connectivity ALB"
+  type        = string
+}
+
+variable "yjsm_hub_svc_alb_name" {
+  description = "The name of the yjsm hub svc ALB"
   type        = string
 }
 
@@ -336,4 +352,11 @@ variable "list_of_target_group_arns" {
 variable "aws_account_id" {
   description = "The AWS account ID"
   type        = string
+}
+
+## YJSM Hub Svc Pilot
+variable "create_svc_pilot" {
+  description = "Create infrastructure for the hub-svc pilot, including ALB and associated resources"
+  type        = bool
+  default     = true
 }

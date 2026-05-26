@@ -50,3 +50,44 @@ module "grafana_api_key_rotator" {
     }
   }
 }
+
+module "securityhub_metric_ingester" {
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "7.20.1"
+
+  function_name = "securityhub-metric-ingester"
+  description   = "Publishes enriched Security Hub metrics for Grafana"
+  handler       = "app.handler"
+  runtime       = "python3.12"
+  memory_size   = 512
+  timeout       = 120
+  tags          = local.tags
+
+  source_path = "${path.module}/lambda/securityhub_metrics"
+
+  publish                           = true
+  cloudwatch_logs_retention_in_days = 90
+
+  environment_variables = {
+    METRIC_NAMESPACE   = "ObservabilityPlatform/SecurityHub"
+    METRIC_NAME        = "SecurityHubFindings"
+    ACCOUNT_NAMES_JSON = jsonencode(local.securityhub_account_name_map)
+  }
+
+  attach_policy_statements = true
+  policy_statements = {
+    cloudwatch = {
+      sid       = "AllowPutMetricData"
+      effect    = "Allow"
+      actions   = ["cloudwatch:PutMetricData"]
+      resources = ["*"]
+    }
+  }
+
+  allowed_triggers = {
+    securityhub_events = {
+      principal  = "events.amazonaws.com"
+      source_arn = aws_cloudwatch_event_rule.securityhub_new_high_critical.arn
+    }
+  }
+}

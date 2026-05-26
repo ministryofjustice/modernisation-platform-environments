@@ -18,11 +18,11 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   approved_patches = ["KB890830"] # Malicious Software Removal Tool
 
   approval_rule {
-    approve_after_days = 1
+    approve_after_days = 5
 
     patch_filter {
       key    = "PRODUCT"
-      values = ["WindowsServer2022"]
+      values = ["WindowsServer2022", "WindowsServer2025"]
     }
     patch_filter {
       key    = "CLASSIFICATION"
@@ -35,7 +35,7 @@ resource "aws_ssm_patch_baseline" "windows_os_apps_baseline" {
   }
 
   approval_rule {
-    approve_after_days = 1
+    approve_after_days = 5
     patch_filter {
       key    = "PATCH_SET"
       values = ["APPLICATION"]

@@ -6,13 +6,16 @@ module "weblogic" {
     aws.core-network-services = aws.core-network-services
   }
 
-  name            = "weblogic"
-  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic:${var.delius_microservice_configs.weblogic.image_tag}"
-  env_name        = var.env_name
-  account_config  = var.account_config
-  account_info    = var.account_info
+  name              = "weblogic"
+  container_image   = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic:${var.delius_microservice_configs.weblogic.image_tag}"
+  env_name          = var.env_name
+  account_config    = var.account_config
+  account_info      = var.account_info
+  capacity_provider = aws_ecs_capacity_provider.weblogic.name
 
-  desired_count = 1
+  desired_count = var.delius_microservice_configs.weblogic.task_count
+
+  force_new_deployment = false
 
   pin_task_definition_revision           = try(var.delius_microservice_configs.weblogic.task_definition_revision, 0)
   ignore_changes_service_task_definition = false
@@ -21,13 +24,12 @@ module "weblogic" {
   container_memory = var.delius_microservice_configs.weblogic.container_memory
   container_cpu    = var.delius_microservice_configs.weblogic.container_cpu
 
-  container_vars_default = {
-    for name in local.weblogic_ssm.vars : name => data.aws_ssm_parameter.weblogic_ssm[name].value
-  }
+  container_vars_default = var.delius_microservice_configs.weblogic_params
+
   container_vars_env_specific = try(var.delius_microservice_configs.weblogic.container_vars_env_specific, {})
 
   container_secrets_default = merge({
-    for name in local.weblogic_ssm.secrets : name => module.weblogic_ssm.arn_map[name]
+    for name in local.weblogic_secrets : name => module.weblogic_ssm.arn_map[name]
     }, {
     "JDBC_PASSWORD" = "${module.oracle_db_shared.database_application_passwords_secret_arn}:delius_pool::"
     }
@@ -45,14 +47,14 @@ module "weblogic" {
 
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   alb_health_check = {
-    path                 = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
+    path                 = "/NDelius-war/delius/javax.faces.resource/health/healthcheck.json"
     healthy_threshold    = 5
     interval             = 30
     protocol             = "HTTP"
-    unhealthy_threshold  = 5
-    matcher              = "200-499"
-    timeout              = 5
-    grace_period_seconds = 300
+    unhealthy_threshold  = 10 # Increased unhealthy threshold to allow longer for recovery, due to instances being stateful
+    matcher              = "200"
+    timeout              = 15 # Should be greater than WebLogic's "Connection Reserve Timeout", which defaults to 10 seconds
+    grace_period_seconds = 480
   }
 
   certificate_arn               = aws_acm_certificate.external.arn
@@ -92,4 +94,132 @@ module "weblogic" {
 
   platform_vars = var.platform_vars
   tags          = var.tags
+}
+
+# Search for ami id
+data "aws_ami" "ecs_ami" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  # Amazon Linux 2 optimised ECS instance
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-ecs-hvm-*"]
+  }
+
+  # correct arch
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+
+  # Owned by Amazon
+  filter {
+    name   = "owner-alias"
+    values = ["amazon"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+resource "aws_launch_template" "weblogic" {
+  name_prefix   = "weblogic-${var.env_name}-ecs-"
+  image_id      = data.aws_ami.ecs_ami.id
+  instance_type = var.delius_microservice_configs.weblogic.ec2_instance_type
+
+  user_data = base64encode(templatefile("${path.module}/templates/ecs-host-userdata.tpl", { ecs_cluster_name = module.ecs.ecs_cluster_name }))
+
+  network_interfaces {
+    associate_public_ip_address = false
+    security_groups = [
+      aws_security_group.ecs_host_sg.id
+    ]
+  }
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.weblogic.name
+  }
+}
+
+# ECS IAM
+resource "aws_iam_role" "weblogic_host" {
+  name               = "weblogic-${var.env_name}-ecshost-private-iam"
+  assume_role_policy = templatefile("${path.module}/templates/ecs-host-assumerole-policy.tpl", {})
+}
+
+resource "aws_iam_role_policy" "weblogic" {
+  name = "weblogic-${var.env_name}-ecshost-private-iam"
+  role = aws_iam_role.weblogic_host.name
+
+  policy = templatefile("${path.module}/templates/ecs-host-role-policy.tpl", {})
+}
+
+data "aws_iam_policy" "AmazonSSMManagedInstanceCore" {
+  name = "AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_role_policy_attachment" "AmazonSSMManagedInstanceCore" {
+  policy_arn = data.aws_iam_policy.AmazonSSMManagedInstanceCore.arn
+  role       = aws_iam_role.weblogic_host.name
+}
+
+resource "aws_iam_instance_profile" "weblogic" {
+  name = "weblogic-${var.env_name}-ecscluster-private-iam"
+  role = aws_iam_role.weblogic_host.name
+}
+
+resource "aws_security_group" "ecs_host_sg" {
+  name        = "weblogic-${var.env_name}-ecscluster-private-sg"
+  description = "Shared ECS Cluster Hosts Security Group"
+  vpc_id      = var.account_info.vpc_id
+
+  # Allow all outbound
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(var.tags, { Name = "weblogic-${var.env_name}-ecscluster-private-sg" })
+}
+
+resource "aws_autoscaling_group" "weblogic" {
+  name = "weblogic-${var.env_name}-ecs-asg"
+
+  min_size = var.delius_microservice_configs.weblogic.asg_min_size
+  max_size = var.delius_microservice_configs.weblogic.asg_max_size
+
+  protect_from_scale_in = true
+
+  vpc_zone_identifier = var.account_config.private_subnet_ids
+
+  launch_template {
+    id      = aws_launch_template.weblogic.id
+    version = "$Latest"
+  }
+
+  tag {
+    key                 = "Name"
+    value               = "weblogic-${var.env_name}-ecs-asg"
+    propagate_at_launch = true
+  }
+}
+
+resource "aws_ecs_capacity_provider" "weblogic" {
+  name = "weblogic-${var.env_name}-ec2-cp"
+
+  auto_scaling_group_provider {
+    auto_scaling_group_arn = aws_autoscaling_group.weblogic.arn
+
+    managed_scaling {
+      status          = "ENABLED"
+      target_capacity = 100
+    }
+
+    managed_termination_protection = "ENABLED"
+  }
 }
