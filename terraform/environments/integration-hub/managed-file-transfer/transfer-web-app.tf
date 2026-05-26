@@ -1,3 +1,7 @@
+data "aws_ssoadmin_instances" "main" {
+  provider = aws.sso-readonly
+}
+
 data "aws_iam_policy_document" "transfer_web_app" {
   statement {
     effect = "Allow"
@@ -77,8 +81,8 @@ resource "aws_transfer_web_app" "this" {
   }
   identity_provider_details {
     identity_center_config {
-      instance_arn = tolist(data.aws_ssoadmin_instances.example.arns)[0]
-      role         = aws_iam_role.example.arn
+      instance_arn = tolist(data.aws_ssoadmin_instances.main.arns)[0]
+      role         = module.transfer_web_app_role.arn
     }
   }
   web_app_units {
