@@ -6,14 +6,6 @@ resource "aws_wafv2_ip_set" "pui_waf_ip_set" {
   ip_address_version = "IPV4"
   description        = "List of trusted IP Addresses allowing access via WAF"
 
-  # addresses = compact([
-  #   local.application_data.accounts[local.environment].aws_workspace,
-  #   data.aws_subnet.private_subnets_a.cidr_block,
-  #   data.aws_subnet.private_subnets_b.cidr_block,
-  #   data.aws_subnet.private_subnets_c.cidr_block,
-  #   local.application_data.accounts[local.environment].sb_vpc
-  # ])
-
   addresses = jsondecode(data.aws_secretsmanager_secret_version.pui_waf_ip_set.secret_string).pui_waf_ip_set
 
   tags = merge(
