@@ -2317,6 +2317,16 @@ data "aws_iam_policy_document" "gdpr_unstructured_control_lambda_iam_role_policy
       module.s3-data-bucket.bucket.arn
     ]
   }
+
+  statement {
+    sid    = "GetDataAccessAndTagsForLakeFormation"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GetDataAccess",
+      "lakeformation:GetResourceLFTags",
+    ]
+    resources = ["*"]
+  }
 }
 
 resource "aws_iam_role" "gdpr_unstructured_control_lambda_iam_role" {
