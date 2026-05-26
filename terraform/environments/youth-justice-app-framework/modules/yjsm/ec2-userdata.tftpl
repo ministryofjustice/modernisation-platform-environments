@@ -1,6 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
+# Set timezone to UK
+timedatectl set-timezone Europe/London
+
 # Helper function to retry dnf installs on cache failures
 dnf_install() {
     local max_attempts=5
@@ -22,6 +25,7 @@ dnf_install ruby wget tar git
 
 
 # Java - Amazon Corretto 21
+dnf_install --setopt=retries=5 java-17-amazon-corretto
 dnf_install --setopt=retries=5 java-21-amazon-corretto
 
 
@@ -165,6 +169,9 @@ systemctl enable nginx
 systemctl enable yjsm-hub
 systemctl enable yjsm-hub-admin
 
+# Create yjsm-hub-system user/group if they don't exist
+getent group yjsm-hub-system  > /dev/null 2>&1 || groupadd -g 1003 yjsm-hub-system
+getent passwd yjsm-hub-system > /dev/null 2>&1 || useradd -u 1003 -g 1003 -m -s /bin/bash yjsm-hub-system
 
 # Create /app directory structure
 mkdir -p /app/scripts
@@ -221,16 +228,17 @@ cat > /app/scripts/app-backup.sh <<'SCRIPT'
 #!/bin/bash
 set -euo pipefail
 
-BUCKET="your-bucket-name"
+BUCKET="${project}-${environment}-yjsm-backup"
 DATE=$(date +%Y-%m-%d)
 BACKUP_FILE="/tmp/app-backup-$DATE.tar.gz"
 
 echo "Starting /app backup - $DATE"
 
-tar -czf "$BACKUP_FILE" /app \
+tar -czf "$BACKUP_FILE" \
   --exclude='/app/scripts' \
   --exclude='/app/yjsm-hub/logging' \
-  --exclude='/app/yjsm-hub-admin/logging'
+  --exclude='/app/yjsm-hub-admin/logging' \
+  /app
 
 aws s3 cp "$BACKUP_FILE" "s3://$BUCKET/backups/app-backup-$DATE.tar.gz"
 

@@ -30,6 +30,8 @@ module "yjsm" {
   vpc_id              = data.aws_vpc.shared.id
   subnet_id           = one(tolist([for s in local.private_subnet_list : s.id if s.availability_zone == "eu-west-2a"]))
   private_subnet_list = local.private_subnet_list
+  # create 2nd instance for updating AMI 
+  create_secondary    = true 
   # Assigning private IP based on environment
   private_ip = lookup(
     {
@@ -54,7 +56,7 @@ module "yjsm" {
   ami = lookup(
     {
       development   = "ami-078b41f5b9f1cd570"
-      test          = "ami-078b41f5b9f1cd570"
+      test          = "ami-0446119d598dab429"
       preproduction = "ami-0d79a6afc87dfa388"
       production    = "ami-0be9396f2bf4f21c1"
       # Add more environments when AMIs are known
