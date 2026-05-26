@@ -118,18 +118,6 @@ data "aws_iam_policy_document" "task" {
     ]
   }
 
-  # secrets manager access
-  statement {
-    sid    = "AllowSecretAccess"
-    effect = "Allow"
-    actions = [
-      "secretsmanager:GetSecretValue"
-    ]
-    resources = [
-      "arn:aws:secretsmanager:eu-west-2:${local.modernisation_platform_account_id}:secret:vcms-test-automation-key-*"
-    ]
-  }
-
   # ecs exec
   statement {
     sid    = "AllowSSMExec"
