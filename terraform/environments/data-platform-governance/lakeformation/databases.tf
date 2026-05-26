@@ -45,9 +45,8 @@ resource "aws_lakeformation_permissions" "database" {
     ]) : "${grant.name}-${grant.principal}" => grant
   })
 
-  principal                     = "arn:aws:iam::${local.environment_management.account_ids[each.value.factory_name]}:role/${each.value.principal}"
-  permissions                   = each.value.permissions
-  permissions_with_grant_option = each.value.permissions
+  principal   = "arn:aws:iam::${local.environment_management.account_ids[each.value.factory_name]}:role/${each.value.principal}"
+  permissions = each.value.permissions
 
   database {
     name = aws_glue_catalog_database.main[each.value.name].name
