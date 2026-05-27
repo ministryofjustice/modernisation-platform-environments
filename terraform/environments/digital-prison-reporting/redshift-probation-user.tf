@@ -3,7 +3,7 @@
 # Purpose: Create a separate database user for probation team access
 #          to the same Redshift cluster and datamart database
 
-# Generate random password for probation user (with lifecycle to prevent changes)
+# Generate random password for probation user
 resource "random_password" "redshift_probation_password" {
   length      = 16
   min_lower   = 1
@@ -11,11 +11,6 @@ resource "random_password" "redshift_probation_password" {
   min_special = 1
   min_upper   = 1
   special     = false
-
-  # Prevent password from regenerating on every terraform apply
-  keepers = {
-    version = "1"  # Only change this value if you want to rotate the password
-  }
 }
 
 # Create secret in AWS Secrets Manager
