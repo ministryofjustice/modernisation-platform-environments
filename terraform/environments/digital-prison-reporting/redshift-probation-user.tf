@@ -3,14 +3,19 @@
 # Purpose: Create a separate database user for probation team access
 #          to the same Redshift cluster and datamart database
 
-# Generate random password for probation user.
+# Generate random password for probation user (with lifecycle to prevent changes)
 resource "random_password" "redshift_probation_password" {
-  length      = 16 
+  length      = 16
   min_lower   = 1
   min_numeric = 1
   min_special = 1
   min_upper   = 1
   special     = false
+
+  # Prevent password from regenerating on every terraform apply
+  keepers = {
+    version = "1"  # Only change this value if you want to rotate the password
+  }
 }
 
 # Create secret in AWS Secrets Manager
@@ -42,9 +47,10 @@ resource "aws_secretsmanager_secret_version" "redshift_probation_user" {
     host                = module.datamart.cluster_endpoint
     port                = "5439"
     dbClusterIdentifier = module.datamart.cluster_identifier
-    database            = "datamart" 
+    database            = "datamart"
   })
 }
+
 # Create Database User using Redshift Data API
 
 
@@ -85,10 +91,7 @@ resource "aws_redshiftdata_statement" "create_probation_user" {
 
   sql = "CALL create_user('probation_mi_app', '${random_password.redshift_probation_password.result}');"
 
-  depends_on = [
-    aws_redshiftdata_statement.create_user_procedure,
-    random_password.redshift_probation_password
-  ]
+  depends_on = [aws_redshiftdata_statement.create_user_procedure]
 }
 
 # Public Schema - Read-only access
