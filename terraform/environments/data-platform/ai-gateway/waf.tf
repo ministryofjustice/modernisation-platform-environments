@@ -8,6 +8,8 @@ locals {
 
 data "aws_lb" "ai_gateway" {
   name = "ai-gateway"
+
+  depends_on = [helm_release.ai_gateway_configuration]
 }
 
 module "waf_ip_set_ai_gateway_allowlist" {
