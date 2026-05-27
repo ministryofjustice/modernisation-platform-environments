@@ -152,6 +152,7 @@ locals {
         "update_ses_access_key",
         "update_ses_secrets_value",
         "ssm_send_command",
+        "ec2_describe_instances"
         # ssm_ec2_send_command is attached separately via aws_iam_role_policy_attachment.attach_ssm_ec2_send_command
       ]
     }
@@ -257,7 +258,8 @@ locals {
           "get_list_waf_web_acls",
           "update_ses_access_key",
 		      "update_ses_secrets_value",
-          "ssm_send_command"
+          "ssm_send_command",
+          "ec2_describe_instances"
           ] : {
           key         = "${policy_name}_${env_key}"
           policy_name = policy_name
@@ -374,6 +376,10 @@ resource "aws_iam_policy" "lambda_policies_v2" {
                   "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript",
                   "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:command/*",
         ]
+        } : each.value.policy_name == "ec2_describe_instances" ? {
+        Effect   = "Allow"
+        Action   = ["ec2:DescribeInstances"]
+        Resource = ["*"]
         } : {
         Effect   = "Deny" # Fallback deny for any unexpected policy names
         Action   = ["*"]
@@ -399,10 +405,12 @@ resource "aws_iam_policy" "ssm_ec2_send_command" {
     Version = "2012-10-17"
     Statement = [{
       Effect   = "Allow"
-      Action   = ["ssm:SendCommand"]
+      Action   = ["ssm:SendCommand", "ec2:DescribeInstances"]
       Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.account_key]}:instance/*"]
       Condition = {
-        StringEquals = { "ssm:resourceTag/role" = "ses_config" }
+        StringEquals = {
+          "ssm:resourceTag/role" = ["ses_web_config", "ses_tfs_config", "ses_sql_config"]
+        }
       }
     }]
   })
