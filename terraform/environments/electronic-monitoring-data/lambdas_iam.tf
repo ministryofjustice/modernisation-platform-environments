@@ -2512,7 +2512,10 @@ data "aws_iam_policy_document" "specials_ingestion_lambda_role_policy_document" 
       "athena:StopQueryExecution"
     ]
     resources = [
-      "*",
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-ears-sars",
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:workgroup/create-a-derived-table",
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:workgroup/primary",
     ]
   }
   statement {
