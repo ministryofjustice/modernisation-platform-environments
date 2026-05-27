@@ -165,12 +165,18 @@ class MetadataExtractor:
         return metadata
 
     def _convert_int_columns(self, metadata: Metadata) -> Metadata:
-        logger.info("Converting int columns for metadata: %s", metadata.to_dict())
+        logger.info("Converting integer columns for metadata: %s", metadata.to_dict())
+    
+        integral_types = {"int", "integer", "bigint", "smallint", "tinyint"}
+    
         for column_name in metadata.column_names:
-            if metadata.get_column(column_name)["type"].startswith("int"):
-                column_int = metadata.get_column(column_name)
+            column_int = metadata.get_column(column_name)
+            column_type = str(column_int.get("type", "")).lower()
+    
+            if column_type.startswith("int") or column_type in integral_types:
                 column_int["type"] = "decimal128(38,0)"
                 metadata.update_column(column_int)
+    
         return metadata
         
     def _dialect_is_mssql(self) -> bool:
@@ -186,22 +192,6 @@ class MetadataExtractor:
             return dialect.url.drivername == "mssql+pymssql"
 
         return False
-        
-    def _convert_mssql_int_columns(self, metadata: Metadata) -> Metadata:
-        """Convert SQL Server integer columns to validation-compatible metadata types."""
-        logger.info("Converting SQL Server integer columns for metadata: %s", metadata.to_dict())
-
-        integral_types = {"int", "integer", "bigint", "smallint", "tinyint"}
-
-        for column_name in metadata.column_names:
-            column = metadata.get_column(column_name)
-            column_type = str(column.get("type", "")).lower()
-
-            if column_type.startswith("int") or column_type in integral_types:
-                column["type"] = "decimal128(38,0)"
-                metadata.update_column(column)
-
-        return metadata
         
     def _rename_materialised_view(self, metadata: Metadata) -> Metadata:
         logger.info("Renaming materialised view for metadata: %s", metadata.to_dict())
@@ -267,7 +257,7 @@ class MetadataExtractor:
             table_meta = self._convert_int_columns(table_meta)
             table_meta = self._rename_materialised_view(table_meta)
         elif self._dialect_is_mssql():
-            table_meta = self._convert_mssql_int_columns(table_meta)
+            table_meta = self._convert_int_columns(table_meta)
     
         table_meta = self._add_reference_columns(table_meta)
         table_meta = self._process_exclusions(table_meta, schema, table)
