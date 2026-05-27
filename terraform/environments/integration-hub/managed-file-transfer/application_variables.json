@@ -4,19 +4,67 @@
       "bucket_configuration": {
         "clean": {
           "bucket_prefix": "integration-hub-clean-",
-          "lifecycle_rule": []
+          "lifecycle_rule": [
+            {
+              "id": "rule-one-day",
+              "status": "Enabled",
+              "filter": {},
+              "expiration": {
+                "days": 1
+              },
+              "abort_incomplete_multipart_upload": {
+                "days_after_initiation": 1
+              }
+            }
+          ]
         },
         "investigation": {
           "bucket_prefix": "integration-hub-investigation-",
-          "lifecycle_rule": []
+          "lifecycle_rule": [
+            {
+              "id": "rule-one-day",
+              "status": "Enabled",
+              "filter": {},
+              "expiration": {
+                "days": 1
+              },
+              "abort_incomplete_multipart_upload": {
+                "days_after_initiation": 1
+              }
+            }
+          ]
         },
         "processing": {
           "bucket_prefix": "integration-hub-processing-",
-          "lifecycle_rule": []
+          "lifecycle_rule": [
+            {
+              "id": "rule-one-day",
+              "status": "Enabled",
+              "filter": {},
+              "expiration": {
+                "days": 1
+              },
+              "abort_incomplete_multipart_upload": {
+                "days_after_initiation": 1
+              }
+            }
+          ]
         },
         "quarantine": {
           "bucket_prefix": "integration-hub-quarantine-",
-          "lifecycle_rule": []
+          "lifecycle_rule": [
+            {
+              "id": "rule-one-day",
+              "status": "Enabled",
+              "filter": {},
+              "expiration": {
+                "days": 1
+              },
+              "abort_incomplete_multipart_upload": {
+                "days_after_initiation": 1
+              }
+            }
+          ]
         },
         "unscanned": {
           "bucket_prefix": "integration-hub-unscanned-",
@@ -39,7 +87,6 @@
         "guardduty_role_name": "integration-hub-development-guardduty-s3-plan",
         "guardduty_policy_name": "integration-hub-development-guardduty-s3-plan",
         "malware_scanning_processing_bucket_key": "processing",
-        "malware_scanning_object_prefix": ["incoming/"],
         "kms_key_arn_list": [
           "arn:aws:kms:eu-west-2:111111111111:key/00000000-0000-0000-0000-000000000000"
         ]

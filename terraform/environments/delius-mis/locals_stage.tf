@@ -4,6 +4,8 @@ locals {
   environment_config_stage = {
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
     legacy_counterpart_vpc_cidr            = "10.160.32.0/20"
+    legacy_ad_domain_name                  = "delius-stage.local"
+    legacy_dns_ip_addrs                    = ["10.160.35.243", "10.160.38.128"]
     ad_domain_name                         = "delius-mis-stage.internal"
     ad_trust_domain_name                   = "azure.hmpp.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers

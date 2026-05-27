@@ -895,6 +895,75 @@ module "landing_file_dlq_redriver" {
   }
 }
 
+#-----------------------------------------------------------------------------------
+# lambda loads - staged_mdss__position and acquisitive_crime__position
+#-----------------------------------------------------------------------------------
+
+module "merge_mdss_staged_event" {
+  count                          = local.is-preproduction || local.is-production ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "merge_mdss_staged_event"
+  role_name                      = aws_iam_role.merge_load_event.name
+  role_arn                       = aws_iam_role.merge_load_event.arn
+  handler                        = "merge_mdss_staged_event.handler"
+  memory_size                    = 1024
+  timeout                        = 900
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+  cloudwatch_retention_days      = 7
+  environment_variables = {
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
+  }
+}
+
+module "merge_mdss_staged_position" {
+  count                          = local.is-preproduction || local.is-production ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "merge_mdss_staged_position"
+  role_name                      = aws_iam_role.merge_load_position.name
+  role_arn                       = aws_iam_role.merge_load_position.arn
+  handler                        = "merge_mdss_staged_position.handler"
+  memory_size                    = 1024
+  timeout                        = 900
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+  cloudwatch_retention_days      = 7
+  environment_variables = {
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
+  }
+}
+
+module "merge_ac_position" {
+  count                          = local.is-preproduction || local.is-production ? 0 : 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "merge_ac_position"
+  role_name                      = aws_iam_role.merge_load_ac.name
+  role_arn                       = aws_iam_role.merge_load_ac.arn
+  handler                        = "merge_ac_position.handler"
+  memory_size                    = 1024
+  timeout                        = 900
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+  cloudwatch_retention_days      = 7
+  environment_variables = {
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
+  }
+}
 
 #-----------------------------------------------------------------------------------
 # Macie Unstrucutred Job
