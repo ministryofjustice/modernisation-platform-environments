@@ -935,5 +935,12 @@ module "specials-ingestion" {
   timeout                 = 900
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+   environment_variables = {
+    SOURCE_BUCKET  = module.s3-json-directory-structure-bucket.bucket.id
+    ATHENA_RESULTS_BUCKET = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER  = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET = module.s3-data-bucket.bucket.id
+  }
 }
 
