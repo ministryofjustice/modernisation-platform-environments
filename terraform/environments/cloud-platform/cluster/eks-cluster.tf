@@ -1,5 +1,4 @@
 module "eks" {
-  count = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
 
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 21.0"
