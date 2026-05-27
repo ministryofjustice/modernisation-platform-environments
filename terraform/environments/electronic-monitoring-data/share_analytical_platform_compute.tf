@@ -28,6 +28,7 @@ locals {
     "check",
     "acquisitive_crime",
     "data_insights",
+    "test_lab",
   ]
   live_feeds_dbs = [
     "allied_mdss",
