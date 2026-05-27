@@ -72,13 +72,6 @@ module "transfer_web_app_role" {
 }
 
 resource "aws_transfer_web_app" "this" {
-  endpoint_details {
-    vpc {
-      security_group_ids = [aws_security_group.transfer.id]
-      subnet_ids         = module.isolated_vpc.public_subnets
-      vpc_id             = module.isolated_vpc.vpc_id
-    }
-  }
   identity_provider_details {
     identity_center_config {
       instance_arn = tolist(data.aws_ssoadmin_instances.main.arns)[0]
