@@ -66,7 +66,8 @@ locals {
     "capita_blob_storage",
     "emd_historic_int",
     "g4s_atrium_unstructured",
-    "g4s_cap_dw"
+    "g4s_cap_dw",
+    "g4s_xdrive_unstructured"
   ] : []
 
   prod_dbs_to_grant = [
