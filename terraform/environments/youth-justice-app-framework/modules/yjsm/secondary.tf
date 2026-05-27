@@ -18,7 +18,7 @@ resource "aws_instance" "yjsm_build" {
 
   tags = merge(
     local.all_tags,
-    { "OS" = "Linux", "Purpose" = "AMI-Build" }
+    { "Name" = "YJSM-al23-build", "OS" = "Linux", "Purpose" = "AMI-Build" }
   )
 
   network_interface {
