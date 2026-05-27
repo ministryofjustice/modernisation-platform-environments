@@ -172,7 +172,37 @@ class MetadataExtractor:
                 column_int["type"] = "decimal128(38,0)"
                 metadata.update_column(column_int)
         return metadata
+        
+    def _dialect_is_mssql(self) -> bool:
+        """Detect mssql+pymssql dialect, tolerating either a string or a
+        SQLAlchemy Engine being passed via db_options['dialect'].
+        """
+        dialect = self.dialect
 
+        if isinstance(dialect, str):
+            return dialect == "mssql+pymssql"
+
+        if hasattr(dialect, "url") and hasattr(dialect.url, "drivername"):
+            return dialect.url.drivername == "mssql+pymssql"
+
+        return False
+        
+    def _convert_mssql_int_columns(self, metadata: Metadata) -> Metadata:
+        """Convert SQL Server integer columns to validation-compatible metadata types."""
+        logger.info("Converting SQL Server integer columns for metadata: %s", metadata.to_dict())
+
+        integral_types = {"int", "integer", "bigint", "smallint", "tinyint"}
+
+        for column_name in metadata.column_names:
+            column = metadata.get_column(column_name)
+            column_type = str(column.get("type", "")).lower()
+
+            if column_type.startswith("int") or column_type in integral_types:
+                column["type"] = "decimal128(38,0)"
+                metadata.update_column(column)
+
+        return metadata
+        
     def _rename_materialised_view(self, metadata: Metadata) -> Metadata:
         logger.info("Renaming materialised view for metadata: %s", metadata.to_dict())
         if metadata.name.lower().endswith("_mv"):
@@ -231,13 +261,16 @@ class MetadataExtractor:
         logger.info("Getting table metadata for table %s in schema %s", table, schema)
         table_meta = self.sqlc.generate_to_meta(table.lower(), schema)
         logger.info("Primary key of %s.%s is %s", schema, table, table_meta.primary_key)
+    
         if self.dialect == "oracle":
             table_meta = self._manage_blob_columns(table_meta)
             table_meta = self._convert_int_columns(table_meta)
-        table_meta = self._rename_materialised_view(table_meta)
+            table_meta = self._rename_materialised_view(table_meta)
+        elif self._dialect_is_mssql():
+            table_meta = self._convert_mssql_int_columns(table_meta)
+    
         table_meta = self._add_reference_columns(table_meta)
         table_meta = self._process_exclusions(table_meta, schema, table)
-        # table_meta = self._convert_metadata(table_meta)
         table_meta.database_name = schema
         table_meta.file_format = "parquet"
         return table_meta
