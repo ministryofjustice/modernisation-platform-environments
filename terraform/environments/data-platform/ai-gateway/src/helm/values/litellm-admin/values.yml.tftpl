@@ -48,7 +48,7 @@ proxy_config:
   general_settings:
     litellm_license: os.environ/LITELLM_LICENSE
     master_key: os.environ/PROXY_MASTER_KEY
-    proxy_admin_email: "Muhammad.Ahmad@justice.gov.uk, Jeremy.Collins@justice.gov.uk, Gary.Henderson1@justice.gov.uk, Lauren.Taylor-Brown@justice.gov.uk, Jacob.Woffenden@justice.gov.uk"
+    proxy_admin_email: "${proxyAdminEmail}"
     ui_access_mode: "admin_only"
     proxy_batch_write_at: 60
     database_connection_pool_limit: 10
@@ -56,6 +56,8 @@ proxy_config:
     request_timeout: 600
     json_logs: true
     cache: false
+    default_internal_user_params:
+      user_role: proxy_admin
     cache_params:
       type: redis
       host: os.environ/primary_endpoint_address
