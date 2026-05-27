@@ -36,10 +36,24 @@ locals {
       protocol    = "tcp"
       cidr_blocks = local.moj_cidr_blocks
     }
+    "lb_ingress_9501" = {
+      description = "Loadbalancer ingress rule for HTTP 9501 (Console/EM)"
+      from_port   = 9501
+      to_port     = 9501
+      protocol    = "tcp"
+      cidr_blocks = local.moj_cidr_blocks
+    }
     "lb_ingress_9502" = {
       description = "Loadbalancer ingress rule for HTTP 9502 (Analytics/DV)"
       from_port   = 9502
       to_port     = 9502
+      protocol    = "tcp"
+      cidr_blocks = local.moj_cidr_blocks
+    }
+    "lb_ingress_9503" = {
+      description = "Loadbalancer ingress rule for HTTP 9503 (Analytics/DV)"
+      from_port   = 9503
+      to_port     = 9503
       protocol    = "tcp"
       cidr_blocks = local.moj_cidr_blocks
     }
@@ -352,6 +366,53 @@ resource "aws_lb_target_group_attachment" "oas_ec2_attachment" {
   port             = 9500
 }
 
+# Target Group for port 9501 HTTPS
+
+resource "aws_lb_target_group" "oas_ec2_https_9501_target_group" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  name_prefix          = "oas-2"
+  port                 = 9501
+  protocol             = "HTTPS"
+  vpc_id               = data.aws_vpc.shared.id
+  target_type          = "instance"
+  deregistration_delay = 30
+
+  stickiness {
+    type            = "lb_cookie"
+    cookie_duration = 86400
+  }
+
+  health_check {
+    path                = "/console"
+    port                = "9501"
+    healthy_threshold   = 3
+    interval            = 30
+    protocol            = "HTTPS"
+    unhealthy_threshold = 3
+    matcher             = "200-399"
+    timeout             = 5
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-ec2-target-group" }
+  )
+}
+
+resource "aws_lb_target_group_attachment" "oas_ec2_https_9501_attachment" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  target_group_arn = aws_lb_target_group.oas_ec2_https_9501_target_group[0].arn
+  target_id        = aws_instance.oas_app_instance_new[0].id
+  port             = 9501
+}
+
+
 # Target Group for Analytics (port 9502)
 resource "aws_lb_target_group" "oas_analytics_target_group" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
@@ -607,7 +668,7 @@ resource "aws_lb_listener_rule" "console_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_ec2_https_9501_target_group[0].arn
   }
 
   condition {
@@ -626,7 +687,7 @@ resource "aws_lb_listener_rule" "em_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_ec2_https_9501_target_group[0].arn
   }
 
   condition {

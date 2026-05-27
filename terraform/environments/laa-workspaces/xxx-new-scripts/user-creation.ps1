@@ -42,7 +42,6 @@ try {
 }
 catch {
     Write-Error "Failed to retrieve service account credentials: $_"
-    Read-Host "Press Enter to exit"
     exit 1
 }
 
@@ -88,8 +87,7 @@ else
     }
     catch {
         Write-Host -ForegroundColor DarkRed "Error creating user: $_" -BackgroundColor White
-        Read-Host "Press Enter to exit"
-        exit 1
+            exit 1
     }
 }
 
