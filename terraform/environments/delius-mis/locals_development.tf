@@ -4,6 +4,8 @@ locals {
   environment_config_dev = {
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
     legacy_counterpart_vpc_cidr            = "10.162.32.0/20"
+    legacy_ad_domain_name                  = null
+    legacy_dns_ip_addrs                    = []
     ad_domain_name                         = "delius-mis-dev.internal"
     ad_trust_domain_name                   = "azure.noms.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.azure.domain_controllers

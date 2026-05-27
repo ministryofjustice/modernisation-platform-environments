@@ -31,6 +31,8 @@ resource "aws_secretsmanager_secret_version" "sversion" {
 # Secret for SES Email User
 
 resource "aws_secretsmanager_secret" "ses_access_key_secret" {
+  # checkov:skip=CKV_AWS_149: "Secrets manager secrets are encrypted by an AWS managed key by default, a customer managed key is not required."
+  # checkov:skip=CKV2_AWS_57: "This secret will be rotated automatically via a lambda function & eventbridge schedule."
   count = local.is-production == false ? 1 : 0
   name  = format("%s-%s-ses-access-key", local.application_name, local.environment)
     lifecycle {
