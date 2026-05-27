@@ -252,12 +252,17 @@ class MetadataExtractor:
         table_meta = self.sqlc.generate_to_meta(table.lower(), schema)
         logger.info("Primary key of %s.%s is %s", schema, table, table_meta.primary_key)
     
-        if self.dialect == "oracle":
+        is_oracle = self.dialect == "oracle"
+        is_mssql = self._dialect_is_mssql()
+    
+        if is_oracle:
             table_meta = self._manage_blob_columns(table_meta)
+    
+        if is_oracle or is_mssql:
             table_meta = self._convert_int_columns(table_meta)
+    
+        if is_oracle:
             table_meta = self._rename_materialised_view(table_meta)
-        elif self._dialect_is_mssql():
-            table_meta = self._convert_int_columns(table_meta)
     
         table_meta = self._add_reference_columns(table_meta)
         table_meta = self._process_exclusions(table_meta, schema, table)
