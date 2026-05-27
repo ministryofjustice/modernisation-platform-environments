@@ -113,11 +113,11 @@ module "mwaa_execution_iam_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.59.0"
-
-  name   = "mwaa-execution"
-  policy = data.aws_iam_policy_document.mwaa_execution_policy.json
+  source      = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version     = "6.6.0"
+  description = "IAM Policy"
+  name        = "mwaa-execution"
+  policy      = data.aws_iam_policy_document.mwaa_execution_policy.json
 
   tags = local.tags
 }
@@ -143,11 +143,11 @@ module "mwaa_ses_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.59.0"
-
-  name   = "mwaa-ses"
-  policy = data.aws_iam_policy_document.mwaa_ses.json
+  source      = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version     = "6.6.0"
+  description = "IAM Policy"
+  name        = "mwaa-ses"
+  policy      = data.aws_iam_policy_document.mwaa_ses.json
 
   tags = local.tags
 }
@@ -196,8 +196,9 @@ module "gha_moj_ap_airflow_iam_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.59.0"
+  source      = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version     = "6.6.0"
+  description = "IAM Policy"
 
   name = "github-actions-ministryofjustice-analytical-platform-airflow"
 
@@ -220,9 +221,10 @@ module "gha_mojas_airflow_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.59.0"
+  version = "6.6.0"
 
   name_prefix = "github-actions-mojas-airflow"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.gha_mojas_airflow.json
 
@@ -243,9 +245,10 @@ module "create_airflow_token_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.59.0"
+  version = "6.6.0"
 
   name_prefix = "create-airflow-token-"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.create_airflow_token.json
 
