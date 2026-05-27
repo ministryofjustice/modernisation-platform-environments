@@ -1,6 +1,12 @@
 #!/bin/bash
 set -euo pipefail
 
+# Only run on first boot - sentinel file
+if [ -f /etc/.userdata-ran ]; then
+  exit 0
+fi
+touch /etc/.userdata-ran
+
 # Set timezone to UK
 timedatectl set-timezone Europe/London
 
@@ -24,7 +30,7 @@ dnf update -y
 dnf_install ruby wget tar git
 
 
-# Java - Amazon Corretto 21
+# Java - Amazon Corretto
 dnf_install --setopt=retries=5 java-17-amazon-corretto
 dnf_install --setopt=retries=5 java-21-amazon-corretto
 
