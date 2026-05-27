@@ -63,6 +63,7 @@ locals {
     "g4s_tasking",
   ] : local.is-development ? [
     "test",
+    "capita_blob_storage",
     "emd_historic_int",
     "g4s_atrium_unstructured",
     "g4s_cap_dw"
