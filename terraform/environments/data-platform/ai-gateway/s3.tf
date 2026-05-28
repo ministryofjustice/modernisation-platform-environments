@@ -1,5 +1,5 @@
 locals {
-  alb_access_logs_bucket_name = "mojdp-${local.environment}-ai-gateway-alb-logs"
+  alb_access_logs_bucket_name = "mojdp-${local.environment}-${local.component_name}-alb-logs"
 }
 
 data "aws_elb_service_account" "current" {}
@@ -9,7 +9,7 @@ data "aws_iam_policy_document" "alb_access_logs_bucket_policy" {
     sid       = "AllowALBPutObject"
     effect    = "Allow"
     actions   = ["s3:PutObject"]
-    resources = ["arn:aws:s3:::${local.alb_access_logs_bucket_name}/ai-gateway/AWSLogs/${data.aws_caller_identity.current.account_id}/*"]
+    resources = ["arn:aws:s3:::${local.alb_access_logs_bucket_name}/${local.component_name}/AWSLogs/${data.aws_caller_identity.current.account_id}/*"]
 
     principals {
       type        = "AWS"
