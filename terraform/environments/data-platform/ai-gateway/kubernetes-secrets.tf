@@ -6,7 +6,7 @@ resource "kubernetes_secret_v1" "litellm_master_key" {
   depends_on = [kubernetes_namespace_v1.ai_gateway]
 
   metadata {
-    namespace = "ai-gateway"
+    namespace = local.component_name
     name      = "litellm-master-key"
   }
 

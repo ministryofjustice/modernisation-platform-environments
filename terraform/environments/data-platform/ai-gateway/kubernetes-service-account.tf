@@ -3,7 +3,7 @@ resource "kubernetes_service_account_v1" "litellm" {
 
   metadata {
     name      = "litellm"
-    namespace = "ai-gateway"
+    namespace = local.component_name
 
     annotations = {
       "eks.amazonaws.com/role-arn" = module.iam_role.arn

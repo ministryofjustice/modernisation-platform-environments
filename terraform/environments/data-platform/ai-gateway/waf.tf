@@ -7,7 +7,7 @@ locals {
 }
 
 data "aws_lb" "ai_gateway" {
-  name = "ai-gateway"
+  name = local.component_name
 
   depends_on = [helm_release.ai_gateway_configuration]
 }
@@ -15,17 +15,17 @@ data "aws_lb" "ai_gateway" {
 module "waf_ip_set_ai_gateway_allowlist" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-wafv2.git//modules/ip-set?ref=36eceb918a237a80b69ce98e50b6f83fe17d2401" # v2.1.0
 
-  name               = "ai-gateway-allowlist-${local.environment}"
+  name               = "${local.component_name}-allowlist-${local.environment}"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
   addresses          = local.environment_configuration.ai_gateway_ingress_allowlist
 }
 
 module "waf_ip_set_ai_gateway_admin_allowlist" {
-  count   = length(local.environment_configuration.ai_gateway_admin_ingress_allowlist) > 0 ? 1 : 0
+  count  = length(local.environment_configuration.ai_gateway_admin_ingress_allowlist) > 0 ? 1 : 0
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-wafv2.git//modules/ip-set?ref=36eceb918a237a80b69ce98e50b6f83fe17d2401" # v2.1.0
 
-  name               = "ai-gateway-admin-allowlist-${local.environment}"
+  name               = "${local.component_name}-admin-allowlist-${local.environment}"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
   addresses          = local.environment_configuration.ai_gateway_admin_ingress_allowlist
@@ -34,7 +34,7 @@ module "waf_ip_set_ai_gateway_admin_allowlist" {
 module "waf_ai_gateway" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-wafv2.git?ref=36eceb918a237a80b69ce98e50b6f83fe17d2401" # v2.1.0
 
-  name  = "ai-gateway-${local.environment}"
+  name  = "${local.component_name}-${local.environment}"
   scope = "REGIONAL"
 
   default_action = "block"
@@ -70,7 +70,7 @@ module "waf_ai_gateway" {
 
       visibility_config = {
         cloudwatch_metrics_enabled = true
-        metric_name                = "ai-gateway-block-sensitive-paths"
+        metric_name                = "${local.component_name}-block-sensitive-paths"
         sampled_requests_enabled   = true
       }
     }
@@ -87,7 +87,7 @@ module "waf_ai_gateway" {
 
       visibility_config = {
         cloudwatch_metrics_enabled = true
-        metric_name                = "ai-gateway-ip-allowlist"
+        metric_name                = "${local.component_name}-ip-allowlist"
         sampled_requests_enabled   = true
       }
     }
@@ -105,7 +105,7 @@ module "waf_ai_gateway" {
 
       visibility_config = {
         cloudwatch_metrics_enabled = true
-        metric_name                = "ai-gateway-common-rules"
+        metric_name                = "${local.component_name}-common-rules"
         sampled_requests_enabled   = true
       }
     }
@@ -123,7 +123,7 @@ module "waf_ai_gateway" {
 
       visibility_config = {
         cloudwatch_metrics_enabled = true
-        metric_name                = "ai-gateway-known-bad-inputs"
+        metric_name                = "${local.component_name}-known-bad-inputs"
         sampled_requests_enabled   = true
       }
     }
@@ -164,7 +164,7 @@ module "waf_ai_gateway" {
 
       visibility_config = {
         cloudwatch_metrics_enabled = true
-        metric_name                = "ai-gateway-allow-admin-authorized"
+        metric_name                = "${local.component_name}-allow-admin-authorized"
         sampled_requests_enabled   = true
       }
     }
@@ -193,7 +193,7 @@ module "waf_ai_gateway" {
 
       visibility_config = {
         cloudwatch_metrics_enabled = true
-        metric_name                = "ai-gateway-block-admin-unauthorized"
+        metric_name                = "${local.component_name}-block-admin-unauthorized"
         sampled_requests_enabled   = true
       }
     }
@@ -210,7 +210,7 @@ module "waf_ai_gateway" {
 
       visibility_config = {
         cloudwatch_metrics_enabled = true
-        metric_name                = "ai-gateway-ip-allowlist-admin"
+        metric_name                = "${local.component_name}-ip-allowlist-admin"
         sampled_requests_enabled   = true
       }
     }
@@ -218,7 +218,7 @@ module "waf_ai_gateway" {
 
   visibility_config = {
     cloudwatch_metrics_enabled = true
-    metric_name                = "ai-gateway-waf"
+    metric_name                = "${local.component_name}-waf"
     sampled_requests_enabled   = true
   }
 

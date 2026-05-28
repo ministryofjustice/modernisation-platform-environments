@@ -1,12 +1,12 @@
 resource "helm_release" "ai_gateway_configuration" {
-  name      = "ai-gateway-configuration"
-  chart     = "${path.module}/src/helm/charts/ai-gateway-configuration"
+  name      = "${local.component_name}-configuration"
+  chart     = "${path.module}/src/helm/charts/${local.component_name}-configuration"
   version   = "1.4.0"
-  namespace = "ai-gateway"
+  namespace = local.component_name
 
   values = [
     templatefile(
-      "${path.module}/src/helm/values/ai-gateway-configuration/values.yml.tftpl",
+      "${path.module}/src/helm/values/${local.component_name}-configuration/values.yml.tftpl",
       {
         hostname        = local.environment_configuration.ai_gateway_hostname
         admin_hostname  = "admin.${local.environment_configuration.ai_gateway_hostname}"
@@ -22,13 +22,13 @@ resource "helm_release" "litellm" {
   repository = "oci://ghcr.io/berriai"
   version    = local.environment_configuration.litellm_versions.chart
   chart      = "litellm-helm"
-  namespace  = "ai-gateway"
+  namespace  = local.component_name
   values = [
     templatefile(
       "${path.module}/src/helm/values/litellm/values.yml.tftpl",
       {
         # Kubernetes
-        namespace          = "ai-gateway"
+        namespace          = "${local.component_name}"
         imageRepository    = "ghcr.io/berriai/litellm-non_root"
         imageTag           = local.environment_configuration.litellm_versions.application
         serviceAccountName = "litellm"
@@ -85,13 +85,13 @@ resource "helm_release" "litellm_admin" {
   repository = "oci://ghcr.io/berriai"
   version    = local.environment_configuration.litellm_versions.chart
   chart      = "litellm-helm"
-  namespace  = "ai-gateway"
+  namespace  = local.component_name
   values = [
     templatefile(
       "${path.module}/src/helm/values/litellm-admin/values.yml.tftpl",
       {
         # Kubernetes
-        namespace          = "ai-gateway"
+        namespace          = "${local.component_name}"
         imageRepository    = "ghcr.io/berriai/litellm-non_root"
         imageTag           = local.environment_configuration.litellm_versions.application
         serviceAccountName = "litellm"

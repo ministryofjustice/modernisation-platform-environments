@@ -10,7 +10,7 @@ module "iam_role" {
   oidc_providers = {
     main = {
       provider_arn               = data.aws_iam_openid_connect_provider.cluster.arn
-      namespace_service_accounts = ["ai-gateway:litellm"]
+      namespace_service_accounts = ["${local.component_name}:litellm"]
     }
   }
 }
