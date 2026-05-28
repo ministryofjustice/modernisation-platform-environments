@@ -1,15 +1,15 @@
 #### This file can be used to store locals specific to the member account ####
 locals {
-  logging_bucket_name            = "${local.application_name}-${local.environment}-logging"
-  rsync_bucket_name              = "${local.application_name}-${local.environment}-dbbackup"
-  lb_log_prefix_ebsapp           = "ebsapps-lb"
-  lb_log_prefix_wgate            = "wgate-lb"
-  lb_log_prefix_wgate_public     = "wgate-lb-public"
-  lb_log_prefix_ebsapp_internal  = "ebsapps-internal-lb"
-  lb_log_prefix_webgate_internal = "webgate-internal-lb"
-  lb_log_prefix_ssogen_internal  = "ssogen-internal-lb"
-  lb_log_prefix_ssogen_internal_console   = "ssogen-console-internal-lb"
-  application_name_ssogen        = "ssogen"
+  logging_bucket_name                   = "${local.application_name}-${local.environment}-logging"
+  rsync_bucket_name                     = "${local.application_name}-${local.environment}-dbbackup"
+  lb_log_prefix_ebsapp                  = "ebsapps-lb"
+  lb_log_prefix_wgate                   = "wgate-lb"
+  lb_log_prefix_wgate_public            = "wgate-lb-public"
+  lb_log_prefix_ebsapp_internal         = "ebsapps-internal-lb"
+  lb_log_prefix_webgate_internal        = "webgate-internal-lb"
+  lb_log_prefix_ssogen_internal         = "ssogen-internal-lb"
+  lb_log_prefix_ssogen_internal_console = "ssogen-console-internal-lb"
+  application_name_ssogen               = "ssogen"
 
 
   disksmount = [
@@ -25,8 +25,8 @@ locals {
     "aserver:/u01/shared/product/runtime/Domain/aserver"
   ]
 
-  efs_mount_points_joined = join(",", local.efs_mount_points) 
-  volume_prefix = local.environment == "production" ? "/CCMS/EBSPROD" : "/CCMS/EBS"
+  efs_mount_points_joined = join(",", local.efs_mount_points)
+  volume_prefix           = local.environment == "production" ? "/CCMS/EBSPROD" : "/CCMS/EBS"
 
   sftp_enabled       = contains(["development", "test"], local.environment)
   lambda_folder_name = ["lambda_delivery", "ftp_lambda_layer", "payment_lambda_layer", "cloudwatch_sns_layer", "payment_load_monitor_layer"]
