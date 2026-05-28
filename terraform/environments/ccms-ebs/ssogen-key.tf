@@ -1,6 +1,7 @@
 # checkov:skip=CKV_AWS_356: KMS key policies require Resource="*"; constrained via principals/conditions
 # checkov:skip=CKV_AWS_109: Root admin stanza retained; functional use is tightly scoped
 data "aws_iam_policy_document" "ssogen_kms_policy" {
+  count         = local.is-development || local.is-test ? 1 : 0
   statement {
     sid = "AllowRootAccountAdmin"
     principals {
@@ -11,10 +12,10 @@ data "aws_iam_policy_document" "ssogen_kms_policy" {
     resources = ["*"]
   }
   statement {
-    sid = "AllowRootAccountAdmin"
+    sid = "AllowRootAccountAdminForDevAccount"
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::jsondecode(data.aws_secretsmanager_secret_version.dev_account_secret.secret_string).dev_account_id:root"]
+      identifiers = ["arn:aws:iam::${jsondecode(data.aws_secretsmanager_secret_version.dev_account_secret[count.index].secret_string).dev_account_id}:root"]
     }
     actions   = ["kms:*"]
     resources = ["*"]
