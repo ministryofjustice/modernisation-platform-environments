@@ -168,7 +168,12 @@ resource "aws_api_gateway_model" "update_p1_export" {
   schema       = jsonencode({
     type = "object"
     properties = {
-      case_numbers = { type = "array", items = {type = "integer"} }
+      case_numbers = { 
+        type = "array"
+        items = {
+          type = "integer"
+        }
+      }
       run_historic = { type = "boolean" }
     }
     required = ["case_numbers", "case_numbers"]
