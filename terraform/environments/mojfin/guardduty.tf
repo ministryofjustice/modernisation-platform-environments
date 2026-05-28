@@ -303,8 +303,3 @@ resource "aws_guardduty_malware_protection_plan" "bastion_s3_protection_plan" {
 
   depends_on = [module.bastion_linux]
 }
-
-moved {
-  from = aws_guardduty_malware_protection_plan.mojfin_s3_malware_plan
-  to   = aws_guardduty_malware_protection_plan.shared_s3_protection_plan
-}
