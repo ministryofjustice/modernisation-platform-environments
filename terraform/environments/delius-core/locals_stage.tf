@@ -102,8 +102,8 @@ locals {
       BREACH_NOTICE_UI_URL_FORMAT = "https://breach-notice-stage.hmpps.service.justice.gov.uk/breach-notice/%s"
       COOKIE_SECURE               = "true"
       # DELIUS_API_URL                    = "" # No longer needed
-      DMS_HOST                          = "https://hmpps-delius-alfresco-stage.apps.live.cloud-platform.service.justice.gov.uk"
-      DMS_OFFICE_URI_HOST               = "https://hmpps-delius-alfresco-stage.apps.live.cloud-platform.service.justice.gov.uk"
+      DMS_HOST                          = "hmpps-delius-alfresco-stage.apps.live.cloud-platform.service.justice.gov.uk"
+      DMS_OFFICE_URI_HOST               = "hmpps-delius-alfresco-stage.apps.live.cloud-platform.service.justice.gov.uk"
       DMS_OFFICE_URI_PORT               = "443"
       DMS_PORT                          = "443"
       DMS_PROTOCOL                      = "https"
