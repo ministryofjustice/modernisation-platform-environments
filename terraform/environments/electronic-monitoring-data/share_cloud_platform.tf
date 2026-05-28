@@ -202,7 +202,7 @@ resource "aws_lakeformation_permissions" "em_data_validation_db" {
 }
 
 resource "aws_lakeformation_permissions" "em_data_validation_table" {
-  count       = local.is-test || local.is-production ? 1 : 0emdi
+  count       = local.is-test || local.is-production ? 1 : 0
   principal   = module.emd_validation_db_role[0].iam_role_arn
   permissions = ["DESCRIBE", "SELECT"]
   table {
