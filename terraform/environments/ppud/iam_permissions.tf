@@ -153,7 +153,8 @@ locals {
         "update_ses_secrets_value",
         "ssm_send_command",
         "ssm_read_command",
-        "ec2_describe_instances"
+        "ec2_describe_instances",
+        "invoke_ses"
         # ssm_ec2_send_command is attached separately via aws_iam_role_policy_attachment.attach_ssm_ec2_send_command
       ]
     }
