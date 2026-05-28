@@ -1,3 +1,4 @@
+# Create the database in Governance
 resource "aws_glue_catalog_database" "main" {
   for_each = tomap({
     for database in flatten([
@@ -27,6 +28,7 @@ resource "aws_glue_catalog_database" "main" {
   )
 }
 
+# Share database with factory
 resource "aws_lakeformation_permissions" "database" {
   for_each = tomap({
     for grant in flatten([
@@ -57,6 +59,7 @@ resource "aws_lakeformation_permissions" "database" {
   }
 }
 
+# Share tables with factory
 resource "aws_lakeformation_permissions" "tables" {
   for_each = tomap({
     for grant in flatten([

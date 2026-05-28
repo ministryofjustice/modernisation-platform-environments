@@ -1,3 +1,4 @@
+# create resource link
 resource "aws_glue_catalog_database" "main" {
   for_each = tomap(try(local.data_platform_lakeformation_configuration.databases, {}))
 
@@ -19,6 +20,7 @@ resource "aws_glue_catalog_database" "main" {
   )
 }
 
+# grant permissions to resource link (database)
 resource "aws_lakeformation_permissions" "database" {
   for_each = tomap({
     for grant in flatten([
@@ -41,6 +43,7 @@ resource "aws_lakeformation_permissions" "database" {
   }
 }
 
+# grant permissions to shared database
 resource "aws_lakeformation_permissions" "shared_database" {
   for_each = tomap({
     for grant in flatten([
@@ -64,6 +67,7 @@ resource "aws_lakeformation_permissions" "shared_database" {
   }
 }
 
+# grant permissions to shared tables
 resource "aws_lakeformation_permissions" "shared_tables" {
   for_each = tomap({
     for grant in flatten([
