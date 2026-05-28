@@ -1,6 +1,49 @@
 {  
-   "StartAt": "RunContainerTask",
+   "StartAt": "ControlLambda",
    "States": {  
+
+      "ControlLambda": {
+         "Type": "Task",
+         "Resource": "${control_lambda_arn}",
+         "Next": "TriggerBatchDeletionJobs"
+      },
+
+      "TriggerBatchDeletionJobs": {
+         "Type": "Map",
+         "ItemsPath": "$",
+         "Next": "RunContainerTask",
+         "ItemProcessor": {
+            "ProcessorConfig": {
+               "Mode": "INLINE"
+            },
+            "StartAt": "SubmitBatchJob",
+            "States": {
+               "SubmitBatchJob": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::batch:submitJob.sync",
+                  "Parameters": {
+                     "JobName.$": "$.job_name",
+                     "JobQueue": "${batch_job_queue_arn}",
+                     "JobDefinition": "${batch_job_definition_arn}",
+                     "ContainerOverrides": {
+                        "Environment": [
+                           {
+                              "Name": "S3_FILE_URI",
+                              "Value.$": "$.s3_file_uri"
+                           },
+                           {
+                              "Name": "MANIFEST_URI",
+                              "Value.$": "$.manifest_uri"
+                           }
+                        ]
+                     }
+                  },
+                  "End": true
+               }
+            }
+         }
+      },
+
       "RunContainerTask": {  
          "Type": "Task",
          "Resource": "arn:aws:states:::ecs:runTask.sync",
@@ -18,17 +61,17 @@
             "Overrides": {  
                "ContainerOverrides": [  
                   {
-                    "Name": "${container_name}",
-                    "Environment": [
-                      {
-                        "Name": "DEPLOY_VERSION",
-                        "Value": "latest"
-                      },
-                      {
-                        "Name": "ATHENA_OUTPUT_BUCKET",
-                        "Value": "${athena_output_bucket}"
-                      }
-                    ]
+                     "Name": "${container_name}",
+                     "Environment": [
+                        {
+                           "Name": "DEPLOY_VERSION",
+                           "Value": "latest"
+                        },
+                        {
+                           "Name": "ATHENA_OUTPUT_BUCKET",
+                           "Value": "${athena_output_bucket}"
+                        }
+                     ]
                   }
                ]
             }
