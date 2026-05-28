@@ -810,7 +810,7 @@ module "create_p1_export" {
 #-----------------------------------------------------------------------------------
 
 module "update_p1_export" {
-  count = local.is-development 1 ? 0
+  count = local.is-development : 1 ? 0
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "update_p1_export"
