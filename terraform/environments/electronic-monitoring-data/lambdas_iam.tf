@@ -2562,7 +2562,7 @@ resource "aws_iam_role_policy_attachment" "lingest_specials_policy_attachment" {
   policy_arn = aws_iam_policy.ingest_specials_lambda_role_policy.arn
 }
 
-module "share_dbs_with_ingestion_lambda_role" {
+module "share_dbs_with_specials_ingestion_lambda_role" {
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = toset(local.historic_source_dbs)
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
@@ -2571,8 +2571,7 @@ module "share_dbs_with_ingestion_lambda_role" {
   de_role_arn             = null
 }
 
-resource "aws_lakeformation_permissions" "dms_add_create_db" {
-  count            = local.is-development ? 0 : 1
+resource "aws_lakeformation_permissions" "specials_ingestion_lambda_add_create_db" {
   permissions      = ["CREATE_DATABASE", "DROP"]
   principal        = aws_iam_role.ingest_specials_data.arn
   catalog_resource = true
