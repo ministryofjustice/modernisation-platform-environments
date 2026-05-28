@@ -4,6 +4,8 @@ locals {
   environment_config_preprod = {
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
     legacy_counterpart_vpc_cidr            = "10.160.0.0/20"
+    legacy_ad_domain_name                  = "delius-pre-prod.local"
+    legacy_dns_ip_addrs                    = ["10.160.0.163", "10.160.6.66"]
     ad_domain_name                         = "delius-mis-preprod.internal"
     ad_trust_domain_name                   = "azure.hmpp.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
@@ -276,9 +278,10 @@ locals {
 
   # BOE DB config
   boe_db_config_preprod = {
-    instance_count = 0
-    instance_type  = "m7i.large"
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    primary_instance_count = 0
+    standby_instance_count = 0
+    instance_type          = "m7i.large"
+    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -321,9 +324,10 @@ locals {
 
   # DSD DB config
   dsd_db_config_preprod = {
-    instance_count = 0
-    instance_type  = "r7i.large"
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    primary_instance_count = 0
+    standby_instance_count = 0
+    instance_type          = "r7i.large"
+    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -366,9 +370,10 @@ locals {
 
   # MIS DB config
   mis_db_config_preprod = {
-    instance_count = 0
-    instance_type  = "r7i.12xlarge"
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    primary_instance_count = 1
+    standby_instance_count = 1
+    instance_type          = "r7i.12xlarge"
+    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -395,10 +400,10 @@ locals {
         type       = "gp3"
       }
       data = {
-        iops       = 5000
-        throughput = 500
+        iops       = 7680
+        throughput = 480
         type       = "gp3"
-        total_size = 6000
+        total_size = 7000
       }
       flash = {
         iops       = 3000

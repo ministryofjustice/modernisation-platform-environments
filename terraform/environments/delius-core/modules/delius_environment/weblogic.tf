@@ -51,10 +51,10 @@ module "weblogic" {
     healthy_threshold    = 5
     interval             = 30
     protocol             = "HTTP"
-    unhealthy_threshold  = 5
+    unhealthy_threshold  = 10 # Increased unhealthy threshold to allow longer for recovery, due to instances being stateful
     matcher              = "200"
-    timeout              = 5
-    grace_period_seconds = 300
+    timeout              = 15 # Should be greater than WebLogic's "Connection Reserve Timeout", which defaults to 10 seconds
+    grace_period_seconds = 480
   }
 
   certificate_arn               = aws_acm_certificate.external.arn
@@ -190,8 +190,9 @@ resource "aws_security_group" "ecs_host_sg" {
 resource "aws_autoscaling_group" "weblogic" {
   name = "weblogic-${var.env_name}-ecs-asg"
 
-  max_size              = 2
-  min_size              = 1
+  min_size = var.delius_microservice_configs.weblogic.asg_min_size
+  max_size = var.delius_microservice_configs.weblogic.asg_max_size
+
   protect_from_scale_in = true
 
   vpc_zone_identifier = var.account_config.private_subnet_ids
