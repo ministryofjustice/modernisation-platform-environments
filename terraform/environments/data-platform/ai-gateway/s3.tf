@@ -47,7 +47,7 @@ module "alb_access_logs" {
       enabled = true
 
       expiration = {
-        days = 90
+        days = 365
       }
     }
   ]
