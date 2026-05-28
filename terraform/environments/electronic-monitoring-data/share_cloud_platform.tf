@@ -657,7 +657,7 @@ data "aws_iam_policy_document" "emac_di_permissions" {
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_mdss*",
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/acquisitive_crime*",
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/data_insights*",
-      ] : local.is-preproduction ? [
+      ] : local.is-preproduction || local.is-production  ? [
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/acquisitive_crime*",
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/data_insights*",
     ] : []
@@ -675,7 +675,7 @@ data "aws_iam_policy_document" "emac_di_permissions" {
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_mdss*/*",
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/acquisitive_crime*/*",
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/data_insights*/*",
-      ] : local.is-preproduction ? [
+      ] : local.is-preproduction || local.is-production ? [
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/acquisitive_crime*/*",
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/data_insights*/*",
     ] : []
@@ -695,7 +695,6 @@ resource "aws_iam_policy" "cmt_specific_access" {
 }
 
 resource "aws_iam_policy" "emac_di_permissions" {
-  count       = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   name_prefix = "emac_di_permissions"
   description = "Access to the Glue tables required by Acquisitive Crime."
   policy      = data.aws_iam_policy_document.emac_di_permissions.json
@@ -718,13 +717,13 @@ resource "aws_iam_role_policy_attachment" "specials_role_standard_athena_access"
 }
 
 resource "aws_iam_role_policy_attachment" "standard_athena_access_ac" {
-  count      = local.is-development || local.is-test ? 1 : 0
+  count      = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   policy_arn = aws_iam_policy.standard_athena_access.arn
   role       = module.acquisitive_crime_assumable_role[0].iam_role_name
 }
 
 resource "aws_iam_role_policy_attachment" "ac_specific_access" {
-  count      = local.is-development || local.is-test ? 1 : 0
+  count      = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   policy_arn = aws_iam_policy.emac_di_permissions[0].arn
   role       = module.acquisitive_crime_assumable_role[0].iam_role_name
 }
