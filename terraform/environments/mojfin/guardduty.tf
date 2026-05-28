@@ -282,24 +282,17 @@ resource "aws_guardduty_malware_protection_plan" "rds_oracle_s3_protection_plan"
   depends_on = [aws_s3_bucket.mojfin_rds_oracle]
 }
 
-resource "aws_guardduty_malware_protection_plan" "bastion_s3_protection_plan" {
-  role = data.aws_iam_role.guardduty_s3_malware_role.arn
+moved {
+  from = aws_guardduty_malware_protection_plan.mojfin_s3_malware_plan
+  to   = aws_guardduty_malware_protection_plan.shared_s3_protection_plan
+}
 
-  protected_resource {
-    s3_bucket {
-      bucket_name = "bastion-${local.application_name}"
-    }
-  }
+moved {
+  from = aws_guardduty_malware_protection_plan.mojfin_s3_shared
+  to   = aws_guardduty_malware_protection_plan.shared_s3_protection_plan
+}
 
-  actions {
-    tagging {
-      status = "ENABLED"
-    }
-  }
-
-  tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-guardduty-mpp", local.application_name, local.environment)) }
-  )
-
-  depends_on = [module.bastion_linux]
+moved {
+  from = aws_guardduty_malware_protection_plan.mojfin_s3_rds_oracle
+  to   = aws_guardduty_malware_protection_plan.rds_oracle_s3_protection_plan
 }
