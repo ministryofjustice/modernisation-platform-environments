@@ -412,7 +412,7 @@ resource "aws_iam_role_policy_attachment" "standard_athena_access_emdi" {
 
 
 resource "aws_iam_role_policy_attachment" "emdi_glue_access" {
-  policy_arn = aws_iam_policy.emac_di_permissions[0].arn
+  policy_arn = aws_iam_policy.emac_di_permissions.arn
   role       = module.emdi_trail_maps_role.iam_role_name
 }
 
@@ -724,6 +724,6 @@ resource "aws_iam_role_policy_attachment" "standard_athena_access_ac" {
 
 resource "aws_iam_role_policy_attachment" "ac_specific_access" {
   count      = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
-  policy_arn = aws_iam_policy.emac_di_permissions[0].arn
+  policy_arn = aws_iam_policy.emac_di_permissions.arn
   role       = module.acquisitive_crime_assumable_role[0].iam_role_name
 }
