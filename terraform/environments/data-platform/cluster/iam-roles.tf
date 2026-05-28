@@ -136,7 +136,7 @@ module "external_secrets_iam_role" {
 
   attach_external_secrets_policy        = true
   external_secrets_kms_key_arns         = [module.secrets_manager_common_kms_key.key_arn]
-  external_secrets_secrets_manager_arns = ["arn:aws:secretsmanager:*:*:secret:ai-gateway/*"]
+  external_secrets_secrets_manager_arns = [for prefix in local.external_secrets_component_prefixes : "arn:aws:secretsmanager:*:*:secret:${prefix}/*"]
 
   oidc_providers = {
     main = {
