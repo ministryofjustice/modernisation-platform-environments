@@ -162,7 +162,7 @@ resource "aws_api_gateway_request_validator" "update_p1_export" {
 }
 
 resource "aws_api_gateway_model" "update_p1_export" {
-  rest_api_id  = aws_api_gateway_rest_api.api_gateway.id
+  rest_api_id  = aws_api_gateway_rest_api.update_p1_export.id
   name         = "UpdateP1ExportModel"
   content_type = "application/json"
   schema       = jsonencode({
