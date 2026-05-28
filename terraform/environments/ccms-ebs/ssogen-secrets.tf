@@ -1,16 +1,16 @@
 # Common EBS Secrets
 resource "aws_secretsmanager_secret" "dev_account_secret" {
-  count         = local.is-development || local.is-test ? 1 : 0
+  count       = local.is-development || local.is-test ? 1 : 0
   name        = "${local.application_name}-dev-account-secrets"
   description = "CCMS EBS Secret for dev account"
 }
 
 resource "aws_secretsmanager_secret_version" "dev_account_secret" {
-  count         = local.is-development || local.is-test ? 1 : 0
+  count     = local.is-development || local.is-test ? 1 : 0
   secret_id = aws_secretsmanager_secret.dev_account_secret[count.index].id
 
   secret_string = jsonencode({
-    "dev_account_id"           = ""
+    "dev_account_id" = ""
   })
 
   lifecycle {
@@ -21,6 +21,6 @@ resource "aws_secretsmanager_secret_version" "dev_account_secret" {
 }
 
 data "aws_secretsmanager_secret_version" "dev_account_secret" {
-  count         = local.is-development || local.is-test ? 1 : 0
-  secret_id = aws_secretsmanager_secret.dev_account_secret[count.index].id 
+  count     = local.is-development || local.is-test ? 1 : 0
+  secret_id = aws_secretsmanager_secret.dev_account_secret[count.index].id
 }
