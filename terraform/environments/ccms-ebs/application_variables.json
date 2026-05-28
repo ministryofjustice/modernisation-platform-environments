@@ -124,7 +124,7 @@
       "tg_ssogen_apps_port": 7777,
       "tg_ssogen_apps_enc_port": 4443,
       "tg_ssogen_admin_enc_port": 4443,
-      "ssogen_ami_id-1": "ami-0b619bfa900dfeb4a",
+      "ssogen_ami_id-1": "ami-0c36600865ec9fb38",
       "ssogen_ami_id-2": "ami-04f15935bbc6f8ca2",
       "ec2_oracle_instance_cores_ssogen": 2,
       "ssogen_desired_capacity": "1",
