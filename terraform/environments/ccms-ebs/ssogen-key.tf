@@ -58,7 +58,7 @@ resource "aws_kms_key" "ssogen_kms" {
   count               = local.is-development || local.is-test ? 1 : 0
   description         = "KMS for SSH private keys in Secrets Manager"
   enable_key_rotation = true
-  policy              = data.aws_iam_policy_document.ssogen_kms_policy.json
+  policy              = data.aws_iam_policy_document.ssogen_kms_policy[count.index].json
   tags                = { Environment = local.environment }
 }
 
