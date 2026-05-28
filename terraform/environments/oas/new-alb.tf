@@ -400,7 +400,7 @@ resource "aws_lb_target_group" "oas_ec2_https_9501_target_group" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-ec2-target-group" }
+    { "Name" = "${local.application_name}-ec2-target-group-https" }
   )
 }
 
@@ -457,6 +457,54 @@ resource "aws_lb_target_group_attachment" "oas_analytics_attachment" {
   target_id        = aws_instance.oas_app_instance_new[0].id
   port             = 9502
 }
+
+# Target Group for Analytics port 9503 HTTPS
+
+resource "aws_lb_target_group" "oas_analytics_https_9503_target_group" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  name_prefix          = "oas-3"
+  port                 = 9503
+  protocol             = "HTTP"
+  vpc_id               = data.aws_vpc.shared.id
+  target_type          = "instance"
+  deregistration_delay = 30
+
+  stickiness {
+    type            = "lb_cookie"
+    cookie_duration = 86400
+  }
+
+  health_check {
+    path                = "/analytics"
+    port                = "9503"
+    healthy_threshold   = 3
+    interval            = 30
+    protocol            = "HTTP"
+    unhealthy_threshold = 3
+    matcher             = "200-399"
+    timeout             = 5
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-analytics-target-group-https" }
+  )
+}
+
+resource "aws_lb_target_group_attachment" "oas_ec2_https_9503_attachment" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+  target_id        = aws_instance.oas_app_instance_new[0].id
+  port             = 9503
+}
+
+
 
 resource "aws_lb_listener" "http_listener" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
@@ -706,7 +754,7 @@ resource "aws_lb_listener_rule" "analytics_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
   }
 
   condition {
@@ -725,7 +773,7 @@ resource "aws_lb_listener_rule" "analytics_ws_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
   }
 
   condition {
@@ -744,7 +792,7 @@ resource "aws_lb_listener_rule" "dv_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
   }
 
   condition {
@@ -763,7 +811,7 @@ resource "aws_lb_listener_rule" "bi_security_login_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
   }
 
   condition {
@@ -782,7 +830,7 @@ resource "aws_lb_listener_rule" "biinfer_login_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
   }
 
   condition {
@@ -797,35 +845,16 @@ resource "aws_lb_listener_rule" "bi_sac_config_mgr_https_rule" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   listener_arn = aws_lb_listener.https_listener[0].arn
-  priority     = 251
+  priority     = 260
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
   }
 
   condition {
     path_pattern {
       values = ["/bi-sac-config-mgr*"]
-    }
-  }
-}
-
-# Listener rule for /static on HTTPS
-resource "aws_lb_listener_rule" "static_https_rule" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
-
-  listener_arn = aws_lb_listener.https_listener[0].arn
-  priority     = 240
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
-  }
-
-  condition {
-    path_pattern {
-      values = ["/static*"]
     }
   }
 }
