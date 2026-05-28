@@ -6,7 +6,7 @@ resource "kubernetes_manifest" "external_secret_litellm_license" {
     kind       = "ExternalSecret"
     metadata = {
       name      = "litellm-license"
-      namespace = "ai-gateway"
+      namespace = "${local.component_name}"
     }
     spec = {
       refreshInterval = "1h"
@@ -37,7 +37,7 @@ resource "kubernetes_manifest" "external_secret_litellm_salt_key" {
     kind       = "ExternalSecret"
     metadata = {
       name      = "litellm-salt-key"
-      namespace = "ai-gateway"
+      namespace = "${local.component_name}"
     }
     spec = {
       refreshInterval = "1h"
@@ -68,7 +68,7 @@ resource "kubernetes_manifest" "external_secret_litellm_entra_id" {
     kind       = "ExternalSecret"
     metadata = {
       name      = "litellm-entra-id"
-      namespace = "ai-gateway"
+      namespace = "${local.component_name}"
     }
     spec = {
       refreshInterval = "1h"
@@ -122,7 +122,7 @@ resource "kubernetes_manifest" "external_secret_aurora" {
     kind       = "ExternalSecret"
     metadata = {
       name      = "aurora"
-      namespace = "ai-gateway"
+      namespace = "${local.component_name}"
     }
     spec = {
       refreshInterval = "1h"
@@ -182,7 +182,7 @@ resource "kubernetes_manifest" "external_secret_elasticache" {
     kind       = "ExternalSecret"
     metadata = {
       name      = "elasticache"
-      namespace = "ai-gateway"
+      namespace = "${local.component_name}"
     }
     spec = {
       refreshInterval = "1h"
