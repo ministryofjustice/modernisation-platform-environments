@@ -165,19 +165,19 @@ resource "aws_api_gateway_model" "update_p1_export" {
   rest_api_id  = aws_api_gateway_rest_api.update_p1_export.id
   name         = "UpdateP1ExportModel"
   content_type = "application/json"
-  schema       = jsonencode({
-    type = "object"
-    properties = {
-      case_numbers = { 
-        type = "array"
-        items = {
-          type = "integer"
+  schema       = jsonencode(
+    {
+      type = "object"
+      properties = {
+        case_numbers = { 
+          type = "array"
+          items = { type = "integer" }
         }
+        run_historic = { type = "boolean" }
       }
-      run_historic = { type = "boolean" }
+      required = ["case_numbers", "run_historic"]
     }
-    required = ["case_numbers", "case_numbers"]
-  })
+  )
 }
 
 resource "aws_api_gateway_integration" "update_p1_export_lambda_post" {
