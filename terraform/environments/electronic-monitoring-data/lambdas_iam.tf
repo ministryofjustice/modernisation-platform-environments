@@ -2144,7 +2144,6 @@ resource "aws_lakeformation_permissions" "lambda_p1_table_access" {
 
 module "update_p1_export_iam_role" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role"
-
   name = "update_p1_export"
 
   trust_policy_permissions = {

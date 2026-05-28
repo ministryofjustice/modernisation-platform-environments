@@ -859,7 +859,7 @@ module "staging_db_janitor" {
 
   security_group_ids = [aws_security_group.lambda_generic.id]
   subnet_ids         = data.aws_subnets.shared-private.ids
-f
+
   environment_variables = {
     POWERTOOLS_LOG_LEVEL  = "INFO"
     SNS_TOPIC_ARN         = aws_sns_topic.emds_alerts.arn

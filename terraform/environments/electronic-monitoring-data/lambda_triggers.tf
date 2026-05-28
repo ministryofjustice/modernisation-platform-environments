@@ -429,3 +429,15 @@ resource "aws_lambda_event_source_mapping" "p1_creation_trigger" {
     principal     = "events.amazonaws.com"
     source_arn    = aws_cloudwatch_event_rule.merge_load_schedule[0].arn
   }
+
+# --------------------------------------------------------
+# update_p1_export
+# --------------------------------------------------------
+
+resource "aws_lambda_permission" "update_p1_export_api_gw" {
+  statement_id  = "AllowAPIGatewayInvokeUpdateP1Export"
+  action        = "lambda:InvokeFunction"
+  function_name = module.update_p1_export.lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.update_p1_export.execution_arn}/*/*"
+}
