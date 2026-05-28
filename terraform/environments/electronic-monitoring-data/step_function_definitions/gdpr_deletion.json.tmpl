@@ -10,7 +10,7 @@
 
       "TriggerBatchDeletionJobs": {
          "Type": "Map",
-         "ItemsPath": "$",
+         "ItemsPath": "$.jobs_to_run",
          "Next": "RunContainerTask",
          "ItemProcessor": {
             "ProcessorConfig": {
