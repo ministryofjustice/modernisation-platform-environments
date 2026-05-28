@@ -28,8 +28,8 @@ resource "aws_glue_catalog_database" "main" {
   )
 }
 
-# Share database with factory
-resource "aws_lakeformation_permissions" "database" {
+# Share database with factory(self)
+resource "aws_lakeformation_permissions" "share_database_self" {
   for_each = tomap({
     for grant in flatten([
       for factory_name, factory in try(local.lakeformation_configuration.factories, {}) : [
@@ -59,8 +59,8 @@ resource "aws_lakeformation_permissions" "database" {
   }
 }
 
-# Share tables with factory
-resource "aws_lakeformation_permissions" "tables" {
+# Share tables with factory(self)
+resource "aws_lakeformation_permissions" "share_tables_self" {
   for_each = tomap({
     for grant in flatten([
       for factory_name, factory in try(local.lakeformation_configuration.factories, {}) : [
