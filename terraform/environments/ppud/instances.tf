@@ -308,8 +308,8 @@ resource "aws_instance" "s609693lo6vw110" {
   tags = {
     Name            = "s609693lo6vw110"
     patch_group     = "dev_win_patch"
-    role            = "ses_web_config"
-    web_config_path = "C:\\Xfer\\inetpub\\web.config"
+    role            = "ses_test_config"
+    web_config_path = "C:\\Scripts\\Test_SES_Email.ps1"
     lse_server      = "true"
     backup          = true
   }

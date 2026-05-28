@@ -1013,3 +1013,26 @@ module "specials-ingestion" {
   }
 }
 
+
+#-----------------------------------------------------------------------------------
+# Control Lambda for File Shredding Batch
+#-----------------------------------------------------------------------------------
+
+module "gdpr_unstructured_control_lambda" {
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "gdpr_unstructured_control_lambda"
+  role_name               = aws_iam_role.gdpr_unstructured_control_lambda_iam_role[0].name
+  role_arn                = aws_iam_role.gdpr_unstructured_control_lambda_iam_role[0].arn
+  handler                 = "gdpr_unstructured_control_lambda.handler"
+  memory_size             = 10240
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    ENVIRONMENT_BUCKET          = module.s3-data-bucket.bucket.id
+    GDPR_AUDIT_BUCKET           = module.s3-gdpr-audit-bucket.bucket.id
+    ATHENA_QUERY_RESULTS_BUCKET = module.s3-athena-bucket.bucket.id
+  }
+}
