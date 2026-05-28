@@ -124,7 +124,7 @@ resource "aws_iam_role_policy" "cloudwatch" {
 # --------------------------------------------------------------------------------
 
 resource "aws_api_gateway_rest_api" "update_p1_export" {
-  count = local.is-development : 1 ? 0
+  count = local.is-development ? 1 : 0
   name        = "update_p1_export"
   description = "Access to update the P1 Export."
 
@@ -134,14 +134,14 @@ resource "aws_api_gateway_rest_api" "update_p1_export" {
 }
 
 resource "aws_api_gateway_resource" "update_p1_export" {
-  count = local.is-development : 1 ? 0
+  count = local.is-development ? 1 : 0
   rest_api_id = aws_api_gateway_rest_api.update_p1_export.id
   parent_id   = aws_api_gateway_rest_api.update_p1_export.root_resource_id
   path_part   = "update"
 }
 
 resource "aws_api_gateway_method" "update_p1_export_post" {
-  count = local.is-development : 1 ? 0
+  count = local.is-development ? 1 : 0
   rest_api_id          = aws_api_gateway_rest_api.update_p1_export.id
   resource_id          = aws_api_gateway_resource.update_p1_export.id
   http_method          = "POST"
@@ -158,7 +158,7 @@ resource "aws_api_gateway_method" "update_p1_export_post" {
 # --------------------------------------------------------
 
 resource "aws_api_gateway_request_validator" "update_p1_export" {
-  count = local.is-development : 1 ? 0
+  count = local.is-development ? 1 : 0
   rest_api_id                 = aws_api_gateway_rest_api.update_p1_export.id
   name                        = "≈RequestValidator"
   validate_request_body       = true
@@ -166,7 +166,7 @@ resource "aws_api_gateway_request_validator" "update_p1_export" {
 }
 
 resource "aws_api_gateway_model" "update_p1_export" {
-  count = local.is-development : 1 ? 0
+  count = local.is-development ? 1 : 0
   rest_api_id  = aws_api_gateway_rest_api.update_p1_export.id
   name         = "UpdateP1ExportModel"
   content_type = "application/json"
@@ -186,7 +186,7 @@ resource "aws_api_gateway_model" "update_p1_export" {
 }
 
 resource "aws_api_gateway_integration" "update_p1_export_lambda_post" {
-  count = local.is-development : 1 ? 0
+  count = local.is-development ? 1 : 0
   rest_api_id = aws_api_gateway_rest_api.update_p1_export.id
   resource_id = aws_api_gateway_resource.update_p1_export.id
   http_method = aws_api_gateway_method.update_p1_export_post.http_method
@@ -197,14 +197,14 @@ resource "aws_api_gateway_integration" "update_p1_export_lambda_post" {
 }
 
 resource "aws_api_gateway_deployment" "update_p1_export" {
-  count = local.is-development : 1 ? 0
+  count = local.is-development ? 1 : 0
   depends_on = [aws_api_gateway_integration.update_p1_export_lambda_post,]
 
   rest_api_id = aws_api_gateway_rest_api.update_p1_export.id
 }
 
 resource "aws_api_gateway_stage" "update_p1_export_stage" {
-  count = local.is-development : 1 ? 0
+  count = local.is-development ? 1 : 0
   deployment_id = aws_api_gateway_deployment.update_p1_export.id
   rest_api_id   = aws_api_gateway_rest_api.update_p1_export.id
   stage_name    = "prod"

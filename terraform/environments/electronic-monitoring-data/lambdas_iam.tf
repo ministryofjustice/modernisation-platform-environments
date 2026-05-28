@@ -2143,7 +2143,7 @@ resource "aws_lakeformation_permissions" "lambda_p1_table_access" {
 # ----------------------------------------------------------------------------------------
 
 module "update_p1_export_iam_role" {
-  count = local.is-development : 1 ? 0
+  count = local.is-development ? 1 : 0
   source = "terraform-aws-modules/iam/aws//modules/iam-role"
   name = "update_p1_export"
 
@@ -2169,7 +2169,7 @@ module "update_p1_export_iam_role" {
 }
 
 resource "aws_lakeformation_permissions" "lambda_update_p1_s3_access" {
-  count = local.is-development : 1 ? 0
+  count = local.is-development ? 1 : 0
   principal   = module.update_p1_export_iam_role.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
@@ -2178,7 +2178,7 @@ resource "aws_lakeformation_permissions" "lambda_update_p1_s3_access" {
 }
 
 resource "aws_lakeformation_permissions" "lambda_update_p1_database_access" {
-  count = local.is-development : 1 ? 0
+  count = local.is-development ? 1 : 0
   principal   = module.update_p1_export_iam_role.arn
   permissions = ["DESCRIBE"]
   database {
@@ -2187,7 +2187,7 @@ resource "aws_lakeformation_permissions" "lambda_update_p1_database_access" {
 }
 
 resource "aws_lakeformation_permissions" "lambda_update_p1_table_access" {
-  count = local.is-development : 1 ? 0
+  count = local.is-development ? 1 : 0
   principal   = module.update_p1_export_iam_role.arn
   permissions = ["SELECT"]
   table {
