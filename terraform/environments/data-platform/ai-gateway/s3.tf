@@ -2,8 +2,6 @@ locals {
   alb_access_logs_bucket_name = "mojdp-${local.environment}-${local.component_name}-alb-logs"
 }
 
-data "aws_elb_service_account" "current" {}
-
 data "aws_iam_policy_document" "alb_access_logs_bucket_policy" {
   statement {
     sid       = "AllowALBPutObject"

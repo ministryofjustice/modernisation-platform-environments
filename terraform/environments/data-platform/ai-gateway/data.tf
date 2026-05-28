@@ -34,3 +34,4 @@ data "aws_secretsmanager_secret_version" "litellm_entra_id" {
   secret_id = module.litellm_entra_id_secret.secret_id
 }
 
+data "aws_elb_service_account" "current" {}
