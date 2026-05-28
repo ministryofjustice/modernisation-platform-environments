@@ -5,7 +5,7 @@ module "dashboard_service_rds" {
   count = terraform.workspace == "analytical-platform-compute-test" ? 0 : 1
 
   source  = "terraform-aws-modules/rds/aws"
-  version = "6.12.0"
+  version = "7.2.0"
 
   identifier = "dashboard-service"
 
@@ -29,7 +29,8 @@ module "dashboard_service_rds" {
   username                    = "dashboard_service"
   db_name                     = "dashboard_service"
   manage_master_user_password = false
-  password                    = random_password.dashboard_service_rds[0].result
+  password_wo                 = random_password.dashboard_service_rds[0].result
+  password_wo_version         = 1
   kms_key_id                  = module.dashboard_service_rds_kms[0].key_arn
 
   parameters = [
