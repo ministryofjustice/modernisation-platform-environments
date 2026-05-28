@@ -465,7 +465,7 @@ resource "aws_lb_target_group" "oas_analytics_https_9503_target_group" {
 
   name_prefix          = "oas-3"
   port                 = 9503
-  protocol             = "HTTP"
+  protocol             = "HTTPS"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "instance"
   deregistration_delay = 30
@@ -480,7 +480,7 @@ resource "aws_lb_target_group" "oas_analytics_https_9503_target_group" {
     port                = "9503"
     healthy_threshold   = 3
     interval            = 30
-    protocol            = "HTTP"
+    protocol            = "HTTPS"
     unhealthy_threshold = 3
     matcher             = "200-399"
     timeout             = 5
