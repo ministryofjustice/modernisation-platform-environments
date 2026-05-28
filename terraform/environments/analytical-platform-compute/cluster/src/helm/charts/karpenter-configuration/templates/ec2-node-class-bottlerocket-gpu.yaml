@@ -6,6 +6,8 @@ metadata:
 spec:
   amiFamily: Bottlerocket
   role: {{ .Values.nodeRole }}
+  tags:
+    backup: "false"
   subnetSelectorTerms:
     - tags:
         karpenter.sh/discovery: {{ .Values.clusterName }}

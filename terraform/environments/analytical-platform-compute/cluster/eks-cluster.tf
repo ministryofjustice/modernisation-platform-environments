@@ -95,6 +95,10 @@ module "eks" {
       desired_size   = 3
       instance_types = ["m6a.xlarge"]
 
+      launch_template_tags = merge(local.tags, {
+        backup = "false"
+      })
+
       use_latest_ami_release_version = false
       ami_release_version            = local.environment_configuration.eks_node_version
       ami_type                       = "BOTTLEROCKET_x86_64"
@@ -139,6 +143,11 @@ module "eks" {
       max_size       = 1
       desired_size   = 0
       instance_types = ["r7i.8xlarge"]
+
+      launch_template_tags = merge(local.tags, {
+        backup = "false"
+      })
+
       labels = {
         high-memory = "true"
       }
