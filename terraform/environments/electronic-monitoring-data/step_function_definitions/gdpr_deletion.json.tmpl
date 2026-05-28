@@ -38,6 +38,32 @@
                         ]
                      }
                   },
+                  "Retry": [
+                     {
+                        "ErrorEquals": [
+                           "Batch.ServerException",
+                           "Batch.AWSBatchException",
+                           "States.TaskFailed"
+                        ],
+                        "IntervalSeconds": 3,
+                        "MaxAttempts": 3,
+                        "BackoffRate": 2.0
+                     }
+                  ],
+                  "Catch": [
+                     {
+                        "ErrorEquals": ["States.ALL"],
+                        "Next": "HandleFailedJob"
+                     }
+                  ],
+                  "End": true
+               },
+               "HandleFailedJob": {
+                  "Type": "Pass",
+                  "Result": {
+                     "status": "FAILED",
+                     "message": "AWS Batch job failed permanently after retries."
+                  },
                   "End": true
                }
             }
