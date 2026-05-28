@@ -286,13 +286,3 @@ moved {
   from = aws_guardduty_malware_protection_plan.mojfin_s3_malware_plan
   to   = aws_guardduty_malware_protection_plan.shared_s3_protection_plan
 }
-
-moved {
-  from = aws_guardduty_malware_protection_plan.mojfin_s3_shared
-  to   = aws_guardduty_malware_protection_plan.shared_s3_protection_plan
-}
-
-moved {
-  from = aws_guardduty_malware_protection_plan.mojfin_s3_rds_oracle
-  to   = aws_guardduty_malware_protection_plan.rds_oracle_s3_protection_plan
-}
