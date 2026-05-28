@@ -46,17 +46,59 @@ resource "aws_subnet" "private_b" {
 }
 
 ##############################################
-### Route Table for Private Subnets
+### Dedicated Firewall Subnets
+### AWS Network Firewall requires dedicated subnets in each AZ.
 ##############################################
 
-resource "aws_route_table" "private" {
+resource "aws_subnet" "firewall_a" {
+  count = local.environment == "development" ? 1 : 0
+
+  vpc_id            = aws_vpc.workspaces[0].id
+  cidr_block        = "10.200.200.0/28"
+  availability_zone = "eu-west-2a"
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-firewall-eu-west-2a" }
+  )
+}
+
+resource "aws_subnet" "firewall_b" {
+  count = local.environment == "development" ? 1 : 0
+
+  vpc_id            = aws_vpc.workspaces[0].id
+  cidr_block        = "10.200.200.16/28"
+  availability_zone = "eu-west-2b"
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-firewall-eu-west-2b" }
+  )
+}
+
+##############################################
+### Route Tables for Private Subnets
+##############################################
+
+resource "aws_route_table" "private_a" {
   count = local.environment == "development" ? 1 : 0
 
   vpc_id = aws_vpc.workspaces[0].id
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-${local.environment}-private-rt" }
+    { "Name" = "${local.application_name}-${local.environment}-private-eu-west-2a-rt" }
+  )
+}
+
+resource "aws_route_table" "private_b" {
+  count = local.environment == "development" ? 1 : 0
+
+  vpc_id = aws_vpc.workspaces[0].id
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-private-eu-west-2b-rt" }
   )
 }
 
@@ -64,14 +106,70 @@ resource "aws_route_table_association" "private_a" {
   count = local.environment == "development" ? 1 : 0
 
   subnet_id      = aws_subnet.private_a[0].id
-  route_table_id = aws_route_table.private[0].id
+  route_table_id = aws_route_table.private_a[0].id
 }
 
 resource "aws_route_table_association" "private_b" {
   count = local.environment == "development" ? 1 : 0
 
   subnet_id      = aws_subnet.private_b[0].id
-  route_table_id = aws_route_table.private[0].id
+  route_table_id = aws_route_table.private_b[0].id
+}
+
+# resource "aws_route" "private_a_firewall" {
+#   count = local.environment == "development" ? 1 : 0
+
+#   route_table_id         = aws_route_table.private_a[0].id
+#   destination_cidr_block = "0.0.0.0/0"
+#   vpc_endpoint_id = element([
+#     for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist[0].firewall_status[0].sync_states : sync_state.endpoint_id
+#     if sync_state.availability_zone == "eu-west-2a"
+#   ], 0)
+# }
+
+# resource "aws_route" "private_b_firewall" {
+#   count = local.environment == "development" ? 1 : 0
+
+#   route_table_id         = aws_route_table.private_b[0].id
+#   destination_cidr_block = "0.0.0.0/0"
+#   vpc_endpoint_id = element([
+#     for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist[0].firewall_status[0].sync_states : sync_state.endpoint_id
+#     if sync_state.availability_zone == "eu-west-2b"
+#   ], 0)
+# }
+
+##############################################
+### Route Table for Firewall Subnets
+##############################################
+
+resource "aws_route_table" "firewall" {
+  count = local.environment == "development" ? 1 : 0
+
+  vpc_id = aws_vpc.workspaces[0].id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.main[0].id
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-firewall-rt" }
+  )
+}
+
+resource "aws_route_table_association" "firewall_a" {
+  count = local.environment == "development" ? 1 : 0
+
+  subnet_id      = aws_subnet.firewall_a[0].id
+  route_table_id = aws_route_table.firewall[0].id
+}
+
+resource "aws_route_table_association" "firewall_b" {
+  count = local.environment == "development" ? 1 : 0
+
+  subnet_id      = aws_subnet.firewall_b[0].id
+  route_table_id = aws_route_table.firewall[0].id
 }
 
 ##############################################
