@@ -2493,12 +2493,15 @@ data "aws_iam_policy_document" "specials_ingestion_lambda_role_policy_document" 
       "s3:GetObjectAttributes",
       "s3:GetObject",
       "s3:ListBucket",
+      "s3:GetBucketLocation",
     ]
     resources = [
       "${module.s3-json-directory-structure-bucket.bucket.arn}/*",
       module.s3-json-directory-structure-bucket.bucket.arn,
       "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/*",
-      module.s3-create-a-derived-table-bucket.bucket.arn
+      module.s3-create-a-derived-table-bucket.bucket.arn,
+      "${module.s3-athena-bucket.bucket.arn}/*",
+      module.s3-athena-bucket.bucket.arn,
     ]
   }
 
