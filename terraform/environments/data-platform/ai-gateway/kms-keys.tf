@@ -34,5 +34,4 @@ module "ai_gateway_aurora_kms_key" {
 
   deletion_window_in_days = 7
 
-  tags = local.tags
 }
