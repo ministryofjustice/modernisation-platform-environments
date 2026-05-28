@@ -814,8 +814,8 @@ module "update_p1_export" {
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "update_p1_export"
-  role_name                      = module.update_p1_export_iam_role.name
-  role_arn                       = module.update_p1_export_iam_role.arn
+  role_name                      = module.update_p1_export_iam_role[0].name
+  role_arn                       = module.update_p1_export_iam_role[0].arn
   memory_size                    = 512
   timeout                        = 300
   reserved_concurrent_executions = 2

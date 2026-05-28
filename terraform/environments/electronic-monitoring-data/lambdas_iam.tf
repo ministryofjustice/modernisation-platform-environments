@@ -2170,7 +2170,7 @@ module "update_p1_export_iam_role" {
 
 resource "aws_lakeformation_permissions" "lambda_update_p1_s3_access" {
   count = local.is-development ? 1 : 0
-  principal   = module.update_p1_export_iam_role.arn
+  principal   = module.update_p1_export_iam_role[0].arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
     arn = aws_lakeformation_resource.data_bucket.arn
@@ -2179,7 +2179,7 @@ resource "aws_lakeformation_permissions" "lambda_update_p1_s3_access" {
 
 resource "aws_lakeformation_permissions" "lambda_update_p1_database_access" {
   count = local.is-development ? 1 : 0
-  principal   = module.update_p1_export_iam_role.arn
+  principal   = module.update_p1_export_iam_role[0].arn
   permissions = ["DESCRIBE"]
   database {
     name = "allied_mdss${local.db_suffix}"
@@ -2188,7 +2188,7 @@ resource "aws_lakeformation_permissions" "lambda_update_p1_database_access" {
 
 resource "aws_lakeformation_permissions" "lambda_update_p1_table_access" {
   count = local.is-development ? 1 : 0
-  principal   = module.update_p1_export_iam_role.arn
+  principal   = module.update_p1_export_iam_role[0].arn
   permissions = ["SELECT"]
   table {
     database_name = "allied_mdss${local.db_suffix}"
