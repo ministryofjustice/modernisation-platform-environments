@@ -55,18 +55,6 @@ resource "aws_security_group_rule" "ingress_from_lb_9500" {
   source_security_group_id = aws_security_group.lb_security_group[0].id
 }
 
-resource "aws_security_group_rule" "ingress_from_lb_9501" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
-
-  type                     = "ingress"
-  security_group_id        = aws_security_group.ec2_sg[0].id
-  description              = "Allow traffic from load balancer to EC2 on port 9501"
-  from_port                = 9501
-  to_port                  = 9501
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.lb_security_group[0].id
-}
-
 resource "aws_security_group_rule" "ingress_from_lb_9502" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
@@ -190,5 +178,5 @@ resource "aws_security_group_rule" "egress_bastion_rds" {
   from_port                = 1521
   to_port                  = 1521
   protocol                 = "tcp"
-  source_security_group_id = aws_security_group.rds_sg[0].id
+  source_security_group_id =  aws_security_group.rds_sg[0].id
 }

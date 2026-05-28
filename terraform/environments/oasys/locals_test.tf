@@ -23,6 +23,7 @@ locals {
         external_validation_records_created = true
         subject_alternate_names = [
           "*.oasys.service.justice.gov.uk",
+          "*.hmpp-azdt.justice.gov.uk",
           "ords.t2.oasys.service.justice.gov.uk",
           "ords.t1.oasys.service.justice.gov.uk",
         ]
@@ -446,6 +447,7 @@ locals {
                       values = [
                         "t2-int.oasys.service.justice.gov.uk",
                         "t2-a-int.oasys.service.justice.gov.uk",
+                        "t2-oasys.hmpp-azdt.justice.gov.uk",
                       ]
                     }
                   }
@@ -479,6 +481,7 @@ locals {
                       values = [
                         "t1-int.oasys.service.justice.gov.uk",
                         "t1-a-int.oasys.service.justice.gov.uk",
+                        "t1-oasys.hmpp-azdt.justice.gov.uk",
                       ]
                     }
                   }

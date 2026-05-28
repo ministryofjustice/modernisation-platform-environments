@@ -51,7 +51,7 @@ module "oracle_db_dsd" {
   server_type_tag     = "mis_db"
   database_tag_prefix = "dsd"
 
-  count             = try(var.dsd_db_config.primary_instance_count, 1)
+  count             = try(var.dsd_db_config.instance_count, 1)
   db_count_index    = count.index + 1
   ec2_instance_type = var.dsd_db_config.instance_type
 
@@ -70,60 +70,6 @@ module "oracle_db_dsd" {
   availability_zone  = "eu-west-2${lookup(local.availability_zone_map, count.index % 3, "a")}"
 
   tags = local.tags
-  user_data = templatefile(
-    "${path.module}/templates/userdata.sh.tftpl",
-    var.dsd_db_config.ansible_user_data_config
-  )
-
-  ssh_keys_bucket_name = module.oracle_db_shared["dsd-db"].ssh_keys_bucket_name
-
-  instance_profile_policies = local.dsd_instance_policies
-
-  deploy_oracle_stats = false
-
-  enable_cloudwatch_alarms = try(var.dsd_db_config.enable_cloudwatch_alarms, true)
-
-  sns_topic_arn = aws_sns_topic.delius_mis_alarms.arn
-
-  providers = {
-    aws          = aws
-    aws.core-vpc = aws.core-vpc
-  }
-}
-
-module "oracle_db_dsd_shared" {
-  source         = "../../../delius-core/modules/components/oracle_db_instance"
-  account_config = var.account_config
-  account_info   = var.account_info
-
-  db_ami = {
-    name_regex = var.dsd_db_config.ami_name_regex
-    owner      = "self"
-  }
-  db_type             = "standby"
-  db_suffix           = "dsd-db"
-  server_type_tag     = "mis_db"
-  database_tag_prefix = "dsd"
-
-  count          = try(var.dsd_db_config.standby_instance_count, 1)
-  db_count_index = count.index + 1
-
-  ec2_instance_type = var.dsd_db_config.instance_type
-
-  security_group_ids = [module.oracle_db_shared["dsd-db"].security_group.id]
-
-  ec2_key_pair_name = module.oracle_db_shared["dsd-db"].db_key_pair.key_name
-
-  user_data_replace_on_change = false
-
-  ebs_volumes       = var.dsd_db_config.ebs_volumes
-  ebs_volume_config = var.dsd_db_config.ebs_volume_config
-
-  env_name           = var.env_name
-  environment_config = var.environment_config
-  subnet_id          = var.account_config.ordered_private_subnet_ids[(count.index + length(module.oracle_db_dsd)) % 3]
-  availability_zone  = "eu-west-2${lookup(local.availability_zone_map, (count.index + length(module.oracle_db_dsd)) % 3, "a")}"
-  tags               = local.tags
   user_data = templatefile(
     "${path.module}/templates/userdata.sh.tftpl",
     var.dsd_db_config.ansible_user_data_config
@@ -158,7 +104,7 @@ module "oracle_db_boe" {
   server_type_tag     = "mis_db"
   database_tag_prefix = "boe"
 
-  count             = try(var.boe_db_config.primary_instance_count, 1)
+  count             = try(var.boe_db_config.instance_count, 1)
   db_count_index    = count.index + 1
   ec2_instance_type = var.boe_db_config.instance_type
 
@@ -198,59 +144,6 @@ module "oracle_db_boe" {
   }
 }
 
-module "oracle_db_boe_shared" {
-  source         = "../../../delius-core/modules/components/oracle_db_instance"
-  account_config = var.account_config
-  account_info   = var.account_info
-
-  db_ami = {
-    name_regex = var.boe_db_config.ami_name_regex
-    owner      = "self"
-  }
-  db_type             = "standby"
-  db_suffix           = "boe-db"
-  server_type_tag     = "mis_db"
-  database_tag_prefix = "boe"
-
-  count          = try(var.boe_db_config.standby_instance_count, 1)
-  db_count_index = count.index + 1
-
-  ec2_instance_type = var.boe_db_config.instance_type
-
-  security_group_ids = [module.oracle_db_shared["boe-db"].security_group.id]
-
-  ec2_key_pair_name = module.oracle_db_shared["boe-db"].db_key_pair.key_name
-
-  user_data_replace_on_change = false
-
-  ebs_volumes       = var.boe_db_config.ebs_volumes
-  ebs_volume_config = var.boe_db_config.ebs_volume_config
-
-  env_name           = var.env_name
-  environment_config = var.environment_config
-  subnet_id          = var.account_config.ordered_private_subnet_ids[(count.index + length(module.oracle_db_boe)) % 3]
-  availability_zone  = "eu-west-2${lookup(local.availability_zone_map, (count.index + length(module.oracle_db_boe)) % 3, "a")}"
-  tags               = local.tags
-  user_data = templatefile(
-    "${path.module}/templates/userdata.sh.tftpl",
-    var.boe_db_config.ansible_user_data_config
-  )
-
-  ssh_keys_bucket_name = module.oracle_db_shared["boe-db"].ssh_keys_bucket_name
-
-  instance_profile_policies = local.boe_instance_policies
-
-  deploy_oracle_stats = false
-
-  enable_cloudwatch_alarms = try(var.boe_db_config.enable_cloudwatch_alarms, true)
-
-  sns_topic_arn = aws_sns_topic.delius_mis_alarms.arn
-
-  providers = {
-    aws          = aws
-    aws.core-vpc = aws.core-vpc
-  }
-}
 
 module "oracle_db_mis" {
   source         = "../../../delius-core/modules/components/oracle_db_instance"
@@ -265,7 +158,7 @@ module "oracle_db_mis" {
   server_type_tag     = "mis_db"
   database_tag_prefix = "mis"
 
-  count             = try(var.mis_db_config.primary_instance_count, 1)
+  count             = try(var.mis_db_config.instance_count, 1)
   db_count_index    = count.index + 1
   ec2_instance_type = var.mis_db_config.instance_type
 
@@ -284,60 +177,6 @@ module "oracle_db_mis" {
   availability_zone  = "eu-west-2${lookup(local.availability_zone_map, count.index % 3, "a")}"
 
   tags = local.tags
-  user_data = templatefile(
-    "${path.module}/templates/userdata.sh.tftpl",
-    var.mis_db_config.ansible_user_data_config
-  )
-
-  ssh_keys_bucket_name = module.oracle_db_shared["mis-db"].ssh_keys_bucket_name
-
-  instance_profile_policies = local.mis_instance_policies
-
-  deploy_oracle_stats = false
-
-  enable_cloudwatch_alarms = try(var.mis_db_config.enable_cloudwatch_alarms, true)
-
-  sns_topic_arn = aws_sns_topic.delius_mis_alarms.arn
-
-  providers = {
-    aws          = aws
-    aws.core-vpc = aws.core-vpc
-  }
-}
-
-module "oracle_db_mis_shared" {
-  source         = "../../../delius-core/modules/components/oracle_db_instance"
-  account_config = var.account_config
-  account_info   = var.account_info
-
-  db_ami = {
-    name_regex = var.mis_db_config.ami_name_regex
-    owner      = "self"
-  }
-  db_type             = "standby"
-  db_suffix           = "mis-db"
-  server_type_tag     = "mis_db"
-  database_tag_prefix = "mis"
-
-  count          = try(var.mis_db_config.standby_instance_count, 1)
-  db_count_index = count.index + 1
-
-  ec2_instance_type = var.mis_db_config.instance_type
-
-  security_group_ids = [module.oracle_db_shared["mis-db"].security_group.id]
-
-  ec2_key_pair_name = module.oracle_db_shared["mis-db"].db_key_pair.key_name
-
-  user_data_replace_on_change = false
-
-  ebs_volumes       = var.mis_db_config.ebs_volumes
-  ebs_volume_config = var.mis_db_config.ebs_volume_config
-
-  env_name           = var.env_name
-  environment_config = var.environment_config
-  subnet_id          = var.account_config.ordered_private_subnet_ids[(count.index + length(module.oracle_db_mis)) % 3]
-  availability_zone  = "eu-west-2${lookup(local.availability_zone_map, (count.index + length(module.oracle_db_mis)) % 3, "a")}"
-  tags               = local.tags
   user_data = templatefile(
     "${path.module}/templates/userdata.sh.tftpl",
     var.mis_db_config.ansible_user_data_config

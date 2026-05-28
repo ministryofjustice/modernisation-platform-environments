@@ -70,32 +70,3 @@ resource "aws_secretsmanager_secret_version" "ebs_cw_alerts_secrets" {
     ]
   }
 }
-
-# Common EBS Secrets
-resource "aws_secretsmanager_secret" "ebs_secrets" {
-  name        = "${local.application_name}-secrets"
-  description = "CCMS EBS Secret"
-}
-
-resource "aws_secretsmanager_secret_version" "ebs_secrets" {
-  secret_id = aws_secretsmanager_secret.ebs_secrets.id
-
-  secret_string = jsonencode({
-    "ebs_internal_waf_ip_set"           = ["${data.aws_vpc.shared.cidr_block}",
-    "${local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod}",
-    "${local.application_data.accounts[local.environment].mojo_devices}",
-    "${local.application_data.accounts[local.environment].dom1_devices}",
-    "${local.application_data.accounts[local.environment].moj_wifi}"]
-  })
-
-  lifecycle {
-    ignore_changes = [
-      secret_string
-    ]
-  }
-}
-
-data "aws_secretsmanager_secret_version" "ebs_secrets" {
-  secret_id = aws_secretsmanager_secret.ebs_secrets.id 
-}
-

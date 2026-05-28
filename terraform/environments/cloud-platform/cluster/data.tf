@@ -49,14 +49,7 @@ data "aws_iam_roles" "platform_engineer_admin_sso_role" {
 #   private_zone = false
 # }
 
-data "aws_eks_cluster" "cluster" {
-  count      = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
-  name       = module.eks[0].cluster_name
-  depends_on = [module.eks]
-}
-
 data "aws_eks_cluster_auth" "cluster" {
-  count      = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
-  name       = module.eks[0].cluster_name
-  depends_on = [module.eks]
+  count = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
+  name  = local.cluster_name
 }

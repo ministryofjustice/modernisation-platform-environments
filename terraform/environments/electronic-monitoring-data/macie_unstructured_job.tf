@@ -1,22 +1,7 @@
-# If ENABLED ensure you turn off automatic discovery via the console.
 resource "aws_macie2_account" "macie_unstructured_spike" {
   status = "PAUSED"
 }
 
-resource "aws_macie2_custom_data_identifier" "subject_id" {
-  name                   = "subject-id"
-  description            = "Subject ID Regex"
-  regex                  = "^[0-9]{7}$"
-  maximum_match_distance = 50 
-}
-
-resource "aws_macie2_classification_export_configuration" "results_config" {
-  s3_destination {
-    bucket_name = module.s3-macie-results-bucket.bucket.id
-    kms_key_arn = module.kms_metadata_key.key_arn
-    key_prefix  = "macie-discovery-results/"
-  }
-}
 
 # Uses the default checks
 # resource "aws_macie2_classification_job" "unstructured_data_spike" {

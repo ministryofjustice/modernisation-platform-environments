@@ -65,59 +65,133 @@ module "s3_bucket" {
   tags = merge(local.tags, {
     Name = "${local.application_name}-${local.environment}-ftp-${each.key}"
   })
+}
 
-  bucket_policy_v2 = [
-    for stmt in [
-      length(aws_iam_role.ftp_lambda_role) > 0 ? {
-        effect  = "Allow"
-        actions = ["s3:GetObject", "s3:DeleteObject"]
-        principals = {
-          type        = "AWS"
-          identifiers = [aws_iam_role.ftp_lambda_role[0].arn]
-        }
-        conditions = []
-      } : null,
+# Bucket policy
 
-      length(aws_iam_role.ftp_lambda_role) > 0 ? {
-        effect  = "Allow"
-        actions = ["s3:ListBucket"]
-        principals = {
-          type        = "AWS"
-          identifiers = [aws_iam_role.ftp_lambda_role[0].arn]
-        }
-        conditions = []
-      } : null,
+resource "aws_s3_bucket_policy" "ftp_user_and_lambda_access" {
+  for_each = local.build_s3 ? module.s3_bucket : {}
+  bucket   = each.value.bucket.bucket
+  policy   = data.aws_iam_policy_document.bucket_policy[each.key].json
+}
 
-      length(aws_iam_user.ftp_user) > 0 ? {
-        effect = "Allow"
-        actions = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject",
-          "s3:GetObjectVersion",
-          "s3:DeleteObjectVersion"
-        ]
-        principals = {
-          type        = "AWS"
-          identifiers = [aws_iam_user.ftp_user[0].arn]
-        }
-        conditions = []
-      } : null,
+data "aws_iam_policy_document" "bucket_policy" {
+  for_each = local.build_s3 ? module.s3_bucket : {}
 
-      length(aws_iam_user.ftp_user) > 0 ? {
-        effect = "Allow"
-        actions = [
-          "s3:GetBucketPolicy",
-          "s3:ListBucket"
-        ]
-        principals = {
-          type        = "AWS"
-          identifiers = [aws_iam_user.ftp_user[0].arn]
-        }
-        conditions = []
-      } : null
-    ] : stmt if stmt != null
-  ]
+  # Enforce TLS v1.2 or higher
+  dynamic "statement" {
+    for_each = length(aws_iam_role.ftp_lambda_role) > 0 ? [1] : []
+
+    content {
+      sid    = "EnforceTLSv12orHigher"
+      effect = "Deny"
+      principals {
+        type        = "AWS"
+        identifiers = ["*"]
+      }
+      actions   = ["s3:*"]
+      resources = ["${each.value.bucket.arn}/*", "${each.value.bucket.arn}"]
+      condition {
+        test     = "NumericLessThan"
+        variable = "s3:TlsVersion"
+        values   = ["1.2"]
+      }
+    }
+  }
+
+  dynamic "statement" {
+    for_each = length(aws_iam_role.ftp_lambda_role) > 0 ? [1] : []
+
+    content {
+      sid    = "AllowLambdaBucketAccess"
+      effect = "Allow"
+
+      principals {
+        type        = "AWS"
+        identifiers = [aws_iam_role.ftp_lambda_role[0].arn]
+      }
+
+      actions = [
+        "s3:GetObject",
+        "s3:DeleteObject"
+      ]
+
+      resources = [
+        "${each.value.bucket.arn}/*"
+      ]
+    }
+  }
+
+  dynamic "statement" {
+    for_each = length(aws_iam_role.ftp_lambda_role) > 0 ? [1] : []
+
+    content {
+      sid    = "AllowLambdaListBucket"
+      effect = "Allow"
+
+      principals {
+        type        = "AWS"
+        identifiers = [aws_iam_role.ftp_lambda_role[0].arn]
+      }
+
+      actions = [
+        "s3:ListBucket"
+      ]
+
+      resources = [
+        each.value.bucket.arn
+      ]
+    }
+  }
+
+  dynamic "statement" {
+    for_each = length(aws_iam_user.ftp_user) > 0 ? [1] : []
+
+    content {
+      sid    = "AllowFTPUserObjectAccess"
+      effect = "Allow"
+
+      principals {
+        type        = "AWS"
+        identifiers = [aws_iam_user.ftp_user[0].arn]
+      }
+
+      actions = [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject",
+        "s3:GetObjectVersion",
+        "s3:DeleteObjectVersion"
+      ]
+
+      resources = [
+        "${each.value.bucket.arn}/*"
+      ]
+    }
+  }
+
+  dynamic "statement" {
+    for_each = length(aws_iam_user.ftp_user) > 0 ? [1] : []
+
+    content {
+      sid    = "AllowFTPUserBucketAccess"
+      effect = "Allow"
+
+      principals {
+        type        = "AWS"
+        identifiers = [aws_iam_user.ftp_user[0].arn]
+      }
+
+      actions = [
+        "s3:GetBucketPolicy",
+        "s3:ListBucket"
+      ]
+
+      resources = [
+        each.value.bucket.arn
+      ]
+    }
+  }
 }
 
 # FTP IAM User

@@ -1,6 +1,6 @@
 #### This file can be used to store locals specific to the member account ####
 locals {
-  artefact_bucket_name = "${local.application_name}-${local.environment}-artefacts"
+  artefact_bucket_name       = "${local.application_name}-${local.environment}-artefacts"
 
   lambda_source_hashes_cloudwatch_alarm_slack_integration = [
     for f in fileset("./lambda/cloudwatch_alarm_slack_integration", "**") :

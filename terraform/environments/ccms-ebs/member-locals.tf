@@ -9,9 +9,7 @@ locals {
   lb_log_prefix_webgate_internal = "webgate-internal-lb"
   lb_log_prefix_ssogen_internal  = "ssogen-internal-lb"
 
-  volume_prefix = local.environment == "production" ? "/CCMS/EBSPROD" : "/CCMS/EBS"
-
-  sftp_enabled       = contains(["development", "test"], local.environment)
+  sftp_enabled       = contains(["development","test"], local.environment)
   lambda_folder_name = ["lambda_delivery", "ftp_lambda_layer", "payment_lambda_layer", "cloudwatch_sns_layer", "payment_load_monitor_layer"]
 
   lambda_source_hashes_cloudwatch_alarm_slack_integration = [
@@ -52,6 +50,7 @@ locals {
   # Subject Alternative Names based on environment
   nonprod_sans = [
     format("ccmsebs.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
+    format("ccmsebs-sso.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
     format("ccms-ebs-db-nlb.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
   ]
 

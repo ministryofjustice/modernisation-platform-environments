@@ -94,10 +94,6 @@ resource "aws_ssm_association" "this" {
       ]
     }
   }
-
-  tags = merge(local.tags, {
-    Name = try(aws_ssm_document.this[each.value.name].name, each.value.name)
-  })
 }
 
 resource "aws_ssm_document" "this" {

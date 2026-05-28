@@ -17,7 +17,7 @@ module "ecs_cluster" {
     # On-demand instances
     asg = {
       auto_scaling_group_arn         = module.autoscaling.autoscaling_group_arn
-      managed_termination_protection = "ENABLED"
+      managed_termination_protection = "DISABLED"
 
       managed_scaling = {
         maximum_scaling_step_size = 1

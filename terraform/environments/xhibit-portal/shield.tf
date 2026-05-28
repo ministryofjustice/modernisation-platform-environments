@@ -9,7 +9,7 @@ data "aws_shield_protection" "excluded" {
 }
 
 module "shield" {
-  source   = "../../modules/shield_advanced_v6"
+  source   = "../../modules/shield_advanced"
   for_each = local.is-production ? { "build" = true } : {}
   providers = {
     aws.modernisation-platform = aws.modernisation-platform

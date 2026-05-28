@@ -15,7 +15,7 @@ module "ec2_autoscaling_group" {
 
   for_each = var.ec2_autoscaling_groups
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=289442f0af6f7473985265d9fc656285ae08c78a" # v4.0.1
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v4.0.0" # replace managed_policy_arns argument in module with aws_iam_role_policy_attachment
 
   providers = {
     aws.core-vpc = aws.core-vpc

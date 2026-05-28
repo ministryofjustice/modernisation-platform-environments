@@ -80,14 +80,14 @@ locals {
   delius_microservices_configs_dev = {
     weblogic = {
       image_tag                = "6.5.15"
-      task_definition_revision = 20
       container_port           = 8080
       container_memory         = 4096
       container_cpu            = 2048
-      ec2_instance_type        = "r7i.large"
-      task_count               = 1
-      asg_min_size             = 1
-      asg_max_size             = 2
+      task_definition_revision = 18
+      ec2_instance_type        = "m5.large"
+      # max_size                 = 2
+      # min_size                 = 1
+      # desired_capacity         = 1
     }
 
     weblogic_params = {
@@ -97,19 +97,19 @@ locals {
       BREACH_NOTICE_UI_URL_FORMAT = "https://breach-notice-dev.hmpps.service.justice.gov.uk/breach-notice/%s"
       COOKIE_SECURE               = "true"
       # DELIUS_API_URL                    = "" # No longer needed
-      DMS_HOST                          = "hmpps-delius-alfresco-dev.apps.live.cloud-platform.service.justice.gov.uk"
-      DMS_OFFICE_URI_HOST               = "hmpps-delius-alfresco-dev.apps.live.cloud-platform.service.justice.gov.uk"
+      DMS_HOST                          = "https://hmpps-delius-alfresco-dev.apps.live.cloud-platform.service.justice.gov.uk"
+      DMS_OFFICE_URI_HOST               = "https://hmpps-delius-alfresco-dev.apps.live.cloud-platform.service.justice.gov.uk"
       DMS_OFFICE_URI_PORT               = "443"
       DMS_PORT                          = "443"
       DMS_PROTOCOL                      = "https"
       EIS_USER_CONTEXT                  = "cn=EISUsers,ou=Users,dc=moj,dc=com"
       ELASTICSEARCH_URL                 = "https://probation-search-dev.hmpps.service.justice.gov.uk/delius"
-      GDPR_URL                          = "https://ndelius.mis-dev.probation.service.justice.gov.uk/gdpr/ui/homepage" # GDPR not deployed to CP yet, <URL>/gdpr/ui/homepage
+      GDPR_URL                          = "/gdpr/ui/homepage" # GDPR not deployed to CP yet, <URL>/gdpr/ui/homepage
       JDBC_CONNECTION_POOL_MAX_CAPACITY = "100"
       JDBC_CONNECTION_POOL_MIN_CAPACITY = "50"
       JDBC_URL                          = "jdbc:oracle:thin:@(DESCRIPTION=(LOAD_BALANCE=OFF)(FAILOVER=ON)(CONNECT_TIMEOUT=10)(RETRY_COUNT=3)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=tcp)(HOST=delius-core-dev-db-1.hmpps-development.modernisation-platform.internal)(PORT=1521))(ADDRESS=(PROTOCOL=tcp)(HOST=delius-core-dev-db-2.hmpps-development.modernisation-platform.internal)(PORT=1521))(ADDRESS=(PROTOCOL=tcp)(HOST=delius-core-dev-db-3.hmpps-development.modernisation-platform.internal)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=DMDNDA_TAF)))"
       JDBC_USERNAME                     = "delius_pool"
-      LDAP_HOST                         = "ldap.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk"
+      LDAP_HOST                         = "https://ldap.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk"
       LDAP_PRINCIPAL                    = "cn=admin,dc=moj,dc=com"
       LOG_LEVEL_NDELIUS                 = "DEBUG"
       MERGE_API_URL                     = "https://delius-merge-api-dev.hmpps.service.justice.gov.uk"
@@ -142,7 +142,6 @@ locals {
       container_memory         = 4096
       container_cpu            = 2048
       task_definition_revision = 16
-      task_count               = 1
     }
 
     pwm = {

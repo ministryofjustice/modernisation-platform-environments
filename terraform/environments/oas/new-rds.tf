@@ -99,11 +99,11 @@ resource "aws_db_parameter_group" "appdbparametergroup19_new" {
 ### RDS Option Group
 ##################################################################################################################
 resource "aws_db_option_group" "appdboptiongroup19_new" {
-  count = contains(["preproduction", "development", "production"], local.environment) ? 1 : 0
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   name                     = "appdboptiongroup19"
   option_group_description = "${local.application_name}-${local.environment}-optiongroup"
-  engine_name              = "oracle-ee"
+  engine_name              = local.application_data.accounts[local.environment].engine
   major_engine_version     = "19"
   skip_destroy             = true
 

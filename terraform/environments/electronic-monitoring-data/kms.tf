@@ -39,24 +39,8 @@ module "kms_metadata_key" {
             module.s3-mdss-general-landing-bucket.bucket_arn,
             module.s3-mdss-ho-landing-bucket.bucket_arn,
             module.s3-mdss-specials-landing-bucket.bucket_arn,
-            module.s3-macie-results-bucket.bucket.arn,
           ]
         }
-      ]
-      resources = ["*"]
-    },
-    {
-      sid    = "AllowMacieToUseKey"
-      effect = "Allow"
-      principals = [
-        {
-          type        = "Service"
-          identifiers = ["macie.amazonaws.com"]
-        }
-      ]
-      actions = [
-        "kms:GenerateDataKey*",
-        "kms:Decrypt"
       ]
       resources = ["*"]
     }

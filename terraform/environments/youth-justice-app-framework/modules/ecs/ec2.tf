@@ -160,15 +160,6 @@ module "autoscaling" {
 
 }
 
-## Used to manage lifecycle hook of already created EC2 autoscaling group
-resource "aws_autoscaling_lifecycle_hook" "ecs_draining" {
-  name                   = "ecs-managed-draining-termination-hook"
-  autoscaling_group_name = module.autoscaling.autoscaling_group_name
-  lifecycle_transition   = "autoscaling:EC2_INSTANCE_TERMINATING"
-  default_result         = "CONTINUE"
-  heartbeat_timeout      = 300
-}
-
 module "autoscaling_sg" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/security-group/aws"

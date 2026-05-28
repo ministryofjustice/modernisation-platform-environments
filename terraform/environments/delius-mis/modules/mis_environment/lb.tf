@@ -15,9 +15,6 @@ locals {
   bws_enabled = var.lb_config != null && var.bws_config != null && var.bws_config.instance_count > 0
   bws_fqdn    = "${var.env_name}.${var.account_config.dns_suffix}"
 
-  bws_sso_enabled = var.lb_config != null && var.bws_sso_config != null && var.bws_sso_config.instance_count > 0
-  bws_sso_fqdn    = "sso.${var.env_name}.${var.account_config.dns_suffix}"
-
   bcs_win_enabled = var.lb_config != null && var.bcs_config_win != null && var.bcs_config_win.instance_count > 0
   bcs_win_fqdn    = "ndl-bcs.${var.env_name}.${var.account_config.dns_suffix}"
 }
@@ -364,44 +361,7 @@ resource "aws_lb_target_group" "bws" {
   )
 }
 
-# Target Group for BWS SSO instances - only created if BWS SSO instances exist
-resource "aws_lb_target_group" "bws_sso" {
-  count    = local.bws_sso_enabled ? 1 : 0
-  name     = "${local.lb_name}-bws-sso-tg"
-  port     = 7777
-  protocol = "HTTP"
-  vpc_id   = var.account_config.shared_vpc_id
-
-  # Deregistration delay - how long to wait before deregistering targets
-  deregistration_delay = 30
-
-  health_check {
-    enabled             = true
-    healthy_threshold   = 2
-    unhealthy_threshold = 3
-    timeout             = 10
-    interval            = 30
-    path                = "/BOE/CMC/"
-    matcher             = "200,302,301"
-    port                = "traffic-port"
-    protocol            = "HTTP"
-  }
-
-  stickiness {
-    type            = "lb_cookie"
-    enabled         = true
-    cookie_duration = 86400 # 1 day
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      "Name" = "${local.lb_name}-bws-sso-tg"
-    },
-  )
-}
-
-# Target Group for BCS_WIN instances - only created if BCS_WIN instances exist
+# Target Group for DIS instances - only created if BCS_WIN instances exist
 resource "aws_lb_target_group" "bcs_win" {
   count    = local.bcs_win_enabled ? 1 : 0
   name     = "${local.lb_name}-bcs-win-tg"
@@ -539,25 +499,6 @@ resource "aws_lb_listener_rule" "bws_https" {
   tags = local.tags
 }
 
-resource "aws_lb_listener_rule" "bws_sso_https" {
-  count        = local.bws_sso_enabled ? 1 : 0
-  listener_arn = aws_lb_listener.mis_https[0].arn
-  priority     = 350
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.bws_sso[0].arn
-  }
-
-  condition {
-    host_header {
-      values = [local.bws_sso_fqdn]
-    }
-  }
-
-  tags = local.tags
-}
-
 resource "aws_lb_listener_rule" "bcs_win_https" {
   count        = local.bcs_win_enabled ? 1 : 0
   listener_arn = aws_lb_listener.mis_https[0].arn
@@ -636,14 +577,6 @@ resource "aws_lb_target_group_attachment" "bws_attachment" {
   port             = 7777
 }
 
-# Attach BWS SSO instances to the target group - only if BWS SSO is enabled
-resource "aws_lb_target_group_attachment" "bws_sso_attachment" {
-  count            = local.bws_sso_enabled ? var.bws_sso_config.instance_count : 0
-  target_group_arn = aws_lb_target_group.bws_sso[0].arn
-  target_id        = module.bws_sso_instance[count.index].aws_instance.id
-  port             = 7777
-}
-
 # Attach BCS_WIN instances to the target group - only if BCS_WIN is enabled
 resource "aws_lb_target_group_attachment" "bcs_win_attachment" {
   count            = local.bcs_win_enabled ? var.bcs_config_win.instance_count : 0
@@ -691,22 +624,6 @@ resource "aws_route53_record" "bws_entry" {
 
   zone_id = var.account_config.route53_external_zone.zone_id
   name    = local.bws_fqdn
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.mis[0].dns_name
-    zone_id                = aws_lb.mis[0].zone_id
-    evaluate_target_health = false
-  }
-}
-
-# Create route53 entry for BWS SSO - only if BWS SSO is enabled
-resource "aws_route53_record" "bws_sso_entry" {
-  count    = local.bws_sso_enabled ? 1 : 0
-  provider = aws.core-vpc
-
-  zone_id = var.account_config.route53_external_zone.zone_id
-  name    = local.bws_sso_fqdn
   type    = "A"
 
   alias {

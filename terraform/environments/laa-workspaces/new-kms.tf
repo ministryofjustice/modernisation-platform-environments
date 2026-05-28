@@ -61,20 +61,6 @@ resource "aws_kms_key_policy" "ebs" {
         Resource = "*"
       },
       {
-        Sid    = "Allow WorkSpaces DefaultRole to use the key"
-        Effect = "Allow"
-        Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/workspaces_DefaultRole"
-        }
-        Action = [
-          "kms:Decrypt",
-          "kms:GenerateDataKey",
-          "kms:CreateGrant",
-          "kms:DescribeKey"
-        ]
-        Resource = "*"
-      },
-      {
         Sid    = "Allow use of the key for EBS encryption"
         Effect = "Allow"
         Principal = {

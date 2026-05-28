@@ -80,9 +80,6 @@ locals {
             "Ec2PPReportingPolicy",
           ])
         })
-        instance = merge(local.ec2_instances.bip_app.instance, {
-          instance_type = "r6i.2xlarge"
-        })
         tags = merge(local.ec2_instances.bip_app.tags, {
           instance-scheduling                  = "skip-scheduling"
           nomis-combined-reporting-environment = "pp"

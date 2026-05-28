@@ -665,7 +665,7 @@ module "share_dbs_with_roles" {
 }
 
 module "existing_audit_dbs_with_roles" {
-  count                   = local.is-test ? 0 : 1
+  count                   = local.is-test || local.is-production ? 0 : 1
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = ["ears_sars_audit"]
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn

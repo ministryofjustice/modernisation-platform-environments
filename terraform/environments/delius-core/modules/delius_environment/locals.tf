@@ -44,12 +44,6 @@ locals {
     "52.56.195.113/32"
   ]
 
-  legacy_preprod_natgw_ips = [
-    "52.56.240.62/32",
-    "18.130.110.168/32",
-    "35.178.44.184/32"
-  ]
-
   secret_prefix           = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}"
   application_secret_name = "${local.secret_prefix}-application-passwords"
   mis_account_id          = lookup(var.platform_vars.environment_management.account_ids, join("-", ["delius-mis", var.account_info.mp_environment]), null)
@@ -60,7 +54,4 @@ locals {
     standbydb2 = try(module.oracle_db_standby[1].oracle_db_server_name, "none")
   }
 
-  container_vars_default = {
-    for key, name in var.delius_microservice_configs.weblogic_params : key => data.aws_ssm_parameter.weblogic_ssm[key].value
-  }
 }

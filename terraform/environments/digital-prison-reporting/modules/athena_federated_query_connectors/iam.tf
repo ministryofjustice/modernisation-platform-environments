@@ -98,7 +98,6 @@ resource "aws_iam_policy" "athena_federated_query_connector_policy" {
       },
       {
         "Action" : [
-          "kms:Decrypt",
           "kms:GenerateDataKey"
         ],
         "Resource" : [

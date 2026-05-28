@@ -111,22 +111,6 @@ resource "aws_security_group_rule" "mis_ad_dns_resolver_security_group_rule_egre
   cidr_blocks       = [var.account_config.shared_vpc_cidr]
 }
 
-resource "aws_security_group_rule" "mis_legacy_ad_dns_resolver_security_group_rule_egress" {
-  provider = aws.core-vpc
-
-  for_each = {
-    tcp = "tcp"
-    udp = "udp"
-  }
-  description       = "VPC to Legacy DNS Endpoint traffic for (${each.key})"
-  from_port         = 53
-  protocol          = each.value
-  security_group_id = aws_security_group.mis_ad_dns_resolver_security_group.id
-  to_port           = 53
-  type              = "egress"
-  cidr_blocks       = [var.environment_config.legacy_counterpart_vpc_cidr]
-}
-
 resource "aws_route53_resolver_endpoint" "resolve_local_entries_using_ad_dns" {
   provider = aws.core-vpc
 
@@ -165,34 +149,6 @@ resource "aws_route53_resolver_rule_association" "vpc_r53_fwd_to_ad" {
   provider = aws.core-vpc
 
   resolver_rule_id = aws_route53_resolver_rule.r53_fwd_to_ad.id
-  vpc_id           = var.account_config.shared_vpc_id
-}
-
-resource "aws_route53_resolver_rule" "r53_fwd_to_legacy_ad" {
-  count = lookup(var.environment_config, "legacy_ad_domain_name", null) != null ? 1 : 0
-
-  provider = aws.core-vpc
-
-  domain_name = var.environment_config.legacy_ad_domain_name
-  name        = replace(var.environment_config.legacy_ad_domain_name, ".", "-")
-  rule_type   = "FORWARD"
-
-  resolver_endpoint_id = aws_route53_resolver_endpoint.resolve_local_entries_using_ad_dns.id
-
-  dynamic "target_ip" {
-    for_each = sort(var.environment_config.legacy_dns_ip_addrs)
-    content {
-      ip = target_ip.value
-    }
-  }
-}
-
-resource "aws_route53_resolver_rule_association" "vpc_r53_fwd_to_legacy_ad" {
-  count = lookup(var.environment_config, "legacy_ad_domain_name", null) != null ? 1 : 0
-
-  provider = aws.core-vpc
-
-  resolver_rule_id = aws_route53_resolver_rule.r53_fwd_to_legacy_ad[0].id
   vpc_id           = var.account_config.shared_vpc_id
 }
 

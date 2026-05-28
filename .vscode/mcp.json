@@ -8,6 +8,14 @@
     }
   ],
   "servers": {
+    "awslabs.aws-diagram-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.aws-diagram-mcp-server@latest"],
+      "env": {
+        "AWS_PROFILE": "${input:aws-profile}",
+        "AWS_REGION": "eu-west-2"
+      }
+    },
     "awslabs.billing-cost-management-mcp-server": {
       "command": "uvx",
       "args": ["awslabs.billing-cost-management-mcp-server@latest"],

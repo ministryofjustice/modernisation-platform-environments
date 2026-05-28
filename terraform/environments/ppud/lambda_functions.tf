@@ -25,7 +25,7 @@ locals {
   # Lambda function configurations
   lambda_functions = {
     check_certificate_expiration = {
-      description  = "Function to check ACM certificate expiration dates and send a reminder for any under 30 days."
+      description  = "Function to check certificate expiration date and send a reminder for any under 30 days."
       role_key     = "get_certificate_expiry"
       environments = ["development", "preproduction", "production"]
       runtime      = "python3.13"
@@ -36,27 +36,6 @@ locals {
       environment = {
         variables = {
           EXPIRY_DAYS = "30"
-          SNS_TOPIC_ARN = {
-            development   = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:ppud-dev-cw-alerts"
-            preproduction = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:ppud-uat-cw-alerts"
-            production    = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:ppud-prod-cw-alerts"
-          }
-        }
-      }
-    }
-    check_internal_certificate_expiration = {
-      description  = "Function to check Internal PKI certificate expiration dates and send a reminder for any under 30 days."
-      role_key     = "get_certificate_expiry"
-      environments = ["development", "preproduction", "production"]
-      runtime      = "python3.13"
-      permissions = [{
-        principal         = "lambda.alarms.cloudwatch.amazonaws.com"
-        source_arn_suffix = "alarm:*"
-      }]
-      environment = {
-        variables = {
-          EXPIRY_DAYS    = "30"
-          PARAMETER_PATH = "/certificates/"
           SNS_TOPIC_ARN = {
             development   = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:ppud-dev-cw-alerts"
             preproduction = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:ppud-uat-cw-alerts"
@@ -272,8 +251,8 @@ locals {
       timeout      = 900
       memory_size  = 1024
       role_key     = "get_cloudwatch"
-      environments = ["development", "production"]
-      layers       = ["xlsxwriter", "requests"]
+      environments = ["production"]
+      layers       = ["beautifulsoup", "xlsxwriter", "requests"]
       vpc_config   = { production = true }
       permissions = [{
         principal         = "cloudwatch.amazonaws.com"
@@ -316,18 +295,6 @@ locals {
         source_arn_suffix = "*"
       }]
     }
-    rotate_ses_access_key = {
-      description  = "Function to rotate ses access key, secret key and derive new smtp password."
-      role_key     = "rotate_ses_access_key"
-      environments = ["development", "preproduction"]
-      permissions  = []
-      environment = {
-        variables = {
-          SES_IAM_USER    = local.ses_iam_user
-          SES_SECRET_NAME = local.ses_secret_name
-        }
-      }
-    }
   }
 
   # Flatten lambda functions with environments
@@ -363,8 +330,8 @@ locals {
   klayers_account_id = data.aws_ssm_parameter.klayers_account.value
 
   layer_arns = {
-  # numpy  = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-numpy:14"
-  # pillow = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-pillow:2"
+    numpy  = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-numpy:8"
+    pillow = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-pillow:1"
   }
 
 }
@@ -425,10 +392,10 @@ resource "aws_lambda_function" "lambda_functions" {
     for_each = try(each.value.config.environment, null) != null ? [each.value.config.environment] : []
     content {
       variables = merge(
-        { for k, v in environment.value.variables : k => v if !can(v[each.value.env]) },
-        try(environment.value.variables.SNS_TOPIC_ARN, null) != null ? {
+        environment.value.variables,
+        {
           SNS_TOPIC_ARN = environment.value.variables.SNS_TOPIC_ARN[each.value.env]
-        } : {}
+        }
       )
     }
   }

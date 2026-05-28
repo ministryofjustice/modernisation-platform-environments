@@ -184,8 +184,8 @@ resource "aws_cloudfront_distribution" "transfer_family" {
 #--WAF logging resources must be in us-east-1 as they are associated with a CLOUDFRONT-scoped WAF ACL
 #--AWS requires the log group name to start with "aws-waf-logs-"
 resource "aws_cloudwatch_log_group" "transfer_family_waf_logs" {
-  count             = (local.is-preproduction || local.is-production) ? 1 : 0
-  provider          = aws.us-east-1
+  count    = (local.is-preproduction || local.is-production) ? 1 : 0
+  provider = aws.us-east-1
   name              = "aws-waf-logs-transfer-family/transfer-family-waf-logs"
   retention_in_days = 30
 

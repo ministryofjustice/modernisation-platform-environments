@@ -92,7 +92,7 @@ resource "aws_lb_target_group" "instance" {
     }
   }
 
-  tags = merge(local.tags, {
+  tags = merge(var.tags, {
     Name = each.key
   })
 }
@@ -111,7 +111,7 @@ module "lb" {
 
   for_each = var.lbs
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=4d29aaf30e88ef37e951e8065cf1fb8db23a7d6d" # v5.1.1
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v5.1.0"
 
   providers = {
     aws.bucket-replication = aws

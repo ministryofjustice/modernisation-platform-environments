@@ -203,8 +203,8 @@ locals {
     }
   ]
 
-  mw_ami_target_id = local.environment == "test" ? "i-0b6b26faa1d5ebce8" : ""
-  mw_date_time     = "2026-05-22T01:00:00"
+  mw_ami_target_id = local.environment == "development" ? "i-07e8ab8df178e58aa" : local.environment == "production" ? "i-06a75f5adc84dab2e" : ""
+  mw_date_time     = "2025-12-05T03:10:00"
 
 }
 #

@@ -185,9 +185,6 @@ resource "aws_iam_user" "email" {
 resource "aws_iam_access_key" "email" {
   count = local.is-production == false ? 1 : 0
   user  = aws_iam_user.email[0].name
-    lifecycle {  # Key now managed by Lambda and not Terraform
-      ignore_changes = all
-  }
 }
 
 #tfsec:ignore:aws-iam-no-policy-wildcards

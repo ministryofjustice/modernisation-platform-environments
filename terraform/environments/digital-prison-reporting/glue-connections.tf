@@ -21,15 +21,21 @@ locals {
     item => "jdbc:postgresql://${local.dps_endpoint[item]}:${local.dps_port[item]}/${local.dps_database[item]}"
   }
 
-  probation_source_secrets_requiring_glue_connections = {
-    for key, value in local.probation_domains :
-    key => module.probation_source_secret[key]
-    if value.create_glue_connection
+  probation_endpoint = {
+    for item in local.probation_domains_list :
+    item => jsondecode(data.aws_secretsmanager_secret_version.probation[item].secret_string)["endpoint"]
   }
-
+  probation_port = {
+    for item in local.probation_domains_list :
+    item => jsondecode(data.aws_secretsmanager_secret_version.probation[item].secret_string)["port"]
+  }
+  probation_database = {
+    for item in local.probation_domains_list :
+    item => jsondecode(data.aws_secretsmanager_secret_version.probation[item].secret_string)["db_name"]
+  }
   probation_connection_string = {
-    for key, entity in local.probation_source_secrets_requiring_glue_connections :
-    key => "jdbc:postgresql://${entity.secret_contents_endpoint}:${entity.secret_contents_port}/${entity.secret_contents_db_name}"
+    for item in local.probation_domains_list :
+    item => "jdbc:postgresql://${local.probation_endpoint[item]}:${local.probation_port[item]}/${local.probation_database[item]}"
   }
 }
 
@@ -92,14 +98,14 @@ resource "aws_glue_connection" "glue_dps_connection" {
 
 # All Probation connections
 resource "aws_glue_connection" "glue_probation_connection" {
-  for_each        = local.create_glue_connection ? local.probation_source_secrets_requiring_glue_connections : {}
-  name            = "${local.project}-${each.key}-connection"
+  for_each        = local.create_glue_connection ? toset(local.probation_domains_list) : []
+  name            = "${local.project}-${each.value}-connection"
   connection_type = "JDBC"
 
   connection_properties = {
-    JDBC_CONNECTION_URL    = local.probation_connection_string[each.key]
+    JDBC_CONNECTION_URL    = local.probation_connection_string[each.value]
     JDBC_DRIVER_CLASS_NAME = "org.postgresql.Driver"
-    SECRET_ID              = module.probation_source_secret[each.key].secret_name
+    SECRET_ID              = aws_secretsmanager_secret.probation[each.value].name
   }
 
   physical_connection_requirements {

@@ -1,0 +1,61 @@
+{
+  "accounts": {
+    "development": {
+      "example_var": "dev-data",
+      "existing_archive_bucket_name": "",
+      "ohssnapshot1": "snap-09be6356ad9f3ae14",
+      "pagerduty_integration_key_name": "laa_portal_nonprod_alarms",
+      "management_cidr": "",
+      "oim_ami_id": "ami-05a2c490847165c9d",
+      "oam_ami_id": "ami-06359d272024ab007",
+      "oam_instance_type": "t3a.large",
+      "oam_fmw_snapshot": "snap-0dba4e0341c3a3241",
+      "oam_aserver_snapshot": "snap-0371f356f5555c5df",
+      "oam_config_snapshot": "snap-092e6168dca44c40e",
+      "oam_mserver_snapshot": "snap-0db8a2c01be9128e8",
+      "oam_repo_home_snapshot": "snap-04ed65da750df338c",
+      "ohs_instance_type": "t3a.medium",
+      "ohs_ami_id": "ami-0e5f1571c6f046b98",
+      "ohs_mserver_snapshot": "snap-08c74940e74f5403d",
+      "igdb_snapshot_name": "portal-igdb-migration-20240807",
+      "iadb_snapshot_name": "portal-iadb-migration-20240807",
+      "oim_instance_type": "t3a.xlarge",
+      "oimsnapshot1": "snap-06fdc159c58e8b9e5",
+      "oimsnapshot2": "snap-09f59c6842e47f52b",
+      "oimsnapshot3": "snap-0a98613dfdaa425eb",
+      "oimsnapshot4": "snap-0a46c9fb16f2ea0b5",
+      "idm_ami_id": "ami-0dade475a7c17c882",
+      "idm_instance_type": "t3a.large",
+      "idm_fmw_snapshot": "snap-0a3213ba856e69d1b",
+      "idm_aserver_snapshot": "snap-0d1122b9e4fb2d8b9",
+      "idm_config_snapshot": "snap-0ec8e0fb2421b8b8f",
+      "idm_mserver_snapshot": "snap-0f196a2f2f8bc532f",
+      "idm_instances_snapshot": "snap-058ee73f8e4a01b75",
+      "lb_access_logs_existing_bucket_name": "",
+      "url": "s3://laa-portal-development-archive-mp",
+      "maintenance_window_name": "diagnostics-log-archive-poc",
+      "landing_zone_vpc_cidr": "10.202.0.0/20",
+      "mp_domain_name": "modernisation-platform.service.justice.gov.uk",
+      "lb_enable_deletion_protection": "false",
+      "efs_enable_deletion_protection": "false"
+    },
+    "test": {
+      "example_var": "test-data",
+      "landing_zone_vpc_cidr": "10.203.0.0/20"
+    },
+    "preproduction": {
+      "example_var": "preproduction-data",
+      "url": "s3://laa-portal-preproduction-archive-mp",
+      "maintenance_window_name": "diagnostics-log-archive-preproduction",
+      "landing_zone_vpc_cidr": "tbc"
+    },
+    "production": {
+      "example_var": "production-data",
+      "existing_archive_bucket_name": "",
+      "ohs_instance_type": "m5.xlarge",
+      "url": "s3://laa-portal-production-archive-mp",
+      "maintenance_window_name": "diagnostics-log-archive-production",
+      "landing_zone_vpc_cidr": "10.205.0.0/20"
+    }
+  }
+}

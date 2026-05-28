@@ -36,7 +36,6 @@ locals {
   db_config_test = {
     instance_type  = "r7i.xlarge"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
-    pinned_ami_id  = "ami-0e0b15e20bd91fd29"
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
     }
@@ -75,21 +74,17 @@ locals {
       ansible_repo_basedir = "ansible"
       ansible_args         = "oracle_19c_install"
     }
-    database_name = "TSTNDA"
+    database_name = "change_me"
     database_port = local.db_port
   }
 
   delius_microservices_configs_test = {
     weblogic = {
-      image_tag                = "6.7.4"
-      task_definition_revision = 13
-      container_port           = 8080
-      container_memory         = 4096
-      container_cpu            = 2048
-      ec2_instance_type        = "r7i.2xlarge"
-      task_count               = 4
-      asg_min_size             = 1
-      asg_max_size             = 2
+      image_tag         = "6.2.0.3"
+      container_port    = 8080
+      container_memory  = 4096
+      container_cpu     = 2048
+      ec2_instance_type = "r5.2xlarge"
     }
 
     weblogic_params = {
@@ -99,19 +94,19 @@ locals {
       BREACH_NOTICE_UI_URL_FORMAT = "https://breach-notice-test.hmpps.service.justice.gov.uk/breach-notice/%s"
       COOKIE_SECURE               = "true"
       # DELIUS_API_URL                    = "" # No longer needed
-      DMS_HOST                          = "hmpps-delius-alfresco-test.apps.live.cloud-platform.service.justice.gov.uk"
-      DMS_OFFICE_URI_HOST               = "hmpps-delius-alfresco-test.apps.live.cloud-platform.service.justice.gov.uk"
+      DMS_HOST                          = "https://hmpps-delius-alfresco-test.apps.live.cloud-platform.service.justice.gov.uk"
+      DMS_OFFICE_URI_HOST               = "https://hmpps-delius-alfresco-test.apps.live.cloud-platform.service.justice.gov.uk"
       DMS_OFFICE_URI_PORT               = "443"
       DMS_PORT                          = "443"
       DMS_PROTOCOL                      = "https"
       EIS_USER_CONTEXT                  = "cn=EISUsers,ou=Users,dc=moj,dc=com"
       ELASTICSEARCH_URL                 = "https://probation-search-test.hmpps.service.justice.gov.uk/delius"
-      GDPR_URL                          = "https://ndelius.test.probation.service.justice.gov.uk/gdpr/ui/homepage" # GDPR not deployed to CP yet, <URL>/gdpr/ui/homepage
+      GDPR_URL                          = "/gdpr/ui/homepage" # GDPR not deployed to CP yet, <URL>/gdpr/ui/homepage
       JDBC_CONNECTION_POOL_MAX_CAPACITY = "100"
       JDBC_CONNECTION_POOL_MIN_CAPACITY = "50"
-      JDBC_URL                          = "jdbc:oracle:thin:@(DESCRIPTION=(LOAD_BALANCE=OFF)(FAILOVER=ON)(CONNECT_TIMEOUT=10)(RETRY_COUNT=3)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=tcp)(HOST=delius-core-test-db-1.hmpps-test.modernisation-platform.internal)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=TSTNDA_TAF)))"
+      JDBC_URL                          = ""
       JDBC_USERNAME                     = "delius_pool"
-      LDAP_HOST                         = "ldap.test.delius-core.hmpps-test.modernisation-platform.service.justice.gov.uk"
+      LDAP_HOST                         = "https://ldap.test.delius-core.hmpps-test.modernisation-platform.service.justice.gov.uk"
       LDAP_PRINCIPAL                    = "cn=admin,dc=moj,dc=com"
       LOG_LEVEL_NDELIUS                 = "DEBUG"
       MERGE_API_URL                     = "https://delius-merge-api-test.hmpps.service.justice.gov.uk"
@@ -139,13 +134,10 @@ locals {
     }
 
     weblogic_eis = {
-      image_tag                = "6.7.4-eis"
-      task_definition_revision = 9
-      container_port           = 8080
-      container_memory         = 2048
-      container_cpu            = 1024
-      ec2_instance_type        = "r7i.large"
-      task_count               = 1
+      image_tag        = "6.2.0.3"
+      container_port   = 8080
+      container_memory = 2048
+      container_cpu    = 1024
     }
 
     pwm = {

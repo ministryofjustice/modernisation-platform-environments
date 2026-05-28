@@ -201,24 +201,6 @@ variable "hub20_s3_bucket" {
   default     = ""
 }
 
-variable "create_std_instance" {
-  type        = bool
-  description = "Whether to create a second RDS instance with max_string_size = STANDARD (non-prod only)"
-  default     = false
-}
-
-variable "std_identifier_suffix" {
-  type        = string
-  description = "Suffix appended to the identifier of the std RDS instance to keep it unique"
-  default     = ""
-}
-
-variable "std_snapshot_arn" {
-  type        = string
-  description = "ARN of the snapshot to restore the std RDS instance from"
-  default     = ""
-}
-
 
 
 

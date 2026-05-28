@@ -17,6 +17,11 @@ data "archive_file" "waf_maintenance_zip" {
   output_path = "${path.module}/lambda/waf_maintenance/maintenance_lambda_function.zip"
 }
 
+# Pull an existing WAF Rule Group and rules using a dynamic name.
+data "aws_wafv2_web_acl" "waf_web_acl" {
+  name  = "ccms-pui-web-acl"
+  scope = "REGIONAL"
+}
 
 # Create IAM Role and Policy for Lambda
 resource "aws_iam_role" "waf_lambda_role" {
@@ -62,8 +67,8 @@ resource "aws_lambda_function" "waf_maintenance" {
   environment {
     variables = {
       SCOPE            = var.scope
-      WEB_ACL_NAME     = aws_wafv2_web_acl.pui_web_acl.name
-      WEB_ACL_ID       = aws_wafv2_web_acl.pui_web_acl.id
+      WEB_ACL_NAME     = data.aws_wafv2_web_acl.waf_web_acl.name
+      WEB_ACL_ID       = data.aws_wafv2_web_acl.waf_web_acl.id
       RULE_NAME        = var.rule_name
       CUSTOM_BODY_NAME = "maintenance_html"
       TIME_FROM        = "21:30" # Optional - these are the defaults

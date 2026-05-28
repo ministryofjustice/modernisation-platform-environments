@@ -33,9 +33,9 @@ locals {
 
 
   db_config_stage = {
-    instance_type          = "r7i.2xlarge"
-    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-06-04T11-24-58.162Z"
-    pinned_ami_id          = "ami-04286e91e4ada8f3a"
+    instance_type  = "r7i.2xlarge"
+    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-06-04T11-24-58.162Z"
+
     primary_instance_count = 1
     standby_count          = 0
 
@@ -89,10 +89,7 @@ locals {
       container_port    = 8080
       container_memory  = 4096
       container_cpu     = 2048
-      ec2_instance_type = "r7i.2xlarge"
-      task_count        = 2
-      asg_min_size      = 1
-      asg_max_size      = 2
+      ec2_instance_type = "r5.2xlarge"
     }
 
     weblogic_params = {
@@ -102,8 +99,8 @@ locals {
       BREACH_NOTICE_UI_URL_FORMAT = "https://breach-notice-stage.hmpps.service.justice.gov.uk/breach-notice/%s"
       COOKIE_SECURE               = "true"
       # DELIUS_API_URL                    = "" # No longer needed
-      DMS_HOST                          = "hmpps-delius-alfresco-stage.apps.live.cloud-platform.service.justice.gov.uk"
-      DMS_OFFICE_URI_HOST               = "hmpps-delius-alfresco-stage.apps.live.cloud-platform.service.justice.gov.uk"
+      DMS_HOST                          = "https://hmpps-delius-alfresco-stage.apps.live.cloud-platform.service.justice.gov.uk"
+      DMS_OFFICE_URI_HOST               = "https://hmpps-delius-alfresco-stage.apps.live.cloud-platform.service.justice.gov.uk"
       DMS_OFFICE_URI_PORT               = "443"
       DMS_PORT                          = "443"
       DMS_PROTOCOL                      = "https"
@@ -114,7 +111,7 @@ locals {
       JDBC_CONNECTION_POOL_MIN_CAPACITY = "50"
       JDBC_URL                          = ""
       JDBC_USERNAME                     = "delius_pool"
-      LDAP_HOST                         = "ldap.stage.delius-core.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"
+      LDAP_HOST                         = "https://ldap.stage.delius-core.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"
       LDAP_PRINCIPAL                    = "cn=admin,dc=moj,dc=com"
       LOG_LEVEL_NDELIUS                 = "DEBUG"
       MERGE_API_URL                     = "https://delius-merge-api-stage.hmpps.service.justice.gov.uk"
@@ -142,12 +139,10 @@ locals {
     }
 
     weblogic_eis = {
-      image_tag         = "6.7.4-eis"
-      container_port    = 8080
-      container_memory  = 2048
-      container_cpu     = 1024
-      ec2_instance_type = "r7i.large"
-      task_count        = 1
+      image_tag        = "6.2.0.3"
+      container_port   = 8080
+      container_memory = 2048
+      container_cpu    = 1024
     }
 
     pwm = {

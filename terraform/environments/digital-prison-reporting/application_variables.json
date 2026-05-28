@@ -17,6 +17,15 @@
       "glue_job_common_log_level": "INFO",
       "glue_job_jar_name": "digital-prison-reporting-jobs-vLatest-all.jar",
       "glue_job_version": "5.0",
+      "maintenance_job_retry_max_attempts": 10,
+      "maintenance_job_retry_min_wait_millis": 1000,
+      "maintenance_job_retry_max_wait_millis": 20000,
+      "compact_job_worker_type": "G.1X",
+      "compact_job_num_workers": 3,
+      "compact_job_log_level": "INFO",
+      "retention_job_worker_type": "G.1X",
+      "retention_job_num_workers": 2,
+      "retention_job_log_level": "INFO",
       "hive_table_creation_job_schema_cache_max_size": 0,
       "create_security_conf": true,
       "setup_buckets": true,
@@ -60,16 +69,7 @@
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
       "scheduled_dataset_lambda_version": "vLatest",
-      "probation_domains": {
-        "pr-test-domain": {
-          "share_with_cloud_platform": false,
-          "create_glue_connection": true
-        },
-        "pr-assessment-view": {
-          "share_with_cloud_platform": true,
-          "create_glue_connection": false
-        }
-      },
+      "probation_domains": ["prb-sentence-plan"],
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -198,6 +198,10 @@
             {
               "glue_database": "curated_prisons_history_dev_dbt",
               "glue_tables": ["*"]
+            },
+            {
+              "glue_database": "staged_prisons_history_dev_dbt",
+              "glue_tables": ["*"]
             }
           ]
         }
@@ -225,7 +229,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "aurora-postgresql",
-        "engine_version": "16.11",
+        "engine_version": "16.8",
         "init_size": "158",
         "max_size": "1000",
         "name": "missingreportsubmissions",
@@ -254,6 +258,15 @@
       "glue_job_common_log_level": "INFO",
       "glue_job_jar_name": "digital-prison-reporting-jobs-vLatest-all.jar",
       "glue_job_version": "5.0",
+      "maintenance_job_retry_max_attempts": 10,
+      "maintenance_job_retry_min_wait_millis": 1000,
+      "maintenance_job_retry_max_wait_millis": 20000,
+      "compact_job_worker_type": "G.1X",
+      "compact_job_num_workers": 3,
+      "compact_job_log_level": "INFO",
+      "retention_job_worker_type": "G.1X",
+      "retention_job_num_workers": 2,
+      "retention_job_log_level": "INFO",
       "hive_table_creation_job_schema_cache_max_size": 0,
       "create_security_conf": true,
       "setup_buckets": true,
@@ -297,12 +310,7 @@
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
       "scheduled_dataset_lambda_version": "vLatest",
-      "probation_domains": {
-        "pr-assessment-view": {
-          "share_with_cloud_platform": true,
-          "create_glue_connection": false
-        }
-      },
+      "probation_domains": ["prb-sentence-plan"],
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -422,7 +430,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "postgres",
-        "engine_version": "16.11",
+        "engine_version": "16.8",
         "init_size": "158",
         "max_size": "1000",
         "name": "testdatabase",
@@ -437,7 +445,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "aurora-postgresql",
-        "engine_version": "16.11",
+        "engine_version": "16.8",
         "init_size": "158",
         "max_size": "1000",
         "name": "missingreportsubmissions",
@@ -466,6 +474,15 @@
       "glue_job_common_log_level": "INFO",
       "glue_job_jar_name": "digital-prison-reporting-jobs-vLatest-all.jar",
       "glue_job_version": "5.0",
+      "maintenance_job_retry_max_attempts": 10,
+      "maintenance_job_retry_min_wait_millis": 1000,
+      "maintenance_job_retry_max_wait_millis": 20000,
+      "compact_job_worker_type": "G.1X",
+      "compact_job_num_workers": 4,
+      "compact_job_log_level": "INFO",
+      "retention_job_worker_type": "G.1X",
+      "retention_job_num_workers": 2,
+      "retention_job_log_level": "INFO",
       "hive_table_creation_job_schema_cache_max_size": 0,
       "create_security_conf": true,
       "setup_buckets": true,
@@ -511,12 +528,7 @@
       "setup_redshift_schedule": true,
       "enable_redshift_health_check": true,
       "scheduled_dataset_lambda_version": "vLatest",
-      "probation_domains": {
-        "pr-assessment-view": {
-          "share_with_cloud_platform": true,
-          "create_glue_connection": false
-        }
-      },
+      "probation_domains": ["prb-sentence-plan"],
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -637,6 +649,10 @@
           "data_locations": ["dpr-structured-historical-preproduction"],
           "resource_shares": [
             {
+              "glue_database": "staged_prisons_history_preprod_dbt",
+              "glue_tables": ["*"]
+            },
+            {
               "glue_database": "curated_prisons_history_preprod_dbt",
               "glue_tables": ["*"]
             }
@@ -651,7 +667,7 @@
         "enable": false,
         "create_replica": false,
         "engine": "postgres",
-        "engine_version": "16.11",
+        "engine_version": "16.8",
         "init_size": "158",
         "max_size": "1000",
         "name": "testdatabase",
@@ -666,7 +682,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "aurora-postgresql",
-        "engine_version": "16.11",
+        "engine_version": "16.8",
         "init_size": "158",
         "max_size": "1000",
         "name": "missingreportsubmissions",
@@ -695,6 +711,15 @@
       "glue_job_common_log_level": "INFO",
       "glue_job_jar_name": "digital-prison-reporting-jobs-vLatest-all.jar",
       "glue_job_version": "5.0",
+      "maintenance_job_retry_max_attempts": 10,
+      "maintenance_job_retry_min_wait_millis": 1000,
+      "maintenance_job_retry_max_wait_millis": 20000,
+      "compact_job_worker_type": "G.1X",
+      "compact_job_num_workers": 5,
+      "compact_job_log_level": "INFO",
+      "retention_job_worker_type": "G.1X",
+      "retention_job_num_workers": 2,
+      "retention_job_log_level": "INFO",
       "hive_table_creation_job_schema_cache_max_size": 0,
       "create_security_conf": true,
       "setup_buckets": true,
@@ -738,12 +763,7 @@
       "setup_scheduled_action_iam_role": false,
       "setup_redshift_schedule": false,
       "scheduled_dataset_lambda_version": "vLatest",
-      "probation_domains": {
-        "pr-assessment-view": {
-          "share_with_cloud_platform": true,
-          "create_glue_connection": false
-        }
-      },
+      "probation_domains": ["prb-sentence-plan"],
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -864,6 +884,10 @@
           "data_locations": ["dpr-structured-historical-production"],
           "resource_shares": [
             {
+              "glue_database": "staged_prisons_history",
+              "glue_tables": ["*"]
+            },
+            {
               "glue_database": "curated_prisons_history",
               "glue_tables": ["*"]
             },
@@ -886,7 +910,7 @@
         "enable": false,
         "create_replica": false,
         "engine": "postgres",
-        "engine_version": "16.11",
+        "engine_version": "16.8",
         "init_size": "158",
         "max_size": "1000",
         "name": "testdatabase",
@@ -901,7 +925,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "aurora-postgresql",
-        "engine_version": "16.11",
+        "engine_version": "16.8",
         "init_size": "158",
         "max_size": "1000",
         "name": "missingreportsubmissions",

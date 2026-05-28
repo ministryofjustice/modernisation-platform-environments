@@ -27,27 +27,3 @@ resource "aws_secretsmanager_secret_version" "sftp_bc_secrets" {
 data "aws_secretsmanager_secret_version" "sftp_bc_secrets" {
   secret_id = aws_secretsmanager_secret.sftp_bc_secrets.id
 }
-
-# SFTP BC Lambda Secrets
-resource "aws_secretsmanager_secret" "sftp_bc_lambda_secrets" {
-  name        = "${local.application_name}-sftp-bc-lambda-secrets"
-  description = "SFTP bc Lambda Secrets"
-  kms_key_id  = aws_kms_key.s3_sftp_bc_kms_key.arn
-}
-
-resource "aws_secretsmanager_secret_version" "sftp_bc_lambda_secrets" {
-  secret_id = aws_secretsmanager_secret.sftp_bc_lambda_secrets.id
-  secret_string = jsonencode({
-    validate_file = ""
-  })
-
-  lifecycle {
-    ignore_changes = [
-      secret_string
-    ]
-  }
-}
-
-data "aws_secretsmanager_secret_version" "sftp_bc_lambda_secrets" {
-  secret_id = aws_secretsmanager_secret.sftp_bc_lambda_secrets.id
-}

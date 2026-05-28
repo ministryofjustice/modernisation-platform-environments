@@ -93,42 +93,52 @@ mkdir -p /stage
 # Larger volume = /oracle/software (oracle home)
 # Smaller volume = /stage
 
-# Identify volumes by their AWS attachment device name (sdb=ORAHOME, sdc=STAGE)
-# This is reliable regardless of volume sizes, avoiding wrong mounts when both volumes
-# are the same size (which makes size-based detection non-deterministic).
-echo "Identifying EBS volumes by attachment device name via instance metadata..."
+echo "Detecting volume sizes..."
+lsblk -b -n -o NAME,SIZE,TYPE | grep disk
 
-INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
-  http://169.254.169.254/latest/meta-data/instance-id)
-REGION="eu-west-2"
+# Find non-root volumes and assign based on size (larger = oracle, smaller = stage)
+ORACLE_SOFTWARE=""
+STAGE=""
+declare -A volumes
 
-ORAHOME_VOL=$(aws ec2 describe-instances --instance-id "$INSTANCE_ID" --region "$REGION" \
-  --query "Reservations[0].Instances[0].BlockDeviceMappings[?DeviceName=='/dev/sdb'].Ebs.VolumeId" \
-  --output text 2>/dev/null)
-STAGE_VOL=$(aws ec2 describe-instances --instance-id "$INSTANCE_ID" --region "$REGION" \
-  --query "Reservations[0].Instances[0].BlockDeviceMappings[?DeviceName=='/dev/sdc'].Ebs.VolumeId" \
-  --output text 2>/dev/null)
+for dev in /dev/nvme*n1; do
+    if [ "$dev" == "/dev/nvme0n1" ]; then
+        continue
+    fi
 
-echo "ORAHOME volume ID (sdb): $ORAHOME_VOL"
-echo "STAGE volume ID   (sdc): $STAGE_VOL"
+    size=$(lsblk -b -n -d -o SIZE "$dev")
+    echo "Device $dev has size $size bytes"
+    volumes["$dev"]=$size
+done
 
-# Resolve volume IDs to NVMe block device paths via /dev/disk/by-id/
-# AWS EBS NVMe devices appear as nvme-Amazon_Elastic_Block_Store_vol<id-without-dashes>
-find_nvme_for_vol() {
-  local vol_id="$1"
-  local by_id_path="/dev/disk/by-id/nvme-Amazon_Elastic_Block_Store_${vol_id/vol-/vol}"
-  if [ -L "$by_id_path" ]; then
-    readlink -f "$by_id_path"
-  else
-    echo ""
-  fi
-}
+# Sort volumes by size and assign (largest = oracle, smallest = stage)
+# This works for any volume sizes configured in terraform
+for dev in "${!volumes[@]}"; do
+    size=${volumes[$dev]}
+    
+    # Skip volumes smaller than 100GB to avoid conflicts
+    if [ "$size" -lt 107374182400 ]; then
+        echo "Skipping $dev (size $size) - too small to be oracle/stage volume"
+        continue
+    fi
+    
+    # Assign larger volume to ORACLE_SOFTWARE if not set or if this is larger
+    if [ -z "$ORACLE_SOFTWARE" ]; then
+        ORACLE_SOFTWARE="$dev"
+        ORACLE_SIZE=$size
+    elif [ "$size" -gt "$ORACLE_SIZE" ]; then
+        # This volume is larger, so previous becomes STAGE
+        STAGE="$ORACLE_SOFTWARE"
+        ORACLE_SOFTWARE="$dev"
+        ORACLE_SIZE=$size
+    elif [ -z "$STAGE" ]; then
+        # This is smaller than ORACLE_SOFTWARE, assign to STAGE
+        STAGE="$dev"
+    fi
+done
 
-ORACLE_SOFTWARE=$(find_nvme_for_vol "$ORAHOME_VOL")
-STAGE=$(find_nvme_for_vol "$STAGE_VOL")
-
-echo "Resolved ORACLE_SOFTWARE device: $ORACLE_SOFTWARE"
-echo "Resolved STAGE device:           $STAGE"
+echo "Assigned ORACLE_SOFTWARE=$ORACLE_SOFTWARE (size: $ORACLE_SIZE bytes)"
+echo "Assigned STAGE=$STAGE"
 
 # Mount oracle software volume (larger volume)
 if [ -n "$ORACLE_SOFTWARE" ]; then

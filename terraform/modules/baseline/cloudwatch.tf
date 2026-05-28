@@ -50,10 +50,6 @@ resource "aws_cloudwatch_event_rule" "this" {
   name = each.key
 
   event_pattern = each.value.event_pattern
-
-  tags = merge(local.tags, {
-    Name = each.key
-  })
 }
 
 resource "aws_cloudwatch_event_target" "this" {

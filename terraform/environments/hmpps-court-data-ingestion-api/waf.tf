@@ -134,6 +134,6 @@ resource "aws_wafv2_ip_set" "allowed_ips" {
   description        = "Allowed IPs for ${local.application_name}"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
-  addresses          = local.whitelist_ips
+  addresses          = []
   tags               = local.tags
 }

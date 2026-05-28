@@ -4,8 +4,6 @@ locals {
   environment_config_stage = {
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
     legacy_counterpart_vpc_cidr            = "10.160.32.0/20"
-    legacy_ad_domain_name                  = "delius-stage.local"
-    legacy_dns_ip_addrs                    = ["10.160.35.243", "10.160.38.128"]
     ad_domain_name                         = "delius-mis-stage.internal"
     ad_trust_domain_name                   = "azure.hmpp.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
@@ -108,37 +106,6 @@ locals {
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
     ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
     ansible_branch = "TM-1884/delius-mis/configure-stage"
-    ebs_volumes = {
-      "/dev/sda1" = { label = "root", size = 100, type = "gp3" }
-      "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }
-      "/dev/sdc"  = { label = "data", size = 100, type = "gp3" }
-      "/dev/sds"  = { label = "swap", size = 8, type = "gp3" }
-    }
-    ebs_volumes_config = {}
-
-    instance_config = {
-      associate_public_ip_address  = false
-      disable_api_termination      = false
-      disable_api_stop             = false
-      instance_type                = "r6i.xlarge"
-      metadata_endpoint_enabled    = "enabled"
-      key_name                     = null
-      metadata_options_http_tokens = "required"
-      monitoring                   = true
-      ebs_block_device_inline      = true
-
-      tags = merge(
-        local.tags,
-        { backup = true }
-      )
-    }
-  }
-
-  bws_sso_config_stage = {
-    instance_count = 1
-    ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
-    ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
-    ansible_branch = "TM-2066/delius-mis/web-sso-config"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100, type = "gp3" }
       "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }
@@ -304,10 +271,9 @@ locals {
 
   # BOE DB config
   boe_db_config_stage = {
-    instance_type          = "m7i.large"
-    primary_instance_count = 1
-    standby_instance_count = 0
-    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    instance_type  = "m7i.large"
+    instance_count = 1
+    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -350,10 +316,9 @@ locals {
 
   # DSD DB config
   dsd_db_config_stage = {
-    instance_type          = "m7i.large"
-    primary_instance_count = 1
-    standby_instance_count = 0
-    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    instance_type  = "m7i.large"
+    instance_count = 1
+    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -396,9 +361,8 @@ locals {
 
   # MIS DB config
   mis_db_config_stage = {
-    instance_type          = "r7i.4xlarge" # manually turn off when not in use to save costs
-    primary_instance_count = 1
-    standby_instance_count = 0
+    instance_type  = "r7i.4xlarge" # manually turn off when not in use to save costs
+    instance_count = 1
     # most recent 8_5 image, ami builder needs fixing after this
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2025-03-02T00-00-34.442Z"
 

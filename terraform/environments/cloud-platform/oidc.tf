@@ -37,8 +37,6 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     actions = [
       "iam:CreateRole",
       "iam:CreatePolicy",
-      "iam:CreatePolicyVersion",
-      "iam:DeletePolicyVersion",
       "iam:DeleteRole",
       "iam:Get*",
       "iam:ListRoles",
