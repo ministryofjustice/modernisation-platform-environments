@@ -116,6 +116,23 @@ data "aws_iam_policy_document" "task" {
     ]
   }
 
+  # S3 permissions for vcms bucket
+  statement {
+    sid    = "AllowVCMSBucket"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:ListBucket",
+      "s3:GetObject"
+    ]
+    resources = [
+      "${module.vcms_bucket.bucket.arn}",
+      "${module.vcms_bucket.bucket.arn}/*"
+    ]
+  }
+
+
   # ecs exec
   statement {
     sid    = "AllowSSMExec"
