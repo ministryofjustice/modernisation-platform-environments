@@ -52,7 +52,7 @@ resource "aws_ssm_parameter" "vcms_bucket_name" {
 
 resource "aws_ssm_parameter" "auto_user" {
   name  = "auto-user"
-  type  = "String"
+  type  = "SecureString"
   value = "CHANGE_ME"
 
   tags = merge(
@@ -65,7 +65,7 @@ resource "aws_ssm_parameter" "auto_user" {
 
 resource "aws_ssm_parameter" "auto_password" {
   name  = "auto-password"
-  type  = "String"
+  type  = "SecureString"
   value = "CHANGE_ME"
 
   tags = merge(
@@ -78,7 +78,7 @@ resource "aws_ssm_parameter" "auto_password" {
 
 resource "aws_ssm_parameter" "admin_user" {
   name  = "admin-user"
-  type  = "String"
+  type  = "SecureString"
   value = "CHANGE_ME"
 
   tags = merge(
@@ -91,7 +91,7 @@ resource "aws_ssm_parameter" "admin_user" {
 
 resource "aws_ssm_parameter" "admin_password" {
   name  = "admin-password"
-  type  = "String"
+  type  = "SecureString"
   value = "CHANGE_ME"
 
   tags = merge(
