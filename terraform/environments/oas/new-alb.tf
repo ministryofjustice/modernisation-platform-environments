@@ -619,7 +619,7 @@ resource "aws_lb_listener_rule" "em_9500_rule" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   listener_arn = aws_lb_listener.http_9500_listener[0].arn
-  priority     = 101
+  priority     = 110
 
   action {
     type             = "forward"
@@ -657,7 +657,7 @@ resource "aws_lb_listener_rule" "em_9501_rule" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   listener_arn = aws_lb_listener.https_9501_listener[0].arn
-  priority     = 101
+  priority     = 110
 
   action {
     type             = "forward"
@@ -761,24 +761,24 @@ resource "aws_lb_listener_rule" "bi_security_login_9502_rule" {
   }
 }
 
-# Listener rule for /static on port 9502
-resource "aws_lb_listener_rule" "static_9502_rule" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+# # Listener rule for /static on port 9502
+# resource "aws_lb_listener_rule" "static_9502_rule" {
+#   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
-  listener_arn = aws_lb_listener.http_9502_listener[0].arn
-  priority     = 230
+#   listener_arn = aws_lb_listener.http_9502_listener[0].arn
+#   priority     = 230
 
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
-  }
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+#   }
 
-  condition {
-    path_pattern {
-      values = ["/static*"]
-    }
-  }
-}
+#   condition {
+#     path_pattern {
+#       values = ["/static*"]
+#     }
+#   }
+# }
 
 # Listener rule for /analytics on port 9503
 resource "aws_lb_listener_rule" "analytics_9503_rule" {
@@ -856,24 +856,24 @@ resource "aws_lb_listener_rule" "bi_security_login_9503_rule" {
   }
 }
 
-# Listener rule for /static on port 9503
-resource "aws_lb_listener_rule" "static_9503_rule" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+# # Listener rule for /static on port 9503
+# resource "aws_lb_listener_rule" "static_9503_rule" {
+#   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
-  listener_arn = aws_lb_listener.https_9503_listener[0].arn
-  priority     = 230
+#   listener_arn = aws_lb_listener.https_9503_listener[0].arn
+#   priority     = 230
 
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
-  }
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+#   }
 
-  condition {
-    path_pattern {
-      values = ["/static*"]
-    }
-  }
-}
+#   condition {
+#     path_pattern {
+#       values = ["/static*"]
+#     }
+#   }
+# }
 
 # HTTPS Listener rules (keeping for SSL access)
 # Listener rule for /console on HTTPS
