@@ -1,6 +1,6 @@
-resource "kubernetes_service_account" "mwaa_external_secrets_analytical_platform_data_production" {
+resource "kubernetes_service_account_v1" "mwaa_external_secrets_analytical_platform_data_production" {
   metadata {
-    namespace = kubernetes_namespace.mwaa.metadata[0].name
+    namespace = kubernetes_namespace_v1.mwaa.metadata[0].name
     # namespace = data.kubernetes_namespace.mwaa.metadata[0].name
     name = "external-secrets-analytical-platform-data-production"
     annotations = {
