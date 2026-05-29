@@ -49,3 +49,55 @@ resource "aws_ssm_parameter" "vcms_bucket_name" {
     },
   )
 }
+
+resource "aws_ssm_parameter" "auto_user" {
+  name  = "auto-user"
+  type  = "String"
+  value = "CHANGE_ME"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "auto-user"
+    },
+  )
+}
+
+resource "aws_ssm_parameter" "auto_password" {
+  name  = "auto-password"
+  type  = "String"
+  value = "CHANGE_ME"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "auto-password"
+    },
+  )
+}
+
+resource "aws_ssm_parameter" "admin_user" {
+  name  = "admin-user"
+  type  = "String"
+  value = "CHANGE_ME"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "admin-user"
+    },
+  )
+}
+
+resource "aws_ssm_parameter" "admin_password" {
+  name  = "admin-password"
+  type  = "String"
+  value = "CHANGE_ME"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "admin-password"
+    },
+  )
+}
