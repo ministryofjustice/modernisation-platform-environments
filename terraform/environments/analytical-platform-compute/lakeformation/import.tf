@@ -22,3 +22,15 @@ moved {
   from = module.lake_formation_to_data_production_mojap_derived_tables_role.aws_iam_role_policy_attachment.custom[0]
   to   = module.lake_formation_to_data_production_mojap_derived_tables_role.aws_iam_role_policy_attachment.this["mojap_derived_bucket_lake_formation_policy"]
 }
+
+
+# analytical_platform_control_panel_service_role
+moved {
+  from = module.analytical_platform_control_panel_service_role.aws_iam_role_policy_attachment.custom[0]
+  to   = module.analytical_platform_control_panel_service_role.aws_iam_role_policy_attachment.this["lakeformation_share_policy"]
+}
+
+moved {
+  from = module.analytical_platform_control_panel_service_role.aws_iam_role_policy_attachment.custom[1]
+  to   = module.analytical_platform_control_panel_service_role.aws_iam_role_policy_attachment.this["aws_lakeformation_policy"]
+}

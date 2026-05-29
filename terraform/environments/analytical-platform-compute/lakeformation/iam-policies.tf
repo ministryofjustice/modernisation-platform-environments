@@ -20,7 +20,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "lakeformation:DescribeResource",
       "lakeformation:GetDataAccess",
     ]
-    resources = ["arn:aws:lakeformation:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:catalog:${data.aws_caller_identity.current.account_id}"]
+    resources = ["arn:aws:lakeformation:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog:${data.aws_caller_identity.current.account_id}"]
   }
   statement {
     effect    = "Allow"
