@@ -23,6 +23,23 @@ data "aws_iam_policy_document" "ai_gateway" {
     resources = ["arn:aws:bedrock:*::foundation-model/*"]
   }
 
+  statement {
+    sid       = "AuditLogS3Access"
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
+    resources = ["${module.audit_logs.s3_bucket_arn}/litellm-audit/audit_logs/*"]
+  }
+
+  statement {
+    sid    = "AuditLogKMSAccess"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt"
+    ]
+    resources = [module.ai_gateway_audit_logs_kms_key.key_arn]
+  }
+
 }
 
 module "ai_gateway_iam_policy" {

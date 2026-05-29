@@ -119,6 +119,9 @@ resource "helm_release" "litellm_admin" {
         # LiteLLM Models
         bedrockModels = try(local.environment_configuration.ai_gateway_models.bedrock, {})
 
+        # Audit Logs
+        auditLogsBucket = module.audit_logs.s3_bucket_id
+
         # Admin
         proxyAdminEmail = join(", ", local.environment_configurations.proxy_admin_emails)
       }

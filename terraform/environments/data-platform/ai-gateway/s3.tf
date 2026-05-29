@@ -1,5 +1,6 @@
 locals {
   alb_access_logs_bucket_name = "mojdp-${local.environment}-${local.component_name}-alb-logs"
+  audit_logs_bucket_name      = "mojdp-${local.environment}-${local.component_name}-audit-logs"
 }
 
 data "aws_iam_policy_document" "alb_access_logs_bucket_policy" {
@@ -43,6 +44,46 @@ module "alb_access_logs" {
     {
       id      = "expire-alb-access-logs"
       enabled = true
+
+      expiration = {
+        days = 365
+      }
+    }
+  ]
+}
+
+module "audit_logs" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=af0286ff37a66c2b79faf360e6e2663744b8e5b5" # v5.13.0
+
+  bucket = local.audit_logs_bucket_name
+
+  force_destroy = false
+
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        sse_algorithm     = "aws:kms"
+        kms_master_key_id = module.ai_gateway_audit_logs_kms_key.key_arn
+      }
+      bucket_key_enabled = true
+    }
+  }
+
+  versioning = {
+    status = "Enabled"
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "transition-audit-logs"
+      enabled = true
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "GLACIER"
+        }
+      ]
 
       expiration = {
         days = 365

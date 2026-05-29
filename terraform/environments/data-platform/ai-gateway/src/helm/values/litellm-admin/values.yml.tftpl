@@ -55,6 +55,12 @@ proxy_config:
   litellm_settings:
     request_timeout: 600
     json_logs: true
+    store_audit_logs: true
+    audit_log_callbacks: ["s3_v2"]
+    s3_audit_callback_params:
+      s3_bucket_name: ${auditLogsBucket}
+      s3_region_name: eu-west-2
+      s3_path: litellm-audit
     cache: false
     default_internal_user_params:
       user_role: proxy_admin
