@@ -99,6 +99,41 @@ data "aws_iam_policy_document" "gdpr_delete_policy_document" {
   }
 
   statement {
+    sid       = "BatchDescribeJobsGlobal"
+    effect    = "Allow"
+    actions   = ["batch:DescribeJobs"]
+    resources = ["*"] 
+  }
+
+  statement {
+    sid       = "BatchSubmitJobScoped"
+    effect    = "Allow"
+    actions   = ["batch:SubmitJob"]
+    
+    resources = [
+      aws_batch_job_queue.shred_unstructured_from_zip_batch_queue[0].arn,
+      "${aws_batch_job_definition.shred_unstructured_from_zip_job.arn}:*",
+      "arn:aws:batch:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:job/*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "batch:SubmitJob",
+      "batch:DescribeJobs",
+      "batch:TerminateJob"
+    ]
+    resources = ["arn:aws:batch:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:job-definition/shred-unstructured-from-zip-job:*"]
+  }
+
+  statement {
+    effect   = "Allow"
+    actions   = ["lambda:InvokeFunction"]
+    resources = [module.gdpr_unstructured_control_lambda[0].lambda_function_arn]
+  }
+
+  statement {
     effect = "Allow"
     actions = [
       "iam:PassRole"
@@ -121,7 +156,10 @@ data "aws_iam_policy_document" "gdpr_delete_policy_document" {
       "events:PutRule",
       "events:DescribeRule"
     ]
-    resources = ["arn:aws:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rule/StepFunctionsGetEventsForECSTaskRule"]
+    resources = [
+      "arn:aws:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rule/StepFunctionsGetEventsForECSTaskRule",
+      "arn:aws:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rule/StepFunctionsGetEventsForBatchJobsRule"
+    ]
   }
 }
 
