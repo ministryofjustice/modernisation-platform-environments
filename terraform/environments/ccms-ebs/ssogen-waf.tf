@@ -1,7 +1,7 @@
 # WAF FOR SSOGEN Console
 
 resource "aws_wafv2_ip_set" "ssogen_console_waf_ip_set" {
-  count              = local.is-development || local.is-test ? 1 : 0
+  count              = local.ssogen_enabled ? 1 : 0
   name               = "${local.application_name_ssogen}-console-waf-ip-set"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
@@ -19,7 +19,7 @@ resource "aws_wafv2_ip_set" "ssogen_console_waf_ip_set" {
 
 
 resource "aws_wafv2_web_acl" "ssogen_console_web_acl" {
-  count       = local.is-development || local.is-test ? 1 : 0
+  count       = local.ssogen_enabled ? 1 : 0
   name        = "${local.application_name_ssogen}-console-web-acl"
   scope       = "REGIONAL"
   description = "AWS WAF Web ACL for SSOGEN Console Application Load Balancer"
@@ -91,7 +91,7 @@ resource "aws_wafv2_web_acl" "ssogen_console_web_acl" {
 }
 
 resource "aws_cloudwatch_log_group" "ssogen_console_waf_logs" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count             = local.ssogen_enabled ? 1 : 0
   name              = "aws-waf-logs-ssogen/ssogen-console-waf-logs"
   retention_in_days = 30
 
@@ -101,14 +101,14 @@ resource "aws_cloudwatch_log_group" "ssogen_console_waf_logs" {
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "ssogen_console_waf_logging" {
-  count                   = local.is-development || local.is-test ? 1 : 0
+  count                   = local.ssogen_enabled ? 1 : 0
   log_destination_configs = [aws_cloudwatch_log_group.ssogen_console_waf_logs[count.index].arn]
   resource_arn            = aws_wafv2_web_acl.ssogen_console_web_acl[count.index].arn
 }
 
 # Associate WAF with Internal ALB for SSOGEN WAF
 resource "aws_wafv2_web_acl_association" "ssogen_console_internal_waf_association" {
-  count        = local.is-development || local.is-test ? 1 : 0
+  count        = local.ssogen_enabled ? 1 : 0
   resource_arn = aws_lb.ssogen_alb_console[count.index].arn
   web_acl_arn  = aws_wafv2_web_acl.ssogen_console_web_acl[count.index].arn
 }
@@ -116,7 +116,7 @@ resource "aws_wafv2_web_acl_association" "ssogen_console_internal_waf_associatio
 # WAF FOR SSOGEN APP
 
 resource "aws_wafv2_ip_set" "ssogen_waf_ip_set" {
-  count              = local.is-development || local.is-test ? 1 : 0
+  count              = local.ssogen_enabled ? 1 : 0
   name               = "${local.application_name_ssogen}-waf-ip-set"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
@@ -138,7 +138,7 @@ resource "aws_wafv2_ip_set" "ssogen_waf_ip_set" {
 
 
 resource "aws_wafv2_web_acl" "ssogen_web_acl" {
-  count       = local.is-development || local.is-test ? 1 : 0
+  count       = local.ssogen_enabled ? 1 : 0
   name        = "${local.application_name_ssogen}-web-acl"
   scope       = "REGIONAL"
   description = "AWS WAF Web ACL for SSOGEN Application Load Balancer"
@@ -210,7 +210,7 @@ resource "aws_wafv2_web_acl" "ssogen_web_acl" {
 }
 
 resource "aws_cloudwatch_log_group" "ssogen_waf_logs" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count             = local.ssogen_enabled ? 1 : 0
   name              = "aws-waf-logs-ssogen/ssogen-waf-logs"
   retention_in_days = 30
 
@@ -220,14 +220,14 @@ resource "aws_cloudwatch_log_group" "ssogen_waf_logs" {
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "ssogen_waf_logging" {
-  count                   = local.is-development || local.is-test ? 1 : 0
+  count                   = local.ssogen_enabled ? 1 : 0
   log_destination_configs = [aws_cloudwatch_log_group.ssogen_waf_logs[count.index].arn]
   resource_arn            = aws_wafv2_web_acl.ssogen_web_acl[count.index].arn
 }
 
 # Associate WAF with Internal ALB for SSOGEN WAF
 resource "aws_wafv2_web_acl_association" "ssogen_internal_waf_association" {
-  count        = local.is-development || local.is-test ? 1 : 0
+  count        = local.ssogen_enabled ? 1 : 0
   resource_arn = aws_lb.ssogen_alb[count.index].arn
   web_acl_arn  = aws_wafv2_web_acl.ssogen_web_acl[count.index].arn
 }

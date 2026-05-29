@@ -1,7 +1,7 @@
 # checkov:skip=CKV_AWS_356: KMS key policies require Resource="*"; constrained via principals/conditions
 # checkov:skip=CKV_AWS_109: Root admin stanza retained; functional use is tightly scoped
 data "aws_iam_policy_document" "ssogen_kms_policy" {
-  count = local.is-development || local.is-test ? 1 : 0
+  count = local.ssogen_enabled ? 1 : 0
   statement {
     sid = "AllowRootAccountAdmin"
     principals {
@@ -49,13 +49,13 @@ data "aws_iam_policy_document" "ssogen_kms_policy" {
 }
 
 resource "aws_kms_alias" "apk" {
-  count         = local.is-development || local.is-test ? 1 : 0
+  count         = local.ssogen_enabled ? 1 : 0
   name          = "alias/ssogen-private-key-alias"
   target_key_id = aws_kms_key.ssogen_kms[0].key_id
 }
 
 resource "aws_kms_key" "ssogen_kms" {
-  count               = local.is-development || local.is-test ? 1 : 0
+  count               = local.ssogen_enabled ? 1 : 0
   description         = "KMS for SSH private keys in Secrets Manager"
   enable_key_rotation = true
   policy              = data.aws_iam_policy_document.ssogen_kms_policy[count.index].json
@@ -64,13 +64,13 @@ resource "aws_kms_key" "ssogen_kms" {
 
 # Generate SSH key pair
 resource "tls_private_key" "ssogen" {
-  count     = local.is-development || local.is-test ? 1 : 0
+  count     = local.ssogen_enabled ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
 resource "aws_key_pair" "ssogen" {
-  count      = local.is-development || local.is-test ? 1 : 0
+  count      = local.ssogen_enabled ? 1 : 0
   key_name   = "ssogen_key_name"
   public_key = tls_private_key.ssogen[count.index].public_key_openssh
   tags       = { Name = "ssogen-key", Environment = local.environment }
@@ -82,7 +82,7 @@ resource "aws_key_pair" "ssogen" {
 }
 
 resource "aws_secretsmanager_secret" "ssogen_privkey" {
-  count                   = local.is-development || local.is-test ? 1 : 0
+  count                   = local.ssogen_enabled ? 1 : 0
   name                    = "ssh/${local.environment}/ssogen/private-key"
   kms_key_id              = aws_kms_key.ssogen_kms[count.index].arn
   recovery_window_in_days = 7
@@ -91,7 +91,7 @@ resource "aws_secretsmanager_secret" "ssogen_privkey" {
 }
 
 resource "aws_secretsmanager_secret_version" "ssogen_privkey_v1" {
-  count     = local.is-development || local.is-test ? 1 : 0
+  count     = local.ssogen_enabled ? 1 : 0
   secret_id = aws_secretsmanager_secret.ssogen_privkey[count.index].id
   secret_string = jsonencode({
     private_key_pem = tls_private_key.ssogen[count.index].private_key_pem

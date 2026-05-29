@@ -1,6 +1,6 @@
 # # Render DNS change template
 # data "template_file" "dns_change" {
-#   count    = local.is-development || local.is-test ? 1 : 0
+#   count    = local.ssogen_enabled ? 1 : 0
 #   template = file("${path.module}/templates/dns-change.json.tpl")
 
 #   vars = {
@@ -9,13 +9,13 @@
 # }
 
 # resource "local_file" "dns_change" {
-#   count    = local.is-development || local.is-test ? 1 : 0
+#   count    = local.ssogen_enabled ? 1 : 0
 #   filename = "${path.module}/dns-change.json"
 #   content  = data.template_file.dns_change[count.index].rendered
 # }
 
 # resource "null_resource" "conditional_dns_update" {
-#   count    = local.is-development || local.is-test ? 1 : 0
+#   count    = local.ssogen_enabled ? 1 : 0
 #   provisioner "local-exec" {
 #     command = <<EOF
 # CREDS=$(aws sts assume-role --role-arn arn:aws:iam::${data.aws_caller_identity.current.id}:role/MemberInfrastructureAccess --role-session-name github-actions-session)

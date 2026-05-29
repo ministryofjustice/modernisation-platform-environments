@@ -1,6 +1,6 @@
 # IAM Role for SSOGEN EC2
 resource "aws_iam_role" "ssogen_ec2" {
-  count = local.is-development || local.is-test ? 1 : 0
+  count = local.ssogen_enabled ? 1 : 0
 
   name = "ssogen-ec2-role-${local.environment}"
   assume_role_policy = jsonencode({
@@ -18,7 +18,7 @@ resource "aws_iam_role" "ssogen_ec2" {
 
 # Instance Profile to attach to EC2
 resource "aws_iam_instance_profile" "ssogen_instance_profile" {
-  count = local.is-development || local.is-test ? 1 : 0
+  count = local.ssogen_enabled ? 1 : 0
 
   name = "ssogen-instance-profile-${local.environment}"
   role = aws_iam_role.ssogen_ec2[0].name
@@ -29,20 +29,20 @@ resource "aws_iam_instance_profile" "ssogen_instance_profile" {
 
 # Attach SSM permissions (Session Manager, logging, patching, etc.)
 resource "aws_iam_role_policy_attachment" "ssogen_ssm" {
-  count = local.is-development || local.is-test ? 1 : 0
+  count = local.ssogen_enabled ? 1 : 0
 
   role       = aws_iam_role.ssogen_ec2[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_kms_alias" "a" {
-  count         = local.is-development || local.is-test ? 1 : 0
+  count         = local.ssogen_enabled ? 1 : 0
   name          = "alias/ssogen-key-alias"
   target_key_id = aws_kms_key.ssogen_kms_key[0].key_id
 }
 
 resource "aws_kms_key" "ssogen_kms_key" {
-  count       = local.is-development || local.is-test ? 1 : 0
+  count       = local.ssogen_enabled ? 1 : 0
   description = "kms key for ssogen ami"
 
   policy = jsonencode({
@@ -116,7 +116,7 @@ resource "aws_kms_key" "ssogen_kms_key" {
 
 # Need to tighten this policy to remove all resources
 resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
-  count = local.is-development || local.is-test ? 1 : 0
+  count = local.ssogen_enabled ? 1 : 0
   name  = "${local.application_name_ssogen}-instance-policy"
 
   policy = <<EOF
@@ -185,7 +185,7 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "ssogen_ec2_policy" {
-  count      = local.is-development || local.is-test ? 1 : 0
+  count      = local.ssogen_enabled ? 1 : 0
   role       = aws_iam_role.ssogen_ec2[count.index].name
   policy_arn = aws_iam_policy.ssogen_ec2_instance_policy[count.index].arn
 }

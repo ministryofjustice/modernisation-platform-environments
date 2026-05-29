@@ -1,5 +1,5 @@
 # resource "aws_route53_record" "ssogen_cloudfront" {
-#   count    = (local.is-development || local.is-test) ? 1 : 0
+#   count    = (local.ssogen_enabled) ? 1 : 0
 #   provider = aws.core-vpc
 #   zone_id  = data.aws_route53_zone.external.zone_id
 #   name     = "ccmsebs-sso-cf"
@@ -10,7 +10,7 @@
 
 # #--Certs need to be created in us-east-1 as they are associated with Cloudfront
 # resource "aws_acm_certificate" "ssogen_cloudfront_cert" {
-#   count    = (local.is-development || local.is-test) ? 1 : 0
+#   count    = (local.ssogen_enabled) ? 1 : 0
 #   provider                  = aws.us-east-1
 #   domain_name               = trim(data.aws_route53_zone.external.name, ".") #--Remove the trailing dot from the zone name
 #   subject_alternative_names = ["${local.application_data.accounts[local.environment].cash_office_upload_hostname}.${trim(data.aws_route53_zone.external.name, ".")}"]
@@ -21,7 +21,7 @@
 # }
 
 # resource "aws_acm_certificate_validation" "ssogen_cloudfront_cert_validation" {
-#   count    = (local.is-development || local.is-test) ? 1 : 0
+#   count    = (local.ssogen_enabled) ? 1 : 0
 #   provider                = aws.us-east-1
 #   certificate_arn         = aws_acm_certificate.ssogen_cloudfront_cert[count.index].arn
 #   validation_record_fqdns = [for record in aws_route53_record.validation : record.fqdn]

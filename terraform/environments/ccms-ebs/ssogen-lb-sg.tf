@@ -3,7 +3,7 @@
 #########################################
 
 resource "aws_security_group" "sg_ssogen_internal_alb" {
-  count       = local.is-development || local.is-test ? 1 : 0
+  count       = local.ssogen_enabled ? 1 : 0
   name        = "ssogen_internal_alb"
   description = "Inbound and outbound rules for SSOGEN Internal Load Balancer"
   vpc_id      = data.aws_vpc.shared.id
@@ -14,7 +14,7 @@ resource "aws_security_group" "sg_ssogen_internal_alb" {
 }
 
 resource "aws_security_group" "sg_ssogen_console_internal_alb" {
-  count       = local.is-development || local.is-test ? 1 : 0
+  count       = local.ssogen_enabled ? 1 : 0
   name        = "ssogen_console_internal_alb"
   description = "Inbound and outbound rules for SSOGEN Console Internal Load Balancer"
   vpc_id      = data.aws_vpc.shared.id
@@ -29,7 +29,7 @@ resource "aws_security_group" "sg_ssogen_console_internal_alb" {
 
 # Allow HTTPS from AWS Workspaces
 resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_app_workspaces" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count             = local.ssogen_enabled ? 1 : 0
   security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
   description       = "Allow HTTPS (443) from AWS Workspaces CIDR"
   from_port         = 443
@@ -39,7 +39,7 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_app_work
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_console_internal_app_workspaces" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count             = local.ssogen_enabled ? 1 : 0
   security_group_id = aws_security_group.sg_ssogen_console_internal_alb[count.index].id
   description       = "Allow HTTPS (443) from AWS Workspaces CIDR"
   from_port         = 443
@@ -50,7 +50,7 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_console_internal_
 
 # Allow HTTPS from Cloufront
 # resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_app_cf" {
-#   count             = local.is-development || local.is-test ? 1 : 0
+#   count             = local.ssogen_enabled ? 1 : 0
 #   security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
 #   description       = "Allow HTTPS (443) from AWS Workspaces CIDR"
 #   from_port         = 443
@@ -62,7 +62,7 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_console_internal_
 
 # Allow HTTPS from AWS Workspaces
 resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_console_workspaces" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count             = local.ssogen_enabled ? 1 : 0
   security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
   description       = "Allow HTTPS (5443) from AWS Workspaces CIDR"
   from_port         = 5443
@@ -73,7 +73,7 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_console_
 
 # Allow 7001 from AWS Workspaces
 resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_admin_workspaces" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count             = local.ssogen_enabled ? 1 : 0
   security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
   description       = "Allow HTTP (7001) from AWS Workspaces CIDR"
   from_port         = 7001
@@ -83,7 +83,7 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_admin_wo
 }
 
 resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_mojo_devices" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count             = local.ssogen_enabled ? 1 : 0
   security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
   type              = "ingress"
   description       = "HTTPS from Mojo Devices"
@@ -94,7 +94,7 @@ resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_mojo_
 }
 
 resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_moj_wifi" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count             = local.ssogen_enabled ? 1 : 0
   security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
   type              = "ingress"
   description       = "HTTPS from MoJ WiFi"
@@ -105,7 +105,7 @@ resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_moj_w
 }
 
 resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_dom1_devices" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count             = local.ssogen_enabled ? 1 : 0
   security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
   type              = "ingress"
   description       = "HTTPS from Dom1 Devices"
@@ -117,7 +117,7 @@ resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_dom1_
 
 # Allow HTTPS from AWS Workspaces
 # resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_internal_7001_workspaces" {
-#   count             = local.is-development || local.is-test ? 1 : 0
+#   count             = local.ssogen_enabled ? 1 : 0
 #   security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
 #   description       = "Allow HTTPS (7001) from AWS Workspaces CIDR"
 #   from_port         = 7001
@@ -131,7 +131,7 @@ resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_dom1_
 
 # Allow outbound HTTPS (7777) only to backend SSOGEN EC2s
 # resource "aws_vpc_security_group_egress_rule" "egress_ssogen_internal_app_backend" {
-#   count                        = local.is-development || local.is-test ? 1 : 0
+#   count                        = local.ssogen_enabled ? 1 : 0
 #   security_group_id            = aws_security_group.sg_ssogen_internal_alb[count.index].id
 #   description                  = "Allow HTTPS (7777) to backend SSOGEN EC2s"
 #   from_port                    = 7777
@@ -142,7 +142,7 @@ resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_dom1_
 
 # Allow outbound HTTPS (7001) only to backend SSOGEN EC2s
 # resource "aws_vpc_security_group_egress_rule" "egress_ssogen_internal_admin_backend" {
-#   count                        = local.is-development || local.is-test ? 1 : 0
+#   count                        = local.ssogen_enabled ? 1 : 0
 #   security_group_id            = aws_security_group.sg_ssogen_internal_alb[count.index].id
 #   description                  = "Allow HTTPS (7001) to backend SSOGEN EC2s"
 #   from_port                    = 7001
@@ -153,7 +153,7 @@ resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_dom1_
 
 # Allow outbound HTTPS (7001) only to backend SSOGEN EC2s
 resource "aws_vpc_security_group_egress_rule" "egress_ssogen_internal_app_enc_backend" {
-  count                        = local.is-development || local.is-test ? 1 : 0
+  count                        = local.ssogen_enabled ? 1 : 0
   security_group_id            = aws_security_group.sg_ssogen_internal_alb[count.index].id
   description                  = "Allow HTTPS (4443) to backend SSOGEN EC2s"
   from_port                    = 4443
@@ -164,7 +164,7 @@ resource "aws_vpc_security_group_egress_rule" "egress_ssogen_internal_app_enc_ba
 
 # Allow outbound HTTPS (7001) only to backend SSOGEN EC2s
 resource "aws_vpc_security_group_egress_rule" "egress_ssogen_console_internal_app_enc_backend" {
-  count                        = local.is-development || local.is-test ? 1 : 0
+  count                        = local.ssogen_enabled ? 1 : 0
   security_group_id            = aws_security_group.sg_ssogen_console_internal_alb[count.index].id
   description                  = "Allow HTTPS (4443) to backend SSOGEN EC2s"
   from_port                    = 4443
