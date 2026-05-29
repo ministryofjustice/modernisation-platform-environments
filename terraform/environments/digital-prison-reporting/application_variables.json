@@ -67,7 +67,7 @@
         },
         "pr-assessment-view": {
           "share_with_cloud_platform": true,
-          "create_glue_connection": false
+          "create_glue_connection": true
         }
       },
       "dps_domains": [
