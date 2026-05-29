@@ -2137,6 +2137,66 @@ resource "aws_lakeformation_permissions" "lambda_p1_table_access" {
   }
 }
 
+
+# ----------------------------------------------------------------------------------------
+# update p1 export
+# ----------------------------------------------------------------------------------------
+
+module "update_p1_export_iam_role" {
+  count = local.is-development || local.is-preproduction ? 1 : 0
+  source = "terraform-aws-modules/iam/aws//modules/iam-role"
+  name = "update_p1_export"
+
+  trust_policy_permissions = {
+    TrustRoleAndServiceToAssume = {
+      actions = [
+        "sts:AssumeRole",
+      ]
+      principals = [{
+        type = "Service"
+        identifiers = [
+          "lambda.amazonaws.com",
+        ]
+      }]
+    }
+  }
+
+  policies = {
+    main_policy = module.create_p1_export_iam_policy.arn
+  }
+
+  tags = local.tags
+}
+
+resource "aws_lakeformation_permissions" "lambda_update_p1_s3_access" {
+  count = local.is-development || local.is-preproduction ? 1 : 0
+  principal   = module.update_p1_export_iam_role[0].arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+  data_location {
+    arn = aws_lakeformation_resource.data_bucket.arn
+  }
+}
+
+resource "aws_lakeformation_permissions" "lambda_update_p1_database_access" {
+  count = local.is-development || local.is-preproduction ? 1 : 0
+  principal   = module.update_p1_export_iam_role[0].arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = "allied_mdss${local.db_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "lambda_update_p1_table_access" {
+  count = local.is-development || local.is-preproduction ? 1 : 0
+  principal   = module.update_p1_export_iam_role[0].arn
+  permissions = ["SELECT"]
+  table {
+    database_name = "allied_mdss${local.db_suffix}"
+    wildcard      = true
+  }
+}
+
+
 #-----------------------------------------------------------------------------------
 # Landing DLQ redriver IAM Role
 #-----------------------------------------------------------------------------------
