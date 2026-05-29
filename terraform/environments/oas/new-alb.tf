@@ -545,6 +545,42 @@ resource "aws_lb_listener" "https_listener" {
   }
 }
 
+resource "aws_lb_listener" "https_9501_listener" {
+  #checkov:skip=CKV_AWS_103
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  depends_on        = [aws_acm_certificate_validation.external]
+  load_balancer_arn = aws_lb.oas_lb[0].arn
+  port              = 9501
+  protocol          = "HTTPS"
+  certificate_arn   = aws_acm_certificate.external[0].arn
+
+  routing_http_response_content_security_policy_header_value = "upgrade-insecure-requests"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_ec2_https_9501_target_group[0].arn
+  }
+}
+
+resource "aws_lb_listener" "https_9503_listener" {
+  #checkov:skip=CKV_AWS_103
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  depends_on        = [aws_acm_certificate_validation.external]
+  load_balancer_arn = aws_lb.oas_lb[0].arn
+  port              = 9503
+  protocol          = "HTTPS"
+  certificate_arn   = aws_acm_certificate.external[0].arn
+
+  routing_http_response_content_security_policy_header_value = "upgrade-insecure-requests"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+  }
+}
+
 # HTTP Listener on port 9500 for WebLogic Console and Enterprise Manager
 resource "aws_lb_listener" "http_9500_listener" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
@@ -588,6 +624,44 @@ resource "aws_lb_listener_rule" "em_9500_rule" {
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/em*"]
+    }
+  }
+}
+
+# Listener rule for /console on port 9501
+resource "aws_lb_listener_rule" "console_9501_rule" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.https_9501_listener[0].arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_ec2_https_9501_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/console*"]
+    }
+  }
+}
+
+# Listener rule for /em on port 9501
+resource "aws_lb_listener_rule" "em_9501_rule" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.https_9501_listener[0].arn
+  priority     = 101
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_ec2_https_9501_target_group[0].arn
   }
 
   condition {
@@ -697,6 +771,101 @@ resource "aws_lb_listener_rule" "static_9502_rule" {
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/static*"]
+    }
+  }
+}
+
+# Listener rule for /analytics on port 9503
+resource "aws_lb_listener_rule" "analytics_9503_rule" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.https_9503_listener[0].arn
+  priority     = 200
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/analytics*"]
+    }
+  }
+}
+
+# Listener rule for /analytics-ws on port 9503
+resource "aws_lb_listener_rule" "analytics_ws_9503_rule" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.https_9503_listener[0].arn
+  priority     = 205
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/analytics-ws*"]
+    }
+  }
+}
+
+# Listener rule for /dv on port 9503
+resource "aws_lb_listener_rule" "dv_9503_rule" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.https_9503_listener[0].arn
+  priority     = 210
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/dv*"]
+    }
+  }
+}
+
+# Listener rule for /bi-security-login on port 9503
+resource "aws_lb_listener_rule" "bi_security_login_9503_rule" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.https_9503_listener[0].arn
+  priority     = 220
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/bi-security-login*"]
+    }
+  }
+}
+
+# Listener rule for /static on port 9503
+resource "aws_lb_listener_rule" "static_9503_rule" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.https_9503_listener[0].arn
+  priority     = 230
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
   }
 
   condition {
