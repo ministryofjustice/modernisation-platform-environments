@@ -21,6 +21,24 @@ data "aws_iam_policy_document" "ssogen_kms_policy" {
     resources = ["*"]
   }
   statement {
+    sid = "AllowRootAccountAdminForPreprodAccount"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${jsondecode(data.aws_secretsmanager_secret_version.dev_account_secret[count.index].secret_string).preprod_account_id}:root"]
+    }
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+  statement {
+    sid = "AllowRootAccountAdminForProdAccount"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${jsondecode(data.aws_secretsmanager_secret_version.dev_account_secret[count.index].secret_string).prod_account_id}:root"]
+    }
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+  statement {
     sid = "AllowUseForSecretsManagerInThisAccount"
     principals {
       type        = "AWS"
