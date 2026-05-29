@@ -50,7 +50,6 @@ resource "aws_security_group" "db" {
   }
 }
 
-
 #--------------------------
 # KMS setup for RDS
 #--------------------------

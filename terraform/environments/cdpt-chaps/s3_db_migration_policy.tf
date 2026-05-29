@@ -105,7 +105,7 @@ data "aws_iam_policy_document" "rds_native_backup_s3_kms" {
   }
 }
 
-resource "aws_iam_policy" "rds_native_backup_s3" {
+resource "aws_iam_policy" "rds_native_backup_s3_kms" {
   name   = "chaps-prod-rds-native-backup-s3-kms"
   policy = data.aws_iam_policy_document.rds_native_backup_s3_kms.json
 }
