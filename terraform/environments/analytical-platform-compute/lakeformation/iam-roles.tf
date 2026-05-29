@@ -2,25 +2,32 @@ module "lake_formation_share_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.59.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.6.0"
 
-  create_role       = true
-  role_requires_mfa = false
 
-  role_name_prefix = "lake-formation-share"
+  name = "lake-formation-share"
 
-  number_of_custom_role_policy_arns = 2
 
-  custom_role_policy_arns = [
-    module.analytical_platform_lake_formation_share_policy.arn,
-    "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
-  ]
+  policies = {
+    lakeformation_share_policy = module.analytical_platform_lake_formation_share_policy.arn
+    aws_lakeformation_policy = "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
+  }
 
-  trusted_role_arns = [
-    "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-management-production"]}:root",
+  trust_policy_permissions = {
+    MwaaExecutionRole = {
+      actions = ["sts:AssumeRole", "sts:TagSession"]
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = [
+                "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-management-production"]}:root",
     "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-compute-development"]}:root"
-  ]
+          ]
+        }
+      ]
+    }
+  }
 
   tags = local.tags
 }
