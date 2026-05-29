@@ -22,8 +22,7 @@ resource "aws_instance" "ec2_ebsapps" {
       ebs_block_device,
       ebs_optimized,
       user_data,
-      user_data_replace_on_change,
-      tags
+      user_data_replace_on_change
     ]
   }
   user_data_replace_on_change = false
@@ -150,7 +149,8 @@ resource "aws_ebs_volume" "stage" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = "stage" }
+    { Name = "apps-${count.index + 1}:/stage" },
+    { mount-point = "/stage" }
   )
 }
 

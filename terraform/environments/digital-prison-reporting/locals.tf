@@ -77,21 +77,6 @@ locals {
   glue_jobs_jar_location           = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/${local.glue_job_jar_name}"
   glue_log_retention_in_days       = local.application_data.accounts[local.environment].glue_log_retention_in_days
 
-  # Common Maintenance Job settings
-  maintenance_job_retry_max_attempts    = local.application_data.accounts[local.environment].maintenance_job_retry_max_attempts
-  maintenance_job_retry_min_wait_millis = local.application_data.accounts[local.environment].maintenance_job_retry_min_wait_millis
-  maintenance_job_retry_max_wait_millis = local.application_data.accounts[local.environment].maintenance_job_retry_max_wait_millis
-
-  # Compact Job
-  compact_job_worker_type = local.application_data.accounts[local.environment].compact_job_worker_type
-  compact_job_num_workers = local.application_data.accounts[local.environment].compact_job_num_workers
-  compact_job_log_level   = local.application_data.accounts[local.environment].compact_job_log_level
-
-  # Retention (vacuum) Job
-  retention_job_worker_type = local.application_data.accounts[local.environment].retention_job_worker_type
-  retention_job_num_workers = local.application_data.accounts[local.environment].retention_job_num_workers
-  retention_job_log_level   = local.application_data.accounts[local.environment].retention_job_log_level
-
   # Hive Table Creation Job
   hive_table_creation_job_schema_cache_max_size = local.application_data.accounts[local.environment].hive_table_creation_job_schema_cache_max_size
 
@@ -122,6 +107,7 @@ locals {
   create_rds_replica             = local.application_data.accounts[local.environment].dpr_rds_db.create_replica
   dpr_rds_engine                 = local.application_data.accounts[local.environment].dpr_rds_db.engine
   dpr_rds_engine_version         = local.application_data.accounts[local.environment].dpr_rds_db.engine_version
+  dpr_rds_replica_engine_version = local.application_data.accounts[local.environment].dpr_rds_db.replica_engine_version
   dpr_rds_init_size              = local.application_data.accounts[local.environment].dpr_rds_db.init_size
   dpr_rds_max_size               = local.application_data.accounts[local.environment].dpr_rds_db.max_size
   dpr_rds_name                   = local.application_data.accounts[local.environment].dpr_rds_db.name
@@ -452,16 +438,7 @@ locals {
     heartbeat_endpoint = "0.0.0.0"
   }
 
-  probation_domains_list = local.application_data.accounts[local.environment].probation_domains
-  probation_secrets_placeholder = {
-    db_name            = "dps"
-    password           = "placeholder"
-    user               = "placeholder"
-    username           = "placeholder"
-    endpoint           = "0.0.0.0"
-    port               = "5432"
-    heartbeat_endpoint = "0.0.0.0"
-  }
+  probation_domains = local.application_data.accounts[local.environment].probation_domains
 
   # Operational DataStore Secrets PlaceHolder
   operational_datastore_secrets_placeholder = {
@@ -581,4 +558,19 @@ locals {
     username = "placeholder"
     password = "placeholder"
   }
+
+  # DPR Cross-account Secret Placeholders for Cloud Platform access
+  # Assessment View Database (PostgreSQL)
+  # Values are intentionally set to "placeholder" - the Cloud Platform team will update them via write access
+  dpr_crossaccount_assessment_view_secrets_placeholder = {
+    engine   = "postgres"
+    source   = "cloud-platform"
+    db_name  = "placeholder"
+    username = "placeholder"
+    password = "placeholder"
+    host     = "placeholder"
+    port     = "placeholder"
+  }
+
+  # Add more cross-account secret placeholders here as needed for other databases
 }

@@ -55,7 +55,7 @@ locals {
       }]
       environment = {
         variables = {
-          EXPIRY_DAYS = "30"
+          EXPIRY_DAYS    = "30"
           PARAMETER_PATH = "/certificates/"
           SNS_TOPIC_ARN = {
             development   = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:ppud-dev-cw-alerts"
@@ -272,7 +272,7 @@ locals {
       timeout      = 900
       memory_size  = 1024
       role_key     = "get_cloudwatch"
-      environments = ["production"]
+      environments = ["development", "production"]
       layers       = ["xlsxwriter", "requests"]
       vpc_config   = { production = true }
       permissions = [{
@@ -316,6 +316,18 @@ locals {
         source_arn_suffix = "*"
       }]
     }
+    rotate_ses_access_key = {
+      description  = "Function to rotate ses access key, secret key and derive new smtp password."
+      role_key     = "rotate_ses_access_key"
+      environments = ["development", "preproduction"]
+      permissions  = []
+      environment = {
+        variables = {
+          SES_IAM_USER    = local.ses_iam_user
+          SES_SECRET_NAME = local.ses_secret_name
+        }
+      }
+    }
   }
 
   # Flatten lambda functions with environments
@@ -351,8 +363,8 @@ locals {
   klayers_account_id = data.aws_ssm_parameter.klayers_account.value
 
   layer_arns = {
-    numpy  = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-numpy:8"
-    pillow = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-pillow:1"
+  # numpy  = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-numpy:14"
+  # pillow = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-pillow:2"
   }
 
 }
@@ -413,10 +425,10 @@ resource "aws_lambda_function" "lambda_functions" {
     for_each = try(each.value.config.environment, null) != null ? [each.value.config.environment] : []
     content {
       variables = merge(
-        environment.value.variables,
-        {
+        { for k, v in environment.value.variables : k => v if !can(v[each.value.env]) },
+        try(environment.value.variables.SNS_TOPIC_ARN, null) != null ? {
           SNS_TOPIC_ARN = environment.value.variables.SNS_TOPIC_ARN[each.value.env]
-        }
+        } : {}
       )
     }
   }

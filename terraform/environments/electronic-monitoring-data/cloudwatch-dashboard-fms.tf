@@ -15,7 +15,7 @@ resource "aws_cloudwatch_dashboard" "fms_ops" {
         properties = {
           title  = "SQS: FMS events waiting for load_fms"
           region = "eu-west-2"
-          stat   = "Sum"
+          stat   = "Maximum"
           period = 60
           metrics = [
             [
@@ -42,7 +42,7 @@ resource "aws_cloudwatch_dashboard" "fms_ops" {
         properties = {
           title  = "SQS DLQ: FMS events that failed load_fms"
           region = "eu-west-2"
-          stat   = "Sum"
+          stat   = "Maximum"
           period = 60
           metrics = [
             [
@@ -67,7 +67,7 @@ resource "aws_cloudwatch_dashboard" "fms_ops" {
         properties = {
           title  = "SQS: format_fms_json queue backlog"
           region = "eu-west-2"
-          stat   = "Sum"
+          stat   = "Maximum"
           period = 60
           metrics = [
             [
@@ -94,7 +94,7 @@ resource "aws_cloudwatch_dashboard" "fms_ops" {
         properties = {
           title  = "SQS DLQ: format_fms_json failures"
           region = "eu-west-2"
-          stat   = "Sum"
+          stat   = "Maximum"
           period = 60
           metrics = [
             [
@@ -126,13 +126,13 @@ resource "aws_cloudwatch_dashboard" "fms_ops" {
               "AWS/Lambda",
               "Errors",
               "FunctionName",
-              module.process_fms_metadata.lambda_function_name
+              module.fms_expected_file_processor.lambda_function_name
             ],
             [
               ".",
               "Throttles",
               ".",
-              module.process_fms_metadata.lambda_function_name
+              module.fms_expected_file_processor.lambda_function_name
             ]
           ]
         }
@@ -152,14 +152,14 @@ resource "aws_cloudwatch_dashboard" "fms_ops" {
               "AWS/Lambda",
               "Duration",
               "FunctionName",
-              module.process_fms_metadata.lambda_function_name,
+              module.fms_expected_file_processor.lambda_function_name,
               { stat = "p95" }
             ],
             [
               ".",
               "Invocations",
               ".",
-              module.process_fms_metadata.lambda_function_name,
+              module.fms_expected_file_processor.lambda_function_name,
               { stat = "Sum" }
             ]
           ]
@@ -185,13 +185,13 @@ resource "aws_cloudwatch_dashboard" "fms_ops" {
               "AWS/Lambda",
               "Errors",
               "FunctionName",
-              module.format_json_fms_data.lambda_function_name
+              module.fms_raw_file_formatter.lambda_function_name
             ],
             [
               ".",
               "Throttles",
               ".",
-              module.format_json_fms_data.lambda_function_name
+              module.fms_raw_file_formatter.lambda_function_name
             ]
           ]
         }
@@ -211,14 +211,14 @@ resource "aws_cloudwatch_dashboard" "fms_ops" {
               "AWS/Lambda",
               "Duration",
               "FunctionName",
-              module.format_json_fms_data.lambda_function_name,
+              module.fms_raw_file_formatter.lambda_function_name,
               { stat = "p95" }
             ],
             [
               ".",
               "Invocations",
               ".",
-              module.format_json_fms_data.lambda_function_name,
+              module.fms_raw_file_formatter.lambda_function_name,
               { stat = "Sum" }
             ]
           ]
@@ -296,7 +296,7 @@ resource "aws_cloudwatch_dashboard" "fms_ops" {
         properties = {
           title  = "SQS DLQs: FMS landing bucket processing"
           region = "eu-west-2"
-          stat   = "Sum"
+          stat   = "Maximum"
           period = 60
           metrics = [
             [
@@ -333,7 +333,7 @@ resource "aws_cloudwatch_dashboard" "fms_ops" {
         properties = {
           title  = "SQS DLQs: FMS support path"
           region = "eu-west-2"
-          stat   = "Sum"
+          stat   = "Maximum"
           period = 60
           metrics = [
             [

@@ -11,10 +11,11 @@ resource "aws_security_group" "bcs_ec2" {
 
 resource "aws_vpc_security_group_ingress_rule" "bcs_ec2" {
   for_each = {
-    all-from-bps = { referenced_security_group_id = aws_security_group.bps_ec2.id }
-    all-from-bws = { referenced_security_group_id = aws_security_group.bws_ec2.id }
-    all-from-dfi = { referenced_security_group_id = aws_security_group.dfi_ec2.id }                                          # client tools temporarily installed on DFI
-    cms-from-vpc = { cidr_ipv4 = var.account_config.shared_vpc_cidr, ip_protocol = "TCP", from_port = 6400, to_port = 6500 } # hmpps jumpservers
+    all-from-self = { referenced_security_group_id = aws_security_group.bcs_ec2.id }
+    all-from-bps  = { referenced_security_group_id = aws_security_group.bps_ec2.id }
+    all-from-bws  = { referenced_security_group_id = aws_security_group.bws_ec2.id }
+    all-from-dfi  = { referenced_security_group_id = aws_security_group.dfi_ec2.id }                                          # client tools temporarily installed on DFI
+    cms-from-vpc  = { cidr_ipv4 = var.account_config.shared_vpc_cidr, ip_protocol = "TCP", from_port = 6400, to_port = 6500 } # hmpps jumpservers
   }
 
   description       = each.key
@@ -31,15 +32,15 @@ resource "aws_vpc_security_group_ingress_rule" "bcs_ec2" {
 
 resource "aws_vpc_security_group_egress_rule" "bcs_ec2" {
   for_each = {
+    all-to-self          = { referenced_security_group_id = aws_security_group.bcs_ec2.id }
     all-to-bps           = { referenced_security_group_id = aws_security_group.bps_ec2.id }
     smtp-to-internal     = { ip_protocol = "TCP", port = 25, cidr_ipv4 = "10.0.0.0/8" }
     http-to-all          = { ip_protocol = "TCP", port = 80, cidr_ipv4 = "0.0.0.0/0" }
     ntp-to-all           = { ip_protocol = "UDP", port = 123, cidr_ipv4 = "0.0.0.0/0" }
-    ldap-tcp-to-vpc      = { ip_protocol = "TCP", port = 389, cidr_ipv4 = var.account_config.shared_vpc_cidr }
-    ldap-udp-to-vpc      = { ip_protocol = "UDP", port = 389, cidr_ipv4 = var.account_config.shared_vpc_cidr }
+    ldap-tcp-to-internal = { ip_protocol = "TCP", port = 389, cidr_ipv4 = "10.0.0.0/8" }
+    ldap-udp-to-internal = { ip_protocol = "UDP", port = 389, cidr_ipv4 = "10.0.0.0/8" }
     https-to-all         = { ip_protocol = "TCP", port = 443, cidr_ipv4 = "0.0.0.0/0" }
-    smb-to-fsx           = { ip_protocol = "TCP", port = 445, referenced_security_group_id = aws_security_group.fsx.id }
-    smb-to-core-vpc      = { ip_protocol = "TCP", port = 445, cidr_ipv4 = var.environment_config.core_shared_services_vpc_cidr }
+    smb-to-internal      = { ip_protocol = "TCP", port = 445, cidr_ipv4 = "10.0.0.0/8" }
     oracle1521-to-vpc    = { ip_protocol = "TCP", port = 1521, cidr_ipv4 = var.account_config.shared_vpc_cidr }
     oracle1521-to-legacy = { ip_protocol = "TCP", port = 1521, cidr_ipv4 = var.environment_config.legacy_counterpart_vpc_cidr }
     nfs-to-efs           = { ip_protocol = "TCP", port = 2049, referenced_security_group_id = aws_security_group.efs.id }

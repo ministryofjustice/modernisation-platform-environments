@@ -1,0 +1,83 @@
+locals {
+  eventbridge_transfer_sftp_upload_rules = {
+    sftp_upload_completed = {
+      name        = "${local.application_name}-transfer-sftp-upload-completed"
+      description = "Forward completed Transfer Family uploads to the unscanned file mover queue"
+      event_pattern = {
+        source        = ["aws.transfer"]
+        "detail-type" = ["SFTP Server File Upload Completed"]
+        resources     = [aws_transfer_server.this.arn]
+        detail = {
+          protocol      = ["SFTP"]
+          "server-id"   = [aws_transfer_server.this.id]
+          "status-code" = ["COMPLETED"]
+        }
+      }
+    }
+  }
+
+  eventbridge_guard_duty_malware_protection_for_s3_rules = {
+    no_threats_found = {
+      name                   = "${local.application_name}-guardduty-no-threats-found"
+      description            = "Move clean objects after a successful GuardDuty Malware Protection for S3 scan"
+      destination_bucket_key = "clean"
+      delete_source          = true
+      event_pattern = {
+        source        = ["aws.guardduty"]
+        "detail-type" = ["GuardDuty Malware Protection Object Scan Result"]
+        resources     = [aws_guardduty_malware_protection_plan.this.arn]
+        detail = {
+          resourceType = ["S3_OBJECT"]
+          s3ObjectDetails = {
+            bucketName = [module.s3_bucket["processing"].s3_bucket_id]
+          }
+          scanResultDetails = {
+            scanResultStatus = ["NO_THREATS_FOUND"]
+          }
+        }
+      }
+    }
+
+    threats_found = {
+      name                   = "${local.application_name}-guardduty-threats-found"
+      description            = "Move quarantined objects after a GuardDuty Malware Protection for S3 detection"
+      destination_bucket_key = "quarantine"
+      delete_source          = true
+      event_pattern = {
+        source        = ["aws.guardduty"]
+        "detail-type" = ["GuardDuty Malware Protection Object Scan Result"]
+        resources     = [aws_guardduty_malware_protection_plan.this.arn]
+        detail = {
+          resourceType = ["S3_OBJECT"]
+          s3ObjectDetails = {
+            bucketName = [module.s3_bucket["processing"].s3_bucket_id]
+          }
+          scanResultDetails = {
+            scanResultStatus = ["THREATS_FOUND"]
+          }
+        }
+      }
+    }
+
+    investigation = {
+      name                   = "${local.application_name}-guardduty-investigation"
+      description            = "Move objects for investigation when a GuardDuty Malware Protection for S3 scan is skipped or fails"
+      destination_bucket_key = "investigation"
+      delete_source          = true
+      event_pattern = {
+        source        = ["aws.guardduty"]
+        "detail-type" = ["GuardDuty Malware Protection Object Scan Result"]
+        resources     = [aws_guardduty_malware_protection_plan.this.arn]
+        detail = {
+          resourceType = ["S3_OBJECT"]
+          s3ObjectDetails = {
+            bucketName = [module.s3_bucket["processing"].s3_bucket_id]
+          }
+          scanResultDetails = {
+            scanResultStatus = ["UNSUPPORTED", "ACCESS_DENIED", "FAILED"]
+          }
+        }
+      }
+    }
+  }
+}

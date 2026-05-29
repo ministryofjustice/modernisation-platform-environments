@@ -4,6 +4,8 @@ locals {
   environment_config_preprod = {
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
     legacy_counterpart_vpc_cidr            = "10.160.0.0/20"
+    legacy_ad_domain_name                  = "delius-pre-prod.local"
+    legacy_dns_ip_addrs                    = ["10.160.0.163", "10.160.6.66"]
     ad_domain_name                         = "delius-mis-preprod.internal"
     ad_trust_domain_name                   = "azure.hmpp.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
@@ -72,42 +74,28 @@ locals {
   }
 
   bps_config_preprod = {
-    instance_count = 0
-    ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
+    instance_count = 4
+    ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
+    ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
+    ansible_branch = "TM-2058/delius-mis/preprod-config"
     ebs_volumes = {
-      "/dev/sda1" = { label = "root", size = 150 }
-      "/dev/xvdf" = { label = "data", size = 300 }
+      "/dev/sda1" = { label = "root", size = 100, type = "gp3" }
+      "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }
+      "/dev/sdc"  = { label = "data", size = 100, type = "gp3" }
+      "/dev/sds"  = { label = "swap", size = 8, type = "gp3" }
     }
-
-    ebs_volumes_config = {
-      data = {
-        iops       = 3000
-        throughput = 125
-        type       = "gp3"
-      }
-      root = {
-        iops       = 3000
-        throughput = 125
-        type       = "gp3"
-      }
-    }
+    ebs_volumes_config = {}
 
     instance_config = {
       associate_public_ip_address  = false
       disable_api_termination      = false
       disable_api_stop             = false
-      instance_type                = "t3.xlarge"
+      instance_type                = "r7i.2xlarge"
       metadata_endpoint_enabled    = "enabled"
       key_name                     = null
       metadata_options_http_tokens = "required"
       monitoring                   = true
       ebs_block_device_inline      = true
-
-      private_dns_name_options = {
-        enable_resource_name_dns_aaaa_record = false
-        enable_resource_name_dns_a_record    = true
-        hostname_type                        = "resource-name"
-      }
 
       tags = merge(
         local.tags,
@@ -117,42 +105,28 @@ locals {
   }
 
   bws_config_preprod = {
-    instance_count = 0
-    ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
+    instance_count = 1
+    ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
+    ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
+    ansible_branch = "TM-2058/delius-mis/preprod-config"
     ebs_volumes = {
-      "/dev/sda1" = { label = "root", size = 150 }
-      "/dev/xvdf" = { label = "data", size = 300 }
+      "/dev/sda1" = { label = "root", size = 100, type = "gp3" }
+      "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }
+      "/dev/sdc"  = { label = "data", size = 100, type = "gp3" }
+      "/dev/sds"  = { label = "swap", size = 8, type = "gp3" }
     }
-
-    ebs_volumes_config = {
-      data = {
-        iops       = 3000
-        throughput = 125
-        type       = "gp3"
-      }
-      root = {
-        iops       = 3000
-        throughput = 125
-        type       = "gp3"
-      }
-    }
+    ebs_volumes_config = {}
 
     instance_config = {
       associate_public_ip_address  = false
       disable_api_termination      = false
       disable_api_stop             = false
-      instance_type                = "t3.xlarge"
+      instance_type                = "r7i.xlarge"
       metadata_endpoint_enabled    = "enabled"
       key_name                     = null
       metadata_options_http_tokens = "required"
       monitoring                   = true
       ebs_block_device_inline      = true
-
-      private_dns_name_options = {
-        enable_resource_name_dns_aaaa_record = false
-        enable_resource_name_dns_a_record    = true
-        hostname_type                        = "resource-name"
-      }
 
       tags = merge(
         local.tags,
@@ -304,9 +278,10 @@ locals {
 
   # BOE DB config
   boe_db_config_preprod = {
-    instance_count = 0
-    instance_type  = "m7i.large"
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    primary_instance_count = 1
+    standby_instance_count = 1
+    instance_type          = "m7i.large"
+    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -349,9 +324,10 @@ locals {
 
   # DSD DB config
   dsd_db_config_preprod = {
-    instance_count = 0
-    instance_type  = "r7i.large"
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    primary_instance_count = 1
+    standby_instance_count = 1
+    instance_type          = "r7i.large"
+    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -394,9 +370,10 @@ locals {
 
   # MIS DB config
   mis_db_config_preprod = {
-    instance_count = 0
-    instance_type  = "r7i.12xlarge"
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    primary_instance_count = 1
+    standby_instance_count = 1
+    instance_type          = "r7i.12xlarge"
+    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -423,10 +400,10 @@ locals {
         type       = "gp3"
       }
       data = {
-        iops       = 5000
-        throughput = 500
+        iops       = 7680
+        throughput = 480
         type       = "gp3"
-        total_size = 6000
+        total_size = 7000
       }
       flash = {
         iops       = 3000
