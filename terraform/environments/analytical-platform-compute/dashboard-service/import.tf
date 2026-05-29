@@ -2,8 +2,9 @@
 
 #### NAMESPACE ######
 import {
-  to = kubernetes_namespace_v1.dashboard_service[0]
-  id = "dashboard-service"
+  for_each = terraform.workspace != "analytical-platform-compute-test" ? { "0" = "dashboard-service" } : {}
+  to       = kubernetes_namespace_v1.dashboard_service[0]
+  id       = each.value
 }
 
 removed {
@@ -15,8 +16,10 @@ removed {
 
 #external secrets
 import {
-  to = kubernetes_secret_v1.dashboard_service_rds[0]
-  id = "dashboard-service/dashboard-service-rds"
+  for_each = terraform.workspace != "analytical-platform-compute-test" ? { "0" = "dashboard-service/dashboard-service-rds" } : {}
+  to       = kubernetes_secret_v1.dashboard_service_rds[0]
+  id       = each.value
+
 }
 
 removed {
