@@ -1,0 +1,27 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: ai-gateway-admin
+  namespace: {{ .Release.Namespace }}
+spec:
+  hostnames:
+    - {{ .Values.adminHostname }}
+  parentRefs:
+    - name: ai-gateway
+      sectionName: https-admin
+  rules:
+    - matches:
+        - path:
+            type: Exact
+            value: /
+      filters:
+        - type: RequestRedirect
+          requestRedirect:
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: /ui
+            statusCode: 302
+    - backendRefs:
+        - name: litellm-admin
+          port: 4000
