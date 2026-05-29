@@ -14,4 +14,7 @@ resource "aws_db_option_group" "sqlserver_native_backup" {
   }
 
   tags = local.tags
+  lifecycle {
+    create_before_destroy = true
+  }
 }
