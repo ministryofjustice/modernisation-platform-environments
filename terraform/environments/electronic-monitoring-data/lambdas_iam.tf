@@ -2569,6 +2569,7 @@ resource "aws_iam_role_policy_attachment" "gdpr_unstructured_control_lambda_iam_
 }
 
 module "share_dbs_with_control_lambda_role" {
+  count                   = local.is-test ? 0 : 1
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = toset(local.historic_source_dbs)
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
