@@ -1,7 +1,7 @@
 locals {
-  source_db_identifier           = "chaps-prod-instance"
-  native_backup_option_group     = "chaps-prod-sqlserver-native-backup"
-  mp_rds_native_backup_role_name = "chaps-prod-rds-native-backup"
+  source_db_identifier           = "db-chaps-dev"
+  native_backup_option_group     = "chaps-dev-sqlserver-native-backup"
+  mp_rds_native_backup_role_name = "chaps-dev-rds-native-backup"
 }
 
 data "aws_iam_policy_document" "rds_native_backup_assume_role" {
@@ -144,3 +144,14 @@ resource "aws_s3_bucket_policy" "db_migration" {
   bucket = aws_s3_bucket.db_migration.id
   policy = data.aws_iam_policy_document.db_migration_bucket_policy.json
 }
+
+output "db_migration_kms_key_arn" {
+  value       = aws_kms_key.db_migration.arn
+  description = "KMS key ARN for the CHAPS dev DB migration S3 bucket"
+}
+
+output "db_migration_bucket_name" {
+  value       = aws_s3_bucket.db_migration.bucket
+  description = "S3 bucket containing CHAPS dev DB migration backups"
+}
+

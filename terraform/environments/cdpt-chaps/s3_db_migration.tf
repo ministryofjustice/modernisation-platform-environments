@@ -1,10 +1,10 @@
 locals {
-  db_migration_bucket_name = "cdpt-chaps-prod-db-migration-${data.aws_caller_identity.current.account_id}"
-  db_migration_prefix      = "native-backups/prod"
+  db_migration_bucket_name = "cdpt-chaps-dev-db-migration-${data.aws_caller_identity.current.account_id}"
+  db_migration_prefix      = "native-backups/dev"
 }
 
 resource "aws_kms_key" "db_migration" {
-  description             = "CHAPS production database migration S3 encryption key"
+  description             = "CHAPS dev database migration S3 encryption key"
   deletion_window_in_days = 30
   enable_key_rotation     = true
 
@@ -12,7 +12,7 @@ resource "aws_kms_key" "db_migration" {
 }
 
 resource "aws_kms_alias" "db_migration" {
-  name          = "alias/chaps-prod-db-migration"
+  name          = "alias/chaps-dev-db-migration"
   target_key_id = aws_kms_key.db_migration.key_id
 }
 
@@ -21,7 +21,7 @@ resource "aws_s3_bucket" "db_migration" {
 
   tags = merge(local.tags, {
     Name    = local.db_migration_bucket_name
-    Purpose = "CHAPS production database migration"
+    Purpose = "CHAPS dev database migration"
   })
 }
 

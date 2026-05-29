@@ -1,6 +1,6 @@
 resource "aws_db_option_group" "sqlserver_native_backup" {
   name                     = local.native_backup_option_group
-  option_group_description = "CHAPS prod SQL Server native backup to S3"
+  option_group_description = "CHAPS dev SQL Server native backup to S3"
   engine_name              = "sqlserver-web"
   major_engine_version     = "14.00"
 
