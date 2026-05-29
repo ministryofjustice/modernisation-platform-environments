@@ -993,6 +993,7 @@ module "macie-unstructured-jobs" {
 #-----------------------------------------------------------------------------------
 
 module "gdpr_unstructured_control_lambda" {
+  count                   = local.is-test ? 0 : 1
   source                  = "./modules/lambdas"
   is_image                = true
   function_name           = "gdpr_unstructured_control_lambda"
