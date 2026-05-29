@@ -1,5 +1,5 @@
 # resource "aws_iam_role" "ssogen_lambda_role" {
-#   count = local.is-development || local.is-test ? 1 : 0
+#   count = local.ssogen_enabled ? 1 : 0
 #   name  = "${local.application_name_ssogen}-${local.environment}-dns-failover-role"
 #   # provider = aws.core-vpc
 #   assume_role_policy = jsonencode({
@@ -18,7 +18,7 @@
 # }
 
 # resource "aws_iam_role_policy" "ssogen_lambda_dns_failover_policy" {
-#   count = local.is-development || local.is-test ? 1 : 0
+#   count = local.ssogen_enabled ? 1 : 0
 #   name  = "${local.application_name_ssogen}-${local.environment}-dns-failover-lambda-policy"
 #   role  = aws_iam_role.ssogen_lambda_role[count.index].id
 
@@ -55,14 +55,14 @@
 # }
 
 # # resource "aws_iam_role_policy_attachment" "ssogen_lambda_attach" {
-# #   count                        = local.is-development || local.is-test ? 1 : 0
+# #   count                        = local.ssogen_enabled ? 1 : 0
 # #   role       = aws_iam_role.ssogen_lambda_role[count.index].name
 # #   policy_arn = aws_iam_policy.ssogen_lambda_policy[count.index].arn
 # # }
 
 # # Empty SG shell (no inline rules)
 # resource "aws_security_group" "ssogen_lambda_sg" {
-#   count       = local.is-development || local.is-test ? 1 : 0
+#   count       = local.ssogen_enabled ? 1 : 0
 #   name        = "lambda-dns-failover-sg"
 #   description = "Egress to Route53 over 443 and to WebLogic targets on app port"
 #   vpc_id      = data.aws_vpc.shared.id
@@ -70,7 +70,7 @@
 
 # # Egress: HTTPS to the internet (Route 53 API via NAT)
 # resource "aws_vpc_security_group_egress_rule" "ssogen_lambda_https_out" {
-#   count             = local.is-development || local.is-test ? 1 : 0
+#   count             = local.ssogen_enabled ? 1 : 0
 #   security_group_id = aws_security_group.ssogen_lambda_sg[count.index].id
 #   ip_protocol       = "tcp"
 #   from_port         = 443
@@ -81,7 +81,7 @@
 
 # # Egress: HTTPS to the internet (Route 53 API via NAT)
 # resource "aws_vpc_security_group_egress_rule" "ssogen_lambda_to_ec2_out" {
-#   count             = local.is-development || local.is-test ? 1 : 0
+#   count             = local.ssogen_enabled ? 1 : 0
 #   security_group_id = aws_security_group.ssogen_lambda_sg[count.index].id
 #   ip_protocol       = "tcp"
 #   from_port         = 7001
@@ -101,14 +101,14 @@
 # # }
 
 # data "archive_file" "ssogen_lambda_zip" {
-#   count       = local.is-development || local.is-test ? 1 : 0
+#   count       = local.ssogen_enabled ? 1 : 0
 #   type        = "zip"
 #   source_dir  = "${path.module}/lambda/ssogen_admin_failover"
 #   output_path = "${path.module}/lambda/ssogen_admin_failover.zip"
 # }
 
 # resource "aws_lambda_function" "ssogen_lambda_dns_admin_failover" {
-#   count            = local.is-development || local.is-test ? 1 : 0
+#   count            = local.ssogen_enabled ? 1 : 0
 #   filename         = data.archive_file.ssogen_lambda_zip[count.index].output_path
 #   source_code_hash = base64sha256(join("", local.lambda_source_hashes_ssogen_admin_failover))
 #   function_name    = "${local.application_name_ssogen}-${local.environment}-dns-failover"
@@ -135,7 +135,7 @@
 # }
 
 # resource "aws_lambda_permission" "lambda_allow_events" {
-#   count         = local.is-development || local.is-test ? 1 : 0
+#   count         = local.ssogen_enabled ? 1 : 0
 #   statement_id  = "AllowExecutionFromEvents"
 #   action        = "lambda:InvokeFunction"
 #   function_name = aws_lambda_function.ssogen_lambda_dns_admin_failover[count.index].function_name
