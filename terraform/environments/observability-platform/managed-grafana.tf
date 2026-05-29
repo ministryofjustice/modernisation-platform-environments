@@ -31,10 +31,13 @@ module "managed_grafana" {
 
   role_associations = {
     "ADMIN" = {
-      "group_ids" = [for group in data.aws_identitystore_group.observability_platform_admins : group.id]
+      "group_ids" = [
+        for group_name in ["observability-platform", "operations-engineering", "azure-aws-sso-modernisation-platform"] :
+        local.identitystore_group_ids_by_name[group_name]
+      ]
     }
     "EDITOR" = {
-      "group_ids" = [for team in data.aws_identitystore_group.all_identity_centre_teams : team.id]
+      "group_ids" = [for team in local.all_identity_centre_teams : local.identitystore_group_ids_by_name[team]]
     }
   }
 

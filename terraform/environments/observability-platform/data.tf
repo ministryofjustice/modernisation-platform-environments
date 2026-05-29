@@ -6,33 +6,16 @@ data "aws_ssoadmin_instances" "main" {
   provider = aws.sso-readonly
 }
 
-data "aws_identitystore_group" "observability_platform_admins" {
-  for_each = toset(["observability-platform", "operations-engineering", "azure-aws-sso-modernisation-platform"])
-
+data "aws_identitystore_groups" "all" {
   provider = aws.sso-readonly
 
   identity_store_id = tolist(data.aws_ssoadmin_instances.main.identity_store_ids)[0]
-
-  alternate_identifier {
-    unique_attribute {
-      attribute_path  = "DisplayName"
-      attribute_value = each.value
-    }
-  }
 }
 
-data "aws_identitystore_group" "all_identity_centre_teams" {
-  for_each = { for team in local.all_identity_centre_teams : team => team }
-
-  provider = aws.sso-readonly
-
-  identity_store_id = tolist(data.aws_ssoadmin_instances.main.identity_store_ids)[0]
-
-  alternate_identifier {
-    unique_attribute {
-      attribute_path  = "DisplayName"
-      attribute_value = each.value
-    }
+locals {
+  identitystore_group_ids_by_name = {
+    for group in data.aws_identitystore_groups.all.groups :
+    group.display_name => group.group_id
   }
 }
 
