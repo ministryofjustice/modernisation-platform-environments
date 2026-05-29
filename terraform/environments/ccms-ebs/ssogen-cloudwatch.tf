@@ -2,7 +2,7 @@
 # SSM Details for SSOGEN
 # ######################################
 resource "aws_cloudwatch_log_group" "ssogen_groups" {
-  for_each          = local.application_data.ssogen_cw_log_groups
+  for_each          = local.is-development || local.is-test ? local.application_data.ssogen_cw_log_groups : {}
   name              = each.key
   retention_in_days = each.value.retention_days
 
