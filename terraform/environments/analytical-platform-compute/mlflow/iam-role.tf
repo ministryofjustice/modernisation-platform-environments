@@ -16,7 +16,7 @@ module "mlflow_iam_role" {
   oidc_providers = {
     main = {
       provider_arn               = data.aws_iam_openid_connect_provider.eks.arn
-      namespace_service_accounts = ["${kubernetes_namespace.mlflow[0].metadata[0].name}:mlflow"]
+      namespace_service_accounts = ["${kubernetes_namespace_v1.mlflow[0].metadata[0].name}:mlflow"]
     }
   }
 

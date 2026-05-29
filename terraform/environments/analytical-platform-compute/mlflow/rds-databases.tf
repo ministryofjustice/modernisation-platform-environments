@@ -5,7 +5,7 @@ module "mlflow_auth_rds" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/rds/aws"
-  version = "6.12.0"
+  version = "7.2.0"
 
   identifier = "mlflow-auth"
 
@@ -28,7 +28,8 @@ module "mlflow_auth_rds" {
   username                    = "mlflowauth"
   db_name                     = "mlflowauth"
   manage_master_user_password = false
-  password                    = random_password.mlflow_auth_rds[0].result
+  password_wo                 = random_password.mlflow_auth_rds[0].result
+  password_wo_version         = 1
   kms_key_id                  = module.mlflow_auth_rds_kms[0].key_arn
 
   parameters = [
