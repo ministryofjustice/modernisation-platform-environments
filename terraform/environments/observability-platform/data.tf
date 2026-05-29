@@ -13,9 +13,11 @@ data "aws_identitystore_group" "observability_platform_admins" {
 
   identity_store_id = tolist(data.aws_ssoadmin_instances.main.identity_store_ids)[0]
 
-  filter {
-    attribute_path  = "DisplayName"
-    attribute_value = each.value
+  alternate_identifier {
+    unique_attribute {
+      attribute_path  = "DisplayName"
+      attribute_value = each.value
+    }
   }
 }
 
@@ -26,9 +28,11 @@ data "aws_identitystore_group" "all_identity_centre_teams" {
 
   identity_store_id = tolist(data.aws_ssoadmin_instances.main.identity_store_ids)[0]
 
-  filter {
-    attribute_path  = "DisplayName"
-    attribute_value = each.value
+  alternate_identifier {
+    unique_attribute {
+      attribute_path  = "DisplayName"
+      attribute_value = each.value
+    }
   }
 }
 

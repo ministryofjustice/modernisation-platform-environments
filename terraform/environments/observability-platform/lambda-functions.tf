@@ -6,7 +6,7 @@ module "grafana_api_key_rotator" {
   #checkov:skip=CKV_AWS_258:Function is not invoked by URL
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.20.1"
+  version = "8.8.0"
 
   publish        = true
   create_package = false
@@ -53,7 +53,7 @@ module "grafana_api_key_rotator" {
 
 module "securityhub_metric_ingester" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.20.1"
+  version = "8.8.0"
 
   function_name = "securityhub-metric-ingester"
   description   = "Publishes enriched Security Hub metrics for Grafana"

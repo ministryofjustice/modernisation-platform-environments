@@ -32,12 +32,23 @@ module "iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.52.2"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.6.1"
 
-  create_role             = true
-  role_name               = "${var.name}-prometheus"
-  trusted_role_arns       = ["arn:aws:iam::${var.account_id}:root"]
-  custom_role_policy_arns = [module.iam_policy.arn]
-  role_requires_mfa       = false
+  name            = "${var.name}-prometheus"
+  use_name_prefix = false
+
+  trust_policy_permissions = {
+    AllowAssumeRole = {
+      actions = ["sts:AssumeRole"]
+      principals = [{
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${var.account_id}:root"]
+      }]
+    }
+  }
+
+  policies = {
+    prometheus = module.iam_policy.arn
+  }
 }
