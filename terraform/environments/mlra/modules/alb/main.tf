@@ -459,7 +459,7 @@ resource "aws_cloudfront_distribution" "external" {
     bucket          = aws_s3_bucket.cloudfront.bucket_domain_name
     prefix          = var.application_name
   }
-  web_acl_id = aws_waf_web_acl.waf_acl.id
+  web_acl_id = aws_wafv2_web_acl.waf_acl.arn
 
   restrictions {
     geo_restriction {
@@ -477,6 +477,7 @@ resource "aws_cloudfront_distribution" "external" {
 ## WAF
 
 resource "aws_waf_ipset" "allow" {
+  # Will be removed once migration to WAFv2 is complete
   name = "${upper(var.application_name)} Manual Allow Set"
 
   # Ranges from https://github.com/ministryofjustice/moj-ip-addresses/blob/master/moj-cidr-addresses.yml
@@ -492,10 +493,12 @@ resource "aws_waf_ipset" "allow" {
 }
 
 resource "aws_waf_ipset" "block" {
+  # Will be removed once migration to WAFv2 is complete
   name = "${upper(var.application_name)} Manual Block Set"
 }
 
 resource "aws_waf_rule" "allow" {
+  # Will be removed once migration to WAFv2 is complete
   name        = "${upper(var.application_name)} Manual Allow Rule"
   metric_name = "${upper(var.application_name)}ManualAllowRule"
 
@@ -507,6 +510,7 @@ resource "aws_waf_rule" "allow" {
 }
 
 resource "aws_waf_rule" "block" {
+  # Will be removed once migration to WAFv2 is complete
   name        = "${upper(var.application_name)} Manual Block Rule"
   metric_name = "${upper(var.application_name)}ManualBlockRule"
 
@@ -518,6 +522,7 @@ resource "aws_waf_rule" "block" {
 }
 
 resource "aws_waf_web_acl" "waf_acl" {
+  # Will be removed once migration to WAFv2 is complete
   #checkov:skip=CKV_AWS_176:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   name        = "${upper(var.application_name)} Whitelisting Requesters"
   metric_name = "${upper(var.application_name)}WhitelistingRequesters"
@@ -537,6 +542,93 @@ resource "aws_waf_web_acl" "waf_acl" {
     }
     priority = 2
     rule_id  = aws_waf_rule.block.id
+  }
+}
+
+resource "aws_wafv2_ip_set" "allow" {
+  name               = "${upper(var.application_name)}-manual-allow-set"
+  scope              = "CLOUDFRONT"
+  provider           = aws.us-east-1
+  ip_address_version = "IPV4"
+  description        = "Manual Allow Set for ${upper(var.application_name)} WAF"
+  # Ranges from https://github.com/ministryofjustice/moj-ip-addresses/blob/master/moj-cidr-addresses.yml
+  # disc_internet_pipeline, disc_dom1, moj_digital_wifi, petty_france_office365, petty_france_wifi, ark_internet, gateway_proxies
+  addresses          = local.ip_set_list
+}
+
+resource "aws_wafv2_ip_set" "block" {
+  name               = "${upper(var.application_name)}-manual-block-set"
+  scope              = "CLOUDFRONT"
+  provider           = aws.us-east-1
+  ip_address_version = "IPV4"
+  description        = "Manual Block Set for ${upper(var.application_name)} WAF"
+  addresses          = []
+}
+
+resource "aws_wafv2_web_acl" "waf_acl" {
+  name        = "${upper(var.application_name)}-Whitelisting-Requesters"
+  provider    = aws.us-east-1
+  scope       = "CLOUDFRONT"
+  description = "Web ACL for ${upper(var.application_name)}"
+
+  default_action {
+    dynamic "allow" {
+      for_each = var.waf_default_action == "ALLOW" ? [1] : []
+      content {}
+    }
+
+    dynamic "block" {
+      for_each = var.waf_default_action == "BLOCK" ? [1] : []
+      content {}
+    }
+  }
+
+  rule {
+    name     = "ManualAllowRule"
+    priority = 1
+
+    action {
+      allow {}
+    }
+
+    statement {
+      ip_set_reference_statement {
+        arn = aws_wafv2_ip_set.allow.arn
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "${upper(var.application_name)}ManualAllowRule"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "ManualBlockRule"
+    priority = 2
+
+    action {
+      block {}
+    }
+
+    statement {
+      ip_set_reference_statement {
+        arn = aws_wafv2_ip_set.block.arn
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "${upper(var.application_name)}ManualBlockRule"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "${upper(var.application_name)}WhitelistingRequesters"
+    sampled_requests_enabled   = true
   }
 }
 
