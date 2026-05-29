@@ -2,7 +2,7 @@ resource "helm_release" "ai_gateway_configuration" {
   name      = "${local.component_name}-configuration"
   chart     = "${path.module}/src/helm/charts/${local.component_name}-configuration"
   version   = "1.4.0"
-  namespace = local.component_name
+  namespace = module.ai_gateway_namespace.name
 
   values = [
     templatefile(
@@ -20,7 +20,7 @@ resource "helm_release" "ai_gateway_configuration" {
 resource "helm_release" "litellm" {
   name       = "litellm"
   repository = "oci://ghcr.io/berriai"
-  version    = local.environment_configuration.litellm_versions.chart
+  version    = local.environment_configuration.litellm_version
   chart      = "litellm-helm"
   namespace  = local.component_name
   values = [
@@ -30,8 +30,8 @@ resource "helm_release" "litellm" {
         # Kubernetes
         namespace          = local.component_name
         imageRepository    = "ghcr.io/berriai/litellm-non_root"
-        imageTag           = local.environment_configuration.litellm_versions.application
-        serviceAccountName = "litellm"
+        imageTag           = local.environment_configuration.litellm_version
+        serviceAccountName = kubernetes_service_account_v1.ai_gateway.metadata[0].name
         ingressHostname    = local.environment_configuration.ai_gateway_hostname
 
         # Database
@@ -70,7 +70,7 @@ resource "helm_release" "litellm" {
   depends_on = [
     helm_release.litellm_admin,
     module.iam_role,
-    kubernetes_service_account_v1.litellm,
+    kubernetes_service_account_v1.ai_gateway,
     kubernetes_secret_v1.litellm_master_key,
     kubernetes_manifest.external_secret_litellm_license,
     kubernetes_manifest.external_secret_litellm_salt_key,
@@ -83,7 +83,7 @@ resource "helm_release" "litellm" {
 resource "helm_release" "litellm_admin" {
   name       = "litellm-admin"
   repository = "oci://ghcr.io/berriai"
-  version    = local.environment_configuration.litellm_versions.chart
+  version    = local.environment_configuration.litellm_version
   chart      = "litellm-helm"
   namespace  = local.component_name
   values = [
@@ -93,9 +93,10 @@ resource "helm_release" "litellm_admin" {
         # Kubernetes
         namespace          = local.component_name
         imageRepository    = "ghcr.io/berriai/litellm-non_root"
-        imageTag           = local.environment_configuration.litellm_versions.application
-        serviceAccountName = "litellm"
+        imageTag           = local.environment_configuration.litellm_version
+        serviceAccountName = kubernetes_service_account_v1.ai_gateway.metadata[0].name
         ingressHostname    = "admin.${local.environment_configuration.ai_gateway_hostname}"
+        proxyHostname      = local.environment_configuration.ai_gateway_hostname
 
         # Database
         databaseSecret      = "aurora"
@@ -121,6 +122,7 @@ resource "helm_release" "litellm_admin" {
 
         # Audit Logs
         auditLogsBucket = module.audit_logs.s3_bucket_id
+        auditLogsRegion = data.aws_region.current.region
 
         # Admin
         proxyAdminEmail = join(", ", local.environment_configurations.proxy_admin_emails)
@@ -131,7 +133,7 @@ resource "helm_release" "litellm_admin" {
   depends_on = [
     module.ai_gateway_aurora,
     module.iam_role,
-    kubernetes_service_account_v1.litellm,
+    kubernetes_service_account_v1.ai_gateway,
     kubernetes_secret_v1.litellm_master_key,
     kubernetes_manifest.external_secret_litellm_license,
     kubernetes_manifest.external_secret_litellm_salt_key,

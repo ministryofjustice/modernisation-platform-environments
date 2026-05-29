@@ -26,6 +26,11 @@ data "aws_subnets" "eks-data" {
   }
 }
 
+data "aws_route53_zone" "ai_gateway" {
+  name         = "${local.environment_configuration.ai_gateway_hostname}."
+  private_zone = false
+}
+
 data "aws_secretsmanager_secret_version" "litellm_license" {
   secret_id = module.litellm_license_secret.secret_id
 }

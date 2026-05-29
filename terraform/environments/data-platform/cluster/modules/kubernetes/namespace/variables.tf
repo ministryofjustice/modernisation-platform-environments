@@ -9,3 +9,7 @@ variable "workload" {
     error_message = "workload must be one of: system, application"
   }
 }
+
+variable "pod_security_mode" {
+  type = string
+}

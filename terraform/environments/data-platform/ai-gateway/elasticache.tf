@@ -33,9 +33,7 @@ module "ai_gateway_elasticache" {
     }
   }
 
-  log_delivery_configuration = {}
-
-  tags = local.tags
+  log_delivery_configuration = {} # TODO: this
 }
 
 module "ai_gateway_elasticache_secret" {

@@ -10,10 +10,7 @@ locals {
       "Jacob.Woffenden@justice.gov.uk"
     ]
     development = {
-      litellm_versions = {
-        application = "1.86.2"
-        chart       = "1.86.2"
-      }
+      litellm_version     = "1.86.2"
       ai_gateway_hostname = "development.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
@@ -51,10 +48,7 @@ locals {
       elasticache_node_type = "cache.t4g.medium"
     }
     test = {
-      litellm_versions = {
-        application = "1.86.2"
-        chart       = "1.86.2"
-      }
+      litellm_version     = "1.86.2"
       ai_gateway_hostname = "test.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
@@ -94,10 +88,7 @@ locals {
       elasticache_node_type = "cache.t4g.medium"
     }
     preproduction = {
-      litellm_versions = {
-        application = "1.86.2"
-        chart       = "1.86.2"
-      }
+      litellm_version     = "1.86.2"
       ai_gateway_hostname = "preproduction.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
@@ -135,10 +126,7 @@ locals {
       elasticache_node_type = "cache.t4g.medium"
     }
     production = {
-      litellm_versions = {
-        application = "1.86.2"
-        chart       = "1.86.2"
-      }
+      litellm_version     = "1.86.2"
       ai_gateway_hostname = "ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN

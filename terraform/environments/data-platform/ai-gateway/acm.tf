@@ -1,8 +1,3 @@
-data "aws_route53_zone" "ai_gateway" {
-  name         = "${local.environment_configuration.ai_gateway_hostname}."
-  private_zone = false
-}
-
 module "acm_ai_gateway" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-acm.git?ref=5d113fa07675fc42237907a621b68ac97109043e" # v6.3.0
 

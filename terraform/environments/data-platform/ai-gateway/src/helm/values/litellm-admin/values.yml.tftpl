@@ -59,7 +59,7 @@ proxy_config:
     audit_log_callbacks: ["s3_v2"]
     s3_audit_callback_params:
       s3_bucket_name: ${auditLogsBucket}
-      s3_region_name: eu-west-2
+      s3_region_name: ${auditLogsRegion}
       s3_path: litellm-audit
     cache: false
     default_internal_user_params:
@@ -168,7 +168,7 @@ envVars: {
     LITELLM_MODE: "PRODUCTION",
     LITELLM_UI_PATH: "/app/var/litellm/ui",
     PRISMA_BINARY_CACHE_DIR: "/app/cache/prisma-python/binaries",
-    PROXY_BASE_URL: "https://${ingressHostname}",
+    PROXY_BASE_URL: "https://${proxyHostname}",
     REDIS_SSL: "True",
     USE_PRISMA_MIGRATE: "True",
     XDG_CACHE_HOME: "/app/cache"

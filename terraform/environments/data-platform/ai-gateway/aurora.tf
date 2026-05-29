@@ -41,8 +41,6 @@ module "ai_gateway_aurora" {
   create_monitoring_role      = local.is-production
   iam_role_name               = "${local.component_name}-monitoring"
   iam_role_use_name_prefix    = true
-
-  tags = local.tags
 }
 
 module "ai_gateway_aurora_secret" {

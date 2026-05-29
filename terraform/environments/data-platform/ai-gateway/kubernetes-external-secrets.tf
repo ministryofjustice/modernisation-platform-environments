@@ -1,12 +1,12 @@
 resource "kubernetes_manifest" "external_secret_litellm_license" {
-  depends_on = [kubernetes_namespace_v1.ai_gateway]
+  depends_on = [module.ai_gateway_namespace]
 
   manifest = {
     apiVersion = "external-secrets.io/v1"
     kind       = "ExternalSecret"
     metadata = {
       name      = "litellm-license"
-      namespace = "${local.component_name}"
+      namespace = module.ai_gateway_namespace.name
     }
     spec = {
       refreshInterval = "1h"
@@ -30,14 +30,14 @@ resource "kubernetes_manifest" "external_secret_litellm_license" {
 }
 
 resource "kubernetes_manifest" "external_secret_litellm_salt_key" {
-  depends_on = [kubernetes_namespace_v1.ai_gateway]
+  depends_on = [module.ai_gateway_namespace]
 
   manifest = {
     apiVersion = "external-secrets.io/v1"
     kind       = "ExternalSecret"
     metadata = {
       name      = "litellm-salt-key"
-      namespace = "${local.component_name}"
+      namespace = module.ai_gateway_namespace.name
     }
     spec = {
       refreshInterval = "1h"
@@ -61,14 +61,14 @@ resource "kubernetes_manifest" "external_secret_litellm_salt_key" {
 }
 
 resource "kubernetes_manifest" "external_secret_litellm_entra_id" {
-  depends_on = [kubernetes_namespace_v1.ai_gateway]
+  depends_on = [module.ai_gateway_namespace]
 
   manifest = {
     apiVersion = "external-secrets.io/v1"
     kind       = "ExternalSecret"
     metadata = {
       name      = "litellm-entra-id"
-      namespace = "${local.component_name}"
+      namespace = module.ai_gateway_namespace.name
     }
     spec = {
       refreshInterval = "1h"
@@ -115,14 +115,14 @@ resource "kubernetes_manifest" "external_secret_litellm_entra_id" {
 
 
 resource "kubernetes_manifest" "external_secret_aurora" {
-  depends_on = [kubernetes_namespace_v1.ai_gateway]
+  depends_on = [module.ai_gateway_namespace]
 
   manifest = {
     apiVersion = "external-secrets.io/v1"
     kind       = "ExternalSecret"
     metadata = {
       name      = "aurora"
-      namespace = "${local.component_name}"
+      namespace = module.ai_gateway_namespace.name
     }
     spec = {
       refreshInterval = "1h"
@@ -175,14 +175,14 @@ resource "kubernetes_manifest" "external_secret_aurora" {
 }
 
 resource "kubernetes_manifest" "external_secret_elasticache" {
-  depends_on = [kubernetes_namespace_v1.ai_gateway]
+  depends_on = [module.ai_gateway_namespace]
 
   manifest = {
     apiVersion = "external-secrets.io/v1"
     kind       = "ExternalSecret"
     metadata = {
       name      = "elasticache"
-      namespace = "${local.component_name}"
+      namespace = module.ai_gateway_namespace.name
     }
     spec = {
       refreshInterval = "1h"
