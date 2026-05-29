@@ -2,32 +2,25 @@ module "lake_formation_share_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.59.0"
 
+  create_role       = true
+  role_requires_mfa = false
 
-  name = "lake-formation-share"
+  role_name_prefix = "lake-formation-share"
 
+  number_of_custom_role_policy_arns = 2
 
-  policies = {
-    lakeformation_share_policy = module.analytical_platform_lake_formation_share_policy.arn
-    aws_lakeformation_policy   = "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
-  }
+  custom_role_policy_arns = [
+    module.analytical_platform_lake_formation_share_policy.arn,
+    "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
+  ]
 
-  trust_policy_permissions = {
-    LakeformationExecutionRole = {
-      actions = ["sts:AssumeRole", "sts:TagSession"]
-      principals = [
-        {
-          type = "AWS"
-          identifiers = [
-            "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-management-production"]}:root",
-            "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-compute-development"]}:root"
-          ]
-        }
-      ]
-    }
-  }
+  trusted_role_arns = [
+    "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-management-production"]}:root",
+    "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-compute-development"]}:root"
+  ]
 
   tags = local.tags
 }
@@ -81,7 +74,7 @@ module "analytical_platform_data_eng_dba_service_role" {
       ]
     }
   }
-  name = "analytical-platform-data-engineering-database-access"
+  name            = "analytical-platform-data-engineering-database-access"
   use_name_prefix = false
   policies = {
     lakeformation_share_policy = module.analytical_platform_lake_formation_share_policy.arn
@@ -98,7 +91,7 @@ module "lake_formation_to_data_production_mojap_derived_tables_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.6.0"
 
-  name = "lake-formation-data-production-data-access"
+  name            = "lake-formation-data-production-data-access"
   use_name_prefix = false
   policies = {
     mojap_derived_bucket_lake_formation_policy = module.data_production_mojap_derived_bucket_lake_formation_policy.arn
@@ -145,7 +138,8 @@ module "copy_apdp_cadet_metadata_to_compute_assumable_role" {
     }
   }
 
-  name = "copy-apdp-cadet-metadata-to-compute"
+  name            = "copy-apdp-cadet-metadata-to-compute"
+  use_name_prefix = false
 
   policies = {
     copy_apdp_cadet_metadata_to_compute_policy = module.copy_apdp_cadet_metadata_to_compute_policy.arn
