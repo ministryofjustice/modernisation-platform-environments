@@ -11,5 +11,6 @@ variable "workload" {
 }
 
 variable "pod_security_mode" {
-  type = string
+  type    = string
+  default = null
 }
