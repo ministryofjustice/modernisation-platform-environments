@@ -10,7 +10,7 @@
       "pagerduty_integration_key_name": "laa_mojfin_non_prod_alarms",
       "allocated_storage_size": "2500",
       "max_allocated_storage_size": "3500",
-      "bastion_bucket_name": "bastion-mojfin-mojfin-development-wrfsv5"
+      "bastion_bucket_suffix": "wrfsv5"
     },
     "test": {
       "landing_zone_vpc_cidr": "test-data",
@@ -25,7 +25,7 @@
       "deletion_protection": "true",
       "allocated_storage_size": "4000",
       "max_allocated_storage_size": "4500",
-      "bastion_bucket_name": "bastion-mojfin-mojfin-preproduction-wzjars"
+      "bastion_bucket_suffix": "wzjars"
     },
     "production": {
       "landing_zone_vpc_cidr": "10.205.0.0/20",
@@ -36,7 +36,7 @@
       "pagerduty_integration_key_name": "laa_mojfin_prod_alarms",
       "allocated_storage_size": "5000",
       "max_allocated_storage_size": "6000",
-      "bastion_bucket_name": "bastion-mojfin-mojfin-production-7mxtlk"
+      "bastion_bucket_suffix": "7mxtlk"
     }
   }
 }

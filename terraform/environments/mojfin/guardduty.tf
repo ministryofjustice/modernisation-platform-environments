@@ -287,7 +287,7 @@ resource "aws_guardduty_malware_protection_plan" "bastion_s3_protection_plan" {
 
   protected_resource {
     s3_bucket {
-      bucket_name = local.application_data.accounts[local.environment].bastion_bucket_name
+      bucket_name = "bastion-${local.application_name}-${local.application_name}-${local.environment}-${local.application_data.accounts[local.environment].bastion_bucket_suffix}"
     }
   }
 
