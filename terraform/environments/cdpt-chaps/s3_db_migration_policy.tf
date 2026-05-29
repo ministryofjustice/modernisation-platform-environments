@@ -78,7 +78,7 @@ data "aws_iam_policy_document" "rds_native_backup_s3_kms" {
 
     actions = [
       "s3:GetObject",
-      "s3.GetObjectAttributes",
+      "s3:GetObjectAttributes",
       "s3:PutObject",
       "s3:ListMultipartUploadParts",
       "s3:AbortMultipartUpload"
