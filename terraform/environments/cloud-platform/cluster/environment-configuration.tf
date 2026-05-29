@@ -7,7 +7,7 @@ locals {
       /* Addons */
       eks_cluster_addon_versions = {
         kube_proxy             = "v1.34.2-eksbuild.1"
-        vpc_cni                = "v1.20.1-eksbuild.1"
+        vpc_cni                = "v1.21.2-eksbuild.2"
         coredns                = "v1.12.2-eksbuild.4"
         eks_pod_identity_agent = "v1.3.8-eksbuild.2"
       }
