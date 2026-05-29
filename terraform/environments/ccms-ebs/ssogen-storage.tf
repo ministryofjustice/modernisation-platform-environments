@@ -1,5 +1,5 @@
 resource "aws_efs_file_system" "storage" {
-  count            = local.is-development || local.is-test ? 1 : 0
+  count            = local.ssogen_enabled ? 1 : 0
   encrypted        = true
   performance_mode = local.application_data.accounts[local.environment].ssogen_efs_performance_mode
   tags = merge(local.tags,
@@ -8,7 +8,7 @@ resource "aws_efs_file_system" "storage" {
 }
 
 resource "aws_efs_mount_target" "mount" {
-  count          = local.is-development || local.is-test ? 1 : 0
+  count          = local.ssogen_enabled ? 1 : 0
   file_system_id = aws_efs_file_system.storage[count.index].id
   subnet_id      = data.aws_subnet.data_subnets_a.id
   security_groups = [
@@ -17,7 +17,7 @@ resource "aws_efs_mount_target" "mount" {
 }
 
 resource "aws_efs_mount_target" "mount_B" {
-  count          = local.is-development || local.is-test ? 1 : 0
+  count          = local.ssogen_enabled ? 1 : 0
   file_system_id = aws_efs_file_system.storage[count.index].id
   subnet_id      = data.aws_subnet.data_subnets_b.id
   security_groups = [
@@ -26,7 +26,7 @@ resource "aws_efs_mount_target" "mount_B" {
 }
 
 resource "aws_efs_mount_target" "mount_C" {
-  count          = local.is-development || local.is-test ? 1 : 0
+  count          = local.ssogen_enabled ? 1 : 0
   file_system_id = aws_efs_file_system.storage[count.index].id
   subnet_id      = data.aws_subnet.data_subnets_c.id
   security_groups = [

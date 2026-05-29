@@ -2,7 +2,7 @@
 # SSM Details for SSOGEN
 # ######################################
 resource "aws_cloudwatch_log_group" "ssogen_groups" {
-  for_each          = local.is-development || local.is-test ? local.application_data.ssogen_cw_log_groups : {}
+  for_each          = local.ssogen_enabled ? local.application_data.ssogen_cw_log_groups : {}
   name              = each.key
   retention_in_days = each.value.retention_days
 
@@ -15,7 +15,7 @@ resource "aws_cloudwatch_log_group" "ssogen_groups" {
 }
 
 resource "aws_ssm_parameter" "ssogen_cw_agent_config" {
-  count       = local.is-development || local.is-test ? 1 : 0
+  count       = local.ssogen_enabled ? 1 : 0
   description = "SSOGEN cloud watch agent config"
   name        = "ssogen-cloud-watch-config"
   type        = "String"
@@ -27,7 +27,7 @@ resource "aws_ssm_parameter" "ssogen_cw_agent_config" {
 }
 
 resource "aws_iam_role_policy_attachment" "ssogen_cloudwatch_datasource_policy_attach" {
-  count      = local.is-development || local.is-test ? 1 : 0
+  count      = local.ssogen_enabled ? 1 : 0
   policy_arn = aws_iam_policy.cloudwatch_datasource_policy.arn
   role       = aws_iam_role.ssogen_ec2[count.index].name
 
@@ -38,7 +38,7 @@ resource "aws_iam_role_policy_attachment" "ssogen_cloudwatch_datasource_policy_a
 # ######################################
 # Alarm for ALB 5xx Errors
 resource "aws_cloudwatch_metric_alarm" "alb_ssogen_5xx" {
-  count               = local.is-development || local.is-test ? 1 : 0
+  count               = local.ssogen_enabled ? 1 : 0
   alarm_name          = "${local.application_name_ssogen}-${local.environment}-5xx-errors"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 3
@@ -60,7 +60,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_ssogen_5xx" {
 
 # Alarm for ALB 5xx Errors
 resource "aws_cloudwatch_metric_alarm" "alb_ssogen_console_5xx" {
-  count               = local.is-development || local.is-test ? 1 : 0
+  count               = local.ssogen_enabled ? 1 : 0
   alarm_name          = "${local.application_name_ssogen}-console-${local.environment}-5xx-errors"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 3
@@ -82,7 +82,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_ssogen_console_5xx" {
 
 # Underlying EC2 Instance Status Check Failure for Primary ASG
 resource "aws_cloudwatch_metric_alarm" "Primary_Status_Check_Failure" {
-  count               = local.is-development || local.is-test ? 1 : 0
+  count               = local.ssogen_enabled ? 1 : 0
   alarm_name          = "${local.application_name_ssogen}-${local.environment}-ec2-primary-status-check-failure"
   alarm_description   = "A ssogen EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -104,7 +104,7 @@ resource "aws_cloudwatch_metric_alarm" "Primary_Status_Check_Failure" {
 
 # Underlying EC2 Instance Status Check Failure
 resource "aws_cloudwatch_metric_alarm" "Secondary_Status_Check_Failure" {
-  count               = local.is-development || local.is-test ? 1 : 0
+  count               = local.ssogen_enabled ? 1 : 0
   alarm_name          = "${local.application_name_ssogen}-${local.environment}-ec2-secondary-status-check-failure"
   alarm_description   = "A ssogen EC2 instance has failed a status check, Runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -126,7 +126,7 @@ resource "aws_cloudwatch_metric_alarm" "Secondary_Status_Check_Failure" {
 
 # Underlying waf Instance Status Check Failure
 resource "aws_cloudwatch_metric_alarm" "ssogen_waf_high_blocked_requests" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count             = local.ssogen_enabled ? 1 : 0
   alarm_name        = "${local.application_name_ssogen}-${local.environment}-waf-high-blocked-requests"
   alarm_description = "High number of requests blocked by WAF. Potential attack."
 
@@ -152,7 +152,7 @@ resource "aws_cloudwatch_metric_alarm" "ssogen_waf_high_blocked_requests" {
 
 # Underlying waf Instance Status Check Failure
 resource "aws_cloudwatch_metric_alarm" "ssogen_console_waf_high_blocked_requests" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count             = local.ssogen_enabled ? 1 : 0
   alarm_name        = "${local.application_name_ssogen}-console-${local.environment}-waf-high-blocked-requests"
   alarm_description = "High number of requests blocked by WAF on console lb. Potential attack."
 
@@ -177,7 +177,7 @@ resource "aws_cloudwatch_metric_alarm" "ssogen_console_waf_high_blocked_requests
 }
 
 resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_app" {
-  count               = local.is-development || local.is-test ? 1 : 0
+  count               = local.ssogen_enabled ? 1 : 0
   alarm_name          = "${local.application_name_ssogen}-${local.environment}-app-alb-targets-group"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = 1
@@ -197,7 +197,7 @@ resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_app" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_admin" {
-  count               = local.is-development || local.is-test ? 1 : 0
+  count               = local.ssogen_enabled ? 1 : 0
   alarm_name          = "${local.application_name_ssogen}-${local.environment}-admin-alb-targets-group"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = 1
@@ -219,7 +219,7 @@ resource "aws_cloudwatch_metric_alarm" "ssogen_alb_healthyhosts_admin" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_temp" {
-  count                     = local.is-development || local.is-test ? 1 : 0
+  count                     = local.ssogen_enabled ? 1 : 0
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-temp"
   alarm_description         = "This metric monitors the amount of free disk space on /tmp mount. If the amount of free disk space falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
@@ -243,7 +243,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_temp" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_fmw" {
-  count                     = local.is-development || local.is-test ? 1 : 0
+  count                     = local.ssogen_enabled ? 1 : 0
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-fmw"
   alarm_description         = "This metric monitors the amount of free disk space on /u01/product/fmw mount. If the amount of free disk space falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
@@ -267,7 +267,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_fmw" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_mserver" {
-  count                     = local.is-development || local.is-test ? 1 : 0
+  count                     = local.ssogen_enabled ? 1 : 0
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 1}-disk_free-mserver"
   alarm_description         = "This metric monitors the amount of free disk space on /u01/product/runtime/Domain/mserver mount. If the amount of free disk space falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
@@ -291,7 +291,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_mserver" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_temp2" {
-  count                     = local.is-development || local.is-test ? 1 : 0
+  count                     = local.ssogen_enabled ? 1 : 0
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 2}-disk_free-temp"
   alarm_description         = "This metric monitors the amount of free disk space on /tmp mount. If the amount of free disk space falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
@@ -315,7 +315,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_temp2" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_fmw2" {
-  count                     = local.is-development || local.is-test ? 1 : 0
+  count                     = local.ssogen_enabled ? 1 : 0
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 2}-disk_free-fmw"
   alarm_description         = "This metric monitors the amount of free disk space on /u01/product/fmw mount. If the amount of free disk space falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
@@ -339,7 +339,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_fmw2" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "disk_free_ssogen_mserver2" {
-  count                     = local.is-development || local.is-test ? 1 : 0
+  count                     = local.ssogen_enabled ? 1 : 0
   alarm_name                = "${local.application_data.accounts[local.environment].short_env}-ssogen${count.index + 2}-disk_free-mserver"
   alarm_description         = "This metric monitors the amount of free disk space on /u01/product/runtime/Domain/mserver mount. If the amount of free disk space falls below 20% for 2 minutes, the alarm will trigger"
   comparison_operator       = "GreaterThanOrEqualToThreshold"

@@ -1,5 +1,5 @@
 resource "aws_lb" "ssogen_alb" {
-  count              = local.is-development || local.is-test ? 1 : 0
+  count              = local.ssogen_enabled ? 1 : 0
   name               = lower(format("lb-%s-internal", local.application_name_ssogen))
   internal           = true
   load_balancer_type = "application"
@@ -21,7 +21,7 @@ resource "aws_lb" "ssogen_alb" {
 }
 
 resource "aws_lb" "ssogen_alb_console" {
-  count              = local.is-development || local.is-test ? 1 : 0
+  count              = local.ssogen_enabled ? 1 : 0
   name               = lower(format("lb-console-%s-internal", local.application_name_ssogen))
   internal           = true
   load_balancer_type = "application"
@@ -43,7 +43,7 @@ resource "aws_lb" "ssogen_alb_console" {
 }
 
 # resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_enc_console" {
-#   count       = local.is-development || local.is-test ? 1 : 0
+#   count       = local.ssogen_enabled ? 1 : 0
 #   name        = lower(format("tg-%s-console-enc", local.application_name_ssogen))
 #   port        = "4443"
 #   protocol    = "HTTPS"
@@ -69,7 +69,7 @@ resource "aws_lb" "ssogen_alb_console" {
 # }
 
 resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_enc_app" {
-  count       = local.is-development || local.is-test ? 1 : 0
+  count       = local.ssogen_enabled ? 1 : 0
   name        = lower(format("tg-%s-enc-app", local.application_name_ssogen))
   port        = local.application_data.accounts[local.environment].tg_ssogen_apps_enc_port
   protocol    = "HTTPS"
@@ -95,7 +95,7 @@ resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_enc_app" {
 }
 
 # resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_enc_app" {
-#   count       = local.is-development || local.is-test ? 1 : 0
+#   count       = local.ssogen_enabled ? 1 : 0
 #   name        = lower(format("tg-%s-enc-app", local.application_name_ssogen))
 #   port        = local.application_data.accounts[local.environment].tg_ssogen_apps_enc_port
 #   protocol    = "HTTPS"
@@ -120,7 +120,7 @@ resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_enc_app" {
 #   # }
 # }
 resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_console" {
-  count       = local.is-development || local.is-test ? 1 : 0
+  count       = local.ssogen_enabled ? 1 : 0
   name        = lower(format("tg-%s-console", local.application_name_ssogen))
   port        = local.application_data.accounts[local.environment].tg_ssogen_admin_enc_port
   protocol    = "HTTPS"
@@ -140,7 +140,7 @@ resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_console" {
 }
 
 resource "aws_lb_listener" "ssogen_internal_app_listener" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count             = local.ssogen_enabled ? 1 : 0
   load_balancer_arn = aws_lb.ssogen_alb[count.index].arn
   port              = "443"
   protocol          = "HTTPS"
@@ -170,7 +170,7 @@ resource "aws_lb_listener" "ssogen_internal_app_listener" {
 }
 
 # resource "aws_lb_listener" "ssogen_internal_console_listener_encrypted" {
-#   count             = local.is-development || local.is-test ? 1 : 0
+#   count             = local.ssogen_enabled ? 1 : 0
 #   load_balancer_arn = aws_lb.ssogen_alb[count.index].arn
 #   port              = "5443"
 #   protocol          = "HTTPS"
@@ -200,7 +200,7 @@ resource "aws_lb_listener" "ssogen_internal_app_listener" {
 # }
 
 resource "aws_lb_listener" "ssogen_internal_console_listener" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count             = local.ssogen_enabled ? 1 : 0
   load_balancer_arn = aws_lb.ssogen_alb_console[count.index].arn
   port              = "443"
   protocol          = "HTTPS"
@@ -216,7 +216,7 @@ resource "aws_lb_listener" "ssogen_internal_console_listener" {
 }
 
 # resource "aws_lb_listener_rule" "ssogen_internal_console_listener_encrypted" {
-#   count        = local.is-development || local.is-test ? 1 : 0
+#   count        = local.ssogen_enabled ? 1 : 0
 #   listener_arn = aws_lb_listener.ssogen_internal_app_listener[count.index].arn
 #   priority     = 10
 

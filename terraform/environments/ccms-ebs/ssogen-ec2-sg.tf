@@ -2,7 +2,7 @@
 # Security Group (no inline rules) — dev only
 ############################################
 resource "aws_security_group" "ssogen_sg" {
-  count       = local.is-development || local.is-test ? 1 : 0
+  count       = local.ssogen_enabled ? 1 : 0
   name        = "ssogen-sg-${local.environment}"
   description = "Security group for SSOGEN EC2 (WebLogic + OHS)"
   vpc_id      = data.aws_vpc.shared.id
@@ -16,7 +16,7 @@ resource "aws_security_group" "ssogen_sg" {
 # # INGRESS — 7001 from Lambda (private)
 # ############################################
 # resource "aws_vpc_security_group_ingress_rule" "ing_console_lambda" {
-#   count             = local.is-development || local.is-test ? 1 : 0
+#   count             = local.ssogen_enabled ? 1 : 0
 #   ip_protocol       = "tcp"
 #   description       = "admin port from Lambda SG"
 #   security_group_id = aws_security_group.ssogen_sg[count.index].id
@@ -29,7 +29,7 @@ resource "aws_security_group" "ssogen_sg" {
 # # INGRESS — 7001 from WorkSpaces subnets (private)
 # ############################################
 resource "aws_vpc_security_group_ingress_rule" "ing_console_workspaces" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count             = local.ssogen_enabled ? 1 : 0
   ip_protocol       = "tcp"
   description       = "7001 from WorkSpaces subnets"
   security_group_id = aws_security_group.ssogen_sg[count.index].id
@@ -46,7 +46,7 @@ resource "aws_vpc_security_group_ingress_rule" "ing_console_workspaces" {
 # # TEMP INGRESS — 4443 from WorkSpaces subnets (private)
 # ############################################
 resource "aws_vpc_security_group_ingress_rule" "ing_4443_workspaces" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count             = local.ssogen_enabled ? 1 : 0
   ip_protocol       = "tcp"
   description       = "4443 from WorkSpaces subnets"
   security_group_id = aws_security_group.ssogen_sg[count.index].id
@@ -63,7 +63,7 @@ resource "aws_vpc_security_group_ingress_rule" "ing_4443_workspaces" {
 # # TEMP INGRESS — 6443 from WorkSpaces subnets (private)
 # ############################################
 resource "aws_vpc_security_group_ingress_rule" "ing_6443_workspaces" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count             = local.ssogen_enabled ? 1 : 0
   ip_protocol       = "tcp"
   description       = "6443 from WorkSpaces subnets"
   security_group_id = aws_security_group.ssogen_sg[count.index].id
@@ -80,7 +80,7 @@ resource "aws_vpc_security_group_ingress_rule" "ing_6443_workspaces" {
 # # TEMP INGRESS — 7777 from WorkSpaces subnets (private)
 # ############################################
 resource "aws_vpc_security_group_ingress_rule" "ing_7777_workspaces" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count             = local.ssogen_enabled ? 1 : 0
   ip_protocol       = "tcp"
   description       = "7777 from WorkSpaces subnets"
   security_group_id = aws_security_group.ssogen_sg[count.index].id
@@ -97,7 +97,7 @@ resource "aws_vpc_security_group_ingress_rule" "ing_7777_workspaces" {
 # # INGRESS — 7001 within ec2 instances
 # ############################################
 resource "aws_vpc_security_group_ingress_rule" "ing_console_ec2" {
-  count                        = local.is-development || local.is-test ? 1 : 0
+  count                        = local.ssogen_enabled ? 1 : 0
   ip_protocol                  = "tcp"
   description                  = "7001 from EC2 instances"
   security_group_id            = aws_security_group.ssogen_sg[count.index].id
@@ -110,7 +110,7 @@ resource "aws_vpc_security_group_ingress_rule" "ing_console_ec2" {
 # # INGRESS — 7003 within ec2 instances
 # ############################################
 resource "aws_vpc_security_group_ingress_rule" "ing_console_ec2_7003" {
-  count                        = local.is-development || local.is-test ? 1 : 0
+  count                        = local.ssogen_enabled ? 1 : 0
   ip_protocol                  = "tcp"
   description                  = "7003 from EC2 instances"
   security_group_id            = aws_security_group.ssogen_sg[count.index].id
@@ -122,7 +122,7 @@ resource "aws_vpc_security_group_ingress_rule" "ing_console_ec2_7003" {
 # # INGRESS — SSH (22) from WorkSpaces subnets (private)
 # ############################################
 resource "aws_vpc_security_group_ingress_rule" "ing_ssh_workspaces" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count             = local.ssogen_enabled ? 1 : 0
   ip_protocol       = "tcp"
   description       = "SSH from WorkSpaces subnets"
   security_group_id = aws_security_group.ssogen_sg[count.index].id
@@ -140,7 +140,7 @@ resource "aws_vpc_security_group_ingress_rule" "ing_ssh_workspaces" {
 # #########################################
 
 resource "aws_vpc_security_group_egress_rule" "from_ec2_to_ec2" {
-  count                        = local.is-development || local.is-test ? 1 : 0
+  count                        = local.ssogen_enabled ? 1 : 0
   security_group_id            = aws_security_group.ssogen_sg[count.index].id
   description                  = "Allow outbound to EC2 (self)"
   from_port                    = 7001
@@ -154,7 +154,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_ec2" {
 # #########################################
 
 resource "aws_vpc_security_group_egress_rule" "from_ec2_to_ec2_7003" {
-  count                        = local.is-development || local.is-test ? 1 : 0
+  count                        = local.ssogen_enabled ? 1 : 0
   security_group_id            = aws_security_group.ssogen_sg[count.index].id
   description                  = "Allow outbound to EC2 (self)"
   from_port                    = 7003
@@ -168,7 +168,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_ec2_7003" {
 # #########################################
 
 resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
-  count                        = local.is-development || local.is-test ? 1 : 0
+  count                        = local.ssogen_enabled ? 1 : 0
   security_group_id            = aws_security_group.ssogen_sg[count.index].id
   description                  = "Allow outbound to RDS"
   from_port                    = local.application_data.accounts[local.environment].tg_db_port
@@ -182,7 +182,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_rds" {
 # #########################################
 
 resource "aws_vpc_security_group_egress_rule" "from_ec2_to_ssm" {
-  count             = local.is-development || local.is-test ? 1 : 0
+  count             = local.ssogen_enabled ? 1 : 0
   security_group_id = aws_security_group.ssogen_sg[count.index].id
   description       = "Allow outbound to SSM"
   from_port         = 443
@@ -196,7 +196,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_ssm" {
 # #########################################
 
 resource "aws_vpc_security_group_egress_rule" "from_ec2_to_efs" {
-  count                        = local.is-development || local.is-test ? 1 : 0
+  count                        = local.ssogen_enabled ? 1 : 0
   security_group_id            = aws_security_group.ssogen_sg[count.index].id
   description                  = "Allow outbound to EFS"
   from_port                    = 2049
@@ -442,7 +442,7 @@ resource "aws_vpc_security_group_egress_rule" "from_ec2_to_efs" {
 # #########################################
 
 resource "aws_vpc_security_group_ingress_rule" "ing_7777_from_alb" {
-  count                        = local.is-development || local.is-test ? 1 : 0
+  count                        = local.ssogen_enabled ? 1 : 0
   security_group_id            = aws_security_group.ssogen_sg[0].id
   description                  = "Allow inbound HTTPS (7777) from SSOGEN internal ALB"
   from_port                    = 7777
@@ -456,7 +456,7 @@ resource "aws_vpc_security_group_ingress_rule" "ing_7777_from_alb" {
 # #########################################
 
 resource "aws_vpc_security_group_ingress_rule" "ing_4443_from_alb" {
-  count                        = local.is-development || local.is-test ? 1 : 0
+  count                        = local.ssogen_enabled ? 1 : 0
   security_group_id            = aws_security_group.ssogen_sg[0].id
   description                  = "Allow inbound HTTPS (4443) from SSOGEN internal ALB"
   from_port                    = 4443
@@ -469,7 +469,7 @@ resource "aws_vpc_security_group_ingress_rule" "ing_4443_from_alb" {
 # #########################################
 
 resource "aws_vpc_security_group_ingress_rule" "ing_7001_from_alb" {
-  count                        = local.is-development || local.is-test ? 1 : 0
+  count                        = local.ssogen_enabled ? 1 : 0
   security_group_id            = aws_security_group.ssogen_sg[0].id
   description                  = "Allow inbound HTTPS (7001) from SSOGEN internal ALB"
   from_port                    = 7001
