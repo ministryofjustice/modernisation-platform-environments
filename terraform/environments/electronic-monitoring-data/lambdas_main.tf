@@ -806,6 +806,34 @@ module "create_p1_export" {
 }
 
 #-----------------------------------------------------------------------------------
+# Update P1 Export
+#-----------------------------------------------------------------------------------
+
+module "update_p1_export" {
+  count = local.is-development || local.is-preproduction ? 1 : 0
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "update_p1_export"
+  role_name                      = module.update_p1_export_iam_role[0].name
+  role_arn                       = module.update_p1_export_iam_role[0].arn
+  memory_size                    = 512
+  timeout                        = 300
+  reserved_concurrent_executions = 2
+
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
+  }
+
+}
+
+#-----------------------------------------------------------------------------------
 # Staging DB janitor
 #-----------------------------------------------------------------------------------
 
@@ -1019,6 +1047,7 @@ module "specials-ingestion" {
 #-----------------------------------------------------------------------------------
 
 module "gdpr_unstructured_control_lambda" {
+  count                   = local.is-test ? 0 : 1
   source                  = "./modules/lambdas"
   is_image                = true
   function_name           = "gdpr_unstructured_control_lambda"
