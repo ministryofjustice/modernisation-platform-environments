@@ -3,8 +3,8 @@ locals {
   environment_configurations = {
     development = {
       litellm_versions = {
-        application = "1.84.0-rc.1"
-        chart       = "1.84.0-rc.1"
+        application = "1.86.2"
+        chart       = "1.86.2"
       }
       llm_gateway_hostname = "llm-gateway.development.data-platform.service.justice.gov.uk"
       llm_gateway_ingress_allowlist = [
