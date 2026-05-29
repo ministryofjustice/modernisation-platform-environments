@@ -11,8 +11,8 @@ locals {
     ]
     development = {
       litellm_versions = {
-        application = "v1.85.0"
-        chart       = "1.85.0"
+        application = "1.86.2"
+        chart       = "1.86.2"
       }
       ai_gateway_hostname = "development.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
@@ -52,8 +52,8 @@ locals {
     }
     test = {
       litellm_versions = {
-        application = "v1.85.0"
-        chart       = "1.85.0"
+        application = "1.86.2"
+        chart       = "1.86.2"
       }
       ai_gateway_hostname = "test.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
@@ -95,8 +95,8 @@ locals {
     }
     preproduction = {
       litellm_versions = {
-        application = "v1.85.0"
-        chart       = "1.85.0"
+        application = "1.86.2"
+        chart       = "1.86.2"
       }
       ai_gateway_hostname = "preproduction.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
@@ -136,8 +136,8 @@ locals {
     }
     production = {
       litellm_versions = {
-        application = "v1.85.0"
-        chart       = "1.85.0"
+        application = "1.86.2"
+        chart       = "1.86.2"
       }
       ai_gateway_hostname = "ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
