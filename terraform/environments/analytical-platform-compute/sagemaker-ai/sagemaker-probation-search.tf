@@ -79,7 +79,7 @@ resource "aws_sagemaker_model" "probation_search_huggingface_embedding_model" {
 
   for_each = tomap(local.probation_search_environment)
 
-  execution_role_arn       = module.probation_search_sagemaker_execution_iam_role[each.key].iam_role_arn
+  execution_role_arn       = module.probation_search_sagemaker_execution_iam_role[each.key].arn
   enable_network_isolation = can(each.value.s3_model_key)
   primary_container {
     image       = data.aws_sagemaker_prebuilt_ecr_image.probation_search_huggingface_embedding_image[each.key].registry_path
@@ -171,19 +171,27 @@ module "probation_search_sagemaker_execution_iam_role" {
 
   for_each = tomap(local.probation_search_environment)
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.55.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.6.0"
 
-  create_role = true
 
-  role_name         = "${each.value.namespace}-sagemaker-exec-role"
-  role_requires_mfa = false
+  name            = "${each.value.namespace}-sagemaker-exec-role"
+  use_name_prefix = false
+  trust_policy_permissions = {
+    SagemakerExecutionRole = {
+      actions = ["sts:AssumeRole", "sts:TagSession"]
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["sagemaker.amazonaws.com"]
+        }
+      ]
+    }
+  }
 
-  trusted_role_services = ["sagemaker.amazonaws.com"]
-
-  inline_policy_statements = [
-    {
-      sid    = "CloudWatchAccess"
+  create_inline_policy = true
+  inline_policy_permissions = {
+    CloudWatchAccess = {
       effect = "Allow"
       actions = [
         "cloudwatch:PutMetricData",
@@ -193,29 +201,27 @@ module "probation_search_sagemaker_execution_iam_role" {
         "logs:PutLogEvents",
       ]
       resources = ["*"]
-    },
-    {
-      sid    = "KMSAccess"
+    }
+    KMSAccess = {
       effect = "Allow"
       actions = [
         "kms:Decrypt",
         "kms:GenerateDataKey"
       ]
       resources = [local.probation_search_model_kms_arn]
-    },
-    {
-      sid       = "S3BucketAccess"
+    }
+    S3BucketAccess = {
       effect    = "Allow"
       actions   = ["s3:ListBucket"]
       resources = ["arn:aws:s3:::${local.probation_search_model_bucket_name}"]
-    },
-    {
+    }
+    S3ObjectAccess = {
       sid       = "S3ObjectAccess"
       effect    = "Allow"
       actions   = ["s3:GetObject"]
       resources = ["arn:aws:s3:::${local.probation_search_model_bucket_name}/*"]
     }
-  ]
+  }
 
   tags = local.tags
 }
@@ -226,19 +232,28 @@ module "probation_search_sagemaker_invocation_iam_role" {
 
   for_each = tomap(local.probation_search_environment)
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.55.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.6.0"
 
-  create_role = true
 
-  role_name         = "${each.value.namespace}-sagemaker-role"
-  role_requires_mfa = false
 
-  trusted_role_arns = ["arn:aws:iam::754256621582:role/${each.value.namespace}-xa-opensearch-to-sagemaker"]
+  name = "${each.value.namespace}-sagemaker-role"
 
-  inline_policy_statements = [
-    {
-      sid    = "SageMakerAccess"
+  use_name_prefix = false
+  trust_policy_permissions = {
+    SagemakerExecutionRole = {
+      actions = ["sts:AssumeRole", "sts:TagSession"]
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["arn:aws:iam::754256621582:role/${each.value.namespace}-xa-opensearch-to-sagemaker"]
+        }
+      ]
+    }
+  }
+  create_inline_policy = true
+  inline_policy_permissions = {
+    SageMakerAccess = {
       effect = "Allow"
       actions = [
         "sagemaker:InvokeEndpoint",
@@ -246,7 +261,7 @@ module "probation_search_sagemaker_invocation_iam_role" {
       ]
       resources = [aws_sagemaker_endpoint.probation_search[each.key].arn]
     }
-  ]
+  }
 
   tags = local.tags
 }
