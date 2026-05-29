@@ -28,7 +28,7 @@ resource "helm_release" "litellm" {
       "${path.module}/src/helm/values/litellm/values.yml.tftpl",
       {
         # Kubernetes
-        namespace          = "${local.component_name}"
+        namespace          = local.component_name
         imageRepository    = "ghcr.io/berriai/litellm-non_root"
         imageTag           = local.environment_configuration.litellm_versions.application
         serviceAccountName = "litellm"
@@ -91,7 +91,7 @@ resource "helm_release" "litellm_admin" {
       "${path.module}/src/helm/values/litellm-admin/values.yml.tftpl",
       {
         # Kubernetes
-        namespace          = "${local.component_name}"
+        namespace          = local.component_name
         imageRepository    = "ghcr.io/berriai/litellm-non_root"
         imageTag           = local.environment_configuration.litellm_versions.application
         serviceAccountName = "litellm"
