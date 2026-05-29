@@ -79,8 +79,9 @@ module "analytical_platform_lake_formation_share_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.59.0"
+  source      = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version     = "6.6.0"
+  description = "IAM Policy"
 
   name_prefix = "analytical-platform-lake-formation-sharing-policy"
 
@@ -127,9 +128,10 @@ module "data_production_mojap_derived_bucket_lake_formation_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.59.0"
+  version = "6.6.0"
 
   name_prefix = "analytical-platform-data-bucket-lake-formation-policy"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.data_production_mojap_derived_bucket_lake_formation_policy.json
 
@@ -232,9 +234,10 @@ module "copy_apdp_cadet_metadata_to_compute_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.59.0"
+  version = "6.6.0"
 
   name_prefix = "copy-apdp-cadet-metadata-to-compute-"
+  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.copy_apdp_cadet_metadata_to_compute_policy.json
 
