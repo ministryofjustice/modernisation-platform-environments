@@ -435,7 +435,7 @@ resource "aws_lambda_event_source_mapping" "p1_creation_trigger" {
 # --------------------------------------------------------
 
 resource "aws_lambda_permission" "update_p1_export_api_gw" {
-  count = local.is-development ? 1 : 0
+  count = local.is-development || local.is-preproduction ? 1 : 0
   statement_id  = "AllowAPIGatewayInvokeUpdateP1Export"
   action        = "lambda:InvokeFunction"
   function_name = module.update_p1_export[0].lambda_function_name
