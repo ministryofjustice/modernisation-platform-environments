@@ -1,7 +1,7 @@
 locals {
   source_db_identifier           = "db-chaps-dev"
-  native_backup_option_group     = "chaps-dev-sqlserver-native-backup"
-  mp_rds_native_backup_role_name = "chaps-dev-rds-native-backup"
+  native_backup_option_group     = "chaps-${local.environment}-sqlserver-native-backup"
+  mp_rds_native_backup_role_name = "chaps-${local.environment}-rds-native-backup"
 }
 
 data "aws_iam_policy_document" "rds_native_backup_assume_role" {
@@ -106,7 +106,7 @@ data "aws_iam_policy_document" "rds_native_backup_s3_kms" {
 }
 
 resource "aws_iam_policy" "rds_native_backup_s3_kms" {
-  name   = "chaps-prod-rds-native-backup-s3-kms"
+  name   = "chaps-dev-rds-native-backup-s3-kms"
   policy = data.aws_iam_policy_document.rds_native_backup_s3_kms.json
 }
 

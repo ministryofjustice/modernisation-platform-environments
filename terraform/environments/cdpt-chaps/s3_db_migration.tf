@@ -67,7 +67,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "db_migration" {
   bucket = aws_s3_bucket.db_migration.id
 
   rule {
-    id     = "expire-prod-db-migration-backups"
+    id     = "expire-dev-db-migration-backups"
     status = "Enabled"
 
     filter {
