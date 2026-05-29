@@ -5,7 +5,7 @@ module "rds" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
   source  = "terraform-aws-modules/rds/aws"
-  version = "6.12.0"
+  version = "7.2.0"
 
   identifier = local.component_name
 
@@ -25,7 +25,8 @@ module "rds" {
   username                    = local.db_dbuser
   db_name                     = local.db_dbname
   manage_master_user_password = false
-  password                    = random_password.rds[0].result
+  password_wo                 = random_password.rds[0].result
+  password_wo_version         = 1
   kms_key_id                  = module.rds_kms[0].key_arn
 
   parameters = [
