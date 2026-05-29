@@ -2559,16 +2559,19 @@ resource "aws_iam_role" "gdpr_unstructured_control_lambda_iam_role" {
 }
 
 resource "aws_iam_policy" "gdpr_unstructured_control_lambda_iam_policy" {
+  count  = local.is-test ? 0 : 1
   name   = "gdpr_unstructured_control_lambda_policy"
   policy = data.aws_iam_policy_document.gdpr_unstructured_control_lambda_iam_role_policy_document[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "gdpr_unstructured_control_lambda_iam_role_attach" {
+  count      = local.is-test ? 0 : 1
   role       = aws_iam_role.gdpr_unstructured_control_lambda_iam_role[0].name
-  policy_arn = aws_iam_policy.gdpr_unstructured_control_lambda_iam_policy.arn
+  policy_arn = aws_iam_policy.gdpr_unstructured_control_lambda_iam_policy[0].arn
 }
 
 module "share_dbs_with_control_lambda_role" {
+  count                   = local.is-test ? 0 : 1
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = toset(local.historic_source_dbs)
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
