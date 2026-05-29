@@ -71,7 +71,7 @@ resource "aws_ecs_service" "ecs_connector_service" {
 
   lifecycle {
     ignore_changes = [
-      task_definition
+      # task_definition
     ]
   }
 
