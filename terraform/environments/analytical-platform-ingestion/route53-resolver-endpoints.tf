@@ -8,6 +8,7 @@ module "connected_vpc_outbound_route53_resolver_endpoint" {
   vpc_id    = module.connected_vpc.vpc_id
   direction = "OUTBOUND"
   protocols = ["Do53"]
+  security_group_use_name_prefix = false
 
   ip_address = [
     {
