@@ -12,7 +12,7 @@ resource "helm_release" "mlflow" {
       "${path.module}/src/helm/values/mlflow/values.yml.tftpl",
       {
         mlflow_hostname = "mlflow.${local.environment_configuration.route53_zone}"
-        eks_role_arn    = module.mlflow_iam_role[0].iam_role_arn
+        eks_role_arn    = module.mlflow_iam_role[0].arn
         s3_bucket_name  = local.environment_configuration.mlflow_s3_bucket_name
       }
     )

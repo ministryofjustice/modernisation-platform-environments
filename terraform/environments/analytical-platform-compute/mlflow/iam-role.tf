@@ -4,12 +4,13 @@ module "mlflow_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.59.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
+  version = "6.6.0"
 
-  role_name_prefix = "mlflow"
+  name            = "mlflow"
+  use_name_prefix = false
 
-  role_policy_arns = {
+  policies = {
     MlflowPolicy = module.mlflow_iam_policy[0].arn
   }
 
