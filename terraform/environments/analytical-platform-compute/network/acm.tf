@@ -5,7 +5,7 @@ module "acm_certificate" {
   source  = "terraform-aws-modules/acm/aws"
   version = "6.3.0"
 
-  zone_id                   = module.route53_zone.id[local.environment_configuration.route53_zone]
+  zone_id                   = module.route53_zone.id
   domain_name               = local.environment_configuration.route53_zone
   subject_alternative_names = ["*.${local.environment_configuration.route53_zone}"]
 
