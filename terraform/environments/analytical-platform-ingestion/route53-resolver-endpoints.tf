@@ -19,19 +19,19 @@ module "connected_vpc_outbound_route53_resolver_endpoint" {
   ]
 
   security_group_ingress_rules = {
-  connected_vpc =  {
-   cidr_ipv4 = module.connected_vpc.vpc_cidr_block
+    connected_vpc = {
+      cidr_ipv4 = module.connected_vpc.vpc_cidr_block
+    }
   }
-}
 
   security_group_egress_rules = {
     /* MoJO DNS Resolver Service */
     moj_service_resolver1 = {
-     cidr_ipv4 = "10.180.80.5/32"
+      cidr_ipv4 = "10.180.80.5/32"
     }
     moj_service_resolver2 = {
-    cidr_ipv4 = "10.180.81.5/32"
-  }
+      cidr_ipv4 = "10.180.81.5/32"
+    }
   }
 
   tags = local.tags
