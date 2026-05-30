@@ -62,7 +62,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "ram:CreateResourceShare",
       "ram:DeleteResourceShare"
     ]
-    resources = ["arn:aws:ram:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:resource-share/*"]
+    resources = ["arn:aws:ram:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:resource-share/*"]
   }
   statement {
     effect = "Allow"
@@ -117,8 +117,8 @@ data "aws_iam_policy_document" "data_production_mojap_derived_bucket_lake_format
       "logs:PutLogEvents"
     ]
     resources = [
-      "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws-lakeformation-acceleration/*",
-      "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws-lakeformation-acceleration/*:log-stream:*"
+      "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws-lakeformation-acceleration/*",
+      "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws-lakeformation-acceleration/*:log-stream:*"
     ]
   }
 }
