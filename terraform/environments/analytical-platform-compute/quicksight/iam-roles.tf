@@ -2,16 +2,29 @@ module "quicksight_vpc_connection_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.59.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.6.0"
 
-  create_role       = true
-  role_name_prefix  = "quicksight-vpc-connection"
-  role_requires_mfa = false
+  name  = "quicksight-vpc-connection"
+  use_name_prefix = false
 
-  trusted_role_services = ["quicksight.amazonaws.com"]
+  trust_policy_permissions = {
+    QuickSightExecutionRole = {
+      actions = ["sts:AssumeRole", "sts:TagSession"]
+      principals = [
+        {
+          type = "Service"
+          identifiers = [
+            "quicksight.amazonaws.com"
+          ]
+        }
+      ]
+    }
+  }
 
-  custom_role_policy_arns = [module.quicksight_vpc_connection_iam_policy.arn]
+  policies = {
+    quicksight_vpc_connection_iam_policy = module.quicksight_vpc_connection_iam_policy.arn
+  }
 
   tags = local.tags
 }
