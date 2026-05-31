@@ -44,7 +44,7 @@ module "tariff_eventbridge_dms_full_load_task_role" {
           identifiers = ["scheduler.amazonaws.com", "apidestinations.events.amazonaws.com"]
         }
       ]
-      conditions = [
+      condition = [
         {
           test     = "StringEquals"
           variable = "aws:SourceAccount"
@@ -58,8 +58,9 @@ module "tariff_eventbridge_dms_full_load_task_role" {
           ]
         }
       ]
-    }
-  }
+  } }
+
+
   policies = {
     tariff_eventbridge_dms_full_load_task_policy = module.tariff_eventbridge_dms_full_load_task_policy.arn
   }
@@ -84,7 +85,7 @@ module "tempus_eventbridge_dms_full_load_task_role" {
           identifiers = ["scheduler.amazonaws.com", "apidestinations.events.amazonaws.com"]
         }
       ]
-      conditions = [
+      condition = [
         {
           test     = "StringEquals"
           variable = "aws:SourceAccount"
