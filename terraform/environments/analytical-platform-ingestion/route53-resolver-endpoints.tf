@@ -22,6 +22,7 @@ module "connected_vpc_outbound_route53_resolver_endpoint" {
   security_group_ingress_rules = {
     connected_vpc = {
       cidr_ipv4 = module.connected_vpc.vpc_cidr_block
+      description = "Allow VPC range"
     }
   }
 
@@ -29,9 +30,11 @@ module "connected_vpc_outbound_route53_resolver_endpoint" {
     /* MoJO DNS Resolver Service */
     moj_service_resolver1 = {
       cidr_ipv4 = "10.180.80.5/32"
+      description = "Allow MoJ service resolver1"
     }
     moj_service_resolver2 = {
       cidr_ipv4 = "10.180.81.5/32"
+      description = "Allow MoJ service resolver2"
     }
   }
 

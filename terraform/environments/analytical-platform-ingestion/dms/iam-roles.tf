@@ -60,7 +60,7 @@ module "tariff_eventbridge_dms_full_load_task_role" {
       ]
     }
   }
-  policy = {
+  policies = {
     tariff_eventbridge_dms_full_load_task_policy = module.tariff_eventbridge_dms_full_load_task_policy.arn
   }
 }

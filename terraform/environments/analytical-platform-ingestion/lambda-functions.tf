@@ -17,6 +17,7 @@ module "definition_upload_lambda" {
   vpc_subnet_ids         = module.isolated_vpc.private_subnets
   vpc_security_group_ids = [module.definition_upload_lambda_security_group.security_group_id]
   attach_network_policy  = true
+  ignore_source_code_hash = true
 
   environment_variables = {
     MODE                         = "definition-upload",
@@ -76,6 +77,7 @@ module "scan_lambda" {
   vpc_subnet_ids         = module.isolated_vpc.private_subnets
   vpc_security_group_ids = [module.scan_lambda_security_group.security_group_id]
   attach_network_policy  = true
+  ignore_source_code_hash = true
 
   environment_variables = {
     MODE                         = "scan",
@@ -152,6 +154,7 @@ module "transfer_lambda" {
   vpc_subnet_ids         = module.isolated_vpc.private_subnets
   vpc_security_group_ids = [module.transfer_lambda_security_group.security_group_id]
   attach_network_policy  = true
+  ignore_source_code_hash = true
 
   environment_variables = {
     PROCESSED_BUCKET_NAME = module.processed_bucket.s3_bucket_id
@@ -260,6 +263,8 @@ module "notify_quarantined_lambda" {
   vpc_subnet_ids         = module.isolated_vpc.private_subnets
   vpc_security_group_ids = [module.transfer_lambda_security_group.security_group_id]
   attach_network_policy  = true
+  ignore_source_code_hash = true
+
 
   environment_variables = {
     MODE = "quarantined"
@@ -326,6 +331,7 @@ module "notify_transferred_lambda" {
   vpc_subnet_ids         = module.isolated_vpc.private_subnets
   vpc_security_group_ids = [module.transfer_lambda_security_group.security_group_id]
   attach_network_policy  = true
+  ignore_source_code_hash = true
 
   environment_variables = {
     MODE                          = "transferred"
