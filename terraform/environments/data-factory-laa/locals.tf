@@ -1,1 +1,3 @@
-#### This file can be used to store locals specific to the member account ####
+locals {
+  fabric_tenant_id = var.fabric_tenant_id
+}
