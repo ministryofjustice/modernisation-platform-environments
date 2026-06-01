@@ -30,32 +30,24 @@
 locals {
   smtp_import_ids = {
     development = {
-      iam_access_key_id        = "AKIAQMEY6GSHNDPEUVWY"
-      route53_zone_id          = "Z0032141ZAYV8DVWNDDC"
-      route53_zone_name        = "laa-development.modernisation-platform.service.justice.gov.uk"
-      smtp_password_secret_arn = "arn:aws:secretsmanager:eu-west-2:688567291430:secret:postfix/app/APP_DATA_MIGRATION_SMTP_PASSWORD-1vOeLY"
-      smtp_password_version_id = "3ca3977c-0db0-4f9c-a8cb-ca1fa034003d"
+      iam_access_key_id = "AKIAQMEY6GSHNDPEUVWY"
+      route53_zone_id   = "Z0032141ZAYV8DVWNDDC"
+      route53_zone_name = "laa-development.modernisation-platform.service.justice.gov.uk"
     }
     test = {
-      iam_access_key_id        = "AKIA2AUOPBYTMYM46K6A"
-      route53_zone_id          = "Z0321080TDDRIM16INGC"
-      route53_zone_name        = "laa-test.modernisation-platform.service.justice.gov.uk"
-      smtp_password_secret_arn = "arn:aws:secretsmanager:eu-west-2:688567291430:secret:postfix/app/APP_DATA_MIGRATION_SMTP_PASSWORD-1vOeLY"
-      smtp_password_version_id = "terraform-20250117124656938900000001"
+      iam_access_key_id = "AKIA2AUOPBYTMYM46K6A"
+      route53_zone_id   = "Z0321080TDDRIM16INGC"
+      route53_zone_name = "laa-test.modernisation-platform.service.justice.gov.uk"
     }
     preproduction = {
-      iam_access_key_id        = "AKIA4SZHNXXSMCO6OBKO"
-      route53_zone_id          = "Z00513657KO1LCLQ89Z9"
-      route53_zone_name        = "laa-preproduction.modernisation-platform.service.justice.gov.uk"
-      smtp_password_secret_arn = "arn:aws:secretsmanager:eu-west-2:864981728740:secret:postfix/app/APP_DATA_MIGRATION_SMTP_PASSWORD-lDnfXD"
-      smtp_password_version_id = "terraform-20250122121009851200000008"
+      iam_access_key_id = "AKIA4SZHNXXSMCO6OBKO"
+      route53_zone_id   = "Z00513657KO1LCLQ89Z9"
+      route53_zone_name = "laa-preproduction.modernisation-platform.service.justice.gov.uk"
     }
     production = {
-      iam_access_key_id        = "AKIA4WJPWYAR45A6OW4S"
-      route53_zone_id          = "Z05810263DZPHQBFPPJAC"
-      route53_zone_name        = "laa-production.modernisation-platform.service.justice.gov.uk"
-      smtp_password_secret_arn = "arn:aws:secretsmanager:eu-west-2:872515289123:secret:postfix/app/APP_DATA_MIGRATION_SMTP_PASSWORD-PCF1qU"
-      smtp_password_version_id = "terraform-20250127102330413700000008"
+      iam_access_key_id = "AKIA4WJPWYAR45A6OW4S"
+      route53_zone_id   = "Z05810263DZPHQBFPPJAC"
+      route53_zone_name = "laa-production.modernisation-platform.service.justice.gov.uk"
     }
   }
 }
@@ -100,8 +92,8 @@ import {
   id = "postfix/app/SESRSAP"
 }
 
-# Secret Version — format is SECRET_ARN|VERSION_ID, both differ per environment account
-import {
-  to = aws_secretsmanager_secret_version.smtp_password
-  id = "${local.smtp_import_ids[local.environment].smtp_password_secret_arn}|${local.smtp_import_ids[local.environment].smtp_password_version_id}"
-}
+# Note: aws_secretsmanager_secret_version.smtp_password is NOT imported here.
+# For test/preprod/prod it is already in Terraform state — once the IAM access key is
+# imported above, ses_smtp_password_v4 resolves to the existing value and the -/+ replace
+# disappears. For dev it will create a new AWSCURRENT version using the imported key, which
+# is correct behaviour.
