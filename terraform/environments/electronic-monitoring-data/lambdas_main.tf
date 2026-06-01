@@ -1037,7 +1037,7 @@ module "specials-ingestion" {
     SOURCE_BUCKET         = module.s3-json-directory-structure-bucket.bucket.id
     ATHENA_RESULTS_BUCKET = module.s3-athena-bucket.bucket.id
     ACCOUNT_NUMBER        = data.aws_caller_identity.current.account_id
-    STAGING_BUCKET        = module.s3-create-a-derived-table-bucket.bucket
+    STAGING_BUCKET        = module.s3-create-a-derived-table-bucket.bucket.id
   }
 }
 
