@@ -470,7 +470,7 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa11g/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g/*",
             ]
           }
         ])
@@ -486,7 +486,7 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa11g2/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g2/weblogic-*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g2/*",
             ]
           }
         ])
@@ -518,7 +518,7 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa19c/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa19c/weblogic-*"
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa19c/*"
             ]
           }
         ])
