@@ -30,44 +30,22 @@
 locals {
   smtp_import_ids = {
     development = {
-      iam_access_key_id = "AKIAQMEY6GSHNDPEUVWY"
       route53_zone_id   = "Z0032141ZAYV8DVWNDDC"
       route53_zone_name = "laa-development.modernisation-platform.service.justice.gov.uk"
     }
     test = {
-      iam_access_key_id = "AKIA2AUOPBYTMYM46K6A"
       route53_zone_id   = "Z0321080TDDRIM16INGC"
       route53_zone_name = "laa-test.modernisation-platform.service.justice.gov.uk"
     }
     preproduction = {
-      iam_access_key_id = "AKIA4SZHNXXSMCO6OBKO"
       route53_zone_id   = "Z00513657KO1LCLQ89Z9"
       route53_zone_name = "laa-preproduction.modernisation-platform.service.justice.gov.uk"
     }
     production = {
-      iam_access_key_id = "AKIA4WJPWYAR45A6OW4S"
       route53_zone_id   = "Z05810263DZPHQBFPPJAC"
       route53_zone_name = "laa-production.modernisation-platform.service.justice.gov.uk"
     }
   }
-}
-
-# IAM User — name is derived from config, no placeholder needed
-import {
-  to = aws_iam_user.smtp
-  id = "${local.application_name}-${local.application_data.accounts[local.environment].env_short}-user"
-}
-
-# IAM Access Key — ID must be retrieved from Secrets Manager per environment
-import {
-  to = aws_iam_access_key.smtp
-  id = local.smtp_import_ids[local.environment].iam_access_key_id
-}
-
-# IAM User Policy — name is derived from config, no placeholder needed
-import {
-  to = aws_iam_user_policy.smtp_user
-  id = "${local.application_name}-${local.application_data.accounts[local.environment].env_short}-user:AmazonSesSendingAccess"
 }
 
 # Route53 Record — format is ZONE_ID_RECORD_NAME_TYPE
@@ -92,8 +70,5 @@ import {
   id = "postfix/app/SESRSAP"
 }
 
-# Note: aws_secretsmanager_secret_version.smtp_password is NOT imported here.
-# For test/preprod/prod it is already in Terraform state — once the IAM access key is
-# imported above, ses_smtp_password_v4 resolves to the existing value and the -/+ replace
-# disappears. For dev it will create a new AWSCURRENT version using the imported key, which
-# is correct behaviour.
+# Note: aws_secretsmanager_secret_version.smtp_password is NOT imported.
+# It is already in state for test/preprod/prod and will be recreated fresh for dev.
