@@ -80,7 +80,7 @@ module "eks" {
     }
     vpc-cni = {
       before_compute = true
-         addon_version = local.environment_configuration.eks_cluster_addon_versions.vpc_cni
+      addon_version  = local.environment_configuration.eks_cluster_addon_versions.vpc_cni
     }
     eks-pod-identity-agent = {
       before_compute = true

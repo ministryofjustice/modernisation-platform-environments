@@ -50,7 +50,7 @@ WorkSpaces Console: "Invite user" button WORKS ✅
 
 ## Prerequisites
 
-### What Terraform Does Automatically:
+### What Terraform Does Automatically
 
 1. **Creates AD Service Account** (`lambda.workspace`)
    - Generated via `xxx-new-service-account.tf`
@@ -59,7 +59,7 @@ WorkSpaces Console: "Invite user" button WORKS ✅
    - User created in `OU=Users,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local`
    - **Attempts to add to AWS Delegated Administrators group automatically**
 
-### Verify Group Membership After Apply:
+### Verify Group Membership After Apply
 
 After `terraform apply`, check the output. If group membership failed, you'll see a command to run manually:
 
@@ -105,7 +105,7 @@ This creates:
      --region eu-west-2 \
      --query 'Members[?SAMAccountName==`lambda.workspace`]'
    ```
-   
+
    If the list is empty, the user wasn't added. Run the manual command from the prerequisites section.
 
 2. **Wait for EC2 to fully boot and join domain** (~5-10 minutes)
@@ -152,7 +152,7 @@ aws lambda invoke \
 cat output.txt
 ```
 
-### What Happens:
+### What Happens
 
 1. Lambda validates input
 2. Lambda sends PowerShell command to EC2 via SSM
@@ -164,7 +164,7 @@ cat output.txt
 4. Lambda creates WorkSpace for `John.Doe`
 5. Lambda returns success message
 
-### Send Invitation to User:
+### Send Invitation to User
 
 1. Go to AWS Console → WorkSpaces
 2. Find the workspace for `John.Doe`
@@ -176,13 +176,13 @@ cat output.txt
 
 ## Verification
 
-### Check if "Invite user" works:
+### Check if "Invite user" works
 
 1. AWS Console → WorkSpaces → Select workspace
 2. User details should show:
    - ✅ First name: John
    - ✅ Last name: Doe
-   - ✅ Email: john.doe@justice.gov.uk
+   - ✅ Email: <john.doe@justice.gov.uk>
 3. Click "Invite user" button → Should open email template
 
 ### Troubleshooting

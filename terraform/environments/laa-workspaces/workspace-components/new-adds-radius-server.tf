@@ -297,7 +297,7 @@ resource "aws_instance" "radius_server" {
   count = local.environment == "development" ? 1 : 0
 
   ami           = data.aws_ami.amazon_linux_2.id
-  instance_type = "t3.medium"  # Required for LinOTP + MariaDB + Apache
+  instance_type = "t3.medium" # Required for LinOTP + MariaDB + Apache
   subnet_id     = aws_subnet.private_a[0].id
 
   vpc_security_group_ids = [aws_security_group.radius_server[0].id]
@@ -305,24 +305,24 @@ resource "aws_instance" "radius_server" {
 
   # LinOTP + FreeRADIUS installation script
   user_data = templatefile("${path.module}/scripts/install-linotp-freeradius.sh", {
-    region                       = "eu-west-2"
-    radius_secret_arn            = aws_secretsmanager_secret.radius_shared_secret[0].arn
-    linotp_admin_password_arn    = aws_secretsmanager_secret.linotp_admin_password[0].arn
-    mariadb_root_password_arn    = aws_secretsmanager_secret.mariadb_root_password[0].arn
-    environment                  = local.environment
-    vpc_cidr                     = aws_vpc.workspaces[0].cidr_block
+    region                    = "eu-west-2"
+    radius_secret_arn         = aws_secretsmanager_secret.radius_shared_secret[0].arn
+    linotp_admin_password_arn = aws_secretsmanager_secret.linotp_admin_password[0].arn
+    mariadb_root_password_arn = aws_secretsmanager_secret.mariadb_root_password[0].arn
+    environment               = local.environment
+    vpc_cidr                  = aws_vpc.workspaces[0].cidr_block
   })
 
   root_block_device {
     volume_type           = "gp3"
-    volume_size           = 30  # Increased for LinOTP + MariaDB
+    volume_size           = 30 # Increased for LinOTP + MariaDB
     encrypted             = true
     delete_on_termination = true
   }
 
   metadata_options {
     http_endpoint               = "enabled"
-    http_tokens                 = "required"  # IMDSv2 only
+    http_tokens                 = "required" # IMDSv2 only
     http_put_response_hop_limit = 1
   }
 
@@ -338,7 +338,7 @@ resource "aws_instance" "radius_server" {
 
   lifecycle {
     ignore_changes = [
-      ami,  # Don't replace on AMI updates
+      ami, # Don't replace on AMI updates
     ]
   }
 }

@@ -234,9 +234,9 @@ resource "aws_secretsmanager_secret_version" "dps" {
 
 # Probation Source Secrets
 module "probation_source_secret" {
-  for_each                         = local.probation_domains
+  for_each = local.probation_domains
 
-  source                           = "./modules/data_source_secret"
+  source = "./modules/data_source_secret"
 
   cloud_platform_aws_account_id    = "754256621582"
   cloud_platform_shared_kms_key_id = aws_kms_key.crossaccount_secret.arn
@@ -734,7 +734,7 @@ data "aws_iam_policy_document" "crossaccount_secret_kms" {
       condition {
         test     = "ArnEquals"
         variable = "aws:PrincipalArn"
-        values   = [ "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/dpr-${statement.key}-federated-query-execution-role"]
+        values   = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/dpr-${statement.key}-federated-query-execution-role"]
       }
     }
   }

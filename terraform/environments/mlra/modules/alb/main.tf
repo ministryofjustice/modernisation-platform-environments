@@ -553,7 +553,7 @@ resource "aws_wafv2_ip_set" "allow" {
   description        = "Manual Allow Set for ${upper(var.application_name)} WAF"
   # Ranges from https://github.com/ministryofjustice/moj-ip-addresses/blob/master/moj-cidr-addresses.yml
   # disc_internet_pipeline, disc_dom1, moj_digital_wifi, petty_france_office365, petty_france_wifi, ark_internet, gateway_proxies
-  addresses          = local.ip_set_list
+  addresses = local.ip_set_list
 }
 
 resource "aws_wafv2_ip_set" "block" {
