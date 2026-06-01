@@ -309,15 +309,15 @@ resource "aws_wafv2_web_acl" "update_p1_export_api_gateway" {
 }
 
 resource "aws_wafv2_web_acl_association" "update_p1_export_api_gateway_association" {
-  resource_arn = aws_api_gateway_stage.update_p1_export_stage.arn
-  web_acl_arn  = aws_wafv2_web_acl.api_gateway.arn
+  resource_arn = aws_api_gateway_stage.update_p1_export_stage[0].arn
+  web_acl_arn  = aws_wafv2_web_acl.update_p1_export_api_gateway.arn
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "update_p1_export_api_gateway_waf_logs" {
-  resource_arn = aws_wafv2_web_acl.api_gateway.arn
+  resource_arn = aws_wafv2_web_acl.update_p1_export_api_gateway.arn
 
   log_destination_configs = [
-    aws_cloudwatch_log_group.waf_log_group.arn
+    aws_cloudwatch_log_group.update_p1_export_waf_log_group.arn
   ]
 }
 
