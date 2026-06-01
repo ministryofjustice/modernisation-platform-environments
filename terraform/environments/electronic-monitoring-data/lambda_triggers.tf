@@ -375,57 +375,70 @@ resource "aws_lambda_event_source_mapping" "p1_creation_trigger" {
 # Schedule merge load lambda (every 3 minutes) - currently only dev and test envs
 #-----------------------------------------------------------------------------------
 
-  resource "aws_cloudwatch_event_rule" "merge_load_schedule" {
-    count = local.is-preproduction || local.is-production ? 0 : 1
-    name                = "merge_load_schedule"  
-    description         = "Runs merge_load Lambdas for MDSS tables on a schedule"  
-    schedule_expression = "rate(5 minutes)"
-    }
+resource "aws_cloudwatch_event_rule" "merge_load_schedule" {
+  count               = local.is-preproduction || local.is-production ? 0 : 1
+  name                = "merge_load_schedule"
+  description         = "Runs merge_load Lambdas for MDSS tables on a schedule"
+  schedule_expression = "rate(5 minutes)"
+}
 
-  # target mdss_staged_event
-  resource "aws_cloudwatch_event_target" "merge_mdss_staged_event" {
-    count = local.is-preproduction || local.is-production ? 0 : 1
-    rule  = aws_cloudwatch_event_rule.merge_load_schedule[0].name
-    arn   = module.merge_mdss_staged_event[0].lambda_function_arn 
-  }
+# target mdss_staged_event
+resource "aws_cloudwatch_event_target" "merge_mdss_staged_event" {
+  count = local.is-preproduction || local.is-production ? 0 : 1
+  rule  = aws_cloudwatch_event_rule.merge_load_schedule[0].name
+  arn   = module.merge_mdss_staged_event[0].lambda_function_arn
+}
 
-  resource "aws_lambda_permission" "allow_eventbridge_merge_mdss_staged_event" {
-    count         = local.is-preproduction || local.is-production ? 0 : 1
-    statement_id  = "AllowExecutionFromEventBridgeStagedMdssStaged"
-    action        = "lambda:InvokeFunction"
-    function_name = module.merge_mdss_staged_event[0].lambda_function_name
-    principal     = "events.amazonaws.com"
-    source_arn    = aws_cloudwatch_event_rule.merge_load_schedule[0].arn
-  }
+resource "aws_lambda_permission" "allow_eventbridge_merge_mdss_staged_event" {
+  count         = local.is-preproduction || local.is-production ? 0 : 1
+  statement_id  = "AllowExecutionFromEventBridgeStagedMdssStaged"
+  action        = "lambda:InvokeFunction"
+  function_name = module.merge_mdss_staged_event[0].lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.merge_load_schedule[0].arn
+}
 
-  # target mdss_staged_position
-  resource "aws_cloudwatch_event_target" "merge_mdss_staged_position" {
-    count = local.is-preproduction || local.is-production ? 0 : 1
-    rule  = aws_cloudwatch_event_rule.merge_load_schedule[0].name
-    arn   = module.merge_mdss_staged_position[0].lambda_function_arn 
-  }
+# target mdss_staged_position
+resource "aws_cloudwatch_event_target" "merge_mdss_staged_position" {
+  count = local.is-preproduction || local.is-production ? 0 : 1
+  rule  = aws_cloudwatch_event_rule.merge_load_schedule[0].name
+  arn   = module.merge_mdss_staged_position[0].lambda_function_arn
+}
 
-  resource "aws_lambda_permission" "allow_eventbridge_merge_mdss_staged_position" {
-    count         = local.is-preproduction || local.is-production ? 0 : 1
-    statement_id  = "AllowExecutionFromEventBridgeStagedMdssStaged"
-    action        = "lambda:InvokeFunction"
-    function_name = module.merge_mdss_staged_position[0].lambda_function_name
-    principal     = "events.amazonaws.com"
-    source_arn    = aws_cloudwatch_event_rule.merge_load_schedule[0].arn
-  }
+resource "aws_lambda_permission" "allow_eventbridge_merge_mdss_staged_position" {
+  count         = local.is-preproduction || local.is-production ? 0 : 1
+  statement_id  = "AllowExecutionFromEventBridgeStagedMdssStaged"
+  action        = "lambda:InvokeFunction"
+  function_name = module.merge_mdss_staged_position[0].lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.merge_load_schedule[0].arn
+}
 
-  # target merge_ac_position
-  resource "aws_cloudwatch_event_target" "merge_ac_position" {
-    count = local.is-preproduction || local.is-production ? 0 : 1
-    rule  = aws_cloudwatch_event_rule.merge_load_schedule[0].name
-    arn   = module.merge_ac_position[0].lambda_function_arn
-  }
+# target merge_ac_position
+resource "aws_cloudwatch_event_target" "merge_ac_position" {
+  count = local.is-preproduction || local.is-production ? 0 : 1
+  rule  = aws_cloudwatch_event_rule.merge_load_schedule[0].name
+  arn   = module.merge_ac_position[0].lambda_function_arn
+}
 
-  resource "aws_lambda_permission" "allow_eventbridge_acquisitive_crime_position" {
-    count = local.is-preproduction || local.is-production ? 0 : 1
-    statement_id  = "AllowExecutionFromEventBridgeAcquisitiveCrimePosition"
-    action        = "lambda:InvokeFunction"
-    function_name = module.merge_ac_position[0].lambda_function_name
-    principal     = "events.amazonaws.com"
-    source_arn    = aws_cloudwatch_event_rule.merge_load_schedule[0].arn
-  }
+resource "aws_lambda_permission" "allow_eventbridge_acquisitive_crime_position" {
+  count         = local.is-preproduction || local.is-production ? 0 : 1
+  statement_id  = "AllowExecutionFromEventBridgeAcquisitiveCrimePosition"
+  action        = "lambda:InvokeFunction"
+  function_name = module.merge_ac_position[0].lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.merge_load_schedule[0].arn
+}
+
+# --------------------------------------------------------
+# update_p1_export
+# --------------------------------------------------------
+
+resource "aws_lambda_permission" "update_p1_export_api_gw" {
+  count         = local.is-development || local.is-preproduction ? 1 : 0
+  statement_id  = "AllowAPIGatewayInvokeUpdateP1Export"
+  action        = "lambda:InvokeFunction"
+  function_name = module.update_p1_export[0].lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*/*"
+}

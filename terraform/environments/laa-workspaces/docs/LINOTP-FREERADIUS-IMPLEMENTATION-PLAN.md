@@ -155,7 +155,7 @@ Step 5: Deploy WorkSpaces (when ready)
 
 ---
 
-   - ❌ Alias to ALB
+- ❌ Alias to ALB
 
 6. **IAM Permissions:**
    - ✅ Secrets Manager access (already configured)
@@ -252,16 +252,16 @@ The script automatically installs and configures everything when the EC2 instanc
 - ⏸️ Policy import - Done via web UI after realm created
 
 ---
-  # Generate self-signed SSL certificate
+# Generate self-signed SSL certificate
   sudo openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 \
     -subj "/C=GB/ST=London/L=London/O=LAA/CN=${instance_hostname}" \
     -keyout /etc/pki/tls/private/server.key \
     -out /etc/pki/tls/certs/server.crt
   
-  # Set permissions
+# Set permissions
   sudo chmod 600 /etc/pki/tls/private/server.key
   
-  # Start Apache
+# Start Apache
   sudo systemctl start httpd
   ```
 
@@ -1072,7 +1072,7 @@ The script automatically installs and configures everything when the EC2 instanc
 
 ~~**Options:**~~ (Not needed with single server)
 
-**Rationale:** 
+**Rationale:**
 - Single server simplifies deployment significantly
 - No database synchronization needed
 - Can add 2nd server later if HA requirements change

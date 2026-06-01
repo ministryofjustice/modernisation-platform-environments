@@ -86,6 +86,6 @@ output "user_creation_lambda_arn" {
 }
 
 output "user_creation_invoke_command" {
-  value = local.environment == "development" ? "aws lambda invoke --function-name ${aws_lambda_function.user_creation[0].function_name} --payload '{\"Firstname\":\"John\",\"Lastname\":\"Doe\",\"Email\":\"john.doe@justice.gov.uk\"}' --region ${local.application_data.accounts[local.environment].region} output.txt --cli-binary-format raw-in-base64-out" : null
+  value       = local.environment == "development" ? "aws lambda invoke --function-name ${aws_lambda_function.user_creation[0].function_name} --payload '{\"Firstname\":\"John\",\"Lastname\":\"Doe\",\"Email\":\"john.doe@justice.gov.uk\"}' --region ${local.application_data.accounts[local.environment].region} output.txt --cli-binary-format raw-in-base64-out" : null
   description = "Example command to invoke user creation Lambda"
 }

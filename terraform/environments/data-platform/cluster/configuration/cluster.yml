@@ -11,7 +11,7 @@ environment:
       eks_pod_identity_agent: "v1.3.10-eksbuild.2"
     crd_versions:
       aws_load_balancer_controller: "v0.0.231"
-      gateway_api: "v1.4.1"
+      gateway_api: "v1.5.1"
       karpenter: "1.11.1"
       prometheus: "v0.90.1"
     helm_chart_versions:
@@ -44,7 +44,7 @@ environment:
       eks_pod_identity_agent: "v1.3.10-eksbuild.2"
     crd_versions:
       aws_load_balancer_controller: "v0.0.231"
-      gateway_api: "v1.4.1"
+      gateway_api: "v1.5.1"
       karpenter: "1.11.1"
       prometheus: "v0.90.1"
     helm_chart_versions:
@@ -77,7 +77,7 @@ environment:
       eks_pod_identity_agent: "v1.3.10-eksbuild.2"
     crd_versions:
       aws_load_balancer_controller: "v0.0.231"
-      gateway_api: "v1.4.1"
+      gateway_api: "v1.5.1"
       karpenter: "1.11.1"
       prometheus: "v0.90.1"
     helm_chart_versions:
@@ -110,7 +110,7 @@ environment:
       eks_pod_identity_agent: "v1.3.10-eksbuild.2"
     crd_versions:
       aws_load_balancer_controller: "v0.0.231"
-      gateway_api: "v1.4.1"
+      gateway_api: "v1.5.1"
       karpenter: "1.11.1"
       prometheus: "v0.90.1"
     helm_chart_versions:
