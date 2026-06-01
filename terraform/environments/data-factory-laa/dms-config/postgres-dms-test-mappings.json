@@ -1,0 +1,12 @@
+{
+  "blobs": [],
+  "columns_to_exclude": [],
+  "objects": [
+    "employees",
+    "departments",
+    "audit_log",
+    "data_types_test",
+    "nullable_test"
+  ],
+  "schema": "public"
+}
