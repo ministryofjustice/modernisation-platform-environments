@@ -45,12 +45,12 @@ locals {
         }
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
-          "/dev/sdb" = { type = "gp3", size = 50 }
-          "/dev/sdc" = { type = "gp3", size = 50 }
-          "/dev/sdd" = { type = "gp3", size = 150 }
-          "/dev/sde" = { type = "gp3", size = 50 }
-          "/dev/sdf" = { type = "gp3", size = 20 }
-          "/dev/sdg" = { type = "gp3", size = 250 }
+          "/dev/sdb"  = { type = "gp3", size = 50 }
+          "/dev/sdc"  = { type = "gp3", size = 50 }
+          "/dev/sdd"  = { type = "gp3", size = 150 }
+          "/dev/sde"  = { type = "gp3", size = 50 }
+          "/dev/sdf"  = { type = "gp3", size = 20 }
+          "/dev/sdg"  = { type = "gp3", size = 250 }
           # "/dev/sdh" = { type = "gp3", size = 50 }
           # "/dev/sdi" = { type = "gp3", size = 20 }
           "/dev/sdj" = { type = "gp3", size = 112 }

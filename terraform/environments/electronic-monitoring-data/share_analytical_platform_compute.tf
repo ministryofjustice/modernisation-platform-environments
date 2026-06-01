@@ -61,7 +61,7 @@ locals {
     "g4s_integrity",
     "g4s_lcm",
     "g4s_tasking",
-  ] : local.is-development ? [
+    ] : local.is-development ? [
     "test",
     "capita_blob_storage",
     "emd_historic_int",
