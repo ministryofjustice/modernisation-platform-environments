@@ -23,20 +23,23 @@ resource "aws_ssm_parameter" "private_key" {
 data "template_file" "userdata" {
   template = file("${path.module}/ec2-userdata.tftpl")
   vars = {
-    env         = var.environment
-    environment = var.environment
-    tags        = jsonencode(local.all_tags)
-    project     = var.project_name
+    env           = var.environment
+    environment   = var.environment
+    tags          = jsonencode(local.all_tags)
+    project       = var.project_name
+    nginx_script  = file("${path.module}/scripts/update-nginx.sh")
   }
 }
 
 resource "aws_instance" "yjsm" {
-  ami                  = var.ami
-  instance_type        = "t3a.xlarge"
-  key_name             = module.key_pair.key_pair_name
-  monitoring           = true
-  ebs_optimized        = true
-  iam_instance_profile = aws_iam_instance_profile.yjsm_ec2_profile.id
+  ami                         = var.ami
+  instance_type               = "t3a.xlarge"
+  key_name                    = module.key_pair.key_pair_name
+  monitoring                  = true
+  ebs_optimized               = true
+  iam_instance_profile        = aws_iam_instance_profile.yjsm_ec2_profile.id
+  user_data                   = data.template_file.userdata.rendered
+  user_data_replace_on_change = false
   tags = merge(
     local.all_tags,
     { "OS" = "Linux" }
@@ -58,7 +61,7 @@ resource "aws_instance" "yjsm" {
   root_block_device {
     encrypted             = true
     delete_on_termination = false
-    volume_size           = 60
+    volume_size           = 80
     volume_type           = "gp2"
   }
 
