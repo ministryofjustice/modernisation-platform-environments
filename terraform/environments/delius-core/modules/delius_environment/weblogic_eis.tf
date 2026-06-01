@@ -134,7 +134,7 @@ resource "aws_autoscaling_group" "weblogic_eis" {
 
   max_size              = 1
   min_size              = 1
-  protect_from_scale_in = false
+  protect_from_scale_in = true
 
   vpc_zone_identifier = var.account_config.private_subnet_ids
 
