@@ -82,5 +82,5 @@ data "aws_route53_zone" "route53_zone_zone" {
 #oci authentication
 
 data "aws_ecrpublic_authorization_token" "token" {
-  provider = aws.us-east-1
+  provider = aws.oci-auth
 }
