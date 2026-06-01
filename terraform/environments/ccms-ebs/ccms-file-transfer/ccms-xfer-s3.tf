@@ -100,7 +100,7 @@ module "s3-bucket-sftp-bc" {
       prefix  = ""
 
       noncurrent_version_expiration = {
-        days = 0
+        days = 1
       }
     }
   ]
