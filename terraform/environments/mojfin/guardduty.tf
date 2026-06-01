@@ -238,7 +238,7 @@ data "aws_iam_role" "guardduty_s3_malware_role" {
   name = "GuardDutyS3MalwareProtectionRole"
 }
 
-resource "aws_guardduty_malware_protection_plan" "shared_s3_protection_plan" {
+resource "aws_guardduty_malware_protection_plan" "shared_protection_plan" {
   role = data.aws_iam_role.guardduty_s3_malware_role.arn
 
   protected_resource {
@@ -254,13 +254,13 @@ resource "aws_guardduty_malware_protection_plan" "shared_s3_protection_plan" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-guardduty-mpp", local.application_name, local.environment)) }
+    { Name = lower(format("s3-%s-%s-shared-guardduty-protection-plan", local.application_name, local.environment)) }
   )
 
   depends_on = [module.s3-bucket-shared]
 }
 
-resource "aws_guardduty_malware_protection_plan" "rds_oracle_s3_protection_plan" {
+resource "aws_guardduty_malware_protection_plan" "rds_oracle_protection_plan" {
   role = data.aws_iam_role.guardduty_s3_malware_role.arn
 
   protected_resource {
@@ -276,13 +276,13 @@ resource "aws_guardduty_malware_protection_plan" "rds_oracle_s3_protection_plan"
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-guardduty-mpp", local.application_name, local.environment)) }
+    { Name = lower(format("s3-%s-%s-rds-oracle-guardduty-protection-plan", local.application_name, local.environment)) }
   )
 
   depends_on = [aws_s3_bucket.mojfin_rds_oracle]
 }
 
-resource "aws_guardduty_malware_protection_plan" "bastion_s3_protection_plan" {
+resource "aws_guardduty_malware_protection_plan" "bastion_protection_plan" {
   role = data.aws_iam_role.guardduty_s3_malware_role.arn
 
   protected_resource {
@@ -298,7 +298,7 @@ resource "aws_guardduty_malware_protection_plan" "bastion_s3_protection_plan" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-guardduty-mpp", local.application_name, local.environment)) }
+    { Name = lower(format("s3-%s-%s-bastion-guardduty-protection-plan", local.application_name, local.environment)) }
   )
 
   depends_on = [module.bastion_linux]
@@ -306,5 +306,5 @@ resource "aws_guardduty_malware_protection_plan" "bastion_s3_protection_plan" {
 
 moved {
   from = aws_guardduty_malware_protection_plan.mojfin_s3_malware_plan
-  to   = aws_guardduty_malware_protection_plan.shared_s3_protection_plan
+  to   = aws_guardduty_malware_protection_plan.shared_protection_plan
 }
