@@ -15,7 +15,8 @@ module "managed_prometheus" {
   # Setting retention_period_in_days prevents "Empty workspace configuration" API error
   retention_period_in_days = 150
 
-  tags = local.tags
+  tags                 = local.tags
+  limits_per_label_set = []
 }
 
 moved {
