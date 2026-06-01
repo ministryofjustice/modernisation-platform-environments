@@ -527,7 +527,8 @@ module "dms_postgres" {
     # Postgres extra_connection_attributes:
     #   PluginName=test_decoding — built-in logical decoding plugin on RDS;
     #                              no pg_logical extension needed
-    extra_connection_attributes = "PluginName=test_decoding;"
+    #   sslMode=require          — RDS enforces SSL via pg_hba.conf
+    extra_connection_attributes = "PluginName=test_decoding;sslMode=require;"
   }
 
   replication_task_id = {
