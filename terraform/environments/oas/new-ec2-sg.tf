@@ -79,6 +79,18 @@ resource "aws_security_group_rule" "ingress_from_lb_9502" {
   source_security_group_id = aws_security_group.lb_security_group[0].id
 }
 
+resource "aws_security_group_rule" "ingress_from_lb_9503" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  type                     = "ingress"
+  security_group_id        = aws_security_group.ec2_sg[0].id
+  description              = "Allow traffic from load balancer to EC2 on port 9503"
+  from_port                = 9503
+  to_port                  = 9503
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.lb_security_group[0].id
+}
+
 # resource "aws_security_group_rule" "ingress_rds_from_mp_vpc_for_edw" {
 #   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 #
