@@ -107,6 +107,7 @@ locals {
   create_rds_replica             = local.application_data.accounts[local.environment].dpr_rds_db.create_replica
   dpr_rds_engine                 = local.application_data.accounts[local.environment].dpr_rds_db.engine
   dpr_rds_engine_version         = local.application_data.accounts[local.environment].dpr_rds_db.engine_version
+  dpr_rds_replica_engine_version = local.application_data.accounts[local.environment].dpr_rds_db.replica_engine_version
   dpr_rds_init_size              = local.application_data.accounts[local.environment].dpr_rds_db.init_size
   dpr_rds_max_size               = local.application_data.accounts[local.environment].dpr_rds_db.max_size
   dpr_rds_name                   = local.application_data.accounts[local.environment].dpr_rds_db.name

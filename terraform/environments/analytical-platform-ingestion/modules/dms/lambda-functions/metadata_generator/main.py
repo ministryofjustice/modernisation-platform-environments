@@ -244,6 +244,16 @@ class MetadataExtractor:
         if self.dialect in self.upper_case_dialects:
             etlmeta.location = etlmeta.location.upper()
         etl_dict = etlmeta.to_dict()
+
+        if self._dialect_is_mssql():
+            for column in etl_dict.get("columns", []):
+                if str(column.get("type", "")).lower() == "int":
+                    logger.info(
+                        "Converting ETL metadata column %s type from int to decimal",
+                        column.get("name"),
+                    )
+                    column["type"] = "decimal"
+                    
         etl_dict["partitions"] = None
         return json.dumps(etl_dict)
 

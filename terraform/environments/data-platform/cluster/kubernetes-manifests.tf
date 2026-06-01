@@ -3,6 +3,7 @@ locals {
     "gatewayclasses",
     "gateways",
     "httproutes",
+    "listenersets",
     "referencegrants",
     "grpcroutes"
   ]
