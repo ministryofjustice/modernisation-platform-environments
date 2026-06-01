@@ -2,10 +2,11 @@ module "dashboard_service_rds" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
+  # module (version 7.2.0) is currently unsupported due to this open issue: https://github.com/hashicorp/terraform-provider-aws/issues/42582.
   count = terraform.workspace == "analytical-platform-compute-test" ? 0 : 1
 
   source  = "terraform-aws-modules/rds/aws"
-  version = "7.2.0"
+  version = "6.12.0"
 
   identifier = "dashboard-service"
 
@@ -29,8 +30,7 @@ module "dashboard_service_rds" {
   username                    = "dashboard_service"
   db_name                     = "dashboard_service"
   manage_master_user_password = false
-  password_wo                 = random_password.dashboard_service_rds[0].result
-  password_wo_version         = 1
+  password                    = random_password.dashboard_service_rds[0].result
   kms_key_id                  = module.dashboard_service_rds_kms[0].key_arn
 
   parameters = [
