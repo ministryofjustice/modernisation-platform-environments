@@ -325,9 +325,9 @@ module "dms_oracle" {
 #   PluginName=test_decoding  — uses the built-in test_decoding plugin on RDS;
 #                               no pg_logical extension required
 #
-# cdc_start_time:
-#   Set to a timestamp AFTER the Postgres DB setup is complete to ensure
-#   WAL segments are available. Update this value before starting the CDC task.
+# CDC note:
+#   Postgres does NOT support cdc_start_time — DMS uses WAL LSN positions.
+#   The CDC task will start from the current WAL position automatically.
 # =============================================================================
 
 # ---------------------------------------------------------------------------
@@ -528,9 +528,6 @@ module "dms_postgres" {
     #   PluginName=test_decoding — built-in logical decoding plugin on RDS;
     #                              no pg_logical extension needed
     extra_connection_attributes = "PluginName=test_decoding;"
-    # Update this to a timestamp AFTER the Postgres DB setup and initial seed
-    # are complete, to ensure WAL segments are available for CDC.
-    cdc_start_time = "2026-06-01T00:00:00Z"
   }
 
   replication_task_id = {
