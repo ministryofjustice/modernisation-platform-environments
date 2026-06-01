@@ -29,18 +29,32 @@ locals {
           protocol    = -1
           self        = true
         }
-        TCP_3389 = {
-          description = "Allow RDP ingress 3389"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "TCP"
+        ICMP = {
+          description = "Allow ping for client host availability check and MTU calculation"
+          from_port   = -1
+          to_port     = -1
+          protocol    = "icmp"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
+        TCP_80 = {
+          description = "Allow HTTP ingress 80 for WebDav check"
+          from_port   = 445
+          to_port     = 445
+          protocol    = "tcp"
           cidr_blocks = local.security_group_cidrs.enduserclient
         }
         TCP_445 = {
           description = "Allow SMB ingress 445"
           from_port   = 445
           to_port     = 445
-          protocol    = "TCP"
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
+        TCP_3389 = {
+          description = "Allow RDP ingress 3389"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "tcp"
           cidr_blocks = local.security_group_cidrs.enduserclient
         }
       }
