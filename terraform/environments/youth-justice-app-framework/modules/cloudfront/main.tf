@@ -190,7 +190,7 @@ resource "aws_cloudfront_response_headers_policy" "strict_transport_security" {
       access_control_max_age_sec = 31536000 # 1 year in seconds
       override                   = true     # Matches "Origin override"
       preload                    = true     # Now on for pen test
-      include_subdomains         = false    # Matches unchecked includeSubDomains
+      include_subdomains         = true     # Now on for pen test
     }
     content_type_options {
       override = true
