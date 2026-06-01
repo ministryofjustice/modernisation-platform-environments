@@ -435,7 +435,7 @@ resource "aws_lambda_permission" "allow_eventbridge_acquisitive_crime_position" 
 # --------------------------------------------------------
 
 resource "aws_lambda_permission" "update_p1_export_api_gw" {
-  count         = local.is-development || local.is-preproduction ? 1 : 0
+  count         = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   statement_id  = "AllowAPIGatewayInvokeUpdateP1Export"
   action        = "lambda:InvokeFunction"
   function_name = module.update_p1_export[0].lambda_function_name
