@@ -93,8 +93,16 @@
       },
       "vpc_configuration": {
         "isolated_vpc_cidr": "10.0.0.0/23",
-        "isolated_vpc_private_subnet_cidrs": ["10.0.0.0/27", "10.0.0.32/27", "10.0.0.64/27"],
-        "isolated_vpc_public_subnet_cidrs": ["10.0.0.128/27", "10.0.0.160/27", "10.0.0.192/27"],
+        "isolated_vpc_private_subnet_cidrs": [
+          "10.0.0.0/27",
+          "10.0.0.32/27",
+          "10.0.0.64/27"
+        ],
+        "isolated_vpc_public_subnet_cidrs": [
+          "10.0.0.128/27",
+          "10.0.0.160/27",
+          "10.0.0.192/27"
+        ],
         "isolated_vpc_enable_nat_gateway": true,
         "isolated_vpc_one_nat_gateway_per_az": true
       }
