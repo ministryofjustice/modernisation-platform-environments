@@ -193,7 +193,7 @@ resource "aws_autoscaling_group" "weblogic" {
   min_size = var.delius_microservice_configs.weblogic.asg_min_size
   max_size = var.delius_microservice_configs.weblogic.asg_max_size
 
-  protect_from_scale_in = true
+  protect_from_scale_in = false
 
   vpc_zone_identifier = var.account_config.private_subnet_ids
 
