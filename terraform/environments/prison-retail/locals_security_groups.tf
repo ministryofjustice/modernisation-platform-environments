@@ -39,8 +39,8 @@ locals {
         }
         TCP_80 = {
           description = "Allow HTTP ingress 80 for WebDav check"
-          from_port   = 445
-          to_port     = 445
+          from_port   = 80
+          to_port     = 80
           protocol    = "tcp"
           cidr_blocks = local.security_group_cidrs.enduserclient
         }
