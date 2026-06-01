@@ -78,3 +78,9 @@ data "http" "prometheus_operator_crds" {
 data "aws_route53_zone" "route53_zone_zone" {
   name = local.environment_configuration.route53_zone
 }
+
+#oci authentication
+
+data "aws_ecrpublic_authorization_token" "token" {
+  provider = aws.oci-auth
+}
