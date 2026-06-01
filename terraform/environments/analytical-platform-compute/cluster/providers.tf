@@ -21,4 +21,11 @@ provider "helm" {
     cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
     token                  = data.aws_eks_cluster_auth.eks_auth.token
   }
+  registries = [
+    {
+      url      = "oci://public.ecr.aws"
+      username = data.aws_ecrpublic_authorization_token.token.user_name
+      password = data.aws_ecrpublic_authorization_token.token.password
+    }
+  ]
 }
