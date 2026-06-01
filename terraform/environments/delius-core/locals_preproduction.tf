@@ -90,7 +90,7 @@ locals {
 
     weblogic = {
       image_tag                = "6.7.4"
-      task_definition_revision = 10
+      task_definition_revision = 11
       container_port           = 8080
       container_memory         = 8192
       container_cpu            = 1024
