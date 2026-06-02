@@ -1,16 +1,16 @@
+# Upgrading the IAM module from v5.x to v6.x introduces breaking changes that cause IAM roles and policies to be replaced. Therefore, we are not proceeding with the version upgrade.
 module "mlflow_iam_role" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
-  version = "6.6.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "5.59.0"
 
-  name            = "mlflow"
-  use_name_prefix = false
+  role_name_prefix = "mlflow"
 
-  policies = {
+  role_policy_arns = {
     MlflowPolicy = module.mlflow_iam_policy[0].arn
   }
 

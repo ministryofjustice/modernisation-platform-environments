@@ -1,3 +1,4 @@
+# module (version 7.2.0) is currently unsupported due to this open issue: https://github.com/hashicorp/terraform-provider-aws/issues/42582.
 module "mlflow_auth_rds" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
@@ -5,7 +6,7 @@ module "mlflow_auth_rds" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/rds/aws"
-  version = "7.2.0"
+  version = "6.12.0"
 
   identifier = "mlflow-auth"
 
@@ -28,8 +29,7 @@ module "mlflow_auth_rds" {
   username                    = "mlflowauth"
   db_name                     = "mlflowauth"
   manage_master_user_password = false
-  password_wo                 = random_password.mlflow_auth_rds[0].result
-  password_wo_version         = 1
+  password                    = random_password.mlflow_auth_rds[0].result
   kms_key_id                  = module.mlflow_auth_rds_kms[0].key_arn
 
   parameters = [
