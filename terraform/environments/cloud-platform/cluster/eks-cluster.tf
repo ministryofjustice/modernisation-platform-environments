@@ -86,37 +86,37 @@ module "eks" {
         ]
       })
     }
-    kube-proxy = {
-      #   addon_version = local.environment_configuration.eks_cluster_addon_versions.kube_proxy
-    }
-    vpc-cni = {
-      before_compute = true
-      addon_version  = local.environment_configuration.eks_cluster_addon_versions.vpc_cni
-    }
-    eks-pod-identity-agent = {
-      before_compute = true
-      #   addon_version = local.environment_configuration.eks_cluster_addon_versions.eks_pod_identity_agent
-    }
+    # kube-proxy = {
+    #   #   addon_version = local.environment_configuration.eks_cluster_addon_versions.kube_proxy
+    # }
+    # vpc-cni = {
+    #   before_compute = true
+    #   addon_version  = local.environment_configuration.eks_cluster_addon_versions.vpc_cni
+    # }
+    # eks-pod-identity-agent = {
+    #   before_compute = true
+    #   #   addon_version = local.environment_configuration.eks_cluster_addon_versions.eks_pod_identity_agent
+    # }
     aws-guardduty-agent = {
     }
 
-    aws-ebs-csi-driver = {
-      configuration_values = jsonencode({
-        controller = {
-          nodeSelector = {
-            "cloud-platform.justice.gov.uk/system-ng" = "true"
-          }
-          tolerations = [
-            {
-              key      = "system-node"
-              value    = "true"
-              effect   = "NoSchedule"
-              operator = "Equal"
-            }
-          ]
-        }
-      })
-    }
+    # aws-ebs-csi-driver = {
+    #   configuration_values = jsonencode({
+    #     controller = {
+    #       nodeSelector = {
+    #         "cloud-platform.justice.gov.uk/system-ng" = "true"
+    #       }
+    #       tolerations = [
+    #         {
+    #           key      = "system-node"
+    #           value    = "true"
+    #           effect   = "NoSchedule"
+    #           operator = "Equal"
+    #         }
+    #       ]
+    #     }
+    #   })
+    # }
 
   }
 
