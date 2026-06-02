@@ -1,30 +1,18 @@
+# Upgrading the IAM module from v5.x to v6.x introduces breaking changes that cause IAM roles and policies to be replaced. Therefore, we are not proceeding with the version upgrade.
 module "quicksight_vpc_connection_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.59.0"
 
-  name  = "quicksight-vpc-connection"
-  use_name_prefix = false
+  create_role       = true
+  role_name_prefix  = "quicksight-vpc-connection"
+  role_requires_mfa = false
 
-  trust_policy_permissions = {
-    QuickSightExecutionRole = {
-      actions = ["sts:AssumeRole", "sts:TagSession"]
-      principals = [
-        {
-          type = "Service"
-          identifiers = [
-            "quicksight.amazonaws.com"
-          ]
-        }
-      ]
-    }
-  }
+  trusted_role_services = ["quicksight.amazonaws.com"]
 
-  policies = {
-    quicksight_vpc_connection_iam_policy = module.quicksight_vpc_connection_iam_policy.arn
-  }
+  custom_role_policy_arns = [module.quicksight_vpc_connection_iam_policy.arn]
 
   tags = local.tags
 }
@@ -33,32 +21,21 @@ module "find_moj_data_quicksight_sa_assumable_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.59.0"
 
-  use_name_prefix = false
-  trust_policy_permissions = {
-    QuickSightExecutionRole = {
-      actions = ["sts:AssumeRole", "sts:TagSession"]
-      principals = [
-        {
-          type = "AWS"
-          identifiers = [
-            "arn:aws:iam::754256621582:role/cloud-platform-irsa-e5ba8827240d2ff3-live",
-            "arn:aws:iam::754256621582:role/cloud-platform-irsa-1003dc6e42f4229f-live",
-            "arn:aws:iam::754256621582:role/cloud-platform-irsa-25d122a26f9264de-live"
-          ]
-        }
-      ]
-    }
-  }
+  allow_self_assume_role = false
+  trusted_role_arns = [
+    "arn:aws:iam::754256621582:role/cloud-platform-irsa-e5ba8827240d2ff3-live",
+    "arn:aws:iam::754256621582:role/cloud-platform-irsa-1003dc6e42f4229f-live",
+    "arn:aws:iam::754256621582:role/cloud-platform-irsa-25d122a26f9264de-live"
+  ]
 
+  create_role       = true
+  role_requires_mfa = false
+  role_name         = "find-moj-data-quicksight"
 
-  name = "find-moj-data-quicksight"
-
-  policies = {
-    find_moj_data_quicksight_policy = module.find_moj_data_quicksight_policy.arn
-  }
+  custom_role_policy_arns = [module.find_moj_data_quicksight_policy.arn]
 
   tags = local.tags
 }

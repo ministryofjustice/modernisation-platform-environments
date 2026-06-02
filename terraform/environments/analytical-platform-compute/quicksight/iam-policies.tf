@@ -1,3 +1,4 @@
+# Upgrading the IAM module from v5.x to v6.x introduces breaking changes that cause IAM roles and policies to be replaced. Therefore, we are not proceeding with the version upgrade.
 data "aws_iam_policy_document" "quicksight_vpc_connection" {
   #checkov:skip=CKV_AWS_111:Policy suggested by AWS documentation
   #checkov:skip=CKV_AWS_356:Policy suggested by AWS documentation
@@ -20,10 +21,9 @@ module "quicksight_vpc_connection_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.0"
+  version = "5.59.0"
 
   name_prefix = "quicksight-vpc-connection"
-  description = "IAM Policy"
 
   policy = data.aws_iam_policy_document.quicksight_vpc_connection.json
 
@@ -58,11 +58,11 @@ module "find_moj_data_quicksight_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.0"
+  version = "5.59.0"
 
   name_prefix = "find-moj-data-quicksight-policy-"
-  description = "IAM Policy"
-  policy      = data.aws_iam_policy_document.find_moj_data_quicksight_policy.json
+
+  policy = data.aws_iam_policy_document.find_moj_data_quicksight_policy.json
 
   tags = local.tags
 }
