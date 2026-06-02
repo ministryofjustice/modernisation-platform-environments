@@ -18,8 +18,7 @@ locals {
         periodOverride = "auto"
         start          = "-PT6H"
         widget_groups = [
-          local.cloudwatch_dashboard_widget_groups.connectivity,
-          local.cloudwatch_dashboard_widget_groups.ec2,
+          local.cloudwatch_dashboard_widget_groups.all_windows_ec2,
         ]
       }
     }
