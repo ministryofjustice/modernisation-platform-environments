@@ -1,5 +1,5 @@
 resource "aws_iam_role" "coat_api_cross_account_role" {
-  name = "coat-api-cross-account-role"
+  name = "coat-api-${local.environment}-cross-account-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -8,9 +8,7 @@ resource "aws_iam_role" "coat_api_cross_account_role" {
         Action = "sts:AssumeRole"
         Effect = "Allow"
         Principal = {
-          AWS = local.is-production ? 
-            [ data.aws_iam_role.moj_mp_dev_role[0].arn ] : 
-            [ data.aws_iam_role.moj_mp_sandbox_role[0].arn ]
+          AWS = local.is-production ? [ data.aws_iam_role.moj_mp_dev_role[0].arn ] : [ data.aws_iam_role.moj_mp_sandbox_role[0].arn ]
         }
       }
     ]
