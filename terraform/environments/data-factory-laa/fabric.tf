@@ -1,9 +1,13 @@
-module "fabric_oidc_provider" {
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/fabric-oidc-provider?ref=36908c4"
-
-  tenant_id          = local.fabric_tenant_id
-  oidc_provider_name = "fabric-s3-access"
-}
+# Phase 1 of a two-phase deployment: the Fabric OIDC provider and IAM role
+# are commented out until the secrets created in secrets.tf have been
+# populated out-of-band. A follow-up change will re-enable these modules
+# and switch the Fabric locals to read from aws_secretsmanager_secret_version.
+# module "fabric_oidc_provider" {
+#   source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/fabric-oidc-provider?ref=36908c4"
+#
+#   tenant_id          = local.fabric_tenant_id
+#   oidc_provider_name = "fabric-s3-access"
+# }
 
 # Curated S3 bucket exposed to Microsoft Fabric via OneLake shortcuts.
 # TODO: Use KMS key for encryption.
@@ -24,14 +28,14 @@ module "fabric_curated_bucket" {
   tags = local.tags
 }
 
-module "fabric_iam_role" {
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/fabric-iam-role?ref=36908c4"
-
-  object_id                          = local.fabric_enterprise_app_object_id
-  oidc_provider_arn                  = module.fabric_oidc_provider.arn
-  oidc_provider_condition_key_prefix = module.fabric_oidc_provider.condition_key_prefix
-
-  bucket_arn       = module.fabric_curated_bucket.bucket.arn
-  role_name        = "fabric-s3-access"
-  role_policy_name = "fabric-s3-read-policy"
-}
+# module "fabric_iam_role" {
+#   source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/fabric-iam-role?ref=36908c4"
+#
+#   object_id                          = local.fabric_enterprise_app_object_id
+#   oidc_provider_arn                  = module.fabric_oidc_provider.arn
+#   oidc_provider_condition_key_prefix = module.fabric_oidc_provider.condition_key_prefix
+#
+#   bucket_arn       = module.fabric_curated_bucket.bucket.arn
+#   role_name        = "fabric-s3-access"
+#   role_policy_name = "fabric-s3-read-policy"
+# }
