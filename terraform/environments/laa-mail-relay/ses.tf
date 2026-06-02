@@ -93,9 +93,12 @@ resource "aws_secretsmanager_secret" "smtp_user" {
 }
 
 resource "aws_secretsmanager_secret_version" "smtp_user" {
-  count         = 0
   secret_id     = aws_secretsmanager_secret.smtp_user.id
-  secret_string = aws_iam_access_key.smtp[0].id
+  secret_string = "managed-outside-terraform"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
 }
 
 resource "aws_secretsmanager_secret" "smtp_password" {
@@ -108,9 +111,12 @@ resource "aws_secretsmanager_secret" "smtp_password" {
 }
 
 resource "aws_secretsmanager_secret_version" "smtp_password" {
-  count         = 0
   secret_id     = aws_secretsmanager_secret.smtp_password.id
-  secret_string = aws_iam_access_key.smtp[0].ses_smtp_password_v4
+  secret_string = "managed-outside-terraform"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
 }
 
 resource "aws_secretsmanager_secret" "smtp_sesans" {
