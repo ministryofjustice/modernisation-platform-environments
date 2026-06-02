@@ -1,6 +1,7 @@
 import hashlib
 import json
 import os
+import uuid
 from datetime import UTC, datetime, timedelta
 from urllib.parse import unquote_plus
 
@@ -107,23 +108,47 @@ def build_notification_message(operation, expiry_seconds, presigned_url):
     expires_at = datetime.now(UTC) + timedelta(seconds=expiry_seconds)
     expiry_minutes = max(1, (expiry_seconds + 59) // 60)
     lines = [
-        "Managed file transfer: clean file ready for download",
-        f"Bucket: {operation['bucket_name']}",
-        f"Key: {operation['object_key']}",
+        "*Managed file transfer: clean file ready for download*",
+        f"*Bucket:* `{operation['bucket_name']}`",
+        f"*Key:* `{operation['object_key']}`",
     ]
 
     if operation["version_id"]:
-        lines.append(f"VersionId: {operation['version_id']}")
+        lines.append(f"*VersionId:* `{operation['version_id']}`")
 
     lines.extend(
         [
-            f"Link valid for: {expiry_minutes} minutes",
-            f"Expires at (UTC): {expires_at.strftime('%Y-%m-%d %H:%M:%S')}",
-            f"Download URL: {presigned_url}",
+            f"*Link valid for:* {expiry_minutes} minutes",
+            f"*Expires at (UTC):* {expires_at.strftime('%Y-%m-%d %H:%M:%S')}",
+            f"*Download URL:* {presigned_url}",
         ]
     )
 
-    return "\n".join(lines)
+    return {
+        "version": "1.0",
+        "source": "custom",
+        "id": str(uuid.uuid4()),
+        "content": {
+            "textType": "client-markdown",
+            "title": ":white_check_mark: Clean file ready",
+            "description": "\n".join(lines),
+            "keywords": [
+                "ManagedFileTransfer",
+                "CleanBucket",
+            ],
+        },
+        "metadata": {
+            "summary": "Managed file transfer clean file ready",
+            "threadId": operation["object_key"],
+            "additionalContext": {
+                "bucket": operation["bucket_name"],
+                "expiresAtUtc": expires_at.strftime("%Y-%m-%d %H:%M:%S"),
+                "expiresInSeconds": str(expiry_seconds),
+                "objectKey": operation["object_key"],
+            },
+            "enableCustomActions": False,
+        },
+    }
 
 
 @idempotent_function(
@@ -158,8 +183,7 @@ def process_record(*, operation):
 
     sns.publish(
         TopicArn=operation["notification_topic_arn"],
-        Subject="Managed file transfer clean file ready",
-        Message=notification_message,
+        Message=json.dumps(notification_message),
     )
 
     logger.info("Published presigned URL notification", extra=get_log_fields(operation))
