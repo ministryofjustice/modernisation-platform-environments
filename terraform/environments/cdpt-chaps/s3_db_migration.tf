@@ -4,9 +4,10 @@ locals {
 }
 
 resource "aws_kms_key" "db_migration" {
-  description             = "CHAPS dev database migration S3 encryption key"
+  description             = "CHAPS ${local.environment} database migration S3 encryption key"
   deletion_window_in_days = 30
   enable_key_rotation     = true
+  policy                  = data.aws_iam_policy_document.db_migration_kms.json
 
   tags = local.tags
 }

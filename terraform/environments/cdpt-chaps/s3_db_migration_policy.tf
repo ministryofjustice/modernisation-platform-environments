@@ -1,7 +1,8 @@
 locals {
-  source_db_identifier           = "db-chaps-dev"
-  native_backup_option_group     = "chaps-${local.environment}-sqlserver-native-backup"
-  mp_rds_native_backup_role_name = "chaps-${local.environment}-rds-native-backup"
+  source_db_identifier                = "db-chaps-dev"
+  native_backup_option_group          = "chaps-${local.environment}-sqlserver-native-backup"
+  mp_rds_native_backup_role_name      = "chaps-${local.environment}-rds-native-backup"
+  cp_db_migration_copy_irsa_role_arn  = "arn:aws:iam::754256621582:role/cloud-platform-irsa-c5c488d70a0c0af2-live"
 }
 
 data "aws_iam_policy_document" "rds_native_backup_assume_role" {
@@ -138,11 +139,107 @@ data "aws_iam_policy_document" "db_migration_bucket_policy" {
       values = ["false"]
     }
   }
+
+  statement {
+    sid = "AllowCpMigrationCopyRoleToListBackupPrefix"
+
+    principals {
+      type = "AWS"
+      identifiers = [local.cp_db_migration_copy_irsa_role_arn]
+    }
+
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket"
+    ]
+
+    resources = [
+      aws_s3_bucket.db_migration.arn
+    ]
+
+    condition {
+      test = "StringLike"
+      variable = "s3:prefix"
+      values = [
+        local.db_migration_prefix,
+        "${local.db_migration_prefix}/*"
+      ]
+    }
+  }
+
+  statement {
+    sid = "AllowCpMigrationCopyRoleToReadBackupObjects"
+
+    principals {
+      type    = "AWS"
+      identifiers = [local.cp_db_migration_copy_irsa_role_arn]
+    }
+
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectAttributes"
+    ]
+
+    resources = [
+      "${aws_s3_bucket.db_migration.arn}/${local.db_migration_prefix}/*"
+      ]
+  }
 }
 
 resource "aws_s3_bucket_policy" "db_migration" {
   bucket = aws_s3_bucket.db_migration.id
   policy = data.aws_iam_policy_document.db_migration_bucket_policy.json
+}
+
+data "aws_iam_policy_document" "db_migration_kms" {
+  statement {
+    sid = "allowAccountRoot"
+    effect = "Allow"
+    actions = ["kms:*"]
+
+    resources = ["*"]
+
+    principals {
+      type = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+  }
+
+  statement {
+    sid = "AllowMpRdsNativeBackupRole"
+    effect = "Allow"
+
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+      "kms:DescribeKey"
+    ]
+
+    resources = ["*"]
+
+    principals {
+      type = "AWS"
+      identifiers = [aws_iam_role.rds_native_backup.arn]
+    }
+  }
+
+  statement {
+    sid = "AllowCpMigrationCopyRoleToDecrypt"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey"
+    ]
+
+    resources = ["*"]
+
+    principals {
+      type = "AWS"
+      identifiers = [local.cp_db_migration_copy_irsa_role_arn]
+    }
+  }
 }
 
 output "db_migration_kms_key_arn" {
