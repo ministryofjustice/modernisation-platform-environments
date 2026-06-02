@@ -70,22 +70,22 @@ module "eks" {
   # }
 
   addons = {
-    coredns = {
-      #   addon_version = local.environment_configuration.eks_cluster_addon_versions.coredns
-      configuration_values = jsonencode({
-        nodeSelector = {
-          "cloud-platform.justice.gov.uk/system-ng" = "true"
-        }
-        tolerations = [
-          {
-            key      = "system-node"
-            value    = "true"
-            effect   = "NoSchedule"
-            operator = "Equal"
-          }
-        ]
-      })
-    }
+    # coredns = {
+    #   #   addon_version = local.environment_configuration.eks_cluster_addon_versions.coredns
+    #   configuration_values = jsonencode({
+    #     nodeSelector = {
+    #       "cloud-platform.justice.gov.uk/system-ng" = "true"
+    #     }
+    #     tolerations = [
+    #       {
+    #         key      = "system-node"
+    #         value    = "true"
+    #         effect   = "NoSchedule"
+    #         operator = "Equal"
+    #       }
+    #     ]
+    #   })
+    # }
     # kube-proxy = {
     #   #   addon_version = local.environment_configuration.eks_cluster_addon_versions.kube_proxy
     # }
