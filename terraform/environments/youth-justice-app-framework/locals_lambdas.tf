@@ -97,6 +97,25 @@ locals {
     }
   }
 
+  malware-threat-notifier = {
+    function_zip_file = "lambda_code/malware-threat-notifier.zip"
+    function_name     = "malware-threat-notifier"
+    handler           = "malware-threat-notifier.lambda_handler"
+    iam_role_name     = "malware-threat-notifier-lambda-role"
+    environment_variables = {
+      THREAT_ENDPOINT_URL = local.application_data.accounts[local.environment].malware_threat_endpoint_url
+    }
+  }
+
+  malware-threat-notifier-role = {
+    name              = "malware-threat-notifier-lambda-role"
+    trust_policy_path = "lambda_policies/lambda-role-trust.json"
+    iam_policy_path   = "lambda_policies/malware-threat-notifier-role-policy.json"
+    policy_template_vars = {
+      account_number = local.environment_management.account_ids[terraform.workspace]
+    }
+  }
+
   inspector-sbom-ec2-role = {
     name              = "inspector-sbom-ec2-lambda-role"
     trust_policy_path = "lambda_policies/lambda-role-trust.json"
