@@ -106,6 +106,10 @@
     },
     {
       "object_name": "dbo.FINISHED_JOB_HISTORY",
+      "column_name": "TARGET_PROCESS_ID"
+    },
+    {
+      "object_name": "dbo.FINISHED_JOB_HISTORY",
       "column_name": "TARGET_TIME_IN_SECONDS"
     },
     {

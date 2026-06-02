@@ -34,5 +34,5 @@ module "airflow_data_ingestion_role" {
   source = "./modules/airflow-data-ingestion-role"
 
   identity_provider_arn = module.airflow_oidc.oidc_arn
-  data_buckets = [module.s3-bucket.bucket.id]
+  data_buckets          = [module.s3-bucket.bucket.id]
 }

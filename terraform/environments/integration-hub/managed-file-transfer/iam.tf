@@ -127,7 +127,7 @@ module "iam_for_transfer" {
 
   create          = true
   use_name_prefix = true
-  name            = "iam_for_transfer"
+  name            = "transfer-logging"
 
   trust_policy_permissions = {
     AllowTransferService = {

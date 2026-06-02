@@ -171,7 +171,6 @@ resource "aws_lb_target_group" "oem_app_7102" {
 
   lifecycle {
     create_before_destroy = true
-    ignore_changes = [health_check[0].protocol]
   }
 }
 
