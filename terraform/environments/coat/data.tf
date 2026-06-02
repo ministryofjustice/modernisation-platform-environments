@@ -5,6 +5,11 @@ data "aws_iam_role" "moj_mp_dev_role" {
   name  = local.mp_dev_role
 }
 
+data "aws_iam_role" "moj_mp_sandbox_role" {
+  count = local.is-production ? 0 : 1
+  name  = local.mp_sandbox_role
+}
+
 #### This file can be used to store data specific to the member account ####
 data "aws_iam_policy_document" "github_actions_assume_role_policy_document" {
   version = "2012-10-17"

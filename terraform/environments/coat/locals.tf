@@ -10,6 +10,7 @@ locals {
   coat_dev_account_id  = "082282578003" #local.environment_management.account_ids["coat-development"]
 
   mp_dev_role = "AWSReservedSSO_modernisation-platform-developer_cd1b8f85b1611d20"
+  mp_sandbox_role = "AWSReservedSSO_modernisation-platform-sandbox_befb4340ef5f2771"
 
   kms_dev_key_id = "arn:aws:kms:${data.aws_region.current.region}:${local.coat_dev_account_id}:key/b6c2960d-bc58-4fec-b941-ab8e602269ef"
 
