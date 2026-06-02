@@ -10,7 +10,18 @@ module "eks" {
   enable_irsa        = true
 
   endpoint_private_access = true
+  # endpoint_public_access_cidrs = ["0.0.0.0/0"] # From William's TF
   endpoint_public_access  = true
+
+  ####### FROM WILLIAMS TF #######
+  enable_cluster_creator_admin_permissions = true
+  # EKS Auto Mode (ADR-008)
+  compute_config = {
+    enabled    = true
+    node_pools = ["general-purpose", "system"]
+  }
+  enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+  ####### END WILLIAMS TF #######
 
   cloudwatch_log_group_retention_in_days = 30
 
