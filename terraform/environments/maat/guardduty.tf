@@ -1,3 +1,4 @@
+/*
 # ---------------------------------------------
 # GuardDuty Findings → Slack Alerting
 # ---------------------------------------------
@@ -287,3 +288,4 @@ resource "aws_guardduty_malware_protection_plan" "s3_shared" {
 
   depends_on = [module.s3-bucket-shared]
 }
+*/
