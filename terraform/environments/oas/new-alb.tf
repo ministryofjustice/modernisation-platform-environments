@@ -761,6 +761,25 @@ resource "aws_lb_listener_rule" "bi_security_login_9502_rule" {
   }
 }
 
+# Listener rule for /bi-sac-config-mgr on port 9502
+resource "aws_lb_listener_rule" "bi_sac_config_mgr_9502_rule" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.http_9502_listener[0].arn
+  priority     = 230
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/bi-sac-config-mgr*"]
+    }
+  }
+}
+
 # # Listener rule for /static on port 9502
 # resource "aws_lb_listener_rule" "static_9502_rule" {
 #   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
@@ -856,6 +875,25 @@ resource "aws_lb_listener_rule" "bi_security_login_9503_rule" {
   }
 }
 
+# Listener rule for /bi-sac-config-mgr on port 9503
+resource "aws_lb_listener_rule" "bi_sac_config_mgr_9503_rule" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.https_9503_listener[0].arn
+  priority     = 230
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/bi-sac-config-mgr*"]
+    }
+  }
+}
+
 # # Listener rule for /static on port 9503
 # resource "aws_lb_listener_rule" "static_9503_rule" {
 #   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
@@ -885,7 +923,7 @@ resource "aws_lb_listener_rule" "console_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_ec2_https_9501_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
   }
 
   condition {
@@ -904,7 +942,7 @@ resource "aws_lb_listener_rule" "em_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_ec2_https_9501_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
   }
 
   condition {
@@ -923,7 +961,7 @@ resource "aws_lb_listener_rule" "analytics_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
   }
 
   condition {
@@ -942,7 +980,7 @@ resource "aws_lb_listener_rule" "analytics_ws_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
   }
 
   condition {
@@ -961,7 +999,7 @@ resource "aws_lb_listener_rule" "dv_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
   }
 
   condition {
@@ -980,7 +1018,7 @@ resource "aws_lb_listener_rule" "bi_security_login_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
   }
 
   condition {
@@ -999,7 +1037,7 @@ resource "aws_lb_listener_rule" "biinfer_login_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
   }
 
   condition {
@@ -1018,7 +1056,7 @@ resource "aws_lb_listener_rule" "bi_sac_config_mgr_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
   }
 
   condition {
