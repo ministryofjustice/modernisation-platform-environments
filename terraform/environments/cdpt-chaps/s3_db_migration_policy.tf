@@ -141,6 +141,23 @@ data "aws_iam_policy_document" "db_migration_bucket_policy" {
   }
 
   statement {
+    sid = "AllowCpMigrationCopyRoleToGetBucketLocation"
+
+    principals {
+      type        = "AWS"
+      identifiers = [local.cp_db_migration_copy_irsa_role_arn]
+    }
+
+    actions = [
+      "s3:GetBucketLocation"
+    ]
+
+    resources = [
+      aws_s3_bucket.db_migration.arn
+    ]
+  }
+
+  statement {
     sid = "AllowCpMigrationCopyRoleToListBackupPrefix"
 
     principals {
@@ -149,7 +166,6 @@ data "aws_iam_policy_document" "db_migration_bucket_policy" {
     }
 
     actions = [
-      "s3:GetBucketLocation",
       "s3:ListBucket"
     ]
 
