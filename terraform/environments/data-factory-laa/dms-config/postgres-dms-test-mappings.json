@@ -1,5 +1,10 @@
 {
-  "blobs": ["image_data"],
+  "blobs": [
+    {
+      "column_name": "image_data",
+      "object_name": "customers"
+    }
+  ],
   "columns_to_exclude": [],
   "objects": [
     "customers",
