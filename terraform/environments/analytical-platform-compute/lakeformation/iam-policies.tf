@@ -1,3 +1,4 @@
+# Upgrading the IAM module from v5.x to v6.x introduces breaking changes that cause IAM roles and policies to be replaced. Therefore, we are not proceeding with the version upgrade.
 #trivy:ignore:AVD-AWS-0345: test policy for development
 data "aws_iam_policy_document" "analytical_platform_share_policy" {
   #checkov:skip=CKV_AWS_110: test policy for development
