@@ -15,6 +15,26 @@ resource "aws_iam_role" "coat_api_cross_account_role" {
   })
 }
 
+resource "aws_iam_role_policy" "coat_api_kms_decrypt" {
+  name = "coat-api-kms-decrypt"
+  role = aws_iam_role.coat_api_cross_account_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "athena_full_access" {
   role       = aws_iam_role.coat_api_cross_account_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonAthenaFullAccess"
