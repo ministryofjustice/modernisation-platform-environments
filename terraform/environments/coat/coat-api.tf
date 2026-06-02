@@ -8,9 +8,9 @@ resource "aws_iam_role" "coat_api_cross_account_role" {
         Action = "sts:AssumeRole"
         Effect = "Allow"
         Principal = {
-          AWS = [
-            data.aws_iam_role.moj_mp_sandbox_role[0].arn
-          ]
+          AWS = local.is-production ? 
+            [ data.aws_iam_role.moj_mp_dev_role[0].arn ] : 
+            [ data.aws_iam_role.moj_mp_sandbox_role[0].arn ]
         }
       }
     ]
