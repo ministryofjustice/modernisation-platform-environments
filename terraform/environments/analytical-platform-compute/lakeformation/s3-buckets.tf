@@ -21,11 +21,9 @@ data "aws_iam_policy_document" "athena_query_results_policy_eu_west_2" {
 }
 
 module "mojap_compute_athena_query_results_bucket_eu_west_2" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.13.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=af0286ff37a66c2b79faf360e6e2663744b8e5b5" # v5.13.0
+
 
   bucket = "mojap-compute-${local.environment}-athena-query-results-eu-west-2"
 
