@@ -79,7 +79,7 @@ resource "aws_sagemaker_model" "probation_search_huggingface_embedding_model" {
 
   for_each = tomap(local.probation_search_environment)
 
-  execution_role_arn       = module.probation_search_sagemaker_execution_iam_role[each.key].arn
+  execution_role_arn       = module.probation_search_sagemaker_execution_iam_role[each.key].iam_role_arn
   enable_network_isolation = can(each.value.s3_model_key)
   primary_container {
     image       = data.aws_sagemaker_prebuilt_ecr_image.probation_search_huggingface_embedding_image[each.key].registry_path
@@ -164,6 +164,7 @@ resource "aws_appautoscaling_policy" "probation_search" {
 # ------------------------------------------------------------------------------
 # IAM Permissions
 # ------------------------------------------------------------------------------
+# Upgrading the IAM module from v5.x to v6.x introduces breaking changes that cause IAM roles and policies to be replaced. Therefore, we are not proceeding with the version upgrade.
 
 module "probation_search_sagemaker_execution_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
@@ -171,27 +172,19 @@ module "probation_search_sagemaker_execution_iam_role" {
 
   for_each = tomap(local.probation_search_environment)
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.55.0"
 
+  create_role = true
 
-  name            = "${each.value.namespace}-sagemaker-exec-role"
-  use_name_prefix = false
-  trust_policy_permissions = {
-    SagemakerExecutionRole = {
-      actions = ["sts:AssumeRole", "sts:TagSession"]
-      principals = [
-        {
-          type        = "Service"
-          identifiers = ["sagemaker.amazonaws.com"]
-        }
-      ]
-    }
-  }
+  role_name         = "${each.value.namespace}-sagemaker-exec-role"
+  role_requires_mfa = false
 
-  create_inline_policy = true
-  inline_policy_permissions = {
-    CloudWatchAccess = {
+  trusted_role_services = ["sagemaker.amazonaws.com"]
+
+  inline_policy_statements = [
+    {
+      sid    = "CloudWatchAccess"
       effect = "Allow"
       actions = [
         "cloudwatch:PutMetricData",
@@ -201,27 +194,29 @@ module "probation_search_sagemaker_execution_iam_role" {
         "logs:PutLogEvents",
       ]
       resources = ["*"]
-    }
-    KMSAccess = {
+    },
+    {
+      sid    = "KMSAccess"
       effect = "Allow"
       actions = [
         "kms:Decrypt",
         "kms:GenerateDataKey"
       ]
       resources = [local.probation_search_model_kms_arn]
-    }
-    S3BucketAccess = {
+    },
+    {
+      sid       = "S3BucketAccess"
       effect    = "Allow"
       actions   = ["s3:ListBucket"]
       resources = ["arn:aws:s3:::${local.probation_search_model_bucket_name}"]
-    }
-    S3ObjectAccess = {
+    },
+    {
       sid       = "S3ObjectAccess"
       effect    = "Allow"
       actions   = ["s3:GetObject"]
       resources = ["arn:aws:s3:::${local.probation_search_model_bucket_name}/*"]
     }
-  }
+  ]
 
   tags = local.tags
 }
@@ -232,28 +227,19 @@ module "probation_search_sagemaker_invocation_iam_role" {
 
   for_each = tomap(local.probation_search_environment)
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.55.0"
 
+  create_role = true
 
+  role_name         = "${each.value.namespace}-sagemaker-role"
+  role_requires_mfa = false
 
-  name = "${each.value.namespace}-sagemaker-role"
+  trusted_role_arns = ["arn:aws:iam::754256621582:role/${each.value.namespace}-xa-opensearch-to-sagemaker"]
 
-  use_name_prefix = false
-  trust_policy_permissions = {
-    SagemakerExecutionRole = {
-      actions = ["sts:AssumeRole", "sts:TagSession"]
-      principals = [
-        {
-          type        = "AWS"
-          identifiers = ["arn:aws:iam::754256621582:role/${each.value.namespace}-xa-opensearch-to-sagemaker"]
-        }
-      ]
-    }
-  }
-  create_inline_policy = true
-  inline_policy_permissions = {
-    SageMakerAccess = {
+  inline_policy_statements = [
+    {
+      sid    = "SageMakerAccess"
       effect = "Allow"
       actions = [
         "sagemaker:InvokeEndpoint",
@@ -261,7 +247,7 @@ module "probation_search_sagemaker_invocation_iam_role" {
       ]
       resources = [aws_sagemaker_endpoint.probation_search[each.key].arn]
     }
-  }
+  ]
 
   tags = local.tags
 }
