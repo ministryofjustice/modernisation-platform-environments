@@ -13,11 +13,18 @@ locals {
 
   # please keep resources in alphabetical order
   baseline_production = {
-    cloudwatch_dashboards = {}
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          local.cloudwatch_dashboard_widget_groups.all_windows_ec2,
+        ]
+      }
+    }
 
     ec2_instances = {
       pd-pr-retail-a = { # 15 char limit on name as domain joined
-        # TODO: enable alarms when commissioned
         # cloudwatch_metric_alarms = merge(
         #   module.baseline_presets.cloudwatch_metric_alarms.ec2,
         #   module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
@@ -51,8 +58,7 @@ locals {
           "/dev/sde"  = { type = "gp3", size = 50 }
           "/dev/sdf"  = { type = "gp3", size = 20 }
           "/dev/sdg"  = { type = "gp3", size = 250 }
-          # "/dev/sdh" = { type = "gp3", size = 50 }
-          # "/dev/sdi" = { type = "gp3", size = 20 }
+
           "/dev/sdj" = { type = "gp3", size = 112 }
           "/dev/sdk" = { type = "gp3", size = 20 }
           "/dev/sdl" = { type = "gp3", size = 200 }
