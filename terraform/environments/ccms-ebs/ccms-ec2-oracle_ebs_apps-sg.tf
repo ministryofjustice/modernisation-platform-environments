@@ -451,3 +451,16 @@ resource "aws_security_group_rule" "egress_traffic_ebsapps_oem_db_1521" {
   cidr_blocks       = [local.application_data.accounts[local.environment].oem.oem_db_platform_cidr]
 }
 
+# EGRESS Rules ---- Found in the OLD ALB SG, unsure if needed or not, but adding here as related to the apps instances
+
+### All
+
+resource "aws_security_group_rule" "egress_traffic_ebslb_80" {
+  security_group_id = aws_security_group.ec2_sg_ebsapps.id
+  type              = "egress"
+  description       = "All"
+  protocol          = "TCP"
+  from_port         = 0
+  to_port           = 0
+  cidr_blocks       = ["0.0.0.0/0"]
+}

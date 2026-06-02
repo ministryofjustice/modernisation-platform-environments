@@ -177,8 +177,8 @@ locals {
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web12.tags, {
-          nomis-environment    = "qa11g2"
-          oracle-db-name       = "qa11g2"
+          nomis-environment    = "qa19c"
+          oracle-db-name       = "qa19c"
           oracle-db-hostname-a = "dev-nomis-db19c-1-a"
           oracle-db-hostname-b = "none"
         })
@@ -470,7 +470,7 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa11g/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g/weblogic-*",
             ]
           }
         ])
@@ -486,7 +486,7 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa11g2/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g2/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g2/weblogic-*",
             ]
           }
         ])
@@ -518,7 +518,7 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa19c/*",
-              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa19c/*"
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa19c/weblogic-*"
             ]
           }
         ])
