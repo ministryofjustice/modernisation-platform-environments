@@ -339,28 +339,9 @@ module "dms_oracle" {
 #   password — dms_user password
 # ---------------------------------------------------------------------------
 
-#checkov:skip=CKV2_AWS_57: Automatic rotation not needed for test credentials
-resource "aws_secretsmanager_secret" "dms_postgres_credentials" {
+data "aws_secretsmanager_secret" "dms_postgres_credentials" {
   count = local.is-development ? 1 : 0
   name  = "laa-df-dev/postgres-dms-test/dms-user"
-  tags  = local.tags
-}
-
-resource "aws_secretsmanager_secret_version" "dms_postgres_credentials" {
-  count     = local.is-development ? 1 : 0
-  secret_id = aws_secretsmanager_secret.dms_postgres_credentials[0].id
-  secret_string = jsonencode({
-    host                 = "<rds-endpoint>"
-    port                 = "5432"
-    username             = "dms_user"
-    password             = "<password>"
-    dbInstanceIdentifier = "postgres-dms-test"
-  })
-
-  lifecycle {
-    # Prevent Terraform from overwriting credentials updated outside of Terraform
-    ignore_changes = [secret_string]
-  }
 }
 
 data "aws_iam_policy_document" "postgres_dms_kms" {
@@ -521,7 +502,7 @@ module "dms_postgres" {
 
   dms_source = {
     engine_name             = "postgres"
-    secrets_manager_arn     = aws_secretsmanager_secret.dms_postgres_credentials[0].arn
+    secrets_manager_arn     = data.aws_secretsmanager_secret.dms_postgres_credentials[0].arn
     secrets_manager_kms_arn = aws_kms_key.postgres_dms[0].arn
     database_name           = "dmstest"
     # Postgres extra_connection_attributes:
