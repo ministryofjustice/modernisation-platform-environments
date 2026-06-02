@@ -69,6 +69,7 @@ data "aws_iam_policy_document" "rds_native_backup_s3_kms" {
       variable  = "s3:prefix"
       values = [
         local.db_migration_prefix,
+        "${local.db_migration_prefix}/",
         "${local.db_migration_prefix}/*"
       ]
     }
@@ -178,6 +179,7 @@ data "aws_iam_policy_document" "db_migration_bucket_policy" {
       variable = "s3:prefix"
       values = [
         local.db_migration_prefix,
+        "${local.db_migration_prefix}/"
         "${local.db_migration_prefix}/*"
       ]
     }
