@@ -2,12 +2,11 @@ locals {
 
   baseline_presets_production = {
     options = {
-      # TODO: configure prison-retail PagerDuty
-      # sns_topics = {
-      #   pagerduty_integrations = {
-      #     pagerduty = "prison-retail"          
-      #   }
-      # }
+      sns_topics = {
+        pagerduty_integrations = {
+          pagerduty = "prison-retail"          
+        }
+      }
     }
   }
 
