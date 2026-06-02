@@ -251,6 +251,8 @@ resource "aws_api_gateway_client_certificate" "update_p1_export_certificate" {
 }
 
 resource "aws_wafv2_web_acl" "update_p1_export_api_gateway" {
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+
   name        = "update_p1_export-waf"
   description = "WAF for API Gateway update_p1_export"
   scope       = "REGIONAL"
@@ -309,11 +311,13 @@ resource "aws_wafv2_web_acl" "update_p1_export_api_gateway" {
 }
 
 resource "aws_wafv2_web_acl_association" "update_p1_export_api_gateway_association" {
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   resource_arn = aws_api_gateway_stage.update_p1_export_stage[0].arn
   web_acl_arn  = aws_wafv2_web_acl.update_p1_export_api_gateway.arn
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "update_p1_export_api_gateway_waf_logs" {
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   resource_arn = aws_wafv2_web_acl.update_p1_export_api_gateway.arn
 
   log_destination_configs = [
@@ -324,6 +328,8 @@ resource "aws_wafv2_web_acl_logging_configuration" "update_p1_export_api_gateway
 # tfsec:ignore:aws-cloudwatch-log-group-customer-key
 resource "aws_cloudwatch_log_group" "update_p1_export_waf_log_group" {
   #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for now"
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+
   name              = "aws-waf-logs-update_p1_export"
   retention_in_days = 400
 }
