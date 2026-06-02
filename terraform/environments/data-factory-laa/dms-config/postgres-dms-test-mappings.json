@@ -1,0 +1,11 @@
+{
+  "blobs": ["image_data"],
+  "columns_to_exclude": [],
+  "objects": [
+    "customers",
+    "orders",
+    "products",
+    "audit_log"
+  ],
+  "schema": "public"
+}
