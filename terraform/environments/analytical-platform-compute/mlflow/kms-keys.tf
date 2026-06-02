@@ -1,11 +1,8 @@
 module "mlflow_auth_rds_kms" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git?ref=407e3db34a65b384c20ef718f55d9ceacb97a846" # v4.2.0
 
   aliases               = ["rds/mlflow-auth"]
   description           = "MLflow Auth RDS KMS key"
@@ -19,11 +16,8 @@ module "mlflow_auth_rds_kms" {
 module "mlflow_rds_kms" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git?ref=407e3db34a65b384c20ef718f55d9ceacb97a846" # v4.2.0
 
-  source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.0"
 
   aliases               = ["rds/mlflow"]
   description           = "MLflow RDS KMS key"
@@ -37,11 +31,7 @@ module "mlflow_rds_kms" {
 module "mlflow_s3_kms" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-
-  source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git?ref=407e3db34a65b384c20ef718f55d9ceacb97a846" # v4.2.0
 
   aliases               = ["s3/mlflow"]
   description           = "MLflow S3 KMS key"
