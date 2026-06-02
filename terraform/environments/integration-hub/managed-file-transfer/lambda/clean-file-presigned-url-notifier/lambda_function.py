@@ -1,7 +1,6 @@
 import hashlib
 import json
 import os
-import uuid
 from datetime import UTC, datetime, timedelta
 from urllib.parse import unquote_plus
 
@@ -127,26 +126,9 @@ def build_notification_message(operation, expiry_seconds, presigned_url):
     return {
         "version": "1.0",
         "source": "custom",
-        "id": str(uuid.uuid4()),
         "content": {
             "textType": "client-markdown",
-            "title": ":white_check_mark: Clean file ready",
             "description": "\n".join(lines),
-            "keywords": [
-                "ManagedFileTransfer",
-                "CleanBucket",
-            ],
-        },
-        "metadata": {
-            "summary": "Managed file transfer clean file ready",
-            "threadId": operation["object_key"],
-            "additionalContext": {
-                "bucket": operation["bucket_name"],
-                "expiresAtUtc": expires_at.strftime("%Y-%m-%d %H:%M:%S"),
-                "expiresInSeconds": str(expiry_seconds),
-                "objectKey": operation["object_key"],
-            },
-            "enableCustomActions": False,
         },
     }
 
