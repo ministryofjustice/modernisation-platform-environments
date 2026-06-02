@@ -380,7 +380,7 @@ locals {
       }
       user_data_cloud_init = {
         args = {
-          branch       = "TM-2061"
+          branch       = "main"
           ansible_args = "--tags ec2provision"
         }
         scripts = [ # paths are relative to templates/ dir
