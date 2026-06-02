@@ -9,7 +9,7 @@ resource "aws_iam_role" "coat_api_cross_account_role" {
         Effect = "Allow"
         Principal = {
           AWS = [
-            data.aws_iam_role.moj_mp_dev_role[0].arn
+            data.aws_iam_role.moj_mp_sandbox_role[0].arn
           ]
         }
       }
