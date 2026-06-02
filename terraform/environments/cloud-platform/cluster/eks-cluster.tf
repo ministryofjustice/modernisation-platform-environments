@@ -122,19 +122,19 @@ module "eks" {
 
   authentication_mode = "API_AND_CONFIG_MAP"
 
-  # access_entries = {
-  #   ## Cloud Platform Platform Engineer access to cluster
-  #   sso-platform-engineer-admin = {
-  #     principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${one(data.aws_iam_roles.platform_engineer_admin_sso_role.names)}"
-  #     policy_associations = {
-  #       eks-admin = {
-  #         policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-  #         access_scope = {
-  #           type = "cluster"
-  #         }
-  #       }
-  #     }
-  #   }
+  access_entries = {
+    ## Cloud Platform Platform Engineer access to cluster
+    sso-platform-engineer-admin = {
+      principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${one(data.aws_iam_roles.platform_engineer_admin_sso_role.names)}"
+      policy_associations = {
+        eks-admin = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
+    }
   #   ## MP Environments Actions (MemberInfrastructureAccess)access to cluster
   #   mpe-administrator = {
   #     principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess"
@@ -160,7 +160,7 @@ module "eks" {
   #       }
   #     }
   #   }
-  # }
+  }
 
   tags = merge(
     local.tags,
