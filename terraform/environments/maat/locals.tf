@@ -36,4 +36,11 @@ locals {
   lbs_domain_type_sub    = [for k, v in local.lbs_domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
   xdr_tags = join(", ", [upper(local.application_name), upper(local.environment), upper(var.networking[0].business-unit)])
+
+  # lambda_source_hashes = [
+  #   for f in fileset("./lambda/cloudwatch_alarm_slack_integration", "**") :
+  #   sha256(file("${path.module}/lambda/cloudwatch_alarm_slack_integration/${f}"))
+  # ]
+
+  # lambda_folder_name = ["lambda_delivery", "cloudwatch_sns_layer"]
 }
