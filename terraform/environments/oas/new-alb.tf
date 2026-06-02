@@ -885,7 +885,7 @@ resource "aws_lb_listener_rule" "console_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_ec2_https_9501_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
   }
 
   condition {
@@ -904,7 +904,7 @@ resource "aws_lb_listener_rule" "em_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_ec2_https_9501_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
   }
 
   condition {
@@ -923,7 +923,7 @@ resource "aws_lb_listener_rule" "analytics_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
   }
 
   condition {
@@ -942,7 +942,7 @@ resource "aws_lb_listener_rule" "analytics_ws_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
   }
 
   condition {
@@ -961,7 +961,7 @@ resource "aws_lb_listener_rule" "dv_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
   }
 
   condition {
@@ -980,7 +980,7 @@ resource "aws_lb_listener_rule" "bi_security_login_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
   }
 
   condition {
@@ -999,7 +999,7 @@ resource "aws_lb_listener_rule" "biinfer_login_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
   }
 
   condition {
@@ -1018,7 +1018,7 @@ resource "aws_lb_listener_rule" "bi_sac_config_mgr_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
   }
 
   condition {
