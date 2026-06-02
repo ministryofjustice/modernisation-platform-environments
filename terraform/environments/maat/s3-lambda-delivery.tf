@@ -1,3 +1,4 @@
+/*
 # Shared S3 bucket for Lambda layer delivery
 # Note: upload lambda_delivery/cloudwatch_sns_layer/layerV1.zip manually before first apply
 # See: https://dsdmoj.atlassian.net/wiki/spaces/LDD/pages/5975606239/Build+Layered+Function+for+Lambda
@@ -26,3 +27,4 @@ resource "aws_s3_object" "folder" {
 
   key = each.value
 }
+*/
