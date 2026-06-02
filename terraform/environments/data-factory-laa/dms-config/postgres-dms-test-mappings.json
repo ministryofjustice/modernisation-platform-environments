@@ -1,5 +1,5 @@
 {
-  "blobs": [],
+  "blobs": ["image_data"],
   "columns_to_exclude": [],
   "objects": [
     "customers",
