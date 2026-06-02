@@ -1,20 +1,34 @@
 locals {
   name = "laa-data-factory"
+  environments = {
+    development = {
+      lakeformation_admins = [
+        "arn:aws:iam::307869868585:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-sandbox_c38cf78de39ef4d0",
+        "arn:aws:iam::307869868585:role/MemberInfrastructureAccess",
+        "arn:aws:iam::307869868585:role/github-actions-apply"
+      ]
+      lakeformation_read_only_admins = [
+        "arn:aws:iam::307869868585:role/github-actions-plan"
+      ]
+    }
+    test = {
+      lakeformation_admins = [
+        "arn:aws:iam::766696030771:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-developer_f6defe724ee76f07",
+        "arn:aws:iam::766696030771:role/MemberInfrastructureAccess",
+        "arn:aws:iam::766696030771:role/github-actions-apply"
+      ]
+      lakeformation_read_only_admins = [
+        "arn:aws:iam::766696030771:role/github-actions-plan"
+      ]
+    }
+  }
 }
 
 module "data_lake_settings" {
   source = "git::https://github.com/ministryofjustice/terraform-aws-data-platform-lakeformation.git//modules/data-lake-settings?ref=43c73a9"
 
-  admins = [
-    # SSO Sandbox role
-    "arn:aws:iam::307869868585:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-sandbox_c38cf78de39ef4d0",
-    "arn:aws:iam::307869868585:role/MemberInfrastructureAccess",
-    "arn:aws:iam::307869868585:role/github-actions-apply"
-  ]
-
-  read_only_admins = [
-    "arn:aws:iam::307869868585:role/github-actions-plan"
-  ]
+  admins           = local.environments[local.environment].lakeformation_admins
+  read_only_admins = local.environments[local.environment].lakeformation_read_only_admins
 }
 
 resource "aws_kms_key" "data_lake_kms_key" {
