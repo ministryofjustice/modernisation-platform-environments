@@ -195,7 +195,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.user_data_cloud_init.args, {
-            branch = "TM-2061"
+            branch = "main"
           })
         })
         tags = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.tags, {
