@@ -18,7 +18,7 @@ resource "aws_ssm_parameter" "db_user" {
 resource "aws_ssm_parameter" "db_hostname" {
   name  = "db-hostname"
   type  = "String"
-  value = "CHANGE_ME"
+  value = aws_db_instance.mariadb.address
 
   tags = merge(
     local.tags,
