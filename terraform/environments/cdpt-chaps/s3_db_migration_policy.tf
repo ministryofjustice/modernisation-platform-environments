@@ -269,4 +269,3 @@ output "db_migration_bucket_name" {
   value       = aws_s3_bucket.db_migration.bucket
   description = "S3 bucket containing CHAPS dev DB migration backups"
 }
-
