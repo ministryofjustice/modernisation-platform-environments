@@ -1017,6 +1017,32 @@ module "macie-unstructured-jobs" {
 }
 
 #-----------------------------------------------------------------------------------
+# Specials Ingestion
+#-----------------------------------------------------------------------------------
+
+module "specials-ingestion" {
+  count                   = local.is-development ? 1 : 0
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "specials_ingestion"
+  role_name               = aws_iam_role.ingest_specials_data.name
+  role_arn                = aws_iam_role.ingest_specials_data.arn
+  handler                 = "specials_ingestion.handler"
+  memory_size             = 1024
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    SOURCE_BUCKET         = module.s3-json-directory-structure-bucket.bucket.id
+    ATHENA_RESULTS_BUCKET = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER        = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET        = module.s3-create-a-derived-table-bucket.bucket.id
+  }
+}
+
+
+#-----------------------------------------------------------------------------------
 # Control Lambda for File Shredding Batch
 #-----------------------------------------------------------------------------------
 

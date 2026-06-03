@@ -2539,6 +2539,107 @@ resource "aws_iam_role_policy_attachment" "macie_unstructured_job_iam_role_polic
   policy_arn = aws_iam_policy.macie_unstructured_job_iam_role_policy[0].arn
 }
 
+
+# -----------------------------------------------------------------------------------
+# Specials Ingestion
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "specials_ingestion_lambda_role_policy_document" {
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObjectAttributes",
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:GetBucketLocation",
+    ]
+    resources = [
+      "${module.s3-json-directory-structure-bucket.bucket.arn}/*",
+      module.s3-json-directory-structure-bucket.bucket.arn,
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/*",
+      module.s3-create-a-derived-table-bucket.bucket.arn,
+      "${module.s3-athena-bucket.bucket.arn}/*",
+      module.s3-athena-bucket.bucket.arn,
+    ]
+  }
+
+  statement {
+    sid    = "AthenaPermissionsForLoadData"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution"
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:workgroup/*",
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:datacatalog/*"
+    ]
+  }
+  statement {
+    sid    = "GluePermissionsForLoad"
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:CreateTable",
+      "glue:CreateDatabase",
+      "glue:UpdateTable",
+      "glue:GetPartition",
+      "glue:GetPartitions",
+      "glue:GetCatalog"
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+    ]
+  }
+  statement {
+    sid    = "GetDataAccessAndTagsForLakeFormation"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GetDataAccess",
+      "lakeformation:GetResourceLFTags",
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role" "ingest_specials_data" {
+  name               = "ingestion_specials_data_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "ingest_specials_lambda_role_policy" {
+  name   = "ingest_specials_lambda_policy"
+  policy = data.aws_iam_policy_document.specials_ingestion_lambda_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "lingest_specials_policy_attachment" {
+  role       = aws_iam_role.ingest_specials_data.name
+  policy_arn = aws_iam_policy.ingest_specials_lambda_role_policy.arn
+}
+
+module "share_dbs_with_specials_ingestion_lambda_role" {
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = toset(local.historic_source_dbs)
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = aws_iam_role.ingest_specials_data.arn
+  db_exists               = true
+  de_role_arn             = null
+}
+
+resource "aws_lakeformation_permissions" "specials_ingestion_lambda_add_create_db" {
+  permissions      = ["CREATE_DATABASE", "DROP"]
+  principal        = aws_iam_role.ingest_specials_data.arn
+  catalog_resource = true
+}
+
 # ---------------------------------
 # GDPR Unstructured Control Lambda
 # ---------------------------------
