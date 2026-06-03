@@ -25,7 +25,7 @@ environment:
       external_secrets: "2.5.0"
       fluent_bit: "0.2.0"
       karpenter: "1.12.1"
-      keda: "2.20.0"
+      keda: "2.19.0"
       kube_prometheus_stack: "86.1.0"
       kyverno: "3.8.1"
     route53_zones:
