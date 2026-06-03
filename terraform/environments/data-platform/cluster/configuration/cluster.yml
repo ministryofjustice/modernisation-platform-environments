@@ -28,6 +28,7 @@ environment:
       keda: "2.19.0"
       kube_prometheus_stack: "86.1.0"
       kyverno: "3.8.1"
+      metrics_server: "3.13.0"
     route53_zones:
       - "development.data-platform.service.justice.gov.uk"
       - "development.ai-gateway.justice.gov.uk"
@@ -61,6 +62,7 @@ environment:
       keda: "2.19.0"
       kube_prometheus_stack: "86.1.0"
       kyverno: "3.8.1"
+      metrics_server: "3.13.0"
     route53_zones:
       - "test.data-platform.service.justice.gov.uk"
       - "test.ai-gateway.justice.gov.uk"
@@ -94,6 +96,7 @@ environment:
       keda: "2.19.0"
       kube_prometheus_stack: "86.1.0"
       kyverno: "3.8.1"
+      metrics_server: "3.13.0"
     route53_zones:
       - "preproduction.data-platform.service.justice.gov.uk"
       - "preproduction.ai-gateway.justice.gov.uk"
@@ -127,6 +130,7 @@ environment:
       keda: "2.19.0"
       kube_prometheus_stack: "86.1.0"
       kyverno: "3.8.1"
+      metrics_server: "3.13.0"
     route53_zones:
       - "data-platform.service.justice.gov.uk"
       - "ai-gateway.justice.gov.uk"
