@@ -3,8 +3,8 @@ locals {
 }
 
 module "bastion_linux" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=e4a3840d4b7b327228d1397bb684bc79cd4e76cb" # v4.5.0
-
+  #source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=e4a3840d4b7b327228d1397bb684bc79cd4e76cb" # v4.5.0
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.2.1"
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
     aws.share-tenant = aws          # The default provider (unaliased, `aws`) is the tenant
