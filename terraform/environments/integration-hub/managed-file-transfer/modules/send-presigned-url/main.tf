@@ -31,17 +31,23 @@ module "sns_clean_bucket_events" {
     sqs_subscribe = {
       actions = [
         "sns:Subscribe",
-        "sns:Receive",
       ]
       principals = [{
         type        = "AWS"
-        identifiers = ["*"]
+        identifiers = [var.account_id]
       }]
-      conditions = [{
-        test     = "StringLike"
-        variable = "sns:Endpoint"
-        values   = [module.sqs_clean_file_notifications.queue_arn]
-      }]
+      conditions = [
+        {
+          test     = "StringEquals"
+          variable = "sns:Protocol"
+          values   = ["sqs"]
+        },
+        {
+          test     = "StringEquals"
+          variable = "sns:Endpoint"
+          values   = [module.sqs_clean_file_notifications.queue_arn]
+        }
+      ]
     }
   }
 
