@@ -106,6 +106,7 @@ def get_expiry_seconds(operation):
 def build_notification_message(operation, expiry_seconds, presigned_url):
     expires_at = datetime.now(UTC) + timedelta(seconds=expiry_seconds)
     expiry_minutes = max(1, (expiry_seconds + 59) // 60)
+    file_name = operation["object_key"].rsplit("/", 1)[-1]
     lines = [
         "*Managed file transfer: clean file ready for download*",
         f"*Bucket:* `{operation['bucket_name']}`",
@@ -119,7 +120,7 @@ def build_notification_message(operation, expiry_seconds, presigned_url):
         [
             f"*Link valid for:* {expiry_minutes} minutes",
             f"*Expires at (UTC):* {expires_at.strftime('%Y-%m-%d %H:%M:%S')}",
-            f"*Download URL:* {presigned_url}",
+            f"*Download URL:* [{file_name}]({presigned_url})",
         ]
     )
 
