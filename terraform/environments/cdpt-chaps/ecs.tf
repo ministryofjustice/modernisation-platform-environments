@@ -323,14 +323,6 @@ resource "aws_security_group" "cluster_ec2" {
     security_groups = [module.lb_access_logs_enabled.security_group.id]
   }
 
-  ingress {
-    description     = "Allow RDP ingress"
-    from_port       = 3389
-    to_port         = 3389
-    protocol        = "tcp"
-    security_groups = [module.bastion_linux.bastion_security_group]
-  }
-
   egress {
     description = "Cluster EC2 loadbalancer egress rule"
     from_port   = 0
@@ -345,6 +337,16 @@ resource "aws_security_group" "cluster_ec2" {
       Name = "${local.application_name}-cluster-ec2-security-group"
     }
   )
+}
+
+resource "aws_security_group_rule" "cluster_ec2_rpd_from_bastion" {
+  type                      = "ingress"
+  description               = "Allow RDP ingress"
+  from_port                 = "3389"
+  to_port                   = "3389"
+  protocol                  = "tcp"
+  security_group_id         = aws_security_group.cluster_ec2.id
+  source_security_group_id  = module.bastion_linux.bastion_security_group
 }
 
 # EC2 launch template - settings to use for new EC2s added to the group
