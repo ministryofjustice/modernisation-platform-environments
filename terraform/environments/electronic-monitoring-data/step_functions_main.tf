@@ -90,7 +90,7 @@ module "gdpr_deletion_step_function" {
       "security_groups_json"     = jsonencode([aws_security_group.ecs_generic.id])
       "subnets_json"             = jsonencode(data.aws_subnets.shared-private.ids)
       "athena_output_bucket"     = "s3://${module.s3-athena-bucket.bucket.id}/output/"
-      "control_lambda_arn"       = module.gdpr_unstructured_control_lambda.lambda_function_arn
+      "control_lambda_arn"       = module.gdpr_unstructured_control_lambda[0].lambda_function_arn
       "batch_job_queue_arn"      = aws_batch_job_queue.shred_unstructured_from_zip_batch_queue[0].arn
       "batch_job_definition_arn" = aws_batch_job_definition.shred_unstructured_from_zip_job.arn
     }
