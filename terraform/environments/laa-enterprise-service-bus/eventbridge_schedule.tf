@@ -1,21 +1,21 @@
 # CWA Extract Schedule
-resource "aws_scheduler_schedule" "cwa_extract_schedule" {
-  count      = local.environment == "development" ? 1 : 0
-  name       = "cwa-extract-schedule"
-  group_name = "default"
-
-  flexible_time_window {
-    mode = "OFF"
-  }
-
-  schedule_expression          = "cron(0 22 ? * WED *)"
-  schedule_expression_timezone = "Europe/London"
-
-  target {
-    arn      = aws_sfn_state_machine.sfn_state_machine.arn
-    role_arn = aws_iam_role.scheduler_invoke_sfn_role.arn
-  }
-}
+# resource "aws_scheduler_schedule" "cwa_extract_schedule" {
+#   count      = local.environment == "development" ? 1 : 0
+#   name       = "cwa-extract-schedule"
+#   group_name = "default"
+#
+#   flexible_time_window {
+#     mode = "OFF"
+#   }
+#
+#   schedule_expression          = "cron(0 22 ? * WED *)"
+#   schedule_expression_timezone = "Europe/London"
+#
+#   target {
+#     arn      = aws_sfn_state_machine.sfn_state_machine.arn
+#     role_arn = aws_iam_role.scheduler_invoke_sfn_role.arn
+#   }
+# }
 
 # CCMS Load Schedule
 resource "aws_scheduler_schedule" "ccms_load_schedule" {
@@ -26,7 +26,7 @@ resource "aws_scheduler_schedule" "ccms_load_schedule" {
     mode = "OFF"
   }
 
-  schedule_expression          = local.environment == "production" ? "rate(15 minutes)" : "cron(0 7-19 ? * * *)"
+  schedule_expression          = local.environment == "production" ? "rate(15 minutes)" : "cron(30 8 ? * MON-FRI *)"
   schedule_expression_timezone = "Europe/London"
 
   # The time has been changed to 1 hour earlier due to a bug that ignores the timezone, and uses UTC.
@@ -48,7 +48,7 @@ resource "aws_scheduler_schedule" "maat_load_schedule" {
     mode = "OFF"
   }
 
-  schedule_expression          = local.environment == "production" ? "cron(45 10 * * ? *)" : "cron(0 7-19 ? * * *)"
+  schedule_expression          = local.environment == "production" ? "cron(45 10 * * ? *)" : "cron(45 10 ? * MON-FRI *)"
   schedule_expression_timezone = "Europe/London"
 
   target {
