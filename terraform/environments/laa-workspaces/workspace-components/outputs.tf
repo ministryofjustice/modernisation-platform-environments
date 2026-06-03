@@ -89,3 +89,8 @@ output "mariadb_root_password_arn" {
   value       = try(aws_secretsmanager_secret.mariadb_root_password[0].arn, null)
   sensitive   = true
 }
+
+output "ses_sender_email" {
+  description = "SES verified sender email address"
+  value       = local.environment == "development" ? "no-reply@${aws_ses_domain_identity.workspaces[0].domain}" : null
+}
