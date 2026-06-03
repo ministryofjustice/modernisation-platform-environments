@@ -1,9 +1,9 @@
 locals {
-  structured_data_image_name       = "gdpr-structured-data"
-  iceberg_table_maint_image_name   = "gdpr-table-maintenance"
-  ecr_repo_name                    = "electronic-monitoring-gdpr"
-  core_shared_services_id          = local.environment_management.account_ids["core-shared-services-production"]
-  target_gdpr_dbs                  = (
+  structured_data_image_name     = "gdpr-structured-data"
+  iceberg_table_maint_image_name = "gdpr-table-maintenance"
+  ecr_repo_name                  = "electronic-monitoring-gdpr"
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  target_gdpr_dbs = (
     local.is-production ? local.prod_databases_for_gdpr : (
       local.is-preproduction ? local.preprod_databases_for_gdpr : (
         local.is-development ? local.dev_databases_for_gdpr : []
@@ -269,8 +269,8 @@ resource "aws_ecs_task_definition" "emds-gdpr-iceberg-table-maintenance" {
       cpu       = 2048
       memory    = 4096
       essential = true
-      environment = [ 
-        { name = "ATHENA_OUTPUT_BUCKET", value = module.s3-athena-bucket.bucket.id } 
+      environment = [
+        { name = "ATHENA_OUTPUT_BUCKET", value = module.s3-athena-bucket.bucket.id }
       ]
       logConfiguration : {
         logDriver = "awslogs",

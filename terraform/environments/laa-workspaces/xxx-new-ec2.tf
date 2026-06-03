@@ -121,9 +121,9 @@ ${file("${path.module}/xxx-new-scripts/user-creation.ps1")}
   tags = merge(
     local.tags,
     {
-      "Name"   = "${local.application_name}-${local.environment}-user-creation-ec2"
+      "Name"    = "${local.application_name}-${local.environment}-user-creation-ec2"
       "Purpose" = "AD user creation automation"
-      "Backup" = "false"
+      "Backup"  = "false"
     }
   )
 

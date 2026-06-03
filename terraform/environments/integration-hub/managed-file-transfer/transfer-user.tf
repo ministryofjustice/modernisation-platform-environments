@@ -94,7 +94,7 @@ module "transfer_user_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.6.0"
 
-  name            = "${local.application_name}-transfer-user-role"
+  name            = "${local.application_name}-transfer-user"
   description     = "AWS Transfer User role"
   use_name_prefix = true
 

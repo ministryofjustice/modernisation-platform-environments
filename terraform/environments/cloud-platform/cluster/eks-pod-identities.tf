@@ -1,5 +1,4 @@
 module "aws_vpc_cni_pod_identity" {
-  count = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
 
   source  = "terraform-aws-modules/eks-pod-identity/aws"
   version = "2.5.0"
@@ -11,7 +10,7 @@ module "aws_vpc_cni_pod_identity" {
 
   associations = {
     this = {
-      cluster_name    = module.eks[0].cluster_name
+      cluster_name    = module.eks.cluster_name
       namespace       = "kube-system"
       service_account = "aws-node"
     }
@@ -21,7 +20,6 @@ module "aws_vpc_cni_pod_identity" {
 }
 
 module "aws_ebs_csi_pod_identity" {
-  count = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
 
   source = "terraform-aws-modules/eks-pod-identity/aws"
 
@@ -32,7 +30,7 @@ module "aws_ebs_csi_pod_identity" {
 
   associations = {
     this = {
-      cluster_name    = module.eks[0].cluster_name
+      cluster_name    = module.eks.cluster_name
       namespace       = "kube-system"
       service_account = "ebs-csi-controller-sa"
     }
