@@ -30,7 +30,7 @@ $Password = Generate-password -length 14
 # Get service account credentials from SSM Parameter Store
 Write-Host "Retrieving service account credentials..."
 try {
-    $ssmResponse = Get-SSMParameterValue -Name "/laa-workspaces/development/ad-service-account-password" -WithDecryption $true
+    $ssmResponse = Get-SSMParameterValue -Name "/laa-workspaces/development/ad-service-account-password" -WithDecryption $true -Region eu-west-2
     $adpasswordSecure = $ssmResponse.Parameters[0].Value
     
     # Service account details
@@ -70,19 +70,13 @@ else
             -EmailAddress $Email `
             -Description "$Firstname $Lastname - Created $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" `
             -AccountPassword (ConvertTo-SecureString $Password -AsPlainText -Force) `
-            -PasswordNeverExpires $True
+            -PasswordNeverExpires $False `
+            -ChangePasswordAtLogon $True
 
         Write-Host -ForegroundColor Green "User account created successfully!"
         Write-Host -ForegroundColor Cyan "Username: $username"
         Write-Host -ForegroundColor Cyan "Password: $Password"
         
-        # Store password in SSM Parameter Store for Lambda to retrieve
-        Write-Host "Storing password in Parameter Store..."
-        $passwordParamName = "/laa-workspaces/development/user-passwords/$username"
-        Write-SSMParameter -Name $passwordParamName -Value $Password -Type "SecureString" -Overwrite $true
-        Write-Host "Password stored successfully in $passwordParamName"
-        
-        # Return success indicator
         Write-Host "SUCCESS"
     }
     catch {
