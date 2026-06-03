@@ -8,7 +8,6 @@ module "proof_of_concept_notification" {
   download_bucket_name            = module.s3_bucket["clean"].s3_bucket_id
   idempotency_table_arn           = module.dynamodb_idempotency.dynamodb_table_arn
   idempotency_table_id            = module.dynamodb_idempotency.dynamodb_table_id
-  lambda_source_path              = "${path.root}/lambda/clean-file-presigned-url-notifier"
   name_suffix                     = ""
   max_presigned_url_expiry_seconds = local.notification_configuration.max_presigned_url_expiry_seconds
   presigned_url_expiry_seconds    = local.notification_configuration.presigned_url_expiry_seconds

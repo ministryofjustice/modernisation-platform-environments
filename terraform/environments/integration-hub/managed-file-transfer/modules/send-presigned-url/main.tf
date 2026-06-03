@@ -2,51 +2,69 @@ locals {
   resource_name_prefix = var.name_suffix == "" ? var.application_name : "${var.application_name}-${var.name_suffix}"
 }
 
-resource "aws_sns_topic" "clean_bucket_events" {
+module "sns_clean_bucket_events" {
+  source  = "terraform-aws-modules/sns/aws"
+  version = "7.1.0"
+
   name = "${local.resource_name_prefix}-clean-bucket-events"
-}
 
-data "aws_iam_policy_document" "clean_bucket_events" {
-  statement {
-    sid     = "AllowCleanBucketPublish"
-    effect  = "Allow"
-    actions = ["SNS:Publish"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["s3.amazonaws.com"]
+  topic_policy_statements = {
+    clean_bucket_publish = {
+      actions = ["sns:Publish"]
+      principals = [{
+        type        = "Service"
+        identifiers = ["s3.amazonaws.com"]
+      }]
+      conditions = [
+        {
+          test     = "ArnEquals"
+          variable = "aws:SourceArn"
+          values   = [var.download_bucket_arn]
+        },
+        {
+          test     = "StringEquals"
+          variable = "aws:SourceAccount"
+          values   = [var.account_id]
+        }
+      ]
     }
-
-    resources = [aws_sns_topic.clean_bucket_events.arn]
-
-    condition {
-      test     = "ArnEquals"
-      variable = "aws:SourceArn"
-      values   = [var.download_bucket_arn]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = [var.account_id]
+    sqs_subscribe = {
+      actions = [
+        "sns:Subscribe",
+        "sns:Receive",
+      ]
+      principals = [{
+        type        = "AWS"
+        identifiers = ["*"]
+      }]
+      conditions = [{
+        test     = "StringLike"
+        variable = "sns:Endpoint"
+        values   = [module.sqs_clean_file_notifications.queue_arn]
+      }]
     }
   }
-}
 
-resource "aws_sns_topic_policy" "clean_bucket_events" {
-  arn    = aws_sns_topic.clean_bucket_events.arn
-  policy = data.aws_iam_policy_document.clean_bucket_events.json
+  subscriptions = {
+    sqs = {
+      protocol             = "sqs"
+      endpoint             = module.sqs_clean_file_notifications.queue_arn
+      raw_message_delivery = true
+    }
+  }
+
+  tags = var.tags
 }
 
 resource "aws_s3_bucket_notification" "clean_bucket_events" {
   bucket = var.download_bucket_name
 
   topic {
-    topic_arn = aws_sns_topic.clean_bucket_events.arn
+    topic_arn = module.sns_clean_bucket_events.topic_arn
     events    = ["s3:ObjectCreated:*"]
   }
 
-  depends_on = [aws_sns_topic_policy.clean_bucket_events]
+  depends_on = [module.sns_clean_bucket_events]
 }
 
 module "sqs_clean_file_notifications" {
@@ -73,7 +91,7 @@ module "sqs_clean_file_notifications" {
         {
           test     = "ArnEquals"
           variable = "aws:SourceArn"
-          values   = [aws_sns_topic.clean_bucket_events.arn]
+          values   = [module.sns_clean_bucket_events.topic_arn]
         }
       ]
     }
@@ -94,43 +112,31 @@ module "sqs_clean_file_notifications" {
   tags = var.tags
 }
 
-resource "aws_sns_topic_subscription" "clean_bucket_events_to_sqs" {
-  topic_arn            = aws_sns_topic.clean_bucket_events.arn
-  protocol             = "sqs"
-  endpoint             = module.sqs_clean_file_notifications.queue_arn
-  raw_message_delivery = true
-}
+module "sns_clean_file_download_notifications" {
+  source  = "terraform-aws-modules/sns/aws"
+  version = "7.1.0"
 
-resource "aws_sns_topic" "clean_file_download_notifications" {
   name = "${local.resource_name_prefix}-clean-file-download-notifications"
-}
 
-data "aws_iam_policy_document" "clean_file_download_notifications" {
-  statement {
-    sid    = "AllowChatbotToConsume"
-    effect = "Allow"
-    actions = [
-      "sns:Subscribe",
-      "sns:Receive",
-      "sns:Publish",
-    ]
-
-    resources = [aws_sns_topic.clean_file_download_notifications.arn]
-
-    principals {
-      type = "Service"
-      identifiers = [
-        "sns.amazonaws.com",
-        "events.amazonaws.com",
-        "chatbot.amazonaws.com",
+  topic_policy_statements = {
+    chatbot_consume = {
+      actions = [
+        "sns:Subscribe",
+        "sns:Receive",
+        "sns:Publish",
       ]
+      principals = [{
+        type = "Service"
+        identifiers = [
+          "sns.amazonaws.com",
+          "events.amazonaws.com",
+          "chatbot.amazonaws.com",
+        ]
+      }]
     }
   }
-}
 
-resource "aws_sns_topic_policy" "clean_file_download_notifications" {
-  arn    = aws_sns_topic.clean_file_download_notifications.arn
-  policy = data.aws_iam_policy_document.clean_file_download_notifications.json
+  tags = var.tags
 }
 
 module "lambda_clean_file_presigned_url_notifier" {
@@ -141,7 +147,7 @@ module "lambda_clean_file_presigned_url_notifier" {
   description                  = "Generates a presigned download URL for clean files and publishes it to SNS"
   handler                      = "lambda_function.lambda_handler"
   runtime                      = "python3.12"
-  source_path                  = var.lambda_source_path
+  source_path                  = "${path.module}/lambda/clean-file-presigned-url-notifier"
   trigger_on_package_timestamp = false
 
   event_source_mapping = {
@@ -156,7 +162,7 @@ module "lambda_clean_file_presigned_url_notifier" {
     DOWNLOAD_URL_EXPIRY_SECONDS     = tostring(var.presigned_url_expiry_seconds)
     IDEMPOTENCY_TABLE               = var.idempotency_table_id
     MAX_DOWNLOAD_URL_EXPIRY_SECONDS = tostring(var.max_presigned_url_expiry_seconds)
-    SLACK_SNS_TOPIC_ARN             = aws_sns_topic.clean_file_download_notifications.arn
+    SLACK_SNS_TOPIC_ARN             = module.sns_clean_file_download_notifications.topic_arn
   }
 
   attach_policy_statements = true
@@ -202,7 +208,7 @@ module "lambda_clean_file_presigned_url_notifier" {
         "sns:Publish",
       ]
       resources = [
-        aws_sns_topic.clean_file_download_notifications.arn,
+        module.sns_clean_file_download_notifications.topic_arn,
       ]
     }
   }
@@ -225,7 +231,7 @@ module "chatbot_clean_file_download_notifications" {
 
   slack_channel_id = var.slack_channel_id
   slack_team_id    = var.slack_team_id
-  sns_topic_arns   = [aws_sns_topic.clean_file_download_notifications.arn]
+  sns_topic_arns   = [module.sns_clean_file_download_notifications.topic_arn]
   tags             = var.tags
   application_name = local.resource_name_prefix
 }

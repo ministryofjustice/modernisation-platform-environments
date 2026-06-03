@@ -14,13 +14,13 @@ moved {
 }
 
 moved {
-  from = aws_sns_topic.clean_bucket_events
-  to   = module.proof_of_concept_notification.aws_sns_topic.clean_bucket_events
+  from = module.proof_of_concept_notification.aws_sns_topic.clean_bucket_events
+  to   = module.proof_of_concept_notification.module.sns_clean_bucket_events.aws_sns_topic.this[0]
 }
 
 moved {
-  from = aws_sns_topic_policy.clean_bucket_events
-  to   = module.proof_of_concept_notification.aws_sns_topic_policy.clean_bucket_events
+  from = module.proof_of_concept_notification.aws_sns_topic_policy.clean_bucket_events
+  to   = module.proof_of_concept_notification.module.sns_clean_bucket_events.aws_sns_topic_policy.this[0]
 }
 
 moved {
@@ -29,16 +29,16 @@ moved {
 }
 
 moved {
-  from = aws_sns_topic_subscription.clean_bucket_events_to_sqs
-  to   = module.proof_of_concept_notification.aws_sns_topic_subscription.clean_bucket_events_to_sqs
+  from = module.proof_of_concept_notification.aws_sns_topic_subscription.clean_bucket_events_to_sqs
+  to   = module.proof_of_concept_notification.module.sns_clean_bucket_events.aws_sns_topic_subscription.this["sqs"]
 }
 
 moved {
-  from = aws_sns_topic.clean_file_download_notifications
-  to   = module.proof_of_concept_notification.aws_sns_topic.clean_file_download_notifications
+  from = module.proof_of_concept_notification.aws_sns_topic.clean_file_download_notifications
+  to   = module.proof_of_concept_notification.module.sns_clean_file_download_notifications.aws_sns_topic.this[0]
 }
 
 moved {
-  from = aws_sns_topic_policy.clean_file_download_notifications
-  to   = module.proof_of_concept_notification.aws_sns_topic_policy.clean_file_download_notifications
+  from = module.proof_of_concept_notification.aws_sns_topic_policy.clean_file_download_notifications
+  to   = module.proof_of_concept_notification.module.sns_clean_file_download_notifications.aws_sns_topic_policy.this[0]
 }

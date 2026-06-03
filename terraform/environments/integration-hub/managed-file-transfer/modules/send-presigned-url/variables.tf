@@ -26,10 +26,6 @@ variable "idempotency_table_id" {
   type = string
 }
 
-variable "lambda_source_path" {
-  type = string
-}
-
 variable "max_presigned_url_expiry_seconds" {
   type = number
 }
