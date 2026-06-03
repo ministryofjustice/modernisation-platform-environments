@@ -2,6 +2,33 @@ locals {
   resource_name_prefix = var.name_suffix == "" ? var.application_name : "${var.application_name}-${var.name_suffix}"
 }
 
+module "dynamodb_idempotency" {
+  source  = "terraform-aws-modules/dynamodb-table/aws"
+  version = "5.5.0"
+
+  name         = "${local.resource_name_prefix}-presigned-url-idempotency"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "id"
+
+  attributes = [
+    {
+      name = "id"
+      type = "S"
+    }
+  ]
+
+  table_class        = "STANDARD"
+  ttl_attribute_name = "expiration"
+  ttl_enabled        = true
+  timeouts = {
+    create = "60m"
+    delete = "60m"
+    update = "60m"
+  }
+
+  tags = var.tags
+}
+
 module "sns_clean_bucket_events" {
   source  = "terraform-aws-modules/sns/aws"
   version = "7.1.0"
@@ -166,7 +193,7 @@ module "lambda_clean_file_presigned_url_notifier" {
   environment_variables = {
     DOWNLOAD_BUCKET_NAME            = var.download_bucket_name
     DOWNLOAD_URL_EXPIRY_SECONDS     = tostring(var.presigned_url_expiry_seconds)
-    IDEMPOTENCY_TABLE               = var.idempotency_table_id
+    IDEMPOTENCY_TABLE               = module.dynamodb_idempotency.dynamodb_table_id
     MAX_DOWNLOAD_URL_EXPIRY_SECONDS = tostring(var.max_presigned_url_expiry_seconds)
     SLACK_SNS_TOPIC_ARN             = module.sns_clean_file_download_notifications.topic_arn
   }
@@ -205,7 +232,7 @@ module "lambda_clean_file_presigned_url_notifier" {
         "dynamodb:DeleteItem",
       ]
       resources = [
-        var.idempotency_table_arn,
+        module.dynamodb_idempotency.dynamodb_table_arn,
       ]
     }
     notification_topic_publish = {

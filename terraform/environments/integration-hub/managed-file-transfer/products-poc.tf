@@ -6,12 +6,22 @@ module "proof_of_concept_notification" {
   download_bucket_arn             = module.s3_bucket["clean"].s3_bucket_arn
   download_bucket_kms_key_arn     = module.kms_s3_bucket["clean"].key_arn
   download_bucket_name            = module.s3_bucket["clean"].s3_bucket_id
-  idempotency_table_arn           = module.dynamodb_idempotency.dynamodb_table_arn
-  idempotency_table_id            = module.dynamodb_idempotency.dynamodb_table_id
   name_suffix                     = ""
-  max_presigned_url_expiry_seconds = local.notification_configuration.max_presigned_url_expiry_seconds
-  presigned_url_expiry_seconds    = local.notification_configuration.presigned_url_expiry_seconds
-  slack_channel_id                = local.notification_configuration.slack_channel_id
-  slack_team_id                   = local.notification_configuration.slack_team_id
+  max_presigned_url_expiry_seconds = try(
+    local.application_data.accounts[local.environment].notification_configuration.max_presigned_url_expiry_seconds,
+    3600,
+  )
+  presigned_url_expiry_seconds = try(
+    local.application_data.accounts[local.environment].notification_configuration.presigned_url_expiry_seconds,
+    1800,
+  )
+  slack_channel_id = try(
+    local.application_data.accounts[local.environment].notification_configuration.slack_channel_id,
+    null,
+  )
+  slack_team_id = try(
+    local.application_data.accounts[local.environment].notification_configuration.slack_team_id,
+    null,
+  )
   tags                            = local.tags
 }

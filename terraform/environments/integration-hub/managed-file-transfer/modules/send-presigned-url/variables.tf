@@ -18,14 +18,6 @@ variable "download_bucket_name" {
   type = string
 }
 
-variable "idempotency_table_arn" {
-  type = string
-}
-
-variable "idempotency_table_id" {
-  type = string
-}
-
 variable "max_presigned_url_expiry_seconds" {
   type = number
 }
