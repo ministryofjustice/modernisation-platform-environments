@@ -120,7 +120,7 @@ def build_notification_message(operation, expiry_seconds, presigned_url):
         [
             f"*Link valid for:* {expiry_minutes} minutes",
             f"*Expires at (UTC):* {expires_at.strftime('%Y-%m-%d %H:%M:%S')}",
-            f"*Download URL:* <{presigned_url}|{file_name}>",
+            f"Download URL: <{presigned_url}|{file_name}>",
         ]
     )
 
