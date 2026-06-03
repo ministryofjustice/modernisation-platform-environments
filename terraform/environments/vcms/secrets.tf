@@ -9,6 +9,10 @@ resource "aws_ssm_parameter" "db_user" {
       Name = "db-user"
     },
   )
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
 
 resource "aws_ssm_parameter" "db_hostname" {
@@ -22,6 +26,10 @@ resource "aws_ssm_parameter" "db_hostname" {
       Name = "db-hostname"
     },
   )
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
 
 resource "aws_ssm_parameter" "database_name" {
@@ -35,6 +43,10 @@ resource "aws_ssm_parameter" "database_name" {
       Name = "db-database-name"
     },
   )
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
 
 resource "aws_ssm_parameter" "vcms_bucket_name" {
@@ -48,6 +60,10 @@ resource "aws_ssm_parameter" "vcms_bucket_name" {
       Name = "vcms-bucket-name"
     },
   )
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
 
 resource "aws_ssm_parameter" "auto_user" {
@@ -61,6 +77,10 @@ resource "aws_ssm_parameter" "auto_user" {
       Name = "auto-user"
     },
   )
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
 
 resource "aws_ssm_parameter" "auto_password" {
@@ -74,6 +94,10 @@ resource "aws_ssm_parameter" "auto_password" {
       Name = "auto-password"
     },
   )
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
 
 resource "aws_ssm_parameter" "admin_user" {
@@ -87,6 +111,10 @@ resource "aws_ssm_parameter" "admin_user" {
       Name = "admin-user"
     },
   )
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
 
 resource "aws_ssm_parameter" "admin_password" {
@@ -100,4 +128,8 @@ resource "aws_ssm_parameter" "admin_password" {
       Name = "admin-password"
     },
   )
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
