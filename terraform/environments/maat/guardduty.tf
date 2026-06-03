@@ -375,3 +375,8 @@ resource "aws_guardduty_malware_protection_plan" "cloudfront_protection_plan" {
 
   depends_on = [aws_s3_bucket.cloudfront]
 }
+
+moved {
+  from = aws_guardduty_malware_protection_plan.s3_shared
+  to   = aws_guardduty_malware_protection_plan.shared_protection_plan
+}
