@@ -102,6 +102,7 @@ resource "aws_secretsmanager_secret_version" "smtp_user" {
 }
 
 resource "aws_secretsmanager_secret" "smtp_password" {
+  count       = local.is-development ? 0 : 1
   name        = "postfix/app/APP_DATA_MIGRATION_SMTP_PASSWORD"
   description = "IAM user access secret for SMTP"
   tags = merge(
@@ -111,7 +112,8 @@ resource "aws_secretsmanager_secret" "smtp_password" {
 }
 
 resource "aws_secretsmanager_secret_version" "smtp_password" {
-  secret_id     = aws_secretsmanager_secret.smtp_password.id
+  count         = local.is-development ? 0 : 1
+  secret_id     = aws_secretsmanager_secret.smtp_password[0].id
   secret_string = "managed-outside-terraform"
 
   lifecycle {
@@ -129,6 +131,7 @@ resource "aws_secretsmanager_secret" "smtp_sesans" {
 }
 
 resource "aws_secretsmanager_secret" "smtp_sesrsap" {
+  count       = local.is-development ? 0 : 1
   name        = "postfix/app/SESRSAP"
   description = ""
   tags = merge(
@@ -138,6 +141,7 @@ resource "aws_secretsmanager_secret" "smtp_sesrsap" {
 }
 
 resource "aws_secretsmanager_secret" "smtp_sesrsa" {
+  count       = local.is-development ? 0 : 1
   name        = "postfix/app/SESRSA"
   description = ""
   tags = merge(
