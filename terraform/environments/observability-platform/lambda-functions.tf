@@ -12,16 +12,16 @@ module "grafana_api_key_rotator" {
   create_package = false
 
   function_name = "grafana-api-key-rotator"
-  description   = "Rotates the Grafana API key used by Terraform"
+  description   = "Rotates the Grafana service account token used by Terraform"
   package_type  = "Image"
   memory_size   = 2048
   timeout       = 120
   image_uri     = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/observability-platform-grafana-api-key-rotator:${local.environment_configuration.grafana_api_key_rotator_version}"
 
   environment_variables = {
-    WORKSPACE_API_KEY_NAME = "observability-platform-automation" #checkov:skip=CKV_SECRET_6:This a reference to a secret, not a secret itself
-    WORKSPACE_ID           = module.managed_grafana.workspace_id
-    SECRET_ID              = aws_secretsmanager_secret.grafana_api_key.id
+    WORKSPACE_SERVICE_ACCOUNT_NAME = "automation"
+    WORKSPACE_ID                   = module.managed_grafana.workspace_id
+    SECRET_ID                      = aws_secretsmanager_secret.grafana_api_key.id
   }
 
   attach_policy_statements = true
@@ -30,8 +30,10 @@ module "grafana_api_key_rotator" {
       sid    = "Grafana"
       effect = "Allow"
       actions = [
-        "grafana:CreateWorkspaceApiKey",
-        "grafana:DeleteWorkspaceApiKey"
+        "grafana:CreateWorkspaceServiceAccountToken",
+        "grafana:DeleteWorkspaceServiceAccountToken",
+        "grafana:ListWorkspaceServiceAccountTokens",
+        "grafana:ListWorkspaceServiceAccounts",
       ]
       resources = [module.managed_grafana.workspace_arn]
     }
