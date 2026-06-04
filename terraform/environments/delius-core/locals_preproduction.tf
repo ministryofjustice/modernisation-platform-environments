@@ -148,7 +148,7 @@ locals {
       container_port    = 8080
       container_memory  = 2048
       container_cpu     = 1024
-      ec2_instance_type = "r7i.large"
+      ec2_instance_type = "r7i.xlarge"
       task_count        = 2
     }
 
