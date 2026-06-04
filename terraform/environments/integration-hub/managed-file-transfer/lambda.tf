@@ -84,7 +84,7 @@ module "lambda_unscanned_to_processing" {
   ]
 
   cloudwatch_logs_kms_key_id        = module.kms_cloudwatch_logs.key_arn
-  cloudwatch_logs_retention_in_days = local.cloudwatch_log_retention_in_days
+  cloudwatch_logs_retention_in_days = 30
 
   tags = local.tags
 }
@@ -184,7 +184,7 @@ module "lambda_processing_to_post_scan" {
   ]
 
   cloudwatch_logs_kms_key_id        = module.kms_cloudwatch_logs.key_arn
-  cloudwatch_logs_retention_in_days = local.cloudwatch_log_retention_in_days
+  cloudwatch_logs_retention_in_days = 30
 
   tags = local.tags
 }

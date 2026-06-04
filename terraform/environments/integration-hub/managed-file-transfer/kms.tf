@@ -118,7 +118,7 @@ module "kms_cloudwatch_logs" {
         {
           test     = "ArnLike"
           variable = "kms:EncryptionContext:aws:logs:arn"
-          values   = local.cloudwatch_logs_kms_encryption_context_arns
+          values   = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:*"]
         },
         {
           test     = "StringEquals"
@@ -140,8 +140,12 @@ module "kms_cloudwatch_logs" {
 
       principals = [
         {
-          type        = "AWS"
-          identifiers = local.cloudwatch_logs_key_users
+          type = "AWS"
+          identifiers = [
+            "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess",
+            "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}",
+            "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/AWSReservedSSO_*",
+          ]
         }
       ]
 
