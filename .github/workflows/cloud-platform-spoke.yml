@@ -1,0 +1,83 @@
+---
+name: cloud-platform-spoke
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform/environments/cloud-platform-spoke/**'
+      - '.github/workflows/cloud-platform-spoke.yml'
+      - '.github/workflows/cloud-platform-spoke-reusable.yml'
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'terraform/environments/cloud-platform-spoke/**'
+      - '.github/workflows/cloud-platform-spoke.yml'
+      - '.github/workflows/cloud-platform-spoke-reusable.yml'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+
+  development-root-terraform:
+    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+    with:
+      application: cloud-platform-spoke
+      environment: development
+      action: "plan_apply"
+      component: "root"
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+  terraform-pr:
+    if: github.event_name == 'pull_request'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - application: cloud-platform-spoke
+            environment: preproduction
+            action: "plan"
+          - application: cloud-platform-spoke
+            environment: nonlive
+            action: "plan"
+          - application: cloud-platform-spoke
+            environment: live
+            action: "plan"
+    uses: ./.github/workflows/cloud-platform-spoke-reusable.yml
+    with:
+      application: "${{ matrix.application }}"
+      environment: "${{ matrix.environment }}"
+      action: "${{ matrix.action }}"
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+  terraform-main:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - application: cloud-platform-spoke
+            environment: preproduction
+            action: "plan_apply"
+          - application: cloud-platform-spoke
+            environment: nonlive
+            action: "plan_apply"
+          - application: cloud-platform-spoke
+            environment: live
+            action: "plan_apply"
+    uses: ./.github/workflows/cloud-platform-spoke-reusable.yml
+    with:
+      application: "${{ matrix.application }}"
+      environment: "${{ matrix.environment }}"
+      action: "${{ matrix.action }}"
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
