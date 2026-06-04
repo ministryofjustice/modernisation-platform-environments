@@ -1,6 +1,7 @@
 locals {
-  db_migration_bucket_name = "cdpt-chaps-dev-db-migration-${data.aws_caller_identity.current.account_id}"
-  db_migration_prefix      = "native-backups/dev"
+  db_migration_name        = local.application_data.accounts[local.environment].db_migration_name
+  db_migration_bucket_name = "cdpt-chaps-${local.application_data.accounts[local.environment].environment_name}-db-migration-${data.aws_caller_identity.current.account_id}"
+  db_migration_prefix      = local.application_data.accounts[local.environment].db_migration_prefix
 }
 
 resource "aws_kms_key" "db_migration" {
@@ -22,7 +23,7 @@ resource "aws_s3_bucket" "db_migration" {
 
   tags = merge(local.tags, {
     Name    = local.db_migration_bucket_name
-    Purpose = "CHAPS dev database migration"
+    Purpose = "CHAPS ${local.application_data.accounts[local.environment].environment_name} database migration"
   })
 }
 
@@ -68,7 +69,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "db_migration" {
   bucket = aws_s3_bucket.db_migration.id
 
   rule {
-    id     = "expire-dev-db-migration-backups"
+    id     = "expire-${local.application_data.accounts[local.environment].environment_name}-db-migration-backups"
     status = "Enabled"
 
     filter {

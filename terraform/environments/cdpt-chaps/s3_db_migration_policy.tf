@@ -1,8 +1,8 @@
 locals {
-  source_db_identifier                = "db-chaps-dev"
+  source_db_identifier                = local.application_data.accounts[local.environment].db_instance_identifier
   native_backup_option_group          = "chaps-${local.environment}-sqlserver-native-backup"
   mp_rds_native_backup_role_name      = "chaps-${local.environment}-rds-native-backup"
-  cp_db_migration_copy_irsa_role_arn  = "arn:aws:iam::754256621582:role/cloud-platform-irsa-c5c488d70a0c0af2-live"
+  cp_db_migration_copy_irsa_role_arn  = local.application_data.accounts[local.environment].cp_db_migration_copy_irsa_role_arn
 }
 
 data "aws_iam_policy_document" "rds_native_backup_assume_role" {
@@ -108,7 +108,7 @@ data "aws_iam_policy_document" "rds_native_backup_s3_kms" {
 }
 
 resource "aws_iam_policy" "rds_native_backup_s3_kms" {
-  name   = "chaps-dev-rds-native-backup-s3-kms"
+  name   = "chaps-${local.db_migration_name}-rds-native-backup-s3-kms"
   policy = data.aws_iam_policy_document.rds_native_backup_s3_kms.json
 }
 
@@ -146,7 +146,7 @@ data "aws_iam_policy_document" "db_migration_bucket_policy" {
 
     principals {
       type        = "AWS"
-      identifiers = [local.cp_db_migration_copy_irsa_role_arn]
+      identifiers = local.application_data.accounts[local.environment].cp_db_migration_copy_irsa_role_arn
     }
 
     actions = [
@@ -163,7 +163,7 @@ data "aws_iam_policy_document" "db_migration_bucket_policy" {
 
     principals {
       type = "AWS"
-      identifiers = [local.cp_db_migration_copy_irsa_role_arn]
+      identifiers = local.application_data.accounts[local.environment].cp_db_migration_copy_irsa_role_arn
     }
 
     actions = [
@@ -190,7 +190,7 @@ data "aws_iam_policy_document" "db_migration_bucket_policy" {
 
     principals {
       type    = "AWS"
-      identifiers = [local.cp_db_migration_copy_irsa_role_arn]
+      identifiers = local.application_data.accounts[local.environment].cp_db_migration_copy_irsa_role_arn
     }
 
     actions = [
@@ -255,17 +255,17 @@ data "aws_iam_policy_document" "db_migration_kms" {
 
     principals {
       type = "AWS"
-      identifiers = [local.cp_db_migration_copy_irsa_role_arn]
+      identifiers = local.application_data.accounts[local.environment].cp_db_migration_copy_irsa_role_arn
     }
   }
 }
 
 output "db_migration_kms_key_arn" {
   value       = aws_kms_key.db_migration.arn
-  description = "KMS key ARN for the CHAPS dev DB migration S3 bucket"
+  description = "KMS key ARN for the CHAPS DB migration S3 bucket"
 }
 
 output "db_migration_bucket_name" {
   value       = aws_s3_bucket.db_migration.bucket
-  description = "S3 bucket containing CHAPS dev DB migration backups"
+  description = "S3 bucket containing CHAPS DB migration backups"
 }
