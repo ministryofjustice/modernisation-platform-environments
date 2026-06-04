@@ -1,0 +1,131 @@
+# USER RESOURCES
+# Users deploy these in their own namespace - they do NOT touch GatewayClass or Gateway
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test-workload
+  labels:
+    pod-security.kubernetes.io/enforce: baseline
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echo
+  namespace: test-workload
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: echo
+  template:
+    metadata:
+      labels:
+        app: echo
+    spec:
+      containers:
+      - name: echo
+        image: hashicorp/http-echo:latest
+        args:
+        - "-text=hello from aws lbc gateway api"
+        ports:
+        - containerPort: 5678
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: echo
+  namespace: test-workload
+spec:
+  type: NodePort
+  selector:
+    app: echo
+  ports:
+  - port: 80
+    targetPort: 5678
+---
+# HTTPRoute: user points to the SHARED platform Gateway (lbc-test/shared-alb)
+# User only needs to know the Gateway name and namespace - nothing else
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: echo-route
+  namespace: test-workload
+spec:
+  parentRefs:
+  - name: shared-alb
+    namespace: lbc-test   # platform Gateway - user references but doesn't own
+  hostnames:
+  - "echo.cp-0106-1340.development.container-platform.service.justice.gov.uk"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: echo
+      port: 80
+---
+# SECOND TEST WORKLOAD - separate namespace, different hostname
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test-workload-2
+  labels:
+    pod-security.kubernetes.io/enforce: baseline
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echo
+  namespace: test-workload-2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: echo
+  template:
+    metadata:
+      labels:
+        app: echo
+    spec:
+      containers:
+      - name: echo
+        image: hashicorp/http-echo:latest
+        args:
+        - "-text=hello from test-workload-2"
+        ports:
+        - containerPort: 5678
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: echo
+  namespace: test-workload-2
+spec:
+  type: NodePort
+  selector:
+    app: echo
+  ports:
+  - port: 80
+    targetPort: 5678
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: echo-route
+  namespace: test-workload-2
+spec:
+  parentRefs:
+  - name: shared-alb
+    namespace: lbc-test
+  hostnames:
+  - "echo2.cp-0106-1340.development.container-platform.service.justice.gov.uk"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: echo
+      port: 80
