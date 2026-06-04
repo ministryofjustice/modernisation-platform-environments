@@ -86,21 +86,21 @@ module "s3-bucket-sftp-bc" {
 
   lifecycle_rule = [
     {
-      id      = "delete-archive-folder-file-after-7-days"
+      id      = "delete-files-after-42-days"
       enabled = "Enabled"
-      prefix  = "archive/"
+      prefix  = ""
 
       expiration = {
-        days = 7
+        days = 42
       }
     },
     {
-      id      = "delete-noncurrent-versions-after-7-days"
+      id      = "delete-noncurrent-versions-asap"
       enabled = "Enabled"
       prefix  = ""
 
       noncurrent_version_expiration = {
-        days = 7
+        days = 1
       }
     }
   ]

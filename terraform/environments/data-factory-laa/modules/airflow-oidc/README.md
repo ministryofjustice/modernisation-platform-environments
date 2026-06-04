@@ -12,4 +12,4 @@ No inputs.
 | Name | Description |
 |------|-------------|
 | <a name="output_oidc_arn"></a> [oidc\_arn](#output\_oidc\_arn) | n/a |
-<!-- END_TF_DOCS --> 
+<!-- END_TF_DOCS -->

@@ -4,7 +4,7 @@ resource "aws_mwaa_environment" "main" {
   environment_class               = local.environment_configuration.airflow_environment_class
   weekly_maintenance_window_start = "SAT:01:00"
 
-  execution_role_arn = module.mwaa_execution_iam_role.iam_role_arn
+  execution_role_arn = module.mwaa_execution_iam_role.arn
 
   kms_key = module.mwaa_kms.key_arn
 
@@ -28,8 +28,8 @@ resource "aws_mwaa_environment" "main" {
     "smtp.smtp_host"                     = "email-smtp.${data.aws_region.current.region}.amazonaws.com"
     "smtp.smtp_port"                     = 587
     "smtp.smtp_starttls"                 = 1
-    "smtp.smtp_user"                     = module.mwaa_ses_iam_user.iam_access_key_id
-    "smtp.smtp_password"                 = module.mwaa_ses_iam_user.iam_access_key_ses_smtp_password_v4
+    "smtp.smtp_user"                     = module.mwaa_ses_iam_user.access_key_id
+    "smtp.smtp_password"                 = module.mwaa_ses_iam_user.access_key_ses_smtp_password_v4
     "smtp.smtp_mail_from"                = "noreply@${local.environment_configuration.route53_zone}"
     "webserver.warn_deployment_exposure" = 0
     "webserver.base_url"                 = "airflow.${local.environment_configuration.route53_zone}"

@@ -7,7 +7,7 @@ resource "aws_wafv2_ip_set" "ebsapps_waf_ip_set" {
   description        = "List of trusted IP Addresses allowing access via WAF for EBS Apps Internal ALB"
 
   addresses = jsondecode(data.aws_secretsmanager_secret_version.ebs_secrets.secret_string).ebs_internal_waf_ip_set
-  
+
   tags = merge(local.tags,
     { Name = lower(format("ebsapp-internal-ip-set")) }
   )

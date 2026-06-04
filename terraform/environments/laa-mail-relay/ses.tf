@@ -54,13 +54,16 @@ resource "aws_route53_record" "ses_dmarc" {
 
 ### SMTP IAM User
 
+# count = 0: IAM user auth decommissioned pending environment teardown
 resource "aws_iam_user" "smtp" {
-  name = "${local.application_name}-${local.application_data.accounts[local.environment].env_short}-user"
-  tags = local.tags
+  count = 0
+  name  = "${local.application_name}-${local.application_data.accounts[local.environment].env_short}-user"
+  tags  = local.tags
 }
 
 resource "aws_iam_access_key" "smtp" {
-  user = aws_iam_user.smtp.name
+  count = 0
+  user  = aws_iam_user.smtp[0].name
 }
 
 data "aws_iam_policy_document" "smtp_user" {
@@ -72,8 +75,9 @@ data "aws_iam_policy_document" "smtp_user" {
 }
 
 resource "aws_iam_user_policy" "smtp_user" {
+  count  = 0
   name   = "AmazonSesSendingAccess"
-  user   = aws_iam_user.smtp.name
+  user   = aws_iam_user.smtp[0].name
   policy = data.aws_iam_policy_document.smtp_user.json
 }
 
@@ -90,10 +94,15 @@ resource "aws_secretsmanager_secret" "smtp_user" {
 
 resource "aws_secretsmanager_secret_version" "smtp_user" {
   secret_id     = aws_secretsmanager_secret.smtp_user.id
-  secret_string = aws_iam_access_key.smtp.id
+  secret_string = "managed-outside-terraform"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
 }
 
 resource "aws_secretsmanager_secret" "smtp_password" {
+  count       = local.is-development ? 0 : 1
   name        = "postfix/app/APP_DATA_MIGRATION_SMTP_PASSWORD"
   description = "IAM user access secret for SMTP"
   tags = merge(
@@ -103,8 +112,13 @@ resource "aws_secretsmanager_secret" "smtp_password" {
 }
 
 resource "aws_secretsmanager_secret_version" "smtp_password" {
-  secret_id     = aws_secretsmanager_secret.smtp_password.id
-  secret_string = aws_iam_access_key.smtp.ses_smtp_password_v4
+  count         = local.is-development ? 0 : 1
+  secret_id     = aws_secretsmanager_secret.smtp_password[0].id
+  secret_string = "managed-outside-terraform"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
 }
 
 resource "aws_secretsmanager_secret" "smtp_sesans" {
@@ -117,6 +131,7 @@ resource "aws_secretsmanager_secret" "smtp_sesans" {
 }
 
 resource "aws_secretsmanager_secret" "smtp_sesrsap" {
+  count       = local.is-development ? 0 : 1
   name        = "postfix/app/SESRSAP"
   description = ""
   tags = merge(
@@ -126,6 +141,7 @@ resource "aws_secretsmanager_secret" "smtp_sesrsap" {
 }
 
 resource "aws_secretsmanager_secret" "smtp_sesrsa" {
+  count       = local.is-development ? 0 : 1
   name        = "postfix/app/SESRSA"
   description = ""
   tags = merge(

@@ -30,7 +30,7 @@ module "vcms_bucket" {
         },
         {
           days          = 365
-          storage_class = "GLACIER"    # deep archive after 1 year
+          storage_class = "GLACIER" # deep archive after 1 year
         }
       ]
 
@@ -78,7 +78,7 @@ module "vcms_testing_reports_bucket" {
         },
         {
           days          = 365
-          storage_class = "GLACIER"    # deep archive after 1 year
+          storage_class = "GLACIER" # deep archive after 1 year
         }
       ]
 
