@@ -95,6 +95,55 @@ resource "aws_s3control_access_grants_instance" "this" {
 
 data "aws_iam_policy_document" "s3_access_grants_location" {
   statement {
+    sid    = "AllowUnscannedBucketReads"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [
+      module.s3_bucket["unscanned"].s3_bucket_arn,
+    ]
+
+    condition {
+      test     = "StringEquals"
+      values   = [data.aws_caller_identity.current.account_id]
+      variable = "aws:ResourceAccount"
+    }
+
+    condition {
+      test     = "ArnEquals"
+      values   = [aws_s3control_access_grants_instance.this.access_grants_instance_arn]
+      variable = "s3:AccessGrantsInstanceArn"
+    }
+  }
+
+  statement {
+    sid    = "AllowUnscannedObjectReads"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectTagging",
+      "s3:GetObjectVersion",
+      "s3:ListMultipartUploadParts",
+    ]
+    resources = [
+      "${module.s3_bucket["unscanned"].s3_bucket_arn}/*",
+    ]
+
+    condition {
+      test     = "StringEquals"
+      values   = [data.aws_caller_identity.current.account_id]
+      variable = "aws:ResourceAccount"
+    }
+
+    condition {
+      test     = "ArnEquals"
+      values   = [aws_s3control_access_grants_instance.this.access_grants_instance_arn]
+      variable = "s3:AccessGrantsInstanceArn"
+    }
+  }
+
+  statement {
     sid    = "AllowUnscannedObjectWrites"
     effect = "Allow"
     actions = [
@@ -121,10 +170,11 @@ data "aws_iam_policy_document" "s3_access_grants_location" {
   }
 
   statement {
-    sid    = "AllowUnscannedKMSWrites"
+    sid    = "AllowUnscannedKMSAccess"
     effect = "Allow"
     actions = [
       "kms:DescribeKey",
+      "kms:Decrypt",
       "kms:Encrypt",
       "kms:GenerateDataKey*",
     ]
@@ -151,7 +201,7 @@ module "s3_access_grants_location_policy" {
   version = "6.6.0"
 
   name        = "${local.application_name}-s3-access-grants-location-policy"
-  description = "AWS S3 Access Grants write access to the unscanned bucket"
+  description = "AWS S3 Access Grants read/write access to the unscanned bucket"
   path        = "/"
 
   policy = data.aws_iam_policy_document.s3_access_grants_location.json
@@ -163,7 +213,7 @@ module "s3_access_grants_location_role" {
 
   name            = "transfer-s3-access-grants-location"
   use_name_prefix = false
-  description     = "Role to allow AWS S3 Access Grants to write to the unscanned bucket"
+  description     = "Role to allow AWS S3 Access Grants to read and write to the unscanned bucket"
 
   trust_policy_permissions = {
     AllowAccessGrants = {
@@ -208,7 +258,7 @@ resource "aws_s3control_access_grants_location" "unscanned" {
 
 resource "aws_s3control_access_grant" "unscanned_uploaders" {
   access_grants_location_id = aws_s3control_access_grants_location.unscanned.access_grants_location_id
-  permission                = "WRITE"
+  permission                = "READWRITE"
 
   access_grants_location_configuration {
     s3_sub_prefix = "*"

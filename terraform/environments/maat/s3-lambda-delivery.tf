@@ -9,12 +9,56 @@ module "s3-bucket-shared" {
   versioning_enabled  = true
   replication_enabled = false
   replication_region  = "eu-west-2"
+  sse_algorithm       = "AES256"
+  custom_kms_key      = ""
+  bucket_policy       = [aws_s3_bucket_policy.shared_bucket_policy.policy]
 
   providers = {
     aws.bucket-replication = aws
   }
 
-  tags = local.tags
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      abort_incomplete_multipart_upload_days = 7
+    }
+  ]
+
+  tags = merge(local.tags,
+    { Name = "${local.application_name}-${local.environment}-shared" }
+  )
+}
+
+resource "aws_s3_bucket_policy" "shared_bucket_policy" {
+  bucket = module.s3-bucket-shared.bucket.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "EnforceTLSv12orHigher",
+        Effect = "Deny",
+        Principal = {
+          AWS = "*"
+        },
+        Action   = "s3:*",
+        Resource = ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
+        Condition = {
+          NumericLessThan = {
+            "s3:TlsVersion" = "1.2"
+          }
+        }
+      }
+    ]
+  })
 }
 
 resource "aws_s3_object" "folder" {

@@ -16,24 +16,6 @@ resource "aws_security_group" "radius_alb" {
   description = "Security group for RADIUS portal ALB"
   vpc_id      = aws_vpc.workspaces[0].id
 
-  # HTTPS from internet
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "HTTPS from internet"
-  }
-
-  # HTTP from internet (redirect to HTTPS)
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "HTTP from internet (redirects to HTTPS)"
-  }
-
   tags = merge(
     local.tags,
     {
@@ -44,6 +26,30 @@ resource "aws_security_group" "radius_alb" {
   lifecycle {
     create_before_destroy = true
   }
+}
+
+resource "aws_security_group_rule" "radius_alb_https_from_internet" {
+  count = local.environment == "development" ? 1 : 0
+
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.radius_alb[0].id
+  description       = "HTTPS from internet"
+}
+
+resource "aws_security_group_rule" "radius_alb_http_from_internet" {
+  count = local.environment == "development" ? 1 : 0
+
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.radius_alb[0].id
+  description       = "HTTP from internet (redirects to HTTPS)"
 }
 
 # Separate egress rule to avoid circular dependency

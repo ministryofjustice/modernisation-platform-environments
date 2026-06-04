@@ -91,6 +91,12 @@
           "arn:aws:kms:eu-west-2:111111111111:key/00000000-0000-0000-0000-000000000000"
         ]
       },
+      "notification_configuration": {
+        "slack_channel_id": "C0ARA0C101L",
+        "slack_team_id": "T02DYEB3A",
+        "max_presigned_url_expiry_seconds": 3600,
+        "presigned_url_expiry_seconds": 1800
+      },
       "vpc_configuration": {
         "isolated_vpc_cidr": "10.0.0.0/23",
         "isolated_vpc_private_subnet_cidrs": [

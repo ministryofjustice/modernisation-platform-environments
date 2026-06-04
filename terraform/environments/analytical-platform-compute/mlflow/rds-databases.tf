@@ -1,3 +1,4 @@
+# module (version 7.2.0) is currently unsupported due to this open issue: https://github.com/hashicorp/terraform-provider-aws/issues/42582.
 module "mlflow_auth_rds" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
