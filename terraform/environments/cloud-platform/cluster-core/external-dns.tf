@@ -1,5 +1,4 @@
 module "external_dns" {
-  count  = contains([local.enabled_workspaces], local.cluster_environment) ? 1 : 0
   source = "github.com/ministryofjustice/container-platform-terraform-external-dns?ref=0.1.0"
   
   eks_cluster_name = local.cluster_name
