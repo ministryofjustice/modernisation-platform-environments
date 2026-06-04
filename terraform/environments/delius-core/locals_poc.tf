@@ -141,7 +141,7 @@ locals {
       container_memory  = 2048
       container_cpu     = 1024
       ec2_instance_type = "r7i.large"
-      task_count        = 2
+      task_count        = 1
     }
 
     pwm = {
