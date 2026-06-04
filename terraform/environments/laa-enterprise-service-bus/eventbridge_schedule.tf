@@ -26,12 +26,12 @@ resource "aws_scheduler_schedule" "ccms_load_schedule" {
     mode = "OFF"
   }
 
-  schedule_expression          = local.environment == "production" ? "rate(15 minutes)" : "cron(0 7-19 ? * * *)"
+  schedule_expression          = local.environment == "production" ? "cron(0 9-10 ? * * *)" : "cron(0 7-19 ? * * *)"
   schedule_expression_timezone = "Europe/London"
 
   # The time has been changed to 1 hour earlier due to a bug that ignores the timezone, and uses UTC.
-  start_date = local.environment == "production" ? "2026-06-04T06:30:00Z" : null
-  end_date   = local.environment == "production" ? "2026-06-04T09:00:00Z" : null
+  # start_date = local.environment == "production" ? "2026-06-04T06:30:00Z" : null
+  # end_date   = local.environment == "production" ? "2026-06-04T09:00:00Z" : null
 
   target {
     arn      = aws_lambda_function.ccms_provider_load.arn
