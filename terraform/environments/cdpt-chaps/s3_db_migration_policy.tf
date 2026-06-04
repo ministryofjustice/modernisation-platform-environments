@@ -141,7 +141,10 @@ data "aws_iam_policy_document" "db_migration_bucket_policy" {
     }
   }
 
-  statement {
+dynamic "statement" {
+  for_each = local.application_data.accounts[local.environment].enable_cp_db_migration_copy_access ? [1] : []
+
+  content {
     sid = "AllowCpMigrationCopyRoleToGetBucketLocation"
 
     principals {
@@ -159,8 +162,12 @@ data "aws_iam_policy_document" "db_migration_bucket_policy" {
       aws_s3_bucket.db_migration.arn
     ]
   }
+}
 
-  statement {
+dyanmic "statement" {
+  for_each = local.application_data.accounts[local.environment].enable_cp_db_migration_copy_access ? [1] : []
+
+  content {
     sid = "AllowCpMigrationCopyRoleToListBackupPrefix"
 
     principals {
@@ -188,8 +195,12 @@ data "aws_iam_policy_document" "db_migration_bucket_policy" {
       ]
     }
   }
+}
 
-  statement {
+dyanmic "statement" {
+  for_each = local.application_data.accounts[local.environment].enable_cp_db_migration_copy_access ? [1] : []
+
+  content {
     sid = "AllowCpMigrationCopyRoleToReadBackupObjects"
 
     principals {
@@ -248,16 +259,12 @@ data "aws_iam_policy_document" "db_migration_kms" {
     }
   }
 
-  statement {
+dynamic "statement" {
+  for_each = local.application_data.accounts[local.environment].enable_cp_db_migration_copy_access ? [1] : []
+
+  content {
     sid = "AllowCpMigrationCopyRoleToDecrypt"
     effect = "Allow"
-
-    actions = [
-      "kms:Decrypt",
-      "kms:DescribeKey"
-    ]
-
-    resources = ["*"]
 
     principals {
       type = "AWS"
@@ -265,6 +272,13 @@ data "aws_iam_policy_document" "db_migration_kms" {
         local.application_data.accounts[local.environment].cp_db_migration_copy_irsa_role_arn
       ]
     }
+
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey"
+    ]
+
+    resources = ["*"]
   }
 }
 

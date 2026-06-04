@@ -339,15 +339,15 @@ resource "aws_security_group" "cluster_ec2" {
   )
 }
 
-resource "aws_security_group_rule" "cluster_ec2_rdp_from_bastion" {
-  type                     = "ingress"
-  description              = "Allow RDP ingress"
-  from_port                = 3389
-  to_port                  = 3389
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.cluster_ec2.id
-  source_security_group_id = module.bastion_linux.bastion_security_group
-}
+#resource "aws_security_group_rule" "cluster_ec2_rdp_from_bastion" {
+#  type                     = "ingress"
+#  description              = "Allow RDP ingress"
+#  from_port                = 3389
+#  to_port                  = 3389
+#  protocol                 = "tcp"
+#  security_group_id        = aws_security_group.cluster_ec2.id
+#  source_security_group_id = module.bastion_linux.bastion_security_group
+#}
 
 # EC2 launch template - settings to use for new EC2s added to the group
 # Note - when updating this you will need to manually terminate the EC2s
