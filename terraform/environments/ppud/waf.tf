@@ -101,12 +101,6 @@ resource "aws_wafv2_rule_group" "wam_waf_acl" {
     }
   }
 
-  visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "custom-wam-waf-rule-group"
-    sampled_requests_enabled   = true
-  }
-
     rule {
     name     = "allow-wam-user-ip-list"
     priority = 30
@@ -130,7 +124,6 @@ resource "aws_wafv2_rule_group" "wam_waf_acl" {
     metric_name                = "custom-wam-waf-rule-group"
     sampled_requests_enabled   = true
   }
-
 
   tags = merge(local.tags,
     { Name = lower(format("%s-custom-wam-waf-rule-group-%s", local.application_name, local.environment)) }
