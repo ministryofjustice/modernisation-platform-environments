@@ -63,7 +63,7 @@ resource "aws_wafv2_rule_group" "wam_waf_acl" {
   name        = "custom-wam-waf-rule-group"
   description = "A custom rule group to include additional rules to the WAF ACL"
   scope       = "REGIONAL"
-  capacity    = 2
+  capacity    = 10
 
   rule {
     name     = "allow-ncsc-ip-list"
@@ -97,6 +97,24 @@ resource "aws_wafv2_rule_group" "wam_waf_acl" {
     visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "allow-circle-ci-ip-list"
+      sampled_requests_enabled   = true
+    }
+  }
+
+    rule {
+    name     = "allow-wam-user-ip-list"
+    priority = 30
+    action {
+      allow {}
+    }
+    statement {
+      ip_set_reference_statement {
+        arn = aws_wafv2_ip_set.wam_user_waf_ip_set.arn
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "allow-wam-user-ip-list"
       sampled_requests_enabled   = true
     }
   }
@@ -155,5 +173,28 @@ resource "aws_wafv2_ip_set" "circle_ci_waf_ip_set" {
 
   tags = merge(local.tags,
     { Name = lower(format("%s-circle-ci-waf-ip-set-%s", local.application_name, local.environment)) }
+  )
+}
+
+# WAF IP Set for WAM End User IP Addresses
+
+data "aws_ssm_parameter" "wam_user_waf_ip_set" {
+  name = "/waf/wam_user_waf_ip_set"
+}
+
+locals {
+  wam_user_ip_addresses = [for ip in split(",", data.aws_ssm_parameter.wam_user_waf_ip_set.value) : trim(ip, " ")]
+}
+
+resource "aws_wafv2_ip_set" "wam_user_waf_ip_set" {
+  # count              = (local.is-development || local.is-preproduction || local.is-production) ? 1 : 0
+  name               = "wam-user-waf-ip-set"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV4"
+  description        = "List of trusted WAM user IP Addresses allowing access via WAF"
+  addresses          = local.wam_user_ip_addresses
+
+  tags = merge(local.tags,
+    { Name = lower(format("%s-wam-user-waf-ip-set-%s", local.application_name, local.environment)) }
   )
 }
