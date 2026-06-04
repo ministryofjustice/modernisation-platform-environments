@@ -397,7 +397,7 @@ resource "aws_lakeformation_permissions" "emdi_di_db" {
 
 resource "aws_lakeformation_permissions" "emdi_di_tables" {
   principal   = module.emdi_trail_maps_role.iam_role_arn
-  permissions = ["SELECT", "DESCRIBE"]
+  permissions = ["SELECT", "DESCRIBE", "INSERT"]
   table {
     database_name = "data_insights${local.dbt_suffix}"
     wildcard      = true
