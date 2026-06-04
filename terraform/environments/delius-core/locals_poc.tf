@@ -86,7 +86,7 @@ locals {
       ec2_instance_type = "r7i.large"
       task_count        = 1
       asg_min_size      = 1
-      asg_max_size      = 2
+      asg_max_size      = 1
     }
 
     weblogic_params = {
@@ -136,10 +136,12 @@ locals {
     }
 
     weblogic_eis = {
-      image_tag        = "6.2.0.3"
-      container_port   = 8080
-      container_memory = 2048
-      container_cpu    = 1024
+      image_tag         = "6.2.0.3"
+      container_port    = 8080
+      container_memory  = 2048
+      container_cpu     = 1024
+      ec2_instance_type = "r7i.large"
+      task_count        = 1
     }
 
     pwm = {
