@@ -140,16 +140,21 @@ module "kms_cloudwatch_logs" {
 
       principals = [
         {
-          type = "AWS"
-          identifiers = [
-            "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess",
-            "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}",
-            "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/AWSReservedSSO_*",
-          ]
+          type        = "AWS"
+          identifiers = ["*"]
         }
       ]
 
       condition = [
+        {
+          test     = "ArnLike"
+          variable = "aws:PrincipalArn"
+          values = [
+            "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess",
+            "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}",
+            "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/AWSReservedSSO_*",
+          ]
+        },
         {
           test     = "StringEquals"
           variable = "kms:ViaService"
