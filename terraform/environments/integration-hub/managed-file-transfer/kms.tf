@@ -80,3 +80,78 @@ module "kms_secrets" {
     }
   ]
 }
+
+module "kms_cloudwatch_logs" {
+  source  = "terraform-aws-modules/kms/aws"
+  version = "4.2.0"
+
+  aliases                 = ["transfer/logs/${local.component_name}"]
+  description             = "KMS CMK for CloudWatch Logs encryption"
+  enable_default_policy   = true
+  enable_key_rotation     = true
+  deletion_window_in_days = 30
+  key_usage               = "ENCRYPT_DECRYPT"
+  is_enabled              = true
+
+  key_administrators = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+
+  key_statements = [
+    {
+      sid = "AllowCloudWatchLogsService"
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+        "kms:ReEncrypt*"
+      ]
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"]
+        }
+      ]
+
+      condition = [
+        {
+          test     = "ArnLike"
+          variable = "kms:EncryptionContext:aws:logs:arn"
+          values   = local.cloudwatch_logs_kms_encryption_context_arns
+        },
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["logs.${data.aws_region.current.region}.amazonaws.com"]
+        }
+      ]
+    },
+    {
+      sid = "AllowPlatformUsersToReadEncryptedLogs"
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+        "kms:ReEncrypt*"
+      ]
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = local.cloudwatch_logs_key_users
+        }
+      ]
+
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["logs.${data.aws_region.current.region}.amazonaws.com"]
+        }
+      ]
+    }
+  ]
+}
