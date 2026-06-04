@@ -86,7 +86,7 @@ locals {
       ec2_instance_type = "r7i.large"
       task_count        = 1
       asg_min_size      = 1
-      asg_max_size      = 2
+      asg_max_size      = 1
     }
 
     weblogic_params = {

@@ -87,9 +87,9 @@ locals {
       container_memory         = 4096
       container_cpu            = 2048
       ec2_instance_type        = "r7i.2xlarge"
-      task_count               = 4
+      task_count               = 3
       asg_min_size             = 1
-      asg_max_size             = 2
+      asg_max_size             = 1
     }
 
     weblogic_params = {
