@@ -1,3 +1,27 @@
+module "eventbridge_logging" {
+  source  = "terraform-aws-modules/eventbridge/aws"
+  version = "4.3.0"
+
+  create_bus     = false
+  create_role    = false
+  create_rules   = false
+  create_targets = false
+
+  bus_name                 = "default"
+  log_delivery_source_name = "${local.application_name}-${local.component_name}-default-bus"
+  log_config = {
+    include_detail = "NONE"
+    level          = "INFO"
+  }
+  log_delivery = {
+    cloudwatch_logs = {
+      destination_arn = module.cloudwatch_eventbridge.cloudwatch_log_group_arn
+    }
+  }
+
+  tags = local.tags
+}
+
 module "eventbridge_guard_duty_malware_protection_for_s3" {
   for_each = local.eventbridge_guard_duty_malware_protection_for_s3_rules
 

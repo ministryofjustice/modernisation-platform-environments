@@ -6,7 +6,7 @@ resource "aws_transfer_server" "this" {
   protocols              = ["SFTP"]
   security_policy_name   = "TransferSecurityPolicy-2025-03"
   structured_log_destinations = [
-    "${aws_cloudwatch_log_group.transfer.arn}:*"
+    "${module.cloudwatch_transfer.cloudwatch_log_group_arn}:*"
   ]
   endpoint_details {
     vpc_id     = module.isolated_vpc.vpc_id
