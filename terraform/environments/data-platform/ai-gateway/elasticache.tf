@@ -19,7 +19,6 @@ module "ai_gateway_elasticache" {
   transit_encryption_enabled = true
   auth_token                 = random_password.elasticache.result
 
-  apply_immediately    = true
   parameter_group_name = "default.valkey9"
 
   # Security group
