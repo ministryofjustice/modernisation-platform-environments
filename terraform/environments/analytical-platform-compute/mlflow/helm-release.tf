@@ -6,7 +6,7 @@ resource "helm_release" "mlflow" {
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "3.7.0-rc4"
   chart      = "mlflow"
-  namespace  = kubernetes_namespace.mlflow[0].metadata[0].name
+  namespace  = kubernetes_namespace_v1.mlflow[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/mlflow/values.yml.tftpl",
@@ -19,8 +19,8 @@ resource "helm_release" "mlflow" {
   ]
   depends_on = [
     module.mlflow_iam_role,
-    kubernetes_secret.mlflow_admin,
-    kubernetes_secret.mlflow_auth_rds,
-    kubernetes_secret.mlflow_rds
+    kubernetes_secret_v1.mlflow_admin,
+    kubernetes_secret_v1.mlflow_auth_rds,
+    kubernetes_secret_v1.mlflow_rds
   ]
 }

@@ -1,5 +1,5 @@
 module "eks" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git?ref=6bac707d5496f4b494ce8bf63bfc8d245aead592" # v21.17.1
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git?ref=5a267ec4264cdeb529512901119223889463703f" # v21.23.0
 
   name               = local.eks_cluster_name
   kubernetes_version = local.cluster_configuration.kubernetes_version
@@ -146,7 +146,7 @@ module "eks" {
 }
 
 module "eks_managed_node_group_system" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git//modules/eks-managed-node-group?ref=6bac707d5496f4b494ce8bf63bfc8d245aead592" # v21.17.1
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git//modules/eks-managed-node-group?ref=5a267ec4264cdeb529512901119223889463703f" # v21.23.0
 
   name         = "system"
   cluster_name = module.eks.cluster_name
@@ -235,7 +235,7 @@ module "eks_managed_node_group_system" {
 }
 
 module "karpenter" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git//modules/karpenter?ref=6bac707d5496f4b494ce8bf63bfc8d245aead592" # v21.17.1
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git//modules/karpenter?ref=5a267ec4264cdeb529512901119223889463703f" # v21.23.0
 
   cluster_name = module.eks.cluster_name
 

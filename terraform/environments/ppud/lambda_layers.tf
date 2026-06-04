@@ -20,13 +20,13 @@ data "aws_s3_bucket" "layer_buckets" {
 
 locals {
   lambda_layers = {
-    matplotlib    = "matplotlib_layer.zip"
-    boto3         = "boto3_layer.zip"
-    pandas        = "pandas_layer.zip"
-    xlsxwriter    = "xlsxwriter_layer.zip"
-    requests      = "requests_v2.3.4_layer.zip"
-    pillow        = "pillow_v12.2.0_layer.zip"
-    numpy         = "numpy_v2.4.4_u2_layer.zip"
+    matplotlib = "matplotlib_layer.zip"
+    boto3      = "boto3_layer.zip"
+    pandas     = "pandas_layer.zip"
+    xlsxwriter = "xlsxwriter_layer.zip"
+    requests   = "requests_v2.3.4_layer.zip"
+    pillow     = "pillow_v12.2.0_layer.zip"
+    numpy      = "numpy_v2.4.4_u2_layer.zip"
   }
 
   layer_env_buckets = {

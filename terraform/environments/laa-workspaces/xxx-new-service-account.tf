@@ -8,9 +8,9 @@
 
 # Generate random password for service account
 resource "random_password" "lambda_service_account" {
-  count   = local.environment == "development" ? 1 : 0
-  length  = 32
-  special = true
+  count            = local.environment == "development" ? 1 : 0
+  length           = 32
+  special          = true
   override_special = "!@#$%^&*"
 
   keepers = {
@@ -222,6 +222,6 @@ output "lambda_service_account_created" {
 }
 
 output "lambda_service_account_manual_group_add" {
-  value = local.environment == "development" ? "If group membership failed, run: aws ds-data add-group-member --directory-id ${aws_directory_service_directory.workspaces_ad[0].id} --group-name 'AWS Delegated Administrators' --member-name lambda.workspace --region eu-west-2" : null
+  value       = local.environment == "development" ? "If group membership failed, run: aws ds-data add-group-member --directory-id ${aws_directory_service_directory.workspaces_ad[0].id} --group-name 'AWS Delegated Administrators' --member-name lambda.workspace --region eu-west-2" : null
   description = "Manual command to add lambda.workspace to admin group if automated method fails"
 }

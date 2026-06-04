@@ -12,9 +12,7 @@ resource "aws_secretsmanager_secret_version" "sftp_bc_secrets" {
     ebs_db_username             = "",
     ebs_db_password             = "",
     ebs_db_endpoint             = "",
-    file_transfer_slack_webhook = "",
-    tls_cert                    = "",
-    tls_key                     = ""
+    file_transfer_slack_webhook = ""
   })
 
   lifecycle {

@@ -426,59 +426,6 @@ resource "aws_iam_role_policy_attachment" "maat_ecs_service_role_policy_attachme
   policy_arn = aws_iam_policy.maat_ecs_service_role_policy.arn
 }
 
-##### ECS Autoscaling Role -----
-
-resource "aws_iam_role" "maat_ecs_autoscaling_role" {
-  name = "${local.application_name}-ecs-autoscaling-role"
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-ecs-autoscaling-role"
-    }
-  )
-  assume_role_policy = <<EOF
-{
-    "Version": "2008-10-17",
-    "Statement": [
-        {
-            "Action": "sts:AssumeRole",
-             "Principal": {
-               "Service": "application-autoscaling.amazonaws.com"
-            },
-            "Effect": "Allow"
-        }
-    ]
-}
-EOF
-}
-
-resource "aws_iam_policy" "maat_ecs_autoscaling_role_policy" {
-  name = "${local.application_name}-ecs-autoscaling-role-policy"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
-          "application-autoscaling:*",
-          "cloudwatch:DescribeAlarms",
-          "cloudwatch:PutMetricAlarm",
-          "ecs:DescribeServices",
-          "ecs:UpdateService"
-        ]
-        Resource = "*"
-      },
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "maat_ecs_autoscaling_role_policy_attachment" {
-  role       = aws_iam_role.maat_ecs_autoscaling_role.name
-  policy_arn = aws_iam_policy.maat_ecs_autoscaling_role_policy.arn
-}
-
 resource "aws_iam_policy" "maat_ecs_policy_access_params" {
   name = "${local.application_name}-ecs-policy-access-params"
 
@@ -582,7 +529,6 @@ resource "aws_appautoscaling_target" "maat_ecs_scaling_target" {
   max_capacity       = local.application_data.accounts[local.environment].maat_ecs_scaling_target_max
   min_capacity       = local.application_data.accounts[local.environment].maat_ecs_scaling_target_min
   resource_id        = "service/${aws_ecs_cluster.maat_ecs_cluster.name}/${aws_ecs_service.maat_ecs_service.name}"
-  role_arn           = aws_iam_role.maat_ecs_autoscaling_role.arn
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
 }
