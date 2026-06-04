@@ -86,7 +86,7 @@ locals {
       container_port           = 8080
       container_memory         = 4096
       container_cpu            = 2048
-      ec2_instance_type        = "r7i.2xlarge"
+      ec2_instance_type        = "r7i.xlarge"
       task_count               = 3
       asg_min_size             = 1
       asg_max_size             = 1
