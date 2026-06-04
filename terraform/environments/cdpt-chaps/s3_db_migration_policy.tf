@@ -164,7 +164,7 @@ data "aws_iam_policy_document" "db_migration_bucket_policy" {
   }
 }
 
-dyanmic "statement" {
+dynamic "statement" {
   for_each = local.application_data.accounts[local.environment].enable_cp_db_migration_copy_access ? [1] : []
 
   content {
@@ -197,7 +197,7 @@ dyanmic "statement" {
   }
 }
 
-dyanmic "statement" {
+dynamic "statement" {
   for_each = local.application_data.accounts[local.environment].enable_cp_db_migration_copy_access ? [1] : []
 
   content {
