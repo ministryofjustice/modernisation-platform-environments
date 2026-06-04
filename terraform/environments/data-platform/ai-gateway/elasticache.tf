@@ -35,16 +35,18 @@ module "ai_gateway_elasticache" {
 
   log_delivery_configuration = {
     slow_log = {
-      destination      = module.ai_gateway_elasticache_slow_log_group.cloudwatch_log_group_name
-      destination_type = "cloudwatch-logs"
-      log_format       = "json"
-      log_type         = "slow-log"
+      create_cloudwatch_log_group = false
+      destination                 = module.ai_gateway_elasticache_slow_log_group.cloudwatch_log_group_name
+      destination_type            = "cloudwatch-logs"
+      log_format                  = "json"
+      log_type                    = "slow-log"
     }
     engine_log = {
-      destination      = module.ai_gateway_elasticache_engine_log_group.cloudwatch_log_group_name
-      destination_type = "cloudwatch-logs"
-      log_format       = "json"
-      log_type         = "engine-log"
+      create_cloudwatch_log_group = false
+      destination                 = module.ai_gateway_elasticache_engine_log_group.cloudwatch_log_group_name
+      destination_type            = "cloudwatch-logs"
+      log_format                  = "json"
+      log_type                    = "engine-log"
     }
   }
 }
