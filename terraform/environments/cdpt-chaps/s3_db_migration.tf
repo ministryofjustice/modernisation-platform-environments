@@ -1,6 +1,6 @@
 locals {
   db_migration_name        = local.application_data.accounts[local.environment].db_migration_name
-  db_migration_bucket_name = "cdpt-chaps-${local.application_data.accounts[local.environment].environment_name}-db-migration-${data.aws_caller_identity.current.account_id}"
+  db_migration_bucket_name = "cdpt-chaps-${local.db_migration_name}-db-migration-${data.aws_caller_identity.current.account_id}"
   db_migration_prefix      = local.application_data.accounts[local.environment].db_migration_prefix
 }
 
@@ -14,7 +14,7 @@ resource "aws_kms_key" "db_migration" {
 }
 
 resource "aws_kms_alias" "db_migration" {
-  name          = "alias/chaps-dev-db-migration"
+  name          = "alias/chaps-${local.db_migration_name}-db-migration"
   target_key_id = aws_kms_key.db_migration.key_id
 }
 
