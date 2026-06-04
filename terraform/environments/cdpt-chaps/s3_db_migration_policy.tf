@@ -146,7 +146,9 @@ data "aws_iam_policy_document" "db_migration_bucket_policy" {
 
     principals {
       type        = "AWS"
-      identifiers = local.application_data.accounts[local.environment].cp_db_migration_copy_irsa_role_arn
+      identifiers = [
+        local.application_data.accounts[local.environment].cp_db_migration_copy_irsa_role_arn
+      ]
     }
 
     actions = [
@@ -163,7 +165,9 @@ data "aws_iam_policy_document" "db_migration_bucket_policy" {
 
     principals {
       type = "AWS"
-      identifiers = local.application_data.accounts[local.environment].cp_db_migration_copy_irsa_role_arn
+      identifiers = [
+        local.application_data.accounts[local.environment].cp_db_migration_copy_irsa_role_arn
+      ]
     }
 
     actions = [
@@ -190,7 +194,9 @@ data "aws_iam_policy_document" "db_migration_bucket_policy" {
 
     principals {
       type    = "AWS"
-      identifiers = local.application_data.accounts[local.environment].cp_db_migration_copy_irsa_role_arn
+      identifiers = [
+        local.application_data.accounts[local.environment].cp_db_migration_copy_irsa_role_arn
+      ]
     }
 
     actions = [
@@ -255,7 +261,9 @@ data "aws_iam_policy_document" "db_migration_kms" {
 
     principals {
       type = "AWS"
-      identifiers = local.application_data.accounts[local.environment].cp_db_migration_copy_irsa_role_arn
+      identifiers = [
+        local.application_data.accounts[local.environment].cp_db_migration_copy_irsa_role_arn
+      ]
     }
   }
 }
