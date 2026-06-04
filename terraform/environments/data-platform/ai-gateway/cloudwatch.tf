@@ -11,7 +11,7 @@ module "ai_gateway_elasticache_slow_log_group" {
 
   name              = "/aws/elasticache/${local.component_name}/slow-log"
   retention_in_days = 365
-  kms_key_id        = module.ai_gateway_cloudwatch_kms_key.key_arn
+  kms_key_id        = module.ai_gateway_elasticache_logs_kms_key.key_arn
 }
 
 module "ai_gateway_elasticache_engine_log_group" {
@@ -19,5 +19,5 @@ module "ai_gateway_elasticache_engine_log_group" {
 
   name              = "/aws/elasticache/${local.component_name}/engine-log"
   retention_in_days = 365
-  kms_key_id        = module.ai_gateway_cloudwatch_kms_key.key_arn
+  kms_key_id        = module.ai_gateway_elasticache_logs_kms_key.key_arn
 }
