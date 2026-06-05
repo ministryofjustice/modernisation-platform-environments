@@ -2,11 +2,11 @@ locals {
 
   baseline_presets_production = {
     options = {
-      sns_topics = {
-        pagerduty_integrations = {
-          pagerduty = "prison-retail"          
-        }
-      }
+      # sns_topics = {
+      #   pagerduty_integrations = {
+      #     pagerduty = "prison-retail"          
+      #   }
+      # }
     }
   }
 
