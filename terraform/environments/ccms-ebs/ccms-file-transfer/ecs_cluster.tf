@@ -16,12 +16,14 @@ resource "aws_ecs_task_definition" "sftp_bc_task_definition" {
   requires_compatibilities = [
     "FARGATE",
   ]
+
+  
   cpu    = local.application_data.accounts[local.environment].container_cpu
   memory = local.application_data.accounts[local.environment].container_memory
 
-  # Forcing ARM64 architecture for Fargate tasks
   runtime_platform {
-    cpu_architecture = "ARM64"
+    operating_system_family = "LINUX"
+    cpu_architecture        = "X86_64"
   }
 
   container_definitions = templatefile(
