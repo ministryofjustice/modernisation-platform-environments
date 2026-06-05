@@ -62,11 +62,11 @@ resource "aws_ecs_service" "sftp_bc_ecs_service" {
   launch_type     = "FARGATE"
 
   health_check_grace_period_seconds = 120
-  # lifecycle {
-  #   ignore_changes = [
-  #     task_definition
-  #   ]
-  # }
+  lifecycle {
+    ignore_changes = [
+      task_definition
+    ]
+  }
 
   network_configuration {
     security_groups = [aws_security_group.cluster_fargate_sg.id]
