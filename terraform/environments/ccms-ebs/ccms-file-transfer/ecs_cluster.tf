@@ -10,7 +10,7 @@ resource "aws_ecs_cluster" "main_cluster" {
 
 # ECS Task Definition
 resource "aws_ecs_task_definition" "sftp_bc_task_definition" {
-  family             = "${local.application_name}-ftp-bc-task"
+  family             = "${local.application_name}-sftp-bc-task"
   execution_role_arn = aws_iam_role.bc_ecs_task_execution_role.arn
   network_mode       = "awsvpc"
   requires_compatibilities = [
