@@ -10,7 +10,7 @@
 #     e.g. individual *.microsoft.com subdomains removed as ".microsoft.com" covers them
 #   - Multi-level wildcards (*.*.domain.com) removed; covered by parent .domain.com entry
 #   - {{ region }} Jinja2 variables replaced with var.aws_region Terraform input
-#   - Four logical rule groups to keep each well under the 100-domain limit
+#   - Four logical rule groups to keep each well under the e0-domain limit
 #
 # IMPORTANT - these rule groups must be referenced in an
 # aws_networkfirewall_firewall_policy to take effect. This file only defines
@@ -34,7 +34,7 @@ variable "aws_region" {
 # -----------------------------------------------------------------------------
 resource "aws_networkfirewall_rule_group" "workspaces_aws_endpoints" {
   name     = "workspaces-aws-endpoints"
-  capacity = 15
+  capacity = 17
   type     = "STATEFUL"
 
   rule_group {
@@ -79,7 +79,7 @@ resource "aws_networkfirewall_rule_group" "workspaces_aws_endpoints" {
 # -----------------------------------------------------------------------------
 resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
   name     = "workspaces-microsoft-services"
-  capacity = 60
+  capacity = 150
   type     = "STATEFUL"
 
   rule_group {
@@ -176,7 +176,7 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
 # -----------------------------------------------------------------------------
 resource "aws_networkfirewall_rule_group" "workspaces_onedrive_live_misc" {
   name     = "workspaces-onedrive-live-misc"
-  capacity = 70
+  capacity = 150
   type     = "STATEFUL"
 
   rule_group {
@@ -286,7 +286,7 @@ resource "aws_networkfirewall_rule_group" "workspaces_onedrive_live_misc" {
 # -----------------------------------------------------------------------------
 resource "aws_networkfirewall_rule_group" "workspaces_certificate_authorities" {
   name     = "workspaces-certificate-authorities"
-  capacity = 25
+  capacity = 150
   type     = "STATEFUL"
 
   rule_group {
