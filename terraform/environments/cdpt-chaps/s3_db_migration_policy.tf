@@ -141,13 +141,16 @@ data "aws_iam_policy_document" "db_migration_bucket_policy" {
     }
   }
 
-  statement {
+  dynamic "statement" {
+    for_each = local.application_data.accounts[local.environment].enable_cp_db_migration_copy_access ? [1] : []
+
+  content {
     sid = "AllowCpMigrationCopyRoleToGetBucketLocation"
 
     principals {
       type        = "AWS"
       identifiers = [
-        local.application_data.accounts[local.environment].cp_db_migration_copy_irsa_role_arn
+        local.cp_db_migration_copy_irsa_role_arn
       ]
     }
 
@@ -159,14 +162,18 @@ data "aws_iam_policy_document" "db_migration_bucket_policy" {
       aws_s3_bucket.db_migration.arn
     ]
   }
+}
 
-  statement {
+dynamic "statement" {
+  for_each = local.application_data.accounts[local.environment].enable_cp_db_migration_copy_access ? [1] : []
+
+  content {
     sid = "AllowCpMigrationCopyRoleToListBackupPrefix"
 
     principals {
       type = "AWS"
       identifiers = [
-        local.application_data.accounts[local.environment].cp_db_migration_copy_irsa_role_arn
+        local.cp_db_migration_copy_irsa_role_arn
       ]
     }
 
@@ -188,14 +195,18 @@ data "aws_iam_policy_document" "db_migration_bucket_policy" {
       ]
     }
   }
+}
 
-  statement {
+dynamic "statement" {
+  for_each = local.application_data.accounts[local.environment].enable_cp_db_migration_copy_access ? [1] : []
+
+  content {
     sid = "AllowCpMigrationCopyRoleToReadBackupObjects"
 
     principals {
       type    = "AWS"
       identifiers = [
-        local.application_data.accounts[local.environment].cp_db_migration_copy_irsa_role_arn
+        local.cp_db_migration_copy_irsa_role_arn
       ]
     }
 
@@ -207,6 +218,7 @@ data "aws_iam_policy_document" "db_migration_bucket_policy" {
     resources = [
       "${aws_s3_bucket.db_migration.arn}/${local.db_migration_prefix}/*"
       ]
+    }
   }
 }
 
@@ -225,7 +237,9 @@ data "aws_iam_policy_document" "db_migration_kms" {
 
     principals {
       type = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+      identifiers = [
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+      ]
     }
   }
 
@@ -244,26 +258,32 @@ data "aws_iam_policy_document" "db_migration_kms" {
 
     principals {
       type = "AWS"
-      identifiers = [aws_iam_role.rds_native_backup.arn]
+      identifiers = [
+        aws_iam_role.rds_native_backup.arn
+      ]
     }
   }
 
-  statement {
-    sid = "AllowCpMigrationCopyRoleToDecrypt"
-    effect = "Allow"
+  dynamic "statement" {
+    for_each = local.application_data.accounts[local.environment].enable_cp_db_migration_copy_access ? [1] : []
 
-    actions = [
-      "kms:Decrypt",
-      "kms:DescribeKey"
-    ]
+    content {
+      sid = "AllowCpMigrationCopyRoleToDecrypt"
+      effect = "Allow"
 
-    resources = ["*"]
+      principals {
+        type = "AWS"
+        identifiers = [
+          local.cp_db_migration_copy_irsa_role_arn
+        ]
+      }
 
-    principals {
-      type = "AWS"
-      identifiers = [
-        local.application_data.accounts[local.environment].cp_db_migration_copy_irsa_role_arn
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey"
       ]
+
+      resources = ["*"]
     }
   }
 }
