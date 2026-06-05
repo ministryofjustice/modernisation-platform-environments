@@ -133,7 +133,7 @@ resource "aws_wafv2_rule_group" "wam_waf_acl" {
 # WAF IP Set for NCSC WebCheck & Detectify Public IP Addresses
 
 data "aws_ssm_parameter" "ncsc_waf_ip_set" {
-  name = "ncsc_waf_ip_set"
+  name = "/waf/ncsc_waf_ip_set"
 }
 
 locals {
@@ -156,7 +156,7 @@ resource "aws_wafv2_ip_set" "ncsc_waf_ip_set" {
 # WAF IP Set for Circle CI Public IP Addresses
 
 data "aws_ssm_parameter" "circle_ci_waf_ip_set" {
-  name = "circle_ci_waf_ip_set"
+  name = "/waf/circle_ci_waf_ip_set"
 }
 
 locals {
