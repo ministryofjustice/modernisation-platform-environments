@@ -161,7 +161,7 @@ data "aws_iam_policy_document" "lakeformation_share_permissions_policy" {
     ]
     resources = [
       #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
-      "arn:aws:lakeformation:${local.current_account_region}:${local.current_account_id}:catalog:${local.current_account_id}"
+      "*"
     ]
   }
 
@@ -204,6 +204,7 @@ data "aws_iam_policy_document" "lakeformation_share_permissions_policy" {
       "iam:DeleteRole",
       "iam:DeleteRolePolicy",
       "iam:GetRole",
+      "iam:GetRolePolicy",
       "iam:TagRole",
       "iam:ListRolePolicies",
       "iam:ListAttachedRolePolicies",
