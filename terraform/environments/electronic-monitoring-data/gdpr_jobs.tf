@@ -184,16 +184,6 @@ resource "aws_ecs_cluster_capacity_providers" "ecd-gdpr-fargate" {
   }
 }
 
-resource "aws_lakeformation_permissions" "gdpr_iceberg_table_db_permissions" {
-  for_each  = local.is-development || local.is-preproduction || local.is-production ? toset(local.target_gdpr_dbs) : []
-  principal = aws_iam_role.gdpr_structured_job_role[0].arn
-
-  database {
-    name = each.value
-  }
-
-  permissions = ["DESCRIBE"]
-}
 resource "aws_lakeformation_permissions" "gdpr_iceberg_table_table_permissions" {
   for_each  = local.is-development || local.is-preproduction || local.is-production ? toset(local.target_gdpr_dbs) : []
   principal = aws_iam_role.gdpr_structured_job_role[0].arn
