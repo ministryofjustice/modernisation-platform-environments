@@ -62,7 +62,7 @@ resource "aws_lambda_function" "process_file_from_bucket_lambda_function" {
   function_name = "${local.application_name}-${local.environment}-process-file-from-bucket-lambda-function"
   role          = aws_iam_role.lambda_process_file_from_bucket_role.arn
   handler       = "example.HelloWorldHandler"
-  runtime       = "java21"
+  runtime       = "java25"
   timeout       = 30
   publish       = true
 
