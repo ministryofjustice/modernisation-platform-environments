@@ -18,7 +18,7 @@
       "dotnet_client_id": "37156e23-43dd-4325-ae36-f998ce4c32ff",
       "TenantId": "c6874728-71e6-41fe-a9e1-2e8c36776ad8",
       "CallbackPath": "/signin-oidc",
-      "enable_cp_db_migration_copy_access": false,
+      "enable_cp_db_migration_copy_access": true,
       "cp_db_migration_copy_irsa_role_arn": "arn:aws:iam::754256621582:role/cloud-platform-irsa-c5c488d70a0c0af2-live",
       "db_migration_prefix": "native-backups/dev",
       "db_migration_name": "dev"
