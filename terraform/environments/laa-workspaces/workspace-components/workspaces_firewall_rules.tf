@@ -331,21 +331,29 @@ resource "aws_networkfirewall_firewall_policy" "workspaces_web_allowlist" {
   firewall_policy {
     stateless_default_actions          = ["aws:forward_to_sfe"]
     stateless_fragment_default_actions = ["aws:forward_to_sfe"]
-    stateful_default_actions           = ["aws:drop"]
+    stateful_default_actions           = ["aws:drop_strict"]
+
+    stateful_engine_options {
+      rule_order = "STRICT_ORDER"
+    }
 
     stateful_rule_group_reference {
+      priority     = 1
       resource_arn = aws_networkfirewall_rule_group.workspaces_aws_endpoints.arn
     }
 
     stateful_rule_group_reference {
+      priority     = 2
       resource_arn = aws_networkfirewall_rule_group.workspaces_microsoft_services.arn
     }
 
     stateful_rule_group_reference {
+      priority     = 3
       resource_arn = aws_networkfirewall_rule_group.workspaces_onedrive_live_misc.arn
     }
 
     stateful_rule_group_reference {
+      priority     = 4
       resource_arn = aws_networkfirewall_rule_group.workspaces_certificate_authorities.arn
     }
   }
