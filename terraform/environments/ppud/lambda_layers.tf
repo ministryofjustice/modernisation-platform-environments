@@ -24,7 +24,7 @@ locals {
     boto3      = "boto3_layer.zip"
     pandas     = "pandas_layer.zip"
     xlsxwriter = "xlsxwriter_layer.zip"
-    requests   = "requests_v2.3.4_layer.zip"
+    requests   = "requests_v2.34.2_layer.zip"
     pillow     = "pillow_v12.2.0_layer.zip"
     numpy      = "numpy_v2.4.4_u2_layer.zip"
   }
