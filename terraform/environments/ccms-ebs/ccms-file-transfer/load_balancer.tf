@@ -34,9 +34,10 @@ resource "aws_lb_target_group" "sftp_bc_target_group" {
 
   health_check {
     path                = "/actuator/health"
+    port                = 8080
     healthy_threshold   = "5"
     interval            = "120"
-    protocol            = "HTTPS"
+    protocol            = "HTTP"
     unhealthy_threshold = "2"
     matcher             = "200"
     timeout             = "5"
