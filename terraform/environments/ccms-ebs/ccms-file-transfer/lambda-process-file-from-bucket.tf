@@ -84,7 +84,7 @@ resource "aws_lambda_function" "process_file_from_bucket_lambda_function" {
  
   lifecycle {
     ignore_changes = [
-      function_name
+      source_code_hash, filename
     ]
   }
 }
