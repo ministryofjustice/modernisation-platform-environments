@@ -4,7 +4,7 @@ locals {
     options = {
       sns_topics = {
         pagerduty_integrations = {
-          pagerduty = "prison-retail"          
+          pagerduty = "prison-retail-production"          
         }
       }
     }
