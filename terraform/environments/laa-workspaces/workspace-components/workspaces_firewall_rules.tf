@@ -38,6 +38,10 @@ resource "aws_networkfirewall_rule_group" "workspaces_aws_endpoints" {
   type     = "STATEFUL"
 
   rule_group {
+    stateful_rule_options {
+      rule_order = "STRICT_ORDER"
+    }
+
     rules_source {
       rules_source_list {
         generated_rules_type = "ALLOWLIST"
@@ -83,6 +87,10 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
   type     = "STATEFUL"
 
   rule_group {
+    stateful_rule_options {
+      rule_order = "STRICT_ORDER"
+    }
+
     rules_source {
       rules_source_list {
         generated_rules_type = "ALLOWLIST"
@@ -180,6 +188,10 @@ resource "aws_networkfirewall_rule_group" "workspaces_onedrive_live_misc" {
   type     = "STATEFUL"
 
   rule_group {
+    stateful_rule_options {
+      rule_order = "STRICT_ORDER"
+    }
+
     rules_source {
       rules_source_list {
         generated_rules_type = "ALLOWLIST"
@@ -288,6 +300,10 @@ resource "aws_networkfirewall_rule_group" "workspaces_certificate_authorities" {
   type     = "STATEFUL"
 
   rule_group {
+    stateful_rule_options {
+      rule_order = "STRICT_ORDER"
+    }
+
     rules_source {
       rules_source_list {
         generated_rules_type = "ALLOWLIST"
