@@ -120,7 +120,6 @@ module "kms_cloudwatch_logs" {
           ]
         }
       ]
-      ]
 
       condition = [
         {
