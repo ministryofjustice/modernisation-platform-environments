@@ -160,7 +160,7 @@ module "eks" {
   #       }
   #     }
   #   }
-  # }
+  }
 
   tags = merge(
     local.tags,
