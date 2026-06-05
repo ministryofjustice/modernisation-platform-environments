@@ -21,7 +21,7 @@ resource "aws_lb" "sftp_bc_load_balancer" {
 resource "aws_lb_target_group" "sftp_bc_target_group" {
   name                 = "${local.application_name}-sftp-bc-tg"
   port                 = local.application_data.accounts[local.environment].api_server_port
-  protocol             = "HTTP"
+  protocol             = "HTTPS"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "ip"
   deregistration_delay = 30
