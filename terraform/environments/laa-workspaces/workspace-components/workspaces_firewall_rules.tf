@@ -20,6 +20,8 @@
 variable "aws_region" {
   description = "AWS region for the WorkSpaces deployment (e.g. eu-west-2)"
   type        = string
+  default     = "eu-west-2"
+
 }
 
 # -----------------------------------------------------------------------------
