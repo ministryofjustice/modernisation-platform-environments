@@ -76,7 +76,7 @@ resource "aws_cloudwatch_event_rule" "sync_ssm_to_waf" {
   "source": ["aws.ssm"],
   "detail-type": ["Parameter Store Change"],
   "detail": {
-    "name": ["/waf/ip_block_list", "circle_ci_waf_ip_set", "ncsc_waf_ip_set"]
+    "name": ["/waf/ip_block_list", "/waf/circle_ci_waf_ip_set", "/waf/ncsc_waf_ip_set", "/waf/wam_user_ip_set"]
   }
 }
 EOF
