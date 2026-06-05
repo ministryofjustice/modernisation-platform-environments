@@ -113,12 +113,13 @@ module "kms_cloudwatch_logs" {
         {
           type = "AWS"
           identifiers = [
-            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply",
-            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan",
-            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess",
+            "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/github-actions-apply",
+            "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/github-actions-plan",
+            "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/MemberInfrastructureAccess",
             "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}",
           ]
         }
+      ]
       ]
 
       condition = [
