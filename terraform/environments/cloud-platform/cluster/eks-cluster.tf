@@ -150,7 +150,7 @@ module "eks" {
 
     ## CP GitHub actions access to cluster
     cpgha-administrator = {
-      principal_arn = "arn:aws:iam::${local.environment_management.account_ids["cloud-platform-development"]}:role/github-actions-development-cluster"
+      principal_arn = "arn:aws:iam::${local.environment_management.account_ids["cloud-platform-development"]}:role/github-actions-development-cluster-change"
       policy_associations = {
         eks-admin = {
           policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
