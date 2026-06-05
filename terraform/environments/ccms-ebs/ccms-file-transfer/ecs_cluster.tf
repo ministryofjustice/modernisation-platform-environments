@@ -51,7 +51,7 @@ resource "aws_ecs_task_definition" "sftp_bc_task_definition" {
 
 # ECS Service
 resource "aws_ecs_service" "sftp_bc_ecs_service" {
-  name            = local.application_data.accounts[local.environment].app_name
+  name            = "${local.application_name}-sftp-bc-service"
   cluster         = aws_ecs_cluster.main_cluster.id
   task_definition = aws_ecs_task_definition.sftp_bc_task_definition.arn
   desired_count   = local.application_data.accounts[local.environment].app_count
