@@ -19,11 +19,8 @@ locals {
 
   python_runtime = local.application_data.accounts[local.environment].python_runtime
 
-  ftp_lambda_source_file = local.application_data.accounts[local.environment].ftp_lambda_source_file
-  zip_lambda_source_file = local.application_data.accounts[local.environment].zip_lambda_source_file
-
-  ftp_lambda_source_file_version = local.application_data.accounts[local.environment].ftp_lambda_source_file_version
-  zip_lambda_source_file_version = local.application_data.accounts[local.environment].zip_lambda_source_file_version
+  ftp_sftp_port   = local.application_data.accounts[local.environment].ftp_sftp_port
+  ftp_remote_path = local.application_data.accounts[local.environment].ftp_remote_path
 
   laa_general_kms_arn = data.aws_kms_key.general_shared.arn
 

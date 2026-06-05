@@ -1,4 +1,5 @@
 import boto3
+import json
 import os
 import subprocess
 import logging
@@ -9,7 +10,6 @@ logger = logging.getLogger()
 logger.setLevel(os.environ.get("LOGLEVEL", "INFO"))
 
 # FTP / FTPS
-host = os.environ.get('HOST')
 port = os.environ.get('PORT')
 protocol = os.environ.get('PROTOCOL')
 transferType = os.environ.get('TRANSFERTYPE')
@@ -22,8 +22,56 @@ caCert = os.environ.get('CA_CERT')
 cert = os.environ.get('CERT')
 key = os.environ.get('KEY')
 keyType = os.environ.get('KEY_TYPE')
-user = os.environ.get('USER')
-password = os.environ.get('PASSWORD')
+
+# Resolve HOST, USER and PASSWORD from AWS Secrets Manager when SECRET_NAME is set.
+# This keeps credentials out of the Lambda console and env var plaintext.
+_secret_name = os.environ.get('SECRET_NAME')
+host = None
+user = None
+password = None
+if _secret_name:
+    try:
+        _sm = boto3.client('secretsmanager')
+        resp = _sm.get_secret_value(SecretId=_secret_name)
+        secret_string = resp.get('SecretString')
+        if secret_string:
+            try:
+                parsed = json.loads(secret_string)
+            except Exception:
+                parsed = {}
+
+            # Support flat JSON: {"HOST":"...","USER":"...","PASSWORD":"..."}
+            if isinstance(parsed, dict):
+                host = parsed.get('HOST') or parsed.get('host') or parsed.get('host_address')
+                user = parsed.get('USER') or parsed.get('user') or parsed.get('username')
+                password = parsed.get('PASSWORD') or parsed.get('password')
+
+            # Support older maatdb array format: [{"name":"xerox-outbound","type":"username","value":"user"}, ...]
+            elif isinstance(parsed, list):
+                for pair in parsed:
+                    if not isinstance(pair, dict):
+                        continue
+                    typ = pair.get('type')
+                    val = pair.get('value')
+                    if not typ or val is None:
+                        continue
+                    t = typ.lower()
+                    if t in ('username', 'user'):
+                        user = val
+                    elif t in ('password', 'pass'):
+                        password = val
+                    elif t in ('remote-host', 'host', 'host_address', 'hostaddress'):
+                        host = val
+    except Exception as e:
+        logger.exception('Unable to retrieve secret from Secrets Manager: %s', str(e))
+
+# Fallback to environment variables if any value is still missing
+if not host:
+    host = os.environ.get('HOST')
+if not user:
+    user = os.environ.get('USER')
+if not password:
+    password = os.environ.get('PASSWORD')
 certPath = os.environ['LAMBDA_TASK_ROOT'] + "/certs/"
 # SFTP related
 ssh_key = os.environ.get('SSH_KEY')
@@ -45,7 +93,7 @@ if fileTypes:
 # Check for valid env vars
 if None in (host, transferType, remotePath, protocol):
     logger.error('Missing Environment Variables')
-    logger.error('Need HOST, TRANSFERTYPE, REMOTEPATH and PROTOCOL')
+    logger.error('Need HOST, TRANSFERTYPE, REMOTEPATH and PROTOCOL (HOST may be sourced from SECRET_NAME)')
     raise Exception('Need HOST, TRANSFERTYPE, REMOTEPATH and PROTOCOL defined')
 
 
