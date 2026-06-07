@@ -333,3 +333,51 @@ resource "aws_cloudwatch_log_group" "update_p1_export_waf_log_group" {
   name              = "aws-waf-logs-update_p1_export"
   retention_in_days = 400
 }
+
+resource "aws_api_gateway_method_response" "add_response_200" {
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.update_p1_export[0].id
+  resource_id = aws_api_gateway_resource.update_p1_export_add[0].id
+  http_method = aws_api_gateway_method.update_p1_export_add_post[0].http_method
+  status_code = "200"
+}
+
+resource "aws_api_gateway_method_response" "add_status_200" {
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.update_p1_export[0].id
+  resource_id = aws_api_gateway_resource.update_p1_export_add[0].id
+  http_method = aws_api_gateway_method.update_p1_export_add_post[0].http_method
+  status_code = "200"
+}
+
+resource "aws_api_gateway_method_response" "add_status_404" {
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.update_p1_export[0].id
+  resource_id = aws_api_gateway_resource.update_p1_export_add[0].id
+  http_method = aws_api_gateway_method.update_p1_export_add_post[0].http_method
+  status_code = "404"
+}
+
+resource "aws_api_gateway_method_response" "remove_response_200" {
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.update_p1_export[0].id
+  resource_id = aws_api_gateway_resource.update_p1_export_remove[0].id
+  http_method = aws_api_gateway_method.update_p1_export_remove_post[0].http_method
+  status_code = "200"
+}
+
+resource "aws_api_gateway_method_response" "remove_status_200" {
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.update_p1_export[0].id
+  resource_id = aws_api_gateway_resource.update_p1_export_remove[0].id
+  http_method = aws_api_gateway_method.update_p1_export_add_post[0].http_method
+  status_code = "200"
+}
+
+resource "aws_api_gateway_method_response" "remove_status_404" {
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.update_p1_export[0].id
+  resource_id = aws_api_gateway_resource.update_p1_export_remove[0].id
+  http_method = aws_api_gateway_method.update_p1_export_remove_post[0].http_method
+  status_code = "404"
+}
