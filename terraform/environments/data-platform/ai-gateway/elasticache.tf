@@ -33,7 +33,22 @@ module "ai_gateway_elasticache" {
     }
   }
 
-  log_delivery_configuration = {} # TODO: this
+  log_delivery_configuration = {
+    slow_log = {
+      create_cloudwatch_log_group = false
+      destination                 = module.ai_gateway_elasticache_slow_log_group.cloudwatch_log_group_name
+      destination_type            = "cloudwatch-logs"
+      log_format                  = "json"
+      log_type                    = "slow-log"
+    }
+    engine_log = {
+      create_cloudwatch_log_group = false
+      destination                 = module.ai_gateway_elasticache_engine_log_group.cloudwatch_log_group_name
+      destination_type            = "cloudwatch-logs"
+      log_format                  = "json"
+      log_type                    = "engine-log"
+    }
+  }
 }
 
 module "ai_gateway_elasticache_secret" {

@@ -14,6 +14,7 @@ locals {
     "acquisitive_crime${local.dbt_suffix}",
     "allied_mdss_${local.environment_shorthand}",
   ]
+
 }
 
 # ------------------------------------------
