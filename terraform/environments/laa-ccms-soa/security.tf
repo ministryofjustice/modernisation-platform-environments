@@ -218,7 +218,7 @@ resource "aws_security_group_rule" "ecs_tasks_admin_egress_all" {
   protocol          = -1
   from_port         = 0
   to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 #--ECS Tasks Managed

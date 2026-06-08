@@ -1,58 +1,58 @@
 ## LOADBALANCER
-resource "aws_route53_record" "external" {
-  count    = local.is-production ? 1 : 0
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.ebsapps_nlb[count.index].dns_name
-    zone_id                = aws_lb.ebsapps_nlb[count.index].zone_id
-    evaluate_target_health = true
-  }
-}
+# resource "aws_route53_record" "external" {
+#   count    = local.is-production ? 1 : 0
+#   provider = aws.core-vpc
+#
+#   zone_id = data.aws_route53_zone.external.zone_id
+#   name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+#   type    = "A"
+#
+#   alias {
+#     name                   = aws_lb.ebsapps_nlb[count.index].dns_name
+#     zone_id                = aws_lb.ebsapps_nlb[count.index].zone_id
+#     evaluate_target_health = true
+#   }
+# }
 
 ## Prod Network Loadbalancer
-resource "aws_route53_record" "prod_ebs_nlb" {
-  provider = aws.core-network-services
-  count    = local.is-production ? 1 : 0
-  zone_id  = data.aws_route53_zone.legalservices.zone_id
-  name     = "ccmsebs.legalservices.gov.uk"
-  type     = "A"
-  alias {
-    name                   = aws_lb.ebsapps_nlb[count.index].dns_name
-    zone_id                = aws_lb.ebsapps_nlb[count.index].zone_id
-    evaluate_target_health = true
-  }
-}
+# resource "aws_route53_record" "prod_ebs_nlb" {
+#   provider = aws.core-network-services
+#   count    = local.is-production ? 1 : 0
+#   zone_id  = data.aws_route53_zone.legalservices.zone_id
+#   name     = "ccmsebs.legalservices.gov.uk"
+#   type     = "A"
+#   alias {
+#     name                   = aws_lb.ebsapps_nlb[count.index].dns_name
+#     zone_id                = aws_lb.ebsapps_nlb[count.index].zone_id
+#     evaluate_target_health = true
+#   }
+# }
 
 # Prod LB EBS Apps DNS
-resource "aws_route53_record" "prod_ebsapp_lb" {
-  count    = local.is-production ? 1 : 0
-  provider = aws.core-network-services
-  zone_id  = data.aws_route53_zone.prod-network-services.zone_id
-  name     = "${var.networking[0].application}.ccms-ebs.service.justice.gov.uk"
-  type     = "A"
+# resource "aws_route53_record" "prod_ebsapp_lb" {
+#   count    = local.is-production ? 1 : 0
+#   provider = aws.core-network-services
+#   zone_id  = data.aws_route53_zone.prod-network-services.zone_id
+#   name     = "${var.networking[0].application}.ccms-ebs.service.justice.gov.uk"
+#   type     = "A"
+#
+#   alias {
+#     name                   = aws_lb.ebsapps_nlb[count.index].dns_name
+#     zone_id                = aws_lb.ebsapps_nlb[count.index].zone_id
+#     evaluate_target_health = true
+#   }
+# }
 
-  alias {
-    name                   = aws_lb.ebsapps_nlb[count.index].dns_name
-    zone_id                = aws_lb.ebsapps_nlb[count.index].zone_id
-    evaluate_target_health = true
-  }
-}
-
-resource "aws_route53_record" "ebslb_cname" {
-  count    = local.is-production ? 1 : 0
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "ccms-ebslb"
-  ttl     = "300"
-  type    = "CNAME"
-  records = [aws_route53_record.external[0].fqdn]
-}
+# resource "aws_route53_record" "ebslb_cname" {
+#   count    = local.is-production ? 1 : 0
+#   provider = aws.core-vpc
+#
+#   zone_id = data.aws_route53_zone.external.zone_id
+#   name    = "ccms-ebslb"
+#   ttl     = "300"
+#   type    = "CNAME"
+#   records = [aws_route53_record.external[0].fqdn]
+# }
 
 ## EBSDB
 resource "aws_route53_record" "ebsdb" {

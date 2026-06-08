@@ -86,7 +86,7 @@ resource "aws_iam_policy" "ears_sars_step_function_policy" {
 # ------------------------------------------
 
 data "aws_iam_policy_document" "gdpr_delete_policy_document" {
-  count = local.is-development || local.is-preproduction ? 1 : 0
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   statement {
     effect = "Allow"
     actions = [
@@ -96,6 +96,41 @@ data "aws_iam_policy_document" "gdpr_delete_policy_document" {
       "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task-definition/${aws_ecs_task_definition.emds-gdpr-structured-data-deletion[0].family}:*",
       "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task-definition/${aws_ecs_task_definition.emds-gdpr-iceberg-table-maintenance[0].family}:*"
     ]
+  }
+
+  statement {
+    sid       = "BatchDescribeJobsGlobal"
+    effect    = "Allow"
+    actions   = ["batch:DescribeJobs"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid     = "BatchSubmitJobScoped"
+    effect  = "Allow"
+    actions = ["batch:SubmitJob"]
+
+    resources = [
+      aws_batch_job_queue.shred_unstructured_from_zip_batch_queue[0].arn,
+      "${aws_batch_job_definition.shred_unstructured_from_zip_job.arn}:*",
+      "arn:aws:batch:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:job/*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "batch:SubmitJob",
+      "batch:DescribeJobs",
+      "batch:TerminateJob"
+    ]
+    resources = ["arn:aws:batch:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:job-definition/shred-unstructured-from-zip-job:*"]
+  }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["lambda:InvokeFunction"]
+    resources = [module.gdpr_unstructured_control_lambda[0].lambda_function_arn]
   }
 
   statement {
@@ -121,12 +156,15 @@ data "aws_iam_policy_document" "gdpr_delete_policy_document" {
       "events:PutRule",
       "events:DescribeRule"
     ]
-    resources = ["arn:aws:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rule/StepFunctionsGetEventsForECSTaskRule"]
+    resources = [
+      "arn:aws:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rule/StepFunctionsGetEventsForECSTaskRule",
+      "arn:aws:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rule/StepFunctionsGetEventsForBatchJobsRule"
+    ]
   }
 }
 
 resource "aws_iam_policy" "gdpr_delete_iam_policy" {
-  count  = local.is-development || local.is-preproduction ? 1 : 0
+  count  = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   name   = "gdpr_deletion_step_function_role"
   policy = data.aws_iam_policy_document.gdpr_delete_policy_document[0].json
 }
@@ -213,7 +251,7 @@ resource "aws_iam_role_policy" "landing_dlq_redriver_state_machine_invoke" {
           "lambda:InvokeFunction",
         ]
         Resource = [
-          module.landing_dlq_redriver.lambda_function_arn,
+          module.landing_file_dlq_redriver.lambda_function_arn,
         ]
       }
     ]

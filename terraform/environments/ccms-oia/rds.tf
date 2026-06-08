@@ -23,7 +23,7 @@ resource "aws_db_instance" "opahub_db" {
   allocated_storage           = local.application_data.accounts[local.environment].db_storage_gb
   storage_type                = "gp3"
   storage_encrypted           = true
-  deletion_protection         = false
+  deletion_protection         = local.application_data.accounts[local.environment].db_deletion_protection
   allow_major_version_upgrade = true
   multi_az                    = true
   username                    = jsondecode(data.aws_secretsmanager_secret_version.opahub_secrets.secret_string)["db_user"]

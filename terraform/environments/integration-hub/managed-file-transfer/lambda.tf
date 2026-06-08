@@ -11,7 +11,7 @@ module "lambda_unscanned_to_processing" {
 
   event_source_mapping = {
     sqs = {
-      event_source_arn = module.sqs_unscanned_s3_notifications.queue_arn
+      event_source_arn = module.sqs_transfer_notifications.queue_arn
       batch_size       = 1
     }
   }
@@ -19,17 +19,20 @@ module "lambda_unscanned_to_processing" {
   environment_variables = {
     DESTINATION_BUCKET_NAME = module.s3_bucket["processing"].s3_bucket_id
     IDEMPOTENCY_TABLE       = module.dynamodb_idempotency.dynamodb_table_id
+    SOURCE_BUCKET_NAME      = module.s3_bucket["unscanned"].s3_bucket_id
   }
 
   attach_policy_statements = true
   policy_statements = {
-    source_bucket_read = {
+    source_bucket_get_delete = {
       effect = "Allow"
       actions = [
         "s3:GetObject",
         "s3:GetObjectVersion",
         "s3:GetObjectTagging",
         "s3:GetObjectVersionTagging",
+        "s3:DeleteObject",
+        "s3:DeleteObjectVersion",
       ]
       resources = [
         "${module.s3_bucket["unscanned"].s3_bucket_arn}/*",
@@ -80,6 +83,7 @@ module "lambda_unscanned_to_processing" {
     "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole",
   ]
 
+  cloudwatch_logs_kms_key_id        = module.kms_cloudwatch_logs.key_arn
   cloudwatch_logs_retention_in_days = 30
 
   tags = local.tags
@@ -179,6 +183,7 @@ module "lambda_processing_to_post_scan" {
     "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole",
   ]
 
+  cloudwatch_logs_kms_key_id        = module.kms_cloudwatch_logs.key_arn
   cloudwatch_logs_retention_in_days = 30
 
   tags = local.tags

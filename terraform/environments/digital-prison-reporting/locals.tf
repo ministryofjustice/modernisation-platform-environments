@@ -107,6 +107,7 @@ locals {
   create_rds_replica             = local.application_data.accounts[local.environment].dpr_rds_db.create_replica
   dpr_rds_engine                 = local.application_data.accounts[local.environment].dpr_rds_db.engine
   dpr_rds_engine_version         = local.application_data.accounts[local.environment].dpr_rds_db.engine_version
+  dpr_rds_replica_engine_version = local.application_data.accounts[local.environment].dpr_rds_db.replica_engine_version
   dpr_rds_init_size              = local.application_data.accounts[local.environment].dpr_rds_db.init_size
   dpr_rds_max_size               = local.application_data.accounts[local.environment].dpr_rds_db.max_size
   dpr_rds_name                   = local.application_data.accounts[local.environment].dpr_rds_db.name
@@ -437,16 +438,7 @@ locals {
     heartbeat_endpoint = "0.0.0.0"
   }
 
-  probation_domains_list = local.application_data.accounts[local.environment].probation_domains
-  probation_secrets_placeholder = {
-    db_name            = "dps"
-    password           = "placeholder"
-    user               = "placeholder"
-    username           = "placeholder"
-    endpoint           = "0.0.0.0"
-    port               = "5432"
-    heartbeat_endpoint = "0.0.0.0"
-  }
+  probation_domains = local.application_data.accounts[local.environment].probation_domains
 
   # Operational DataStore Secrets PlaceHolder
   operational_datastore_secrets_placeholder = {

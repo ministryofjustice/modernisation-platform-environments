@@ -1,5 +1,4 @@
 module "eks" {
-  count = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
 
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 21.0"
@@ -28,19 +27,6 @@ module "eks" {
       create_security_group  = true
       create_launch_template = true
       labels                 = local.environment_configuration.default_ng.labels
-    }
-    default_ng_arm = {
-      ami_type               = local.environment_configuration.ami_type_arm
-      desired_size           = local.environment_configuration.default_ng_arm.desired_capacity
-      max_size               = local.environment_configuration.default_ng_arm.max_size
-      min_size               = local.environment_configuration.default_ng_arm.min_size
-      instance_types         = local.environment_configuration.default_ng_arm.instance_types
-      block_device_mappings  = local.environment_configuration.default_ng_arm.block_device_mappings
-      subnet_ids             = data.aws_subnets.eks_private.ids
-      name                   = "${local.cluster_name}-def-ng"
-      create_security_group  = true
-      create_launch_template = true
-      labels                 = local.environment_configuration.default_ng_arm.labels
     }
     monitoring_ng = {
       ami_type               = local.environment_configuration.ami_type
@@ -94,7 +80,7 @@ module "eks" {
     }
     vpc-cni = {
       before_compute = true
-      #   addon_version = local.environment_configuration.eks_cluster_addon_versions.vpc_cni
+      addon_version  = local.environment_configuration.eks_cluster_addon_versions.vpc_cni
     }
     eks-pod-identity-agent = {
       before_compute = true
@@ -138,6 +124,18 @@ module "eks" {
         }
       }
     }
+    ## MP Environments Actions (github-actions-plan) access to cluster
+    github-actions-plan = {
+      principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan"
+      policy_associations = {
+        eks-admin = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
+    }
     ## MP Environments Actions (MemberInfrastructureAccess)access to cluster
     mpe-administrator = {
       principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess"
@@ -165,5 +163,8 @@ module "eks" {
     }
   }
 
-  tags = local.tags
+  tags = merge(
+    local.tags,
+    null_resource.created_by_tag.triggers.created_by == "__unset__" ? {} : { "created-by" = null_resource.created_by_tag.triggers.created_by }
+  )
 }
