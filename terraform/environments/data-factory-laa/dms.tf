@@ -529,6 +529,16 @@ module "dms_postgres" {
 
   slack_webhook_secret_id = aws_secretsmanager_secret.dms_slack_webhook[0].id
 
+  # Lake Formation grants — required for Athena queries against the Glue tables
+  # registered by the metadata generator. Without these, Athena returns
+  # "Relation contains no accessible columns" even for LF admins (Athena v3
+  # enforces explicit TableWithColumns grants).
+  lakeformation_grants = {
+    principals = [
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-sandbox_c38cf78de39ef4d0",
+    ]
+  }
+
   depends_on = [
     aws_iam_role_policy_attachment.dms_vpc_role,
     aws_s3_object.postgres_dms_mappings[0],
