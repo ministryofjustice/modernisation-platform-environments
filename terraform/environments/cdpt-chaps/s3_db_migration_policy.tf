@@ -1,8 +1,8 @@
 locals {
-  source_db_identifier                = local.application_data.accounts[local.environment].db_instance_identifier
-  native_backup_option_group          = "chaps-${local.environment}-sqlserver-native-backup"
-  mp_rds_native_backup_role_name      = "chaps-${local.environment}-rds-native-backup"
-  cp_db_migration_copy_irsa_role_arn  = local.application_data.accounts[local.environment].cp_db_migration_copy_irsa_role_arn
+  source_db_identifier               = local.application_data.accounts[local.environment].db_instance_identifier
+  native_backup_option_group         = "chaps-${local.environment}-sqlserver-native-backup"
+  mp_rds_native_backup_role_name     = "chaps-${local.environment}-rds-native-backup"
+  cp_db_migration_copy_irsa_role_arn = local.application_data.accounts[local.environment].cp_db_migration_copy_irsa_role_arn
 }
 
 data "aws_iam_policy_document" "rds_native_backup_assume_role" {
@@ -65,8 +65,8 @@ data "aws_iam_policy_document" "rds_native_backup_s3_kms" {
     ]
 
     condition {
-      test      = "StringLike"
-      variable  = "s3:prefix"
+      test     = "StringLike"
+      variable = "s3:prefix"
       values = [
         local.db_migration_prefix,
         "${local.db_migration_prefix}/",
@@ -119,11 +119,11 @@ resource "aws_iam_role_policy_attachment" "rds_native_backup_s3_kms" {
 
 data "aws_iam_policy_document" "db_migration_bucket_policy" {
   statement {
-    sid = "DenyInsecureTransport"
+    sid    = "DenyInsecureTransport"
     effect = "Deny"
 
     principals {
-      type = "*"
+      type        = "*"
       identifiers = ["*"]
     }
 
@@ -135,88 +135,88 @@ data "aws_iam_policy_document" "db_migration_bucket_policy" {
     ]
 
     condition {
-      test = "Bool"
+      test     = "Bool"
       variable = "aws:SecureTransport"
-      values = ["false"]
+      values   = ["false"]
     }
   }
 
   dynamic "statement" {
     for_each = local.application_data.accounts[local.environment].enable_cp_db_migration_copy_access ? [1] : []
 
-  content {
-    sid = "AllowCpMigrationCopyRoleToGetBucketLocation"
+    content {
+      sid = "AllowCpMigrationCopyRoleToGetBucketLocation"
 
-    principals {
-      type        = "AWS"
-      identifiers = [
-        local.cp_db_migration_copy_irsa_role_arn
+      principals {
+        type = "AWS"
+        identifiers = [
+          local.cp_db_migration_copy_irsa_role_arn
+        ]
+      }
+
+      actions = [
+        "s3:GetBucketLocation"
       ]
-    }
 
-    actions = [
-      "s3:GetBucketLocation"
-    ]
-
-    resources = [
-      aws_s3_bucket.db_migration.arn
-    ]
-  }
-}
-
-dynamic "statement" {
-  for_each = local.application_data.accounts[local.environment].enable_cp_db_migration_copy_access ? [1] : []
-
-  content {
-    sid = "AllowCpMigrationCopyRoleToListBackupPrefix"
-
-    principals {
-      type = "AWS"
-      identifiers = [
-        local.cp_db_migration_copy_irsa_role_arn
-      ]
-    }
-
-    actions = [
-      "s3:ListBucket"
-    ]
-
-    resources = [
-      aws_s3_bucket.db_migration.arn
-    ]
-
-    condition {
-      test = "StringLike"
-      variable = "s3:prefix"
-      values = [
-        local.db_migration_prefix,
-        "${local.db_migration_prefix}/",
-        "${local.db_migration_prefix}/*"
+      resources = [
+        aws_s3_bucket.db_migration.arn
       ]
     }
   }
-}
 
-dynamic "statement" {
-  for_each = local.application_data.accounts[local.environment].enable_cp_db_migration_copy_access ? [1] : []
+  dynamic "statement" {
+    for_each = local.application_data.accounts[local.environment].enable_cp_db_migration_copy_access ? [1] : []
 
-  content {
-    sid = "AllowCpMigrationCopyRoleToReadBackupObjects"
+    content {
+      sid = "AllowCpMigrationCopyRoleToListBackupPrefix"
 
-    principals {
-      type    = "AWS"
-      identifiers = [
-        local.cp_db_migration_copy_irsa_role_arn
+      principals {
+        type = "AWS"
+        identifiers = [
+          local.cp_db_migration_copy_irsa_role_arn
+        ]
+      }
+
+      actions = [
+        "s3:ListBucket"
       ]
+
+      resources = [
+        aws_s3_bucket.db_migration.arn
+      ]
+
+      condition {
+        test     = "StringLike"
+        variable = "s3:prefix"
+        values = [
+          local.db_migration_prefix,
+          "${local.db_migration_prefix}/",
+          "${local.db_migration_prefix}/*"
+        ]
+      }
     }
+  }
 
-    actions = [
-      "s3:GetObject",
-      "s3:GetObjectAttributes"
-    ]
+  dynamic "statement" {
+    for_each = local.application_data.accounts[local.environment].enable_cp_db_migration_copy_access ? [1] : []
 
-    resources = [
-      "${aws_s3_bucket.db_migration.arn}/${local.db_migration_prefix}/*"
+    content {
+      sid = "AllowCpMigrationCopyRoleToReadBackupObjects"
+
+      principals {
+        type = "AWS"
+        identifiers = [
+          local.cp_db_migration_copy_irsa_role_arn
+        ]
+      }
+
+      actions = [
+        "s3:GetObject",
+        "s3:GetObjectAttributes"
+      ]
+
+      resources = [
+        "${aws_s3_bucket.db_migration.arn}/${local.db_migration_prefix}/*"
       ]
     }
   }
@@ -229,8 +229,8 @@ resource "aws_s3_bucket_policy" "db_migration" {
 
 data "aws_iam_policy_document" "db_migration_kms" {
   statement {
-    sid = "allowAccountRoot"
-    effect = "Allow"
+    sid     = "allowAccountRoot"
+    effect  = "Allow"
     actions = ["kms:*"]
 
     resources = ["*"]
@@ -244,7 +244,7 @@ data "aws_iam_policy_document" "db_migration_kms" {
   }
 
   statement {
-    sid = "AllowMpRdsNativeBackupRole"
+    sid    = "AllowMpRdsNativeBackupRole"
     effect = "Allow"
 
     actions = [
@@ -268,7 +268,7 @@ data "aws_iam_policy_document" "db_migration_kms" {
     for_each = local.application_data.accounts[local.environment].enable_cp_db_migration_copy_access ? [1] : []
 
     content {
-      sid = "AllowCpMigrationCopyRoleToDecrypt"
+      sid    = "AllowCpMigrationCopyRoleToDecrypt"
       effect = "Allow"
 
       principals {

@@ -34,15 +34,15 @@ resource "aws_lambda_function" "user_creation" {
   environment {
     variables = {
       # Must point to Windows EC2 instance for domain-joined PowerShell execution
-      EC2_INSTANCE_ID     = aws_instance.user_creation_ec2[0].id
-      DIRECTORY_ID        = aws_directory_service_directory.workspaces_ad[0].id
+      EC2_INSTANCE_ID       = aws_instance.user_creation_ec2[0].id
+      DIRECTORY_ID          = aws_directory_service_directory.workspaces_ad[0].id
       BUNDLE_ID_STANDARD    = local.workspace_types["standard"].bundle_id
       BUNDLE_ID_PERFORMANCE = local.workspace_types["performance"].bundle_id
       BUNDLE_ID_POWER       = local.workspace_types["power"].bundle_id
-      KMS_KEY_ID          = aws_kms_key.ebs[0].arn
-      REGION              = local.application_data.accounts[local.environment].region
-      SES_SENDER          = data.terraform_remote_state.workspace_components.outputs.ses_sender_email
-      SELFSERVICE_URL     = "${data.terraform_remote_state.workspace_components.outputs.radius_portal_url}/selfservice/login"
+      KMS_KEY_ID            = aws_kms_key.ebs[0].arn
+      REGION                = local.application_data.accounts[local.environment].region
+      SES_SENDER            = data.terraform_remote_state.workspace_components.outputs.ses_sender_email
+      SELFSERVICE_URL       = "${data.terraform_remote_state.workspace_components.outputs.radius_portal_url}/selfservice/login"
     }
   }
 
