@@ -42,11 +42,6 @@ locals {
     sha256(file("${path.module}/lambda/payment_load_monitor/${f}"))
   ]
 
-  lambda_source_hashes_ssogen_admin_failover = [
-    for f in fileset("./lambda/ssogen_admin_failover", "**") :
-    sha256(file("${path.module}/lambda/ssogen_admin_failover/${f}"))
-  ]
-
   private_subnets_cidr_blocks = [
     data.aws_subnet.private_subnets_a.cidr_block,
     data.aws_subnet.private_subnets_b.cidr_block,
@@ -89,7 +84,7 @@ locals {
     format("ccms-ebs-db-nlb.%s", local.prod_domain),
     format("ccmsebs-sso.%s", local.prod_domain),
   ]
-  
+
   subject_alternative_names = local.is-production ? local.prod_sans : local.nonprod_sans
 
   # Domain validation options mapping (following the example pattern)

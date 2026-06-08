@@ -1,7 +1,3 @@
-# locals {
-#   is_development = local.environment == "development"
-# }
-
 data "template_file" "launch-template1" {
   count    = local.ssogen_enabled ? 1 : 0
   template = file("${path.module}/templates/ec2_user_data_ssogen.sh")
