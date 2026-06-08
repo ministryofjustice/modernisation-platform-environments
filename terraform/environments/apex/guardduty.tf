@@ -331,3 +331,92 @@ resource "aws_guardduty_malware_protection_plan" "backup_lambda_protection_plan"
 
   depends_on = [aws_s3_bucket.backup_lambda]
 }
+
+resource "aws_guardduty_malware_protection_plan" "bastion_protection_plan" {
+  count = can(local.application_data.accounts[local.environment].bastion_bucket_suffix) ? 1 : 0
+  role  = data.aws_iam_role.guardduty_s3_scan.arn
+
+  protected_resource {
+    s3_bucket {
+      bucket_name = "bastion-${local.application_name}-${local.application_name}-${local.environment}-${local.application_data.accounts[local.environment].bastion_bucket_suffix}"
+    }
+  }
+
+  actions {
+    tagging {
+      status = "ENABLED"
+    }
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("s3-%s-%s-bastion-guardduty-protection-plan", local.application_name, local.environment)) }
+  )
+}
+
+resource "aws_guardduty_malware_protection_plan" "lb_access_logs_protection_plan" {
+  role = data.aws_iam_role.guardduty_s3_scan.arn
+
+  protected_resource {
+    s3_bucket {
+      bucket_name = module.alb.s3_bucket.id
+    }
+  }
+
+  actions {
+    tagging {
+      status = "ENABLED"
+    }
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("s3-%s-%s-lb-access-logs-guardduty-protection-plan", local.application_name, local.environment)) }
+  )
+
+  depends_on = [module.alb]
+}
+
+resource "aws_guardduty_malware_protection_plan" "codebuild_report_protection_plan" {
+  count = local.environment == "development" ? 1 : 0
+  role  = data.aws_iam_role.guardduty_s3_scan.arn
+
+  protected_resource {
+    s3_bucket {
+      bucket_name = "laa-${local.application_name}-deployment-pipeline-reportbucket"
+    }
+  }
+
+  actions {
+    tagging {
+      status = "ENABLED"
+    }
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("s3-%s-%s-codebuild-report-guardduty-protection-plan", local.application_name, local.environment)) }
+  )
+
+  depends_on = [module.apex-ecr-codebuild]
+}
+
+resource "aws_guardduty_malware_protection_plan" "codebuild_resources_protection_plan" {
+  count = local.environment == "development" ? 1 : 0
+  role  = data.aws_iam_role.guardduty_s3_scan.arn
+
+  protected_resource {
+    s3_bucket {
+      bucket_name = "laa-${local.application_name}-management-resourcebucket"
+    }
+  }
+
+  actions {
+    tagging {
+      status = "ENABLED"
+    }
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("s3-%s-%s-codebuild-resources-guardduty-protection-plan", local.application_name, local.environment)) }
+  )
+
+  depends_on = [module.apex-ecr-codebuild]
+}
