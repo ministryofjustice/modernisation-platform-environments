@@ -122,7 +122,8 @@ resource "aws_route" "private_a_firewall" {
   route_table_id         = aws_route_table.private_a[0].id
   destination_cidr_block = "0.0.0.0/0"
   vpc_endpoint_id = element([
-    for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist[0].firewall_status[0].sync_states : sync_state.endpoint_id
+    for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist[0].firewall_status[0].sync_states
+    : sync_state.attachment[0].endpoint_id
     if sync_state.availability_zone == "eu-west-2a"
   ], 0)
 }
@@ -133,7 +134,8 @@ resource "aws_route" "private_b_firewall" {
   route_table_id         = aws_route_table.private_b[0].id
   destination_cidr_block = "0.0.0.0/0"
   vpc_endpoint_id = element([
-    for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist[0].firewall_status[0].sync_states : sync_state.endpoint_id
+    for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist[0].firewall_status[0].sync_states
+    : sync_state.attachment[0].endpoint_id
     if sync_state.availability_zone == "eu-west-2b"
   ], 0)
 }
