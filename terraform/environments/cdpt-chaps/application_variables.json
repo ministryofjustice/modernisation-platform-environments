@@ -41,8 +41,8 @@
       "dotnet_client_id": "efdcd721-93a1-46c1-b0da-29532763b12d",
       "TenantId": "c6874728-71e6-41fe-a9e1-2e8c36776ad8",
       "CallbackPath": "/signin-oidc",
-      "enable_cp_db_migration_copy_access": false,
-      "cp_db_migration_copy_irsa_role_arn": "",
+      "enable_cp_db_migration_copy_access": true,
+      "cp_db_migration_copy_irsa_role_arn": "arn:aws:iam::754256621582:role/cloud-platform-irsa-fe83b7b809aee6b4-live",
       "db_migration_prefix": "native-backups/staging",
       "db_migration_name": "staging"
     },
@@ -64,8 +64,8 @@
       "dotnet_client_id": "7361e073-5dc6-43a2-80fb-6cbb742166bb",
       "TenantId": "c6874728-71e6-41fe-a9e1-2e8c36776ad8",
       "CallbackPath": "/signin-oidc",
-      "enable_cp_db_migration_copy_access": false,
-      "cp_db_migration_copy_irsa_role_arn": "",
+      "enable_cp_db_migration_copy_access": true,
+      "cp_db_migration_copy_irsa_role_arn": "arn:aws:iam::754256621582:role/cloud-platform-irsa-e58a85df36ca23a9-live",
       "db_migration_prefix": "native-backups/prod",
       "db_migration_name": "prod"
     }
