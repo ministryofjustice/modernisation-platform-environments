@@ -3,18 +3,16 @@
 locals {
 
   ftp_job = {
-    job_name        = "xerox-outbound"
-    bucket_name     = try(module.s3_bucket.outbound.bucket.bucket, "")
-    bucket_folder   = "export/home/ccmtdb/central_print/rep_orders/"
-    ftp_protocol    = "SFTP"
-    ftp_type        = "SFTP_UPLOAD"
-    require_ssl     = "NO"
-    insecure        = "YES"
-    ftp_file_types  = "zip"
-    file_remove     = "YES"
-    ftp_port        = local.ftp_sftp_port
-    ftp_remote_path = local.ftp_remote_path
-    cron_rule       = local.application_data.accounts[local.environment].ftp_lambda_eventbridge_cron
+    job_name       = "xerox-outbound"
+    bucket_name    = try(module.s3_bucket.outbound.bucket.bucket, "")
+    bucket_folder  = "export/home/ccmtdb/central_print/rep_orders/"
+    ftp_protocol   = "SFTP"
+    ftp_type       = "SFTP_UPLOAD"
+    require_ssl    = "NO"
+    insecure       = "YES"
+    ftp_file_types = "zip"
+    file_remove    = "YES"
+    cron_rule      = local.application_data.accounts[local.environment].ftp_lambda_eventbridge_cron
   }
 
   zip_job = {
@@ -254,8 +252,8 @@ resource "aws_security_group" "ftp_lambda" {
 
   egress {
     description = "Allow SFTP outbound"
-    from_port   = tonumber(local.ftp_job.ftp_port)
-    to_port     = tonumber(local.ftp_job.ftp_port)
+    from_port   = 22
+    to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -316,12 +314,10 @@ resource "aws_lambda_function" "ftp" {
 
   environment {
     variables = {
-      PORT         = local.ftp_job.ftp_port
       PROTOCOL     = local.ftp_job.ftp_protocol
       FILETYPES    = local.ftp_job.ftp_file_types
       TRANSFERTYPE = local.ftp_job.ftp_type
       LOCALPATH    = local.ftp_job.bucket_folder
-      REMOTEPATH   = local.ftp_job.ftp_remote_path
       REQUIRE_SSL  = local.ftp_job.require_ssl
       INSECURE     = local.ftp_job.insecure
       S3BUCKET     = local.ftp_job.bucket_name

@@ -2,20 +2,26 @@
 # This is required BEFORE the lambdas are built as the secrets are manually added & as such is always created.
 
 
-# This secret manages the details of the endpoints such as server names and remote folders
-# It will have:
-
-# 1. The name of the job. This will match the value of ftp_job.job_name in the ftp_lambda.tf file
-# 2. The value type (host_address or remote_folder)
-# 3. The secret value
-
-# For example:
-
+# This secret manages all connection details for the SFTP endpoint.
+# After the Terraform resource is created, update the secret value in the AWS console for each environment.
+#
+# Preferred format — flat JSON (HOST, PORT, USER, PASSWORD and REMOTEPATH are all read by the Lambda at runtime):
+#
+# {
+#   "HOST": "sftp.example.com",
+#   "PORT": "22",
+#   "USER": "username",
+#   "PASSWORD": "password",
+#   "REMOTEPATH": "/upload/"
+# }
+#
+# Legacy array format is also supported for backwards compatibility:
+#
 # [
 #   {
 #     "name": "xerox-outbound",
 #     "type": "remote-host",
-#     "value": "sftp.example.com" or IP address
+#     "value": "sftp.example.com"
 #   },
 #   {
 #     "name": "xerox-outbound",
@@ -25,7 +31,7 @@
 #   {
 #     "name": "xerox-outbound",
 #     "type": "remote-folder",
-#     "value": "/incoming/"
+#     "value": "/upload/"
 #   },
 #   {
 #     "name": "xerox-outbound",

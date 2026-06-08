@@ -10,11 +10,11 @@ logger = logging.getLogger()
 logger.setLevel(os.environ.get("LOGLEVEL", "INFO"))
 
 # FTP / FTPS
-port = os.environ.get('PORT')
+port = None
 protocol = os.environ.get('PROTOCOL')
 transferType = os.environ.get('TRANSFERTYPE')
 fileTypes = os.environ.get('FILETYPES')
-remotePath = os.environ.get('REMOTEPATH')
+remotePath = None
 localPath = os.environ.get('LOCALPATH')
 requireSSL = os.environ.get('REQUIRE_SSL')
 insecure = os.environ.get('INSECURE')
@@ -40,11 +40,13 @@ if _secret_name:
             except Exception:
                 parsed = {}
 
-            # Support flat JSON: {"HOST":"...","USER":"...","PASSWORD":"..."}
+            # Support flat JSON: {"HOST":"...","USER":"...","PASSWORD":"...","PORT":"22","REMOTEPATH":"/upload/"}
             if isinstance(parsed, dict):
                 host = parsed.get('HOST') or parsed.get('host') or parsed.get('host_address')
                 user = parsed.get('USER') or parsed.get('user') or parsed.get('username')
                 password = parsed.get('PASSWORD') or parsed.get('password')
+                port = parsed.get('PORT') or parsed.get('port')
+                remotePath = parsed.get('REMOTEPATH') or parsed.get('remotepath') or parsed.get('remote_path')
 
             # Support older maatdb array format: [{"name":"xerox-outbound","type":"username","value":"user"}, ...]
             elif isinstance(parsed, list):
@@ -62,6 +64,10 @@ if _secret_name:
                         password = val
                     elif t in ('remote-host', 'host', 'host_address', 'hostaddress'):
                         host = val
+                    elif t in ('remote-port', 'port'):
+                        port = val
+                    elif t in ('remote-folder', 'remote-path', 'remotepath', 'remotefolder'):
+                        remotePath = val
     except Exception as e:
         logger.exception('Unable to retrieve secret from Secrets Manager: %s', str(e))
 
@@ -72,6 +78,10 @@ if not user:
     user = os.environ.get('USER')
 if not password:
     password = os.environ.get('PASSWORD')
+if not port:
+    port = os.environ.get('PORT')
+if not remotePath:
+    remotePath = os.environ.get('REMOTEPATH')
 certPath = os.environ['LAMBDA_TASK_ROOT'] + "/certs/"
 # SFTP related
 ssh_key = os.environ.get('SSH_KEY')
