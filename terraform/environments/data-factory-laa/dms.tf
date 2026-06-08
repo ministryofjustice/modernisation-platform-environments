@@ -474,7 +474,7 @@ module "dms_postgres" {
   # checkov:skip=CKV_TF_1: using branch ref for testing
   # checkov:skip=CKV_TF_2: using branch ref for testing
   count  = local.is-development ? 1 : 0
-  source = "github.com/ministryofjustice/terraform-dms-module?ref=66044c08910546d1d93821811e4e7d69136dbf36"
+  source = "github.com/ministryofjustice/terraform-dms-module?ref=c613aa7e78b2227204618713e45867e472aca2f4"
 
   vpc_id      = data.aws_vpc.shared.id
   environment = local.environment
