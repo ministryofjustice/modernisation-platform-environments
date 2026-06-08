@@ -40,7 +40,7 @@ resource "aws_instance" "s609693lo6vw100" {
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0fbad994892c0f0c4"
-  instance_type          = "m5.large"
+  instance_type          = "m5.xlarge"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-Database-Server[0].id]
@@ -268,7 +268,7 @@ resource "aws_instance" "s609693lo6vw109" {
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-05d3600bb677c98cd"
-  instance_type          = "m5.large"
+  instance_type          = "m5.xlarge"
   vpc_security_group_ids = [aws_security_group.SCR-Team-Foundation-Server[0].id]
   source_dest_check      = true
   subnet_id              = data.aws_subnet.private_subnets_a.id
