@@ -1,8 +1,16 @@
 ---
+replicas: 2
+
 hostNetwork:
   enabled: true
 
 containerPort: 4443
 
+nodeSelector:
+  compute.data-platform.service.justice.gov.uk/node: system
+
 tolerations:
-  - operator: Exists
+  - key: compute.data-platform.service.justice.gov.uk/node
+    operator: Equal
+    value: system
+    effect: NoSchedule
