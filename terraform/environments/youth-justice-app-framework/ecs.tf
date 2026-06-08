@@ -115,11 +115,28 @@ module "ecs" {
   ])
   ecs_role_additional_policies_arns = [
     aws_iam_policy.s3-access.arn,
-    aws_iam_policy.ses-access.arn
+    aws_iam_policy.ses-access.arn,
+    aws_iam_policy.rds-iam-auth.arn
   ]
   list_of_target_group_arns = local.list_of_target_group_arns
 
   depends_on = [module.internal_alb, module.external_alb, module.aurora, module.redshift]
+}
+
+resource "aws_iam_policy" "rds-iam-auth" {
+  name        = "${local.project_name}-ecs-rds-iam-auth"
+  description = "Allows ecs task role to authenticate to the Aurora cluster via IAM database authentication"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "rds-db:connect"
+        Resource = "arn:aws:rds-db:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:dbuser:${module.aurora.cluster_resource_id}/yjaf_service_iam_user"
+      }
+    ]
+  })
 }
 
 resource "aws_iam_policy" "s3-access" {

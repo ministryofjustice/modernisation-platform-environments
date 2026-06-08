@@ -47,3 +47,8 @@ output "cluster_id" {
   description = "The ID of the RDS Aurora cluster"
   value       = module.aurora.cluster_id
 }
+
+output "cluster_resource_id" {
+  description = "The Resource ID of the RDS Aurora cluster, used to scope IAM database authentication policies (rds-db:connect)"
+  value       = module.aurora.cluster_resource_id
+}
