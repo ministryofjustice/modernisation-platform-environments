@@ -116,27 +116,27 @@ resource "aws_route_table_association" "private_b" {
   route_table_id = aws_route_table.private_b[0].id
 }
 
-# resource "aws_route" "private_a_firewall" {
-#   count = local.environment == "development" ? 1 : 0
+resource "aws_route" "private_a_firewall" {
+  count = local.environment == "development" ? 1 : 0
 
-#   route_table_id         = aws_route_table.private_a[0].id
-#   destination_cidr_block = "0.0.0.0/0"
-#   vpc_endpoint_id = element([
-#     for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist[0].firewall_status[0].sync_states : sync_state.endpoint_id
-#     if sync_state.availability_zone == "eu-west-2a"
-#   ], 0)
-# }
+  route_table_id         = aws_route_table.private_a[0].id
+  destination_cidr_block = "0.0.0.0/0"
+  vpc_endpoint_id = element([
+    for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist[0].firewall_status[0].sync_states : sync_state.endpoint_id
+    if sync_state.availability_zone == "eu-west-2a"
+  ], 0)
+}
 
-# resource "aws_route" "private_b_firewall" {
-#   count = local.environment == "development" ? 1 : 0
+resource "aws_route" "private_b_firewall" {
+  count = local.environment == "development" ? 1 : 0
 
-#   route_table_id         = aws_route_table.private_b[0].id
-#   destination_cidr_block = "0.0.0.0/0"
-#   vpc_endpoint_id = element([
-#     for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist[0].firewall_status[0].sync_states : sync_state.endpoint_id
-#     if sync_state.availability_zone == "eu-west-2b"
-#   ], 0)
-# }
+  route_table_id         = aws_route_table.private_b[0].id
+  destination_cidr_block = "0.0.0.0/0"
+  vpc_endpoint_id = element([
+    for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist[0].firewall_status[0].sync_states : sync_state.endpoint_id
+    if sync_state.availability_zone == "eu-west-2b"
+  ], 0)
+}
 
 ##############################################
 ### Route Table for Firewall Subnets
