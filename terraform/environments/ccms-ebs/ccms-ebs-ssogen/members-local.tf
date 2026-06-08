@@ -1,66 +1,7 @@
 #### This file can be used to store locals specific to the member account ####
 locals {
-  logging_bucket_name            = "${local.application_name}-${local.environment}-logging"
-  rsync_bucket_name              = "${local.application_name}-${local.environment}-dbbackup"
-  lb_log_prefix_ebsapp           = "ebsapps-lb"
-  lb_log_prefix_wgate            = "wgate-lb"
-  lb_log_prefix_wgate_public     = "wgate-lb-public"
-  lb_log_prefix_ebsapp_internal  = "ebsapps-internal-lb"
-  lb_log_prefix_webgate_internal = "webgate-internal-lb"
-  lb_log_prefix_ssogen_internal  = "ssogen-internal-lb"
+
   application_name_ssogen        = "ssogen"
-
-
-  disksmount = [
-    "/dev/nvme1n1:/u01/product/fmw",
-    "/dev/nvme2n1:/u01/product/runtime/Domain/mserver",
-    "/dev/nvme3n1:/tmp"
-  ]
-
-  disksmount_joined = join(",", local.disksmount)
-
-  efs_mount_points = [
-    "stage:/stage",
-    "aserver:/u01/shared/product/runtime/Domain/aserver"
-  ]
-
-  efs_mount_points_joined = join(",", local.efs_mount_points)
-
-  lambda_folder_name = ["lambda_delivery", "ftp_lambda_layer", "payment_lambda_layer", "cloudwatch_sns_layer", "payment_load_monitor_layer"]
-
-  lambda_source_hashes_cloudwatch_alarm_slack_integration = [
-    for f in fileset("./lambda/cloudwatch_alarm_slack_integration", "**") :
-    sha256(file("${path.module}/lambda/cloudwatch_alarm_slack_integration/${f}"))
-  ]
-
-  lambda_source_hashes_payment_load_monitor = [
-    for f in fileset("./lambda/payment_load_monitor", "**") :
-    sha256(file("${path.module}/lambda/payment_load_monitor/${f}"))
-  ]
-
-  private_subnets_cidr_blocks = [
-    data.aws_subnet.private_subnets_a.cidr_block,
-    data.aws_subnet.private_subnets_b.cidr_block,
-    data.aws_subnet.private_subnets_c.cidr_block
-  ]
-
-  data_subnets = [
-    data.aws_subnet.data_subnets_a.id,
-    data.aws_subnet.data_subnets_b.id,
-    data.aws_subnet.data_subnets_c.id
-  ]
-
-  private_subnets = [
-    data.aws_subnet.private_subnets_a.id,
-    data.aws_subnet.private_subnets_b.id,
-    data.aws_subnet.private_subnets_c.id
-  ]
-
-  public_subnets = [
-    data.aws_subnet.public_subnets_a.id,
-    data.aws_subnet.public_subnets_b.id,
-    data.aws_subnet.public_subnets_c.id
-  ]
 
   # Certificate configuration based on environment
   nonprod_domain = format("%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
@@ -71,12 +12,10 @@ locals {
 
   nonprod_sans = [
     format("ccmsebs-sso.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
-    # format("ccmsebs-sso-cf.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
     format("ccms-ssogen-as1.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
     format("ccms-ssogen-as2.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
     format("ccms-ssogen-admin.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
     format("ccmsebs-sso-admin.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
-    #  format("ccms-sso-admin.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
   ]
 
   prod_sans = [
