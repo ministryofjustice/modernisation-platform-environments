@@ -3,10 +3,18 @@ kind: Service
 metadata:
   name: echo
   namespace: test-workload
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: external
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+    service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: preserve_client_ip.enabled=true
+    external-dns.alpha.kubernetes.io/hostname: echo2.cp-0806-1543.development.container-platform.service.justice.gov.uk
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: echo
   ports:
-    - port: 80
+    - name: http
+      port: 80
       targetPort: 5678
+      protocol: TCP

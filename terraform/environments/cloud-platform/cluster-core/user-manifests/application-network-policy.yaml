@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.aws/v1alpha1
+kind: ApplicationNetworkPolicy
+metadata:
+  name: echo-source-ip-allowlist
+  namespace: test-workload
+spec:
+  podSelector:
+    matchLabels:
+      app: echo
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: 83.100.215.187/32
+      ports:
+        - protocol: TCP
+          port: 5678
