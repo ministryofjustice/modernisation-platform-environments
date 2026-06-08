@@ -56,6 +56,7 @@ module "s3_bucket_notification" {
   bucket     = module.s3_bucket["unscanned"].s3_bucket_id
   bucket_arn = module.s3_bucket["unscanned"].s3_bucket_arn
 
+  depends_on = [module.sqs_unscanned_s3_notifications]
   sqs_notifications = {
     unscanned = {
       queue_arn = module.sqs_unscanned_s3_notifications.queue_arn
