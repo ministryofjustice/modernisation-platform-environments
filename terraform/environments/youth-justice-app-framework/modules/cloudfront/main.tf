@@ -60,7 +60,7 @@ resource "aws_cloudfront_distribution" "external" {
   }
 
   logging_config {
-    include_cookies = false
+    include_cookies = true
     bucket          = aws_s3_bucket.cloudfront.bucket_domain_name
     prefix          = ""
   }
@@ -152,7 +152,7 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
 
 resource "aws_cloudfront_origin_request_policy" "headers_policy" {
   name    = "cloudfront-${var.cloudfront_route53_record_name}-headers-policy"
-  comment = "Policy to include all viewer headers, all query strings, and no cookies."
+  comment = "Policy to include all viewer headers, all query strings, and all cookies."
 
   headers_config {
     header_behavior = "allViewer" # This includes all headers sent by the viewer.
@@ -163,7 +163,7 @@ resource "aws_cloudfront_origin_request_policy" "headers_policy" {
   }
 
   cookies_config {
-    cookie_behavior = "none" # This does not include any cookies in the origin request.
+    cookie_behavior = "all" # This includes all cookies in the origin request.
   }
 }
 #trivy:ignore:AVD-AWS-0132 todo fix later
