@@ -1,0 +1,21 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  # TODO: fix the name
+  name: nginx
+  namespace: test-app
+spec:
+  parentRefs:
+    - name: eg
+      namespace: default
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: hello-world-service
+          port: 8080
+          weight: 1

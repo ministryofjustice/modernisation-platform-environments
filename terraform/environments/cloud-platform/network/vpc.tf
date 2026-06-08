@@ -28,7 +28,8 @@ module "vpc" {
   create_multiple_public_route_tables = true
 
   public_subnet_tags = {
-    SubnetType = "Public"
+    SubnetType = "Public",
+    # TODO: consider putting the AWS LBC tags here
   }
 
   private_subnet_tags = {
