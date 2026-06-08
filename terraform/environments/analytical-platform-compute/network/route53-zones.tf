@@ -5,12 +5,12 @@ module "route53_zone" {
   source  = "terraform-aws-modules/route53/aws"
   version = "6.5.0"
 
-   
-    # tflint-ignore: terraform_deprecated_interpolation
-   name =  "${local.environment_configuration.route53_zone}"
-   comment = local.environment_configuration.route53_zone
 
-    records = {
+  # tflint-ignore: terraform_deprecated_interpolation
+  name    = local.environment_configuration.route53_zone
+  comment = local.environment_configuration.route53_zone
+
+  records = {
     airflow = {
       name    = "airflow"
       type    = "CNAME"
@@ -41,7 +41,7 @@ module "route53_zone" {
       ttl     = 300
       records = ["${aws_ses_domain_dkim.main.dkim_tokens[2]}.dkim.amazonses.com"]
     }
-}
+  }
 
   tags = local.tags
 }

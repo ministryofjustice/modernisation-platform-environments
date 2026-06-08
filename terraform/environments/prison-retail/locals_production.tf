@@ -4,7 +4,7 @@ locals {
     options = {
       sns_topics = {
         pagerduty_integrations = {
-          pagerduty = "prison-retail-production"          
+          pagerduty = "prison-retail-production"
         }
       }
     }
@@ -27,7 +27,7 @@ locals {
         cloudwatch_metric_alarms = merge(
           module.baseline_presets.cloudwatch_metric_alarms.ec2,
           module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
-           module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
         )
         config = {
           ami_name                      = "prison-retail-0"
