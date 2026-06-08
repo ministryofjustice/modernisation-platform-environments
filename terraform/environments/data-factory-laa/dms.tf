@@ -341,7 +341,12 @@ module "dms_oracle" {
 
 data "aws_secretsmanager_secret" "dms_postgres_credentials" {
   count = local.is-development ? 1 : 0
-  name  = "laa-df-dev/postgres-dms-test/dms-user"
+  name  = "postgres-dms-example/dms-user"
+}
+
+data "aws_kms_alias" "dms_postgres_example" {
+  count = local.is-development ? 1 : 0
+  name  = "alias/postgres-dms-example"
 }
 
 data "aws_iam_policy_document" "postgres_dms_kms" {
@@ -503,7 +508,7 @@ module "dms_postgres" {
   dms_source = {
     engine_name             = "postgres"
     secrets_manager_arn     = data.aws_secretsmanager_secret.dms_postgres_credentials[0].arn
-    secrets_manager_kms_arn = aws_kms_key.postgres_dms[0].arn
+    secrets_manager_kms_arn = data.aws_kms_alias.dms_postgres_example[0].target_key_arn
     database_name           = "dmstest"
     # Postgres extra_connection_attributes:
     #   PluginName=test_decoding — built-in logical decoding plugin on RDS;
