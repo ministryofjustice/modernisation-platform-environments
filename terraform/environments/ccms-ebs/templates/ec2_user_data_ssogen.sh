@@ -11,18 +11,7 @@ nmcli con up "System eth0"
 # === Base updates and packages ===
 yum update -y
 
-# systemctl enable amazon-ssm-agent
-# systemctl start amazon-ssm-agent
-
 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:ssogen-cloud-watch-config
-
-# nvme1n1 = first attached volume goes to root
-# nvme2n1 = second attached volume, etc.
-# DISKSARRAY=(
-#   "/dev/nvme2n1:/u01/product/fmw"
-#   "/dev/nvme3n1:/u01/product/runtime/Domain/mserver"
-#   "/dev/nvme4n1:/tmp"
-# )
 
 # Wait for disks to appear
 sleep 25
@@ -34,18 +23,6 @@ for entry in "$${DISKS_ARRAY[@]}"; do
   echo "Processing $disk -> $mount"
   # Ensure directory exists
   mkdir -p "$mount"
-
-  # Check if disk already has a filesystem
-  # if ! file -s "$disk" | grep -q "data"; then
-  #   echo "Filesystem already exists on $disk"
-  # else
-  #   echo "Creating filesystem on $disk"
-  #   mkfs.xfs "$disk"
-  # fi
-
-  # Mount disk
-  # echo "Mounting $disk to $mount"
-  # mount "$disk" "$mount"
 
   if [[ $mount != "/tmp" ]] ; then
     # Get UUID for persistent mount
@@ -102,7 +79,4 @@ for var in "$${EFS_MP_ARRAY[@]}"; do
 done
 
 umount /mnt/efs
-# Fix /tmp mount uuid in /etc/fstab-> It shouldn't be done as we don't want /tmp to be persistent
-# uuid=$(blkid -s UUID -o value /dev/nvme3n1)
-# sed -i "s/\/dev\/nvme3n1/UUID=$${uuid}/g" /etc/fstab
 echo "SSOGEN instance bootstrap completed" >> /var/log/user-data.log
