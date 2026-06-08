@@ -88,6 +88,7 @@ resource "aws_route53_record" "external_prod" {
   zone_id  = data.aws_route53_zone.application_zone.zone_id
   name     = "correspondence-handling-and-processing.service.justice.gov.uk"
   type     = "A"
+  ttl      = 10
 
   alias {
     name                   = module.lb_access_logs_enabled.load_balancer.dns_name
