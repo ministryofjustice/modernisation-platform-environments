@@ -1,12 +1,12 @@
 module "proof_of_concept_notification" {
   source = "./modules/send-presigned-url"
 
-  account_id                      = data.aws_caller_identity.current.account_id
-  application_name                = local.application_name
-  download_bucket_arn             = module.s3_bucket["clean"].s3_bucket_arn
-  download_bucket_kms_key_arn     = module.kms_s3_bucket["clean"].key_arn
-  download_bucket_name            = module.s3_bucket["clean"].s3_bucket_id
-  name_suffix                     = ""
+  account_id                  = data.aws_caller_identity.current.account_id
+  application_name            = local.application_name
+  download_bucket_arn         = module.s3_bucket["clean"].s3_bucket_arn
+  download_bucket_kms_key_arn = module.kms_s3_bucket["clean"].key_arn
+  download_bucket_name        = module.s3_bucket["clean"].s3_bucket_id
+  name_suffix                 = ""
   max_presigned_url_expiry_seconds = try(
     local.application_data.accounts[local.environment].notification_configuration.max_presigned_url_expiry_seconds,
     3600,
@@ -23,5 +23,5 @@ module "proof_of_concept_notification" {
     local.application_data.accounts[local.environment].notification_configuration.slack_team_id,
     null,
   )
-  tags                            = local.tags
+  tags = local.tags
 }

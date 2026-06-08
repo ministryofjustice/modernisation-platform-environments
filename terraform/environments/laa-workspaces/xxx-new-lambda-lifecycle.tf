@@ -121,9 +121,9 @@ resource "aws_iam_role_policy" "user_lifecycle_lambda_policy" {
         Resource = aws_secretsmanager_secret.user_list[0].arn
       },
       {
-        Sid    = "InvokeUserCreationLambda"
-        Effect = "Allow"
-        Action = ["lambda:InvokeFunction"]
+        Sid      = "InvokeUserCreationLambda"
+        Effect   = "Allow"
+        Action   = ["lambda:InvokeFunction"]
         Resource = aws_lambda_function.user_creation[0].arn
       },
       {
@@ -136,9 +136,9 @@ resource "aws_iam_role_policy" "user_lifecycle_lambda_policy" {
         Resource = "*"
       },
       {
-        Sid    = "DirectoryServiceDataAccess"
-        Effect = "Allow"
-        Action = ["ds:AccessDSData"]
+        Sid      = "DirectoryServiceDataAccess"
+        Effect   = "Allow"
+        Action   = ["ds:AccessDSData"]
         Resource = "arn:aws:ds:${local.application_data.accounts[local.environment].region}:${data.aws_caller_identity.current.account_id}:directory/${aws_directory_service_directory.workspaces_ad[0].id}"
       },
       {
@@ -151,9 +151,9 @@ resource "aws_iam_role_policy" "user_lifecycle_lambda_policy" {
         Resource = "arn:aws:ds:${local.application_data.accounts[local.environment].region}:${data.aws_caller_identity.current.account_id}:directory/${aws_directory_service_directory.workspaces_ad[0].id}"
       },
       {
-        Sid    = "SSMParameterCleanup"
-        Effect = "Allow"
-        Action = ["ssm:DeleteParameter"]
+        Sid      = "SSMParameterCleanup"
+        Effect   = "Allow"
+        Action   = ["ssm:DeleteParameter"]
         Resource = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${data.aws_caller_identity.current.account_id}:parameter/laa-workspaces/${local.environment}/user-passwords/*"
       },
       {

@@ -9,7 +9,7 @@ terraform {
       source  = "hashicorp/http"
     }
     archive = {
-      source  = "hashicorp/archive"
+      source = "hashicorp/archive"
     }
   }
   required_version = "~> 1.10"

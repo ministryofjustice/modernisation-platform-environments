@@ -101,7 +101,7 @@ resource "aws_wafv2_rule_group" "wam_waf_acl" {
     }
   }
 
-    rule {
+  rule {
     name     = "allow-wam-user-ip-list"
     priority = 30
     action {
