@@ -23,24 +23,6 @@ resource "aws_acm_certificate" "external" {
   )
 }
 
-# resource "aws_acm_certificate" "external_cf" {
-#   provider                  = aws.us-east-1
-#   validation_method         = "DNS"
-#   domain_name               = trim(data.aws_route53_zone.external.name, ".") 
-#   subject_alternative_names = local.subject_alternative_names_cf
-
-#   options {
-#     export = "ENABLED"
-#   }
-
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-#   tags = merge(local.tags,
-#     { Name = format("%s-%s", local.application_name_ssogen, local.environment) }
-#   )
-# }
-
 # ## Validation Records
 
 resource "aws_route53_record" "external_validation_nonprod" {
@@ -55,20 +37,6 @@ resource "aws_route53_record" "external_validation_nonprod" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
-# ## Validation Records
-
-# resource "aws_route53_record" "external_validation_nonprod_cf" {
-#   count    = local.is-production ? 0 : length(local.modernisation_platform_validations_cf)
-#   provider = aws.core-vpc
-
-#   allow_overwrite = true
-#   name            = local.modernisation_platform_validations_cf[count.index].name
-#   records         = [local.modernisation_platform_validations_cf[count.index].record]
-#   ttl             = 60
-#   type            = local.modernisation_platform_validations_cf[count.index].type
-#   zone_id         = data.aws_route53_zone.external.zone_id
-# }
-
 resource "aws_route53_record" "external_validation_prod" {
   count    = local.is-production ? length(local.laa_validations) : 0
   provider = aws.core-network-services
@@ -81,17 +49,6 @@ resource "aws_route53_record" "external_validation_prod" {
   zone_id         = data.aws_route53_zone.laa.zone_id
 }
 
-# resource "aws_route53_record" "external_validation_prod_cf" {
-#   count    = local.is-production ? length(local.laa_validations_cf) : 0
-#   provider = aws.core-network-services
-
-#   allow_overwrite = true
-#   name            = local.laa_validations_cf[count.index].name
-#   records         = [local.laa_validations_cf[count.index].record]
-#   ttl             = 60
-#   type            = local.laa_validations_cf[count.index].type
-#   zone_id         = data.aws_route53_zone.laa.zone_id
-# }
 ## Certificate Validation
 
 resource "aws_acm_certificate_validation" "external_nonprod" {
@@ -109,21 +66,6 @@ resource "aws_acm_certificate_validation" "external_nonprod" {
   }
 }
 
-# resource "aws_acm_certificate_validation" "external_nonprod_cf" {
-#   count    = local.is-production ? 0 : 1
-#   provider = aws.us-east-1
-#   depends_on = [
-#     aws_route53_record.external_validation_nonprod_cf
-#   ]
-
-#   certificate_arn         = aws_acm_certificate.external_cf.arn
-#   validation_record_fqdns = [for record in aws_route53_record.external_validation_nonprod_cf : record.fqdn]
-
-#   timeouts {
-#     create = "10m"
-#   }
-# }
-
 resource "aws_acm_certificate_validation" "external_prod" {
   count = local.is-production ? 1 : 0
 
@@ -138,18 +80,3 @@ resource "aws_acm_certificate_validation" "external_prod" {
     create = "10m"
   }
 }
-
-# resource "aws_acm_certificate_validation" "external_prod_cf" {
-#   count    = local.is-production ? 1 : 0
-#   provider = aws.us-east-1
-#   depends_on = [
-#     aws_route53_record.external_validation_prod_cf
-#   ]
-
-#   certificate_arn         = aws_acm_certificate.external.arn
-#   validation_record_fqdns = [for record in aws_route53_record.external_validation_prod_cf : record.fqdn]
-
-#   timeouts {
-#     create = "10m"
-#   }
-# }
