@@ -213,6 +213,6 @@ output "user_list_secret_arn" {
 }
 
 output "user_list_update_command" {
-  value = local.environment == "development" ? "aws secretsmanager put-secret-value --secret-id ${aws_secretsmanager_secret.user_list[0].arn} --secret-string '{\"users\":[{\"username\":\"Bob.Smith\",\"firstname\":\"Bob\",\"lastname\":\"Smith\",\"email\":\"bob.smith@justice.gov.uk\"}]}' --region ${local.application_data.accounts[local.environment].region}" : null
+  value       = local.environment == "development" ? "aws secretsmanager put-secret-value --secret-id ${aws_secretsmanager_secret.user_list[0].arn} --secret-string '{\"users\":[{\"username\":\"Bob.Smith\",\"firstname\":\"Bob\",\"lastname\":\"Smith\",\"email\":\"bob.smith@justice.gov.uk\"}]}' --region ${local.application_data.accounts[local.environment].region}" : null
   description = "Example command to update the user list"
 }

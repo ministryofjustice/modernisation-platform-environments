@@ -12,7 +12,7 @@ locals {
 
 module "external_dns" {
   source = "github.com/ministryofjustice/container-platform-terraform-external-dns?ref=0.1.0"
-  
+
   eks_cluster_name = local.cluster_name
 
   required_inputs = {
