@@ -10,10 +10,11 @@ locals {
     "intermediate_tasking${local.dbt_suffix}"
   ]
   load_lambda_databases = [
-    "staged_mdss${local.dbt_suffix}", 
-    "acquisitive_crime${local.dbt_suffix}", 
+    "staged_mdss${local.dbt_suffix}",
+    "acquisitive_crime${local.dbt_suffix}",
     "allied_mdss_${local.environment_shorthand}",
-    ]
+  ]
+
 }
 
 # ------------------------------------------
@@ -2137,6 +2138,66 @@ resource "aws_lakeformation_permissions" "lambda_p1_table_access" {
   }
 }
 
+
+# ----------------------------------------------------------------------------------------
+# update p1 export
+# ----------------------------------------------------------------------------------------
+
+module "update_p1_export_iam_role" {
+  count  = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  source = "terraform-aws-modules/iam/aws//modules/iam-role"
+  name   = "update_p1_export"
+
+  trust_policy_permissions = {
+    TrustRoleAndServiceToAssume = {
+      actions = [
+        "sts:AssumeRole",
+      ]
+      principals = [{
+        type = "Service"
+        identifiers = [
+          "lambda.amazonaws.com",
+        ]
+      }]
+    }
+  }
+
+  policies = {
+    main_policy = module.create_p1_export_iam_policy.arn
+  }
+
+  tags = local.tags
+}
+
+resource "aws_lakeformation_permissions" "lambda_update_p1_s3_access" {
+  count       = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  principal   = module.update_p1_export_iam_role[0].arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+  data_location {
+    arn = aws_lakeformation_resource.data_bucket.arn
+  }
+}
+
+resource "aws_lakeformation_permissions" "lambda_update_p1_database_access" {
+  count       = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  principal   = module.update_p1_export_iam_role[0].arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = "allied_mdss${local.db_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "lambda_update_p1_table_access" {
+  count       = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  principal   = module.update_p1_export_iam_role[0].arn
+  permissions = ["SELECT"]
+  table {
+    database_name = "allied_mdss${local.db_suffix}"
+    wildcard      = true
+  }
+}
+
+
 #-----------------------------------------------------------------------------------
 # Landing DLQ redriver IAM Role
 #-----------------------------------------------------------------------------------
@@ -2263,7 +2324,7 @@ resource "aws_iam_role" "merge_load_ac" {
 data "aws_iam_policy_document" "merge_load_policy_document" {
   statement {
     sid    = "AthenaPermissions"
-    effect = "Allow" 
+    effect = "Allow"
     actions = [
       "athena:GetDataCatalog",
       "athena:GetQueryExecution",
@@ -2305,7 +2366,7 @@ data "aws_iam_policy_document" "merge_load_policy_document" {
       "${module.s3-athena-bucket.bucket.arn}/output/*",
       module.s3-create-a-derived-table-bucket.bucket.arn,
       "${module.s3-create-a-derived-table-bucket.bucket.arn}/*"
-      ]
+    ]
 
   }
   statement {
@@ -2314,39 +2375,39 @@ data "aws_iam_policy_document" "merge_load_policy_document" {
     actions   = ["s3:ListAllMyBuckets"]
     resources = ["*"]
   }
-  statement { 
+  statement {
     sid    = "GluePermissions"
-    effect = "Allow" 
+    effect = "Allow"
     actions = [
-          "glue:GetDatabase",
-          "glue:GetDatabases",
-          "glue:GetTable",
-          "glue:GetTables",
-          "glue:GetPartition",
-          "glue:GetPartitions",
-          "glue:UpdateTable",
-          ]
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:GetTable",
+      "glue:GetTables",
+      "glue:GetPartition",
+      "glue:GetPartitions",
+      "glue:UpdateTable",
+    ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
       "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
       "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
-      ]
-    }
+    ]
+  }
 }
 
 resource "aws_iam_policy" "merge_load" {
-  name   = "merge_load_lambda_policy"  
+  name   = "merge_load_lambda_policy"
   policy = data.aws_iam_policy_document.merge_load_policy_document.json
-  }
+}
 
 resource "aws_iam_role_policy_attachment" "merge_load_position_attach" {
-  role       = aws_iam_role.merge_load_position.name  
+  role       = aws_iam_role.merge_load_position.name
   policy_arn = aws_iam_policy.merge_load.arn
-  }
+}
 
 
-  resource "aws_lakeformation_permissions" "merge_load_position_lambda_database_access" {
-  for_each = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
+resource "aws_lakeformation_permissions" "merge_load_position_lambda_database_access" {
+  for_each    = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
   principal   = aws_iam_role.merge_load_position.arn
   permissions = ["DESCRIBE"]
   database {
@@ -2355,7 +2416,7 @@ resource "aws_iam_role_policy_attachment" "merge_load_position_attach" {
 }
 
 resource "aws_lakeformation_permissions" "merge_load_position_lambda_table_access" {
-  for_each = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
+  for_each    = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
   principal   = aws_iam_role.merge_load_position.arn
   permissions = ["SELECT", "INSERT", "ALTER", "DESCRIBE"]
   table {
@@ -2365,7 +2426,7 @@ resource "aws_lakeformation_permissions" "merge_load_position_lambda_table_acces
 }
 
 resource "aws_lakeformation_permissions" "merge_load_position_lambda_s3_access" {
-  count     = local.is-development || local.is-test ? 1 : 0
+  count       = local.is-development || local.is-test ? 1 : 0
   principal   = aws_iam_role.merge_load_position.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
@@ -2374,13 +2435,13 @@ resource "aws_lakeformation_permissions" "merge_load_position_lambda_s3_access" 
 }
 
 resource "aws_iam_role_policy_attachment" "merge_load_ac_attach" {
-  role       = aws_iam_role.merge_load_ac.name  
+  role       = aws_iam_role.merge_load_ac.name
   policy_arn = aws_iam_policy.merge_load.arn
-  }
+}
 
 
-  resource "aws_lakeformation_permissions" "merge_load_ac_lambda_database_access" {
-  for_each = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
+resource "aws_lakeformation_permissions" "merge_load_ac_lambda_database_access" {
+  for_each    = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
   principal   = aws_iam_role.merge_load_ac.arn
   permissions = ["DESCRIBE"]
   database {
@@ -2389,7 +2450,7 @@ resource "aws_iam_role_policy_attachment" "merge_load_ac_attach" {
 }
 
 resource "aws_lakeformation_permissions" "merge_load_ac_lambda_table_access" {
-  for_each = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
+  for_each    = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
   principal   = aws_iam_role.merge_load_ac.arn
   permissions = ["SELECT", "INSERT", "ALTER", "DESCRIBE"]
   table {
@@ -2399,7 +2460,7 @@ resource "aws_lakeformation_permissions" "merge_load_ac_lambda_table_access" {
 }
 
 resource "aws_lakeformation_permissions" "merge_load_ac_lambda_s3_access" {
-  count     = local.is-development || local.is-test ? 1 : 0
+  count       = local.is-development || local.is-test ? 1 : 0
   principal   = aws_iam_role.merge_load_ac.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
@@ -2408,13 +2469,13 @@ resource "aws_lakeformation_permissions" "merge_load_ac_lambda_s3_access" {
 }
 
 resource "aws_iam_role_policy_attachment" "merge_load_event_attach" {
-  role       = aws_iam_role.merge_load_event.name  
+  role       = aws_iam_role.merge_load_event.name
   policy_arn = aws_iam_policy.merge_load.arn
-  }
+}
 
 
-  resource "aws_lakeformation_permissions" "merge_load_event_lambda_database_access" {
-  for_each = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
+resource "aws_lakeformation_permissions" "merge_load_event_lambda_database_access" {
+  for_each    = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
   principal   = aws_iam_role.merge_load_event.arn
   permissions = ["DESCRIBE"]
   database {
@@ -2423,7 +2484,7 @@ resource "aws_iam_role_policy_attachment" "merge_load_event_attach" {
 }
 
 resource "aws_lakeformation_permissions" "merge_load_event_lambda_table_access" {
-  for_each = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
+  for_each    = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
   principal   = aws_iam_role.merge_load_event.arn
   permissions = ["SELECT", "INSERT", "ALTER", "DESCRIBE"]
   table {
@@ -2433,7 +2494,7 @@ resource "aws_lakeformation_permissions" "merge_load_event_lambda_table_access" 
 }
 
 resource "aws_lakeformation_permissions" "merge_load_event_lambda_s3_access" {
-  count     = local.is-development || local.is-test ? 1 : 0
+  count       = local.is-development || local.is-test ? 1 : 0
   principal   = aws_iam_role.merge_load_event.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
@@ -2479,6 +2540,107 @@ resource "aws_iam_role_policy_attachment" "macie_unstructured_job_iam_role_polic
   policy_arn = aws_iam_policy.macie_unstructured_job_iam_role_policy[0].arn
 }
 
+
+# -----------------------------------------------------------------------------------
+# Specials Ingestion
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "specials_ingestion_lambda_role_policy_document" {
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObjectAttributes",
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:GetBucketLocation",
+    ]
+    resources = [
+      "${module.s3-json-directory-structure-bucket.bucket.arn}/*",
+      module.s3-json-directory-structure-bucket.bucket.arn,
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/*",
+      module.s3-create-a-derived-table-bucket.bucket.arn,
+      "${module.s3-athena-bucket.bucket.arn}/*",
+      module.s3-athena-bucket.bucket.arn,
+    ]
+  }
+
+  statement {
+    sid    = "AthenaPermissionsForLoadData"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution"
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:workgroup/*",
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:datacatalog/*"
+    ]
+  }
+  statement {
+    sid    = "GluePermissionsForLoad"
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:CreateTable",
+      "glue:CreateDatabase",
+      "glue:UpdateTable",
+      "glue:GetPartition",
+      "glue:GetPartitions",
+      "glue:GetCatalog"
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*/*",
+    ]
+  }
+  statement {
+    sid    = "GetDataAccessAndTagsForLakeFormation"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GetDataAccess",
+      "lakeformation:GetResourceLFTags",
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role" "ingest_specials_data" {
+  name               = "ingestion_specials_data_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "ingest_specials_lambda_role_policy" {
+  name   = "ingest_specials_lambda_policy"
+  policy = data.aws_iam_policy_document.specials_ingestion_lambda_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "lingest_specials_policy_attachment" {
+  role       = aws_iam_role.ingest_specials_data.name
+  policy_arn = aws_iam_policy.ingest_specials_lambda_role_policy.arn
+}
+
+module "share_dbs_with_specials_ingestion_lambda_role" {
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = toset(local.historic_source_dbs)
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = aws_iam_role.ingest_specials_data.arn
+  db_exists               = true
+  de_role_arn             = null
+}
+
+resource "aws_lakeformation_permissions" "specials_ingestion_lambda_add_create_db" {
+  permissions      = ["CREATE_DATABASE", "DROP"]
+  principal        = aws_iam_role.ingest_specials_data.arn
+  catalog_resource = true
+}
+
 # ---------------------------------
 # GDPR Unstructured Control Lambda
 # ---------------------------------
@@ -2503,13 +2665,13 @@ data "aws_iam_policy_document" "gdpr_unstructured_control_lambda_iam_role_policy
   }
 
   statement {
-    sid     = "S3BucketPerms"
-    effect  = "Allow"
+    sid    = "S3BucketPerms"
+    effect = "Allow"
     actions = [
-      "s3:PutObject", 
-      "s3:GetObject", 
-      "s3:PutObjectAcl", 
-      "s3:GetBucketLocation", 
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:PutObjectAcl",
+      "s3:GetBucketLocation",
       "s3:ListBucket"
     ]
     resources = [
@@ -2559,16 +2721,19 @@ resource "aws_iam_role" "gdpr_unstructured_control_lambda_iam_role" {
 }
 
 resource "aws_iam_policy" "gdpr_unstructured_control_lambda_iam_policy" {
+  count  = local.is-test ? 0 : 1
   name   = "gdpr_unstructured_control_lambda_policy"
   policy = data.aws_iam_policy_document.gdpr_unstructured_control_lambda_iam_role_policy_document[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "gdpr_unstructured_control_lambda_iam_role_attach" {
+  count      = local.is-test ? 0 : 1
   role       = aws_iam_role.gdpr_unstructured_control_lambda_iam_role[0].name
-  policy_arn = aws_iam_policy.gdpr_unstructured_control_lambda_iam_policy.arn
+  policy_arn = aws_iam_policy.gdpr_unstructured_control_lambda_iam_policy[0].arn
 }
 
 module "share_dbs_with_control_lambda_role" {
+  count                   = local.is-test ? 0 : 1
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = toset(local.historic_source_dbs)
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn

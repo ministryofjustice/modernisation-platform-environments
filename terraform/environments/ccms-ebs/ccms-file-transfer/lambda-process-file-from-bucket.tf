@@ -44,14 +44,14 @@ resource "aws_iam_role_policy" "lambda_process_file_from_bucket_policy" {
         Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.process_file_from_bucket_lambda_function.function_name}:*"
       },
       {
-        "Effect": "Allow",
-        "Action": ["secretsmanager:GetSecretValue"],
-        "Resource": ["${aws_secretsmanager_secret.sftp_bc_lambda_secrets.id}"]
+        "Effect" : "Allow",
+        "Action" : ["secretsmanager:GetSecretValue"],
+        "Resource" : ["${aws_secretsmanager_secret.sftp_bc_lambda_secrets.id}"]
       },
       {
-        "Effect": "Allow",
-        "Action": ["kms:GenerateDataKey*","kms:Decrypt"],
-        "Resource": ["${aws_kms_key.s3_sftp_bc_kms_key.arn}"]
+        "Effect" : "Allow",
+        "Action" : ["kms:GenerateDataKey*", "kms:Decrypt"],
+        "Resource" : ["${aws_kms_key.s3_sftp_bc_kms_key.arn}"]
       }
     ]
   })
@@ -62,7 +62,7 @@ resource "aws_lambda_function" "process_file_from_bucket_lambda_function" {
   function_name = "${local.application_name}-${local.environment}-process-file-from-bucket-lambda-function"
   role          = aws_iam_role.lambda_process_file_from_bucket_role.arn
   handler       = "example.HelloWorldHandler"
-  runtime       = "java21"
+  runtime       = "java25"
   timeout       = 30
   publish       = true
 

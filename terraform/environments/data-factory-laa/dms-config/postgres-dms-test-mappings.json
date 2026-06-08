@@ -1,0 +1,15 @@
+{
+  "blobs": [
+    {
+      "column_name": "image_data",
+      "object_name": "customers"
+    },
+    {
+      "column_name": "image_data",
+      "object_name": "products"
+    }
+  ],
+  "columns_to_exclude": [],
+  "objects": ["customers", "orders", "products", "audit_log"],
+  "schema": "public"
+}

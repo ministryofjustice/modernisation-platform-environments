@@ -58,6 +58,7 @@ jobs:
       application: ${{ inputs.application }}
       environment: ${{ inputs.environment }}
       action: ${{ inputs.action }}
+      plan_apply_tfargs: ${{ format('-var=created_by={0}/{1}/actions/runs/{2}/', github.server_url, github.repository, github.run_id) }}
       component: "cluster"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}

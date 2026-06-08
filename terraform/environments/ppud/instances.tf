@@ -40,7 +40,7 @@ resource "aws_instance" "s609693lo6vw100" {
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0fbad994892c0f0c4"
-  instance_type          = "m5.large"
+  instance_type          = "m5.xlarge"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-Database-Server[0].id]
@@ -52,10 +52,10 @@ resource "aws_instance" "s609693lo6vw100" {
   }
 
   tags = {
-    Name              = "s609693lo6vw100"
-    patch_group       = "dev_win_patch"
-    role              = "ses_sql_config"  
-    backup            = true
+    Name        = "s609693lo6vw100"
+    patch_group = "dev_win_patch"
+    role        = "ses_sql_config"
+    backup      = true
   }
 }
 
@@ -268,7 +268,7 @@ resource "aws_instance" "s609693lo6vw109" {
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-05d3600bb677c98cd"
-  instance_type          = "m5.large"
+  instance_type          = "m5.xlarge"
   vpc_security_group_ids = [aws_security_group.SCR-Team-Foundation-Server[0].id]
   source_dest_check      = true
   subnet_id              = data.aws_subnet.private_subnets_a.id
@@ -306,12 +306,12 @@ resource "aws_instance" "s609693lo6vw110" {
   }
 
   tags = {
-    Name            = "s609693lo6vw110"
-    patch_group     = "dev_win_patch"
-    role            = "ses_test_config"
-    web_config_path = "C:\\Scripts\\Test_SES_Email.ps1"
-    lse_server      = "true"
-    backup          = true
+    Name             = "s609693lo6vw110"
+    patch_group      = "dev_win_patch"
+    test_role        = "ses_test_config"
+    test_config_path = "C:\\Scripts\\Test_SES_Email.ps1"
+    lse_server       = "true"
+    backup           = true
   }
 }
 
@@ -467,7 +467,7 @@ resource "aws_instance" "s609693lo6vw116" {
   tags = {
     Name        = "s609693lo6vw116"
     patch_group = "dev_win_patch"
-    role        = "ses_sql_config"  
+    role        = "ses_sql_config"
     backup      = true
   }
 }
@@ -495,11 +495,12 @@ resource "aws_instance" "s618358rgvw023" {
   }
 
   tags = {
-    Name        = "s618358rgvw023"
-    patch_group = "uat_win_patch"
-#   role        = "ses_web_config"
-    backup      = true
-    cpu_alarm   = true
+    Name            = "s618358rgvw023"
+    patch_group     = "uat_win_patch"
+    role            = "ses_web_config"
+    web_config_path = "D:\\inetpub\\wwwroot\\web.config"
+    backup          = true
+    cpu_alarm       = true
   }
 }
 
@@ -524,7 +525,9 @@ resource "aws_instance" "s618358rgvw024" {
   tags = {
     Name               = "s618358rgvw024"
     patch_group        = "uat_win_patch"
-#   role               = "ses_sql_config"
+    role               = "ses_sql_config"
+    test_role          = "ses_test_config"
+    test_config_path   = "C:\\Scripts\\Test_SES_Email.ps1"
     backup             = true
     cpu_alarm          = true
     cpu_lambda_trigger = true

@@ -55,8 +55,8 @@ data "aws_iam_policy_document" "cloudwatch_sns_encryption" {
 
 # SNS topic for GuardDuty findings
 resource "aws_sns_topic" "guardduty_alerts" {
-  name = "${local.application_name}-guardduty-alerts"
-  delivery_policy = <<EOF
+  name              = "${local.application_name}-guardduty-alerts"
+  delivery_policy   = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {
@@ -238,7 +238,7 @@ data "aws_iam_role" "guardduty_s3_malware_role" {
   name = "GuardDutyS3MalwareProtectionRole"
 }
 
-resource "aws_guardduty_malware_protection_plan" "mojfin_s3_malware_plan" {
+resource "aws_guardduty_malware_protection_plan" "shared_protection_plan" {
   role = data.aws_iam_role.guardduty_s3_malware_role.arn
 
   protected_resource {
@@ -254,8 +254,52 @@ resource "aws_guardduty_malware_protection_plan" "mojfin_s3_malware_plan" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-guardduty-mpp", local.application_name, local.environment)) }
+    { Name = lower(format("s3-%s-%s-shared-guardduty-protection-plan", local.application_name, local.environment)) }
   )
 
   depends_on = [module.s3-bucket-shared]
+}
+
+resource "aws_guardduty_malware_protection_plan" "rds_oracle_protection_plan" {
+  role = data.aws_iam_role.guardduty_s3_malware_role.arn
+
+  protected_resource {
+    s3_bucket {
+      bucket_name = aws_s3_bucket.mojfin_rds_oracle.id
+    }
+  }
+
+  actions {
+    tagging {
+      status = "ENABLED"
+    }
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("s3-%s-%s-rds-oracle-guardduty-protection-plan", local.application_name, local.environment)) }
+  )
+
+  depends_on = [aws_s3_bucket.mojfin_rds_oracle]
+}
+
+resource "aws_guardduty_malware_protection_plan" "bastion_protection_plan" {
+  role = data.aws_iam_role.guardduty_s3_malware_role.arn
+
+  protected_resource {
+    s3_bucket {
+      bucket_name = "bastion-${local.application_name}-${local.application_name}-${local.environment}-${local.application_data.accounts[local.environment].bastion_bucket_suffix}"
+    }
+  }
+
+  actions {
+    tagging {
+      status = "ENABLED"
+    }
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("s3-%s-%s-bastion-guardduty-protection-plan", local.application_name, local.environment)) }
+  )
+
+  depends_on = [module.bastion_linux]
 }
