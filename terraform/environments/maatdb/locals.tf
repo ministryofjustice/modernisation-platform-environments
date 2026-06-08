@@ -19,6 +19,9 @@ locals {
 
   python_runtime = local.application_data.accounts[local.environment].python_runtime
 
+  ftp_sftp_port   = local.application_data.accounts[local.environment].ftp_sftp_port
+  ftp_remote_path = local.application_data.accounts[local.environment].ftp_remote_path
+
   laa_general_kms_arn = data.aws_kms_key.general_shared.arn
 
   lambda_source_hashes = [

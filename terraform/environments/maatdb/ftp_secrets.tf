@@ -2,26 +2,20 @@
 # This is required BEFORE the lambdas are built as the secrets are manually added & as such is always created.
 
 
-# This secret manages the connection details for the SFTP endpoint.
-# After the secret resource is created, update the value in the AWS console for each environment.
-#
-# The expected format is a flat JSON object:
-#
-# {
-#   "HOST": "sftp.example.com",
-#   "PORT": "22",
-#   "USER": "username",
-#   "PASSWORD": "password",
-#   "REMOTEPATH": "/upload/"
-# }
-#
-# Alternatively, the older array format is still supported:
-#
+# This secret manages the details of the endpoints such as server names and remote folders
+# It will have:
+
+# 1. The name of the job. This will match the value of ftp_job.job_name in the ftp_lambda.tf file
+# 2. The value type (host_address or remote_folder)
+# 3. The secret value
+
+# For example:
+
 # [
 #   {
 #     "name": "xerox-outbound",
 #     "type": "remote-host",
-#     "value": "sftp.example.com"
+#     "value": "sftp.example.com" or IP address
 #   },
 #   {
 #     "name": "xerox-outbound",
@@ -31,7 +25,7 @@
 #   {
 #     "name": "xerox-outbound",
 #     "type": "remote-folder",
-#     "value": "/upload/"
+#     "value": "/incoming/"
 #   },
 #   {
 #     "name": "xerox-outbound",
