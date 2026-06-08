@@ -49,18 +49,14 @@ module "s3_bucket" {
   }
 }
 
-module "s3_bucket_notification" {
-  source  = "terraform-aws-modules/s3-bucket/aws//modules/notification"
-  version = "5.13.0"
+resource "aws_s3_bucket_notification" "unscanned" {
+  bucket = module.s3_bucket["unscanned"].s3_bucket_id
 
-  bucket     = module.s3_bucket["unscanned"].s3_bucket_id
-  bucket_arn = module.s3_bucket["unscanned"].s3_bucket_arn
+  queue {
+    id        = "unscanned"
+    queue_arn = module.sqs_unscanned_s3_notifications.queue_arn
+    events    = ["s3:ObjectCreated:*"]
+  }
 
   depends_on = [module.sqs_unscanned_s3_notifications]
-  sqs_notifications = {
-    unscanned = {
-      queue_arn = module.sqs_unscanned_s3_notifications.queue_arn
-      events    = ["s3:ObjectCreated:*"]
-    }
-  }
 }

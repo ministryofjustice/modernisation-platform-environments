@@ -5,7 +5,33 @@ module "sqs_unscanned_s3_notifications" {
   name            = "${local.application_name}-unscanned-s3-notifications"
   use_name_prefix = false
 
-  create_queue_policy = false
+  create_queue_policy = true
+  queue_policy_statements = {
+    s3 = {
+      sid     = "AllowUnscannedBucketSendMessage"
+      actions = ["sqs:SendMessage"]
+
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["s3.amazonaws.com"]
+        }
+      ]
+
+      condition = [
+        {
+          test     = "ArnEquals"
+          variable = "aws:SourceArn"
+          values   = [module.s3_bucket["unscanned"].s3_bucket_arn]
+        },
+        {
+          test     = "StringEquals"
+          variable = "aws:SourceAccount"
+          values   = [data.aws_caller_identity.current.account_id]
+        },
+      ]
+    }
+  }
 
   create_dlq = true
   dlq_name   = "${local.application_name}-unscanned-s3-notifications-dlq"
