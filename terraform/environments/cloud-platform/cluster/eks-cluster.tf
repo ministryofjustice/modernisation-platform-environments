@@ -13,7 +13,7 @@ module "eks" {
   # endpoint_public_access_cidrs = ["0.0.0.0/0"]
   endpoint_public_access  = true
 
-  enable_cluster_creator_admin_permissions = true ## CP GitHub actions access to cluster, Adds to access entries
+  # enable_cluster_creator_admin_permissions = true ## CP GitHub actions access to cluster, Adds to access entries
   compute_config = {
     enabled    = true
     node_pools = ["general-purpose", "system"]
@@ -67,22 +67,6 @@ module "eks" {
   # }
 
   addons = {
-    # coredns = {
-    #   #   addon_version = local.environment_configuration.eks_cluster_addon_versions.coredns
-    #   configuration_values = jsonencode({
-    #     nodeSelector = {
-    #       "cloud-platform.justice.gov.uk/system-ng" = "true"
-    #     }
-    #     tolerations = [
-    #       {
-    #         key      = "system-node"
-    #         value    = "true"
-    #         effect   = "NoSchedule"
-    #         operator = "Equal"
-    #       }
-    #     ]
-    #   })
-    # }
     # kube-proxy = {
     #   #   addon_version = local.environment_configuration.eks_cluster_addon_versions.kube_proxy
     # }
@@ -135,6 +119,18 @@ module "eks" {
     ## MP Environments Actions (MemberInfrastructureAccess)access to cluster
     mpe-administrator = {
       principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess"
+      policy_associations = {
+        eks-admin = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
+    }
+    ## CP GitHub actions access to cluster
+    cpgha-administrator = {
+      principal_arn = "arn:aws:iam::${local.environment_management.account_ids["cloud-platform-development"]}:role/github-actions-development-cluster"
       policy_associations = {
         eks-admin = {
           policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
