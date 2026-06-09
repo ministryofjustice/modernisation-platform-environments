@@ -1,27 +1,3 @@
-module "eventbridge_logging" {
-  source  = "terraform-aws-modules/eventbridge/aws"
-  version = "4.3.0"
-
-  create_bus     = false
-  create_role    = false
-  create_rules   = false
-  create_targets = false
-
-  bus_name                 = "default"
-  log_delivery_source_name = "${local.application_name}-${local.component_name}-default-bus"
-  log_config = {
-    include_detail = "NONE"
-    level          = "INFO"
-  }
-  log_delivery = {
-    cloudwatch_logs = {
-      destination_arn = module.cloudwatch_eventbridge.cloudwatch_log_group_arn
-    }
-  }
-
-  tags = local.tags
-}
-
 module "eventbridge_guard_duty_malware_protection_for_s3" {
   for_each = local.eventbridge_guard_duty_malware_protection_for_s3_rules
 
@@ -64,59 +40,6 @@ module "eventbridge_guard_duty_malware_protection_for_s3" {
 					  "scan_result_status": "<scan_result_status>"
 					}
 					EOF
-        }
-      }
-    ]
-  }
-
-  tags = local.tags
-}
-
-module "eventbridge_transfer_upload" {
-  for_each = local.eventbridge_transfer_sftp_upload_rules
-
-  source  = "terraform-aws-modules/eventbridge/aws"
-  version = "4.3.0"
-
-  create_bus                 = false
-  create_role                = false
-  create_log_delivery_source = false
-  create_log_delivery        = false
-
-  bus_name            = "default"
-  append_rule_postfix = false
-
-  rules = {
-    (each.value.name) = {
-      description   = each.value.description
-      event_pattern = jsonencode(each.value.event_pattern)
-    }
-  }
-
-  targets = {
-    (each.value.name) = [
-      {
-        name = "${each.value.name}-to-sqs"
-        arn  = module.sqs_transfer_notifications.queue_arn
-        input_transformer = {
-          input_paths = {
-            file_path   = "$.detail.file-path"
-            username    = "$.detail.username"
-            server_id   = "$.detail.server-id"
-            status_code = "$.detail.status-code"
-          }
-          input_template = <<-EOF
-          {
-            "source": "aws.transfer",
-            "detail-type": "SFTP Server File Upload Completed",
-            "detail": {
-              "file-path": "<file_path>",
-              "username": "<username>",
-              "server-id": "<server_id>",
-              "status-code": "<status_code>"
-            }
-          }
-          EOF
         }
       }
     ]
