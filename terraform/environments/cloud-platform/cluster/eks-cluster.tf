@@ -21,84 +21,9 @@ module "eks" {
   enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
   cloudwatch_log_group_retention_in_days = 30
-
-  # eks_managed_node_groups = {
-  #   default_ng = {
-  #     ami_type               = local.environment_configuration.ami_type
-  #     desired_size           = local.environment_configuration.default_ng.desired_capacity
-  #     max_size               = local.environment_configuration.default_ng.max_size
-  #     min_size               = local.environment_configuration.default_ng.min_size
-  #     instance_types         = local.environment_configuration.default_ng.instance_types
-  #     block_device_mappings  = local.environment_configuration.default_ng.block_device_mappings
-  #     subnet_ids             = data.aws_subnets.eks_private.ids
-  #     name                   = "${local.cluster_name}-def-ng"
-  #     create_security_group  = true
-  #     create_launch_template = true
-  #     labels                 = local.environment_configuration.default_ng.labels
-  #   }
-  #   monitoring_ng = {
-  #     ami_type               = local.environment_configuration.ami_type
-  #     desired_size           = local.environment_configuration.monitoring_ng.desired_capacity
-  #     max_size               = local.environment_configuration.monitoring_ng.max_size
-  #     min_size               = local.environment_configuration.monitoring_ng.min_size
-  #     instance_types         = local.environment_configuration.monitoring_ng.instance_types
-  #     block_device_mappings  = local.environment_configuration.monitoring_ng.block_device_mappings
-  #     subnet_ids             = data.aws_subnets.eks_private.ids
-  #     name                   = "${local.cluster_name}-mon-ng"
-  #     create_security_group  = true
-  #     create_launch_template = true
-  #     taints                 = local.environment_configuration.monitoring_ng.taints
-  #     labels                 = local.environment_configuration.monitoring_ng.labels
-  #   }
-  #   system_ng = {
-  #     ami_type               = local.environment_configuration.ami_type
-  #     desired_size           = local.environment_configuration.system_ng.desired_capacity
-  #     max_size               = local.environment_configuration.system_ng.max_size
-  #     min_size               = local.environment_configuration.system_ng.min_size
-  #     instance_types         = local.environment_configuration.system_ng.instance_types
-  #     block_device_mappings  = local.environment_configuration.system_ng.block_device_mappings
-  #     subnet_ids             = data.aws_subnets.eks_private.ids
-  #     name                   = "${local.cluster_name}-sys-ng"
-  #     create_security_group  = true
-  #     create_launch_template = true
-  #     taints                 = local.environment_configuration.system_ng.taints
-  #     labels                 = local.environment_configuration.system_ng.labels
-  #   }
-  # }
-
   addons = {
-    # kube-proxy = {
-    #   #   addon_version = local.environment_configuration.eks_cluster_addon_versions.kube_proxy
-    # }
-    # vpc-cni = {
-    #   before_compute = true
-    #   addon_version  = local.environment_configuration.eks_cluster_addon_versions.vpc_cni
-    # }
-    # eks-pod-identity-agent = {
-    #   before_compute = true
-    #   #   addon_version = local.environment_configuration.eks_cluster_addon_versions.eks_pod_identity_agent
-    # }
     aws-guardduty-agent = {
     }
-
-    # aws-ebs-csi-driver = {
-    #   configuration_values = jsonencode({
-    #     controller = {
-    #       nodeSelector = {
-    #         "cloud-platform.justice.gov.uk/system-ng" = "true"
-    #       }
-    #       tolerations = [
-    #         {
-    #           key      = "system-node"
-    #           value    = "true"
-    #           effect   = "NoSchedule"
-    #           operator = "Equal"
-    #         }
-    #       ]
-    #     }
-    #   })
-    # }
-
   }
 
   authentication_mode = "API_AND_CONFIG_MAP"
