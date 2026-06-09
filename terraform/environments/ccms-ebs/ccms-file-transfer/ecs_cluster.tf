@@ -60,8 +60,8 @@ resource "aws_ecs_service" "sftp_bc_ecs_service" {
   task_definition = aws_ecs_task_definition.sftp_bc_task_definition.arn
   desired_count   = local.application_data.accounts[local.environment].app_count
   launch_type     = "FARGATE"
-
-  health_check_grace_period_seconds = 120
+  health_check_grace_period_seconds = 180
+  enable_execute_command            = true
   lifecycle {
     ignore_changes = [
       task_definition
