@@ -35,7 +35,7 @@ resource "aws_cloudwatch_metric_alarm" "container_sftpcount" {
   threshold           = local.application_data.accounts[local.environment].app_count
   dimensions = {
     ClusterName = aws_ecs_cluster.main_cluster.name
-    ServiceName = aws_ecs_service.sftpecs_service.name
+    ServiceName = aws_ecs_service.sftp_ecs_service.name
   }
   alarm_description         = "The number of sftp_bc ECS tasks is less than ${local.application_data.accounts[local.environment].app_count}. Runbook: https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   treat_missing_data        = "breaching"
