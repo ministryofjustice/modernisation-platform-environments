@@ -35,6 +35,11 @@ moved {
   to   = aws_secretsmanager_secret.sftp_secrets
 }
 
+moved {
+  from = aws_secretsmanager_secret_version.sftp_bc_secrets
+  to   = aws_secretsmanager_secret_version.sftp_secrets
+}
+
 # SFTP BC Lambda Secrets
 resource "aws_secretsmanager_secret" "sftp_lambda_secrets" {
   name        = "${local.sftp_suffix}-bc-lambda-secrets"
@@ -58,6 +63,11 @@ resource "aws_secretsmanager_secret_version" "sftp_lambda_secrets" {
       secret_string
     ]
   }
+}
+
+moved {
+  from = aws_secretsmanager_secret_version.sftp_bc_lambda_secrets
+  to   = aws_secretsmanager_secret_version.sftp_lambda_secrets
 }
 
 data "aws_secretsmanager_secret_version" "sftp_lambda_secrets" {
