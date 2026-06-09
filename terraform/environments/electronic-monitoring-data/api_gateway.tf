@@ -241,3 +241,95 @@ resource "aws_api_gateway_stage" "update_p1_export_stage" {
   rest_api_id   = aws_api_gateway_rest_api.update_p1_export[0].id
   stage_name    = "prod"
 }
+
+# -------------------------------------------------------
+# certificate and waf
+# -------------------------------------------------------
+
+resource "aws_api_gateway_client_certificate" "update_p1_export_certificate" {
+  description = "Client certificate for API Gateway update_p1_export"
+}
+
+resource "aws_wafv2_web_acl" "update_p1_export_api_gateway" {
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+
+  name        = "update_p1_export-waf"
+  description = "WAF for API Gateway update_p1_export"
+  scope       = "REGIONAL"
+  default_action {
+    allow {}
+  }
+
+  rule {
+    name     = "Log4j-Block"
+    priority = 1
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesKnownBadInputsRuleSet"
+        vendor_name = "AWS"
+      }
+
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "update_p1_export-log4j-block"
+      sampled_requests_enabled   = true
+    }
+  }
+  rule {
+    name     = "Common-Rules"
+    priority = 2
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "update_p1_export-common-rules"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "update_p1_export-waf"
+    sampled_requests_enabled   = false
+  }
+}
+
+resource "aws_wafv2_web_acl_association" "update_p1_export_api_gateway_association" {
+  count        = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  resource_arn = aws_api_gateway_stage.update_p1_export_stage[0].arn
+  web_acl_arn  = aws_wafv2_web_acl.update_p1_export_api_gateway[0].arn
+}
+
+resource "aws_wafv2_web_acl_logging_configuration" "update_p1_export_api_gateway_waf_logs" {
+  count        = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  resource_arn = aws_wafv2_web_acl.update_p1_export_api_gateway[0].arn
+
+  log_destination_configs = [
+    aws_cloudwatch_log_group.update_p1_export_waf_log_group[0].arn
+  ]
+}
+
+# tfsec:ignore:aws-cloudwatch-log-group-customer-key
+resource "aws_cloudwatch_log_group" "update_p1_export_waf_log_group" {
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for now"
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+
+  name              = "aws-waf-logs-update_p1_export"
+  retention_in_days = 400
+}

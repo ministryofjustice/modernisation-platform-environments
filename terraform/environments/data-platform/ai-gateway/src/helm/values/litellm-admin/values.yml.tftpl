@@ -166,9 +166,10 @@ envVars: {
     LITELLM_LOG: "ERROR",
     LITELLM_MIGRATION_DIR: "/app/migrations",
     LITELLM_MODE: "PRODUCTION",
+    LITELLM_UI_API_DOC_BASE_URL: "https://${proxyHostname}",
     LITELLM_UI_PATH: "/app/var/litellm/ui",
     PRISMA_BINARY_CACHE_DIR: "/app/cache/prisma-python/binaries",
-    PROXY_BASE_URL: "https://${proxyHostname}",
+    PROXY_BASE_URL: "https://${ingressHostname}",
     REDIS_SSL: "True",
     USE_PRISMA_MIGRATE: "True",
     XDG_CACHE_HOME: "/app/cache"

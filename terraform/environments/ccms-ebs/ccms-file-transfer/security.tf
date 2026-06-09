@@ -86,3 +86,13 @@ resource "aws_vpc_security_group_egress_rule" "process_file_from_bucket_lambda_s
   to_port                      = 443
   referenced_security_group_id = aws_security_group.sftp_bc_load_balancer.id
 }
+
+#Opening this for aws secret manager and slack channel webhook access from lambda function
+resource "aws_vpc_security_group_egress_rule" "process_file_from_bucket_lambda_sg_egress_sec_manager_slack" {
+  security_group_id = aws_security_group.process_file_from_bucket_lambda_sg.id
+
+  ip_protocol                  = "tcp"
+  from_port                    = 443
+  to_port                      = 443
+  cidr_ipv4                    = "0.0.0.0/0"
+}

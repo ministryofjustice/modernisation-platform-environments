@@ -17,8 +17,7 @@ resource "aws_db_instance" "database" {
   publicly_accessible       = false
   ca_cert_identifier        = "rds-ca-rsa2048-g1"
   apply_immediately         = true
-
-
+  option_group_name         = aws_db_option_group.sqlserver_native_backup.name
 }
 
 resource "aws_db_subnet_group" "db" {

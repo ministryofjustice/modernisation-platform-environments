@@ -6,7 +6,7 @@ resource "helm_release" "dashboard_service" {
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "0.3.2"
   chart      = "dashboard-service"
-  namespace  = kubernetes_namespace.dashboard_service[0].metadata[0].name
+  namespace  = kubernetes_namespace_v1.dashboard_service[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/dashboard-service/values.yml.tftpl",

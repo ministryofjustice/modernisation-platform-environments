@@ -31,7 +31,7 @@ module "yjsm" {
   subnet_id           = one(tolist([for s in local.private_subnet_list : s.id if s.availability_zone == "eu-west-2a"]))
   private_subnet_list = local.private_subnet_list
   # create 2nd instance for updating AMI 
-  create_secondary    = true 
+  create_secondary = true
   # Assigning private IP based on environment
   private_ip = lookup(
     {
