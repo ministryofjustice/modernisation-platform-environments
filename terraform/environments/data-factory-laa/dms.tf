@@ -479,7 +479,7 @@ module "dms_postgres" {
   # checkov:skip=CKV_TF_1: using branch ref for testing
   # checkov:skip=CKV_TF_2: using branch ref for testing
   count  = local.is-development ? 1 : 0
-  source = "github.com/ministryofjustice/terraform-dms-module?ref=5a6b4dd49d1b2c92813f8bdb0b42e117ce247ba2"
+  source = "github.com/ministryofjustice/terraform-dms-module?ref=075c7dde7f5259c0e28ba00af1cd1fd49336a3fb"
 
   vpc_id      = data.aws_vpc.shared.id
   environment = local.environment
@@ -528,16 +528,6 @@ module "dms_postgres" {
   }
 
   slack_webhook_secret_id = aws_secretsmanager_secret.dms_slack_webhook[0].id
-
-  # Lake Formation grants — required for Athena queries against the Glue tables
-  # registered by the metadata generator. Without these, Athena returns
-  # "Relation contains no accessible columns" even for LF admins (Athena v3
-  # enforces explicit TableWithColumns grants).
-  lakeformation_grants = {
-    principals = [
-      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-sandbox_c38cf78de39ef4d0",
-    ]
-  }
 
   depends_on = [
     aws_iam_role_policy_attachment.dms_vpc_role,
