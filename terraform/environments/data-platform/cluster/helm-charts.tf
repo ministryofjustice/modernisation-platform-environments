@@ -396,3 +396,25 @@ resource "helm_release" "keda" {
     )
   ]
 }
+
+resource "helm_release" "metrics_server" {
+  /* https://artifacthub.io/packages/helm/metrics-server/metrics-server */
+
+  name       = "metrics-server"
+  repository = "https://kubernetes-sigs.github.io/metrics-server"
+  chart      = "metrics-server"
+  version    = local.cluster_configuration.helm_chart_versions.metrics_server
+  namespace  = module.metrics_server_namespace.name
+
+  values = [
+    templatefile(
+      "${path.module}/configuration/helm/metrics-server/values.yml.tftpl",
+      {}
+    )
+  ]
+
+  depends_on = [
+    helm_release.cilium,
+    helm_release.coredns
+  ]
+}

@@ -48,3 +48,15 @@ module "s3_bucket" {
     mfa_delete = false
   }
 }
+
+resource "aws_s3_bucket_notification" "unscanned" {
+  bucket = module.s3_bucket["unscanned"].s3_bucket_id
+
+  queue {
+    id        = "unscanned"
+    queue_arn = module.sqs_unscanned_s3_notifications.queue_arn
+    events    = ["s3:ObjectCreated:*"]
+  }
+
+  depends_on = [module.sqs_unscanned_s3_notifications]
+}
