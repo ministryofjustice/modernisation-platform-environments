@@ -88,7 +88,7 @@ resource "aws_ecs_service" "sftp_ecs_service" {
 
   depends_on = [
     aws_lb_listener.sftp_listener,
-    aws_iam_role_policy_attachment.bc_ecs_task_execution_role,
+    aws_iam_role_policy_attachment.ecs_task_execution_role,
     aws_autoscaling_group.cluster-scaling-group
   ]
 }

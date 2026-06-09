@@ -14,7 +14,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_sftp5xx" {
   threshold           = 10
   alarm_description   = "Alarm when the number of 5xx errors from the sftp_bc ALB exceeds 10 in a 3 minute period"
   dimensions = {
-    LoadBalancer = aws_lb.sftpload_balancer.arn_suffix
+    LoadBalancer = aws_lb.sftp_load_balancer.arn_suffix
   }
   treat_missing_data = "notBreaching"
   alarm_actions      = [data.aws_sns_topic.cw_alerts.arn]
@@ -61,7 +61,7 @@ resource "aws_cloudwatch_metric_alarm" "sftpwaf_high_blocked_requests" {
   treat_missing_data  = "notBreaching"
 
   dimensions = {
-    WebACL = aws_wafv2_web_acl.sftpweb_acl.name
+    WebACL = aws_wafv2_web_acl.sftp_web_acl.name
     Scope  = "REGIONAL"
   }
 
@@ -86,8 +86,8 @@ resource "aws_cloudwatch_metric_alarm" "sftpalb_healthyhosts" {
   alarm_actions       = [data.aws_sns_topic.cw_alerts.arn]
   ok_actions          = [data.aws_sns_topic.cw_alerts.arn]
   dimensions = {
-    TargetGroup  = aws_lb_target_group.sftptarget_group.arn_suffix
-    LoadBalancer = aws_lb.sftpload_balancer.arn_suffix
+    TargetGroup  = aws_lb_target_group.sftp_target_group.arn_suffix
+    LoadBalancer = aws_lb.sftp_load_balancer.arn_suffix
   }
 }
 
@@ -106,7 +106,7 @@ resource "aws_cloudwatch_metric_alarm" "sftpecs_high_memory" {
 
   dimensions = {
     ClusterName = aws_ecs_cluster.main_cluster.name
-    ServiceName = aws_ecs_service.sftpecs_service.name
+    ServiceName = aws_ecs_service.sftp_ecs_service.name
   }
 
   alarm_actions = [data.aws_sns_topic.cw_alerts.arn]
