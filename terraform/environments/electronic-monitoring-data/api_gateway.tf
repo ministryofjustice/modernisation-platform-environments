@@ -123,6 +123,45 @@ resource "aws_iam_role_policy" "cloudwatch" {
 # update_p1_export
 # --------------------------------------------------------------------------------
 
+data "aws_vpc_endpoint" "api_gateway" {
+  service_name = "com.amazonaws.eu-west-2.execute-api"
+}
+
+data "aws_iam_policy_document" "update_p1_export_vpc" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = [module.emd_update_p1_cp_role.iam_role.this_iam_role_arn]
+    }
+
+    actions   = ["execute-api:Invoke"]
+    resources = ["${aws_api_gateway_rest_api.update_p1_export.execution_arn}/*"]
+  }
+  statement {
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions   = ["execute-api:Invoke"]
+    condition {
+      test = "StringNotEquals"
+      variable = "aws:sourceVpce"
+      values = [
+        data.aws_vpc_endpoint.api_gateway.id
+      ]
+    }
+  }
+}
+
+resource "aws_api_gateway_rest_api_policy" "update_p1_export_vpc" {
+  rest_api_id = aws_api_gateway_rest_api.update_p1_export.id
+  policy      = data.aws_iam_policy_document.update_p1_export_vpc.json
+}
+
+
 resource "aws_api_gateway_rest_api" "update_p1_export" {
   count       = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   name        = "update_p1_export"
@@ -130,6 +169,11 @@ resource "aws_api_gateway_rest_api" "update_p1_export" {
 
   lifecycle {
     create_before_destroy = true
+  }
+
+  endpoint_configuration {
+    types = ["PRIVATE"]
+    vpc_endpoint_ids = [data.aws_vpc_endpoint.api_gateway.id]
   }
 }
 
