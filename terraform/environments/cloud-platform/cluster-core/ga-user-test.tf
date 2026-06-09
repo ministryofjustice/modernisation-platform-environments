@@ -19,11 +19,12 @@ resource "kubernetes_manifest" "user_test_service" {
   ]
 }
 
-resource "kubernetes_manifest" "user_test_application_network_policy" {
-  manifest = yamldecode(file("${path.module}/user-manifests/application-network-policy.yaml"))
+resource "kubernetes_manifest" "user_test_http_route" {
+  manifest = yamldecode(file("${path.module}/user-manifests/http-route.yaml"))
 
   depends_on = [
     kubernetes_manifest.user_test_namespace,
-    kubernetes_manifest.user_test_deployment,
+    kubernetes_manifest.user_test_service,
+    kubectl_manifest.gateway_platform,
   ]
 }
