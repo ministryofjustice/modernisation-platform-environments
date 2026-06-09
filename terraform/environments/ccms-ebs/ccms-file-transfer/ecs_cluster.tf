@@ -1,17 +1,17 @@
 # ECS Cluster
 
-resource "aws_ecs_cluster" "main_cluster" {
-  name = "${local.sftp_suffix}-cluster"
-  setting {
-    name  = "containerInsights"
-    value = "enabled"
-  }
-}
+# resource "aws_ecs_cluster" "main_cluster" {
+#   name = "${local.sftp_suffix}-cluster"
+#   setting {
+#     name  = "containerInsights"
+#     value = "enabled"
+#   }
+# }
 
-resource "aws_ecs_cluster_capacity_providers" "main_cluster_capacity_providers" {
-  cluster_name       = aws_ecs_cluster.main_cluster.name
-  capacity_providers = [aws_ecs_capacity_provider.main_cluster_capacity_provider.name]
-}
+# resource "aws_ecs_cluster_capacity_providers" "main_cluster_capacity_providers" {
+#   cluster_name       = aws_ecs_cluster.main_cluster.name
+#   capacity_providers = [aws_ecs_capacity_provider.main_cluster_capacity_provider.name]
+# }
 
 # ECS Task Definition
 # resource "aws_ecs_task_definition" "sftp_task_definition" {
