@@ -1,16 +1,25 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "region": "eu-west-2",
+      "vpc_cidr": "10.26.130.0/23",
+      "private_subnet_a_cidr": "10.26.130.0/25",
+      "private_subnet_b_cidr": "10.26.130.128/25",
+      "public_subnet_a_cidr": "10.26.131.0/26",
+      "public_subnet_b_cidr": "10.26.131.64/26",
+      "free_cidr": "10.26.131.128/25"
+
     },
-    "test": {
-      "example_var": "test-data"
-    },
-    "preproduction": {
-      "example_var": "preproduction-data"
-    },
+    "test": {},
+    "preproduction": {},
     "production": {
-      "example_var": "production-data"
+      "region": "eu-west-2",
+      "vpc_cidr": "10.27.130.0/23",
+      "private_subnet_a_cidr": "10.27.130.0/25",
+      "private_subnet_b_cidr": "10.27.130.128/25",
+      "public_subnet_a_cidr": "10.27.131.0/26",
+      "public_subnet_b_cidr": "10.27.131.64/26",
+      "free_cidr": "10.27.131.128/25"
     }
   }
 }
