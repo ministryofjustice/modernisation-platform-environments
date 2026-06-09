@@ -1,26 +1,39 @@
 # Lambda
 
-resource "null_resource" "build_lambda_zip" {
+locals {
+  rag_lambda_source_files = concat(
+    ["rag-lambda.py", "requirements.txt"],
+    [for f in fileset("${path.module}/lambdas/rag-lambda/lib", "**") : "lib/${f}"],
+    [for f in fileset("${path.module}/lambdas/rag-lambda/services", "**") : "services/${f}"],
+    [for f in fileset("${path.module}/lambdas/rag-lambda/schemas", "**") : "schemas/${f}"],
+  )
 
+  rag_lambda_source_hash = sha256(join("", [
+    for f in local.rag_lambda_source_files :
+    filesha256("${path.module}/lambdas/rag-lambda/${f}")
+  ]))
+}
+
+resource "null_resource" "build_lambda_zip" {
   triggers = {
-    always_run = timestamp()
+    source_hash = local.rag_lambda_source_hash
   }
 
   provisioner "local-exec" {
     command = <<-EOT
       cd ${path.module}/lambdas/rag-lambda
-	    
-	    pip3 install -r requirements.txt -t .
-
-      zip -r rag-lambda.zip .
+      pip3 install -r requirements.txt -t .
     EOT
   }
 }
 
 data "archive_file" "rag_lambda" {
+  depends_on = [null_resource.build_lambda_zip]
+
   type        = "zip"
   source_dir  = "${path.module}/lambdas/rag-lambda/"
   output_path = "${path.module}/lambdas/rag-lambda/rag-lambda.zip"
+  excludes    = ["rag-lambda.zip"]
 }
 
 resource "aws_security_group" "rag_lambda" {
@@ -74,8 +87,6 @@ resource "aws_lambda_function" "rag_lambda" {
   tags = {
     "service-area" = "Hosting"
   }
-
-  depends_on = [null_resource.build_lambda_zip]
 }
 
 # Logs
