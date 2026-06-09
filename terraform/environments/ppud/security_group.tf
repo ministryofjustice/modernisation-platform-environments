@@ -1154,6 +1154,7 @@ locals {
       name        = "PPUD-Web-Portal-Server-Security-Group"
       description = "PPUD Web Portal server security group for all environments"
       ingress = [
+        # Note there is an additional ingress rule for port 443 from the ALB in a separate statement
         { port = 80,   cidr = "vpc",       description = "Allow port 80 inbound" },
         { port = 3389, cidr = "vpc",       description = "Allow port 3389 inbound" },
       ]
@@ -1194,6 +1195,7 @@ locals {
       name        = "WAM-Web-Portal-Server-Security-Group"
       description = "WAM Web Portal server security group for all environments"
       ingress = [
+        # Note there is an additional ingress rule for port 443 from the ALB in a separate statement
         { port = 80,   cidr = "vpc", description = "Allow port 80 inbound" },
         { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
       ]
