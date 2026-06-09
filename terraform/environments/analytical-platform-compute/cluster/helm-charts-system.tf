@@ -5,7 +5,7 @@ resource "helm_release" "kyverno" {
   repository = "https://kyverno.github.io/kyverno"
   chart      = "kyverno"
   version    = local.environment_configuration.helm_chart_version.kyverno
-  namespace  = kubernetes_namespace.kyverno.metadata[0].name
+  namespace  = kubernetes_namespace_v1.kyverno.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/kyverno/values.yml.tftpl",
@@ -27,7 +27,7 @@ resource "helm_release" "aws_cloudwatch_metrics" {
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-cloudwatch-metrics"
   version    = local.environment_configuration.helm_chart_version.aws_cloudwatch_metrics
-  namespace  = kubernetes_namespace.aws_observability.metadata[0].name
+  namespace  = kubernetes_namespace_v1.aws_observability.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/aws-cloudwatch-metrics/values.yml.tftpl",
@@ -46,7 +46,7 @@ resource "helm_release" "aws_for_fluent_bit" {
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-for-fluent-bit"
   version    = local.environment_configuration.helm_chart_version.aws_for_fluent_bit
-  namespace  = kubernetes_namespace.aws_observability.metadata[0].name
+  namespace  = kubernetes_namespace_v1.aws_observability.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/aws-for-fluent-bit/values.yml.tftpl",
@@ -72,7 +72,7 @@ resource "helm_release" "amazon_prometheus_proxy" {
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
   version    = local.environment_configuration.helm_chart_version.kube_prometheus_stack
-  namespace  = kubernetes_namespace.aws_observability.metadata[0].name
+  namespace  = kubernetes_namespace_v1.aws_observability.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/amazon-prometheus-proxy/values.yml.tftpl",
@@ -97,7 +97,7 @@ resource "helm_release" "cluster_autoscaler" {
   repository = "https://kubernetes.github.io/autoscaler"
   chart      = "cluster-autoscaler"
   version    = local.environment_configuration.helm_chart_version.cluster_autoscaler
-  namespace  = kubernetes_namespace.cluster_autoscaler.metadata[0].name
+  namespace  = kubernetes_namespace_v1.cluster_autoscaler.metadata[0].name
 
   values = [
     templatefile(
@@ -106,7 +106,7 @@ resource "helm_release" "cluster_autoscaler" {
         aws_region                = data.aws_region.current.region
         cluster_name              = module.eks.cluster_name
         eks_role_arn              = module.cluster_autoscaler_iam_role.arn
-        service_monitor_namespace = kubernetes_namespace.cluster_autoscaler.metadata[0].name
+        service_monitor_namespace = kubernetes_namespace_v1.cluster_autoscaler.metadata[0].name
       }
     )
   ]
@@ -120,13 +120,13 @@ resource "helm_release" "karpenter_crd" {
   repository = "oci://public.ecr.aws/karpenter"
   chart      = "karpenter-crd"
   version    = local.environment_configuration.helm_chart_version.karpenter
-  namespace  = kubernetes_namespace.karpenter.metadata[0].name
+  namespace  = kubernetes_namespace_v1.karpenter.metadata[0].name
 
   values = [
     templatefile(
       "${path.module}/src/helm/values/karpenter-crd/values.yml.tftpl",
       {
-        service_namespace = kubernetes_namespace.karpenter.metadata[0].name
+        service_namespace = kubernetes_namespace_v1.karpenter.metadata[0].name
       }
     )
   ]
@@ -142,7 +142,7 @@ resource "helm_release" "karpenter" {
   repository = "oci://public.ecr.aws/karpenter"
   chart      = "karpenter"
   version    = local.environment_configuration.helm_chart_version.karpenter
-  namespace  = kubernetes_namespace.karpenter.metadata[0].name
+  namespace  = kubernetes_namespace_v1.karpenter.metadata[0].name
 
   values = [
     templatefile(
@@ -165,7 +165,7 @@ resource "helm_release" "karpenter" {
 resource "helm_release" "karpenter_configuration" {
   name      = "karpenter-configuration"
   chart     = "./src/helm/charts/karpenter-configuration"
-  namespace = kubernetes_namespace.karpenter.metadata[0].name
+  namespace = kubernetes_namespace_v1.karpenter.metadata[0].name
 
   values = [
     templatefile(
@@ -189,7 +189,7 @@ resource "helm_release" "external_dns" {
   repository = "https://kubernetes-sigs.github.io/external-dns"
   chart      = "external-dns"
   version    = local.environment_configuration.helm_chart_version.external_dns
-  namespace  = kubernetes_namespace.external_dns.metadata[0].name
+  namespace  = kubernetes_namespace_v1.external_dns.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/external-dns/values.yml.tftpl",
@@ -210,7 +210,7 @@ resource "helm_release" "cert_manager" {
   repository = "https://charts.jetstack.io"
   chart      = "cert-manager"
   version    = local.environment_configuration.helm_chart_version.cert_manager
-  namespace  = kubernetes_namespace.cert_manager.metadata[0].name
+  namespace  = kubernetes_namespace_v1.cert_manager.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/cert-manager/values.yml.tftpl",
@@ -225,7 +225,7 @@ resource "helm_release" "cert_manager" {
 resource "helm_release" "cert_manager_issuers" {
   name      = "cert-manager-issuers"
   chart     = "./src/helm/charts/cert-manager-issuers"
-  namespace = kubernetes_namespace.cert_manager.metadata[0].name
+  namespace = kubernetes_namespace_v1.cert_manager.metadata[0].name
 
   values = [
     templatefile(
@@ -244,7 +244,7 @@ resource "helm_release" "cert_manager_issuers" {
 resource "helm_release" "ingress_nginx_default_certificate" {
   name      = "ingress-nginx-default-certificate"
   chart     = "./src/helm/charts/ingress-nginx-default-certificate"
-  namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
+  namespace = kubernetes_namespace_v1.ingress_nginx.metadata[0].name
 
   values = [
     templatefile(
@@ -263,14 +263,14 @@ resource "helm_release" "ingress_nginx" {
   repository = "https://kubernetes.github.io/ingress-nginx"
   chart      = "ingress-nginx"
   version    = local.environment_configuration.helm_chart_version.ingress_nginx
-  namespace  = kubernetes_namespace.ingress_nginx.metadata[0].name
+  namespace  = kubernetes_namespace_v1.ingress_nginx.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/ingress-nginx/values.yml.tftpl",
       {
-        default_ssl_certificate   = "${kubernetes_namespace.ingress_nginx.metadata[0].name}/default-certificate"
+        default_ssl_certificate   = "${kubernetes_namespace_v1.ingress_nginx.metadata[0].name}/default-certificate"
         ingress_hostname          = "ingress.${local.environment_configuration.route53_zone}"
-        service_monitor_namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
+        service_monitor_namespace = kubernetes_namespace_v1.ingress_nginx.metadata[0].name
       }
     )
   ]
@@ -284,7 +284,7 @@ resource "helm_release" "external_secrets" {
   repository = "https://charts.external-secrets.io"
   chart      = "external-secrets"
   version    = local.environment_configuration.helm_chart_version.external_secrets
-  namespace  = kubernetes_namespace.external_secrets.metadata[0].name
+  namespace  = kubernetes_namespace_v1.external_secrets.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/external-secrets/values.yml.tftpl",
@@ -299,7 +299,7 @@ resource "helm_release" "external_secrets" {
 resource "helm_release" "external_secrets_cluster_secret_store" {
   name      = "external-secrets-cluster-secret-store"
   chart     = "./src/helm/charts/external-secrets-cluster-secret-store"
-  namespace = kubernetes_namespace.external_secrets.metadata[0].name
+  namespace = kubernetes_namespace_v1.external_secrets.metadata[0].name
 
   depends_on = [helm_release.external_secrets]
 }
@@ -311,7 +311,7 @@ resource "helm_release" "keda" {
   repository = "https://kedacore.github.io/charts"
   chart      = "keda"
   version    = local.environment_configuration.helm_chart_version.keda
-  namespace  = kubernetes_namespace.keda.metadata[0].name
+  namespace  = kubernetes_namespace_v1.keda.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/keda/values.yml.tftpl",
@@ -327,7 +327,7 @@ resource "helm_release" "velero" {
   repository = "https://vmware-tanzu.github.io/helm-charts"
   chart      = "velero"
   version    = local.environment_configuration.helm_chart_version.velero
-  namespace  = kubernetes_namespace.velero.metadata[0].name
+  namespace  = kubernetes_namespace_v1.velero.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/velero/values.yml.tftpl",

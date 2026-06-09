@@ -266,7 +266,7 @@ data "aws_iam_role" "guardduty_s3_scan" {
   name = "GuardDutyS3MalwareProtectionRole"
 }
 
-resource "aws_guardduty_malware_protection_plan" "s3_shared" {
+resource "aws_guardduty_malware_protection_plan" "shared_protection_plan" {
   role = data.aws_iam_role.guardduty_s3_scan.arn
 
   protected_resource {
@@ -282,8 +282,101 @@ resource "aws_guardduty_malware_protection_plan" "s3_shared" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-guardduty-mpp", local.application_name, local.environment)) }
+    { Name = lower(format("s3-%s-%s-shared-guardduty-protection-plan", local.application_name, local.environment)) }
   )
 
   depends_on = [module.s3-bucket-shared]
+}
+
+resource "aws_guardduty_malware_protection_plan" "artifacts_protection_plan" {
+  role = data.aws_iam_role.guardduty_s3_scan.arn
+
+  protected_resource {
+    s3_bucket {
+      bucket_name = module.artifacts-s3.bucket.id
+    }
+  }
+
+  actions {
+    tagging {
+      status = "ENABLED"
+    }
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("s3-%s-%s-artifacts-guardduty-protection-plan", local.application_name, local.environment)) }
+  )
+
+  depends_on = [module.artifacts-s3]
+}
+
+resource "aws_guardduty_malware_protection_plan" "lb_access_logs_protection_plan" {
+  role = data.aws_iam_role.guardduty_s3_scan.arn
+
+  protected_resource {
+    s3_bucket {
+      bucket_name = module.lb-s3-access-logs[0].bucket.id
+    }
+  }
+
+  actions {
+    tagging {
+      status = "ENABLED"
+    }
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("s3-%s-%s-lb-access-logs-guardduty-protection-plan", local.application_name, local.environment)) }
+  )
+
+  depends_on = [module.lb-s3-access-logs]
+}
+
+resource "aws_guardduty_malware_protection_plan" "athena_protection_plan" {
+  role = data.aws_iam_role.guardduty_s3_scan.arn
+
+  protected_resource {
+    s3_bucket {
+      bucket_name = module.s3-bucket-athena-queries-output.bucket.id
+    }
+  }
+
+  actions {
+    tagging {
+      status = "ENABLED"
+    }
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("s3-%s-%s-athena-guardduty-protection-plan", local.application_name, local.environment)) }
+  )
+
+  depends_on = [module.s3-bucket-athena-queries-output]
+}
+
+resource "aws_guardduty_malware_protection_plan" "cloudfront_protection_plan" {
+  role = data.aws_iam_role.guardduty_s3_scan.arn
+
+  protected_resource {
+    s3_bucket {
+      bucket_name = aws_s3_bucket.cloudfront.id
+    }
+  }
+
+  actions {
+    tagging {
+      status = "ENABLED"
+    }
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("s3-%s-%s-cloudfront-guardduty-protection-plan", local.application_name, local.environment)) }
+  )
+
+  depends_on = [aws_s3_bucket.cloudfront]
+}
+
+moved {
+  from = aws_guardduty_malware_protection_plan.s3_shared
+  to   = aws_guardduty_malware_protection_plan.shared_protection_plan
 }
