@@ -1,6 +1,6 @@
 # ECS Task Execution Role
 
-data "aws_iam_policy_document" "bc_ecs_task_execution_assume_role_policy" {
+data "aws_iam_policy_document" "ecs_task_execution_assume_role_policy" {
   version = "2012-10-17"
   statement {
     sid    = ""
@@ -18,40 +18,41 @@ data "aws_iam_policy_document" "bc_ecs_task_execution_assume_role_policy" {
   }
 }
 
+
 # ECS task execution role
-resource "aws_iam_role" "bc_ecs_task_execution_role" {
-  name               = "${local.application_name}-bc-ecs-task-execution-role"
-  assume_role_policy = data.aws_iam_policy_document.bc_ecs_task_execution_assume_role_policy.json
+resource "aws_iam_role" "ecs_task_execution_role" {
+  name               = "${local.sftp_suffix}-ecs-task-execution-role"
+  assume_role_policy = data.aws_iam_policy_document.ecs_task_execution_assume_role_policy.json
 
   tags = merge(local.tags,
-    { Name = lower(format("%s-sftp-bc-%s-ecs-role", local.application_name, local.environment)) }
+    { Name = "${local.sftp_suffix}-ecs-task-execution-role" }
   )
 }
 
 # ECS task execution role
-resource "aws_iam_role" "bc_ecs_task_role" {
-  name               = "${local.application_name}-bc-ecs-task-role"
-  assume_role_policy = data.aws_iam_policy_document.bc_ecs_task_execution_assume_role_policy.json
+resource "aws_iam_role" "ecs_task_role" {
+  name               = "${local.sftp_suffix}-ecs-task-role"
+  assume_role_policy = data.aws_iam_policy_document.ecs_task_execution_assume_role_policy.json
 
   tags = merge(local.tags,
-    { Name = lower(format("%s-sftp-bc-%s-ecs-role", local.application_name, local.environment)) }
+    { Name = "${local.sftp_suffix}-ecs-task-role" }
   )
 }
 
 # ECS task execution role policy attachment
-resource "aws_iam_role_policy_attachment" "bc_ecs_task_execution_role" {
-  role       = aws_iam_role.bc_ecs_task_execution_role.name
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
+  role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
 # ECS task role policy attachment
-resource "aws_iam_role_policy_attachment" "bc_ecs_task_role" {
-  role       = aws_iam_role.bc_ecs_task_role.name
+resource "aws_iam_role_policy_attachment" "ecs_task_role" {
+  role       = aws_iam_role.ecs_task_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 # ECS Secrets Manager Policy
-resource "aws_iam_policy" "bc_ecs_secrets_policy" {
-  name = "${local.application_name}-bc-ecs_secrets_policy"
+resource "aws_iam_policy" "ecs_secrets_policy" {
+  name = "${local.sftp_suffix}-ecs_secrets_policy"
 
   policy = <<EOF
 {
@@ -60,19 +61,19 @@ resource "aws_iam_policy" "bc_ecs_secrets_policy" {
     {
       "Effect": "Allow",
       "Action": ["secretsmanager:GetSecretValue"],
-      "Resource": ["${aws_secretsmanager_secret.sftp_bc_secrets.id}"]
+      "Resource": ["${aws_secretsmanager_secret.sftp_secrets.id}"]
     },
     {
       "Effect": "Allow",
       "Action": ["kms:GenerateDataKey*","kms:Decrypt"],
-      "Resource": ["${aws_kms_key.s3_sftp_bc_kms_key.arn}"]
+      "Resource": ["${aws_kms_key.s3_sftp_kms_key.arn}"]
     },
     {
       "Effect": "Allow",
       "Action": [
           "s3:GetObject",
           "s3:GetObjectTagging",
-          "s3:ListObjects*",
+          "s3:ListBucket",
           "s3:DeleteObject"
         ],
       "Resource": [
@@ -87,13 +88,13 @@ EOF
 }
 
 # ECS secrets role policy attachment
-resource "aws_iam_role_policy_attachment" "bc_ecs_secrets_policy_attachment" {
-  role       = aws_iam_role.bc_ecs_task_execution_role.name
-  policy_arn = aws_iam_policy.bc_ecs_secrets_policy.arn
+resource "aws_iam_role_policy_attachment" "ecs_secrets_policy_attachment" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = aws_iam_policy.ecs_secrets_policy.arn
 }
 
 # ECS secrets role policy attachment
-resource "aws_iam_role_policy_attachment" "role_bc_ecs_secrets_policy_attachment" {
-  role       = aws_iam_role.bc_ecs_task_role.name
-  policy_arn = aws_iam_policy.bc_ecs_secrets_policy.arn
+resource "aws_iam_role_policy_attachment" "role_ecs_secrets_policy_attachment" {
+  role       = aws_iam_role.ecs_task_role.name
+  policy_arn = aws_iam_policy.ecs_secrets_policy.arn
 }

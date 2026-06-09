@@ -1,13 +1,13 @@
 #### This file can be used to store secrets specific to the sftp client account ####
 # SFTP BC Application Secrets
-resource "aws_secretsmanager_secret" "sftp_bc_secrets" {
-  name        = "${local.application_name}-sftp-bc-secrets"
+resource "aws_secretsmanager_secret" "sftp_secrets" {
+  name        = "${local.sftp_suffix}-bc-secrets"
   description = "SFTP bc Ingress Application Secrets"
-  kms_key_id  = aws_kms_key.s3_sftp_bc_kms_key.arn
+  kms_key_id  = aws_kms_key.s3_sftp_kms_key.arn
 }
 
-resource "aws_secretsmanager_secret_version" "sftp_bc_secrets" {
-  secret_id = aws_secretsmanager_secret.sftp_bc_secrets.id
+resource "aws_secretsmanager_secret_version" "sftp_secrets" {
+  secret_id = aws_secretsmanager_secret.sftp_secrets.id
   secret_string = jsonencode({
     ORACLE_URL         = "",
     ORACLE_PASSWORD    = "",
@@ -26,19 +26,29 @@ resource "aws_secretsmanager_secret_version" "sftp_bc_secrets" {
   }
 }
 
-data "aws_secretsmanager_secret_version" "sftp_bc_secrets" {
-  secret_id = aws_secretsmanager_secret.sftp_bc_secrets.id
+data "aws_secretsmanager_secret_version" "sftp_secrets" {
+  secret_id = aws_secretsmanager_secret.sftp_secrets.id
+}
+
+moved {
+  from = aws_secretsmanager_secret.sftp_bc_secrets
+  to   = aws_secretsmanager_secret.sftp_secrets
 }
 
 # SFTP BC Lambda Secrets
-resource "aws_secretsmanager_secret" "sftp_bc_lambda_secrets" {
-  name        = "${local.application_name}-sftp-bc-lambda-secrets"
-  description = "SFTP bc Lambda Secrets"
-  kms_key_id  = aws_kms_key.s3_sftp_bc_kms_key.arn
+resource "aws_secretsmanager_secret" "sftp_lambda_secrets" {
+  name        = "${local.sftp_suffix}-bc-lambda-secrets"
+  description = "SFTP lambda Secrets"
+  kms_key_id  = aws_kms_key.s3_sftp_kms_key.arn
 }
 
-resource "aws_secretsmanager_secret_version" "sftp_bc_lambda_secrets" {
-  secret_id = aws_secretsmanager_secret.sftp_bc_lambda_secrets.id
+moved {
+  from = aws_secretsmanager_secret.sftp_bc_lambda_secrets
+  to   = aws_secretsmanager_secret.sftp_lambda_secrets
+}
+
+resource "aws_secretsmanager_secret_version" "sftp_lambda_secrets" {
+  secret_id = aws_secretsmanager_secret.sftp_lambda_secrets.id
   secret_string = jsonencode({
     validate_file = ""
   })
@@ -50,6 +60,6 @@ resource "aws_secretsmanager_secret_version" "sftp_bc_lambda_secrets" {
   }
 }
 
-data "aws_secretsmanager_secret_version" "sftp_bc_lambda_secrets" {
-  secret_id = aws_secretsmanager_secret.sftp_bc_lambda_secrets.id
+data "aws_secretsmanager_secret_version" "sftp_lambda_secrets" {
+  secret_id = aws_secretsmanager_secret.sftp_lambda_secrets.id
 }

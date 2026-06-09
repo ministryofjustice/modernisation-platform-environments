@@ -1,31 +1,31 @@
 # ECS Cluster
 
 resource "aws_ecs_cluster" "main_cluster" {
-  name = "${local.application_name}-sftp-cluster"
+  name = "${local.sftp_suffix}-cluster"
   setting {
     name  = "containerInsights"
     value = "enabled"
   }
 }
 
+resource "aws_ecs_cluster_capacity_providers" "main_cluster_capacity_providers" {
+  cluster_name       = aws_ecs_cluster.main_cluster.name
+  capacity_providers = [aws_ecs_capacity_provider.main_cluster_capacity_providers.name]
+}
+
 # ECS Task Definition
-resource "aws_ecs_task_definition" "sftp_bc_task_definition" {
-  family             = "${local.application_name}-sftp-bc-task"
+resource "aws_ecs_task_definition" "sftp_task_definition" {
+  family             = "${local.sftp_suffix}-task"
   execution_role_arn = aws_iam_role.bc_ecs_task_execution_role.arn
   task_role_arn      = aws_iam_role.bc_ecs_task_role.arn
   network_mode       = "awsvpc"
   requires_compatibilities = [
-    "FARGATE",
+    "EC2",
   ]
 
 
   cpu    = local.application_data.accounts[local.environment].container_cpu
   memory = local.application_data.accounts[local.environment].container_memory
-
-  runtime_platform {
-    operating_system_family = "LINUX"
-    cpu_architecture        = "X86_64"
-  }
 
   container_definitions = templatefile(
     "${path.module}/templates/task_definition_api.json.tpl",
@@ -39,14 +39,14 @@ resource "aws_ecs_task_definition" "sftp_bc_task_definition" {
       container_version  = local.application_data.accounts[local.environment].container_version
       ccms_s3_bucket     = local.sftp_bc_bucket_name
       logging_level_root = local.application_data.accounts[local.environment].logging_level_root
-      ORACLE_USERNAME    = "${data.aws_secretsmanager_secret_version.sftp_bc_secrets.arn}:ORACLE_USERNAME::"
-      ORACLE_PASSWORD    = "${data.aws_secretsmanager_secret_version.sftp_bc_secrets.arn}:ORACLE_PASSWORD::"
-      ORACLE_URL         = "${data.aws_secretsmanager_secret_version.sftp_bc_secrets.arn}:ORACLE_URL::"
-      SLACK_WEBHOOK      = "${data.aws_secretsmanager_secret_version.sftp_bc_secrets.arn}:SLACK_WEBHOOK::"
-      ENABLE_SWAGGER     = "${data.aws_secretsmanager_secret_version.sftp_bc_secrets.arn}:ENABLE_SWAGGER::"
-      AUTHORIZED_CLIENTS = "${data.aws_secretsmanager_secret_version.sftp_bc_secrets.arn}:AUTHORIZED_CLIENTS::"
-      AUTHORIZED_ROLES   = "${data.aws_secretsmanager_secret_version.sftp_bc_secrets.arn}:AUTHORIZED_ROLES::"
-      UNPROTECTED_URIS   = "${data.aws_secretsmanager_secret_version.sftp_bc_secrets.arn}:UNPROTECTED_URIS::"
+      ORACLE_USERNAME    = "${data.aws_secretsmanager_secret_version.sftpsecrets.arn}:ORACLE_USERNAME::"
+      ORACLE_PASSWORD    = "${data.aws_secretsmanager_secret_version.sftpsecrets.arn}:ORACLE_PASSWORD::"
+      ORACLE_URL         = "${data.aws_secretsmanager_secret_version.sftpsecrets.arn}:ORACLE_URL::"
+      SLACK_WEBHOOK      = "${data.aws_secretsmanager_secret_version.sftpsecrets.arn}:SLACK_WEBHOOK::"
+      ENABLE_SWAGGER     = "${data.aws_secretsmanager_secret_version.sftpsecrets.arn}:ENABLE_SWAGGER::"
+      AUTHORIZED_CLIENTS = "${data.aws_secretsmanager_secret_version.sftpsecrets.arn}:AUTHORIZED_CLIENTS::"
+      AUTHORIZED_ROLES   = "${data.aws_secretsmanager_secret_version.sftpsecrets.arn}:AUTHORIZED_ROLES::"
+      UNPROTECTED_URIS   = "${data.aws_secretsmanager_secret_version.sftpsecrets.arn}:UNPROTECTED_URIS::"
     }
   )
 
@@ -56,33 +56,39 @@ resource "aws_ecs_task_definition" "sftp_bc_task_definition" {
 }
 
 # ECS Service
-resource "aws_ecs_service" "sftp_bc_ecs_service" {
-  name                              = "${local.application_name}-sftp-bc-service"
+resource "aws_ecs_service" "sftp_ecs_service" {
+  name                              = "${local.sftp_suffix}-service"
   cluster                           = aws_ecs_cluster.main_cluster.id
-  task_definition                   = aws_ecs_task_definition.sftp_bc_task_definition.arn
+  task_definition                   = aws_ecs_task_definition.sftptask_definition.arn
   desired_count                     = local.application_data.accounts[local.environment].app_count
-  launch_type                       = "FARGATE"
-  health_check_grace_period_seconds = 180
-  enable_execute_command            = true
+  launch_type                       = "EC2"
+  health_check_grace_period_seconds = 120
+
   lifecycle {
     ignore_changes = [
       task_definition
     ]
   }
 
+  ordered_placement_strategy {
+    field = "attribute:ecs.availability-zone"
+    type  = "spread"
+  }
+
   network_configuration {
-    security_groups = [aws_security_group.cluster_fargate_sg.id]
+    security_groups = [aws_security_group.ecs_tasks_sftp_security_group.id]
     subnets         = data.aws_subnets.shared-private.ids
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.sftp_bc_target_group.arn
+    target_group_arn = aws_lb_target_group.sftptarget_group.arn
     container_name   = local.application_data.accounts[local.environment].app_name
     container_port   = local.application_data.accounts[local.environment].api_server_port
   }
 
   depends_on = [
-    aws_lb_listener.sftp_bc_listener,
-    aws_iam_role_policy_attachment.bc_ecs_task_execution_role
+    aws_lb_listener.sftplistener,
+    aws_iam_role_policy_attachment.bc_ecs_task_execution_role,
+    aws_autoscaling_group.cluster-scaling-group
   ]
 }
