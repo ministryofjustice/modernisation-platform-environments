@@ -10,18 +10,15 @@ module "eks" {
   enable_irsa        = true
 
   endpoint_private_access = true
-  # endpoint_public_access_cidrs = ["0.0.0.0/0"] # From William's TF
+  # endpoint_public_access_cidrs = ["0.0.0.0/0"]
   endpoint_public_access  = true
 
-  ####### FROM WILLIAMS TF #######
-  # enable_cluster_creator_admin_permissions = true
-  # EKS Auto Mode (ADR-008)
+  enable_cluster_creator_admin_permissions = true ## CP GitHub actions access to cluster, Adds to access entries
   compute_config = {
     enabled    = true
     node_pools = ["general-purpose", "system"]
   }
   enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
-  ####### END WILLIAMS TF #######
 
   cloudwatch_log_group_retention_in_days = 30
 
@@ -138,19 +135,6 @@ module "eks" {
     ## MP Environments Actions (MemberInfrastructureAccess)access to cluster
     mpe-administrator = {
       principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess"
-      policy_associations = {
-        eks-admin = {
-          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-          access_scope = {
-            type = "cluster"
-          }
-        }
-      }
-    }
-
-    ## CP GitHub actions access to cluster
-    cpgha-administrator = {
-      principal_arn = "arn:aws:iam::${local.environment_management.account_ids["cloud-platform-development"]}:role/github-actions-development-cluster"
       policy_associations = {
         eks-admin = {
           policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
