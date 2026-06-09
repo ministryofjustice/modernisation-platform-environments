@@ -45,7 +45,7 @@ resource "aws_iam_role_policy" "lambda_process_file_from_bucket_policy" {
       },
       {
         "Effect" : "Allow",
-        "Action" : ["secretsmanager:GetSecretValue","secretsmanager:DescribeSecret","secretsmanager:ListSecretVersionIds"],
+        "Action" : ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret", "secretsmanager:ListSecretVersionIds"],
         "Resource" : ["${aws_secretsmanager_secret.sftp_bc_lambda_secrets.id}"]
       },
       {

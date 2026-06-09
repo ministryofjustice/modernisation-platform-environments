@@ -12,12 +12,13 @@ resource "aws_ecs_cluster" "main_cluster" {
 resource "aws_ecs_task_definition" "sftp_bc_task_definition" {
   family             = "${local.application_name}-sftp-bc-task"
   execution_role_arn = aws_iam_role.bc_ecs_task_execution_role.arn
+  task_role_arn      = aws_iam_role.bc_ecs_task_execution_role.arn
   network_mode       = "awsvpc"
   requires_compatibilities = [
     "FARGATE",
   ]
 
-  
+
   cpu    = local.application_data.accounts[local.environment].container_cpu
   memory = local.application_data.accounts[local.environment].container_memory
 
@@ -55,11 +56,11 @@ resource "aws_ecs_task_definition" "sftp_bc_task_definition" {
 
 # ECS Service
 resource "aws_ecs_service" "sftp_bc_ecs_service" {
-  name            = "${local.application_name}-sftp-bc-service"
-  cluster         = aws_ecs_cluster.main_cluster.id
-  task_definition = aws_ecs_task_definition.sftp_bc_task_definition.arn
-  desired_count   = local.application_data.accounts[local.environment].app_count
-  launch_type     = "FARGATE"
+  name                              = "${local.application_name}-sftp-bc-service"
+  cluster                           = aws_ecs_cluster.main_cluster.id
+  task_definition                   = aws_ecs_task_definition.sftp_bc_task_definition.arn
+  desired_count                     = local.application_data.accounts[local.environment].app_count
+  launch_type                       = "FARGATE"
   health_check_grace_period_seconds = 180
   enable_execute_command            = true
   lifecycle {
