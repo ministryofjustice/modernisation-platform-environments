@@ -72,10 +72,18 @@ else
             -AccountPassword (ConvertTo-SecureString $Password -AsPlainText -Force) `
             -PasswordNeverExpires $False `
             -ChangePasswordAtLogon $True
+            
+           Set-ADUser -Identity $username -ChangePasswordAtLogon $true
 
         Write-Host -ForegroundColor Green "User account created successfully!"
         Write-Host -ForegroundColor Cyan "Username: $username"
         Write-Host -ForegroundColor Cyan "Password: $Password"
+
+        # Store password in SSM Parameter Store for Lambda to retrieve
+        Write-Host "Storing password in Parameter Store..."
+        $passwordParamName = "/laa-workspaces/development/user-passwords/$username"
+        Write-SSMParameter -Name $passwordParamName -Value $Password -Type "SecureString" -Overwrite $true
+        Write-Host "Password stored successfully in $passwordParamName"
         
         Write-Host "SUCCESS"
     }
@@ -86,3 +94,8 @@ else
 }
 
 Write-Host "User creation process completed."
+
+'@
+    
+    $scriptContent | Out-File -FilePath "C:\Windows\system32\user-creation.ps1" -Encoding UTF8
+    Write-Host "User creation script deployed successfully"
