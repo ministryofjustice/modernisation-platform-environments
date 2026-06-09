@@ -223,7 +223,7 @@ data "aws_iam_policy_document" "inbound_bucket_policy" {
       type = "AWS"
       identifiers = [
         "arn:aws:iam::${local.environment_management.account_ids["laa-ccms-soa-${local.environment}"]}:role/ccms-soa-ec2-instance-role",
-        "arn:aws:iam::${local.environment_management.account_ids["laa-ccms-ebs-${local.environment}"]}:role/ccms-soa-sandbox-development-ec2-instance-role",
+        "arn:aws:iam::${local.environment_management.account_ids["laa-ccms-soa-${local.environment}"]}:role/ccms-soa-sandbox-development-ec2-instance-role",
         "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/role_stsassume_oracle_base"
       ]
     }
