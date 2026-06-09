@@ -137,8 +137,6 @@ locals {
         # Sites
         "213.121.161.112/28", # 102PF
         "51.149.2.0/24",      # 10SC
-        # Hoose
-        "51.179.193.117/32"
       ]
       ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
