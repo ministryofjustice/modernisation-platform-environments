@@ -137,7 +137,7 @@ data "aws_iam_policy_document" "update_p1_export_vpc" {
 
     principals {
       type        = "AWS"
-      identifiers = [module.emd_update_p1_cp_role.iam_role.this_iam_role_arn]
+      identifiers = [module.emd_update_p1_cp_role[0].iam_role.this_iam_role_arn]
     }
 
     actions   = ["execute-api:Invoke"]
