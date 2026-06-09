@@ -43,7 +43,7 @@ data "aws_iam_policy_document" "ai_gateway" {
 }
 
 module "ai_gateway_iam_policy" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-policy?ref=1d73bcb359419e1b41872ac5ccaf8808b8f1150e" # v6.6.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-policy?ref=5b962b1163790398605f2b17447cf5b6cc512237" # v6.6.1
 
   name_prefix = local.component_name
 

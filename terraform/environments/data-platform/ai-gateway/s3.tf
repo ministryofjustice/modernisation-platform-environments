@@ -19,7 +19,7 @@ data "aws_iam_policy_document" "alb_access_logs_bucket_policy" {
 
 #trivy:ignore:AVD-AWS-0132: ALB access log buckets cannot use SSE-KMS (https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html)
 module "alb_access_logs" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=af0286ff37a66c2b79faf360e6e2663744b8e5b5" # v5.13.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=0ffe41e66ad5854c637a736e43180c29eb727393" # v5.14.0
 
   bucket = local.alb_access_logs_bucket_name
 
@@ -53,7 +53,7 @@ module "alb_access_logs" {
 }
 
 module "audit_logs" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=af0286ff37a66c2b79faf360e6e2663744b8e5b5" # v5.13.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=0ffe41e66ad5854c637a736e43180c29eb727393" # v5.14.0
 
   bucket = local.audit_logs_bucket_name
 
