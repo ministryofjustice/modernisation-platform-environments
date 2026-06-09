@@ -28,12 +28,27 @@ resource "aws_iam_role" "bc_ecs_task_execution_role" {
   )
 }
 
+# ECS task execution role
+resource "aws_iam_role" "bc_ecs_task_role" {
+  name               = "${local.application_name}-bc-ecs-task-role"
+  assume_role_policy = data.aws_iam_policy_document.bc_ecs_task_execution_assume_role_policy.json
+
+  tags = merge(local.tags,
+    { Name = lower(format("%s-sftp-bc-%s-ecs-role", local.application_name, local.environment)) }
+  )
+}
+
 # ECS task execution role policy attachment
 resource "aws_iam_role_policy_attachment" "bc_ecs_task_execution_role" {
   role       = aws_iam_role.bc_ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+# ECS task role policy attachment
+resource "aws_iam_role_policy_attachment" "bc_ecs_task_role" {
+  role       = aws_iam_role.bc_ecs_task_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
 # ECS Secrets Manager Policy
 resource "aws_iam_policy" "bc_ecs_secrets_policy" {
   name = "${local.application_name}-bc-ecs_secrets_policy"
@@ -74,5 +89,11 @@ EOF
 # ECS secrets role policy attachment
 resource "aws_iam_role_policy_attachment" "bc_ecs_secrets_policy_attachment" {
   role       = aws_iam_role.bc_ecs_task_execution_role.name
+  policy_arn = aws_iam_policy.bc_ecs_secrets_policy.arn
+}
+
+# ECS secrets role policy attachment
+resource "aws_iam_role_policy_attachment" "role_bc_ecs_secrets_policy_attachment" {
+  role       = aws_iam_role.bc_ecs_task_role.name
   policy_arn = aws_iam_policy.bc_ecs_secrets_policy.arn
 }

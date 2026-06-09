@@ -12,7 +12,8 @@
       "container_cpu": "512",
       "container_memory": "1024",
       "lz_aws_workspace_nonprod_prod": "10.200.0.0/19",
-      "lz_aws_appstream_subnet_a_b": "10.200.32.0/23"
+      "lz_aws_appstream_subnet_a_b": "10.200.32.0/23",
+      "logging_level_root": "debug"
     },
     "test": {
       "short_env": "tst",
@@ -26,7 +27,8 @@
       "container_cpu": "512",
       "container_memory": "1024",
       "lz_aws_workspace_nonprod_prod": "10.200.0.0/19",
-      "lz_aws_appstream_subnet_a_b": "10.200.32.0/23"
+      "lz_aws_appstream_subnet_a_b": "10.200.32.0/23",
+      "logging_level_root": "debug"
     }
   }
 }

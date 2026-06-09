@@ -12,7 +12,7 @@ resource "aws_ecs_cluster" "main_cluster" {
 resource "aws_ecs_task_definition" "sftp_bc_task_definition" {
   family             = "${local.application_name}-sftp-bc-task"
   execution_role_arn = aws_iam_role.bc_ecs_task_execution_role.arn
-  task_role_arn      = aws_iam_role.bc_ecs_task_execution_role.arn
+  task_role_arn      = aws_iam_role.bc_ecs_task_role.arn
   network_mode       = "awsvpc"
   requires_compatibilities = [
     "FARGATE",
@@ -38,6 +38,7 @@ resource "aws_ecs_task_definition" "sftp_bc_task_definition" {
       aws_region         = local.application_data.accounts[local.environment].aws_region
       container_version  = local.application_data.accounts[local.environment].container_version
       ccms_s3_bucket     = local.sftp_bc_bucket_name
+      logging_level_root = local.application_data.accounts[local.environment].logging_level_root
       ORACLE_USERNAME    = "${data.aws_secretsmanager_secret_version.sftp_bc_secrets.arn}:ORACLE_USERNAME::"
       ORACLE_PASSWORD    = "${data.aws_secretsmanager_secret_version.sftp_bc_secrets.arn}:ORACLE_PASSWORD::"
       ORACLE_URL         = "${data.aws_secretsmanager_secret_version.sftp_bc_secrets.arn}:ORACLE_URL::"

@@ -22,6 +22,10 @@
       {
         "name": "CCMS_S3_BUCKET",
         "value": "${ccms_s3_bucket}"
+      },
+      {
+        "name": "LOGGING_LEVEL_ROOT",
+        "value": "${logging_level_root}"
       }
     ],
     "secrets": [
