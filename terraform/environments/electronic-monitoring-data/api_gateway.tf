@@ -122,6 +122,10 @@ resource "aws_iam_role_policy" "cloudwatch" {
 # --------------------------------------------------------------------------------
 # update_p1_export
 # --------------------------------------------------------------------------------
+locals {
+  endpoint_type = local.is-development ? {"REGIONAL": null} : {"PRIVATE": [data.aws_vpc_endpoint.api_gateway.id]}
+}
+
 
 data "aws_vpc_endpoint" "api_gateway" {
   service_name = "com.amazonaws.eu-west-2.execute-api"
@@ -171,9 +175,12 @@ resource "aws_api_gateway_rest_api" "update_p1_export" {
     create_before_destroy = true
   }
 
-  endpoint_configuration {
-    types = ["PRIVATE"]
-    vpc_endpoint_ids = [data.aws_vpc_endpoint.api_gateway.id]
+  dynamic "endpoint_configuration" {
+    for_each = local.endpoint_type
+    content {
+      types = [each.key]
+      vpc_endpoint_ids = each.value
+    }
   }
 }
 
