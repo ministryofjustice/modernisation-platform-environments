@@ -2,12 +2,11 @@ locals {
 
   baseline_presets_production = {
     options = {
-      # TODO: configure prison-retail PagerDuty
-      # sns_topics = {
-      #   pagerduty_integrations = {
-      #     pagerduty = "prison-retail"          
-      #   }
-      # }
+      sns_topics = {
+        pagerduty_integrations = {
+          pagerduty = "prison-retail-production"
+        }
+      }
     }
   }
 
@@ -25,11 +24,11 @@ locals {
 
     ec2_instances = {
       pd-pr-retail-a = { # 15 char limit on name as domain joined
-        # cloudwatch_metric_alarms = merge(
-        #   module.baseline_presets.cloudwatch_metric_alarms.ec2,
-        #   module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
-        #    module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
-        # )
+        cloudwatch_metric_alarms = merge(
+          module.baseline_presets.cloudwatch_metric_alarms.ec2,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
+        )
         config = {
           ami_name                      = "prison-retail-0"
           ami_owner                     = "self"

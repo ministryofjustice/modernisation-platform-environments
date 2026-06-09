@@ -13,10 +13,12 @@ module "isolated_vpc" {
   enable_nat_gateway     = local.vpc_configuration.isolated_vpc_enable_nat_gateway
   one_nat_gateway_per_az = local.vpc_configuration.isolated_vpc_one_nat_gateway_per_az
 
-  enable_flow_log                      = true
-  create_flow_log_cloudwatch_log_group = true
-  create_flow_log_cloudwatch_iam_role  = true
-  flow_log_max_aggregation_interval    = 60
+  enable_flow_log                                 = true
+  create_flow_log_cloudwatch_log_group            = true
+  create_flow_log_cloudwatch_iam_role             = true
+  flow_log_cloudwatch_log_group_kms_key_id        = module.kms_cloudwatch_logs.key_arn
+  flow_log_cloudwatch_log_group_retention_in_days = 30
+  flow_log_max_aggregation_interval               = 60
 
   tags = local.tags
 }

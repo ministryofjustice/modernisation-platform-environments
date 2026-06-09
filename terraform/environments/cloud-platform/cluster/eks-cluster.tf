@@ -41,6 +41,18 @@ module "eks" {
         }
       }
     }
+    ## MP Environments Actions (github-actions-plan) access to cluster
+    github-actions-plan = {
+      principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan"
+      policy_associations = {
+        eks-admin = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
+    }
     ## MP Environments Actions (MemberInfrastructureAccess)access to cluster
     mpe-administrator = {
       principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess"
