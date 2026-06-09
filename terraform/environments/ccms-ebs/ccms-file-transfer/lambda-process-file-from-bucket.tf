@@ -34,15 +34,15 @@ resource "aws_iam_role_policy" "lambda_process_file_from_bucket_policy" {
           "${module.s3-bucket-sftp-bc.bucket.arn}/*"
         ]
       },
-      {
-        Effect = "Allow"
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ]
-        Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.process_file_from_bucket_lambda_function.function_name}:*"
-      },
+      # {
+      #   Effect = "Allow"
+      #   Action = [
+      #     "logs:CreateLogGroup",
+      #     "logs:CreateLogStream",
+      #     "logs:PutLogEvents"
+      #   ]
+      #   Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.process_file_from_bucket_lambda_function.function_name}:*"
+      # },
       {
         "Effect" : "Allow",
         "Action" : ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret", "secretsmanager:ListSecretVersionIds"],
@@ -89,13 +89,13 @@ resource "aws_iam_role_policy" "lambda_process_file_from_bucket_policy" {
 #   }
 # }
 
-resource "aws_lambda_permission" "allow_s3_invoke" {
-  statement_id  = "AllowExecutionFromS3"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.process_file_from_bucket_lambda_function.function_name
-  principal     = "s3.amazonaws.com"
-  source_arn    = module.s3-bucket-sftp-bc.bucket.arn
-}
+# resource "aws_lambda_permission" "allow_s3_invoke" {
+#   statement_id  = "AllowExecutionFromS3"
+#   action        = "lambda:InvokeFunction"
+#   function_name = aws_lambda_function.process_file_from_bucket_lambda_function.function_name
+#   principal     = "s3.amazonaws.com"
+#   source_arn    = module.s3-bucket-sftp-bc.bucket.arn
+# }
 
 resource "aws_iam_role_policy_attachment" "lambda_vpc" {
   role       = aws_iam_role.lambda_process_file_from_bucket_role.name
