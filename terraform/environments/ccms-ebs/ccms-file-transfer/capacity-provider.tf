@@ -1,6 +1,6 @@
 # Capacity Providers
 
-resource "aws_ecs_capacity_provider" "capacity-provider" {
+resource "aws_ecs_capacity_provider" "main_cluster_capacity_provider" {
   name = "${local.sftp_env_suffix}-capacity-provider"
 
   auto_scaling_group_provider {

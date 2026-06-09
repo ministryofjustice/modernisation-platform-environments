@@ -10,14 +10,14 @@ resource "aws_ecs_cluster" "main_cluster" {
 
 resource "aws_ecs_cluster_capacity_providers" "main_cluster_capacity_providers" {
   cluster_name       = aws_ecs_cluster.main_cluster.name
-  capacity_providers = [aws_ecs_capacity_provider.main_cluster_capacity_providers.name]
+  capacity_providers = [aws_ecs_capacity_provider.main_cluster_capacity_provider.name]
 }
 
 # ECS Task Definition
 resource "aws_ecs_task_definition" "sftp_task_definition" {
   family             = "${local.sftp_suffix}-task"
-  execution_role_arn = aws_iam_role.bc_ecs_task_execution_role.arn
-  task_role_arn      = aws_iam_role.bc_ecs_task_role.arn
+  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn      = aws_iam_role.ecs_task_role.arn
   network_mode       = "awsvpc"
   requires_compatibilities = [
     "EC2",
@@ -39,14 +39,14 @@ resource "aws_ecs_task_definition" "sftp_task_definition" {
       container_version  = local.application_data.accounts[local.environment].container_version
       ccms_s3_bucket     = local.sftp_bc_bucket_name
       logging_level_root = local.application_data.accounts[local.environment].logging_level_root
-      ORACLE_USERNAME    = "${data.aws_secretsmanager_secret_version.sftpsecrets.arn}:ORACLE_USERNAME::"
-      ORACLE_PASSWORD    = "${data.aws_secretsmanager_secret_version.sftpsecrets.arn}:ORACLE_PASSWORD::"
-      ORACLE_URL         = "${data.aws_secretsmanager_secret_version.sftpsecrets.arn}:ORACLE_URL::"
-      SLACK_WEBHOOK      = "${data.aws_secretsmanager_secret_version.sftpsecrets.arn}:SLACK_WEBHOOK::"
-      ENABLE_SWAGGER     = "${data.aws_secretsmanager_secret_version.sftpsecrets.arn}:ENABLE_SWAGGER::"
-      AUTHORIZED_CLIENTS = "${data.aws_secretsmanager_secret_version.sftpsecrets.arn}:AUTHORIZED_CLIENTS::"
-      AUTHORIZED_ROLES   = "${data.aws_secretsmanager_secret_version.sftpsecrets.arn}:AUTHORIZED_ROLES::"
-      UNPROTECTED_URIS   = "${data.aws_secretsmanager_secret_version.sftpsecrets.arn}:UNPROTECTED_URIS::"
+      ORACLE_USERNAME    = "${data.aws_secretsmanager_secret_version.sftp_secrets.arn}:ORACLE_USERNAME::"
+      ORACLE_PASSWORD    = "${data.aws_secretsmanager_secret_version.sftp_secrets.arn}:ORACLE_PASSWORD::"
+      ORACLE_URL         = "${data.aws_secretsmanager_secret_version.sftp_secrets.arn}:ORACLE_URL::"
+      SLACK_WEBHOOK      = "${data.aws_secretsmanager_secret_version.sftp_secrets.arn}:SLACK_WEBHOOK::"
+      ENABLE_SWAGGER     = "${data.aws_secretsmanager_secret_version.sftp_secrets.arn}:ENABLE_SWAGGER::"
+      AUTHORIZED_CLIENTS = "${data.aws_secretsmanager_secret_version.sftp_secrets.arn}:AUTHORIZED_CLIENTS::"
+      AUTHORIZED_ROLES   = "${data.aws_secretsmanager_secret_version.sftp_secrets.arn}:AUTHORIZED_ROLES::"
+      UNPROTECTED_URIS   = "${data.aws_secretsmanager_secret_version.sftp_secrets.arn}:UNPROTECTED_URIS::"
     }
   )
 
