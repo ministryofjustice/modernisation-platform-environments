@@ -393,6 +393,7 @@ resource "aws_networkfirewall_firewall" "workspaces_web_allowlist" {
     subnet_id = aws_subnet.firewall_b[0].id
   }
 
+
   tags = {
     Name = "workspaces-web-allowlist-firewall"
   }
