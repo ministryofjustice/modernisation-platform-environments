@@ -128,7 +128,12 @@ locals {
 
 
 data "aws_vpc_endpoint" "api_gateway" {
+  provider     = aws.core-vpc
   service_name = "com.amazonaws.eu-west-2.execute-api"
+  vpc_id       = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-com.amazonaws.${data.aws_region.current.name}.execute-api"
+  }
 }
 
 data "aws_iam_policy_document" "update_p1_export_vpc" {
