@@ -24,7 +24,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_sftp5xx" {
 }
 
 # Alarm for ECS Container Count for sftp_bc Service
-resource "aws_cloudwatch_metric_alarm" "container_sftpcount" {
+resource "aws_cloudwatch_metric_alarm" "container_sftp_count" {
   alarm_name          = "${local.application_name}-${local.environment}-sftp-bc-container-count-low"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = 1
@@ -47,7 +47,7 @@ resource "aws_cloudwatch_metric_alarm" "container_sftpcount" {
 }
 
 # Underlying waf Instance Status Check Failure
-resource "aws_cloudwatch_metric_alarm" "sftpwaf_high_blocked_requests" {
+resource "aws_cloudwatch_metric_alarm" "sftp_waf_high_blocked_requests" {
   alarm_name        = "${local.application_name}-sftp-bc-${local.environment}-waf-high-blocked-requests"
   alarm_description = "High number of requests blocked by WAF. Potential attack."
 
@@ -71,7 +71,7 @@ resource "aws_cloudwatch_metric_alarm" "sftpwaf_high_blocked_requests" {
   tags = local.tags
 }
 
-resource "aws_cloudwatch_metric_alarm" "sftpalb_healthyhosts" {
+resource "aws_cloudwatch_metric_alarm" "sftp_alb_healthyhosts" {
   alarm_name          = "${local.application_name}-sftp-bc-${local.environment}-alb-targets-group"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = 1
@@ -91,7 +91,7 @@ resource "aws_cloudwatch_metric_alarm" "sftpalb_healthyhosts" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "sftpecs_high_memory" {
+resource "aws_cloudwatch_metric_alarm" "sftp_ecs_high_memory" {
   alarm_name          = "${local.application_name}-sftp-bc-${local.environment}-ecs-high-memory"
   alarm_description   = "ECS Fargate service memory utilization is high"
   comparison_operator = "GreaterThanThreshold"
