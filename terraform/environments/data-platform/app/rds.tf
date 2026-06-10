@@ -1,12 +1,12 @@
-module "rds" {
+module "app_rds" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-rds.git?ref=bc8c1e240a98fd54a12c61c70de91cbabec71863" # v7.2.0
 
   identifier = local.component_name
 
   engine               = "postgres"
   engine_version       = local.environment_configuration.rds_engine_version
-  family               = "postgres17"
-  major_engine_version = "17"
+  family               = "postgres18"
+  major_engine_version = "18"
   instance_class       = local.environment_configuration.rds_instance_class
 
   allocated_storage     = local.environment_configuration.rds_allocated_storage
@@ -15,15 +15,15 @@ module "rds" {
   storage_encrypted     = true
   kms_key_id            = module.rds_encryption.key_arn
 
-  db_name                     = "app"
-  username                    = "app"
-  password_wo                 = random_password.rds.result
+  db_name                     = local.component_name
+  username                    = local.component_name
+  password_wo                 = random_password.app_rds.result
   password_wo_version         = 1
   manage_master_user_password = false
 
   multi_az               = local.environment_configuration.rds_multi_az
   publicly_accessible    = false
-  vpc_security_group_ids = [aws_security_group.rds.id]
+  vpc_security_group_ids = [module.app_rds_security_group.id]
 
   create_db_subnet_group = true
   subnet_ids             = data.aws_subnets.eks_data.ids
@@ -61,7 +61,7 @@ module "rds" {
   skip_final_snapshot = !local.is-production
 }
 
-resource "random_password" "rds" {
+resource "random_password" "app_rds" {
   length  = 32
   special = false
 }

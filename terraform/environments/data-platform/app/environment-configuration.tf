@@ -3,8 +3,8 @@ locals {
 
   environment_configurations = {
     development = {
-      rds_engine_version          = "17.4"
-      rds_instance_class          = "db.t4g.medium"
+      rds_engine_version          = "18.4"
+      rds_instance_class          = "db.t4g.small"
       rds_allocated_storage       = 20
       rds_max_allocated_storage   = 100
       rds_multi_az                = false
@@ -12,8 +12,8 @@ locals {
       rds_monitoring_interval     = 0
     }
     test = {
-      rds_engine_version          = "17.4"
-      rds_instance_class          = "db.t4g.medium"
+      rds_engine_version          = "18.4"
+      rds_instance_class          = "db.t4g.small"
       rds_allocated_storage       = 20
       rds_max_allocated_storage   = 100
       rds_multi_az                = false
@@ -21,19 +21,19 @@ locals {
       rds_monitoring_interval     = 0
     }
     preproduction = {
-      rds_engine_version          = "17.4"
-      rds_instance_class          = "db.m7g.large"
-      rds_allocated_storage       = 50
-      rds_max_allocated_storage   = 200
+      rds_engine_version          = "18.4"
+      rds_instance_class          = "db.t4g.small"
+      rds_allocated_storage       = 20
+      rds_max_allocated_storage   = 100
       rds_multi_az                = true
       rds_backup_retention_period = 7
-      rds_monitoring_interval     = 60
+      rds_monitoring_interval     = 0
     }
     production = {
-      rds_engine_version          = "17.4"
-      rds_instance_class          = "db.m7g.large"
+      rds_engine_version          = "18.4"
+      rds_instance_class          = "db.t4g.medium"
       rds_allocated_storage       = 100
-      rds_max_allocated_storage   = 500
+      rds_max_allocated_storage   = 250
       rds_multi_az                = true
       rds_backup_retention_period = 7
       rds_monitoring_interval     = 60
