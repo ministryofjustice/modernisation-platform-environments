@@ -72,7 +72,7 @@ module "ecr_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name_prefix = "ecr-access"
   description = "IAM Policy"
@@ -96,7 +96,7 @@ module "snyk_analytical_platform_airflow_container_scanning_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name_prefix = "snyk-analytical-platform-airflow-container-scanning"
   description = "IAM Policy"
@@ -111,7 +111,7 @@ module "trivy_analytical_platform_airflow_container_scanning_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name_prefix = "trivy-analytical-platform-airflow-container-scanning"
   description = "IAM Policy"
@@ -170,7 +170,7 @@ module "analytical_platform_terraform_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name_prefix = "analytical-platform-terraform"
   description = "IAM Policy"
@@ -232,7 +232,7 @@ module "analytical_platform_github_actions_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name_prefix = "analytical-platform-github-actions"
   description = "IAM Policy"
@@ -271,7 +271,7 @@ module "data_engineering_datalake_access_github_actions_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name_prefix = "data-engineering-datalake-access-github-actions"
   description = "IAM Policy"
@@ -315,7 +315,7 @@ module "data_engineering_datalake_access_terraform_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name_prefix = "data-engineering-datalake-access-terraform"
   description = "IAM Policy"
