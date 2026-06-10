@@ -172,7 +172,6 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_800x" {
   from_port         = 8000
   to_port           = 8005
   cidr_blocks = [data.aws_vpc.shared.cidr_block,
-    local.application_data.accounts[local.environment].lz_aws_subnet_env,
     local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
   local.application_data.accounts[local.environment].lz_aws_appstream_subnet_a_b]
 }
