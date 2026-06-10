@@ -14,7 +14,6 @@ from aws_lambda_powertools.utilities.idempotency import (
 s3 = boto3.client("s3")
 DESTINATION_BUCKET_NAME = os.environ["DESTINATION_BUCKET_NAME"]
 IDEMPOTENCY_TABLE = os.environ["IDEMPOTENCY_TABLE"]
-SOURCE_BUCKET_NAME = os.getenv("SOURCE_BUCKET_NAME")
 logger = Logger(service="managed-file-transfer-unscanned-to-processing")
 # Keep the truncated hash short enough for readable logs while still providing
 # a stable discriminator for same-named objects under different prefixes.
@@ -48,45 +47,11 @@ def iter_records(event):
         yield payload
 
 
-def normalise_transfer_record(record):
-    if record.get("source") != "aws.transfer":
-        raise KeyError("source")
-
-    if record.get("detail-type") != "SFTP Server File Upload Completed":
-        raise ValueError(f"Unsupported Transfer event type: {record.get('detail-type')}")
-
-    detail = record["detail"]
-    file_path = detail["file-path"].lstrip("/")
-    bucket_name, separator, source_key = file_path.partition("/")
-
-    if not separator or not bucket_name or not source_key:
-        raise ValueError(f"Unsupported Transfer file path: {detail['file-path']}")
-
-    username = detail["username"]
-    expected_prefix = f"{username}/"
-    if not source_key.startswith(expected_prefix):
-        raise ValueError(
-            f"Transfer file path is outside the user's home directory: {detail['file-path']}"
-        )
-
-    if SOURCE_BUCKET_NAME and bucket_name != SOURCE_BUCKET_NAME:
-        raise ValueError(
-            f"Transfer file path bucket {bucket_name} did not match expected source bucket {SOURCE_BUCKET_NAME}"
-        )
-
-    return {
-        "operation": "unscanned-to-processing",
-        "source_bucket_name": bucket_name,
-        "source_key": source_key,
-        "source_version_id": None,
-        "destination_bucket_name": DESTINATION_BUCKET_NAME,
-    }
+def is_s3_test_event(record):
+    return record.get("Service") == "Amazon S3" and record.get("Event") == "s3:TestEvent"
 
 
 def normalise_record(record):
-    if "detail" in record and "detail-type" in record:
-        return normalise_transfer_record(record)
-
     object_details = record["s3"]["object"]
 
     return {
@@ -106,6 +71,14 @@ def get_log_fields(operation):
         "object_key_path_hash": hashlib.sha256(source_key.encode("utf-8")).hexdigest()[:LOG_KEY_PATH_HASH_LENGTH],
         "source_bucket_name": operation["source_bucket_name"],
         "destination_bucket_name": operation["destination_bucket_name"],
+    }
+
+
+def get_s3_test_event_log_fields(record):
+    return {
+        "event_name": record.get("Event"),
+        "event_service": record.get("Service"),
+        "source_bucket_name": record.get("Bucket"),
     }
 
 
@@ -164,6 +137,13 @@ def lambda_handler(event, context):
         operation = None
 
         try:
+            if is_s3_test_event(record):
+                logger.info(
+                    "Received S3 notification test event",
+                    extra=get_s3_test_event_log_fields(record),
+                )
+                continue
+
             operation = normalise_record(record)
             process_record(operation=operation)
         except Exception:
