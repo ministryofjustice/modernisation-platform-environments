@@ -195,7 +195,7 @@ module "emd_validation_db_role" {
 module "emd_update_p1_cp_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-  count   = local.is-preproduction ? 1 : 0
+  count   = local.is-preproduction || local.is-production ? 1 : 0
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.48.0"
 
