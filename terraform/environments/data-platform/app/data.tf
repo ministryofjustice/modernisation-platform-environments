@@ -16,4 +16,6 @@ data "aws_subnets" "eks_data" {
     name   = "tag:Name"
     values = ["${local.application_name}-${local.environment}-data*"]
   }
+data "aws_eks_cluster_auth" "cluster" {
+  name = data.aws_eks_cluster.cluster.name
 }
