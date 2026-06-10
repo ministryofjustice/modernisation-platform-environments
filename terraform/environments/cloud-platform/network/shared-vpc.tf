@@ -7,9 +7,9 @@ module "cluster_vpc" {
   cidr = lookup(local.vpc_cidr, local.cp_vpc_name)
   azs  = slice(data.aws_availability_zones.available.names, 0, 3)
   private_subnets = [
-    cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 8, 1),
-    cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 8, 2),
-    cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 8, 3)
+    cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 3, 1),
+    cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 3, 2),
+    cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 3, 3)
   ]
 
   public_subnets = [
@@ -33,7 +33,7 @@ module "cluster_vpc" {
   }
 
   private_subnet_tags = {
-    SubnetType = "TGW-Private"
+    SubnetType = "Private"
   }
 
   tags = merge({
@@ -41,27 +41,26 @@ module "cluster_vpc" {
   }, local.tags)
 }
 
-resource "aws_subnet" "eks_private_subnet" {
+resource "aws_subnet" "tgw_private" {
   count = terraform.workspace == "cloud-platform-development" ? 3 : 0
 
   vpc_id                  = module.cluster_vpc[0].vpc_id
-  cidr_block              = cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 3, count.index + 4)
+  cidr_block              = cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 8, count.index + 4)
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   map_public_ip_on_launch = false
 
   tags = merge({
-    Name                              = "${local.cp_vpc_name}-eks-private-${data.aws_availability_zones.available.names[count.index]}"
-    SubnetType                        = "EKS-Private"
+    Name                              = "${local.cp_vpc_name}-tgw-private-${data.aws_availability_zones.available.names[count.index]}"
+    SubnetType                        = "TGW-Private"
     "kubernetes.io/role/internal-elb" = "1"
     Terraform                         = "true"
     Cluster                           = local.cp_vpc_name
-    # Domain                            = local.vpc_base_domain_name
   }, local.tags)
 }
 
-resource "aws_route_table_association" "eks_private_route" {
+resource "aws_route_table_association" "tgw_private" {
   count = terraform.workspace == "cloud-platform-development" ? 3 : 0
 
-  subnet_id      = aws_subnet.eks_private_subnet[count.index].id
+  subnet_id      = aws_subnet.tgw_private[count.index].id
   route_table_id = module.cluster_vpc[0].private_route_table_ids[count.index]
 }
