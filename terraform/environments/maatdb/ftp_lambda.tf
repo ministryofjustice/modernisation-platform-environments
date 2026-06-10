@@ -14,7 +14,7 @@ locals {
   endpoint_details = {
     for pair in local.decoded_ftp_secret :
     "${pair.name}.${pair.type}" => pair.value
-    if contains(keys(pair), "name") && contains(keys(pair), "type") && contains(keys(pair), "value")
+    if can(pair.name) && can(pair.type) && can(pair.value)
   }
 
   ftp_job = {
