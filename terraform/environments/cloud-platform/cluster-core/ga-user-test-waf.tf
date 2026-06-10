@@ -18,27 +18,20 @@ resource "aws_wafv2_ip_set" "echo_allowlist" {
   addresses          = ["83.100.215.187/32"]
 }
 
-resource "aws_wafv2_ip_set" "echo3_allowlist" {
-  name               = "${local.cluster_name}-echo3-source-ip-allowlist"
-  scope              = "REGIONAL"
-  ip_address_version = "IPV4"
-  addresses          = ["203.0.113.1/32"]
-}
-
 resource "aws_wafv2_web_acl" "echo" {
   name  = "${local.cluster_name}-echo-source-ip-acl"
   scope = "REGIONAL"
 
   default_action {
-    block {}
+    allow {}
   }
 
   rule {
-    name     = "allow-echo2-from-allowlist"
+    name     = "restrict-echo2-to-allowlist"
     priority = 1
 
     action {
-      allow {}
+      block {}
     }
 
     statement {
@@ -62,51 +55,12 @@ resource "aws_wafv2_web_acl" "echo" {
         }
 
         statement {
-          ip_set_reference_statement {
-            arn = aws_wafv2_ip_set.echo_allowlist.arn
-          }
-        }
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "echo2-source-ip-allow"
-      sampled_requests_enabled   = true
-    }
-  }
-
-  rule {
-    name     = "allow-echo3-from-allowlist"
-    priority = 2
-
-    action {
-      allow {}
-    }
-
-    statement {
-      and_statement {
-        statement {
-          byte_match_statement {
-            search_string         = local.echo3_hostname
-            positional_constraint = "EXACTLY"
-
-            field_to_match {
-              single_header {
-                name = "host"
+          not_statement {
+            statement {
+              ip_set_reference_statement {
+                arn = aws_wafv2_ip_set.echo_allowlist.arn
               }
             }
-
-            text_transformation {
-              priority = 0
-              type     = "LOWERCASE"
-            }
-          }
-        }
-
-        statement {
-          ip_set_reference_statement {
-            arn = aws_wafv2_ip_set.echo3_allowlist.arn
           }
         }
       }
@@ -114,7 +68,7 @@ resource "aws_wafv2_web_acl" "echo" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "echo3-source-ip-allow"
+      metric_name                = "echo2-source-ip-restrict"
       sampled_requests_enabled   = true
     }
   }
