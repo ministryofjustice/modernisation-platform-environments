@@ -13,9 +13,9 @@ module "cluster_vpc" {
   ]
 
   public_subnets = [
-    cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 7, 0),
-    cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 7, 1),
-    cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 7, 2)
+    cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 7, 4),
+    cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 7, 5),
+    cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 7, 6)
   ]
 
   manage_default_network_acl    = false
