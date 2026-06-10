@@ -58,7 +58,7 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_sftp_security_group_in
   referenced_security_group_id = aws_security_group.sftp_load_balancer.id
 }
 
-resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_sftp_security_group_ingress_rule" {
+resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_sftp_security_group_ec2_ingress_rule" {
   security_group_id = aws_security_group.ecs_tasks_sftp_security_group.id
 
   ip_protocol                  = "tcp"
