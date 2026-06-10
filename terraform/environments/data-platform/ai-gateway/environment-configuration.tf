@@ -18,7 +18,7 @@ locals {
         "35.176.93.186/32", # GlobalProtect (Alpha)
         # Sites
         "213.121.161.112/28", # 102PF
-        "51.149.2.0/24",      # 10SC
+        "51.149.2.0/24"       # 10SC
       ]
       ai_gateway_admin_ingress_allowlist = [
         # VPN
@@ -26,7 +26,7 @@ locals {
         "35.176.93.186/32", # GlobalProtect (Alpha)
         # Sites
         "213.121.161.112/28", # 102PF
-        "51.149.2.0/24",      # 10SC
+        "51.149.2.0/24"       # 10SC
       ]
       ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
@@ -53,7 +53,7 @@ locals {
         "35.176.93.186/32", # GlobalProtect (Alpha)
         # Sites
         "213.121.161.112/28", # 102PF
-        "51.149.2.0/24",      # 10SC
+        "51.149.2.0/24"       # 10SC
       ]
       ai_gateway_admin_ingress_allowlist = [
         # VPN
@@ -61,7 +61,7 @@ locals {
         "35.176.93.186/32", # GlobalProtect (Alpha)
         # Sites
         "213.121.161.112/28", # 102PF
-        "51.149.2.0/24",      # 10SC
+        "51.149.2.0/24"       # 10SC
       ]
       ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
@@ -88,7 +88,7 @@ locals {
         "35.176.93.186/32", # GlobalProtect (Alpha)
         # Sites
         "213.121.161.112/28", # 102PF
-        "51.149.2.0/24",      # 10SC
+        "51.149.2.0/24"       # 10SC
       ]
       ai_gateway_admin_ingress_allowlist = [
         # VPN
@@ -96,7 +96,7 @@ locals {
         "35.176.93.186/32", # GlobalProtect (Alpha)
         # Sites
         "213.121.161.112/28", # 102PF
-        "51.149.2.0/24",      # 10SC
+        "51.149.2.0/24"       # 10SC
       ]
       ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
@@ -123,7 +123,7 @@ locals {
         "35.176.93.186/32", # GlobalProtect (Alpha)
         # Sites
         "213.121.161.112/28", # 102PF
-        "51.149.2.0/24",      # 10SC
+        "51.149.2.0/24"       # 10SC
       ]
       ai_gateway_admin_ingress_allowlist = [
         # VPN
@@ -131,7 +131,7 @@ locals {
         "35.176.93.186/32", # GlobalProtect (Alpha)
         # Sites
         "213.121.161.112/28", # 102PF
-        "51.149.2.0/24",      # 10SC
+        "51.149.2.0/24"       # 10SC
       ]
       ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
