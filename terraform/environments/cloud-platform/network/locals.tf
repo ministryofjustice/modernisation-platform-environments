@@ -19,6 +19,7 @@ locals {
   vpc_cidr = {
     cloud-platform-development   = "10.195.32.0/20"
     cloud-platform-preproduction = "10.195.16.0/20"
+    cloud-platform-nonlive       = "10.0.0.0/20"
     cloud-platform-live          = "10.195.0.0/20"
   }
 
