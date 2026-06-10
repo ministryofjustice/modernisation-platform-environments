@@ -130,9 +130,10 @@ resource "aws_instance" "s609693lo6vw103" {
   }
 
   tags = {
-    Name        = "s609693lo6vw103"
-    patch_group = "dev_win_patch"
-    backup      = true
+    Name                = "s609693lo6vw103"
+    patch_group         = "dev_win_patch"
+    backup              = true
+    ses_service_restart = "PPUDAutomatedProcessManagerTEST"
   }
 }
 
@@ -523,14 +524,15 @@ resource "aws_instance" "s618358rgvw024" {
   }
 
   tags = {
-    Name               = "s618358rgvw024"
-    patch_group        = "uat_win_patch"
-    role               = "ses_sql_config"
-    test_role          = "ses_test_config"
-    test_config_path   = "C:\\Scripts\\Test_SES_Email.ps1"
-    backup             = true
-    cpu_alarm          = true
-    cpu_lambda_trigger = true
+    Name                = "s618358rgvw024"
+    patch_group         = "uat_win_patch"
+    role                = "ses_sql_config"
+    test_role           = "ses_test_config"
+    ses_service_restart = "PPUDAutomatedProcessManagerUAT"
+    test_config_path    = "C:\\Scripts\\Test_SES_Email.ps1"
+    backup              = true
+    cpu_alarm           = true
+    cpu_lambda_trigger  = true
   }
 }
 
