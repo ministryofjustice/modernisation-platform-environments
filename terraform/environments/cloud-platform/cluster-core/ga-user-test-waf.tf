@@ -6,11 +6,23 @@
 # at the AWS networking layer in front of the load balancer.
 ###############################################################################
 
+locals {
+  echo2_hostname = "echo2.${local.cluster_name}.${local.cluster_base_domain}"
+  echo3_hostname = "echo3.${local.cluster_name}.${local.cluster_base_domain}"
+}
+
 resource "aws_wafv2_ip_set" "echo_allowlist" {
   name               = "${local.cluster_name}-echo-source-ip-allowlist"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
   addresses          = ["83.100.215.187/32"]
+}
+
+resource "aws_wafv2_ip_set" "echo3_allowlist" {
+  name               = "${local.cluster_name}-echo3-source-ip-allowlist"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV4"
+  addresses          = ["203.0.113.1/32"]
 }
 
 resource "aws_wafv2_web_acl" "echo" {
@@ -22,7 +34,7 @@ resource "aws_wafv2_web_acl" "echo" {
   }
 
   rule {
-    name     = "allow-from-allowlist"
+    name     = "allow-echo2-from-allowlist"
     priority = 1
 
     action {
@@ -30,14 +42,79 @@ resource "aws_wafv2_web_acl" "echo" {
     }
 
     statement {
-      ip_set_reference_statement {
-        arn = aws_wafv2_ip_set.echo_allowlist.arn
+      and_statement {
+        statement {
+          byte_match_statement {
+            search_string         = local.echo2_hostname
+            positional_constraint = "EXACTLY"
+
+            field_to_match {
+              single_header {
+                name = "host"
+              }
+            }
+
+            text_transformation {
+              priority = 0
+              type     = "LOWERCASE"
+            }
+          }
+        }
+
+        statement {
+          ip_set_reference_statement {
+            arn = aws_wafv2_ip_set.echo_allowlist.arn
+          }
+        }
       }
     }
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "echo-source-ip-allow"
+      metric_name                = "echo2-source-ip-allow"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "allow-echo3-from-allowlist"
+    priority = 2
+
+    action {
+      allow {}
+    }
+
+    statement {
+      and_statement {
+        statement {
+          byte_match_statement {
+            search_string         = local.echo3_hostname
+            positional_constraint = "EXACTLY"
+
+            field_to_match {
+              single_header {
+                name = "host"
+              }
+            }
+
+            text_transformation {
+              priority = 0
+              type     = "LOWERCASE"
+            }
+          }
+        }
+
+        statement {
+          ip_set_reference_statement {
+            arn = aws_wafv2_ip_set.echo3_allowlist.arn
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "echo3-source-ip-allow"
       sampled_requests_enabled   = true
     }
   }
