@@ -152,6 +152,8 @@ data "terraform_remote_state" "core_network_services" {
 
 data "terraform_remote_state" "managed_file_transfer" {
   backend = "s3"
+  workspace = terraform.workspace
+
   config = {
     acl                  = "bucket-owner-full-control"
     bucket               = "modernisation-platform-terraform-state"
