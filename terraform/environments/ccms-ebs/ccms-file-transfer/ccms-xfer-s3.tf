@@ -124,11 +124,6 @@ resource "aws_s3_bucket_notification" "sftp_bucket_notification" {
   depends_on = [module.s3-bucket-sftp-bc]
 }
 
-moved {
-  from = aws_s3_bucket_notification.sftp_bc_bucket_notification
-  to   = aws_s3_bucket_notification.sftp_bucket_notification
-}
-
 resource "aws_cloudwatch_event_rule" "sftp_bucket_event_rule" {
   name        = "sftp-bc-bucket-event-rule"
   description = "Event rule to trigger on S3 Object Created events for the sftp-bc bucket"
@@ -144,25 +139,10 @@ resource "aws_cloudwatch_event_rule" "sftp_bucket_event_rule" {
   tags = merge(local.tags, { name = "sftp-bc-bucket-event-rule" })
 }
 
-moved {
-  from = aws_cloudwatch_event_rule.sftp_bc_bucket_event_rule
-  to   = aws_cloudwatch_event_rule.sftp_bucket_event_rule
-}
-
-moved {
-  from = aws_cloudwatch_event_target.sftp_bc_bucket_event_target
-  to   = aws_cloudwatch_event_target.sftp_bucket_event_target
-}
-
 resource "aws_cloudwatch_event_target" "sftp_bucket_event_target" {
   rule      = aws_cloudwatch_event_rule.sftp_bucket_event_rule.name
   target_id = "s3-event-target"
   arn       = data.aws_sns_topic.s3_topic.arn
-}
-
-moved {
-  from = aws_s3_object.sftp_bc_folder
-  to   = aws_s3_object.sftp_folder
 }
 
 resource "aws_s3_object" "sftp_folder" {

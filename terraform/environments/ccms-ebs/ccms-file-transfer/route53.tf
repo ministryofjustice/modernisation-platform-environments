@@ -14,10 +14,6 @@ resource "aws_route53_record" "route53_record_sftp_nonprod" {
   }
 }
 
-moved {
-  from = aws_route53_record.route53_record_sftp_bc_nonprod
-  to   = aws_route53_record.route53_record_sftp_nonprod
-}
 # Creates Route53 DNS records for the SFTP bc LB in PROD
 resource "aws_route53_record" "route53_record_sftp_prod" {
   count    = local.is-production ? 1 : 0
@@ -30,9 +26,4 @@ resource "aws_route53_record" "route53_record_sftp_prod" {
     zone_id                = aws_lb.sftp_load_balancer.zone_id
     evaluate_target_health = false
   }
-}
-
-moved {
-  from = aws_route53_record.route53_record_sftp_bc_prod
-  to   = aws_route53_record.route53_record_sftp_prod
 }

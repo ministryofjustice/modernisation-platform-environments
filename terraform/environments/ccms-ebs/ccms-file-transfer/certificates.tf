@@ -5,10 +5,6 @@
 #   *.laa.service.justice.gov.uk
 
 # Certificate
-moved {
-  from = aws_acm_certificate.external_sftp_bc
-  to   = aws_acm_certificate.external_sftp
-}
 resource "aws_acm_certificate" "external_sftp" {
   validation_method         = "DNS"
   domain_name               = local.primary_domain
@@ -17,11 +13,6 @@ resource "aws_acm_certificate" "external_sftp" {
   tags = merge(local.tags,
     { Environment = local.environment }
   )
-}
-
-moved {
-  from = aws_route53_record.external_validation_sftp_bc_nonprod
-  to   = aws_route53_record.external_validation_sftp_nonprod
 }
 
 ## Validation Records
@@ -37,10 +28,6 @@ resource "aws_route53_record" "external_validation_sftp_nonprod" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
-moved {
-  from = aws_route53_record.external_validation_sftp_bc_prod
-  to   = aws_route53_record.external_validation_sftp_prod
-}
 resource "aws_route53_record" "external_validation_sftp_prod" {
   count    = local.is-production ? length(local.laa_validations) : 0
   provider = aws.core-network-services
@@ -53,10 +40,6 @@ resource "aws_route53_record" "external_validation_sftp_prod" {
   zone_id         = data.aws_route53_zone.laa.zone_id
 }
 
-moved {
-  from = aws_acm_certificate_validation.external_sftp_bc_nonprod
-  to   = aws_acm_certificate_validation.external_sftp_nonprod
-}
 ## Certificate Validation
 resource "aws_acm_certificate_validation" "external_sftp_nonprod" {
   count = local.is-production ? 0 : 1
