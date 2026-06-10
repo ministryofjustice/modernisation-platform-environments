@@ -116,6 +116,15 @@ resource "aws_route_table_association" "private_b" {
   route_table_id = aws_route_table.private_b[0].id
 }
 
+
+resource "aws_route" "private_a_to_nat" {
+  count = local.environment == "development" ? 1 : 0
+
+  route_table_id      = aws_route_table.private_a[0].id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id      = aws_nat_gateway.main[0].id
+}
+
 # resource "aws_route" "private_a_firewall" {
 #   count = local.environment == "development" ? 1 : 0
 
