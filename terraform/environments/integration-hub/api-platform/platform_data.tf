@@ -150,6 +150,18 @@ data "terraform_remote_state" "core_network_services" {
   }
 }
 
+data "terraform_remote_state" "managed_file_transfer" {
+  backend = "s3"
+  config = {
+    acl                  = "bucket-owner-full-control"
+    bucket               = "modernisation-platform-terraform-state"
+    encrypt              = true
+    key                  = "terraform.tfstate"
+    region               = "eu-west-2"
+    workspace_key_prefix = "environments/members/integration-hub/managed-file-transfer"
+  }
+}
+
 data "aws_organizations_organization" "root_account" {}
 
 # Retrieve information about the modernisation platform account

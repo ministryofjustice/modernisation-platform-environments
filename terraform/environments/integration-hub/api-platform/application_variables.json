@@ -1,0 +1,43 @@
+{
+  "accounts": {
+    "development": {
+      "api_configuration": {
+        "max_presigned_url_expiry_seconds": 3600,
+        "presigned_url_expiry_seconds": 900
+      },
+      "transfer_clients": {
+        "products-poc": {
+          "enabled": true,
+          "key_prefix": "products-poc/uploads",
+          "max_upload_size_bytes": 52428800,
+          "allowed_content_types": [
+            "text/csv",
+            "application/json",
+            "application/zip"
+          ]
+        }
+      }
+    },
+    "test": {
+      "api_configuration": {
+        "max_presigned_url_expiry_seconds": 3600,
+        "presigned_url_expiry_seconds": 900
+      },
+      "transfer_clients": {}
+    },
+    "preproduction": {
+      "api_configuration": {
+        "max_presigned_url_expiry_seconds": 3600,
+        "presigned_url_expiry_seconds": 900
+      },
+      "transfer_clients": {}
+    },
+    "production": {
+      "api_configuration": {
+        "max_presigned_url_expiry_seconds": 3600,
+        "presigned_url_expiry_seconds": 900
+      },
+      "transfer_clients": {}
+    }
+  }
+}
