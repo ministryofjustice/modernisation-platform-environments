@@ -124,7 +124,9 @@ data "aws_iam_policy_document" "gdpr_structured_job_policy_document" {
       module.s3-data-bucket.bucket.arn,
       "${module.s3-data-bucket.bucket.arn}/*",
       module.s3-athena-bucket.bucket.arn,
-      "${module.s3-athena-bucket.bucket.arn}/*"
+      "${module.s3-athena-bucket.bucket.arn}/*",
+      module.s3-gdpr-audit-bucket.bucket.arn,
+      "${module.s3-gdpr-audit-bucket.bucket.arn}/*"
     ]
   }
 
@@ -184,7 +186,7 @@ resource "aws_ecs_cluster_capacity_providers" "ecd-gdpr-fargate" {
   }
 }
 
-resource "aws_lakeformation_permissions" "gdpr_iceberg_table_table_permissions" {
+resource "aws_lakeformation_permissions" "gdpr_ecs_task_table_permissions" {
   for_each  = local.is-development || local.is-preproduction || local.is-production ? toset(local.target_gdpr_dbs) : []
   principal = aws_iam_role.gdpr_structured_job_role[0].arn
 
@@ -196,7 +198,7 @@ resource "aws_lakeformation_permissions" "gdpr_iceberg_table_table_permissions" 
   permissions = ["SELECT", "DESCRIBE", "ALTER", "INSERT", "DELETE"] # last three perms are required for optimising / vacuuming
 }
 
-resource "aws_lakeformation_permissions" "gdpr_iceberg_table_datalake_location" {
+resource "aws_lakeformation_permissions" "gdpr_ecs_task_datalake_location" {
   count     = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   principal = aws_iam_role.gdpr_structured_job_role[0].arn
 
