@@ -163,6 +163,7 @@ data "aws_iam_policy_document" "update_p1_export_vpc" {
         data.aws_vpc_endpoint.api_gateway.id
       ]
     }
+    resources = ["${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*"]
   }
 }
 
