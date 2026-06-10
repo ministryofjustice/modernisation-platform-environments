@@ -10,37 +10,41 @@ resource "aws_ecs_cluster" "main_cluster" {
 
 # ECS Task Definition
 resource "aws_ecs_task_definition" "sftp_bc_task_definition" {
-  family             = "${local.application_name}-ftp-bc-task"
+  family             = "${local.application_name}-sftp-bc-task"
   execution_role_arn = aws_iam_role.bc_ecs_task_execution_role.arn
   network_mode       = "awsvpc"
   requires_compatibilities = [
     "FARGATE",
   ]
+
+  
   cpu    = local.application_data.accounts[local.environment].container_cpu
   memory = local.application_data.accounts[local.environment].container_memory
 
-  # Forcing ARM64 architecture for Fargate tasks
   runtime_platform {
-    cpu_architecture = "ARM64"
+    operating_system_family = "LINUX"
+    cpu_architecture        = "X86_64"
   }
 
   container_definitions = templatefile(
     "${path.module}/templates/task_definition_api.json.tpl",
     {
-      app_name                    = local.application_data.accounts[local.environment].app_name
-      app_image                   = local.application_data.accounts[local.environment].app_image
-      api_server_port             = local.application_data.accounts[local.environment].api_server_port
-      cpu                         = local.application_data.accounts[local.environment].container_cpu
-      memory                      = local.application_data.accounts[local.environment].container_memory
-      aws_region                  = local.application_data.accounts[local.environment].aws_region
-      container_version           = local.application_data.accounts[local.environment].container_version
-      ccms_s3_bucket              = local.sftp_bc_bucket_name
-      ebs_db_username             = "${aws_secretsmanager_secret.sftp_bc_secrets.arn}:ebs_db_username::"
-      ebs_db_password             = "${aws_secretsmanager_secret.sftp_bc_secrets.arn}:ebs_db_password::"
-      ebs_db_endpoint             = "${aws_secretsmanager_secret.sftp_bc_secrets.arn}:ebs_db_endpoint::"
-      file_transfer_slack_webhook = "${aws_secretsmanager_secret.sftp_bc_secrets.arn}:file_transfer_slack_webhook::"
-      TLS_CERT                    = "${aws_secretsmanager_secret.sftp_bc_secrets.arn}:tls_cert::"
-      TLS_KEY                     = "${aws_secretsmanager_secret.sftp_bc_secrets.arn}:tls_key::"
+      app_name           = local.application_data.accounts[local.environment].app_name
+      app_image          = local.application_data.accounts[local.environment].app_image
+      api_server_port    = local.application_data.accounts[local.environment].api_server_port
+      cpu                = local.application_data.accounts[local.environment].container_cpu
+      memory             = local.application_data.accounts[local.environment].container_memory
+      aws_region         = local.application_data.accounts[local.environment].aws_region
+      container_version  = local.application_data.accounts[local.environment].container_version
+      ccms_s3_bucket     = local.sftp_bc_bucket_name
+      ORACLE_USERNAME    = "${data.aws_secretsmanager_secret_version.sftp_bc_secrets.arn}:ORACLE_USERNAME::"
+      ORACLE_PASSWORD    = "${data.aws_secretsmanager_secret_version.sftp_bc_secrets.arn}:ORACLE_PASSWORD::"
+      ORACLE_URL         = "${data.aws_secretsmanager_secret_version.sftp_bc_secrets.arn}:ORACLE_URL::"
+      SLACK_WEBHOOK      = "${data.aws_secretsmanager_secret_version.sftp_bc_secrets.arn}:SLACK_WEBHOOK::"
+      ENABLE_SWAGGER     = "${data.aws_secretsmanager_secret_version.sftp_bc_secrets.arn}:ENABLE_SWAGGER::"
+      AUTHORIZED_CLIENTS = "${data.aws_secretsmanager_secret_version.sftp_bc_secrets.arn}:AUTHORIZED_CLIENTS::"
+      AUTHORIZED_ROLES   = "${data.aws_secretsmanager_secret_version.sftp_bc_secrets.arn}:AUTHORIZED_ROLES::"
+      UNPROTECTED_URIS   = "${data.aws_secretsmanager_secret_version.sftp_bc_secrets.arn}:UNPROTECTED_URIS::"
     }
   )
 
@@ -51,18 +55,18 @@ resource "aws_ecs_task_definition" "sftp_bc_task_definition" {
 
 # ECS Service
 resource "aws_ecs_service" "sftp_bc_ecs_service" {
-  name            = local.application_data.accounts[local.environment].app_name
+  name            = "${local.application_name}-sftp-bc-service"
   cluster         = aws_ecs_cluster.main_cluster.id
   task_definition = aws_ecs_task_definition.sftp_bc_task_definition.arn
   desired_count   = local.application_data.accounts[local.environment].app_count
   launch_type     = "FARGATE"
 
   health_check_grace_period_seconds = 120
-  # lifecycle {
-  #   ignore_changes = [
-  #     task_definition
-  #   ]
-  # }
+  lifecycle {
+    ignore_changes = [
+      task_definition
+    ]
+  }
 
   network_configuration {
     security_groups = [aws_security_group.cluster_fargate_sg.id]

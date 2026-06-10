@@ -402,19 +402,48 @@ resource "aws_iam_policy" "ssm_ec2_send_command" {
   path        = "/"
   description = "Lambda policy for ssm_ec2_send_command in ${each.key} environment"
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
+policy = jsonencode({
+  Version = "2012-10-17"
+  Statement = [
+    {
       Effect   = "Allow"
       Action   = ["ssm:SendCommand", "ec2:DescribeInstances"]
       Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.account_key]}:instance/*"]
       Condition = {
         StringEquals = {
-          "ssm:resourceTag/role" = ["ses_web_config", "ses_tfs_config", "ses_sql_config", "ses_test_config"]
+          "ssm:resourceTag/role" = [
+            "ses_web_config",
+            "ses_tfs_config",
+            "ses_sql_config"
+          ]
         }
       }
-    }]
-  })
+    },
+    {
+      Effect   = "Allow"
+      Action   = ["ssm:SendCommand", "ec2:DescribeInstances"]
+      Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.account_key]}:instance/*"]
+      Condition = {
+        StringEquals = {
+          "ssm:resourceTag/ses_service_restart" = [
+            "PPUDAutomatedProcessManagerTEST",
+            "PPUDAutomatedProcessManagerUAT"
+            ]
+        }
+      }
+    },
+    {
+      Effect   = "Allow"
+      Action   = ["ssm:SendCommand", "ec2:DescribeInstances"]
+      Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.account_key]}:instance/*"]
+      Condition = {
+        StringEquals = {
+          "ssm:resourceTag/test_role": ["ses_test_config"]
+        }
+      }
+    }
+  ]
+})
 }
 
 #######################################################################
