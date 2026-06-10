@@ -1,0 +1,49 @@
+###############################################################################
+# AC3a: EBS CSI Driver Validation
+#
+# Auto Mode includes the EBS CSI driver as a built-in component.
+# This test creates a PVC and a pod that writes data to verify the driver
+# provisions and mounts EBS volumes correctly.
+###############################################################################
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: us106-ebs-test
+  namespace: default
+  labels:
+    validation: us-106
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: gp3
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: us106-ebs-writer
+  namespace: default
+  labels:
+    app: us106-ebs-writer
+    validation: us-106
+spec:
+  terminationGracePeriodSeconds: 0
+  containers:
+    - name: writer
+      image: public.ecr.aws/eks-distro/kubernetes/pause:3.7
+      command:
+        - /bin/sh
+        - -c
+        - |
+          echo "US-106 EBS CSI validation - $(date)" > /data/validation.txt
+          echo "Volume mounted and writable" >> /data/validation.txt
+          sleep 3600
+      volumeMounts:
+        - name: ebs-volume
+          mountPath: /data
+  volumes:
+    - name: ebs-volume
+      persistentVolumeClaim:
+        claimName: us106-ebs-test

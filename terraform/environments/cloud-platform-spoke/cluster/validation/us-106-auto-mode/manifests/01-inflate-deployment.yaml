@@ -1,0 +1,33 @@
+###############################################################################
+# AC1: Inflate Deployment — Forces Auto Mode to provision new nodes
+#
+# Each replica requests 1 CPU. Scaling to 10+ replicas will exceed available
+# capacity and trigger Auto Mode's managed Karpenter to provision new nodes.
+###############################################################################
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: us106-inflate
+  namespace: default
+  labels:
+    app: us106-inflate
+    validation: us-106
+spec:
+  replicas: 0  # Start at 0, scale up during test
+  selector:
+    matchLabels:
+      app: us106-inflate
+  template:
+    metadata:
+      labels:
+        app: us106-inflate
+        validation: us-106
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: pause
+          image: public.ecr.aws/eks-distro/kubernetes/pause:3.7
+          resources:
+            requests:
+              cpu: "1"
+              memory: "512Mi"

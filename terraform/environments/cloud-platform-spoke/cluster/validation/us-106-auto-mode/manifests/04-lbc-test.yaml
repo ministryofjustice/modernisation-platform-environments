@@ -1,0 +1,76 @@
+###############################################################################
+# AC3b: AWS Load Balancer Controller Validation
+#
+# Auto Mode includes the AWS LBC as a built-in component.
+# This test creates a simple nginx deployment with an Ingress resource that
+# should trigger ALB provisioning.
+###############################################################################
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: us106-lbc-backend
+  namespace: default
+  labels:
+    app: us106-lbc-backend
+    validation: us-106
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: us106-lbc-backend
+  template:
+    metadata:
+      labels:
+        app: us106-lbc-backend
+        validation: us-106
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: nginx
+          image: public.ecr.aws/nginx/nginx:1.27-alpine
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: us106-lbc-backend
+  namespace: default
+  labels:
+    validation: us-106
+spec:
+  selector:
+    app: us106-lbc-backend
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: us106-lbc-test
+  namespace: default
+  labels:
+    validation: us-106
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internal
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/tags: "validation=us-106,Terraform=false"
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: us106-lbc-backend
+                port:
+                  number: 80
