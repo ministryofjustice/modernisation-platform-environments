@@ -1,7 +1,8 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "example_var": "dev-data",
+      "eks_version": "1.36"
     },
     "test": {
       "example_var": "test-data"
