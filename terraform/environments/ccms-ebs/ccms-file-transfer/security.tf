@@ -58,6 +58,15 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_sftp_security_group_in
   referenced_security_group_id = aws_security_group.sftp_load_balancer.id
 }
 
+resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_sftp_security_group_ingress_rule" {
+  security_group_id = aws_security_group.ecs_tasks_sftp_security_group.id
+
+  ip_protocol                  = "tcp"
+  from_port                    = local.application_data.accounts[local.environment].api_server_port
+  to_port                      = local.application_data.accounts[local.environment].api_server_port
+  referenced_security_group_id = aws_security_group.cluster_ec2.id
+}
+
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_sftp_security_group_egress_rule" {
   security_group_id = aws_security_group.ecs_tasks_sftp_security_group.id
 
