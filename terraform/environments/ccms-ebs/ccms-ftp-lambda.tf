@@ -25,6 +25,7 @@ locals {
   ]
 
   # Folders in the FTP lambda inbound and outbound S3 buckets(ensure trailing slash)
+  # Added SOA Sanbox folder to transfer the laa-ccms-app-soa(composite) git repo via S3 bucket
   target_prefixes = [
     "CCMS_PRD_Allpay/Inbound/",
     "CCMS_PRD_Allpay/Outbound/",
@@ -37,7 +38,8 @@ locals {
     "CCMS_PRD_Rossendales/Inbound/",
     "CCMS_PRD_Rossendales/Outbound/",
     "CCMS_PRD_TDX_DECRYPTED/Inbound/",
-    "outbound-lambda-runs/"
+    "outbound-lambda-runs/",
+    "soa-sandbox/"
   ]
 
   is_production = local.environment == "production"
@@ -203,6 +205,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle" {
 
 
 #--Dynamic blocks for transfer family policy in production only
+#Added SOA Sanbox IAM role permision to transfer the laa-ccms-app-soa(composite) git repo via S3 bucket
 data "aws_iam_policy_document" "inbound_bucket_policy" {
   statement {
     sid    = "Access_for_ccms-ebs_and_soa"
@@ -220,6 +223,7 @@ data "aws_iam_policy_document" "inbound_bucket_policy" {
       type = "AWS"
       identifiers = [
         "arn:aws:iam::${local.environment_management.account_ids["laa-ccms-soa-${local.environment}"]}:role/ccms-soa-ec2-instance-role",
+        "arn:aws:iam::${local.environment_management.account_ids["laa-ccms-soa-${local.environment}"]}:role/ccms-soa-sandbox-development-ec2-instance-role",
         "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/role_stsassume_oracle_base"
       ]
     }
