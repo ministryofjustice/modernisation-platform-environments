@@ -25,6 +25,7 @@ locals {
   ]
 
   # Folders in the FTP lambda inbound and outbound S3 buckets(ensure trailing slash)
+  # Added SOA Sanbox folder to transfer the laa-ccms-app-soa(composite) git repo via S3 bucket
   target_prefixes = [
     "CCMS_PRD_Allpay/Inbound/",
     "CCMS_PRD_Allpay/Outbound/",
@@ -203,6 +204,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle" {
 
 
 #--Dynamic blocks for transfer family policy in production only
+#Added SOA Sanbox IAM role permision to transfer the laa-ccms-app-soa(composite) git repo via S3 bucket
 data "aws_iam_policy_document" "inbound_bucket_policy" {
   statement {
     sid    = "Access_for_ccms-ebs_and_soa"

@@ -1154,6 +1154,7 @@ locals {
       name        = "PPUD-Web-Portal-Server-Security-Group"
       description = "PPUD Web Portal server security group for all environments"
       ingress = [
+        # Note there is an additional ingress rule for port 443 from the ALB in a separate statement
         { port = 80,   cidr = "vpc",       description = "Allow port 80 inbound" },
         { port = 3389, cidr = "vpc",       description = "Allow port 3389 inbound" },
       ]
@@ -1176,9 +1177,37 @@ locals {
         { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
       ]
     }
+    "Document-Service-Server-Security-Group" = {
+      name        = "Document-Service-Server-Security-Group"
+      description = "Document Service server security group for all environments"
+      ingress = [
+        { port = 80,   cidr = "vpc", description = "Allow port 80 inbound" },
+        { port = 445,  cidr = "vpc", description = "Allow port 445 inbound" },
+        { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
+      ]
+      egress = [
+        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",       description = "Allow all outbound (VPC)" },
+        { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
+        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
+      ]
+    }
     "WAM-Web-Portal-Server-Security-Group" = {
       name        = "WAM-Web-Portal-Server-Security-Group"
       description = "WAM Web Portal server security group for all environments"
+      ingress = [
+        # Note there is an additional ingress rule for port 443 from the ALB in a separate statement
+        { port = 80,   cidr = "vpc", description = "Allow port 80 inbound" },
+        { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
+      ]
+      egress = [
+        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",       description = "Allow all outbound (VPC)" },
+        { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
+        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
+      ]
+    }
+    "Certificate-Authority-Server-Security-Group" = {
+      name        = "Certificate-Authority-Server-Security-Group"
+      description = "Certificate Authority server security group for all environments"
       ingress = [
         { port = 80,   cidr = "vpc", description = "Allow port 80 inbound" },
         { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
@@ -1221,7 +1250,7 @@ locals {
       name        = "Team-Foundation-Server-Security-Group"
       description = "Team Foundation Server security group for the development environment"
       ingress = [
-        { port = 8080, cidr = "vpc", description = "Allow port 8080 inbound" },
+        { port = 8080, cidr = "vpc", description = "Allow port 8080 inbound" }, # Port 8080 no longer used, to be removed soon
         { port = 80,   cidr = "vpc", description = "Allow port 80 inbound" },
         { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
         { port = 443,  cidr = "vpc", description = "Allow port 443 inbound" },
@@ -1276,58 +1305,13 @@ locals {
     }
   } : {}
 
-  sg_not_preproduction = !local.is-preproduction ? {
-    "Live-DOC-Server-Security-Group" = {
-      name        = "Live-DOC-Server-Security-Group"
-      description = "Live DOC Server security group for DEV & PROD environments"
-      ingress = [
-        { port = 80,   cidr = "vpc", description = "Allow port 80 inbound" },
-        { port = 445,  cidr = "vpc", description = "Allow port 445 inbound" },
-        { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
-      ]
-      egress = [
-        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",       description = "Allow all outbound (VPC)" },
-        { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
-        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
-      ]
-    }
-    "Archive-DOC-Server-Security-Group" = {
-      name        = "Archive-DOC-Server-Security-Group"
-      description = "Archive DOC Server security group for DEV & PROD environments"
-      ingress = [
-        { port = 80,   cidr = "vpc", description = "Allow port 80 inbound" },
-        { port = 445,  cidr = "vpc", description = "Allow port 445 inbound" },
-        { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
-      ]
-      egress = [
-        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",       description = "Allow all outbound (VPC)" },
-        { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
-        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
-      ]
-    }
-  } : {}
-
   sg_preproduction = local.is-preproduction ? {
-    "UAT-Document-Service-Security-Group" = {
-      name        = "UAT-Document-Service-Security-Group"
+    "Database-and-Document-Service-Security-Group" = {
+      name        = "Database-and-Document-Service-Security-Group"
       description = "Document Service security group for the UAT environment"
       ingress = [
         { port = 80,   cidr = "vpc", description = "Allow port 80 inbound" },
         { port = 1433, cidr = "vpc", description = "Allow port 1433 inbound" },
-        { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
-      ]
-      egress = [
-        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",       description = "Allow all outbound (VPC)" },
-        { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
-        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
-      ]
-    }
-    "UAT-Document-Servers-Security-Group" = {
-      name        = "UAT-Document-Servers-Security-Group"
-      description = "Document Servers security group for the UAT environment"
-      ingress = [
-        { port = 80,   cidr = "vpc", description = "Allow port 80 inbound" },
-        { port = 445,  cidr = "vpc", description = "Allow port 445 inbound" },
         { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
       ]
       egress = [
@@ -1397,7 +1381,6 @@ locals {
   sg_conditional = merge(
     local.sg_development,
     local.sg_not_development,
-    local.sg_not_preproduction,
     local.sg_preproduction,
     local.sg_production,
   )

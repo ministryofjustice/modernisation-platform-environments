@@ -1,30 +1,20 @@
-locals {
-  sqs_transfer_notifications_source_arns = [
-    for rule_key, rule in local.eventbridge_transfer_sftp_upload_rules : module.eventbridge_transfer_upload[rule_key].eventbridge_rule_arns[rule.name]
-  ]
-
-  sqs_guard_duty_malware_protection_for_s3_source_arns = [
-    for rule_key, rule in local.eventbridge_guard_duty_malware_protection_for_s3_rules : module.eventbridge_guard_duty_malware_protection_for_s3[rule_key].eventbridge_rule_arns[rule.name]
-  ]
-}
-
-module "sqs_transfer_notifications" {
+module "sqs_unscanned_s3_notifications" {
   source  = "terraform-aws-modules/sqs/aws"
   version = "5.2.1"
 
-  name            = "${local.application_name}-transfer-notifications"
+  name            = "${local.application_name}-unscanned-s3-notifications"
   use_name_prefix = false
 
   create_queue_policy = true
   queue_policy_statements = {
-    eventbridge = {
-      sid     = "AllowTransferEventBridgeSendMessage"
+    s3 = {
+      sid     = "AllowUnscannedBucketSendMessage"
       actions = ["sqs:SendMessage"]
 
       principals = [
         {
           type        = "Service"
-          identifiers = ["events.amazonaws.com"]
+          identifiers = ["s3.amazonaws.com"]
         }
       ]
 
@@ -32,14 +22,19 @@ module "sqs_transfer_notifications" {
         {
           test     = "ArnEquals"
           variable = "aws:SourceArn"
-          values   = local.sqs_transfer_notifications_source_arns
-        }
+          values   = [module.s3_bucket["unscanned"].s3_bucket_arn]
+        },
+        {
+          test     = "StringEquals"
+          variable = "aws:SourceAccount"
+          values   = [data.aws_caller_identity.current.account_id]
+        },
       ]
     }
   }
 
   create_dlq = true
-  dlq_name   = "${local.application_name}-transfer-notifications-dlq"
+  dlq_name   = "${local.application_name}-unscanned-s3-notifications-dlq"
 
   message_retention_seconds     = 1209600
   visibility_timeout_seconds    = 180
@@ -77,7 +72,9 @@ module "sqs_guard_duty_malware_protection_for_s3_events" {
         {
           test     = "ArnEquals"
           variable = "aws:SourceArn"
-          values   = local.sqs_guard_duty_malware_protection_for_s3_source_arns
+          values = [
+            for rule_key, rule in local.eventbridge_guard_duty_malware_protection_for_s3_rules : module.eventbridge_guard_duty_malware_protection_for_s3[rule_key].eventbridge_rule_arns[rule.name]
+          ]
         }
       ]
     }
