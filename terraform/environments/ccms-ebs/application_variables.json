@@ -360,7 +360,7 @@
       "dbf_device": "nvme3n1",
       "dbf_path": "/CCMS/EBS/dbf",
       "ebs_type_ebsdb_backup": "io2",
-      "ebs_backup_snapshot_id": "",
+      "ebs_backup_snapshot_id": "snap-0fff1126838e1a963",
       "ebs_backup_prod_snapshot_id": "",
       "instance_role_accessgate": "accessgate",
       "instance_role_clamav": "clamav",
