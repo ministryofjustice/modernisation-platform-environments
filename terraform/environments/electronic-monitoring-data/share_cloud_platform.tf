@@ -192,6 +192,65 @@ module "emd_validation_db_role" {
   tags = local.tags
 }
 
+module "emd_update_p1_cp_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  count   = local.is-preproduction || local.is-production ? 1 : 0
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.48.0"
+
+  trusted_role_arns = flatten([
+    data.aws_iam_roles.mod_plat_roles.arns,
+    local.iam_role_ear_sar_db,
+  ])
+
+  create_role       = true
+  role_requires_mfa = false
+
+  role_name = "emd_update_p1_${local.environment_shorthand}"
+
+  tags = local.tags
+}
+
+
+data "aws_iam_policy_document" "em_dashboard_update_p1_permissions" {
+  count = local.is-preproduction ? 1 : 0
+  statement {
+    sid       = "AllowAccessToTriggerUpdateP1API"
+    effect    = "Allow"
+    actions   = ["execute-api:Invoke"]
+    resources = ["arn:aws:execute-api:${data.aws_region.current.name}:${local.env_account_id}:${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*"]
+  }
+  statement {
+    sid       = "ListAccountAliasForEnvironmentClass"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "ListAllBucketsForEnvironmentClass"
+    effect = "Allow"
+    actions = [
+      "s3:ListAllMyBuckets",
+      "s3:GetBucketLocation"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "em_dashboard_update_p1_permissions" {
+  count       = local.is-preproduction ? 1 : 0
+  name_prefix = "em_dashboard_update_p1_permissions"
+  description = "Permissions for updating p1 export."
+  policy      = data.aws_iam_policy_document.em_dashboard_update_p1_permissions[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "em_dashboard_update_p1_permissions" {
+  count      = local.is-preproduction ? 1 : 0
+  policy_arn = aws_iam_policy.em_dashboard_update_p1_permissions[0].arn
+  role       = module.emd_update_p1_cp_role[0].iam_role_name
+}
+
 resource "aws_lakeformation_permissions" "em_data_validation_db" {
   count       = local.is-test || local.is-production ? 1 : 0
   principal   = module.emd_validation_db_role[0].iam_role_arn
