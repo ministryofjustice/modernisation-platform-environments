@@ -29,6 +29,23 @@ module "rds_encryption" {
           identifiers = ["rds.amazonaws.com"]
         }
       ]
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["rds.${data.aws_region.current.region}.amazonaws.com"]
+        },
+        {
+          test     = "StringEquals"
+          variable = "kms:CallerAccount"
+          values   = [data.aws_caller_identity.current.account_id]
+        },
+        {
+          test     = "StringEquals"
+          variable = "aws:SourceArn"
+          values   = ["arn:aws:rds:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:db:${local.component_name}"]
+        }
+      ]
     }
   ]
 
