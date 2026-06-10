@@ -1,4 +1,4 @@
-module "app_rds_kms_key" {
+module "rds_encryption" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git?ref=407e3db34a65b384c20ef718f55d9ceacb97a846" # v4.2.0
 
   description           = "KMS key for app RDS PostgreSQL encryption"

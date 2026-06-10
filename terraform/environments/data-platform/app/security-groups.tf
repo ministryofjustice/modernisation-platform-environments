@@ -4,7 +4,7 @@ resource "aws_security_group" "rds" {
   vpc_id      = data.aws_vpc.eks.id
 }
 
-resource "aws_vpc_security_group_ingress_rule" "rds_eks" {
+resource "aws_vpc_security_group_ingress_rule" "rds_from_eks" {
   security_group_id = aws_security_group.rds.id
   description       = "Allow PostgreSQL access from EKS pods"
   cidr_ipv4         = data.aws_vpc.eks.cidr_block
