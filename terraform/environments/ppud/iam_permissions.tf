@@ -425,6 +425,19 @@ policy = jsonencode({
       Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.account_key]}:instance/*"]
       Condition = {
         StringEquals = {
+          "ssm:resourceTag/ses_service_restart" = [
+            "PPUDAutomatedProcessManagerTEST",
+            "PPUDAutomatedProcessManagerUAT"
+            ]
+        }
+      }
+    },
+    {
+      Effect   = "Allow"
+      Action   = ["ssm:SendCommand", "ec2:DescribeInstances"]
+      Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.account_key]}:instance/*"]
+      Condition = {
+        StringEquals = {
           "ssm:resourceTag/test_role": ["ses_test_config"]
         }
       }
