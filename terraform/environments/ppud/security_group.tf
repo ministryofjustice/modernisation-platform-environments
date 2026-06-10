@@ -1205,6 +1205,19 @@ locals {
         { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
       ]
     }
+    "Certificate-Authority-Server-Security-Group" = {
+      name        = "Certificate-Authority-Server-Security-Group"
+      description = "Certificate Authority server security group for all environments"
+      ingress = [
+        { port = 80,   cidr = "vpc", description = "Allow port 80 inbound" },
+        { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
+      ]
+      egress = [
+        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",       description = "Allow all outbound (VPC)" },
+        { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
+        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
+      ]
+    }
     "PPUD-ALB-Load-Balancer-Security-Group" = {
       name        = "PPUD-ALB-Load-Balancer-Security-Group"
       description = "PPUD ALB load balancer security group for all environments"
