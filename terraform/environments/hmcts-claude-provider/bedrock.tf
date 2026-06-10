@@ -59,6 +59,15 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
         Resource = "*"
       },
       {
+        Sid    = "BedrockAccountDataRetention",
+        Effect = "Allow",
+        Action = [
+          "bedrock:GetAccountDataRetention",
+          "bedrock:PutAccountDataRetention"
+        ],
+        Resource = "*"
+      },
+      {
         Sid    = "BedrockInferenceProfileManagement",
         Effect = "Allow",
         Action = [
