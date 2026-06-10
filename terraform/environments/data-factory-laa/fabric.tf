@@ -2,7 +2,7 @@
 # exposed to Microsoft Fabric via OneLake S3 shortcuts.
 
 module "fabric_oidc_provider" {
-  count  = local.is-development ? 1 : 0
+  count  = local.fabric_oidc_enabled ? 1 : 0
   source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/fabric-oidc-provider?ref=c770ed02f420a0c66744189ad9818a9cf03e92a4"
 
   tenant_id          = local.fabric_tenant_id
@@ -12,7 +12,7 @@ module "fabric_oidc_provider" {
 # Curated S3 bucket exposed to Microsoft Fabric via OneLake shortcuts.
 # TODO: Use KMS key for encryption.
 module "fabric_curated_bucket" {
-  count  = local.is-development ? 1 : 0
+  count  = local.fabric_oidc_enabled ? 1 : 0
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=ce9c0c07489e393ce80441aed0fd5bf7798956a3"
 
   bucket_prefix      = "laa-data-factory-curated"
@@ -30,7 +30,7 @@ module "fabric_curated_bucket" {
 }
 
 module "fabric_iam_role" {
-  count  = local.is-development ? 1 : 0
+  count  = local.fabric_oidc_enabled ? 1 : 0
   source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/fabric-iam-role?ref=c770ed02f420a0c66744189ad9818a9cf03e92a4"
 
   object_id                          = local.fabric_enterprise_app_object_id
