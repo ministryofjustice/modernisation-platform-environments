@@ -48,6 +48,7 @@
       "python_runtime": "python3.12",
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? 2999)",
       "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)",
+      "ftp_sftp_port": "22",
       "max_string_size": "EXTENDED"
     },
 
@@ -99,6 +100,7 @@
       "python_runtime": "python3.12",
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? 2999)",
       "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)",
+      "ftp_sftp_port": "22",
       "max_string_size": "EXTENDED"
     },
     "preproduction": {
@@ -149,6 +151,7 @@
       "python_runtime": "python3.12",
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? 2999)",
       "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)",
+      "ftp_sftp_port": "22",
       "max_string_size": "EXTENDED"
     },
 
@@ -200,6 +203,7 @@
       "python_runtime": "python3.12",
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? *)",
       "zip_lambda_eventbridge_cron": "cron(45 6 * * ? *)",
+      "ftp_sftp_port": "22",
       "max_string_size": "STANDARD"
     }
   }

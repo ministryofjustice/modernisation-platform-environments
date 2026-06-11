@@ -12,6 +12,7 @@ locals {
     insecure       = "YES"
     ftp_file_types = "zip"
     file_remove    = "YES"
+    ftp_port       = local.ftp_sftp_port
     cron_rule      = local.application_data.accounts[local.environment].ftp_lambda_eventbridge_cron
   }
 
@@ -252,9 +253,8 @@ resource "aws_security_group" "ftp_lambda" {
 
   egress {
     description = "Allow SFTP outbound"
-    # Port must be a static value — Terraform evaluates security group rules at plan time and cannot read runtime secrets.
-    from_port   = 22
-    to_port     = 22
+    from_port   = tonumber(local.ftp_job.ftp_port)
+    to_port     = tonumber(local.ftp_job.ftp_port)
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
