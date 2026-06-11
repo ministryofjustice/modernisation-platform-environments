@@ -1,4 +1,5 @@
 module "vpc" {
+  count   = terraform.workspace == "cloud-platform-development" ? 0 : 1
   version = "6.5.1"
   source  = "terraform-aws-modules/vpc/aws"
 
