@@ -136,6 +136,22 @@ data "aws_vpc_endpoint" "api_gateway" {
   }
 }
 
+resource "aws_security_group" "allow_cp_access" {
+  name        = "allow_cp_access"
+  description = "allow cp access"
+  vpc_id      = aws_vpc.core-vpc
+  tags        = local.tags
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_cp_access" {
+  security_group_id = aws_security_group.allow_cp_access.id
+
+  cidr_ipv4   = "172.20.0.0/16"
+  from_port   = 443
+  ip_protocol = "tcp"
+  to_port     = 443
+}
+
 data "aws_iam_policy_document" "update_p1_export_vpc" {
   count = local.is-test || local.is-development ? 0 : 1
   statement {
