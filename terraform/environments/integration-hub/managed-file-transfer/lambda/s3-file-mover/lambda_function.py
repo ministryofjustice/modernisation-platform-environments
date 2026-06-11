@@ -29,22 +29,31 @@ idempotency_config = IdempotencyConfig(
 
 def iter_records(event):
     if "Records" not in event:
-        yield event
+        yield {"payload": event, "sqs_message_id": None}
         return
 
     for record in event["Records"]:
         if "body" not in record:
-            yield record
+            yield {
+                "payload": record,
+                "sqs_message_id": record.get("messageId"),
+            }
             continue
 
         payload = json.loads(record["body"])
 
         if "Records" in payload:
             for nested_record in payload["Records"]:
-                yield nested_record
+                yield {
+                    "payload": nested_record,
+                    "sqs_message_id": record.get("messageId"),
+                }
             continue
 
-        yield payload
+        yield {
+            "payload": payload,
+            "sqs_message_id": record.get("messageId"),
+        }
 
 
 def is_s3_test_event(record):
@@ -70,15 +79,18 @@ def get_log_fields(operation):
         "object_key": source_key.rsplit("/", 1)[-1],
         "object_key_path_hash": hashlib.sha256(source_key.encode("utf-8")).hexdigest()[:LOG_KEY_PATH_HASH_LENGTH],
         "source_bucket_name": operation["source_bucket_name"],
+        "source_version_id": operation["source_version_id"],
         "destination_bucket_name": operation["destination_bucket_name"],
+        "sqs_message_id": operation.get("sqs_message_id"),
     }
 
 
-def get_s3_test_event_log_fields(record):
+def get_s3_test_event_log_fields(record, sqs_message_id):
     return {
         "event_name": record.get("Event"),
         "event_service": record.get("Service"),
         "source_bucket_name": record.get("Bucket"),
+        "sqs_message_id": sqs_message_id,
     }
 
 
@@ -135,18 +147,21 @@ def process_record(*, operation):
 def lambda_handler(event, context):
     idempotency_config.register_lambda_context(context)
 
-    for record in iter_records(event):
+    for record_wrapper in iter_records(event):
+        record = record_wrapper["payload"]
+        sqs_message_id = record_wrapper["sqs_message_id"]
         operation = None
 
         try:
             if is_s3_test_event(record):
                 logger.info(
                     "Received S3 notification test event",
-                    extra=get_s3_test_event_log_fields(record),
+                    extra=get_s3_test_event_log_fields(record, sqs_message_id),
                 )
                 continue
 
             operation = normalise_record(record)
+            operation["sqs_message_id"] = sqs_message_id
             process_record(operation=operation)
         except Exception:
             logger.exception(

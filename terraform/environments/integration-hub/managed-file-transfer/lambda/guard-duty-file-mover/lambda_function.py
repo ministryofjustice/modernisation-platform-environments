@@ -31,15 +31,21 @@ idempotency_config = IdempotencyConfig(
 
 def iter_events(event):
     if "Records" not in event:
-        yield event
+        yield {"payload": event, "sqs_message_id": None}
         return
 
     for record in event["Records"]:
         if "body" not in record:
-            yield record
+            yield {
+                "payload": record,
+                "sqs_message_id": record.get("messageId"),
+            }
             continue
 
-        yield json.loads(record["body"])
+        yield {
+            "payload": json.loads(record["body"]),
+            "sqs_message_id": record.get("messageId"),
+        }
 
 
 def get_object_details(event):
@@ -135,7 +141,9 @@ def get_log_fields(operation):
         "object_key": source_key.rsplit("/", 1)[-1],
         "object_key_path_hash": hashlib.sha256(source_key.encode("utf-8")).hexdigest()[:LOG_KEY_PATH_HASH_LENGTH],
         "source_bucket_name": operation["source_bucket_name"],
+        "source_version_id": operation["source_version_id"],
         "destination_bucket_name": operation["destination_bucket_name"],
+        "sqs_message_id": operation.get("sqs_message_id"),
     }
 
 
@@ -195,11 +203,14 @@ def process_record(*, operation):
 def lambda_handler(event, context):
     idempotency_config.register_lambda_context(context)
 
-    for payload in iter_events(event):
+    for payload_wrapper in iter_events(event):
+        payload = payload_wrapper["payload"]
+        sqs_message_id = payload_wrapper["sqs_message_id"]
         operation = None
 
         try:
             operation = normalise_payload(payload)
+            operation["sqs_message_id"] = sqs_message_id
             process_record(operation=operation)
         except Exception:
             logger.exception(
