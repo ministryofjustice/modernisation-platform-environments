@@ -122,6 +122,73 @@ resource "aws_iam_role_policy" "cloudwatch" {
 # --------------------------------------------------------------------------------
 # update_p1_export
 # --------------------------------------------------------------------------------
+locals {
+  endpoint_type = local.is-development ? {"REGIONAL": null} : {"PRIVATE": data.aws_vpc_endpoint.api_gateway.cidr_blocks}
+}
+
+
+data "aws_vpc_endpoint" "api_gateway" {
+  provider     = aws.core-vpc
+  service_name = "com.amazonaws.eu-west-2.execute-api"
+  vpc_id       = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-com.amazonaws.${data.aws_region.current.name}.execute-api"
+  }
+}
+
+resource "aws_security_group" "allow_cp_access" {
+  name        = "allow_cp_access"
+  description = "allow cp access"
+  vpc_id      = data.aws_vpc.shared.id
+  tags        = local.tags
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_cp_access" {
+  security_group_id = aws_security_group.allow_cp_access.id
+
+  cidr_ipv4   = "172.20.0.0/16"
+  from_port   = 443
+  ip_protocol = "tcp"
+  to_port     = 443
+}
+
+data "aws_iam_policy_document" "update_p1_export_vpc" {
+  count = local.is-test || local.is-development ? 0 : 1
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = [module.emd_update_p1_cp_role[0].iam_role_arn]
+    }
+
+    actions   = ["execute-api:Invoke"]
+    resources = ["${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*"]
+  }
+  statement {
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions   = ["execute-api:Invoke"]
+    condition {
+      test = "StringNotEquals"
+      variable = "aws:sourceVpce"
+      values = [
+        data.aws_vpc_endpoint.api_gateway.id
+      ]
+    }
+    resources = ["${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*"]
+  }
+}
+
+resource "aws_api_gateway_rest_api_policy" "update_p1_export_vpc" {
+  count = local.is-test || local.is-development ? 0 : 1
+  rest_api_id = aws_api_gateway_rest_api.update_p1_export[0].id
+  policy      = data.aws_iam_policy_document.update_p1_export_vpc[0].json
+}
+
 
 resource "aws_api_gateway_rest_api" "update_p1_export" {
   count       = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
@@ -131,6 +198,12 @@ resource "aws_api_gateway_rest_api" "update_p1_export" {
   lifecycle {
     create_before_destroy = true
   }
+
+endpoint_configuration {
+  types            = [local.is-development ? "REGIONAL" : "PRIVATE"]
+  vpc_endpoint_ids = local.is-development ? null : [data.aws_vpc_endpoint.api_gateway.id]
+  ip_address_type  = local.is-development ? null : "dualstack"
+}
 }
 
 resource "aws_api_gateway_resource" "update_p1_export_add" {
@@ -332,4 +405,37 @@ resource "aws_cloudwatch_log_group" "update_p1_export_waf_log_group" {
 
   name              = "aws-waf-logs-update_p1_export"
   retention_in_days = 400
+}
+
+resource "aws_api_gateway_method_response" "add_response_200" {
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.update_p1_export[0].id
+  resource_id = aws_api_gateway_resource.update_p1_export_add[0].id
+  http_method = aws_api_gateway_method.update_p1_export_add_post[0].http_method
+  status_code = "200"
+}
+
+resource "aws_api_gateway_method_response" "add_status_404" {
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.update_p1_export[0].id
+  resource_id = aws_api_gateway_resource.update_p1_export_add[0].id
+  http_method = aws_api_gateway_method.update_p1_export_add_post[0].http_method
+  status_code = "404"
+}
+
+resource "aws_api_gateway_method_response" "remove_response_200" {
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.update_p1_export[0].id
+  resource_id = aws_api_gateway_resource.update_p1_export_remove[0].id
+  http_method = aws_api_gateway_method.update_p1_export_remove_post[0].http_method
+  status_code = "200"
+}
+
+
+resource "aws_api_gateway_method_response" "remove_status_404" {
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.update_p1_export[0].id
+  resource_id = aws_api_gateway_resource.update_p1_export_remove[0].id
+  http_method = aws_api_gateway_method.update_p1_export_remove_post[0].http_method
+  status_code = "404"
 }

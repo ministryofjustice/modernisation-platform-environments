@@ -45,7 +45,7 @@ resource "aws_iam_role_policy" "lambda_process_file_from_bucket_policy" {
       },
       {
         "Effect" : "Allow",
-        "Action" : ["secretsmanager:GetSecretValue"],
+        "Action" : ["secretsmanager:GetSecretValue","secretsmanager:DescribeSecret","secretsmanager:ListSecretVersionIds"],
         "Resource" : ["${aws_secretsmanager_secret.sftp_bc_lambda_secrets.id}"]
       },
       {
@@ -63,7 +63,7 @@ resource "aws_lambda_function" "process_file_from_bucket_lambda_function" {
   role          = aws_iam_role.lambda_process_file_from_bucket_role.arn
   handler       = "example.HelloWorldHandler"
   runtime       = "java25"
-  timeout       = 30
+  timeout       = 60
   publish       = true
 
   vpc_config {
@@ -74,13 +74,19 @@ resource "aws_lambda_function" "process_file_from_bucket_lambda_function" {
   environment {
     variables = {
       # This secret now contains slack_channel_webhook, slack_channel_webhook_guardduty, slack_channel_webhook_s3
-      SECRET_NAME = aws_secretsmanager_secret.sftp_bc_lambda_secrets.name
+      SECRET_NAME = aws_secretsmanager_secret.sftp_bc_lambda_secrets.arn
     }
   }
 
   tags = merge(local.tags, {
     Name = "${local.application_name}-${local.environment}-process-file-from-bucket"
   })
+
+  lifecycle {
+    ignore_changes = [
+      source_code_hash, filename, handler, qualified_arn, qualified_invoke_arn, version
+    ]
+  }
 }
 
 resource "aws_lambda_permission" "allow_s3_invoke" {
