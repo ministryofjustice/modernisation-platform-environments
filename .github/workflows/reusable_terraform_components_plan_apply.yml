@@ -32,6 +32,10 @@
             required: false
             description: "Set to true to do a state refresh prior to the plan"
             default: false
+          account_name:
+            type: string
+            required: false
+            description: "Optional: account name override for ACCOUNT_NAME env var."
           post_plan_to_pr:
             type: boolean
             required: false
@@ -49,7 +53,7 @@
             required: true
 
     env:
-      ACCOUNT_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
+      ACCOUNT_NAME: "${{ inputs.account_name || format('{0}-{1}', inputs.application, inputs.environment) }}"
       WORKSPACE_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
       SKIP_PLAN_EVALUATOR: '["cloud-platform-development", "cloud-platform-preproduction", "cloud-platform-nonlive", "cloud-platform-live", "data-platform-development", "data-platform-test", "data-platform-preproduction", "data-platform-production", "laa-workspaces-development", "laa-new-workspaces-development"]'
     permissions:
@@ -74,6 +78,7 @@
             run: |
               echo "application=${{ inputs.application }}"
               echo "environment=${{ inputs.environment }}"
+              echo "account_name=${{ inputs.account_name }}"
               echo "action=${{ inputs.action }}"
               echo "plan_apply_tfargs=${{ inputs.plan_apply_tfargs }}"
               echo "do_state_refresh_on_plan=${{ inputs.do_state_refresh_on_plan }}"
