@@ -347,12 +347,14 @@ resource "aws_cloudwatch_event_rule" "last_day_of_month" {
 }
 
 resource "aws_cloudwatch_event_target" "step_function_target" {
-  count     = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
-  rule      = aws_cloudwatch_event_rule.last_day_of_month.name
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+
+  rule      = aws_cloudwatch_event_rule.last_day_of_month[0].name
   target_id = "TriggerStepFunction"
 
-  arn      = module.gdpr_deletion_step_function[0].arn
-  role_arn = aws_iam_role.eventbridge_to_gdpr_step_function.arn
+  arn = module.gdpr_deletion_step_function[0].arn
+
+  role_arn = aws_iam_role.eventbridge_to_gdpr_step_function[0].arn
 
   depends_on = [
     module.gdpr_deletion_step_function
@@ -394,7 +396,8 @@ resource "aws_iam_policy" "eventbridge_to_gdpr_sfn_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "eventbridge_sfn_attach" {
-  count      = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
-  role       = aws_iam_role.eventbridge_to_gdpr_step_function.name
-  policy_arn = aws_iam_policy.eventbridge_to_gdpr_sfn_policy.arn
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+
+  role       = aws_iam_role.eventbridge_to_gdpr_step_function[0].name
+  policy_arn = aws_iam_policy.eventbridge_to_gdpr_sfn_policy[0].arn
 }
