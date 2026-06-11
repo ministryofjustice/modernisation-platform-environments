@@ -141,7 +141,7 @@ resource "aws_route" "private_a_to_nat" {
 # }
 
 ##############################################
-### Route Table for Firewall Subnets
+### Route Table for Firewall Subnets -firewall to Internet Gateway
 ##############################################
 
 resource "aws_route_table" "firewall" {
@@ -151,7 +151,7 @@ resource "aws_route_table" "firewall" {
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.main[0].id
+    nat_gateway_id = aws_internet_gateway.main[0].id
   }
 
   tags = merge(
