@@ -67,20 +67,30 @@ resource "aws_iam_role_policy_attachment" "datasync_s3_attach" {
 # -----------------------------------------------------------------------------
 resource "aws_datasync_location_s3" "source" {
   s3_bucket_arn = module.s3-create-a-derived-table-bucket.bucket.arn
-  subdirectory  = "staging/" 
+  subdirectory  = "/staging/" 
   
   s3_config {
     bucket_access_role_arn = aws_iam_role.datasync_s3_role.arn
   }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.datasync_s3_attach,
+    module.s3-create-a-derived-table-bucket
+  ]
 }
 
 resource "aws_datasync_location_s3" "destination" {
   s3_bucket_arn = module.s3-create-a-derived-table-back-up-bucket-staging.bucket.arn
-  subdirectory  = "staging/"
+  subdirectory  = "/staging/"
   
   s3_config {
     bucket_access_role_arn = aws_iam_role.datasync_s3_role.arn
   }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.datasync_s3_attach,
+    module.s3-create-a-derived-table-back-up-bucket-staging
+  ]
 }
 
 # -----------------------------------------------------------------------------
@@ -104,22 +114,20 @@ resource "aws_datasync_task" "historic_replication" {
     # CHANGED ensures it only scans and syncs modifications
     transfer_mode = "CHANGED"
 
-    # Keeps standard metadata intact
+    verify_mode = "ONLY_FILES_TRANSFERRED"
+    log_level = "TRANSFERRING"
+
     posix_permissions = "NONE"
     uid               = "NONE"
     gid               = "NONE"
   }
 }
 
-# -----------------------------------------------------------------------------
-# CloudWatch Logs for Monitoring the Task
-# -----------------------------------------------------------------------------
 resource "aws_cloudwatch_log_group" "datasync_logs" {
   name              = "/aws/datasync/historic-data-monthly-sync"
   retention_in_days = 14
 }
 
-# Allow DataSync to write to the CloudWatch log group
 resource "aws_cloudwatch_log_resource_policy" "datasync_logs_policy" {
   policy_name     = "datasync-logs-policy"
   policy_document = jsonencode({
