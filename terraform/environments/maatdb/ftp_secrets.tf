@@ -56,4 +56,13 @@ resource "aws_secretsmanager_secret_version" "ftp_jobs_secret_values" {
   secret_string = jsonencode({
     organisation_id = "CHANGE_ME_IN_THE_CONSOLE"
   })
+  lifecycle {
+    # Prevent Terraform from overwriting secret values that are managed manually in the AWS console.
+    ignore_changes = [secret_string]
+  }
+}
+
+data "aws_secretsmanager_secret_version" "ftp_jobs_secret_version" {
+  secret_id  = aws_secretsmanager_secret.ftp_jobs_secret.id
+  depends_on = [aws_secretsmanager_secret_version.ftp_jobs_secret_values]
 }

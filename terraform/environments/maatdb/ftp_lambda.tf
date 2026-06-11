@@ -252,6 +252,7 @@ resource "aws_security_group" "ftp_lambda" {
 
   egress {
     description = "Allow SFTP outbound"
+    # Port must be a static value — Terraform evaluates security group rules at plan time and cannot read runtime secrets.
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
@@ -299,6 +300,7 @@ resource "aws_lambda_function" "ftp" {
   memory_size      = 512
   timeout          = 300
   filename         = data.archive_file.ftp_lambda_zip.output_path
+  # source_code_hash ensures Lambda is only redeployed when the Python source file actually changes.
   source_code_hash = data.archive_file.ftp_lambda_zip.output_base64sha256
 
   reserved_concurrent_executions = 1
@@ -322,7 +324,7 @@ resource "aws_lambda_function" "ftp" {
       INSECURE     = local.ftp_job.insecure
       S3BUCKET     = local.ftp_job.bucket_name
       FILEREMOVE   = local.ftp_job.file_remove
-      SECRET_NAME  = aws_secretsmanager_secret.ftp_jobs_secret.name
+      SECRET_NAME  = data.aws_secretsmanager_secret_version.ftp_jobs_secret_version.arn
     }
   }
 }

@@ -42,11 +42,11 @@ if _secret_name:
 
             # Support flat JSON: {"HOST":"...","USER":"...","PASSWORD":"...","PORT":"22","REMOTEPATH":"/upload/"}
             if isinstance(parsed, dict):
-                host = parsed.get('HOST') or parsed.get('host') or parsed.get('host_address')
-                user = parsed.get('USER') or parsed.get('user') or parsed.get('username')
-                password = parsed.get('PASSWORD') or parsed.get('password')
-                port = parsed.get('PORT') or parsed.get('port')
-                remotePath = parsed.get('REMOTEPATH') or parsed.get('remotepath') or parsed.get('remote_path')
+                host = parsed.get('HOST')
+                user = parsed.get('USER')
+                password = parsed.get('PASSWORD')
+                port = parsed.get('PORT')
+                remotePath = parsed.get('REMOTEPATH')
 
             # Support older maatdb array format: [{"name":"xerox-outbound","type":"username","value":"user"}, ...]
             elif isinstance(parsed, list):
@@ -71,17 +71,6 @@ if _secret_name:
     except Exception as e:
         logger.exception('Unable to retrieve secret from Secrets Manager: %s', str(e))
 
-# Fallback to environment variables if any value is still missing
-if not host:
-    host = os.environ.get('HOST')
-if not user:
-    user = os.environ.get('USER')
-if not password:
-    password = os.environ.get('PASSWORD')
-if not port:
-    port = os.environ.get('PORT')
-if not remotePath:
-    remotePath = os.environ.get('REMOTEPATH')
 certPath = os.environ['LAMBDA_TASK_ROOT'] + "/certs/"
 # SFTP related
 ssh_key = os.environ.get('SSH_KEY')
