@@ -1063,5 +1063,6 @@ module "gdpr_unstructured_control_lambda" {
     ENVIRONMENT_BUCKET          = module.s3-data-bucket.bucket.id
     GDPR_AUDIT_BUCKET           = module.s3-gdpr-audit-bucket.bucket.id
     ATHENA_QUERY_RESULTS_BUCKET = module.s3-athena-bucket.bucket.id
+    ENVIRONMENT_NAME            = local.environment_shorthand
   }
 }
