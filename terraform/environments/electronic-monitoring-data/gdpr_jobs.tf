@@ -340,17 +340,19 @@ resource "aws_ecs_task_definition" "emds-gdpr-iceberg-table-maintenance" {
 }
 
 resource "aws_cloudwatch_event_rule" "last_day_of_month" {
+  count               = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   name                = "trigger-gdpr-step-function-last-day"
   description         = "Triggers the gdpr step function on the last day of every month at midnight UTC"
   schedule_expression = "cron(0 0 L * ? *)" # "L" stands for Last day of the month
 }
 
 resource "aws_cloudwatch_event_target" "step_function_target" {
+  count     = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   rule      = aws_cloudwatch_event_rule.last_day_of_month.name
   target_id = "TriggerStepFunction"
-  
-  arn       = module.gdpr_deletion_step_function[0].arn 
-  role_arn  = aws_iam_role.eventbridge_to_gdpr_step_function.arn
+
+  arn      = module.gdpr_deletion_step_function[0].arn
+  role_arn = aws_iam_role.eventbridge_to_gdpr_step_function.arn
 
   depends_on = [
     module.gdpr_deletion_step_function
@@ -358,7 +360,8 @@ resource "aws_cloudwatch_event_target" "step_function_target" {
 }
 
 resource "aws_iam_role" "eventbridge_to_gdpr_step_function" {
-  name = "eventbridge-to-gdpr-step-function-role"
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  name  = "eventbridge-to-gdpr-step-function-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -375,7 +378,8 @@ resource "aws_iam_role" "eventbridge_to_gdpr_step_function" {
 }
 
 resource "aws_iam_policy" "eventbridge_to_gdpr_sfn_policy" {
-  name = "eventbridge-to-gdpr-step-function-policy"
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  name  = "eventbridge-to-gdpr-step-function-policy"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -390,6 +394,7 @@ resource "aws_iam_policy" "eventbridge_to_gdpr_sfn_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "eventbridge_sfn_attach" {
+  count      = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   role       = aws_iam_role.eventbridge_to_gdpr_step_function.name
   policy_arn = aws_iam_policy.eventbridge_to_gdpr_sfn_policy.arn
 }
