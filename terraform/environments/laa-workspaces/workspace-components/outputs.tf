@@ -116,3 +116,42 @@ output "ses_sender_email" {
   description = "SES verified sender email address"
   value       = local.environment == "development" ? "no-reply@${aws_ses_domain_identity.workspaces[0].domain}" : null
 }
+
+##############################################
+### ECS / LinOTP 3.x Outputs
+##############################################
+
+output "ecr_linotp3_repository_url" {
+  description = "ECR repository URL for LinOTP 3.x image"
+  value       = try(aws_ecr_repository.linotp3[0].repository_url, null)
+}
+
+output "ecr_freeradius_repository_url" {
+  description = "ECR repository URL for FreeRADIUS + LinOTP Perl module image"
+  value       = try(aws_ecr_repository.freeradius_linotp[0].repository_url, null)
+}
+
+output "ecs_cluster_name" {
+  description = "ECS cluster name"
+  value       = try(aws_ecs_cluster.workspaces[0].name, null)
+}
+
+output "ecs_linotp3_service_name" {
+  description = "ECS service name for LinOTP 3.x + FreeRADIUS"
+  value       = try(aws_ecs_service.linotp3[0].name, null)
+}
+
+output "rds_linotp3_endpoint" {
+  description = "RDS MySQL endpoint for LinOTP 3.x"
+  value       = try(aws_db_instance.linotp3[0].address, null)
+}
+
+output "nlb_radius_ecs_dns_name" {
+  description = "Internal NLB DNS name for ECS FreeRADIUS — use this to switch Directory Service RADIUS when ready"
+  value       = try(aws_lb.radius_ecs[0].dns_name, null)
+}
+
+output "linotp3_portal_url" {
+  description = "URL of the LinOTP 3.x MFA portal (ECS parallel deployment)"
+  value       = try("https://workspace-mfa-ecs.${trimsuffix(data.aws_route53_zone.external.name, ".")}", null)
+}
