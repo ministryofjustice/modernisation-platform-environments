@@ -80,28 +80,6 @@ resource "aws_subnet" "firewall_b" {
 ### Route Tables for Private Subnets
 ##############################################
 
-# resource "aws_route_table" "private_a" {
-#   count = local.environment == "development" ? 1 : 0
-
-#   vpc_id = aws_vpc.workspaces[0].id
-
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "${local.application_name}-${local.environment}-private-eu-west-2a-rt" }
-#   )
-# }
-
-# resource "aws_route_table" "private_b" {
-#   count = local.environment == "development" ? 1 : 0
-
-#   vpc_id = aws_vpc.workspaces[0].id
-
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "${local.application_name}-${local.environment}-private-eu-west-2b-rt" }
-#   )
-# }
-
 
 
 resource "aws_route_table" "private" {
