@@ -2,7 +2,6 @@ locals {
   mp_environments = [
     "cloud-platform-development",
     "cloud-platform-preproduction",
-    "cloud-platform-nonlive",
     "cloud-platform-live",
   ]
   enabled_workspaces  = ["development_cluster"]
@@ -10,16 +9,13 @@ locals {
   cp_vpc_name         = terraform.workspace
   cp_vpc_cidr = {
     development_cluster = "10.0.0.0/16"
-    development         = "10.1.0.0/16"
     preproduction       = "10.2.0.0/16"
-    nonlive             = "10.195.0.0/16"
     live                = "10.41.0.0/16"
   }
 
   vpc_cidr = {
     cloud-platform-development   = "10.195.32.0/20"
     cloud-platform-preproduction = "10.195.16.0/20"
-    cloud-platform-nonlive       = "10.0.0.0/20"
     cloud-platform-live          = "10.195.0.0/20"
   }
 
