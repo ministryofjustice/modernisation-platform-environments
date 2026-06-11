@@ -60,7 +60,7 @@
       id-token: write
       contents: read
     concurrency:
-      group: ${{ inputs.application }}-${{ inputs.environment }}-${{ inputs.component }}
+      group: ${{ inputs.account_name && format('{0}-{1}', inputs.account_name, inputs.component) || format('{0}-{1}-{2}', inputs.application, inputs.environment, inputs.component) }}
     jobs:
       fetch-secrets:
         uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
