@@ -1,7 +1,7 @@
 resource "aws_subnet" "eks_private" {
-  count = 3
+  count = terraform.workspace == "cloud-platform-development" ? 0 : 3
 
-  vpc_id                  = module.vpc.vpc_id
+  vpc_id                  = module.vpc[0].vpc_id
   cidr_block              = cidrsubnet(lookup(local.cp_vpc_cidr, local.cluster_environment), 3, count.index + 4)
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   map_public_ip_on_launch = false
@@ -17,8 +17,8 @@ resource "aws_subnet" "eks_private" {
 }
 
 resource "aws_route_table_association" "eks_private" {
-  count = 3
+  count = terraform.workspace == "cloud-platform-development" ? 0 : 3
 
   subnet_id      = aws_subnet.eks_private[count.index].id
-  route_table_id = module.vpc.private_route_table_ids[count.index]
+  route_table_id = module.vpc[0].private_route_table_ids[count.index]
 }

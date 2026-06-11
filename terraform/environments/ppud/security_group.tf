@@ -7,6 +7,7 @@
 # PPUD Web Portal Group
 
 resource "aws_security_group" "PPUD-WEB-Portal" {
+  # checkov:skip=CKV2_AWS_5: "Security group will be updated or removed in the near term, so this finding can be ignored for now."
   vpc_id      = data.aws_vpc.shared.id
   name        = "PPUD-WEB-Portal"
   description = "PPUD-WEB-Portal for Dev, UAT & PROD"
@@ -79,6 +80,7 @@ resource "aws_security_group_rule" "PPUD-WEB-Portal-egress-2" {
 # WAM Data Access Server Group
 
 resource "aws_security_group" "WAM-Data-Access-Server" {
+  # checkov:skip=CKV2_AWS_5: "Security group will be updated or removed in the near term, so this finding can be ignored for now."
   lifecycle {
     create_before_destroy = true
   }
@@ -144,6 +146,7 @@ resource "aws_security_group_rule" "WAM-Data-Access-Server-Egress-2" {
 # WAM Portal Group
 
 resource "aws_security_group" "WAM-Portal" {
+  # checkov:skip=CKV2_AWS_5: "Security group will be updated or removed in the near term, so this finding can be ignored for now."
   vpc_id      = data.aws_vpc.shared.id
   name        = "WAM-Portal"
   description = "WAM-Portal for Dev, UAT & PROD"
@@ -216,6 +219,7 @@ resource "aws_security_group_rule" "WAM-Portal-egress-2" {
 # Foundation Server Portal Group
 
 resource "aws_security_group" "SCR-Team-Foundation-Server" {
+  # checkov:skip=CKV2_AWS_5: "Security group will be updated or removed in the near term, so this finding can be ignored for now."
   count       = local.is-development == true ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
   name        = "TFS Server"
@@ -306,6 +310,7 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Egress-2" {
 # Developer Servers Standard Group
 
 resource "aws_security_group" "Dev-Servers-Standard" {
+  # checkov:skip=CKV2_AWS_5: "Security group will be updated or removed in the near term, so this finding can be ignored for now."
   count       = local.is-development == true ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
   name        = "Dev-Servers-Standard"
@@ -374,6 +379,7 @@ resource "aws_security_group_rule" "Dev-Servers-Standard-Egress-2" {
 # Production
 
 resource "aws_security_group" "Live-DOC-Server" {
+  # checkov:skip=CKV2_AWS_5: "Security group will be updated or removed in the near term, so this finding can be ignored for now."
   count       = local.is-preproduction == false ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
   name        = "Live-DOC-Server"
@@ -451,6 +457,7 @@ resource "aws_security_group_rule" "Live-DOC-Server-Egress-2" {
 }
 
 resource "aws_security_group" "Archive-DOC-Server" {
+  # checkov:skip=CKV2_AWS_5: "Security group will be updated or removed in the near term, so this finding can be ignored for now."
   count       = local.is-preproduction == false ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
   name        = "Archive-DOC-Server"
@@ -528,6 +535,7 @@ resource "aws_security_group_rule" "Archive-DOC-Server-Egress-2" {
 }
 
 resource "aws_security_group" "PPUD-Database-Server" {
+  # checkov:skip=CKV2_AWS_5: "Security group will be updated or removed in the near term, so this finding can be ignored for now."
   count       = local.is-development == true ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
   name        = "Dev-Database-Server"
@@ -594,6 +602,7 @@ resource "aws_security_group_rule" "PPUD-Database-Server-Egress-2" {
 }
 
 resource "aws_security_group" "PPUD-ALB" {
+  # checkov:skip=CKV2_AWS_5: "Security group will be updated or removed in the near term, so this finding can be ignored for now."
   vpc_id      = data.aws_vpc.shared.id
   name        = "PPUD-ALB"
   description = "PPUD-ALB"
@@ -634,6 +643,7 @@ resource "aws_security_group_rule" "PPUD-ALB-Egress-1" {
 }
 
 resource "aws_security_group" "WAM-ALB" {
+  # checkov:skip=CKV2_AWS_5: "Security group will be updated or removed in the near term, so this finding can be ignored for now."
   vpc_id      = data.aws_vpc.shared.id
   name        = "WAM-ALB"
   description = "WAM-ALB"
@@ -673,6 +683,7 @@ resource "aws_security_group_rule" "WAM-ALB-Egress-1" {
 }
 
 resource "aws_security_group" "Bridge-Server" {
+  # checkov:skip=CKV2_AWS_5: "Security group will be updated or removed in the near term, so this finding can be ignored for now."
   count       = local.is-development == false ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
   name        = "UAT-Bridge-Server"
@@ -738,6 +749,7 @@ resource "aws_security_group_rule" "UAT-Bridge-Server-Egress-2" {
 }
 
 resource "aws_security_group" "UAT-Document-Service" {
+  # checkov:skip=CKV2_AWS_5: "Security group will be updated or removed in the near term, so this finding can be ignored for now."
   count       = local.is-preproduction == true ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
   name        = "UAT-Document-Service"
@@ -815,6 +827,7 @@ resource "aws_security_group_rule" "UAT-Document-Service-Egress-2" {
 }
 
 resource "aws_security_group" "UAT-Document-Servers" {
+  # checkov:skip=CKV2_AWS_5: "Security group will be updated or removed in the near term, so this finding can be ignored for now."
   count       = local.is-preproduction == true ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
   name        = "UAT-Document-Servers"
@@ -892,6 +905,7 @@ resource "aws_security_group_rule" "UAT-Document-Servers-Egress-2" {
 }
 
 resource "aws_security_group" "PPUD-PROD-Database" {
+  # checkov:skip=CKV2_AWS_5: "Security group will be updated or removed in the near term, so this finding can be ignored for now."
   count       = local.is-production == true ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
   name        = "s618358rgvw021"
@@ -958,6 +972,7 @@ resource "aws_security_group_rule" "PPUD-Database-Egress-2" {
 }
 
 resource "aws_security_group" "PPUD-Mail-Server" {
+  # checkov:skip=CKV2_AWS_5: "Security group will be updated or removed in the near term, so this finding can be ignored for now."
   count       = local.is-production == true ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
   name        = "PPUD-Mail-Server"
@@ -1013,6 +1028,7 @@ resource "aws_security_group_rule" "PPUD-Mail-Server-Egress-2" {
 }
 
 resource "aws_security_group" "PPUD-Mail-Server-2" {
+  # checkov:skip=CKV2_AWS_5: "Security group will be updated or removed in the near term, so this finding can be ignored for now."
   count       = local.is-production == true ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
   name        = "PPUD-Relay-Server"
@@ -1068,6 +1084,7 @@ resource "aws_security_group_rule" "PPUD-Mail-Server-2-Egress-2" {
 }
 
 resource "aws_security_group" "docker-build-server" {
+  # checkov:skip=CKV2_AWS_5: "Security group will be updated or removed in the near term, so this finding can be ignored for now."
   count       = local.is-production == true ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
   name        = "docker-build-server"
@@ -1196,6 +1213,19 @@ locals {
       description = "WAM Web Portal server security group for all environments"
       ingress = [
         # Note there is an additional ingress rule for port 443 from the ALB in a separate statement
+        { port = 80,   cidr = "vpc", description = "Allow port 80 inbound" },
+        { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
+      ]
+      egress = [
+        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",       description = "Allow all outbound (VPC)" },
+        { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
+        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
+      ]
+    }
+    "Certificate-Authority-Server-Security-Group" = {
+      name        = "Certificate-Authority-Server-Security-Group"
+      description = "Certificate Authority server security group for all environments"
+      ingress = [
         { port = 80,   cidr = "vpc", description = "Allow port 80 inbound" },
         { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
       ]
@@ -1424,6 +1454,7 @@ locals {
 # All-environment security groups
 # -------------------------------------------------------------------
 resource "aws_security_group" "all" {
+  # checkov:skip=CKV2_AWS_5: "Security group will be updated or removed in the near term, so this finding can be ignored for now."
   for_each    = local.sg_all
   vpc_id      = data.aws_vpc.shared.id
   name        = each.value.name
@@ -1485,6 +1516,7 @@ resource "aws_security_group_rule" "wam_portal_alb_ingress" {
 # Conditional security groups
 # -------------------------------------------------------------------
 resource "aws_security_group" "conditional" {
+  # checkov:skip=CKV2_AWS_5: "Security group will be updated or removed in the near term, so this finding can be ignored for now."
   for_each    = local.sg_conditional
   vpc_id      = data.aws_vpc.shared.id
   name        = each.value.name

@@ -130,9 +130,10 @@ resource "aws_instance" "s609693lo6vw103" {
   }
 
   tags = {
-    Name        = "s609693lo6vw103"
-    patch_group = "dev_win_patch"
-    backup      = true
+    Name                = "s609693lo6vw103"
+    patch_group         = "dev_win_patch"
+    backup              = true
+    ses_service_restart = "PPUDAutomatedProcessManagerTEST"
   }
 }
 
@@ -428,7 +429,8 @@ resource "aws_instance" "s609693lo6vw115" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.conditional["Development-Servers-Standard-Security-Group"].id]
+  vpc_security_group_ids = [aws_security_group.all["Certificate-Authority-Server-Security-Group"].id]  
+# vpc_security_group_ids = [aws_security_group.conditional["Development-Servers-Standard-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
@@ -514,7 +516,8 @@ resource "aws_instance" "s618358rgvw024" {
   instance_type          = "m6i.2xlarge"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.UAT-Document-Service[0].id]
+  vpc_security_group_ids = [aws_security_group.conditional["Database-and-Document-Service-Security-Group"].id]
+# vpc_security_group_ids = [aws_security_group.UAT-Document-Service[0].id]
   subnet_id              = data.aws_subnet.data_subnets_a.id
 
   metadata_options {
@@ -523,14 +526,15 @@ resource "aws_instance" "s618358rgvw024" {
   }
 
   tags = {
-    Name               = "s618358rgvw024"
-    patch_group        = "uat_win_patch"
-    role               = "ses_sql_config"
-    test_role          = "ses_test_config"
-    test_config_path   = "C:\\Scripts\\Test_SES_Email.ps1"
-    backup             = true
-    cpu_alarm          = true
-    cpu_lambda_trigger = true
+    Name                = "s618358rgvw024"
+    patch_group         = "uat_win_patch"
+    role                = "ses_sql_config"
+    test_role           = "ses_test_config"
+    ses_service_restart = "PPUDAutomatedProcessManagerUAT"
+    test_config_path    = "C:\\Scripts\\Test_SES_Email.ps1"
+    backup              = true
+    cpu_alarm           = true
+    cpu_lambda_trigger  = true
   }
 }
 
@@ -544,7 +548,8 @@ resource "aws_instance" "s618358rgsw025" {
   instance_type          = "c5.4xlarge"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
+  vpc_security_group_ids = [aws_security_group.all["WAM-Data-Access-Server-Security-Group"].id]
+# vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
@@ -569,7 +574,8 @@ resource "aws_instance" "s618358rgvw026" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+  vpc_security_group_ids = [aws_security_group.all["Certificate-Authority-Server-Security-Group"].id]  
+# vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   subnet_id              = data.aws_subnet.data_subnets_b.id
 
   metadata_options {
@@ -597,7 +603,8 @@ resource "aws_instance" "s618358rgvw028" {
   instance_type          = "m5.xlarge"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.UAT-Document-Servers[0].id]
+  vpc_security_group_ids = [aws_security_group.all["Document-Service-Server-Security-Group"].id]  
+# vpc_security_group_ids = [aws_security_group.UAT-Document-Servers[0].id]
   subnet_id              = data.aws_subnet.data_subnets_b.id
 
   metadata_options {
@@ -647,7 +654,8 @@ resource "aws_instance" "S618358RGVW202" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Bridge-Server[0].id]
+  vpc_security_group_ids = [aws_security_group.conditional["WAM-Bridge-Server-Security-Group"].id]
+# vpc_security_group_ids = [aws_security_group.Bridge-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
@@ -861,7 +869,8 @@ resource "aws_instance" "s618358rgvw030" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+  vpc_security_group_ids = [aws_security_group.all["Certificate-Authority-Server-Security-Group"].id]  
+# vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
@@ -876,6 +885,31 @@ resource "aws_instance" "s618358rgvw030" {
     adcs_service     = "true"
     iisadmin_service = "true"
     wwwpub_service   = "true"
+  }
+}
+
+# Data Analytics Server
+
+resource "aws_instance" "s618358rgvw031" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-038a9d01a2c2c0cea"
+  instance_type          = "c6i.xlarge"
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.all["Document-Service-Server-Security-Group"].id]  
+  subnet_id              = data.aws_subnet.private_subnets_c.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name             = "s618358rgvw031"
+    patch_group      = "prod_win_patch"
+    is-production    = true
   }
 }
 

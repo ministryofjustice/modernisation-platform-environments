@@ -129,6 +129,40 @@ data "aws_iam_policy_document" "gdpr_structured_job_policy_document" {
   }
 
   statement {
+    sid    = "PublishGdprMaintenanceNotifications"
+    effect = "Allow"
+    actions = [
+      "sns:Publish"
+    ]
+    resources = [
+      aws_sns_topic.emds_alerts.arn
+    ]
+  }
+
+  statement {
+    sid    = "UseEncryptedAlertsTopic"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey*"
+    ]
+    resources = [
+      aws_kms_key.emds_alerts.arn
+    ]
+  }
+
+  statement {
+    sid    = "WriteGdprMaintenanceReports"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject"
+    ]
+    resources = [
+      "${module.s3-gdpr-audit-bucket.bucket.arn}/reports/*"
+    ]
+  }
+
+  statement {
     sid    = "GetDataAccessAndTagsForLakeFormation"
     effect = "Allow"
     actions = [
@@ -224,6 +258,20 @@ resource "aws_ecs_task_definition" "emds-gdpr-structured-data-deletion" {
       cpu       = 2048
       memory    = 4096
       essential = true
+      environment = [
+        {
+          name  = "ATHENA_OUTPUT_BUCKET"
+          value = "s3://${module.s3-athena-bucket.bucket.id}/output/"
+        },
+        {
+          name  = "SNS_TOPIC_ARN"
+          value = aws_sns_topic.emds_alerts.arn
+        },
+        {
+          name  = "GDPR_REPORT_BUCKET"
+          value = module.s3-gdpr-audit-bucket.bucket.id
+        }
+      ]
       logConfiguration : {
         logDriver = "awslogs",
         options = {
@@ -260,7 +308,18 @@ resource "aws_ecs_task_definition" "emds-gdpr-iceberg-table-maintenance" {
       memory    = 4096
       essential = true
       environment = [
-        { name = "ATHENA_OUTPUT_BUCKET", value = module.s3-athena-bucket.bucket.id }
+        {
+          name  = "ATHENA_OUTPUT_BUCKET"
+          value = "s3://${module.s3-athena-bucket.bucket.id}/output/"
+        },
+        {
+          name  = "SNS_TOPIC_ARN"
+          value = aws_sns_topic.emds_alerts.arn
+        },
+        {
+          name  = "GDPR_REPORT_BUCKET"
+          value = module.s3-gdpr-audit-bucket.bucket.id
+        }
       ]
       logConfiguration : {
         logDriver = "awslogs",
