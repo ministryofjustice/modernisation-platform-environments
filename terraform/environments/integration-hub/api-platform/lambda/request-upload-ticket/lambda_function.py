@@ -90,8 +90,13 @@ def lambda_handler(event, _context):
         )
 
     size_bytes = request.get("sizeBytes")
+    try:
+        size_bytes_int = int(size_bytes) if size_bytes is not None else None
+    except (TypeError, ValueError):
+        return _response(400, {"message": "sizeBytes must be an integer"})
+
     max_upload_size_bytes = int(record.get("max_upload_size_bytes", 0))
-    if size_bytes is not None and max_upload_size_bytes and int(size_bytes) > max_upload_size_bytes:
+    if size_bytes_int is not None and max_upload_size_bytes and size_bytes_int > max_upload_size_bytes:
         return _response(
             400,
             {
@@ -100,9 +105,13 @@ def lambda_handler(event, _context):
             },
         )
 
-    requested_expiry_seconds = int(request.get("requestedExpirySeconds", DEFAULT_EXPIRY_SECONDS))
+    try:
+        requested_expiry_seconds = int(
+            request.get("requestedExpirySeconds", DEFAULT_EXPIRY_SECONDS)
+        )
+    except (TypeError, ValueError):
+        return _response(400, {"message": "requestedExpirySeconds must be an integer"})
     expiry_seconds = max(1, min(requested_expiry_seconds, MAX_EXPIRY_SECONDS))
-
     transfer_ticket = str(uuid.uuid4())
     object_key = _build_object_key(record["key_prefix"], file_name)
     content_md5 = request.get("contentMd5")
