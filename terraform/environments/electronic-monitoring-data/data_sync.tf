@@ -115,7 +115,7 @@ resource "aws_datasync_task" "historic_replication" {
     transfer_mode = "CHANGED"
 
     verify_mode = "ONLY_FILES_TRANSFERRED"
-    log_level = "TRANSFERRING"
+    log_level = "TRANSFER"
 
     posix_permissions = "NONE"
     uid               = "NONE"
