@@ -152,6 +152,27 @@ resource "aws_vpc_security_group_ingress_rule" "allow_cp_access" {
   to_port     = 443
 }
 
+data "aws_route53_zone" "hmpps_internal" {
+  name = "hmpps-preproduction.modernisation-platform.internal"
+}
+
+data "aws_network_interface" "execute_api_endpoint_eni" {
+  for_each = toset(data.aws_vpc_endpoint.api_gateway.network_interface_ids)
+  id       = each.value
+}
+
+resource "aws_route53_record" "private_api" {
+  zone_id = data.aws_route53_zone.hmpps_internal.zone_id
+  name    = trimsuffix(trimprefix(aws_api_gateway_stage.update_p1_export_stage.invoke_url, "https://"), "/prod")
+  type    = "A"
+  ttl     = 60
+
+  records = [
+    for eni in data.aws_network_interface.execute_api_endpoint_eni :
+    eni.private_ip
+  ]
+}
+
 data "aws_iam_policy_document" "update_p1_export_vpc" {
   count = local.is-test || local.is-development ? 0 : 1
   statement {
