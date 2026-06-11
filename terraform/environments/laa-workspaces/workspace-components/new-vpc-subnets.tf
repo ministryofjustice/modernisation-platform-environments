@@ -80,25 +80,38 @@ resource "aws_subnet" "firewall_b" {
 ### Route Tables for Private Subnets
 ##############################################
 
-resource "aws_route_table" "private_a" {
+# resource "aws_route_table" "private_a" {
+#   count = local.environment == "development" ? 1 : 0
+
+#   vpc_id = aws_vpc.workspaces[0].id
+
+#   tags = merge(
+#     local.tags,
+#     { "Name" = "${local.application_name}-${local.environment}-private-eu-west-2a-rt" }
+#   )
+# }
+
+# resource "aws_route_table" "private_b" {
+#   count = local.environment == "development" ? 1 : 0
+
+#   vpc_id = aws_vpc.workspaces[0].id
+
+#   tags = merge(
+#     local.tags,
+#     { "Name" = "${local.application_name}-${local.environment}-private-eu-west-2b-rt" }
+#   )
+# }
+
+
+
+resource "aws_route_table" "private" {
   count = local.environment == "development" ? 1 : 0
 
   vpc_id = aws_vpc.workspaces[0].id
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-${local.environment}-private-eu-west-2a-rt" }
-  )
-}
-
-resource "aws_route_table" "private_b" {
-  count = local.environment == "development" ? 1 : 0
-
-  vpc_id = aws_vpc.workspaces[0].id
-
-  tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-${local.environment}-private-eu-west-2b-rt" }
+    { "Name" = "${local.application_name}-${local.environment}-workspaces-private-rt" }
   )
 }
 
@@ -106,21 +119,21 @@ resource "aws_route_table_association" "private_a" {
   count = local.environment == "development" ? 1 : 0
 
   subnet_id      = aws_subnet.private_a[0].id
-  route_table_id = aws_route_table.private_a[0].id
+  route_table_id = aws_route_table.private[0].id
 }
 
 resource "aws_route_table_association" "private_b" {
   count = local.environment == "development" ? 1 : 0
 
   subnet_id      = aws_subnet.private_b[0].id
-  route_table_id = aws_route_table.private_b[0].id
+  route_table_id = aws_route_table.private[0].id
 }
 
 
 resource "aws_route" "private_a_to_nat" {
   count = local.environment == "development" ? 1 : 0
 
-  route_table_id      = aws_route_table.private_a[0].id
+  route_table_id      = aws_route_table.private[0].id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id      = aws_nat_gateway.main[0].id
 }
@@ -128,7 +141,7 @@ resource "aws_route" "private_a_to_nat" {
 # resource "aws_route" "private_a_firewall" {
 #   count = local.environment == "development" ? 1 : 0
 
-#   route_table_id         = aws_route_table.private_a[0].id
+#   route_table_id         = aws_route_table.private[0].id
 #   destination_cidr_block = "0.0.0.0/0"
 #   vpc_endpoint_id = element([
 #     for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist[0].firewall_status[0].sync_states
@@ -140,7 +153,7 @@ resource "aws_route" "private_a_to_nat" {
 # resource "aws_route" "private_b_firewall" {
 #   count = local.environment == "development" ? 1 : 0
 
-#   route_table_id         = aws_route_table.private_b[0].id
+#   route_table_id         = aws_route_table.private[0].id
 #   destination_cidr_block = "0.0.0.0/0"
 #   vpc_endpoint_id = element([
 #     for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist[0].firewall_status[0].sync_states
