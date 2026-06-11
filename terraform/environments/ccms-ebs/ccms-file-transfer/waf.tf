@@ -69,8 +69,8 @@ resource "aws_wafv2_web_acl" "sftp_web_acl" {
 
     statement {
       rate_based_statement {
-        limit              = 30
-        aggregate_key_type = "IP"
+        limit                 = 30
+        aggregate_key_type    = "IP"
         evaluation_window_sec = 60
 
         # scope_down_statement {
@@ -106,7 +106,7 @@ resource "aws_wafv2_web_acl" "sftp_web_acl" {
       cloudwatch_metrics_enabled = true
       metric_name                = "EndpointSpecific10RPSLimit"
     }
-}
+  }
 
   # Restrict access to trusted IPs only - Non-Prod environments only
   dynamic "rule" {

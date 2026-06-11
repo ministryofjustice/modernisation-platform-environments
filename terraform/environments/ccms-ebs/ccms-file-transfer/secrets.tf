@@ -9,14 +9,15 @@ resource "aws_secretsmanager_secret" "sftp_secrets" {
 resource "aws_secretsmanager_secret_version" "sftp_secrets" {
   secret_id = aws_secretsmanager_secret.sftp_secrets.id
   secret_string = jsonencode({
-    ORACLE_URL         = "",
-    ORACLE_PASSWORD    = "",
-    ORACLE_USERNAME    = "",
-    SLACK_WEBHOOK      = "",
-    ENABLE_SWAGGER     = "",
-    AUTHORIZED_CLIENTS = "",
-    AUTHORIZED_ROLES   = "",
-    UNPROTECTED_URIS   = ""
+    ORACLE_URL            = "",
+    ORACLE_PASSWORD       = "",
+    ORACLE_USERNAME       = "",
+    SLACK_WEBHOOK         = "",
+    ENABLE_SWAGGER        = "",
+    AUTHORIZED_CLIENTS    = "",
+    AUTHORIZED_ROLES      = "",
+    UNPROTECTED_URIS      = "",
+    TLS_KEYSTORE_PASSWORD = ""
   })
 
   lifecycle {

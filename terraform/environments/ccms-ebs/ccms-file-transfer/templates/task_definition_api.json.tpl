@@ -60,6 +60,10 @@
       {
         "name": "UNPROTECTED_URIS",
         "valueFrom": "${UNPROTECTED_URIS}"
+      },
+      {
+        "name": "TLS_KEYSTORE_PASSWORD",
+        "valueFrom": "${TLS_KEYSTORE_PASSWORD}"
       }
     ]
   }
