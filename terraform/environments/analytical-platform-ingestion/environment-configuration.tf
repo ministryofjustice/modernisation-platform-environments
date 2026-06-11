@@ -63,6 +63,10 @@ locals {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDMRvtIhxI+k3AXkGpZe6242VucffThflI3PCezvNYhjHVCfaMvNjt0yAXOO7hrzqY8TMOwH2LXsM1yGhUrL2Qe2WBl5gebqsKsR0H6eKypdT6GJhWg81AAf2Zckzk2ibdHqs3w8ZmjGblSv6ReAfg4l/VYeAqdBCfY7m6r+jbgcRtRbsM75GGz0Ts1rgGYF9jrKglF0SKDxT2rvzX+mUB13oxjzWW+C8lGw7aVrtL+hDgXB7gRAa5hqnDIij4rdhd4xt/PzvFZ1FoeutnvEzNMvvtaC/0Iu6IdBdOk3ay/wG7Q6w9pb5BCvKYMUz3MXUbqRSUg8Ed/UHAs6kGBRS9h"
           cidr_blocks = ["172.167.164.209/32"]
         }
+        "bt-pin" = {
+          ssh_key     = "AAAAB3NzaC1yc2EAAAADAQABAAACAQC2o5mRmcvgNsrGjhzqKF4NEnQJ5bOXtVnbi9SVEKTJG7YQlRte+sC290y1Lvr2Sc1KItnIUGWU4vRh8w0KKYetKRQ/XqTqgobedS3aBQrOm/UBASdlFh+4WPhsDGEywhcjy7yNw/e5F8WjVQJlBjuowD6dl07dzR5lrpTZRWz3nMj3zfWHvWoU3nJLyOv1mbl22BRYMJTJ0IANxwuTQrNfepNypnPFBKe8kagGVrahd5xb+UXoSAaZhd+gguKjpBS6uufrvp2v/YdrgxkeS7k5LcIGuWqsGONPzrLfU5Gmgd1o7DlVM8/ex39EC0zxWwz6Kdp8r4O2zX0nPQHXCjyIZbON0etq2fcgdf239aQGRlDiwBH2YEpmHtcoEhULX8BgnPGQfVxVqU2lJnjlXX12PmlrOOOHmp4MOTX0OiOcPz9SOhpRGnSTum9BJQxp1jABCuKTNQjo2U5JJKEISZHazeXEQnPZPz3YUGmBAB4S6QN3cQfHzXCWD7+dsgAQ7qtyAZeN3YV9NLkBNbuoQoBuAdmAtDtSu8tyqjEaXpHqA3Od3XJhS77jprao+sUJgE9102QBlcXQp5+PUKf8Y8BlJR41yxYDU4nFa5/8Xu8H1Z4aGWt9+iEgjLNIzKi7ExXwjEZy6uPjPVO5/+LCRgPmf5ypLlc4GcI7G6G+5H9F1Q=="
+          cidr_blocks = ["109.144.8.4/32"]
+        }
       }
       transfer_server_sftp_users_with_egress = {
         "essex-police" = {
