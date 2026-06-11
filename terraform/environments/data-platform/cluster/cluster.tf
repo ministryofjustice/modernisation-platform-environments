@@ -169,6 +169,7 @@ module "eks_managed_node_group_system" {
   # Bottlerocket configuration
   ami_type                       = "BOTTLEROCKET_ARM_64"
   use_latest_ami_release_version = false
+  kubernetes_version             = local.cluster_configuration.kubernetes_version
   ami_release_version            = local.cluster_configuration.bottlerocket_version
 
   enable_monitoring = true
