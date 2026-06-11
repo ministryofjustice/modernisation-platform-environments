@@ -3,7 +3,7 @@ module "vpc" {
   version = "6.5.1"
   source  = "terraform-aws-modules/vpc/aws"
 
-  name = local.cp_vpc_name
+  name = "${local.cp_vpc_name}-old"
   cidr = lookup(local.cp_vpc_cidr, local.cluster_environment)
   azs  = slice(data.aws_availability_zones.available.names, 0, 3)
   private_subnets = [
