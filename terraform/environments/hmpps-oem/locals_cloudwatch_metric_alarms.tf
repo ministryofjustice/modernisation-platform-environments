@@ -9,86 +9,85 @@ locals {
 
     test = {
       # hmpps-domain-services
-      rdgateway = ["rdgateway1.test.hmpps-domain.service.justice.gov.uk", true, "hmpps-domain-services-pagerduty"]
-      rdweb     = ["rdweb1.test.hmpps-domain.service.justice.gov.uk", true, "hmpps-domain-services-pagerduty"]
+      rdgateway = ["rdgateway1.test.hmpps-domain.service.justice.gov.uk", true, "hmpps-domain-services-test-pagerduty"]
+      rdweb     = ["rdweb1.test.hmpps-domain.service.justice.gov.uk", true, "hmpps-domain-services-test-pagerduty"]
 
       # nomis
-      nomis-t1 = ["c-t1.test.nomis.service.justice.gov.uk", true, "nomis-pagerduty"]
-      nomis-t2 = ["c-t2.test.nomis.service.justice.gov.uk", true, "nomis-pagerduty"]
-      nomis-t3 = ["c-t3.test.nomis.service.justice.gov.uk", true, "nomis-pagerduty"]
+      nomis-t1 = ["c-t1.test.nomis.service.justice.gov.uk", true, "nomis-test-pagerduty"]
+      nomis-t2 = ["c-t2.test.nomis.service.justice.gov.uk", true, "nomis-test-pagerduty"]
+      nomis-t3 = ["c-t3.test.nomis.service.justice.gov.uk", true, "nomis-test-pagerduty"]
 
       # oasys
-      oasys-t1 = ["t1-int.oasys.service.justice.gov.uk", true, "oasys-pagerduty"]
-      oasys-t2 = ["t2-int.oasys.service.justice.gov.uk", true, "oasys-pagerduty"]
+      oasys-t1 = ["t1-int.oasys.service.justice.gov.uk", true, "oasys-test-pagerduty"]
+      oasys-t2 = ["t2-int.oasys.service.justice.gov.uk", true, "oasys-test-pagerduty"]
     }
 
     preproduction = {
       # corporate-staff-rostering - alarms disabled on request from Glenn
-      #csr-r1-pp  = ["r1.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
-      #csr-r2-pp  = ["r2.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
-      #csr-r3-pp  = ["r3.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
-      #csr-r4-pp  = ["r4.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
-      #csr-r5-pp  = ["r5.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
-      #csr-r6-pp  = ["r6.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
-      csr-traina = ["traina.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
+      #csr-r1-pp  = ["r1.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-preproduction-pagerduty"]
+      #csr-r2-pp  = ["r2.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-preproduction-pagerduty"]
+      #csr-r3-pp  = ["r3.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-preproduction-pagerduty"]
+      #csr-r4-pp  = ["r4.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-preproduction-pagerduty"]
+      #csr-r5-pp  = ["r5.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-preproduction-pagerduty"]
+      #csr-r6-pp  = ["r6.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-preproduction-pagerduty"]
+      csr-traina = ["traina.csr.service.justice.gov.uk", false, "corporate-staff-rostering-production-pagerduty"]
 
       # hmpps-domain-services
-      rdgateway = ["rdgateway1.preproduction.hmpps-domain.service.justice.gov.uk", true, "hmpps-domain-services-pagerduty"]
+      rdgateway = ["rdgateway1.preproduction.hmpps-domain.service.justice.gov.uk", true, "hmpps-domain-services-preproduction-pagerduty"]
 
       # nomis
-      nomis-lsast = ["c-lsast.preproduction.nomis.service.justice.gov.uk", true, "nomis-pagerduty"]
-      nomis-pp    = ["c.preproduction.nomis.service.justice.gov.uk", true, "nomis-pagerduty"]
+      nomis-pp = ["c.preproduction.nomis.service.justice.gov.uk", true, "nomis-preproduction-pagerduty"]
 
       # nomis-combined-reporting
-      nomis-reporting-pp-aws = ["preproduction.reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
+      nomis-reporting-pp-aws = ["preproduction.reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-preproduction-pagerduty"]
 
       # oasys
-      oasys-pp = ["pp.oasys.service.justice.gov.uk", true, "oasys-pagerduty"]
+      oasys-pp = ["pp.oasys.service.justice.gov.uk", true, "oasys-preproduction-pagerduty"]
 
       # oasys-national-reporting
-      onr-pp-az-redirect = ["onr.pp-oasys.az.justice.gov.uk", true, "oasys-national-reporting-pagerduty"]
-      onr-pp             = ["preproduction.reporting.oasys.service.justice.gov.uk", true, "oasys-national-reporting-pagerduty"]
+      onr-pp-az-redirect = ["onr.pp-oasys.az.justice.gov.uk", true, "oasys-national-reporting-preproduction-pagerduty"]
+      onr-pp             = ["preproduction.reporting.oasys.service.justice.gov.uk", true, "oasys-national-reporting-preproduction-pagerduty"]
 
       # planetfm - alarms disabled on request from Glenn
-      #cafmtx-pp   = ["cafmtx.pp.planetfm.service.justice.gov.uk", true, "planetfm-pagerduty"]
-      #cafmwebx-pp = ["cafmwebx.pp.planetfm.service.justice.gov.uk", true, "planetfm-pagerduty"]
+      #cafmtx-pp   = ["cafmtx.pp.planetfm.service.justice.gov.uk", true, "planetfm-preproduction-pagerduty"]
+      #cafmwebx-pp = ["cafmwebx.pp.planetfm.service.justice.gov.uk", true, "planetfm-preproduction-pagerduty"]
     }
 
     production = {
       # az-noms-production-1
-      hmpps-az-gw1-rdgateway = ["hmpps-az-gw1.justice.gov.uk", true, "azure-fixngo-pagerduty"]
+      hmpps-az-gw1-rdgateway = ["hmpps-az-gw1.justice.gov.uk", true, "azure-fixngo-production-pagerduty"]
 
       # corporate-staff-rostering
-      csr-r1 = ["r1.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
-      csr-r2 = ["r2.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
-      csr-r3 = ["r3.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
-      csr-r4 = ["r4.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
-      csr-r5 = ["r5.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
-      csr-r6 = ["r6.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
+      csr-r1 = ["r1.csr.service.justice.gov.uk", false, "corporate-staff-rostering-production-pagerduty"]
+      csr-r2 = ["r2.csr.service.justice.gov.uk", false, "corporate-staff-rostering-production-pagerduty"]
+      csr-r3 = ["r3.csr.service.justice.gov.uk", false, "corporate-staff-rostering-production-pagerduty"]
+      csr-r4 = ["r4.csr.service.justice.gov.uk", false, "corporate-staff-rostering-production-pagerduty"]
+      csr-r5 = ["r5.csr.service.justice.gov.uk", false, "corporate-staff-rostering-production-pagerduty"]
+      csr-r6 = ["r6.csr.service.justice.gov.uk", false, "corporate-staff-rostering-production-pagerduty"]
 
       # hmpps-domain-services
-      rdgateway = ["rdgateway1.hmpps-domain.service.justice.gov.uk", true, "hmpps-domain-services-pagerduty"]
+      rdgateway = ["rdgateway1.hmpps-domain.service.justice.gov.uk", true, "hmpps-domain-services-production-pagerduty"]
 
       # nomis
-      nomis = ["c.nomis.az.justice.gov.uk", true, "nomis-pagerduty"]
+      nomis = ["c.nomis.az.justice.gov.uk", true, "nomis-production-pagerduty"]
 
       # nomis-combined-reporting
-      nomis-reporting = ["reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
+      nomis-reporting = ["reporting.nomis.service.justice.gov.uk", true, "nomis-combined-reporting-production-pagerduty"]
 
       # oasys
-      oasys          = ["oasys.service.justice.gov.uk", true, "oasys-pagerduty"]
-      oasys-int      = ["int.oasys.service.justice.gov.uk", true, "oasys-pagerduty"]
-      oasys-practice = ["practice.int.oasys.service.justice.gov.uk", true, "oasys-pagerduty"]
-      oasys-training = ["training.int.oasys.service.justice.gov.uk", true, "oasys-pagerduty"]
+      oasys          = ["oasys.service.justice.gov.uk", true, "oasys-production-pagerduty"]
+      oasys-int      = ["int.oasys.service.justice.gov.uk", true, "oasys-production-pagerduty"]
+      oasys-practice = ["practice.int.oasys.service.justice.gov.uk", true, "oasys-production-pagerduty"]
+      oasys-training = ["training.int.oasys.service.justice.gov.uk", true, "oasys-production-pagerduty"]
 
       # oasys-national-reporting
-      onr-az-redirect = ["onr.oasys.az.justice.gov.uk", true, "oasys-national-reporting-pagerduty"]
-      onr             = ["reporting.oasys.service.justice.gov.uk", true, "oasys-national-reporting-pagerduty"]
+      onr-az-redirect = ["onr.oasys.az.justice.gov.uk", true, "oasys-national-reporting-production-pagerduty"]
+      onr             = ["reporting.oasys.service.justice.gov.uk", true, "oasys-national-reporting-production-pagerduty"]
 
       # planetfm - alarms disabled on request from Glenn
-      #cafmtrainweb = ["cafmtrainweb.planetfm.service.justice.gov.uk", true, "planetfm-pagerduty"]
-      #cafmtx       = ["cafmtx.planetfm.service.justice.gov.uk", true, "planetfm-pagerduty"]
-      #cafmwebx2    = ["cafmwebx2.planetfm.service.justice.gov.uk", true, "planetfm-pagerduty"]
+      #cafmtrainweb = ["cafmtrainweb.planetfm.service.justice.gov.uk", true, "planetfm-production-pagerduty"]
+      #cafmtx       = ["cafmtx.planetfm.service.justice.gov.uk", true, "planetfm-production-pagerduty"]
+      #cafmwebx2    = ["cafmwebx2.planetfm.service.justice.gov.uk", true, "planetfm-production-pagerduty"]
     }
   }
 
@@ -144,20 +143,20 @@ locals {
     ["dso-modernisation-platform-automation", "ssm_command_monitoring", "dso-pipelines-pagerduty", { threshold = "10" }], # pipeline sometimes fails due to API errors hence only alarm if it continually fails
     ["dso-modernisation-platform-automation", "github_workflow_monitoring", "dso-pipelines-pagerduty", { threshold = "10" }],
     ["dso-modernisation-platform-automation", "planetfm_gfsl_data_extract", "dso-pipelines-pagerduty", {}],
-    ["dso-modernisation-platform-automation", "nomis_environment_start", "nomis-pagerduty", {}],
+    ["dso-modernisation-platform-automation", "nomis_environment_start", "nomis-preproduction-pagerduty", {}],
     ["dso-modernisation-platform-automation", "certificate_renewal", "dso-pipelines-pagerduty", {}],
-    ["dso-modernisation-platform-automation", "azure_sas_token_refresh", "nomis-data-hub-pagerduty", {}],
+    ["dso-modernisation-platform-automation", "azure_sas_token_refresh", "nomis-data-hub-production-pagerduty", {}],
     ["dso-modernisation-platform-automation", "jump_server_start", "dso-pipelines-pagerduty", {}],
     ["dso-modernisation-platform-automation", "jump_server_stop", "dso-pipelines-pagerduty", {}],
-    ["dso-modernisation-platform-automation", "ncr_environment_start", "dso-pipelines-pagerduty", {}],
-    ["dso-modernisation-platform-automation", "ncr_environment_stop", "dso-pipelines-pagerduty", {}],
-    ["dso-modernisation-platform-automation", "ndh_offloc_cdecopy", "nomis-data-hub-pagerduty", {}],
-    ["dso-modernisation-platform-automation", "ndh_offloc_cloudplatfom_copy", "dso-pipelines-pagerduty", {}],
-    ["dso-modernisation-platform-automation", "nomis_environment_stop", "nomis-pagerduty", {}],
-    ["dso-modernisation-platform-automation", "nomis_database_refresh", "nomis-pagerduty", {}],
-    ["dso-modernisation-platform-automation", "oasys_database_refresh", "oasys-pagerduty", {}],
-    ["dso-modernisation-platform-automation", "onr_environment_start", "dso-pipelines-pagerduty", {}],
-    ["dso-modernisation-platform-automation", "onr_environment_stop", "dso-pipelines-pagerduty", {}],
+    ["dso-modernisation-platform-automation", "ncr_environment_start", "nomis-combined-reporting-preproduction-pagerduty", {}],
+    ["dso-modernisation-platform-automation", "ncr_environment_stop", "nomis-combined-reporting-preproduction-pagerduty", {}],
+    ["dso-modernisation-platform-automation", "ndh_offloc_cdecopy", "nomis-data-hub-production-pagerduty", {}],
+    ["dso-modernisation-platform-automation", "ndh_offloc_cloudplatfom_copy", "nomis-data-hub-production-pagerduty", {}],
+    ["dso-modernisation-platform-automation", "nomis_environment_stop", "nomis-preproduction-pagerduty", {}],
+    ["dso-modernisation-platform-automation", "nomis_database_refresh", "nomis-preproduction-pagerduty", {}],
+    ["dso-modernisation-platform-automation", "oasys_database_refresh", "oasys-preproduction-pagerduty", {}],
+    ["dso-modernisation-platform-automation", "onr_environment_start", "oasys-national-reporting-preproduction-pagerduty", {}],
+    ["dso-modernisation-platform-automation", "onr_environment_stop", "oasys-national-reporting-preproduction-pagerduty", {}],
     ["dso-modernisation-platform-automation", "security_hub_alerting", "dso-pipelines-pagerduty", {}],
     ["dso-repositories", "stale", "dso-pipelines-pagerduty", {}],
     ["dso-useful-stuff", "stale", "dso-pipelines-pagerduty", {}],

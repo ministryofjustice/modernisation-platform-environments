@@ -138,9 +138,20 @@ locals {
       policies = [
         "send_message_to_sqs",
         "publish_to_sns",
+        "send_logs_to_cloudwatch",
         "invoke_ses",
         "get_cloudwatch_metrics",
         "get_list_waf_web_acls"
+      ]
+    }
+    file_server_analysis = {
+      description = "Lambda Function Role for retrieving and analysing data from S3"
+      policies = [
+        "send_message_to_sqs",
+        "publish_to_sns",
+        "send_logs_to_cloudwatch",
+        "invoke_ses",
+        "get_data_s3"
       ]
     }
     rotate_ses_access_key = {
