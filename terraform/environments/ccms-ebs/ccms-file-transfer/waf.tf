@@ -71,6 +71,7 @@ rule {
     rate_based_statement {
       limit              = 30
       aggregate_key_type = "IP"
+      evaluation_window_sec = 60
 
       # scope_down_statement {
       #   byte_match_statement {
