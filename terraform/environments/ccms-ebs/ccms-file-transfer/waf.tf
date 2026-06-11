@@ -72,22 +72,22 @@ rule {
       limit              = 30
       aggregate_key_type = "IP"
 
-      scope_down_statement {
-        byte_match_statement {
-          search_string = "/swagger-ui.html"
+      # scope_down_statement {
+      #   byte_match_statement {
+      #     search_string = "/swagger-ui.html"
 
-          field_to_match {
-            uri_path {}
-          }
+      #     field_to_match {
+      #       uri_path {}
+      #     }
 
-          text_transformation {
-            priority = 0
-            type     = "LOWERCASE"
-          }
+      #     text_transformation {
+      #       priority = 0
+      #       type     = "LOWERCASE"
+      #     }
 
-          positional_constraint = "EXACTLY"
-        }
-      }
+      #     positional_constraint = "EXACTLY"
+      #   }
+      # }
     }
   }
 
