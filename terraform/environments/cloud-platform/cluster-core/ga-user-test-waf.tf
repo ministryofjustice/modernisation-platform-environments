@@ -7,8 +7,10 @@
 ###############################################################################
 
 locals {
-  echo2_hostname = "echo2.${local.cluster_name}.${local.cluster_base_domain}"
-  echo3_hostname = "echo3.${local.cluster_name}.${local.cluster_base_domain}"
+  echo_hostnames = {
+    for i in range(1, 5) :
+    "echo${i}" => "echo${i}.${local.cluster_name}.${local.cluster_base_domain}"
+  }
 }
 
 resource "aws_wafv2_ip_set" "echo_allowlist" {
@@ -16,6 +18,20 @@ resource "aws_wafv2_ip_set" "echo_allowlist" {
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
   addresses          = ["83.100.215.187/32"]
+}
+
+resource "aws_wafv2_ip_set" "echo3_allowlist" {
+  name               = "${local.cluster_name}-echo3-source-ip-allowlist"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV4"
+  addresses          = ["203.0.113.1/32"]
+}
+
+resource "aws_wafv2_ip_set" "echo4_allowlist" {
+  name               = "${local.cluster_name}-echo4-source-ip-allowlist"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV4"
+  addresses          = ["203.0.113.1/32"]
 }
 
 resource "aws_wafv2_web_acl" "echo" {
@@ -27,7 +43,7 @@ resource "aws_wafv2_web_acl" "echo" {
   }
 
   rule {
-    name     = "restrict-echo2-to-allowlist"
+    name     = "restrict-echo1-to-allowlist"
     priority = 1
 
     action {
@@ -38,7 +54,7 @@ resource "aws_wafv2_web_acl" "echo" {
       and_statement {
         statement {
           byte_match_statement {
-            search_string         = local.echo2_hostname
+            search_string         = local.echo_hostnames["echo1"]
             positional_constraint = "EXACTLY"
 
             field_to_match {
@@ -68,7 +84,101 @@ resource "aws_wafv2_web_acl" "echo" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "echo2-source-ip-restrict"
+      metric_name                = "echo1-source-ip-restrict"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "restrict-echo3-to-allowlist"
+    priority = 2
+
+    action {
+      block {}
+    }
+
+    statement {
+      and_statement {
+        statement {
+          byte_match_statement {
+            search_string         = local.echo_hostnames["echo3"]
+            positional_constraint = "EXACTLY"
+
+            field_to_match {
+              single_header {
+                name = "host"
+              }
+            }
+
+            text_transformation {
+              priority = 0
+              type     = "LOWERCASE"
+            }
+          }
+        }
+
+        statement {
+          not_statement {
+            statement {
+              ip_set_reference_statement {
+                arn = aws_wafv2_ip_set.echo3_allowlist.arn
+              }
+            }
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "echo3-source-ip-restrict"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "restrict-echo4-misconfigured"
+    priority = 3
+
+    action {
+      block {}
+    }
+
+    statement {
+      and_statement {
+        statement {
+          byte_match_statement {
+            search_string         = "echo4"
+            positional_constraint = "EXACTLY"
+
+            field_to_match {
+              single_header {
+                name = "host"
+              }
+            }
+
+            text_transformation {
+              priority = 0
+              type     = "LOWERCASE"
+            }
+          }
+        }
+
+        statement {
+          not_statement {
+            statement {
+              ip_set_reference_statement {
+                arn = aws_wafv2_ip_set.echo4_allowlist.arn
+              }
+            }
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "echo4-source-ip-restrict"
       sampled_requests_enabled   = true
     }
   }
@@ -88,7 +198,7 @@ data "aws_lb" "shared_alb" {
 
   depends_on = [
     kubectl_manifest.gateway_platform,
-    kubernetes_manifest.user_test_http_route,
+    kubernetes_manifest.user_test_http_routes,
   ]
 }
 
