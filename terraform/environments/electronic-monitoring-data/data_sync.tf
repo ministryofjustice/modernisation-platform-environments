@@ -20,7 +20,7 @@ resource "aws_iam_role" "datasync_s3_role" {
 
 resource "aws_iam_policy" "datasync_s3_policy" {
   name        = "datasync-s3-replication-policy"
-  description = "Allows DataSync to read from source and write to destination buckets"
+  description = "Datasync cross bucket policy"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -33,8 +33,8 @@ resource "aws_iam_policy" "datasync_s3_policy" {
         ]
         Effect = "Allow"
         Resource = [
-          "arn:aws:s3:::your-source-bucket-name",      # REPLACE WITH YOUR SOURCE BUCKET
-          "arn:aws:s3:::your-destination-bucket-name"  # REPLACE WITH YOUR DESTINATION BUCKET
+          module.s3-create-a-derived-table-bucket.bucket.arn,
+          module.s3-create-a-derived-table-back-up-bucket-staging.bucket.arn
         ]
       },
       {
@@ -49,8 +49,8 @@ resource "aws_iam_policy" "datasync_s3_policy" {
         ]
         Effect = "Allow"
         Resource = [
-          "arn:aws:s3:::your-source-bucket-name/*",      # REPLACE WITH YOUR SOURCE BUCKET
-          "arn:aws:s3:::your-destination-bucket-name/*"  # REPLACE WITH YOUR DESTINATION BUCKET
+          "${module.s3-create-a-derived-table-bucket.bucket.arn}/staging/*",
+          "${module.s3-create-a-derived-table-back-up-bucket-staging.bucket.arn}/staging/*"
         ]
       }
     ]
@@ -66,8 +66,8 @@ resource "aws_iam_role_policy_attachment" "datasync_s3_attach" {
 # DataSync S3 Locations
 # -----------------------------------------------------------------------------
 resource "aws_datasync_location_s3" "source" {
-  # REPLACE WITH YOUR SOURCE BUCKET
-  s3_bucket_arn = "arn:aws:s3:::your-source-bucket-name" 
+  s3_bucket_arn = module.s3-create-a-derived-table-bucket.bucket.arn
+  subdirectory  = "staging/" 
   
   s3_config {
     bucket_access_role_arn = aws_iam_role.datasync_s3_role.arn
@@ -75,8 +75,8 @@ resource "aws_datasync_location_s3" "source" {
 }
 
 resource "aws_datasync_location_s3" "destination" {
-  # REPLACE WITH YOUR DESTINATION BUCKET
-  s3_bucket_arn = "arn:aws:s3:::your-destination-bucket-name" 
+  s3_bucket_arn = module.s3-create-a-derived-table-back-up-bucket-staging.bucket.arn
+  subdirectory  = "staging/"
   
   s3_config {
     bucket_access_role_arn = aws_iam_role.datasync_s3_role.arn
@@ -90,8 +90,6 @@ resource "aws_datasync_task" "historic_replication" {
   name                     = "historic-data-monthly-sync"
   source_location_arn      = aws_datasync_location_s3.source.arn
   destination_location_arn = aws_datasync_location_s3.destination.arn
-
-  # CloudWatch Log Group for DataSync execution logs (Optional but highly recommended)
   cloudwatch_log_group_arn = aws_cloudwatch_log_group.datasync_logs.arn
 
   # cron(0 0 20 * ? *) runs at midnight UTC on the 20th of every month
@@ -103,7 +101,7 @@ resource "aws_datasync_task" "historic_replication" {
     # REMOVE ensures GDPR deletions in the source are mirrored to the destination
     preserve_deleted_files = "REMOVE" 
     
-    # CHANGED ensures it only scans and syncs modifications, not the entire TBs of data
+    # CHANGED ensures it only scans and syncs modifications
     transfer_mode = "CHANGED"
 
     # Keeps standard metadata intact
