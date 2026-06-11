@@ -79,7 +79,7 @@ locals {
   validation_record_fqdns = local.is-development ? [local.domain_name_main[0], local.domain_name_sub[0]] : [local.domain_name_main[0], local.domain_name_sub[0]]
 
   app_url                       = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
-  acm_subject_alternative_names = [local.app_url]
+  acm_subject_alternative_names = [local.app_url, local.app_config.legacy_url]
 
 }
 
