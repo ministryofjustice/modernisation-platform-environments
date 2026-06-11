@@ -64,7 +64,7 @@ terraform plan
 Then initialise and plan the API platform stack:
 
 ```bash
-cd /Users/harsh.vasudev/IdeaProjects/modernisation-platform-environments/terraform/environments/integration-hub/api-platform
+cd terraform/environments/integration-hub/api-platform
 terraform init -reconfigure
 terraform workspace select integration-hub-development
 terraform plan
