@@ -30,7 +30,7 @@ resource "aws_wafv2_web_acl" "sftp_web_acl" {
 
   rule {
     name     = "AWS-AWSManagedRulesCommonRuleSet"
-    priority = 1
+    priority = 2
 
     override_action {
       none {}
