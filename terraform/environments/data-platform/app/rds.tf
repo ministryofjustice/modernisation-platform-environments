@@ -5,8 +5,8 @@ module "app_rds" {
 
   engine               = "postgres"
   engine_version       = local.environment_configuration.rds_engine_version
-  family               = "postgres18"
-  major_engine_version = "18"
+  family               = "postgres${local.rds_major_engine_version}"
+  major_engine_version = local.rds_major_engine_version
   instance_class       = local.environment_configuration.rds_instance_class
 
   allocated_storage     = local.environment_configuration.rds_allocated_storage

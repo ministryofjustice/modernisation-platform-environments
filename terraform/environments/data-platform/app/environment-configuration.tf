@@ -1,5 +1,6 @@
 locals {
   environment_configuration = local.environment_configurations[local.environment]
+  rds_major_engine_version  = split(".", local.environment_configuration.rds_engine_version)[0]
 
   environment_configurations = {
     development = {
