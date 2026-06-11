@@ -153,6 +153,10 @@ locals {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCWE5yFwkIyeXukHNw0Qi+ps8w3Df2VuB9LPEiCeOS52ZJ30ih/5yf1iUho2XRY22imbUBdw7Menqn1fEA2OVNh30NOgS7kut0EPmvLr5cFrROiglbFvIM5pEeNnOfFgTPkCsOs81gMOikLG+eZZ6+rSacBnxTmCWbN7xVJobdD7UsXpqfrC8lx7MuZSvVbo/MN5L09KaehBRRvLkkGCOhjn04UjgRyxAhlKVHUSzX4oz4wgAnxh41y8MJoRYAs5OdfeqcBpoquPQJYypfKEGSLUBO4Frc5nAG4yLKwFZLN2T68J+mXdVI2QyoVnH6oLugAS4IVqxEY2vdlkP72GYDjZ2Z1B+YyNEhAC5b8+Djh65/Tgg3Y/4haM7zdNa8zdlJzwWEYZkRMO/ppivC571ZPyO2AuZV8/FuZSW9GSWtE+VqAI46GE+MXkrh5S66prKPBsB//GmZwL60m1oMG8xxjSXYzbit5Vho0nZSaJ9EdfaHLaVulsuC6Kd01x99QgU6GMARG6FPsIRTFr3UOzycJn0UbAmF0Vzelayt9CZxbTRToJdDi44edMTDavyKbYryEaPPHftECXnY4SqSzvo27qcO+UNOB9c+FZzoHBWim0SK4qqiF6bgf2WU/uPYM7u5szVIRmEwdEpv+0TX/nI8Ih3HNwGYbjABTdDG/6cFs9Q=="
           cidr_blocks = ["51.142.161.93/32"]
         }
+        "bt-pin" = {
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC2o5mRmcvgNsrGjhzqKF4NEnQJ5bOXtVnbi9SVEKTJG7YQlRte+sC290y1Lvr2Sc1KItnIUGWU4vRh8w0KKYetKRQ/XqTqgobedS3aBQrOm/UBASdlFh+4WPhsDGEywhcjy7yNw/e5F8WjVQJlBjuowD6dl07dzR5lrpTZRWz3nMj3zfWHvWoU3nJLyOv1mbl22BRYMJTJ0IANxwuTQrNfepNypnPFBKe8kagGVrahd5xb+UXoSAaZhd+gguKjpBS6uufrvp2v/YdrgxkeS7k5LcIGuWqsGONPzrLfU5Gmgd1o7DlVM8/ex39EC0zxWwz6Kdp8r4O2zX0nPQHXCjyIZbON0etq2fcgdf239aQGRlDiwBH2YEpmHtcoEhULX8BgnPGQfVxVqU2lJnjlXX12PmlrOOOHmp4MOTX0OiOcPz9SOhpRGnSTum9BJQxp1jABCuKTNQjo2U5JJKEISZHazeXEQnPZPz3YUGmBAB4S6QN3cQfHzXCWD7+dsgAQ7qtyAZeN3YV9NLkBNbuoQoBuAdmAtDtSu8tyqjEaXpHqA3Od3XJhS77jprao+sUJgE9102QBlcXQp5+PUKf8Y8BlJR41yxYDU4nFa5/8Xu8H1Z4aGWt9+iEgjLNIzKi7ExXwjEZy6uPjPVO5/+LCRgPmf5ypLlc4GcI7G6G+5H9F1Q=="
+          cidr_blocks = ["109.144.8.4/32"]
+        }
       }
       transfer_server_sftp_users_with_egress = {
         "essex-police" = {

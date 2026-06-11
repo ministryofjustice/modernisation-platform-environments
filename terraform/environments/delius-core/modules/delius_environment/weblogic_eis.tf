@@ -12,7 +12,7 @@ module "weblogic_eis" {
   env_name          = var.env_name
   account_config    = var.account_config
   account_info      = var.account_info
-  capacity_provider = aws_ecs_capacity_provider.weblogic.name
+  capacity_provider = aws_ecs_capacity_provider.weblogic_eis.name
 
   force_new_deployment = false
 
@@ -129,6 +129,25 @@ data "aws_ssm_parameter" "usermanagement_secret" {
   name = aws_ssm_parameter.usermanagement_secret.name
 }
 
+resource "aws_launch_template" "weblogic_eis" {
+  name_prefix   = "weblogic-eis-${var.env_name}-ecs-"
+  image_id      = data.aws_ami.ecs_ami.id
+  instance_type = var.delius_microservice_configs.weblogic_eis.ec2_instance_type
+
+  user_data = base64encode(templatefile("${path.module}/templates/ecs-host-userdata.tpl", { ecs_cluster_name = module.ecs.ecs_cluster_name }))
+
+  network_interfaces {
+    associate_public_ip_address = false
+    security_groups = [
+      aws_security_group.ecs_host_sg.id
+    ]
+  }
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.weblogic.name
+  }
+}
+
 resource "aws_autoscaling_group" "weblogic_eis" {
   name = "weblogic-eis-${var.env_name}-ecs-asg"
 
@@ -143,7 +162,7 @@ resource "aws_autoscaling_group" "weblogic_eis" {
   }
 
   launch_template {
-    id      = aws_launch_template.weblogic.id
+    id      = aws_launch_template.weblogic_eis.id
     version = "$Latest"
   }
 

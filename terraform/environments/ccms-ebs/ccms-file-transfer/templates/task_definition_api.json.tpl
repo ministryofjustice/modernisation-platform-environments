@@ -26,28 +26,36 @@
     ],
     "secrets": [
       {
-        "name": "ebs_db_username",
-        "valueFrom": "${ebs_db_username}"
+        "name": "ORACLE_USERNAME",
+        "valueFrom": "${ORACLE_USERNAME}"
       },
       {
-        "name": "ebs_db_password",
-        "valueFrom": "${ebs_db_password}"
+        "name": "ORACLE_PASSWORD",
+        "valueFrom": "${ORACLE_PASSWORD}"
       },
       {
-        "name": "ebs_db_endpoint",
-        "valueFrom": "${ebs_db_endpoint}"
+        "name": "ORACLE_URL",
+        "valueFrom": "${ORACLE_URL}"
       },
       {
-        "name": "file_transfer_slack_webhook",
-        "valueFrom": "${file_transfer_slack_webhook}"
+        "name": "SLACK_WEBHOOK",
+        "valueFrom": "${SLACK_WEBHOOK}"
       },
       {
-        "name": "TLS_CERT",
-        "valueFrom": "${TLS_CERT}"
+        "name": "ENABLE_SWAGGER",
+        "valueFrom": "${ENABLE_SWAGGER}"
       },
       {
-        "name": "TLS_KEY",
-        "valueFrom": "${TLS_KEY}"
+        "name": "AUTHORIZED_CLIENTS",
+        "valueFrom": "${AUTHORIZED_CLIENTS}"
+      },
+      {
+        "name": "AUTHORIZED_ROLES",
+        "valueFrom": "${AUTHORIZED_ROLES}"
+      },
+      {
+        "name": "UNPROTECTED_URIS",
+        "valueFrom": "${UNPROTECTED_URIS}"
       }
     ]
   }

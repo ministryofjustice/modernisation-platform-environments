@@ -129,9 +129,7 @@ data "aws_iam_policy_document" "lakeformation_share_permissions_policy" {
       "iam:GetRolePolicy",
       "iam:GetRole"
     ]
-    resources = [
-      "*"
-    ]
+    resources = [aws_iam_role.lakeformation_share_role.arn]
   }
 
   # Lake Formation permissions to manage cross-account access
@@ -218,4 +216,10 @@ data "aws_iam_policy_document" "lakeformation_share_permissions_policy" {
       "arn:aws:iam::${local.current_account_id}:role/*-location"
     ]
   }
+}
+
+resource "aws_iam_role_policy" "lakeformation_share_permissions_policy" {
+  name   = "lakeformation-share-permissions-policy"
+  role   = aws_iam_role.lakeformation_share_role.id
+  policy = data.aws_iam_policy_document.lakeformation_share_permissions_policy.json
 }
