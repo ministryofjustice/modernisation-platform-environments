@@ -67,6 +67,7 @@ resource "aws_secretsmanager_secret_version" "ftp_jobs_secret_values" {
 }
 
 data "aws_secretsmanager_secret_version" "ftp_jobs_secret_version" {
+  count      = local.build_ftp ? 1 : 0
   secret_id  = aws_secretsmanager_secret.ftp_jobs_secret.id
   depends_on = [aws_secretsmanager_secret_version.ftp_jobs_secret_values]
 }

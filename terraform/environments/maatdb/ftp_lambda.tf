@@ -324,7 +324,7 @@ resource "aws_lambda_function" "ftp" {
       INSECURE     = local.ftp_job.insecure
       S3BUCKET     = local.ftp_job.bucket_name
       FILEREMOVE   = local.ftp_job.file_remove
-      SECRET_NAME  = data.aws_secretsmanager_secret_version.ftp_jobs_secret_version.arn
+      SECRET_NAME  = data.aws_secretsmanager_secret_version.ftp_jobs_secret_version[0].arn
     }
   }
 }
