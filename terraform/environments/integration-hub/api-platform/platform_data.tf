@@ -151,7 +151,7 @@ data "terraform_remote_state" "core_network_services" {
 }
 
 data "terraform_remote_state" "managed_file_transfer" {
-  backend = "s3"
+  backend   = "s3"
   workspace = terraform.workspace
 
   config = {

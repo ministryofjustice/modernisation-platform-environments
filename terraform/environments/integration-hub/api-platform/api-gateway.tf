@@ -8,14 +8,18 @@ resource "aws_apigatewayv2_api" "upload_ticket" {
   name          = "${local.application_name}-${local.component_name}"
   protocol_type = "HTTP"
 
-  cors_configuration {
-    allow_headers = ["content-md5", "content-type"]
-    allow_methods = ["OPTIONS", "POST"]
-    allow_origins = ["*"]
-    expose_headers = [
-      "content-type",
-    ]
-    max_age = 300
+  dynamic "cors_configuration" {
+    for_each = length(local.cors_allowed_origins) > 0 ? [1] : []
+
+    content {
+      allow_headers = ["content-md5", "content-type"]
+      allow_methods = ["OPTIONS", "POST"]
+      allow_origins = local.cors_allowed_origins
+      expose_headers = [
+        "content-type",
+      ]
+      max_age = 300
+    }
   }
 
   tags = local.tags

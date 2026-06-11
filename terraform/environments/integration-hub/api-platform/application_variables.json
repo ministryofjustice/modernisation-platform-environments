@@ -2,6 +2,7 @@
   "accounts": {
     "development": {
       "api_configuration": {
+        "cors_allowed_origins": [],
         "max_presigned_url_expiry_seconds": 3600,
         "presigned_url_expiry_seconds": 900
       },
@@ -20,6 +21,7 @@
     },
     "test": {
       "api_configuration": {
+        "cors_allowed_origins": [],
         "max_presigned_url_expiry_seconds": 3600,
         "presigned_url_expiry_seconds": 900
       },
@@ -27,6 +29,7 @@
     },
     "preproduction": {
       "api_configuration": {
+        "cors_allowed_origins": [],
         "max_presigned_url_expiry_seconds": 3600,
         "presigned_url_expiry_seconds": 900
       },
@@ -34,6 +37,7 @@
     },
     "production": {
       "api_configuration": {
+        "cors_allowed_origins": [],
         "max_presigned_url_expiry_seconds": 3600,
         "presigned_url_expiry_seconds": 900
       },
