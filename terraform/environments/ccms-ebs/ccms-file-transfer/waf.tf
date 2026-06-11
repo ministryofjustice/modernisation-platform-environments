@@ -63,6 +63,50 @@ resource "aws_wafv2_web_acl" "sftp_web_acl" {
     }
   }
 
+rule {
+  name     = "EndpointSpecific-10RPS-Limit"
+  priority = 1
+
+  statement {
+    rate_based_statement {
+      limit              = 30
+      aggregate_key_type = "IP"
+
+      scope_down_statement {
+        byte_match_statement {
+          search_string = "/swagger-ui.html"
+
+          field_to_match {
+            uri_path {}
+          }
+
+          text_transformation {
+            priority = 0
+            type     = "LOWERCASE"
+          }
+
+          positional_constraint = "EXACTLY"
+        }
+      }
+    }
+  }
+
+  action {
+    block {
+      custom_response {
+        response_code            = 429
+        custom_response_body_key = "TooManyRequests"
+      }
+    }
+  }
+
+  visibility_config {
+    sampled_requests_enabled   = true
+    cloudwatch_metrics_enabled = true
+    metric_name                = "EndpointSpecific10RPSLimit"
+  }
+}
+
   # Restrict access to trusted IPs only - Non-Prod environments only
   dynamic "rule" {
     for_each = !local.is-production ? [1] : [1] # Temprorarily enable for Prod as well - to be removed when Geo Match is live
