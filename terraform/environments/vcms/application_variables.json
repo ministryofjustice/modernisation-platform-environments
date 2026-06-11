@@ -11,7 +11,7 @@
       "image_tag": "tm-1408-composer-19577361514-1",
       "db_snapshot_identifier": "rds-vcmsdev-db-backup-2025-09-26-14-04-mpcp",
       "log_retention_in_days": 14,
-      "legacy_url": "dev.victim-case-management.service.justice.gov.uk",
+      "legacy_url": "www.dev.victim-case-management.service.justice.gov.uk",
       "legacy_validation_record": "_499d343e257e36c131dd73a9aaaf97b6.dev.victim-case-management.service.justice.gov.uk"
     },
     "vcms-test": {
