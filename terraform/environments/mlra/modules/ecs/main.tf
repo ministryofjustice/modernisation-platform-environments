@@ -84,7 +84,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
 
 resource "aws_autoscaling_group" "cluster-scaling-group-al2023" {
   vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
-  name                  = "${var.app_name}-cluster-scaling-group-al2023"
+  name_prefix                  = "${var.app_name}-ec2-al2023-"
   # New ASG, set capacity to 0 - will be scaled manually during migration.
   # Follow-up Terraform PR will update to desired final capacity.
   desired_capacity      = 0
@@ -122,7 +122,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group-al2023" {
 
   tag {
     key                 = "Name"
-    value               = "${var.app_name}-cluster-scaling-group"
+    value               = "${var.app_name}-cluster-scaling-group-al2023"
     propagate_at_launch = true
   }
 
@@ -212,13 +212,14 @@ data "aws_ssm_parameter" "ecs_optimized_ami_al2023" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended"
 }
 
-# remove after migration
-output "ami_id_al2" {
+# update to reference AL2023 ID after migration
+# if the AMI is used elsewhere it can be obtained here
+output "ami_id" {
   value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2.value)["image_id"]
   sensitive = true
 }
 
-# if the AMI is used elsewhere it can be obtained here
+# move to ami_id after migration
 output "ami_id_al2023" {
   value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2023.value)["image_id"]
   sensitive = true
@@ -295,7 +296,7 @@ resource "aws_launch_template" "ec2-launch-template" {
 resource "aws_launch_template" "ec2-launch-template-al2023" {
   #checkov:skip=CKV_AWS_79:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   #checkov:skip=CKV_AWS_341:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-  name_prefix            = "${var.app_name}-ec2-launch-template-al2023"
+  name_prefix            = "${var.app_name}-ec2-al2023-"
   image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2023.value)["image_id"]
   instance_type          = var.instance_type
   key_name               = var.key_name

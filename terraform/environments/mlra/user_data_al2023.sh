@@ -1,7 +1,8 @@
 #!/bin/bash -xe
 echo ECS_CLUSTER=${app_name} >> /etc/ecs/ecs.config
+echo ECS_IMAGE_PULL_BEHAVIOR=always >> /etc/ecs/ecs.config
 # Install CloudWatch Agent
-yum install -y aws-cfn-bootstrap amazon-cloudwatch-agent
+yum install -y amazon-cloudwatch-agent
 # Write CloudWatch Agent config (provided via Terraform)
 cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<-EOF
 ${cw_agent_config}
@@ -35,7 +36,7 @@ else
   AGENT_PATH="pre-prod/cortex-agent.tar.gz"
 fi
 
-aws s3 cp $${XDR_AGENT_BUCKET}$${AGENT_PATH} ${xdr_tar}
+aws s3 cp "$${XDR_AGENT_BUCKET}$${AGENT_PATH}" ${xdr_tar}
 
 if [[ -f ${xdr_tar} ]]; then
   mkdir -p ${xdr_dir}
