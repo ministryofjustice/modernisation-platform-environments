@@ -139,7 +139,7 @@ data "aws_vpc_endpoint" "api_gateway" {
 resource "aws_security_group" "allow_cp_access" {
   name        = "allow_cp_access"
   description = "allow cp access"
-  vpc_id      = aws_vpc.core-vpc
+  vpc_id      = data.aws_vpc.shared.id
   tags        = local.tags
 }
 
