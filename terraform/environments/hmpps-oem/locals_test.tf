@@ -21,13 +21,16 @@ locals {
 
       sns_topics = {
         pagerduty_integrations = {
-          azure-fixngo-pagerduty          = "az-noms-dev-test-environments-alerts"
-          dso-pipelines-pagerduty         = "dso-pipelines"
-          hmpps-domain-services-pagerduty = "hmpps-domain-services-test"
-          nomis-pagerduty                 = "nomis-test"
-          nomis-data-hub-pagerduty        = "nomis-data-hub-test"
-          oasys-pagerduty                 = "oasys-test"
-          pagerduty                       = "hmpps-oem-test"
+          dso-pipelines-pagerduty                          = "dso-pipelines"
+          hmpps-domain-services-test-pagerduty             = "hmpps-domain-services-test"
+          nomis-test-pagerduty                             = "nomis-test"
+          nomis-preproduction-pagerduty                    = "nomis-preproduction"
+          nomis-combined-reporting-preproduction-pagerduty = "nomis-combined-reporting-preproduction"
+          nomis-data-hub-production-pagerduty              = "nomis-data-hub-production"
+          oasys-test-pagerduty                             = "oasys-test"
+          oasys-preproduction-pagerduty                    = "oasys-preproduction"
+          oasys-national-reporting-preproduction-pagerduty = "oasys-national-reporting-preproduction"
+          pagerduty                                        = "hmpps-oem-test"
         }
       }
     }
