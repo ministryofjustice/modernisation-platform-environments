@@ -35,7 +35,7 @@
         }
       },
       "quicksight_setup": true,
-      "malware_threat_endpoint_url": "https://TODO.development.yjbservices.yjb.gov.uk/document/threatDetected"
+      "malware_threat_endpoint_url": "https://yjaf.development.yjbservices.yjb.gov.uk/api/v1/docs/threatDetected"
     },
     "test": {
       "allow_s3_replication": false,
@@ -72,7 +72,7 @@
         }
       },
       "quicksight_setup": true,
-      "malware_threat_endpoint_url": "https://TODO.test.yjbservices.yjb.gov.uk/document/threatDetected"
+      "malware_threat_endpoint_url": "https://yjaf.test.yjbservices.yjb.gov.uk/api/v1/docs/threatDetected"
     },
     "preproduction": {
       "allow_s3_replication": false,
@@ -109,7 +109,7 @@
         }
       },
       "quicksight_setup": true,
-      "malware_threat_endpoint_url": "https://TODO.preproduction.yjbservices.yjb.gov.uk/document/threatDetected"
+      "malware_threat_endpoint_url": "https://yjaf.preproduction.yjbservices.yjb.gov.uk/api/v1/docs/threatDetected"
     },
     "production": {
       "allow_s3_replication": false,
@@ -150,7 +150,7 @@
         }
       },
       "quicksight_setup": true,
-      "malware_threat_endpoint_url": "https://TODO.yjbservices.yjb.gov.uk/document/threatDetected"
+      "malware_threat_endpoint_url": "https://yjaf.yjbservices.yjb.gov.uk/api/v1/docs/threatDetected"
     }
   }
 }
