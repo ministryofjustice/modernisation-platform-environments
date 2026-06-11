@@ -153,15 +153,19 @@ resource "aws_vpc_security_group_ingress_rule" "allow_cp_access" {
 }
 
 data "aws_route53_zone" "hmpps_internal" {
+  provider     = aws.core-vpc
   name = "hmpps-preproduction.modernisation-platform.internal"
 }
 
 data "aws_network_interface" "execute_api_endpoint_eni" {
+  provider     = aws.core-vpc
   for_each = toset(data.aws_vpc_endpoint.api_gateway.network_interface_ids)
   id       = each.value
 }
 
 resource "aws_route53_record" "private_api" {
+  provider     = aws.core-vpc
+
   zone_id = data.aws_route53_zone.hmpps_internal.zone_id
   name    = trimsuffix(trimprefix(aws_api_gateway_stage.update_p1_export_stage.invoke_url, "https://"), "/prod")
   type    = "A"
