@@ -529,13 +529,13 @@ systemctl start radiusd
 
 echo "Waiting for LinOTP /manage to become ready..."
 for attempt in $(seq 1 60); do
-  http_code=$(curl -sk -o /dev/null -w "%{http_code}" https://localhost/manage || true)
-  if [[ "$http_code" == "200" || "$http_code" == "401" ]]; then
-    echo "✓ LinOTP /manage is responding with HTTP $http_code"
+  http_code=$(curl -sk -o /dev/null -w "%%{http_code}" https://localhost/manage || true)
+  if [[ "$${http_code}" == "200" || "$${http_code}" == "401" ]]; then
+    echo "✓ LinOTP /manage is responding with HTTP $${http_code}"
     break
   fi
 
-  if [[ "$attempt" -eq 60 ]]; then
+  if [[ "$${attempt}" -eq 60 ]]; then
     echo "ERROR: LinOTP /manage did not become ready in time"
     exit 1
   fi
