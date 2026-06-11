@@ -55,7 +55,7 @@ This component provides a thin API layer for Managed File Transfer uploads.
 Apply the Managed File Transfer stack first so its remote state exposes the upload bucket output:
 
 ```bash
-cd /Users/harsh.vasudev/IdeaProjects/modernisation-platform-environments/terraform/environments/integration-hub/managed-file-transfer
+cd terraform/environments/integration-hub/managed-file-transfer
 terraform init -reconfigure
 terraform workspace select integration-hub-development
 terraform plan
