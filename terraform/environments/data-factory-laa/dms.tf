@@ -303,3 +303,234 @@ module "dms_oracle" {
     aws_s3_object.oracle_dms_mappings[0],
   ]
 }
+
+# =============================================================================
+# DMS Postgres Test - Development only
+# Deploys terraform-dms-module against the throwaway Postgres RDS instance
+#
+# Postgres DMS user minimum grants for full-load + CDC:
+#   CREATE USER dms_user WITH PASSWORD '...';
+#   GRANT CONNECT ON DATABASE dmstest TO dms_user;
+#   GRANT USAGE ON SCHEMA public TO dms_user;
+#   GRANT SELECT ON ALL TABLES IN SCHEMA public TO dms_user;
+#   ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO dms_user;
+#
+# For CDC (logical replication), the DMS user also needs:
+#   ALTER USER dms_user WITH REPLICATION;
+#
+# RDS parameter group must have:
+#   rds.logical_replication = 1  (enables WAL level logical)
+#
+# extra_connection_attributes:
+#   PluginName=test_decoding  — uses the built-in test_decoding plugin on RDS;
+#                               no pg_logical extension required
+#
+# CDC note:
+#   Postgres does NOT support cdc_start_time — DMS uses WAL LSN positions.
+#   The CDC task will start from the current WAL position automatically.
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Postgres DMS credentials secret
+# Populate the secret value with real credentials before running terraform apply:
+#   host     — RDS endpoint for the Postgres instance
+#   port     — 5432
+#   username — dms_user (must have CONNECT + SELECT + REPLICATION grants)
+#   password — dms_user password
+# ---------------------------------------------------------------------------
+
+data "aws_secretsmanager_secret" "dms_postgres_credentials" {
+  count = local.is-development ? 1 : 0
+  name  = "postgres-dms-example/dms-user"
+}
+
+data "aws_kms_alias" "dms_postgres_example" {
+  count = local.is-development ? 1 : 0
+  name  = "alias/postgres-dms-example"
+}
+
+data "aws_iam_policy_document" "postgres_dms_kms" {
+  count = local.is-development ? 1 : 0
+
+  statement {
+    sid    = "AllowAccountRootFullAccess"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowS3ToUseKeyForQueueNotifications"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt",
+    ]
+
+    resources = ["*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+}
+
+resource "aws_kms_key" "postgres_dms" {
+  count = local.is-development ? 1 : 0
+
+  description         = "KMS key for Postgres DMS test resources"
+  enable_key_rotation = true
+  policy              = data.aws_iam_policy_document.postgres_dms_kms[0].json
+
+  tags = local.tags
+}
+
+resource "aws_kms_alias" "postgres_dms" {
+  count = local.is-development ? 1 : 0
+
+  name          = "alias/${local.application_name}-${local.environment}-postgres-dms-test"
+  target_key_id = aws_kms_key.postgres_dms[0].key_id
+}
+
+# ---------------------------------------------------------------------------
+# S3 mapping rules object (reuses existing dms_config bucket)
+# ---------------------------------------------------------------------------
+
+resource "aws_s3_object" "postgres_dms_mappings" {
+  count        = local.is-development ? 1 : 0
+  bucket       = aws_s3_bucket.dms_config[0].id
+  key          = "mappings/postgres-dms-test.json"
+  content      = file("${path.module}/dms-config/postgres-dms-test-mappings.json")
+  content_type = "application/json"
+  tags         = local.tags
+}
+
+# ---------------------------------------------------------------------------
+# IAM role for metadata generator Lambda to access Glue catalog (Postgres)
+# ---------------------------------------------------------------------------
+
+resource "aws_iam_role" "postgres_dms_glue_access" {
+  count = local.is-development ? 1 : 0
+  name  = "${local.application_name}-postgres-dms-test-glue-access"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action = ["sts:AssumeRole", "sts:TagSession"]
+      }
+    ]
+  })
+
+  tags = local.tags
+}
+
+resource "aws_iam_role_policy" "postgres_dms_glue_access" {
+  count = local.is-development ? 1 : 0
+  name  = "glue-catalog-access"
+  role  = aws_iam_role.postgres_dms_glue_access[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "glue:GetDatabase",
+          "glue:CreateDatabase",
+          "glue:GetTable",
+          "glue:CreateTable",
+          "glue:UpdateTable"
+        ]
+        Resource = [
+          "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:catalog",
+          "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:database/*",
+          "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:table/*/*"
+        ]
+      }
+    ]
+  })
+}
+
+# ---------------------------------------------------------------------------
+# DMS Module — Postgres
+# ---------------------------------------------------------------------------
+
+#trivy:ignore:AVD-AWS-0066 X-Ray tracing not currently required
+module "dms_postgres" {
+  # checkov:skip=CKV_TF_1: using branch ref for testing
+  # checkov:skip=CKV_TF_2: using branch ref for testing
+  count  = local.is-development ? 1 : 0
+  source = "github.com/ministryofjustice/terraform-dms-module?ref=075c7dde7f5259c0e28ba00af1cd1fd49336a3fb"
+
+  vpc_id      = data.aws_vpc.shared.id
+  environment = local.environment
+  db          = "postgres-dms-test"
+  tags        = local.tags
+
+  validation_sqs_kms_key_arn = aws_kms_key.postgres_dms[0].arn
+
+  write_metadata_to_glue_catalog = true
+  glue_catalog_arn               = "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:catalog"
+  glue_catalog_role_arn          = aws_iam_role.postgres_dms_glue_access[0].arn
+
+  dms_replication_instance = {
+    replication_instance_id    = "${local.application_name}-postgres-dms-test"
+    subnet_ids                 = data.aws_subnets.shared-private.ids
+    allocated_storage          = 50
+    availability_zone          = "eu-west-2a"
+    engine_version             = "3.5.4"
+    kms_key_arn                = aws_kms_key.postgres_dms[0].arn
+    multi_az                   = false
+    replication_instance_class = "dms.t3.medium"
+    inbound_cidr               = data.aws_vpc.shared.cidr_block
+    apply_immediately          = true
+  }
+
+  dms_source = {
+    engine_name             = "postgres"
+    secrets_manager_arn     = data.aws_secretsmanager_secret.dms_postgres_credentials[0].arn
+    secrets_manager_kms_arn = data.aws_kms_alias.dms_postgres_example[0].target_key_arn
+    database_name           = "dmstest"
+    # Postgres extra_connection_attributes:
+    #   PluginName=test_decoding — built-in logical decoding plugin on RDS;
+    #                              no pg_logical extension needed
+    #   sslMode=require          — RDS enforces SSL via pg_hba.conf
+    extra_connection_attributes = "PluginName=test_decoding;sslMode=require;"
+  }
+
+  replication_task_id = {
+    full_load = "${local.application_name}-postgres-dms-test-full-load"
+    cdc       = "${local.application_name}-postgres-dms-test-cdc"
+  }
+
+  dms_mapping_rules = {
+    bucket = aws_s3_bucket.dms_config[0].id
+    key    = aws_s3_object.postgres_dms_mappings[0].key
+  }
+
+  slack_webhook_secret_id = aws_secretsmanager_secret.dms_slack_webhook[0].id
+
+  depends_on = [
+    aws_iam_role_policy_attachment.dms_vpc_role,
+    aws_s3_object.postgres_dms_mappings[0],
+  ]
+}

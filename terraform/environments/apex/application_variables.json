@@ -50,7 +50,8 @@
       "alb_target_4xx_alarm_threshold": "10",
       "alb_elb_4xx_alarm_threshold": "10",
       "oas_lz_cidr": "10.202.4.85/32",
-      "lz_account_id": "411213865113"
+      "lz_account_id": "411213865113",
+      "bastion_bucket_suffix": "xwk1ug"
     },
     "test": {
       "ec2amiid": "ami-00b96c3ab7b1106b4",
@@ -100,7 +101,8 @@
       "alb_target_4xx_alarm_threshold": "10",
       "alb_elb_4xx_alarm_threshold": "10",
       "oas_lz_cidr": "10.206.4.156/32",
-      "lz_account_id": "140455166311"
+      "lz_account_id": "140455166311",
+      "bastion_bucket_suffix": "4yymig"
     },
     "preproduction": {
       "ec2amiid": "ami-0cd12aabdcc3e788a",
@@ -200,7 +202,8 @@
       "alb_target_4xx_alarm_threshold": "10",
       "alb_elb_4xx_alarm_threshold": "10",
       "oas_lz_cidr": "10.205.4.186/32",
-      "lz_account_id": "842522700642"
+      "lz_account_id": "842522700642",
+      "bastion_bucket_suffix": "bablvh"
     }
   }
 }

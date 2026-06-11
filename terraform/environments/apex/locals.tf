@@ -78,6 +78,13 @@ locals {
   app_db_password_name = "APP_APEX_DBPASSWORD_TAD"
   db_hostname          = "db.${local.application_name}"
 
+  lambda_source_hashes = [
+    for f in fileset("./lambda/cloudwatch_alarm_slack_integration", "**") :
+    sha256(file("${path.module}/lambda/cloudwatch_alarm_slack_integration/${f}"))
+  ]
+
+  lambda_folder_name = ["lambda_delivery", "cloudwatch_sns_layer"]
+
   backup_schedule_tags       = local.environment == "production" ? { "snapshot-35-day-retention" = "yes" } : null
   database-instance-userdata = <<EOF
 #!/bin/bash

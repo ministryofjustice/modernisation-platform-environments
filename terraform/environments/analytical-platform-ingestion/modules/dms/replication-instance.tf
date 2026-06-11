@@ -1,9 +1,9 @@
 resource "aws_security_group" "replication_instance" {
-  name        = "${var.db}-${data.aws_region.current.name}-${var.environment}"
+  name        = "${var.db}-${data.aws_region.current.region}-${var.environment}"
   description = "Security group for DMS replication instances. Managed by Terraform"
   vpc_id      = var.vpc_id
   tags = merge(
-    { Name = "${var.db}-${data.aws_region.current.name}-${var.environment}" },
+    { Name = "${var.db}-${data.aws_region.current.region}-${var.environment}" },
     var.tags
   )
 }
@@ -39,13 +39,13 @@ resource "aws_vpc_security_group_egress_rule" "replication_instance_outbound" {
 resource "aws_dms_replication_subnet_group" "replication_subnet_group" {
   count                                = var.dms_replication_instance.subnet_group_id == null ? 1 : 0
   replication_subnet_group_description = "Subnet group for DMS replication instances"
-  replication_subnet_group_id          = var.dms_replication_instance.subnet_group_name == null ? "${data.aws_region.current.name}-${var.environment}" : var.dms_replication_instance.subnet_group_name
+  replication_subnet_group_id          = var.dms_replication_instance.subnet_group_name == null ? "${data.aws_region.current.region}-${var.environment}" : var.dms_replication_instance.subnet_group_name
   # these would come from the core stack once created
   subnet_ids = data.aws_subnets.subnet_ids_vpc_subnets.ids
 
   tags = merge(var.tags,
     {
-      Name        = "${data.aws_region.current.name}-${var.environment}"
+      Name        = "${data.aws_region.current.region}-${var.environment}"
       application = "Data Engineering"
     }
   )

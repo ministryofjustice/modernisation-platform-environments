@@ -90,10 +90,10 @@ locals {
       container_port    = 8080
       container_memory  = 4096
       container_cpu     = 2048
-      ec2_instance_type = "r7i.2xlarge"
+      ec2_instance_type = "r7i.xlarge"
       task_count        = 2
       asg_min_size      = 1
-      asg_max_size      = 2
+      asg_max_size      = 1
     }
 
     weblogic_params = {
@@ -147,8 +147,8 @@ locals {
       container_port    = 8080
       container_memory  = 2048
       container_cpu     = 1024
-      ec2_instance_type = "r7i.large"
-      task_count        = 1
+      ec2_instance_type = "r7i.xlarge"
+      task_count        = 2
     }
 
     pwm = {

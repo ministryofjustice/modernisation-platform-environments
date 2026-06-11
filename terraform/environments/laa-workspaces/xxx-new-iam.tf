@@ -175,6 +175,12 @@ resource "aws_iam_role_policy" "user_creation_lambda_policy" {
           "kms:GenerateDataKey"
         ]
         Resource = aws_kms_key.ebs[0].arn
+      },
+      {
+        Sid      = "SESEmailDelivery"
+        Effect   = "Allow"
+        Action   = ["ses:SendEmail", "ses:SendRawEmail"]
+        Resource = "*"
       }
     ]
   })
