@@ -1287,7 +1287,7 @@ module "s3-create-a-derived-table-back-up-bucket-staging" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
   bucket_name        = "${local.bucket_prefix}-cadt-backup-staging"
-  versioning_enabled = true
+  versioning_enabled = false
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
   ownership_controls = "BucketOwnerEnforced"
