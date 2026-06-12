@@ -34,6 +34,7 @@ module "app_rds" {
     {
       name  = "rds.force_ssl"
       value = "1"
+      apply_method = "pending-reboot"
     }
   ]
 
