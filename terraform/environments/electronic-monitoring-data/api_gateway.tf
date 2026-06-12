@@ -207,6 +207,8 @@ resource "aws_security_group_rule" "egress_dns_endpoint_traffic" {
 }
 
 resource "aws_route53_resolver_endpoint" "inbound_api" {
+  provider     = aws.core-vpc
+
   name      = "inbound-resolver"
   direction = "INBOUND"
 
