@@ -160,8 +160,6 @@ resource "aws_route_table" "firewall" {
   )
 }
 
-
-
 resource "aws_route_table_association" "firewall_a" {
   count = local.environment == "development" ? 1 : 0
 
@@ -222,6 +220,37 @@ resource "aws_internet_gateway" "main" {
     { "Name" = "${local.application_name}-${local.environment}-igw" }
   )
 }
+
+
+
+resource "aws_route_table" "edge" {
+  count = local.environment == "development" ? 1 : 0
+
+  vpc_id = aws_vpc.default.id
+
+  tags = {
+    Name = "${local.application_name}-${local.environment}-production-edge"
+  }
+}
+
+
+resource "aws_route" "first_az" {
+  count = local.environment == "development" ? 1 : 0
+  
+  route_table_id            = aws_route_table.edge[0].id
+  destination_cidr_block    = "10.200.10.0/24"
+  vpc_endpoint_id           = local.firewall_endpoints["eu-west-2a"]
+}
+
+
+resource "aws_route_table_association" "edge" {
+  count = local.environment == "development" ? 1 : 0
+
+  gateway_id     = aws_internet_gateway.main[0].id
+  route_table_id = aws_route_table.edge[0].id
+}
+
+
 
 ##############################################
 ### Route Table for Public Subnets - nat-gateway to firewall
