@@ -150,18 +150,16 @@ data "terraform_remote_state" "core_network_services" {
   }
 }
 
-data "terraform_remote_state" "managed_file_transfer" {
-  backend   = "s3"
-  workspace = terraform.workspace
+data "aws_ssm_parameter" "mft_upload_bucket_name" {
+  name = "${local.mft_upload_bucket_parameter_prefix}/name"
+}
 
-  config = {
-    acl                  = "bucket-owner-full-control"
-    bucket               = "modernisation-platform-terraform-state"
-    encrypt              = true
-    key                  = "terraform.tfstate"
-    region               = "eu-west-2"
-    workspace_key_prefix = "environments/members/integration-hub/managed-file-transfer"
-  }
+data "aws_ssm_parameter" "mft_upload_bucket_arn" {
+  name = "${local.mft_upload_bucket_parameter_prefix}/arn"
+}
+
+data "aws_ssm_parameter" "mft_upload_bucket_kms_key_arn" {
+  name = "${local.mft_upload_bucket_parameter_prefix}/kms-key-arn"
 }
 
 data "aws_organizations_organization" "root_account" {}

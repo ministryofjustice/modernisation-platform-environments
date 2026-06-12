@@ -13,8 +13,8 @@ module "lambda_upload_ticket" {
     MAX_PRESIGNED_URL_EXPIRY_SECONDS = tostring(try(local.api_configuration.max_presigned_url_expiry_seconds, 3600))
     PRESIGNED_URL_EXPIRY_SECONDS     = tostring(try(local.api_configuration.presigned_url_expiry_seconds, 900))
     TRANSFER_CLIENTS_TABLE           = module.dynamodb_transfer_clients.dynamodb_table_id
-    UPLOAD_BUCKET_KMS_KEY_ARN        = data.terraform_remote_state.managed_file_transfer.outputs.upload_bucket.kms_key_arn
-    UPLOAD_BUCKET_NAME               = data.terraform_remote_state.managed_file_transfer.outputs.upload_bucket.id
+    UPLOAD_BUCKET_KMS_KEY_ARN        = data.aws_ssm_parameter.mft_upload_bucket_kms_key_arn.value
+    UPLOAD_BUCKET_NAME               = data.aws_ssm_parameter.mft_upload_bucket_name.value
   }
 
   attach_policy_statements = true
@@ -34,7 +34,7 @@ module "lambda_upload_ticket" {
         "s3:PutObject",
       ]
       resources = [
-        "${data.terraform_remote_state.managed_file_transfer.outputs.upload_bucket.arn}/*",
+        "${data.aws_ssm_parameter.mft_upload_bucket_arn.value}/*",
       ]
     }
     upload_bucket_kms_access = {
@@ -45,7 +45,7 @@ module "lambda_upload_ticket" {
         "kms:GenerateDataKey*",
       ]
       resources = [
-        data.terraform_remote_state.managed_file_transfer.outputs.upload_bucket.kms_key_arn,
+        data.aws_ssm_parameter.mft_upload_bucket_kms_key_arn.value,
       ]
     }
   }
