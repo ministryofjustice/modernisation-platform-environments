@@ -232,12 +232,14 @@
                 const {data: reviews} = await github.rest.pulls.listReviews({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  pull_number: context.payload.pull_request.number
+                  pull_number: context.payload.pull_request.number,
+                  per_page: 100
                 });
 
                 const {data: team_members} = await github.rest.teams.listMembersInOrg({
                   org: orgName,
-                  team_slug: teamSlug
+                  team_slug: teamSlug,
+                  per_page: 100
                 });
 
                 const teamMemberLogins = team_members.map(member => member.login);
