@@ -6,6 +6,9 @@ module "s3_bucket" {
   version = "5.13.0"
 
   allowed_kms_key_arn = module.kms_s3_bucket[each.key].key_arn
+  attach_deny_incorrect_encryption_headers = true
+  attach_deny_insecure_transport_policy    = true
+  attach_deny_unencrypted_object_uploads   = true
   bucket_prefix       = each.value.bucket_prefix
   cors_rule = each.key == "unscanned" ? [
     {
