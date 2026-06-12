@@ -5,7 +5,7 @@
 # This secret manages all connection details for the SFTP endpoint.
 # After the Terraform resource is created, update the secret value in the AWS console for each environment.
 #
-# Preferred format — flat JSON (HOST, PORT, USER, PASSWORD and REMOTEPATH are all read by the Lambda at runtime):
+# Required format — flat JSON:
 #
 # {
 #   "HOST": "sftp.example.com",
@@ -14,36 +14,6 @@
 #   "PASSWORD": "password",
 #   "REMOTEPATH": "/upload/"
 # }
-#
-# Legacy array format is also supported for backwards compatibility:
-#
-# [
-#   {
-#     "name": "xerox-outbound",
-#     "type": "remote-host",
-#     "value": "sftp.example.com"
-#   },
-#   {
-#     "name": "xerox-outbound",
-#     "type": "remote-port",
-#     "value": "22"
-#   },
-#   {
-#     "name": "xerox-outbound",
-#     "type": "remote-folder",
-#     "value": "/upload/"
-#   },
-#   {
-#     "name": "xerox-outbound",
-#     "type": "username",
-#     "value": "username"
-#   },
-#   {
-#     "name": "xerox-outbound",
-#     "type": "password",
-#     "value": "password"
-#   }
-# ]
 
 resource "aws_secretsmanager_secret" "ftp_jobs_secret" {
   #checkov:skip=CKV2_AWS_57:"This will be fixed at a later date"

@@ -40,34 +40,13 @@ if _secret_name:
             except Exception:
                 parsed = {}
 
-            # Support flat JSON: {"HOST":"...","USER":"...","PASSWORD":"...","PORT":"22","REMOTEPATH":"/upload/"}
+            # Flat JSON format: {"HOST":"...","USER":"...","PASSWORD":"...","PORT":"22","REMOTEPATH":"/upload/"}
             if isinstance(parsed, dict):
                 host = parsed.get('HOST')
                 user = parsed.get('USER')
                 password = parsed.get('PASSWORD')
                 port = parsed.get('PORT')
                 remotePath = parsed.get('REMOTEPATH')
-
-            # Support older maatdb array format: [{"name":"xerox-outbound","type":"username","value":"user"}, ...]
-            elif isinstance(parsed, list):
-                for pair in parsed:
-                    if not isinstance(pair, dict):
-                        continue
-                    typ = pair.get('type')
-                    val = pair.get('value')
-                    if not typ or val is None:
-                        continue
-                    t = typ.lower()
-                    if t in ('username', 'user'):
-                        user = val
-                    elif t in ('password', 'pass'):
-                        password = val
-                    elif t in ('remote-host', 'host', 'host_address', 'hostaddress'):
-                        host = val
-                    elif t in ('remote-port', 'port'):
-                        port = val
-                    elif t in ('remote-folder', 'remote-path', 'remotepath', 'remotefolder'):
-                        remotePath = val
     except Exception as e:
         logger.exception('Unable to retrieve secret from Secrets Manager: %s', str(e))
 
