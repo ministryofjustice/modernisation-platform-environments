@@ -1259,15 +1259,6 @@ module "s3-create-a-derived-table-bucket" {
         }
       ]
 
-      noncurrent_version_transition = [
-        {
-          days          = 30
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 90
-          storage_class = "GLACIER"
-        }
-      ]
 
       noncurrent_version_expiration = {
         days = 35
