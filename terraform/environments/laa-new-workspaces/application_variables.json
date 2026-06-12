@@ -20,7 +20,8 @@
       "private_subnet_b_cidr": "10.27.130.128/25",
       "public_subnet_a_cidr": "10.27.131.0/26",
       "public_subnet_b_cidr": "10.27.131.64/26",
-      "free_cidr": "10.27.131.128/25"
+      "free_cidr": "10.27.131.128/25",
+      "transit_gateway_id": "tgw-053d9dd7f1222a554"
     }
   }
 }
