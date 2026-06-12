@@ -52,7 +52,7 @@ This component provides a thin API layer for Managed File Transfer uploads.
 
 ## Terraform commands
 
-Apply the Managed File Transfer stack first so its remote state exposes the upload bucket output:
+Apply the Managed File Transfer stack first so it creates the SSM parameters for the upload bucket (consumed by this stack):
 
 ```bash
 cd terraform/environments/integration-hub/managed-file-transfer
