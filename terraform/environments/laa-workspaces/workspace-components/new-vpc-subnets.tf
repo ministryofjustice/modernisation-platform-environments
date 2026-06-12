@@ -226,7 +226,7 @@ resource "aws_internet_gateway" "main" {
 resource "aws_route_table" "edge" {
   count = local.environment == "development" ? 1 : 0
 
-  vpc_id = aws_vpc.default.id
+  vpc_id = aws_vpc.workspaces[0].id
 
   tags = {
     Name = "${local.application_name}-${local.environment}-production-edge"
