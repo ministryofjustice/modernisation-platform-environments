@@ -150,8 +150,8 @@ resource "aws_route_table" "firewall" {
   vpc_id = aws_vpc.workspaces[0].id
 
   route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_internet_gateway.main[0].id
+    cidr_block      = "0.0.0.0/0"
+    gateway_id      = aws_internet_gateway.main[0].id
   }
 
   tags = merge(
