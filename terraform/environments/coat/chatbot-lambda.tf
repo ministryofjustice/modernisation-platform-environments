@@ -1,41 +1,5 @@
 # Lambda
 
-locals {
-  rag_lambda_source_files = concat(
-    ["rag-lambda.py", "requirements.txt"],
-    [for f in fileset("${path.module}/lambdas/rag-lambda/lib", "**") : "lib/${f}"],
-    [for f in fileset("${path.module}/lambdas/rag-lambda/services", "**") : "services/${f}"],
-    [for f in fileset("${path.module}/lambdas/rag-lambda/schemas", "**") : "schemas/${f}"],
-  )
-
-  rag_lambda_source_hash = sha256(join("", [
-    for f in local.rag_lambda_source_files :
-    filesha256("${path.module}/lambdas/rag-lambda/${f}")
-  ]))
-}
-
-resource "null_resource" "build_lambda_zip" {
-  triggers = {
-    source_hash = local.rag_lambda_source_hash
-  }
-
-  provisioner "local-exec" {
-    command = <<-EOT
-      cd ${path.module}/lambdas/rag-lambda
-      pip3 install -r requirements.txt -t .
-    EOT
-  }
-}
-
-data "archive_file" "rag_lambda" {
-  depends_on = [null_resource.build_lambda_zip]
-
-  type        = "zip"
-  source_dir  = "${path.module}/lambdas/rag-lambda/"
-  output_path = "${path.module}/lambdas/rag-lambda/rag-lambda.zip"
-  excludes    = ["rag-lambda.zip"]
-}
-
 resource "aws_security_group" "rag_lambda" {
   name        = "${local.application_name}-${local.environment}-rag-lambda-security-group"
   description = "RAG Lambda Security Group"
@@ -48,52 +12,6 @@ resource "aws_security_group" "rag_lambda" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-}
-
-resource "aws_lambda_function" "rag_lambda" {
-  #checkov:skip=CKV_AWS_173:No sensitive information stored in Lambda environment variables
-  #checkov:skip=CKV_AWS_116:Queue it self has DLQ so Lambda fail should redrive to DLQ
-  #checkov:skip=CKV_AWS_272:Doesn't need code signing
-
-  function_name = "RAGLambdaFunction"
-  description   = "Recieve NL request from user, use Bedrock to create SQL from NL, and use query to extract data from Athena"
-
-  role    = aws_iam_role.rag_lambda_role.arn
-  runtime = "python3.12"
-  timeout = 30
-
-  handler          = "rag-lambda.lambda_handler"
-  package_type     = "Zip"
-  filename         = "${path.module}/lambdas/rag-lambda/rag-lambda.zip"
-  source_code_hash = data.archive_file.rag_lambda.output_base64sha256
-
-  reserved_concurrent_executions = 10
-
-  vpc_config {
-    security_group_ids = [aws_security_group.rag_lambda.id]
-    subnet_ids         = [data.aws_subnet.private_subnets_a.id]
-  }
-
-  tracing_config {
-    mode = "PassThrough"
-  }
-
-  environment {
-    variables = {
-      ENVIRONMENT = local.environment
-    }
-  }
-
-  tags = {
-    "service-area" = "Hosting"
-  }
-}
-
-# Logs
-
-resource "aws_cloudwatch_log_group" "rag_lambda_log_group" {
-  name              = "/aws/lambda/${aws_lambda_function.rag_lambda.function_name}"
-  retention_in_days = 120
 }
 
 # IAM role
@@ -220,6 +138,61 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
 resource "aws_iam_role_policy_attachment" "rag_lambda_vpc_access" {
   role       = aws_iam_role.rag_lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+module "rag_lambda" {
+  #checkov:skip=CKV_TF_1:Module is from Terraform registry
+  #checkov:skip=CKV_AWS_173:No sensitive information stored in Lambda environment variables
+  #checkov:skip=CKV_AWS_116:Queue it self has DLQ so Lambda fail should redrive to DLQ
+  #checkov:skip=CKV_AWS_272:Doesn't need code signing
+
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "8.8.0"
+
+  function_name = "RAGLambdaFunction"
+  description   = "Recieve NL request from user, use Bedrock to create SQL from NL, and use query to extract data from Athena"
+  handler       = "rag-lambda.lambda_handler"
+  runtime       = "python3.12"
+  timeout       = 30
+
+  source_path = [{
+    path = "${path.module}/lambdas/rag-lambda"
+    commands = [
+      "pip3 install -r requirements.txt -t .",
+      ":zip",
+    ]
+  }]
+  trigger_on_package_timestamp = false
+
+  reserved_concurrent_executions = 10
+
+  vpc_subnet_ids         = [data.aws_subnet.private_subnets_a.id]
+  vpc_security_group_ids = [aws_security_group.rag_lambda.id]
+
+  tracing_mode = "PassThrough"
+
+  environment_variables = {
+    ENVIRONMENT = local.environment
+  }
+
+  create_role = false
+  lambda_role = aws_iam_role.rag_lambda_role.arn
+
+  cloudwatch_logs_retention_in_days = 120
+
+  tags = {
+    "service-area" = "Hosting"
+  }
+}
+
+moved {
+  from = aws_lambda_function.rag_lambda
+  to   = module.rag_lambda.aws_lambda_function.this[0]
+}
+
+moved {
+  from = aws_cloudwatch_log_group.rag_lambda_log_group
+  to   = module.rag_lambda.aws_cloudwatch_log_group.lambda[0]
 }
 
 # Secrets
