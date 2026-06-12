@@ -17,6 +17,7 @@ function Generate-password ($length)
     return [string]$characters[$random]
 }
 
+
 Write-Host "Starting user creation process..."
 Write-Host "Firstname: $Firstname"
 Write-Host "Lastname: $Lastname"
