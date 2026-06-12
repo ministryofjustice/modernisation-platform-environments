@@ -180,6 +180,8 @@ resource "aws_iam_policy" "ec2_instance_policy" {
                 "ecs:UpdateContainerInstancesState",
                 "ecs:Submit*",
                 "ecs:SubmitTaskStateChange",
+                "ecs:DescribeTasks",
+                "ecs:DescribeServices",
                 "ecr:GetAuthorizationToken",
                 "ecr:BatchCheckLayerAvailability",
                 "ecr:GetDownloadUrlForLayer",
