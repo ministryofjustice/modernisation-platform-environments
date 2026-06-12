@@ -52,3 +52,18 @@ output "cluster_resource_id" {
   description = "The Resource ID of the RDS Aurora cluster, used to scope IAM database authentication policies (rds-db:connect)"
   value       = module.aurora.cluster_resource_id
 }
+
+output "rds_proxy_endpoint" {
+  description = "The endpoint of the RDS Proxy"
+  value       = aws_db_proxy.rds_proxy.endpoint
+}
+
+output "rds_proxy_arn" {
+  description = "The ARN of the RDS Proxy"
+  value       = aws_db_proxy.rds_proxy.arn
+}
+
+output "rds_proxy_security_group_id" {
+  description = "The ID of the security group controlling access to the RDS Proxy"
+  value       = aws_security_group.rds_proxy.id
+}
