@@ -1259,10 +1259,6 @@ module "s3-create-a-derived-table-bucket" {
         }
       ]
 
-      expiration = {
-        days = 1000
-      }
-
       noncurrent_version_transition = [
         {
           days          = 30
@@ -1274,7 +1270,7 @@ module "s3-create-a-derived-table-bucket" {
       ]
 
       noncurrent_version_expiration = {
-        days = 365
+        days = 35
       }
     }
   ]
@@ -1317,31 +1313,13 @@ module "s3-create-a-derived-table-back-up-bucket-staging" {
 
       transition = [
         {
-          days          = 365
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 700
-          storage_class = "GLACIER"
-        }
-      ]
-
-      expiration = {
-        days = 1000
-      }
-
-      noncurrent_version_transition = [
-        {
           days          = 30
           storage_class = "STANDARD_IA"
           }, {
-          days          = 90
+          days          = 60
           storage_class = "GLACIER"
         }
       ]
-
-      noncurrent_version_expiration = {
-        days = 365
-      }
     }
   ]
 
