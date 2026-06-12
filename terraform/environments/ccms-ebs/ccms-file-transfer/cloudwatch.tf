@@ -23,7 +23,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_sftp5xx" {
   tags = local.tags
 }
 
-Alarm for ECS Container Count for sftp_bc Service
+# Alarm for ECS Container Count for sftp_bc Service
 resource "aws_cloudwatch_metric_alarm" "container_sftp_count" {
   alarm_name          = "${local.application_name}-${local.environment}-sftp-bc-container-count-low"
   comparison_operator = "LessThanThreshold"
