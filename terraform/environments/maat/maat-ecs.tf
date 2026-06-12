@@ -124,13 +124,14 @@ data "aws_ssm_parameter" "ecs_optimized_ami_al2023" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended"
 }
 
-# remove after migration
-output "ami_id_al2" {
+# update to reference AL2023 ID after migration
+# if the AMI is used elsewhere it can be obtained here
+output "ami_id" {
   value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2.value)["image_id"]
   sensitive = true
 }
 
-# if the AMI is used elsewhere it can be obtained here
+# move to ami_id after migration
 output "ami_id_al2023" {
   value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2023.value)["image_id"]
   sensitive = true
@@ -193,7 +194,7 @@ resource "aws_launch_template" "maat_ec2_launch_template" {
 
 resource "aws_launch_template" "maat_ec2_launch_template_al2023" {
   #checkov:skip=AVD-AWS-0130: "Ignore - Launch template does not require IMDS access to require a token"
-  name_prefix   = "${local.application_name}-ec2-launch-template-al2023"
+  name_prefix   = "${local.application_name}-ec2-al2023-"
   image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2023.value)["image_id"]
   instance_type = local.application_data.accounts[local.environment].instance_type
 
@@ -280,7 +281,7 @@ resource "aws_autoscaling_group" "maat_ec2_scaling_group" {
 
 resource "aws_autoscaling_group" "maat_ec2_scaling_group_al2023" {
   vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
-  name                = "${local.application_name}-EC2-asg-al2023"
+  name_prefix         = "${local.application_name}-ec2-al2023-"
   # New ASG, set capacity to 0 - will be scaled manually during migration.
   # Follow-up Terraform PR will update to desired final capacity.
   desired_capacity    = 0
