@@ -34,12 +34,13 @@ def create_ad_user(event):
     """
     instance_id = os.environ['EC2_INSTANCE_ID']
     region = os.environ['REGION']
+    service_account_secret_arn = os.environ.get('LAMBDA_SERVICE_ACCOUNT_SECRET_ARN', '')
 
     firstname = event['Firstname']
     lastname = event['Lastname']
     email = event['Email']
 
-    powershell_command = f"powershell.exe -File 'C:\\Windows\\system32\\user-creation.ps1' -Firstname '{firstname}' -Lastname '{lastname}' -Email '{email}'"
+    powershell_command = f"powershell.exe -File 'C:\\Windows\\system32\\user-creation.ps1' -Firstname '{firstname}' -Lastname '{lastname}' -Email '{email}' -ServiceAccountSecretArn '{service_account_secret_arn}' -Region '{region}'"
 
     ssm_client = boto3.client('ssm', region_name=region)
     response = ssm_client.send_command(

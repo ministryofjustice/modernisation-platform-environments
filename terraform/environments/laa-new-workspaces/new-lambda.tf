@@ -41,6 +41,7 @@ resource "aws_lambda_function" "user_creation" {
       REGION                = local.application_data.accounts[local.environment].region
       SES_SENDER            = data.terraform_remote_state.workspace_components.outputs.ses_sender_email
       SELFSERVICE_URL       = "${data.terraform_remote_state.workspace_components.outputs.radius_portal_url}/selfservice/login"
+      LAMBDA_SERVICE_ACCOUNT_SECRET_ARN = aws_secretsmanager_secret.lambda_service_account_password.arn
     }
   }
 
