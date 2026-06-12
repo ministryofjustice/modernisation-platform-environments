@@ -5,7 +5,7 @@ metadata:
   namespace: test-workload
 spec:
   parentRefs:
-    - name: shared-alb
+    - name: ${gateway_name}
       namespace: lbc-test
   hostnames:
     - "${hostname}"
