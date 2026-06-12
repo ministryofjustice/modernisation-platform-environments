@@ -149,35 +149,18 @@ resource "aws_route_table" "firewall" {
 
   vpc_id = aws_vpc.workspaces[0].id
 
+  route {
+    cidr_block      = "0.0.0.0/0"
+    gateway_id      = aws_internet_gateway.main[0].id
+  }
+
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}-${local.environment}-firewall-rt" }
   )
 }
 
-resource "aws_route" "firewall_to_igw" {
-  count = local.environment == "development" ? 1 : 0
 
-  route_table_id         = aws_route_table.firewall[0].id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.main[0].id
-}
-
-resource "aws_route" "firewall_return_a" {
-  count = local.environment == "development" ? 1 : 0
-
-  route_table_id         = aws_route_table.firewall[0].id
-  destination_cidr_block = local.application_data.accounts[local.environment].public_subnet_a_cidr
-  vpc_endpoint_id        = local.firewall_endpoints["eu-west-2a"]
-}
-
-resource "aws_route" "firewall_return_b" {
-  count = local.environment == "development" ? 1 : 0
-
-  route_table_id         = aws_route_table.firewall[0].id
-  destination_cidr_block = local.application_data.accounts[local.environment].public_subnet_b_cidr
-  vpc_endpoint_id        = local.firewall_endpoints["eu-west-2b"]
-}
 
 resource "aws_route_table_association" "firewall_a" {
   count = local.environment == "development" ? 1 : 0
