@@ -28,6 +28,12 @@ resource "aws_wafv2_web_acl" "sftp_web_acl" {
     block {}
   }
 
+  custom_response_body {
+    key          = "TooManyRequests"
+    content_type = "APPLICATION_JSON"
+    content      = "{\"message\":\"Too many requests\"}"
+  }
+  
   rule {
     name     = "AWS-AWSManagedRulesCommonRuleSet"
     priority = 2
