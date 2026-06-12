@@ -1057,7 +1057,8 @@ resource "aws_instance" "docker-build-server" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.docker-build-server[0].id]
+  vpc_security_group_ids = [aws_security_group.conditional["Docker-Build-Server-Security-Group"].id]  
+# vpc_security_group_ids = [aws_security_group.docker-build-server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
   key_name               = aws_key_pair.cjms_instance[0].key_name
   root_block_device {

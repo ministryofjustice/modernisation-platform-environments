@@ -56,6 +56,7 @@ locals {
     "g4s_emsys_tpims",
     "capita_alcohol_monitoring",
     "capita_blob_storage",
+    "emd_historic_int",
     "emd_historic_int_preprod_dbt",
     "g4s_atrium",
     "g4s_centurion",
