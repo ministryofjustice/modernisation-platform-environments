@@ -2,6 +2,9 @@
 # LOCALS
 # ---------------------------------------------------------------------------------------------------------------------
 locals {
-  name = "streaming-pov"
+  name       = "streaming-pov"
   ecs_prefix = "${local.name}-ecs"
+  extended_tags = merge(local.tags, {
+    component = local.name
+  })
 }
