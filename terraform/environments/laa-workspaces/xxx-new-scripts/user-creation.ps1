@@ -27,17 +27,16 @@ $domain = "laa-workspaces.local"
 $OU = "OU=Users,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local"
 $Password = Generate-password -length 14
 
-# Get service account credentials from SSM Parameter Store
+# Get AD service account credentials from SSM Parameter Store
 Write-Host "Retrieving service account credentials..."
 try {
     $ssmResponse = Get-SSMParameterValue -Name "/laa-workspaces/development/ad-service-account-password" -WithDecryption $true -Region eu-west-2
     $adpasswordSecure = $ssmResponse.Parameters[0].Value
-    
-    # Service account details
-    $adusername = 'LAAWORKSPACES\lambda.workspace'
+
+    $adusername = "LAAWORKSPACES\lambda.workspace"
     $securePassword = ConvertTo-SecureString $adpasswordSecure -AsPlainText -Force
     $adcredential = New-Object System.Management.Automation.PSCredential $adusername, $securePassword
-    
+
     Write-Host "Service account credentials retrieved successfully"
 }
 catch {
@@ -50,6 +49,16 @@ Write-Host "Checking if user already exists..."
 if (Get-ADUser -Credential $adcredential -Filter {SamAccountName -eq $username} -ErrorAction SilentlyContinue)
 {
     Write-Warning "A user account $username already exists in Active Directory."
+
+    try {
+        Set-ADUser -Credential $adcredential -Identity $username -ChangePasswordAtLogon $true -ErrorAction Stop
+        Write-Host "Set ChangePasswordAtLogon for existing user."
+    }
+    catch {
+        Write-Error "Failed to set ChangePasswordAtLogon for existing user: $_"
+        exit 1
+    }
+
     Write-Host "User creation skipped."
 }
 else
@@ -70,32 +79,21 @@ else
             -EmailAddress $Email `
             -Description "$Firstname $Lastname - Created $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" `
             -AccountPassword (ConvertTo-SecureString $Password -AsPlainText -Force) `
-            -PasswordNeverExpires $False `
-            -ChangePasswordAtLogon $True
-            
-           Set-ADUser -Identity $username -ChangePasswordAtLogon $true
+            -PasswordNeverExpires $False
+
+        Set-ADUser -Credential $adcredential -Identity $username -ChangePasswordAtLogon $true -ErrorAction Stop
 
         Write-Host -ForegroundColor Green "User account created successfully!"
         Write-Host -ForegroundColor Cyan "Username: $username"
         Write-Host -ForegroundColor Cyan "Password: $Password"
 
-        # Store password in SSM Parameter Store for Lambda to retrieve
-        Write-Host "Storing password in Parameter Store..."
-        $passwordParamName = "/laa-workspaces/development/user-passwords/$username"
-        Write-SSMParameter -Name $passwordParamName -Value $Password -Type "SecureString" -Overwrite $true
-        Write-Host "Password stored successfully in $passwordParamName"
-        
         Write-Host "SUCCESS"
     }
     catch {
         Write-Host -ForegroundColor DarkRed "Error creating user: $_" -BackgroundColor White
-            exit 1
+        exit 1
     }
 }
 
 Write-Host "User creation process completed."
-
-'@
-    
-    $scriptContent | Out-File -FilePath "C:\Windows\system32\user-creation.ps1" -Encoding UTF8
-    Write-Host "User creation script deployed successfully"
+'@ | Set-Content -Path .\user-creation.ps1 -Encoding UTF8
