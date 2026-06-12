@@ -4,7 +4,7 @@
 module "ecs_cluster" {
   count = contains(["development"], local.environment) ? 1 : 0
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v6.0.2"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=697b010957fabc36b7f648bc535021231f748674" # v6.0.2
   name   = "${local.ecs_prefix}-cluster"
 
   tags = local.extended_tags
