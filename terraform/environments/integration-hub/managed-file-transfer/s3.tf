@@ -107,9 +107,7 @@ module "s3_bucket" {
 
   allowed_kms_key_arn                      = module.kms_s3_bucket[each.key].key_arn
   attach_policy                            = contains(["processing", "unscanned"], each.key)
-  attach_deny_incorrect_encryption_headers = true
   attach_deny_insecure_transport_policy    = true
-  attach_deny_unencrypted_object_uploads   = true
   bucket_prefix                            = each.value.bucket_prefix
   policy                                   = each.key == "unscanned" ? data.aws_iam_policy_document.unscanned_guardduty_tag_protection.json : each.key == "processing" ? data.aws_iam_policy_document.processing_guardduty_tag_protection.json : null
   cors_rule = each.key == "unscanned" ? [
