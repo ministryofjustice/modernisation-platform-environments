@@ -25,6 +25,7 @@ def _response(status_code, body):
         "statusCode": status_code,
         "headers": {
             "content-type": "application/json",
+            "cache-control": "no-store",
         },
         "body": json.dumps(body),
     }
