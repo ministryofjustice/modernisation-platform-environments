@@ -71,25 +71,25 @@ resource "aws_cloudwatch_metric_alarm" "sftp_waf_high_blocked_requests" {
   tags = local.tags
 }
 
-resource "aws_cloudwatch_metric_alarm" "sftp_alb_healthyhosts" {
-  alarm_name          = "${local.application_name}-sftp-bc-${local.environment}-alb-targets-group"
-  comparison_operator = "LessThanThreshold"
-  evaluation_periods  = 1
-  metric_name         = "HealthyHostCount"
-  namespace           = "AWS/ApplicationELB"
-  period              = 240
-  statistic           = "Average"
-  threshold           = local.application_data.accounts[local.environment].app_count
-  alarm_description   = "Number of healthy nodes in Target Group"
-  actions_enabled     = true
-  treat_missing_data  = "breaching"
-  alarm_actions       = [data.aws_sns_topic.cw_alerts.arn]
-  ok_actions          = [data.aws_sns_topic.cw_alerts.arn]
-  dimensions = {
-    TargetGroup  = aws_lb_target_group.sftp_target_group.arn_suffix
-    LoadBalancer = aws_lb.sftp_load_balancer.arn_suffix
-  }
-}
+# resource "aws_cloudwatch_metric_alarm" "sftp_alb_healthyhosts" {
+#   alarm_name          = "${local.application_name}-sftp-bc-${local.environment}-alb-targets-group"
+#   comparison_operator = "LessThanThreshold"
+#   evaluation_periods  = 1
+#   metric_name         = "HealthyHostCount"
+#   namespace           = "AWS/ApplicationELB"
+#   period              = 240
+#   statistic           = "Average"
+#   threshold           = local.application_data.accounts[local.environment].app_count
+#   alarm_description   = "Number of healthy nodes in Target Group"
+#   actions_enabled     = true
+#   treat_missing_data  = "breaching"
+#   alarm_actions       = [data.aws_sns_topic.cw_alerts.arn]
+#   ok_actions          = [data.aws_sns_topic.cw_alerts.arn]
+#   dimensions = {
+#     TargetGroup  = aws_lb_target_group.sftp_target_group.arn_suffix
+#     LoadBalancer = aws_lb.sftp_load_balancer.arn_suffix
+#   }
+# }
 
 resource "aws_cloudwatch_metric_alarm" "sftp_ecs_high_memory" {
   alarm_name          = "${local.application_name}-sftp-bc-${local.environment}-ecs-high-memory"
