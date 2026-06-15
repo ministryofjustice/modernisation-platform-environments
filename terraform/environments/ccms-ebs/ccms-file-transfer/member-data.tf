@@ -16,3 +16,11 @@ data "aws_route53_zone" "laa" {
   name         = "laa.service.justice.gov.uk"
   private_zone = false
 }
+
+data "aws_security_group" "vpce_security_group" {
+  provider = aws.core-vpc
+  filter {
+    name   = "tag:Name"
+    values = ["${var.networking[0].business-unit}-${local.environment}-int-endpoint"]
+  }
+}
