@@ -25,7 +25,7 @@ data "aws_security_group" "vpce_security_group" {
   }
   filter {
     name   = "owner-id"
-    values = ["${data.aws_secretsmanager_secret_version.sftp_lambda_secrets.arn}:vpce_sm_owning_account_id::"]
+    values = ["${data.aws_secretsmanager_secret_version.sftp_lambda_secrets.arn}:vpce_sm_owner_account_id::"]
   }
 
 }
