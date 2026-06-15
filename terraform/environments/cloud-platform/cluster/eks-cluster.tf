@@ -11,7 +11,7 @@ module "eks" {
 
   endpoint_private_access = true
   # endpoint_public_access_cidrs = ["0.0.0.0/0"]
-  endpoint_public_access  = true
+  endpoint_public_access = true
 
   # enable_cluster_creator_admin_permissions = true ## CP GitHub actions access to cluster, Adds to access entries
   compute_config = {
