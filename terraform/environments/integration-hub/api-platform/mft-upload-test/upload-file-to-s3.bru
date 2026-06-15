@@ -1,0 +1,25 @@
+meta {
+  name: Upload File To S3
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{upload_url}}
+  body: file
+  auth: none
+}
+
+headers {
+  x-amz-server-side-encryption: {{sse}}
+  x-amz-server-side-encryption-aws-kms-key-id: {{kms_key}}
+  x-amz-meta-client-id: {{client_id}}
+  x-amz-meta-original-file-name: {{original_file_name}}
+  x-amz-meta-transfer-ticket: {{transfer_ticket}}
+  Content-Type: {{content_type}}
+  Content-MD5: {{content_md5}}
+}
+
+body:file {
+  file: @file(example-upload.csv) @contentType(text/csv)
+}
