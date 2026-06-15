@@ -29,7 +29,7 @@ resource "kubectl_manifest" "gateway_platform" {
       metadata:
         name: lbc-test
         labels:
-          pod-security.kubernetes.io/enforce: baseline
+          pod-security.kubernetes.io/enforce: restricted
     YAML
     "gateway" = <<-YAML
       apiVersion: gateway.networking.k8s.io/v1
