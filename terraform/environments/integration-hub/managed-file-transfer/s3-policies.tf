@@ -100,6 +100,31 @@ data "aws_iam_policy_document" "processing" {
 
 data "aws_iam_policy_document" "clean" {
   statement {
+    sid    = "DenyAccessToObjectsWithoutCleanGuardDutyStatus"
+    effect = "Deny"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+    ]
+
+    resources = [
+      "_S3_BUCKET_ARN_/*",
+    ]
+
+    condition {
+      test     = "StringNotEquals"
+      variable = "s3:ExistingObjectTag/GuardDutyMalwareScanStatus"
+      values   = ["NO_THREATS_FOUND"]
+    }
+  }
+
+  statement {
     sid    = "DenyGuardDutyTagWritesFromNonFileMoverPrincipals"
     effect = "Deny"
 
@@ -170,6 +195,31 @@ data "aws_iam_policy_document" "clean" {
 }
 
 data "aws_iam_policy_document" "quarantine" {
+  statement {
+    sid    = "DenyAccessToObjectsWithoutCleanGuardDutyStatus"
+    effect = "Deny"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+    ]
+
+    resources = [
+      "_S3_BUCKET_ARN_/*",
+    ]
+
+    condition {
+      test     = "StringNotEquals"
+      variable = "s3:ExistingObjectTag/GuardDutyMalwareScanStatus"
+      values   = ["NO_THREATS_FOUND"]
+    }
+  }
+
   statement {
     sid    = "DenyGuardDutyTagWritesFromNonFileMoverPrincipals"
     effect = "Deny"
