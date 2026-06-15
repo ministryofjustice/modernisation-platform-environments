@@ -116,6 +116,11 @@ resource "aws_vpc_security_group_egress_rule" "process_file_from_bucket_lambda_s
   cidr_ipv4   = "0.0.0.0/0"
 }
 
+moved {
+  from = aws_vpc_security_group_egress_rule.process_file_from_bucket_lambda_sg_egress_sec_manager_slack
+  to = aws_vpc_security_group_egress_rule.process_file_from_bucket_lambda_sg_egress_slack
+}
+
 #access to secrets manager from lambda function via vpc endpoint
 resource "aws_vpc_security_group_egress_rule" "process_file_from_bucket_lambda_sg_egress_sec_manager" {
   security_group_id = aws_security_group.process_file_from_bucket_lambda_sg.id
