@@ -211,6 +211,11 @@ variable "aws_account_id" {
 }
 
 ## RDS Proxy
+variable "proxy_secret_arn" {
+  description = "The ARN of the secrets manager secret containing the credentials the RDS Proxy uses to connect to the database"
+  type        = string
+}
+
 variable "proxy_idle_client_timeout" {
   description = "Number of seconds a client connection to the proxy can be inactive before the proxy disconnects it"
   type        = number

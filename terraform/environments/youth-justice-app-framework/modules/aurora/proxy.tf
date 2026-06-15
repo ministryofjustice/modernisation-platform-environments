@@ -3,7 +3,6 @@
 ################################################################################
 
 data "aws_region" "current" {}
-data "aws_caller_identity" "current" {}
 
 resource "aws_security_group" "rds_proxy" {
   name_prefix = "RDS Proxy Security Group"
@@ -66,14 +65,9 @@ resource "aws_iam_role_policy" "rds_proxy_secrets" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = "rds-db:connect"
-        Resource = "arn:aws:rds-db:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:dbuser:${module.aurora.cluster_resource_id}/yjaf_service_iam_user"
-      },
-      {
         Effect   = "Allow"
         Action   = "secretsmanager:GetSecretValue"
-        Resource = aws_secretsmanager_secret.user_admin_secret["postgres_rotated"].arn
+        Resource = var.proxy_secret_arn
       },
       {
         Effect = "Allow"
@@ -101,9 +95,9 @@ resource "aws_db_proxy" "rds_proxy" {
   vpc_security_group_ids = [aws_security_group.rds_proxy.id]
 
   auth {
-    auth_scheme = "IAM"
-    iam_auth    = "REQUIRED"
-    secret_arn  = aws_secretsmanager_secret.user_admin_secret["postgres_rotated"].arn
+    auth_scheme = "SECRETS"
+    iam_auth    = "DISABLED"
+    secret_arn  = var.proxy_secret_arn
   }
 
   tags = local.all_tags
