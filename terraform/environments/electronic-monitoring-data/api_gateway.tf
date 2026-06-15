@@ -120,42 +120,30 @@ resource "aws_iam_role_policy" "cloudwatch" {
 }
 
 # --------------------------------------------------------------------------------
-# update_p1_export
+# update_p1_export networking
 # --------------------------------------------------------------------------------
+
 locals {
-  endpoint_type = local.is-development ? { "REGIONAL" : null } : { "PRIVATE" : data.aws_vpc_endpoint.api_gateway.cidr_blocks }
+  shared_ca_name = contains(["prod", "preprod", "stage"], local.environment_shorthand) ? "acm-pca-live" : "acm-pca-non-live"
+  update_p1_export_domain_name = "update-p1-export.${trimsuffix(data.aws_route53_zone.inner.name, ".")}"
 }
 
+data "aws_ram_resource_share" "shared_private_ca" {
+  name                  = local.shared_ca_name
+  resource_owner        = "OTHER-ACCOUNTS"
+  resource_share_status = "ACTIVE"
+}
 
-data "aws_vpc_endpoint" "api_gateway" {
-  provider     = aws.core-vpc
-  service_name = "com.amazonaws.eu-west-2.execute-api"
-  vpc_id       = data.aws_vpc.shared.id
-  tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-com.amazonaws.${data.aws_region.current.name}.execute-api"
+resource "aws_acm_certificate" "update_p1_export" {
+  domain_name               = local.update_p1_export_domain_name
+  certificate_authority_arn = data.aws_ram_resource_share.shared_private_ca.resource_arns[0]
+  key_algorithm             = "RSA_2048"
+
+  lifecycle {
+    create_before_destroy = true
   }
-}
 
-resource "aws_security_group" "allow_cp_access" {
-  name        = "allow_cp_access"
-  description = "allow cp access"
-  vpc_id      = data.aws_vpc.shared.id
-  tags        = local.tags
-}
-
-resource "aws_vpc_security_group_ingress_rule" "allow_cp_access" {
-  security_group_id = aws_security_group.allow_cp_access.id
-
-  cidr_ipv4   = "172.20.0.0/16"
-  from_port   = 443
-  ip_protocol = "tcp"
-  to_port     = 443
-}
-
-data "aws_network_interface" "execute_api_endpoint_eni" {
-  provider = aws.core-vpc
-  for_each = toset(data.aws_vpc_endpoint.api_gateway.network_interface_ids)
-  id       = each.value
+  tags = local.tags
 }
 
 resource "aws_security_group" "aws_dns_resolver" {
@@ -225,21 +213,6 @@ resource "aws_route53_resolver_endpoint" "inbound_api" {
   tags = local.tags
 }
 
-
-resource "aws_route53_record" "private_api" {
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.inner.zone_id
-  name    = "update-p1-export.${trimsuffix(data.aws_route53_zone.inner.name, ".")}"
-  type    = "A"
-  ttl     = 60
-
-  records = [
-    for eni in data.aws_network_interface.execute_api_endpoint_eni :
-    eni.private_ip
-  ]
-}
-
 data "aws_iam_policy_document" "update_p1_export_vpc" {
   count = local.is-test ? 0 : 1
   statement {
@@ -269,6 +242,89 @@ data "aws_iam_policy_document" "update_p1_export_vpc" {
     }
     resources = ["${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*"]
   }
+}
+
+resource "aws_api_gateway_domain_name" "update_p1_export" {
+  domain_name = local.update_p1_export_domain_name
+
+  # For PRIVATE custom domains, use certificate_arn, not regional_certificate_arn.
+  certificate_arn = aws_acm_certificate.update_p1_export.arn
+
+  security_policy = "SecurityPolicy_TLS13_1_3_2025_09"
+  routing_mode    = "BASE_PATH_MAPPING_ONLY"
+
+  # This is the custom domain resource policy.
+  policy = data.aws_iam_policy_document.update_p1_export_vpc[0].json
+
+  endpoint_configuration {
+    types           = ["PRIVATE"]
+    ip_address_type = "dualstack"
+  }
+
+  tags = local.tags
+}
+
+resource "aws_api_gateway_base_path_mapping" "update_p1_export" {
+  api_id     = aws_api_gateway_rest_api.update_p1_export[0].id
+  stage_name = aws_api_gateway_stage.update_p1_export_stage[0].stage_name
+  domain_name    = aws_api_gateway_domain_name.update_p1_export.domain_name
+  domain_name_id = aws_api_gateway_domain_name.update_p1_export.domain_name_id
+}
+
+data "aws_vpc_endpoint" "api_gateway" {
+  provider     = aws.core-vpc
+  service_name = "com.amazonaws.eu-west-2.execute-api"
+  vpc_id       = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-com.amazonaws.${data.aws_region.current.name}.execute-api"
+  }
+}
+
+resource "aws_api_gateway_domain_name_access_association" "update_p1_export" {
+  domain_name_arn                = aws_api_gateway_domain_name.update_p1_export.arn
+  access_association_source      = data.aws_vpc_endpoint.api_gateway.id
+  access_association_source_type = "VPCE"
+
+  depends_on = [
+    aws_api_gateway_base_path_mapping.update_p1_export
+  ]
+}
+
+resource "aws_route53_record" "private_api" {
+  provider     = aws.core-vpc
+
+  zone_id = data.aws_route53_zone.inner.zone_id
+  name    = local.update_p1_export_domain_name
+  type    = "A"
+
+  alias {
+    name                   = aws_api_gateway_domain_name.update_p1_export.regional_domain_name
+    zone_id                = aws_api_gateway_domain_name.update_p1_export.regional_zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_security_group" "allow_cp_access" {
+  name        = "allow_cp_access"
+  description = "allow cp access"
+  vpc_id      = data.aws_vpc.shared.id
+  tags        = local.tags
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_cp_access" {
+  security_group_id = aws_security_group.allow_cp_access.id
+
+  cidr_ipv4   = "172.20.0.0/16"
+  from_port   = 443
+  ip_protocol = "tcp"
+  to_port     = 443
+}
+
+# --------------------------------------------------------------------------------
+# update_p1_export
+# --------------------------------------------------------------------------------
+locals {
+  endpoint_type = local.is-development ? {"REGIONAL": null} : {"PRIVATE": data.aws_vpc_endpoint.api_gateway.cidr_blocks}
 }
 
 resource "aws_api_gateway_rest_api_policy" "update_p1_export_vpc" {
