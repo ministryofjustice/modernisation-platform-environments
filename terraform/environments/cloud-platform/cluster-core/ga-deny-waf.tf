@@ -25,7 +25,13 @@ locals {
   #   hostname = the exact Host header to match
   #   cidrs    = allowed source CIDRs (internal network sources)
   #   priority = WAF rule priority (unique per rule)
-  deny_allowlists = {}
+  deny_allowlists = {
+    echo1 = {
+      hostname = "echo1.${local.cluster_name}.${local.cluster_base_domain}"
+      cidrs    = ["83.100.215.187/32"]
+      priority = 1
+    }
+  }
 }
 
 # The LBC-provisioned ALB for the shared-alb Gateway (Tim's foundation).
