@@ -297,7 +297,9 @@ data "aws_iam_policy_document" "gdpr_batch_jobs_s3_access_policy_document" {
     ]
     resources = [
       module.s3-data-bucket.bucket.arn,
-      "${module.s3-data-bucket.bucket.arn}/*"
+      "${module.s3-data-bucket.bucket.arn}/*",
+      module.s3-gdpr-audit-bucket.bucket.arn,
+      "${module.s3-gdpr-audit-bucket.bucket.arn}/*"
     ]
   }
 }

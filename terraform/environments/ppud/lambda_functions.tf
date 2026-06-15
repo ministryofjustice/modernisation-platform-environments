@@ -316,6 +316,27 @@ locals {
         source_arn_suffix = "*"
       }]
     }
+    file_server_analysis = {
+      description  = "Function to analyse metadata from the PPUD file server and generate a report."
+      timeout      = 900
+      memory_size  = 1024
+      role_key     = "file_server_analysis"
+      environments = ["development"]
+      layers       = ["numpy", "pillow", "matplotlib"]
+      permissions  = []
+    }
+    rotate_ses_access_key = {
+      description  = "Function to rotate ses access key, secret key and derive new smtp password."
+      role_key     = "rotate_ses_access_key"
+      environments = ["development", "preproduction"]
+      permissions  = []
+      environment = {
+        variables = {
+          SES_IAM_USER    = local.ses_iam_user
+          SES_SECRET_NAME = local.ses_secret_name
+        }
+      }
+    }
   }
 
   # Flatten lambda functions with environments
@@ -351,8 +372,8 @@ locals {
   klayers_account_id = data.aws_ssm_parameter.klayers_account.value
 
   layer_arns = {
-  # numpy  = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-numpy:14"
-  # pillow = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-pillow:2"
+    # numpy  = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-numpy:14"
+    # pillow = "arn:aws:lambda:eu-west-2:${local.klayers_account_id}:layer:Klayers-p312-pillow:2"
   }
 
 }
@@ -413,10 +434,10 @@ resource "aws_lambda_function" "lambda_functions" {
     for_each = try(each.value.config.environment, null) != null ? [each.value.config.environment] : []
     content {
       variables = merge(
-        environment.value.variables,
-        {
+        { for k, v in environment.value.variables : k => v if !can(v[each.value.env]) },
+        try(environment.value.variables.SNS_TOPIC_ARN, null) != null ? {
           SNS_TOPIC_ARN = environment.value.variables.SNS_TOPIC_ARN[each.value.env]
-        }
+        } : {}
       )
     }
   }

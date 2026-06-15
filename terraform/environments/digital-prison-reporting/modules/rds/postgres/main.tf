@@ -108,6 +108,7 @@ resource "aws_db_instance" "replica" {
   storage_encrypted       = aws_db_instance.default[0].storage_encrypted
   apply_immediately       = aws_db_instance.default[0].apply_immediately
   max_allocated_storage   = var.max_allocated_size
+  engine_version          = var.replica_engine_version
   ca_cert_identifier      = var.ca_cert_identifier
   copy_tags_to_snapshot   = aws_db_instance.default[0].copy_tags_to_snapshot
   multi_az                = aws_db_instance.default[0].multi_az

@@ -13,4 +13,4 @@ The role is assumed by a web identity provider, allowing Airflow to interact wit
 ## Outputs
 
 No outputs.
-<!-- END_TF_DOCS --> 
+<!-- END_TF_DOCS -->

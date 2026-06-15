@@ -49,10 +49,12 @@ locals {
     "g4s_lcm_archive",
     "g4s_tasking",
     "scram_alcohol_monitoring",
+    "g4s_xdrive_unstructured"
     ] : local.is-preproduction ? [
     "g4s_cap_dw",
     "g4s_emsys_tpims",
     "capita_alcohol_monitoring",
+    "capita_blob_storage",
     "g4s_atrium",
     "g4s_centurion",
     "g4s_emsys_mvp",
@@ -61,7 +63,16 @@ locals {
     "g4s_integrity",
     "g4s_lcm",
     "g4s_tasking",
-  ] : local.is-development ? ["test"] : []
+    "g4s_atrium_unstructured",
+    "g4s_xdrive_unstructured"
+    ] : local.is-development ? [
+    "test",
+    "capita_blob_storage",
+    "emd_historic_int",
+    "g4s_atrium_unstructured",
+    "g4s_cap_dw",
+    "g4s_xdrive_unstructured"
+  ] : []
 
   prod_dbs_to_grant = [
     "am_stg",
@@ -676,7 +687,7 @@ module "existing_audit_dbs_with_roles" {
 
 
 module "share_existing_dbs_with_roles" {
-  count                   = local.is-development ? 0 : 1
+  count                   = length(local.existing_dbs_to_grant) > 0 ? 1 : 0
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = local.existing_dbs_to_grant
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn

@@ -4,6 +4,8 @@ locals {
   environment_config_dev = {
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
     legacy_counterpart_vpc_cidr            = "10.162.32.0/20"
+    legacy_ad_domain_name                  = null
+    legacy_dns_ip_addrs                    = []
     ad_domain_name                         = "delius-mis-dev.internal"
     ad_trust_domain_name                   = "azure.noms.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.azure.domain_controllers
@@ -274,8 +276,10 @@ locals {
 
   # base config for each database
   base_db_config_dev = {
-    instance_type  = "m7i.large"
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    instance_type          = "m7i.large"
+    primary_instance_count = 1
+    standby_instance_count = 0
+    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access

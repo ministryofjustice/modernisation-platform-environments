@@ -46,12 +46,9 @@
       "ftp_layer_folder_location": "laa-ftp",
       "ftp_layer_source_zip": "ftpclient-python-requirements312.zip",
       "python_runtime": "python3.12",
-      "ftp_lambda_source_file": "ftpclient_1.2.zip",
-      "ftp_lambda_source_file_version": "LKYb32.Rqjizm17IiAsa.YZhOXfumTGj",
-      "zip_lambda_source_file": "zip_s3_objects.zip",
-      "zip_lambda_source_file_version": "TevkiwEbMJttB_5X7VX03Sas1u6ONJbE",
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? 2999)",
       "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)",
+      "ftp_sftp_port": "22",
       "max_string_size": "EXTENDED"
     },
 
@@ -101,12 +98,9 @@
       "ftp_layer_folder_location": "laa-ftp",
       "ftp_layer_source_zip": "ftpclient-python-requirements312.zip",
       "python_runtime": "python3.12",
-      "ftp_lambda_source_file": "ftpclient_1.2.zip",
-      "ftp_lambda_source_file_version": "LKYb32.Rqjizm17IiAsa.YZhOXfumTGj",
-      "zip_lambda_source_file": "zip_s3_objects.zip",
-      "zip_lambda_source_file_version": "TevkiwEbMJttB_5X7VX03Sas1u6ONJbE",
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? 2999)",
       "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)",
+      "ftp_sftp_port": "22",
       "max_string_size": "EXTENDED"
     },
     "preproduction": {
@@ -155,12 +149,9 @@
       "ftp_layer_folder_location": "laa-ftp",
       "ftp_layer_source_zip": "ftpclient-python-requirements312.zip",
       "python_runtime": "python3.12",
-      "ftp_lambda_source_file": "ftpclient_1.2.zip",
-      "ftp_lambda_source_file_version": "LKYb32.Rqjizm17IiAsa.YZhOXfumTGj",
-      "zip_lambda_source_file": "zip_s3_objects.zip",
-      "zip_lambda_source_file_version": "TevkiwEbMJttB_5X7VX03Sas1u6ONJbE",
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? 2999)",
       "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)",
+      "ftp_sftp_port": "22",
       "max_string_size": "EXTENDED"
     },
 
@@ -170,7 +161,7 @@
       "allocated_storage": 600,
       "ram_size": 16,
       "engine": "oracle-se2",
-      "engine_version": "19.0.0.0.ru-2025-10.rur-2025-10.r1",
+      "engine_version": "19.0.0.0.ru-2026-01.rur-2026-01.r3",
       "hub20_sec_group_id": "sg-07369f468604d33c6",
       "hub20_s3_bucket": "hub20-production-cwa-extract-data",
       "mojfin_sec_group_id": "sg-036d95b37acd2c42e",
@@ -210,12 +201,9 @@
       "ftp_layer_folder_location": "laa-ftp",
       "ftp_layer_source_zip": "ftpclient-python-requirements312.zip",
       "python_runtime": "python3.12",
-      "ftp_lambda_source_file": "ftpclient_1.2.zip",
-      "ftp_lambda_source_file_version": "LKYb32.Rqjizm17IiAsa.YZhOXfumTGj",
-      "zip_lambda_source_file": "zip_s3_objects.zip",
-      "zip_lambda_source_file_version": "TevkiwEbMJttB_5X7VX03Sas1u6ONJbE",
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? *)",
       "zip_lambda_eventbridge_cron": "cron(45 6 * * ? *)",
+      "ftp_sftp_port": "22",
       "max_string_size": "STANDARD"
     }
   }

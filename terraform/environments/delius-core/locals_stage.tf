@@ -89,8 +89,10 @@ locals {
       container_port    = 8080
       container_memory  = 4096
       container_cpu     = 2048
-      ec2_instance_type = "r7i.2xlarge"
-      task_count        = 8
+      ec2_instance_type = "r7i.xlarge"
+      task_count        = 2
+      asg_min_size      = 1
+      asg_max_size      = 1
     }
 
     weblogic_params = {
@@ -100,8 +102,8 @@ locals {
       BREACH_NOTICE_UI_URL_FORMAT = "https://breach-notice-stage.hmpps.service.justice.gov.uk/breach-notice/%s"
       COOKIE_SECURE               = "true"
       # DELIUS_API_URL                    = "" # No longer needed
-      DMS_HOST                          = "https://hmpps-delius-alfresco-stage.apps.live.cloud-platform.service.justice.gov.uk"
-      DMS_OFFICE_URI_HOST               = "https://hmpps-delius-alfresco-stage.apps.live.cloud-platform.service.justice.gov.uk"
+      DMS_HOST                          = "hmpps-delius-alfresco-stage.apps.live.cloud-platform.service.justice.gov.uk"
+      DMS_OFFICE_URI_HOST               = "hmpps-delius-alfresco-stage.apps.live.cloud-platform.service.justice.gov.uk"
       DMS_OFFICE_URI_PORT               = "443"
       DMS_PORT                          = "443"
       DMS_PROTOCOL                      = "https"
@@ -112,7 +114,7 @@ locals {
       JDBC_CONNECTION_POOL_MIN_CAPACITY = "50"
       JDBC_URL                          = ""
       JDBC_USERNAME                     = "delius_pool"
-      LDAP_HOST                         = "https://ldap.stage.delius-core.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"
+      LDAP_HOST                         = "ldap.stage.delius-core.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"
       LDAP_PRINCIPAL                    = "cn=admin,dc=moj,dc=com"
       LOG_LEVEL_NDELIUS                 = "DEBUG"
       MERGE_API_URL                     = "https://delius-merge-api-stage.hmpps.service.justice.gov.uk"
@@ -140,12 +142,12 @@ locals {
     }
 
     weblogic_eis = {
-      image_tag         = "6.2.0.3"
+      image_tag         = "6.7.4-eis"
       container_port    = 8080
       container_memory  = 2048
       container_cpu     = 1024
       ec2_instance_type = "r7i.large"
-      task_count        = 1
+      task_count        = 0
     }
 
     pwm = {

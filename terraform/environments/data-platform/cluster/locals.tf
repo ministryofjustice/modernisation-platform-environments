@@ -10,6 +10,8 @@ locals {
 
   container_insights_log_group_name = "/aws/containerinsights/${local.eks_cluster_name}/performance"
 
+  external_secrets_component_prefixes = ["ai-gateway"]
+
   kyverno_privileged_policies = [
     {
       name        = "cloudwatch-agent"

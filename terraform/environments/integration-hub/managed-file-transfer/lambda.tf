@@ -2,17 +2,24 @@ module "lambda_unscanned_to_processing" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.8.0"
 
-  function_name                = "${local.application_name}-unscanned-to-processing"
-  description                  = "Moves uploaded files from the unscanned bucket to the processing bucket"
-  handler                      = "lambda_function.lambda_handler"
-  runtime                      = "python3.12"
-  source_path                  = "lambda/s3-file-mover"
-  trigger_on_package_timestamp = false
+  function_name                  = "${local.application_name}-unscanned-to-processing"
+  description                    = "Moves uploaded files from the unscanned bucket to the processing bucket"
+  handler                        = "lambda_function.lambda_handler"
+  memory_size                    = 512
+  reserved_concurrent_executions = 10
+  runtime                        = "python3.12"
+  source_path                    = "lambda/s3-file-mover"
+  timeout                        = 30
+  tracing_mode                   = "Active"
+  trigger_on_package_timestamp   = false
 
   event_source_mapping = {
     sqs = {
       event_source_arn = module.sqs_unscanned_s3_notifications.queue_arn
       batch_size       = 1
+      scaling_config = {
+        maximum_concurrency = 10
+      }
     }
   }
 
@@ -23,13 +30,15 @@ module "lambda_unscanned_to_processing" {
 
   attach_policy_statements = true
   policy_statements = {
-    source_bucket_read = {
+    source_bucket_get_delete = {
       effect = "Allow"
       actions = [
         "s3:GetObject",
         "s3:GetObjectVersion",
         "s3:GetObjectTagging",
         "s3:GetObjectVersionTagging",
+        "s3:DeleteObject",
+        "s3:DeleteObjectVersion",
       ]
       resources = [
         "${module.s3_bucket["unscanned"].s3_bucket_arn}/*",
@@ -74,12 +83,14 @@ module "lambda_unscanned_to_processing" {
     }
   }
 
-  attach_policies    = true
-  number_of_policies = 1
+  attach_policies       = true
+  attach_tracing_policy = true
+  number_of_policies    = 1
   policies = [
     "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole",
   ]
 
+  cloudwatch_logs_kms_key_id        = module.kms_cloudwatch_logs.key_arn
   cloudwatch_logs_retention_in_days = 30
 
   tags = local.tags
@@ -89,17 +100,24 @@ module "lambda_processing_to_post_scan" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.8.0"
 
-  function_name                = "${local.application_name}-processing-to-post-scan"
-  description                  = "Moves scanned files from the processing bucket to the post-scan destination bucket"
-  handler                      = "lambda_function.lambda_handler"
-  runtime                      = "python3.12"
-  source_path                  = "lambda/guard-duty-file-mover"
-  trigger_on_package_timestamp = false
+  function_name                  = "${local.application_name}-processing-to-post-scan"
+  description                    = "Moves scanned files from the processing bucket to the post-scan destination bucket"
+  handler                        = "lambda_function.lambda_handler"
+  memory_size                    = 512
+  reserved_concurrent_executions = 10
+  runtime                        = "python3.12"
+  source_path                    = "lambda/guard-duty-file-mover"
+  timeout                        = 30
+  tracing_mode                   = "Active"
+  trigger_on_package_timestamp   = false
 
   event_source_mapping = {
     sqs = {
       event_source_arn = module.sqs_guard_duty_malware_protection_for_s3_events.queue_arn
       batch_size       = 1
+      scaling_config = {
+        maximum_concurrency = 10
+      }
     }
   }
 
@@ -173,12 +191,14 @@ module "lambda_processing_to_post_scan" {
     }
   }
 
-  attach_policies    = true
-  number_of_policies = 1
+  attach_policies       = true
+  attach_tracing_policy = true
+  number_of_policies    = 1
   policies = [
     "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole",
   ]
 
+  cloudwatch_logs_kms_key_id        = module.kms_cloudwatch_logs.key_arn
   cloudwatch_logs_retention_in_days = 30
 
   tags = local.tags

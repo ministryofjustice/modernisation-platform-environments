@@ -18,7 +18,7 @@ resource "aws_guardduty_malware_protection_plan" "s3_scan_bucket1" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.application_name}", local.environment)) }
+    { Name = lower(format("s3-%s-%s-awsgaurdduty-mpp", "${local.sftp_suffix}", local.environment)) }
   )
 
   depends_on = [module.s3-bucket-sftp-bc]
