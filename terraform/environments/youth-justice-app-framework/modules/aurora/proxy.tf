@@ -96,7 +96,7 @@ resource "aws_db_proxy" "rds_proxy" {
 
   auth {
     auth_scheme = "SECRETS"
-    iam_auth    = "DISABLED"
+    iam_auth    = "REQUIRED"
     secret_arn  = var.proxy_secret_arn
   }
 
