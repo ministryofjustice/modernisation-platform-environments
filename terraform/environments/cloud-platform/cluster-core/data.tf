@@ -6,17 +6,6 @@ data "aws_vpc" "selected" {
   }
 }
 
-data "aws_subnets" "eks_private" {
-
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.selected.id]
-  }
-  tags = {
-    SubnetType = "EKS-Private"
-  }
-}
-
 data "aws_subnets" "private" {
 
   filter {
