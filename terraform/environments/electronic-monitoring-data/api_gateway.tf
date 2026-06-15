@@ -123,20 +123,20 @@ resource "aws_iam_role_policy" "cloudwatch" {
 # update_p1_export networking
 # --------------------------------------------------------------------------------
 
-data "aws_acmpca_certificate_authorities" "shared_private_subordinate" {
-  type           = "SUBORDINATE"
-  state          = "ACTIVE"
-  resource_owner = "OTHER_ACCOUNTS"
+locals {
+  shared_ca_name = contains(["prod", "preprod", "stage"], local.environment_shorthand) ? "acm-pca-live" : "acm-pca-non-live"
+  update_p1_export_domain_name = "update-p1-export.${trimsuffix(data.aws_route53_zone.inner.name, ".")}"
 }
 
-locals {
-  private_subordinate_ca_arn = one(data.aws_acmpca_certificate_authorities.shared_private_subordinate.arns)
-  update_p1_export_domain_name = "update-p1-export.${trimsuffix(data.aws_route53_zone.inner.name, ".")}"
+data "aws_ram_resource_share" "shared_private_ca" {
+  name                  = local.shared_ca_name
+  resource_owner        = "OTHER-ACCOUNTS"
+  resource_share_status = "ACTIVE"
 }
 
 resource "aws_acm_certificate" "update_p1_export" {
   domain_name               = local.update_p1_export_domain_name
-  certificate_authority_arn = local.private_subordinate_ca_arn
+  certificate_authority_arn = data.aws_ram_resource_share.shared_ca.resource_arns[0]
   key_algorithm             = "RSA_2048"
 
   lifecycle {
