@@ -125,7 +125,7 @@ resource "aws_iam_role_policy" "cloudwatch" {
 
 locals {
   shared_ca_name = contains(["prod", "preprod", "stage"], local.environment_shorthand) ? "acm-pca-live" : "acm-pca-non-live"
-  update_p1_export_domain_name = "update-p1-export.${trimsuffix(data.aws_route53_zone.inner.name, ".")}"
+  update_p1_export_domain_name = "p1-export.${trimsuffix(data.aws_route53_zone.inner.name, ".")}"
 }
 
 data "aws_ram_resource_share" "shared_private_ca" {
