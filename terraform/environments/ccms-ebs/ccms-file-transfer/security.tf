@@ -117,7 +117,7 @@ resource "aws_vpc_security_group_egress_rule" "process_file_from_bucket_lambda_s
 }
 
 moved {
-  from = aws_vpc_security_group_egress_rule.process_file_from_bucket_lambda_sg_egress_sec_manager_slack
+  from = aws_vpc_security_group_egress_rule.process_file_from_bucket_lambda_sg_egress_rule
   to = aws_vpc_security_group_egress_rule.process_file_from_bucket_lambda_sg_egress_slack
 }
 
