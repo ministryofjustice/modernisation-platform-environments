@@ -428,15 +428,6 @@ resource "aws_networkfirewall_logging_configuration" "workspaces" {
     log_destination_config {
       log_destination = {
         cloudwatch_logs_log_group = {
-          log_group = aws_cloudwatch_log_group.firewall_flow_logs[0].name
-        }
-      }
-      log_destination_type = "CLOUDWATCH_LOGS"
-      log_type             = "FLOW"
-    }
-    log_destination_config {
-      log_destination = {
-        cloudwatch_logs_log_group = {
           log_group = aws_cloudwatch_log_group.firewall_alert_logs[0].name
         }
       }
