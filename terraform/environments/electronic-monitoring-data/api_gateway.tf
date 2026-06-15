@@ -136,7 +136,7 @@ data "aws_ram_resource_share" "shared_private_ca" {
 
 resource "aws_acm_certificate" "update_p1_export" {
   domain_name               = local.update_p1_export_domain_name
-  certificate_authority_arn = data.aws_ram_resource_share.shared_ca.resource_arns[0]
+  certificate_authority_arn = data.aws_ram_resource_share.shared_private_ca.resource_arns[0]
   key_algorithm             = "RSA_2048"
 
   lifecycle {
