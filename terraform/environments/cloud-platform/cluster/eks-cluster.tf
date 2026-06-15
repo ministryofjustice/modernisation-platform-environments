@@ -6,7 +6,7 @@ module "eks" {
   name               = local.cluster_name
   kubernetes_version = local.environment_configuration.eks_cluster_version
   vpc_id             = data.aws_vpc.selected.id
-  subnet_ids         = data.aws_subnets.eks_private.ids
+  subnet_ids         = data.aws_subnets.private.ids
   enable_irsa        = true
 
   endpoint_private_access = true
