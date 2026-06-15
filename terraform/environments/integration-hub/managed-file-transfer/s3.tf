@@ -1,12 +1,122 @@
+data "aws_iam_policy_document" "unscanned" {
+  statement {
+    sid    = "DenyGuardDutyTagWrites"
+    effect = "Deny"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectTagging",
+      "s3:PutObjectVersionTagging",
+    ]
+
+    # The S3 bucket module replaces the bucket placeholders with the created bucket ARN.
+    resources = [
+      "_S3_BUCKET_ARN_/*",
+    ]
+
+    condition {
+      test     = "ForAnyValue:StringEquals"
+      variable = "s3:RequestObjectTagKeys"
+      values   = ["GuardDutyMalwareScanStatus"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "processing" {
+  statement {
+    sid    = "DenyGuardDutyTagWritesFromNonGuardDutyPrincipals"
+    effect = "Deny"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectTagging",
+      "s3:PutObjectVersionTagging",
+    ]
+
+    resources = [
+      "_S3_BUCKET_ARN_/*",
+    ]
+
+    condition {
+      test     = "ArnNotEquals"
+      variable = "aws:PrincipalArn"
+      values = [
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.iam_configuration.guardduty_role_name}",
+      ]
+    }
+
+    condition {
+      test     = "ForAnyValue:StringEquals"
+      variable = "s3:RequestObjectTagKeys"
+      values   = ["GuardDutyMalwareScanStatus"]
+    }
+  }
+
+  statement {
+    sid    = "DenyGuardDutyTagMutationFromNonGuardDutyPrincipals"
+    effect = "Deny"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    actions = [
+      "s3:PutObjectTagging",
+      "s3:PutObjectVersionTagging",
+      "s3:DeleteObjectTagging",
+      "s3:DeleteObjectVersionTagging",
+    ]
+
+    resources = [
+      "_S3_BUCKET_ARN_/*",
+    ]
+
+    condition {
+      test     = "ArnNotEquals"
+      variable = "aws:PrincipalArn"
+      values = [
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.iam_configuration.guardduty_role_name}",
+      ]
+    }
+
+    condition {
+      test     = "Null"
+      variable = "s3:ExistingObjectTag/GuardDutyMalwareScanStatus"
+      values   = ["false"]
+    }
+  }
+}
+
 module "s3_bucket" {
   for_each = {
     for key, value in local.bucket_configuration : key => value
   }
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.13.0"
+  version = "5.14.0"
 
-  allowed_kms_key_arn = module.kms_s3_bucket[each.key].key_arn
-  bucket_prefix       = each.value.bucket_prefix
+  allowed_kms_key_arn                   = module.kms_s3_bucket[each.key].key_arn
+  attach_policy                         = contains(["processing", "unscanned"], each.key)
+  attach_deny_insecure_transport_policy = true
+  bucket_prefix                         = each.value.bucket_prefix
+  policy = lookup(
+    {
+      unscanned  = data.aws_iam_policy_document.unscanned.json
+      processing = data.aws_iam_policy_document.processing.json
+    },
+    each.key,
+    null
+  )
   cors_rule = each.key == "unscanned" ? [
     {
       allowed_headers = ["*"]
