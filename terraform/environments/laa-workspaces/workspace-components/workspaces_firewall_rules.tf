@@ -394,18 +394,6 @@ resource "aws_networkfirewall_firewall" "workspaces_web_allowlist" {
     subnet_id = aws_subnet.firewall_b[0].id
   }
 
-  logging_configuration {
-    cloudwatch_logs_log_group {
-      log_group_name = aws_cloudwatch_log_group.firewall_flow_logs[0].name
-      enabled        = true
-    }
-
-    cloudwatch_logs_log_group {
-      log_group_name = aws_cloudwatch_log_group.firewall_alert_logs[0].name
-      enabled        = true
-    }
-  }
-
   tags = {
     Name = "workspaces-web-allowlist-firewall"
   }
@@ -429,5 +417,22 @@ resource "aws_cloudwatch_log_group" "firewall_alert_logs" {
 
   tags = {
     Name = "workspaces-firewall-alert-logs"
+  }
+}
+
+# Enable firewall logging
+resource "aws_networkfirewall_logging_configuration" "workspaces" {
+  count           = local.environment == "development" ? 1 : 0
+  firewall_arn    = aws_networkfirewall_firewall.workspaces_web_allowlist[0].arn
+  logging_configuration {
+    cloudwatch_logs_log_group {
+      log_group_name = aws_cloudwatch_log_group.firewall_flow_logs[0].name
+      enabled        = true
+    }
+
+    cloudwatch_logs_log_group {
+      log_group_name = aws_cloudwatch_log_group.firewall_alert_logs[0].name
+      enabled        = true
+    }
   }
 }
