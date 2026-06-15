@@ -64,7 +64,7 @@ resource "aws_lambda_layer_version" "lambda_layer" {
   description              = "Lambda Layer for ${local.application_name} Edrms Docs Exception"
 }
 
-data "archive_file" "lambda_zip" {
+data "archive_file" "edrms_docs_exception_zip" {
   type        = "zip"
   source_dir  = "${path.module}/lambda/edrms_docs_exception"
   output_path = "${path.module}/lambda/edrms_docs_exception.zip"
