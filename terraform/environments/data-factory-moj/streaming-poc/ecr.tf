@@ -1,9 +1,16 @@
 # ---------------------------------------------------------------------------------------------------------------------
 # ECR
 # ---------------------------------------------------------------------------------------------------------------------
+locals {
+  ecr_repositories = contains(["development"], local.environment) ? {
+    sdg    = "${local.name}-sdg"
+    alerts = "${local.name}-alerts"
+  } : {}
+}
+
 resource "aws_ecr_repository" "repository" {
-  count                = contains(["development"], local.environment) ? 1 : 0
-  name                 = "${local.name}-ecr"
+  for_each             = local.ecr_repositories
+  name                 = each.value
   image_tag_mutability = "IMMUTABLE"
 
   image_scanning_configuration {
@@ -19,8 +26,8 @@ resource "aws_ecr_repository" "repository" {
 }
 
 resource "aws_ecr_lifecycle_policy" "policy" {
-  count      = contains(["development"], local.environment) ? 1 : 0
-  repository = aws_ecr_repository.repository[0].name
+  for_each   = local.ecr_repositories
+  repository = aws_ecr_repository.repository[each.key].name
 
   policy = jsonencode({
     rules = [
@@ -83,7 +90,7 @@ data "aws_iam_policy_document" "ecr_policy_document" {
 }
 
 resource "aws_ecr_repository_policy" "ecr_policy" {
-  count      = contains(["development"], local.environment) ? 1 : 0
-  repository = aws_ecr_repository.repository[0].name
+  for_each   = local.ecr_repositories
+  repository = aws_ecr_repository.repository[each.key].name
   policy     = data.aws_iam_policy_document.ecr_policy_document.json
 }
