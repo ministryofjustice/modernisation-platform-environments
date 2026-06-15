@@ -112,7 +112,7 @@ locals {
             },
             docs-hub-github-pages-challenge-txt = {
               type    = "TXT"
-              name    = "_github-pages-challenge-ministryofjustice.docs-hub.data-platform.service.justice.gov.uk"
+              name    = "_github-pages-challenge-ministryofjustice.docs-hub"
               ttl     = 300
               records = ["538403c0023ec96ea670ef9e55bf7c"]
             },
