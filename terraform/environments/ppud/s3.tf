@@ -235,7 +235,7 @@ resource "aws_s3_bucket_policy" "moj-infrastructure" {
         ],
         "Principal" : {
           "AWS" : [
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",     # Cross account access disabled, only turned on when required
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role", # Cross account access disabled, only turned on when required
             # "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role",   # Cross account access disabled, only turned on when required
             "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role"
           ]
@@ -1980,7 +1980,7 @@ resource "aws_s3_bucket_policy" "moj-infrastructure-dev" {
           "AWS" : [
             "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",
             # "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role", # Cross account access disabled, only turned on when required
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role"     # Cross account access disabled, only turned on when required
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role" # Cross account access disabled, only turned on when required
           ]
         }
       },
