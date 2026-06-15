@@ -1,6 +1,8 @@
 # CloudFront access logs delivered to CloudWatch Logs.
 # Delivery source/destination must be created in us-east-1, as CloudFront is managed from that region.
 
+/*
+
 resource "aws_cloudwatch_log_group" "cloudfront" {
   #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS" - fix later us east-1 region issues
   provider          = aws.us-east-1
