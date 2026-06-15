@@ -1,4 +1,4 @@
-data "aws_iam_policy_document" "unscanned_guardduty_tag_protection" {
+data "aws_iam_policy_document" "unscanned" {
   statement {
     sid    = "DenyGuardDutyTagWrites"
     effect = "Deny"
@@ -27,7 +27,7 @@ data "aws_iam_policy_document" "unscanned_guardduty_tag_protection" {
   }
 }
 
-data "aws_iam_policy_document" "processing_guardduty_tag_protection" {
+data "aws_iam_policy_document" "processing" {
   statement {
     sid    = "DenyGuardDutyTagWritesFromNonGuardDutyPrincipals"
     effect = "Deny"
@@ -105,11 +105,18 @@ module "s3_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "5.13.0"
 
-  allowed_kms_key_arn                      = module.kms_s3_bucket[each.key].key_arn
-  attach_policy                            = contains(["processing", "unscanned"], each.key)
-  attach_deny_insecure_transport_policy    = true
-  bucket_prefix                            = each.value.bucket_prefix
-  policy                                   = each.key == "unscanned" ? data.aws_iam_policy_document.unscanned_guardduty_tag_protection.json : each.key == "processing" ? data.aws_iam_policy_document.processing_guardduty_tag_protection.json : null
+  allowed_kms_key_arn                   = module.kms_s3_bucket[each.key].key_arn
+  attach_policy                         = contains(["processing", "unscanned"], each.key)
+  attach_deny_insecure_transport_policy = true
+  bucket_prefix                         = each.value.bucket_prefix
+  policy = lookup(
+    {
+      unscanned  = data.aws_iam_policy_document.unscanned.json
+      processing = data.aws_iam_policy_document.processing.json
+    },
+    each.key,
+    null
+  )
   cors_rule = each.key == "unscanned" ? [
     {
       allowed_headers = ["*"]
