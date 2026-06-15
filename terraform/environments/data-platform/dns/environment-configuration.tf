@@ -110,6 +110,12 @@ locals {
               ttl     = 300
               records = ["ministryofjustice.github.io."]
             },
+            docs-hub-github-pages-cname = {
+              type    = "CNAME"
+              name    = "docs-hub"
+              ttl     = 300
+              records = ["ministryofjustice.github.io."]
+            },
             docs-hub-github-pages-challenge-txt = {
               type    = "TXT"
               name    = "_github-pages-challenge-ministryofjustice.docs-hub"
