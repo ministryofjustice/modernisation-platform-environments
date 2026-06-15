@@ -46,7 +46,7 @@ resource "aws_secretsmanager_secret_version" "sftp_lambda_secrets" {
     financial_transfers_api_url = "",
     financial_transfer_api_auth_header = "",
     slack_webhook_url = "",
-    vpce_sm_owning_account_id = ""
+    vpce_sm_owner_account_id = ""
   })
 
   lifecycle {
