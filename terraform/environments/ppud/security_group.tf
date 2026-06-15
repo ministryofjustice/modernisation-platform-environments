@@ -1171,7 +1171,7 @@ locals {
       name        = "PPUD-Web-Portal-Server-Security-Group"
       description = "PPUD Web Portal server security group for all environments"
       ingress = [
-        # Note there is an additional ingress rule for port 443 from the ALB in a separate statement
+        # Note there are additional ingress rules for port 443 from the old and new ALB security groups in separate statements
         { port = 80,   cidr = "vpc",       description = "Allow port 80 inbound" },
         { port = 3389, cidr = "vpc",       description = "Allow port 3389 inbound" },
       ]
@@ -1521,6 +1521,17 @@ resource "aws_security_group_rule" "wam_portal_alb_ingress_legacy" {
   protocol                 = "tcp"
   source_security_group_id = aws_security_group.WAM-ALB.id
   security_group_id        = aws_security_group.all["WAM-Web-Portal-Server-Security-Group"].id
+}
+
+# Temporary rule - allows health checks from the old WAM-ALB SG until the ALB is migrated to the new WAM-ALB-Load-Balancer-Security-Group
+resource "aws_security_group_rule" "ppud_portal_alb_ingress_legacy" {
+  description              = "Allow port 443 inbound from legacy PPUD-ALB security group"
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.PPUD-ALB.id
+  security_group_id        = aws_security_group.all["PPUD-Web-Portal-Server-Security-Group"].id
 }
 
 # -------------------------------------------------------------------
