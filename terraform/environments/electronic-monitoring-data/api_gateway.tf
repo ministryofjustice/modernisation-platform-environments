@@ -146,7 +146,8 @@ resource "aws_acm_certificate" "update_p1_export" {
   tags = local.tags
 }
 
-data "aws_iam_policy_document" "update_p1_export_domain_policy_vpc" {
+data "aws_iam_policy_document" "update_p1_export_vpc" {
+  count = local.is-test || local.is-development ? 0 : 1
   statement {
     effect = "Allow"
 
@@ -156,6 +157,22 @@ data "aws_iam_policy_document" "update_p1_export_domain_policy_vpc" {
     }
 
     actions   = ["execute-api:Invoke"]
+    resources = ["${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*"]
+  }
+  statement {
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["execute-api:Invoke"]
+    condition {
+      test     = "StringNotEquals"
+      variable = "aws:sourceVpce"
+      values = [
+        data.aws_vpc_endpoint.api_gateway.id
+      ]
+    }
     resources = ["${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*"]
   }
 }
@@ -170,7 +187,7 @@ resource "aws_api_gateway_domain_name" "update_p1_export" {
   routing_mode    = "BASE_PATH_MAPPING_ONLY"
 
   # This is the custom domain resource policy.
-  policy = data.aws_iam_policy_document.update_p1_export_domain_policy_vpc.json
+  policy = data.aws_iam_policy_document.update_p1_export_vpc[0].json
 
   endpoint_configuration {
     types           = ["PRIVATE"]
@@ -241,37 +258,6 @@ resource "aws_vpc_security_group_ingress_rule" "allow_cp_access" {
 # --------------------------------------------------------------------------------
 locals {
   endpoint_type = local.is-development ? {"REGIONAL": null} : {"PRIVATE": data.aws_vpc_endpoint.api_gateway.cidr_blocks}
-}
-
-data "aws_iam_policy_document" "update_p1_export_vpc" {
-  count = local.is-test || local.is-development ? 0 : 1
-  statement {
-    effect = "Allow"
-
-    principals {
-      type        = "AWS"
-      identifiers = [module.emd_update_p1_cp_role[0].iam_role_arn]
-    }
-
-    actions   = ["execute-api:Invoke"]
-    resources = ["${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*"]
-  }
-  statement {
-    effect = "Deny"
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-    actions = ["execute-api:Invoke"]
-    condition {
-      test     = "StringNotEquals"
-      variable = "aws:sourceVpce"
-      values = [
-        data.aws_vpc_endpoint.api_gateway.id
-      ]
-    }
-    resources = ["${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*"]
-  }
 }
 
 resource "aws_api_gateway_rest_api_policy" "update_p1_export_vpc" {
