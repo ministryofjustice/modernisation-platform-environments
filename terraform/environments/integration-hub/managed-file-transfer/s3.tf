@@ -103,7 +103,7 @@ module "s3_bucket" {
     for key, value in local.bucket_configuration : key => value
   }
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.13.0"
+  version = "5.14.0"
 
   allowed_kms_key_arn                   = module.kms_s3_bucket[each.key].key_arn
   attach_policy                         = contains(["processing", "unscanned"], each.key)
