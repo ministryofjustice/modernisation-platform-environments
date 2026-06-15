@@ -71,7 +71,7 @@ data "archive_file" "edrms_docs_exception_zip" {
 }
 
 resource "aws_lambda_function" "edrms_docs_exception_monitor" {
-  filename         = "data.archive_file.edrms_docs_exception_zip.output_path"
+  filename         = data.archive_file.edrms_docs_exception_zip.output_path
   source_code_hash = data.archive_file.edrms_docs_exception_zip.output_base64sha256
   function_name    = "${local.application_name}-${local.environment}-edrms-docs-exception-monitor"
   role             = aws_iam_role.lambda_edrms_docs_exception_role.arn
