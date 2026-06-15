@@ -9,7 +9,8 @@
       "transfer_clients": {
         "products-poc": {
           "enabled": true,
-          "key_prefix": "products-poc/uploads"
+          "key_prefix": "products-poc/uploads",
+          "max_upload_size_bytes": 107374182400
         }
       }
     },

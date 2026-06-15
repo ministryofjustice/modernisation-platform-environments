@@ -40,7 +40,7 @@ resource "aws_dynamodb_table_item" "transfer_client" {
       S = try(each.value.key_prefix, each.key)
     }
     max_upload_size_bytes = {
-      N = tostring(try(each.value.max_upload_size_bytes, 52428800))
+      N = tostring(try(each.value.max_upload_size_bytes, 107374182400))
     }
     allowed_content_types = {
       L = [
