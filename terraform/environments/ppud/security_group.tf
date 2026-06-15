@@ -1172,40 +1172,40 @@ locals {
       description = "PPUD Web Portal server security group for all environments"
       ingress = [
         # Note there is an additional ingress rule for port 443 from the ALB in a separate statement
-        { port = 80,   cidr = "vpc",       description = "Allow port 80 inbound" },
-        { port = 3389, cidr = "vpc",       description = "Allow port 3389 inbound" },
+        { port = 80, cidr = "vpc", description = "Allow port 80 inbound" },
+        { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
       ]
       egress = [
-        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",       description = "Allow all outbound (VPC)" },
+        { port = 0, to_port = 0, protocol = "all", cidr = "vpc", description = "Allow all outbound (VPC)" },
         { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
-        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
+        { port = 80, to_port = 80, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
       ]
     }
     "WAM-Data-Access-Server-Security-Group" = {
       name        = "WAM-Data-Access-Server-Security-Group"
       description = "WAM Data Access server security group for for all environments"
       ingress = [
-        { port = 80,   cidr = "vpc", description = "Allow port 80 inbound" },
+        { port = 80, cidr = "vpc", description = "Allow port 80 inbound" },
         { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
       ]
       egress = [
-        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",       description = "Allow all outbound (VPC)" },
+        { port = 0, to_port = 0, protocol = "all", cidr = "vpc", description = "Allow all outbound (VPC)" },
         { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
-        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
+        { port = 80, to_port = 80, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
       ]
     }
     "Document-Service-Server-Security-Group" = {
       name        = "Document-Service-Server-Security-Group"
       description = "Document Service server security group for all environments"
       ingress = [
-        { port = 80,   cidr = "vpc", description = "Allow port 80 inbound" },
-        { port = 445,  cidr = "vpc", description = "Allow port 445 inbound" },
+        { port = 80, cidr = "vpc", description = "Allow port 80 inbound" },
+        { port = 445, cidr = "vpc", description = "Allow port 445 inbound" },
         { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
       ]
       egress = [
-        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",       description = "Allow all outbound (VPC)" },
+        { port = 0, to_port = 0, protocol = "all", cidr = "vpc", description = "Allow all outbound (VPC)" },
         { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
-        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
+        { port = 80, to_port = 80, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
       ]
     }
     "WAM-Web-Portal-Server-Security-Group" = {
@@ -1213,26 +1213,26 @@ locals {
       description = "WAM Web Portal server security group for all environments"
       ingress = [
         # Note there are additional ingress rules for port 443 from the old and new ALB security groups in separate statements
-        { port = 80,   cidr = "vpc", description = "Allow port 80 inbound" },
+        { port = 80, cidr = "vpc", description = "Allow port 80 inbound" },
         { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
       ]
       egress = [
-        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",       description = "Allow all outbound (VPC)" },
+        { port = 0, to_port = 0, protocol = "all", cidr = "vpc", description = "Allow all outbound (VPC)" },
         { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
-        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
+        { port = 80, to_port = 80, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
       ]
     }
     "Certificate-Authority-Server-Security-Group" = {
       name        = "Certificate-Authority-Server-Security-Group"
       description = "Certificate Authority server security group for all environments"
       ingress = [
-        { port = 80,   cidr = "vpc", description = "Allow port 80 inbound" },
+        { port = 80, cidr = "vpc", description = "Allow port 80 inbound" },
         { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
       ]
       egress = [
-        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",       description = "Allow all outbound (VPC)" },
+        { port = 0, to_port = 0, protocol = "all", cidr = "vpc", description = "Allow all outbound (VPC)" },
         { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
-        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
+        { port = 80, to_port = 80, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
       ]
     }
     "PPUD-ALB-Load-Balancer-Security-Group" = {
@@ -1243,7 +1243,7 @@ locals {
       ]
       egress = [
         { port = 443, to_port = 443, protocol = "tcp", cidr = "vpc", description = "Allow port 443 outbound" },
-        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "vpc", description = "Allow port 80 outbound" },
+        { port = 80, to_port = 80, protocol = "tcp", cidr = "vpc", description = "Allow port 80 outbound" },
       ]
     }
     "WAM-ALB-Load-Balancer-Security-Group" = {
@@ -1253,7 +1253,7 @@ locals {
         { port = 443, cidr = "0.0.0.0/0", description = "Allow port 443 inbound" },
       ]
       egress = [
-        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "vpc", description = "Allow port 80 outbound" },
+        { port = 80, to_port = 80, protocol = "tcp", cidr = "vpc", description = "Allow port 80 outbound" },
         { port = 443, to_port = 443, protocol = "tcp", cidr = "vpc", description = "Allow port 443 outbound" },
       ]
     }
@@ -1268,14 +1268,14 @@ locals {
       description = "Team Foundation Server security group for the development environment"
       ingress = [
         { port = 8080, cidr = "vpc", description = "Allow port 8080 inbound" }, # Port 8080 no longer used, to be removed soon
-        { port = 80,   cidr = "vpc", description = "Allow port 80 inbound" },
+        { port = 80, cidr = "vpc", description = "Allow port 80 inbound" },
         { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
-        { port = 443,  cidr = "vpc", description = "Allow port 443 inbound" },
+        { port = 443, cidr = "vpc", description = "Allow port 443 inbound" },
       ]
       egress = [
-        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",       description = "Allow all outbound (VPC)" },
+        { port = 0, to_port = 0, protocol = "all", cidr = "vpc", description = "Allow all outbound (VPC)" },
         { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
-        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
+        { port = 80, to_port = 80, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
       ]
     }
     "Development-Servers-Standard-Security-Group" = {
@@ -1283,12 +1283,12 @@ locals {
       description = "Development servers standard security group for the development environment"
       ingress = [
         { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
-        { port = 80,   cidr = "vpc", description = "Allow port 80 inbound" },
+        { port = 80, cidr = "vpc", description = "Allow port 80 inbound" },
       ]
       egress = [
-        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",       description = "Allow all outbound (VPC)" },
+        { port = 0, to_port = 0, protocol = "all", cidr = "vpc", description = "Allow all outbound (VPC)" },
         { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
-        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
+        { port = 80, to_port = 80, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
       ]
     }
     "PPUD-Database-Server-Security-Group" = {
@@ -1299,9 +1299,9 @@ locals {
         { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
       ]
       egress = [
-        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",       description = "Allow all outbound (VPC)" },
+        { port = 0, to_port = 0, protocol = "all", cidr = "vpc", description = "Allow all outbound (VPC)" },
         { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
-        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
+        { port = 80, to_port = 80, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
       ]
     }
   } : {}
@@ -1311,13 +1311,13 @@ locals {
       name        = "WAM-Bridge-Server-Security-Group"
       description = "WAM Bridge server security group for UAT & PROD environments"
       ingress = [
-        { port = 80,   cidr = "vpc", description = "Allow port 80 inbound" },
+        { port = 80, cidr = "vpc", description = "Allow port 80 inbound" },
         { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
       ]
       egress = [
-        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",       description = "Allow all outbound (VPC)" },
+        { port = 0, to_port = 0, protocol = "all", cidr = "vpc", description = "Allow all outbound (VPC)" },
         { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
-        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
+        { port = 80, to_port = 80, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
       ]
     }
   } : {}
@@ -1327,14 +1327,14 @@ locals {
       name        = "Database-and-Document-Service-Security-Group"
       description = "Document Service security group for the UAT environment"
       ingress = [
-        { port = 80,   cidr = "vpc", description = "Allow port 80 inbound" },
+        { port = 80, cidr = "vpc", description = "Allow port 80 inbound" },
         { port = 1433, cidr = "vpc", description = "Allow port 1433 inbound" },
         { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
       ]
       egress = [
-        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",       description = "Allow all outbound (VPC)" },
+        { port = 0, to_port = 0, protocol = "all", cidr = "vpc", description = "Allow all outbound (VPC)" },
         { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
-        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
+        { port = 80, to_port = 80, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
       ]
     }
   } : {}
@@ -1348,9 +1348,9 @@ locals {
         { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
       ]
       egress = [
-        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",       description = "Allow all outbound (VPC)" },
+        { port = 0, to_port = 0, protocol = "all", cidr = "vpc", description = "Allow all outbound (VPC)" },
         { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
-        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
+        { port = 80, to_port = 80, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
       ]
     }
     "Internal-Mail-Relay-Security-Group" = {
@@ -1360,9 +1360,9 @@ locals {
         { port = 25, cidr = "vpc", description = "Allow port 25 inbound" },
       ]
       egress = [
-        { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0",  description = "Allow port 443 outbound" },
-        { port = 25,  to_port = 25,  protocol = "tcp", cidr = "vpc",         description = "Allow port 25 outbound" },
-        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",         description = "Allow all outbound (VPC)" },
+        { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
+        { port = 25, to_port = 25, protocol = "tcp", cidr = "vpc", description = "Allow port 25 outbound" },
+        { port = 0, to_port = 0, protocol = "all", cidr = "vpc", description = "Allow all outbound (VPC)" },
       ]
     }
     "External-Mail-Relay-Security-Group" = {
@@ -1373,8 +1373,8 @@ locals {
       ]
       egress = [
         { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
-        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",        description = "Allow all outbound (VPC)" },
-        { port = 25,  to_port = 25,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 25 outbound" },
+        { port = 0, to_port = 0, protocol = "all", cidr = "vpc", description = "Allow all outbound (VPC)" },
+        { port = 25, to_port = 25, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 25 outbound" },
       ]
     }
     "Docker-Build-Server-Security-Group" = {
@@ -1385,9 +1385,9 @@ locals {
       ]
       egress = [
         { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
-        { port = 0,   to_port = 0,   protocol = "all", cidr = "vpc",        description = "Allow all outbound (VPC)" },
-        { port = 80,  to_port = 80,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
-        { port = 25,  to_port = 25,  protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 25 outbound" },
+        { port = 0, to_port = 0, protocol = "all", cidr = "vpc", description = "Allow all outbound (VPC)" },
+        { port = 80, to_port = 80, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
+        { port = 25, to_port = 25, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 25 outbound" },
       ]
     }
   } : {}
