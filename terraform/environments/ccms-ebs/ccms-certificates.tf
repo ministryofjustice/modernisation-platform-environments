@@ -50,6 +50,18 @@ resource "aws_route53_record" "external_validation_prod" {
   zone_id         = data.aws_route53_zone.laa.zone_id
 }
 
+resource "aws_route53_record" "gandicert_validation_prod" {
+  count = local.is-production ? 1 : 0
+  provider = aws.core-network-services
+
+  allow_overwrite = true
+  zone_id = data.aws_route53_zone.legalservices.zone_id
+  name    = "_dnsauth.legalservices.gov.uk"
+  type    = "CNAME"
+  ttl     = 300
+  records = ["_hhd25927klr06tscqd08560wbhgj718.dcv.digicert.com"]
+}
+
 ## Certificate Validation
 
 resource "aws_acm_certificate_validation" "external_nonprod" {
