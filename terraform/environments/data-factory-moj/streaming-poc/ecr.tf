@@ -1,13 +1,6 @@
 # ---------------------------------------------------------------------------------------------------------------------
 # ECR
 # ---------------------------------------------------------------------------------------------------------------------
-locals {
-  ecr_repositories = contains(["development"], local.environment) ? {
-    sdg    = "${local.name}-sdg"
-    alerts = "${local.name}-alerts"
-  } : {}
-}
-
 resource "aws_ecr_repository" "repository" {
   for_each             = local.ecr_repositories
   name                 = each.value
