@@ -112,7 +112,7 @@ resource "aws_vpc_security_group_egress_rule" "process_file_from_bucket_lambda_s
   ip_protocol = "tcp"
   from_port   = 443
   to_port     = 443
-  referenced_security_group_id = aws_security_group.vpce_security_group.id
+  referenced_security_group_id = data.aws_security_group.vpce_security_group.id
 }
 # EC2 Instances Security Group
 resource "aws_security_group" "cluster_ec2" {
