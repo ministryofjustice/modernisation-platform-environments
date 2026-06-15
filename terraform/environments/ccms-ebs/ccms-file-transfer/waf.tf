@@ -1,6 +1,7 @@
 # WAF FOR SFTP CLIENT 1 APP
-resource "aws_wafv2_ip_set" "sftp_bc_waf_ip_set" {
-  name               = "${local.application_name}-sftp-bc-waf-ip-set"
+
+resource "aws_wafv2_ip_set" "sftp_waf_ip_set" {
+  name               = "${local.sftp_suffix}-waf-ip-set"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
   description        = "List of trusted IP Addresses allowing access via WAF"
@@ -14,22 +15,28 @@ resource "aws_wafv2_ip_set" "sftp_bc_waf_ip_set" {
 
   tags = merge(
     local.tags,
-    { Name = lower(format("%s-sftp-bc-%s-ip-set", local.application_name, local.environment)) }
+    { Name = "${local.sftp_suffix}-waf-ip-set" }
   )
 }
 
-resource "aws_wafv2_web_acl" "sftp_bc_web_acl" {
-  name        = "${local.application_name}-sftp-bc-web-acl"
+resource "aws_wafv2_web_acl" "sftp_web_acl" {
+  name        = "${local.sftp_suffix}-web-acl"
   scope       = "REGIONAL"
-  description = "AWS WAF Web ACL for SFTP Client 1 Application Load Balancer"
+  description = "AWS WAF Web ACL for SFTP Application Load Balancer"
 
   default_action {
     block {}
   }
 
+  custom_response_body {
+    key          = "TooManyRequests"
+    content_type = "APPLICATION_JSON"
+    content      = "{\"message\":\"Too many requests\"}"
+  }
+
   rule {
     name     = "AWS-AWSManagedRulesCommonRuleSet"
-    priority = 1
+    priority = 2
 
     override_action {
       none {}
@@ -62,12 +69,57 @@ resource "aws_wafv2_web_acl" "sftp_bc_web_acl" {
     }
   }
 
+  rule {
+    name     = "EndpointSpecific-10RPS-Limit"
+    priority = 1
+
+    statement {
+      rate_based_statement {
+        limit                 = 30
+        aggregate_key_type    = "IP"
+        evaluation_window_sec = 60
+
+        # scope_down_statement {
+        #   byte_match_statement {
+        #     search_string = "/swagger-ui.html"
+
+        #     field_to_match {
+        #       uri_path {}
+        #     }
+
+        #     text_transformation {
+        #       priority = 0
+        #       type     = "LOWERCASE"
+        #     }
+
+        #     positional_constraint = "EXACTLY"
+        #   }
+        # }
+      }
+    }
+
+    action {
+      block {
+        custom_response {
+          response_code            = 429
+          custom_response_body_key = "TooManyRequests"
+        }
+      }
+    }
+
+    visibility_config {
+      sampled_requests_enabled   = true
+      cloudwatch_metrics_enabled = true
+      metric_name                = "EndpointSpecific10RPSLimit"
+    }
+  }
+
   # Restrict access to trusted IPs only - Non-Prod environments only
   dynamic "rule" {
     for_each = !local.is-production ? [1] : [1] # Temprorarily enable for Prod as well - to be removed when Geo Match is live
     content {
-      name     = "${local.application_name}-sftp-bc-waf-ip-set"
-      priority = 2
+      name     = "${local.sftp_suffix}-waf-ip-set"
+      priority = 3
 
       action {
         allow {}
@@ -75,46 +127,46 @@ resource "aws_wafv2_web_acl" "sftp_bc_web_acl" {
 
       statement {
         ip_set_reference_statement {
-          arn = aws_wafv2_ip_set.sftp_bc_waf_ip_set.arn
+          arn = aws_wafv2_ip_set.sftp_waf_ip_set.arn
         }
       }
 
       visibility_config {
         cloudwatch_metrics_enabled = true
-        metric_name                = "${local.application_name}-sftp-bc-waf-ip-set"
+        metric_name                = "${local.sftp_suffix}-waf-ip-set"
         sampled_requests_enabled   = true
       }
     }
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("%s-sftp-bc-%s-web-acl", local.application_name, local.environment)) }
+    { Name = "${local.sftp_suffix}-web-acl" }
   )
 
   visibility_config {
     cloudwatch_metrics_enabled = true
-    metric_name                = "${local.application_name}-sftp-bc-waf-metrics"
+    metric_name                = "${local.sftp_suffix}-waf-metrics"
     sampled_requests_enabled   = true
   }
 }
 
 # WAF Logging to CloudWatch
-resource "aws_cloudwatch_log_group" "sftp_bc_waf_logs" {
-  name              = "aws-waf-logs-${local.application_name}-sftp-bc/sftp-bc-waf-logs"
+resource "aws_cloudwatch_log_group" "sftp_waf_logs" {
+  name              = "aws-waf-logs-${local.sftp_suffix}/${local.sftp_suffix}-waf-logs"
   retention_in_days = 30
 
   tags = merge(local.tags,
-    { Name = lower(format("%s-sftp-bc-%s-waf-logs", local.application_name, local.environment)) }
+    { Name = "${local.sftp_suffix}-waf-logs" }
   )
 }
 
-resource "aws_wafv2_web_acl_logging_configuration" "sftp_bc_waf_logging" {
-  log_destination_configs = [aws_cloudwatch_log_group.sftp_bc_waf_logs.arn]
-  resource_arn            = aws_wafv2_web_acl.sftp_bc_web_acl.arn
+resource "aws_wafv2_web_acl_logging_configuration" "sftp_waf_logging" {
+  log_destination_configs = [aws_cloudwatch_log_group.sftp_waf_logs.arn]
+  resource_arn            = aws_wafv2_web_acl.sftp_web_acl.arn
 }
 
 # Associate the WAF with the SFTP bc Application Load Balancer
-resource "aws_wafv2_web_acl_association" "sftp_bc_waf_association" {
-  resource_arn = aws_lb.sftp_bc_load_balancer.arn
-  web_acl_arn  = aws_wafv2_web_acl.sftp_bc_web_acl.arn
+resource "aws_wafv2_web_acl_association" "sftp_waf_association" {
+  resource_arn = aws_lb.sftp_load_balancer.arn
+  web_acl_arn  = aws_wafv2_web_acl.sftp_web_acl.arn
 }

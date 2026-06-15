@@ -45,13 +45,13 @@ resource "aws_iam_role_policy" "lambda_process_file_from_bucket_policy" {
       },
       {
         "Effect" : "Allow",
-        "Action" : ["secretsmanager:GetSecretValue","secretsmanager:DescribeSecret","secretsmanager:ListSecretVersionIds"],
-        "Resource" : ["${aws_secretsmanager_secret.sftp_bc_lambda_secrets.id}"]
+        "Action" : ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret", "secretsmanager:ListSecretVersionIds"],
+        "Resource" : ["${aws_secretsmanager_secret.sftp_lambda_secrets.id}"]
       },
       {
         "Effect" : "Allow",
         "Action" : ["kms:GenerateDataKey*", "kms:Decrypt"],
-        "Resource" : ["${aws_kms_key.s3_sftp_bc_kms_key.arn}"]
+        "Resource" : ["${aws_kms_key.s3_sftp_kms_key.arn}"]
       }
     ]
   })
@@ -74,7 +74,7 @@ resource "aws_lambda_function" "process_file_from_bucket_lambda_function" {
   environment {
     variables = {
       # This secret now contains slack_channel_webhook, slack_channel_webhook_guardduty, slack_channel_webhook_s3
-      SECRET_NAME = aws_secretsmanager_secret.sftp_bc_lambda_secrets.arn
+      SECRET_NAME = aws_secretsmanager_secret.sftp_lambda_secrets.arn
     }
   }
 
