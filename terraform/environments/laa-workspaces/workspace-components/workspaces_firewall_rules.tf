@@ -425,14 +425,23 @@ resource "aws_networkfirewall_logging_configuration" "workspaces" {
   count           = local.environment == "development" ? 1 : 0
   firewall_arn    = aws_networkfirewall_firewall.workspaces_web_allowlist[0].arn
   logging_configuration {
-    cloudwatch_logs_log_group {
-      log_group_name = aws_cloudwatch_log_group.firewall_flow_logs[0].name
-      enabled        = true
+    log_destination_config {
+      log_destination = {
+        cloudwatch_logs_log_group = {
+          log_group = aws_cloudwatch_log_group.firewall_flow_logs[0].name
+        }
+      }
+      log_destination_type = "CLOUDWATCH_LOGS"
+      log_type             = "FLOW"
     }
-
-    cloudwatch_logs_log_group {
-      log_group_name = aws_cloudwatch_log_group.firewall_alert_logs[0].name
-      enabled        = true
+    log_destination_config {
+      log_destination = {
+        cloudwatch_logs_log_group = {
+          log_group = aws_cloudwatch_log_group.firewall_alert_logs[0].name
+        }
+      }
+      log_destination_type = "CLOUDWATCH_LOGS"
+      log_type             = "ALERT"
     }
   }
 }
