@@ -100,7 +100,7 @@ data "aws_iam_policy_document" "processing" {
 
 data "aws_iam_policy_document" "clean" {
   statement {
-    sid    = "DenyAccessToObjectsWithoutCleanGuardDutyStatus"
+    sid    = "DenyAccessToObjectsWithoutNoThreatsFoundGuardDutyStatus"
     effect = "Deny"
 
     principals {
@@ -196,7 +196,7 @@ data "aws_iam_policy_document" "clean" {
 
 data "aws_iam_policy_document" "quarantine" {
   statement {
-    sid    = "DenyAccessToObjectsWithoutCleanGuardDutyStatus"
+    sid    = "DenyAccessToObjectsWithoutNoThreatsFoundGuardDutyStatus"
     effect = "Deny"
 
     principals {
