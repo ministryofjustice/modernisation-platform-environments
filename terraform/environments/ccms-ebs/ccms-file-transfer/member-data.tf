@@ -23,9 +23,5 @@ data "aws_security_group" "vpce_security_group" {
     name   = "tag:Name"
     values = ["${var.networking[0].business-unit}-${local.environment}-int-endpoint"]
   }
-  filter {
-    name   = "owner-id"
-    values = ["${data.aws_secretsmanager_secret_version.sftp_lambda_secrets.arn}:vpce_sm_owner_account_id::"]
-  }
 
 }

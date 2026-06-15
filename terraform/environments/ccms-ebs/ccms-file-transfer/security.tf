@@ -75,6 +75,10 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_sftp_security_group_egr
   from_port   = 443
   to_port     = 443
   referenced_security_group_id = data.aws_security_group.vpce_security_group.id
+
+  lifecycle {
+    ignore_changes = [referenced_security_group_id]
+  }
 }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_sftp_security_group_egress_rule" {
@@ -124,6 +128,10 @@ resource "aws_vpc_security_group_egress_rule" "process_file_from_bucket_lambda_s
   from_port   = 443
   to_port     = 443
   referenced_security_group_id = data.aws_security_group.vpce_security_group.id
+
+  lifecycle {
+    ignore_changes = [referenced_security_group_id]
+  }
 }
 # EC2 Instances Security Group
 resource "aws_security_group" "cluster_ec2" {
