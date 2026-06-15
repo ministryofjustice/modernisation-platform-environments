@@ -282,6 +282,7 @@ data "aws_vpc_endpoint" "api_gateway" {
 }
 
 resource "aws_api_gateway_domain_name_access_association" "update_p1_export" {
+  provider                       = aws.core-vpc
   domain_name_arn                = aws_api_gateway_domain_name.update_p1_export.arn
   access_association_source      = data.aws_vpc_endpoint.api_gateway.id
   access_association_source_type = "VPCE"
@@ -299,8 +300,8 @@ resource "aws_route53_record" "private_api" {
   type    = "A"
 
   alias {
-    name                   = aws_api_gateway_domain_name.update_p1_export.regional_domain_name
-    zone_id                = aws_api_gateway_domain_name.update_p1_export.regional_zone_id
+    name                   = data.aws_vpc_endpoint.api_gateway.dns_entry[0].dns_name
+    zone_id                = data.aws_vpc_endpoint.api_gateway.dns_entry[0].hosted_zone_id
     evaluate_target_health = false
   }
 }
