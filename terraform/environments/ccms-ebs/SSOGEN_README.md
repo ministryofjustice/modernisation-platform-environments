@@ -51,7 +51,7 @@ SSOGEN is deployed as a highly available infrastructure with the following key c
      - Uses primary AMI ID: `ssogen_ami_id-1`
    - **Secondary Template** (`ssogen-ec2-launch-template-secondary`):
      - Uses secondary AMI ID: `ssogen_ami_id-2`
-   
+
    **Configuration for both**:
    - Instance type: `ec2_oracle_instance_type_ssogen` (environment-specific)
    - EBS optimized: enabled
@@ -60,13 +60,13 @@ SSOGEN is deployed as a highly available infrastructure with the following key c
    - Public IP association: disabled
    - Security groups: `ssogen_sg`
    - User data: base64-encoded template files
-   
+
    **Block Device Mappings** (encrypted EBS volumes with KMS):
    - `/dev/sda1`: Root volume (`ec2_disk_size_ssogen`)
    - `/dev/sdb`: Framework volume (`ec2_disk_size_ssogen_fmw`) for WebLogic framework
    - `/dev/sdc`: Managed Server volume (`ec2_disk_size_ssogen_mserver`)
    - `/dev/sdd`: Temp volume (`ec2_disk_size_ssogen_temp`)
-   
+
    **Tagging**:
    - Instance role reference
    - Backup: enabled
@@ -239,7 +239,7 @@ SSOGEN is deployed as a highly available infrastructure with the following key c
    - Referenced in launch template IAM instance profile
 
 3. **Managed Policies**:
-   - `AmazonSSMManagedInstanceCore`: 
+   - `AmazonSSMManagedInstanceCore`:
      - Session Manager access for remote connection
      - CloudWatch agent deployment
      - AWS Systems Manager patching
@@ -253,7 +253,7 @@ SSOGEN is deployed as a highly available infrastructure with the following key c
    - Managed here: `alias/ssogen-key-alias`
    - Target: `ssogen_kms_key` from ssogen-key.tf
 
-**Security Model**: 
+**Security Model**:
 - Least privilege: Only SSM managed core policy
 - Session Manager enables secure shell access without SSH keys
 - No direct SSH access needed (uses Systems Manager)
@@ -368,20 +368,20 @@ SSOGEN is deployed as a highly available infrastructure with the following key c
    - Name: `{application_name}-console-web-acl`
    - Scope: REGIONAL
    - Description: AWS WAF Web ACL for SSOGEN Console ALB
-   
+
    **Rules**:
    - **Priority 1**: AWS Managed Rules - Common Rule Set
      - Vendor: AWS
      - Override action: none (enforces rules)
      - Blocks common web exploits and attacks
      - CloudWatch metrics enabled
-   
+
    - **Priority 2**: IP Whitelist Rule
      - Action: ALLOW
      - References: IP set (`ssogen_console_waf_ip_set`)
      - Allows traffic only from trusted IPs
      - Visibility: CloudWatch metrics enabled
-   
+
    **Default Action**: BLOCK (deny all traffic by default)
 
 3. **WAF Logging**:
@@ -397,7 +397,7 @@ SSOGEN is deployed as a highly available infrastructure with the following key c
 
 **Applied To**: Console ALB only (main ALB has no WAF)
 
-**Security Model**: 
+**Security Model**:
 - Default-deny policy with explicit whitelist
 - Protects console from unauthorized access and web attacks
 - Only AWS WorkSpaces users can reach console
@@ -431,7 +431,7 @@ Auto-Scaling Groups manage EC2 instance lifecycle for SSOGEN:
 - **Desired Capacity**: `ssogen_desired_capacity`
 - **Min Size**: `ssogen_min_capacity`
 - **Max Size**: `ssogen_max_capacity`
-- **Target Groups**: 
+- **Target Groups**:
   - Main application target group (`ssogen_internal_tg_ssogen_enc_app`)
   - Console target group (`ssogen_internal_tg_ssogen_console`)
 - **Subnets**: All shared private subnets (spans all availability zones)
@@ -612,7 +612,7 @@ ORDER BY count DESC;
 ```
 
 ### Health Checks
-- **ALB Target Health**: 
+- **ALB Target Health**:
   - Path: `/`
   - Protocol: HTTPS
   - Expected: HTTP 200

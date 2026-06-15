@@ -123,7 +123,7 @@ resource "aws_iam_role_policy" "cloudwatch" {
 # update_p1_export
 # --------------------------------------------------------------------------------
 locals {
-  endpoint_type = local.is-development ? {"REGIONAL": null} : {"PRIVATE": data.aws_vpc_endpoint.api_gateway.cidr_blocks}
+  endpoint_type = local.is-development ? { "REGIONAL" : null } : { "PRIVATE" : data.aws_vpc_endpoint.api_gateway.cidr_blocks }
 }
 
 
@@ -153,7 +153,7 @@ resource "aws_vpc_security_group_ingress_rule" "allow_cp_access" {
 }
 
 data "aws_network_interface" "execute_api_endpoint_eni" {
-  provider     = aws.core-vpc
+  provider = aws.core-vpc
   for_each = toset(data.aws_vpc_endpoint.api_gateway.network_interface_ids)
   id       = each.value
 }
@@ -227,7 +227,7 @@ resource "aws_route53_resolver_endpoint" "inbound_api" {
 
 
 resource "aws_route53_record" "private_api" {
-  provider     = aws.core-vpc
+  provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.inner.zone_id
   name    = "update-p1-export.${trimsuffix(data.aws_route53_zone.inner.name, ".")}"
@@ -259,9 +259,9 @@ data "aws_iam_policy_document" "update_p1_export_vpc" {
       type        = "*"
       identifiers = ["*"]
     }
-    actions   = ["execute-api:Invoke"]
+    actions = ["execute-api:Invoke"]
     condition {
-      test = "StringNotEquals"
+      test     = "StringNotEquals"
       variable = "aws:sourceVpce"
       values = [
         data.aws_vpc_endpoint.api_gateway.id
@@ -496,7 +496,7 @@ resource "aws_cloudwatch_log_group" "update_p1_export_waf_log_group" {
 }
 
 resource "aws_api_gateway_method_response" "add_response_200" {
-  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  count       = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   rest_api_id = aws_api_gateway_rest_api.update_p1_export[0].id
   resource_id = aws_api_gateway_resource.update_p1_export_add[0].id
   http_method = aws_api_gateway_method.update_p1_export_add_post[0].http_method
@@ -504,7 +504,7 @@ resource "aws_api_gateway_method_response" "add_response_200" {
 }
 
 resource "aws_api_gateway_method_response" "add_status_404" {
-  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  count       = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   rest_api_id = aws_api_gateway_rest_api.update_p1_export[0].id
   resource_id = aws_api_gateway_resource.update_p1_export_add[0].id
   http_method = aws_api_gateway_method.update_p1_export_add_post[0].http_method
@@ -512,7 +512,7 @@ resource "aws_api_gateway_method_response" "add_status_404" {
 }
 
 resource "aws_api_gateway_method_response" "remove_response_200" {
-  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  count       = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   rest_api_id = aws_api_gateway_rest_api.update_p1_export[0].id
   resource_id = aws_api_gateway_resource.update_p1_export_remove[0].id
   http_method = aws_api_gateway_method.update_p1_export_remove_post[0].http_method
@@ -521,7 +521,7 @@ resource "aws_api_gateway_method_response" "remove_response_200" {
 
 
 resource "aws_api_gateway_method_response" "remove_status_404" {
-  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  count       = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   rest_api_id = aws_api_gateway_rest_api.update_p1_export[0].id
   resource_id = aws_api_gateway_resource.update_p1_export_remove[0].id
   http_method = aws_api_gateway_method.update_p1_export_remove_post[0].http_method

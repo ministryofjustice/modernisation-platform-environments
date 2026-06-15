@@ -61,7 +61,7 @@ resource "aws_iam_policy" "datasync_s3_policy" {
           "kms:Decrypt",
           "kms:GenerateDataKey"
         ]
-        Effect = "Allow"
+        Effect   = "Allow"
         Resource = ["*"]
       }
     ]
