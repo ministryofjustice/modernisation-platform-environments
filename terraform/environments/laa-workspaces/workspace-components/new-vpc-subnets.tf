@@ -229,7 +229,7 @@ resource "aws_route_table" "edge" {
   vpc_id = aws_vpc.workspaces[0].id
 
   tags = {
-    Name = "${local.application_name}-${local.environment}-production-edge"
+    Name = "${local.application_name}-${local.environment}-edge"
   }
 }
 
@@ -238,7 +238,7 @@ resource "aws_route" "first_az" {
   count = local.environment == "development" ? 1 : 0
   
   route_table_id            = aws_route_table.edge[0].id
-  destination_cidr_block    = "10.200.10.0/24"
+  destination_cidr_block    = local.application_data.accounts[local.environment].public_subnet_a_cidr
   vpc_endpoint_id           = local.firewall_endpoints["eu-west-2a"]
 }
 
