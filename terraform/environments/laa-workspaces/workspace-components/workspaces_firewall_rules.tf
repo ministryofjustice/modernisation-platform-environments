@@ -140,6 +140,7 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
           ".outlook.com",
           ".onenote.com",
           ".sharepointonline.com",
+          "teams.microsoft.com",
 
           # CDN / delivery
           ".msecnd.net",
@@ -393,8 +394,40 @@ resource "aws_networkfirewall_firewall" "workspaces_web_allowlist" {
     subnet_id = aws_subnet.firewall_b[0].id
   }
 
+  logging_configuration {
+    cloudwatch_logs_log_group {
+      log_group_name = aws_cloudwatch_log_group.firewall_flow_logs[0].name
+      enabled        = true
+    }
+
+    cloudwatch_logs_log_group {
+      log_group_name = aws_cloudwatch_log_group.firewall_alert_logs[0].name
+      enabled        = true
+    }
+  }
 
   tags = {
     Name = "workspaces-web-allowlist-firewall"
+  }
+}
+
+# CloudWatch Log Groups for firewall
+resource "aws_cloudwatch_log_group" "firewall_flow_logs" {
+  count             = local.environment == "development" ? 1 : 0
+  name              = "/aws/network-firewall/workspaces/flow-logs"
+  retention_in_days = 7
+
+  tags = {
+    Name = "workspaces-firewall-flow-logs"
+  }
+}
+
+resource "aws_cloudwatch_log_group" "firewall_alert_logs" {
+  count             = local.environment == "development" ? 1 : 0
+  name              = "/aws/network-firewall/workspaces/alert-logs"
+  retention_in_days = 7
+
+  tags = {
+    Name = "workspaces-firewall-alert-logs"
   }
 }
