@@ -166,7 +166,7 @@ resource "aws_api_gateway_domain_name" "update_p1_export" {
   # For PRIVATE custom domains, use certificate_arn, not regional_certificate_arn.
   certificate_arn = aws_acm_certificate.update_p1_export.arn
 
-  security_policy = "TLS_1_3"
+  security_policy = "SecurityPolicy_TLS13_1_3_2025_09"
   routing_mode    = "BASE_PATH_MAPPING_ONLY"
 
   # This is the custom domain resource policy.
@@ -174,7 +174,7 @@ resource "aws_api_gateway_domain_name" "update_p1_export" {
 
   endpoint_configuration {
     types           = ["PRIVATE"]
-    ip_address_type = "DUALSTACK"
+    ip_address_type = "dualstack"
   }
 
   tags = local.tags
