@@ -251,6 +251,7 @@ resource "aws_api_gateway_domain_name" "update_p1_export" {
   certificate_arn = aws_acm_certificate.update_p1_export.arn
 
   security_policy = "SecurityPolicy_TLS13_1_3_2025_09"
+  endpoint_access_mode     = "STRICT"
   routing_mode    = "BASE_PATH_MAPPING_ONLY"
 
   # This is the custom domain resource policy.
