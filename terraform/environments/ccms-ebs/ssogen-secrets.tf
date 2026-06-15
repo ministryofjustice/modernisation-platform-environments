@@ -10,9 +10,9 @@ resource "aws_secretsmanager_secret_version" "dev_account_secret" {
   secret_id = aws_secretsmanager_secret.dev_account_secret[count.index].id
 
   secret_string = jsonencode({
-    "dev_account_id" = "",
+    "dev_account_id"     = "",
     "preprod_account_id" = "",
-    "prod_account_id" = ""
+    "prod_account_id"    = ""
   })
 
   lifecycle {

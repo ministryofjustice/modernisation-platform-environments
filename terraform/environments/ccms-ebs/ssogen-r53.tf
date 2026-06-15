@@ -94,6 +94,6 @@ resource "aws_route53_record" "ssogen_admin_primary" {
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "ccms-${local.application_name_ssogen}-admin.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type     = "A"
-  ttl     = 300
-  records = [data.aws_instance.ssogen_primary_details[count.index].private_ip]
+  ttl      = 300
+  records  = [data.aws_instance.ssogen_primary_details[count.index].private_ip]
 }
