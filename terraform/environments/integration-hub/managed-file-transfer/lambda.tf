@@ -5,7 +5,7 @@ module "lambda_unscanned_to_processing" {
   function_name                  = "${local.application_name}-unscanned-to-processing"
   description                    = "Moves uploaded files from the unscanned bucket to the processing bucket"
   handler                        = "lambda_function.lambda_handler"
-  memory_size                    = 512
+  memory_size                    = 256
   reserved_concurrent_executions = 10
   runtime                        = "python3.12"
   source_path                    = "lambda/s3-file-mover"
@@ -103,7 +103,7 @@ module "lambda_processing_to_post_scan" {
   function_name                  = "${local.application_name}-processing-to-post-scan"
   description                    = "Moves scanned files from the processing bucket to the post-scan destination bucket"
   handler                        = "lambda_function.lambda_handler"
-  memory_size                    = 512
+  memory_size                    = 256
   reserved_concurrent_executions = 10
   runtime                        = "python3.12"
   source_path                    = "lambda/guard-duty-file-mover"
