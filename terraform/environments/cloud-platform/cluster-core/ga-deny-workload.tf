@@ -15,6 +15,7 @@ locals {
   # echo5) are added in later steps as each deny-by-default scenario is built.
   deny_echo_hostnames = {
     echo1 = "echo1.${local.cluster_name}.${local.cluster_base_domain}"
+    echo3 = "echo3.${local.cluster_name}.${local.cluster_base_domain}"
   }
 }
 

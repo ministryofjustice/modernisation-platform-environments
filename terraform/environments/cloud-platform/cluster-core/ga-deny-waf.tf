@@ -31,6 +31,14 @@ locals {
       cidrs    = ["83.100.215.187/32"]
       priority = 1
     }
+    # D2: echo3 gets its own rule + IP set with a DIFFERENT (dummy) CIDR. From
+    # the test source IP this must yield echo1 -> 200 and echo3 -> 403
+    # simultaneously, proving per-host rules are independent (no cross-bleed).
+    echo3 = {
+      hostname = "echo3.${local.cluster_name}.${local.cluster_base_domain}"
+      cidrs    = ["203.0.113.3/32"]
+      priority = 2
+    }
   }
 }
 
