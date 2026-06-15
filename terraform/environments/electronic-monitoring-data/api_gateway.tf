@@ -212,7 +212,6 @@ resource "aws_route53_record" "private_api" {
   zone_id = data.aws_route53_zone.inner.zone_id
   name    = local.update_p1_export_domain_name
   type    = "A"
-  ttl     = 60
 
   alias {
     name                   = aws_api_gateway_domain_name.update_p1_export.regional_domain_name
