@@ -35,3 +35,4 @@ resource "aws_cloudwatch_log_delivery" "cloudfront" {
   delivery_source_name     = aws_cloudwatch_log_delivery_source.cloudfront.name
   delivery_destination_arn = aws_cloudwatch_log_delivery_destination.cloudfront.arn
 }
+*/
