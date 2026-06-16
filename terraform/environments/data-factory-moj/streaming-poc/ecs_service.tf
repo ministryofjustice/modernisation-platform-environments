@@ -245,7 +245,7 @@ module "ecs_container_sdg" {
     logDriver = "awslogs"
     options = {
       "awslogs-group"         = "/ecs/${local.sdg_prefix}"
-      "awslogs-region"        = data.aws_region.current.name
+      "awslogs-region"        = data.aws_region.current.region
       "awslogs-stream-prefix" = "ecs"
     }
   }
@@ -304,7 +304,7 @@ module "ecs_container_alerts" {
     logDriver = "awslogs"
     options = {
       "awslogs-group"         = "/ecs/${local.alerts_prefix}"
-      "awslogs-region"        = data.aws_region.current.name
+      "awslogs-region"        = data.aws_region.current.region
       "awslogs-stream-prefix" = "ecs"
     }
   }
