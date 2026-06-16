@@ -33,7 +33,7 @@ resource "aws_wafv2_web_acl" "sftp_web_acl" {
     content_type = "APPLICATION_JSON"
     content      = "{\"message\":\"Too many requests\"}"
   }
-  
+
   rule {
     name     = "AWS-AWSManagedRulesCommonRuleSet"
     priority = 2
