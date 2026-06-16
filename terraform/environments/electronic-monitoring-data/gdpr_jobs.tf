@@ -87,7 +87,8 @@ data "aws_iam_policy_document" "gdpr_structured_job_policy_document" {
       "athena:StartQueryExecution",
       "athena:GetQueryExecution",
       "athena:GetQueryResults",
-      "athena:StopQueryExecution"
+      "athena:StopQueryExecution",
+      "athena:GetWorkGroup"
     ]
     resources = ["*"]
   }
