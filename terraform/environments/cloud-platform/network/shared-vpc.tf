@@ -1,7 +1,6 @@
 module "cluster_vpc" {
   version = "6.5.1"
   source  = "terraform-aws-modules/vpc/aws"
-  count   = contains(["cloud-platform-development", "cloud-platform-preproduction", "cloud-platform-live"], terraform.workspace) ? 1 : 0
 
   name = local.cp_vpc_name
   cidr = contains(keys(local.vpc_cidr), local.cp_vpc_name) ? lookup(local.vpc_cidr, local.cp_vpc_name) : null
@@ -42,9 +41,9 @@ module "cluster_vpc" {
 }
 
 resource "aws_subnet" "tgw_private" {
-  count = contains(["cloud-platform-development", "cloud-platform-preproduction", "cloud-platform-live"], terraform.workspace) ? 3 : 0
+  count = 3
 
-  vpc_id                  = module.cluster_vpc[0].vpc_id
+  vpc_id                  = module.cluster_vpc.vpc_id
   cidr_block              = contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 8, count.index + 4) : null
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   map_public_ip_on_launch = false
@@ -59,8 +58,7 @@ resource "aws_subnet" "tgw_private" {
 }
 
 resource "aws_route_table_association" "tgw_private" {
-  count = contains(["cloud-platform-development", "cloud-platform-preproduction", "cloud-platform-live"], terraform.workspace) ? 3 : 0
-
+  count          = 3
   subnet_id      = aws_subnet.tgw_private[count.index].id
-  route_table_id = module.cluster_vpc[0].private_route_table_ids[count.index]
+  route_table_id = module.cluster_vpc.private_route_table_ids[count.index]
 }
