@@ -318,10 +318,12 @@ locals {
     }
     file_server_analysis = {
       description  = "Function to analyse metadata from the PPUD file server and generate a report."
+      timeout      = 900
+      memory_size  = 1024
       role_key     = "file_server_analysis"
       environments = ["development"]
       layers       = ["numpy", "pillow", "matplotlib"]
-      permissions = []
+      permissions  = []
     }
     rotate_ses_access_key = {
       description  = "Function to rotate ses access key, secret key and derive new smtp password."

@@ -1,21 +1,20 @@
 module "cluster_vpc" {
   version = "6.5.1"
   source  = "terraform-aws-modules/vpc/aws"
-  count   = terraform.workspace == "cloud-platform-development" ? 1 : 0
 
   name = local.cp_vpc_name
-  cidr = lookup(local.vpc_cidr, local.cp_vpc_name)
+  cidr = contains(keys(local.vpc_cidr), local.cp_vpc_name) ? lookup(local.vpc_cidr, local.cp_vpc_name) : null
   azs  = slice(data.aws_availability_zones.available.names, 0, 3)
   private_subnets = [
-    cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 3, 1),
-    cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 3, 2),
-    cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 3, 3)
+    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 3, 1) : null,
+    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 3, 2) : null,
+    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 3, 3) : null
   ]
 
   public_subnets = [
-    cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 7, 4),
-    cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 7, 5),
-    cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 7, 6)
+    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 7, 4) : null,
+    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 7, 5) : null,
+    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 7, 6) : null
   ]
 
   manage_default_network_acl    = false
@@ -42,10 +41,10 @@ module "cluster_vpc" {
 }
 
 resource "aws_subnet" "tgw_private" {
-  count = terraform.workspace == "cloud-platform-development" ? 3 : 0
+  count = 3
 
-  vpc_id                  = module.cluster_vpc[0].vpc_id
-  cidr_block              = cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 8, count.index + 4)
+  vpc_id                  = module.cluster_vpc.vpc_id
+  cidr_block              = contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 8, count.index + 4) : null
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   map_public_ip_on_launch = false
 
@@ -59,8 +58,7 @@ resource "aws_subnet" "tgw_private" {
 }
 
 resource "aws_route_table_association" "tgw_private" {
-  count = terraform.workspace == "cloud-platform-development" ? 3 : 0
-
+  count          = 3
   subnet_id      = aws_subnet.tgw_private[count.index].id
-  route_table_id = module.cluster_vpc[0].private_route_table_ids[count.index]
+  route_table_id = module.cluster_vpc.private_route_table_ids[count.index]
 }
