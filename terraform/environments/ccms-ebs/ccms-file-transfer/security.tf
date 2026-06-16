@@ -67,19 +67,20 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_sftp_security_group_ec
   referenced_security_group_id = aws_security_group.cluster_ec2.id
 }
 
-#access to secrets manager from lambda function via vpc endpoint
-resource "aws_vpc_security_group_egress_rule" "ecs_tasks_sftp_security_group_egress_rule_sec_manager" {
-  security_group_id = aws_security_group.ecs_tasks_sftp_security_group.id
+#access to secrets manager from lambda function via vpc endpoint, keeping this disabled just for visibility as we have opened full egress on port 443
+# resource "aws_vpc_security_group_egress_rule" "ecs_tasks_sftp_security_group_egress_rule_sec_manager" {
+#   security_group_id = aws_security_group.ecs_tasks_sftp_security_group.id
 
-  ip_protocol = "tcp"
-  from_port   = 443
-  to_port     = 443
-  referenced_security_group_id = data.aws_security_group.vpce_security_group.id
+#   description = "Allowing egress to secrets manager via vpc endpoint"
+#   ip_protocol = "tcp"
+#   from_port   = 443
+#   to_port     = 443
+#   referenced_security_group_id = data.aws_security_group.vpce_security_group.id
 
-  lifecycle {
-    ignore_changes = [referenced_security_group_id]
-  }
-}
+#   lifecycle {
+#     ignore_changes = [referenced_security_group_id]
+#   }
+# }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_sftp_security_group_egress_rule" {
   security_group_id = aws_security_group.ecs_tasks_sftp_security_group.id
@@ -113,26 +114,28 @@ resource "aws_vpc_security_group_egress_rule" "process_file_from_bucket_lambda_s
 #Opening this for slack channel webhook access from lambda function
 resource "aws_vpc_security_group_egress_rule" "process_file_from_bucket_lambda_sg_egress_slack" {
   security_group_id = aws_security_group.process_file_from_bucket_lambda_sg.id
-
+  
+  description = "Allowing egress to slack channel webhook"
   ip_protocol = "tcp"
   from_port   = 443
   to_port     = 443
   cidr_ipv4   = "0.0.0.0/0"
 }
 
-#access to secrets manager from lambda function via vpc endpoint
-resource "aws_vpc_security_group_egress_rule" "process_file_from_bucket_lambda_sg_egress_sec_manager" {
-  security_group_id = aws_security_group.process_file_from_bucket_lambda_sg.id
+#access to secrets manager from lambda function via vpc endpoint, keeping this disabled just for visibility as we have opened full egress on port 443
+# resource "aws_vpc_security_group_egress_rule" "process_file_from_bucket_lambda_sg_egress_sec_manager" {
+#   security_group_id = aws_security_group.process_file_from_bucket_lambda_sg.id
 
-  ip_protocol = "tcp"
-  from_port   = 443
-  to_port     = 443
-  referenced_security_group_id = data.aws_security_group.vpce_security_group.id
+#   description = "Allowing egress to secrets manager via vpc endpoint"
+#   ip_protocol = "tcp"
+#   from_port   = 443
+#   to_port     = 443
+#   referenced_security_group_id = data.aws_security_group.vpce_security_group.id
 
-  lifecycle {
-    ignore_changes = [referenced_security_group_id]
-  }
-}
+#   lifecycle {
+#     ignore_changes = [referenced_security_group_id]
+#   }
+# }
 # EC2 Instances Security Group
 resource "aws_security_group" "cluster_ec2" {
   name        = "${local.sftp_suffix}-cluster-ec2-security-group"
