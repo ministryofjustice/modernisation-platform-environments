@@ -1,3 +1,15 @@
+module "app_secrets" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
+
+  name       = "${local.component_name}/secrets"
+  kms_key_id = module.app_secret_encryption.key_arn
+
+  secret_string = jsonencode({
+    secret_key = random_password.app_secrets.result
+    sentry_dsn = local.environment_configuration.sentry_dsn
+  })
+}
+
 module "app_rds_credentials" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
 
