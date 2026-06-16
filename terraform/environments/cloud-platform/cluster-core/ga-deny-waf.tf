@@ -28,14 +28,18 @@ locals {
   deny_allowlists = {
     echo1 = {
       hostname = "echo1.${local.cluster_name}.${local.cluster_base_domain}"
-      cidrs    = ["83.100.215.187/32"]
+      # 35.176.93.186 = work VPN gateway (AWS eu-west-2) = the corporate egress
+      # IP WAF sees when the split-tunnel routes justice.gov.uk via the VPN.
+      # Home IP removed: this proves traffic is allowed ONLY from the internal
+      # (VPN) source, matching the ticket's "internal network sources" intent.
+      cidrs    = ["35.176.93.186/32"]
       priority = 1
     }
-    # D2: echo3 gets its own rule + IP set with a DIFFERENT (dummy) CIDR. From
-    # the test source IP this must yield echo1 -> 200 and echo3 -> 403
+    # D2: echo2 gets its own rule + IP set with a DIFFERENT (dummy) CIDR. From
+    # the test source IP this must yield echo1 -> 200 and echo2 -> 403
     # simultaneously, proving per-host rules are independent (no cross-bleed).
-    echo3 = {
-      hostname = "echo3.${local.cluster_name}.${local.cluster_base_domain}"
+    echo2 = {
+      hostname = "echo2.${local.cluster_name}.${local.cluster_base_domain}"
       cidrs    = ["203.0.113.3/32"]
       priority = 2
     }

@@ -11,11 +11,11 @@
 # Gatekeeper policy (user-ns-require-psa-label).
 
 locals {
-  # Incremental: start with echo1 only; additional hostnames (echo3, echo4,
-  # echo5) are added in later steps as each deny-by-default scenario is built.
+  # Incremental: start with echo1 only; additional hostnames (echo3, echo4)
+  # are added in later steps as each deny-by-default scenario is built.
   deny_echo_hostnames = {
     echo1 = "echo1.${local.cluster_name}.${local.cluster_base_domain}"
-    echo3 = "echo3.${local.cluster_name}.${local.cluster_base_domain}"
+    echo2 = "echo2.${local.cluster_name}.${local.cluster_base_domain}"
   }
 }
 
