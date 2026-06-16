@@ -20,5 +20,11 @@ locals {
         config    = { description = "BODS Configuration" }
       }
     }
+
+    github_pat = {
+      secrets = {
+        pat = { description = "github-hmpps-dso-automation-pat" }
+      }
+    }
   }
 }

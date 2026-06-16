@@ -446,6 +446,7 @@ locals {
       "/sap/bip/pd"              = local.secretsmanager_secrets.bip
       "/oracle/database/PDBOSYS" = local.secretsmanager_secrets.db
       "/oracle/database/PDBOAUD" = local.secretsmanager_secrets.db
+      "/github_pat"              = local.secretsmanager_secrets.github_pat
     }
   }
 }
