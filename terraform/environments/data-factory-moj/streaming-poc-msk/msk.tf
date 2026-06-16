@@ -40,11 +40,11 @@ resource "aws_security_group" "msk" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "private_subnets" {
-  for_each          = data.aws_subnet.private_subnet_ids
+  for_each          = local.msk_sg_ingress_cidr
   security_group_id = aws_security_group.msk[0].id
-  description       = "Allow inbound traffic from private subnet ${each.value.id}"
+  description       = "Allow inbound traffic from private subnet ${each.value}"
   from_port         = 9098
   to_port           = 9098
   ip_protocol       = "tcp"
-  cidr_ipv4         = each.value.cidr_block
+  cidr_ipv4         = each.value
 }
