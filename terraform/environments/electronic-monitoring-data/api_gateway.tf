@@ -124,7 +124,7 @@ resource "aws_iam_role_policy" "cloudwatch" {
 # --------------------------------------------------------------------------------
 
 locals {
-  shared_ca_name = contains(["prod", "preprod", "stage"], local.environment_shorthand) ? "acm-pca-live" : "acm-pca-non-live"
+  shared_ca_name               = contains(["prod", "preprod", "stage"], local.environment_shorthand) ? "acm-pca-live" : "acm-pca-non-live"
   update_p1_export_domain_name = "p1-export.${trimsuffix(data.aws_route53_zone.inner.name, ".")}"
 }
 
@@ -195,7 +195,7 @@ resource "aws_security_group_rule" "egress_dns_endpoint_traffic" {
 }
 
 resource "aws_route53_resolver_endpoint" "inbound_api" {
-  provider     = aws.core-vpc
+  provider = aws.core-vpc
 
   name      = "inbound-resolver"
   direction = "INBOUND"
@@ -271,9 +271,9 @@ resource "aws_api_gateway_domain_name" "update_p1_export" {
   # For PRIVATE custom domains, use certificate_arn, not regional_certificate_arn.
   certificate_arn = aws_acm_certificate.update_p1_export.arn
 
-  security_policy = "SecurityPolicy_TLS13_1_3_2025_09"
-  endpoint_access_mode     = "STRICT"
-  routing_mode    = "BASE_PATH_MAPPING_ONLY"
+  security_policy      = "SecurityPolicy_TLS13_1_3_2025_09"
+  endpoint_access_mode = "STRICT"
+  routing_mode         = "BASE_PATH_MAPPING_ONLY"
 
   # This is the custom domain resource policy.
   policy = data.aws_iam_policy_document.update_p1_export_vpc[0].json
@@ -286,9 +286,32 @@ resource "aws_api_gateway_domain_name" "update_p1_export" {
   tags = local.tags
 }
 
+resource "aws_ram_resource_share" "update_p1_export_domain_name" {
+  count = local.is-test ? 0 : 1
+
+  name                      = "${replace(local.update_p1_export_domain_name, ".", "-")}-share"
+  allow_external_principals = false
+
+  tags = local.tags
+}
+
+resource "aws_ram_principal_association" "update_p1_export_domain_name" {
+  count = local.is-test ? 0 : 1
+
+  principal          = local.environment_management.account_ids[local.provider_name]
+  resource_share_arn = aws_ram_resource_share.update_p1_export_domain_name[0].arn
+}
+
+resource "aws_ram_resource_association" "update_p1_export_domain_name" {
+  count = local.is-test ? 0 : 1
+
+  resource_arn       = aws_api_gateway_domain_name.update_p1_export.arn
+  resource_share_arn = aws_ram_resource_share.update_p1_export_domain_name[0].arn
+}
+
 resource "aws_api_gateway_base_path_mapping" "update_p1_export" {
-  api_id     = aws_api_gateway_rest_api.update_p1_export[0].id
-  stage_name = aws_api_gateway_stage.update_p1_export_stage[0].stage_name
+  api_id         = aws_api_gateway_rest_api.update_p1_export[0].id
+  stage_name     = aws_api_gateway_stage.update_p1_export_stage[0].stage_name
   domain_name    = aws_api_gateway_domain_name.update_p1_export.domain_name
   domain_name_id = aws_api_gateway_domain_name.update_p1_export.domain_name_id
 }
@@ -314,7 +337,7 @@ resource "aws_api_gateway_domain_name_access_association" "update_p1_export" {
 }
 
 resource "aws_route53_record" "private_api" {
-  provider     = aws.core-vpc
+  provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.inner.zone_id
   name    = local.update_p1_export_domain_name
@@ -347,11 +370,11 @@ resource "aws_vpc_security_group_ingress_rule" "allow_cp_access" {
 # update_p1_export
 # --------------------------------------------------------------------------------
 locals {
-  endpoint_type = local.is-development ? {"REGIONAL": null} : {"PRIVATE": data.aws_vpc_endpoint.api_gateway.cidr_blocks}
+  endpoint_type = local.is-development ? { "REGIONAL" : null } : { "PRIVATE" : data.aws_vpc_endpoint.api_gateway.cidr_blocks }
 }
 
 resource "aws_api_gateway_rest_api_policy" "update_p1_export_vpc" {
-  count = local.is-test ? 0 : 1
+  count       = local.is-test ? 0 : 1
   rest_api_id = aws_api_gateway_rest_api.update_p1_export[0].id
   policy      = data.aws_iam_policy_document.update_p1_export_vpc[0].json
 }
@@ -366,11 +389,11 @@ resource "aws_api_gateway_rest_api" "update_p1_export" {
     create_before_destroy = true
   }
 
-endpoint_configuration {
-  types            = ["PRIVATE"]
-  vpc_endpoint_ids = [data.aws_vpc_endpoint.api_gateway.id]
-  ip_address_type  = "dualstack"
-}
+  endpoint_configuration {
+    types            = ["PRIVATE"]
+    vpc_endpoint_ids = [data.aws_vpc_endpoint.api_gateway.id]
+    ip_address_type  = "dualstack"
+  }
 }
 
 resource "aws_api_gateway_resource" "update_p1_export_add" {
