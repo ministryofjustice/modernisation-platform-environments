@@ -34,7 +34,7 @@ environment:
       - "development.ai-gateway.justice.gov.uk"
     shared_services_gateway_hostname: "*.development.data-platform.service.justice.gov.uk"
   test:
-    kubernetes_version: "1.35"
+    kubernetes_version: "1.36"
     bottlerocket_version: "1.62.0-49f1c7d2"
     addon_versions:
       aws_ebs_csi_driver: "v1.61.1-eksbuild.1"
