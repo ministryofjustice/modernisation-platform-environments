@@ -284,7 +284,7 @@ resource "aws_cloudwatch_log_group" "sdg" {
   count             = contains(["development"], local.environment) ? 1 : 0
   name              = "/ecs/${local.sdg_prefix}"
   retention_in_days = 30
-  kms_key_id        = data.aws_kms_key.general_shared.arn
+  kms_key_id        = aws_kms_key.ecs_cloudwatch[0].arn
   tags              = local.extended_tags
 }
 
@@ -342,6 +342,6 @@ resource "aws_cloudwatch_log_group" "alerts" {
   count             = contains(["development"], local.environment) ? 1 : 0
   name              = "/ecs/${local.alerts_prefix}"
   retention_in_days = 30
-  kms_key_id        = data.aws_kms_key.general_shared.arn
+  kms_key_id        = aws_kms_key.ecs_cloudwatch[0].arn
   tags              = local.extended_tags
 }
