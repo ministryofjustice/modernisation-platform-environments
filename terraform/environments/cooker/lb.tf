@@ -29,6 +29,18 @@ locals {
   }
 }
 
+resource "aws_lakeformation_data_lake_settings" "lake_formation" {
+  admins = [
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess",
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan",
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply",
+  ]
+
+  parameters = {
+    "CROSS_ACCOUNT_VERSION" = "4"
+  }
+}
+
 module "lb_access_logs_enabled" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=43426f3146df7eee38eb4bf193459499b8d5fc2f" #vtesting
   providers = {
