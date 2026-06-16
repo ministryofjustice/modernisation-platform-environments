@@ -41,7 +41,7 @@ resource "aws_iam_role_policy" "lambda_process_file_from_bucket_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.process_file_from_bucket_lambda_function.function_name}:*"
+        Resource = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.process_file_from_bucket_lambda_function.function_name}:*"
       },
       {
         "Effect" : "Allow",
@@ -84,7 +84,7 @@ resource "aws_lambda_function" "process_file_from_bucket_lambda_function" {
 
   lifecycle {
     ignore_changes = [
-      source_code_hash, filename, handler, qualified_arn, qualified_invoke_arn, version
+      source_code_hash, filename, handler
     ]
   }
 }
