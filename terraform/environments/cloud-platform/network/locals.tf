@@ -3,7 +3,10 @@ locals {
     "cloud-platform-development",
     "cloud-platform-preproduction",
     "cloud-platform-live",
+    "container-platform-octo-nonlive",
+    "container-platform-octo-live"
   ]
+
   cluster_environment = contains(local.mp_environments, terraform.workspace) ? local.environment : "development_cluster"
   cp_vpc_name         = terraform.workspace
 
@@ -28,6 +31,7 @@ locals {
       primary   = "10.41.0.0/20"
       secondary = "100.80.0.0/16"
     }
+  }
 
   vpc_flow_log_cloudwatch_log_group_name_prefix       = "/aws/vpc-flow-log/"
   vpc_flow_log_cloudwatch_log_group_name_suffix       = local.cp_vpc_name

@@ -3,7 +3,10 @@ locals {
     "cloud-platform-preproduction",
     "cloud-platform-nonlive",
     "cloud-platform-live",
+    "container-platform-octo-nonlive",
+    "container-platform-octo-live"
   ]
+
   environment_configuration = local.environment_configurations[local.cluster_environment]
   cp_vpc_name               = local.cluster_environment == "development_cluster" ? "cloud-platform-development" : terraform.workspace
   cluster_name              = contains(local.mp_environments, terraform.workspace) ? local.environment : terraform.workspace
