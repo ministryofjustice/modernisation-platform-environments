@@ -95,9 +95,10 @@ resource "aws_db_proxy" "rds_proxy" {
   vpc_security_group_ids = [aws_security_group.rds_proxy.id]
 
   auth {
-    auth_scheme = "SECRETS"
-    iam_auth    = "REQUIRED"
-    secret_arn  = var.proxy_secret_arn
+    auth_scheme               = "SECRETS"
+    iam_auth                  = "REQUIRED"
+    client_password_auth_type = "POSTGRES_SCRAM_SHA_256"
+    secret_arn                = var.proxy_secret_arn
   }
 
   tags = local.all_tags
