@@ -8,11 +8,8 @@ provider "aws" {
 # AWS provider for the workspace you're working in (every resource will default to using this, unless otherwise specified)
 provider "aws" {
   region = "eu-west-2"
-  dynamic "assume_role" {
-    for_each = local.workspace_assume_role_arn != null ? [1] : []
-    content {
-      role_arn = local.workspace_assume_role_arn
-    }
+  assume_role {
+    role_arn = !can(regex("githubactionsrolesession|AdministratorAccess|user", data.aws_caller_identity.original_session.arn)) ? null : can(regex("user", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}" : "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
   }
   default_tags { tags = local.tags }
 }
@@ -51,11 +48,8 @@ provider "aws" {
 provider "aws" {
   alias  = "us-east-1"
   region = "us-east-1"
-  dynamic "assume_role" {
-    for_each = local.us_east_1_assume_role_arn != null ? [1] : []
-    content {
-      role_arn = local.us_east_1_assume_role_arn
-    }
+  assume_role {
+    role_arn = !can(regex("githubactionsrolesession|AdministratorAccess|user", data.aws_caller_identity.original_session.arn)) ? null : can(regex("user", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}" : "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccessUSEast"
   }
   default_tags { tags = local.tags }
 }
