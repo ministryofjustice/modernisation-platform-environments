@@ -61,7 +61,7 @@ locals {
         }
         "access-uk" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDMRvtIhxI+k3AXkGpZe6242VucffThflI3PCezvNYhjHVCfaMvNjt0yAXOO7hrzqY8TMOwH2LXsM1yGhUrL2Qe2WBl5gebqsKsR0H6eKypdT6GJhWg81AAf2Zckzk2ibdHqs3w8ZmjGblSv6ReAfg4l/VYeAqdBCfY7m6r+jbgcRtRbsM75GGz0Ts1rgGYF9jrKglF0SKDxT2rvzX+mUB13oxjzWW+C8lGw7aVrtL+hDgXB7gRAa5hqnDIij4rdhd4xt/PzvFZ1FoeutnvEzNMvvtaC/0Iu6IdBdOk3ay/wG7Q6w9pb5BCvKYMUz3MXUbqRSUg8Ed/UHAs6kGBRS9h"
-          cidr_blocks = ["172.167.164.209/32"]
+          cidr_blocks = ["172.167.164.209/32", "51.11.29.242/32"]
         }
       }
       transfer_server_sftp_users_with_egress = {
