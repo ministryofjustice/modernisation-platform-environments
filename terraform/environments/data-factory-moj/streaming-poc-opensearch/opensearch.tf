@@ -7,8 +7,9 @@ module "opensearch" {
   engine_version = var.engine_version
 
   cluster_config = {
-    instance_count = var.instance_count
-    instance_type  = var.instance_type
+    instance_count        = var.instance_count
+    instance_type         = var.instance_type
+    dedicated_master_type = var.instance_type
   }
 
   advanced_security_options = {
