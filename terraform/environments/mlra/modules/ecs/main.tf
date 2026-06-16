@@ -84,7 +84,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
 
 resource "aws_autoscaling_group" "cluster-scaling-group-al2023" {
   vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
-  name_prefix                  = "${var.app_name}-ec2-al2023-"
+  name                  = "${var.app_name}-cluster-scaling-group-al2023"
   # New ASG, set capacity to 0 - will be scaled manually during migration.
   # Follow-up Terraform PR will update to desired final capacity.
   desired_capacity      = 0
@@ -832,8 +832,7 @@ resource "aws_ecs_cluster_capacity_providers" "mlra" {
   cluster_name = aws_ecs_cluster.ecs_cluster.name
 
   capacity_providers = [
-    aws_ecs_capacity_provider.mlra.name,
-    aws_ecs_capacity_provider.mlra-al2023.name
+    aws_ecs_capacity_provider.mlra.name
   ]
 }
 
