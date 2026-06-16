@@ -3,7 +3,7 @@
 
 module "fabric_oidc_provider" {
   count  = local.fabric_oidc_enabled ? 1 : 0
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/fabric-oidc-provider?ref=c770ed02f420a0c66744189ad9818a9cf03e92a4"
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/fabric-oidc-provider?ref=f9867304610d6ff9604bf079aa56d3c2f4c49800"
 
   tenant_id          = local.fabric_tenant_id
   oidc_provider_name = "fabric-s3-access"
@@ -31,7 +31,7 @@ module "fabric_curated_bucket" {
 
 module "fabric_iam_role" {
   count  = local.fabric_oidc_enabled ? 1 : 0
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/fabric-iam-role?ref=c770ed02f420a0c66744189ad9818a9cf03e92a4"
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/fabric-iam-role?ref=f9867304610d6ff9604bf079aa56d3c2f4c49800"
 
   object_id                          = local.fabric_enterprise_app_object_id
   oidc_provider_arn                  = module.fabric_oidc_provider[0].arn
