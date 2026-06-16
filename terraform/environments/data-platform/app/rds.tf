@@ -62,7 +62,3 @@ module "app_rds" {
   skip_final_snapshot = !local.is-production
 }
 
-resource "random_password" "app_rds" {
-  length  = 32
-  special = false
-}
