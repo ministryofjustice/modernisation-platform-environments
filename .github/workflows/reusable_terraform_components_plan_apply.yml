@@ -124,8 +124,8 @@
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
               terraform --version
-              echo "terraform init with state bucket KMS backend config"
-              bash ${GITHUB_WORKSPACE}/scripts/terraform-init.sh "${PWD}"
+              echo "terraform init"
+              terraform init
 
           #
           # Terraform Workspace Select
@@ -325,8 +325,8 @@
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
               terraform --version
-              echo "terraform init with state bucket KMS backend config"
-              bash ${GITHUB_WORKSPACE}/scripts/terraform-init.sh "${PWD}"
+              echo "terraform init"
+              terraform init
 
           - name: Terraform Workspace Select
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
