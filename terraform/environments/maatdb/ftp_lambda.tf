@@ -6,10 +6,9 @@ locals {
     job_name       = "xerox-outbound"
     bucket_name    = try(module.s3_bucket.outbound.bucket.bucket, "")
     bucket_folder  = "export/home/ccmtdb/central_print/rep_orders/"
+    remote_path    = local.environment == "production" ? "/Production/outbound/RepDocs/" : local.environment == "preproduction" ? "/Test/Outbound/RepDocs/" : "/upload/"
     ftp_protocol   = "SFTP"
     ftp_type       = "SFTP_UPLOAD"
-    require_ssl    = "NO"
-    insecure       = "YES"
     ftp_file_types = "zip"
     file_remove    = "YES"
     ftp_port       = local.ftp_sftp_port
@@ -237,7 +236,7 @@ resource "aws_lambda_layer_version" "ftpclientlibs" {
   count               = local.build_ftp ? 1 : 0
   layer_name          = "ftpclientlibs"
   description         = "FtpClient Dependencies"
-  compatible_runtimes = ["python3.12"]
+  compatible_runtimes = [local.python_runtime]
   s3_bucket           = local.ftp_layer_bucket
   s3_key              = "${local.ftp_layer_folder_location}/${local.ftp_layer_source_zip}"
 }
@@ -316,15 +315,15 @@ resource "aws_lambda_function" "ftp" {
 
   environment {
     variables = {
-      PROTOCOL     = local.ftp_job.ftp_protocol
-      FILETYPES    = local.ftp_job.ftp_file_types
-      TRANSFERTYPE = local.ftp_job.ftp_type
-      LOCALPATH    = local.ftp_job.bucket_folder
-      REQUIRE_SSL  = local.ftp_job.require_ssl
-      INSECURE     = local.ftp_job.insecure
-      S3BUCKET     = local.ftp_job.bucket_name
-      FILEREMOVE   = local.ftp_job.file_remove
-      SECRET_NAME  = data.aws_secretsmanager_secret_version.ftp_jobs_secret_version[0].arn
+      FILETYPES             = local.ftp_job.ftp_file_types
+      TRANSFERTYPE          = local.ftp_job.ftp_type
+      LOCALPATH             = local.ftp_job.bucket_folder
+      REMOTEPATH            = local.ftp_job.remote_path
+      PORT                  = local.ftp_job.ftp_port
+      S3BUCKET              = local.ftp_job.bucket_name
+      FILEREMOVE            = local.ftp_job.file_remove
+      SKIP_KEY_VERIFICATION = "YES"
+      SECRET_NAME           = data.aws_secretsmanager_secret_version.ftp_jobs_secret_version[0].arn
     }
   }
 }
