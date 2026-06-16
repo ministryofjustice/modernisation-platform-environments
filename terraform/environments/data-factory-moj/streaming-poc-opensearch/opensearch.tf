@@ -43,3 +43,13 @@ module "opensearch" {
     description = "POV opensearch cluster"
   })
 }
+
+resource "aws_iam_service_linked_role" "opensearch" {
+  aws_service_name = "opensearchservice.amazonaws.com"
+  description      = "Service Linked Role for OpenSearch Service to manage resources for a domain."
+
+  tags = merge(local.extended_tags, {
+    name        = "${local.cluster_name}-Service-Link-Role"
+    description = "Service Linked Role for OpenSearch Service to manage resources for a domain."
+  })
+}
