@@ -22,14 +22,15 @@ resource "aws_iam_role" "rag_lambda_role" {
 
   assume_role_policy = data.aws_iam_policy_document.rag_lambda_function_assume_role.json
 
-  inline_policy {
-    name   = "rag_lambda_policy"
-    policy = data.aws_iam_policy_document.rag_lambda_function_role.json
-  }
-
   tags = {
     "service-area" = "Hosting"
   }
+}
+
+resource "aws_iam_role_policy" "rag_lambda_policy" {
+  name   = "rag_lambda_policy"
+  role   = aws_iam_role.rag_lambda_role.id
+  policy = data.aws_iam_policy_document.rag_lambda_function_role.json
 }
 
 data "aws_iam_policy_document" "rag_lambda_function_assume_role" {
