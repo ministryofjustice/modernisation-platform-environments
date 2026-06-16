@@ -16,6 +16,6 @@
     "lodash": "4.17.21",
     "node-fetch": "^3.2.3",
     "semver": "^7.5.2",
-    "tedious": "^14.3.0"
+    "tedious": "^19.2.1"
   }
 }
