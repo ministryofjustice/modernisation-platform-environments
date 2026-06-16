@@ -1,11 +1,19 @@
 locals {
   loadbalancer_ingress_rules = {
+    "cluster_ec2_lb_ingress_http" = {
+      description     = "allow access on HTTP"
+      from_port       = 80
+      to_port         = 80
+      protocol        = "tcp"
+      cidr_blocks     = ["90.247.65.98/32"]
+      security_groups = []
+    }
     "cluster_ec2_lb_ingress" = {
-      description = "allow access on HTTPS"
-      from_port   = 443
-      to_port     = 443
-      protocol    = "tcp"
-      cidr_blocks = ["188.214.15.75/32"]
+      description     = "allow access on HTTPS"
+      from_port       = 443
+      to_port         = 443
+      protocol        = "tcp"
+      cidr_blocks     = ["90.247.65.98/32"]
       security_groups = []
     }
   }
@@ -38,5 +46,22 @@ module "lb_access_logs_enabled" {
   idle_timeout               = 60
   tags                       = { Name = "lb_module" }
 
+}
+
+resource "aws_lb_listener" "http_access_logs_probe" {
+  load_balancer_arn = module.lb_access_logs_enabled.load_balancer.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  # A fixed response is enough to make the ALB serve requests and emit access logs.
+  default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "access logs enabled"
+      status_code  = "200"
+    }
+  }
 }
 
