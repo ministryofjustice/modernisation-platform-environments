@@ -43,6 +43,20 @@ locals {
       cidrs    = ["203.0.113.3/32"]
       priority = 2
     }
+    # echo3: the INVERSE of echo1 on the same ALB/ACL. Allowlists only the home
+    # router IP, so the corporate VPN egress is denied. Proves two hosts can
+    # carry opposite policies without interfering.
+    #   VPN off (home 83.100.215.187) -> 200
+    #   VPN on  (corp 35.176.93.186)  -> 403
+    echo3 = {
+      hostname = "echo3.${local.cluster_name}.${local.cluster_base_domain}"
+      cidrs    = ["83.100.215.187/32"]
+      priority = 3
+    }
+    # NOTE: echo4 is intentionally ABSENT from this map. With no allow rule it
+    # falls through to default_action=block, proving "routed but no rule -> 403
+    # from any source" (deny-by-default). Its HTTPRoute lives in
+    # ga-deny-workload.tf so the host is reachable enough to be denied.
   }
 }
 

@@ -11,11 +11,17 @@
 # Gatekeeper policy (user-ns-require-psa-label).
 
 locals {
-  # Incremental: start with echo1 only; additional hostnames (echo3, echo4)
-  # are added in later steps as each deny-by-default scenario is built.
+  # Hostnames routed to the shared echo backend. Each gets its own HTTPRoute.
+  # WAF treatment per host is in ga-deny-waf.tf (deny_allowlists):
+  #   echo1 - allow corporate VPN egress
+  #   echo2 - allow dummy CIDR (always denied from real sources)
+  #   echo3 - allow home router IP (inverse of echo1)
+  #   echo4 - NO allow rule -> default block (deny-by-default proof)
   deny_echo_hostnames = {
     echo1 = "echo1.${local.cluster_name}.${local.cluster_base_domain}"
     echo2 = "echo2.${local.cluster_name}.${local.cluster_base_domain}"
+    echo3 = "echo3.${local.cluster_name}.${local.cluster_base_domain}"
+    echo4 = "echo4.${local.cluster_name}.${local.cluster_base_domain}"
   }
 }
 
