@@ -45,6 +45,7 @@ module "opensearch" {
 }
 
 resource "aws_iam_service_linked_role" "opensearch" {
+  count            = contains(["development"], local.environment) ? 1 : 0
   aws_service_name = "opensearchservice.amazonaws.com"
   description      = "Service Linked Role for OpenSearch Service to manage resources for a domain."
 
