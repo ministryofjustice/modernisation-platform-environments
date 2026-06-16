@@ -65,6 +65,6 @@ resource "aws_route_table_association" "tgw_private" {
 
 # Secondary CIDR for pods
 resource "aws_vpc_ipv4_cidr_block_association" "secondary" {
-  vpc_id     = aws_vpc.this.id
+  vpc_id     = module.cluster_vpc.vpc_id
   cidr_block = local.vpc_cidr[local.cp_vpc_name].secondary
 }

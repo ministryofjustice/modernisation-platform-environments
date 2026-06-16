@@ -1,11 +1,14 @@
 locals {
-  mp_environments = [
-    "cloud-platform-development",
-    "cloud-platform-preproduction",
-    "cloud-platform-live",
-    "container-platform-octo-nonlive",
-    "container-platform-octo-live"
-  ]
+  bu_accounts = jsondecode(file("${path.module}/../accounts.json"))
+
+  mp_environments = concat(
+    [
+      "cloud-platform-development",
+      "cloud-platform-preproduction",
+      "cloud-platform-live"
+    ],
+    local.bu_accounts.accounts
+  )
 
   cluster_environment = contains(local.mp_environments, terraform.workspace) ? local.environment : "development_cluster"
   cp_vpc_name         = terraform.workspace
