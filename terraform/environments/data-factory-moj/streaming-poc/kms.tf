@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "ecs_cloudwatch_kms" {
 }
 
 resource "aws_kms_key" "ecs_cloudwatch" {
-  count                   = contains(["development"], local.environment) ? 1 : 0
+  count                   = contains(local.deploy_to, local.environment) ? 1 : 0
   description             = "KMS key for ECS CloudWatch log groups"
   deletion_window_in_days = 7
   enable_key_rotation     = true
@@ -46,7 +46,7 @@ resource "aws_kms_key" "ecs_cloudwatch" {
 }
 
 resource "aws_kms_alias" "ecs_cloudwatch" {
-  count         = contains(["development"], local.environment) ? 1 : 0
+  count         = contains(local.deploy_to, local.environment) ? 1 : 0
   name          = "alias/${local.ecs_prefix}-cloudwatch"
   target_key_id = aws_kms_key.ecs_cloudwatch[0].key_id
 }
