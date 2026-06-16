@@ -532,7 +532,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_uat_alarms" {
   alarm_actions = concat(
     [aws_sns_topic.cw_uat_alerts[0].arn],
     lookup(data.aws_instance.cpu_alarm_instance_details_uat[each.key].tags, "cpu_lambda_trigger", "false") == "true" && local.is-preproduction ?
-    ["arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:terminate_cpu_process_preproduction"] : []
+    ["arn:aws:lambda:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:function:terminate_cpu_process_preproduction"] : []
   )
 
   dimensions = {
@@ -580,17 +580,17 @@ locals {
     production = {
       enabled   = local.is-production
       instances = data.aws_instances.windows_tagged_instances.ids
-      sns_topic = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${lookup(local.application_data.accounts[local.environment], "cloudwatch_sns_topic_name", local.application_data.accounts[local.environment].cloudwatch_sns_topic_name)}"
+      sns_topic = "arn:aws:sns:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:${lookup(local.application_data.accounts[local.environment], "cloudwatch_sns_topic_name", local.application_data.accounts[local.environment].cloudwatch_sns_topic_name)}"
     }
     preproduction = {
       enabled   = local.is-preproduction
       instances = data.aws_instances.windows_tagged_instances_uat.ids
-      sns_topic = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.application_data.accounts[local.environment].cloudwatch_sns_topic_name}"
+      sns_topic = "arn:aws:sns:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:${local.application_data.accounts[local.environment].cloudwatch_sns_topic_name}"
     }
     development = {
       enabled   = local.is-development
       instances = data.aws_instances.windows_tagged_instances_dev.ids
-      sns_topic = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${local.application_data.accounts[local.environment].cloudwatch_sns_topic_name}"
+      sns_topic = "arn:aws:sns:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:${local.application_data.accounts[local.environment].cloudwatch_sns_topic_name}"
     }
   }
 
