@@ -237,7 +237,7 @@ module "ecs_container_sdg" {
   name                     = local.sdg_prefix
   image                    = "${aws_ecr_repository.repository["sdg"].repository_url}:latest"
   essential                = true
-  readonly_root_filesystem = true
+  readonly_root_filesystem = false
   port_mappings            = []
   secrets                  = []
   environment              = []
