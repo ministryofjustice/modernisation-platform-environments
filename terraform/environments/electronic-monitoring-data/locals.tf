@@ -24,7 +24,14 @@ locals {
     cidr_ipv6s = []
   }
 
-  dev_databases_for_gdpr = ["test"]
+  dev_databases_for_gdpr = [
+    "test",
+    "capita_blob_storage",
+    "emd_historic_int",
+    "g4s_atrium_unstructured",
+    "g4s_cap_dw",
+    "g4s_xdrive_unstructured"
+    ]
   preprod_databases_for_gdpr = [
     "am_stg_preprod_dbt",
     "buddi_buddi_preprod_dbt",

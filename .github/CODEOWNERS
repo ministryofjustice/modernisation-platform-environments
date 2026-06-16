@@ -9,7 +9,7 @@
 /terraform/environments/analytical-platform-next-poc-hub @ministryofjustice/analytical-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/analytical-platform-next-poc-producer @ministryofjustice/analytical-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/apex @ministryofjustice/laa-apex-developer @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
-/terraform/environments/ccms-ebs-ai @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
+/terraform/environments/ccms-ebs-ai @ministryofjustice/ccms-ai-team @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs-upgrade @ministryofjustice/laa-ccms-migration-team @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs-upgrade/anonymisation @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs-upgrade/sandbox @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
@@ -42,6 +42,9 @@
 /terraform/environments/data-factory-laa @ministryofjustice/laa-data-factory-engineering @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-moj @ministryofjustice/data-engineering @ministryofjustice/data-platform-engineering @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-moj/streaming-poc @ministryofjustice/data-factory-aker-team @ministryofjustice/modernisation-platform
+/terraform/environments/data-factory-moj/streaming-poc-msk @ministryofjustice/data-factory-aker-team @ministryofjustice/modernisation-platform
+/terraform/environments/data-factory-moj/streaming-poc-opensearch @ministryofjustice/data-factory-aker-team @ministryofjustice/modernisation-platform
+/terraform/environments/data-factory-moj/streaming-poc-maf @ministryofjustice/data-factory-aker-team @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform-governance @ministryofjustice/data-platform-engineering @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform @ministryofjustice/data-platform-engineering @ministryofjustice/modernisation-platform
 /terraform/environments/delius-alfresco @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform

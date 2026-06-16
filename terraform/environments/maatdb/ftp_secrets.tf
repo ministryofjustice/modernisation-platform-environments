@@ -24,10 +24,10 @@ resource "aws_secretsmanager_secret" "ftp_jobs_secret" {
 resource "aws_secretsmanager_secret_version" "ftp_jobs_secret_values" {
   secret_id = aws_secretsmanager_secret.ftp_jobs_secret.id
   secret_string = jsonencode({
-    HOST      = "",
-    PORT      = "",
-    USER      = "",
-    PASSWORD  = "",
+    HOST       = "",
+    PORT       = "",
+    USER       = "",
+    PASSWORD   = "",
     REMOTEPATH = ""
   })
   lifecycle {
