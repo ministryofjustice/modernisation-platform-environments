@@ -411,7 +411,6 @@ locals {
       "/sap/bip/t2"              = local.secretsmanager_secrets.bip
       "/oracle/database/T2BOSYS" = local.secretsmanager_secrets.db
       "/oracle/database/T2BOAUD" = local.secretsmanager_secrets.db
-      "/github_pat"              = local.secretsmanager_secrets.github_pat
     }
   }
 }

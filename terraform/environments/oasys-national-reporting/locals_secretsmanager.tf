@@ -21,10 +21,5 @@ locals {
       }
     }
 
-    github_pat = {
-      secrets = {
-        pat = { description = "github-hmpps-dso-automation-pat" }
-      }
-    }
   }
 }
