@@ -63,6 +63,11 @@ output "rds_proxy_arn" {
   value       = aws_db_proxy.rds_proxy.arn
 }
 
+output "rds_proxy_resource_id" {
+  description = "The resource ID of the RDS Proxy (prx-XXXXX), used to scope rds-db:connect IAM policies for proxy IAM authentication"
+  value       = element(split(":", aws_db_proxy.rds_proxy.arn), length(split(":", aws_db_proxy.rds_proxy.arn)) - 1)
+}
+
 output "rds_proxy_security_group_id" {
   description = "The ID of the security group controlling access to the RDS Proxy"
   value       = aws_security_group.rds_proxy.id
