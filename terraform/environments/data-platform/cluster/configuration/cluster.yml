@@ -18,7 +18,7 @@ environment:
       aws_cloudwatch_observability: "5.4.0"
       aws_load_balancer_controller: "v3.4.0"
       cert_manager: "1.20.2"
-      cilium: "1.19.4"
+      cilium: "1.19.5"
       cluster_autoscaler: "9.57.0"
       coredns: "1.46.0"
       external_dns: "1.21.1"
