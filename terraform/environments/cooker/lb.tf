@@ -1,5 +1,4 @@
 locals {
-
   loadbalancer_ingress_rules = {
     "cluster_ec2_lb_ingress" = {
       description = "allow access on HTTPS"
@@ -10,7 +9,6 @@ locals {
       security_groups = []
     }
   }
-
   loadbalancer_egress_rules = {
     "cluster_ec2_lb_egress" = {
       description     = "Open all outbound ports"
@@ -21,13 +19,10 @@ locals {
       security_groups = []
     }
   }
-
-
 }
 
-
 module "lb_access_logs_enabled" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=97cb25f5d84bc10f10d4cab2e63d4d2e2b282f2f" #vtesting
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=43426f3146df7eee38eb4bf193459499b8d5fc2f" #vtesting
   providers = {
     aws.bucket-replication = aws
   }
