@@ -38,7 +38,7 @@ data "aws_iam_policy_document" "transfer_web_app" {
 
 module "transfer_web_app_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name        = "${local.application_name}-transfer-web-app-policy"
   description = "AWS Transfer web app access grants policy"
@@ -49,7 +49,7 @@ module "transfer_web_app_policy" {
 
 module "transfer_web_app_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.0"
+  version = "6.6.1"
 
   create          = true
   use_name_prefix = false
@@ -198,7 +198,7 @@ data "aws_iam_policy_document" "s3_access_grants_location" {
 
 module "s3_access_grants_location_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name        = "${local.application_name}-s3-access-grants-location-policy"
   description = "AWS S3 Access Grants read/write access to the unscanned bucket"
@@ -209,7 +209,7 @@ module "s3_access_grants_location_policy" {
 
 module "s3_access_grants_location_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name            = "transfer-s3-access-grants-location"
   use_name_prefix = false

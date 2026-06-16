@@ -16,7 +16,8 @@ resource "aws_instance" "PPUDWEBSERVER2" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+# vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+  vpc_security_group_ids = [aws_security_group.all["PPUD-Web-Portal-Server-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
 
   metadata_options {
@@ -69,7 +70,8 @@ resource "aws_instance" "s609693lo6vw101" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+# vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+  vpc_security_group_ids = [aws_security_group.all["PPUD-Web-Portal-Server-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
 
   metadata_options {
@@ -172,7 +174,8 @@ resource "aws_instance" "s609693lo6vw105" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+  vpc_security_group_ids = [aws_security_group.all["WAM-Web-Portal-Server-Security-Group"].id]
+# vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
@@ -429,9 +432,9 @@ resource "aws_instance" "s609693lo6vw115" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.all["Certificate-Authority-Server-Security-Group"].id]  
-# vpc_security_group_ids = [aws_security_group.conditional["Development-Servers-Standard-Security-Group"].id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  vpc_security_group_ids = [aws_security_group.all["Certificate-Authority-Server-Security-Group"].id]
+  # vpc_security_group_ids = [aws_security_group.conditional["Development-Servers-Standard-Security-Group"].id]
+  subnet_id = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -488,7 +491,8 @@ resource "aws_instance" "s618358rgvw023" {
   instance_type          = "c5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+# vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+  vpc_security_group_ids = [aws_security_group.all["PPUD-Web-Portal-Server-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
 
   metadata_options {
@@ -517,8 +521,8 @@ resource "aws_instance" "s618358rgvw024" {
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.conditional["Database-and-Document-Service-Security-Group"].id]
-# vpc_security_group_ids = [aws_security_group.UAT-Document-Service[0].id]
-  subnet_id              = data.aws_subnet.data_subnets_a.id
+  # vpc_security_group_ids = [aws_security_group.UAT-Document-Service[0].id]
+  subnet_id = data.aws_subnet.data_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -549,8 +553,8 @@ resource "aws_instance" "s618358rgsw025" {
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.all["WAM-Data-Access-Server-Security-Group"].id]
-# vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  # vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
+  subnet_id = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -574,9 +578,9 @@ resource "aws_instance" "s618358rgvw026" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.all["Certificate-Authority-Server-Security-Group"].id]  
-# vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
-  subnet_id              = data.aws_subnet.data_subnets_b.id
+  vpc_security_group_ids = [aws_security_group.all["Certificate-Authority-Server-Security-Group"].id]
+  # vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+  subnet_id = data.aws_subnet.data_subnets_b.id
 
   metadata_options {
     http_tokens   = "required"
@@ -603,9 +607,9 @@ resource "aws_instance" "s618358rgvw028" {
   instance_type          = "m5.xlarge"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.all["Document-Service-Server-Security-Group"].id]  
-# vpc_security_group_ids = [aws_security_group.UAT-Document-Servers[0].id]
-  subnet_id              = data.aws_subnet.data_subnets_b.id
+  vpc_security_group_ids = [aws_security_group.all["Document-Service-Server-Security-Group"].id]
+  # vpc_security_group_ids = [aws_security_group.UAT-Document-Servers[0].id]
+  subnet_id = data.aws_subnet.data_subnets_b.id
 
   metadata_options {
     http_tokens   = "required"
@@ -629,7 +633,8 @@ resource "aws_instance" "s618358rgvw201" {
   instance_type          = "c5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+# vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+  vpc_security_group_ids = [aws_security_group.all["WAM-Web-Portal-Server-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
@@ -655,8 +660,8 @@ resource "aws_instance" "S618358RGVW202" {
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.conditional["WAM-Bridge-Server-Security-Group"].id]
-# vpc_security_group_ids = [aws_security_group.Bridge-Server[0].id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  # vpc_security_group_ids = [aws_security_group.Bridge-Server[0].id]
+  subnet_id = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -869,9 +874,9 @@ resource "aws_instance" "s618358rgvw030" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.all["Certificate-Authority-Server-Security-Group"].id]  
-# vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  vpc_security_group_ids = [aws_security_group.all["Certificate-Authority-Server-Security-Group"].id]
+  # vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+  subnet_id = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -898,7 +903,7 @@ resource "aws_instance" "s618358rgvw031" {
   instance_type          = "c6i.xlarge"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.all["Document-Service-Server-Security-Group"].id]  
+  vpc_security_group_ids = [aws_security_group.all["Document-Service-Server-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
 
   metadata_options {
@@ -907,9 +912,9 @@ resource "aws_instance" "s618358rgvw031" {
   }
 
   tags = {
-    Name             = "s618358rgvw031"
-    patch_group      = "prod_win_patch"
-    is-production    = true
+    Name          = "s618358rgvw031"
+    patch_group   = "prod_win_patch"
+    is-production = true
   }
 }
 
@@ -1057,10 +1062,10 @@ resource "aws_instance" "docker-build-server" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.conditional["Docker-Build-Server-Security-Group"].id]  
-# vpc_security_group_ids = [aws_security_group.docker-build-server[0].id]
-  subnet_id              = data.aws_subnet.private_subnets_c.id
-  key_name               = aws_key_pair.cjms_instance[0].key_name
+  vpc_security_group_ids = [aws_security_group.conditional["Docker-Build-Server-Security-Group"].id]
+  # vpc_security_group_ids = [aws_security_group.docker-build-server[0].id]
+  subnet_id = data.aws_subnet.private_subnets_c.id
+  key_name  = aws_key_pair.cjms_instance[0].key_name
   root_block_device {
     delete_on_termination = true
     volume_size           = "40"

@@ -84,7 +84,7 @@ locals {
     ] : local.is-production ? [
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-a7f6cc937a0f63ce-live",
   ] : []
-  iam_role_ear_sar_db    = local.is-preproduction ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live" : ""
+  iam_role_ear_sar_db = local.is-preproduction ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live" : ""
   emdi_cp_roles = local.is-development || local.is-test ? [
     var.cloud-platform-emdi-iam-dev
     ] : local.is-preproduction ? [var.cloud-platform-emdi-iam-preprod] : [
@@ -539,35 +539,35 @@ module "specials_cmt_front_end_assumable_role" {
   tags = local.tags
 }
 
-module "share_data_marts" {
-  source = "./modules/lakeformation_w_data_filter"
+# module "share_data_marts" {
+#   source = "./modules/lakeformation_w_data_filter"
 
-  count         = local.is-development ? 0 : local.is-preproduction ? 0 : 1
-  table_filters = local.table_filters
-  database_name = "historic_api_mart"
-  extra_arns = [
-    try(one(data.aws_iam_roles.mod_plat_roles.arns)),
-    data.aws_iam_role.github_actions_role.arn,
-    data.aws_iam_session_context.current.issuer_arn
-  ]
-  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  role_arn                = module.cmt_front_end_assumable_role.iam_role_arn
-}
+#   count         = local.is-development ? 0 : local.is-preproduction ? 0 : 1
+#   table_filters = local.table_filters
+#   database_name = "historic_api_mart"
+#   extra_arns = [
+#     try(one(data.aws_iam_roles.mod_plat_roles.arns)),
+#     data.aws_iam_role.github_actions_role.arn,
+#     data.aws_iam_session_context.current.issuer_arn
+#   ]
+#   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+#   role_arn                = module.cmt_front_end_assumable_role.iam_role_arn
+# }
 
-module "share_specials_data_marts" {
-  source = "./modules/lakeformation_w_data_filter"
+# module "share_specials_data_marts" {
+#   source = "./modules/lakeformation_w_data_filter"
 
-  count         = local.is-development ? 0 : local.is-preproduction ? 0 : 1
-  table_filters = local.specials_table_filters
-  database_name = "historic_api_mart"
-  extra_arns = [
-    try(one(data.aws_iam_roles.mod_plat_roles.arns)),
-    data.aws_iam_role.github_actions_role.arn,
-    data.aws_iam_session_context.current.issuer_arn
-  ]
-  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  role_arn                = module.specials_cmt_front_end_assumable_role.iam_role_arn
-}
+#   count         = local.is-development ? 0 : local.is-preproduction ? 0 : 1
+#   table_filters = local.specials_table_filters
+#   database_name = "historic_api_mart"
+#   extra_arns = [
+#     try(one(data.aws_iam_roles.mod_plat_roles.arns)),
+#     data.aws_iam_role.github_actions_role.arn,
+#     data.aws_iam_session_context.current.issuer_arn
+#   ]
+#   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+#   role_arn                = module.specials_cmt_front_end_assumable_role.iam_role_arn
+# }
 
 resource "aws_lakeformation_permissions" "ac_allied_db" {
   count       = local.is-development ? 1 : 0
