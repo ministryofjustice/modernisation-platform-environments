@@ -422,11 +422,6 @@ locals {
     }
   }
 
-  # fsx_config_production = {
-  #   storage_capacity     = 200
-  #   throughtput_capacity = 16
-  # }
-
   fsx_config_production = null
 
   # fsx_config_production = {
