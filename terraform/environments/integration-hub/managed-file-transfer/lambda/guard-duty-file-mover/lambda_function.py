@@ -1,6 +1,6 @@
+import hashlib
 import json
 import os
-import hashlib
 from urllib.parse import unquote_plus
 
 import boto3
@@ -156,14 +156,16 @@ def process_record(*, operation):
     if operation["source_version_id"]:
         copy_source["VersionId"] = operation["source_version_id"]
 
-    copy_response = s3.copy_object(
+    s3.copy(
+        CopySource=copy_source,
         Bucket=operation["destination_bucket_name"],
         Key=operation["source_key"],
-        CopySource=copy_source,
-        MetadataDirective="COPY",
-        TaggingDirective="COPY",
+        ExtraArgs={
+            "MetadataDirective": "COPY",
+            "TaggingDirective": "COPY",
+        },
     )
-    put_destination_tags(operation, copy_response.get("VersionId"))
+    put_destination_tags(operation, None)
 
     logger.info("Copied S3 object", extra=get_log_fields(operation))
 

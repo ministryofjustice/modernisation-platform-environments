@@ -51,7 +51,7 @@
     env:
       ACCOUNT_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
       WORKSPACE_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
-      SKIP_PLAN_EVALUATOR: '["cloud-platform-development", "cloud-platform-preproduction", "cloud-platform-nonlive", "cloud-platform-live", "data-platform-development", "data-platform-test", "data-platform-preproduction", "data-platform-production"]'
+      SKIP_PLAN_EVALUATOR: '["cloud-platform-development", "cloud-platform-preproduction", "cloud-platform-nonlive", "cloud-platform-live", "data-platform-development", "data-platform-test", "data-platform-preproduction", "data-platform-production", "laa-workspaces-development", "laa-new-workspaces-development"]'
     permissions:
       id-token: write
       contents: read
@@ -81,7 +81,7 @@
               echo "component=${{ inputs.component }}"
 
           - name: Checkout Repository
-            uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+            uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
           - name: Decrypt Secrets
             uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
             with:
@@ -232,12 +232,14 @@
                 const {data: reviews} = await github.rest.pulls.listReviews({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  pull_number: context.payload.pull_request.number
+                  pull_number: context.payload.pull_request.number,
+                  per_page: 100
                 });
 
                 const {data: team_members} = await github.rest.teams.listMembersInOrg({
                   org: orgName,
-                  team_slug: teamSlug
+                  team_slug: teamSlug,
+                  per_page: 100
                 });
 
                 const teamMemberLogins = team_members.map(member => member.login);
@@ -286,7 +288,7 @@
         environment: ${{ inputs.component != 'root' && format('{0}-{1}-{2}', inputs.application, inputs.environment, inputs.component) || format('{0}-{1}', inputs.application, inputs.environment) }}
         steps:
           - name: Checkout Repository
-            uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+            uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
           
           - name: Decrypt Secrets
             uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1

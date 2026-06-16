@@ -129,6 +129,40 @@ data "aws_iam_policy_document" "gdpr_structured_job_policy_document" {
   }
 
   statement {
+    sid    = "PublishGdprMaintenanceNotifications"
+    effect = "Allow"
+    actions = [
+      "sns:Publish"
+    ]
+    resources = [
+      aws_sns_topic.emds_alerts.arn
+    ]
+  }
+
+  statement {
+    sid    = "UseEncryptedAlertsTopic"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey*"
+    ]
+    resources = [
+      aws_kms_key.emds_alerts.arn
+    ]
+  }
+
+  statement {
+    sid    = "WriteGdprMaintenanceReports"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject"
+    ]
+    resources = [
+      "${module.s3-gdpr-audit-bucket.bucket.arn}/reports/*"
+    ]
+  }
+
+  statement {
     sid    = "GetDataAccessAndTagsForLakeFormation"
     effect = "Allow"
     actions = [
@@ -224,6 +258,20 @@ resource "aws_ecs_task_definition" "emds-gdpr-structured-data-deletion" {
       cpu       = 2048
       memory    = 4096
       essential = true
+      environment = [
+        {
+          name  = "ATHENA_OUTPUT_BUCKET"
+          value = "s3://${module.s3-athena-bucket.bucket.id}/output/"
+        },
+        {
+          name  = "SNS_TOPIC_ARN"
+          value = aws_sns_topic.emds_alerts.arn
+        },
+        {
+          name  = "GDPR_REPORT_BUCKET"
+          value = module.s3-gdpr-audit-bucket.bucket.id
+        }
+      ]
       logConfiguration : {
         logDriver = "awslogs",
         options = {
@@ -260,7 +308,18 @@ resource "aws_ecs_task_definition" "emds-gdpr-iceberg-table-maintenance" {
       memory    = 4096
       essential = true
       environment = [
-        { name = "ATHENA_OUTPUT_BUCKET", value = module.s3-athena-bucket.bucket.id }
+        {
+          name  = "ATHENA_OUTPUT_BUCKET"
+          value = "s3://${module.s3-athena-bucket.bucket.id}/output/"
+        },
+        {
+          name  = "SNS_TOPIC_ARN"
+          value = aws_sns_topic.emds_alerts.arn
+        },
+        {
+          name  = "GDPR_REPORT_BUCKET"
+          value = module.s3-gdpr-audit-bucket.bucket.id
+        }
       ]
       logConfiguration : {
         logDriver = "awslogs",
@@ -278,4 +337,67 @@ resource "aws_ecs_task_definition" "emds-gdpr-iceberg-table-maintenance" {
       ]
     },
   ])
+}
+
+resource "aws_cloudwatch_event_rule" "last_day_of_month" {
+  count               = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  name                = "trigger-gdpr-step-function-last-day"
+  description         = "Triggers the gdpr step function on the last day of every month at midnight UTC"
+  schedule_expression = "cron(0 0 L * ? *)" # "L" stands for Last day of the month
+}
+
+resource "aws_cloudwatch_event_target" "step_function_target" {
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+
+  rule      = aws_cloudwatch_event_rule.last_day_of_month[0].name
+  target_id = "TriggerStepFunction"
+
+  arn = module.gdpr_deletion_step_function[0].arn
+
+  role_arn = aws_iam_role.eventbridge_to_gdpr_step_function[0].arn
+
+  depends_on = [
+    module.gdpr_deletion_step_function
+  ]
+}
+
+resource "aws_iam_role" "eventbridge_to_gdpr_step_function" {
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  name  = "eventbridge-to-gdpr-step-function-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "events.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "eventbridge_to_gdpr_sfn_policy" {
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  name  = "eventbridge-to-gdpr-step-function-policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = "states:StartExecution"
+        Effect   = "Allow"
+        Resource = module.gdpr_deletion_step_function[0].arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "eventbridge_sfn_attach" {
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+
+  role       = aws_iam_role.eventbridge_to_gdpr_step_function[0].name
+  policy_arn = aws_iam_policy.eventbridge_to_gdpr_sfn_policy[0].arn
 }

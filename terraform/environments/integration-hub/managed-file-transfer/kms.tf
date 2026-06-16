@@ -20,7 +20,7 @@ module "kms_s3_bucket" {
 
 module "kms_secrets" {
   source  = "terraform-aws-modules/kms/aws"
-  version = "~> 4.1.0"
+  version = "4.2.0"
 
   aliases                 = ["transfer/secrets"]
   description             = "KMS CMK for Secrets Manager encryption"

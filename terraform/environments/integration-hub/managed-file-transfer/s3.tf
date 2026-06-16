@@ -3,10 +3,22 @@ module "s3_bucket" {
     for key, value in local.bucket_configuration : key => value
   }
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.13.0"
+  version = "5.14.0"
 
-  allowed_kms_key_arn = module.kms_s3_bucket[each.key].key_arn
-  bucket_prefix       = each.value.bucket_prefix
+  allowed_kms_key_arn                   = module.kms_s3_bucket[each.key].key_arn
+  attach_policy                         = contains(["clean", "processing", "quarantine", "unscanned"], each.key)
+  attach_deny_insecure_transport_policy = true
+  bucket_prefix                         = each.value.bucket_prefix
+  policy = lookup(
+    {
+      clean      = data.aws_iam_policy_document.clean.json
+      unscanned  = data.aws_iam_policy_document.unscanned.json
+      processing = data.aws_iam_policy_document.processing.json
+      quarantine = data.aws_iam_policy_document.quarantine.json
+    },
+    each.key,
+    null
+  )
   cors_rule = each.key == "unscanned" ? [
     {
       allowed_headers = ["*"]

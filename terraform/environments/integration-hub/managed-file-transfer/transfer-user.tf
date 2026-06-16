@@ -79,7 +79,7 @@ data "aws_iam_policy_document" "transfer_user_session" {
 
 module "transfer_user_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name        = "${local.application_name}-transfer-user-policy"
   description = "AWS Transfer User policy"
@@ -92,7 +92,7 @@ module "transfer_user_policy" {
 
 module "transfer_user_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name            = "${local.application_name}-transfer-user"
   description     = "AWS Transfer User role"
