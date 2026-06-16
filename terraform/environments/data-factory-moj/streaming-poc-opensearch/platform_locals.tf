@@ -1,6 +1,7 @@
 locals {
 
-  application_name = "laa-new-workspaces"
+  application_name = "data-factory-moj"
+  component_name   = "streaming-poc-opensearch"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
@@ -29,6 +30,7 @@ locals {
   subnet_set_name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}"
 
   is_live       = [substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" || substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction" ? "live" : "non-live"]
+  provider_name = "core-vpc-${local.environment}"
 
   # environment specfic variables
   # example usage:

@@ -1,49 +1,51 @@
-# Terraform configuration data for environments in delius-mis preproduction account
+# Terraform configuration data for environments in delius-mis production account
 
 locals {
-  environment_config_preprod = {
+  environment_config_production = {
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
-    legacy_counterpart_vpc_cidr            = "10.160.0.0/20"
-    legacy_ad_domain_name                  = "delius-pre-prod.local"
-    legacy_dns_ip_addrs                    = ["10.160.0.163", "10.160.6.66"]
-    ad_domain_name                         = "delius-mis-preprod.internal"
-    ad_trust_domain_name                   = "azure.hmpp.root"
+    legacy_counterpart_vpc_cidr            = "10.160.16.0/20"
+    legacy_ad_domain_name                  = "delius-prod.local"
+    legacy_dns_ip_addrs                    = ["10.160.17.254", "10.160.22.121"]
+    ad_domain_name                         = "delius-mis-prod.internal"
+    # ad_trust_domain_name                   = "azure.hmpp.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
     ad_trust_dns_ip_addrs                  = module.ip_addresses.mp_ips.ad_fixngo_hmpp_domain_controllers
     core_shared_services_vpc_cidr          = module.ip_addresses.mp_cidr["core-shared-services-live-data-additional"]
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
     lb_additional_allowed_public_cidrs     = module.ip_addresses.mp_cidrs.live_eu_west_nat
-    migration_environment_full_name        = "del-pre-prod"
+    migration_environment_full_name        = "del-prod"
     migration_environment_abbreviated_name = "del"
-    migration_environment_short_name       = "pre-prod"
-    migration_environment_private_cidr     = ["10.160.0.0/22", "10.160.4.0/22", "10.160.8.0/22"]
-    migration_environment_db_cidr          = ["10.160.12.0/24", "10.160.13.0/24", "10.160.14.0/25"]
+    migration_environment_short_name       = "prod"
+    migration_environment_private_cidr     = ["10.160.16.0/22", "10.160.20.0/22", "10.160.24.0/22"]
+    migration_environment_db_cidr          = ["10.160.28.0/24", "10.160.29.0/24", "10.160.30.0/25"]
     cloudwatch_alarm_schedule              = true
     cloudwatch_alarm_disable_time          = "20:45"
     cloudwatch_alarm_enable_time           = "06:15"
     cloudwatch_alarm_disable_weekend       = true
   }
 
-  bastion_config_preprod = {
+  bastion_config_production = {
     extra_user_data_content = "yum install -y openldap-clients"
   }
 
-  boe_efs_config_preprod = {
-    availability_zone_name = "eu-west-2a"
-    mount_targets_subnet_ids = {
-      single-az = data.aws_subnets.shared-private-a.ids[0]
-    }
-    # For multi-az, use:
-    # availability_zone_name = null
-    # mount_targets_subnet_ids = {
-    #   multi-az-a = data.aws_subnets.shared-private-a.ids[0]
-    #   multi-az-b = data.aws_subnets.shared-private-b.ids[0]
-    #   multi-az-c = data.aws_subnets.shared-private-c.ids[0]
-    # }
-  }
+  boe_efs_config_production = null
 
-  bcs_config_preprod = {
-    instance_count = 2
+  # boe_efs_config_production = {
+  #   availability_zone_name = "eu-west-2a"
+  #   mount_targets_subnet_ids = {
+  #     single-az = data.aws_subnets.shared-private-a.ids[0]
+  #   }
+  #   # For multi-az, use:
+  #   # availability_zone_name = null
+  #   # mount_targets_subnet_ids = {
+  #   #   multi-az-a = data.aws_subnets.shared-private-a.ids[0]
+  #   #   multi-az-b = data.aws_subnets.shared-private-b.ids[0]
+  #   #   multi-az-c = data.aws_subnets.shared-private-c.ids[0]
+  #   # }
+  # }
+
+  bcs_config_production = {
+    instance_count = 0
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
     ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
     ansible_branch = "TM-2058/delius-mis/preprod-config"
@@ -73,8 +75,8 @@ locals {
     }
   }
 
-  bps_config_preprod = {
-    instance_count = 4
+  bps_config_production = {
+    instance_count = 0
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
     ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
     ansible_branch = "TM-2058/delius-mis/preprod-config"
@@ -104,8 +106,8 @@ locals {
     }
   }
 
-  bws_config_preprod = {
-    instance_count = 1
+  bws_config_production = {
+    instance_count = 0
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
     ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
     ansible_branch = "TM-2058/delius-mis/preprod-config"
@@ -135,10 +137,10 @@ locals {
     }
   }
 
-  dis_config_preprod = {
-    instance_count    = 1
+  dis_config_production = {
+    instance_count    = 0
     ami_name          = "delius_mis_windows_server_patch_2025-10-01T13-00-02.504Z"
-    computer_name     = "NDMIS-PRE-DIS" # 15 char limit
+    computer_name     = "NDMIS-PRD-DIS" # 15 char limit
     powershell_branch = "TM-2016/delius-mis/preprod-dis-build"
 
     ebs_volumes = {
@@ -184,7 +186,7 @@ locals {
   }
 
   # new DFI instance config to differentiate from DIS
-  dfi_config_preprod = {
+  dfi_config_production = {
     instance_count = 0
     ami_name       = "delius_mis_windows_server_patch_2025-07-09T12-56-15.901Z"
     ebs_volumes = {
@@ -228,10 +230,10 @@ locals {
     }
   }
 
-  bcs_config_win_preprod = {
-    instance_count    = 1
+  bcs_config_win_production = {
+    instance_count    = 0
     ami_name          = "delius_mis_windows_server_patch_2025-10-01T13-00-02.504Z"
-    computer_name     = "NDMIS-PP-BCS" # 15 char limit
+    computer_name     = "NDMIS-PD-BCS" # 15 char limit
     powershell_branch = "TM-2005/ndmis/windows-initial-config"
 
     ebs_volumes = {
@@ -277,9 +279,9 @@ locals {
   }
 
   # BOE DB config
-  boe_db_config_preprod = {
-    primary_instance_count = 1
-    standby_instance_count = 1
+  boe_db_config_production = {
+    primary_instance_count = 0
+    standby_instance_count = 0
     instance_type          = "m7i.large"
     ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
@@ -323,9 +325,9 @@ locals {
 
 
   # DSD DB config
-  dsd_db_config_preprod = {
-    primary_instance_count = 1
-    standby_instance_count = 1
+  dsd_db_config_production = {
+    primary_instance_count = 0
+    standby_instance_count = 0
     instance_type          = "r7i.large"
     ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
@@ -369,9 +371,9 @@ locals {
 
 
   # MIS DB config
-  mis_db_config_preprod = {
-    primary_instance_count = 1
-    standby_instance_count = 1
+  mis_db_config_production = {
+    primary_instance_count = 0
+    standby_instance_count = 0
     instance_type          = "r7i.12xlarge"
     ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
@@ -420,21 +422,28 @@ locals {
     }
   }
 
-  fsx_config_preprod = {
-    storage_capacity     = 1000 # temporarily increasing for prod->stage migration, was 200
-    throughtput_capacity = 128  # temporarily increasing for prod->stage migration, was 16
+  fsx_config_production = {
+    storage_capacity     = 200
+    throughtput_capacity = 16
   }
 
-  dfi_report_bucket_config_preprod = null
+  # fsx_config_production = {
+  #   storage_capacity     = 1000 # temporarily increasing for prod->stage migration, was 200
+  #   throughtput_capacity = 128  # temporarily increasing for prod->stage migration, was 16
+  # }
 
-  lb_config_preprod = {
-    bucket_policy_enabled = true
-  }
+  dfi_report_bucket_config_production = null
 
-  datasync_config_preprod = null
+  lb_config_production = null
 
-  db_backup_config_preprod = {
-    object_lock_days             = 10
+  # lb_config_production = {
+  #   bucket_policy_enabled = true
+  # }
+
+  datasync_config_production = null
+
+  db_backup_config_production = {
+    object_lock_days             = 1
     expire_current_after_days    = 200
     expire_noncurrent_after_days = 10
     transition = [
