@@ -1,6 +1,7 @@
 #!/bin/bash
 echo "ECS_CLUSTER=${cluster_name}" >> /etc/ecs/ecs.config
 
+yum update ecs-init -y
 start ecs
 
 yum install -y awscli
