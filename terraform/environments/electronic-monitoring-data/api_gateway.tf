@@ -219,6 +219,27 @@ data "aws_iam_policy_document" "update_p1_export_vpc" {
     effect = "Allow"
 
     principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/member-delegation-${local.vpc_name}-${local.environment}"
+      ]
+    }
+
+    actions = [
+      "apigateway:CreateAccessAssociation",
+      "apigateway:DeleteAccessAssociation"
+    ]
+
+    resources = [
+      "arn:aws:apigateway:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:/domainnames/${local.update_p1_export_domain_name}+*"
+    ]
+
+  }
+
+  statement {
+    effect = "Allow"
+
+    principals {
       type        = "AWS"
       identifiers = [module.emd_update_p1_cp_role[0].iam_role_arn]
     }
