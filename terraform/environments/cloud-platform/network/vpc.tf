@@ -3,18 +3,18 @@ module "cluster_vpc" {
   source  = "terraform-aws-modules/vpc/aws"
 
   name = local.cp_vpc_name
-  cidr = contains(keys(local.vpc_cidr), local.cp_vpc_name) ? lookup(local.vpc_cidr, local.cp_vpc_name) : null
+  cidr = contains(keys(local.vpc_cidr), local.cp_vpc_name) ? local.vpc_cidr[local.cp_vpc_name].primary : null
   azs  = slice(data.aws_availability_zones.available.names, 0, 3)
   private_subnets = [
-    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 3, 1) : null,
-    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 3, 2) : null,
-    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 3, 3) : null
+    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(local.vpc_cidr[local.cp_vpc_name].primary, 3, 1) : null,
+    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(local.vpc_cidr[local.cp_vpc_name].primary, 3, 2) : null,
+    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(local.vpc_cidr[local.cp_vpc_name].primary, 3, 3) : null
   ]
 
   public_subnets = [
-    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 7, 4) : null,
-    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 7, 5) : null,
-    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 7, 6) : null
+    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(local.vpc_cidr[local.cp_vpc_name].primary, 7, 4) : null,
+    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(local.vpc_cidr[local.cp_vpc_name].primary, 7, 5) : null,
+    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(local.vpc_cidr[local.cp_vpc_name].primary, 7, 6) : null
   ]
 
   manage_default_network_acl    = false
@@ -44,7 +44,7 @@ resource "aws_subnet" "tgw_private" {
   count = 3
 
   vpc_id                  = module.cluster_vpc.vpc_id
-  cidr_block              = contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(lookup(local.vpc_cidr, local.cp_vpc_name), 8, count.index + 4) : null
+  cidr_block              = contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(local.vpc_cidr[local.cp_vpc_name].primary, 8, count.index + 4) : null
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   map_public_ip_on_launch = false
 
@@ -61,4 +61,10 @@ resource "aws_route_table_association" "tgw_private" {
   count          = 3
   subnet_id      = aws_subnet.tgw_private[count.index].id
   route_table_id = module.cluster_vpc.private_route_table_ids[count.index]
+}
+
+# Secondary CIDR for pods
+resource "aws_vpc_ipv4_cidr_block_association" "secondary" {
+  vpc_id     = aws_vpc.this.id
+  cidr_block = local.vpc_cidr[local.cp_vpc_name].secondary
 }
