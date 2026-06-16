@@ -20,6 +20,5 @@ locals {
         config    = { description = "BODS Configuration" }
       }
     }
-
   }
 }
