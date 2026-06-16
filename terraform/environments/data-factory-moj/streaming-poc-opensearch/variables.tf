@@ -6,7 +6,7 @@ variable "engine_version" {
 
 variable "instance_type" {
   type    = string
-  default = "t3.small.search"
+  default = "m6g.large.search"
 }
 
 variable "instance_count" {
