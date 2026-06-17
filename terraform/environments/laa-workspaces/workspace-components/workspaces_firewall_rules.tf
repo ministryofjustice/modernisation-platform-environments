@@ -166,6 +166,10 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
            # LinOTP portals
           ".laa-development.modernisation-platform.service.justice.gov.uk",
 
+           # Required if service is behind CloudFront or ALB
+           ".cloudfront.net",
+           ".elb.amazonaws.com",
+
         ]
       }
     }
