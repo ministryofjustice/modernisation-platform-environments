@@ -351,6 +351,10 @@ class NotificationService:
         self.function_name = function_name
         logger.info("Slack notifications configured")
 
+    def _display_name(self) -> str:
+        """Return a Slack-friendly function label."""
+        return self.function_name.replace("_", "-")
+
     def send_notification(
         self, title: str, message: str, is_error: bool = False
     ) -> bool:
@@ -366,7 +370,7 @@ class NotificationService:
                 "attachments": [
                     {
                         "color": color,
-                        "title": f"{emoji} [{self.function_name}] {title}",
+                        "title": f"{emoji} [{self._display_name()}] {title}",
                         "text": message,
                         "footer": "SFTP Transfer Lambda",
                         "ts": int(time.time()),
@@ -707,7 +711,7 @@ class SftpPycurlHandler:
 
                 self.notification_service.send_notification(
                     "SFTP Download Complete",
-                    f"Successfully downloaded {success_count} files from `{config.host}{config.remote_path}` to s3://{config.s3_bucket}/{config.local_path}:{files_list}",
+                    f"Successfully downloaded {success_count} files from `{config.host}{config.remote_path}` to `s3://{config.s3_bucket}/{config.local_path}`:{files_list}",
                 )
 
             if fail_count > 0:
