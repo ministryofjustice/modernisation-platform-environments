@@ -4,7 +4,6 @@ resource "aws_security_group" "transfer" {
   vpc_id      = module.isolated_vpc.vpc_id
 }
 
-/*
 resource "aws_security_group_rule" "transfer_inbound_sftp" {
   description       = "Inbound rule for SFTP protocol on port 22"
   type              = "ingress"
@@ -12,16 +11,25 @@ resource "aws_security_group_rule" "transfer_inbound_sftp" {
   to_port           = 22
   protocol          = "tcp"
   security_group_id = aws_security_group.transfer.id
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = local.custom_idp_configuration.ingress_cidr_blocks
 }
 
-resource "aws_security_group_rule" "transfer_inbound_ftps" {
-  description       = "Inbound rule for FTPS protocol on port 443"
+resource "aws_security_group_rule" "transfer_inbound_ftps_control" {
+  description       = "Inbound rule for FTPS control channel on port 21"
   type              = "ingress"
-  from_port         = 443
-  to_port           = 443
+  from_port         = 21
+  to_port           = 21
   protocol          = "tcp"
   security_group_id = aws_security_group.transfer.id
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = local.custom_idp_configuration.ingress_cidr_blocks
 }
-*/
+
+resource "aws_security_group_rule" "transfer_inbound_ftps_passive" {
+  description       = "Inbound rule for FTPS passive data channel ports"
+  type              = "ingress"
+  from_port         = 8192
+  to_port           = 8200
+  protocol          = "tcp"
+  security_group_id = aws_security_group.transfer.id
+  cidr_blocks       = local.custom_idp_configuration.ingress_cidr_blocks
+}
