@@ -291,7 +291,7 @@ resource "aws_lambda_function" "ftp" {
   #checkov:skip=CKV_AWS_116:"To be ignored for now as not implemented in LZ lambdas"
   #checkov:skip=CKV_AWS_50:"To be ignored for now as not implemented in LZ lambdas"
   count         = local.build_ftp ? 1 : 0
-  function_name = "laa-ftp-${local.ftp_job.job_name}-${local.application_name}-${local.environment}"
+  function_name = "xerox-outbound-ftp"
   role          = aws_iam_role.ftp_lambda_role[0].arn
   runtime       = local.python_runtime
   handler       = "ftpclient.lambda_handler"
