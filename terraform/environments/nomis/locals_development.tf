@@ -227,6 +227,28 @@ locals {
           oracle-db-hostname-b = "none"
         })
       })
+
+      qa12c-nomis-web = merge(local.ec2_autoscaling_groups.qa12c-nomis-web, {
+        autoscaling_schedules = {}
+        config = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.config, {
+          instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
+            "Ec2Qa11GWeblogicPolicy",
+            "Ec2Qa11G2WeblogicPolicy",
+            "Ec2Qa19CWeblogicPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.user_data_cloud_init.args, {
+            branch = "TM-2138-NOMIS-Weblogic-12-Update-Ansible-role-to-be-compliant-with-Oracle-Licenses"
+          })
+        })
+        tags = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.tags, {
+          nomis-environment    = "qa19c"
+          oracle-db-name       = "qa19c"
+          oracle-db-hostname-a = "dev-nomis-db19c-1-b"
+          oracle-db-hostname-b = "none"
+        })
+      })
     }
 
     ec2_instances = {

@@ -1,17 +1,39 @@
 locals {
-  mp_environments = [
-    "cloud-platform-development",
-    "cloud-platform-preproduction",
-    "cloud-platform-live",
-  ]
-  enabled_workspaces  = ["development_cluster"]
+  bu_accounts = jsondecode(file("${path.module}/../accounts.json"))
+
+  mp_environments = concat(
+    [
+      "cloud-platform-development",
+      "cloud-platform-preproduction",
+      "cloud-platform-live"
+    ],
+    local.bu_accounts.accounts
+  )
+
   cluster_environment = contains(local.mp_environments, terraform.workspace) ? local.environment : "development_cluster"
   cp_vpc_name         = terraform.workspace
 
   vpc_cidr = {
-    cloud-platform-development   = "10.195.32.0/20"
-    cloud-platform-preproduction = "10.195.16.0/20"
-    cloud-platform-live          = "10.195.0.0/20"
+    cloud-platform-development = {
+      primary   = "10.195.32.0/20"
+      secondary = "100.66.0.0/16"
+    }
+    cloud-platform-preproduction = {
+      primary   = "10.195.16.0/20"
+      secondary = "100.65.0.0/16"
+    }
+    cloud-platform-live = {
+      primary   = "10.195.0.0/20"
+      secondary = "100.64.0.0/16"
+    }
+    container-platform-octo-nonlive = {
+      primary   = "10.195.48.0/20"
+      secondary = "100.68.0.0/16"
+    }
+    container-platform-octo-live = {
+      primary   = "10.41.0.0/20"
+      secondary = "100.80.0.0/16"
+    }
   }
 
   vpc_flow_log_cloudwatch_log_group_name_prefix       = "/aws/vpc-flow-log/"

@@ -64,9 +64,15 @@ resource "aws_lambda_layer_version" "lambda_layer" {
   description              = "Lambda Layer for ${local.application_name} Edrms Docs Exception"
 }
 
+data "archive_file" "edrms_docs_exception_zip" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda/edrms_docs_exception"
+  output_path = "${path.module}/lambda/edrms_docs_exception.zip"
+}
+
 resource "aws_lambda_function" "edrms_docs_exception_monitor" {
-  filename         = "./lambda/edrms_docs_exception.zip"
-  source_code_hash = filebase64sha256("./lambda/edrms_docs_exception.zip")
+  filename         = data.archive_file.edrms_docs_exception_zip.output_path
+  source_code_hash = data.archive_file.edrms_docs_exception_zip.output_base64sha256
   function_name    = "${local.application_name}-${local.environment}-edrms-docs-exception-monitor"
   role             = aws_iam_role.lambda_edrms_docs_exception_role.arn
   handler          = "lambda_function.lambda_handler"
