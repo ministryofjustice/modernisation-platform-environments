@@ -165,6 +165,7 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
 
            # LinOTP portals
           "workspace-mfa.laa-development.modernisation-platform.service.justice.gov.uk",
+
         ]
       }
     }
