@@ -138,9 +138,20 @@ locals {
       policies = [
         "send_message_to_sqs",
         "publish_to_sns",
+        "send_logs_to_cloudwatch",
         "invoke_ses",
         "get_cloudwatch_metrics",
         "get_list_waf_web_acls"
+      ]
+    }
+    file_server_analysis = {
+      description = "Lambda Function Role for retrieving and analysing data from S3"
+      policies = [
+        "send_message_to_sqs",
+        "publish_to_sns",
+        "send_logs_to_cloudwatch",
+        "invoke_ses",
+        "get_data_s3"
       ]
     }
     rotate_ses_access_key = {
@@ -258,7 +269,7 @@ locals {
           "suppress_sechub_findings",
           "get_list_waf_web_acls",
           "update_ses_access_key",
-		      "update_ses_secrets_value",
+          "update_ses_secrets_value",
           "ssm_send_command",
           "ssm_read_command"
           ] : {
@@ -362,7 +373,7 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Effect   = "Allow"
         Action   = ["wafv2:GetWebACL", "wafv2:ListWebACLs"]
         Resource = ["arn:aws:wafv2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
-         } : each.value.policy_name == "update_ses_access_key" ? {
+        } : each.value.policy_name == "update_ses_access_key" ? {
         Effect   = "Allow"
         Action   = ["iam:CreateAccessKey", "iam:DeleteAccessKey", "iam:ListAccessKeys", "iam:UpdateAccessKey"]
         Resource = ["arn:aws:iam::${local.environment_management.account_ids[each.value.env_config.account_key]}:user/${local.ses_iam_user}"]
@@ -371,15 +382,15 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Action   = ["secretsmanager:GetSecretValue", "secretsmanager:PutSecretValue", "secretsmanager:UpdateSecret"]
         Resource = ["arn:aws:secretsmanager:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:secret:${local.ses_secret_name}-*"]
         } : each.value.policy_name == "ssm_send_command" ? {
-        Effect   = "Allow"
-        Action   = ["ssm:SendCommand"]
+        Effect = "Allow"
+        Action = ["ssm:SendCommand"]
         Resource = [
-                  "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript",
-                  "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:command/*",
+          "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript",
+          "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:command/*",
         ]
         } : each.value.policy_name == "ssm_read_command" ? {
         Effect   = "Allow"
-        Action   = ["ssm:GetCommandInvocation", "ssm:ListCommandInvocations", "ssm:ListCommands", "ec2:DescribeInstances" ]
+        Action   = ["ssm:GetCommandInvocation", "ssm:ListCommandInvocations", "ssm:ListCommands", "ec2:DescribeInstances"]
         Resource = ["*"]
         } : {
         Effect   = "Deny" # Fallback deny for any unexpected policy names
@@ -404,16 +415,45 @@ resource "aws_iam_policy" "ssm_ec2_send_command" {
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Effect   = "Allow"
-      Action   = ["ssm:SendCommand", "ec2:DescribeInstances"]
-      Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.account_key]}:instance/*"]
-      Condition = {
-        StringEquals = {
-          "ssm:resourceTag/role" = ["ses_web_config", "ses_tfs_config", "ses_sql_config", "ses_test_config"]
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["ssm:SendCommand", "ec2:DescribeInstances"]
+        Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.account_key]}:instance/*"]
+        Condition = {
+          StringEquals = {
+            "ssm:resourceTag/role" = [
+              "ses_web_config",
+              "ses_tfs_config",
+              "ses_sql_config"
+            ]
+          }
+        }
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["ssm:SendCommand", "ec2:DescribeInstances"]
+        Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.account_key]}:instance/*"]
+        Condition = {
+          StringEquals = {
+            "ssm:resourceTag/ses_service_restart" = [
+              "PPUDAutomatedProcessManagerTEST",
+              "PPUDAutomatedProcessManagerUAT"
+            ]
+          }
+        }
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["ssm:SendCommand", "ec2:DescribeInstances"]
+        Resource = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[each.value.account_key]}:instance/*"]
+        Condition = {
+          StringEquals = {
+            "ssm:resourceTag/test_role" : ["ses_test_config"]
+          }
         }
       }
-    }]
+    ]
   })
 }
 

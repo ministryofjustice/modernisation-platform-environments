@@ -6,17 +6,6 @@ data "aws_vpc" "selected" {
   }
 }
 
-data "aws_subnets" "eks_private" {
-
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.selected.id]
-  }
-  tags = {
-    SubnetType = "EKS-Private"
-  }
-}
-
 data "aws_subnets" "private" {
 
   filter {
@@ -50,13 +39,11 @@ data "aws_iam_roles" "platform_engineer_admin_sso_role" {
 # }
 
 data "aws_eks_cluster" "cluster" {
-  count      = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
-  name       = module.eks[0].cluster_name
+  name       = module.eks.cluster_name
   depends_on = [module.eks]
 }
 
 data "aws_eks_cluster_auth" "cluster" {
-  count      = contains(local.enabled_workspaces, local.cluster_environment) ? 1 : 0
-  name       = module.eks[0].cluster_name
+  name       = module.eks.cluster_name
   depends_on = [module.eks]
 }

@@ -1,7 +1,7 @@
 resource "kubernetes_secret_v1" "chainguard_pull_credentials" {
   metadata {
     name      = "chainguard-pull-secret"
-    namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
+    namespace = kubernetes_namespace_v1.ingress_nginx.metadata[0].name
   }
 
   type = "kubernetes.io/dockerconfigjson"

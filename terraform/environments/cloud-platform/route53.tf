@@ -1,5 +1,5 @@
 resource "aws_route53_zone" "container_platform_service_justice_gov_uk" {
-  count = local.environment == "live" ? 1 : 0
+  count = terraform.workspace == "cloud-platform-live" ? 1 : 0
   name  = local.base_domain
 }
 
@@ -13,7 +13,7 @@ resource "aws_route53_zone" "environment_container_platform_justice_gov_uk" {
 # each account zone is created and must be copied here manually.
 
 resource "aws_route53_record" "development_ns" {
-  count   = local.environment == "live" ? 1 : 0
+  count   = terraform.workspace == "cloud-platform-live" ? 1 : 0
   zone_id = aws_route53_zone.container_platform_service_justice_gov_uk[0].zone_id
   name    = "development.${local.base_domain}"
   type    = "NS"
@@ -27,7 +27,7 @@ resource "aws_route53_record" "development_ns" {
 }
 
 resource "aws_route53_record" "preproduction_ns" {
-  count   = local.environment == "live" ? 1 : 0
+  count   = terraform.workspace == "cloud-platform-live" ? 1 : 0
   zone_id = aws_route53_zone.container_platform_service_justice_gov_uk[0].zone_id
   name    = "preproduction.${local.base_domain}"
   type    = "NS"
@@ -41,7 +41,7 @@ resource "aws_route53_record" "preproduction_ns" {
 }
 
 resource "aws_route53_record" "nonlive_ns" {
-  count   = local.environment == "live" ? 1 : 0
+  count   = terraform.workspace == "cloud-platform-live" ? 1 : 0
   zone_id = aws_route53_zone.container_platform_service_justice_gov_uk[0].zone_id
   name    = "nonlive.${local.base_domain}"
   type    = "NS"
@@ -55,7 +55,7 @@ resource "aws_route53_record" "nonlive_ns" {
 }
 
 resource "aws_route53_record" "live_ns" {
-  count   = local.environment == "live" ? 1 : 0
+  count   = terraform.workspace == "cloud-platform-live" ? 1 : 0
   zone_id = aws_route53_zone.container_platform_service_justice_gov_uk[0].zone_id
   name    = "live.${local.base_domain}"
   type    = "NS"

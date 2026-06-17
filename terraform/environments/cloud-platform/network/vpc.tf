@@ -1,20 +1,20 @@
-module "vpc" {
+module "cluster_vpc" {
   version = "6.5.1"
   source  = "terraform-aws-modules/vpc/aws"
 
   name = local.cp_vpc_name
-  cidr = lookup(local.cp_vpc_cidr, local.cluster_environment)
+  cidr = contains(keys(local.vpc_cidr), local.cp_vpc_name) ? local.vpc_cidr[local.cp_vpc_name].primary : null
   azs  = slice(data.aws_availability_zones.available.names, 0, 3)
   private_subnets = [
-    cidrsubnet(lookup(local.cp_vpc_cidr, local.cluster_environment), 3, 1),
-    cidrsubnet(lookup(local.cp_vpc_cidr, local.cluster_environment), 3, 2),
-    cidrsubnet(lookup(local.cp_vpc_cidr, local.cluster_environment), 3, 3)
+    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(local.vpc_cidr[local.cp_vpc_name].primary, 3, 1) : null,
+    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(local.vpc_cidr[local.cp_vpc_name].primary, 3, 2) : null,
+    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(local.vpc_cidr[local.cp_vpc_name].primary, 3, 3) : null
   ]
 
   public_subnets = [
-    cidrsubnet(lookup(local.cp_vpc_cidr, local.cluster_environment), 6, 0),
-    cidrsubnet(lookup(local.cp_vpc_cidr, local.cluster_environment), 6, 1),
-    cidrsubnet(lookup(local.cp_vpc_cidr, local.cluster_environment), 6, 2)
+    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(local.vpc_cidr[local.cp_vpc_name].primary, 7, 4) : null,
+    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(local.vpc_cidr[local.cp_vpc_name].primary, 7, 5) : null,
+    contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(local.vpc_cidr[local.cp_vpc_name].primary, 7, 6) : null
   ]
 
   manage_default_network_acl    = false
@@ -23,7 +23,7 @@ module "vpc" {
 
   public_dedicated_network_acl = true //Creates a dedicated network ACL and attaches to the public subnets
 
-  enable_nat_gateway                  = true
+  enable_nat_gateway                  = false
   one_nat_gateway_per_az              = true
   create_multiple_public_route_tables = true
 
@@ -38,4 +38,33 @@ module "vpc" {
   tags = merge({
     Terraform = "true"
   }, local.tags)
+}
+
+resource "aws_subnet" "tgw_private" {
+  count = 3
+
+  vpc_id                  = module.cluster_vpc.vpc_id
+  cidr_block              = contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(local.vpc_cidr[local.cp_vpc_name].primary, 8, count.index + 4) : null
+  availability_zone       = data.aws_availability_zones.available.names[count.index]
+  map_public_ip_on_launch = false
+
+  tags = merge({
+    Name                              = "${local.cp_vpc_name}-tgw-private-${data.aws_availability_zones.available.names[count.index]}"
+    SubnetType                        = "TGW-Private"
+    "kubernetes.io/role/internal-elb" = "1"
+    Terraform                         = "true"
+    Cluster                           = local.cp_vpc_name
+  }, local.tags)
+}
+
+resource "aws_route_table_association" "tgw_private" {
+  count          = 3
+  subnet_id      = aws_subnet.tgw_private[count.index].id
+  route_table_id = module.cluster_vpc.private_route_table_ids[count.index]
+}
+
+# Secondary CIDR for pods
+resource "aws_vpc_ipv4_cidr_block_association" "secondary" {
+  vpc_id     = module.cluster_vpc.vpc_id
+  cidr_block = local.vpc_cidr[local.cp_vpc_name].secondary
 }

@@ -49,10 +49,14 @@ locals {
     "g4s_lcm_archive",
     "g4s_tasking",
     "scram_alcohol_monitoring",
+    "g4s_xdrive_unstructured"
     ] : local.is-preproduction ? [
+    "g4s_atrium_unstructured",
     "g4s_cap_dw",
     "g4s_emsys_tpims",
     "capita_alcohol_monitoring",
+    "capita_blob_storage",
+    "emd_historic_int_preprod_dbt",
     "g4s_atrium",
     "g4s_centurion",
     "g4s_emsys_mvp",
@@ -61,7 +65,8 @@ locals {
     "g4s_integrity",
     "g4s_lcm",
     "g4s_tasking",
-  ] : local.is-development ? [
+    "g4s_xdrive_unstructured",
+    ] : local.is-development ? [
     "test",
     "capita_blob_storage",
     "emd_historic_int",

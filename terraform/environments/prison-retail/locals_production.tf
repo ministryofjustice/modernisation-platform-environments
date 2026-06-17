@@ -2,27 +2,31 @@ locals {
 
   baseline_presets_production = {
     options = {
-      # TODO: configure prison-retail PagerDuty
-      # sns_topics = {
-      #   pagerduty_integrations = {
-      #     pagerduty = "prison-retail"          
-      #   }
-      # }
+      sns_topics = {
+        pagerduty_integrations = {
+          pagerduty = "prison-retail-production"
+        }
+      }
     }
   }
 
   # please keep resources in alphabetical order
   baseline_production = {
-    cloudwatch_dashboards = {}
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          local.cloudwatch_dashboard_widget_groups.all_windows_ec2,
+        ]
+      }
+    }
 
     ec2_instances = {
       pd-pr-retail-a = { # 15 char limit on name as domain joined
-        # TODO: enable alarms when commissioned
-        # cloudwatch_metric_alarms = merge(
-        #   module.baseline_presets.cloudwatch_metric_alarms.ec2,
-        #   module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
-        #    module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
-        # )
+        cloudwatch_metric_alarms = merge(
+          module.baseline_presets.cloudwatch_metric_alarms.ec2,
+        )
         config = {
           ami_name                      = "prison-retail-0"
           ami_owner                     = "self"
@@ -45,14 +49,13 @@ locals {
         }
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 }
-          "/dev/sdb" = { type = "gp3", size = 50 }
-          "/dev/sdc" = { type = "gp3", size = 50 }
-          "/dev/sdd" = { type = "gp3", size = 150 }
-          "/dev/sde" = { type = "gp3", size = 50 }
-          "/dev/sdf" = { type = "gp3", size = 20 }
-          "/dev/sdg" = { type = "gp3", size = 250 }
-          # "/dev/sdh" = { type = "gp3", size = 50 }
-          # "/dev/sdi" = { type = "gp3", size = 20 }
+          "/dev/sdb"  = { type = "gp3", size = 50 }
+          "/dev/sdc"  = { type = "gp3", size = 50 }
+          "/dev/sdd"  = { type = "gp3", size = 150 }
+          "/dev/sde"  = { type = "gp3", size = 50 }
+          "/dev/sdf"  = { type = "gp3", size = 20 }
+          "/dev/sdg"  = { type = "gp3", size = 250 }
+
           "/dev/sdj" = { type = "gp3", size = 112 }
           "/dev/sdk" = { type = "gp3", size = 20 }
           "/dev/sdl" = { type = "gp3", size = 200 }

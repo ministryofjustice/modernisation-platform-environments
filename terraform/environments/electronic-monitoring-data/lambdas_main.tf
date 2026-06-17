@@ -806,6 +806,34 @@ module "create_p1_export" {
 }
 
 #-----------------------------------------------------------------------------------
+# Update P1 Export
+#-----------------------------------------------------------------------------------
+
+module "update_p1_export" {
+  count                          = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "update_p1_export"
+  role_name                      = module.update_p1_export_iam_role[0].name
+  role_arn                       = module.update_p1_export_iam_role[0].arn
+  memory_size                    = 512
+  timeout                        = 300
+  reserved_concurrent_executions = 2
+
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
+  }
+
+}
+
+#-----------------------------------------------------------------------------------
 # Staging DB janitor
 #-----------------------------------------------------------------------------------
 
@@ -896,11 +924,11 @@ module "landing_file_dlq_redriver" {
 }
 
 #-----------------------------------------------------------------------------------
-# lambda loads - staged_mdss__position and acquisitive_crime__position
+# lambda merge loads - staged_mdss__position, staged_mdss__event, acquisitive_crime__position
 #-----------------------------------------------------------------------------------
 
 module "merge_mdss_staged_event" {
-  count                          = local.is-preproduction || local.is-production ? 0 : 1
+  count                          = local.is-production ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_mdss_staged_event"
@@ -922,7 +950,7 @@ module "merge_mdss_staged_event" {
 }
 
 module "merge_mdss_staged_position" {
-  count                          = local.is-preproduction || local.is-production ? 0 : 1
+  count                          = local.is-production ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_mdss_staged_position"
@@ -944,7 +972,7 @@ module "merge_mdss_staged_position" {
 }
 
 module "merge_ac_position" {
-  count                          = local.is-preproduction || local.is-production ? 0 : 1
+  count                          = local.is-production ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_ac_position"
@@ -989,6 +1017,32 @@ module "macie-unstructured-jobs" {
 }
 
 #-----------------------------------------------------------------------------------
+# Specials Ingestion
+#-----------------------------------------------------------------------------------
+
+module "specials-ingestion" {
+  count                   = local.is-development || local.is-production ? 1 : 0
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "specials_ingestion"
+  role_name               = aws_iam_role.ingest_specials_data.name
+  role_arn                = aws_iam_role.ingest_specials_data.arn
+  handler                 = "specials_ingestion.handler"
+  memory_size             = 1024
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    SOURCE_BUCKET         = module.s3-json-directory-structure-bucket.bucket.id
+    ATHENA_RESULTS_BUCKET = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER        = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET        = module.s3-create-a-derived-table-bucket.bucket.id
+  }
+}
+
+
+#-----------------------------------------------------------------------------------
 # Control Lambda for File Shredding Batch
 #-----------------------------------------------------------------------------------
 
@@ -1009,5 +1063,6 @@ module "gdpr_unstructured_control_lambda" {
     ENVIRONMENT_BUCKET          = module.s3-data-bucket.bucket.id
     GDPR_AUDIT_BUCKET           = module.s3-gdpr-audit-bucket.bucket.id
     ATHENA_QUERY_RESULTS_BUCKET = module.s3-athena-bucket.bucket.id
+    ENVIRONMENT_NAME            = local.environment_shorthand
   }
 }

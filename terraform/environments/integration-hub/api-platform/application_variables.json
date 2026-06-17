@@ -1,0 +1,42 @@
+{
+  "accounts": {
+    "development": {
+      "api_configuration": {
+        "cors_allowed_origins": [],
+        "max_presigned_url_expiry_seconds": 3600,
+        "presigned_url_expiry_seconds": 900
+      },
+      "transfer_clients": {
+        "products-poc": {
+          "enabled": true,
+          "key_prefix": "products-poc/uploads",
+          "max_upload_size_bytes": 107374182400
+        }
+      }
+    },
+    "test": {
+      "api_configuration": {
+        "cors_allowed_origins": [],
+        "max_presigned_url_expiry_seconds": 3600,
+        "presigned_url_expiry_seconds": 900
+      },
+      "transfer_clients": {}
+    },
+    "preproduction": {
+      "api_configuration": {
+        "cors_allowed_origins": [],
+        "max_presigned_url_expiry_seconds": 3600,
+        "presigned_url_expiry_seconds": 900
+      },
+      "transfer_clients": {}
+    },
+    "production": {
+      "api_configuration": {
+        "cors_allowed_origins": [],
+        "max_presigned_url_expiry_seconds": 3600,
+        "presigned_url_expiry_seconds": 900
+      },
+      "transfer_clients": {}
+    }
+  }
+}

@@ -11,7 +11,7 @@ locals {
 module "waf" {
   # checkov:skip=CKV_TF_1: "Commit Hash requirement temporarily disabled"
   # checkov:skip=CKV_TF_2: "Version number tag requirement temporarily disabled"
-  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=c0875272407dd5094287c021201b36f250be3806"
+  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=22d5505e11da4fbab027eea4e65e8ff458bbcfaf"
   web_acl_name             = "wam-acl"
   enable_ddos_protection   = true # Defaults to rule priority 2
   ddos_rate_limit          = 150
@@ -50,6 +50,13 @@ module "waf" {
     AWSManagedRulesBotControlRuleSet     = 15
   }
 
+# AWSManagedRulesBotControlRuleSet configuration
+
+  bot_control_inspection_level = "COMMON"          # default; or "TARGETED"
+# bot_control_scope_down_cidrs = ["34.0.0.0/8"]    # optional; inspect only GCP traffic
+
+
+
   core_logging_account_id = local.environment_management.account_ids["core-logging-production"]
 
   application_name = local.application_name
@@ -63,7 +70,7 @@ resource "aws_wafv2_rule_group" "wam_waf_acl" {
   name        = "custom-wam-waf-rule-group"
   description = "A custom rule group to include additional rules to the WAF ACL"
   scope       = "REGIONAL"
-  capacity    = 2
+  capacity    = 10
 
   rule {
     name     = "allow-ncsc-ip-list"
@@ -101,6 +108,24 @@ resource "aws_wafv2_rule_group" "wam_waf_acl" {
     }
   }
 
+  rule {
+    name     = "allow-wam-user-ip-list"
+    priority = 30
+    action {
+      allow {}
+    }
+    statement {
+      ip_set_reference_statement {
+        arn = aws_wafv2_ip_set.wam_user_waf_ip_set.arn
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "allow-wam-user-ip-list"
+      sampled_requests_enabled   = true
+    }
+  }
+
   visibility_config {
     cloudwatch_metrics_enabled = true
     metric_name                = "custom-wam-waf-rule-group"
@@ -115,7 +140,7 @@ resource "aws_wafv2_rule_group" "wam_waf_acl" {
 # WAF IP Set for NCSC WebCheck & Detectify Public IP Addresses
 
 data "aws_ssm_parameter" "ncsc_waf_ip_set" {
-  name = "ncsc_waf_ip_set"
+  name = "/waf/ncsc_waf_ip_set"
 }
 
 locals {
@@ -138,7 +163,7 @@ resource "aws_wafv2_ip_set" "ncsc_waf_ip_set" {
 # WAF IP Set for Circle CI Public IP Addresses
 
 data "aws_ssm_parameter" "circle_ci_waf_ip_set" {
-  name = "circle_ci_waf_ip_set"
+  name = "/waf/circle_ci_waf_ip_set"
 }
 
 locals {
@@ -155,5 +180,28 @@ resource "aws_wafv2_ip_set" "circle_ci_waf_ip_set" {
 
   tags = merge(local.tags,
     { Name = lower(format("%s-circle-ci-waf-ip-set-%s", local.application_name, local.environment)) }
+  )
+}
+
+# WAF IP Set for WAM End User IP Addresses
+
+data "aws_ssm_parameter" "wam_user_waf_ip_set" {
+  name = "/waf/wam_user_waf_ip_set"
+}
+
+locals {
+  wam_user_ip_addresses = [for ip in split(",", data.aws_ssm_parameter.wam_user_waf_ip_set.value) : trim(ip, " ")]
+}
+
+resource "aws_wafv2_ip_set" "wam_user_waf_ip_set" {
+  # count              = (local.is-development || local.is-preproduction || local.is-production) ? 1 : 0
+  name               = "wam-user-waf-ip-set"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV4"
+  description        = "List of trusted WAM user IP Addresses allowing access via WAF"
+  addresses          = local.wam_user_ip_addresses
+
+  tags = merge(local.tags,
+    { Name = lower(format("%s-wam-user-waf-ip-set-%s", local.application_name, local.environment)) }
   )
 }
