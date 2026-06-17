@@ -1,7 +1,8 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "ccms-ebs-db-ai-1-ip": "10.26.60.168",
+      "ccms-ebs-db-ai-2-ip": "10.26.60.205"
     },
     "test": {
       "example_var": "test-data"

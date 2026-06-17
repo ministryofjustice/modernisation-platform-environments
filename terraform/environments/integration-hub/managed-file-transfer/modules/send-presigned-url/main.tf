@@ -102,7 +102,7 @@ resource "aws_s3_bucket_notification" "clean_bucket_events" {
 
 module "sqs_clean_file_notifications" {
   source  = "terraform-aws-modules/sqs/aws"
-  version = "5.2.1"
+  version = "5.2.2"
 
   name            = "${local.resource_name_prefix}-clean-file-notifications"
   use_name_prefix = false

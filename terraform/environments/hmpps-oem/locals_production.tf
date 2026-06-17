@@ -20,16 +20,15 @@ locals {
 
       sns_topics = {
         pagerduty_integrations = {
-          azure-fixngo-pagerduty              = "az-noms-production-1-alerts"
-          corporate-staff-rostering-pagerduty = "corporate-staff-rostering-production"
-          dso-pipelines-pagerduty             = "dso-pipelines"
-          hmpps-domain-services-pagerduty     = "hmpps-domain-services-production"
-          nomis-combined-reporting-pagerduty  = "nomis-combined-reporting-production"
-          nomis-pagerduty                     = "nomis-production"
-          oasys-national-reporting-pagerduty  = "oasys-national-reporting-production"
-          oasys-pagerduty                     = "oasys-production"
-          pagerduty                           = "hmpps-oem-production"
-          planetfm-pagerduty                  = "planetfm-production"
+          azure-fixngo-production-pagerduty              = "az-noms-production-1-alerts"
+          corporate-staff-rostering-production-pagerduty = "corporate-staff-rostering-production"
+          hmpps-domain-services-production-pagerduty     = "hmpps-domain-services-production"
+          nomis-combined-reporting-production-pagerduty  = "nomis-combined-reporting-production"
+          nomis-production-pagerduty                     = "nomis-production"
+          oasys-national-reporting-production-pagerduty  = "oasys-national-reporting-production"
+          oasys-production-pagerduty                     = "oasys-production"
+          pagerduty                                      = "hmpps-oem-production"
+          planetfm-production-pagerduty                  = "planetfm-production"
         }
       }
     }
