@@ -45,7 +45,7 @@ module "flink_geofence" {
           "kafka-cluster:Connect",
           "kafka-cluster:DescribeCluster"
         ]
-        resources = [data.external.msk_arn.result.arn]
+        resources = [local.msk_arn]
       },
       {
         sid    = "AllowMSKTopics"
@@ -61,7 +61,7 @@ module "flink_geofence" {
           "kafka-cluster:WriteData"
         ]
         resources = [
-          format("%s/*", replace(data.external.msk_arn.result.arn, ":cluster/", ":topic/"))
+          format("%s/*", replace(local.msk_arn, ":cluster/", ":topic/"))
         ]
       },
       {
@@ -72,7 +72,7 @@ module "flink_geofence" {
           "kafka-cluster:DescribeGroup"
         ]
         resources = [
-          format("%s/*", replace(data.external.msk_arn.result.arn, ":cluster/", ":group/"))
+          format("%s/*", replace(local.msk_arn, ":cluster/", ":group/"))
         ]
       }
     ]
