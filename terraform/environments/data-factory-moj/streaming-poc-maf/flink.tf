@@ -10,8 +10,8 @@ module "flink_geofence" {
   s3_source_key    = local.geofence_app.jar_filename
 
   vpc_security_groups = [
-    aws_security_group.allow_s3.id,
-    aws_security_group.allow_msk.id
+    aws_security_group.allow_s3[0].id,
+    aws_security_group.allow_msk[0].id
   ]
 
   config_property_group = {

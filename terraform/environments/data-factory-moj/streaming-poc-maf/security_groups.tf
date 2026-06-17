@@ -2,6 +2,7 @@
 # SECURITY GROUPS
 # ---------------------------------------------------------------------------------------------------------------------
 resource "aws_security_group" "allow_s3" {
+  count       = contains(local.deploy_to, local.environment) ? 1 : 0
   name        = "allow-s3-egress-from-flink"
   description = "Allow HTTPS egress traffic to s3 from flink applications"
   vpc_id      = data.aws_vpc.shared.id
@@ -12,7 +13,8 @@ resource "aws_security_group" "allow_s3" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "egress_to_s3" {
-  security_group_id = aws_security_group.allow_s3.id
+  count             = contains(local.deploy_to, local.environment) ? 1 : 0
+  security_group_id = aws_security_group.allow_s3[0].id
   description       = "Allow HTTPS egress traffic to s3 from flink applications"
 
   from_port      = 443
@@ -26,6 +28,7 @@ resource "aws_vpc_security_group_egress_rule" "egress_to_s3" {
 }
 
 resource "aws_security_group" "allow_msk" {
+  count       = contains(local.deploy_to, local.environment) ? 1 : 0
   name        = "allow-msk-egress-from-flink"
   description = "Allow egress to MSK Serverless cluster - VPC only access"
   vpc_id      = data.aws_vpc.shared.id
@@ -52,7 +55,8 @@ resource "aws_security_group" "allow_msk" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "msk_iam_auth" {
-  security_group_id = aws_security_group.allow_msk.id
+  count             = contains(local.deploy_to, local.environment) ? 1 : 0
+  security_group_id = aws_security_group.allow_msk[0].id
   description       = "IAM SASL authentication from VPC"
 
   from_port   = 9098
