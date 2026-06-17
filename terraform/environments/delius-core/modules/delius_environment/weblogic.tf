@@ -223,3 +223,9 @@ resource "aws_ecs_capacity_provider" "weblogic" {
     managed_termination_protection = "ENABLED"
   }
 }
+
+# Cert for Legacy URL
+resource "aws_acm_certificate" "alb" {
+  domain_name       = "*.mis-dev.probation.service.justice.gov.uk"
+  validation_method = "DNS"
+}
