@@ -86,10 +86,6 @@
         "value": "${logging_level_uk_gov_laa_opa}"
       },
       {
-        "name": "LOGGING_LEVEL_UK_GOV_LAA_OPA_CONNECTOR_BC_CLIENT",
-        "value": "debug"
-      },
-      {
         "name": "spring_datasource_hikari_keepalive-time",
         "value": "60000"
       }
