@@ -1,7 +1,7 @@
 #### This file can be used to store locals specific to the member account ####
 locals {
 
-  application_name_ssogen        = "ssogen"
+  application_name_ssogen = "ssogen"
 
   # Certificate configuration based on environment
   nonprod_domain = format("%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment)
@@ -26,7 +26,7 @@ locals {
     format("ccms-ssogen-admin.%s", local.prod_domain)
   ]
 
-  subject_alternative_names    = local.is-production ? local.prod_sans : local.nonprod_sans
+  subject_alternative_names = local.is-production ? local.prod_sans : local.nonprod_sans
   # Domain validation options mapping (following the example pattern)
   domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
     name   = dvo.resource_record_name
@@ -36,7 +36,7 @@ locals {
   }
 
   # Split domain validation by domain type
-  modernisation_platform_validations    = [for k, v in local.domain_types : v if strcontains(k, "modernisation-platform.service.justice.gov.uk")]
-  laa_validations                       = [for k, v in local.domain_types : v if strcontains(k, "laa.service.justice.gov.uk")]
+  modernisation_platform_validations = [for k, v in local.domain_types : v if strcontains(k, "modernisation-platform.service.justice.gov.uk")]
+  laa_validations                    = [for k, v in local.domain_types : v if strcontains(k, "laa.service.justice.gov.uk")]
 
 }

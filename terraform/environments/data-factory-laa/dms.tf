@@ -387,6 +387,29 @@ data "aws_iam_policy_document" "postgres_dms_kms" {
       values   = [data.aws_caller_identity.current.account_id]
     }
   }
+
+  statement {
+    sid    = "AllowEventBridgeToPublishEncryptedSns"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt",
+    ]
+
+    resources = ["*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
 }
 
 resource "aws_kms_key" "postgres_dms" {
@@ -479,7 +502,7 @@ module "dms_postgres" {
   # checkov:skip=CKV_TF_1: using branch ref for testing
   # checkov:skip=CKV_TF_2: using branch ref for testing
   count  = local.is-development ? 1 : 0
-  source = "github.com/ministryofjustice/terraform-dms-module?ref=075c7dde7f5259c0e28ba00af1cd1fd49336a3fb"
+  source = "github.com/ministryofjustice/terraform-dms-module?ref=54b49927f5b3eaee6610209528bda186b0201c7d"
 
   vpc_id      = data.aws_vpc.shared.id
   environment = local.environment

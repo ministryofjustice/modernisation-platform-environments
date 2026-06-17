@@ -32,6 +32,10 @@
             required: false
             description: "Set to true to do a state refresh prior to the plan"
             default: false
+          account_name:
+            type: string
+            required: false
+            description: "Optional: account name override for ACCOUNT_NAME env var."
           post_plan_to_pr:
             type: boolean
             required: false
@@ -49,14 +53,15 @@
             required: true
 
     env:
-      ACCOUNT_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
-      WORKSPACE_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
-      SKIP_PLAN_EVALUATOR: '["cloud-platform-development", "cloud-platform-preproduction", "cloud-platform-nonlive", "cloud-platform-live", "data-platform-development", "data-platform-test", "data-platform-preproduction", "data-platform-production"]'
+      ACCOUNT_NAME: "${{ inputs.account_name || format('{0}-{1}', inputs.application, inputs.environment) }}"
+      WORKSPACE_NAME: "${{ inputs.account_name || format('{0}-{1}', inputs.application, inputs.environment) }}"
+      SKIP_PLAN_EVALUATOR: "[]"
+      SKIP_PLAN_EVALUATOR_FILE: ".github/config/skip-plan-evaluator-workspaces.json"
     permissions:
       id-token: write
       contents: read
     concurrency:
-      group: ${{ inputs.application }}-${{ inputs.environment }}-${{ inputs.component }}
+      group: ${{ inputs.account_name && format('{0}-{1}', inputs.account_name, inputs.component) || format('{0}-{1}-{2}', inputs.application, inputs.environment, inputs.component) }}
     jobs:
       fetch-secrets:
         uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
@@ -64,7 +69,7 @@
           MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
       plan:
-        name: "plan"
+        name: "plan ${{ inputs.component}}"
         runs-on: ubuntu-latest
         needs: fetch-secrets
         outputs:
@@ -74,6 +79,7 @@
             run: |
               echo "application=${{ inputs.application }}"
               echo "environment=${{ inputs.environment }}"
+              echo "account_name=${{ inputs.account_name }}"
               echo "action=${{ inputs.action }}"
               echo "plan_apply_tfargs=${{ inputs.plan_apply_tfargs }}"
               echo "do_state_refresh_on_plan=${{ inputs.do_state_refresh_on_plan }}"
@@ -82,6 +88,12 @@
 
           - name: Checkout Repository
             uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+          - name: Load skip plan evaluator list
+            run: |
+              SKIP_PLAN_EVALUATOR=$(jq -c '.' "${GITHUB_WORKSPACE}/${SKIP_PLAN_EVALUATOR_FILE}")
+              echo "SKIP_PLAN_EVALUATOR=${SKIP_PLAN_EVALUATOR}" >> $GITHUB_ENV
+
           - name: Decrypt Secrets
             uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
             with:
@@ -232,12 +244,14 @@
                 const {data: reviews} = await github.rest.pulls.listReviews({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  pull_number: context.payload.pull_request.number
+                  pull_number: context.payload.pull_request.number,
+                  per_page: 100
                 });
 
                 const {data: team_members} = await github.rest.teams.listMembersInOrg({
                   org: orgName,
-                  team_slug: teamSlug
+                  team_slug: teamSlug,
+                  per_page: 100
                 });
 
                 const teamMemberLogins = team_members.map(member => member.login);
@@ -283,7 +297,7 @@
         needs: [plan, fetch-secrets]
         if: inputs.action == 'plan_apply' && needs.plan.outputs.plan_exitcode == '2'
         runs-on: ubuntu-latest
-        environment: ${{ inputs.component != 'root' && format('{0}-{1}-{2}', inputs.application, inputs.environment, inputs.component) || format('{0}-{1}', inputs.application, inputs.environment) }}
+        environment: ${{ inputs.account_name && (inputs.component != 'root' && format('{0}-{1}', inputs.account_name, inputs.component) || inputs.account_name) || (inputs.component != 'root' && format('{0}-{1}-{2}', inputs.application, inputs.environment, inputs.component) || format('{0}-{1}', inputs.application, inputs.environment)) }}
         steps:
           - name: Checkout Repository
             uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3

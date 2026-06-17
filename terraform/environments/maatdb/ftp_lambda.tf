@@ -296,9 +296,9 @@ resource "aws_lambda_function" "ftp" {
   runtime       = local.python_runtime
   handler       = "ftpclient.lambda_handler"
 
-  memory_size      = 512
-  timeout          = 300
-  filename         = data.archive_file.ftp_lambda_zip.output_path
+  memory_size = 512
+  timeout     = 300
+  filename    = data.archive_file.ftp_lambda_zip.output_path
   # source_code_hash ensures Lambda is only redeployed when the Python source file actually changes.
   source_code_hash = data.archive_file.ftp_lambda_zip.output_base64sha256
 

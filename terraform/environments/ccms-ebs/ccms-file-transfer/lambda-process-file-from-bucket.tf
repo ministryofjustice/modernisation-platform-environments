@@ -27,7 +27,11 @@ resource "aws_iam_role_policy" "lambda_process_file_from_bucket_policy" {
         Effect = "Allow"
         Action = [
           "s3:GetObject",
-          "s3:GetObjectTagging"
+          "s3:GetObjectTagging",
+          "s3:ListBucket",
+          "s3:PutObject",
+          "s3:PutObjectTagging",
+          "s3:DeleteObject"
         ]
         Resource = [
           module.s3-bucket-sftp-bc.bucket.arn,
@@ -41,17 +45,17 @@ resource "aws_iam_role_policy" "lambda_process_file_from_bucket_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.process_file_from_bucket_lambda_function.function_name}:*"
+        Resource = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.process_file_from_bucket_lambda_function.function_name}:*"
       },
       {
         "Effect" : "Allow",
-        "Action" : ["secretsmanager:GetSecretValue","secretsmanager:DescribeSecret","secretsmanager:ListSecretVersionIds"],
-        "Resource" : ["${aws_secretsmanager_secret.sftp_bc_lambda_secrets.id}"]
+        "Action" : ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret", "secretsmanager:ListSecretVersionIds"],
+        "Resource" : ["${aws_secretsmanager_secret.sftp_lambda_secrets.id}"]
       },
       {
         "Effect" : "Allow",
         "Action" : ["kms:GenerateDataKey*", "kms:Decrypt"],
-        "Resource" : ["${aws_kms_key.s3_sftp_bc_kms_key.arn}"]
+        "Resource" : ["${aws_kms_key.s3_sftp_kms_key.arn}"]
       }
     ]
   })
@@ -74,7 +78,7 @@ resource "aws_lambda_function" "process_file_from_bucket_lambda_function" {
   environment {
     variables = {
       # This secret now contains slack_channel_webhook, slack_channel_webhook_guardduty, slack_channel_webhook_s3
-      SECRET_NAME = aws_secretsmanager_secret.sftp_bc_lambda_secrets.arn
+      SECRET_NAME = aws_secretsmanager_secret.sftp_lambda_secrets.arn
     }
   }
 
@@ -84,7 +88,7 @@ resource "aws_lambda_function" "process_file_from_bucket_lambda_function" {
 
   lifecycle {
     ignore_changes = [
-      source_code_hash, filename, handler, qualified_arn, qualified_invoke_arn, version
+      source_code_hash, filename, handler
     ]
   }
 }
