@@ -12,6 +12,38 @@ resource "aws_wafv2_web_acl" "waf" {
   }
 
   dynamic "rule" {
+    for_each = var.waf_path_allow_rules
+    content {
+      name     = rule.value.name
+      priority = rule.value.priority
+
+      action {
+        allow {}
+      }
+
+      statement {
+        byte_match_statement {
+          search_string = rule.value.path
+          field_to_match {
+            uri_path {}
+          }
+          text_transformation {
+            priority = 0
+            type     = "NONE"
+          }
+          positional_constraint = "EXACTLY"
+        }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = rule.value.name
+        sampled_requests_enabled   = true
+      }
+    }
+  }
+
+  dynamic "rule" {
     for_each = var.waf_IP_rules
     content {
       name     = rule.value.name
