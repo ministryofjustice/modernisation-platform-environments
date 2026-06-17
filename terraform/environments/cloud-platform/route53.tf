@@ -62,3 +62,32 @@ resource "aws_route53_record" "live_ns" {
   ttl     = 172800
   records = aws_route53_zone.environment_container_platform_justice_gov_uk.name_servers
 }
+
+# Business unit records
+resource "aws_route53_record" "octo_nonlive_ns" {
+  count   = terraform.workspace == "cloud-platform-live" ? 1 : 0
+  zone_id = aws_route53_zone.container_platform_service_justice_gov_uk[0].zone_id
+  name    = "octo-nonlive.${local.base_domain}"
+  type    = "NS"
+  ttl     = 172800
+  records = [
+    "ns-345.awsdns-43.com.",
+    "ns-621.awsdns-13.net.",
+    "ns-1186.awsdns-20.org.",
+    "ns-1597.awsdns-07.co.uk.",
+  ]
+}
+
+resource "aws_route53_record" "octo_live_ns" {
+  count   = terraform.workspace == "cloud-platform-live" ? 1 : 0
+  zone_id = aws_route53_zone.container_platform_service_justice_gov_uk[0].zone_id
+  name    = "octo-live.${local.base_domain}"
+  type    = "NS"
+  ttl     = 172800
+  records = [
+    "ns-1377.awsdns-44.org.",
+    "ns-320.awsdns-40.com.",
+    "ns-1835.awsdns-37.co.uk.",
+    "ns-691.awsdns-22.net.",
+  ]
+}
