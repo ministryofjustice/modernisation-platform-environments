@@ -23,7 +23,7 @@ resource "aws_wafv2_ip_set" "echo_allowlist" {
   name               = "${local.cluster_name}-echo-source-ip-allowlist"
   scope              = "REGIONAL"
   ip_address_version = "IPV4"
-  addresses          = ["83.100.215.187/32"]
+  addresses          = ["171.22.105.26/32"]
 }
 
 resource "aws_wafv2_ip_set" "echo3_allowlist" {
