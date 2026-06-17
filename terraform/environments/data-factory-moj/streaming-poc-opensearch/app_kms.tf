@@ -1,4 +1,5 @@
 resource "aws_kms_key" "flow_logs" {
+  count                   = contains(["development"], local.environment) ? 1 : 0
   description             = "KMS key for VPC Flow Logs encryption"
   deletion_window_in_days = 30
   enable_key_rotation     = true
@@ -38,9 +39,14 @@ resource "aws_kms_key" "flow_logs" {
       }
     ]
   })
+
+  tags = merge(local.extended_tags, {
+    description = "KMS key for VPC Flow Logs encryption"
+  })
 }
 
 resource "aws_kms_alias" "flow_logs" {
+  count         = contains(["development"], local.environment) ? 1 : 0
   name          = "alias/${local.name}-flow-logs"
-  target_key_id = aws_kms_key.flow_logs.key_id
+  target_key_id = aws_kms_key.flow_logs[0].key_id
 }
