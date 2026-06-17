@@ -177,6 +177,24 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
           ".storage.live.com",
           ".livefilestore.com",
           ".storage.msn.com",
+          "login.live.com",
+            "account.live.com",
+            ".live.com",
+            ".msn.com",
+            ".msaauth.net",
+            ".msaauthimages.net",
+            ".msauth.net",
+            ".msauthimages.net",
+            ".msftauth.net",
+            ".msftauthimages.net",
+            "secure.aadcdn.microsoftonline-p.com",
+            "logincdn.msauth.net",
+            "logincdn.msauthimages.net",
+            "acctcdn.msauth.net",
+              "acctcdn.msauthimages.net"  
+
+
+
 
 
         ]
