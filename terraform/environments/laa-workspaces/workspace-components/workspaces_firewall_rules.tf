@@ -306,6 +306,12 @@ resource "aws_networkfirewall_rule_group" "workspaces_onedrive_live_misc" {
           ".mesh.com",
           "vas.samsungapps.com",
           "connect.facebook.net", # REVIEW — used by some Office add-ins
+
+        ".static.microsoft",
+        ".onecdn.static.microsoft",
+
+        
+
         ]
       }
     }
