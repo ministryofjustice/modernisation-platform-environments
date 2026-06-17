@@ -226,8 +226,12 @@ resource "aws_ecs_capacity_provider" "weblogic" {
 
 # Cert for Legacy URL
 resource "aws_acm_certificate" "legacy" {
-  domain_name       = "*.mis-dev.probation.service.justice.gov.uk"
+  domain_name       = "mis-dev.probation.service.justice.gov.uk"
   validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lb_listener_certificate" "legacy" {
