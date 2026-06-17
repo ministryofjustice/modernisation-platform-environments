@@ -173,7 +173,6 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
 
 
                    # OneDrive
-          "onedrive.live.com/login",
           ".onedrive.com",
           ".onedrive.live.com",
           ".storage.live.com",
