@@ -70,7 +70,7 @@ resource "aws_cloudwatch_metric_alarm" "ftp_lambda_error" {
   period              = 300
   statistic           = "Sum"
   threshold           = 0
-  treat_missing_data  = "missing"
+  treat_missing_data  = "notBreaching"
 
   dimensions = {
     FunctionName = aws_lambda_function.ftp[0].function_name
@@ -90,7 +90,7 @@ resource "aws_cloudwatch_metric_alarm" "zip_lambda_error" {
   period              = 300
   statistic           = "Sum"
   threshold           = 0
-  treat_missing_data  = "missing"
+  treat_missing_data  = "notBreaching"
 
   dimensions = {
     FunctionName = aws_lambda_function.zip[0].function_name
