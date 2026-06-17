@@ -13,7 +13,6 @@ locals {
         backup_retention_period = 1
         monitoring_interval     = 0
       }
-      sentry_dsn = ""
     }
     test = {
       rds = {
@@ -25,7 +24,6 @@ locals {
         backup_retention_period = 1
         monitoring_interval     = 0
       }
-      sentry_dsn = ""
     }
     preproduction = {
       rds = {
@@ -37,7 +35,6 @@ locals {
         backup_retention_period = 7
         monitoring_interval     = 0
       }
-      sentry_dsn = ""
     }
     production = {
       rds = {
@@ -49,7 +46,6 @@ locals {
         backup_retention_period = 7
         monitoring_interval     = 60
       }
-      sentry_dsn = ""
     }
   }
 }
