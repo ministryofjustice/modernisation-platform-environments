@@ -10,8 +10,9 @@ locals {
     local.bu_accounts.accounts
   )
 
-  cluster_environment = contains(local.mp_environments, terraform.workspace) ? local.environment : "development_cluster"
-  cp_vpc_name         = terraform.workspace
+  workspace_environment = element(reverse(split("-", terraform.workspace)), 0)
+  cluster_environment   = contains(local.mp_environments, terraform.workspace) ? local.workspace_environment : "development_cluster"
+  cp_vpc_name           = terraform.workspace
 
   vpc_cidr = {
     cloud-platform-development = {
