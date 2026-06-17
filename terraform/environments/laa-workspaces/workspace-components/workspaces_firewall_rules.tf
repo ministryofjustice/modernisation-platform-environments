@@ -170,6 +170,15 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
            ".cloudfront.net",
            ".elb.amazonaws.com",
 
+
+                   # OneDrive
+          ".onedrive.com",
+          ".onedrive.live.com",
+          ".storage.live.com",
+          ".livefilestore.com",
+          ".storage.msn.com",
+
+
         ]
       }
     }
@@ -209,12 +218,12 @@ resource "aws_networkfirewall_rule_group" "workspaces_onedrive_live_misc" {
         generated_rules_type = "ALLOWLIST"
         target_types         = ["TLS_SNI", "HTTP_HOST"]
         targets = [
-          # OneDrive
-          ".onedrive.com",
-          ".onedrive.live.com",
-          ".storage.live.com",
-          ".livefilestore.com",
-          ".storage.msn.com",
+          # # OneDrive
+          # ".onedrive.com",
+          # ".onedrive.live.com",
+          # ".storage.live.com",
+          # ".livefilestore.com",
+          # ".storage.msn.com",
 
           # live.com services
           "login.live.com",
