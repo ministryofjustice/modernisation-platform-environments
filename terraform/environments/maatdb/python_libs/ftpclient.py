@@ -352,8 +352,16 @@ class NotificationService:
         logger.info("Slack notifications configured")
 
     def _display_name(self) -> str:
-        """Return a Slack-friendly function label."""
-        return self.function_name.replace("_", "-")
+        """Return a Slack-friendly function label in EBS style: laa-ftp-{job_name}-{application_name}-{environment}."""
+        job_name = os.getenv("JOB_NAME", "").replace("_", "-")
+        app_name = os.getenv("APPLICATION_NAME", "").replace("_", "-")
+        environment = os.getenv("ENVIRONMENT", "").replace("_", "-")
+        
+        if job_name and app_name and environment:
+            return f"laa-ftp-{job_name}-{app_name}-{environment}"
+        else:
+            # Fallback if env vars are not set
+            return self.function_name.replace("_", "-")
 
     def send_notification(
         self, title: str, message: str, is_error: bool = False
