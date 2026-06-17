@@ -55,8 +55,6 @@ resource "aws_networkfirewall_rule_group" "workspaces_aws_endpoints" {
           "sqs.${var.aws_region}.amazonaws.com",
           "cloudfront.amazonaws.com",
 
-           # LinOTP portals
-          "workspace-mfa.laa-development.modernisation-platform.service.justice.gov.uk",
         ]
       }
     }
@@ -162,6 +160,11 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
           "ecn.dev.virtualearth.net",
           "platform.linkedin.com",
           "tokensit.cp.microsoft-tst.com", # Microsoft test tenant CP endpoint
+
+
+
+           # LinOTP portals
+          "workspace-mfa.laa-development.modernisation-platform.service.justice.gov.uk",
         ]
       }
     }
