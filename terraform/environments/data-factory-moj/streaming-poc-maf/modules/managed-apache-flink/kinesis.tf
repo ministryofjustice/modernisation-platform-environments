@@ -12,8 +12,8 @@ resource "aws_kinesisanalyticsv2_application" "managed_apache_flink_application"
       code_content {
         s3_content_location {
           bucket_arn     = data.aws_s3_bucket.source_bucket.arn
-          file_key       = aws_s3_object.source_bucket.key
-          object_version = aws_s3_object.source_bucket.version_id
+          file_key       = data.aws_s3_object.source_file.key
+          object_version = data.aws_s3_object.source_file.version_id
         }
       }
       code_content_type = "ZIPFILE"
@@ -61,6 +61,4 @@ resource "aws_kinesisanalyticsv2_application" "managed_apache_flink_application"
       }
     }
   }
-
-  depends_on = [aws_s3_object.source_bucket]
 }

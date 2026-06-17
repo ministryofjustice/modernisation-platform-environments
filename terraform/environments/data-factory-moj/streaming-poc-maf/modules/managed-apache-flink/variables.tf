@@ -42,11 +42,6 @@ variable "s3_source_key" {
   type        = string
 }
 
-variable "source_file_name" {
-  description = "Local path to the Flink application JAR to upload."
-  type        = string
-}
-
 variable "additional_s3_bucket_arn_list" {
   description = "List of additional S3 bucket ARNs the Flink application needs access to."
   type        = list(string)
