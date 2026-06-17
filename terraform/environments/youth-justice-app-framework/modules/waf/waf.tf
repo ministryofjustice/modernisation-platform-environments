@@ -160,7 +160,7 @@ resource "aws_wafv2_web_acl" "cf" {
           field_to_match {
             uri_path {}
           }
-          text_transformations {
+          text_transformation {
             priority = 0
             type     = "NONE"
           }
