@@ -1,0 +1,21 @@
+data "aws_vpc" "selected" {
+  filter {
+    name   = "tag:Name"
+    values = [terraform.workspace]
+  }
+}
+
+data "aws_subnets" "private" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.selected.id]
+  }
+  tags = {
+    SubnetType = "Private"
+  }
+}
+
+data "aws_iam_roles" "platform_engineer_admin_sso_role" {
+  name_regex  = "AWSReservedSSO_platform-engineer-admin_.*"
+  path_prefix = "/aws-reserved/sso.amazonaws.com/"
+}
