@@ -142,6 +142,8 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
           ".onenote.com",
           ".sharepointonline.com",
           "teams.microsoft.com",
+          ".teams.microsoft.com",
+          ".skype.com",
 
           # CDN / delivery
           ".msecnd.net",
@@ -172,6 +174,7 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
 
 
                    # OneDrive
+          "onedrive.live.com/login",
           ".onedrive.com",
           ".onedrive.live.com",
           ".storage.live.com",
