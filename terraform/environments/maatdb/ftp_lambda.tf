@@ -323,6 +323,9 @@ resource "aws_lambda_function" "ftp" {
       S3BUCKET              = local.ftp_job.bucket_name
       FILEREMOVE            = local.ftp_job.file_remove
       SKIP_KEY_VERIFICATION = "YES"
+      PROTOCOL              = local.ftp_job.ftp_protocol
+      REQUIRE_SSL           = "NO"
+      INSECURE              = "YES"
       SECRET_NAME           = data.aws_secretsmanager_secret_version.ftp_jobs_secret_version[0].arn
     }
   }
