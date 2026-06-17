@@ -14,7 +14,7 @@ module "flink_artifacts_bucket" {
   server_side_encryption_configuration = {
     rule = {
       apply_server_side_encryption_by_default = {
-        kms_master_key_id = aws_kms_key.s3[0].arn
+        kms_master_key_id = contains(local.deploy_to, local.environment) ? aws_kms_key.s3[0].arn : null
         sse_algorithm     = "aws:kms"
       }
     }
