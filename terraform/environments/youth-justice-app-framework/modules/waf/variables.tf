@@ -62,6 +62,16 @@ variable "waf_IP_rules_cf" {
   default = {}
 }
 
+variable "waf_path_allow_rules_cf" {
+  description = "A map of URI path exact-match allow rules for CloudFront WAF (evaluated before managed rule groups)"
+  type = map(object({
+    name     = string
+    priority = number
+    path     = string
+  }))
+  default = {}
+}
+
 variable "waf_geoIP_rules" {
   description = "A list of GeoIP rules to add to the waf"
   type = list(object({
