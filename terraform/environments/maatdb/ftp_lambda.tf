@@ -326,7 +326,7 @@ resource "aws_lambda_function" "ftp" {
       PROTOCOL              = local.ftp_job.ftp_protocol
       REQUIRE_SSL           = "NO"
       INSECURE              = "YES"
-      SECRET_NAME           = data.aws_secretsmanager_secret_version.ftp_jobs_secret_version[0].arn
+      SECRET_NAME           = aws_secretsmanager_secret.ftp_jobs_secret.name
       JOB_NAME              = local.ftp_job.job_name
       APPLICATION_NAME      = local.application_name
       ENVIRONMENT           = local.environment
