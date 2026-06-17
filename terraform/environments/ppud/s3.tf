@@ -29,11 +29,13 @@ resource "aws_s3_bucket" "PPUD" {
   )
 }
 
-resource "aws_s3_bucket_acl" "PPUD_ACL" {
-  count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.PPUD[0].id
-  acl    = "private"
-}
+# Deprecated
+
+# resource "aws_s3_bucket_acl" "PPUD_ACL" {
+#   count  = local.is-production == true ? 1 : 0
+#   bucket = aws_s3_bucket.PPUD[0].id
+#   acl    = "private"
+# }
 
 resource "aws_s3_bucket_versioning" "PPUD" {
   count  = local.is-production == true ? 1 : 0
