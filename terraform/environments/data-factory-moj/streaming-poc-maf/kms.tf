@@ -1,0 +1,47 @@
+# ---------------------------------------------------------------------------------------------------------------------
+# KMS
+# ---------------------------------------------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "s3_kms" {
+  statement {
+    sid    = "EnableRootAccess"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "AllowS3"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_kms_key" "s3" {
+  count                   = contains(local.deploy_to, local.environment) ? 1 : 0
+  description             = "KMS key for S3 buckets"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+  policy                  = data.aws_iam_policy_document.s3_kms.json
+  tags                    = local.tags
+}
+
+resource "aws_kms_alias" "s3" {
+  count         = contains(local.deploy_to, local.environment) ? 1 : 0
+  name          = "alias/streaming-poc-maf-s3"
+  target_key_id = aws_kms_key.s3[0].key_id
+}

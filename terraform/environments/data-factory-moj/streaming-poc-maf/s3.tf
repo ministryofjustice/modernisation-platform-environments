@@ -14,10 +14,12 @@ module "flink_artifacts_bucket" {
   server_side_encryption_configuration = {
     rule = {
       apply_server_side_encryption_by_default = {
-        sse_algorithm = "AES256"
+        kms_master_key_id = aws_kms_key.s3[0].arn
+        sse_algorithm     = "aws:kms"
       }
     }
   }
+  
   
   block_public_acls       = true
   block_public_policy     = true
