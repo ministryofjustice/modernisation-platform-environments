@@ -225,7 +225,12 @@ resource "aws_ecs_capacity_provider" "weblogic" {
 }
 
 # Cert for Legacy URL
-resource "aws_acm_certificate" "alb" {
+resource "aws_acm_certificate" "legacy" {
   domain_name       = "*.mis-dev.probation.service.justice.gov.uk"
   validation_method = "DNS"
+}
+
+resource "aws_lb_listener_certificate" "legacy" {
+  listener_arn    = aws_lb_listener.listener_https.arn
+  certificate_arn = aws_acm_certificate.legacy.arn
 }
