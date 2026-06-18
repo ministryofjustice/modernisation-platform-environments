@@ -372,8 +372,8 @@ locals {
 
   # MIS DB config
   mis_db_config_production = {
-    primary_instance_count = 0
-    standby_instance_count = 0
+    primary_instance_count = 1
+    standby_instance_count = 1
     instance_type          = "r7i.12xlarge"
     ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
@@ -422,10 +422,7 @@ locals {
     }
   }
 
-  fsx_config_production = {
-    storage_capacity     = 200
-    throughtput_capacity = 16
-  }
+  fsx_config_production = null
 
   # fsx_config_production = {
   #   storage_capacity     = 1000 # temporarily increasing for prod->stage migration, was 200
