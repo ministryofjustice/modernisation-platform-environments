@@ -12,7 +12,6 @@ module "lambda_unscanned_to_processing" {
   source_path                    = "lambda/s3-file-mover"
   timeout                        = 30
   tracing_mode                   = "Active"
-  trigger_on_package_timestamp   = false
 
   event_source_mapping = {
     sqs = {
@@ -111,7 +110,6 @@ module "lambda_processing_to_post_scan" {
   source_path                    = "lambda/guard-duty-file-mover"
   timeout                        = 30
   tracing_mode                   = "Active"
-  trigger_on_package_timestamp   = false
 
   event_source_mapping = {
     sqs = {
