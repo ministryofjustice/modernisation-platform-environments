@@ -1,6 +1,10 @@
 locals {
 
-  delius_oasys_queues_test = {}
+  delius_oasys_queues_test = {
+    "t2" = {
+      sns_topic_arn_configured = false
+    }
+  }
 
   baseline_presets_test = {
     options = {
