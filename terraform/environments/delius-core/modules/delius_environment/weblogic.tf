@@ -224,17 +224,27 @@ resource "aws_ecs_capacity_provider" "weblogic" {
   }
 }
 
-# Cert for Legacy URL
+# Cert for Legacy URL: https://dsdmoj.atlassian.net/browse/TM-2173
+# 1. Create ACM cert (apply this config)
+# 2. Manually validate cert by adding validation records to legacy zone
+# 3. Wait for cert to say "ISSUED"
+# 4. Uncomment aws_lb_listener_certificate and apply this config
 resource "aws_acm_certificate" "legacy" {
-  domain_name       = "mis-dev.probation.service.justice.gov.uk"
+  count = var.env_name == "prod" ? 1 : 0
+
+  domain_name       = "*.probation.service.justice.gov.uk"
   validation_method = "DNS"
+  tags              = var.tags
 
   lifecycle {
     create_before_destroy = true
   }
 }
 
-resource "aws_lb_listener_certificate" "legacy" {
-  listener_arn    = aws_lb_listener.listener_https.arn
-  certificate_arn = aws_acm_certificate.legacy.arn
-}
+# Uncomment once cert is "ISSUED"
+# resource "aws_lb_listener_certificate" "legacy" {
+#   count = var.env_name == "prod" ? 1 : 0
+
+#   listener_arn    = aws_lb_listener.listener_https.arn
+#   certificate_arn = aws_acm_certificate.legacy.arn
+# }
