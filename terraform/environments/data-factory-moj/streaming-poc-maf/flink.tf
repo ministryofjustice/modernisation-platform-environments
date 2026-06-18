@@ -1,23 +1,6 @@
 # ---------------------------------------------------------------------------------------------------------------------
 # Managed Apache Flink
 # ---------------------------------------------------------------------------------------------------------------------
-
-# output "debug_config" {
-#   value = module.flink_geofence[0].config
-# }
-
-# output "debug_bucket" {
-#   value = module.flink_geofence[0].bucket.arn
-# }
-#
-# output "debug_object_key" {
-#   value = module.flink_geofence[0].object.key
-# }
-#
-# output "debug_object_version" {
-#   value = module.flink_geofence[0].object.version_id
-# }
-
 module "flink_geofence" {
   count  = contains(local.deploy_to, local.environment) ? 1 : 0
   source = "./modules/managed-apache-flink"
@@ -27,6 +10,7 @@ module "flink_geofence" {
   private_subnets  = data.aws_subnets.shared-private.ids
   s3_source_bucket = module.flink_artifacts_bucket.s3_bucket_id
   s3_source_key    = local.geofence_app.jar_filename
+  s3_kms_key_arn   = aws_kms_key.s3[0].arn
 
   vpc_security_groups = [
     aws_security_group.allow_s3[0].id,

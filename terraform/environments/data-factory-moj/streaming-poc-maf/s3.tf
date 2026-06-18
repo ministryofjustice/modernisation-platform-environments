@@ -28,24 +28,3 @@ module "flink_artifacts_bucket" {
 
   tags = local.extended_tags
 }
-
-# module "vpc_endpoints" {
-#   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
-#   version = "~> 6.0"
-#
-#   create = contains(local.deploy_to, local.environment) ? true : false
-#
-#   vpc_id = data.aws_vpc.shared.id
-#
-#   endpoints = {
-#     s3 = {
-#       service         = "s3"
-#       service_type    = "Gateway"
-#       route_table_ids = [data.aws_vpc.shared.main_route_table_id]
-#       tags = merge(local.extended_tags, {
-#         Name = "s3-endpoint"
-#       })
-#     }
-#   }
-# }
-

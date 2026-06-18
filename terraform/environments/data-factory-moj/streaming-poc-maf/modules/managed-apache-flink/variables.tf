@@ -37,6 +37,12 @@ variable "s3_source_bucket" {
   type        = string
 }
 
+variable "s3_kms_key_arn" {
+  description = "ARN of the KMS key used to encrypt the S3 source bucket. Required if the bucket uses customer-managed KMS encryption."
+  type        = string
+  default     = null
+}
+
 variable "s3_source_key" {
   description = "S3 object key for the Flink application JAR."
   type        = string

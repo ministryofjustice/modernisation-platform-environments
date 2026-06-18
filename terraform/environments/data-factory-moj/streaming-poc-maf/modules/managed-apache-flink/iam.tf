@@ -10,6 +10,19 @@ data "aws_iam_policy_document" "managed_apache_flink" {
   }
 
   dynamic "statement" {
+    for_each = var.s3_kms_key_arn != null ? [1] : []
+    content {
+      sid    = "AllowS3KMSDecrypt"
+      effect = "Allow"
+      actions = [
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
+      ]
+      resources = [var.s3_kms_key_arn]
+    }
+  }
+
+  dynamic "statement" {
     for_each = length(var.additional_s3_bucket_arn_list) > 0 ? [1] : []
 
     content {
