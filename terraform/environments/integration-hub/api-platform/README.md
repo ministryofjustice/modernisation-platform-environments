@@ -15,8 +15,9 @@ It now protects the API with:
 3. The authorizer validates the caller against Secrets Manager credentials or bearer tokens and resolves the caller's role mapping from DynamoDB.
 4. The upload-ticket Lambda reads client upload configuration from DynamoDB.
 5. The upload-ticket Lambda verifies that the authenticated caller is allowed to request a ticket for the requested `clientId`.
-6. The Lambda generates a short-lived S3 pre-signed `PUT` URL for the existing Managed File Transfer upload bucket.
-7. The client uploads the file directly to S3 with the returned URL and headers.
+6. For files at or below the single PUT limit, the Lambda generates a short-lived pre-signed `PUT` URL for the existing Managed File Transfer upload bucket.
+7. For larger files, the Lambda initiates an S3 multipart upload, persists the upload session, and returns the first batch of pre-signed part URLs plus follow-up API operations for the remaining parts, completion, and abort.
+8. The client uploads directly to S3 and, for multipart flows, completes the upload through the API once all parts have been transferred.
 
 ## Sample request payload
 
@@ -31,7 +32,7 @@ It now protects the API with:
 }
 ```
 
-## Example response shape
+## Example single-upload response shape
 
 ```json
 {
@@ -44,6 +45,7 @@ It now protects the API with:
       "Content-Type": "text/csv",
       "Content-MD5": "CY9rzUYh03PK3k6DJie09g==",
       "x-amz-meta-client-id": "products-poc",
+      "x-amz-meta-declared-size-bytes": "12345",
       "x-amz-meta-original-file-name": "example-upload.csv",
       "x-amz-meta-transfer-ticket": "f2e7fd50-f0c5-4f8c-b0ad-f27c0c4d2b61",
       "x-amz-server-side-encryption": "aws:kms",
@@ -54,6 +56,40 @@ It now protects the API with:
   "object": {
     "bucket": "integration-hub-unscanned-...",
     "key": "products-poc/uploads/2026/06/09/uuid.csv"
+  }
+}
+```
+
+## Example multipart response shape
+
+```json
+{
+  "transferTicket": "f2e7fd50-f0c5-4f8c-b0ad-f27c0c4d2b61",
+  "clientId": "products-poc",
+  "object": {
+    "bucket": "integration-hub-unscanned-...",
+    "key": "products-poc/uploads/2026/06/09/uuid.csv"
+  },
+  "multipart": {
+    "uploadId": "abc123...",
+    "partSizeBytes": 67108864,
+    "totalParts": 1600,
+    "maxParts": 10000,
+    "expiresInSeconds": 900,
+    "initialParts": [
+      {
+        "partNumber": 1,
+        "method": "PUT",
+        "url": "https://...",
+        "headers": {},
+        "expiresInSeconds": 900
+      }
+    ],
+    "operations": {
+      "presignPartsPath": "/transfer-tickets/f2e7fd50-f0c5-4f8c-b0ad-f27c0c4d2b61/parts",
+      "completePath": "/transfer-tickets/f2e7fd50-f0c5-4f8c-b0ad-f27c0c4d2b61/complete",
+      "abortPath": "/transfer-tickets/f2e7fd50-f0c5-4f8c-b0ad-f27c0c4d2b61"
+    }
   }
 }
 ```
@@ -164,6 +200,16 @@ terraform output system_auth_secret_names
 scripts/bootstrap-api-credentials.sh system --secret-id integration-hub-api-platform-development-system-products-poc-api
 ```
 
+## Upload selection
+
+The client always provides `sizeBytes`. The API uses that declared size to:
+
+- reject requests above the configured 100 GB maximum for the client
+- return a single pre-signed `PUT` upload for files up to the S3 single-request limit
+- return a multipart upload session for files above the single-request limit
+
+The declared size is stored as multipart session state and written into the uploaded object's S3 metadata for traceability.
+
 ## Example API call with Basic auth
 
 Replace `<api-endpoint>` with the `transfer_ticket_api_endpoint` Terraform output after apply.
@@ -196,6 +242,41 @@ curl -X POST "https://<api-endpoint>/transfer-tickets" \
     "requestedExpirySeconds": 900,
     "contentMd5": "CY9rzUYh03PK3k6DJie09g=="
   }'
+```
+
+## Multipart follow-up calls
+
+Request more part URLs:
+
+```bash
+curl -X POST "https://<api-endpoint>/transfer-tickets/<transfer-ticket>/parts" \
+  -H "authorization: Bearer <tokenId>.<token>" \
+  -H "content-type: application/json" \
+  -d '{
+    "partNumberStart": 11,
+    "partNumberEnd": 20
+  }'
+```
+
+Complete the multipart upload after collecting the `ETag` response header from each uploaded part:
+
+```bash
+curl -X POST "https://<api-endpoint>/transfer-tickets/<transfer-ticket>/complete" \
+  -H "authorization: Bearer <tokenId>.<token>" \
+  -H "content-type: application/json" \
+  -d '{
+    "parts": [
+      { "partNumber": 1, "eTag": "\"etag-for-part-1\"" },
+      { "partNumber": 2, "eTag": "\"etag-for-part-2\"" }
+    ]
+  }'
+```
+
+Abort a multipart upload if the transfer is abandoned:
+
+```bash
+curl -X DELETE "https://<api-endpoint>/transfer-tickets/<transfer-ticket>" \
+  -H "authorization: Bearer <tokenId>.<token>"
 ```
 
 ## OpenAPI
