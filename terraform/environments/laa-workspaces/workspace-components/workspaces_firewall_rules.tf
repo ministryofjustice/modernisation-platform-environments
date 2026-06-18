@@ -67,35 +67,6 @@ resource "aws_networkfirewall_rule_group" "workspaces_aws_endpoints" {
 }
 
 # -----------------------------------------------------------------------------
-# Rule Group 5
-# Covers: OTP Portal access from internet
-#
-# NOTE: Testing only
-# -----------------------------------------------------------------------------
-
-resource "aws_networkfirewall_rule_group" "allow_alb_https" {
-  capacity = 100
-  name     = "allow-alb-https"
-  type     = "STATEFUL"
-
-  rule_group {
-    rules_source {
-      rules_string = <<EOF
-pass tls any any -> any any (
-    tls.sni;
-    content:"workspace-mfa.laa-development.modernisation-platform.service.justice.gov.uk";
-    endswith;
-    nocase;
-    msg:"Allow OTP Linux portal access";
-    sid:1000001;
-    rev:1;
-)
-EOF
-    }
-  }
-}
-
-# -----------------------------------------------------------------------------
 # Rule Group 2 — Microsoft Services
 # Covers: Windows Update, Windows Defender, Office 365, Azure AD / Identity,
 #         SharePoint Online, Teams, OneDrive (via officeapps), Azure platform,
@@ -424,10 +395,10 @@ resource "aws_networkfirewall_firewall_policy" "workspaces_web_allowlist" {
   firewall_policy {
     stateless_default_actions          = ["aws:forward_to_sfe"]
     stateless_fragment_default_actions = ["aws:forward_to_sfe"]
-    stateful_default_actions           = ["aws:alert_strict", "aws:drop_established"] 
+    # stateful_default_actions           = ["aws:alert_strict", "aws:drop_established"] 
 
     stateful_engine_options {
-      rule_order = "STRICT_ORDER"
+      rule_order = "DEFAULT_ACTION_ORDER"
     }
 
     stateful_rule_group_reference {
@@ -448,11 +419,6 @@ resource "aws_networkfirewall_firewall_policy" "workspaces_web_allowlist" {
     stateful_rule_group_reference {
       priority     = 4
       resource_arn = aws_networkfirewall_rule_group.workspaces_certificate_authorities.arn
-    }
-
-    stateful_rule_group_reference {
-      priority     = 5
-      resource_arn = aws_networkfirewall_rule_group.allow_alb_https.arn
     }
 
   }
