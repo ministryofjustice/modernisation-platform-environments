@@ -9,11 +9,12 @@
 #
 # {
 #   "HOST": "sftp.example.com",
-#   "PORT": "22",
 #   "USER": "username",
 #   "PASSWORD": "password",
-#   "REMOTEPATH": "/upload/"
+#   "SLACK_WEBHOOK": "https://hooks.slack.com/services/..."
 # }
+#
+# PORT and REMOTEPATH are configured as Lambda environment variables, not in the secret.
 
 resource "aws_secretsmanager_secret" "ftp_jobs_secret" {
   #checkov:skip=CKV2_AWS_57:"This will be fixed at a later date"
@@ -24,20 +25,13 @@ resource "aws_secretsmanager_secret" "ftp_jobs_secret" {
 resource "aws_secretsmanager_secret_version" "ftp_jobs_secret_values" {
   secret_id = aws_secretsmanager_secret.ftp_jobs_secret.id
   secret_string = jsonencode({
-    HOST       = "",
-    PORT       = "",
-    USER       = "",
-    PASSWORD   = "",
-    REMOTEPATH = ""
+    HOST         = "",
+    USER         = "",
+    PASSWORD     = "",
+    SLACK_WEBHOOK = ""
   })
   lifecycle {
     # Prevent Terraform from overwriting secret values that are managed manually in the AWS console.
     ignore_changes = [secret_string]
   }
-}
-
-data "aws_secretsmanager_secret_version" "ftp_jobs_secret_version" {
-  count      = local.build_ftp ? 1 : 0
-  secret_id  = aws_secretsmanager_secret.ftp_jobs_secret.id
-  depends_on = [aws_secretsmanager_secret_version.ftp_jobs_secret_values]
 }
