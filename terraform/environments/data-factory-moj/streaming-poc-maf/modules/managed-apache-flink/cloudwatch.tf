@@ -1,6 +1,7 @@
 resource "aws_cloudwatch_log_group" "flink_log_group" {
   name              = "/aws/kinesis-analytics/${lower(var.config_property_group.app_name)}-flink-streaming-application"
   retention_in_days = var.config_property_group.log_retention_days
+  kms_key_id        = var.cloudwatch_kms_key_arn
   tags              = var.tags
 }
 

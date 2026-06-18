@@ -43,6 +43,12 @@ variable "s3_kms_key_arn" {
   default     = null
 }
 
+variable "cloudwatch_kms_key_arn" {
+  description = "ARN of the KMS key used to encrypt CloudWatch log groups."
+  type        = string
+  default     = null
+}
+
 variable "s3_source_key" {
   description = "S3 object key for the Flink application JAR."
   type        = string

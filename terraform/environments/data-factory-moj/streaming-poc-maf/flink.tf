@@ -7,10 +7,11 @@ module "flink_geofence" {
 
   depends_on = [module.flink_artifacts_bucket]
 
-  private_subnets  = data.aws_subnets.shared-private.ids
-  s3_source_bucket = module.flink_artifacts_bucket.s3_bucket_id
-  s3_source_key    = local.geofence_app.jar_filename
-  s3_kms_key_arn   = aws_kms_key.s3[0].arn
+  private_subnets        = data.aws_subnets.shared-private.ids
+  s3_source_bucket       = module.flink_artifacts_bucket.s3_bucket_id
+  s3_source_key          = local.geofence_app.jar_filename
+  s3_kms_key_arn         = aws_kms_key.s3[0].arn
+  cloudwatch_kms_key_arn = aws_kms_key.cloudwatch[0].arn
 
   vpc_security_groups = [
     aws_security_group.allow_s3[0].id,
