@@ -333,6 +333,6 @@ resource "aws_route" "nat_to_firewall_b" {
 
   route_table_id      = aws_route_table.public_b[0].id
   destination_cidr_block = "0.0.0.0/0"
-  vpc_endpoint_id        = local.firewall_endpoints["eu-west-2b"]
+  vpc_endpoint_id        = local.firewall_endpoints["eu-west-2a"]
 
 }

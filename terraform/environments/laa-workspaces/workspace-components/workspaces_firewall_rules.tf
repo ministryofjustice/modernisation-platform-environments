@@ -107,6 +107,7 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
           # Microsoft (broad — mirrors original list; covers all *.microsoft.com at any depth)
           ".microsoft.com",
           "c.s-microsoft.com", # root is s-microsoft.com, NOT covered by .microsoft.com
+          ".microsoft365.com",
 
           # Azure / Windows platform
           ".windows.net", # covers all *.windows.net subdomains
