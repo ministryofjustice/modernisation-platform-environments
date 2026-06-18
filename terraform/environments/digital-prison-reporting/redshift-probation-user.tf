@@ -48,243 +48,48 @@ resource "aws_secretsmanager_secret_version" "redshift_probation_user" {
 
 # Create Database User using Redshift Data API
 
-
-# Create generic stored procedure to safely create any user (idempotent and reusable)
-resource "aws_redshiftdata_statement" "create_user_procedure" {
+# Stored procedure to create user and grant all permissions (idempotent)
+resource "aws_redshiftdata_statement" "setup_probation_user" {
   cluster_identifier = module.datamart.cluster_identifier
   database           = "datamart"
   db_user            = "dpruser"
-  statement_name     = "create-user-procedure-${local.environment}"
+  statement_name     = "setup-probation-user-${local.environment}"
 
   sql = <<-SQL
-    CREATE OR REPLACE PROCEDURE create_user(
-      user_name VARCHAR(128),
-      user_pwd VARCHAR(256)
-    )
-    LANGUAGE plpgsql
-    AS $$
+    DO $$
     BEGIN
-      -- Check if user already exists
-      IF NOT EXISTS (SELECT 1 FROM pg_user WHERE usename = user_name) THEN
-        -- Create user only if it doesn't exist
-        EXECUTE 'CREATE USER ' || user_name || ' WITH PASSWORD ''' || user_pwd || '''';
-        RAISE INFO 'User % created successfully', user_name;
+      -- Create user if it doesn't exist
+      IF NOT EXISTS (SELECT 1 FROM pg_user WHERE usename = 'probation_mi_app') THEN
+        CREATE USER probation_mi_app WITH PASSWORD '${random_password.redshift_probation_password.result}';
+        RAISE INFO 'User probation_mi_app created successfully';
       ELSE
-        RAISE INFO 'User % already exists, skipping creation', user_name;
+        RAISE INFO 'User probation_mi_app already exists, skipping creation';
       END IF;
-    END;
+
+      -- Public Schema - Read-only access
+      GRANT USAGE ON SCHEMA public TO probation_mi_app;
+      GRANT SELECT ON ALL TABLES IN SCHEMA public TO probation_mi_app;
+      ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO probation_mi_app;
+
+      -- Reports Schema - CREATE and full DML access
+      GRANT USAGE, CREATE ON SCHEMA reports TO probation_mi_app;
+      GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA reports TO probation_mi_app;
+      ALTER DEFAULT PRIVILEGES IN SCHEMA reports GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO probation_mi_app;
+
+      -- Admin Schema - INSERT and SELECT access
+      GRANT USAGE ON SCHEMA admin TO probation_mi_app;
+      GRANT SELECT, INSERT ON ALL TABLES IN SCHEMA admin TO probation_mi_app;
+      ALTER DEFAULT PRIVILEGES IN SCHEMA admin GRANT SELECT, INSERT ON TABLES TO probation_mi_app;
+
+      -- Product_ Schema - Full DML access
+      GRANT USAGE ON SCHEMA product_ TO probation_mi_app;
+      GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA product_ TO probation_mi_app;
+      ALTER DEFAULT PRIVILEGES IN SCHEMA product_ GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO probation_mi_app;
+
+      RAISE INFO 'All permissions granted successfully to probation_mi_app';
+    END
     $$;
   SQL
-}
-
-# Call the stored procedure to create the probation user
-resource "aws_redshiftdata_statement" "create_probation_user" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "call-create-probation-user-${local.environment}"
-
-  sql = "CALL create_user('probation_mi_app', '${random_password.redshift_probation_password.result}');"
-
-  depends_on = [aws_redshiftdata_statement.create_user_procedure]
-}
-
-# Public Schema - Read-only access
-
-resource "aws_redshiftdata_statement" "grant_probation_usage_public" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-usage-public-${local.environment}"
-  sql                = "GRANT USAGE ON SCHEMA public TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.create_probation_user]
-}
-
-resource "aws_redshiftdata_statement" "grant_probation_select_public" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-select-public-${local.environment}"
-  sql                = "GRANT SELECT ON ALL TABLES IN SCHEMA public TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.grant_probation_usage_public]
-}
-
-resource "aws_redshiftdata_statement" "grant_probation_future_select_public" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-future-public-${local.environment}"
-  sql                = "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.grant_probation_select_public]
-}
-
-# Reports Schema - CREATE and SELECT only
-
-resource "aws_redshiftdata_statement" "grant_probation_usage_reports" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-usage-reports-${local.environment}"
-  sql                = "GRANT USAGE ON SCHEMA reports TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.create_probation_user]
-}
-
-resource "aws_redshiftdata_statement" "grant_probation_create_reports" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-create-reports-${local.environment}"
-  sql                = "GRANT CREATE ON SCHEMA reports TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.grant_probation_usage_reports]
-}
-
-resource "aws_redshiftdata_statement" "grant_probation_select_reports" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-select-reports-${local.environment}"
-  sql                = "GRANT SELECT ON ALL TABLES IN SCHEMA reports TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.grant_probation_create_reports]
-}
-
-resource "aws_redshiftdata_statement" "grant_probation_future_select_reports" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-future-select-reports-${local.environment}"
-  sql                = "ALTER DEFAULT PRIVILEGES IN SCHEMA reports GRANT SELECT ON TABLES TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.grant_probation_select_reports]
-}
-
-# Admin Schema - INSERT and SELECT only
-
-resource "aws_redshiftdata_statement" "grant_probation_usage_admin" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-usage-admin-${local.environment}"
-  sql                = "GRANT USAGE ON SCHEMA admin TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.create_probation_user]
-}
-
-resource "aws_redshiftdata_statement" "grant_probation_insert_admin" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-insert-admin-${local.environment}"
-  sql                = "GRANT INSERT ON ALL TABLES IN SCHEMA admin TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.grant_probation_usage_admin]
-}
-
-resource "aws_redshiftdata_statement" "grant_probation_select_admin" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-select-admin-${local.environment}"
-  sql                = "GRANT SELECT ON ALL TABLES IN SCHEMA admin TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.grant_probation_insert_admin]
-}
-
-resource "aws_redshiftdata_statement" "grant_probation_future_insert_admin" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-future-insert-admin-${local.environment}"
-  sql                = "ALTER DEFAULT PRIVILEGES IN SCHEMA admin GRANT INSERT ON TABLES TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.grant_probation_select_admin]
-}
-
-resource "aws_redshiftdata_statement" "grant_probation_future_select_admin" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-future-select-admin-${local.environment}"
-  sql                = "ALTER DEFAULT PRIVILEGES IN SCHEMA admin GRANT SELECT ON TABLES TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.grant_probation_future_insert_admin]
-}
-
-
-# Product_ Schema - INSERT, UPDATE, DELETE, and SELECT
-
-resource "aws_redshiftdata_statement" "grant_probation_usage_product" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-usage-product-${local.environment}"
-  sql                = "GRANT USAGE ON SCHEMA product_ TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.create_probation_user]
-}
-
-resource "aws_redshiftdata_statement" "grant_probation_insert_product" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-insert-product-${local.environment}"
-  sql                = "GRANT INSERT ON ALL TABLES IN SCHEMA product_ TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.grant_probation_usage_product]
-}
-
-resource "aws_redshiftdata_statement" "grant_probation_update_product" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-update-product-${local.environment}"
-  sql                = "GRANT UPDATE ON ALL TABLES IN SCHEMA product_ TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.grant_probation_insert_product]
-}
-
-resource "aws_redshiftdata_statement" "grant_probation_delete_product" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-delete-product-${local.environment}"
-  sql                = "GRANT DELETE ON ALL TABLES IN SCHEMA product_ TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.grant_probation_update_product]
-}
-
-resource "aws_redshiftdata_statement" "grant_probation_select_product" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-select-product-${local.environment}"
-  sql                = "GRANT SELECT ON ALL TABLES IN SCHEMA product_ TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.grant_probation_delete_product]
-}
-
-resource "aws_redshiftdata_statement" "grant_probation_future_insert_product" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-future-insert-product-${local.environment}"
-  sql                = "ALTER DEFAULT PRIVILEGES IN SCHEMA product_ GRANT INSERT ON TABLES TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.grant_probation_select_product]
-}
-
-resource "aws_redshiftdata_statement" "grant_probation_future_update_product" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-future-update-product-${local.environment}"
-  sql                = "ALTER DEFAULT PRIVILEGES IN SCHEMA product_ GRANT UPDATE ON TABLES TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.grant_probation_future_insert_product]
-}
-
-resource "aws_redshiftdata_statement" "grant_probation_future_delete_product" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-future-delete-product-${local.environment}"
-  sql                = "ALTER DEFAULT PRIVILEGES IN SCHEMA product_ GRANT DELETE ON TABLES TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.grant_probation_future_update_product]
-}
-
-resource "aws_redshiftdata_statement" "grant_probation_future_select_product" {
-  cluster_identifier = module.datamart.cluster_identifier
-  database           = "datamart"
-  db_user            = "dpruser"
-  statement_name     = "grant-probation-future-select-product-${local.environment}"
-  sql                = "ALTER DEFAULT PRIVILEGES IN SCHEMA product_ GRANT SELECT ON TABLES TO probation_mi_app;"
-  depends_on         = [aws_redshiftdata_statement.grant_probation_future_delete_product]
 }
 
 # Outputs for reference
