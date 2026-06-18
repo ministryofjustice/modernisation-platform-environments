@@ -200,4 +200,4 @@ curl -X POST "https://<api-endpoint>/transfer-tickets" \
 
 ## OpenAPI
 
-The API contract is documented in [`openapi.yaml`](</Users/harsh.vasudev/IdeaProjects/modernisation-platform-environments/terraform/environments/integration-hub/api-platform/openapi.yaml>).
+The API contract is documented in [`openapi.yaml`](openapi.yaml).
