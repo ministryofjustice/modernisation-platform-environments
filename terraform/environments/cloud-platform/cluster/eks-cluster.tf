@@ -29,7 +29,9 @@ module "eks" {
   cloudwatch_log_group_retention_in_days = 30
   addons = {
     aws-guardduty-agent = {
-    }
+    },
+    coredns = {
+    },
   }
 
   authentication_mode = "API_AND_CONFIG_MAP"
