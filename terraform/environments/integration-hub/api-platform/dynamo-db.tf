@@ -144,8 +144,8 @@ resource "aws_dynamodb_table_item" "auth_user_principal" {
     role_name = {
       S = each.value.role_name
     }
-    secret_arn = {
-      S = module.api_user_credentials_secret[each.key].secret_arn
+    secret_name = {
+      S = module.api_user_credentials_secret[each.key].secret_name
     }
   })
 }
@@ -172,8 +172,8 @@ resource "aws_dynamodb_table_item" "auth_system_principal" {
     role_name = {
       S = each.value.role_name
     }
-    secret_arn = {
-      S = module.api_system_bearer_token_secret[each.key].secret_arn
+    secret_name = {
+      S = module.api_system_bearer_token_secret[each.key].secret_name
     }
   })
 }

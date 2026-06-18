@@ -36,9 +36,9 @@ def _get_role(role_name):
     return table.get_item(Key={"role_name": role_name}).get("Item")
 
 
-def _load_secret_json(secret_arn):
+def _load_secret_json(secret_id):
     try:
-        response = SECRETS_MANAGER.get_secret_value(SecretId=secret_arn)
+        response = SECRETS_MANAGER.get_secret_value(SecretId=secret_id)
         secret_string = response.get("SecretString") or ""
         return json.loads(secret_string) if secret_string else {}
     except Exception:
@@ -54,7 +54,7 @@ def _authenticate_basic(token):
     if principal is None or not principal.get("enabled", True):
         return None
 
-    secret = _load_secret_json(principal.get("secret_arn", ""))
+    secret = _load_secret_json(principal.get("secret_name", ""))
     expected_password = secret.get("password")
     if not expected_password or expected_password == "replace-me" or not hmac.compare_digest(password, str(expected_password)):
         return None
@@ -71,7 +71,7 @@ def _authenticate_bearer(token):
     if principal is None or not principal.get("enabled", True):
         return None
 
-    secret = _load_secret_json(principal.get("secret_arn", ""))
+    secret = _load_secret_json(principal.get("secret_name", ""))
     expected_token = secret.get("bearerToken")
     if not expected_token or expected_token == "replace-me" or not hmac.compare_digest(str(expected_token), token_secret):
         return None

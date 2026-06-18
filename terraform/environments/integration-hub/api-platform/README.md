@@ -113,7 +113,7 @@ terraform output user_auth_secret_names
 terraform output system_auth_secret_names
 ```
 
-Terraform creates the secret containers, but the live secret values are managed operationally in AWS Secrets Manager and ignored by Terraform after creation.
+Terraform creates the secret containers, but the live secret values are managed operationally in AWS Secrets Manager and ignored by Terraform after creation. The authorizer resolves the current secret value from Secrets Manager at request time using the stored secret name.
 
 For repeatable credential bootstrapping outside Terraform state, use:
 
