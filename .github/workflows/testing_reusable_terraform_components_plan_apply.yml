@@ -125,7 +125,7 @@ jobs:
         run: |
           terraform --version
           echo "terraform init"
-          MODERNISATION_PLATFORM_ACCOUNT_ID="${BACKEND_NUMBER}" bash "${GITHUB_WORKSPACE}/scripts/terraform-init.sh" "$PWD"
+          terraform init
 
       #
       # Terraform Workspace Select
@@ -334,7 +334,7 @@ jobs:
         run: |
           terraform --version
           echo "terraform init"
-          MODERNISATION_PLATFORM_ACCOUNT_ID="${BACKEND_NUMBER}" bash "${GITHUB_WORKSPACE}/scripts/terraform-init.sh" "$PWD"
+          terraform init
 
       - name: Terraform Workspace Select
         working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
