@@ -1,6 +1,5 @@
 locals {
   definitions_bucket_name = "${local.project}-data-product-definitions-${local.env}"
-  # DPD publishing teams
   dpd_publishing_teams = {
     activities = {
       github_repo      = "hmpps-dpr-activities-dpds"
@@ -9,7 +8,6 @@ locals {
   }
 }
 
-# S3 Data Product Definitions Bucket
 module "s3_data_product_definitions_bucket" {
   source                    = "./modules/s3_bucket"
   create_s3                 = local.setup_buckets
