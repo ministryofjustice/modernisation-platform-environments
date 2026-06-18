@@ -3,6 +3,12 @@ resource "aws_kinesisanalyticsv2_application" "managed_apache_flink_application"
   runtime_environment    = var.config_property_group.runtime_environment
   service_execution_role = aws_iam_role.managed_apache_flink_application.arn
 
+  depends_on = [
+    aws_iam_role_policy_attachment.managed_apache_flink_application,
+    aws_iam_role_policy_attachment.managed_apache_flink_application_amazonvpcfullaccess,
+    aws_iam_role_policy_attachment.managed_apache_flink_application_cloudwatchfullaccess
+  ]
+
   cloudwatch_logging_options {
     log_stream_arn = aws_cloudwatch_log_stream.flink_log_stream.arn
   }
