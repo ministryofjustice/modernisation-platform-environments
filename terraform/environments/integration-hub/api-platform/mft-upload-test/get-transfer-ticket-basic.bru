@@ -1,21 +1,22 @@
 meta {
-  name: Get Transfer Ticket (Bearer)
+  name: Get Transfer Ticket (Basic)
   type: http
-  seq: 1
+  seq: 3
 }
 
 post {
   url: {{api_endpoint}}/transfer-tickets
   body: json
-  auth: bearer
+  auth: basic
 }
 
 headers {
   Content-Type: application/json
 }
 
-auth:bearer {
-  token: {{bearer_token}}
+auth:basic {
+  username: {{api_username}}
+  password: {{api_password}}
 }
 
 body:json {
@@ -31,7 +32,7 @@ body:json {
 
 script:post-response {
   const ticket = res.getBody();
-  
+
   bru.setVar("upload_url", ticket["upload"]["url"]);
   bru.setVar("sse", ticket["upload"]["headers"]["x-amz-server-side-encryption"]);
   bru.setVar("kms_key", ticket["upload"]["headers"]["x-amz-server-side-encryption-aws-kms-key-id"]);

@@ -54,3 +54,70 @@ module "lambda_upload_ticket" {
 
   tags = local.tags
 }
+
+module "lambda_api_authorizer" {
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "8.8.0"
+
+  function_name                = "${local.application_name}-${local.component_name}-authorizer"
+  description                  = "Authenticates and authorises MFT API callers"
+  handler                      = "lambda_function.lambda_handler"
+  runtime                      = "python3.12"
+  source_path                  = "${path.module}/lambda/request-authorizer"
+  trigger_on_package_timestamp = false
+
+  environment_variables = {
+    AUTH_PRINCIPALS_TABLE = module.dynamodb_auth_principals.dynamodb_table_id
+    AUTH_ROLES_TABLE      = module.dynamodb_auth_roles.dynamodb_table_id
+  }
+
+  attach_policy_statements = true
+  policy_statements = merge(
+    {
+      auth_principals_table_read = {
+        effect = "Allow"
+        actions = [
+          "dynamodb:GetItem",
+        ]
+        resources = [
+          module.dynamodb_auth_principals.dynamodb_table_arn,
+        ]
+      }
+      auth_roles_table_read = {
+        effect = "Allow"
+        actions = [
+          "dynamodb:GetItem",
+        ]
+        resources = [
+          module.dynamodb_auth_roles.dynamodb_table_arn,
+        ]
+      }
+    },
+    length(local.auth_users) > 0 ? {
+      auth_user_secret_read = {
+        effect = "Allow"
+        actions = [
+          "secretsmanager:GetSecretValue",
+        ]
+        resources = [
+          for secret in values(module.api_user_credentials_secret) : secret.secret_arn
+        ]
+      }
+    } : {},
+    length(local.auth_system_principals) > 0 ? {
+      auth_system_secret_read = {
+        effect = "Allow"
+        actions = [
+          "secretsmanager:GetSecretValue",
+        ]
+        resources = [
+          for secret in values(module.api_system_bearer_token_secret) : secret.secret_arn
+        ]
+      }
+    } : {}
+  )
+
+  cloudwatch_logs_retention_in_days = 30
+
+  tags = local.tags
+}

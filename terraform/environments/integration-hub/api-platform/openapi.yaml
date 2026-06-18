@@ -1,0 +1,167 @@
+openapi: 3.0.3
+info:
+  title: Integration Hub Managed File Transfer API
+  version: 1.0.0
+  description: |
+    Thin API layer for Managed File Transfer uploads.
+
+    The API supports:
+    - Basic authentication for user-driven HTTPS upload flows
+    - Bearer token authentication for system-to-system integrations
+
+    Authorisation is role-based. Each authenticated principal is mapped to one
+    or more permitted `clientId` values.
+servers:
+  - url: https://{apiHost}
+    variables:
+      apiHost:
+        default: example.execute-api.eu-west-2.amazonaws.com
+security:
+  - basicAuth: []
+  - bearerAuth: []
+paths:
+  /transfer-tickets:
+    post:
+      summary: Create an upload transfer ticket
+      description: |
+        Issues a short-lived pre-signed S3 PUT URL for an authorised transfer client.
+
+        For Basic authentication, provide the configured username and password.
+
+        For Bearer authentication, provide a token in the form:
+        `<tokenId>.<bearerToken>`
+      operationId: createTransferTicket
+      security:
+        - basicAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferTicketRequest'
+            examples:
+              csvUpload:
+                value:
+                  clientId: products-poc
+                  fileName: example-upload.csv
+                  contentType: text/csv
+                  sizeBytes: 12345
+                  requestedExpirySeconds: 900
+                  contentMd5: CY9rzUYh03PK3k6DJie09g==
+      responses:
+        '200':
+          description: Transfer ticket created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferTicketResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication failed
+        '403':
+          description: Authenticated caller is not authorised for the requested client
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Unknown transfer client
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Basic auth using a Secrets Manager-managed username/password.
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque token in the form tokenId.bearerToken
+      description: Bearer token using a Secrets Manager-managed token pair.
+  schemas:
+    TransferTicketRequest:
+      type: object
+      required:
+        - clientId
+        - fileName
+      properties:
+        clientId:
+          type: string
+          example: products-poc
+        fileName:
+          type: string
+          example: example-upload.csv
+        contentType:
+          type: string
+          example: text/csv
+        sizeBytes:
+          type: integer
+          format: int64
+          example: 12345
+        requestedExpirySeconds:
+          type: integer
+          example: 900
+        contentMd5:
+          type: string
+          description: Base64-encoded MD5 digest of the upload content
+          example: CY9rzUYh03PK3k6DJie09g==
+    TransferTicketResponse:
+      type: object
+      required:
+        - transferTicket
+        - clientId
+        - upload
+        - object
+      properties:
+        transferTicket:
+          type: string
+          format: uuid
+        clientId:
+          type: string
+        upload:
+          type: object
+          required:
+            - method
+            - url
+            - headers
+            - expiresInSeconds
+          properties:
+            method:
+              type: string
+              example: PUT
+            url:
+              type: string
+              format: uri
+            headers:
+              type: object
+              additionalProperties:
+                type: string
+            expiresInSeconds:
+              type: integer
+              example: 900
+        object:
+          type: object
+          required:
+            - bucket
+            - key
+          properties:
+            bucket:
+              type: string
+            key:
+              type: string
+    ErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
