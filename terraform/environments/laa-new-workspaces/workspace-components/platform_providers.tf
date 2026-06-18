@@ -26,18 +26,13 @@ provider "aws" {
   default_tags { tags = local.tags }
 }
 
-# AWS provider for core-vpc-<environment>, to access resources in the core-vpc accounts
-# NOTE: For laa-new-workspaces, this points back to the workspaces account itself
-# (not to a core-vpc account) since this environment uses its own isolated VPC
+# AWS provider for core-vpc-<environment>, to access Route53 zones in core-vpc accounts
+# Uses read-only for local runs, write-enabled delegation role for CI/CD
 provider "aws" {
   alias  = "core-vpc"
   region = "eu-west-2"
-  dynamic "assume_role" {
-    # Only assume role for user sessions, not for GitHub Actions
-    for_each = can(regex("user", data.aws_caller_identity.original_session.arn)) ? [1] : []
-    content {
-      role_arn = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}"
-    }
+  assume_role {
+    role_arn = !can(regex("githubactionsrolesession|AdministratorAccess", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/member-delegation-read-only" : "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/member-delegation-${local.vpc_name}-${local.environment}"
   }
   default_tags { tags = local.tags }
 }
