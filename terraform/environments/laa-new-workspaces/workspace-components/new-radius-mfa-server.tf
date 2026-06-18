@@ -198,14 +198,16 @@ resource "aws_instance" "radius_server" {
   iam_instance_profile   = aws_iam_instance_profile.radius_server.name
 
   # LinOTP + FreeRADIUS installation script
-  user_data = templatefile("${path.module}/userdata/install-linotp-freeradius.sh", {
+  user_data = base64gzip(templatefile("${path.module}/userdata/install-linotp-freeradius.sh", {
     region                    = "eu-west-2"
     radius_secret_arn         = aws_secretsmanager_secret.radius_shared_secret.arn
     linotp_admin_password_arn = aws_secretsmanager_secret.linotp_admin_password.arn
     mariadb_root_password_arn = aws_secretsmanager_secret.mariadb_root_password.arn
     environment               = local.environment
     vpc_cidr                  = aws_vpc.workspaces.cidr_block
-  })
+  }))
+
+  user_data_replace_on_change = true
 
   root_block_device {
     volume_type           = "gp3"
