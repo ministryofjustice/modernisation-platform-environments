@@ -114,7 +114,7 @@ resource "aws_ecs_cluster" "maat_ecs_cluster" {
   )
 }
 
-# remove after migration
+# TODO LASB-5089 Remove
 data "aws_ssm_parameter" "ecs_optimized_ami_al2" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
 }
@@ -124,14 +124,14 @@ data "aws_ssm_parameter" "ecs_optimized_ami_al2023" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended"
 }
 
-# update to reference AL2023 ID after migration
+# TODO LASB-5089 Update to reference AL2023 ID
 # if the AMI is used elsewhere it can be obtained here
 output "ami_id" {
   value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2.value)["image_id"]
   sensitive = true
 }
 
-# move to ami_id after migration
+# TODO LASB-5089 move to ami_id
 output "ami_id_al2023" {
   value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2023.value)["image_id"]
   sensitive = true
@@ -139,7 +139,7 @@ output "ami_id_al2023" {
 
 ##### EC2 launch config/template -----
 
-# remove after migration
+# TODO LASB-5089 Remove
 resource "aws_launch_template" "maat_ec2_launch_template" {
   #checkov:skip=AVD-AWS-0130: "Ignore - Launch template does not require IMDS access to require a token"
   name_prefix   = "${local.application_name}-ec2-launch-template"
@@ -253,13 +253,13 @@ resource "aws_launch_template" "maat_ec2_launch_template_al2023" {
 
 #### EC2 Scaling Group  -----
 
-# remove after migration
+# TODO LASB-5089 Remove
 resource "aws_autoscaling_group" "maat_ec2_scaling_group" {
   vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
   name                = "${local.application_name}-EC2-asg"
-  desired_capacity    = local.application_data.accounts[local.environment].maat_ec2_asg_desired_capacity
+  desired_capacity    = 0
   max_size            = local.application_data.accounts[local.environment].maat_ec2_asg_max_size
-  min_size            = local.application_data.accounts[local.environment].maat_ec2_asg_min_size
+  min_size            = 0
   metrics_granularity = "1Minute"
 
 
@@ -284,9 +284,9 @@ resource "aws_autoscaling_group" "maat_ec2_scaling_group_al2023" {
   name_prefix         = "${local.application_name}-ec2-al2023-"
   # New ASG, set capacity to 0 - will be scaled manually during migration.
   # Follow-up Terraform PR will update to desired final capacity.
-  desired_capacity    = 0
+  desired_capacity    = local.application_data.accounts[local.environment].maat_ec2_asg_desired_capacity
   max_size            = local.application_data.accounts[local.environment].maat_ec2_asg_max_size
-  min_size            = 0
+  min_size            = local.application_data.accounts[local.environment].maat_ec2_asg_min_size
   metrics_granularity = "1Minute"
 
 
