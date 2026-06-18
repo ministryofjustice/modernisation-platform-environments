@@ -21,7 +21,7 @@ on:
         description: 'Set either [deploy|destroy].'
         default: 'deploy'
         required: true
-        type: string
+        type: choice
         options:
           - deploy
           - destroy
