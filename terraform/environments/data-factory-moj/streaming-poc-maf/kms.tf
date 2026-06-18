@@ -37,7 +37,7 @@ resource "aws_kms_key" "s3" {
   deletion_window_in_days = 7
   enable_key_rotation     = true
   policy                  = data.aws_iam_policy_document.s3_kms.json
-  tags                    = local.tags
+  tags                    = local.extended_tags
 }
 
 resource "aws_kms_alias" "s3" {

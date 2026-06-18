@@ -102,4 +102,6 @@ module "flink_geofence" {
       }
     ]
   }
+
+  tags = local.extended_tags
 }

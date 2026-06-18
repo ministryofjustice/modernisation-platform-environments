@@ -1,6 +1,7 @@
 resource "aws_cloudwatch_log_group" "flink_log_group" {
   name              = "/aws/kinesis-analytics/${lower(var.config_property_group.app_name)}-flink-streaming-application"
   retention_in_days = var.config_property_group.log_retention_days
+  tags              = var.tags
 }
 
 resource "aws_cloudwatch_log_stream" "flink_log_stream" {
@@ -22,6 +23,7 @@ resource "aws_cloudwatch_metric_alarm" "application_failed" {
   treat_missing_data  = "notBreaching"
   alarm_actions       = var.alarm_actions
   ok_actions          = var.ok_actions
+  tags                = var.tags
 
   dimensions = {
     Application = lower(var.config_property_group.app_name)
@@ -43,6 +45,7 @@ resource "aws_cloudwatch_metric_alarm" "full_restarts" {
   treat_missing_data  = "notBreaching"
   alarm_actions       = var.alarm_actions
   ok_actions          = var.ok_actions
+  tags                = var.tags
 
   dimensions = {
     Application = lower(var.config_property_group.app_name)

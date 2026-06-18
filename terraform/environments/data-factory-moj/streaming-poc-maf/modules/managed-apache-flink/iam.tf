@@ -46,11 +46,13 @@ data "aws_iam_policy_document" "managed_apache_flink_application_assume_role_pol
 resource "aws_iam_policy" "managed_apache_flink_application" {
   name   = "${lower(var.config_property_group.app_name)}-flink-iam-policy"
   policy = data.aws_iam_policy_document.managed_apache_flink.json
+  tags   = var.tags
 }
 
 resource "aws_iam_role" "managed_apache_flink_application" {
   name               = "${lower(var.config_property_group.app_name)}-flink-iam-role"
   assume_role_policy = data.aws_iam_policy_document.managed_apache_flink_application_assume_role_policy.json
+  tags               = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "managed_apache_flink_application" {

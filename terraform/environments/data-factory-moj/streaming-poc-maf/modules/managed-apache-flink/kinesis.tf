@@ -67,4 +67,5 @@ resource "aws_kinesisanalyticsv2_application" "managed_apache_flink_application"
       }
     }
   }
+  tags = var.tags
 }

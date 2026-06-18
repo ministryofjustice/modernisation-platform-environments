@@ -94,3 +94,9 @@ variable "full_restarts_period" {
   type        = number
   default     = 300
 }
+
+variable "tags" {
+  description = "A map of tags to apply to all resources."
+  type        = map(string)
+  default     = {}
+}
