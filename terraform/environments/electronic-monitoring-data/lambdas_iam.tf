@@ -2741,3 +2741,36 @@ module "share_dbs_with_control_lambda_role" {
   db_exists               = true
   de_role_arn             = null
 }
+
+# ---------------------------------
+# GDPR Batch Job Evaluator lambda
+# ---------------------------------
+
+data "aws_iam_policy_document" "gdpr_evaluate_batch_results_policy_document" {
+  count = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+
+  statement {
+    effect = "Allow"
+    actions = ["sns:Publish"]
+    resources = [aws_sns_topic.emds_alerts.arn]
+  }
+
+}
+
+resource "aws_iam_role" "gdpr_evaluate_batch_results_iam_role" {
+  count              = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  name               = "gdpr-evaluate-batch-results-iam-role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "gdpr_evaluate_batch_results_iam_policy" {
+  count  = local.is-test ? 0 : 1
+  name   = "gdpr_evaluate_batch_results_policy"
+  policy = data.aws_iam_policy_document.gdpr_evaluate_batch_results_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "gdpr_evaluate_batch_results_iam_role_attach" {
+  count      = local.is-test ? 0 : 1
+  role       = aws_iam_role.gdpr_evaluate_batch_results_iam_role[0].name
+  policy_arn = aws_iam_policy.gdpr_evaluate_batch_results_iam_policy[0].arn
+}

@@ -1066,3 +1066,25 @@ module "gdpr_unstructured_control_lambda" {
     ENVIRONMENT_NAME            = local.environment_shorthand
   }
 }
+
+#-----------------------------------------------------------------------------------
+# Evaluator Lambda for Batch Job Error handling
+#-----------------------------------------------------------------------------------
+
+module "gdpr_evaluate_batch_results" {
+  count                   = local.is-test ? 0 : 1
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "gdpr_evaluate_batch_results"
+  role_name               = aws_iam_role.gdpr_evaluate_batch_results_iam_role[0].name
+  role_arn                = aws_iam_role.gdpr_evaluate_batch_results_iam_role[0].arn
+  handler                 = "gdpr_evaluate_batch_results.handler"
+  memory_size             = 1024
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    SNS_TOPIC_ARN = aws_sns_topic.emds_alerts.arn
+  }
+}
