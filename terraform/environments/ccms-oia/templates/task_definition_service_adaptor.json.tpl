@@ -40,6 +40,10 @@
       {
         "name": "CCMS_REF-DATA-FILE",
         "value": "reference/opa_entities.csv"
+      },
+      {
+        "name": "LOGGING_LEVEL_UK_GOV_JUSTICE_LAA_CCMS",
+        "value": "${logging_level_uk_gov_justice_laa_ccms}"
       }
     ],
     "secrets": [
