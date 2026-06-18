@@ -80,14 +80,15 @@ def _authenticate_bearer(token):
 
 
 def _build_context(principal, role):
-    allowed_client_ids = role.get("allowed_client_ids", [])
+    allowed_client_ids = role.get("allowed_client_ids") or []
+    allowed_client_ids_csv = ",".join(str(value) for value in allowed_client_ids if value is not None)
     return {
         "isAuthorized": True,
         "context": {
             "principalId": principal["principal_id"],
             "roleName": principal["role_name"],
             "authType": principal["auth_type"],
-            "allowedClientIds": ",".join(allowed_client_ids),
+            "allowedClientIds": allowed_client_ids_csv,
         },
     }
 
