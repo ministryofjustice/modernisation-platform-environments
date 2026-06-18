@@ -10,7 +10,7 @@ module "r53_managed_file_transfer" {
   records = {
     sftp = {
       name    = "sftp"
-      type    = "CNAME"
+      type    = "A"
       ttl     = 300
       records = [for key, value in aws_eip.this : value.public_ip]
     }
