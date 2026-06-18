@@ -61,8 +61,6 @@ resource "aws_vpc_security_group_egress_rule" "msk_outbound_vpc" {
   security_group_id = aws_security_group.allow_msk[0].id
   description       = "Allow outbound within VPC only"
 
-  from_port   = 0
-  to_port     = 0
   ip_protocol = "-1"
   cidr_ipv4   = data.aws_vpc.shared.cidr_block
 
