@@ -71,9 +71,9 @@ def _authenticate_bearer(token):
     if principal is None or not principal.get("enabled", True):
         return None
 
-    secret = _load_secret_json(principal["secret_arn"])
+    secret = _load_secret_json(principal.get("secret_arn", ""))
     expected_token = secret.get("bearerToken")
-    if not expected_token or not hmac.compare_digest(str(expected_token), token_secret):
+    if not expected_token or expected_token == "replace-me" or not hmac.compare_digest(str(expected_token), token_secret):
         return None
 
     return principal
