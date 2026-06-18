@@ -54,6 +54,7 @@ resource "aws_networkfirewall_rule_group" "workspaces_aws_endpoints" {
           ".s3-${var.aws_region}.amazonaws.com",
           "sqs.${var.aws_region}.amazonaws.com",
           "cloudfront.amazonaws.com",
+          "workspace-mfa.laa-development.modernisation-platform.service.justice.gov.uk"
 
         ]
       }
