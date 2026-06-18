@@ -32,8 +32,12 @@ provider "aws" {
 provider "aws" {
   alias  = "core-vpc"
   region = "eu-west-2"
-  assume_role {
-    role_arn = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/MemberInfrastructureAccess"
+  dynamic "assume_role" {
+    # Only assume role for user sessions, not for GitHub Actions
+    for_each = can(regex("user", data.aws_caller_identity.original_session.arn)) ? [1] : []
+    content {
+      role_arn = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}"
+    }
   }
   default_tags { tags = local.tags }
 }
