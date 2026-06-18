@@ -37,9 +37,12 @@ def _get_role(role_name):
 
 
 def _load_secret_json(secret_arn):
-    secret_value = SECRETS_MANAGER.get_secret_value(SecretId=secret_arn)["SecretString"]
-    return json.loads(secret_value)
-
+    try:
+        response = SECRETS_MANAGER.get_secret_value(SecretId=secret_arn)
+        secret_string = response.get("SecretString") or ""
+        return json.loads(secret_string) if secret_string else {}
+    except Exception:
+        return {}
 
 def _authenticate_basic(token):
     try:
