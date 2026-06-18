@@ -242,6 +242,14 @@ resource "aws_route" "a_az" {
   vpc_endpoint_id           = local.firewall_endpoints["eu-west-2a"]
 }
 
+
+resource "aws_route" "b_az" {
+  count = local.environment == "development" ? 1 : 0
+  
+  route_table_id            = aws_route_table.edge[0].id
+  destination_cidr_block    = local.application_data.accounts[local.environment].public_subnet_b_cidr
+  vpc_endpoint_id           = local.firewall_endpoints["eu-west-2a"]
+}
 # resource "aws_route" "b_az" {
 #   count = local.environment == "development" ? 1 : 0
 
