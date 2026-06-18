@@ -54,7 +54,8 @@ resource "aws_networkfirewall_rule_group" "workspaces_aws_endpoints" {
           ".s3-${var.aws_region}.amazonaws.com",
           "sqs.${var.aws_region}.amazonaws.com",
           "cloudfront.amazonaws.com",
-          "workspace-mfa.laa-development.modernisation-platform.service.justice.gov.uk"
+          "workspace-mfa.laa-development.modernisation-platform.service.justice.gov.uk".
+          ".microsoft.com", # REMOVE ME THIS IS FOR TESTING
 
         ]
       }
@@ -453,17 +454,17 @@ resource "aws_networkfirewall_firewall_policy" "workspaces_web_allowlist_2" {
       resource_arn = aws_networkfirewall_rule_group.workspaces_aws_endpoints.arn
     }
 
-    stateful_rule_group_reference {
-      resource_arn = aws_networkfirewall_rule_group.workspaces_microsoft_services.arn
-    }
+    # stateful_rule_group_reference {
+    #   resource_arn = aws_networkfirewall_rule_group.workspaces_microsoft_services.arn
+    # }
 
-    stateful_rule_group_reference {
-      resource_arn = aws_networkfirewall_rule_group.workspaces_onedrive_live_misc.arn
-    }
+    # stateful_rule_group_reference {
+    #   resource_arn = aws_networkfirewall_rule_group.workspaces_onedrive_live_misc.arn
+    # }
 
-    stateful_rule_group_reference {
-      resource_arn = aws_networkfirewall_rule_group.workspaces_certificate_authorities.arn
-    }
+    # stateful_rule_group_reference {
+    #   resource_arn = aws_networkfirewall_rule_group.workspaces_certificate_authorities.arn
+    # }
 
   }
 
