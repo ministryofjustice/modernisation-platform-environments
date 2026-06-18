@@ -198,7 +198,7 @@ resource "aws_instance" "radius_server" {
   iam_instance_profile   = aws_iam_instance_profile.radius_server.name
 
   # LinOTP + FreeRADIUS installation script
-  user_data = base64gzip(templatefile("${path.module}/userdata/install-linotp-freeradius.sh", {
+  user_data_base64 = base64gzip(templatefile("${path.module}/userdata/install-linotp-freeradius.sh", {
     region                    = "eu-west-2"
     radius_secret_arn         = aws_secretsmanager_secret.radius_shared_secret.arn
     linotp_admin_password_arn = aws_secretsmanager_secret.linotp_admin_password.arn
