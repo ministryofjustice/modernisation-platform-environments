@@ -186,7 +186,9 @@ PY
 
 echo "Reading secret container metadata from Secrets Manager" >&2
 CURRENT_SECRET_JSON="$("${AWS_CMD[@]}" secretsmanager get-secret-value --secret-id "$SECRET_ID" --query SecretString --output text)"
-
+if [ "$CURRENT_SECRET_JSON" = "None" ] || [ "$CURRENT_SECRET_JSON" = "null" ]; then
+  CURRENT_SECRET_JSON=""
+fi
 if [ "$MODE" = "user" ]; then
   USERNAME="${USERNAME:-$(read_secret_field "$CURRENT_SECRET_JSON" "username")}"
   ROLE_NAME="${ROLE_NAME:-$(read_secret_field "$CURRENT_SECRET_JSON" "roleName")}"
