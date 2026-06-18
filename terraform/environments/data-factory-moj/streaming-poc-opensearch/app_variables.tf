@@ -14,8 +14,3 @@ variable "instance_count" {
   default = 2
 }
 
-variable "flowlog_retention_in_days" {
-  description = "Number of days to keep flowlogs"
-  type        = number
-  default     = 7
-}

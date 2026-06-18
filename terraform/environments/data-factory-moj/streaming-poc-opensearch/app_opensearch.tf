@@ -44,13 +44,29 @@ module "opensearch" {
   })
 }
 
-# resource "aws_iam_service_linked_role" "opensearch" {
-#   count            = contains(["development"], local.environment) ? 1 : 0
-#   aws_service_name = "opensearchservice.amazonaws.com"
-#   description      = "Service Linked Role for OpenSearch Service to manage resources for a domain."
+resource "aws_security_group" "opensearch" {
+  count       = contains(["development"], local.environment) ? 1 : 0
+  name_prefix = "${local.cluster_name}-sg"
+  description = "Security group for OpenSearch domain access"
+  vpc_id      = data.aws_vpc.shared.id
 
-#   tags = merge(local.extended_tags, {
-#     name        = "${local.cluster_name}-Service-Link-Role"
-#     description = "Service Linked Role for OpenSearch Service to manage resources for a domain."
-#   })
-# }
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = merge(local.extended_tags, {
+    name        = "{local.cluster_name}-sg",
+    description = "Security group for OpenSearch domain access"
+  })
+
+}
+
+resource "aws_vpc_security_group_ingress_rule" "opensearch_sg" {
+  for_each          = local.opensearch_sg_ingress_cidr
+  security_group_id = aws_security_group.opensearch[0].id
+  description       = "Allow inbound traffic from private subnet ${each.value}"
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp"
+  cidr_ipv4         = each.value
+}
