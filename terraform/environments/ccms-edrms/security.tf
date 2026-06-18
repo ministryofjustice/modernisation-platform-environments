@@ -24,11 +24,25 @@ resource "aws_security_group_rule" "alb_ingress_443" {
 resource "aws_security_group_rule" "alb_egress_all" {
   security_group_id = aws_security_group.load_balancer.id
   type              = "egress"
-  description       = "All"
-  protocol          = -1
-  from_port         = 0
-  to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Allow LB to reach EC2 cluster ephemeral ports"
+  protocol          = "TCP"
+  from_port         = 32768
+  to_port           = 61000
+  destination_security_group_id = aws_security_group.cluster_ec2.id
+}
+
+# VPC Endpoint security group lookup (used to restrict egress to VPC endpoints)
+data "aws_security_group" "vpce_security_group" {
+  provider = aws.core-vpc
+  filter {
+    name   = "tag:Name"
+    values = ["${var.networking[0].business-unit}-${local.environment}-int-endpoint"]
+  }
+
+}
+
+data "aws_prefix_list" "s3" {
+  name = "com.amazonaws.${data.aws_region.current.name}.s3"
 }
 
 
@@ -54,14 +68,38 @@ resource "aws_security_group_rule" "ecs_tasks_edrms" {
   source_security_group_id = aws_security_group.load_balancer.id
 }
 
-resource "aws_security_group_rule" "ecs_tasks_egress_all" {
+resource "aws_security_group_rule" "ecs_tasks_egress_s3" {
   security_group_id = aws_security_group.ecs_tasks_edrms.id
   type              = "egress"
-  description       = "All"
-  protocol          = -1
-  from_port         = 0
-  to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Allow S3 access via gateway endpoint (prefix list)"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  prefix_list_ids   = [data.aws_prefix_list.s3.id]
+}
+
+resource "aws_security_group_rule" "ecs_tasks_egress_db" {
+  security_group_id = aws_security_group.ecs_tasks_edrms.id
+  type              = "egress"
+  description       = "Allow outbound DB access to TDS"
+  protocol          = "TCP"
+  from_port         = 1521
+  to_port           = 1521
+  destination_security_group_id = aws_security_group.tds_db.id
+}
+
+resource "aws_security_group_rule" "ecs_tasks_egress_vpce" {
+  security_group_id = aws_security_group.ecs_tasks_edrms.id
+  type              = "egress"
+  description       = "Allow egress to VPC endpoints (S3 / Secrets Manager)"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  destination_security_group_id = data.aws_security_group.vpce_security_group.id
+
+  lifecycle {
+    ignore_changes = [destination_security_group_id]
+  }
 }
 
 
@@ -112,19 +150,33 @@ resource "aws_security_group_rule" "cluster_ec2_ingress_lb" {
   type                     = "ingress"
   description              = "Application Traffic"
   protocol                 = "TCP"
-  from_port                = 0
-  to_port                  = 65535
+  from_port                = 32768
+  to_port                  = 61000
   source_security_group_id = aws_security_group.load_balancer.id # Allow the LB to access the EC2 instances
 }
 
-resource "aws_security_group_rule" "cluster_ec2_egress_all" {
+resource "aws_security_group_rule" "cluster_ec2_egress_s3" {
   security_group_id = aws_security_group.cluster_ec2.id
   type              = "egress"
-  description       = "All Egress"
-  protocol          = -1
-  from_port         = 0
-  to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"] # Restrict to what's needed
+  description       = "Allow S3 access via gateway endpoint (prefix list)"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  prefix_list_ids   = [data.aws_prefix_list.s3.id]
+}
+
+resource "aws_security_group_rule" "cluster_ec2_egress_vpce" {
+  security_group_id = aws_security_group.cluster_ec2.id
+  type              = "egress"
+  description       = "Allow egress to VPC endpoints (logs/ecs/secrets)"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  destination_security_group_id = data.aws_security_group.vpce_security_group.id
+
+  lifecycle {
+    ignore_changes = [destination_security_group_id]
+  }
 }
 
 # RDS Security Group
@@ -153,12 +205,12 @@ resource "aws_vpc_security_group_ingress_rule" "tds_db_workspace_ingress" {
   cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
 }
 
-resource "aws_security_group_rule" "tds_db_egress_all" {
-  security_group_id = aws_security_group.tds_db.id
-  type              = "egress"
-  description       = "All Egress"
-  protocol          = -1
-  from_port         = 0
-  to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+#resource "aws_security_group_rule" "tds_db_egress_all" {
+#  security_group_id = aws_security_group.tds_db.id
+#  type              = "egress"
+#  description       = "Allow HTTPS outbound to VPC endpoints (temporary 0.0.0.0/0)"
+#  protocol          = "TCP"
+#  from_port         = 443
+#  to_port           = 443
+#  cidr_blocks       = ["0.0.0.0/0"]
+#}
