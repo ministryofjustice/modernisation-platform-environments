@@ -395,6 +395,50 @@ resource "aws_networkfirewall_firewall_policy" "workspaces_web_allowlist" {
   firewall_policy {
     stateless_default_actions          = ["aws:forward_to_sfe"]
     stateless_fragment_default_actions = ["aws:forward_to_sfe"]
+    stateful_default_actions           = ["aws:alert_strict", "aws:drop_established"] 
+
+    stateful_engine_options {
+      rule_order = "STRICT_ORDER"
+    }
+
+    stateful_rule_group_reference {
+      priority     = 1
+      resource_arn = aws_networkfirewall_rule_group.workspaces_aws_endpoints.arn
+    }
+
+    stateful_rule_group_reference {
+      priority     = 2
+      resource_arn = aws_networkfirewall_rule_group.workspaces_microsoft_services.arn
+    }
+
+    stateful_rule_group_reference {
+      priority     = 3
+      resource_arn = aws_networkfirewall_rule_group.workspaces_onedrive_live_misc.arn
+    }
+
+    stateful_rule_group_reference {
+      priority     = 4
+      resource_arn = aws_networkfirewall_rule_group.workspaces_certificate_authorities.arn
+    }
+
+  }
+
+  tags = {
+    Name = "workspaces-web-allowlist-policy"
+  }
+}
+
+################################
+## Dummy policy for swapping
+################################
+resource "aws_networkfirewall_firewall_policy" "workspaces_web_allowlist_2" {
+  count       = local.environment == "development" ? 1 : 0
+  name        = "workspaces-web-allowlist-policy-2"
+  description = "Allow only approved WorkSpaces FQDN traffic and drop all other stateful traffic."
+
+  firewall_policy {
+    stateless_default_actions          = ["aws:forward_to_sfe"]
+    stateless_fragment_default_actions = ["aws:forward_to_sfe"]
     # stateful_default_actions           = ["aws:alert_strict", "aws:drop_established"] 
 
     stateful_engine_options {
@@ -428,14 +472,15 @@ resource "aws_networkfirewall_firewall_policy" "workspaces_web_allowlist" {
   }
 
   tags = {
-    Name = "workspaces-web-allowlist-policy"
+    Name = "workspaces-web-allowlist-policy-2"
   }
 }
+#################################
 
 resource "aws_networkfirewall_firewall" "workspaces_web_allowlist" {
   count               = local.environment == "development" ? 1 : 0
   name                = "workspaces-web-allowlist-firewall"
-  firewall_policy_arn = aws_networkfirewall_firewall_policy.workspaces_web_allowlist[0].arn
+  firewall_policy_arn = aws_networkfirewall_firewall_policy.workspaces_web_allowlist_2[0].arn
   vpc_id              = aws_vpc.workspaces[0].id
 
   subnet_mapping {
