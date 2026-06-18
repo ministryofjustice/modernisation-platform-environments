@@ -54,8 +54,9 @@ def _authenticate_basic(token):
     if principal is None or not principal.get("enabled", True):
         return None
 
-    secret = _load_secret_json(principal["secret_arn"])
-    if not hmac.compare_digest(password, secret["password"]):
+    secret = _load_secret_json(principal.get("secret_arn", ""))
+    expected_password = secret.get("password")
+    if not expected_password or expected_password == "replace-me" or not hmac.compare_digest(password, str(expected_password)):
         return None
 
     return principal
