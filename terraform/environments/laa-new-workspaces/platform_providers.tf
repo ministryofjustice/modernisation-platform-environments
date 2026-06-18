@@ -27,6 +27,18 @@ provider "aws" {
   default_tags { tags = local.tags }
 }
 
+# AWS provider for core-vpc-<environment>, to access resources in the core-vpc accounts
+# NOTE: For laa-new-workspaces, this points back to the workspaces account itself
+# (not to a core-vpc account) since this environment uses its own isolated VPC
+provider "aws" {
+  alias  = "core-vpc"
+  region = "eu-west-2"
+  assume_role {
+    role_arn = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/MemberInfrastructureAccess"
+  }
+  default_tags { tags = local.tags }
+}
+
 # AWS provider for network services to enable dns entries for certificate validation to be created
 provider "aws" {
   alias  = "core-network-services"
