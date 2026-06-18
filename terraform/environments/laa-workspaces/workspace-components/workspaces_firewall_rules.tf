@@ -38,9 +38,9 @@ resource "aws_networkfirewall_rule_group" "workspaces_aws_endpoints" {
   type     = "STATEFUL"
 
   rule_group {
-    stateful_rule_options {
-      rule_order = "STRICT_ORDER"
-    }
+    # stateful_rule_options {
+    #   rule_order = "STRICT_ORDER"
+    # }
 
     rules_source {
       rules_source_list {
@@ -89,9 +89,9 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
   type     = "STATEFUL"
 
   rule_group {
-    stateful_rule_options {
-      rule_order = "STRICT_ORDER"
-    }
+    # stateful_rule_options {
+    #   rule_order = "STRICT_ORDER"
+    # }
 
     rules_source {
       rules_source_list {
@@ -230,9 +230,9 @@ resource "aws_networkfirewall_rule_group" "workspaces_onedrive_live_misc" {
   type     = "STATEFUL"
 
   rule_group {
-    stateful_rule_options {
-      rule_order = "STRICT_ORDER"
-    }
+    # stateful_rule_options {
+    #   rule_order = "STRICT_ORDER"
+    # }
 
     rules_source {
       rules_source_list {
@@ -348,9 +348,9 @@ resource "aws_networkfirewall_rule_group" "workspaces_certificate_authorities" {
   type     = "STATEFUL"
 
   rule_group {
-    stateful_rule_options {
-      rule_order = "STRICT_ORDER"
-    }
+    # stateful_rule_options {
+    #   rule_order = "STRICT_ORDER"
+    # }
 
     rules_source {
       rules_source_list {
@@ -449,21 +449,21 @@ resource "aws_networkfirewall_firewall_policy" "workspaces_web_allowlist_2" {
     #   rule_order = "STRICT_ORDER"
     # }
 
-    # stateful_rule_group_reference {
-    #   resource_arn = aws_networkfirewall_rule_group.workspaces_aws_endpoints.arn
-    # }
+    stateful_rule_group_reference {
+      resource_arn = aws_networkfirewall_rule_group.workspaces_aws_endpoints.arn
+    }
 
-    # stateful_rule_group_reference {
-    #   resource_arn = aws_networkfirewall_rule_group.workspaces_microsoft_services.arn
-    # }
+    stateful_rule_group_reference {
+      resource_arn = aws_networkfirewall_rule_group.workspaces_microsoft_services.arn
+    }
 
-    # stateful_rule_group_reference {
-    #   resource_arn = aws_networkfirewall_rule_group.workspaces_onedrive_live_misc.arn
-    # }
+    stateful_rule_group_reference {
+      resource_arn = aws_networkfirewall_rule_group.workspaces_onedrive_live_misc.arn
+    }
 
-    # stateful_rule_group_reference {
-    #   resource_arn = aws_networkfirewall_rule_group.workspaces_certificate_authorities.arn
-    # }
+    stateful_rule_group_reference {
+      resource_arn = aws_networkfirewall_rule_group.workspaces_certificate_authorities.arn
+    }
 
   }
 
