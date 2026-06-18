@@ -229,6 +229,7 @@ resource "aws_ecs_capacity_provider" "weblogic" {
 # 2. Manually validate cert by adding validation records to legacy zone
 # 3. Wait for cert to say "ISSUED"
 # 4. Uncomment aws_lb_listener_certificate and apply this config
+# 5. Create CNAME record in legacy that points ndelius.probation.service.justice.gov.uk -> ndelius.prod.delius-core.hmpps-production.modernisation-platform.service.justice.gov.uk
 resource "aws_acm_certificate" "legacy" {
   count = var.env_name == "prod" ? 1 : 0
 
