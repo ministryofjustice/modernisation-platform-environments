@@ -45,7 +45,9 @@ module "flink_geofence" {
           "kafka-cluster:Connect",
           "kafka-cluster:DescribeCluster"
         ]
-        resources = [local.msk_arn]
+        # TODO: This is a workaround for the fact that the ARN of the MSK cluster is not available yet
+        resources = ["*"]
+        #resources = [data.external.msk_arn]
       },
       {
         sid    = "AllowMSKTopics"
@@ -60,7 +62,11 @@ module "flink_geofence" {
           "kafka-cluster:ReadData",
           "kafka-cluster:WriteData"
         ]
-        resources = data.external.msk_arn == "None" ? [*] : [format("%s/*", replace(local.msk_arn, ":cluster/", ":topic/"))]
+        # TODO: This is a workaround for the fact that the ARN of the MSK cluster is not available yet
+        resources = ["*"]
+        #resources = [
+        #  format("%s/*", replace(data.external.msk_arn, ":cluster/", ":topic/"))
+        #]
       },
       {
         sid    = "AllowMSKGroups"
@@ -69,7 +75,11 @@ module "flink_geofence" {
           "kafka-cluster:AlterGroup",
           "kafka-cluster:DescribeGroup"
         ]
-        resources = data.external.msk_arn == "None" ? [*] : [format("%s/*", replace(local.msk_arn, ":cluster/", ":group/"))]
+        # TODO: This is a workaround for the fact that the ARN of the MSK cluster is not available yet
+        resources = ["*"]
+        #resources = [
+        #  format("%s/*", replace(local.msk_arn, ":cluster/", ":group/"))
+        #]
       }
     ]
   }
