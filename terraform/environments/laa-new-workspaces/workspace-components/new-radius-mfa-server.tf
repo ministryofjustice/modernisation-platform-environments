@@ -72,17 +72,17 @@ resource "aws_security_group_rule" "radius_server_egress_all" {
   description       = "Allow all outbound traffic"
 }
 
-# Separate ingress rule to avoid circular dependency
-resource "aws_security_group_rule" "radius_server_from_alb" {
+# # Separate ingress rule to avoid circular dependency
+# resource "aws_security_group_rule" "radius_server_from_alb" {
 
-  type                     = "ingress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.radius_server.id
-  source_security_group_id = aws_security_group.radius_alb.id
-  description              = "HTTPS from ALB for LinOTP portal"
-}
+#   type                     = "ingress"
+#   from_port                = 443
+#   to_port                  = 443
+#   protocol                 = "tcp"
+#   security_group_id        = aws_security_group.radius_server.id
+#   source_security_group_id = aws_security_group.radius_alb.id
+#   description              = "HTTPS from ALB for LinOTP portal"
+# }
 
 ##############################################
 ### IAM Role for RADIUS Servers
