@@ -17,9 +17,6 @@ resource "aws_db_instance" "mariadb" {
   vpc_security_group_ids = [aws_security_group.mariadb.id]
   skip_final_snapshot    = true
   storage_encrypted      = true
-  lifecycle {
-    prevent_destroy = false
-  }
 }
 
 resource "random_id" "db_password" {
