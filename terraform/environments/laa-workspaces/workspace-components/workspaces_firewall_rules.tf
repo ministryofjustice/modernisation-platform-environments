@@ -34,7 +34,7 @@ variable "aws_region" {
 # -----------------------------------------------------------------------------
 resource "aws_networkfirewall_rule_group" "workspaces_aws_endpoints" {
   name     = "workspaces-aws-endpoints"
-  capacity = 17
+  capacity = 100
   type     = "STATEFUL"
 
   rule_group {
