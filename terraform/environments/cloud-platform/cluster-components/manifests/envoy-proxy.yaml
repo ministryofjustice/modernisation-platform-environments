@@ -1,0 +1,42 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: custom-proxy-config
+  namespace: default
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyDeployment:
+        replicas: 5
+        pod:
+          volumes:
+            - name: dynamic-modules
+              image:
+                reference: ghcr.io/tetratelabs/built-on-envoy/composer:0.6.0-dev
+                pullPolicy: IfNotPresent
+        container:
+          env:
+            - name: GODEBUG
+              value: "cgocheck=0"
+          volumeMounts:
+            - name: dynamic-modules
+              mountPath: /etc/envoy/dynamic-modules
+              readOnly: true
+      envoyService:
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-type: external
+          service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+          service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+          service.beta.kubernetes.io/aws-load-balancer-name: envoy-gw-nlb
+          # TODO: see if we can use the auto discovery rather than explicitly declaring
+          # https://repost.aws/knowledge-center/load-balancer-troubleshoot-creating
+          # service.beta.kubernetes.io/aws-load-balancer-subnets: subnet-0df18aac4d4a98b34,subnet-0e25a0b8430a0c7d8,subnet-0901fe8be978042a4
+  dynamicModules:
+    - name: composer
+      source:
+        type: Local
+        local:
+          path: /etc/envoy/dynamic-modules/libcomposer.so
+      doNotClose: true
+      loadGlobally: false

@@ -1,0 +1,20 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyExtensionPolicy
+metadata:
+  name: coraza-waf
+  namespace: default
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: eg
+  dynamicModule:
+    - name: composer
+      filterName: coraza-waf
+      config:
+        directives:
+          - Include @coraza.conf
+          - SecRuleEngine DetectionOnly
+          - SecResponseBodyAccess Off
+          - Include @crs-setup.conf
+          - Include @owasp_crs/*.conf
