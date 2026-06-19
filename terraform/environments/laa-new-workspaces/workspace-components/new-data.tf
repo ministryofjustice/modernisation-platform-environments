@@ -10,7 +10,7 @@ data "aws_ec2_transit_gateway" "moj_tgw" {
 ### Data sources for Route53 hosted zones
 ###
 ### External zone is created locally in new-route53-zones.tf
-### Network-services zone is in core-network-services (platform)
+### Network-services zone is in platform_data.tf (from cloud-platform)
 ##############################################################
 
 data "aws_route53_zone" "external" {
@@ -18,11 +18,4 @@ data "aws_route53_zone" "external" {
   private_zone = false
 
   depends_on = [aws_route53_zone.external]
-}
-
-data "aws_route53_zone" "network-services" {
-  provider = aws.core-network-services
-
-  name         = "modernisation-platform.service.justice.gov.uk."
-  private_zone = false
 }
