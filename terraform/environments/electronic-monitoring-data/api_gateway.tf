@@ -179,7 +179,7 @@ resource "aws_security_group_rule" "ingress_dns_endpoint_traffic" {
   security_group_id = aws_security_group.aws_dns_resolver.id
   to_port           = each.value.to_port
   type              = "ingress"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  cidr_blocks       = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
 }
 
 resource "aws_security_group_rule" "egress_dns_endpoint_traffic" {
