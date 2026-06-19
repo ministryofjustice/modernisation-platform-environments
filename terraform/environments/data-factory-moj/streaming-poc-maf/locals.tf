@@ -17,13 +17,14 @@ locals {
     "smalavalli@akersystems.com",
     "vshah@akersystems.com",
   ]
-
-  drone_incursion_alert_phone_numbers = [
-    "+447966916633", # Stuart
-    "+447951225592", # Salman
-    "+447865613301", # Nick
-    "+447535705157"  # Sharath
-  ]
+  
+# TODO: uncomment when we have sender ID and are out of sandbox mode.
+#  drone_incursion_alert_phone_numbers = [
+#    "+44##########", # Stuart
+#    "+44##########", # Salman
+#    "+44##########", # Nick
+#    "+44##########"  # Sharath
+#  ]
 
   geofence_app = {
     jar_filename = "flink-moj-geofence-1.0.24.jar"
