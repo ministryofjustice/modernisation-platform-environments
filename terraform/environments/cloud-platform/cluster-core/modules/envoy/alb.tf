@@ -50,13 +50,20 @@ resource "kubernetes_ingress_v1" "alb_auto_mode_test" {
 
     namespace = kubernetes_namespace_v1.envoy_gateway_system.metadata[0].name
     annotations = {
-      "alb.ingress.kubernetes.io/scheme"      = "internet-facing"
-      "alb.ingress.kubernetes.io/target-type" = "ip"
+      "alb.ingress.kubernetes.io/scheme"              = "internet-facing"
+      "alb.ingress.kubernetes.io/target-type"         = "ip"
+      "alb.ingress.kubernetes.io/certificate-arn"     = var.alb_certificate_arn
+      "alb.ingress.kubernetes.io/listen-ports"        = "[{\"HTTP\": 80}, {\"HTTPS\": 443}]"
+      "alb.ingress.kubernetes.io/ssl-redirect"        = "443"
     }
   }
 
   spec {
     ingress_class_name = "alb"
+
+    tls {
+      hosts = ["*.cp-1606-0845.development.container-platform.service.justice.gov.uk"]
+    }
 
     rule {
       http {

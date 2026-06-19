@@ -36,3 +36,8 @@ resource "aws_acm_certificate_validation" "cluster_wildcard" {
   certificate_arn         = aws_acm_certificate.cluster_wildcard[0].arn
   validation_record_fqdns = [for record in aws_route53_record.cluster_wildcard_validation : record.fqdn]
 }
+
+output "cluster_wildcard_certificate_arn" {
+  description = "ARN of the wildcard ACM certificate"
+  value       = var.gateway_name == "default" ? aws_acm_certificate.cluster_wildcard[0].arn : null
+}
