@@ -275,6 +275,27 @@ resource "aws_lakeformation_permissions" "em_data_validation_table" {
   }
 }
 
+resource "aws_lakeformation_permissions" "em_data_validation_datamart_dev_dbt" {
+  count       = local.is-test ? 1 : 0
+  principal   = module.emd_validation_db_role[0].iam_role_arn
+  permissions = ["DESCRIBE"]
+
+  database {
+    name = "datamart_dev_dbt"
+  }
+}
+
+resource "aws_lakeformation_permissions" "em_data_validation_order_dim" {
+  count       = local.is-test ? 1 : 0
+  principal   = module.emd_validation_db_role[0].iam_role_arn
+  permissions = ["DESCRIBE", "SELECT"]
+
+  table {
+    database_name = "datamart_dev_dbt"
+    name          = "order_dim"
+  }
+}
+
 resource "aws_lakeformation_permissions" "em_data_validation_s3" {
   count       = local.is-test || local.is-production ? 1 : 0
   principal   = module.emd_validation_db_role[0].iam_role_arn
@@ -325,19 +346,31 @@ data "aws_iam_policy_document" "em_data_validation_permissions" {
       "glue:GetTables",
       "glue:GetTable",
     ]
-    resources = [
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/validation${local.dbt_suffix}",
-    ]
+    resources = concat(
+      [
+        "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/validation${local.dbt_suffix}",
+      ],
+      local.is-test ? [
+        "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/datamart_dev_dbt",
+      ] : []
+    )
   }
   statement {
     effect = "Allow"
     actions = [
       "glue:GetTables",
       "glue:GetTable",
+      "glue:GetPartition",
+      "glue:GetPartitions",
     ]
-    resources = [
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/validation${local.dbt_suffix}/*",
-    ]
+    resources = concat(
+      [
+        "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/validation${local.dbt_suffix}/*",
+      ],
+      local.is-test ? [
+        "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/datamart_dev_dbt/order_dim",
+      ] : []
+    )
   }
 }
 
