@@ -73,7 +73,7 @@ It now protects the API with:
   "multipart": {
     "uploadId": "abc123...",
     "partSizeBytes": 67108864,
-    "totalParts": 1600,
+    "totalParts": 160,
     "maxParts": 10000,
     "expiresInSeconds": 900,
     "initialParts": [
