@@ -16,6 +16,10 @@ resource "aws_msk_serverless_cluster" "cluster" {
     }
   }
 
+  lifecycle {
+    prevent_destroy = true
+  }
+
   tags = merge(local.extended_tags, {
     name        = local.cluster_name,
     description = "POV MSK cluster"
