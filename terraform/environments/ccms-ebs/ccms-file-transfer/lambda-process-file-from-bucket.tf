@@ -87,11 +87,11 @@ resource "aws_lambda_function" "process_file_from_bucket_lambda_function" {
     Name = "${local.application_name}-${local.environment}-process-file-from-bucket"
   })
 
-  # lifecycle {
-  #   ignore_changes = [
-  #     source_code_hash, filename, handler
-  #   ]
-  # }
+  lifecycle {
+    ignore_changes = [
+      source_code_hash, filename, handler
+    ]
+  }
 }
 
 resource "aws_lambda_permission" "allow_s3_invoke" {
