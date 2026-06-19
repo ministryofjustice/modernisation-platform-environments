@@ -76,7 +76,7 @@ resource "aws_route53_record" "radius_cert_validation_parent" {
 # Environment-specific domains validate in environment zone
 resource "aws_route53_record" "radius_cert_validation_env" {
   for_each = local.radius_env_domain_validation
-  provider = aws.core-vpc
+  
 
   allow_overwrite = true
   name            = each.value.name

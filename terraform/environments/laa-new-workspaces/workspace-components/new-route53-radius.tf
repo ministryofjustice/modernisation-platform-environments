@@ -7,7 +7,7 @@
 
 resource "aws_route53_record" "radius_portal" {
 
-  provider = aws.core-vpc
+  
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "workspace-new-mfa.${data.aws_route53_zone.external.name}"
   type     = "A"

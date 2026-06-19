@@ -1,3 +1,4 @@
+# AWS provider for the original session which you connect with
 provider "aws" {
   alias  = "original-session"
   region = "eu-west-2"
@@ -7,11 +8,8 @@ provider "aws" {
 # AWS provider for the workspace you're working in (every resource will default to using this, unless otherwise specified)
 provider "aws" {
   region = "eu-west-2"
-  dynamic "assume_role" {
-    for_each = !can(regex("githubactionsrolesession|AdministratorAccess|user", data.aws_caller_identity.original_session.arn)) ? [] : [1]
-    content {
-      role_arn = can(regex("user", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}" : "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
-    }
+  assume_role {
+    role_arn = !can(regex("githubactionsrolesession|AdministratorAccess|user", data.aws_caller_identity.original_session.arn)) ? null : can(regex("user", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}" : "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
   }
   default_tags { tags = local.tags }
 }
@@ -23,18 +21,7 @@ provider "aws" {
   assume_role {
     role_arn = "arn:aws:iam::${local.modernisation_platform_account_id}:role/modernisation-account-limited-read-member-access"
   }
-  default_tags { tags = local.tags }
-}
 
-# AWS provider for core-vpc-<environment>, to access Route53 zones in core-vpc accounts
-# Uses read-only for local runs, write-enabled delegation role for CI/CD
-provider "aws" {
-  alias  = "core-vpc"
-  region = "eu-west-2"
-  assume_role {
-    role_arn = !can(regex("githubactionsrolesession|AdministratorAccess", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/member-delegation-read-only" : "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/member-delegation-${local.vpc_name}-${local.environment}"
-  }
-  default_tags { tags = local.tags }
 }
 
 # AWS provider for network services to enable dns entries for certificate validation to be created
@@ -51,11 +38,8 @@ provider "aws" {
 provider "aws" {
   alias  = "us-east-1"
   region = "us-east-1"
-  dynamic "assume_role" {
-    for_each = !can(regex("githubactionsrolesession|AdministratorAccess|user", data.aws_caller_identity.original_session.arn)) ? [] : [1]
-    content {
-      role_arn = can(regex("user", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}" : "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccessUSEast"
-    }
+  assume_role {
+    role_arn = !can(regex("githubactionsrolesession|AdministratorAccess|user", data.aws_caller_identity.original_session.arn)) ? null : can(regex("user", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}" : "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccessUSEast"
   }
   default_tags { tags = local.tags }
 }
