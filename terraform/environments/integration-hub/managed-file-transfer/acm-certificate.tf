@@ -1,3 +1,5 @@
+/*  Because this approach uses two providers it's not a candidate for refactoring using a registry module */
+
 resource "aws_acm_certificate" "ftps" {
   domain_name       = local.is-production == false ? "ftps.${local.environment}.managed-file-transfer.service.justice.gov.uk" : "ftps.managed-file-transfer.service.justice.gov.uk"
   validation_method = "DNS"
