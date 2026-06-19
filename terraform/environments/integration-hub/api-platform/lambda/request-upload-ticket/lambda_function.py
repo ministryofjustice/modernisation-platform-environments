@@ -124,6 +124,7 @@ def _update_multipart_session(transfer_ticket, status, extra_attributes=None):
         UpdateExpression="SET " + ", ".join(update_terms),
         ExpressionAttributeNames=expression_names,
         ExpressionAttributeValues=expression_values,
+        ConditionExpression="attribute_exists(transfer_ticket)",
     )
 
 
