@@ -3,6 +3,7 @@ module "lambda_unscanned_to_processing" {
   version = "8.8.0"
 
   function_name                  = "${local.application_name}-unscanned-to-processing"
+  architectures                  = ["arm64"]
   description                    = "Moves uploaded files from the unscanned bucket to the processing bucket"
   handler                        = "lambda_function.lambda_handler"
   memory_size                    = 256
@@ -101,6 +102,7 @@ module "lambda_processing_to_post_scan" {
   version = "8.8.0"
 
   function_name                  = "${local.application_name}-processing-to-post-scan"
+  architectures                  = ["arm64"]
   description                    = "Moves scanned files from the processing bucket to the post-scan destination bucket"
   handler                        = "lambda_function.lambda_handler"
   memory_size                    = 256
