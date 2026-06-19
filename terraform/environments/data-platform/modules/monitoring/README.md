@@ -1,11 +1,11 @@
-# Data Platform Observability Module
+# Data Platform Monitoring Module
 
-This Terraform module provisions the required IAM resources for the Observability Platform's Grafana to read CloudWatch, Prometheus, and X-Ray data from Data Platform AWS accounts.
+This Terraform module provisions the required IAM resources for the Data Platform's Grafana instanceto read CloudWatch, Prometheus, and X-Ray data from Data Platform AWS accounts.
 
 ## Usage
 
 ```hcl
-module "data_platform_observability" {
+module "data_platform_monitoring" {
   source = "./modules/monitoring"
 
   enable_cloudwatch_read_only_access    = true
