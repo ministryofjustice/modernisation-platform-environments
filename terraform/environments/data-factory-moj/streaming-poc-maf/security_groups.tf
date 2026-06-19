@@ -1,6 +1,7 @@
 # ---------------------------------------------------------------------------------------------------------------------
 # SECURITY GROUPS
 # ---------------------------------------------------------------------------------------------------------------------
+#checkov:skip=CKV2_AWS_5:Security groups are attached to the Flink application via the managed-apache-flink module
 resource "aws_security_group" "allow_s3" {
   count       = contains(local.deploy_to, local.environment) ? 1 : 0
   name        = "allow-s3-egress-from-flink"

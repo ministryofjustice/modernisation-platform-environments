@@ -1,3 +1,4 @@
+#checkov:skip=CKV_TF_1:terraform-aws-modules uses version pinning which is the recommended approach for registry modules
 module "sns_drone_incursion_alerts" {
   count   = contains(local.deploy_to, local.environment) ? 1 : 0
   source  = "terraform-aws-modules/sns/aws"
