@@ -28,7 +28,7 @@ resource "aws_security_group_rule" "alb_egress_all" {
   protocol          = "TCP"
   from_port         = 32768
   to_port           = 61000
-  destination_security_group_id = aws_security_group.cluster_ec2.id
+  source_security_group_id = aws_security_group.cluster_ec2.id
 }
 
 # VPC Endpoint security group lookup (used to restrict egress to VPC endpoints)
@@ -85,7 +85,7 @@ resource "aws_security_group_rule" "ecs_tasks_egress_db" {
   protocol          = "TCP"
   from_port         = 1521
   to_port           = 1521
-  destination_security_group_id = aws_security_group.tds_db.id
+  source_security_group_id = aws_security_group.tds_db.id
 }
 
 resource "aws_security_group_rule" "ecs_tasks_egress_vpce" {
@@ -95,10 +95,10 @@ resource "aws_security_group_rule" "ecs_tasks_egress_vpce" {
   protocol          = "TCP"
   from_port         = 443
   to_port           = 443
-  destination_security_group_id = data.aws_security_group.vpce_security_group.id
+  source_security_group_id = data.aws_security_group.vpce_security_group.id
 
   lifecycle {
-    ignore_changes = [destination_security_group_id]
+    ignore_changes = [source_security_group_id]
   }
 }
 
@@ -172,10 +172,10 @@ resource "aws_security_group_rule" "cluster_ec2_egress_vpce" {
   protocol          = "TCP"
   from_port         = 443
   to_port           = 443
-  destination_security_group_id = data.aws_security_group.vpce_security_group.id
+  source_security_group_id = data.aws_security_group.vpce_security_group.id
 
   lifecycle {
-    ignore_changes = [destination_security_group_id]
+    ignore_changes = [source_security_group_id]
   }
 }
 
