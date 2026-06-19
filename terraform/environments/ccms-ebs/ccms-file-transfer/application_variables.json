@@ -2,7 +2,7 @@
   "accounts": {
     "development": {
       "short_env": "dev",
-      "ami_image_id": "ami-0d6d764bbe794b8ca",
+      "ami_image_id": "ami-02f77a03ec776dc35",
       "ec2_instance_type": "m5.large",
       "ec2_desired_capacity": "1",
       "ec2_max_capacity": "2",
@@ -22,7 +22,7 @@
     },
     "test": {
       "short_env": "tst",
-      "ami_image_id": "ami-0d6d764bbe794b8ca",
+      "ami_image_id": "ami-02f77a03ec776dc35",
       "ec2_instance_type": "m5.large",
       "ec2_desired_capacity": "1",
       "ec2_max_capacity": "2",
@@ -42,7 +42,7 @@
     },
     "preproduction": {
       "short_env": "prep",
-      "ami_image_id": "ami-0d6d764bbe794b8ca",
+      "ami_image_id": "ami-02f77a03ec776dc35",
       "ec2_instance_type": "m5.large",
       "ec2_desired_capacity": "1",
       "ec2_max_capacity": "2",
@@ -62,7 +62,7 @@
     },
     "production": {
       "short_env": "prod",
-      "ami_image_id": "ami-0d6d764bbe794b8ca",
+      "ami_image_id": "ami-02f77a03ec776dc35",
       "ec2_instance_type": "m5.large",
       "ec2_desired_capacity": "1",
       "ec2_max_capacity": "2",

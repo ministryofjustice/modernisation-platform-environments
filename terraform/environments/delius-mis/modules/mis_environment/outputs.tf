@@ -11,12 +11,12 @@ output "datasync_fsx_credentials_secret_arn" {
 
 output "fsx_dns_name" {
   description = "DNS name of the FSX Windows file system"
-  value       = aws_fsx_windows_file_system.mis_share.dns_name
+  value       = var.fsx_config != null ? aws_fsx_windows_file_system.mis_share[0].dns_name : null
 }
 
 output "fsx_share_path" {
   description = "Full UNC path to the FSX share for DFI reports"
-  value       = "\\\\${aws_fsx_windows_file_system.mis_share.dns_name}\\share\\dfiinterventions\\dfi"
+  value       = var.fsx_config != null ? "\\\\${aws_fsx_windows_file_system.mis_share[0].dns_name}\\share\\dfiinterventions\\dfi" : null
 }
 
 # Load Balancer outputs

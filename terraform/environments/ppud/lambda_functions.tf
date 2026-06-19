@@ -104,6 +104,16 @@ locals {
         source_arn_suffix = "*"
       }]
     }
+    wam_waf_analysis_monthly = {
+      description  = "Function to analyse WAM WAF ACL traffic and email a monthly report."
+      role_key     = "get_cloudwatch"
+      environments = ["development"]
+      layers       = ["numpy", "pillow", "requests", "matplotlib"]
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
     securityhub_critical_report = {
       description  = "Function to email a summary of critical CVEs found in AWS Security Hub."
       role_key     = "get_securityhub_data"

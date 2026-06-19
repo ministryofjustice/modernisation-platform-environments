@@ -58,6 +58,21 @@ def _build_object_key(prefix, file_name):
     return posixpath.join(prefix.strip("/"), today_prefix, generated_name)
 
 
+def _authorizer_context(event):
+    authorizer = event.get("requestContext", {}).get("authorizer", {})
+    if isinstance(authorizer.get("lambda"), dict):
+        return authorizer["lambda"]
+    return authorizer
+
+
+def _allowed_client_ids(event):
+    context = _authorizer_context(event)
+    raw_value = context.get("allowedClientIds", "")
+    if not raw_value:
+        return set()
+    return {value for value in raw_value.split(",") if value}
+
+
 def lambda_handler(event, _context):
     try:
         request = _load_body(event)
@@ -69,6 +84,10 @@ def lambda_handler(event, _context):
 
     if not client_id or not file_name:
         return _response(400, {"message": "clientId and fileName are required"})
+
+    allowed_client_ids = _allowed_client_ids(event)
+    if not allowed_client_ids or ("*" not in allowed_client_ids and client_id not in allowed_client_ids):
+        return _response(403, {"message": f"Not authorised to request tickets for clientId '{client_id}'"})
 
     table = DYNAMODB.Table(TRANSFER_CLIENTS_TABLE)
     record = table.get_item(Key={"client_id": client_id}).get("Item")
