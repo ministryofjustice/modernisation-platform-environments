@@ -6,6 +6,27 @@
         "max_presigned_url_expiry_seconds": 3600,
         "presigned_url_expiry_seconds": 900
       },
+      "auth_configuration": {
+        "roles": {
+          "products-poc-upload": {
+            "allowed_client_ids": [
+              "products-poc"
+            ]
+          }
+        },
+        "users": {
+          "products-poc-user": {
+            "enabled": true,
+            "role_name": "products-poc-upload"
+          }
+        },
+        "system_principals": {
+          "products-poc-api": {
+            "enabled": true,
+            "role_name": "products-poc-upload"
+          }
+        }
+      },
       "transfer_clients": {
         "products-poc": {
           "enabled": true,
@@ -20,6 +41,11 @@
         "max_presigned_url_expiry_seconds": 3600,
         "presigned_url_expiry_seconds": 900
       },
+      "auth_configuration": {
+        "roles": {},
+        "users": {},
+        "system_principals": {}
+      },
       "transfer_clients": {}
     },
     "preproduction": {
@@ -28,6 +54,11 @@
         "max_presigned_url_expiry_seconds": 3600,
         "presigned_url_expiry_seconds": 900
       },
+      "auth_configuration": {
+        "roles": {},
+        "users": {},
+        "system_principals": {}
+      },
       "transfer_clients": {}
     },
     "production": {
@@ -35,6 +66,11 @@
         "cors_allowed_origins": [],
         "max_presigned_url_expiry_seconds": 3600,
         "presigned_url_expiry_seconds": 900
+      },
+      "auth_configuration": {
+        "roles": {},
+        "users": {},
+        "system_principals": {}
       },
       "transfer_clients": {}
     }
