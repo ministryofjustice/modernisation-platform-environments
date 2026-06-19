@@ -103,7 +103,8 @@ locals {
     handler           = "malware-threat-notifier.lambda_handler"
     iam_role_name     = "malware-threat-notifier-lambda-role"
     environment_variables = {
-      THREAT_ENDPOINT_URL = local.application_data.accounts[local.environment].malware_threat_endpoint_url
+      THREAT_ENDPOINT_URL   = local.application_data.accounts[local.environment].malware_threat_endpoint_url
+      AUTO_ADMIT_SECRET_NAME = aws_secretsmanager_secret.auto_admit_secret.name
     }
   }
 

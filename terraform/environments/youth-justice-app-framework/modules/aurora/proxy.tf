@@ -90,7 +90,6 @@ resource "aws_db_proxy" "rds_proxy" {
   require_tls            = true
   debug_logging          = var.proxy_debug_logging
   role_arn               = aws_iam_role.rds_proxy.arn
-  session_pinning_filters = ["EXCLUDE_VARIABLE_SETS"]
 
   vpc_subnet_ids         = var.database_subnets
   vpc_security_group_ids = [aws_security_group.rds_proxy.id]
