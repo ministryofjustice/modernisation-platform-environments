@@ -43,7 +43,7 @@ variable "envoy_service_port" {
 variable "health_check_path" {
   description = "Path for ALB health checks"
   type        = string
-  default     = "/"
+  default     = "/alb-health"
 }
 
 variable "redirect_http_to_https" {
