@@ -79,8 +79,8 @@
       "adaptor_spring_profile": "aws",
       "adaptor_container_cpu": "512",
       "adaptor_container_memory": "2048",
-      "client_opa12assess_means_address": "https://ccms-opa.laa-development.modernisation-platform.service.justice.gov.uk/opa/determinations-server/answer/soap/12.2.1/MeansAssessment",
-      "client_opa12assess_billing_address": "https://ccms-opa.laa-development.modernisation-platform.service.justice.gov.uk/opa/determinations-server/answer/soap/12.2.1/BillingAssessment",
+      "client_opa12assess_means_address": "https://ccms-opa.laa-development.modernisation-platform.service.justice.gov.uk/opa/determinations-server/assess/soap/generic/12.2.1/MeansAssessment",
+      "client_opa12assess_billing_address": "https://ccms-opa.laa-development.modernisation-platform.service.justice.gov.uk/opa/determinations-server/assess/soap/generic/12.2.1/BillingAssessment",
       "server_opa10assess_security_user_name": "admin"
     },
     "test": {
