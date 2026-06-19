@@ -17,17 +17,6 @@ locals {
       type   = dvo.resource_record_type
     }
   }
-
-  # Split domains: parent (modernisation-platform) vs environment-specific (laa-development)
-  radius_parent_domain_validation = {
-    for k, v in local.radius_domain_types : k => v
-    if k == "modernisation-platform.service.justice.gov.uk"
-  }
-
-  radius_env_domain_validation = {
-    for k, v in local.radius_domain_types : k => v
-    if k != "modernisation-platform.service.justice.gov.uk"
-  }
 }
 
 ##############################################
@@ -58,11 +47,11 @@ resource "aws_acm_certificate" "radius_portal" {
 
 ##############################################
 ### Route53 DNS Records for Certificate Validation
+### All records created in parent zone (core-network-services)
 ##############################################
 
-# Parent domain validates in parent zone
-resource "aws_route53_record" "radius_cert_validation_parent" {
-  for_each = local.radius_parent_domain_validation
+resource "aws_route53_record" "radius_cert_validation" {
+  for_each = local.radius_domain_types
   provider = aws.core-network-services
 
   allow_overwrite = true
@@ -73,26 +62,10 @@ resource "aws_route53_record" "radius_cert_validation_parent" {
   zone_id         = data.aws_route53_zone.network-services.zone_id
 }
 
-# Environment-specific domains validate in environment zone
-resource "aws_route53_record" "radius_cert_validation_env" {
-  for_each = local.radius_env_domain_validation
-  
-
-  allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
-  ttl             = 60
-  type            = each.value.type
-  zone_id         = data.aws_route53_zone.external.zone_id
-}
-
 ##############################################
 ### ACM Certificate Validation
 ##############################################
 resource "aws_acm_certificate_validation" "radius_portal" {
-  certificate_arn = aws_acm_certificate.radius_portal.arn
-  validation_record_fqdns = concat(
-    values(aws_route53_record.radius_cert_validation_parent)[*].fqdn,
-    values(aws_route53_record.radius_cert_validation_env)[*].fqdn
-  )
+  certificate_arn         = aws_acm_certificate.radius_portal.arn
+  validation_record_fqdns = values(aws_route53_record.radius_cert_validation)[*].fqdn
 }

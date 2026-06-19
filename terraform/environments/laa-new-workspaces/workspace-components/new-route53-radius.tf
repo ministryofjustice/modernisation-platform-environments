@@ -2,14 +2,14 @@
 ### Route53 DNS Record for RADIUS Portal
 ###
 ### Creates user-facing DNS name for LinOTP
-### MFA enrollment portal
+### MFA enrollment portal in parent zone
 ##############################################
 
 resource "aws_route53_record" "radius_portal" {
+  provider = aws.core-network-services
 
-  
-  zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "workspace-new-mfa.${data.aws_route53_zone.external.name}"
+  zone_id  = data.aws_route53_zone.network-services.zone_id
+  name     = "workspace-new-mfa.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type     = "A"
 
   alias {
