@@ -493,6 +493,10 @@ def _load_active_session(transfer_ticket, allowed_client_ids):
     if session is None:
         return None, _response(404, {"message": f"Unknown transfer ticket '{transfer_ticket}'"})
 
+    expires_at_epoch = session.get("expires_at_epoch")
+    if expires_at_epoch is not None and int(expires_at_epoch) <= int(datetime.now(timezone.utc).timestamp()):
+        return None, _response(409, {"message": f"Transfer ticket '{transfer_ticket}' has expired"})
+
     access_error = _validate_client_access(session["client_id"], allowed_client_ids)
     if access_error:
         return None, access_error
