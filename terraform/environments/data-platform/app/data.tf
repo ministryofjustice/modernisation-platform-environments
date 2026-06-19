@@ -2,6 +2,10 @@ data "aws_eks_cluster" "cluster" {
   name = "${local.application_name}-${local.environment}"
 }
 
+data "aws_kms_key" "secrets_manager_common" {
+  key_id = "alias/secretsmanager/${local.application_name}-${local.environment}/common"
+}
+
 data "aws_vpc" "eks" {
   id = data.aws_eks_cluster.cluster.vpc_config[0].vpc_id
 }

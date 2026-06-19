@@ -1,0 +1,75 @@
+---
+name: container-platform
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform/environments/cloud-platform/**'
+      - 'terraform/environments/cloud-platform/accounts.json'
+      - '.github/workflows/container-platform.yml'
+      - '.github/workflows/cloud-platform-reusable.yml'
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'terraform/environments/cloud-platform/**'
+      - 'terraform/environments/cloud-platform/accounts.json'
+      - '.github/workflows/container-platform.yml'
+      - '.github/workflows/cloud-platform-reusable.yml'
+
+permissions:
+  id-token: write  # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - id: set-matrix
+        run: |
+          json="["
+          while IFS= read -r account; do
+            env="${account##*-}"
+            json+="{\"environment\":\"$env\",\"account_name\":\"$account\"},"
+          done < <(jq -r '.accounts[]' terraform/environments/cloud-platform/accounts.json)
+          echo "matrix=${json%,}]" >> $GITHUB_OUTPUT
+
+  terraform-pr:
+    needs: setup
+    if: github.event_name == 'pull_request'
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.setup.outputs.matrix) }}
+    uses: ./.github/workflows/cloud-platform-reusable.yml
+    with:
+      application: "cloud-platform"
+      environment: "${{ matrix.environment }}"
+      action: "plan"
+      account_name: "${{ matrix.account_name }}"
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+  terraform-main:
+    needs: setup
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.setup.outputs.matrix) }}
+    uses: ./.github/workflows/cloud-platform-reusable.yml
+    with:
+      application: "cloud-platform"
+      environment: "${{ matrix.environment }}"
+      action: "plan_apply"
+      account_name: "${{ matrix.account_name }}"
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}

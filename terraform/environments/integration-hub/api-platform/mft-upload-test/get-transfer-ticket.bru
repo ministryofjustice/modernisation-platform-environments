@@ -1,5 +1,5 @@
 meta {
-  name: Get Transfer Ticket
+  name: Get Transfer Ticket (Bearer)
   type: http
   seq: 1
 }
@@ -7,11 +7,15 @@ meta {
 post {
   url: {{api_endpoint}}/transfer-tickets
   body: json
-  auth: none
+  auth: bearer
 }
 
 headers {
   Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{bearer_token}}
 }
 
 body:json {

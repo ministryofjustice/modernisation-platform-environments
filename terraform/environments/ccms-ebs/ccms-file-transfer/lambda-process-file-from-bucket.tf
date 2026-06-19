@@ -27,7 +27,11 @@ resource "aws_iam_role_policy" "lambda_process_file_from_bucket_policy" {
         Effect = "Allow"
         Action = [
           "s3:GetObject",
-          "s3:GetObjectTagging"
+          "s3:GetObjectTagging",
+          "s3:ListBucket",
+          "s3:PutObject",
+          "s3:PutObjectTagging",
+          "s3:DeleteObject"
         ]
         Resource = [
           module.s3-bucket-sftp-bc.bucket.arn,
