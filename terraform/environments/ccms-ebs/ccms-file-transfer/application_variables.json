@@ -39,7 +39,7 @@
       "container_version": "financial-transfers-api-0.0.6-test",
       "lz_aws_workspace_nonprod_prod": "10.200.0.0/19",
       "logging_level_root": "info",
-      "logging_level_uk_gov_laa_ccms": "debug",
+      "logging_level_uk_gov_laa_ccms": "info",
       "cortex_deps_bucket_name": "ccms-shared"
     },
     "preproduction": {
@@ -60,7 +60,7 @@
       "container_version": "financial-transfers-api-0.0.6-pre-production",
       "lz_aws_workspace_nonprod_prod": "10.200.0.0/19",
       "logging_level_root": "info",
-      "logging_level_uk_gov_laa_ccms": "debug",
+      "logging_level_uk_gov_laa_ccms": "info",
       "cortex_deps_bucket_name": "ccms-shared"
     },
     "production": {
