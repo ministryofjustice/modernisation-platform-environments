@@ -55,6 +55,7 @@ resource "kubernetes_ingress_v1" "envoy" {
         # HTTPS configuration
         "alb.ingress.kubernetes.io/listen-ports"    = jsonencode([{ "HTTP" : 80 }, { "HTTPS" : 443 }])
         "alb.ingress.kubernetes.io/certificate-arn" = var.certificate_arn
+        "alb.ingress.kubernetes.io/success-codes"   = "200"
       },
       var.redirect_http_to_https ? {
         "alb.ingress.kubernetes.io/ssl-redirect" = "443"
