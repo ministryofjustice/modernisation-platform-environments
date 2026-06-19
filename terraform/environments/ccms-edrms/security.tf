@@ -179,6 +179,16 @@ resource "aws_security_group_rule" "cluster_ec2_egress_vpce" {
   }
 }
 
+resource "aws_security_group_rule" "cluster_ec2_egress_NEC" {
+  security_group_id = aws_security_group.cluster_ec2.id
+  type              = "egress"
+  description       = "Allow outbound HTTPS to 10.120.0.0/24"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = ["10.120.0.0/24"]
+}
+
 # RDS Security Group
 resource "aws_security_group" "tds_db" {
   name        = "${local.application_name}-tds-allow-db"
