@@ -4,8 +4,8 @@
 locals {
   name                       = "streaming-poc-maf"
   deploy_to                  = ["development"]
-  opensearch_host            = data.aws_opensearch_domain.opensearch.endpoint
-  msk_bootstrap_brokers      = data.aws_msk_bootstrap_brokers.msk.bootstrap_brokers_sasl_iam
+  opensearch_host            = contains(local.deploy_to, local.environment) ? try(data.aws_opensearch_domain.opensearch.endpoint, null) : null
+  msk_bootstrap_brokers      = contains(local.deploy_to, local.environment) ? try(data.aws_msk_bootstrap_brokers.msk.bootstrap_brokers_sasl_iam, null) : null
   sns_sender_id              = "MOJSTREAMPC"
   sns_monthly_spending_limit = 200
 
