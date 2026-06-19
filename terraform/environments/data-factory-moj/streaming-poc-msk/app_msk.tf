@@ -24,7 +24,7 @@ resource "aws_msk_serverless_cluster" "cluster" {
 
 resource "aws_security_group" "msk" {
   count       = contains(["development"], local.environment) ? 1 : 0
-  name_prefix = "{local.cluster_name}-sg"
+  name_prefix = "${local.cluster_name}-sg"
   description = "Security group for MSK Serverless cluster"
   vpc_id      = data.aws_vpc.shared.id
 
