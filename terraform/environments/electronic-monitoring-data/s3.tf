@@ -598,18 +598,8 @@ module "s3-data-bucket" {
         days = 10000
       }
 
-      noncurrent_version_transition = [
-        {
-          days          = 30
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 90
-          storage_class = "GLACIER"
-        }
-      ]
-
       noncurrent_version_expiration = {
-        days = 365
+        days = 35
       }
     }
   ]
