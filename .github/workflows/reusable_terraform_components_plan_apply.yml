@@ -137,7 +137,7 @@
             run: |
               terraform --version
               if [[ "${{ inputs.component }}" == "state-kms-backend-canary" ]]; then
-                kms_key_id="arn:aws:kms:eu-west-2:${BACKEND_NUMBER}:alias/s3-state-bucket"
+                kms_key_id="arn:aws:kms:eu-west-2:946070829339:key/mrk-886857b0d52a4c308722d53f112f7c60"
                 echo "terraform init with state bucket KMS backend config"
                 terraform init -backend-config="kms_key_id=${kms_key_id}"
               else
