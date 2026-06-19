@@ -635,9 +635,15 @@ def _handle_complete_multipart(event):
     if len({item["PartNumber"] for item in normalised_parts}) != len(normalised_parts):
         return _response(400, {"message": "Duplicate partNumber values are not allowed"})
 
+    total_parts = session.get("total_parts")
+    if total_parts is not None and any(item["PartNumber"] > int(total_parts) for item in normalised_parts):
+        return _response(
+            400,
+            {"message": "Requested part number exceeds the number of parts for this upload", "totalParts": int(total_parts)},
+        )
+
     if any(item["PartNumber"] < 1 or item["PartNumber"] > MULTIPART_MAX_PARTS for item in normalised_parts):
         return _response(400, {"message": f"partNumber must be between 1 and {MULTIPART_MAX_PARTS}"})
-
     complete_response = S3_CLIENT.complete_multipart_upload(
         Bucket=session["bucket"],
         Key=session["object_key"],
