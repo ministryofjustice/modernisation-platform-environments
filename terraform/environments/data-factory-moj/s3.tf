@@ -4,4 +4,16 @@ module "s3_bucket" {
   
   bucket_name      = "intermediate-salad-aisle-rehearsal"
   bucket_namespace = "account-regional"
+
+  providers = {
+    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
+    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
+    # Platform team to add a new provider for the additional Region.
+    # Leave this provider block in even if you are not using replication
+    aws.bucket-replication = aws
+  }
+
+  sse_algorithm = "AES256"
+
+  tags = local.tags
 }
