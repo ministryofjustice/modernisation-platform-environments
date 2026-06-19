@@ -2,13 +2,13 @@
 # LOCALS
 # ---------------------------------------------------------------------------------------------------------------------
 locals {
-  name      = "streaming-poc-maf"
-  deploy_to = ["development"]
-  opensearch_host    = data.aws_opensearch_domain.opensearch.endpoint
-  msk_bootstrap_brokers = data.aws_msk_bootstrap_brokers.msk.bootstrap_brokers_sasl_iam
+  name                       = "streaming-poc-maf"
+  deploy_to                  = ["development"]
+  opensearch_host            = data.aws_opensearch_domain.opensearch.endpoint
+  msk_bootstrap_brokers      = data.aws_msk_bootstrap_brokers.msk.bootstrap_brokers_sasl_iam
   sns_sender_id              = "MOJSTREAMPC"
   sns_monthly_spending_limit = 200
-  
+
   drone_incursion_alert_emails = [
     "dnguyen@akersystems.com",
     "smir@akersystems.com",
@@ -17,14 +17,14 @@ locals {
     "smalavalli@akersystems.com",
     "vshah@akersystems.com",
   ]
-  
+
   drone_incursion_alert_phone_numbers = [
     "+447966916633", # Stuart
     "+447951225592", # Salman
     "+447865613301", # Nick
     "+447535705157"  # Sharath
   ]
-  
+
   geofence_app = {
     jar_filename = "flink-moj-geofence-1.0.24.jar"
   }
