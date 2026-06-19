@@ -84,9 +84,12 @@ resource "aws_sqs_queue_policy" "delius_oasys" {
 resource "aws_sns_topic_subscription" "delius_oasys" {
   for_each = local.delius_oasys_queues_with_topic_arns
 
-  topic_arn = local.delius_oasys_sns_topic_arns[each.key]
+  endpoint = aws_sqs_queue.delius_oasys[each.key].arn
+  filter_policy = local.is-development ? null : jsonencode({
+    eventType = ["probation-case.sentence.terminated"]
+  })
   protocol  = "sqs"
-  endpoint  = aws_sqs_queue.delius_oasys[each.key].arn
+  topic_arn = local.delius_oasys_sns_topic_arns[each.key]
 }
 
 resource "aws_iam_user" "delius_oasys" {
