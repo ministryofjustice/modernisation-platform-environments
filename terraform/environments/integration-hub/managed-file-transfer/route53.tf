@@ -1,12 +1,12 @@
 module "r53_managed_file_transfer" {
   providers = { aws = aws.core-network-services }
-  source   = "terraform-aws-modules/route53/aws"
-  version  = "6.5.0"
+  source    = "terraform-aws-modules/route53/aws"
+  version   = "6.5.0"
 
   name        = local.is-production == false ? "${local.environment}.managed-file-transfer.service.justice.gov.uk" : "managed-file-transfer.service.justice.gov.uk"
   comment     = "Managed by Terraform"
   create_zone = false
-  
+
   records = {
     sftp = {
       name    = "sftp"
