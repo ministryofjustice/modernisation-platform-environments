@@ -171,7 +171,7 @@ module "flink_rules" {
         sid       = "AllowSNSPublish"
         effect    = "Allow"
         actions   = ["sns:Publish"]
-        resources = [module.sns_drone_incursion_alerts.topic_arn]
+        resources = [module.sns_drone_incursion_alerts[0].topic_arn]
       },
       {
         sid    = "AllowSNSKMS"
@@ -180,7 +180,7 @@ module "flink_rules" {
           "kms:GenerateDataKey",
           "kms:Decrypt"
         ]
-        resources = [module.sns_drone_incursion_alerts.topic_arn]
+        resources = [module.sns_drone_incursion_alerts[0].topic_arn]
       }
     ]
   }
