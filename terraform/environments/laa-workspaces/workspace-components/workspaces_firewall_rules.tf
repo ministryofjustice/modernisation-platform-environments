@@ -53,10 +53,7 @@ resource "aws_networkfirewall_rule_group" "workspaces_aws_endpoints" {
           ".s3-external-1.amazonaws.com",
           ".s3-${var.aws_region}.amazonaws.com",
           "sqs.${var.aws_region}.amazonaws.com",
-          "cloudfront.amazonaws.com",
-          "workspace-mfa.laa-development.modernisation-platform.service.justice.gov.uk",
-          ".microsoft.com", # REMOVE ME THIS IS FOR TESTING
-          ".amazonaws.com" # REMOVE ME THIS IS FOR TESTING
+          "cloudfront.amazonaws.com"
 
         ]
       }
@@ -165,11 +162,6 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
           "ecn.dev.virtualearth.net",
           "platform.linkedin.com",
           "tokensit.cp.microsoft-tst.com", # Microsoft test tenant CP endpoint
-
-
-
-           # LinOTP portals
-          ".laa-development.modernisation-platform.service.justice.gov.uk",
 
            # Required if service is behind CloudFront or ALB
            ".cloudfront.net",
@@ -387,7 +379,8 @@ resource "aws_networkfirewall_rule_group" "workspaces_certificate_authorities" {
 }
 
 # -----------------------------------------------------------------------------
-# WorkSpaces Network Firewall policy and firewall
+# WorkSpaces Network Firewall policy and firewall - Strict Order option
+# This one is currently INACTIVE
 # -----------------------------------------------------------------------------
 resource "aws_networkfirewall_firewall_policy" "workspaces_web_allowlist" {
   count       = local.environment == "development" ? 1 : 0
@@ -430,9 +423,10 @@ resource "aws_networkfirewall_firewall_policy" "workspaces_web_allowlist" {
   }
 }
 
-################################
-## Dummy policy for swapping
-################################
+# --------------------------------------------------------------------------------
+# WorkSpaces Network Firewall policy and firewall - Default Action Order option
+# This one is currently IN USE
+# --------------------------------------------------------------------------------
 resource "aws_networkfirewall_firewall_policy" "workspaces_web_allowlist_2" {
   count       = local.environment == "development" ? 1 : 0
   name        = "workspaces-web-allowlist-policy-2"
