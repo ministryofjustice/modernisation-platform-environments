@@ -153,7 +153,7 @@
       "logging_config": "classpath:log4j2-aws.xml",
       "logging_level_root": "info",
       "logging_level_uk_gov_laa_opa": "info",
-      "logging_level_uk_gov_justice_laa_ccms": "debug",
+      "logging_level_uk_gov_justice_laa_ccms": "info",
       "adaptor_ecr_repo": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-service-adaptor",
       "adaptor_container_version": "0.0.7",
       "adaptor_server_port": "8080",
@@ -161,8 +161,8 @@
       "adaptor_spring_profile": "aws",
       "adaptor_container_cpu": "1024",
       "adaptor_container_memory": "2048",
-      "client_opa12assess_means_address": "https://ccms-opa.laa-test.modernisation-platform.service.justice.gov.uk/opa/determinations-server/answer/soap/12.2.1/MeansAssessment",
-      "client_opa12assess_billing_address": "https://ccms-opa.laa-test.modernisation-platform.service.justice.gov.uk/opa/determinations-server/answer/soap/12.2.1/BillingAssessment",
+      "client_opa12assess_means_address": "https://ccms-opa.laa-test.modernisation-platform.service.justice.gov.uk/opa/determinations-server/assess/soap/generic/12.2.1/MeansAssessment",
+      "client_opa12assess_billing_address": "https://ccms-opa.laa-test.modernisation-platform.service.justice.gov.uk/opa/determinations-server/assess/soap/generic/12.2.1/BillingAssessment",
       "server_opa10assess_security_user_name": "admin"
     },
     "preproduction": {
@@ -235,7 +235,7 @@
       "logging_config": "classpath:log4j2-aws.xml",
       "logging_level_root": "info",
       "logging_level_uk_gov_laa_opa": "info",
-      "logging_level_uk_gov_justice_laa_ccms": "debug",
+      "logging_level_uk_gov_justice_laa_ccms": "info",
       "adaptor_ecr_repo": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-service-adaptor",
       "adaptor_container_version": "0.0.7",
       "adaptor_server_port": "8080",
@@ -243,8 +243,8 @@
       "adaptor_spring_profile": "aws",
       "adaptor_container_cpu": "1024",
       "adaptor_container_memory": "2048",
-      "client_opa12assess_means_address": "https://ccms-opa.laa-preproduction.modernisation-platform.service.justice.gov.uk/opa/determinations-server/answer/soap/12.2.1/MeansAssessment",
-      "client_opa12assess_billing_address": "https://ccms-opa.laa-preproduction.modernisation-platform.service.justice.gov.uk/opa/determinations-server/answer/soap/12.2.1/BillingAssessment",
+      "client_opa12assess_means_address": "https://ccms-opa.laa-preproduction.modernisation-platform.service.justice.gov.uk/opa/determinations-server/assess/soap/generic/12.2.1/MeansAssessment",
+      "client_opa12assess_billing_address": "https://ccms-opa.laa-preproduction.modernisation-platform.service.justice.gov.uk/opa/determinations-server/assess/soap/generic/12.2.1/BillingAssessment",
       "server_opa10assess_security_user_name": "admin"
     },
     "production": {
@@ -325,8 +325,8 @@
       "adaptor_spring_profile": "aws",
       "adaptor_container_cpu": "1024",
       "adaptor_container_memory": "2048",
-      "client_opa12assess_means_address": "https://ccms-opa.laa.service.justice.gov.uk/opa/determinations-server/answer/soap/12.2.1/MeansAssessment",
-      "client_opa12assess_billing_address": "https://ccms-opa.laa.service.justice.gov.uk/opa/determinations-server/answer/soap/12.2.1/BillingAssessment",
+      "client_opa12assess_means_address": "https://ccms-opa.laa.service.justice.gov.uk/opa/determinations-server/assess/soap/generic/12.2.1/MeansAssessment",
+      "client_opa12assess_billing_address": "https://ccms-opa.laa.service.justice.gov.uk/opa/determinations-server/assess/soap/generic/12.2.1/BillingAssessment",
       "server_opa10assess_security_user_name": "admin",
       "cortex_deps_bucket_name": "ccms-shared"
     }
