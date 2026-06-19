@@ -20,6 +20,36 @@ resource "helm_release" "envoy_gateway" {
 
 }
 
+resource "kubernetes_manifest" "envoy_proxy" {
+  manifest = {
+    apiVersion = "gateway.envoyproxy.io/v1alpha1"
+    kind       = "EnvoyProxy"
+
+    metadata = {
+      name      = "shared-alb-proxy"
+      namespace = "envoy-gateway-system"
+    }
+
+    spec = {
+      provider = {
+        type = "Kubernetes"
+
+        kubernetes = {
+          envoyDeployment = {
+            replicas = 3
+          }
+
+          envoyService = {
+            type = "ClusterIP"
+            name = "envoy-gateway-proxy-alb"
+          }
+        }
+      }
+    }
+  }
+
+  depends_on = [helm_release.envoy_gateway]
+}
 resource "kubernetes_manifest" "gateway_class" {
   manifest = {
     apiVersion = "gateway.networking.k8s.io/v1"
@@ -31,10 +61,20 @@ resource "kubernetes_manifest" "gateway_class" {
 
     spec = {
       controllerName = "gateway.envoyproxy.io/gatewayclass-controller"
+
+      parametersRef = {
+        group     = "gateway.envoyproxy.io"
+        kind      = "EnvoyProxy"
+        name      = "shared-alb-proxy"
+        namespace = "envoy-gateway-system"
+      }
     }
   }
 
-  depends_on = [helm_release.envoy_gateway]
+  depends_on = [
+    helm_release.envoy_gateway,
+    kubernetes_manifest.envoy_proxy
+  ]
 }
 
 resource "kubernetes_manifest" "gateway" {
