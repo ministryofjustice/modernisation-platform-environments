@@ -1,8 +1,8 @@
 # ---------------------------------------------------------------------------------------------------------------------
 # S3
 # ---------------------------------------------------------------------------------------------------------------------
-#checkov:skip=CKV_TF_1:terraform-aws-modules uses version pinning which is the recommended approach for registry modules
 module "flink_artifacts_bucket" {
+  #checkov:skip=CKV_TF_1:terraform-aws-modules uses version pinning which is the recommended approach for registry modules
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "~> 5.0"
 

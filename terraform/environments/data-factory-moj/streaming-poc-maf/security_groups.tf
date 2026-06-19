@@ -1,8 +1,8 @@
 # ---------------------------------------------------------------------------------------------------------------------
 # SECURITY GROUPS
 # ---------------------------------------------------------------------------------------------------------------------
-#checkov:skip=CKV2_AWS_5:Security groups are attached to the Flink application via the managed-apache-flink module
 resource "aws_security_group" "allow_s3" {
+  #checkov:skip=CKV2_AWS_5:Security groups are attached to the Flink application via the managed-apache-flink module
   count       = contains(local.deploy_to, local.environment) ? 1 : 0
   name        = "allow-s3-egress-from-flink"
   description = "Allow HTTPS egress traffic to s3 from flink applications"
@@ -32,6 +32,7 @@ resource "aws_vpc_security_group_egress_rule" "egress_to_s3" {
 # TODO: Remove this security group once MSK is deployed to the shared account
 # ---------------------------------------------------------------------------------------------------------------------
 resource "aws_security_group" "allow_msk" {
+  #checkov:skip=CKV2_AWS_5:Security groups are attached to the Flink application via the managed-apache-flink module
   count       = contains(local.deploy_to, local.environment) ? 1 : 0
   name        = "allow-msk-egress-from-flink"
   description = "Allow egress to MSK Serverless cluster - VPC only access"

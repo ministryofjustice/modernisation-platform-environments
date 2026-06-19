@@ -1,12 +1,10 @@
 # ---------------------------------------------------------------------------------------------------------------------
 # KMS
 # ---------------------------------------------------------------------------------------------------------------------
-
-#checkov:skip=CKV_AWS_111:KMS key policies require kms:* on * for the root account - this is an AWS requirement
-#checkov:skip=CKV_AWS_109:KMS key policies require kms:* on * for the root account - this is an AWS requirement
-#checkov:skip=CKV_AWS_356:KMS key policies require * as resource - this is an AWS requirement
-
 data "aws_iam_policy_document" "s3_kms" {
+  #checkov:skip=CKV_AWS_111:KMS key policies require kms:* on * for the root account - this is an AWS requirement
+  #checkov:skip=CKV_AWS_109:KMS key policies require kms:* on * for the root account - this is an AWS requirement
+  #checkov:skip=CKV_AWS_356:KMS key policies require * as resource - this is an AWS requirement
   statement {
     sid    = "EnableRootAccess"
     effect = "Allow"
@@ -51,6 +49,9 @@ resource "aws_kms_alias" "s3" {
 }
 
 data "aws_iam_policy_document" "cloudwatch_kms" {
+  #checkov:skip=CKV_AWS_111:KMS key policies require kms:* on * for the root account - this is an AWS requirement
+  #checkov:skip=CKV_AWS_109:KMS key policies require kms:* on * for the root account - this is an AWS requirement
+  #checkov:skip=CKV_AWS_356:KMS key policies require * as resource - this is an AWS requirement
   statement {
     sid    = "EnableRootAccess"
     effect = "Allow"
@@ -100,6 +101,9 @@ resource "aws_kms_alias" "cloudwatch" {
 }
 
 data "aws_iam_policy_document" "sns_kms" {
+  #checkov:skip=CKV_AWS_111:KMS key policies require kms:* on * for the root account - this is an AWS requirement
+  #checkov:skip=CKV_AWS_109:KMS key policies require kms:* on * for the root account - this is an AWS requirement
+  #checkov:skip=CKV_AWS_356:KMS key policies require * as resource - this is an AWS requirement
   statement {
     sid    = "EnableRootAccess"
     effect = "Allow"
