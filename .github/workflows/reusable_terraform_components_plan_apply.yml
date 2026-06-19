@@ -136,8 +136,14 @@
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
               terraform --version
-              echo "terraform init"
-              terraform init
+              if [[ "${{ inputs.component }}" == "state-kms-backend-canary" ]]; then
+                kms_key_id="arn:aws:kms:eu-west-2:${BACKEND_NUMBER}:alias/s3-state-bucket"
+                echo "terraform init with state bucket KMS backend config"
+                terraform init -backend-config="kms_key_id=${kms_key_id}"
+              else
+                echo "terraform init"
+                terraform init
+              fi
 
           #
           # Terraform Workspace Select
