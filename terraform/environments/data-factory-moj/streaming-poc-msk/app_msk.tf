@@ -39,7 +39,7 @@ resource "aws_security_group" "msk" {
   }
 
   tags = merge(local.extended_tags, {
-    name        = "{local.cluster_name}-sg",
+    name        = "${local.cluster_name}-sg",
     description = "Security group for MSK Serverless cluster"
   })
 
