@@ -5,7 +5,7 @@ resource "aws_msk_serverless_cluster" "cluster" {
 
   vpc_config {
     subnet_ids         = data.aws_subnets.shared-private.ids
-    security_group_ids = [aws_security_group.msk_1[0].id]
+    security_group_ids = [aws_security_group.msk[0].id, aws_security_group.msk_1[0].id]
   }
 
   lifecycle {
@@ -30,7 +30,7 @@ resource "aws_msk_serverless_cluster" "cluster" {
 
 resource "aws_security_group" "msk" {
   count       = contains(["development"], local.environment) ? 1 : 0
-  name_prefix = "${local.cluster_name}-sg"
+  name_prefix = "{local.cluster_name}-sg"
   description = "Security group for MSK Serverless cluster"
   vpc_id      = data.aws_vpc.shared.id
 
@@ -39,7 +39,7 @@ resource "aws_security_group" "msk" {
   }
 
   tags = merge(local.extended_tags, {
-    name        = "${local.cluster_name}-sg",
+    name        = "{local.cluster_name}-sg",
     description = "Security group for MSK Serverless cluster"
   })
 
