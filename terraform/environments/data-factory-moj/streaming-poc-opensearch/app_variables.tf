@@ -14,3 +14,11 @@ variable "instance_count" {
   default = 2
 }
 
+variable "opensearch_role_mappings" {
+  description = "Map of OpenSearch role name to backend IAM role ARNs and/or internal users."
+  type = map(object({
+    backend_roles = optional(list(string), [])
+    users         = optional(list(string), [])
+  }))
+  default = {}
+}
