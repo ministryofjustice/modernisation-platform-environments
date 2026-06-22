@@ -1,4 +1,5 @@
 module "opensearch" {
+  #checkov:skip=CKV_TF_1:Skipping as have tagged major version
   count   = contains(["development"], local.environment) ? 1 : 0
   source  = "terraform-aws-modules/opensearch/aws"
   version = "~> 2.0"
@@ -45,6 +46,7 @@ module "opensearch" {
 }
 
 resource "aws_security_group" "opensearch" {
+  #checkov:skip=CKV2_AWS_5:Skipping because this SG is attached via the opensearch vpc_options block
   count       = contains(["development"], local.environment) ? 1 : 0
   name_prefix = "${local.cluster_name}-sg"
   description = "Security group for OpenSearch domain access"
