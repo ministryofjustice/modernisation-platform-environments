@@ -2,21 +2,21 @@ locals {
   definitions_bucket_name = "${local.project}-data-product-definitions-${local.env}"
   dpd_publishing_teams = {
     activities = {
-      github_repo      = "hmpps-dpr-activities-dpds"
-      s3_prefix        = "activities"
+      github_repo = "hmpps-dpr-activities-dpds"
+      s3_prefix   = "activities"
     }
   }
 }
 
 module "s3_data_product_definitions_bucket" {
-  source                    = "./modules/s3_bucket"
-  create_s3                 = local.setup_buckets
-  name                      = local.definitions_bucket_name
-  custom_kms_key            = local.s3_kms_arn
-  create_notification_queue = false
-  enable_lifecycle          = false
-  enable_s3_versioning      = true
-  enable_versioning_config  = "Enabled"
+  source                     = "./modules/s3_bucket"
+  create_s3                  = local.setup_buckets
+  name                       = local.definitions_bucket_name
+  custom_kms_key             = local.s3_kms_arn
+  create_notification_queue  = false
+  enable_lifecycle           = false
+  enable_s3_versioning       = true
+  enable_versioning_config   = "Enabled"
   enable_intelligent_tiering = false
 
   tags = merge(

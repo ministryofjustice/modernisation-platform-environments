@@ -25,9 +25,9 @@ resource "aws_secretsmanager_secret" "ftp_jobs_secret" {
 resource "aws_secretsmanager_secret_version" "ftp_jobs_secret_values" {
   secret_id = aws_secretsmanager_secret.ftp_jobs_secret.id
   secret_string = jsonencode({
-    HOST         = "",
-    USER         = "",
-    PASSWORD     = "",
+    HOST          = "",
+    USER          = "",
+    PASSWORD      = "",
     SLACK_WEBHOOK = ""
   })
   lifecycle {

@@ -17,8 +17,8 @@ resource "aws_lb" "PPUD-ALB" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.PPUD-ALB.id]
-# security_groups    = [aws_security_group.all["PPUD-ALB-Load-Balancer-Security-Group"].id] # to be migrated over under a change maintenance window
-  subnets            = [data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
+  # security_groups    = [aws_security_group.all["PPUD-ALB-Load-Balancer-Security-Group"].id] # to be migrated over under a change maintenance window
+  subnets = [data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
 
   enable_deletion_protection = true
   drop_invalid_header_fields = true
@@ -97,8 +97,8 @@ resource "aws_lb" "WAM-ALB" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.WAM-ALB.id]
-# security_groups    = [aws_security_group.all["WAM-ALB-Load-Balancer-Security-Group"].id] # to be migrated over under a change maintenance window
-  subnets            = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id]
+  # security_groups    = [aws_security_group.all["WAM-ALB-Load-Balancer-Security-Group"].id] # to be migrated over under a change maintenance window
+  subnets = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id]
 
   enable_deletion_protection = true
   drop_invalid_header_fields = true
