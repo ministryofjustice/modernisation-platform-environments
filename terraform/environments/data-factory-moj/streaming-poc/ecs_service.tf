@@ -74,6 +74,7 @@ resource "aws_iam_role_policy" "sdg_task_exec_ecr" {
 }
 
 data "aws_iam_policy_document" "sdg_task" {
+  for_each = toset(contains(local.deploy_to, local.environment) ? ["sdg_task"] : [])
   statement {
     sid    = "AllowMSKClusters"
     effect = "Allow"
@@ -127,7 +128,7 @@ resource "aws_iam_role_policy" "sdg_task" {
   count  = contains(local.deploy_to, local.environment) ? 1 : 0
   name   = "${local.sdg_prefix}-task"
   role   = aws_iam_role.sdg_task[0].name
-  policy = data.aws_iam_policy_document.sdg_task.json
+  policy = data.aws_iam_policy_document.sdg_task["sdg_task"].json
 }
 
 # --- Alerts Service IAM ---
@@ -160,6 +161,7 @@ resource "aws_iam_role_policy" "alerts_task_exec_ecr" {
 }
 
 data "aws_iam_policy_document" "alerts_task" {
+  for_each = toset(contains(local.deploy_to, local.environment) ? ["alerts_task"] : [])
   statement {
     sid    = "AllowMSKClusters"
     effect = "Allow"
@@ -221,7 +223,7 @@ resource "aws_iam_role_policy" "alerts_task" {
   count  = contains(local.deploy_to, local.environment) ? 1 : 0
   name   = "${local.alerts_prefix}-task"
   role   = aws_iam_role.alerts_task[0].name
-  policy = data.aws_iam_policy_document.alerts_task.json
+  policy = data.aws_iam_policy_document.alerts_task["alerts_task"].json
 }
 
 # --- Security Groups ---
@@ -295,6 +297,7 @@ resource "aws_vpc_security_group_egress_rule" "alerts_msk_out" {
 # --- Synthetic Data Generator ---
 
 module "ecs_container_sdg" {
+  count  = contains(local.deploy_to, local.environment) ? 1 : 0
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=697b010957fabc36b7f648bc535021231f748674" # v6.0.2
 
   name                     = local.sdg_prefix
@@ -330,7 +333,7 @@ module "ecs_service_sdg" {
   name        = local.sdg_prefix
   cluster_arn = module.ecs_cluster[0].ecs_cluster_arn
 
-  container_definitions = module.ecs_container_sdg.json_encoded_list
+  container_definitions = module.ecs_container_sdg[0].json_encoded_list
 
   subnets         = data.aws_subnets.shared-private.ids
   security_groups = [aws_security_group.sdg[0].id]
@@ -363,6 +366,7 @@ resource "aws_cloudwatch_log_group" "sdg" {
 # --- Alerts Service ---
 
 module "ecs_container_alerts" {
+  count  = contains(local.deploy_to, local.environment) ? 1 : 0
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=697b010957fabc36b7f648bc535021231f748674" # v6.0.2
 
   name                     = local.alerts_prefix
@@ -402,7 +406,7 @@ module "ecs_service_alerts" {
   name        = local.alerts_prefix
   cluster_arn = module.ecs_cluster[0].ecs_cluster_arn
 
-  container_definitions = module.ecs_container_alerts.json_encoded_list
+  container_definitions = module.ecs_container_alerts[0].json_encoded_list
 
   subnets         = data.aws_subnets.shared-private.ids
   security_groups = [aws_security_group.alerts[0].id]
