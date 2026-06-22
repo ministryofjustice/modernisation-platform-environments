@@ -468,6 +468,12 @@ locals {
           disable_api_termination = true
           instance_type           = "r6i.4xlarge"
         })
+        tags = merge(local.ec2_instances.db.tags, {
+          description       = "Disaster-Recovery/High-Availability production databases for AUDIT/MIS"
+          misload-dbname    = "DRMIS"
+          nomis-environment = "prod"
+          oracle-sids       = "DRMIS DRCNMAUD"
+        })
       })
     }
 
