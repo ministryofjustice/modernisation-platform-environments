@@ -130,3 +130,34 @@ resource "kubernetes_manifest" "gateway_proxy" {
   ]
 }
 
+resource "kubernetes_manifest" "coraza_waf" {
+  manifest = yamldecode(<<-YAML
+    apiVersion: gateway.envoyproxy.io/v1alpha1
+    kind: EnvoyExtensionPolicy
+    metadata:
+      name: coraza-waf
+      namespace: envoy-gateway-system
+    spec:
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: Gateway
+          name: eg
+      dynamicModule:
+        - name: composer
+          filterName: coraza-waf
+          config:
+            directives:
+              - Include @coraza.conf
+              - SecRuleEngine DetectionOnly
+              - SecAuditEngine On
+              - SecResponseBodyAccess Off
+              - Include @crs-setup.conf
+              - Include @owasp_crs/*.conf
+   YAML
+  )
+
+  depends_on = [
+    helm_release.envoy_gateway,
+    kubernetes_manifest.gatewayclass,
+  ]
+}
