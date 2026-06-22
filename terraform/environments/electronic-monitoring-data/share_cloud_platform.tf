@@ -203,7 +203,7 @@ module "emd_validation_db_role" {
 module "emd_data_api_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-  count   = local.is-test ? 1 : 0
+  count   = local.is-development ? 1 : 0
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.48.0"
 
@@ -302,6 +302,37 @@ resource "aws_lakeformation_permissions" "em_data_validation_s3" {
   count       = local.is-test || local.is-production ? 1 : 0
   principal   = module.emd_validation_db_role[0].iam_role_arn
   permissions = ["DATA_LOCATION_ACCESS"]
+  data_location {
+    arn = module.s3-create-a-derived-table-bucket.bucket.arn
+  }
+}
+
+resource "aws_lakeformation_permissions" "em_data_api_datamart_db" {
+  count       = local.is-development ? 1 : 0
+  principal   = module.emd_data_api_role[0].iam_role_arn
+  permissions = ["DESCRIBE"]
+
+  database {
+    name = "datamart${local.dbt_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "em_data_api_order_dim" {
+  count       = local.is-development ? 1 : 0
+  principal   = module.emd_data_api_role[0].iam_role_arn
+  permissions = ["DESCRIBE", "SELECT"]
+
+  table {
+    database_name = "datamart${local.dbt_suffix}"
+    name          = "order_dim"
+  }
+}
+
+resource "aws_lakeformation_permissions" "em_data_api_s3" {
+  count       = local.is-development ? 1 : 0
+  principal   = module.emd_data_api_role[0].iam_role_arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+
   data_location {
     arn = module.s3-create-a-derived-table-bucket.bucket.arn
   }
