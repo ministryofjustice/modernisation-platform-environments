@@ -17,7 +17,8 @@
       "app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-financial-transfers",
       "container_version": "financial-transfers-api-0.0.6-development",
       "lz_aws_workspace_nonprod_prod": "10.200.0.0/19",
-      "logging_level_root": "debug",
+      "logging_level_root": "info",
+      "logging_level_uk_gov_laa_ccms": "debug",
       "cortex_deps_bucket_name": "ccms-shared"
     },
     "test": {
@@ -37,7 +38,8 @@
       "app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-financial-transfers",
       "container_version": "financial-transfers-api-0.0.6-test",
       "lz_aws_workspace_nonprod_prod": "10.200.0.0/19",
-      "logging_level_root": "debug",
+      "logging_level_root": "info",
+      "logging_level_uk_gov_laa_ccms": "info",
       "cortex_deps_bucket_name": "ccms-shared"
     },
     "preproduction": {
@@ -58,6 +60,7 @@
       "container_version": "financial-transfers-api-0.0.6-pre-production",
       "lz_aws_workspace_nonprod_prod": "10.200.0.0/19",
       "logging_level_root": "info",
+      "logging_level_uk_gov_laa_ccms": "info",
       "cortex_deps_bucket_name": "ccms-shared"
     },
     "production": {
@@ -78,6 +81,7 @@
       "container_version": "financial-transfers-api-0.0.6-production",
       "lz_aws_workspace_nonprod_prod": "10.200.0.0/19",
       "logging_level_root": "info",
+      "logging_level_uk_gov_laa_ccms": "info",
       "cortex_deps_bucket_name": "ccms-shared"
     }
   }

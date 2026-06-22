@@ -119,7 +119,7 @@ variable "appscaling_max_capacity" {
   default     = 6
 }
 
-# replace with AL2023 user data after migration
+# TODO LASB-5089 Replace with AL2023 user data
 variable "user_data" {
   type        = string
   description = "The configuration used when creating EC2s used for the ECS cluster"
