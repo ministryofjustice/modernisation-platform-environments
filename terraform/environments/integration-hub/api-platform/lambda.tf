@@ -59,6 +59,7 @@ module "lambda_upload_ticket" {
     upload_bucket_kms_access = {
       effect = "Allow"
       actions = [
+        "kms:Decrypt",
         "kms:DescribeKey",
         "kms:Encrypt",
         "kms:GenerateDataKey*",
