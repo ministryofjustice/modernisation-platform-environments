@@ -68,38 +68,14 @@ resource "aws_security_group_rule" "ecs_tasks_edrms" {
   source_security_group_id = aws_security_group.load_balancer.id
 }
 
-resource "aws_security_group_rule" "ecs_tasks_egress_s3" {
+resource "aws_security_group_rule" "ecs_tasks_egress_all" {
   security_group_id = aws_security_group.ecs_tasks_edrms.id
   type              = "egress"
-  description       = "Allow S3 access via gateway endpoint (prefix list)"
-  protocol          = "tcp"
-  from_port         = 443
-  to_port           = 443
-  prefix_list_ids   = [data.aws_prefix_list.s3.id]
-}
-
-resource "aws_security_group_rule" "ecs_tasks_egress_db" {
-  security_group_id = aws_security_group.ecs_tasks_edrms.id
-  type              = "egress"
-  description       = "Allow outbound DB access to TDS"
-  protocol          = "TCP"
-  from_port         = 1521
-  to_port           = 1521
-  source_security_group_id = aws_security_group.tds_db.id
-}
-
-resource "aws_security_group_rule" "ecs_tasks_egress_vpce" {
-  security_group_id = aws_security_group.ecs_tasks_edrms.id
-  type              = "egress"
-  description       = "Allow egress to VPC endpoints (S3 / Secrets Manager)"
-  protocol          = "TCP"
-  from_port         = 443
-  to_port           = 443
-  source_security_group_id = data.aws_security_group.vpce_security_group.id
-
-  lifecycle {
-    ignore_changes = [source_security_group_id]
-  }
+  description       = "All"
+  protocol          = -1
+  from_port         = 0
+  to_port           = 0
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 
