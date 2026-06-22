@@ -664,10 +664,12 @@ def lambda_handler(event, context):
             logger.info("CloudWatch Alarm detected in SNS message")
             logger.info("Starting Notification to Slack for CloudWatch Alarm via SNS Topic")
 
+            alarm_time = datetime.utcnow()  # fallback if timestamp is missing
             timestamp_str = sns_message.get('Timestamp')
             if timestamp_str:
                 dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
                 formatted = dt.strftime("%a, %d %b %Y %H:%M:%S UTC")
+                alarm_time = dt
 
             channelconfig = config.slack_channel_webhook
             alarmnotifiction = "CloudWatch Alarm Notification"
@@ -676,6 +678,18 @@ def lambda_handler(event, context):
             new_state = alarm_details.get('NewStateValue', '')
             if new_state == "OK":
                 is_error = False
+
+            # Suppress INSUFFICIENT_DATA notifications outside business hours (07:00–19:00 UTC).
+            # NonProd VMs (mailrelay, ftp, etc.) are stopped on a schedule after 7pm; the
+            # resulting INSUFFICIENT_DATA alarms are expected noise and should not page the team.
+            if new_state == "INSUFFICIENT_DATA" and not (7 <= alarm_time.hour < 19):
+                logger.info(
+                    "Suppressing INSUFFICIENT_DATA alarm '%s' outside business hours "
+                    "(hour=%d UTC). No Slack notification sent.",
+                    alarm_details.get('AlarmName', 'unknown'),
+                    alarm_time.hour,
+                )
+                return
 
         # Initialize services
         notification_service = NotificationService(
