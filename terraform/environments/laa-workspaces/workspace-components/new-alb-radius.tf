@@ -84,12 +84,17 @@ resource "aws_security_group_rule" "radius_alb_to_radius_server" {
   count = local.environment == "development" ? 1 : 0
 
   type                     = "egress"
-  from_port                = 443
-  to_port                  = 443
+  from_port                = 80
+  to_port                  = 80
   protocol                 = "tcp"
   security_group_id        = aws_security_group.radius_alb[0].id
   source_security_group_id = aws_security_group.radius_server[0].id
-  description              = "HTTPS to RADIUS servers"
+  description              = "HTTP to RADIUS servers"
+
+  # Previous configuration:
+  # from_port   = 443
+  # to_port     = 443
+  # description = "HTTPS to RADIUS servers"
 }
 
 ##############################################
@@ -125,10 +130,14 @@ resource "aws_lb_target_group" "radius_portal" {
   count = local.environment == "development" ? 1 : 0
 
   name_prefix = "radmfa"
-  port        = 443
-  protocol    = "HTTPS"
+  port        = 80
+  protocol    = "HTTP"
   vpc_id      = aws_vpc.workspaces[0].id
   target_type = "instance"
+
+  # Previous configuration:
+  # port     = 443
+  # protocol = "HTTPS"
 
   health_check {
     enabled             = true
@@ -137,8 +146,12 @@ resource "aws_lb_target_group" "radius_portal" {
     timeout             = 5
     interval            = 30
     path                = "/manage"
-    protocol            = "HTTPS"
-    matcher             = "200,401" # 401 is OK (auth required for /manage)
+    protocol            = "HTTP"
+    matcher             = "200,301,302,401" # 401/redirects are OK for /manage
+
+    # Previous health check configuration:
+    # protocol = "HTTPS"
+    # matcher  = "200,401"
   }
 
   deregistration_delay = 30
@@ -164,7 +177,10 @@ resource "aws_lb_target_group_attachment" "radius_portal" {
 
   target_group_arn = aws_lb_target_group.radius_portal[0].arn
   target_id        = aws_instance.radius_server[0].id
-  port             = 443
+  port             = 80
+
+  # Previous configuration:
+  # port = 443
 }
 
 ##############################################

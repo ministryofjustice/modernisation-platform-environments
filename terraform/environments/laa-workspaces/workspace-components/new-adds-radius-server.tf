@@ -176,12 +176,17 @@ resource "aws_security_group_rule" "radius_server_from_alb" {
   count = local.environment == "development" ? 1 : 0
 
   type                     = "ingress"
-  from_port                = 443
-  to_port                  = 443
+  from_port                = 80
+  to_port                  = 80
   protocol                 = "tcp"
   security_group_id        = aws_security_group.radius_server[0].id
   source_security_group_id = aws_security_group.radius_alb[0].id
-  description              = "HTTPS from ALB for LinOTP portal"
+  description              = "HTTP from ALB for LinOTP portal"
+
+  # Previous configuration:
+  # from_port   = 443
+  # to_port     = 443
+  # description = "HTTPS from ALB for LinOTP portal"
 }
 
 ##############################################
