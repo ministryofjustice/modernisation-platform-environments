@@ -29,19 +29,6 @@ resource "aws_security_group" "radius_alb" {
   }
 }
 
-# Commented out - public access disabled in favor of VPN-only access
-# resource "aws_security_group_rule" "radius_alb_https_from_internet" {
-#   count = local.environment == "development" ? 1 : 0
-#
-#   type              = "ingress"
-#   from_port         = 443
-#   to_port           = 443
-#   protocol          = "tcp"
-#   cidr_blocks       = ["0.0.0.0/0"]
-#   security_group_id = aws_security_group.radius_alb[0].id
-#   description       = "HTTPS from internet"
-# }
-
 resource "aws_security_group_rule" "radius_alb_https_from_vpn" {
   count = local.environment == "development" ? 1 : 0
 
@@ -53,19 +40,6 @@ resource "aws_security_group_rule" "radius_alb_https_from_vpn" {
   security_group_id = aws_security_group.radius_alb[0].id
   description       = "HTTPS from Global Protect Alpha VPN"
 }
-
-# Commented out - public access disabled in favor of VPN-only access
-# resource "aws_security_group_rule" "radius_alb_http_from_internet" {
-#   count = local.environment == "development" ? 1 : 0
-#
-#   type              = "ingress"
-#   from_port         = 80
-#   to_port           = 80
-#   protocol          = "tcp"
-#   cidr_blocks       = ["0.0.0.0/0"]
-#   security_group_id = aws_security_group.radius_alb[0].id
-#   description       = "HTTP from internet (redirects to HTTPS)"
-# }
 
 resource "aws_security_group_rule" "radius_alb_http_from_vpn" {
   count = local.environment == "development" ? 1 : 0
