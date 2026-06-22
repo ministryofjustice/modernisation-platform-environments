@@ -9,9 +9,17 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import boto3
+from botocore.config import Config
 
 
-S3_CLIENT = boto3.client("s3")
+AWS_REGION = os.environ.get("AWS_REGION", "eu-west-2")
+
+S3_CLIENT = boto3.client(
+    "s3",
+    region_name=AWS_REGION,
+    endpoint_url=f"https://s3.{AWS_REGION}.amazonaws.com",
+    config=Config(signature_version="s3v4", s3={"addressing_style": "virtual"}),
+)
 DYNAMODB = boto3.resource("dynamodb")
 
 TRANSFER_CLIENTS_TABLE = os.environ["TRANSFER_CLIENTS_TABLE"]
