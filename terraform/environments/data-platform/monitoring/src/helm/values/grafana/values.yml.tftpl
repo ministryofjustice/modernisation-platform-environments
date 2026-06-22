@@ -1,0 +1,14 @@
+# Grafana Helm chart values
+# Chart: https://github.com/grafana/helm-charts/tree/main/charts/grafana
+#
+# Skeleton values file - extend as the monitoring stack is built out.
+
+replicas: 1
+
+ingress:
+  enabled: true
+  hosts:
+    - ${hostname}
+
+persistence:
+  enabled: false
