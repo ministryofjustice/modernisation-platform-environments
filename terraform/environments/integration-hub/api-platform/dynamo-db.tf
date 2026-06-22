@@ -73,6 +73,34 @@ module "dynamodb_auth_principals" {
   tags = local.tags
 }
 
+module "dynamodb_multipart_uploads" {
+  source  = "terraform-aws-modules/dynamodb-table/aws"
+  version = "5.5.0"
+
+  name         = "${local.application_name}-${local.component_name}-multipart-uploads"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "transfer_ticket"
+
+  attributes = [
+    {
+      name = "transfer_ticket"
+      type = "S"
+    }
+  ]
+
+  table_class = "STANDARD"
+  timeouts = {
+    create = "60m"
+    delete = "60m"
+    update = "60m"
+  }
+
+  ttl_enabled        = true
+  ttl_attribute_name = "expires_at_epoch"
+
+  tags = local.tags
+}
+
 resource "aws_dynamodb_table_item" "transfer_client" {
   for_each = local.transfer_clients
 
