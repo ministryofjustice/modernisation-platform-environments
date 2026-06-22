@@ -114,6 +114,7 @@ locals {
     iam_policy_path   = "lambda_policies/malware-threat-notifier-role-policy.json"
     policy_template_vars = {
       account_number = local.environment_management.account_ids[terraform.workspace]
+      kms_key_arn    = module.kms.key_arn
     }
   }
 
