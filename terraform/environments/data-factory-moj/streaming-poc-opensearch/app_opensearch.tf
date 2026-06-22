@@ -55,7 +55,7 @@ resource "aws_security_group" "opensearch" {
   }
 
   tags = merge(local.extended_tags, {
-    name        = "{local.cluster_name}-sg",
+    Name        = "${local.cluster_name}-sg",
     description = "Security group for OpenSearch domain access"
   })
 
