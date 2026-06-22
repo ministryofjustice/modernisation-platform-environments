@@ -126,7 +126,7 @@ resource "aws_lb_target_group" "radius_portal" {
 
   name_prefix = "radmfa"
   port        = 443
-  protocol    = "HTTPs"
+  protocol    = "HTTPS"
   vpc_id      = aws_vpc.workspaces[0].id
   target_type = "instance"
 
