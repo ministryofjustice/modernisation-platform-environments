@@ -39,6 +39,7 @@ resource "aws_ecs_task_definition" "sftp_task_definition" {
       container_version     = local.application_data.accounts[local.environment].container_version
       ccms_s3_bucket        = local.sftp_bc_bucket_name
       logging_level_root    = local.application_data.accounts[local.environment].logging_level_root
+      logging_level_uk_gov_laa_ccms = local.application_data.accounts[local.environment].logging_level_uk_gov_laa_ccms
       ORACLE_USERNAME       = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:ORACLE_USERNAME::"
       ORACLE_PASSWORD       = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:ORACLE_PASSWORD::"
       ORACLE_URL            = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:ORACLE_URL::"
