@@ -75,14 +75,40 @@ resource "aws_iam_role_policy" "sdg_task_exec_ecr" {
 
 data "aws_iam_policy_document" "sdg_task" {
   statement {
-    sid    = "MSKProduce"
+    sid    = "AllowMSKClusters"
     effect = "Allow"
     actions = [
+      "kafka-cluster:AlterCluster",
       "kafka-cluster:Connect",
+      "kafka-cluster:DescribeCluster"
+    ]
+    resources = [local.msk_cluster_arn]
+  }
+
+  statement {
+    sid    = "AllowMSKTopics"
+    effect = "Allow"
+    actions = [
+      "kafka-cluster:AlterTopic",
+      "kafka-cluster:AlterTopicDynamicConfiguration",
+      "kafka-cluster:CreateTopic",
+      "kafka-cluster:DeleteTopic",
       "kafka-cluster:DescribeTopic",
+      "kafka-cluster:DescribeTopicDynamicConfiguration",
+      "kafka-cluster:ReadData",
       "kafka-cluster:WriteData"
     ]
-    resources = ["*"] # TODO: scope to specific resource once that resource is created
+    resources = local.msk_topic_arns
+  }
+
+  statement {
+    sid    = "AllowMSKGroups"
+    effect = "Allow"
+    actions = [
+      "kafka-cluster:AlterGroup",
+      "kafka-cluster:DescribeGroup"
+    ]
+    resources = local.msk_group_arns
   }
   statement {
     sid    = "SSMExec"
@@ -135,22 +161,59 @@ resource "aws_iam_role_policy" "alerts_task_exec_ecr" {
 
 data "aws_iam_policy_document" "alerts_task" {
   statement {
-    sid    = "MSKConsume"
+    sid    = "AllowMSKClusters"
     effect = "Allow"
     actions = [
+      "kafka-cluster:AlterCluster",
       "kafka-cluster:Connect",
-      "kafka-cluster:DescribeTopic",
-      "kafka-cluster:DescribeGroup",
-      "kafka-cluster:AlterGroup",
-      "kafka-cluster:ReadData"
+      "kafka-cluster:DescribeCluster"
     ]
-    resources = ["*"] # TODO: scope to specific resource once that resource is created
+    resources = [local.msk_cluster_arn]
   }
+
   statement {
-    sid       = "SNSPublish"
-    effect    = "Allow"
-    actions   = ["sns:Publish"]
-    resources = ["*"] # TODO: scope to specific resource once that resource is created
+    sid    = "AllowMSKTopics"
+    effect = "Allow"
+    actions = [
+      "kafka-cluster:AlterTopic",
+      "kafka-cluster:AlterTopicDynamicConfiguration",
+      "kafka-cluster:CreateTopic",
+      "kafka-cluster:DeleteTopic",
+      "kafka-cluster:DescribeTopic",
+      "kafka-cluster:DescribeTopicDynamicConfiguration",
+      "kafka-cluster:ReadData",
+      "kafka-cluster:WriteData"
+    ]
+    resources = local.msk_topic_arns
+  }
+
+  statement {
+    sid    = "AllowMSKGroups"
+    effect = "Allow"
+    actions = [
+      "kafka-cluster:AlterGroup",
+      "kafka-cluster:DescribeGroup"
+    ]
+    resources = local.msk_group_arns
+  }
+
+  statement {
+    sid    = "AllowSNSTopics"
+    effect = "Allow"
+    actions = [
+      "sns:Publish"
+    ]
+    resources = [data.aws_sns_topic.drone_incursion_topic["topic"].arn]
+  }
+
+  statement {
+    sid    = "AllowKMSAccess"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt"
+    ]
+    resources = [data.aws_kms_key.sns_topic_kmskey["sns"].arn]
   }
 }
 
@@ -240,7 +303,16 @@ module "ecs_container_sdg" {
   readonly_root_filesystem = false
   port_mappings            = []
   secrets                  = []
-  environment              = []
+  environment = [
+    {
+      name  = "ENVIRONMENT"
+      value = substr(lower(local.environment), 0, 3)
+    },
+    {
+      name  = "KAFKA_BROKER"
+      value = local.msk_bootstrap_brokers
+    }
+  ]
   log_configuration = {
     logDriver = "awslogs"
     options = {
@@ -299,7 +371,20 @@ module "ecs_container_alerts" {
   readonly_root_filesystem = true
   port_mappings            = []
   secrets                  = []
-  environment              = []
+  environment = [
+    {
+      name  = "ENVIRONMENT"
+      value = substr(lower(local.environment), 0, 3)
+    },
+    {
+      name  = "SPRING_PROFILES_ACTIVE"
+      value = substr(lower(local.environment), 0, 3)
+    },
+    {
+      name  = "MOJ-DRONE-INCURSION-ARN"
+      value = data.aws_sns_topic.drone_incursion_topic["topic"].arn
+    }
+  ]
   log_configuration = {
     logDriver = "awslogs"
     options = {
