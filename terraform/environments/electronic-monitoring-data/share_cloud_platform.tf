@@ -507,7 +507,7 @@ resource "aws_iam_role_policy_attachment" "em_data_validation_permissions" {
 }
 
 resource "aws_iam_policy" "em_data_api_permissions" {
-  count       = local.is-test ? 1 : 0
+  count       = local.is-development ? 1 : 0
   name_prefix = "em_data_api_permissions"
   description = "Permissions for the Electronic Monitoring Data API."
   policy      = data.aws_iam_policy_document.em_data_api_permissions.json
