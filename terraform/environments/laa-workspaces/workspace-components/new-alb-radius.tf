@@ -1,8 +1,9 @@
 ##############################################
 ### Application Load Balancer for RADIUS Portal
 ###
-### Provides public HTTPS access to LinOTP
+### Provides HTTPS access to LinOTP
 ### self-service MFA enrollment portal
+### Access restricted to Global Protect Alpha VPN
 ##############################################
 
 ##############################################
@@ -28,28 +29,54 @@ resource "aws_security_group" "radius_alb" {
   }
 }
 
-resource "aws_security_group_rule" "radius_alb_https_from_internet" {
+# Commented out - public access disabled in favor of VPN-only access
+# resource "aws_security_group_rule" "radius_alb_https_from_internet" {
+#   count = local.environment == "development" ? 1 : 0
+#
+#   type              = "ingress"
+#   from_port         = 443
+#   to_port           = 443
+#   protocol          = "tcp"
+#   cidr_blocks       = ["0.0.0.0/0"]
+#   security_group_id = aws_security_group.radius_alb[0].id
+#   description       = "HTTPS from internet"
+# }
+
+resource "aws_security_group_rule" "radius_alb_https_from_vpn" {
   count = local.environment == "development" ? 1 : 0
 
   type              = "ingress"
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = local.global_protect_alpha_vpn_cidrs
   security_group_id = aws_security_group.radius_alb[0].id
-  description       = "HTTPS from internet"
+  description       = "HTTPS from Global Protect Alpha VPN"
 }
 
-resource "aws_security_group_rule" "radius_alb_http_from_internet" {
+# Commented out - public access disabled in favor of VPN-only access
+# resource "aws_security_group_rule" "radius_alb_http_from_internet" {
+#   count = local.environment == "development" ? 1 : 0
+#
+#   type              = "ingress"
+#   from_port         = 80
+#   to_port           = 80
+#   protocol          = "tcp"
+#   cidr_blocks       = ["0.0.0.0/0"]
+#   security_group_id = aws_security_group.radius_alb[0].id
+#   description       = "HTTP from internet (redirects to HTTPS)"
+# }
+
+resource "aws_security_group_rule" "radius_alb_http_from_vpn" {
   count = local.environment == "development" ? 1 : 0
 
   type              = "ingress"
   from_port         = 80
   to_port           = 80
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = local.global_protect_alpha_vpn_cidrs
   security_group_id = aws_security_group.radius_alb[0].id
-  description       = "HTTP from internet (redirects to HTTPS)"
+  description       = "HTTP from Global Protect Alpha VPN (redirects to HTTPS)"
 }
 
 # Separate egress rule to avoid circular dependency
