@@ -140,12 +140,12 @@ resource "kubernetes_manifest" "test_workload_httproute" {
 }
 
 
-resource "kubernetes_manifest" "coraza_waf" {
+resource "kubernetes_manifest" "coraza_waf_http" {
   manifest = yamldecode(<<-YAML
     apiVersion: gateway.envoyproxy.io/v1alpha1
     kind: EnvoyExtensionPolicy
     metadata:
-      name: coraza-waf-httproute
+      name: coraza-waf
       namespace: test-workload
     spec:
       targetRefs:
@@ -157,13 +157,29 @@ resource "kubernetes_manifest" "coraza_waf" {
           filterName: coraza-waf
           config:
             directives:
+              # Loads Coraza base defaults and recommended core settings.
               - Include @coraza.conf
+
+              # Enforces the WAF engine to be active and process requests/responses.
               - SecRuleEngine On
+
+              # Enables audit logging for matched/security-relevant transactions.
               - SecAuditEngine On
+
+              # Writes audit logs as JSON to make stern/k9s output machine-parseable.
+              - SecAuditLogFormat JSON
+
+              # Sends audit logs to container stdout so they appear in Kubernetes logs.
+              - SecAuditLog /dev/stdout
+
+              # Skips response body inspection to reduce overhead/noise.
               - SecResponseBodyAccess Off
+
+              # Loads CRS tuning/bootstrap variables before CRS rules.
               - Include @crs-setup.conf
+
+              # Loads the full OWASP Core Rule Set.
               - Include @owasp_crs/*.conf
    YAML
   )
 }
-
