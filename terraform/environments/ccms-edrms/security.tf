@@ -21,14 +21,14 @@ resource "aws_security_group_rule" "alb_ingress_443" {
 }
 
 
-resource "aws_security_group_rule" "alb_egress_all" {
+resource "aws_security_group_rule" "alb_egress_ec2" {
   security_group_id = aws_security_group.load_balancer.id
   type              = "egress"
-  description       = "All"
-  protocol          = -1
-  from_port         = 0
-  to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Allow LB to reach EC2 cluster ephemeral ports"
+  protocol          = "TCP"
+  from_port         = 32768
+  to_port           = 61000
+  source_security_group_id = aws_security_group.cluster_ec2.id
 }
 
 
@@ -112,8 +112,8 @@ resource "aws_security_group_rule" "cluster_ec2_ingress_lb" {
   type                     = "ingress"
   description              = "Application Traffic"
   protocol                 = "TCP"
-  from_port                = 0
-  to_port                  = 65535
+  from_port                = 32768
+  to_port                  = 61000
   source_security_group_id = aws_security_group.load_balancer.id # Allow the LB to access the EC2 instances
 }
 
@@ -153,12 +153,4 @@ resource "aws_vpc_security_group_ingress_rule" "tds_db_workspace_ingress" {
   cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
 }
 
-resource "aws_security_group_rule" "tds_db_egress_all" {
-  security_group_id = aws_security_group.tds_db.id
-  type              = "egress"
-  description       = "All Egress"
-  protocol          = -1
-  from_port         = 0
-  to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+
