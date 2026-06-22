@@ -1,4 +1,7 @@
 locals {
+  # Shortened application name used in naming resources
+  application_name_short = "cfo-dms"
+
   # API ALB Ingress Rules - Used in loadbalancer.tf by MP module
   api_lb_ingress_rules = {
     "https-cloud-platform" = {
