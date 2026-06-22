@@ -17,7 +17,7 @@ _If you have any questions surrounding this page please post in the `#ask-integr
 
 <!-- A short (less than 50 word) description of what your service does, and who it’s for.-->
 
-A proof of concept managed file transfer service for the Integration Hub. It lets external partners upload files over SFTP and FTPS (or a browser-based web app), scans every file for malware with Amazon GuardDuty, and applies preset patterns clean files are ready to collect.
+A proof of concept managed file transfer service for the Integration Hub. It lets external partners upload files over SFTP and FTPS (or a browser-based web app), scans every file for malware with Amazon GuardDuty, and routes clean files onward so the team can collect them.
 
 ### **Service URLs:**
 
@@ -104,10 +104,6 @@ CloudWatch alarms are configured for the custom identity provider Lambda:
 <!-- A short description of the risks if your service is down for an extended period of time. -->
 
 If the identity provider Lambda or the Transfer server is unavailable, partners cannot authenticate or upload files. If the post-scan pipeline is down, files remain in the `unscanned`/`processing` buckets and are not delivered, but short bucket lifecycle rules mean undelivered files expire after one day. As a proof of concept the service carries no production data.
-
-### **Impact of an outage:**
-
-<!-- A short description of the risks if your service is down for an extended period of time. -->
 
 ### **Out of hours response types:**
 

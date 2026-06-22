@@ -94,6 +94,7 @@ resource "aws_lambda_permission" "transfer_custom_idp" {
   function_name  = module.lambda_custom_idp.lambda_function_name
   principal      = "transfer.amazonaws.com"
   source_account = data.aws_caller_identity.current.account_id
+  source_arn     = aws_transfer_server.this.arn
 }
 
 resource "aws_cloudwatch_metric_alarm" "custom_idp_lambda_errors" {
