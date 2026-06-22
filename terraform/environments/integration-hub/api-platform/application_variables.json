@@ -9,9 +9,7 @@
       "auth_configuration": {
         "roles": {
           "products-poc-upload": {
-            "allowed_client_ids": [
-              "products-poc"
-            ]
+            "allowed_client_ids": ["products-poc"]
           }
         },
         "users": {

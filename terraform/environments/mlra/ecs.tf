@@ -6,11 +6,11 @@ module "mlra-ecs" {
 
   source = "./modules/ecs"
 
-  subnet_set_name                = local.subnet_set_name
-  vpc_all                        = local.vpc_all
-  app_name                       = local.application_name
-  container_instance_type        = local.application_data.accounts[local.environment].container_instance_type
-  instance_type                  = local.application_data.accounts[local.environment].instance_type
+  subnet_set_name         = local.subnet_set_name
+  vpc_all                 = local.vpc_all
+  app_name                = local.application_name
+  container_instance_type = local.application_data.accounts[local.environment].container_instance_type
+  instance_type           = local.application_data.accounts[local.environment].instance_type
   # replace with AL2023 user data after migration
   user_data                      = local.user_data
   user_data_al2023               = local.user_data_al2023

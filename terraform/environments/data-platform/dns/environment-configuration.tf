@@ -33,7 +33,7 @@ locals {
                 "ns-1859.awsdns-40.co.uk.",
                 "ns-278.awsdns-34.com.",
                 "ns-695.awsdns-22.net."
-              ]              
+              ]
             }
           }
         }
@@ -113,7 +113,7 @@ locals {
                 "ns-152.awsdns-19.com.",
                 "ns-1550.awsdns-01.co.uk.",
                 "ns-954.awsdns-55.net."
-              ]              
+              ]
             },
             /* GitHub Pages */
             user-guide-github-pages-challenge-txt = {

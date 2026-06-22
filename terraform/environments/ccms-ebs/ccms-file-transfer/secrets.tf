@@ -41,11 +41,11 @@ resource "aws_secretsmanager_secret" "sftp_lambda_secrets" {
 resource "aws_secretsmanager_secret_version" "sftp_lambda_secrets" {
   secret_id = aws_secretsmanager_secret.sftp_lambda_secrets.id
   secret_string = jsonencode({
-    validate_file = "",
-    financial_transfers_api_key = "",
-    financial_transfers_api_url = "",
+    validate_file                      = "",
+    financial_transfers_api_key        = "",
+    financial_transfers_api_url        = "",
     financial_transfer_api_auth_header = "",
-    slack_webhook_url = ""
+    slack_webhook_url                  = ""
   })
 
   lifecycle {
