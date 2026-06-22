@@ -79,20 +79,22 @@ resource "aws_dynamodb_table_item" "custom_idp_identity_provider_secrets" {
   })
 }
 
-resource "aws_dynamodb_table_item" "custom_idp_user_dms1981" {
+resource "aws_dynamodb_table_item" "custom_idp_user" {
+  for_each = local.custom_idp_users
+
   table_name = module.dynamodb_custom_idp_users.dynamodb_table_id
   hash_key   = "user"
   range_key  = "identity_provider_key"
 
   item = jsonencode({
     user = {
-      S = "dms1981"
+      S = each.key
     }
     identity_provider_key = {
-      S = "secrets"
+      S = try(each.value.identity_provider_key, "secrets")
     }
     ipv4_allow_list = {
-      SS = local.custom_idp_configuration.ingress_cidr_blocks
+      SS = try(each.value.ipv4_allow_list, local.custom_idp_configuration.ingress_cidr_blocks)
     }
     config = {
       M = {
@@ -113,7 +115,7 @@ resource "aws_dynamodb_table_item" "custom_idp_user_dms1981" {
                   S = "/"
                 }
                 Target = {
-                  S = "/${module.s3_bucket["unscanned"].s3_bucket_id}/dms1981"
+                  S = try(each.value.home_directory_target, "/${module.s3_bucket["unscanned"].s3_bucket_id}/${each.key}")
                 }
               }
             }
