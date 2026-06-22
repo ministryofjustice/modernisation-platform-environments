@@ -514,13 +514,13 @@ resource "aws_iam_policy" "em_data_api_permissions" {
 }
 
 resource "aws_iam_role_policy_attachment" "standard_athena_access_em_data_api" {
-  count      = local.is-test ? 1 : 0
+  count      = local.is-development ? 1 : 0
   policy_arn = aws_iam_policy.standard_athena_access.arn
   role       = module.emd_data_api_role[0].iam_role_name
 }
 
 resource "aws_iam_role_policy_attachment" "em_data_api_permissions" {
-  count      = local.is-test ? 1 : 0
+  count      = local.is-development ? 1 : 0
   policy_arn = aws_iam_policy.em_data_api_permissions[0].arn
   role       = module.emd_data_api_role[0].iam_role_name
 }
