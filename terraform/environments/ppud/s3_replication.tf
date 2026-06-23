@@ -2,7 +2,7 @@
 # S3 Replication Buckets (database-source & report-source) for DEV, UAT, PROD
 # Optimised replacement for s3.tf lines 282-443, 447-604, 1017-1174, 1178-1336, 1559-1716, 1720-1877
 ##########################################################################################
-/*
+
 locals {
   s3_replication_buckets = {
     for k, v in {
@@ -18,18 +18,18 @@ locals {
         iam_role_key            = "database_dev"
         ec2_account             = "ppud-development"
       }
-      report_dev = {
-        condition       = local.is-development
-        bucket_name     = "moj-report-source-dev"
-        log_bucket      = "moj-log-files-dev"
-        log_prefix      = "s3-logs/moj-report-source-dev-logs/"
-        lifecycle_id    = "delete-moj-report-source-dev"
-        expiration_days = 6
-        replication_destination = "arn:aws:s3:::cloud-platform-db973d65892f599f6e78cb90252d7dc9"
-        replication_rule_id     = "ppud-report-replication-rule-dev"
-        iam_role_key            = "report_dev"
-        ec2_account             = "ppud-development"
-      }
+#      report_dev = {
+#        condition       = local.is-development
+#        bucket_name     = "moj-report-source-dev"
+#        log_bucket      = "moj-log-files-dev"
+#        log_prefix      = "s3-logs/moj-report-source-dev-logs/"
+#        lifecycle_id    = "delete-moj-report-source-dev"
+#        expiration_days = 6
+#        replication_destination = "arn:aws:s3:::cloud-platform-db973d65892f599f6e78cb90252d7dc9"
+#        replication_rule_id     = "ppud-report-replication-rule-dev"
+#        iam_role_key            = "report_dev"
+#        ec2_account             = "ppud-development"
+#      }
       database_uat = {
         condition       = local.is-preproduction
         bucket_name     = "moj-database-source-uat"
@@ -291,4 +291,3 @@ resource "aws_iam_role_policy_attachment" "s3_replication" {
   role       = aws_iam_role.s3_replication[each.key].name
   policy_arn = aws_iam_policy.s3_replication[each.key].arn
 }
-*/
