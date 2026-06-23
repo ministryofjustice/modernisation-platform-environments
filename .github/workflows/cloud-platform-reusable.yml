@@ -16,6 +16,10 @@ on:
         required: false
         description: "Set to plan or plan_apply"
         default: plan
+      account_name:
+        type: string
+        required: false
+        description: "Optional: account name override for ACCOUNT_NAME env var."
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID:
         required: true
@@ -35,6 +39,7 @@ jobs:
       environment: ${{ inputs.environment }}
       action: ${{ inputs.action }}
       component: "root"
+      account_name: ${{ inputs.account_name }}
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -47,6 +52,7 @@ jobs:
       environment: ${{ inputs.environment }}
       action: ${{ inputs.action }}
       component: "network"
+      account_name: ${{ inputs.account_name }}
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -60,6 +66,7 @@ jobs:
       action: ${{ inputs.action }}
       plan_apply_tfargs: ${{ format('-var=created_by={0}/{1}/actions/runs/{2}/', github.server_url, github.repository, github.run_id) }}
       component: "cluster"
+      account_name: ${{ inputs.account_name }}
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -72,6 +79,7 @@ jobs:
       environment: ${{ inputs.environment }}
       action: ${{ inputs.action }}
       component: "cluster-core"
+      account_name: ${{ inputs.account_name }}
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -84,6 +92,7 @@ jobs:
       environment: ${{ inputs.environment }}
       action: ${{ inputs.action }}
       component: "cluster-components"
+      account_name: ${{ inputs.account_name }}
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}

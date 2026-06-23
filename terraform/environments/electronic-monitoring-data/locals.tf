@@ -31,13 +31,14 @@ locals {
     "g4s_atrium_unstructured",
     "g4s_cap_dw",
     "g4s_xdrive_unstructured"
-    ]
+  ]
   preprod_databases_for_gdpr = [
     "am_stg_preprod_dbt",
     "buddi_buddi_preprod_dbt",
     "buddi_stg_preprod_dbt",
     "cap_dw_stg_preprod_dbt",
     "capita_alcohol_monitoring",
+    "capita_blob_storage",
     "curated_alcohol_monitoring_preprod_dbt",
     "curated_cap_dw",
     "curated_cap_dw_preprod_dbt",
@@ -90,6 +91,7 @@ locals {
     "g4s_tasking_curated_historic_dev_dbt",
     "g4s_tasking_curated_preprod_dbt",
     "g4s_telephony",
+    "g4s_xdrive_unstructured",
     "historic_api_mart_mock_preprod_dbt",
     "historic_api_mart_preprod_dbt",
     "historic_ears_and_sars_int_preprod_dbt",
@@ -204,6 +206,8 @@ locals {
     "g4s_telephony_staging",
     "g4s_x_drive",
     "g4s_x_drive_staging",
+    "g4s_xdrive_unstructured",
+    "g4s_xdrive_unstructured_staging",
     "historic_alcohol_monitoring_stg_historic_dev_dbt",
     "historic_api_mart",
     "historic_api_mart_historic_dev_dbt",

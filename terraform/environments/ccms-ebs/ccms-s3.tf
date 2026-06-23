@@ -307,7 +307,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "lambda_payment_load_lifecycle"
   }
 }
 resource "aws_s3_bucket_object_lock_configuration" "dbbackup" {
-  count       =local.is-test ? 1 : 0
+  count  = local.is-test ? 1 : 0
   bucket = module.s3-bucket-dbbackup.bucket.id
 
   rule {
