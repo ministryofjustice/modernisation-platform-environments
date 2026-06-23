@@ -79,6 +79,7 @@ resource "aws_lambda_function" "process_file_from_bucket_lambda_function" {
     variables = {
       # This secret now contains slack_channel_webhook, slack_channel_webhook_guardduty, slack_channel_webhook_s3
       SECRET_NAME = aws_secretsmanager_secret.sftp_lambda_secrets.arn
+      BUCKET_BASE_PREFIX = "ccms-transfer-bc-${local.environment}"
     }
   }
 

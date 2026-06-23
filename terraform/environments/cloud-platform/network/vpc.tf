@@ -28,8 +28,8 @@ module "cluster_vpc" {
   create_multiple_public_route_tables = true
 
   public_subnet_tags = {
-    SubnetType                        = "Public"
-    "kubernetes.io/role/elb"          = "1"
+    SubnetType               = "Public"
+    "kubernetes.io/role/elb" = "1"
   }
 
   private_subnet_tags = {

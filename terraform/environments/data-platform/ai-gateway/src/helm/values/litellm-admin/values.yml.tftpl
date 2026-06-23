@@ -32,7 +32,7 @@ db:
     usernameKey: ${databaseUserNameKey}
     passwordKey: ${databasePasswordKey}
     endpointKey: ${databaseEndpointKey}
-
+${databaseReaderEndpointKey != "" ? "    readReplicaUrlKey: ${databaseReaderEndpointKey}" : ""}
 masterkeySecretName: ${masterkeySecretName}
 masterkeySecretKey: ${masterkeySecretKey}
 

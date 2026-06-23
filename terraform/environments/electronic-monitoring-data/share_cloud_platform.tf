@@ -308,36 +308,6 @@ resource "aws_lakeformation_permissions" "em_data_validation_s3" {
   }
 }
 
-resource "aws_lakeformation_permissions" "em_data_api_datamart_db" {
-  count       = local.is-test ? 1 : 0
-  principal   = module.emd_data_api_role[0].iam_role_arn
-  permissions = ["DESCRIBE"]
-
-  database {
-    name = "datamart${local.dbt_suffix}"
-  }
-}
-
-resource "aws_lakeformation_permissions" "em_data_api_order_dim" {
-  count       = local.is-test ? 1 : 0
-  principal   = module.emd_data_api_role[0].iam_role_arn
-  permissions = ["DESCRIBE", "SELECT"]
-
-  table {
-    database_name = "datamart${local.dbt_suffix}"
-    name          = "order_dim"
-  }
-}
-
-resource "aws_lakeformation_permissions" "em_data_api_s3" {
-  count       = local.is-test ? 1 : 0
-  principal   = module.emd_data_api_role[0].iam_role_arn
-  permissions = ["DATA_LOCATION_ACCESS"]
-
-  data_location {
-    arn = module.s3-create-a-derived-table-bucket.bucket.arn
-  }
-}
 
 resource "aws_iam_role_policy_attachment" "standard_athena_access_em_data_validation" {
   count      = local.is-test || local.is-production ? 1 : 0
