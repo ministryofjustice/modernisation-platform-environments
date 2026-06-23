@@ -2,7 +2,7 @@
 # S3 Replication Buckets (database-source & report-source) for DEV, UAT, PROD
 # Optimised replacement for s3.tf lines 282-443, 447-604, 1017-1174, 1178-1336, 1559-1716, 1720-1877
 ##########################################################################################
-/*
+
 locals {
   s3_replication_buckets = {
     for k, v in {
@@ -291,4 +291,3 @@ resource "aws_iam_role_policy_attachment" "s3_replication" {
   role       = aws_iam_role.s3_replication[each.key].name
   policy_arn = aws_iam_policy.s3_replication[each.key].arn
 }
-*/
