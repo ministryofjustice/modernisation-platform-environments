@@ -26,3 +26,13 @@ output "radius_server_private_ips" {
   description = "Private IP addresses of RADIUS servers"
   value       = [aws_instance.radius_server.private_ip]
 }
+
+output "ses_sender_email" {
+  description = "SES sender email address for notifications"
+  value       = "no-reply@${aws_ses_domain_identity.workspaces.domain}"
+}
+
+output "radius_portal_url" {
+  description = "URL of the RADIUS MFA self-service portal"
+  value       = "https://${aws_route53_record.radius_portal.name}"
+}
