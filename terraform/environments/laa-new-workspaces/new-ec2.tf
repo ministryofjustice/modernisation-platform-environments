@@ -44,7 +44,7 @@ resource "aws_instance" "user_creation_ec2" {
   ami                    = data.aws_ami.windows_2022.id
   instance_type          = "t3.medium"
   iam_instance_profile   = aws_iam_instance_profile.user_creation_ec2_profile.name
-  subnet_id              = data.terraform_remote_state.workspace_components.outputs.private_subnet_ids
+  subnet_id              = data.terraform_remote_state.workspace_components.outputs.private_subnet_ids[0]
   vpc_security_group_ids = [aws_security_group.user_creation_ec2_sg.id]
 
   # Domain join and script deployment configuration
