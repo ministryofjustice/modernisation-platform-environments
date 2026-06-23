@@ -102,7 +102,7 @@ environment:
       - "preproduction.ai-gateway.justice.gov.uk"
     shared_services_gateway_hostname: "*.preproduction.data-platform.service.justice.gov.uk"
   production:
-    kubernetes_version: "1.35"
+    kubernetes_version: "1.36"
     bottlerocket_version: "1.62.0-49f1c7d2"
     addon_versions:
       aws_ebs_csi_driver: "v1.61.1-eksbuild.1"
@@ -120,7 +120,7 @@ environment:
       aws_cloudwatch_observability: "5.4.0"
       aws_load_balancer_controller: "v3.4.0"
       cert_manager: "1.20.2"
-      cilium: "1.19.4"
+      cilium: "1.19.5"
       cluster_autoscaler: "9.57.0"
       coredns: "1.46.0"
       external_dns: "1.21.1"
