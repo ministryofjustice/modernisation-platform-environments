@@ -526,3 +526,7 @@ resource "aws_route53_resolver_endpoint" "inbound_api" {
   }
   tags = local.tags
 }
+
+module "ip_addresses" {
+  source = "../../modules/ip_addresses"
+}
