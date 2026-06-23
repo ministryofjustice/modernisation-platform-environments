@@ -89,11 +89,12 @@ locals {
   }
 }
 
-# checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
-# checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
-# checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
-# checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
+
 resource "aws_s3_bucket" "s3_replication" {
+  # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
+  # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
+  # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
+  # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
   for_each = local.s3_replication_buckets
   bucket   = each.value.bucket_name
   tags = merge(local.tags, {
