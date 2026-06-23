@@ -30,20 +30,6 @@ resource "aws_ssm_parameter" "lambda_service_account_password" {
   )
 }
 
-# Get the Windows EC2 instance for running PowerShell commands
-data "aws_instance" "user_creation_ec2" {
-
-  filter {
-    name   = "tag:Name"
-    values = ["${local.application_name}-${local.environment}-user-creation-ec2"]
-  }
-
-  filter {
-    name   = "instance-state-name"
-    values = ["running"]
-  }
-}
-
 # Create the lambda.workspace AD user
 resource "terraform_data" "lambda_service_account" {
 
@@ -111,7 +97,7 @@ resource "terraform_data" "lambda_service_account_password_reset" {
   ]
 
   input = {
-    instance_id = data.aws_instance.user_creation_ec2.id
+    instance_id = aws_instance.user_creation_ec2.id
     region      = local.application_data.accounts[local.environment].region
   }
 
