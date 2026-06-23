@@ -157,11 +157,11 @@ module "lambda_api_docs" {
   source_path = [
     {
       path     = "${path.module}/lambda/request-docs"
-      patterns = ["*.py"]
+      patterns = [".*\\.py$"]
     },
     {
       path     = "${path.module}"
-      patterns = ["openapi.yaml"]
+      patterns = ["openapi\\.yaml$"]
     },
   ]
 
