@@ -161,7 +161,7 @@ resource "aws_lb_target_group" "oem_app_7102" {
     path                = "/console"
     healthy_threshold   = "5"
     interval            = "60"
-    protocol            = "HTTP"
+    protocol            = "HTTPS"
     unhealthy_threshold = "2"
     matcher             = "200"
     timeout             = "5"
