@@ -212,8 +212,7 @@ EOF
 mkdir -p /etc/linotp2/data
 mkdir -p /var/log/linotp
 chown -R linotp:linotp /etc/linotp2
-# Apache runs WSGI app as 'apache' user, needs write access to log directory
-chown -R linotp:apache /var/log/linotp
+# Note: Apache user ownership will be set after Apache is installed
 chmod -R 775 /var/log/linotp
 
 # Initialize LinOTP database schema
@@ -249,6 +248,9 @@ yum install -y LinOTP_apache
 
 # Enable httpd service
 systemctl enable httpd
+
+# Apache runs WSGI app as 'apache' user, needs write access to log directory
+chown -R linotp:apache /var/log/linotp
 
 # Backup default SSL config
 mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.back || true
