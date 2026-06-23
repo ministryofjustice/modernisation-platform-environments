@@ -383,6 +383,16 @@ resource "aws_vpc_security_group_egress_rule" "kafka_ui_msk_out" {
   cidr_ipv4         = data.aws_vpc.shared.cidr_block
 }
 
+resource "aws_vpc_security_group_egress_rule" "kafka_ui_https_out" {
+  count             = contains(local.deploy_to, local.environment) ? 1 : 0
+  security_group_id = aws_security_group.kafka_ui[0].id
+  description       = "Allow HTTPS outbound for AWS API calls"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
 resource "aws_vpc_security_group_ingress_rule" "kafka_ui_ingress" {
   count             = contains(local.deploy_to, local.environment) ? 1 : 0
   security_group_id = aws_security_group.kafka_ui[0].id
