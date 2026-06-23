@@ -117,6 +117,15 @@ resource "aws_security_group_rule" "cluster_ec2_ingress_lb" {
   source_security_group_id = aws_security_group.load_balancer.id # Allow the LB to access the EC2 instances
 }
 
+# VPC Endpoint security group lookup (used to restrict egress to VPC endpoints)
+data "aws_security_group" "vpce_security_group" {
+  provider = aws.core-vpc
+  filter {
+    name   = "tag:Name"
+    values = ["${var.networking[0].business-unit}-${local.environment}-int-endpoint"]
+  }
+}
+
 resource "aws_security_group_rule" "cluster_ec2_egress_vpce" {
   security_group_id = aws_security_group.cluster_ec2.id
   type              = "egress"
