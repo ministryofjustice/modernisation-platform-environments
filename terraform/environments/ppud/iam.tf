@@ -218,7 +218,7 @@ data "aws_iam_policy_document" "email" {
 #########################################################
 # IAM Role & Policy for S3 Bucket Replication to DE - DEV
 #########################################################
-
+/*
 resource "aws_iam_role" "iam_role_s3_bucket_moj_database_source_dev" {
   count              = local.is-development == true ? 1 : 0
   name               = "iam_role_s3_bucket_moj_database_source_dev"
@@ -660,3 +660,4 @@ resource "aws_iam_role_policy_attachment" "attach_iam_role_to_iam_policy_s3_buck
   role       = aws_iam_role.iam_role_s3_bucket_moj_database_source_prod[0].name
   policy_arn = aws_iam_policy.iam_policy_s3_bucket_moj_database_source_prod[0].arn
 }
+*/
