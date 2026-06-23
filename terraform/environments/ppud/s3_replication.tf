@@ -277,8 +277,8 @@ resource "aws_iam_policy" "s3_replication" {
           "s3:ReplicateDelete"
         ]
         Resource = [
-          each.value.destination,
-          "${each.value.destination}/*"
+          each.value.replication_destination,
+          "${each.value.replication_destination}/*"
         ]
       }
     ]
