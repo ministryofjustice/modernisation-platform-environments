@@ -224,40 +224,7 @@ resource "aws_s3_bucket_policy" "s3_replication" {
 ##########################################################################################
 
 locals {
-  s3_replication_configs = {
-    for k, v in {
-      database_dev = {
-        condition     = local.is-development
-        source_bucket = aws_s3_bucket.moj-database-source-dev
-        destination   = "arn:aws:s3:::mojap-data-engineering-production-ppud-dev"
-      }
-      report_dev = {
-        condition     = local.is-development
-        source_bucket = aws_s3_bucket.moj-report-source-dev
-        destination   = "arn:aws:s3:::cloud-platform-db973d65892f599f6e78cb90252d7dc9"
-      }
-      database_uat = {
-        condition     = local.is-preproduction
-        source_bucket = aws_s3_bucket.moj-database-source-uat
-        destination   = "arn:aws:s3:::mojap-data-engineering-production-ppud-preprod"
-      }
-      report_uat = {
-        condition     = local.is-preproduction
-        source_bucket = aws_s3_bucket.moj-report-source-uat
-        destination   = "arn:aws:s3:::cloud-platform-ffbd9073e2d0d537d825ebea31b441fc"
-      }
-      report_prod = {
-        condition     = local.is-production
-        source_bucket = aws_s3_bucket.moj-report-source-prod
-        destination   = "arn:aws:s3:::cloud-platform-9c7fd5fc774969b089e942111a7d5671"
-      }
-      database_prod = {
-        condition     = local.is-production
-        source_bucket = aws_s3_bucket.moj-database-source-prod
-        destination   = "arn:aws:s3:::mojap-data-engineering-production-ppud-prod"
-      }
-    } : k => v if v.condition
-  }
+  s3_replication_configs = local.s3_replication_buckets
 }
 
 resource "aws_iam_role" "s3_replication" {
@@ -295,8 +262,8 @@ resource "aws_iam_policy" "s3_replication" {
           "s3:GetReplicationConfiguration"
         ]
         Resource = [
-          each.value.source_bucket[0].arn,
-          "${each.value.source_bucket[0].arn}/*"
+          aws_s3_bucket.s3_replication[each.key].arn,
+          "${aws_s3_bucket.s3_replication[each.key].arn}/*"
         ]
       },
       {
