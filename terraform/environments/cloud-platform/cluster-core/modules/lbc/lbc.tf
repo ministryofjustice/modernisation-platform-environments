@@ -21,7 +21,7 @@ resource "helm_release" "aws_load_balancer_controller" {
 
 # role
 resource "aws_iam_role" "lbc_role" {
-  name        = "AmazonEKSLoadBalancerControllerRole"
+  name        = "AmazonEKSLoadBalancerControllerRole-${var.cluster_name}"
   description = "Role for the AWS LBC to assume"
 
   assume_role_policy = jsonencode({
@@ -45,7 +45,7 @@ resource "aws_iam_role" "lbc_role" {
 }
 
 resource "aws_iam_policy" "lbc_policy" {
-  name        = "AWSLoadBalancerControllerIAMPolicy"
+  name        = "AWSLoadBalancerControllerIAMPolicy-${var.cluster_name}"
   path        = "/"
   description = "Policy to allow AWS LBC to manage load balancers"
 
@@ -311,20 +311,22 @@ resource "aws_iam_role_policy_attachment" "lbc-role-policy-attach" {
 }
 
 # Service account
-resource "kubernetes_manifest" "lbc_service_account" {
-  manifest = yamldecode(<<-YAML
-    apiVersion: v1
-    kind: ServiceAccount
-    metadata:
-      labels:
-        app.kubernetes.io/component: controller
-        app.kubernetes.io/name: aws-load-balancer-controller
-      name: aws-load-balancer-controller
-      namespace: kube-system
-      annotations:
-        eks.amazonaws.com/role-arn: arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/AmazonEKSLoadBalancerControllerRole
-   YAML
-  )
+resource "kubernetes_service_account_v1" "lbc_service_account" {
+  metadata {
+    labels = {
+      "app.kubernetes.io/component" = "controller"
+      "app.kubernetes.io/name"      = "aws-load-balancer-controller"
+    }
+    name      = "aws-load-balancer-controller"
+    namespace = "kube-system"
+    annotations = {
+      "eks.amazonaws.com/role-arn" = aws_iam_role.lbc_role.arn
+    }
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.lbc-role-policy-attach,
+  ]
 }
 
 
