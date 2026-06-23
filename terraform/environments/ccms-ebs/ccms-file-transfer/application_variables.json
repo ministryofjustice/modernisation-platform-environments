@@ -57,7 +57,7 @@
       "api_server_port": "8443",
       "aws_region": "eu-west-2",
       "app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-financial-transfers",
-      "container_version": "financial-transfers-api-0.0.6-pre-production",
+      "container_version": "financial-transfers-api-0.0.8-pre-production",
       "lz_aws_workspace_nonprod_prod": "10.200.0.0/19",
       "logging_level_root": "info",
       "logging_level_uk_gov_laa_ccms": "info",
