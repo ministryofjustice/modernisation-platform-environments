@@ -459,19 +459,3 @@ resource "aws_api_gateway_method_response" "remove_status_404" {
   http_method = aws_api_gateway_method.update_p1_export_remove_post[0].http_method
   status_code = "404"
 }
-
-resource "aws_security_group" "allow_cp_access" {
-  name        = "allow_cp_access"
-  description = "allow cp access"
-  vpc_id      = data.aws_vpc.shared.id
-  tags        = local.tags
-}
-
-resource "aws_vpc_security_group_ingress_rule" "allow_cp_access" {
-  security_group_id = aws_security_group.allow_cp_access.id
-
-  cidr_ipv4   = "172.20.0.0/16"
-  from_port   = 443
-  ip_protocol = "tcp"
-  to_port     = 443
-}
