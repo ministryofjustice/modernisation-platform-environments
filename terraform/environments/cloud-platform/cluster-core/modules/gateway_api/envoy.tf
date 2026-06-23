@@ -23,68 +23,72 @@ resource "helm_release" "envoy_gateway" {
 }
 
 # GatewayClass
-resource "kubernetes_manifest" "gatewayclass" {
-  manifest = yamldecode(<<-YAML
-     apiVersion: gateway.networking.k8s.io/v1
-     kind: GatewayClass
-     metadata:
-       name: eg
-     spec:
-       controllerName: gateway.envoyproxy.io/gatewayclass-controller
-   YAML
-  )
+resource "kubectl_manifest" "gatewayclass" {
+  yaml_body = <<-YAML
+    apiVersion: gateway.networking.k8s.io/v1
+    kind: GatewayClass
+    metadata:
+      name: eg
+    spec:
+      controllerName: gateway.envoyproxy.io/gatewayclass-controller
+  YAML
+
+  server_side_apply = true
+  wait              = true
 
   depends_on = [helm_release.envoy_gateway]
 }
 
 # Gateway
-resource "kubernetes_manifest" "gateway" {
-  manifest = yamldecode(<<-YAML
-     apiVersion: gateway.networking.k8s.io/v1
-     kind: Gateway
-     metadata:
-       name: eg
-       namespace: envoy-gateway-system
-       annotations:
-         cert-manager.io/cluster-issuer: letsencrypt-prod
-     spec:
-       infrastructure:
-         parametersRef:
-           group: gateway.envoyproxy.io
-           kind: EnvoyProxy
-           name: custom-proxy-config
-       gatewayClassName: eg
-       listeners:
-         - name: http
-           protocol: HTTP
-           port: 80
-           allowedRoutes:
-             namespaces:
-               from: All
-         - name: https
-           protocol: HTTPS
-           hostname: "${var.wildcard_domain}"
-           port: 443
-           tls:
-             mode: Terminate
-             certificateRefs:
-               - kind: Secret
-                 name: cluster-wildcard-tls
-           allowedRoutes:
-             namespaces:
-               from: All
-   YAML
-  )
+resource "kubectl_manifest" "gateway" {
+  yaml_body = <<-YAML
+    apiVersion: gateway.networking.k8s.io/v1
+    kind: Gateway
+    metadata:
+      name: eg
+      namespace: envoy-gateway-system
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+    spec:
+      infrastructure:
+        parametersRef:
+          group: gateway.envoyproxy.io
+          kind: EnvoyProxy
+          name: custom-proxy-config
+      gatewayClassName: eg
+      listeners:
+        - name: http
+          protocol: HTTP
+          port: 80
+          allowedRoutes:
+            namespaces:
+              from: All
+        - name: https
+          protocol: HTTPS
+          hostname: "${var.wildcard_domain}"
+          port: 443
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - kind: Secret
+                name: cluster-wildcard-tls
+          allowedRoutes:
+            namespaces:
+              from: All
+  YAML
+
+  server_side_apply = true
+  wait              = true
 
   depends_on = [
     helm_release.envoy_gateway,
-    kubernetes_manifest.gatewayclass,
+    kubectl_manifest.gatewayclass,
   ]
 }
 
 # GatewayProxy (ensure Envoy Gateway CRDs are available)
-resource "kubernetes_manifest" "gateway_proxy" {
-  manifest = yamldecode(<<-YAML
+resource "kubectl_manifest" "gateway_proxy" {
+  yaml_body = <<-YAML
     apiVersion: gateway.envoyproxy.io/v1alpha1
     kind: EnvoyProxy
     metadata:
@@ -124,18 +128,20 @@ resource "kubernetes_manifest" "gateway_proxy" {
               path: /etc/envoy/dynamic-modules/libcomposer.so
           doNotClose: true
           loadGlobally: false
-   YAML
-  )
+  YAML
+
+  server_side_apply = true
+  wait              = true
 
   depends_on = [
     helm_release.envoy_gateway,
-    kubernetes_manifest.gatewayclass,
+    kubectl_manifest.gatewayclass,
   ]
 }
 
 # Gateway-wide WAF policy (ensure EnvoyExtensionPolicy CRD is available)
-resource "kubernetes_manifest" "coraza_waf" {
-  manifest = yamldecode(<<-YAML
+resource "kubectl_manifest" "coraza_waf" {
+  yaml_body = <<-YAML
     apiVersion: gateway.envoyproxy.io/v1alpha1
     kind: EnvoyExtensionPolicy
     metadata:
@@ -178,11 +184,13 @@ resource "kubernetes_manifest" "coraza_waf" {
 
               # Loads the full OWASP Core Rule Set.
               - Include @owasp_crs/*.conf
-   YAML
-  )
+  YAML
+
+  server_side_apply = true
+  wait              = true
 
   depends_on = [
     helm_release.envoy_gateway,
-    kubernetes_manifest.gatewayclass,
+    kubectl_manifest.gatewayclass,
   ]
 }

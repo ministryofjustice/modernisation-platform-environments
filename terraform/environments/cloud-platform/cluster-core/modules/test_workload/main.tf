@@ -76,8 +76,8 @@ resource "kubernetes_manifest" "service" {
   depends_on = [kubernetes_manifest.deployment]
 }
 
-resource "kubernetes_manifest" "httproute" {
-  manifest = {
+resource "kubectl_manifest" "httproute" {
+  yaml_body = yamlencode({
     apiVersion = "gateway.networking.k8s.io/v1"
     kind       = "HTTPRoute"
     metadata = {
@@ -111,7 +111,10 @@ resource "kubernetes_manifest" "httproute" {
         }
       ]
     }
-  }
+  })
+
+  server_side_apply = true
+  wait              = true
 
   depends_on = [kubernetes_manifest.service]
 }
@@ -138,10 +141,10 @@ locals {
   all_directives = concat(local.base_directives, var.extra_waf_directives)
 }
 
-resource "kubernetes_manifest" "waf_policy" {
+resource "kubectl_manifest" "waf_policy" {
   count = var.create_waf_policy ? 1 : 0
 
-  manifest = {
+  yaml_body = yamlencode({
     apiVersion = "gateway.envoyproxy.io/v1alpha1"
     kind       = "EnvoyExtensionPolicy"
     metadata = {
@@ -166,7 +169,10 @@ resource "kubernetes_manifest" "waf_policy" {
         }
       ]
     }
-  }
+  })
 
-  depends_on = [kubernetes_manifest.httproute]
+  server_side_apply = true
+  wait              = true
+
+  depends_on = [kubectl_manifest.httproute]
 }

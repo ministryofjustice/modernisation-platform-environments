@@ -37,8 +37,8 @@ resource "helm_release" "cert_manager" {
   depends_on = [kubernetes_namespace_v1.cert_manager, aws_iam_role.cert_manager]
 }
 
-resource "kubernetes_manifest" "clusterissuer_selfsigned" {
-  manifest = {
+resource "kubectl_manifest" "clusterissuer_selfsigned" {
+  yaml_body = yamlencode({
     apiVersion = "cert-manager.io/v1"
     kind       = "ClusterIssuer"
     metadata = {
@@ -47,13 +47,16 @@ resource "kubernetes_manifest" "clusterissuer_selfsigned" {
     spec = {
       selfSigned = {}
     }
-  }
+  })
+
+  server_side_apply = true
+  wait              = true
 
   depends_on = [helm_release.cert_manager]
 }
 
-resource "kubernetes_manifest" "clusterissuer_letsencrypt_staging" {
-  manifest = {
+resource "kubectl_manifest" "clusterissuer_letsencrypt_staging" {
+  yaml_body = yamlencode({
     apiVersion = "cert-manager.io/v1"
     kind       = "ClusterIssuer"
     metadata = {
@@ -75,13 +78,16 @@ resource "kubernetes_manifest" "clusterissuer_letsencrypt_staging" {
         ]
       }
     }
-  }
+  })
+
+  server_side_apply = true
+  wait              = true
 
   depends_on = [helm_release.cert_manager]
 }
 
-resource "kubernetes_manifest" "clusterissuer_letsencrypt_prod" {
-  manifest = {
+resource "kubectl_manifest" "clusterissuer_letsencrypt_prod" {
+  yaml_body = yamlencode({
     apiVersion = "cert-manager.io/v1"
     kind       = "ClusterIssuer"
     metadata = {
@@ -103,7 +109,10 @@ resource "kubernetes_manifest" "clusterissuer_letsencrypt_prod" {
         ]
       }
     }
-  }
+  })
+
+  server_side_apply = true
+  wait              = true
 
   depends_on = [helm_release.cert_manager]
 }
