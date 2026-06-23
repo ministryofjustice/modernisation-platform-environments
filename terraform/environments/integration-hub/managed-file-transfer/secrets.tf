@@ -31,7 +31,7 @@ module "secrets_custom_idp_user" {
   }
 
   secret_string = jsonencode({
-    Password   = "replace-me"
-    PublicKeys = ["replace-me"]
+    Password   = null
+    PublicKeys = []
   })
 }

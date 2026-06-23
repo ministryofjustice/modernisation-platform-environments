@@ -21,7 +21,7 @@ resource "aws_transfer_server" "this" {
       aws_security_group.transfer.id
     ]
   }
-  
+
   protocol_details {
     passive_ip = aws_eip.this[0].public_ip
   }
