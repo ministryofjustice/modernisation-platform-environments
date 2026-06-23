@@ -1,11 +1,11 @@
 resource "aws_lb" "oem_app" {
-  name               = "lb-${local.application_name}-app"
-  load_balancer_type = "application"
-  internal           = false
-  security_groups    = [aws_security_group.load_balancer_security_group.id]
-  subnets            = data.aws_subnets.shared-public.ids
-
-  tags = local.tags
+  name                       = "lb-${local.application_name}-app"
+  load_balancer_type         = "application"
+  internal                   = false
+  security_groups            = [aws_security_group.load_balancer_security_group.id]
+  subnets                    = data.aws_subnets.shared-public.ids
+  enable_deletion_protection = true
+  tags                       = local.tags
 }
 
 resource "aws_lb_listener" "oem_app" {

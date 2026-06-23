@@ -3,7 +3,7 @@
     "development": {
       "env_short_name": "dev",
       "cloudfront_domain_name": "modernisation-platform.service.justice.gov.uk",
-      "ext_lb_enable_deletion_protection": "false",
+      "ext_lb_enable_deletion_protection": "true",
       "instance_type": "m5.large",
       "maat_ec2_asg_desired_capacity": "1",
       "maat_ec2_asg_min_size": "1",
@@ -49,7 +49,7 @@
     "test": {
       "env_short_name": "test",
       "cloudfront_domain_name": "modernisation-platform.service.justice.gov.uk",
-      "ext_lb_enable_deletion_protection": "false",
+      "ext_lb_enable_deletion_protection": "true",
       "instance_type": "m5.large",
       "maat_ec2_asg_desired_capacity": "1",
       "maat_ec2_asg_min_size": "1",
@@ -95,7 +95,7 @@
     "preproduction": {
       "env_short_name": "preproduction",
       "cloudfront_domain_name": "modernisation-platform.service.justice.gov.uk",
-      "ext_lb_enable_deletion_protection": "false",
+      "ext_lb_enable_deletion_protection": "true",
       "instance_type": "m5.large",
       "maat_ec2_asg_desired_capacity": "1",
       "maat_ec2_asg_min_size": "1",
