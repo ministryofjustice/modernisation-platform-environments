@@ -2,16 +2,16 @@
 ### SES Domain Identity + DKIM
 ###
 ### Verifies the sending domain so emails pass
-### DMARC alignment. Uses the existing Route53
-### hosted zone (same domain as the ALB record).
+### DMARC alignment. Uses a workspace-specific
+### subdomain to avoid conflicts.
 ###
-### Sender address: no-reply@<domain>
-### e.g. no-reply@laa-development.modernisation-platform.service.justice.gov.uk
+### Sender address: no-reply@<subdomain>
+### e.g. no-reply@workspaces-new.laa-development.modernisation-platform.service.justice.gov.uk
 ##############################################
 
 resource "aws_ses_domain_identity" "workspaces" {
 
-  domain = trimsuffix(data.aws_route53_zone.external.name, ".")
+  domain = "workspaces-new.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
 }
 
 resource "aws_ses_domain_dkim" "workspaces" {
