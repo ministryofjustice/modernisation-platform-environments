@@ -679,14 +679,20 @@ def lambda_handler(event, context):
             if new_state == "OK":
                 is_error = False
 
-            # Suppress INSUFFICIENT_DATA notifications outside business hours (07:00–19:00 UTC).
-            # NonProd VMs (mailrelay, ftp, etc.) are stopped on a schedule after 7pm; the
-            # resulting INSUFFICIENT_DATA alarms are expected noise and should not page the team.
-            if new_state == "INSUFFICIENT_DATA" and not (7 <= alarm_time.hour < 19):
+            # Suppress INSUFFICIENT_DATA notifications outside business hours (07:00–19:00 UTC)
+            # for NonProd environments only (dev-, tst-, prep- prefixed alarms).
+            # NonProd VMs are stopped on a schedule after 7pm; the resulting INSUFFICIENT_DATA
+            # alarms are expected noise and should not page the team out of hours.
+            # Production alarms (prod- prefix) are never suppressed — always notify.
+            NON_PROD_PREFIXES = ("dev-", "tst-", "prep-")
+            alarm_name = alarm_details.get('AlarmName', '')
+            is_non_prod = alarm_name.startswith(NON_PROD_PREFIXES)
+
+            if new_state == "INSUFFICIENT_DATA" and is_non_prod and not (7 <= alarm_time.hour < 19):
                 logger.info(
                     "Suppressing INSUFFICIENT_DATA alarm '%s' outside business hours "
-                    "(hour=%d UTC). No Slack notification sent.",
-                    alarm_details.get('AlarmName', 'unknown'),
+                    "(hour=%d UTC, non-prod environment). No Slack notification sent.",
+                    alarm_name,
                     alarm_time.hour,
                 )
                 return
