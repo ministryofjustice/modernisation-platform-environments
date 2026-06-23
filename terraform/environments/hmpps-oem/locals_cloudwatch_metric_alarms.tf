@@ -185,4 +185,8 @@ locals {
     local.cloudwatch_metric_alarms_github_action_failed,
     local.cloudwatch_metric_alarms_github_action_missing
   )
+
+  smtp_connectivity_test = merge(
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_connectivity_test,
+  )
 }
