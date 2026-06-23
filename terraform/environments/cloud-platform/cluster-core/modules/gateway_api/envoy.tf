@@ -16,6 +16,9 @@ resource "helm_release" "envoy_gateway" {
   version    = "1.8.1"
   namespace  = "envoy-gateway-system"
 
+  wait    = true
+  timeout = 300
+
   depends_on = [kubernetes_namespace_v1.envoy_gateway_system]
 }
 
@@ -79,7 +82,7 @@ resource "kubernetes_manifest" "gateway" {
   ]
 }
 
-# GatewayProxy
+# GatewayProxy (ensure Envoy Gateway CRDs are available)
 resource "kubernetes_manifest" "gateway_proxy" {
   manifest = yamldecode(<<-YAML
     apiVersion: gateway.envoyproxy.io/v1alpha1
@@ -130,7 +133,7 @@ resource "kubernetes_manifest" "gateway_proxy" {
   ]
 }
 
-# Gateway-wide WAF policy
+# Gateway-wide WAF policy (ensure EnvoyExtensionPolicy CRD is available)
 resource "kubernetes_manifest" "coraza_waf" {
   manifest = yamldecode(<<-YAML
     apiVersion: gateway.envoyproxy.io/v1alpha1

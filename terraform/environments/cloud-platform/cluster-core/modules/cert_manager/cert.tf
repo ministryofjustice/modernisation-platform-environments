@@ -14,6 +14,9 @@ resource "helm_release" "cert_manager" {
   version    = "v1.20.2"
   namespace  = "cert-manager"
 
+  wait    = true
+  timeout = 300
+
   set = [{
     name  = "crds.enabled"
     value = "true"
