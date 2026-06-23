@@ -267,6 +267,7 @@ module "dms_oracle" {
 
   dms_replication_instance = {
     replication_instance_id    = "${local.application_name}-oracle-dms-test"
+    subnet_group_name          = "oracle-dms-test-data"
     subnet_ids                 = data.aws_subnets.shared-data.ids
     allocated_storage          = 50
     availability_zone          = "eu-west-2a"
@@ -523,6 +524,7 @@ module "dms_postgres" {
 
   dms_replication_instance = {
     replication_instance_id    = "${local.application_name}-postgres-dms-test"
+    subnet_group_name          = "postgres-dms-test-data"
     subnet_ids                 = data.aws_subnets.shared-data.ids
     allocated_storage          = 50
     availability_zone          = "eu-west-2a"
