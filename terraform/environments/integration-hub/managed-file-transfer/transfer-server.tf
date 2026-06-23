@@ -20,6 +20,11 @@ resource "aws_transfer_server" "this" {
       aws_security_group.transfer.id
     ]
   }
+
+  tags = {
+    "transfer:customHostname"      = local.is-production == false ? "sftp.${local.environment}.managed-file-transfer.service.justice.gov.uk" : "sftp.managed-file-transfer.service.justice.gov.uk"
+    "transfer:route53HostedZoneId" = "/hostedzone/${data.aws_route53_zone.service.zone_id}"
+  }
 }
 
 resource "aws_eip" "this" {
