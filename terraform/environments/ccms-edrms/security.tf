@@ -127,6 +127,10 @@ resource "aws_security_group_rule" "cluster_ec2_egress_all" {
   cidr_blocks       = ["0.0.0.0/0"] # Restrict to what's needed
 }
 
+data "aws_prefix_list" "s3" {
+  name = "com.amazonaws.${data.aws_region.current.name}.s3"
+}
+
 resource "aws_security_group_rule" "cluster_ec2_egress_s3" {
   security_group_id = aws_security_group.cluster_ec2.id
   type              = "egress"
