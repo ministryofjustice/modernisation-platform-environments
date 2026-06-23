@@ -22,5 +22,7 @@ module "cert_manager" {
   source           = "./modules/cert_manager"
   cluster_name     = local.cluster_name
   route53_zone_id  = data.aws_route53_zone.environment.zone_id
+
+  depends_on = [module.lbc]
 }
 

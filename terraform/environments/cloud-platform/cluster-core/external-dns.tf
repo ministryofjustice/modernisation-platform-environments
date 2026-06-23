@@ -61,4 +61,6 @@ module "external_dns" {
     slack-channel = "cloud-platform"
     is-production = "true"
   }
+
+  depends_on = [module.lbc]
 }
