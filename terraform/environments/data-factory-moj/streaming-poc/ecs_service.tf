@@ -305,6 +305,16 @@ resource "aws_security_group" "sdg" {
   }
 }
 
+resource "aws_vpc_security_group_egress_rule" "sdg_kafka_ui_out" {
+  count                        = contains(local.deploy_to, local.environment) ? 1 : 0
+  security_group_id            = aws_security_group.sdg[0].id
+  description                  = "Allow SDG to reach Kafka UI"
+  ip_protocol                  = "tcp"
+  from_port                    = 80
+  to_port                      = 80
+  referenced_security_group_id = aws_security_group.kafka_ui[0].id
+}
+
 resource "aws_vpc_security_group_egress_rule" "sdg_https_out" {
   count             = contains(local.deploy_to, local.environment) ? 1 : 0
   security_group_id = aws_security_group.sdg[0].id
