@@ -28,16 +28,10 @@ module "waf_inherit" {
   name     = "waf-inherit"
   hostname = local.waf_inherit_hostname
 
-  # No route-level EEP created at all. Demonstrates the cluster-wide baseline:
-  # every route is automatically protected by cluster enforcement unless explicitly overridden.
   create_waf_policy = false
 
   depends_on = [module.gateway_api]
 }
-
-# waf_detect:
-#   curl "https://${local.waf_detect_hostname}/?id=1'+OR+'1'%3D'1" -v
-#     → 200 OK (SQL injection logged, not blocked)
 
 module "waf_detect" {
   source = "./modules/test_workload"
@@ -50,10 +44,6 @@ module "waf_detect" {
 
   depends_on = [module.gateway_api]
 }
-
-# waf_disabled:
-#   curl "https://${local.waf_disabled_hostname}/?id=1'+OR+'1'%3D'1" -v
-#     → 200 OK (route-level WAF off, but Gateway still detects & logs)
 
 module "waf_disabled" {
   source = "./modules/test_workload"
@@ -114,21 +104,3 @@ module "waf_custom" {
 
   depends_on = [module.gateway_api]
 }
-
-module "waf_new" {
-  source = "./modules/test_workload"
-
-  name     = "waf-new"
-  hostname = local.waf_new_hostname
-
-  # Enforce mode with a bespoke team rule appended after the CRS includes.
-  # Demonstrates that teams can add custom logic without modifying the CRS.
-  waf_rule_engine = "On"
-
-  extra_waf_directives = [
-    "SecRule REQUEST_URI \"@beginsWith /admin\" \"id:9001,phase:1,deny,status:403,msg:'Admin path blocked by custom rule'\"",
-  ]
-
-  depends_on = [module.gateway_api]
-}
-

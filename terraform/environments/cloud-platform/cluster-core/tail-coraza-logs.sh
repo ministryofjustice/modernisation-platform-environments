@@ -15,6 +15,10 @@ container="${3:-envoy}"
 
 # Clear the terminal screen and show fresh logs from now on
 clear
+echo "═══════════════════════════════════════════════════════════════════════════════════════"
+echo "Starting fresh log tail at $(date '+%Y-%m-%d %H:%M:%S')"
+echo "═══════════════════════════════════════════════════════════════════════════════════════"
+echo ""
 
 stern "$selector" -n "$namespace" -c "$container" -o raw --since 1m | jq -Rr '
   def parse_rule:

@@ -4,6 +4,9 @@ data "aws_eks_cluster" "cluster" {
 
 data "aws_caller_identity" "current" {}
 
+
+# TODO: Can we use EKS pod identity for this instead?
+
 # IAM role for cert-manager IRSA
 resource "aws_iam_role" "cert_manager" {
   name        = "cert-manager-${var.cluster_name}"

@@ -130,6 +130,7 @@ resource "kubernetes_manifest" "gateway_proxy" {
   ]
 }
 
+# Gateway-wide WAF policy
 resource "kubernetes_manifest" "coraza_waf" {
   manifest = yamldecode(<<-YAML
     apiVersion: gateway.envoyproxy.io/v1alpha1
