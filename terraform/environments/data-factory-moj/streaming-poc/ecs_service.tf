@@ -548,22 +548,38 @@ module "ecs_container_kafka_ui" {
   secrets                  = []
   environment = [
     {
-      name  = "ENVIRONMENT"
-      value = substr(lower(local.environment), 0, 3)
+      name  = "KAFKA_CLUSTERS_0_NAME"
+      value = module.ecs_cluster[0].ecs_cluster_name
     },
     {
-      name  = "SPRING_PROFILES_ACTIVE"
-      value = substr(lower(local.environment), 0, 3)
+      name  = "KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS"
+      value = local.msk_bootstrap_brokers
     },
     {
-      name  = "MOJ-DRONE-INCURSION-ARN"
-      value = data.aws_sns_topic.drone_incursion_topic["topic"].arn
+      name  = "KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL"
+      value = "SASL_SSL"
+    },
+    {
+      name  = "KAFKA_CLUSTERS_0_PROPERTIES_SASL_MECHANISM"
+      value = "AWS_MSK_IAM"
+    },
+    {
+      name  = "KAFKA_CLUSTERS_0_PROPERTIES_SASL_JAAS_CONFIG"
+      value = "software.amazon.msk.auth.iam.IAMLoginModule required;"
+    },
+    {
+      name  = "KAFKA_CLUSTERS_0_PROPERTIES_SASL_CLIENT_CALLBACK_HANDLER_CLASS"
+      value = "software.amazon.msk.auth.iam.IAMClientCallbackHandler"
+    },
+    {
+      name  = "LOGGING_LEVEL_ROOT"
+      value = "INFO"
     }
   ]
   log_configuration = {
     logDriver = "awslogs"
     options = {
-      "awslogs-group"         = "/ecs/${local.alerts_prefix}"
+      "awslogs-group"         = "/ecs/${local.kafka_ui_prefix}"
       "awslogs-region"        = data.aws_region.current.region
       "awslogs-stream-prefix" = "ecs"
     }
