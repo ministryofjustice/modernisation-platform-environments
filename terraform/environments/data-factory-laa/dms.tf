@@ -27,7 +27,7 @@
 
 data "aws_secretsmanager_secret" "dms_oracle_credentials" {
   count = local.is-development ? 1 : 0
-  name  = "laa-df-dev/oracle-dms-test/dms-user"
+  name  = "oracle-dms-example/oracle-dms-test/dms-user"
 }
 
 data "aws_iam_policy_document" "oracle_dms_kms" {
