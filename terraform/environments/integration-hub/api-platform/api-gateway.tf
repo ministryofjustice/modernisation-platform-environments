@@ -13,7 +13,7 @@ resource "aws_apigatewayv2_api" "upload_ticket" {
 
     content {
       allow_headers = ["authorization", "content-md5", "content-type"]
-      allow_methods = ["OPTIONS", "POST"]
+      allow_methods = ["DELETE", "OPTIONS", "POST"]
       allow_origins = local.cors_allowed_origins
       expose_headers = [
         "content-type",
@@ -46,6 +46,30 @@ resource "aws_apigatewayv2_authorizer" "mft_request" {
 resource "aws_apigatewayv2_route" "transfer_tickets" {
   api_id             = aws_apigatewayv2_api.upload_ticket.id
   route_key          = "POST /transfer-tickets"
+  target             = "integrations/${aws_apigatewayv2_integration.upload_ticket.id}"
+  authorization_type = "CUSTOM"
+  authorizer_id      = aws_apigatewayv2_authorizer.mft_request.id
+}
+
+resource "aws_apigatewayv2_route" "transfer_ticket_parts" {
+  api_id             = aws_apigatewayv2_api.upload_ticket.id
+  route_key          = "POST /transfer-tickets/{transferTicket}/parts"
+  target             = "integrations/${aws_apigatewayv2_integration.upload_ticket.id}"
+  authorization_type = "CUSTOM"
+  authorizer_id      = aws_apigatewayv2_authorizer.mft_request.id
+}
+
+resource "aws_apigatewayv2_route" "transfer_ticket_complete" {
+  api_id             = aws_apigatewayv2_api.upload_ticket.id
+  route_key          = "POST /transfer-tickets/{transferTicket}/complete"
+  target             = "integrations/${aws_apigatewayv2_integration.upload_ticket.id}"
+  authorization_type = "CUSTOM"
+  authorizer_id      = aws_apigatewayv2_authorizer.mft_request.id
+}
+
+resource "aws_apigatewayv2_route" "transfer_ticket_abort" {
+  api_id             = aws_apigatewayv2_api.upload_ticket.id
+  route_key          = "DELETE /transfer-tickets/{transferTicket}"
   target             = "integrations/${aws_apigatewayv2_integration.upload_ticket.id}"
   authorization_type = "CUSTOM"
   authorizer_id      = aws_apigatewayv2_authorizer.mft_request.id
