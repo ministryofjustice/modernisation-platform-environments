@@ -256,6 +256,8 @@ module "dms_oracle" {
   db          = "oracle-dms-test"
   tags        = local.tags
 
+  manage_dms_service_roles = false
+
   validation_sqs_kms_key_arn = aws_kms_key.oracle_dms[0].arn
 
   write_metadata_to_glue_catalog = true
@@ -508,6 +510,8 @@ module "dms_postgres" {
   environment = local.environment
   db          = "postgres-dms-test"
   tags        = local.tags
+
+  manage_dms_service_roles = false
 
   validation_sqs_kms_key_arn = aws_kms_key.postgres_dms[0].arn
 
