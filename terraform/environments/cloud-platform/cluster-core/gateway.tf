@@ -2,6 +2,7 @@
 module "gateway_api" {
   source           = "./modules/gateway_api"
   wildcard_domain  = "*.${local.cluster_name}.${local.cluster_base_domain}"
+  cluster_name     = local.cluster_name
 
   depends_on = [module.lbc]
 }

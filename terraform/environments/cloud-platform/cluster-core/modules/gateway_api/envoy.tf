@@ -112,7 +112,7 @@ resource "kubernetes_manifest" "gateway_proxy" {
             annotations:
               service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
               service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
-              service.beta.kubernetes.io/aws-load-balancer-name: envoy-gw-nlb-jb
+              service.beta.kubernetes.io/aws-load-balancer-name: envoy-${var.cluster_name}
       dynamicModules:
         - name: composer
           source:
@@ -148,6 +148,10 @@ resource "kubernetes_manifest" "coraza_waf" {
           filterName: coraza-waf
           config:
             directives:
+              # TODO: look into admin rules that cna't be overridden by route-level policies, and whether we need to disable them. (e.g. IMDS endpoint)
+
+
+
               # Loads Coraza base defaults and recommended core settings.
               - Include @coraza.conf
 

@@ -4,7 +4,6 @@ data "aws_eks_cluster" "cluster" {
 
 data "aws_caller_identity" "current" {}
 
-
 # TODO: Can we use EKS pod identity for this instead?
 
 # IAM role for cert-manager IRSA
