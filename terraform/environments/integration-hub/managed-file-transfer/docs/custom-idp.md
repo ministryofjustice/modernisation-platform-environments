@@ -159,38 +159,39 @@ For the seeded `dms1981` user, the response pins the session to the shared `tran
 
 ## Managing users
 
-A user exists as **two** linked things: a record in the users DynamoDB table (who they are and what they can do) and a secret in Secrets Manager (their credentials). Both are managed in Terraform in this directory. Use the seeded `dms1981` resources as templates: `custom_idp_user_dms1981` in [`custom-idp-dynamodb.tf`](../custom-idp-dynamodb.tf) and `secrets_custom_idp_user_dms1981` in [`secrets.tf`](../secrets.tf).
+A user exists as **two** linked things: a record in the users DynamoDB table (who they are and what they can do) and a secret in Secrets Manager (their credentials). Both are driven from a single map, `local.custom_idp_users` in [`custom-idp-users.tf`](../custom-idp-users.tf). Each key in that map is a username; the `aws_dynamodb_table_item.custom_idp_user` resource in [`custom-idp-dynamodb.tf`](../custom-idp-dynamodb.tf) and the `module.secrets_custom_idp_user` block in [`secrets.tf`](../secrets.tf) both `for_each` over it, so adding a user is a one-line change.
 
 ### Add a user
 
-1. **Add the user record** to [`custom-idp-dynamodb.tf`](../custom-idp-dynamodb.tf). Set `identity_provider_key` to `secrets`, point the home directory at the user's own prefix in the `unscanned` bucket, and add `ipv4_allow_list`/`server_id_allow_list` restrictions as needed:
+1. **Add a key to `local.custom_idp_users`** in [`custom-idp-users.tf`](../custom-idp-users.tf). The simplest form uses all defaults:
 
    ```hcl
-   resource "aws_dynamodb_table_item" "custom_idp_user_alice" {
-     table_name = module.dynamodb_custom_idp_users.dynamodb_table_id
-     hash_key   = "user"
-     range_key  = "identity_provider_key"
-
-     item = jsonencode({
-       user                  = { S = "alice" }
-       identity_provider_key = { S = "secrets" }
-       ipv4_allow_list       = { SS = local.custom_idp_configuration.ingress_cidr_blocks }
-       config = { M = {
-         Role              = { S = module.transfer_user_role.arn }
-         Policy            = { S = data.aws_iam_policy_document.transfer_user_session.json }
-         HomeDirectoryType = { S = "LOGICAL" }
-         HomeDirectoryDetails = { L = [{ M = {
-           Entry  = { S = "/" }
-           Target = { S = "/${module.s3_bucket["unscanned"].s3_bucket_id}/alice" }
-         } }] }
-       } }
-     })
+   custom_idp_users = {
+     dms1981 = {}
+     alice   = {}
    }
    ```
 
-2. **Add the credential secret** to [`secrets.tf`](../secrets.tf), named `${local.custom_idp_configuration.secret_prefix}alice` (i.e. `transfer/alice`), mirroring `secrets_custom_idp_user_dms1981`.
-3. **Apply** the Terraform. This creates the record and a *placeholder* secret only — `ignore_secret_changes = true` means Terraform will never read or overwrite the real value.
-4. **Set the real credentials out of band.** Put the actual `Password` and/or `PublicKeys` into the secret in the AWS console or CLI, so they are never committed to source control:
+   Every field is optional. Omitting a field applies its default (resolved with `try()` in the resource):
+
+   - `identity_provider_key` → `secrets` (authenticate against Secrets Manager)
+   - `ipv4_allow_list` → `local.custom_idp_configuration.ingress_cidr_blocks` (the shared ingress allow-list)
+   - `home_directory_target` → `/<unscanned-bucket>/<username>` (the user's own prefix in the `unscanned` bucket)
+
+   To override any of them, give the user an object instead of `{}`:
+
+   ```hcl
+   custom_idp_users = {
+     alice = {
+       identity_provider_key = "secrets"
+       ipv4_allow_list       = ["203.0.113.0/24", "198.51.100.10/32"]
+       home_directory_target = "/${module.s3_bucket["unscanned"].s3_bucket_id}/alice"
+     }
+   }
+   ```
+
+2. **Apply** the Terraform. For the new key this creates the DynamoDB user record and a *placeholder* credential secret named `${local.custom_idp_configuration.secret_prefix}<username>` (i.e. `transfer/alice`). `ignore_secret_changes = true` means Terraform will never read or overwrite the real value.
+3. **Set the real credentials out of band.** Put the actual `Password` and/or `PublicKeys` into the secret in the AWS console or CLI, so they are never committed to source control:
 
    ```bash
    aws secretsmanager put-secret-value \
@@ -204,8 +205,7 @@ The user can now authenticate as `alice` (or `alice@@secrets` to name the provid
 
 ### Remove a user
 
-1. **Delete the user record** by removing the `aws_dynamodb_table_item` block from [`custom-idp-dynamodb.tf`](../custom-idp-dynamodb.tf) and applying. As soon as the record is gone the user can no longer authenticate (the IdP denies any login with no matching record, unless a `$default$` record exists).
-2. **Delete the credential secret** by removing the secret block from [`secrets.tf`](../secrets.tf) and applying. The secret enters its recovery window (7 days) before final deletion; use `aws secretsmanager delete-secret --force-delete-without-recovery` only if immediate removal is required.
+1. **Remove the user's key** from `local.custom_idp_users` in [`custom-idp-users.tf`](../custom-idp-users.tf) and apply. This deletes both the DynamoDB user record and the credential secret in one step. As soon as the record is gone the user can no longer authenticate (the IdP denies any login with no matching record, unless a `$default$` record exists). The secret enters its recovery window (7 days) before final deletion; use `aws secretsmanager delete-secret --force-delete-without-recovery` only if immediate removal is required.
 
 To revoke access **immediately** without a Terraform run, blank the credentials in the secret (`put-secret-value` with empty `Password`/`PublicKeys`) — the next login attempt will fail. To revoke **everyone** at once, set `disabled = true` on the `secrets` provider record.
 
