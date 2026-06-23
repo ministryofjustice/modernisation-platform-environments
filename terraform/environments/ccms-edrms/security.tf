@@ -117,14 +117,18 @@ resource "aws_security_group_rule" "cluster_ec2_ingress_lb" {
   source_security_group_id = aws_security_group.load_balancer.id # Allow the LB to access the EC2 instances
 }
 
-resource "aws_security_group_rule" "cluster_ec2_egress_all" {
+resource "aws_security_group_rule" "cluster_ec2_egress_vpce" {
   security_group_id = aws_security_group.cluster_ec2.id
   type              = "egress"
-  description       = "All Egress"
-  protocol          = -1
-  from_port         = 0
-  to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"] # Restrict to what's needed
+  description       = "Allow egress to VPC endpoints (logs/ecs/secrets)"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  source_security_group_id = data.aws_security_group.vpce_security_group.id
+
+  lifecycle {
+    ignore_changes = [source_security_group_id]
+  }
 }
 
 data "aws_prefix_list" "s3" {
@@ -139,6 +143,16 @@ resource "aws_security_group_rule" "cluster_ec2_egress_s3" {
   from_port         = 443
   to_port           = 443
   prefix_list_ids   = [data.aws_prefix_list.s3.id]
+}
+
+resource "aws_security_group_rule" "cluster_ec2_egress_db" {
+  security_group_id = aws_security_group.cluster_ec2.id
+  type              = "egress"
+  description       = "Allow outbound DB access to TDS"
+  protocol          = "TCP"
+  from_port         = 1521
+  to_port           = 1521
+  source_security_group_id = aws_security_group.tds_db.id
 }
 
 resource "aws_security_group_rule" "cluster_ec2_egress_NEC" {
