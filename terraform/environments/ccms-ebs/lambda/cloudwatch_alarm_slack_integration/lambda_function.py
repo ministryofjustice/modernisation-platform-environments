@@ -680,20 +680,21 @@ def lambda_handler(event, context):
                 is_error = False
 
             # Suppress INSUFFICIENT_DATA notifications outside business hours (07:00–19:00 UTC)
-            # for NonProd environments only (dev-, tst-, prep- prefixed alarms).
+            # for NonProd environments only.
             # NonProd VMs are stopped on a schedule after 7pm; the resulting INSUFFICIENT_DATA
             # alarms are expected noise and should not page the team out of hours.
-            # Production alarms (prod- prefix) are never suppressed — always notify.
-            NON_PROD_PREFIXES = ("dev-", "tst-", "prep-")
+            # APP_ENV is injected by Terraform — production is never suppressed.
+            app_env = os.environ.get("APP_ENV", "").lower()
+            is_non_prod = app_env != "production"
             alarm_name = alarm_details.get('AlarmName', '')
-            is_non_prod = alarm_name.startswith(NON_PROD_PREFIXES)
 
             if new_state == "INSUFFICIENT_DATA" and is_non_prod and not (7 <= alarm_time.hour < 19):
                 logger.info(
                     "Suppressing INSUFFICIENT_DATA alarm '%s' outside business hours "
-                    "(hour=%d UTC, non-prod environment). No Slack notification sent.",
+                    "(hour=%d UTC, APP_ENV=%s). No Slack notification sent.",
                     alarm_name,
                     alarm_time.hour,
+                    app_env,
                 )
                 return
 

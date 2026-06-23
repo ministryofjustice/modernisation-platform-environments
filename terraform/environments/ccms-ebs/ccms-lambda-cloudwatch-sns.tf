@@ -95,6 +95,8 @@ resource "aws_lambda_function" "cloudwatch_sns" {
     variables = {
       # This secret now contains slack_channel_webhook, slack_channel_webhook_guardduty, slack_channel_webhook_s3
       SECRET_NAME = aws_secretsmanager_secret.ebs_cw_alerts_secrets.name
+      # Used to gate out-of-hours INSUFFICIENT_DATA suppression to non-prod environments only
+      APP_ENV = local.environment
     }
   }
 
