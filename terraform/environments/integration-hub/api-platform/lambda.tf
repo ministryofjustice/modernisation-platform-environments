@@ -155,14 +155,8 @@ module "lambda_api_docs" {
     DOCS_BASIC_AUTH_SECRET_ID = module.api_docs_basic_auth_secret.secret_name
   }
   source_path = [
-    {
-      path     = "${path.module}/lambda/request-docs"
-      patterns = [".*\\.py$"]
-    },
-    {
-      path     = "${path.module}"
-      patterns = ["openapi\\.yaml$"]
-    },
+    "${path.module}/lambda/request-docs",
+    "${path.module}/openapi.yaml",
   ]
 
   attach_policy_statements = true
