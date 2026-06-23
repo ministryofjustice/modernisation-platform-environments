@@ -173,7 +173,7 @@ resource "aws_route53_record" "private_api" {
 }
 
 data "aws_iam_policy_document" "update_p1_export_vpc" {
-  count = local.is-test || local.is-development ? 0 : 1
+  count = local.is-test ? 0 : 1
   statement {
     effect = "Allow"
 
@@ -204,7 +204,7 @@ data "aws_iam_policy_document" "update_p1_export_vpc" {
 }
 
 resource "aws_api_gateway_rest_api_policy" "update_p1_export_vpc" {
-  count       = local.is-test || local.is-development ? 0 : 1
+  count       = local.is-test ? 0 : 1
   rest_api_id = aws_api_gateway_rest_api.update_p1_export[0].id
   policy      = data.aws_iam_policy_document.update_p1_export_vpc[0].json
 }
