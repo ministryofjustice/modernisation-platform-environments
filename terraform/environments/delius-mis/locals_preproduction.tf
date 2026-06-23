@@ -434,7 +434,7 @@ locals {
   datasync_config_preprod = null
 
   db_backup_config_preprod = {
-    object_lock_days             = 1
+    object_lock_days             = 10
     expire_current_after_days    = 200
     expire_noncurrent_after_days = 10
     transition = [

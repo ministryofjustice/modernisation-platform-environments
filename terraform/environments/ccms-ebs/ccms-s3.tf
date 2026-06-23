@@ -306,6 +306,17 @@ resource "aws_s3_bucket_lifecycle_configuration" "lambda_payment_load_lifecycle"
     }
   }
 }
+resource "aws_s3_bucket_object_lock_configuration" "dbbackup" {
+  count  = local.is-test ? 1 : 0
+  bucket = module.s3-bucket-dbbackup.bucket.id
+
+  rule {
+    default_retention {
+      mode = "COMPLIANCE"
+      days = local.application_data.accounts[local.environment].rman_s3_lifecycle_days_expiration_current
+    }
+  }
+}
 
 # ---------------------------------------------
 # MOVED blocks

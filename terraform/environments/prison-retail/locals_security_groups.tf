@@ -14,7 +14,7 @@ locals {
     # development   = local.security_group_cidrs_devtest
     # test          = local.security_group_cidrs_devtest
     # preproduction = local.security_group_cidrs_preprod_prod
-    production    = local.security_group_cidrs_preprod_prod
+    production = local.security_group_cidrs_preprod_prod
   }
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 

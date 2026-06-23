@@ -20,10 +20,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_80" {
   protocol          = "TCP"
   from_port         = 80
   to_port           = 80
-  cidr_blocks = [data.aws_vpc.shared.cidr_block,
-    local.application_data.accounts[local.environment].lz_aws_subnet_env,
-    local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
-  local.application_data.accounts[local.environment].lz_aws_appstream_subnet_a_b]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
 ### HTTPS
@@ -35,10 +32,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_443" {
   protocol          = "TCP"
   from_port         = 443
   to_port           = 443
-  cidr_blocks = [data.aws_vpc.shared.cidr_block,
-    local.application_data.accounts[local.environment].lz_aws_subnet_env,
-    local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
-  local.application_data.accounts[local.environment].lz_aws_appstream_subnet_a_b]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
 ### SSH
@@ -51,9 +45,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_22" {
   from_port         = 22
   to_port           = 22
   cidr_blocks = [data.aws_vpc.shared.cidr_block,
-    local.application_data.accounts[local.environment].lz_aws_subnet_env,
-    local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
-  local.application_data.accounts[local.environment].lz_aws_appstream_subnet_a_b]
+  local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod]
 }
 
 ### Oracle LDAP
@@ -65,10 +57,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_1389" {
   protocol          = "TCP"
   from_port         = 1389
   to_port           = 1389
-  cidr_blocks = [data.aws_vpc.shared.cidr_block,
-    local.application_data.accounts[local.environment].lz_aws_subnet_env,
-    local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
-  local.application_data.accounts[local.environment].lz_aws_appstream_subnet_a_b]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
 ### Oracle Listerner Port
@@ -81,9 +70,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_152x" {
   from_port         = 1521
   to_port           = 1522
   cidr_blocks = [data.aws_vpc.shared.cidr_block,
-    local.application_data.accounts[local.environment].lz_aws_subnet_env,
     local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
-    local.application_data.accounts[local.environment].lz_aws_appstream_subnet_a_b,
   local.application_data.accounts[local.environment].cloud_platform_subnet]
 }
 
@@ -96,10 +83,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_5101" {
   protocol          = "TCP"
   from_port         = 5101
   to_port           = 5101
-  cidr_blocks = [data.aws_vpc.shared.cidr_block,
-    local.application_data.accounts[local.environment].lz_aws_subnet_env,
-    local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
-  local.application_data.accounts[local.environment].lz_aws_appstream_subnet_a_b]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
 ### Oracle
@@ -111,10 +95,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_5401" {
   protocol          = "TCP"
   from_port         = 5401
   to_port           = 5401
-  cidr_blocks = [data.aws_vpc.shared.cidr_block,
-    local.application_data.accounts[local.environment].lz_aws_subnet_env,
-    local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
-  local.application_data.accounts[local.environment].lz_aws_appstream_subnet_a_b]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
 ### Oracle
@@ -126,10 +107,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_5575" {
   protocol          = "TCP"
   from_port         = 5575
   to_port           = 5575
-  cidr_blocks = [data.aws_vpc.shared.cidr_block,
-    local.application_data.accounts[local.environment].lz_aws_subnet_env,
-    local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
-  local.application_data.accounts[local.environment].lz_aws_appstream_subnet_a_b]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
 ### Oracle LDAP SSL
@@ -141,10 +119,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_1636" {
   protocol          = "TCP"
   from_port         = 1636
   to_port           = 1636
-  cidr_blocks = [data.aws_vpc.shared.cidr_block,
-    local.application_data.accounts[local.environment].lz_aws_subnet_env,
-    local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
-  local.application_data.accounts[local.environment].lz_aws_appstream_subnet_a_b]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
 ### Oracle
@@ -156,10 +131,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_10401" {
   protocol          = "TCP"
   from_port         = 10401
   to_port           = 10401
-  cidr_blocks = [data.aws_vpc.shared.cidr_block,
-    local.application_data.accounts[local.environment].lz_aws_subnet_env,
-    local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
-  local.application_data.accounts[local.environment].lz_aws_appstream_subnet_a_b]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
 ### Oracle HTTP
@@ -171,10 +143,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_800x" {
   protocol          = "TCP"
   from_port         = 8000
   to_port           = 8005
-  cidr_blocks = [data.aws_vpc.shared.cidr_block,
-    local.application_data.accounts[local.environment].lz_aws_subnet_env,
-    local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
-  local.application_data.accounts[local.environment].lz_aws_appstream_subnet_a_b]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
 ### Oracle HTTPS
@@ -186,10 +155,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_4443" {
   protocol          = "TCP"
   from_port         = 4443
   to_port           = 4444
-  cidr_blocks = [data.aws_vpc.shared.cidr_block,
-    local.application_data.accounts[local.environment].lz_aws_subnet_env,
-    local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
-  local.application_data.accounts[local.environment].lz_aws_appstream_subnet_a_b]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
 

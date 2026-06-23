@@ -248,6 +248,12 @@ locals {
       description  = "Trigger Lambda at 07:15 each Monday"
       timezone     = "Europe/London"
     }
+    wam_waf_analysis_monthly = {
+      environments = ["development"]
+      schedule     = "cron(0 2 1 * ? *)"
+      description  = "Trigger Lambda at 07:00 on the 1st day of every month"
+      timezone     = "Europe/London"
+    }
     suppress_securityhub_findings = {
       environments = ["development", "preproduction", "production"]
       schedule     = "cron(15 7 ? * MON-FRI *)"
@@ -382,6 +388,7 @@ locals {
     #    local.is-production ? aws_lambda_function.lambda_functions["wam_waf_analysis_production"].arn : null
     #))
     # check_elb_trt_alarm            = local.is-production ? aws_lambda_function.lambda_functions["check_elb_trt_alarm_production"].arn : null
+    wam_waf_analysis_monthly       = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_monthly_development"].arn : null
     send_cpu_graph                 = local.is-production ? aws_lambda_function.lambda_functions["send_cpu_graph_production"].arn : null
     disable_cpu_alarms             = local.is-production ? aws_lambda_function.lambda_functions["disable_cpu_alarm_production"].arn : null
     enable_cpu_alarms              = local.is-production ? aws_lambda_function.lambda_functions["enable_cpu_alarm_production"].arn : null

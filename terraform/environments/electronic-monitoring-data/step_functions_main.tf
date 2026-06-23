@@ -98,6 +98,7 @@ module "gdpr_deletion_step_function" {
   type = "STANDARD"
 }
 
+
 # ------------------------------------------
 # Iceberg Step Function
 # ------------------------------------------

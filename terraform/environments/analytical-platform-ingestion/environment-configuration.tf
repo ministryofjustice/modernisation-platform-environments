@@ -20,9 +20,9 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.2.4"
-      transfer_image_version = "0.0.26"
-      notify_image_version   = "0.0.27"
+      scan_image_version     = "0.2.5"
+      transfer_image_version = "0.0.27"
+      notify_image_version   = "0.0.28"
 
       /* Target Buckets */
       target_buckets = [
@@ -49,7 +49,7 @@ locals {
         }
         "opg-restore-ocr" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCWz7ue/saomMAKrVgo6FifjpGQfl7B4fs2s/MJa2jhpBVWXk9tquGDXp1/Yfk4C7FIneGKfh8fWHz9FPS+u6h3a9hMW8d/5onNuSr9S6T2mN7ydZQzGez5qyG2vNFLyip3ls6mQjIpXSo2aow7+3Y2lbDe8UamiYNVgvvWB+hVl5RJjcaReDDbi0xwdjGjep0LcvgAyKa8evmcEbFVkrLhWyc30xn1+OesqPWSpoIb/IlBDFxCqR46GW/zlOldEIatONhXWgvJ6dS5T1YmHsE4U0Py3BV8O5zvc+XRYjr/3w9LOwmTHS1xbzlhNBjO1o6O9hSBsowBjsWLL5aNWcdBH0DiWfIWkoq9Fy8VEAa/T5v7GCaKvDs9pGBpjQSQsWyKXbwP0Z2RGyU2CSGVzMM6gzrjaxanOK9QbLOqCpTSSIYWfokt+MNrHcQU+9mBTjq20URF7RW6tsM8GvzGRNk0hlkX3ueq86uLpQzRctGBTjN74qBba0WbauIcSl4OIrc+NEwjaFTmuIs0NIG5aoAop8WHOC8cxFAST2XjMF30eEh6/W9Gh0uPor4L5tUqJ/JuI2wcfYLuk1KLDcOUVin79QficX93zbaTPNXWW052ct50B0KnCmZyvQORwOH8gBFgkFe5MO/bqevG9Xpof/QvpCLKEON/fBAW4bEdIIv5qw=="
-          cidr_blocks = ["51.11.176.157/32", "20.117.187.79/32"]
+          cidr_blocks = ["51.11.176.157/32"]
         }
         "maat-xhibit-dev" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCuB8p8OaxeX3sILMVUQcD48XBPuVLzddUixUUbYLS1WPiEUz7XcUkozeuhulIy9CzqA9yyAa2uPWhQr3KL2bKpXo8UIJr+3n51mjJp9V+LO65kMN5ewQHzx9phpZba5UOth1aEwn4vAFQwm2q6/ydNrJtRQeaI0DT4njaf0MC9FM/nu25IvUbl2dzUn2MX7/WuMouzcYXTeiLUIMvgRoAw4pjnCmU2AuPTokC7OynFh++SiHRUw6OwNKxqORv3du7qlfcGDWx+oAHbUVOnSaTrUssUuEXPFS5ytwWEp6GpzfZpNvD7Kj7gw/7ntpdTckh+d5INJHu+2L74Ytj2RPLNoHEB9t1ptEI2d2SeKpHqPSak2uQzk4aHV2SJs4IO0omTWKHojtSxo5gxAl4B58UjdzmFn0yNr3rJbKnn2w1H7viaM/0vWRgZrtgo07pd2uJePObaUE9jf1re+woasVWJAy3v9dZszVBcJ62NK/QU3cGfUncBw2OnnDURm7z1YVAj8mrReOkZWFA7nJ4/Gzh5pR8wNhnSLsDFqsQefaQiHBi2vZzDRqaUu03eWvd8BmomWC5joT7qqY8Qv+X5boO9CI0hX9FcoJJMXJwckoVAZGuZKgOwOL4y1Y7hpCO1U5ex9mbyMy5D5r/FNf7B85d/qCxcGwesIzI1b0QRupKxDw=="
@@ -61,7 +61,7 @@ locals {
         }
         "access-uk" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDMRvtIhxI+k3AXkGpZe6242VucffThflI3PCezvNYhjHVCfaMvNjt0yAXOO7hrzqY8TMOwH2LXsM1yGhUrL2Qe2WBl5gebqsKsR0H6eKypdT6GJhWg81AAf2Zckzk2ibdHqs3w8ZmjGblSv6ReAfg4l/VYeAqdBCfY7m6r+jbgcRtRbsM75GGz0Ts1rgGYF9jrKglF0SKDxT2rvzX+mUB13oxjzWW+C8lGw7aVrtL+hDgXB7gRAa5hqnDIij4rdhd4xt/PzvFZ1FoeutnvEzNMvvtaC/0Iu6IdBdOk3ay/wG7Q6w9pb5BCvKYMUz3MXUbqRSUg8Ed/UHAs6kGBRS9h"
-          cidr_blocks = ["172.167.164.209/32"]
+          cidr_blocks = ["172.167.164.209/32", "51.11.29.242/32"]
         }
       }
       transfer_server_sftp_users_with_egress = {
@@ -134,7 +134,7 @@ locals {
           cidr_blocks = ["20.50.108.242/32", "20.50.109.148/32", "51.11.124.205/32", "51.11.124.216/32"]
         }
         "opg-restore-ocr" = {
-          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCWz7ue/saomMAKrVgo6FifjpGQfl7B4fs2s/MJa2jhpBVWXk9tquGDXp1/Yfk4C7FIneGKfh8fWHz9FPS+u6h3a9hMW8d/5onNuSr9S6T2mN7ydZQzGez5qyG2vNFLyip3ls6mQjIpXSo2aow7+3Y2lbDe8UamiYNVgvvWB+hVl5RJjcaReDDbi0xwdjGjep0LcvgAyKa8evmcEbFVkrLhWyc30xn1+OesqPWSpoIb/IlBDFxCqR46GW/zlOldEIatONhXWgvJ6dS5T1YmHsE4U0Py3BV8O5zvc+XRYjr/3w9LOwmTHS1xbzlhNBjO1o6O9hSBsowBjsWLL5aNWcdBH0DiWfIWkoq9Fy8VEAa/T5v7GCaKvDs9pGBpjQSQsWyKXbwP0Z2RGyU2CSGVzMM6gzrjaxanOK9QbLOqCpTSSIYWfokt+MNrHcQU+9mBTjq20URF7RW6tsM8GvzGRNk0hlkX3ueq86uLpQzRctGBTjN74qBba0WbauIcSl4OIrc+NEwjaFTmuIs0NIG5aoAop8WHOC8cxFAST2XjMF30eEh6/W9Gh0uPor4L5tUqJ/JuI2wcfYLuk1KLDcOUVin79QficX93zbaTPNXWW052ct50B0KnCmZyvQORwOH8gBFgkFe5MO/bqevG9Xpof/QvpCLKEON/fBAW4bEdIIv5qw=="
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCbNgCuuc3q1yjTyFXI4i4hu9RUMciJvGXyMctZWW0tHjAmYA5uCPLQOiie2LN/bghjkXLg8aWh2WOITv9vcUksXS9pok7cZjTQUw+8p240apXEJYaq7F+orsYOK1s3Li8Z/h/53bPKwPOkO5Ve+28MGZ2ebACeMqEdhUjiWL7K1hnUuKPapxOAYfCzwxXQ03Z3jASOOV8gSci5YwvtMevoGzKbIDh+RHLRG4snijMSTc+8MA9I8T9JgzBD5eR8NGfGiUz9e01oYOiObEE+jjqUsGVaman2LHW+NBZRselCNF2jeT6dlTpETTPqUElRz95uLdEze6gMRubU3ssNMRMM2WbCrGqQn6O+nwKkQFdUmFAcpaCmIGFfYSqWoHxELJ+xdVUcKoTVfjnhgoPGaeahUiocEmxHMk4yRjuQMze8968NVLtVFWC++eHMDNrRXq7tsRH+IxP7hOw1IMADE8XTJrCg0Al4wXSvS4l9trbPuEmk8TDC0qq+ztV+TxBphVA0Ol0CNUE6Ie1qW0m//r87oh82gVk+y9YjYGxfUjCRwwdR7XKhPRUPJ/mrPQ+fhqvH1tjM58Ef93pGpPo6/jUABFuWS1Jmf1P/n2naUk11HxbE1LqMCesw/BjeKuaZWuNcL1vi4bWOTAqbokFezIr97QfHi2mQyJqCppKqFaEoUQ=="
           cidr_blocks = ["20.117.187.79/32"]
         }
         "sscl-chris-j" = {
@@ -152,6 +152,10 @@ locals {
         "meganexususer" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCWE5yFwkIyeXukHNw0Qi+ps8w3Df2VuB9LPEiCeOS52ZJ30ih/5yf1iUho2XRY22imbUBdw7Menqn1fEA2OVNh30NOgS7kut0EPmvLr5cFrROiglbFvIM5pEeNnOfFgTPkCsOs81gMOikLG+eZZ6+rSacBnxTmCWbN7xVJobdD7UsXpqfrC8lx7MuZSvVbo/MN5L09KaehBRRvLkkGCOhjn04UjgRyxAhlKVHUSzX4oz4wgAnxh41y8MJoRYAs5OdfeqcBpoquPQJYypfKEGSLUBO4Frc5nAG4yLKwFZLN2T68J+mXdVI2QyoVnH6oLugAS4IVqxEY2vdlkP72GYDjZ2Z1B+YyNEhAC5b8+Djh65/Tgg3Y/4haM7zdNa8zdlJzwWEYZkRMO/ppivC571ZPyO2AuZV8/FuZSW9GSWtE+VqAI46GE+MXkrh5S66prKPBsB//GmZwL60m1oMG8xxjSXYzbit5Vho0nZSaJ9EdfaHLaVulsuC6Kd01x99QgU6GMARG6FPsIRTFr3UOzycJn0UbAmF0Vzelayt9CZxbTRToJdDi44edMTDavyKbYryEaPPHftECXnY4SqSzvo27qcO+UNOB9c+FZzoHBWim0SK4qqiF6bgf2WU/uPYM7u5szVIRmEwdEpv+0TX/nI8Ih3HNwGYbjABTdDG/6cFs9Q=="
           cidr_blocks = ["51.142.161.93/32"]
+        }
+        "bt-pin" = {
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC2o5mRmcvgNsrGjhzqKF4NEnQJ5bOXtVnbi9SVEKTJG7YQlRte+sC290y1Lvr2Sc1KItnIUGWU4vRh8w0KKYetKRQ/XqTqgobedS3aBQrOm/UBASdlFh+4WPhsDGEywhcjy7yNw/e5F8WjVQJlBjuowD6dl07dzR5lrpTZRWz3nMj3zfWHvWoU3nJLyOv1mbl22BRYMJTJ0IANxwuTQrNfepNypnPFBKe8kagGVrahd5xb+UXoSAaZhd+gguKjpBS6uufrvp2v/YdrgxkeS7k5LcIGuWqsGONPzrLfU5Gmgd1o7DlVM8/ex39EC0zxWwz6Kdp8r4O2zX0nPQHXCjyIZbON0etq2fcgdf239aQGRlDiwBH2YEpmHtcoEhULX8BgnPGQfVxVqU2lJnjlXX12PmlrOOOHmp4MOTX0OiOcPz9SOhpRGnSTum9BJQxp1jABCuKTNQjo2U5JJKEISZHazeXEQnPZPz3YUGmBAB4S6QN3cQfHzXCWD7+dsgAQ7qtyAZeN3YV9NLkBNbuoQoBuAdmAtDtSu8tyqjEaXpHqA3Od3XJhS77jprao+sUJgE9102QBlcXQp5+PUKf8Y8BlJR41yxYDU4nFa5/8Xu8H1Z4aGWt9+iEgjLNIzKi7ExXwjEZy6uPjPVO5/+LCRgPmf5ypLlc4GcI7G6G+5H9F1Q=="
+          cidr_blocks = ["109.144.8.4/32"]
         }
       }
       transfer_server_sftp_users_with_egress = {

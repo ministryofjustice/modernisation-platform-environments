@@ -20,6 +20,21 @@ locals {
                 "ns-885.awsdns-46.net."
               ]
             }
+            monitoring-ns = {
+              /* 
+                Delegate monitoring.development.data-platform.service.justice.gov.uk to Cloud Platform 
+                https://github.com/ministryofjustice/cloud-platform-environments/blob/main/namespaces/live.cloud-platform.service.justice.gov.uk/data-platform-monitoring-development/resources/route53.tf
+              */
+              type = "NS"
+              name = "monitoring"
+              ttl  = 86400
+              records = [
+                "ns-1439.awsdns-51.org.",
+                "ns-1859.awsdns-40.co.uk.",
+                "ns-278.awsdns-34.com.",
+                "ns-695.awsdns-22.net."
+              ]
+            }
           }
         }
         "development.ai-gateway.justice.gov.uk" = {
@@ -85,6 +100,21 @@ locals {
                 "ns-674.awsdns-20.net."
               ]
             },
+            monitoring-ns = {
+              /* 
+                Delegate monitoring.data-platform.service.justice.gov.uk to Cloud Platform 
+                https://github.com/ministryofjustice/cloud-platform-environments/blob/main/namespaces/live.cloud-platform.service.justice.gov.uk/data-platform-monitoring-production/resources/route53.tf
+              */
+              type = "NS"
+              name = "monitoring"
+              ttl  = 86400
+              records = [
+                "ns-1507.awsdns-60.org.",
+                "ns-152.awsdns-19.com.",
+                "ns-1550.awsdns-01.co.uk.",
+                "ns-954.awsdns-55.net."
+              ]
+            },
             /* GitHub Pages */
             user-guide-github-pages-challenge-txt = {
               type    = "TXT"
@@ -109,7 +139,19 @@ locals {
               name    = "manual"
               ttl     = 300
               records = ["ministryofjustice.github.io."]
-            }
+            },
+            docs-hub-github-pages-cname = {
+              type    = "CNAME"
+              name    = "docs-hub"
+              ttl     = 300
+              records = ["ministryofjustice.github.io."]
+            },
+            docs-hub-github-pages-challenge-txt = {
+              type    = "TXT"
+              name    = "_github-pages-challenge-ministryofjustice.docs-hub"
+              ttl     = 300
+              records = ["538403c0023ec96ea670ef9e55bf7c"]
+            },
             /* PagerDuty Status Page */
             pagerduty-dkim1-cname = {
               type    = "CNAME"
