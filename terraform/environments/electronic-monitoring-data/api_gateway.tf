@@ -220,9 +220,9 @@ resource "aws_api_gateway_rest_api" "update_p1_export" {
   }
 
   endpoint_configuration {
-    types            = [local.is-development ? "REGIONAL" : "PRIVATE"]
-    vpc_endpoint_ids = local.is-development ? null : [data.aws_vpc_endpoint.api_gateway.id]
-    ip_address_type  = local.is-development ? null : "dualstack"
+    types            = ["PRIVATE"]
+    vpc_endpoint_ids = [data.aws_vpc_endpoint.api_gateway.id]
+    ip_address_type  = "dualstack"
   }
 }
 
