@@ -249,7 +249,7 @@ module "dms_oracle" {
   # checkov:skip=CKV_TF_1: using branch ref for testing
   # checkov:skip=CKV_TF_2: using branch ref for testing
   count  = local.is-development ? 1 : 0
-  source = "github.com/ministryofjustice/terraform-dms-module?ref=bc5a588"
+  source = "github.com/ministryofjustice/terraform-dms-module?ref=0933e0512e10527e0ba72ba07e1e20162b6ed3be"
 
   vpc_id      = data.aws_vpc.shared.id
   environment = local.environment
@@ -479,7 +479,7 @@ module "dms_postgres" {
   # checkov:skip=CKV_TF_1: using branch ref for testing
   # checkov:skip=CKV_TF_2: using branch ref for testing
   count  = local.is-development ? 1 : 0
-  source = "github.com/ministryofjustice/terraform-dms-module?ref=075c7dde7f5259c0e28ba00af1cd1fd49336a3fb"
+  source = "github.com/ministryofjustice/terraform-dms-module?ref=0933e0512e10527e0ba72ba07e1e20162b6ed3be"
 
   vpc_id      = data.aws_vpc.shared.id
   environment = local.environment
