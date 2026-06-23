@@ -2,10 +2,11 @@
 # DMS Oracle Test - Development only
 # Deploys terraform-dms-module against the throwaway Oracle RDS instance
 #
-# Oracle DMS user minimum grants for full-load:
+# Oracle DMS user minimum grants for full-load + CDC:
 #   GRANT CONNECT TO dms_user;
 #   GRANT SELECT ANY TABLE TO dms_user;
 #   GRANT SELECT_CATALOG_ROLE TO dms_user;
+#   GRANT LOGMINING TO dms_user;
 #
 # Module quirks (ministryofjustice/terraform-dms-module):
 #   - Requires hashicorp/tls provider (via Lambda sub-module) — add to versions.tf
@@ -283,14 +284,15 @@ module "dms_oracle" {
     secrets_manager_kms_arn = aws_kms_key.oracle_dms[0].arn
     sid                     = "DMSTEST"
     # Oracle extra_connection_attributes:
-    #   addSupplementalLogging=N - not needed for full-load only (no CDC)
+    #   addSupplementalLogging=N - supplemental logging is managed on the RDS instance
     #   useBfile=Y              - use BFILE for reading LOBs (faster than API)
-    #   useLogminerReader=N     - not needed without CDC; avoids requiring LOGMINING grant
+    #   useLogminerReader=N     - use Binary Reader rather than LogMiner for CDC
     extra_connection_attributes = "addSupplementalLogging=N;useBfile=Y;useLogminerReader=N;"
   }
 
   replication_task_id = {
     full_load = "${local.application_name}-oracle-dms-test-full-load"
+    cdc       = "${local.application_name}-oracle-dms-test-cdc"
   }
 
   dms_mapping_rules = {
