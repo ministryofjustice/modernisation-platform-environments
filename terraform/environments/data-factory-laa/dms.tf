@@ -544,8 +544,15 @@ module "dms_postgres" {
     # Postgres extra_connection_attributes:
     #   PluginName=test_decoding — built-in logical decoding plugin on RDS;
     #                              no pg_logical extension needed
+    #   CaptureDDLs=N            — do NOT create the awsdms_intercept_ddl event
+    #                              trigger; dms_user lacks rights to create it,
+    #                              which otherwise blocks CDC from starting
+    #   HeartbeatEnable=true     — periodic heartbeat stops the replication slot
+    #                              pinning WAL when there is no source activity
     #   sslMode=require          — RDS enforces SSL via pg_hba.conf
-    extra_connection_attributes = "PluginName=test_decoding;sslMode=require;"
+    # NB: this string fully replaces the module default (coalesce), so it must
+    #     reproduce the module's CaptureDDLs/Heartbeat settings, not just TLS.
+    extra_connection_attributes = "PluginName=test_decoding;CaptureDDLs=N;HeartbeatEnable=true;HeartbeatFrequency=5;HeartbeatSchema=public;sslMode=require;"
   }
 
   replication_task_id = {
