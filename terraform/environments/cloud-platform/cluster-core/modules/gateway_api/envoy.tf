@@ -150,8 +150,8 @@ resource "kubernetes_manifest" "coraza_waf" {
               # Loads Coraza base defaults and recommended core settings.
               - Include @coraza.conf
 
-              # Keeps WAF in monitor mode (log only, do not block requests).
-              - SecRuleEngine DetectionOnly
+              # Enables WAF enforcement at cluster level – teams can override per-route.
+              - SecRuleEngine On
 
               # Enables audit logging for matched/security-relevant transactions.
               - SecAuditEngine On

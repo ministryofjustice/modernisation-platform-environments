@@ -13,7 +13,10 @@ namespace="${1:-envoy-gateway-system}"
 selector="${2:-envoy-envoy-gateway-system-eg}"
 container="${3:-envoy}"
 
-stern "$selector" -n "$namespace" -c "$container" -o raw | jq -Rr '
+# Clear the terminal screen and show fresh logs from now on
+clear
+
+stern "$selector" -n "$namespace" -c "$container" -o raw --since 1m | jq -Rr '
   def parse_rule:
     capture("\\[id \\\"(?<id>[0-9]+)\\\"\\].*\\[msg \\\"(?<msg>[^\\\"]+)\\\"\\].*\\[severity \\\"(?<severity>[^\\\"]+)\\\"]")? // null;
 
@@ -37,11 +40,16 @@ stern "$selector" -n "$namespace" -c "$container" -o raw | jq -Rr '
 
   (fromjson? // {"raw": .}) as $line
   | if $line.transaction? then
+      # Bind defaults to variables first to avoid double-quotes inside \() interpolation.
+      ($line.transaction.producer.rule_engine // "unknown") as $engine |
+      ($line.transaction.response.status   // 0)           as $status |
+      ($line.transaction.is_interrupted    // false)        as $interrupted |
+      ($line.transaction.request.uri       // "")           as $uri |
       "------------------------------------------------------------",
       "time=\($line.transaction.timestamp) id=\($line.transaction.id)",
-      "verdict=\(verdict($line.transaction)) status=\($line.transaction.response.status // 0) interrupted=\($line.transaction.is_interrupted // false) engine=\($line.transaction.producer.rule_engine // "unknown")",
+      "verdict=\(verdict($line.transaction)) status=\($status) interrupted=\($interrupted) engine=\($engine)",
       "client=\($line.transaction.client_ip):\($line.transaction.client_port) host=\($line.transaction.server_id)",
-      "request=\($line.transaction.request.method) \(($line.transaction.request.uri // "" ) | trunc(180))",
+      "request=\($line.transaction.request.method) \($uri | trunc(180))",
       (
         $line.messages[]?.error_message
         | parse_rule
@@ -53,11 +61,16 @@ stern "$selector" -n "$namespace" -c "$container" -o raw | jq -Rr '
       ),
       ""
     elif $line.msg? then
-      # Skip duplicate info/warn lines because the structured transaction entry is easier to read.
+      # Skip duplicate info/warn lines; the structured transaction entry is easier to read.
       empty
     elif $line.response_code? then
-      "access verdict=\(access_verdict($line)) status=\($line.response_code // 0) details=\($line.response_code_details // "") id=\($line["x-request-id"] // "unknown")",
-      "host=\($line[":authority"] // "") route=\(($line.route_name // "") | trunc(120)) path=\(($line["x-envoy-origin-path"] // "") | trunc(120))",
+      ($line.response_code_details // "") as $details |
+      ($line["x-request-id"]       // "unknown") as $rid |
+      ($line[":authority"]         // "") as $authority |
+      ($line.route_name            // "") as $route |
+      ($line["x-envoy-origin-path"] // "") as $path |
+      "access verdict=\(access_verdict($line)) status=\($line.response_code) details=\($details) id=\($rid)",
+      "host=\($authority) route=\($route | trunc(120)) path=\($path | trunc(120))",
       ""
     else
       # Ignore non-JSON/noise lines (including literal "null" output) for cleaner tails.
