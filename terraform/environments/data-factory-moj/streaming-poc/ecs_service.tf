@@ -229,6 +229,7 @@ resource "aws_iam_role_policy" "alerts_task" {
 # --- Security Groups ---
 
 resource "aws_security_group" "sdg" {
+  #checkov:skip=CKV2_AWS_5: Security group is attached to the SDG ECS service network configuration; Checkov cannot infer attachment through counted/dynamic references.
   count       = contains(local.deploy_to, local.environment) ? 1 : 0
   name_prefix = local.sdg_prefix
   vpc_id      = data.aws_vpc.shared.id
@@ -262,6 +263,7 @@ resource "aws_vpc_security_group_egress_rule" "sdg_msk_out" {
 }
 
 resource "aws_security_group" "alerts" {
+  #checkov:skip=CKV2_AWS_5: Security group is attached to the alerts ECS service network configuration; Checkov cannot infer attachment through counted/dynamic references.
   count       = contains(local.deploy_to, local.environment) ? 1 : 0
   name_prefix = local.alerts_prefix
   vpc_id      = data.aws_vpc.shared.id
@@ -358,7 +360,7 @@ module "ecs_service_sdg" {
 resource "aws_cloudwatch_log_group" "sdg" {
   count             = contains(local.deploy_to, local.environment) ? 1 : 0
   name              = "/ecs/${local.sdg_prefix}"
-  retention_in_days = 30
+  retention_in_days = 365
   kms_key_id        = aws_kms_key.ecs_cloudwatch[0].arn
   tags              = local.extended_tags
 }
@@ -430,7 +432,7 @@ module "ecs_service_alerts" {
 resource "aws_cloudwatch_log_group" "alerts" {
   count             = contains(local.deploy_to, local.environment) ? 1 : 0
   name              = "/ecs/${local.alerts_prefix}"
-  retention_in_days = 30
+  retention_in_days = 365
   kms_key_id        = aws_kms_key.ecs_cloudwatch[0].arn
   tags              = local.extended_tags
 }
