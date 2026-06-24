@@ -115,7 +115,7 @@ resource "aws_dynamodb_table_item" "custom_idp_user" {
                   S = "/"
                 }
                 Target = {
-                  S = try(each.value.home_directory_target, "/${module.s3_bucket["unscanned"].s3_bucket_id}/${each.key}")
+                  S = "/${module.s3_bucket["unscanned"].s3_bucket_id}/${trimprefix(try(each.value.home_directory_target, each.key), "/")}"
                 }
               }
             }

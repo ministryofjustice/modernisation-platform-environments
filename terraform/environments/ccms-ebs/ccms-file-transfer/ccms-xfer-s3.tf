@@ -118,7 +118,6 @@ resource "aws_s3_bucket_notification" "sftp_bucket_notification" {
     lambda_function_arn = aws_lambda_function.process_file_from_bucket_lambda_function.arn
     events              = ["s3:ObjectCreated:Put"]
     filter_prefix       = "ccms-transfer-bc-${local.environment}/inbound/"
-    filter_suffix       = ".csv"
   }
 
   depends_on = [module.s3-bucket-sftp-bc]
