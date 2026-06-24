@@ -153,7 +153,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "moj_tgw" {
   vpc_id                             = aws_vpc.workspaces.id
   subnet_ids                         = [aws_subnet.private_a.id, aws_subnet.private_b.id]
   security_group_referencing_support = "enable"
-  
+
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}-${local.environment}-tgw-attachment" }

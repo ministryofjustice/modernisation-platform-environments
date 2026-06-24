@@ -4,8 +4,10 @@ resource "aws_lb" "sftp_load_balancer" {
   internal           = true
   load_balancer_type = "application"
   subnets            = data.aws_subnets.shared-private.ids
+  security_groups    = [aws_security_group.sftp_load_balancer.id]
 
-  security_groups = [aws_security_group.sftp_load_balancer.id]
+  drop_invalid_header_fields = true
+  enable_deletion_protection = true
 
   access_logs {
     bucket  = data.aws_s3_bucket.logging_bucket.id

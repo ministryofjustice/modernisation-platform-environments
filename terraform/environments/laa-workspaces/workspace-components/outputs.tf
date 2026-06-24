@@ -38,6 +38,28 @@ output "nat_gateway_public_ip" {
   value       = try(aws_eip.nat[0].public_ip, null)
 }
 
+###############################################
+# Outputs for AWS Network Firewall
+###############################################
+
+output "network_firewall_policy_arn" {
+  description = "ARN of the WorkSpaces Network Firewall policy for web filtering"
+  value       = try(aws_networkfirewall_firewall_policy.workspaces_web_allowlist[0].arn, null)
+}
+
+output "network_firewall_id" {
+  description = "ID of the WorkSpaces Network Firewall"
+  value       = try(aws_networkfirewall_firewall.workspaces_web_allowlist[0].id, null)
+}
+
+output "network_firewall_endpoint_ids" {
+  description = "Endpoint IDs for the WorkSpaces Network Firewall"
+  value = try(
+   [for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist[0].firewall_status[0].sync_states : sync_state.attachment[0].endpoint_id],
+    []
+  )
+}
+
 ##############################################
 ### RADIUS Server Outputs
 ##############################################

@@ -18,6 +18,11 @@ output "auth_principals_table_name" {
   value       = module.dynamodb_auth_principals.dynamodb_table_id
 }
 
+output "multipart_uploads_table_name" {
+  description = "DynamoDB table containing multipart upload sessions"
+  value       = module.dynamodb_multipart_uploads.dynamodb_table_id
+}
+
 output "user_auth_secret_names" {
   description = "HTTPS upload credential secret names keyed by username"
   value = {

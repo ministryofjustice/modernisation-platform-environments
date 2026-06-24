@@ -4,14 +4,18 @@
       "api_configuration": {
         "cors_allowed_origins": [],
         "max_presigned_url_expiry_seconds": 3600,
-        "presigned_url_expiry_seconds": 900
+        "presigned_url_expiry_seconds": 900,
+        "multipart_upload": {
+          "single_put_limit_bytes": 5368709120,
+          "multipart_default_part_size_bytes": 67108864,
+          "multipart_max_parts": 10000,
+          "multipart_initial_presign_parts": 10
+        }
       },
       "auth_configuration": {
         "roles": {
           "products-poc-upload": {
-            "allowed_client_ids": [
-              "products-poc"
-            ]
+            "allowed_client_ids": ["products-poc"]
           }
         },
         "users": {
@@ -39,7 +43,13 @@
       "api_configuration": {
         "cors_allowed_origins": [],
         "max_presigned_url_expiry_seconds": 3600,
-        "presigned_url_expiry_seconds": 900
+        "presigned_url_expiry_seconds": 900,
+        "multipart_upload": {
+          "single_put_limit_bytes": 5368709120,
+          "multipart_default_part_size_bytes": 67108864,
+          "multipart_max_parts": 10000,
+          "multipart_initial_presign_parts": 10
+        }
       },
       "auth_configuration": {
         "roles": {},
@@ -52,7 +62,13 @@
       "api_configuration": {
         "cors_allowed_origins": [],
         "max_presigned_url_expiry_seconds": 3600,
-        "presigned_url_expiry_seconds": 900
+        "presigned_url_expiry_seconds": 900,
+        "multipart_upload": {
+          "single_put_limit_bytes": 5368709120,
+          "multipart_default_part_size_bytes": 67108864,
+          "multipart_max_parts": 10000,
+          "multipart_initial_presign_parts": 10
+        }
       },
       "auth_configuration": {
         "roles": {},
@@ -65,7 +81,13 @@
       "api_configuration": {
         "cors_allowed_origins": [],
         "max_presigned_url_expiry_seconds": 3600,
-        "presigned_url_expiry_seconds": 900
+        "presigned_url_expiry_seconds": 900,
+        "multipart_upload": {
+          "single_put_limit_bytes": 5368709120,
+          "multipart_default_part_size_bytes": 67108864,
+          "multipart_max_parts": 10000,
+          "multipart_initial_presign_parts": 10
+        }
       },
       "auth_configuration": {
         "roles": {},
