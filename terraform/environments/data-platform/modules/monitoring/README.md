@@ -1,6 +1,6 @@
 # Data Platform Monitoring Module
 
-This Terraform module provisions the required IAM resources for the Data Platform's Grafana instanceto read CloudWatch, Prometheus, and X-Ray data from Data Platform AWS accounts.
+This Terraform module provisions the required IAM resources for the Data Platform's Grafana instance to read CloudWatch, Prometheus, and X-Ray data from Data Platform AWS accounts.
 
 ## Usage
 
