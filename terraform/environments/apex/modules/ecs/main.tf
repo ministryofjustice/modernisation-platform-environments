@@ -360,7 +360,8 @@ resource "aws_iam_policy" "ecs_task_execution_policy" { #tfsec:ignore:aws-iam-no
     {
       "Effect": "Allow",
       "Action": [
-        "secretsmanager:GetSecretValue"
+        "secretsmanager:GetSecretValue",
+        "ssm:GetParameters"
       ],
       "Resource": ["${var.database_tad_password_arn}"]
     }
