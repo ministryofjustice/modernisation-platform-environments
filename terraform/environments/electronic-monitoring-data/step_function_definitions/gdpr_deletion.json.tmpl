@@ -1,17 +1,36 @@
-{  
+{
    "StartAt": "ControlLambda",
-   "States": {  
+   "States": {
 
       "ControlLambda": {
          "Type": "Task",
          "Resource": "${control_lambda_arn}",
-         "Next": "TriggerBatchDeletionJobs"
+         "Next": "TriggerBatchDeletionJobs",
+         "Catch": [
+            {
+               "ErrorEquals": [
+                  "States.ALL"
+               ],
+               "ResultPath": "$.unstructured_error",
+               "Next": "BuildUnstructuredControlFailureMessage"
+            }
+         ]
       },
 
       "TriggerBatchDeletionJobs": {
          "Type": "Map",
          "ItemsPath": "$.jobs_to_run",
-         "Next": "RunContainerTask",
+         "ResultPath": "$.batch_results",
+         "Next": "BuildUnstructuredSuccessMessage",
+         "Catch": [
+            {
+               "ErrorEquals": [
+                  "States.ALL"
+               ],
+               "ResultPath": "$.unstructured_error",
+               "Next": "BuildUnstructuredBatchFailureMessage"
+            }
+         ],
          "ItemProcessor": {
             "ProcessorConfig": {
                "Mode": "INLINE"
@@ -56,10 +75,146 @@
          }
       },
 
-      "RunContainerTask": {  
+      "BuildUnstructuredSuccessMessage": {
+         "Type": "Pass",
+         "ResultPath": "$.notification",
+         "Parameters": {
+            "version": "1.0",
+            "source": "custom",
+            "id.$": "States.Format('gdpr-unstructured-deletion-{}', $$.Execution.Name)",
+            "content": {
+               "textType": "client-markdown",
+               "title": ":white_check_mark: GDPR unstructured deletion succeeded in ${environment_name}",
+               "description.$": "States.Format('*Environment*: {}\\n*Jobs run*: {}\\n*Atrium records selected*: {}\\n*Blob records selected*: {}\\n*XDrive records selected*: {}\\n*Audit bucket*: `{}`', $.summary.environment, $.summary.jobs_to_run, $.summary.atrium_records_selected, $.summary.blob_records_selected, $.summary.xdrive_records_selected, $.summary.audit_bucket)",
+               "nextSteps": [],
+               "keywords": [
+                  "GDPR",
+                  "Unstructured Deletion",
+                  "SUCCEEDED"
+               ]
+            },
+            "metadata": {
+               "additionalContext": {
+                  "environment": "${environment_name}"
+               },
+               "enableCustomActions": false
+            }
+         },
+         "Next": "PublishUnstructuredSuccessMessage"
+      },
+
+      "PublishUnstructuredSuccessMessage": {
+         "Type": "Task",
+         "Resource": "arn:aws:states:::sns:publish",
+         "Parameters": {
+            "TopicArn": "${sns_topic_arn}",
+            "Message.$": "States.JsonToString($.notification)"
+         },
+         "ResultPath": null,
+         "Next": "RunContainerTask"
+      },
+
+      "BuildUnstructuredControlFailureMessage": {
+         "Type": "Pass",
+         "ResultPath": "$.notification",
+         "Parameters": {
+            "version": "1.0",
+            "source": "custom",
+            "id.$": "States.Format('gdpr-unstructured-control-failure-{}', $$.Execution.Name)",
+            "content": {
+               "textType": "client-markdown",
+               "title": ":x: GDPR unstructured control failed in ${environment_name}",
+               "description.$": "States.Format('*Environment*: ${environment_name}\\n*Failed state*: ControlLambda\\n*Error*: {}\\n*Cause*: {}', $.unstructured_error.Error, $.unstructured_error.Cause)",
+               "nextSteps": [
+                  "Review the Step Function execution history.",
+                  "Review the unstructured control Lambda logs."
+               ],
+               "keywords": [
+                  "GDPR",
+                  "Unstructured Deletion",
+                  "FAILED"
+               ]
+            },
+            "metadata": {
+               "additionalContext": {
+                  "environment": "${environment_name}"
+               },
+               "enableCustomActions": false
+            }
+         },
+         "Next": "PublishUnstructuredControlFailureMessage"
+      },
+
+      "PublishUnstructuredControlFailureMessage": {
+         "Type": "Task",
+         "Resource": "arn:aws:states:::sns:publish",
+         "Parameters": {
+            "TopicArn": "${sns_topic_arn}",
+            "Message.$": "States.JsonToString($.notification)"
+         },
+         "ResultPath": null,
+         "Next": "FailUnstructuredControl"
+      },
+
+      "FailUnstructuredControl": {
+         "Type": "Fail",
+         "Error": "UnstructuredControlFailed",
+         "Cause": "The unstructured control Lambda failed."
+      },
+
+      "BuildUnstructuredBatchFailureMessage": {
+         "Type": "Pass",
+         "ResultPath": "$.notification",
+         "Parameters": {
+            "version": "1.0",
+            "source": "custom",
+            "id.$": "States.Format('gdpr-unstructured-batch-failure-{}', $$.Execution.Name)",
+            "content": {
+               "textType": "client-markdown",
+               "title": ":x: GDPR unstructured deletion failed in ${environment_name}",
+               "description.$": "States.Format('*Environment*: {}\\n*Failed state*: TriggerBatchDeletionJobs\\n*Jobs prepared*: {}\\n*Error*: {}\\n*Cause*: {}', $.summary.environment, $.summary.jobs_to_run, $.unstructured_error.Error, $.unstructured_error.Cause)",
+               "nextSteps": [
+                  "Review the Step Function execution history.",
+                  "Review the Batch job logs.",
+                  "Check the manifest and audit parquet outputs."
+               ],
+               "keywords": [
+                  "GDPR",
+                  "Unstructured Deletion",
+                  "FAILED"
+               ]
+            },
+            "metadata": {
+               "additionalContext": {
+                  "environment": "${environment_name}"
+               },
+               "enableCustomActions": false
+            }
+         },
+         "Next": "PublishUnstructuredBatchFailureMessage"
+      },
+
+      "PublishUnstructuredBatchFailureMessage": {
+         "Type": "Task",
+         "Resource": "arn:aws:states:::sns:publish",
+         "Parameters": {
+            "TopicArn": "${sns_topic_arn}",
+            "Message.$": "States.JsonToString($.notification)"
+         },
+         "ResultPath": null,
+         "Next": "FailUnstructuredBatch"
+      },
+
+      "FailUnstructuredBatch": {
+         "Type": "Fail",
+         "Error": "UnstructuredBatchFailed",
+         "Cause": "The unstructured Batch Map state failed."
+      },
+
+      "RunContainerTask": {
          "Type": "Task",
          "Resource": "arn:aws:states:::ecs:runTask.sync",
-         "Parameters": {  
+         "Parameters": {
             "LaunchType": "FARGATE",
             "Cluster": "${cluster_arn}",
             "TaskDefinition": "${task_definition_family}",
@@ -70,8 +225,8 @@
                   "AssignPublicIp": "DISABLED"
                }
             },
-            "Overrides": {  
-               "ContainerOverrides": [  
+            "Overrides": {
+               "ContainerOverrides": [
                   {
                      "Name": "${container_name}",
                      "Environment": [
