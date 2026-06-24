@@ -1083,4 +1083,10 @@ module "write_to_sharepoint" {
   timeout                 = 900
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    SECRET_AZURE_TENANT_ID     = jsondecode(data.aws_secretsmanager_secret_version.entra_app_details.secret_string)["tenant_id"]
+    SECRET_AZURE_CLIENT_ID     = jsondecode(data.aws_secretsmanager_secret_version.entra_app_details.secret_string)["client_id"]
+    SECRET_AZURE_CLIENT_SECRET = jsondecode(data.aws_secretsmanager_secret_version.entra_app_details.secret_string)["client_secret"]
+  }
 }
