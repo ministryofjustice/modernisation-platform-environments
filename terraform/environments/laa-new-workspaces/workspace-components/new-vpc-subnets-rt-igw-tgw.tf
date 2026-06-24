@@ -99,6 +99,106 @@ resource "aws_subnet" "public_b" {
 }
 
 ##############################################
+### Protected Subnets
+##############################################
+
+resource "aws_subnet" "protected_a" {
+
+  vpc_id            = aws_vpc.workspaces.id
+  cidr_block        = local.application_data.accounts[local.environment].protected_subnet_a_cidr
+  availability_zone = "eu-west-2a"
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-protected-eu-west-2a" }
+  )
+}
+
+resource "aws_subnet" "protected_b" {
+
+  vpc_id            = aws_vpc.workspaces.id
+  cidr_block        = local.application_data.accounts[local.environment].protected_subnet_b_cidr
+  availability_zone = "eu-west-2b"
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-protected-eu-west-2b" }
+  )
+}
+
+resource "aws_route_table" "protected" {
+
+  vpc_id = aws_vpc.workspaces.id
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-protected-rt" }
+  )
+}
+
+resource "aws_route_table_association" "protected_a" {
+
+  subnet_id      = aws_subnet.protected_a.id
+  route_table_id = aws_route_table.protected.id
+}
+
+resource "aws_route_table_association" "protected_b" {
+
+  subnet_id      = aws_subnet.protected_b.id
+  route_table_id = aws_route_table.protected.id
+}
+
+##############################################
+### Firewall Subnets
+##############################################
+
+resource "aws_subnet" "firewall_a" {
+
+  vpc_id            = aws_vpc.workspaces.id
+  cidr_block        = local.application_data.accounts[local.environment].firewall_subnet_a_cidr
+  availability_zone = "eu-west-2a"
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-firewall-eu-west-2a" }
+  )
+}
+
+resource "aws_subnet" "firewall_b" {
+
+  vpc_id            = aws_vpc.workspaces.id
+  cidr_block        = local.application_data.accounts[local.environment].firewall_subnet_b_cidr
+  availability_zone = "eu-west-2b"
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-firewall-eu-west-2b" }
+  )
+}
+
+resource "aws_route_table" "firewall" {
+
+  vpc_id = aws_vpc.workspaces.id
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-firewall-rt" }
+  )
+}
+
+resource "aws_route_table_association" "firewall_a" {
+
+  subnet_id      = aws_subnet.firewall_a.id
+  route_table_id = aws_route_table.firewall.id
+}
+
+resource "aws_route_table_association" "firewall_b" {
+
+  subnet_id      = aws_subnet.firewall_b.id
+  route_table_id = aws_route_table.firewall.id
+}
+
+##############################################
 ### Internet Gateway
 ##############################################
 
