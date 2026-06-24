@@ -130,7 +130,10 @@ data "aws_iam_policy_document" "gdpr_delete_policy_document" {
   statement {
     effect    = "Allow"
     actions   = ["lambda:InvokeFunction"]
-    resources = [module.gdpr_unstructured_control_lambda[0].lambda_function_arn]
+    resources = [
+      module.gdpr_unstructured_control_lambda[0].lambda_function_arn,
+      module.gdpr_evaluate_batch_results[0].lambda_function_arn
+    ]
   }
 
   statement {

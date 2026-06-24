@@ -11,7 +11,7 @@
       "TriggerBatchDeletionJobs": {
          "Type": "Map",
          "ItemsPath": "$.jobs_to_run",
-         "Next": "RunContainerTask",
+         "Next": "EvaluateBatchResults",
          "ItemProcessor": {
             "ProcessorConfig": {
                "Mode": "INLINE"
@@ -21,6 +21,8 @@
                "SubmitBatchJob": {
                   "Type": "Task",
                   "Resource": "arn:aws:states:::batch:submitJob.sync",
+                  "ResultPath": "$.batch_result",
+                  "Next": "MarkAsSuccess",
                   "Parameters": {
                      "JobName.$": "$.job_name",
                      "JobQueue": "${batch_job_queue_arn}",
@@ -50,10 +52,36 @@
                         "BackoffRate": 2.0
                      }
                   ],
+                  "Catch": [
+                     {
+                        "ErrorEquals": ["States.ALL"],
+                        "ResultPath": "$.error_details",
+                        "Next": "MarkAsFailed"
+                     }
+                  ]
+               },
+
+               "MarkAsSuccess": {
+                  "Type": "Pass",
+                  "Result": "SUCCESS",
+                  "ResultPath": "$.job_status",
+                  "End": true
+               },
+
+               "MarkAsFailed": {
+                  "Type": "Pass",
+                  "Result": "FAILED",
+                  "ResultPath": "$.job_status",
                   "End": true
                }
             }
          }
+      },
+
+      "EvaluateBatchResults": {
+         "Type": "Task",
+         "Resource": "${evaluator_lambda_arn}",
+         "Next": "RunContainerTask"
       },
 
       "RunContainerTask": {  
