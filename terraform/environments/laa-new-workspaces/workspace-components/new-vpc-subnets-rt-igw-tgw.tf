@@ -259,3 +259,4 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "moj_tgw" {
     { "Name" = "${local.application_name}-${local.environment}-tgw-attachment" }
   )
 }
+
