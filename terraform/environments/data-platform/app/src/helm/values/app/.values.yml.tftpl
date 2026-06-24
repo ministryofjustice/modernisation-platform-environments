@@ -46,3 +46,11 @@ app:
         secretKeyRef:
           name: app-rds
           key: dbname
+
+tolerations:
+  - key: compute.data-platform.service.justice.gov.uk/node-pool
+    value: "general-on-demand-arm64"
+    effect: NoSchedule
+
+nodeSelector:
+  compute.data-platform.service.justice.gov.uk/node-pool: "general-on-demand-arm64"
