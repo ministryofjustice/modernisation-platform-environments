@@ -1,10 +1,10 @@
 environment:
   development:
     kubernetes_version: "1.36"
-    bottlerocket_version: "1.62.0-49f1c7d2"
+    bottlerocket_version: "1.62.1-ea1afdd6"
     addon_versions:
       aws_ebs_csi_driver: "v1.62.0-eksbuild.1"
-      aws_efs_csi_driver: "v3.2.0-eksbuild.1"
+      aws_efs_csi_driver: "v3.3.0-eksbuild.1"
       aws_guardduty_agent: "v1.15.0-eksbuild.2"
       aws_network_flow_monitoring_agent: "v1.1.4-eksbuild.1"
       eks_node_monitoring_agent: "v1.6.6-eksbuild.1"
@@ -35,10 +35,10 @@ environment:
     shared_services_gateway_hostname: "*.development.data-platform.service.justice.gov.uk"
   test:
     kubernetes_version: "1.36"
-    bottlerocket_version: "1.62.0-49f1c7d2"
+    bottlerocket_version: "1.62.1-ea1afdd6"
     addon_versions:
       aws_ebs_csi_driver: "v1.62.0-eksbuild.1"
-      aws_efs_csi_driver: "v3.2.0-eksbuild.1"
+      aws_efs_csi_driver: "v3.3.0-eksbuild.1"
       aws_guardduty_agent: "v1.15.0-eksbuild.2"
       aws_network_flow_monitoring_agent: "v1.1.4-eksbuild.1"
       eks_node_monitoring_agent: "v1.6.6-eksbuild.1"
@@ -69,10 +69,10 @@ environment:
     shared_services_gateway_hostname: "*.test.data-platform.service.justice.gov.uk"
   preproduction:
     kubernetes_version: "1.36"
-    bottlerocket_version: "1.62.0-49f1c7d2"
+    bottlerocket_version: "1.62.1-ea1afdd6"
     addon_versions:
       aws_ebs_csi_driver: "v1.62.0-eksbuild.1"
-      aws_efs_csi_driver: "v3.2.0-eksbuild.1"
+      aws_efs_csi_driver: "v3.3.0-eksbuild.1"
       aws_guardduty_agent: "v1.15.0-eksbuild.2"
       aws_network_flow_monitoring_agent: "v1.1.4-eksbuild.1"
       eks_node_monitoring_agent: "v1.6.6-eksbuild.1"
@@ -103,10 +103,10 @@ environment:
     shared_services_gateway_hostname: "*.preproduction.data-platform.service.justice.gov.uk"
   production:
     kubernetes_version: "1.36"
-    bottlerocket_version: "1.62.0-49f1c7d2"
+    bottlerocket_version: "1.62.1-ea1afdd6"
     addon_versions:
       aws_ebs_csi_driver: "v1.62.0-eksbuild.1"
-      aws_efs_csi_driver: "v3.2.0-eksbuild.1"
+      aws_efs_csi_driver: "v3.3.0-eksbuild.1"
       aws_guardduty_agent: "v1.15.0-eksbuild.2"
       aws_network_flow_monitoring_agent: "v1.1.4-eksbuild.1"
       eks_node_monitoring_agent: "v1.6.6-eksbuild.1"

@@ -97,6 +97,14 @@
         "max_presigned_url_expiry_seconds": 3600,
         "presigned_url_expiry_seconds": 1800
       },
+      "custom_idp_configuration": {
+        "ingress_cidr_blocks": [
+          "0.0.0.0/0"
+        ],
+        "log_level": "INFO",
+        "secret_prefix": "transfer/",
+        "user_name_delimiter": "@@"
+      },
       "vpc_configuration": {
         "isolated_vpc_cidr": "10.0.0.0/23",
         "isolated_vpc_private_subnet_cidrs": [
