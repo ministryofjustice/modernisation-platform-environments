@@ -6,6 +6,7 @@ locals {
   ecs_prefix        = "${local.name}-ecs"
   sdg_prefix        = "${local.ecs_prefix}-sdg"
   alerts_prefix     = "${local.ecs_prefix}-alerts"
+  kafka_ui_prefix   = "${local.ecs_prefix}-kafka-ui"
   deploy_to         = ["development"]
   capacity_provider = contains(["development"], local.environment) ? "FARGATE_SPOT" : null
   msk_bootstrap_brokers = contains(local.deploy_to, local.environment) ? (

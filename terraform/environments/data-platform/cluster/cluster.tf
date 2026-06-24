@@ -166,9 +166,16 @@ module "eks_managed_node_group_system" {
   desired_size   = 3
   instance_types = ["m8g.large"]
 
+  # Rolling update: replace at most one node at a time to preserve capacity
+  update_config = {
+    max_unavailable = 1
+    update_strategy = "DEFAULT"
+  }
+
   # Bottlerocket configuration
   ami_type                       = "BOTTLEROCKET_ARM_64"
   use_latest_ami_release_version = false
+  kubernetes_version             = local.cluster_configuration.kubernetes_version
   ami_release_version            = local.cluster_configuration.bottlerocket_version
 
   enable_monitoring = true
