@@ -26,6 +26,10 @@
       {
         "name": "LOGGING_LEVEL_ROOT",
         "value": "${logging_level_root}"
+      },
+      {
+        "name": "LOGGING_LEVEL_UK_GOV_LAA_CCMS",
+        "value": "${logging_level_uk_gov_laa_ccms}"
       }
     ],
     "secrets": [

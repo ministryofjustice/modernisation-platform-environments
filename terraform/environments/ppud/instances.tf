@@ -11,12 +11,12 @@
 resource "aws_instance" "PPUDWEBSERVER2" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
-  count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-0852d4d5313264225"
-  instance_type          = "m5.large"
-  source_dest_check      = true
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-# vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+  count                = local.is-development == true ? 1 : 0
+  ami                  = "ami-0852d4d5313264225"
+  instance_type        = "m5.large"
+  source_dest_check    = true
+  iam_instance_profile = aws_iam_instance_profile.ec2_profile.id
+  # vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   vpc_security_group_ids = [aws_security_group.all["PPUD-Web-Portal-Server-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
 
@@ -65,12 +65,12 @@ resource "aws_instance" "s609693lo6vw100" {
 resource "aws_instance" "s609693lo6vw101" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
-  count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-07315ed3a1b524be8"
-  instance_type          = "m5.large"
-  source_dest_check      = true
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-# vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+  count                = local.is-development == true ? 1 : 0
+  ami                  = "ami-07315ed3a1b524be8"
+  instance_type        = "m5.large"
+  source_dest_check    = true
+  iam_instance_profile = aws_iam_instance_profile.ec2_profile.id
+  # vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   vpc_security_group_ids = [aws_security_group.all["PPUD-Web-Portal-Server-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
 
@@ -175,8 +175,8 @@ resource "aws_instance" "s609693lo6vw105" {
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.all["WAM-Web-Portal-Server-Security-Group"].id]
-# vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  # vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+  subnet_id = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -486,12 +486,12 @@ resource "aws_instance" "s609693lo6vw116" {
 resource "aws_instance" "s618358rgvw023" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
-  count                  = local.is-preproduction == true ? 1 : 0
-  ami                    = "ami-0f073b401ba3f1cff"
-  instance_type          = "c5.large"
-  source_dest_check      = true
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-# vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+  count                = local.is-preproduction == true ? 1 : 0
+  ami                  = "ami-0f073b401ba3f1cff"
+  instance_type        = "c5.large"
+  source_dest_check    = true
+  iam_instance_profile = aws_iam_instance_profile.ec2_profile.id
+  # vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   vpc_security_group_ids = [aws_security_group.all["PPUD-Web-Portal-Server-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
 
@@ -628,12 +628,12 @@ resource "aws_instance" "s618358rgvw028" {
 resource "aws_instance" "s618358rgvw201" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
-  count                  = local.is-preproduction == true ? 1 : 0
-  ami                    = "ami-0d1cb68fb6c1f131b"
-  instance_type          = "c5.large"
-  source_dest_check      = true
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-# vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+  count                = local.is-preproduction == true ? 1 : 0
+  ami                  = "ami-0d1cb68fb6c1f131b"
+  instance_type        = "c5.large"
+  source_dest_check    = true
+  iam_instance_profile = aws_iam_instance_profile.ec2_profile.id
+  # vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   vpc_security_group_ids = [aws_security_group.all["WAM-Web-Portal-Server-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
 

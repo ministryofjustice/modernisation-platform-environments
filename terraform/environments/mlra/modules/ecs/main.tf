@@ -22,13 +22,13 @@ data "aws_subnets" "shared-private" {
   }
 }
 
-# remove after migration
+# TODO LASB-5089 Remove
 resource "aws_autoscaling_group" "cluster-scaling-group" {
   vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
   name                  = "${var.app_name}-cluster-scaling-group"
-  desired_capacity      = var.ec2_desired_capacity
+  desired_capacity      = 0
   max_size              = var.ec2_max_size
-  min_size              = var.ec2_min_size
+  min_size              = 0
   protect_from_scale_in = true
   metrics_granularity   = "1Minute"
   enabled_metrics = [
@@ -85,11 +85,9 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
 resource "aws_autoscaling_group" "cluster-scaling-group-al2023" {
   vpc_zone_identifier   = sort(data.aws_subnets.shared-private.ids)
   name_prefix           = "${var.app_name}-ec2-al2023-"
-  # New ASG, set capacity to 0 - will be scaled manually during migration.
-  # Follow-up Terraform PR will update to desired final capacity.
-  desired_capacity      = 0
+  desired_capacity      = var.ec2_desired_capacity
   max_size              = var.ec2_max_size
-  min_size              = 0
+  min_size              = var.ec2_min_size
   protect_from_scale_in = true
   metrics_granularity   = "1Minute"
   enabled_metrics = [
@@ -202,7 +200,7 @@ resource "aws_security_group_rule" "mlra_to_maatdb_sg_rule_outbound" {
   source_security_group_id = var.maatdb_rds_sec_group_id
 }
 
-# remove after migration
+# TODO LASB-5089 Remove
 data "aws_ssm_parameter" "ecs_optimized_ami_al2" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
 }
@@ -212,14 +210,14 @@ data "aws_ssm_parameter" "ecs_optimized_ami_al2023" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended"
 }
 
-# update to reference AL2023 ID after migration
+# TODO LASB-5089 update to reference AL2023 ID after migration
 # if the AMI is used elsewhere it can be obtained here
 output "ami_id" {
   value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2.value)["image_id"]
   sensitive = true
 }
 
-# move to ami_id after migration
+# TODO LASB-5089 rename to ami_id after migration
 output "ami_id_al2023" {
   value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2023.value)["image_id"]
   sensitive = true
@@ -229,7 +227,7 @@ output "ami_id_al2023" {
 # Note - when updating this you will need to manually terminate the EC2s
 # so that the autoscaling group creates new ones using the new launch template
 
-# remove after migration
+# TODO LASB-5089 Remove
 #tfsec:ignore:AVD-AWS-0130:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
 resource "aws_launch_template" "ec2-launch-template" {
   #checkov:skip=CKV_AWS_79:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
@@ -536,13 +534,12 @@ resource "aws_ecs_service" "ecs_service" {
 
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.mlra.name
-    weight            = 1
+    weight            = 0
   }
 
-  # increase weight gradually during migration
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.mlra-al2023.name
-    weight            = 0
+    weight            = 1
   }
 
   health_check_grace_period_seconds = 300
@@ -795,7 +792,7 @@ resource "aws_appautoscaling_policy" "ecs_target_memory" {
   }
 }
 
-# remove after migration
+# TODO LASB-5089 Remove
 resource "aws_ecs_capacity_provider" "mlra" {
   name = "${var.app_name}-${var.environment}-capacity-provider"
 

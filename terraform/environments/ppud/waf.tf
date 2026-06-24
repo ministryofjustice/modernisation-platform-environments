@@ -50,10 +50,10 @@ module "waf" {
     AWSManagedRulesBotControlRuleSet     = 15
   }
 
-# AWSManagedRulesBotControlRuleSet configuration
+  # AWSManagedRulesBotControlRuleSet configuration
 
-  bot_control_inspection_level = "COMMON"          # default; or "TARGETED"
-# bot_control_scope_down_cidrs = ["34.0.0.0/8"]    # optional; inspect only GCP traffic
+  bot_control_inspection_level = "COMMON" # default; or "TARGETED"
+  # bot_control_scope_down_cidrs = ["34.0.0.0/8"]    # optional; inspect only GCP traffic
 
 
 

@@ -28,11 +28,13 @@ module "cluster_vpc" {
   create_multiple_public_route_tables = true
 
   public_subnet_tags = {
-    SubnetType = "Public"
+    SubnetType               = "Public"
+    "kubernetes.io/role/elb" = "1"
   }
 
   private_subnet_tags = {
-    SubnetType = "Private"
+    SubnetType                        = "Private"
+    "kubernetes.io/role/internal-elb" = "1"
   }
 
   tags = merge({
@@ -49,11 +51,10 @@ resource "aws_subnet" "tgw_private" {
   map_public_ip_on_launch = false
 
   tags = merge({
-    Name                              = "${local.cp_vpc_name}-tgw-private-${data.aws_availability_zones.available.names[count.index]}"
-    SubnetType                        = "TGW-Private"
-    "kubernetes.io/role/internal-elb" = "1"
-    Terraform                         = "true"
-    Cluster                           = local.cp_vpc_name
+    Name       = "${local.cp_vpc_name}-tgw-private-${data.aws_availability_zones.available.names[count.index]}"
+    SubnetType = "TGW-Private"
+    Terraform  = "true"
+    Cluster    = local.cp_vpc_name
   }, local.tags)
 }
 
@@ -67,4 +68,20 @@ resource "aws_route_table_association" "tgw_private" {
 resource "aws_vpc_ipv4_cidr_block_association" "secondary" {
   vpc_id     = module.cluster_vpc.vpc_id
   cidr_block = local.vpc_cidr[local.cp_vpc_name].secondary
+}
+
+resource "aws_subnet" "pod_private" {
+  count = 3
+
+  vpc_id                  = module.cluster_vpc.vpc_id
+  cidr_block              = contains(keys(local.vpc_cidr), local.cp_vpc_name) ? cidrsubnet(local.vpc_cidr[local.cp_vpc_name].secondary, 2, count.index) : null
+  availability_zone       = data.aws_availability_zones.available.names[count.index]
+  map_public_ip_on_launch = false
+
+  tags = merge({
+    Name       = "${local.cp_vpc_name}-pod-private-${data.aws_availability_zones.available.names[count.index]}"
+    SubnetType = "pod-private"
+    Terraform  = "true"
+    Cluster    = local.cp_vpc_name
+  }, local.tags)
 }
