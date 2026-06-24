@@ -21,6 +21,9 @@ resource "helm_release" "grafana" {
       monitored_accounts = [
         for account in local.environment_configuration.grafana_monitored_accounts : merge(account, {
           account_id = local.environment_management.account_ids[account.name]
+          # Grafana datasource UIDs are capped at 40 characters, so derive a
+          # shorter UID by dropping the shared data-platform- name prefix.
+          uid = trimprefix(account.name, "data-platform-")
         })
       ]
     }),

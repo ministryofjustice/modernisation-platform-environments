@@ -1,5 +1,6 @@
 # Grafana Helm chart values
-# Chart: https://github.com/grafana/helm-charts/tree/main/charts/grafana
+# Chart: https://github.com/grafana-community/helm-charts/tree/main/charts/grafana
+# (the grafana-community fork, pulled via oci://ghcr.io/grafana-community/helm-charts in helm-release.tf)
 #
 # Single sign-on is provided by Microsoft Entra ID (Azure AD). The OAuth client
 # ID and secret are injected as environment variables via the `set_sensitive`
@@ -43,17 +44,51 @@ ingress:
         - ${hostname}
 
 persistence:
+  # Grafana's state (dashboards, users, preferences) lives in the external Cloud
+  # Platform RDS Postgres database configured below, so the pod is stateless and
+  # needs no persistent volume.
   enabled: false
 
+# Host, database name, user and password for the external Cloud Platform RDS
+# Postgres backend are injected from the grafana-rds Kubernetes secret (created
+# from the RDS instance), so the password is never written into this file. The
+# non-sensitive settings (type, ssl_mode) live under grafana.ini.database below.
+envValueFrom:
+  GF_DATABASE_HOST:
+    secretKeyRef:
+      name: grafana-rds
+      key: rds_instance_endpoint
+  GF_DATABASE_NAME:
+    secretKeyRef:
+      name: grafana-rds
+      key: database_name
+  GF_DATABASE_USER:
+    secretKeyRef:
+      name: grafana-rds
+      key: database_username
+  GF_DATABASE_PASSWORD:
+    secretKeyRef:
+      name: grafana-rds
+      key: database_password
+
 grafana.ini:
+  # Use the external RDS Postgres instance as Grafana's backend database instead
+  # of the default ephemeral SQLite. Cloud Platform RDS mandates TLS, hence
+  # ssl_mode=require; the connection details come from envValueFrom above.
+  database:
+    type: postgres
+    ssl_mode: require
   server:
     root_url: https://${hostname}
   auth:
-    # Keep the local login form available as a break-glass fallback while the
-    # Entra ID credentials are being configured. Disable it once SSO is proven.
-    disable_login_form: false
+    # Pure SSO: the local login form is disabled, so all sign-in is via Entra ID.
+    disable_login_form: true
   auth.basic:
-    enabled: true
+    enabled: false
+  security:
+    # Pure SSO: do not create the default local admin user. Admin rights are
+    # granted through the GrafanaAdmin/Admin Entra ID App Role (see auth.azuread).
+    disable_initial_admin_creation: true
   auth.azuread:
     name: Microsoft Entra ID
     enabled: true
@@ -61,6 +96,14 @@ grafana.ini:
     auth_url: https://login.microsoftonline.com/${entra_id_tenant_id}/oauth2/v2.0/authorize
     token_url: https://login.microsoftonline.com/${entra_id_tenant_id}/oauth2/v2.0/token
     scopes: openid email profile
+    # Grafana maps Entra ID App Roles (the token's "roles" claim) to its own
+    # roles, so admins are granted in Entra rather than configured here. Define
+    # App Roles with the values Viewer, Editor, Admin and GrafanaAdmin on the app
+    # registration and assign users/groups to them. role_attribute_strict=false
+    # lets users with no mapped role sign in as Viewer; allow_assign_grafana_admin
+    # lets the GrafanaAdmin app role grant the server (super) admin role.
+    role_attribute_strict: false
+    allow_assign_grafana_admin: true
 
 # Grafana plugins for the AWS data sources below. CloudWatch is built in; X-Ray
 # and Amazon Managed Prometheus are provided by these plugins.
@@ -74,6 +117,8 @@ plugins:
 # CloudWatch and an X-Ray data source; accounts with an Amazon Managed
 # Prometheus workspace (prometheus_workspace_id set) also get a Prometheus data
 # source. Driven from grafana_monitored_accounts in environment-configuration.tf.
+# Each data source UID uses account.uid (the account name with the shared
+# data-platform- prefix removed) to stay within Grafana's 40-character limit.
 datasources:
   datasources.yaml:
     apiVersion: 1
@@ -82,17 +127,17 @@ datasources:
       - name: ${account.name}-cloudwatch
         type: cloudwatch
         access: proxy
-        uid: ${account.name}-cloudwatch
+        uid: ${account.uid}-cloudwatch
         isDefault: false
         jsonData:
           defaultRegion: eu-west-2
           assumeRoleArn: arn:aws:iam::${account.account_id}:role/data-platform-monitoring
           # Surface the matching X-Ray traces from CloudWatch logs and metrics.
-          tracingDatasourceUid: ${account.name}-xray
+          tracingDatasourceUid: ${account.uid}-xray
       - name: ${account.name}-xray
         type: grafana-x-ray-datasource
         access: proxy
-        uid: ${account.name}-xray
+        uid: ${account.uid}-xray
         isDefault: false
         jsonData:
           defaultRegion: eu-west-2
@@ -101,7 +146,7 @@ datasources:
       - name: ${account.name}-prometheus
         type: grafana-amazonprometheus-datasource
         access: proxy
-        uid: ${account.name}-prometheus
+        uid: ${account.uid}-prometheus
         isDefault: false
         url: https://aps-workspaces.eu-west-2.amazonaws.com/workspaces/${account.prometheus_workspace_id}/
         jsonData:
