@@ -5,12 +5,9 @@ locals {
   # You'll need to update these with the actual role ARNs from your Cloud Platform namespaces
   trusted_role_arns = [
     # Development namespace IRSA role
-    # Format: arn:aws:iam::754256621582:role/cloud-platform-irsa-<hash>-live
-    # You can get this from: kubectl get serviceaccount -n data-platform-monitoring-development -o yaml
-    # "arn:aws:iam::754256621582:role/cloud-platform-irsa-XXXXXXXX-live", 
-    
-    # Production namespace IRSA role (when created)
-    # "arn:aws:iam::754256621582:role/cloud-platform-irsa-YYYYYYYY-live"
+    "arn:aws:iam::754256621582:role/cloud-platform-irsa-4348d681e9c70290-live",
+    # Production namespace IRSA role
+    "arn:aws:iam::754256621582:role/cloud-platform-irsa-405b2679c48ef147-live"
   ]
 }
 
