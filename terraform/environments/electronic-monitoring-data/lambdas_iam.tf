@@ -2764,7 +2764,7 @@ data "aws_iam_policy_document" "write_to_sharepoint_iam_role_policy_document" {
   }
 }
 
-resource "aws_iam_role" "write_to_sharepoint_iam_role" {
+resource "aws_iam_role" "write_to_sharepoint" {
   count              = local.is-test ? 0 : 1
   name               = "write-to-sharepoint-iam-role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
