@@ -13,3 +13,13 @@ data "aws_secretsmanager_secret_version" "cloud_platform_live_namespace" {
 
   secret_id = module.cloud_platform_live_namespace_secret[0].secret_id
 }
+
+# Microsoft Entra ID (Azure AD) OAuth credentials used by Grafana for single
+# sign-on. The secret is created with placeholder values in secrets.tf and
+# populated out-of-band, so it is read back here to inject the values into the
+# Helm release.
+data "aws_secretsmanager_secret_version" "grafana_entra_id" {
+  count = local.environment_configuration.monitoring_stack_enabled ? 1 : 0
+
+  secret_id = module.grafana_entra_id_secret[0].secret_id
+}

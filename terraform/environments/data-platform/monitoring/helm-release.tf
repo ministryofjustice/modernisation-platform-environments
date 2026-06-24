@@ -10,7 +10,34 @@ resource "helm_release" "grafana" {
 
   values = [
     templatefile("${path.module}/src/helm/values/grafana/values.yml.tftpl", {
-      hostname = local.environment_configuration.monitoring_hostname
+      hostname           = local.environment_configuration.monitoring_hostname
+      entra_id_tenant_id = local.grafana_entra_id.tenant_id
+      monitored_accounts = local.environment_configuration.grafana_monitored_accounts
+    }),
+    # Roll the Grafana pods whenever the rendered configuration or the Entra ID
+    # credentials change.
+    yamlencode({
+      podAnnotations = {
+        "checksum/config" = sha256(jsonencode({
+          secret_version = data.aws_secretsmanager_secret_version.grafana_entra_id[0].version_id
+          hostname       = local.environment_configuration.monitoring_hostname
+          tenant_id      = local.grafana_entra_id.tenant_id
+        }))
+      }
     })
+  ]
+
+  # OAuth client credentials are injected as environment variables so they are
+  # never written into the rendered values file or the stored Helm release
+  # manifest in plaintext.
+  set_sensitive = [
+    {
+      name  = "env.GF_AUTH_AZUREAD_CLIENT_ID"
+      value = local.grafana_entra_id.client_id
+    },
+    {
+      name  = "env.GF_AUTH_AZUREAD_CLIENT_SECRET"
+      value = local.grafana_entra_id.client_secret
+    }
   ]
 }

@@ -1,9 +1,26 @@
 # Grafana Helm chart values
 # Chart: https://github.com/grafana/helm-charts/tree/main/charts/grafana
 #
-# Skeleton values file - extend as the monitoring stack is built out.
+# Single sign-on is provided by Microsoft Entra ID (Azure AD). The OAuth client
+# ID and secret are injected as environment variables via the `set_sensitive`
+# block in helm-release.tf, so they are deliberately absent from this file.
 
 replicas: 1
+
+# Cloud Platform is a shared, multi-tenant cluster and only grants
+# namespace-scoped permissions. The chart defaults to creating a cluster-scoped
+# ClusterRole/ClusterRoleBinding, which the namespace service account is not
+# permitted to create, so RBAC creation is disabled. Grafana itself does not
+# need in-cluster API access in this configuration.
+rbac:
+  create: false
+
+# The grafana-irsa service account is pre-provisioned in the Cloud Platform
+# namespace (annotated with the IAM role for IRSA), so the chart references it by
+# name rather than creating its own.
+serviceAccount:
+  create: false
+  name: grafana-irsa
 
 ingress:
   enabled: true
@@ -12,3 +29,71 @@ ingress:
 
 persistence:
   enabled: false
+
+grafana.ini:
+  server:
+    root_url: https://${hostname}
+  auth:
+    # Keep the local login form available as a break-glass fallback while the
+    # Entra ID credentials are being configured. Disable it once SSO is proven.
+    disable_login_form: false
+  auth.basic:
+    enabled: true
+  auth.azuread:
+    name: Microsoft Entra ID
+    enabled: true
+    allow_sign_up: true
+    auth_url: https://login.microsoftonline.com/${entra_id_tenant_id}/oauth2/v2.0/authorize
+    token_url: https://login.microsoftonline.com/${entra_id_tenant_id}/oauth2/v2.0/token
+    scopes: openid email profile
+
+# Grafana plugins for the AWS data sources below. CloudWatch is built in; X-Ray
+# and Amazon Managed Prometheus are provided by these plugins.
+plugins:
+  - grafana-x-ray-datasource
+  - grafana-amazonprometheus-datasource
+
+# AWS data sources. Grafana runs as the grafana-irsa service account, whose IAM
+# role assumes the data-platform-monitoring role in each monitored account
+# (defined in ../modules/monitoring) to read its data. Every account gets a
+# CloudWatch and an X-Ray data source; accounts with an Amazon Managed
+# Prometheus workspace (prometheus_workspace_id set) also get a Prometheus data
+# source. Driven from grafana_monitored_accounts in environment-configuration.tf.
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+%{ for account in monitored_accounts ~}
+      - name: ${account.name}-cloudwatch
+        type: cloudwatch
+        access: proxy
+        uid: ${account.name}-cloudwatch
+        isDefault: false
+        jsonData:
+          defaultRegion: eu-west-2
+          assumeRoleArn: arn:aws:iam::${account.account_id}:role/data-platform-monitoring
+          # Surface the matching X-Ray traces from CloudWatch logs and metrics.
+          tracingDatasourceUid: ${account.name}-xray
+      - name: ${account.name}-xray
+        type: grafana-x-ray-datasource
+        access: proxy
+        uid: ${account.name}-xray
+        isDefault: false
+        jsonData:
+          defaultRegion: eu-west-2
+          assumeRoleArn: arn:aws:iam::${account.account_id}:role/data-platform-monitoring
+%{ if account.prometheus_workspace_id != "" ~}
+      - name: ${account.name}-prometheus
+        type: grafana-amazonprometheus-datasource
+        access: proxy
+        uid: ${account.name}-prometheus
+        isDefault: false
+        url: https://aps-workspaces.eu-west-2.amazonaws.com/workspaces/${account.prometheus_workspace_id}/
+        jsonData:
+          httpMethod: POST
+          sigV4Auth: true
+          sigV4AuthType: default
+          sigV4Region: eu-west-2
+          sigV4AssumeRoleArn: arn:aws:iam::${account.account_id}:role/data-platform-monitoring
+%{ endif ~}
+%{ endfor ~}
