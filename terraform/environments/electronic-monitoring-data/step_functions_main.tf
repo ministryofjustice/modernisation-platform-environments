@@ -67,6 +67,7 @@ module "ears_sars_step_function" {
   variable_dictionary = tomap(
     {
       "ears_sars_request" = module.ears_sars_request[0].lambda_function_name,
+      "write_to_sharepoint" =  module.write_to_sharepoint[0].lambda_function_name,
     }
   )
   type = "STANDARD"
