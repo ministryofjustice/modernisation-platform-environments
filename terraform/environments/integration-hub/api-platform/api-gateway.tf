@@ -89,12 +89,6 @@ resource "aws_apigatewayv2_route" "api_docs" {
   target    = "integrations/${aws_apigatewayv2_integration.api_docs.id}"
 }
 
-resource "aws_apigatewayv2_route" "api_docs_slash" {
-  api_id    = aws_apigatewayv2_api.upload_ticket.id
-  route_key = "GET /docs/"
-  target    = "integrations/${aws_apigatewayv2_integration.api_docs.id}"
-}
-
 resource "aws_apigatewayv2_route" "api_openapi_contract" {
   api_id    = aws_apigatewayv2_api.upload_ticket.id
   route_key = "GET /openapi.yaml"
