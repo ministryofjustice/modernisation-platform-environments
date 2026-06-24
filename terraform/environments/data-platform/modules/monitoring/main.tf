@@ -9,9 +9,6 @@ locals {
 }
 
 module "iam_role" {
-  #checkov:skip=CKV_TF_1:Module is from Terraform registry
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=277e8947b1267290988e47882d8dc116850929be" # v6.4.0
   name            = local.role_name
   use_name_prefix = false
