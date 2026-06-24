@@ -30,12 +30,5 @@ resource "null_resource" "run_role_mappings" {
 
       sleep 10
 EOT
-
-    environment = {
-      AWS_ACCESS_KEY_ID     = var.AWS_ACCESS_KEY_ID
-      AWS_SECRET_ACCESS_KEY = var.AWS_SECRET_ACCESS_KEY
-      AWS_SESSION_TOKEN     = var.AWS_SESSION_TOKEN
-      AWS_DEFAULT_REGION    = var.AWS_DEFAULT_REGION
-    }
   }
 }
