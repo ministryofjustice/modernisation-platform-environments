@@ -161,6 +161,28 @@ data "aws_iam_policy_document" "gdpr_delete_policy_document" {
       "arn:aws:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rule/StepFunctionsGetEventsForBatchJobsRule"
     ]
   }
+  statement {
+    sid    = "PublishGdprStepFunctionNotifications"
+    effect = "Allow"
+    actions = [
+      "sns:Publish"
+    ]
+    resources = [
+      aws_sns_topic.emds_alerts.arn
+    ]
+  }
+
+  statement {
+    sid    = "UseEncryptedAlertsTopicForGdprStepFunction"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey*"
+    ]
+    resources = [
+      aws_kms_key.emds_alerts.arn
+    ]
+  }  
 }
 
 resource "aws_iam_policy" "gdpr_delete_iam_policy" {
