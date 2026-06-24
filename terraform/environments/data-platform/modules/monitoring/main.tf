@@ -1,8 +1,5 @@
 locals {
   role_name = "data-platform-monitoring"
-  
-  # Trusted role ARNs - these will be the Cloud Platform IRSA roles for your Grafana pods
-  # You'll need to update these with the actual role ARNs from your Cloud Platform namespaces
   trusted_role_arns = [
     # Development namespace IRSA role
     "arn:aws:iam::754256621582:role/cloud-platform-irsa-4348d681e9c70290-live",
