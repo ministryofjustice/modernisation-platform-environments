@@ -75,7 +75,7 @@ resource "aws_wafv2_web_acl" "sftp_web_acl" {
 
     statement {
       rate_based_statement {
-        limit                 = 1
+        limit                 = 10
         aggregate_key_type    = "IP"
         evaluation_window_sec = 600
 
