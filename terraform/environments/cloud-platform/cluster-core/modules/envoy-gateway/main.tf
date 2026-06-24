@@ -26,7 +26,7 @@ resource "kubernetes_manifest" "envoy_proxy" {
     kind       = "EnvoyProxy"
 
     metadata = {
-      name      = "shared-alb-proxy"
+      name      = "shared-nlb-proxy"
       namespace = "envoy-gateway-system"
     }
 
@@ -40,8 +40,15 @@ resource "kubernetes_manifest" "envoy_proxy" {
           }
 
           envoyService = {
-            type = "ClusterIP"
-            name = "envoy-gateway-proxy-alb"
+            type = "LoadBalancer"
+            annotations = {
+              "service.beta.kubernetes.io/aws-load-balancer-name"                  = "${var.cluster_name}-envoy-default"
+              "service.beta.kubernetes.io/aws-load-balancer-scheme"                = "internet-facing"
+              "service.beta.kubernetes.io/aws-load-balancer-nlb-target-type"       = "ip"
+              "service.beta.kubernetes.io/aws-load-balancer-healthcheck-protocol"  = "TCP"
+              "service.beta.kubernetes.io/aws-load-balancer-healthcheck-port"      = "traffic-port"
+              "service.beta.kubernetes.io/aws-load-balancer-attributes"            = "load_balancing.cross_zone.enabled=true"
+            }
           }
         }
       }
@@ -65,7 +72,7 @@ resource "kubernetes_manifest" "gateway_class" {
       parametersRef = {
         group     = "gateway.envoyproxy.io"
         kind      = "EnvoyProxy"
-        name      = "shared-alb-proxy"
+        name      = "shared-nlb-proxy"
         namespace = "envoy-gateway-system"
       }
     }
@@ -77,6 +84,15 @@ resource "kubernetes_manifest" "gateway_class" {
   ]
 }
 
+# Platform Gateway.
+#
+# It owns physical ports only.
+# Direct tenant HTTPRoute attachment is blocked by default because
+# allowedRoutes is omitted, which defaults to Same namespace only.
+#
+# Tenants use either:
+# - the platform default ListenerSet and wildcard certificate for quick start, or
+# - create their own ListenerSet in their namespacefor custom cert/hostname control.
 resource "kubernetes_manifest" "gateway" {
   manifest = {
     apiVersion = "gateway.networking.k8s.io/v1"
@@ -92,19 +108,58 @@ resource "kubernetes_manifest" "gateway" {
 
       listeners = [
         {
-          name     = "http"
+          name     = "platform-http"
           protocol = "HTTP"
           port     = 80
-
-          allowedRoutes = {
-            namespaces = {
-              from = "All"
-            }
+        },
+        {
+          # Use TLS here because hostname/cert mapping is supplied by ListenerSets.
+          name     = "platform-tls"
+          protocol = "TLS"
+          port     = 443
+          tls = {
+            mode = "Passthrough"
           }
         }
       ]
+
+      # Any namespace can attach a ListenerSet to this platform Gateway.
+      allowedListeners = {
+        namespaces = {
+          from = "All"
+        }
+      }
     }
   }
 
   depends_on = [kubernetes_manifest.gateway_class]
+}
+
+##########################################################
+# Certificate resources for wildcard domain cert issuing #
+##########################################################
+
+resource "kubectl_manifest" "envoy_gateway_default_certificate" {
+  yaml_body = templatefile("${path.module}/templates/default-certificate.yaml.tpl", {
+    cluster_base_domain = var.cluster_base_domain
+  })
+
+  depends_on = [
+    kubernetes_namespace_v1.envoy_gateway_system
+  ]
+}
+
+resource "kubectl_manifest" "envoy_gateway_default_listenerset" {
+  yaml_body = templatefile("${path.module}/templates/default-listenerset.yaml.tpl", {
+    gateway_name             = kubernetes_manifest.gateway.manifest.metadata.name
+    namespace                = kubernetes_namespace_v1.envoy_gateway_system.metadata[0].name
+    listenerset_name         = "default-listenerset"
+    tls_secret_name          = "default-certificate"
+    base_domain              = var.cluster_base_domain
+  })
+
+  depends_on = [
+    kubernetes_manifest.gateway,
+    kubectl_manifest.envoy_gateway_default_certificate
+  ]
 }
