@@ -82,8 +82,8 @@ The proof of concept seeds a single provider named `secrets` using the `secrets_
 
 Credentials are **not** held in DynamoDB. For the `secrets_manager` provider, each user has a secret at `<secret_prefix><idp_username>` (for example `transfer/dms1981`). The secret JSON may contain:
 
-- `Password` — the expected password.
-- `PublicKeys` — a list (or JSON-encoded list) of authorised SSH public keys.
+- `password` — the expected password.
+- `publicKeys` — a list (or JSON-encoded list) of authorised SSH public keys.
 
 Public keys may alternatively be stored in a separate secret at `<secret_prefix><idp_username>/keys`. Secrets are encrypted with the service KMS key and their values are managed manually (Terraform creates the secret with a placeholder and `ignore_secret_changes = true`).
 
@@ -133,8 +133,8 @@ This lets a single Transfer server front multiple back-end providers while keepi
 
 The protocol determines which credential is checked:
 
-- **Password present** (FTPS, or SFTP with password): the handler reads the user's secret and compares the supplied password against the stored `Password` using `hmac.compare_digest`, a constant-time comparison that avoids leaking information through timing.
-- **No password** (SFTP with a key): the handler returns the user's authorised `PublicKeys`. Transfer Family then verifies the client's signature against those keys. Keys come from the provider's secret (`PublicKeys`), or a dedicated `…/keys` secret, or — if the provider does not support keys — from the user record's `config.PublicKeys`. If no keys are configured, authentication is denied.
+- **Password present** (FTPS, or SFTP with password): the handler reads the user's secret and compares the supplied password against the stored `password` using `hmac.compare_digest`, a constant-time comparison that avoids leaking information through timing.
+- **No password** (SFTP with a key): the handler returns the user's authorised `publicKeys`. Transfer Family then verifies the client's signature against those keys. Keys come from the provider's secret (`publicKeys`), or a dedicated `…/keys` secret, or — if the provider does not support keys — from the user record's `config.PublicKeys`. If no keys are configured, authentication is denied.
 
 ## Authorisation context
 
@@ -159,7 +159,7 @@ For the seeded `dms1981` user, the response pins the session to the shared `tran
 
 ## Managing users
 
-A user exists as **two** linked things: a record in the users DynamoDB table (who they are and what they can do) and a secret in Secrets Manager (their credentials). Both are driven from a single map, `local.custom_idp_users` in [`custom-idp-users.tf`](../custom-idp-users.tf). Each key in that map is a username; the `aws_dynamodb_table_item.custom_idp_user` resource in [`custom-idp-dynamodb.tf`](../custom-idp-dynamodb.tf) and the `module.secrets_custom_idp_user` block in [`secrets.tf`](../secrets.tf) both `for_each` over it, so adding a user is a one-line change.
+A user exists as **two** linked things: a record in the users DynamoDB table (who they are and what they can do) and a secret in Secrets Manager (their credentials). Both are driven from a single map, `local.custom_idp_users` in [`custom-idp-users.tf`](../custom-idp-users.tf). Each key in that map is a username; the `aws_dynamodb_table_item.custom_idp_user` resource in [`custom-idp-dynamodb.tf`](../custom-idp-dynamodb.tf) and the `module.secrets_custom_idp_user` block in [`custom-idp-secrets.tf`](../custom-idp-secrets.tf) both `for_each` over it, so adding a user is a one-line change.
 
 ### Add a user
 
@@ -176,7 +176,7 @@ A user exists as **two** linked things: a record in the users DynamoDB table (wh
 
    - `identity_provider_key` → `secrets` (authenticate against Secrets Manager)
    - `ipv4_allow_list` → `local.custom_idp_configuration.ingress_cidr_blocks` (the shared ingress allow-list)
-   - `home_directory_target` → `/<unscanned-bucket>/<username>` (the user's own prefix in the `unscanned` bucket)
+  - `home_directory_target` → `<username>` (the user's own prefix in the `unscanned` bucket)
 
    To override any of them, give the user an object instead of `{}`:
 
@@ -185,21 +185,21 @@ A user exists as **two** linked things: a record in the users DynamoDB table (wh
      alice = {
        identity_provider_key = "secrets"
        ipv4_allow_list       = ["203.0.113.0/24", "198.51.100.10/32"]
-       home_directory_target = "/${module.s3_bucket["unscanned"].s3_bucket_id}/alice"
+      home_directory_target = "alice"
      }
    }
    ```
 
 2. **Apply** the Terraform. For the new key this creates the DynamoDB user record and a *placeholder* credential secret named `${local.custom_idp_configuration.secret_prefix}<username>` (i.e. `transfer/alice`). `ignore_secret_changes = true` means Terraform will never read or overwrite the real value.
-3. **Set the real credentials out of band.** Put the actual `Password` and/or `PublicKeys` into the secret in the AWS console or CLI, so they are never committed to source control:
+3. **Set the real credentials out of band.** Put the actual `password` and/or `publicKeys` into the secret in the AWS console or CLI, so they are never committed to source control:
 
    ```bash
    aws secretsmanager put-secret-value \
      --secret-id transfer/alice \
-     --secret-string '{"Password":"…","PublicKeys":["ssh-ed25519 AAAA… alice"]}'
+     --secret-string '{"password":"…","publicKeys":["ssh-ed25519 AAAA… alice"]}'
    ```
 
-   For key-only (SSH) access, omit `Password`. For password-only (FTPS) access, omit `PublicKeys`.
+   For key-only (SSH) access, omit `password`. For password-only (FTPS) access, omit `publicKeys`.
 
 The user can now authenticate as `alice` (or `alice@@secrets` to name the provider explicitly).
 
@@ -207,7 +207,7 @@ The user can now authenticate as `alice` (or `alice@@secrets` to name the provid
 
 1. **Remove the user's key** from `local.custom_idp_users` in [`custom-idp-users.tf`](../custom-idp-users.tf) and apply. This deletes both the DynamoDB user record and the credential secret in one step. As soon as the record is gone the user can no longer authenticate (the IdP denies any login with no matching record, unless a `$default$` record exists). The secret enters its recovery window (7 days) before final deletion; use `aws secretsmanager delete-secret --force-delete-without-recovery` only if immediate removal is required.
 
-To revoke access **immediately** without a Terraform run, blank the credentials in the secret (`put-secret-value` with empty `Password`/`PublicKeys`) — the next login attempt will fail. To revoke **everyone** at once, set `disabled = true` on the `secrets` provider record.
+To revoke access **immediately** without a Terraform run, blank the credentials in the secret (`put-secret-value` with empty `password`/`publicKeys`) — the next login attempt will fail. To revoke **everyone** at once, set `disabled = true` on the `secrets` provider record.
 
 ### Add a back-end provider
 
