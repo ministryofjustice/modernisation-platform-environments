@@ -1,4 +1,4 @@
-/*
+
 ##########################################################################################
 # S3 Replication Buckets (database-source & report-source) for DEV, UAT, PROD
 # Optimised replacement for s3.tf lines 282-443, 447-604, 1017-1174, 1178-1336, 1559-1716, 1720-1877
@@ -7,7 +7,7 @@
 locals {
   s3_replication_buckets = {
     for k, v in {
-      database_dev = {
+      database_source_dev = {
         condition       = local.is-development
         bucket_name     = "moj-database-source-dev"
         log_bucket      = "moj-log-files-dev"
@@ -16,10 +16,10 @@ locals {
         expiration_days = 6
         replication_destination = "arn:aws:s3:::mojap-data-engineering-production-ppud-dev"
         replication_rule_id     = "ppud-database-replication-rule-dev"
-        iam_role_key            = "database_dev"
+        iam_role_key            = "database_source_dev"
         ec2_account             = "ppud-development"
       }
-      report_dev = {
+      report_source_dev = {
         condition       = local.is-development
         bucket_name     = "moj-report-source-dev"
         log_bucket      = "moj-log-files-dev"
@@ -28,10 +28,10 @@ locals {
         expiration_days = 6
         replication_destination = "arn:aws:s3:::cloud-platform-db973d65892f599f6e78cb90252d7dc9"
         replication_rule_id     = "ppud-report-replication-rule-dev"
-        iam_role_key            = "report_dev"
+        iam_role_key            = "report_source_dev"
         ec2_account             = "ppud-development"
       }
-      database_uat = {
+      database_source_uat = {
         condition       = local.is-preproduction
         bucket_name     = "moj-database-source-uat"
         log_bucket      = "moj-log-files-uat"
@@ -40,10 +40,10 @@ locals {
         expiration_days = 6
         replication_destination = "arn:aws:s3:::mojap-data-engineering-production-ppud-preprod"
         replication_rule_id     = "ppud-database-replication-rule-uat"
-        iam_role_key            = "database_uat"
+        iam_role_key            = "database_source_uat"
         ec2_account             = "ppud-preproduction"
       }
-      report_uat = {
+      report_source_uat = {
         condition       = local.is-preproduction
         bucket_name     = "moj-report-source-uat"
         log_bucket      = "moj-log-files-uat"
@@ -52,10 +52,10 @@ locals {
         expiration_days = 6
         replication_destination = "arn:aws:s3:::cloud-platform-ffbd9073e2d0d537d825ebea31b441fc"
         replication_rule_id     = "ppud-report-replication-rule-uat"
-        iam_role_key            = "report_uat"
+        iam_role_key            = "report_source_uat"
         ec2_account             = "ppud-preproduction"
       }
-      database_prod = {
+      database_source_prod = {
         condition       = local.is-production
         bucket_name     = "moj-database-source-prod"
         log_bucket      = "moj-log-files-prod"
@@ -64,10 +64,10 @@ locals {
         expiration_days = 6
         replication_destination = "arn:aws:s3:::mojap-data-engineering-production-ppud-prod"
         replication_rule_id     = "ppud-report-replication-rule-prod"
-        iam_role_key            = "database_prod"
+        iam_role_key            = "database_source_prod"
         ec2_account             = "ppud-production"
       }
-      report_prod = {
+      report_source_prod = {
         condition       = local.is-production
         bucket_name     = "moj-report-source-prod"
         log_bucket      = "moj-log-files-prod"
@@ -76,7 +76,7 @@ locals {
         expiration_days = 6
         replication_destination = "arn:aws:s3:::cloud-platform-9c7fd5fc774969b089e942111a7d5671"
         replication_rule_id     = "ppud-report-replication-rule-prod"
-        iam_role_key            = "report_prod"
+        iam_role_key            = "report_source_prod"
         ec2_account             = "ppud-production"
       }
     } : k => v if v.condition
@@ -292,4 +292,3 @@ resource "aws_iam_role_policy_attachment" "s3_replication" {
   role       = aws_iam_role.s3_replication[each.key].name
   policy_arn = aws_iam_policy.s3_replication[each.key].arn
 }
-*/
