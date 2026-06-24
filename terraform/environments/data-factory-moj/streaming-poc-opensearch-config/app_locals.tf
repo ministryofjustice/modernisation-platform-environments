@@ -17,7 +17,7 @@ locals {
     ), "ACCOUNT_ID", data.aws_caller_identity.current.account_id), "USER", local.os_creds.username)
   }
 
-  geo_fence_events_b64 = base64encode(
-    file("${path.cwd}/index/geo-fence-events.json")
-  )
+  #   geo_fence_events_b64 = base64encode(
+  #     file("${path.cwd}/index/geo-fence-events.json")
+  #   )
 }
