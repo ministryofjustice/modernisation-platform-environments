@@ -12,7 +12,7 @@ locals {
 
   alb_security_group_id = module.alb.security_group.id
 
-  # remove after migration
+  # TODO LASB-5089 Remove
   user_data = base64encode(templatefile("user_data.sh", {
     app_name    = local.application_name,
     environment = local.environment,
@@ -21,6 +21,7 @@ locals {
     xdr_tags    = local.xdr_tags
   }))
 
+  # TODO LASB-5089 (Optional) rename to user_data
   user_data_al2023 = base64encode(templatefile("user_data_al2023.sh", {
     app_name    = local.application_name,
     environment = local.environment,

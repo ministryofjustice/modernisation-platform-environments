@@ -74,15 +74,42 @@ resource "aws_iam_role_policy" "sdg_task_exec_ecr" {
 }
 
 data "aws_iam_policy_document" "sdg_task" {
+  for_each = toset(contains(local.deploy_to, local.environment) ? ["sdg_task"] : [])
   statement {
-    sid    = "MSKProduce"
+    sid    = "AllowMSKClusters"
     effect = "Allow"
     actions = [
+      "kafka-cluster:AlterCluster",
       "kafka-cluster:Connect",
+      "kafka-cluster:DescribeCluster"
+    ]
+    resources = [local.msk_cluster_arn]
+  }
+
+  statement {
+    sid    = "AllowMSKTopics"
+    effect = "Allow"
+    actions = [
+      "kafka-cluster:AlterTopic",
+      "kafka-cluster:AlterTopicDynamicConfiguration",
+      "kafka-cluster:CreateTopic",
+      "kafka-cluster:DeleteTopic",
       "kafka-cluster:DescribeTopic",
+      "kafka-cluster:DescribeTopicDynamicConfiguration",
+      "kafka-cluster:ReadData",
       "kafka-cluster:WriteData"
     ]
-    resources = ["*"] # TODO: scope to specific resource once that resource is created
+    resources = local.msk_topic_arns
+  }
+
+  statement {
+    sid    = "AllowMSKGroups"
+    effect = "Allow"
+    actions = [
+      "kafka-cluster:AlterGroup",
+      "kafka-cluster:DescribeGroup"
+    ]
+    resources = local.msk_group_arns
   }
   statement {
     sid    = "SSMExec"
@@ -101,7 +128,7 @@ resource "aws_iam_role_policy" "sdg_task" {
   count  = contains(local.deploy_to, local.environment) ? 1 : 0
   name   = "${local.sdg_prefix}-task"
   role   = aws_iam_role.sdg_task[0].name
-  policy = data.aws_iam_policy_document.sdg_task.json
+  policy = data.aws_iam_policy_document.sdg_task["sdg_task"].json
 }
 
 # --- Alerts Service IAM ---
@@ -134,23 +161,61 @@ resource "aws_iam_role_policy" "alerts_task_exec_ecr" {
 }
 
 data "aws_iam_policy_document" "alerts_task" {
+  for_each = toset(contains(local.deploy_to, local.environment) ? ["alerts_task"] : [])
   statement {
-    sid    = "MSKConsume"
+    sid    = "AllowMSKClusters"
     effect = "Allow"
     actions = [
+      "kafka-cluster:AlterCluster",
       "kafka-cluster:Connect",
-      "kafka-cluster:DescribeTopic",
-      "kafka-cluster:DescribeGroup",
-      "kafka-cluster:AlterGroup",
-      "kafka-cluster:ReadData"
+      "kafka-cluster:DescribeCluster"
     ]
-    resources = ["*"] # TODO: scope to specific resource once that resource is created
+    resources = [local.msk_cluster_arn]
   }
+
   statement {
-    sid       = "SNSPublish"
-    effect    = "Allow"
-    actions   = ["sns:Publish"]
-    resources = ["*"] # TODO: scope to specific resource once that resource is created
+    sid    = "AllowMSKTopics"
+    effect = "Allow"
+    actions = [
+      "kafka-cluster:AlterTopic",
+      "kafka-cluster:AlterTopicDynamicConfiguration",
+      "kafka-cluster:CreateTopic",
+      "kafka-cluster:DeleteTopic",
+      "kafka-cluster:DescribeTopic",
+      "kafka-cluster:DescribeTopicDynamicConfiguration",
+      "kafka-cluster:ReadData",
+      "kafka-cluster:WriteData"
+    ]
+    resources = local.msk_topic_arns
+  }
+
+  statement {
+    sid    = "AllowMSKGroups"
+    effect = "Allow"
+    actions = [
+      "kafka-cluster:AlterGroup",
+      "kafka-cluster:DescribeGroup"
+    ]
+    resources = local.msk_group_arns
+  }
+
+  statement {
+    sid    = "AllowSNSTopics"
+    effect = "Allow"
+    actions = [
+      "sns:Publish"
+    ]
+    resources = [data.aws_sns_topic.drone_incursion_topic["topic"].arn]
+  }
+
+  statement {
+    sid    = "AllowKMSAccess"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt"
+    ]
+    resources = [data.aws_kms_key.sns_topic_kmskey["sns"].arn]
   }
 }
 
@@ -158,12 +223,13 @@ resource "aws_iam_role_policy" "alerts_task" {
   count  = contains(local.deploy_to, local.environment) ? 1 : 0
   name   = "${local.alerts_prefix}-task"
   role   = aws_iam_role.alerts_task[0].name
-  policy = data.aws_iam_policy_document.alerts_task.json
+  policy = data.aws_iam_policy_document.alerts_task["alerts_task"].json
 }
 
 # --- Security Groups ---
 
 resource "aws_security_group" "sdg" {
+  #checkov:skip=CKV2_AWS_5: Security group is attached to the SDG ECS service network configuration; Checkov cannot infer attachment through counted/dynamic references.
   count       = contains(local.deploy_to, local.environment) ? 1 : 0
   name_prefix = local.sdg_prefix
   vpc_id      = data.aws_vpc.shared.id
@@ -197,6 +263,7 @@ resource "aws_vpc_security_group_egress_rule" "sdg_msk_out" {
 }
 
 resource "aws_security_group" "alerts" {
+  #checkov:skip=CKV2_AWS_5: Security group is attached to the alerts ECS service network configuration; Checkov cannot infer attachment through counted/dynamic references.
   count       = contains(local.deploy_to, local.environment) ? 1 : 0
   name_prefix = local.alerts_prefix
   vpc_id      = data.aws_vpc.shared.id
@@ -232,6 +299,7 @@ resource "aws_vpc_security_group_egress_rule" "alerts_msk_out" {
 # --- Synthetic Data Generator ---
 
 module "ecs_container_sdg" {
+  count  = contains(local.deploy_to, local.environment) ? 1 : 0
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=697b010957fabc36b7f648bc535021231f748674" # v6.0.2
 
   name                     = local.sdg_prefix
@@ -240,7 +308,16 @@ module "ecs_container_sdg" {
   readonly_root_filesystem = false
   port_mappings            = []
   secrets                  = []
-  environment              = []
+  environment = [
+    {
+      name  = "ENVIRONMENT"
+      value = substr(lower(local.environment), 0, 3)
+    },
+    {
+      name  = "KAFKA_BROKER"
+      value = local.msk_bootstrap_brokers
+    }
+  ]
   log_configuration = {
     logDriver = "awslogs"
     options = {
@@ -258,7 +335,7 @@ module "ecs_service_sdg" {
   name        = local.sdg_prefix
   cluster_arn = module.ecs_cluster[0].ecs_cluster_arn
 
-  container_definitions = module.ecs_container_sdg.json_encoded_list
+  container_definitions = module.ecs_container_sdg[0].json_encoded_list
 
   subnets         = data.aws_subnets.shared-private.ids
   security_groups = [aws_security_group.sdg[0].id]
@@ -283,7 +360,7 @@ module "ecs_service_sdg" {
 resource "aws_cloudwatch_log_group" "sdg" {
   count             = contains(local.deploy_to, local.environment) ? 1 : 0
   name              = "/ecs/${local.sdg_prefix}"
-  retention_in_days = 30
+  retention_in_days = 365
   kms_key_id        = aws_kms_key.ecs_cloudwatch[0].arn
   tags              = local.extended_tags
 }
@@ -291,6 +368,7 @@ resource "aws_cloudwatch_log_group" "sdg" {
 # --- Alerts Service ---
 
 module "ecs_container_alerts" {
+  count  = contains(local.deploy_to, local.environment) ? 1 : 0
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=697b010957fabc36b7f648bc535021231f748674" # v6.0.2
 
   name                     = local.alerts_prefix
@@ -299,7 +377,20 @@ module "ecs_container_alerts" {
   readonly_root_filesystem = true
   port_mappings            = []
   secrets                  = []
-  environment              = []
+  environment = [
+    {
+      name  = "ENVIRONMENT"
+      value = substr(lower(local.environment), 0, 3)
+    },
+    {
+      name  = "SPRING_PROFILES_ACTIVE"
+      value = substr(lower(local.environment), 0, 3)
+    },
+    {
+      name  = "MOJ-DRONE-INCURSION-ARN"
+      value = data.aws_sns_topic.drone_incursion_topic["topic"].arn
+    }
+  ]
   log_configuration = {
     logDriver = "awslogs"
     options = {
@@ -317,7 +408,7 @@ module "ecs_service_alerts" {
   name        = local.alerts_prefix
   cluster_arn = module.ecs_cluster[0].ecs_cluster_arn
 
-  container_definitions = module.ecs_container_alerts.json_encoded_list
+  container_definitions = module.ecs_container_alerts[0].json_encoded_list
 
   subnets         = data.aws_subnets.shared-private.ids
   security_groups = [aws_security_group.alerts[0].id]
@@ -341,7 +432,7 @@ module "ecs_service_alerts" {
 resource "aws_cloudwatch_log_group" "alerts" {
   count             = contains(local.deploy_to, local.environment) ? 1 : 0
   name              = "/ecs/${local.alerts_prefix}"
-  retention_in_days = 30
+  retention_in_days = 365
   kms_key_id        = aws_kms_key.ecs_cloudwatch[0].arn
   tags              = local.extended_tags
 }

@@ -114,7 +114,7 @@ resource "aws_vpc_security_group_egress_rule" "process_file_from_bucket_lambda_s
 #Opening this for slack channel webhook access from lambda function
 resource "aws_vpc_security_group_egress_rule" "process_file_from_bucket_lambda_sg_egress_slack" {
   security_group_id = aws_security_group.process_file_from_bucket_lambda_sg.id
-  
+
   description = "Allowing egress to slack channel webhook"
   ip_protocol = "tcp"
   from_port   = 443
