@@ -157,3 +157,9 @@ datasources:
           sigV4AssumeRoleArn: arn:aws:iam::${account.account_id}:role/data-platform-monitoring
 %{ endif ~}
 %{ endfor ~}
+
+# Dashboards are provisioned as code from helm-release.tf (the JSON files in
+# src/helm/dashboards/, where each subdirectory maps to a Grafana folder). Their
+# panels pick one of the CloudWatch data sources above through an "Account" data
+# source template variable, so a single dashboard works across every monitored
+# account.
