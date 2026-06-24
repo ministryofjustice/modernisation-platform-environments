@@ -43,12 +43,13 @@ resource "aws_lb" "ssogen_alb_console" {
 }
 
 resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_enc_app" {
-  count       = local.ssogen_enabled ? 1 : 0
-  name        = lower(format("tg-%s-enc-app", local.application_name_ssogen))
-  port        = local.application_data.accounts[local.environment].tg_ssogen_apps_enc_port
-  protocol    = "HTTPS"
-  vpc_id      = data.aws_vpc.shared.id
-  target_type = "instance"
+  count            = local.ssogen_enabled ? 1 : 0
+  name             = lower(format("tg-%s-enc-app", local.application_name_ssogen))
+  port             = local.application_data.accounts[local.environment].tg_ssogen_apps_enc_port
+  protocol         = "HTTPS"
+  protocol_version = "HTTP2"
+  vpc_id           = data.aws_vpc.shared.id
+  target_type      = "instance"
   # deregistration_delay = 60
   health_check {
     enabled             = true
@@ -69,12 +70,13 @@ resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_enc_app" {
 }
 
 resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_console" {
-  count       = local.ssogen_enabled ? 1 : 0
-  name        = lower(format("tg-%s-console", local.application_name_ssogen))
-  port        = local.application_data.accounts[local.environment].tg_ssogen_admin_enc_port
-  protocol    = "HTTPS"
-  vpc_id      = data.aws_vpc.shared.id
-  target_type = "instance"
+  count            = local.ssogen_enabled ? 1 : 0
+  name             = lower(format("tg-%s-console", local.application_name_ssogen))
+  port             = local.application_data.accounts[local.environment].tg_ssogen_admin_enc_port
+  protocol         = "HTTPS"
+  protocol_version = "HTTP2"
+  vpc_id           = data.aws_vpc.shared.id
+  target_type      = "instance"
   # deregistration_delay = 60
   health_check {
     enabled             = true
