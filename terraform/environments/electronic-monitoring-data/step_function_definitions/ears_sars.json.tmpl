@@ -28,6 +28,16 @@
           "body.$": "States.JsonToString($)"
         }
       },
+      "Next": "WriteToSharepoint"
+    },
+    "WriteToSharepoint": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "FunctionName": "${write_to_sharepoint}",
+        "Payload.$": "$",
+      },
       "End": true
     }
   }
