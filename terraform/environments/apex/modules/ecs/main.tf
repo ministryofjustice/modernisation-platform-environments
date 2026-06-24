@@ -337,6 +337,22 @@ resource "aws_iam_policy" "ecs_task_execution_policy" { #tfsec:ignore:aws-iam-no
       Name = "${var.app_name}-ecs-task-execution-policy"
     }
   )
+  # Previous policy used SSM parameter store to retrieve the secret.
+  # Keep the old block commented out for rollback.
+  # policy = <<EOF
+  # {
+  #   "Version": "2012-10-17",
+  #   "Statement": [
+  #     {
+  #       "Effect": "Allow",
+  #       "Action": [
+  #         "ssm:GetParameters"
+  #       ],
+  #       "Resource": ["${var.database_tad_password_arn}"]
+  #     }
+  #   ]
+  # }
+  # EOF
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -344,7 +360,7 @@ resource "aws_iam_policy" "ecs_task_execution_policy" { #tfsec:ignore:aws-iam-no
     {
       "Effect": "Allow",
       "Action": [
-        "ssm:GetParameters"
+        "secretsmanager:GetSecretValue"
       ],
       "Resource": ["${var.database_tad_password_arn}"]
     }
