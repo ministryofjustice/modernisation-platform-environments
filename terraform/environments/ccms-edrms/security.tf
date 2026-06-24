@@ -174,19 +174,19 @@ resource "aws_security_group_rule" "cluster_ec2_ingress_lb" {
 }
 
 
-resource "aws_security_group_rule" "cluster_ec2_egress_vpce" {
-  security_group_id = aws_security_group.cluster_ec2.id
-  type              = "egress"
-  description       = "Allow egress to VPC endpoints (logs/ecs/secrets)"
-  protocol          = "TCP"
-  from_port         = 443
-  to_port           = 443
-  source_security_group_id = data.aws_security_group.vpce_security_group.id
+#resource "aws_security_group_rule" "cluster_ec2_egress_vpce" {
+#  security_group_id = aws_security_group.cluster_ec2.id
+#  type              = "egress"
+#  description       = "Allow egress to VPC endpoints (logs/ecs/secrets)"
+#  protocol          = "TCP"
+#  from_port         = 443
+#  to_port           = 443
+#  source_security_group_id = data.aws_security_group.vpce_security_group.id
 
-  lifecycle {
-    ignore_changes = [source_security_group_id]
-  }
-}
+#  lifecycle {
+#    ignore_changes = [source_security_group_id]
+#  }
+#}
 
 resource "aws_security_group_rule" "cluster_ec2_egress_s3" {
   security_group_id = aws_security_group.cluster_ec2.id
@@ -216,6 +216,16 @@ resource "aws_security_group_rule" "cluster_ec2_egress_NEC" {
   from_port         = 443
   to_port           = 443
   cidr_blocks       = ["10.120.0.0/24"]
+}
+
+resource "aws_security_group_rule" "cluster_ec2_egress_all" {
+  security_group_id = aws_security_group.cluster_ec2.id
+  type              = "egress"
+  description       = "All Egress"
+  protocol          = -1
+  from_port         = 0
+  to_port           = 0
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 # RDS Security Group
