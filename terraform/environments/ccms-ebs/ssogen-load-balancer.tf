@@ -15,6 +15,8 @@ resource "aws_lb" "ssogen_alb" {
     enabled = true
   }
 
+  depends_on = [aws_lb_target_group.ssogen_internal_tg_ssogen_enc_app]
+
   tags = merge(local.tags,
     { Name = lower(format("lb-%s-internal", local.application_name_ssogen)) }
   )
@@ -37,6 +39,8 @@ resource "aws_lb" "ssogen_alb_console" {
     enabled = true
   }
 
+  depends_on = [aws_lb_target_group.ssogen_internal_tg_ssogen_console]
+  
   tags = merge(local.tags,
     { Name = lower(format("lb-console-%s-internal", local.application_name_ssogen)) }
   )
@@ -67,6 +71,10 @@ resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_enc_app" {
     type            = "lb_cookie"
     cookie_duration = 3600
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_console" {
@@ -87,6 +95,10 @@ resource "aws_lb_target_group" "ssogen_internal_tg_ssogen_console" {
     timeout             = 5
     healthy_threshold   = 3
     unhealthy_threshold = 3
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
