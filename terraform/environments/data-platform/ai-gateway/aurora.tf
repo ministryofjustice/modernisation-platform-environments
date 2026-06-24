@@ -48,11 +48,16 @@ module "ai_gateway_aurora_secret" {
 
   name = "${local.component_name}/aurora"
 
-  secret_string = jsonencode({
-    username = module.ai_gateway_aurora.cluster_master_username
-    password = random_password.aurora.result
-    host     = module.ai_gateway_aurora.cluster_endpoint
-    port     = tostring(module.ai_gateway_aurora.cluster_port)
-    dbname   = module.ai_gateway_aurora.cluster_database_name
-  })
+  secret_string = jsonencode(merge(
+    {
+      username = module.ai_gateway_aurora.cluster_master_username
+      password = random_password.aurora.result
+      host     = module.ai_gateway_aurora.cluster_endpoint
+      port     = tostring(module.ai_gateway_aurora.cluster_port)
+      dbname   = module.ai_gateway_aurora.cluster_database_name
+    },
+    local.has_reader ? {
+      read-url = "postgresql://${module.ai_gateway_aurora.cluster_master_username}:${random_password.aurora.result}@${module.ai_gateway_aurora.cluster_reader_endpoint}/${module.ai_gateway_aurora.cluster_database_name}"
+    } : {}
+  ))
 }

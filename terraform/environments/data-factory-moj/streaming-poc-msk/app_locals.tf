@@ -3,7 +3,7 @@ locals {
   cluster_name = "${local.name}-msk"
 
   extended_tags = merge(local.tags, {
-    component = local.name
+    component = local.cluster_name
   })
 
   msk_sg_ingress_cidr = contains(["development"], local.environment) ? toset([
