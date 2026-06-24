@@ -85,7 +85,7 @@
             "content": {
                "textType": "client-markdown",
                "title": ":white_check_mark: GDPR unstructured deletion succeeded in ${environment_name}",
-               "description.$": "States.Format('*Environment*: {}\\n*Jobs run*: {}\\n*Atrium records selected*: {}\\n*Blob records selected*: {}\\n*XDrive records selected*: {}\\n*Audit bucket*: `{}`', $.summary.environment, $.summary.jobs_to_run, $.summary.atrium_records_selected, $.summary.blob_records_selected, $.summary.xdrive_records_selected, $.summary.audit_bucket)",
+               "description.$": "States.Format('Environment: {}; Jobs run: {}; Atrium records selected: {}; Blob records selected: {}; XDrive records selected: {}; Audit bucket: {}', $.summary.environment, $.summary.jobs_to_run, $.summary.atrium_records_selected, $.summary.blob_records_selected, $.summary.xdrive_records_selected, $.summary.audit_bucket)",
                "nextSteps": [],
                "keywords": [
                   "GDPR",
@@ -124,7 +124,7 @@
             "content": {
                "textType": "client-markdown",
                "title": ":x: GDPR unstructured control failed in ${environment_name}",
-               "description.$": "States.Format('*Environment*: ${environment_name}\\n*Failed state*: ControlLambda\\n*Error*: {}\\n*Cause*: {}', $.unstructured_error.Error, $.unstructured_error.Cause)",
+               "description.$": "States.Format('Environment: ${environment_name}; Failed state: ControlLambda; Error: {}; Cause: {}', $.unstructured_error.Error, $.unstructured_error.Cause)",
                "nextSteps": [
                   "Review the Step Function execution history.",
                   "Review the unstructured control Lambda logs."
@@ -172,7 +172,7 @@
             "content": {
                "textType": "client-markdown",
                "title": ":x: GDPR unstructured deletion failed in ${environment_name}",
-               "description.$": "States.Format('*Environment*: {}\\n*Failed state*: TriggerBatchDeletionJobs\\n*Jobs prepared*: {}\\n*Error*: {}\\n*Cause*: {}', $.summary.environment, $.summary.jobs_to_run, $.unstructured_error.Error, $.unstructured_error.Cause)",
+               "description.$": "States.Format('Environment: {}; Failed state: TriggerBatchDeletionJobs; Jobs prepared: {}; Error: {}; Cause: {}', $.summary.environment, $.summary.jobs_to_run, $.unstructured_error.Error, $.unstructured_error.Cause)",
                "nextSteps": [
                   "Review the Step Function execution history.",
                   "Review the Batch job logs.",
