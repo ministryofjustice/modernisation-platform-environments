@@ -1,7 +1,18 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "example_var": "dev-data",
+      "opensearch_role_mappings": {
+        "all_access": {
+          "backend_roles": [
+            "arn:aws:iam::ACCOUNT_ID:role/flink-moj-geofence-flink-iam-role",
+            "arn:aws:iam::ACCOUNT_ID:role/flink-moj-rules-flink-iam-role"
+          ],
+          "users": [
+            "USER"
+          ]
+        }
+      }
     },
     "test": {
       "example_var": "test-data"
