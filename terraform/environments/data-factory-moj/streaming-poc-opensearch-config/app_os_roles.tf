@@ -13,7 +13,8 @@ resource "null_resource" "run_role_mappings" {
         --query "taskArns[0]" \
         --region "eu-west-2" \
         --output text)
-
+      
+      echo "TASK ARN == $TASK_ARN" 
       if [ "$TASK_ARN" = "None" ] || [ -z "$TASK_ARN" ]; then
         echo "Error: No running ECS tasks found for this service!"
         exit 1
@@ -29,5 +30,12 @@ resource "null_resource" "run_role_mappings" {
 
       sleep 10
 EOT
+
+    environment = {
+      AWS_ACCESS_KEY_ID     = var.AWS_ACCESS_KEY_ID
+      AWS_SECRET_ACCESS_KEY = var.AWS_SECRET_ACCESS_KEY
+      AWS_SESSION_TOKEN     = var.AWS_SESSION_TOKEN
+      AWS_DEFAULT_REGION    = var.AWS_DEFAULT_REGION
+    }
   }
 }
