@@ -12,6 +12,10 @@ resource "helm_release" "grafana" {
     templatefile("${path.module}/src/helm/values/grafana/values.yml.tftpl", {
       hostname           = local.environment_configuration.monitoring_hostname
       entra_id_tenant_id = local.grafana_entra_id.tenant_id
+      # Cloud Platform requires a unique external-dns set-identifier per ingress:
+      # <ingress-name>-<namespace>-<cluster-colour>. The chart names the ingress
+      # after the release ("grafana") and the live cluster colour is green.
+      ingress_set_identifier = "grafana-${local.environment_configuration.grafana_namespace}-green"
       # Resolve each monitored account's ID by name from the Modernisation
       # Platform environment_management map rather than hardcoding it.
       monitored_accounts = [

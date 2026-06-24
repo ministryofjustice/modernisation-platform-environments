@@ -22,10 +22,25 @@ serviceAccount:
   create: false
   name: grafana-irsa
 
+# Cloud Platform enforces (via a Gatekeeper policy) that every ingress carries
+# external-dns weight and set-identifier annotations so Route 53 records are
+# weighted across its blue/green clusters. The set-identifier must be unique:
+# <ingress-name>-<namespace>-<cluster-colour>.
 ingress:
   enabled: true
+  ingressClassName: default
+  annotations:
+    external-dns.alpha.kubernetes.io/aws-weight: "100"
+    external-dns.alpha.kubernetes.io/set-identifier: ${ingress_set_identifier}
+    external-dns.alpha.kubernetes.io/hostname: ${hostname}
   hosts:
     - ${hostname}
+  # The TLS certificate is provisioned on the Cloud Platform side; reference the
+  # resulting secret here so the ingress terminates TLS for the hostname.
+  tls:
+    - secretName: monitoring-tls
+      hosts:
+        - ${hostname}
 
 persistence:
   enabled: false
