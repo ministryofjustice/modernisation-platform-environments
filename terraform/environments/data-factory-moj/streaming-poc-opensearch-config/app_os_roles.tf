@@ -6,7 +6,7 @@ resource "null_resource" "run_role_mappings" {
 
   provisioner "local-exec" {
     command = <<EOT
-      TASK_ARN=$(AWS_PROFILE=moj-sandbox aws ecs list-tasks \
+      TASK_ARN=$(aws ecs list-tasks \
         --cluster "streaming-pov-ecs-cluster" \
         --service-name "streaming-pov-ecs-sdg" \
         --desired-status "RUNNING" \
