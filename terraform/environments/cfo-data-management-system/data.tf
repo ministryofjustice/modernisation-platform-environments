@@ -1,6 +1,6 @@
 #### This file can be used to store data specific to the member account ####
 
-# Shared MoJ IP address ranges — used for ALB ingress rules
+# Shared MoJ IP address ranges used for ALB ingress rules
 module "ip_addresses" {
   source = "../../modules/ip_addresses"
 }
@@ -13,7 +13,7 @@ data "aws_security_group" "rds" {
   depends_on = [module.rds]
 }
 
-# CloudFront managed prefix list — restricts visualiser ALB ingress to CloudFront edge nodes only
+# CloudFront managed prefix list restricts visualiser ALB ingress to CloudFront edge nodes only
 data "aws_ec2_managed_prefix_list" "cloudfront" {
   name = "com.amazonaws.global.cloudfront.origin-facing"
 }

@@ -8,8 +8,8 @@
         "performance_insights_enabled": false,
         "skip_final_snapshot": true
       },
-      "api_domain": "dev.api.cfo-dms.service.justice.gov.uk",
-      "visualiser_domain": "dev.visualiser.cfo-dms.service.justice.gov.uk"
+      "api_domain": "api.cfo-data-management-system.hmpps-development.modernisation-platform.service.justice.gov.uk",
+      "visualiser_domain": "visualiser.cfo-data-management-system.hmpps-development.modernisation-platform.service.justice.gov.uk"
     },
     "preproduction": {
       "rds": {
@@ -19,8 +19,8 @@
         "performance_insights_enabled": true,
         "skip_final_snapshot": true
       },
-      "api_domain": "preprod.api.cfo-dms.service.justice.gov.uk",
-      "visualiser_domain": "preprod.visualiser.cfo-dms.service.justice.gov.uk"
+      "api_domain": "api.cfo-data-management-system.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
+      "visualiser_domain": "visualiser.cfo-data-management-system.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"
     },
     "production": {
       "rds": {
@@ -30,8 +30,8 @@
         "performance_insights_enabled": true,
         "skip_final_snapshot": false
       },
-      "api_domain": "api.cfo-dms.service.justice.gov.uk",
-      "visualiser_domain": "visualiser.cfo-dms.service.justice.gov.uk"
+      "api_domain": "api.cfo-data-management-system.service.justice.gov.uk",
+      "visualiser_domain": "visualiser.manage-external-funded-offender-provision.service.justice.gov.uk"
     }
   }
 }

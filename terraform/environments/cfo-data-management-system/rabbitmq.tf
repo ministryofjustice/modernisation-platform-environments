@@ -1,4 +1,4 @@
-# Amazon MQ — RabbitMQ
+# Amazon MQ RabbitMQ
 resource "aws_mq_broker" "rabbitmq" {
   broker_name = "${local.application_name_short}-${local.environment}-rabbitmq"
 
