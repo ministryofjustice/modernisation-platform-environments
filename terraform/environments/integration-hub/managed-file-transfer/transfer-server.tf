@@ -33,10 +33,3 @@ resource "aws_transfer_server" "this" {
 
   depends_on = [aws_acm_certificate.ftps]
 }
-
-resource "aws_eip" "this" {
-  count  = 1
-  domain = "vpc"
-
-  depends_on = [aws_acm_certificate.ftps]
-}
