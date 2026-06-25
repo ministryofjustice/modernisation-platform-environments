@@ -22,13 +22,13 @@ resource "null_resource" "run_role_mappings" {
         exit 1
       fi
       session-manager-plugin --version || echo MISSING 
-      script -q /dev/null aws ecs execute-command \
+      aws ecs execute-command \
         --cluster "streaming-pov-ecs-cluster" \
         --task "$TASK_ARN" \
         --container "streaming-pov-ecs-sdg" \
         --interactive \
         --region "eu-west-2" \
-        --command "sh -c 'echo ${local.escaped_payloads[each.key]} > /tmp/rolemapping_payload.json'"
+        --command "sh -c 'echo ${local.escaped_payloads[each.key]} > /tmp/rolemapping_payload25.json'"
 
       sleep 10
 EOT
