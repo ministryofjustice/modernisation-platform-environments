@@ -98,7 +98,7 @@ locals {
   }
 
   malware-threat-notifier = {
-    function_zip_file = "lambda_code/malware-threat-notifier.zip"
+    function_zip_file = data.archive_file.malware_threat_notifier_placeholder.output_path
     function_name     = "malware-threat-notifier"
     handler           = "malware-threat-notifier.lambda_handler"
     iam_role_name     = "malware-threat-notifier-lambda-role"
