@@ -162,8 +162,20 @@ resource "aws_s3_bucket_replication_configuration" "s3_replication" {
     destination {
       bucket        = each.value.replication_destination
       storage_class = "STANDARD"
+      metrics {
+        status = "Enabled"
+        event_threshold {
+          minutes = 15
+        }
+      }
     }
   }
+}
+
+resource "aws_s3_bucket_notification" "s3_replication" {
+  for_each    = local.s3_replication_buckets
+  bucket      = aws_s3_bucket.s3_replication[each.key].id
+  eventbridge = true
 }
 
 resource "aws_s3_bucket_policy" "s3_replication" {
@@ -188,7 +200,7 @@ resource "aws_s3_bucket_policy" "s3_replication" {
       },
       {
         Effect = "Allow"
-        Action = ["s3:DeleteObject", "s3:GetObject", "s3:PutObject", "s3:ListBucket"]
+        Action = ["s3:GetBucketAcl", "s3:DeleteObject", "s3:GetObject", "s3:PutObject", "s3:ListBucket"]
         Resource = [
           aws_s3_bucket.s3_replication[each.key].arn,
           "${aws_s3_bucket.s3_replication[each.key].arn}/*"
