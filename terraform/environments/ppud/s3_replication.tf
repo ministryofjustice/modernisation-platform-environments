@@ -164,9 +164,6 @@ resource "aws_s3_bucket_replication_configuration" "s3_replication" {
       storage_class = "STANDARD"
       metrics {
         status = "Enabled"
-        event_threshold {
-          minutes = 15
-        }
       }
     }
   }
