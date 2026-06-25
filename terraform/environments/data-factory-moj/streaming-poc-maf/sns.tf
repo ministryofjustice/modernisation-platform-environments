@@ -45,7 +45,7 @@ resource "aws_sns_topic_subscription" "drone_incursion_alert_emails" {
   endpoint  = each.value
 }
 
-# TODO: uncomment when we have sender ID and are out of sandbox mode.
+# TODO: uncomment if a sender ID is created and sms is out of sandbox mode.
 # resource "aws_sns_topic_subscription" "drone_incursion_alert_sms" {
 #   for_each = contains(local.deploy_to, local.environment) ? toset(local.drone_incursion_alert_phone_numbers) : toset([])
 #
