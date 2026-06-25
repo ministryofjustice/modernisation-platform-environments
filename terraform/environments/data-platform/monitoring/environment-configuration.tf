@@ -26,25 +26,14 @@ locals {
       ]
 
       # CIDRs allowed to reach Grafana; joined into the ingress
-      # whitelist-source-range annotation (values.yml.tftpl). Kept in step with
-      # the llm-gateway ingress allowlist.
+      # whitelist-source-range annotation (values.yml.tftpl). Limited to the
+      # MoJ VPN and office sites.
       grafana_ingress_allowlist = [
         # VPN
         "128.77.75.64/26", # Prisma Corporate
         # Sites
         "213.121.161.112/28", # 102PF
         "51.149.2.0/24",      # 10SC
-        # Cloud Platform Live
-        "3.8.51.207/32",
-        "35.177.252.54/32",
-        "35.178.209.113/32",
-        # Modernisation Platform
-        "13.41.38.176/32",
-        "3.8.81.175/32",
-        "3.11.197.133/32",
-        "13.43.9.198/32",
-        "13.42.163.245/32",
-        "18.132.208.127/32",
       ]
     }
     test = {
@@ -72,25 +61,14 @@ locals {
       ]
 
       # CIDRs allowed to reach Grafana; joined into the ingress
-      # whitelist-source-range annotation (values.yml.tftpl). Kept in step with
-      # the llm-gateway ingress allowlist.
+      # whitelist-source-range annotation (values.yml.tftpl). Limited to the
+      # MoJ VPN and office sites.
       grafana_ingress_allowlist = [
         # VPN
         "128.77.75.64/26", # Prisma Corporate
         # Sites
         "213.121.161.112/28", # 102PF
         "51.149.2.0/24",      # 10SC
-        # Cloud Platform Live
-        "3.8.51.207/32",
-        "35.177.252.54/32",
-        "35.178.209.113/32",
-        # Modernisation Platform
-        "13.41.38.176/32",
-        "3.8.81.175/32",
-        "3.11.197.133/32",
-        "13.43.9.198/32",
-        "13.42.163.245/32",
-        "18.132.208.127/32",
       ]
     }
   }
