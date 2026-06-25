@@ -7,5 +7,5 @@ locals {
     local.application_data.accounts[local.environment].notification_configuration,
     {},
   )
-  vpc_configuration = try(local.application_data.accounts[local.environment].vpc_configuration, {}) 
+  vpc_configuration = try(local.application_data.accounts[local.environment].vpc_configuration, {})
 }

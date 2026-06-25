@@ -13,7 +13,7 @@ resource "aws_transfer_server" "this" {
 
   endpoint_details {
     vpc_id     = module.isolated_vpc.vpc_id
-    subnet_ids = slice(module.isolated_vpc.public_subnets, 0, 1)
+    subnet_ids = module.isolated_vpc.public_subnets
     address_allocation_ids = [
       for key, value in aws_eip.this : value.id
     ]
@@ -23,7 +23,7 @@ resource "aws_transfer_server" "this" {
   }
 
   protocol_details {
-    passive_ip = aws_eip.this[0].public_ip
+    passive_ip = "AUTO"
   }
 
   tags = {
