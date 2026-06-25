@@ -27,7 +27,7 @@ locals {
     "clean-file-presigned-url-notifier" = {
       alarm_name_prefix           = "${local.application_name}-clean-file-presigned-url-notifier"
       description                 = "Clean file presigned URL notifier Lambda"
-      function_name               = module.proof_of_concept_notification.lambda_function_name
+      function_name               = module.proof_of_concept_notification.lambda_clean_file_presigned_url_notifier.lambda_function_name
       duration_threshold_ms       = 2500
       duration_evaluation_periods = 2
     }
@@ -55,7 +55,7 @@ locals {
     "clean-file-notifications" = {
       alarm_name_prefix                    = "${local.application_name}-clean-file-notifications"
       description                          = "Clean file notification queue"
-      queue_name                           = module.proof_of_concept_notification.clean_file_notifications_queue_name
+      queue_name                           = module.proof_of_concept_notification.sqs_clean_file_notifications.queue_name
       oldest_message_threshold_seconds     = 900
       visible_messages_threshold           = 100
       visible_messages_evaluation_periods  = 3
@@ -77,7 +77,7 @@ locals {
     "clean-file-notifications-dlq" = {
       alarm_name_prefix = "${local.application_name}-clean-file-notifications-dlq"
       description       = "Clean file notification dead-letter queue"
-      queue_name        = module.proof_of_concept_notification.clean_file_notifications_dead_letter_queue_name
+      queue_name        = module.proof_of_concept_notification.sqs_clean_file_notifications.dead_letter_queue_name
     }
   }
 
@@ -118,7 +118,7 @@ locals {
       QUERY
     }
     "clean-file-notification-failures" = {
-      log_group_names = [module.proof_of_concept_notification.lambda_cloudwatch_log_group_name]
+      log_group_names = [module.proof_of_concept_notification.lambda_clean_file_presigned_url_notifier.lambda_cloudwatch_log_group_name]
       query_string    = <<-QUERY
         fields @timestamp, level, location, message, bucket_name, object_key, version_id
         | filter level = "ERROR"

@@ -85,18 +85,3 @@ module "sns_cloudwatch_alarms_low_priority" {
 
   tags = local.tags
 }
-
-module "chatbot_cloudwatch_alarms" {
-  count = try(local.notification_configuration.slack_channel_id, null) != null && try(local.notification_configuration.slack_team_id, null) != null ? 1 : 0
-
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=0ec33c7bfde5649af3c23d0834ea85c849edf3ac" # v3.0.0
-
-  application_name = "${local.application_name}-${local.component_name}-cloudwatch-alarms"
-  slack_channel_id = local.notification_configuration.slack_channel_id
-  slack_team_id    = local.notification_configuration.slack_team_id
-  sns_topic_arns = [
-    module.sns_cloudwatch_alarms_high_priority.topic_arn,
-    module.sns_cloudwatch_alarms_low_priority.topic_arn,
-  ]
-  tags = local.tags
-}
