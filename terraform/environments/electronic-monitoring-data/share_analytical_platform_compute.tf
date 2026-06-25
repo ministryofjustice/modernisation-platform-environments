@@ -29,6 +29,9 @@ locals {
     "acquisitive_crime",
     "data_insights",
   ]
+  seed_dbs = [
+    "acquisitive_crime_test_cases"
+  ]
   live_feeds_dbs = [
     "allied_mdss",
     "serco_fms",
@@ -75,6 +78,7 @@ locals {
     "g4s_xdrive_unstructured"
   ] : []
 
+
   prod_dbs_to_grant = [
     "am_stg",
     "buddi_stg",
@@ -114,10 +118,11 @@ locals {
   ]
 
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
+  test_dbs_to_grant      = local.is-test || local.is-development ? [for db in local.seed_dbs : "${db}${local.dbt_suffix}"] : []
   prod_dbt_dbs_to_grant  = flatten([[for db in local.prod_dbs_to_grant : "${db}${local.dbt_suffix}"], local.dev_dbs_to_grant])
   dbt_dbs_to_grant       = [for db in local.dbt_dbs : "${db}${local.dbt_suffix}"]
   live_feed_dbs_to_grant = [for db in local.live_feeds_dbs : "${db}${local.db_suffix}"]
-  dbs_to_grant           = toset(flatten([local.prod_dbt_dbs_to_grant, local.dbt_dbs_to_grant]))
+  dbs_to_grant           = toset(flatten([local.prod_dbt_dbs_to_grant, local.dbt_dbs_to_grant, local.test_dbs_to_grant]))
 
 
   existing_dbs_to_grant = toset(flatten([local.live_feed_dbs_to_grant, local.historic_source_dbs]))

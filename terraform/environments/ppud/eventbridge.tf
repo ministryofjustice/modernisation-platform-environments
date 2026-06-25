@@ -151,6 +151,39 @@ resource "aws_lambda_permission" "allow_eventbridge_ssm_patch_completion" {
   source_arn    = aws_cloudwatch_event_rule.ssm_patch_completion[each.key].arn
 }
 
+######################################################
+# EventBridge Rule for S3 Replication Failures
+######################################################
+
+resource "aws_cloudwatch_event_rule" "s3_replication_failure" {
+  name          = "s3-replication-failure"
+  description   = "Capture S3 replication failure events"
+  event_pattern = <<EOF
+{
+  "source": ["aws.s3"],
+  "detail-type": ["Object Replication Failed"]
+}
+EOF
+}
+
+resource "aws_cloudwatch_event_target" "s3_replication_failure" {
+  rule = aws_cloudwatch_event_rule.s3_replication_failure.name
+  arn  = aws_cloudwatch_log_group.s3_replication_failure.arn
+}
+
+resource "aws_cloudwatch_log_resource_policy" "s3_replication_failure" {
+  policy_name = "s3-replication-failure-eventbridge-policy"
+  policy_document = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "events.amazonaws.com" }
+      Action    = ["logs:CreateLogStream", "logs:PutLogEvents"]
+      Resource  = "${aws_cloudwatch_log_group.s3_replication_failure.arn}:*"
+    }]
+  })
+}
+
 #################################
 # EventBridge Scheduler Schedules 
 #################################

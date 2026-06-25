@@ -33,6 +33,14 @@ resource "aws_apigatewayv2_integration" "upload_ticket" {
   payload_format_version = "2.0"
 }
 
+resource "aws_apigatewayv2_integration" "api_docs" {
+  api_id                 = aws_apigatewayv2_api.upload_ticket.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = module.lambda_api_docs.lambda_function_invoke_arn
+  integration_method     = "POST"
+  payload_format_version = "2.0"
+}
+
 resource "aws_apigatewayv2_authorizer" "mft_request" {
   api_id                            = aws_apigatewayv2_api.upload_ticket.id
   authorizer_type                   = "REQUEST"
@@ -75,6 +83,18 @@ resource "aws_apigatewayv2_route" "transfer_ticket_abort" {
   authorizer_id      = aws_apigatewayv2_authorizer.mft_request.id
 }
 
+resource "aws_apigatewayv2_route" "api_docs" {
+  api_id    = aws_apigatewayv2_api.upload_ticket.id
+  route_key = "GET /docs"
+  target    = "integrations/${aws_apigatewayv2_integration.api_docs.id}"
+}
+
+resource "aws_apigatewayv2_route" "api_openapi_contract" {
+  api_id    = aws_apigatewayv2_api.upload_ticket.id
+  route_key = "GET /openapi.yaml"
+  target    = "integrations/${aws_apigatewayv2_integration.api_docs.id}"
+}
+
 resource "aws_apigatewayv2_stage" "default" {
   api_id      = aws_apigatewayv2_api.upload_ticket.id
   name        = "$default"
@@ -111,4 +131,12 @@ resource "aws_lambda_permission" "allow_api_gateway_authorizer" {
   function_name = module.lambda_api_authorizer.lambda_function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.upload_ticket.execution_arn}/authorizers/${aws_apigatewayv2_authorizer.mft_request.id}"
+}
+
+resource "aws_lambda_permission" "allow_api_gateway_api_docs" {
+  statement_id  = "AllowExecutionFromApiGatewayApiDocs"
+  action        = "lambda:InvokeFunction"
+  function_name = module.lambda_api_docs.lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.upload_ticket.execution_arn}/*/*"
 }
