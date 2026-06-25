@@ -155,7 +155,9 @@ resource "aws_s3_bucket_replication_configuration" "s3_replication" {
   rule {
     id     = each.value.replication_rule_id
     status = "Enabled"
-    filter {}
+    filter {
+      prefix = ""
+    }
     delete_marker_replication {
       status = "Disabled"
     }
