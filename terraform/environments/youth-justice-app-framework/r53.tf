@@ -19,16 +19,6 @@ resource "aws_route53_record" "dbdns-ro" {
   records = [module.aurora.rds_cluster_reader_endpoint]
 }
 
-resource "aws_route53_record" "dbdns-proxy" {
-  provider = aws.core-network-services
-
-  zone_id = data.aws_route53_zone.yjaf-inner.id
-  name    = "db-yjafrds01-proxy"
-  type    = "CNAME"
-  ttl     = 300
-  records = [module.aurora.rds_proxy_endpoint]
-}
-
 resource "aws_route53_record" "redshift" {
   provider = aws.core-network-services
 
