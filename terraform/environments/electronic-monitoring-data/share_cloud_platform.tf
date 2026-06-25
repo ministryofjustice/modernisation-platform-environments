@@ -78,8 +78,16 @@ locals {
     ] : local.is-preproduction ? [
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-api-iam-preprod}",
   ] : []
-  iam_role_validation_db = local.is-test ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live" : local.is-production ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-a7f6cc937a0f63ce-live" : ""
-  iam_role_ear_sar_db    = local.is-preproduction ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live" : ""
+  iam_role_validation_db = local.is-test ? [
+    "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live",
+    "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-21220dacf93f9ac4-live",
+    ] : local.is-production ? [
+    "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-a7f6cc937a0f63ce-live",
+  ] : []
+  iam_role_data_api = local.is-test ? [
+    "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-21220dacf93f9ac4-live",
+  ] : []
+  iam_role_ear_sar_db = local.is-preproduction ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live" : ""
   emdi_cp_roles = local.is-development || local.is-test ? [
     var.cloud-platform-emdi-iam-dev
     ] : local.is-preproduction ? [var.cloud-platform-emdi-iam-preprod] : [
@@ -192,6 +200,85 @@ module "emd_validation_db_role" {
   tags = local.tags
 }
 
+module "emd_data_api_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  count   = local.is-test ? 1 : 0
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.48.0"
+
+  trusted_role_arns = flatten([
+    data.aws_iam_roles.mod_plat_roles.arns,
+    local.iam_role_data_api,
+  ])
+
+  create_role       = true
+  role_requires_mfa = false
+
+  role_name = "emd_data_api_read_data_${local.environment_shorthand}"
+
+  tags = local.tags
+}
+
+module "emd_update_p1_cp_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  count   = local.is-preproduction || local.is-production ? 1 : 0
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.48.0"
+
+  trusted_role_arns = flatten([
+    data.aws_iam_roles.mod_plat_roles.arns,
+    local.iam_role_ear_sar_db,
+  ])
+
+  create_role       = true
+  role_requires_mfa = false
+
+  role_name = "emd_update_p1_${local.environment_shorthand}"
+
+  tags = local.tags
+}
+
+
+data "aws_iam_policy_document" "em_dashboard_update_p1_permissions" {
+  count = local.is-preproduction ? 1 : 0
+  statement {
+    sid       = "AllowAccessToTriggerUpdateP1API"
+    effect    = "Allow"
+    actions   = ["execute-api:Invoke"]
+    resources = ["arn:aws:execute-api:${data.aws_region.current.name}:${local.env_account_id}:${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*"]
+  }
+  statement {
+    sid       = "ListAccountAliasForEnvironmentClass"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "ListAllBucketsForEnvironmentClass"
+    effect = "Allow"
+    actions = [
+      "s3:ListAllMyBuckets",
+      "s3:GetBucketLocation"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "em_dashboard_update_p1_permissions" {
+  count       = local.is-preproduction ? 1 : 0
+  name_prefix = "em_dashboard_update_p1_permissions"
+  description = "Permissions for updating p1 export."
+  policy      = data.aws_iam_policy_document.em_dashboard_update_p1_permissions[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "em_dashboard_update_p1_permissions" {
+  count      = local.is-preproduction ? 1 : 0
+  policy_arn = aws_iam_policy.em_dashboard_update_p1_permissions[0].arn
+  role       = module.emd_update_p1_cp_role[0].iam_role_name
+}
+
 resource "aws_lakeformation_permissions" "em_data_validation_db" {
   count       = local.is-test || local.is-production ? 1 : 0
   principal   = module.emd_validation_db_role[0].iam_role_arn
@@ -219,6 +306,7 @@ resource "aws_lakeformation_permissions" "em_data_validation_s3" {
     arn = module.s3-create-a-derived-table-bucket.bucket.arn
   }
 }
+
 
 resource "aws_iam_role_policy_attachment" "standard_athena_access_em_data_validation" {
   count      = local.is-test || local.is-production ? 1 : 0
@@ -270,9 +358,68 @@ data "aws_iam_policy_document" "em_data_validation_permissions" {
     actions = [
       "glue:GetTables",
       "glue:GetTable",
+      "glue:GetPartition",
+      "glue:GetPartitions",
     ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/validation${local.dbt_suffix}/*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "em_data_api_permissions" {
+  statement {
+    sid       = "ListAccountAliasForEnvironmentClass"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "ListAllBucketsForEnvironmentClass"
+    effect = "Allow"
+    actions = [
+      "s3:ListAllMyBuckets",
+      "s3:GetBucketLocation"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabases",
+      "glue:GetDatabase",
+      "glue:GetTables",
+      "glue:GetTable",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabase",
+      "glue:GetTables",
+      "glue:GetTable",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/datamart${local.dbt_suffix}",
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetTables",
+      "glue:GetTable",
+      "glue:GetPartition",
+      "glue:GetPartitions",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/datamart${local.dbt_suffix}/order_dim",
     ]
   }
 }
@@ -326,6 +473,25 @@ resource "aws_iam_role_policy_attachment" "em_data_validation_permissions" {
   count      = local.is-test || local.is-production ? 1 : 0
   policy_arn = aws_iam_policy.em_data_validation_permissions[0].arn
   role       = module.emd_validation_db_role[0].iam_role_name
+}
+
+resource "aws_iam_policy" "em_data_api_permissions" {
+  count       = local.is-test ? 1 : 0
+  name_prefix = "em_data_api_permissions"
+  description = "Permissions for the Electronic Monitoring Data API."
+  policy      = data.aws_iam_policy_document.em_data_api_permissions.json
+}
+
+resource "aws_iam_role_policy_attachment" "standard_athena_access_em_data_api" {
+  count      = local.is-test ? 1 : 0
+  policy_arn = aws_iam_policy.standard_athena_access.arn
+  role       = module.emd_data_api_role[0].iam_role_name
+}
+
+resource "aws_iam_role_policy_attachment" "em_data_api_permissions" {
+  count      = local.is-test ? 1 : 0
+  policy_arn = aws_iam_policy.em_data_api_permissions[0].arn
+  role       = module.emd_data_api_role[0].iam_role_name
 }
 
 
@@ -475,35 +641,35 @@ module "specials_cmt_front_end_assumable_role" {
   tags = local.tags
 }
 
-module "share_data_marts" {
-  source = "./modules/lakeformation_w_data_filter"
+# module "share_data_marts" {
+#   source = "./modules/lakeformation_w_data_filter"
 
-  count         = local.is-development ? 0 : local.is-preproduction ? 0 : 1
-  table_filters = local.table_filters
-  database_name = "historic_api_mart"
-  extra_arns = [
-    try(one(data.aws_iam_roles.mod_plat_roles.arns)),
-    data.aws_iam_role.github_actions_role.arn,
-    data.aws_iam_session_context.current.issuer_arn
-  ]
-  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  role_arn                = module.cmt_front_end_assumable_role.iam_role_arn
-}
+#   count         = local.is-development ? 0 : local.is-preproduction ? 0 : 1
+#   table_filters = local.table_filters
+#   database_name = "historic_api_mart"
+#   extra_arns = [
+#     try(one(data.aws_iam_roles.mod_plat_roles.arns)),
+#     data.aws_iam_role.github_actions_role.arn,
+#     data.aws_iam_session_context.current.issuer_arn
+#   ]
+#   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+#   role_arn                = module.cmt_front_end_assumable_role.iam_role_arn
+# }
 
-module "share_specials_data_marts" {
-  source = "./modules/lakeformation_w_data_filter"
+# module "share_specials_data_marts" {
+#   source = "./modules/lakeformation_w_data_filter"
 
-  count         = local.is-development ? 0 : local.is-preproduction ? 0 : 1
-  table_filters = local.specials_table_filters
-  database_name = "historic_api_mart"
-  extra_arns = [
-    try(one(data.aws_iam_roles.mod_plat_roles.arns)),
-    data.aws_iam_role.github_actions_role.arn,
-    data.aws_iam_session_context.current.issuer_arn
-  ]
-  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  role_arn                = module.specials_cmt_front_end_assumable_role.iam_role_arn
-}
+#   count         = local.is-development ? 0 : local.is-preproduction ? 0 : 1
+#   table_filters = local.specials_table_filters
+#   database_name = "historic_api_mart"
+#   extra_arns = [
+#     try(one(data.aws_iam_roles.mod_plat_roles.arns)),
+#     data.aws_iam_role.github_actions_role.arn,
+#     data.aws_iam_session_context.current.issuer_arn
+#   ]
+#   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+#   role_arn                = module.specials_cmt_front_end_assumable_role.iam_role_arn
+# }
 
 resource "aws_lakeformation_permissions" "ac_allied_db" {
   count       = local.is-development ? 1 : 0

@@ -68,6 +68,10 @@
         "pr-assessment-view": {
           "share_with_cloud_platform": true,
           "create_glue_connection": true
+        },
+        "pr-assess-view": {
+          "share_with_cloud_platform": true,
+          "create_glue_connection": true
         }
       },
       "dps_domains": [
@@ -95,7 +99,8 @@
         "dps-san",
         "dps-cvl",
         "dps-adjudications",
-        "dps-acc-pro-custody"
+        "dps-acc-pro-custody",
+        "dps-manage-offences"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -302,6 +307,10 @@
         "pr-assessment-view": {
           "share_with_cloud_platform": true,
           "create_glue_connection": true
+        },
+        "pr-assess-view": {
+          "share_with_cloud_platform": true,
+          "create_glue_connection": true
         }
       },
       "dps_domains": [
@@ -327,7 +336,8 @@
         "dps-san",
         "dps-cvl",
         "dps-adjudications",
-        "dps-acc-pro-custody"
+        "dps-acc-pro-custody",
+        "dps-manage-offences"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -516,7 +526,11 @@
       "probation_domains": {
         "pr-assessment-view": {
           "share_with_cloud_platform": true,
-          "create_glue_connection": false
+          "create_glue_connection": true
+        },
+        "pr-assess-view": {
+          "share_with_cloud_platform": true,
+          "create_glue_connection": true
         }
       },
       "dps_domains": [
@@ -542,7 +556,8 @@
         "dps-san",
         "dps-cvl",
         "dps-adjudications",
-        "dps-acc-pro-custody"
+        "dps-acc-pro-custody",
+        "dps-manage-offences"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -745,6 +760,10 @@
         "pr-assessment-view": {
           "share_with_cloud_platform": true,
           "create_glue_connection": false
+        },
+        "pr-assess-view": {
+          "share_with_cloud_platform": true,
+          "create_glue_connection": true
         }
       },
       "dps_domains": [

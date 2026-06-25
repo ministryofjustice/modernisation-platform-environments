@@ -1,6 +1,6 @@
 module "sqs_unscanned_s3_notifications" {
   source  = "terraform-aws-modules/sqs/aws"
-  version = "5.2.1"
+  version = "5.2.2"
 
   name            = "${local.application_name}-unscanned-s3-notifications"
   use_name_prefix = false
@@ -50,7 +50,7 @@ module "sqs_unscanned_s3_notifications" {
 
 module "sqs_guard_duty_malware_protection_for_s3_events" {
   source  = "terraform-aws-modules/sqs/aws"
-  version = "5.2.1"
+  version = "5.2.2"
 
   name            = "${local.application_name}-guard-duty-malware-protection-for-s3-events"
   use_name_prefix = false

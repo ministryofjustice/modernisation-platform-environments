@@ -79,7 +79,7 @@ data "aws_iam_policy_document" "transfer_user_session" {
 
 module "transfer_user_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name        = "${local.application_name}-transfer-user-policy"
   description = "AWS Transfer User policy"
@@ -92,7 +92,7 @@ module "transfer_user_policy" {
 
 module "transfer_user_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name            = "${local.application_name}-transfer-user"
   description     = "AWS Transfer User role"
@@ -112,26 +112,4 @@ module "transfer_user_role" {
   policies = {
     transfer_user_policy = module.transfer_user_policy.arn
   }
-}
-
-# POC user based on my GitHub username
-resource "aws_transfer_user" "this" {
-  for_each            = toset(["dms1981"])
-  role                = module.transfer_user_role.arn
-  server_id           = aws_transfer_server.this.id
-  user_name           = "dms1981"
-  home_directory_type = "LOGICAL"
-  home_directory      = "/"
-  home_directory_mappings {
-    entry  = "/"
-    target = "/${module.s3_bucket["unscanned"].s3_bucket_id}/${each.key}"
-  }
-  policy = data.aws_iam_policy_document.transfer_user_session.json
-}
-
-resource "aws_transfer_ssh_key" "this" {
-  for_each  = toset(["dms1981"])
-  body      = data.aws_secretsmanager_secret_version.secrets_transfer_user_ssh.secret_string
-  server_id = aws_transfer_server.this.id
-  user_name = aws_transfer_user.this[each.key].user_name
 }

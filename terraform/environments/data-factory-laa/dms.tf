@@ -341,7 +341,12 @@ module "dms_oracle" {
 
 data "aws_secretsmanager_secret" "dms_postgres_credentials" {
   count = local.is-development ? 1 : 0
-  name  = "laa-df-dev/postgres-dms-test/dms-user"
+  name  = "postgres-dms-example/dms-user"
+}
+
+data "aws_kms_alias" "dms_postgres_example" {
+  count = local.is-development ? 1 : 0
+  name  = "alias/postgres-dms-example"
 }
 
 data "aws_iam_policy_document" "postgres_dms_kms" {
@@ -367,6 +372,29 @@ data "aws_iam_policy_document" "postgres_dms_kms" {
     principals {
       type        = "Service"
       identifiers = ["s3.amazonaws.com"]
+    }
+
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt",
+    ]
+
+    resources = ["*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+
+  statement {
+    sid    = "AllowEventBridgeToPublishEncryptedSns"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
     }
 
     actions = [
@@ -474,7 +502,7 @@ module "dms_postgres" {
   # checkov:skip=CKV_TF_1: using branch ref for testing
   # checkov:skip=CKV_TF_2: using branch ref for testing
   count  = local.is-development ? 1 : 0
-  source = "github.com/ministryofjustice/terraform-dms-module?ref=66044c08910546d1d93821811e4e7d69136dbf36"
+  source = "github.com/ministryofjustice/terraform-dms-module?ref=54b49927f5b3eaee6610209528bda186b0201c7d"
 
   vpc_id      = data.aws_vpc.shared.id
   environment = local.environment
@@ -503,7 +531,7 @@ module "dms_postgres" {
   dms_source = {
     engine_name             = "postgres"
     secrets_manager_arn     = data.aws_secretsmanager_secret.dms_postgres_credentials[0].arn
-    secrets_manager_kms_arn = aws_kms_key.postgres_dms[0].arn
+    secrets_manager_kms_arn = data.aws_kms_alias.dms_postgres_example[0].target_key_arn
     database_name           = "dmstest"
     # Postgres extra_connection_attributes:
     #   PluginName=test_decoding — built-in logical decoding plugin on RDS;

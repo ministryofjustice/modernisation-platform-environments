@@ -151,6 +151,39 @@ resource "aws_lambda_permission" "allow_eventbridge_ssm_patch_completion" {
   source_arn    = aws_cloudwatch_event_rule.ssm_patch_completion[each.key].arn
 }
 
+######################################################
+# EventBridge Rule for S3 Replication Failures
+######################################################
+
+resource "aws_cloudwatch_event_rule" "s3_replication_failure" {
+  name          = "s3-replication-failure"
+  description   = "Capture S3 replication failure events"
+  event_pattern = <<EOF
+{
+  "source": ["aws.s3"],
+  "detail-type": ["Object Replication Failed"]
+}
+EOF
+}
+
+resource "aws_cloudwatch_event_target" "s3_replication_failure" {
+  rule = aws_cloudwatch_event_rule.s3_replication_failure.name
+  arn  = aws_cloudwatch_log_group.s3_replication_failure.arn
+}
+
+resource "aws_cloudwatch_log_resource_policy" "s3_replication_failure" {
+  policy_name = "s3-replication-failure-eventbridge-policy"
+  policy_document = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "events.amazonaws.com" }
+      Action    = ["logs:CreateLogStream", "logs:PutLogEvents"]
+      Resource  = "${aws_cloudwatch_log_group.s3_replication_failure.arn}:*"
+    }]
+  })
+}
+
 #################################
 # EventBridge Scheduler Schedules 
 #################################
@@ -246,6 +279,12 @@ locals {
       environments = ["development", "preproduction"]
       schedule     = "cron(15 7 ? * MON *)"
       description  = "Trigger Lambda at 07:15 each Monday"
+      timezone     = "Europe/London"
+    }
+    wam_waf_analysis_monthly = {
+      environments = ["development"]
+      schedule     = "cron(0 2 1 * ? *)"
+      description  = "Trigger Lambda at 07:00 on the 1st day of every month"
       timezone     = "Europe/London"
     }
     suppress_securityhub_findings = {
@@ -382,6 +421,7 @@ locals {
     #    local.is-production ? aws_lambda_function.lambda_functions["wam_waf_analysis_production"].arn : null
     #))
     # check_elb_trt_alarm            = local.is-production ? aws_lambda_function.lambda_functions["check_elb_trt_alarm_production"].arn : null
+    wam_waf_analysis_monthly       = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_monthly_development"].arn : null
     send_cpu_graph                 = local.is-production ? aws_lambda_function.lambda_functions["send_cpu_graph_production"].arn : null
     disable_cpu_alarms             = local.is-production ? aws_lambda_function.lambda_functions["disable_cpu_alarm_production"].arn : null
     enable_cpu_alarms              = local.is-production ? aws_lambda_function.lambda_functions["enable_cpu_alarm_production"].arn : null

@@ -104,6 +104,16 @@ locals {
         source_arn_suffix = "*"
       }]
     }
+    wam_waf_analysis_monthly = {
+      description  = "Function to analyse WAM WAF ACL traffic and email a monthly report."
+      role_key     = "get_cloudwatch"
+      environments = ["development"]
+      layers       = ["numpy", "pillow", "requests", "matplotlib"]
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
     securityhub_critical_report = {
       description  = "Function to email a summary of critical CVEs found in AWS Security Hub."
       role_key     = "get_securityhub_data"
@@ -315,6 +325,15 @@ locals {
         principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
       }]
+    }
+    file_server_analysis = {
+      description  = "Function to analyse metadata from the PPUD file server and generate a report."
+      timeout      = 900
+      memory_size  = 1024
+      role_key     = "file_server_analysis"
+      environments = ["development"]
+      layers       = ["numpy", "pillow", "matplotlib"]
+      permissions  = []
     }
     rotate_ses_access_key = {
       description  = "Function to rotate ses access key, secret key and derive new smtp password."

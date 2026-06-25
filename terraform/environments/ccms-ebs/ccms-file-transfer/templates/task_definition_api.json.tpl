@@ -22,6 +22,14 @@
       {
         "name": "CCMS_S3_BUCKET",
         "value": "${ccms_s3_bucket}"
+      },
+      {
+        "name": "LOGGING_LEVEL_ROOT",
+        "value": "${logging_level_root}"
+      },
+      {
+        "name": "LOGGING_LEVEL_UK_GOV_LAA_CCMS",
+        "value": "${logging_level_uk_gov_laa_ccms}"
       }
     ],
     "secrets": [
@@ -56,6 +64,10 @@
       {
         "name": "UNPROTECTED_URIS",
         "valueFrom": "${UNPROTECTED_URIS}"
+      },
+      {
+        "name": "TLS_KEYSTORE_PASSWORD",
+        "valueFrom": "${TLS_KEYSTORE_PASSWORD}"
       }
     ]
   }

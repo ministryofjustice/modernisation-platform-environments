@@ -1,17 +1,35 @@
 #### This file can be used to store locals specific to the member account ####
 locals {
-  logging_bucket_name            = "${local.application_name}-${local.environment}-logging"
-  rsync_bucket_name              = "${local.application_name}-${local.environment}-dbbackup"
-  lb_log_prefix_ebsapp           = "ebsapps-lb"
-  lb_log_prefix_wgate            = "wgate-lb"
-  lb_log_prefix_wgate_public     = "wgate-lb-public"
-  lb_log_prefix_ebsapp_internal  = "ebsapps-internal-lb"
-  lb_log_prefix_webgate_internal = "webgate-internal-lb"
-  lb_log_prefix_ssogen_internal  = "ssogen-internal-lb"
+  logging_bucket_name                   = "${local.application_name}-${local.environment}-logging"
+  rsync_bucket_name                     = "${local.application_name}-${local.environment}-dbbackup"
+  lb_log_prefix_ebsapp                  = "ebsapps-lb"
+  lb_log_prefix_wgate                   = "wgate-lb"
+  lb_log_prefix_wgate_public            = "wgate-lb-public"
+  lb_log_prefix_ebsapp_internal         = "ebsapps-internal-lb"
+  lb_log_prefix_webgate_internal        = "webgate-internal-lb"
+  lb_log_prefix_ssogen_internal         = "ssogen-internal-lb"
+  lb_log_prefix_ssogen_internal_console = "ssogen-console-internal-lb"
+  application_name_ssogen               = "ssogen"
 
-  volume_prefix = local.environment == "production" ? "/CCMS/EBSPROD" : "/CCMS/EBS"
 
-  sftp_enabled       = contains(["development", "test"], local.environment)
+  disksmount = [
+    "/dev/nvme1n1:/u01/product/fmw",
+    "/dev/nvme2n1:/u01/product/runtime/Domain/mserver",
+    "/dev/nvme3n1:/tmp"
+  ]
+
+  disksmount_joined = join(",", local.disksmount)
+
+  efs_mount_points = [
+    "stage:/stage",
+    "aserver:/u01/shared/product/runtime/Domain/aserver"
+  ]
+
+  efs_mount_points_joined = join(",", local.efs_mount_points)
+  volume_prefix           = local.environment == "production" ? "/CCMS/EBSPROD" : "/CCMS/EBS"
+
+  sftp_enabled       = contains(["development", "test", "preproduction", "production"], local.environment)
+  ssogen_enabled     = contains(["development", "test"], local.environment)
   lambda_folder_name = ["lambda_delivery", "ftp_lambda_layer", "payment_lambda_layer", "cloudwatch_sns_layer", "payment_load_monitor_layer"]
 
   lambda_source_hashes_cloudwatch_alarm_slack_integration = [
@@ -22,6 +40,12 @@ locals {
   lambda_source_hashes_payment_load_monitor = [
     for f in fileset("./lambda/payment_load_monitor", "**") :
     sha256(file("${path.module}/lambda/payment_load_monitor/${f}"))
+  ]
+
+  private_subnets_cidr_blocks = [
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block
   ]
 
   data_subnets = [

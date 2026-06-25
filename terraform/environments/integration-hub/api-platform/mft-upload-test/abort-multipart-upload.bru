@@ -1,0 +1,15 @@
+meta {
+  name: Abort Multipart Upload
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{api_endpoint}}/transfer-tickets/{{transfer_ticket}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{bearer_token}}
+}
