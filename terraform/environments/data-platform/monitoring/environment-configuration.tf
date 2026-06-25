@@ -40,7 +40,7 @@ locals {
       # Let the grafana provider manage dashboards as code (grafana-dashboards.tf).
       # Keep false until a valid service-account token is stored in the
       # monitoring/grafana-api-token secret; flip to true to start managing them.
-      grafana_dashboards_enabled = false
+      grafana_dashboards_enabled = true
 
       grafana_monitored_accounts = [
         { name = "data-platform-production", prometheus_workspace_id = "ws-d3a32572-9e85-49f9-8654-bffcf5877783a2" },
