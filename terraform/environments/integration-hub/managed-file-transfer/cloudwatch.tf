@@ -90,8 +90,17 @@ locals {
     "transfer-authentication-failures" = {
       log_group_names = [module.cloudwatch_transfer.cloudwatch_log_group_name]
       query_string    = <<-QUERY
-        fields @timestamp, userName, protocol, sourceIp, status, errorCode, message
-        | filter status = "FAILED" or @message like /auth|Auth|AUTH|denied|Denied|DENIED|failure|Failure|FAILURE/
+        fields @timestamp, `activity-type`, user, method, `source-ip`, message, `session-id`
+        | filter `activity-type` = "AUTH_FAILURE"
+        | sort @timestamp desc
+        | limit 100
+      QUERY
+    }
+    "custom-idp-authentication-failures" = {
+      log_group_names = [module.lambda_custom_idp.lambda_cloudwatch_log_group_name]
+      query_string    = <<-QUERY
+        fields @timestamp, @message
+        | filter @message like /Authentication failed:|Unexpected custom IdP error/
         | sort @timestamp desc
         | limit 100
       QUERY
@@ -103,7 +112,7 @@ locals {
       ]
       query_string = <<-QUERY
         fields @timestamp, level, location, message, object_key, source_bucket_name, destination_bucket_name, scan_result_status
-        | filter level = "ERROR" or @message like /ERROR|Error|Exception|Traceback|Idempotency/
+        | filter level = "ERROR"
         | sort @timestamp desc
         | limit 100
       QUERY
@@ -111,8 +120,8 @@ locals {
     "clean-file-notification-failures" = {
       log_group_names = [module.proof_of_concept_notification.lambda_cloudwatch_log_group_name]
       query_string    = <<-QUERY
-        fields @timestamp, level, location, message, object_key
-        | filter level = "ERROR" or @message like /ERROR|Error|Exception|Traceback|Idempotency/
+        fields @timestamp, level, location, message, bucket_name, object_key, version_id
+        | filter level = "ERROR"
         | sort @timestamp desc
         | limit 100
       QUERY
