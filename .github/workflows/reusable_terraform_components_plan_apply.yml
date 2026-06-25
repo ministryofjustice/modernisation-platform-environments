@@ -344,8 +344,15 @@
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
               terraform --version
-              echo "terraform init"
-              terraform init
+              if [[ "${{ inputs.component }}" == "state-kms-backend-canary" ]]; then
+                kms_key_id="arn:aws:kms:eu-west-2:946070829339:key/mrk-886857b0d52a4c308722d53f112f7c60"
+                echo "TF_VAR_canary_run_id=${{ github.run_id }}-${{ github.run_attempt }}" >> $GITHUB_ENV
+                echo "terraform init with state bucket KMS backend config"
+                terraform init -backend-config="kms_key_id=${kms_key_id}"
+              else
+                echo "terraform init"
+                terraform init
+              fi
 
           - name: Terraform Workspace Select
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
