@@ -286,9 +286,26 @@ module "dms_oracle" {
     sid                     = "DMSTEST"
     # Oracle extra_connection_attributes:
     #   addSupplementalLogging=N - supplemental logging is managed on the RDS instance
-    #   useBfile=Y              - use BFILE for reading LOBs (faster than API)
-    #   useLogminerReader=N     - use Binary Reader rather than LogMiner for CDC
-    extra_connection_attributes = "addSupplementalLogging=N;useBfile=Y;useLogminerReader=N;"
+    #   useLogminerReader=Y      - use LogMiner, which reads redo through the DB
+    #                              engine (SQL/PLSQL). REQUIRED for Amazon RDS Oracle.
+    #   useBfile=N               - explicitly disable Binary Reader / BFILE access.
+    #
+    # Why NOT Binary Reader (useBfile=Y;useLogminerReader=N) on RDS:
+    #   Binary Reader opens the redo log FILES directly off disk via Oracle BFILE
+    #   directory objects. RDS Oracle gives no filesystem access, so DMS cannot open
+    #   /rdsdbdata/db/.../onlinelog/*.log and CDC fails with
+    #   "file ... cannot be opened (errno 2)". LogMiner is the AWS-recommended mode.
+    #
+    # Operational notes (this ECA alone is necessary but not sufficient):
+    #   1. Changing this on an EXISTING endpoint is a ModifyEndpoint and may not flip
+    #      the structured reader mode - the source endpoint AND the CDC task must be
+    #      recreated once for LogMiner to take effect (DMS bakes reader mode in at
+    #      task-create time).
+    #   2. dms_user needs LogMiner grants in the database: EXECUTE on DBMS_LOGMNR,
+    #      SELECT on the V_$LOGMNR_*/V_$LOG views, LOGMINING, and
+    #      SELECT ANY TRANSACTION / SELECT ANY DICTIONARY (see the Oracle DB setup
+    #      runbook). Without them CDC fails with ORA-00942.
+    extra_connection_attributes = "addSupplementalLogging=N;useLogminerReader=Y;useBfile=N;"
   }
 
   replication_task_id = {
