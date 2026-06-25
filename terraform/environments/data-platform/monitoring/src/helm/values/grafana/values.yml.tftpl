@@ -158,8 +158,8 @@ datasources:
 %{ endif ~}
 %{ endfor ~}
 
-# Dashboards are provisioned as code from helm-release.tf (the JSON files in
-# src/helm/dashboards/, where each subdirectory maps to a Grafana folder). Their
-# panels pick one of the CloudWatch data sources above through an "Account" data
-# source template variable, so a single dashboard works across every monitored
-# account.
+# Dashboards are managed as code by the Terraform grafana provider (see
+# grafana-dashboards.tf and the JSON files in src/helm/dashboards/, where each
+# subdirectory maps to a Grafana folder), not by this chart. Their panels pick
+# one of the CloudWatch data sources above through an "Account" data source
+# template variable, so a single dashboard works across every monitored account.

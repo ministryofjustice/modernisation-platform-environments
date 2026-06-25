@@ -37,21 +37,6 @@ resource "helm_release" "grafana" {
           tenant_id      = local.grafana_entra_id.tenant_id
         }))
       }
-    }),
-    # Provision dashboards as code, organised into Grafana folders. Each
-    # subdirectory of src/helm/dashboards/ becomes a folder (see the
-    # grafana_dashboard_* locals); a dashboard switches account at the top via
-    # its "Account" data source variable, reusing the per-account CloudWatch data
-    # sources from values.yml.tftpl. The chart restarts the pods automatically
-    # when a dashboard's contents change.
-    yamlencode({
-      dashboardProviders = {
-        "dashboardproviders.yaml" = {
-          apiVersion = 1
-          providers  = local.grafana_dashboard_providers
-        }
-      }
-      dashboards = local.grafana_dashboards
     })
   ]
 

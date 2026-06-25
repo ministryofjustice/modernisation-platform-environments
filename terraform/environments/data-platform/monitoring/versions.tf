@@ -12,6 +12,10 @@ terraform {
       version = "~> 2.0"
       source  = "hashicorp/external"
     }
+    grafana = {
+      version = "~> 4.0"
+      source  = "grafana/grafana"
+    }
     http = {
       version = "~> 3.0"
       source  = "hashicorp/http"

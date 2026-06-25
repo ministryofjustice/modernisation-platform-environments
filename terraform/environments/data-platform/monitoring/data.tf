@@ -23,3 +23,12 @@ data "aws_secretsmanager_secret_version" "grafana_entra_id" {
 
   secret_id = module.grafana_entra_id_secret[0].secret_id
 }
+
+# Grafana service-account token used by the Terraform grafana provider. The secret
+# is created with a placeholder value in secrets.tf and populated out-of-band, so
+# it is read back here to configure the provider in providers.tf.
+data "aws_secretsmanager_secret_version" "grafana_api_token" {
+  count = local.environment_configuration.monitoring_stack_enabled ? 1 : 0
+
+  secret_id = module.grafana_api_token_secret[0].secret_id
+}

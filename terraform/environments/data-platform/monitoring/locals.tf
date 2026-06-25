@@ -6,6 +6,12 @@ locals {
   # therefore has no instances.
   grafana_entra_id = try(jsondecode(data.aws_secretsmanager_secret_version.grafana_entra_id[0].secret_string), {})
 
+  # Grafana service-account token used by the grafana provider (providers.tf) to
+  # manage dashboards and folders as code. Provisioned as a placeholder in
+  # secrets.tf and populated out-of-band; try() keeps it resolvable where the
+  # monitoring stack is disabled and the data source has no instances.
+  grafana_api_token = try(jsondecode(data.aws_secretsmanager_secret_version.grafana_api_token[0].secret_string)["token"], "")
+
   # Dashboards as code, organised into Grafana folders. Each subdirectory of
   # src/helm/dashboards/ maps to one Grafana folder: the map key is the on-disk
   # directory name and the value is the folder's display name. Drop a dashboard
@@ -20,28 +26,24 @@ locals {
     databases  = "Databases"
   }
 
-  # One provisioning provider per folder, each reading the dashboards the chart
-  # mounts at /var/lib/grafana/dashboards/<key>.
-  grafana_dashboard_providers = [
-    for key, display_name in local.grafana_dashboard_folders : {
-      name            = key
-      orgId           = 1
-      folder          = display_name
-      type            = "file"
-      disableDeletion = false
-      editable        = true
-      options         = { path = "/var/lib/grafana/dashboards/${key}" }
-    }
-  ]
-
-  # Discover the dashboard JSON files in each folder's subdirectory, keyed by
-  # filename without the .json suffix, for the chart's `dashboards` value.
-  grafana_dashboards = {
-    for key in keys(local.grafana_dashboard_folders) : key => {
+  # Discover every dashboard JSON across the folder subdirectories, flattened into
+  # a single map for the grafana_dashboard resource (grafana-dashboards.tf). The
+  # key "<folder>/<name>" is stable per file; the value carries the folder it
+  # belongs to and the file's path.
+  grafana_dashboard_files = merge([
+    for key in keys(local.grafana_dashboard_folders) : {
       for filename in fileset("${local.grafana_dashboard_root}/${key}", "*.json") :
-      trimsuffix(filename, ".json") => {
-        json = file("${local.grafana_dashboard_root}/${key}/${filename}")
+      "${key}/${trimsuffix(filename, ".json")}" => {
+        folder_key = key
+        path       = "${local.grafana_dashboard_root}/${key}/${filename}"
       }
     }
-  }
+  ]...)
+
+  # The grafana provider can only manage dashboards once Grafana is deployed and a
+  # real service-account token has been populated in Secrets Manager. Until then
+  # (placeholder token, or the monitoring stack disabled) create no grafana
+  # resources, so terraform plan/apply never tries to reach an unconfigured
+  # Grafana during bootstrap.
+  grafana_dashboards_manageable = local.environment_configuration.monitoring_stack_enabled && !contains(["", "CHANGEME"], local.grafana_api_token)
 }
