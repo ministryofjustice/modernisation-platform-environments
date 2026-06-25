@@ -16,7 +16,7 @@ resource "aws_db_instance" "pra_db" {
   password                        = random_password.password.result
   skip_final_snapshot             = true
   storage_encrypted               = true
-  publicly_accessible             = local.is-development ? true : false
+  publicly_accessible             = false
   vpc_security_group_ids          = [aws_security_group.postgresql_db_sc.id]
   db_subnet_group_name            = aws_db_subnet_group.dbsubnetgroup.name
   allow_major_version_upgrade     = false
