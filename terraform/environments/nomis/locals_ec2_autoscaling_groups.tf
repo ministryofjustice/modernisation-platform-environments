@@ -297,7 +297,7 @@ locals {
       }
       user_data_cloud_init = {
         args = {
-          branch       = "TM-2138-NOMIS-Weblogic-12-Update-Ansible-role-to-be-compliant-with-Oracle-Licenses"
+          branch       = "main"
           ansible_args = "--tags ec2provision"
         }
         scripts = [ # paths are relative to templates/ dir
