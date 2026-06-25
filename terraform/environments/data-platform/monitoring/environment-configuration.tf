@@ -24,6 +24,28 @@ locals {
         { name = "data-platform-test", prometheus_workspace_id = "ws-80d995fc-475d-4232-ad3f-80e2342e428902" },
         { name = "data-platform-preproduction", prometheus_workspace_id = "ws-007c0bbe-4cc7-484b-a012-0105073723ba72" },
       ]
+
+      # CIDRs allowed to reach Grafana; joined into the ingress
+      # whitelist-source-range annotation (values.yml.tftpl). Kept in step with
+      # the llm-gateway ingress allowlist.
+      grafana_ingress_allowlist = [
+        # VPN
+        "128.77.75.64/26", # Prisma Corporate
+        # Sites
+        "213.121.161.112/28", # 102PF
+        "51.149.2.0/24",      # 10SC
+        # Cloud Platform Live
+        "3.8.51.207/32",
+        "35.177.252.54/32",
+        "35.178.209.113/32",
+        # Modernisation Platform
+        "13.41.38.176/32",
+        "3.8.81.175/32",
+        "3.11.197.133/32",
+        "13.43.9.198/32",
+        "13.42.163.245/32",
+        "18.132.208.127/32",
+      ]
     }
     test = {
       monitoring_stack_enabled = false
@@ -47,6 +69,28 @@ locals {
         { name = "data-platform-development", prometheus_workspace_id = "ws-1103e531-1155-4d18-ad5f-87ba29e2a38b7a" },
         { name = "data-platform-test", prometheus_workspace_id = "ws-80d995fc-475d-4232-ad3f-80e2342e428902" },
         { name = "data-platform-preproduction", prometheus_workspace_id = "ws-007c0bbe-4cc7-484b-a012-0105073723ba72" },
+      ]
+
+      # CIDRs allowed to reach Grafana; joined into the ingress
+      # whitelist-source-range annotation (values.yml.tftpl). Kept in step with
+      # the llm-gateway ingress allowlist.
+      grafana_ingress_allowlist = [
+        # VPN
+        "128.77.75.64/26", # Prisma Corporate
+        # Sites
+        "213.121.161.112/28", # 102PF
+        "51.149.2.0/24",      # 10SC
+        # Cloud Platform Live
+        "3.8.51.207/32",
+        "35.177.252.54/32",
+        "35.178.209.113/32",
+        # Modernisation Platform
+        "13.41.38.176/32",
+        "3.8.81.175/32",
+        "3.11.197.133/32",
+        "13.43.9.198/32",
+        "13.42.163.245/32",
+        "18.132.208.127/32",
       ]
     }
   }
