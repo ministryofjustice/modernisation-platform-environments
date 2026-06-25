@@ -37,13 +37,25 @@ echo "Region: $${REGION}"
 echo "========================================="
 
 ##############################################
+### 0. Wait for System yum Update to Complete
+##############################################
+
+echo "[0/12] Waiting for system yum updates to complete..."
+while pgrep yum > /dev/null; do
+  echo "yum is running, waiting..."
+  sleep 10
+done
+echo "✓ yum update completed, proceeding with installation..."
+sleep 5
+
+##############################################
 ### 1. System Preparation
 ##############################################
 
 echo "[1/12] Updating system and installing prerequisites..."
 
-# Update system
-yum -y update
+# System is already updated, just install additional packages
+# yum -y update  # Skip as system auto-updates on startup
 
 # Install AWS CLI and jq (for secrets retrieval)
 yum -y install awscli jq
@@ -57,12 +69,33 @@ amazon-linux-extras install epel -y
 
 echo "[2/12] Installing LinOTP repository..."
 
-# Download and install LinOTP repository package
-yum localinstall -y http://dist.linotp.org/rpm/el7/linotp/x86_64/Packages/LinOTP_repos-1.1-1.el7.x86_64.rpm
+# Download and install LinOTP repository package with retry
+LINOTP_REPO_URL="http://dist.linotp.org/rpm/el7/linotp/x86_64/Packages/LinOTP_repos-1.1-1.el7.x86_64.rpm"
+RETRY_COUNT=0
+MAX_RETRIES=3
 
-# Fix repository URLs (they moved from linotp.org to dist.linotp.org)
-sed -i 's,http://linotp.org/rpm/el7/dependencies/x86_64,http://dist.linotp.org/rpm/el7/dependencies/x86_64,g' /etc/yum.repos.d/linotp.repo
-sed -i 's,http://linotp.org/rpm/el7/linotp/x86_64,http://dist.linotp.org/rpm/el7/linotp/x86_64,g' /etc/yum.repos.d/linotp.repo
+while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+  if yum localinstall -y "$LINOTP_REPO_URL"; then
+    echo "✓ LinOTP repository installed"
+    break
+  else
+    RETRY_COUNT=$((RETRY_COUNT + 1))
+    if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+      echo "⚠️  LinOTP repo download failed, retrying ($RETRY_COUNT/$MAX_RETRIES)..."
+      sleep 10
+    else
+      echo "❌ LinOTP repo download failed after $MAX_RETRIES attempts"
+      echo "⚠️  Continuing with system packages (LinOTP will not be available)"
+      SKIP_LINOTP=1
+    fi
+  fi
+done
+
+# Fix repository URLs only if repo file was created
+if [ -f /etc/yum.repos.d/linotp.repo ]; then
+  sed -i 's,http://linotp.org/rpm/el7/dependencies/x86_64,http://dist.linotp.org/rpm/el7/dependencies/x86_64,g' /etc/yum.repos.d/linotp.repo
+  sed -i 's,http://linotp.org/rpm/el7/linotp/x86_64,http://dist.linotp.org/rpm/el7/linotp/x86_64,g' /etc/yum.repos.d/linotp.repo
+fi
 
 ##############################################
 ### 3. Retrieve Secrets from Secrets Manager
@@ -118,31 +151,32 @@ echo "✓ MariaDB installed (not secured yet - waiting for LinOTP setup)"
 ### 5. Install and Configure LinOTP
 ##############################################
 
-echo "[5/12] Installing LinOTP..."
+if [ -z "$SKIP_LINOTP" ]; then
+  echo "[5/12] Installing LinOTP..."
 
-# Install LinOTP and MariaDB connector
-yum install -y LinOTP LinOTP_mariadb
+  # Install LinOTP and MariaDB connector
+  yum install -y LinOTP LinOTP_mariadb
 
-# Fix SELinux contexts
-restorecon -Rv /etc/linotp2/ || true
-restorecon -Rv /var/log/linotp || true
+  # Fix SELinux contexts
+  restorecon -Rv /etc/linotp2/ || true
+  restorecon -Rv /var/log/linotp || true
 
-# Create LinOTP database and user manually (bypassing interactive linotp-create-mariadb)
-# IMPORTANT: Do this BEFORE securing MariaDB (while root has no password)
-mysql <<LINOTP_DB_SETUP
+  # Create LinOTP database and user manually (bypassing interactive linotp-create-mariadb)
+  # IMPORTANT: Do this BEFORE securing MariaDB (while root has no password)
+  mysql <<LINOTP_DB_SETUP
 CREATE DATABASE IF NOT EXISTS linotp2 DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
 GRANT ALL PRIVILEGES ON linotp2.* TO 'linotp2'@'localhost' IDENTIFIED BY '$${MARIADB_ROOT_PASSWORD}';
 FLUSH PRIVILEGES;
 LINOTP_DB_SETUP
 
-# Create LinOTP encryption key file
-mkdir -p /etc/linotp2/
-openssl rand -hex 32 > /etc/linotp2/encKey
-chmod 600 /etc/linotp2/encKey
-chown linotp:linotp /etc/linotp2/encKey
+  # Create LinOTP encryption key file
+  mkdir -p /etc/linotp2/
+  openssl rand -hex 32 > /etc/linotp2/encKey
+  chmod 600 /etc/linotp2/encKey
+  chown linotp:linotp /etc/linotp2/encKey
 
-# Configure LinOTP to use the database
-cat > /etc/linotp2/linotp.ini <<EOF
+  # Configure LinOTP to use the database
+  cat > /etc/linotp2/linotp.ini <<EOF
 [DEFAULT]
 sqlalchemy.url = mysql://linotp2:$${MARIADB_ROOT_PASSWORD}@localhost/linotp2
 who.config_file = %(here)s/who.ini
@@ -208,21 +242,25 @@ format = %(asctime)s %(levelname)-5.5s [%(name)s][%(funcName)s #%(lineno)d] %(me
 datefmt = %Y/%m/%d - %H:%M:%S
 EOF
 
-# Create cache and log directories
-mkdir -p /etc/linotp2/data
-mkdir -p /var/log/linotp
-chown -R linotp:linotp /etc/linotp2
-# Note: Apache user ownership will be set after Apache is installed
-chmod -R 775 /var/log/linotp
+  # Create cache and log directories
+  mkdir -p /etc/linotp2/data
+  mkdir -p /var/log/linotp
+  chown -R linotp:linotp /etc/linotp2
+  # Note: Apache user ownership will be set after Apache is installed
+  chmod -R 775 /var/log/linotp
 
-# Initialize LinOTP database schema
-paster setup-app /etc/linotp2/linotp.ini
+  # Initialize LinOTP database schema
+  paster setup-app /etc/linotp2/linotp.ini
 
-# Lock python-repoze-who version for stability
-yum install -y yum-plugin-versionlock
-yum versionlock python-repoze-who
+  # Lock python-repoze-who version for stability
+  yum install -y yum-plugin-versionlock
+  yum versionlock python-repoze-who
 
-echo "✓ LinOTP database created and configured"
+  echo "✓ LinOTP database created and configured"
+else
+  echo "[5/12] Skipping LinOTP installation (repository unavailable)"
+  echo "⚠️  LinOTP will NOT be available - manual installation required"
+fi
 
 # NOW secure MariaDB (after LinOTP database is created)
 echo "Securing MariaDB..."
