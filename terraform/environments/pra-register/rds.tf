@@ -83,23 +83,23 @@ data "http" "myip" {
 }
 
 // Sets up empty database for Development environment
-resource "null_resource" "setup_dev_db" {
-  count = local.is-development ? 1 : 0
+# resource "null_resource" "setup_dev_db" {
+#   count = local.is-development ? 1 : 0
 
-  depends_on = [aws_db_instance.pra_db]
+#   depends_on = [aws_db_instance.pra_db]
 
-  provisioner "local-exec" {
-    interpreter = ["bash", "-c"]
-    command     = "chmod +x ./setup-dev-db.sh; ./setup-dev-db.sh"
+#   provisioner "local-exec" {
+#     interpreter = ["bash", "-c"]
+#     command     = "chmod +x ./setup-dev-db.sh; ./setup-dev-db.sh"
 
-    environment = {
-      DB_HOSTNAME     = aws_db_instance.pra_db.address
-      DB_NAME         = aws_db_instance.pra_db.db_name
-      PRA_DB_USERNAME = aws_db_instance.pra_db.username
-      PRA_DB_PASSWORD = random_password.password.result
-    }
-  }
-  triggers = {
-    always_run = timestamp()
-  }
-}
+#     environment = {
+#       DB_HOSTNAME     = aws_db_instance.pra_db.address
+#       DB_NAME         = aws_db_instance.pra_db.db_name
+#       PRA_DB_USERNAME = aws_db_instance.pra_db.username
+#       PRA_DB_PASSWORD = random_password.password.result
+#     }
+#   }
+#   triggers = {
+#     always_run = timestamp()
+#   }
+# }
