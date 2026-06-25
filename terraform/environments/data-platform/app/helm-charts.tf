@@ -8,11 +8,12 @@ resource "helm_release" "app" {
   namespace  = module.app_namespace.name
   values = [
     templatefile(
-      "${path.module}/src/helm/values/app/.values.yml.tftpl",
+      "${path.module}/src/helm/values/app/values.yml.tftpl",
       {
         app_env                    = local.environment,
         app_django_settings_module = "data_platform_app.settings.${local.environment == "production" ? "production" : "development"}"
         app_hostname               = local.environment_configuration.app_hostname,
+        app_allowed_hosts          = join(" ", local.environment_configuration.app_allowed_hosts),
       }
     )
   ]
@@ -21,7 +22,7 @@ resource "helm_release" "app" {
 resource "helm_release" "app_configuration" {
   name      = "${local.component_name}-configuration"
   chart     = "${path.module}/src/helm/charts/${local.component_name}-configuration"
-  version   = "1.0.0"
+  version   = "1.1.0"
   namespace = module.app_namespace.name
 
   values = [

@@ -5,6 +5,10 @@ locals {
   environment_configurations = {
     development = {
       app_hostname = "development.data-platform.service.justice.gov.uk"
+      app_allowed_hosts = [
+        "development.data-platform.service.justice.gov.uk",
+        ".elb.amazonaws.com",
+      ]
       app_ingress_allowlist = [
         "128.77.75.64/26", # Prisma Corporate
       ]
@@ -20,6 +24,10 @@ locals {
     }
     test = {
       app_hostname = "test.data-platform.service.justice.gov.uk"
+      app_allowed_hosts = [
+        "test.data-platform.service.justice.gov.uk",
+        ".elb.amazonaws.com",
+      ]
       app_ingress_allowlist = [
         "128.77.75.64/26", # Prisma Corporate
       ]
@@ -35,6 +43,10 @@ locals {
     }
     preproduction = {
       app_hostname = "preproduction.data-platform.service.justice.gov.uk"
+      app_allowed_hosts = [
+        "preproduction.data-platform.service.justice.gov.uk",
+        ".elb.amazonaws.com",
+      ]
       app_ingress_allowlist = [
         "128.77.75.64/26", # Prisma Corporate
       ]
@@ -50,6 +62,10 @@ locals {
     }
     production = {
       app_hostname = "data-platform.service.justice.gov.uk"
+      app_allowed_hosts = [
+        "data-platform.service.justice.gov.uk",
+        ".elb.amazonaws.com",
+      ]
       app_ingress_allowlist = [
         "128.77.75.64/26", # Prisma Corporate
       ]

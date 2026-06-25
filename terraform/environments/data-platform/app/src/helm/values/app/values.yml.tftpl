@@ -11,6 +11,8 @@ app:
       value: ${app_django_settings_module}
     - name: APP_ENV
       value: ${app_env}
+    - name: ALLOWED_HOSTS
+      value: ${app_allowed_hosts}
     - name: SECRET_KEY
       valueFrom:
         secretKeyRef:

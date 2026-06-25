@@ -9,3 +9,5 @@ spec:
     name: app
   defaultConfiguration:
     targetType: instance
+    healthCheckConfig:
+      healthCheckPath: /healthcheck/
