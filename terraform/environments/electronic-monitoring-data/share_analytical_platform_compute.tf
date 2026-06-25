@@ -4,6 +4,7 @@ locals {
   dbt_k8s_secrets_placeholder = {
     oidc_cluster_identifier = "placeholder2"
   }
+  airflow_suffix = local.is-preproduction ? "-pp" : "" 
   dbt_suffix = local.is-production ? "" : "_${local.environment_shorthand}_dbt"
   suffix     = local.is-production ? "" : local.is-preproduction ? "-pp" : local.is-test ? "-test" : "-dev"
   db_suffix  = local.is-production ? "" : "_${local.environment_shorthand}"
@@ -251,7 +252,7 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
     }
     condition {
       test     = "StringEquals"
-      values   = ["system:serviceaccount:mwaa:emds-cadet", "system:serviceaccount:mwaa:emds-historic-dev"]
+      values   = ["system:serviceaccount:mwaa:emds-cadet${local.airflow_suffix}", "system:serviceaccount:mwaa:emds-historic-dev"]
       variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]}:sub"
     }
     condition {
