@@ -2,11 +2,11 @@
 
 locals {
   environment_config_production = {
-    legacy_engineering_vpc_cidr            = "10.160.98.0/25"
-    legacy_counterpart_vpc_cidr            = "10.160.16.0/20"
-    legacy_ad_domain_name                  = "delius-prod.local"
-    legacy_dns_ip_addrs                    = ["10.160.17.254", "10.160.22.121"]
-    ad_domain_name                         = "delius-mis-prod.internal"
+    legacy_engineering_vpc_cidr = "10.160.98.0/25"
+    legacy_counterpart_vpc_cidr = "10.160.16.0/20"
+    legacy_ad_domain_name       = "delius-prod.local"
+    legacy_dns_ip_addrs         = ["10.160.17.254", "10.160.22.121"]
+    ad_domain_name              = "delius-mis-prod.internal"
     # ad_trust_domain_name                   = "azure.hmpp.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
     ad_trust_dns_ip_addrs                  = module.ip_addresses.mp_ips.ad_fixngo_hmpp_domain_controllers
@@ -280,8 +280,8 @@ locals {
 
   # BOE DB config
   boe_db_config_production = {
-    primary_instance_count = 0
-    standby_instance_count = 0
+    primary_instance_count = 1
+    standby_instance_count = 1
     instance_type          = "m7i.large"
     ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
@@ -306,7 +306,7 @@ locals {
         iops       = 3000
         throughput = 500
         type       = "gp3"
-        total_size = 200
+        total_size = 500
       }
       flash = {
         iops       = 3000
@@ -326,8 +326,8 @@ locals {
 
   # DSD DB config
   dsd_db_config_production = {
-    primary_instance_count = 0
-    standby_instance_count = 0
+    primary_instance_count = 1
+    standby_instance_count = 1
     instance_type          = "r7i.large"
     ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
@@ -372,8 +372,8 @@ locals {
 
   # MIS DB config
   mis_db_config_production = {
-    primary_instance_count = 0
-    standby_instance_count = 0
+    primary_instance_count = 1
+    standby_instance_count = 1
     instance_type          = "r7i.12xlarge"
     ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
@@ -422,10 +422,7 @@ locals {
     }
   }
 
-  fsx_config_production = {
-    storage_capacity     = 200
-    throughtput_capacity = 16
-  }
+  fsx_config_production = null
 
   # fsx_config_production = {
   #   storage_capacity     = 1000 # temporarily increasing for prod->stage migration, was 200

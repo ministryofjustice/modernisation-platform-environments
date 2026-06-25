@@ -11,7 +11,7 @@ locals {
 module "waf" {
   # checkov:skip=CKV_TF_1: "Commit Hash requirement temporarily disabled"
   # checkov:skip=CKV_TF_2: "Version number tag requirement temporarily disabled"
-  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=c0875272407dd5094287c021201b36f250be3806"
+  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-aws-waf?ref=22d5505e11da4fbab027eea4e65e8ff458bbcfaf"
   web_acl_name             = "wam-acl"
   enable_ddos_protection   = true # Defaults to rule priority 2
   ddos_rate_limit          = 150
@@ -49,6 +49,13 @@ module "waf" {
     AWSManagedRulesLinuxRuleSet          = 14
     AWSManagedRulesBotControlRuleSet     = 15
   }
+
+  # AWSManagedRulesBotControlRuleSet configuration
+
+  bot_control_inspection_level = "COMMON" # default; or "TARGETED"
+  # bot_control_scope_down_cidrs = ["34.0.0.0/8"]    # optional; inspect only GCP traffic
+
+
 
   core_logging_account_id = local.environment_management.account_ids["core-logging-production"]
 

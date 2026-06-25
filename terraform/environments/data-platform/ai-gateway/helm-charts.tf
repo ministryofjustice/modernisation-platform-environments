@@ -1,7 +1,7 @@
 resource "helm_release" "ai_gateway_configuration" {
   name      = "${local.component_name}-configuration"
   chart     = "${path.module}/src/helm/charts/${local.component_name}-configuration"
-  version   = "1.4.0"
+  version   = "1.4.1"
   namespace = module.ai_gateway_namespace.name
 
   values = [
@@ -35,11 +35,12 @@ resource "helm_release" "litellm" {
         ingressHostname    = local.environment_configuration.ai_gateway_hostname
 
         # Database
-        databaseSecret      = "aurora"
-        databaseUserNameKey = "username"
-        databasePasswordKey = "password"
-        databaseEndpointKey = "host"
-        databaseName        = module.ai_gateway_aurora.cluster_database_name
+        databaseSecret            = "aurora"
+        databaseUserNameKey       = "username"
+        databasePasswordKey       = "password"
+        databaseEndpointKey       = "host"
+        databaseReaderEndpointKey = local.has_reader ? "read-url" : ""
+        databaseName              = module.ai_gateway_aurora.cluster_database_name
 
         # LiteLLM
         masterkeySecretName = kubernetes_secret_v1.litellm_master_key.metadata[0].name
@@ -99,11 +100,12 @@ resource "helm_release" "litellm_admin" {
         proxyHostname      = local.environment_configuration.ai_gateway_hostname
 
         # Database
-        databaseSecret      = "aurora"
-        databaseUserNameKey = "username"
-        databasePasswordKey = "password"
-        databaseEndpointKey = "host"
-        databaseName        = module.ai_gateway_aurora.cluster_database_name
+        databaseSecret            = "aurora"
+        databaseUserNameKey       = "username"
+        databasePasswordKey       = "password"
+        databaseEndpointKey       = "host"
+        databaseReaderEndpointKey = local.has_reader ? "read-url" : ""
+        databaseName              = module.ai_gateway_aurora.cluster_database_name
 
         # LiteLLM
         masterkeySecretName = kubernetes_secret_v1.litellm_master_key.metadata[0].name

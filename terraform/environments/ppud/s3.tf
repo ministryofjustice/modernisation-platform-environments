@@ -29,12 +29,6 @@ resource "aws_s3_bucket" "PPUD" {
   )
 }
 
-resource "aws_s3_bucket_acl" "PPUD_ACL" {
-  count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.PPUD[0].id
-  acl    = "private"
-}
-
 resource "aws_s3_bucket_versioning" "PPUD" {
   count  = local.is-production == true ? 1 : 0
   bucket = aws_s3_bucket.PPUD[0].id
@@ -235,7 +229,7 @@ resource "aws_s3_bucket_policy" "moj-infrastructure" {
         ],
         "Principal" : {
           "AWS" : [
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role", # Cross account access disabled, only turned on when required
+            # "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role", # Cross account access disabled, only turned on when required
             # "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role",   # Cross account access disabled, only turned on when required
             "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role"
           ]
@@ -284,7 +278,7 @@ resource "aws_s3_bucket_policy" "moj-infrastructure" {
 }
 
 # S3 Bucket for PPUD Database Replication to MoJ Cloud Platform
-
+/*
 resource "aws_s3_bucket" "moj-database-source-prod" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
   # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
@@ -608,7 +602,7 @@ resource "aws_s3_bucket_policy" "moj-report-source-prod" {
     ]
   })
 }
-
+*/
 # S3 Bucket for S3 Notification and ELB Log Files for Production
 
 resource "aws_s3_bucket" "moj-log-files-prod" {
@@ -1019,7 +1013,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
 }
 
 # S3 Bucket for Database Replication to Data Engineering for Preproduction
-
+/*
 resource "aws_s3_bucket" "moj-database-source-uat" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
   # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
@@ -1340,7 +1334,7 @@ resource "aws_s3_bucket_policy" "moj-report-source-uat" {
     ]
   })
 }
-
+*/
 #######################################################################################################
 # Development Environment 
 #######################################################################################################
@@ -1561,7 +1555,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
 }
 
 # S3 Bucket for Database Replication to Data Engineering for Development
-
+/*
 resource "aws_s3_bucket" "moj-database-source-dev" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
   # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
@@ -1881,7 +1875,7 @@ resource "aws_s3_bucket_policy" "moj-report-source-dev" {
     ]
   })
 }
-
+*/
 # S3 Bucket for PPUD Infrastructure Development
 
 resource "aws_s3_bucket" "moj-infrastructure-dev" {
@@ -1980,7 +1974,7 @@ resource "aws_s3_bucket_policy" "moj-infrastructure-dev" {
           "AWS" : [
             "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",
             # "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role", # Cross account access disabled, only turned on when required
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role" # Cross account access disabled, only turned on when required
+            # "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role" # Cross account access disabled, only turned on when required
           ]
         }
       },

@@ -924,11 +924,11 @@ module "landing_file_dlq_redriver" {
 }
 
 #-----------------------------------------------------------------------------------
-# lambda loads - staged_mdss__position and acquisitive_crime__position
+# lambda merge loads - staged_mdss__position, staged_mdss__event, acquisitive_crime__position
 #-----------------------------------------------------------------------------------
 
 module "merge_mdss_staged_event" {
-  count                          = local.is-preproduction || local.is-production ? 0 : 1
+  count                          = local.is-production ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_mdss_staged_event"
@@ -950,7 +950,7 @@ module "merge_mdss_staged_event" {
 }
 
 module "merge_mdss_staged_position" {
-  count                          = local.is-preproduction || local.is-production ? 0 : 1
+  count                          = local.is-production ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_mdss_staged_position"
@@ -972,7 +972,7 @@ module "merge_mdss_staged_position" {
 }
 
 module "merge_ac_position" {
-  count                          = local.is-preproduction || local.is-production ? 0 : 1
+  count                          = local.is-production ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_ac_position"

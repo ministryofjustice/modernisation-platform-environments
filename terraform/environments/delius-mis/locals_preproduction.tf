@@ -304,7 +304,7 @@ locals {
         iops       = 3000
         throughput = 500
         type       = "gp3"
-        total_size = 200
+        total_size = 500
       }
       flash = {
         iops       = 3000
@@ -434,7 +434,7 @@ locals {
   datasync_config_preprod = null
 
   db_backup_config_preprod = {
-    object_lock_days             = 1
+    object_lock_days             = 10
     expire_current_after_days    = 200
     expire_noncurrent_after_days = 10
     transition = [

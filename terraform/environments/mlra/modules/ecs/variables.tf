@@ -119,9 +119,15 @@ variable "appscaling_max_capacity" {
   default     = 6
 }
 
+# TODO LASB-5089 Replace with AL2023 user data
 variable "user_data" {
   type        = string
   description = "The configuration used when creating EC2s used for the ECS cluster"
+}
+
+variable "user_data_al2023" {
+  type        = string
+  description = "The configuration used when creating AL2023 EC2s used for the ECS cluster"
 }
 
 variable "vpc_all" {

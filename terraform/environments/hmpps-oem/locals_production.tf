@@ -258,7 +258,8 @@ locals {
       prod-oem-a = merge(local.ec2_instances.oem, {
         cloudwatch_metric_alarms = merge(
           local.ec2_instances.oem.cloudwatch_metric_alarms,
-          local.cloudwatch_metric_alarms_endpoint_monitoring
+          local.cloudwatch_metric_alarms_endpoint_monitoring,
+          local.cloudwatch_metric_alarms_smtp_connectivity_test
         )
         config = merge(local.ec2_instances.oem.config, {
           availability_zone = "eu-west-2a"
