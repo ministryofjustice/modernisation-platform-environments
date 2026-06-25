@@ -38,7 +38,7 @@ module "sns_drone_incursion_alerts" {
 }
 
 resource "aws_sns_topic_subscription" "drone_incursion_alert_emails" {
-  for_each = contains(local.deploy_to, local.environment) ? toset(local.drone_incursion_alert_emails) : toset([])
+  for_each = contains(local.deploy_to, local.environment) ? nonsensitive(toset(local.drone_incursion_alert_emails)) : toset([])
 
   topic_arn = module.sns_drone_incursion_alerts[0].topic_arn
   protocol  = "email"
