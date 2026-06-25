@@ -10,7 +10,7 @@ locals {
       # Let the grafana provider manage dashboards as code (grafana-dashboards.tf).
       # Keep false until a valid service-account token is stored in the
       # monitoring/grafana-api-token secret; flip to true to start managing them.
-      grafana_dashboards_enabled = false
+      grafana_dashboards_enabled = true
 
       # Accounts Grafana reads by assuming the data-platform-monitoring role in
       # each (defined in ../modules/monitoring). Account IDs are resolved by name
