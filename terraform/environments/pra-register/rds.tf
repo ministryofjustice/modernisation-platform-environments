@@ -15,6 +15,7 @@ resource "aws_db_instance" "pra_db" {
   username                        = local.application_data.accounts[local.environment].db_username
   password                        = random_password.password.result
   skip_final_snapshot             = true
+  storage_encrypted               = true
   publicly_accessible             = local.is-development ? true : false
   vpc_security_group_ids          = [aws_security_group.postgresql_db_sc.id]
   db_subnet_group_name            = aws_db_subnet_group.dbsubnetgroup.name
