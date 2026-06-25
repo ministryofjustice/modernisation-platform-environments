@@ -60,7 +60,7 @@ resource "aws_cloudfront_distribution" "external" {
   }
 
   logging_config {
-    include_cookies = true
+    include_cookies = false
     bucket          = aws_s3_bucket.cloudfront.bucket_domain_name
     prefix          = ""
   }
