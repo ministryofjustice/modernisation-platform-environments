@@ -126,7 +126,7 @@ If the identity provider Lambda or the Transfer server is unavailable, partners 
 - Each user is restricted to their own logical home directory and may only upload (not download or list other users' files) to the `unscanned` bucket.
 - The custom identity provider supports per-user and per-provider IPv4 allow lists (`ingress_cidr_blocks`). In development this currently defaults to `0.0.0.0/0` and will be tightened before any real use.
 - The web app is gated behind AWS IAM Identity Center and S3 Access Grants.
-- FTPS passive mode is configured with a single `passive_ip`. Even though the Transfer server endpoint is deployed across multiple subnets with multiple Elastic IPs, the passive-mode response advertises only that one IP. Treat this as an FTPS passive-mode limitation of the current design when troubleshooting data-connection behaviour.
+- FTPS passive mode is configured with a single, automatically selected, `passive_ip`. Even though the Transfer server endpoint is deployed across multiple subnets with multiple Elastic IPs, the passive-mode response advertises only that one IP. Treat this as an FTPS passive-mode limitation of the current design when troubleshooting data-connection behaviour.
 
 ### **How to resolve specific issues:**
 
