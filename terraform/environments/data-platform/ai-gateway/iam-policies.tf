@@ -20,7 +20,7 @@ data "aws_iam_policy_document" "ai_gateway" {
     sid       = "BedrockFoundationModelAccess"
     effect    = "Allow"
     actions   = ["bedrock:InvokeModel*"]
-    resources = formatlist("arn:aws:bedrock:%s::foundation-model/*", ["eu-west-1", "eu-west-2"])
+    resources = ["arn:aws:bedrock:eu-*::foundation-model/*"]
   }
 
   statement {
