@@ -70,11 +70,11 @@ resource "aws_ecs_service" "sftp_ecs_service" {
   launch_type                       = "EC2"
   health_check_grace_period_seconds = 120
 
-  lifecycle {
-    ignore_changes = [
-      task_definition
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     task_definition
+  #   ]
+  # }
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
