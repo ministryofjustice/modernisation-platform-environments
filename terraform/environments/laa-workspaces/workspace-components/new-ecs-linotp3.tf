@@ -329,13 +329,13 @@ resource "aws_ecs_service" "linotp3" {
     assign_public_ip = false
   }
 
-  load_balancers {
+  load_balancer {
     target_group_arn = aws_lb_target_group.linotp3_portal[0].arn
     container_name   = "linotp"
     container_port   = 80
   }
 
-  load_balancers {
+  load_balancer {
     target_group_arn = aws_lb_target_group.radius_ecs[0].arn
     container_name   = "freeradius"
     container_port   = 1812
