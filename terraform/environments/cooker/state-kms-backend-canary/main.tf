@@ -2,6 +2,7 @@
 variable "canary_run_id" {
   description = "Workflow run identifier used to force a canary state write."
   type        = string
+  default     = "not-set"
 }
 
 resource "terraform_data" "state_kms_backend_canary" {
