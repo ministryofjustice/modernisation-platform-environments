@@ -102,6 +102,8 @@ module "kms_cloudwatch_logs" {
       ]
     }
   ]
+
+  tags = local.tags
 }
 
 module "kms_sns" {
@@ -151,8 +153,17 @@ module "kms_sns" {
           identifiers = ["sns.amazonaws.com"]
         }
       ]
+      condition = [
+        {
+          test     = "ArnLike"
+          variable = "kms:EncryptionContext:aws:sns:topicArn"
+          values   = ["arn:aws:sns:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:*"]
+        }
+      ]
     }
   ]
+
+  tags = local.tags
 }
 
 module "kms_s3_bucket" {
@@ -216,4 +227,6 @@ module "kms_secrets" {
       ]
     }
   ]
+
+  tags = local.tags
 }
