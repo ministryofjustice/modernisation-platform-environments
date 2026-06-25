@@ -278,7 +278,7 @@ resource "aws_s3_bucket_policy" "moj-infrastructure" {
 }
 
 # S3 Bucket for PPUD Database Replication to MoJ Cloud Platform
-
+/*
 resource "aws_s3_bucket" "moj-database-source-prod" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
   # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
@@ -602,7 +602,7 @@ resource "aws_s3_bucket_policy" "moj-report-source-prod" {
     ]
   })
 }
-
+*/
 # S3 Bucket for S3 Notification and ELB Log Files for Production
 
 resource "aws_s3_bucket" "moj-log-files-prod" {
@@ -1013,7 +1013,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
 }
 
 # S3 Bucket for Database Replication to Data Engineering for Preproduction
-
+/*
 resource "aws_s3_bucket" "moj-database-source-uat" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
   # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
@@ -1334,7 +1334,7 @@ resource "aws_s3_bucket_policy" "moj-report-source-uat" {
     ]
   })
 }
-
+*/
 #######################################################################################################
 # Development Environment 
 #######################################################################################################
@@ -1555,7 +1555,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
 }
 
 # S3 Bucket for Database Replication to Data Engineering for Development
-
+/*
 resource "aws_s3_bucket" "moj-database-source-dev" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
   # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
@@ -1875,7 +1875,7 @@ resource "aws_s3_bucket_policy" "moj-report-source-dev" {
     ]
   })
 }
-
+*/
 # S3 Bucket for PPUD Infrastructure Development
 
 resource "aws_s3_bucket" "moj-infrastructure-dev" {

@@ -68,6 +68,10 @@
         "pr-assessment-view": {
           "share_with_cloud_platform": true,
           "create_glue_connection": true
+        },
+        "pr-assess-view": {
+          "share_with_cloud_platform": true,
+          "create_glue_connection": true
         }
       },
       "dps_domains": [
@@ -303,6 +307,10 @@
         "pr-assessment-view": {
           "share_with_cloud_platform": true,
           "create_glue_connection": true
+        },
+        "pr-assess-view": {
+          "share_with_cloud_platform": true,
+          "create_glue_connection": true
         }
       },
       "dps_domains": [
@@ -518,7 +526,11 @@
       "probation_domains": {
         "pr-assessment-view": {
           "share_with_cloud_platform": true,
-          "create_glue_connection": false
+          "create_glue_connection": true
+        },
+        "pr-assess-view": {
+          "share_with_cloud_platform": true,
+          "create_glue_connection": true
         }
       },
       "dps_domains": [
@@ -748,6 +760,10 @@
         "pr-assessment-view": {
           "share_with_cloud_platform": true,
           "create_glue_connection": false
+        },
+        "pr-assess-view": {
+          "share_with_cloud_platform": true,
+          "create_glue_connection": true
         }
       },
       "dps_domains": [

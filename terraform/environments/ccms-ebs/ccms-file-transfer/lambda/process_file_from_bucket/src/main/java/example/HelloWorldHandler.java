@@ -12,6 +12,7 @@ public class HelloWorldHandler implements RequestHandler<Map<String, Object>, St
     @Override
     public String handleRequest(Map<String, Object> event, Context context) {
         String secretName = System.getenv("SECRET_NAME");
+        String bucketBasePrefix = System.getenv("BUCKET_BASE_PREFIX");
         String regionEnv = System.getenv("AWS_REGION");
         Region region = Region.of(regionEnv);
 

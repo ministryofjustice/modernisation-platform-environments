@@ -3,6 +3,9 @@
 # ---------------------------------------------------------------------------------------------------------------------
 
 data "aws_iam_policy_document" "ecs_cloudwatch_kms" {
+  #checkov:skip=CKV_AWS_109: KMS key policy requires permissions management on the key; access is limited to account root and CloudWatch Logs service conditions.
+  #checkov:skip=CKV_AWS_111: KMS key policy uses Resource "*" because key policies apply to the attached key; CloudWatch Logs access is constrained by encryption context.
+  #checkov:skip=CKV_AWS_356: KMS key policies commonly require Resource "*"; CloudWatch Logs statement is constrained to matching ECS log group ARNs.
   statement {
     sid    = "EnableRootAccess"
     effect = "Allow"

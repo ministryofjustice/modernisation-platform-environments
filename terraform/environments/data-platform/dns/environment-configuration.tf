@@ -20,6 +20,21 @@ locals {
                 "ns-885.awsdns-46.net."
               ]
             }
+            monitoring-ns = {
+              /* 
+                Delegate monitoring.development.data-platform.service.justice.gov.uk to Cloud Platform 
+                https://github.com/ministryofjustice/cloud-platform-environments/blob/main/namespaces/live.cloud-platform.service.justice.gov.uk/data-platform-monitoring-development/resources/route53.tf
+              */
+              type = "NS"
+              name = "monitoring"
+              ttl  = 86400
+              records = [
+                "ns-1439.awsdns-51.org.",
+                "ns-1859.awsdns-40.co.uk.",
+                "ns-278.awsdns-34.com.",
+                "ns-695.awsdns-22.net."
+              ]
+            }
           }
         }
         "development.ai-gateway.justice.gov.uk" = {
@@ -83,6 +98,21 @@ locals {
                 "ns-1449.awsdns-53.org.",
                 "ns-1599.awsdns-07.co.uk.",
                 "ns-674.awsdns-20.net."
+              ]
+            },
+            monitoring-ns = {
+              /* 
+                Delegate monitoring.data-platform.service.justice.gov.uk to Cloud Platform 
+                https://github.com/ministryofjustice/cloud-platform-environments/blob/main/namespaces/live.cloud-platform.service.justice.gov.uk/data-platform-monitoring-production/resources/route53.tf
+              */
+              type = "NS"
+              name = "monitoring"
+              ttl  = 86400
+              records = [
+                "ns-1507.awsdns-60.org.",
+                "ns-152.awsdns-19.com.",
+                "ns-1550.awsdns-01.co.uk.",
+                "ns-954.awsdns-55.net."
               ]
             },
             /* GitHub Pages */

@@ -1,35 +1,36 @@
 openapi: 3.0.3
 info:
   title: Integration Hub Managed File Transfer API
-  version: 1.0.0
+  version: 2.0.0
   description: |
     Thin API layer for Managed File Transfer uploads.
 
-    The API supports:
-    - Basic authentication for user-driven HTTPS upload flows
-    - Bearer token authentication for system-to-system integrations
-
-    Authorisation is role-based. Each authenticated principal is mapped to one
-    or more permitted `clientId` values.
+    Small files can use a single pre-signed S3 PUT.
+    Large files automatically switch to a multipart upload flow so the client
+    ingress path can support uploads larger than 5 GB.
 servers:
-  - url: https://{apiHost}
-    variables:
-      apiHost:
-        default: example.execute-api.eu-west-2.amazonaws.com
+  - url: /
+    description: Same origin as the deployed Swagger UI or API hostname.
 security:
   - basicAuth: []
   - bearerAuth: []
+tags:
+  - name: Transfer Tickets
+    description: Create upload sessions for small and large files.
+  - name: Multipart Uploads
+    description: Continue, complete, or abort multipart transfers.
 paths:
   /transfer-tickets:
     post:
+      tags:
+        - Transfer Tickets
       summary: Create an upload transfer ticket
       description: |
-        Issues a short-lived pre-signed S3 PUT URL for an authorised transfer client.
+        Creates either:
+        - a single PUT upload ticket for smaller files, or
+        - a multipart upload session for larger files.
 
-        For Basic authentication, provide the configured username and password.
-
-        For Bearer authentication, provide a token in the form:
-        `<tokenId>.<bearerToken>`
+        The client supplies `sizeBytes` and the API decides which upload path to use.
       operationId: createTransferTicket
       security:
         - basicAuth: []
@@ -40,43 +41,133 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TransferTicketRequest'
-            examples:
-              csvUpload:
-                value:
-                  clientId: products-poc
-                  fileName: example-upload.csv
-                  contentType: text/csv
-                  sizeBytes: 12345
-                  requestedExpirySeconds: 900
-                  contentMd5: CY9rzUYh03PK3k6DJie09g==
       responses:
         '200':
-          description: Transfer ticket created
+          description: Upload session created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransferTicketResponse'
+                oneOf:
+                  - $ref: '#/components/schemas/SingleUploadTicketResponse'
+                  - $ref: '#/components/schemas/MultipartUploadTicketResponse'
         '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/ErrorResponse'
         '401':
           description: Authentication failed
         '403':
-          description: Authenticated caller is not authorised for the requested client
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/ErrorResponse'
         '404':
-          description: Unknown transfer client
+          $ref: '#/components/responses/ErrorResponse'
+  /transfer-tickets/{transferTicket}/parts:
+    post:
+      tags:
+        - Multipart Uploads
+      summary: Generate pre-signed multipart part URLs
+      operationId: presignMultipartParts
+      security:
+        - basicAuth: []
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TransferTicket'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MultipartPartRequest'
+      responses:
+        '200':
+          description: Pre-signed part URLs generated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/MultipartPartResponse'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+        '401':
+          description: Authentication failed
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/ErrorResponse'
+        '409':
+          $ref: '#/components/responses/ErrorResponse'
+  /transfer-tickets/{transferTicket}/complete:
+    post:
+      tags:
+        - Multipart Uploads
+      summary: Complete a multipart upload
+      operationId: completeMultipartUpload
+      security:
+        - basicAuth: []
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TransferTicket'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MultipartCompleteRequest'
+      responses:
+        '200':
+          description: Multipart upload completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultipartCompleteResponse'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+        '401':
+          description: Authentication failed
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/ErrorResponse'
+        '409':
+          $ref: '#/components/responses/ErrorResponse'
+  /transfer-tickets/{transferTicket}:
+    delete:
+      tags:
+        - Multipart Uploads
+      summary: Abort a multipart upload
+      operationId: abortMultipartUpload
+      security:
+        - basicAuth: []
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TransferTicket'
+      responses:
+        '200':
+          description: Multipart upload aborted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultipartAbortResponse'
+        '401':
+          description: Authentication failed
+        '403':
+          $ref: '#/components/responses/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/ErrorResponse'
+        '409':
+          $ref: '#/components/responses/ErrorResponse'
 components:
+  parameters:
+    TransferTicket:
+      name: transferTicket
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    ErrorResponse:
+      description: Request failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   securitySchemes:
     basicAuth:
       type: http
@@ -93,6 +184,7 @@ components:
       required:
         - clientId
         - fileName
+        - sizeBytes
       properties:
         clientId:
           type: string
@@ -112,9 +204,39 @@ components:
           example: 900
         contentMd5:
           type: string
-          description: Base64-encoded MD5 digest of the upload content
+          description: Base64-encoded MD5 digest for single PUT uploads only
           example: CY9rzUYh03PK3k6DJie09g==
-    TransferTicketResponse:
+    ObjectReference:
+      type: object
+      required:
+        - bucket
+        - key
+      properties:
+        bucket:
+          type: string
+        key:
+          type: string
+    PresignedSingleUpload:
+      type: object
+      required:
+        - method
+        - url
+        - headers
+        - expiresInSeconds
+      properties:
+        method:
+          type: string
+          example: PUT
+        url:
+          type: string
+          format: uri
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+        expiresInSeconds:
+          type: integer
+    SingleUploadTicketResponse:
       type: object
       required:
         - transferTicket
@@ -128,36 +250,183 @@ components:
         clientId:
           type: string
         upload:
-          type: object
-          required:
-            - method
-            - url
-            - headers
-            - expiresInSeconds
-          properties:
-            method:
-              type: string
-              example: PUT
-            url:
-              type: string
-              format: uri
-            headers:
-              type: object
-              additionalProperties:
-                type: string
-            expiresInSeconds:
-              type: integer
-              example: 900
+          $ref: '#/components/schemas/PresignedSingleUpload'
         object:
+          $ref: '#/components/schemas/ObjectReference'
+    MultipartOperationPaths:
+      type: object
+      required:
+        - presignPartsPath
+        - completePath
+        - abortPath
+      properties:
+        presignPartsPath:
+          type: string
+        completePath:
+          type: string
+        abortPath:
+          type: string
+    MultipartPart:
+      type: object
+      required:
+        - partNumber
+        - method
+        - url
+        - headers
+        - expiresInSeconds
+      properties:
+        partNumber:
+          type: integer
+        method:
+          type: string
+          example: PUT
+        url:
+          type: string
+          format: uri
+        headers:
           type: object
-          required:
-            - bucket
-            - key
+          additionalProperties:
+            type: string
+        expiresInSeconds:
+          type: integer
+    MultipartUploadSession:
+      type: object
+      required:
+        - uploadId
+        - partSizeBytes
+        - maxParts
+        - expiresInSeconds
+        - initialParts
+        - operations
+      properties:
+        uploadId:
+          type: string
+        partSizeBytes:
+          type: integer
+          format: int64
+        totalParts:
+          type: integer
+          nullable: true
+        maxParts:
+          type: integer
+        expiresInSeconds:
+          type: integer
+        initialParts:
+          type: array
+          items:
+            $ref: '#/components/schemas/MultipartPart'
+        operations:
+          $ref: '#/components/schemas/MultipartOperationPaths'
+    MultipartUploadTicketResponse:
+      type: object
+      required:
+        - transferTicket
+        - clientId
+        - object
+        - multipart
+      properties:
+        transferTicket:
+          type: string
+          format: uuid
+        clientId:
+          type: string
+        object:
+          $ref: '#/components/schemas/ObjectReference'
+        multipart:
+          $ref: '#/components/schemas/MultipartUploadSession'
+    MultipartPartRequest:
+      type: object
+      description: Provide either `partNumbers` or `partNumberStart` and `partNumberEnd`.
+      properties:
+        partNumbers:
+          type: array
+          items:
+            type: integer
+        partNumberStart:
+          type: integer
+        partNumberEnd:
+          type: integer
+    MultipartPartResponse:
+      type: object
+      required:
+        - transferTicket
+        - clientId
+        - uploadId
+        - parts
+      properties:
+        transferTicket:
+          type: string
+          format: uuid
+        clientId:
+          type: string
+        uploadId:
+          type: string
+        parts:
+          type: array
+          items:
+            $ref: '#/components/schemas/MultipartPart'
+    MultipartCompletedPart:
+      type: object
+      required:
+        - partNumber
+        - eTag
+      properties:
+        partNumber:
+          type: integer
+        eTag:
+          type: string
+    MultipartCompleteRequest:
+      type: object
+      required:
+        - parts
+      properties:
+        parts:
+          type: array
+          items:
+            $ref: '#/components/schemas/MultipartCompletedPart'
+    MultipartCompleteResponse:
+      type: object
+      required:
+        - transferTicket
+        - clientId
+        - status
+        - object
+        - result
+      properties:
+        transferTicket:
+          type: string
+          format: uuid
+        clientId:
+          type: string
+        status:
+          type: string
+          enum: [completed]
+        object:
+          $ref: '#/components/schemas/ObjectReference'
+        result:
+          type: object
           properties:
-            bucket:
+            eTag:
               type: string
-            key:
+            location:
               type: string
+            partCount:
+              type: integer
+    MultipartAbortResponse:
+      type: object
+      required:
+        - transferTicket
+        - clientId
+        - status
+      properties:
+        transferTicket:
+          type: string
+          format: uuid
+        clientId:
+          type: string
+        status:
+          type: string
+          enum: [aborted]
     ErrorResponse:
       type: object
       required:

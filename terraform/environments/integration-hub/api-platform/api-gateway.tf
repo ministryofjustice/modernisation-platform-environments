@@ -13,7 +13,7 @@ resource "aws_apigatewayv2_api" "upload_ticket" {
 
     content {
       allow_headers = ["authorization", "content-md5", "content-type"]
-      allow_methods = ["OPTIONS", "POST"]
+      allow_methods = ["DELETE", "OPTIONS", "POST"]
       allow_origins = local.cors_allowed_origins
       expose_headers = [
         "content-type",
@@ -29,6 +29,14 @@ resource "aws_apigatewayv2_integration" "upload_ticket" {
   api_id                 = aws_apigatewayv2_api.upload_ticket.id
   integration_type       = "AWS_PROXY"
   integration_uri        = module.lambda_upload_ticket.lambda_function_invoke_arn
+  integration_method     = "POST"
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_integration" "api_docs" {
+  api_id                 = aws_apigatewayv2_api.upload_ticket.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = module.lambda_api_docs.lambda_function_invoke_arn
   integration_method     = "POST"
   payload_format_version = "2.0"
 }
@@ -49,6 +57,42 @@ resource "aws_apigatewayv2_route" "transfer_tickets" {
   target             = "integrations/${aws_apigatewayv2_integration.upload_ticket.id}"
   authorization_type = "CUSTOM"
   authorizer_id      = aws_apigatewayv2_authorizer.mft_request.id
+}
+
+resource "aws_apigatewayv2_route" "transfer_ticket_parts" {
+  api_id             = aws_apigatewayv2_api.upload_ticket.id
+  route_key          = "POST /transfer-tickets/{transferTicket}/parts"
+  target             = "integrations/${aws_apigatewayv2_integration.upload_ticket.id}"
+  authorization_type = "CUSTOM"
+  authorizer_id      = aws_apigatewayv2_authorizer.mft_request.id
+}
+
+resource "aws_apigatewayv2_route" "transfer_ticket_complete" {
+  api_id             = aws_apigatewayv2_api.upload_ticket.id
+  route_key          = "POST /transfer-tickets/{transferTicket}/complete"
+  target             = "integrations/${aws_apigatewayv2_integration.upload_ticket.id}"
+  authorization_type = "CUSTOM"
+  authorizer_id      = aws_apigatewayv2_authorizer.mft_request.id
+}
+
+resource "aws_apigatewayv2_route" "transfer_ticket_abort" {
+  api_id             = aws_apigatewayv2_api.upload_ticket.id
+  route_key          = "DELETE /transfer-tickets/{transferTicket}"
+  target             = "integrations/${aws_apigatewayv2_integration.upload_ticket.id}"
+  authorization_type = "CUSTOM"
+  authorizer_id      = aws_apigatewayv2_authorizer.mft_request.id
+}
+
+resource "aws_apigatewayv2_route" "api_docs" {
+  api_id    = aws_apigatewayv2_api.upload_ticket.id
+  route_key = "GET /docs"
+  target    = "integrations/${aws_apigatewayv2_integration.api_docs.id}"
+}
+
+resource "aws_apigatewayv2_route" "api_openapi_contract" {
+  api_id    = aws_apigatewayv2_api.upload_ticket.id
+  route_key = "GET /openapi.yaml"
+  target    = "integrations/${aws_apigatewayv2_integration.api_docs.id}"
 }
 
 resource "aws_apigatewayv2_stage" "default" {
@@ -87,4 +131,12 @@ resource "aws_lambda_permission" "allow_api_gateway_authorizer" {
   function_name = module.lambda_api_authorizer.lambda_function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.upload_ticket.execution_arn}/authorizers/${aws_apigatewayv2_authorizer.mft_request.id}"
+}
+
+resource "aws_lambda_permission" "allow_api_gateway_api_docs" {
+  statement_id  = "AllowExecutionFromApiGatewayApiDocs"
+  action        = "lambda:InvokeFunction"
+  function_name = module.lambda_api_docs.lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.upload_ticket.execution_arn}/*/*"
 }

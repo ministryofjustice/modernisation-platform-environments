@@ -118,6 +118,11 @@ resource "aws_datasync_task" "historic_replication" {
     schedule_expression = "cron(0 0 20 * ? *)"
   }
 
+  excludes {
+    filter_type = "SIMPLE_PATTERN"
+    value       = "/allied_mdss_pipeline/*|/serco_fms_pipeline/*"
+  }
+
   options {
     # REMOVE ensures GDPR deletions in the source are mirrored to the destination
     preserve_deleted_files = "REMOVE"
