@@ -1,3 +1,22 @@
+# The MP RDS module hardcodes immediate for all engines, so we manage the parameter group ourselves.
+resource "aws_db_parameter_group" "rds" {
+  name        = "${local.application_name_short}-${local.environment}-rds"
+  family      = "sqlserver-se-16.0"
+  description = "${local.application_name_short} ${local.environment} RDS parameter group - SSL/TLS enforcement enabled"
+
+  parameter {
+    name         = "rds.force_ssl"
+    value        = "1"
+    apply_method = "pending-reboot"
+  }
+
+  tags = merge(local.tags, { "Name" = "${local.application_name_short}-${local.environment}-rds" })
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
 # MP RDS Instance Module - https://github.com/ministryofjustice/modernisation-platform-terraform-rds-instance
 module "rds" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-rds-instance.git?ref=v0.5.0"
@@ -11,9 +30,9 @@ module "rds" {
   db_port    = 1433
 
   # Engine
-  db_engine                 = "sqlserver-se"
-  db_engine_version         = "16.00.4250.1.v1"
-  db_parameter_group_family = "sqlserver-se-16.0"
+  db_engine         = "sqlserver-se"
+  db_engine_version = "16.00.4250.1.v1"
+  parameter_group_name = aws_db_parameter_group.rds.name
 
   # Storage
   db_instance_class    = local.application_data.accounts[local.environment].rds.db_instance_class
@@ -23,7 +42,7 @@ module "rds" {
   db_username = "dbadmin"
 
   # Encryption
-  kms_key_id = data.aws_kms_key.rds_shared.arn
+  kms_key_id = aws_kms_key.rds.arn
 
   # Availability & maintenance
   multi_az            = local.application_data.accounts[local.environment].rds.db_multi_az
@@ -46,4 +65,7 @@ module "rds" {
 
   # XSIAM logging - Opt out
   opt_in_xsiam_logging = false
+
+  # Ensure the key policy is applied before the module creates RDS CloudWatch log groups
+  depends_on = [aws_kms_key_policy.rds]
 }

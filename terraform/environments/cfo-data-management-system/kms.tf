@@ -44,7 +44,7 @@ resource "aws_kms_alias" "ecs-logs" {
   target_key_id = aws_kms_key.ecs-logs.key_id
 }
 
-# EFS 
+# EFS
 resource "aws_kms_key" "efs" {
   description             = "KMS key for ${local.application_name_short} ${local.environment} EFS encryption"
   enable_key_rotation     = true
@@ -104,4 +104,50 @@ resource "aws_kms_key_policy" "ecr" {
 resource "aws_kms_alias" "ecr" {
   name          = "alias/${local.application_name_short}-${local.environment}-ecr"
   target_key_id = aws_kms_key.ecr.key_id
+}
+
+# RDS CloudWatch Logs and Storage
+resource "aws_kms_key" "rds" {
+  description             = "KMS key for ${local.application_name_short} ${local.environment} RDS and its CloudWatch log groups"
+  enable_key_rotation     = true
+  deletion_window_in_days = 7
+  tags                    = local.tags
+}
+
+resource "aws_kms_key_policy" "rds" {
+  key_id = aws_kms_key.rds.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "Root"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${local.environment_management.account_ids["${local.application_name}-${local.environment}"]}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowCloudWatchLogs"
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.eu-west-2.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt*",
+          "kms:Decrypt*",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:Describe*"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_kms_alias" "rds" {
+  name          = "alias/${local.application_name_short}-${local.environment}-rds"
+  target_key_id = aws_kms_key.rds.key_id
 }
