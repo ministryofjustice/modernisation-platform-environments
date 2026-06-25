@@ -7,6 +7,11 @@ locals {
       grafana_namespace        = "data-platform-monitoring-development"
       grafana_chart_version    = "12.4.8"
 
+      # Let the grafana provider manage dashboards as code (grafana-dashboards.tf).
+      # Keep false until a valid service-account token is stored in the
+      # monitoring/grafana-api-token secret; flip to true to start managing them.
+      grafana_dashboards_enabled = false
+
       # Accounts Grafana reads by assuming the data-platform-monitoring role in
       # each (defined in ../modules/monitoring). Account IDs are resolved by name
       # from the Modernisation Platform environment_management map in
@@ -31,6 +36,11 @@ locals {
       monitoring_hostname      = "monitoring.data-platform.service.justice.gov.uk"
       grafana_namespace        = "data-platform-monitoring-production"
       grafana_chart_version    = "12.4.8"
+
+      # Let the grafana provider manage dashboards as code (grafana-dashboards.tf).
+      # Keep false until a valid service-account token is stored in the
+      # monitoring/grafana-api-token secret; flip to true to start managing them.
+      grafana_dashboards_enabled = false
 
       grafana_monitored_accounts = [
         { name = "data-platform-production", prometheus_workspace_id = "ws-d3a32572-9e85-49f9-8654-bffcf5877783a2" },

@@ -41,9 +41,11 @@ locals {
   ]...)
 
   # The grafana provider can only manage dashboards once Grafana is deployed and a
-  # real service-account token has been populated in Secrets Manager. Until then
-  # (placeholder token, or the monitoring stack disabled) create no grafana
-  # resources, so terraform plan/apply never tries to reach an unconfigured
-  # Grafana during bootstrap.
-  grafana_dashboards_manageable = local.environment_configuration.monitoring_stack_enabled && !contains(["", "CHANGEME"], local.grafana_api_token)
+  # real service-account token has been populated in Secrets Manager. That state
+  # cannot be detected at plan time (the token is read from a data source and is
+  # unknown until apply, which would make the resources' for_each keys unknown),
+  # so it is gated by the static per-environment grafana_dashboards_enabled flag:
+  # flip it on once the token is in place. Until then no grafana resources exist,
+  # so terraform never reaches an unconfigured Grafana.
+  grafana_dashboards_manageable = local.environment_configuration.monitoring_stack_enabled && try(local.environment_configuration.grafana_dashboards_enabled, false)
 }

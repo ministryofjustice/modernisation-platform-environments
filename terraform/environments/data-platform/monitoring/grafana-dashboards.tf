@@ -4,11 +4,11 @@
 # datasource template variable, which selects from those per-account CloudWatch
 # datasources at view time, so the dashboard JSON is unchanged by this move.
 #
-# These resources are created only once a real service-account token has been
-# populated in Secrets Manager (local.grafana_dashboards_manageable), which keeps
-# terraform plan/apply from reaching an unauthenticated Grafana during the initial
-# bootstrap. depends_on orders dashboard creation after the Helm release so
-# Grafana is deployed before the provider pushes to it.
+# These resources are created only when grafana_dashboards_enabled is set for the
+# environment (local.grafana_dashboards_manageable), which keeps terraform
+# plan/apply from reaching an unauthenticated Grafana before its service-account
+# token is in Secrets Manager. depends_on orders dashboard creation after the Helm
+# release so Grafana is deployed before the provider pushes to it.
 
 resource "grafana_folder" "this" {
   for_each = local.grafana_dashboards_manageable ? local.grafana_dashboard_folders : {}
