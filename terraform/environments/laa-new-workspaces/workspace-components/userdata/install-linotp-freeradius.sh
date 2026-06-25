@@ -328,9 +328,19 @@ echo "✓ LinOTP admin user created"
 echo "[8/12] Creating LinOTP policy configuration..."
 
 cat > /tmp/samplepolicy.cfg <<'EOFPOLICY'
-[Limit_to_one_token]
-realm = *
-name = Limit_to_one_token
+[selfservice_enrollment]
+realm = laa-workspaces
+name = selfservice_enrollment
+action = enrollTOTP, webprovisionGOOGLE
+client = *
+user = *
+time = * * * * * *;
+active = True
+scope = selfservice
+
+[limit_one_token]
+realm = laa-workspaces
+name = limit_one_token
 action = maxtoken=1
 client = *
 user = *
@@ -338,25 +348,15 @@ time = * * * * * *;
 active = True
 scope = enrollment
 
-[OTP_to_authenticate]
-realm = *
-name = OTP_to_authenticate
-action = otppin = token_pin
+[otp_authentication]
+realm = laa-workspaces
+name = otp_authentication
+action = otppin=1
 client = *
 user = *
 time = * * * * * *;
 active = True
 scope = authentication
-
-[Require_MFA_at_Self_Service_Portal]
-realm = *
-name = Require_MFA_at_Self_Service_Portal
-active = False
-client = *
-user = *
-time = * * * * * *;
-action = mfa_login
-scope = selfservice
 EOFPOLICY
 
 echo "✓ Policy file created at /tmp/samplepolicy.cfg"
