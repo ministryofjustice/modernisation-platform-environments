@@ -147,7 +147,7 @@
                 exit 1
               fi
 
-              echo "terraform init with dynamically resolved state bucket KMS backend config"
+              echo "terraform init with state bucket KMS backend config"
               terraform init -backend-config="kms_key_id=${state_kms_key_id}"
 
           #
@@ -359,7 +359,7 @@
                 exit 1
               fi
 
-              echo "terraform init with dynamically resolved state bucket KMS backend config"
+              echo "terraform init with state bucket KMS backend config"
               terraform init -backend-config="kms_key_id=${state_kms_key_id}"
 
           - name: Terraform Workspace Select
