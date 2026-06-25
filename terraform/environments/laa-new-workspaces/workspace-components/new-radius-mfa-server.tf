@@ -207,7 +207,7 @@ resource "aws_instance" "radius_server" {
     vpc_cidr                  = aws_vpc.workspaces.cidr_block
   }))
 
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
 
   root_block_device {
     volume_type           = "gp3"
