@@ -14,7 +14,7 @@ locals {
       }),
       "\"",
       "\\\\\\\""
-    ), "ACCOUNT_ID", data.aws_caller_identity.current.account_id), "USER", local.os_creds.username)
+    ), "ACCOUNT_ID", data.aws_caller_identity.current.account_id), "USER", local.region)
   }
 
   #   geo_fence_events_b64 = base64encode(
