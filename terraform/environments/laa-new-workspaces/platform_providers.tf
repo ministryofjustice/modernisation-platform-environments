@@ -27,8 +27,7 @@ provider "aws" {
   default_tags { tags = local.tags }
 }
 
-# AWS provider for core-vpc-<environment>, to access Route53 zones in core-vpc accounts
-# Uses read-only for local runs, write-enabled delegation role for CI/CD
+# AWS provider for core-vpc-<environment>, to access resources in the core-vpc accounts
 provider "aws" {
   alias  = "core-vpc"
   region = "eu-west-2"
