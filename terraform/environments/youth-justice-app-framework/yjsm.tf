@@ -77,6 +77,7 @@ module "yjsm" {
   #  esb_service_sg_id             = module.esb.esb_security_group_id
   ecs_autoscaling_sg_id         = module.ecs.autoscaling_sg_id
   rds_cluster_security_group_id = module.aurora.rds_cluster_security_group_id
+  rds_proxy_security_group_id   = module.aurora.rds_proxy_security_group_id
   alb_security_group_id         = module.internal_alb.alb_security_group_id
   connectivity_alb_sg_id        = module.connectivity_alb.alb_security_group_id
   management_server_sg_id       = module.ds.management_server_sg_id
@@ -89,7 +90,8 @@ module "yjsm" {
 
   yjsm_role_additional_policies_arns = [
     aws_iam_policy.yjsm-s3-access.arn,
-    aws_iam_policy.yjsm-ses-access.arn
+    aws_iam_policy.yjsm-ses-access.arn,
+    aws_iam_policy.yjsm-rds-iam-auth.arn
   ]
 
   yjsm_secrets_access_policy_secret_arns = jsonencode([
@@ -116,4 +118,23 @@ resource "aws_iam_policy" "yjsm-ses-access" {
   name        = "${local.project_name}-yjsm-ses-access"
   description = "Policy for yjsm task role to access SES"
   policy      = file("${path.module}/iam_policies/ses_user_policy.json")
+}
+
+resource "aws_iam_policy" "yjsm-rds-iam-auth" {
+  name        = "${local.project_name}-yjsm-rds-iam-auth"
+  description = "Allows yjsm EC2 role to authenticate to the Aurora cluster and RDS Proxy via IAM database authentication"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "rds-db:connect"
+        Resource = [
+          "arn:aws:rds-db:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:dbuser:${module.aurora.cluster_resource_id}/yjaf_service_iam_user",
+          "arn:aws:rds-db:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:dbuser:${module.aurora.rds_proxy_resource_id}/yjaf_service_iam_user"
+        ]
+      }
+    ]
+  })
 }

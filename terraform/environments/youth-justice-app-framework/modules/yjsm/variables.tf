@@ -52,6 +52,11 @@ variable "rds_cluster_security_group_id" {
   type        = string
 }
 
+variable "rds_proxy_security_group_id" {
+  description = "Security Group ID for the RDS Proxy"
+  type        = string
+}
+
 variable "alb_security_group_id" {
   description = "Security Group ID for ALB"
   type        = string
