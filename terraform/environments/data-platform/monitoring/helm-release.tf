@@ -16,6 +16,9 @@ resource "helm_release" "grafana" {
       # <ingress-name>-<namespace>-<cluster-colour>. The chart names the ingress
       # after the release ("grafana") and the live cluster colour is green.
       ingress_set_identifier = "grafana-${local.environment_configuration.grafana_namespace}-green"
+      # CIDRs allowed to reach Grafana, joined into the ingress
+      # whitelist-source-range annotation in the template.
+      ingress_allowlist = local.environment_configuration.grafana_ingress_allowlist
       # Resolve each monitored account's ID by name from the Modernisation
       # Platform environment_management map rather than hardcoding it.
       monitored_accounts = [

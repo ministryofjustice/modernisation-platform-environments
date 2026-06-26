@@ -34,6 +34,23 @@ ingress:
     external-dns.alpha.kubernetes.io/aws-weight: "100"
     external-dns.alpha.kubernetes.io/set-identifier: ${ingress_set_identifier}
     external-dns.alpha.kubernetes.io/hostname: ${hostname}
+    # Restrict ingress to the allowlisted CIDRs (grafana_ingress_allowlist in
+    # environment-configuration.tf) so Grafana is reachable from the MoJ network
+    # and the cluster rather than the public internet.
+    nginx.ingress.kubernetes.io/whitelist-source-range: ${join(",", ingress_allowlist)}
+  # Route /metrics to the deliberately non-existent "blackhole" service so
+  # Grafana's metrics endpoint cannot be reached through the ingress from outside
+  # the cluster. The service does not exist anywhere, so nginx has no upstream and
+  # returns 503 for /metrics (the port is therefore irrelevant). extraPaths render
+  # ahead of the main "/" path.
+  extraPaths:
+    - path: /metrics
+      pathType: Exact
+      backend:
+        service:
+          name: blackhole
+          port:
+            number: 80
   hosts:
     - ${hostname}
   # The TLS certificate is provisioned on the Cloud Platform side; reference the
