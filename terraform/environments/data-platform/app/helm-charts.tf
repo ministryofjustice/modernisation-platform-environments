@@ -3,7 +3,7 @@ resource "helm_release" "app" {
   /* https://github.com/ministryofjustice/data-platform-app */
   name       = "app"
   repository = "oci://ghcr.io/ministryofjustice/data-platform-charts"
-  version    = "0.0.4"
+  version    = "0.0.5"
   chart      = "app"
   namespace  = module.app_namespace.name
   values = [
@@ -13,7 +13,6 @@ resource "helm_release" "app" {
         app_env                    = local.environment,
         app_django_settings_module = "data_platform_app.settings.${local.environment == "production" ? "production" : "development"}"
         app_hostname               = local.environment_configuration.app_hostname,
-        app_allowed_hosts          = join(" ", local.environment_configuration.app_allowed_hosts),
       }
     )
   ]
@@ -22,7 +21,7 @@ resource "helm_release" "app" {
 resource "helm_release" "app_configuration" {
   name      = "${local.component_name}-configuration"
   chart     = "${path.module}/src/helm/charts/${local.component_name}-configuration"
-  version   = "1.1.0"
+  version   = "1.2.0"
   namespace = module.app_namespace.name
 
   values = [
