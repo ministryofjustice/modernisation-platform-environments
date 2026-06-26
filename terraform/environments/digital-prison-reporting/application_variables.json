@@ -68,6 +68,10 @@
         "pr-assessment-view": {
           "share_with_cloud_platform": true,
           "create_glue_connection": true
+        },
+        "pr-assess-view": {
+          "share_with_cloud_platform": true,
+          "create_glue_connection": true
         }
       },
       "dps_domains": [
@@ -303,6 +307,10 @@
         "pr-assessment-view": {
           "share_with_cloud_platform": true,
           "create_glue_connection": true
+        },
+        "pr-assess-view": {
+          "share_with_cloud_platform": true,
+          "create_glue_connection": true
         }
       },
       "dps_domains": [
@@ -517,6 +525,10 @@
       "scheduled_dataset_lambda_version": "vLatest",
       "probation_domains": {
         "pr-assessment-view": {
+          "share_with_cloud_platform": true,
+          "create_glue_connection": true
+        },
+        "pr-assess-view": {
           "share_with_cloud_platform": true,
           "create_glue_connection": true
         }
@@ -748,6 +760,10 @@
         "pr-assessment-view": {
           "share_with_cloud_platform": true,
           "create_glue_connection": false
+        },
+        "pr-assess-view": {
+          "share_with_cloud_platform": true,
+          "create_glue_connection": true
         }
       },
       "dps_domains": [
