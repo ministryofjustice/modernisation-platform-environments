@@ -27,13 +27,13 @@ resource "aws_networkfirewall_rule_group" "workspaces_aws_endpoints" {
         generated_rules_type = "ALLOWLIST"
         target_types         = ["TLS_SNI", "HTTP_HOST"]
         targets = [
-          "wam-idb.eu-west-2.amazonaws.com",
-          "wam-ps.eu-west-2.amazonaws.com",
-          ".s3.amazonaws.com", # covers s3.amazonaws.com and *.s3.amazonaws.com
-          ".s3-external-1.amazonaws.com",
-          ".s3-eu-west-2.amazonaws.com",
-          "sqs.eu-west-2.amazonaws.com",
-          "cloudfront.amazonaws.com",
+          # "wam-idb.eu-west-2.amazonaws.com",
+          # "wam-ps.eu-west-2.amazonaws.com",
+          # ".s3.amazonaws.com", # covers s3.amazonaws.com and *.s3.amazonaws.com
+          # ".s3-external-1.amazonaws.com",
+          # ".s3-eu-west-2.amazonaws.com",
+          # "sqs.eu-west-2.amazonaws.com",
+          # "cloudfront.amazonaws.com",
         ]
       }
     }
@@ -84,29 +84,29 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
           "c.s-microsoft.com", # root is s-microsoft.com, NOT covered by .microsoft.com
 
           # Azure / Windows platform
-          ".windows.net", # covers all *.windows.net subdomains
-          "management.azure.com",
-          "amp.azure.net",
-          ".adhybridhealth.azure.com",
-          ".informationprotection.azure.com",
-          "informationprotection.hosting.portal.azure.net",
-          ".portal.cloudappsecurity.com",
-          ".cloudapp.net",
-          ".aadrm.com",
-          ".azurerms.com",
+          # ".windows.net", # covers all *.windows.net subdomains
+          # "management.azure.com",
+          # "amp.azure.net",
+          # ".adhybridhealth.azure.com",
+          # ".informationprotection.azure.com",
+          # "informationprotection.hosting.portal.azure.net",
+          # ".portal.cloudappsecurity.com",
+          # ".cloudapp.net",
+          # ".aadrm.com",
+          # ".azurerms.com",
 
           # Azure AD / Identity
-          ".microsoftonline.com", # covers all individual Azure AD endpoint subdomains
-          ".microsoftonline-p.com",
-          ".microsoftonline-p.net",
-          "autologon.microsoftazuread-sso.com",
-          "policykeyservice.dc.ad.msft.net",
-          ".msauth.net",
-          ".msauthimages.net",
-          ".msftauth.net",
-          ".msftauthimages.net",
-          ".phonefactor.net",
-          ".msappproxy.net",
+          # ".microsoftonline.com", # covers all individual Azure AD endpoint subdomains
+          # ".microsoftonline-p.com",
+          # ".microsoftonline-p.net",
+          # "autologon.microsoftazuread-sso.com",
+          # "policykeyservice.dc.ad.msft.net",
+          # ".msauth.net",
+          # ".msauthimages.net",
+          # ".msftauth.net",
+          # ".msftauthimages.net",
+          # ".phonefactor.net",
+          # ".msappproxy.net",
 
           # Office 365 (covers portal, admin, forms, SharePoint, Teams, StaffHub etc.)
           ".office.com",
@@ -118,22 +118,22 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
           ".sharepointonline.com",
 
           # CDN / delivery
-          ".msecnd.net",
-          ".akamaized.net",
-          "spoprod-a.akamaihd.net",
-          "ajax.aspnetcdn.com",
-          "assets.onestore.ms",
-          "auth.gfx.ms",
-          "mem.gfx.ms",
-          "prod.msocdn.com",
-          "shellprod.msocdn.com",
-          ".hockeyapp.net",
+          # ".msecnd.net",
+          # ".akamaized.net",
+          # "spoprod-a.akamaihd.net",
+          # "ajax.aspnetcdn.com",
+          # "assets.onestore.ms",
+          # "auth.gfx.ms",
+          # "mem.gfx.ms",
+          # "prod.msocdn.com",
+          # "shellprod.msocdn.com",
+          # ".hockeyapp.net",
 
           # Misc Microsoft-adjacent services
-          "dc.services.visualstudio.com",
-          "ecn.dev.virtualearth.net",
-          "platform.linkedin.com",
-          "tokensit.cp.microsoft-tst.com", # Microsoft test tenant CP endpoint
+          # "dc.services.visualstudio.com",
+          # "ecn.dev.virtualearth.net",
+          # "platform.linkedin.com",
+          # "tokensit.cp.microsoft-tst.com", # Microsoft test tenant CP endpoint
         ]
       }
     }
@@ -213,33 +213,33 @@ resource "aws_networkfirewall_rule_group" "workspaces_onedrive_live_misc" {
           "www.msftconnecttest.com",
 
           # CyberDuck update check
-          "version.cyberduck.io",
+          # "version.cyberduck.io",
 
           # Office first-party add-in delivery
-          "firstpartyapps.oaspapps.com",
-          "telemetryservice.firstpartyapps.oaspapps.com",
-          "prod.firstpartyapps.oaspapps.com.akadns.net",
-          "wus-firstpartyapps.oaspapps.com",
+          # "firstpartyapps.oaspapps.com",
+          # "telemetryservice.firstpartyapps.oaspapps.com",
+          # "prod.firstpartyapps.oaspapps.com.akadns.net",
+          # "wus-firstpartyapps.oaspapps.com",
 
           # StaffHub (legacy) # REVIEW — Microsoft retired StaffHub Jan 2020
-          "staffhub.ms",
-          "staffhub.uservoice.com",
-          "staffhubweb.azureedge.net",
-          "outlook.uservoice.com",
+          # "staffhub.ms",
+          # "staffhub.uservoice.com",
+          # "staffhubweb.azureedge.net",
+          # "outlook.uservoice.com",
 
           # Analytics / engagement SDKs # REVIEW — mobile-oriented, likely not needed for desktop WorkSpaces
-          ".helpshift.com",
-          ".localytics.com",
-          "cdn.optimizely.com",
-          ".log.optimizely.com",
-          ".o365weve.com",
-          ".branch.io",
-          ".adjust.com",
-          ".crashlytics.com",
-          "fabric.io",
-          ".mesh.com",
-          "vas.samsungapps.com",
-          "connect.facebook.net", # REVIEW — used by some Office add-ins
+          # ".helpshift.com",
+          # ".localytics.com",
+          # "cdn.optimizely.com",
+          # ".log.optimizely.com",
+          # ".o365weve.com",
+          # ".branch.io",
+          # ".adjust.com",
+          # ".crashlytics.com",
+          # "fabric.io",
+          # ".mesh.com",
+          # "vas.samsungapps.com",
+          # "connect.facebook.net", # REVIEW — used by some Office add-ins
         ]
       }
     }
@@ -279,23 +279,23 @@ resource "aws_networkfirewall_rule_group" "workspaces_certificate_authorities" {
         generated_rules_type = "ALLOWLIST"
         target_types         = ["TLS_SNI", "HTTP_HOST"]
         targets = [
-          ".digicert.com",
-          ".globalsign.com",
-          ".globalsign.net",
-          ".entrust.net",
-          ".geotrust.com",
-          ".verisign.com",
-          ".verisign.net",
-          ".symcb.com",
-          ".symcd.com",
-          ".omniroot.com",
-          ".public-trust.com",
-          ".identrust.com",
-          ".letsencrypt.org",
-          ".usertrust.com",
-          "ocsp.msocsp.com", # Microsoft OCSP responder — not under .microsoft.com TLD
-          "crl.sectigo.com",
-          "ocsp.sectigo.com",
+          # ".digicert.com",
+          # ".globalsign.com",
+          # ".globalsign.net",
+          # ".entrust.net",
+          # ".geotrust.com",
+          # ".verisign.com",
+          # ".verisign.net",
+          # ".symcb.com",
+          # ".symcd.com",
+          # ".omniroot.com",
+          # ".public-trust.com",
+          # ".identrust.com",
+          # ".letsencrypt.org",
+          # ".usertrust.com",
+          # "ocsp.msocsp.com", # Microsoft OCSP responder — not under .microsoft.com TLD
+          # "crl.sectigo.com",
+          # "ocsp.sectigo.com",
         ]
       }
     }
