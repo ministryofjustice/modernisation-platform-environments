@@ -83,7 +83,7 @@ resource "aws_route" "private_a_firewall" {
   route_table_id         = aws_route_table.private_a.id
   destination_cidr_block = "0.0.0.0/0"
   vpc_endpoint_id = element([
-    for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist.firewall_status.sync_states : sync_state.endpoint_id
+    for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist.firewall_status[0].sync_states : sync_state.endpoint_id
     if sync_state.availability_zone == "eu-west-2a"
   ], 0)
 }
@@ -93,7 +93,7 @@ resource "aws_route" "private_b_firewall" {
   route_table_id         = aws_route_table.private_b.id
   destination_cidr_block = "0.0.0.0/0"
   vpc_endpoint_id = element([
-    for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist.firewall_status.sync_states : sync_state.endpoint_id
+    for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist.firewall_status[0].sync_states : sync_state.endpoint_id
     if sync_state.availability_zone == "eu-west-2b"
   ], 0)
 }
@@ -193,7 +193,7 @@ resource "aws_route" "nat_firewall_a" {
   route_table_id         = aws_route_table.nat.id
   destination_cidr_block = "0.0.0.0/0"
   vpc_endpoint_id = element([
-    for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist.firewall_status.sync_states : sync_state.endpoint_id
+    for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist.firewall_status[0].sync_states : sync_state.endpoint_id
     if sync_state.availability_zone == "eu-west-2a"
   ], 0)
   
@@ -204,7 +204,7 @@ resource "aws_route" "nat_firewall_b" {
   route_table_id         = aws_route_table.nat.id
   destination_cidr_block = "0.0.0.0/0"
   vpc_endpoint_id = element([
-    for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist.firewall_status.sync_states : sync_state.endpoint_id
+    for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist.firewall_status[0].sync_states : sync_state.endpoint_id
     if sync_state.availability_zone == "eu-west-2b"
   ], 0)
   

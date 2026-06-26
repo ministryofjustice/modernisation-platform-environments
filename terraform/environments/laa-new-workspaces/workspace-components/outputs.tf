@@ -54,7 +54,7 @@ output "network_firewall_id" {
 output "network_firewall_endpoint_ids" {
   description = "Endpoint IDs for the WorkSpaces Network Firewall"
   value = try(
-    [for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist.firewall_status.sync_states : sync_state.endpoint_id],
+    [for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist.firewall_status[0].sync_states : sync_state.endpoint_id],
     []
   )
 }
