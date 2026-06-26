@@ -7,6 +7,7 @@ usage() {
 Usage:
   scripts/bootstrap-api-credentials.sh user --secret-id <secret-id> [--username <username>] [--role-name <role-name>] [--profile <aws-profile>] [--region <aws-region>]
   scripts/bootstrap-api-credentials.sh system --secret-id <secret-id> [--token-id <token-id>] [--role-name <role-name>] [--profile <aws-profile>] [--region <aws-region>]
+  scripts/bootstrap-api-credentials.sh docs --secret-id <secret-id> [--username <username>] [--profile <aws-profile>] [--region <aws-region>]
 
 Description:
   Generates a strong API credential outside Terraform state, writes it to the
@@ -24,6 +25,11 @@ Modes:
       {"tokenId":"...","bearerToken":"...","roleName":"..."}
     Prints only the bearer token value to hand over to the client in this form:
       <tokenId>.<bearerToken>
+
+  docs
+    Writes JSON in this shape:
+      {"username":"...","password":"..."}
+    Prints only the generated password to stdout.
 
 Notes:
   - If username, token-id, or role-name are omitted, the script will try to
@@ -96,8 +102,8 @@ if [ -z "$SECRET_ID" ]; then
   exit 1
 fi
 
-if [ "$MODE" != "user" ] && [ "$MODE" != "system" ]; then
-  echo "Mode must be 'user' or 'system'" >&2
+if [ "$MODE" != "user" ] && [ "$MODE" != "system" ] && [ "$MODE" != "docs" ]; then
+  echo "Mode must be 'user', 'system', or 'docs'" >&2
   exit 1
 fi
 
@@ -213,6 +219,35 @@ if [ "$MODE" = "user" ]; then
 
   echo "Username: $USERNAME" >&2
   echo "Role name: $ROLE_NAME" >&2
+  printf '%s\n' "$PASSWORD"
+  exit 0
+fi
+
+if [ "$MODE" = "docs" ]; then
+  USERNAME="${USERNAME:-$(read_secret_field "$CURRENT_SECRET_JSON" "username")}"
+
+  if [ -z "$USERNAME" ]; then
+    echo "Username is missing. Pass --username or store it in the current secret JSON." >&2
+    exit 1
+  fi
+
+  PASSWORD="$(generate_secret_value 40)"
+  SECRET_STRING="$(python3 - "$USERNAME" "$PASSWORD" <<'PY'
+import json
+import sys
+
+username, password = sys.argv[1:]
+print(json.dumps({"username": username, "password": password}, separators=(",", ":")), end="")
+PY
+)"
+
+  echo "Writing generated docs password to $SECRET_ID" >&2
+  "${AWS_CMD[@]}" secretsmanager put-secret-value \
+    --secret-id "$SECRET_ID" \
+    --secret-string "$SECRET_STRING" \
+    >/dev/null
+
+  echo "Username: $USERNAME" >&2
   printf '%s\n' "$PASSWORD"
   exit 0
 fi

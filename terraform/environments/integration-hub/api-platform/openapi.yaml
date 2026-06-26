@@ -9,16 +9,21 @@ info:
     Large files automatically switch to a multipart upload flow so the client
     ingress path can support uploads larger than 5 GB.
 servers:
-  - url: https://{apiHost}
-    variables:
-      apiHost:
-        default: example.execute-api.eu-west-2.amazonaws.com
+  - url: /
+    description: Same origin as the deployed Swagger UI or API hostname.
 security:
   - basicAuth: []
   - bearerAuth: []
+tags:
+  - name: Transfer Tickets
+    description: Create upload sessions for small and large files.
+  - name: Multipart Uploads
+    description: Continue, complete, or abort multipart transfers.
 paths:
   /transfer-tickets:
     post:
+      tags:
+        - Transfer Tickets
       summary: Create an upload transfer ticket
       description: |
         Creates either:
@@ -55,6 +60,8 @@ paths:
           $ref: '#/components/responses/ErrorResponse'
   /transfer-tickets/{transferTicket}/parts:
     post:
+      tags:
+        - Multipart Uploads
       summary: Generate pre-signed multipart part URLs
       operationId: presignMultipartParts
       security:
@@ -87,6 +94,8 @@ paths:
           $ref: '#/components/responses/ErrorResponse'
   /transfer-tickets/{transferTicket}/complete:
     post:
+      tags:
+        - Multipart Uploads
       summary: Complete a multipart upload
       operationId: completeMultipartUpload
       security:
@@ -119,6 +128,8 @@ paths:
           $ref: '#/components/responses/ErrorResponse'
   /transfer-tickets/{transferTicket}:
     delete:
+      tags:
+        - Multipart Uploads
       summary: Abort a multipart upload
       operationId: abortMultipartUpload
       security:

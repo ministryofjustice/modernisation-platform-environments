@@ -1,5 +1,11 @@
 locals {
-  api_configuration      = try(local.application_data.accounts[local.environment].api_configuration, {})
+  api_configuration = try(local.application_data.accounts[local.environment].api_configuration, {})
+  api_docs_configuration = merge(
+    {
+      basic_auth_username = "api-docs"
+    },
+    try(local.api_configuration.docs, {})
+  )
   auth_configuration     = try(local.application_data.accounts[local.environment].auth_configuration, {})
   auth_roles             = try(local.auth_configuration.roles, {})
   auth_users             = try(local.auth_configuration.users, {})

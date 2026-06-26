@@ -30,7 +30,7 @@ DNS follows the pattern `<endpoint>.<environment>.managed-file-transfer.service.
 | `sftp.*` | AWS Transfer Family SFTP endpoint |
 | `ftps.*` | AWS Transfer Family FTPS endpoint |
 | `web.*` | AWS Transfer Family web app (browser uploads) |
-| `api.*` | Reserved for future API access (not yet provisioned) |
+| `api.*` | API access, provisioned by the adjacent `api-platform` Terraform stack |
 
 For example, the development SFTP endpoint resolves at `sftp.development.managed-file-transfer.service.justice.gov.uk`.
 
@@ -83,7 +83,7 @@ All buckets are KMS-encrypted, versioned, block public access, and have short (o
 
 - Main repository: [ministryofjustice/modernisation-platform-environments](https://github.com/ministryofjustice/modernisation-platform-environments) — this service lives under `terraform/environments/integration-hub/managed-file-transfer`.
 - Custom identity provider documentation: [docs/custom-idp.md](docs/custom-idp.md)
-- Monitoring: CloudWatch (structured Transfer logs, Lambda logs and alarms) in the Integration Hub AWS account.
+- Monitoring: CloudWatch (structured Transfer logs, Lambda logs, saved Logs Insights queries and alarms) in the Integration Hub AWS account.
 
 ### **Expected speed and frequency of releases:**
 
@@ -93,11 +93,13 @@ All buckets are KMS-encrypted, versioned, block public access, and have short (o
 
 <!-- List, briefly, problems (or types of problem) that will automatically alert your team when they occur. -->
 
-CloudWatch alarms are configured for the custom identity provider Lambda:
+CloudWatch alarms publish to high- and low-priority SNS topics, which feed Amazon Q / AWS Chatbot in Slack. They cover:
 
-- **Errors** — any function error.
-- **Throttles** — any throttled invocation (concurrency exhausted).
-- **Duration** — average runtime approaching the 30-second authentication timeout.
+- **Lambda health** — errors, throttles and duration for the custom identity provider, file-movement Lambdas and clean-file notification Lambda.
+- **Queue health** — stale or accumulating messages on the S3 notification, GuardDuty event and clean-file notification queues.
+- **Dead-letter queues** — any message arriving on a dead-letter queue.
+- **GuardDuty Malware Protection for S3** — failed, skipped or infected object scans.
+- **Transfer ingress volume** — unexpectedly high file ingress for the MVP.
 
 ### **Impact of an outage:**
 

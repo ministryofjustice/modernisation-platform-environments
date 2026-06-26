@@ -3,6 +3,21 @@ output "transfer_ticket_api_endpoint" {
   value       = aws_apigatewayv2_api.upload_ticket.api_endpoint
 }
 
+output "transfer_ticket_api_docs_url" {
+  description = "Protected Swagger UI for the managed file transfer API"
+  value       = "${aws_apigatewayv2_api.upload_ticket.api_endpoint}/docs"
+}
+
+output "transfer_ticket_openapi_url" {
+  description = "Protected OpenAPI contract URL for the managed file transfer API"
+  value       = "${aws_apigatewayv2_api.upload_ticket.api_endpoint}/openapi.yaml"
+}
+
+output "transfer_ticket_api_docs_basic_auth_secret_name" {
+  description = "Secrets Manager secret name for the Swagger UI basic auth credentials"
+  value       = module.api_docs_basic_auth_secret.secret_name
+}
+
 output "transfer_clients_table_name" {
   description = "DynamoDB table containing upload client configuration"
   value       = module.dynamodb_transfer_clients.dynamodb_table_id

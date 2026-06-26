@@ -20,7 +20,7 @@ data "aws_iam_policy_document" "ai_gateway" {
     sid       = "BedrockFoundationModelAccess"
     effect    = "Allow"
     actions   = ["bedrock:InvokeModel*"]
-    resources = ["arn:aws:bedrock:*::foundation-model/*"]
+    resources = ["arn:aws:bedrock:eu-*::foundation-model/*"]
   }
 
   statement {

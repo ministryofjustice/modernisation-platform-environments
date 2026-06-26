@@ -24,8 +24,8 @@ module "ai_gateway_aurora" {
 
   security_group_ingress_rules = {
     eks_ingress = {
-      cidr_ipv4   = data.aws_vpc.eks.cidr_block
-      description = "Allow PostgreSQL access from EKS pods"
+      referenced_security_group_id = data.aws_eks_cluster.cluster.vpc_config[0].cluster_security_group_id
+      description                  = "Allow PostgreSQL access from EKS pods"
     }
   }
 
