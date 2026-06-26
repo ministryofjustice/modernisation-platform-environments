@@ -14,10 +14,11 @@ resource "aws_secretsmanager_secret" "gitlab_token" {
 }
 
 resource "aws_secretsmanager_secret_version" "gitlab_token" {
+  #checkov:skip=CKV_SECRET_6: Secret string is a placeholder only
   count = contains(local.deploy_to, local.environment) ? 1 : 0
 
   secret_id     = aws_secretsmanager_secret.gitlab_token[0].id
-  secret_string = "gitlab-token-placeholder"
+  secret_string = "not-a-real-secret"
 
   lifecycle {
     ignore_changes = [secret_string]
