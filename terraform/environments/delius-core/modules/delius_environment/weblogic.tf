@@ -15,7 +15,7 @@ module "weblogic" {
 
   desired_count = var.delius_microservice_configs.weblogic.task_count
 
-  force_new_deployment = true
+  force_new_deployment = false
 
   pin_task_definition_revision           = try(var.delius_microservice_configs.weblogic.task_definition_revision, 0)
   ignore_changes_service_task_definition = false

@@ -14,7 +14,7 @@ module "weblogic_eis" {
   account_info      = var.account_info
   capacity_provider = aws_ecs_capacity_provider.weblogic_eis.name
 
-  force_new_deployment = true
+  force_new_deployment = false
 
   desired_count = var.delius_microservice_configs.weblogic_eis.task_count
 
