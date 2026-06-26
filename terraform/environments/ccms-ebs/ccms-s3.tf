@@ -125,6 +125,25 @@ data "aws_iam_policy_document" "logging_s3_policy" {
       values   = ["${data.aws_caller_identity.current.account_id}"]
     }
   }
+
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      module.s3-bucket-logging.bucket.arn,
+      "${module.s3-bucket-logging.bucket.arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
 }
 
 # ---------------------------------------------
@@ -205,6 +224,25 @@ data "aws_iam_policy_document" "dbbackup_s3_policy" {
     ]
     resources = ["${module.s3-bucket-dbbackup.bucket.arn}/*"]
   }
+
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      module.s3-bucket-dbbackup.bucket.arn,
+      "${module.s3-bucket-dbbackup.bucket.arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
 }
 
 #For shared bucket lifecycle rule is not needed as it host lambda application source code
@@ -242,6 +280,32 @@ resource "aws_s3_bucket_versioning" "ccms_ebs_shared" {
   versioning_configuration {
     status = "Enabled"
   }
+}
+
+data "aws_iam_policy_document" "shared_bucket_secure_transport" {
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.ccms_ebs_shared.arn,
+      "${aws_s3_bucket.ccms_ebs_shared.arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "shared_bucket_secure_transport" {
+  bucket = aws_s3_bucket.ccms_ebs_shared.id
+  policy = data.aws_iam_policy_document.shared_bucket_secure_transport.json
 }
 
 # S3 Bucket for Payment Load
@@ -306,6 +370,33 @@ resource "aws_s3_bucket_lifecycle_configuration" "lambda_payment_load_lifecycle"
     }
   }
 }
+
+data "aws_iam_policy_document" "payment_load_bucket_secure_transport" {
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.lambda_payment_load.arn,
+      "${aws_s3_bucket.lambda_payment_load.arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "payment_load_bucket_secure_transport" {
+  bucket = aws_s3_bucket.lambda_payment_load.id
+  policy = data.aws_iam_policy_document.payment_load_bucket_secure_transport.json
+}
+
 resource "aws_s3_bucket_object_lock_configuration" "dbbackup" {
   count  = local.is-test ? 1 : 0
   bucket = module.s3-bucket-dbbackup.bucket.id
