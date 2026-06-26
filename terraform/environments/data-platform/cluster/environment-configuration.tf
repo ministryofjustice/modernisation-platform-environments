@@ -1,7 +1,4 @@
 locals {
-  # eks_public_access_cidrs lists the CIDRs permitted to reach the EKS public API
-  # server endpoint (endpoint_public_access_cidrs in cluster.tf). Restricts public
-  # access to the MoJ VPN, the octo-production GitHub runner and office sites.
   environment_configurations = {
     development = {
       eks_public_access_cidrs = [
