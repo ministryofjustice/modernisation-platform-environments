@@ -26,7 +26,7 @@ data "aws_prefix_list" "s3" {
 data "external" "ssm_lookup" {
   for_each = toset(contains(local.deploy_to, local.environment) ? ["ssm_lookup"] : [])
   program = ["bash", "-c", <<EOF
-    value=$(aws ssm get-parameter --name "/streaming-poc-maf/${local.environment}/drone-incursion-alert-emails" --query "Parameter.Value" --output text 2>/dev/null)
+    value=$(aws ssm get-parameter --name "/streaming-poc-maf/${local.environment}/drone-incursion-alert-emails"  --with-decryption --query "Parameter.Value" --output text 2>/dev/null)
     if [ $? -eq 0 ]; then
       jq -n --arg val "$value" '{"value": $val}'
     else
