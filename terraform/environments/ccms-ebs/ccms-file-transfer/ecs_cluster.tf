@@ -48,6 +48,10 @@ resource "aws_ecs_task_definition" "sftp_task_definition" {
       AUTHORIZED_CLIENTS            = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:AUTHORIZED_CLIENTS::"
       AUTHORIZED_ROLES              = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:AUTHORIZED_ROLES::"
       UNPROTECTED_URIS              = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:UNPROTECTED_URIS::"
+      OAUTH2_ISSUER_URI             = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:OAUTH2_ISSUER_URI::"
+      OAUTH2_AUDIENCE               = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:OAUTH2_AUDIENCE::"
+      OAUTH2_ROLES                  = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:OAUTH2_ROLES::"
+      OAUTH2_UNPROTECTED_URIS       = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:OAUTH2_UNPROTECTED_URIS::"
       TLS_KEYSTORE_PASSWORD         = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:TLS_KEYSTORE_PASSWORD::"
     }
   )

@@ -51,6 +51,34 @@ module "external_dns" {
       aws_zone_cache_duration = local.aws_zone_cache_duration.production
       log_level               = "info"
     }
+    container-platform-laa-nonlive = {
+      version                 = local.chart_version
+      domain_name_prefix      = "laa-nonlive"
+      sync_interval           = local.sync_interval.production
+      aws_zone_cache_duration = local.aws_zone_cache_duration.production
+      log_level               = "info"
+    }
+    container-platform-laa-live = {
+      version                 = local.chart_version
+      domain_name_prefix      = "laa-live"
+      sync_interval           = local.sync_interval.production
+      aws_zone_cache_duration = local.aws_zone_cache_duration.production
+      log_level               = "info"
+    }
+    container-platform-hmpps-nonlive = {
+      version                 = local.chart_version
+      domain_name_prefix      = "hmpps-nonlive"
+      sync_interval           = local.sync_interval.production
+      aws_zone_cache_duration = local.aws_zone_cache_duration.production
+      log_level               = "info"
+    }
+    container-platform-hmpps-live = {
+      version                 = local.chart_version
+      domain_name_prefix      = "hmpps-live"
+      sync_interval           = local.sync_interval.production
+      aws_zone_cache_duration = local.aws_zone_cache_duration.production
+      log_level               = "info"
+    }
   }
   tags = {
     application   = "External DNS"

@@ -31,6 +31,8 @@
 /terraform/environments/cloud-platform-non-live @ministryofjustice/cloud-platform-engineers @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/cloud-platform @ministryofjustice/cloud-platform-engineers @ministryofjustice/container-platform-aws @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/coat @ministryofjustice/cloud-optimisation-and-accountability @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
+/terraform/environments/container-platform-hmpps @ministryofjustice/cloud-platform-engineers @ministryofjustice/modernisation-platform
+/terraform/environments/container-platform-laa @ministryofjustice/cloud-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/container-platform-octo @ministryofjustice/cloud-platform-engineers @ministryofjustice/container-platform-aws @ministryofjustice/modernisation-platform
 /terraform/environments/contract-work-administration @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-cwa-developer @ministryofjustice/laa-pcuam @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/cooker @ministryofjustice/modernisation-platform @ministryofjustice/octo-cyber-team @ministryofjustice/tvm-purple-team @ministryofjustice/modernisation-platform

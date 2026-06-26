@@ -160,8 +160,7 @@ resource "aws_cloudwatch_event_rule" "s3_replication_failure" {
   description   = "Capture S3 replication failure events"
   event_pattern = <<EOF
 {
-  "source": ["aws.s3"],
-  "detail-type": ["Object Replication Failed"]
+  "source": ["aws.s3"]
 }
 EOF
 }
