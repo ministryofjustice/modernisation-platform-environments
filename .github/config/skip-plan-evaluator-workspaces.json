@@ -10,5 +10,9 @@
   "laa-workspaces-development",
   "laa-new-workspaces-development",
   "container-platform-octo-nonlive",
-  "container-platform-octo-live"
+  "container-platform-octo-live",
+  "container-platform-laa-nonlive",
+  "container-platform-laa-live",
+  "container-platform-hmpps-nonlive",
+  "container-platform-hmpps-live"
 ]
