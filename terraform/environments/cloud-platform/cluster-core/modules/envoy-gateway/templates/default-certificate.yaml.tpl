@@ -4,7 +4,7 @@ metadata:
   name: default
   namespace: envoy-gateway-system
 spec:
-  secretName: default-certificate
+  secretName: ${gateway_name}-certificate
   issuerRef:
     name: letsencrypt-production
     kind: ClusterIssuer

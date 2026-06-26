@@ -14,7 +14,7 @@ resource "helm_release" "envoy_gateway" {
   chart      = "gateway-helm"
   repository = "oci://docker.io/envoyproxy/"
   version    = "1.8.1"
-  namespace  = "envoy-gateway-system"
+  namespace  = kubernetes_namespace_v1.envoy_gateway_system.metadata[0].name
 
   depends_on = [ kubernetes_namespace_v1.envoy_gateway_system ]
 
@@ -26,8 +26,8 @@ resource "kubernetes_manifest" "envoy_proxy" {
     kind       = "EnvoyProxy"
 
     metadata = {
-      name      = "shared-nlb-proxy"
-      namespace = "envoy-gateway-system"
+      name      = var.envoy_proxy_name
+      namespace = kubernetes_namespace_v1.envoy_gateway_system.metadata[0].name
     }
 
     spec = {
@@ -36,13 +36,13 @@ resource "kubernetes_manifest" "envoy_proxy" {
 
         kubernetes = {
           envoyDeployment = {
-            replicas = 3
+            replicas = var.envoy_proxy_replicas
           }
 
           envoyService = {
             type = "LoadBalancer"
             annotations = {
-              "service.beta.kubernetes.io/aws-load-balancer-name"                  = "${var.cluster_name}-envoy-default"
+              "service.beta.kubernetes.io/aws-load-balancer-name"                  = "${var.cluster_name}-envoy-${var.gateway_name}"
               "service.beta.kubernetes.io/aws-load-balancer-scheme"                = "internet-facing"
               "service.beta.kubernetes.io/aws-load-balancer-nlb-target-type"       = "ip"
               "service.beta.kubernetes.io/aws-load-balancer-healthcheck-protocol"  = "TCP"
@@ -63,7 +63,7 @@ resource "kubernetes_manifest" "gateway_class" {
     kind       = "GatewayClass"
 
     metadata = {
-      name = "default-gateway-class"
+      name = "${var.gateway_name}-gateway-class"
     }
 
     spec = {
@@ -99,7 +99,7 @@ resource "kubernetes_manifest" "gateway" {
     kind       = "Gateway"
 
     metadata = {
-      name      = "default"
+      name      = var.gateway_name
       namespace = kubernetes_namespace_v1.envoy_gateway_system.metadata[0].name
     }
 
@@ -112,15 +112,15 @@ resource "kubernetes_manifest" "gateway" {
           protocol = "HTTP"
           port     = 80
         },
-        {
-          # Use TLS here because hostname/cert mapping is supplied by ListenerSets.
-          name     = "platform-tls"
-          protocol = "TLS"
-          port     = 443
-          tls = {
-            mode = "Passthrough"
-          }
-        }
+        # {
+        #   # Use TLS here because hostname/cert mapping is supplied by ListenerSets.
+        #   name     = "platform-tls"
+        #   protocol = "TLS"
+        #   port     = 443
+        #   tls = {
+        #     mode = "Passthrough"
+        #   }
+        # }
       ]
 
       # Any namespace can attach a ListenerSet to this platform Gateway.
@@ -142,6 +142,7 @@ resource "kubernetes_manifest" "gateway" {
 resource "kubectl_manifest" "envoy_gateway_default_certificate" {
   yaml_body = templatefile("${path.module}/templates/default-certificate.yaml.tpl", {
     cluster_base_domain = var.cluster_base_domain
+    gateway_name         = var.gateway_name
   })
 
   depends_on = [
@@ -153,8 +154,8 @@ resource "kubectl_manifest" "envoy_gateway_default_listenerset" {
   yaml_body = templatefile("${path.module}/templates/default-listenerset.yaml.tpl", {
     gateway_name             = kubernetes_manifest.gateway.manifest.metadata.name
     namespace                = kubernetes_namespace_v1.envoy_gateway_system.metadata[0].name
-    listenerset_name         = "default-listenerset"
-    tls_secret_name          = "default-certificate"
+    listenerset_name         = "${var.gateway_name}-listenerset"
+    tls_secret_name          = "${var.gateway_name}-certificate"
     base_domain              = var.cluster_base_domain
   })
 
