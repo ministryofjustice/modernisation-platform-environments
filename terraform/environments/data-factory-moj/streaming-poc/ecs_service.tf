@@ -485,6 +485,8 @@ module "ecs_service_sdg" {
   service_role_arn   = aws_iam_role.sdg_task[0].arn
   task_role_arn      = aws_iam_role.sdg_task[0].arn
   task_exec_role_arn = aws_iam_role.sdg_task_exec[0].arn
+  task_cpu           = "2048"
+  task_memory        = "8192"
 
   capacity_provider      = local.capacity_provider
   enable_execute_command = true
@@ -518,7 +520,12 @@ module "ecs_container_alerts" {
   essential                = true
   readonly_root_filesystem = true
   port_mappings            = []
-  secrets                  = []
+  secrets = [
+    {
+      name      = "GITLAB_TOKEN"
+      valueFrom = aws_secretsmanager_secret.gitlab_token[0].arn
+    }
+  ]
   environment = [
     {
       name  = "ENVIRONMENT"
