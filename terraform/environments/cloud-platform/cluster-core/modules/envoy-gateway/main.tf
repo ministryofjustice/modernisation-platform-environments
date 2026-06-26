@@ -26,7 +26,7 @@ resource "kubernetes_manifest" "envoy_proxy" {
     kind       = "EnvoyProxy"
 
     metadata = {
-      name      = var.envoy_proxy_name
+      name      = "${var.gateway_name}-envoy-proxy"
       namespace = kubernetes_namespace_v1.envoy_gateway_system.metadata[0].name
     }
 
@@ -57,6 +57,7 @@ resource "kubernetes_manifest" "envoy_proxy" {
 
   depends_on = [helm_release.envoy_gateway]
 }
+
 resource "kubernetes_manifest" "gateway_class" {
   manifest = {
     apiVersion = "gateway.networking.k8s.io/v1"
@@ -72,8 +73,8 @@ resource "kubernetes_manifest" "gateway_class" {
       parametersRef = {
         group     = "gateway.envoyproxy.io"
         kind      = "EnvoyProxy"
-        name      = "shared-nlb-proxy"
-        namespace = "envoy-gateway-system"
+        name      = "${var.gateway_name}-envoy-proxy"
+        namespace = kubernetes_namespace_v1.envoy_gateway_system.metadata[0].name
       }
     }
   }
@@ -93,6 +94,7 @@ resource "kubernetes_manifest" "gateway_class" {
 # Tenants use either:
 # - the platform default ListenerSet and wildcard certificate for quick start, or
 # - create their own ListenerSet in their namespacefor custom cert/hostname control.
+
 resource "kubernetes_manifest" "gateway" {
   manifest = {
     apiVersion = "gateway.networking.k8s.io/v1"

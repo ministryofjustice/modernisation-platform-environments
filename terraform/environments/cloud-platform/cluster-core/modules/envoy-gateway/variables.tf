@@ -14,14 +14,6 @@ variable envoy_proxy_replicas {
   default     = 2
 }
 
-variable "envoy_proxy_name" {
-  type = string
-}
-
-variable "gateway_class_name" {
-  type = string
-}
-
 variable "gateway_name" {
   type = string
 }
