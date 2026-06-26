@@ -2400,6 +2400,7 @@ resource "aws_iam_policy" "merge_load" {
   policy = data.aws_iam_policy_document.merge_load_policy_document.json
 }
 
+# merge load position
 resource "aws_iam_role_policy_attachment" "merge_load_position_attach" {
   role       = aws_iam_role.merge_load_position.name
   policy_arn = aws_iam_policy.merge_load.arn
@@ -2407,7 +2408,7 @@ resource "aws_iam_role_policy_attachment" "merge_load_position_attach" {
 
 
 resource "aws_lakeformation_permissions" "merge_load_position_lambda_database_access" {
-  for_each    = local.is-development || local.is-test || local.is-preproduction ? toset(local.load_lambda_databases) : []
+  for_each    = toset(local.load_lambda_databases)
   principal   = aws_iam_role.merge_load_position.arn
   permissions = ["DESCRIBE"]
   database {
@@ -2416,7 +2417,7 @@ resource "aws_lakeformation_permissions" "merge_load_position_lambda_database_ac
 }
 
 resource "aws_lakeformation_permissions" "merge_load_position_lambda_table_access" {
-  for_each    = local.is-development || local.is-test || local.is-preproduction ? toset(local.load_lambda_databases) : []
+  for_each    = toset(local.load_lambda_databases)
   principal   = aws_iam_role.merge_load_position.arn
   permissions = ["SELECT", "INSERT", "ALTER", "DESCRIBE"]
   table {
@@ -2426,7 +2427,7 @@ resource "aws_lakeformation_permissions" "merge_load_position_lambda_table_acces
 }
 
 resource "aws_lakeformation_permissions" "merge_load_position_lambda_s3_access" {
-  count       = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
+  count       = 1
   principal   = aws_iam_role.merge_load_position.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
@@ -2434,6 +2435,7 @@ resource "aws_lakeformation_permissions" "merge_load_position_lambda_s3_access" 
   }
 }
 
+# merge load ac
 resource "aws_iam_role_policy_attachment" "merge_load_ac_attach" {
   role       = aws_iam_role.merge_load_ac.name
   policy_arn = aws_iam_policy.merge_load.arn
@@ -2468,6 +2470,7 @@ resource "aws_lakeformation_permissions" "merge_load_ac_lambda_s3_access" {
   }
 }
 
+# merge load event
 resource "aws_iam_role_policy_attachment" "merge_load_event_attach" {
   role       = aws_iam_role.merge_load_event.name
   policy_arn = aws_iam_policy.merge_load.arn
@@ -2475,7 +2478,7 @@ resource "aws_iam_role_policy_attachment" "merge_load_event_attach" {
 
 
 resource "aws_lakeformation_permissions" "merge_load_event_lambda_database_access" {
-  for_each    = local.is-development || local.is-test || local.is-preproduction ? toset(local.load_lambda_databases) : []
+  for_each    = toset(local.load_lambda_databases)
   principal   = aws_iam_role.merge_load_event.arn
   permissions = ["DESCRIBE"]
   database {
@@ -2484,7 +2487,7 @@ resource "aws_lakeformation_permissions" "merge_load_event_lambda_database_acces
 }
 
 resource "aws_lakeformation_permissions" "merge_load_event_lambda_table_access" {
-  for_each    = local.is-development || local.is-test || local.is-preproduction ? toset(local.load_lambda_databases) : []
+  for_each    = toset(local.load_lambda_databases)
   principal   = aws_iam_role.merge_load_event.arn
   permissions = ["SELECT", "INSERT", "ALTER", "DESCRIBE"]
   table {
@@ -2494,7 +2497,7 @@ resource "aws_lakeformation_permissions" "merge_load_event_lambda_table_access" 
 }
 
 resource "aws_lakeformation_permissions" "merge_load_event_lambda_s3_access" {
-  count       = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
+  count       = 1
   principal   = aws_iam_role.merge_load_event.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
