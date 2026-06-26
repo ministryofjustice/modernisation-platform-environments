@@ -13,8 +13,8 @@ locals {
     try(aws_kms_key.secretsmanager[0].arn, "*")
   ) : "*"
   secretsmanager_gitlab_token_arn = contains(local.deploy_to, local.environment) ? (
-  try(aws_secretsmanager_secret.gitlab_token[0].arn, "*")
-  )  : "*"
+    try(aws_secretsmanager_secret.gitlab_token[0].arn, "*")
+  ) : "*"
   msk_bootstrap_brokers = contains(local.deploy_to, local.environment) ? (
     try(data.aws_msk_bootstrap_brokers.msk["msk"].bootstrap_brokers_sasl_iam, null)
   ) : null
