@@ -136,33 +136,3 @@ resource "kubernetes_manifest" "gateway" {
 
   depends_on = [kubernetes_manifest.gateway_class]
 }
-
-##########################################################
-# Certificate resources for wildcard domain cert issuing #
-##########################################################
-
-resource "kubectl_manifest" "envoy_gateway_default_certificate" {
-  yaml_body = templatefile("${path.module}/templates/default-certificate.yaml.tpl", {
-    cluster_base_domain = var.cluster_base_domain
-    gateway_name         = var.gateway_name
-  })
-
-  depends_on = [
-    kubernetes_namespace_v1.envoy_gateway_system
-  ]
-}
-
-resource "kubectl_manifest" "envoy_gateway_default_listenerset" {
-  yaml_body = templatefile("${path.module}/templates/default-listenerset.yaml.tpl", {
-    gateway_name             = kubernetes_manifest.gateway.manifest.metadata.name
-    namespace                = kubernetes_namespace_v1.envoy_gateway_system.metadata[0].name
-    listenerset_name         = "${var.gateway_name}-listenerset"
-    tls_secret_name          = "${var.gateway_name}-certificate"
-    base_domain              = var.cluster_base_domain
-  })
-
-  depends_on = [
-    kubernetes_manifest.gateway,
-    kubectl_manifest.envoy_gateway_default_certificate
-  ]
-}
