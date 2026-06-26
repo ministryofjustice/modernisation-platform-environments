@@ -13,10 +13,18 @@ module "waf" {
     aws.us-east-1 = aws.us-east-1
   }
 
+  waf_path_allow_rules = {
+    "allow-malware-notifier" = {
+      name     = "allow-malware-notifier"
+      priority = 1
+      path     = "/secure/api/v1/docs/threatDetected"
+    }
+  }
+
   waf_IP_rules = {
     "Cloudfront" = {
       name        = "Cloudfront"
-      priority    = 1
+      priority    = 11
       description = "Cloudfront IP addresses"
       ip_addresses = ["99.84.0.0/16", "118.193.97.64/26", "3.35.130.128/25", "36.103.232.0/25", "18.192.142.0/23", "3.234.232.224/27", "65.9.128.0/18",
         "205.251.254.0/24", "180.163.57.0/25", "99.86.0.0/16", "52.56.127.0/25", "3.134.215.0/24", "116.129.226.0/25", "71.152.0.0/17",

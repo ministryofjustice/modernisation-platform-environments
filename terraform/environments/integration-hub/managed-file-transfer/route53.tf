@@ -8,6 +8,12 @@ module "r53_managed_file_transfer" {
   create_zone = false
 
   records = {
+    ftps = {
+      name    = "ftps"
+      type    = "A"
+      ttl     = 300
+      records = [for key, value in aws_eip.this : value.public_ip]
+    }
     sftp = {
       name    = "sftp"
       type    = "A"

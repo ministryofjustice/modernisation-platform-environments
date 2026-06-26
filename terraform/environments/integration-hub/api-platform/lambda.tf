@@ -141,3 +141,39 @@ module "lambda_api_authorizer" {
 
   tags = local.tags
 }
+
+module "lambda_api_docs" {
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "8.8.0"
+
+  function_name                = "${local.application_name}-${local.component_name}-docs"
+  description                  = "Serves the protected Swagger UI and OpenAPI contract for the MFT API"
+  handler                      = "lambda_function.lambda_handler"
+  runtime                      = "python3.12"
+  # Rebuild the package on clean CI runners when the local zip is absent.
+  trigger_on_package_timestamp = true
+  environment_variables = {
+    DOCS_BASIC_AUTH_SECRET_ID = module.api_docs_basic_auth_secret.secret_name
+  }
+  source_path = [
+    "${path.module}/lambda/request-docs",
+    "${path.module}/openapi.yaml",
+  ]
+
+  attach_policy_statements = true
+  policy_statements = {
+    docs_auth_secret_read = {
+      effect = "Allow"
+      actions = [
+        "secretsmanager:GetSecretValue",
+      ]
+      resources = [
+        module.api_docs_basic_auth_secret.secret_arn,
+      ]
+    }
+  }
+
+  cloudwatch_logs_retention_in_days = 30
+
+  tags = local.tags
+}

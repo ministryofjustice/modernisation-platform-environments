@@ -15,11 +15,11 @@ data "aws_msk_bootstrap_brokers" "msk" {
 }
 
 data "aws_kms_key" "sns_topic_kmskey" {
-  for_each    = toset(contains(local.deploy_to, local.environment) ? ["sns"] : [])
-  key_id = "alias/streaming-poc-maf-sns"
+  for_each = toset(contains(local.deploy_to, local.environment) ? ["sns"] : [])
+  key_id   = "alias/streaming-poc-maf-sns"
 }
 
 data "aws_sns_topic" "drone_incursion_topic" {
-  for_each    = toset(contains(local.deploy_to, local.environment) ? ["topic"] : [])
-  name = "moj-pov-drone-incursion-alerts"
+  for_each = toset(contains(local.deploy_to, local.environment) ? ["topic"] : [])
+  name     = "moj-pov-drone-incursion-alerts"
 }

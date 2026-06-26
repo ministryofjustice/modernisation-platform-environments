@@ -53,3 +53,34 @@ resource "aws_kms_alias" "ecs_cloudwatch" {
   name          = "alias/${local.ecs_prefix}-cloudwatch"
   target_key_id = aws_kms_key.ecs_cloudwatch[0].key_id
 }
+
+data "aws_iam_policy_document" "secretsmanager" {
+  #checkov:skip=CKV_AWS_109:KMS key policy requires permissions management on the key; access is limited to account root.
+  #checkov:skip=CKV_AWS_111:KMS key policies require kms:* on * for the root account - this is an AWS requirement
+  #checkov:skip=CKV_AWS_356:KMS key policies require * as resource - this is an AWS requirement
+  statement {
+    sid    = "EnableRootAccess"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_kms_key" "secretsmanager" {
+  count                   = contains(local.deploy_to, local.environment) ? 1 : 0
+  description             = "KMS key for Secrets Manager secrets"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+  policy                  = data.aws_iam_policy_document.secretsmanager.json
+  tags                    = local.extended_tags
+}
+
+resource "aws_kms_alias" "secretsmanager" {
+  count         = contains(local.deploy_to, local.environment) ? 1 : 0
+  name          = "alias/${local.ecs_prefix}-secretsmanager"
+  target_key_id = aws_kms_key.secretsmanager[0].key_id
+}

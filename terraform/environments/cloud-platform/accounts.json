@@ -1,6 +1,10 @@
 {
   "accounts": [
     "container-platform-octo-nonlive",
-    "container-platform-octo-live"
+    "container-platform-octo-live",
+    "container-platform-laa-nonlive",
+    "container-platform-laa-live",
+    "container-platform-hmpps-nonlive",
+    "container-platform-hmpps-live"
   ]
 }
