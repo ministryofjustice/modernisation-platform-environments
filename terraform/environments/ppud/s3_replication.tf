@@ -93,8 +93,6 @@ locals {
 
 resource "aws_s3_bucket" "s3_replication" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
-  # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
-  # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
   # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
   for_each = local.s3_replication_buckets
   bucket   = each.value.bucket_name
@@ -155,15 +153,26 @@ resource "aws_s3_bucket_replication_configuration" "s3_replication" {
   rule {
     id     = each.value.replication_rule_id
     status = "Enabled"
-    filter {}
+    filter {
+      prefix = ""
+    }
     delete_marker_replication {
       status = "Disabled"
     }
     destination {
       bucket        = each.value.replication_destination
       storage_class = "STANDARD"
+      metrics {
+        status = "Enabled"
+      }
     }
   }
+}
+
+resource "aws_s3_bucket_notification" "s3_replication" {
+  for_each    = local.s3_replication_buckets
+  bucket      = aws_s3_bucket.s3_replication[each.key].id
+  eventbridge = true
 }
 
 resource "aws_s3_bucket_policy" "s3_replication" {
@@ -188,7 +197,7 @@ resource "aws_s3_bucket_policy" "s3_replication" {
       },
       {
         Effect = "Allow"
-        Action = ["s3:DeleteObject", "s3:GetObject", "s3:PutObject", "s3:ListBucket"]
+        Action = ["s3:GetBucketAcl", "s3:DeleteObject", "s3:GetObject", "s3:PutObject", "s3:ListBucket"]
         Resource = [
           aws_s3_bucket.s3_replication[each.key].arn,
           "${aws_s3_bucket.s3_replication[each.key].arn}/*"
