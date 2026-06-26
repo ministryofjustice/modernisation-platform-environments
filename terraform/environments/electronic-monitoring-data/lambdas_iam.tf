@@ -10,7 +10,6 @@ locals {
     "intermediate_tasking${local.dbt_suffix}"
   ]
 
-  # add databases (and split out?)
   load_lambda_databases = [
     "staged_mdss${local.dbt_suffix}",
     "acquisitive_crime${local.dbt_suffix}",
@@ -2521,7 +2520,7 @@ resource "aws_iam_role_policy_attachment" "merge_load_emdi_attach" {
 
 
 resource "aws_lakeformation_permissions" "merge_load_emdi_lambda_database_access" {
-  for_each    = local.is-development || local.is-test || local.is-preproduction ? toset(local.load_lambda_databases) : []
+  for_each    = local.is-development ? toset(local.load_lambda_databases) : []
   principal   = aws_iam_role.merge_load_emdi.arn
   permissions = ["DESCRIBE"]
   database {
@@ -2530,7 +2529,7 @@ resource "aws_lakeformation_permissions" "merge_load_emdi_lambda_database_access
 }
 
 resource "aws_lakeformation_permissions" "merge_load_emdi_lambda_table_access" {
-  for_each    = local.is-development || local.is-test || local.is-preproduction ? toset(local.load_lambda_databases) : []
+  for_each    = local.is-development ? toset(local.load_lambda_databases) : []
   principal   = aws_iam_role.merge_load_emdi.arn
   permissions = ["SELECT", "INSERT", "ALTER", "DESCRIBE"]
   table {
@@ -2540,7 +2539,7 @@ resource "aws_lakeformation_permissions" "merge_load_emdi_lambda_table_access" {
 }
 
 resource "aws_lakeformation_permissions" "merge_load_emdi_lambda_s3_access" {
-  count       = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
+  count       = local.is-development ? 1 : 0
   principal   = aws_iam_role.merge_load_emdi.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
