@@ -16,11 +16,11 @@ terraform {
     }
   }
 
-  backend "s3" {
-    bucket       = "streaming-poc-tfstate"
-    key          = "opensearch-config/terraform.tfstate"
-    region       = "eu-west-2"
-    encrypt      = true
-    use_lockfile = true
-  }
+  # backend "s3" {
+  #   bucket       = "streaming-poc-tfstate"
+  #   key          = "opensearch-config/terraform.tfstate"
+  #   region       = "eu-west-2"
+  #   encrypt      = true
+  #   use_lockfile = true
+  # }
 }
