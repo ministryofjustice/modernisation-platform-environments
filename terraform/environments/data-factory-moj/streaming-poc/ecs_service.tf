@@ -42,6 +42,21 @@ data "aws_iam_policy_document" "ecs_task_exec" {
     ]
     resources = [data.aws_kms_key.general_shared.arn]
   }
+  statement {
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret"
+    ]
+    resources = [aws_secretsmanager_secret.gitlab_token[0].arn]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt"
+    ]
+    resources = [aws_kms_key.secretsmanager[0].arn]
+  }
 }
 
 # --- Synthetic Data Generator IAM ---
@@ -71,24 +86,6 @@ resource "aws_iam_role_policy" "sdg_task_exec_ecr" {
   name   = "${local.sdg_prefix}-task-exec-ecr"
   role   = aws_iam_role.sdg_task_exec[0].name
   policy = data.aws_iam_policy_document.ecs_task_exec.json
-}
-
-data "aws_iam_policy_document" "sdg_task_exec_secrets" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "secretsmanager:GetSecretValue",
-      "secretsmanager:DescribeSecret"
-    ]
-    resources = [aws_secretsmanager_secret.gitlab_token[0].arn]
-  }
-}
-
-resource "aws_iam_role_policy" "sdg_task_exec_secrets" {
-  count  = contains(local.deploy_to, local.environment) ? 1 : 0
-  name   = "${local.sdg_prefix}-task-exec-secrets"
-  role   = aws_iam_role.sdg_task_exec[0].name
-  policy = data.aws_iam_policy_document.sdg_task_exec_secrets.json
 }
 
 data "aws_iam_policy_document" "sdg_task" {
