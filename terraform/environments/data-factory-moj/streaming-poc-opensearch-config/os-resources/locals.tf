@@ -9,7 +9,7 @@ locals {
         "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/flink-moj-geofence-flink-iam-role",
         "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/flink-rules-flink-iam-role"
       ]
-      users = ["${local.os_creds.username}"]
+      users = [local.os_creds.username]
     }
   }
 }
