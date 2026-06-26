@@ -68,7 +68,10 @@ aws ssm start-session \
 
 ```bash
 cd os-resources
+un-comment the backend block in 2_terraform.tf  # this is work around until we get stretegic solution on platform 
 terraform init
 terraform plan
 terraform apply
+comment the backend block in 2_terraform.tf
+push changes backup to repo.
 ```
