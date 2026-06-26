@@ -73,6 +73,24 @@ resource "aws_iam_role_policy" "sdg_task_exec_ecr" {
   policy = data.aws_iam_policy_document.ecs_task_exec.json
 }
 
+data "aws_iam_policy_document" "sdg_task_exec_secrets" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret"
+    ]
+    resources = [aws_secretsmanager_secret.gitlab_token[0].arn]
+  }
+}
+
+resource "aws_iam_role_policy" "sdg_task_exec_secrets" {
+  count  = contains(local.deploy_to, local.environment) ? 1 : 0
+  name   = "${local.sdg_prefix}-task-exec-secrets"
+  role   = aws_iam_role.sdg_task_exec[0].name
+  policy = data.aws_iam_policy_document.sdg_task_exec_secrets.json
+}
+
 data "aws_iam_policy_document" "sdg_task" {
   for_each = toset(contains(local.deploy_to, local.environment) ? ["sdg_task"] : [])
   statement {
@@ -421,10 +439,17 @@ module "ecs_container_sdg" {
 
   name                     = local.sdg_prefix
   image                    = "${aws_ecr_repository.repository["sdg"].repository_url}:latest"
+  memory                   = 8192
+  cpu                      = 2048
   essential                = true
   readonly_root_filesystem = false
   port_mappings            = []
-  secrets                  = []
+  secrets = [
+    {
+      name      = "GITLAB_TOKEN"
+      valueFrom = aws_secretsmanager_secret.gitlab_token[0].arn
+    }
+  ]
   environment = [
     {
       name  = "ENVIRONMENT"
@@ -432,7 +457,7 @@ module "ecs_container_sdg" {
     },
     {
       name  = "KAFKA_BROKER"
-      value = local.msk_bootstrap_brokers
+      value = substr(local.msk_bootstrap_brokers, 0, length(local.msk_bootstrap_brokers) - 5)
     }
   ]
   log_configuration = {
@@ -502,6 +527,10 @@ module "ecs_container_alerts" {
     {
       name  = "SPRING_PROFILES_ACTIVE"
       value = substr(lower(local.environment), 0, 3)
+    },
+    {
+      name  = "KAFKA_BOOTSTRAP_SERVERS"
+      value = local.msk_bootstrap_brokers
     },
     {
       name  = "MOJ-DRONE-INCURSION-ARN"
