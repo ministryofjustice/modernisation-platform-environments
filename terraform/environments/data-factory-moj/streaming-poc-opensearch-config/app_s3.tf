@@ -112,6 +112,7 @@ resource "aws_s3_bucket_policy" "secure_policy" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "state_lifecycle" {
+  count      = contains(local.deploy_to, local.environment) ? 1 : 0
   depends_on = [aws_s3_bucket_versioning.versioning]
   bucket     = aws_s3_bucket.tfstate[0].id
 
