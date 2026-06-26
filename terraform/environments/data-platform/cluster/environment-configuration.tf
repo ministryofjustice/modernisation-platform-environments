@@ -3,6 +3,7 @@ locals {
     development = {
       eks_public_access_cidrs = [
         "128.77.75.64/26", # Prisma Corporate
+        "35.176.93.186/32", # GlobalProtect (Alpha)
         "20.58.27.30/32",  # GitHub Runner (octo-production)
         # Sites
         "213.121.161.112/28", # 102PF
@@ -12,6 +13,7 @@ locals {
     test = {
       eks_public_access_cidrs = [
         "128.77.75.64/26", # Prisma Corporate
+        "35.176.93.186/32", # GlobalProtect (Alpha)
         "20.58.27.30/32",  # GitHub Runner (octo-production)
         # Sites
         "213.121.161.112/28", # 102PF
@@ -21,6 +23,7 @@ locals {
     preproduction = {
       eks_public_access_cidrs = [
         "128.77.75.64/26", # Prisma Corporate
+        "35.176.93.186/32", # GlobalProtect (Alpha)
         "20.58.27.30/32",  # GitHub Runner (octo-production)
         # Sites
         "213.121.161.112/28", # 102PF
@@ -30,6 +33,7 @@ locals {
     production = {
       eks_public_access_cidrs = [
         "128.77.75.64/26", # Prisma Corporate
+        "35.176.93.186/32", # GlobalProtect (Alpha)
         "20.58.27.30/32",  # GitHub Runner (octo-production)
         # Sites
         "213.121.161.112/28", # 102PF
