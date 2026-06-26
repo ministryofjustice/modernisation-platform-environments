@@ -35,7 +35,3 @@ data "external" "ssm_lookup" {
   EOF
   ]
 }
-
-output "debug" {
-  value = data.external.ssm_lookup
-}
