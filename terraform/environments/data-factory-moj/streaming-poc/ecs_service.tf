@@ -48,14 +48,14 @@ data "aws_iam_policy_document" "ecs_task_exec" {
       "secretsmanager:GetSecretValue",
       "secretsmanager:DescribeSecret"
     ]
-    resources = [aws_secretsmanager_secret.gitlab_token[0].arn]
+    resources = [local.secretsmanager_gitlab_token_arn]
   }
   statement {
     effect = "Allow"
     actions = [
       "kms:Decrypt"
     ]
-    resources = [aws_kms_key.secretsmanager[0].arn]
+    resources = [local.secretsmanager_kms_key_arn]
   }
 }
 
