@@ -12,3 +12,17 @@ crds:
 
 serviceAccount:
   create: true
+
+replicaCount: ${certman_replicas}
+
+webhook:
+  replicaCount: ${webhook_replicas}
+
+cainjector:
+  replicaCount: ${cainjector_replicas}
+
+config:
+  enableGatewayAPI: true
+  enableGatewayAPIListenerSet: true
+  featureGates:
+    ListenerSets: true  
