@@ -29,7 +29,7 @@ resources:
 db:
   deployStandalone: false
   useExisting: true
-  url: postgresql://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST)/$(DATABASE_NAME)
+  url: postgresql://$(DATABASE_USERNAME)@$(DATABASE_HOST)/$(DATABASE_NAME)
   database: ${databaseName}
   secret:
     name: ${databaseSecret}
@@ -139,11 +139,13 @@ envVars: {
     DOCS_DESCRIPTION: "Contact us on Slack - #data-platform-ai-gateway-users",
     DOCS_FILTERED: "True",
     DOCS_TITLE: "MOJ AI Gateway",
-    LITELLM_LOG: "ERROR",
+    LITELLM_LOG: "INFO",
     LITELLM_MIGRATION_DIR: "/app/migrations",
     LITELLM_MODE: "PRODUCTION",
     PRISMA_BINARY_CACHE_DIR: "/app/cache/prisma-python/binaries",
     PROXY_BASE_URL: "https://${ingressHostname}",
     REDIS_SSL: "True",
-    XDG_CACHE_HOME: "/app/cache"
+    XDG_CACHE_HOME: "/app/cache",
+    IAM_TOKEN_DB_AUTH: "True",
+    DATABASE_USER: "${databaseUsername}"
 }
