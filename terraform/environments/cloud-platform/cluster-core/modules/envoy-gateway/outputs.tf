@@ -17,6 +17,6 @@ output "default_listenerset_name" {
   value = kubernetes_manifest.envoy_gateway_default_listenerset.manifest.metadata.name
 }
 
-output "default_certificate_name" {
-  value = kubernetes_manifest.envoy_gateway_default_certificate.manifest.metadata.name
-}
+# output "default_certificate_name" {
+#   value = kubernetes_manifest.envoy_gateway_default_certificate.manifest.metadata.name
+# }

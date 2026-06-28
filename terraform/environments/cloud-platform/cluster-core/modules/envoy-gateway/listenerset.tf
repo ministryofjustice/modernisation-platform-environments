@@ -4,11 +4,11 @@ resource "kubernetes_manifest" "envoy_gateway_default_listenerset" {
     namespace        = kubernetes_namespace_v1.envoy_gateway_system.metadata[0].name
     gateway_name     = kubernetes_manifest.gateway.manifest.metadata.name
     base_domain      = var.cluster_base_domain
-    tls_secret_name  = kubernetes_manifest.envoy_gateway_default_certificate.manifest.spec.secretName
+    tls_secret_name  = "default-certificate"
   }))
 
   depends_on = [
     kubernetes_manifest.gateway,
-    kubernetes_manifest.envoy_gateway_default_certificate
+    # kubernetes_manifest.envoy_gateway_default_certificate
   ]
 }

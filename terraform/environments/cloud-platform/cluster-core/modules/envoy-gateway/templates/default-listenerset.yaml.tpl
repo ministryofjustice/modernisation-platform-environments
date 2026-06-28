@@ -3,6 +3,8 @@ kind: ListenerSet
 metadata:
   name: ${listenerset_name}
   namespace: ${namespace}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production  
 spec:
   parentRef:
     group: gateway.networking.k8s.io
