@@ -41,6 +41,7 @@ resource "helm_release" "litellm" {
         databaseEndpointKey       = "host"
         databaseReaderEndpointKey = local.has_reader ? "read-url" : ""
         databaseName              = module.ai_gateway_aurora.cluster_database_name
+        databaseUsername          = module.ai_gateway_aurora.cluster_master_username
 
         # LiteLLM
         masterkeySecretName = kubernetes_secret_v1.litellm_master_key.metadata[0].name
@@ -77,7 +78,8 @@ resource "helm_release" "litellm" {
     kubernetes_manifest.external_secret_litellm_salt_key,
     kubernetes_manifest.external_secret_litellm_entra_id,
     kubernetes_manifest.external_secret_aurora,
-    kubernetes_manifest.external_secret_elasticache
+    kubernetes_manifest.external_secret_elasticache,
+    null_resource.cleanup_psql_temp
   ]
 }
 
@@ -106,6 +108,7 @@ resource "helm_release" "litellm_admin" {
         databaseEndpointKey       = "host"
         databaseReaderEndpointKey = local.has_reader ? "read-url" : ""
         databaseName              = module.ai_gateway_aurora.cluster_database_name
+        databaseUsername          = module.ai_gateway_aurora.cluster_master_username
 
         # LiteLLM
         masterkeySecretName = kubernetes_secret_v1.litellm_master_key.metadata[0].name
@@ -141,6 +144,7 @@ resource "helm_release" "litellm_admin" {
     kubernetes_manifest.external_secret_litellm_salt_key,
     kubernetes_manifest.external_secret_litellm_entra_id,
     kubernetes_manifest.external_secret_aurora,
-    kubernetes_manifest.external_secret_elasticache
+    kubernetes_manifest.external_secret_elasticache,
+    null_resource.cleanup_psql_temp
   ]
 }
