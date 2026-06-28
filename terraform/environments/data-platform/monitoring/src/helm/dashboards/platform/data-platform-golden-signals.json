@@ -300,25 +300,12 @@
       ]
     },
     {
-      "id": 25,
-      "type": "timeseries",
-      "title": "Lambda error rate",
-      "description": "Errors as a percentage of invocations per function.",
-      "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 43 },
-      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "percent", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }, { "color": "red", "value": 5 }] } }, "overrides": [] },
-      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
-      "targets": [
-        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/Lambda", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT 100 * SUM(Errors) / SUM(Invocations) FROM SCHEMA(\"AWS/Lambda\", FunctionName) GROUP BY FunctionName ORDER BY SUM() DESC" }
-      ]
-    },
-    {
       "id": 26,
       "type": "timeseries",
       "title": "SQS age of oldest message",
       "description": "Age of the oldest in-flight message per queue — a rising value indicates a queue backlog or a stuck consumer.",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 43 },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 43 },
       "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "s" }, "overrides": [] },
       "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
@@ -331,7 +318,7 @@
       "title": "NAT packets dropped",
       "description": "NAT packets dropped — should normally remain zero.",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 51 },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 43 },
       "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }] } }, "overrides": [] },
       "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
@@ -343,7 +330,7 @@
       "type": "row",
       "title": "Saturation",
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 59 },
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 51 },
       "panels": []
     },
     {
@@ -352,7 +339,7 @@
       "title": "RDS CPU utilisation",
       "description": "Average RDS CPU per instance.",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 60 },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 52 },
       "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "max": 100, "unit": "percent", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 75 }, { "color": "red", "value": 90 }] } }, "overrides": [] },
       "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
@@ -365,7 +352,7 @@
       "title": "Lambda concurrent executions",
       "description": "Peak concurrent Lambda executions per function; approaching the account concurrency limit causes throttling.",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 60 },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 52 },
       "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short" }, "overrides": [] },
       "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
@@ -378,7 +365,7 @@
       "title": "NAT port-allocation errors",
       "description": "NAT port-allocation errors may indicate SNAT exhaustion.",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 60 },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 52 },
       "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] } }, "overrides": [] },
       "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
@@ -391,7 +378,7 @@
       "title": "RDS database connections",
       "description": "Average active database connections per instance.",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 68 },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 60 },
       "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short" }, "overrides": [] },
       "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
@@ -404,7 +391,7 @@
       "title": "RDS freeable memory",
       "description": "Freeable memory per instance — a low or falling value is an early warning of memory pressure.",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 68 },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 60 },
       "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "bytes" }, "overrides": [] },
       "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
@@ -417,7 +404,7 @@
       "title": "RDS free storage",
       "description": "Free storage per instance — a low or falling value is an early warning of running out of disk.",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 68 },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 60 },
       "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "bytes" }, "overrides": [] },
       "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
@@ -430,7 +417,7 @@
       "title": "ALB unhealthy targets",
       "description": "Targets failing health checks per load balancer and target group.",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 76 },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 68 },
       "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] } }, "overrides": [] },
       "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
@@ -443,7 +430,7 @@
       "title": "NAT active connections",
       "description": "Average active connections per NAT gateway; a rising count is the leading indicator of NAT saturation.",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 76 },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 68 },
       "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short" }, "overrides": [] },
       "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
