@@ -2,11 +2,12 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: default
-  namespace: envoy-gateway-system
+  namespace: ${namespace}
 spec:
-  secretName: ${gateway_name}-certificate
+  secretName: default-certificate
   issuerRef:
     name: letsencrypt-production
     kind: ClusterIssuer
   dnsNames:
-    - '*.apps.${cluster_base_domain}'
+    - "*.apps.${cluster_base_domain}"
+    - "*.${cluster_base_domain}"
