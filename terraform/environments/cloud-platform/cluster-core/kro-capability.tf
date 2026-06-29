@@ -20,6 +20,11 @@ resource "aws_iam_role" "kro_capability" {
   tags = local.tags
 }
 
+resource "time_sleep" "kro_role_propagation" {
+  depends_on      = [aws_iam_role.kro_capability]
+  create_duration = "15s"
+}
+
 resource "aws_eks_capability" "kro" {
   cluster_name              = local.cluster_name
   capability_name           = "${local.cluster_name}-kro"
@@ -28,6 +33,8 @@ resource "aws_eks_capability" "kro" {
   delete_propagation_policy = "RETAIN"
 
   tags = local.tags
+
+  depends_on = [time_sleep.kro_role_propagation]
 }
 
 ###############################################################################

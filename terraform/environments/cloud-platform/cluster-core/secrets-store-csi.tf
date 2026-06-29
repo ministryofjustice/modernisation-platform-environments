@@ -1,32 +1,14 @@
 ###############################################################################
-# Secrets Store CSI Driver + AWS Provider (US-005c)
+# Secrets Store CSI Driver — EKS Managed Addon (US-005c)
 #
 # Mounts secrets from AWS Secrets Manager as pod volumes.
-# The AWS provider DaemonSet fetches secrets using Pod Identity.
-#
-# NOTE: Requires Gatekeeper module update before deploy — see gatekeeper.tf TODO.
+# Uses Pod Identity for authentication. AWS manages the driver and provider
+# as a single addon — no Helm charts required.
 ###############################################################################
 
-resource "helm_release" "secrets_store_csi" {
-  name       = "secrets-store-csi-driver"
-  repository = "https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts"
-  chart      = "secrets-store-csi-driver"
-  version    = "1.4.7"
-  namespace  = "kube-system"
+resource "aws_eks_addon" "secrets_store_csi" {
+  cluster_name = local.cluster_name
+  addon_name   = "aws-secrets-store-csi-driver-provider"
 
-  set = [
-    { name = "syncSecret.enabled", value = "true" },
-    { name = "enableSecretRotation", value = "true" },
-    { name = "rotationPollInterval", value = "3600s" },
-  ]
-}
-
-resource "helm_release" "secrets_store_aws_provider" {
-  name       = "secrets-store-csi-driver-provider-aws"
-  repository = "https://aws.github.io/secrets-store-csi-driver-provider-aws"
-  chart      = "secrets-store-csi-driver-provider-aws"
-  version    = "0.3.11"
-  namespace  = "kube-system"
-
-  depends_on = [helm_release.secrets_store_csi]
+  tags = local.tags
 }

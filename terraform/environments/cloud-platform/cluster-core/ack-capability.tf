@@ -81,6 +81,11 @@ resource "aws_iam_role_policy_attachment" "ack_capability" {
   policy_arn = aws_iam_policy.ack_capability.arn
 }
 
+resource "time_sleep" "ack_role_propagation" {
+  depends_on      = [aws_iam_role_policy_attachment.ack_capability]
+  create_duration = "15s"
+}
+
 resource "aws_eks_capability" "ack" {
   cluster_name              = local.cluster_name
   capability_name           = "${local.cluster_name}-ack"
@@ -90,5 +95,5 @@ resource "aws_eks_capability" "ack" {
 
   tags = local.tags
 
-  depends_on = [aws_iam_role_policy_attachment.ack_capability]
+  depends_on = [time_sleep.ack_role_propagation]
 }
