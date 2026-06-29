@@ -185,7 +185,7 @@ resource "aws_route" "nat_igw" {
 resource "aws_route" "nat_firewall_a" {
 
   route_table_id         = aws_route_table.nat.id
-  destination_cidr_block = "0.0.0.0/0"
+  destination_cidr_block = local.application_data.accounts[local.environment].private_subnet_a_cidr
   vpc_endpoint_id = local.firewall_endpoints["eu-west-2a"]
   
 }
@@ -193,7 +193,7 @@ resource "aws_route" "nat_firewall_a" {
 resource "aws_route" "nat_firewall_b" {
 
   route_table_id         = aws_route_table.nat.id
-  destination_cidr_block = "0.0.0.0/0"
+  destination_cidr_block = local.application_data.accounts[local.environment].private_subnet_b_cidr
   vpc_endpoint_id = local.firewall_endpoints["eu-west-2b"]
   
 }
