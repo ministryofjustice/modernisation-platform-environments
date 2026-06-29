@@ -1,7 +1,7 @@
 resource "helm_release" "ai_gateway_configuration" {
   name      = "${local.component_name}-configuration"
   chart     = "${path.module}/src/helm/charts/${local.component_name}-configuration"
-  version   = "1.4.1"
+  version   = "1.4.2"
   namespace = module.ai_gateway_namespace.name
 
   values = [
