@@ -72,7 +72,7 @@
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
       "gridPos": { "h": 4, "w": 4, "x": 16, "y": 4 },
       "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }] } }, "overrides": [] },
-      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false }, "textMode": "auto" },
       "targets": [
         { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/DynamoDB", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(ThrottledRequests) FROM \"AWS/DynamoDB\"" }
       ]
@@ -84,7 +84,7 @@
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
       "gridPos": { "h": 4, "w": 4, "x": 20, "y": 4 },
       "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] } }, "overrides": [] },
-      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false }, "textMode": "auto" },
       "targets": [
         { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/DynamoDB", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(SystemErrors) FROM \"AWS/DynamoDB\"" }
       ]

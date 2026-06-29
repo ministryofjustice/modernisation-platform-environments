@@ -337,14 +337,14 @@
     {
       "id": 35,
       "type": "timeseries",
-      "title": "Pod restarts by namespace",
-      "description": "Container restarts by namespace over time — useful for detecting crash loops or unstable workloads.",
+      "title": "Pod restarts over time (cluster total)",
+      "description": "Total container restarts across the cluster over time — distinct from the per-namespace breakdown; useful for spotting cluster-wide crash-loop spikes.",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
       "gridPos": { "h": 8, "w": 8, "x": 8, "y": 79 },
       "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }] } }, "overrides": [] },
       "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "ContainerInsights", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(pod_number_of_container_restarts) FROM \"ContainerInsights\" WHERE ClusterName = '${cluster}' GROUP BY Namespace ORDER BY SUM() DESC" }
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "ContainerInsights", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(pod_number_of_container_restarts) FROM \"ContainerInsights\" WHERE ClusterName = '${cluster}'" }
       ]
     },
     {
@@ -430,7 +430,7 @@
       "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short" }, "overrides": [] },
       "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/ApplicationELB", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT MAX(HealthyHostCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY TargetGroup ORDER BY MAX() ASC" }
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/ApplicationELB", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT MAX(HealthyHostCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY TargetGroup ORDER BY MAX() DESC" }
       ]
     }
   ],
