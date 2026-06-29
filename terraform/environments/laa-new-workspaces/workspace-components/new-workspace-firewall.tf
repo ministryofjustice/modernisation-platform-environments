@@ -184,8 +184,6 @@ resource "aws_networkfirewall_rule_group" "workspaces_onedrive_live_misc" {
           "client.hip.live.com",
           "wu.client.hip.live.com",
           "oauth.live.com",
-          "photos.live.com",
-          # "skydrive.live.com",
           "favorites.live.com",
           ".office.live.com",   # covers *.groups.office.live.com etc.
           ".photos.live.com",   # covers *.groups.photos.live.com etc.
