@@ -4,8 +4,15 @@ variable "cluster_name" {
 }
 
 variable "hostzones" {
-  description = "In order to solve ACME Challenges certmanager creates DNS records. We should limit the scope to certain hostzones. If star (*) is used certmanager will control all hostzones"
+  description = "List of Route53 Hosted Zone ARNs that cert-manager is allowed to manage for ACME DNS challenges. Format: arn:aws:route53:::hostedzone/<ZONE_ID>. Use [\"arn:aws:route53:::hostedzone/*\"] to allow all hosted zones."
   type        = list(string)
+
+  validation {
+    condition = alltrue([
+      for arn in var.hostzones : can(regex("^arn:aws:route53:::hostedzone/[A-Z0-9*]+$", arn))
+    ])
+    error_message = "Hosted zone ARNs must be in the format 'arn:aws:route53:::hostedzone/<ZONE_ID>' or 'arn:aws:route53:::hostedzone/*' for all zones."
+  }
 }
 
 variable "certman_replicas" {
