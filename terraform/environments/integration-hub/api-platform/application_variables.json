@@ -4,7 +4,32 @@
       "api_configuration": {
         "cors_allowed_origins": [],
         "max_presigned_url_expiry_seconds": 3600,
-        "presigned_url_expiry_seconds": 900
+        "presigned_url_expiry_seconds": 900,
+        "multipart_upload": {
+          "single_put_limit_bytes": 5368709120,
+          "multipart_default_part_size_bytes": 67108864,
+          "multipart_max_parts": 10000,
+          "multipart_initial_presign_parts": 10
+        }
+      },
+      "auth_configuration": {
+        "roles": {
+          "products-poc-upload": {
+            "allowed_client_ids": ["products-poc"]
+          }
+        },
+        "users": {
+          "products-poc-user": {
+            "enabled": true,
+            "role_name": "products-poc-upload"
+          }
+        },
+        "system_principals": {
+          "products-poc-api": {
+            "enabled": true,
+            "role_name": "products-poc-upload"
+          }
+        }
       },
       "transfer_clients": {
         "products-poc": {
@@ -18,7 +43,18 @@
       "api_configuration": {
         "cors_allowed_origins": [],
         "max_presigned_url_expiry_seconds": 3600,
-        "presigned_url_expiry_seconds": 900
+        "presigned_url_expiry_seconds": 900,
+        "multipart_upload": {
+          "single_put_limit_bytes": 5368709120,
+          "multipart_default_part_size_bytes": 67108864,
+          "multipart_max_parts": 10000,
+          "multipart_initial_presign_parts": 10
+        }
+      },
+      "auth_configuration": {
+        "roles": {},
+        "users": {},
+        "system_principals": {}
       },
       "transfer_clients": {}
     },
@@ -26,7 +62,18 @@
       "api_configuration": {
         "cors_allowed_origins": [],
         "max_presigned_url_expiry_seconds": 3600,
-        "presigned_url_expiry_seconds": 900
+        "presigned_url_expiry_seconds": 900,
+        "multipart_upload": {
+          "single_put_limit_bytes": 5368709120,
+          "multipart_default_part_size_bytes": 67108864,
+          "multipart_max_parts": 10000,
+          "multipart_initial_presign_parts": 10
+        }
+      },
+      "auth_configuration": {
+        "roles": {},
+        "users": {},
+        "system_principals": {}
       },
       "transfer_clients": {}
     },
@@ -34,7 +81,18 @@
       "api_configuration": {
         "cors_allowed_origins": [],
         "max_presigned_url_expiry_seconds": 3600,
-        "presigned_url_expiry_seconds": 900
+        "presigned_url_expiry_seconds": 900,
+        "multipart_upload": {
+          "single_put_limit_bytes": 5368709120,
+          "multipart_default_part_size_bytes": 67108864,
+          "multipart_max_parts": 10000,
+          "multipart_initial_presign_parts": 10
+        }
+      },
+      "auth_configuration": {
+        "roles": {},
+        "users": {},
+        "system_principals": {}
       },
       "transfer_clients": {}
     }

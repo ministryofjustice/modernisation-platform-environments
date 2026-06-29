@@ -25,14 +25,14 @@
 /terraform/environments/cdpt-chaps @ministryofjustice/azure-aws-sso-cdpt @ministryofjustice/central-digital-product-team @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/cdpt-ifs @ministryofjustice/azure-aws-sso-cdpt @ministryofjustice/central-digital-product-team @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/cfo-data-management-system @ministryofjustice/hmpps-creating-future-opportunities-devs @ministryofjustice/hmpps-creating-future-opportunities-live @ministryofjustice/modernisation-platform
-/terraform/environments/cica-copilot @ministryofjustice/cica-copilot-llm-maintainers @ministryofjustice/modernisation-platform
-/terraform/environments/cica-data-extraction @ministryofjustice/cica-mp-tariff @ministryofjustice/modernisation-platform
 /terraform/environments/cica-sandbox @ministryofjustice/cica-external-developers @ministryofjustice/cica-review-case-documents @ministryofjustice/modernisation-platform
 /terraform/environments/cica-tariff @ministryofjustice/cica-mp-tariff @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/cloud-platform-live @ministryofjustice/cloud-platform-engineers @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/cloud-platform-non-live @ministryofjustice/cloud-platform-engineers @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/cloud-platform @ministryofjustice/cloud-platform-engineers @ministryofjustice/container-platform-aws @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/coat @ministryofjustice/cloud-optimisation-and-accountability @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
+/terraform/environments/container-platform-hmpps @ministryofjustice/cloud-platform-engineers @ministryofjustice/modernisation-platform
+/terraform/environments/container-platform-laa @ministryofjustice/cloud-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/container-platform-octo @ministryofjustice/cloud-platform-engineers @ministryofjustice/container-platform-aws @ministryofjustice/modernisation-platform
 /terraform/environments/contract-work-administration @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-cwa-developer @ministryofjustice/laa-pcuam @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/cooker @ministryofjustice/modernisation-platform @ministryofjustice/octo-cyber-team @ministryofjustice/tvm-purple-team @ministryofjustice/modernisation-platform
@@ -45,6 +45,7 @@
 /terraform/environments/data-factory-moj/streaming-poc-msk @ministryofjustice/data-factory-aker-team @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-moj/streaming-poc-opensearch @ministryofjustice/data-factory-aker-team @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-moj/streaming-poc-maf @ministryofjustice/data-factory-aker-team @ministryofjustice/modernisation-platform
+/terraform/environments/data-factory-moj/streaming-poc-opensearch-config @ministryofjustice/data-factory-aker-team @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform-governance @ministryofjustice/data-platform-engineering @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform @ministryofjustice/data-platform-engineering @ministryofjustice/modernisation-platform
 /terraform/environments/delius-alfresco @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform
@@ -73,7 +74,7 @@
 /terraform/environments/laa-enterprise-service-bus @ministryofjustice/hub20-validation @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-sre-admins @ministryofjustice/v1-hub20-developers @ministryofjustice/modernisation-platform
 /terraform/environments/laa-mail-relay @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/laa-new-workspaces @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
-/terraform/environments/laa-oem @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
+/terraform/environments/laa-oem @ministryofjustice/laa-ccms-ebs-developers @ministryofjustice/laa-ccms-migration-team @ministryofjustice/laa-dba @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/laa-pui-secure-browser @ministryofjustice/ecp-admin @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/laa-pui-secure-browser/networking @ministryofjustice/ecp-admin @ministryofjustice/modernisation-platform
 /terraform/environments/laa-pui-secure-browser/workspaces-secure-browser @ministryofjustice/ecp-admin @ministryofjustice/modernisation-platform

@@ -12,6 +12,14 @@ spec:
       kind: LoadBalancerConfiguration
       name: ai-gateway
   listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      hostname: {{ .Values.hostname }}
+    - name: http-admin
+      protocol: HTTP
+      port: 80
+      hostname: {{ .Values.adminHostname }}
     - name: https
       protocol: HTTPS
       port: 443

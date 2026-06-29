@@ -24,8 +24,8 @@ module "ai_gateway_aurora" {
 
   security_group_ingress_rules = {
     eks_ingress = {
-      cidr_ipv4   = data.aws_vpc.eks.cidr_block
-      description = "Allow PostgreSQL access from EKS pods"
+      referenced_security_group_id = data.aws_eks_cluster.cluster.vpc_config[0].cluster_security_group_id
+      description                  = "Allow PostgreSQL access from EKS pods"
     }
   }
 
@@ -48,11 +48,16 @@ module "ai_gateway_aurora_secret" {
 
   name = "${local.component_name}/aurora"
 
-  secret_string = jsonencode({
-    username = module.ai_gateway_aurora.cluster_master_username
-    password = random_password.aurora.result
-    host     = module.ai_gateway_aurora.cluster_endpoint
-    port     = tostring(module.ai_gateway_aurora.cluster_port)
-    dbname   = module.ai_gateway_aurora.cluster_database_name
-  })
+  secret_string = jsonencode(merge(
+    {
+      username = module.ai_gateway_aurora.cluster_master_username
+      password = random_password.aurora.result
+      host     = module.ai_gateway_aurora.cluster_endpoint
+      port     = tostring(module.ai_gateway_aurora.cluster_port)
+      dbname   = module.ai_gateway_aurora.cluster_database_name
+    },
+    local.has_reader ? {
+      read-url = "postgresql://${module.ai_gateway_aurora.cluster_master_username}:${random_password.aurora.result}@${module.ai_gateway_aurora.cluster_reader_endpoint}/${module.ai_gateway_aurora.cluster_database_name}"
+    } : {}
+  ))
 }

@@ -41,7 +41,7 @@ locals {
       module.ip_addresses.external_cidrs.cloud_platform,
     ])
     https_external_2 = flatten([
-      module.ip_addresses.external_cidrs.sodeco,
+      module.ip_addresses.external_cidrs.sodexo,
       module.ip_addresses.external_cidrs.interserve,
       module.ip_addresses.external_cidrs.meganexus,
       module.ip_addresses.external_cidrs.serco,
@@ -83,7 +83,7 @@ locals {
       module.ip_addresses.external_cidrs.cloud_platform,
     ])
     https_external_2 = flatten([
-      module.ip_addresses.external_cidrs.sodeco,
+      module.ip_addresses.external_cidrs.sodexo,
       module.ip_addresses.external_cidrs.interserve,
       module.ip_addresses.external_cidrs.meganexus,
       module.ip_addresses.external_cidrs.serco,

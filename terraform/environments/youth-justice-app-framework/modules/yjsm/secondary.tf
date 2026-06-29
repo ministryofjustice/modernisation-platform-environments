@@ -7,7 +7,7 @@ resource "aws_network_interface" "build" {
 
 resource "aws_instance" "yjsm_build" {
   count                       = var.create_secondary ? 1 : 0
-  ami                         = var.ami
+  ami                         = "ami-078b41f5b9f1cd570"
   instance_type               = "t3a.xlarge"
   key_name                    = module.key_pair.key_pair_name
   monitoring                  = true

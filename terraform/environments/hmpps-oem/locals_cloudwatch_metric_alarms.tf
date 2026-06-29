@@ -125,6 +125,10 @@ locals {
     local.cloudwatch_metric_alarms_endpoint_monitoring_cert_expiry
   )
 
+  cloudwatch_metric_alarms_smtp_connectivity_test = merge(
+    module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_connectivity_test
+  )
+
   # you can generate list of scheduled pipelines using script in dso-modernisation-platform-automation repo
   # e.g. src/github-workflow-monitoring/github-workflow-monitor.sh -i 3600 -n 168 -r all | grep -v all | cut -d, -f2,3 | sed 's/^/["/g' | sed 's/,/", "/g' | sed 's/$/", "dso-pipelines-pagerduty"],/g'
   gha_pipeline_alarms = [

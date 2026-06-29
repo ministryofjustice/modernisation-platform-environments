@@ -31,7 +31,7 @@ locals {
     "g4s_atrium_unstructured",
     "g4s_cap_dw",
     "g4s_xdrive_unstructured"
-    ]
+  ]
   preprod_databases_for_gdpr = [
     "am_stg_preprod_dbt",
     "buddi_buddi_preprod_dbt",

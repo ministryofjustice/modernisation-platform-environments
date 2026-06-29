@@ -11,6 +11,7 @@ module "ecs_cluster" {
 }
 
 resource "aws_security_group" "cluster" {
+  #checkov:skip=CKV2_AWS_5: Security group is used by ECS resources; Checkov cannot infer attachment through counted/dynamic references.
   count = contains(local.deploy_to, local.environment) ? 1 : 0
 
   name_prefix = "${local.ecs_prefix}-cluster"
