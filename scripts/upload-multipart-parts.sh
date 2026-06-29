@@ -151,25 +151,24 @@ for part in parts:
     header_file = uploads_dir / f"part-{part_number}.headers"
 
     print(f"Uploading part {part_number} from {chunk_file}", file=sys.stderr)
-    with header_file.open("w", encoding="utf-8") as header_fh:
-        completed = subprocess.run(
-            [
-                "curl",
-                "--fail-with-body",
-                "--silent",
-                "--show-error",
-                "--request",
-                part.get("method", "PUT"),
-                "--dump-header",
-                str(header_file),
-                "--output",
-                "/dev/null",
-                "--upload-file",
-                str(chunk_file),
-                part["url"],
-            ],
-            check=False,
-        )
+    completed = subprocess.run(
+        [
+            "curl",
+            "--fail-with-body",
+            "--silent",
+            "--show-error",
+            "--request",
+            part.get("method", "PUT"),
+            "--dump-header",
+            str(header_file),
+            "--output",
+            "/dev/null",
+            "--upload-file",
+            str(chunk_file),
+            part["url"],
+        ],
+        check=False,
+    )
 
     if completed.returncode != 0:
         raise SystemExit(f"Upload failed for part {part_number}")
