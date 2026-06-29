@@ -327,17 +327,17 @@ resource "aws_networkfirewall_firewall_policy" "workspaces_web_allowlist" {
 
     stateful_rule_group_reference {
       resource_arn = aws_networkfirewall_rule_group.workspaces_microsoft_services.arn
-      priority     = 2
+      priority     = 1
     }
 
     stateful_rule_group_reference {
       resource_arn = aws_networkfirewall_rule_group.workspaces_onedrive_live_misc.arn
-      priority     = 3
+      priority     = 2
     }
 
     # stateful_rule_group_reference {
     #   resource_arn = aws_networkfirewall_rule_group.workspaces_certificate_authorities.arn
-    #   priority     = 4
+    #   priority     = 2
     # }
   }
 
