@@ -24,7 +24,10 @@
       "type": "text",
       "title": "About this dashboard",
       "gridPos": { "h": 4, "w": 24, "x": 0, "y": 0 },
-      "options": { "mode": "markdown", "content": "Landing overview for a single Data Platform account, built from auto-published CloudWatch metrics (no agents or setup needed). Pick an **Account** at the top to switch between the per-account CloudWatch data sources. The **At a glance** tiles summarise the selected time window; the rows below break down ingress (ALB), compute (Lambda), databases (RDS), messaging (SQS) and networking (NAT). Panels use CloudWatch Metrics Insights so they keep working as resources come and go; extend this by dropping a JSON file into `src/helm/dashboards/platform/`. Glue, Athena and S3 storage can be added the same way." }
+      "options": {
+        "mode": "markdown",
+        "content": "Landing overview for a single Data Platform account, built from auto-published CloudWatch metrics (no agents or setup needed). Pick an **Account** at the top to switch between the per-account CloudWatch data sources. The **At a glance** tiles summarise the selected time window; the rows below break down ingress (ALB), compute (Lambda), databases (RDS), messaging (SQS) and networking (NAT). Panels use CloudWatch Metrics Insights so they keep working as resources come and go; extend this by dropping a JSON file into `src/helm/dashboards/platform/`. Glue, Athena and S3 storage can be added the same way."
+      }
     },
     { "id": 2, "type": "row", "title": "At a glance", "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 4 }, "panels": [] },
     {

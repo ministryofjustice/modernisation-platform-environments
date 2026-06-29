@@ -26,7 +26,7 @@
       "gridPos": { "h": 3, "w": 24, "x": 0, "y": 0 },
       "options": {
         "mode": "markdown",
-        "content": "EKS health for a single Data Platform account, using CloudWatch Container Insights. Choose an Account and Cluster at the top. This dashboard is intended as a first-look cluster health view: node readiness, resource pressure, pod health, restarts and related ALB health. It helps identify whether an issue is cluster-level, node-level, namespace-level or ingress-related. Detailed workload, application and networking views should live in separate deep-dive dashboards."
+        "content": "EKS health for a single Data Platform account, using CloudWatch Container Insights. Choose an Account and Cluster at the top. This dashboard is intended as a first-look cluster health view: node readiness, resource pressure, pod health, restarts and related ALB health. It helps identify whether an issue is cluster-level, node-level, namespace-level or ingress-related. Note: ALB metrics have no ClusterName dimension, so the ALB panels are account-wide and not filtered by the selected cluster. Detailed workload, application and networking views should live in separate deep-dive dashboards."
       }
     },
     { "id": 2, "type": "row", "title": "At a glance", "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 3 }, "panels": [] },

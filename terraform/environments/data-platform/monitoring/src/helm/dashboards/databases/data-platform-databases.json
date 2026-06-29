@@ -12,7 +12,10 @@
       "type": "text",
       "title": "About this dashboard",
       "gridPos": { "h": 3, "w": 24, "x": 0, "y": 0 },
-      "options": { "mode": "markdown", "content": "Database health for a single Data Platform account, using auto-published CloudWatch metrics. Pick an **Account** at the top. This dashboard provides a first-look operational view across RDS/Aurora and DynamoDB. It highlights saturation, latency, storage pressure, connection pressure and throttling. Empty panels usually mean that the service is not present in the selected account." }
+      "options": {
+        "mode": "markdown",
+        "content": "Database health for a single Data Platform account, using auto-published CloudWatch metrics. Pick an **Account** at the top. This dashboard provides a first-look operational view across RDS/Aurora and DynamoDB. It highlights saturation, latency, storage pressure, connection pressure and throttling. Empty panels usually mean that the service is not present in the selected account."
+      }
     },
     { "id": 2, "type": "row", "title": "At a glance", "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 3 }, "panels": [] },
     {
