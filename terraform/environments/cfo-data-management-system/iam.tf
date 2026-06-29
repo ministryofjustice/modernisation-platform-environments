@@ -162,3 +162,59 @@ resource "aws_iam_role_policy" "task" {
   role   = aws_iam_role.task.id
   policy = data.aws_iam_policy_document.task.json
 }
+
+# RabbitMQ EC2 Instance Role
+resource "aws_iam_role" "rabbitmq" {
+  name               = "${local.application_name_short}-${local.environment}-rabbitmq"
+  assume_role_policy = data.aws_iam_policy_document.rabbitmq-assume.json
+  tags               = local.tags
+}
+
+data "aws_iam_policy_document" "rabbitmq-assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
+
+# Allows SSM Session Manager access
+resource "aws_iam_role_policy_attachment" "rabbitmq-ssm" {
+  role       = aws_iam_role.rabbitmq.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+data "aws_iam_policy_document" "rabbitmq" {
+  # Allows user_data to fetch the RabbitMQ password from Secrets Manager on first boot
+  statement {
+    sid     = "AllowSecretsManagerRead"
+    effect  = "Allow"
+    actions = ["secretsmanager:GetSecretValue"]
+    resources = [aws_secretsmanager_secret.rabbitmq-password.arn]
+  }
+
+  statement {
+    sid    = "AllowKMSDecrypt"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+    ]
+    resources = [data.aws_kms_key.general_shared.arn]
+  }
+}
+
+resource "aws_iam_role_policy" "rabbitmq" {
+  name   = "${local.application_name_short}-${local.environment}-rabbitmq"
+  role   = aws_iam_role.rabbitmq.id
+  policy = data.aws_iam_policy_document.rabbitmq.json
+}
+
+resource "aws_iam_instance_profile" "rabbitmq" {
+  name = "${local.application_name_short}-${local.environment}-rabbitmq"
+  role = aws_iam_role.rabbitmq.name
+  tags = local.tags
+}
