@@ -12,7 +12,7 @@ locals {
   load_lambda_databases = [
     "staged_mdss${local.dbt_suffix}",
     "acquisitive_crime${local.dbt_suffix}",
-    local.is-production ? "allied_mdss" : "allied_mdss_${local.environment_shorthand}",
+    "allied_mdss${local.db_suffix}"
   ]
 
 }
