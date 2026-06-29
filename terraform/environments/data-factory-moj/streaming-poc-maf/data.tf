@@ -22,3 +22,16 @@ data "aws_opensearch_domain" "opensearch" {
 data "aws_prefix_list" "s3" {
   name = "com.amazonaws.${data.aws_region.current.region}.s3"
 }
+
+data "external" "ssm_lookup" {
+  for_each = toset(contains(local.deploy_to, local.environment) ? ["ssm_lookup"] : [])
+  program = ["bash", "-c", <<EOF
+    value=$(aws ssm get-parameter --name "/streaming-poc-maf/${local.environment}/drone-incursion-alert-emails"  --with-decryption --query "Parameter.Value" --output text 2>/dev/null)
+    if [ $? -eq 0 ]; then
+      jq -n --arg val "$value" '{"value": $val}'
+    else
+      jq -n '{"value": "test@test.com,test2@test.com"}'
+    fi
+  EOF
+  ]
+}

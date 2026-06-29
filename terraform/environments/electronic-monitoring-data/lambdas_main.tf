@@ -928,7 +928,7 @@ module "landing_file_dlq_redriver" {
 #-----------------------------------------------------------------------------------
 
 module "merge_mdss_staged_event" {
-  count                          = local.is-production ? 0 : 1
+  count                          = 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_mdss_staged_event"
@@ -950,7 +950,7 @@ module "merge_mdss_staged_event" {
 }
 
 module "merge_mdss_staged_position" {
-  count                          = local.is-production ? 0 : 1
+  count                          = 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_mdss_staged_position"
