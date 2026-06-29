@@ -3,4 +3,4 @@ apiVersion: v2
 name: ai-gateway-configuration
 description: A Helm chart to deploy Gateway API configuration for ai-gateway
 type: application
-version: 1.4.2
+version: 1.4.1
