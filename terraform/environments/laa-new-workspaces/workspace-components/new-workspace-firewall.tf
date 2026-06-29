@@ -300,11 +300,11 @@ resource "aws_networkfirewall_rule_group" "workspaces_onedrive_live_misc" {
 #       }
 #     }
 #   }
-
-  tags = {
-    Name = "workspaces-certificate-authorities"
-  }
-}
+# 
+#   tags = {
+#     Name = "workspaces-certificate-authorities"
+#   }
+# }
 
 # -----------------------------------------------------------------------------
 # WorkSpaces Network Firewall policy and firewall
