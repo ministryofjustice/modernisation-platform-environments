@@ -84,12 +84,12 @@ resource "aws_iam_role_policy" "rds_proxy_secrets" {
 }
 
 resource "aws_db_proxy" "rds_proxy" {
-  name                   = "${var.name}-proxy"
-  engine_family          = "POSTGRESQL"
-  idle_client_timeout    = var.proxy_idle_client_timeout
-  require_tls            = true
-  debug_logging          = var.proxy_debug_logging
-  role_arn               = aws_iam_role.rds_proxy.arn
+  name                = "${var.name}-proxy"
+  engine_family       = "POSTGRESQL"
+  idle_client_timeout = var.proxy_idle_client_timeout
+  require_tls         = true
+  debug_logging       = var.proxy_debug_logging
+  role_arn            = aws_iam_role.rds_proxy.arn
 
   vpc_subnet_ids         = var.database_subnets
   vpc_security_group_ids = [aws_security_group.rds_proxy.id]
