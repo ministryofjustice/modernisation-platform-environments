@@ -151,6 +151,62 @@ resource "aws_lambda_permission" "allow_eventbridge_ssm_patch_completion" {
   source_arn    = aws_cloudwatch_event_rule.ssm_patch_completion[each.key].arn
 }
 
+############################################################################
+# EventBridge Rule for S3 Replication Failures to Justice Digital S3 Buckets
+############################################################################
+
+resource "aws_cloudwatch_event_rule" "s3_replication_failure" {
+  name        = "s3-replication-failure"
+  description = "Capture S3 replication failure events"
+
+  event_pattern = <<EOF
+{
+  "source": ["aws.s3"],
+  "detail-type": ["Object Replication Event"],
+  "detail": {
+    "replication-status": ["FAILED"]
+  }
+}
+EOF
+}
+
+resource "aws_cloudwatch_event_target" "s3_replication_failure" {
+  rule      = aws_cloudwatch_event_rule.s3_replication_failure.name
+  target_id = "s3-replication-failure-logs"
+  arn       = aws_cloudwatch_log_group.s3_replication_failure.arn
+}
+
+resource "aws_cloudwatch_event_target" "s3_replication_failure_sns" {
+  rule      = aws_cloudwatch_event_rule.s3_replication_failure.name
+  target_id = "s3-replication-failure-sns"
+  arn = (
+    local.is-production ? aws_sns_topic.cw_alerts[0].arn :
+    local.is-preproduction ? aws_sns_topic.cw_uat_alerts[0].arn :
+    aws_sns_topic.cw_dev_alerts[0].arn
+  )
+}
+
+resource "aws_sns_topic_policy" "s3_replication_failure" {
+  arn = (
+    local.is-production ? aws_sns_topic.cw_alerts[0].arn :
+    local.is-preproduction ? aws_sns_topic.cw_uat_alerts[0].arn :
+    aws_sns_topic.cw_dev_alerts[0].arn
+  )
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "events.amazonaws.com" }
+      Action    = "sns:Publish"
+      Resource = (
+        local.is-production ? aws_sns_topic.cw_alerts[0].arn :
+        local.is-preproduction ? aws_sns_topic.cw_uat_alerts[0].arn :
+        aws_sns_topic.cw_dev_alerts[0].arn
+      )
+    }]
+  })
+}
+
 #################################
 # EventBridge Scheduler Schedules 
 #################################

@@ -13,24 +13,22 @@ locals {
   #
   #   ipv4_allow_list (list(string))
   #     Source CIDR blocks permitted to authenticate as this user.
-  #     Default: local.custom_idp_configuration.ingress_cidr_blocks
-  #     (the shared ingress allow-list for the transfer server).
+  #     Default: local.custom_idp_configuration.ingress_cidr_blocks, defined in
+  #     application_variables.json as the shared ingress allow-list for the
+  #     transfer server.
   #
   #   home_directory_target (string)
-  #     The physical S3 path the user's logical "/" maps to. The transfer
-  #     server uses LOGICAL home directories, so this is an S3 location of the
-  #     form "/<bucket>/<prefix>", not a server-wide setting. Point it at the
-  #     bucket/prefix the user should land in (the unscanned bucket is the AV
-  #     scan landing zone).
-  #     Default: "/<unscanned-bucket>/<username>"
+  #     The user-relative prefix inside the unscanned bucket that the user's
+  #     logical "/" maps to. The unscanned bucket is always used as the root.
+  #     Default: "<username>"
   #
   # Example of a fully specified user, overriding every default (uncomment and
   # adapt as needed):
   #
   # alice = {
+  #   home_directory_target = "alice"
   #   identity_provider_key = "secrets"
   #   ipv4_allow_list       = ["203.0.113.0/24", "198.51.100.10/32"]
-  #   home_directory_target = "/${module.s3_bucket["unscanned"].s3_bucket_id}/alice"
   # }
   custom_idp_users = {
     dms1981 = {}

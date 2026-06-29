@@ -1,8 +1,9 @@
 ##############################################
 ### Application Load Balancer for RADIUS Portal
 ###
-### Provides public HTTPS access to LinOTP
+### Provides HTTPS access to LinOTP
 ### self-service MFA enrollment portal
+### Access restricted to Global Protect Alpha VPN
 ##############################################
 
 ##############################################
@@ -27,26 +28,26 @@ resource "aws_security_group" "radius_alb" {
   }
 }
 
-resource "aws_security_group_rule" "radius_alb_https_from_internet" {
+resource "aws_security_group_rule" "radius_alb_https_from_vpn" {
 
   type              = "ingress"
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = local.global_protect_alpha_vpn_cidrs
   security_group_id = aws_security_group.radius_alb.id
-  description       = "HTTPS from internet"
+  description       = "HTTPS from Global Protect Alpha VPN"
 }
 
-resource "aws_security_group_rule" "radius_alb_http_from_internet" {
+resource "aws_security_group_rule" "radius_alb_http_from_vpn" {
 
   type              = "ingress"
   from_port         = 80
   to_port           = 80
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = local.global_protect_alpha_vpn_cidrs
   security_group_id = aws_security_group.radius_alb.id
-  description       = "HTTP from internet (redirects to HTTPS)"
+  description       = "HTTP from Global Protect Alpha VPN (redirects to HTTPS)"
 }
 
 # Separate egress rule to avoid circular dependency
@@ -97,6 +98,7 @@ resource "aws_lb_target_group" "radius_portal" {
   vpc_id      = aws_vpc.workspaces.id
   target_type = "instance"
 
+
   health_check {
     enabled             = true
     healthy_threshold   = 2
@@ -105,7 +107,7 @@ resource "aws_lb_target_group" "radius_portal" {
     interval            = 30
     path                = "/manage"
     protocol            = "HTTPS"
-    matcher             = "200,401" # 401 is OK (auth required for /manage)
+    matcher             = "200,401" # 401/redirects are OK for /manage
   }
 
   deregistration_delay = 30
@@ -132,35 +134,34 @@ resource "aws_lb_target_group_attachment" "radius_portal" {
   target_id        = aws_instance.radius_server.id
   port             = 443
 
-  depends_on = [aws_instance.radius_server]
 }
 
-# ##############################################
-# ### HTTPS Listener (Primary)
-# ##############################################
-#
-# resource "aws_lb_listener" "radius_https" {
-#
-#   load_balancer_arn = aws_lb.radius_portal.arn
-#   port              = 443
-#   protocol          = "HTTPS"
-#   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-#   certificate_arn   = aws_acm_certificate.radius_portal.arn
-#
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.radius_portal.arn
-#   }
-#
-#   depends_on = [aws_acm_certificate_validation.radius_portal]
-#
-#   tags = merge(
-#     local.tags,
-#     {
-#       "Name" = "${local.application_name}-${local.environment}-radius-https-listener"
-#     }
-#   )
-# }
+##############################################
+### HTTPS Listener (Primary)
+##############################################
+
+resource "aws_lb_listener" "radius_https" {
+
+  load_balancer_arn = aws_lb.radius_portal.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn   = aws_acm_certificate.radius_portal.arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.radius_portal.arn
+  }
+
+  depends_on = [aws_acm_certificate_validation.radius_portal]
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.application_name}-${local.environment}-radius-https-listener"
+    }
+  )
+}
 
 ##############################################
 ### HTTP Listener (Redirect to HTTPS)

@@ -18,6 +18,7 @@ It now protects the API with:
 6. For files at or below the single PUT limit, the Lambda generates a short-lived pre-signed `PUT` URL for the existing Managed File Transfer upload bucket.
 7. For larger files, the Lambda initiates an S3 multipart upload, persists the upload session, and returns the first batch of pre-signed part URLs plus follow-up API operations for the remaining parts, completion, and abort.
 8. The client uploads directly to S3 and, for multipart flows, completes the upload through the API once all parts have been transferred.
+9. When the file reaches the Managed File Transfer `clean` bucket, the downstream notifier publishes a client-facing SNS event containing the `clientId`, `transferTicket`, file details, and a presigned download URL.
 
 ## Sample request payload
 
@@ -281,4 +282,33 @@ curl -X DELETE "https://<api-endpoint>/transfer-tickets/<transfer-ticket>" \
 
 ## OpenAPI
 
-The API contract is documented in [`openapi.yaml`](openapi.yaml).
+The source contract is documented in [`openapi.yaml`](openapi.yaml).
+
+After deployment, the same API publishes a protected Swagger UI and the raw OpenAPI document:
+
+- `terraform output transfer_ticket_api_docs_url`
+- `terraform output transfer_ticket_openapi_url`
+- `terraform output transfer_ticket_api_docs_basic_auth_secret_name`
+
+The docs page and raw OpenAPI URL are protected with browser-friendly HTTP Basic auth backed by Secrets Manager. Bootstrap the live password outside Terraform state with:
+
+```bash
+terraform output transfer_ticket_api_docs_basic_auth_secret_name
+scripts/bootstrap-api-credentials.sh docs --secret-id <docs-secret-name>
+```
+
+Inside Swagger UI, callers should still use the API's own security schemes for actual operations:
+
+- Basic auth credentials backed by Secrets Manager, or
+- a Bearer token in the form `<tokenId>.<bearerToken>`
+
+## Recommended sharing pattern
+
+The standard pattern for sharing a Swagger contract with internal and external consumers is:
+
+1. Host the human-friendly UI close to the API itself so the contract and runtime stay in sync.
+2. Protect the UI with SSO or browser-friendly basic auth if broader internet reach is required.
+3. Publish the raw OpenAPI document as a separate protected URL for code generation, Postman imports, and client automation.
+4. Treat the OpenAPI file as versioned source alongside the implementation so contract changes are reviewed with code changes.
+
+This stack now follows that pattern by serving `/docs` and `/openapi.yaml` from the same HTTP API, protecting the docs URLs with dedicated basic auth, and keeping the upload operations on their existing Basic and Bearer authentication controls.

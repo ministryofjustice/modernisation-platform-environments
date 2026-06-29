@@ -66,6 +66,22 @@
         "valueFrom": "${UNPROTECTED_URIS}"
       },
       {
+        "name": "OAUTH2_ISSUER_URI",
+        "valueFrom": "${OAUTH2_ISSUER_URI}"
+      },
+      {
+        "name": "OAUTH2_AUDIENCE",
+        "valueFrom": "${OAUTH2_AUDIENCE}"
+      },
+      {
+        "name": "OAUTH2_ROLES",
+        "valueFrom": "${OAUTH2_ROLES}"
+      },
+      {
+        "name": "OAUTH2_UNPROTECTED_URIS",
+        "valueFrom": "${OAUTH2_UNPROTECTED_URIS}"
+      },
+      {
         "name": "TLS_KEYSTORE_PASSWORD",
         "valueFrom": "${TLS_KEYSTORE_PASSWORD}"
       }

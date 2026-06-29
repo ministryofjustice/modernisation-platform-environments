@@ -172,6 +172,35 @@ module "sns_clean_file_download_notifications" {
   tags = var.tags
 }
 
+module "sns_clean_file_client_notifications" {
+  source  = "terraform-aws-modules/sns/aws"
+  version = "7.1.0"
+
+  name = "${local.resource_name_prefix}-clean-file-client-notifications"
+
+  topic_policy_statements = {
+    account_subscribe = {
+      actions = [
+        "sns:Subscribe",
+        "sns:Receive",
+      ]
+      principals = [{
+        type        = "AWS"
+        identifiers = [var.account_id]
+      }]
+      conditions = [
+        {
+          test     = "StringEquals"
+          variable = "sns:Protocol"
+          values   = ["sqs"]
+        }
+      ]
+    }
+  }
+
+  tags = var.tags
+}
+
 module "lambda_clean_file_presigned_url_notifier" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.8.0"
@@ -191,6 +220,7 @@ module "lambda_clean_file_presigned_url_notifier" {
   }
 
   environment_variables = {
+    CLIENT_NOTIFICATION_SNS_TOPIC_ARN = module.sns_clean_file_client_notifications.topic_arn
     DOWNLOAD_BUCKET_NAME            = var.download_bucket_name
     DOWNLOAD_URL_EXPIRY_SECONDS     = tostring(var.presigned_url_expiry_seconds)
     IDEMPOTENCY_TABLE               = module.dynamodb_idempotency.dynamodb_table_id
@@ -241,6 +271,7 @@ module "lambda_clean_file_presigned_url_notifier" {
         "sns:Publish",
       ]
       resources = [
+        module.sns_clean_file_client_notifications.topic_arn,
         module.sns_clean_file_download_notifications.topic_arn,
       ]
     }

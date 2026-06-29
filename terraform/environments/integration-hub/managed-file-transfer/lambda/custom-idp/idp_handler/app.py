@@ -160,7 +160,7 @@ def build_transfer_response(user_record, identity_provider_record):
 
 def authenticate_password(input_password, username, identity_provider_record):
     secret_value = get_user_secret(username, identity_provider_record)
-    expected_password = secret_value.get("Password")
+    expected_password = secret_value.get("password", secret_value.get("Password"))
 
     if not expected_password:
         raise AuthenticationError("Password is not configured for user")
@@ -174,7 +174,7 @@ def get_public_keys(username, user_record, identity_provider_record):
         return user_record.get("config", {}).get("PublicKeys", [])
 
     secret_value = get_user_secret(username, identity_provider_record)
-    public_keys = secret_value.get("PublicKeys", [])
+    public_keys = secret_value.get("publicKeys", secret_value.get("PublicKeys", []))
     if isinstance(public_keys, str):
         public_keys = json.loads(public_keys)
 
@@ -185,7 +185,7 @@ def get_public_keys(username, user_record, identity_provider_record):
     try:
         key_secret = secretsmanager_client.get_secret_value(SecretId=key_secret_name)
         key_secret_value = json.loads(key_secret["SecretString"])
-        return key_secret_value.get("PublicKeys", [])
+        return key_secret_value.get("publicKeys", key_secret_value.get("PublicKeys", []))
     except secretsmanager_client.exceptions.ResourceNotFoundException:
         return []
 

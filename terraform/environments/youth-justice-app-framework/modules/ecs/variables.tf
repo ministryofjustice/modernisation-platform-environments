@@ -322,6 +322,11 @@ variable "rds_postgresql_sg_id" {
   type        = string
 }
 
+variable "rds_proxy_security_group_id" {
+  description = "The ID of the security group that controls ingress to the RDS Proxy."
+  type        = string
+}
+
 variable "redshift_sg_id" {
   description = "The ID of the security group that controlls ingress to the Redshift database."
   type        = string

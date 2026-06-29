@@ -306,7 +306,7 @@ locals {
         iops       = 3000
         throughput = 500
         type       = "gp3"
-        total_size = 200
+        total_size = 500
       }
       flash = {
         iops       = 3000
