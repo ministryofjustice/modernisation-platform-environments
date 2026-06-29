@@ -98,13 +98,14 @@ locals {
   }
 
   malware-threat-notifier = {
-    function_zip_file = data.archive_file.malware_threat_notifier_placeholder.output_path
+    s3_bucket         = module.s3.aws_s3_bucket_id["lambda-artifacts"].id
+    s3_key            = "malware-threat-notifier.zip"
     function_name     = "malware-threat-notifier"
     handler           = "malware-threat-notifier.lambda_handler"
     iam_role_name     = "malware-threat-notifier-lambda-role"
     environment_variables = {
-      THREAT_ENDPOINT_URL    = local.application_data.accounts[local.environment].malware_threat_endpoint_url
-      THREAT_API_SECRET_ARN  = aws_secretsmanager_secret.auto_admit_secret.arn
+      THREAT_ENDPOINT_URL   = local.application_data.accounts[local.environment].malware_threat_endpoint_url
+      THREAT_API_SECRET_ARN = aws_secretsmanager_secret.auto_admit_secret.arn
     }
   }
 

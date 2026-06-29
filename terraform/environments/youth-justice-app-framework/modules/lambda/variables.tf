@@ -43,7 +43,9 @@ variable "lambda_role" {
 variable "lambda" {
   description = "The lambda function"
   type = object({
-    function_zip_file     = string
+    function_zip_file     = optional(string, "")
+    s3_bucket             = optional(string, "")
+    s3_key                = optional(string, "")
     function_name         = string
     handler               = string
     iam_role_name         = string
