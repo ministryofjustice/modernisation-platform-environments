@@ -146,10 +146,10 @@ module "lambda_api_docs" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.8.0"
 
-  function_name                = "${local.application_name}-${local.component_name}-docs"
-  description                  = "Serves the protected Swagger UI and OpenAPI contract for the MFT API"
-  handler                      = "lambda_function.lambda_handler"
-  runtime                      = "python3.12"
+  function_name = "${local.application_name}-${local.component_name}-docs"
+  description   = "Serves the protected Swagger UI and OpenAPI contract for the MFT API"
+  handler       = "lambda_function.lambda_handler"
+  runtime       = "python3.12"
   # Rebuild the package on clean CI runners when the local zip is absent.
   trigger_on_package_timestamp = true
   environment_variables = {
