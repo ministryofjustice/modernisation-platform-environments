@@ -52,26 +52,11 @@
       ]
     },
     {
-      "id": 5,
-      "type": "stat",
-      "title": "Lambda error rate",
-      "description": "Account-wide Lambda error rate, derived in Grafana as (SUM(Errors) / SUM(Invocations)) * 100. Computed with a Grafana expression because CloudWatch Metrics Insights SQL does not support arithmetic across aggregates. Shows no data when there are no invocations.",
-      "datasource": { "type": "datasource", "uid": "-- Mixed --" },
-      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 5 },
-      "fieldConfig": { "defaults": { "unit": "percent", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }, { "color": "red", "value": 5 }] } }, "overrides": [] },
-      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["mean"], "fields": "", "values": false }, "textMode": "auto" },
-      "targets": [
-        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/Lambda", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(Errors) FROM \"AWS/Lambda\"", "hide": true },
-        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "B", "region": "eu-west-2", "namespace": "AWS/Lambda", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(Invocations) FROM \"AWS/Lambda\"", "hide": true },
-        { "datasource": { "type": "__expr__", "uid": "__expr__" }, "refId": "C", "type": "math", "expression": "($A / $B) * 100" }
-      ]
-    },
-    {
       "id": 6,
       "type": "stat",
       "title": "Lambda throttles",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 5 },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 5 },
       "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }] } }, "overrides": [] },
       "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false }, "textMode": "auto" },
       "targets": [
@@ -83,7 +68,7 @@
       "type": "stat",
       "title": "ALB target 5xx",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 5 },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 5 },
       "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] } }, "overrides": [] },
       "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false }, "textMode": "auto" },
       "targets": [
@@ -107,7 +92,7 @@
       "type": "stat",
       "title": "RDS peak CPU",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 9 },
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 5 },
       "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100, "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 75 }, { "color": "red", "value": 90 }] } }, "overrides": [] },
       "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["max"], "fields": "", "values": false }, "textMode": "auto" },
       "targets": [

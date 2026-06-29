@@ -26,7 +26,7 @@
       "gridPos": { "h": 3, "w": 24, "x": 0, "y": 0 },
       "options": {
         "mode": "markdown",
-        "content": "Networking health for a single Data Platform account, from auto-published CloudWatch metrics (no setup needed). Pick an **Account** at the top. The **At a glance** tiles flag the key saturation/error signals and the **Cost & usage** tiles give an estimated NAT spend and data volume for the selected window; the rows below break down NAT gateways by resource via Metrics Insights. Watch for NAT **port-allocation errors** (SNAT exhaustion) and **packets dropped**. NAT cost is approximate — data-processing only, at the eu-west-2 rate of $0.048/GB, and excludes the per-hour gateway charge."
+        "content": "Networking health for a single Data Platform account, from auto-published CloudWatch metrics (no setup needed). Pick an **Account** at the top. The **At a glance** tiles flag the key saturation/error signals and the **Cost & usage** tiles give an estimated NAT spend and data volume for the selected window; the rows below break down NAT gateways by resource via Metrics Insights. Watch for NAT **port-allocation errors** (SNAT exhaustion) and **packets dropped**. NAT cost is approximate — data-processing only, at the eu-west-2 rate of $0.05/GB, and excludes the per-hour gateway charge."
       }
     },
     {

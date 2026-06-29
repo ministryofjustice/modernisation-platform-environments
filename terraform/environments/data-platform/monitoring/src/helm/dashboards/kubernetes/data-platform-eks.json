@@ -337,7 +337,7 @@
     {
       "id": 35,
       "type": "timeseries",
-      "title": "Pod restarts over time",
+      "title": "Pod restarts by namespace",
       "description": "Container restarts by namespace over time — useful for detecting crash loops or unstable workloads.",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
       "gridPos": { "h": 8, "w": 8, "x": 8, "y": 79 },
@@ -350,7 +350,7 @@
     {
       "id": 36,
       "type": "timeseries",
-      "title": "Running pods over time",
+      "title": "Running pods by namespace",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
       "gridPos": { "h": 8, "w": 8, "x": 16, "y": 79 },
       "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short" }, "overrides": [] },
