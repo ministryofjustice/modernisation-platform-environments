@@ -9,7 +9,11 @@ locals {
     "am_stg${local.dbt_suffix}",
     "intermediate_tasking${local.dbt_suffix}"
   ]
-  load_lambda_databases = [
+  load_lambda_databases = local.is-production ? [
+    "staged_mdss",
+    "acquisitive_crime",
+    "allied_mdss",
+  ] : [
     "staged_mdss${local.dbt_suffix}",
     "acquisitive_crime${local.dbt_suffix}",
     "allied_mdss_${local.environment_shorthand}",
