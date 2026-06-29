@@ -6,7 +6,7 @@ Terraform project to configure the AWS OpenSearch domain created by the [opensea
 
 - AWS CLI v2
 - Terraform ~> 1.9
-- Port forwarding to ECS - streaming-pov-ecs-sdg container 
+- Port forwarding to ECS - streaming-pov-ecs-sdg container
 - Access to MOJ aws environments
 
 ## Important
@@ -21,9 +21,9 @@ The OpenSearch domain is only accessible from within the VPC, so this project mu
 aws sso login --sso-session <session>
 
 ```
-# port forward script 
+# port forward script
 
-```bash 
+```bash
 #!/bin/sh
 
 AWS_REGION="eu-west-2"
