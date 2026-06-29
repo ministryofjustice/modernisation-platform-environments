@@ -9,7 +9,7 @@
 resource "aws_cloudwatch_log_group" "s3_replication_failure" {
   # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
   name              = "/aws/events/s3-replication-failure"
-  retention_in_days = 30
+  retention_in_days = 365
 }
 
 ###############################

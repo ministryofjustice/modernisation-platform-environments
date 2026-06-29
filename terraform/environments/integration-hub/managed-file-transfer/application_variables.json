@@ -218,9 +218,7 @@
         }
       },
       "custom_idp_configuration": {
-        "ingress_cidr_blocks": [
-          "0.0.0.0/0"
-        ],
+        "ingress_cidr_blocks": ["0.0.0.0/0"],
         "log_level": "INFO",
         "secret_prefix": "transfer/",
         "user_name_delimiter": "@@"

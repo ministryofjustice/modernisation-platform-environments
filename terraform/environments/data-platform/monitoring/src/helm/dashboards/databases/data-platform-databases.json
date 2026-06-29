@@ -1,0 +1,726 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "id": 1,
+      "type": "text",
+      "title": "About this dashboard",
+      "gridPos": { "h": 3, "w": 24, "x": 0, "y": 0 },
+      "options": {
+        "mode": "markdown",
+        "content": "Database health for a single Data Platform account, from auto-published CloudWatch metrics. Pick an **Account** at the top. Covers RDS/Aurora, Redshift, OpenSearch and DynamoDB — empty panels simply mean that engine is not used in the selected account."
+      }
+    },
+    {
+      "id": 2,
+      "type": "row",
+      "title": "RDS / Aurora",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 3 },
+      "panels": []
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "CPU utilisation by instance",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "max": 100,
+          "unit": "percent",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 75 },
+              { "color": "red", "value": 90 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/RDS",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT AVG(CPUUtilization) FROM SCHEMA(\"AWS/RDS\", DBInstanceIdentifier) GROUP BY DBInstanceIdentifier ORDER BY AVG() DESC"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Database connections by instance",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/RDS",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT AVG(DatabaseConnections) FROM SCHEMA(\"AWS/RDS\", DBInstanceIdentifier) GROUP BY DBInstanceIdentifier ORDER BY AVG() DESC"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Read latency by instance",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/RDS",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT AVG(ReadLatency) FROM SCHEMA(\"AWS/RDS\", DBInstanceIdentifier) GROUP BY DBInstanceIdentifier ORDER BY AVG() DESC"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Write latency by instance",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/RDS",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT AVG(WriteLatency) FROM SCHEMA(\"AWS/RDS\", DBInstanceIdentifier) GROUP BY DBInstanceIdentifier ORDER BY AVG() DESC"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Freeable memory by instance",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/RDS",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT AVG(FreeableMemory) FROM SCHEMA(\"AWS/RDS\", DBInstanceIdentifier) GROUP BY DBInstanceIdentifier ORDER BY AVG() ASC"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Free storage space by instance",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/RDS",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT AVG(FreeStorageSpace) FROM SCHEMA(\"AWS/RDS\", DBInstanceIdentifier) GROUP BY DBInstanceIdentifier ORDER BY AVG() ASC"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "row",
+      "title": "Redshift",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 28 },
+      "panels": []
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "CPU utilisation by cluster",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 29 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "max": 100,
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/Redshift",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT AVG(CPUUtilization) FROM SCHEMA(\"AWS/Redshift\", ClusterIdentifier) GROUP BY ClusterIdentifier ORDER BY AVG() DESC"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "Disk space used by cluster",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 29 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "max": 100,
+          "unit": "percent",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 80 },
+              { "color": "red", "value": 90 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/Redshift",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT MAX(PercentageDiskSpaceUsed) FROM SCHEMA(\"AWS/Redshift\", ClusterIdentifier) GROUP BY ClusterIdentifier ORDER BY MAX() DESC"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "Connections by cluster",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 29 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/Redshift",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT AVG(DatabaseConnections) FROM SCHEMA(\"AWS/Redshift\", ClusterIdentifier) GROUP BY ClusterIdentifier ORDER BY AVG() DESC"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "type": "row",
+      "title": "OpenSearch",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 37 },
+      "panels": []
+    },
+    {
+      "id": 14,
+      "type": "timeseries",
+      "title": "Cluster status red by domain",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 38 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/ES",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT MAX(\"ClusterStatus.red\") FROM \"AWS/ES\" GROUP BY DomainName ORDER BY MAX() DESC"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "type": "timeseries",
+      "title": "CPU utilisation by domain",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 38 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "max": 100,
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/ES",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT AVG(CPUUtilization) FROM \"AWS/ES\" GROUP BY DomainName ORDER BY AVG() DESC"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "type": "timeseries",
+      "title": "JVM memory pressure by domain",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 46 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "max": 100,
+          "unit": "percent",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 80 },
+              { "color": "red", "value": 92 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/ES",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT MAX(JVMMemoryPressure) FROM \"AWS/ES\" GROUP BY DomainName ORDER BY MAX() DESC"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "type": "timeseries",
+      "title": "Free storage space by domain",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 46 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "decmbytes"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/ES",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT MIN(FreeStorageSpace) FROM \"AWS/ES\" GROUP BY DomainName ORDER BY MIN() ASC"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "type": "row",
+      "title": "DynamoDB",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 54 },
+      "panels": []
+    },
+    {
+      "id": 19,
+      "type": "timeseries",
+      "title": "Consumed read capacity by table",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 55 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/DynamoDB",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT SUM(ConsumedReadCapacityUnits) FROM \"AWS/DynamoDB\" GROUP BY TableName ORDER BY SUM() DESC"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "type": "timeseries",
+      "title": "Throttled requests by table",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 55 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 1 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/DynamoDB",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT SUM(ThrottledRequests) FROM \"AWS/DynamoDB\" GROUP BY TableName ORDER BY SUM() DESC"
+        }
+      ]
+    }
+  ],
+  "refresh": "5m",
+  "schemaVersion": 39,
+  "tags": ["data-platform", "databases", "cloudwatch"],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "hide": 0,
+        "includeAll": false,
+        "label": "Account",
+        "multi": false,
+        "name": "account",
+        "options": [],
+        "query": "cloudwatch",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Data Platform — Databases",
+  "uid": "data-platform-databases",
+  "version": 1,
+  "weekStart": ""
+}

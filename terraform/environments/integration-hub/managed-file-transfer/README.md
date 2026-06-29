@@ -71,7 +71,7 @@ The service is built entirely from AWS managed services, provisioned with Terraf
    - `clean` — `NO_THREATS_FOUND`
    - `quarantine` — `THREATS_FOUND`
    - `investigation` — `UNSUPPORTED`, `ACCESS_DENIED` or `FAILED`
-7. **Notification.** When a clean object lands, the `send-presigned-url` module generates a time-limited presigned download URL and posts it to Slack.
+7. **Notification.** When a clean object lands, the `send-presigned-url` module generates a time-limited presigned download URL, posts it to Slack, and publishes a client-facing notification event to SNS for downstream consumers.
 
 All buckets are KMS-encrypted, versioned, block public access, and have short (one day) lifecycle expiry as befits a transfer staging area.
 
@@ -100,6 +100,23 @@ CloudWatch alarms publish to high- and low-priority SNS topics, which feed Amazo
 - **Dead-letter queues** — any message arriving on a dead-letter queue.
 - **GuardDuty Malware Protection for S3** — failed, skipped or infected object scans.
 - **Transfer ingress volume** — unexpectedly high file ingress for the MVP.
+
+## Client notification testing
+
+For the API upload flow, clean files now also emit a downstream consumer notification with the client ID, transfer ticket, file details, and a presigned download URL.
+
+In development, Terraform provisions a `products-poc` test SQS subscription for this SNS topic. Useful outputs are:
+
+- `terraform output clean_file_client_notification_topic_arn`
+- `terraform output products_poc_clean_file_notification_test_queue_url`
+
+You can poll the queue with:
+
+```bash
+scripts/poll-clean-file-notification.sh \
+  --profile integration-hub-development \
+  --queue-url "$(terraform output -raw products_poc_clean_file_notification_test_queue_url)"
+```
 
 ### **Impact of an outage:**
 

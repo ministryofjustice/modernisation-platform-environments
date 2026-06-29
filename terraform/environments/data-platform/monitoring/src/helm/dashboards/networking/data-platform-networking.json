@@ -1,0 +1,481 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "id": 1,
+      "type": "text",
+      "title": "About this dashboard",
+      "gridPos": { "h": 3, "w": 24, "x": 0, "y": 0 },
+      "options": {
+        "mode": "markdown",
+        "content": "Networking health for a single Data Platform account, from auto-published CloudWatch metrics (no setup needed). Pick an **Account** at the top. The **At a glance** tiles flag the key saturation/error signals and the **Cost & usage** tiles give an estimated NAT spend and data volume for the selected window; the rows below break down NAT gateways by resource via Metrics Insights. Watch for NAT **port-allocation errors** (SNAT exhaustion) and **packets dropped**. NAT cost is approximate — data-processing only, at the eu-west-2 rate of $0.048/GB, and excludes the per-hour gateway charge."
+      }
+    },
+    {
+      "id": 13,
+      "type": "row",
+      "title": "At a glance",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 3 },
+      "panels": []
+    },
+    {
+      "id": 14,
+      "type": "stat",
+      "title": "NAT port-allocation errors",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 4, "w": 12, "x": 0, "y": 4 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/NATGateway",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT SUM(ErrorPortAllocation) FROM \"AWS/NATGateway\""
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "type": "stat",
+      "title": "NAT packets dropped",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 4, "w": 12, "x": 12, "y": 4 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 1 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/NATGateway",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT SUM(PacketsDropCount) FROM \"AWS/NATGateway\""
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "row",
+      "title": "Cost & usage (estimated)",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 8 },
+      "panels": []
+    },
+    {
+      "id": 8,
+      "type": "stat",
+      "title": "NAT data-processing cost (est.)",
+      "description": "Estimated NAT gateway data-processing charge over the selected window: (BytesInFromSource + BytesInFromDestination) converted to GB and multiplied by the eu-west-2 rate of $0.048/GB. Excludes the fixed per-hour gateway charge.",
+      "datasource": { "type": "datasource", "uid": "-- Mixed --" },
+      "gridPos": { "h": 4, "w": 8, "x": 0, "y": 9 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 2,
+          "color": { "mode": "fixed", "fixedColor": "green" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/NATGateway",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT SUM(BytesInFromSource) FROM \"AWS/NATGateway\"",
+          "hide": true
+        },
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "B",
+          "region": "eu-west-2",
+          "namespace": "AWS/NATGateway",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT SUM(BytesInFromDestination) FROM \"AWS/NATGateway\"",
+          "hide": true
+        },
+        {
+          "datasource": { "type": "__expr__", "uid": "__expr__" },
+          "refId": "C",
+          "type": "math",
+          "expression": "($A + $B) / 1000000000 * 0.048"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "stat",
+      "title": "Data processed (NAT)",
+      "description": "Total data processed by NAT gateways over the selected window (BytesInFromSource + BytesInFromDestination) — the volume the data-processing charge is based on.",
+      "datasource": { "type": "datasource", "uid": "-- Mixed --" },
+      "gridPos": { "h": 4, "w": 8, "x": 8, "y": 9 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "color": { "mode": "fixed", "fixedColor": "blue" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/NATGateway",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT SUM(BytesInFromSource) FROM \"AWS/NATGateway\"",
+          "hide": true
+        },
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "B",
+          "region": "eu-west-2",
+          "namespace": "AWS/NATGateway",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT SUM(BytesInFromDestination) FROM \"AWS/NATGateway\"",
+          "hide": true
+        },
+        {
+          "datasource": { "type": "__expr__", "uid": "__expr__" },
+          "refId": "C",
+          "type": "math",
+          "expression": "$A + $B"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "stat",
+      "title": "Peak active connections",
+      "description": "Highest total of concurrent active connections across all NAT gateways during the selected window.",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 9 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "fixed", "fixedColor": "blue" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["max"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/NATGateway",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT SUM(ActiveConnectionCount) FROM \"AWS/NATGateway\""
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "row",
+      "title": "NAT gateways",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 },
+      "panels": []
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "NAT bytes out to destination",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/NATGateway",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT SUM(BytesOutToDestination) FROM SCHEMA(\"AWS/NATGateway\", NatGatewayId) GROUP BY NatGatewayId ORDER BY SUM() DESC"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "NAT active connections",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/NATGateway",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT AVG(ActiveConnectionCount) FROM SCHEMA(\"AWS/NATGateway\", NatGatewayId) GROUP BY NatGatewayId ORDER BY AVG() DESC"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "NAT port-allocation errors (SNAT exhaustion)",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 22 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/NATGateway",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT SUM(ErrorPortAllocation) FROM SCHEMA(\"AWS/NATGateway\", NatGatewayId) GROUP BY NatGatewayId ORDER BY SUM() DESC"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "NAT packets dropped",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 22 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 1 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/NATGateway",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT SUM(PacketsDropCount) FROM SCHEMA(\"AWS/NATGateway\", NatGatewayId) GROUP BY NatGatewayId ORDER BY SUM() DESC"
+        }
+      ]
+    }
+  ],
+  "refresh": "5m",
+  "schemaVersion": 39,
+  "tags": ["data-platform", "networking", "cloudwatch"],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "hide": 0,
+        "includeAll": false,
+        "label": "Account",
+        "multi": false,
+        "name": "account",
+        "options": [],
+        "query": "cloudwatch",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Data Platform — Networking",
+  "uid": "data-platform-networking",
+  "version": 1,
+  "weekStart": ""
+}

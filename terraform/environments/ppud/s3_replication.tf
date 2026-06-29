@@ -1,79 +1,77 @@
-
 ##########################################################################################
 # S3 Replication Buckets (database-source & report-source) for DEV, UAT, PROD
-# Optimised replacement for s3.tf lines 282-443, 447-604, 1017-1174, 1178-1336, 1559-1716, 1720-1877
 ##########################################################################################
 
 locals {
   s3_replication_buckets = {
     for k, v in {
       database_source_dev = {
-        condition       = local.is-development
-        bucket_name     = "moj-database-source-dev"
-        log_bucket      = "moj-log-files-dev"
-        log_prefix      = "s3-logs/moj-database-source-dev-logs/"
-        lifecycle_id    = "delete-moj-database-source-dev"
-        expiration_days = 6
+        condition               = local.is-development
+        bucket_name             = "moj-database-source-dev"
+        log_bucket              = "moj-log-files-dev"
+        log_prefix              = "s3-logs/moj-database-source-dev-logs/"
+        lifecycle_id            = "delete-moj-database-source-dev"
+        expiration_days         = 6
         replication_destination = "arn:aws:s3:::mojap-data-engineering-production-ppud-dev"
         replication_rule_id     = "ppud-database-replication-rule-dev"
         iam_role_key            = "database_source_dev"
         ec2_account             = "ppud-development"
       }
       report_source_dev = {
-        condition       = local.is-development
-        bucket_name     = "moj-report-source-dev"
-        log_bucket      = "moj-log-files-dev"
-        log_prefix      = "s3-logs/moj-report-source-dev-logs/"
-        lifecycle_id    = "delete-moj-report-source-dev"
-        expiration_days = 6
+        condition               = local.is-development
+        bucket_name             = "moj-report-source-dev"
+        log_bucket              = "moj-log-files-dev"
+        log_prefix              = "s3-logs/moj-report-source-dev-logs/"
+        lifecycle_id            = "delete-moj-report-source-dev"
+        expiration_days         = 6
         replication_destination = "arn:aws:s3:::cloud-platform-db973d65892f599f6e78cb90252d7dc9"
         replication_rule_id     = "ppud-report-replication-rule-dev"
         iam_role_key            = "report_source_dev"
         ec2_account             = "ppud-development"
       }
       database_source_uat = {
-        condition       = local.is-preproduction
-        bucket_name     = "moj-database-source-uat"
-        log_bucket      = "moj-log-files-uat"
-        log_prefix      = "s3-logs/moj-database-source-uat-logs/"
-        lifecycle_id    = "delete-moj-database-source-uat"
-        expiration_days = 6
+        condition               = local.is-preproduction
+        bucket_name             = "moj-database-source-uat"
+        log_bucket              = "moj-log-files-uat"
+        log_prefix              = "s3-logs/moj-database-source-uat-logs/"
+        lifecycle_id            = "delete-moj-database-source-uat"
+        expiration_days         = 6
         replication_destination = "arn:aws:s3:::mojap-data-engineering-production-ppud-preprod"
         replication_rule_id     = "ppud-database-replication-rule-uat"
         iam_role_key            = "database_source_uat"
         ec2_account             = "ppud-preproduction"
       }
       report_source_uat = {
-        condition       = local.is-preproduction
-        bucket_name     = "moj-report-source-uat"
-        log_bucket      = "moj-log-files-uat"
-        log_prefix      = "s3-logs/moj-report-source-uat-logs/"
-        lifecycle_id    = "delete-moj-report-source-uat"
-        expiration_days = 6
+        condition               = local.is-preproduction
+        bucket_name             = "moj-report-source-uat"
+        log_bucket              = "moj-log-files-uat"
+        log_prefix              = "s3-logs/moj-report-source-uat-logs/"
+        lifecycle_id            = "delete-moj-report-source-uat"
+        expiration_days         = 6
         replication_destination = "arn:aws:s3:::cloud-platform-ffbd9073e2d0d537d825ebea31b441fc"
         replication_rule_id     = "ppud-report-replication-rule-uat"
         iam_role_key            = "report_source_uat"
         ec2_account             = "ppud-preproduction"
       }
       database_source_prod = {
-        condition       = local.is-production
-        bucket_name     = "moj-database-source-prod"
-        log_bucket      = "moj-log-files-prod"
-        log_prefix      = "s3-logs/moj-database-source-prod-logs/"
-        lifecycle_id    = "delete-moj-database-source-prod"
-        expiration_days = 6
+        condition               = local.is-production
+        bucket_name             = "moj-database-source-prod"
+        log_bucket              = "moj-log-files-prod"
+        log_prefix              = "s3-logs/moj-database-source-prod-logs/"
+        lifecycle_id            = "delete-moj-database-source-prod"
+        expiration_days         = 6
         replication_destination = "arn:aws:s3:::mojap-data-engineering-production-ppud-prod"
         replication_rule_id     = "ppud-report-replication-rule-prod"
         iam_role_key            = "database_source_prod"
         ec2_account             = "ppud-production"
       }
       report_source_prod = {
-        condition       = local.is-production
-        bucket_name     = "moj-report-source-prod"
-        log_bucket      = "moj-log-files-prod"
-        log_prefix      = "s3-logs/moj-report-source-prod-logs/"
-        lifecycle_id    = "delete-moj-report-source-prod"
-        expiration_days = 6
+        condition               = local.is-production
+        bucket_name             = "moj-report-source-prod"
+        log_bucket              = "moj-log-files-prod"
+        log_prefix              = "s3-logs/moj-report-source-prod-logs/"
+        lifecycle_id            = "delete-moj-report-source-prod"
+        expiration_days         = 6
         replication_destination = "arn:aws:s3:::cloud-platform-9c7fd5fc774969b089e942111a7d5671"
         replication_rule_id     = "ppud-report-replication-rule-prod"
         iam_role_key            = "report_source_prod"
@@ -93,8 +91,6 @@ locals {
 
 resource "aws_s3_bucket" "s3_replication" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
-  # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
-  # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
   # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
   for_each = local.s3_replication_buckets
   bucket   = each.value.bucket_name
@@ -233,7 +229,6 @@ resource "aws_s3_bucket_policy" "s3_replication" {
 
 ##########################################################################################
 # S3 Bucket Roles and Policies for S3 Buckets that replicate to Justice Digital S3 Buckets
-# Optimised replacement for iam.tf lines 214-662
 ##########################################################################################
 
 locals {
