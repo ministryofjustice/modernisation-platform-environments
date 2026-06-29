@@ -46,7 +46,17 @@ def fake_idempotent_function(**_kwargs):
 
 
 sys.modules.setdefault("boto3", SimpleNamespace(client=lambda _service_name, **_kwargs: SimpleNamespace()))
-sys.modules.setdefault("botocore.config", SimpleNamespace(Config=lambda **_kwargs: SimpleNamespace()))
+
+# `from botocore.config import Config` imports `botocore` first, so stub both the
+# package and the submodule to keep tests runnable without botocore installed.
+_module_type = type(sys)
+_botocore_pkg = _module_type("botocore")
+_botocore_pkg.__path__ = []
+_botocore_config = _module_type("botocore.config")
+_botocore_config.Config = lambda **_kwargs: SimpleNamespace()
+sys.modules.setdefault("botocore", _botocore_pkg)
+sys.modules.setdefault("botocore.config", _botocore_config)
+
 sys.modules.setdefault("aws_lambda_powertools", SimpleNamespace(Logger=FakeLogger))
 sys.modules.setdefault(
     "aws_lambda_powertools.utilities.idempotency",
