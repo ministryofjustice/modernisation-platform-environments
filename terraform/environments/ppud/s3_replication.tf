@@ -1,7 +1,5 @@
-
 ##########################################################################################
 # S3 Replication Buckets (database-source & report-source) for DEV, UAT, PROD
-# Optimised replacement for s3.tf lines 282-443, 447-604, 1017-1174, 1178-1336, 1559-1716, 1720-1877
 ##########################################################################################
 
 locals {
@@ -231,7 +229,6 @@ resource "aws_s3_bucket_policy" "s3_replication" {
 
 ##########################################################################################
 # S3 Bucket Roles and Policies for S3 Buckets that replicate to Justice Digital S3 Buckets
-# Optimised replacement for iam.tf lines 214-662
 ##########################################################################################
 
 locals {
