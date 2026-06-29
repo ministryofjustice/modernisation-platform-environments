@@ -120,6 +120,10 @@ resource "kubectl_manifest" "gateway_proxy" {
               service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
               service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
               service.beta.kubernetes.io/aws-load-balancer-name: envoy-${var.cluster_name}
+              # Preserve the real client source IP. Disabled by default for NLB
+              # ip-target groups (TCP/TLS), so without this Envoy sees the NLB
+              # node IP and SecurityPolicy clientCIDRs would match the wrong address.
+              service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: preserve_client_ip.enabled=true
       dynamicModules:
         - name: composer
           source:
