@@ -16,33 +16,33 @@
 # keep that traffic off the internet entirely — you could then remove those
 # entries from this list and reduce the attack surface.
 # -----------------------------------------------------------------------------
-resource "aws_networkfirewall_rule_group" "workspaces_aws_endpoints" {
-  name     = "workspaces-aws-endpoints"
-  capacity = 15
-  type     = "STATEFUL"
+# resource "aws_networkfirewall_rule_group" "workspaces_aws_endpoints" {
+#   name     = "workspaces-aws-endpoints"
+#   capacity = 15
+#   type     = "STATEFUL"
 
-  rule_group {
-    rules_source {
-      rules_source_list {
-        generated_rules_type = "ALLOWLIST"
-        target_types         = ["TLS_SNI", "HTTP_HOST"]
-        targets = [
-          # "wam-idb.eu-west-2.amazonaws.com",
-          # "wam-ps.eu-west-2.amazonaws.com",
-          # ".s3.amazonaws.com", # covers s3.amazonaws.com and *.s3.amazonaws.com
-          # ".s3-external-1.amazonaws.com",
-          # ".s3-eu-west-2.amazonaws.com",
-          # "sqs.eu-west-2.amazonaws.com",
-          # "cloudfront.amazonaws.com",
-        ]
-      }
-    }
-  }
+#   rule_group {
+#     rules_source {
+#       rules_source_list {
+#         generated_rules_type = "ALLOWLIST"
+#         target_types         = ["TLS_SNI", "HTTP_HOST"]
+#         targets = [
+#           # "wam-idb.eu-west-2.amazonaws.com",
+#           # "wam-ps.eu-west-2.amazonaws.com",
+#           # ".s3.amazonaws.com", # covers s3.amazonaws.com and *.s3.amazonaws.com
+#           # ".s3-external-1.amazonaws.com",
+#           # ".s3-eu-west-2.amazonaws.com",
+#           # "sqs.eu-west-2.amazonaws.com",
+#           # "cloudfront.amazonaws.com",
+#         ]
+#       }
+#     }
+#   }
 
-  tags = {
-    Name = "workspaces-aws-endpoints"
-  }
-}
+#   tags = {
+#     Name = "workspaces-aws-endpoints"
+#   }
+# }
 
 # -----------------------------------------------------------------------------
 # Rule Group 2 — Microsoft Services
@@ -159,7 +159,7 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
 #     for your security posture.
 # -----------------------------------------------------------------------------
 resource "aws_networkfirewall_rule_group" "workspaces_onedrive_live_misc" {
-  name     = "workspaces-onedrive-live-misc"
+  name     = "workspaces-onedrive-live"
   capacity = 70
   type     = "STATEFUL"
 
@@ -246,7 +246,7 @@ resource "aws_networkfirewall_rule_group" "workspaces_onedrive_live_misc" {
   }
 
   tags = {
-    Name = "workspaces-onedrive-live-misc"
+    Name = "workspaces-onedrive-live"
   }
 }
 
@@ -268,38 +268,38 @@ resource "aws_networkfirewall_rule_group" "workspaces_onedrive_live_misc" {
 #   ".omniroot.com"    — replaces cacert/cacert.a/ocsp/vassg142.* entries
 #   ".letsencrypt.org" — replaces cert.int-x3 and ocsp.int-x3 entries
 # -----------------------------------------------------------------------------
-resource "aws_networkfirewall_rule_group" "workspaces_certificate_authorities" {
-  name     = "workspaces-certificate-authorities"
-  capacity = 25
-  type     = "STATEFUL"
+# resource "aws_networkfirewall_rule_group" "workspaces_certificate_authorities" {
+#   name     = "workspaces-certificate-authorities"
+#   capacity = 25
+#   type     = "STATEFUL"
 
-  rule_group {
-    rules_source {
-      rules_source_list {
-        generated_rules_type = "ALLOWLIST"
-        target_types         = ["TLS_SNI", "HTTP_HOST"]
-        targets = [
-          # ".digicert.com",
-          # ".globalsign.com",
-          # ".globalsign.net",
-          # ".entrust.net",
-          # ".geotrust.com",
-          # ".verisign.com",
-          # ".verisign.net",
-          # ".symcb.com",
-          # ".symcd.com",
-          # ".omniroot.com",
-          # ".public-trust.com",
-          # ".identrust.com",
-          # ".letsencrypt.org",
-          # ".usertrust.com",
-          # "ocsp.msocsp.com", # Microsoft OCSP responder — not under .microsoft.com TLD
-          # "crl.sectigo.com",
-          # "ocsp.sectigo.com",
-        ]
-      }
-    }
-  }
+#   rule_group {
+#     rules_source {
+#       rules_source_list {
+#         generated_rules_type = "ALLOWLIST"
+#         target_types         = ["TLS_SNI", "HTTP_HOST"]
+#         targets = [
+#           # ".digicert.com",
+#           # ".globalsign.com",
+#           # ".globalsign.net",
+#           # ".entrust.net",
+#           # ".geotrust.com",
+#           # ".verisign.com",
+#           # ".verisign.net",
+#           # ".symcb.com",
+#           # ".symcd.com",
+#           # ".omniroot.com",
+#           # ".public-trust.com",
+#           # ".identrust.com",
+#           # ".letsencrypt.org",
+#           # ".usertrust.com",
+#           # "ocsp.msocsp.com", # Microsoft OCSP responder — not under .microsoft.com TLD
+#           # "crl.sectigo.com",
+#           # "ocsp.sectigo.com",
+#         ]
+#       }
+#     }
+#   }
 
   tags = {
     Name = "workspaces-certificate-authorities"
@@ -322,10 +322,10 @@ resource "aws_networkfirewall_firewall_policy" "workspaces_web_allowlist" {
       rule_order = "STRICT_ORDER"
     }
 
-    stateful_rule_group_reference {
-      resource_arn = aws_networkfirewall_rule_group.workspaces_aws_endpoints.arn
-      priority     = 1
-    }
+    # stateful_rule_group_reference {
+    #   resource_arn = aws_networkfirewall_rule_group.workspaces_aws_endpoints.arn
+    #   priority     = 1
+    # }
 
     stateful_rule_group_reference {
       resource_arn = aws_networkfirewall_rule_group.workspaces_microsoft_services.arn
@@ -337,10 +337,10 @@ resource "aws_networkfirewall_firewall_policy" "workspaces_web_allowlist" {
       priority     = 3
     }
 
-    stateful_rule_group_reference {
-      resource_arn = aws_networkfirewall_rule_group.workspaces_certificate_authorities.arn
-      priority     = 4
-    }
+    # stateful_rule_group_reference {
+    #   resource_arn = aws_networkfirewall_rule_group.workspaces_certificate_authorities.arn
+    #   priority     = 4
+    # }
   }
 
   tags = {
