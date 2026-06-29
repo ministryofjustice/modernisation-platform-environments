@@ -18,6 +18,7 @@ It now protects the API with:
 6. For files at or below the single PUT limit, the Lambda generates a short-lived pre-signed `PUT` URL for the existing Managed File Transfer upload bucket.
 7. For larger files, the Lambda initiates an S3 multipart upload, persists the upload session, and returns the first batch of pre-signed part URLs plus follow-up API operations for the remaining parts, completion, and abort.
 8. The client uploads directly to S3 and, for multipart flows, completes the upload through the API once all parts have been transferred.
+9. When the file reaches the Managed File Transfer `clean` bucket, the downstream notifier publishes a client-facing SNS event containing the `clientId`, `transferTicket`, file details, and a presigned download URL.
 
 ## Sample request payload
 
