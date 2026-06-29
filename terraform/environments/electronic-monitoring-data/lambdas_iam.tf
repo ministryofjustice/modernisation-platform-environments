@@ -2323,7 +2323,7 @@ resource "aws_iam_role" "merge_load_ac" {
 }
 
 resource "aws_iam_role" "merge_load_emdi" {
-  name               = "merge_load_ac_lambda_role"
+  name               = "merge_load_emdi_lambda_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
