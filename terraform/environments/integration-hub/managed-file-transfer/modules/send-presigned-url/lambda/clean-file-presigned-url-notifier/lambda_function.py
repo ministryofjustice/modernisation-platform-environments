@@ -5,6 +5,7 @@ from datetime import UTC, datetime, timedelta
 from urllib.parse import unquote_plus
 
 import boto3
+from botocore.config import Config
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.idempotency import (
     DynamoDBPersistenceLayer,
@@ -12,7 +13,13 @@ from aws_lambda_powertools.utilities.idempotency import (
     idempotent_function,
 )
 
-s3 = boto3.client("s3")
+AWS_REGION = os.environ.get("AWS_REGION", "eu-west-2")
+s3 = boto3.client(
+    "s3",
+    region_name=AWS_REGION,
+    endpoint_url=f"https://s3.{AWS_REGION}.amazonaws.com",
+    config=Config(signature_version="s3v4", s3={"addressing_style": "virtual"}),
+)
 sns = boto3.client("sns")
 CLIENT_NOTIFICATION_SNS_TOPIC_ARN = os.environ["CLIENT_NOTIFICATION_SNS_TOPIC_ARN"]
 DOWNLOAD_BUCKET_NAME = os.environ["DOWNLOAD_BUCKET_NAME"]

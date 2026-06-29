@@ -45,7 +45,8 @@ def fake_idempotent_function(**_kwargs):
     return decorator
 
 
-sys.modules.setdefault("boto3", SimpleNamespace(client=lambda _service_name: SimpleNamespace()))
+sys.modules.setdefault("boto3", SimpleNamespace(client=lambda _service_name, **_kwargs: SimpleNamespace()))
+sys.modules.setdefault("botocore.config", SimpleNamespace(Config=lambda **_kwargs: SimpleNamespace()))
 sys.modules.setdefault("aws_lambda_powertools", SimpleNamespace(Logger=FakeLogger))
 sys.modules.setdefault(
     "aws_lambda_powertools.utilities.idempotency",
