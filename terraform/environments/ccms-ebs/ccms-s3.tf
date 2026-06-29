@@ -8,7 +8,72 @@ module "s3-bucket-logging" {
 
   bucket_name        = local.logging_bucket_name
   versioning_enabled = true
-  bucket_policy      = [data.aws_iam_policy_document.logging_s3_policy.json]
+  bucket_policy = [jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        "Sid" : "DenyInsecureTransport",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          module.s3-bucket-logging.bucket.arn,
+          "${module.s3-bucket-logging.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
+        Sid    = "AllowELBLogDeliveryPutObject"
+        Effect = "Allow"
+        Principal = {
+          Service = "logdelivery.elasticloadbalancing.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "${module.s3-bucket-logging.bucket.arn}/*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+            "s3:x-amz-acl"      = "bucket-owner-full-control"
+          }
+        }
+      },
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "logging.s3.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "arn:aws:s3:::ccms-ebs-${local.environment}-logging/*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      },
+      {
+        "Sid" = "RestrictToTLSRequestsOnly",
+        "Action" : "s3:*",
+        "Effect" : "Deny",
+        "Resource" : [
+          module.s3-bucket-logging.bucket.arn,
+          "${module.s3-bucket-logging.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          },
+          "NumericLessThan" : {
+            "aws:TLSVersion" : "1.2"
+          }
+        },
+        "Principal" : "*"
+      }
+    ]
+  })]
 
   log_bucket    = local.logging_bucket_name
   log_prefix    = "s3access/${local.logging_bucket_name}"
@@ -85,67 +150,6 @@ resource "aws_s3_bucket_notification" "logging_bucket_notification" {
   }
 }
 
-data "aws_iam_policy_document" "logging_s3_policy" {
-  statement {
-    sid    = "AllowELBLogDeliveryPutObject"
-    effect = "Allow"
-    principals {
-      type = "Service"
-      identifiers = [
-        "logdelivery.elasticloadbalancing.amazonaws.com"
-      ]
-    }
-    actions   = ["s3:PutObject"]
-    resources = ["${module.s3-bucket-logging.bucket.arn}/*"]
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = ["${data.aws_caller_identity.current.account_id}"]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "s3:x-amz-acl"
-      values   = ["bucket-owner-full-control"]
-    }
-
-  }
-
-  statement {
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["logging.s3.amazonaws.com"]
-    }
-    actions   = ["s3:PutObject"]
-    resources = ["arn:aws:s3:::ccms-ebs-${local.environment}-logging/*"]
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = ["${data.aws_caller_identity.current.account_id}"]
-    }
-  }
-
-  statement {
-    sid    = "DenyInsecureTransport"
-    effect = "Deny"
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-    actions = ["s3:*"]
-    resources = [
-      module.s3-bucket-logging.bucket.arn,
-      "${module.s3-bucket-logging.bucket.arn}/*",
-    ]
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-      values   = ["false"]
-    }
-  }
-}
-
 # ---------------------------------------------
 # S3 Bucket - R-sync
 # ---------------------------------------------
@@ -155,7 +159,55 @@ module "s3-bucket-dbbackup" {
 
   bucket_name        = local.rsync_bucket_name
   versioning_enabled = true
-  bucket_policy      = [data.aws_iam_policy_document.dbbackup_s3_policy.json]
+  bucket_policy = [jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        "Sid" : "DenyInsecureTransport",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          module.s3-bucket-dbbackup.bucket.arn,
+          "${module.s3-bucket-dbbackup.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = [
+            "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root",
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/developer"
+          ]
+        }
+        Action   = "s3:PutObject"
+        Resource = "${module.s3-bucket-dbbackup.bucket.arn}/*"
+      },
+      {
+        "Sid" = "RestrictToTLSRequestsOnly",
+        "Action" : "s3:*",
+        "Effect" : "Deny",
+        "Resource" : [
+          module.s3-bucket-dbbackup.bucket.arn,
+          "${module.s3-bucket-dbbackup.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          },
+          "NumericLessThan" : {
+            "aws:TLSVersion" : "1.2"
+          }
+        },
+        "Principal" : "*"
+      }
+    ]
+  })]
 
   log_bucket = local.logging_bucket_name
   log_prefix = "s3access/${local.rsync_bucket_name}"
@@ -207,41 +259,6 @@ resource "aws_s3_bucket_notification" "dbbackup_bucket_notification" {
     topic_arn     = aws_sns_topic.s3_topic.arn
     events        = ["s3:ObjectCreated:*"]
     filter_suffix = ".log"
-  }
-}
-
-data "aws_iam_policy_document" "dbbackup_s3_policy" {
-  statement {
-    principals {
-      type = "AWS"
-      identifiers = [
-        "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root",
-        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/developer"
-      ]
-    }
-    actions = [
-      "s3:PutObject"
-    ]
-    resources = ["${module.s3-bucket-dbbackup.bucket.arn}/*"]
-  }
-
-  statement {
-    sid    = "DenyInsecureTransport"
-    effect = "Deny"
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-    actions = ["s3:*"]
-    resources = [
-      module.s3-bucket-dbbackup.bucket.arn,
-      "${module.s3-bucket-dbbackup.bucket.arn}/*",
-    ]
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-      values   = ["false"]
-    }
   }
 }
 
