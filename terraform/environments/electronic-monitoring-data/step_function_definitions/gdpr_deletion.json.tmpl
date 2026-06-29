@@ -105,12 +105,13 @@
 
       "PublishUnstructuredSuccessMessage": {
          "Type": "Task",
+         "QueryLanguage": "JSONata",
          "Resource": "arn:aws:states:::sns:publish",
-         "Parameters": {
+         "Arguments": {
             "TopicArn": "${sns_topic_arn}",
-            "Message.$": "States.JsonToString($.notification)"
+            "Message": "{% $string($states.input.notification) %}"
          },
-         "ResultPath": null,
+         "Output": "{% $states.input %}",
          "Next": "RunContainerTask"
       },
 
@@ -147,12 +148,13 @@
 
       "PublishUnstructuredControlFailureMessage": {
          "Type": "Task",
+         "QueryLanguage": "JSONata",
          "Resource": "arn:aws:states:::sns:publish",
-         "Parameters": {
+         "Arguments": {
             "TopicArn": "${sns_topic_arn}",
-            "Message.$": "States.JsonToString($.notification)"
+            "Message": "{% $string($states.input.notification) %}"
          },
-         "ResultPath": null,
+         "Output": "{% $states.input %}",
          "Next": "FailUnstructuredControl"
       },
 
@@ -196,12 +198,13 @@
 
       "PublishUnstructuredBatchFailureMessage": {
          "Type": "Task",
+         "QueryLanguage": "JSONata",
          "Resource": "arn:aws:states:::sns:publish",
-         "Parameters": {
+         "Arguments": {
             "TopicArn": "${sns_topic_arn}",
-            "Message.$": "States.JsonToString($.notification)"
+            "Message": "{% $string($states.input.notification) %}"
          },
-         "ResultPath": null,
+         "Output": "{% $states.input %}",
          "Next": "FailUnstructuredBatch"
       },
 
