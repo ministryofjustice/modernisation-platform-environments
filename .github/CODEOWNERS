@@ -67,6 +67,7 @@
 /terraform/environments/hmpps-domain-services @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/hmpps-esupervision @ministryofjustice/stg-pathfinders @ministryofjustice/modernisation-platform
 /terraform/environments/hmpps-oem @ministryofjustice/hmpps-dba @ministryofjustice/hmpps-migration @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
+/terraform/environments/integration-hub-file-transfer @ministryofjustice/integration-hub @ministryofjustice/modernisation-platform
 /terraform/environments/integration-hub @ministryofjustice/integration-hub @ministryofjustice/modernisation-platform
 /terraform/environments/laa-ccms-soa @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/laa-ccms-soa/ccms-soa-sandbox @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
