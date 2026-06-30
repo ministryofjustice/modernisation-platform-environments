@@ -10,7 +10,7 @@ resource "kubernetes_job_v1" "grant_rds_iam" {
 
   spec {
     backoff_limit               = 2
-    ttl_seconds_after_finished  = 60
+
 
     template {
       metadata {
