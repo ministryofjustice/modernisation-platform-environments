@@ -2744,3 +2744,43 @@ module "share_dbs_with_control_lambda_role" {
   db_exists               = true
   de_role_arn             = null
 }
+
+
+# ---------------------------------
+# Write EAR/SAR data to SharePoint
+# ---------------------------------
+
+data "aws_iam_policy_document" "write_to_sharepoint_iam_role_policy_document" {
+  count = local.is-test ? 0 : 1
+  statement {
+    sid    = "S3BucketPerms"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetBucketLocation",
+      "s3:ListBucket"
+    ]
+    resources = [
+      "${module.s3-ears-sars-bucket.bucket.arn}/*",
+      module.s3-ears-sars-bucket.bucket.arn,
+    ]
+  }
+}
+
+resource "aws_iam_role" "write_to_sharepoint" {
+  count              = local.is-test ? 0 : 1
+  name               = "write-to-sharepoint-iam-role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "write_to_sharepoint_iam_policy" {
+  count  = local.is-test ? 0 : 1
+  name   = "write_to_sharepoint_lambda_policy"
+  policy = data.aws_iam_policy_document.write_to_sharepoint_iam_role_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "write_to_sharepoint_iam_role_attach" {
+  count      = local.is-test ? 0 : 1
+  role       = aws_iam_role.write_to_sharepoint[0].name
+  policy_arn = aws_iam_policy.write_to_sharepoint_iam_policy[0].arn
+}

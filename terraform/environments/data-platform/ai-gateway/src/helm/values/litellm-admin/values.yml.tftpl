@@ -25,7 +25,7 @@ resources:
 db:
   deployStandalone: false
   useExisting: true
-  url: postgresql://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST)/$(DATABASE_NAME)
+  url: postgresql://$(DATABASE_USERNAME)@$(DATABASE_HOST)/$(DATABASE_NAME)
   database: ${databaseName}
   secret:
     name: ${databaseSecret}
@@ -172,5 +172,7 @@ envVars: {
     PROXY_BASE_URL: "https://${ingressHostname}",
     REDIS_SSL: "True",
     USE_PRISMA_MIGRATE: "True",
-    XDG_CACHE_HOME: "/app/cache"
+    XDG_CACHE_HOME: "/app/cache",
+    IAM_TOKEN_DB_AUTH: "True",
+    DATABASE_USER: "${databaseUsername}"
 }
