@@ -97,3 +97,22 @@ resource "aws_eks_capability" "ack" {
 
   depends_on = [time_sleep.ack_role_propagation]
 }
+
+###############################################################################
+# Grant ACK cluster admin access to read Kubernetes Secrets
+#
+# ACK needs to read Kubernetes Secrets (e.g. master passwords for RDS) from
+# application namespaces. The default AmazonEKSACKPolicy doesn't cover this.
+###############################################################################
+
+resource "aws_eks_access_policy_association" "ack_admin" {
+  cluster_name  = local.cluster_name
+  principal_arn = aws_iam_role.ack_capability.arn
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+  access_scope {
+    type = "cluster"
+  }
+
+  depends_on = [aws_eks_capability.ack]
+}
