@@ -68,6 +68,7 @@ proxy_config:
       host: os.environ/primary_endpoint_address
       port: 6379
       password: os.environ/auth_token
+    require_auth_for_metrics_endpoint: false
     callbacks: ["prometheus"]
     success_callback: ["prometheus"]
     failure_callback: ["prometheus"]
@@ -141,7 +142,7 @@ envVars: {
     DISABLE_ADMIN_UI: "True",
     DOCS_DESCRIPTION: "Contact us on Slack - #data-platform-ai-gateway-users",
     DOCS_FILTERED: "True",
-    DOCS_TITLE: "MOJ AI Gateway",
+    DOCS_TITLE: "Justice AI Gateway",
     LITELLM_LOG: "ERROR",
     LITELLM_MIGRATION_DIR: "/app/migrations",
     LITELLM_MODE: "PRODUCTION",

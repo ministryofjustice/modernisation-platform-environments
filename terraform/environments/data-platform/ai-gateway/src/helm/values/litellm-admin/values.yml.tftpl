@@ -65,6 +65,11 @@ proxy_config:
       s3_region_name: ${auditLogsRegion}
       s3_path: litellm-audit
     cache: false
+    require_auth_for_metrics_endpoint: false
+    callbacks: ["prometheus"]
+    success_callback: ["prometheus"]
+    failure_callback: ["prometheus"]
+    service_callback: ["prometheus_system"]
     default_internal_user_params:
       user_role: proxy_admin
     cache_params:
@@ -164,7 +169,7 @@ envVars: {
     DISABLE_LLM_API_ENDPOINTS: "True",
     DOCS_DESCRIPTION: "Administration interface for the AI Gateway.",
     DOCS_FILTERED: "True",
-    DOCS_TITLE: "MOJ AI Gateway Admin",
+    DOCS_TITLE: "Justice AI Gateway Admin",
     LITELLM_ASSETS_PATH: "/app/var/litellm/assets",
     LITELLM_LOG: "ERROR",
     LITELLM_MIGRATION_DIR: "/app/migrations",
