@@ -1,6 +1,7 @@
 {
   "accounts": {
     "development": {
+      "build_mft": true,
       "bucket_configuration": {
         "clean": {
           "bucket_prefix": "integration-hub-clean-",
@@ -83,13 +84,16 @@
           ]
         }
       },
+      "custom_idp_configuration": {
+        "ingress_cidr_blocks": [
+          "0.0.0.0/0"
+        ],
+        "log_level": "INFO",
+        "secret_prefix": "transfer/",
+        "user_name_delimiter": "@@"
+      },
       "iam_configuration": {
-        "guardduty_role_name": "integration-hub-development-guardduty-s3-plan",
-        "guardduty_policy_name": "integration-hub-development-guardduty-s3-plan",
-        "malware_scanning_processing_bucket_key": "processing",
-        "kms_key_arn_list": [
-          "arn:aws:kms:eu-west-2:111111111111:key/00000000-0000-0000-0000-000000000000"
-        ]
+        "malware_scanning_processing_bucket_key": "processing"
       },
       "notification_configuration": {
         "high_priority_alerts": {
@@ -106,14 +110,6 @@
           "max_presigned_url_expiry_seconds": 3600,
           "presigned_url_expiry_seconds": 1800
         }
-      },
-      "custom_idp_configuration": {
-        "ingress_cidr_blocks": [
-          "0.0.0.0/0"
-        ],
-        "log_level": "INFO",
-        "secret_prefix": "transfer/",
-        "user_name_delimiter": "@@"
       },
       "vpc_configuration": {
         "isolated_vpc_cidr": "10.0.0.0/23",
@@ -132,13 +128,135 @@
       }
     },
     "test": {
-      "example_var": "test-data"
+      "build_mft": false
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "build_mft": false
     },
     "production": {
-      "example_var": "production-data"
+      "build_mft": true,
+      "bucket_configuration": {
+        "clean": {
+          "bucket_prefix": "integration-hub-clean-",
+          "lifecycle_rule": [
+            {
+              "id": "rule-one-day",
+              "status": "Enabled",
+              "filter": {},
+              "expiration": {
+                "days": 1
+              },
+              "abort_incomplete_multipart_upload": {
+                "days_after_initiation": 1
+              }
+            }
+          ]
+        },
+        "investigation": {
+          "bucket_prefix": "integration-hub-investigation-",
+          "lifecycle_rule": [
+            {
+              "id": "rule-one-day",
+              "status": "Enabled",
+              "filter": {},
+              "expiration": {
+                "days": 1
+              },
+              "abort_incomplete_multipart_upload": {
+                "days_after_initiation": 1
+              }
+            }
+          ]
+        },
+        "processing": {
+          "bucket_prefix": "integration-hub-processing-",
+          "lifecycle_rule": [
+            {
+              "id": "rule-one-day",
+              "status": "Enabled",
+              "filter": {},
+              "expiration": {
+                "days": 1
+              },
+              "abort_incomplete_multipart_upload": {
+                "days_after_initiation": 1
+              }
+            }
+          ]
+        },
+        "quarantine": {
+          "bucket_prefix": "integration-hub-quarantine-",
+          "lifecycle_rule": [
+            {
+              "id": "rule-one-day",
+              "status": "Enabled",
+              "filter": {},
+              "expiration": {
+                "days": 1
+              },
+              "abort_incomplete_multipart_upload": {
+                "days_after_initiation": 1
+              }
+            }
+          ]
+        },
+        "unscanned": {
+          "bucket_prefix": "integration-hub-unscanned-",
+          "lifecycle_rule": [
+            {
+              "id": "rule-one-day",
+              "status": "Enabled",
+              "filter": {},
+              "expiration": {
+                "days": 1
+              },
+              "abort_incomplete_multipart_upload": {
+                "days_after_initiation": 1
+              }
+            }
+          ]
+        }
+      },
+      "custom_idp_configuration": {
+        "ingress_cidr_blocks": ["0.0.0.0/0"],
+        "log_level": "INFO",
+        "secret_prefix": "transfer/",
+        "user_name_delimiter": "@@"
+      },
+      "iam_configuration": {
+        "malware_scanning_processing_bucket_key": "processing"
+      },
+      "notification_configuration": {
+        "high_priority_alerts": {
+          "slack_channel_id": "C0BDYBK6GPJ",
+          "slack_team_id": "T02DYEB3A"
+        },
+        "low_priority_alerts": {
+          "slack_channel_id": "C0B7PM6VD0E",
+          "slack_team_id": "T02DYEB3A"
+        },
+        "team_channel": {
+          "slack_channel_id": "C0ARA0C101L",
+          "slack_team_id": "T02DYEB3A",
+          "max_presigned_url_expiry_seconds": 3600,
+          "presigned_url_expiry_seconds": 1800
+        }
+      },
+      "vpc_configuration": {
+        "isolated_vpc_cidr": "10.0.0.0/23",
+        "isolated_vpc_private_subnet_cidrs": [
+          "10.0.0.0/27",
+          "10.0.0.32/27",
+          "10.0.0.64/27"
+        ],
+        "isolated_vpc_public_subnet_cidrs": [
+          "10.0.0.128/27",
+          "10.0.0.160/27",
+          "10.0.0.192/27"
+        ],
+        "isolated_vpc_enable_nat_gateway": true,
+        "isolated_vpc_one_nat_gateway_per_az": true
+      }
     }
   }
 }

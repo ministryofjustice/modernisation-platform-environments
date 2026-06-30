@@ -71,7 +71,7 @@ The service is built entirely from AWS managed services, provisioned with Terraf
    - `clean` — `NO_THREATS_FOUND`
    - `quarantine` — `THREATS_FOUND`
    - `investigation` — `UNSUPPORTED`, `ACCESS_DENIED` or `FAILED`
-7. **Notification.** When a clean object lands, the `send-presigned-url` module generates a time-limited presigned download URL and posts it to Slack.
+7. **Notification.** When a clean object lands, the `send-presigned-url` module generates a time-limited presigned download URL, posts it to Slack, and publishes a client-facing notification event to SNS for downstream consumers.
 
 All buckets are KMS-encrypted, versioned, block public access, and have short (one day) lifecycle expiry as befits a transfer staging area.
 
@@ -101,6 +101,23 @@ CloudWatch alarms publish to high- and low-priority SNS topics, which feed Amazo
 - **GuardDuty Malware Protection for S3** — failed, skipped or infected object scans.
 - **Transfer ingress volume** — unexpectedly high file ingress for the MVP.
 
+## Client notification testing
+
+For the API upload flow, clean files now also emit a downstream consumer notification with the client ID, transfer ticket, file details, and a presigned download URL.
+
+In development, Terraform provisions a `products-poc` test SQS subscription for this SNS topic. Useful outputs are:
+
+- `terraform output clean_file_client_notification_topic_arn`
+- `terraform output products_poc_clean_file_notification_test_queue_url`
+
+You can poll the queue with:
+
+```bash
+scripts/poll-clean-file-notification.sh \
+  --profile integration-hub-development \
+  --queue-url "$(terraform output -raw products_poc_clean_file_notification_test_queue_url)"
+```
+
 ### **Impact of an outage:**
 
 <!-- A short description of the risks if your service is down for an extended period of time. -->
@@ -126,6 +143,7 @@ If the identity provider Lambda or the Transfer server is unavailable, partners 
 - Each user is restricted to their own logical home directory and may only upload (not download or list other users' files) to the `unscanned` bucket.
 - The custom identity provider supports per-user and per-provider IPv4 allow lists (`ingress_cidr_blocks`). In development this currently defaults to `0.0.0.0/0` and will be tightened before any real use.
 - The web app is gated behind AWS IAM Identity Center and S3 Access Grants.
+- FTPS passive mode is configured with a single, automatically selected, `passive_ip`. Even though the Transfer server endpoint is deployed across multiple subnets with multiple Elastic IPs, the passive-mode response advertises only that one IP. Treat this as an FTPS passive-mode limitation of the current design when troubleshooting data-connection behaviour.
 
 ### **How to resolve specific issues:**
 
