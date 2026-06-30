@@ -32,7 +32,7 @@ resource "aws_api_gateway_integration" "send_request_post_integration" {
   resource_id             = aws_api_gateway_resource.send_request.id
   rest_api_id             = aws_api_gateway_rest_api.chatbot_api.id
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.rag_lambda.invoke_arn
+  uri                     = module.rag_lambda.lambda_function_invoke_arn
   integration_http_method = "POST"
 }
 
@@ -50,11 +50,10 @@ resource "aws_api_gateway_method" "send_request_options" {
 }
 
 resource "aws_api_gateway_integration" "send_request_options_integration" {
-  rest_api_id             = aws_api_gateway_rest_api.chatbot_api.id
-  resource_id             = aws_api_gateway_resource.send_request.id
-  http_method             = aws_api_gateway_method.send_request_options.http_method
-  type                    = "MOCK"
-  integration_http_method = "OPTIONS"
+  rest_api_id = aws_api_gateway_rest_api.chatbot_api.id
+  resource_id = aws_api_gateway_resource.send_request.id
+  http_method = aws_api_gateway_method.send_request_options.http_method
+  type        = "MOCK"
 
   request_templates = {
     "application/json" = "{\"statusCode\": 200}"
@@ -139,7 +138,7 @@ resource "aws_lambda_permission" "chatbot_api_lambda_permission" {
 
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.rag_lambda.function_name
+  function_name = module.rag_lambda.lambda_function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.chatbot_api.execution_arn}/*/*"
 }

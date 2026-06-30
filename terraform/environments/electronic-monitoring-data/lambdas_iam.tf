@@ -12,7 +12,7 @@ locals {
   load_lambda_databases = [
     "staged_mdss${local.dbt_suffix}",
     "acquisitive_crime${local.dbt_suffix}",
-    "allied_mdss_${local.environment_shorthand}",
+    "allied_mdss${local.db_suffix}"
   ]
 
 }
@@ -2400,6 +2400,7 @@ resource "aws_iam_policy" "merge_load" {
   policy = data.aws_iam_policy_document.merge_load_policy_document.json
 }
 
+# merge load position
 resource "aws_iam_role_policy_attachment" "merge_load_position_attach" {
   role       = aws_iam_role.merge_load_position.name
   policy_arn = aws_iam_policy.merge_load.arn
@@ -2407,7 +2408,7 @@ resource "aws_iam_role_policy_attachment" "merge_load_position_attach" {
 
 
 resource "aws_lakeformation_permissions" "merge_load_position_lambda_database_access" {
-  for_each    = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
+  for_each    = toset(local.load_lambda_databases)
   principal   = aws_iam_role.merge_load_position.arn
   permissions = ["DESCRIBE"]
   database {
@@ -2416,7 +2417,7 @@ resource "aws_lakeformation_permissions" "merge_load_position_lambda_database_ac
 }
 
 resource "aws_lakeformation_permissions" "merge_load_position_lambda_table_access" {
-  for_each    = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
+  for_each    = toset(local.load_lambda_databases)
   principal   = aws_iam_role.merge_load_position.arn
   permissions = ["SELECT", "INSERT", "ALTER", "DESCRIBE"]
   table {
@@ -2426,7 +2427,7 @@ resource "aws_lakeformation_permissions" "merge_load_position_lambda_table_acces
 }
 
 resource "aws_lakeformation_permissions" "merge_load_position_lambda_s3_access" {
-  count       = local.is-development || local.is-test ? 1 : 0
+  count       = 1
   principal   = aws_iam_role.merge_load_position.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
@@ -2434,6 +2435,7 @@ resource "aws_lakeformation_permissions" "merge_load_position_lambda_s3_access" 
   }
 }
 
+# merge load ac
 resource "aws_iam_role_policy_attachment" "merge_load_ac_attach" {
   role       = aws_iam_role.merge_load_ac.name
   policy_arn = aws_iam_policy.merge_load.arn
@@ -2441,7 +2443,7 @@ resource "aws_iam_role_policy_attachment" "merge_load_ac_attach" {
 
 
 resource "aws_lakeformation_permissions" "merge_load_ac_lambda_database_access" {
-  for_each    = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
+  for_each    = local.is-development || local.is-test || local.is-preproduction ? toset(local.load_lambda_databases) : []
   principal   = aws_iam_role.merge_load_ac.arn
   permissions = ["DESCRIBE"]
   database {
@@ -2450,7 +2452,7 @@ resource "aws_lakeformation_permissions" "merge_load_ac_lambda_database_access" 
 }
 
 resource "aws_lakeformation_permissions" "merge_load_ac_lambda_table_access" {
-  for_each    = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
+  for_each    = local.is-development || local.is-test || local.is-preproduction ? toset(local.load_lambda_databases) : []
   principal   = aws_iam_role.merge_load_ac.arn
   permissions = ["SELECT", "INSERT", "ALTER", "DESCRIBE"]
   table {
@@ -2460,7 +2462,7 @@ resource "aws_lakeformation_permissions" "merge_load_ac_lambda_table_access" {
 }
 
 resource "aws_lakeformation_permissions" "merge_load_ac_lambda_s3_access" {
-  count       = local.is-development || local.is-test ? 1 : 0
+  count       = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   principal   = aws_iam_role.merge_load_ac.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
@@ -2468,6 +2470,7 @@ resource "aws_lakeformation_permissions" "merge_load_ac_lambda_s3_access" {
   }
 }
 
+# merge load event
 resource "aws_iam_role_policy_attachment" "merge_load_event_attach" {
   role       = aws_iam_role.merge_load_event.name
   policy_arn = aws_iam_policy.merge_load.arn
@@ -2475,7 +2478,7 @@ resource "aws_iam_role_policy_attachment" "merge_load_event_attach" {
 
 
 resource "aws_lakeformation_permissions" "merge_load_event_lambda_database_access" {
-  for_each    = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
+  for_each    = toset(local.load_lambda_databases)
   principal   = aws_iam_role.merge_load_event.arn
   permissions = ["DESCRIBE"]
   database {
@@ -2484,7 +2487,7 @@ resource "aws_lakeformation_permissions" "merge_load_event_lambda_database_acces
 }
 
 resource "aws_lakeformation_permissions" "merge_load_event_lambda_table_access" {
-  for_each    = local.is-development || local.is-test ? toset(local.load_lambda_databases) : []
+  for_each    = toset(local.load_lambda_databases)
   principal   = aws_iam_role.merge_load_event.arn
   permissions = ["SELECT", "INSERT", "ALTER", "DESCRIBE"]
   table {
@@ -2494,7 +2497,7 @@ resource "aws_lakeformation_permissions" "merge_load_event_lambda_table_access" 
 }
 
 resource "aws_lakeformation_permissions" "merge_load_event_lambda_s3_access" {
-  count       = local.is-development || local.is-test ? 1 : 0
+  count       = 1
   principal   = aws_iam_role.merge_load_event.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
@@ -2740,4 +2743,44 @@ module "share_dbs_with_control_lambda_role" {
   role_arn                = aws_iam_role.gdpr_unstructured_control_lambda_iam_role[0].arn
   db_exists               = true
   de_role_arn             = null
+}
+
+
+# ---------------------------------
+# Write EAR/SAR data to SharePoint
+# ---------------------------------
+
+data "aws_iam_policy_document" "write_to_sharepoint_iam_role_policy_document" {
+  count = local.is-test ? 0 : 1
+  statement {
+    sid    = "S3BucketPerms"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetBucketLocation",
+      "s3:ListBucket"
+    ]
+    resources = [
+      "${module.s3-ears-sars-bucket.bucket.arn}/*",
+      module.s3-ears-sars-bucket.bucket.arn,
+    ]
+  }
+}
+
+resource "aws_iam_role" "write_to_sharepoint" {
+  count              = local.is-test ? 0 : 1
+  name               = "write-to-sharepoint-iam-role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "write_to_sharepoint_iam_policy" {
+  count  = local.is-test ? 0 : 1
+  name   = "write_to_sharepoint_lambda_policy"
+  policy = data.aws_iam_policy_document.write_to_sharepoint_iam_role_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "write_to_sharepoint_iam_role_attach" {
+  count      = local.is-test ? 0 : 1
+  role       = aws_iam_role.write_to_sharepoint[0].name
+  policy_arn = aws_iam_policy.write_to_sharepoint_iam_policy[0].arn
 }

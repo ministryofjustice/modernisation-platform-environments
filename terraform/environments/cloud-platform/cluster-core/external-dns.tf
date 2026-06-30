@@ -11,7 +11,7 @@ locals {
 }
 
 module "external_dns" {
-  source = "github.com/ministryofjustice/container-platform-terraform-external-dns?ref=0.1.0"
+  source = "github.com/ministryofjustice/container-platform-terraform-external-dns?ref=0.0.1"
 
   eks_cluster_name = local.cluster_name
 
@@ -30,13 +30,6 @@ module "external_dns" {
       aws_zone_cache_duration = local.aws_zone_cache_duration.development
       log_level               = "info"
     }
-    cloud-platform-nonlive = {
-      version                 = local.chart_version
-      domain_name_prefix      = "nonlive"
-      sync_interval           = local.sync_interval.production
-      aws_zone_cache_duration = local.aws_zone_cache_duration.production
-      log_level               = "info"
-    }
     cloud-platform-live = {
       version                 = local.chart_version
       domain_name_prefix      = "live"
@@ -44,7 +37,48 @@ module "external_dns" {
       aws_zone_cache_duration = local.aws_zone_cache_duration.production
       log_level               = "info"
     }
-
+    container-platform-octo-nonlive = {
+      version                 = local.chart_version
+      domain_name_prefix      = "octo-nonlive"
+      sync_interval           = local.sync_interval.production
+      aws_zone_cache_duration = local.aws_zone_cache_duration.production
+      log_level               = "info"
+    }
+    container-platform-octo-live = {
+      version                 = local.chart_version
+      domain_name_prefix      = "octo-live"
+      sync_interval           = local.sync_interval.production
+      aws_zone_cache_duration = local.aws_zone_cache_duration.production
+      log_level               = "info"
+    }
+    container-platform-laa-nonlive = {
+      version                 = local.chart_version
+      domain_name_prefix      = "laa-nonlive"
+      sync_interval           = local.sync_interval.production
+      aws_zone_cache_duration = local.aws_zone_cache_duration.production
+      log_level               = "info"
+    }
+    container-platform-laa-live = {
+      version                 = local.chart_version
+      domain_name_prefix      = "laa-live"
+      sync_interval           = local.sync_interval.production
+      aws_zone_cache_duration = local.aws_zone_cache_duration.production
+      log_level               = "info"
+    }
+    container-platform-hmpps-nonlive = {
+      version                 = local.chart_version
+      domain_name_prefix      = "hmpps-nonlive"
+      sync_interval           = local.sync_interval.production
+      aws_zone_cache_duration = local.aws_zone_cache_duration.production
+      log_level               = "info"
+    }
+    container-platform-hmpps-live = {
+      version                 = local.chart_version
+      domain_name_prefix      = "hmpps-live"
+      sync_interval           = local.sync_interval.production
+      aws_zone_cache_duration = local.aws_zone_cache_duration.production
+      log_level               = "info"
+    }
   }
   tags = {
     application   = "External DNS"

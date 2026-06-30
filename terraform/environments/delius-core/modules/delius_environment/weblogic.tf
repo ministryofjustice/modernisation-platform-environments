@@ -101,10 +101,10 @@ data "aws_ami" "ecs_ami" {
   most_recent = true
   owners      = ["amazon"]
 
-  # Amazon Linux 2 optimised ECS instance
+  # Amazon Linux 2023 optimised ECS instance
   filter {
     name   = "name"
-    values = ["amzn2-ami-ecs-hvm-*"]
+    values = ["al2023-ami-ecs-hvm-*"]
   }
 
   # correct arch
