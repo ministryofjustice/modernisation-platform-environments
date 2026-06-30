@@ -9,7 +9,7 @@ resource "kubernetes_manifest" "external_secret_litellm_license" {
       namespace = module.ai_gateway_namespace.name
     }
     spec = {
-      refreshInterval = "1h"
+      refreshInterval = "5m"
       secretStoreRef = {
         name = "aws-secretsmanager"
         kind = "ClusterSecretStore"
@@ -40,7 +40,7 @@ resource "kubernetes_manifest" "external_secret_litellm_salt_key" {
       namespace = module.ai_gateway_namespace.name
     }
     spec = {
-      refreshInterval = "1h"
+      refreshInterval = "5m"
       secretStoreRef = {
         name = "aws-secretsmanager"
         kind = "ClusterSecretStore"
@@ -71,7 +71,7 @@ resource "kubernetes_manifest" "external_secret_litellm_entra_id" {
       namespace = module.ai_gateway_namespace.name
     }
     spec = {
-      refreshInterval = "1h"
+      refreshInterval = "5m"
       secretStoreRef = {
         name = "aws-secretsmanager"
         kind = "ClusterSecretStore"
@@ -125,7 +125,7 @@ resource "kubernetes_manifest" "external_secret_aurora" {
       namespace = module.ai_gateway_namespace.name
     }
     spec = {
-      refreshInterval = "1h"
+      refreshInterval = "5m"
       secretStoreRef = {
         name = "aws-secretsmanager"
         kind = "ClusterSecretStore"
@@ -196,7 +196,7 @@ resource "kubernetes_manifest" "external_secret_elasticache" {
       namespace = module.ai_gateway_namespace.name
     }
     spec = {
-      refreshInterval = "1h"
+      refreshInterval = "5m"
       secretStoreRef = {
         name = "aws-secretsmanager"
         kind = "ClusterSecretStore"
