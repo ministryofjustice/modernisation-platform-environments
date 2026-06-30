@@ -3,8 +3,8 @@ locals {
 
   # placeholder value once UP3 confirm
   serco_fms_key_distribution_recipient_emails = [
-  "Khristiania.Raihan@justice.gov.uk",
-]
+    "Khristiania.Raihan@justice.gov.uk",
+  ]
 
   # placeholder value once GOV.UK Notify template is created
   serco_fms_key_distribution_notify_template_id = (
@@ -47,7 +47,7 @@ locals {
 }
 
 resource "aws_secretsmanager_secret" "serco_fms_password_state" {
-  name        = "serco-fms-key-distribution-password-state"
+  name        = "serco-fms-key-distribution-password-state-${local.environment_shorthand}"
   description = "Generated passwords for Serco FMS encrypted key files"
 
   tags = merge(
@@ -75,7 +75,7 @@ resource "aws_secretsmanager_secret_version" "serco_fms_password_state" {
 }
 
 resource "aws_secretsmanager_secret" "govuk_notify_serco_fms_api_key" {
-  name        = "govuk-notify-serco-fms-api-key"
+  name        = "govuk-notify-serco-fms-api-key-${local.environment_shorthand}"
   description = "GOV.UK Notify API key for Serco FMS key distribution"
 
   tags = merge(
@@ -98,7 +98,7 @@ resource "aws_secretsmanager_secret_version" "govuk_notify_serco_fms_api_key" {
 }
 
 resource "aws_iam_role" "send_serco_fms_keys" {
-  name               = "send_serco_fms_keys_lambda_role"
+  name               = "send_serco_fms_keys_lambda_role_${local.environment_shorthand}"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
@@ -188,7 +188,7 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
 }
 
 resource "aws_iam_policy" "send_serco_fms_keys" {
-  name   = "send_serco_fms_keys_lambda_policy"
+  name   = "send_serco_fms_keys_lambda_policy_${local.environment_shorthand}"
   policy = data.aws_iam_policy_document.send_serco_fms_keys.json
 }
 
@@ -210,11 +210,12 @@ module "send_serco_fms_keys" {
   core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
   production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
 
-
   environment_variables = {
     SERCO_KEY_DISTRIBUTION_ENABLED = (
       tostring(local.serco_fms_key_distribution_enabled)
     )
+
+    SERCO_KEY_DISTRIBUTION_ENCRYPTION_MODE = "password"
 
     ENVIRONMENT = local.environment_shorthand
 
@@ -247,7 +248,7 @@ module "send_serco_fms_keys" {
 }
 
 resource "aws_iam_role" "send_serco_fms_keys_scheduler" {
-  name = "send_serco_fms_keys_scheduler_role"
+  name = "send_serco_fms_keys_scheduler_role_${local.environment_shorthand}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -282,7 +283,7 @@ resource "aws_iam_role_policy" "send_serco_fms_keys_scheduler" {
 }
 
 resource "aws_scheduler_schedule" "send_serco_fms_keys" {
-  name        = "send_serco_fms_keys_quarterly"
+  name        = "send_serco_fms_keys_quarterly_${local.environment_shorthand}"
   description = "Sends encrypted Serco FMS keys after quarterly rotation"
   state = (
     local.serco_fms_key_distribution_enabled ? "ENABLED" : "DISABLED"
@@ -292,7 +293,7 @@ resource "aws_scheduler_schedule" "send_serco_fms_keys" {
     mode = "OFF"
   }
 
-  schedule_expression          = "cron(0 11 ? FEB,MAY,AUG,NOV TUE#2 *)"
+  schedule_expression          = "cron(30 12 ? FEB,MAY,AUG,NOV TUE#2 *)"
   schedule_expression_timezone = "Europe/London"
 
   target {
@@ -306,7 +307,7 @@ resource "aws_scheduler_schedule" "send_serco_fms_keys" {
 }
 
 resource "aws_scheduler_schedule" "send_serco_fms_keys_watchdog" {
-  name        = "send_serco_fms_keys_watchdog"
+  name        = "send_serco_fms_keys_watchdog_${local.environment_shorthand}"
   description = "Checks Serco FMS key distribution completed"
   state = (
     local.serco_fms_key_distribution_enabled ? "ENABLED" : "DISABLED"
@@ -316,7 +317,7 @@ resource "aws_scheduler_schedule" "send_serco_fms_keys_watchdog" {
     mode = "OFF"
   }
 
-  schedule_expression          = "cron(0 12 ? FEB,MAY,AUG,NOV TUE#2 *)"
+  schedule_expression          = "cron(0 14 ? FEB,MAY,AUG,NOV TUE#2 *)"
   schedule_expression_timezone = "Europe/London"
 
   target {
@@ -331,7 +332,7 @@ resource "aws_scheduler_schedule" "send_serco_fms_keys_watchdog" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "send_serco_fms_keys_errors" {
-  alarm_name        = "send_serco_fms_keys_errors"
+  alarm_name        = "send_serco_fms_keys_errors_${local.environment_shorthand}"
   alarm_description = "Triggered when Serco FMS key distribution fails"
 
   comparison_operator = "GreaterThanThreshold"
