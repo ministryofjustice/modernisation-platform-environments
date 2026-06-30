@@ -5,6 +5,18 @@
 # (RDS, Secrets Manager, etc.) managed by AWS. No Helm required.
 ###############################################################################
 
+###############################################################################
+# RDS Service-Linked Role
+#
+# Required for ACK to create RDS instances. Every account that uses RDS needs
+# this. Fresh accounts won't have it. If the account already has this role
+# (from prior RDS usage), this resource will fail — remove it in that case.
+###############################################################################
+
+resource "aws_iam_service_linked_role" "rds" {
+  aws_service_name = "rds.amazonaws.com"
+}
+
 resource "aws_iam_role" "ack_capability" {
   name = "${local.cluster_name}-ack-capability"
 
