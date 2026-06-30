@@ -12,7 +12,7 @@ locals {
       "Jacob.Woffenden@justice.gov.uk"
     ]
     development = {
-      litellm_version     = "1.87.0"
+      litellm_version     = "1.90.0"
       ai_gateway_hostname = "development.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
