@@ -8,6 +8,9 @@ nameOverride: "litellm"
 service:
   type: NodePort
 
+serviceMonitor:
+  enabled: true
+
 serviceAccount:
   create: false
   name: ${serviceAccountName}
