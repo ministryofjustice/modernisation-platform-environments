@@ -7,7 +7,6 @@ resource "aws_secretsmanager_secret_version" "sandbox_ccms_soa_secrets_version" 
   secret_id = aws_secretsmanager_secret.soa_sandbox_secrets.id
 
   secret_string = jsonencode({
-
     slack_channel_webhook                       = "",
     slack_channel_webhook_guardduty             = "",
     "ccms/soasandbox/deploy-github-ssh-key"     = "",
