@@ -146,7 +146,7 @@ resource "kubernetes_manifest" "external_secret_aurora" {
             secretKey = "password"
             remoteRef = {
               key      = tostring(module.ai_gateway_aurora_secret.secret_id)
-              property = "password"
+              property = "dummy_password"
             }
           },
           {
