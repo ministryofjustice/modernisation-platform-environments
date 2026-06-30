@@ -15,7 +15,6 @@ module "lambda_products_poc_destination_presign_api" {
   trigger_on_package_timestamp = false
 
   environment_variables = {
-    AWS_REGION              = data.aws_region.current.region
     DESTINATION_BUCKET_NAME = module.s3_bucket["investigation"].s3_bucket_id
     DESTINATION_KMS_KEY_ARN = module.kms_s3_bucket["investigation"].key_arn
     DESTINATION_PREFIX      = "manual-destination-tests"
