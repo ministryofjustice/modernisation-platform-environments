@@ -2,22 +2,6 @@
 # Grant rds_iam role to the litellm DB user (one-time setup).
 # ──────────────────────────────────────────────────────────────────
 
-resource "kubernetes_secret_v1" "psql_temp" {
-  metadata {
-    name      = "psql-temp"
-    namespace = local.component_name
-  }
-
-  data = {
-    password = random_password.aurora.result
-  }
-
-  depends_on = [
-    module.ai_gateway_namespace,
-    module.ai_gateway_aurora
-  ]
-}
-
 resource "kubernetes_job_v1" "grant_rds_iam" {
   metadata {
     name      = "psql-grant"
@@ -50,13 +34,6 @@ resource "kubernetes_job_v1" "grant_rds_iam" {
           }
         }
 
-        volume {
-          name = "psql-temp"
-          secret {
-            secret_name = kubernetes_secret_v1.psql_temp.metadata[0].name
-          }
-        }
-
         container {
           name    = "psql"
           image   = "postgres:15-alpine"
@@ -64,7 +41,7 @@ resource "kubernetes_job_v1" "grant_rds_iam" {
           args = [
             <<-EOT
             wget -qO /tmp/global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
-            PGPASSWORD="$(cat /var/secrets/password)" psql \
+            PGPASSWORD="$PGPASSWORD" psql \
               "host=${module.ai_gateway_aurora.cluster_endpoint} \
                port=${tostring(module.ai_gateway_aurora.cluster_port)} \
                dbname=${module.ai_gateway_aurora.cluster_database_name} \
@@ -75,6 +52,11 @@ resource "kubernetes_job_v1" "grant_rds_iam" {
             EOT
           ]
 
+          env {
+            name  = "PGPASSWORD"
+            value = random_password.aurora.result
+          }
+
           security_context {
             allow_privilege_escalation = false
             run_as_non_root            = true
@@ -82,12 +64,6 @@ resource "kubernetes_job_v1" "grant_rds_iam" {
             capabilities {
               drop = ["ALL"]
             }
-          }
-
-          volume_mount {
-            name       = "psql-temp"
-            mount_path = "/var/secrets"
-            read_only  = true
           }
 
           resources {
@@ -113,6 +89,6 @@ resource "kubernetes_job_v1" "grant_rds_iam" {
   depends_on = [
     module.ai_gateway_namespace,
     kubernetes_service_account_v1.ai_gateway,
-    kubernetes_secret_v1.psql_temp
+    module.ai_gateway_aurora
   ]
 }
