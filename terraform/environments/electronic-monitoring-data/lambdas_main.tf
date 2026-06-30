@@ -1066,3 +1066,27 @@ module "gdpr_unstructured_control_lambda" {
     ENVIRONMENT_NAME            = local.environment_shorthand
   }
 }
+
+#-----------------------------------------------------------------------------------
+# Write EAR/SAR data to SharePoint
+#-----------------------------------------------------------------------------------
+
+module "write_to_sharepoint" {
+  count                   = local.is-test ? 0 : 1
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "write_to_sharepoint"
+  role_name               = aws_iam_role.write_to_sharepoint[0].name
+  role_arn                = aws_iam_role.write_to_sharepoint[0].arn
+  handler                 = "write_to_sharepoint.handler"
+  memory_size             = 10240
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    SECRET_AZURE_TENANT_ID     = jsondecode(data.aws_secretsmanager_secret_version.entra_app_details[0].secret_string)["tenant_id"]
+    SECRET_AZURE_CLIENT_ID     = jsondecode(data.aws_secretsmanager_secret_version.entra_app_details[0].secret_string)["client_id"]
+    SECRET_AZURE_CLIENT_SECRET = jsondecode(data.aws_secretsmanager_secret_version.entra_app_details[0].secret_string)["client_secret"]
+  }
+}
