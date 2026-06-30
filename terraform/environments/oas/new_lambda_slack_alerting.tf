@@ -67,6 +67,7 @@ resource "aws_lambda_function" "security_alerts_to_slack" {
   environment {
     variables = {
       SLACK_WEBHOOK_SECRET_NAME = aws_secretsmanager_secret.slack_security_alerts_webhook[0].name
+      ACCOUNT_NAME              = "oas-${local.environment}"
     }
   }
 

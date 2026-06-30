@@ -19,6 +19,9 @@ def lambda_handler(event, context):
         secret_name = os.environ['SLACK_WEBHOOK_SECRET_NAME']
         slack_webhook_url = get_slack_webhook(secret_name)
 
+        # Get account name from environment variable
+        account_name = os.environ.get('ACCOUNT_NAME', 'oas')
+
         # Parse SNS message
         sns_message = json.loads(event['Records'][0]['Sns']['Message'])
 
@@ -41,6 +44,7 @@ def lambda_handler(event, context):
             timestamp=timestamp,
             region=region,
             account_id=account_id,
+            account_name=account_name,
             color=color
         )
 
@@ -89,7 +93,7 @@ def get_color_for_state(state):
     }
     return colors.get(state, '#808080')  # Default gray
 
-def format_slack_message(alarm_name, state, reason, timestamp, region, account_id, color):
+def format_slack_message(alarm_name, state, reason, timestamp, region, account_id, account_name, color):
     """Format CloudWatch alarm as Slack attachment."""
 
     # Add emoji based on state
@@ -98,6 +102,9 @@ def format_slack_message(alarm_name, state, reason, timestamp, region, account_i
         'OK': ':white_check_mark:',
         'INSUFFICIENT_DATA': ':warning:'
     }.get(state, ':question:')
+
+    # Format account info as "account-name (account-id)"
+    account_info = f"{account_name} ({account_id})"
 
     return {
         "attachments": [
@@ -117,7 +124,7 @@ def format_slack_message(alarm_name, state, reason, timestamp, region, account_i
                     },
                     {
                         "title": "Account",
-                        "value": account_id,
+                        "value": account_info,
                         "short": True
                     },
                     {
