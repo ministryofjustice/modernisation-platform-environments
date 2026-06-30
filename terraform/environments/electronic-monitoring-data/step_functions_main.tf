@@ -94,6 +94,8 @@ module "gdpr_deletion_step_function" {
       "control_lambda_arn"       = module.gdpr_unstructured_control_lambda[0].lambda_function_arn
       "batch_job_queue_arn"      = aws_batch_job_queue.shred_unstructured_from_zip_batch_queue[0].arn
       "batch_job_definition_arn" = aws_batch_job_definition.shred_unstructured_from_zip_job.arn
+      "sns_topic_arn"            = aws_sns_topic.emds_alerts.arn
+      "environment_name"         = local.environment_shorthand
     }
   )
   type = "STANDARD"
