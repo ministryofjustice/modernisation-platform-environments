@@ -507,6 +507,154 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
             | limit 100
           EOT
         }
+      },
+
+      # --------------------------
+      # Recent successful landings
+      # --------------------------
+      {
+        type   = "log"
+        x      = 0
+        y      = 50
+        width  = 24
+        height = 8
+
+        properties = {
+          title  = "Recent successful landings"
+          region = "eu-west-2"
+          view   = "table"
+
+          query = <<-EOT
+            SOURCE '/aws/lambda/process_landing_bucket_files_fms_general'
+            | SOURCE '/aws/lambda/process_landing_bucket_files_fms_ho'
+            | SOURCE '/aws/lambda/process_landing_bucket_files_fms_specials'
+            | SOURCE '/aws/lambda/process_landing_bucket_files_mdss_general'
+            | SOURCE '/aws/lambda/process_landing_bucket_files_mdss_ho'
+            | SOURCE '/aws/lambda/process_landing_bucket_files_mdss_specials'
+            | filter ispresent(message.event)
+            | filter message.event = "LANDING_FILE_OK"
+            | fields
+                @timestamp,
+                message.feed,
+                message.order_type,
+                message.table,
+                message.delivery_date,
+                message.source_s3path,
+                message.destination_s3path
+            | sort @timestamp desc
+            | limit 200
+          EOT
+        }
+      },
+
+      # --------------------------
+      # Landing failure summary
+      # --------------------------
+      {
+        type   = "log"
+        x      = 0
+        y      = 58
+        width  = 24
+        height = 8
+
+        properties = {
+          title  = "Landing failures by feed/order/error type"
+          region = "eu-west-2"
+          view   = "table"
+
+          query = <<-EOT
+            SOURCE '/aws/lambda/process_landing_bucket_files_fms_general'
+            | SOURCE '/aws/lambda/process_landing_bucket_files_fms_ho'
+            | SOURCE '/aws/lambda/process_landing_bucket_files_fms_specials'
+            | SOURCE '/aws/lambda/process_landing_bucket_files_mdss_general'
+            | SOURCE '/aws/lambda/process_landing_bucket_files_mdss_ho'
+            | SOURCE '/aws/lambda/process_landing_bucket_files_mdss_specials'
+            | filter ispresent(message.event)
+            | filter message.event in [
+                "LANDING_FILE_RETRY",
+                "LANDING_FILE_MANUAL_REQUIRED",
+                "LANDING_FILE_FAIL"
+              ]
+            | stats
+                count_distinct(message.source_s3path) as affected_files,
+                latest(@timestamp) as latest_seen,
+                latest(message.reason) as latest_reason
+              by
+                message.feed,
+                message.order_type,
+                message.error_type,
+                message.retry_policy
+            | sort affected_files desc, latest_seen desc
+            | limit 100
+          EOT
+        }
+      },
+
+      # --------------------------
+      # FMS no-data formatter detail
+      # --------------------------
+      {
+        type   = "log"
+        x      = 0
+        y      = 66
+        width  = 24
+        height = 8
+
+        properties = {
+          title  = "FMS no-data deliveries"
+          region = "eu-west-2"
+          view   = "table"
+
+          query = <<-EOT
+            SOURCE '${module.fms_raw_file_formatter.cloudwatch_log_group.name}'
+            | filter @message like /No-data FMS delivery found at/
+            | parse @message "*No-data FMS delivery found at *"
+                as log_prefix, source_s3path
+            | fields
+                @timestamp,
+                source_s3path,
+                @message
+            | sort @timestamp desc
+            | limit 200
+          EOT
+        }
+      },
+
+      # --------------------------
+      # FMS formatter loadability summary
+      # --------------------------
+      {
+        type   = "log"
+        x      = 0
+        y      = 74
+        width  = 24
+        height = 8
+
+        properties = {
+          title  = "FMS formatter loadability summary"
+          region = "eu-west-2"
+          view   = "table"
+
+          query = <<-EOT
+            SOURCE '${module.fms_raw_file_formatter.cloudwatch_log_group.name}'
+            | filter @message like /No-data FMS delivery found at/
+                or @message like /Converted /
+            | fields
+                bin(1h) as hour,
+                if(
+                  @message like /No-data FMS delivery found at/,
+                  1,
+                  0
+                ) as no_data_delivery,
+                if(@message like /Converted /, 1, 0) as converted_event
+            | stats
+                sum(no_data_delivery) as no_data_deliveries,
+                sum(converted_event) as converted_events
+              by hour
+            | sort hour desc
+            | limit 100
+          EOT
+        }
       }
     ]
   })
