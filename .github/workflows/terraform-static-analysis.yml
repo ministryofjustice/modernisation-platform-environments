@@ -24,21 +24,18 @@ jobs:
     if: github.event_name != 'workflow_dispatch' && github.event_name != 'schedule'
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
       - name: Run Analysis
-        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@d2d07632db53d17c9760c0c2c06f22a37bd3f0a1 # v6.0.1
+        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           scan_type: changed
-          trivy_severity: HIGH,CRITICAL
-          trivy_ignore: ./.trivyignore.yaml
           checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
           tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none
-          tfsec_trivy: trivy
           use_trivy_ecr_database: true
 
   terraform-static-analysis-full-scan:
@@ -52,20 +49,15 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
       - name: Run Analysis
-        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@d2d07632db53d17c9760c0c2c06f22a37bd3f0a1 # v6.0.1
+        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           scan_type: full
-          tfsec_trivy: trivy
-          trivy_skip_dir: ""
-          trivy_severity: HIGH,CRITICAL
-          trivy_ignore: ./.trivyignore.yaml
-          tfsec_exclude: aws-ssm-secret-use-customer-key,github-repositories-private,aws-vpc-no-excessive-port-access,github-repositories-require-signed-commits
           checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
           tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none
@@ -77,19 +69,15 @@ jobs:
     if: github.event_name == 'schedule'
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
       - name: Run Analysis
-        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@d2d07632db53d17c9760c0c2c06f22a37bd3f0a1 # v6.0.1
+        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           scan_type: full
-          tfsec_trivy: trivy
-          trivy_severity: HIGH,CRITICAL
-          trivy_ignore: ./.trivyignore.yaml
-          tfsec_exclude: aws-ssm-secret-use-customer-key,github-repositories-private,aws-vpc-no-excessive-port-access,github-repositories-require-signed-commits
           checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
           tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none

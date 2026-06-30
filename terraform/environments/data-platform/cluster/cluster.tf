@@ -1,11 +1,12 @@
 module "eks" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git?ref=6bac707d5496f4b494ce8bf63bfc8d245aead592" # v21.17.1
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git?ref=5a267ec4264cdeb529512901119223889463703f" # v21.23.0
 
   name               = local.eks_cluster_name
   kubernetes_version = local.cluster_configuration.kubernetes_version
 
-  endpoint_private_access = true
-  endpoint_public_access  = true
+  endpoint_private_access      = true
+  endpoint_public_access       = true
+  endpoint_public_access_cidrs = local.environment_configuration.eks_public_access_cidrs
 
   vpc_id                   = data.aws_vpc.main.id
   control_plane_subnet_ids = data.aws_subnets.private.ids
@@ -146,7 +147,7 @@ module "eks" {
 }
 
 module "eks_managed_node_group_system" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git//modules/eks-managed-node-group?ref=6bac707d5496f4b494ce8bf63bfc8d245aead592" # v21.17.1
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git//modules/eks-managed-node-group?ref=5a267ec4264cdeb529512901119223889463703f" # v21.23.0
 
   name         = "system"
   cluster_name = module.eks.cluster_name
@@ -166,9 +167,16 @@ module "eks_managed_node_group_system" {
   desired_size   = 3
   instance_types = ["m8g.large"]
 
+  # Rolling update: replace at most one node at a time to preserve capacity
+  update_config = {
+    max_unavailable = 1
+    update_strategy = "DEFAULT"
+  }
+
   # Bottlerocket configuration
   ami_type                       = "BOTTLEROCKET_ARM_64"
   use_latest_ami_release_version = false
+  kubernetes_version             = local.cluster_configuration.kubernetes_version
   ami_release_version            = local.cluster_configuration.bottlerocket_version
 
   enable_monitoring = true
@@ -235,7 +243,7 @@ module "eks_managed_node_group_system" {
 }
 
 module "karpenter" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git//modules/karpenter?ref=6bac707d5496f4b494ce8bf63bfc8d245aead592" # v21.17.1
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git//modules/karpenter?ref=5a267ec4264cdeb529512901119223889463703f" # v21.23.0
 
   cluster_name = module.eks.cluster_name
 

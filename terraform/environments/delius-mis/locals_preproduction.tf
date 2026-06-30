@@ -4,6 +4,8 @@ locals {
   environment_config_preprod = {
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
     legacy_counterpart_vpc_cidr            = "10.160.0.0/20"
+    legacy_ad_domain_name                  = "delius-pre-prod.local"
+    legacy_dns_ip_addrs                    = ["10.160.0.163", "10.160.6.66"]
     ad_domain_name                         = "delius-mis-preprod.internal"
     ad_trust_domain_name                   = "azure.hmpp.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
@@ -15,7 +17,7 @@ locals {
     migration_environment_abbreviated_name = "del"
     migration_environment_short_name       = "pre-prod"
     migration_environment_private_cidr     = ["10.160.0.0/22", "10.160.4.0/22", "10.160.8.0/22"]
-    migration_environment_db_cidr          = ["10.162.110.0/25", "10.162.108.0/24", "10.162.109.0/24"]
+    migration_environment_db_cidr          = ["10.160.12.0/24", "10.160.13.0/24", "10.160.14.0/25"]
     cloudwatch_alarm_schedule              = true
     cloudwatch_alarm_disable_time          = "20:45"
     cloudwatch_alarm_enable_time           = "06:15"
@@ -276,9 +278,10 @@ locals {
 
   # BOE DB config
   boe_db_config_preprod = {
-    instance_count = 0
-    instance_type  = "m7i.large"
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    primary_instance_count = 1
+    standby_instance_count = 1
+    instance_type          = "m7i.large"
+    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -301,7 +304,7 @@ locals {
         iops       = 3000
         throughput = 500
         type       = "gp3"
-        total_size = 200
+        total_size = 500
       }
       flash = {
         iops       = 3000
@@ -321,9 +324,10 @@ locals {
 
   # DSD DB config
   dsd_db_config_preprod = {
-    instance_count = 0
-    instance_type  = "r7i.large"
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    primary_instance_count = 1
+    standby_instance_count = 1
+    instance_type          = "r7i.large"
+    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -366,9 +370,10 @@ locals {
 
   # MIS DB config
   mis_db_config_preprod = {
-    instance_count = 0
-    instance_type  = "r7i.12xlarge"
-    ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
+    primary_instance_count = 1
+    standby_instance_count = 1
+    instance_type          = "r7i.12xlarge"
+    ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
@@ -395,10 +400,10 @@ locals {
         type       = "gp3"
       }
       data = {
-        iops       = 5000
-        throughput = 500
+        iops       = 7680
+        throughput = 480
         type       = "gp3"
-        total_size = 6000
+        total_size = 7000
       }
       flash = {
         iops       = 3000
@@ -429,7 +434,7 @@ locals {
   datasync_config_preprod = null
 
   db_backup_config_preprod = {
-    object_lock_days             = 1
+    object_lock_days             = 10
     expire_current_after_days    = 200
     expire_noncurrent_after_days = 10
     transition = [

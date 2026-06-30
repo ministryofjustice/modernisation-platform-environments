@@ -4,9 +4,10 @@ locals {
   dbt_k8s_secrets_placeholder = {
     oidc_cluster_identifier = "placeholder2"
   }
-  dbt_suffix = local.is-production ? "" : "_${local.environment_shorthand}_dbt"
-  suffix     = local.is-production ? "" : local.is-preproduction ? "-pp" : local.is-test ? "-test" : "-dev"
-  db_suffix  = local.is-production ? "" : "_${local.environment_shorthand}"
+  airflow_suffix = local.is-preproduction ? "-pp" : ""
+  dbt_suffix     = local.is-production ? "" : "_${local.environment_shorthand}_dbt"
+  suffix         = local.is-production ? "" : local.is-preproduction ? "-pp" : local.is-test ? "-test" : "-dev"
+  db_suffix      = local.is-production ? "" : "_${local.environment_shorthand}"
   dbt_dbs = [
     "analysis",
     "curated_fms",
@@ -29,6 +30,9 @@ locals {
     "acquisitive_crime",
     "data_insights",
   ]
+  seed_dbs = [
+    "acquisitive_crime_test_cases"
+  ]
   live_feeds_dbs = [
     "allied_mdss",
     "serco_fms",
@@ -49,10 +53,14 @@ locals {
     "g4s_lcm_archive",
     "g4s_tasking",
     "scram_alcohol_monitoring",
+    "g4s_xdrive_unstructured"
     ] : local.is-preproduction ? [
+    "g4s_atrium_unstructured",
     "g4s_cap_dw",
     "g4s_emsys_tpims",
     "capita_alcohol_monitoring",
+    "capita_blob_storage",
+    "emd_historic_int_preprod_dbt",
     "g4s_atrium",
     "g4s_centurion",
     "g4s_emsys_mvp",
@@ -61,7 +69,16 @@ locals {
     "g4s_integrity",
     "g4s_lcm",
     "g4s_tasking",
-  ] : local.is-development ? ["test"] : []
+    "g4s_xdrive_unstructured",
+    ] : local.is-development ? [
+    "test",
+    "capita_blob_storage",
+    "emd_historic_int",
+    "g4s_atrium_unstructured",
+    "g4s_cap_dw",
+    "g4s_xdrive_unstructured"
+  ] : []
+
 
   prod_dbs_to_grant = [
     "am_stg",
@@ -102,10 +119,11 @@ locals {
   ]
 
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
+  test_dbs_to_grant      = local.is-test || local.is-development ? [for db in local.seed_dbs : "${db}${local.dbt_suffix}"] : []
   prod_dbt_dbs_to_grant  = flatten([[for db in local.prod_dbs_to_grant : "${db}${local.dbt_suffix}"], local.dev_dbs_to_grant])
   dbt_dbs_to_grant       = [for db in local.dbt_dbs : "${db}${local.dbt_suffix}"]
   live_feed_dbs_to_grant = [for db in local.live_feeds_dbs : "${db}${local.db_suffix}"]
-  dbs_to_grant           = toset(flatten([local.prod_dbt_dbs_to_grant, local.dbt_dbs_to_grant]))
+  dbs_to_grant           = toset(flatten([local.prod_dbt_dbs_to_grant, local.dbt_dbs_to_grant, local.test_dbs_to_grant]))
 
 
   existing_dbs_to_grant = toset(flatten([local.live_feed_dbs_to_grant, local.historic_source_dbs]))
@@ -234,7 +252,7 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
     }
     condition {
       test     = "StringEquals"
-      values   = ["system:serviceaccount:mwaa:emds-cadet", "system:serviceaccount:mwaa:emds-historic-dev"]
+      values   = ["system:serviceaccount:mwaa:emds-cadet${local.airflow_suffix}", "system:serviceaccount:mwaa:emds-historic-dev"]
       variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]}:sub"
     }
     condition {
@@ -676,7 +694,7 @@ module "existing_audit_dbs_with_roles" {
 
 
 module "share_existing_dbs_with_roles" {
-  count                   = local.is-development ? 0 : 1
+  count                   = length(local.existing_dbs_to_grant) > 0 ? 1 : 0
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = local.existing_dbs_to_grant
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn

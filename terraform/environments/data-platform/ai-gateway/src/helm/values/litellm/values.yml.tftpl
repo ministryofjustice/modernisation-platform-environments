@@ -1,0 +1,154 @@
+---
+image:
+  repository: ${imageRepository}
+  tag: ${imageTag}
+
+nameOverride: "litellm"
+
+service:
+  type: NodePort
+
+serviceMonitor:
+  enabled: true
+
+serviceAccount:
+  create: false
+  name: ${serviceAccountName}
+
+autoscaling:
+  enabled: true
+  minReplicas: ${minReplicas}
+  maxReplicas: ${maxReplicas}
+  targetCPUUtilizationPercentage: ${targetCPUUtilizationPercentage}
+
+resources:
+  requests:
+    cpu: 1
+    memory: 2Gi
+  limits:
+    cpu: 2
+    memory: 4Gi
+
+db:
+  deployStandalone: false
+  useExisting: true
+  url: postgresql://$(DATABASE_USERNAME)@$(DATABASE_HOST)/$(DATABASE_NAME)
+  database: ${databaseName}
+  secret:
+    name: ${databaseSecret}
+    usernameKey: ${databaseUserNameKey}
+    passwordKey: ${databasePasswordKey}
+    endpointKey: ${databaseEndpointKey}
+${databaseReaderEndpointKey != "" ? "    readReplicaUrlKey: ${databaseReaderEndpointKey}" : ""}
+masterkeySecretName: ${masterkeySecretName}
+masterkeySecretKey: ${masterkeySecretKey}
+
+environmentSecrets:
+%{ for secret in environmentSecrets ~}
+  - ${secret}
+%{ endfor ~}
+  - litellm-salt-key
+
+proxyConfigMap:
+  create: true
+proxy_config:
+  general_settings:
+    litellm_license: os.environ/LITELLM_LICENSE
+    master_key: os.environ/PROXY_MASTER_KEY
+    proxy_admin_email: "${proxyAdminEmail}"
+    ui_access_mode: "admin_only"
+    proxy_batch_write_at: 60
+    database_connection_pool_limit: 10
+  litellm_settings:
+    request_timeout: 600
+    json_logs: true
+    cache: false
+    cache_params:
+      type: redis
+      host: os.environ/primary_endpoint_address
+      port: 6379
+      password: os.environ/auth_token
+    callbacks: ["prometheus"]
+    success_callback: ["prometheus"]
+    failure_callback: ["prometheus"]
+    prometheus_initialize_budget_metrics: true
+    service_callback: ["prometheus_system"]
+    default_internal_user_params:
+      user_role: internal_user_viewer
+      max_budget: 20
+      budget_duration: 30d
+      models: []
+    default_team_params:
+      max_budget: 100
+      budget_duration: 30d
+      models: []
+  router_settings:
+    routing_strategy: simple-shuffle
+    redis_host: os.environ/primary_endpoint_address
+    redis_port: 6379
+    redis_password: os.environ/auth_token
+
+  model_list:
+%{ for key, profile in bedrockModels ~}
+    - model_name: bedrock-${key}
+      litellm_params:
+        model: bedrock/${profile.model_id}
+        aws_role_name: ${iamRole}
+        aws_region_name: ${profile.region}
+%{ endfor ~}
+
+tolerations:
+  - key: compute.data-platform.service.justice.gov.uk/node-pool
+    value: "general-on-demand-arm64"
+    effect: NoSchedule
+
+nodeSelector:
+  compute.data-platform.service.justice.gov.uk/node-pool: "general-on-demand-arm64"
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 65534
+  seccompProfile:
+    type: RuntimeDefault
+
+volumes:
+  - name: app-cache
+    emptyDir:
+      sizeLimit: 500Mi
+  - name: migrations
+    emptyDir:
+      sizeLimit: 64Mi
+
+volumeMounts:
+  - name: app-cache
+    mountPath: /app/cache
+  - name: migrations
+    mountPath: /app/migrations
+
+migrationJob:
+  enabled: false
+
+ingress:
+  enabled: false
+
+envVars: {
+    DISABLE_ADMIN_ENDPOINTS: "True",
+    DISABLE_ADMIN_UI: "True",
+    DOCS_DESCRIPTION: "Contact us on Slack - #data-platform-ai-gateway-users",
+    DOCS_FILTERED: "True",
+    DOCS_TITLE: "MOJ AI Gateway",
+    LITELLM_LOG: "ERROR",
+    LITELLM_MIGRATION_DIR: "/app/migrations",
+    LITELLM_MODE: "PRODUCTION",
+    PRISMA_BINARY_CACHE_DIR: "/app/cache/prisma-python/binaries",
+    PROXY_BASE_URL: "https://${ingressHostname}",
+    REDIS_SSL: "True",
+    XDG_CACHE_HOME: "/app/cache",
+    IAM_TOKEN_DB_AUTH: "True",
+    DATABASE_USER: "${databaseUsername}"
+}

@@ -1,0 +1,181 @@
+---
+replicaCount: 1
+
+image:
+  repository: ${imageRepository}
+  tag: ${imageTag}
+
+nameOverride: "litellm-admin"
+
+service:
+  type: NodePort
+
+serviceMonitor:
+  enabled: true
+
+serviceAccount:
+  create: false
+  name: ${serviceAccountName}
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 1Gi
+  limits:
+    cpu: 500m
+    memory: 2Gi
+
+db:
+  deployStandalone: false
+  useExisting: true
+  url: postgresql://$(DATABASE_USERNAME)@$(DATABASE_HOST)/$(DATABASE_NAME)
+  database: ${databaseName}
+  secret:
+    name: ${databaseSecret}
+    usernameKey: ${databaseUserNameKey}
+    passwordKey: ${databasePasswordKey}
+    endpointKey: ${databaseEndpointKey}
+${databaseReaderEndpointKey != "" ? "    readReplicaUrlKey: ${databaseReaderEndpointKey}" : ""}
+masterkeySecretName: ${masterkeySecretName}
+masterkeySecretKey: ${masterkeySecretKey}
+
+environmentSecrets:
+%{ for secret in environmentSecrets ~}
+  - ${secret}
+%{ endfor ~}
+  - litellm-salt-key
+
+proxyConfigMap:
+  create: true
+proxy_config:
+  general_settings:
+    litellm_license: os.environ/LITELLM_LICENSE
+    master_key: os.environ/PROXY_MASTER_KEY
+    proxy_admin_email: "${proxyAdminEmail}"
+    ui_access_mode: "admin_only"
+    proxy_batch_write_at: 60
+    database_connection_pool_limit: 10
+  litellm_settings:
+    request_timeout: 600
+    json_logs: true
+    store_audit_logs: true
+    audit_log_callbacks: ["s3_v2"]
+    s3_audit_callback_params:
+      s3_bucket_name: ${auditLogsBucket}
+      s3_region_name: ${auditLogsRegion}
+      s3_path: litellm-audit
+    cache: false
+    default_internal_user_params:
+      user_role: proxy_admin
+    cache_params:
+      type: redis
+      host: os.environ/primary_endpoint_address
+      port: 6379
+      password: os.environ/auth_token
+  router_settings:
+    routing_strategy: simple-shuffle
+    redis_host: os.environ/primary_endpoint_address
+    redis_port: 6379
+    redis_password: os.environ/auth_token
+  model_list:
+%{ for key, profile in bedrockModels ~}
+    - model_name: bedrock-${key}
+      litellm_params:
+        model: bedrock/${profile.model_id}
+        aws_role_name: ${iamRole}
+        aws_region_name: ${profile.region}
+%{ endfor ~}
+
+tolerations:
+  - key: compute.data-platform.service.justice.gov.uk/node-pool
+    value: "general-on-demand-arm64"
+    effect: NoSchedule
+
+nodeSelector:
+  compute.data-platform.service.justice.gov.uk/node-pool: "general-on-demand-arm64"
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 65534
+  seccompProfile:
+    type: RuntimeDefault
+
+volumes:
+  - name: ui
+    emptyDir:
+      sizeLimit: 100Mi
+  - name: assets
+    emptyDir:
+      sizeLimit: 10Mi
+  - name: app-cache
+    emptyDir:
+      sizeLimit: 500Mi
+  - name: migrations
+    emptyDir:
+      sizeLimit: 64Mi
+
+volumeMounts:
+  - name: ui
+    mountPath: /app/var/litellm/ui
+  - name: assets
+    mountPath: /app/var/litellm/assets
+  - name: app-cache
+    mountPath: /app/cache
+  - name: migrations
+    mountPath: /app/migrations
+
+extraInitContainers:
+  - name: setup-ui
+    image: ${imageRepository}:${imageTag}
+    command: ["sh", "-c"]
+    args:
+      - |
+        cp -r /var/lib/litellm/ui/* /app/var/litellm/ui/ && \
+        cp -r /var/lib/litellm/assets/* /app/var/litellm/assets/
+    volumeMounts:
+      - name: ui
+        mountPath: /app/var/litellm/ui
+      - name: assets
+        mountPath: /app/var/litellm/assets
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 65534
+      seccompProfile:
+        type: RuntimeDefault
+
+migrationJob:
+  enabled: true
+
+ingress:
+  enabled: false
+
+envVars: {
+    AUTO_REDIRECT_UI_LOGIN_TO_SSO: "True",
+    DISABLE_LLM_API_ENDPOINTS: "True",
+    DOCS_DESCRIPTION: "Administration interface for the AI Gateway.",
+    DOCS_FILTERED: "True",
+    DOCS_TITLE: "MOJ AI Gateway Admin",
+    LITELLM_ASSETS_PATH: "/app/var/litellm/assets",
+    LITELLM_LOG: "ERROR",
+    LITELLM_MIGRATION_DIR: "/app/migrations",
+    LITELLM_MODE: "PRODUCTION",
+    LITELLM_UI_API_DOC_BASE_URL: "https://${proxyHostname}",
+    LITELLM_UI_PATH: "/app/var/litellm/ui",
+    PRISMA_BINARY_CACHE_DIR: "/app/cache/prisma-python/binaries",
+    PROXY_BASE_URL: "https://${ingressHostname}",
+    REDIS_SSL: "True",
+    USE_PRISMA_MIGRATE: "True",
+    XDG_CACHE_HOME: "/app/cache",
+    IAM_TOKEN_DB_AUTH: "True",
+    DATABASE_USER: "${databaseUsername}"
+}

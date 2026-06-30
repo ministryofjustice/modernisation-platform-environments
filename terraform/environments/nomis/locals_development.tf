@@ -162,29 +162,7 @@ locals {
         })
       })
 
-      dev-nomis-weblogic-12 = merge(local.ec2_autoscaling_groups.weblogic-12, {
-        autoscaling_schedules = {}
-        config = merge(local.ec2_autoscaling_groups.web12.config, {
-          instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
-            "Ec2Qa11GWeblogicPolicy",
-            "Ec2Qa11G2WeblogicPolicy",
-            "Ec2Qa19CWeblogicPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.web12.tags, {
-          nomis-environment    = "qa11g2"
-          oracle-db-name       = "qa11g2"
-          oracle-db-hostname-a = "dev-nomis-db19c-1-a"
-          oracle-db-hostname-b = "none"
-        })
-      })
-
-      qa12c-nomis-web-a = merge(local.ec2_autoscaling_groups.qa12c-nomis-web, {
+      qa12c-nomis-web = merge(local.ec2_autoscaling_groups.qa12c-nomis-web, {
         autoscaling_schedules = {}
         config = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.config, {
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
@@ -195,12 +173,12 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.user_data_cloud_init.args, {
-            branch = "TM-2061"
+            branch = "main"
           })
         })
         tags = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.tags, {
-          nomis-environment    = "qa11g"
-          oracle-db-name       = "qa11g"
+          nomis-environment    = "qa19c"
+          oracle-db-name       = "qa19c"
           oracle-db-hostname-a = "dev-nomis-db19c-1-b"
           oracle-db-hostname-b = "none"
         })

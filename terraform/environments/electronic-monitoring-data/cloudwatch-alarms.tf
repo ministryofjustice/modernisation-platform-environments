@@ -80,13 +80,43 @@ resource "aws_cloudwatch_metric_alarm" "sqs_dlq_has_messages" {
   # Disable direct alarm actions to avoid duplicate Slack messages.
   actions_enabled = false
 
-  metric_name = "ApproximateNumberOfMessagesVisible"
-  namespace   = "AWS/SQS"
-  period      = 60
-  statistic   = "Sum"
+  metric_query {
+    id          = "visible"
+    return_data = false
 
-  dimensions = {
-    QueueName = each.value.queue_name
+    metric {
+      metric_name = "ApproximateNumberOfMessagesVisible"
+      namespace   = "AWS/SQS"
+      period      = 60
+      stat        = "Sum"
+
+      dimensions = {
+        QueueName = each.value.queue_name
+      }
+    }
+  }
+
+  metric_query {
+    id          = "not_visible"
+    return_data = false
+
+    metric {
+      metric_name = "ApproximateNumberOfMessagesNotVisible"
+      namespace   = "AWS/SQS"
+      period      = 60
+      stat        = "Sum"
+
+      dimensions = {
+        QueueName = each.value.queue_name
+      }
+    }
+  }
+
+  metric_query {
+    id          = "total_messages"
+    expression  = "visible + not_visible"
+    label       = "Messages visible or in flight"
+    return_data = true
   }
 
   alarm_actions = [
@@ -111,7 +141,7 @@ resource "aws_cloudwatch_metric_alarm" "mdss_reconciler_errors_alarm" {
   statistic   = "Sum"
 
   dimensions = {
-    FunctionName = module.mdss_reconciler[0].lambda_function_name
+    FunctionName = module.mdss_load_redrive_controller[0].lambda_function_name
   }
 
   alarm_actions = [

@@ -114,23 +114,36 @@ resource "aws_ecs_cluster" "maat_ecs_cluster" {
   )
 }
 
-# always use the recommended ECS optimized linux 2 base image; used to obtain its AMI ID
-data "aws_ssm_parameter" "ecs_optimized_ami" {
+# TODO LASB-5089 Remove
+data "aws_ssm_parameter" "ecs_optimized_ami_al2" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
 }
 
+# always use the recommended ECS optimized linux 2023 base image; used to obtain its AMI ID
+data "aws_ssm_parameter" "ecs_optimized_ami_al2023" {
+  name = "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended"
+}
+
+# TODO LASB-5089 Update to reference AL2023 ID
 # if the AMI is used elsewhere it can be obtained here
 output "ami_id" {
-  value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+  value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2.value)["image_id"]
+  sensitive = true
+}
+
+# TODO LASB-5089 move to ami_id
+output "ami_id_al2023" {
+  value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2023.value)["image_id"]
   sensitive = true
 }
 
 ##### EC2 launch config/template -----
 
+# TODO LASB-5089 Remove
 resource "aws_launch_template" "maat_ec2_launch_template" {
   #checkov:skip=AVD-AWS-0130: "Ignore - Launch template does not require IMDS access to require a token"
   name_prefix   = "${local.application_name}-ec2-launch-template"
-  image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+  image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2.value)["image_id"]
   instance_type = local.application_data.accounts[local.environment].instance_type
 
   monitoring {
@@ -179,11 +192,98 @@ resource "aws_launch_template" "maat_ec2_launch_template" {
   }), local.tags)
 }
 
+resource "aws_launch_template" "maat_ec2_launch_template_al2023" {
+  #checkov:skip=AVD-AWS-0130: "Ignore - Launch template does not require IMDS access to require a token"
+  name_prefix   = "${local.application_name}-ec2-al2023-"
+  image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami_al2023.value)["image_id"]
+  instance_type = local.application_data.accounts[local.environment].instance_type
+
+  monitoring {
+    enabled = true
+  }
+
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "optional"
+    http_put_response_hop_limit = "2"
+  }
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.maat_ec2_instance_profile.name
+  }
+
+  network_interfaces {
+    security_groups = [aws_security_group.maat_ecs_security_group.id]
+  }
+
+  user_data = base64encode(templatefile("maat-ec2-user-data-al2023.sh", {
+    maat_ec2_log_group = local.application_data.accounts[local.environment].maat_ec2_log_group,
+    app_ecs_cluster    = aws_ecs_cluster.maat_ecs_cluster.name,
+    environment        = local.environment,
+    xdr_dir            = "/tmp/cortex-agent",
+    xdr_tar            = "/tmp/cortex-agent.tar.gz",
+    xdr_tags           = local.xdr_tags
+
+    cw_agent_config = templatefile(
+      "${path.module}/cloudwatch-agent.json",
+      {
+        maat_ec2_log_group = local.application_data.accounts[local.environment].maat_ec2_log_group
+      }
+    )
+  }))
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = merge(tomap({
+      "Name" = "${local.application_name}-ecs-cluster"
+    }), local.tags)
+  }
+
+  tag_specifications {
+    resource_type = "volume"
+    tags = merge(tomap({
+      "Name" = "${local.application_name}-ecs-cluster"
+    }), local.tags)
+  }
+
+  tags = merge(tomap({
+    "Name" = "${local.application_name}-ecs-cluster-template"
+  }), local.tags)
+}
+
 #### EC2 Scaling Group  -----
 
+# TODO LASB-5089 Remove
 resource "aws_autoscaling_group" "maat_ec2_scaling_group" {
   vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
   name                = "${local.application_name}-EC2-asg"
+  desired_capacity    = 0
+  max_size            = local.application_data.accounts[local.environment].maat_ec2_asg_max_size
+  min_size            = 0
+  metrics_granularity = "1Minute"
+
+
+  launch_template {
+    id      = aws_launch_template.maat_ec2_launch_template.id
+    version = "$Latest"
+  }
+
+  dynamic "tag" {
+    for_each = local.tags
+
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = true
+    }
+  }
+}
+
+resource "aws_autoscaling_group" "maat_ec2_scaling_group_al2023" {
+  vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
+  name_prefix         = "${local.application_name}-ec2-al2023-"
+  # New ASG, set capacity to 0 - will be scaled manually during migration.
+  # Follow-up Terraform PR will update to desired final capacity.
   desired_capacity    = local.application_data.accounts[local.environment].maat_ec2_asg_desired_capacity
   max_size            = local.application_data.accounts[local.environment].maat_ec2_asg_max_size
   min_size            = local.application_data.accounts[local.environment].maat_ec2_asg_min_size
@@ -191,7 +291,7 @@ resource "aws_autoscaling_group" "maat_ec2_scaling_group" {
 
 
   launch_template {
-    id      = aws_launch_template.maat_ec2_launch_template.id
+    id      = aws_launch_template.maat_ec2_launch_template_al2023.id
     version = "$Latest"
   }
 
@@ -426,59 +526,6 @@ resource "aws_iam_role_policy_attachment" "maat_ecs_service_role_policy_attachme
   policy_arn = aws_iam_policy.maat_ecs_service_role_policy.arn
 }
 
-##### ECS Autoscaling Role -----
-
-resource "aws_iam_role" "maat_ecs_autoscaling_role" {
-  name = "${local.application_name}-ecs-autoscaling-role"
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-ecs-autoscaling-role"
-    }
-  )
-  assume_role_policy = <<EOF
-{
-    "Version": "2008-10-17",
-    "Statement": [
-        {
-            "Action": "sts:AssumeRole",
-             "Principal": {
-               "Service": "application-autoscaling.amazonaws.com"
-            },
-            "Effect": "Allow"
-        }
-    ]
-}
-EOF
-}
-
-resource "aws_iam_policy" "maat_ecs_autoscaling_role_policy" {
-  name = "${local.application_name}-ecs-autoscaling-role-policy"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
-          "application-autoscaling:*",
-          "cloudwatch:DescribeAlarms",
-          "cloudwatch:PutMetricAlarm",
-          "ecs:DescribeServices",
-          "ecs:UpdateService"
-        ]
-        Resource = "*"
-      },
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "maat_ecs_autoscaling_role_policy_attachment" {
-  role       = aws_iam_role.maat_ecs_autoscaling_role.name
-  policy_arn = aws_iam_policy.maat_ecs_autoscaling_role_policy.arn
-}
-
 resource "aws_iam_policy" "maat_ecs_policy_access_params" {
   name = "${local.application_name}-ecs-policy-access-params"
 
@@ -582,7 +629,6 @@ resource "aws_appautoscaling_target" "maat_ecs_scaling_target" {
   max_capacity       = local.application_data.accounts[local.environment].maat_ecs_scaling_target_max
   min_capacity       = local.application_data.accounts[local.environment].maat_ecs_scaling_target_min
   resource_id        = "service/${aws_ecs_cluster.maat_ecs_cluster.name}/${aws_ecs_service.maat_ecs_service.name}"
-  role_arn           = aws_iam_role.maat_ecs_autoscaling_role.arn
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
 }

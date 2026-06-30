@@ -1,0 +1,34 @@
+{
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "/var/log/secure",
+            "log_group_name": "${app_name}-EC2",
+            "log_stream_name": "secure/{instance_id}",
+            "timestamp_format": "%b %d %H:%M:%S"
+          },
+          {
+            "file_path": "/var/log/messages",
+            "log_group_name": "${app_name}-EC2",
+            "log_stream_name": "messages/{instance_id}",
+            "timestamp_format": "%b %d %H:%M:%S"
+          },
+          {
+            "file_path": "/var/log/ecs/ecs-init.log",
+            "log_group_name": "${app_name}-EC2",
+            "log_stream_name": "ecs-init/{instance_id}",
+            "timestamp_format": "%Y-%m-%dT%H:%M:%SZ"
+          },
+          {
+            "file_path": "/var/log/ecs/ecs-agent.log.*",
+            "log_group_name": "${app_name}-EC2",
+            "log_stream_name": "ecs-agent/{instance_id}",
+            "timestamp_format": "%Y-%m-%dT%H:%M:%SZ"
+          }
+        ]
+      }
+    }
+  }
+}

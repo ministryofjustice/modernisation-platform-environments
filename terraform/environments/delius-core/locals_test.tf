@@ -86,8 +86,10 @@ locals {
       container_port           = 8080
       container_memory         = 4096
       container_cpu            = 2048
-      ec2_instance_type        = "r7i.2xlarge"
+      ec2_instance_type        = "r7i.xlarge"
       task_count               = 4
+      asg_min_size             = 2
+      asg_max_size             = 2
     }
 
     weblogic_params = {
@@ -97,8 +99,8 @@ locals {
       BREACH_NOTICE_UI_URL_FORMAT = "https://breach-notice-test.hmpps.service.justice.gov.uk/breach-notice/%s"
       COOKIE_SECURE               = "true"
       # DELIUS_API_URL                    = "" # No longer needed
-      DMS_HOST                          = "https://hmpps-delius-alfresco-test.apps.live.cloud-platform.service.justice.gov.uk"
-      DMS_OFFICE_URI_HOST               = "https://hmpps-delius-alfresco-test.apps.live.cloud-platform.service.justice.gov.uk"
+      DMS_HOST                          = "hmpps-delius-alfresco-test.apps.live.cloud-platform.service.justice.gov.uk"
+      DMS_OFFICE_URI_HOST               = "hmpps-delius-alfresco-test.apps.live.cloud-platform.service.justice.gov.uk"
       DMS_OFFICE_URI_PORT               = "443"
       DMS_PORT                          = "443"
       DMS_PROTOCOL                      = "https"

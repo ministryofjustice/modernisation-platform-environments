@@ -1,6 +1,6 @@
 # SSM Maintenance Window (MW) IAM Role & Policy
 resource "aws_iam_role" "mw_execution_role" {
-  count = local.environment == "development" ? 1 : local.environment == "production" ? 1 : 0
+  count = local.environment == "test" ? 1 : 0
   name  = "ssm-maintenance-window-ami-role"
 
   assume_role_policy = jsonencode({
@@ -18,7 +18,7 @@ resource "aws_iam_role" "mw_execution_role" {
 }
 
 resource "aws_iam_policy" "mw_execution_policy" {
-  count       = local.environment == "development" ? 1 : local.environment == "production" ? 1 : 0
+  count       = local.environment == "test" ? 1 : 0
   name        = "ssm-maintenance-window-ami-policy"
   description = "Allows SSM MW to run automation and create AMIs"
 
@@ -59,14 +59,14 @@ resource "aws_iam_policy" "mw_execution_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "mw_attach" {
-  count      = local.environment == "development" ? 1 : local.environment == "production" ? 1 : 0
+  count      = local.environment == "test" ? 1 : 0
   role       = aws_iam_role.mw_execution_role[0].name
   policy_arn = aws_iam_policy.mw_execution_policy[0].arn
 }
 
 # SSM Maintenance Window
 resource "aws_ssm_maintenance_window" "snapshot_window" {
-  count                      = local.environment == "development" ? 1 : local.environment == "production" ? 1 : 0
+  count                      = local.environment == "test" ? 1 : 0
   name                       = "tariff-app-one-time-ami-creation"
   schedule                   = "at(${local.mw_date_time})"
   duration                   = 1
@@ -76,7 +76,7 @@ resource "aws_ssm_maintenance_window" "snapshot_window" {
 
 # Task registration
 resource "aws_ssm_maintenance_window_task" "create_image_task" {
-  count            = local.environment == "development" ? 1 : local.environment == "production" ? 1 : 0
+  count            = local.environment == "test" ? 1 : 0
   window_id        = aws_ssm_maintenance_window.snapshot_window[0].id
   name             = "create-ami-task"
   description      = "Creates an AMI of the target instance"

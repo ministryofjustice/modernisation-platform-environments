@@ -425,6 +425,32 @@ class NotificationService:
                         }
                     ]
                 }
+        elif type == "Certificate Expiry":
+            if "Records" not in alarmdetails or not alarmdetails["Records"]:
+                cert_info = alarmdetails.get("detail", {})
+                days_to_expiry = cert_info.get("DaysToExpiry", "Unknown")
+                common_name = cert_info.get("CommonName", "Unknown")
+                emoji = ":rotating_light:"
+                header = f"{emoji} *Certificate {common_name} is expiring soon.*"
+                payload = {
+                    "blocks": [
+                        {
+                            "type": "section",
+                            "text": {"type": "mrkdwn", "text": header}
+                        },
+                        {
+                            "type": "section",
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": (
+                                    "*Details*\n"
+                                    f" • *Days to Expiry:* {days_to_expiry}\n"
+                                    f" • *Common Name:* {common_name}"
+                                )
+                            }
+                        }
+                    ]
+                }
 
         # ---------------- Fallback ----------------
         else:
@@ -481,7 +507,6 @@ def lambda_handler(event, context):
     This function gets triggered by SNS Topic subscriptions to CloudWatch Alarms,
     GuardDuty findings, eventbridge and S3 events.
     """
-
     tracemalloc.start()
 
     notification_service = None
@@ -520,14 +545,29 @@ def lambda_handler(event, context):
     logger.info("Parsing configuration from environment and secrets")
     config = parse_config_from_env_and_secrets(env_config, secrets_data)
 
-    sns_message = event['Records'][0]['Sns']
-    message_str = sns_message.get('Message', '{}')
-    
-    # Check for SNS control message types and ignore them
-    sns_type = sns_message.get('Type', '')
-    if sns_type in ("SubscriptionConfirmation", "UnsubscribeConfirmation"):
-        logger.info(f"Ignoring SNS control message Type={sns_type}")
-        return
+
+    # SNS event
+    if "Records" in event and "Sns" in event["Records"][0]:
+        sns_message = event['Records'][0]['Sns']
+        message_str = event["Records"][0]["Sns"]["Message"]
+        print("SNS message:", message_str)
+        # Check for SNS control message types and ignore them
+        sns_type = sns_message.get('Type', '')
+        if sns_type in ("SubscriptionConfirmation", "UnsubscribeConfirmation"):
+            logger.info(f"Ignoring SNS control message Type={sns_type}")
+            return
+        
+    # EventBridge event
+    if "detail" in event:
+        if "CommonName" in event["detail"]:
+            common_name = event["detail"]["CommonName"] 
+            days_to_expiry = event["detail"].get("DaysToExpiry", "N/A")
+            print(f"Certificate {common_name} expires in {days_to_expiry} days")
+            message_str = json.dumps(event)
+
+
+    # sns_message = event['Records'][0]['Sns']
+    # message_str = sns_message.get('Message', '{}')
 
     try:
         alarm_details = json.loads(message_str)
@@ -601,15 +641,35 @@ def lambda_handler(event, context):
             type = "S3 Event"
             is_error = False   # S3 put is informational
 
+        # ---------------- Certificate Expiry Event ----------------
+        elif source == "aws.acm":
+            logger.info("Certificate Expiry event detected in SNS message")
+            logger.info("Starting Notification to Slack for Certificate Expiry Event")
+            timestamp_str = alarm_details.get('time')
+            if timestamp_str:
+                # Example: 2026-01-12T16:10:07.364Z
+                try:
+                    dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+                except ValueError:
+                    dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%SZ")
+                formatted = dt.strftime("%d %b %Y %H:%M:%S UTC")
+
+            channelconfig = config.slack_channel_webhook
+            alarmnotifiction = "Certificate Expiry Notification"
+            type = "Certificate Expiry"
+            is_error = False   # Certificate expiry is informational
+
         # ---------------- CloudWatch Alarm (default) ----------------
         else:
             logger.info("CloudWatch Alarm detected in SNS message")
             logger.info("Starting Notification to Slack for CloudWatch Alarm via SNS Topic")
 
+            alarm_time = datetime.utcnow()  # fallback if timestamp is missing
             timestamp_str = sns_message.get('Timestamp')
             if timestamp_str:
                 dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
                 formatted = dt.strftime("%a, %d %b %Y %H:%M:%S UTC")
+                alarm_time = dt
 
             channelconfig = config.slack_channel_webhook
             alarmnotifiction = "CloudWatch Alarm Notification"
@@ -618,6 +678,24 @@ def lambda_handler(event, context):
             new_state = alarm_details.get('NewStateValue', '')
             if new_state == "OK":
                 is_error = False
+
+            # Suppress INSUFFICIENT_DATA notifications outside business hours (07:00–19:00 UTC)
+            # for NonProd environments only (dev-, tst-, prep- prefixed alarms).
+            # NonProd VMs are stopped on a schedule after 7pm; the resulting INSUFFICIENT_DATA
+            # alarms are expected noise and should not page the team out of hours.
+            # Production alarms (prod- prefix) are never suppressed — always notify.
+            NON_PROD_PREFIXES = ("dev-", "tst-", "prep-")
+            alarm_name = alarm_details.get('AlarmName', '')
+            is_non_prod = alarm_name.startswith(NON_PROD_PREFIXES)
+
+            if new_state == "INSUFFICIENT_DATA" and is_non_prod and not (7 <= alarm_time.hour < 19):
+                logger.info(
+                    "Suppressing INSUFFICIENT_DATA alarm '%s' outside business hours "
+                    "(hour=%d UTC, non-prod environment). No Slack notification sent.",
+                    alarm_name,
+                    alarm_time.hour,
+                )
+                return
 
         # Initialize services
         notification_service = NotificationService(
@@ -664,4 +742,3 @@ def lambda_handler(event, context):
             f"Current memory usage: {current / 1024 / 1024:.2f} MB; Peak: {peak / 1024 / 1024:.2f} MB"
         )
         tracemalloc.stop()
-

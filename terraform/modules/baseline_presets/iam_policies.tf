@@ -40,7 +40,6 @@ locals {
       description = "Default EC2 Policy for a DB in this environment"
       statements = flatten([
         local.iam_policy_statements_in_ec2_default,
-        local.iam_policy_statements_ec2.OracleLicenseTracking,
         var.options.enable_s3_db_backup_bucket ? local.iam_policy_statements_ec2.S3DbBackupRead : [],
       ])
     }

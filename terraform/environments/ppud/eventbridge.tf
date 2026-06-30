@@ -76,7 +76,7 @@ resource "aws_cloudwatch_event_rule" "sync_ssm_to_waf" {
   "source": ["aws.ssm"],
   "detail-type": ["Parameter Store Change"],
   "detail": {
-    "name": ["/waf/ip_block_list", "circle_ci_waf_ip_set", "ncsc_waf_ip_set"]
+    "name": ["/waf/ip_block_list", "/waf/circle_ci_waf_ip_set", "/waf/ncsc_waf_ip_set", "/waf/wam_user_waf_ip_set"]
   }
 }
 EOF
@@ -149,6 +149,62 @@ resource "aws_lambda_permission" "allow_eventbridge_ssm_patch_completion" {
   function_name = aws_lambda_function.lambda_functions[each.key].function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.ssm_patch_completion[each.key].arn
+}
+
+############################################################################
+# EventBridge Rule for S3 Replication Failures to Justice Digital S3 Buckets
+############################################################################
+
+resource "aws_cloudwatch_event_rule" "s3_replication_failure" {
+  name        = "s3-replication-failure"
+  description = "Capture S3 replication failure events"
+
+  event_pattern = <<EOF
+{
+  "source": ["aws.s3"],
+  "detail-type": ["Object Replication Event"],
+  "detail": {
+    "replication-status": ["FAILED"]
+  }
+}
+EOF
+}
+
+resource "aws_cloudwatch_event_target" "s3_replication_failure" {
+  rule      = aws_cloudwatch_event_rule.s3_replication_failure.name
+  target_id = "s3-replication-failure-logs"
+  arn       = aws_cloudwatch_log_group.s3_replication_failure.arn
+}
+
+resource "aws_cloudwatch_event_target" "s3_replication_failure_sns" {
+  rule      = aws_cloudwatch_event_rule.s3_replication_failure.name
+  target_id = "s3-replication-failure-sns"
+  arn = (
+    local.is-production ? aws_sns_topic.cw_alerts[0].arn :
+    local.is-preproduction ? aws_sns_topic.cw_uat_alerts[0].arn :
+    aws_sns_topic.cw_dev_alerts[0].arn
+  )
+}
+
+resource "aws_sns_topic_policy" "s3_replication_failure" {
+  arn = (
+    local.is-production ? aws_sns_topic.cw_alerts[0].arn :
+    local.is-preproduction ? aws_sns_topic.cw_uat_alerts[0].arn :
+    aws_sns_topic.cw_dev_alerts[0].arn
+  )
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "events.amazonaws.com" }
+      Action    = "sns:Publish"
+      Resource = (
+        local.is-production ? aws_sns_topic.cw_alerts[0].arn :
+        local.is-preproduction ? aws_sns_topic.cw_uat_alerts[0].arn :
+        aws_sns_topic.cw_dev_alerts[0].arn
+      )
+    }]
+  })
 }
 
 #################################
@@ -246,6 +302,12 @@ locals {
       environments = ["development", "preproduction"]
       schedule     = "cron(15 7 ? * MON *)"
       description  = "Trigger Lambda at 07:15 each Monday"
+      timezone     = "Europe/London"
+    }
+    wam_waf_analysis_monthly = {
+      environments = ["development"]
+      schedule     = "cron(0 2 1 * ? *)"
+      description  = "Trigger Lambda at 07:00 on the 1st day of every month"
       timezone     = "Europe/London"
     }
     suppress_securityhub_findings = {
@@ -382,6 +444,7 @@ locals {
     #    local.is-production ? aws_lambda_function.lambda_functions["wam_waf_analysis_production"].arn : null
     #))
     # check_elb_trt_alarm            = local.is-production ? aws_lambda_function.lambda_functions["check_elb_trt_alarm_production"].arn : null
+    wam_waf_analysis_monthly       = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_monthly_development"].arn : null
     send_cpu_graph                 = local.is-production ? aws_lambda_function.lambda_functions["send_cpu_graph_production"].arn : null
     disable_cpu_alarms             = local.is-production ? aws_lambda_function.lambda_functions["disable_cpu_alarm_production"].arn : null
     enable_cpu_alarms              = local.is-production ? aws_lambda_function.lambda_functions["enable_cpu_alarm_production"].arn : null

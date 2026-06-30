@@ -61,14 +61,14 @@ resource "aws_s3_bucket_notification" "data_bucket_triggers" {
 module "process_fms_metadata_sqs" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-data-bucket.bucket
-  lambda_function_name = module.process_fms_metadata.lambda_function_name
+  lambda_function_name = module.fms_expected_file_processor.lambda_function_name
   bucket_prefix        = local.bucket_prefix
 }
 
 module "copy_mdss_data_sqs" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-data-bucket.bucket
-  lambda_function_name = module.copy_mdss_data.lambda_function_name
+  lambda_function_name = module.mdss_raw_file_stager.lambda_function_name
   bucket_prefix        = local.bucket_prefix
 }
 
@@ -135,7 +135,7 @@ data "aws_iam_policy_document" "allow_lambda_to_write" {
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values   = [module.process_fms_metadata.lambda_function_arn]
+      values   = [module.fms_expected_file_processor.lambda_function_arn]
     }
     condition {
       test     = "StringEquals"
@@ -153,7 +153,7 @@ resource "aws_sqs_queue_policy" "allow_lambda_to_write" {
 
 resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   event_source_arn = aws_sqs_queue.format_fms_json_event_queue.arn
-  function_name    = module.format_json_fms_data.lambda_function_name
+  function_name    = module.fms_raw_file_formatter.lambda_function_name
   batch_size       = 10
   scaling_config {
     maximum_concurrency = 1000
@@ -208,7 +208,7 @@ module "load_fms_event_queue" {
 module "fms_fan_out_event_queue" {
   source               = "./modules/sqs_s3_lambda_trigger"
   bucket               = module.s3-raw-formatted-data-bucket.bucket
-  lambda_function_name = module.fan_out_tags.lambda_function_name
+  lambda_function_name = module.fms_validation_rejection_fanout.lambda_function_name
   bucket_prefix        = local.bucket_prefix
   maximum_concurrency  = 100
   max_receive_count    = local.load_sqs_max_receive_count
@@ -288,14 +288,14 @@ resource "aws_cloudwatch_event_rule" "mdss_reconciler_schedule" {
 resource "aws_cloudwatch_event_target" "mdss_reconciler_target" {
   count = 1
   rule  = aws_cloudwatch_event_rule.mdss_reconciler_schedule[0].name
-  arn   = module.mdss_reconciler[0].lambda_function_arn
+  arn   = module.mdss_load_redrive_controller[0].lambda_function_arn
 }
 
 resource "aws_lambda_permission" "mdss_reconciler_allow_eventbridge" {
   count         = 1
   statement_id  = "AllowExecutionFromEventBridgeMdssReconciler"
   action        = "lambda:InvokeFunction"
-  function_name = module.mdss_reconciler[0].lambda_function_name
+  function_name = module.mdss_load_redrive_controller[0].lambda_function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.mdss_reconciler_schedule[0].arn
 }
@@ -368,4 +368,77 @@ resource "aws_lambda_event_source_mapping" "p1_creation_trigger" {
   scaling_config {
     maximum_concurrency = 2
   }
+}
+
+
+#-----------------------------------------------------------------------------------
+# Schedule merge load lambda
+#-----------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "merge_load_schedule" {
+  count               = 1
+  name                = "merge_load_schedule"
+  description         = "Runs merge_load Lambdas for MDSS tables on a schedule"
+  schedule_expression = "rate(3 minutes)"
+}
+
+# target mdss_staged_event
+resource "aws_cloudwatch_event_target" "merge_mdss_staged_event" {
+  count = 1
+  rule  = aws_cloudwatch_event_rule.merge_load_schedule[0].name
+  arn   = module.merge_mdss_staged_event[0].lambda_function_arn
+}
+
+resource "aws_lambda_permission" "allow_eventbridge_merge_mdss_staged_event" {
+  count         = 1
+  statement_id  = "AllowExecutionFromEventBridgeStagedMdssStaged"
+  action        = "lambda:InvokeFunction"
+  function_name = module.merge_mdss_staged_event[0].lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.merge_load_schedule[0].arn
+}
+
+# target mdss_staged_position
+resource "aws_cloudwatch_event_target" "merge_mdss_staged_position" {
+  count = 1
+  rule  = aws_cloudwatch_event_rule.merge_load_schedule[0].name
+  arn   = module.merge_mdss_staged_position[0].lambda_function_arn
+}
+
+resource "aws_lambda_permission" "allow_eventbridge_merge_mdss_staged_position" {
+  count         = 1
+  statement_id  = "AllowExecutionFromEventBridgeStagedMdssStaged"
+  action        = "lambda:InvokeFunction"
+  function_name = module.merge_mdss_staged_position[0].lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.merge_load_schedule[0].arn
+}
+
+# target merge_ac_position
+resource "aws_cloudwatch_event_target" "merge_ac_position" {
+  count = local.is-production ? 0 : 1
+  rule  = aws_cloudwatch_event_rule.merge_load_schedule[0].name
+  arn   = module.merge_ac_position[0].lambda_function_arn
+}
+
+resource "aws_lambda_permission" "allow_eventbridge_acquisitive_crime_position" {
+  count         = local.is-production ? 0 : 1
+  statement_id  = "AllowExecutionFromEventBridgeAcquisitiveCrimePosition"
+  action        = "lambda:InvokeFunction"
+  function_name = module.merge_ac_position[0].lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.merge_load_schedule[0].arn
+}
+
+# --------------------------------------------------------
+# update_p1_export
+# --------------------------------------------------------
+
+resource "aws_lambda_permission" "update_p1_export_api_gw" {
+  count         = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
+  statement_id  = "AllowAPIGatewayInvokeUpdateP1Export"
+  action        = "lambda:InvokeFunction"
+  function_name = module.update_p1_export[0].lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*/*"
 }

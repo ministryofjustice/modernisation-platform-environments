@@ -8,7 +8,7 @@ resource "kubernetes_manifest" "actions_runners_token_apc_self_hosted_runners_se
     "kind"       = "ExternalSecret"
     "metadata" = {
       "name"      = "actions-runners-token-apc-self-hosted-runners"
-      "namespace" = kubernetes_namespace.actions_runners[0].metadata[0].name
+      "namespace" = kubernetes_namespace_v1.actions_runners[0].metadata[0].name
     }
     "spec" = {
       "refreshInterval" = "1m"
@@ -41,7 +41,7 @@ resource "kubernetes_manifest" "actions_runners_token_moj_apc_self_hosted_runner
     "kind"       = "ExternalSecret"
     "metadata" = {
       "name"      = "actions-runners-token-moj-apc-self-hosted-runners"
-      "namespace" = kubernetes_namespace.actions_runners[0].metadata[0].name
+      "namespace" = kubernetes_namespace_v1.actions_runners[0].metadata[0].name
     }
     "spec" = {
       "refreshInterval" = "1m"
@@ -74,7 +74,7 @@ resource "kubernetes_manifest" "actions_runners_github_app_apc_self_hosted_runne
     "kind"       = "ExternalSecret"
     "metadata" = {
       "name"      = "actions-runners-github-app-apc-self-hosted-runners"
-      "namespace" = kubernetes_namespace.actions_runners[0].metadata[0].name
+      "namespace" = kubernetes_namespace_v1.actions_runners[0].metadata[0].name
     }
     "spec" = {
       "refreshInterval" = "1m"

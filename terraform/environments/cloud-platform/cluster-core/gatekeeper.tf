@@ -1,6 +1,5 @@
 module "gatekeeper" {
-  count  = contains(["development_cluster"], local.cluster_environment) ? 1 : 0
-  source = "github.com/ministryofjustice/container-platform-terraform-gatekeeper?ref=1.0.0"
+  source = "github.com/ministryofjustice/container-platform-terraform-gatekeeper?ref=1.1.0"
 
   # boolean expression for applying opa valid hostname for test clusters only.
   dryrun_map = {

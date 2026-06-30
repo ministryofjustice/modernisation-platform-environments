@@ -2,42 +2,19 @@
 # This is required BEFORE the lambdas are built as the secrets are manually added & as such is always created.
 
 
-# This secret manages the details of the endpoints such as server names and remote folders
-# It will have:
-
-# 1. The name of the job. This will match the value of ftp_job.job_name in the ftp_lambda.tf file
-# 2. The value type (host_address or remote_folder)
-# 3. The secret value
-
-# For example:
-
-# [
-#   {
-#     "name": "xerox-outbound",
-#     "type": "remote-host",
-#     "value": "sftp.example.com" or IP address
-#   },
-#   {
-#     "name": "xerox-outbound",
-#     "type": "remote-port",
-#     "value": "22"
-#   },
-#   {
-#     "name": "xerox-outbound",
-#     "type": "remote-folder",
-#     "value": "/incoming/"
-#   },
-#   {
-#     "name": "xerox-outbound",
-#     "type": "username",
-#     "value": "username"
-#   },
-#   {
-#     "name": "xerox-outbound",
-#     "type": "password",
-#     "value": "password"
-#   }
-# ]
+# This secret manages all connection details for the SFTP endpoint.
+# After the Terraform resource is created, update the secret value in the AWS console for each environment.
+#
+# Required format — flat JSON:
+#
+# {
+#   "HOST": "sftp.example.com",
+#   "USER": "username",
+#   "PASSWORD": "password",
+#   "SLACK_WEBHOOK": "https://hooks.slack.com/services/..."
+# }
+#
+# PORT and REMOTEPATH are configured as Lambda environment variables, not in the secret.
 
 resource "aws_secretsmanager_secret" "ftp_jobs_secret" {
   #checkov:skip=CKV2_AWS_57:"This will be fixed at a later date"
@@ -48,11 +25,13 @@ resource "aws_secretsmanager_secret" "ftp_jobs_secret" {
 resource "aws_secretsmanager_secret_version" "ftp_jobs_secret_values" {
   secret_id = aws_secretsmanager_secret.ftp_jobs_secret.id
   secret_string = jsonencode({
-    organisation_id = "CHANGE_ME_IN_THE_CONSOLE"
+    HOST          = "",
+    USER          = "",
+    PASSWORD      = "",
+    SLACK_WEBHOOK = ""
   })
-}
-
-data "aws_secretsmanager_secret_version" "ftp_jobs_secret_version" {
-  count     = local.build_ftp ? 1 : 0
-  secret_id = aws_secretsmanager_secret.ftp_jobs_secret.id
+  lifecycle {
+    # Prevent Terraform from overwriting secret values that are managed manually in the AWS console.
+    ignore_changes = [secret_string]
+  }
 }

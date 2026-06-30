@@ -31,5 +31,54 @@ locals {
 
   # please keep resources in alphabetical order
   baseline_development = {
+
+    ec2_instances = {
+      dev-capita-c = {
+        config = {
+          ami_name          = "base_ol_8_5_2023-06-08T09-45-10.579Z"
+          availability_zone = "eu-west-2c"
+          instance_profile_policies = [
+            # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
+            "EC2Default",
+            "EC2S3BucketWriteAndDeleteAccessPolicy",
+            "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+            "Ec2DeliusIntegrationPolicy",
+          ]
+          subnet_name = "private"
+        }
+        instance = {
+          disable_api_termination      = false
+          instance_type                = "t3.medium"
+          key_name                     = "ec2-user"
+          metadata_options_http_tokens = "optional"
+          vpc_security_group_ids       = ["ec2-linux"]
+          tags = {
+            backup-plan = "daily-and-weekly"
+          }
+        }
+        user_data_cloud_init = {
+          args = {
+            branch       = "main"
+            ansible_args = ""
+          }
+          scripts = [ # paths are relative to templates/ dir
+            "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+            "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+            "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
+          ]
+        }
+        tags = {
+          backup           = "false" # opt out of mod platform default backup plan
+          component        = "data"
+          description      = "Capita dev server"
+          os-type          = "Linux"
+          os-major-version = 8
+          os-version       = "OL 8.5"
+          server-type      = "base-ol85"
+          update-ssm-agent = "patchgroup1"
+        }
+      }
+    }
+
   }
 }
