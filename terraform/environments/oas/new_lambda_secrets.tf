@@ -3,7 +3,8 @@
 #####################################################################################
 
 resource "aws_secretsmanager_secret" "slack_security_alerts_webhook" {
-  name = "oas-slack-security-alerts-webhook-${local.environment}"
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+  name  = "oas-slack-security-alerts-webhook-${local.environment}"
 
   tags = merge(
     local.tags,
