@@ -11,7 +11,3 @@ spec:
     targetType: instance
     healthCheckConfig:
       healthCheckPath: /healthcheck/
-      # Temporary workaround: Django currently returns 400 for ALB health checks
-      # using IP Host headers. Treat 400 as healthy until app host validation is fixed.
-      matcher:
-        httpCode: "200-400"

@@ -21,7 +21,7 @@ resource "helm_release" "app" {
 resource "helm_release" "app_configuration" {
   name      = "${local.component_name}-configuration"
   chart     = "${path.module}/src/helm/charts/${local.component_name}-configuration"
-  version   = "1.2.0"
+  version   = "1.3.0"
   namespace = module.app_namespace.name
 
   values = [
