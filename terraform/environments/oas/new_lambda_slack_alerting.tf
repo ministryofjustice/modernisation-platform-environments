@@ -179,73 +179,25 @@ resource "aws_iam_role_policy_attachment" "security_alerts_lambda_vpc_access" {
 }
 
 ######################################
-### Auto-configure CloudWatch Alarms
+### Manual CloudWatch Alarm Configuration Required
 ######################################
 
-# List of security alarms that need SNS action configured
-locals {
-  security_alarm_names = [
-    "cloudtrail-configuration-changes",
-    "cmk-removal",
-    "config-configuration-changes",
-    "iam-policy-changes",
-    "s3-bucket-policy-changes",
-    "security-group-changes",
-    "unauthorised-api-calls"
-  ]
-}
-
-# Automatically add SNS topic to CloudWatch alarms
-resource "null_resource" "update_security_alarms" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
-
-  # Trigger update when SNS topic changes or alarm list changes
-  triggers = {
-    sns_topic_arn = aws_sns_topic.oas_security_alerts[0].arn
-    alarm_names   = join(",", local.security_alarm_names)
-  }
-
-  # Add SNS topic to each alarm
-  provisioner "local-exec" {
-    command = <<-EOT
-      for alarm in ${join(" ", local.security_alarm_names)}; do
-        echo "Updating CloudWatch alarm: $alarm"
-
-        # Get existing alarm configuration
-        alarm_config=$(aws cloudwatch describe-alarms \
-          --alarm-names "$alarm" \
-          --region ${data.aws_region.current.name} \
-          --output json)
-
-        # Extract existing alarm actions (to preserve them)
-        existing_actions=$(echo "$alarm_config" | jq -r '.MetricAlarms[0].AlarmActions[]' 2>/dev/null | tr '\n' ' ')
-
-        # Check if SNS topic already exists in actions
-        if echo "$existing_actions" | grep -q "${aws_sns_topic.oas_security_alerts[0].arn}"; then
-          echo "  ✓ SNS topic already configured for $alarm"
-        else
-          echo "  → Adding SNS topic to $alarm"
-
-          # Add SNS topic to alarm actions (preserving existing actions)
-          all_actions="${aws_sns_topic.oas_security_alerts[0].arn} $existing_actions"
-
-          aws cloudwatch put-metric-alarm \
-            --alarm-name "$alarm" \
-            --alarm-actions $all_actions \
-            --region ${data.aws_region.current.name} || echo "  ⚠ Warning: Could not update $alarm (may not exist in this environment)"
-        fi
-      done
-
-      echo ""
-      echo "✓ CloudWatch alarm configuration complete"
-    EOT
-
-    interpreter = ["/bin/bash", "-c"]
-  }
-
-  depends_on = [
-    aws_sns_topic.oas_security_alerts,
-    aws_lambda_function.security_alerts_to_slack,
-    aws_sns_topic_subscription.security_alerts_lambda_subscription
-  ]
-}
+# The following CloudWatch alarms need to be manually updated to add SNS topic actions.
+# These alarms are managed by the Modernisation Platform baseline module and cannot be
+# modified by OAS Terraform due to IAM restrictions.
+#
+# Run this command manually with appropriate permissions:
+#
+# SNS_TOPIC_ARN="arn:aws:sns:eu-west-2:ACCOUNT_ID:oas-security-alerts-development"
+#
+# for alarm in cloudtrail-configuration-changes cmk-removal config-configuration-changes \
+#              iam-policy-changes s3-bucket-policy-changes security-group-changes \
+#              unauthorised-api-calls; do
+#   echo "Updating $alarm..."
+#   aws cloudwatch put-metric-alarm \
+#     --alarm-name "$alarm" \
+#     --alarm-actions "$SNS_TOPIC_ARN" \
+#     --region eu-west-2
+# done
+#
+# Or update via AWS Console: CloudWatch → Alarms → Edit → Add SNS topic action
