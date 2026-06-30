@@ -5,6 +5,10 @@ locals {
   iam_configuration        = try(local.application_data.accounts[local.environment].iam_configuration, {})
   web_app_hostname         = local.is-production == false ? "web.${local.environment}.managed-file-transfer.service.justice.gov.uk" : "web.managed-file-transfer.service.justice.gov.uk"
   web_app_origin           = "https://${local.web_app_hostname}"
+  client_destination_delivery = try(
+    local.application_data.accounts[local.environment].client_destination_delivery,
+    {},
+  )
   notification_configuration = try(
     local.application_data.accounts[local.environment].notification_configuration,
     {},
