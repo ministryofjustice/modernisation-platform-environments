@@ -180,6 +180,8 @@ The consumer API must return JSON containing either a top-level upload target or
 
 The platform then streams the clean object from S3 to that presigned destination. Because Lambda retries can happen after partial progress, the consumer API should treat `transferTicket` as an idempotency key and tolerate a repeated request for a fresh presigned upload target.
 
+In `integration-hub-development`, Terraform also provisions a temporary mock consumer API for `products-poc`. It returns a presigned PUT URL into the investigation bucket so the destination-delivery flow can be exercised end to end without needing a separate external consumer system.
+
 ### **Impact of an outage:**
 
 <!-- A short description of the risks if your service is down for an extended period of time. -->

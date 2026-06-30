@@ -9,6 +9,19 @@ locals {
     local.application_data.accounts[local.environment].client_destination_delivery,
     {},
   )
+  client_destination_delivery_effective = local.environment == "development" ? merge(
+    local.client_destination_delivery,
+    {
+      "products-poc" = merge(
+        try(local.client_destination_delivery["products-poc"], {}),
+        {
+          enabled        = true
+          request_method = "POST"
+          request_url    = aws_lambda_function_url.products_poc_destination_presign_api[0].function_url
+        }
+      )
+    }
+  ) : local.client_destination_delivery
   notification_configuration = try(
     local.application_data.accounts[local.environment].notification_configuration,
     {},
