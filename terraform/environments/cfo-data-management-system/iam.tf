@@ -218,3 +218,109 @@ resource "aws_iam_instance_profile" "rabbitmq" {
   role = aws_iam_role.rabbitmq.name
   tags = local.tags
 }
+
+# GitHub Actions OIDC Role
+# Allows GitHub Actions workflows in the CFO-DataManagementSystem repository to deploy
+# MP OIDC Module - https://github.com/ministryofjustice/modernisation-platform-github-oidc-role
+module "github-actions-oidc-role" {
+  source = "github.com/ministryofjustice/modernisation-platform-github-oidc-role?ref=b40748ec162b446f8f8d282f767a85b6501fd192" # v4.0.0
+
+  github_repositories = ["ministryofjustice/CFO-DataManagementSystem"]
+  role_name           = "${local.application_name_short}-${local.environment}-github-actions"
+  policy_jsons        = [data.aws_iam_policy_document.github-actions.json]
+  subject_claim       = "repo:ministryofjustice/CFO-DataManagementSystem:environment:${local.environment}"
+  tags                = local.tags
+}
+
+data "aws_iam_policy_document" "github-actions" {
+  # ECR authentication (account-wide, required for GetAuthorizationToken)
+  statement {
+    sid     = "AllowECRAuth"
+    effect  = "Allow"
+    actions = ["ecr:GetAuthorizationToken"]
+    resources = ["*"]
+  }
+
+  # ECR image push for the app repository
+  statement {
+    sid    = "AllowECRPush"
+    effect = "Allow"
+    actions = [
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:BatchGetImage",
+      "ecr:PutImage",
+      "ecr:InitiateLayerUpload",
+      "ecr:UploadLayerPart",
+      "ecr:CompleteLayerUpload",
+    ]
+    resources = [aws_ecr_repository.app.arn]
+  }
+
+  # KMS decrypt for ECR repository encryption
+  statement {
+    sid    = "AllowECRKMSDecrypt"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+    ]
+    resources = [aws_kms_key.ecr.arn]
+  }
+
+  # ECS task definition registration (required to deploy new image versions)
+  statement {
+    sid    = "AllowECSTaskDefinition"
+    effect = "Allow"
+    actions = [
+      "ecs:RegisterTaskDefinition",
+      "ecs:DescribeTaskDefinition",
+      "ecs:ListTaskDefinitions",
+    ]
+    resources = ["*"]
+  }
+
+  # ECS service updates (scoped to this environment's cluster)
+  statement {
+    sid    = "AllowECSServiceUpdate"
+    effect = "Allow"
+    actions = [
+      "ecs:UpdateService",
+      "ecs:DescribeServices",
+    ]
+    resources = [
+      "arn:aws:ecs:eu-west-2:${local.environment_management.account_ids["${local.application_name}-${local.environment}"]}:service/${local.application_name_short}-${local.environment}-cluster/*"
+    ]
+  }
+
+  # IAM PassRole — allows GitHub Actions to assign task/execution roles to ECS task definitions
+  statement {
+    sid    = "AllowIAMPassRole"
+    effect = "Allow"
+    actions = ["iam:PassRole"]
+    resources = [
+      aws_iam_role.task.arn,
+      aws_iam_role.execution.arn,
+    ]
+  }
+
+  # Read app secrets from Secrets Manager
+  statement {
+    sid     = "AllowSecretsManagerRead"
+    effect  = "Allow"
+    actions = ["secretsmanager:GetSecretValue"]
+    resources = [
+      "arn:aws:secretsmanager:eu-west-2:${local.environment_management.account_ids["${local.application_name}-${local.environment}"]}:secret:${local.application_name_short}/${local.environment}/*",
+    ]
+  }
+
+  statement {
+    sid    = "AllowKMSDecrypt"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+    ]
+    resources = [data.aws_kms_key.general_shared.arn]
+  }
+}

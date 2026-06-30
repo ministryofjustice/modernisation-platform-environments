@@ -42,6 +42,15 @@ resource "aws_vpc_security_group_ingress_rule" "rabbitmq-from-ecs" {
   referenced_security_group_id = aws_security_group.ecs.id
 }
 
+resource "aws_vpc_security_group_ingress_rule" "rabbitmq-from-ecs-tls" {
+  security_group_id            = aws_security_group.rabbitmq.id
+  description                  = "Allow AMQPS (TLS) from ECS tasks"
+  ip_protocol                  = "tcp"
+  from_port                    = 5671
+  to_port                      = 5671
+  referenced_security_group_id = aws_security_group.ecs.id
+}
+
 # RabbitMQ Egress
 resource "aws_vpc_security_group_egress_rule" "rabbitmq-to-internet" {
   security_group_id = aws_security_group.rabbitmq.id
@@ -117,6 +126,15 @@ resource "aws_vpc_security_group_egress_rule" "ecs-to-rabbitmq" {
   ip_protocol                  = "tcp"
   from_port                    = 5672
   to_port                      = 5672
+  referenced_security_group_id = aws_security_group.rabbitmq.id
+}
+
+resource "aws_vpc_security_group_egress_rule" "ecs-to-rabbitmq-tls" {
+  security_group_id            = aws_security_group.ecs.id
+  description                  = "Allow AMQPS (TLS) traffic to RabbitMQ"
+  ip_protocol                  = "tcp"
+  from_port                    = 5671
+  to_port                      = 5671
   referenced_security_group_id = aws_security_group.rabbitmq.id
 }
 
