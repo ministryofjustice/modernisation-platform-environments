@@ -58,4 +58,9 @@ locals {
   vpc_flow_log_cloudwatch_log_group_retention_in_days = 400
   vpc_flow_log_max_aggregation_interval               = 60
 
+  vpc_gateway_endpoint_service_names = [
+    "s3",      # S3
+    "dynamodb" # DynamoDB
+  ]
+
 }
