@@ -3,7 +3,7 @@
     "development": {
       "app_name": "ccms-oia",
       "aws_region": "eu-west-2",
-      "ami_image_id": "ami-0d6d764bbe794b8ca",
+      "ami_image_id": "ami-02f77a03ec776dc35",
       "gh_runner_ami_id": "ami-0336cdd409ab5eec4",
       "opa_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-oia",
       "opa_container_version": "ccms-oia-dev-bf589eb-SNAPSHOT",
@@ -86,7 +86,7 @@
     "test": {
       "app_name": "ccms-oia",
       "aws_region": "eu-west-2",
-      "ami_image_id": "ami-0d6d764bbe794b8ca",
+      "ami_image_id": "ami-02f77a03ec776dc35",
       "gh_runner_ami_id": "ami-0336cdd409ab5eec4",
       "opa_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-oia",
       "opa_container_version": "ccms-oia-23b-aca4955",
@@ -168,7 +168,7 @@
     "preproduction": {
       "app_name": "ccms-oia",
       "aws_region": "eu-west-2",
-      "ami_image_id": "ami-0d6d764bbe794b8ca",
+      "ami_image_id": "ami-02f77a03ec776dc35",
       "gh_runner_ami_id": "ami-0336cdd409ab5eec4",
       "opa_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-oia",
       "opa_container_version": "ccms-oia-23b-aca4955",
