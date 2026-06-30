@@ -46,11 +46,12 @@ variable "lambda" {
     function_zip_file     = optional(string, "")
     s3_bucket             = optional(string, "")
     s3_key                = optional(string, "")
+    source_code_hash      = optional(string, null)
     function_name         = string
     handler               = string
     iam_role_name         = string
     environment_variables = optional(map(string), {})
-    lambda_memory_size    = optional(number, 128)
+    lambda_memory_size    = optional(number, 256)
     lambda_timeout        = optional(number, 10)
     log_group = optional(object({
       name = string
