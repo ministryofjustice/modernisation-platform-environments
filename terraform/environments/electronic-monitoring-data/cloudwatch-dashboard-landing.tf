@@ -609,10 +609,10 @@ resource "aws_cloudwatch_dashboard" "landing_ops" {
             SOURCE '${module.fms_raw_file_formatter.cloudwatch_log_group.name}'
             | filter @message like /No-data FMS delivery found at/
             | parse @message "*No-data FMS delivery found at *"
-                as log_prefix, source_s3path
+                as log_prefix, no_data_path
             | fields
                 @timestamp,
-                source_s3path,
+                no_data_path,
                 @message
             | sort @timestamp desc
             | limit 200
