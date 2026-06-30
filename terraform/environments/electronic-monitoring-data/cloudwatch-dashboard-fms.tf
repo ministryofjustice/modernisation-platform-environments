@@ -414,32 +414,17 @@ resource "aws_cloudwatch_dashboard" "fms_ops" {
                     @timestamp,
                     0
                   )
-                ) as rejected_at,
+                ) as latest_rejection_at,
                 max(
                   if(message.event = "FMS_FILE_OK", @timestamp, 0)
-                ) as loaded_at,
+                ) as latest_loaded_at,
                 latest(message.bucket) as bucket,
                 latest(message.s3path) as s3path,
                 latest(message.load_status) as latest_load_status,
                 latest(message.reason) as latest_reason
               by message.table, message.delivery_date, message.file_name
-            | filter rejected_at > 0
-            | fields
-                message.table,
-                message.delivery_date,
-                message.file_name,
-                rejected_at,
-                loaded_at,
-                if(
-                  loaded_at > rejected_at,
-                  "reloaded",
-                  "still_rejected"
-                ) as recovery_status,
-                latest_load_status,
-                bucket,
-                s3path,
-                latest_reason
-            | sort rejected_at desc
+            | filter latest_rejection_at > 0
+            | sort latest_rejection_at desc
             | limit 200
           EOT
         }
