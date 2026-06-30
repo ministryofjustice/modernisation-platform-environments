@@ -79,7 +79,7 @@ resource "helm_release" "litellm" {
     kubernetes_manifest.external_secret_litellm_entra_id,
     kubernetes_manifest.external_secret_aurora,
     kubernetes_manifest.external_secret_elasticache,
-    null_resource.cleanup_psql_temp
+    kubernetes_job_v1.grant_rds_iam
   ]
 }
 
@@ -145,6 +145,6 @@ resource "helm_release" "litellm_admin" {
     kubernetes_manifest.external_secret_litellm_entra_id,
     kubernetes_manifest.external_secret_aurora,
     kubernetes_manifest.external_secret_elasticache,
-    null_resource.cleanup_psql_temp
+    kubernetes_job_v1.grant_rds_iam
   ]
 }
