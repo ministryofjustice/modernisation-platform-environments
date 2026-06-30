@@ -13,6 +13,19 @@ data "aws_security_group" "rds" {
   depends_on = [module.rds]
 }
 
+# Look up the RDS instance to retrieve its endpoint and master user secret ARN
+data "aws_db_instance" "rds" {
+  db_instance_identifier = "${local.application_name_short}-${local.environment}-rds"
+
+  depends_on = [module.rds]
+}
+
+# Read the RDS master user password from the RDS-managed Secrets Manager secret
+# Used to auto-generate database connection strings in secrets.tf
+data "aws_secretsmanager_secret_version" "rds-master-password" {
+  secret_id = data.aws_db_instance.rds.master_user_secret[0].secret_arn
+}
+
 # CloudFront managed prefix list restricts visualiser ALB ingress to CloudFront edge nodes only
 data "aws_ec2_managed_prefix_list" "cloudfront" {
   name = "com.amazonaws.global.cloudfront.origin-facing"
