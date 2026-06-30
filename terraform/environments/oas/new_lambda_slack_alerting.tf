@@ -178,26 +178,3 @@ resource "aws_iam_role_policy_attachment" "security_alerts_lambda_vpc_access" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
-######################################
-### Manual CloudWatch Alarm Configuration Required
-######################################
-
-# The following CloudWatch alarms need to be manually updated to add SNS topic actions.
-# These alarms are managed by the Modernisation Platform baseline module and cannot be
-# modified by OAS Terraform due to IAM restrictions.
-#
-# Run this command manually with appropriate permissions:
-#
-# SNS_TOPIC_ARN="arn:aws:sns:eu-west-2:ACCOUNT_ID:oas-security-alerts-development"
-#
-# for alarm in cloudtrail-configuration-changes cmk-removal config-configuration-changes \
-#              iam-policy-changes s3-bucket-policy-changes security-group-changes \
-#              unauthorised-api-calls; do
-#   echo "Updating $alarm..."
-#   aws cloudwatch put-metric-alarm \
-#     --alarm-name "$alarm" \
-#     --alarm-actions "$SNS_TOPIC_ARN" \
-#     --region eu-west-2
-# done
-#
-# Or update via AWS Console: CloudWatch → Alarms → Edit → Add SNS topic action
