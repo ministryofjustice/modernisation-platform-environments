@@ -15,17 +15,15 @@
 # Required for ACK to create RDS instances in the cluster's private subnets.
 # Uses a fixed well-known name so the RGD can reference it without needing
 # to know the cluster name.
-#
-# TEMPORARILY COMMENTED OUT FOR DESTROY — uncomment after destroy completes.
 ###############################################################################
 
-# resource "aws_db_subnet_group" "platform" {
-#   name        = "platform-db-subnet-group"
-#   description = "DB subnet group for platform-managed RDS instances"
-#   subnet_ids  = data.aws_subnets.private.ids
-#
-#   tags = local.tags
-# }
+resource "aws_db_subnet_group" "platform" {
+  name        = "platform-db-subnet-group"
+  description = "DB subnet group for platform-managed RDS instances"
+  subnet_ids  = data.aws_subnets.private.ids
+
+  tags = local.tags
+}
 
 resource "aws_iam_role" "ack_capability" {
   name = "${local.cluster_name}-ack-capability"
