@@ -1,17 +1,12 @@
 locals {
   serco_fms_key_distribution_enabled = false
 
-  # placeholder value once UP3 confirm
-  serco_fms_key_distribution_recipient_emails = [
-    "Khristiania.Raihan@justice.gov.uk",
-  ]
-
   # placeholder value once GOV.UK Notify template is created
   serco_fms_key_distribution_notify_template_id = (
     "f547eba8-a5d4-4218-b5ff-a238bc054136"
   )
 
-  serco_fms_key_distribution_state_prefix = "serco-fms-key-distribution"
+  serco_fms_key_distribution_state_prefix = "state"
 
   serco_fms_key_distribution_secret_specs = [
     {
@@ -39,10 +34,7 @@ locals {
 
   serco_fms_key_distribution_secret_arns = concat(
     local.serco_fms_key_distribution_feed_secret_arns,
-    local.serco_fms_key_distribution_config_secret_arns,
-    [
-      aws_secretsmanager_secret.serco_fms_password_state.arn,
-    ]
+    local.serco_fms_key_distribution_config_secret_arns
   )
 }
 
@@ -138,10 +130,7 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
     ]
 
     resources = [
-      join("", [
-        "arn:aws:s3:::",
-        module.s3-logging-bucket.bucket.id,
-      ])
+      module.s3-serco-fms-key-distribution-bucket.bucket.arn,
     ]
 
     condition {
@@ -149,17 +138,8 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
       variable = "s3:prefix"
 
       values = [
-        join("", [
-          local.serco_fms_key_distribution_state_prefix,
-          "/",
-          local.environment_shorthand,
-        ]),
-        join("", [
-          local.serco_fms_key_distribution_state_prefix,
-          "/",
-          local.environment_shorthand,
-          "/*",
-        ]),
+        "${local.serco_fms_key_distribution_state_prefix}/${local.environment_shorthand}",
+        "${local.serco_fms_key_distribution_state_prefix}/${local.environment_shorthand}/*",
       ]
     }
   }
@@ -174,15 +154,35 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
     ]
 
     resources = [
-      join("", [
-        "arn:aws:s3:::",
-        module.s3-logging-bucket.bucket.id,
-        "/",
-        local.serco_fms_key_distribution_state_prefix,
-        "/",
-        local.environment_shorthand,
-        "/*",
-      ])
+      "${module.s3-serco-fms-key-distribution-bucket.bucket.arn}/${local.serco_fms_key_distribution_state_prefix}/${local.environment_shorthand}/*",
+    ]
+  }
+
+  statement {
+    sid    = "ReadDistributionAllowlist"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+    ]
+
+    resources = [
+      "${module.s3-serco-fms-key-distribution-bucket.bucket.arn}/${local.serco_fms_key_distribution_allowlist_key}",
+    ]
+  }
+
+  statement {
+    sid    = "WriteEncryptedDistributionFiles"
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectTagging",
+    ]
+
+    resources = [
+      "${module.s3-serco-fms-key-distribution-bucket.bucket.arn}/${local.serco_fms_key_distribution_files_prefix}/${local.environment_shorthand}/*",
     ]
   }
 }
@@ -235,12 +235,20 @@ module "send_serco_fms_keys" {
       local.serco_fms_key_distribution_notify_template_id
     )
 
-    SERCO_RECIPIENT_EMAILS = jsonencode(
-      local.serco_fms_key_distribution_recipient_emails
+    DISTRIBUTION_BUCKET = (
+      module.s3-serco-fms-key-distribution-bucket.bucket.id
     )
 
-    STATE_BUCKET = module.s3-logging-bucket.bucket.id
+    FILES_PREFIX = local.serco_fms_key_distribution_files_prefix
+
+    STATE_BUCKET = module.s3-serco-fms-key-distribution-bucket.bucket.id
     STATE_PREFIX = local.serco_fms_key_distribution_state_prefix
+
+    ALLOWLIST_BUCKET = (
+      module.s3-serco-fms-key-distribution-bucket.bucket.id
+    )
+
+    ALLOWLIST_KEY = local.serco_fms_key_distribution_allowlist_key
 
     MAX_SECRET_AGE_HOURS         = "48"
     NOTIFY_FILE_RETENTION_PERIOD = "1 week"
