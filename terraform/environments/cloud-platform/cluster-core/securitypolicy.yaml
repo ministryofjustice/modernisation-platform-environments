@@ -2,7 +2,7 @@ apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy
 metadata:
   name: source-ip-allowlist
-  namespace: test-workload
+  namespace: waf-disabled
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io
