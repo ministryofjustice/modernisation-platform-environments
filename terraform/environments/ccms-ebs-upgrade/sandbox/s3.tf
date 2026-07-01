@@ -152,12 +152,19 @@ module "s3-bucket-logging" {
         }
       },
       {
+        Sid    = "AllowELBLogDeliveryPutObject"
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::652711504416:root"
+          Service = "logdelivery.elasticloadbalancing.amazonaws.com"
         }
         Action   = "s3:PutObject"
         Resource = "${module.s3-bucket-logging.bucket.arn}/*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+            "s3:x-amz-acl"      = "bucket-owner-full-control"
+          }
+        }
       },
       {
         "Sid" = "RestrictToTLSRequestsOnly",
