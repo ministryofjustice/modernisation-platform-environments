@@ -994,7 +994,7 @@ module "merge_ac_position" {
 }
 
 module "merge_emdi_position" {
-  count                          = local.is-test || local.is-preproduction || local.is-production ? 0 : 1
+  count                          = local.is-production ? 0 : 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_emdi_position"
