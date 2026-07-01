@@ -53,9 +53,18 @@ locals {
     { id = module.s3-dms-target-store-bucket.bucket.id, arn = module.s3-dms-target-store-bucket.bucket.arn },
     { id = module.s3-create-a-derived-table-bucket.bucket.id, arn = module.s3-create-a-derived-table-bucket.bucket.arn },
     { id = module.s3-raw-formatted-data-bucket.bucket.id, arn = module.s3-raw-formatted-data-bucket.bucket.arn },
-    { id = module.s3-lambda-store-bucket.bucket.id, arn = module.s3-lambda-store-bucket.bucket.arn },
-    { id = module.s3-serco-fms-key-distribution-bucket.bucket.id, arn = module.s3-serco-fms-key-distribution-bucket.bucket.arn }
+    { id = module.s3-lambda-store-bucket.bucket.id, arn = module.s3-lambda-store-bucket.bucket.arn }
   ]
+
+  bucket_logging_source_arns = concat(
+    [
+      for bucket in local.buckets_to_log :
+      bucket.arn
+    ],
+    [
+      module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+    ]
+  )
 
   cross_account_recieve_mapping = local.is-development ? "test" : local.is-preproduction ? "production" : local.is-test ? "preproduction" : null
   cross_env_bucket_policy = {
@@ -171,7 +180,7 @@ data "aws_iam_policy_document" "log_bucket_policy" {
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values   = [for bucket in local.buckets_to_log : bucket.arn]
+      values   = local.bucket_logging_source_arns
     }
 
     condition {

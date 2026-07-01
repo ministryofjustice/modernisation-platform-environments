@@ -55,6 +55,19 @@ module "s3-serco-fms-key-distribution-bucket" {
   )
 }
 
+resource "aws_s3_bucket_logging" "serco_fms_key_distribution" {
+  bucket = module.s3-serco-fms-key-distribution-bucket.bucket.id
+
+  target_bucket = module.s3-logging-bucket.bucket.id
+  target_prefix = "logs/"
+
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
+}
+
 resource "aws_s3_object" "serco_fms_key_distribution_allowlist" {
   bucket = module.s3-serco-fms-key-distribution-bucket.bucket.id
   key    = local.serco_fms_key_distribution_allowlist_key
@@ -87,8 +100,6 @@ resource "aws_s3_object" "serco_fms_key_distribution_allowlist" {
       }
     ]
   })
-
-  server_side_encryption = "AES256"
 
   tags = merge(
     local.tags,
