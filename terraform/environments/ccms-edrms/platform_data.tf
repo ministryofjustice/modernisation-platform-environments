@@ -103,6 +103,47 @@ data "aws_subnet" "public_subnets_c" {
   }
 }
 
+# VPC Endpoint security group lookup (used to restrict egress to VPC endpoints)
+data "aws_security_groups" "vpce_security_groups" {
+  provider = aws.core-vpc
+
+  filter {
+    name   = "tag:Name"
+    values = [
+      "${var.networking[0].business-unit}-${local.environment}-int-endpoint-${data.aws_region.current.name}a",
+      "${var.networking[0].business-unit}-${local.environment}-int-endpoint-${data.aws_region.current.name}b",
+      "${var.networking[0].business-unit}-${local.environment}-int-endpoint-${data.aws_region.current.name}c",
+    ]
+  }
+}
+
+data "aws_security_group" "vpce_security_group_a" {
+  provider = aws.core-vpc
+
+  filter {
+    name   = "tag:Name"
+    values = ["${var.networking[0].business-unit}-${local.environment}-int-endpoint-${data.aws_region.current.name}a"]
+  }
+}
+
+data "aws_security_group" "vpce_security_group_b" {
+  provider = aws.core-vpc
+
+  filter {
+    name   = "tag:Name"
+    values = ["${var.networking[0].business-unit}-${local.environment}-int-endpoint-${data.aws_region.current.name}b"]
+  }
+}
+
+data "aws_security_group" "vpce_security_group_c" {
+  provider = aws.core-vpc
+
+  filter {
+    name   = "tag:Name"
+    values = ["${var.networking[0].business-unit}-${local.environment}-int-endpoint-${data.aws_region.current.name}c"]
+  }
+}
+
 # Route53 DNS data
 data "aws_route53_zone" "external" {
   provider = aws.core-vpc

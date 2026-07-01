@@ -35,15 +35,6 @@ data "aws_prefix_list" "s3" {
   name = "com.amazonaws.${data.aws_region.current.name}.s3"
 }
 
-# VPC Endpoint security group lookup (used to restrict egress to VPC endpoints)
-data "aws_security_group" "vpce_security_group" {
-  provider = aws.core-vpc
-  filter {
-    name   = "tag:Name"
-    values = ["${var.networking[0].business-unit}-${local.environment}-int-endpoint"]
-  }
-}
-
 ### Container Security Group
 
 resource "aws_security_group" "ecs_tasks_edrms" {
@@ -73,7 +64,7 @@ resource "aws_security_group_rule" "ecs_tasks_egress_vpce" {
   protocol          = "TCP"
   from_port         = 443
   to_port           = 443
-  source_security_group_id = data.aws_security_group.vpce_security_group.id
+  source_security_group_id = data.aws_security_groups.vpce_security_groups.ids[0]
 
   lifecycle {
     ignore_changes = [source_security_group_id]
@@ -171,7 +162,7 @@ resource "aws_security_group_rule" "cluster_ec2_egress_vpce" {
   protocol          = "TCP"
   from_port         = 443
   to_port           = 443
-  source_security_group_id = data.aws_security_group.vpce_security_group.id
+  source_security_group_id = data.aws_security_groups.vpce_security_groups.ids[0]
 
   lifecycle {
     ignore_changes = [source_security_group_id]
