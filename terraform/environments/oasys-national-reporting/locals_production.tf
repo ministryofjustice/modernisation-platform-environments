@@ -116,9 +116,6 @@ locals {
         })
         instance = merge(local.ec2_instances.bip_cms.instance, {
           instance_type = "m6i.2xlarge"
-          tags = merge(local.ec2_instances.bip_cms.instance.tags, {
-            "owner" = "mark.richardson@digital.justice.gov.uk" # remove this once user-data provider bug fixed
-          })
         })
         user_data_cloud_init = merge(local.ec2_instances.bip_cms.user_data_cloud_init, {
           args = merge(local.ec2_instances.bip_cms.user_data_cloud_init.args, {
@@ -127,6 +124,7 @@ locals {
         })
         tags = merge(local.ec2_instances.bip_cms.tags, {
           oasys-national-reporting-environment = "pd"
+          owner                                = "mark.richardson@digital.justice.gov.uk" # remove this once user-data provider bug fixed
         })
       })
 
@@ -139,9 +137,6 @@ locals {
         })
         instance = merge(local.ec2_instances.bip_cms.instance, {
           instance_type = "m6i.2xlarge"
-          tags = merge(local.ec2_instances.bip_cms.instance.tags, {
-            "owner" = "mark.richardson@digital.justice.gov.uk" # remove this once user-data provider bug fixed
-          })
         })
         user_data_cloud_init = merge(local.ec2_instances.bip_cms.user_data_cloud_init, {
           args = merge(local.ec2_instances.bip_cms.user_data_cloud_init.args, {
@@ -150,6 +145,7 @@ locals {
         })
         tags = merge(local.ec2_instances.bip_cms.tags, {
           oasys-national-reporting-environment = "pd"
+          owner                                = "mark.richardson@digital.justice.gov.uk" # remove this once user-data provider bug fixed
         })
       })
 
@@ -162,9 +158,6 @@ locals {
         })
         instance = merge(local.ec2_instances.bip_web.instance, {
           instance_type = "m6i.xlarge"
-          tags = merge(local.ec2_instances.bip_web.instance.tags, {
-            "owner" = "mark.richardson@digital.justice.gov.uk" # remove this once user-data provider bug fixed
-          })
         })
         user_data_cloud_init = merge(local.ec2_instances.bip_web.user_data_cloud_init, {
           args = merge(local.ec2_instances.bip_web.user_data_cloud_init.args, {
@@ -173,6 +166,7 @@ locals {
         })
         tags = merge(local.ec2_instances.bip_web.tags, {
           oasys-national-reporting-environment = "pd"
+          owner                                = "mark.richardson@digital.justice.gov.uk" # remove this once user-data provider bug fixed
         })
       })
 
@@ -185,9 +179,6 @@ locals {
         })
         instance = merge(local.ec2_instances.bip_web.instance, {
           instance_type = "m6i.xlarge"
-          tags = merge(local.ec2_instances.bip_web.instance.tags, {
-            "owner" = "mark.richardson@digital.justice.gov.uk" # remove this once user-data provider bug fixed
-          })
         })
         user_data_cloud_init = merge(local.ec2_instances.bip_web.user_data_cloud_init, {
           args = merge(local.ec2_instances.bip_web.user_data_cloud_init.args, {
@@ -196,6 +187,7 @@ locals {
         })
         tags = merge(local.ec2_instances.bip_web.tags, {
           oasys-national-reporting-environment = "pd"
+          owner                                = "mark.richardson@digital.justice.gov.uk" # remove this once user-data provider bug fixed
         })
       })
     }
