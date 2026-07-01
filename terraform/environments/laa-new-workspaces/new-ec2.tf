@@ -126,7 +126,6 @@ ${file("${path.module}/xxx-new-scripts/user-creation.ps1")}
 
   lifecycle {
     ignore_changes = [
-      user_data,
       ami
     ]
   }
