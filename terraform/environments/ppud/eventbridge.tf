@@ -169,6 +169,7 @@ resource "aws_cloudwatch_event_rule" "s3_replication_failure" {
     "errorCode": [{ "exists": true }],
     "eventName": ["PutObject", "ReplicateObject", "ReplicateDelete", "ReplicateTags"]
 }
+}
 EOF
 }
 
