@@ -5,8 +5,6 @@ locals {
 
   serco_fms_key_distribution_files_prefix = "files"
 
-  serco_fms_key_distribution_state_prefix = "state"
-
   serco_fms_key_distribution_config_prefix = "config"
 
   serco_fms_key_distribution_allowlist_key = (
