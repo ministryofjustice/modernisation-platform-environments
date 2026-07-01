@@ -1,3 +1,19 @@
+resource "terraform_data" "products_poc_destination_presign_api_package" {
+  count = local.environment == "development" ? 1 : 0
+
+  input = {
+    filename = "${path.module}/builds/products-poc-destination-presign-api.zip"
+  }
+
+  triggers_replace = [
+    filesha256("${path.module}/lambda/mock-destination-presign-api/lambda_function.py"),
+  ]
+
+  provisioner "local-exec" {
+    command = "mkdir -p ${path.module}/builds && rm -f ${self.input.filename} && cd ${path.module} && zip -q -j ${self.input.filename} lambda/mock-destination-presign-api/lambda_function.py"
+  }
+}
+
 module "lambda_products_poc_destination_presign_api" {
   count = local.environment == "development" ? 1 : 0
 
@@ -9,8 +25,9 @@ module "lambda_products_poc_destination_presign_api" {
   description                  = "Development-only mock consumer API that returns a presigned destination upload URL for products-poc"
   handler                      = "lambda_function.lambda_handler"
   memory_size                  = 256
+  create_package               = false
+  local_existing_package       = terraform_data.products_poc_destination_presign_api_package[0].output.filename
   runtime                      = "python3.12"
-  source_path                  = "lambda/mock-destination-presign-api"
   timeout                      = 10
   trigger_on_package_timestamp = false
 
