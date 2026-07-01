@@ -66,15 +66,26 @@ resource "aws_instance" "user_creation_ec2" {
         Write-Host "WARNING: DNS resolution failed, but continuing with domain join"
     }
     
-    # Join domain
+    # Join domain with static computer name
     $domain = "${local.application_data.accounts[local.environment].ad_directory_name}"
     $password = "${random_password.ad_admin_password.result}" | ConvertTo-SecureString -AsPlainText -Force
     $username = "Admin"
     $credential = New-Object System.Management.Automation.PSCredential("$domain\$username", $password)
-    
+
+    # Set computer name based on environment (max 15 chars for Windows)
+    $computerName = switch ("${local.environment}") {
+        "development"    { "LAA-UC-DEV" }
+        "test"           { "LAA-UC-TEST" }
+        "preproduction"  { "LAA-UC-PRE" }
+        "production"     { "LAA-UC-PROD" }
+        default          { "LAA-UC-DEV" }
+    }
+
+    Write-Host "Computer name will be set to: $computerName"
+
     try {
-        Add-Computer -DomainName $domain -Credential $credential -Restart -Force -ErrorAction Stop
-        Write-Host "Domain join initiated, restarting..."
+        Add-Computer -DomainName $domain -Credential $credential -NewName $computerName -Restart -Force -ErrorAction Stop
+        Write-Host "Domain join initiated with computer name $computerName, restarting..."
     } catch {
         Write-Host "Domain join failed: $_"
         Write-Host "Will retry after reboot..."
