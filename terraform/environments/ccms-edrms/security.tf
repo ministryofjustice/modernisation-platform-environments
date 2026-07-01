@@ -64,11 +64,11 @@ resource "aws_security_group_rule" "ecs_tasks_egress_vpce" {
   protocol          = "TCP"
   from_port         = 443
   to_port           = 443
-  source_security_group_id = data.aws_security_groups.vpce_security_groups.ids[0]
-
-  lifecycle {
-    ignore_changes = [source_security_group_id]
-  }
+  cidr_blocks = [
+    data.aws_subnet.vpce_subnet_a.cidr_block,
+    data.aws_subnet.vpce_subnet_b.cidr_block,
+    data.aws_subnet.vpce_subnet_c.cidr_block,
+  ]
 }
 
 resource "aws_security_group_rule" "ecs_tasks_egress_s3" {
@@ -162,11 +162,11 @@ resource "aws_security_group_rule" "cluster_ec2_egress_vpce" {
   protocol          = "TCP"
   from_port         = 443
   to_port           = 443
-  source_security_group_id = data.aws_security_groups.vpce_security_groups.ids[0]
-
-  lifecycle {
-    ignore_changes = [source_security_group_id]
-  }
+  cidr_blocks = [
+    data.aws_subnet.vpce_subnet_a.cidr_block,
+    data.aws_subnet.vpce_subnet_b.cidr_block,
+    data.aws_subnet.vpce_subnet_c.cidr_block,
+  ]
 }
 
 resource "aws_security_group_rule" "cluster_ec2_egress_s3" {

@@ -103,44 +103,35 @@ data "aws_subnet" "public_subnets_c" {
   }
 }
 
-# VPC Endpoint security group lookup (used to restrict egress to VPC endpoints)
-data "aws_security_groups" "vpce_security_groups" {
-  provider = aws.core-vpc
-
+# VPC Endpoint subnet lookup (used to identify VPCE subnets)
+data "aws_subnets" "vpce_subnets" {
   filter {
-    name   = "tag:Name"
-    values = [
-      "${var.networking[0].business-unit}-${local.environment}-int-endpoint-${data.aws_region.current.name}a",
-      "${var.networking[0].business-unit}-${local.environment}-int-endpoint-${data.aws_region.current.name}b",
-      "${var.networking[0].business-unit}-${local.environment}-int-endpoint-${data.aws_region.current.name}c",
-    ]
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared.id]
+  }
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-int-endpoint*"
   }
 }
 
-data "aws_security_group" "vpce_security_group_a" {
-  provider = aws.core-vpc
-
-  filter {
-    name   = "tag:Name"
-    values = ["${var.networking[0].business-unit}-${local.environment}-int-endpoint-${data.aws_region.current.name}a"]
+data "aws_subnet" "vpce_subnet_a" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-int-endpoint-${data.aws_region.current.name}a"
   }
 }
 
-data "aws_security_group" "vpce_security_group_b" {
-  provider = aws.core-vpc
-
-  filter {
-    name   = "tag:Name"
-    values = ["${var.networking[0].business-unit}-${local.environment}-int-endpoint-${data.aws_region.current.name}b"]
+data "aws_subnet" "vpce_subnet_b" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-int-endpoint-${data.aws_region.current.name}b"
   }
 }
 
-data "aws_security_group" "vpce_security_group_c" {
-  provider = aws.core-vpc
-
-  filter {
-    name   = "tag:Name"
-    values = ["${var.networking[0].business-unit}-${local.environment}-int-endpoint-${data.aws_region.current.name}c"]
+data "aws_subnet" "vpce_subnet_c" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-int-endpoint-${data.aws_region.current.name}c"
   }
 }
 
