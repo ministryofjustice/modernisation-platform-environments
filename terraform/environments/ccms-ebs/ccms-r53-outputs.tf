@@ -61,31 +61,31 @@ output "aws_route53_record_prod_ebsapps_fqdn" {
 
 #
 
-output "aws_route53_record_webgate_ec2_fqdn" {
-  description = "aws_route53_record webgate_ec2 fqdn"
-  value       = aws_route53_record.webgate_ec2[*].fqdn
-}
+# output "aws_route53_record_webgate_ec2_fqdn" {
+#   description = "aws_route53_record webgate_ec2 fqdn"
+#   value       = aws_route53_record.webgate_ec2[*].fqdn
+# }
 
 #
 
-output "aws_route53_record_prod_webgate_ec2_fqdn" {
-  description = "aws_route53_record prod_webgate_ec2 fqdn"
-  value       = aws_route53_record.prod_webgate_ec2[*].fqdn
-}
+# output "aws_route53_record_prod_webgate_ec2_fqdn" {
+#   description = "aws_route53_record prod_webgate_ec2 fqdn"
+#   value       = aws_route53_record.prod_webgate_ec2[*].fqdn
+# }
 
 #
 
-output "aws_route53_record_accessgate_ec2_fqdn" {
-  description = "aws_route53_record accessgate_ec2 fqdn"
-  value       = aws_route53_record.accessgate_ec2[*].fqdn
-}
+# output "aws_route53_record_accessgate_ec2_fqdn" {
+#   description = "aws_route53_record accessgate_ec2 fqdn"
+#   value       = aws_route53_record.accessgate_ec2[*].fqdn
+# }
 
 #
 
-output "aws_route53_record_prod_accessgate_ec2_fqdn" {
-  description = "aws_route53_record prod_accessgate_ec2 fqdn"
-  value       = aws_route53_record.prod_accessgate_ec2[*].fqdn
-}
+# output "aws_route53_record_prod_accessgate_ec2_fqdn" {
+#   description = "aws_route53_record prod_accessgate_ec2 fqdn"
+#   value       = aws_route53_record.prod_accessgate_ec2[*].fqdn
+# }
 
 #
 

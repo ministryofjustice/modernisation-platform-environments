@@ -151,28 +151,28 @@ resource "aws_route53_record" "prod_ebsapps" {
 #   }
 # }
 
-resource "aws_route53_record" "webgate_ec2" {
-  provider = aws.core-vpc
-  count    = local.application_data.accounts[local.environment].webgate_no_instances
+# resource "aws_route53_record" "webgate_ec2" {
+#   provider = aws.core-vpc
+#   count    = local.application_data.accounts[local.environment].webgate_no_instances
+#
+#   zone_id = data.aws_route53_zone.external.zone_id
+#   name    = "${local.application_data.accounts[local.environment].webgate_dns_prefix}${count.index + 1}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+#   #name    = "ccms-ebs-app${count.index + 1}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+#   type    = "A"
+#   ttl     = 300
+#   records = [aws_instance.ec2_webgate[count.index].private_ip]
+# }
 
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${local.application_data.accounts[local.environment].webgate_dns_prefix}${count.index + 1}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  #name    = "ccms-ebs-app${count.index + 1}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
-  ttl     = 300
-  records = [aws_instance.ec2_webgate[count.index].private_ip]
-}
-
-# PROD WEBGATE INSTANCES
-resource "aws_route53_record" "prod_webgate_ec2" {
-  provider = aws.core-network-services
-  count    = local.is-production ? local.application_data.accounts[local.environment].webgate_no_instances : 0
-  zone_id  = data.aws_route53_zone.prod-network-services.zone_id
-  name     = "${local.application_data.accounts[local.environment].webgate_dns_prefix}${count.index + 1}.ccms-ebs.service.justice.gov.uk"
-  type     = "A"
-  ttl      = 300
-  records  = [aws_instance.ec2_webgate[count.index].private_ip]
-}
+# # PROD WEBGATE INSTANCES
+# resource "aws_route53_record" "prod_webgate_ec2" {
+#   provider = aws.core-network-services
+#   count    = local.is-production ? local.application_data.accounts[local.environment].webgate_no_instances : 0
+#   zone_id  = data.aws_route53_zone.prod-network-services.zone_id
+#   name     = "${local.application_data.accounts[local.environment].webgate_dns_prefix}${count.index + 1}.ccms-ebs.service.justice.gov.uk"
+#   type     = "A"
+#   ttl      = 300
+#   records  = [aws_instance.ec2_webgate[count.index].private_ip]
+# }
 
 # resource "aws_route53_record" "webgate_ec2_single" {
 #   provider = aws.core-vpc
@@ -210,29 +210,29 @@ resource "aws_route53_record" "prod_webgate_ec2" {
 #   records = [aws_instance.ec2_accessgate[count.index].private_ip]
 # }
 
-resource "aws_route53_record" "accessgate_ec2" {
-  provider = aws.core-vpc
-  count    = local.application_data.accounts[local.environment].accessgate_no_instances
+# resource "aws_route53_record" "accessgate_ec2" {
+#   provider = aws.core-vpc
+#   count    = local.application_data.accounts[local.environment].accessgate_no_instances
+#
+#   zone_id = data.aws_route53_zone.external.zone_id
+#   name    = "${local.application_data.accounts[local.environment].accessgate_dns_prefix}${count.index + 1}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+#   #name    = "ccms-ebs-app${count.index + 1}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+#   type    = "A"
+#   ttl     = 300
+#   records = [aws_instance.ec2_accessgate[count.index].private_ip]
+# }
 
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${local.application_data.accounts[local.environment].accessgate_dns_prefix}${count.index + 1}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  #name    = "ccms-ebs-app${count.index + 1}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
-  ttl     = 300
-  records = [aws_instance.ec2_accessgate[count.index].private_ip]
-}
-
-# PROD ACCESSGATE INSTANCES
-resource "aws_route53_record" "prod_accessgate_ec2" {
-  provider = aws.core-network-services
-  count    = local.is-production ? local.application_data.accounts[local.environment].accessgate_no_instances : 0
-
-  zone_id = data.aws_route53_zone.prod-network-services.zone_id
-  name    = "${local.application_data.accounts[local.environment].accessgate_dns_prefix}${count.index + 1}.ccms-ebs.service.justice.gov.uk"
-  type    = "A"
-  ttl     = 300
-  records = [aws_instance.ec2_accessgate[count.index].private_ip]
-}
+# # PROD ACCESSGATE INSTANCES
+# resource "aws_route53_record" "prod_accessgate_ec2" {
+#   provider = aws.core-network-services
+#   count    = local.is-production ? local.application_data.accounts[local.environment].accessgate_no_instances : 0
+#
+#   zone_id = data.aws_route53_zone.prod-network-services.zone_id
+#   name    = "${local.application_data.accounts[local.environment].accessgate_dns_prefix}${count.index + 1}.ccms-ebs.service.justice.gov.uk"
+#   type    = "A"
+#   ttl     = 300
+#   records = [aws_instance.ec2_accessgate[count.index].private_ip]
+# }
 
 # resource "aws_route53_record" "accessgate_ec2_single" {
 #   provider = aws.core-vpc
