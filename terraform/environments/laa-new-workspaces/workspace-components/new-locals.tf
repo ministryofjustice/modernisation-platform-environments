@@ -12,4 +12,6 @@ locals {
     s.availability_zone => s.attachment[0].endpoint_id
   }
 
+  moj_tgw_id = "tgw-026162f1ba39ce704"
+
 }
