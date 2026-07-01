@@ -16,6 +16,12 @@ resource "aws_secretsmanager_secret_version" "rabbitmq-password" {
   secret_string = random_password.rabbitmq.result
 }
 
+# API Auth Key
+resource "random_password" "api-key" {
+  length  = 48
+  special = false
+}
+
 # App Secrets — third-party credentials and tuneable config managed manually via the AWS console.
 # lifecycle ignore_changes preserves manual updates on subsequent Terraform applies.
 resource "aws_secretsmanager_secret" "app-secrets" {
@@ -33,8 +39,8 @@ resource "aws_secretsmanager_secret_version" "app-secrets" {
     Client_ID             = "CHANGE_ME"
     Client_Secret         = "CHANGE_ME"
     API_Client_ID         = "CHANGE_ME"
-    # API auth
-    Authentication_ApiKey = "CHANGE_ME"
+    # API auth — auto-generated on first create; share with callers via Secrets Manager
+    Authentication_ApiKey = random_password.api-key.result
     # Sentry
     Sentry_Dsn            = "CHANGE_ME"
     # RabbitMQ — auto-populated; update CatsRabbitMQ manually
