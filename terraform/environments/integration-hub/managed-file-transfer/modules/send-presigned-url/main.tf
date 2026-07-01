@@ -206,7 +206,7 @@ module "lambda_clean_file_presigned_url_notifier" {
   version = "8.8.0"
 
   function_name                = "${local.resource_name_prefix}-clean-file-presigned-url-notifier"
-  description                  = "Generates a presigned download URL for clean files and publishes it to SNS"
+  description                  = "Generates a presigned download URL for clean files, optionally pushes them to a client destination, and publishes notifications"
   handler                      = "lambda_function.lambda_handler"
   runtime                      = "python3.12"
   source_path                  = "${path.module}/lambda/clean-file-presigned-url-notifier"
@@ -220,62 +220,77 @@ module "lambda_clean_file_presigned_url_notifier" {
   }
 
   environment_variables = {
-    CLIENT_NOTIFICATION_SNS_TOPIC_ARN = module.sns_clean_file_client_notifications.topic_arn
-    DOWNLOAD_BUCKET_NAME            = var.download_bucket_name
-    DOWNLOAD_URL_EXPIRY_SECONDS     = tostring(var.presigned_url_expiry_seconds)
-    IDEMPOTENCY_TABLE               = module.dynamodb_idempotency.dynamodb_table_id
-    MAX_DOWNLOAD_URL_EXPIRY_SECONDS = tostring(var.max_presigned_url_expiry_seconds)
-    SLACK_SNS_TOPIC_ARN             = module.sns_clean_file_download_notifications.topic_arn
+    CLIENT_NOTIFICATION_SNS_TOPIC_ARN       = module.sns_clean_file_client_notifications.topic_arn
+    CLIENT_DESTINATION_DELIVERY_CONFIG_JSON = jsonencode(var.client_destination_delivery_config)
+    DOWNLOAD_BUCKET_NAME                    = var.download_bucket_name
+    DOWNLOAD_URL_EXPIRY_SECONDS             = tostring(var.presigned_url_expiry_seconds)
+    IDEMPOTENCY_TABLE                       = module.dynamodb_idempotency.dynamodb_table_id
+    MAX_DOWNLOAD_URL_EXPIRY_SECONDS         = tostring(var.max_presigned_url_expiry_seconds)
+    SLACK_SNS_TOPIC_ARN                     = module.sns_clean_file_download_notifications.topic_arn
   }
 
   attach_policy_statements = true
-  policy_statements = {
-    clean_bucket_read = {
-      effect = "Allow"
-      actions = [
-        "s3:GetObject",
-        "s3:GetObjectVersion",
-        "s3:GetObjectTagging",
-        "s3:GetObjectVersionTagging",
-      ]
-      resources = [
-        "${var.download_bucket_arn}/*",
-      ]
+  policy_statements = merge(
+    {
+      clean_bucket_read = {
+        effect = "Allow"
+        actions = [
+          "s3:GetObject",
+          "s3:GetObjectVersion",
+          "s3:GetObjectTagging",
+          "s3:GetObjectVersionTagging",
+        ]
+        resources = [
+          "${var.download_bucket_arn}/*",
+        ]
+      }
+      clean_bucket_kms_access = {
+        effect = "Allow"
+        actions = [
+          "kms:Decrypt",
+          "kms:DescribeKey",
+          "kms:GenerateDataKey*",
+        ]
+        resources = [
+          var.download_bucket_kms_key_arn,
+        ]
+      }
+      idempotency_table_access = {
+        effect = "Allow"
+        actions = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+        ]
+        resources = [
+          module.dynamodb_idempotency.dynamodb_table_arn,
+        ]
+      }
+      notification_topic_publish = {
+        effect = "Allow"
+        actions = [
+          "sns:Publish",
+        ]
+        resources = [
+          module.sns_clean_file_client_notifications.topic_arn,
+          module.sns_clean_file_download_notifications.topic_arn,
+        ]
+      }
+    },
+    length(var.client_destination_delivery_secret_names) == 0 ? {} : {
+      destination_api_secret_read = {
+        effect = "Allow"
+        actions = [
+          "secretsmanager:GetSecretValue",
+        ]
+        resources = [
+          for secret_name in var.client_destination_delivery_secret_names :
+          "arn:aws:secretsmanager:${var.aws_region}:${var.account_id}:secret:${secret_name}*"
+        ]
+      }
     }
-    clean_bucket_kms_access = {
-      effect = "Allow"
-      actions = [
-        "kms:Decrypt",
-        "kms:DescribeKey",
-        "kms:GenerateDataKey*",
-      ]
-      resources = [
-        var.download_bucket_kms_key_arn,
-      ]
-    }
-    idempotency_table_access = {
-      effect = "Allow"
-      actions = [
-        "dynamodb:GetItem",
-        "dynamodb:PutItem",
-        "dynamodb:UpdateItem",
-        "dynamodb:DeleteItem",
-      ]
-      resources = [
-        module.dynamodb_idempotency.dynamodb_table_arn,
-      ]
-    }
-    notification_topic_publish = {
-      effect = "Allow"
-      actions = [
-        "sns:Publish",
-      ]
-      resources = [
-        module.sns_clean_file_client_notifications.topic_arn,
-        module.sns_clean_file_download_notifications.topic_arn,
-      ]
-    }
-  }
+  )
 
   attach_policies    = true
   number_of_policies = 1

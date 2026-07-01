@@ -11,7 +11,7 @@ locals {
         "ec2_autoscaling_group_linux",
         "ec2_instance_linux",
         "ec2_instance_oracle_db_with_backup",
-        "ec2_instance_textfile_monitoring",
+        "ec2_instance_textfile_monitoring_with_connectivity_test",
         "ec2_windows",
         "ssm_command",
       ]
