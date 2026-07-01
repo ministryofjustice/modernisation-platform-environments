@@ -190,7 +190,7 @@ locals {
       read_database = "STGNDA"
     }
     audit_target_endpoint = {
-      write_environment = "production"
+      write_environment = "prod"
     }
     user_source_endpoint = {}
     user_target_endpoint = {
