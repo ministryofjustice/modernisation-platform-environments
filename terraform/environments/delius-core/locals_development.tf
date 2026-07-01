@@ -154,7 +154,7 @@ locals {
     }
 
     ldap = {
-      image_tag        = "6.4.3-20916932939-1"
+      image_tag        = "6.5.2.1-28507933108-1"
       container_port   = 389
       slapd_log_level  = "stats"
       container_cpu    = 512
