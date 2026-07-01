@@ -9,6 +9,22 @@
 #   aws iam create-service-linked-role --aws-service-name rds.amazonaws.com
 ###############################################################################
 
+###############################################################################
+# DB Subnet Group
+#
+# Required for ACK to create RDS instances in the cluster's private subnets.
+# Uses a fixed well-known name so the RGD can reference it without needing
+# to know the cluster name.
+###############################################################################
+
+resource "aws_db_subnet_group" "platform" {
+  name        = "platform-db-subnet-group"
+  description = "DB subnet group for platform-managed RDS instances"
+  subnet_ids  = data.aws_subnets.eks_private.ids
+
+  tags = local.tags
+}
+
 resource "aws_iam_role" "ack_capability" {
   name = "${local.cluster_name}-ack-capability"
 
