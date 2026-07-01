@@ -241,7 +241,14 @@ def build_destination_request_headers(config):
         "Accept": "application/json",
         "Content-Type": "application/json",
     }
-    headers.update(config["request_headers"])
+
+    request_headers = config.get("request_headers") or {}
+    if not isinstance(request_headers, dict):
+        raise ValueError(
+            f"request_headers in destination delivery config for client {config.get('client_id')} must be a JSON object"
+        )
+
+    headers.update({str(key): str(value) for key, value in request_headers.items()})
 
     secret_name = config.get("request_auth_secret_name")
     if not secret_name:
