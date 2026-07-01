@@ -138,26 +138,14 @@ resource "aws_vpc_security_group_egress_rule" "ecs-to-rabbitmq-tls" {
   referenced_security_group_id = aws_security_group.rabbitmq.id
 }
 
-# EC2 Instance Connect Endpoint (EICE)
-resource "aws_security_group" "eice" {
-  name        = "${local.application_name_short}-${local.environment}-eice"
-  description = "Controls traffic from the EC2 Instance Connect Endpoint into the VPC"
-  vpc_id      = data.aws_vpc.shared.id
-
-  tags = merge(
-    local.tags,
-    { Name = "${local.application_name_short}-${local.environment}-eice" }
-  )
-}
-
-# EICE Egress
-resource "aws_vpc_security_group_egress_rule" "eice-to-rds" {
-  security_group_id            = aws_security_group.eice.id
-  description                  = "Allow SQL Server tunnels from EICE to RDS"
+# Bastion Ingress
+resource "aws_vpc_security_group_ingress_rule" "rds-from-bastion" {
+  security_group_id            = data.aws_security_group.rds.id
+  description                  = "Allow SQL Server connections from the bastion host"
   ip_protocol                  = "tcp"
   from_port                    = 1433
   to_port                      = 1433
-  referenced_security_group_id = data.aws_security_group.rds.id
+  referenced_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 # RDS Ingress
@@ -169,15 +157,6 @@ resource "aws_vpc_security_group_ingress_rule" "rds-from-ecs" {
   from_port                    = 1433
   to_port                      = 1433
   referenced_security_group_id = aws_security_group.ecs.id
-}
-
-resource "aws_vpc_security_group_ingress_rule" "rds-from-eice" {
-  security_group_id            = data.aws_security_group.rds.id
-  description                  = "Allow SQL Server connections from EICE"
-  ip_protocol                  = "tcp"
-  from_port                    = 1433
-  to_port                      = 1433
-  referenced_security_group_id = aws_security_group.eice.id
 }
 
 # Visualiser ALB Ingress
