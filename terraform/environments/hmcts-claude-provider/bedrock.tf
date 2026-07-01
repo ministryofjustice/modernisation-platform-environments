@@ -21,6 +21,7 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-opus-4-8",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-opus-4-6-v1",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-sonnet-4-6",
+          "arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-5",
           "arn:aws:bedrock:*::foundation-model/anthropic.claude-opus-4-5-20251101-v1:0",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0",
@@ -29,6 +30,7 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-3-haiku-20240307-v1:0",
           # Global foundation model ARN (required for global cross-region inference)
+          "arn:aws:bedrock:::foundation-model/anthropic.claude-sonnet-5",
           "arn:aws:bedrock:::foundation-model/anthropic.claude-opus-4-5-20251101-v1:0",
           # Inference profiles (regional and account-specific)
           "arn:aws:bedrock:*::inference-profile/*",
