@@ -20,68 +20,33 @@ resource "helm_release" "envoy_gateway" {
 
 }
 
-resource "kubernetes_manifest" "envoy_proxy" {
-  manifest = {
-    apiVersion = "gateway.envoyproxy.io/v1alpha1"
-    kind       = "EnvoyProxy"
+resource "kubectl_manifest" "envoy_proxy" {
+  yaml_body = templatefile("${path.module}/templates/envoy-proxy.yaml.tpl", {
+    gateway_name         = var.gateway_name
+    namespace            = kubernetes_namespace_v1.envoy_gateway_system.metadata[0].name
+    envoy_proxy_replicas = var.envoy_proxy_replicas
+    cluster_name         = var.cluster_name
+  })
 
-    metadata = {
-      name      = "${var.gateway_name}-envoy-proxy"
-      namespace = kubernetes_namespace_v1.envoy_gateway_system.metadata[0].name
-    }
-
-    spec = {
-      provider = {
-        type = "Kubernetes"
-
-        kubernetes = {
-          envoyDeployment = {
-            replicas = var.envoy_proxy_replicas
-          }
-
-          envoyService = {
-            type = "LoadBalancer"
-            annotations = {
-              "service.beta.kubernetes.io/aws-load-balancer-name"                  = "${var.cluster_name}-envoy-${var.gateway_name}"
-              "service.beta.kubernetes.io/aws-load-balancer-scheme"                = "internet-facing"
-              "service.beta.kubernetes.io/aws-load-balancer-nlb-target-type"       = "ip"
-              "service.beta.kubernetes.io/aws-load-balancer-healthcheck-protocol"  = "TCP"
-              "service.beta.kubernetes.io/aws-load-balancer-healthcheck-port"      = "traffic-port"
-              "service.beta.kubernetes.io/aws-load-balancer-attributes"            = "load_balancing.cross_zone.enabled=true"
-            }
-          }
-        }
-      }
-    }
-  }
+  server_side_apply = true
+  wait              = true
 
   depends_on = [helm_release.envoy_gateway]
 }
 
-resource "kubernetes_manifest" "gateway_class" {
-  manifest = {
-    apiVersion = "gateway.networking.k8s.io/v1"
-    kind       = "GatewayClass"
+resource "kubectl_manifest" "gateway_class" {
+  yaml_body = templatefile("${path.module}/templates/gateway-class.yaml.tpl", {
+    gateway_class_name = "${var.gateway_name}-gateway-class"
+    envoy_proxy_name   = "${var.gateway_name}-envoy-proxy"
+    namespace          = kubernetes_namespace_v1.envoy_gateway_system.metadata[0].name
+  })
 
-    metadata = {
-      name = "${var.gateway_name}-gateway-class"
-    }
-
-    spec = {
-      controllerName = "gateway.envoyproxy.io/gatewayclass-controller"
-
-      parametersRef = {
-        group     = "gateway.envoyproxy.io"
-        kind      = "EnvoyProxy"
-        name      = "${var.gateway_name}-envoy-proxy"
-        namespace = kubernetes_namespace_v1.envoy_gateway_system.metadata[0].name
-      }
-    }
-  }
+  server_side_apply = true
+  wait              = true
 
   depends_on = [
     helm_release.envoy_gateway,
-    kubernetes_manifest.envoy_proxy
+    kubectl_manifest.envoy_proxy
   ]
 }
 
@@ -94,45 +59,15 @@ resource "kubernetes_manifest" "gateway_class" {
 # Tenants use either:
 # - the platform default ListenerSet and wildcard certificate for quick start, or
 # - create their own ListenerSet in their namespacefor custom cert/hostname control.
+resource "kubectl_manifest" "gateway" {
+  yaml_body = templatefile("${path.module}/templates/gateway.yaml.tpl", {
+    gateway_name       = var.gateway_name
+    namespace          = kubernetes_namespace_v1.envoy_gateway_system.metadata[0].name
+    gateway_class_name = "${var.gateway_name}-gateway-class"
+  })
 
-resource "kubernetes_manifest" "gateway" {
-  manifest = {
-    apiVersion = "gateway.networking.k8s.io/v1"
-    kind       = "Gateway"
+  server_side_apply = true
+  wait              = true
 
-    metadata = {
-      name      = var.gateway_name
-      namespace = kubernetes_namespace_v1.envoy_gateway_system.metadata[0].name
-    }
-
-    spec = {
-      gatewayClassName = kubernetes_manifest.gateway_class.manifest.metadata.name
-
-      listeners = [
-        {
-          name     = "platform-http"
-          protocol = "HTTP"
-          port     = 80
-        },
-        # {
-        #   # Use TLS here because hostname/cert mapping is supplied by ListenerSets.
-        #   name     = "platform-tls"
-        #   protocol = "TLS"
-        #   port     = 443
-        #   tls = {
-        #     mode = "Passthrough"
-        #   }
-        # }
-      ]
-
-      # Any namespace can attach a ListenerSet to this platform Gateway.
-      allowedListeners = {
-        namespaces = {
-          from = "All"
-        }
-      }
-    }
-  }
-
-  depends_on = [kubernetes_manifest.gateway_class]
+  depends_on = [kubectl_manifest.gateway_class]
 }
