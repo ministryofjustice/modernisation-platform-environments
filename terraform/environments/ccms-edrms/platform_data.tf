@@ -112,7 +112,7 @@ data "aws_subnets" "shared_vpce" {
     values = [data.aws_vpc.shared.id]
   }
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-int-endpoint*"
+    Name = "${var.networking[0].business-unit}-${local.environment}-protected*"
   }
 }
 
@@ -120,7 +120,7 @@ data "aws_subnet" "vpce_subnets_a" {
   provider = aws.core-vpc
   vpc_id   = data.aws_vpc.shared.id
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-int-endpoint-${data.aws_region.current.name}a"
+    Name = "${var.networking[0].business-unit}-${local.environment}-protected-${data.aws_region.current.name}a"
   }
 }
 
@@ -128,7 +128,7 @@ data "aws_subnet" "vpce_subnets_b" {
   provider = aws.core-vpc
   vpc_id   = data.aws_vpc.shared.id
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-int-endpoint-${data.aws_region.current.name}b"
+    Name = "${var.networking[0].business-unit}-${local.environment}-protected-${data.aws_region.current.name}b"
   }
 }
 
@@ -136,7 +136,7 @@ data "aws_subnet" "vpce_subnets_c" {
   provider = aws.core-vpc
   vpc_id   = data.aws_vpc.shared.id
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-int-endpoint-${data.aws_region.current.name}c"
+    Name = "${var.networking[0].business-unit}-${local.environment}-protected-${data.aws_region.current.name}c"
   }
 }
 
