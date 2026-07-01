@@ -1,3 +1,5 @@
-# resource "litellm_organization" "ministryofjustice" {
-#   organization_alias = "Ministry of Justice"
-# }
+resource "litellm_organization" "organisations" {
+  for_each = local.environment_configuration.ai_gateway_configuration.organisations
+
+  organization_alias = each.value.organization_alias
+}

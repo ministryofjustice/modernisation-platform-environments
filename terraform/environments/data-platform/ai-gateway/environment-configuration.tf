@@ -1,16 +1,5 @@
 locals {
-  environment_configuration = local.environment_configurations[local.environment]
-  ai_gateway_models         = yamldecode(file("${path.module}/configuration/models.yml"))
-  has_reader                = contains(keys(local.environment_configuration.aurora_instances), "reader")
-  dummy_password            = "iam-auth-dummy-password"
   environment_configurations = {
-    proxy_admin_emails = [
-      "Muhammad.Ahmad@justice.gov.uk",
-      "Jeremy.Collins@justice.gov.uk",
-      "Gary.Henderson1@justice.gov.uk",
-      "Lauren.Taylor-Brown@justice.gov.uk",
-      "Jacob.Woffenden@justice.gov.uk"
-    ]
     development = {
       litellm_version     = "1.90.0"
       ai_gateway_hostname = "development.ai-gateway.justice.gov.uk"
@@ -37,6 +26,23 @@ locals {
         min_replicas                      = 1
         max_replicas                      = 3
         target_cpu_utilization_percentage = 60
+      }
+      ai_gateway_configuration = {
+        organisations = {
+          ministryofjustice = {
+            organization_alias = "Ministry of Justice"
+          }
+        }
+        teams = {
+          justice-data-platform = {
+            team_alias        = "Justice Data Platform"
+            organization_name = "ministryofjustice"
+          }
+          justice-engineering-ai-enablement = {
+            team_alias        = "Justice Engineering AI Enablement"
+            organization_name = "ministryofjustice"
+          }
+        }
       }
       aurora_instance_class = "db.serverless"
       aurora_engine_version = "17.7"
@@ -75,6 +81,19 @@ locals {
         max_replicas                      = 3
         target_cpu_utilization_percentage = 60
       }
+      ai_gateway_configuration = {
+        organisations = {
+          ministryofjustice = {
+            organization_alias = "Ministry of Justice"
+          }
+        }
+        teams = {
+          justice-data-platform = {
+            team_alias        = "Justice Data Platform"
+            organization_name = "ministryofjustice"
+          }
+        }
+      }
       aurora_instance_class = "db.serverless"
       aurora_engine_version = "17.7"
       aurora_instances      = { writer = {} }
@@ -112,6 +131,19 @@ locals {
         max_replicas                      = 3
         target_cpu_utilization_percentage = 60
       }
+      ai_gateway_configuration = {
+        organisations = {
+          ministryofjustice = {
+            organization_alias = "Ministry of Justice"
+          }
+        }
+        teams = {
+          justice-data-platform = {
+            team_alias        = "Justice Data Platform"
+            organization_name = "ministryofjustice"
+          }
+        }
+      }
       aurora_instance_class = "db.serverless"
       aurora_engine_version = "17.7"
       aurora_instances      = { writer = {} }
@@ -148,6 +180,19 @@ locals {
         min_replicas                      = 2
         max_replicas                      = 10
         target_cpu_utilization_percentage = 60
+      }
+      ai_gateway_configuration = {
+        organisations = {
+          ministryofjustice = {
+            organization_alias = "Ministry of Justice"
+          }
+        }
+        teams = {
+          justice-data-platform = {
+            team_alias        = "Justice Data Platform"
+            organization_name = "ministryofjustice"
+          }
+        }
       }
       aurora_instance_class                     = "db.t4g.medium"
       aurora_engine_version                     = "17.7"

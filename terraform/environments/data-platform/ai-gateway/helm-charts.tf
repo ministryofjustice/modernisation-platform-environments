@@ -64,7 +64,7 @@ resource "helm_release" "litellm" {
         bedrockModels = try(local.environment_configuration.ai_gateway_models.bedrock, {})
 
         # Admin
-        proxyAdminEmail = join(", ", local.environment_configurations.proxy_admin_emails)
+        proxyAdminEmail = join(", ", local.proxy_admin_emails)
       }
     )
   ]
@@ -130,7 +130,7 @@ resource "helm_release" "litellm_admin" {
         auditLogsRegion = data.aws_region.current.region
 
         # Admin
-        proxyAdminEmail = join(", ", local.environment_configurations.proxy_admin_emails)
+        proxyAdminEmail = join(", ", local.proxy_admin_emails)
       }
     )
   ]
