@@ -103,35 +103,40 @@ data "aws_subnet" "public_subnets_c" {
   }
 }
 
-# VPC Endpoint subnet lookup (used to identify VPCE subnets)
-data "aws_subnets" "vpce_subnets" {
+# VPC Endpoint subnet lookup (used to identify shared VPCE subnets)
+data "aws_subnets" "shared_vpce" {
+  provider = aws.core-vpc
+
   filter {
     name   = "vpc-id"
     values = [data.aws_vpc.shared.id]
   }
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-int-endpoint*"
+    Name = "${var.networking[0].business-unit}-${local.environment}-int-endpoint*"
   }
 }
 
-data "aws_subnet" "vpce_subnet_a" {
-  vpc_id = data.aws_vpc.shared.id
+data "aws_subnet" "vpce_subnets_a" {
+  provider = aws.core-vpc
+  vpc_id   = data.aws_vpc.shared.id
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-int-endpoint-${data.aws_region.current.name}a"
+    Name = "${var.networking[0].business-unit}-${local.environment}-int-endpoint-${data.aws_region.current.name}a"
   }
 }
 
-data "aws_subnet" "vpce_subnet_b" {
-  vpc_id = data.aws_vpc.shared.id
+data "aws_subnet" "vpce_subnets_b" {
+  provider = aws.core-vpc
+  vpc_id   = data.aws_vpc.shared.id
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-int-endpoint-${data.aws_region.current.name}b"
+    Name = "${var.networking[0].business-unit}-${local.environment}-int-endpoint-${data.aws_region.current.name}b"
   }
 }
 
-data "aws_subnet" "vpce_subnet_c" {
-  vpc_id = data.aws_vpc.shared.id
+data "aws_subnet" "vpce_subnets_c" {
+  provider = aws.core-vpc
+  vpc_id   = data.aws_vpc.shared.id
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-int-endpoint-${data.aws_region.current.name}c"
+    Name = "${var.networking[0].business-unit}-${local.environment}-int-endpoint-${data.aws_region.current.name}c"
   }
 }
 

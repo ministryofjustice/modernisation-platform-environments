@@ -65,9 +65,9 @@ resource "aws_security_group_rule" "ecs_tasks_egress_vpce" {
   from_port         = 443
   to_port           = 443
   cidr_blocks = [
-    data.aws_subnet.vpce_subnet_a.cidr_block,
-    data.aws_subnet.vpce_subnet_b.cidr_block,
-    data.aws_subnet.vpce_subnet_c.cidr_block,
+    data.aws_subnet.vpce_subnets_a.cidr_block,
+    data.aws_subnet.vpce_subnets_b.cidr_block,
+    data.aws_subnet.vpce_subnets_c.cidr_block,
   ]
 }
 
@@ -163,9 +163,9 @@ resource "aws_security_group_rule" "cluster_ec2_egress_vpce" {
   from_port         = 443
   to_port           = 443
   cidr_blocks = [
-    data.aws_subnet.vpce_subnet_a.cidr_block,
-    data.aws_subnet.vpce_subnet_b.cidr_block,
-    data.aws_subnet.vpce_subnet_c.cidr_block,
+    data.aws_subnet.vpce_subnets_a.cidr_block,
+    data.aws_subnet.vpce_subnets_b.cidr_block,
+    data.aws_subnet.vpce_subnets_c.cidr_block,
   ]
 }
 
