@@ -179,7 +179,7 @@ locals {
   }
 
   dms_config_stage = {
-    deploy_dms                 = false
+    deploy_dms                 = true
     replication_instance_class = "dms.t3.medium"
     engine_version             = "3.5.4"
 
@@ -190,13 +190,9 @@ locals {
       read_database = "STGNDA"
     }
     audit_target_endpoint = {
-      write_environment = "stage" # Until production exists set dummy replication target
-      write_database    = "NONE"  # Remove this dummy attribute once production target exists
+      write_environment = "production"
     }
-    user_source_endpoint = { # Set this map to {} once production exists
-      read_host     = "primarydb"
-      read_database = "NONE"
-    }
+    user_source_endpoint = {}
     user_target_endpoint = {
       write_database = "STGNDA"
     }
