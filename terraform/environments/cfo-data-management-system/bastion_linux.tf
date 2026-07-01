@@ -1,6 +1,17 @@
 locals {
   # SSH public keys
   public_key_data = jsondecode(file("./bastion_linux.json"))
+
+  # Trimmed tags due to S3 Objects limit of 10 tags
+  bastion_tags = {
+    application            = local.tags["application"]
+    business-unit          = local.tags["business-unit"]
+    environment-name       = local.tags["environment-name"]
+    infrastructure-support = local.tags["infrastructure-support"]
+    is-production          = tostring(local.is-production)
+    owner                  = local.tags["owner"]
+    service-area           = local.tags["service-area"]
+  }
 }
 
 # MP Bastion Linux module - https://github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux
@@ -26,6 +37,6 @@ module "bastion_linux" {
   environment   = local.environment
   region        = "eu-west-2"
 
-  tags_common = local.tags
+  tags_common = local.bastion_tags
   tags_prefix = terraform.workspace
 }
