@@ -151,21 +151,23 @@ resource "aws_lambda_permission" "allow_eventbridge_ssm_patch_completion" {
   source_arn    = aws_cloudwatch_event_rule.ssm_patch_completion[each.key].arn
 }
 
-############################################################################
-# EventBridge Rule for S3 Replication Failures to Justice Digital S3 Buckets
-############################################################################
+######################################################
+# EventBridge Rule for S3 Replication Failures
+######################################################
 
 resource "aws_cloudwatch_event_rule" "s3_replication_failure" {
-  name        = "s3-replication-failure"
-  description = "Capture S3 replication failure events"
-
+  name          = "s3-replication-failure"
+  description   = "Capture S3 replication failure events"
   event_pattern = <<EOF
 {
   "source": ["aws.s3"],
-  "detail-type": ["Object Replication Event"],
+  "detail-type": ["AWS API Call via CloudTrail"],
   "detail": {
-    "replication-status": ["FAILED"]
-  }
+    "userIdentity": {
+      "invokedBy": ["s3.amazonaws.com"]
+    },
+    "errorCode": [{ "exists": true }],
+    "eventName": ["PutObject", "ReplicateObject", "ReplicateDelete", "ReplicateTags"]
 }
 EOF
 }
