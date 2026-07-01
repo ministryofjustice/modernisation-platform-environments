@@ -5,6 +5,8 @@ locals {
 
   serco_fms_key_distribution_files_prefix = "files"
 
+  serco_fms_key_distribution_state_prefix = "state"
+
   serco_fms_key_distribution_config_prefix = "config"
 
   serco_fms_key_distribution_allowlist_key = (
@@ -66,45 +68,4 @@ resource "aws_s3_bucket_logging" "serco_fms_key_distribution" {
       partition_date_source = "EventTime"
     }
   }
-}
-
-resource "aws_s3_object" "serco_fms_key_distribution_allowlist" {
-  bucket = module.s3-serco-fms-key-distribution-bucket.bucket.id
-  key    = local.serco_fms_key_distribution_allowlist_key
-
-  content_type = "application/json"
-
-  content = jsonencode({
-    schema_version = "1.0"
-    environment    = local.environment_shorthand
-    enabled        = true
-    test_mode      = true
-
-    notify_recipients = [
-      {
-        email        = "Khristiania.Raihan@justice.gov.uk"
-        name         = "EM test recipient"
-        organisation = "EM Data Hub"
-        enabled      = true
-      }
-    ]
-
-    claim_recipients = [
-      {
-        email                = "Khristiania.Raihan@justice.gov.uk"
-        name                 = "EM test recipient"
-        organisation         = "EM Data Hub"
-        enabled              = true
-        can_claim_file       = true
-        can_request_password = true
-      }
-    ]
-  })
-
-  tags = merge(
-    local.tags,
-    {
-      purpose = "serco-fms-key-distribution-allowlist"
-    }
-  )
 }
