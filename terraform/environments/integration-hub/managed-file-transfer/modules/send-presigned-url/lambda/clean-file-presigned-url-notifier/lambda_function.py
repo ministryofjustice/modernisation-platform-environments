@@ -213,6 +213,11 @@ def get_destination_delivery_config(client_id):
     if not request_url:
         raise ValueError(f"Missing request_url in destination delivery config for client {client_id}")
 
+    from urllib.parse import urlsplit
+
+    if urlsplit(request_url).scheme != "https":
+        raise ValueError(f"Destination delivery request_url for client {client_id} must use https")
+
     return {
         "client_id": client_id,
         "request_auth_secret_name": config.get("request_auth_secret_name"),
