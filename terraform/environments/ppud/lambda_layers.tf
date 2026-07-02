@@ -7,7 +7,7 @@
 data "aws_s3_bucket" "layer_buckets" {
   for_each = {
     for env, bucket_name in {
-      development   = "moj-infrastructure-dev"
+      development   = "moj-general-infrastructure-dev"
       preproduction = "moj-infrastructure-uat"
       production    = "moj-infrastructure"
     } : env => bucket_name
