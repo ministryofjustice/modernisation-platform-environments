@@ -1,7 +1,7 @@
 resource "helm_release" "ai_gateway_configuration" {
   name      = "${local.component_name}-configuration"
   chart     = "${path.module}/src/helm/charts/${local.component_name}-configuration"
-  version   = "1.4.1"
+  version   = "1.4.2"
   namespace = module.ai_gateway_namespace.name
 
   values = [
@@ -64,7 +64,7 @@ resource "helm_release" "litellm" {
         bedrockModels = try(local.environment_configuration.ai_gateway_models.bedrock, {})
 
         # Admin
-        proxyAdminEmail = join(", ", local.environment_configurations.proxy_admin_emails)
+        proxyAdminEmail = join(", ", local.proxy_admin_emails)
       }
     )
   ]
@@ -130,7 +130,7 @@ resource "helm_release" "litellm_admin" {
         auditLogsRegion = data.aws_region.current.region
 
         # Admin
-        proxyAdminEmail = join(", ", local.environment_configurations.proxy_admin_emails)
+        proxyAdminEmail = join(", ", local.proxy_admin_emails)
       }
     )
   ]

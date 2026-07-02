@@ -43,7 +43,7 @@ module "ai_gateway_aurora" {
   iam_role_use_name_prefix    = true
 
   iam_database_authentication_enabled = true
-  apply_immediately                   = true
+  apply_immediately                   = false
 }
 
 module "ai_gateway_aurora_secret" {

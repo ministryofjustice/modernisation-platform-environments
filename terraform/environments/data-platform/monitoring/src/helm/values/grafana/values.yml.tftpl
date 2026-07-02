@@ -23,6 +23,14 @@ serviceAccount:
   create: false
   name: grafana-irsa
 
+# Create a ServiceMonitor (a Prometheus Operator CRD that Cloud Platform
+# reconciles for tenant namespaces) so the cluster's Prometheus scrapes Grafana's
+# own /metrics endpoint and we can observe Grafana itself. This is the legitimate
+# in-cluster scrape path; the ingress below separately blackholes /metrics so the
+# endpoint stays unreachable from outside the cluster.
+serviceMonitor:
+  enabled: true
+
 # Cloud Platform enforces (via a Gatekeeper policy) that every ingress carries
 # external-dns weight and set-identifier annotations so Route 53 records are
 # weighted across its blue/green clusters. The set-identifier must be unique:

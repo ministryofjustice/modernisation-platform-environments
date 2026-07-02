@@ -9,6 +9,7 @@ locals {
     "am_stg${local.dbt_suffix}",
     "intermediate_tasking${local.dbt_suffix}"
   ]
+
   load_lambda_databases = [
     "staged_mdss${local.dbt_suffix}",
     "acquisitive_crime${local.dbt_suffix}",
@@ -2321,6 +2322,11 @@ resource "aws_iam_role" "merge_load_ac" {
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
+resource "aws_iam_role" "merge_load_emdi" {
+  name               = "merge_load_emdi_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
 data "aws_iam_policy_document" "merge_load_policy_document" {
   statement {
     sid    = "AthenaPermissions"
@@ -2505,6 +2511,40 @@ resource "aws_lakeformation_permissions" "merge_load_event_lambda_s3_access" {
   }
 }
 
+# merge load emdi
+resource "aws_iam_role_policy_attachment" "merge_load_emdi_attach" {
+  role       = aws_iam_role.merge_load_emdi.name
+  policy_arn = aws_iam_policy.merge_load.arn
+}
+
+
+resource "aws_lakeformation_permissions" "merge_load_emdi_lambda_database_access" {
+  for_each    = local.is-development || local.is-test || local.is-preproduction ? toset(local.load_lambda_databases) : []
+  principal   = aws_iam_role.merge_load_emdi.arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = each.value
+  }
+}
+
+resource "aws_lakeformation_permissions" "merge_load_emdi_lambda_table_access" {
+  for_each    = local.is-development || local.is-test || local.is-preproduction ? toset(local.load_lambda_databases) : []
+  principal   = aws_iam_role.merge_load_emdi.arn
+  permissions = ["SELECT", "INSERT", "ALTER", "DESCRIBE"]
+  table {
+    database_name = each.value
+    wildcard      = true
+  }
+}
+
+resource "aws_lakeformation_permissions" "merge_load_emdi_lambda_s3_access" {
+  count       = local.is-production ? 0 : 1
+  principal   = aws_iam_role.merge_load_emdi.arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+  data_location {
+    arn = aws_lakeformation_resource.data_bucket.arn
+  }
+}
 
 # -----------------------------------------------------------------------------------
 # Macie Unstructured Job
