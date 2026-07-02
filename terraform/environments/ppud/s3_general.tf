@@ -223,7 +223,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "s3_general" {
   }
 }
 
-
 resource "aws_s3_bucket_notification" "s3_general" {
   for_each    = local.s3_general_buckets
   bucket      = aws_s3_bucket.s3_general[each.key].id
