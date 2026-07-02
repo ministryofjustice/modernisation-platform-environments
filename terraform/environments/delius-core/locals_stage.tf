@@ -179,7 +179,7 @@ locals {
   }
 
   dms_config_stage = {
-    deploy_dms                 = true
+    deploy_dms                 = false
     replication_instance_class = "dms.t3.medium"
     engine_version             = "3.5.4"
 
