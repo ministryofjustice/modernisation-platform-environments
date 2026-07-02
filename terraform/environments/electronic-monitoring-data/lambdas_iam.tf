@@ -2538,7 +2538,7 @@ resource "aws_lakeformation_permissions" "merge_load_emdi_lambda_table_access" {
 }
 
 resource "aws_lakeformation_permissions" "merge_load_emdi_lambda_s3_access" {
-  count       = local.is-production 0 : 1
+  count       = local.is-production ? 0 : 1
   principal   = aws_iam_role.merge_load_emdi.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
