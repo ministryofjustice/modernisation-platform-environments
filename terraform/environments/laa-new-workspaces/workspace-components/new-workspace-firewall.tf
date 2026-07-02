@@ -403,3 +403,46 @@ resource "aws_networkfirewall_firewall" "workspaces_web_allowlist" {
     Name = "workspaces-web-allowlist-firewall"
   }
 }
+
+# CloudWatch Log Groups for firewall
+resource "aws_cloudwatch_log_group" "firewall_flow_logs" {
+  name              = "/aws/network-firewall/workspaces/flow-logs"
+  retention_in_days = 7
+
+  tags = {
+    Name = "workspaces-firewall-flow-logs"
+  }
+}
+
+resource "aws_cloudwatch_log_group" "firewall_alert_logs" {
+  name              = "/aws/network-firewall/workspaces/alert-logs"
+  retention_in_days = 7
+
+  tags = {
+    Name = "workspaces-firewall-alert-logs"
+  }
+}
+
+# Enable firewall logging
+resource "aws_networkfirewall_logging_configuration" "workspaces" {
+  firewall_arn = aws_networkfirewall_firewall.workspaces_web_allowlist.arn
+  logging_configuration {
+    log_destination_config {
+      log_destination = {
+        logGroup = aws_cloudwatch_log_group.firewall_alert_logs.name
+      }
+      log_destination_type = "CloudWatchLogs"
+      log_type             = "ALERT"
+    }
+
+    log_destination_config {
+      log_destination = {
+        logGroup = aws_cloudwatch_log_group.firewall_flow_logs.name
+      }
+      log_destination_type = "CloudWatchLogs"
+      log_type             = "FLOW"
+    }
+
+
+  }
+}
