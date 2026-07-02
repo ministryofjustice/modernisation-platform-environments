@@ -12,18 +12,18 @@
 ###############################################################################
 # DB Subnet Group
 #
-# Required for ACK to create RDS instances in the cluster's private subnets.
-# Uses a fixed well-known name so the RGD can reference it without needing
-# to know the cluster name.
+# PREREQUISITE: DB subnet group and RDS service-linked role must exist in the
+# account before ACK can create RDS instances. These are one-time manual
+# prerequisites — see findings doc for details.
 ###############################################################################
 
-resource "aws_db_subnet_group" "platform" {
-  name        = "platform-db-subnet-group"
-  description = "DB subnet group for platform-managed RDS instances"
-  subnet_ids  = data.aws_subnets.private.ids
-
-  tags = local.tags
-}
+# resource "aws_db_subnet_group" "platform" {
+#   name        = "platform-db-subnet-group"
+#   description = "DB subnet group for platform-managed RDS instances"
+#   subnet_ids  = data.aws_subnets.private.ids
+#
+#   tags = local.tags
+# }
 
 resource "aws_iam_role" "ack_capability" {
   name = "${local.cluster_name}-ack-capability"
