@@ -310,6 +310,38 @@ resource "aws_networkfirewall_rule_group" "workspaces_onedrive_live_misc" {
 #   }
 # }
 
+
+# -----------------------------------------------------------------------------
+# Rule Group 5 — LAA Applications
+# Covers: 
+# -----------------------------------------------------------------------------
+resource "aws_networkfirewall_rule_group" "workspaces_laa_apps" {
+  name     = "workspaces-laa-apps"
+  capacity = 200
+  type     = "STATEFUL"
+
+  rule_group {
+    stateful_rule_options {
+      rule_order = "STRICT_ORDER"
+    }
+    rules_source {
+      rules_source_list {
+        generated_rules_type = "ALLOWLIST"
+        target_types         = ["TLS_SNI", "HTTP_HOST"]
+        targets = [
+          ".laa-development.modernisation-platform.service.justice.gov.uk"
+        ]
+      }
+    }
+  }
+
+  tags = {
+    Name = "workspaces-laa-apps"
+  }
+}
+
+
+
 # -----------------------------------------------------------------------------
 # WorkSpaces Network Firewall policy and firewall
 # -----------------------------------------------------------------------------
@@ -341,10 +373,12 @@ resource "aws_networkfirewall_firewall_policy" "workspaces_web_allowlist" {
       priority     = 2
     }
 
-    # stateful_rule_group_reference {
-    #   resource_arn = aws_networkfirewall_rule_group.workspaces_certificate_authorities.arn
-    #   priority     = 2
-    # }
+    stateful_rule_group_reference {
+      resource_arn = aws_networkfirewall_rule_group.workspaces_laa_apps.arn
+      priority     = 3
+    }
+
+
   }
 
   tags = {
