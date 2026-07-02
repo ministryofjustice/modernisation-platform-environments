@@ -39,6 +39,11 @@ data "aws_iam_policy_document" "lambda_assume" {
       type        = "Service"
       identifiers = ["lambda.amazonaws.com"]
     }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
   }
 }
 
@@ -109,14 +114,16 @@ resource "aws_lambda_function" "inspector_report" {
   #checkov:skip=CKV_AWS_116:DLQ not required for scheduled reporting
   #checkov:skip=CKV_AWS_117:VPC not required - Lambda only calls AWS APIs via service endpoints
   #checkov:skip=CKV_AWS_272:code signing not required
-  count            = contains(local.deploy_to, local.environment) ? 1 : 0
-  function_name    = "${local.name}-inspector-report"
-  role             = aws_iam_role.lambda_inspector[0].arn
-  filename         = data.archive_file.lambda_inspector.output_path
-  source_code_hash = data.archive_file.lambda_inspector.output_base64sha256
-  handler          = "inspector_report.handler"
-  runtime          = "python3.13"
-  kms_key_arn      = aws_kms_key.inspector_s3[0].arn
+  #checkov:skip=CKV_AWS_50:X-Ray tracing not required for scheduled reporting
+  count                          = contains(local.deploy_to, local.environment) ? 1 : 0
+  function_name                  = "${local.name}-inspector-report"
+  role                           = aws_iam_role.lambda_inspector[0].arn
+  filename                       = data.archive_file.lambda_inspector.output_path
+  source_code_hash               = data.archive_file.lambda_inspector.output_base64sha256
+  handler                        = "inspector_report.handler"
+  runtime                        = "python3.13"
+  kms_key_arn                    = aws_kms_key.inspector_s3[0].arn
+  reserved_concurrent_executions = 1
 
   environment {
     variables = {
@@ -139,6 +146,11 @@ data "aws_iam_policy_document" "scheduler_assume" {
     principals {
       type        = "Service"
       identifiers = ["scheduler.amazonaws.com"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
     }
   }
 }
