@@ -4,6 +4,16 @@ variable "report_schedule" {
   default     = "rate(1 day)"
 }
 
+variable "report_format" {
+  description = "Format for the Inspector findings report. Valid values are JSON or CSV."
+  type        = string
+  default     = "CSV"
+  validation {
+    condition     = contains(["JSON", "CSV"], var.report_format)
+    error_message = "report_format must be JSON or CSV."
+  }
+}
+
 variable "inspector_filters" {
   description = <<-EOT
     Optional Inspector filter criteria passed directly to CreateFindingsReport.

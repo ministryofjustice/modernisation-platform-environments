@@ -88,7 +88,7 @@ data "archive_file" "lambda_inspector" {
           client = boto3.client("inspector2")
           filters = json.loads(os.environ.get("INSPECTOR_FILTERS", "{}"))
           params = {
-              "reportFormat": "JSON",
+              "reportFormat": os.environ.get("REPORT_FORMAT", "JSON"),
               "s3Destination": {
                   "bucketName": os.environ["BUCKET_NAME"],
                   "kmsKeyArn":  os.environ["KMS_KEY_ARN"],
@@ -129,6 +129,7 @@ resource "aws_lambda_function" "inspector_report" {
     variables = {
       BUCKET_NAME       = aws_s3_bucket.inspector_reports[0].bucket
       KMS_KEY_ARN       = aws_kms_key.inspector_s3[0].arn
+      REPORT_FORMAT     = var.report_format
       INSPECTOR_FILTERS = length(var.inspector_filters) > 0 ? jsonencode(var.inspector_filters) : "{}"
     }
   }
