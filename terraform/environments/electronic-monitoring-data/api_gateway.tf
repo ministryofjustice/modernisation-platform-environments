@@ -152,6 +152,11 @@ resource "aws_vpc_security_group_ingress_rule" "allow_cp_access" {
   to_port     = 443
 }
 
+resource "aws_vpc_endpoint_security_group_association" "cp_access_to_vpc_endpoint" {
+  vpc_endpoint_id   = data.aws_vpc_endpoint.api_gateway.id
+  security_group_id = aws_security_group.allow_cp_access.id
+}
+
 data "aws_network_interface" "execute_api_endpoint_eni" {
   provider = aws.core-vpc
   for_each = toset(data.aws_vpc_endpoint.api_gateway.network_interface_ids)
