@@ -12,7 +12,7 @@ locals {
     }
     preproduction = {
       condition   = local.is-preproduction
-      s3_bucket   = "moj-infrastructure-uat"
+      s3_bucket   = "moj-general-infrastructure-uat"
       account_key = "ppud-preproduction" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
     }
     production = {

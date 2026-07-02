@@ -8,7 +8,7 @@ locals {
       database_source_dev = {
         condition               = local.is-development
         bucket_name             = "moj-database-source-dev"
-        log_bucket              = "moj-log-files-dev"
+        log_bucket              = "moj-general-logs-dev"
         log_prefix              = "s3-logs/moj-database-source-dev-logs/"
         lifecycle_id            = "delete-moj-database-source-dev"
         expiration_days         = 6
@@ -20,7 +20,7 @@ locals {
       report_source_dev = {
         condition               = local.is-development
         bucket_name             = "moj-report-source-dev"
-        log_bucket              = "moj-log-files-dev"
+        log_bucket              = "moj-general-logs-dev"
         log_prefix              = "s3-logs/moj-report-source-dev-logs/"
         lifecycle_id            = "delete-moj-report-source-dev"
         expiration_days         = 6
@@ -32,7 +32,7 @@ locals {
       database_source_uat = {
         condition               = local.is-preproduction
         bucket_name             = "moj-database-source-uat"
-        log_bucket              = "moj-log-files-uat"
+        log_bucket              = "moj-general-logs-uat"
         log_prefix              = "s3-logs/moj-database-source-uat-logs/"
         lifecycle_id            = "delete-moj-database-source-uat"
         expiration_days         = 6
@@ -44,7 +44,7 @@ locals {
       report_source_uat = {
         condition               = local.is-preproduction
         bucket_name             = "moj-report-source-uat"
-        log_bucket              = "moj-log-files-uat"
+        log_bucket              = "moj-general-logs-uat"
         log_prefix              = "s3-logs/moj-report-source-uat-logs/"
         lifecycle_id            = "delete-moj-report-source-uat"
         expiration_days         = 6
