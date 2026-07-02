@@ -140,15 +140,6 @@ data "aws_subnet" "vpce_subnets_c" {
   }
 }
 
-data "aws_security_group" "vpce" {
-  provider = aws.core-vpc
-
-  filter {
-    name   = "tag:Name"
-    values = ["${var.networking[0].business-unit}-${local.environment}-int-endpoint"]
-  }
-}
-
 # Route53 DNS data
 data "aws_route53_zone" "external" {
   provider = aws.core-vpc
