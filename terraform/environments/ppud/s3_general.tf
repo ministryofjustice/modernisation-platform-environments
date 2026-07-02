@@ -223,22 +223,21 @@ resource "aws_s3_bucket_lifecycle_configuration" "s3_general" {
   }
 }
 
-/*
-# S3 Bucket Notification disabled by default but can be turned on if required
 
 resource "aws_s3_bucket_notification" "s3_general" {
-  for_each = local.s3_general_buckets
-  bucket   = aws_s3_bucket.s3_general[each.key].id
-  topic {
-    topic_arn = local.is-production ? aws_sns_topic.s3_bucket_notifications_prod[0].arn : (
-      local.is-preproduction ? aws_sns_topic.s3_bucket_notifications_uat[0].arn :
-      aws_sns_topic.s3_bucket_notifications_dev[0].arn
-    )
-    events        = ["s3:ObjectCreated:*"]
-    filter_prefix = ""
-  }
+  for_each    = local.s3_general_buckets
+  bucket      = aws_s3_bucket.s3_general[each.key].id
+  eventbridge = true
+  # Uncomment to re-enable SNS notifications
+  #topic {
+  #  topic_arn = local.is-production ? aws_sns_topic.s3_bucket_notifications_prod[0].arn : (
+  #    local.is-preproduction ? aws_sns_topic.s3_bucket_notifications_uat[0].arn :
+  #    aws_sns_topic.s3_bucket_notifications_dev[0].arn
+  #  )
+  #  events        = ["s3:ObjectCreated:*"]
+  #  filter_prefix = ""
+  #}
 }
-*/
 
 # Standard S3 Bucket policy for all buckets
 # Infrastructure buckets also include CrossAccountEC2Access when local.cross_account_access[key] = true

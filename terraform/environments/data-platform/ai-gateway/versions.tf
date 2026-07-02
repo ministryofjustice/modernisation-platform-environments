@@ -20,6 +20,10 @@ terraform {
       version = "~> 3.0"
       source  = "hashicorp/null"
     }
+    litellm = {
+      source  = "ncecere/litellm"
+      version = "~> 2.0"
+    }
   }
   required_version = "~> 1.0"
 }
