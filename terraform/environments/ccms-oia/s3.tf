@@ -56,6 +56,24 @@ module "s3_ccms_oia" {
             "aws:SecureTransport" : "false"
           }
         }
+      },
+      {
+        "Sid" = "RestrictToTLSRequestsOnly",
+        "Action" : "s3:*",
+        "Effect" : "Deny",
+        "Resource" : [
+          module.s3_ccms_oia.bucket.arn,
+          "${module.s3_ccms_oia.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          },
+          "NumericLessThan" : {
+            "aws:TLSVersion" : "1.2"
+          }
+        },
+        "Principal" : "*"
       }
     ]
   })]
@@ -172,6 +190,9 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         Action   = "s3:*",
         Resource = ["${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}"],
         Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
           NumericLessThan = {
             "s3:TlsVersion" = "1.2"
           }
@@ -271,6 +292,9 @@ resource "aws_s3_bucket_policy" "shared_bucket_policy" {
         Action   = "s3:*",
         Resource = ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
         Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
           NumericLessThan = {
             "s3:TlsVersion" = "1.2"
           }
