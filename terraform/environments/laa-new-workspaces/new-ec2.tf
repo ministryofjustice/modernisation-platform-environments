@@ -51,7 +51,7 @@ resource "aws_instance" "user_creation_ec2" {
   user_data = <<-USERDATA
     <powershell>
     # Set DNS servers: AD DNS (from AWS Managed AD) + AWS VPC DNS (for SSM connectivity)
-    $adDnsServers = @("${aws_directory_service_directory.workspaces_ad.dns_ip_addresses[0]}", "${aws_directory_service_directory.workspaces_ad.dns_ip_addresses[1]}", "${cidrhost(local.application_data.accounts[local.environment].vpc_cidr, 2)}")
+    $adDnsServers = @("${tolist(aws_directory_service_directory.workspaces_ad.dns_ip_addresses)[0]}", "${tolist(aws_directory_service_directory.workspaces_ad.dns_ip_addresses)[1]}", "${cidrhost(local.application_data.accounts[local.environment].vpc_cidr, 2)}")
     $interfaceAlias = (Get-NetAdapter | Where-Object {$_.Status -eq "Up"} | Select-Object -First 1).Name
     Set-DnsClientServerAddress -InterfaceAlias $interfaceAlias -ServerAddresses $adDnsServers
 
@@ -95,7 +95,7 @@ resource "aws_instance" "user_creation_ec2" {
     <powershell>
     # This runs after domain join restart
     # Re-set DNS servers: AD DNS (from AWS Managed AD) + AWS VPC DNS (for SSM connectivity)
-    $adDnsServers = @("${aws_directory_service_directory.workspaces_ad.dns_ip_addresses[0]}", "${aws_directory_service_directory.workspaces_ad.dns_ip_addresses[1]}", "${cidrhost(local.application_data.accounts[local.environment].vpc_cidr, 2)}")
+    $adDnsServers = @("${tolist(aws_directory_service_directory.workspaces_ad.dns_ip_addresses)[0]}", "${tolist(aws_directory_service_directory.workspaces_ad.dns_ip_addresses)[1]}", "${cidrhost(local.application_data.accounts[local.environment].vpc_cidr, 2)}")
     $interfaceAlias = (Get-NetAdapter | Where-Object {$_.Status -eq "Up"} | Select-Object -First 1).Name
     Set-DnsClientServerAddress -InterfaceAlias $interfaceAlias -ServerAddresses $adDnsServers
     
