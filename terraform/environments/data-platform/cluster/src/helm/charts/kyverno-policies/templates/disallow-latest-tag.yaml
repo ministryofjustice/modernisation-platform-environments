@@ -13,7 +13,6 @@ metadata:
       a specific version of an application Pod. This policy validates that the image
       specifies a tag and that it is not called `latest`.      
 spec:
-  validationFailureAction: {{ .Values.validationFailureAction }}
   background: true
   rules:
   - name: require-image-tag
@@ -22,6 +21,7 @@ spec:
         kinds:
         - Pod
     validate:
+      failureAction: {{ .Values.failureAction }}
       message: "An image tag is required."
       pattern:
         spec:
@@ -33,6 +33,7 @@ spec:
         kinds:
         - Pod
     validate:
+      failureAction: {{ .Values.failureAction }}
       message: "Using a mutable image tag e.g. 'latest' is not allowed."
       pattern:
         spec:

@@ -1,2 +1,2 @@
 ---
-validationFailureAction: audit
+failureAction: Audit
