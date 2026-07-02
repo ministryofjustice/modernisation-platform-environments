@@ -19,20 +19,13 @@ locals {
     development = {
       default = [
         {
-          id     = "abort-incomplete-multipart-upload-after-1-day"
-          status = "Enabled"
-          filter = {}
-          abort_incomplete_multipart_upload = {
-            days_after_initiation = 1
-          }
-        },
-        {
           id     = "expire-objects-after-1-day"
           status = "Enabled"
           filter = {}
           expiration = {
             days = 1
           }
+          abort_incomplete_multipart_upload_days = 1
         },
       ]
     }
@@ -40,20 +33,13 @@ locals {
     production = {
       default = [
         {
-          id     = "abort-incomplete-multipart-upload-after-1-day"
-          status = "Enabled"
-          filter = {}
-          abort_incomplete_multipart_upload = {
-            days_after_initiation = 1
-          }
-        },
-        {
           id     = "expire-objects-after-1-day"
           status = "Enabled"
           filter = {}
           expiration = {
-            days = 1
+            days = 14
           }
+          abort_incomplete_multipart_upload_days = 1
         },
       ]
     }
