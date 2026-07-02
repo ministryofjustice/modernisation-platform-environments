@@ -235,6 +235,12 @@ module "send_serco_fms_keys" {
       local.serco_fms_key_distribution_notify_template_id
     )
 
+    CLAIM_PAGE_URL = (
+      aws_lambda_function_url.serco_fms_claim_page.function_url
+    )
+
+    CLAIM_TOKEN_TTL_HOURS = "168"
+
     DISTRIBUTION_BUCKET = (
       module.s3-serco-fms-key-distribution-bucket.bucket.id
     )
@@ -250,8 +256,7 @@ module "send_serco_fms_keys" {
 
     ALLOWLIST_KEY = local.serco_fms_key_distribution_allowlist_key
 
-    MAX_SECRET_AGE_HOURS         = "48"
-    NOTIFY_FILE_RETENTION_PERIOD = "1 week"
+    MAX_SECRET_AGE_HOURS = "48"
   }
 }
 
