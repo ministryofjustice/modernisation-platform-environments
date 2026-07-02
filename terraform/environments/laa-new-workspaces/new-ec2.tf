@@ -50,11 +50,11 @@ resource "aws_instance" "user_creation_ec2" {
   # Domain join and script deployment configuration
   user_data = <<-USERDATA
     <powershell>
-    # Set DNS servers to AD DNS before domain join
-    $adDnsServers = @("10.200.1.245", "10.200.2.11")
+    # Set DNS servers: AD DNS + AWS VPC DNS (for SSM connectivity)
+    $adDnsServers = @("10.200.1.245", "10.200.2.11", "${cidrhost(local.application_data.accounts[local.environment].vpc_cidr, 2)}")
     $interfaceAlias = (Get-NetAdapter | Where-Object {$_.Status -eq "Up"} | Select-Object -First 1).Name
     Set-DnsClientServerAddress -InterfaceAlias $interfaceAlias -ServerAddresses $adDnsServers
-    
+
     Write-Host "DNS servers configured: $adDnsServers"
     Start-Sleep -Seconds 5
     
@@ -94,8 +94,8 @@ resource "aws_instance" "user_creation_ec2" {
     <persist>true</persist>
     <powershell>
     # This runs after domain join restart
-    # Re-set DNS servers (in case they were reset)
-    $adDnsServers = @("10.200.1.245", "10.200.2.11")
+    # Re-set DNS servers: AD DNS + AWS VPC DNS (for SSM connectivity)
+    $adDnsServers = @("10.200.1.245", "10.200.2.11", "${cidrhost(local.application_data.accounts[local.environment].vpc_cidr, 2)}")
     $interfaceAlias = (Get-NetAdapter | Where-Object {$_.Status -eq "Up"} | Select-Object -First 1).Name
     Set-DnsClientServerAddress -InterfaceAlias $interfaceAlias -ServerAddresses $adDnsServers
     
