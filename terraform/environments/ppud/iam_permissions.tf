@@ -177,7 +177,7 @@ locals {
       condition   = local.is-development
       account_key = "ppud-development" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
       s3_bucket_names = {
-        infrastructure = "moj-infrastructure-dev"
+        infrastructure = "moj-general-infrastructure-dev"
         log_files      = "moj-general-logs-dev"
       }
     }
