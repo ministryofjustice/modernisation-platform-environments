@@ -58,13 +58,17 @@ resource "aws_security_group_rule" "ecs_tasks_edrms" {
 }
 
 resource "aws_security_group_rule" "ecs_tasks_egress_vpce" {
-  security_group_id        = aws_security_group.ecs_tasks_edrms.id
-  type                     = "egress"
-  description              = "Allow egress to VPC endpoints (S3 / Secrets Manager)"
-  protocol                 = "TCP"
-  from_port                = 443
-  to_port                  = 443
-  source_security_group_id = data.aws_security_group.vpce.id
+  security_group_id = aws_security_group.ecs_tasks_edrms.id
+  type              = "egress"
+  description       = "Allow egress to VPC endpoints (S3 / Secrets Manager)"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks = [
+    data.aws_subnet.vpce_subnets_a.cidr_block,
+    data.aws_subnet.vpce_subnets_b.cidr_block,
+    data.aws_subnet.vpce_subnets_c.cidr_block,
+  ]
 }
 
 resource "aws_security_group_rule" "ecs_tasks_egress_s3" {
@@ -152,13 +156,17 @@ resource "aws_security_group_rule" "cluster_ec2_ingress_lb" {
 
 
 resource "aws_security_group_rule" "cluster_ec2_egress_vpce" {
-  security_group_id        = aws_security_group.cluster_ec2.id
-  type                     = "egress"
-  description              = "Allow egress to VPC endpoints (logs/ecs/secrets)"
-  protocol                 = "TCP"
-  from_port                = 443
-  to_port                  = 443
-  source_security_group_id = data.aws_security_group.vpce.id
+  security_group_id = aws_security_group.cluster_ec2.id
+  type              = "egress"
+  description       = "Allow egress to VPC endpoints (logs/ecs/secrets)"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks = [
+    data.aws_subnet.vpce_subnets_a.cidr_block,
+    data.aws_subnet.vpce_subnets_b.cidr_block,
+    data.aws_subnet.vpce_subnets_c.cidr_block,
+  ]
 }
 
 resource "aws_security_group_rule" "cluster_ec2_egress_s3" {
