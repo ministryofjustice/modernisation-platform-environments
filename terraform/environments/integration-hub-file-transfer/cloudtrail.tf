@@ -26,5 +26,5 @@ resource "aws_cloudtrail" "s3_data_events" {
     { "Name" = "${local.application_name}-${local.environment}-s3-data-events" }
   )
 
-  depends_on = [module.s3_audit]
+  depends_on = [module.s3_audit_bucket]
 }
