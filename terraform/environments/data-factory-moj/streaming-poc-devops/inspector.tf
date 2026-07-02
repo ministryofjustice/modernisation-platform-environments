@@ -105,7 +105,7 @@ data "archive_file" "lambda_inspector" {
 resource "aws_cloudwatch_log_group" "lambda_inspector" {
   count             = contains(local.deploy_to, local.environment) ? 1 : 0
   name              = "/aws/lambda/${local.name}-inspector-report"
-  retention_in_days = 30
+  retention_in_days = 365
   kms_key_id        = aws_kms_key.inspector_s3[0].arn
   tags              = local.extended_tags
 }
@@ -189,6 +189,7 @@ resource "aws_scheduler_schedule" "inspector_report" {
   }
 
   schedule_expression = var.report_schedule
+  kms_key_arn         = aws_kms_key.inspector_s3[0].arn
 
   target {
     arn      = aws_lambda_function.inspector_report[0].arn
