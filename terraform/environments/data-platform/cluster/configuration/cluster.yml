@@ -30,7 +30,7 @@ environment:
       kyverno: "3.8.1"
       metrics_server: "3.13.1"
     kyverno_policies:
-      validation_failure_action: "audit"
+      validation_failure_action: "Audit"
     route53_zones:
       - "development.data-platform.service.justice.gov.uk"
       - "development.ai-gateway.justice.gov.uk"
@@ -66,7 +66,7 @@ environment:
       kyverno: "3.8.1"
       metrics_server: "3.13.1"
     kyverno_policies:
-      validation_failure_action: "audit"
+      validation_failure_action: "Audit"
     route53_zones:
       - "test.data-platform.service.justice.gov.uk"
       - "test.ai-gateway.justice.gov.uk"
@@ -102,7 +102,7 @@ environment:
       kyverno: "3.8.1"
       metrics_server: "3.13.1"
     kyverno_policies:
-      validation_failure_action: "audit"
+      validation_failure_action: "Audit"
     route53_zones:
       - "preproduction.data-platform.service.justice.gov.uk"
       - "preproduction.ai-gateway.justice.gov.uk"
@@ -138,7 +138,7 @@ environment:
       kyverno: "3.8.1"
       metrics_server: "3.13.1"
     kyverno_policies:
-      validation_failure_action: "enforce"
+      validation_failure_action: "Audit"
     route53_zones:
       - "data-platform.service.justice.gov.uk"
       - "ai-gateway.justice.gov.uk"
