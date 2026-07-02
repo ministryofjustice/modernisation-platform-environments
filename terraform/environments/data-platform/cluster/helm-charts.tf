@@ -66,6 +66,22 @@ resource "helm_release" "kyverno" {
   ]
 }
 
+resource "helm_release" "kyverno_policies" {
+  name      = "kyverno-policies"
+  chart     = "./src/helm/charts/kyverno-policies"
+  namespace = module.kyverno_namespace.name
+
+  values = [
+    templatefile(
+      "${path.module}/configuration/helm/kyverno-policies/values.yml.tftpl",
+      {
+        validation_failure_action = local.cluster_configuration.kyverno_policies.validation_failure_action
+      }
+    )
+  ]
+  depends_on = [helm_release.kyverno]
+}
+
 resource "helm_release" "cluster_autoscaler" {
   /* https://artifacthub.io/packages/helm/cluster-autoscaler/cluster-autoscaler */
 
