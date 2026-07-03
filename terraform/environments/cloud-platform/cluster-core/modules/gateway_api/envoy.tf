@@ -115,14 +115,15 @@ resource "kubectl_manifest" "gateway_proxy" {
                   mountPath: /etc/envoy/dynamic-modules
                   readOnly: true
           envoyService:
-            loadBalancerClass: service.k8s.aws/nlb
+            # Auto Mode NLB class; the classic service.k8s.aws/nlb controller
+            # isn't present on Auto Mode clusters.
+            loadBalancerClass: eks.amazonaws.com/nlb
             annotations:
               service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
               service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
               service.beta.kubernetes.io/aws-load-balancer-name: envoy-${var.cluster_name}
-              # Preserve the real client source IP. Disabled by default for NLB
-              # ip-target groups (TCP/TLS), so without this Envoy sees the NLB
-              # node IP and SecurityPolicy clientCIDRs would match the wrong address.
+              # Preserve the client IP; off by default on NLB ip-target groups.
+              # Without it Envoy sees the NLB node IP and SecurityPolicy CIDRs never match.
               service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: preserve_client_ip.enabled=true
       dynamicModules:
         - name: composer

@@ -1,18 +1,22 @@
+# SecurityPolicy: source-IP allowlist for one HTTPRoute (ticket 7885).
+# Needs client-IP preservation at the NLB (envoy.tf preserve_client_ip); without it
+# Envoy sees the NLB node IP and the CIDRs below never match.
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy
 metadata:
   name: source-ip-allowlist
-  namespace: waf-disabled
+  # Must sit in the same namespace as the target HTTPRoute.
+  namespace: starter-pack
 spec:
+  # Attaches to one HTTPRoute by name.
   targetRefs:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
-      name: nginx
+      name: hello-world
   authorization:
-    defaultAction: Deny
+    defaultAction: Deny   # deny unless an Allow rule matches
     rules:
       - action: Allow
         principal:
           clientCIDRs:
-            - 83.100.215.187/32
-            - 35.176.93.186/32
+            - 35.176.93.186/32   # alpha VPN
