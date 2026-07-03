@@ -5,8 +5,8 @@
 locals {
   # Cross-account access flags - set to true temporarily when cross-account access is required
   cross_account_access = {
-    general_infrastructure_dev  = false
-    general_infrastructure_uat  = false
+    general_infrastructure_dev  = true # temporarily enabled for testing
+    general_infrastructure_uat  = true # temporarily enabled for testing
     general_infrastructure_prod = false
   }
 
