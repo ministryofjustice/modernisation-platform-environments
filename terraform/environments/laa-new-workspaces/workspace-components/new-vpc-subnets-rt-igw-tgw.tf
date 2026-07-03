@@ -95,28 +95,14 @@ resource "aws_route" "private_b_firewall" {
 resource "aws_route" "private_a_laa_vpc_dev" {
   count = local.environment == "development" ? 1 : 0
   route_table_id         = aws_route_table.private_a.id
-  destination_cidr_block = "10.26.56.0/21"
+  destination_cidr_block = "10.0.0.0/8"
   transit_gateway_id = local.moj_tgw_id
 }
 
 resource "aws_route" "private_b_laa_vpc_dev" {
   count = local.environment == "development" ? 1 : 0
   route_table_id         = aws_route_table.private_b.id
-  destination_cidr_block = "10.26.56.0/21"
-  transit_gateway_id = local.moj_tgw_id
-}
-
-resource "aws_route" "private_a_laa_vpc_tst" {
-  count = local.environment == "development" ? 1 : 0
-  route_table_id         = aws_route_table.private_a.id
-  destination_cidr_block = "10.26.96.0/21"
-  transit_gateway_id = local.moj_tgw_id
-}
-
-resource "aws_route" "private_b_laa_vpc_tst" {
-  count = local.environment == "development" ? 1 : 0
-  route_table_id         = aws_route_table.private_b.id
-  destination_cidr_block = "10.26.96.0/21"
+  destination_cidr_block = "10.0.0.0/8"
   transit_gateway_id = local.moj_tgw_id
 }
 
