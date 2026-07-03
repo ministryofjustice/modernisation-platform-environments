@@ -5,8 +5,8 @@
 locals {
   # Cross-account access flags - set to true temporarily when cross-account access is required
   cross_account_access = {
-    general_infrastructure_dev  = true # temporarily enabled for testing
-    general_infrastructure_uat  = true # temporarily enabled for testing
+    general_infrastructure_dev  = false
+    general_infrastructure_uat  = false
     general_infrastructure_prod = false
   }
 
@@ -47,7 +47,7 @@ locals {
         log_prefix               = "s3-logs/moj-general-logs-dev/"
         lifecycle_id             = "delete-moj-general-logs-dev"
         ec2_account              = "ppud-development"
-        enable_versioning        = true
+        enable_versioning        = false
         enable_logging           = true
         expiration_days          = 120
         is_infrastructure_bucket = false
@@ -73,7 +73,7 @@ locals {
         log_prefix               = "s3-logs/moj-general-logs-uat/"
         lifecycle_id             = "delete-moj-general-logs-uat"
         ec2_account              = "ppud-preproduction"
-        enable_versioning        = true
+        enable_versioning        = false
         enable_logging           = true
         expiration_days          = 120
         is_infrastructure_bucket = false
@@ -99,7 +99,7 @@ locals {
         log_prefix               = "s3-logs/moj-general-logs-prod/"
         lifecycle_id             = "delete-moj-general-logs-prod"
         ec2_account              = "ppud-production"
-        enable_versioning        = true
+        enable_versioning        = false
         enable_logging           = true
         expiration_days          = 120
         is_infrastructure_bucket = false
