@@ -1464,6 +1464,10 @@
     },
     {
       "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "NAME"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
       "column_name": "NO_OF_BAGS"
     },
     {

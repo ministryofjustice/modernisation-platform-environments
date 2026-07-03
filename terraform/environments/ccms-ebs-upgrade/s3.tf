@@ -6,7 +6,55 @@ module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
   bucket_name = local.artefact_bucket_name
   #  bucket_prefix      = "s3-bucket-example"
   versioning_enabled = false
-  bucket_policy      = [data.aws_iam_policy_document.artefacts_s3_policy.json]
+  bucket_policy = [jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        "Sid" : "DenyInsecureTransport",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          module.s3-bucket.bucket.arn,
+          "${module.s3-bucket.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = [
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/developer",
+            "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"
+          ]
+        }
+        Action   = "s3:GetObject"
+        Resource = "arn:aws:s3:::${local.artefact_bucket_name}/*"
+      },
+      {
+        "Sid" = "RestrictToTLSRequestsOnly",
+        "Action" : "s3:*",
+        "Effect" : "Deny",
+        "Resource" : [
+          module.s3-bucket.bucket.arn,
+          "${module.s3-bucket.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          },
+          "NumericLessThan" : {
+            "aws:TLSVersion" : "1.2"
+          }
+        },
+        "Principal" : "*"
+      }
+    ]
+  })]
 
   log_bucket = local.logging_bucket_name
   log_prefix = "s3access/${local.artefact_bucket_name}"
@@ -79,27 +127,65 @@ resource "aws_s3_bucket_notification" "artefact_bucket_notification" {
   }
 }
 
-data "aws_iam_policy_document" "artefacts_s3_policy" {
-  statement {
-    principals {
-      type = "AWS"
-      identifiers = [
-        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/developer",
-        "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"
-      ]
-    }
-    actions   = ["s3:GetObject"]
-    resources = ["arn:aws:s3:::${local.artefact_bucket_name}/*"]
-  }
-}
-
 # S3 Bucket - Logging
 module "s3-bucket-logging" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
 
   bucket_name        = local.logging_bucket_name
   versioning_enabled = false
-  bucket_policy      = [data.aws_iam_policy_document.logging_s3_policy.json]
+  bucket_policy = [jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        "Sid" : "DenyInsecureTransport",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          module.s3-bucket-logging.bucket.arn,
+          "${module.s3-bucket-logging.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
+        Sid    = "AllowELBLogDeliveryPutObject"
+        Effect = "Allow"
+        Principal = {
+          Service = "logdelivery.elasticloadbalancing.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "${module.s3-bucket-logging.bucket.arn}/*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+            "s3:x-amz-acl"      = "bucket-owner-full-control"
+          }
+        }
+      },
+      {
+        "Sid" = "RestrictToTLSRequestsOnly",
+        "Action" : "s3:*",
+        "Effect" : "Deny",
+        "Resource" : [
+          module.s3-bucket-logging.bucket.arn,
+          "${module.s3-bucket-logging.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          },
+          "NumericLessThan" : {
+            "aws:TLSVersion" : "1.2"
+          }
+        },
+        "Principal" : "*"
+      }
+    ]
+  })]
 
   log_bucket = local.logging_bucket_name
   log_prefix = "s3access/${local.logging_bucket_name}"
@@ -172,17 +258,6 @@ resource "aws_s3_bucket_notification" "logging_bucket_notification" {
   }
 }
 
-data "aws_iam_policy_document" "logging_s3_policy" {
-  statement {
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::652711504416:root"]
-    }
-    actions   = ["s3:PutObject"]
-    resources = ["${module.s3-bucket-logging.bucket.arn}/*"]
-  }
-}
-
 # S3 Bucket - R-sync
 module "s3-bucket-dbbackup" {
   # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
@@ -190,7 +265,55 @@ module "s3-bucket-dbbackup" {
 
   bucket_name        = local.rsync_bucket_name
   versioning_enabled = false
-  bucket_policy      = [data.aws_iam_policy_document.dbbackup_s3_policy.json]
+  bucket_policy = [jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        "Sid" : "DenyInsecureTransport",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          module.s3-bucket-dbbackup.bucket.arn,
+          "${module.s3-bucket-dbbackup.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = [
+            "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root",
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/developer"
+          ]
+        }
+        Action   = "s3:PutObject"
+        Resource = "${module.s3-bucket-dbbackup.bucket.arn}/*"
+      },
+      {
+        "Sid" = "RestrictToTLSRequestsOnly",
+        "Action" : "s3:*",
+        "Effect" : "Deny",
+        "Resource" : [
+          module.s3-bucket-dbbackup.bucket.arn,
+          "${module.s3-bucket-dbbackup.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          },
+          "NumericLessThan" : {
+            "aws:TLSVersion" : "1.2"
+          }
+        },
+        "Principal" : "*"
+      }
+    ]
+  })]
 
   log_bucket = local.logging_bucket_name
   log_prefix = "s3access/${local.rsync_bucket_name}"
@@ -263,22 +386,6 @@ resource "aws_s3_bucket_notification" "dbbackup_bucket_notification" {
   }
 }
 
-data "aws_iam_policy_document" "dbbackup_s3_policy" {
-  statement {
-    principals {
-      type = "AWS"
-      identifiers = [
-        "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root",
-        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/developer"
-      ]
-    }
-    actions = [
-      "s3:PutObject"
-    ]
-    resources = ["${module.s3-bucket-dbbackup.bucket.arn}/*"]
-  }
-}
-
 resource "aws_s3_bucket" "ccms_ebs_shared" {
   bucket = "${local.application_name}-${local.environment}-shared"
 }
@@ -297,6 +404,32 @@ resource "aws_s3_bucket_versioning" "ccms_ebs_shared" {
   versioning_configuration {
     status = "Enabled"
   }
+}
+
+data "aws_iam_policy_document" "shared_bucket_secure_transport" {
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.ccms_ebs_shared.arn,
+      "${aws_s3_bucket.ccms_ebs_shared.arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "shared_bucket_secure_transport" {
+  bucket = aws_s3_bucket.ccms_ebs_shared.id
+  policy = data.aws_iam_policy_document.shared_bucket_secure_transport.json
 }
 
 # Development

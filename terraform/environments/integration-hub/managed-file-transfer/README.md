@@ -71,7 +71,7 @@ The service is built entirely from AWS managed services, provisioned with Terraf
    - `clean` — `NO_THREATS_FOUND`
    - `quarantine` — `THREATS_FOUND`
    - `investigation` — `UNSUPPORTED`, `ACCESS_DENIED` or `FAILED`
-7. **Notification.** When a clean object lands, the `send-presigned-url` module generates a time-limited presigned download URL, posts it to Slack, and publishes a client-facing notification event to SNS for downstream consumers.
+7. **Notification and downstream delivery.** When a clean object lands, the `send-presigned-url` module generates a time-limited presigned download URL, posts it to Slack, and publishes a client-facing notification event to SNS for downstream consumers. Optionally, the same Lambda can call a client-owned API to request a presigned destination URL and then push the clean file to that destination.
 
 All buckets are KMS-encrypted, versioned, block public access, and have short (one day) lifecycle expiry as befits a transfer staging area.
 
@@ -117,6 +117,70 @@ scripts/poll-clean-file-notification.sh \
   --profile integration-hub-development \
   --queue-url "$(terraform output -raw products_poc_clean_file_notification_test_queue_url)"
 ```
+
+## Client-managed destination delivery
+
+Some consumers want the platform to deliver the clean file onward rather than only notifying them. For that case, configure `client_destination_delivery` in `application_variables.json`, keyed by `clientId`:
+
+```json
+{
+  "client_destination_delivery": {
+    "products-poc": {
+      "enabled": true,
+      "request_url": "https://consumer.example.justice.gov.uk/mft/presigned-destination",
+      "request_method": "POST",
+      "request_timeout_seconds": 30,
+      "request_auth_secret_name": "integration-hub-products-poc-destination-api-auth"
+    }
+  }
+}
+```
+
+If `request_auth_secret_name` is set, the Lambda reads that Secrets Manager value and merges `headers` from the secret JSON into the API request. Expected secret shape:
+
+```json
+{
+  "headers": {
+    "Authorization": "Bearer <token>",
+    "x-api-key": "<optional-key>"
+  }
+}
+```
+
+The consumer API receives a JSON payload in this shape:
+
+```json
+{
+  "clientId": "products-poc",
+  "transferTicket": "12345678-1234-1234-1234-123456789012",
+  "fileName": "example.csv",
+  "contentLengthBytes": 123,
+  "contentType": "text/csv",
+  "source": {
+    "bucket": "integration-hub-clean-...",
+    "key": "products-poc/uploads/2026/06/30/example.csv",
+    "versionId": "..."
+  }
+}
+```
+
+The consumer API must return JSON containing either a top-level upload target or an `upload` object:
+
+```json
+{
+  "upload": {
+    "url": "https://destination.example.test/presigned-put",
+    "method": "PUT",
+    "headers": {
+      "Content-Type": "text/csv"
+    }
+  }
+}
+```
+
+The platform then streams the clean object from S3 to that presigned destination. Because Lambda retries can happen after partial progress, the consumer API should treat `transferTicket` as an idempotency key and tolerate a repeated request for a fresh presigned upload target.
+
+In `integration-hub-development`, Terraform also provisions a temporary mock consumer API for `products-poc`. It returns a presigned PUT URL into the investigation bucket so the destination-delivery flow can be exercised end to end without needing a separate external consumer system.
 
 ### **Impact of an outage:**
 
