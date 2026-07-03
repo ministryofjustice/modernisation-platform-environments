@@ -21,6 +21,24 @@ data "aws_iam_policy_document" "inspector_reports_bucket_policy" {
       values   = [data.aws_caller_identity.current.account_id]
     }
   }
+  statement {
+    sid    = "DenyNonTLS"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.inspector_reports[0].arn,
+      "${aws_s3_bucket.inspector_reports[0].arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
 }
 
 resource "aws_s3_bucket_policy" "inspector_reports" {
