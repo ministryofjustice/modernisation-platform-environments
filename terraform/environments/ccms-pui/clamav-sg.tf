@@ -24,12 +24,12 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_clamav_3310" {
 
 # EGRESS Rules
 
-### HTTPS
-resource "aws_vpc_security_group_egress_rule" "egress_traffic_clamav_443" {
-  security_group_id = aws_security_group.ec2_sg_clamav.id
-  description       = "Outbound HTTPS"
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "tcp"
-  from_port         = 443
-  to_port           = 443
-}
+# ### HTTPS
+# resource "aws_vpc_security_group_egress_rule" "egress_traffic_clamav_443" {
+#   security_group_id = aws_security_group.ec2_sg_clamav.id
+#   description       = "Outbound HTTPS"
+#   cidr_ipv4         = "0.0.0.0/0"
+#   ip_protocol       = "tcp"
+#   from_port         = 443
+#   to_port           = 443
+# }
