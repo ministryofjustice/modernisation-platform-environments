@@ -140,6 +140,26 @@ resource "aws_security_group_rule" "lb_egress_rules" {
   cidr_blocks       = each.value.cidr_blocks
 }
 
+
+#########################################
+# This can be removed after testing
+#########################################
+
+resource "aws_security_group_rule" "ingress_mp_443_workspace" {
+  count = contains(["development"], local.environment) ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.lb_security_group[0].id
+  description       = "Testing from LAA MP workspaces"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = "10.26.130.0/23"     # Testing new MP WorkSpaces
+}
+#########################################
+
+
+    
 ##############################################
 ### S3 Bucket for Load Balancer Access Logs
 ##############################################
