@@ -13,7 +13,7 @@
       "maintenance_window_task_name": "DEV-Instance-Patch",
       "pre_healthcheck_Priority": 1,
       "post_healthcheck_Priority": 20,
-      "ssm_health_check_reports_s3": "moj-log-files-dev",
+      "ssm_health_check_reports_s3": "moj-general-logs-dev",
       "cloudwatch_sns_topic_name": "ppud-dev-cw-alerts",
       "ses_iam_user": "ppud-development-email_user",
       "ses_secret_name": "ppud-development-ses-access-key"
@@ -37,7 +37,7 @@
       "maintenance_window_task_name": "UAT-Instance-Patch",
       "pre_healthcheck_Priority": 1,
       "post_healthcheck_Priority": 20,
-      "ssm_health_check_reports_s3": "moj-log-files-uat",
+      "ssm_health_check_reports_s3": "moj-general-logs-uat",
       "cloudwatch_sns_topic_name": "ppud-uat-cw-alerts",
       "ses_iam_user": "ppud-preproduction-email_user",
       "ses_secret_name": "ppud-preproduction-ses-access-key"

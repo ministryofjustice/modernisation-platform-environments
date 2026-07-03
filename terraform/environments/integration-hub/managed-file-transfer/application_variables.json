@@ -92,6 +92,7 @@
         "secret_prefix": "transfer/",
         "user_name_delimiter": "@@"
       },
+      "client_destination_delivery": {},
       "iam_configuration": {
         "malware_scanning_processing_bucket_key": "processing"
       },
@@ -223,6 +224,7 @@
         "secret_prefix": "transfer/",
         "user_name_delimiter": "@@"
       },
+      "client_destination_delivery": {},
       "iam_configuration": {
         "malware_scanning_processing_bucket_key": "processing"
       },
