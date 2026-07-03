@@ -1,5 +1,5 @@
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
 metadata:
   name: disallow-latest-tag
   annotations:
@@ -11,31 +11,39 @@ metadata:
       The ':latest' tag is mutable and can lead to unexpected errors if the
       image changes. A best practice is to use an immutable tag that maps to
       a specific version of an application Pod. This policy validates that the image
-      specifies a tag and that it is not called `latest`.      
+      specifies a tag and that it is not called `latest`.
 spec:
-  background: true
-  rules:
-  - name: require-image-tag
-    match:
-      resources:
-        kinds:
-        - Pod
-    validate:
-      failureAction: {{ .Values.failureAction }}
-      message: "An image tag is required."
-      pattern:
-        spec:
-          containers:
-          - image: "*:*"
-  - name: validate-image-tag
-    match:
-      resources:
-        kinds:
-        - Pod
-    validate:
-      failureAction: {{ .Values.failureAction }}
+  validationActions:
+    - {{ .Values.validationAction }}
+  evaluation:
+    background:
+      enabled: true
+  autogen:
+    podControllers:
+      controllers:
+        - deployments
+        - statefulsets
+        - daemonsets
+        - jobs
+        - cronjobs
+        - replicasets
+        - replicationcontrollers
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  variables:
+    - name: allContainers
+      expression: >-
+        object.spec.containers
+        + object.spec.?initContainers.orValue([])
+        + object.spec.?ephemeralContainers.orValue([])
+  validations:
+    - expression: >-
+        variables.allContainers.all(container, image(container.image).tag() != '' || image(container.image).containsDigest())
+      message: "An image tag or digest is required."
+    - expression: >-
+        variables.allContainers.all(container, image(container.image).tag() != 'latest')
       message: "Using a mutable image tag e.g. 'latest' is not allowed."
-      pattern:
-        spec:
-          containers:
-          - image: "!*:latest"
