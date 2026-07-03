@@ -56,7 +56,7 @@ locals {
       database_source_prod = {
         condition               = local.is-production
         bucket_name             = "moj-database-source-prod"
-        log_bucket              = "moj-log-files-prod"
+        log_bucket              = "moj-general-logs-prod"
         log_prefix              = "s3-logs/moj-database-source-prod/"
         lifecycle_id            = "delete-moj-database-source-prod"
         expiration_days         = 6
@@ -68,7 +68,7 @@ locals {
       report_source_prod = {
         condition               = local.is-production
         bucket_name             = "moj-report-source-prod"
-        log_bucket              = "moj-log-files-prod"
+        log_bucket              = "moj-general-logs-prod"
         log_prefix              = "s3-logs/moj-report-source-prod/"
         lifecycle_id            = "delete-moj-report-source-prod"
         expiration_days         = 6
