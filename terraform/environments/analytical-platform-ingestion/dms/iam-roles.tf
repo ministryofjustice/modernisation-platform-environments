@@ -4,7 +4,7 @@ module "production_replication_cica_dms_iam_role" {
   count = local.environment == "production" ? 1 : 0
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.0"
+  version = "6.6.1"
 
 
   name            = "cica-dms-ingress-production-replication"
@@ -30,7 +30,7 @@ module "tariff_eventbridge_dms_full_load_task_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name = "tariff-dms-eventbridge-full-load-task-role"
 
@@ -71,7 +71,7 @@ module "tempus_eventbridge_dms_full_load_task_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name = "tempus-dms-eventbridge-full-load-task-role"
 
