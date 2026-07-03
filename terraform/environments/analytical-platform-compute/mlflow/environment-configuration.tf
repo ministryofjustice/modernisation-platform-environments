@@ -13,14 +13,14 @@ locals {
         "18.169.147.172/32",
         "18.130.148.126/32",
         "35.176.148.126/32",
-        # Elastic IPs for the Legacy Development NAT Gateways
-        "3.248.51.175/32",
-        "63.32.185.181/32",
-        "54.217.86.185/32",
-        # Elastic IPs for the Development Analytical Platform Compute NAT Gateways
-        "18.133.132.50/32",
-        "18.132.51.177/32",
-        "13.42.93.133/32",
+        # Elastic IPs for the Legacy Production NAT Gateways
+        "54.195.74.96/32",
+        "63.35.122.32/32",
+        "79.125.36.56/32",
+        # Elastic IPs for the Production Analytical Platform Compute NAT Gateways
+        "18.168.85.104/32",
+        "13.42.220.232/32",
+        "18.168.158.203/32",
       ]
     }
     test = {
