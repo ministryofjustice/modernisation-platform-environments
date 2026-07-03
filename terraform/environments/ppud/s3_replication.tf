@@ -57,7 +57,7 @@ locals {
         condition               = local.is-production
         bucket_name             = "moj-database-source-prod"
         log_bucket              = "moj-log-files-prod"
-        log_prefix              = "s3-logs/moj-database-source-prod-logs/"
+        log_prefix              = "s3-logs/moj-database-source-prod/"
         lifecycle_id            = "delete-moj-database-source-prod"
         expiration_days         = 6
         replication_destination = "arn:aws:s3:::mojap-data-engineering-production-ppud-prod"
@@ -69,7 +69,7 @@ locals {
         condition               = local.is-production
         bucket_name             = "moj-report-source-prod"
         log_bucket              = "moj-log-files-prod"
-        log_prefix              = "s3-logs/moj-report-source-prod-logs/"
+        log_prefix              = "s3-logs/moj-report-source-prod/"
         lifecycle_id            = "delete-moj-report-source-prod"
         expiration_days         = 6
         replication_destination = "arn:aws:s3:::cloud-platform-9c7fd5fc774969b089e942111a7d5671"
