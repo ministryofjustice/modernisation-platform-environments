@@ -39,6 +39,45 @@ module "s3_pui_docs" {
     }
   ]
 
+  bucket_policy = [jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        "Sid" : "DenyInsecureTransport",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          module.s3_pui_docs.bucket.arn,
+          "${module.s3_pui_docs.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
+        "Sid" = "RestrictToTLSRequestsOnly",
+        "Action" : "s3:*",
+        "Effect" : "Deny",
+        "Resource" : [
+          module.s3_pui_docs.bucket.arn,
+          "${module.s3_pui_docs.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          },
+          "NumericLessThan" : {
+            "aws:TLSVersion" : "1.2"
+          }
+        },
+        "Principal" : "*"
+      }
+    ]
+  })]
+
   tags = merge(local.tags,
     { Name = lower(format("%s-docs-%s", local.application_name, local.environment)) }
   )
