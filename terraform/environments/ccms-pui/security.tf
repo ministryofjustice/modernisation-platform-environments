@@ -20,13 +20,18 @@ resource "aws_vpc_security_group_ingress_rule" "alb_ingress_443" {
   to_port     = 443
 }
 
-resource "aws_vpc_security_group_egress_rule" "alb_egress_all" {
+resource "aws_security_group_rule" "alb_egress_targets" {
   security_group_id = aws_security_group.load_balancer.id
-
-  cidr_ipv4   = "0.0.0.0/0"
-  ip_protocol = "tcp"
-  from_port   = 0
-  to_port     = 65535
+  type              = "egress"
+  description       = "Allow ALB outbound traffic to protected subnets"
+  protocol          = "tcp"
+  from_port         = 8080
+  to_port           = 8080
+  cidr_blocks = [
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block,
+  ]
 }
 
 ### Container Security Group
@@ -50,13 +55,42 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_pui" {
   referenced_security_group_id = aws_security_group.load_balancer.id
 }
 
-resource "aws_vpc_security_group_egress_rule" "ecs_tasks_egress_all" {
+resource "aws_security_group_rule" "ecs_tasks_egress_vpce" {
   security_group_id = aws_security_group.ecs_tasks_pui.id
+  type              = "egress"
+  description       = "Allow egress to VPC endpoints"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks = [
+    data.aws_subnet.vpce_subnets_a.cidr_block,
+    data.aws_subnet.vpce_subnets_b.cidr_block,
+    data.aws_subnet.vpce_subnets_c.cidr_block,
+  ]
+}
 
-  cidr_ipv4   = "0.0.0.0/0"
-  ip_protocol = "tcp"
-  from_port   = 0
-  to_port     = 65535
+resource "aws_security_group_rule" "ecs_tasks_egress_s3" {
+  security_group_id = aws_security_group.ecs_tasks_pui.id
+  type              = "egress"
+  description       = "Allow S3 access via gateway endpoint (prefix list)"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  prefix_list_ids   = [data.aws_prefix_list.s3.id]
+}
+
+resource "aws_security_group_rule" "ecs_tasks_egress_other_apps" {
+  security_group_id = aws_security_group.ecs_tasks_pui.id
+  type              = "egress"
+  description       = "HTTPS"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks = [
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block,
+  ]
 }
 
 
@@ -71,11 +105,40 @@ resource "aws_security_group" "cluster_ec2" {
   )
 }
 
-resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_all" {
+resource "aws_security_group_rule" "cluster_ec2_egress_vpce" {
   security_group_id = aws_security_group.cluster_ec2.id
+  type              = "egress"
+  description       = "Allow egress to VPC endpoints"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks = [
+    data.aws_subnet.vpce_subnets_a.cidr_block,
+    data.aws_subnet.vpce_subnets_b.cidr_block,
+    data.aws_subnet.vpce_subnets_c.cidr_block,
+  ]
+}
 
-  cidr_ipv4   = "0.0.0.0/0"
-  ip_protocol = "tcp"
-  from_port   = 0
-  to_port     = 65535
+resource "aws_security_group_rule" "cluster_ec2_egress_s3" {
+  security_group_id = aws_security_group.cluster_ec2.id
+  type              = "egress"
+  description       = "Allow S3 access via gateway endpoint (prefix list)"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  prefix_list_ids   = [data.aws_prefix_list.s3.id]
+}
+
+resource "aws_security_group_rule" "cluster_ec2_egress_other_apps" {
+  security_group_id = aws_security_group.cluster_ec2.id
+  type              = "egress"
+  description       = "HTTPS"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks = [
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block,
+  ]
 }
