@@ -4,7 +4,7 @@ module "cur_v2_hourly" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.14.0"
+  version = "5.14.1"
 
   bucket = "coat-${local.environment}-cur-v2-hourly"
 
@@ -336,7 +336,7 @@ module "focus_reports" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.14.0"
+  version = "5.14.1"
 
   bucket           = "coat-${local.environment}-focus-reports"
   object_ownership = "BucketOwnerEnforced"
@@ -399,7 +399,7 @@ module "coat_reports" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.14.0"
+  version = "5.14.1"
 
   bucket           = "coat-reports-${local.environment}"
   object_ownership = "BucketOwnerEnforced"
@@ -533,7 +533,7 @@ module "cur_v2_hourly_enriched" {
   count = local.is-development ? 0 : 1
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.14.0"
+  version = "5.14.1"
 
   bucket = "coat-${local.environment}-cur-v2-hourly-enriched"
 
