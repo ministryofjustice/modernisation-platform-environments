@@ -5,6 +5,45 @@
 
 locals {
   admin_roles = local.is-development ? "sandbox" : "data-eng"
+
+  lakeformation_sso_admin_role_names = distinct(
+    concat(
+      tolist(data.aws_iam_roles.mod_plat_roles.names),
+      tolist(data.aws_iam_roles.modernisation_platform_sandbox_role.names),
+    )
+  )
+
+  lakeformation_sso_admin_role_arns = [
+    for role_name in local.lakeformation_sso_admin_role_names :
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${role_name}"
+  ]
+
+  lakeformation_github_actions_role_arns = [
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan",
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply",
+  ]
+
+  lakeformation_analytical_platform_share_role_arns = [
+    for share in local.analytical_platform_share :
+    aws_iam_role.analytical_platform_share_role[
+      share.target_account_name
+    ].arn
+  ]
+
+  lakeformation_admin_arns = distinct(
+    flatten(
+      [
+        local.lakeformation_sso_admin_role_arns,
+        local.lakeformation_github_actions_role_arns,
+        data.aws_iam_role.github_actions_role.arn,
+        data.aws_iam_session_context.current.issuer_arn,
+        local.lakeformation_analytical_platform_share_role_arns,
+        aws_iam_role.clean_after_dlt_load.arn,
+        aws_iam_role.glue_db_count_metrics.arn,
+        aws_iam_role.staging_db_janitor.arn,
+      ]
+    )
+  )
 }
 
 data "aws_iam_role" "github_actions_role" {
@@ -16,20 +55,13 @@ data "aws_iam_roles" "mod_plat_roles" {
   path_prefix = "/aws-reserved/sso.amazonaws.com/"
 }
 
+data "aws_iam_roles" "modernisation_platform_sandbox_role" {
+  name_regex  = "AWSReservedSSO_modernisation-platform-sandbox_.*"
+  path_prefix = "/aws-reserved/sso.amazonaws.com/"
+}
+
 resource "aws_lakeformation_data_lake_settings" "settings" {
-  admins = flatten(
-    [
-      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.mod_plat_roles.names)}",
-      data.aws_iam_role.github_actions_role.arn,
-      data.aws_iam_session_context.current.issuer_arn,
-      [for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn],
-      aws_iam_role.clean_after_dlt_load.arn,
-      aws_iam_role.glue_db_count_metrics.arn,
-      aws_iam_role.staging_db_janitor.arn,
-      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan",
-      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply",
-    ]
-  )
+  admins = local.lakeformation_admin_arns
 
   parameters = {
     "CROSS_ACCOUNT_VERSION" = "4"
