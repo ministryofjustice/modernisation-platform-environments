@@ -315,30 +315,30 @@ resource "aws_networkfirewall_rule_group" "workspaces_onedrive_live_misc" {
 # Rule Group 5 — LAA Applications
 # Covers: Any public (non-TGW) traffic to other LAA applications
 # -----------------------------------------------------------------------------
-resource "aws_networkfirewall_rule_group" "workspaces_laa_apps" {
-  name     = "workspaces-laa-apps"
-  capacity = 200
-  type     = "STATEFUL"
+# resource "aws_networkfirewall_rule_group" "workspaces_laa_apps" {
+#   name     = "workspaces-laa-apps"
+#   capacity = 200
+#   type     = "STATEFUL"
 
-  rule_group {
-    stateful_rule_options {
-      rule_order = "STRICT_ORDER"
-    }
-    rules_source {
-      rules_source_list {
-        generated_rules_type = "ALLOWLIST"
-        target_types         = ["TLS_SNI", "HTTP_HOST"]
-        targets = [
-          ".laa-development.modernisation-platform.service.justice.gov.uk"
-        ]
-      }
-    }
-  }
+#   rule_group {
+#     stateful_rule_options {
+#       rule_order = "STRICT_ORDER"
+#     }
+#     rules_source {
+#       rules_source_list {
+#         generated_rules_type = "ALLOWLIST"
+#         target_types         = ["TLS_SNI", "HTTP_HOST"]
+#         targets = [
+#           ".laa-development.modernisation-platform.service.justice.gov.uk"
+#         ]
+#       }
+#     }
+#   }
 
-  tags = {
-    Name = "workspaces-laa-apps"
-  }
-}
+#   tags = {
+#     Name = "workspaces-laa-apps"
+#   }
+# }
 
 
 
