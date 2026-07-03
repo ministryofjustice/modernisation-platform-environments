@@ -11,9 +11,10 @@ resource "helm_release" "mlflow" {
     templatefile(
       "${path.module}/src/helm/values/mlflow/values.yml.tftpl",
       {
-        mlflow_hostname = "mlflow.${local.environment_configuration.route53_zone}"
-        eks_role_arn    = module.mlflow_iam_role[0].iam_role_arn
-        s3_bucket_name  = local.environment_configuration.mlflow_s3_bucket_name
+        mlflow_hostname   = "mlflow.${local.environment_configuration.route53_zone}"
+        eks_role_arn      = module.mlflow_iam_role[0].iam_role_arn
+        s3_bucket_name    = local.environment_configuration.mlflow_s3_bucket_name
+        ingress_allowlist = local.environment_configuration.mlflow_ingress_allowlist
       }
     )
   ]
