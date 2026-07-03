@@ -6,41 +6,38 @@
 locals {
   admin_roles = local.is-development ? "sandbox" : "data-eng"
 
-  lakeformation_sso_path_prefix = (
-    "aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}"
+  lakeformation_sso_admin_role_names = distinct(
+    concat(
+      tolist(data.aws_iam_roles.mod_plat_roles.names),
+      tolist(data.aws_iam_roles.modernisation_platform_sandbox_role.names),
+    )
   )
 
-  lakeformation_mod_plat_admin_role_arn = (
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.lakeformation_sso_path_prefix}/${one(data.aws_iam_roles.mod_plat_roles.names)}"
-  )
+  lakeformation_sso_admin_role_arns = [
+    for role_name in local.lakeformation_sso_admin_role_names :
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${role_name}"
+  ]
 
-  lakeformation_sandbox_role_arn = (
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.lakeformation_sso_path_prefix}/${one(data.aws_iam_roles.modernisation_platform_sandbox_role.names)}"
-  )
+  lakeformation_github_actions_role_arns = [
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan",
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply",
+  ]
 
-  lakeformation_github_actions_plan_role_arn = (
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan"
-  )
-
-  lakeformation_github_actions_apply_role_arn = (
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply"
-  )
+  lakeformation_analytical_platform_share_role_arns = [
+    for share in local.analytical_platform_share :
+    aws_iam_role.analytical_platform_share_role[
+      share.target_account_name
+    ].arn
+  ]
 
   lakeformation_admin_arns = distinct(
     flatten(
       [
-        local.lakeformation_mod_plat_admin_role_arn,
-        local.lakeformation_sandbox_role_arn,
-        local.lakeformation_github_actions_plan_role_arn,
-        local.lakeformation_github_actions_apply_role_arn,
+        local.lakeformation_sso_admin_role_arns,
+        local.lakeformation_github_actions_role_arns,
         data.aws_iam_role.github_actions_role.arn,
         data.aws_iam_session_context.current.issuer_arn,
-        [
-          for share in local.analytical_platform_share :
-          aws_iam_role.analytical_platform_share_role[
-            share.target_account_name
-          ].arn
-        ],
+        local.lakeformation_analytical_platform_share_role_arns,
         aws_iam_role.clean_after_dlt_load.arn,
         aws_iam_role.glue_db_count_metrics.arn,
         aws_iam_role.staging_db_janitor.arn,
