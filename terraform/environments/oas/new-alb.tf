@@ -154,7 +154,7 @@ resource "aws_security_group_rule" "ingress_mp_443_workspace" {
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
-  cidr_blocks       = "10.26.130.0/23"     # Testing new MP WorkSpaces
+  cidr_blocks       = ["10.26.130.0/23"]     # Testing new MP WorkSpaces
 }
 #########################################
 
