@@ -36,6 +36,11 @@ resource "aws_security_group_rule" "alb_egress_targets" {
 
 ### Container Security Group
 
+data "aws_prefix_list" "s3" {
+  name = "com.amazonaws.${data.aws_region.current.name}.s3"
+}
+
+
 resource "aws_security_group" "ecs_tasks_pui" {
   name_prefix = "${local.application_name}-ecs-tasks-security-group"
   description = "Controls access to ${local.application_name} containers"
