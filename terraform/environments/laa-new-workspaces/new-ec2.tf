@@ -50,11 +50,11 @@ resource "aws_instance" "user_creation_ec2" {
   # Domain join and script deployment configuration
   user_data = <<-USERDATA
     <powershell>
-    # Set DNS servers to AD DNS before domain join
-    $adDnsServers = @("10.200.1.245", "10.200.2.11")
+    # Set DNS servers: AD DNS (from AWS Managed AD) + AWS VPC DNS (for SSM connectivity)
+    $adDnsServers = @("${tolist(aws_directory_service_directory.workspaces_ad.dns_ip_addresses)[0]}", "${tolist(aws_directory_service_directory.workspaces_ad.dns_ip_addresses)[1]}", "${cidrhost(local.application_data.accounts[local.environment].vpc_cidr, 2)}")
     $interfaceAlias = (Get-NetAdapter | Where-Object {$_.Status -eq "Up"} | Select-Object -First 1).Name
     Set-DnsClientServerAddress -InterfaceAlias $interfaceAlias -ServerAddresses $adDnsServers
-    
+
     Write-Host "DNS servers configured: $adDnsServers"
     Start-Sleep -Seconds 5
     
@@ -66,15 +66,26 @@ resource "aws_instance" "user_creation_ec2" {
         Write-Host "WARNING: DNS resolution failed, but continuing with domain join"
     }
     
-    # Join domain
+    # Join domain with static computer name
     $domain = "${local.application_data.accounts[local.environment].ad_directory_name}"
     $password = "${random_password.ad_admin_password.result}" | ConvertTo-SecureString -AsPlainText -Force
     $username = "Admin"
     $credential = New-Object System.Management.Automation.PSCredential("$domain\$username", $password)
-    
+
+    # Set computer name based on environment (max 15 chars for Windows)
+    $computerName = switch ("${local.environment}") {
+        "development"    { "LAA-UC-DEV" }
+        "test"           { "LAA-UC-TEST" }
+        "preproduction"  { "LAA-UC-PRE" }
+        "production"     { "LAA-UC-PROD" }
+        default          { "LAA-UC-DEV" }
+    }
+
+    Write-Host "Computer name will be set to: $computerName"
+
     try {
-        Add-Computer -DomainName $domain -Credential $credential -Restart -Force -ErrorAction Stop
-        Write-Host "Domain join initiated, restarting..."
+        Add-Computer -DomainName $domain -Credential $credential -NewName $computerName -Restart -Force -ErrorAction Stop
+        Write-Host "Domain join initiated with computer name $computerName, restarting..."
     } catch {
         Write-Host "Domain join failed: $_"
         Write-Host "Will retry after reboot..."
@@ -83,8 +94,8 @@ resource "aws_instance" "user_creation_ec2" {
     <persist>true</persist>
     <powershell>
     # This runs after domain join restart
-    # Re-set DNS servers (in case they were reset)
-    $adDnsServers = @("10.200.1.245", "10.200.2.11")
+    # Re-set DNS servers: AD DNS (from AWS Managed AD) + AWS VPC DNS (for SSM connectivity)
+    $adDnsServers = @("${tolist(aws_directory_service_directory.workspaces_ad.dns_ip_addresses)[0]}", "${tolist(aws_directory_service_directory.workspaces_ad.dns_ip_addresses)[1]}", "${cidrhost(local.application_data.accounts[local.environment].vpc_cidr, 2)}")
     $interfaceAlias = (Get-NetAdapter | Where-Object {$_.Status -eq "Up"} | Select-Object -First 1).Name
     Set-DnsClientServerAddress -InterfaceAlias $interfaceAlias -ServerAddresses $adDnsServers
     
@@ -126,7 +137,6 @@ ${file("${path.module}/xxx-new-scripts/user-creation.ps1")}
 
   lifecycle {
     ignore_changes = [
-      user_data,
       ami
     ]
   }

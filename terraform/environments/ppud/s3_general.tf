@@ -5,8 +5,8 @@
 locals {
   # Cross-account access flags - set to true temporarily when cross-account access is required
   cross_account_access = {
-    general_infrastructure_dev  = false
-    general_infrastructure_uat  = false
+    general_infrastructure_dev  = true # temporarily enabled for testing
+    general_infrastructure_uat  = true # temporarily enabled for testing
     general_infrastructure_prod = false
   }
 
@@ -222,7 +222,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "s3_general" {
     }
   }
 }
-
 
 resource "aws_s3_bucket_notification" "s3_general" {
   for_each    = local.s3_general_buckets
