@@ -9,7 +9,7 @@ locals {
         condition               = local.is-development
         bucket_name             = "moj-database-source-dev"
         log_bucket              = "moj-general-logs-dev"
-        log_prefix              = "s3-logs/moj-database-source-dev-logs/"
+        log_prefix              = "s3-logs/moj-database-source-dev/"
         lifecycle_id            = "delete-moj-database-source-dev"
         expiration_days         = 6
         replication_destination = "arn:aws:s3:::mojap-data-engineering-production-ppud-dev"
@@ -21,7 +21,7 @@ locals {
         condition               = local.is-development
         bucket_name             = "moj-report-source-dev"
         log_bucket              = "moj-general-logs-dev"
-        log_prefix              = "s3-logs/moj-report-source-dev-logs/"
+        log_prefix              = "s3-logs/moj-report-source-dev/"
         lifecycle_id            = "delete-moj-report-source-dev"
         expiration_days         = 6
         replication_destination = "arn:aws:s3:::cloud-platform-db973d65892f599f6e78cb90252d7dc9"
@@ -33,7 +33,7 @@ locals {
         condition               = local.is-preproduction
         bucket_name             = "moj-database-source-uat"
         log_bucket              = "moj-general-logs-uat"
-        log_prefix              = "s3-logs/moj-database-source-uat-logs/"
+        log_prefix              = "s3-logs/moj-database-source-uat/"
         lifecycle_id            = "delete-moj-database-source-uat"
         expiration_days         = 6
         replication_destination = "arn:aws:s3:::mojap-data-engineering-production-ppud-preprod"
@@ -45,7 +45,7 @@ locals {
         condition               = local.is-preproduction
         bucket_name             = "moj-report-source-uat"
         log_bucket              = "moj-general-logs-uat"
-        log_prefix              = "s3-logs/moj-report-source-uat-logs/"
+        log_prefix              = "s3-logs/moj-report-source-uat/"
         lifecycle_id            = "delete-moj-report-source-uat"
         expiration_days         = 6
         replication_destination = "arn:aws:s3:::cloud-platform-ffbd9073e2d0d537d825ebea31b441fc"
