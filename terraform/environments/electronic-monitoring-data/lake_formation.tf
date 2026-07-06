@@ -28,6 +28,7 @@ resource "aws_lakeformation_data_lake_settings" "settings" {
       aws_iam_role.staging_db_janitor.arn,
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan",
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply",
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess",
     ]
   )
 
