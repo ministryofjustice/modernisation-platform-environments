@@ -209,14 +209,12 @@ def process_record(*, operation):
     if operation["source_version_id"]:
         copy_source["VersionId"] = operation["source_version_id"]
 
-    copy_response = s3_client.copy(
+    copy_response = s3_client.copy_object(
         CopySource=copy_source,
         Bucket=operation["destination_bucket_name"],
         Key=operation["source_key"],
-        ExtraArgs={
-            "MetadataDirective": "COPY",
-            "TaggingDirective": "COPY",
-        },
+        MetadataDirective="COPY",
+        TaggingDirective="COPY",
     )
     put_destination_tags(operation, copy_response.get("VersionId"))
 
