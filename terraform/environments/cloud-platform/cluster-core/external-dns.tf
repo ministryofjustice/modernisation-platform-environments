@@ -11,7 +11,7 @@ locals {
 }
 
 module "external_dns" {
-  source = "github.com/ministryofjustice/container-platform-terraform-external-dns?ref=0.0.1"
+  source = "github.com/ministryofjustice/container-platform-terraform-external-dns?ref=e927c4398e0b0c8c420eac1cd44c30df94526958" # temp lock to commit hash until ve a proper release tag
 
   eks_cluster_name = local.cluster_name
 
