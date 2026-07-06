@@ -69,8 +69,11 @@ def is_s3_test_event(record):
 
 
 def is_eventbridge_s3_object_created_event(payload):
-    return payload.get("source") == "aws.s3" and payload.get("detail-type") == "Object Created"
-
+    return (
+        payload.get("source") == "aws.s3"
+        and payload.get("detail-type") == "Object Created"
+        and isinstance(payload.get("detail"), dict)
+    )
 
 def normalise_record(record, sqs_message_id):
     metadata = build_event_metadata(record, sqs_message_id)
