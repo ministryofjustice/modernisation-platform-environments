@@ -73,7 +73,7 @@ locals {
   evaluation_interval = "1m"
 
   grafana_monitored_accounts_by_name = {
-    for account in local.environment_configuration.grafana_monitored_accounts :
+    for account in try(local.environment_configuration.grafana_monitored_accounts, []) :
     account.name => account
   }
 
