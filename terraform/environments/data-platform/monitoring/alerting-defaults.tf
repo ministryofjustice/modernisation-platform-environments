@@ -8,6 +8,10 @@ locals {
 
     litellm_provider_state_warn = 90 
     litellm_provider_state_crit = 99
+
+    litellm_bedrock_exception_rate_warn = 0
+litellm_bedrock_exception_rate_crit = 1
+
   }
 
   # Per-account effective thresholds: defaults merged with any account-specific
