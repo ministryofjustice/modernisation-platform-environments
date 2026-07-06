@@ -30,7 +30,7 @@ persistence_layer = DynamoDBPersistenceLayer(table_name=IDEMPOTENCY_TABLE)
 # Use object identity rather than transport metadata so duplicate SQS deliveries
 # collapse onto the same logical move operation.
 idempotency_config = IdempotencyConfig(
-    event_key_jmespath='["operation", "source_bucket_name", "source_key", "source_version_id", "destination_bucket_name"]'
+    event_key_jmespath="[operation, source_bucket_name, source_key, source_version_id, destination_bucket_name]"
 )
 
 
