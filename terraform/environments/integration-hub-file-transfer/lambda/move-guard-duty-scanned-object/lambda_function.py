@@ -4,22 +4,35 @@ import os
 from urllib.parse import unquote_plus
 
 import boto3
-from aws_lambda_powertools import Logger
+from aws_lambda_powertools import Logger, Metrics, Tracer
+from aws_lambda_powertools.metrics import MetricUnit
 from aws_lambda_powertools.utilities.idempotency import (
     DynamoDBPersistenceLayer,
     IdempotencyConfig,
     idempotent_function,
 )
 
-s3 = boto3.client("s3")
+SERVICE_NAME = "managed-file-transfer-processing-to-post-scan"
+METRICS_NAMESPACE = "IntegrationHubFileTransfer"
+
+s3_client = boto3.client("s3")
 BUCKET_NAMES_BY_KEY = json.loads(os.environ["BUCKET_NAMES_BY_KEY"])
 DEFAULT_SOURCE_BUCKET_KEY = os.environ["DEFAULT_SOURCE_BUCKET_KEY"]
 IDEMPOTENCY_TABLE = os.environ["IDEMPOTENCY_TABLE"]
 GUARDDUTY_MALWARE_SCAN_STATUS_TAG = "GuardDutyMalwareScanStatus"
-logger = Logger(service="managed-file-transfer-processing-to-post-scan")
+logger = Logger(service=SERVICE_NAME)
+metrics = Metrics(namespace=METRICS_NAMESPACE, service=SERVICE_NAME)
+tracer = Tracer(service=SERVICE_NAME)
 # Keep the truncated hash short enough for readable logs while still providing
 # a stable discriminator for same-named objects under different prefixes.
 LOG_KEY_PATH_HASH_LENGTH = 12
+SCAN_RESULT_STATUS_TO_BUCKET_KEY = {
+    "NO_THREATS_FOUND": "clean",
+    "THREATS_FOUND": "quarantine",
+    "UNSUPPORTED": "investigation",
+    "ACCESS_DENIED": "investigation",
+    "FAILED": "investigation",
+}
 
 persistence_layer = DynamoDBPersistenceLayer(table_name=IDEMPOTENCY_TABLE)
 # Use the resolved source and destination buckets so transport-level duplicates
@@ -31,15 +44,25 @@ idempotency_config = IdempotencyConfig(
 
 def iter_events(event):
     if "Records" not in event:
-        yield event
+        yield {"payload": event, "sqs_message_id": None}
         return
 
     for record in event["Records"]:
         if "body" not in record:
-            yield record
+            yield {"payload": record, "sqs_message_id": record.get("messageId")}
             continue
 
-        yield json.loads(record["body"])
+        yield {"payload": json.loads(record["body"]), "sqs_message_id": record.get("messageId")}
+
+
+def build_event_metadata(payload, sqs_message_id):
+    return {
+        "event_time": payload.get("time"),
+        "eventbridge_detail_type": payload.get("detail-type"),
+        "eventbridge_event_id": payload.get("id"),
+        "eventbridge_source": payload.get("source"),
+        "sqs_message_id": sqs_message_id,
+    }
 
 
 def get_object_details(event):
@@ -64,9 +87,18 @@ def as_bool(value):
     return str(value).lower() == "true"
 
 
-def normalise_payload(payload):
+def resolve_destination_bucket_key(payload, scan_result_status):
+    if payload.get("destination_bucket_key"):
+        return payload["destination_bucket_key"]
+
+    return SCAN_RESULT_STATUS_TO_BUCKET_KEY.get(scan_result_status)
+
+
+def normalise_payload(payload, sqs_message_id):
+    metadata = build_event_metadata(payload, sqs_message_id)
     source_bucket_key = payload.get("source_bucket_key", DEFAULT_SOURCE_BUCKET_KEY)
-    destination_bucket_key = payload.get("destination_bucket_key")
+    scan_result_status = get_scan_result_status(payload)
+    destination_bucket_key = resolve_destination_bucket_key(payload, scan_result_status)
 
     if destination_bucket_key is None and "destination_bucket_name" not in payload and "destination_bucket" not in payload:
         raise KeyError("destination_bucket_key")
@@ -83,12 +115,14 @@ def normalise_payload(payload):
 
     return {
         "operation": "processing-to-post-scan",
+        "destination_bucket_key": destination_bucket_key,
         "source_bucket_name": source_bucket_name,
         "source_key": source_key,
         "source_version_id": version_id,
         "destination_bucket_name": destination_bucket_name,
         "delete_source": as_bool(payload.get("delete_source", False)),
-        "scan_result_status": get_scan_result_status(payload),
+        "scan_result_status": scan_result_status,
+        **metadata,
     }
 
 
@@ -101,7 +135,7 @@ def get_source_tags(operation):
     if operation["source_version_id"]:
         tagging_kwargs["VersionId"] = operation["source_version_id"]
 
-    tag_set = s3.get_object_tagging(**tagging_kwargs).get("TagSet", [])
+    tag_set = s3_client.get_object_tagging(**tagging_kwargs).get("TagSet", [])
     return {tag["Key"]: tag["Value"] for tag in tag_set}
 
 
@@ -125,18 +159,33 @@ def put_destination_tags(operation, destination_version_id):
     if destination_version_id:
         tagging_kwargs["VersionId"] = destination_version_id
 
-    s3.put_object_tagging(**tagging_kwargs)
+    s3_client.put_object_tagging(**tagging_kwargs)
 
 
-def get_log_fields(operation):
+def get_log_fields(operation, routing_outcome=None):
     source_key = operation["source_key"]
 
-    return {
+    log_fields = {
+        "delete_source": operation["delete_source"],
+        "destination_bucket_key": operation.get("destination_bucket_key"),
+        "event_time": operation.get("event_time"),
+        "eventbridge_detail_type": operation.get("eventbridge_detail_type"),
+        "eventbridge_event_id": operation.get("eventbridge_event_id"),
+        "eventbridge_source": operation.get("eventbridge_source"),
         "object_key": source_key.rsplit("/", 1)[-1],
         "object_key_path_hash": hashlib.sha256(source_key.encode("utf-8")).hexdigest()[:LOG_KEY_PATH_HASH_LENGTH],
+        "operation": operation["operation"],
+        "scan_result_status": operation["scan_result_status"],
         "source_bucket_name": operation["source_bucket_name"],
+        "source_version_id": operation["source_version_id"],
+        "sqs_message_id": operation.get("sqs_message_id"),
         "destination_bucket_name": operation["destination_bucket_name"],
     }
+
+    if routing_outcome is not None:
+        log_fields["routing_outcome"] = routing_outcome
+
+    return log_fields
 
 
 @idempotent_function(
@@ -145,8 +194,9 @@ def get_log_fields(operation):
     config=idempotency_config,
     key_prefix="managed-file-transfer/processing-to-post-scan",
 )
+@tracer.capture_method
 def process_record(*, operation):
-    logger.info("Processing S3 object", extra=get_log_fields(operation))
+    logger.info("Starting post-scan routing", extra=get_log_fields(operation, routing_outcome="started"))
 
     copy_source = {
         "Bucket": operation["source_bucket_name"],
@@ -156,7 +206,7 @@ def process_record(*, operation):
     if operation["source_version_id"]:
         copy_source["VersionId"] = operation["source_version_id"]
 
-    s3.copy(
+    copy_response = s3_client.copy(
         CopySource=copy_source,
         Bucket=operation["destination_bucket_name"],
         Key=operation["source_key"],
@@ -165,9 +215,9 @@ def process_record(*, operation):
             "TaggingDirective": "COPY",
         },
     )
-    put_destination_tags(operation, None)
+    put_destination_tags(operation, copy_response.get("VersionId"))
 
-    logger.info("Copied S3 object", extra=get_log_fields(operation))
+    logger.info("Copied S3 object", extra=get_log_fields(operation, routing_outcome="copied"))
 
     if operation["delete_source"]:
         delete_kwargs = {
@@ -178,12 +228,15 @@ def process_record(*, operation):
         if operation["source_version_id"]:
             delete_kwargs["VersionId"] = operation["source_version_id"]
 
-        s3.delete_object(**delete_kwargs)
-        logger.info("Moved S3 object", extra=get_log_fields(operation))
+        s3_client.delete_object(**delete_kwargs)
+        logger.info("Moved S3 object", extra=get_log_fields(operation, routing_outcome="moved"))
+    else:
+        logger.info("Retained source S3 object", extra=get_log_fields(operation, routing_outcome="copied_only"))
 
     return {
         "delete_source": operation["delete_source"],
         "destination_bucket_name": operation["destination_bucket_name"],
+        "destination_bucket_key": operation.get("destination_bucket_key"),
         "source_bucket_name": operation["source_bucket_name"],
         "source_key": operation["source_key"],
         "source_version_id": operation["source_version_id"],
@@ -192,18 +245,27 @@ def process_record(*, operation):
 
 
 @logger.inject_lambda_context(clear_state=True, log_event=False)
+@tracer.capture_lambda_handler
+@metrics.log_metrics(capture_cold_start_metric=True)
 def lambda_handler(event, context):
     idempotency_config.register_lambda_context(context)
 
-    for payload in iter_events(event):
+    for record in iter_events(event):
         operation = None
+        payload = record["payload"]
+        sqs_message_id = record["sqs_message_id"]
 
         try:
-            operation = normalise_payload(payload)
+            operation = normalise_payload(payload, sqs_message_id)
+            tracer.put_annotation("route_name", operation["operation"])
+            tracer.put_annotation("destination_bucket_key", operation.get("destination_bucket_key") or "direct")
+            tracer.put_annotation("scan_result_status", operation["scan_result_status"] or "UNKNOWN")
             process_record(operation=operation)
+            metrics.add_metric(name="ObjectsRouted", unit=MetricUnit.Count, value=1)
         except Exception:
+            metrics.add_metric(name="RecordProcessingFailures", unit=MetricUnit.Count, value=1)
             logger.exception(
                 "Failed to move S3 object",
-                extra=get_log_fields(operation) if operation else {},
+                extra=get_log_fields(operation, routing_outcome="failed") if operation else build_event_metadata(payload, sqs_message_id),
             )
             raise

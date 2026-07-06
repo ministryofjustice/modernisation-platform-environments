@@ -3,5 +3,4 @@ locals {
     development = 30
     production  = 400
   }
-
 }

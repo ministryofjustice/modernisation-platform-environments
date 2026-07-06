@@ -23,6 +23,13 @@ module "sqs_incoming_s3_events" {
           test     = "StringEquals"
           variable = "aws:SourceAccount"
           values   = [data.aws_caller_identity.current.account_id]
+        },
+        {
+          test     = "ArnEquals"
+          variable = "aws:SourceArn"
+          values = [
+            for rule_key, rule in local.eventbridge_incoming_s3_rules : module.eventbridge_incoming_s3[rule_key].eventbridge_rule_arns[rule.name]
+          ]
         }
       ]
     }
@@ -89,6 +96,13 @@ module "sqs_guard_duty_malware_protection_for_s3_events" {
           test     = "StringEquals"
           variable = "aws:SourceAccount"
           values   = [data.aws_caller_identity.current.account_id]
+        },
+        {
+          test     = "ArnEquals"
+          variable = "aws:SourceArn"
+          values = [
+            for rule_key, rule in local.eventbridge_guard_duty_malware_protection_for_s3_rules : module.eventbridge_guard_duty_malware_protection_for_s3[rule_key].eventbridge_rule_arns[rule.name]
+          ]
         }
       ]
     }
