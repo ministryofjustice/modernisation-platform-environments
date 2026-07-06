@@ -353,6 +353,8 @@ resource "aws_cloudwatch_metric_alarm" "send_serco_fms_keys_errors" {
   threshold           = 0
   treat_missing_data  = "notBreaching"
 
+  actions_enabled = false
+
   metric_name = "Errors"
   namespace   = "AWS/Lambda"
   period      = 60
