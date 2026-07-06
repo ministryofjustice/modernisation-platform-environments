@@ -11,3 +11,32 @@ module "starter_pack" {
   image_repository      = format("%s.dkr.ecr.%s.amazonaws.com/cloud-platform/container-platform-terraform-starter-pack", data.aws_caller_identity.current.account_id, data.aws_region.current.region)
   image_tag             = "1.2.1"
 }
+
+resource "kubectl_manifest" "security_policy" {
+  yaml_body = <<-YAML
+    apiVersion: gateway.envoyproxy.io/v1alpha1
+    kind: SecurityPolicy
+    metadata:
+      name: source-ip-allowlist
+      namespace: starter-pack
+    spec:
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: starter-pack-route
+      authorization:
+        defaultAction: Deny
+        rules:
+          - action: Allow
+            principal:
+              clientCIDRs:
+                - 35.176.93.186/32   # alpha VPN
+  YAML
+
+  server_side_apply = true
+  wait              = true
+
+  depends_on = [
+    module.starter_pack
+  ]
+}
