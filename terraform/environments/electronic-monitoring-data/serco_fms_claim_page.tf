@@ -55,6 +55,18 @@ data "aws_iam_policy_document" "serco_fms_claim_page" {
     resources = [
       aws_sns_topic.emds_alerts.arn,
     ]
+  }
+  statement {
+    sid    = "ReadPasswordStateSecret"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      aws_secretsmanager_secret.serco_fms_password_state.arn,
+    ]
   }  
 }
 
@@ -97,8 +109,12 @@ module "serco_fms_claim_page" {
     ALLOWLIST_KEY = local.serco_fms_key_distribution_allowlist_key
 
     FILE_URL_TTL_SECONDS = "900"
-    
-    SNS_TOPIC_ARN = aws_sns_topic.emds_alerts.arn    
+
+    SNS_TOPIC_ARN = aws_sns_topic.emds_alerts.arn
+
+    SERCO_PASSWORD_STATE_SECRET_ARN = (
+      aws_secretsmanager_secret.serco_fms_password_state.arn
+    )
   }
 }
 
