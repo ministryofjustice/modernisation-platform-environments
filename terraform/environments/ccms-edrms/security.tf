@@ -91,16 +91,25 @@ resource "aws_security_group_rule" "ecs_tasks_egress_db" {
   source_security_group_id = aws_security_group.tds_db.id
 }
 
-resource "aws_security_group_rule" "ecs_tasks_egress_NEC" {
+resource "aws_security_group_rule" "ecs_tasks_egress_NEC_443" {
   security_group_id = aws_security_group.ecs_tasks_edrms.id
   type              = "egress"
-  description       = "Allow outbound HTTPS to 10.120.0.0/24"
+  description       = "Allow outbound HTTPS to NEC on port 443"
   protocol          = "TCP"
   from_port         = 443
   to_port           = 443
-  cidr_blocks       = ["10.120.0.0/24"]
+  cidr_blocks       = [local.application_data.accounts[local.environment].northgate_proxy]
 }
 
+resource "aws_security_group_rule" "ecs_tasks_egress_NEC_80" {
+  security_group_id = aws_security_group.ecs_tasks_edrms.id
+  type              = "egress"
+  description       = "Allow outbound HTTPS to NEC on port 80"
+  protocol          = "TCP"
+  from_port         = 80
+  to_port           = 80
+  cidr_blocks       = [local.application_data.accounts[local.environment].northgate_proxy]
+}
 
 # EC2 Instances Security Group
 resource "aws_security_group" "cluster_ec2" {
@@ -189,14 +198,24 @@ resource "aws_security_group_rule" "cluster_ec2_egress_db" {
   source_security_group_id = aws_security_group.tds_db.id
 }
 
-resource "aws_security_group_rule" "cluster_ec2_egress_NEC" {
+resource "aws_security_group_rule" "cluster_ec2_egress_NEC_443" {
   security_group_id = aws_security_group.cluster_ec2.id
   type              = "egress"
-  description       = "Allow outbound HTTPS to 10.120.0.0/24"
+  description       = "Allow outbound HTTPS to NEC on port 443"
   protocol          = "TCP"
   from_port         = 443
   to_port           = 443
-  cidr_blocks       = ["10.120.0.0/24"]
+  cidr_blocks       = [local.application_data.accounts[local.environment].northgate_proxy]
+}
+
+resource "aws_security_group_rule" "cluster_ec2_egress_NEC_80" {
+  security_group_id = aws_security_group.cluster_ec2.id
+  type              = "egress"
+  description       = "Allow outbound HTTPS to NEC on port 80"
+  protocol          = "TCP"
+  from_port         = 80
+  to_port           = 80
+  cidr_blocks       = [local.application_data.accounts[local.environment].northgate_proxy]
 }
 
 
