@@ -44,6 +44,18 @@ data "aws_iam_policy_document" "serco_fms_claim_page" {
       "${module.s3-serco-fms-key-distribution-bucket.bucket.arn}/${local.serco_fms_key_distribution_files_prefix}/${local.environment_shorthand}/*",
     ]
   }
+  statement {
+    sid    = "PublishClaimNotifications"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [
+      aws_sns_topic.emds_alerts.arn,
+    ]
+  }  
 }
 
 resource "aws_iam_policy" "serco_fms_claim_page" {
@@ -85,6 +97,8 @@ module "serco_fms_claim_page" {
     ALLOWLIST_KEY = local.serco_fms_key_distribution_allowlist_key
 
     FILE_URL_TTL_SECONDS = "900"
+    
+    SNS_TOPIC_ARN = aws_sns_topic.emds_alerts.arn    
   }
 }
 

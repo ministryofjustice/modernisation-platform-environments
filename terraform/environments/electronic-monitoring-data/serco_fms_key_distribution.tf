@@ -185,6 +185,18 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
       "${module.s3-serco-fms-key-distribution-bucket.bucket.arn}/${local.serco_fms_key_distribution_files_prefix}/${local.environment_shorthand}/*",
     ]
   }
+  statement {
+    sid    = "PublishDistributionNotifications"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [
+      aws_sns_topic.emds_alerts.arn,
+    ]
+  }  
 }
 
 resource "aws_iam_policy" "send_serco_fms_keys" {
@@ -257,6 +269,8 @@ module "send_serco_fms_keys" {
     ALLOWLIST_KEY = local.serco_fms_key_distribution_allowlist_key
 
     MAX_SECRET_AGE_HOURS = "48"
+
+    SNS_TOPIC_ARN = aws_sns_topic.emds_alerts.arn
   }
 }
 
