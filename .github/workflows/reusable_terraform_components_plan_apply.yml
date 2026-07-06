@@ -126,12 +126,17 @@
 
           - name: Checkout Linked Repository
             if: inputs.linked_repository != '' && inputs.linked_repository_path != ''
-            uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-            with:
-              repository: ${{ inputs.linked_repository }}
-              ref: ${{ inputs.linked_repository_ref }}
-              path: ${{ inputs.linked_repository_path }}
-              token: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
+            env:
+              LINKED_REPOSITORY: ${{ inputs.linked_repository }}
+              LINKED_REPOSITORY_PATH: ${{ inputs.linked_repository_path }}
+              LINKED_REPOSITORY_REF: ${{ inputs.linked_repository_ref }}
+            run: |
+              git -c http.extraheader="AUTHORIZATION: basic $(printf "x-access-token:%s" "$GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT" | base64 | tr -d '\n')" \
+                clone \
+                --branch "${LINKED_REPOSITORY_REF}" \
+                --depth 1 \
+                "https://github.com/${LINKED_REPOSITORY}.git" \
+                "${LINKED_REPOSITORY_PATH}"
 
           - name: Get AWS Account Number
             run: |
@@ -331,20 +336,30 @@
           - name: Checkout Repository
             uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-          - name: Checkout Linked Repository
-            if: inputs.linked_repository != '' && inputs.linked_repository_path != ''
-            uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-            with:
-              repository: ${{ inputs.linked_repository }}
-              ref: ${{ inputs.linked_repository_ref }}
-              path: ${{ inputs.linked_repository_path }}
-              token: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
-          
           - name: Decrypt Secrets
             uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
             with:
               environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
+              github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
               PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+          - name: Set Environment Variables
+            run: |
+              echo "GITHUB_TOKEN=$GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT" >> $GITHUB_ENV
+
+          - name: Checkout Linked Repository
+            if: inputs.linked_repository != '' && inputs.linked_repository_path != ''
+            env:
+              LINKED_REPOSITORY: ${{ inputs.linked_repository }}
+              LINKED_REPOSITORY_PATH: ${{ inputs.linked_repository_path }}
+              LINKED_REPOSITORY_REF: ${{ inputs.linked_repository_ref }}
+            run: |
+              git -c http.extraheader="AUTHORIZATION: basic $(printf "x-access-token:%s" "$GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT" | base64 | tr -d '\n')" \
+                clone \
+                --branch "${LINKED_REPOSITORY_REF}" \
+                --depth 1 \
+                "https://github.com/${LINKED_REPOSITORY}.git" \
+                "${LINKED_REPOSITORY_PATH}"
 
           - name: Get AWS Account Number
             run: |
