@@ -101,7 +101,7 @@ resource "aws_wafv2_web_acl" "oas_waf" {
 
 resource "aws_wafv2_web_acl_association" "oas_alb" {
   count        = contains(["preproduction", "development"], local.environment) ? 1 : 0
-  resource_arn = aws_lb.oas_lb.arn
+  resource_arn = aws_lb.oas_lb[0].arn
   web_acl_arn  = aws_wafv2_web_acl.oas_waf[0].arn
 }
 
@@ -129,6 +129,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "waf_logs_lifecycle" {
   rule {
     id     = "transition-to-glacier"
     status = "Enabled"
+
+    filter {}
 
     transition {
       days          = 90
