@@ -20,3 +20,13 @@ spec:
     - protocolPort: HTTPS:443
       defaultCertificate: {{ .Values.certificateArn }}
       sslPolicy: ELBSecurityPolicy-TLS13-1-2-2021-06
+      # https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_ListenerAttribute.html
+      listenerAttributes:
+        - key: routing.http.response.server.enabled
+          value: "false"         
+        - key: routing.http.response.strict_transport_security.header_value
+          value: "max-age=31536000; includeSubDomains; preload"
+        - key: routing.http.response.x_content_type_options.header_value
+          value: "nosniff"
+        - key: routing.http.response.x_frame_options.header_value
+          value: "SAMEORIGIN"

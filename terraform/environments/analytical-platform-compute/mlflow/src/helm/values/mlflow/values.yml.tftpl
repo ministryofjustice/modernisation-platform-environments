@@ -4,6 +4,7 @@ ingress:
   className: "default"
   annotations:
     external-dns.alpha.kubernetes.io/hostname: ${mlflow_hostname}
+    nginx.ingress.kubernetes.io/whitelist-source-range: ${join(",", ingress_allowlist)}
   hosts:
     - host: ${mlflow_hostname}
       paths:

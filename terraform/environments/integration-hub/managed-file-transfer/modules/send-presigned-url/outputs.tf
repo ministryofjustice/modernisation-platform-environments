@@ -23,6 +23,11 @@ output "sns_clean_file_download_notifications" {
   value       = module.sns_clean_file_download_notifications
 }
 
+output "sns_clean_file_client_notifications" {
+  description = "The full output of the SNS clean file client notifications module."
+  value       = module.sns_clean_file_client_notifications
+}
+
 output "lambda_clean_file_presigned_url_notifier" {
   description = "The full output of the Lambda clean file presigned URL notifier module."
   value       = module.lambda_clean_file_presigned_url_notifier

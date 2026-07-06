@@ -26,7 +26,7 @@
       "gridPos": { "h": 3, "w": 24, "x": 0, "y": 0 },
       "options": {
         "mode": "markdown",
-        "content": "Networking health for a single Data Platform account, from auto-published CloudWatch metrics (no setup needed). Pick an **Account** at the top. The **At a glance** tiles flag the key saturation/error signals and the **Cost & usage** tiles give an estimated NAT spend and data volume for the selected window; the rows below break down NAT gateways by resource via Metrics Insights. Watch for NAT **port-allocation errors** (SNAT exhaustion) and **packets dropped**. NAT cost is approximate — data-processing only, at the eu-west-2 rate of $0.048/GB, and excludes the per-hour gateway charge."
+        "content": "Networking health for a single Data Platform account, from auto-published CloudWatch metrics (no setup needed). Pick an **Account** at the top. The **At a glance** tiles flag the key saturation/error signals and the **Cost & usage** tiles give an estimated NAT spend and data volume for the selected window; the rows below break down NAT gateways by resource via Metrics Insights. Watch for NAT **port-allocation errors** (SNAT exhaustion) and **packets dropped**. NAT cost is approximate — data-processing only, at the eu-west-2 rate of $0.05/GB, and excludes the per-hour gateway charge."
       }
     },
     {
@@ -128,12 +128,82 @@
       "panels": []
     },
     {
+      "id": 16,
+      "type": "stat",
+      "title": "NAT bytes in from source",
+      "description": "Total BytesInFromSource processed by NAT gateways over the selected window. The source-side component of NAT data processing.",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 9 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "color": { "mode": "fixed", "fixedColor": "blue" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/NATGateway",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT SUM(BytesInFromSource) FROM \"AWS/NATGateway\""
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "type": "stat",
+      "title": "NAT bytes in from destination",
+      "description": "Total BytesInFromDestination processed by NAT gateways over the selected window. The destination-side component of NAT data processing.",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 9 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "color": { "mode": "fixed", "fixedColor": "blue" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "cloudwatch", "uid": "${account}" },
+          "refId": "A",
+          "region": "eu-west-2",
+          "namespace": "AWS/NATGateway",
+          "queryMode": "Metrics",
+          "metricQueryType": 1,
+          "metricEditorMode": 1,
+          "sqlExpression": "SELECT SUM(BytesInFromDestination) FROM \"AWS/NATGateway\""
+        }
+      ]
+    },
+    {
       "id": 8,
       "type": "stat",
-      "title": "NAT data-processing cost (est.)",
-      "description": "Estimated NAT gateway data-processing charge over the selected window: (BytesInFromSource + BytesInFromDestination) converted to GB and multiplied by the eu-west-2 rate of $0.048/GB. Excludes the fixed per-hour gateway charge.",
+      "title": "Estimated source-side NAT data-processing cost",
+      "description": "Estimated from NAT Gateway BytesInFromSource at the eu-west-2 rate of USD $0.05 per GB. Source-side component only — see panel notes. Excludes hourly, egress and cross-AZ charges.",
       "datasource": { "type": "datasource", "uid": "-- Mixed --" },
-      "gridPos": { "h": 4, "w": 8, "x": 0, "y": 9 },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 9 },
       "fieldConfig": {
         "defaults": {
           "unit": "currencyUSD",
@@ -163,35 +233,25 @@
           "hide": true
         },
         {
-          "datasource": { "type": "cloudwatch", "uid": "${account}" },
-          "refId": "B",
-          "region": "eu-west-2",
-          "namespace": "AWS/NATGateway",
-          "queryMode": "Metrics",
-          "metricQueryType": 1,
-          "metricEditorMode": 1,
-          "sqlExpression": "SELECT SUM(BytesInFromDestination) FROM \"AWS/NATGateway\"",
-          "hide": true
-        },
-        {
           "datasource": { "type": "__expr__", "uid": "__expr__" },
           "refId": "C",
           "type": "math",
-          "expression": "($A + $B) / 1000000000 * 0.048"
+          "expression": "$A / 1000000000 * 0.05"
         }
       ]
     },
     {
       "id": 9,
       "type": "stat",
-      "title": "Data processed (NAT)",
-      "description": "Total data processed by NAT gateways over the selected window (BytesInFromSource + BytesInFromDestination) — the volume the data-processing charge is based on.",
+      "title": "Estimated destination-side NAT data-processing cost",
+      "description": "Estimated from NAT Gateway BytesInFromDestination at the eu-west-2 rate of USD $0.05 per GB. Destination-side component only — see panel notes. Excludes hourly, egress and cross-AZ charges.",
       "datasource": { "type": "datasource", "uid": "-- Mixed --" },
-      "gridPos": { "h": 4, "w": 8, "x": 8, "y": 9 },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 9 },
       "fieldConfig": {
         "defaults": {
-          "unit": "bytes",
-          "color": { "mode": "fixed", "fixedColor": "blue" }
+          "unit": "currencyUSD",
+          "decimals": 2,
+          "color": { "mode": "fixed", "fixedColor": "green" }
         },
         "overrides": []
       },
@@ -212,17 +272,6 @@
           "queryMode": "Metrics",
           "metricQueryType": 1,
           "metricEditorMode": 1,
-          "sqlExpression": "SELECT SUM(BytesInFromSource) FROM \"AWS/NATGateway\"",
-          "hide": true
-        },
-        {
-          "datasource": { "type": "cloudwatch", "uid": "${account}" },
-          "refId": "B",
-          "region": "eu-west-2",
-          "namespace": "AWS/NATGateway",
-          "queryMode": "Metrics",
-          "metricQueryType": 1,
-          "metricEditorMode": 1,
           "sqlExpression": "SELECT SUM(BytesInFromDestination) FROM \"AWS/NATGateway\"",
           "hide": true
         },
@@ -230,9 +279,19 @@
           "datasource": { "type": "__expr__", "uid": "__expr__" },
           "refId": "C",
           "type": "math",
-          "expression": "$A + $B"
+          "expression": "$A / 1000000000 * 0.05"
         }
       ]
+    },
+    {
+      "id": 11,
+      "type": "text",
+      "title": "NAT cost estimate notes",
+      "gridPos": { "h": 4, "w": 16, "x": 8, "y": 13 },
+      "options": {
+        "mode": "markdown",
+        "content": "CloudWatch Metrics Insights cannot safely combine BytesInFromSource and BytesInFromDestination in a single panel without Grafana expression union warnings. These panels show the two components separately. For actual billing, use AWS Cost Explorer or CUR."
+      }
     },
     {
       "id": 10,
@@ -240,7 +299,7 @@
       "title": "Peak active connections",
       "description": "Highest total of concurrent active connections across all NAT gateways during the selected window.",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 9 },
+      "gridPos": { "h": 4, "w": 8, "x": 0, "y": 13 },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
@@ -274,7 +333,7 @@
       "type": "row",
       "title": "NAT gateways",
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 },
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 17 },
       "panels": []
     },
     {
@@ -282,7 +341,7 @@
       "type": "timeseries",
       "title": "NAT bytes out to destination",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 18 },
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -321,7 +380,7 @@
       "type": "timeseries",
       "title": "NAT active connections",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 18 },
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -360,7 +419,7 @@
       "type": "timeseries",
       "title": "NAT port-allocation errors (SNAT exhaustion)",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 22 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 26 },
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -407,7 +466,7 @@
       "type": "timeseries",
       "title": "NAT packets dropped",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 22 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 26 },
       "fieldConfig": {
         "defaults": {
           "custom": {

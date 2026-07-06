@@ -3,7 +3,7 @@
     "development": {
       "app_name": "ccms-oia",
       "aws_region": "eu-west-2",
-      "ami_image_id": "ami-0d6d764bbe794b8ca",
+      "ami_image_id": "ami-02f77a03ec776dc35",
       "gh_runner_ami_id": "ami-0336cdd409ab5eec4",
       "opa_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-oia",
       "opa_container_version": "ccms-oia-dev-bf589eb-SNAPSHOT",
@@ -86,7 +86,7 @@
     "test": {
       "app_name": "ccms-oia",
       "aws_region": "eu-west-2",
-      "ami_image_id": "ami-0d6d764bbe794b8ca",
+      "ami_image_id": "ami-02f77a03ec776dc35",
       "gh_runner_ami_id": "ami-0336cdd409ab5eec4",
       "opa_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-oia",
       "opa_container_version": "ccms-oia-23b-aca4955",
@@ -168,7 +168,7 @@
     "preproduction": {
       "app_name": "ccms-oia",
       "aws_region": "eu-west-2",
-      "ami_image_id": "ami-0d6d764bbe794b8ca",
+      "ami_image_id": "ami-02f77a03ec776dc35",
       "gh_runner_ami_id": "ami-0336cdd409ab5eec4",
       "opa_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-oia",
       "opa_container_version": "ccms-oia-23b-aca4955",
@@ -264,8 +264,8 @@
       "opa_server_port": "7001",
       "db_user": "opahubdb",
       "wl_user": "weblogicadmin",
-      "db_instance_version": "8.0.44",
-      "option_group_name": "default:mysql-8-0",
+      "db_instance_version": "8.4.8",
+      "option_group_name": "default:mysql-8-4",
       "maintenance_window": "Thu:00:00-Thu:03:00",
       "wl_mem_args": "-Xms6144m -Xmx8192m",
       "opa_container_cpu": "3072",

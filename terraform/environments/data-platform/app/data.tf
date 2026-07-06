@@ -2,6 +2,13 @@ data "aws_eks_cluster" "cluster" {
   name = "${local.application_name}-${local.environment}"
 }
 
+data "aws_route53_zone" "app" {
+  name         = "${local.environment_configuration.app_hostname}."
+  private_zone = false
+}
+
+data "aws_elb_service_account" "current" {}
+
 data "aws_kms_key" "secrets_manager_common" {
   key_id = "alias/secretsmanager/${local.application_name}-${local.environment}/common"
 }

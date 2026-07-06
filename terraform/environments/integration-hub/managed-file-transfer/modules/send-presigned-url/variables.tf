@@ -6,6 +6,18 @@ variable "application_name" {
   type = string
 }
 
+variable "aws_region" {
+  type = string
+}
+
+variable "client_destination_delivery_config" {
+  type = map(any)
+}
+
+variable "client_destination_delivery_secret_names" {
+  type = list(string)
+}
+
 variable "download_bucket_arn" {
   type = string
 }

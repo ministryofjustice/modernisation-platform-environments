@@ -7,17 +7,17 @@ locals {
   lambda_environments = {
     development = {
       condition   = local.is-development
-      s3_bucket   = "moj-infrastructure-dev"
+      s3_bucket   = "moj-general-infrastructure-dev"
       account_key = "ppud-development" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
     }
     preproduction = {
       condition   = local.is-preproduction
-      s3_bucket   = "moj-infrastructure-uat"
+      s3_bucket   = "moj-general-infrastructure-uat"
       account_key = "ppud-preproduction" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
     }
     production = {
       condition   = local.is-production
-      s3_bucket   = "moj-infrastructure"
+      s3_bucket   = "moj-general-infrastructure-prod"
       account_key = "ppud-production" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
     }
   }

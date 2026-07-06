@@ -4,6 +4,10 @@ locals {
 
   environment_configurations = {
     development = {
+      app_hostname = "development.data-platform.service.justice.gov.uk"
+      app_ingress_allowlist = [
+        "128.77.75.64/26", # Prisma Corporate
+      ]
       rds = {
         engine_version          = "18.4"
         instance_class          = "db.t4g.small"
@@ -13,9 +17,12 @@ locals {
         backup_retention_period = 1
         monitoring_interval     = 0
       }
-      sentry_dsn = ""
     }
     test = {
+      app_hostname = "test.data-platform.service.justice.gov.uk"
+      app_ingress_allowlist = [
+        "128.77.75.64/26", # Prisma Corporate
+      ]
       rds = {
         engine_version          = "18.4"
         instance_class          = "db.t4g.small"
@@ -25,9 +32,12 @@ locals {
         backup_retention_period = 1
         monitoring_interval     = 0
       }
-      sentry_dsn = ""
     }
     preproduction = {
+      app_hostname = "preproduction.data-platform.service.justice.gov.uk"
+      app_ingress_allowlist = [
+        "128.77.75.64/26", # Prisma Corporate
+      ]
       rds = {
         engine_version          = "18.4"
         instance_class          = "db.t4g.small"
@@ -37,9 +47,12 @@ locals {
         backup_retention_period = 7
         monitoring_interval     = 0
       }
-      sentry_dsn = ""
     }
     production = {
+      app_hostname = "data-platform.service.justice.gov.uk"
+      app_ingress_allowlist = [
+        "128.77.75.64/26", # Prisma Corporate
+      ]
       rds = {
         engine_version          = "18.4"
         instance_class          = "db.t4g.medium"
@@ -49,7 +62,6 @@ locals {
         backup_retention_period = 7
         monitoring_interval     = 60
       }
-      sentry_dsn = ""
     }
   }
 }

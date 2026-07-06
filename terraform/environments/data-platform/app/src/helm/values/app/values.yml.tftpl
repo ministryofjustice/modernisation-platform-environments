@@ -1,0 +1,56 @@
+---
+ingress:
+  enabled: false
+
+service:
+  type: NodePort
+
+app:
+  environment:
+    - name: DJANGO_SETTINGS_MODULE
+      value: ${app_django_settings_module}
+    - name: APP_ENV
+      value: ${app_env}
+    - name: SECRET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: app-secrets
+          key: secret-key
+    - name: SENTRY_DSN
+      valueFrom:
+        secretKeyRef:
+          name: app-secrets
+          key: sentry-dsn
+    - name: DB_USER
+      valueFrom:
+        secretKeyRef:
+          name: app-rds
+          key: username
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: app-rds
+          key: password
+    - name: DB_HOST
+      valueFrom:
+        secretKeyRef:
+          name: app-rds
+          key: host
+    - name: DB_PORT
+      valueFrom:
+        secretKeyRef:
+          name: app-rds
+          key: port
+    - name: DB_NAME
+      valueFrom:
+        secretKeyRef:
+          name: app-rds
+          key: dbname
+
+tolerations:
+  - key: compute.data-platform.service.justice.gov.uk/node-pool
+    value: "general-on-demand-arm64"
+    effect: NoSchedule
+
+nodeSelector:
+  compute.data-platform.service.justice.gov.uk/node-pool: "general-on-demand-arm64"

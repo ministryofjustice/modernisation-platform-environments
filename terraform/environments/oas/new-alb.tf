@@ -766,7 +766,7 @@ resource "aws_lb_listener_rule" "bi_sac_config_mgr_9502_rule" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   listener_arn = aws_lb_listener.http_9502_listener[0].arn
-  priority     = 230
+  priority     = 235
 
   action {
     type             = "forward"

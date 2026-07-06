@@ -16,6 +16,7 @@
     "CLAIMS.INVOLVEMENTS",
     "CLAIMS.INVOLVEMENT_TYPE_CODES",
     "CLAIMS.PI_TYPE_CAUSES",
+    "CLAIMS.POL_VICT_DETAILS",
     "CLAIMS.POST_HOLDERS",
     "CLAIMS.POST_HOLDER_GRADES",
     "DRAFT_OL.SAVE_APPLICANT_INJURIES",
@@ -1461,6 +1462,10 @@
     {
       "object_name": "CLAIMS.POST_HOLDERS",
       "column_name": "MOBILE_PHONE_NUMBER"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "NAME"
     },
     {
       "object_name": "CLAIMS.POST_HOLDERS",
