@@ -59,6 +59,7 @@ resource "aws_ecs_task_definition" "soasandbox-admin" {
       app_name             = local.application_data.accounts[local.environment].app_name
       app_image            = local.application_data.accounts[local.environment].admin_app_image
       admin_server_port    = local.application_data.accounts[local.environment].admin_server_port
+      admin_ssl_port       = local.application_data.accounts[local.environment].admin_ssl_port
       aws_region           = local.application_data.accounts[local.environment].aws_region
       container_version    = local.application_data.accounts[local.environment].admin_container_version
       soa_password         = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/password::"
@@ -66,6 +67,10 @@ resource "aws_ecs_task_definition" "soasandbox-admin" {
       db_role              = local.application_data.accounts[local.environment].soa_db_role
       db_instance_endpoint = aws_db_instance.soa_db.endpoint
       as_hostname          = aws_route53_record.admin-sandbox.fqdn
+      caab_user            = local.application_data.accounts[local.environment].admin_caab_user
+      pui_user             = local.application_data.accounts[local.environment].admin_pui_user
+      apply_user           = local.application_data.accounts[local.environment].admin_apply_user
+      keystore_secret_id   = local.application_data.accounts[local.environment].admin_keystore_secret_id
       wl_admin_mem_args    = local.application_data.accounts[local.environment].admin_wl_mem_args
       xxsoa_ds_host        = local.application_data.accounts[local.environment].tds_db_endpoint
       xxsoa_ds_db          = local.application_data.accounts[local.environment].tds_ds_db
@@ -82,6 +87,19 @@ resource "aws_ecs_task_definition" "soasandbox-admin" {
       pui_user_password    = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/pui/user/password::"
       ebs_user_username    = local.application_data.accounts[local.environment].admin_ebs_user_username
       ebs_user_password    = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/ebs/user/password::"
+      soa_rds_admin_user_password        = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:soa_rds_admin_user_password::"
+      soa_rds_all_ccmssoa_schema_password = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:soa_rds_all_ccmssoa_schema_password::"
+      admin_server_password               = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:admin_server_password::"
+      edrms_xxsoa_user_password           = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:edrms_xxsoa_user_password::"
+      ccms_apps_user_password             = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms_apps_user_password::"
+      cwa_apps_user_password              = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:cwa_apps_user_password::"
+      soa_realm_pui_user_password         = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:soa_realm_pui_user_password::"
+      soa_realm_apply_user_password       = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:soa_realm_apply_user_password::"
+      soa_realm_caab_user_password        = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:soa_realm_caab_user_password::"
+      soa_realm_ebs_soa_super_user_password = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:soa_realm_ebs_soa_super_user_password::"
+      extra_java_properties               = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:extra_java_properties::"
+      keystorePassword                    = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:keystorePassword::"
+      truststorePassword                  = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:truststorePassword::"
       run_rcu              = local.application_data.accounts[local.environment].admin_run_rcu_bootstrap
     }
   )
