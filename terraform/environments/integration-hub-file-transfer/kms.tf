@@ -69,3 +69,73 @@ module "kms_s3_audit" {
 
   tags = local.tags
 }
+
+module "kms_dynamodb" {
+  source  = "terraform-aws-modules/kms/aws"
+  version = "4.2.0"
+
+  aliases                 = ["dynamodb/idempotency"]
+  description             = "Key for cryptographic functions on DynamoDB tables"
+  enable_default_policy   = true
+  deletion_window_in_days = 30
+  multi_region            = false
+  is_enabled              = true
+  key_usage               = "ENCRYPT_DECRYPT"
+  enable_key_rotation     = true
+
+  # Allow the root account as administrator
+  key_administrators = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+
+  key_statements = [
+    {
+      sid = "AllowDynamoDBUseOfTheKey"
+      actions = [
+        "kms:CreateGrant",
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+        "kms:ReEncrypt*",
+      ]
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["*"]
+        }
+      ]
+
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "kms:CallerAccount"
+          values   = [data.aws_caller_identity.current.account_id]
+        },
+        {
+          test     = "StringLike"
+          variable = "kms:ViaService"
+          values   = ["dynamodb.*.amazonaws.com"]
+        }
+      ]
+    },
+    {
+      sid = "AllowDynamoDBServiceToDescribeTheKey"
+      actions = [
+        "kms:Describe*",
+        "kms:Get*",
+        "kms:List*",
+      ]
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["dynamodb.amazonaws.com"]
+        }
+      ]
+    }
+  ]
+
+  tags = local.tags
+}
