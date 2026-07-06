@@ -18,10 +18,10 @@ locals {
     migration_environment_short_name       = "prod"
     migration_environment_private_cidr     = ["10.160.16.0/22", "10.160.20.0/22", "10.160.24.0/22"]
     migration_environment_db_cidr          = ["10.160.28.0/24", "10.160.29.0/24", "10.160.30.0/25"]
-    cloudwatch_alarm_schedule              = true
-    cloudwatch_alarm_disable_time          = "20:45"
-    cloudwatch_alarm_enable_time           = "06:15"
-    cloudwatch_alarm_disable_weekend       = true
+    cloudwatch_alarm_schedule              = false
+    cloudwatch_alarm_disable_time          = null
+    cloudwatch_alarm_enable_time           = null
+    cloudwatch_alarm_disable_weekend       = null
   }
 
   bastion_config_production = {
@@ -138,10 +138,10 @@ locals {
   }
 
   dis_config_production = {
-    instance_count    = 0
+    instance_count    = 1
     ami_name          = "delius_mis_windows_server_patch_2025-10-01T13-00-02.504Z"
     computer_name     = "NDMIS-PRD-DIS" # 15 char limit
-    powershell_branch = "TM-2016/delius-mis/preprod-dis-build"
+    powershell_branch = "TM-2156/delius-mis/build-dis-server-part-1"
 
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100 }
@@ -402,7 +402,7 @@ locals {
         type       = "gp3"
       }
       data = {
-        iops       = 7680
+        iops       = 15360
         throughput = 480
         type       = "gp3"
         total_size = 7000
@@ -431,11 +431,9 @@ locals {
 
   dfi_report_bucket_config_production = null
 
-  lb_config_production = null
-
-  # lb_config_production = {
-  #   bucket_policy_enabled = true
-  # }
+  lb_config_production = {
+    bucket_policy_enabled = true
+  }
 
   datasync_config_production = null
 
