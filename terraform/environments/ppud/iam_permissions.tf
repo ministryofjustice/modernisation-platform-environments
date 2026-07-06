@@ -193,8 +193,8 @@ locals {
       condition   = local.is-production
       account_key = "ppud-production" # checkov:skip=CKV_SECRET_6: "Environment identifier, not a secret"
       s3_bucket_names = {
-        infrastructure = "moj-infrastructure"
-        log_files      = "moj-log-files-prod"
+        infrastructure = "moj-general-infrastructure-prod"
+        log_files      = "moj-general-logs-prod"
       }
     }
   }
