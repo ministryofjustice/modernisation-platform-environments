@@ -140,8 +140,7 @@ module "lambda_processing_to_post_scan" {
       quarantine    = module.s3_bucket["quarantine"].s3_bucket_id
       investigation = module.s3_bucket["investigation"].s3_bucket_id
     })
-    DEFAULT_SOURCE_BUCKET_KEY = module.s3_bucket["processing"].s3_bucket_id
-    IDEMPOTENCY_TABLE         = module.dynamodb_idempotency.dynamodb_table_id
+    IDEMPOTENCY_TABLE = module.dynamodb_idempotency.dynamodb_table_id
   }
 
   attach_policy_statements = true

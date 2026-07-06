@@ -17,7 +17,6 @@ METRICS_NAMESPACE = "IntegrationHubFileTransfer"
 
 s3_client = boto3.client("s3")
 BUCKET_NAMES_BY_KEY = json.loads(os.environ["BUCKET_NAMES_BY_KEY"])
-DEFAULT_SOURCE_BUCKET_KEY = os.environ["DEFAULT_SOURCE_BUCKET_KEY"]
 IDEMPOTENCY_TABLE = os.environ["IDEMPOTENCY_TABLE"]
 GUARDDUTY_MALWARE_SCAN_STATUS_TAG = "GuardDutyMalwareScanStatus"
 logger = Logger(service=SERVICE_NAME)
@@ -94,23 +93,27 @@ def resolve_destination_bucket_key(payload, scan_result_status):
     return SCAN_RESULT_STATUS_TO_BUCKET_KEY.get(scan_result_status)
 
 
+def resolve_destination_bucket_name(payload, destination_bucket_key):
+    return (
+        payload.get("destination_bucket_name")
+        or payload.get("destination_bucket")
+        or BUCKET_NAMES_BY_KEY[destination_bucket_key]
+    )
+
+
 def normalise_payload(payload, sqs_message_id):
     metadata = build_event_metadata(payload, sqs_message_id)
-    source_bucket_key = payload.get("source_bucket_key", DEFAULT_SOURCE_BUCKET_KEY)
     scan_result_status = get_scan_result_status(payload)
     destination_bucket_key = resolve_destination_bucket_key(payload, scan_result_status)
+
+    if "source_bucket_name" not in payload and "source_bucket" not in payload:
+        raise KeyError("source_bucket_name")
 
     if destination_bucket_key is None and "destination_bucket_name" not in payload and "destination_bucket" not in payload:
         raise KeyError("destination_bucket_key")
 
-    source_bucket_name = payload.get(
-        "source_bucket_name",
-        payload.get("source_bucket", BUCKET_NAMES_BY_KEY[source_bucket_key]),
-    )
-    destination_bucket_name = payload.get(
-        "destination_bucket_name",
-        payload.get("destination_bucket", BUCKET_NAMES_BY_KEY[destination_bucket_key]),
-    )
+    source_bucket_name = payload.get("source_bucket_name") or payload.get("source_bucket")
+    destination_bucket_name = resolve_destination_bucket_name(payload, destination_bucket_key)
     source_key, version_id = get_object_details(payload)
 
     return {

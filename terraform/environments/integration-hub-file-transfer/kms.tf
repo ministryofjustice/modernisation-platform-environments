@@ -89,7 +89,7 @@ module "kms_cloudwatch_logs" {
           test     = "ArnLike"
           variable = "aws:PrincipalArn"
           values = [
-            "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess",
+            "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess",
             "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}",
             "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/AWSReservedSSO_*",
           ]
@@ -314,7 +314,7 @@ module "kms_sqs" {
         {
           test     = "ArnLike"
           variable = "kms:EncryptionContext:aws:sqs:queueArn"
-          values   = ["arn:aws:sqs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"]
+          values   = ["arn:aws:sqs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:*"]
         }
       ]
     }
