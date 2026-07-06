@@ -1,11 +1,11 @@
 locals {
 
-  application_name          = "integration-hub-api"
+  application_name          = "integration-hub"
   resource_application_name = "integration-hub"
   component_name            = "api-platform"
   resource_name_prefix      = "${local.resource_application_name}-${local.component_name}"
   workspace_application_prefixes = [
-    "${local.application_name}-",
+    "integration-hub-api-",
     "${local.resource_application_name}-",
   ]
   workspace_environment_matches = [
