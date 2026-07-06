@@ -35,6 +35,11 @@ locals {
         "213.121.161.112/28", # 102PF
         "51.149.2.0/24",      # 10SC
       ]
+
+      # Alert Routing Blocks: Scopes rules, disables specific metrics, and configures resource overrides
+      alerts_configured_accounts = [
+        { name = "data-platform-development", enabled_groups = ["AI Gateway"] }
+      ]
     }
     test = {
       monitoring_stack_enabled = false

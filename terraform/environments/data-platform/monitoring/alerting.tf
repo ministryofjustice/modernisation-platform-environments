@@ -1,0 +1,59 @@
+# ------------------------------------------------------------------------------
+# ALERT FOLDERS
+# Creates the logical directory structure with-in Grafana to organize alerting rules.
+# ------------------------------------------------------------------------------
+resource "grafana_folder" "alert_rules" {
+  for_each = local.grafana_alerting_manageable ? local.alert_rule_folder_paths : toset([])
+
+  uid   = "alert-rules-${replace(each.key, "/", "-")}"
+  title = each.key
+
+  depends_on = [helm_release.grafana]
+}
+
+# ------------------------------------------------------------------------------
+#ALERT RULE GROUPS & RULES
+# Manages the evaluation groups, query structures, and thresholds for alerts.
+# ------------------------------------------------------------------------------
+resource "grafana_rule_group" "this" {
+  for_each = {
+    for name, group in local.rule_groups_flat :
+    name => group
+    if local.grafana_alerting_manageable
+  }
+
+  name       = each.value.name
+  
+  folder_uid = grafana_folder.alert_rules[each.value.folder].uid
+  
+  interval_seconds = local.interval_seconds_by_env[each.value.env]
+
+  dynamic "rule" {
+    for_each = each.value.rules
+    content {
+      name          = rule.value.title
+      uid           = rule.value.uid
+      condition     = rule.value.condition
+      for           = rule.value.for
+      no_data_state = rule.value.noDataState
+      labels        = rule.value.labels
+
+      dynamic "data" {
+        for_each = rule.value.data
+        content {
+          ref_id         = data.value.refId
+          datasource_uid = data.value.datasourceUid
+          
+          model          = sensitive(jsonencode(data.value.model))
+
+          relative_time_range {
+            from = data.value.relativeTimeRange.from
+            to   = data.value.relativeTimeRange.to
+          }
+        }
+      }
+    }
+  }
+
+  depends_on = [helm_release.grafana]
+}
