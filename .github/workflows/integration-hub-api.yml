@@ -56,6 +56,7 @@ jobs:
       component: "${{ matrix.component }}"     # If your strategy workflow also outputs "matrix.component"
       linked_repository: "ministryofjustice/integration-hub-file-transfer-api"
       linked_repository_path: ".linked-repos/integration-hub-file-transfer-api"
+      linked_repository_ref: "${{ github.head_ref || github.ref_name }}"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -71,6 +72,7 @@ jobs:
       component: "${{ inputs.component }}"  # Targets a specific component for the destroy operation; defaults to 'root' if not specified.
       linked_repository: "ministryofjustice/integration-hub-file-transfer-api"
       linked_repository_path: ".linked-repos/integration-hub-file-transfer-api"
+      linked_repository_ref: "${{ github.head_ref || github.ref_name }}"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
