@@ -431,11 +431,9 @@ locals {
 
   dfi_report_bucket_config_production = null
 
-  lb_config_production = null
-
-  # lb_config_production = {
-  #   bucket_policy_enabled = true
-  # }
+  lb_config_production = {
+    bucket_policy_enabled = true
+  }
 
   datasync_config_production = null
 
