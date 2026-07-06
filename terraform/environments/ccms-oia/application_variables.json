@@ -265,7 +265,6 @@
       "db_user": "opahubdb",
       "wl_user": "weblogicadmin",
       "db_instance_version": "8.4.8",
-      "option_group_name": "default:mysql-8-4",
       "maintenance_window": "Thu:00:00-Thu:03:00",
       "wl_mem_args": "-Xms6144m -Xmx8192m",
       "opa_container_cpu": "3072",
