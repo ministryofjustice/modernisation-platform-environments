@@ -35,6 +35,16 @@ resource "aws_security_group_rule" "alb_admin_ingress_7001" {
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
+resource "aws_security_group_rule" "alb_admin_ingress_7002" {
+  security_group_id = aws_security_group.alb_admin.id
+  type              = "ingress"
+  description       = "Admin Weblogic - SSL Port"
+  protocol          = "TCP"
+  from_port         = 7002
+  to_port           = 7002
+  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+}
+
 resource "aws_security_group_rule" "alb_admin_workspace_ingress_80" {
   security_group_id = aws_security_group.alb_admin.id
   type              = "ingress"
