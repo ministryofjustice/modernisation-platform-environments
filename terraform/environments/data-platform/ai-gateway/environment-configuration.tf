@@ -1,7 +1,6 @@
 locals {
   environment_configurations = {
     development = {
-      ai_background_health_check_interval = 60
       litellm_version     = "1.90.0"
       ai_gateway_hostname = "development.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
