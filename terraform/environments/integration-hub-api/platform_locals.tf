@@ -1,6 +1,9 @@
 locals {
 
-  application_name = "integration-hub-api"
+  application_name          = "integration-hub-api"
+  resource_application_name = "integration-hub"
+  component_name            = "api-platform"
+  resource_name_prefix      = "${local.resource_application_name}-${local.component_name}"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 

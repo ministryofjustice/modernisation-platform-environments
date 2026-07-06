@@ -1,5 +1,14 @@
 locals {
   api_configuration = try(local.application_data.accounts[local.environment].api_configuration, {})
+  api_code_root_candidates = [
+    abspath("${path.module}/../../../../../integration-hub-file-transfer-api"),
+    abspath("${path.module}/../../../../.linked-repos/integration-hub-file-transfer-api"),
+  ]
+  api_code_root_matches = [
+    for candidate in local.api_code_root_candidates : candidate
+    if fileexists("${candidate}/openapi.yaml")
+  ]
+  api_code_root = local.api_code_root_matches[0]
   api_docs_configuration = merge(
     {
       basic_auth_username = "api-docs"

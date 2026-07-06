@@ -51,6 +51,21 @@
             required: false
             default: "ubuntu-latest"
             description: "GitHub Actions runner label to use for plan and apply jobs."
+          linked_repository:
+            type: string
+            required: false
+            default: ""
+            description: "Optional companion repository to check out into the workspace before Terraform runs."
+          linked_repository_path:
+            type: string
+            required: false
+            default: ""
+            description: "Workspace-relative path where the optional companion repository should be checked out."
+          linked_repository_ref:
+            type: string
+            required: false
+            default: "main"
+            description: "Git ref to use when checking out the optional companion repository."
         secrets:
           MODERNISATION_PLATFORM_ACCOUNT_ID:
             required: true
@@ -108,6 +123,15 @@
           - name: Set Environment Variables
             run: |
               echo "GITHUB_TOKEN=$GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT" >> $GITHUB_ENV
+
+          - name: Checkout Linked Repository
+            if: inputs.linked_repository != '' && inputs.linked_repository_path != ''
+            uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            with:
+              repository: ${{ inputs.linked_repository }}
+              ref: ${{ inputs.linked_repository_ref }}
+              path: ${{ inputs.linked_repository_path }}
+              token: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
 
           - name: Get AWS Account Number
             run: |
@@ -306,6 +330,15 @@
         steps:
           - name: Checkout Repository
             uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+          - name: Checkout Linked Repository
+            if: inputs.linked_repository != '' && inputs.linked_repository_path != ''
+            uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            with:
+              repository: ${{ inputs.linked_repository }}
+              ref: ${{ inputs.linked_repository_ref }}
+              path: ${{ inputs.linked_repository_path }}
+              token: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
           
           - name: Decrypt Secrets
             uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1

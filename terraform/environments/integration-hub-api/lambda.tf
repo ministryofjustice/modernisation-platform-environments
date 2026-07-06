@@ -2,7 +2,7 @@ module "lambda_upload_ticket" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.8.0"
 
-  function_name                = "${local.application_name}-${local.component_name}-upload-ticket"
+  function_name                = "${local.resource_name_prefix}-upload-ticket"
   description                  = "Generates presigned S3 upload URLs for managed file transfer clients"
   handler                      = "lambda_function.lambda_handler"
   runtime                      = "python3.12"
@@ -79,7 +79,7 @@ module "lambda_api_authorizer" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.8.0"
 
-  function_name                = "${local.application_name}-${local.component_name}-authorizer"
+  function_name                = "${local.resource_name_prefix}-authorizer"
   description                  = "Authenticates and authorises MFT API callers"
   handler                      = "lambda_function.lambda_handler"
   runtime                      = "python3.12"
@@ -146,7 +146,7 @@ module "lambda_api_docs" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.8.0"
 
-  function_name = "${local.application_name}-${local.component_name}-docs"
+  function_name = "${local.resource_name_prefix}-docs"
   description   = "Serves the protected Swagger UI and OpenAPI contract for the MFT API"
   handler       = "lambda_function.lambda_handler"
   runtime       = "python3.12"
