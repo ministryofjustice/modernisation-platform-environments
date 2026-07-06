@@ -29,7 +29,7 @@ resource "aws_db_instance" "opahub_db" {
   username                    = jsondecode(data.aws_secretsmanager_secret_version.opahub_secrets.secret_string)["db_user"]
   password                    = jsondecode(data.aws_secretsmanager_secret_version.opahub_secrets.secret_string)["db_password"]
   port                        = 3306
-  apply_immediately           = false #Toggle to true if you want changes to be applied immediately
+  apply_immediately           = true #Toggle to true if you want changes to be applied immediately
 
   vpc_security_group_ids  = [aws_security_group.opahub_db.id]
   db_subnet_group_name    = aws_db_subnet_group.opahub_db_subnets.id
