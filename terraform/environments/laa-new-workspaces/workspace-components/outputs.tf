@@ -36,3 +36,26 @@ output "radius_portal_url" {
   description = "URL of the RADIUS MFA self-service portal"
   value       = "https://${aws_route53_record.radius_portal.name}"
 }
+
+###############################################
+# Outputs for AWS Network Firewall
+###############################################
+
+output "network_firewall_policy_arn" {
+  description = "ARN of the WorkSpaces Network Firewall policy for web filtering"
+  value       = try(aws_networkfirewall_firewall_policy.workspaces_web_allowlist.arn, null)
+}
+
+output "network_firewall_id" {
+  description = "ID of the WorkSpaces Network Firewall"
+  value       = try(aws_networkfirewall_firewall.workspaces_web_allowlist.id, null)
+}
+
+output "network_firewall_endpoint_ids" {
+  description = "Endpoint IDs for the WorkSpaces Network Firewall"
+  value = try(
+    [for sync_state in aws_networkfirewall_firewall.workspaces_web_allowlist.firewall_status[0].sync_states : sync_state.endpoint_id],
+    []
+  )
+}
+
