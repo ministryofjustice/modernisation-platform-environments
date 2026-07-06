@@ -213,7 +213,7 @@ locals {
               try(combo.rule.use_metric_math, false) == true
               ? [true] : []
               ) : [{
-                refId             = "math"
+                refId      = "math"
                 refId      = "EXPR"
                 expression = "$A / $A2 * 100"
               }

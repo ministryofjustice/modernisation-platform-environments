@@ -22,10 +22,10 @@ resource "grafana_rule_group" "this" {
     if local.grafana_alerting_manageable
   }
 
-  name       = each.value.name
-  
+  name = each.value.name
+
   folder_uid = grafana_folder.alert_rules[each.value.folder].uid
-  
+
   interval_seconds = local.interval_seconds_by_env[each.value.env]
 
   dynamic "rule" {
@@ -43,8 +43,8 @@ resource "grafana_rule_group" "this" {
         content {
           ref_id         = data.value.refId
           datasource_uid = data.value.datasourceUid
-          
-          model          = sensitive(jsonencode(data.value.model))
+
+          model = sensitive(jsonencode(data.value.model))
 
           relative_time_range {
             from = data.value.relativeTimeRange.from

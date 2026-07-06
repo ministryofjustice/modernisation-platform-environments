@@ -70,7 +70,7 @@ locals {
   alert_rule_folder_paths = toset([for g in local.group_folders : g.folder])
 
   # Default evaluation interval for alert rules (e.g. '1m', '5m')
-  evaluation_interval = "1m" 
+  evaluation_interval = "1m"
 
   grafana_monitored_accounts_by_name = {
     for account in local.environment_configuration.grafana_monitored_accounts :

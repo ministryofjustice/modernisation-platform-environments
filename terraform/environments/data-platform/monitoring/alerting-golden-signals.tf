@@ -4,7 +4,7 @@ locals {
   # the suffix used when naming the rule group in the YAML output.
   # ---------------------------------------------------------------------------
   group_folders = {
-     "AI Gateway"      = { folder = "internal/compute/ai-gateway", name_suffix = "litellm" }
+    "AI Gateway" = { folder = "internal/compute/ai-gateway", name_suffix = "litellm" }
   }
 
   # ---------------------------------------------------------------------------
@@ -73,9 +73,9 @@ locals {
   alerting_golden_signals = {
 
     # ── AI Gateway (LiteLLM) ──────────────────────────────────────────────────
-    litellm_deployment_state = { group = "AI Gateway", datasource_type = "prometheus", expr = "(sum by (litellm_model_name, requested_model) (rate(litellm_deployment_failure_responses_total{api_key_alias=\"litellm-internal-health-check\"}[5m])) or (sum by (litellm_model_name, requested_model) (rate(litellm_deployment_total_requests_total{api_key_alias=\"litellm-internal-health-check\"}[5m])) * 0)) / sum by (litellm_model_name, requested_model) (rate(litellm_deployment_total_requests_total{api_key_alias=\"litellm-internal-health-check\"}[5m])) * 100", metric = "litellm_deployment_health_check_failure_rate_pct", type = "gt", dim_key = "", ok_when_nodata = true, warning = "litellm_deployment_state_warn", critical = "litellm_deployment_state_crit" }
-    litellm_provider_state = { group = "AI Gateway", datasource_type = "prometheus", expr = "min by (api_provider) ((sum by (api_provider, litellm_model_name) (rate(litellm_deployment_failure_responses_total{api_key_alias=\"litellm-internal-health-check\"}[5m])) or (sum by (api_provider, litellm_model_name) (rate(litellm_deployment_total_requests_total{api_key_alias=\"litellm-internal-health-check\"}[5m])) * 0)) / sum by (api_provider, litellm_model_name) (rate(litellm_deployment_total_requests_total{api_key_alias=\"litellm-internal-health-check\"}[5m])) * 100)", metric = "litellm_provider_health_check_failure_rate_pct", type = "gt", dim_key = "", ok_when_nodata = true, warning = "litellm_provider_state_warn", critical = "litellm_provider_state_crit" }
+    litellm_deployment_state       = { group = "AI Gateway", datasource_type = "prometheus", expr = "(sum by (litellm_model_name, requested_model) (rate(litellm_deployment_failure_responses_total{api_key_alias=\"litellm-internal-health-check\"}[5m])) or (sum by (litellm_model_name, requested_model) (rate(litellm_deployment_total_requests_total{api_key_alias=\"litellm-internal-health-check\"}[5m])) * 0)) / sum by (litellm_model_name, requested_model) (rate(litellm_deployment_total_requests_total{api_key_alias=\"litellm-internal-health-check\"}[5m])) * 100", metric = "litellm_deployment_health_check_failure_rate_pct", type = "gt", dim_key = "", ok_when_nodata = true, warning = "litellm_deployment_state_warn", critical = "litellm_deployment_state_crit" }
+    litellm_provider_state         = { group = "AI Gateway", datasource_type = "prometheus", expr = "min by (api_provider) ((sum by (api_provider, litellm_model_name) (rate(litellm_deployment_failure_responses_total{api_key_alias=\"litellm-internal-health-check\"}[5m])) or (sum by (api_provider, litellm_model_name) (rate(litellm_deployment_total_requests_total{api_key_alias=\"litellm-internal-health-check\"}[5m])) * 0)) / sum by (api_provider, litellm_model_name) (rate(litellm_deployment_total_requests_total{api_key_alias=\"litellm-internal-health-check\"}[5m])) * 100)", metric = "litellm_provider_health_check_failure_rate_pct", type = "gt", dim_key = "", ok_when_nodata = true, warning = "litellm_provider_state_warn", critical = "litellm_provider_state_crit" }
     litellm_bedrock_exception_rate = { group = "AI Gateway", datasource_type = "prometheus", expr = "sum by (api_provider) (rate(litellm_deployment_failure_responses_total{exception_class=~\"Bedrock\\\\..*\"}[5m]))", metric = "litellm_bedrock_exception_rate", type = "gt", dim_key = "", ok_when_nodata = true, warning = "litellm_bedrock_exception_rate_warn", critical = "litellm_bedrock_exception_rate_crit" }
 
-    }
+  }
 }
