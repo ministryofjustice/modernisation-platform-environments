@@ -43,100 +43,63 @@ data "aws_subnets" "shared-public" {
 data "aws_subnet" "data_subnets_a" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.name}a"
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.region}a"
   }
 }
 
 data "aws_subnet" "data_subnets_b" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.name}b"
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.region}b"
   }
 }
 
 data "aws_subnet" "data_subnets_c" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.name}c"
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.region}c"
   }
 }
 
 data "aws_subnet" "private_subnets_a" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}a"
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.region}a"
   }
 }
 
 data "aws_subnet" "private_subnets_b" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}b"
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.region}b"
   }
 }
 
 data "aws_subnet" "private_subnets_c" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}c"
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.region}c"
   }
 }
 
 data "aws_subnet" "public_subnets_a" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}a"
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.region}a"
   }
 }
 
 data "aws_subnet" "public_subnets_b" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}b"
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.region}b"
   }
 }
 
 data "aws_subnet" "public_subnets_c" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}c"
-  }
-}
-
-# VPC Endpoint subnet lookup (used to identify shared VPCE subnets)
-data "aws_subnets" "shared_vpce" {
-  provider = aws.core-vpc
-
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.shared.id]
-  }
-  tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-protected*"
-  }
-}
-
-data "aws_subnet" "vpce_subnets_a" {
-  provider = aws.core-vpc
-  vpc_id   = data.aws_vpc.shared.id
-  tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-protected-${data.aws_region.current.name}a"
-  }
-}
-
-data "aws_subnet" "vpce_subnets_b" {
-  provider = aws.core-vpc
-  vpc_id   = data.aws_vpc.shared.id
-  tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-protected-${data.aws_region.current.name}b"
-  }
-}
-
-data "aws_subnet" "vpce_subnets_c" {
-  provider = aws.core-vpc
-  vpc_id   = data.aws_vpc.shared.id
-  tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-protected-${data.aws_region.current.name}c"
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.region}c"
   }
 }
 
