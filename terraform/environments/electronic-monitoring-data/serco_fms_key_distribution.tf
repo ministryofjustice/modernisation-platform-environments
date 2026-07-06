@@ -271,6 +271,12 @@ module "send_serco_fms_keys" {
     MAX_SECRET_AGE_HOURS = "48"
 
     SNS_TOPIC_ARN = aws_sns_topic.emds_alerts.arn
+
+    FILE_CLAIM_WARNING_HOURS = "24"
+
+    PASSWORD_DISPLAY_WARNING_HOURS = "24"
+
+    PASSWORD_ACK_WARNING_HOURS = "1"
   }
 }
 
