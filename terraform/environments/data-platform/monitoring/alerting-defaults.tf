@@ -7,14 +7,14 @@ locals {
     litellm_deployment_state_warn = 0 # % of failed health-check requests for a given model/deployment — fires on state > 0  → catches any failure at all (even a single blip)
     litellm_deployment_state_crit = 1 # % of failed health-check requests for a given model/deployment — fires on state > 1  → catches sustained/repeated failures, not just a one-off blip
 
-    litellm_provider_state_warn = 90 # % of models within a provider failing health checks — fires on state > 90 → catches early signs most models for that provider are down
-    litellm_provider_state_crit = 99 # % of models within a provider failing health checks — fires on state > 99 → catches near-total/total provider outage
+    litellm_provider_state_warn = 0 # % of models within a provider failing health checks — fires on state > 0 → catches any failure at all (even a single blip)
+    litellm_provider_state_crit = 1 # % of models within a provider failing health checks — fires on state > 1 → catches sustained/repeated failures, not just a one-off blip
 
     # Same thresholds reused for the admin instance's equivalent rules
     litellm_deployment_state_admin_warn = 0
     litellm_deployment_state_admin_crit = 1
-    litellm_provider_state_admin_warn   = 90
-    litellm_provider_state_admin_crit   = 99
+    litellm_provider_state_admin_warn   = 0
+    litellm_provider_state_admin_crit   = 1
 
   }
 
