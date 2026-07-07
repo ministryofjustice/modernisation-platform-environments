@@ -25,6 +25,9 @@ module "bastion_linux" {
   environment   = local.environment
   region        = "eu-west-2"
 
-  tags_common = local.tags
+  tags_common = {
+    for k, v in local.tags : k => v
+    if k != "source-code"
+  }
   tags_prefix = terraform.workspace
 }
