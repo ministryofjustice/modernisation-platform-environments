@@ -73,6 +73,7 @@ resource "helm_release" "litellm" {
     helm_release.litellm_admin,
     module.iam_role,
     kubernetes_service_account_v1.ai_gateway,
+    kubernetes_config_map_v1.litellm_hooks,
     kubernetes_secret_v1.litellm_master_key,
     kubernetes_manifest.external_secret_litellm_license,
     kubernetes_manifest.external_secret_litellm_salt_key,
