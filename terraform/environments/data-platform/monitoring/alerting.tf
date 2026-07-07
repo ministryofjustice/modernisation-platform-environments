@@ -3,7 +3,7 @@
 # Creates the logical directory structure within Grafana to organize alerting rules.
 # ------------------------------------------------------------------------------
 resource "grafana_folder" "alert_rules" {
-  for_each = local.grafana_alerting_manageable ? local.alert_rule_folder_paths : toset([])
+  for_each = (local.grafana_alerting_manageable && length(local.grafana_monitored_accounts_by_uid) > 0) ? local.alert_rule_folder_paths : toset([])
 
   uid   = "alert-rules-${replace(each.key, "/", "-")}"
   title = each.key
