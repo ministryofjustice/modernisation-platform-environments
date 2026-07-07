@@ -12,7 +12,7 @@ resource "kubectl_manifest" "nodeclass_custom_networking" {
       subnetSelectorTerms:
         - tags:
             SubnetType: "Private"
-            Cluster: "${local.cp_vpc_name}"
+            environment-name: "${local.cp_vpc_name}"
 
       # Node security group
       securityGroupSelectorTerms:
