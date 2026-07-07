@@ -21,6 +21,9 @@ locals {
         # GitHub Actions
         "20.58.27.30/32" # octo-production
       ]
+      ai_gateway_internal_ingress_allowlist = [
+        "172.16.0.0/16"
+      ]
       ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
         min_replicas                      = 1
@@ -75,6 +78,9 @@ locals {
         # GitHub Actions
         "20.58.27.30/32" # octo-production
       ]
+      ai_gateway_internal_ingress_allowlist = [
+        "172.16.0.0/16"
+      ]
       ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
         min_replicas                      = 1
@@ -125,6 +131,9 @@ locals {
         # GitHub Actions
         "20.58.27.30/32" # octo-production
       ]
+      ai_gateway_internal_ingress_allowlist = [
+        "172.16.0.0/16"
+      ]
       ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
         min_replicas                      = 1
@@ -174,6 +183,9 @@ locals {
         "51.149.2.0/24",      # 10SC
         # GitHub Actions
         "20.58.27.30/32" # octo-production
+      ]
+      ai_gateway_internal_ingress_allowlist = [
+        "172.16.0.0/16"
       ]
       ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
