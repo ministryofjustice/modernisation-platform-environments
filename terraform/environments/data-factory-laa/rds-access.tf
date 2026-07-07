@@ -47,8 +47,9 @@ resource "aws_db_snapshot_copy" "access" {
   source_db_snapshot_identifier = local.access_source_snapshot_arn
   target_db_snapshot_identifier = "${local.application_name}-access-staging-copy"
   kms_key_id                    = aws_kms_key.access_rds[0].arn
-  copy_tags                     = true
 
+  # copy_tags is not permitted for shared/public source snapshots; we apply our
+  # own tags below instead.
   tags = local.tags
 }
 
