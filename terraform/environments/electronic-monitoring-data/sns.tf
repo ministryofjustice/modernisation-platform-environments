@@ -139,7 +139,23 @@ data "aws_iam_policy_document" "emds_alerts_kms" {
         aws_iam_role.serco_fms_claim_page.arn,
       ]
     }
-  }  
+  }
+  statement {
+    sid       = "AllowSercoFmsKeyAccessObserverUseOfKey"
+    effect    = "Allow"
+    resources = ["*"]
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+    ]
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        aws_iam_role.serco_fms_key_access_observer.arn,
+      ]
+    }
+  }
 }
 
 data "aws_iam_policy_document" "emds_alerts_topic_policy" {
@@ -263,6 +279,23 @@ data "aws_iam_policy_document" "emds_alerts_topic_policy" {
       identifiers = [
         aws_iam_role.send_serco_fms_keys.arn,
         aws_iam_role.serco_fms_claim_page.arn,
+      ]
+    }
+  }
+  statement {
+    sid    = "AllowSercoFmsKeyAccessObserverToPublish"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [aws_sns_topic.emds_alerts.arn]
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        aws_iam_role.serco_fms_key_access_observer.arn,
       ]
     }
   }
