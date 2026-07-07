@@ -44,17 +44,6 @@ resource "aws_lb_target_group" "admin" {
   }
 }
 
-resource "aws_lb_listener" "admin80" {
-  load_balancer_arn = aws_lb.admin.id
-  port              = 80 #--Don't know why HTTP is being listened, is this a redirect? Why? - Revist. AW
-  protocol          = "TCP"
-
-  default_action {
-    target_group_arn = aws_lb_target_group.admin.id
-    type             = "forward"
-  }
-}
-
 resource "aws_lb_listener" "admin443" {
   load_balancer_arn = aws_lb.admin.id
   port              = 443
@@ -67,9 +56,9 @@ resource "aws_lb_listener" "admin443" {
   }
 }
 
-resource "aws_lb_listener" "admin_server_port" {
+resource "aws_lb_listener" "admin_ssl_port" {
   load_balancer_arn = aws_lb.admin.id
-  port              = local.application_data.accounts[local.environment].admin_server_port
+  port              = local.application_data.accounts[local.environment].admin_ssl_port
   protocol          = "TCP"
 
   default_action {
@@ -115,17 +104,6 @@ resource "aws_lb_target_group" "managed" {
   }
 }
 
-resource "aws_lb_listener" "managed80" {
-  load_balancer_arn = aws_lb.managed.id
-  port              = 80 #--Don't know why HTTP is being listened, is this a redirect? Why? - Revist. AW
-  protocol          = "TCP"
-
-  default_action {
-    target_group_arn = aws_lb_target_group.managed.id
-    type             = "forward"
-  }
-}
-
 resource "aws_lb_listener" "managed443" {
   load_balancer_arn = aws_lb.managed.id
   port              = 443
@@ -138,9 +116,9 @@ resource "aws_lb_listener" "managed443" {
   }
 }
 
-resource "aws_lb_listener" "managed_server_port" {
+resource "aws_lb_listener" "managed_ssl_port" {
   load_balancer_arn = aws_lb.managed.id
-  port              = local.application_data.accounts[local.environment].managed_server_port
+  port              = local.application_data.accounts[local.environment].managed_ssl_port
   protocol          = "TCP"
 
   default_action {
