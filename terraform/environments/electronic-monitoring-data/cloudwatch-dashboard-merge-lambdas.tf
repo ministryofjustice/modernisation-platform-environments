@@ -172,10 +172,3 @@ resource "aws_cloudwatch_dashboard" "merge_emdi_position_lambda_ops" {
         widgets = local.merge_lambda_widgets
         })
     }
-
-resource "aws_cloudwatch_dashboard" "merge_staged_position_lambda_ops" {
-  dashboard_name = "merge-staged-position-lambda-ops${local.environment_shorthand}"
-    dashboard_body = jsonencode({
-        widgets = local.merge_lambda_widgets
-        })
-    }
