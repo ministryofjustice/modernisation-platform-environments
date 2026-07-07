@@ -36,7 +36,7 @@ resource "aws_lb_target_group" "admin" {
     interval            = 30
     path                = "/weblogic/ready"
     port                = local.application_data.accounts[local.environment].admin_server_port
-    protocol            = "HTTP"
+    protocol            = "HTTPS"
     timeout             = 5
     healthy_threshold   = 3
     unhealthy_threshold = 3
@@ -97,10 +97,12 @@ resource "aws_lb_target_group" "managed" {
   target_type = "ip"
 
   health_check {
-    healthy_threshold   = "3"
-    interval            = "30"
-    protocol            = "TCP"
-    unhealthy_threshold = "3"
+    healthy_threshold   = 3
+    interval            = 30
+    protocol            = "HTTPS"
+    unhealthy_threshold = 3
+    path                = "/weblogic/ready"
+    matcher             = "200"
   }
 }
 
