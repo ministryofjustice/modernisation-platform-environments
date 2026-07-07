@@ -49,8 +49,6 @@ proxyConfigMap:
   create: true
 proxy_config:
   general_settings:
-    background_health_checks: True
-    health_check_interval: ${ai_background_health_check_interval}
     litellm_license: os.environ/LITELLM_LICENSE
     master_key: os.environ/PROXY_MASTER_KEY
     proxy_admin_email: "${proxyAdminEmail}"
