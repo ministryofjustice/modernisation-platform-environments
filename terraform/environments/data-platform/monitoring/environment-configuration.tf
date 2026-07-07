@@ -82,7 +82,7 @@ locals {
         { name = "data-platform-development", enabled_groups = ["AI Gateway"] },
         { name = "data-platform-test", enabled_groups = ["AI Gateway"] },
         { name = "data-platform-preproduction", enabled_groups = ["AI Gateway"] },
-        { name = "data-platform-preproduction", enabled_groups = ["AI Gateway"] }
+        { name = "data-platform-production", enabled_groups = ["AI Gateway"] }
       ]
     }
   }
