@@ -7,6 +7,7 @@ on:
     paths:
       - 'terraform/environments/integration-hub-api/**'
       - '.github/workflows/integration-hub-api.yml'
+      - '.github/workflows/reusable_terraform_components_plan_apply.yml'
 
   pull_request:
     branches:
@@ -14,6 +15,7 @@ on:
     paths:
       - 'terraform/environments/integration-hub-api/**'
       - '.github/workflows/integration-hub-api.yml'
+      - '.github/workflows/reusable_terraform_components_plan_apply.yml'
 
   workflow_dispatch:
     inputs:
