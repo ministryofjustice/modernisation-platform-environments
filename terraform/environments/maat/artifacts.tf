@@ -9,6 +9,44 @@ module "artifacts-s3" {
   replication_enabled = false
   versioning_enabled  = true
   force_destroy       = true
+  bucket_policy = [jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        "Sid" : "DenyInsecureTransport",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          module.artifacts-s3.bucket.arn,
+          "${module.artifacts-s3.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
+        "Sid" : "RestrictToTLSRequestsOnly",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          module.artifacts-s3.bucket.arn,
+          "${module.artifacts-s3.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          },
+          "NumericLessThan" : {
+            "aws:TLSVersion" : "1.2"
+          }
+        }
+      }
+    ]
+  })]
   lifecycle_rule = [
     {
       id      = "main"
