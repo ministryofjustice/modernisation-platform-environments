@@ -59,6 +59,21 @@ locals {
     }
   }
 
+  # ── 3b. ACTIVE SEVERITIES PER COMBO ────────────────────────────────────────
+  # A rule only generates a Grafana alert rule for a severity if it actually
+  # defines that threshold key (e.g. `warning = "..."` / `critical = "..."`
+  # in alerting_golden_signals).
+  active_severities_by_combo = {
+    for env, cfg in local.grafana_monitored_accounts_by_uid :
+    env => {
+      for combo_key, combo in local.rule_combos_by_env[env] :
+      combo_key => [
+        for severity in ["warning", "critical"] :
+        severity if try(combo.rule[severity], null) != null
+      ]
+    }
+  }
+
   # ── 4. SLACK CHANNEL RESOLUTION ───────────────────────────────────────────
   # Resolves alert routing by evaluating hierarchy:
   # 1. Custom rule override per severity -> 2. Rule default -> 3. Account fallback.
@@ -67,7 +82,7 @@ locals {
     env => {
       for combo_key, combo in local.rule_combos_by_env[env] :
       combo_key => {
-        for severity in ["warning", "critical"] :
+        for severity in local.active_severities_by_combo[env][combo_key] :
         severity => (
           try(cfg.slack_channel_overrides[combo_key][severity], null) == "disabled" ? null :
           try(cfg.slack_channel_overrides[combo_key][severity], null) != null
@@ -90,7 +105,7 @@ locals {
     env => {
       for combo_key, combo in local.rule_combos_by_env[env] :
       combo_key => {
-        for severity in ["warning", "critical"] :
+        for severity in local.active_severities_by_combo[env][combo_key] :
         severity => (
           combo.rule.type == "baseline_lt"
           ? "$BASE_R > 0 && ($B - $BASE_R) / $BASE_R * 100 < -${local.alert_thresholds[env][severity == "warning" ? combo.rule.warning : combo.rule.critical]}"
@@ -107,7 +122,7 @@ locals {
     env => {
       for combo_key, combo in local.rule_combos_by_env[env] :
       combo_key => {
-        for severity in ["warning", "critical"] :
+        for severity in local.active_severities_by_combo[env][combo_key] :
         severity => concat(
 
           # Ref 'A': Prometheus Instant Query
@@ -280,9 +295,9 @@ locals {
     env => {
       for combo_key, combo in local.rule_combos_by_env[env] :
       combo_key => {
-        for severity in ["warning", "critical"] :
+        for severity in local.active_severities_by_combo[env][combo_key] :
         severity => {
-          title       = "${combo_key}_${severity}"
+          title       = endswith(combo_key, "_${severity}") ? combo_key : "${combo_key}_${severity}"
           uid         = substr(md5("${env}-${combo_key}-${severity}"), 0, 8)
           condition   = contains(["baseline_gt", "baseline_lt"], combo.rule.type) ? "D" : "C"
           for         = try(combo.rule.for_duration, "5m")
@@ -318,8 +333,8 @@ locals {
         rules = flatten([
           for combo_key, combo in local.rule_combos_by_env[env] :
           combo.rule.group == group ? [
-            local.rule_objects[env][combo_key]["warning"],
-            local.rule_objects[env][combo_key]["critical"],
+            for severity in local.active_severities_by_combo[env][combo_key] :
+            local.rule_objects[env][combo_key][severity]
           ] : []
         ])
       }
