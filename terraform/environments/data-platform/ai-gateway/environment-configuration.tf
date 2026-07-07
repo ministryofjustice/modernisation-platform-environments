@@ -22,7 +22,8 @@ locals {
         "20.58.27.30/32" # octo-production
       ]
       ai_gateway_internal_ingress_allowlist = [
-        "172.16.0.0/16"
+        "10.0.0.0/8",   # MOJ internal network
+        "172.20.0.0/16" # Cloud Platform
       ]
       ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
@@ -79,7 +80,8 @@ locals {
         "20.58.27.30/32" # octo-production
       ]
       ai_gateway_internal_ingress_allowlist = [
-        "172.16.0.0/16"
+        "10.0.0.0/8",   # MOJ internal network
+        "172.20.0.0/16" # Cloud Platform
       ]
       ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
@@ -132,7 +134,8 @@ locals {
         "20.58.27.30/32" # octo-production
       ]
       ai_gateway_internal_ingress_allowlist = [
-        "172.16.0.0/16"
+        "10.0.0.0/8",   # MOJ internal network
+        "172.20.0.0/16" # Cloud Platform
       ]
       ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
@@ -185,7 +188,8 @@ locals {
         "20.58.27.30/32" # octo-production
       ]
       ai_gateway_internal_ingress_allowlist = [
-        "172.16.0.0/16"
+        "10.0.0.0/8",   # MOJ internal network
+        "172.20.0.0/16" # Cloud Platform
       ]
       ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
