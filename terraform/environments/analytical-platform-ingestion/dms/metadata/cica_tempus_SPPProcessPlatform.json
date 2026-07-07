@@ -732,5 +732,19 @@
       "object_name": "dbo.VARIABLE",
       "column_name": "VERSION"
     }
+  ],
+  "columns_to_keep_as_int": [
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "ACTIVITY_TYPE"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "PERFORMED"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "TIME_SPENT_IN_SECONDS"
+    }
   ]
 }
