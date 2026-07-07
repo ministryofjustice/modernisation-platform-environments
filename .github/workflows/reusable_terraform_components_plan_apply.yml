@@ -66,6 +66,11 @@
             required: false
             default: "main"
             description: "Git ref to use when checking out the optional companion repository."
+          apply_without_plan_file:
+            type: boolean
+            required: false
+            default: false
+            description: "Run terraform apply directly instead of generating and applying a saved plan file."
         secrets:
           MODERNISATION_PLATFORM_ACCOUNT_ID:
             required: true
@@ -399,6 +404,7 @@
               terraform workspace select "${WORKSPACE_NAME}"
 
           - name: Terraform Plan
+            if: inputs.apply_without_plan_file == false
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
               set -o pipefail
@@ -407,9 +413,19 @@
               terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
 
           - name: Terraform Apply
+            if: inputs.apply_without_plan_file == false
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
               set -o pipefail
               tf_args="${{ inputs.plan_apply_tfargs }} x.tfplan"
+              echo "terraform apply ${tf_args}"
+              terraform apply ${tf_args} 2>&1 | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+
+          - name: Terraform Apply (Direct)
+            if: inputs.apply_without_plan_file == true
+            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+            run: |
+              set -o pipefail
+              tf_args="-refresh=false -auto-approve ${{ inputs.plan_apply_tfargs }}"
               echo "terraform apply ${tf_args}"
               terraform apply ${tf_args} 2>&1 | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
