@@ -115,4 +115,4 @@ The source contract is documented in the companion repository's `openapi.yaml`.
 
 The companion repository also contains the Lambda unit tests and Bruno request collection used to exercise the API.
 
-For the legacy-state cutover from `terraform/environments/integration-hub/api-platform`, see [STATE_MIGRATION.md](/Users/harsh.vasudev/IdeaProjects/modernisation-platform-environments/terraform/environments/integration-hub-api/STATE_MIGRATION.md).
+For the legacy-state cutover from `terraform/environments/integration-hub/api-platform`, see [STATE_MIGRATION.md](STATE_MIGRATION.md).
