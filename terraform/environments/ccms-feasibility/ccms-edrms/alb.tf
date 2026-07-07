@@ -6,7 +6,7 @@ module "alb" {
   subnet_ids         = data.aws_subnets.shared-private.ids
   security_group_ids = [aws_security_group.alb.id]
   vpc_id             = data.aws_vpc.shared.id
-  certificate_arn    = aws_acm_certificate_validation.external.certificate_arn
+  certificate_arn    = data.aws_acm_certificate.wildcard.arn
   target_port        = local.application_data.accounts[local.environment].edrms_server_port
 
   health_check = {

@@ -85,3 +85,20 @@ resource "aws_iam_role_policy_attachment" "ecs_secrets" {
   role       = aws_iam_role.ecs_task_execution.name
   policy_arn = aws_iam_policy.ecs_secrets.arn
 }
+
+# Grant the Auto Scaling service-linked role access to the cross-account shared EBS KMS key.
+# Service-linked roles cannot have IAM policies attached, so a KMS grant is required.
+resource "aws_kms_grant" "autoscaling_ebs" {
+  name              = "${local.component_name}-${local.env_label}-autoscaling-ebs-grant"
+  key_id            = data.aws_kms_key.ebs_shared.arn
+  grantee_principal = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+  operations = [
+    "Encrypt",
+    "Decrypt",
+    "ReEncryptFrom",
+    "GenerateDataKey",
+    "GenerateDataKeyWithoutPlaintext",
+    "DescribeKey",
+    "CreateGrant",
+  ]
+}
