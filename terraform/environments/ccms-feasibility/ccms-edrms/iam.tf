@@ -49,7 +49,7 @@ resource "aws_iam_role" "ecs_task_execution" {
       Principal = { Service = "ecs-tasks.amazonaws.com" }
       Condition = {
         ArnLike = {
-          "aws:SourceArn" = "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/${local.component_name}-${local.env_label}-cluster"
+          "aws:SourceArn" = "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:cluster/${local.component_name}-${local.env_label}-cluster"
         }
         StringEquals = {
           "aws:SourceAccount" = data.aws_caller_identity.current.account_id
@@ -76,7 +76,7 @@ resource "aws_iam_policy" "ecs_secrets" {
     Statement = [{
       Effect   = "Allow"
       Action   = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
-      Resource = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:${local.component_name}*"]
+      Resource = ["arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:${local.component_name}*"]
     }]
   })
 }

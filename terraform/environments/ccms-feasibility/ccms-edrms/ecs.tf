@@ -39,7 +39,7 @@ module "ecs_service" {
     app_image                     = local.application_data.accounts[local.environment].app_image
     container_version             = local.application_data.accounts[local.environment].container_version
     edrms_server_port             = local.application_data.accounts[local.environment].edrms_server_port
-    aws_region                    = data.aws_region.current.name
+    aws_region                    = data.aws_region.current.region
     spring_profiles_active        = local.application_data.accounts[local.environment].spring_profiles_active
     edrms_secret_arn              = aws_secretsmanager_secret.edrms.arn
     target_northgate_hub_dime_url = local.application_data.accounts[local.environment].target_northgate_hub_dime_url
