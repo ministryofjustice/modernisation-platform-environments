@@ -12,12 +12,6 @@ locals {
     litellm_provider_state_warn = 0  # % of models within a provider failing health checks — fires on state > 0
     litellm_provider_state_crit = 50 # % of models within a provider failing health checks — fires on state > 50
 
-    # Same thresholds reused for the admin instance's equivalent rules
-    litellm_deployment_state_admin_warn = 0
-    litellm_deployment_state_admin_crit = 50
-    litellm_provider_state_admin_warn   = 0
-    litellm_provider_state_admin_crit   = 50
-
   }
 
   # Per-account effective thresholds: defaults merged with any account-specific
