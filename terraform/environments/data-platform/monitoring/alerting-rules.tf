@@ -228,11 +228,15 @@ locals {
               try(combo.rule.use_metric_math, false) == true
               ? [true] : []
               ) : [{
-                refId      = "math"
-                refId      = "EXPR"
-                expression = "$A / $A2 * 100"
-              }
-            ]
+                refId             = "EXPR"
+                datasourceUid     = "__expr__"
+                relativeTimeRange = { from = try(combo.rule.query_window_seconds, 300), to = 0 }
+                model = {
+                  type       = "math"
+                  refId      = "EXPR"
+                  expression = "$A / $A2 * 100"
+                }
+            }]
           ]),
 
           # Refs 'BASE', 'BASE_R', 'D': Historical Baseline Evaluation Pipeline

@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 # ALERT FOLDERS
-# Creates the logical directory structure with-in Grafana to organize alerting rules.
+# Creates the logical directory structure within Grafana to organize alerting rules.
 # ------------------------------------------------------------------------------
 resource "grafana_folder" "alert_rules" {
   for_each = local.grafana_alerting_manageable ? local.alert_rule_folder_paths : toset([])
