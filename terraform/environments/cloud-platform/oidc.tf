@@ -223,6 +223,24 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     resources = ["*"]
   }
 
+  statement {
+    sid    = "SSOForArgoCDCapability"
+    effect = "Allow"
+    actions = [
+      "sso:CreateApplication",
+      "sso:DeleteApplication",
+      "sso:DescribeApplication",
+      "sso:PutApplicationAccessScope",
+      "sso:PutApplicationAuthenticationMethod",
+      "sso:PutApplicationGrant",
+      "sso:DeleteApplicationAccessScope",
+      "sso:DeleteApplicationAuthenticationMethod",
+      "sso:DeleteApplicationGrant",
+      "sso:PutApplicationAssignmentConfiguration"
+    ]
+    resources = ["*"]
+  }
+
 }
 
 
