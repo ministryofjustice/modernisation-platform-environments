@@ -84,6 +84,10 @@ resource "aws_ecs_task_definition" "soasandbox-admin" {
       ebs_user_username    = local.application_data.accounts[local.environment].admin_ebs_user_username
       ebs_user_password    = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/ebs/user/password::"
       run_rcu              = local.application_data.accounts[local.environment].admin_run_rcu_bootstrap
+      caab_user             = local.application_data.accounts[local.environment].admin_caab_user
+      pui_user              = local.application_data.accounts[local.environment].admin_pui_user
+      apply_user            = local.application_data.accounts[local.environment].admin_apply_user
+      keystore_secret_id    = local.application_data.accounts[local.environment].admin_keystore_secret_id
     }
   )
 }
