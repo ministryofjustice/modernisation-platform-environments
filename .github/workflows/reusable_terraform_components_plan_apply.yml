@@ -71,6 +71,11 @@
             required: false
             default: false
             description: "Run terraform apply directly instead of generating and applying a saved plan file."
+          prepare_lambda_archives:
+            type: boolean
+            required: false
+            default: false
+            description: "Force-build terraform-aws-lambda local archives before the main apply."
         secrets:
           MODERNISATION_PLATFORM_ACCOUNT_ID:
             required: true
@@ -422,7 +427,32 @@
               terraform apply ${tf_args} 2>&1 | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
 
           - name: Terraform Apply (Direct)
-            if: inputs.apply_without_plan_file == true
+            if: inputs.apply_without_plan_file == true && inputs.prepare_lambda_archives == false
+            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+            run: |
+              set -o pipefail
+              tf_args="-refresh=false -auto-approve ${{ inputs.plan_apply_tfargs }}"
+              echo "terraform apply ${tf_args}"
+              terraform apply ${tf_args} 2>&1 | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+
+          - name: Prebuild Lambda Archives
+            if: inputs.prepare_lambda_archives == true
+            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+            run: |
+              set -o pipefail
+              tf_args="-refresh=false -auto-approve \
+                -replace=module.lambda_upload_ticket.null_resource.archive[0] \
+                -replace=module.lambda_api_authorizer.null_resource.archive[0] \
+                -replace=module.lambda_api_docs.null_resource.archive[0] \
+                -target=module.lambda_upload_ticket.null_resource.archive \
+                -target=module.lambda_api_authorizer.null_resource.archive \
+                -target=module.lambda_api_docs.null_resource.archive \
+                ${{ inputs.plan_apply_tfargs }}"
+              echo "terraform apply ${tf_args}"
+              terraform apply ${tf_args} 2>&1 | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+
+          - name: Terraform Apply (Direct, After Prebuild)
+            if: inputs.apply_without_plan_file == true && inputs.prepare_lambda_archives == true
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
               set -o pipefail

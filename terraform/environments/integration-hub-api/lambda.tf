@@ -150,8 +150,8 @@ module "lambda_api_docs" {
   description   = "Serves the protected Swagger UI and OpenAPI contract for the MFT API"
   handler       = "lambda_function.lambda_handler"
   runtime       = "python3.12"
-  # Rebuild the package on clean CI runners when the local zip is absent.
-  trigger_on_package_timestamp = true
+  # Keep packaging deterministic in CI; the workflow now prebuilds archives before apply.
+  trigger_on_package_timestamp = false
   environment_variables = {
     DOCS_BASIC_AUTH_SECRET_ID = module.api_docs_basic_auth_secret.secret_name
   }

@@ -59,6 +59,7 @@ jobs:
       linked_repository_path: ".linked-repos/integration-hub-file-transfer-api"
       linked_repository_ref: "${{ github.event_name == 'pull_request' && 'api-code-in-its-own-repo' || 'main' }}"
       apply_without_plan_file: true
+      prepare_lambda_archives: true
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -77,6 +78,7 @@ jobs:
       linked_repository_path: ".linked-repos/integration-hub-file-transfer-api"
       linked_repository_ref: "${{ github.event_name == 'pull_request' && 'api-code-in-its-own-repo' || 'main' }}"
       apply_without_plan_file: true
+      prepare_lambda_archives: true
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
