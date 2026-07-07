@@ -209,6 +209,16 @@ resource "aws_security_group_rule" "ecs_tasks_admin_server" {
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
+resource "aws_security_group_rule" "ecs_tasks_admin_ssl_port" {
+  security_group_id = aws_security_group.ecs_tasks_admin.id
+  type              = "ingress"
+  description       = "SOA Admin SSL Port"
+  protocol          = "TCP"
+  from_port         = local.application_data.accounts[local.environment].admin_ssl_port
+  to_port           = local.application_data.accounts[local.environment].admin_ssl_port
+  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+}
+
 resource "aws_security_group_rule" "ecs_tasks_admin_egress_all" {
   security_group_id = aws_security_group.ecs_tasks_admin.id
   type              = "egress"
@@ -233,6 +243,16 @@ resource "aws_security_group_rule" "ecs_tasks_managed_server" {
   protocol          = "TCP"
   from_port         = local.application_data.accounts[local.environment].managed_server_port
   to_port           = local.application_data.accounts[local.environment].managed_server_port
+  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+}
+
+resource "aws_security_group_rule" "ecs_tasks_managed_ssl_port" {
+  security_group_id = aws_security_group.ecs_tasks_managed.id
+  type              = "ingress"
+  description       = "SOA Managed SSL Port"
+  protocol          = "TCP"
+  from_port         = local.application_data.accounts[local.environment].managed_ssl_port
+  to_port           = local.application_data.accounts[local.environment].managed_ssl_port
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
