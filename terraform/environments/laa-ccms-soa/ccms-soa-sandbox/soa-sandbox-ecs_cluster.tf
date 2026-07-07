@@ -137,13 +137,12 @@ resource "aws_ecs_service" "soasandbox-admin" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.admin.id
+    target_group_arn = aws_lb_target_group.admin_https.id
     container_name   = "${local.application_data.accounts[local.environment].app_name}-admin"
     container_port   = local.application_data.accounts[local.environment].admin_server_port
   }
 
   depends_on = [
-    aws_lb_listener.admin80,
     aws_iam_role_policy_attachment.ecs_task_execution_role,
     aws_db_instance.soa_db,
     aws_efs_file_system.storage,
@@ -230,13 +229,12 @@ resource "aws_ecs_service" "soasandbox-managed" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.managed.id
+    target_group_arn = aws_lb_target_group.managed_https.id
     container_name   = "${local.application_data.accounts[local.environment].app_name}-managed"
     container_port   = local.application_data.accounts[local.environment].managed_server_port
   }
 
   depends_on = [
-    aws_lb_listener.managed80,
     aws_iam_role_policy_attachment.ecs_task_execution_role,
     aws_ecs_service.soasandbox-admin,
   ]
