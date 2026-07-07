@@ -2,7 +2,7 @@
 
 This folder is now the legacy location for the original Integration Hub API Platform stack.
 
-The active Modernisation Platform environment for this service is [`terraform/environments/integration-hub-api`](/Users/harsh.vasudev/IdeaProjects/modernisation-platform-environments/terraform/environments/integration-hub-api), with application code in `ministryofjustice/integration-hub-file-transfer-api`.
+The active Modernisation Platform environment for this service is [`terraform/environments/integration-hub-api`](../../integration-hub-api), with application code in `ministryofjustice/integration-hub-file-transfer-api`.
 
 This component provides a thin API layer for Managed File Transfer uploads.
 
