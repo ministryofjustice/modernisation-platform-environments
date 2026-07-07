@@ -4,7 +4,7 @@ locals {
 
 # MP Bastion Linux module - https://github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux
 module "bastion_linux" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=29c5908bd41b183808fe0c02d9ae06f0ede2036b" # v6.0.0
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=9657c1df83514ad5cb17a02254d0bd91c8e30ef5" # v6.0.1
 
   providers = {
     aws.share-host   = aws.core-vpc
