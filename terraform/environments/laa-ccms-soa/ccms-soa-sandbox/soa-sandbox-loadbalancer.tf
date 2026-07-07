@@ -25,7 +25,7 @@ resource "aws_lb" "admin" {
 resource "aws_lb_target_group" "admin" {
   name                 = "${local.component_name}-admin-tg"
   port                 = local.application_data.accounts[local.environment].admin_server_port
-  protocol             = "TCP"
+  protocol             = "TLS"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "ip"
   deregistration_delay = 30
