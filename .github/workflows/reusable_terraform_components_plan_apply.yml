@@ -402,7 +402,7 @@
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
               set -o pipefail
-              tf_args="-out x.tfplan ${{ inputs.plan_apply_tfargs }}"
+              tf_args="-refresh=false -out x.tfplan ${{ inputs.plan_apply_tfargs }}"
               echo "terraform plan ${tf_args}"
               terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
 
