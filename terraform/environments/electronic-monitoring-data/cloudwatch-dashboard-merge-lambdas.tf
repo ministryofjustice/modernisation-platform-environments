@@ -15,7 +15,7 @@ locals {
           stat   = "Average"
           period = 180
           metrics = [
-            ["TestPlaceholder",
+            ["AWS/Lambda",
             "TestPlaceholder"]
           ]
         }
@@ -35,7 +35,7 @@ locals {
           stat   = "Average"
           period = 180
           metrics = [
-            ["TestPlaceholder",
+            ["AWS/Lambda",
             "TestPlaceholder"]
           ]
         }
@@ -55,7 +55,7 @@ locals {
           stat   = "Average"
           period = 180
           metrics = [
-            ["TestPlaceholder",
+            ["AWS/Lambda",
             "TestPlaceholder"]
           ]
         }
@@ -75,7 +75,7 @@ locals {
           stat   = "Average"
           period = 180
           metrics = [
-            ["TestPlaceholder",
+            ["AWS/Lambda",
             "TestPlaceholder"]
           ]
         }
@@ -95,7 +95,7 @@ locals {
           stat   = "Average"
           period = 180
           metrics = [
-            ["TestPlaceholder",
+            ["AWS/Lambda",
             "TestPlaceholder"]
           ]
         }
@@ -115,7 +115,7 @@ locals {
           stat   = "Average"
           period = 180
           metrics = [
-            ["TestPlaceholder",
+            ["AWS/Lambda",
             "TestPlaceholder"]
           ]
         }
@@ -135,7 +135,7 @@ locals {
           stat   = "Average"
           period = 180
           metrics = [
-            ["TestPlaceholder",
+            ["AWS/Lambda",
             "TestPlaceholder"]
           ]
         }
