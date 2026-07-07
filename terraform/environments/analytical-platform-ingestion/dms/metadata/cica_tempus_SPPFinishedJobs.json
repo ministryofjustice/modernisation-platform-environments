@@ -152,15 +152,18 @@
   "columns_to_keep_as_int": [
     {
       "object_name": "dbo.FINISHED_JOB_HISTORY",
-      "column_name": "ACTIVITY_TYPE"
+      "column_name": "ACTIVITY_TYPE",
+      "apply_to_environments": ["development"]
     },
     {
       "object_name": "dbo.FINISHED_JOB_HISTORY",
-      "column_name": "PERFORMED"
+      "column_name": "PERFORMED",
+      "apply_to_environments": ["development"]
     },
     {
       "object_name": "dbo.FINISHED_JOB_HISTORY",
-      "column_name": "TIME_SPENT_IN_SECONDS"
+      "column_name": "TIME_SPENT_IN_SECONDS",
+      "apply_to_environments": ["development"]
     }
   ]
 }

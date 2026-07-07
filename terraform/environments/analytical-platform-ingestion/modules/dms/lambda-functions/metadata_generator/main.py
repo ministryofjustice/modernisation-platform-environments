@@ -124,6 +124,7 @@ class MetadataExtractor:
         self.dialect = db_options["dialect"]
         self.objects = db_options["objects"]
         self.deleted_tables = db_options.get("deleted_tables", [])
+        self.environment = os.getenv("ENVIRONMENT", "").lower()
         self.dms_mapping_rules = {}
         self.excluded_columns_by_object = defaultdict(set)
         self.columns_to_keep_as_int_by_object = defaultdict(set)
@@ -139,6 +140,9 @@ class MetadataExtractor:
         for object_column in self.dms_mapping_rules.get("columns_to_exclude", []):
             self.excluded_columns_by_object[object_column["object_name"].upper()].add(object_column["column_name"].upper())
         for object_column in self.dms_mapping_rules.get("columns_to_keep_as_int", []):
+            applies_to_environments = [environment.lower() for environment in object_column.get("apply_to_environments", [])]
+            if applies_to_environments and self.environment not in applies_to_environments:
+                continue
             self.columns_to_keep_as_int_by_object[object_column["object_name"].upper()].add(object_column["column_name"].upper())
 
         logger.info("Excluded columns loaded as %s", self.excluded_columns_by_object)
