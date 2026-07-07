@@ -1,519 +1,490 @@
 ---
-    name: terraform plan apply
+name: terraform plan apply
 
-    on:
-      workflow_call:
-        inputs:
-          application:
-            type: string
-            required: true
-            description: "Name of the application, e.g. nomis"
-          environment:
-            type: string
-            required: true
-            description: "Name of the environment, e.g. development"
-          action:
-            type: string
-            required: false
-            description: "Set to plan or plan_apply"
-            default: plan
-          terraform_version:
-            type: string
-            required: false
-            description: "The terraform version to use"
-            default: "~1"
-          plan_apply_tfargs:
-            type: string
-            required: false
-            description: "Any additional terraform arguments to be passed in to terraform plan/apply, e.g. -var 'foo=bar'"
-            default: ""
-          do_state_refresh_on_plan:
-            type: boolean
-            required: false
-            description: "Set to true to do a state refresh prior to the plan"
-            default: false
-          account_name:
-            type: string
-            required: false
-            description: "Optional: account name override for ACCOUNT_NAME env var."
-          post_plan_to_pr:
-            type: boolean
-            required: false
-            description: "Set to true to post terraform plan as a comment to the PR"
-            default: false
-          component:
-            type: string
-            required: false
-            default: "root"
-            description: "Optional: subfolder in 'terraform/environments/<application>' if present."
-          runner:
-            type: string
-            required: false
-            default: "ubuntu-latest"
-            description: "GitHub Actions runner label to use for plan and apply jobs."
-          linked_repository:
-            type: string
-            required: false
-            default: ""
-            description: "Optional companion repository to check out into the workspace before Terraform runs."
-          linked_repository_path:
-            type: string
-            required: false
-            default: ""
-            description: "Workspace-relative path where the optional companion repository should be checked out."
-          linked_repository_ref:
-            type: string
-            required: false
-            default: "main"
-            description: "Git ref to use when checking out the optional companion repository."
-          apply_without_plan_file:
-            type: boolean
-            required: false
-            default: false
-            description: "Run terraform apply directly instead of generating and applying a saved plan file."
-          prepare_lambda_archives:
-            type: boolean
-            required: false
-            default: false
-            description: "Force-build terraform-aws-lambda local archives before the main apply."
-        secrets:
-          MODERNISATION_PLATFORM_ACCOUNT_ID:
-            required: true
-          PASSPHRASE:
-            required: true
+on:
+  workflow_call:
+    inputs:
+      application:
+        type: string
+        required: true
+        description: "Name of the application, e.g. nomis"
+      environment:
+        type: string
+        required: true
+        description: "Name of the environment, e.g. development"
+      action:
+        type: string
+        required: false
+        description: "Set to plan or plan_apply"
+        default: plan
+      terraform_version:
+        type: string
+        required: false
+        description: "The terraform version to use"
+        default: "~1"
+      plan_apply_tfargs:
+        type: string
+        required: false
+        description: "Any additional terraform arguments to be passed in to terraform plan/apply, e.g. -var 'foo=bar'"
+        default: ""
+      do_state_refresh_on_plan:
+        type: boolean
+        required: false
+        description: "Set to true to do a state refresh prior to the plan"
+        default: false
+      account_name:
+        type: string
+        required: false
+        description: "Optional: account name override for ACCOUNT_NAME env var."
+      post_plan_to_pr:
+        type: boolean
+        required: false
+        description: "Set to true to post terraform plan as a comment to the PR"
+        default: false
+      component:
+        type: string
+        required: false
+        default: "root"
+        description: "Optional: subfolder in 'terraform/environments/<application>' if present."
+      runner:
+        type: string
+        required: false
+        default: "ubuntu-latest"
+        description: "GitHub Actions runner label to use for plan and apply jobs."
+      linked_repository:
+        type: string
+        required: false
+        default: ""
+        description: "Optional companion repository to check out into the workspace before Terraform runs."
+      linked_repository_path:
+        type: string
+        required: false
+        default: ""
+        description: "Workspace-relative path where the optional companion repository should be checked out."
+      linked_repository_ref:
+        type: string
+        required: false
+        default: "main"
+        description: "Git ref to use when checking out the optional companion repository."
+      apply_without_plan_file:
+        type: boolean
+        required: false
+        default: false
+        description: "Run terraform apply directly instead of generating and applying a saved plan file."
+      prepare_lambda_archives:
+        type: boolean
+        required: false
+        default: false
+        description: "Force-build terraform-aws-lambda local archives before the main apply."
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID:
+        required: true
+      PASSPHRASE:
+        required: true
 
-    env:
-      ACCOUNT_NAME: "${{ inputs.account_name || format('{0}-{1}', inputs.application, inputs.environment) }}"
-      WORKSPACE_NAME: "${{ inputs.account_name || format('{0}-{1}', inputs.application, inputs.environment) }}"
-      SKIP_PLAN_EVALUATOR: "[]"
-      SKIP_PLAN_EVALUATOR_FILE: ".github/config/skip-plan-evaluator-workspaces.json"
-    permissions:
-      id-token: write
-      contents: read
-    concurrency:
-      group: ${{ inputs.account_name && format('{0}-{1}', inputs.account_name, inputs.component) || format('{0}-{1}-{2}', inputs.application, inputs.environment, inputs.component) }}
-    jobs:
-      fetch-secrets:
-        uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
-        secrets:
-          MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+env:
+  ACCOUNT_NAME: "${{ inputs.account_name || format('{0}-{1}', inputs.application, inputs.environment) }}"
+  WORKSPACE_NAME: "${{ inputs.account_name || format('{0}-{1}', inputs.application, inputs.environment) }}"
+  SKIP_PLAN_EVALUATOR: "[]"
+  SKIP_PLAN_EVALUATOR_FILE: ".github/config/skip-plan-evaluator-workspaces.json"
+permissions:
+  id-token: write
+  contents: read
+concurrency:
+  group: ${{ inputs.account_name && format('{0}-{1}', inputs.account_name, inputs.component) || format('{0}-{1}-{2}', inputs.application, inputs.environment, inputs.component) }}
+jobs:
+  fetch-secrets:
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+  plan:
+    name: "plan ${{ inputs.component}}"
+    runs-on: ${{ inputs.runner }}
+    needs: fetch-secrets
+    outputs:
+      plan_exitcode: "${{ steps.plan.outputs.exitcode }}"
+    steps:
+      - name: Debug
+        run: |
+          echo "application=${{ inputs.application }}"
+          echo "environment=${{ inputs.environment }}"
+          echo "account_name=${{ inputs.account_name }}"
+          echo "action=${{ inputs.action }}"
+          echo "plan_apply_tfargs=${{ inputs.plan_apply_tfargs }}"
+          echo "do_state_refresh_on_plan=${{ inputs.do_state_refresh_on_plan }}"
+          echo "post_plan_to_pr=${{ inputs.post_plan_to_pr }}"
+          echo "component=${{ inputs.component }}"
+
+      - name: Checkout Repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Load skip plan evaluator list
+        run: |
+          SKIP_PLAN_EVALUATOR=$(jq -c '.' "${GITHUB_WORKSPACE}/${SKIP_PLAN_EVALUATOR_FILE}")
+          echo "SKIP_PLAN_EVALUATOR=${SKIP_PLAN_EVALUATOR}" >> $GITHUB_ENV
+
+      - name: Decrypt Secrets
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
+        with:
+          environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
+          github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
-      plan:
-        name: "plan ${{ inputs.component}}"
-        runs-on: ${{ inputs.runner }}
-        needs: fetch-secrets
-        outputs:
-          plan_exitcode: "${{ steps.plan.outputs.exitcode }}"
-        steps:
-          - name: Debug
-            run: |
-              echo "application=${{ inputs.application }}"
-              echo "environment=${{ inputs.environment }}"
-              echo "account_name=${{ inputs.account_name }}"
-              echo "action=${{ inputs.action }}"
-              echo "plan_apply_tfargs=${{ inputs.plan_apply_tfargs }}"
-              echo "do_state_refresh_on_plan=${{ inputs.do_state_refresh_on_plan }}"
-              echo "post_plan_to_pr=${{ inputs.post_plan_to_pr }}"
-              echo "component=${{ inputs.component }}"
+      - name: Set Environment Variables
+        run: |
+          echo "GITHUB_TOKEN=$GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT" >> $GITHUB_ENV
 
-          - name: Checkout Repository
-            uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Checkout Linked Repository
+        if: inputs.linked_repository != '' && inputs.linked_repository_path != ''
+        env:
+          LINKED_REPOSITORY: ${{ inputs.linked_repository }}
+          LINKED_REPOSITORY_PATH: ${{ inputs.linked_repository_path }}
+          LINKED_REPOSITORY_REF: ${{ inputs.linked_repository_ref }}
+        run: |
+          git -c http.extraheader="AUTHORIZATION: basic $(printf "x-access-token:%s" "$GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT" | base64 | tr -d '\n')" \
+            clone \
+            --branch "${LINKED_REPOSITORY_REF}" \
+            --depth 1 \
+            "https://github.com/${LINKED_REPOSITORY}.git" \
+            "${LINKED_REPOSITORY_PATH}"
 
-          - name: Load skip plan evaluator list
-            run: |
-              SKIP_PLAN_EVALUATOR=$(jq -c '.' "${GITHUB_WORKSPACE}/${SKIP_PLAN_EVALUATOR_FILE}")
-              echo "SKIP_PLAN_EVALUATOR=${SKIP_PLAN_EVALUATOR}" >> $GITHUB_ENV
+      - name: Get AWS Account Number
+        run: |
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "::add-mask::$ACCOUNT_NUMBER"
+          echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
-          - name: Decrypt Secrets
-            uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
-            with:
-              environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
-              github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
-              PASSPHRASE: ${{ secrets.PASSPHRASE }}
-          - name: Set Environment Variables
-            run: |
-              echo "GITHUB_TOKEN=$GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT" >> $GITHUB_ENV
+      - name: Get Backend AWS Account Number
+        run: |
+          BACKEND_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "::add-mask::$BACKEND_NUMBER"
+          echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
-          - name: Checkout Linked Repository
-            if: inputs.linked_repository != '' && inputs.linked_repository_path != ''
-            env:
-              LINKED_REPOSITORY: ${{ inputs.linked_repository }}
-              LINKED_REPOSITORY_PATH: ${{ inputs.linked_repository_path }}
-              LINKED_REPOSITORY_REF: ${{ inputs.linked_repository_ref }}
-            run: |
-              git -c http.extraheader="AUTHORIZATION: basic $(printf "x-access-token:%s" "$GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT" | base64 | tr -d '\n')" \
-                clone \
-                --branch "${LINKED_REPOSITORY_REF}" \
-                --depth 1 \
-                "https://github.com/${LINKED_REPOSITORY}.git" \
-                "${LINKED_REPOSITORY_PATH}"
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@254c19bd240aabef8777f48595e9d2d7b972184b  # v6.2.1
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-plan"
+          role-session-name: "githubactionsplanrolesession"
+          aws-region: "eu-west-2"
 
-          - name: Get AWS Account Number
-            run: |
-              ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
-              echo "::add-mask::$ACCOUNT_NUMBER"
-              echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
-
-          - name: Get Backend AWS Account Number
-            run: |
-              BACKEND_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< $ENVIRONMENT_MANAGEMENT)
-              echo "::add-mask::$BACKEND_NUMBER"
-              echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
-
-          - name: Configure AWS Credentials
-            uses: aws-actions/configure-aws-credentials@254c19bd240aabef8777f48595e9d2d7b972184b  # v6.2.1
-            with:
-              role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-plan"
-              role-session-name: "githubactionsplanrolesession"
-              aws-region: "eu-west-2"
-
-          - name: Setup Terraform
-            uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e  # v4.0.1
-            with:
-              terraform_version: "${{ inputs.terraform_version }}"
-              terraform_wrapper: false
-
-          #
-          # Terraform Init
-          #
-          - name: Terraform Init
-            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-            run: |
-              terraform --version
-              echo "terraform init"
-              terraform init
-
-          #
-          # Terraform Workspace Select
-          #
-          - name: Terraform Workspace Select
-            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-            run: |
-              terraform workspace select "${WORKSPACE_NAME}"
-
-          #
-          # Optional State Refresh
-          #
-          - name: Terraform State Refresh (Optional)
-            if: inputs.do_state_refresh_on_plan == true
-            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-            run: |
-              set -o pipefail
-              tf_args="${{ inputs.plan_apply_tfargs }}"
-              echo "terraform apply -refresh-only -auto-approve ${tf_args}"
-              terraform apply -refresh-only -auto-approve ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
-
-          #
-          # Terraform Plan
-          #
-          - name: Terraform Plan
-            id: plan
-            env:
-              POST_PLAN_TO_PR: "${{ github.event_name == 'pull_request' && inputs.post_plan_to_pr == true }}"
-            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-            run: |
-              set -o pipefail
-              exitcode=0
-              tf_args="-detailed-exitcode ${{ inputs.plan_apply_tfargs }}"
-              [[ ${POST_PLAN_TO_PR} == 'true' ]] && tf_args="${tf_args} -no-color"
-              [[ ${{ inputs.do_state_refresh_on_plan }} == 'true' ]] && tf_args="${tf_args} -refresh=false"
-              echo "terraform plan ${tf_args} -out=tfplan"
-              terraform plan ${tf_args} -out=tfplan | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
-              terraform show -json tfplan > tfplan.json
-              echo "exitcode=${exitcode}"
-              echo "exitcode=${exitcode}" >> $GITHUB_OUTPUT
-              (( exitcode == 1 )) && exit 1 || exit 0
-
-          - name: Evaluate Terraform Plan
-            if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && !contains(fromJSON(env.SKIP_PLAN_EVALUATOR), env.WORKSPACE_NAME)
-            id: evaluate_terraform_plan
-            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-            shell: bash
-            run: |
-              bash ${GITHUB_WORKSPACE}/scripts/terraform-plan-evaluator.sh tfplan.json
-
-          - name: Create Plan PR message (Optional)
-            if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
-            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-            run: |
-              comment() {
-                url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-                len=$(cat tfplan.txt | wc -c)
-                echo '**`${{ env.WORKSPACE_NAME }}`** terraform plan on `${{ github.event_name }}` event [#${{ github.run_number }}]('${url}')'
-                echo
-                echo '```'
-                head -c 65476 tfplan.txt | sed -n '/Terraform will perform/,$p'
-                echo
-                echo '```'
-                if [[ $len -gt 65476 ]]; then
-                  echo "** Truncated output.  See $url for the rest **"
-                fi
-              }
-              echo 'TF_PLAN_OUT<<EOF' >> $GITHUB_ENV
-              comment >> $GITHUB_ENV
-              echo 'EOF' >> $GITHUB_ENV
-
-          - name: Hide Previous PR comment (Optional)
-            if: ${{ github.event_name == 'pull_request' }}
-            working-directory: "scripts/minimise-comments"
-            env:
-              COMMENT_BODY_CONTAINS: "**`${{ env.WORKSPACE_NAME }}`**"
-              PR_NUMBER: "${{ github.event.pull_request.number }}"
-            run: |
-              go build
-              ./minimise-comments
-
-          - name: Post Plan to PR (Optional)
-            if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
-            env:
-              message: "${{ env.TF_PLAN_OUT }}"
-            run: |
-              escaped_message=$(echo "$message" | jq -Rsa .)
-              curl -sS -X POST \
-                -H "Accept: application/vnd.github+json" \
-                -H "Authorization: Bearer ${{ env.GITHUB_TOKEN }}" \
-                "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
-                -d '{"body":'"${escaped_message}"'}'
-
-          - name: Check for Approval
-            id: check_approval
-            if: github.event_name == 'pull_request' && steps.evaluate_terraform_plan.outputs.resources_found == 'true'
-            uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-            with:
-              github-token: ${{ env.GITHUB_TOKEN }}
-              script: |
-                const orgName = 'ministryofjustice';
-                const teamSlug = 'modernisation-platform';
-
-                const {data: reviews} = await github.rest.pulls.listReviews({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  pull_number: context.payload.pull_request.number,
-                  per_page: 100
-                });
-
-                const {data: team_members} = await github.rest.teams.listMembersInOrg({
-                  org: orgName,
-                  team_slug: teamSlug,
-                  per_page: 100
-                });
-
-                const teamMemberLogins = team_members.map(member => member.login);
-                const approved = reviews.some(review => review.state === 'APPROVED' && teamMemberLogins.includes(review.user.login));
-
-                if (approved) {
-                  core.notice('Pull request approved by a member of @ministryofjustice/modernisation-platform');
-                } else {
-                  core.setFailed('Terraform plan evaluation detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform - please contact #ask-modernisation-platform for assistance');
-
-                  await github.rest.pulls.createReview({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    pull_number: context.payload.pull_request.number,
-                    event: 'REQUEST_CHANGES',
-                    body: 'Terraform plan evaluation detected changes to resources that require approval from @ministryofjustice/modernsation-platform - please contact #ask-modernisation-platform for assistance'
-                  });
-                }
-
-          - name: Comment if PR Requires Approval
-            id: comment_if_not_approved
-            if: failure() && github.event_name == 'pull_request' && steps.check_approval.outcome == 'failure'
-            uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-            with:
-              github-token: ${{ env.GITHUB_TOKEN }}
-              script: |
-                const owner = context.repo.owner;
-                const repo = context.repo.repo;
-
-                await github.rest.issues.createComment({
-                  owner: owner,
-                  repo: repo,
-                  issue_number: context.payload.pull_request.number,
-                  body: `@${context.actor} Terraform plan evaluation detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform - please contact #ask-modernisation-platform for assistance\n
-                Guidance on approving these PRs is available at https://user-guide.modernisation-platform.service.justice.gov.uk/runbooks/reviewing-mp-environments-prs.html#process-for-approving-prs`
-                });
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e  # v4.0.1
+        with:
+          terraform_version: "${{ inputs.terraform_version }}"
+          terraform_wrapper: false
 
       #
-      # The "apply" job (only runs if plan_exitcode == 2 => changes present)
+      # Terraform Init
       #
-      apply:
-        name: "apply"
-        needs: [plan, fetch-secrets]
-        if: inputs.action == 'plan_apply' && needs.plan.outputs.plan_exitcode == '2'
-        runs-on: ${{ inputs.runner }}
-        environment: ${{ inputs.account_name && (inputs.component != 'root' && format('{0}-{1}', inputs.account_name, inputs.component) || inputs.account_name) || (inputs.component != 'root' && format('{0}-{1}-{2}', inputs.application, inputs.environment, inputs.component) || format('{0}-{1}', inputs.application, inputs.environment)) }}
-        steps:
-          - name: Checkout Repository
-            uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Terraform Init
+        working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+        run: |
+          terraform --version
+          echo "terraform init"
+          terraform init
 
-          - name: Decrypt Secrets
-            uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
-            with:
-              environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
-              github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
-              PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      #
+      # Terraform Workspace Select
+      #
+      - name: Terraform Workspace Select
+        working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+        run: |
+          terraform workspace select "${WORKSPACE_NAME}"
 
-          - name: Set Environment Variables
-            run: |
-              echo "GITHUB_TOKEN=$GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT" >> $GITHUB_ENV
+      #
+      # Optional State Refresh
+      #
+      - name: Terraform State Refresh (Optional)
+        if: inputs.do_state_refresh_on_plan == true
+        working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+        run: |
+          set -o pipefail
+          tf_args="${{ inputs.plan_apply_tfargs }}"
+          echo "terraform apply -refresh-only -auto-approve ${tf_args}"
+          terraform apply -refresh-only -auto-approve ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
 
-          - name: Checkout Linked Repository
-            if: inputs.linked_repository != '' && inputs.linked_repository_path != ''
-            env:
-              LINKED_REPOSITORY: ${{ inputs.linked_repository }}
-              LINKED_REPOSITORY_PATH: ${{ inputs.linked_repository_path }}
-              LINKED_REPOSITORY_REF: ${{ inputs.linked_repository_ref }}
-            run: |
-              git -c http.extraheader="AUTHORIZATION: basic $(printf "x-access-token:%s" "$GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT" | base64 | tr -d '\n')" \
-                clone \
-                --branch "${LINKED_REPOSITORY_REF}" \
-                --depth 1 \
-                "https://github.com/${LINKED_REPOSITORY}.git" \
-                "${LINKED_REPOSITORY_PATH}"
+      #
+      # Terraform Plan
+      #
+      - name: Terraform Plan
+        id: plan
+        env:
+          POST_PLAN_TO_PR: "${{ github.event_name == 'pull_request' && inputs.post_plan_to_pr == true }}"
+        working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+        run: |
+          set -o pipefail
+          exitcode=0
+          tf_args="-detailed-exitcode ${{ inputs.plan_apply_tfargs }}"
+          [[ ${POST_PLAN_TO_PR} == 'true' ]] && tf_args="${tf_args} -no-color"
+          [[ ${{ inputs.do_state_refresh_on_plan }} == 'true' ]] && tf_args="${tf_args} -refresh=false"
+          echo "terraform plan ${tf_args} -out=tfplan"
+          terraform plan ${tf_args} -out=tfplan | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
+          terraform show -json tfplan > tfplan.json
+          echo "exitcode=${exitcode}"
+          echo "exitcode=${exitcode}" >> $GITHUB_OUTPUT
+          (( exitcode == 1 )) && exit 1 || exit 0
 
-          - name: Get AWS Account Number
-            run: |
-              ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
-              echo "::add-mask::$ACCOUNT_NUMBER"
-              echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
+      - name: Evaluate Terraform Plan
+        if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && !contains(fromJSON(env.SKIP_PLAN_EVALUATOR), env.WORKSPACE_NAME)
+        id: evaluate_terraform_plan
+        working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+        shell: bash
+        run: |
+          bash ${GITHUB_WORKSPACE}/scripts/terraform-plan-evaluator.sh tfplan.json
 
-          - name: Get Backend AWS Account Number
-            run: |
-              BACKEND_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< $ENVIRONMENT_MANAGEMENT)
-              echo "::add-mask::$BACKEND_NUMBER"
-              echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
+      - name: Create Plan PR message (Optional)
+        if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
+        working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+        run: |
+          comment() {
+            url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            len=$(cat tfplan.txt | wc -c)
+            echo '**`${{ env.WORKSPACE_NAME }}`** terraform plan on `${{ github.event_name }}` event [#${{ github.run_number }}]('${url}')'
+            echo
+            echo '```'
+            head -c 65476 tfplan.txt | sed -n '/Terraform will perform/,$p'
+            echo
+            echo '```'
+            if [[ $len -gt 65476 ]]; then
+              echo "** Truncated output.  See $url for the rest **"
+            fi
+          }
+          echo 'TF_PLAN_OUT<<EOF' >> $GITHUB_ENV
+          comment >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
 
-          - name: Configure AWS Credentials
-            uses: aws-actions/configure-aws-credentials@254c19bd240aabef8777f48595e9d2d7b972184b  # v6.2.1
-            with:
-              role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-apply"
-              role-session-name: "githubactionsrolesession"
-              aws-region: "eu-west-2"
+      - name: Hide Previous PR comment (Optional)
+        if: ${{ github.event_name == 'pull_request' }}
+        working-directory: "scripts/minimise-comments"
+        env:
+          COMMENT_BODY_CONTAINS: "**`${{ env.WORKSPACE_NAME }}`**"
+          PR_NUMBER: "${{ github.event.pull_request.number }}"
+        run: |
+          go build
+          ./minimise-comments
 
-          - name: Setup Terraform
-            uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e  # v4.0.1
-            with:
-              terraform_version: "${{ inputs.terraform_version }}"
-              terraform_wrapper: false
+      - name: Post Plan to PR (Optional)
+        if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
+        env:
+          message: "${{ env.TF_PLAN_OUT }}"
+        run: |
+          escaped_message=$(echo "$message" | jq -Rsa .)
+          curl -sS -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ env.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+            -d '{"body":'"${escaped_message}"'}'
 
-          - name: Terraform Init
-            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-            run: |
-              terraform --version
-              echo "terraform init"
-              terraform init
+      - name: Check for Approval
+        id: check_approval
+        if: github.event_name == 'pull_request' && steps.evaluate_terraform_plan.outputs.resources_found == 'true'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          github-token: ${{ env.GITHUB_TOKEN }}
+          script: |
+            const orgName = 'ministryofjustice';
+            const teamSlug = 'modernisation-platform';
 
-          - name: Terraform Workspace Select
-            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-            run: |
-              terraform workspace select "${WORKSPACE_NAME}"
+            const {data: reviews} = await github.rest.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              per_page: 100
+            });
 
-          - name: Terraform Plan
-            if: inputs.apply_without_plan_file == false
-            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-            run: |
-              set -o pipefail
-              tf_args="-refresh=false -out x.tfplan ${{ inputs.plan_apply_tfargs }}"
-              echo "terraform plan ${tf_args}"
-              terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+            const {data: team_members} = await github.rest.teams.listMembersInOrg({
+              org: orgName,
+              team_slug: teamSlug,
+              per_page: 100
+            });
 
-          - name: Terraform Apply
-            if: inputs.apply_without_plan_file == false
-            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-            run: |
-              set -o pipefail
-              tf_args="${{ inputs.plan_apply_tfargs }} x.tfplan"
-              echo "terraform apply ${tf_args}"
-              terraform apply ${tf_args} 2>&1 | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+            const teamMemberLogins = team_members.map(member => member.login);
+            const approved = reviews.some(review => review.state === 'APPROVED' && teamMemberLogins.includes(review.user.login));
 
-          - name: Terraform Apply (Direct)
-            if: inputs.apply_without_plan_file == true && inputs.prepare_lambda_archives == false
-            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-            run: |
-              set -o pipefail
-              tf_args="-refresh=false -auto-approve ${{ inputs.plan_apply_tfargs }}"
-              echo "terraform apply ${tf_args}"
-              terraform apply ${tf_args} 2>&1 | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+            if (approved) {
+              core.notice('Pull request approved by a member of @ministryofjustice/modernisation-platform');
+            } else {
+              core.setFailed('Terraform plan evaluation detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform - please contact #ask-modernisation-platform for assistance');
 
-          - name: Prebuild Lambda Archives
-            if: inputs.prepare_lambda_archives == true
-            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-            run: |
-              set -o pipefail
-              export API_CODE_ROOT="${GITHUB_WORKSPACE}/.linked-repos/integration-hub-file-transfer-api"
-              export TF_ROOT="${PWD}"
+              await github.rest.pulls.createReview({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+                event: 'REQUEST_CHANGES',
+                body: 'Terraform plan evaluation detected changes to resources that require approval from @ministryofjustice/modernsation-platform - please contact #ask-modernisation-platform for assistance'
+              });
+            }
 
-              build_lambda_archive() {
-                local module_name="$1"
-                local runtime="$2"
-                local source_path="$3"
-                local module_dir="${TF_ROOT}/.terraform/modules/${module_name}"
-                local query_file
-                local result_file
-                local build_plan_file
-                local timestamp
+      - name: Comment if PR Requires Approval
+        id: comment_if_not_approved
+        if: failure() && github.event_name == 'pull_request' && steps.check_approval.outcome == 'failure'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          github-token: ${{ env.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
 
-                query_file="$(mktemp)"
-                result_file="$(mktemp)"
+            await github.rest.issues.createComment({
+              owner: owner,
+              repo: repo,
+              issue_number: context.payload.pull_request.number,
+              body: `@${context.actor} Terraform plan evaluation detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform - please contact #ask-modernisation-platform for assistance\n
+            Guidance on approving these PRs is available at https://user-guide.modernisation-platform.service.justice.gov.uk/runbooks/reviewing-mp-environments-prs.html#process-for-approving-prs`
+            });
 
-                MODULE_DIR="${module_dir}" \
-                TF_ROOT="${TF_ROOT}" \
-                LAMBDA_RUNTIME="${runtime}" \
-                SOURCE_PATH="${source_path}" \
-                python3 <<'PY' > "${query_file}"
-import hashlib
-import json
-import os
+  #
+  # The "apply" job (only runs if plan_exitcode == 2 => changes present)
+  #
+  apply:
+    name: "apply"
+    needs: [plan, fetch-secrets]
+    if: inputs.action == 'plan_apply' && needs.plan.outputs.plan_exitcode == '2'
+    runs-on: ${{ inputs.runner }}
+    environment: ${{ inputs.account_name && (inputs.component != 'root' && format('{0}-{1}', inputs.account_name, inputs.component) || inputs.account_name) || (inputs.component != 'root' && format('{0}-{1}-{2}', inputs.application, inputs.environment, inputs.component) || format('{0}-{1}', inputs.application, inputs.environment)) }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-module_dir = os.environ["MODULE_DIR"]
-tf_root = os.environ["TF_ROOT"]
-runtime = os.environ["LAMBDA_RUNTIME"]
-source_path = os.environ["SOURCE_PATH"]
+      - name: Decrypt Secrets
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
+        with:
+          environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
+          github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
-with open(os.path.join(module_dir, "package.py"), "rb") as f:
-    package_hash = hashlib.sha256(f.read()).hexdigest()
+      - name: Set Environment Variables
+        run: |
+          echo "GITHUB_TOKEN=$GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT" >> $GITHUB_ENV
 
-query = {
-    "paths": json.dumps({
-        "module": module_dir,
-        "root": tf_root,
-        "cwd": tf_root,
-    }),
-    "artifacts_dir": "builds",
-    "runtime": runtime,
-    "source_path": source_path,
-    "hash_extra": "",
-    "hash_internal": json.dumps([package_hash]),
-    "recreate_missing_package": "true",
-    "quiet": "true",
-}
+      - name: Checkout Linked Repository
+        if: inputs.linked_repository != '' && inputs.linked_repository_path != ''
+        env:
+          LINKED_REPOSITORY: ${{ inputs.linked_repository }}
+          LINKED_REPOSITORY_PATH: ${{ inputs.linked_repository_path }}
+          LINKED_REPOSITORY_REF: ${{ inputs.linked_repository_ref }}
+        run: |
+          git -c http.extraheader="AUTHORIZATION: basic $(printf "x-access-token:%s" "$GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT" | base64 | tr -d '\n')" \
+            clone \
+            --branch "${LINKED_REPOSITORY_REF}" \
+            --depth 1 \
+            "https://github.com/${LINKED_REPOSITORY}.git" \
+            "${LINKED_REPOSITORY_PATH}"
 
-print(json.dumps(query))
-PY
+      - name: Get AWS Account Number
+        run: |
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "::add-mask::$ACCOUNT_NUMBER"
+          echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
-                MODULE_DIR="${module_dir}" \
-                TF_ROOT="${TF_ROOT}" \
-                LAMBDA_RUNTIME="${runtime}" \
-                SOURCE_PATH="${source_path}" \
-                python3 "${module_dir}/package.py" prepare < "${query_file}" > "${result_file}"
+      - name: Get Backend AWS Account Number
+        run: |
+          BACKEND_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "::add-mask::$BACKEND_NUMBER"
+          echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
-                build_plan_file="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["build_plan_filename"])' "${result_file}")"
-                timestamp="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["timestamp"])' "${result_file}")"
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@254c19bd240aabef8777f48595e9d2d7b972184b  # v6.2.1
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-apply"
+          role-session-name: "githubactionsrolesession"
+          aws-region: "eu-west-2"
 
-                python3 "${module_dir}/package.py" build --force --timestamp "${timestamp}" "${build_plan_file}"
-              }
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e  # v4.0.1
+        with:
+          terraform_version: "${{ inputs.terraform_version }}"
+          terraform_wrapper: false
 
-              build_lambda_archive "lambda_upload_ticket" "python3.12" "${API_CODE_ROOT}/lambda/request-upload-ticket"
+      - name: Terraform Init
+        working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+        run: |
+          terraform --version
+          echo "terraform init"
+          terraform init
 
-              build_lambda_archive "lambda_api_authorizer" "python3.12" "${API_CODE_ROOT}/lambda/request-authorizer"
+      - name: Terraform Workspace Select
+        working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+        run: |
+          terraform workspace select "${WORKSPACE_NAME}"
 
-              build_lambda_archive "lambda_api_docs" "python3.12" "$(python3 -c 'import json,os; print(json.dumps([os.environ["API_CODE_ROOT"] + "/lambda/request-docs", os.environ["API_CODE_ROOT"] + "/openapi.yaml"]))')"
+      - name: Terraform Plan
+        if: inputs.apply_without_plan_file == false
+        working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+        run: |
+          set -o pipefail
+          tf_args="-refresh=false -out x.tfplan ${{ inputs.plan_apply_tfargs }}"
+          echo "terraform plan ${tf_args}"
+          terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
 
-          - name: Terraform Apply (Direct, After Prebuild)
-            if: inputs.apply_without_plan_file == true && inputs.prepare_lambda_archives == true
-            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-            run: |
-              set -o pipefail
-              tf_args="-refresh=false -auto-approve ${{ inputs.plan_apply_tfargs }}"
-              echo "terraform apply ${tf_args}"
-              terraform apply ${tf_args} 2>&1 | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+      - name: Terraform Apply
+        if: inputs.apply_without_plan_file == false
+        working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+        run: |
+          set -o pipefail
+          tf_args="${{ inputs.plan_apply_tfargs }} x.tfplan"
+          echo "terraform apply ${tf_args}"
+          terraform apply ${tf_args} 2>&1 | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+
+      - name: Terraform Apply (Direct)
+        if: inputs.apply_without_plan_file == true && inputs.prepare_lambda_archives == false
+        working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+        run: |
+          set -o pipefail
+          tf_args="-refresh=false -auto-approve ${{ inputs.plan_apply_tfargs }}"
+          echo "terraform apply ${tf_args}"
+          terraform apply ${tf_args} 2>&1 | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+
+      - name: Prebuild Lambda Archives
+        if: inputs.prepare_lambda_archives == true
+        working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+        run: |
+          set -o pipefail
+          export API_CODE_ROOT="${GITHUB_WORKSPACE}/.linked-repos/integration-hub-file-transfer-api"
+          export TF_ROOT="${PWD}"
+
+          build_lambda_archive() {
+            local module_name="$1"
+            local runtime="$2"
+            local source_path="$3"
+            local module_dir="${TF_ROOT}/.terraform/modules/${module_name}"
+            local query_file
+            local result_file
+            local build_plan_file
+            local package_hash
+            local timestamp
+
+            query_file="$(mktemp)"
+            result_file="$(mktemp)"
+
+            package_hash="$(python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1], "rb").read()).hexdigest())' "${module_dir}/package.py")"
+
+            python3 -c 'import json,sys; module_dir, tf_root, runtime, source_path, package_hash = sys.argv[1:6]; print(json.dumps({"paths": json.dumps({"module": module_dir, "root": tf_root, "cwd": tf_root}), "artifacts_dir": "builds", "runtime": runtime, "source_path": source_path, "hash_extra": "", "hash_internal": json.dumps([package_hash]), "recreate_missing_package": "true", "quiet": "true"}))' \
+              "${module_dir}" "${TF_ROOT}" "${runtime}" "${source_path}" "${package_hash}" > "${query_file}"
+
+            MODULE_DIR="${module_dir}" \
+            TF_ROOT="${TF_ROOT}" \
+            LAMBDA_RUNTIME="${runtime}" \
+            SOURCE_PATH="${source_path}" \
+            python3 "${module_dir}/package.py" prepare < "${query_file}" > "${result_file}"
+
+            build_plan_file="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["build_plan_filename"])' "${result_file}")"
+            timestamp="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["timestamp"])' "${result_file}")"
+
+            python3 "${module_dir}/package.py" build --force --timestamp "${timestamp}" "${build_plan_file}"
+          }
+
+          build_lambda_archive "lambda_upload_ticket" "python3.12" "${API_CODE_ROOT}/lambda/request-upload-ticket"
+
+          build_lambda_archive "lambda_api_authorizer" "python3.12" "${API_CODE_ROOT}/lambda/request-authorizer"
+
+          build_lambda_archive "lambda_api_docs" "python3.12" "$(python3 -c 'import json,os; print(json.dumps([os.environ["API_CODE_ROOT"] + "/lambda/request-docs", os.environ["API_CODE_ROOT"] + "/openapi.yaml"]))')"
+
+      - name: Terraform Apply (Direct, After Prebuild)
+        if: inputs.apply_without_plan_file == true && inputs.prepare_lambda_archives == true
+        working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+        run: |
+          set -o pipefail
+          tf_args="-refresh=false -auto-approve ${{ inputs.plan_apply_tfargs }}"
+          echo "terraform apply ${tf_args}"
+          terraform apply ${tf_args} 2>&1 | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
