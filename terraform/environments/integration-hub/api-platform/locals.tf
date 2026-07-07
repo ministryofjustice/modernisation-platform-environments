@@ -8,7 +8,7 @@ locals {
     for candidate in local.api_code_root_candidates : candidate
     if fileexists("${candidate}/openapi.yaml")
   ]
-  api_code_root = local.api_code_root_matches[0]
+  api_code_root = length(local.api_code_root_matches) > 0 ? local.api_code_root_matches[0] : error("Cannot find integration-hub-file-transfer-api (openapi.yaml) in any of: ${join(", ", local.api_code_root_candidates)}")
   api_docs_configuration = merge(
     {
       basic_auth_username = "api-docs"
