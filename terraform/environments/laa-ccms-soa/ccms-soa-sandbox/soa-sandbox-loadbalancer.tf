@@ -22,20 +22,19 @@ resource "aws_lb" "admin" {
   depends_on = [module.s3-bucket-logging]
 }
 
-resource "aws_lb_target_group" "admin" {
-  name                 = "${local.component_name}-admin-tg"
-  port                 = local.application_data.accounts[local.environment].admin_server_port
+resource "aws_lb_target_group" "admin_https" {
+  name                 = "ccms-soa-sandbox-admin-https-tg"
+  port                 = 443
   protocol             = "TLS"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "ip"
   deregistration_delay = 30
 
   health_check {
-
     enabled             = true
     interval            = 30
     path                = "/weblogic/ready"
-    port                = local.application_data.accounts[local.environment].admin_server_port
+    port                = 443
     protocol            = "HTTPS"
     timeout             = 5
     healthy_threshold   = 3
@@ -51,7 +50,7 @@ resource "aws_lb_listener" "admin443" {
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
   certificate_arn   = aws_acm_certificate_validation.soa-sandbox.certificate_arn
   default_action {
-    target_group_arn = aws_lb_target_group.admin.id
+    target_group_arn = aws_lb_target_group.admin_https.id
     type             = "forward"
   }
 }
@@ -62,7 +61,7 @@ resource "aws_lb_listener" "admin_ssl_port" {
   protocol          = "TCP"
 
   default_action {
-    target_group_arn = aws_lb_target_group.admin.id
+    target_group_arn = aws_lb_target_group.admin_https.id
     type             = "forward"
   }
 }
@@ -89,19 +88,23 @@ resource "aws_lb" "managed" {
   depends_on = [module.s3-bucket-logging]
 }
 
-resource "aws_lb_target_group" "managed" {
-  name        = "${local.component_name}-managed-tg"
-  port        = local.application_data.accounts[local.environment].managed_server_port
-  protocol    = "TCP"
-  vpc_id      = data.aws_vpc.shared.id
-  target_type = "ip"
+resource "aws_lb_target_group" "managed_https" {
+  name                 = "ccms-soa-sandbox-mgd-https-tg"
+  port                 = 443
+  protocol             = "TLS"
+  vpc_id               = data.aws_vpc.shared.id
+  target_type          = "ip"
+  deregistration_delay = 30
 
   health_check {
-    healthy_threshold   = 3
+    enabled             = true
     interval            = 30
-    protocol            = "HTTPS"
-    unhealthy_threshold = 3
     path                = "/weblogic/ready"
+    port                = 443
+    protocol            = "HTTPS"
+    timeout             = 5
+    healthy_threshold   = 3
+    unhealthy_threshold = 3
     matcher             = "200"
   }
 }
@@ -113,7 +116,7 @@ resource "aws_lb_listener" "managed443" {
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
   certificate_arn   = aws_acm_certificate_validation.soa-sandbox.certificate_arn
   default_action {
-    target_group_arn = aws_lb_target_group.managed.id
+    target_group_arn = aws_lb_target_group.managed_https.id
     type             = "forward"
   }
 }
@@ -124,7 +127,7 @@ resource "aws_lb_listener" "managed_ssl_port" {
   protocol          = "TCP"
 
   default_action {
-    target_group_arn = aws_lb_target_group.managed.id
+    target_group_arn = aws_lb_target_group.managed_https.id
     type             = "forward"
   }
 }
