@@ -18,7 +18,7 @@
       },
       {
           "containerPort": ${admin_ssl_port},
-          "hostPort": ${admin_ssl_port},
+          "hostPort": ${admin_ssl_port}
       }
     ],
     "mountPoints": [
