@@ -93,7 +93,7 @@ locals {
         width  = 24
         height = 6
         properties = {
-          title  = "Average Execution Time"
+          title  = "Average Total Execution Time"
           region = "eu-west-2"
           stat   = "Average"
           period = 180
@@ -165,7 +165,7 @@ locals {
         width  = 24
         height = 6
         properties = {
-          title  = "Average Service Processing Time"
+          title  = "Average Service Pre-Processing Time"
           region = "eu-west-2"
           stat   = "Average"
           period = 180
