@@ -34,7 +34,7 @@ resource "aws_lb_target_group" "radius_ecs" {
   health_check {
     enabled             = true
     protocol            = "TCP"
-    port                = 80
+    port                = 5000
     interval            = 30
     healthy_threshold   = 2
     unhealthy_threshold = 2
