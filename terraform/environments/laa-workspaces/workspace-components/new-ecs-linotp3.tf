@@ -53,8 +53,8 @@ resource "aws_security_group" "ecs_linotp3" {
 
   ingress {
     description     = "LinOTP HTTP from ALB"
-    from_port       = 80
-    to_port         = 80
+    from_port       = 5000
+    to_port         = 5000
     protocol        = "tcp"
     security_groups = [aws_security_group.radius_alb[0].id]
   }
