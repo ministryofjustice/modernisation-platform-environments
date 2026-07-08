@@ -32,10 +32,20 @@ locals {
               "FunctionName",
               lambda_name,
               {
-                color = "#E34234"
+                color = "#228B22"
               }
             ]
           ]
+          annotations = {
+            horizontal = [
+              {
+                value = 0
+                label = "Warning - Low",
+                color = "#E34234"
+              }
+            ]
+
+          }
         }
       },
       {
@@ -59,7 +69,7 @@ locals {
               "FunctionName",
               lambda_name,
               {
-                color = "#228B22"
+                color = "#E34234"
               }
             ]
           ]
