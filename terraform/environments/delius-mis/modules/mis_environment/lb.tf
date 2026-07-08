@@ -594,7 +594,7 @@ resource "aws_lb_listener_rule" "maintenance" {
     type = "fixed-response"
 
     fixed_response {
-      content_type = "text/plain"
+      content_type = "text/html"
       message_body = templatefile("${path.module}/templates/maintenance.html.tftpl", {
         maintenance_title   = "NDMIS Reporting Maintenance Window"
         maintenance_message = var.lb_config.maintenance_message
