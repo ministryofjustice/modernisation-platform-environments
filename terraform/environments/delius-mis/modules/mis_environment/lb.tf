@@ -20,6 +20,9 @@ locals {
 
   bcs_win_enabled = var.lb_config != null && var.bcs_config_win != null && var.bcs_config_win.instance_count > 0
   bcs_win_fqdn    = "ndl-bcs.${var.env_name}.${var.account_config.dns_suffix}"
+
+  maintenance_rule_enabled = var.lb_config != null && lookup(var.lb_config, "maintenance_message", null) != null
+  maintenance_rule_fqdn    = "maintenance.${var.env_name}.${var.account_config.dns_suffix}"
 }
 
 # Main security group for ALB
@@ -571,6 +574,38 @@ resource "aws_lb_listener_rule" "bcs_win_https" {
   condition {
     host_header {
       values = [local.bcs_win_fqdn]
+    }
+  }
+
+  tags = local.tags
+}
+
+resource "aws_lb_listener_rule" "maintenance" {
+  count = local.maintenance_rule_enabled ? 1 : 0
+
+  listener_arn = aws_lb_listener.mis_https[0].arn
+  priority     = 999
+
+  action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = templatefile("${path.module}/templates/maintenance.html.tftpl", {
+        maintenance_title   = "NDMIS Reporting Maintenance Window"
+        maintenance_message = var.lb_config.maintenance_message
+      })
+      status_code = "200"
+    }
+  }
+
+  condition {
+    host_header {
+      values = [
+        local.bws_fqdn,
+        local.bws_sso_fqdn,
+        local.maintenance_rule_fqdn,
+      ]
     }
   }
 
