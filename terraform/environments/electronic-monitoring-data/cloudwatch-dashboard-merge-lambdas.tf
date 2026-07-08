@@ -30,7 +30,10 @@ locals {
               "EM/MergeLambdas",
               "SuccessfulQueries",
               "FunctionName",
-              lambda_name
+              lambda_name,
+              {
+                color = "#E34234"
+              }
             ]
           ]
         }
@@ -54,7 +57,10 @@ locals {
               "EM/MergeLambdas",
               "FailedQueries",
               "FunctionName",
-              lambda_name
+              lambda_name,
+              {
+                color = "#228B22"
+              }
             ]
           ]
         }
@@ -78,7 +84,10 @@ locals {
               "EM/MergeLambdas",
               "DataScanned",
               "FunctionName",
-              lambda_name
+              lambda_name,
+              {
+                color = "#00008B"
+              }
             ]
           ]
         }
@@ -102,7 +111,10 @@ locals {
               "EM/MergeLambdas",
               "TotalExecutionTime",
               "FunctionName",
-              lambda_name
+              lambda_name,
+              {
+                color = "#00008B"
+              }
             ]
           ]
         }
@@ -126,7 +138,10 @@ locals {
               "EM/MergeLambdas",
               "EngineExecutionTime",
               "FunctionName",
-              lambda_name
+              lambda_name,
+              {
+                color = "#00008B"
+              }
             ]
           ]
         }
@@ -150,7 +165,10 @@ locals {
               "EM/MergeLambdas",
               "ServiceProcessingTime",
               "FunctionName",
-              lambda_name
+              lambda_name,
+              {
+                color = "#00008B"
+              }
             ]
           ]
         }
@@ -174,7 +192,10 @@ locals {
               "EM/MergeLambdas",
               "ServicePreProcessingTime",
               "FunctionName",
-              lambda_name
+              lambda_name,
+              {
+                color = "#00008B"
+              }
             ]
           ]
         }
@@ -198,7 +219,10 @@ locals {
               "EM/MergeLambdas",
               "QueryQueueTime",
               "FunctionName",
-              lambda_name
+              lambda_name,
+              {
+                color = "#00008B"
+              }
             ]
           ]
         }
@@ -222,7 +246,10 @@ locals {
               "EM/MergeLambdas",
               "QueryPlanningTime",
               "FunctionName",
-              lambda_name
+              lambda_name,
+              {
+                color = "#00008B"
+              }
             ]
           ]
         }
