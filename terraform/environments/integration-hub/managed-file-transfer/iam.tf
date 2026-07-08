@@ -2,7 +2,7 @@ module "guardduty_s3_plan_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "6.6.1"
 
-  name        = local.iam_configuration.guardduty_policy_name
+  name        = "${local.application_name}-${local.environment}-guardduty-s3-plan"
   description = "GuardDuty S3 malware protection plan policy"
   path        = "/"
 
@@ -17,7 +17,7 @@ module "guardduty_s3_plan_role" {
 
   create          = true
   use_name_prefix = false
-  name            = local.iam_configuration.guardduty_role_name
+  name            = "${local.application_name}-${local.environment}-guardduty-s3-plan"
 
   trust_policy_permissions = {
     AllowGuardDutyService = {

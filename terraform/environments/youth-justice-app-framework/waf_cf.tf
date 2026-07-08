@@ -18,6 +18,14 @@ module "waf-cf" {
     }
   }
 
+  waf_path_allow_rules_cf = {
+    "allow-malware-notifier" = {
+      name     = "allow-malware-notifier"
+      priority = 1
+      path     = "/secure/api/v1/docs/threatDetected"
+    }
+  }
+
   project_name = local.project_name
   tags         = local.tags
   waf_name     = "yjaf-cf"

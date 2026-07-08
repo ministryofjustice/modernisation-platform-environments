@@ -24,8 +24,8 @@ module "ai_gateway_aurora" {
 
   security_group_ingress_rules = {
     eks_ingress = {
-      cidr_ipv4   = data.aws_vpc.eks.cidr_block
-      description = "Allow PostgreSQL access from EKS pods"
+      referenced_security_group_id = data.aws_eks_cluster.cluster.vpc_config[0].cluster_security_group_id
+      description                  = "Allow PostgreSQL access from EKS pods"
     }
   }
 
@@ -41,6 +41,9 @@ module "ai_gateway_aurora" {
   create_monitoring_role      = local.is-production
   iam_role_name               = "${local.component_name}-monitoring"
   iam_role_use_name_prefix    = true
+
+  iam_database_authentication_enabled = true
+  apply_immediately                   = false
 }
 
 module "ai_gateway_aurora_secret" {
@@ -50,14 +53,15 @@ module "ai_gateway_aurora_secret" {
 
   secret_string = jsonencode(merge(
     {
-      username = module.ai_gateway_aurora.cluster_master_username
-      password = random_password.aurora.result
-      host     = module.ai_gateway_aurora.cluster_endpoint
-      port     = tostring(module.ai_gateway_aurora.cluster_port)
-      dbname   = module.ai_gateway_aurora.cluster_database_name
+      username       = module.ai_gateway_aurora.cluster_master_username
+      password       = random_password.aurora.result
+      host           = module.ai_gateway_aurora.cluster_endpoint
+      port           = tostring(module.ai_gateway_aurora.cluster_port)
+      dbname         = module.ai_gateway_aurora.cluster_database_name
+      dummy_password = local.dummy_password
     },
     local.has_reader ? {
-      read-url = "postgresql://${module.ai_gateway_aurora.cluster_master_username}:${random_password.aurora.result}@${module.ai_gateway_aurora.cluster_reader_endpoint}/${module.ai_gateway_aurora.cluster_database_name}"
+      read-url = "postgresql://${module.ai_gateway_aurora.cluster_master_username}@${module.ai_gateway_aurora.cluster_reader_endpoint}/${module.ai_gateway_aurora.cluster_database_name}"
     } : {}
   ))
 }

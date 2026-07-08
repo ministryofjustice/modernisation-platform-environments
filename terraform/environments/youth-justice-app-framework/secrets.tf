@@ -126,6 +126,22 @@ resource "aws_secretsmanager_secret_version" "google_api" {
   }
 }
 
+resource "aws_secretsmanager_secret" "proxy_account" {
+  #checkov:skip=CKV2_AWS_57:doesn't need rotation
+  name        = "${local.project_name}_proxy_account"
+  description = "Used by rds proxy to login to rds cluster"
+  kms_key_id  = module.kms.key_id
+  tags        = local.tags
+}
+
+resource "aws_secretsmanager_secret_version" "proxy_account" {
+  secret_id     = aws_secretsmanager_secret.proxy_account.id
+  secret_string = "dummy" # InvalidRequestException: You must provide either SecretString or SecretBinary.
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
 resource "aws_secretsmanager_secret" "ordnance_survey_api" {
   #checkov:skip=CKV2_AWS_57:doesn't need rotation
   name        = "${local.project_name}_ordnance_survey_api"

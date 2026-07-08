@@ -173,9 +173,9 @@ resource "aws_secretsmanager_secret_version" "delius_oasys" {
     client_id     = aws_iam_access_key.delius_oasys[each.key].id
     client_secret = aws_iam_access_key.delius_oasys[each.key].secret
     }) : jsonencode({
-    topic_arn = local.delius_oasys_sns_topic_arns[each.key]
-    queue_url = aws_sqs_queue.delius_oasys[each.key].id
-    client_id     = null
-    client_secret = null    
+    topic_arn     = local.delius_oasys_sns_topic_arns[each.key]
+    queue_url     = aws_sqs_queue.delius_oasys[each.key].id
+    client_id     = "" # the java code requires these fields
+    client_secret = ""
   })
 }

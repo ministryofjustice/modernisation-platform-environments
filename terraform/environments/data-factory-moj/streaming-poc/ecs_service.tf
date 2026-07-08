@@ -42,6 +42,21 @@ data "aws_iam_policy_document" "ecs_task_exec" {
     ]
     resources = [data.aws_kms_key.general_shared.arn]
   }
+  statement {
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret"
+    ]
+    resources = [local.secretsmanager_gitlab_token_arn]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt"
+    ]
+    resources = [local.secretsmanager_kms_key_arn]
+  }
 }
 
 # --- Synthetic Data Generator IAM ---
@@ -421,10 +436,17 @@ module "ecs_container_sdg" {
 
   name                     = local.sdg_prefix
   image                    = "${aws_ecr_repository.repository["sdg"].repository_url}:latest"
+  memory                   = 8192
+  cpu                      = 2048
   essential                = true
-  readonly_root_filesystem = false
+  readonly_root_filesystem = true
   port_mappings            = []
-  secrets                  = []
+  secrets = [
+    {
+      name      = "GITLAB_TOKEN"
+      valueFrom = aws_secretsmanager_secret.gitlab_token[0].arn
+    }
+  ]
   environment = [
     {
       name  = "ENVIRONMENT"
@@ -432,7 +454,7 @@ module "ecs_container_sdg" {
     },
     {
       name  = "KAFKA_BROKER"
-      value = local.msk_bootstrap_brokers
+      value = substr(local.msk_bootstrap_brokers, 0, length(local.msk_bootstrap_brokers) - 5)
     }
   ]
   log_configuration = {
@@ -460,6 +482,8 @@ module "ecs_service_sdg" {
   service_role_arn   = aws_iam_role.sdg_task[0].arn
   task_role_arn      = aws_iam_role.sdg_task[0].arn
   task_exec_role_arn = aws_iam_role.sdg_task_exec[0].arn
+  task_cpu           = "2048"
+  task_memory        = "8192"
 
   capacity_provider      = local.capacity_provider
   enable_execute_command = true
@@ -493,7 +517,12 @@ module "ecs_container_alerts" {
   essential                = true
   readonly_root_filesystem = true
   port_mappings            = []
-  secrets                  = []
+  secrets = [
+    {
+      name      = "GITLAB_TOKEN"
+      valueFrom = aws_secretsmanager_secret.gitlab_token[0].arn
+    }
+  ]
   environment = [
     {
       name  = "ENVIRONMENT"
@@ -502,6 +531,10 @@ module "ecs_container_alerts" {
     {
       name  = "SPRING_PROFILES_ACTIVE"
       value = substr(lower(local.environment), 0, 3)
+    },
+    {
+      name  = "KAFKA_BOOTSTRAP_SERVERS"
+      value = local.msk_bootstrap_brokers
     },
     {
       name  = "MOJ-DRONE-INCURSION-ARN"

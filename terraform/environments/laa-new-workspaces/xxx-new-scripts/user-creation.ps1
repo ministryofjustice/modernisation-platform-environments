@@ -96,4 +96,3 @@ else
 }
 
 Write-Host "User creation process completed."
-'@ | Set-Content -Path .\user-creation.ps1 -Encoding UTF8

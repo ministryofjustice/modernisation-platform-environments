@@ -163,32 +163,32 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
           "platform.linkedin.com",
           "tokensit.cp.microsoft-tst.com", # Microsoft test tenant CP endpoint
 
-           # Required if service is behind CloudFront or ALB
-           ".cloudfront.net",
-           ".elb.amazonaws.com",
+          # Required if service is behind CloudFront or ALB
+          ".cloudfront.net",
+          ".elb.amazonaws.com",
 
 
-                   # OneDrive
+          # OneDrive
           ".onedrive.com",
           ".onedrive.live.com",
           ".storage.live.com",
           ".livefilestore.com",
           ".storage.msn.com",
           "login.live.com",
-            "account.live.com",
-            ".live.com",
-            ".msn.com",
-            ".msaauth.net",
-            ".msaauthimages.net",
-            ".msauth.net",
-            ".msauthimages.net",
-            ".msftauth.net",
-            ".msftauthimages.net",
-            "secure.aadcdn.microsoftonline-p.com",
-            "logincdn.msauth.net",
-            "logincdn.msauthimages.net",
-            "acctcdn.msauth.net",
-              "acctcdn.msauthimages.net"  
+          "account.live.com",
+          ".live.com",
+          ".msn.com",
+          ".msaauth.net",
+          ".msaauthimages.net",
+          ".msauth.net",
+          ".msauthimages.net",
+          ".msftauth.net",
+          ".msftauthimages.net",
+          "secure.aadcdn.microsoftonline-p.com",
+          "logincdn.msauth.net",
+          "logincdn.msauthimages.net",
+          "acctcdn.msauth.net",
+          "acctcdn.msauthimages.net"
 
 
 
@@ -303,10 +303,10 @@ resource "aws_networkfirewall_rule_group" "workspaces_onedrive_live_misc" {
           "vas.samsungapps.com",
           "connect.facebook.net", # REVIEW — used by some Office add-ins
 
-        ".static.microsoft",
-        ".onecdn.static.microsoft",
+          ".static.microsoft",
+          ".onecdn.static.microsoft",
 
-        
+
 
         ]
       }
@@ -390,7 +390,7 @@ resource "aws_networkfirewall_firewall_policy" "workspaces_web_allowlist" {
   firewall_policy {
     stateless_default_actions          = ["aws:forward_to_sfe"]
     stateless_fragment_default_actions = ["aws:forward_to_sfe"]
-    stateful_default_actions           = ["aws:alert_strict", "aws:drop_established"] 
+    stateful_default_actions           = ["aws:alert_strict", "aws:drop_established"]
 
     stateful_engine_options {
       rule_order = "STRICT_ORDER"
@@ -511,24 +511,24 @@ resource "aws_cloudwatch_log_group" "firewall_alert_logs" {
 
 # Enable firewall logging
 resource "aws_networkfirewall_logging_configuration" "workspaces" {
-  count           = local.environment == "development" ? 1 : 0
-  firewall_arn    = aws_networkfirewall_firewall.workspaces_web_allowlist[0].arn
+  count        = local.environment == "development" ? 1 : 0
+  firewall_arn = aws_networkfirewall_firewall.workspaces_web_allowlist[0].arn
   logging_configuration {
     log_destination_config {
       log_destination = {
         logGroup = aws_cloudwatch_log_group.firewall_alert_logs[0].name
       }
-      log_destination_type  = "CloudWatchLogs"
-      log_type              = "ALERT"
+      log_destination_type = "CloudWatchLogs"
+      log_type             = "ALERT"
     }
 
-  log_destination_config {
-    log_destination = {
-      logGroup = aws_cloudwatch_log_group.firewall_flow_logs[0].name
+    log_destination_config {
+      log_destination = {
+        logGroup = aws_cloudwatch_log_group.firewall_flow_logs[0].name
+      }
+      log_destination_type = "CloudWatchLogs"
+      log_type             = "FLOW"
     }
-    log_destination_type = "CloudWatchLogs"
-    log_type             = "FLOW"
-  }
 
 
   }
