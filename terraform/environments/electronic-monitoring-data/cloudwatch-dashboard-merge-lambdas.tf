@@ -1,9 +1,9 @@
 locals {
   lambda_functions = {
-    merge_staged_position_lambda_ops = "merge_mdss_staged_position"
-    merge_staged_event_lambda_ops    = "merge_mdss_staged_event"
-    merge_ac_position_lambda_ops     = "merge_ac_position"
-    merge_emdi_position_lambda_ops   = "merge_emdi_position"
+    merge_staged_position_lambda_ops = module.merge_mdss_staged_position.lambda_function_name
+    merge_staged_event_lambda_ops    = module.merge_mdss_staged_event.lambda_function_name
+    merge_ac_position_lambda_ops     = module.merge_ac_position.lambda_function_name
+    merge_emdi_position_lambda_ops   = module.merge_emdi_position.lambda_function_name
   }
 }
 
@@ -27,7 +27,7 @@ locals {
           period = 180
           metrics = [
             [
-              "AWS/Lambda",
+              "EMLambda/Merge",
               "SuccessfulQueries",
               "FunctionName",
               lambda_name
@@ -51,7 +51,7 @@ locals {
           period = 180
           metrics = [
             [
-              "AWS/Lambda",
+              "EMLambda/Merge",
               "FailedQueries",
               "FunctionName",
               lambda_name
@@ -75,7 +75,7 @@ locals {
           period = 180
           metrics = [
             [
-              "AWS/Lambda",
+              "EMLambda/Merge",
               "PollsMade",
               "FunctionName",
               lambda_name
@@ -99,7 +99,7 @@ locals {
           period = 180
           metrics = [
             [
-              "AWS/Lambda",
+              "EMLambda/Merge",
               "DataScanned",
               "FunctionName",
               lambda_name
@@ -123,7 +123,7 @@ locals {
           period = 180
           metrics = [
             [
-              "AWS/Lambda",
+              "EMLambda/Merge",
               "ExecutionTime",
               "FunctionName",
               lambda_name
@@ -147,7 +147,7 @@ locals {
           period = 180
           metrics = [
             [
-              "AWS/Lambda",
+              "EMLambda/Merge",
               "TimeInQueue",
               "FunctionName",
               lambda_name
@@ -171,7 +171,7 @@ locals {
           period = 180
           metrics = [
             [
-              "AWS/Lambda",
+              "EMLambda/Merge",
               "QueryPlanTime",
               "FunctionName",
               lambda_name
@@ -195,7 +195,7 @@ locals {
           period = 180
           metrics = [
             [
-              "AWS/Lambda",
+              "EMLambda/Merge",
               "LambdaProcessingTime",
               "FunctionName",
               lambda_name
