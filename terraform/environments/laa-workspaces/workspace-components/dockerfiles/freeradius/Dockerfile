@@ -3,12 +3,14 @@ FROM freeradius/freeradius-server:latest
 USER root
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    freeradius-perl \
+    build-essential \
+    libperl-dev \
     libconfig-file-perl \
     cpanminus \
     git \
     ca-certificates \
     libssl-dev \
+    zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
 RUN cpanm --notest Config::File LWP::UserAgent LWP::Protocol::https Try::Tiny
@@ -23,6 +25,8 @@ COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh \
     && mkdir -p /etc/linotp \
+    && mkdir -p /etc/freeradius/3.0/sites-enabled \
+    && mkdir -p /etc/freeradius/3.0/mods-enabled \
     && rm -f /etc/freeradius/3.0/sites-enabled/default \
               /etc/freeradius/3.0/sites-enabled/inner-tunnel \
     && rm -f /etc/freeradius/3.0/mods-enabled/eap \
