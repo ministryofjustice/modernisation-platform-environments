@@ -13,5 +13,5 @@ chown -R linotp:linotp /etc/linotp
 export LINOTP_DATABASE_URI="mysql+pymysql://${LINOTP_DB_USER}:${LINOTP_DB_PASSWORD}@${LINOTP_DB_HOST}/linotp3?charset=utf8"
 export SECRET_FILE="/etc/linotp/encKey"
 
-# Call original LinOTP entrypoint with migrations
-exec /app/entrypoint.sh --with-migrations
+# Call original LinOTP entrypoint with bootstrap (creates audit keys + runs migrations)
+exec /app/entrypoint.sh --with-bootstrap
