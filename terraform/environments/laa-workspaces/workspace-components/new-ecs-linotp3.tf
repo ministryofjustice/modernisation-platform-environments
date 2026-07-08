@@ -169,7 +169,7 @@ resource "aws_ecs_task_definition" "linotp3" {
       essential = true
 
       portMappings = [
-        { containerPort = 80, protocol = "tcp" }
+        { containerPort = 5000, protocol = "tcp" }
       ]
 
       environment = [
@@ -248,7 +248,7 @@ resource "aws_lb_target_group" "linotp3_portal" {
   count = local.environment == "development" ? 1 : 0
 
   name_prefix = "lntp3-"
-  port        = 80
+  port        = 5000
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = aws_vpc.workspaces[0].id
@@ -332,7 +332,7 @@ resource "aws_ecs_service" "linotp3" {
   load_balancer {
     target_group_arn = aws_lb_target_group.linotp3_portal[0].arn
     container_name   = "linotp"
-    container_port   = 80
+    container_port   = 5000
   }
 
   load_balancer {
