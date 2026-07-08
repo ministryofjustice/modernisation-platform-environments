@@ -145,6 +145,12 @@ resource "aws_db_instance" "access" {
   kms_key_id        = aws_kms_key.access_rds[0].arn
   storage_encrypted = true
 
+  # The snapshot's original master password is unknown, so reset it here. The
+  # pipeline CI role can modify the instance (the developer SSO role cannot).
+  # These credentials are stored in aws_secretsmanager_secret.access_master and
+  # consumed by the Access DMS source endpoint.
+  password = random_password.access_master[0].result
+
   multi_az            = false
   publicly_accessible = false
 
@@ -155,8 +161,41 @@ resource "aws_db_instance" "access" {
   tags = local.tags
 
   lifecycle {
-    # Master credentials, engine version and the source snapshot are inherited
-    # from the restored snapshot; avoid perpetual diffs / accidental replacement.
+    # Engine version and the source snapshot are inherited from the restored
+    # snapshot; avoid perpetual diffs / accidental replacement.
     ignore_changes = [snapshot_identifier, engine_version]
   }
+}
+
+# ---------------------------------------------------------------------------
+# Master credentials secret (consumed by the Access DMS source endpoint)
+# The snapshot's original master password is unknown; we reset it on the
+# instance above and store the working credentials here for DMS to read.
+# ---------------------------------------------------------------------------
+resource "random_password" "access_master" {
+  count   = local.is-test ? 1 : 0
+  length  = 24
+  special = false
+}
+
+#checkov:skip=CKV2_AWS_57: Automatic rotation not needed for throwaway test instance
+resource "aws_secretsmanager_secret" "access_master" {
+  count      = local.is-test ? 1 : 0
+  name       = "${local.application_name}-${local.environment}/access-rds/master"
+  kms_key_id = aws_kms_key.access_rds[0].arn
+  tags       = local.tags
+}
+
+resource "aws_secretsmanager_secret_version" "access_master" {
+  count     = local.is-test ? 1 : 0
+  secret_id = aws_secretsmanager_secret.access_master[0].id
+
+  secret_string = jsonencode({
+    engine   = "postgres"
+    host     = aws_db_instance.access[0].address
+    port     = aws_db_instance.access[0].port
+    dbname   = aws_db_instance.access[0].db_name
+    username = aws_db_instance.access[0].username
+    password = random_password.access_master[0].result
+  })
 }
