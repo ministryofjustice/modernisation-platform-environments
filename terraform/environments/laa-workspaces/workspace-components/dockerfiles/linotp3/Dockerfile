@@ -2,6 +2,8 @@ FROM linotp/linotp:3.4.4
 
 USER root
 
+RUN pip install --no-cache-dir pymysql
+
 COPY entrypoint.sh /usr/local/bin/custom-entrypoint.sh
 RUN chmod +x /usr/local/bin/custom-entrypoint.sh
 
