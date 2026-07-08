@@ -42,7 +42,7 @@ resource "aws_iam_policy" "ecs_secrets_policy" {
     {
       "Effect": "Allow",
       "Action": ["secretsmanager:GetSecretValue"],
-      "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa*"]
+      "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:soasandbox-password*"]
     }
   ]
 }
@@ -240,16 +240,7 @@ resource "aws_iam_policy" "ec2_instance_policy" {
         {
           "Effect": "Allow",
           "Action": ["secretsmanager:GetSecretValue"],
-          "Resource": [
-            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soasandbox/deploy-*",
-            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soasandbox/password",
-            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soasandbox/xxsoa/ds/password",
-            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soasandbox/ebs/sms/ds/password",
-            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soasandbox/ebs/user/password",
-            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soasandbox/ebs/ds/password",
-            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soasandbox/pui/user/password",
-            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soasandbox/java/trust-store/password"
-          ]
+          "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:soasandbox-password*"]
         }
     ]
 }
