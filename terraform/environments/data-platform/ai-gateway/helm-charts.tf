@@ -1,17 +1,18 @@
 resource "helm_release" "ai_gateway_configuration" {
   name      = "${local.component_name}-configuration"
   chart     = "${path.module}/src/helm/charts/${local.component_name}-configuration"
-  version   = "1.4.2"
+  version   = "1.5.0"
   namespace = module.ai_gateway_namespace.name
 
   values = [
     templatefile(
       "${path.module}/src/helm/values/${local.component_name}-configuration/values.yml.tftpl",
       {
-        hostname        = local.environment_configuration.ai_gateway_hostname
-        admin_hostname  = "admin.${local.environment_configuration.ai_gateway_hostname}"
-        certificate_arn = module.acm_ai_gateway.acm_certificate_arn
-        alb_logs_bucket = module.alb_access_logs.s3_bucket_id
+        hostname          = local.environment_configuration.ai_gateway_hostname
+        admin_hostname    = "admin.${local.environment_configuration.ai_gateway_hostname}"
+        internal_hostname = "internal.${local.environment_configuration.ai_gateway_hostname}"
+        certificate_arn   = module.acm_ai_gateway.acm_certificate_arn
+        alb_logs_bucket   = module.alb_access_logs.s3_bucket_id
       }
     )
   ]
