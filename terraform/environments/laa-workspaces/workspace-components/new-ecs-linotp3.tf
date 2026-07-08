@@ -266,6 +266,10 @@ resource "aws_lb_target_group" "linotp3_portal" {
 
   deregistration_delay = 30
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}-${local.environment}-linotp3-portal" }
