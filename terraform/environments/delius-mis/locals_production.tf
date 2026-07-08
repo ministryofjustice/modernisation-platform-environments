@@ -402,7 +402,7 @@ locals {
         type       = "gp3"
       }
       data = {
-        iops       = 7680
+        iops       = 15360
         throughput = 480
         type       = "gp3"
         total_size = 7000
@@ -431,11 +431,9 @@ locals {
 
   dfi_report_bucket_config_production = null
 
-  lb_config_production = null
-
-  # lb_config_production = {
-  #   bucket_policy_enabled = true
-  # }
+  lb_config_production = {
+    bucket_policy_enabled = true
+  }
 
   datasync_config_production = null
 

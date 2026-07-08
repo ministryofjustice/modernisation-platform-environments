@@ -1,0 +1,2 @@
+aws-lambda-powertools==3.29.0
+aws-xray-sdk==2.14.0

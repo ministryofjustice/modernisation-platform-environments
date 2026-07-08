@@ -29,11 +29,11 @@ resource "aws_db_instance" "opahub_db" {
   username                    = jsondecode(data.aws_secretsmanager_secret_version.opahub_secrets.secret_string)["db_user"]
   password                    = jsondecode(data.aws_secretsmanager_secret_version.opahub_secrets.secret_string)["db_password"]
   port                        = 3306
-  apply_immediately           = true #Toggle to true if you want changes to be applied immediately
+  apply_immediately           = false #Toggle to true if you want changes to be applied immediately
 
   vpc_security_group_ids  = [aws_security_group.opahub_db.id]
   db_subnet_group_name    = aws_db_subnet_group.opahub_db_subnets.id
-  option_group_name       = local.application_data.accounts[local.environment].option_group_name
+  option_group_name       = lookup(local.application_data.accounts[local.environment], "option_group_name", null)
   backup_retention_period = 30
   #  snapshot_identifier     = local.is-development ? local.application_data.accounts[local.environment].db_snapshot_identifier : null
   snapshot_identifier = null
