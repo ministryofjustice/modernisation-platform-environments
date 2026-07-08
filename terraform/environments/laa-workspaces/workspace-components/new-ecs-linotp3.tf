@@ -255,9 +255,9 @@ resource "aws_lb_target_group" "linotp3_portal" {
 
   health_check {
     enabled             = true
-    path                = "/manage/"
+    path                = "/"
     protocol            = "HTTP"
-    matcher             = "200,401"
+    matcher             = "200-399"
     interval            = 30
     timeout             = 10
     healthy_threshold   = 2
