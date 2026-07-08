@@ -740,7 +740,7 @@ resource "aws_route53_record" "bws_entry" {
 }
 
 # Create route53 entry for BWS admin - only if BWS is enabled
-resource "aws_route53_record" "bws_entry" {
+resource "aws_route53_record" "bws_admin_entry" {
   count    = local.bws_enabled ? 1 : 0
   provider = aws.core-vpc
 
