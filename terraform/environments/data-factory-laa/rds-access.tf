@@ -191,11 +191,14 @@ resource "aws_secretsmanager_secret_version" "access_master" {
   secret_id = aws_secretsmanager_secret.access_master[0].id
 
   secret_string = jsonencode({
-    engine   = "postgres"
-    host     = aws_db_instance.access[0].address
-    port     = aws_db_instance.access[0].port
-    dbname   = aws_db_instance.access[0].db_name
-    username = aws_db_instance.access[0].username
-    password = random_password.access_master[0].result
+    engine = "postgres"
+    host   = aws_db_instance.access[0].address
+    port   = aws_db_instance.access[0].port
+    dbname = aws_db_instance.access[0].db_name
+    # The DMS module reads dbInstanceIdentifier to name the Glue database/table
+    # (metadata_generator.tf) — omitting it causes an "Invalid index" error.
+    dbInstanceIdentifier = aws_db_instance.access[0].identifier
+    username             = aws_db_instance.access[0].username
+    password             = random_password.access_master[0].result
   })
 }

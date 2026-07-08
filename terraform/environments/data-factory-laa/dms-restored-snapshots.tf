@@ -22,11 +22,11 @@
 #   rds-access.tf). Using master avoids creating a dedicated dms_user role
 #   inside the DB, which is not possible here — the CI pipeline runs outside the
 #   VPC and the read-only developer role cannot reach the private RDS.
-# - The mapping uses schema "%" (all user schemas) because the real schema name
-#   is not known up front. Once a source endpoint exists, discover it with:
-#     aws dms describe-schemas --endpoint-arn <arn> \
-#       --profile data-factory-laa-test --region eu-west-2
-#   then tighten the corresponding dms-config/*-mappings.json if desired.
+# - The mapping must list EXACT schema and table names. The DMS module builds
+#   selection rules with rule-action "explicit", and AWS DMS rejects "%"
+#   wildcards for explicit rules ("Exact schema name and table name required").
+#   The Access objects were derived from the laa-data-access-api Flyway
+#   migrations (schema "public"); see dms-config/access-dms-mappings.json.
 # =============================================================================
 
 # #############################################################################

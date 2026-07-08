@@ -1,6 +1,18 @@
 {
   "blobs": [],
   "columns_to_exclude": [],
-  "objects": ["%"],
-  "schema": "%"
+  "schema": "public",
+  "objects": [
+    "public.applications",
+    "public.application_notes",
+    "public.caseworkers",
+    "public.certificates",
+    "public.decisions",
+    "public.domain_events",
+    "public.individuals",
+    "public.linked_applications",
+    "public.linked_individuals",
+    "public.merits_decisions",
+    "public.proceedings"
+  ]
 }
