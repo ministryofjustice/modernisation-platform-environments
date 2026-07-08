@@ -24,6 +24,7 @@ resource "helm_release" "litellm" {
   version    = local.environment_configuration.litellm_version
   chart      = "litellm-helm"
   namespace  = local.component_name
+  timeout    = "1200" 
   values = [
     templatefile(
       "${path.module}/src/helm/values/litellm/values.yml.tftpl",
@@ -96,6 +97,7 @@ resource "helm_release" "litellm_admin" {
   version    = local.environment_configuration.litellm_version
   chart      = "litellm-helm"
   namespace  = local.component_name
+  timeout    = "1200"
   values = [
     templatefile(
       "${path.module}/src/helm/values/litellm-admin/values.yml.tftpl",
