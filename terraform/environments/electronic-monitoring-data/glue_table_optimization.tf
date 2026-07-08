@@ -1,5 +1,20 @@
 locals {
-  database_to_optimize = local.live_feeds_dbs
+  database_to_optimize = [
+    "allied_mdss",
+    "serco_fms",
+    "staged_mdss",
+    "serco_fms_deduped",
+    "serco_fms_curated",
+    "staging_mdss",
+    "staging_fms",
+    "intermediate_fms",
+    "intermediate_mdss",
+    "datamart",
+    "derived",
+    "analysis",
+    "acquisitive_crime",
+    "data_insights",
+  ]
 
   # Default settings applied to all tables unless overridden per-table.
   # Set a value to null to use the provider default.
@@ -250,7 +265,7 @@ locals {
       "x_serg2_mdss_em_event_type"                           = {}
       "x_serg2_mdss_em_mdss_alert"                           = {}
     }
-    staging_fms = {
+    "staging_fms" = {
       "stg_alm_asset_fms"                                            = {}
       "stg_asmt_assessment_instance_fms"                             = {}
       "stg_asmt_assessment_instance_question_fms"                    = {}
@@ -315,7 +330,7 @@ locals {
       "stg_x_serg2_mdss_em_event_type_fms"                           = {}
       "stg_x_serg2_mdss_em_mdss_alert_fms"                           = {}
     }
-    staging_mdss = {
+    "staging_mdss" = {
       "stg_curfew_rule_type_flag_mdss" = {}
       "stg_curfew_rule_type_mdss" = {}
       "stg_device_status_mdss" = {}
@@ -325,7 +340,7 @@ locals {
       "stg_position_lbs_mdss" = {}
       "stg_sim_card_status_mdss" = {}
     }
-    intermediate_fms = {
+    "intermediate_fms" = {
       "cemo_case_id_lookup" = {}
       "cemo_order_curfews_current" = {}
       "dd_device_wearer_current" = {}
@@ -335,7 +350,7 @@ locals {
       "indications_of_noncompliance" = {}
       "indications_of_violations" = {}
     }
-    intermediate_mdss = {
+    "intermediate_mdss" = {
       "int_person_latest_event_report" = {}
       "int_person_latest_position_report" = {}
       "int_person_reports_in_event" = {}
@@ -345,7 +360,7 @@ locals {
       "int_person_status_history_from_event" = {}
       "int_person_status_history_from_position" = {}
     }
-    datamart = {
+    "datamart" = {
       "atv_fct" = {}
       "breaches_fct" = {}
       "date_dim" = {}
@@ -357,7 +372,7 @@ locals {
       "time_dim" = {}
       "violation_event_fct" = {}
     }
-    derived = {
+    "derived" = {
       "atv" = {}
       "breaches" = {}
       "daily_caseload" = {}
@@ -366,18 +381,18 @@ locals {
       "not_monitored" = {}
       "visits" = {}
     }
-    acquisitive_crime = {
+    "acquisitive_crime" = {
       "caseload" = {}
       "daily_caseload_count" = {}
       "device_activations" = {}
       "position" = {}
     }
-    analysis= {
+    "analysis"= {
       "breaches" = {}
       "daily_caseload" = {}
       "not_monitored" = {}
     }
-    data_insights = {
+    "data_insights" = {
       "caseload" = {}
       "curfew_atv" = {}
       "daily_caseload_count" = {}
@@ -401,7 +416,7 @@ locals {
 resource "aws_glue_catalog_table_optimizer" "standard_compaction" {
   for_each      = local.tables_to_optimize_flat
   catalog_id    = data.aws_caller_identity.current.account_id
-  database_name = "${split(".", each.key)[0]}${local.db_suffix}"
+  database_name = split(".", each.key)[0] == "allied_mdss" || split(".", each.key)[0] == "serco_fms" ? "${split(".", each.key)[0]}${local.db_suffix}" : "${split(".", each.key)[0]}${local.dbt_suffix}"
   table_name    = split(".", each.key)[1]
 
   configuration {
