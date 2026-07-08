@@ -61,30 +61,6 @@ locals {
       },
       {
         # --------------------------
-        # Polls made
-        # --------------------------
-        type   = "metric"
-        x      = 0
-        y      = 0
-        width  = 24
-        height = 6
-        properties = {
-          title  = "Average Athena Polls"
-          region = "eu-west-2"
-          stat   = "Average"
-          period = 180
-          metrics = [
-            [
-              "EM/MergeLambdas",
-              "PollsMade",
-              "FunctionName",
-              lambda_name
-            ]
-          ]
-        }
-      },
-      {
-        # --------------------------
         # Data scanned
         # --------------------------
         type   = "metric"
@@ -109,7 +85,7 @@ locals {
       },
       {
         # --------------------------
-        # Execution time
+        # Execution time (total)
         # --------------------------
         type   = "metric"
         x      = 0
@@ -124,7 +100,79 @@ locals {
           metrics = [
             [
               "EM/MergeLambdas",
-              "ExecutionTime",
+              "TotalExecutionTime",
+              "FunctionName",
+              lambda_name
+            ]
+          ]
+        }
+      },
+      {
+        # --------------------------
+        # Execution time (engine)
+        # --------------------------
+        type   = "metric"
+        x      = 0
+        y      = 0
+        width  = 24
+        height = 6
+        properties = {
+          title  = "Average Engine Execution Time"
+          region = "eu-west-2"
+          stat   = "Average"
+          period = 180
+          metrics = [
+            [
+              "EM/MergeLambdas",
+              "EngineExecutionTime",
+              "FunctionName",
+              lambda_name
+            ]
+          ]
+        }
+      },
+      {
+        # --------------------------
+        # Processing time (service)
+        # --------------------------
+        type   = "metric"
+        x      = 0
+        y      = 0
+        width  = 24
+        height = 6
+        properties = {
+          title  = "Average Service Processing Time"
+          region = "eu-west-2"
+          stat   = "Average"
+          period = 180
+          metrics = [
+            [
+              "EM/MergeLambdas",
+              "ServiceProcessingTime",
+              "FunctionName",
+              lambda_name
+            ]
+          ]
+        }
+      },
+      {
+        # --------------------------
+        # Pre-processing time (service)
+        # --------------------------
+        type   = "metric"
+        x      = 0
+        y      = 0
+        width  = 24
+        height = 6
+        properties = {
+          title  = "Average Service Processing Time"
+          region = "eu-west-2"
+          stat   = "Average"
+          period = 180
+          metrics = [
+            [
+              "EM/MergeLambdas",
+              "ServicePreProcessingTime",
               "FunctionName",
               lambda_name
             ]
@@ -148,7 +196,7 @@ locals {
           metrics = [
             [
               "EM/MergeLambdas",
-              "TimeInQueue",
+              "QueryQueueTime",
               "FunctionName",
               lambda_name
             ]
@@ -172,31 +220,7 @@ locals {
           metrics = [
             [
               "EM/MergeLambdas",
-              "QueryPlanTime",
-              "FunctionName",
-              lambda_name
-            ]
-          ]
-        }
-      },
-      {
-        # --------------------------
-        # Lambda processing time
-        # --------------------------
-        type   = "metric"
-        x      = 0
-        y      = 0
-        width  = 24
-        height = 6
-        properties = {
-          title  = "Average Lambda Processing Time"
-          region = "eu-west-2"
-          stat   = "Average"
-          period = 180
-          metrics = [
-            [
-              "EM/MergeLambdas",
-              "LambdaProcessingTime",
+              "QueryPlanningTime",
               "FunctionName",
               lambda_name
             ]
