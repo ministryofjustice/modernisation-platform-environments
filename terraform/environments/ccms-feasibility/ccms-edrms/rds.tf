@@ -1,6 +1,6 @@
 module "rds" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/11c2b289779bfa4e0c02ca7d4b31a0092f2124e1
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/rds-instance?ref=11c2b289779bfa4e0c02ca7d4b31a0092f2124e1"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/29884f0212632a650344ec73811e0cc2844c1e73
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/rds-instance?ref=29884f0212632a650344ec73811e0cc2844c1e73"
 
   name                 = "${local.component_name}-${local.env_label}-tds"
   engine               = "oracle-se2"
