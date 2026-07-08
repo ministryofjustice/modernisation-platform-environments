@@ -1,13 +1,10 @@
-FROM linotp/linotp:3
+FROM linotp/linotp:3.4.4
 
-COPY linotp-http.conf /etc/apache2/sites-available/linotp-http.conf
-COPY entrypoint.sh /entrypoint.sh
+USER root
 
-RUN chmod +x /entrypoint.sh \
-    && a2ensite linotp-http \
-    && a2dissite 000-default default-ssl linotp 2>/dev/null || true \
-    && a2enmod wsgi headers
+COPY entrypoint.sh /usr/local/bin/custom-entrypoint.sh
+RUN chmod +x /usr/local/bin/custom-entrypoint.sh
 
 EXPOSE 80
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/custom-entrypoint.sh"]
