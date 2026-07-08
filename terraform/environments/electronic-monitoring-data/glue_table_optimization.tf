@@ -430,7 +430,7 @@ resource "aws_glue_catalog_table_optimizer" "standard_compaction" {
 resource "aws_glue_catalog_table_optimizer" "standard_retention" {
   for_each      = local.tables_to_optimize_flat
   catalog_id    = data.aws_caller_identity.current.account_id
-  database_name = "${split(".", each.key)[0]}${local.db_suffix}"
+  database_name = split(".", each.key)[0] == "allied_mdss" || split(".", each.key)[0] == "serco_fms" ? "${split(".", each.key)[0]}${local.db_suffix}" : "${split(".", each.key)[0]}${local.dbt_suffix}"
   table_name    = split(".", each.key)[1]
 
   configuration {
@@ -454,7 +454,7 @@ resource "aws_glue_catalog_table_optimizer" "standard_retention" {
 resource "aws_glue_catalog_table_optimizer" "standard_orphan_file_deletion" {
   for_each      = local.tables_to_optimize_flat
   catalog_id    = data.aws_caller_identity.current.account_id
-  database_name = "${split(".", each.key)[0]}${local.db_suffix}"
+  database_name = split(".", each.key)[0] == "allied_mdss" || split(".", each.key)[0] == "serco_fms" ? "${split(".", each.key)[0]}${local.db_suffix}" : "${split(".", each.key)[0]}${local.dbt_suffix}"
   table_name    = split(".", each.key)[1]
 
   configuration {
@@ -557,7 +557,7 @@ resource "aws_lakeformation_permissions" "glue_table_optimizer_table_permissions
   principal   = aws_iam_role.glue_table_optimizer.arn
   permissions = ["ALTER", "DESCRIBE", "INSERT", "DELETE"]
   table {
-    database_name = "${each.key}${local.db_suffix}"
+    database_name = split(".", each.key)[0] == "allied_mdss" || split(".", each.key)[0] == "serco_fms" ? "${split(".", each.key)[0]}${local.db_suffix}" : "${split(".", each.key)[0]}${local.dbt_suffix}"
     wildcard      = true
   }
 }
@@ -568,6 +568,6 @@ resource "aws_lakeformation_permissions" "glue_table_optimizer_database_permissi
   principal   = aws_iam_role.glue_table_optimizer.arn
   permissions = ["DESCRIBE"]
   database {
-    name = "${each.key}${local.db_suffix}"
+    name = split(".", each.key)[0] == "allied_mdss" || split(".", each.key)[0] == "serco_fms" ? "${split(".", each.key)[0]}${local.db_suffix}" : "${split(".", each.key)[0]}${local.dbt_suffix}"
   }
 }
