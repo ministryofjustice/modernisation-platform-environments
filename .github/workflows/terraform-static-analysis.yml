@@ -28,7 +28,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run Analysis
-        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
+        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@3f4b0b80deea0ac74630e80189e1edeee3378793 # v6.1.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -53,7 +53,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run Analysis
-        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
+        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@3f4b0b80deea0ac74630e80189e1edeee3378793 # v6.1.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -73,7 +73,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run Analysis
-        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
+        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@3f4b0b80deea0ac74630e80189e1edeee3378793 # v6.1.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
