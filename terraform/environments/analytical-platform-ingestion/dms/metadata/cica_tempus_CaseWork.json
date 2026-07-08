@@ -22,10 +22,6 @@
     },
     {
       "object_name": "dbo.CaseTrimDocuments",
-      "column_name": "CaseTrimDocID"
-    },
-    {
-      "object_name": "dbo.CaseTrimDocuments",
       "column_name": "CopiedFrom"
     },
     {
@@ -42,19 +38,11 @@
     },
     {
       "object_name": "dbo.CaseTrimDocuments",
-      "column_name": "Direction"
-    },
-    {
-      "object_name": "dbo.CaseTrimDocuments",
       "column_name": "DocumentFileLocation"
     },
     {
       "object_name": "dbo.CaseTrimDocuments",
       "column_name": "DocumentFolderLocation"
-    },
-    {
-      "object_name": "dbo.CaseTrimDocuments",
-      "column_name": "DocumentReviewStatus"
     },
     {
       "object_name": "dbo.CaseTrimDocuments",
@@ -67,14 +55,6 @@
     {
       "object_name": "dbo.CaseTrimDocuments",
       "column_name": "DocumentSentTo"
-    },
-    {
-      "object_name": "dbo.CaseTrimDocuments",
-      "column_name": "DocumentStatus"
-    },
-    {
-      "object_name": "dbo.CaseTrimDocuments",
-      "column_name": "DueDate"
     },
     {
       "object_name": "dbo.CaseTrimDocuments",
@@ -91,10 +71,6 @@
     {
       "object_name": "dbo.CaseTrimDocuments",
       "column_name": "IVB_ID"
-    },
-    {
-      "object_name": "dbo.CaseTrimDocuments",
-      "column_name": "JobID"
     },
     {
       "object_name": "dbo.CaseTrimDocuments",
