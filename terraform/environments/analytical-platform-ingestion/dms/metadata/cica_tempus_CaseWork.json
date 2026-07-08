@@ -112,12 +112,5 @@
       "object_name": "dbo.CaseTrimDocuments",
       "column_name": "SentBy"
     }
-  ],
-  "columns_to_keep_as_int": [
-    {
-      "object_name": "dbo.CaseTrimDocuments",
-      "column_name": "CaseTrimDocID",
-      "apply_to_environments": ["development", "production"]
-    }
   ]
 }
