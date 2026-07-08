@@ -184,7 +184,7 @@ resource "aws_ecs_task_definition" "linotp3" {
       ]
 
       healthCheck = {
-        command     = ["CMD-SHELL", "curl -sf http://localhost/manage/ || exit 1"]
+        command     = ["CMD-SHELL", "curl -sf http://localhost:5000/manage/ || exit 1"]
         interval    = 30
         timeout     = 10
         retries     = 3
