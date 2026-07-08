@@ -64,9 +64,6 @@ resource "aws_s3_bucket_policy" "shared_bucket_policy" {
         Action   = "s3:*",
         Resource = ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
         Condition = {
-          Bool = {
-            "aws:SecureTransport" = "false"
-          }
           NumericLessThan = {
             "s3:TlsVersion" = "1.2"
           }
