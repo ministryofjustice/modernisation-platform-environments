@@ -54,16 +54,34 @@ resource "kubectl_manifest" "nodepool_custom_networking" {
             - key: eks.amazonaws.com/instance-generation
               operator: Gt
               values: ["4"]
+
+            - key: topology.kubernetes.io/zone
+              operator: In
+              values: ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
+            - key: "eks.amazonaws.com/instance-cpu"
+              operator: In
+              values: ["4", "8", "16", "32"]
+            - key: "eks.amazonaws.com/instance-gpu-count"
+              operator: In
+              values: ["0"]
           nodeClassRef:
             group: eks.amazonaws.com
             kind: NodeClass
             name: custom-networking
+        metadata:
+          labels:
+            karpenter.sh/discovery: ${local.cluster_name}
+            Terraform: "true"
+            "cloud-platform.justice.gov.uk/default-ng": "true"
+            Cluster: "${terraform.workspace}"
+            Domain: "fqdn"
       disruption:
         consolidationPolicy: WhenEmptyOrUnderutilized
         consolidateAfter: 60s
       limits:
         cpu: "100"
         memory: 400Gi
+        nodes: 100
   YAML
 
   depends_on = [kubectl_manifest.nodeclass_custom_networking]
