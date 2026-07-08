@@ -55,21 +55,3 @@ resource "null_resource" "created_by_tag" {
     ignore_changes = [triggers["created_by"]]
   }
 }
-
-variable "enable_argocd" {
-  type        = bool
-  default     = false
-  description = "Enable the EKS Capability for Argo CD on this cluster (hub cluster role)."
-}
-
-variable "argocd_idc_instance_arn" {
-  type        = string
-  default     = "" # Set to your org's IAM Identity Center instance ARN
-  description = "ARN of the AWS IAM Identity Center instance for Argo CD authentication. Required when enable_argocd is true."
-}
-
-variable "argocd_idc_region" {
-  type        = string
-  default     = "eu-west-2"
-  description = "Region of the IAM Identity Center instance."
-}
