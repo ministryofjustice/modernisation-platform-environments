@@ -7,16 +7,21 @@ resource "aws_secretsmanager_secret_version" "sandbox_ccms_soa_secrets_version" 
   secret_id = aws_secretsmanager_secret.soa_sandbox_secrets.id
 
   secret_string = jsonencode({
-    slack_channel_webhook           = "",
-    slack_channel_webhook_guardduty = "",
-    "ccms/soasandbox/password"         = "",
-    "ccms/soasandbox/xxsoa/ds/password" = "",
-    "ccms/soasandbox/ebs/ds/password"  = "",
-    "ccms/soasandbox/ebs/sms/ds/password" = "",
-    "ccms/soasandbox/pui/user/password" = "",
-    "ccms/soasandbox/ebs/user/password" = "",
-    "ccms/soasandbox/deploy-github-ssh-key" = "",
-    "ccms/soasandbox/java/trust-store/password" = ""
+    slack_channel_webhook                 = "",
+    slack_channel_webhook_guardduty       = "",
+    soa_realm_apply_user_password         = "",
+    soa_realm_caab_user_password          = "",
+    keystorePassword                      = "",
+    truststorePassword                    = "",
+    admin_server_password                 = "",
+    edrms_xxsoa_user_password             = "",
+    ccms_apps_user_password               = "",
+    cwa_apps_user_password                = "",
+    soa_realm_pui_user_password           = "",
+    soa_realm_ebs_soa_super_user_password = "",
+    soa_rds_admin_user_password           = "",
+    soa_rds_all_ccmssoa_schema_password   = "",
+    extra_java_properties                 = ""
   })
 
   # lifecycle {
