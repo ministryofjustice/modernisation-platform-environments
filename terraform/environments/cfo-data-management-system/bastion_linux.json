@@ -1,13 +1,15 @@
 {
   "keys": {
     "development": {
-      "rkearsley": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILENw2m2wC3bnjENE2/gwdd+hQcFDYACtIgq1x3FubhC ryan.kearsley@justice.gov.uk"
+      "rkearsley": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINlvfY/5/nBlq6UmKPaJVVDZvTB66bS9zXDl7wsPe11x ryan.kearsley@MJ007459",
+      "sgbison": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEaccHBZ2VrG632pFHddDFdtNpkS8guZZHRDD4cTSTwu sam.gibson@MJ007460"
     },
     "preproduction": {
-      "rkearsley": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILENw2m2wC3bnjENE2/gwdd+hQcFDYACtIgq1x3FubhC ryan.kearsley@justice.gov.uk"
+      "rkearsley": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINlvfY/5/nBlq6UmKPaJVVDZvTB66bS9zXDl7wsPe11x ryan.kearsley@MJ007459",
+      "sgbison": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEaccHBZ2VrG632pFHddDFdtNpkS8guZZHRDD4cTSTwu sam.gibson@MJ007460"
     },
     "production": {
-      "rkearsley": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILENw2m2wC3bnjENE2/gwdd+hQcFDYACtIgq1x3FubhC ryan.kearsley@justice.gov.uk"
+      "rkearsley": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINlvfY/5/nBlq6UmKPaJVVDZvTB66bS9zXDl7wsPe11x ryan.kearsley@MJ007459"
     }
   }
 }
