@@ -185,7 +185,7 @@ locals {
         instance_target_groups = {
           pd-rdgw-1-http = merge(local.lbs.public.instance_target_groups.http, {
             attachments = [
-              { ec2_instance_name = "pd-rdgw-1-a" },
+              # { ec2_instance_name = "pd-rdgw-1-a" },
               { ec2_instance_name = "pd-rdgw-1-b" },
             ]
           })
