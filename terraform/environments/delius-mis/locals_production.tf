@@ -7,7 +7,7 @@ locals {
     legacy_ad_domain_name       = "delius-prod.local"
     legacy_dns_ip_addrs         = ["10.160.17.254", "10.160.22.121"]
     ad_domain_name              = "delius-mis-prod.internal"
-    # ad_trust_domain_name                   = "azure.hmpp.root"
+    ad_trust_domain_name                   = "azure.hmpp.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
     ad_trust_dns_ip_addrs                  = module.ip_addresses.mp_ips.ad_fixngo_hmpp_domain_controllers
     core_shared_services_vpc_cidr          = module.ip_addresses.mp_cidr["core-shared-services-live-data-additional"]
@@ -393,6 +393,11 @@ locals {
       "/dev/sdj" = { label = "flash" }           # FLASH
       "/dev/sdk" = { label = "flash" }           # FLASH
       "/dev/sdl" = { label = "flash" }           # FLASH
+      "/dev/sdm" = { label = "data" }            # DATA
+      "/dev/sdn" = { label = "data" }            # DATA
+      "/dev/sdo" = { label = "data" }            # DATA
+      "/dev/sdp" = { label = "data" }            # DATA
+      "/dev/sdq" = { label = "data" }            # DATA
       "/dev/sds" = { label = "swap" }
     }
     ebs_volume_config = {
@@ -405,7 +410,7 @@ locals {
         iops       = 15360
         throughput = 480
         type       = "gp3"
-        total_size = 7000
+        total_size = 14000
       }
       flash = {
         iops       = 3000
