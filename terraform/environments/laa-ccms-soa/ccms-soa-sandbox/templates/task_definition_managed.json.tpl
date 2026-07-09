@@ -13,10 +13,6 @@
     },
     "portMappings": [
       {
-        "containerPort": ${managed_server_port},
-        "hostPort": ${managed_server_port}
-      },
-      {
         "containerPort": ${managed_ssl_port},
         "hostPort": ${managed_ssl_port}
       },
@@ -52,10 +48,6 @@
       }
     ],
     "environment": [
-      {
-        "name": "CONNECTION_STRING",
-        "value": "${db_instance_endpoint}/SOADB"
-      },
       {
         "name": "DOMAIN_TYPE",
         "value": "soa"
@@ -120,7 +112,19 @@
         },
         {
           "name": "EXTRA_JAVA_PROPERTIES",
-          "valueFrom": "${trust_store_password}"
+          "valueFrom": "${extra_java_properties}"
+        },
+        {
+          "name": "KEYSTORE_PASSWORD",
+          "valueFrom": "${keystorePassword}"
+        },
+        {
+          "name": "TRUSTSTORE_PASSWORD",
+          "valueFrom": "${truststorePassword}"
+        },
+        {
+           "name": "SLACK_CHANNEL_WEBHOOK",
+           "valueFrom": "${slack_channel_webhook}"
         }
     ]
   }

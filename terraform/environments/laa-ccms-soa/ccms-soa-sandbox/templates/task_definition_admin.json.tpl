@@ -13,10 +13,6 @@
     },
     "portMappings": [
       {
-        "containerPort": ${admin_server_port},
-        "hostPort": ${admin_server_port}
-      },
-      {
           "containerPort": ${admin_ssl_port},
           "hostPort": ${admin_ssl_port}
       }
@@ -119,8 +115,7 @@
       {
         "name": "USER_MEM_ARGS",
         "value": "${wl_admin_mem_args} -Djava.security.egd=file:/tmp/big.random.file"
-      },      
-            
+      },
       {
         "name": "EBS_INITIAL_CAPACITY",
         "value": "5"
@@ -175,7 +170,7 @@
           "name": "CAAB_USER_PASSWORD",
           "valueFrom": "${soa_realm_caab_user_password}"
         },
-          {
+        {
           "name": "EBS_USER_PASSWORD",
           "valueFrom": "${soa_realm_ebs_soa_super_user_password}"
         },
@@ -190,6 +185,10 @@
         {
           "name": "TRUSTSTORE_PASSWORD",
           "valueFrom": "${truststorePassword}"
+        },
+        {
+          "name": "SLACK_CHANNEL_WEBHOOK",
+          "valueFrom": "${slack_channel_webhook}"
         }
     ]
   }

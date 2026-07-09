@@ -1,5 +1,5 @@
 resource "aws_secretsmanager_secret" "soa_sandbox_secrets" {
-  name        = "soasandbox-password"
+  name        = "soasandbox-secrets"
   description = "SOA Weblogic,EM Console for user weblogic, RDS Database Password for SOAPDB admin, PUI and other passwords in Key values"
 }
 

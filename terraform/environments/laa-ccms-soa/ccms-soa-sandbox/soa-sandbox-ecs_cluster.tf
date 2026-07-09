@@ -88,19 +88,20 @@ resource "aws_ecs_task_definition" "soasandbox-admin" {
       pui_user                             = local.application_data.accounts[local.environment].admin_pui_user
       apply_user                           = local.application_data.accounts[local.environment].admin_apply_user
       keystore_secret_id                   = local.application_data.accounts[local.environment].admin_keystore_secret_id
-      soa_rds_admin_user_password          = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/password::"
-      soa_rds_all_ccmssoa_schema_password  = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/schema/password::"
-      admin_server_password                = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/admin/password::"
-      edrms_xxsoa_user_password            = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/xxsoa/password::"
-      ccms_apps_user_password              = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/ccms/apps/password::"
-      cwa_apps_user_password               = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/cwa/apps/password::"
-      soa_realm_pui_user_password          = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/pui/password::"
-      soa_realm_apply_user_password        = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/apply/password::"
-      soa_realm_caab_user_password         = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/caab/password::"
-      soa_realm_ebs_soa_super_user_password = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/ebs/soa/super/user/password::"
-      extra_java_properties                = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/extra/java/properties::"
-      keystorePassword                     = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/keystore/password::"
-      truststorePassword                   = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/truststore/password::"
+      soa_rds_admin_user_password          = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:admin_server_password::"
+      soa_rds_all_ccmssoa_schema_password  = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:soa_rds_all_ccmssoa_schema_password::"
+      admin_server_password                = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:admin_server_password::"
+      edrms_xxsoa_user_password            = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:edrms_xxsoa_user_password::"
+      ccms_apps_user_password              = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms_apps_user_password::"
+      cwa_apps_user_password               = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:cwa_apps_user_password::"
+      soa_realm_pui_user_password          = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:soa_realm_pui_user_password::"
+      soa_realm_apply_user_password        = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:soa_realm_apply_user_password::"
+      soa_realm_caab_user_password         = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:soa_realm_caab_user_password::"
+      soa_realm_ebs_soa_super_user_password = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:soa_realm_ebs_soa_super_user_password::"
+      extra_java_properties                = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:extra_java_properties::"
+      keystorePassword                     = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:keystorePassword::"
+      truststorePassword                   = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:truststorePassword::"
+      slack_channel_webhook                = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:slack_channel_webhook::"
     }
   )
 }
@@ -180,19 +181,22 @@ resource "aws_ecs_task_definition" "soasandbox-managed" {
   container_definitions = templatefile(
     "${path.module}/templates/task_definition_managed.json.tpl",
     {
-      app_name             = local.application_data.accounts[local.environment].app_name
-      app_image            = local.application_data.accounts[local.environment].managed_app_image
-      db_instance_endpoint = aws_db_instance.soa_db.endpoint
-      managed_server_port  = local.application_data.accounts[local.environment].managed_server_port
-      managed_ssl_port     = local.application_data.accounts[local.environment].managed_ssl_port
-      admin_server_port    = local.application_data.accounts[local.environment].admin_server_port
-      aws_region           = local.application_data.accounts[local.environment].aws_region
-      container_version    = local.application_data.accounts[local.environment].managed_container_version
-      admin_host           = aws_route53_record.admin-sandbox.fqdn
-      soa_password         = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/password::"
-      trust_store_password = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/java/trust-store/password::"
-      ms_hostname          = aws_route53_record.managed-sandbox.fqdn
-      wl_mem_args          = local.application_data.accounts[local.environment].managed_wl_mem_args
+      app_name              = local.application_data.accounts[local.environment].app_name
+      app_image             = local.application_data.accounts[local.environment].managed_app_image
+      db_instance_endpoint  = aws_db_instance.soa_db.endpoint
+      managed_server_port   = local.application_data.accounts[local.environment].managed_server_port
+      managed_ssl_port      = local.application_data.accounts[local.environment].managed_ssl_port
+      admin_server_port     = local.application_data.accounts[local.environment].admin_server_port
+      aws_region            = local.application_data.accounts[local.environment].aws_region
+      container_version     = local.application_data.accounts[local.environment].managed_container_version
+      admin_host            = aws_route53_record.admin-sandbox.fqdn
+      soa_password          = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:admin_server_password::"
+      extra_java_properties = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:extra_java_properties::"
+      keystorePassword      = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:keystorePassword::"
+      truststorePassword    = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:truststorePassword::"
+      slack_channel_webhook = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:slack_channel_webhook::"
+      ms_hostname           = aws_route53_record.managed-sandbox.fqdn
+      wl_mem_args           = local.application_data.accounts[local.environment].managed_wl_mem_args
     }
   )
 }

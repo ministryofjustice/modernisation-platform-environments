@@ -19,7 +19,7 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
 
 #--Secrets access policy for ECS tasks
 data "aws_secretsmanager_secret" "pull_soasandbox_password" {
-  name = "soasandbox-password"
+  name = "soasandbox-secrets"
 }
 
 resource "aws_iam_role" "ecs_task_execution_role" {
@@ -42,7 +42,7 @@ resource "aws_iam_policy" "ecs_secrets_policy" {
     {
       "Effect": "Allow",
       "Action": ["secretsmanager:GetSecretValue"],
-      "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:soasandbox-password*"]
+      "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:soasandbox-secrets*"]
     }
   ]
 }
@@ -240,7 +240,7 @@ resource "aws_iam_policy" "ec2_instance_policy" {
         {
           "Effect": "Allow",
           "Action": ["secretsmanager:GetSecretValue"],
-          "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:soasandbox-password*"]
+          "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:soasandbox-secrets*"]
         }
     ]
 }
