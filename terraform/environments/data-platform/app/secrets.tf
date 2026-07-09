@@ -6,8 +6,9 @@ module "app_secrets" {
 
   secret_string = jsonencode({
     secret_key = random_password.app_secrets.result
-    sentry_dsn = local.environment_configuration.sentry_dsn
+    sentry_dsn = "CHANGEME"
   })
+  ignore_secret_changes = true
 }
 
 module "app_rds_credentials" {

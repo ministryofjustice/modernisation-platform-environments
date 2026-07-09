@@ -46,6 +46,11 @@
             required: false
             default: "root"
             description: "Optional: subfolder in 'terraform/environments/<application>' if present."
+          runner:
+            type: string
+            required: false
+            default: "ubuntu-latest"
+            description: "GitHub Actions runner label to use for plan and apply jobs."
         secrets:
           MODERNISATION_PLATFORM_ACCOUNT_ID:
             required: true
@@ -64,13 +69,13 @@
       group: ${{ inputs.account_name && format('{0}-{1}', inputs.account_name, inputs.component) || format('{0}-{1}-{2}', inputs.application, inputs.environment, inputs.component) }}
     jobs:
       fetch-secrets:
-        uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
+        uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@3f4b0b80deea0ac74630e80189e1edeee3378793 # v6.1.5
         secrets:
           MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
       plan:
         name: "plan ${{ inputs.component}}"
-        runs-on: ubuntu-latest
+        runs-on: ${{ inputs.runner }}
         needs: fetch-secrets
         outputs:
           plan_exitcode: "${{ steps.plan.outputs.exitcode }}"
@@ -87,7 +92,7 @@
               echo "component=${{ inputs.component }}"
 
           - name: Checkout Repository
-            uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
           - name: Load skip plan evaluator list
             run: |
@@ -95,7 +100,7 @@
               echo "SKIP_PLAN_EVALUATOR=${SKIP_PLAN_EVALUATOR}" >> $GITHUB_ENV
 
           - name: Decrypt Secrets
-            uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
+            uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@3f4b0b80deea0ac74630e80189e1edeee3378793 # v6.1.5
             with:
               environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
               github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -117,7 +122,7 @@
               echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
           - name: Configure AWS Credentials
-            uses: aws-actions/configure-aws-credentials@e7f100cf4c008499ea8adda475de1042d6975c7b  # v6.2.0
+            uses: aws-actions/configure-aws-credentials@254c19bd240aabef8777f48595e9d2d7b972184b  # v6.2.1
             with:
               role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-plan"
               role-session-name: "githubactionsplanrolesession"
@@ -296,14 +301,14 @@
         name: "apply"
         needs: [plan, fetch-secrets]
         if: inputs.action == 'plan_apply' && needs.plan.outputs.plan_exitcode == '2'
-        runs-on: ubuntu-latest
+        runs-on: ${{ inputs.runner }}
         environment: ${{ inputs.account_name && (inputs.component != 'root' && format('{0}-{1}', inputs.account_name, inputs.component) || inputs.account_name) || (inputs.component != 'root' && format('{0}-{1}-{2}', inputs.application, inputs.environment, inputs.component) || format('{0}-{1}', inputs.application, inputs.environment)) }}
         steps:
           - name: Checkout Repository
-            uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
           
           - name: Decrypt Secrets
-            uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
+            uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@3f4b0b80deea0ac74630e80189e1edeee3378793 # v6.1.5
             with:
               environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
               PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -321,7 +326,7 @@
               echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
           - name: Configure AWS Credentials
-            uses: aws-actions/configure-aws-credentials@e7f100cf4c008499ea8adda475de1042d6975c7b  # v6.2.0
+            uses: aws-actions/configure-aws-credentials@254c19bd240aabef8777f48595e9d2d7b972184b  # v6.2.1
             with:
               role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-apply"
               role-session-name: "githubactionsrolesession"
@@ -359,4 +364,4 @@
               set -o pipefail
               tf_args="${{ inputs.plan_apply_tfargs }} x.tfplan"
               echo "terraform apply ${tf_args}"
-              terraform apply ${tf_args} 2>&1 | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh | bash ${GITHUB_WORKSPACE}/scripts/enhance-scp-error.sh
+              terraform apply ${tf_args} 2>&1 | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh

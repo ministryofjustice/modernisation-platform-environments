@@ -1,0 +1,451 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "id": 1,
+      "type": "text",
+      "title": "About this dashboard",
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 0 },
+      "options": {
+        "mode": "markdown",
+        "content": "Landing overview for a single Data Platform account, built from auto-published CloudWatch metrics (no agents or setup needed). Pick an **Account** at the top to switch between the per-account CloudWatch data sources. The **At a glance** tiles summarise the selected time window; the rows below break down ingress (ALB), compute (Lambda), databases (RDS), messaging (SQS) and networking (NAT). Panels use CloudWatch Metrics Insights so they keep working as resources come and go; extend this by dropping a JSON file into `src/helm/dashboards/platform/`. Glue, Athena and S3 storage can be added the same way."
+      }
+    },
+    { "id": 2, "type": "row", "title": "At a glance", "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 4 }, "panels": [] },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Lambda invocations",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 5 },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/Lambda", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(Invocations) FROM \"AWS/Lambda\"" }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Lambda errors",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 5 },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] } }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/Lambda", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(Errors) FROM \"AWS/Lambda\"" }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Lambda throttles",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 5 },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }] } }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/Lambda", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(Throttles) FROM \"AWS/Lambda\"" }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "ALB target 5xx",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 5 },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] } }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/ApplicationELB", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(HTTPCode_Target_5XX_Count) FROM \"AWS/ApplicationELB\"" }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "stat",
+      "title": "ALB unhealthy targets",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 5 },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] } }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["max"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/ApplicationELB", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT MAX(UnHealthyHostCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup)" }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "stat",
+      "title": "RDS peak CPU",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 5 },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100, "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 75 }, { "color": "red", "value": 90 }] } }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["max"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/RDS", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT MAX(CPUUtilization) FROM \"AWS/RDS\"" }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "stat",
+      "title": "RDS connections",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 9 },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["max"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/RDS", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT MAX(DatabaseConnections) FROM \"AWS/RDS\"" }
+      ]
+    },
+    {
+      "id": 11,
+      "type": "stat",
+      "title": "SQS visible messages",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 9 },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["max"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/SQS", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT MAX(ApproximateNumberOfMessagesVisible) FROM \"AWS/SQS\"" }
+      ]
+    },
+    {
+      "id": 12,
+      "type": "stat",
+      "title": "SQS oldest message age",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 9 },
+      "fieldConfig": { "defaults": { "unit": "s", "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["max"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/SQS", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT MAX(ApproximateAgeOfOldestMessage) FROM \"AWS/SQS\"" }
+      ]
+    },
+    { "id": 13, "type": "row", "title": "Ingress — Application Load Balancers", "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 }, "panels": [] },
+    {
+      "id": 14,
+      "type": "timeseries",
+      "title": "ALB request count by load balancer",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/ApplicationELB", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(RequestCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC" }
+      ]
+    },
+    {
+      "id": 15,
+      "type": "timeseries",
+      "title": "ALB target response time by load balancer",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "s" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/ApplicationELB", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT AVG(TargetResponseTime) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY AVG() DESC" }
+      ]
+    },
+    {
+      "id": 16,
+      "type": "timeseries",
+      "title": "ALB target 5xx by load balancer",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 22 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }] } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/ApplicationELB", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(HTTPCode_Target_5XX_Count) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer) GROUP BY LoadBalancer ORDER BY SUM() DESC" }
+      ]
+    },
+    {
+      "id": 17,
+      "type": "timeseries",
+      "title": "ALB unhealthy targets by load balancer / target group",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 22 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }] } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/ApplicationELB", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT MAX(UnHealthyHostCount) FROM SCHEMA(\"AWS/ApplicationELB\", LoadBalancer, TargetGroup) GROUP BY LoadBalancer, TargetGroup ORDER BY MAX() DESC" }
+      ]
+    },
+    { "id": 18, "type": "row", "title": "Compute — Lambda", "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 30 }, "panels": [] },
+    {
+      "id": 19,
+      "type": "timeseries",
+      "title": "Invocations (top 10 by function)",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 31 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/Lambda", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(Invocations) FROM \"AWS/Lambda\" GROUP BY FunctionName ORDER BY SUM() DESC LIMIT 10" }
+      ]
+    },
+    {
+      "id": 20,
+      "type": "timeseries",
+      "title": "Errors (top 10 by function)",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 31 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }] } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/Lambda", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(Errors) FROM \"AWS/Lambda\" GROUP BY FunctionName ORDER BY SUM() DESC LIMIT 10" }
+      ]
+    },
+    {
+      "id": 21,
+      "type": "timeseries",
+      "title": "Average duration (top 10 by function)",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 39 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "ms" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/Lambda", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT AVG(Duration) FROM \"AWS/Lambda\" GROUP BY FunctionName ORDER BY AVG() DESC LIMIT 10" }
+      ]
+    },
+    {
+      "id": 22,
+      "type": "timeseries",
+      "title": "Throttles (top 10 by function)",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 39 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }] } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/Lambda", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(Throttles) FROM \"AWS/Lambda\" GROUP BY FunctionName ORDER BY SUM() DESC LIMIT 10" }
+      ]
+    },
+    {
+      "id": 24,
+      "type": "timeseries",
+      "title": "Lambda concurrent executions by function",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 47 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/Lambda", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT MAX(ConcurrentExecutions) FROM SCHEMA(\"AWS/Lambda\", FunctionName) GROUP BY FunctionName ORDER BY MAX() DESC LIMIT 10" }
+      ]
+    },
+    { "id": 25, "type": "row", "title": "Databases — RDS", "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 55 }, "panels": [] },
+    {
+      "id": 26,
+      "type": "timeseries",
+      "title": "CPU utilisation by instance",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 56 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "max": 100, "unit": "percent", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 75 }, { "color": "red", "value": 90 }] } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/RDS", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT AVG(CPUUtilization) FROM SCHEMA(\"AWS/RDS\", DBInstanceIdentifier) GROUP BY DBInstanceIdentifier ORDER BY AVG() DESC" }
+      ]
+    },
+    {
+      "id": 27,
+      "type": "timeseries",
+      "title": "Freeable memory by instance",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 56 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "bytes" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/RDS", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT AVG(FreeableMemory) FROM SCHEMA(\"AWS/RDS\", DBInstanceIdentifier) GROUP BY DBInstanceIdentifier ORDER BY AVG() ASC" }
+      ]
+    },
+    {
+      "id": 28,
+      "type": "timeseries",
+      "title": "Connections by instance",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 56 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/RDS", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT AVG(DatabaseConnections) FROM SCHEMA(\"AWS/RDS\", DBInstanceIdentifier) GROUP BY DBInstanceIdentifier ORDER BY AVG() DESC" }
+      ]
+    },
+    {
+      "id": 29,
+      "type": "timeseries",
+      "title": "Free storage by DB instance",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 64 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "bytes" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/RDS", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT AVG(FreeStorageSpace) FROM SCHEMA(\"AWS/RDS\", DBInstanceIdentifier) GROUP BY DBInstanceIdentifier ORDER BY AVG() ASC" }
+      ]
+    },
+    {
+      "id": 30,
+      "type": "timeseries",
+      "title": "Read latency by DB instance",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 64 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "s" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/RDS", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT AVG(ReadLatency) FROM SCHEMA(\"AWS/RDS\", DBInstanceIdentifier) GROUP BY DBInstanceIdentifier ORDER BY AVG() DESC" }
+      ]
+    },
+    {
+      "id": 31,
+      "type": "timeseries",
+      "title": "Write latency by DB instance",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 64 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "s" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/RDS", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT AVG(WriteLatency) FROM SCHEMA(\"AWS/RDS\", DBInstanceIdentifier) GROUP BY DBInstanceIdentifier ORDER BY AVG() DESC" }
+      ]
+    },
+    { "id": 32, "type": "row", "title": "Messaging — SQS", "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 72 }, "panels": [] },
+    {
+      "id": 33,
+      "type": "timeseries",
+      "title": "Messages visible by queue",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 73 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/SQS", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT MAX(ApproximateNumberOfMessagesVisible) FROM SCHEMA(\"AWS/SQS\", QueueName) GROUP BY QueueName ORDER BY MAX() DESC" }
+      ]
+    },
+    {
+      "id": 34,
+      "type": "timeseries",
+      "title": "Age of oldest message by queue",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 73 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "s" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/SQS", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT MAX(ApproximateAgeOfOldestMessage) FROM SCHEMA(\"AWS/SQS\", QueueName) GROUP BY QueueName ORDER BY MAX() DESC" }
+      ]
+    },
+    {
+      "id": 35,
+      "type": "timeseries",
+      "title": "Messages received by queue",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 81 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/SQS", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(NumberOfMessagesReceived) FROM SCHEMA(\"AWS/SQS\", QueueName) GROUP BY QueueName ORDER BY SUM() DESC" }
+      ]
+    },
+    {
+      "id": 36,
+      "type": "timeseries",
+      "title": "Messages deleted by queue",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 81 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/SQS", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(NumberOfMessagesDeleted) FROM SCHEMA(\"AWS/SQS\", QueueName) GROUP BY QueueName ORDER BY SUM() DESC" }
+      ]
+    },
+    { "id": 37, "type": "row", "title": "Networking — NAT Gateway", "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 89 }, "panels": [] },
+    {
+      "id": 38,
+      "type": "timeseries",
+      "title": "NAT bytes out to destination by NAT Gateway",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 90 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "bytes" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/NATGateway", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(BytesOutToDestination) FROM SCHEMA(\"AWS/NATGateway\", NatGatewayId) GROUP BY NatGatewayId ORDER BY SUM() DESC" }
+      ]
+    },
+    {
+      "id": 39,
+      "type": "timeseries",
+      "title": "NAT bytes in from source by NAT Gateway",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 90 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "bytes" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/NATGateway", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(BytesInFromSource) FROM SCHEMA(\"AWS/NATGateway\", NatGatewayId) GROUP BY NatGatewayId ORDER BY SUM() DESC" }
+      ]
+    },
+    {
+      "id": 40,
+      "type": "timeseries",
+      "title": "NAT port allocation errors by NAT Gateway",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 98 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/NATGateway", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(ErrorPortAllocation) FROM SCHEMA(\"AWS/NATGateway\", NatGatewayId) GROUP BY NatGatewayId ORDER BY SUM() DESC" }
+      ]
+    },
+    {
+      "id": 41,
+      "type": "timeseries",
+      "title": "NAT packets dropped by NAT Gateway",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 98 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "showPoints": "never" }, "min": 0, "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }] } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        { "datasource": { "type": "cloudwatch", "uid": "${account}" }, "refId": "A", "region": "eu-west-2", "namespace": "AWS/NATGateway", "queryMode": "Metrics", "metricQueryType": 1, "metricEditorMode": 1, "sqlExpression": "SELECT SUM(PacketsDropCount) FROM SCHEMA(\"AWS/NATGateway\", NatGatewayId) GROUP BY NatGatewayId ORDER BY SUM() DESC" }
+      ]
+    }
+  ],
+  "refresh": "5m",
+  "schemaVersion": 39,
+  "tags": ["data-platform", "overview", "cloudwatch"],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "hide": 0,
+        "includeAll": false,
+        "label": "Account",
+        "multi": false,
+        "name": "account",
+        "options": [],
+        "query": "cloudwatch",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Data Platform — AWS account overview",
+  "uid": "data-platform-overview",
+  "version": 1,
+  "weekStart": ""
+}

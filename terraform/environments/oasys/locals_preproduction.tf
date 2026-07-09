@@ -1,6 +1,10 @@
 locals {
 
-  delius_oasys_queues_preproduction = {}
+  delius_oasys_queues_preproduction = {
+    "pp" = {
+      sns_topic_arn_configured = true # set to true when sns_topic_arn has been populated in config secret
+    }
+  }
 
   baseline_presets_preproduction = {
     options = {
@@ -109,8 +113,8 @@ locals {
         ebs_volumes = {
           "/dev/sdb" = { label = "app", size = 200 }  # /u01
           "/dev/sdc" = { label = "app", size = 1000 } # /u02
-          "/dev/sde" = { label = "data", size = 2000, iops = 3000, throughput = 250 }
-          "/dev/sdf" = { label = "data", size = 2000, iops = 3000, throughput = 250 }
+          "/dev/sde" = { label = "data", size = 3000, iops = 3000, throughput = 250 }
+          "/dev/sdf" = { label = "data", size = 3000, iops = 3000, throughput = 250 }
           "/dev/sdj" = { label = "flash", size = 1000 }
           "/dev/sds" = { label = "swap", size = 2 }
         }

@@ -11,7 +11,7 @@ locals {
         "ec2_autoscaling_group_linux",
         "ec2_instance_linux",
         "ec2_instance_oracle_db_with_backup",
-        "ec2_instance_textfile_monitoring",
+        "ec2_instance_textfile_monitoring_with_connectivity_test",
         "ec2_windows",
         "ssm_command",
       ]
@@ -258,7 +258,8 @@ locals {
       prod-oem-a = merge(local.ec2_instances.oem, {
         cloudwatch_metric_alarms = merge(
           local.ec2_instances.oem.cloudwatch_metric_alarms,
-          local.cloudwatch_metric_alarms_endpoint_monitoring
+          local.cloudwatch_metric_alarms_endpoint_monitoring,
+          local.cloudwatch_metric_alarms_smtp_connectivity_test
         )
         config = merge(local.ec2_instances.oem.config, {
           availability_zone = "eu-west-2a"

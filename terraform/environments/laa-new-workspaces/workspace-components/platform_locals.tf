@@ -10,7 +10,7 @@ locals {
 
   # This takes the name of the Terraform workspace (e.g. core-vpc-production), strips out the application name (e.g. core-vpc), and checks if
   # the string leftover is `-production`, if it isn't (e.g. core-vpc-non-production => -non-production) then it sets the var to false.
-  is-production    = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production"
+  is-production    = can(regex("-(production|live|nonlive)$", terraform.workspace))
   is-preproduction = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction"
   is-test          = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-test"
   is-development   = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-development"
@@ -30,9 +30,10 @@ locals {
   subnet_set_name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}"
 
   is_live       = [substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" || substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction" ? "live" : "non-live"]
+  provider_name = "core-vpc-${local.environment}"
 
   # environment specfic variables
   # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var
-  application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
+  application_data = fileexists("./../application_variables.json") ? jsondecode(file("./../application_variables.json")) : null
 }

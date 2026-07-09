@@ -9,15 +9,19 @@ resource "aws_secretsmanager_secret" "sftp_secrets" {
 resource "aws_secretsmanager_secret_version" "sftp_secrets" {
   secret_id = aws_secretsmanager_secret.sftp_secrets.id
   secret_string = jsonencode({
-    ORACLE_URL            = "",
-    ORACLE_PASSWORD       = "",
-    ORACLE_USERNAME       = "",
-    SLACK_WEBHOOK         = "",
-    ENABLE_SWAGGER        = "",
-    AUTHORIZED_CLIENTS    = "",
-    AUTHORIZED_ROLES      = "",
-    UNPROTECTED_URIS      = "",
-    TLS_KEYSTORE_PASSWORD = ""
+    ORACLE_URL              = "",
+    ORACLE_PASSWORD         = "",
+    ORACLE_USERNAME         = "",
+    SLACK_WEBHOOK           = "",
+    ENABLE_SWAGGER          = "",
+    AUTHORIZED_CLIENTS      = "",
+    AUTHORIZED_ROLES        = "",
+    UNPROTECTED_URIS        = "",
+    OAUTH2_ISSUER_URI       = "",
+    OAUTH2_AUDIENCE         = "",
+    OAUTH2_ROLES            = "",
+    OAUTH2_UNPROTECTED_URIS = "",
+    TLS_KEYSTORE_PASSWORD   = ""
   })
 
   lifecycle {
@@ -41,11 +45,11 @@ resource "aws_secretsmanager_secret" "sftp_lambda_secrets" {
 resource "aws_secretsmanager_secret_version" "sftp_lambda_secrets" {
   secret_id = aws_secretsmanager_secret.sftp_lambda_secrets.id
   secret_string = jsonencode({
-    validate_file = "",
-    financial_transfers_api_key = "",
-    financial_transfers_api_url = "",
+    validate_file                      = "",
+    financial_transfers_api_key        = "",
+    financial_transfers_api_url        = "",
     financial_transfer_api_auth_header = "",
-    slack_webhook_url = ""
+    slack_webhook_url                  = ""
   })
 
   lifecycle {

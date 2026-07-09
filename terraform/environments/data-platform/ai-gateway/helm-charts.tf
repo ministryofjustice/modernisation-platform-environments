@@ -1,17 +1,18 @@
 resource "helm_release" "ai_gateway_configuration" {
   name      = "${local.component_name}-configuration"
   chart     = "${path.module}/src/helm/charts/${local.component_name}-configuration"
-  version   = "1.4.0"
+  version   = "1.5.0"
   namespace = module.ai_gateway_namespace.name
 
   values = [
     templatefile(
       "${path.module}/src/helm/values/${local.component_name}-configuration/values.yml.tftpl",
       {
-        hostname        = local.environment_configuration.ai_gateway_hostname
-        admin_hostname  = "admin.${local.environment_configuration.ai_gateway_hostname}"
-        certificate_arn = module.acm_ai_gateway.acm_certificate_arn
-        alb_logs_bucket = module.alb_access_logs.s3_bucket_id
+        hostname          = local.environment_configuration.ai_gateway_hostname
+        admin_hostname    = "admin.${local.environment_configuration.ai_gateway_hostname}"
+        internal_hostname = "internal.${local.environment_configuration.ai_gateway_hostname}"
+        certificate_arn   = module.acm_ai_gateway.acm_certificate_arn
+        alb_logs_bucket   = module.alb_access_logs.s3_bucket_id
       }
     )
   ]
@@ -35,11 +36,13 @@ resource "helm_release" "litellm" {
         ingressHostname    = local.environment_configuration.ai_gateway_hostname
 
         # Database
-        databaseSecret      = "aurora"
-        databaseUserNameKey = "username"
-        databasePasswordKey = "password"
-        databaseEndpointKey = "host"
-        databaseName        = module.ai_gateway_aurora.cluster_database_name
+        databaseSecret            = "aurora"
+        databaseUserNameKey       = "username"
+        databasePasswordKey       = "password"
+        databaseEndpointKey       = "host"
+        databaseReaderEndpointKey = local.has_reader ? "read-url" : ""
+        databaseName              = module.ai_gateway_aurora.cluster_database_name
+        databaseUsername          = module.ai_gateway_aurora.cluster_master_username
 
         # LiteLLM
         masterkeySecretName = kubernetes_secret_v1.litellm_master_key.metadata[0].name
@@ -62,7 +65,13 @@ resource "helm_release" "litellm" {
         bedrockModels = try(local.environment_configuration.ai_gateway_models.bedrock, {})
 
         # Admin
-        proxyAdminEmail = join(", ", local.environment_configurations.proxy_admin_emails)
+        proxyAdminEmail = join(", ", local.proxy_admin_emails)
+
+        # How often (in seconds) LiteLLM checks each model's health.
+        # Comes from the environment config; defaults to 300s if not set.
+        # Note: if you change this, also check the alert's rate() window
+        # still has enough samples to work correctly.
+        ai_background_health_check_interval = try(local.environment_configuration.ai_background_health_check_interval, 300)
       }
     )
   ]
@@ -76,7 +85,8 @@ resource "helm_release" "litellm" {
     kubernetes_manifest.external_secret_litellm_salt_key,
     kubernetes_manifest.external_secret_litellm_entra_id,
     kubernetes_manifest.external_secret_aurora,
-    kubernetes_manifest.external_secret_elasticache
+    kubernetes_manifest.external_secret_elasticache,
+    kubernetes_job_v1.grant_rds_iam
   ]
 }
 
@@ -99,11 +109,13 @@ resource "helm_release" "litellm_admin" {
         proxyHostname      = local.environment_configuration.ai_gateway_hostname
 
         # Database
-        databaseSecret      = "aurora"
-        databaseUserNameKey = "username"
-        databasePasswordKey = "password"
-        databaseEndpointKey = "host"
-        databaseName        = module.ai_gateway_aurora.cluster_database_name
+        databaseSecret            = "aurora"
+        databaseUserNameKey       = "username"
+        databasePasswordKey       = "password"
+        databaseEndpointKey       = "host"
+        databaseReaderEndpointKey = local.has_reader ? "read-url" : ""
+        databaseName              = module.ai_gateway_aurora.cluster_database_name
+        databaseUsername          = module.ai_gateway_aurora.cluster_master_username
 
         # LiteLLM
         masterkeySecretName = kubernetes_secret_v1.litellm_master_key.metadata[0].name
@@ -125,7 +137,7 @@ resource "helm_release" "litellm_admin" {
         auditLogsRegion = data.aws_region.current.region
 
         # Admin
-        proxyAdminEmail = join(", ", local.environment_configurations.proxy_admin_emails)
+        proxyAdminEmail = join(", ", local.proxy_admin_emails)
       }
     )
   ]
@@ -139,6 +151,7 @@ resource "helm_release" "litellm_admin" {
     kubernetes_manifest.external_secret_litellm_salt_key,
     kubernetes_manifest.external_secret_litellm_entra_id,
     kubernetes_manifest.external_secret_aurora,
-    kubernetes_manifest.external_secret_elasticache
+    kubernetes_manifest.external_secret_elasticache,
+    kubernetes_job_v1.grant_rds_iam
   ]
 }

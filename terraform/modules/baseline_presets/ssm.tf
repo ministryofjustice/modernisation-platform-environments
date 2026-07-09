@@ -156,7 +156,6 @@ locals {
 
   ssm_parameters_filter = flatten([
     length(local.account_names_for_account_ids_ssm_parameter) != 0 ? ["account"] : [],
-    var.options.enable_azure_sas_token ? ["/azure"] : [],
     var.options.enable_ec2_cloud_watch_agent && fileexists(local.cloud_watch_windows_filename) ? ["cloud-watch-config"] : [],
     try(length(var.options.cloudwatch_metric_oam_links_ssm_parameters), 0) != 0 ? ["/oam"] : [],
     var.options.enable_xsiam_cloudwatch_integration || var.options.enable_xsiam_s3_integration ? ["/xsiam"] : [],
@@ -174,12 +173,6 @@ locals {
             key => value if contains(local.account_names_for_account_ids_ssm_parameter, key)
           })
         }
-      }
-    }
-
-    "/azure" = {
-      parameters = {
-        sas_token = { description = "database backup storage account read-only sas token" }
       }
     }
 

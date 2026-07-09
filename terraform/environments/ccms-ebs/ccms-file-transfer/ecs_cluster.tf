@@ -30,24 +30,29 @@ resource "aws_ecs_task_definition" "sftp_task_definition" {
   container_definitions = templatefile(
     "${path.module}/templates/task_definition_api.json.tpl",
     {
-      app_name              = local.application_data.accounts[local.environment].app_name
-      app_image             = local.application_data.accounts[local.environment].app_image
-      api_server_port       = local.application_data.accounts[local.environment].api_server_port
-      cpu                   = local.application_data.accounts[local.environment].container_cpu
-      memory                = local.application_data.accounts[local.environment].container_memory
-      aws_region            = local.application_data.accounts[local.environment].aws_region
-      container_version     = local.application_data.accounts[local.environment].container_version
-      ccms_s3_bucket        = local.sftp_bc_bucket_name
-      logging_level_root    = local.application_data.accounts[local.environment].logging_level_root
-      ORACLE_USERNAME       = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:ORACLE_USERNAME::"
-      ORACLE_PASSWORD       = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:ORACLE_PASSWORD::"
-      ORACLE_URL            = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:ORACLE_URL::"
-      SLACK_WEBHOOK         = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:SLACK_WEBHOOK::"
-      ENABLE_SWAGGER        = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:ENABLE_SWAGGER::"
-      AUTHORIZED_CLIENTS    = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:AUTHORIZED_CLIENTS::"
-      AUTHORIZED_ROLES      = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:AUTHORIZED_ROLES::"
-      UNPROTECTED_URIS      = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:UNPROTECTED_URIS::"
-      TLS_KEYSTORE_PASSWORD = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:TLS_KEYSTORE_PASSWORD::"
+      app_name                      = local.application_data.accounts[local.environment].app_name
+      app_image                     = local.application_data.accounts[local.environment].app_image
+      api_server_port               = local.application_data.accounts[local.environment].api_server_port
+      cpu                           = local.application_data.accounts[local.environment].container_cpu
+      memory                        = local.application_data.accounts[local.environment].container_memory
+      aws_region                    = local.application_data.accounts[local.environment].aws_region
+      container_version             = local.application_data.accounts[local.environment].container_version
+      ccms_s3_bucket                = local.sftp_bc_bucket_name
+      logging_level_root            = local.application_data.accounts[local.environment].logging_level_root
+      logging_level_uk_gov_laa_ccms = local.application_data.accounts[local.environment].logging_level_uk_gov_laa_ccms
+      ORACLE_USERNAME               = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:ORACLE_USERNAME::"
+      ORACLE_PASSWORD               = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:ORACLE_PASSWORD::"
+      ORACLE_URL                    = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:ORACLE_URL::"
+      SLACK_WEBHOOK                 = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:SLACK_WEBHOOK::"
+      ENABLE_SWAGGER                = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:ENABLE_SWAGGER::"
+      AUTHORIZED_CLIENTS            = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:AUTHORIZED_CLIENTS::"
+      AUTHORIZED_ROLES              = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:AUTHORIZED_ROLES::"
+      UNPROTECTED_URIS              = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:UNPROTECTED_URIS::"
+      OAUTH2_ISSUER_URI             = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:OAUTH2_ISSUER_URI::"
+      OAUTH2_AUDIENCE               = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:OAUTH2_AUDIENCE::"
+      OAUTH2_ROLES                  = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:OAUTH2_ROLES::"
+      OAUTH2_UNPROTECTED_URIS       = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:OAUTH2_UNPROTECTED_URIS::"
+      TLS_KEYSTORE_PASSWORD         = "${data.aws_secretsmanager_secret_version.sftp_secrets.secret_arn}:TLS_KEYSTORE_PASSWORD::"
     }
   )
 

@@ -8,6 +8,9 @@ nameOverride: "litellm"
 service:
   type: NodePort
 
+serviceMonitor:
+  enabled: true
+
 serviceAccount:
   create: false
   name: ${serviceAccountName}
@@ -29,14 +32,14 @@ resources:
 db:
   deployStandalone: false
   useExisting: true
-  url: postgresql://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST)/$(DATABASE_NAME)
+  url: postgresql://$(DATABASE_USERNAME)@$(DATABASE_HOST)/$(DATABASE_NAME)
   database: ${databaseName}
   secret:
     name: ${databaseSecret}
     usernameKey: ${databaseUserNameKey}
     passwordKey: ${databasePasswordKey}
     endpointKey: ${databaseEndpointKey}
-
+${databaseReaderEndpointKey != "" ? "    readReplicaUrlKey: ${databaseReaderEndpointKey}" : ""}
 masterkeySecretName: ${masterkeySecretName}
 masterkeySecretKey: ${masterkeySecretKey}
 
@@ -50,6 +53,8 @@ proxyConfigMap:
   create: true
 proxy_config:
   general_settings:
+    background_health_checks: true
+    health_check_interval: ${ai_background_health_check_interval}
     litellm_license: os.environ/LITELLM_LICENSE
     master_key: os.environ/PROXY_MASTER_KEY
     proxy_admin_email: "${proxyAdminEmail}"
@@ -65,6 +70,7 @@ proxy_config:
       host: os.environ/primary_endpoint_address
       port: 6379
       password: os.environ/auth_token
+    require_auth_for_metrics_endpoint: false
     callbacks: ["prometheus"]
     success_callback: ["prometheus"]
     failure_callback: ["prometheus"]
@@ -138,12 +144,14 @@ envVars: {
     DISABLE_ADMIN_UI: "True",
     DOCS_DESCRIPTION: "Contact us on Slack - #data-platform-ai-gateway-users",
     DOCS_FILTERED: "True",
-    DOCS_TITLE: "MOJ AI Gateway",
+    DOCS_TITLE: "Justice AI Gateway",
     LITELLM_LOG: "ERROR",
     LITELLM_MIGRATION_DIR: "/app/migrations",
     LITELLM_MODE: "PRODUCTION",
     PRISMA_BINARY_CACHE_DIR: "/app/cache/prisma-python/binaries",
     PROXY_BASE_URL: "https://${ingressHostname}",
     REDIS_SSL: "True",
-    XDG_CACHE_HOME: "/app/cache"
+    XDG_CACHE_HOME: "/app/cache",
+    IAM_TOKEN_DB_AUTH: "True",
+    DATABASE_USER: "${databaseUsername}"
 }

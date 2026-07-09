@@ -84,6 +84,9 @@ locals {
     ] : local.is-production ? [
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-a7f6cc937a0f63ce-live",
   ] : []
+  iam_role_data_api = local.is-test ? [
+    "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-21220dacf93f9ac4-live",
+  ] : []
   iam_role_ear_sar_db = local.is-preproduction ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live" : ""
   emdi_cp_roles = local.is-development || local.is-test ? [
     var.cloud-platform-emdi-iam-dev
@@ -197,6 +200,26 @@ module "emd_validation_db_role" {
   tags = local.tags
 }
 
+module "emd_data_api_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  count   = local.is-test ? 1 : 0
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.48.0"
+
+  trusted_role_arns = flatten([
+    data.aws_iam_roles.mod_plat_roles.arns,
+    local.iam_role_data_api,
+  ])
+
+  create_role       = true
+  role_requires_mfa = false
+
+  role_name = "emd_data_api_read_data_${local.environment_shorthand}"
+
+  tags = local.tags
+}
+
 module "emd_update_p1_cp_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
@@ -284,6 +307,7 @@ resource "aws_lakeformation_permissions" "em_data_validation_s3" {
   }
 }
 
+
 resource "aws_iam_role_policy_attachment" "standard_athena_access_em_data_validation" {
   count      = local.is-test || local.is-production ? 1 : 0
   policy_arn = aws_iam_policy.standard_athena_access.arn
@@ -334,9 +358,68 @@ data "aws_iam_policy_document" "em_data_validation_permissions" {
     actions = [
       "glue:GetTables",
       "glue:GetTable",
+      "glue:GetPartition",
+      "glue:GetPartitions",
     ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/validation${local.dbt_suffix}/*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "em_data_api_permissions" {
+  statement {
+    sid       = "ListAccountAliasForEnvironmentClass"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "ListAllBucketsForEnvironmentClass"
+    effect = "Allow"
+    actions = [
+      "s3:ListAllMyBuckets",
+      "s3:GetBucketLocation"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabases",
+      "glue:GetDatabase",
+      "glue:GetTables",
+      "glue:GetTable",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabase",
+      "glue:GetTables",
+      "glue:GetTable",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/datamart${local.dbt_suffix}",
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetTables",
+      "glue:GetTable",
+      "glue:GetPartition",
+      "glue:GetPartitions",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/datamart${local.dbt_suffix}/order_dim",
     ]
   }
 }
@@ -390,6 +473,25 @@ resource "aws_iam_role_policy_attachment" "em_data_validation_permissions" {
   count      = local.is-test || local.is-production ? 1 : 0
   policy_arn = aws_iam_policy.em_data_validation_permissions[0].arn
   role       = module.emd_validation_db_role[0].iam_role_name
+}
+
+resource "aws_iam_policy" "em_data_api_permissions" {
+  count       = local.is-test ? 1 : 0
+  name_prefix = "em_data_api_permissions"
+  description = "Permissions for the Electronic Monitoring Data API."
+  policy      = data.aws_iam_policy_document.em_data_api_permissions.json
+}
+
+resource "aws_iam_role_policy_attachment" "standard_athena_access_em_data_api" {
+  count      = local.is-test ? 1 : 0
+  policy_arn = aws_iam_policy.standard_athena_access.arn
+  role       = module.emd_data_api_role[0].iam_role_name
+}
+
+resource "aws_iam_role_policy_attachment" "em_data_api_permissions" {
+  count      = local.is-test ? 1 : 0
+  policy_arn = aws_iam_policy.em_data_api_permissions[0].arn
+  role       = module.emd_data_api_role[0].iam_role_name
 }
 
 

@@ -35,11 +35,32 @@ locals {
       primary   = "10.41.0.0/20"
       secondary = "100.80.0.0/16"
     }
+    container-platform-laa-nonlive = {
+      primary   = "10.195.80.0/20"
+      secondary = "100.70.0.0/16"
+    }
+    container-platform-laa-live = {
+      primary   = "10.41.32.0/20"
+      secondary = "100.82.0.0/16"
+    }
+    container-platform-hmpps-nonlive = {
+      primary   = "10.195.64.0/20"
+      secondary = "100.69.0.0/16"
+    }
+    container-platform-hmpps-live = {
+      primary   = "10.41.16.0/20"
+      secondary = "100.81.0.0/16"
+    }
   }
 
   vpc_flow_log_cloudwatch_log_group_name_prefix       = "/aws/vpc-flow-log/"
   vpc_flow_log_cloudwatch_log_group_name_suffix       = local.cp_vpc_name
   vpc_flow_log_cloudwatch_log_group_retention_in_days = 400
   vpc_flow_log_max_aggregation_interval               = 60
+
+  vpc_gateway_endpoint_service_names = [
+    "s3",      # S3
+    "dynamodb" # DynamoDB
+  ]
 
 }

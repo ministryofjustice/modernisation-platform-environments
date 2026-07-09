@@ -101,10 +101,10 @@ data "aws_ami" "ecs_ami" {
   most_recent = true
   owners      = ["amazon"]
 
-  # Amazon Linux 2 optimised ECS instance
+  # Amazon Linux 2023 optimised ECS instance
   filter {
     name   = "name"
-    values = ["amzn2-ami-ecs-hvm-*"]
+    values = ["al2023-ami-ecs-hvm-*"]
   }
 
   # correct arch
@@ -223,3 +223,52 @@ resource "aws_ecs_capacity_provider" "weblogic" {
     managed_termination_protection = "ENABLED"
   }
 }
+
+locals {
+  weblogic_cutover_envs = ["dev", "test"]
+}
+
+# Cert for Legacy URL: https://dsdmoj.atlassian.net/browse/TM-2173
+# 1. Create ACM cert (apply this config)
+# 2. Manually validate cert by adding validation records to legacy zone
+# 3. Wait for cert to say "ISSUED"
+# 4. Uncomment aws_lb_listener_certificate and apply this config
+# 5. Create CNAME record in legacy that points ndelius.probation.service.justice.gov.uk -> ndelius.prod.delius-core.hmpps-production.modernisation-platform.service.justice.gov.uk
+resource "aws_acm_certificate" "legacy" {
+  count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name != "prod" ? 1 : 0
+ 
+  domain_name       = "*.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"
+  validation_method = "DNS"
+  tags              = var.tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_lb_listener_certificate" "legacy" {
+  count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name != "prod" ? 1 : 0
+
+  listener_arn    = aws_lb_listener.listener_https.arn
+  certificate_arn = aws_acm_certificate.legacy[0].arn
+}
+
+resource "aws_acm_certificate" "legacy_prod" {
+  count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name == "prod" ? 1 : 0
+
+  domain_name       = "*.probation.service.justice.gov.uk"
+  validation_method = "DNS"
+  tags              = var.tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# Uncomment once cert is "ISSUED"
+# resource "aws_lb_listener_certificate" "legacy_prod" {
+#   count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name == "prod" ? 1 : 0
+
+#   listener_arn    = aws_lb_listener.listener_https.arn
+#   certificate_arn = aws_acm_certificate.legacy_prod[0].arn
+# }
