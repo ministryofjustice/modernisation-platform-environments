@@ -61,9 +61,6 @@ resource "kubectl_manifest" "nodepool_custom_networking" {
             - key: "eks.amazonaws.com/instance-cpu"
               operator: In
               values: ["4", "8", "16", "32"]
-            - key: "eks.amazonaws.com/instance-gpu-count"
-              operator: In
-              values: ["0"]
           nodeClassRef:
             group: eks.amazonaws.com
             kind: NodeClass
