@@ -70,7 +70,6 @@ resource "kubectl_manifest" "nodepool_custom_networking" {
             name: custom-networking
         metadata:
           labels:
-            karpenter.sh/discovery: ${local.cluster_name}
             Terraform: "true"
             "cloud-platform.justice.gov.uk/default-ng": "true"
             Cluster: "${terraform.workspace}"
