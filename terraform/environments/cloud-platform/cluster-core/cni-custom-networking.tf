@@ -70,7 +70,7 @@ resource "kubectl_manifest" "nodepool_custom_networking" {
             Terraform: "true"
             "cloud-platform.justice.gov.uk/default-ng": "true"
             Cluster: "${terraform.workspace}"
-            Domain: "fqdn"
+            Domain: "${terraform.workspace}.container-platform.service.justice.gov.uk"
       disruption:
         consolidationPolicy: WhenEmptyOrUnderutilized
         consolidateAfter: 60s
