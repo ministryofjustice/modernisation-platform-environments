@@ -274,7 +274,7 @@ module "github_actions_container_platform_identity_oidc_role_plan" {
   github_repositories = ["ministryofjustice/container-platform-environments"]
   role_name           = "github-actions-container-platform-identity-plan"
   policy_jsons        = [data.aws_iam_policy_document.github_actions_container_platform_identity_oidc_policy_plan.json]
-  subject_claim       = "ref:refs/heads/*"
+  subject_claim       = "pull_request"
   tags                = merge({ "Name" = "GitHub Actions Container Platform Identity Role" }, local.tags)
 }
 
@@ -300,6 +300,28 @@ data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_
       variable = "aws:ResourceOrgID"
       values   = [data.aws_organizations_organization.root_account.id]
     }
+  }
+  statement {
+    sid    = "IdentityRoleClusterStateBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:DeleteObject"
+    ]
+    resources = [
+      "arn:aws:s3:::modernisation-platform-terraform-state/environments/members/cloud-platform/container-platform-identity/*"
+    ]
+  }
+
+  statement {
+    sid    = "IdentityRoleClusterKMSKey"
+    effect = "Allow"
+    actions = [
+      "kms:*"
+    ]
+    resources = ["*"]
   }
 }
 
@@ -336,5 +358,27 @@ data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_
       variable = "aws:ResourceOrgID"
       values   = [data.aws_organizations_organization.root_account.id]
     }
+  }
+  statement {
+    sid    = "IdentityRoleClusterStateBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:DeleteObject"
+    ]
+    resources = [
+      "arn:aws:s3:::modernisation-platform-terraform-state/environments/members/cloud-platform/container-platform-identity/*"
+    ]
+  }
+
+  statement {
+    sid    = "IdentityRoleClusterKMSKey"
+    effect = "Allow"
+    actions = [
+      "kms:*"
+    ]
+    resources = ["*"]
   }
 }
