@@ -89,6 +89,8 @@ proxy_config:
         model: bedrock/${profile.model_id}
         aws_role_name: ${iamRole}
         aws_region_name: ${profile.region}
+      model_info:
+        generally_available: ${profile.generally_available}
 %{ endfor ~}
 
 tolerations:
