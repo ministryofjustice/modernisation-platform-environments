@@ -21,7 +21,8 @@ resource "aws_secretsmanager_secret_version" "sandbox_ccms_soa_secrets_version" 
     soa_realm_ebs_soa_super_user_password = "",
     soa_rds_admin_user_password           = "",
     soa_rds_all_ccmssoa_schema_password   = "",
-    extra_java_properties                 = ""
+    extra_java_properties                 = "",
+    privateKeyAlias                       = ""
   })
 
   # lifecycle {
