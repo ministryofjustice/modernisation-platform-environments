@@ -972,7 +972,7 @@ module "merge_mdss_staged_position" {
 }
 
 module "merge_ac_position" {
-  count                          = 1
+  count                          = local.is-development ? 1 : 0
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_ac_position"
