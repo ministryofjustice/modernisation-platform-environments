@@ -56,6 +56,7 @@ proxy_config:
     proxy_batch_write_at: 60
     database_connection_pool_limit: 10
   litellm_settings:
+    drop_params: true
     request_timeout: 600
     json_logs: true
     store_audit_logs: true
@@ -82,6 +83,8 @@ proxy_config:
     redis_host: os.environ/primary_endpoint_address
     redis_port: 6379
     redis_password: os.environ/auth_token
+
+  model_list: []
 
 tolerations:
   - key: compute.data-platform.service.justice.gov.uk/node-pool
@@ -174,5 +177,6 @@ envVars: {
     USE_PRISMA_MIGRATE: "True",
     XDG_CACHE_HOME: "/app/cache",
     IAM_TOKEN_DB_AUTH: "True",
-    DATABASE_USER: "${databaseUsername}"
+    DATABASE_USER: "${databaseUsername}",
+    STORE_MODEL_IN_DB: "True"
 }
