@@ -25,7 +25,7 @@
       "image_tag": "tm-1408-composer-19577361514-1",
       "db_snapshot_identifier": "",
       "log_retention_in_days": 14,
-      "legacy_url": "test.victim-case-management.service.justice.gov.uk"
+      "legacy_url": "www.test.victim-case-management.service.justice.gov.uk"
     },
     "vcms-preproduction": {
       "container_port": 80,
