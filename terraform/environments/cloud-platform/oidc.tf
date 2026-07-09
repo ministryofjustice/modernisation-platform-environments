@@ -301,6 +301,28 @@ data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_
       values   = [data.aws_organizations_organization.root_account.id]
     }
   }
+  statement {
+    sid    = "IdentityRoleClusterStateBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:DeleteObject"
+    ]
+    resources = [
+      "arn:aws:s3:::modernisation-platform-terraform-state/environments/members/cloud-platform/container-platform-identity/*"
+    ]
+  }
+
+  statement {
+    sid    = "IdentityRoleClusterKMSKey"
+    effect = "Allow"
+    actions = [
+      "kms:*"
+    ]
+    resources = ["*"]
+  }
 }
 
 # OIDC Role for GitHub Actions - Container Platform Identity Workflow Apply
@@ -336,5 +358,27 @@ data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_
       variable = "aws:ResourceOrgID"
       values   = [data.aws_organizations_organization.root_account.id]
     }
+  }
+  statement {
+    sid    = "IdentityRoleClusterStateBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:DeleteObject"
+    ]
+    resources = [
+      "arn:aws:s3:::modernisation-platform-terraform-state/environments/members/cloud-platform/container-platform-identity/*"
+    ]
+  }
+
+  statement {
+    sid    = "IdentityRoleClusterKMSKey"
+    effect = "Allow"
+    actions = [
+      "kms:*"
+    ]
+    resources = ["*"]
   }
 }
