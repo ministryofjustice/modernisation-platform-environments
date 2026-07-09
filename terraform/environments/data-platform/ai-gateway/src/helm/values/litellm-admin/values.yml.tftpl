@@ -82,16 +82,6 @@ proxy_config:
     redis_host: os.environ/primary_endpoint_address
     redis_port: 6379
     redis_password: os.environ/auth_token
-  model_list:
-%{ for key, profile in bedrockModels ~}
-    - model_name: bedrock-${key}
-      litellm_params:
-        model: bedrock/${profile.model_id}
-        aws_role_name: ${iamRole}
-        aws_region_name: ${profile.region}
-      model_info:
-        generally_available: ${profile.generally_available}
-%{ endfor ~}
 
 tolerations:
   - key: compute.data-platform.service.justice.gov.uk/node-pool
