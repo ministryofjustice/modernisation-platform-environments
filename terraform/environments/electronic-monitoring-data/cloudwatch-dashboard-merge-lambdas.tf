@@ -24,7 +24,7 @@ locals {
           title  = "Total Successful Queries"
           region = "eu-west-2"
           stat   = "Sum"
-          period = 180
+          period = 60
           metrics = [
             [
               "EM/MergeLambdas",
@@ -36,16 +36,6 @@ locals {
               }
             ]
           ]
-          annotations = {
-            horizontal = [
-              {
-                value = 0
-                label = "Warning - Low",
-                color = "#E34234"
-              }
-            ]
-
-          }
         }
       },
       {
@@ -61,7 +51,7 @@ locals {
           title  = "Total Failed Queries"
           region = "eu-west-2"
           stat   = "Sum"
-          period = 180
+          period = 60
           metrics = [
             [
               "EM/MergeLambdas",
@@ -127,6 +117,15 @@ locals {
               }
             ]
           ]
+          annotations = {
+            horizontal = [
+              {
+                value = 180000
+                label = "Warning - High",
+                color = "#E34234"
+              }
+            ]
+          }
         }
       },
       {
@@ -154,6 +153,15 @@ locals {
               }
             ]
           ]
+          annotations = {
+            horizontal = [
+              {
+                value = 180000
+                label = "Warning - High",
+                color = "#E34234"
+              }
+            ]
+          }
         }
       },
       {
@@ -181,6 +189,15 @@ locals {
               }
             ]
           ]
+          annotations = {
+            horizontal = [
+              {
+                value = 180000
+                label = "Warning - High",
+                color = "#E34234"
+              }
+            ]
+          }
         }
       },
       {
