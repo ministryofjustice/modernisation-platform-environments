@@ -1,6 +1,6 @@
 # Monitoring
 
-Terraform module that deploys Grafana (via Helm) onto EKS and manages, it as code:
+Terraform module that deploys Grafana (via Helm) onto EKS and manages it as code:
 
 - **Dashboards** — JSON files under `src/helm/dashboards/`, provisioned into Grafana folders.
 - **Alert rules** — generated from a compact "golden signals" definition and across environments, AWS accounts, and resources.
