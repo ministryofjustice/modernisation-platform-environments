@@ -30,7 +30,7 @@ environment:
       kyverno: "3.8.1"
       metrics_server: "3.13.1"
     kyverno_policies:
-      validation_action: "Deny"
+      validation_action: "Audit"
     route53_zones:
       - "development.data-platform.service.justice.gov.uk"
       - "development.ai-gateway.justice.gov.uk"
