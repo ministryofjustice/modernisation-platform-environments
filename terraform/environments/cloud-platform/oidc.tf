@@ -274,7 +274,7 @@ module "github_actions_container_platform_identity_oidc_role_plan" {
   github_repositories = ["ministryofjustice/container-platform-environments"]
   role_name           = "github-actions-container-platform-identity-plan"
   policy_jsons        = [data.aws_iam_policy_document.github_actions_container_platform_identity_oidc_policy_plan.json]
-  subject_claim       = "ref:refs/heads/*"
+  subject_claim       = "pull_request"
   tags                = merge({ "Name" = "GitHub Actions Container Platform Identity Role" }, local.tags)
 }
 
