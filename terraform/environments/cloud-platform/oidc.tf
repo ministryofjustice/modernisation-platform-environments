@@ -266,3 +266,75 @@ data "aws_iam_policy_document" "github_actions_cluster_reminder_oidc_policy" {
     resources = ["*"]
   }
 }
+
+# OIDC Role for GitHub Actions - Container Platform Identity Workflow Plan
+module "github_actions_container_platform_identity_oidc_role_plan" {
+  count               = terraform.workspace == "cloud-platform-live" ? 1 : 0
+  source              = "github.com/ministryofjustice/modernisation-platform-github-oidc-role?ref=b40748ec162b446f8f8d282f767a85b6501fd192" # v4.0.0
+  github_repositories = ["ministryofjustice/container-platform-environments"]
+  role_name           = "github-actions-container-platform-identity-plan"
+  policy_jsons        = [data.aws_iam_policy_document.github_actions_container_platform_identity_oidc_policy_plan.json]
+  subject_claim       = "ref:refs/heads/*"
+  tags                = merge({ "Name" = "GitHub Actions Container Platform Identity Role" }, local.tags)
+}
+
+data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_policy_plan" {
+  statement {
+    sid    = "AssumeContainerPlatformReadOnlyRole"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ContainerPlatformSSOReadOnly"]
+  }
+
+  statement {
+    sid    = "AssumeContainerPlatformEKSAccessRolesInOrganisation"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = ["arn:aws:iam::*:role/ContainerPlatformEKSAccess"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceOrgID"
+      values   = [data.aws_organizations_organization.root_account.id]
+    }
+  }
+}
+
+# OIDC Role for GitHub Actions - Container Platform Identity Workflow Apply
+module "github_actions_container_platform_identity_oidc_role_apply" {
+  count               = terraform.workspace == "cloud-platform-live" ? 1 : 0
+  source              = "github.com/ministryofjustice/modernisation-platform-github-oidc-role?ref=b40748ec162b446f8f8d282f767a85b6501fd192" # v4.0.0
+  github_repositories = ["ministryofjustice/container-platform-environments"]
+  role_name           = "github-actions-container-platform-identity-apply"
+  policy_jsons        = [data.aws_iam_policy_document.github_actions_container_platform_identity_oidc_policy_apply.json]
+  subject_claim       = "ref:refs/heads/*"
+  tags                = merge({ "Name" = "GitHub Actions Container Platform Identity Role" }, local.tags)
+}
+
+data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_policy_apply" {
+  statement {
+    sid    = "AssumeContainerPlatformReadOnlyRole"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ContainerPlatformSSOAdministrator"]
+  }
+
+  statement {
+    sid    = "AssumeContainerPlatformEKSAccessRolesInOrganisation"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = ["arn:aws:iam::*:role/ContainerPlatformEKSAccess"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceOrgID"
+      values   = [data.aws_organizations_organization.root_account.id]
+    }
+  }
+}
