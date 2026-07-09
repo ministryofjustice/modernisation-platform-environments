@@ -98,6 +98,8 @@ proxy_config:
         model: bedrock/${profile.model_id}
         aws_role_name: ${iamRole}
         aws_region_name: ${profile.region}
+      model_info:
+        generally_available: ${profile.generally_available}
 %{ endfor ~}
 
 tolerations:
@@ -142,7 +144,7 @@ ingress:
 envVars: {
     DISABLE_ADMIN_ENDPOINTS: "True",
     DISABLE_ADMIN_UI: "True",
-    DOCS_DESCRIPTION: "Contact us on Slack - #data-platform-ai-gateway-users",
+    DOCS_DESCRIPTION: "Contact us on Slack - #ask-data-platform",
     DOCS_FILTERED: "True",
     DOCS_TITLE: "Justice AI Gateway",
     LITELLM_LOG: "ERROR",
