@@ -29,6 +29,11 @@ resource "kubectl_manifest" "nodeclass_custom_networking" {
       podSecurityGroupSelectorTerms:
         - tags:
             aws:eks:cluster-name: "${local.cluster_name}"
+
+      # tags:
+      #   default_ng: "true"
+      #   application: "moj-cloud-platform"
+      #   business-unit: "platforms"
   YAML
 }
 
