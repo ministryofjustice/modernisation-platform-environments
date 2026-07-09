@@ -300,6 +300,7 @@ resource "aws_cloudwatch_dashboard" "merge_staged_event_lambda_ops" {
 }
 
 resource "aws_cloudwatch_dashboard" "merge_ac_position_lambda_ops" {
+  count          = local.is-development ? 1 : 0
   dashboard_name = "merge-ac-position-lambda-ops"
   dashboard_body = jsonencode({
     widgets = local.merge_lambda_widgets["merge_ac_position_lambda_ops"]
