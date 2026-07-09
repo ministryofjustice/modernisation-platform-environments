@@ -121,9 +121,7 @@ resource "helm_release" "litellm" {
         maxReplicas                    = local.environment_configuration.ai_gateway_autoscaling.max_replicas
         targetCPUUtilizationPercentage = local.environment_configuration.ai_gateway_autoscaling.target_cpu_utilization_percentage
 
-        # LiteLLM Models
-        bedrockModels = try(local.environment_configuration.ai_gateway_models.bedrock, {})
-
+        # LiteLLM models are stored in the database; no model list is templated here.
         # Admin
         proxyAdminEmail = join(", ", local.proxy_admin_emails)
 

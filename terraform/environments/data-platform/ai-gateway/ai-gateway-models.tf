@@ -1,6 +1,5 @@
 resource "litellm_model" "amazon_bedrock" {
-  for_each = local.ai_gateway_models.amazon_bedrock
-
+  for_each = tomap(local.ai_gateway_models.amazon_bedrock)
   custom_llm_provider = "bedrock"
   model_name          = "bedrock-${each.key}"
   base_model          = each.value.model_id
@@ -17,14 +16,14 @@ resource "litellm_model" "amazon_bedrock" {
   }
 
   depends_on = [
+    helm_release.ai_gateway_configuration,
     helm_release.litellm,
     helm_release.litellm_admin
   ]
 }
 
 resource "litellm_model" "google_gemini_enterprise_agent_platform" {
-  for_each = local.ai_gateway_models.google_gemini_enterprise_agent_platform
-
+  for_each = tomap(local.ai_gateway_models.google_gemini_enterprise_agent_platform)
   custom_llm_provider = "gemini"
   model_name          = "gemini-${each.key}"
   base_model          = each.value.model_id
@@ -38,14 +37,14 @@ resource "litellm_model" "google_gemini_enterprise_agent_platform" {
   }
 
   depends_on = [
+    helm_release.ai_gateway_configuration,
     helm_release.litellm,
     helm_release.litellm_admin
   ]
 }
 
 resource "litellm_model" "microsoft_foundry" {
-  for_each = local.ai_gateway_models.microsoft_foundry
-
+  for_each = tomap(local.ai_gateway_models.microsoft_foundry)
   custom_llm_provider = "azure"
   model_name          = "azure-${each.key}"
   base_model          = each.value.model_id
@@ -59,6 +58,7 @@ resource "litellm_model" "microsoft_foundry" {
   }
 
   depends_on = [
+    helm_release.ai_gateway_configuration,
     helm_release.litellm,
     helm_release.litellm_admin
   ]
