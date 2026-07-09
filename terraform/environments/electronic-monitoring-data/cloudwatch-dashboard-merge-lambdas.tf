@@ -90,6 +90,15 @@ locals {
               }
             ]
           ]
+          annotations = {
+            horizontal = [
+              {
+                value = 1073741824
+                label = "1GB",
+                color = "#E34234"
+              }
+            ]
+          }
         }
       },
       {
