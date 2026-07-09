@@ -972,7 +972,7 @@ module "merge_mdss_staged_position" {
 }
 
 module "merge_ac_position" {
-  count                          = local.is-production ? 0 : 1
+  count                          = 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_ac_position"
@@ -994,7 +994,7 @@ module "merge_ac_position" {
 }
 
 module "merge_emdi_position" {
-  count                          = local.is-production ? 0 : 1
+  count                          = 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_emdi_position"
