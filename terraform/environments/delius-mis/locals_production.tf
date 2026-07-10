@@ -405,7 +405,7 @@ locals {
         iops       = 15360
         throughput = 480
         type       = "gp3"
-        total_size = 14000
+        total_size = 7000
       }
       flash = {
         iops       = 3000
@@ -436,8 +436,7 @@ locals {
   }
 
   datasync_config_production = {
-    source_s3_bucket_arn   = "arn:aws:s3:::eu-west-2-delius-prod-dfi-extracts"
-    source_s3_subdirectory = "dfinterventions/dfi/csv/reports/"
+    source_s3_bucket_arn = "arn:aws:s3:::eu-west-2-delius-prod-dfi-extracts"
   }
 
   db_backup_config_production = {
