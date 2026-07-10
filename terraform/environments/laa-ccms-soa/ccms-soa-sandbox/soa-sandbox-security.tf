@@ -204,8 +204,8 @@ resource "aws_security_group_rule" "ecs_tasks_admin_server" {
   type              = "ingress"
   description       = "SOA Admin Server"
   protocol          = "TCP"
-  from_port         = local.application_data.accounts[local.environment].admin_server_port
-  to_port           = local.application_data.accounts[local.environment].admin_server_port
+  from_port         = local.application_data.accounts[local.environment].admin_ssl_port
+  to_port           = local.application_data.accounts[local.environment].admin_ssl_port
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
