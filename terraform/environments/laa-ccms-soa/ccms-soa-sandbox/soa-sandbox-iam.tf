@@ -239,7 +239,11 @@ resource "aws_iam_policy" "ec2_instance_policy" {
         },
         {
           "Effect": "Allow",
-          "Action": ["secretsmanager:GetSecretValue"],
+          "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:PutSecretValue",
+                "secretsmanager:CreateSecret"
+          ],
           "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:soasandbox-secrets*"]
         }
     ]
