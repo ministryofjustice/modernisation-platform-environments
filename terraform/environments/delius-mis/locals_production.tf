@@ -393,11 +393,6 @@ locals {
       "/dev/sdj" = { label = "flash" }           # FLASH
       "/dev/sdk" = { label = "flash" }           # FLASH
       "/dev/sdl" = { label = "flash" }           # FLASH
-      "/dev/sdm" = { label = "data" }            # DATA
-      "/dev/sdn" = { label = "data" }            # DATA
-      "/dev/sdo" = { label = "data" }            # DATA
-      "/dev/sdp" = { label = "data" }            # DATA
-      "/dev/sdq" = { label = "data" }            # DATA
       "/dev/sds" = { label = "swap" }
     }
     ebs_volume_config = {
