@@ -700,6 +700,36 @@
       "object_name": "dbo.JOB_HISTORY",
       "column_name": "TIME_SPENT_IN_SECONDS",
       "apply_to_environments": ["development"]
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "NODE_ID_AFTER_DECISION",
+      "apply_to_environments": ["development"]
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "WORKING_TIME_SPENT_IN_SECONDS",
+      "apply_to_environments": ["development"]
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "TIME_PENDING_IN_SECS",
+      "apply_to_environments": ["development"]
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "WORKING_TIME_PENDING_IN_SECS",
+      "apply_to_environments": ["development"]
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "TARGET_TIME_IN_SECONDS",
+      "apply_to_environments": ["development"]
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "OVERDUE",
+      "apply_to_environments": ["development"]
     }
   ]
 }
