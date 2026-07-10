@@ -427,14 +427,14 @@ locals {
     }
   }
 
-  fsx_config_production = null
+  fsx_config_production = {
+    storage_capacity     = 200
+    throughtput_capacity = 16
+  }
 
-  # fsx_config_production = {
-  #   storage_capacity     = 1000 # temporarily increasing for prod->stage migration, was 200
-  #   throughtput_capacity = 128  # temporarily increasing for prod->stage migration, was 16
-  # }
-
-  dfi_report_bucket_config_production = null
+  dfi_report_bucket_config_production = {
+    bucket_policy_enabled = true
+  }
 
   lb_config_production = {
     bucket_policy_enabled = true
