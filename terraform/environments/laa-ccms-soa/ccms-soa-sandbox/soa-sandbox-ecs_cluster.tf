@@ -140,7 +140,7 @@ resource "aws_ecs_service" "soasandbox-admin" {
   load_balancer {
     target_group_arn = aws_lb_target_group.admin_https.id
     container_name   = "${local.application_data.accounts[local.environment].app_name}-admin"
-    container_port   = local.application_data.accounts[local.environment].admin_server_port
+    container_port   = local.application_data.accounts[local.environment].admin_ssl_port
   }
 
   depends_on = [
