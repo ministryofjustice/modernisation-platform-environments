@@ -1,0 +1,173 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "FileReceived.v1",
+  "description": "A complete, versioned object has been accepted at the managed file transfer ingress boundary and is eligible for automated processing.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "id",
+    "detail-type",
+    "source",
+    "account",
+    "time",
+    "region",
+    "detail"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "enum": ["0"]
+    },
+    "id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "detail-type": {
+      "type": "string",
+      "enum": ["FileReceived.v1"]
+    },
+    "source": {
+      "type": "string",
+      "enum": ["uk.gov.justice.service.managed-file-transfer"]
+    },
+    "account": {
+      "type": "string",
+      "pattern": "^[0-9]{12}$"
+    },
+    "time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "region": {
+      "type": "string"
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "replay-name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "detail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metadata", "data"],
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/eventMetadata"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["file"],
+          "properties": {
+            "file": {
+              "$ref": "#/definitions/file"
+            },
+            "provenance": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "clientId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "transferTicket": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "ingressMethod": {
+                  "type": "string",
+                  "enum": ["s3", "transfer-family", "api"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "eventMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["correlationId", "idempotencyKey"],
+      "properties": {
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fileId", "bucket", "key", "versionId", "sizeBytes"],
+      "properties": {
+        "fileId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "bucket": {
+          "type": "string",
+          "minLength": 3
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "versionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "version": "0",
+      "id": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
+      "detail-type": "FileReceived.v1",
+      "source": "uk.gov.justice.service.managed-file-transfer",
+      "account": "123456789012",
+      "time": "2026-07-10T14:00:00Z",
+      "region": "eu-west-2",
+      "resources": ["arn:aws:s3:::incoming/example/report.csv"],
+      "detail": {
+        "metadata": {
+          "correlationId": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
+          "idempotencyKey": "incoming/example/report.csv:3Lg..."
+        },
+        "data": {
+          "file": {
+            "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+            "bucket": "incoming",
+            "key": "example/report.csv",
+            "versionId": "3Lg...",
+            "sizeBytes": 4096
+          },
+          "provenance": {
+            "ingressMethod": "s3",
+            "clientId": "example-client"
+          }
+        }
+      }
+    }
+  ]
+}
