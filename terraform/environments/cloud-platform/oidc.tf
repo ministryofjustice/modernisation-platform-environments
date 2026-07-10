@@ -274,18 +274,27 @@ module "github_actions_container_platform_identity_oidc_role_plan" {
   github_repositories = ["ministryofjustice/container-platform-environments"]
   role_name           = "github-actions-container-platform-identity-plan"
   policy_jsons        = [data.aws_iam_policy_document.github_actions_container_platform_identity_oidc_policy_plan.json]
-  subject_claim       = "ref:refs/heads/*"
+  subject_claim       = "pull_request"
   tags                = merge({ "Name" = "GitHub Actions Container Platform Identity Role" }, local.tags)
 }
 
 data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_policy_plan" {
   statement {
-    sid    = "AssumeContainerPlatformReadOnlyRole"
+    sid    = "AssumeSSOReadOnlyRole"
     effect = "Allow"
     actions = [
       "sts:AssumeRole"
     ]
     resources = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ContainerPlatformSSOReadOnly"]
+  }
+
+  statement {
+    sid    = "AssumeModernisationPlatformReadOnlyRole"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = ["arn:aws:iam::${data.aws_ssm_parameter.modernisation_platform_account_id.value}:role/modernisation-account-limited-read-member-access"]
   }
 
   statement {
@@ -300,6 +309,28 @@ data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_
       variable = "aws:ResourceOrgID"
       values   = [data.aws_organizations_organization.root_account.id]
     }
+  }
+  statement {
+    sid    = "IdentityRoleClusterStateBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:DeleteObject"
+    ]
+    resources = [
+      "arn:aws:s3:::modernisation-platform-terraform-state/environments/members/cloud-platform/container-platform-identity/*"
+    ]
+  }
+
+  statement {
+    sid    = "IdentityRoleClusterKMSKey"
+    effect = "Allow"
+    actions = [
+      "kms:*"
+    ]
+    resources = ["*"]
   }
 }
 
@@ -316,12 +347,21 @@ module "github_actions_container_platform_identity_oidc_role_apply" {
 
 data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_policy_apply" {
   statement {
-    sid    = "AssumeContainerPlatformReadOnlyRole"
+    sid    = "AssumeSSOAdminRole"
     effect = "Allow"
     actions = [
       "sts:AssumeRole"
     ]
     resources = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ContainerPlatformSSOAdministrator"]
+  }
+
+  statement {
+    sid    = "AssumeModernisationPlatformReadOnlyRole"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = ["arn:aws:iam::${data.aws_ssm_parameter.modernisation_platform_account_id.value}:role/modernisation-account-limited-read-member-access"]
   }
 
   statement {
@@ -336,5 +376,27 @@ data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_
       variable = "aws:ResourceOrgID"
       values   = [data.aws_organizations_organization.root_account.id]
     }
+  }
+  statement {
+    sid    = "IdentityRoleClusterStateBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:DeleteObject"
+    ]
+    resources = [
+      "arn:aws:s3:::modernisation-platform-terraform-state/environments/members/cloud-platform/container-platform-identity/*"
+    ]
+  }
+
+  statement {
+    sid    = "IdentityRoleClusterKMSKey"
+    effect = "Allow"
+    actions = [
+      "kms:*"
+    ]
+    resources = ["*"]
   }
 }
