@@ -4,7 +4,7 @@
   "description": "GuardDuty Malware Protection for S3 has recorded a scan result for a processing object.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "id", "detail-type", "source", "time", "detail"],
+  "required": ["version", "id", "detail-type", "source", "account", "time", "region", "detail"],
   "properties": {
     "version": {"type": "string", "enum": ["0"]},
     "id": {"type": "string", "format": "uuid"},
@@ -14,6 +14,7 @@
     "time": {"type": "string", "format": "date-time"},
     "region": {"type": "string"},
     "resources": {"type": "array", "items": {"type": "string"}},
+    "replay-name": {"type": "string", "minLength": 1},
     "detail": {
       "type": "object",
       "additionalProperties": false,
@@ -40,7 +41,7 @@
     "eventMetadata": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["correlationId", "idempotencyKey"],
+      "required": ["correlationId", "causationId", "idempotencyKey"],
       "properties": {
         "correlationId": {"type": "string", "format": "uuid"},
         "causationId": {"type": "string", "format": "uuid"},
@@ -66,7 +67,9 @@
       "id": "c5dc9cb4-3b1f-4f01-a4c6-41b30e11d790",
       "detail-type": "FileScanResultRecorded.v1",
       "source": "uk.gov.justice.service.managed-file-transfer",
+      "account": "123456789012",
       "time": "2026-07-10T14:02:00Z",
+      "region": "eu-west-2",
       "detail": {
         "metadata": {
           "correlationId": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",

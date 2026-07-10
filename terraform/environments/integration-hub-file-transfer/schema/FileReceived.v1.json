@@ -9,7 +9,9 @@
     "id",
     "detail-type",
     "source",
+    "account",
     "time",
+    "region",
     "detail"
   ],
   "properties": {
@@ -45,6 +47,10 @@
       "items": {
         "type": "string"
       }
+    },
+    "replay-name": {
+      "type": "string",
+      "minLength": 1
     },
     "detail": {
       "type": "object",

@@ -4,7 +4,7 @@
   "description": "A processing object has been moved to a destination based on its malware scan result and the source has been deleted.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "id", "detail-type", "source", "time", "detail"],
+  "required": ["version", "id", "detail-type", "source", "account", "time", "region", "detail"],
   "properties": {
     "version": {"type": "string", "enum": ["0"]},
     "id": {"type": "string", "format": "uuid"},
@@ -14,6 +14,7 @@
     "time": {"type": "string", "format": "date-time"},
     "region": {"type": "string"},
     "resources": {"type": "array", "items": {"type": "string"}},
+    "replay-name": {"type": "string", "minLength": 1},
     "detail": {
       "type": "object",
       "additionalProperties": false,
@@ -24,6 +25,26 @@
           "type": "object",
           "additionalProperties": false,
           "required": ["sourceFile", "destinationFile", "route", "scanResultStatus", "sourceDeleted"],
+          "oneOf": [
+            {
+              "properties": {
+                "route": {"enum": ["clean"]},
+                "scanResultStatus": {"enum": ["NO_THREATS_FOUND"]}
+              }
+            },
+            {
+              "properties": {
+                "route": {"enum": ["quarantine"]},
+                "scanResultStatus": {"enum": ["THREATS_FOUND"]}
+              }
+            },
+            {
+              "properties": {
+                "route": {"enum": ["investigation"]},
+                "scanResultStatus": {"enum": ["UNSUPPORTED", "ACCESS_DENIED", "FAILED"]}
+              }
+            }
+          ],
           "properties": {
             "sourceFile": {"$ref": "#/definitions/file"},
             "destinationFile": {"$ref": "#/definitions/file"},
@@ -42,7 +63,7 @@
     "eventMetadata": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["correlationId", "idempotencyKey"],
+      "required": ["correlationId", "causationId", "idempotencyKey"],
       "properties": {
         "correlationId": {"type": "string", "format": "uuid"},
         "causationId": {"type": "string", "format": "uuid"},
@@ -68,7 +89,9 @@
       "id": "aa88e95a-159c-40c1-9e7b-38d00b0b6169",
       "detail-type": "FileRouted.v1",
       "source": "uk.gov.justice.service.managed-file-transfer",
+      "account": "123456789012",
       "time": "2026-07-10T14:03:00Z",
+      "region": "eu-west-2",
       "detail": {
         "metadata": {
           "correlationId": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
