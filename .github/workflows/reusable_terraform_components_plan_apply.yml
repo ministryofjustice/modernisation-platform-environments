@@ -94,7 +94,7 @@ concurrency:
   group: ${{ inputs.account_name && format('{0}-{1}', inputs.account_name, inputs.component) || format('{0}-{1}-{2}', inputs.application, inputs.environment, inputs.component) }}
 jobs:
   fetch-secrets:
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@3f4b0b80deea0ac74630e80189e1edeee3378793 # v6.1.5
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -125,7 +125,7 @@ jobs:
           echo "SKIP_PLAN_EVALUATOR=${SKIP_PLAN_EVALUATOR}" >> $GITHUB_ENV
 
       - name: Decrypt Secrets
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@3f4b0b80deea0ac74630e80189e1edeee3378793 # v6.1.5
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -344,7 +344,7 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Decrypt Secrets
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@3f4b0b80deea0ac74630e80189e1edeee3378793 # v6.1.5
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}

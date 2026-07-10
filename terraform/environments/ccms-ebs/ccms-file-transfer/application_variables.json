@@ -74,7 +74,7 @@
       "container_memory": "3072",
       "dns": "laa-production",
       "app_name": "ccms-ebs-sftp-container",
-      "app_count": "2",
+      "app_count": "1",
       "api_server_port": "8443",
       "aws_region": "eu-west-2",
       "app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-financial-transfers",
