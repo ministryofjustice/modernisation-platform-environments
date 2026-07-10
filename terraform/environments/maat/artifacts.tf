@@ -33,3 +33,46 @@ module "artifacts-s3" {
   tags = local.tags
 }
 
+data "aws_iam_policy_document" "artifacts_secure_transport" {
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      module.artifacts-s3.bucket.arn,
+      "${module.artifacts-s3.bucket.arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+  statement {
+    sid    = "RestrictToTLSRequestsOnly"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      module.artifacts-s3.bucket.arn,
+      "${module.artifacts-s3.bucket.arn}/*",
+    ]
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = ["1.2"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "artifacts_secure_transport" {
+  bucket = module.artifacts-s3.bucket.id
+  policy = data.aws_iam_policy_document.artifacts_secure_transport.json
+}
