@@ -322,3 +322,34 @@ module "shared_services_client_team_gov_29148_egress_kms" {
   ]
   deletion_window_in_days = 7
 }
+
+module "property_datahub_staging_egress_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  count = local.is-production ? 1 : 0
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "4.2.0"
+
+  aliases               = ["s3/property-datahub-staging-egress"]
+  description           = "Property Datahub Staging Egress"
+  enable_default_policy = true
+  key_statements = [
+    {
+      sid = "AllowAnalyticalPlatformDataProduction"
+      actions = [
+        "kms:Encrypt",
+        "kms:GenerateDataKey"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/mojap-data-production-property-datahub-staging-egress"]
+        }
+      ]
+    }
+  ]
+  deletion_window_in_days = 7
+}
