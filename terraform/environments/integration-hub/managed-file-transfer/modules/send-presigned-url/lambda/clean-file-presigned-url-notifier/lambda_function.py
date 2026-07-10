@@ -38,6 +38,7 @@ TTL_METADATA_KEY = "presigned-url-expiry-seconds"
 logger = Logger(service="managed-file-transfer-clean-file-presigned-url-notifier")
 LOG_KEY_PATH_HASH_LENGTH = 12
 DEFAULT_DESTINATION_REQUEST_TIMEOUT_SECONDS = 30
+MAX_SINGLE_PUT_DESTINATION_UPLOAD_BYTES = 5_000_000_000
 
 persistence_layer = DynamoDBPersistenceLayer(table_name=IDEMPOTENCY_TABLE)
 idempotency_config = IdempotencyConfig(
@@ -348,6 +349,18 @@ def deliver_clean_file_to_destination(operation, metadata, object_details):
         logger.info(
             "Skipping client destination delivery because no client delivery config is present",
             extra={**get_log_fields(operation), "client_id": client_id},
+        )
+        return None
+
+    if (object_details.get("ContentLength") or 0) > MAX_SINGLE_PUT_DESTINATION_UPLOAD_BYTES:
+        logger.info(
+            "Skipping client destination delivery because object exceeds single PUT upload limit",
+            extra={
+                **get_log_fields(operation),
+                "client_id": client_id,
+                "content_length_bytes": object_details.get("ContentLength"),
+                "max_single_put_destination_upload_bytes": MAX_SINGLE_PUT_DESTINATION_UPLOAD_BYTES,
+            },
         )
         return None
 
