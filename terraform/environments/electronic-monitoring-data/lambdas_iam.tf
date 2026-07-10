@@ -2868,7 +2868,7 @@ resource "aws_iam_role" "serco_fms_key_access_observer" {
 locals {
   serco_fms_lambda_execution_roles = {
     distribution = aws_iam_role.send_serco_fms_keys.name
-    claim_page    = aws_iam_role.serco_fms_claim_page.name
+    claim_page   = aws_iam_role.serco_fms_claim_page.name
     access_observer = (
       aws_iam_role.serco_fms_key_access_observer.name
     )
@@ -2880,10 +2880,7 @@ resource "aws_iam_role_policy_attachment" "serco_fms_basic_execution" {
 
   role = each.value
 
-  policy_arn = (
-    "arn:aws:iam::aws:policy/service-role/"
-    "AWSLambdaBasicExecutionRole"
-  )
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 
