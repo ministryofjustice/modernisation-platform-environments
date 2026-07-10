@@ -40,6 +40,15 @@ resource "aws_secretsmanager_secret_version" "auto_admit_version" {
   }
 }
 
+# Reads the live secret value (including the internalServiceToken key added manually
+data "aws_secretsmanager_secret_version" "auto_admit_secret" {
+  secret_id = aws_secretsmanager_secret.auto_admit_secret.id
+}
+
+locals {
+  internal_service_token = jsondecode(data.aws_secretsmanager_secret_version.auto_admit_secret.secret_string).internalServiceToken
+}
+
 
 resource "aws_secretsmanager_secret" "LDAP_administration_secret" {
   #checkov:skip=CKV2_AWS_57:todo add rotation if needed

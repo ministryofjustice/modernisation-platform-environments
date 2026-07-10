@@ -89,3 +89,25 @@ resource "aws_lb_listener" "frontend_https" {
     target_group_arn = aws_lb_target_group.frontend.arn
   }
 }
+
+# Legacy Redirect Rule
+resource "aws_lb_listener_rule" "legacy_redirect" {
+  listener_arn = aws_lb_listener.frontend_https.arn
+  priority     = 100
+
+  action {
+    type = "redirect"
+    redirect {
+      host        = "vcms.hmpps-development.modernisation-platform.service.justice.gov.uk"
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+
+  condition {
+    host_header {
+      values = ["www.dev.victim-case-management.service.justice.gov.uk"]
+    }
+  }
+}
