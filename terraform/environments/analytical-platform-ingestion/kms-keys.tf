@@ -346,7 +346,14 @@ module "property_datahub_staging_egress_kms" {
       principals = [
         {
           type        = "AWS"
-          identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/mojap-data-production-property-datahub-staging-egress"]
+          identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:root"]
+        }
+      ]
+      conditions = [
+        {
+          test     = "ArnLike"
+          variable = "aws:PrincipalArn"
+          values   = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/mojap-data-production-property-datahub-staging-egress"]
         }
       ]
     }
