@@ -62,7 +62,6 @@ resource "aws_ecs_task_definition" "soasandbox-admin" {
       admin_ssl_port                       = local.application_data.accounts[local.environment].admin_ssl_port
       aws_region                           = local.application_data.accounts[local.environment].aws_region
       container_version                    = local.application_data.accounts[local.environment].admin_container_version
-      soa_password                         = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/password::"
       db_user                              = local.application_data.accounts[local.environment].soa_db_user
       db_role                              = local.application_data.accounts[local.environment].soa_db_role
       db_instance_endpoint                 = aws_db_instance.soa_db.endpoint
@@ -72,17 +71,11 @@ resource "aws_ecs_task_definition" "soasandbox-admin" {
       xxsoa_ds_db                          = local.application_data.accounts[local.environment].tds_ds_db
       xxsoa_ds_username                    = local.application_data.accounts[local.environment].admin_xxsoa_ds_username
       xxsoa_ds_url                         = local.application_data.accounts[local.environment].xxsoa_ds_url
-      xxsoa_ds_password                    = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/xxsoa/ds/password::"
       ebs_ds_url                           = local.application_data.accounts[local.environment].admin_ebs_ds_url
       ebs_ds_username                      = local.application_data.accounts[local.environment].admin_ebs_ds_username
-      ebs_ds_password                      = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/ebs/ds/password::"
-      trust_store_password                 = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/java/trust-store/password::"
       ebssms_ds_url                        = local.application_data.accounts[local.environment].admin_ebssms_ds_url
       ebssms_ds_username                   = local.application_data.accounts[local.environment].admin_ebs_ds_username
-      ebssms_ds_password                   = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/ebs/sms/ds/password::"
-      pui_user_password                    = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/pui/user/password::"
       ebs_user_username                    = local.application_data.accounts[local.environment].admin_ebs_user_username
-      ebs_user_password                    = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:ccms/soasandbox/ebs/user/password::"
       run_rcu                              = local.application_data.accounts[local.environment].admin_run_rcu_bootstrap
       caab_user                            = local.application_data.accounts[local.environment].admin_caab_user
       pui_user                             = local.application_data.accounts[local.environment].admin_pui_user
@@ -210,7 +203,7 @@ resource "aws_ecs_service" "soasandbox-managed" {
   deployment_minimum_healthy_percent = 50
   launch_type                        = "EC2"
 
-  health_check_grace_period_seconds = 1800
+  health_check_grace_period_seconds = 3600
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
