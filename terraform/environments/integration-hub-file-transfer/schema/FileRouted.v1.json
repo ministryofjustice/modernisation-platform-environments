@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "FileRouted.v1",
+  "description": "A processing object has been moved to a destination based on its malware scan result and the source has been deleted.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "id", "detail-type", "source", "time", "detail"],
+  "properties": {
+    "version": {"type": "string", "enum": ["0"]},
+    "id": {"type": "string", "format": "uuid"},
+    "detail-type": {"type": "string", "enum": ["FileRouted.v1"]},
+    "source": {"type": "string", "enum": ["uk.gov.justice.service.managed-file-transfer"]},
+    "account": {"type": "string", "pattern": "^[0-9]{12}$"},
+    "time": {"type": "string", "format": "date-time"},
+    "region": {"type": "string"},
+    "resources": {"type": "array", "items": {"type": "string"}},
+    "detail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metadata", "data"],
+      "properties": {
+        "metadata": {"$ref": "#/definitions/eventMetadata"},
+        "data": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sourceFile", "destinationFile", "route", "scanResultStatus", "sourceDeleted"],
+          "properties": {
+            "sourceFile": {"$ref": "#/definitions/file"},
+            "destinationFile": {"$ref": "#/definitions/file"},
+            "route": {"type": "string", "enum": ["clean", "quarantine", "investigation"]},
+            "scanResultStatus": {
+              "type": "string",
+              "enum": ["NO_THREATS_FOUND", "THREATS_FOUND", "UNSUPPORTED", "ACCESS_DENIED", "FAILED"]
+            },
+            "sourceDeleted": {"type": "boolean", "enum": [true]}
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "eventMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["correlationId", "idempotencyKey"],
+      "properties": {
+        "correlationId": {"type": "string", "format": "uuid"},
+        "causationId": {"type": "string", "format": "uuid"},
+        "idempotencyKey": {"type": "string", "minLength": 1}
+      }
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fileId", "bucket", "key", "versionId", "sizeBytes"],
+      "properties": {
+        "fileId": {"type": "string", "format": "uuid"},
+        "bucket": {"type": "string", "minLength": 3},
+        "key": {"type": "string", "minLength": 1},
+        "versionId": {"type": "string", "minLength": 1},
+        "sizeBytes": {"type": "integer", "minimum": 0}
+      }
+    }
+  },
+  "examples": [
+    {
+      "version": "0",
+      "id": "aa88e95a-159c-40c1-9e7b-38d00b0b6169",
+      "detail-type": "FileRouted.v1",
+      "source": "uk.gov.justice.service.managed-file-transfer",
+      "time": "2026-07-10T14:03:00Z",
+      "detail": {
+        "metadata": {
+          "correlationId": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
+          "causationId": "c5dc9cb4-3b1f-4f01-a4c6-41b30e11d790",
+          "idempotencyKey": "route:clean:example/report.csv:4Mh..."
+        },
+        "data": {
+          "sourceFile": {
+            "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+            "bucket": "processing",
+            "key": "example/report.csv",
+            "versionId": "4Mh...",
+            "sizeBytes": 4096
+          },
+          "destinationFile": {
+            "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+            "bucket": "clean",
+            "key": "example/report.csv",
+            "versionId": "5Ni...",
+            "sizeBytes": 4096
+          },
+          "route": "clean",
+          "scanResultStatus": "NO_THREATS_FOUND",
+          "sourceDeleted": true
+        }
+      }
+    }
+  ]
+}

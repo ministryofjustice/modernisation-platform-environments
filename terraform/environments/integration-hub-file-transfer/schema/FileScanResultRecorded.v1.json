@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "FileScanResultRecorded.v1",
+  "description": "GuardDuty Malware Protection for S3 has recorded a scan result for a processing object.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "id", "detail-type", "source", "time", "detail"],
+  "properties": {
+    "version": {"type": "string", "enum": ["0"]},
+    "id": {"type": "string", "format": "uuid"},
+    "detail-type": {"type": "string", "enum": ["FileScanResultRecorded.v1"]},
+    "source": {"type": "string", "enum": ["uk.gov.justice.service.managed-file-transfer"]},
+    "account": {"type": "string", "pattern": "^[0-9]{12}$"},
+    "time": {"type": "string", "format": "date-time"},
+    "region": {"type": "string"},
+    "resources": {"type": "array", "items": {"type": "string"}},
+    "detail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metadata", "data"],
+      "properties": {
+        "metadata": {"$ref": "#/definitions/eventMetadata"},
+        "data": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["file", "scanResultStatus", "recordedAt"],
+          "properties": {
+            "file": {"$ref": "#/definitions/file"},
+            "scanResultStatus": {
+              "type": "string",
+              "enum": ["NO_THREATS_FOUND", "THREATS_FOUND", "UNSUPPORTED", "ACCESS_DENIED", "FAILED"]
+            },
+            "recordedAt": {"type": "string", "format": "date-time"}
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "eventMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["correlationId", "idempotencyKey"],
+      "properties": {
+        "correlationId": {"type": "string", "format": "uuid"},
+        "causationId": {"type": "string", "format": "uuid"},
+        "idempotencyKey": {"type": "string", "minLength": 1}
+      }
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fileId", "bucket", "key", "versionId", "sizeBytes"],
+      "properties": {
+        "fileId": {"type": "string", "format": "uuid"},
+        "bucket": {"type": "string", "minLength": 3},
+        "key": {"type": "string", "minLength": 1},
+        "versionId": {"type": "string", "minLength": 1},
+        "sizeBytes": {"type": "integer", "minimum": 0}
+      }
+    }
+  },
+  "examples": [
+    {
+      "version": "0",
+      "id": "c5dc9cb4-3b1f-4f01-a4c6-41b30e11d790",
+      "detail-type": "FileScanResultRecorded.v1",
+      "source": "uk.gov.justice.service.managed-file-transfer",
+      "time": "2026-07-10T14:02:00Z",
+      "detail": {
+        "metadata": {
+          "correlationId": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
+          "causationId": "6dce6b40-6e43-49f0-a2cf-1da1d43bce22",
+          "idempotencyKey": "scan:processing:example/report.csv:4Mh..."
+        },
+        "data": {
+          "file": {
+            "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+            "bucket": "processing",
+            "key": "example/report.csv",
+            "versionId": "4Mh...",
+            "sizeBytes": 4096
+          },
+          "scanResultStatus": "NO_THREATS_FOUND",
+          "recordedAt": "2026-07-10T14:02:00Z"
+        }
+      }
+    }
+  ]
+}
