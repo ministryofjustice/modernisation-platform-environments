@@ -236,15 +236,15 @@ resource "aws_security_group" "ecs_tasks_managed" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_security_group_rule" "ecs_tasks_managed_server" {
-  security_group_id = aws_security_group.ecs_tasks_managed.id
-  type              = "ingress"
-  description       = "SOA Managed Server"
-  protocol          = "TCP"
-  from_port         = local.application_data.accounts[local.environment].managed_server_port
-  to_port           = local.application_data.accounts[local.environment].managed_server_port
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-}
+# resource "aws_security_group_rule" "ecs_tasks_managed_server" {
+#   security_group_id = aws_security_group.ecs_tasks_managed.id
+#   type              = "ingress"
+#   description       = "SOA Managed Server"
+#   protocol          = "TCP"
+#   from_port         = local.application_data.accounts[local.environment].managed_server_port
+#   to_port           = local.application_data.accounts[local.environment].managed_server_port
+#   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+# }
 
 resource "aws_security_group_rule" "ecs_tasks_managed_ssl_port" {
   security_group_id = aws_security_group.ecs_tasks_managed.id

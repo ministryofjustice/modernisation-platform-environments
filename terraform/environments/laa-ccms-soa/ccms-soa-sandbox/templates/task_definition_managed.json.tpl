@@ -90,7 +90,7 @@
       },
       {
         "name": "MS_PORT",
-        "value": "${managed_server_port}"
+        "value": "${managed_ssl_port}"
       },     
       {
         "name": "USER_MEM_ARGS",

@@ -184,7 +184,7 @@ resource "aws_ecs_task_definition" "soasandbox-managed" {
       app_name              = local.application_data.accounts[local.environment].app_name
       app_image             = local.application_data.accounts[local.environment].managed_app_image
       db_instance_endpoint  = aws_db_instance.soa_db.endpoint
-      managed_server_port   = local.application_data.accounts[local.environment].managed_server_port
+      managed_server_port   = local.application_data.accounts[local.environment].managed_ssl_port
       managed_ssl_port      = local.application_data.accounts[local.environment].managed_ssl_port
       admin_server_port     = local.application_data.accounts[local.environment].admin_ssl_port
       aws_region            = local.application_data.accounts[local.environment].aws_region
@@ -235,7 +235,7 @@ resource "aws_ecs_service" "soasandbox-managed" {
   load_balancer {
     target_group_arn = aws_lb_target_group.managed_https.id
     container_name   = "${local.application_data.accounts[local.environment].app_name}-managed"
-    container_port   = local.application_data.accounts[local.environment].managed_server_port
+    container_port   = local.application_data.accounts[local.environment].managed_ssl_port
   }
 
   depends_on = [
