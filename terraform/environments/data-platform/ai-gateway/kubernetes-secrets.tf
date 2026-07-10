@@ -1,7 +1,3 @@
-locals {
-  litellm_master_key = "sk-${random_password.litellm_secret_key.result}" # "sk-" prefix is required by LiteLLM
-}
-
 resource "kubernetes_secret_v1" "litellm_master_key" {
   metadata {
     namespace = module.ai_gateway_namespace.name
