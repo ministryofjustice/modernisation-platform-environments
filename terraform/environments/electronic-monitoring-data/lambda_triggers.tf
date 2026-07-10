@@ -416,13 +416,13 @@ resource "aws_lambda_permission" "allow_eventbridge_merge_mdss_staged_position" 
 
 # target merge_ac_position
 resource "aws_cloudwatch_event_target" "merge_ac_position" {
-  count = local.is-production ? 0 : 1
+  count = 1
   rule  = aws_cloudwatch_event_rule.merge_load_schedule[0].name
   arn   = module.merge_ac_position[0].lambda_function_arn
 }
 
 resource "aws_lambda_permission" "allow_eventbridge_acquisitive_crime_position" {
-  count         = local.is-production ? 0 : 1
+  count         = 1
   statement_id  = "AllowExecutionFromEventBridgeAcquisitiveCrimePosition"
   action        = "lambda:InvokeFunction"
   function_name = module.merge_ac_position[0].lambda_function_name
@@ -432,13 +432,13 @@ resource "aws_lambda_permission" "allow_eventbridge_acquisitive_crime_position" 
 
 # target merge_emdi_position
 resource "aws_cloudwatch_event_target" "merge_emdi_position" {
-  count = local.is-production ? 0 : 1
+  count = 1
   rule  = aws_cloudwatch_event_rule.merge_load_schedule[0].name
   arn   = module.merge_emdi_position[0].lambda_function_arn
 }
 
 resource "aws_lambda_permission" "allow_eventbridge_emdi_position" {
-  count         = local.is-production ? 0 : 1
+  count         = 1
   statement_id  = "AllowExecutionFromEventBridgeEmdiPosition"
   action        = "lambda:InvokeFunction"
   function_name = module.merge_emdi_position[0].lambda_function_name

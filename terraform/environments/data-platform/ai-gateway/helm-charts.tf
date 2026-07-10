@@ -65,6 +65,12 @@ resource "helm_release" "litellm" {
 
         # Admin
         proxyAdminEmail = join(", ", local.proxy_admin_emails)
+
+        # How often (in seconds) LiteLLM checks each model's health.
+        # Comes from the environment config; defaults to 300s if not set.
+        # Note: if you change this, also check the alert's rate() window
+        # still has enough samples to work correctly.
+        ai_background_health_check_interval = try(local.environment_configuration.ai_background_health_check_interval, 300)
       }
     )
   ]
