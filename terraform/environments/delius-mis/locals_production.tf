@@ -2,11 +2,11 @@
 
 locals {
   environment_config_production = {
-    legacy_engineering_vpc_cidr = "10.160.98.0/25"
-    legacy_counterpart_vpc_cidr = "10.160.16.0/20"
-    legacy_ad_domain_name       = "delius-prod.local"
-    legacy_dns_ip_addrs         = ["10.160.17.254", "10.160.22.121"]
-    ad_domain_name              = "delius-mis-prod.internal"
+    legacy_engineering_vpc_cidr            = "10.160.98.0/25"
+    legacy_counterpart_vpc_cidr            = "10.160.16.0/20"
+    legacy_ad_domain_name                  = "delius-prod.local"
+    legacy_dns_ip_addrs                    = ["10.160.17.254", "10.160.22.121"]
+    ad_domain_name                         = "delius-mis-prod.internal"
     ad_trust_domain_name                   = "azure.hmpp.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
     ad_trust_dns_ip_addrs                  = module.ip_addresses.mp_ips.ad_fixngo_hmpp_domain_controllers
@@ -440,7 +440,9 @@ locals {
     bucket_policy_enabled = true
   }
 
-  datasync_config_production = null
+  datasync_config_production = {
+    source_s3_bucket_arn = "arn:aws:s3:::eu-west-2-delius-prod-dfi-extracts"
+  }
 
   db_backup_config_production = {
     object_lock_days             = 1
