@@ -191,7 +191,7 @@ locals {
       write_database = "PRDNDA"
     }
     user_source_endpoint = { 
-      read_host     = "primarydb"
+      read_host     = "standbydb2"
       read_database = "PRDNDAS2"
     }
     user_target_endpoint = {}
