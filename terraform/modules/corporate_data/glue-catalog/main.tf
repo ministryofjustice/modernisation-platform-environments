@@ -1,13 +1,13 @@
-resource "aws_glue_catalog_database" "this" {
+resource "aws_glue_catalog_database" "corporate_glue_database" {
   name        = var.database_name
   description = var.database_description
 }
 
-resource "aws_glue_catalog_table" "this" {
+resource "aws_glue_catalog_table" "corporate_glue_table" {
   for_each = var.tables
 
   name          = each.key
-  database_name = aws_glue_catalog_database.this.name
+  database_name = aws_glue_catalog_database.corportate_glue_database.name
   description   = try(each.value.description, null)
 
   table_type = "EXTERNAL_TABLE"

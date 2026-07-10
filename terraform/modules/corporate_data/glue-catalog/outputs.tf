@@ -1,7 +1,9 @@
-output "database_name" {
-  value = aws_glue_catalog_database.this.name
+output "table_name" {
+  description = "Name of the created Glue table"
+  value       = aws_glue_catalog_table.this.name
 }
 
-output "table_names" {
-  value = keys/aws_glue_catalog_table.this
+output "table_arn" {
+  description = "ARN of the created Glue table"
+  value       = aws_glue_catalog_table.this.arn
 }
