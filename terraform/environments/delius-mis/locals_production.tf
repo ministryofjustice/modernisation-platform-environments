@@ -441,7 +441,8 @@ locals {
   }
 
   datasync_config_production = {
-    source_s3_bucket_arn = "arn:aws:s3:::eu-west-2-delius-prod-dfi-extracts"
+    source_s3_bucket_arn   = "arn:aws:s3:::eu-west-2-delius-prod-dfi-extracts"
+    source_s3_subdirectory = "dfinterventions/dfi/csv/reports/"
   }
 
   db_backup_config_production = {
