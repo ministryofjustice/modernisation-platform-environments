@@ -390,7 +390,7 @@ resource "aws_cloudwatch_event_target" "merge_mdss_staged_event" {
 }
 
 resource "aws_lambda_permission" "allow_eventbridge_merge_mdss_staged_event" {
-  count         = 1
+  count         = local.is-development ? 1 : 0
   statement_id  = "AllowExecutionFromEventBridgeStagedMdssStaged"
   action        = "lambda:InvokeFunction"
   function_name = module.merge_mdss_staged_event[0].lambda_function_name
