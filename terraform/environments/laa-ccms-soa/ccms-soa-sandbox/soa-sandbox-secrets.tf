@@ -24,11 +24,11 @@ resource "aws_secretsmanager_secret_version" "sandbox_ccms_soa_secrets_version" 
     extra_java_properties                 = ""
   })
 
-  # lifecycle {
-  #   ignore_changes = [
-  #     secret_string
-  #   ]
-  # }
+  lifecycle {
+    ignore_changes = [
+      secret_string
+    ]
+  }
 }
 
 data "aws_secretsmanager_secret_version" "soa_password" {
