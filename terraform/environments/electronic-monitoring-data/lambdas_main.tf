@@ -1132,21 +1132,11 @@ module "send_serco_fms_keys" {
   reserved_concurrent_executions = 1
   cloudwatch_retention_days      = 7
 
-  core_shared_services_id = (
-    local.environment_management.account_ids[
-      "core-shared-services-production"
-    ]
-  )
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
 
-  production_dev = (
-    local.is-production
-    ? "prod"
-    : local.is-preproduction
-    ? "preprod"
-    : local.is-test
-    ? "test"
-    : "dev"
-  )
+  production_dev = local.env_name
 
   environment_variables = {
     POWERTOOLS_LOG_LEVEL = "INFO"
@@ -1162,9 +1152,7 @@ module "send_serco_fms_keys" {
     )
 
     GOVUK_NOTIFY_API_KEY_SECRET_ARN = (
-      aws_secretsmanager_secret
-      .govuk_notify_serco_fms_api_key
-      .arn
+      aws_secretsmanager_secret.govuk_notify_serco_fms_api_key.arn
     )
 
     GOVUK_NOTIFY_EMAIL_TEMPLATE_ID = (
@@ -1175,67 +1163,37 @@ module "send_serco_fms_keys" {
       local.serco_fms_notify_sms_template_id
     )
 
-    CLAIM_PAGE_URL = (
-      aws_lambda_function_url
-      .serco_fms_claim_page
-      .function_url
-    )
+    CLAIM_PAGE_URL = aws_lambda_function_url.serco_fms_claim_page.function_url
 
     CLAIM_TOKEN_TTL_HOURS = "168"
 
     DISTRIBUTION_BUCKET = (
-      module
-      .s3-serco-fms-key-distribution-bucket
-      .bucket
-      .id
+      module.s3-serco-fms-key-distribution-bucket.bucket.id
     )
 
-    FILES_PREFIX = (
-      local.serco_fms_key_distribution_files_prefix
-    )
+    FILES_PREFIX = local.serco_fms_key_distribution_files_prefix
 
-    STATE_BUCKET = (
-      module
-      .s3-serco-fms-key-distribution-bucket
-      .bucket
-      .id
-    )
+    STATE_BUCKET = module.s3-serco-fms-key-distribution-bucket.bucket.id
 
-    STATE_PREFIX = (
-      local.serco_fms_key_distribution_state_prefix
-    )
+    STATE_PREFIX = local.serco_fms_key_distribution_state_prefix
 
-    EVENTS_PREFIX = (
-      local.serco_fms_key_distribution_events_prefix
-    )
+    EVENTS_PREFIX = local.serco_fms_key_distribution_events_prefix
 
     PASSWORD_BUCKET = (
-      module
-      .s3-serco-fms-key-distribution-bucket
-      .bucket
-      .id
+      module.s3-serco-fms-key-distribution-bucket.bucket.id
     )
 
-    PASSWORDS_PREFIX = (
-      local.serco_fms_key_distribution_passwords_prefix
-    )
+    PASSWORDS_PREFIX = local.serco_fms_key_distribution_passwords_prefix
 
     PASSWORD_KMS_KEY_ARN = (
-      aws_kms_key
-      .serco_fms_key_distribution_passwords
-      .arn
+      aws_kms_key.serco_fms_key_distribution_passwords.arn
     )
 
     ALLOWLIST_BUCKET = (
-      module
-      .s3-serco-fms-key-distribution-bucket
-      .bucket
-      .id
+      module.s3-serco-fms-key-distribution-bucket.bucket.id
     )
 
-    ALLOWLIST_KEY = (
-      local.serco_fms_key_distribution_allowlist_key
-    )
+    ALLOWLIST_KEY = local.serco_fms_key_distribution_allowlist_key
 
     MAX_SECRET_AGE_HOURS = "48"
 
@@ -1267,52 +1225,28 @@ module "serco_fms_claim_page" {
   reserved_concurrent_executions = 5
   cloudwatch_retention_days      = 7
 
-  core_shared_services_id = (
-    local.environment_management.account_ids[
-      "core-shared-services-production"
-    ]
-  )
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
 
-  production_dev = (
-    local.is-production
-    ? "prod"
-    : local.is-preproduction
-    ? "preprod"
-    : local.is-test
-    ? "test"
-    : "dev"
-  )
+  production_dev = local.env_name
 
   environment_variables = {
     POWERTOOLS_LOG_LEVEL = "INFO"
 
     ENVIRONMENT = local.environment_shorthand
 
-    STATE_BUCKET = (
-      module
-      .s3-serco-fms-key-distribution-bucket
-      .bucket
-      .id
-    )
+    STATE_BUCKET = module.s3-serco-fms-key-distribution-bucket.bucket.id
 
-    STATE_PREFIX = (
-      local.serco_fms_key_distribution_state_prefix
-    )
+    STATE_PREFIX = local.serco_fms_key_distribution_state_prefix
 
-    EVENTS_PREFIX = (
-      local.serco_fms_key_distribution_events_prefix
-    )
+    EVENTS_PREFIX = local.serco_fms_key_distribution_events_prefix
 
     ALLOWLIST_BUCKET = (
-      module
-      .s3-serco-fms-key-distribution-bucket
-      .bucket
-      .id
+      module.s3-serco-fms-key-distribution-bucket.bucket.id
     )
 
-    ALLOWLIST_KEY = (
-      local.serco_fms_key_distribution_allowlist_key
-    )
+    ALLOWLIST_KEY = local.serco_fms_key_distribution_allowlist_key
 
     FILE_URL_TTL_SECONDS = "900"
 
@@ -1321,12 +1255,10 @@ module "serco_fms_claim_page" {
 }
 
 resource "aws_lambda_function_url" "serco_fms_claim_page" {
-  function_name = (
-    module.serco_fms_claim_page.lambda_function_name
-  )
+  function_name = module.serco_fms_claim_page.lambda_function_name
 
   authorization_type = "NONE"
-  invoke_mode         = "BUFFERED"
+  invoke_mode        = "BUFFERED"
 }
 
 
@@ -1341,58 +1273,30 @@ module "serco_fms_key_access_observer" {
   function_name = "serco_fms_key_access_observer"
   handler       = "serco_fms_key_access_observer.handler"
 
-  role_name = (
-    aws_iam_role
-    .serco_fms_key_access_observer
-    .name
-  )
-
-  role_arn = (
-    aws_iam_role
-    .serco_fms_key_access_observer
-    .arn
-  )
+  role_name = aws_iam_role.serco_fms_key_access_observer.name
+  role_arn  = aws_iam_role.serco_fms_key_access_observer.arn
 
   memory_size                    = 256
   timeout                        = 60
   reserved_concurrent_executions = 5
   cloudwatch_retention_days      = 7
 
-  core_shared_services_id = (
-    local.environment_management.account_ids[
-      "core-shared-services-production"
-    ]
-  )
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
 
-  production_dev = (
-    local.is-production
-    ? "prod"
-    : local.is-preproduction
-    ? "preprod"
-    : local.is-test
-    ? "test"
-    : "dev"
-  )
+  production_dev = local.env_name
 
   environment_variables = {
     POWERTOOLS_LOG_LEVEL = "INFO"
 
     ENVIRONMENT = local.environment_shorthand
 
-    STATE_BUCKET = (
-      module
-      .s3-serco-fms-key-distribution-bucket
-      .bucket
-      .id
-    )
+    STATE_BUCKET = module.s3-serco-fms-key-distribution-bucket.bucket.id
 
-    STATE_PREFIX = (
-      local.serco_fms_key_distribution_state_prefix
-    )
+    STATE_PREFIX = local.serco_fms_key_distribution_state_prefix
 
-    EVENTS_PREFIX = (
-      local.serco_fms_key_distribution_events_prefix
-    )
+    EVENTS_PREFIX = local.serco_fms_key_distribution_events_prefix
 
     STATE_SCAN_LIMIT = "25"
 

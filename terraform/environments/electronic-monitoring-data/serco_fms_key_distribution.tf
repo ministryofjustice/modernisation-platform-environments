@@ -16,7 +16,6 @@ locals {
     "ee1ee19f-7cf9-45ac-97a8-eb4c8c3ff7fd"
   )
 
-
   # ---------------------------------------------------------------------------
   # Distribution-bucket configuration
   #
@@ -27,31 +26,21 @@ locals {
     "${local.bucket_prefix}-serco-fms-keys-"
   )
 
-  serco_fms_key_distribution_files_prefix = (
-    "files"
-  )
+  serco_fms_key_distribution_files_prefix = "files"
 
-  serco_fms_key_distribution_passwords_prefix = (
-    "passwords"
-  )
+  serco_fms_key_distribution_passwords_prefix = "passwords"
 
-  serco_fms_key_distribution_state_prefix = (
-    "state"
-  )
+  serco_fms_key_distribution_state_prefix = "state"
 
-  serco_fms_key_distribution_events_prefix = (
-    "events"
-  )
+  serco_fms_key_distribution_events_prefix = "events"
 
-  serco_fms_key_distribution_config_prefix = (
-    "config"
-  )
+  serco_fms_key_distribution_config_prefix = "config"
 
-  serco_fms_key_distribution_allowlist_key = (
-    "${local.serco_fms_key_distribution_config_prefix}/"
-    "${local.environment_shorthand}/allowlist.json"
+  serco_fms_key_distribution_allowlist_key = format(
+    "%s/%s/allowlist.json",
+    local.serco_fms_key_distribution_config_prefix,
+    local.environment_shorthand,
   )
-
 
   # ---------------------------------------------------------------------------
   # Credential secrets distributed as one batch
@@ -59,50 +48,30 @@ locals {
 
   serco_fms_key_distribution_secret_specs = [
     {
-      label = "General"
-
-      secret_arn = (
-        module
-        .s3-fms-general-landing-bucket-iam-user
-        .secret_arn
-      )
+      label      = "General"
+      secret_arn = module.s3-fms-general-landing-bucket-iam-user.secret_arn
     },
     {
-      label = "Home Office"
-
-      secret_arn = (
-        module
-        .s3-fms-ho-landing-bucket-iam-user
-        .secret_arn
-      )
+      label      = "Home Office"
+      secret_arn = module.s3-fms-ho-landing-bucket-iam-user.secret_arn
     },
     {
-      label = "Specials"
-
-      secret_arn = (
-        module
-        .s3-fms-specials-landing-bucket-iam-user
-        .secret_arn
-      )
+      label      = "Specials"
+      secret_arn = module.s3-fms-specials-landing-bucket-iam-user.secret_arn
     },
   ]
 
   serco_fms_key_distribution_feed_secret_arns = [
-    for specification in (
-      local.serco_fms_key_distribution_secret_specs
-    ) :
+    for specification in local.serco_fms_key_distribution_secret_specs :
     specification.secret_arn
   ]
 
   serco_fms_key_distribution_secret_arns = concat(
     local.serco_fms_key_distribution_feed_secret_arns,
     [
-      aws_secretsmanager_secret
-      .govuk_notify_serco_fms_api_key
-      .arn,
+      aws_secretsmanager_secret.govuk_notify_serco_fms_api_key.arn,
     ],
   )
-
 
   # ---------------------------------------------------------------------------
   # FMS landing buckets observed after key rotation
@@ -120,25 +89,24 @@ locals {
     module.s3-fms-specials-landing-bucket.bucket_arn,
   ]
 
-
   # ---------------------------------------------------------------------------
   # CloudTrail configuration for rotated-key adoption evidence
   # ---------------------------------------------------------------------------
 
-  serco_fms_key_access_trail_name = (
-    "serco-fms-key-access-"
-    "${local.environment_shorthand}"
+  serco_fms_key_access_trail_name = format(
+    "serco-fms-key-access-%s",
+    local.environment_shorthand,
   )
 
   serco_fms_key_access_trail_log_prefix = (
     "cloudtrail/serco-fms-key-access"
   )
 
-  serco_fms_key_access_trail_arn = (
-    "arn:aws:cloudtrail:"
-    "${data.aws_region.current.name}:"
-    "${data.aws_caller_identity.current.account_id}:"
-    "trail/${local.serco_fms_key_access_trail_name}"
+  serco_fms_key_access_trail_arn = format(
+    "arn:aws:cloudtrail:%s:%s:trail/%s",
+    data.aws_region.current.name,
+    data.aws_caller_identity.current.account_id,
+    local.serco_fms_key_access_trail_name,
   )
 }
 
@@ -166,11 +134,7 @@ resource "aws_secretsmanager_secret" "govuk_notify_serco_fms_api_key" {
 }
 
 resource "aws_secretsmanager_secret_version" "govuk_notify_serco_fms_api_key" {
-  secret_id = (
-    aws_secretsmanager_secret
-    .govuk_notify_serco_fms_api_key
-    .id
-  )
+  secret_id = aws_secretsmanager_secret.govuk_notify_serco_fms_api_key.id
 
   # The real API key is inserted through the AWS CLI.
   secret_string = "PLACEHOLDER"
@@ -204,14 +168,10 @@ resource "aws_kms_key" "serco_fms_key_distribution_passwords" {
 }
 
 resource "aws_kms_alias" "serco_fms_key_distribution_passwords" {
-  name = (
-    "alias/serco-fms-key-distribution-passwords-"
-    "${local.environment_shorthand}"
+  name = format(
+    "alias/serco-fms-key-distribution-passwords-%s",
+    local.environment_shorthand,
   )
 
-  target_key_id = (
-    aws_kms_key
-    .serco_fms_key_distribution_passwords
-    .key_id
-  )
+  target_key_id = aws_kms_key.serco_fms_key_distribution_passwords.key_id
 }

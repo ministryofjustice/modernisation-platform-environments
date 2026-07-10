@@ -62,10 +62,7 @@ locals {
       bucket.arn
     ],
     [
-      module
-      .s3-serco-fms-key-distribution-bucket
-      .bucket
-      .arn,
+      module.s3-serco-fms-key-distribution-bucket.bucket.arn,
     ],
   )
 
@@ -269,11 +266,11 @@ data "aws_iam_policy_document" "log_bucket_policy" {
     ]
 
     resources = [
-      (
-        "${module.s3-logging-bucket.bucket.arn}/"
-        "${local.serco_fms_key_access_trail_log_prefix}/"
-        "AWSLogs/"
-        "${data.aws_caller_identity.current.account_id}/*"
+      format(
+        "%s/%s/AWSLogs/%s/*",
+        module.s3-logging-bucket.bucket.arn,
+        local.serco_fms_key_access_trail_log_prefix,
+        data.aws_caller_identity.current.account_id,
       ),
     ]
 
@@ -1811,16 +1808,9 @@ module "s3-macie-results-bucket" {
 # ------------------------------------------------------------------------------
 
 module "s3-serco-fms-key-distribution-bucket" {
-  source = (
-    "github.com/ministryofjustice/"
-    "modernisation-platform-terraform-s3-bucket"
-    "?ref=9facf9f"
-  )
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
 
-  # Keep the existing prefix stable to prevent bucket replacement.
-  bucket_prefix = (
-    local.serco_fms_key_distribution_bucket_prefix
-  )
+  bucket_prefix = local.serco_fms_key_distribution_bucket_prefix
 
   versioning_enabled = true
 
@@ -1894,17 +1884,9 @@ module "s3-serco-fms-key-distribution-bucket" {
 # ------------------------------------------------------------------------------
 
 resource "aws_s3_bucket_logging" "serco_fms_key_distribution" {
-  bucket = (
-    module
-    .s3-serco-fms-key-distribution-bucket
-    .bucket
-    .id
-  )
+  bucket = module.s3-serco-fms-key-distribution-bucket.bucket.id
 
-  target_bucket = (
-    module.s3-logging-bucket.bucket.id
-  )
-
+  target_bucket = module.s3-logging-bucket.bucket.id
   target_prefix = "logs/"
 
   target_object_key_format {

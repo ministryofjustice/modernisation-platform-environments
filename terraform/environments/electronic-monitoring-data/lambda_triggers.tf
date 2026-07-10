@@ -464,9 +464,9 @@ resource "aws_lambda_permission" "update_p1_export_api_gw" {
 # ------------------------------------------------------------------------------
 
 resource "aws_iam_role" "send_serco_fms_keys_scheduler" {
-  name = (
-    "send_serco_fms_keys_scheduler_role_"
-    "${local.environment_shorthand}"
+  name = format(
+    "send_serco_fms_keys_scheduler_role_%s",
+    local.environment_shorthand,
   )
 
   assume_role_policy = jsonencode({
@@ -487,9 +487,7 @@ resource "aws_iam_role" "send_serco_fms_keys_scheduler" {
 }
 
 resource "aws_iam_role_policy" "send_serco_fms_keys_scheduler" {
-  name = (
-    "send_serco_fms_keys_scheduler_invoke_policy"
-  )
+  name = "send_serco_fms_keys_scheduler_invoke_policy"
 
   role = aws_iam_role.send_serco_fms_keys_scheduler.id
 
@@ -518,14 +516,12 @@ resource "aws_iam_role_policy" "send_serco_fms_keys_scheduler" {
 # ------------------------------------------------------------------------------
 
 resource "aws_scheduler_schedule" "send_serco_fms_keys" {
-  name = (
-    "send_serco_fms_keys_quarterly_"
-    "${local.environment_shorthand}"
+  name = format(
+    "send_serco_fms_keys_quarterly_%s",
+    local.environment_shorthand,
   )
 
-  description = (
-    "Sends encrypted Serco FMS keys after quarterly rotation"
-  )
+  description = "Sends encrypted Serco FMS keys after quarterly rotation"
 
   state = (
     local.serco_fms_key_distribution_enabled
@@ -537,20 +533,14 @@ resource "aws_scheduler_schedule" "send_serco_fms_keys" {
     mode = "OFF"
   }
 
-  schedule_expression = (
-    "cron(30 12 ? FEB,MAY,AUG,NOV TUE#2 *)"
-  )
+  schedule_expression = "cron(30 12 ? FEB,MAY,AUG,NOV TUE#2 *)"
 
   schedule_expression_timezone = "Europe/London"
 
   target {
-    arn = (
-      module.send_serco_fms_keys.lambda_function_arn
-    )
+    arn = module.send_serco_fms_keys.lambda_function_arn
 
-    role_arn = (
-      aws_iam_role.send_serco_fms_keys_scheduler.arn
-    )
+    role_arn = aws_iam_role.send_serco_fms_keys_scheduler.arn
 
     input = jsonencode({
       source = "quarterly-schedule"
@@ -565,14 +555,12 @@ resource "aws_scheduler_schedule" "send_serco_fms_keys" {
 # ------------------------------------------------------------------------------
 
 resource "aws_scheduler_schedule" "send_serco_fms_keys_watchdog" {
-  name = (
-    "send_serco_fms_keys_watchdog_"
-    "${local.environment_shorthand}"
+  name = format(
+    "send_serco_fms_keys_watchdog_%s",
+    local.environment_shorthand,
   )
 
-  description = (
-    "Checks active Serco FMS handovers for overdue stages"
-  )
+  description = "Checks active Serco FMS handovers for overdue stages"
 
   state = (
     local.serco_fms_key_distribution_enabled
@@ -589,13 +577,9 @@ resource "aws_scheduler_schedule" "send_serco_fms_keys_watchdog" {
   schedule_expression_timezone = "Europe/London"
 
   target {
-    arn = (
-      module.send_serco_fms_keys.lambda_function_arn
-    )
+    arn = module.send_serco_fms_keys.lambda_function_arn
 
-    role_arn = (
-      aws_iam_role.send_serco_fms_keys_scheduler.arn
-    )
+    role_arn = aws_iam_role.send_serco_fms_keys_scheduler.arn
 
     input = jsonencode({
       source = "daily-watchdog"
@@ -608,24 +592,18 @@ resource "aws_scheduler_schedule" "send_serco_fms_keys_watchdog" {
 # ------------------------------------------------------------------------------
 # CloudTrail S3 write data events
 #
-# The trail captures completed write operations against the three supplier
-# landing buckets.
+# The trail captures write operations against the three supplier landing
+# buckets. EventBridge routes completed object uploads to the observer.
 # ------------------------------------------------------------------------------
 
 resource "aws_cloudtrail" "serco_fms_key_access" {
   name = local.serco_fms_key_access_trail_name
 
-  s3_bucket_name = (
-    module.s3-logging-bucket.bucket.id
-  )
+  s3_bucket_name = module.s3-logging-bucket.bucket.id
 
-  s3_key_prefix = (
-    local.serco_fms_key_access_trail_log_prefix
-  )
+  s3_key_prefix = local.serco_fms_key_access_trail_log_prefix
 
-  enable_logging = (
-    local.serco_fms_key_distribution_enabled
-  )
+  enable_logging = local.serco_fms_key_distribution_enabled
 
   enable_log_file_validation    = true
   include_global_service_events = false
@@ -639,9 +617,7 @@ resource "aws_cloudtrail" "serco_fms_key_access" {
       type = "AWS::S3::Object"
 
       values = [
-        for bucket_arn in (
-          local.serco_fms_landing_bucket_arns
-        ) :
+        for bucket_arn in local.serco_fms_landing_bucket_arns :
         "${bucket_arn}/"
       ]
     }
@@ -665,9 +641,9 @@ resource "aws_cloudtrail" "serco_fms_key_access" {
 # ------------------------------------------------------------------------------
 
 resource "aws_cloudwatch_event_rule" "serco_fms_key_access" {
-  name = (
-    "serco-fms-key-access-"
-    "${local.environment_shorthand}"
+  name = format(
+    "serco-fms-key-access-%s",
+    local.environment_shorthand,
   )
 
   description = (
@@ -700,48 +676,32 @@ resource "aws_cloudwatch_event_rule" "serco_fms_key_access" {
       ]
 
       requestParameters = {
-        bucketName = (
-          local.serco_fms_landing_bucket_ids
-        )
+        bucketName = local.serco_fms_landing_bucket_ids
       }
     }
   })
 }
 
 resource "aws_cloudwatch_event_target" "serco_fms_key_access" {
-  rule = (
-    aws_cloudwatch_event_rule
-    .serco_fms_key_access
-    .name
-  )
+  rule = aws_cloudwatch_event_rule.serco_fms_key_access.name
 
   target_id = "serco-fms-key-access-observer"
 
   arn = (
-    module
-    .serco_fms_key_access_observer
-    .lambda_function_arn
+    module.serco_fms_key_access_observer.lambda_function_arn
   )
 }
 
 resource "aws_lambda_permission" "serco_fms_key_access_eventbridge" {
-  statement_id = (
-    "AllowExecutionFromEventBridgeSercoFmsKeyAccess"
-  )
+  statement_id = "AllowExecutionFromEventBridgeSercoFmsKeyAccess"
 
   action = "lambda:InvokeFunction"
 
   function_name = (
-    module
-    .serco_fms_key_access_observer
-    .lambda_function_name
+    module.serco_fms_key_access_observer.lambda_function_name
   )
 
   principal = "events.amazonaws.com"
 
-  source_arn = (
-    aws_cloudwatch_event_rule
-    .serco_fms_key_access
-    .arn
-  )
+  source_arn = aws_cloudwatch_event_rule.serco_fms_key_access.arn
 }
