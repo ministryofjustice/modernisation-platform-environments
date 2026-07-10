@@ -117,7 +117,7 @@
     {
       "object_name": "dbo.CaseTrimDocuments",
       "column_name": "CaseTrimDocID",
-      "apply_to_environments": ["development"]
+      "apply_to_environments": ["development", "production"]
     }
   ]
 }
