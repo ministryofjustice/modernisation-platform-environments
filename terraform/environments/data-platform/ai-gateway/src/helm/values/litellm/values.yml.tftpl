@@ -62,6 +62,7 @@ proxy_config:
     proxy_batch_write_at: 60
     database_connection_pool_limit: 10
   litellm_settings:
+    drop_params: true
     request_timeout: 600
     json_logs: true
     cache: false
@@ -91,16 +92,7 @@ proxy_config:
     redis_port: 6379
     redis_password: os.environ/auth_token
 
-  model_list:
-%{ for key, profile in bedrockModels ~}
-    - model_name: bedrock-${key}
-      litellm_params:
-        model: bedrock/${profile.model_id}
-        aws_role_name: ${iamRole}
-        aws_region_name: ${profile.region}
-      model_info:
-        generally_available: ${profile.generally_available}
-%{ endfor ~}
+  model_list: []
 
 tolerations:
   - key: compute.data-platform.service.justice.gov.uk/node-pool
@@ -155,5 +147,6 @@ envVars: {
     REDIS_SSL: "True",
     XDG_CACHE_HOME: "/app/cache",
     IAM_TOKEN_DB_AUTH: "True",
-    DATABASE_USER: "${databaseUsername}"
+    DATABASE_USER: "${databaseUsername}",
+    STORE_MODEL_IN_DB: "True"
 }
