@@ -2831,56 +2831,44 @@ resource "aws_iam_role_policy_attachment" "write_to_sharepoint_iam_role_attach" 
 # ------------------------------------------------------------------------------
 
 resource "aws_iam_role" "send_serco_fms_keys" {
-  name = (
-    "send_serco_fms_keys_lambda_role_"
-    "${local.environment_shorthand}"
+  name = format(
+    "send_serco_fms_keys_lambda_role_%s",
+    local.environment_shorthand,
   )
 
-  assume_role_policy = (
-    data.aws_iam_policy_document.lambda_assume_role.json
-  )
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 resource "aws_iam_role" "serco_fms_claim_page" {
-  name = (
-    "serco_fms_claim_page_lambda_role_"
-    "${local.environment_shorthand}"
+  name = format(
+    "serco_fms_claim_page_lambda_role_%s",
+    local.environment_shorthand,
   )
 
-  assume_role_policy = (
-    data.aws_iam_policy_document.lambda_assume_role.json
-  )
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 resource "aws_iam_role" "serco_fms_key_access_observer" {
-  name = (
-    "serco_fms_key_access_observer_lambda_role_"
-    "${local.environment_shorthand}"
+  name = format(
+    "serco_fms_key_access_observer_lambda_role_%s",
+    local.environment_shorthand,
   )
 
-  assume_role_policy = (
-    data.aws_iam_policy_document.lambda_assume_role.json
-  )
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
 
 # ------------------------------------------------------------------------------
-# Basic Lambda logging permissions
+# Basic Lambda execution permissions
 #
-# These Lambdas are not attached to the VPC. Their application permissions are
-# defined separately below.
+# These Lambdas are not attached to the VPC. Application permissions are
+# defined by the custom policies below.
 # ------------------------------------------------------------------------------
 
 locals {
   serco_fms_lambda_execution_roles = {
-    distribution = (
-      aws_iam_role.send_serco_fms_keys.name
-    )
-
-    claim_page = (
-      aws_iam_role.serco_fms_claim_page.name
-    )
-
+    distribution = aws_iam_role.send_serco_fms_keys.name
+    claim_page    = aws_iam_role.serco_fms_claim_page.name
     access_observer = (
       aws_iam_role.serco_fms_key_access_observer.name
     )
@@ -2893,8 +2881,8 @@ resource "aws_iam_role_policy_attachment" "serco_fms_basic_execution" {
   role = each.value
 
   policy_arn = (
-    "arn:aws:iam::aws:policy/"
-    "service-role/AWSLambdaBasicExecutionRole"
+    "arn:aws:iam::aws:policy/service-role/"
+    "AWSLambdaBasicExecutionRole"
   )
 }
 
@@ -2914,9 +2902,7 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
       "secretsmanager:ListSecretVersionIds",
     ]
 
-    resources = (
-      local.serco_fms_key_distribution_secret_arns
-    )
+    resources = local.serco_fms_key_distribution_secret_arns
   }
 
   statement {
@@ -2928,10 +2914,7 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
     ]
 
     resources = [
-      module
-      .s3-serco-fms-key-distribution-bucket
-      .bucket
-      .arn,
+      module.s3-serco-fms-key-distribution-bucket.bucket.arn,
     ]
 
     condition {
@@ -2939,13 +2922,15 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
       variable = "s3:prefix"
 
       values = [
-        (
-          "${local.serco_fms_key_distribution_state_prefix}/"
-          "${local.environment_shorthand}"
+        format(
+          "%s/%s",
+          local.serco_fms_key_distribution_state_prefix,
+          local.environment_shorthand,
         ),
-        (
-          "${local.serco_fms_key_distribution_state_prefix}/"
-          "${local.environment_shorthand}/*"
+        format(
+          "%s/%s/*",
+          local.serco_fms_key_distribution_state_prefix,
+          local.environment_shorthand,
         ),
       ]
     }
@@ -2962,10 +2947,11 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
     ]
 
     resources = [
-      (
-        "${module.s3-serco-fms-key-distribution-bucket.bucket.arn}/"
-        "${local.serco_fms_key_distribution_state_prefix}/"
-        "${local.environment_shorthand}/*"
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_state_prefix,
+        local.environment_shorthand,
       ),
     ]
   }
@@ -2979,10 +2965,11 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
     ]
 
     resources = [
-      (
-        "${module.s3-serco-fms-key-distribution-bucket.bucket.arn}/"
-        "${local.serco_fms_key_distribution_events_prefix}/"
-        "${local.environment_shorthand}/*"
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_events_prefix,
+        local.environment_shorthand,
       ),
     ]
   }
@@ -2997,9 +2984,10 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
     ]
 
     resources = [
-      (
-        "${module.s3-serco-fms-key-distribution-bucket.bucket.arn}/"
-        "${local.serco_fms_key_distribution_allowlist_key}"
+      format(
+        "%s/%s",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_allowlist_key,
       ),
     ]
   }
@@ -3014,10 +3002,11 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
     ]
 
     resources = [
-      (
-        "${module.s3-serco-fms-key-distribution-bucket.bucket.arn}/"
-        "${local.serco_fms_key_distribution_files_prefix}/"
-        "${local.environment_shorthand}/*"
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_files_prefix,
+        local.environment_shorthand,
       ),
     ]
   }
@@ -3034,10 +3023,11 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
     ]
 
     resources = [
-      (
-        "${module.s3-serco-fms-key-distribution-bucket.bucket.arn}/"
-        "${local.serco_fms_key_distribution_passwords_prefix}/"
-        "${local.environment_shorthand}/*"
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_passwords_prefix,
+        local.environment_shorthand,
       ),
     ]
   }
@@ -3054,9 +3044,7 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
     ]
 
     resources = [
-      aws_kms_key
-      .serco_fms_key_distribution_passwords
-      .arn,
+      aws_kms_key.serco_fms_key_distribution_passwords.arn,
     ]
   }
 
@@ -3079,6 +3067,7 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
 
     actions = [
       "kms:Decrypt",
+      "kms:GenerateDataKey",
       "kms:GenerateDataKey*",
     ]
 
@@ -3089,22 +3078,17 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
 }
 
 resource "aws_iam_policy" "send_serco_fms_keys" {
-  name = (
-    "send_serco_fms_keys_lambda_policy_"
-    "${local.environment_shorthand}"
+  name = format(
+    "send_serco_fms_keys_lambda_policy_%s",
+    local.environment_shorthand,
   )
 
-  policy = (
-    data.aws_iam_policy_document.send_serco_fms_keys.json
-  )
+  policy = data.aws_iam_policy_document.send_serco_fms_keys.json
 }
 
 resource "aws_iam_role_policy_attachment" "send_serco_fms_keys" {
-  role = aws_iam_role.send_serco_fms_keys.name
-
-  policy_arn = (
-    aws_iam_policy.send_serco_fms_keys.arn
-  )
+  role       = aws_iam_role.send_serco_fms_keys.name
+  policy_arn = aws_iam_policy.send_serco_fms_keys.arn
 }
 
 
@@ -3128,10 +3112,7 @@ data "aws_iam_policy_document" "serco_fms_claim_page" {
     ]
 
     resources = [
-      module
-      .s3-serco-fms-key-distribution-bucket
-      .bucket
-      .arn,
+      module.s3-serco-fms-key-distribution-bucket.bucket.arn,
     ]
 
     condition {
@@ -3139,13 +3120,15 @@ data "aws_iam_policy_document" "serco_fms_claim_page" {
       variable = "s3:prefix"
 
       values = [
-        (
-          "${local.serco_fms_key_distribution_state_prefix}/"
-          "${local.environment_shorthand}"
+        format(
+          "%s/%s",
+          local.serco_fms_key_distribution_state_prefix,
+          local.environment_shorthand,
         ),
-        (
-          "${local.serco_fms_key_distribution_state_prefix}/"
-          "${local.environment_shorthand}/*"
+        format(
+          "%s/%s/*",
+          local.serco_fms_key_distribution_state_prefix,
+          local.environment_shorthand,
         ),
       ]
     }
@@ -3162,10 +3145,11 @@ data "aws_iam_policy_document" "serco_fms_claim_page" {
     ]
 
     resources = [
-      (
-        "${module.s3-serco-fms-key-distribution-bucket.bucket.arn}/"
-        "${local.serco_fms_key_distribution_state_prefix}/"
-        "${local.environment_shorthand}/*"
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_state_prefix,
+        local.environment_shorthand,
       ),
     ]
   }
@@ -3179,10 +3163,11 @@ data "aws_iam_policy_document" "serco_fms_claim_page" {
     ]
 
     resources = [
-      (
-        "${module.s3-serco-fms-key-distribution-bucket.bucket.arn}/"
-        "${local.serco_fms_key_distribution_events_prefix}/"
-        "${local.environment_shorthand}/*"
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_events_prefix,
+        local.environment_shorthand,
       ),
     ]
   }
@@ -3197,9 +3182,10 @@ data "aws_iam_policy_document" "serco_fms_claim_page" {
     ]
 
     resources = [
-      (
-        "${module.s3-serco-fms-key-distribution-bucket.bucket.arn}/"
-        "${local.serco_fms_key_distribution_allowlist_key}"
+      format(
+        "%s/%s",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_allowlist_key,
       ),
     ]
   }
@@ -3214,10 +3200,11 @@ data "aws_iam_policy_document" "serco_fms_claim_page" {
     ]
 
     resources = [
-      (
-        "${module.s3-serco-fms-key-distribution-bucket.bucket.arn}/"
-        "${local.serco_fms_key_distribution_files_prefix}/"
-        "${local.environment_shorthand}/*"
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_files_prefix,
+        local.environment_shorthand,
       ),
     ]
   }
@@ -3241,6 +3228,7 @@ data "aws_iam_policy_document" "serco_fms_claim_page" {
 
     actions = [
       "kms:Decrypt",
+      "kms:GenerateDataKey",
       "kms:GenerateDataKey*",
     ]
 
@@ -3251,22 +3239,17 @@ data "aws_iam_policy_document" "serco_fms_claim_page" {
 }
 
 resource "aws_iam_policy" "serco_fms_claim_page" {
-  name = (
-    "serco_fms_claim_page_lambda_policy_"
-    "${local.environment_shorthand}"
+  name = format(
+    "serco_fms_claim_page_lambda_policy_%s",
+    local.environment_shorthand,
   )
 
-  policy = (
-    data.aws_iam_policy_document.serco_fms_claim_page.json
-  )
+  policy = data.aws_iam_policy_document.serco_fms_claim_page.json
 }
 
 resource "aws_iam_role_policy_attachment" "serco_fms_claim_page" {
-  role = aws_iam_role.serco_fms_claim_page.name
-
-  policy_arn = (
-    aws_iam_policy.serco_fms_claim_page.arn
-  )
+  role       = aws_iam_role.serco_fms_claim_page.name
+  policy_arn = aws_iam_policy.serco_fms_claim_page.arn
 }
 
 
@@ -3290,10 +3273,7 @@ data "aws_iam_policy_document" "serco_fms_key_access_observer" {
     ]
 
     resources = [
-      module
-      .s3-serco-fms-key-distribution-bucket
-      .bucket
-      .arn,
+      module.s3-serco-fms-key-distribution-bucket.bucket.arn,
     ]
 
     condition {
@@ -3301,13 +3281,15 @@ data "aws_iam_policy_document" "serco_fms_key_access_observer" {
       variable = "s3:prefix"
 
       values = [
-        (
-          "${local.serco_fms_key_distribution_state_prefix}/"
-          "${local.environment_shorthand}"
+        format(
+          "%s/%s",
+          local.serco_fms_key_distribution_state_prefix,
+          local.environment_shorthand,
         ),
-        (
-          "${local.serco_fms_key_distribution_state_prefix}/"
-          "${local.environment_shorthand}/*"
+        format(
+          "%s/%s/*",
+          local.serco_fms_key_distribution_state_prefix,
+          local.environment_shorthand,
         ),
       ]
     }
@@ -3324,10 +3306,11 @@ data "aws_iam_policy_document" "serco_fms_key_access_observer" {
     ]
 
     resources = [
-      (
-        "${module.s3-serco-fms-key-distribution-bucket.bucket.arn}/"
-        "${local.serco_fms_key_distribution_state_prefix}/"
-        "${local.environment_shorthand}/*"
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_state_prefix,
+        local.environment_shorthand,
       ),
     ]
   }
@@ -3341,10 +3324,11 @@ data "aws_iam_policy_document" "serco_fms_key_access_observer" {
     ]
 
     resources = [
-      (
-        "${module.s3-serco-fms-key-distribution-bucket.bucket.arn}/"
-        "${local.serco_fms_key_distribution_events_prefix}/"
-        "${local.environment_shorthand}/*"
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_events_prefix,
+        local.environment_shorthand,
       ),
     ]
   }
@@ -3368,6 +3352,7 @@ data "aws_iam_policy_document" "serco_fms_key_access_observer" {
 
     actions = [
       "kms:Decrypt",
+      "kms:GenerateDataKey",
       "kms:GenerateDataKey*",
     ]
 
@@ -3378,28 +3363,20 @@ data "aws_iam_policy_document" "serco_fms_key_access_observer" {
 }
 
 resource "aws_iam_policy" "serco_fms_key_access_observer" {
-  name = (
-    "serco_fms_key_access_observer_lambda_policy_"
-    "${local.environment_shorthand}"
+  name = format(
+    "serco_fms_key_access_observer_lambda_policy_%s",
+    local.environment_shorthand,
   )
 
   policy = (
-    data.aws_iam_policy_document
-    .serco_fms_key_access_observer
-    .json
+    data.aws_iam_policy_document.serco_fms_key_access_observer.json
   )
 }
 
 resource "aws_iam_role_policy_attachment" "serco_fms_key_access_observer" {
-  role = (
-    aws_iam_role
-    .serco_fms_key_access_observer
-    .name
-  )
+  role = aws_iam_role.serco_fms_key_access_observer.name
 
   policy_arn = (
-    aws_iam_policy
-    .serco_fms_key_access_observer
-    .arn
+    aws_iam_policy.serco_fms_key_access_observer.arn
   )
 }
