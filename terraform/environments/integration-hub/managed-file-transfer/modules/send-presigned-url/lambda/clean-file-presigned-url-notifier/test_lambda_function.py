@@ -190,7 +190,7 @@ class CleanFileNotifierTests(unittest.TestCase):
                                     "eventSource": "aws:s3",
                                     "s3": {
                                         "bucket": {"name": "clean-bucket"},
-                                        "object": {"key": "products-poc/uploads/2026/06/25/test.csv"},
+                                        "object": {"key": "products-poc/uploads/2026/06/25/uuid-prefix-test.csv"},
                                     },
                                 }
                             ]
@@ -231,8 +231,12 @@ class CleanFileNotifierTests(unittest.TestCase):
         handler.lambda_handler(self._event(), SimpleNamespace())
 
         self.assertEqual(2, len(fake_sns.publish_calls))
+        slack_publish = fake_sns.publish_calls[0]
+        slack_message = json.loads(slack_publish["Message"])
         client_publish = fake_sns.publish_calls[1]
         message = json.loads(client_publish["Message"])
+        self.assertIn("*File name:* `test.csv`", slack_message["content"]["description"])
+        self.assertIn("Download URL: <https://example.test/download|test.csv>", slack_message["content"]["description"])
         self.assertEqual(handler.CLIENT_NOTIFICATION_SNS_TOPIC_ARN, client_publish["TopicArn"])
         self.assertEqual("products-poc", message["clientId"])
         self.assertEqual("ticket-123", message["transferTicket"])

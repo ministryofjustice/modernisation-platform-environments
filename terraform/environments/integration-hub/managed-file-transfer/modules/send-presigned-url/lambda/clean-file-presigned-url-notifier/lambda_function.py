@@ -127,12 +127,13 @@ def get_expiry_seconds(operation, metadata):
     return min(expiry_seconds, MAX_DOWNLOAD_URL_EXPIRY_SECONDS)
 
 
-def build_notification_message(operation, expiry_seconds, presigned_url):
+def build_notification_message(operation, metadata, expiry_seconds, presigned_url):
     expires_at = datetime.now(UTC) + timedelta(seconds=expiry_seconds)
     expiry_minutes = max(1, (expiry_seconds + 59) // 60)
-    file_name = operation["object_key"].rsplit("/", 1)[-1]
+    file_name = metadata.get(ORIGINAL_FILE_NAME_METADATA_KEY) or operation["object_key"].rsplit("/", 1)[-1]
     lines = [
         "*Managed file transfer: clean file ready for download*",
+        f"*File name:* `{file_name}`",
         f"*Bucket:* `{operation['bucket_name']}`",
         f"*Key:* `{operation['object_key']}`",
     ]
@@ -426,7 +427,7 @@ def process_record(*, operation):
     )
     destination_delivery = deliver_clean_file_to_destination(operation, metadata, object_details)
 
-    notification_message = build_notification_message(operation, expiry_seconds, presigned_url)
+    notification_message = build_notification_message(operation, metadata, expiry_seconds, presigned_url)
     sns.publish(
         TopicArn=operation["notification_topic_arn"],
         Message=json.dumps(notification_message),

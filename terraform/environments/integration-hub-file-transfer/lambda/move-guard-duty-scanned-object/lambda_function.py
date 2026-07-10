@@ -191,6 +191,28 @@ def get_log_fields(operation, routing_outcome=None):
     return log_fields
 
 
+def get_copy_object_kwargs(operation):
+    head_object_kwargs = {
+        "Bucket": operation["source_bucket_name"],
+        "Key": operation["source_key"],
+    }
+
+    if operation["source_version_id"]:
+        head_object_kwargs["VersionId"] = operation["source_version_id"]
+
+    source_object = s3_client.head_object(**head_object_kwargs)
+    copy_kwargs = {
+        "MetadataDirective": "REPLACE",
+        "Metadata": source_object.get("Metadata", {}),
+        "TaggingDirective": "COPY",
+    }
+
+    if source_object.get("ContentType"):
+        copy_kwargs["ContentType"] = source_object["ContentType"]
+
+    return copy_kwargs
+
+
 @idempotent_function(
     data_keyword_argument="operation",
     persistence_store=persistence_layer,
@@ -213,8 +235,7 @@ def process_record(*, operation):
         CopySource=copy_source,
         Bucket=operation["destination_bucket_name"],
         Key=operation["source_key"],
-        MetadataDirective="COPY",
-        TaggingDirective="COPY",
+        **get_copy_object_kwargs(operation),
     )
     put_destination_tags(operation, copy_response.get("VersionId"))
 
