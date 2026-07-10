@@ -136,17 +136,14 @@ jobs:
 
       - name: Checkout Linked Repository
         if: inputs.linked_repository != '' && inputs.linked_repository_path != ''
-        env:
-          LINKED_REPOSITORY: ${{ inputs.linked_repository }}
-          LINKED_REPOSITORY_PATH: ${{ inputs.linked_repository_path }}
-          LINKED_REPOSITORY_REF: ${{ inputs.linked_repository_ref }}
-        run: |
-          git -c http.extraheader="AUTHORIZATION: basic $(printf "x-access-token:%s" "$GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT" | base64 | tr -d '\n')" \
-            clone \
-            --branch "${LINKED_REPOSITORY_REF}" \
-            --depth 1 \
-            "https://github.com/${LINKED_REPOSITORY}.git" \
-            "${LINKED_REPOSITORY_PATH}"
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: ${{ inputs.linked_repository }}
+          ref: ${{ inputs.linked_repository_ref }}
+          path: ${{ inputs.linked_repository_path }}
+          token: ${{ env.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
+          persist-credentials: false
+          fetch-depth: 1
 
       - name: Get AWS Account Number
         run: |
@@ -359,17 +356,14 @@ jobs:
 
       - name: Checkout Linked Repository
         if: inputs.linked_repository != '' && inputs.linked_repository_path != ''
-        env:
-          LINKED_REPOSITORY: ${{ inputs.linked_repository }}
-          LINKED_REPOSITORY_PATH: ${{ inputs.linked_repository_path }}
-          LINKED_REPOSITORY_REF: ${{ inputs.linked_repository_ref }}
-        run: |
-          git -c http.extraheader="AUTHORIZATION: basic $(printf "x-access-token:%s" "$GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT" | base64 | tr -d '\n')" \
-            clone \
-            --branch "${LINKED_REPOSITORY_REF}" \
-            --depth 1 \
-            "https://github.com/${LINKED_REPOSITORY}.git" \
-            "${LINKED_REPOSITORY_PATH}"
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: ${{ inputs.linked_repository }}
+          ref: ${{ inputs.linked_repository_ref }}
+          path: ${{ inputs.linked_repository_path }}
+          token: ${{ env.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
+          persist-credentials: false
+          fetch-depth: 1
 
       - name: Get AWS Account Number
         run: |
