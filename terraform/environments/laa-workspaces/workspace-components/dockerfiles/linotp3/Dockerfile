@@ -11,7 +11,6 @@ USER root
 RUN apt-get update && \
     apt-get upgrade -y --no-install-recommends && \
     apt-get remove -y python2.7 python2.7-minimal libpython2.7-stdlib libpython2.7-minimal || true && \
-    apt-get install -y --no-install-recommends python3-pymysql && \
     apt-get autoremove -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -38,6 +37,11 @@ RUN apt-get update && \
     apt-get autoremove -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /root/.cpanm
+
+# SECURITY FIX: Upgrade setuptools to fix CVE-2024-6345 (HIGH)
+# Install pymysql via pip (required for MySQL connection in virtualenv)
+RUN pip install --no-cache-dir --upgrade setuptools pymysql && \
+    rm -rf /root/.cache
 
 COPY entrypoint.sh /usr/local/bin/custom-entrypoint.sh
 COPY configure_linotp.py /usr/local/bin/configure_linotp.py
