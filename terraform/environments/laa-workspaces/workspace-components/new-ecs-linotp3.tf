@@ -186,7 +186,8 @@ resource "aws_ecs_task_definition" "linotp3" {
         { name = "LINOTP_REALM_NAME", value = "laa-workspaces" },
         { name = "LINOTP_URL", value = "http://localhost:5000" },
         { name = "LINOTP_ADMIN_USER", value = "admin" },
-        { name = "ENABLE_AUTO_CONFIG", value = "true" }
+        # IMPORTANT: Set to "false" initially, then "true" after AD is deployed
+        { name = "ENABLE_AUTO_CONFIG", value = "false" }
       ]
 
       secrets = [
