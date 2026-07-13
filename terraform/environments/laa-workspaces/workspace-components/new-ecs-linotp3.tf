@@ -49,14 +49,14 @@ resource "aws_security_group" "ecs_linotp3" {
 
   name_prefix = "${local.application_name}-${local.environment}-ecs-linotp3-"
   description = "ECS Fargate tasks: LinOTP 3.x (port 80) + FreeRADIUS (1812/1813 UDP)"
-  vpc_id      = aws_vpc.workspaces[0].id
+  vpc_id      = data.terraform_remote_state.workspace_components.outputs.vpc_id
 
   ingress {
     description     = "LinOTP HTTP from ALB"
     from_port       = 5000
     to_port         = 5000
     protocol        = "tcp"
-    security_groups = [aws_security_group.radius_alb[0].id]
+    security_groups = [data.terraform_remote_state.workspace_components.outputs.radius_alb_security_group_id]
   }
 
   ingress {
@@ -64,7 +64,7 @@ resource "aws_security_group" "ecs_linotp3" {
     from_port   = 1812
     to_port     = 1812
     protocol    = "udp"
-    cidr_blocks = [aws_vpc.workspaces[0].cidr_block]
+    cidr_blocks = [data.terraform_remote_state.workspace_components.outputs.vpc_cidr_block]
   }
 
   ingress {
@@ -72,7 +72,7 @@ resource "aws_security_group" "ecs_linotp3" {
     from_port   = 1813
     to_port     = 1813
     protocol    = "udp"
-    cidr_blocks = [aws_vpc.workspaces[0].cidr_block]
+    cidr_blocks = [data.terraform_remote_state.workspace_components.outputs.vpc_cidr_block]
   }
 
   egress {
@@ -186,8 +186,8 @@ resource "aws_ecs_task_definition" "linotp3" {
         { name = "LINOTP_REALM_NAME", value = "laa-workspaces" },
         { name = "LINOTP_URL", value = "http://localhost:5000" },
         { name = "LINOTP_ADMIN_USER", value = "admin" },
-        # IMPORTANT: Set to "false" initially, then "true" after AD is deployed
-        { name = "ENABLE_AUTO_CONFIG", value = "false" }
+        # Auto-configuration enabled - runs after AD is deployed (ensured by depends_on)
+        { name = "ENABLE_AUTO_CONFIG", value = "true" }
       ]
 
       secrets = [
@@ -364,6 +364,9 @@ resource "aws_ecs_service" "linotp3" {
     aws_iam_role_policy.ecs_task_execution_secrets,
     aws_lb_listener_rule.linotp3_portal,
     aws_lb_target_group.radius_ecs,
+    # CRITICAL: Ensure AD and lambda.workspace service account exist before starting LinOTP
+    # This data source creates dependency on parent module AD deployment
+    data.aws_ssm_parameter.lambda_service_account_password,
   ]
 
   tags = merge(
