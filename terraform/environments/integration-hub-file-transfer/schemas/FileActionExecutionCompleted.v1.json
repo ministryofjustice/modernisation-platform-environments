@@ -1,0 +1,134 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "FileActionExecutionCompleted.v1",
+  "description": "Object file actions are completed. The requested action has taken place and a concluding succeeded or failed status has been identified.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "id", "detail-type", "source", "account", "time", "region", "detail"],
+  "properties": {
+    "version": {"type": "string", "enum": ["0"]},
+    "id": {"type": "string", "format": "uuid"},
+    "detail-type": {"type": "string", "enum": ["FileActionExecutionCompleted.v1"]},
+    "source": {"type": "string", "enum": ["uk.gov.justice.service.managed-file-transfer"]},
+    "account": {"type": "string", "pattern": "^[0-9]{12}$"},
+    "time": {"type": "string", "format": "date-time"},
+    "region": {"type": "string"},
+    "resources": {"type": "array", "items": {"type": "string"}},
+    "replay-name": {"type": "string", "minLength": 1},
+    "detail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metadata", "data"],
+      "properties": {
+        "metadata": {"$ref": "#/definitions/eventMetadata"},
+        "data": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["fileId", "object", "actionDefinitionId", "actionExecutionId", "status", "completedAt"],
+              "properties": {
+                "fileId": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Stable logical file identifier inherited from FileReceived.v1."
+                },
+                "object": {"$ref": "#/definitions/s3Object"},
+                "actionDefinitionId": {"type": "string", "minLength": 1},
+                "actionExecutionId": {"type": "string", "format": "uuid"},
+                "status": {"type": "string", "enum": ["succeeded"]},
+                "completedAt": {"type": "string", "format": "date-time"},
+                "result": {"type": "object"}
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["fileId", "object", "actionDefinitionId", "actionExecutionId", "status", "completedAt", "failure"],
+              "properties": {
+                "fileId": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Stable logical file identifier inherited from FileReceived.v1."
+                },
+                "object": {"$ref": "#/definitions/s3Object"},
+                "actionDefinitionId": {"type": "string", "minLength": 1},
+                "actionExecutionId": {"type": "string", "format": "uuid"},
+                "status": {"type": "string", "enum": ["failed"]},
+                "completedAt": {"type": "string", "format": "date-time"},
+                "failure": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["code", "message"],
+                  "properties": {
+                    "code": {"type": "string", "minLength": 1},
+                    "message": {"type": "string", "minLength": 1},
+                    "retryable": {"type": "boolean"}
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "definitions": {
+    "eventMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["correlationId", "causationId", "idempotencyKey"],
+      "properties": {
+        "correlationId": {"type": "string", "format": "uuid"},
+        "causationId": {"type": "string", "format": "uuid"},
+        "idempotencyKey": {"type": "string", "minLength": 1}
+      }
+    },
+    "s3Object": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A particular version of an object stored in Amazon S3.",
+      "required": ["bucket", "key", "versionId", "sizeBytes"],
+      "properties": {
+        "bucket": {"type": "string", "minLength": 3},
+        "key": {"type": "string", "minLength": 1},
+        "versionId": {"type": "string", "minLength": 1},
+        "sizeBytes": {"type": "integer", "minimum": 0}
+      }
+    }
+  },
+  "examples": [
+    {
+      "version": "0",
+      "id": "6cf0aa2e-1df5-42a8-99f7-4b8b8df9c4f3",
+      "detail-type": "FileActionExecutionCompleted.v1",
+      "source": "uk.gov.justice.service.managed-file-transfer",
+      "account": "123456789012",
+      "time": "2026-07-10T14:05:00Z",
+      "region": "eu-west-2",
+      "detail": {
+        "metadata": {
+          "correlationId": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
+          "causationId": "2bd32cbb-c3e2-4b62-8b53-90ea0a7a4de5",
+          "idempotencyKey": "action-complete:b1d4e7c2-f073-4ed4-9565-a4c31c54bd7f"
+        },
+        "data": {
+          "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+          "object": {
+            "bucket": "clean",
+            "key": "example/report.csv",
+            "versionId": "5Ni...",
+            "sizeBytes": 4096
+          },
+          "actionDefinitionId": "send-to-consumer",
+          "actionExecutionId": "b1d4e7c2-f073-4ed4-9565-a4c31c54bd7f",
+          "status": "succeeded",
+          "completedAt": "2026-07-10T14:05:00Z",
+          "result": {
+            "consumer": "consumer-a"
+          }
+        }
+      }
+    }
+  ]
+}

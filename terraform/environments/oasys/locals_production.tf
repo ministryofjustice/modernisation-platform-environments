@@ -2,7 +2,11 @@ locals {
 
   web_live_side = "b"
 
-  delius_oasys_queues_production = {}
+  delius_oasys_queues_production = {
+    "pd" = {
+      sns_topic_arn_configured = true # set to true when sns_topic_arn has been populated in config secret
+    }
+  }
 
   baseline_presets_production = {
     options = {
