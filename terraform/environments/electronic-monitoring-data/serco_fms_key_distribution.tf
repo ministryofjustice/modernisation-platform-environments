@@ -3,8 +3,8 @@
 # ------------------------------------------------------------------------------
 
 locals {
-  # Keep disabled until the controlled development test is complete.
-  serco_fms_key_distribution_enabled = false
+  # Enable the workflow only in the development environment.
+  serco_fms_key_distribution_enabled = local.is-development
 
   # The same GOV.UK Notify templates are used in each environment.
   # The environment is supplied as template personalisation.
