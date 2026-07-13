@@ -67,7 +67,7 @@ resource "aws_sns_topic_subscription" "lambda_cloudwatch_slack_integration_v2_sn
 resource "aws_lambda_layer_version" "lambda_cloudwatch_slack_integration_v2_layer" {
   # filename                 = "lambda/layerV1.zip"
   layer_name               = "${local.application_name}-${local.environment}-cloudwatch-slack-integration-v2-layer"
-  s3_key                   = "lambda_delivery/cloudwatch_sns_layer/layerV2.zip"
+  s3_key                   = "lambda_delivery/cloudwatch_sns_layer/layerV1.zip"
   s3_bucket                = aws_s3_bucket.ccms_ebs_shared.bucket
   compatible_runtimes      = ["python3.13"]
   compatible_architectures = ["x86_64"]
