@@ -16,7 +16,7 @@ module "eks" {
   # enable_cluster_creator_admin_permissions = true ## CP GitHub actions access to cluster, Adds to access entries
   compute_config = {
     enabled    = true
-    node_pools = ["system"] # US-028: general-purpose removed — user workloads use custom-networking NodePool only
+    # node_pools = ["system"] # US-028: general-purpose removed — user workloads use custom-networking NodePool only
   }
   enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
