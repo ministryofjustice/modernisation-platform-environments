@@ -1,10 +1,10 @@
 
-resource "kubectl_manifest" "nodeclass_custom_networking" {
+resource "kubectl_manifest" "default_nodeclass" {
   yaml_body = <<-YAML
     apiVersion: eks.amazonaws.com/v1
     kind: NodeClass
     metadata:
-      name: custom-networking
+      name: ${terraform.workspace}-nodeclass
     spec:
       role: ${local.node_role_name}
 
@@ -37,12 +37,12 @@ resource "kubectl_manifest" "nodeclass_custom_networking" {
   YAML
 }
 
-resource "kubectl_manifest" "nodepool_custom_networking" {
+resource "kubectl_manifest" "default_nodepool" {
   yaml_body = <<-YAML
     apiVersion: karpenter.sh/v1
     kind: NodePool
     metadata:
-      name: application-default-nodepool
+      name: ${terraform.workspace}-nodepool
     spec:
       template:
         spec:
@@ -58,18 +58,18 @@ resource "kubectl_manifest" "nodepool_custom_networking" {
               values: ["c", "m", "r"]
             - key: eks.amazonaws.com/instance-generation
               operator: Gt
-              values: ["4"]
+              values: ["3"]
 
             - key: topology.kubernetes.io/zone
               operator: In
               values: ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
             - key: "eks.amazonaws.com/instance-cpu"
               operator: In
-              values: ["4", "8", "16", "32"]
+              values: ["16", "32"]
           nodeClassRef:
             group: eks.amazonaws.com
             kind: NodeClass
-            name: custom-networking
+            name: ${terraform.workspace}-nodeclass
         metadata:
           labels:
             Terraform: "true"
@@ -80,20 +80,18 @@ resource "kubectl_manifest" "nodepool_custom_networking" {
         consolidationPolicy: WhenEmptyOrUnderutilized
         consolidateAfter: 60s
       limits:
-        cpu: "100"
-        memory: 400Gi
-        nodes: 100
+        nodes: 50
   YAML
 
-  depends_on = [kubectl_manifest.nodeclass_custom_networking]
+  depends_on = [kubectl_manifest.default_nodeclass]
 }
 
-resource "kubectl_manifest" "nodepool_custom_networking" {
+resource "kubectl_manifest" "system_nodepool" {
   yaml_body = <<-YAML
     apiVersion: karpenter.sh/v1
     kind: NodePool
     metadata:
-      name: system-nodepool
+      name: ${terraform.workspace}-system-nodepool
     spec:
       template:
         spec:
@@ -109,14 +107,14 @@ resource "kubectl_manifest" "nodepool_custom_networking" {
               values: ["c", "m", "r"]
             - key: eks.amazonaws.com/instance-generation
               operator: Gt
-              values: ["4"]
+              values: ["3"]
 
           nodeClassRef:
             group: eks.amazonaws.com
             kind: NodeClass
-            name: custom-networking
+            name: ${terraform.workspace}-nodeclass
           taints:
-            - key: monitoring-node
+            - key: system-node
               value: "true"
               effect: NoSchedule
         metadata:
@@ -132,5 +130,5 @@ resource "kubectl_manifest" "nodepool_custom_networking" {
         nodes: 10
   YAML
 
-  depends_on = [kubectl_manifest.nodeclass_custom_networking]
+  depends_on = [kubectl_manifest.default_nodeclass]
 }
