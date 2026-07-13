@@ -49,14 +49,14 @@ resource "aws_security_group" "ecs_linotp3" {
 
   name_prefix = "${local.application_name}-${local.environment}-ecs-linotp3-"
   description = "ECS Fargate tasks: LinOTP 3.x (port 80) + FreeRADIUS (1812/1813 UDP)"
-  vpc_id      = data.terraform_remote_state.workspace_components.outputs.vpc_id
+  vpc_id      = aws_vpc.workspaces[0].id
 
   ingress {
     description     = "LinOTP HTTP from ALB"
     from_port       = 5000
     to_port         = 5000
     protocol        = "tcp"
-    security_groups = [data.terraform_remote_state.workspace_components.outputs.radius_alb_security_group_id]
+    security_groups = [aws_security_group.radius_alb[0].id]
   }
 
   ingress {
@@ -64,7 +64,7 @@ resource "aws_security_group" "ecs_linotp3" {
     from_port   = 1812
     to_port     = 1812
     protocol    = "udp"
-    cidr_blocks = [data.terraform_remote_state.workspace_components.outputs.vpc_cidr_block]
+    cidr_blocks = [aws_vpc.workspaces[0].cidr_block]
   }
 
   ingress {
@@ -72,7 +72,7 @@ resource "aws_security_group" "ecs_linotp3" {
     from_port   = 1813
     to_port     = 1813
     protocol    = "udp"
-    cidr_blocks = [data.terraform_remote_state.workspace_components.outputs.vpc_cidr_block]
+    cidr_blocks = [aws_vpc.workspaces[0].cidr_block]
   }
 
   egress {
