@@ -30,10 +30,10 @@ resource "kubectl_manifest" "nodeclass_custom_networking" {
         - tags:
             aws:eks:cluster-name: "${local.cluster_name}"
 
-      # tags:
-      #   default_ng: "true"
-      #   application: "moj-cloud-platform"
-      #   business-unit: "platforms"
+      tags:
+        default_ng: "true"
+        application: "moj-cloud-platform"
+        business-unit: "platforms"
   YAML
 }
 
@@ -42,7 +42,7 @@ resource "kubectl_manifest" "nodepool_custom_networking" {
     apiVersion: karpenter.sh/v1
     kind: NodePool
     metadata:
-      name: custom-networking
+      name: application-default-nodepool
     spec:
       template:
         spec:
@@ -83,6 +83,53 @@ resource "kubectl_manifest" "nodepool_custom_networking" {
         cpu: "100"
         memory: 400Gi
         nodes: 100
+  YAML
+
+  depends_on = [kubectl_manifest.nodeclass_custom_networking]
+}
+
+resource "kubectl_manifest" "nodepool_custom_networking" {
+  yaml_body = <<-YAML
+    apiVersion: karpenter.sh/v1
+    kind: NodePool
+    metadata:
+      name: system-nodepool
+    spec:
+      template:
+        spec:
+          requirements:
+            - key: karpenter.sh/capacity-type
+              operator: In
+              values: ["on-demand"]
+            - key: kubernetes.io/arch
+              operator: In
+              values: ["amd64"]
+            - key: eks.amazonaws.com/instance-category
+              operator: In
+              values: ["c", "m", "r"]
+            - key: eks.amazonaws.com/instance-generation
+              operator: Gt
+              values: ["4"]
+
+          nodeClassRef:
+            group: eks.amazonaws.com
+            kind: NodeClass
+            name: custom-networking
+          taints:
+            - key: monitoring-node
+              value: "true"
+              effect: NoSchedule
+        metadata:
+          labels:
+            Terraform: "true"
+            "cloud-platform.justice.gov.uk/system-ng": "true"
+            Cluster: "${terraform.workspace}"
+            Domain: "${terraform.workspace}.container-platform.service.justice.gov.uk"
+      disruption:
+        consolidationPolicy: WhenEmptyOrUnderutilized
+        consolidateAfter: 60s
+      limits:
+        nodes: 10
   YAML
 
   depends_on = [kubectl_manifest.nodeclass_custom_networking]
