@@ -176,10 +176,10 @@ resource "aws_ecs_task_definition" "linotp3" {
       environment = [
         { name = "LINOTP_DB_HOST", value = aws_db_instance.linotp3[0].address },
         { name = "LINOTP_DB_USER", value = "linotp" },
-        # AD LDAP configuration - uses AWS Managed Microsoft AD DNS endpoints
+        # AD LDAP configuration - uses existing lambda.workspace service account
         { name = "AD_LDAP_URI", value = "ldap://${local.application_data.accounts[local.environment].ad_directory_name}:389" },
         { name = "AD_BASE_DN", value = "DC=laa-workspaces,DC=local" },
-        { name = "AD_BIND_DN", value = "CN=linotp-svc,OU=Service Accounts,DC=laa-workspaces,DC=local" },
+        { name = "AD_BIND_DN", value = "CN=lambda.workspace,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local" },
         { name = "AD_USER_FILTER", value = "(&(sAMAccountName=%s)(objectClass=user))" },
         { name = "AD_SEARCH_FILTER", value = "(sAMAccountName=*)" },
         { name = "LINOTP_RESOLVER_NAME", value = "ad-resolver" },

@@ -6,6 +6,7 @@ Quick reference for deploying automated LinOTP configuration.
 
 - [ ] Review `LINOTP-AUTOMATION.md` for detailed setup instructions
 - [ ] Verify AWS Managed Microsoft AD is deployed and healthy
+- [ ] Verify `lambda.workspace` service account exists in AD (already created for user-creation.ps1)
 - [ ] Confirm ECS cluster and service are running
 - [ ] Confirm RDS MySQL instance is accessible
 
@@ -43,58 +44,21 @@ git push origin <branch-name>
 ### 2. Verify Terraform Deployment
 
 ```bash
-# Check secret was created
+# Check secret was created (mirrors lambda.workspace password from SSM)
 aws secretsmanager describe-secret \
   --secret-id laa-workspaces/development/linotp-ad-bind-password \
   --region eu-west-2 \
   --profile mp-workspaces-dev \
   --no-cli-pager
-```
 
-### 3. Create AD Service Account
-
-**Get the password from Secrets Manager:**
-```bash
-aws secretsmanager get-secret-value \
-  --secret-id laa-workspaces/development/linotp-ad-bind-password \
+# Verify it matches SSM parameter
+aws ssm get-parameter \
+  --name /laa-workspaces/development/ad-service-account-password \
+  --with-decryption \
   --region eu-west-2 \
   --profile mp-workspaces-dev \
-  --query SecretString \
-  --output text \
   --no-cli-pager
 ```
-
-**Create service account in Active Directory:**
-
-Option A - Via PowerShell on domain-joined Windows machine:
-```powershell
-# Connect to domain controller via RDP or remote PowerShell
-# Create OU (if not exists)
-New-ADOrganizationalUnit -Name "Service Accounts" -Path "DC=laa-workspaces,DC=local"
-
-# Create service account
-New-ADUser -Name "linotp-svc" `
-  -SamAccountName "linotp-svc" `
-  -UserPrincipalName "linotp-svc@laa-workspaces.local" `
-  -Path "OU=Service Accounts,DC=laa-workspaces,DC=local" `
-  -AccountPassword (ConvertTo-SecureString "<PASSWORD-FROM-ABOVE>" -AsPlainText -Force) `
-  -Enabled $true `
-  -PasswordNeverExpires $true `
-  -CannotChangePassword $true `
-  -Description "LinOTP LDAP service account for MFA authentication"
-
-# Verify
-Get-ADUser -Identity "linotp-svc" -Properties *
-```
-
-Option B - Via AWS Directory Service Console:
-1. Navigate to Directory Service console
-2. Select `laa-workspaces.local` directory
-3. Go to "Users and computers"
-4. Create OU: `Service Accounts`
-5. Create user: `linotp-svc` with password from Secrets Manager
-
-### 4. Build and Push Docker Image
 
 ```bash
 cd dockerfiles/linotp3
@@ -114,7 +78,7 @@ docker tag laa-workspaces/linotp3:latest \
 docker push 945484575162.dkr.ecr.eu-west-2.amazonaws.com/laa-workspaces/linotp3:latest
 ```
 
-### 5. Deploy to ECS
+### 3. Build and Push Docker Image
 
 ```bash
 aws ecs update-service \
@@ -126,7 +90,7 @@ aws ecs update-service \
   --no-cli-pager
 ```
 
-### 6. Monitor Deployment
+### 4. Deploy to ECS
 
 Watch CloudWatch Logs for configuration progress:
 
@@ -162,7 +126,7 @@ Self-service policy 'selfservice_portal' created successfully
 ✅ LinOTP configuration completed successfully
 ```
 
-### 7. Verify Configuration in Portal
+### 5. Monitor Deployment
 
 ```bash
 # Open portal
@@ -190,7 +154,7 @@ aws secretsmanager get-secret-value \
 - [ ] Navigate to **Config > Realms** → See "laa-workspaces" (default)
 - [ ] Navigate to **Config > Policies** → See 3 policies
 
-### 8. Test Token Enrollment
+### 6. Verify Configuration in Portal
 
 1. Navigate to self-service portal:
    ```
@@ -203,7 +167,7 @@ aws secretsmanager get-secret-value \
 
 4. Test authentication
 
-## 🔍 Troubleshooting
+### 7. Test Token Enrollment
 
 ### Configuration Failed - Check Logs
 
@@ -243,15 +207,17 @@ aws ecs execute-command \
 
 ### AD Service Account Issues
 
-Verify account exists:
+Verify `lambda.workspace` account exists and is enabled:
 ```powershell
-Get-ADUser -Identity "linotp-svc" -Properties *
+Get-ADUser -Identity "lambda.workspace" -Properties Enabled,PasswordNeverExpires
 ```
 
-Test authentication:
+Test authentication with the service account:
 ```powershell
-$password = ConvertTo-SecureString "<PASSWORD>" -AsPlainText -Force
-$credential = New-Object System.Management.Automation.PSCredential("laa-workspaces\linotp-svc", $password)
+# Get password from SSM
+$password = (Get-SSMParameterValue -Name "/laa-workspaces/development/ad-service-account-password" -WithDecryption $true -Region eu-west-2).Parameters[0].Value
+$securePassword = ConvertTo-SecureString $password -AsPlainText -Force
+$credential = New-Object System.Management.Automation.PSCredential("LAAWORKSPACES\lambda.workspace", $securePassword)
 
 # This should succeed
 Get-ADUser -Identity "Administrator" -Credential $credential
