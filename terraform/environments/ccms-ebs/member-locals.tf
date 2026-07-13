@@ -37,6 +37,11 @@ locals {
     sha256(file("${path.module}/lambda/cloudwatch_alarm_slack_integration/${f}"))
   ]
 
+  lambda_source_hashes_cloudwatch_slack_integration_v2 = [
+    for f in fileset("./lambda/cloudwatch-slack-integration-v2", "**") :
+    sha256(file("${path.module}/lambda/cloudwatch-slack-integration-v2/${f}"))
+  ]
+
   lambda_source_hashes_payment_load_monitor = [
     for f in fileset("./lambda/payment_load_monitor", "**") :
     sha256(file("${path.module}/lambda/payment_load_monitor/${f}"))
