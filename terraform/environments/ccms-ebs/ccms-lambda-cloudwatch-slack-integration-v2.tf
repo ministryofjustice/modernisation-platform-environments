@@ -107,7 +107,7 @@ resource "aws_lambda_function" "cloudwatch_slack_integration_v2" {
   })
 }
 
-resource "aws_lambda_permission" "allow_sns_invoke" {
+resource "aws_lambda_permission" "allow_sns_invoke_v2" {
   statement_id  = "AllowExecutionFromSNS"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudwatch_slack_integration_v2.function_name
@@ -115,7 +115,7 @@ resource "aws_lambda_permission" "allow_sns_invoke" {
   source_arn    = aws_sns_topic.cw_alerts.arn
 }
 
-resource "aws_lambda_permission" "allow_s3_sns_invoke" {
+resource "aws_lambda_permission" "allow_s3_sns_invoke_v2" {
   statement_id  = "AllowExecutionFromS3SNSTopic"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudwatch_slack_integration_v2.function_name
@@ -123,7 +123,7 @@ resource "aws_lambda_permission" "allow_s3_sns_invoke" {
   source_arn    = aws_sns_topic.s3_topic.arn
 }
 
-resource "aws_lambda_permission" "allow_ddos_sns_invoke" {
+resource "aws_lambda_permission" "allow_ddos_sns_invoke_v2" {
   statement_id  = "AllowExecutionFromDDoSSNSTopic"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudwatch_slack_integration_v2.function_name
@@ -131,7 +131,7 @@ resource "aws_lambda_permission" "allow_ddos_sns_invoke" {
   source_arn    = aws_sns_topic.ddos_alarm.arn
 }
 
-resource "aws_lambda_permission" "allow_sns_invoke_guardduty" {
+resource "aws_lambda_permission" "allow_sns_invoke_guardduty_v2" {
   statement_id  = "AllowExecutionFromGuardDutySNS"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudwatch_slack_integration_v2.function_name
@@ -139,7 +139,7 @@ resource "aws_lambda_permission" "allow_sns_invoke_guardduty" {
   source_arn    = aws_sns_topic.guardduty_alerts.arn
 }
 
-resource "aws_lambda_permission" "allow_eventbridge_invoke" {
+resource "aws_lambda_permission" "allow_eventbridge_invoke_v2" {
   statement_id  = "AllowExecutionFromEventBridge"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudwatch_slack_integration_v2.function_name
