@@ -34,42 +34,17 @@ LinOTP fully configured ✅
 
 ## Prerequisites
 
-### 1. Active Directory Service Account
+### ✅ Using Existing Service Account
 
-Create a service account in Active Directory for LinOTP LDAP queries:
+**Good news!** LinOTP will use the existing `lambda.workspace` service account that's already deployed for user creation. No additional AD account creation is needed.
 
-```powershell
-# Connect to AD Domain Controller
-# Create service account
-New-ADUser -Name "linotp-svc" `
-  -SamAccountName "linotp-svc" `
-  -UserPrincipalName "linotp-svc@laa-workspaces.local" `
-  -Path "OU=Service Accounts,DC=laa-workspaces,DC=local" `
-  -AccountPassword (ConvertTo-SecureString "USE-SECRET-FROM-SECRETS-MANAGER" -AsPlainText -Force) `
-  -Enabled $true `
-  -PasswordNeverExpires $true `
-  -CannotChangePassword $true
+**Service Account Details:**
+- Username: `lambda.workspace`
+- Domain: `LAAWORKSPACES`
+- Bind DN: `CN=lambda.workspace,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local`
+- Password: Stored in SSM Parameter Store at `/laa-workspaces/development/ad-service-account-password`
 
-# Grant read permissions (default Domain Users is sufficient)
-# No special permissions needed - service account only reads user objects
-```
-
-**Get the password from Secrets Manager:**
-```bash
-aws secretsmanager get-secret-value \
-  --secret-id laa-workspaces/development/linotp-ad-bind-password \
-  --region eu-west-2 \
-  --profile mp-workspaces-dev \
-  --query SecretString \
-  --output text \
-  --no-cli-pager
-```
-
-### 2. Create Service Accounts OU (if not exists)
-
-```powershell
-New-ADOrganizationalUnit -Name "Service Accounts" -Path "DC=laa-workspaces,DC=local"
-```
+This account already has the necessary permissions to read AD user objects, which is all LinOTP needs for LDAP authentication.
 
 ## Deployment Process
 
@@ -104,11 +79,7 @@ docker tag laa-workspaces/linotp3:latest 945484575162.dkr.ecr.eu-west-2.amazonaw
 docker push 945484575162.dkr.ecr.eu-west-2.amazonaws.com/laa-workspaces/linotp3:latest
 ```
 
-### 3. Create AD Service Account
-
-Follow the steps in **Prerequisites > 1. Active Directory Service Account** above.
-
-### 4. Deploy New ECS Task
+### 2. Build and Push Docker Image
 
 ```bash
 aws ecs update-service \
@@ -120,7 +91,7 @@ aws ecs update-service \
   --no-cli-pager
 ```
 
-### 5. Verify Configuration
+### 3. Deploy New ECS Task
 
 Watch CloudWatch Logs for configuration progress:
 
@@ -151,7 +122,7 @@ Creating self-service policy 'selfservice_portal'...
 ✅ LinOTP configuration completed successfully
 ```
 
-### 6. Test Configuration
+### 4. Verify Configuration
 
 ```bash
 # Login to LinOTP portal
@@ -180,11 +151,13 @@ Name: ad-resolver
 Type: LDAP
 URI: ldap://laa-workspaces.local:389
 Base DN: DC=laa-workspaces,DC=local
-Bind DN: CN=linotp-svc,OU=Service Accounts,DC=laa-workspaces,DC=local
+Bind DN: CN=lambda.workspace,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local
 User Filter: (&(sAMAccountName=%s)(objectClass=user))
 Search Filter: (sAMAccountName=*)
 Login Attribute: sAMAccountName
 ```
+
+**Note:** Uses existing `lambda.workspace` service account - no new AD account required.
 
 ### Realm Configuration
 
@@ -281,10 +254,15 @@ aws logs tail /aws/ecs/laa-workspaces-development-linotp3 \
 ### LDAP Connection Failures
 
 Verify:
-1. Service account exists in AD
-2. Service account password matches secret
+1. `lambda.workspace` service account exists and is enabled in AD
+2. Service account password in SSM matches AD
 3. AD is accessible from ECS tasks (check security groups)
 4. Domain name resolves from ECS (should use AWS Managed AD DNS)
+
+Verify service account:
+```powershell
+Get-ADUser -Identity "lambda.workspace" -Properties Enabled
+```
 
 Test DNS resolution:
 ```bash
