@@ -2,6 +2,17 @@
 
 This document explains the automated LinOTP configuration system that runs after ECS deployment.
 
+## ⚠️ Important: Deployment Order
+
+**LinOTP requires Active Directory to be deployed first!**
+
+The automated configuration connects to AD for LDAP queries, so:
+1. **First:** Deploy Active Directory (parent module)
+2. **Then:** Deploy LinOTP ECS (workspace-components) with `ENABLE_AUTO_CONFIG=false`
+3. **Finally:** Enable auto-config by setting `ENABLE_AUTO_CONFIG=true` and redeploying
+
+See **LINOTP-DEPLOYMENT-ORDER.md** for detailed deployment strategy.
+
 ## Overview
 
 The automated configuration system eliminates manual LinOTP setup by:
