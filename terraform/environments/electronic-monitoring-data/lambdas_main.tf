@@ -1258,7 +1258,7 @@ resource "aws_lambda_function_url" "serco_fms_claim_page" {
   function_name = module.serco_fms_claim_page.lambda_function_name
 
   authorization_type = "NONE"
-  invoke_mode        = "BUFFERED"
+  invoke_mode         = "BUFFERED"
 }
 
 
