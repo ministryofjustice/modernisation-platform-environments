@@ -7,8 +7,7 @@ module "eventbridge_default_bus" {
   create_log_delivery        = false
   create_log_delivery_source = false
   append_rule_postfix        = false
-  role_name                  = "${local.application_name}-incoming-s3"
-  attach_policy_statements   = true
+  create_role                = false
 
   rules = {
     "incoming-s3-object-created" = {
@@ -28,25 +27,14 @@ module "eventbridge_default_bus" {
   targets = {
     "incoming-s3-object-created" = [
       {
-        name              = "file-received-v1"
-        arn               = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
-        attach_role_arn   = true
-        input_transformer = local.file_received_transformer
+        name = "file-received-v1"
+        arn  = module.lambda_file_received_adapter.lambda_function_arn
       }
     ]
   }
 
-  policy_statements = {
-    publish_file_received_events = {
-      effect    = "Allow"
-      actions   = ["events:PutEvents"]
-      resources = [module.eventbridge_file_transfer_bus.eventbridge_bus_arn]
-    }
-  }
-
   tags = local.tags
 }
-
 
 module "eventbridge_file_transfer_bus" {
   source  = "terraform-aws-modules/eventbridge/aws"
