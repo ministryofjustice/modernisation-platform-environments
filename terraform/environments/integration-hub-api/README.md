@@ -4,7 +4,7 @@ This environment is the active Modernisation Platform home for the Integration H
 
 The Lambda application code, OpenAPI contract, and API request collections live in the companion repository `ministryofjustice/integration-hub-file-transfer-api`.
 
-For local Terraform work, clone that repository alongside this one so the default source-path lookup resolves `../integration-hub-file-transfer-api`. In GitHub Actions, the `integration-hub-api` workflow checks the companion repository out automatically before Terraform plan/apply.
+This repository now stays infrastructure-only. Terraform creates the API Gateway, IAM, DynamoDB, and bootstrap Lambda resources here; the companion repository owns deployment of the real Lambda code through a separate app workflow using GitHub OIDC into the member account.
 
 It protects the API with:
 
@@ -26,13 +26,6 @@ It protects the API with:
 
 ## Terraform commands
 
-Before running Terraform for this component locally, make sure the application repository is available next to this repository:
-
-```bash
-cd ..
-git clone git@github.com:ministryofjustice/integration-hub-file-transfer-api.git
-```
-
 Apply the Managed File Transfer stack first so it creates the SSM parameters for the upload bucket consumed by this stack:
 
 ```bash
@@ -47,9 +40,11 @@ Then initialise and plan the API platform stack from its new owning environment:
 ```bash
 cd terraform/environments/integration-hub-api
 terraform init -reconfigure
-terraform workspace select integration-hub-api-development
+terraform workspace select integration-hub-development
 terraform plan
 ```
+
+Phase 1 note: this environment currently uses the legacy `integration-hub/api-platform` backend path and workspace name to avoid a disruptive state migration during the repo split. The state cutover steps are documented in [STATE_MIGRATION.md](STATE_MIGRATION.md).
 
 ## Authentication configuration
 
@@ -114,5 +109,7 @@ scripts/bootstrap-api-credentials.sh system --secret-id integration-hub-api-plat
 The source contract is documented in the companion repository's `openapi.yaml`.
 
 The companion repository also contains the Lambda unit tests and Bruno request collection used to exercise the API.
+
+After Terraform creates or updates the infrastructure here, deploy the real Lambda application code from `integration-hub-file-transfer-api` using the dedicated OIDC role exposed as `terraform output app_deploy_role_arn`. Until that app workflow runs, the API Lambdas return bootstrap `503` responses.
 
 For the legacy-state cutover from `terraform/environments/integration-hub/api-platform`, see [STATE_MIGRATION.md](STATE_MIGRATION.md).

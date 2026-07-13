@@ -38,6 +38,20 @@ output "multipart_uploads_table_name" {
   value       = module.dynamodb_multipart_uploads.dynamodb_table_id
 }
 
+output "lambda_function_names" {
+  description = "Lambda function names for the app-owned deployment workflow"
+  value = {
+    api_docs      = module.lambda_api_docs.lambda_function_name
+    authorizer    = module.lambda_api_authorizer.lambda_function_name
+    upload_ticket = module.lambda_upload_ticket.lambda_function_name
+  }
+}
+
+output "app_deploy_role_arn" {
+  description = "IAM role ARN for the companion repository GitHub Actions deployment workflow"
+  value       = aws_iam_role.app_deploy.arn
+}
+
 output "user_auth_secret_names" {
   description = "HTTPS upload credential secret names keyed by username"
   value = {

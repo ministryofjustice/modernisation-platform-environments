@@ -6,7 +6,7 @@ module "lambda_upload_ticket" {
   description                  = "Generates presigned S3 upload URLs for managed file transfer clients"
   handler                      = "lambda_function.lambda_handler"
   runtime                      = "python3.12"
-  source_path                  = "${local.api_code_root}/lambda/request-upload-ticket"
+  source_path                  = "${local.bootstrap_code_root}/request-upload-ticket"
   trigger_on_package_timestamp = false
 
   environment_variables = {
@@ -83,7 +83,7 @@ module "lambda_api_authorizer" {
   description                  = "Authenticates and authorises MFT API callers"
   handler                      = "lambda_function.lambda_handler"
   runtime                      = "python3.12"
-  source_path                  = "${local.api_code_root}/lambda/request-authorizer"
+  source_path                  = "${local.bootstrap_code_root}/request-authorizer"
   trigger_on_package_timestamp = false
 
   environment_variables = {
@@ -146,19 +146,15 @@ module "lambda_api_docs" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.8.0"
 
-  function_name = "${local.resource_name_prefix}-docs"
-  description   = "Serves the protected Swagger UI and OpenAPI contract for the MFT API"
-  handler       = "lambda_function.lambda_handler"
-  runtime       = "python3.12"
-  # Keep packaging deterministic in CI; the workflow now prebuilds archives before apply.
+  function_name                = "${local.resource_name_prefix}-docs"
+  description                  = "Serves the protected Swagger UI and OpenAPI contract for the MFT API"
+  handler                      = "lambda_function.lambda_handler"
+  runtime                      = "python3.12"
   trigger_on_package_timestamp = false
   environment_variables = {
     DOCS_BASIC_AUTH_SECRET_ID = module.api_docs_basic_auth_secret.secret_name
   }
-  source_path = [
-    "${local.api_code_root}/lambda/request-docs",
-    "${local.api_code_root}/openapi.yaml",
-  ]
+  source_path = "${local.bootstrap_code_root}/request-docs"
 
   attach_policy_statements = true
   policy_statements = {

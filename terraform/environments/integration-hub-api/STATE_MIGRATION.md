@@ -8,7 +8,7 @@ to the new owning environment:
 
 - `terraform/environments/integration-hub-api`
 
-It assumes the application code already lives in `ministryofjustice/integration-hub-file-transfer-api` and that the Terraform configuration in `integration-hub-api` is the active source of truth.
+It assumes the companion repository `ministryofjustice/integration-hub-file-transfer-api` owns the live Lambda application code and that the Terraform configuration in `integration-hub-api` is the active infrastructure source of truth.
 
 ## What moves
 
@@ -30,14 +30,7 @@ The resource addresses inside the state do not need to change because the copied
 
 1. Pause any manual applies for both `integration-hub` and `integration-hub-api`.
 2. Do not merge or apply any further changes to the legacy `terraform/environments/integration-hub/api-platform` stack during the migration window.
-3. Ensure the new companion application repository is cloned locally next to this repository:
-
-```bash
-cd ..
-git clone git@github.com:ministryofjustice/integration-hub-file-transfer-api.git
-```
-
-4. Ensure you are authenticated for the target AWS account:
+3. Ensure you are authenticated for the target AWS account:
 
 ```bash
 AWS_PROFILE=integration-hub-development aws sts get-caller-identity --region eu-west-2

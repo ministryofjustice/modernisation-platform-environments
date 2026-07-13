@@ -8,7 +8,7 @@ This component provides a thin API layer for Managed File Transfer uploads.
 
 The infrastructure for this component stays in `modernisation-platform-environments`, but the Lambda application code, OpenAPI contract, and API request collections now live in the companion repository `ministryofjustice/integration-hub-file-transfer-api`.
 
-For local Terraform work, clone that repository alongside this one so the default source-path lookup resolves `../integration-hub-file-transfer-api`.
+This environments repository now stays infrastructure-only. The Terraform here creates bootstrap Lambda resources only; the companion repository owns deployment of the real Lambda code through a separate app workflow.
 
 It now protects the API with:
 
@@ -104,13 +104,6 @@ It now protects the API with:
 ```
 
 ## Terraform commands
-
-Before running Terraform for this component locally, make sure the application repository is available next to this repository:
-
-```bash
-cd ..
-git clone git@github.com:ministryofjustice/integration-hub-file-transfer-api.git
-```
 
 Apply the Managed File Transfer stack first so it creates the SSM parameters for the upload bucket (consumed by this stack):
 

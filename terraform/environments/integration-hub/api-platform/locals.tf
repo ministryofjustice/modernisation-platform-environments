@@ -1,14 +1,6 @@
 locals {
-  api_configuration = try(local.application_data.accounts[local.environment].api_configuration, {})
-  api_code_root_candidates = [
-    abspath("${path.module}/../../../../../integration-hub-file-transfer-api"),
-    abspath("${path.module}/../../../../.linked-repos/integration-hub-file-transfer-api"),
-  ]
-  api_code_root_matches = [
-    for candidate in local.api_code_root_candidates : candidate
-    if fileexists("${candidate}/openapi.yaml")
-  ]
-  api_code_root = length(local.api_code_root_matches) > 0 ? local.api_code_root_matches[0] : error("Cannot find integration-hub-file-transfer-api (openapi.yaml) in any of: ${join(", ", local.api_code_root_candidates)}")
+  api_configuration   = try(local.application_data.accounts[local.environment].api_configuration, {})
+  bootstrap_code_root = "${path.module}/bootstrap-lambdas"
   api_docs_configuration = merge(
     {
       basic_auth_username = "api-docs"
