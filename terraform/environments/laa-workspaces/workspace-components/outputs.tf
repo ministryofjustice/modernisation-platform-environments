@@ -64,6 +64,11 @@ output "network_firewall_endpoint_ids" {
 ### RADIUS Server Outputs
 ##############################################
 
+output "radius_alb_security_group_id" {
+  description = "Security group ID for RADIUS ALB"
+  value       = try(aws_security_group.radius_alb[0].id, null)
+}
+
 output "radius_server_security_group_id" {
   description = "Security group ID for RADIUS servers"
   value       = try(aws_security_group.radius_server[0].id, null)
@@ -121,6 +126,21 @@ output "ses_sender_email" {
 ### ECS / LinOTP 3.x Outputs
 ##############################################
 
+output "ecs_cluster_id" {
+  description = "ECS cluster ID"
+  value       = try(aws_ecs_cluster.workspaces[0].id, null)
+}
+
+output "ecs_cluster_name" {
+  description = "ECS cluster name"
+  value       = try(aws_ecs_cluster.workspaces[0].name, null)
+}
+
+output "ecs_cloudwatch_log_group_name" {
+  description = "CloudWatch log group name for ECS"
+  value       = try(aws_cloudwatch_log_group.ecs_linotp3[0].name, null)
+}
+
 output "ecr_linotp3_repository_url" {
   description = "ECR repository URL for LinOTP 3.x image"
   value       = try(aws_ecr_repository.linotp3[0].repository_url, null)
@@ -131,27 +151,34 @@ output "ecr_freeradius_repository_url" {
   value       = try(aws_ecr_repository.freeradius_linotp[0].repository_url, null)
 }
 
-output "ecs_cluster_name" {
-  description = "ECS cluster name"
-  value       = try(aws_ecs_cluster.workspaces[0].name, null)
+output "radius_alb_listener_https_arn" {
+  description = "RADIUS ALB HTTPS listener ARN"
+  value       = try(aws_lb_listener.radius_https[0].arn, null)
 }
 
-output "ecs_linotp3_service_name" {
-  description = "ECS service name for LinOTP 3.x + FreeRADIUS"
-  value       = try(aws_ecs_service.linotp3[0].name, null)
+output "radius_alb_dns_name" {
+  description = "RADIUS ALB DNS name"
+  value       = try(aws_lb.radius_portal[0].dns_name, null)
 }
 
-output "rds_linotp3_endpoint" {
-  description = "RDS MySQL endpoint for LinOTP 3.x"
-  value       = try(aws_db_instance.linotp3[0].address, null)
+output "radius_alb_zone_id" {
+  description = "RADIUS ALB zone ID for Route53 alias"
+  value       = try(aws_lb.radius_portal[0].zone_id, null)
 }
 
-output "nlb_radius_ecs_dns_name" {
-  description = "Internal NLB DNS name for ECS FreeRADIUS — use this to switch Directory Service RADIUS when ready"
-  value       = try(aws_lb.radius_ecs[0].dns_name, null)
+output "radius_nlb_target_group_arn" {
+  description = "RADIUS NLB target group ARN for ECS"
+  value       = try(aws_lb_target_group.radius_ecs[0].arn, null)
 }
 
-output "linotp3_portal_url" {
-  description = "URL of the LinOTP 3.x MFA portal (ECS parallel deployment)"
-  value       = try("https://workspace-mfa-ecs.${trimsuffix(data.aws_route53_zone.external.name, ".")}", null)
+output "radius_shared_secret_arn" {
+  description = "ARN of the RADIUS shared secret"
+  value       = try(aws_secretsmanager_secret.radius_shared_secret[0].arn, null)
+  sensitive   = true
+}
+
+output "linotp_admin_password_arn" {
+  description = "ARN of the LinOTP admin password"
+  value       = try(aws_secretsmanager_secret.linotp_admin_password[0].arn, null)
+  sensitive   = true
 }
