@@ -229,7 +229,7 @@ resource "aws_security_group_rule" "ecs_tasks_managed_egress_all" {
 
 #--Cluster EC2 Instances
 resource "aws_security_group" "cluster_ec2" {
-  name        = "${local.component_name}-cluster-ec2-security-group"
+  name        = "${local.application_data.accounts[local.environment].app_name}-cluster-ec2-security-group"
   description = "controls access to the cluster ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
 }
