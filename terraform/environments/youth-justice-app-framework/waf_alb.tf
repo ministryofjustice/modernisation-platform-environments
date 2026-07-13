@@ -13,13 +13,18 @@ module "waf" {
     aws.us-east-1 = aws.us-east-1
   }
 
-  waf_path_allow_rules = {
+  waf_header_allow_rules = {
     "allow-malware-notifier" = {
       name     = "allow-malware-notifier"
       priority = 1
-      path     = "/secure/api/v1/docs/threatDetected"
+      paths = [
+        "/secure/api/v1/auth",
+        "/secure/api/v1/docs/threatDetected"
+      ]
     }
   }
+  waf_header_allow_header_name  = "X-Internal-Service"
+  waf_header_allow_header_value = local.internal_service_token
 
   waf_IP_rules = {
     "Cloudfront" = {
