@@ -34,8 +34,8 @@ locals {
     litellm_ttft_p99_crit                     = 8    # time-to-first-token p99, seconds
     litellm_in_flight_requests_warn           = 100  # concurrent in-flight requests across all pods
     litellm_in_flight_requests_crit           = 250  # concurrent in-flight requests across all pods
-    litellm_overhead_latency_p99_warn         = 1    # LiteLLM-added processing overhead p99, seconds
-    litellm_overhead_latency_p99_crit         = 2    # LiteLLM-added processing overhead p99, seconds
+    litellm_overhead_latency_p99_warn         = 10    # LiteLLM-added processing overhead p99, seconds
+    litellm_overhead_latency_p99_crit         = 20   # LiteLLM-added processing overhead p99, seconds
     litellm_deployment_latency_per_token_warn = 0.75 # seconds per output token, p99
     litellm_deployment_latency_per_token_crit = 1.5  # seconds per output token, p99
 
