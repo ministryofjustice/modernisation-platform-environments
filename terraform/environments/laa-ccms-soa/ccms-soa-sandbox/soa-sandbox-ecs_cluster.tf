@@ -183,11 +183,11 @@ resource "aws_ecs_task_definition" "soasandbox-managed" {
       aws_region            = local.application_data.accounts[local.environment].aws_region
       container_version     = local.application_data.accounts[local.environment].managed_container_version
       admin_host            = aws_route53_record.admin-sandbox.fqdn
-      soa_password          = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:admin_server_password::"
-      extra_java_properties = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:extra_java_properties::"
-      keystorePassword      = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:keystorePassword::"
-      truststorePassword    = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:truststorePassword::"
-      slack_channel_webhook = "${aws_secretsmanager_secret.soa_sandbox_secrets.arn}:slack_channel_webhook::"
+      soa_password          = "${data.aws_secretsmanager_secret.soa_sandbox_secrets.arn}:admin_server_password::"
+      extra_java_properties = "${data.aws_secretsmanager_secret.soa_sandbox_secrets.arn}:extra_java_properties::"
+      keystorePassword      = "${data.aws_secretsmanager_secret.soa_sandbox_secrets.arn}:keystorePassword::"
+      truststorePassword    = "${data.aws_secretsmanager_secret.soa_sandbox_secrets.arn}:truststorePassword::"
+      slack_channel_webhook = "${data.aws_secretsmanager_secret.soa_sandbox_secrets.arn}:slack_channel_webhook::"
       ms_hostname           = aws_route53_record.managed-sandbox.fqdn
       wl_mem_args           = local.application_data.accounts[local.environment].managed_wl_mem_args
     }
