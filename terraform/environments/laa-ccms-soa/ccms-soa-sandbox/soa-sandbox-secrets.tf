@@ -4,7 +4,8 @@ resource "aws_secretsmanager_secret" "soa_sandbox_secrets" {
 }
 
 resource "aws_secretsmanager_secret_version" "sandbox_ccms_soa_secrets_version" {
-  secret_id = aws_secretsmanager_secret.soa_sandbox_secrets.id
+  # Updated to use the data source ID
+  secret_id = data.aws_secretsmanager_secret.soa_sandbox_secrets.id
 
   secret_string = jsonencode({
     slack_channel_webhook                 = "",
@@ -32,7 +33,8 @@ resource "aws_secretsmanager_secret_version" "sandbox_ccms_soa_secrets_version" 
 }
 
 data "aws_secretsmanager_secret_version" "soa_password" {
-  secret_id = aws_secretsmanager_secret.soa_sandbox_secrets.id
+  # Updated to use the data source ID
+  secret_id = data.aws_secretsmanager_secret.soa_sandbox_secrets.id
 }
 
 # resource "aws_secretsmanager_secret" "xxsoa_sandbox_ds_password" {

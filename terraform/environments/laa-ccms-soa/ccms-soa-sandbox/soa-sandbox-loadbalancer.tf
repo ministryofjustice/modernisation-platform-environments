@@ -58,7 +58,7 @@ resource "aws_lb_listener" "admin443" {
 resource "aws_lb_listener" "admin_ssl_port" {
   load_balancer_arn = aws_lb.admin.id
   port              = local.application_data.accounts[local.environment].admin_ssl_port
-  protocol          = "TCP"
+  protocol          = "TLS"
 
   default_action {
     target_group_arn = aws_lb_target_group.admin_https.id
@@ -124,7 +124,7 @@ resource "aws_lb_listener" "managed443" {
 resource "aws_lb_listener" "managed_ssl_port" {
   load_balancer_arn = aws_lb.managed.id
   port              = local.application_data.accounts[local.environment].managed_ssl_port
-  protocol          = "TCP"
+  protocol          = "TLS"
 
   default_action {
     target_group_arn = aws_lb_target_group.managed_https.id
