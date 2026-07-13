@@ -67,14 +67,23 @@ webhooksCleanup:
 
 config:
   resourceFiltersExcludeNamespaces:
-    # System and platform namespaces excluded from Kyverno resource filtering.
-    - kube-system
-    - cilium-secrets
+    # System and platform namespaces excluded from Kyverno admission processing.
     - amazon-guardduty
     - amazon-network-flow-monitor
+    - aws-cloudwatch-observability
+    - cert-manager
+    - cilium-secrets
     - cluster-autoscaler
-    - prometheus
+    - external-dns
+    - external-secrets
     - fluent-bit
+    - karpenter
+    - keda
+    - kube-system
+    - kyverno
+    - metrics-server
+    - prometheus
+    - shared-services
 
 features:
   controllerRuntimeMetrics:
