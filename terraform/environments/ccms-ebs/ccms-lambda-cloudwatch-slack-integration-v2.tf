@@ -87,7 +87,7 @@ resource "aws_lambda_function" "cloudwatch_slack_integration_v2" {
   role             = aws_iam_role.lambda_cloudwatch_slack_integration_v2_role.arn
   handler          = "lambda_function.lambda_handler"
   layers           = [aws_lambda_layer_version.lambda_cloudwatch_slack_integration_v2_layer.arn]
-  runtime          = "python3.14"
+  runtime          = "python3.13"
   timeout          = 30
   publish          = true
 
