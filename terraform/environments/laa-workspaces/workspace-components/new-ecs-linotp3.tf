@@ -142,6 +142,7 @@ resource "aws_iam_role_policy" "ecs_task_execution_secrets" {
           aws_secretsmanager_secret.linotp3_db_password[0].arn,
           aws_secretsmanager_secret.linotp_admin_password[0].arn,
           aws_secretsmanager_secret.radius_shared_secret[0].arn,
+          aws_secretsmanager_secret.linotp_ad_bind_password[0].arn,
         ]
       }
     ]
@@ -174,13 +175,25 @@ resource "aws_ecs_task_definition" "linotp3" {
 
       environment = [
         { name = "LINOTP_DB_HOST", value = aws_db_instance.linotp3[0].address },
-        { name = "LINOTP_DB_USER", value = "linotp" }
+        { name = "LINOTP_DB_USER", value = "linotp" },
+        # AD LDAP configuration - uses AWS Managed Microsoft AD DNS endpoints
+        { name = "AD_LDAP_URI", value = "ldap://${local.application_data.accounts[local.environment].ad_directory_name}:389" },
+        { name = "AD_BASE_DN", value = "DC=laa-workspaces,DC=local" },
+        { name = "AD_BIND_DN", value = "CN=linotp-svc,OU=Service Accounts,DC=laa-workspaces,DC=local" },
+        { name = "AD_USER_FILTER", value = "(&(sAMAccountName=%s)(objectClass=user))" },
+        { name = "AD_SEARCH_FILTER", value = "(sAMAccountName=*)" },
+        { name = "LINOTP_RESOLVER_NAME", value = "ad-resolver" },
+        { name = "LINOTP_REALM_NAME", value = "laa-workspaces" },
+        { name = "LINOTP_URL", value = "http://localhost:5000" },
+        { name = "LINOTP_ADMIN_USER", value = "admin" },
+        { name = "ENABLE_AUTO_CONFIG", value = "true" }
       ]
 
       secrets = [
         { name = "LINOTP_ENC_KEY_VALUE",   valueFrom = aws_secretsmanager_secret.linotp3_enc_key[0].arn },
         { name = "LINOTP_DB_PASSWORD",     valueFrom = aws_secretsmanager_secret.linotp3_db_password[0].arn },
-        { name = "LINOTP_ADMIN_PASSWORD",  valueFrom = aws_secretsmanager_secret.linotp_admin_password[0].arn }
+        { name = "LINOTP_ADMIN_PASSWORD",  valueFrom = aws_secretsmanager_secret.linotp_admin_password[0].arn },
+        { name = "AD_BIND_PASSWORD",       valueFrom = aws_secretsmanager_secret.linotp_ad_bind_password[0].arn }
       ]
 
       healthCheck = {
