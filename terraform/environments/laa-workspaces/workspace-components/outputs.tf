@@ -156,11 +156,6 @@ output "radius_alb_listener_https_arn" {
   value       = try(aws_lb_listener.radius_https[0].arn, null)
 }
 
-output "radius_alb_dns_name" {
-  description = "RADIUS ALB DNS name"
-  value       = try(aws_lb.radius_portal[0].dns_name, null)
-}
-
 output "radius_alb_zone_id" {
   description = "RADIUS ALB zone ID for Route53 alias"
   value       = try(aws_lb.radius_portal[0].zone_id, null)
@@ -171,14 +166,3 @@ output "radius_nlb_target_group_arn" {
   value       = try(aws_lb_target_group.radius_ecs[0].arn, null)
 }
 
-output "radius_shared_secret_arn" {
-  description = "ARN of the RADIUS shared secret"
-  value       = try(aws_secretsmanager_secret.radius_shared_secret[0].arn, null)
-  sensitive   = true
-}
-
-output "linotp_admin_password_arn" {
-  description = "ARN of the LinOTP admin password"
-  value       = try(aws_secretsmanager_secret.linotp_admin_password[0].arn, null)
-  sensitive   = true
-}
