@@ -2,12 +2,12 @@
 
 locals {
   environment_config_production = {
-    legacy_engineering_vpc_cidr = "10.160.98.0/25"
-    legacy_counterpart_vpc_cidr = "10.160.16.0/20"
-    legacy_ad_domain_name       = "delius-prod.local"
-    legacy_dns_ip_addrs         = ["10.160.17.254", "10.160.22.121"]
-    ad_domain_name              = "delius-mis-prod.internal"
-    # ad_trust_domain_name                   = "azure.hmpp.root"
+    legacy_engineering_vpc_cidr            = "10.160.98.0/25"
+    legacy_counterpart_vpc_cidr            = "10.160.16.0/20"
+    legacy_ad_domain_name                  = "delius-prod.local"
+    legacy_dns_ip_addrs                    = ["10.160.17.254", "10.160.22.121"]
+    ad_domain_name                         = "delius-mis-prod.internal"
+    ad_trust_domain_name                   = "azure.hmpp.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
     ad_trust_dns_ip_addrs                  = module.ip_addresses.mp_ips.ad_fixngo_hmpp_domain_controllers
     core_shared_services_vpc_cidr          = module.ip_addresses.mp_cidr["core-shared-services-live-data-additional"]
@@ -422,20 +422,22 @@ locals {
     }
   }
 
-  fsx_config_production = null
+  fsx_config_production = {
+    storage_capacity     = 200
+    throughtput_capacity = 16
+  }
 
-  # fsx_config_production = {
-  #   storage_capacity     = 1000 # temporarily increasing for prod->stage migration, was 200
-  #   throughtput_capacity = 128  # temporarily increasing for prod->stage migration, was 16
-  # }
-
-  dfi_report_bucket_config_production = null
+  dfi_report_bucket_config_production = {
+    bucket_policy_enabled = true
+  }
 
   lb_config_production = {
     bucket_policy_enabled = true
   }
 
-  datasync_config_production = null
+  datasync_config_production = {
+    source_s3_bucket_arn = "arn:aws:s3:::eu-west-2-delius-prod-dfi-extracts"
+  }
 
   db_backup_config_production = {
     object_lock_days             = 1

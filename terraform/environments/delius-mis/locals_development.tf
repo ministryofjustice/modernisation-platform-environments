@@ -347,6 +347,7 @@ locals {
 
   lb_config_dev = {
     bucket_policy_enabled = true
+    maintenance_message   = "NDMIS Reporting Dev is currently unavailable due to planned maintenance or out-of-hours shutdown (7pm-7am)."
   }
 
   datasync_config_dev = {
