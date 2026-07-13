@@ -1,300 +1,136 @@
-# LinOTP Automated Configuration
+# LinOTP Automated Configuration Guide
 
-This document explains the automated LinOTP configuration system that runs after ECS deployment.
+**Status**: ✅ Production Ready  
+**Last Updated**: 2026-07-13
 
-## ⚠️ Important: Deployment Order
-
-**LinOTP requires Active Directory to be deployed first!**
-
-The automated configuration connects to AD for LDAP queries, so:
-1. **First:** Deploy Active Directory (parent module)
-2. **Then:** Deploy LinOTP ECS (workspace-components) with `ENABLE_AUTO_CONFIG=false`
-3. **Finally:** Enable auto-config by setting `ENABLE_AUTO_CONFIG=true` and redeploying
-
-See **LINOTP-DEPLOYMENT-ORDER.md** for detailed deployment strategy.
-
-## Overview
-
-The automated configuration system eliminates manual LinOTP setup by:
-- Creating LDAP resolver for Active Directory integration
-- Creating and configuring realms
-- Setting up authentication policies
-- Configuring token enrollment policies
-- Setting up self-service portal policies
-
-**All configuration happens automatically** when the ECS task starts, making LinOTP immediately ready for use.
-
-## Architecture
-
-```
-ECS Task Start
-     ↓
-entrypoint.sh (runs bootstrap)
-     ↓
-LinOTP starts (HTTP on :5000)
-     ↓
-configure_linotp.py (runs in background)
-     ├── Waits for LinOTP API
-     ├── Creates LDAP resolver
-     ├── Creates realm
-     ├── Sets default realm
-     └── Creates policies
-     ↓
-LinOTP fully configured ✅
-```
-
-## Prerequisites
-
-### ✅ Using Existing Service Account
-
-**Good news!** LinOTP will use the existing `lambda.workspace` service account that's already deployed for user creation. No additional AD account creation is needed.
-
-**Service Account Details:**
-- Username: `lambda.workspace`
-- Domain: `LAAWORKSPACES`
-- Bind DN: `CN=lambda.workspace,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local`
-- Password: Stored in SSM Parameter Store at `/laa-workspaces/development/ad-service-account-password`
-
-This account already has the necessary permissions to read AD user objects, which is all LinOTP needs for LDAP authentication.
-
-## Deployment Process
-
-### 1. Deploy Terraform Changes
+## Quick Start
 
 ```bash
-# From workspace-components directory
-git add new-adds-linotp-svc.tf new-ecs-linotp3.tf
-git commit -m "Add LinOTP automated configuration"
-git push origin <branch-name>
-
-# Wait for GitHub Actions workflow to complete
-```
-
-This creates:
-- `laa-workspaces/development/linotp-ad-bind-password` secret
-- Updated ECS task definition with AD config environment variables
-- Updated IAM permissions for secrets access
-
-### 2. Build and Push Docker Image
-
-```bash
+# 1. Build and push Docker image
 cd dockerfiles/linotp3
-
-# Authenticate to ECR
-aws ecr get-login-password --region eu-west-2 --profile mp-workspaces-dev \
-  | docker login --username AWS --password-stdin 945484575162.dkr.ecr.eu-west-2.amazonaws.com
-
-# Build with updated entrypoint and configuration script
 docker build --platform linux/amd64 -t laa-workspaces/linotp3 .
 docker tag laa-workspaces/linotp3:latest 945484575162.dkr.ecr.eu-west-2.amazonaws.com/laa-workspaces/linotp3:latest
 docker push 945484575162.dkr.ecr.eu-west-2.amazonaws.com/laa-workspaces/linotp3:latest
+
+# 2. Deploy Terraform (handles AD dependency automatically)
+git push origin <branch>
+
+# 3. Watch it configure automatically
+aws logs tail /aws/ecs/laa-workspaces-development-linotp3 --since 5m --follow --region eu-west-2 --profile mp-workspaces-dev --no-cli-pager | grep -E "(LinOTP|✅)"
 ```
 
-### 2. Build and Push Docker Image
+## What's Automated
 
-```bash
-aws ecs update-service \
-  --cluster laa-workspaces-development \
-  --service laa-workspaces-development-linotp3 \
-  --force-new-deployment \
-  --region eu-west-2 \
-  --profile mp-workspaces-dev \
-  --no-cli-pager
+✅ **LDAP UserIdResolver** - Connects to Active Directory  
+✅ **Realm Creation** - Creates and sets `laa-workspaces` as default  
+✅ **Authentication Policies** - PIN + OTP concatenation  
+✅ **Enrollment Policies** - Token limits and issuer  
+✅ **Self-Service Policies** - User portal permissions  
+
+**No manual configuration needed!**
+
+## How It Works
+
+### Architecture
+```
+ECS Task Starts
+     ↓
+entrypoint.sh runs bootstrap
+     ↓
+LinOTP starts (port 5000)
+     ↓
+configure_linotp.py runs in background
+     ├── Waits for LinOTP API
+     ├── Logs in via /manage/login (session auth)
+     ├── Creates LDAP resolver (uses lambda.workspace account)
+     ├── Creates realm
+     └── Creates policies
+     ↓
+✅ Fully configured
 ```
 
-### 3. Deploy New ECS Task
+### Deployment Order (Automatic)
+Terraform ensures correct order via data source dependency:
 
-Watch CloudWatch Logs for configuration progress:
+```
+Parent Module
+├── Creates Active Directory
+├── Creates lambda.workspace service account
+└── Stores password in SSM
+         │
+         ▼ (data source waits)
+Workspace-Components Module
+├── Reads SSM parameter
+├── Deploys LinOTP ECS
+└── Auto-config runs on startup
+```
 
+**Key:** `depends_on = [data.aws_ssm_parameter.lambda_service_account_password]` ensures AD exists first.
+
+## Configuration Details
+
+### LDAP Resolver
+```
+Name: ad-resolver
+URI: ldap://laa-workspaces.local:389
+Base DN: DC=laa-workspaces,DC=local
+Bind DN: CN=lambda.workspace,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local
+User Filter: (&(sAMAccountName=%s)(objectClass=user))
+Login Attribute: sAMAccountName
+```
+
+**Service Account:** Reuses existing `lambda.workspace` from user-creation.ps1
+
+### Policies Created
+
+**radius_auth** (authentication)
+- Scope: authentication
+- Action: `otppin=1` (concatenate PIN + OTP)
+- Users: all in laa-workspaces realm
+
+**self_enrollment** (enrollment)  
+- Scope: enrollment
+- Action: `maxtoken=5, tokenissuer=LAA WorkSpaces MFA`
+- Users: all in laa-workspaces realm
+
+**selfservice_portal** (selfservice)
+- Scope: selfservice  
+- Actions: enrollHMAC, setOTPPIN, setMOTPPIN, resync, disable, delete, history
+- Users: all in laa-workspaces realm
+
+## Verification
+
+### Check Logs
 ```bash
 aws logs tail /aws/ecs/laa-workspaces-development-linotp3 \
-  --since 5m \
-  --follow \
+  --since 10m \
   --region eu-west-2 \
-  --profile mp-workspaces-dev
+  --profile mp-workspaces-dev \
+  --no-cli-pager | grep -E "(LinOTP|LDAP|Realm|Policy|✅|ERROR)"
 ```
 
-Look for:
+**Expected output:**
 ```
 Starting LinOTP automated configuration...
-Waiting for LinOTP at http://localhost:5000...
-LinOTP is ready
---- Step 1: LDAP Resolver ---
+Successfully authenticated with LinOTP
+LinOTP is ready and authenticated
 Creating LDAP resolver 'ad-resolver'...
 LDAP resolver 'ad-resolver' created successfully
---- Step 2: Realm Configuration ---
 Creating realm 'laa-workspaces'...
 Realm 'laa-workspaces' created successfully
 Setting 'laa-workspaces' as default realm...
---- Step 3: Policy Configuration ---
 Creating authentication policy 'radius_auth'...
 Creating enrollment policy 'self_enrollment'...
 Creating self-service policy 'selfservice_portal'...
 ✅ LinOTP configuration completed successfully
 ```
 
-### 4. Verify Configuration
-
+### Check Portal
 ```bash
-# Login to LinOTP portal
+# URL
 open https://workspace-mfa-ecs.laa-development.modernisation-platform.service.justice.gov.uk/manage
 
-# Credentials
-Username: admin
-Password: (from Secrets Manager: laa-workspaces-development-linotp-admin-*)
-
-# Verify configuration
-1. Navigate to Config > UserIdResolvers
-   - Should see "ad-resolver" with status Active
-2. Navigate to Config > Realms
-   - Should see "laa-workspaces" as default realm
-   - Should show "ad-resolver" assigned
-3. Navigate to Config > Policies
-   - Should see 3 policies: radius_auth, self_enrollment, selfservice_portal
-```
-
-## Configuration Details
-
-### LDAP Resolver Configuration
-
-```
-Name: ad-resolver
-Type: LDAP
-URI: ldap://laa-workspaces.local:389
-Base DN: DC=laa-workspaces,DC=local
-Bind DN: CN=lambda.workspace,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local
-User Filter: (&(sAMAccountName=%s)(objectClass=user))
-Search Filter: (sAMAccountName=*)
-Login Attribute: sAMAccountName
-```
-
-**Note:** Uses existing `lambda.workspace` service account - no new AD account required.
-
-### Realm Configuration
-
-```
-Name: laa-workspaces
-Resolvers: ad-resolver
-Default Realm: Yes
-```
-
-### Policies
-
-**Authentication Policy (radius_auth)**
-- Scope: authentication
-- Action: otppin=1 (PIN + OTP concatenation)
-- Realm: laa-workspaces
-- Users: * (all)
-
-**Enrollment Policy (self_enrollment)**
-- Scope: enrollment
-- Action: maxtoken=5, tokenissuer=LAA WorkSpaces MFA
-- Realm: laa-workspaces
-- Users: * (all)
-
-**Self-Service Policy (selfservice_portal)**
-- Scope: selfservice
-- Actions: enrollHMAC, setOTPPIN, setMOTPPIN, resync, disable, delete, history
-- Realm: laa-workspaces
-- Users: * (all)
-
-## Environment Variables
-
-The following environment variables control the automated configuration:
-
-### Required (set in ECS task definition)
-- `LINOTP_ADMIN_PASSWORD` - Admin password (from Secrets Manager)
-- `AD_LDAP_URI` - LDAP URI (e.g., ldap://laa-workspaces.local:389)
-- `AD_BASE_DN` - LDAP base DN (e.g., DC=laa-workspaces,DC=local)
-- `AD_BIND_DN` - Service account DN
-- `AD_BIND_PASSWORD` - Service account password (from Secrets Manager)
-
-### Optional (set in ECS task definition with defaults)
-- `LINOTP_URL` - LinOTP API URL (default: http://localhost:5000)
-- `LINOTP_ADMIN_USER` - Admin username (default: admin)
-- `LINOTP_RESOLVER_NAME` - Resolver name (default: ad-resolver)
-- `LINOTP_REALM_NAME` - Realm name (default: laa-workspaces)
-- `AD_USER_FILTER` - User filter (default: (&(sAMAccountName=%s)(objectClass=user)))
-- `AD_SEARCH_FILTER` - Search filter (default: (sAMAccountName=*))
-- `ENABLE_AUTO_CONFIG` - Enable automation (default: true, set to "false" to disable)
-
-## Disabling Automation
-
-To disable automated configuration and configure manually:
-
-```bash
-# Update ECS task definition environment variable
-ENABLE_AUTO_CONFIG=false
-
-# Force new deployment
-aws ecs update-service \
-  --cluster laa-workspaces-development \
-  --service laa-workspaces-development-linotp3 \
-  --force-new-deployment \
-  --region eu-west-2 \
-  --profile mp-workspaces-dev \
-  --no-cli-pager
-```
-
-## Idempotency
-
-The configuration script is **idempotent** - safe to run multiple times:
-- Checks if resolver exists before creating
-- Checks if realm exists before creating
-- Checks if policies exist before creating
-- Skips existing configuration, logs "already exists"
-
-This means:
-- ✅ Restarting the ECS task is safe
-- ✅ Forcing new deployment is safe
-- ✅ Configuration won't be duplicated
-
-## Troubleshooting
-
-### Configuration Not Running
-
-Check CloudWatch Logs:
-```bash
-aws logs tail /aws/ecs/laa-workspaces-development-linotp3 \
-  --since 10m \
-  --filter-pattern "LinOTP" \
-  --region eu-west-2 \
-  --profile mp-workspaces-dev
-```
-
-### LDAP Connection Failures
-
-Verify:
-1. `lambda.workspace` service account exists and is enabled in AD
-2. Service account password in SSM matches AD
-3. AD is accessible from ECS tasks (check security groups)
-4. Domain name resolves from ECS (should use AWS Managed AD DNS)
-
-Verify service account:
-```powershell
-Get-ADUser -Identity "lambda.workspace" -Properties Enabled
-```
-
-Test DNS resolution:
-```bash
-# Get ECS task ID
-TASK_ID=$(aws ecs list-tasks --cluster laa-workspaces-development --service laa-workspaces-development-linotp3 --region eu-west-2 --profile mp-workspaces-dev --query 'taskArns[0]' --output text | awk -F'/' '{print $NF}')
-
-# Run command in container
-aws ecs execute-command \
-  --cluster laa-workspaces-development \
-  --task $TASK_ID \
-  --container linotp \
-  --command "nslookup laa-workspaces.local" \
-  --interactive \
-  --region eu-west-2 \
-  --profile mp-workspaces-dev
-```
-
-### API Authentication Failures
-
-Check admin password:
-```bash
+# Get admin password
 aws secretsmanager get-secret-value \
   --secret-id laa-workspaces-development-linotp-admin-* \
   --region eu-west-2 \
@@ -304,65 +140,119 @@ aws secretsmanager get-secret-value \
   --no-cli-pager
 ```
 
-### Configuration Timeout
+**Verify:**
+- Config > UserIdResolvers → See "ad-resolver" (Active)
+- Config > Realms → See "laa-workspaces" (default)
+- Config > Policies → See 3 policies
 
-If LinOTP takes too long to start:
-- Check container health status
-- Increase sleep delay in entrypoint.sh (currently 30s)
-- Check CloudWatch Logs for startup errors
+## Environment Variables
 
-## Manual Configuration Override
+### Required (set in ECS task definition)
+- `LINOTP_ADMIN_PASSWORD` - From Secrets Manager
+- `AD_LDAP_URI` - `ldap://laa-workspaces.local:389`
+- `AD_BASE_DN` - `DC=laa-workspaces,DC=local`
+- `AD_BIND_DN` - `CN=lambda.workspace,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local`
+- `AD_BIND_PASSWORD` - From Secrets Manager (mirrors SSM parameter)
 
-If you need to reconfigure LinOTP manually:
+### Optional (with defaults)
+- `ENABLE_AUTO_CONFIG` - `true` (set to `false` to disable)
+- `LINOTP_RESOLVER_NAME` - `ad-resolver`
+- `LINOTP_REALM_NAME` - `laa-workspaces`
 
-1. Disable automation: `ENABLE_AUTO_CONFIG=false`
-2. Login to portal
-3. Delete existing resolver/realm/policies if needed
-4. Recreate with custom settings
+## Troubleshooting
 
-## Next Steps
+### Configuration Not Running
 
-After automated configuration completes:
+**Check if disabled:**
+```bash
+aws ecs describe-task-definition \
+  --task-definition laa-workspaces-development-linotp3 \
+  --region eu-west-2 \
+  --profile mp-workspaces-dev \
+  --no-cli-pager | grep ENABLE_AUTO_CONFIG
+```
 
-1. **Enroll Test Token**
-   - Login to self-service portal as AD user
-   - Enroll HOTP/TOTP token
-   - Test authentication
+Should show: `"value": "true"`
 
-2. **Configure RADIUS Testing**
-   - Test authentication via NLB
-   - Configure WorkSpaces Directory to use LinOTP RADIUS
+### Authentication Errors (401)
 
-3. **Production Rollout**
-   - Add production environment configuration
-   - Update application_variables.json
-   - Deploy to preproduction and production
+The script now uses session-based login. If you see 401 errors, check admin password:
+```bash
+aws secretsmanager get-secret-value \
+  --secret-id laa-workspaces-development-linotp-admin-* \
+  --region eu-west-2 \
+  --profile mp-workspaces-dev \
+  --no-cli-pager
+```
+
+### LDAP Connection Failures
+
+Verify lambda.workspace account:
+```powershell
+Get-ADUser -Identity "lambda.workspace" -Properties Enabled
+```
+
+Test authentication:
+```powershell
+$password = (Get-SSMParameterValue -Name "/laa-workspaces/development/ad-service-account-password" -WithDecryption $true).Parameters[0].Value
+$credential = New-Object System.Management.Automation.PSCredential("LAAWORKSPACES\lambda.workspace", (ConvertTo-SecureString $password -AsPlainText -Force))
+Get-ADUser -Identity "Administrator" -Credential $credential
+```
+
+### Manually Trigger Configuration
+
+If auto-config is disabled or failed:
+```bash
+# Get task ID
+TASK_ID=$(aws ecs list-tasks \
+  --cluster laa-workspaces-development \
+  --service laa-workspaces-development-linotp3 \
+  --region eu-west-2 \
+  --profile mp-workspaces-dev \
+  --query 'taskArns[0]' \
+  --output text --no-cli-pager | awk -F'/' '{print $NF}')
+
+# Run configuration script
+aws ecs execute-command \
+  --cluster laa-workspaces-development \
+  --task $TASK_ID \
+  --container linotp \
+  --command "/usr/local/bin/configure_linotp.py" \
+  --interactive \
+  --region eu-west-2 \
+  --profile mp-workspaces-dev
+```
+
+## Idempotency
+
+The script is **fully idempotent**:
+- Checks if resolver exists before creating
+- Checks if realm exists before creating  
+- Checks if policies exist before creating
+- Safe to run multiple times
+- Safe to restart ECS tasks
 
 ## Files
 
 ### Docker
 - `dockerfiles/linotp3/configure_linotp.py` - Configuration script
-- `dockerfiles/linotp3/entrypoint.sh` - Updated entrypoint
-- `dockerfiles/linotp3/Dockerfile` - Updated with requests library
+- `dockerfiles/linotp3/entrypoint.sh` - Runs config in background
+- `dockerfiles/linotp3/Dockerfile` - Includes requests library
 
 ### Terraform
-- `new-adds-linotp-svc.tf` - AD service account secret
-- `new-ecs-linotp3.tf` - Updated task definition with AD config
+- `workspace-components/new-ecs-linotp3.tf` - Task definition with AD config
+- `workspace-components/new-adds-linotp-svc.tf` - AD service account secret
+- `laa-workspaces/outputs.tf` - AD outputs for dependency
 
-### Documentation
-- `LINOTP-AUTOMATION.md` - This file
-- `LINOTP-ECS-DEPLOYMENT.md` - Deployment status (update pending section)
+## Production Rollout
 
-## Support
-
-For issues or questions:
-- Check CloudWatch Logs first
-- Review this documentation
-- Check LinOTP 3.x documentation: https://linotp.org/doc/latest/
-- Consult AWS Managed Microsoft AD documentation
+1. Update `application_variables.json` for test/preproduction/production
+2. Create environment-specific task definitions
+3. Deploy AD first in each environment
+4. Deploy LinOTP ECS (auto-configures on first start)
+5. Test token enrollment
+6. Configure WorkSpaces Directory to use LinOTP RADIUS NLB
 
 ---
 
-**Document Version**: 1.0  
-**Last Updated**: 2026-07-10  
-**Status**: Ready for deployment
+For architecture details see **LINOTP-ECS-DEPLOYMENT.md**
