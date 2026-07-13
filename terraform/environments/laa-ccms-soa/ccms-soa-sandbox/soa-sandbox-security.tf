@@ -160,15 +160,15 @@ resource "aws_security_group" "ecs_tasks_admin" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_security_group_rule" "ecs_tasks_admin_server" {
-  security_group_id = aws_security_group.ecs_tasks_admin.id
-  type              = "ingress"
-  description       = "SOA Admin Server"
-  protocol          = "TCP"
-  from_port         = local.application_data.accounts[local.environment].admin_ssl_port
-  to_port           = local.application_data.accounts[local.environment].admin_ssl_port
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-}
+# resource "aws_security_group_rule" "ecs_tasks_admin_server" {
+#   security_group_id = aws_security_group.ecs_tasks_admin.id
+#   type              = "ingress"
+#   description       = "SOA Admin Server"
+#   protocol          = "TCP"
+#   from_port         = local.application_data.accounts[local.environment].admin_ssl_port
+#   to_port           = local.application_data.accounts[local.environment].admin_ssl_port
+#   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+# }
 
 resource "aws_security_group_rule" "ecs_tasks_admin_ssl_port" {
   security_group_id = aws_security_group.ecs_tasks_admin.id
