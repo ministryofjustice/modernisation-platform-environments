@@ -1,10 +1,11 @@
-#--ALB Admin
+#--NLB Admin Server Security Group
 resource "aws_security_group" "alb_admin" {
   name        = "${local.component_name}_alb_admin"
   description = "Controls Traffic for SOA Admin Application"
   vpc_id      = data.aws_vpc.shared.id
 }
 
+#--NLB Admin Server Security Group Ingress Rules for Weblogic
 resource "aws_security_group_rule" "alb_admin_ingress_443" {
   security_group_id = aws_security_group.alb_admin.id
   type              = "ingress"
@@ -25,6 +26,7 @@ resource "aws_security_group_rule" "alb_admin_ingress_7002" {
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
+#--NLB Admin Server Security Group Ingress Rule for Workspace
 resource "aws_security_group_rule" "alb_admin_workspace_ingress_443" {
   security_group_id = aws_security_group.alb_admin.id
   type              = "ingress"
@@ -35,6 +37,7 @@ resource "aws_security_group_rule" "alb_admin_workspace_ingress_443" {
   cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace_cidr]
 }
 
+#--NLB Admin Server Security Group Ingress Rule for Weblogic
 resource "aws_security_group_rule" "alb_admin_workspace_ingress_7002" {
   security_group_id = aws_security_group.alb_admin.id
   type              = "ingress"
@@ -45,6 +48,7 @@ resource "aws_security_group_rule" "alb_admin_workspace_ingress_7002" {
   cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace_cidr]
 }
 
+#--NLB Admin Server Security Group Egress Rule
 resource "aws_security_group_rule" "alb_admin_egress_all" {
   security_group_id = aws_security_group.alb_admin.id
   type              = "egress"
@@ -55,13 +59,14 @@ resource "aws_security_group_rule" "alb_admin_egress_all" {
   cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW
 }
 
-#--Managed
+#--NLB Managed Server Security Group
 resource "aws_security_group" "alb_managed" {
   name        = "${local.component_name}_alb_managed"
   description = "Controls Traffic for SOA Managed Application"
   vpc_id      = data.aws_vpc.shared.id
 }
 
+#--NLB Managed Server Security Group Ingress Rule for HTTPS service
 resource "aws_security_group_rule" "alb_managed_ingress_443" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "ingress"
@@ -72,6 +77,7 @@ resource "aws_security_group_rule" "alb_managed_ingress_443" {
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
+#--NLB Admin Managed Security Group Ingress Rule for HTTPS DB connections
 resource "aws_security_group_rule" "alb_managed_ingress_443_databases" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "ingress"
@@ -82,6 +88,7 @@ resource "aws_security_group_rule" "alb_managed_ingress_443_databases" {
   cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
 }
 
+#--NLB Managed Server Security Group Ingress Rule for AWS workspace
 resource "aws_security_group_rule" "alb_managed_workspace_ingress_443" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "ingress"
@@ -92,6 +99,7 @@ resource "aws_security_group_rule" "alb_managed_workspace_ingress_443" {
   cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace_cidr]
 }
 
+#--NLB Managed Server Security Group Ingress Rule for EM
 resource "aws_security_group_rule" "alb_managed_ingress_7002" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "ingress"
@@ -102,6 +110,7 @@ resource "aws_security_group_rule" "alb_managed_ingress_7002" {
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
+#--NLB Managed Server Security Group Ingress Rules for CP
 resource "aws_security_group_rule" "alb_managed_ingress_cp443" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "ingress"
@@ -122,6 +131,7 @@ resource "aws_security_group_rule" "alb_managed_ingress_cp7002" {
   cidr_blocks       = [local.application_data.accounts[local.environment].cloud_platform_cidr]
 }
 
+#--NLB Managed Server Security Group Ingress Rule for NEC
 resource "aws_security_group_rule" "alb_managed_ingress_nec443" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "ingress"
@@ -132,6 +142,7 @@ resource "aws_security_group_rule" "alb_managed_ingress_nec443" {
   cidr_blocks       = [local.application_data.accounts[local.environment].northgate_proxy]
 }
 
+#--NLB Managed Server Security Group Egress Rule for NEC
 resource "aws_security_group_rule" "alb_managed_egress_all" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "egress"
