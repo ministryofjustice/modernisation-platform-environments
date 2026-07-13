@@ -432,7 +432,7 @@ The LinOTP configuration is now **fully automated** via a Python script that run
 
 ### What's Automated
 
-- ✅ LDAP UserIdResolver creation
+- ✅ LDAP UserIdResolver creation (uses existing `lambda.workspace` service account)
 - ✅ Realm creation and default realm assignment
 - ✅ Authentication policies (PIN + OTP)
 - ✅ Token enrollment policies
@@ -440,31 +440,20 @@ The LinOTP configuration is now **fully automated** via a Python script that run
 
 ### Required Manual Steps
 
-1. **Create AD Service Account** (one-time setup):
-   ```powershell
-   New-ADUser -Name "linotp-svc" `
-     -SamAccountName "linotp-svc" `
-     -UserPrincipalName "linotp-svc@laa-workspaces.local" `
-     -Path "OU=Service Accounts,DC=laa-workspaces,DC=local" `
-     -AccountPassword (ConvertTo-SecureString "PASSWORD-FROM-SECRETS-MANAGER" -AsPlainText -Force) `
-     -Enabled $true `
-     -PasswordNeverExpires $true
-   ```
+**None!** The existing `lambda.workspace` service account (created for user-creation.ps1) is reused for LinOTP LDAP queries.
 
-2. **Deploy with Automation**:
-   ```bash
-   # Build and push updated Docker image
-   docker build --platform linux/amd64 -t laa-workspaces/linotp3 dockerfiles/linotp3/
-   docker tag laa-workspaces/linotp3:latest 945484575162.dkr.ecr.eu-west-2.amazonaws.com/laa-workspaces/linotp3:latest
-   docker push 945484575162.dkr.ecr.eu-west-2.amazonaws.com/laa-workspaces/linotp3:latest
-   
-   # Force new ECS deployment
-   aws ecs update-service --cluster laa-workspaces-development --service laa-workspaces-development-linotp3 --force-new-deployment --region eu-west-2 --profile mp-workspaces-dev --no-cli-pager
-   ```
+**Just deploy:**
+```bash
+# Build and push updated Docker image
+docker build --platform linux/amd64 -t laa-workspaces/linotp3 dockerfiles/linotp3/
+docker tag laa-workspaces/linotp3:latest 945484575162.dkr.ecr.eu-west-2.amazonaws.com/laa-workspaces/linotp3:latest
+docker push 945484575162.dkr.ecr.eu-west-2.amazonaws.com/laa-workspaces/linotp3:latest
 
-3. **Verify** via CloudWatch Logs or LinOTP portal
+# Force new ECS deployment
+aws ecs update-service --cluster laa-workspaces-development --service laa-workspaces-development-linotp3 --force-new-deployment --region eu-west-2 --profile mp-workspaces-dev --no-cli-pager
+```
 
-See **LINOTP-AUTOMATION.md** for complete setup guide.
+Verify via CloudWatch Logs or LinOTP portal. See **LINOTP-AUTOMATION.md** for details.
 
 ---
 
