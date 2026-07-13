@@ -17,7 +17,6 @@ import json
 import time
 import logging
 import requests
-from requests.auth import HTTPBasicAuth
 from urllib.parse import urljoin
 
 logging.basicConfig(
@@ -54,13 +53,37 @@ class LinOTPClient:
 
     def __init__(self, url, username, password):
         self.url = url.rstrip('/')
-        self.auth = HTTPBasicAuth(username, password)
+        self.username = username
+        self.password = password
         self.session = requests.Session()
-        self.session.auth = self.auth
         self.session.headers.update({'Content-Type': 'application/x-www-form-urlencoded'})
+        self.authenticated = False
+
+    def login(self):
+        """Authenticate with LinOTP and establish session"""
+        login_url = urljoin(self.url, '/manage/login')
+        try:
+            response = self.session.post(
+                login_url,
+                data={
+                    'username': self.username,
+                    'password': self.password
+                },
+                timeout=30
+            )
+            response.raise_for_status()
+            self.authenticated = True
+            logger.info("Successfully authenticated with LinOTP")
+            return True
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Login failed: {e}")
+            raise LinOTPConfigError(f"Login failed: {e}")
 
     def _request(self, method, endpoint, data=None, params=None):
         """Make HTTP request to LinOTP API"""
+        if not self.authenticated:
+            self.login()
+
         url = urljoin(self.url, endpoint)
         try:
             response = self.session.request(
@@ -149,12 +172,15 @@ def wait_for_linotp(client, max_attempts=30, delay=10):
 
     for attempt in range(1, max_attempts + 1):
         try:
+            # Try to login - this will test if LinOTP is ready and authenticate
+            client.login()
+            # Test if API is working
             response = client.get('/system/getResolvers')
-            logger.info("LinOTP is ready")
+            logger.info("LinOTP is ready and authenticated")
             return True
         except Exception as e:
             if attempt == max_attempts:
-                raise LinOTPConfigError(f"LinOTP not ready after {max_attempts} attempts")
+                raise LinOTPConfigError(f"LinOTP not ready after {max_attempts} attempts: {e}")
             logger.info(f"Attempt {attempt}/{max_attempts}: LinOTP not ready yet, retrying in {delay}s...")
             time.sleep(delay)
 
