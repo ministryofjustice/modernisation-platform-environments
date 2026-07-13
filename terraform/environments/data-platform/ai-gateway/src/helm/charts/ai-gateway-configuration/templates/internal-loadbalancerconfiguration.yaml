@@ -1,0 +1,32 @@
+---
+apiVersion: gateway.k8s.aws/v1beta1
+kind: LoadBalancerConfiguration
+metadata:
+  name: ai-gateway-internal
+  namespace: {{ .Release.Namespace }}
+spec:
+  loadBalancerName: ai-gateway-internal
+  scheme: internal
+  loadBalancerAttributes:
+    - key: load_balancing.cross_zone.enabled
+      value: "true"
+    - key: access_logs.s3.enabled
+      value: "true"
+    - key: access_logs.s3.bucket
+      value: {{ .Values.albLogsBucket }}
+    - key: access_logs.s3.prefix
+      value: "ai-gateway-internal"
+  listenerConfigurations:
+    - protocolPort: HTTPS:443
+      defaultCertificate: {{ .Values.certificateArn }}
+      sslPolicy: ELBSecurityPolicy-TLS13-1-2-2021-06
+      # https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_ListenerAttribute.html
+      listenerAttributes:
+        - key: routing.http.response.server.enabled
+          value: "false"
+        - key: routing.http.response.strict_transport_security.header_value
+          value: "max-age=31536000; includeSubDomains; preload"
+        - key: routing.http.response.x_content_type_options.header_value
+          value: "nosniff"
+        - key: routing.http.response.x_frame_options.header_value
+          value: "SAMEORIGIN"

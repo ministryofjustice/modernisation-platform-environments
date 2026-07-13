@@ -9,17 +9,9 @@ variable "created_by" {
   }
 }
 
-resource "null_resource" "created_by_tag" {
-  triggers = {
-    # Persist the initial creator value in state; ignore future tf var changes.
-    created_by = coalesce(var.created_by, "__unset__")
-  }
-
-  lifecycle {
-    ignore_changes = [triggers["created_by"]]
-  }
-}
-
+#------------------------------------------------------------------------------
+# Argo CD Hub Cluster Configuration (ADR-002)
+#------------------------------------------------------------------------------
 variable "enable_argocd" {
   type        = bool
   default     = false
@@ -36,4 +28,30 @@ variable "argocd_idc_region" {
   type        = string
   default     = "eu-west-2"
   description = "Region of the IAM Identity Center instance."
+}
+
+variable "argocd_rbac_admin_identities" {
+  type = list(object({
+    id   = string
+    type = string
+  }))
+  default     = []
+  description = "List of Identity Center identities (SSO_USER or SSO_GROUP) to grant ADMIN role in Argo CD."
+}
+
+variable "argocd_codeconnection_arn" {
+  type        = string
+  default     = ""
+  description = "AWS CodeConnections ARN for GitHub repository access from Argo CD."
+}
+
+resource "null_resource" "created_by_tag" {
+  triggers = {
+    # Persist the initial creator value in state; ignore future tf var changes.
+    created_by = coalesce(var.created_by, "__unset__")
+  }
+
+  lifecycle {
+    ignore_changes = [triggers["created_by"]]
+  }
 }
