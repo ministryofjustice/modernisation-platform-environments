@@ -24,9 +24,14 @@
         "data": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["file", "reasonCode", "description", "requiredAt"],
+          "required": ["fileId", "object", "reasonCode", "description", "requiredAt"],
           "properties": {
-            "file": {"$ref": "#/definitions/file"},
+            "fileId": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Stable logical file identifier inherited from FileReceived.v1."
+            },
+            "object": {"$ref": "#/definitions/s3Object"},
             "actionExecutionId": {"type": "string", "format": "uuid"},
             "reasonCode": {
               "type": "string",
@@ -55,12 +60,12 @@
         "idempotencyKey": {"type": "string", "minLength": 1}
       }
     },
-    "file": {
+    "s3Object": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["fileId", "bucket", "key", "versionId", "sizeBytes"],
+      "description": "A particular version of an object stored in Amazon S3.",
+      "required": ["bucket", "key", "versionId", "sizeBytes"],
       "properties": {
-        "fileId": {"type": "string", "format": "uuid"},
         "bucket": {"type": "string", "minLength": 3},
         "key": {"type": "string", "minLength": 1},
         "versionId": {"type": "string", "minLength": 1},
@@ -84,8 +89,8 @@
           "idempotencyKey": "manual-intervention:3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501"
         },
         "data": {
-          "file": {
-            "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+          "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+          "object": {
             "bucket": "investigation",
             "key": "example/report.csv",
             "versionId": "6Oj...",

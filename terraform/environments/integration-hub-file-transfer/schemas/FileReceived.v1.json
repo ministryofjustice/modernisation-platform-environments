@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "FileReceived.v1",
-  "description": "A complete, versioned object has been accepted into the managed file transfer ingress boundary. A file is eligible for automated processing; its identity is its bucket, key and versionId, and its metadata and authoritative size should be read from that object version.",
+  "description": "A complete, versioned object has been accepted into the managed file transfer ingress boundary. fileId is the stable identity of the logical file throughout its MFT lifecycle; object identifies its current S3 object version.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -63,10 +63,15 @@
         "data": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["file"],
+          "required": ["fileId", "object"],
           "properties": {
-            "file": {
-              "$ref": "#/definitions/file"
+            "fileId": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Stable logical file identifier generated when the file first enters MFT and reused in every subsequent event."
+            },
+            "object": {
+              "$ref": "#/definitions/s3Object"
             },
             "provenance": {
               "type": "object",
@@ -111,15 +116,12 @@
         }
       }
     },
-    "file": {
+    "s3Object": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["fileId", "bucket", "key", "versionId", "sizeBytes"],
+      "description": "A particular version of an object stored in Amazon S3.",
+      "required": ["bucket", "key", "versionId", "sizeBytes"],
       "properties": {
-        "fileId": {
-          "type": "string",
-          "format": "uuid"
-        },
         "bucket": {
           "type": "string",
           "minLength": 3
@@ -155,8 +157,8 @@
           "idempotencyKey": "incoming/example/report.csv:3Lg..."
         },
         "data": {
-          "file": {
-            "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+          "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+          "object": {
             "bucket": "incoming",
             "key": "example/report.csv",
             "versionId": "3Lg...",

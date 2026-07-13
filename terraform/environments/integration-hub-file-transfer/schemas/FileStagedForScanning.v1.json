@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "FileStagedForScanning.v1",
-  "description": "An object has been copied to the processing bucket, verified, and removed from its source.",
+  "description": "A file has been copied from the incoming bucket to the processing bucket. The source object's metadata and existing tags have been preserved and verified on the processing object, and the source object has been deleted.",
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "id", "detail-type", "source", "account", "time", "region", "detail"],
@@ -24,13 +24,30 @@
         "data": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["sourceFile", "stagedFile", "metadataVerified", "tagsVerified", "sourceDeleted"],
+          "required": ["fileId", "sourceObject", "stagedObject", "metadataPreserved", "tagsPreserved", "sourceDeleted"],
           "properties": {
-            "sourceFile": {"$ref": "#/definitions/file"},
-            "stagedFile": {"$ref": "#/definitions/file"},
-            "metadataVerified": {"type": "boolean", "enum": [true]},
-            "tagsVerified": {"type": "boolean", "enum": [true]},
-            "sourceDeleted": {"type": "boolean", "enum": [true]}
+            "fileId": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Stable logical file identifier inherited from FileReceived.v1."
+            },
+            "sourceObject": {"$ref": "#/definitions/s3Object"},
+            "stagedObject": {"$ref": "#/definitions/s3Object"},
+            "metadataPreserved": {
+              "type": "boolean",
+              "enum": [true],
+              "description": "The source object's metadata was preserved and verified on the staged object."
+            },
+            "tagsPreserved": {
+              "type": "boolean",
+              "enum": [true],
+              "description": "The source object's pre-scan tags were preserved and verified on the staged object. This does not refer to GuardDuty scan-result tags."
+            },
+            "sourceDeleted": {
+              "type": "boolean",
+              "enum": [true],
+              "description": "The source object version was deleted after the staged object was verified."
+            }
           }
         }
       }
@@ -47,12 +64,12 @@
         "idempotencyKey": {"type": "string", "minLength": 1}
       }
     },
-    "file": {
+    "s3Object": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["fileId", "bucket", "key", "versionId", "sizeBytes"],
+      "description": "A particular version of an object stored in Amazon S3.",
+      "required": ["bucket", "key", "versionId", "sizeBytes"],
       "properties": {
-        "fileId": {"type": "string", "format": "uuid"},
         "bucket": {"type": "string", "minLength": 3},
         "key": {"type": "string", "minLength": 1},
         "versionId": {"type": "string", "minLength": 1},
@@ -76,22 +93,21 @@
           "idempotencyKey": "processing/example/report.csv:3Lg..."
         },
         "data": {
-          "sourceFile": {
-            "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+          "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+          "sourceObject": {
             "bucket": "incoming",
             "key": "example/report.csv",
             "versionId": "3Lg...",
             "sizeBytes": 4096
           },
-          "stagedFile": {
-            "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+          "stagedObject": {
             "bucket": "processing",
             "key": "example/report.csv",
             "versionId": "4Mh...",
             "sizeBytes": 4096
           },
-          "metadataVerified": true,
-          "tagsVerified": true,
+          "metadataPreserved": true,
+          "tagsPreserved": true,
           "sourceDeleted": true
         }
       }

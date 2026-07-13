@@ -24,7 +24,7 @@
         "data": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["sourceFile", "destinationFile", "route", "scanResultStatus", "sourceDeleted"],
+          "required": ["fileId", "sourceObject", "destinationObject", "route", "scanResultStatus", "sourceDeleted"],
           "oneOf": [
             {
               "properties": {
@@ -46,8 +46,13 @@
             }
           ],
           "properties": {
-            "sourceFile": {"$ref": "#/definitions/file"},
-            "destinationFile": {"$ref": "#/definitions/file"},
+            "fileId": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Stable logical file identifier inherited from FileReceived.v1."
+            },
+            "sourceObject": {"$ref": "#/definitions/s3Object"},
+            "destinationObject": {"$ref": "#/definitions/s3Object"},
             "route": {"type": "string", "enum": ["clean", "quarantine", "investigation"]},
             "scanResultStatus": {
               "type": "string",
@@ -70,12 +75,12 @@
         "idempotencyKey": {"type": "string", "minLength": 1}
       }
     },
-    "file": {
+    "s3Object": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["fileId", "bucket", "key", "versionId", "sizeBytes"],
+      "description": "A particular version of an object stored in Amazon S3.",
+      "required": ["bucket", "key", "versionId", "sizeBytes"],
       "properties": {
-        "fileId": {"type": "string", "format": "uuid"},
         "bucket": {"type": "string", "minLength": 3},
         "key": {"type": "string", "minLength": 1},
         "versionId": {"type": "string", "minLength": 1},
@@ -99,15 +104,14 @@
           "idempotencyKey": "route:clean:example/report.csv:4Mh..."
         },
         "data": {
-          "sourceFile": {
-            "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+          "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+          "sourceObject": {
             "bucket": "processing",
             "key": "example/report.csv",
             "versionId": "4Mh...",
             "sizeBytes": 4096
           },
-          "destinationFile": {
-            "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+          "destinationObject": {
             "bucket": "clean",
             "key": "example/report.csv",
             "versionId": "5Ni...",

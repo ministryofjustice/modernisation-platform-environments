@@ -26,9 +26,14 @@
             {
               "type": "object",
               "additionalProperties": false,
-              "required": ["file", "actionDefinitionId", "actionExecutionId", "status", "completedAt"],
+              "required": ["fileId", "object", "actionDefinitionId", "actionExecutionId", "status", "completedAt"],
               "properties": {
-                "file": {"$ref": "#/definitions/file"},
+                "fileId": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Stable logical file identifier inherited from FileReceived.v1."
+                },
+                "object": {"$ref": "#/definitions/s3Object"},
                 "actionDefinitionId": {"type": "string", "minLength": 1},
                 "actionExecutionId": {"type": "string", "format": "uuid"},
                 "status": {"type": "string", "enum": ["succeeded"]},
@@ -39,9 +44,14 @@
             {
               "type": "object",
               "additionalProperties": false,
-              "required": ["file", "actionDefinitionId", "actionExecutionId", "status", "completedAt", "failure"],
+              "required": ["fileId", "object", "actionDefinitionId", "actionExecutionId", "status", "completedAt", "failure"],
               "properties": {
-                "file": {"$ref": "#/definitions/file"},
+                "fileId": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Stable logical file identifier inherited from FileReceived.v1."
+                },
+                "object": {"$ref": "#/definitions/s3Object"},
                 "actionDefinitionId": {"type": "string", "minLength": 1},
                 "actionExecutionId": {"type": "string", "format": "uuid"},
                 "status": {"type": "string", "enum": ["failed"]},
@@ -74,12 +84,12 @@
         "idempotencyKey": {"type": "string", "minLength": 1}
       }
     },
-    "file": {
+    "s3Object": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["fileId", "bucket", "key", "versionId", "sizeBytes"],
+      "description": "A particular version of an object stored in Amazon S3.",
+      "required": ["bucket", "key", "versionId", "sizeBytes"],
       "properties": {
-        "fileId": {"type": "string", "format": "uuid"},
         "bucket": {"type": "string", "minLength": 3},
         "key": {"type": "string", "minLength": 1},
         "versionId": {"type": "string", "minLength": 1},
@@ -103,8 +113,8 @@
           "idempotencyKey": "action-complete:b1d4e7c2-f073-4ed4-9565-a4c31c54bd7f"
         },
         "data": {
-          "file": {
-            "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+          "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+          "object": {
             "bucket": "clean",
             "key": "example/report.csv",
             "versionId": "5Ni...",
