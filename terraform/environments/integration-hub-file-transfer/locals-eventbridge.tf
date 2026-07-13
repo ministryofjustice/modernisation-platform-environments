@@ -4,7 +4,8 @@ locals {
 
   eventbridge_retention_days = local.is-production ? 400 : 30
 
-  filereceived_transformer = {
+  file_received_transformer = {
+    # Maps to ./schema/FileReceived.v1.json
     input_paths = {
       account_id = "$.account"
       bucket     = "$.detail.bucket.name"

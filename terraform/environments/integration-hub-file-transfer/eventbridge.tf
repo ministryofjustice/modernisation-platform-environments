@@ -31,7 +31,7 @@ module "eventbridge_default_bus" {
         name              = "file-received-v1"
         arn               = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
         attach_role_arn   = true
-        input_transformer = local.filereceived_transformer
+        input_transformer = local.file_received_transformer
       }
     ]
   }
