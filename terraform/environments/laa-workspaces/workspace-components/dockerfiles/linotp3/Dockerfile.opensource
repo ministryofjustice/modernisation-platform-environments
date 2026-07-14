@@ -1,0 +1,50 @@
+# Build from LinOTP GitHub source (AGPL-3.0, no license required)
+FROM debian:bookworm-slim
+
+USER root
+
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
+    python3-venv \
+    python3-dev \
+    git \
+    build-essential \
+    libmariadb-dev \
+    libldap2-dev \
+    libsasl2-dev \
+    libsodium-dev \
+    pkg-config \
+    curl \
+    default-mysql-client \
+    && apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Clone LinOTP from GitHub (open source, no license required)
+RUN git clone --depth 1 --branch release/3.4.4 https://github.com/LinOTP/LinOTP.git /opt/linotp
+
+# Create venv and install LinOTP with its pinned dependencies
+RUN python3 -m venv /opt/venv && \
+    /opt/venv/bin/pip install --upgrade pip setuptools && \
+    /opt/venv/bin/pip install -r /opt/linotp/requirements-prod.txt && \
+    /opt/venv/bin/pip install /opt/linotp && \
+    /opt/venv/bin/pip install pymysql gunicorn
+
+ENV PATH="/opt/venv/bin:$PATH"
+ENV LINOTP_CFG="/etc/linotp/linotp.cfg"
+
+# Copy custom entrypoint, configuration scripts, and LinOTP config
+COPY entrypoint.sh /usr/local/bin/custom-entrypoint.sh
+COPY configure_linotp_api.sh /usr/local/bin/configure_linotp_api.sh
+COPY configure_linotp_cli.sh /usr/local/bin/configure_linotp_cli.sh
+COPY linotp.cfg /etc/linotp/linotp.cfg
+RUN chmod +x /usr/local/bin/custom-entrypoint.sh && \
+    chmod +x /usr/local/bin/configure_linotp_api.sh && \
+    chmod +x /usr/local/bin/configure_linotp_cli.sh && \
+    mkdir -p /etc/linotp /var/cache/linotp /var/log/linotp
+
+EXPOSE 5000
+
+ENTRYPOINT ["/usr/local/bin/custom-entrypoint.sh"]

@@ -118,11 +118,12 @@ resource "aws_ecs_task_definition" "linotp3" {
 resource "aws_ecs_service" "linotp3" {
   count = local.environment == "development" ? 1 : 0
 
-  name            = "${local.application_name}-${local.environment}-linotp3"
-  cluster         = data.terraform_remote_state.workspace_components.outputs.ecs_cluster_id
-  task_definition = aws_ecs_task_definition.linotp3[0].arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
+  name                   = "${local.application_name}-${local.environment}-linotp3"
+  cluster                = data.terraform_remote_state.workspace_components.outputs.ecs_cluster_id
+  task_definition        = aws_ecs_task_definition.linotp3[0].arn
+  desired_count          = 1
+  launch_type            = "FARGATE"
+  enable_execute_command = true
 
   network_configuration {
     subnets          = data.terraform_remote_state.workspace_components.outputs.private_subnet_ids
