@@ -7,6 +7,53 @@
 ##############################################
 
 ##############################################
+### IAM Task Role for ECS Exec
+##############################################
+
+resource "aws_iam_role" "ecs_task_role" {
+  count = local.environment == "development" ? 1 : 0
+
+  name_prefix = "${local.application_name}-${local.environment}-ecs-task-"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "ecs-tasks.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-ecs-task-role" }
+  )
+}
+
+resource "aws_iam_role_policy" "ecs_exec_policy" {
+  count = local.environment == "development" ? 1 : 0
+
+  name = "${local.application_name}-${local.environment}-ecs-exec"
+  role = aws_iam_role.ecs_task_role[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+##############################################
 ### ECS Task Definition
 ##############################################
 
@@ -19,6 +66,7 @@ resource "aws_ecs_task_definition" "linotp3" {
   cpu                      = 1024
   memory                   = 2048
   execution_role_arn       = data.terraform_remote_state.workspace_components.outputs.ecs_task_execution_role_arn
+  task_role_arn            = aws_iam_role.ecs_task_role[0].arn
 
   container_definitions = jsonencode([
     {
