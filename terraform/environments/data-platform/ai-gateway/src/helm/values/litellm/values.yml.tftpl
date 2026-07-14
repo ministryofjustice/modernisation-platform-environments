@@ -72,7 +72,7 @@ proxy_config:
       port: 6379
       password: os.environ/auth_token
     require_auth_for_metrics_endpoint: false
-    callbacks: ["prometheus"]
+    callbacks: ["custom_callbacks.proxy_handler_instance", "prometheus"]
     success_callback: ["prometheus"]
     failure_callback: ["prometheus"]
     prometheus_initialize_budget_metrics: true
@@ -120,12 +120,19 @@ volumes:
   - name: migrations
     emptyDir:
       sizeLimit: 64Mi
+  - name: litellm-hooks
+    configMap:
+      name: litellm-hooks
 
 volumeMounts:
   - name: app-cache
     mountPath: /app/cache
   - name: migrations
     mountPath: /app/migrations
+  - name: litellm-hooks
+    mountPath: /app/custom_callbacks.py
+    subPath: custom_callbacks.py
+    readOnly: true
 
 migrationJob:
   enabled: false
