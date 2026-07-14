@@ -1,6 +1,6 @@
 {
   "accounts": {
-    "feasibility": {
+    "development": {
       "ami_image_id": "ami-02f77a03ec776dc35",
 
       "ec2_instance_type": "m5.xlarge",
