@@ -18,8 +18,7 @@ locals {
   engine                     = "oracle-se2"
   engine_version = (
     local.environment == "production" ? "19.0.0.0.ru-2026-04.rur-2026-04.r1" :
-    local.environment == "development" ? "19.0.0.0.ru-2026-04.rur-2026-04.r1" :
-    "19.0.0.0.ru-2026-01.rur-2026-01.r3" # preproduction, test
+    "19.0.0.0.ru-2026-01.rur-2026-01.r3" # development, preproduction, test
   )
   username                   = "sysdba"
   backup_window              = "22:00-01:00"
