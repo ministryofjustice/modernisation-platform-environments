@@ -37,7 +37,7 @@ resource "aws_lb_target_group" "radius_ecs" {
     port                = 5000
     interval            = 30
     healthy_threshold   = 2
-    unhealthy_threshold = 2
+    unhealthy_threshold = 6  # Allow 180s for LinOTP startup (startPeriod = 120s + buffer)
   }
 
   tags = merge(
