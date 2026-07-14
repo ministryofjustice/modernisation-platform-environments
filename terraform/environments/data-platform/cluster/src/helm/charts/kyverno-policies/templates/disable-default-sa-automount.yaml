@@ -1,0 +1,37 @@
+apiVersion: policies.kyverno.io/v1
+kind: MutatingPolicy
+metadata:
+  name: disable-default-sa-automount
+  annotations:
+    policies.kyverno.io/title: Disable Default ServiceAccount Token Automount
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: ServiceAccount
+    policies.kyverno.io/description: >-
+      Kubernetes automatically creates a 'default' ServiceAccount in every
+      namespace and, unless told otherwise, mounts its API token into Pods that
+      do not name a ServiceAccount. That token is rarely needed and widens the
+      blast radius if a Pod is compromised. When the 'default' ServiceAccount is
+      created for a new namespace, this policy sets automountServiceAccountToken
+      to false so workloads must opt in explicitly.
+spec:
+  # Admission-time only: mutate the 'default' ServiceAccount on create and on
+  # update, so the setting is re-asserted if anything later flips it back on.
+  # Existing ServiceAccounts are only mutated when next modified (mutateExisting
+  # is off by default), so pre-existing ones stay untouched until updated.
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["serviceaccounts"]
+        # Scope the webhook to just the auto-created 'default' ServiceAccount,
+        # so Kyverno is only invoked for it rather than every ServiceAccount.
+        resourceNames: ["default"]
+  mutations:
+    - patchType: ApplyConfiguration
+      applyConfiguration:
+        expression: >-
+          Object{
+            automountServiceAccountToken: false
+          }

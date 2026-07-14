@@ -1,0 +1,135 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "FileStagedForScanning.v1",
+  "description": "A file has been copied from the incoming bucket to the processing bucket. The source object's metadata and existing tags have been preserved and verified on the processing object, and the source object has been deleted.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "id",
+    "detail-type",
+    "source",
+    "account",
+    "time",
+    "region",
+    "detail"
+  ],
+  "properties": {
+    "version": { "type": "string", "enum": ["0"] },
+    "id": { "type": "string", "format": "uuid" },
+    "detail-type": { "type": "string", "enum": ["FileStagedForScanning.v1"] },
+    "source": {
+      "type": "string",
+      "enum": ["uk.gov.justice.service.managed-file-transfer"]
+    },
+    "account": { "type": "string", "pattern": "^[0-9]{12}$" },
+    "time": { "type": "string", "format": "date-time" },
+    "region": { "type": "string" },
+    "resources": { "type": "array", "items": { "type": "string" } },
+    "replay-name": { "type": "string", "minLength": 1 },
+    "detail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metadata", "data"],
+      "properties": {
+        "metadata": { "$ref": "#/definitions/eventMetadata" },
+        "data": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "fileId",
+            "sourceObject",
+            "stagedObject",
+            "metadataPreserved",
+            "tagsPreserved",
+            "sourceDeleted"
+          ],
+          "properties": {
+            "fileId": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Stable logical file identifier inherited from FileReceived.v1."
+            },
+            "sourceObject": { "$ref": "#/definitions/s3Object" },
+            "stagedObject": { "$ref": "#/definitions/s3Object" },
+            "metadataPreserved": {
+              "type": "boolean",
+              "enum": [true],
+              "description": "The source object's metadata was preserved and verified on the staged object."
+            },
+            "tagsPreserved": {
+              "type": "boolean",
+              "enum": [true],
+              "description": "The source object's pre-scan tags were preserved and verified on the staged object. This does not refer to GuardDuty scan-result tags."
+            },
+            "sourceDeleted": {
+              "type": "boolean",
+              "enum": [true],
+              "description": "The source object version was deleted after the staged object was verified."
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "eventMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["correlationId", "causationId", "idempotencyKey"],
+      "properties": {
+        "correlationId": { "type": "string", "format": "uuid" },
+        "causationId": { "type": "string", "format": "uuid" },
+        "idempotencyKey": { "type": "string", "minLength": 1 }
+      }
+    },
+    "s3Object": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A particular version of an object stored in Amazon S3.",
+      "required": ["bucket", "key", "versionId", "sizeBytes"],
+      "properties": {
+        "bucket": { "type": "string", "minLength": 3 },
+        "key": { "type": "string", "minLength": 1 },
+        "versionId": { "type": "string", "minLength": 1 },
+        "sizeBytes": { "type": "integer", "minimum": 0 }
+      }
+    }
+  },
+  "examples": [
+    {
+      "version": "0",
+      "id": "6dce6b40-6e43-49f0-a2cf-1da1d43bce22",
+      "detail-type": "FileStagedForScanning.v1",
+      "source": "uk.gov.justice.service.managed-file-transfer",
+      "account": "123456789012",
+      "time": "2026-07-10T14:01:00Z",
+      "region": "eu-west-2",
+      "detail": {
+        "metadata": {
+          "correlationId": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
+          "causationId": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
+          "idempotencyKey": "processing/example/report.csv:3Lg..."
+        },
+        "data": {
+          "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+          "sourceObject": {
+            "bucket": "incoming",
+            "key": "example/report.csv",
+            "versionId": "3Lg...",
+            "sizeBytes": 4096
+          },
+          "stagedObject": {
+            "bucket": "processing",
+            "key": "example/report.csv",
+            "versionId": "4Mh...",
+            "sizeBytes": 4096
+          },
+          "metadataPreserved": true,
+          "tagsPreserved": true,
+          "sourceDeleted": true
+        }
+      }
+    }
+  ]
+}
