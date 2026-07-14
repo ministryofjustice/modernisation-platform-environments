@@ -38,9 +38,9 @@ locals {
 
       # Alert Routing Blocks: Scopes rules, disables specific metrics, and configures resource overrides
       alerts_configured_accounts = [
-        { name = "data-platform-development", enabled_groups = ["AI Gateway"] },
-        { name = "data-platform-test", enabled_groups = ["AI Gateway"] },
-        { name = "data-platform-preproduction", enabled_groups = ["AI Gateway"] }
+        { name = "data-platform-development", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] },
+        { name = "data-platform-test", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] },
+        { name = "data-platform-preproduction", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] }
       ]
     }
     test = {
@@ -79,10 +79,10 @@ locals {
       ]
       # Alert Routing Blocks: Scopes rules, disables specific metrics, and configures resource overrides
       alerts_configured_accounts = [
-        { name = "data-platform-development", enabled_groups = ["AI Gateway"] },
-        { name = "data-platform-test", enabled_groups = ["AI Gateway"] },
-        { name = "data-platform-preproduction", enabled_groups = ["AI Gateway"] },
-        { name = "data-platform-production", enabled_groups = ["AI Gateway"] }
+        { name = "data-platform-development", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] },
+        { name = "data-platform-test", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] },
+        { name = "data-platform-preproduction", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] },
+        { name = "data-platform-production", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] }
       ]
     }
   }
