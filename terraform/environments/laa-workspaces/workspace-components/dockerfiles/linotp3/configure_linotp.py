@@ -56,25 +56,44 @@ class LinOTPClient:
         self.username = username
         self.password = password
         self.session = requests.Session()
-        self.session.headers.update({'Content-Type': 'application/x-www-form-urlencoded'})
         self.authenticated = False
 
     def login(self):
         """Authenticate with LinOTP and establish session"""
-        login_url = urljoin(self.url, '/manage/login')
+        # LinOTP uses session-based authentication via cookies
+        # First, access the management interface to get a session
+        manage_url = urljoin(self.url, '/manage/')
+        auth_url = urljoin(self.url, '/admin/login')
+
         try:
+            # Get session cookie from manage interface
+            self.session.get(manage_url, timeout=10)
+
+            # Authenticate using the admin login endpoint
             response = self.session.post(
-                login_url,
+                auth_url,
                 data={
-                    'username': self.username,
+                    'login': self.username,
                     'password': self.password
                 },
-                timeout=30
+                timeout=30,
+                allow_redirects=True
             )
-            response.raise_for_status()
-            self.authenticated = True
-            logger.info("Successfully authenticated with LinOTP")
-            return True
+
+            # Check if we got a valid session
+            # Try a simple API call to verify
+            test_response = self.session.get(
+                urljoin(self.url, '/system/getResolvers'),
+                timeout=10
+            )
+
+            if test_response.status_code == 200:
+                self.authenticated = True
+                logger.info("Successfully authenticated with LinOTP")
+                return True
+            else:
+                raise LinOTPConfigError(f"Authentication failed: {test_response.status_code}")
+
         except requests.exceptions.RequestException as e:
             logger.error(f"Login failed: {e}")
             raise LinOTPConfigError(f"Login failed: {e}")
@@ -93,6 +112,21 @@ class LinOTPClient:
                 params=params,
                 timeout=30
             )
+
+            # If we get 401, try to re-authenticate once
+            if response.status_code == 401 and self.authenticated:
+                logger.info("Session expired, re-authenticating...")
+                self.authenticated = False
+                self.login()
+                # Retry the request
+                response = self.session.request(
+                    method=method,
+                    url=url,
+                    data=data,
+                    params=params,
+                    timeout=30
+                )
+
             response.raise_for_status()
 
             result = response.json()
