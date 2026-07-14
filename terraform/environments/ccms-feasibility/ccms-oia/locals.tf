@@ -7,5 +7,5 @@ locals {
 
   opahub_name    = "ccms-opahub"
   connector_name = "ccms-connector"
-  adaptor_name   = "ccms-service-adaptor"
+  adaptor_name   = "ccms-adaptor"
 }
