@@ -1,9 +1,0 @@
-# Application metadata
-application: hello-world
-team: container-platform
-slack_channel: "#container-platform"
-source_code: https://github.com/ministryofjustice/container-platform-terraform-test-app
-
-access:
-  - identity: container-platform-team
-    role: admin
