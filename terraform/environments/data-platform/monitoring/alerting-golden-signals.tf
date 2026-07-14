@@ -129,7 +129,7 @@ locals {
     litellm_api_key_budget_remaining = { group = "AI Gateway", datasource_type = "prometheus", expr = "min by (api_key_alias) (litellm_remaining_api_key_budget_metric{container=\"litellm\"})", metric = "litellm_api_key_budget_remaining_gbp", type = "lt", dim_key = "", ok_when_nodata = true, warning = "litellm_api_key_budget_remaining_warn", critical = "litellm_api_key_budget_remaining_crit" }
 
     # ── Redis ────────────────────────────────────────────────────────────────
-    litellm_redis_failure_rate = { group = "AI Gateway", datasource_type = "prometheus", expr = "sum(increase(litellm_redis_fails_total{container=\"litellm\"}[5m]))", metric = "litellm_redis_fails_count", type = "gt", dim_key = "", ok_when_nodata = true, warning = "litellm_redis_failure_rate_warn", critical = "litellm_redis_failure_rate_crit" }
+    litellm_redis_failure_rate = { group = "AI Gateway", datasource_type = "prometheus", expr = "sum(increase(litellm_redis_failed_requests_total{container=\"litellm\"}[5m]))", metric = "litellm_redis_fails_count", type = "gt", dim_key = "", ok_when_nodata = true, warning = "litellm_redis_failure_rate_warn", critical = "litellm_redis_failure_rate_crit" }
     litellm_redis_latency_p99  = { group = "AI Gateway", datasource_type = "prometheus", expr = "histogram_quantile(0.99, sum(rate(litellm_redis_latency_bucket{container=\"litellm\"}[5m])) by (le))", metric = "litellm_redis_latency_p99_seconds", type = "gt", dim_key = "", warning = "litellm_redis_latency_p99_warn", critical = "litellm_redis_latency_p99_crit" }
 
     # ── Internal Self Latency ───────────────────────────────────────────────
