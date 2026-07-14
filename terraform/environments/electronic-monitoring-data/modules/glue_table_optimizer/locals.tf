@@ -12,10 +12,6 @@ locals {
     for db in var.databases : db => "staging/${db}_pipeline/${db}"
   }
 
-  orphan_prefix_by_database = merge(
-    local.default_orphan_prefix_by_database,
-    var.orphan_prefix_overrides_by_database
-  )
 
   tables_to_optimize_flat = length(keys(data.external.glue_tables_by_database)) == 0 ? {} : merge([
     for database_name in keys(data.external.glue_tables_by_database) : {
