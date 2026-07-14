@@ -8,10 +8,11 @@ metadata:
     policies.kyverno.io/severity: medium
     policies.kyverno.io/subject: NetworkPolicy
     policies.kyverno.io/description: >-
-      On namespace creation, generate a default-deny NetworkPolicy that blocks
-      all ingress and all egress except DNS to CoreDNS. Teams then explicitly
-      allow the traffic their workloads need. System and platform namespaces are
-      skipped.
+      On namespace creation, generate a default NetworkPolicy that isolates the
+      namespace: deny all cross-namespace and external traffic, while allowing
+      traffic within the same namespace and DNS to CoreDNS. Teams then
+      explicitly allow any additional traffic their workloads need. System and
+      platform namespaces are skipped.
 spec:
   evaluation:
     # Keep the generated NetworkPolicy in sync: recreate it if deleted, update
@@ -40,7 +41,19 @@ spec:
             "spec": dyn({
               "podSelector": dyn({}),
               "policyTypes": dyn(["Ingress", "Egress"]),
+              "ingress": dyn([
+                dyn({
+                  "from": dyn([
+                    dyn({"podSelector": dyn({})})
+                  ])
+                })
+              ]),
               "egress": dyn([
+                dyn({
+                  "to": dyn([
+                    dyn({"podSelector": dyn({})})
+                  ])
+                }),
                 dyn({
                   "to": dyn([
                     dyn({
