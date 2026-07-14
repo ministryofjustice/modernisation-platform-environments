@@ -1,3 +1,4 @@
+# Upgrading the IAM module from v5.x to v6.x introduces breaking changes that cause IAM roles and policies to be replaced. Therefore, we are not proceeding with the version upgrade.
 #trivy:ignore:AVD-AWS-0345: test policy for development
 data "aws_iam_policy_document" "analytical_platform_share_policy" {
   #checkov:skip=CKV_AWS_110: test policy for development
@@ -20,7 +21,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "lakeformation:DescribeResource",
       "lakeformation:GetDataAccess",
     ]
-    resources = ["arn:aws:lakeformation:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:catalog:${data.aws_caller_identity.current.account_id}"]
+    resources = ["arn:aws:lakeformation:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog:${data.aws_caller_identity.current.account_id}"]
   }
   statement {
     effect    = "Allow"
@@ -62,7 +63,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "ram:CreateResourceShare",
       "ram:DeleteResourceShare"
     ]
-    resources = ["arn:aws:ram:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:resource-share/*"]
+    resources = ["arn:aws:ram:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:resource-share/*"]
   }
   statement {
     effect = "Allow"
@@ -116,8 +117,8 @@ data "aws_iam_policy_document" "data_production_mojap_derived_bucket_lake_format
       "logs:PutLogEvents"
     ]
     resources = [
-      "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws-lakeformation-acceleration/*",
-      "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws-lakeformation-acceleration/*:log-stream:*"
+      "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws-lakeformation-acceleration/*",
+      "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws-lakeformation-acceleration/*:log-stream:*"
     ]
   }
 }
