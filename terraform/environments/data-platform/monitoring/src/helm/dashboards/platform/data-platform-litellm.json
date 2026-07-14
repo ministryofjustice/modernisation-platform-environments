@@ -250,7 +250,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "(sum(increase(litellm_spend_metric{container=\"litellm\"}[$__range])))",
+          "expr": "(sum(increase(litellm_spend_metric_total{container=\"litellm\"}[$__range])))",
           "refId": "A"
         }
       ],
@@ -310,7 +310,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "(sum(increase(litellm_total_tokens_metric{container=\"litellm\"}[$__range])))",
+          "expr": "(sum(increase(litellm_total_tokens_metric_total{container=\"litellm\"}[$__range])))",
           "refId": "A"
         }
       ],
