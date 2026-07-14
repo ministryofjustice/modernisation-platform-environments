@@ -13,12 +13,12 @@ chown -R linotp:linotp /etc/linotp
 export LINOTP_DATABASE_URI="mysql+pymysql://${LINOTP_DB_USER}:${LINOTP_DB_PASSWORD}@${LINOTP_DB_HOST}/linotp3?charset=utf8"
 export SECRET_FILE="/etc/linotp/encKey"
 
-# Run LinOTP configuration in background (waits for LinOTP to be ready, then configures)
+# Run LinOTP configuration in background using REST API
 if [ "${ENABLE_AUTO_CONFIG:-true}" = "true" ]; then
     (
         sleep 30  # Give LinOTP time to start
         echo "Starting LinOTP automated configuration..."
-        /usr/local/bin/configure_linotp.py
+        /usr/local/bin/configure_linotp_api.sh
         if [ $? -eq 0 ]; then
             echo "LinOTP configuration completed successfully"
         else

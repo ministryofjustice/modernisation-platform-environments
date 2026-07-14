@@ -45,8 +45,12 @@ RUN pip install --no-cache-dir --upgrade setuptools pymysql && \
 
 COPY entrypoint.sh /usr/local/bin/custom-entrypoint.sh
 COPY configure_linotp.py /usr/local/bin/configure_linotp.py
+COPY configure_linotp_cli.sh /usr/local/bin/configure_linotp_cli.sh
+COPY configure_linotp_api.sh /usr/local/bin/configure_linotp_api.sh
 RUN chmod +x /usr/local/bin/custom-entrypoint.sh && \
-    chmod +x /usr/local/bin/configure_linotp.py
+    chmod +x /usr/local/bin/configure_linotp.py && \
+    chmod +x /usr/local/bin/configure_linotp_cli.sh && \
+    chmod +x /usr/local/bin/configure_linotp_api.sh
 
 EXPOSE 80
 
