@@ -15,9 +15,10 @@ locals {
       "products-poc" = merge(
         try(local.client_destination_delivery["products-poc"], {}),
         {
-          enabled        = true
-          request_method = "POST"
-          request_url    = aws_lambda_function_url.products_poc_destination_presign_api[0].function_url
+          enabled                 = true
+          request_method          = "POST"
+          request_timeout_seconds = 900
+          request_url             = aws_lambda_function_url.products_poc_destination_presign_api[0].function_url
         }
       )
     }

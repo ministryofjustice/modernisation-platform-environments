@@ -13,34 +13,21 @@ metadata:
       do not name a ServiceAccount. That token is rarely needed and widens the
       blast radius if a Pod is compromised. When the 'default' ServiceAccount is
       created for a new namespace, this policy sets automountServiceAccountToken
-      to false so workloads must opt in explicitly. System and platform
-      namespaces are skipped.
+      to false so workloads must opt in explicitly.
 spec:
-  # Admission-time only: mutate the 'default' ServiceAccount as it is created.
-  # Existing ServiceAccounts are left untouched (mutateExisting is off by
-  # default), so this only affects namespaces created from now on.
+  # Admission-time only: mutate the 'default' ServiceAccount on create and on
+  # update, so the setting is re-asserted if anything later flips it back on.
+  # Existing ServiceAccounts are only mutated when next modified (mutateExisting
+  # is off by default), so pre-existing ones stay untouched until updated.
   matchConstraints:
     resourceRules:
       - apiGroups: [""]
         apiVersions: ["v1"]
-        operations: ["CREATE"]
+        operations: ["CREATE", "UPDATE"]
         resources: ["serviceaccounts"]
-  matchConditions:
-    # Only the auto-created 'default' ServiceAccount, not user-managed ones.
-    - name: only-default-sa
-      expression: object.metadata.name == 'default'
-    # Skip system/platform namespaces so their 'default' ServiceAccount keeps
-    # its existing behaviour. Keyed on the namespace name to mirror
-    # generate-default-network-policy; keep this list in step with that policy
-    # and with resourceFiltersExcludeNamespaces.
-    - name: skip-system-namespaces
-      expression: >-
-        !object.metadata.namespace.startsWith('kube-')
-        && !(object.metadata.namespace in ['kyverno', 'cilium-secrets', 'karpenter',
-        'cert-manager', 'external-dns', 'external-secrets', 'metrics-server',
-        'prometheus', 'fluent-bit', 'cluster-autoscaler', 'amazon-guardduty',
-        'amazon-network-flow-monitor', 'keda', 'shared-services',
-        'aws-cloudwatch-observability'])
+        # Scope the webhook to just the auto-created 'default' ServiceAccount,
+        # so Kyverno is only invoked for it rather than every ServiceAccount.
+        resourceNames: ["default"]
   mutations:
     - patchType: ApplyConfiguration
       applyConfiguration:
