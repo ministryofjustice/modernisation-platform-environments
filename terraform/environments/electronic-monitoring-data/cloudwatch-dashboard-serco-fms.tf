@@ -7,6 +7,10 @@ resource "aws_cloudwatch_dashboard" "serco_fms_key_distribution" {
 
   dashboard_body = jsonencode({
     widgets = [
+      # ------------------------------------------------------------------------
+      # Step 1: Show rotation and current workflow status
+      # ------------------------------------------------------------------------
+
       {
         type   = "custom"
         x      = 0
@@ -51,6 +55,11 @@ resource "aws_cloudwatch_dashboard" "serco_fms_key_distribution" {
           }
         }
       },
+
+      # ------------------------------------------------------------------------
+      # Step 2: Show restricted recipient and claim details
+      # ------------------------------------------------------------------------
+
       {
         type   = "custom"
         x      = 0
@@ -97,6 +106,11 @@ resource "aws_cloudwatch_dashboard" "serco_fms_key_distribution" {
           }
         }
       },
+
+      # ------------------------------------------------------------------------
+      # Step 3: Show notification and rotated-key adoption status
+      # ------------------------------------------------------------------------
+
       {
         type   = "custom"
         x      = 0
@@ -142,6 +156,11 @@ resource "aws_cloudwatch_dashboard" "serco_fms_key_distribution" {
           }
         }
       },
+
+      # ------------------------------------------------------------------------
+      # Step 4: Show the immutable workflow event timeline
+      # ------------------------------------------------------------------------
+
       {
         type   = "custom"
         x      = 0
@@ -164,6 +183,11 @@ resource "aws_cloudwatch_dashboard" "serco_fms_key_distribution" {
           }
         }
       },
+
+      # ------------------------------------------------------------------------
+      # Step 5: Show Lambda health metrics
+      # ------------------------------------------------------------------------
+
       {
         type   = "metric"
         x      = 0
@@ -180,19 +204,89 @@ resource "aws_cloudwatch_dashboard" "serco_fms_key_distribution" {
           stacked = false
 
           metrics = [
-            ["AWS/Lambda", "Invocations", "FunctionName", module.send_serco_fms_keys.lambda_function_name, { label = "Distribution invocations" }],
-            ["AWS/Lambda", "Errors", "FunctionName", module.send_serco_fms_keys.lambda_function_name, { label = "Distribution errors" }],
-            ["AWS/Lambda", "Invocations", "FunctionName", module.serco_fms_claim_page.lambda_function_name, { label = "Claim invocations" }],
-            ["AWS/Lambda", "Errors", "FunctionName", module.serco_fms_claim_page.lambda_function_name, { label = "Claim errors" }],
-            ["AWS/Lambda", "Invocations", "FunctionName", module.serco_fms_key_access_observer.lambda_function_name, { label = "Observer invocations" }],
-            ["AWS/Lambda", "Errors", "FunctionName", module.serco_fms_key_access_observer.lambda_function_name, { label = "Observer errors" }],
-            ["AWS/Lambda", "Invocations", "FunctionName", module.serco_fms_key_distribution_dashboard.lambda_function_name, { label = "Dashboard invocations" }],
-            ["AWS/Lambda", "Errors", "FunctionName", module.serco_fms_key_distribution_dashboard.lambda_function_name, { label = "Dashboard errors" }],
+            [
+              "AWS/Lambda",
+              "Invocations",
+              "FunctionName",
+              module.send_serco_fms_keys.lambda_function_name,
+              {
+                label = "Distribution invocations"
+              }
+            ],
+            [
+              "AWS/Lambda",
+              "Errors",
+              "FunctionName",
+              module.send_serco_fms_keys.lambda_function_name,
+              {
+                label = "Distribution errors"
+              }
+            ],
+            [
+              "AWS/Lambda",
+              "Invocations",
+              "FunctionName",
+              module.serco_fms_claim_page.lambda_function_name,
+              {
+                label = "Claim invocations"
+              }
+            ],
+            [
+              "AWS/Lambda",
+              "Errors",
+              "FunctionName",
+              module.serco_fms_claim_page.lambda_function_name,
+              {
+                label = "Claim errors"
+              }
+            ],
+            [
+              "AWS/Lambda",
+              "Invocations",
+              "FunctionName",
+              module.serco_fms_key_access_observer.lambda_function_name,
+              {
+                label = "Observer invocations"
+              }
+            ],
+            [
+              "AWS/Lambda",
+              "Errors",
+              "FunctionName",
+              module.serco_fms_key_access_observer.lambda_function_name,
+              {
+                label = "Observer errors"
+              }
+            ],
+            [
+              "AWS/Lambda",
+              "Invocations",
+              "FunctionName",
+              module.serco_fms_key_distribution_dashboard.lambda_function_name,
+              {
+                label = "Dashboard invocations"
+              }
+            ],
+            [
+              "AWS/Lambda",
+              "Errors",
+              "FunctionName",
+              module.serco_fms_key_distribution_dashboard.lambda_function_name,
+              {
+                label = "Dashboard errors"
+              }
+            ],
           ]
         }
       },
+
+      # ------------------------------------------------------------------------
+      # Step 6: Show the current alarm states
+      # Use an alarm-status widget rather than metric alarm annotations.
+      # ------------------------------------------------------------------------
+
       {
-        type   = "metric"
+        type   = "alarm"
         x      = 12
         y      = 41
         width  = 12
@@ -200,16 +294,24 @@ resource "aws_cloudwatch_dashboard" "serco_fms_key_distribution" {
 
         properties = {
           title  = "Serco FMS Lambda alarm states"
-          region = "eu-west-2"
-          view   = "timeSeries"
+          sortBy = "stateUpdatedTimestamp"
 
-          annotations = {
-            alarms = [
-              for _, alarm in aws_cloudwatch_metric_alarm.serco_fms_key_distribution_errors : alarm.arn
-            ]
-          }
+          states = [
+            "ALARM",
+            "INSUFFICIENT_DATA",
+            "OK",
+          ]
+
+          alarms = [
+            for _, alarm in aws_cloudwatch_metric_alarm.serco_fms_key_distribution_errors : alarm.arn
+          ]
         }
       },
+
+      # ------------------------------------------------------------------------
+      # Step 7: Show recent errors and failures
+      # ------------------------------------------------------------------------
+
       {
         type   = "log"
         x      = 0
