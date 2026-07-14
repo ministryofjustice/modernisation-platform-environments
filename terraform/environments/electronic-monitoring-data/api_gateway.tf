@@ -152,6 +152,11 @@ resource "aws_vpc_security_group_ingress_rule" "allow_cp_access" {
   to_port     = 443
 }
 
+resource "aws_vpc_endpoint_security_group_association" "cp_access_to_vpc_endpoint" {
+  vpc_endpoint_id   = data.aws_vpc_endpoint.api_gateway.id
+  security_group_id = aws_security_group.allow_cp_access.id
+}
+
 data "aws_network_interface" "execute_api_endpoint_eni" {
   provider = aws.core-vpc
   for_each = toset(data.aws_vpc_endpoint.api_gateway.network_interface_ids)
@@ -173,7 +178,7 @@ resource "aws_route53_record" "private_api" {
 }
 
 data "aws_iam_policy_document" "update_p1_export_vpc" {
-  count = local.is-test || local.is-development ? 0 : 1
+  count = local.is-test || local.is-preproduction ? 0 : 1
   statement {
     effect = "Allow"
 
@@ -204,7 +209,7 @@ data "aws_iam_policy_document" "update_p1_export_vpc" {
 }
 
 resource "aws_api_gateway_rest_api_policy" "update_p1_export_vpc" {
-  count       = local.is-test || local.is-development ? 0 : 1
+  count       = local.is-test || local.is-preproduction ? 0 : 1
   rest_api_id = aws_api_gateway_rest_api.update_p1_export[0].id
   policy      = data.aws_iam_policy_document.update_p1_export_vpc[0].json
 }
@@ -220,9 +225,9 @@ resource "aws_api_gateway_rest_api" "update_p1_export" {
   }
 
   endpoint_configuration {
-    types            = [local.is-development ? "REGIONAL" : "PRIVATE"]
-    vpc_endpoint_ids = local.is-development ? null : [data.aws_vpc_endpoint.api_gateway.id]
-    ip_address_type  = local.is-development ? null : "dualstack"
+    types            = ["PRIVATE"]
+    vpc_endpoint_ids = [data.aws_vpc_endpoint.api_gateway.id]
+    ip_address_type  = "dualstack"
   }
 }
 
@@ -458,4 +463,75 @@ resource "aws_api_gateway_method_response" "remove_status_404" {
   resource_id = aws_api_gateway_resource.update_p1_export_remove[0].id
   http_method = aws_api_gateway_method.update_p1_export_remove_post[0].http_method
   status_code = "404"
+}
+
+locals {
+  dns_endpoint_rules = {
+    "TCP_53" : {
+      "from_port" : 53,
+      "to_port" : 53,
+      "protocol" : "TCP"
+    },
+    "UDP_53" : {
+      "from_port" : 53,
+      "to_port" : 53,
+      "protocol" : "UDP"
+    }
+  }
+}
+
+resource "aws_security_group" "aws_dns_resolver" {
+  provider    = aws.core-vpc
+  name        = "dns-resolver"
+  description = "Security Group for DNS resolver request"
+  vpc_id      = data.aws_vpc.shared.id
+
+  tags = local.tags
+}
+
+resource "aws_security_group_rule" "ingress_dns_endpoint_traffic" {
+  provider          = aws.core-vpc
+  for_each          = local.dns_endpoint_rules
+  description       = format("VPC to DNS Endpoint traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.aws_dns_resolver.id
+  to_port           = each.value.to_port
+  type              = "ingress"
+  cidr_blocks       = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
+}
+
+resource "aws_security_group_rule" "egress_dns_endpoint_traffic" {
+  provider          = aws.core-vpc
+  for_each          = local.dns_endpoint_rules
+  description       = format("DNS Endpoint to Domain Controller traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.aws_dns_resolver.id
+  to_port           = each.value.to_port
+  type              = "egress"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_route53_resolver_endpoint" "inbound_api" {
+  provider = aws.core-vpc
+
+  name      = "inbound-resolver"
+  direction = "INBOUND"
+
+  security_group_ids = [aws_security_group.aws_dns_resolver.id]
+  ip_address {
+    subnet_id = data.aws_subnet.private_subnets_a.id
+  }
+  ip_address {
+    subnet_id = data.aws_subnet.private_subnets_b.id
+  }
+  ip_address {
+    subnet_id = data.aws_subnet.private_subnets_c.id
+  }
+  tags = local.tags
+}
+
+module "ip_addresses" {
+  source = "../../modules/ip_addresses"
 }
