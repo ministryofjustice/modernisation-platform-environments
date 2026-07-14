@@ -924,11 +924,11 @@ module "landing_file_dlq_redriver" {
 }
 
 #-----------------------------------------------------------------------------------
-# lambda loads - staged_mdss__position and acquisitive_crime__position
+# lambda merge loads - staged_mdss__position, staged_mdss__event, acquisitive_crime__position, data_insights__position
 #-----------------------------------------------------------------------------------
 
 module "merge_mdss_staged_event" {
-  count                          = local.is-preproduction || local.is-production ? 0 : 1
+  count                          = 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_mdss_staged_event"
@@ -950,7 +950,7 @@ module "merge_mdss_staged_event" {
 }
 
 module "merge_mdss_staged_position" {
-  count                          = local.is-preproduction || local.is-production ? 0 : 1
+  count                          = 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_mdss_staged_position"
@@ -972,13 +972,35 @@ module "merge_mdss_staged_position" {
 }
 
 module "merge_ac_position" {
-  count                          = local.is-preproduction || local.is-production ? 0 : 1
+  count                          = 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_ac_position"
   role_name                      = aws_iam_role.merge_load_ac.name
   role_arn                       = aws_iam_role.merge_load_ac.arn
   handler                        = "merge_ac_position.handler"
+  memory_size                    = 1024
+  timeout                        = 900
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+  cloudwatch_retention_days      = 7
+  environment_variables = {
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
+  }
+}
+
+module "merge_emdi_position" {
+  count                          = 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "merge_emdi_position"
+  role_name                      = aws_iam_role.merge_load_emdi.name
+  role_arn                       = aws_iam_role.merge_load_emdi.arn
+  handler                        = "merge_emdi_position.handler"
   memory_size                    = 1024
   timeout                        = 900
   reserved_concurrent_executions = 1
@@ -1064,5 +1086,29 @@ module "gdpr_unstructured_control_lambda" {
     GDPR_AUDIT_BUCKET           = module.s3-gdpr-audit-bucket.bucket.id
     ATHENA_QUERY_RESULTS_BUCKET = module.s3-athena-bucket.bucket.id
     ENVIRONMENT_NAME            = local.environment_shorthand
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# Write EAR/SAR data to SharePoint
+#-----------------------------------------------------------------------------------
+
+module "write_to_sharepoint" {
+  count                   = local.is-test ? 0 : 1
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "write_to_sharepoint"
+  role_name               = aws_iam_role.write_to_sharepoint[0].name
+  role_arn                = aws_iam_role.write_to_sharepoint[0].arn
+  handler                 = "write_to_sharepoint.handler"
+  memory_size             = 10240
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    SECRET_AZURE_TENANT_ID     = jsondecode(data.aws_secretsmanager_secret_version.entra_app_details[0].secret_string)["tenant_id"]
+    SECRET_AZURE_CLIENT_ID     = jsondecode(data.aws_secretsmanager_secret_version.entra_app_details[0].secret_string)["client_id"]
+    SECRET_AZURE_CLIENT_SECRET = jsondecode(data.aws_secretsmanager_secret_version.entra_app_details[0].secret_string)["client_secret"]
   }
 }

@@ -20,9 +20,9 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.2.4"
-      transfer_image_version = "0.0.26"
-      notify_image_version   = "0.0.27"
+      scan_image_version     = "0.2.5"
+      transfer_image_version = "0.0.27"
+      notify_image_version   = "0.0.28"
 
       /* Target Buckets */
       target_buckets = [
@@ -49,7 +49,7 @@ locals {
         }
         "opg-restore-ocr" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCWz7ue/saomMAKrVgo6FifjpGQfl7B4fs2s/MJa2jhpBVWXk9tquGDXp1/Yfk4C7FIneGKfh8fWHz9FPS+u6h3a9hMW8d/5onNuSr9S6T2mN7ydZQzGez5qyG2vNFLyip3ls6mQjIpXSo2aow7+3Y2lbDe8UamiYNVgvvWB+hVl5RJjcaReDDbi0xwdjGjep0LcvgAyKa8evmcEbFVkrLhWyc30xn1+OesqPWSpoIb/IlBDFxCqR46GW/zlOldEIatONhXWgvJ6dS5T1YmHsE4U0Py3BV8O5zvc+XRYjr/3w9LOwmTHS1xbzlhNBjO1o6O9hSBsowBjsWLL5aNWcdBH0DiWfIWkoq9Fy8VEAa/T5v7GCaKvDs9pGBpjQSQsWyKXbwP0Z2RGyU2CSGVzMM6gzrjaxanOK9QbLOqCpTSSIYWfokt+MNrHcQU+9mBTjq20URF7RW6tsM8GvzGRNk0hlkX3ueq86uLpQzRctGBTjN74qBba0WbauIcSl4OIrc+NEwjaFTmuIs0NIG5aoAop8WHOC8cxFAST2XjMF30eEh6/W9Gh0uPor4L5tUqJ/JuI2wcfYLuk1KLDcOUVin79QficX93zbaTPNXWW052ct50B0KnCmZyvQORwOH8gBFgkFe5MO/bqevG9Xpof/QvpCLKEON/fBAW4bEdIIv5qw=="
-          cidr_blocks = ["51.11.176.157/32", "20.117.187.79/32"]
+          cidr_blocks = ["51.11.176.157/32"]
         }
         "maat-xhibit-dev" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCuB8p8OaxeX3sILMVUQcD48XBPuVLzddUixUUbYLS1WPiEUz7XcUkozeuhulIy9CzqA9yyAa2uPWhQr3KL2bKpXo8UIJr+3n51mjJp9V+LO65kMN5ewQHzx9phpZba5UOth1aEwn4vAFQwm2q6/ydNrJtRQeaI0DT4njaf0MC9FM/nu25IvUbl2dzUn2MX7/WuMouzcYXTeiLUIMvgRoAw4pjnCmU2AuPTokC7OynFh++SiHRUw6OwNKxqORv3du7qlfcGDWx+oAHbUVOnSaTrUssUuEXPFS5ytwWEp6GpzfZpNvD7Kj7gw/7ntpdTckh+d5INJHu+2L74Ytj2RPLNoHEB9t1ptEI2d2SeKpHqPSak2uQzk4aHV2SJs4IO0omTWKHojtSxo5gxAl4B58UjdzmFn0yNr3rJbKnn2w1H7viaM/0vWRgZrtgo07pd2uJePObaUE9jf1re+woasVWJAy3v9dZszVBcJ62NK/QU3cGfUncBw2OnnDURm7z1YVAj8mrReOkZWFA7nJ4/Gzh5pR8wNhnSLsDFqsQefaQiHBi2vZzDRqaUu03eWvd8BmomWC5joT7qqY8Qv+X5boO9CI0hX9FcoJJMXJwckoVAZGuZKgOwOL4y1Y7hpCO1U5ex9mbyMy5D5r/FNf7B85d/qCxcGwesIzI1b0QRupKxDw=="
@@ -61,7 +61,7 @@ locals {
         }
         "access-uk" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDMRvtIhxI+k3AXkGpZe6242VucffThflI3PCezvNYhjHVCfaMvNjt0yAXOO7hrzqY8TMOwH2LXsM1yGhUrL2Qe2WBl5gebqsKsR0H6eKypdT6GJhWg81AAf2Zckzk2ibdHqs3w8ZmjGblSv6ReAfg4l/VYeAqdBCfY7m6r+jbgcRtRbsM75GGz0Ts1rgGYF9jrKglF0SKDxT2rvzX+mUB13oxjzWW+C8lGw7aVrtL+hDgXB7gRAa5hqnDIij4rdhd4xt/PzvFZ1FoeutnvEzNMvvtaC/0Iu6IdBdOk3ay/wG7Q6w9pb5BCvKYMUz3MXUbqRSUg8Ed/UHAs6kGBRS9h"
-          cidr_blocks = ["172.167.164.209/32"]
+          cidr_blocks = ["172.167.164.209/32", "51.11.29.242/32"]
         }
       }
       transfer_server_sftp_users_with_egress = {
@@ -104,7 +104,8 @@ locals {
         "mojap-land",
         "mojap-data-production-shared-services-client-team-gov-29148",
         "cloud-platform-623c2bd763adf52b51a0c0cee5c1ec72",
-        "property-datahub-landing-production"
+        "property-datahub-landing-production",
+        "ccms-ebs-production-bc-inbound-mp"
       ]
       datasync_target_buckets     = ["mojap-land"]
       datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-production"]
@@ -116,7 +117,8 @@ locals {
       /* Target KMS */
       target_kms_keys = [
         "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/62503ba6-316e-473d-ae4b-042f8420dd07", # s3/mojap-data-production-shared-services-client-team-gov-29148
-        "arn:aws:kms:eu-west-2:437720536440:key/d4cd0acf-5b4f-461f-ba01-886f814afec5"                                                                        # s3/property-datahub-landing-production
+        "arn:aws:kms:eu-west-2:437720536440:key/d4cd0acf-5b4f-461f-ba01-886f814afec5",                                                                       # s3/property-datahub-landing-production
+        "arn:aws:kms:eu-west-2:285499101317:key/5aa5fda6-0c5c-4a5d-9574-3b2ba9675e54"                                                                        # s3/ccms-ebs-production-bc-inbound-mp
       ]
       mojap_land_kms_key                  = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/2855ac30-4e14-482e-85ca-53258e01f64c"
       datasync_opg_target_bucket_kms      = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/96eb04fe-8393-402c-b1f9-71fcece99e75"
@@ -134,7 +136,7 @@ locals {
           cidr_blocks = ["20.50.108.242/32", "20.50.109.148/32", "51.11.124.205/32", "51.11.124.216/32"]
         }
         "opg-restore-ocr" = {
-          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCWz7ue/saomMAKrVgo6FifjpGQfl7B4fs2s/MJa2jhpBVWXk9tquGDXp1/Yfk4C7FIneGKfh8fWHz9FPS+u6h3a9hMW8d/5onNuSr9S6T2mN7ydZQzGez5qyG2vNFLyip3ls6mQjIpXSo2aow7+3Y2lbDe8UamiYNVgvvWB+hVl5RJjcaReDDbi0xwdjGjep0LcvgAyKa8evmcEbFVkrLhWyc30xn1+OesqPWSpoIb/IlBDFxCqR46GW/zlOldEIatONhXWgvJ6dS5T1YmHsE4U0Py3BV8O5zvc+XRYjr/3w9LOwmTHS1xbzlhNBjO1o6O9hSBsowBjsWLL5aNWcdBH0DiWfIWkoq9Fy8VEAa/T5v7GCaKvDs9pGBpjQSQsWyKXbwP0Z2RGyU2CSGVzMM6gzrjaxanOK9QbLOqCpTSSIYWfokt+MNrHcQU+9mBTjq20URF7RW6tsM8GvzGRNk0hlkX3ueq86uLpQzRctGBTjN74qBba0WbauIcSl4OIrc+NEwjaFTmuIs0NIG5aoAop8WHOC8cxFAST2XjMF30eEh6/W9Gh0uPor4L5tUqJ/JuI2wcfYLuk1KLDcOUVin79QficX93zbaTPNXWW052ct50B0KnCmZyvQORwOH8gBFgkFe5MO/bqevG9Xpof/QvpCLKEON/fBAW4bEdIIv5qw=="
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCbNgCuuc3q1yjTyFXI4i4hu9RUMciJvGXyMctZWW0tHjAmYA5uCPLQOiie2LN/bghjkXLg8aWh2WOITv9vcUksXS9pok7cZjTQUw+8p240apXEJYaq7F+orsYOK1s3Li8Z/h/53bPKwPOkO5Ve+28MGZ2ebACeMqEdhUjiWL7K1hnUuKPapxOAYfCzwxXQ03Z3jASOOV8gSci5YwvtMevoGzKbIDh+RHLRG4snijMSTc+8MA9I8T9JgzBD5eR8NGfGiUz9e01oYOiObEE+jjqUsGVaman2LHW+NBZRselCNF2jeT6dlTpETTPqUElRz95uLdEze6gMRubU3ssNMRMM2WbCrGqQn6O+nwKkQFdUmFAcpaCmIGFfYSqWoHxELJ+xdVUcKoTVfjnhgoPGaeahUiocEmxHMk4yRjuQMze8968NVLtVFWC++eHMDNrRXq7tsRH+IxP7hOw1IMADE8XTJrCg0Al4wXSvS4l9trbPuEmk8TDC0qq+ztV+TxBphVA0Ol0CNUE6Ie1qW0m//r87oh82gVk+y9YjYGxfUjCRwwdR7XKhPRUPJ/mrPQ+fhqvH1tjM58Ef93pGpPo6/jUABFuWS1Jmf1P/n2naUk11HxbE1LqMCesw/BjeKuaZWuNcL1vi4bWOTAqbokFezIr97QfHi2mQyJqCppKqFaEoUQ=="
           cidr_blocks = ["20.117.187.79/32"]
         }
         "sscl-chris-j" = {
@@ -157,6 +159,10 @@ locals {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC2o5mRmcvgNsrGjhzqKF4NEnQJ5bOXtVnbi9SVEKTJG7YQlRte+sC290y1Lvr2Sc1KItnIUGWU4vRh8w0KKYetKRQ/XqTqgobedS3aBQrOm/UBASdlFh+4WPhsDGEywhcjy7yNw/e5F8WjVQJlBjuowD6dl07dzR5lrpTZRWz3nMj3zfWHvWoU3nJLyOv1mbl22BRYMJTJ0IANxwuTQrNfepNypnPFBKe8kagGVrahd5xb+UXoSAaZhd+gguKjpBS6uufrvp2v/YdrgxkeS7k5LcIGuWqsGONPzrLfU5Gmgd1o7DlVM8/ex39EC0zxWwz6Kdp8r4O2zX0nPQHXCjyIZbON0etq2fcgdf239aQGRlDiwBH2YEpmHtcoEhULX8BgnPGQfVxVqU2lJnjlXX12PmlrOOOHmp4MOTX0OiOcPz9SOhpRGnSTum9BJQxp1jABCuKTNQjo2U5JJKEISZHazeXEQnPZPz3YUGmBAB4S6QN3cQfHzXCWD7+dsgAQ7qtyAZeN3YV9NLkBNbuoQoBuAdmAtDtSu8tyqjEaXpHqA3Od3XJhS77jprao+sUJgE9102QBlcXQp5+PUKf8Y8BlJR41yxYDU4nFa5/8Xu8H1Z4aGWt9+iEgjLNIzKi7ExXwjEZy6uPjPVO5/+LCRgPmf5ypLlc4GcI7G6G+5H9F1Q=="
           cidr_blocks = ["109.144.8.4/32"]
         }
+        "ccms-transfer-bc-production" = {
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDbzJeKIPpsPl5n+2z1al80H4EPGCY3WfwN8w4P4/zw6yS9uXfrH+X3Nz5jeVnQKuATI2/uQQ813TNjA6u0VP9Qqd8CJkhPIh42UDtuCwkt1aXDS0NZvUA8k7h85ZY2cboVcZZHLLljDL2B4SmKA6IFVZ9+sQaWDCJctOcFHhO9zQ8Sje4mtuJyCUjczV26Ge1o5Bo116xWX7eRr87wpJXbHMMR0jbdMRdpwfpks0kidtoCXPe6o/06jcorXvSSsNX0MAJhs/OUfAIZ1pwmwlwIkhulqNDF+5A1CLCYqKrpmX3CltApROWvjJNIBOxDVkf9yfpgJ1isiXzIud/bHgq2xTteWffpqDcLrPQXj8lsOD9+MuuGcSLLRcA+9jSHFz1BrMFLaMjPHEKE2EdWfWRJxHMcjdPStUQfAAJ2g0YUXwmsrCxXgrgQlFh+J478Xf0invBG+kz6yuw20CNaiKgF8fDwxBHoV6oQ1fxy8PUASgQZubU5YegAQdveUqTwcC4+Pw9IPZ7GAFaIl7GuORxth/WcJ7esoqv7q6jhAqqSvuUwPsDyzKCgvTjXoNrs/VNDx1fquHa/fRD/XreLJ47uYYoR0oNZnJINnD0P4D5Bfjf7cuHIttyR44ygnV/KZqQ8XGTsau0C9EDeH1CW90rq6EvtThYQdmD13KfQc3yatw=="
+          cidr_blocks = ["157.83.145.201/32", "157.83.145.202/32", "157.83.145.203/32", "157.83.145.204/32", "157.83.145.205/32", "157.83.147.201/32", "157.83.147.202/32", "157.83.147.203/32", "157.83.147.204/32", "157.83.147.205/32"]
+        }
       }
       transfer_server_sftp_users_with_egress = {
         "essex-police" = {
@@ -172,6 +178,20 @@ locals {
           # Without it, it cannot plan
           egress_bucket         = try(module.shared_services_client_team_gov_29148_egress_bucket[0].s3_bucket_id, null)
           egress_bucket_kms_key = try(module.shared_services_client_team_gov_29148_egress_kms[0].key_arn, null)
+        }
+        "wsm-access-lot1" = {
+          ssh_key               = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGdW8CETshyJErMuSaL9gL6+2MKl7nLtbC/mrUUyr4a1"
+          cidr_blocks           = ["100.64.15.107/32"]
+          egress_bucket         = try(module.property_datahub_staging_egress_bucket[0].s3_bucket_id, null)
+          egress_bucket_kms_key = try(module.property_datahub_staging_egress_kms[0].key_arn, null)
+          egress_folder_path    = "lot1"
+        }
+        "wsm-access-lot2" = {
+          ssh_key               = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGdW8CETshyJErMuSaL9gL6+2MKl7nLtbC/mrUUyr4a1"
+          cidr_blocks           = ["100.64.15.107/32"]
+          egress_bucket         = try(module.property_datahub_staging_egress_bucket[0].s3_bucket_id, null)
+          egress_bucket_kms_key = try(module.property_datahub_staging_egress_kms[0].key_arn, null)
+          egress_folder_path    = "lot2"
         }
       }
 

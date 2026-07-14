@@ -10,6 +10,9 @@ nameOverride: "litellm-admin"
 service:
   type: NodePort
 
+serviceMonitor:
+  enabled: true
+
 serviceAccount:
   create: false
   name: ${serviceAccountName}
@@ -25,14 +28,14 @@ resources:
 db:
   deployStandalone: false
   useExisting: true
-  url: postgresql://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST)/$(DATABASE_NAME)
+  url: postgresql://$(DATABASE_USERNAME)@$(DATABASE_HOST)/$(DATABASE_NAME)
   database: ${databaseName}
   secret:
     name: ${databaseSecret}
     usernameKey: ${databaseUserNameKey}
     passwordKey: ${databasePasswordKey}
     endpointKey: ${databaseEndpointKey}
-
+${databaseReaderEndpointKey != "" ? "    readReplicaUrlKey: ${databaseReaderEndpointKey}" : ""}
 masterkeySecretName: ${masterkeySecretName}
 masterkeySecretKey: ${masterkeySecretKey}
 
@@ -53,6 +56,7 @@ proxy_config:
     proxy_batch_write_at: 60
     database_connection_pool_limit: 10
   litellm_settings:
+    drop_params: true
     request_timeout: 600
     json_logs: true
     store_audit_logs: true
@@ -62,6 +66,11 @@ proxy_config:
       s3_region_name: ${auditLogsRegion}
       s3_path: litellm-audit
     cache: false
+    require_auth_for_metrics_endpoint: false
+    callbacks: ["prometheus"]
+    success_callback: ["prometheus"]
+    failure_callback: ["prometheus"]
+    service_callback: ["prometheus_system"]
     default_internal_user_params:
       user_role: proxy_admin
     cache_params:
@@ -74,14 +83,8 @@ proxy_config:
     redis_host: os.environ/primary_endpoint_address
     redis_port: 6379
     redis_password: os.environ/auth_token
-  model_list:
-%{ for key, profile in bedrockModels ~}
-    - model_name: bedrock-${key}
-      litellm_params:
-        model: bedrock/${profile.model_id}
-        aws_role_name: ${iamRole}
-        aws_region_name: ${profile.region}
-%{ endfor ~}
+
+  model_list: []
 
 tolerations:
   - key: compute.data-platform.service.justice.gov.uk/node-pool
@@ -161,7 +164,7 @@ envVars: {
     DISABLE_LLM_API_ENDPOINTS: "True",
     DOCS_DESCRIPTION: "Administration interface for the AI Gateway.",
     DOCS_FILTERED: "True",
-    DOCS_TITLE: "MOJ AI Gateway Admin",
+    DOCS_TITLE: "Justice AI Gateway Admin",
     LITELLM_ASSETS_PATH: "/app/var/litellm/assets",
     LITELLM_LOG: "ERROR",
     LITELLM_MIGRATION_DIR: "/app/migrations",
@@ -172,5 +175,8 @@ envVars: {
     PROXY_BASE_URL: "https://${ingressHostname}",
     REDIS_SSL: "True",
     USE_PRISMA_MIGRATE: "True",
-    XDG_CACHE_HOME: "/app/cache"
+    XDG_CACHE_HOME: "/app/cache",
+    IAM_TOKEN_DB_AUTH: "True",
+    DATABASE_USER: "${databaseUsername}",
+    STORE_MODEL_IN_DB: "True"
 }

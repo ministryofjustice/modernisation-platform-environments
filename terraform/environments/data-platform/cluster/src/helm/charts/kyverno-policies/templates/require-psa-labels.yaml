@@ -1,0 +1,43 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: require-psa-labels
+  annotations:
+    policies.kyverno.io/title: Require Pod Security Admission Labels
+    policies.kyverno.io/category: Pod Security Standards
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Namespace
+    policies.kyverno.io/description: >-
+      Pod Security Admission is applied per namespace via labels. This policy
+      requires every namespace to set the 'pod-security.kubernetes.io/enforce'
+      label on creation to 'baseline' or 'restricted'. The 'privileged' level is
+      not permitted, so every namespace enforces at least the baseline standard.
+spec:
+  validationActions:
+    - {{ .Values.validationAction }}
+  evaluation:
+    # Creation-time policy: background scanning is disabled so pre-existing
+    # namespaces that predate this policy are not repeatedly reported.
+    background:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE"]
+        resources: ["namespaces"]
+  variables:
+    - name: labels
+      expression: object.metadata.?labels.orValue({})
+    - name: enforce
+      expression: >-
+        'pod-security.kubernetes.io/enforce' in variables.labels
+        ? variables.labels['pod-security.kubernetes.io/enforce']
+        : ''
+  validations:
+    - expression: >-
+        variables.enforce != ''
+      message: "Namespaces must set the 'pod-security.kubernetes.io/enforce' Pod Security Admission label."
+    - expression: >-
+        variables.enforce == '' || variables.enforce in ['baseline', 'restricted']
+      message: "The 'pod-security.kubernetes.io/enforce' label must be 'baseline' or 'restricted'; 'privileged' is not permitted."

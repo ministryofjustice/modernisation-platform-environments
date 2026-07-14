@@ -94,3 +94,40 @@ module "cross_account_details" {
 
   tags = local.tags
 }
+
+module "entra_app_details" {
+  count  = local.is-test ? 0 : 1
+  source = "terraform-aws-modules/secrets-manager/aws"
+
+  name_prefix             = "entra_app_details"
+  description             = "details for the entra app"
+  recovery_window_in_days = 30
+
+  create_policy       = true
+  block_public_policy = true
+  policy_statements = {
+    read = {
+      sid = "AllowAccountRead"
+      principals = [{
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${local.env_account_id}:root"]
+      }]
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = ["*"]
+    }
+  }
+
+  ignore_secret_changes = true
+  secret_string = jsonencode({
+    tenant_id            = ""
+    client_id            = ""
+    client_secret        = ""
+  })
+
+  tags = local.tags
+}
+
+data "aws_secretsmanager_secret_version" "entra_app_details" {
+  count     = local.is-test ? 0 : 1
+  secret_id = module.entra_app_details[0].secret_id
+}

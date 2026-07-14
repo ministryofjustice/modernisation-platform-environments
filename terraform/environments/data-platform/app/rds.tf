@@ -4,13 +4,13 @@ module "app_rds" {
   identifier = local.component_name
 
   engine               = "postgres"
-  engine_version       = local.environment_configuration.rds_engine_version
+  engine_version       = local.environment_configuration.rds.engine_version
   family               = "postgres${local.rds_major_engine_version}"
   major_engine_version = local.rds_major_engine_version
-  instance_class       = local.environment_configuration.rds_instance_class
+  instance_class       = local.environment_configuration.rds.instance_class
 
-  allocated_storage     = local.environment_configuration.rds_allocated_storage
-  max_allocated_storage = local.environment_configuration.rds_max_allocated_storage
+  allocated_storage     = local.environment_configuration.rds.allocated_storage
+  max_allocated_storage = local.environment_configuration.rds.max_allocated_storage
   storage_type          = "gp3"
   storage_encrypted     = true
   kms_key_id            = module.rds_encryption.key_arn
@@ -21,7 +21,7 @@ module "app_rds" {
   password_wo_version         = 1
   manage_master_user_password = false
 
-  multi_az               = local.environment_configuration.rds_multi_az
+  multi_az               = local.environment_configuration.rds.multi_az
   publicly_accessible    = false
   vpc_security_group_ids = [module.app_rds_security_group.id]
 
@@ -32,16 +32,16 @@ module "app_rds" {
   parameter_group_use_name_prefix = false
   parameters = [
     {
-      name  = "rds.force_ssl"
-      value = "1"
+      name         = "rds.force_ssl"
+      value        = "1"
       apply_method = "pending-reboot"
     }
   ]
 
   iam_database_authentication_enabled = true
 
-  monitoring_interval    = local.environment_configuration.rds_monitoring_interval
-  create_monitoring_role = local.environment_configuration.rds_monitoring_interval != 0
+  monitoring_interval    = local.environment_configuration.rds.monitoring_interval
+  create_monitoring_role = local.environment_configuration.rds.monitoring_interval != 0
   monitoring_role_name   = "${local.component_name}-rds-monitoring"
 
   performance_insights_enabled          = true
@@ -50,7 +50,7 @@ module "app_rds" {
 
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
 
-  backup_retention_period = local.environment_configuration.rds_backup_retention_period
+  backup_retention_period = local.environment_configuration.rds.backup_retention_period
   backup_window           = "02:00-03:00"
   maintenance_window      = "Mon:03:30-Mon:04:30"
   copy_tags_to_snapshot   = true
@@ -62,7 +62,3 @@ module "app_rds" {
   skip_final_snapshot = !local.is-production
 }
 
-resource "random_password" "app_rds" {
-  length  = 32
-  special = false
-}

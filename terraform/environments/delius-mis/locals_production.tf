@@ -7,7 +7,7 @@ locals {
     legacy_ad_domain_name                  = "delius-prod.local"
     legacy_dns_ip_addrs                    = ["10.160.17.254", "10.160.22.121"]
     ad_domain_name                         = "delius-mis-prod.internal"
-    # ad_trust_domain_name                   = "azure.hmpp.root"
+    ad_trust_domain_name                   = "azure.hmpp.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
     ad_trust_dns_ip_addrs                  = module.ip_addresses.mp_ips.ad_fixngo_hmpp_domain_controllers
     core_shared_services_vpc_cidr          = module.ip_addresses.mp_cidr["core-shared-services-live-data-additional"]
@@ -18,10 +18,10 @@ locals {
     migration_environment_short_name       = "prod"
     migration_environment_private_cidr     = ["10.160.16.0/22", "10.160.20.0/22", "10.160.24.0/22"]
     migration_environment_db_cidr          = ["10.160.28.0/24", "10.160.29.0/24", "10.160.30.0/25"]
-    cloudwatch_alarm_schedule              = true
-    cloudwatch_alarm_disable_time          = "20:45"
-    cloudwatch_alarm_enable_time           = "06:15"
-    cloudwatch_alarm_disable_weekend       = true
+    cloudwatch_alarm_schedule              = false
+    cloudwatch_alarm_disable_time          = null
+    cloudwatch_alarm_enable_time           = null
+    cloudwatch_alarm_disable_weekend       = null
   }
 
   bastion_config_production = {
@@ -138,10 +138,10 @@ locals {
   }
 
   dis_config_production = {
-    instance_count    = 0
+    instance_count    = 1
     ami_name          = "delius_mis_windows_server_patch_2025-10-01T13-00-02.504Z"
     computer_name     = "NDMIS-PRD-DIS" # 15 char limit
-    powershell_branch = "TM-2016/delius-mis/preprod-dis-build"
+    powershell_branch = "TM-2156/delius-mis/build-dis-server-part-1"
 
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100 }
@@ -280,8 +280,8 @@ locals {
 
   # BOE DB config
   boe_db_config_production = {
-    primary_instance_count = 0
-    standby_instance_count = 0
+    primary_instance_count = 1
+    standby_instance_count = 1
     instance_type          = "m7i.large"
     ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
@@ -306,7 +306,7 @@ locals {
         iops       = 3000
         throughput = 500
         type       = "gp3"
-        total_size = 200
+        total_size = 500
       }
       flash = {
         iops       = 3000
@@ -326,8 +326,8 @@ locals {
 
   # DSD DB config
   dsd_db_config_production = {
-    primary_instance_count = 0
-    standby_instance_count = 0
+    primary_instance_count = 1
+    standby_instance_count = 1
     instance_type          = "r7i.large"
     ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
@@ -372,8 +372,8 @@ locals {
 
   # MIS DB config
   mis_db_config_production = {
-    primary_instance_count = 0
-    standby_instance_count = 0
+    primary_instance_count = 1
+    standby_instance_count = 1
     instance_type          = "r7i.12xlarge"
     ami_name_regex         = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
@@ -402,7 +402,7 @@ locals {
         type       = "gp3"
       }
       data = {
-        iops       = 7680
+        iops       = 15360
         throughput = 480
         type       = "gp3"
         total_size = 7000
@@ -427,20 +427,17 @@ locals {
     throughtput_capacity = 16
   }
 
-  # fsx_config_production = {
-  #   storage_capacity     = 1000 # temporarily increasing for prod->stage migration, was 200
-  #   throughtput_capacity = 128  # temporarily increasing for prod->stage migration, was 16
-  # }
+  dfi_report_bucket_config_production = {
+    bucket_policy_enabled = true
+  }
 
-  dfi_report_bucket_config_production = null
+  lb_config_production = {
+    bucket_policy_enabled = true
+  }
 
-  lb_config_production = null
-
-  # lb_config_production = {
-  #   bucket_policy_enabled = true
-  # }
-
-  datasync_config_production = null
+  datasync_config_production = {
+    source_s3_bucket_arn = "arn:aws:s3:::eu-west-2-delius-prod-dfi-extracts"
+  }
 
   db_backup_config_production = {
     object_lock_days             = 1

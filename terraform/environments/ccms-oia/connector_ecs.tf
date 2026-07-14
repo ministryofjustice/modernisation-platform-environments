@@ -46,6 +46,10 @@ resource "aws_ecs_task_definition" "ecs_connector_task_definition" {
       logging_level_oracle_ocs_opa_laa             = local.application_data.accounts[local.environment].logging_level_oracle_ocs_opa_laa
       logging_level_uk_gov_laa_opa                 = local.application_data.accounts[local.environment].logging_level_uk_gov_laa_opa
       opa_security_password                        = "${aws_secretsmanager_secret.connector_secrets.arn}:opa_security_password::"
+      ccms_bc_url                                  = "${aws_secretsmanager_secret.connector_secrets.arn}:ccms_bc_url::"
+      ccms_bc_lscServiceName                       = "${aws_secretsmanager_secret.connector_secrets.arn}:ccms_bc_lscServiceName::"
+      ccms_bc_clientOrgId                          = "${aws_secretsmanager_secret.connector_secrets.arn}:ccms_bc_clientOrgId::"
+      ccms_bc_clientUserId                         = "${aws_secretsmanager_secret.connector_secrets.arn}:ccms_bc_clientUserId::"
     }
   )
 

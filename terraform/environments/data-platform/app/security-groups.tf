@@ -8,16 +8,12 @@ module "app_rds_security_group" {
   revoke_rules_on_delete = true
 
   ingress_rules = {
-    for subnet_name, subnet_cidr in {
-      private_subnet_a = data.aws_subnet.private_subnets_a.cidr_block
-      private_subnet_b = data.aws_subnet.private_subnets_b.cidr_block
-      private_subnet_c = data.aws_subnet.private_subnets_c.cidr_block
-      } : "postgres_from_${subnet_name}" => {
+    eks_ingress = {
       from_port   = 5432
       to_port     = 5432
       ip_protocol = "tcp"
-      cidr_ipv4   = subnet_cidr
-      description = "Allow PostgreSQL access from EKS ${replace(subnet_name, "_", " ")}"
+      cidr_ipv4   = data.aws_vpc.eks.cidr_block
+      description = "Allow PostgreSQL access from EKS pods"
     }
   }
 
