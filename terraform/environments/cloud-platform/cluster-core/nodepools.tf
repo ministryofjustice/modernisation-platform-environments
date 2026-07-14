@@ -54,7 +54,7 @@ resource "kubectl_manifest" "default_nodepool" {
               values: ["amd64"]
             - key: eks.amazonaws.com/instance-category
               operator: In
-              values: ["c", "m", "r"]
+              values: ["m", "r"]
             - key: eks.amazonaws.com/instance-generation
               operator: Gt
               values: ["3"]
@@ -62,9 +62,9 @@ resource "kubectl_manifest" "default_nodepool" {
             - key: topology.kubernetes.io/zone
               operator: In
               values: ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
-            - key: "eks.amazonaws.com/instance-cpu"
+            - key: "eks.amazonaws.com/instance-size"
               operator: In
-              values: ["16", "32"]
+              values: ["4xlarge", "8xlarge"]
           nodeClassRef:
             group: eks.amazonaws.com
             kind: NodeClass
@@ -72,7 +72,7 @@ resource "kubectl_manifest" "default_nodepool" {
         metadata:
           labels:
             Terraform: "true"
-            "cloud-platform.justice.gov.uk/default-ng": "true"
+            "container-platform.justice.gov.uk/default-ng": "true"
             Cluster: "${terraform.workspace}"
             Domain: "${terraform.workspace}.container-platform.service.justice.gov.uk"
       disruption:
@@ -103,7 +103,7 @@ resource "kubectl_manifest" "system_nodepool" {
               values: ["amd64"]
             - key: eks.amazonaws.com/instance-category
               operator: In
-              values: ["c", "m", "r"]
+              values: ["m", "r"]
             - key: eks.amazonaws.com/instance-generation
               operator: Gt
               values: ["3"]
@@ -119,7 +119,7 @@ resource "kubectl_manifest" "system_nodepool" {
         metadata:
           labels:
             Terraform: "true"
-            "cloud-platform.justice.gov.uk/system-ng": "true"
+            "container-platform.justice.gov.uk/system-ng": "true"
             Cluster: "${terraform.workspace}"
             Domain: "${terraform.workspace}.container-platform.service.justice.gov.uk"
       disruption:
