@@ -264,7 +264,7 @@ resource "aws_iam_instance_profile" "ssm_instance_profile" {
 
 # Create S3 bucket
 module "s3-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=4e17731f72ef24b804207f55b182f49057e73ec9" #v8.1.0
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=355197b5695fcce014ad838c7b586b95f9eb4988" # v10.2.0
 
   bucket_prefix      = "panda-cyber-bucket"
   versioning_enabled = true
@@ -355,7 +355,3 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
   bucket = module.s3-bucket.bucket.id
   policy = data.aws_iam_policy_document.bucket_policy.json
 }
-
-
-
-
