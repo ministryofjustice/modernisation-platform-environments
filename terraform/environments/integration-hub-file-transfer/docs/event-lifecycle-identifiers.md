@@ -26,7 +26,7 @@ The top-level EventBridge **`id`** is different from all of the above. It identi
 
 When a file lands in the `incoming` bucket, S3 sends a native `Object Created` notification to EventBridge. A Lambda adapter picks this up and publishes `FileReceived.v1` to the file-transfer event bus.
 
-The adapter calculates both `fileId` and `correlationId` as a SHA-256 digest of the bucket name, object key and S3 version ID. This gives the same logical file the same identity even when S3 emits more than one notification for that exact object version.
+The adapter calculates both `fileId` and `correlationId` as a deterministic UUID derived from a SHA-256 hash of the bucket name, object key and S3 version ID. This gives the same logical file the same identity even when S3 emits more than one notification for that exact object version.
 
 The `idempotencyKey` is set to `bucket:key:versionId`, for example:
 

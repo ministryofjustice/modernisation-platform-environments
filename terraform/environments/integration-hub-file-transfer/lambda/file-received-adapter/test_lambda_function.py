@@ -112,9 +112,9 @@ class FileReceivedAdapterTest(unittest.TestCase):
 
         entry = self.events_client.put_events.call_args.kwargs["Entries"][0]
         detail = json.loads(entry["Detail"])
-        expected_file_id = hashlib.sha256(
-            f"{INCOMING_BUCKET}:example/report.csv:3Lg...".encode("utf-8")
-        ).hexdigest()
+        expected_file_id = self.adapter._file_id(
+            INCOMING_BUCKET, "example/report.csv", "3Lg..."
+        )
         self.assertEqual(entry["DetailType"], "FileReceived.v1")
         self.assertEqual(
             entry["Source"], "uk.gov.justice.service.managed-file-transfer"

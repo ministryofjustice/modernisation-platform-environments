@@ -32,9 +32,11 @@ def _required(value, field_name):
 
 
 def _file_id(bucket_name, object_key, version_id):
-    object_version = f"{bucket_name}:{object_key}:{version_id}"
-    return hashlib.sha256(object_version.encode("utf-8")).hexdigest()
+    import uuid
 
+    object_version = f"{bucket_name}:{object_key}:{version_id}"
+    digest = hashlib.sha256(object_version.encode("utf-8")).digest()
+    return str(uuid.UUID(bytes=digest[:16], version=5))
 
 def _build_detail(event):
     if event.get("source") != "aws.s3":
