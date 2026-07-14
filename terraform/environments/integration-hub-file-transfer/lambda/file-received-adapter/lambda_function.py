@@ -1,3 +1,4 @@
+import hashlib
 import json
 import os
 from datetime import datetime
@@ -30,13 +31,17 @@ def _required(value, field_name):
     return value
 
 
+def _file_id(bucket_name, object_key, version_id):
+    object_version = f"{bucket_name}:{object_key}:{version_id}"
+    return hashlib.sha256(object_version.encode("utf-8")).hexdigest()
+
+
 def _build_detail(event):
     if event.get("source") != "aws.s3":
         raise ValueError("Event source must be aws.s3")
     if event.get("detail-type") != "Object Created":
         raise ValueError("Event detail-type must be Object Created")
 
-    event_id = _required(event.get("id"), "id")
     detail = _required(event.get("detail"), "detail")
     bucket = _required(detail.get("bucket"), "detail.bucket")
     bucket_name = _required(bucket.get("name"), "detail.bucket.name")
@@ -49,14 +54,15 @@ def _build_detail(event):
         object_detail.get("version-id"), "detail.object.version-id"
     )
     size_bytes = _required(object_detail.get("size"), "detail.object.size")
+    file_id = _file_id(bucket_name, object_key, version_id)
 
     return {
         "metadata": {
-            "correlationId": event_id,
+            "correlationId": file_id,
             "idempotencyKey": f"{bucket_name}:{object_key}:{version_id}",
         },
         "data": {
-            "fileId": event_id,
+            "fileId": file_id,
             "object": {
                 "bucket": bucket_name,
                 "key": object_key,

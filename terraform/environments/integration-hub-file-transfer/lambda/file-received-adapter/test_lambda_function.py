@@ -1,4 +1,5 @@
 import importlib
+import hashlib
 import json
 import os
 import sys
@@ -111,12 +112,15 @@ class FileReceivedAdapterTest(unittest.TestCase):
 
         entry = self.events_client.put_events.call_args.kwargs["Entries"][0]
         detail = json.loads(entry["Detail"])
+        expected_file_id = hashlib.sha256(
+            f"{INCOMING_BUCKET}:example/report.csv:3Lg...".encode("utf-8")
+        ).hexdigest()
         self.assertEqual(entry["DetailType"], "FileReceived.v1")
         self.assertEqual(
             entry["Source"], "uk.gov.justice.service.managed-file-transfer"
         )
-        self.assertEqual(detail["data"]["fileId"], self.event["id"])
-        self.assertEqual(detail["metadata"]["correlationId"], self.event["id"])
+        self.assertEqual(detail["data"]["fileId"], expected_file_id)
+        self.assertEqual(detail["metadata"]["correlationId"], expected_file_id)
         self.assertEqual(
             detail["metadata"]["idempotencyKey"],
             f"{INCOMING_BUCKET}:example/report.csv:3Lg...",
@@ -131,6 +135,17 @@ class FileReceivedAdapterTest(unittest.TestCase):
 
         self.assertEqual(first_result, second_result)
         self.events_client.put_events.assert_called_once()
+
+    def test_same_object_version_has_stable_identity_across_notifications(self):
+        first_detail = self.adapter._build_detail(self.event)
+        self.event["id"] = "a-new-native-event-id"
+        second_detail = self.adapter._build_detail(self.event)
+
+        self.assertEqual(first_detail["data"]["fileId"], second_detail["data"]["fileId"])
+        self.assertEqual(
+            first_detail["metadata"]["correlationId"],
+            second_detail["metadata"]["correlationId"],
+        )
 
     def test_configures_source_event_id_as_required_idempotency_key(self):
         self.assertEqual(self.adapter.idempotency_config.options["event_key_jmespath"], "id")
