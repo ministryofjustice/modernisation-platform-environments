@@ -32,7 +32,7 @@ resource "kubectl_manifest" "default_nodeclass" {
 
       tags:
         application: "moj-container-platform"
-        business-unit: "platforms"
+        business-unit: "octo"
   YAML
 }
 
