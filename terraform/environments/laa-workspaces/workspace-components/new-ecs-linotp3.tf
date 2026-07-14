@@ -148,3 +148,77 @@ resource "aws_iam_role_policy" "ecs_task_execution_secrets" {
     ]
   })
 }
+
+##############################################
+### ALB Target Group + Listener Rule for LinOTP 3.x Portal
+##############################################
+
+resource "aws_lb_target_group" "linotp3_portal" {
+  count = local.environment == "development" ? 1 : 0
+
+  name_prefix = "lntp3-"
+  port        = 5000
+  protocol    = "HTTP"
+  target_type = "ip"
+  vpc_id      = aws_vpc.workspaces[0].id
+
+  health_check {
+    enabled             = true
+    path                = "/"
+    protocol            = "HTTP"
+    matcher             = "200-399"
+    interval            = 30
+    timeout             = 10
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+  }
+
+  deregistration_delay = 30
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-linotp3-portal" }
+  )
+}
+
+resource "aws_lb_listener_rule" "linotp3_portal" {
+  count = local.environment == "development" ? 1 : 0
+
+  listener_arn = aws_lb_listener.radius_https[0].arn
+  priority     = 10
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.linotp3_portal[0].arn
+  }
+
+  condition {
+    host_header {
+      values = ["workspace-mfa-ecs.${trimsuffix(data.aws_route53_zone.external.name, ".")}"]
+    }
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-${local.environment}-linotp3-portal-rule" }
+  )
+}
+
+resource "aws_route53_record" "linotp3_portal" {
+  count = local.environment == "development" ? 1 : 0
+
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "workspace-mfa-ecs.${data.aws_route53_zone.external.name}"
+  type     = "A"
+
+  alias {
+    name                   = aws_lb.radius_portal[0].dns_name
+    zone_id                = aws_lb.radius_portal[0].zone_id
+    evaluate_target_health = true
+  }
+}
