@@ -226,6 +226,18 @@ resource "aws_iam_role_policy_attachment" "ssm_policy" {
   role       = aws_iam_role.ssm_role.name
 }
 
+resource "aws_kms_key" "s3" {
+  description             = "CMK for panda-cyber-appsec-lab S3 bucket encryption"
+  deletion_window_in_days = 10
+  enable_key_rotation     = true
+  tags                    = local.tags
+}
+
+resource "aws_kms_alias" "s3" {
+  name          = "alias/panda-cyber-appsec-lab-s3"
+  target_key_id = aws_kms_key.s3.key_id
+}
+
 # Attach an additional policy for S3 access
 resource "aws_iam_policy" "s3_access_policy" {
   name        = "SSMInstanceS3AccessPolicy"
@@ -244,6 +256,18 @@ resource "aws_iam_policy" "s3_access_policy" {
         Resource = [
           module.s3-bucket.bucket.arn,
           "${module.s3-bucket.bucket.arn}/*"
+        ]
+      },
+      {
+        Action = [
+          "kms:Decrypt",
+          "kms:Encrypt",
+          "kms:GenerateDataKey",
+          "kms:DescribeKey"
+        ],
+        Effect = "Allow",
+        Resource = [
+          aws_kms_key.s3.arn
         ]
       }
     ]
@@ -268,6 +292,19 @@ module "s3-bucket" {
 
   bucket_prefix      = "panda-cyber-bucket"
   versioning_enabled = true
+  sse_algorithm      = "aws:kms"
+  custom_kms_key     = aws_kms_key.s3.arn
+
+  # Keep environment-specific allow access inside the module policy to avoid
+  # conflicts with the module-managed aws_s3_bucket_policy resource.
+  bucket_policy_v2 = [{
+    effect  = "Allow"
+    actions = ["s3:GetObject", "s3:PutObject", "s3:ListBucket"]
+    principals = {
+      type        = "AWS"
+      identifiers = [aws_iam_role.ssm_role.arn]
+    }
+  }]
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
   ownership_controls = "BucketOwnerEnforced"
@@ -326,32 +363,4 @@ module "s3-bucket" {
   ]
 
   tags = local.tags
-}
-
-data "aws_iam_policy_document" "bucket_policy" {
-  statement {
-    sid    = "s3Access"
-    effect = "Allow"
-
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:ListBucket"
-    ]
-
-    resources = [
-      module.s3-bucket.bucket.arn,
-      "${module.s3-bucket.bucket.arn}/*"
-    ]
-
-    principals {
-      type        = "AWS"
-      identifiers = [aws_iam_role.ssm_role.arn]
-    }
-  }
-}
-
-resource "aws_s3_bucket_policy" "bucket_policy" {
-  bucket = module.s3-bucket.bucket.id
-  policy = data.aws_iam_policy_document.bucket_policy.json
 }
