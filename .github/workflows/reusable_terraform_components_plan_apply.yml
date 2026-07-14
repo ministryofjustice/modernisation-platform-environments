@@ -141,8 +141,19 @@
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
               terraform --version
-              echo "terraform init"
-              terraform init
+              state_kms_key_id=$(aws s3api get-bucket-encryption \
+                --bucket modernisation-platform-terraform-state \
+                --region eu-west-2 \
+                --query 'ServerSideEncryptionConfiguration.Rules[0].ApplyServerSideEncryptionByDefault.KMSMasterKeyID' \
+                --output text)
+
+              if [[ -z "${state_kms_key_id}" || "${state_kms_key_id}" == "None" ]]; then
+                echo "Unable to resolve state bucket KMS key ARN from bucket encryption config." >&2
+                exit 1
+              fi
+
+              echo "terraform init with state bucket KMS backend config"
+              terraform init -backend-config="kms_key_id=${state_kms_key_id}"
 
           #
           # Terraform Workspace Select
@@ -342,8 +353,19 @@
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
               terraform --version
-              echo "terraform init"
-              terraform init
+              state_kms_key_id=$(aws s3api get-bucket-encryption \
+                --bucket modernisation-platform-terraform-state \
+                --region eu-west-2 \
+                --query 'ServerSideEncryptionConfiguration.Rules[0].ApplyServerSideEncryptionByDefault.KMSMasterKeyID' \
+                --output text)
+
+              if [[ -z "${state_kms_key_id}" || "${state_kms_key_id}" == "None" ]]; then
+                echo "Unable to resolve state bucket KMS key ARN from bucket encryption config." >&2
+                exit 1
+              fi
+
+              echo "terraform init with state bucket KMS backend config"
+              terraform init -backend-config="kms_key_id=${state_kms_key_id}"
 
           - name: Terraform Workspace Select
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
