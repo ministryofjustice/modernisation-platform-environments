@@ -60,6 +60,14 @@ resource "aws_security_group" "ecs_linotp3" {
   }
 
   ingress {
+    description = "LinOTP HTTP from NLB (health checks)"
+    from_port   = 5000
+    to_port     = 5000
+    protocol    = "tcp"
+    cidr_blocks = [aws_vpc.workspaces[0].cidr_block]
+  }
+
+  ingress {
     description = "RADIUS auth from VPC"
     from_port   = 1812
     to_port     = 1812
