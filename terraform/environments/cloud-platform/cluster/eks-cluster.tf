@@ -10,8 +10,14 @@ module "eks" {
   enable_irsa        = true
 
   endpoint_private_access = true
+  endpoint_public_access  = true
   # endpoint_public_access_cidrs = ["0.0.0.0/0"]
-  endpoint_public_access = true
+
+  iam_role_name            = "${trimprefix(trimprefix(terraform.workspace, "cloud-platform-"), "container-platform-")}-cluster"
+  iam_role_use_name_prefix = false
+
+  node_iam_role_name            = "${trimprefix(trimprefix(terraform.workspace, "cloud-platform-"), "container-platform-")}-eks-auto"
+  node_iam_role_use_name_prefix = false
 
   # enable_cluster_creator_admin_permissions = true ## CP GitHub actions access to cluster, Adds to access entries
   compute_config = {

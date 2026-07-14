@@ -216,8 +216,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "s3_general" {
         storage_class   = "STANDARD_IA"
       }
       transition {
-        days            = 60
-        storage_class   = "STANDARD_IA"
+        days          = 60
+        storage_class = "STANDARD_IA"
       }
     }
   }

@@ -4,38 +4,59 @@
   "description": "A routed object has matched a configured follow-up action. The platform has determined that a particular action should be performed and identifies both the configured actionDefinitionId and unique actionExecutionId.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "id", "detail-type", "source", "account", "time", "region", "detail"],
+  "required": [
+    "version",
+    "id",
+    "detail-type",
+    "source",
+    "account",
+    "time",
+    "region",
+    "detail"
+  ],
   "properties": {
-    "version": {"type": "string", "enum": ["0"]},
-    "id": {"type": "string", "format": "uuid"},
-    "detail-type": {"type": "string", "enum": ["FileActionExecutionRequested.v1"]},
-    "source": {"type": "string", "enum": ["uk.gov.justice.service.managed-file-transfer"]},
-    "account": {"type": "string", "pattern": "^[0-9]{12}$"},
-    "time": {"type": "string", "format": "date-time"},
-    "region": {"type": "string"},
-    "resources": {"type": "array", "items": {"type": "string"}},
-    "replay-name": {"type": "string", "minLength": 1},
+    "version": { "type": "string", "enum": ["0"] },
+    "id": { "type": "string", "format": "uuid" },
+    "detail-type": {
+      "type": "string",
+      "enum": ["FileActionExecutionRequested.v1"]
+    },
+    "source": {
+      "type": "string",
+      "enum": ["uk.gov.justice.service.managed-file-transfer"]
+    },
+    "account": { "type": "string", "pattern": "^[0-9]{12}$" },
+    "time": { "type": "string", "format": "date-time" },
+    "region": { "type": "string" },
+    "resources": { "type": "array", "items": { "type": "string" } },
+    "replay-name": { "type": "string", "minLength": 1 },
     "detail": {
       "type": "object",
       "additionalProperties": false,
       "required": ["metadata", "data"],
       "properties": {
-        "metadata": {"$ref": "#/definitions/eventMetadata"},
+        "metadata": { "$ref": "#/definitions/eventMetadata" },
         "data": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["fileId", "object", "actionDefinitionId", "actionExecutionId", "requestedAt"],
+          "required": [
+            "fileId",
+            "object",
+            "actionDefinitionId",
+            "actionExecutionId",
+            "requestedAt"
+          ],
           "properties": {
             "fileId": {
               "type": "string",
               "format": "uuid",
               "description": "Stable logical file identifier inherited from FileReceived.v1."
             },
-            "object": {"$ref": "#/definitions/s3Object"},
-            "actionDefinitionId": {"type": "string", "minLength": 1},
-            "actionExecutionId": {"type": "string", "format": "uuid"},
-            "requestedAt": {"type": "string", "format": "date-time"},
-            "parameters": {"type": "object"}
+            "object": { "$ref": "#/definitions/s3Object" },
+            "actionDefinitionId": { "type": "string", "minLength": 1 },
+            "actionExecutionId": { "type": "string", "format": "uuid" },
+            "requestedAt": { "type": "string", "format": "date-time" },
+            "parameters": { "type": "object" }
           }
         }
       }
@@ -47,9 +68,9 @@
       "additionalProperties": false,
       "required": ["correlationId", "causationId", "idempotencyKey"],
       "properties": {
-        "correlationId": {"type": "string", "format": "uuid"},
-        "causationId": {"type": "string", "format": "uuid"},
-        "idempotencyKey": {"type": "string", "minLength": 1}
+        "correlationId": { "type": "string", "format": "uuid" },
+        "causationId": { "type": "string", "format": "uuid" },
+        "idempotencyKey": { "type": "string", "minLength": 1 }
       }
     },
     "s3Object": {
@@ -58,10 +79,10 @@
       "description": "A particular version of an object stored in Amazon S3.",
       "required": ["bucket", "key", "versionId", "sizeBytes"],
       "properties": {
-        "bucket": {"type": "string", "minLength": 3},
-        "key": {"type": "string", "minLength": 1},
-        "versionId": {"type": "string", "minLength": 1},
-        "sizeBytes": {"type": "integer", "minimum": 0}
+        "bucket": { "type": "string", "minLength": 3 },
+        "key": { "type": "string", "minLength": 1 },
+        "versionId": { "type": "string", "minLength": 1 },
+        "sizeBytes": { "type": "integer", "minimum": 0 }
       }
     }
   },
