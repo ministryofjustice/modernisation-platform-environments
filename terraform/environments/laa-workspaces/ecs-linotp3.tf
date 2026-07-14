@@ -33,8 +33,8 @@ resource "aws_ecs_task_definition" "linotp3" {
       environment = [
         { name = "LINOTP_DB_HOST", value = data.terraform_remote_state.workspace_components.outputs.linotp3_db_endpoint },
         { name = "LINOTP_DB_USER", value = "linotp" },
-        # AD LDAP configuration - uses AD DNS IP from directory service
-        { name = "AD_LDAP_URI", value = "ldap://${aws_directory_service_directory.workspaces_ad[0].dns_ip_addresses[0]}:389" },
+        # AD LDAP configuration - uses AD DNS IP from directory service (first DNS server)
+        { name = "AD_LDAP_URI", value = "ldap://${tolist(aws_directory_service_directory.workspaces_ad[0].dns_ip_addresses)[0]}:389" },
         { name = "AD_BASE_DN", value = "DC=laa-workspaces,DC=local" },
         { name = "AD_BIND_DN", value = "CN=lambda.workspace,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local" },
         { name = "AD_USER_FILTER", value = "(&(sAMAccountName=%s)(objectClass=user))" },
