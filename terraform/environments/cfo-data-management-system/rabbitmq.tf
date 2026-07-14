@@ -33,7 +33,7 @@ resource "aws_instance" "rabbitmq" {
     delete_on_termination = false
   }
 
-  user_data = base64encode(templatefile("${path.module}/templates/rabbitmq-userdata.sh.tftpl", {
+  user_data_base64 = base64encode(templatefile("${path.module}/templates/rabbitmq-userdata.sh.tftpl", {
     secret_arn = aws_secretsmanager_secret.rabbitmq-password.arn
     region     = data.aws_region.current.name
   }))
@@ -45,6 +45,6 @@ resource "aws_instance" "rabbitmq" {
 
   lifecycle {
     # Prevent replacement when a newer AMI is published or user_data drifts after first boot
-    ignore_changes = [ami, user_data]
+    ignore_changes = [ami, user_data_base64]
   }
 }
