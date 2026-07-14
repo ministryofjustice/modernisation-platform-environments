@@ -18,6 +18,8 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
+  "id": null,
+  "links": [],
   "liveNow": false,
   "panels": [
     {
@@ -46,7 +48,7 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "# LiteLLM AI Gateway\n\nThis dashboard monitors the **LiteLLM AI Gateway** — the internal proxy that routes, load-balances, and tracks spend for all LLM API traffic across teams.\n\n**What to look first:**\n- **Overview** — total requests, failures, spend, and token usage over the selected time range, plus current model/provider health.\n- **Deployment Health** — health-check failure rates and cooldown events per model deployment.\n- **Proxy Overview** — request/failure rates and latency for the proxy itself.\n- **Budget** — remaining budget per team and per virtual API key.\n- **Latency / Redis & Postgres / Spend Queue Backpressure** — infrastruture-level performance and backpressure indicators.\n- **Usage by Model & Virtual Key** — token and spend breakdowns for cost attribution.\n- **LLM API Rate Limits** — remaining rate-limit headroom reported by upstream providers.",
+        "content": "# LiteLLM AI Gateway\n\nThis dashboard monitors the **LiteLLM AI Gateway** — the internal proxy that routes, load-balances, and tracks spend for all LLM API traffic across teams.\n\n**What to look first:**\n- **Overview** — total requests, failures, spend, and token usage over the selected time range, plus current model/provider health.\n- **Deployment Health** — health-check failure rates and cooldown events per model deployment.\n- **Proxy Overview** — request/failure rates and latency for the proxy itself.\n- **Budget** — remaining budget per team and per virtual API key.\n- **Latency / Redis & Postgres / Spend Queue Backpressure** — infrastructure-level performance and backpressure indicators.\n- **Usage by Model & Virtual Key** — token and spend breakdowns for cost attribution.\n- **LLM API Rate Limits** — remaining rate-limit headroom reported by upstream providers.",
         "mode": "markdown"
       },
       "pluginVersion": "13.0.2",
@@ -1709,7 +1711,7 @@
           },
           "editorMode": "code",
           "expr": "(sum(rate(litellm_proxy_total_requests_metric_total{container=\"litellm\"}[2m])) by (api_key_alias))",
-          "legendFormat": "{{team_alias}}",
+          "legendFormat": "{{api_key_alias}}",
           "range": true,
           "refId": "A"
         }
@@ -4018,7 +4020,7 @@
           },
           "editorMode": "code",
           "expr": "(sum(rate(litellm_proxy_failed_requests_metric_total{container=\"litellm\"}[2m])) by (exception_class))",
-          "legendFormat": "{{api_key_alias}}",
+          "legendFormat": "{{exception_class}}",
           "range": true,
           "refId": "A"
         }
@@ -4148,10 +4150,7 @@
     "list": [
       {
         "allowCustomValue": true,
-        "current": {
-          "text": "data-platform-development-prometheus",
-          "value": "development-prometheus"
-        },
+        "current": {},
         "hide": 0,
         "includeAll": false,
         "label": "Datasource",
