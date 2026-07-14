@@ -28,7 +28,7 @@ api_call() {
     local endpoint="$1"
     shift
     local response
-    response=$(curl -sf "$LINOTP_URL$endpoint" "$@" 2>&1)
+    response=$(curl -sf --connect-timeout 10 --max-time 30 "$LINOTP_URL$endpoint" "$@" 2>&1)
     local exit_code=$?
     if [ $exit_code -ne 0 ]; then
         echo "ERROR: API call to $endpoint failed (exit code: $exit_code)"
