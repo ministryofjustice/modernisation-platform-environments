@@ -35,7 +35,7 @@ resource "aws_lb_target_group" "radius_ecs" {
     enabled             = true
     protocol            = "HTTP"
     port                = 5000
-    path                = "/manage/"
+    path                = "/"
     interval            = 30
     healthy_threshold   = 2
     unhealthy_threshold = 6  # Allow 180s for LinOTP startup (startPeriod = 120s + buffer)
