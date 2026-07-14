@@ -27,8 +27,9 @@ module "eventbridge_default_bus" {
   targets = {
     "incoming-s3-object-created" = [
       {
-        name = "file-received-v1"
-        arn  = module.lambda_file_received_adapter.lambda_function_arn
+        name            = "file-received-v1"
+        dead_letter_arn = module.sqs_eventbridge_default_dlq.queue_arn
+        arn             = module.lambda_file_received_adapter.lambda_function_arn
       }
     ]
   }
