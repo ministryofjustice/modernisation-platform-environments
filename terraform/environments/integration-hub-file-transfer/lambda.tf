@@ -13,7 +13,7 @@ module "lambda_file_received_adapter" {
   function_name                     = "${local.application_name}-file-received-adapter"
   handler                           = "lambda_function.lambda_handler"
   maximum_event_age_in_seconds      = 21600
-  maximum_retry_attempts            = 3
+  maximum_retry_attempts            = 2
   memory_size                       = 128
   reserved_concurrent_executions    = 10
   runtime                           = "python3.12"
