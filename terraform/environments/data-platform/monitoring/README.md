@@ -54,7 +54,7 @@ group_folders = {
 - `folder` — the Grafana folder path the rule group is filed under.
 - `name_suffix` — appended to `<env>-` to build the Grafana rule group name (e.g. `development-rds`).
 
-A group only produces alerts once it's also switched on for an account 
+A group only produces alerts once it's also switched on for an account
 
 ### 2. Add a new alert (golden signal)
 
