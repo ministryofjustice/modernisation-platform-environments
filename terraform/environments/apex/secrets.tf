@@ -9,6 +9,7 @@ data "aws_ssm_parameter" "ec2_ssh_key" {
 }
 
 data "aws_ssm_parameter" "app_apex_dbpassword_admin" {
+  count           = contains(["test", "preproduction"], local.environment) ? 1 : 0
   name            = "APP_APEX_DBPASSWORD_ADMIN"
   with_decryption = true
 }
@@ -32,10 +33,12 @@ resource "aws_secretsmanager_secret_version" "ec2_ssh_key" {
 }
 
 resource "aws_secretsmanager_secret" "app_apex_dbpassword_admin" {
+  count = contains(["test", "preproduction"], local.environment) ? 1 : 0
   name  = "APP_APEX_DBPASSWORD_ADMIN"
 }
 resource "aws_secretsmanager_secret_version" "app_apex_dbpassword_admin" {
-  secret_id     = aws_secretsmanager_secret.app_apex_dbpassword_admin.id
-  secret_string = data.aws_ssm_parameter.app_apex_dbpassword_admin.value
+  count         = contains(["test", "preproduction"], local.environment) ? 1 : 0
+  secret_id     = aws_secretsmanager_secret.app_apex_dbpassword_admin[0].id
+  secret_string = data.aws_ssm_parameter.app_apex_dbpassword_admin[0].value
 }
 

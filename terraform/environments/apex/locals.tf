@@ -73,7 +73,7 @@ locals {
     db_secret_arn     = local.db_secret_arn
   })
 
-  db_secret_arn = local.environment == "development" ? try(aws_secretsmanager_secret.app_apex_dbpassword_tad[0].arn, "") : "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.app_db_password_name}"
+  db_secret_arn = contains(["development", "test", "preproduction"], local.environment) ? aws_secretsmanager_secret.app_apex_dbpassword_tad.arn : "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.app_db_password_name}"
 
   env_account_id       = local.environment_management.account_ids[terraform.workspace]
   app_db_password_name = "APP_APEX_DBPASSWORD_TAD"
