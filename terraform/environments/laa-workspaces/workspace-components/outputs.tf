@@ -166,3 +166,41 @@ output "radius_nlb_target_group_arn" {
   value       = try(aws_lb_target_group.radius_ecs[0].arn, null)
 }
 
+output "linotp_portal_target_group_arn" {
+  description = "LinOTP portal target group ARN (ALB)"
+  value       = try(aws_lb_target_group.linotp3_portal[0].arn, null)
+}
+
+output "ecs_task_execution_role_arn" {
+  description = "ECS task execution role ARN"
+  value       = try(aws_iam_role.ecs_task_execution[0].arn, null)
+}
+
+output "ecs_linotp3_security_group_id" {
+  description = "Security group ID for ECS LinOTP tasks"
+  value       = try(aws_security_group.ecs_linotp3[0].id, null)
+}
+
+output "linotp3_db_endpoint" {
+  description = "LinOTP 3.x RDS database endpoint"
+  value       = try(aws_db_instance.linotp3[0].address, null)
+}
+
+output "linotp3_enc_key_secret_arn" {
+  description = "LinOTP 3.x encryption key secret ARN"
+  value       = try(aws_secretsmanager_secret.linotp3_enc_key[0].arn, null)
+  sensitive   = true
+}
+
+output "linotp3_db_password_secret_arn" {
+  description = "LinOTP 3.x database password secret ARN"
+  value       = try(aws_secretsmanager_secret.linotp3_db_password[0].arn, null)
+  sensitive   = true
+}
+
+output "linotp_ad_bind_password_secret_arn" {
+  description = "LinOTP AD bind password secret ARN"
+  value       = try(aws_secretsmanager_secret.linotp_ad_bind_password[0].arn, null)
+  sensitive   = true
+}
+
