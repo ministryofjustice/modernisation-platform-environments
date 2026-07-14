@@ -31,8 +31,7 @@ resource "kubectl_manifest" "default_nodeclass" {
             aws:eks:cluster-name: "${local.cluster_name}"
 
       tags:
-        default_ng: "true"
-        application: "moj-cloud-platform"
+        application: "moj-container-platform"
         business-unit: "platforms"
   YAML
 }
