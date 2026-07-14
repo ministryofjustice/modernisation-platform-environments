@@ -2,18 +2,25 @@ module "lambda_file_received_adapter" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.8.0"
 
-  function_name                  = "${local.application_name}-file-received-adapter"
-  architectures                  = ["arm64"]
-  description                    = "Transforms incoming S3 Object Created notifications into FileReceived.v1 events"
-  handler                        = "lambda_function.lambda_handler"
-  memory_size                    = 128
-  reserved_concurrent_executions = 10
-  runtime                        = "python3.12"
-  source_path                    = "lambda/file-received-adapter"
-  timeout                        = 30
-  tracing_mode                   = "Active"
-  trigger_on_package_timestamp   = false
-  dead_letter_target_arn         = module.sqs_lambda_file_received_adapter_dlq.queue_arn
+  architectures                     = ["arm64"]
+  attach_dead_letter_policy         = true
+  attach_tracing_policy             = true
+  cloudwatch_logs_kms_key_id        = module.kms_cloudwatch_logs.key_arn
+  cloudwatch_logs_retention_in_days = local.eventbridge_retention_days
+  create_async_event_config         = true
+  dead_letter_target_arn            = module.sqs_lambda_file_received_adapter_dlq.queue_arn
+  description                       = "Transforms incoming S3 Object Created notifications into FileReceived.v1 events"
+  function_name                     = "${local.application_name}-file-received-adapter"
+  handler                           = "lambda_function.lambda_handler"
+  maximum_event_age_in_seconds      = 21600
+  maximum_retry_attempts            = 3
+  memory_size                       = 128
+  reserved_concurrent_executions    = 10
+  runtime                           = "python3.12"
+  source_path                       = "lambda/file-received-adapter"
+  timeout                           = 30
+  tracing_mode                      = "Active"
+  trigger_on_package_timestamp      = false
 
   environment_variables = {
     EVENT_BUS_ARN              = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
@@ -43,11 +50,7 @@ module "lambda_file_received_adapter" {
     }
   }
 
-  attach_dead_letter_policy = true
-  attach_tracing_policy     = true
 
-  cloudwatch_logs_kms_key_id        = module.kms_cloudwatch_logs.key_arn
-  cloudwatch_logs_retention_in_days = local.eventbridge_retention_days
 
   tags = local.tags
 }
