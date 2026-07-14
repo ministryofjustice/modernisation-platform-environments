@@ -66,7 +66,7 @@ webhooksCleanup:
       effect: NoSchedule
 
 config:
-  resourceFiltersExcludeNamespaces:
+  resourceFiltersIncludeNamespaces:
     # System and platform namespaces excluded from Kyverno admission processing.
     - amazon-guardduty
     - amazon-network-flow-monitor
