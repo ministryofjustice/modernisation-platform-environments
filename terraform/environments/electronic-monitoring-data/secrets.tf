@@ -119,9 +119,9 @@ module "entra_app_details" {
 
   ignore_secret_changes = true
   secret_string = jsonencode({
-    tenant_id            = ""
-    client_id            = ""
-    client_secret        = ""
+    tenant_id     = ""
+    client_id     = ""
+    client_secret = ""
   })
 
   tags = local.tags

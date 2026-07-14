@@ -9,7 +9,7 @@ resource "kubernetes_job_v1" "grant_rds_iam" {
   }
 
   spec {
-    backoff_limit               = 2
+    backoff_limit = 2
 
 
     template {
@@ -18,8 +18,8 @@ resource "kubernetes_job_v1" "grant_rds_iam" {
       }
 
       spec {
-        restart_policy        = "Never"
-        service_account_name  = local.component_name
+        restart_policy       = "Never"
+        service_account_name = local.component_name
 
         toleration {
           key      = "compute.data-platform.service.justice.gov.uk/node-pool"
