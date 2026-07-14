@@ -170,7 +170,7 @@ resource "aws_instance" "s609693lo6vw105" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-03ae7bafd3430076e"
+  ami                    = "ami-04fef7199862173bb"
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
