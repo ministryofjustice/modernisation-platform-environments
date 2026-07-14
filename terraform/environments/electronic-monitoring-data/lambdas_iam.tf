@@ -3377,3 +3377,95 @@ resource "aws_iam_role_policy_attachment" "serco_fms_key_access_observer" {
     aws_iam_policy.serco_fms_key_access_observer.arn
   )
 }
+
+# ------------------------------------------------------------------------------
+# Serco FMS key-distribution dashboard Lambda IAM
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "serco_fms_key_distribution_dashboard" {
+  name               = "serco_fms_key_distribution_dashboard_lambda_role_${local.environment_shorthand}"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "serco_fms_key_distribution_dashboard_basic_execution" {
+  role       = aws_iam_role.serco_fms_key_distribution_dashboard.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+data "aws_iam_policy_document" "serco_fms_key_distribution_dashboard" {
+  statement {
+    sid    = "ListDashboardStateAndEvents"
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+    ]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+
+      values = [
+        "${local.serco_fms_key_distribution_state_prefix}/${local.environment_shorthand}",
+        "${local.serco_fms_key_distribution_state_prefix}/${local.environment_shorthand}/*",
+        "${local.serco_fms_key_distribution_events_prefix}/${local.environment_shorthand}",
+        "${local.serco_fms_key_distribution_events_prefix}/${local.environment_shorthand}/*",
+      ]
+    }
+  }
+
+  statement {
+    sid    = "ReadDashboardStateAndEvents"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+    ]
+
+    resources = [
+      "${module.s3-serco-fms-key-distribution-bucket.bucket.arn}/${local.serco_fms_key_distribution_state_prefix}/${local.environment_shorthand}/*",
+      "${module.s3-serco-fms-key-distribution-bucket.bucket.arn}/${local.serco_fms_key_distribution_events_prefix}/${local.environment_shorthand}/*",
+    ]
+  }
+
+  statement {
+    sid    = "ReadDashboardAllowlist"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+    ]
+
+    resources = [
+      "${module.s3-serco-fms-key-distribution-bucket.bucket.arn}/${local.serco_fms_key_distribution_allowlist_key}",
+    ]
+  }
+
+  statement {
+    sid    = "ReadFeedSecretVersionMetadata"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:ListSecretVersionIds",
+    ]
+
+    resources = local.serco_fms_key_distribution_feed_secret_arns
+  }
+}
+
+resource "aws_iam_policy" "serco_fms_key_distribution_dashboard" {
+  name   = "serco_fms_key_distribution_dashboard_lambda_policy_${local.environment_shorthand}"
+  policy = data.aws_iam_policy_document.serco_fms_key_distribution_dashboard.json
+}
+
+resource "aws_iam_role_policy_attachment" "serco_fms_key_distribution_dashboard" {
+  role       = aws_iam_role.serco_fms_key_distribution_dashboard.name
+  policy_arn = aws_iam_policy.serco_fms_key_distribution_dashboard.arn
+}

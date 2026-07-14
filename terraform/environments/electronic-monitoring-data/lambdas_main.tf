@@ -1307,3 +1307,51 @@ module "serco_fms_key_access_observer" {
     SNS_TOPIC_ARN = aws_sns_topic.emds_alerts.arn
   }
 }
+
+# ------------------------------------------------------------------------------
+# Serco FMS key-distribution dashboard Lambda
+# ------------------------------------------------------------------------------
+
+module "serco_fms_key_distribution_dashboard" {
+  source   = "./modules/lambdas"
+  is_image = true
+
+  function_name = "serco_fms_key_distribution_dashboard"
+  handler       = "serco_fms_key_distribution_dashboard.handler"
+
+  role_name = aws_iam_role.serco_fms_key_distribution_dashboard.name
+  role_arn  = aws_iam_role.serco_fms_key_distribution_dashboard.arn
+
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 5
+  cloudwatch_retention_days      = 180
+
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.env_name
+
+  environment_variables = {
+    POWERTOOLS_LOG_LEVEL = "INFO"
+
+    ENVIRONMENT = local.environment_shorthand
+
+    STATE_BUCKET = module.s3-serco-fms-key-distribution-bucket.bucket.id
+    STATE_PREFIX = local.serco_fms_key_distribution_state_prefix
+    EVENTS_PREFIX = local.serco_fms_key_distribution_events_prefix
+
+    ALLOWLIST_BUCKET = module.s3-serco-fms-key-distribution-bucket.bucket.id
+    ALLOWLIST_KEY    = local.serco_fms_key_distribution_allowlist_key
+
+    SECRET_SPEC_JSON = jsonencode(local.serco_fms_key_distribution_secret_specs)
+    FEATURE_ENABLED  = tostring(local.serco_fms_key_distribution_enabled)
+
+    ROTATION_MONTHS_JSON = jsonencode([2, 5, 8, 11])
+    ROTATION_WEEKDAY     = "1"
+    ROTATION_OCCURRENCE  = "2"
+    ROTATION_HOUR        = "12"
+    ROTATION_MINUTE      = "30"
+    ROTATION_TIMEZONE    = "Europe/London"
+
+    MAX_EVENTS = "30"
+  }
+}
