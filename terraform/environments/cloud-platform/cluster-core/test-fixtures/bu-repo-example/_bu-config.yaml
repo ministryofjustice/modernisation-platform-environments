@@ -1,0 +1,11 @@
+# BU Configuration — OCTO (example)
+# This file defines BU-level metadata and access controls.
+bu_name: octo
+display_name: "OCTO"
+description: "Office of the Chief Technology Officer"
+
+# BU-wide access — these identities get access to ALL namespaces in this BU
+access:
+  - identity: octo-sre
+    role: admin
+    scope: bu-wide

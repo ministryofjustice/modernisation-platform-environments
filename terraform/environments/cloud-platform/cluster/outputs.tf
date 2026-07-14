@@ -29,3 +29,13 @@ output "argocd_spoke_access_role_arn" {
   description = "ARN of the IAM role for spoke cluster access (register this in spoke Access Entries)"
   value       = var.enable_argocd ? module.argocd[0].spoke_access_role_arn : ""
 }
+
+output "argocd_spoke_registered" {
+  description = "Whether this cluster is registered as an ArgoCD spoke"
+  value       = local.is_argocd_spoke
+}
+
+output "argocd_hub_role_arn_used" {
+  description = "The hub spoke-access role ARN this spoke registered with (empty if not a spoke)"
+  value       = local.is_argocd_spoke ? local.resolved_hub_spoke_access_role_arn : ""
+}
