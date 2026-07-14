@@ -28,12 +28,12 @@ linotp init audit-keys 2>&1 || echo "Audit keys already exist"
 
 echo "--- Starting LinOTP ---"
 
-# Run LinOTP configuration in background using CLI
+# Run LinOTP configuration in background using Python
 if [ "${ENABLE_AUTO_CONFIG:-true}" = "true" ]; then
     (
         sleep 30  # Give LinOTP time to start
-        echo "Starting LinOTP automated configuration (CLI-based)..."
-        /usr/local/bin/configure_linotp_cli.sh
+        echo "Starting LinOTP automated configuration (Python)..."
+        python3 /usr/local/bin/configure_linotp_python.py
         if [ $? -eq 0 ]; then
             echo "✅ LinOTP configuration completed successfully"
         else
