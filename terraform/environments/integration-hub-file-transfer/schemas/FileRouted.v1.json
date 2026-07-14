@@ -4,44 +4,65 @@
   "description": "A processing object has been copied to clean, quarantine or investigation; required metadata and GuardDuty status tags have been verified; and the source object was deleted. The managed file transfer flow has moved the object to a destination based on a GuardDuty Malware Protection for S3 scan outcome.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "id", "detail-type", "source", "account", "time", "region", "detail"],
+  "required": [
+    "version",
+    "id",
+    "detail-type",
+    "source",
+    "account",
+    "time",
+    "region",
+    "detail"
+  ],
   "properties": {
-    "version": {"type": "string", "enum": ["0"]},
-    "id": {"type": "string", "format": "uuid"},
-    "detail-type": {"type": "string", "enum": ["FileRouted.v1"]},
-    "source": {"type": "string", "enum": ["uk.gov.justice.service.managed-file-transfer"]},
-    "account": {"type": "string", "pattern": "^[0-9]{12}$"},
-    "time": {"type": "string", "format": "date-time"},
-    "region": {"type": "string"},
-    "resources": {"type": "array", "items": {"type": "string"}},
-    "replay-name": {"type": "string", "minLength": 1},
+    "version": { "type": "string", "enum": ["0"] },
+    "id": { "type": "string", "format": "uuid" },
+    "detail-type": { "type": "string", "enum": ["FileRouted.v1"] },
+    "source": {
+      "type": "string",
+      "enum": ["uk.gov.justice.service.managed-file-transfer"]
+    },
+    "account": { "type": "string", "pattern": "^[0-9]{12}$" },
+    "time": { "type": "string", "format": "date-time" },
+    "region": { "type": "string" },
+    "resources": { "type": "array", "items": { "type": "string" } },
+    "replay-name": { "type": "string", "minLength": 1 },
     "detail": {
       "type": "object",
       "additionalProperties": false,
       "required": ["metadata", "data"],
       "properties": {
-        "metadata": {"$ref": "#/definitions/eventMetadata"},
+        "metadata": { "$ref": "#/definitions/eventMetadata" },
         "data": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["fileId", "sourceObject", "destinationObject", "route", "scanResultStatus", "sourceDeleted"],
+          "required": [
+            "fileId",
+            "sourceObject",
+            "destinationObject",
+            "route",
+            "scanResultStatus",
+            "sourceDeleted"
+          ],
           "oneOf": [
             {
               "properties": {
-                "route": {"enum": ["clean"]},
-                "scanResultStatus": {"enum": ["NO_THREATS_FOUND"]}
+                "route": { "enum": ["clean"] },
+                "scanResultStatus": { "enum": ["NO_THREATS_FOUND"] }
               }
             },
             {
               "properties": {
-                "route": {"enum": ["quarantine"]},
-                "scanResultStatus": {"enum": ["THREATS_FOUND"]}
+                "route": { "enum": ["quarantine"] },
+                "scanResultStatus": { "enum": ["THREATS_FOUND"] }
               }
             },
             {
               "properties": {
-                "route": {"enum": ["investigation"]},
-                "scanResultStatus": {"enum": ["UNSUPPORTED", "ACCESS_DENIED", "FAILED"]}
+                "route": { "enum": ["investigation"] },
+                "scanResultStatus": {
+                  "enum": ["UNSUPPORTED", "ACCESS_DENIED", "FAILED"]
+                }
               }
             }
           ],
@@ -51,14 +72,23 @@
               "format": "uuid",
               "description": "Stable logical file identifier inherited from FileReceived.v1."
             },
-            "sourceObject": {"$ref": "#/definitions/s3Object"},
-            "destinationObject": {"$ref": "#/definitions/s3Object"},
-            "route": {"type": "string", "enum": ["clean", "quarantine", "investigation"]},
+            "sourceObject": { "$ref": "#/definitions/s3Object" },
+            "destinationObject": { "$ref": "#/definitions/s3Object" },
+            "route": {
+              "type": "string",
+              "enum": ["clean", "quarantine", "investigation"]
+            },
             "scanResultStatus": {
               "type": "string",
-              "enum": ["NO_THREATS_FOUND", "THREATS_FOUND", "UNSUPPORTED", "ACCESS_DENIED", "FAILED"]
+              "enum": [
+                "NO_THREATS_FOUND",
+                "THREATS_FOUND",
+                "UNSUPPORTED",
+                "ACCESS_DENIED",
+                "FAILED"
+              ]
             },
-            "sourceDeleted": {"type": "boolean", "enum": [true]}
+            "sourceDeleted": { "type": "boolean", "enum": [true] }
           }
         }
       }
@@ -70,9 +100,9 @@
       "additionalProperties": false,
       "required": ["correlationId", "causationId", "idempotencyKey"],
       "properties": {
-        "correlationId": {"type": "string", "format": "uuid"},
-        "causationId": {"type": "string", "format": "uuid"},
-        "idempotencyKey": {"type": "string", "minLength": 1}
+        "correlationId": { "type": "string", "format": "uuid" },
+        "causationId": { "type": "string", "format": "uuid" },
+        "idempotencyKey": { "type": "string", "minLength": 1 }
       }
     },
     "s3Object": {
@@ -81,10 +111,10 @@
       "description": "A particular version of an object stored in Amazon S3.",
       "required": ["bucket", "key", "versionId", "sizeBytes"],
       "properties": {
-        "bucket": {"type": "string", "minLength": 3},
-        "key": {"type": "string", "minLength": 1},
-        "versionId": {"type": "string", "minLength": 1},
-        "sizeBytes": {"type": "integer", "minimum": 0}
+        "bucket": { "type": "string", "minLength": 3 },
+        "key": { "type": "string", "minLength": 1 },
+        "versionId": { "type": "string", "minLength": 1 },
+        "sizeBytes": { "type": "integer", "minimum": 0 }
       }
     }
   },
