@@ -91,8 +91,8 @@ resource "aws_ecs_task_definition" "linotp3" {
         { name = "LINOTP_REALM_NAME", value = "laa-workspaces" },
         { name = "LINOTP_URL", value = "http://localhost:5000" },
         { name = "LINOTP_ADMIN_USER", value = "admin" },
-        # Auto-configuration enabled
-        { name = "ENABLE_AUTO_CONFIG", value = "true" }
+        # Auto-configuration disabled (causes worker crashes due to licensing errors in open-source build)
+        { name = "ENABLE_AUTO_CONFIG", value = "false" }
       ]
 
       secrets = [
