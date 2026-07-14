@@ -35,14 +35,12 @@ RUN python3 -m venv /opt/venv && \
 ENV PATH="/opt/venv/bin:$PATH"
 ENV LINOTP_CFG="/etc/linotp/linotp.cfg"
 
-# Copy custom entrypoint, configuration scripts, and LinOTP config
+# Copy custom entrypoint, configuration script, and LinOTP config
 COPY entrypoint.sh /usr/local/bin/custom-entrypoint.sh
-COPY configure_linotp_api.sh /usr/local/bin/configure_linotp_api.sh
-COPY configure_linotp_cli.sh /usr/local/bin/configure_linotp_cli.sh
+COPY configure_linotp_python.py /usr/local/bin/configure_linotp_python.py
 COPY linotp.cfg /etc/linotp/linotp.cfg
 RUN chmod +x /usr/local/bin/custom-entrypoint.sh && \
-    chmod +x /usr/local/bin/configure_linotp_api.sh && \
-    chmod +x /usr/local/bin/configure_linotp_cli.sh && \
+    chmod +x /usr/local/bin/configure_linotp_python.py && \
     mkdir -p /etc/linotp /var/cache/linotp /var/log/linotp
 
 EXPOSE 5000

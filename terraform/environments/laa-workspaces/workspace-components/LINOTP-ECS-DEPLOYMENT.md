@@ -163,8 +163,8 @@ All secrets stored in `eu-west-2` under `laa-workspaces-development-*`:
 
 3. **linotp-admin-password** (`laa-workspaces-development-linotp-admin-*`)
    - LinOTP web portal admin password
-   - **Username**: `admin`
-   - **Password**: `Ze(yHd*:rV&NpXO:()i6PO=yK)dkB=Yl`
+   - **Username**: `regular admin name`
+   - **Password**: `check for password`
 
 4. **radius-shared-secret** (`laa-workspaces-development-radius-shared-secret-*`)
    - RADIUS shared secret between clients and FreeRADIUS
