@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
 
-# LinOTP Configuration Script using CLI commands
+# LinOTP Configuration Script using CLI instead of REST API
 # Runs after LinOTP bootstrap to configure LDAP, realms, and policies
 
 echo "============================================================"
-echo "LinOTP Automated Configuration (CLI)"
+echo "LinOTP Automated Configuration (CLI-based)"
 echo "============================================================"
 
 # Wait for LinOTP to be ready
@@ -19,96 +19,64 @@ for i in {1..30}; do
     sleep 10
 done
 
-# Configuration using linotp CLI commands
+##############################################
+### Discover available CLI commands
+##############################################
 echo ""
-echo "--- Step 1: LDAP Resolver ---"
-
-# Check if resolver exists
-if linotp-cli resolver list 2>/dev/null | grep -q "ad-resolver"; then
-    echo "Resolver 'ad-resolver' already exists, skipping creation"
-else
-    echo "Creating LDAP resolver 'ad-resolver'..."
-    linotp-cli resolver create \
-        --name ad-resolver \
-        --type ldap \
-        --uri "$AD_LDAP_URI" \
-        --basedn "$AD_BASE_DN" \
-        --binddn "$AD_BIND_DN" \
-        --bindpw "$AD_BIND_PASSWORD" \
-        --searchfilter "$AD_SEARCH_FILTER" \
-        --userfilter "$AD_USER_FILTER" \
-        --loginattr sAMAccountName \
-        --timeout 5 \
-        --sizelimit 500
-
-    echo "LDAP resolver 'ad-resolver' created successfully"
-fi
+echo "--- Discovering LinOTP CLI commands ---"
+echo "Available 'linotp' subcommands:"
+linotp --help 2>&1 || true
 
 echo ""
-echo "--- Step 2: Realm Configuration ---"
-
-# Check if realm exists
-if linotp-cli realm list 2>/dev/null | grep -q "laa-workspaces"; then
-    echo "Realm 'laa-workspaces' already exists, skipping creation"
-else
-    echo "Creating realm 'laa-workspaces'..."
-    linotp-cli realm create \
-        --name laa-workspaces \
-        --resolvers ad-resolver \
-        --default
-
-    echo "Realm 'laa-workspaces' created successfully"
-fi
+echo "Available 'linotp init' subcommands:"
+linotp init --help 2>&1 || true
 
 echo ""
-echo "--- Step 3: Policy Configuration ---"
+echo "Available 'linotp config' subcommands (if exists):"
+linotp config --help 2>&1 || true
 
-# Authentication policy
-if linotp-cli policy list 2>/dev/null | grep -q "radius_auth"; then
-    echo "Policy 'radius_auth' already exists, skipping creation"
-else
-    echo "Creating authentication policy 'radius_auth'..."
-    linotp-cli policy create \
-        --name radius_auth \
-        --scope authentication \
-        --action "otppin=1" \
-        --realm laa-workspaces \
-        --user "*"
+echo ""
+echo "Available 'linotp admin' subcommands (if exists):"
+linotp admin --help 2>&1 || true
 
-    echo "Authentication policy 'radius_auth' created successfully"
-fi
+##############################################
+### Try CLI-based configuration
+##############################################
+echo ""
+echo "--- Attempting CLI-based configuration ---"
 
-# Enrollment policy
-if linotp-cli policy list 2>/dev/null | grep -q "self_enrollment"; then
-    echo "Policy 'self_enrollment' already exists, skipping creation"
-else
-    echo "Creating enrollment policy 'self_enrollment'..."
-    linotp-cli policy create \
-        --name self_enrollment \
-        --scope enrollment \
-        --action "maxtoken=5, tokenissuer=LAA WorkSpaces MFA" \
-        --realm laa-workspaces \
-        --user "*"
+# Try to create LDAP resolver using CLI (if command exists)
+echo "Attempting to create LDAP resolver via CLI..."
+linotp resolver create ldap \
+    --name "$LINOTP_RESOLVER_NAME" \
+    --ldap-uri "$AD_LDAP_URI" \
+    --base-dn "$AD_BASE_DN" \
+    --bind-dn "$AD_BIND_DN" \
+    --bind-password "$AD_BIND_PASSWORD" \
+    --search-filter "$AD_SEARCH_FILTER" \
+    --user-filter "$AD_USER_FILTER" \
+    --login-attribute "sAMAccountName" \
+    2>&1 || echo "ERROR: CLI command 'linotp resolver create' does not exist or failed"
 
-    echo "Enrollment policy 'self_enrollment' created successfully"
-fi
+# Try to create realm using CLI
+echo "Attempting to create realm via CLI..."
+linotp realm create \
+    --name "$LINOTP_REALM_NAME" \
+    --resolver "$LINOTP_RESOLVER_NAME" \
+    --default \
+    2>&1 || echo "ERROR: CLI command 'linotp realm create' does not exist or failed"
 
-# Self-service policy
-if linotp-cli policy list 2>/dev/null | grep -q "selfservice_portal"; then
-    echo "Policy 'selfservice_portal' already exists, skipping creation"
-else
-    echo "Creating self-service policy 'selfservice_portal'..."
-    linotp-cli policy create \
-        --name selfservice_portal \
-        --scope selfservice \
-        --action "enrollHMAC, setOTPPIN, setMOTPPIN, resync, disable, delete, history" \
-        --realm laa-workspaces \
-        --user "*"
-
-    echo "Self-service policy 'selfservice_portal' created successfully"
-fi
+# Try to create policies using CLI
+echo "Attempting to create policies via CLI..."
+linotp policy create \
+    --name "radius_auth" \
+    --scope authentication \
+    --action "otppin=1" \
+    --realm "$LINOTP_REALM_NAME" \
+    2>&1 || echo "ERROR: CLI command 'linotp policy create' does not exist or failed"
 
 echo ""
 echo "============================================================"
-echo "✅ LinOTP configuration completed successfully"
+echo "CLI-based configuration exploration completed"
+echo "Check logs above to see which commands are available"
 echo "============================================================"
