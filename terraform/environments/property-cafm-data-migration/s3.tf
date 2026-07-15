@@ -276,10 +276,10 @@ resource "aws_s3_bucket_replication_configuration" "staging" {
     }
 
     destination {
-      bucket             = "arn:aws:s3:::mojap-ingestion-production-property-datahub-staging-egress"
+      bucket             = "arn:aws:s3:::${local.environment_configuration.property_datahub_staging_egress_target_bucket}"
       storage_class      = "STANDARD"
-      account_id         = local.environment_management.account_ids["property-cafm-data-migration-production"]
-      replica_kms_key_id = "arn:aws:kms:eu-west-2:471112983409:key/6da79242-5b40-4a37-bbdf-961950ced1f4"
+      account_id         = local.environment_configuration.property_datahub_staging_egress_account_id
+      replica_kms_key_id = local.environment_configuration.property_datahub_staging_egress_kms_arn
 
       access_control_translation {
         owner_override = "Destination"

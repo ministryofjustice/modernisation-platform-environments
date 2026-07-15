@@ -93,7 +93,7 @@ data "aws_iam_policy_document" "staging_replication" {
       "s3:ObjectOwnerOverrideToBucketOwner",
       "s3:GetObjectVersionTagging"
     ]
-    resources = ["arn:aws:s3:::mojap-ingestion-${local.environment}-property-datahub-staging-egress/*"]
+    resources = ["arn:aws:s3:::${local.environment_configuration.property_datahub_staging_egress_target_bucket}/*"]
   }
 
   statement {
@@ -103,7 +103,7 @@ data "aws_iam_policy_document" "staging_replication" {
       "kms:Encrypt",
       "kms:GenerateDataKey"
     ]
-    resources = ["arn:aws:kms:eu-west-2:471112983409:key/6da79242-5b40-4a37-bbdf-961950ced1f4"]
+    resources = [local.environment_configuration.property_datahub_staging_egress_kms_arn]
   }
 }
 
