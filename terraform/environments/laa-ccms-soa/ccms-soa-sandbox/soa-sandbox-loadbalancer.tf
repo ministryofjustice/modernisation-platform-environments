@@ -24,7 +24,7 @@ resource "aws_lb" "admin" {
 
 resource "aws_lb_target_group" "admin_https" {
   name                 = "ccms-soa-sandbox-admin-https-tg"
-  port                 = 7002
+  port                 = 443
   protocol             = "TLS"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "ip"
@@ -34,7 +34,7 @@ resource "aws_lb_target_group" "admin_https" {
     enabled             = true
     interval            = 30
     path                = "/weblogic/ready"
-    port                = 7002
+    port                = 443
     protocol            = "HTTPS"
     timeout             = 5
     healthy_threshold   = 3
@@ -91,7 +91,7 @@ resource "aws_lb" "managed" {
 
 resource "aws_lb_target_group" "managed_https" {
   name                 = "ccms-soa-sandbox-mgd-https-tg"
-  port                 = 7002
+  port                 = 443
   protocol             = "TLS"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "ip"
@@ -101,7 +101,7 @@ resource "aws_lb_target_group" "managed_https" {
     enabled             = true
     interval            = 30
     path                = "/weblogic/ready"
-    port                = 7002
+    port                = 443
     protocol            = "HTTPS"
     timeout             = 5
     healthy_threshold   = 3
