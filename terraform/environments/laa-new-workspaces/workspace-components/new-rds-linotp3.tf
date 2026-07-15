@@ -37,7 +37,7 @@ resource "aws_db_subnet_group" "linotp3" {
   count = local.environment == "development" ? 1 : 0
 
   name       = "${local.application_name}-${local.environment}-linotp3"
-  subnet_ids = [aws_subnet.private_a[0].id, aws_subnet.private_b[0].id]
+  subnet_ids = [aws_subnet.private_a.id, aws_subnet.private_b.id]
 
   tags = merge(
     local.tags,
@@ -50,7 +50,7 @@ resource "aws_security_group" "rds_linotp3" {
 
   name_prefix = "${local.application_name}-${local.environment}-rds-linotp3-"
   description = "Allow MySQL access from LinOTP 3.x ECS tasks only"
-  vpc_id      = aws_vpc.workspaces[0].id
+  vpc_id      = aws_vpc.workspaces.id
 
   revoke_rules_on_delete = true
 
