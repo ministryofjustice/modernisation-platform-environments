@@ -1,25 +1,13 @@
 ###############################################################################
 # US-005c: RDS Instance for team-a (Terraform approach)
 #
-# App team requests a database by adding this file (or a module call) to
-# their namespace directory. The pipeline (or local apply) provisions it.
+# App team requests a database by adding this config to their namespace
+# directory and running terraform apply.
 #
 # Prerequisites:
 # - Shared DB subnet group "platform-db-subnet-group" (network/vpc.tf)
 # - RDS service-linked role (account bootstrap)
 # - Secrets Store CSI Driver addon (cluster-core/secrets-store-csi.tf)
-# - App team creates SecretProviderClass in their namespace YAML
-#
-# PIPELINE PERMISSIONS NOTE:
-# If running via GitHub Actions, the pipeline role needs:
-# - rds:CreateDBInstance / rds:DeleteDBInstance / rds:ModifyDBInstance
-# - rds:DescribeDBInstances / rds:DescribeDBSubnetGroups
-# - rds:AddTagsToResource / rds:ListTagsForResource
-# - secretsmanager:CreateSecret / secretsmanager:PutSecretValue
-# - secretsmanager:DeleteSecret / secretsmanager:DescribeSecret
-# - kms:CreateKey / kms:CreateAlias / kms:DescribeKey / kms:TagResource
-# - ec2:CreateSecurityGroup / ec2:AuthorizeSecurityGroupIngress
-# - ec2:DescribeVpcs / ec2:DescribeSubnets / ec2:DescribeSecurityGroups
 ###############################################################################
 
 # --- Unique identifiers ------------------------------------------------------
