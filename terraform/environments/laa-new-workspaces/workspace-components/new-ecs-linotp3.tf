@@ -210,7 +210,7 @@ resource "aws_lb_listener_rule" "linotp3_portal" {
 
   condition {
     host_header {
-      values = ["workspace-mfa-ecs.${trimsuffix(data.aws_route53_zone.external.name, ".")}"]
+      values = ["mfa-portal.${trimsuffix(data.aws_route53_zone.external.name, ".")}"]
     }
   }
 
@@ -223,7 +223,7 @@ resource "aws_lb_listener_rule" "linotp3_portal" {
 resource "aws_route53_record" "linotp3_portal" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "workspace-mfa-ecs.${data.aws_route53_zone.external.name}"
+  name     = "mfa-portal.${data.aws_route53_zone.external.name}"
   type     = "A"
 
   alias {
