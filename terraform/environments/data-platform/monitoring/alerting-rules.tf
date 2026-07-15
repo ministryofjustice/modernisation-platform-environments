@@ -309,8 +309,9 @@ locals {
           labels = merge(
             {
               severity    = severity
-              environment = env
+              environment = cfg.name
               service     = lower(replace(combo.rule.group, " ", "_"))
+              component   = combo.rule.group
               metric      = combo.rule.metric
             },
             local.sc_resolved[env][combo_key][severity] != null

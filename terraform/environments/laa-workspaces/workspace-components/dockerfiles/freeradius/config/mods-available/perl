@@ -1,0 +1,3 @@
+perl {
+  filename = /usr/share/linotp/linotp-auth-freeradius-perl/radius_linotp.pm
+}

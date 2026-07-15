@@ -1,0 +1,48 @@
+server default {
+  listen {
+    type   = auth
+    ipaddr = *
+    port   = 1812
+  }
+
+  listen {
+    type   = acct
+    ipaddr = *
+    port   = 1813
+  }
+
+  authorize {
+    preprocess
+    perl
+    if (ok) {
+      update control {
+        Auth-Type := Perl
+      }
+    }
+  }
+
+  authenticate {
+    Auth-Type Perl {
+      perl
+    }
+  }
+
+  preacct {
+    preprocess
+  }
+
+  accounting {
+  }
+
+  session {
+  }
+
+  post-auth {
+  }
+
+  pre-proxy {
+  }
+
+  post-proxy {
+  }
+}

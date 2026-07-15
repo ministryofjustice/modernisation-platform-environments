@@ -8,10 +8,11 @@ metadata:
     policies.kyverno.io/severity: medium
     policies.kyverno.io/subject: NetworkPolicy
     policies.kyverno.io/description: >-
-      On namespace creation, generate a default-deny NetworkPolicy that blocks
-      all ingress and all egress except DNS to CoreDNS. Teams then explicitly
-      allow the traffic their workloads need. System and platform namespaces are
-      skipped.
+      On namespace creation, generate a default NetworkPolicy that isolates the
+      namespace: deny all cross-namespace and external traffic, while allowing
+      traffic within the same namespace and DNS to CoreDNS. Teams then
+      explicitly allow any additional traffic their workloads need. System and
+      platform namespaces are skipped.
 spec:
   evaluation:
     # Keep the generated NetworkPolicy in sync: recreate it if deleted, update
@@ -24,18 +25,6 @@ spec:
         apiVersions: ["v1"]
         operations: ["CREATE"]
         resources: ["namespaces"]
-  matchConditions:
-    # Skip system/platform namespaces. Matched by name (not by label) so that
-    # namespaces created outside the namespace module are still locked down by
-    # default. Keep this list in step with resourceFiltersExcludeNamespaces.
-    - name: skip-system-namespaces
-      expression: >-
-        !object.metadata.name.startsWith('kube-')
-        && !(object.metadata.name in ['kyverno', 'cilium-secrets', 'karpenter',
-        'cert-manager', 'external-dns', 'external-secrets', 'metrics-server',
-        'prometheus', 'fluent-bit', 'cluster-autoscaler', 'amazon-guardduty',
-        'amazon-network-flow-monitor', 'keda', 'shared-services',
-        'aws-cloudwatch-observability'])
   variables:
     - name: nsName
       expression: object.metadata.name
@@ -52,7 +41,19 @@ spec:
             "spec": dyn({
               "podSelector": dyn({}),
               "policyTypes": dyn(["Ingress", "Egress"]),
+              "ingress": dyn([
+                dyn({
+                  "from": dyn([
+                    dyn({"podSelector": dyn({})})
+                  ])
+                })
+              ]),
               "egress": dyn([
+                dyn({
+                  "to": dyn([
+                    dyn({"podSelector": dyn({})})
+                  ])
+                }),
                 dyn({
                   "to": dyn([
                     dyn({
