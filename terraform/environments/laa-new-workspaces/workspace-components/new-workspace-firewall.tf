@@ -352,7 +352,7 @@ resource "aws_networkfirewall_firewall_policy" "workspaces_web_allowlist" {
   firewall_policy {
     stateless_default_actions          = ["aws:forward_to_sfe"]
     stateless_fragment_default_actions = ["aws:forward_to_sfe"]
-    stateful_default_actions           = ["aws:alert_strict", "aws:drop_established"] 
+    stateful_default_actions           = ["aws:alert_strict", "aws:drop_established"]
 
     stateful_engine_options {
       rule_order = "STRICT_ORDER"

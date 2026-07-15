@@ -12,7 +12,7 @@ locals {
 
   cp_vpc_name           = local.cluster_environment == "development_cluster" ? "cloud-platform-development" : terraform.workspace
   workspace_environment = element(reverse(split("-", terraform.workspace)), 0)
-  cluster_name          = contains(local.mp_environments, terraform.workspace) ? local.workspace_environment : terraform.workspace
+  cluster_name          = terraform.workspace
   cluster_environment   = contains(local.mp_environments, terraform.workspace) ? local.workspace_environment : "development_cluster"
 
   node_role_name = split("/", data.aws_eks_cluster.cluster.compute_config[0].node_role_arn)[1]
