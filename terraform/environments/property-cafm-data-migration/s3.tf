@@ -249,3 +249,41 @@ resource "aws_s3_bucket_logging" "staging_bucket" {
   target_bucket = module.s3_bucket_logs.bucket.id
   target_prefix = "staging/"
 }
+
+# S3 bucket replication configuration (production-only)
+resource "aws_s3_bucket_replication_configuration" "staging" {
+  count = local.is-production ? 1 : 0
+
+  role   = aws_iam_role.staging_replication[0].arn
+  bucket = module.aws_s3_staging.bucket.id
+
+  rule {
+    id     = "property-datahub-staging-replication"
+    status = "Enabled"
+
+    delete_marker_replication {
+      status = "Disabled"
+    }
+
+    filter {
+      prefix = ""
+    }
+
+    source_selection_criteria {
+      sse_kms_encrypted_objects {
+        status = "Enabled"
+      }
+    }
+
+    destination {
+      bucket             = "arn:aws:s3:::mojap-ingestion-production-property-datahub-staging-egress"
+      storage_class      = "STANDARD"
+      account_id         = local.environment_management.account_ids["property-cafm-data-migration-production"]
+      replica_kms_key_id = "arn:aws:kms:eu-west-2:471112983409:key/6da79242-5b40-4a37-bbdf-961950ced1f4"
+
+      access_control_translation {
+        owner_override = "Destination"
+      }
+    }
+  }
+}
