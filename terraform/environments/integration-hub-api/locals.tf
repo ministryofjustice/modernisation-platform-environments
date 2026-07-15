@@ -12,7 +12,11 @@ locals {
   auth_users             = try(local.auth_configuration.users, {})
   auth_system_principals = try(local.auth_configuration.system_principals, {})
   cors_allowed_origins   = try(local.api_configuration.cors_allowed_origins, [])
-  transfer_clients       = try(local.application_data.accounts[local.environment].transfer_clients, {})
+  notification_configuration = try(
+    local.application_data.accounts[local.environment].notification_configuration,
+    null
+  )
+  transfer_clients = try(local.application_data.accounts[local.environment].transfer_clients, {})
   multipart_configuration = merge(
     {
       single_put_limit_bytes            = 5368709120

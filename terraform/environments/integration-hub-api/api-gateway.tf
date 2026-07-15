@@ -1,5 +1,6 @@
 resource "aws_cloudwatch_log_group" "api_access" {
   name              = "/aws/apigateway/${local.resource_name_prefix}"
+  kms_key_id        = module.kms_cloudwatch_logs.key_arn
   retention_in_days = 30
   tags              = local.tags
 }
@@ -100,17 +101,26 @@ resource "aws_apigatewayv2_stage" "default" {
   name        = "$default"
   auto_deploy = true
 
+  default_route_settings {
+    detailed_metrics_enabled = true
+  }
+
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.api_access.arn
     format = jsonencode({
-      requestId      = "$context.requestId"
-      sourceIp       = "$context.identity.sourceIp"
-      requestTime    = "$context.requestTime"
-      httpMethod     = "$context.httpMethod"
-      routeKey       = "$context.routeKey"
-      status         = "$context.status"
-      protocol       = "$context.protocol"
-      responseLength = "$context.responseLength"
+      requestId               = "$context.requestId"
+      sourceIp                = "$context.identity.sourceIp"
+      requestTime             = "$context.requestTime"
+      httpMethod              = "$context.httpMethod"
+      routeKey                = "$context.routeKey"
+      status                  = "$context.status"
+      protocol                = "$context.protocol"
+      responseLength          = "$context.responseLength"
+      responseLatency         = "$context.responseLatency"
+      integrationStatus       = "$context.integration.status"
+      integrationLatency      = "$context.integration.latency"
+      integrationErrorMessage = "$context.integrationErrorMessage"
+      authorizerError         = "$context.authorizer.error"
     })
   }
 
