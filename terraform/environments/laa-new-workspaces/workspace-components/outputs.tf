@@ -59,3 +59,72 @@ output "network_firewall_endpoint_ids" {
   )
 }
 
+###############################################
+# Outputs for LinOTP ECS Infrastructure
+###############################################
+
+output "ecs_cluster_id" {
+  description = "ID of the ECS cluster for LinOTP"
+  value       = try(aws_ecs_cluster.linotp[0].id, null)
+}
+
+output "ecs_linotp3_security_group_id" {
+  description = "Security group ID for LinOTP ECS tasks"
+  value       = try(aws_security_group.ecs_linotp3[0].id, null)
+}
+
+output "linotp3_db_endpoint" {
+  description = "RDS endpoint for LinOTP 3.x database"
+  value       = try(aws_db_instance.linotp3[0].endpoint, null)
+}
+
+output "linotp3_enc_key_secret_arn" {
+  description = "ARN of LinOTP 3.x encryption key secret"
+  value       = try(aws_secretsmanager_secret.linotp3_enc_key[0].arn, null)
+}
+
+output "linotp3_db_password_secret_arn" {
+  description = "ARN of LinOTP 3.x database password secret"
+  value       = try(aws_secretsmanager_secret.linotp3_db_password[0].arn, null)
+}
+
+output "linotp_admin_password_arn" {
+  description = "ARN of LinOTP admin password secret"
+  value       = aws_secretsmanager_secret.linotp_admin_password.arn
+}
+
+output "ad_admin_password_secret_arn" {
+  description = "ARN of AD admin password secret (used for LDAP bind)"
+  value       = aws_secretsmanager_secret.ad_admin_password.arn
+}
+
+output "linotp_portal_target_group_arn" {
+  description = "ARN of the LinOTP portal target group"
+  value       = try(aws_lb_target_group.linotp3_portal[0].arn, null)
+}
+
+output "radius_nlb_target_group_arn" {
+  description = "ARN of the RADIUS NLB target group for ECS"
+  value       = try(aws_lb_target_group.radius_ecs[0].arn, null)
+}
+
+output "ecs_task_execution_role_arn" {
+  description = "ARN of the ECS task execution role"
+  value       = try(aws_iam_role.ecs_task_execution[0].arn, null)
+}
+
+output "ecr_linotp3_repository_url" {
+  description = "URL of the LinOTP 3.x ECR repository"
+  value       = try(aws_ecr_repository.linotp3[0].repository_url, null)
+}
+
+output "ecr_freeradius_repository_url" {
+  description = "URL of the FreeRADIUS ECR repository"
+  value       = try(aws_ecr_repository.freeradius_linotp[0].repository_url, null)
+}
+
+output "ecs_cloudwatch_log_group_name" {
+  description = "Name of the CloudWatch log group for ECS tasks"
+  value       = try(aws_cloudwatch_log_group.ecs[0].name, null)
+}
+

@@ -13,7 +13,7 @@ resource "aws_lb" "radius_ecs" {
   name_prefix                      = "recs-"
   internal                         = true
   load_balancer_type               = "network"
-  subnets                          = [aws_subnet.private_a[0].id, aws_subnet.private_b[0].id]
+  subnets                          = [aws_subnet.private_a.id, aws_subnet.private_b.id]
   enable_cross_zone_load_balancing = true
 
   tags = merge(
@@ -29,7 +29,7 @@ resource "aws_lb_target_group" "radius_ecs" {
   port        = 1812
   protocol    = "UDP"
   target_type = "ip"
-  vpc_id      = aws_vpc.workspaces[0].id
+  vpc_id      = aws_vpc.workspaces.id
 
   health_check {
     enabled             = true

@@ -49,7 +49,7 @@ resource "aws_security_group" "ecs_linotp3" {
 
   name_prefix = "${local.application_name}-${local.environment}-ecs-linotp3-"
   description = "ECS Fargate tasks: LinOTP 3.x (port 5000) + FreeRADIUS (1812/1813 UDP)"
-  vpc_id      = aws_vpc.workspaces[0].id
+  vpc_id      = aws_vpc.workspaces.id
 
   revoke_rules_on_delete = true
 
@@ -71,7 +71,7 @@ resource "aws_security_group_rule" "ecs_linotp3_ingress_alb" {
   from_port                = 5000
   to_port                  = 5000
   protocol                 = "tcp"
-  source_security_group_id = aws_security_group.radius_alb[0].id
+  source_security_group_id = aws_security_group.radius_alb.id
   description              = "LinOTP HTTP from ALB"
 }
 
@@ -83,7 +83,7 @@ resource "aws_security_group_rule" "ecs_linotp3_ingress_nlb_healthcheck" {
   from_port         = 5000
   to_port           = 5000
   protocol          = "tcp"
-  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
+  cidr_blocks       = [aws_vpc.workspaces.cidr_block]
   description       = "LinOTP HTTP from NLB (health checks)"
 }
 
@@ -95,7 +95,7 @@ resource "aws_security_group_rule" "ecs_linotp3_ingress_radius_auth" {
   from_port         = 1812
   to_port           = 1812
   protocol          = "udp"
-  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
+  cidr_blocks       = [aws_vpc.workspaces.cidr_block]
   description       = "RADIUS auth from VPC"
 }
 
@@ -107,7 +107,7 @@ resource "aws_security_group_rule" "ecs_linotp3_ingress_radius_accounting" {
   from_port         = 1813
   to_port           = 1813
   protocol          = "udp"
-  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
+  cidr_blocks       = [aws_vpc.workspaces.cidr_block]
   description       = "RADIUS accounting from VPC"
 }
 
@@ -171,9 +171,9 @@ resource "aws_iam_role_policy" "ecs_task_execution_secrets" {
         Resource = [
           aws_secretsmanager_secret.linotp3_enc_key[0].arn,
           aws_secretsmanager_secret.linotp3_db_password[0].arn,
-          aws_secretsmanager_secret.linotp_admin_password[0].arn,
-          aws_secretsmanager_secret.radius_shared_secret[0].arn,
-          aws_secretsmanager_secret.linotp_ad_bind_password[0].arn,
+          aws_secretsmanager_secret.linotp_admin_password.arn,
+          aws_secretsmanager_secret.radius_shared_secret.arn,
+          aws_secretsmanager_secret.ad_admin_password.arn,
         ]
       }
     ]
@@ -191,7 +191,7 @@ resource "aws_lb_target_group" "linotp3_portal" {
   port        = 5000
   protocol    = "HTTP"
   target_type = "ip"
-  vpc_id      = aws_vpc.workspaces[0].id
+  vpc_id      = aws_vpc.workspaces.id
 
   health_check {
     enabled             = true
@@ -219,7 +219,7 @@ resource "aws_lb_target_group" "linotp3_portal" {
 resource "aws_lb_listener_rule" "linotp3_portal" {
   count = local.environment == "development" ? 1 : 0
 
-  listener_arn = aws_lb_listener.radius_https[0].arn
+  listener_arn = aws_lb_listener.radius_https.arn
   priority     = 10
 
   action {
@@ -248,8 +248,8 @@ resource "aws_route53_record" "linotp3_portal" {
   type     = "A"
 
   alias {
-    name                   = aws_lb.radius_portal[0].dns_name
-    zone_id                = aws_lb.radius_portal[0].zone_id
+    name                   = aws_lb.radius_portal.dns_name
+    zone_id                = aws_lb.radius_portal.zone_id
     evaluate_target_health = true
   }
 }
