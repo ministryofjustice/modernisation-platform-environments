@@ -47,7 +47,7 @@ resource "aws_secretsmanager_secret_version" "linotp3_enc_key" {
 ##############################################
 
 resource "aws_security_group" "ecs_linotp3" {
-  name_prefix = "${local.application_name}-${local.environment}-ecs-linotp3-"
+  name_prefix = "lnw-${local.environment}-ecs-linotp3-"
   description = "ECS Fargate tasks: LinOTP 3.x (port 5000) + FreeRADIUS (1812/1813 UDP)"
   vpc_id      = aws_vpc.workspaces.id
 
@@ -119,7 +119,7 @@ resource "aws_security_group_rule" "ecs_linotp3_egress_all" {
 ##############################################
 
 resource "aws_iam_role" "ecs_task_execution" {
-  name_prefix = "${local.application_name}-${local.environment}-ecs-exec-"
+  name_prefix = "lnw-${local.environment}-ecs-exec-"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -143,7 +143,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
 }
 
 resource "aws_iam_role_policy" "ecs_task_execution_secrets" {
-  name = "${local.application_name}-${local.environment}-ecs-exec-secrets"
+  name = "lnw-${local.environment}-ecs-secrets"
   role = aws_iam_role.ecs_task_execution.id
 
   policy = jsonencode({

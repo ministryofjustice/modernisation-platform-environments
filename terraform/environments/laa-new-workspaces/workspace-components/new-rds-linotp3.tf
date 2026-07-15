@@ -38,7 +38,7 @@ resource "aws_db_subnet_group" "linotp3" {
 }
 
 resource "aws_security_group" "rds_linotp3" {
-  name_prefix = "${local.application_name}-${local.environment}-rds-linotp3-"
+  name_prefix = "lnw-${local.environment}-rds-linotp3-"
   description = "Allow MySQL access from LinOTP 3.x ECS tasks only"
   vpc_id      = aws_vpc.workspaces.id
 

@@ -11,7 +11,7 @@
 ##############################################
 
 resource "aws_iam_role" "ecs_task_role" {
-  name_prefix = "${local.application_name}-${local.environment}-ecs-task-"
+  name_prefix = "lnw-${local.environment}-ecs-task-"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -29,7 +29,7 @@ resource "aws_iam_role" "ecs_task_role" {
 }
 
 resource "aws_iam_role_policy" "ecs_exec_policy" {
-  name = "${local.application_name}-${local.environment}-ecs-exec"
+  name = "lnw-${local.environment}-ecs-exec"
   role = aws_iam_role.ecs_task_role.id
 
   policy = jsonencode({
