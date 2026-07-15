@@ -49,3 +49,19 @@ module "cloud_platform_live_namespace_secret" {
   })
   ignore_secret_changes = true
 }
+
+# PagerDuty Events API v2 routing key used by the Grafana contact point to
+# send alert notifications. Created with a placeholder value and populated
+# out-of-band; ignore_secret_changes keeps Terraform from overwriting it.
+module "pagerduty_routing_key_secret" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
+
+  count = local.environment_configuration.monitoring_stack_enabled ? 1 : 0
+
+  name = "${local.component_name}/pagerduty-routing-key"
+
+  secret_string = jsonencode({
+    routing_key = "CHANGEME"
+  })
+  ignore_secret_changes = true
+}

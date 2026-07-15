@@ -32,3 +32,11 @@ data "aws_secretsmanager_secret_version" "grafana_api_token" {
 
   secret_id = module.grafana_api_token_secret[0].secret_id
 }
+
+# PagerDuty Events API v2 routing key used by the Grafana contact point. The
+# secret is created with a placeholder in secrets.tf and populated out-of-band.
+data "aws_secretsmanager_secret_version" "pagerduty_routing_key" {
+  count = local.environment_configuration.monitoring_stack_enabled ? 1 : 0
+
+  secret_id = module.pagerduty_routing_key_secret[0].secret_id
+}

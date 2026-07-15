@@ -12,6 +12,11 @@ locals {
   # monitoring stack is disabled and the data source has no instances.
   grafana_api_token = try(jsondecode(data.aws_secretsmanager_secret_version.grafana_api_token[0].secret_string)["token"], "")
 
+  # PagerDuty Events API v2 routing key used by the grafana_contact_point resource
+  # (alerting.tf). Provisioned as a placeholder in secrets.tf and populated out-of-band;
+  # try() keeps it resolvable where the monitoring stack is disabled.
+  pagerduty_routing_key = try(jsondecode(data.aws_secretsmanager_secret_version.pagerduty_routing_key[0].secret_string)["routing_key"], "")
+
   # Dashboards as code, organised into Grafana folders. Each subdirectory of
   # src/helm/dashboards/ maps to one Grafana folder: the map key is the on-disk
   # directory name and the value is the folder's display name. Drop a dashboard

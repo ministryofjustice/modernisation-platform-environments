@@ -57,3 +57,46 @@ resource "grafana_rule_group" "this" {
 
   depends_on = [helm_release.grafana]
 }
+
+# ------------------------------------------------------------------------------
+# PAGERDUTY CONTACT POINT
+# Sends alert notifications to PagerDuty via the Events API v2. The routing key
+# is the Global Event Orchestration routing key, stored in Secrets Manager
+# (secrets.tf / data.tf) and injected at apply time. The severity label on each
+# alert rule is forwarded as a payload field for orchestration rules to act on.
+# ------------------------------------------------------------------------------
+resource "grafana_contact_point" "pagerduty" {
+  count = local.grafana_alerting_manageable ? 1 : 0
+
+  name = "pagerduty"
+
+  pagerduty {
+    integration_key = local.pagerduty_routing_key
+    severity        = "{{ index .CommonLabels \"severity\" }}"
+    component       = "{{ index .CommonLabels \"namespace\" }}"
+    details = {
+      environment = "{{ index .CommonLabels \"environment\" }}"
+    }
+  }
+
+  depends_on = [helm_release.grafana]
+}
+
+# ------------------------------------------------------------------------------
+# NOTIFICATION POLICY
+# Routes all firing alerts to the PagerDuty contact point. Group by folder,
+# alert name, and severity so each distinct signal creates a separate PagerDuty
+# incident rather than being bundled into one.
+# ------------------------------------------------------------------------------
+resource "grafana_notification_policy" "this" {
+  count = local.grafana_alerting_manageable ? 1 : 0
+
+  contact_point = grafana_contact_point.pagerduty[0].name
+  group_by      = ["grafana_folder", "alertname", "severity"]
+
+  group_wait      = "30s"
+  group_interval  = "5m"
+  repeat_interval = "4h"
+
+  depends_on = [grafana_contact_point.pagerduty]
+}
