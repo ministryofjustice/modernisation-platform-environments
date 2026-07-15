@@ -11,6 +11,7 @@ Configuration is stored in RDS database and persists across container restarts.
 import os
 import sys
 import time
+import subprocess
 
 def wait_for_linotp():
     """Wait for LinOTP to be ready."""
@@ -31,6 +32,42 @@ def wait_for_linotp():
     return False
 
 
+def set_admin_password():
+    """Set LinOTP admin user password from environment variable."""
+    admin_user = os.environ.get('LINOTP_ADMIN_USER', 'admin')
+    admin_password = os.environ.get('LINOTP_ADMIN_PASSWORD')
+
+    if not admin_password:
+        print("WARNING: LINOTP_ADMIN_PASSWORD not set, skipping admin password configuration")
+        return False
+
+    print(f"\n--- Setting admin password for user '{admin_user}' ---")
+
+    try:
+        # Use linotp CLI to set admin password
+        proc = subprocess.Popen(
+            ['linotp', 'admin', 'set-password', admin_user],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+
+        # Provide password twice (confirmation)
+        stdout, stderr = proc.communicate(input=f"{admin_password}\n{admin_password}\n", timeout=10)
+
+        if proc.returncode == 0:
+            print(f"✓ Admin password set successfully for user '{admin_user}'")
+            return True
+        else:
+            print(f"WARNING: Failed to set admin password: {stderr}")
+            return False
+
+    except Exception as e:
+        print(f"WARNING: Error setting admin password: {e}")
+        return False
+
+
 def configure_linotp():
     """Configure LinOTP resolver, realm, and policies."""
 
@@ -47,6 +84,9 @@ def configure_linotp():
         print("\n" + "=" * 60)
         print("LinOTP Automated Configuration (Python)")
         print("=" * 60)
+
+        # Step 0: Set admin password
+        set_admin_password()
 
         _configure_linotp_internal(resolver, realm, getLinotpConfig, storeConfig, db)
 
@@ -85,7 +125,7 @@ def _configure_linotp_internal(resolver, realm, getLinotpConfig, storeConfig, db
             f'linotp.ldapresolver.TIMEOUT.{resolver_name}': '5',
             f'linotp.ldapresolver.SIZELIMIT.{resolver_name}': '500',
             f'linotp.ldapresolver.NOREFERRALS.{resolver_name}': 'True',
-            f'linotp.ldapresolver.EnforceTLS.{resolver_name}': 'True',
+            f'linotp.ldapresolver.EnforceTLS.{resolver_name}': 'False',
         }
 
         # Write resolver config to database
