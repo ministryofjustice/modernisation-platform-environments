@@ -81,12 +81,9 @@ resource "aws_ecs_task_definition" "linotp3" {
       environment = [
         { name = "LINOTP_DB_HOST", value = data.terraform_remote_state.workspace_components.outputs.linotp3_db_endpoint },
         { name = "LINOTP_DB_USER", value = "linotp" },
-        # AD LDAP configuration - uses AD DNS IP from directory service (first DNS server)
-        { name = "AD_LDAP_URI", value = "ldap://${tolist(aws_directory_service_directory.workspaces_ad[0].dns_ip_addresses)[0]}:389" },
-        { name = "AD_BASE_DN", value = "DC=laa-workspaces,DC=local" },
-        { name = "AD_BIND_DN", value = "CN=lambda.workspace,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local" },
-        { name = "AD_USER_FILTER", value = "(&(sAMAccountName=%s)(objectClass=user))" },
-        { name = "AD_SEARCH_FILTER", value = "(sAMAccountName=*)" },
+        # AD LDAP configuration - password injected from Secrets Manager
+        # Note: Most AD config is now hardcoded in configure_linotp_python.py to match working EC2 setup
+        { name = "AD_BIND_DN", value = "CN=Admin,OU=Users,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local" },
         { name = "LINOTP_RESOLVER_NAME", value = "ad-resolver" },
         { name = "LINOTP_REALM_NAME", value = "laa-workspaces" },
         { name = "LINOTP_URL", value = "http://localhost:5000" },
