@@ -1,9 +1,5 @@
 locals {
   orphan_prefix_overrides_by_database = {}
-  dbt_databases                       = setintersection(
-    setsubtract(local.dbs_to_grant, toset(local.test_dbs_to_grant)),
-    local.existing_dbs_to_grant
-  )
   dbt_domain_name_by_database         = {
     # leaving the domains here, need to do a mapping 
     # consumption
@@ -29,39 +25,10 @@ module "glue_table_optimizer" {
   orphan_prefix_overrides_by_database = local.orphan_prefix_overrides_by_database
   role_arn                            = aws_iam_role.glue_table_optimizer.arn
   environment                         = local.environment_shorthand
-  dbt_databases                       = local.dbt_databases
+  dbt_databases                       = local.dbt_dbs_to_grant
   dbt_domain_name_by_database         = local.dbt_domain_name_by_database
 }
 
-moved {
-  from = aws_glue_catalog_table_optimizer.standard_compaction
-  to   = module.glue_table_optimizer.aws_glue_catalog_table_optimizer.standard_compaction
-}
-
-moved {
-  from = aws_glue_catalog_table_optimizer.standard_retention
-  to   = module.glue_table_optimizer.aws_glue_catalog_table_optimizer.standard_retention
-}
-
-moved {
-  from = aws_glue_catalog_table_optimizer.standard_orphan_file_deletion
-  to   = module.glue_table_optimizer.aws_glue_catalog_table_optimizer.standard_orphan_file_deletion
-}
-
-moved {
-  from = aws_lakeformation_permissions.glue_table_optimizer_permissions
-  to   = module.glue_table_optimizer.aws_lakeformation_permissions.glue_table_optimizer_permissions
-}
-
-moved {
-  from = aws_lakeformation_permissions.glue_table_optimizer_table_permissions
-  to   = module.glue_table_optimizer.aws_lakeformation_permissions.glue_table_optimizer_table_permissions
-}
-
-moved {
-  from = aws_lakeformation_permissions.glue_table_optimizer_database_permissions
-  to   = module.glue_table_optimizer.aws_lakeformation_permissions.glue_table_optimizer_database_permissions
-}
 
 data "aws_iam_policy_document" "glue_table_optimizer_assume_role_policy" {
   statement {
