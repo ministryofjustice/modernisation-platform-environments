@@ -42,15 +42,16 @@ def configure_linotp():
         # Import LinOTP modules within Flask application context
         from linotp.lib import resolver, realm
         from linotp.lib.config import getLinotpConfig, storeConfig
+        from linotp.model import db
 
         print("\n" + "=" * 60)
         print("LinOTP Automated Configuration (Python)")
         print("=" * 60)
 
-        _configure_linotp_internal(resolver, realm, getLinotpConfig, storeConfig)
+        _configure_linotp_internal(resolver, realm, getLinotpConfig, storeConfig, db)
 
 
-def _configure_linotp_internal(resolver, realm, getLinotpConfig, storeConfig):
+def _configure_linotp_internal(resolver, realm, getLinotpConfig, storeConfig, db):
     """Internal configuration logic (runs within Flask context)."""
 
     # Get environment variables
@@ -72,21 +73,27 @@ def _configure_linotp_internal(resolver, realm, getLinotpConfig, storeConfig):
 
         # Build resolver configuration
         resolver_config = {
-            f'linotp.ldapresolver.LDAPURI.{resolver_name}': os.environ['AD_LDAP_URI'],
-            f'linotp.ldapresolver.LDAPBASE.{resolver_name}': os.environ['AD_BASE_DN'],
-            f'linotp.ldapresolver.BINDDN.{resolver_name}': os.environ['AD_BIND_DN'],
+            f'linotp.ldapresolver.LDAPURI.{resolver_name}': 'ldap://10.200.1.245, ldap://10.200.2.11',
+            f'linotp.ldapresolver.LDAPBASE.{resolver_name}': 'OU=Users,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local',
+            f'linotp.ldapresolver.BINDDN.{resolver_name}': 'CN=Admin,OU=Users,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local',
             f'linotp.ldapresolver.BINDPW.{resolver_name}': os.environ['AD_BIND_PASSWORD'],
             f'linotp.ldapresolver.LOGINNAMEATTRIBUTE.{resolver_name}': 'sAMAccountName',
-            f'linotp.ldapresolver.LDAPFILTER.{resolver_name}': os.environ['AD_USER_FILTER'],
-            f'linotp.ldapresolver.LDAPSEARCHFILTER.{resolver_name}': os.environ['AD_SEARCH_FILTER'],
+            f'linotp.ldapresolver.LDAPFILTER.{resolver_name}': '(&(sAMAccountName=%s)(objectClass=user))',
+            f'linotp.ldapresolver.LDAPSEARCHFILTER.{resolver_name}': '(sAMAccountName=*)(objectClass=user)',
+            f'linotp.ldapresolver.USERINFO.{resolver_name}': '{ "username": "sAMAccountName", "phone" : "telephoneNumber", "mobile" : "mobile", "email" : "mail", "surname" : "sn", "givenname" : "givenName" }',
+            f'linotp.ldapresolver.UIDTYPE.{resolver_name}': 'objectGUID',
             f'linotp.ldapresolver.TIMEOUT.{resolver_name}': '5',
             f'linotp.ldapresolver.SIZELIMIT.{resolver_name}': '500',
             f'linotp.ldapresolver.NOREFERRALS.{resolver_name}': 'True',
+            f'linotp.ldapresolver.EnforceTLS.{resolver_name}': 'True',
         }
 
         # Write resolver config to database
         for key, value in resolver_config.items():
             storeConfig(key, value)
+
+        # Commit to database
+        db.session.commit()
 
         print(f"✓ Resolver '{resolver_name}' created successfully")
 
@@ -112,6 +119,9 @@ def _configure_linotp_internal(resolver, realm, getLinotpConfig, storeConfig):
 
         # Set as default realm
         realm.setDefaultRealm(realm_name, check_if_exists=False)
+
+        # Commit to database
+        db.session.commit()
 
         print(f"✓ Realm '{realm_name}' created and set as default")
 
@@ -173,6 +183,9 @@ def _configure_linotp_internal(resolver, realm, getLinotpConfig, storeConfig):
 
             for key, value in policy_config.items():
                 storeConfig(key, value)
+
+            # Commit to database
+            db.session.commit()
 
             print(f"  ✓ Policy '{policy_name}' created")
 
