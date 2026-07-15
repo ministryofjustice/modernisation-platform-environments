@@ -393,11 +393,6 @@ locals {
       "/dev/sdj" = { label = "flash" }           # FLASH
       "/dev/sdk" = { label = "flash" }           # FLASH
       "/dev/sdl" = { label = "flash" }           # FLASH
-      "/dev/sdm" = { label = "data" }            # DATA
-      "/dev/sdn" = { label = "data" }            # DATA
-      "/dev/sdo" = { label = "data" }            # DATA
-      "/dev/sdp" = { label = "data" }            # DATA
-      "/dev/sdq" = { label = "data" }            # DATA
       "/dev/sds" = { label = "swap" }
     }
     ebs_volume_config = {
@@ -410,7 +405,7 @@ locals {
         iops       = 15360
         throughput = 480
         type       = "gp3"
-        total_size = 14000
+        total_size = 7000
       }
       flash = {
         iops       = 3000
