@@ -23,7 +23,7 @@ locals {
 module "glue_table_optimizer" {
   source = "./modules/glue_table_optimizer"
 
-  databases                           = local.is-development ? local.live_feeds_dbs : local.existing_dbs_to_grant
+  databases                           = local.is-development ? local.live_feed_dbs_to_grant : local.existing_dbs_to_grant
   data_bucket_lf_resource_arn         = aws_lakeformation_resource.data_bucket.arn
   optimizer_bucket_id                 = module.s3-create-a-derived-table-bucket.bucket.id
   orphan_prefix_overrides_by_database = local.orphan_prefix_overrides_by_database
