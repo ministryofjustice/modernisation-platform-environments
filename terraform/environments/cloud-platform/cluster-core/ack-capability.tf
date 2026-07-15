@@ -5,25 +5,16 @@
 # (RDS, Secrets Manager, etc.) managed by AWS. No Helm required.
 #
 # PREREQUISITE: The RDS service-linked role (AWSServiceRoleForRDS) must exist
-# in the account before ACK can create RDS instances. Run once per account:
-#   aws iam create-service-linked-role --aws-service-name rds.amazonaws.com
+# in the account before ACK can create RDS instances. This will be added to
+# the account bootstrap workflow (one-time per account setup).
 ###############################################################################
 
 ###############################################################################
-# DB Subnet Group
+# DB Subnet Group and Security Group
 #
-# PREREQUISITE: DB subnet group and RDS service-linked role must exist in the
-# account before ACK can create RDS instances. These are one-time manual
-# prerequisites — see findings doc for details.
+# Shared resources created in network/rds-networking.tf. ACK references them
+# by name: dbSubnetGroupName: "platform-db-subnet-group"
 ###############################################################################
-
-# resource "aws_db_subnet_group" "platform" {
-#   name        = "platform-db-subnet-group"
-#   description = "DB subnet group for platform-managed RDS instances"
-#   subnet_ids  = data.aws_subnets.private.ids
-#
-#   tags = local.tags
-# }
 
 resource "aws_iam_role" "ack_capability" {
   name = "${local.cluster_name}-ack-capability"
