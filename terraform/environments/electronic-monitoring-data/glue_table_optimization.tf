@@ -1,18 +1,39 @@
 locals {
   orphan_prefix_overrides_by_database = {}
   dbt_domain_name_by_database         = {
-    # leaving the domains here, need to do a mapping 
-    # consumption
-    # curated
-    # deduped
-    # fms
-    # historic
-    # intermediate_layer
-    # live
-    # preprocessed
-    # quicksight
-    # staged
-    # staging
+    "staged_mdss" = "staged"
+    "check" = "quicksight"
+    "validation" = "quicksight"
+    "staging_fms" = "live"
+    "staging_mdss" = "live"
+    "intermediate_fms" = "live"
+    "intermediate_mdss" = "live"
+    "am_stg" = "historic"
+    "buddi_stg" = "historic"
+    "cap_dw_stg" = "historic"
+    "emd_historic_int" = "historic"
+    "historic_api_mart" = "historic"
+    "histoirc_api_mart_mock" = "historic"
+    "intermeidate_tasking" = "historic"
+    "sar_ear_reports_mart" = "historic"
+    "serco_fms_deduped" = "deduped"
+    "curated_alcohol_monitoring" = "curated"
+    "curated_cap_dw" = "curated"
+    "curated_emsys_mvp" = "curated"
+    "curated_emsys_tpims" = "curated"
+    "curated_fep" = "curated"
+    "curated_scram_alcohol_monitoring" = "curated"
+    "g4s_atrium_curated" = "curated"
+    "g4s_centurion_curated" = "curated"
+    "g4s_integrity_curated" = "curated"
+    "g4s_lcm_curated" = "curated"
+    "g4s_tasking_curated" = "curated"
+    "serco_fms_curated" = "curated"
+    "acquisitive_crime" = "consumption"
+    "analysis" = "consumption"
+    "data_insights" = "consumption"
+    "datamart" = "consumption"
+    "derived" = "consumption"
   }
 }
 
