@@ -276,13 +276,13 @@ resource "aws_s3_bucket_replication_configuration" "staging" {
     }
 
     destination {
-      bucket             = "arn:aws:s3:::${local.replication_configuration.property_datahub_staging_egress_target_bucket}"
-      storage_class      = "STANDARD"
-      account_id         = local.replication_configuration.property_datahub_staging_egress_account_id
-      replica_kms_key_id = local.replication_configuration.property_datahub_staging_egress_kms_arn
+      bucket           = "arn:aws:s3:::${local.replication_configuration.property_datahub_staging_egress_target_bucket}"
+      storage_class    = "STANDARD"
+      account          = local.replication_configuration.property_datahub_staging_egress_account_id
+      encryption_key_id = local.replication_configuration.property_datahub_staging_egress_kms_arn
 
       access_control_translation {
-        owner_override = "Destination"
+        owner = "Destination"
       }
     }
   }
