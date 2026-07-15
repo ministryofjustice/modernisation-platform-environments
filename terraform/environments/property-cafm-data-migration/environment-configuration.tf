@@ -1,7 +1,7 @@
 locals {
-  environment_configuration = local.environment_configurations[local.environment]
+  replication_configuration = local.replication_configurations[local.environment]
 
-  environment_configurations = {
+  replication_configurations = {
     production = {
       # Replication configuration for property-datahub-staging bucket
       property_datahub_staging_egress_target_bucket = "mojap-ingestion-production-property-datahub-staging-egress"
