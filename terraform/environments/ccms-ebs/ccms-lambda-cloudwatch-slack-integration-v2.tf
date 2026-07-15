@@ -94,7 +94,14 @@ resource "aws_lambda_function" "cloudwatch_slack_integration_v2" {
   environment {
     variables = {
       # This secret now contains slack_channel_webhook, slack_channel_webhook_guardduty, slack_channel_webhook_s3
-      SECRET_NAME = aws_secretsmanager_secret.ebs_cw_alerts_secrets.name
+      SECRET_NAME             = aws_secretsmanager_secret.ebs_cw_alerts_secrets.name
+      DEBUG                   = false
+      METRICS_ENABLED         = true
+      METRICS_NAMESPACE       = "CcmsEbs/SlackNotifier"
+      NOTIFY_UNRECOGNISED     = true
+      SUPPRESSED_ENVIRONMENTS = "dev-,test-,prep-"
+      SUPPRESSION_TIME_START  = "19:00"
+      SUPPRESSION_TIME_END    = "07:00"
     }
   }
 
@@ -145,4 +152,64 @@ resource "aws_lambda_permission" "allow_eventbridge_invoke_v2" {
   function_name = aws_lambda_function.cloudwatch_slack_integration_v2.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.certificate_expiration_warning.arn
+}
+
+resource "aws_sqs_queue" "cloudwatch_sns_dlq" {
+  name                      = "${local.application_name}-${local.environment}-cloudwatch-sns-dlq"
+  message_retention_seconds = 1209600 # 14 days
+  sqs_managed_sse_enabled   = true
+  tags                      = merge(local.tags, { Name = "${local.application_name}-${local.environment}-cloudwatch-sns-dlq" })
+}
+
+resource "aws_lambda_function_event_invoke_config" "cloudwatch_sns" {
+  function_name                = aws_lambda_function.cloudwatch_slack_integration_v2.function_name
+  maximum_retry_attempts       = 0
+  maximum_event_age_in_seconds = 3600
+  destination_config {
+    on_failure {
+      destination = aws_sqs_queue.cloudwatch_sns_dlq.arn
+    }
+  }
+}
+
+resource "aws_iam_role_policy" "cloudwatch_sns_dlq" {
+  name = "${local.application_name}-${local.environment}-cloudwatch-sns-dlq-policy"
+  role = aws_iam_role.lambda_cloudwatch_slack_integration_v2_role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = ["sqs:SendMessage"],
+        Resource = [aws_sqs_queue.cloudwatch_sns_dlq.arn]
+      }
+    ]
+  })
+}
+
+resource "aws_cloudwatch_metric_alarm" "cloudwatch_sns_dlq_not_empty" {
+  alarm_name          = "${local.application_name}-${local.environment}-cloudwatch-sns-dlq-not-empty"
+  namespace           = "AWS/SQS"
+  metric_name         = "ApproximateNumberOfMessagesVisible"
+  dimensions          = { QueueName = aws_sqs_queue.cloudwatch_sns_dlq.name }
+  statistic           = "Maximum"
+  period              = 300
+  evaluation_periods  = 1
+  threshold           = 0
+  comparison_operator = "GreaterThanThreshold"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "A CloudWatch/GuardDuty/S3 notification could not be delivered to Slack and was dead-lettered."
+  alarm_actions       = [aws_sns_topic.notifier_dlq_alerts.arn]
+  tags                = local.tags
+}
+
+resource "aws_sns_topic" "notifier_dlq_alerts" {
+  name = "${local.application_name}-${local.environment}-notifier-dlq-alerts"
+  tags = local.tags
+}
+
+resource "aws_sns_topic_subscription" "notifier_dlq_email" {
+  topic_arn = aws_sns_topic.notifier_dlq_alerts.arn
+  protocol  = "email"
+  endpoint  = "ApplicationOperations@justice.gov.uk"
 }

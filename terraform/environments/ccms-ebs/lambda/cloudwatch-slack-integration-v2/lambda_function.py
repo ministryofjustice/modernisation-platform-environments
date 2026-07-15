@@ -4,6 +4,11 @@ into Slack. This will also publish GuardDuty findings, EventBridge events
 and S3 events into Slack.
 """
 
+# Defer annotation evaluation so TYPE_CHECKING-only names (SecretsManagerClient) and
+# self-referential annotations work at import. Required on Python <= 3.13; harmless on
+# 3.14+ (which defers natively via PEP 649).
+
+from __future__ import annotations
 import functools
 import json
 import os
@@ -588,7 +593,7 @@ def build_cert(details: dict) -> Payload:
     days_raw = cert_info.get("DaysToExpiry", "Unknown")
     try:
         days_to_expiry = int(float(days_raw))  # 17.0 -> 17
-    except TypeError, ValueError:
+    except (TypeError, ValueError):
         days_to_expiry = days_raw  # keep "Unknown" / unexpected as-is
     common_name = cert_info.get("CommonName", "Unknown")
     expiry_date = format_expiry_date(details.get("time"), days_to_expiry)
