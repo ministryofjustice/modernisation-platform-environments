@@ -32,6 +32,12 @@ module "eks" {
     },
     coredns = {
     },
+
+    vpc_cni = {
+
+    },
+    kube-proxy = {
+    },
   }
 
   authentication_mode = "API_AND_CONFIG_MAP"
