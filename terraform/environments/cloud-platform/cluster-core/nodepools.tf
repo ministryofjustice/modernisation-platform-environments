@@ -68,7 +68,7 @@ resource "kubectl_manifest" "default_nodepool" {
           nodeClassRef:
             group: eks.amazonaws.com
             kind: NodeClass
-            name: ${terraform.workspace}-nodeclass
+            name: default-nodeclass
         metadata:
           labels:
             Terraform: "true"
@@ -111,7 +111,7 @@ resource "kubectl_manifest" "system_nodepool" {
           nodeClassRef:
             group: eks.amazonaws.com
             kind: NodeClass
-            name: ${terraform.workspace}-nodeclass
+            name: default-nodeclass
           taints:
             - key: system-node
               value: "true"
