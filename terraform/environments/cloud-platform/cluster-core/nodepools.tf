@@ -4,7 +4,7 @@ resource "kubectl_manifest" "default_nodeclass" {
     apiVersion: eks.amazonaws.com/v1
     kind: NodeClass
     metadata:
-      name: ${terraform.workspace}-nodeclass
+      name: default-nodeclass
     spec:
       role: ${local.node_role_name}
 
@@ -41,7 +41,7 @@ resource "kubectl_manifest" "default_nodepool" {
     apiVersion: karpenter.sh/v1
     kind: NodePool
     metadata:
-      name: ${terraform.workspace}-nodepool
+      name: default-nodepool
     spec:
       template:
         spec:
@@ -90,7 +90,7 @@ resource "kubectl_manifest" "system_nodepool" {
     apiVersion: karpenter.sh/v1
     kind: NodePool
     metadata:
-      name: ${terraform.workspace}-system-nodepool
+      name: system-nodepool
     spec:
       template:
         spec:
