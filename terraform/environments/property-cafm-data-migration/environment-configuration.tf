@@ -8,17 +8,5 @@ locals {
       property_datahub_staging_egress_account_id    = local.environment_management.account_ids["analytical-platform-ingestion-production"]
       property_datahub_staging_egress_kms_arn       = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-ingestion-production"]}:key/6da79242-5b40-4a37-bbdf-961950ced1f4"
     }
-    preproduction = {
-      # Preproduction configuration (if needed in future)
-      property_datahub_staging_egress_target_bucket = null
-      property_datahub_staging_egress_account_id    = null
-      property_datahub_staging_egress_kms_arn       = null
-    }
-    development = {
-      # Development configuration (if needed in future)
-      property_datahub_staging_egress_target_bucket = null
-      property_datahub_staging_egress_account_id    = null
-      property_datahub_staging_egress_kms_arn       = null
-    }
   }
 }
