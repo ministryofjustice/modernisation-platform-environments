@@ -34,13 +34,24 @@ def wait_for_linotp():
 def configure_linotp():
     """Configure LinOTP resolver, realm, and policies."""
 
-    # Import LinOTP modules within Flask shell context
-    from linotp.lib import resolver, realm
-    from linotp.lib.config import getLinotpConfig, storeConfig
+    # Create Flask application context
+    from linotp.app import create_app
+    app = create_app()
 
-    print("\n" + "=" * 60)
-    print("LinOTP Automated Configuration (Python)")
-    print("=" * 60)
+    with app.app_context():
+        # Import LinOTP modules within Flask application context
+        from linotp.lib import resolver, realm
+        from linotp.lib.config import getLinotpConfig, storeConfig
+
+        print("\n" + "=" * 60)
+        print("LinOTP Automated Configuration (Python)")
+        print("=" * 60)
+
+        _configure_linotp_internal(resolver, realm, getLinotpConfig, storeConfig)
+
+
+def _configure_linotp_internal(resolver, realm, getLinotpConfig, storeConfig):
+    """Internal configuration logic (runs within Flask context)."""
 
     # Get environment variables
     resolver_name = os.environ.get('LINOTP_RESOLVER_NAME', 'ad-resolver')
