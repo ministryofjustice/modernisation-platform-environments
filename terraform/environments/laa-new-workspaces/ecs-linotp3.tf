@@ -11,8 +11,6 @@
 ##############################################
 
 resource "aws_iam_role" "ecs_task_role" {
-  count = local.environment == "development" ? 1 : 0
-
   name_prefix = "${local.application_name}-${local.environment}-ecs-task-"
 
   assume_role_policy = jsonencode({
@@ -31,10 +29,8 @@ resource "aws_iam_role" "ecs_task_role" {
 }
 
 resource "aws_iam_role_policy" "ecs_exec_policy" {
-  count = local.environment == "development" ? 1 : 0
-
   name = "${local.application_name}-${local.environment}-ecs-exec"
-  role = aws_iam_role.ecs_task_role[0].id
+  role = aws_iam_role.ecs_task_role.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -58,15 +54,13 @@ resource "aws_iam_role_policy" "ecs_exec_policy" {
 ##############################################
 
 resource "aws_ecs_task_definition" "linotp3" {
-  count = local.environment == "development" ? 1 : 0
-
   family                   = "${local.application_name}-${local.environment}-linotp3"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   cpu                      = 1024
   memory                   = 2048
   execution_role_arn       = data.terraform_remote_state.workspace_components.outputs.ecs_task_execution_role_arn
-  task_role_arn            = aws_iam_role.ecs_task_role[0].arn
+  task_role_arn            = aws_iam_role.ecs_task_role.arn
 
   container_definitions = jsonencode([
     {
@@ -161,11 +155,9 @@ resource "aws_ecs_task_definition" "linotp3" {
 ##############################################
 
 resource "aws_ecs_service" "linotp3" {
-  count = local.environment == "development" ? 1 : 0
-
   name                   = "${local.application_name}-${local.environment}-linotp3"
   cluster                = data.terraform_remote_state.workspace_components.outputs.ecs_cluster_id
-  task_definition        = aws_ecs_task_definition.linotp3[0].arn
+  task_definition        = aws_ecs_task_definition.linotp3.arn
   desired_count          = 1
   launch_type            = "FARGATE"
   enable_execute_command = true

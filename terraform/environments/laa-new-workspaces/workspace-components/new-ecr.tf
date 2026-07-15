@@ -3,8 +3,6 @@
 ##############################################
 
 resource "aws_ecr_repository" "linotp3" {
-  count = local.environment == "development" ? 1 : 0
-
   name                 = "${local.application_name}/linotp3"
   image_tag_mutability = "MUTABLE"
 
@@ -19,9 +17,7 @@ resource "aws_ecr_repository" "linotp3" {
 }
 
 resource "aws_ecr_lifecycle_policy" "linotp3" {
-  count = local.environment == "development" ? 1 : 0
-
-  repository = aws_ecr_repository.linotp3[0].name
+  repository = aws_ecr_repository.linotp3.name
 
   policy = jsonencode({
     rules = [{
@@ -38,8 +34,6 @@ resource "aws_ecr_lifecycle_policy" "linotp3" {
 }
 
 resource "aws_ecr_repository" "freeradius_linotp" {
-  count = local.environment == "development" ? 1 : 0
-
   name                 = "${local.application_name}/freeradius-linotp"
   image_tag_mutability = "MUTABLE"
 
@@ -54,9 +48,7 @@ resource "aws_ecr_repository" "freeradius_linotp" {
 }
 
 resource "aws_ecr_lifecycle_policy" "freeradius_linotp" {
-  count = local.environment == "development" ? 1 : 0
-
-  repository = aws_ecr_repository.freeradius_linotp[0].name
+  repository = aws_ecr_repository.freeradius_linotp.name
 
   policy = jsonencode({
     rules = [{
