@@ -8,8 +8,6 @@
 ##############################################
 
 resource "aws_lb" "radius_ecs" {
-  count = local.environment == "development" ? 1 : 0
-
   name_prefix                      = "recs-"
   internal                         = true
   load_balancer_type               = "network"
@@ -23,8 +21,6 @@ resource "aws_lb" "radius_ecs" {
 }
 
 resource "aws_lb_target_group" "radius_ecs" {
-  count = local.environment == "development" ? 1 : 0
-
   name_prefix = "recs-"
   port        = 1812
   protocol    = "UDP"
@@ -49,15 +45,13 @@ resource "aws_lb_target_group" "radius_ecs" {
 }
 
 resource "aws_lb_listener" "radius_ecs" {
-  count = local.environment == "development" ? 1 : 0
-
-  load_balancer_arn = aws_lb.radius_ecs[0].arn
+  load_balancer_arn = aws_lb.radius_ecs.arn
   port              = 1812
   protocol          = "UDP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.radius_ecs[0].arn
+    target_group_arn = aws_lb_target_group.radius_ecs.arn
   }
 
   tags = merge(

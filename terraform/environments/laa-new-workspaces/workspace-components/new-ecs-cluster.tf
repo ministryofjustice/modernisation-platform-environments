@@ -3,8 +3,6 @@
 ##############################################
 
 resource "aws_ecs_cluster" "workspaces" {
-  count = local.environment == "development" ? 1 : 0
-
   name = "${local.application_name}-${local.environment}"
 
   setting {
@@ -19,9 +17,7 @@ resource "aws_ecs_cluster" "workspaces" {
 }
 
 resource "aws_ecs_cluster_capacity_providers" "workspaces" {
-  count = local.environment == "development" ? 1 : 0
-
-  cluster_name       = aws_ecs_cluster.workspaces[0].name
+  cluster_name       = aws_ecs_cluster.workspaces.name
   capacity_providers = ["FARGATE", "FARGATE_SPOT"]
 
   default_capacity_provider_strategy {
@@ -32,8 +28,6 @@ resource "aws_ecs_cluster_capacity_providers" "workspaces" {
 }
 
 resource "aws_cloudwatch_log_group" "ecs_linotp3" {
-  count = local.environment == "development" ? 1 : 0
-
   name              = "/aws/ecs/${local.application_name}-${local.environment}-linotp3"
   retention_in_days = 30
 
