@@ -59,12 +59,12 @@ output "observability_dashboard_name" {
 
 output "observability_high_priority_topic_arn" {
   description = "SNS topic ARN for high priority API platform alarms"
-  value       = local.enable_alerting ? module.sns_cloudwatch_alarms_high_priority[0].topic_arn : null
+  value       = local.enable_alerting ? data.aws_sns_topic.mft_cloudwatch_alarms_high_priority[0].arn : null
 }
 
 output "observability_low_priority_topic_arn" {
   description = "SNS topic ARN for low priority API platform alarms"
-  value       = local.enable_alerting ? module.sns_cloudwatch_alarms_low_priority[0].topic_arn : null
+  value       = local.enable_alerting ? data.aws_sns_topic.mft_cloudwatch_alarms_low_priority[0].arn : null
 }
 
 output "user_auth_secret_names" {

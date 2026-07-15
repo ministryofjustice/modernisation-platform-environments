@@ -9,15 +9,13 @@ locals {
     try(local.application_data.accounts[local.environment].observability_configuration, {})
   )
 
-  enable_alerting = local.notification_configuration != null && alltrue([
-    try(local.notification_configuration.high_priority_alerts.slack_channel_id, "") != "",
-    try(local.notification_configuration.high_priority_alerts.slack_team_id, "") != "",
-    try(local.notification_configuration.low_priority_alerts.slack_channel_id, "") != "",
-    try(local.notification_configuration.low_priority_alerts.slack_team_id, "") != "",
-  ])
+  # Reuse the existing Managed File Transfer alarm routing in environments
+  # where that stack is active, instead of creating duplicate Chatbot channel
+  # configurations for the same Slack channels.
+  enable_alerting = contains(["development", "production"], local.environment)
 
-  cloudwatch_alarm_actions_high_priority = local.enable_alerting ? [module.sns_cloudwatch_alarms_high_priority[0].topic_arn] : []
-  cloudwatch_alarm_actions_low_priority  = local.enable_alerting ? [module.sns_cloudwatch_alarms_low_priority[0].topic_arn] : []
+  cloudwatch_alarm_actions_high_priority = local.enable_alerting ? [data.aws_sns_topic.mft_cloudwatch_alarms_high_priority[0].arn] : []
+  cloudwatch_alarm_actions_low_priority  = local.enable_alerting ? [data.aws_sns_topic.mft_cloudwatch_alarms_low_priority[0].arn] : []
 
   cloudwatch_lambda_alarms = {
     "upload-ticket" = {
@@ -36,6 +34,16 @@ locals {
       function_name     = module.lambda_api_docs.lambda_function_name
     }
   }
+}
+
+data "aws_sns_topic" "mft_cloudwatch_alarms_high_priority" {
+  count = local.enable_alerting ? 1 : 0
+  name  = "integration-hub-managed-file-transfer-cloudwatch-alarms-high-priority"
+}
+
+data "aws_sns_topic" "mft_cloudwatch_alarms_low_priority" {
+  count = local.enable_alerting ? 1 : 0
+  name  = "integration-hub-managed-file-transfer-cloudwatch-alarms-low-priority"
 }
 
 module "kms_cloudwatch_logs" {
@@ -138,177 +146,6 @@ module "kms_cloudwatch_logs" {
   ]
 
   tags = local.tags
-}
-
-module "kms_sns" {
-  count   = local.enable_alerting ? 1 : 0
-  source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.0"
-
-  aliases                 = ["integration-hub-api/sns/${local.component_name}"]
-  description             = "KMS CMK for Integration Hub API SNS alarm encryption"
-  enable_default_policy   = true
-  enable_key_rotation     = true
-  deletion_window_in_days = 30
-  key_usage               = "ENCRYPT_DECRYPT"
-  is_enabled              = true
-
-  key_administrators = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-
-  key_statements = [
-    {
-      sid = "AllowCloudWatchAlarmPublishers"
-      actions = [
-        "kms:Decrypt",
-        "kms:GenerateDataKey*",
-      ]
-      resources = ["*"]
-      principals = [
-        {
-          type        = "Service"
-          identifiers = ["cloudwatch.amazonaws.com"]
-        }
-      ]
-    },
-    {
-      sid = "AllowSNSService"
-      actions = [
-        "kms:Decrypt",
-        "kms:DescribeKey",
-        "kms:Encrypt",
-        "kms:GenerateDataKey*",
-        "kms:ReEncrypt*"
-      ]
-      resources = ["*"]
-      principals = [
-        {
-          type        = "Service"
-          identifiers = ["sns.amazonaws.com"]
-        }
-      ]
-      condition = [
-        {
-          test     = "ArnLike"
-          variable = "kms:EncryptionContext:aws:sns:topicArn"
-          values   = ["arn:aws:sns:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:*"]
-        }
-      ]
-    }
-  ]
-
-  tags = local.tags
-}
-
-module "sns_cloudwatch_alarms_high_priority" {
-  count   = local.enable_alerting ? 1 : 0
-  source  = "terraform-aws-modules/sns/aws"
-  version = "7.1.0"
-
-  name              = "${local.resource_name_prefix}-cloudwatch-alarms-high-priority"
-  kms_master_key_id = module.kms_sns[0].key_arn
-
-  topic_policy_statements = {
-    cloudwatch_publish = {
-      sid     = "AllowCloudWatchAlarmsPublish"
-      actions = ["sns:Publish"]
-      principals = [{
-        type        = "Service"
-        identifiers = ["cloudwatch.amazonaws.com"]
-      }]
-      conditions = [
-        {
-          test     = "StringEquals"
-          variable = "aws:SourceAccount"
-          values   = [data.aws_caller_identity.current.account_id]
-        }
-      ]
-    }
-    chatbot_consume = {
-      sid = "AllowChatbotToConsume"
-      actions = [
-        "sns:Subscribe",
-        "sns:Receive",
-        "sns:Publish",
-      ]
-      principals = [{
-        type = "Service"
-        identifiers = [
-          "sns.amazonaws.com",
-          "events.amazonaws.com",
-          "chatbot.amazonaws.com",
-        ]
-      }]
-    }
-  }
-
-  tags = local.tags
-}
-
-module "sns_cloudwatch_alarms_low_priority" {
-  count   = local.enable_alerting ? 1 : 0
-  source  = "terraform-aws-modules/sns/aws"
-  version = "7.1.0"
-
-  name              = "${local.resource_name_prefix}-cloudwatch-alarms-low-priority"
-  kms_master_key_id = module.kms_sns[0].key_arn
-
-  topic_policy_statements = {
-    cloudwatch_publish = {
-      sid     = "AllowCloudWatchAlarmsPublish"
-      actions = ["sns:Publish"]
-      principals = [{
-        type        = "Service"
-        identifiers = ["cloudwatch.amazonaws.com"]
-      }]
-      conditions = [
-        {
-          test     = "StringEquals"
-          variable = "aws:SourceAccount"
-          values   = [data.aws_caller_identity.current.account_id]
-        }
-      ]
-    }
-    chatbot_consume = {
-      sid = "AllowChatbotToConsume"
-      actions = [
-        "sns:Subscribe",
-        "sns:Receive",
-        "sns:Publish",
-      ]
-      principals = [{
-        type = "Service"
-        identifiers = [
-          "sns.amazonaws.com",
-          "events.amazonaws.com",
-          "chatbot.amazonaws.com",
-        ]
-      }]
-    }
-  }
-
-  tags = local.tags
-}
-
-module "chatbot_cloudwatch_alarms_high_priority" {
-  count  = local.enable_alerting ? 1 : 0
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=0ec33c7bfde5649af3c23d0834ea85c849edf3ac" # v3.0.0
-
-  application_name = "${local.resource_name_prefix}-cloudwatch-alarms-high-priority"
-  slack_channel_id = local.notification_configuration.high_priority_alerts.slack_channel_id
-  slack_team_id    = local.notification_configuration.high_priority_alerts.slack_team_id
-  sns_topic_arns   = [module.sns_cloudwatch_alarms_high_priority[0].topic_arn]
-  tags             = local.tags
-}
-
-module "chatbot_cloudwatch_alarms_low_priority" {
-  count  = local.enable_alerting ? 1 : 0
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot?ref=0ec33c7bfde5649af3c23d0834ea85c849edf3ac" # v3.0.0
-
-  application_name = "${local.resource_name_prefix}-cloudwatch-alarms-low-priority"
-  slack_channel_id = local.notification_configuration.low_priority_alerts.slack_channel_id
-  slack_team_id    = local.notification_configuration.low_priority_alerts.slack_team_id
-  sns_topic_arns   = [module.sns_cloudwatch_alarms_low_priority[0].topic_arn]
-  tags             = local.tags
 }
 
 module "cloudwatch_api_gateway_5xx" {

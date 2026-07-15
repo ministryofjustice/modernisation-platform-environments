@@ -37,16 +37,6 @@
           "key_prefix": "products-poc/uploads",
           "max_upload_size_bytes": 107374182400
         }
-      },
-      "notification_configuration": {
-        "high_priority_alerts": {
-          "slack_channel_id": "C0BDYBK6GPJ",
-          "slack_team_id": "T02DYEB3A"
-        },
-        "low_priority_alerts": {
-          "slack_channel_id": "C0B7PM6VD0E",
-          "slack_team_id": "T02DYEB3A"
-        }
       }
     },
     "test": {
@@ -104,17 +94,7 @@
         "users": {},
         "system_principals": {}
       },
-      "transfer_clients": {},
-      "notification_configuration": {
-        "high_priority_alerts": {
-          "slack_channel_id": "C0BDYBK6GPJ",
-          "slack_team_id": "T02DYEB3A"
-        },
-        "low_priority_alerts": {
-          "slack_channel_id": "C0B7PM6VD0E",
-          "slack_team_id": "T02DYEB3A"
-        }
-      }
+      "transfer_clients": {}
     }
   }
 }
