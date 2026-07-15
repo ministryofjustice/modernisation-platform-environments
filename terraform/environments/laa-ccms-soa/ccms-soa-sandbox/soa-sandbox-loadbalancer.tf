@@ -34,7 +34,7 @@ resource "aws_lb_target_group" "admin_https" {
     enabled             = true
     interval            = 30
     path                = "/weblogic/ready"
-    port                = 443
+    port                = local.application_data.accounts[local.environment].admin_ssl_port
     protocol            = "HTTPS"
     timeout             = 5
     healthy_threshold   = 3
@@ -101,7 +101,7 @@ resource "aws_lb_target_group" "managed_https" {
     enabled             = true
     interval            = 30
     path                = "/weblogic/ready"
-    port                = 443
+    port                = local.application_data.accounts[local.environment].admin_ssl_port
     protocol            = "HTTPS"
     timeout             = 5
     healthy_threshold   = 3
