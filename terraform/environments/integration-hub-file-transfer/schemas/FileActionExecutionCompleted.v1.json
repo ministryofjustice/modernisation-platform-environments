@@ -4,66 +4,96 @@
   "description": "Object file actions are completed. The requested action has taken place and a concluding succeeded or failed status has been identified.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "id", "detail-type", "source", "account", "time", "region", "detail"],
+  "required": [
+    "version",
+    "id",
+    "detail-type",
+    "source",
+    "account",
+    "time",
+    "region",
+    "detail"
+  ],
   "properties": {
-    "version": {"type": "string", "enum": ["0"]},
-    "id": {"type": "string", "format": "uuid"},
-    "detail-type": {"type": "string", "enum": ["FileActionExecutionCompleted.v1"]},
-    "source": {"type": "string", "enum": ["uk.gov.justice.service.managed-file-transfer"]},
-    "account": {"type": "string", "pattern": "^[0-9]{12}$"},
-    "time": {"type": "string", "format": "date-time"},
-    "region": {"type": "string"},
-    "resources": {"type": "array", "items": {"type": "string"}},
-    "replay-name": {"type": "string", "minLength": 1},
+    "version": { "type": "string", "enum": ["0"] },
+    "id": { "type": "string", "format": "uuid" },
+    "detail-type": {
+      "type": "string",
+      "enum": ["FileActionExecutionCompleted.v1"]
+    },
+    "source": {
+      "type": "string",
+      "enum": ["uk.gov.justice.service.managed-file-transfer"]
+    },
+    "account": { "type": "string", "pattern": "^[0-9]{12}$" },
+    "time": { "type": "string", "format": "date-time" },
+    "region": { "type": "string" },
+    "resources": { "type": "array", "items": { "type": "string" } },
+    "replay-name": { "type": "string", "minLength": 1 },
     "detail": {
       "type": "object",
       "additionalProperties": false,
       "required": ["metadata", "data"],
       "properties": {
-        "metadata": {"$ref": "#/definitions/eventMetadata"},
+        "metadata": { "$ref": "#/definitions/eventMetadata" },
         "data": {
           "oneOf": [
             {
               "type": "object",
               "additionalProperties": false,
-              "required": ["fileId", "object", "actionDefinitionId", "actionExecutionId", "status", "completedAt"],
+              "required": [
+                "fileId",
+                "object",
+                "actionDefinitionId",
+                "actionExecutionId",
+                "status",
+                "completedAt"
+              ],
               "properties": {
                 "fileId": {
                   "type": "string",
                   "format": "uuid",
                   "description": "Stable logical file identifier inherited from FileReceived.v1."
                 },
-                "object": {"$ref": "#/definitions/s3Object"},
-                "actionDefinitionId": {"type": "string", "minLength": 1},
-                "actionExecutionId": {"type": "string", "format": "uuid"},
-                "status": {"type": "string", "enum": ["succeeded"]},
-                "completedAt": {"type": "string", "format": "date-time"},
-                "result": {"type": "object"}
+                "object": { "$ref": "#/definitions/s3Object" },
+                "actionDefinitionId": { "type": "string", "minLength": 1 },
+                "actionExecutionId": { "type": "string", "format": "uuid" },
+                "status": { "type": "string", "enum": ["succeeded"] },
+                "completedAt": { "type": "string", "format": "date-time" },
+                "result": { "type": "object" }
               }
             },
             {
               "type": "object",
               "additionalProperties": false,
-              "required": ["fileId", "object", "actionDefinitionId", "actionExecutionId", "status", "completedAt", "failure"],
+              "required": [
+                "fileId",
+                "object",
+                "actionDefinitionId",
+                "actionExecutionId",
+                "status",
+                "completedAt",
+                "failure"
+              ],
               "properties": {
                 "fileId": {
                   "type": "string",
                   "format": "uuid",
                   "description": "Stable logical file identifier inherited from FileReceived.v1."
                 },
-                "object": {"$ref": "#/definitions/s3Object"},
-                "actionDefinitionId": {"type": "string", "minLength": 1},
-                "actionExecutionId": {"type": "string", "format": "uuid"},
-                "status": {"type": "string", "enum": ["failed"]},
-                "completedAt": {"type": "string", "format": "date-time"},
+                "object": { "$ref": "#/definitions/s3Object" },
+                "actionDefinitionId": { "type": "string", "minLength": 1 },
+                "actionExecutionId": { "type": "string", "format": "uuid" },
+                "status": { "type": "string", "enum": ["failed"] },
+                "completedAt": { "type": "string", "format": "date-time" },
                 "failure": {
                   "type": "object",
                   "additionalProperties": false,
                   "required": ["code", "message"],
                   "properties": {
-                    "code": {"type": "string", "minLength": 1},
-                    "message": {"type": "string", "minLength": 1},
-                    "retryable": {"type": "boolean"}
+                    "code": { "type": "string", "minLength": 1 },
+                    "message": { "type": "string", "minLength": 1 },
+                    "retryable": { "type": "boolean" }
                   }
                 }
               }
@@ -79,9 +109,9 @@
       "additionalProperties": false,
       "required": ["correlationId", "causationId", "idempotencyKey"],
       "properties": {
-        "correlationId": {"type": "string", "format": "uuid"},
-        "causationId": {"type": "string", "format": "uuid"},
-        "idempotencyKey": {"type": "string", "minLength": 1}
+        "correlationId": { "type": "string", "format": "uuid" },
+        "causationId": { "type": "string", "format": "uuid" },
+        "idempotencyKey": { "type": "string", "minLength": 1 }
       }
     },
     "s3Object": {
@@ -90,10 +120,10 @@
       "description": "A particular version of an object stored in Amazon S3.",
       "required": ["bucket", "key", "versionId", "sizeBytes"],
       "properties": {
-        "bucket": {"type": "string", "minLength": 3},
-        "key": {"type": "string", "minLength": 1},
-        "versionId": {"type": "string", "minLength": 1},
-        "sizeBytes": {"type": "integer", "minimum": 0}
+        "bucket": { "type": "string", "minLength": 3 },
+        "key": { "type": "string", "minLength": 1 },
+        "versionId": { "type": "string", "minLength": 1 },
+        "sizeBytes": { "type": "integer", "minimum": 0 }
       }
     }
   },

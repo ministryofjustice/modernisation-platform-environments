@@ -13,6 +13,6 @@ locals {
   environment_configuration = local.environment_configurations[local.cluster_environment]
   cp_vpc_name               = local.cluster_environment == "development_cluster" ? "cloud-platform-development" : terraform.workspace
   workspace_environment     = element(reverse(split("-", terraform.workspace)), 0)
-  cluster_name              = contains(local.mp_environments, terraform.workspace) ? local.workspace_environment : terraform.workspace
+  cluster_name              = terraform.workspace
   cluster_environment       = contains(local.mp_environments, terraform.workspace) ? local.workspace_environment : "development_cluster"
 }
