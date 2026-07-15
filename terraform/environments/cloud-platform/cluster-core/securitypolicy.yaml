@@ -12,7 +12,7 @@ spec:
   targetRefs:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
-      name: hello-world
+      name: starter-pack-route
   authorization:
     defaultAction: Deny   # deny unless an Allow rule matches
     rules:
