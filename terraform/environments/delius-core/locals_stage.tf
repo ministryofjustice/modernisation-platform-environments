@@ -179,7 +179,7 @@ locals {
   }
 
   dms_config_stage = {
-    deploy_dms                 = false
+    deploy_dms                 = true
     replication_instance_class = "dms.t3.medium"
     engine_version             = "3.5.4"
 
@@ -199,6 +199,8 @@ locals {
     # Auditing from the Stage environment is considered production data
     is-production = true
   }
+
+
 
   db_backup_config_stage = {
     object_lock_days             = 0

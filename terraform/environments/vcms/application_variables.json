@@ -10,7 +10,9 @@
       "health_check_grace_period_seconds": 60,
       "image_tag": "tm-1408-composer-19577361514-1",
       "db_snapshot_identifier": "rds-vcmsdev-db-backup-2025-09-26-14-04-mpcp",
-      "log_retention_in_days": 14
+      "log_retention_in_days": 14,
+      "legacy_url": "www.dev.victim-case-management.service.justice.gov.uk",
+      "legacy_validation_record": "_de3175001d80dab25ece87b3ec484246.www.dev.victim-case-management.service.justice.gov.uk"
     },
     "vcms-test": {
       "container_port": 80,
@@ -22,7 +24,8 @@
       "health_check_grace_period_seconds": 60,
       "image_tag": "tm-1408-composer-19577361514-1",
       "db_snapshot_identifier": "",
-      "log_retention_in_days": 14
+      "log_retention_in_days": 14,
+      "legacy_url": "www.test.victim-case-management.service.justice.gov.uk"
     },
     "vcms-preproduction": {
       "container_port": 80,
@@ -33,8 +36,10 @@
       "deployment_minimum_healthy_percent": 0,
       "health_check_grace_period_seconds": 60,
       "image_tag": "tm-1408-composer-19577361514-1",
-      "db_snapshot_identifier": "",
-      "log_retention_in_days": 90
+      "db_snapshot_identifier": "rds-vcmsdev-db-backup-2025-09-26-14-04-mpcp",
+      "log_retention_in_days": 90,
+      "legacy_url": "www.preprod.victim-case-management.service.justice.gov.uk",
+      "legacy_validation_record": "_1f5950bad5290cf57d332b6d1a3a12fc.www.preprod.victim-case-management.service.justice.gov.uk"
     },
     "vcms-production": {
       "container_port": 80,

@@ -1104,8 +1104,7 @@ module "share_db_with_fms_lambda_role" {
   dbs_to_grant            = toset(["serco_fms${local.db_suffix}"])
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.load_fms.arn
-  db_exists               = !local.is-development
-  de_role_arn             = local.is-development ? try(one(data.aws_iam_roles.mod_plat_roles.arns)) : null
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 }
 
 resource "aws_lakeformation_permissions" "fms_add_create_db" {
@@ -2450,7 +2449,7 @@ resource "aws_iam_role_policy_attachment" "merge_load_ac_attach" {
 
 
 resource "aws_lakeformation_permissions" "merge_load_ac_lambda_database_access" {
-  for_each    = local.is-development || local.is-test || local.is-preproduction ? toset(local.load_lambda_databases) : []
+  for_each    = toset(local.load_lambda_databases)
   principal   = aws_iam_role.merge_load_ac.arn
   permissions = ["DESCRIBE"]
   database {
@@ -2459,7 +2458,7 @@ resource "aws_lakeformation_permissions" "merge_load_ac_lambda_database_access" 
 }
 
 resource "aws_lakeformation_permissions" "merge_load_ac_lambda_table_access" {
-  for_each    = local.is-development || local.is-test || local.is-preproduction ? toset(local.load_lambda_databases) : []
+  for_each    = toset(local.load_lambda_databases)
   principal   = aws_iam_role.merge_load_ac.arn
   permissions = ["SELECT", "INSERT", "ALTER", "DESCRIBE"]
   table {
@@ -2469,7 +2468,7 @@ resource "aws_lakeformation_permissions" "merge_load_ac_lambda_table_access" {
 }
 
 resource "aws_lakeformation_permissions" "merge_load_ac_lambda_s3_access" {
-  count       = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
+  count       = 1
   principal   = aws_iam_role.merge_load_ac.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
@@ -2520,7 +2519,7 @@ resource "aws_iam_role_policy_attachment" "merge_load_emdi_attach" {
 
 
 resource "aws_lakeformation_permissions" "merge_load_emdi_lambda_database_access" {
-  for_each    = local.is-development || local.is-test || local.is-preproduction ? toset(local.load_lambda_databases) : []
+  for_each    = toset(local.load_lambda_databases)
   principal   = aws_iam_role.merge_load_emdi.arn
   permissions = ["DESCRIBE"]
   database {
@@ -2529,7 +2528,7 @@ resource "aws_lakeformation_permissions" "merge_load_emdi_lambda_database_access
 }
 
 resource "aws_lakeformation_permissions" "merge_load_emdi_lambda_table_access" {
-  for_each    = local.is-development || local.is-test || local.is-preproduction ? toset(local.load_lambda_databases) : []
+  for_each    = toset(local.load_lambda_databases)
   principal   = aws_iam_role.merge_load_emdi.arn
   permissions = ["SELECT", "INSERT", "ALTER", "DESCRIBE"]
   table {
@@ -2539,7 +2538,7 @@ resource "aws_lakeformation_permissions" "merge_load_emdi_lambda_table_access" {
 }
 
 resource "aws_lakeformation_permissions" "merge_load_emdi_lambda_s3_access" {
-  count       = local.is-production ? 0 : 1
+  count       = 1
   principal   = aws_iam_role.merge_load_emdi.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {

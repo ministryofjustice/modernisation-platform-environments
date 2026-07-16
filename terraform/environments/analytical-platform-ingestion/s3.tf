@@ -580,3 +580,77 @@ module "shared_services_client_team_gov_29148_egress_bucket" {
     }
   }
 }
+
+data "aws_iam_policy_document" "property_datahub_staging_egress" {
+
+  count = local.is-production ? 1 : 0
+
+  statement {
+    sid    = "ReplicationPermissions"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:root"]
+    }
+    condition {
+      test     = "ArnLike"
+      variable = "aws:PrincipalArn"
+      values   = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/mojap-data-production-property-datahub-staging-egress"]
+    }
+    actions = [
+      "s3:ReplicateObject",
+      "s3:ObjectOwnerOverrideToBucketOwner",
+      "s3:GetObjectVersionTagging",
+      "s3:ReplicateTags",
+      "s3:ReplicateDelete"
+    ]
+    resources = ["arn:aws:s3:::mojap-ingestion-${local.environment}-property-datahub-staging-egress/*"]
+  }
+
+  statement {
+    sid    = "DenyS3AccessSandbox"
+    effect = "Deny"
+    principals {
+      type        = "AWS"
+      identifiers = [local.environment == "development" ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/sandbox" : "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/developer"]
+    }
+    actions = [
+      "s3:*"
+    ]
+    resources = [
+      "arn:aws:s3:::mojap-ingestion-${local.environment}-property-datahub-staging-egress/*",
+      "arn:aws:s3:::mojap-ingestion-${local.environment}-property-datahub-staging-egress"
+    ]
+  }
+}
+
+#tfsec:ignore:avd-aws-0088 - The bucket policy is attached to the bucket
+#tfsec:ignore:avd-aws-0132 - The bucket policy is attached to the bucket
+module "property_datahub_staging_egress_bucket" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  count = local.is-production ? 1 : 0
+
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "5.13.0"
+
+  bucket = "mojap-ingestion-${local.environment}-property-datahub-staging-egress"
+
+  force_destroy = true
+  attach_policy = true
+
+  versioning = {
+    enabled = true
+  }
+
+  policy = data.aws_iam_policy_document.property_datahub_staging_egress[0].json
+
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        kms_master_key_id = module.property_datahub_staging_egress_kms[0].key_arn
+        sse_algorithm     = "aws:kms"
+      }
+    }
+  }
+}

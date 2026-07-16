@@ -1,0 +1,27 @@
+apiVersion: policies.kyverno.io/v1
+kind: DeletingPolicy
+metadata:
+  name: cleanup-bare-pods
+  annotations:
+    policies.kyverno.io/title: Cleanup Bare Pods
+    policies.kyverno.io/category: Other
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      A bare Pod is any Pod created directly and not owned by a controller such
+      as a Deployment or Job. Bare Pods are often created manually while
+      troubleshooting; if left behind they create clutter, increase cost, and can
+      be a security risk. This policy finds and removes all bare Pods across the
+      cluster on a schedule.
+spec:
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+  conditions:
+    - name: is-bare-pod
+      expression: >-
+        !has(object.metadata.ownerReferences) || size(object.metadata.ownerReferences) == 0
+  # Runs daily at 02:00 UTC.
+  schedule: "0 2 * * *"
