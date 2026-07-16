@@ -15,7 +15,6 @@ locals {
   cluster_name          = terraform.workspace
   cluster_environment   = contains(local.mp_environments, terraform.workspace) ? local.workspace_environment : "development_cluster"
 
-  node_role_name = split("/", data.aws_eks_cluster.cluster.compute_config[0].node_role_arn)[1]
 
   base_domain = "container-platform.service.justice.gov.uk"
 

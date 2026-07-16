@@ -20,6 +20,10 @@ terraform {
       version = "~> 0.10"
       source  = "hashicorp/time"
     }
+    kubectl = {
+      source  = "alekc/kubectl"
+      version = "~> 2.0"
+    }
     tls = {
       version = "~> 4.0"
       source  = "hashicorp/tls"
