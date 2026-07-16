@@ -336,7 +336,7 @@ module "property_datahub_staging_egress_kms" {
   enable_default_policy = true
   key_statements = [
     {
-      sid = "AllowAnalyticalPlatformDataProduction"
+      sid = "AllowPropertyCafmReplication"
       actions = [
         "kms:Encrypt",
         "kms:GenerateDataKey"
@@ -346,14 +346,14 @@ module "property_datahub_staging_egress_kms" {
       principals = [
         {
           type        = "AWS"
-          identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:root"]
+          identifiers = ["arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-production"]}:root"]
         }
       ]
       conditions = [
         {
           test     = "ArnLike"
           variable = "aws:PrincipalArn"
-          values   = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/mojap-data-production-property-datahub-staging-egress"]
+          values   = ["arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-production"]}:role/property-datahub-staging-replication"]
         }
       ]
     }
