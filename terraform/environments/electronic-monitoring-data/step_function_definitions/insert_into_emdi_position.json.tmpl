@@ -1,0 +1,83 @@
+{
+  "StartAt": "ProcessDates",
+  "States": {
+    "ProcessDates": {
+      "Type": "Map",
+      "ItemsPath": "$.filter_dates",
+      "MaxConcurrency": 1,
+      "ResultPath": "$.date_results",
+      "ItemSelector": {
+        "filter_date.$": "$$.Map.Item.Value",
+        "input.$": "$"
+      },
+      "Iterator": {
+        "StartAt": "MergeIntoEmdiPosition",
+        "States": {
+          "MergeIntoEmdiPosition": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "ResultPath": "$.merge_result",
+            "Parameters": {
+              "FunctionName": "${merge_emdi_position}",
+              "Payload": {
+                "resource": "/request/",
+                "path": "/request/",
+                "httpMethod": "POST",
+                "headers": {
+                  "Content-Type": "application/json"
+                },
+                "multiValueHeaders": {},
+                "queryStringParameters": null,
+                "requestContext": {
+                  "resourcePath": "/request/",
+                  "httpMethod": "POST",
+                  "path": "/request/",
+                  "identity": {
+                    "sourceIp": "127.0.0.1"
+                  }
+                },
+                "isBase64Encoded": false,
+                "body.$": "States.JsonToString($)"
+              }
+            },
+            "Retry": [
+              {
+                "ErrorEquals": ["States.ALL"],
+                "IntervalSeconds": 2,
+                "BackoffRate": 2,
+                "MaxAttempts": 2
+              }
+            ],
+            "Catch": [
+              {
+                "ErrorEquals": ["States.ALL"],
+                "ResultPath": "$.error",
+                "Next": "MarkFailed"
+              }
+            ],
+            "Next": "MarkSucceeded"
+          },
+          "MarkSucceeded": {
+            "Type": "Pass",
+            "Parameters": {
+              "filter_date.$": "$.filter_date",
+              "status": "SUCCEEDED",
+              "result.$": "$.merge_result.Payload"
+            },
+            "End": true
+          },
+          "MarkFailed": {
+            "Type": "Pass",
+            "Parameters": {
+              "filter_date.$": "$.filter_date",
+              "status": "FAILED",
+              "error.$": "$.error"
+            },
+            "End": true
+          }
+        }
+      },
+      "End": true
+    }
+  }
+}
