@@ -75,7 +75,7 @@ output "ecs_linotp3_security_group_id" {
 
 output "linotp3_db_endpoint" {
   description = "RDS endpoint for LinOTP 3.x database"
-  value       = aws_db_instance.linotp3.endpoint
+  value       = aws_db_instance.linotp3.address
 }
 
 output "linotp3_enc_key_secret_arn" {
