@@ -69,6 +69,7 @@
       "workspace_cidr_nonprod": "10.200.0.0/20",
       "northgate_proxy": "10.120.0.147/32",
       "aws_workspace_cidr": "10.200.0.0/20",
+      "mp_v1_workspaces_cidr": "10.26.130.0/24",
       "cloud_platform_cidr": "172.20.0.0/16",
       "oem": {
         "agent_port": "3872",
