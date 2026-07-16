@@ -38,7 +38,7 @@ locals {
   ]
 
   lambda_source_hashes_cloudwatch_slack_integration_v2 = [
-    for f in fileset("./lambda/cloudwatch-slack-integration-v2", "**") :
+    for f in fileset("./lambda/cloudwatch-slack-integration-v2", "lambda_function.py") :
     sha256(file("${path.module}/lambda/cloudwatch-slack-integration-v2/${f}"))
   ]
 
