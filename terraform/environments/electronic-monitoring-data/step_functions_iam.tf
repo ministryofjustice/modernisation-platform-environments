@@ -205,7 +205,7 @@ data "aws_iam_policy_document" "insert_into_emdi_position" {
 
 resource "aws_iam_policy" "insert_into_emdi_position" {
   name   = "insert_into_emdi_position"
-  policy = data.aws_iam_policy_document.insert_into_emdi_position[0].json
+  policy = data.aws_iam_policy_document.insert_into_emdi_position.json
 }
 
 
