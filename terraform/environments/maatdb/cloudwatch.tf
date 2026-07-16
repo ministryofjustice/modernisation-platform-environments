@@ -39,10 +39,10 @@ resource "aws_cloudwatch_metric_alarm" "rds_alarms" {
   period              = local.common_rds_config.period
   statistic           = local.common_rds_config.statistic
   threshold           = each.key == "FreeStorageSpace" ? local.storage : each.key == "FreeableMemory" ? local.FreeMemory : local.common_rds_config.threshold
-  alarm_description   = "Alarm for RDS Oracle metric: ${each.key}"
-  alarm_actions       = [aws_sns_topic.maatdb_alerting_topic.arn]
-  ok_actions          = [aws_sns_topic.maatdb_alerting_topic.arn]
-  treat_missing_data  = each.key == "DatabaseConnections" ? "missing" : "notBreaching"
+  alarm_description  = "Alarm for RDS Oracle metric: ${each.key}"
+  alarm_actions      = [aws_sns_topic.maatdb_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.maatdb_alerting_topic.arn]
+  treat_missing_data = each.key == "DatabaseConnections" ? "missing" : "notBreaching"
 
   dimensions = {
     DBInstanceIdentifier = module.rds.db_instance_identifier
