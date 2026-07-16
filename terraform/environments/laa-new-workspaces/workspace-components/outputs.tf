@@ -22,11 +22,6 @@ output "radius_shared_secret_arn" {
   value       = aws_secretsmanager_secret.radius_shared_secret.arn
 }
 
-output "radius_server_private_ips" {
-  description = "Private IP addresses of RADIUS servers (EC2 - legacy)"
-  value       = [aws_instance.radius_server.private_ip]
-}
-
 output "radius_nlb_private_ips" {
   description = "Private IP addresses of RADIUS NLB for ECS (use this for AD RADIUS config)"
   value       = [for eni in data.aws_network_interface.radius_nlb : eni.private_ip]
