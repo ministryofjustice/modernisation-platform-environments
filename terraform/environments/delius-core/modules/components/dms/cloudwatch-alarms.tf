@@ -9,7 +9,7 @@ resource "aws_sns_topic" "dms_alerts_topic" {
 }
 
 resource "aws_iam_role" "sns_logging_role" {
-  name = "sns-logging-role"
+  name = "${var.env_name}-dms-sns-logging-role"
 
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
@@ -200,7 +200,7 @@ module "disable_out_of_hours_alarms" {
 # IAM Role for Lambda
 resource "aws_iam_role" "lambda_exec" {
   #checkov:skip=CKV_AWS_60 "ignore"
-  name = "dms-checker-lambda-role"
+  name = "${var.env_name}-dms-checker-lambda-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
