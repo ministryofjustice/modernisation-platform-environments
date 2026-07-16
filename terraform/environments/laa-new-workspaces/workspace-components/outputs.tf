@@ -23,9 +23,15 @@ output "radius_shared_secret_arn" {
 }
 
 output "radius_server_private_ips" {
-  description = "Private IP addresses of RADIUS servers"
+  description = "Private IP addresses of RADIUS servers (EC2 - legacy)"
   value       = [aws_instance.radius_server.private_ip]
 }
+
+output "radius_nlb_private_ips" {
+  description = "Private IP addresses of RADIUS NLB for ECS (use this for AD RADIUS config)"
+  value       = [for subnet in aws_lb.radius_ecs.subnet_mapping : subnet.private_ipv4_address]
+}
+
 
 output "ses_sender_email" {
   description = "SES sender email address for notifications"

@@ -32,8 +32,8 @@ def wait_for_linotp():
     return False
 
 
-def set_admin_password():
-    """Set LinOTP admin user password from environment variable."""
+def set_admin_password_internal(db):
+    """Set LinOTP admin user password using internal API."""
     admin_user = os.environ.get('LINOTP_ADMIN_USER', 'admin')
     admin_password = os.environ.get('LINOTP_ADMIN_PASSWORD')
 
@@ -44,27 +44,41 @@ def set_admin_password():
     print(f"\n--- Setting admin password for user '{admin_user}' ---")
 
     try:
-        # Use linotp CLI to set admin password
-        proc = subprocess.Popen(
-            ['linotp', 'admin', 'set-password', admin_user],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True
+        from passlib.hash import bcrypt
+        from sqlalchemy import text
+
+        # Hash password using bcrypt
+        password_hash = bcrypt.hash(admin_password)
+
+        # Delete any existing admin user first
+        delete_sql = text("DELETE FROM imported_user WHERE username = :username")
+        db.session.execute(delete_sql, {'username': admin_user})
+
+        # Insert admin user into imported_user table (not admin_users!)
+        insert_sql = text("""
+            INSERT INTO imported_user (groupid, userid, username, password, email)
+            VALUES (:groupid, :userid, :username, :password, :email)
+        """)
+
+        db.session.execute(
+            insert_sql,
+            {
+                'groupid': 'LinOTP_local_admins',
+                'userid': admin_user,
+                'username': admin_user,
+                'password': password_hash,
+                'email': f'{admin_user}@local'
+            }
         )
+        db.session.commit()
 
-        # Provide password twice (confirmation)
-        stdout, stderr = proc.communicate(input=f"{admin_password}\n{admin_password}\n", timeout=10)
-
-        if proc.returncode == 0:
-            print(f"✓ Admin password set successfully for user '{admin_user}'")
-            return True
-        else:
-            print(f"WARNING: Failed to set admin password: {stderr}")
-            return False
+        print(f"✓ Admin password set successfully for user '{admin_user}'")
+        return True
 
     except Exception as e:
         print(f"WARNING: Error setting admin password: {e}")
+        import traceback
+        traceback.print_exc()
         return False
 
 
@@ -85,8 +99,8 @@ def configure_linotp():
         print("LinOTP Automated Configuration (Python)")
         print("=" * 60)
 
-        # Step 0: Set admin password
-        set_admin_password()
+        # Step 0: Set admin password using internal API
+        set_admin_password_internal(db)
 
         _configure_linotp_internal(resolver, realm, getLinotpConfig, storeConfig, db)
 
@@ -115,12 +129,19 @@ def _configure_linotp_internal(resolver, realm, getLinotpConfig, storeConfig, db
     else:
         print(f"Creating LDAP resolver '{resolver_name}'...")
 
+        # Encrypt the AD bind password using LinOTP's encryption
+        from linotp.lib.crypto.encrypted_data import EncryptedData
+
+        # Create encrypted data object - this handles encryption automatically via storeConfig
+        bindpw = os.environ['AD_BIND_PASSWORD']
+
         # Build resolver configuration
+        # Note: storeConfig will automatically encrypt sensitive values like BINDPW
         resolver_config = {
             f'linotp.ldapresolver.LDAPURI.{resolver_name}': ldap_uris,
             f'linotp.ldapresolver.LDAPBASE.{resolver_name}': 'OU=Users,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local',
             f'linotp.ldapresolver.BINDDN.{resolver_name}': 'CN=Admin,OU=Users,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local',
-            f'linotp.ldapresolver.BINDPW.{resolver_name}': os.environ['AD_BIND_PASSWORD'],
+            f'linotp.ldapresolver.BINDPW.{resolver_name}': bindpw,
             f'linotp.ldapresolver.LOGINNAMEATTRIBUTE.{resolver_name}': 'sAMAccountName',
             f'linotp.ldapresolver.LDAPFILTER.{resolver_name}': '(&(sAMAccountName=%s)(objectClass=user))',
             f'linotp.ldapresolver.LDAPSEARCHFILTER.{resolver_name}': '(sAMAccountName=*)(objectClass=user)',
