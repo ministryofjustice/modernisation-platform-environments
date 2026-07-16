@@ -63,29 +63,22 @@ module "firewall_transit_gateway_routes" {
 }
 
 resource "aws_route" "transit_gateway_to_network_firewall" {
-  for_each = length(local.transit_gateway_routes) > 0 ? {
-    for key, value in local.additional_cidr_subnets : key => value
-    if value.type == "attachments"
-  } : {}
+  for_each = {
+    for route in flatten([
+      for attachment_key, attachment in local.additional_cidr_subnets : [
+        for subnet_key, subnet in local.subnets : {
+          key              = "${attachment_key}-${subnet_key}"
+          attachment_key   = attachment_key
+          attachment_az    = attachment.az
+          destination_cidr = subnet.cidr_block
+        } if subnet.type == "private"
+      ]
+    ]) : route.key => route
+  }
 
-  route_table_id         = aws_route_table.additional[each.key].id
-  destination_cidr_block = "0.0.0.0/0"
-  vpc_endpoint_id        = data.aws_vpc_endpoint.network_firewall[each.value.az].id
+  route_table_id         = aws_route_table.additional[each.value.attachment_key].id
+  destination_cidr_block = each.value.destination_cidr
+  vpc_endpoint_id        = data.aws_vpc_endpoint.network_firewall[each.value.attachment_az].id
 
   depends_on = [aws_networkfirewall_firewall.main]
-}
-
-# Temporary bypass: routes Cloud Platform return traffic (172.20.0.0/16) directly
-# to the TGW from private subnets, skipping the GWLB/Network Firewall inspection
-# path. This isolates whether the inspection path is causing connectivity issues.
-# Remove once the inspection path is confirmed working.
-resource "aws_route" "private_to_tgw_cloud_platform_bypass" {
-  for_each = try(local.network_configuration.transit_gateway.temporary_bypass_cloud_platform, false) ? {
-    for key, value in local.subnets : value.az => value
-    if value.type == "private"
-  } : {}
-
-  route_table_id         = aws_route_table.main["private-${each.key}"].id
-  destination_cidr_block = "172.20.0.0/16"
-  transit_gateway_id     = data.aws_ec2_transit_gateway.moj_tgw.id
 }

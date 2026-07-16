@@ -109,7 +109,6 @@ environment:
             kubernetes.io/role/internal-elb: 1
             karpenter.sh/discovery: ${environment}
     transit_gateway:
-      temporary_bypass_cloud_platform: true
       routes:
         - name: internal
           cidr: 10.0.0.0/8
