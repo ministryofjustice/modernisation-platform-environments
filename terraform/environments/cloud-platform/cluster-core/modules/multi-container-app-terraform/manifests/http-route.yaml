@@ -1,0 +1,26 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: multi-container-app-route
+  namespace: ${namespace}
+spec:
+  parentRefs:
+    - name: ${listenerset_name}
+      namespace: ${listenerset_namespace}
+      kind: ListenerSet
+      group: gateway.networking.k8s.io
+  hostnames:
+%{ for hostname in hostnames ~}
+    - ${hostname}
+%{ endfor ~}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: rails-app-service
+          port: 3000
+          weight: 1

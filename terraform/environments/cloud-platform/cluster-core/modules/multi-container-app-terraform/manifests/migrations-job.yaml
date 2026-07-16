@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rails-migrations
+  namespace: ${namespace}
+spec:
+  template:
+    spec:
+      containers:
+        - name: rails-app
+          image: ${image_repository}:${image_tag}
+          command: ["bundle", "exec", "rails", "db:migrate"]
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ${database_secret_name}
+                  key: url
+      restartPolicy: OnFailure
+  backoffLimit: 4
