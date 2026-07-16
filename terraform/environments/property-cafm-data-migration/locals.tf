@@ -51,7 +51,7 @@ locals {
   environment_shorthand = local.environment_map[local.environment]
 
   # S3 replication configuration for property-datahub-staging bucket
-  replication_configuration = local.replication_configurations[local.environment]
+  replication_configuration = lookup(local.replication_configurations, local.environment, null)
 
   replication_configurations = {
     production = {
