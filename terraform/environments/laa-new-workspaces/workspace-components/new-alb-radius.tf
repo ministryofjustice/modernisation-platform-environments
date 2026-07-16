@@ -62,6 +62,18 @@ resource "aws_security_group_rule" "radius_alb_to_radius_server" {
   description              = "HTTPS to RADIUS servers"
 }
 
+# Egress rule for ECS LinOTP tasks
+resource "aws_security_group_rule" "radius_alb_to_ecs_linotp" {
+
+  type                     = "egress"
+  from_port                = 5000
+  to_port                  = 5000
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.radius_alb.id
+  source_security_group_id = aws_security_group.ecs_linotp3.id
+  description              = "HTTP to ECS LinOTP tasks"
+}
+
 ##############################################
 ### Application Load Balancer
 ##############################################
