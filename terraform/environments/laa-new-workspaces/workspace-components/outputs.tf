@@ -40,7 +40,7 @@ output "ses_sender_email" {
 
 output "radius_portal_url" {
   description = "URL of the RADIUS MFA self-service portal"
-  value       = "https://${aws_route53_record.radius_portal.name}"
+  value       = "https://${aws_route53_record.linotp3_portal.name}"
 }
 
 ###############################################

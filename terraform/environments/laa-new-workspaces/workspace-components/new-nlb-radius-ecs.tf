@@ -11,8 +11,15 @@ resource "aws_lb" "radius_ecs" {
   name_prefix                      = "recs-"
   internal                         = true
   load_balancer_type               = "network"
-  subnets                          = [aws_subnet.private_a.id, aws_subnet.private_b.id]
   enable_cross_zone_load_balancing = true
+
+  subnet_mapping {
+    subnet_id = aws_subnet.private_a.id
+  }
+
+  subnet_mapping {
+    subnet_id = aws_subnet.private_b.id
+  }
 
   tags = merge(
     local.tags,
