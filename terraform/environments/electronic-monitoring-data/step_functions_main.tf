@@ -126,7 +126,7 @@ module "iceberg_table_maintenance_step_function" {
 }
 
 # ------------------------------------------
-# Insert into emdi position
+# Insert into emdi position step function
 # ------------------------------------------
 
 
