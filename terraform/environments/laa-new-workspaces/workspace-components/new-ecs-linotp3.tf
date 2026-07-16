@@ -178,7 +178,7 @@ resource "aws_lb_target_group" "linotp3_portal" {
 
   health_check {
     enabled             = true
-    path                = "/"
+    path                = "/manage/"
     protocol            = "HTTP"
     matcher             = "200-399"
     interval            = 30
