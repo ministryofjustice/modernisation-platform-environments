@@ -265,7 +265,7 @@ resource "aws_s3_bucket_policy" "s3_general" {
         {
           Sid    = "EC2Access"
           Effect = "Allow"
-          Action = ["s3:GetBucketAcl", "s3:DeleteObject", "s3:GetObject", "s3:PutObject", "s3:ListBucket"]
+          Action = ["s3:GetBucketAcl", "s3:DeleteObject", "s3:GetObject", "s3:PutObject", "s3:ListBucket", "s3:GetObjectTagging", "s3:PutObjectTagging"]
           Resource = [
             aws_s3_bucket.s3_general[each.key].arn,
             "${aws_s3_bucket.s3_general[each.key].arn}/*"
