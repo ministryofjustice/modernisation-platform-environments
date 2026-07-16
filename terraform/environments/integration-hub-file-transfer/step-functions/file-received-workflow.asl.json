@@ -1,0 +1,1021 @@
+{
+  "Comment": "Stage an exact incoming S3 object version in processing with durable idempotency checkpoints",
+  "QueryLanguage": "JSONata",
+  "StartAt": "Initialise",
+  "TimeoutSeconds": ${state_machine_timeout_secs},
+  "States": {
+    "Initialise": {
+      "Type": "Pass",
+      "Assign": {
+        "event": "{% $states.input %}",
+        "eventId": "{% $exists($states.input.id) ? $states.input.id : null %}",
+        "fileId": "{% $exists($states.input.detail.data.fileId) ? $states.input.detail.data.fileId : null %}",
+        "correlationId": "{% $exists($states.input.detail.metadata.correlationId) ? $states.input.detail.metadata.correlationId : null %}",
+        "idempotencyKey": "{% $exists($states.input.detail.metadata.idempotencyKey) ? $states.input.detail.metadata.idempotencyKey : null %}",
+        "sourceBucket": "{% $exists($states.input.detail.data.object.bucket) ? $states.input.detail.data.object.bucket : null %}",
+        "sourceKey": "{% $exists($states.input.detail.data.object.key) ? $states.input.detail.data.object.key : null %}",
+        "sourceVersionId": "{% $exists($states.input.detail.data.object.versionId) ? $states.input.detail.data.object.versionId : null %}",
+        "sizeBytes": "{% $exists($states.input.detail.data.object.sizeBytes) ? $states.input.detail.data.object.sizeBytes : null %}",
+        "expectedAccountId": ${account_id},
+        "incomingBucket": ${incoming_bucket_name},
+        "processingBucket": ${processing_bucket_name},
+        "destinationKmsKeyArn": ${destination_kms_key_arn},
+        "partSize": ${part_size_bytes},
+        "maximumSize": ${maximum_size_bytes},
+        "leaseSeconds": ${lease_seconds},
+        "recordRetentionSeconds": ${record_retention_seconds},
+        "nowEpoch": "{% $floor($toMillis($states.context.Execution.StartTime) / 1000) %}",
+        "multipartAttempt": 0
+      },
+      "Next": "Validate Event"
+    },
+    "Validate Event": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Condition": "{% $event.version = '0' and $event.`detail-type` = 'FileReceived.v1' and $event.source = 'uk.gov.justice.service.managed-file-transfer' and $event.account = $expectedAccountId and $sourceBucket = $incomingBucket and $type($eventId) = 'string' and $length($eventId) > 0 and $type($fileId) = 'string' and $length($fileId) > 0 and $type($correlationId) = 'string' and $length($correlationId) > 0 and $type($idempotencyKey) = 'string' and $length($idempotencyKey) > 0 and $type($sourceKey) = 'string' and $length($sourceKey) > 0 and $type($sourceVersionId) = 'string' and $length($sourceVersionId) > 0 and $type($sizeBytes) = 'number' and $floor($sizeBytes) = $sizeBytes and $sizeBytes >= 0 and $sizeBytes <= $maximumSize %}",
+          "Next": "Prepare Operation"
+        }
+      ],
+      "Default": "Invalid Event"
+    },
+    "Invalid Event": {
+      "Type": "Fail",
+      "Error": "InvalidFileReceivedEvent",
+      "Cause": "The event does not satisfy the FileReceived.v1 workflow contract"
+    },
+    "Prepare Operation": {
+      "Type": "Pass",
+      "Assign": {
+        "operationId": "{% 'file-received-workflow#' & $idempotencyKey %}"
+      },
+      "Next": "Claim Operation"
+    },
+    "Claim Operation": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:putItem",
+      "Arguments": {
+        "TableName": ${idempotency_table_name},
+        "Item": {
+          "id": { "S": "{% $operationId %}" },
+          "status": { "S": "INPROGRESS" },
+          "execution_arn": { "S": "{% $states.context.Execution.Id %}" },
+          "event_id": { "S": "{% $eventId %}" },
+          "file_id": { "S": "{% $fileId %}" },
+          "correlation_id": { "S": "{% $correlationId %}" },
+          "source_bucket": { "S": "{% $sourceBucket %}" },
+          "source_key": { "S": "{% $sourceKey %}" },
+          "source_version_id": { "S": "{% $sourceVersionId %}" },
+          "created_at": { "S": "{% $states.context.Execution.StartTime %}" },
+          "updated_at": { "S": "{% $states.context.Execution.StartTime %}" },
+          "expiration": { "N": "{% $string($nowEpoch + $recordRetentionSeconds) %}" },
+          "in_progress_expiration": { "N": "{% $string($nowEpoch + $leaseSeconds) %}" }
+        },
+        "ConditionExpression": "attribute_not_exists(id) OR expiration < :now",
+        "ExpressionAttributeValues": {
+          ":now": { "N": "{% $string($nowEpoch) %}" }
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "DynamoDB.InternalServerError",
+            "DynamoDB.ProvisionedThroughputExceededException",
+            "DynamoDB.RequestLimitExceeded"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 4,
+          "BackoffRate": 2,
+          "MaxDelaySeconds": 30,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["DynamoDB.ConditionalCheckFailedException"],
+          "Next": "Get Existing Operation"
+        }
+      ],
+      "Next": "Set New Operation Status"
+    },
+    "Set New Operation Status": {
+      "Type": "Pass",
+      "Assign": {
+        "resumeStatus": "INPROGRESS"
+      },
+      "Next": "Inspect Source Object"
+    },
+    "Get Existing Operation": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:getItem",
+      "Arguments": {
+        "TableName": ${idempotency_table_name},
+        "ConsistentRead": true,
+        "Key": {
+          "id": { "S": "{% $operationId %}" }
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "DynamoDB.InternalServerError",
+            "DynamoDB.ProvisionedThroughputExceededException",
+            "DynamoDB.RequestLimitExceeded"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 4,
+          "BackoffRate": 2,
+          "MaxDelaySeconds": 30,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Assign": {
+        "existingItem": "{% $exists($states.result.Item) ? $states.result.Item : {} %}"
+      },
+      "Next": "Evaluate Existing Operation"
+    },
+    "Evaluate Existing Operation": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Condition": "{% $exists($existingItem.status.S) and $existingItem.status.S = 'COMPLETED' %}",
+          "Next": "Duplicate Event"
+        },
+        {
+          "Condition": "{% $exists($existingItem.in_progress_expiration.N) and $number($existingItem.in_progress_expiration.N) >= $nowEpoch %}",
+          "Next": "Operation In Progress"
+        },
+        {
+          "Condition": "{% $exists($existingItem.status.S) and $exists($existingItem.execution_arn.S) %}",
+          "Next": "Take Over Expired Operation"
+        }
+      ],
+      "Default": "Invalid Stored Operation"
+    },
+    "Duplicate Event": {
+      "Type": "Succeed"
+    },
+    "Operation In Progress": {
+      "Type": "Succeed"
+    },
+    "Invalid Stored Operation": {
+      "Type": "Fail",
+      "Error": "InvalidStoredOperation",
+      "Cause": "The idempotency record is missing required workflow state"
+    },
+    "Take Over Expired Operation": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "Arguments": {
+        "TableName": ${idempotency_table_name},
+        "Key": {
+          "id": { "S": "{% $operationId %}" }
+        },
+        "UpdateExpression": "SET execution_arn = :execution, in_progress_expiration = :lease, updated_at = :updated",
+        "ConditionExpression": "execution_arn = :previous_execution AND in_progress_expiration < :now AND #status <> :completed",
+        "ExpressionAttributeNames": {
+          "#status": "status"
+        },
+        "ExpressionAttributeValues": {
+          ":execution": { "S": "{% $states.context.Execution.Id %}" },
+          ":previous_execution": { "S": "{% $existingItem.execution_arn.S %}" },
+          ":lease": { "N": "{% $string($nowEpoch + $leaseSeconds) %}" },
+          ":now": { "N": "{% $string($nowEpoch) %}" },
+          ":updated": { "S": "{% $states.context.Execution.StartTime %}" },
+          ":completed": { "S": "COMPLETED" }
+        },
+        "ReturnValues": "ALL_NEW"
+      },
+      "Assign": {
+        "resumeStatus": "{% $states.result.Attributes.status.S %}",
+        "uploadId": "{% $exists($states.result.Attributes.upload_id.S) ? $states.result.Attributes.upload_id.S : null %}",
+        "partCount": "{% $exists($states.result.Attributes.part_count.N) ? $number($states.result.Attributes.part_count.N) : null %}",
+        "destinationVersionId": "{% $exists($states.result.Attributes.destination_version_id.S) ? $states.result.Attributes.destination_version_id.S : null %}",
+        "copyMethod": "{% $exists($states.result.Attributes.copy_method.S) ? $states.result.Attributes.copy_method.S : ($states.result.Attributes.status.S in ['MULTIPART_CREATED', 'PARTS_COPIED', 'MULTIPART_ABORTED'] ? 'MULTIPART' : null) %}"
+      },
+      "Next": "Route Stored Checkpoint"
+    },
+    "Route Stored Checkpoint": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Condition": "{% $resumeStatus = 'VERIFIED' %}",
+          "Next": "Delete Exact Source Version"
+        },
+        {
+          "Condition": "{% $resumeStatus in ['INPROGRESS', 'MULTIPART_CREATED', 'PARTS_COPIED', 'MULTIPART_ABORTED', 'COPIED'] %}",
+          "Next": "Inspect Source Object"
+        }
+      ],
+      "Default": "Invalid Stored Operation"
+    },
+    "Inspect Source Object": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:headObject",
+      "Arguments": {
+        "Bucket": "{% $sourceBucket %}",
+        "Key": "{% $sourceKey %}",
+        "VersionId": "{% $sourceVersionId %}",
+        "ExpectedBucketOwner": "{% $expectedAccountId %}",
+        "ChecksumMode": "ENABLED"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["S3.InternalErrorException", "S3.RequestTimeoutException", "S3.ServiceUnavailableException", "S3.SlowDownException", "States.Timeout"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 4,
+          "BackoffRate": 2,
+          "MaxDelaySeconds": 30,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Assign": {
+        "sourceHead": "{% $states.result %}"
+      },
+      "Next": "Get Source Tags"
+    },
+    "Get Source Tags": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:getObjectTagging",
+      "Arguments": {
+        "Bucket": "{% $sourceBucket %}",
+        "Key": "{% $sourceKey %}",
+        "VersionId": "{% $sourceVersionId %}",
+        "ExpectedBucketOwner": "{% $expectedAccountId %}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["S3.InternalErrorException", "S3.RequestTimeoutException", "S3.ServiceUnavailableException", "S3.SlowDownException", "States.Timeout"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 4,
+          "BackoffRate": 2,
+          "MaxDelaySeconds": 30,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Assign": {
+        "sourceTags": "{% $exists($states.result.TagSet) ? $states.result.TagSet : [] %}",
+        "sourceTagging": "{% $count($states.result.TagSet) > 0 ? $join($map($states.result.TagSet, function($tag) { $encodeUrlComponent($tag.Key) & '=' & $encodeUrlComponent($tag.Value) }), '&') : '' %}",
+        "sourceTagFingerprint": "{% $count($states.result.TagSet) > 0 ? $join($sort($map($states.result.TagSet, function($tag) { $encodeUrlComponent($tag.Key) & '=' & $encodeUrlComponent($tag.Value) })), '&') : '' %}",
+        "expectedMetadata": "{% $merge([$exists($sourceHead.Metadata) ? $sourceHead.Metadata : {}, {'mft-file-id': $fileId}]) %}"
+      },
+      "Next": "Validate Source Object"
+    },
+    "Validate Source Object": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Condition": "{% $sourceHead.ContentLength = $sizeBytes and ($not($exists($sourceHead.Metadata)) or $not($exists($lookup($sourceHead.Metadata, 'mft-file-id')))) %}",
+          "Next": "Route Copy Checkpoint"
+        }
+      ],
+      "Default": "Invalid Source Object"
+    },
+    "Invalid Source Object": {
+      "Type": "Fail",
+      "Error": "InvalidSourceObject",
+      "Cause": "The exact source version does not match the event or uses reserved metadata"
+    },
+    "Route Copy Checkpoint": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Condition": "{% $resumeStatus = 'COPIED' %}",
+          "Next": "Inspect Destination Object"
+        },
+        {
+          "Condition": "{% $resumeStatus = 'MULTIPART_CREATED' %}",
+          "Next": "Build Resumed Multipart Ranges"
+        },
+        {
+          "Condition": "{% $resumeStatus = 'PARTS_COPIED' %}",
+          "Next": "List Parts For Completion"
+        },
+        {
+          "Condition": "{% $resumeStatus = 'MULTIPART_ABORTED' %}",
+          "Next": "Prepare Multipart Copy"
+        },
+        {
+          "Condition": "{% $resumeStatus = 'INPROGRESS' and $sizeBytes <= $partSize %}",
+          "Next": "Prepare Single Copy"
+        },
+        {
+          "Condition": "{% $resumeStatus = 'INPROGRESS' and $sizeBytes > $partSize %}",
+          "Next": "Prepare Multipart Copy"
+        }
+      ],
+      "Default": "Invalid Stored Operation"
+    },
+    "Prepare Single Copy": {
+      "Type": "Pass",
+      "Assign": {
+        "copyMethod": "SINGLE"
+      },
+      "Next": "Copy Source Object"
+    },
+    "Copy Source Object": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:copyObject",
+      "Arguments": "{% $merge([{'Bucket': $processingBucket, 'Key': $sourceKey, 'CopySource': $sourceBucket & '/' & $encodeUrlComponent($sourceKey) & '?versionId=' & $encodeUrlComponent($sourceVersionId), 'ExpectedBucketOwner': $expectedAccountId, 'ExpectedSourceBucketOwner': $expectedAccountId, 'MetadataDirective': 'REPLACE', 'Metadata': $expectedMetadata, 'ServerSideEncryption': 'aws:kms', 'SSEKMSKeyId': $destinationKmsKeyArn}, $count($sourceTags) > 0 ? {'TaggingDirective': 'REPLACE', 'Tagging': $sourceTagging} : {}, $exists($sourceHead.CacheControl) ? {'CacheControl': $sourceHead.CacheControl} : {}, $exists($sourceHead.ContentDisposition) ? {'ContentDisposition': $sourceHead.ContentDisposition} : {}, $exists($sourceHead.ContentEncoding) ? {'ContentEncoding': $sourceHead.ContentEncoding} : {}, $exists($sourceHead.ContentLanguage) ? {'ContentLanguage': $sourceHead.ContentLanguage} : {}, $exists($sourceHead.ContentType) ? {'ContentType': $sourceHead.ContentType} : {}, $exists($sourceHead.Expires) ? {'Expires': $sourceHead.Expires} : {}, $exists($sourceHead.WebsiteRedirectLocation) ? {'WebsiteRedirectLocation': $sourceHead.WebsiteRedirectLocation} : {}]) %}",
+      "Assign": {
+        "destinationVersionId": "{% $states.result.VersionId %}"
+      },
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "Reconcile Destination Object"
+        }
+      ],
+      "Next": "Checkpoint Copied"
+    },
+    "Prepare Multipart Copy": {
+      "Type": "Pass",
+      "Assign": {
+        "copyMethod": "MULTIPART",
+        "partCount": "{% $ceil($sizeBytes / $partSize) %}",
+        "multipartAttempt": "{% $multipartAttempt + 1 %}"
+      },
+      "Next": "Build Multipart Ranges"
+    },
+    "Build Multipart Ranges": {
+      "Type": "Pass",
+      "Assign": {
+        "parts": "{% $map($range(0, $partCount - 1, 1), function($index) { {'PartNumber': $index + 1, 'RangeStart': $index * $partSize, 'RangeEnd': $min([(($index + 1) * $partSize) - 1, $sizeBytes - 1]), 'ExpectedSize': $min([$partSize, $sizeBytes - ($index * $partSize)])} }) %}"
+      },
+      "Next": "Create Multipart Upload"
+    },
+    "Build Resumed Multipart Ranges": {
+      "Type": "Pass",
+      "Assign": {
+        "parts": "{% $map($range(0, $partCount - 1, 1), function($index) { {'PartNumber': $index + 1, 'RangeStart': $index * $partSize, 'RangeEnd': $min([(($index + 1) * $partSize) - 1, $sizeBytes - 1]), 'ExpectedSize': $min([$partSize, $sizeBytes - ($index * $partSize)])} }) %}"
+      },
+      "Next": "List Existing Parts"
+    },
+    "Multipart Reconciliation Failure": {
+      "Type": "Fail",
+      "Error": "MultipartReconciliationFailure",
+      "Cause": "An ambiguous multipart upload could not be reconciled safely"
+    },
+    "Create Multipart Upload": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:createMultipartUpload",
+      "Arguments": "{% $merge([{'Bucket': $processingBucket, 'Key': $sourceKey, 'ExpectedBucketOwner': $expectedAccountId, 'Metadata': $expectedMetadata, 'ServerSideEncryption': 'aws:kms', 'SSEKMSKeyId': $destinationKmsKeyArn}, $count($sourceTags) > 0 ? {'Tagging': $sourceTagging} : {}, $exists($sourceHead.CacheControl) ? {'CacheControl': $sourceHead.CacheControl} : {}, $exists($sourceHead.ContentDisposition) ? {'ContentDisposition': $sourceHead.ContentDisposition} : {}, $exists($sourceHead.ContentEncoding) ? {'ContentEncoding': $sourceHead.ContentEncoding} : {}, $exists($sourceHead.ContentLanguage) ? {'ContentLanguage': $sourceHead.ContentLanguage} : {}, $exists($sourceHead.ContentType) ? {'ContentType': $sourceHead.ContentType} : {}, $exists($sourceHead.Expires) ? {'Expires': $sourceHead.Expires} : {}, $exists($sourceHead.WebsiteRedirectLocation) ? {'WebsiteRedirectLocation': $sourceHead.WebsiteRedirectLocation} : {}]) %}",
+      "Assign": {
+        "uploadId": "{% $states.result.UploadId %}"
+      },
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "Multipart Reconciliation Failure"
+        }
+      ],
+      "Next": "Checkpoint Multipart Created"
+    },
+    "Checkpoint Multipart Created": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "Arguments": {
+        "TableName": ${idempotency_table_name},
+        "Key": {
+          "id": { "S": "{% $operationId %}" }
+        },
+        "UpdateExpression": "SET #status = :status, upload_id = :upload_id, part_count = :part_count, part_size = :part_size, updated_at = :updated, in_progress_expiration = :lease",
+        "ConditionExpression": "execution_arn = :execution AND #status IN (:inprogress, :aborted)",
+        "ExpressionAttributeNames": {
+          "#status": "status"
+        },
+        "ExpressionAttributeValues": {
+          ":status": { "S": "MULTIPART_CREATED" },
+          ":inprogress": { "S": "INPROGRESS" },
+          ":aborted": { "S": "MULTIPART_ABORTED" },
+          ":execution": { "S": "{% $states.context.Execution.Id %}" },
+          ":upload_id": { "S": "{% $uploadId %}" },
+          ":part_count": { "N": "{% $string($partCount) %}" },
+          ":part_size": { "N": "{% $string($partSize) %}" },
+          ":updated": { "S": "{% $now() %}" },
+          ":lease": { "N": "{% $string($floor($toMillis($now()) / 1000) + $leaseSeconds) %}" }
+        }
+      },
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "Abort Multipart Upload"
+        }
+      ],
+      "Next": "List Existing Parts"
+    },
+    "List Existing Parts": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:listParts",
+      "Arguments": {
+        "Bucket": "{% $processingBucket %}",
+        "Key": "{% $sourceKey %}",
+        "UploadId": "{% $uploadId %}",
+        "MaxParts": 1000,
+        "ExpectedBucketOwner": "{% $expectedAccountId %}"
+      },
+      "Assign": {
+        "listedParts": "{% $exists($states.result.Parts) ? $map($states.result.Parts, function($part) { {'PartNumber': $part.PartNumber, 'Size': $part.Size, 'ETag': $part.ETag} }) : [] %}"
+      },
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "Reconcile Destination Object"
+        }
+      ],
+      "Next": "Build Missing Parts"
+    },
+    "Build Missing Parts": {
+      "Type": "Pass",
+      "Assign": {
+        "missingParts": "{% $filter($parts, function($expected) { $count($filter($listedParts, function($listed) { $listed.PartNumber = $expected.PartNumber and $listed.Size = $expected.ExpectedSize })) = 0 }) %}"
+      },
+      "Next": "Copy Missing Parts"
+    },
+    "Copy Missing Parts": {
+      "Type": "Map",
+      "Items": "{% $missingParts %}",
+      "MaxConcurrency": ${multipart_max_concurrency},
+      "ItemProcessor": {
+        "ProcessorConfig": {
+          "Mode": "INLINE"
+        },
+        "StartAt": "Copy Part",
+        "States": {
+          "Copy Part": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::aws-sdk:s3:uploadPartCopy",
+            "Arguments": {
+              "Bucket": "{% $processingBucket %}",
+              "Key": "{% $sourceKey %}",
+              "UploadId": "{% $uploadId %}",
+              "PartNumber": "{% $states.input.PartNumber %}",
+              "CopySource": "{% $sourceBucket & '/' & $encodeUrlComponent($sourceKey) & '?versionId=' & $encodeUrlComponent($sourceVersionId) %}",
+              "CopySourceRange": "{% 'bytes=' & $string($states.input.RangeStart) & '-' & $string($states.input.RangeEnd) %}",
+              "ExpectedBucketOwner": "{% $expectedAccountId %}",
+              "ExpectedSourceBucketOwner": "{% $expectedAccountId %}"
+            },
+            "Retry": [
+              {
+                "ErrorEquals": ["S3.InternalErrorException", "S3.RequestTimeoutException", "S3.ServiceUnavailableException", "S3.SlowDownException", "States.Timeout"],
+                "IntervalSeconds": 2,
+                "MaxAttempts": 5,
+                "BackoffRate": 2,
+                "MaxDelaySeconds": 60,
+                "JitterStrategy": "FULL"
+              }
+            ],
+            "Output": {},
+            "End": true
+          }
+        }
+      },
+      "Output": [],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "Abort Multipart Upload"
+        }
+      ],
+      "Next": "Release Part Planning Data"
+    },
+    "Release Part Planning Data": {
+      "Type": "Pass",
+      "Assign": {
+        "parts": null,
+        "listedParts": null,
+        "missingParts": null
+      },
+      "Next": "List Parts For Completion"
+    },
+    "List Parts For Completion": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:listParts",
+      "Arguments": {
+        "Bucket": "{% $processingBucket %}",
+        "Key": "{% $sourceKey %}",
+        "UploadId": "{% $uploadId %}",
+        "MaxParts": 1000,
+        "ExpectedBucketOwner": "{% $expectedAccountId %}"
+      },
+      "Assign": {
+        "partsListTruncated": "{% $states.result.IsTruncated %}",
+        "completedParts": "{% $exists($states.result.Parts) ? $map($states.result.Parts, function($part) { {'PartNumber': $part.PartNumber, 'Size': $part.Size, 'ETag': $part.ETag} }) : [] %}"
+      },
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "Reconcile Destination Object"
+        }
+      ],
+      "Next": "Validate Completed Parts"
+    },
+    "Validate Completed Parts": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Condition": "{% $partsListTruncated = false and $count($completedParts) = $partCount and $count($filter($completedParts, function($part) { $part.PartNumber >= 1 and $part.PartNumber <= $partCount and $part.Size = ($part.PartNumber = $partCount ? $sizeBytes - (($partCount - 1) * $partSize) : $partSize) })) = $partCount %}",
+          "Next": "Checkpoint Parts Copied"
+        }
+      ],
+      "Default": "Abort Multipart Upload"
+    },
+    "Checkpoint Parts Copied": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "Arguments": {
+        "TableName": ${idempotency_table_name},
+        "Key": {
+          "id": { "S": "{% $operationId %}" }
+        },
+        "UpdateExpression": "SET #status = :status, updated_at = :updated, in_progress_expiration = :lease",
+        "ConditionExpression": "execution_arn = :execution AND #status IN (:created, :parts)",
+        "ExpressionAttributeNames": {
+          "#status": "status"
+        },
+        "ExpressionAttributeValues": {
+          ":status": { "S": "PARTS_COPIED" },
+          ":created": { "S": "MULTIPART_CREATED" },
+          ":parts": { "S": "PARTS_COPIED" },
+          ":execution": { "S": "{% $states.context.Execution.Id %}" },
+          ":updated": { "S": "{% $now() %}" },
+          ":lease": { "N": "{% $string($floor($toMillis($now()) / 1000) + $leaseSeconds) %}" }
+        }
+      },
+      "Next": "Complete Multipart Upload"
+    },
+    "Complete Multipart Upload": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:completeMultipartUpload",
+      "Arguments": {
+        "Bucket": "{% $processingBucket %}",
+        "Key": "{% $sourceKey %}",
+        "UploadId": "{% $uploadId %}",
+        "ExpectedBucketOwner": "{% $expectedAccountId %}",
+        "MpuObjectSize": "{% $sizeBytes %}",
+        "MultipartUpload": {
+          "Parts": "{% $map($completedParts, function($part) { {'PartNumber': $part.PartNumber, 'ETag': $part.ETag} }) %}"
+        }
+      },
+      "Assign": {
+        "destinationVersionId": "{% $states.result.VersionId %}"
+      },
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "List Parts After Completion Failure"
+        }
+      ],
+      "Next": "Checkpoint Copied"
+    },
+    "List Parts After Completion Failure": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:listParts",
+      "Arguments": {
+        "Bucket": "{% $processingBucket %}",
+        "Key": "{% $sourceKey %}",
+        "UploadId": "{% $uploadId %}",
+        "MaxParts": 1000,
+        "ExpectedBucketOwner": "{% $expectedAccountId %}"
+      },
+      "Assign": {
+        "completedParts": "{% $map($states.result.Parts, function($part) { {'PartNumber': $part.PartNumber, 'Size': $part.Size, 'ETag': $part.ETag} }) %}"
+      },
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "Reconcile Destination Object"
+        }
+      ],
+      "Next": "Retry Complete Multipart Upload"
+    },
+    "Retry Complete Multipart Upload": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:completeMultipartUpload",
+      "Arguments": {
+        "Bucket": "{% $processingBucket %}",
+        "Key": "{% $sourceKey %}",
+        "UploadId": "{% $uploadId %}",
+        "ExpectedBucketOwner": "{% $expectedAccountId %}",
+        "MpuObjectSize": "{% $sizeBytes %}",
+        "MultipartUpload": {
+          "Parts": "{% $map($completedParts, function($part) { {'PartNumber': $part.PartNumber, 'ETag': $part.ETag} }) %}"
+        }
+      },
+      "Assign": {
+        "destinationVersionId": "{% $states.result.VersionId %}"
+      },
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "Reconcile Destination Object"
+        }
+      ],
+      "Next": "Checkpoint Copied"
+    },
+    "Reconcile Destination Object": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:headObject",
+      "Arguments": {
+        "Bucket": "{% $processingBucket %}",
+        "Key": "{% $sourceKey %}",
+        "ExpectedBucketOwner": "{% $expectedAccountId %}",
+        "ChecksumMode": "ENABLED"
+      },
+      "Assign": {
+        "destinationHead": "{% $states.result %}",
+        "destinationVersionId": "{% $states.result.VersionId %}"
+      },
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "Ambiguous Copy Failure"
+        }
+      ],
+      "Next": "Get Reconciled Destination Tags"
+    },
+    "Get Reconciled Destination Tags": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:getObjectTagging",
+      "Arguments": {
+        "Bucket": "{% $processingBucket %}",
+        "Key": "{% $sourceKey %}",
+        "VersionId": "{% $destinationVersionId %}",
+        "ExpectedBucketOwner": "{% $expectedAccountId %}"
+      },
+      "Assign": {
+        "destinationTags": "{% $exists($states.result.TagSet) ? $states.result.TagSet : [] %}",
+        "destinationTagFingerprint": "{% $count($states.result.TagSet) > 0 ? $join($sort($map($states.result.TagSet, function($tag) { $encodeUrlComponent($tag.Key) & '=' & $encodeUrlComponent($tag.Value) })), '&') : '' %}"
+      },
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "Ambiguous Copy Failure"
+        }
+      ],
+      "Next": "Validate Reconciled Destination"
+    },
+    "Validate Reconciled Destination": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Condition": "{% $destinationHead.ContentLength = $sizeBytes and $destinationHead.ServerSideEncryption = 'aws:kms' and $destinationHead.SSEKMSKeyId = $destinationKmsKeyArn and $count($keys($destinationHead.Metadata)) = $count($keys($expectedMetadata)) and $count($filter($keys($expectedMetadata), function($key) { $lookup($destinationHead.Metadata, $key) = $lookup($expectedMetadata, $key) })) = $count($keys($expectedMetadata)) and $destinationTagFingerprint = $sourceTagFingerprint %}",
+          "Next": "Checkpoint Copied"
+        }
+      ],
+      "Default": "Ambiguous Copy Failure"
+    },
+    "Ambiguous Copy Failure": {
+      "Type": "Fail",
+      "Error": "AmbiguousCopyFailure",
+      "Cause": "The copy outcome could not be reconciled without risking a duplicate destination version"
+    },
+    "Checkpoint Copied": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "Arguments": {
+        "TableName": ${idempotency_table_name},
+        "Key": {
+          "id": { "S": "{% $operationId %}" }
+        },
+        "UpdateExpression": "SET #status = :status, copy_method = :copy_method, destination_bucket = :destination_bucket, destination_key = :destination_key, destination_version_id = :destination_version_id, updated_at = :updated, in_progress_expiration = :lease",
+        "ConditionExpression": "execution_arn = :execution AND #status IN (:inprogress, :parts, :copied)",
+        "ExpressionAttributeNames": {
+          "#status": "status"
+        },
+        "ExpressionAttributeValues": {
+          ":status": { "S": "COPIED" },
+          ":inprogress": { "S": "INPROGRESS" },
+          ":parts": { "S": "PARTS_COPIED" },
+          ":copied": { "S": "COPIED" },
+          ":execution": { "S": "{% $states.context.Execution.Id %}" },
+          ":copy_method": { "S": "{% $copyMethod %}" },
+          ":destination_bucket": { "S": "{% $processingBucket %}" },
+          ":destination_key": { "S": "{% $sourceKey %}" },
+          ":destination_version_id": { "S": "{% $destinationVersionId %}" },
+          ":updated": { "S": "{% $now() %}" },
+          ":lease": { "N": "{% $string($floor($toMillis($now()) / 1000) + $leaseSeconds) %}" }
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "DynamoDB.InternalServerError",
+            "DynamoDB.ProvisionedThroughputExceededException",
+            "DynamoDB.RequestLimitExceeded"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 4,
+          "BackoffRate": 2,
+          "MaxDelaySeconds": 30,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "Get Copied Checkpoint"
+        }
+      ],
+      "Next": "Inspect Destination Object"
+    },
+    "Get Copied Checkpoint": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:getItem",
+      "Arguments": {
+        "TableName": ${idempotency_table_name},
+        "ConsistentRead": true,
+        "Key": {
+          "id": { "S": "{% $operationId %}" }
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "DynamoDB.InternalServerError",
+            "DynamoDB.ProvisionedThroughputExceededException",
+            "DynamoDB.RequestLimitExceeded"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 4,
+          "BackoffRate": 2,
+          "MaxDelaySeconds": 30,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Assign": {
+        "copiedCheckpointItem": "{% $exists($states.result.Item) ? $states.result.Item : {} %}"
+      },
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "Ambiguous Copied Checkpoint Failure"
+        }
+      ],
+      "Next": "Evaluate Copied Checkpoint"
+    },
+    "Evaluate Copied Checkpoint": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Condition": "{% $exists($copiedCheckpointItem.status.S) and $copiedCheckpointItem.status.S = 'COPIED' and $exists($copiedCheckpointItem.execution_arn.S) and $copiedCheckpointItem.execution_arn.S = $states.context.Execution.Id and $exists($copiedCheckpointItem.destination_version_id.S) and $copiedCheckpointItem.destination_version_id.S = $destinationVersionId %}",
+          "Next": "Inspect Destination Object"
+        },
+        {
+          "Condition": "{% $exists($copiedCheckpointItem.status.S) and $copiedCheckpointItem.status.S in ['INPROGRESS', 'PARTS_COPIED'] and $exists($copiedCheckpointItem.execution_arn.S) and $copiedCheckpointItem.execution_arn.S = $states.context.Execution.Id %}",
+          "Next": "Delete Uncheckpointed Destination Version"
+        }
+      ],
+      "Default": "Ambiguous Copied Checkpoint Failure"
+    },
+    "Delete Uncheckpointed Destination Version": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:deleteObject",
+      "Arguments": {
+        "Bucket": "{% $processingBucket %}",
+        "Key": "{% $sourceKey %}",
+        "VersionId": "{% $destinationVersionId %}",
+        "ExpectedBucketOwner": "{% $expectedAccountId %}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["S3.InternalErrorException", "S3.RequestTimeoutException", "S3.ServiceUnavailableException", "S3.SlowDownException", "States.Timeout"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 5,
+          "BackoffRate": 2,
+          "MaxDelaySeconds": 60,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "Uncheckpointed Destination Cleanup Failure"
+        }
+      ],
+      "Next": "Route Uncheckpointed Copy Rollback"
+    },
+    "Route Uncheckpointed Copy Rollback": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Condition": "{% $copyMethod = 'MULTIPART' %}",
+          "Next": "Checkpoint Multipart Aborted"
+        }
+      ],
+      "Default": "Uncheckpointed Copy Rolled Back"
+    },
+    "Uncheckpointed Copy Rolled Back": {
+      "Type": "Fail",
+      "Error": "UncheckpointedCopyRolledBack",
+      "Cause": "The exact destination version was removed because its durable checkpoint did not commit"
+    },
+    "Ambiguous Copied Checkpoint Failure": {
+      "Type": "Fail",
+      "Error": "AmbiguousCopiedCheckpointFailure",
+      "Cause": "The copy checkpoint outcome could not be reconciled safely"
+    },
+    "Uncheckpointed Destination Cleanup Failure": {
+      "Type": "Fail",
+      "Error": "UncheckpointedDestinationCleanupFailure",
+      "Cause": "The uncheckpointed destination version could not be removed safely"
+    },
+    "Abort Multipart Upload": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:abortMultipartUpload",
+      "Arguments": {
+        "Bucket": "{% $processingBucket %}",
+        "Key": "{% $sourceKey %}",
+        "UploadId": "{% $uploadId %}",
+        "ExpectedBucketOwner": "{% $expectedAccountId %}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["S3.InternalErrorException", "S3.RequestTimeoutException", "S3.ServiceUnavailableException", "S3.SlowDownException", "States.Timeout"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 5,
+          "BackoffRate": 2,
+          "MaxDelaySeconds": 60,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Next": "Checkpoint Multipart Aborted"
+    },
+    "Checkpoint Multipart Aborted": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "Arguments": {
+        "TableName": ${idempotency_table_name},
+        "Key": {
+          "id": { "S": "{% $operationId %}" }
+        },
+        "UpdateExpression": "SET #status = :status, updated_at = :updated, in_progress_expiration = :lease REMOVE upload_id, part_count, part_size",
+        "ConditionExpression": "execution_arn = :execution AND #status IN (:inprogress, :created, :parts)",
+        "ExpressionAttributeNames": {
+          "#status": "status"
+        },
+        "ExpressionAttributeValues": {
+          ":status": { "S": "MULTIPART_ABORTED" },
+          ":inprogress": { "S": "INPROGRESS" },
+          ":created": { "S": "MULTIPART_CREATED" },
+          ":parts": { "S": "PARTS_COPIED" },
+          ":execution": { "S": "{% $states.context.Execution.Id %}" },
+          ":updated": { "S": "{% $now() %}" },
+          ":lease": { "N": "{% $string($floor($toMillis($now()) / 1000) + $leaseSeconds) %}" }
+        }
+      },
+      "Next": "Allow Multipart Retry"
+    },
+    "Allow Multipart Retry": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Condition": "{% $multipartAttempt < 2 %}",
+          "Next": "Prepare Multipart Copy"
+        }
+      ],
+      "Default": "Multipart Copy Failure"
+    },
+    "Multipart Copy Failure": {
+      "Type": "Fail",
+      "Error": "MultipartCopyFailure",
+      "Cause": "The multipart copy failed after its bounded recovery attempt"
+    },
+    "Inspect Destination Object": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:headObject",
+      "Arguments": {
+        "Bucket": "{% $processingBucket %}",
+        "Key": "{% $sourceKey %}",
+        "VersionId": "{% $destinationVersionId %}",
+        "ExpectedBucketOwner": "{% $expectedAccountId %}",
+        "ChecksumMode": "ENABLED"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["S3.InternalErrorException", "S3.RequestTimeoutException", "S3.ServiceUnavailableException", "S3.SlowDownException", "States.Timeout"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 4,
+          "BackoffRate": 2,
+          "MaxDelaySeconds": 30,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Assign": {
+        "destinationHead": "{% $states.result %}"
+      },
+      "Next": "Get Destination Tags"
+    },
+    "Get Destination Tags": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:getObjectTagging",
+      "Arguments": {
+        "Bucket": "{% $processingBucket %}",
+        "Key": "{% $sourceKey %}",
+        "VersionId": "{% $destinationVersionId %}",
+        "ExpectedBucketOwner": "{% $expectedAccountId %}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["S3.InternalErrorException", "S3.RequestTimeoutException", "S3.ServiceUnavailableException", "S3.SlowDownException", "States.Timeout"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 4,
+          "BackoffRate": 2,
+          "MaxDelaySeconds": 30,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Assign": {
+        "destinationTags": "{% $exists($states.result.TagSet) ? $states.result.TagSet : [] %}",
+        "destinationTagFingerprint": "{% $count($states.result.TagSet) > 0 ? $join($sort($map($states.result.TagSet, function($tag) { $encodeUrlComponent($tag.Key) & '=' & $encodeUrlComponent($tag.Value) })), '&') : '' %}"
+      },
+      "Next": "Verify Destination Object"
+    },
+    "Verify Destination Object": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Condition": "{% $destinationHead.ContentLength = $sizeBytes and $destinationHead.ServerSideEncryption = 'aws:kms' and $destinationHead.SSEKMSKeyId = $destinationKmsKeyArn and $count($keys($destinationHead.Metadata)) = $count($keys($expectedMetadata)) and $count($filter($keys($expectedMetadata), function($key) { $lookup($destinationHead.Metadata, $key) = $lookup($expectedMetadata, $key) })) = $count($keys($expectedMetadata)) and $destinationTagFingerprint = $sourceTagFingerprint %}",
+          "Next": "Checkpoint Verified"
+        }
+      ],
+      "Default": "Destination Verification Failure"
+    },
+    "Destination Verification Failure": {
+      "Type": "Fail",
+      "Error": "DestinationVerificationFailure",
+      "Cause": "The destination version does not match the exact source object attributes"
+    },
+    "Checkpoint Verified": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "Arguments": {
+        "TableName": ${idempotency_table_name},
+        "Key": {
+          "id": { "S": "{% $operationId %}" }
+        },
+        "UpdateExpression": "SET #status = :status, verified_at = :verified, updated_at = :updated, in_progress_expiration = :lease",
+        "ConditionExpression": "execution_arn = :execution AND #status = :copied",
+        "ExpressionAttributeNames": {
+          "#status": "status"
+        },
+        "ExpressionAttributeValues": {
+          ":status": { "S": "VERIFIED" },
+          ":copied": { "S": "COPIED" },
+          ":execution": { "S": "{% $states.context.Execution.Id %}" },
+          ":verified": { "S": "{% $now() %}" },
+          ":updated": { "S": "{% $now() %}" },
+          ":lease": { "N": "{% $string($floor($toMillis($now()) / 1000) + $leaseSeconds) %}" }
+        }
+      },
+      "Next": "Delete Exact Source Version"
+    },
+    "Delete Exact Source Version": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:deleteObject",
+      "Arguments": {
+        "Bucket": "{% $sourceBucket %}",
+        "Key": "{% $sourceKey %}",
+        "VersionId": "{% $sourceVersionId %}",
+        "ExpectedBucketOwner": "{% $expectedAccountId %}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["S3.InternalErrorException", "S3.RequestTimeoutException", "S3.ServiceUnavailableException", "S3.SlowDownException", "States.Timeout"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 5,
+          "BackoffRate": 2,
+          "MaxDelaySeconds": 60,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Next": "Checkpoint Completed"
+    },
+    "Checkpoint Completed": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "Arguments": {
+        "TableName": ${idempotency_table_name},
+        "Key": {
+          "id": { "S": "{% $operationId %}" }
+        },
+        "UpdateExpression": "SET #status = :status, completed_at = :completed, updated_at = :updated REMOVE in_progress_expiration",
+        "ConditionExpression": "execution_arn = :execution AND #status = :verified",
+        "ExpressionAttributeNames": {
+          "#status": "status"
+        },
+        "ExpressionAttributeValues": {
+          ":status": { "S": "COMPLETED" },
+          ":verified": { "S": "VERIFIED" },
+          ":execution": { "S": "{% $states.context.Execution.Id %}" },
+          ":completed": { "S": "{% $now() %}" },
+          ":updated": { "S": "{% $now() %}" }
+        }
+      },
+      "Next": "Workflow Completed"
+    },
+    "Workflow Completed": {
+      "Type": "Succeed"
+    }
+  }
+}
