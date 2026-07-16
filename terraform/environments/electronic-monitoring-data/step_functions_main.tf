@@ -125,6 +125,23 @@ module "iceberg_table_maintenance_step_function" {
   type = "STANDARD"
 }
 
+# ------------------------------------------
+# Insert into emdi position
+# ------------------------------------------
+
+
+module "insert_into_emdi_position" {
+  source       = "./modules/step_function"
+  name         = "insert_into_emdi_position"
+  iam_policies = tomap({ "insert_into_emdi_position_step_function_policy" = aws_iam_policy.insert_into_emdi_position })
+  variable_dictionary = tomap(
+    {
+      "merge_emdi_position"    = module.merge_emdi_position[0].lambda_function_arn
+    }
+  )
+  type = "STANDARD"
+}
+
 # ------------------------------------------------------------------------------
 # Staging DB janitor Step Function
 # ------------------------------------------------------------------------------
