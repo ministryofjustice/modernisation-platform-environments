@@ -56,6 +56,7 @@
       "lz_domain_name": "*.dev.legalservices.gov.uk",
       "ebs_new_url": "https://ccmsebs.laa-development.modernisation-platform.service.justice.gov.uk/OA_HTML/AppsLocalLogin.jsp",
       "mp_aws_subnet_env": "10.200.0.0/20",
+      "mp_v1_workspaces_cidr": "10.26.130.0/24",
       "ebs_default_iops": 12000,
       "webgate_no_instances": 2,
       "webgate_default_iops": 3000,
