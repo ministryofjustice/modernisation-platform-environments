@@ -1,3 +1,4 @@
+#checkov:skip=CKV2_AWS_12: Default security group rules are not used
 resource "aws_vpc" "main" {
   cidr_block                           = local.network_configuration.vpc.cidr_block
   enable_dns_hostnames                 = true
