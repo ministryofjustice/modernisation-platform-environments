@@ -40,6 +40,14 @@ resource "aws_security_group" "alb_sg" {
     }
   }
 
+  ingress {
+    description     = "Allow HTTPS from VCMS ECS tasks"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.vcms_ecs.id]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -49,7 +57,6 @@ resource "aws_security_group" "alb_sg" {
 
   tags = local.tags
 }
-
 # ALB
 resource "aws_lb" "frontend" {
   name               = "frontend-alb"
