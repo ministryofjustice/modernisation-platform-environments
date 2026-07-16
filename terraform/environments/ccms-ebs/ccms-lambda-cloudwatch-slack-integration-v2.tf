@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_cloudwatch_slack_integration_v2_role" {
-  name = "${local.application_name}-${local.environment}-lambda_cloudwatch_slack_integration_v2_role"
+  name = "${local.application_name}-${local.environment}-lambda_cw_slack_integration_v2_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -17,7 +17,7 @@ resource "aws_iam_role" "lambda_cloudwatch_slack_integration_v2_role" {
 }
 
 resource "aws_iam_role_policy" "lambda_cloudwatch_slack_integration_v2_policy" {
-  name = "${local.application_name}-${local.environment}-lambda_cloudwatch_slack_integration_v2_role_policy"
+  name = "${local.application_name}-${local.environment}-lambda_cw_slack_integration_v2_role_policy"
   role = aws_iam_role.lambda_cloudwatch_slack_integration_v2_role.id
 
   policy = jsonencode({
