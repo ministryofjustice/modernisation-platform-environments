@@ -181,14 +181,14 @@ locals {
         }
         "wsm-access-lot1" = {
           ssh_key               = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGdW8CETshyJErMuSaL9gL6+2MKl7nLtbC/mrUUyr4a1"
-          cidr_blocks           = ["100.64.15.107/32"]
+          cidr_blocks           = ["86.152.143.5/32"]
           egress_bucket         = try(module.property_datahub_staging_egress_bucket[0].s3_bucket_id, null)
           egress_bucket_kms_key = try(module.property_datahub_staging_egress_kms[0].key_arn, null)
           egress_folder_path    = "lot1"
         }
         "wsm-access-lot2" = {
           ssh_key               = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGdW8CETshyJErMuSaL9gL6+2MKl7nLtbC/mrUUyr4a1"
-          cidr_blocks           = ["100.64.15.107/32"]
+          cidr_blocks           = ["86.152.143.5/32"]
           egress_bucket         = try(module.property_datahub_staging_egress_bucket[0].s3_bucket_id, null)
           egress_bucket_kms_key = try(module.property_datahub_staging_egress_kms[0].key_arn, null)
           egress_folder_path    = "lot2"
