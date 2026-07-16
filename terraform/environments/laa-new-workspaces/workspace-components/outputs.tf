@@ -29,7 +29,7 @@ output "radius_server_private_ips" {
 
 output "radius_nlb_private_ips" {
   description = "Private IP addresses of RADIUS NLB for ECS (use this for AD RADIUS config)"
-  value       = [for subnet in aws_lb.radius_ecs.subnet_mapping : subnet.private_ipv4_address]
+  value       = [for eni in data.aws_network_interface.radius_nlb : eni.private_ip]
 }
 
 

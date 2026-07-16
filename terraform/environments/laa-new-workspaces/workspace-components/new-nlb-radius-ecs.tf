@@ -66,3 +66,27 @@ resource "aws_lb_listener" "radius_ecs" {
     { "Name" = "${local.application_name}-${local.environment}-radius-ecs-listener" }
   )
 }
+
+##############################################
+### Data Sources — NLB Network Interfaces
+### (for dynamic IP retrieval)
+##############################################
+
+data "aws_network_interfaces" "radius_nlb" {
+  filter {
+    name   = "description"
+    values = ["ELB ${aws_lb.radius_ecs.arn_suffix}"]
+  }
+
+  filter {
+    name   = "vpc-id"
+    values = [aws_vpc.workspaces.id]
+  }
+
+  depends_on = [aws_lb.radius_ecs]
+}
+
+data "aws_network_interface" "radius_nlb" {
+  for_each = toset(data.aws_network_interfaces.radius_nlb.ids)
+  id       = each.value
+}
