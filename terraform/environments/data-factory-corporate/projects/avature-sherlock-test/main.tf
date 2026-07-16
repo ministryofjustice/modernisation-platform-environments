@@ -1,3 +1,6 @@
+terraform {
+  required_version = ">= 1.7.0"
+}
 
 module "s3_bucket" {
   source = "git::ssh://git@github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/s3-bucket?ref=ea258ee2e63c433d8925ac9e751c44cb3b5225ed"
