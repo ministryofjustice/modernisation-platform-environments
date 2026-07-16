@@ -81,6 +81,7 @@ resource "kubernetes_manifest" "external_secret_litellm_entra_id" {
       }
       data = [
         {
+          # checkov:skip=CKV_SECRET_6: Static env var key name, not a credential value
           secretKey = "MICROSOFT_CLIENT_ID"
           remoteRef = {
             key      = tostring(module.litellm_entra_id_secret.secret_id)
