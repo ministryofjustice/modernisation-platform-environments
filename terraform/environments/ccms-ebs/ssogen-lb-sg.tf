@@ -93,6 +93,18 @@ resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_dom1_
   cidr_blocks       = [local.application_data.accounts[local.environment].dom1_devices]
 }
 
+# CC-4731: MP Workspaces (V1) - DEV only, SSO HTTPS access
+resource "aws_security_group_rule" "ingress_traffic_ssogenalb_internal_443_mp_v1_workspaces" {
+  count             = local.ssogen_enabled && local.environment == "development" ? 1 : 0
+  security_group_id = aws_security_group.sg_ssogen_internal_alb[count.index].id
+  type              = "ingress"
+  description       = "HTTPS from MP Workspaces (V1) - DEV only"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = [local.application_data.accounts[local.environment].mp_v1_workspaces_cidr]
+}
+
 #########################################
 # EGRESS RULES
 #########################################
