@@ -10,9 +10,10 @@ resource "litellm_model" "amazon_bedrock" {
 
   additional_litellm_params = {
     ai_model_provider            = "Amazon Bedrock"
+    ai_model_family              = each.value.model_family
     ai_model_name                = each.value.model_name
     ai_model_generally_available = each.value.generally_available
-    additional_drop_params       = "[\"ai_model_provider\",\"ai_model_name\",\"ai_model_generally_available\"]"
+    additional_drop_params       = "[\"ai_model_provider\",\"ai_model_family\",\"ai_model_name\",\"ai_model_generally_available\"]"
   }
 
   depends_on = [
@@ -31,9 +32,10 @@ resource "litellm_model" "google_gemini_enterprise_agent_platform" {
 
   additional_litellm_params = {
     ai_model_provider            = "Google Gemini Enterprise Agent Platform"
+    ai_model_family              = each.value.model_family
     ai_model_name                = each.value.model_name
     ai_model_generally_available = each.value.generally_available
-    additional_drop_params       = "[\"ai_model_provider\",\"ai_model_name\",\"ai_model_generally_available\"]"
+    additional_drop_params       = "[\"ai_model_provider\",\"ai_model_family\",\"ai_model_name\",\"ai_model_generally_available\"]"
   }
 
   depends_on = [
@@ -52,9 +54,10 @@ resource "litellm_model" "microsoft_foundry" {
 
   additional_litellm_params = {
     ai_model_provider            = "Microsoft Foundry"
+    ai_model_family              = each.value.model_family
     ai_model_name                = each.value.model_name
     ai_model_generally_available = each.value.generally_available
-    additional_drop_params       = "[\"ai_model_provider\",\"ai_model_name\",\"ai_model_generally_available\"]"
+    additional_drop_params       = "[\"ai_model_provider\",\"ai_model_family\",\"ai_model_name\",\"ai_model_generally_available\"]"
   }
 
   depends_on = [
