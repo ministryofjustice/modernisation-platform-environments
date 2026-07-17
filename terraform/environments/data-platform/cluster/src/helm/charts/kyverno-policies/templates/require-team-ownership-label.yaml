@@ -1,0 +1,47 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: require-team-ownership-label
+  annotations:
+    policies.kyverno.io/title: Require Team Ownership Label
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Every workload must declare an owning team via the
+      'data-platform.service.justice.gov.uk/team' label so that workloads can
+      be attributed to a team. The label must be present and non-empty.
+spec:
+  validationActions:
+    - {{ .Values.validationAction }}
+  evaluation:
+    background:
+      enabled: true
+  autogen:
+    podControllers:
+      controllers:
+        - deployments
+        - statefulsets
+        - daemonsets
+        - jobs
+        - cronjobs
+        - replicasets
+        - replicationcontrollers
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  variables:
+    - name: labels
+      expression: object.metadata.?labels.orValue({})
+    - name: team
+      expression: >-
+        'data-platform.service.justice.gov.uk/team' in variables.labels
+        ? variables.labels['data-platform.service.justice.gov.uk/team']
+        : ''
+  validations:
+    - expression: >-
+        variables.team != ''
+      message: "Workloads must set a non-empty 'data-platform.service.justice.gov.uk/team' label identifying the owning team."

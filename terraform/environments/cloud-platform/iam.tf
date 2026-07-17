@@ -20,6 +20,15 @@ resource "aws_iam_role" "eks_access" {
 
 data "aws_iam_policy_document" "eks_access" {
   statement {
+    sid    = "DiscoverPermissionSetRoles"
+    effect = "Allow"
+    actions = [
+      "iam:ListRoles"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
     sid    = "CreateAndListAccessEntriesOnApprovedClusters"
     effect = "Allow"
     actions = [

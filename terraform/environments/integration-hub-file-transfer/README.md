@@ -43,6 +43,8 @@ Modernisation Platform
 
 <!--  If you can, provide links to the service’s monitoring dashboard(s), health checks, documentation (ideally describing how to run/work with the service), and main GitHub repository. -->
 
+- [Event lifecycle identifiers](docs/event-lifecycle-identifiers.md)
+
 ### **Expected speed and frequency of releases:**
 
 <!-- How often are you able to release changes to your service, and how long do those changes take? -->

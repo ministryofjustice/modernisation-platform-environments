@@ -67,7 +67,7 @@ resource "helm_release" "kyverno" {
 }
 
 resource "helm_release" "kyverno_policies" {
-  count = terraform.workspace == "data-platform-development" ? 1 : 0
+  count = contains(["data-platform-development", "data-platform-test"], terraform.workspace) ? 1 : 0
 
   name      = "kyverno-policies"
   chart     = "./src/helm/charts/kyverno-policies"

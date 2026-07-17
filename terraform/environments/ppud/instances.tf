@@ -1233,7 +1233,7 @@ resource "aws_instance" "docker-build-instance" {
   }
 }
 
-/*
+
 # Elastic IP Addresses for External Mail Relays
 
 resource "aws_eip" "non-cjsm-mail-relay-eip" {
@@ -1266,4 +1266,3 @@ resource "aws_eip_association" "cjsm-mail-relay-eip-association" {
   instance_id   = aws_instance.cjsm-mail-relay[0].id
   allocation_id = aws_eip.cjsm-mail-relay-eip[0].id
 }
-*/
