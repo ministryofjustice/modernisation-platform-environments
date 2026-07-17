@@ -31,6 +31,12 @@ resource "kubernetes_manifest" "app_secrets_secret" {
             "property" = "sentry_dsn"
           }
           "secretKey" = "sentry-dsn"
+        },
+        {
+          "remoteRef" = {
+            "key" = data.aws_secretsmanager_secret.ai_gateway_litellm_master_key.id
+          }
+          "secretKey" = format("ai-gateway-%s", "master-key")
         }
       ]
     }
