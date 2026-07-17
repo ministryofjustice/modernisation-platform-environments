@@ -52,11 +52,11 @@ module "sqs_lambda_file_received_adapter_dlq" {
   tags = local.tags
 }
 
-module "sqs_eventbridge_file_received_workflow_dlq" {
+module "sqs_eventbridge_file_transfer_workflow_dlq" {
   source  = "terraform-aws-modules/sqs/aws"
   version = "5.2.2"
 
-  name            = "${local.application_name}-file-received-workflow-dlq"
+  name            = "${local.application_name}-file-transfer-workflow-dlq"
   use_name_prefix = false
 
   message_retention_seconds  = 1209600
@@ -81,7 +81,7 @@ module "sqs_eventbridge_file_received_workflow_dlq" {
         {
           test     = "ArnEquals"
           variable = "aws:SourceArn"
-          values   = [module.eventbridge_file_transfer_bus.eventbridge_rule_arns["file-received-workflow"]]
+          values   = [module.eventbridge_file_transfer_bus.eventbridge_rule_arns["file-transfer-workflow"]]
         },
         {
           test     = "StringEquals"

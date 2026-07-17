@@ -4,7 +4,7 @@ module "cloudwatch_eventbridge" {
 
   name              = "/aws/vendedlogs/events/event-bus/${local.application_name}"
   kms_key_id        = module.kms_cloudwatch_logs.key_arn
-  retention_in_days = local.eventbridge_retention_days
+  retention_in_days = local.cloudwatch_retention_days
 
   tags = local.tags
 }

@@ -25,11 +25,11 @@ module "dynamodb_idempotency" {
   }
 }
 
-module "dynamodb_file_received_workflow_idempotency" {
+module "dynamodb_file_transfer_workflow_idempotency" {
   source  = "terraform-aws-modules/dynamodb-table/aws"
   version = "5.5.0"
 
-  name         = "${local.application_name}-${local.environment}-file-received-workflow-idempotency"
+  name         = "${local.application_name}-${local.environment}-file-transfer-workflow-idempotency"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "id"
 

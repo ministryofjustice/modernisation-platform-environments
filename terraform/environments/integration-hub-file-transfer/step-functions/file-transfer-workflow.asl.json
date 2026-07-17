@@ -47,7 +47,7 @@
     "Prepare Operation": {
       "Type": "Pass",
       "Assign": {
-        "operationId": "{% 'file-received-workflow#' & $idempotencyKey %}"
+        "operationId": "{% 'file-transfer-workflow#' & $idempotencyKey %}"
       },
       "Next": "Claim Operation"
     },
