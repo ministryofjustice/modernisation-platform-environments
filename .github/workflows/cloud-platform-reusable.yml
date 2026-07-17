@@ -27,11 +27,10 @@ on:
         required: true
 
 permissions:
-  id-token: write  # This is required for requesting the JWT
-  contents: read  # This is required for actions/checkout
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
 
 jobs:
-
   root-terraform:
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
@@ -71,8 +70,22 @@ jobs:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
-  cluster-core-terraform:
+  cluster-base-terraform:
     needs: cluster-terraform
+    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+    with:
+      application: ${{ inputs.application }}
+      environment: ${{ inputs.environment }}
+      action: ${{ inputs.action }}
+      plan_apply_tfargs: ${{ format('-var=created_by={0}/{1}/actions/runs/{2}/', github.server_url, github.repository, github.run_id) }}
+      component: "cluster-base"
+      account_name: ${{ inputs.account_name }}
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+  cluster-core-terraform:
+    needs: cluster-base
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: ${{ inputs.application }}
