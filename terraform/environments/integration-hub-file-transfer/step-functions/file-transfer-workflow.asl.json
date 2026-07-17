@@ -316,7 +316,7 @@
     "Copy Source Object": {
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:copyObject",
-      "Arguments": "{% $merge([{'Bucket': $processingBucket, 'Key': $sourceKey, 'CopySource': $sourceBucket & '/' & $encodeUrlComponent($sourceKey) & '?versionId=' & $encodeUrlComponent($sourceVersionId), 'ExpectedBucketOwner': $expectedAccountId, 'ExpectedSourceBucketOwner': $expectedAccountId, 'MetadataDirective': 'REPLACE', 'Metadata': $expectedMetadata, 'ServerSideEncryption': 'aws:kms', 'SSEKMSKeyId': $destinationKmsKeyArn}, $count($sourceTags) > 0 ? {'TaggingDirective': 'REPLACE', 'Tagging': $sourceTagging} : {}, $exists($sourceHead.CacheControl) ? {'CacheControl': $sourceHead.CacheControl} : {}, $exists($sourceHead.ContentDisposition) ? {'ContentDisposition': $sourceHead.ContentDisposition} : {}, $exists($sourceHead.ContentEncoding) ? {'ContentEncoding': $sourceHead.ContentEncoding} : {}, $exists($sourceHead.ContentLanguage) ? {'ContentLanguage': $sourceHead.ContentLanguage} : {}, $exists($sourceHead.ContentType) ? {'ContentType': $sourceHead.ContentType} : {}, $exists($sourceHead.Expires) ? {'Expires': $sourceHead.Expires} : {}, $exists($sourceHead.WebsiteRedirectLocation) ? {'WebsiteRedirectLocation': $sourceHead.WebsiteRedirectLocation} : {}]) %}",
+      "Arguments": "{% $merge([{'Bucket': $processingBucket, 'Key': $sourceKey, 'CopySource': $sourceBucket & '/' & $encodeUrlComponent($sourceKey) & '?versionId=' & $encodeUrlComponent($sourceVersionId), 'ExpectedBucketOwner': $expectedAccountId, 'ExpectedSourceBucketOwner': $expectedAccountId, 'MetadataDirective': 'REPLACE', 'Metadata': $expectedMetadata, 'ServerSideEncryption': 'aws:kms', 'SsekmsKeyId': $destinationKmsKeyArn}, $count($sourceTags) > 0 ? {'TaggingDirective': 'REPLACE', 'Tagging': $sourceTagging} : {}, $exists($sourceHead.CacheControl) ? {'CacheControl': $sourceHead.CacheControl} : {}, $exists($sourceHead.ContentDisposition) ? {'ContentDisposition': $sourceHead.ContentDisposition} : {}, $exists($sourceHead.ContentEncoding) ? {'ContentEncoding': $sourceHead.ContentEncoding} : {}, $exists($sourceHead.ContentLanguage) ? {'ContentLanguage': $sourceHead.ContentLanguage} : {}, $exists($sourceHead.ContentType) ? {'ContentType': $sourceHead.ContentType} : {}, $exists($sourceHead.Expires) ? {'Expires': $sourceHead.Expires} : {}, $exists($sourceHead.WebsiteRedirectLocation) ? {'WebsiteRedirectLocation': $sourceHead.WebsiteRedirectLocation} : {}]) %}",
       "Assign": {
         "destinationVersionId": "{% $states.result.VersionId %}"
       },
@@ -359,7 +359,7 @@
     "Create Multipart Upload": {
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:createMultipartUpload",
-      "Arguments": "{% $merge([{'Bucket': $processingBucket, 'Key': $sourceKey, 'ExpectedBucketOwner': $expectedAccountId, 'Metadata': $expectedMetadata, 'ServerSideEncryption': 'aws:kms', 'SSEKMSKeyId': $destinationKmsKeyArn}, $count($sourceTags) > 0 ? {'Tagging': $sourceTagging} : {}, $exists($sourceHead.CacheControl) ? {'CacheControl': $sourceHead.CacheControl} : {}, $exists($sourceHead.ContentDisposition) ? {'ContentDisposition': $sourceHead.ContentDisposition} : {}, $exists($sourceHead.ContentEncoding) ? {'ContentEncoding': $sourceHead.ContentEncoding} : {}, $exists($sourceHead.ContentLanguage) ? {'ContentLanguage': $sourceHead.ContentLanguage} : {}, $exists($sourceHead.ContentType) ? {'ContentType': $sourceHead.ContentType} : {}, $exists($sourceHead.Expires) ? {'Expires': $sourceHead.Expires} : {}, $exists($sourceHead.WebsiteRedirectLocation) ? {'WebsiteRedirectLocation': $sourceHead.WebsiteRedirectLocation} : {}]) %}",
+      "Arguments": "{% $merge([{'Bucket': $processingBucket, 'Key': $sourceKey, 'ExpectedBucketOwner': $expectedAccountId, 'Metadata': $expectedMetadata, 'ServerSideEncryption': 'aws:kms', 'SsekmsKeyId': $destinationKmsKeyArn}, $count($sourceTags) > 0 ? {'Tagging': $sourceTagging} : {}, $exists($sourceHead.CacheControl) ? {'CacheControl': $sourceHead.CacheControl} : {}, $exists($sourceHead.ContentDisposition) ? {'ContentDisposition': $sourceHead.ContentDisposition} : {}, $exists($sourceHead.ContentEncoding) ? {'ContentEncoding': $sourceHead.ContentEncoding} : {}, $exists($sourceHead.ContentLanguage) ? {'ContentLanguage': $sourceHead.ContentLanguage} : {}, $exists($sourceHead.ContentType) ? {'ContentType': $sourceHead.ContentType} : {}, $exists($sourceHead.Expires) ? {'Expires': $sourceHead.Expires} : {}, $exists($sourceHead.WebsiteRedirectLocation) ? {'WebsiteRedirectLocation': $sourceHead.WebsiteRedirectLocation} : {}]) %}",
       "Assign": {
         "uploadId": "{% $states.result.UploadId %}"
       },
@@ -659,7 +659,7 @@
       "Type": "Choice",
       "Choices": [
         {
-          "Condition": "{% $destinationHead.ContentLength = $sizeBytes and $destinationHead.ServerSideEncryption = 'aws:kms' and $destinationHead.SSEKMSKeyId = $destinationKmsKeyArn and $count($keys($destinationHead.Metadata)) = $count($keys($expectedMetadata)) and $count($filter($keys($expectedMetadata), function($key) { $lookup($destinationHead.Metadata, $key) = $lookup($expectedMetadata, $key) })) = $count($keys($expectedMetadata)) and $destinationTagFingerprint = $sourceTagFingerprint %}",
+          "Condition": "{% $destinationHead.ContentLength = $sizeBytes and $destinationHead.ServerSideEncryption = 'aws:kms' and $destinationHead.SsekmsKeyId = $destinationKmsKeyArn and $count($keys($destinationHead.Metadata)) = $count($keys($expectedMetadata)) and $count($filter($keys($expectedMetadata), function($key) { $lookup($destinationHead.Metadata, $key) = $lookup($expectedMetadata, $key) })) = $count($keys($expectedMetadata)) and $destinationTagFingerprint = $sourceTagFingerprint %}",
           "Next": "Checkpoint Copied"
         }
       ],
@@ -935,7 +935,7 @@
       "Type": "Choice",
       "Choices": [
         {
-          "Condition": "{% $destinationHead.ContentLength = $sizeBytes and $destinationHead.ServerSideEncryption = 'aws:kms' and $destinationHead.SSEKMSKeyId = $destinationKmsKeyArn and $count($keys($destinationHead.Metadata)) = $count($keys($expectedMetadata)) and $count($filter($keys($expectedMetadata), function($key) { $lookup($destinationHead.Metadata, $key) = $lookup($expectedMetadata, $key) })) = $count($keys($expectedMetadata)) and $destinationTagFingerprint = $sourceTagFingerprint %}",
+          "Condition": "{% $destinationHead.ContentLength = $sizeBytes and $destinationHead.ServerSideEncryption = 'aws:kms' and $destinationHead.SsekmsKeyId = $destinationKmsKeyArn and $count($keys($destinationHead.Metadata)) = $count($keys($expectedMetadata)) and $count($filter($keys($expectedMetadata), function($key) { $lookup($destinationHead.Metadata, $key) = $lookup($expectedMetadata, $key) })) = $count($keys($expectedMetadata)) and $destinationTagFingerprint = $sourceTagFingerprint %}",
           "Next": "Checkpoint Verified"
         }
       ],
