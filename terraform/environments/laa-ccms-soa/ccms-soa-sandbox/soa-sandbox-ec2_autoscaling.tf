@@ -2,10 +2,10 @@
 
 #--Managed
 resource "aws_autoscaling_group" "cluster-scaling-group-managed" {
-  name                = "${local.application_data.accounts[local.environment].app_name}-auto-scaling-group-managed"
+  name                = "${local.component_name}-${local.environment}-auto-scaling-group-managed"
   vpc_zone_identifier = data.aws_subnets.shared-private.ids
   desired_capacity    = local.application_data.accounts[local.environment].managed_ec2_desired_capacity
-  max_size            = local.is-production ? 7 : 4
+  max_size            = 4
   min_size            = 1
 
   launch_template {
@@ -25,7 +25,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group-managed" {
 
 #--Admin
 resource "aws_autoscaling_group" "cluster-scaling-group-admin" {
-  name                = "${local.application_data.accounts[local.environment].app_name}-auto-scaling-group-admin"
+  name                = "${local.component_name}-${local.environment}-auto-scaling-group-admin"
   vpc_zone_identifier = data.aws_subnets.shared-private.ids
   desired_capacity    = local.application_data.accounts[local.environment].admin_ec2_desired_capacity
   max_size            = 1
@@ -51,7 +51,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group-admin" {
 # so that the autoscaling group creates new ones using the new launch template
 
 resource "aws_launch_template" "ec2-launch-template-managed" {
-  name          = "${local.application_data.accounts[local.environment].app_name}-launch-template-managed"
+  name          = "${local.component_name}-${local.environment}-launch-template-managed"
   image_id      = local.application_data.accounts[local.environment].managed_ami_image_id
   instance_type = local.application_data.accounts[local.environment].managed_ec2_instance_type
   ebs_optimized = true
@@ -76,7 +76,7 @@ resource "aws_launch_template" "ec2-launch-template-managed" {
       delete_on_termination = true
       encrypted             = true
       kms_key_id            = data.aws_kms_alias.ebs.target_key_arn #--Instances would not book with a CMK and time to debug was not available.
-      volume_size           = 60                                    #  Ideally this needs to be debugged and migrated on to a CMK! - AW
+      volume_size           = 60                              #  Ideally this needs to be debugged and migrated on to a CMK! - AW
       volume_type           = "gp2"
       iops                  = 0
     }
@@ -88,7 +88,7 @@ resource "aws_launch_template" "ec2-launch-template-managed" {
     resource_type = "instance"
     tags = merge(
       local.tags,
-      { "Name" = "${local.application_data.accounts[local.environment].app_name}-ecs-cluster-managed" },
+      { "Name" = "${local.component_name}-${local.environment}-ecs-cluster-managed" },
     )
   }
 
@@ -96,19 +96,19 @@ resource "aws_launch_template" "ec2-launch-template-managed" {
     resource_type = "volume"
     tags = merge(
       local.tags,
-      { "Name" = "${local.application_data.accounts[local.environment].app_name}-ecs-cluster-managed" },
+      { "Name" = "${local.component_name}-${local.environment}-ecs-cluster-managed" },
     )
   }
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_data.accounts[local.environment].app_name}-ecs-cluster-template-managed" },
+    { "Name" = "${local.component_name}-${local.environment}-ecs-cluster-template-managed" },
   )
 }
 
 # Admin server launch template
 resource "aws_launch_template" "ec2-launch-template-admin" {
-  name          = "${local.application_data.accounts[local.environment].app_name}-launch-template-admin"
+  name          = "${local.component_name}-${local.environment}-launch-template-admin"
   image_id      = local.application_data.accounts[local.environment].admin_ami_image_id
   instance_type = local.application_data.accounts[local.environment].admin_ec2_instance_type
   #key_name      = local.application_data.accounts[local.environment].admin_ec2_key_name
@@ -146,7 +146,7 @@ resource "aws_launch_template" "ec2-launch-template-admin" {
     resource_type = "instance"
     tags = merge(
       local.tags,
-      { "Name" = "${local.application_data.accounts[local.environment].app_name}-ecs-cluster-admin" },
+      { "Name" = "${local.component_name}-${local.environment}-ecs-cluster-admin" },
     )
   }
 
@@ -154,13 +154,13 @@ resource "aws_launch_template" "ec2-launch-template-admin" {
     resource_type = "volume"
     tags = merge(
       local.tags,
-      { "Name" = "${local.application_data.accounts[local.environment].app_name}-ecs-cluster-admin" },
+      { "Name" = "${local.component_name}-${local.environment}-ecs-cluster-admin" },
     )
   }
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_data.accounts[local.environment].app_name}-ecs-cluster-template-admin" },
+    { "Name" = "${local.component_name}-${local.environment}-ecs-cluster-template-admin" },
   )
 }
 
@@ -168,11 +168,9 @@ resource "aws_launch_template" "ec2-launch-template-admin" {
 data "template_file" "launch-template-managed" {
   template = file("${path.module}/templates/user-data.sh")
   vars = {
-    cluster_name       = "${local.application_data.accounts[local.environment].app_name}-cluster"
+    cluster_name       = "${local.component_name}-${local.environment}-cluster"
     efs_id             = aws_efs_file_system.storage.id
     server             = "managed"
-    inbound_bucket     = local.application_data.accounts[local.environment].inbound_s3_bucket_name
-    outbound_bucket    = local.application_data.accounts[local.environment].outbound_s3_bucket_name
     deploy_environment = local.environment
   }
 }
@@ -180,11 +178,9 @@ data "template_file" "launch-template-managed" {
 data "template_file" "launch-template-admin" {
   template = file("${path.module}/templates/user-data.sh")
   vars = {
-    cluster_name       = "${local.application_data.accounts[local.environment].app_name}-cluster"
+    cluster_name       = "${local.component_name}-${local.environment}-cluster"
     efs_id             = aws_efs_file_system.storage.id
     server             = "admin"
-    inbound_bucket     = local.application_data.accounts[local.environment].inbound_s3_bucket_name
-    outbound_bucket    = local.application_data.accounts[local.environment].outbound_s3_bucket_name
     deploy_environment = local.environment
   }
 }

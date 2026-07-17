@@ -49,7 +49,49 @@ resource "aws_secretsmanager_secret" "trust_store_password" {
 data "aws_secretsmanager_secret_version" "trust_store_password" {
   secret_id = aws_secretsmanager_secret.trust_store_password.id
 }
+resource "aws_secretsmanager_secret" "soa_secrets" {
+  name        = "soa-password"
+  description = "SOA Weblogic,EM Console for user weblogic, RDS Database Password for SOAPDB admin, PUI and other passwords in Key values"
+}
 
+resource "aws_secretsmanager_secret_version" "ccms_soa_secrets_version" {
+  secret_id = aws_secretsmanager_secret.soa_secrets.id
+
+  secret_string = jsonencode({
+    slack_channel_webhook                  = "",
+    slack_channel_webhook_guardduty        = "",
+    "ccms/soa/password"                    = "",
+    "ccms/soa/xxsoa/ds/password"           = "",
+    "ccms/soa/ebs/ds/password"             = "",
+    "ccms/soa/java/trust-store/password::" = "",
+    "ccms/soa/ebs/sms/ds/password"         = "",
+    "ccms/soa/pui/user/password"           = "",
+    "ccms/soa/ebs/user/password"           = "",
+    "ccms/soa/deploy-github-ssh-key"       = "",
+    "ccms/soa/apply/password::"            = "",
+    "ccms/soa/caab/password::"             = "",
+    "ccms/soa/keystore/password"           = "",
+    "ccms/soa/truststore/password"         = "",
+    "ccms/soa/admin/password"              = "",
+    "ccms/soa/xxsoa/password::"            = "",
+    "ccms/soa/cwa/apps/password"           = "",
+    "ccms/soa/pui/password"                = "",
+    "ccms/soa/ebs/soa/super/user/password" = "",
+    "ccms/soa/java/trust-store/password"   = "",
+    "ccms/soa/schema/password"             = "",
+    "ccms/soa/extra/java/properties"       = ""
+  })
+
+  # lifecycle {
+  #   ignore_changes = [
+  #     secret_string
+  #   ]
+  # }
+}
+
+data "aws_secretsmanager_secret_version" "soa_password" {
+  secret_id = aws_secretsmanager_secret.soa_secrets.id
+}
 # Slack Channel ID for Alerts
 resource "aws_secretsmanager_secret" "slack_channel_id" {
   name        = "guardduty_slack_channel_id"
@@ -87,6 +129,7 @@ resource "aws_secretsmanager_secret_version" "ccms_soa_quiesced_secrets_version"
   secret_string = jsonencode({
     slack_channel_webhook           = "",
     slack_channel_webhook_guardduty = "",
+    slack_channel_webhook_s3        = "",
     agent_registration_password     = ""
 
   })
