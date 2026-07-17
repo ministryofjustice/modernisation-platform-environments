@@ -1204,6 +1204,7 @@ resource "aws_instance" "cjsm-mail-relay" {
     is-production  = true
     patch_group    = "prod_lin_patch"
     docker_service = "true"
+    port_25        = "true"
   }
 }
 
