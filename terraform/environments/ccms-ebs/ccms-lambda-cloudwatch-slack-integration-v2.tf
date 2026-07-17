@@ -1,5 +1,5 @@
 # During the test period (a few days) the V2 function will be deployed only in non-production environments.
-# Hence the conditional `count` everywhere.
+# Hence the conditional `count` everywhere, and all references to resources are indexed with "[0]".
 
 resource "aws_iam_role" "lambda_cloudwatch_slack_integration_v2_role" {
   count = local.is-production ? 0 : 1
@@ -23,7 +23,7 @@ resource "aws_iam_role" "lambda_cloudwatch_slack_integration_v2_role" {
 resource "aws_iam_role_policy" "lambda_cloudwatch_slack_integration_v2_policy" {
   count = local.is-production ? 0 : 1
   name  = "${local.application_name}-${local.environment}-lambda_cw_slack_integration_v2_role_policy"
-  role  = aws_iam_role.lambda_cloudwatch_slack_integration_v2_role.id
+  role  = aws_iam_role.lambda_cloudwatch_slack_integration_v2_role[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -45,7 +45,7 @@ resource "aws_iam_role_policy" "lambda_cloudwatch_slack_integration_v2_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.cloudwatch_slack_integration_v2.function_name}:*"
+        Resource = "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.cloudwatch_slack_integration_v2[0].function_name}:*"
       },
       {
         Effect = "Allow"
@@ -63,7 +63,7 @@ resource "aws_sns_topic_subscription" "lambda_cloudwatch_slack_integration_v2_sn
   count     = local.is-production ? 0 : 1
   topic_arn = aws_sns_topic.cw_alerts.arn
   protocol  = "lambda"
-  endpoint  = aws_lambda_function.cloudwatch_slack_integration_v2.arn
+  endpoint  = aws_lambda_function.cloudwatch_slack_integration_v2[0].arn
 }
 
 # Lambda Layer -> requirements.txt for layer function has been generated following process in the link but it is same as
@@ -91,12 +91,12 @@ data "archive_file" "lambda_cloudwatch_slack_integration_v2_zip" {
 
 resource "aws_lambda_function" "cloudwatch_slack_integration_v2" {
   count            = local.is-production ? 0 : 1
-  filename         = data.archive_file.lambda_cloudwatch_slack_integration_v2_zip.output_path
+  filename         = data.archive_file.lambda_cloudwatch_slack_integration_v2_zip[0].output_path
   source_code_hash = base64sha256(join("", local.lambda_source_hashes_cloudwatch_slack_integration_v2))
   function_name    = "${local.application_name}-${local.environment}-cloudwatch-slack-integration-v2"
-  role             = aws_iam_role.lambda_cloudwatch_slack_integration_v2_role.arn
+  role             = aws_iam_role.lambda_cloudwatch_slack_integration_v2_role[0].arn
   handler          = "lambda_function.lambda_handler"
-  layers           = [aws_lambda_layer_version.lambda_cloudwatch_slack_integration_v2_layer.arn]
+  layers           = [aws_lambda_layer_version.lambda_cloudwatch_slack_integration_v2_layer[0].arn]
   runtime          = "python3.13"
   timeout          = 30
   publish          = true
@@ -128,7 +128,7 @@ resource "aws_lambda_permission" "allow_sns_invoke_v2" {
   count         = local.is-production ? 0 : 1
   statement_id  = "AllowExecutionFromSNS"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.cloudwatch_slack_integration_v2.function_name
+  function_name = aws_lambda_function.cloudwatch_slack_integration_v2[0].function_name
   principal     = "sns.amazonaws.com"
   source_arn    = aws_sns_topic.cw_alerts.arn
 }
@@ -137,7 +137,7 @@ resource "aws_lambda_permission" "allow_s3_sns_invoke_v2" {
   count         = local.is-production ? 0 : 1
   statement_id  = "AllowExecutionFromS3SNSTopic"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.cloudwatch_slack_integration_v2.function_name
+  function_name = aws_lambda_function.cloudwatch_slack_integration_v2[0].function_name
   principal     = "sns.amazonaws.com"
   source_arn    = aws_sns_topic.s3_topic.arn
 }
@@ -146,7 +146,7 @@ resource "aws_lambda_permission" "allow_ddos_sns_invoke_v2" {
   count         = local.is-production ? 0 : 1
   statement_id  = "AllowExecutionFromDDoSSNSTopic"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.cloudwatch_slack_integration_v2.function_name
+  function_name = aws_lambda_function.cloudwatch_slack_integration_v2[0].function_name
   principal     = "sns.amazonaws.com"
   source_arn    = aws_sns_topic.ddos_alarm.arn
 }
@@ -155,7 +155,7 @@ resource "aws_lambda_permission" "allow_sns_invoke_guardduty_v2" {
   count         = local.is-production ? 0 : 1
   statement_id  = "AllowExecutionFromGuardDutySNS"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.cloudwatch_slack_integration_v2.function_name
+  function_name = aws_lambda_function.cloudwatch_slack_integration_v2[0].function_name
   principal     = "sns.amazonaws.com"
   source_arn    = aws_sns_topic.guardduty_alerts.arn
 }
@@ -164,7 +164,7 @@ resource "aws_lambda_permission" "allow_eventbridge_invoke_v2" {
   count         = local.is-production ? 0 : 1
   statement_id  = "AllowExecutionFromEventBridge"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.cloudwatch_slack_integration_v2.function_name
+  function_name = aws_lambda_function.cloudwatch_slack_integration_v2[0].function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.certificate_expiration_warning.arn
 }
@@ -179,12 +179,12 @@ resource "aws_sqs_queue" "cloudwatch_sns_dlq" {
 
 resource "aws_lambda_function_event_invoke_config" "cloudwatch_sns" {
   count                        = local.is-production ? 0 : 1
-  function_name                = aws_lambda_function.cloudwatch_slack_integration_v2.function_name
+  function_name                = aws_lambda_function.cloudwatch_slack_integration_v2[0].function_name
   maximum_retry_attempts       = 0
   maximum_event_age_in_seconds = 3600
   destination_config {
     on_failure {
-      destination = aws_sqs_queue.cloudwatch_sns_dlq.arn
+      destination = aws_sqs_queue.cloudwatch_sns_dlq[0].arn
     }
   }
 }
@@ -192,14 +192,14 @@ resource "aws_lambda_function_event_invoke_config" "cloudwatch_sns" {
 resource "aws_iam_role_policy" "cloudwatch_sns_dlq" {
   count = local.is-production ? 0 : 1
   name  = "${local.application_name}-${local.environment}-cloudwatch-sns-dlq-policy"
-  role  = aws_iam_role.lambda_cloudwatch_slack_integration_v2_role.id
+  role  = aws_iam_role.lambda_cloudwatch_slack_integration_v2_role[0].id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
         Effect   = "Allow",
         Action   = ["sqs:SendMessage"],
-        Resource = [aws_sqs_queue.cloudwatch_sns_dlq.arn]
+        Resource = [aws_sqs_queue.cloudwatch_sns_dlq[0].arn]
       }
     ]
   })
@@ -218,7 +218,7 @@ resource "aws_cloudwatch_metric_alarm" "cloudwatch_sns_dlq_not_empty" {
   comparison_operator = "GreaterThanThreshold"
   treat_missing_data  = "notBreaching"
   alarm_description   = "A CloudWatch/GuardDuty/S3 notification could not be delivered to Slack and was dead-lettered."
-  alarm_actions       = [aws_sns_topic.notifier_dlq_alerts.arn]
+  alarm_actions       = [aws_sns_topic.notifier_dlq_alerts[0].arn]
   tags                = local.tags
 }
 
@@ -230,7 +230,7 @@ resource "aws_sns_topic" "notifier_dlq_alerts" {
 
 resource "aws_sns_topic_subscription" "notifier_dlq_email" {
   count     = local.is-production ? 0 : 1
-  topic_arn = aws_sns_topic.notifier_dlq_alerts.arn
+  topic_arn = aws_sns_topic.notifier_dlq_alerts[0].arn
   protocol  = "email"
   endpoint  = "ApplicationOperations@justice.gov.uk"
 }
