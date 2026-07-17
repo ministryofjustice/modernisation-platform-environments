@@ -1,0 +1,31 @@
+{
+  "version": "0",
+  "id": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
+  "detail-type": "FileReceived.v1",
+  "source": "uk.gov.justice.service.managed-file-transfer",
+  "account": "123456789012",
+  "time": "2026-07-10T14:00:00Z",
+  "region": "eu-west-2",
+  "resources": [
+    "arn:aws:s3:::integration-hub-file-transfer-development-incoming/example/report.csv"
+  ],
+  "detail": {
+    "metadata": {
+      "correlationId": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
+      "idempotencyKey": "example/report.csv:3Lg..."
+    },
+    "data": {
+      "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+      "object": {
+        "bucket": "integration-hub-file-transfer-development-incoming",
+        "key": "example/report.csv",
+        "versionId": "3Lg...",
+        "sizeBytes": 4096
+      },
+      "provenance": {
+        "ingressMethod": "s3",
+        "clientId": "example-client"
+      }
+    }
+  }
+}

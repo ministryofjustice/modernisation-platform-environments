@@ -46,6 +46,33 @@ app:
         secretKeyRef:
           name: app-rds
           key: dbname
+    - name: AZURE_AUTHORITY
+      valueFrom:
+        secretKeyRef:
+          name: app-secrets
+          key: azure-authority
+    - name: AZURE_CLIENT_ID
+      valueFrom:
+        secretKeyRef:
+          name: app-secrets
+          key: azure-client-id
+    - name: AZURE_CLIENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: app-secrets
+          key: azure-client-secret
+    - name: FIELD_ENCRYPTION_KEY
+      valueFrom:
+        secretKeyRef:
+          name: app-secrets
+          key: field-encryption-key
+    - name: AI_GATEWAY_URL
+      value: http://litellm-admin.ai-gateway.svc.cluster.local:4000
+    - name: AI_GATEWAY_MASTER_KEY
+      valueFrom:
+        secretKeyRef:
+          name: app-secrets
+          key: ai-gateway-master-key
 
 tolerations:
   - key: compute.data-platform.service.justice.gov.uk/node-pool

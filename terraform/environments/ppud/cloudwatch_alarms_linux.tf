@@ -210,7 +210,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_docker" {
 resource "aws_cloudwatch_metric_alarm" "port_25_status_check" {
   for_each = local.is-production ? {
     for id, instance in data.aws_instance.linux_instance_details :
-    id => instance if lookup(instance.tags, "port_25", "false") == "true"
+    id => instance if lookup(instance.tags, "port25_cjsm", "false") == "true"
   } : {}
 
   alarm_name          = "CJSM-Port-25-Status-Check-${each.key}"
@@ -227,6 +227,6 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check" {
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     Instance = each.key
-    Port     = "Port25"
+    Port     = "port25"
   }
 }
