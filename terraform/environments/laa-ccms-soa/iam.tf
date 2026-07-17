@@ -17,6 +17,31 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
   }
 }
 
+#--Secrets access policy for ECS tasks
+data "aws_secretsmanager_secret" "pull_soa_password" {
+  name = "soa-password"
+}
+
+# resource to allow ECS tasks to access specific secrets
+resource "aws_iam_role_policy" "ecs_execution_secret_access" {
+  name = "ecs-exec-secret-access"
+  role = aws_iam_role.ecs_task_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ]
+        Resource = data.aws_secretsmanager_secret.pull_soa_password.arn
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role" "ecs_task_execution_role" {
   name               = "${local.application_data.accounts[local.environment].app_name}-WorldTaskExecutionRole"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_execution_role.json
@@ -28,27 +53,27 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-resource "aws_iam_policy" "ecs_secrets_policy" {
-  name   = "${local.application_data.accounts[local.environment].app_name}-ecs_secrets_policy"
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": ["secretsmanager:GetSecretValue"],
-      "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa*"]
-    }
-  ]
-}
-EOF
-}
+# resource "aws_iam_policy" "ecs_secrets_policy" {
+#   name   = "${local.application_data.accounts[local.environment].app_name}-ecs_secrets_policy"
+#   policy = <<EOF
+# {
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#       "Effect": "Allow",
+#       "Action": ["secretsmanager:GetSecretValue"],
+#       "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa*"]
+#     }
+#   ]
+# }
+# EOF
+# }
 
 
-resource "aws_iam_role_policy_attachment" "ecs_secrets_policy_attachment" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = aws_iam_policy.ecs_secrets_policy.arn
-}
+# resource "aws_iam_role_policy_attachment" "ecs_secrets_policy_attachment" {
+#   role       = aws_iam_role.ecs_task_execution_role.name
+#   policy_arn = aws_iam_policy.ecs_secrets_policy.arn
+# }
 
 resource "aws_iam_policy" "soa_s3_policy" {
   name        = "${local.application_data.accounts[local.environment].app_name}-s3-policy"
