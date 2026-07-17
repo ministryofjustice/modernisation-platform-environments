@@ -68,8 +68,10 @@ webhooksCleanup:
 config:
   resourceFiltersIncludeNamespaces:
     # System and platform namespaces excluded from Kyverno admission processing.
+    - ai-gateway
     - amazon-guardduty
     - amazon-network-flow-monitor
+    - app
     - aws-cloudwatch-observability
     - cert-manager
     - cilium-secrets
