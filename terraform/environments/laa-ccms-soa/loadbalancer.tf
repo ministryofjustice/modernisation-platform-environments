@@ -101,11 +101,11 @@ resource "aws_lb" "managed" {
 }
 
 resource "aws_lb_target_group" "managed_https" {
-  name        = "${local.application_data.accounts[local.environment].app_name}-managed-target-group"
-  port        = local.application_data.accounts[local.environment].managed_server_port
-  protocol    = "TLS"
-  vpc_id      = data.aws_vpc.shared.id
-  target_type = "ip"
+  name                 = "${local.application_data.accounts[local.environment].app_name}-managed-target-group"
+  port                 = local.application_data.accounts[local.environment].managed_server_port
+  protocol             = "TLS"
+  vpc_id               = data.aws_vpc.shared.id
+  target_type          = "ip"
   deregistration_delay = 30
 
   health_check {
