@@ -49,7 +49,43 @@ resource "aws_secretsmanager_secret" "trust_store_password" {
 data "aws_secretsmanager_secret_version" "trust_store_password" {
   secret_id = aws_secretsmanager_secret.trust_store_password.id
 }
+resource "aws_secretsmanager_secret" "soa_secrets" {
+  name        = "soa-password"
+  description = "SOA Weblogic,EM Console for user weblogic, RDS Database Password for SOAPDB admin, PUI and other passwords in Key values"
+}
 
+resource "aws_secretsmanager_secret_version" "ccms_soa_secrets_version" {
+  secret_id = aws_secretsmanager_secret.soa_secrets.id
+
+  secret_string = jsonencode({
+    deploy-github-ssh-key                  = "",
+    slack_channel_webhook                  = "",
+    slack_channel_webhook_guardduty        = "",
+    soa_realm_apply_user_password          = "",
+    soa_realm_caab_user_password           = "",
+    keystorePassword                       = "",
+    truststorePassword                     = "",
+    admin_server_password                  = "",
+    edrms_xxsoa_user_password              = "",
+    ccms_apps_user_password                = "",
+    cwa_apps_user_password                 = "",
+    soa_realm_pui_user_password            = "",
+    soa_realm_ebs_soa_super_user_password  = "",
+    soa_rds_admin_user_password            = "",
+    soa_rds_all_ccmssoa_schema_password    = "",
+    extra_java_properties                  = ""
+  })
+
+  # lifecycle {
+  #   ignore_changes = [
+  #     secret_string
+  #   ]
+  # }
+}
+
+# data "aws_secretsmanager_secret_version" "soa_password" {
+#   secret_id = aws_secretsmanager_secret.soa_secrets.id
+# }
 # Slack Channel ID for Alerts
 resource "aws_secretsmanager_secret" "slack_channel_id" {
   name        = "guardduty_slack_channel_id"
@@ -87,6 +123,7 @@ resource "aws_secretsmanager_secret_version" "ccms_soa_quiesced_secrets_version"
   secret_string = jsonencode({
     slack_channel_webhook           = "",
     slack_channel_webhook_guardduty = "",
+    slack_channel_webhook_s3        = "",
     agent_registration_password     = ""
 
   })
