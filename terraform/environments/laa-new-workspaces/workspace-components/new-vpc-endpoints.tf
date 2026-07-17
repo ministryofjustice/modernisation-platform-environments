@@ -128,6 +128,61 @@ resource "aws_vpc_endpoint" "secretsmanager" {
 }
 
 ##############################################
+### ECR VPC Endpoints (for ECS Fargate)
+##############################################
+
+resource "aws_vpc_endpoint" "ecr_api" {
+
+  vpc_id              = aws_vpc.workspaces.id
+  service_name        = "com.amazonaws.eu-west-2.ecr.api"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+  security_group_ids  = [aws_security_group.vpc_endpoints.id]
+  private_dns_enabled = true
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.application_name}-${local.environment}-ecr-api-endpoint"
+    }
+  )
+}
+
+resource "aws_vpc_endpoint" "ecr_dkr" {
+
+  vpc_id              = aws_vpc.workspaces.id
+  service_name        = "com.amazonaws.eu-west-2.ecr.dkr"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+  security_group_ids  = [aws_security_group.vpc_endpoints.id]
+  private_dns_enabled = true
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.application_name}-${local.environment}-ecr-dkr-endpoint"
+    }
+  )
+}
+
+resource "aws_vpc_endpoint" "logs" {
+
+  vpc_id              = aws_vpc.workspaces.id
+  service_name        = "com.amazonaws.eu-west-2.logs"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+  security_group_ids  = [aws_security_group.vpc_endpoints.id]
+  private_dns_enabled = true
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.application_name}-${local.environment}-logs-endpoint"
+    }
+  )
+}
+
+##############################################
 ### EC2 VPC Endpoint (for EC2 metadata)
 ##############################################
 
