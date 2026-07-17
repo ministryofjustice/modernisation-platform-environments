@@ -6,7 +6,7 @@ module "lambda_file_received_adapter" {
   attach_dead_letter_policy         = true
   attach_tracing_policy             = true
   cloudwatch_logs_kms_key_id        = module.kms_cloudwatch_logs.key_arn
-  cloudwatch_logs_retention_in_days = local.eventbridge_retention_days
+  cloudwatch_logs_retention_in_days = local.cloudwatch_retention_days
   create_async_event_config         = true
   dead_letter_target_arn            = module.sqs_lambda_file_received_adapter_dlq.queue_arn
   description                       = "Transforms incoming S3 Object Created notifications into FileReceived.v1 events"
@@ -24,7 +24,7 @@ module "lambda_file_received_adapter" {
 
   environment_variables = {
     EVENT_BUS_ARN              = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
-    IDEMPOTENCY_EXPIRY_SECONDS = tostring(local.eventbridge_retention_days * 24 * 60 * 60)
+    IDEMPOTENCY_EXPIRY_SECONDS = tostring(local.cloudwatch_retention_days * 24 * 60 * 60)
     IDEMPOTENCY_TABLE          = module.dynamodb_idempotency.dynamodb_table_id
     INCOMING_BUCKET_NAME       = module.s3_bucket["incoming"].s3_bucket_id
     POWERTOOLS_LOG_LEVEL       = "INFO"
