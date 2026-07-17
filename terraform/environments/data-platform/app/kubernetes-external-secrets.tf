@@ -34,6 +34,34 @@ resource "kubernetes_manifest" "app_secrets_secret" {
         },
         {
           "remoteRef" = {
+            "key"      = tostring(module.app_secrets.secret_id)
+            "property" = "azure_authority"
+          }
+          "secretKey" = "azure-authority"
+        },
+        {
+          "remoteRef" = {
+            "key"      = tostring(module.app_secrets.secret_id)
+            "property" = "azure_client_id"
+          }
+          "secretKey" = "azure-client-id"
+        },
+        {
+          "remoteRef" = {
+            "key"      = tostring(module.app_secrets.secret_id)
+            "property" = "azure_client_secret"
+          }
+          "secretKey" = "azure-client-secret"
+        },
+        {
+          "remoteRef" = {
+            "key"      = tostring(module.app_secrets.secret_id)
+            "property" = "field_encryption_key"
+          }
+          "secretKey" = "field-encryption-key"
+        },
+        {
+          "remoteRef" = {
             "key" = data.aws_secretsmanager_secret.ai_gateway_litellm_master_key.id
           }
           "secretKey" = format("ai-gateway-%s", "master-key")
