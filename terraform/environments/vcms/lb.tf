@@ -45,7 +45,7 @@ resource "aws_security_group" "alb_sg" {
     from_port       = 443
     to_port         = 443
     protocol        = "tcp"
-    security_groups = [aws_security_group.vcms_ecs.id]
+    security_groups = [data.aws_security_group.vcms_ecs.id]
   }
 
   egress {
