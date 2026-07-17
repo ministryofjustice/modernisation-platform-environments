@@ -12,14 +12,14 @@
         "fileId": "{% $exists($states.input.detail.data.fileId) ? $states.input.detail.data.fileId : null %}",
         "correlationId": "{% $exists($states.input.detail.metadata.correlationId) ? $states.input.detail.metadata.correlationId : null %}",
         "idempotencyKey": "{% $exists($states.input.detail.metadata.idempotencyKey) ? $states.input.detail.metadata.idempotencyKey : null %}",
-        "sourceBucket": "{% $exists($states.input.detail.data.object.bucket) ? $states.input.detail.data.object.bucket : null %}",
-        "sourceKey": "{% $exists($states.input.detail.data.object.key) ? $states.input.detail.data.object.key : null %}",
-        "sourceVersionId": "{% $exists($states.input.detail.data.object.versionId) ? $states.input.detail.data.object.versionId : null %}",
-        "sizeBytes": "{% $exists($states.input.detail.data.object.sizeBytes) ? $states.input.detail.data.object.sizeBytes : null %}",
+        "incomingObjectBucket": "{% $exists($states.input.detail.data.object.bucket) ? $states.input.detail.data.object.bucket : null %}",
+        "incomingObjectKey": "{% $exists($states.input.detail.data.object.key) ? $states.input.detail.data.object.key : null %}",
+        "incomingObjectVersionId": "{% $exists($states.input.detail.data.object.versionId) ? $states.input.detail.data.object.versionId : null %}",
+        "incomingObjectSizeBytes": "{% $exists($states.input.detail.data.object.sizeBytes) ? $states.input.detail.data.object.sizeBytes : null %}",
         "expectedAccountId": ${account_id},
         "incomingBucket": ${incoming_bucket_name},
         "processingBucket": ${processing_bucket_name},
-        "destinationKmsKeyArn": ${destination_kms_key_arn},
+        "processingKmsKeyArn": ${processing_kms_key_arn},
         "partSize": ${part_size_bytes},
         "maximumSize": ${maximum_size_bytes},
         "leaseSeconds": ${lease_seconds},
@@ -33,7 +33,7 @@
       "Type": "Choice",
       "Choices": [
         {
-          "Condition": "{% $event.version = '0' and $event.`detail-type` = 'FileReceived.v1' and $event.source = 'uk.gov.justice.service.managed-file-transfer' and $event.account = $expectedAccountId and $sourceBucket = $incomingBucket and $type($eventId) = 'string' and $length($eventId) > 0 and $type($fileId) = 'string' and $length($fileId) > 0 and $type($correlationId) = 'string' and $length($correlationId) > 0 and $type($idempotencyKey) = 'string' and $length($idempotencyKey) > 0 and $type($sourceKey) = 'string' and $length($sourceKey) > 0 and $type($sourceVersionId) = 'string' and $length($sourceVersionId) > 0 and $type($sizeBytes) = 'number' and $floor($sizeBytes) = $sizeBytes and $sizeBytes >= 0 and $sizeBytes <= $maximumSize %}",
+          "Condition": "{% $event.version = '0' and $event.`detail-type` = 'FileReceived.v1' and $event.source = 'uk.gov.justice.service.managed-file-transfer' and $event.account = $expectedAccountId and $incomingObjectBucket = $incomingBucket and $type($eventId) = 'string' and $length($eventId) > 0 and $type($fileId) = 'string' and $length($fileId) > 0 and $type($correlationId) = 'string' and $length($correlationId) > 0 and $type($idempotencyKey) = 'string' and $length($idempotencyKey) > 0 and $type($incomingObjectKey) = 'string' and $length($incomingObjectKey) > 0 and $type($incomingObjectVersionId) = 'string' and $length($incomingObjectVersionId) > 0 and $type($incomingObjectSizeBytes) = 'number' and $floor($incomingObjectSizeBytes) = $incomingObjectSizeBytes and $incomingObjectSizeBytes >= 0 and $incomingObjectSizeBytes <= $maximumSize %}",
           "Next": "Prepare Operation"
         }
       ],
@@ -63,9 +63,9 @@
           "event_id": { "S": "{% $eventId %}" },
           "file_id": { "S": "{% $fileId %}" },
           "correlation_id": { "S": "{% $correlationId %}" },
-          "source_bucket": { "S": "{% $sourceBucket %}" },
-          "source_key": { "S": "{% $sourceKey %}" },
-          "source_version_id": { "S": "{% $sourceVersionId %}" },
+          "incoming_bucket": { "S": "{% $incomingObjectBucket %}" },
+          "incoming_key": { "S": "{% $incomingObjectKey %}" },
+          "incoming_version_id": { "S": "{% $incomingObjectVersionId %}" },
           "created_at": { "S": "{% $states.context.Execution.StartTime %}" },
           "updated_at": { "S": "{% $states.context.Execution.StartTime %}" },
           "expiration": { "N": "{% $string($nowEpoch + $recordRetentionSeconds) %}" },
@@ -103,7 +103,7 @@
       "Assign": {
         "resumeStatus": "INPROGRESS"
       },
-      "Next": "Inspect Source Object"
+      "Next": "Inspect Incoming Object"
     },
     "Get Existing Operation": {
       "Type": "Task",
@@ -190,7 +190,7 @@
         "resumeStatus": "{% $states.result.Attributes.status.S %}",
         "uploadId": "{% $exists($states.result.Attributes.upload_id.S) ? $states.result.Attributes.upload_id.S : null %}",
         "partCount": "{% $exists($states.result.Attributes.part_count.N) ? $number($states.result.Attributes.part_count.N) : null %}",
-        "destinationVersionId": "{% $exists($states.result.Attributes.destination_version_id.S) ? $states.result.Attributes.destination_version_id.S : null %}",
+        "processingObjectVersionId": "{% $exists($states.result.Attributes.processing_version_id.S) ? $states.result.Attributes.processing_version_id.S : null %}",
         "copyMethod": "{% $exists($states.result.Attributes.copy_method.S) ? $states.result.Attributes.copy_method.S : ($states.result.Attributes.status.S in ['MULTIPART_CREATED', 'PARTS_COPIED', 'MULTIPART_ABORTED'] ? 'MULTIPART' : null) %}"
       },
       "Next": "Route Stored Checkpoint"
@@ -200,22 +200,22 @@
       "Choices": [
         {
           "Condition": "{% $resumeStatus = 'VERIFIED' %}",
-          "Next": "Delete Exact Source Version"
+          "Next": "Delete Exact Incoming Object Version"
         },
         {
           "Condition": "{% $resumeStatus in ['INPROGRESS', 'MULTIPART_CREATED', 'PARTS_COPIED', 'MULTIPART_ABORTED', 'COPIED'] %}",
-          "Next": "Inspect Source Object"
+          "Next": "Inspect Incoming Object"
         }
       ],
       "Default": "Invalid Stored Operation"
     },
-    "Inspect Source Object": {
+    "Inspect Incoming Object": {
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:headObject",
       "Arguments": {
-        "Bucket": "{% $sourceBucket %}",
-        "Key": "{% $sourceKey %}",
-        "VersionId": "{% $sourceVersionId %}",
+        "Bucket": "{% $incomingObjectBucket %}",
+        "Key": "{% $incomingObjectKey %}",
+        "VersionId": "{% $incomingObjectVersionId %}",
         "ExpectedBucketOwner": "{% $expectedAccountId %}",
         "ChecksumMode": "ENABLED"
       },
@@ -230,17 +230,17 @@
         }
       ],
       "Assign": {
-        "sourceHead": "{% $states.result %}"
+        "incomingObjectHead": "{% $states.result %}"
       },
-      "Next": "Get Source Tags"
+      "Next": "Get Incoming Object Tags"
     },
-    "Get Source Tags": {
+    "Get Incoming Object Tags": {
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:getObjectTagging",
       "Arguments": {
-        "Bucket": "{% $sourceBucket %}",
-        "Key": "{% $sourceKey %}",
-        "VersionId": "{% $sourceVersionId %}",
+        "Bucket": "{% $incomingObjectBucket %}",
+        "Key": "{% $incomingObjectKey %}",
+        "VersionId": "{% $incomingObjectVersionId %}",
         "ExpectedBucketOwner": "{% $expectedAccountId %}"
       },
       "Retry": [
@@ -254,34 +254,34 @@
         }
       ],
       "Assign": {
-        "sourceTags": "{% $exists($states.result.TagSet) ? $states.result.TagSet : [] %}",
-        "sourceTagging": "{% $count($states.result.TagSet) > 0 ? $join($map($states.result.TagSet, function($tag) { $encodeUrlComponent($tag.Key) & '=' & $encodeUrlComponent($tag.Value) }), '&') : '' %}",
-        "sourceTagFingerprint": "{% $count($states.result.TagSet) > 0 ? $join($sort($map($states.result.TagSet, function($tag) { $encodeUrlComponent($tag.Key) & '=' & $encodeUrlComponent($tag.Value) })), '&') : '' %}",
-        "expectedMetadata": "{% $merge([$exists($sourceHead.Metadata) ? $sourceHead.Metadata : {}, {'mft-file-id': $fileId}]) %}"
+        "incomingObjectTags": "{% $exists($states.result.TagSet) ? $states.result.TagSet : [] %}",
+        "incomingObjectTagging": "{% $count($states.result.TagSet) > 0 ? $join($map($states.result.TagSet, function($tag) { $encodeUrlComponent($tag.Key) & '=' & $encodeUrlComponent($tag.Value) }), '&') : '' %}",
+        "incomingObjectTagFingerprint": "{% $count($states.result.TagSet) > 0 ? $join($sort($map($states.result.TagSet, function($tag) { $encodeUrlComponent($tag.Key) & '=' & $encodeUrlComponent($tag.Value) })), '&') : '' %}",
+        "expectedProcessingObjectMetadata": "{% $merge([$exists($incomingObjectHead.Metadata) ? $incomingObjectHead.Metadata : {}, {'mft-file-id': $fileId}]) %}"
       },
-      "Next": "Validate Source Object"
+      "Next": "Validate Incoming Object"
     },
-    "Validate Source Object": {
+    "Validate Incoming Object": {
       "Type": "Choice",
       "Choices": [
         {
-          "Condition": "{% $sourceHead.ContentLength = $sizeBytes and ($not($exists($sourceHead.Metadata)) or $not($exists($lookup($sourceHead.Metadata, 'mft-file-id')))) %}",
+          "Condition": "{% $incomingObjectHead.ContentLength = $incomingObjectSizeBytes and ($not($exists($incomingObjectHead.Metadata)) or $not($exists($lookup($incomingObjectHead.Metadata, 'mft-file-id')))) %}",
           "Next": "Route Copy Checkpoint"
         }
       ],
-      "Default": "Invalid Source Object"
+      "Default": "Invalid Incoming Object"
     },
-    "Invalid Source Object": {
+    "Invalid Incoming Object": {
       "Type": "Fail",
-      "Error": "InvalidSourceObject",
-      "Cause": "The exact source version does not match the event or uses reserved metadata"
+      "Error": "InvalidIncomingObject",
+      "Cause": "The exact incoming version does not match the event or uses reserved metadata"
     },
     "Route Copy Checkpoint": {
       "Type": "Choice",
       "Choices": [
         {
           "Condition": "{% $resumeStatus = 'COPIED' %}",
-          "Next": "Inspect Destination Object"
+          "Next": "Inspect Processing Object"
         },
         {
           "Condition": "{% $resumeStatus = 'MULTIPART_CREATED' %}",
@@ -296,11 +296,11 @@
           "Next": "Prepare Multipart Copy"
         },
         {
-          "Condition": "{% $resumeStatus = 'INPROGRESS' and $sizeBytes <= $partSize %}",
+          "Condition": "{% $resumeStatus = 'INPROGRESS' and $incomingObjectSizeBytes <= $partSize %}",
           "Next": "Prepare Single Copy"
         },
         {
-          "Condition": "{% $resumeStatus = 'INPROGRESS' and $sizeBytes > $partSize %}",
+          "Condition": "{% $resumeStatus = 'INPROGRESS' and $incomingObjectSizeBytes > $partSize %}",
           "Next": "Prepare Multipart Copy"
         }
       ],
@@ -311,19 +311,19 @@
       "Assign": {
         "copyMethod": "SINGLE"
       },
-      "Next": "Copy Source Object"
+      "Next": "Copy Incoming Object"
     },
-    "Copy Source Object": {
+    "Copy Incoming Object": {
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:copyObject",
-      "Arguments": "{% $merge([{'Bucket': $processingBucket, 'Key': $sourceKey, 'CopySource': $sourceBucket & '/' & $encodeUrlComponent($sourceKey) & '?versionId=' & $encodeUrlComponent($sourceVersionId), 'ExpectedBucketOwner': $expectedAccountId, 'ExpectedSourceBucketOwner': $expectedAccountId, 'MetadataDirective': 'REPLACE', 'Metadata': $expectedMetadata, 'ServerSideEncryption': 'aws:kms', 'SsekmsKeyId': $destinationKmsKeyArn}, $count($sourceTags) > 0 ? {'TaggingDirective': 'REPLACE', 'Tagging': $sourceTagging} : {}, $exists($sourceHead.CacheControl) ? {'CacheControl': $sourceHead.CacheControl} : {}, $exists($sourceHead.ContentDisposition) ? {'ContentDisposition': $sourceHead.ContentDisposition} : {}, $exists($sourceHead.ContentEncoding) ? {'ContentEncoding': $sourceHead.ContentEncoding} : {}, $exists($sourceHead.ContentLanguage) ? {'ContentLanguage': $sourceHead.ContentLanguage} : {}, $exists($sourceHead.ContentType) ? {'ContentType': $sourceHead.ContentType} : {}, $exists($sourceHead.Expires) ? {'Expires': $sourceHead.Expires} : {}, $exists($sourceHead.WebsiteRedirectLocation) ? {'WebsiteRedirectLocation': $sourceHead.WebsiteRedirectLocation} : {}]) %}",
+      "Arguments": "{% $merge([{'Bucket': $processingBucket, 'Key': $incomingObjectKey, 'CopySource': $incomingObjectBucket & '/' & $encodeUrlComponent($incomingObjectKey) & '?versionId=' & $encodeUrlComponent($incomingObjectVersionId), 'ExpectedBucketOwner': $expectedAccountId, 'ExpectedSourceBucketOwner': $expectedAccountId, 'MetadataDirective': 'REPLACE', 'Metadata': $expectedProcessingObjectMetadata, 'ServerSideEncryption': 'aws:kms', 'SsekmsKeyId': $processingKmsKeyArn}, $count($incomingObjectTags) > 0 ? {'TaggingDirective': 'REPLACE', 'Tagging': $incomingObjectTagging} : {}, $exists($incomingObjectHead.CacheControl) ? {'CacheControl': $incomingObjectHead.CacheControl} : {}, $exists($incomingObjectHead.ContentDisposition) ? {'ContentDisposition': $incomingObjectHead.ContentDisposition} : {}, $exists($incomingObjectHead.ContentEncoding) ? {'ContentEncoding': $incomingObjectHead.ContentEncoding} : {}, $exists($incomingObjectHead.ContentLanguage) ? {'ContentLanguage': $incomingObjectHead.ContentLanguage} : {}, $exists($incomingObjectHead.ContentType) ? {'ContentType': $incomingObjectHead.ContentType} : {}, $exists($incomingObjectHead.Expires) ? {'Expires': $incomingObjectHead.Expires} : {}, $exists($incomingObjectHead.WebsiteRedirectLocation) ? {'WebsiteRedirectLocation': $incomingObjectHead.WebsiteRedirectLocation} : {}]) %}",
       "Assign": {
-        "destinationVersionId": "{% $states.result.VersionId %}"
+        "processingObjectVersionId": "{% $states.result.VersionId %}"
       },
       "Catch": [
         {
           "ErrorEquals": ["States.ALL"],
-          "Next": "Reconcile Destination Object"
+          "Next": "Reconcile Processing Object"
         }
       ],
       "Next": "Checkpoint Copied"
@@ -332,7 +332,7 @@
       "Type": "Pass",
       "Assign": {
         "copyMethod": "MULTIPART",
-        "partCount": "{% $ceil($sizeBytes / $partSize) %}",
+        "partCount": "{% $ceil($incomingObjectSizeBytes / $partSize) %}",
         "multipartAttempt": "{% $multipartAttempt + 1 %}"
       },
       "Next": "Build Multipart Ranges"
@@ -340,14 +340,14 @@
     "Build Multipart Ranges": {
       "Type": "Pass",
       "Assign": {
-        "parts": "{% $map($range(0, $partCount - 1, 1), function($index) { {'PartNumber': $index + 1, 'RangeStart': $index * $partSize, 'RangeEnd': $min([(($index + 1) * $partSize) - 1, $sizeBytes - 1]), 'ExpectedSize': $min([$partSize, $sizeBytes - ($index * $partSize)])} }) %}"
+        "parts": "{% $map($range(0, $partCount - 1, 1), function($index) { {'PartNumber': $index + 1, 'RangeStart': $index * $partSize, 'RangeEnd': $min([(($index + 1) * $partSize) - 1, $incomingObjectSizeBytes - 1]), 'ExpectedSize': $min([$partSize, $incomingObjectSizeBytes - ($index * $partSize)])} }) %}"
       },
       "Next": "Create Multipart Upload"
     },
     "Build Resumed Multipart Ranges": {
       "Type": "Pass",
       "Assign": {
-        "parts": "{% $map($range(0, $partCount - 1, 1), function($index) { {'PartNumber': $index + 1, 'RangeStart': $index * $partSize, 'RangeEnd': $min([(($index + 1) * $partSize) - 1, $sizeBytes - 1]), 'ExpectedSize': $min([$partSize, $sizeBytes - ($index * $partSize)])} }) %}"
+        "parts": "{% $map($range(0, $partCount - 1, 1), function($index) { {'PartNumber': $index + 1, 'RangeStart': $index * $partSize, 'RangeEnd': $min([(($index + 1) * $partSize) - 1, $incomingObjectSizeBytes - 1]), 'ExpectedSize': $min([$partSize, $incomingObjectSizeBytes - ($index * $partSize)])} }) %}"
       },
       "Next": "List Existing Parts"
     },
@@ -359,7 +359,7 @@
     "Create Multipart Upload": {
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:createMultipartUpload",
-      "Arguments": "{% $merge([{'Bucket': $processingBucket, 'Key': $sourceKey, 'ExpectedBucketOwner': $expectedAccountId, 'Metadata': $expectedMetadata, 'ServerSideEncryption': 'aws:kms', 'SsekmsKeyId': $destinationKmsKeyArn}, $count($sourceTags) > 0 ? {'Tagging': $sourceTagging} : {}, $exists($sourceHead.CacheControl) ? {'CacheControl': $sourceHead.CacheControl} : {}, $exists($sourceHead.ContentDisposition) ? {'ContentDisposition': $sourceHead.ContentDisposition} : {}, $exists($sourceHead.ContentEncoding) ? {'ContentEncoding': $sourceHead.ContentEncoding} : {}, $exists($sourceHead.ContentLanguage) ? {'ContentLanguage': $sourceHead.ContentLanguage} : {}, $exists($sourceHead.ContentType) ? {'ContentType': $sourceHead.ContentType} : {}, $exists($sourceHead.Expires) ? {'Expires': $sourceHead.Expires} : {}, $exists($sourceHead.WebsiteRedirectLocation) ? {'WebsiteRedirectLocation': $sourceHead.WebsiteRedirectLocation} : {}]) %}",
+      "Arguments": "{% $merge([{'Bucket': $processingBucket, 'Key': $incomingObjectKey, 'ExpectedBucketOwner': $expectedAccountId, 'Metadata': $expectedProcessingObjectMetadata, 'ServerSideEncryption': 'aws:kms', 'SsekmsKeyId': $processingKmsKeyArn}, $count($incomingObjectTags) > 0 ? {'Tagging': $incomingObjectTagging} : {}, $exists($incomingObjectHead.CacheControl) ? {'CacheControl': $incomingObjectHead.CacheControl} : {}, $exists($incomingObjectHead.ContentDisposition) ? {'ContentDisposition': $incomingObjectHead.ContentDisposition} : {}, $exists($incomingObjectHead.ContentEncoding) ? {'ContentEncoding': $incomingObjectHead.ContentEncoding} : {}, $exists($incomingObjectHead.ContentLanguage) ? {'ContentLanguage': $incomingObjectHead.ContentLanguage} : {}, $exists($incomingObjectHead.ContentType) ? {'ContentType': $incomingObjectHead.ContentType} : {}, $exists($incomingObjectHead.Expires) ? {'Expires': $incomingObjectHead.Expires} : {}, $exists($incomingObjectHead.WebsiteRedirectLocation) ? {'WebsiteRedirectLocation': $incomingObjectHead.WebsiteRedirectLocation} : {}]) %}",
       "Assign": {
         "uploadId": "{% $states.result.UploadId %}"
       },
@@ -409,7 +409,7 @@
       "Resource": "arn:aws:states:::aws-sdk:s3:listParts",
       "Arguments": {
         "Bucket": "{% $processingBucket %}",
-        "Key": "{% $sourceKey %}",
+        "Key": "{% $incomingObjectKey %}",
         "UploadId": "{% $uploadId %}",
         "MaxParts": 1000,
         "ExpectedBucketOwner": "{% $expectedAccountId %}"
@@ -420,7 +420,7 @@
       "Catch": [
         {
           "ErrorEquals": ["States.ALL"],
-          "Next": "Reconcile Destination Object"
+          "Next": "Reconcile Processing Object"
         }
       ],
       "Next": "Build Missing Parts"
@@ -447,10 +447,10 @@
             "Resource": "arn:aws:states:::aws-sdk:s3:uploadPartCopy",
             "Arguments": {
               "Bucket": "{% $processingBucket %}",
-              "Key": "{% $sourceKey %}",
+              "Key": "{% $incomingObjectKey %}",
               "UploadId": "{% $uploadId %}",
               "PartNumber": "{% $states.input.PartNumber %}",
-              "CopySource": "{% $sourceBucket & '/' & $encodeUrlComponent($sourceKey) & '?versionId=' & $encodeUrlComponent($sourceVersionId) %}",
+              "CopySource": "{% $incomingObjectBucket & '/' & $encodeUrlComponent($incomingObjectKey) & '?versionId=' & $encodeUrlComponent($incomingObjectVersionId) %}",
               "CopySourceRange": "{% 'bytes=' & $string($states.input.RangeStart) & '-' & $string($states.input.RangeEnd) %}",
               "ExpectedBucketOwner": "{% $expectedAccountId %}",
               "ExpectedSourceBucketOwner": "{% $expectedAccountId %}"
@@ -493,7 +493,7 @@
       "Resource": "arn:aws:states:::aws-sdk:s3:listParts",
       "Arguments": {
         "Bucket": "{% $processingBucket %}",
-        "Key": "{% $sourceKey %}",
+        "Key": "{% $incomingObjectKey %}",
         "UploadId": "{% $uploadId %}",
         "MaxParts": 1000,
         "ExpectedBucketOwner": "{% $expectedAccountId %}"
@@ -505,7 +505,7 @@
       "Catch": [
         {
           "ErrorEquals": ["States.ALL"],
-          "Next": "Reconcile Destination Object"
+          "Next": "Reconcile Processing Object"
         }
       ],
       "Next": "Validate Completed Parts"
@@ -514,7 +514,7 @@
       "Type": "Choice",
       "Choices": [
         {
-          "Condition": "{% $partsListTruncated = false and $count($completedParts) = $partCount and $count($filter($completedParts, function($part) { $part.PartNumber >= 1 and $part.PartNumber <= $partCount and $part.Size = ($part.PartNumber = $partCount ? $sizeBytes - (($partCount - 1) * $partSize) : $partSize) })) = $partCount %}",
+          "Condition": "{% $partsListTruncated = false and $count($completedParts) = $partCount and $count($filter($completedParts, function($part) { $part.PartNumber >= 1 and $part.PartNumber <= $partCount and $part.Size = ($part.PartNumber = $partCount ? $incomingObjectSizeBytes - (($partCount - 1) * $partSize) : $partSize) })) = $partCount %}",
           "Next": "Checkpoint Parts Copied"
         }
       ],
@@ -549,16 +549,16 @@
       "Resource": "arn:aws:states:::aws-sdk:s3:completeMultipartUpload",
       "Arguments": {
         "Bucket": "{% $processingBucket %}",
-        "Key": "{% $sourceKey %}",
+        "Key": "{% $incomingObjectKey %}",
         "UploadId": "{% $uploadId %}",
         "ExpectedBucketOwner": "{% $expectedAccountId %}",
-        "MpuObjectSize": "{% $sizeBytes %}",
+        "MpuObjectSize": "{% $incomingObjectSizeBytes %}",
         "MultipartUpload": {
           "Parts": "{% $map($completedParts, function($part) { {'PartNumber': $part.PartNumber, 'ETag': $part.ETag} }) %}"
         }
       },
       "Assign": {
-        "destinationVersionId": "{% $states.result.VersionId %}"
+        "processingObjectVersionId": "{% $states.result.VersionId %}"
       },
       "Catch": [
         {
@@ -573,7 +573,7 @@
       "Resource": "arn:aws:states:::aws-sdk:s3:listParts",
       "Arguments": {
         "Bucket": "{% $processingBucket %}",
-        "Key": "{% $sourceKey %}",
+        "Key": "{% $incomingObjectKey %}",
         "UploadId": "{% $uploadId %}",
         "MaxParts": 1000,
         "ExpectedBucketOwner": "{% $expectedAccountId %}"
@@ -584,7 +584,7 @@
       "Catch": [
         {
           "ErrorEquals": ["States.ALL"],
-          "Next": "Reconcile Destination Object"
+          "Next": "Reconcile Processing Object"
         }
       ],
       "Next": "Retry Complete Multipart Upload"
@@ -594,37 +594,37 @@
       "Resource": "arn:aws:states:::aws-sdk:s3:completeMultipartUpload",
       "Arguments": {
         "Bucket": "{% $processingBucket %}",
-        "Key": "{% $sourceKey %}",
+        "Key": "{% $incomingObjectKey %}",
         "UploadId": "{% $uploadId %}",
         "ExpectedBucketOwner": "{% $expectedAccountId %}",
-        "MpuObjectSize": "{% $sizeBytes %}",
+        "MpuObjectSize": "{% $incomingObjectSizeBytes %}",
         "MultipartUpload": {
           "Parts": "{% $map($completedParts, function($part) { {'PartNumber': $part.PartNumber, 'ETag': $part.ETag} }) %}"
         }
       },
       "Assign": {
-        "destinationVersionId": "{% $states.result.VersionId %}"
+        "processingObjectVersionId": "{% $states.result.VersionId %}"
       },
       "Catch": [
         {
           "ErrorEquals": ["States.ALL"],
-          "Next": "Reconcile Destination Object"
+          "Next": "Reconcile Processing Object"
         }
       ],
       "Next": "Checkpoint Copied"
     },
-    "Reconcile Destination Object": {
+    "Reconcile Processing Object": {
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:headObject",
       "Arguments": {
         "Bucket": "{% $processingBucket %}",
-        "Key": "{% $sourceKey %}",
+        "Key": "{% $incomingObjectKey %}",
         "ExpectedBucketOwner": "{% $expectedAccountId %}",
         "ChecksumMode": "ENABLED"
       },
       "Assign": {
-        "destinationHead": "{% $states.result %}",
-        "destinationVersionId": "{% $states.result.VersionId %}"
+        "processingObjectHead": "{% $states.result %}",
+        "processingObjectVersionId": "{% $states.result.VersionId %}"
       },
       "Catch": [
         {
@@ -632,20 +632,20 @@
           "Next": "Ambiguous Copy Failure"
         }
       ],
-      "Next": "Get Reconciled Destination Tags"
+      "Next": "Get Reconciled Processing Object Tags"
     },
-    "Get Reconciled Destination Tags": {
+    "Get Reconciled Processing Object Tags": {
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:getObjectTagging",
       "Arguments": {
         "Bucket": "{% $processingBucket %}",
-        "Key": "{% $sourceKey %}",
-        "VersionId": "{% $destinationVersionId %}",
+        "Key": "{% $incomingObjectKey %}",
+        "VersionId": "{% $processingObjectVersionId %}",
         "ExpectedBucketOwner": "{% $expectedAccountId %}"
       },
       "Assign": {
-        "destinationTags": "{% $exists($states.result.TagSet) ? $states.result.TagSet : [] %}",
-        "destinationTagFingerprint": "{% $count($states.result.TagSet) > 0 ? $join($sort($map($states.result.TagSet, function($tag) { $encodeUrlComponent($tag.Key) & '=' & $encodeUrlComponent($tag.Value) })), '&') : '' %}"
+        "processingObjectTags": "{% $exists($states.result.TagSet) ? $states.result.TagSet : [] %}",
+        "processingObjectTagFingerprint": "{% $count($states.result.TagSet) > 0 ? $join($sort($map($states.result.TagSet, function($tag) { $encodeUrlComponent($tag.Key) & '=' & $encodeUrlComponent($tag.Value) })), '&') : '' %}"
       },
       "Catch": [
         {
@@ -653,13 +653,13 @@
           "Next": "Ambiguous Copy Failure"
         }
       ],
-      "Next": "Validate Reconciled Destination"
+      "Next": "Validate Reconciled Processing Object"
     },
-    "Validate Reconciled Destination": {
+    "Validate Reconciled Processing Object": {
       "Type": "Choice",
       "Choices": [
         {
-          "Condition": "{% $destinationHead.ContentLength = $sizeBytes and $destinationHead.ServerSideEncryption = 'aws:kms' and $destinationHead.SsekmsKeyId = $destinationKmsKeyArn and $count($keys($destinationHead.Metadata)) = $count($keys($expectedMetadata)) and $count($filter($keys($expectedMetadata), function($key) { $lookup($destinationHead.Metadata, $key) = $lookup($expectedMetadata, $key) })) = $count($keys($expectedMetadata)) and $destinationTagFingerprint = $sourceTagFingerprint %}",
+          "Condition": "{% $processingObjectHead.ContentLength = $incomingObjectSizeBytes and $processingObjectHead.ServerSideEncryption = 'aws:kms' and $processingObjectHead.SsekmsKeyId = $processingKmsKeyArn and $count($keys($processingObjectHead.Metadata)) = $count($keys($expectedProcessingObjectMetadata)) and $count($filter($keys($expectedProcessingObjectMetadata), function($key) { $lookup($processingObjectHead.Metadata, $key) = $lookup($expectedProcessingObjectMetadata, $key) })) = $count($keys($expectedProcessingObjectMetadata)) and $processingObjectTagFingerprint = $incomingObjectTagFingerprint %}",
           "Next": "Checkpoint Copied"
         }
       ],
@@ -668,7 +668,7 @@
     "Ambiguous Copy Failure": {
       "Type": "Fail",
       "Error": "AmbiguousCopyFailure",
-      "Cause": "The copy outcome could not be reconciled without risking a duplicate destination version"
+      "Cause": "The copy outcome could not be reconciled without risking a duplicate processing version"
     },
     "Checkpoint Copied": {
       "Type": "Task",
@@ -678,7 +678,7 @@
         "Key": {
           "id": { "S": "{% $operationId %}" }
         },
-        "UpdateExpression": "SET #status = :status, copy_method = :copy_method, destination_bucket = :destination_bucket, destination_key = :destination_key, destination_version_id = :destination_version_id, updated_at = :updated, in_progress_expiration = :lease",
+        "UpdateExpression": "SET #status = :status, copy_method = :copy_method, processing_bucket = :processing_bucket, processing_key = :processing_key, processing_version_id = :processing_version_id, updated_at = :updated, in_progress_expiration = :lease",
         "ConditionExpression": "execution_arn = :execution AND #status IN (:inprogress, :parts, :copied)",
         "ExpressionAttributeNames": {
           "#status": "status"
@@ -690,9 +690,9 @@
           ":copied": { "S": "COPIED" },
           ":execution": { "S": "{% $states.context.Execution.Id %}" },
           ":copy_method": { "S": "{% $copyMethod %}" },
-          ":destination_bucket": { "S": "{% $processingBucket %}" },
-          ":destination_key": { "S": "{% $sourceKey %}" },
-          ":destination_version_id": { "S": "{% $destinationVersionId %}" },
+          ":processing_bucket": { "S": "{% $processingBucket %}" },
+          ":processing_key": { "S": "{% $incomingObjectKey %}" },
+          ":processing_version_id": { "S": "{% $processingObjectVersionId %}" },
           ":updated": { "S": "{% $now() %}" },
           ":lease": { "N": "{% $string($floor($toMillis($now()) / 1000) + $leaseSeconds) %}" }
         }
@@ -717,7 +717,7 @@
           "Next": "Get Copied Checkpoint"
         }
       ],
-      "Next": "Inspect Destination Object"
+      "Next": "Inspect Processing Object"
     },
     "Get Copied Checkpoint": {
       "Type": "Task",
@@ -758,23 +758,23 @@
       "Type": "Choice",
       "Choices": [
         {
-          "Condition": "{% $exists($copiedCheckpointItem.status.S) and $copiedCheckpointItem.status.S = 'COPIED' and $exists($copiedCheckpointItem.execution_arn.S) and $copiedCheckpointItem.execution_arn.S = $states.context.Execution.Id and $exists($copiedCheckpointItem.destination_version_id.S) and $copiedCheckpointItem.destination_version_id.S = $destinationVersionId %}",
-          "Next": "Inspect Destination Object"
+          "Condition": "{% $exists($copiedCheckpointItem.status.S) and $copiedCheckpointItem.status.S = 'COPIED' and $exists($copiedCheckpointItem.execution_arn.S) and $copiedCheckpointItem.execution_arn.S = $states.context.Execution.Id and $exists($copiedCheckpointItem.processing_version_id.S) and $copiedCheckpointItem.processing_version_id.S = $processingObjectVersionId %}",
+          "Next": "Inspect Processing Object"
         },
         {
           "Condition": "{% $exists($copiedCheckpointItem.status.S) and $copiedCheckpointItem.status.S in ['INPROGRESS', 'PARTS_COPIED'] and $exists($copiedCheckpointItem.execution_arn.S) and $copiedCheckpointItem.execution_arn.S = $states.context.Execution.Id %}",
-          "Next": "Delete Uncheckpointed Destination Version"
+          "Next": "Delete Uncheckpointed Processing Version"
         }
       ],
       "Default": "Ambiguous Copied Checkpoint Failure"
     },
-    "Delete Uncheckpointed Destination Version": {
+    "Delete Uncheckpointed Processing Version": {
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:deleteObject",
       "Arguments": {
         "Bucket": "{% $processingBucket %}",
-        "Key": "{% $sourceKey %}",
-        "VersionId": "{% $destinationVersionId %}",
+        "Key": "{% $incomingObjectKey %}",
+        "VersionId": "{% $processingObjectVersionId %}",
         "ExpectedBucketOwner": "{% $expectedAccountId %}"
       },
       "Retry": [
@@ -790,7 +790,7 @@
       "Catch": [
         {
           "ErrorEquals": ["States.ALL"],
-          "Next": "Uncheckpointed Destination Cleanup Failure"
+          "Next": "Uncheckpointed Processing Cleanup Failure"
         }
       ],
       "Next": "Route Uncheckpointed Copy Rollback"
@@ -808,24 +808,24 @@
     "Uncheckpointed Copy Rolled Back": {
       "Type": "Fail",
       "Error": "UncheckpointedCopyRolledBack",
-      "Cause": "The exact destination version was removed because its durable checkpoint did not commit"
+      "Cause": "The exact processing version was removed because its durable checkpoint did not commit"
     },
     "Ambiguous Copied Checkpoint Failure": {
       "Type": "Fail",
       "Error": "AmbiguousCopiedCheckpointFailure",
       "Cause": "The copy checkpoint outcome could not be reconciled safely"
     },
-    "Uncheckpointed Destination Cleanup Failure": {
+    "Uncheckpointed Processing Cleanup Failure": {
       "Type": "Fail",
-      "Error": "UncheckpointedDestinationCleanupFailure",
-      "Cause": "The uncheckpointed destination version could not be removed safely"
+      "Error": "UncheckpointedProcessingCleanupFailure",
+      "Cause": "The uncheckpointed processing version could not be removed safely"
     },
     "Abort Multipart Upload": {
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:abortMultipartUpload",
       "Arguments": {
         "Bucket": "{% $processingBucket %}",
-        "Key": "{% $sourceKey %}",
+        "Key": "{% $incomingObjectKey %}",
         "UploadId": "{% $uploadId %}",
         "ExpectedBucketOwner": "{% $expectedAccountId %}"
       },
@@ -881,13 +881,13 @@
       "Error": "MultipartCopyFailure",
       "Cause": "The multipart copy failed after its bounded recovery attempt"
     },
-    "Inspect Destination Object": {
+    "Inspect Processing Object": {
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:headObject",
       "Arguments": {
         "Bucket": "{% $processingBucket %}",
-        "Key": "{% $sourceKey %}",
-        "VersionId": "{% $destinationVersionId %}",
+        "Key": "{% $incomingObjectKey %}",
+        "VersionId": "{% $processingObjectVersionId %}",
         "ExpectedBucketOwner": "{% $expectedAccountId %}",
         "ChecksumMode": "ENABLED"
       },
@@ -902,17 +902,17 @@
         }
       ],
       "Assign": {
-        "destinationHead": "{% $states.result %}"
+        "processingObjectHead": "{% $states.result %}"
       },
-      "Next": "Get Destination Tags"
+      "Next": "Get Processing Object Tags"
     },
-    "Get Destination Tags": {
+    "Get Processing Object Tags": {
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:getObjectTagging",
       "Arguments": {
         "Bucket": "{% $processingBucket %}",
-        "Key": "{% $sourceKey %}",
-        "VersionId": "{% $destinationVersionId %}",
+        "Key": "{% $incomingObjectKey %}",
+        "VersionId": "{% $processingObjectVersionId %}",
         "ExpectedBucketOwner": "{% $expectedAccountId %}"
       },
       "Retry": [
@@ -926,25 +926,25 @@
         }
       ],
       "Assign": {
-        "destinationTags": "{% $exists($states.result.TagSet) ? $states.result.TagSet : [] %}",
-        "destinationTagFingerprint": "{% $count($states.result.TagSet) > 0 ? $join($sort($map($states.result.TagSet, function($tag) { $encodeUrlComponent($tag.Key) & '=' & $encodeUrlComponent($tag.Value) })), '&') : '' %}"
+        "processingObjectTags": "{% $exists($states.result.TagSet) ? $states.result.TagSet : [] %}",
+        "processingObjectTagFingerprint": "{% $count($states.result.TagSet) > 0 ? $join($sort($map($states.result.TagSet, function($tag) { $encodeUrlComponent($tag.Key) & '=' & $encodeUrlComponent($tag.Value) })), '&') : '' %}"
       },
-      "Next": "Verify Destination Object"
+      "Next": "Verify Processing Object"
     },
-    "Verify Destination Object": {
+    "Verify Processing Object": {
       "Type": "Choice",
       "Choices": [
         {
-          "Condition": "{% $destinationHead.ContentLength = $sizeBytes and $destinationHead.ServerSideEncryption = 'aws:kms' and $destinationHead.SsekmsKeyId = $destinationKmsKeyArn and $count($keys($destinationHead.Metadata)) = $count($keys($expectedMetadata)) and $count($filter($keys($expectedMetadata), function($key) { $lookup($destinationHead.Metadata, $key) = $lookup($expectedMetadata, $key) })) = $count($keys($expectedMetadata)) and $destinationTagFingerprint = $sourceTagFingerprint %}",
+          "Condition": "{% $processingObjectHead.ContentLength = $incomingObjectSizeBytes and $processingObjectHead.ServerSideEncryption = 'aws:kms' and $processingObjectHead.SsekmsKeyId = $processingKmsKeyArn and $count($keys($processingObjectHead.Metadata)) = $count($keys($expectedProcessingObjectMetadata)) and $count($filter($keys($expectedProcessingObjectMetadata), function($key) { $lookup($processingObjectHead.Metadata, $key) = $lookup($expectedProcessingObjectMetadata, $key) })) = $count($keys($expectedProcessingObjectMetadata)) and $processingObjectTagFingerprint = $incomingObjectTagFingerprint %}",
           "Next": "Checkpoint Verified"
         }
       ],
-      "Default": "Destination Verification Failure"
+      "Default": "Processing Object Verification Failure"
     },
-    "Destination Verification Failure": {
+    "Processing Object Verification Failure": {
       "Type": "Fail",
-      "Error": "DestinationVerificationFailure",
-      "Cause": "The destination version does not match the exact source object attributes"
+      "Error": "ProcessingObjectVerificationFailure",
+      "Cause": "The processing version does not match the exact incoming object attributes"
     },
     "Checkpoint Verified": {
       "Type": "Task",
@@ -968,15 +968,15 @@
           ":lease": { "N": "{% $string($floor($toMillis($now()) / 1000) + $leaseSeconds) %}" }
         }
       },
-      "Next": "Delete Exact Source Version"
+      "Next": "Delete Exact Incoming Object Version"
     },
-    "Delete Exact Source Version": {
+    "Delete Exact Incoming Object Version": {
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:deleteObject",
       "Arguments": {
-        "Bucket": "{% $sourceBucket %}",
-        "Key": "{% $sourceKey %}",
-        "VersionId": "{% $sourceVersionId %}",
+        "Bucket": "{% $incomingObjectBucket %}",
+        "Key": "{% $incomingObjectKey %}",
+        "VersionId": "{% $incomingObjectVersionId %}",
         "ExpectedBucketOwner": "{% $expectedAccountId %}"
       },
       "Retry": [

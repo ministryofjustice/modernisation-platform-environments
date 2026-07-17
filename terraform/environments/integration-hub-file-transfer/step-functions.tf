@@ -7,7 +7,7 @@ module "step_function_file_transfer_workflow" {
 
   definition = templatefile("${path.module}/step-functions/file-transfer-workflow.asl.json", {
     account_id                 = jsonencode(data.aws_caller_identity.current.account_id)
-    destination_kms_key_arn    = jsonencode(module.kms_s3_bucket["processing"].key_arn)
+    processing_kms_key_arn     = jsonencode(module.kms_s3_bucket["processing"].key_arn)
     idempotency_table_name     = jsonencode(module.dynamodb_file_transfer_workflow_idempotency.dynamodb_table_id)
     incoming_bucket_name       = jsonencode(module.s3_bucket["incoming"].s3_bucket_id)
     lease_seconds              = local.file_transfer_workflow_lease_seconds
