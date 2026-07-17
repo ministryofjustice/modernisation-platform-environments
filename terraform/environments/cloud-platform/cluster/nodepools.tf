@@ -36,8 +36,7 @@ resource "kubectl_manifest" "default_nodeclass" {
   YAML
 
   depends_on = [
-    module.eks,
-    data.aws_eks_cluster.cluster
+    module.eks
   ]
 }
 
