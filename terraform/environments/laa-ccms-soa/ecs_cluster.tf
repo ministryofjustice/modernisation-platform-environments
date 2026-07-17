@@ -136,13 +136,12 @@ resource "aws_ecs_service" "admin" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.admin.id
+    target_group_arn = aws_lb_target_group.admin_https.id
     container_name   = "${local.application_data.accounts[local.environment].app_name}-admin"
     container_port   = local.application_data.accounts[local.environment].admin_server_port
   }
 
   depends_on = [
-    aws_lb_listener.admin80,
     aws_iam_role_policy_attachment.ecs_task_execution_role,
     aws_db_instance.soa_db,
     aws_efs_file_system.storage,
@@ -182,13 +181,14 @@ resource "aws_ecs_task_definition" "managed" {
     {
       app_name             = local.application_data.accounts[local.environment].app_name
       app_image            = local.application_data.accounts[local.environment].managed_app_image
+      db_instance_endpoint = aws_db_instance.soa_db.endpoint
       managed_server_port  = local.application_data.accounts[local.environment].managed_server_port
       admin_server_port    = local.application_data.accounts[local.environment].admin_server_port
       aws_region           = local.application_data.accounts[local.environment].aws_region
       container_version    = local.application_data.accounts[local.environment].managed_container_version
       admin_host           = aws_route53_record.admin.fqdn
-      soa_password         = aws_secretsmanager_secret.soa_password.arn
-      trust_store_password = aws_secretsmanager_secret.trust_store_password.arn
+      soa_password         = "${aws_secretsmanager_secret.soa_secrets.arn}:ccms/soa/password::"
+      trust_store_password = "${aws_secretsmanager_secret.soa_secrets.arn}:ccms/soa/java/trust-store/password::"
       ms_hostname          = aws_route53_record.managed.fqdn
       wl_mem_args          = local.application_data.accounts[local.environment].managed_wl_mem_args
     }
@@ -227,13 +227,12 @@ resource "aws_ecs_service" "managed" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.managed.id
+    target_group_arn = aws_lb_target_group.managed_https.id
     container_name   = "${local.application_data.accounts[local.environment].app_name}-managed"
     container_port   = local.application_data.accounts[local.environment].managed_server_port
   }
 
   depends_on = [
-    aws_lb_listener.managed80,
     aws_iam_role_policy_attachment.ecs_task_execution_role,
     aws_ecs_service.admin,
   ]
