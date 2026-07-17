@@ -295,3 +295,4 @@ module "corporate_glue_table" {
 
   partition_keys = try(each.value.partition_keys, [])
 }
+
