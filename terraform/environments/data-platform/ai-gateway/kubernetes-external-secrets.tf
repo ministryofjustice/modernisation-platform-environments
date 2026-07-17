@@ -81,14 +81,14 @@ resource "kubernetes_manifest" "external_secret_litellm_entra_id" {
       }
       data = [
         {
-          secretKey = "MICROSOFT_CLIENT_ID"
+          secretKey = "MICROSOFT_CLIENT_ID" #checkov:skip=CKV_SECRET_6:secretKey is a reference key, not secret material
           remoteRef = {
             key      = tostring(module.litellm_entra_id_secret.secret_id)
             property = "client_id"
           }
         },
         {
-          secretKey = "MICROSOFT_CLIENT_SECRET"
+          secretKey = "MICROSOFT_CLIENT_SECRET" #checkov:skip=CKV_SECRET_6:secretKey is a reference key, not secret material
           remoteRef = {
             key      = tostring(module.litellm_entra_id_secret.secret_id)
             property = "client_secret"

@@ -35,13 +35,13 @@ aws ecr get-login-password --region ${AWS_REGION} --profile ${AWS_PROFILE} \
 # Build LinOTP
 echo -e "\n${GREEN}Building LinOTP image...${NC}"
 cd linotp3 || exit 1
-docker build --platform linux/amd64 -f Dockerfile.opensource -t laa-workspaces/linotp3:latest . || exit 1
+docker build --platform linux/amd64 -f Dockerfile.opensource -t laa-new-workspaces/linotp3:latest . || exit 1
 echo -e "${GREEN}✓ LinOTP image built${NC}"
 
 # Build FreeRADIUS
 echo -e "\n${GREEN}Building FreeRADIUS image...${NC}"
 cd ../freeradius || exit 1
-docker build --platform linux/amd64 -t laa-workspaces/freeradius-linotp:latest . || exit 1
+docker build --platform linux/amd64 -t laa-new-workspaces/freeradius-linotp:latest . || exit 1
 echo -e "${GREEN}✓ FreeRADIUS image built${NC}"
 
 cd .. || exit 1
@@ -50,29 +50,23 @@ cd .. || exit 1
 echo -e "\n${GREEN}Tagging images...${NC}"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 
-docker tag laa-workspaces/linotp3:latest ${ECR_BASE}/laa-workspaces/linotp3:latest
-docker tag laa-workspaces/linotp3:latest ${ECR_BASE}/laa-workspaces/linotp3:${TIMESTAMP}
+docker tag laa-new-workspaces/linotp3:latest ${ECR_BASE}/laa-new-workspaces/linotp3:latest
+docker tag laa-new-workspaces/linotp3:latest ${ECR_BASE}/laa-new-workspaces/linotp3:${TIMESTAMP}
 
-docker tag laa-workspaces/freeradius-linotp:latest ${ECR_BASE}/laa-workspaces/freeradius-linotp:latest
-docker tag laa-workspaces/freeradius-linotp:latest ${ECR_BASE}/laa-workspaces/freeradius-linotp:${TIMESTAMP}
+docker tag laa-new-workspaces/freeradius-linotp:latest ${ECR_BASE}/laa-new-workspaces/freeradius-linotp:latest
+docker tag laa-new-workspaces/freeradius-linotp:latest ${ECR_BASE}/laa-new-workspaces/freeradius-linotp:${TIMESTAMP}
 
 # Push to ECR
 echo -e "\n${GREEN}Pushing images to ECR...${NC}"
-docker push ${ECR_BASE}/laa-workspaces/linotp3:latest
-docker push ${ECR_BASE}/laa-workspaces/linotp3:${TIMESTAMP}
+docker push ${ECR_BASE}/laa-new-workspaces/linotp3:latest
+docker push ${ECR_BASE}/laa-new-workspaces/linotp3:${TIMESTAMP}
 echo -e "${GREEN}✓ LinOTP pushed${NC}"
 
-docker push ${ECR_BASE}/laa-workspaces/freeradius-linotp:latest
-docker push ${ECR_BASE}/laa-workspaces/freeradius-linotp:${TIMESTAMP}
+docker push ${ECR_BASE}/laa-new-workspaces/freeradius-linotp:latest
+docker push ${ECR_BASE}/laa-new-workspaces/freeradius-linotp:${TIMESTAMP}
 echo -e "${GREEN}✓ FreeRADIUS pushed${NC}"
 
 echo -e "\n${GREEN}=== Success! ===${NC}"
 echo -e "${YELLOW}Images pushed with tags:${NC}"
 echo "  - latest"
 echo "  - ${TIMESTAMP}"
-echo ""
-echo -e "${YELLOW}ECR will automatically scan the images (takes 5-10 minutes)${NC}"
-echo ""
-echo "Check scan results:"
-echo "  aws ecr describe-image-scan-findings --repository-name laa-workspaces/linotp3 --image-id imageTag=latest --region ${AWS_REGION} --profile ${AWS_PROFILE} --no-cli-pager --query 'imageScanFindings.findingSeverityCounts'"
-
