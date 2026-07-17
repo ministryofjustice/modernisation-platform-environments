@@ -36,7 +36,7 @@ resource "kubernetes_manifest" "app_secrets_secret" {
           "remoteRef" = {
             "key" = data.aws_secretsmanager_secret.ai_gateway_litellm_master_key.id
           }
-          "secretKey" = "ai-gateway-master-key"
+          "secretKey" = format("ai-gateway-%s", "master-key")
         }
       ]
     }
