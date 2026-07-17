@@ -16,12 +16,13 @@ Both images have been hardened to minimize security vulnerabilities detected by 
 The following security improvements have been applied to reduce ECR vulnerability findings:
 
 ### LinOTP3 Image
-- **Base image**: linotp/linotp:3.4.4 (latest available)
+- **Base image**: Debian Bookworm Slim
+- **Source**: Built from LinOTP GitHub (AGPLv3) release/3.4.4
 - **Security patches**: Applied all available OS security updates (`apt-get upgrade`)
-- **Python packages upgraded**: Flask, PyJWT, Werkzeug, cryptography, urllib3, setuptools, pyasn1
+- **Python packages**: Uses LinOTP's pinned requirements-prod.txt
 - **Cleanup**: Removed temporary files and caches
 
-**Results**: Reduced CRITICAL vulnerabilities by 50%, HIGH by 56%
+**No commercial license required** - Built from open-source repository
 
 ### FreeRADIUS Image
 - **Base image**: freeradius/freeradius-server:3.2.10 (latest stable)
@@ -76,9 +77,9 @@ AWS_REGION=eu-west-1 ./build-and-push.sh
 ### Build Individual Images
 
 ```bash
-# Build LinOTP only
+# Build LinOTP only (using open-source Dockerfile)
 cd linotp3
-docker build --platform linux/amd64 -t laa-workspaces/linotp3 .
+docker build --platform linux/amd64 -f Dockerfile.opensource -t laa-workspaces/linotp3 .
 
 # Build FreeRADIUS only
 cd freeradius
@@ -89,7 +90,7 @@ docker build --platform linux/amd64 -t laa-workspaces/freeradius-linotp .
 
 ## Deploying to ECS
 
-After pushing images to ECR, force a new deployment:
+The build script only builds and pushes images to ECR. To deploy the new images to ECS, manually trigger a deployment:
 
 ```bash
 aws ecs update-service \
@@ -165,10 +166,10 @@ When new versions of base images are released:
 
 ```
 linotp3/
-├── Dockerfile              # Production Dockerfile (hardened)
-├── Dockerfile.original     # Original (pre-hardening) for reference
-├── entrypoint.sh          # Custom entrypoint for secrets/DB init
-└── linotp-http.conf       # Apache configuration
+├── Dockerfile.opensource   # Production Dockerfile (built from GitHub)
+├── entrypoint.sh           # Custom entrypoint for secrets/DB init
+├── configure_linotp_python.py  # Automated configuration script
+└── linotp.cfg              # LinOTP configuration file
 ```
 
 ### FreeRADIUS (`freeradius/`)

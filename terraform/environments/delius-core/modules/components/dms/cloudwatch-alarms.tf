@@ -1,6 +1,6 @@
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "dms_alerts_topic" {
-  name              = "delius-dms-alerts-topic"
+  name              = "${var.env_name}-delius-dms-alerts-topic"
   kms_master_key_id = var.account_config.kms_keys.general_shared
 
   http_success_feedback_role_arn    = aws_iam_role.sns_logging_role.arn
@@ -91,7 +91,7 @@ locals {
 
 resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_source" {
   for_each            = local.aws_dms_replication_tasks
-  alarm_name          = "dms-cdc-latency-source-${each.value.replication_task_id}"
+  alarm_name          = "${var.env_name}-dms-cdc-latency-source-${each.value.replication_task_id}"
   alarm_description   = "High CDC source latency for dms replication task for ${each.value.replication_task_id}"
   namespace           = "AWS/DMS"
   statistic           = "Average"
@@ -113,7 +113,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_source" {
 
 resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_target" {
   for_each            = local.aws_dms_replication_tasks
-  alarm_name          = "dms-cdc-latency-target-${each.value.replication_task_id}"
+  alarm_name          = "${var.env_name}-dms-cdc-latency-target-${each.value.replication_task_id}"
   alarm_description   = "High CDC target latency for dms replication task for ${each.value.replication_task_id}"
   namespace           = "AWS/DMS"
   statistic           = "Average"
@@ -186,7 +186,7 @@ module "disable_out_of_hours_alarms" {
   count  = local.disable_latency_alarms.start_time == null ? 0 : 1
   source = "../../../../../modules/schedule_alarms_lambda"
 
-  lambda_function_name = "toggle-dms-cdc-latency-alarms"
+  lambda_function_name = "${var.env_name}-toggle-dms-cdc-latency-alarms"
 
   start_time      = local.disable_latency_alarms.start_time
   end_time        = local.disable_latency_alarms.end_time
@@ -219,7 +219,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
   #checkov:skip=CKV_AWS_290 "ignore"
   #checkov:skip=CKV_AWS_50 "ignore"
   #checkov:skip=CKV_AWS_355 "ignore"
-  name = "dms-checker-policy"
+  name = "${var.env_name}-dms-checker-policy"
   role = aws_iam_role.lambda_exec.id
 
   policy = jsonencode({
@@ -269,7 +269,7 @@ resource "aws_lambda_function" "dms_checker" {
   #checkov:skip=CKV_AWS_173 "ignore"
   #checkov:skip=CKV_AWS_50 "ignore"
   #checkov:skip=CKV_AWS_272 "ignore"
-  function_name = "dms-task-health-checker"
+  function_name = "${var.env_name}-dms-task-health-checker"
   role          = aws_iam_role.lambda_exec.arn
   handler       = "detect_stopped_replication.lambda_handler"
   runtime       = "python3.11"
@@ -288,7 +288,7 @@ resource "aws_lambda_function" "dms_checker" {
 
 # EventBridge Rule to Trigger Lambda Every 15 Minutes (We hardcode this for now for simplicity - can change it if it needs to be configurable)
 resource "aws_cloudwatch_event_rule" "check_dms_every_15_min" {
-  name                = "check-dms-every-15-minutes"
+  name                = "${var.env_name}-check-dms-every-15-minutes"
   schedule_expression = "rate(15 minutes)"
 }
 

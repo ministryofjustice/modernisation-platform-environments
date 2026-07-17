@@ -1,4 +1,9 @@
 locals {
+  cloudwatch_guardduty_malware_protection_dimensions = {
+    "Malware Protection Plan Id" = aws_guardduty_malware_protection_plan.this.id
+    "Resource Name"              = module.s3_bucket["processing"].s3_bucket_id
+  }
+
   cloudwatch_metric_alarms = {
     "lambda-file-received-adapter-errors" = {
       alarm_description   = "The file received adapter Lambda function has failed to process one or more events"
@@ -77,6 +82,111 @@ locals {
       namespace          = "AWS/SQS"
       period             = 300
       statistic          = "Maximum"
+      threshold          = 0
+    }
+    "eventbridge-file-transfer-workflow-failed-invocations" = {
+      alarm_description   = "The FileReceived.v1 EventBridge rule has failed to start the file transfer workflow"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        EventBusName = module.eventbridge_file_transfer_bus.eventbridge_bus_name
+        RuleName     = module.eventbridge_file_transfer_bus.eventbridge_rules["file-transfer-workflow"].name
+      }
+      evaluation_periods = 1
+      metric_name        = "FailedInvocations"
+      namespace          = "AWS/Events"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
+    }
+    "eventbridge-file-transfer-workflow-dlq-visible-messages" = {
+      alarm_description   = "The file transfer workflow EventBridge dead-letter queue contains failed events"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        QueueName = module.sqs_eventbridge_file_transfer_workflow_dlq.queue_name
+      }
+      evaluation_periods = 1
+      metric_name        = "ApproximateNumberOfMessagesVisible"
+      namespace          = "AWS/SQS"
+      period             = 300
+      statistic          = "Maximum"
+      threshold          = 0
+    }
+    "step-functions-file-transfer-workflow-failures" = {
+      alarm_description   = "The file transfer workflow has failed one or more executions"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        StateMachineArn = module.step_function_file_transfer_workflow.state_machine_arn
+      }
+      evaluation_periods = 1
+      metric_name        = "ExecutionsFailed"
+      namespace          = "AWS/States"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
+    }
+    "step-functions-file-transfer-workflow-timeouts" = {
+      alarm_description   = "The file transfer workflow has timed out one or more executions"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        StateMachineArn = module.step_function_file_transfer_workflow.state_machine_arn
+      }
+      evaluation_periods = 1
+      metric_name        = "ExecutionsTimedOut"
+      namespace          = "AWS/States"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
+    }
+    "step-functions-file-transfer-workflow-aborts" = {
+      alarm_description   = "The file transfer workflow has aborted one or more executions"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        StateMachineArn = module.step_function_file_transfer_workflow.state_machine_arn
+      }
+      evaluation_periods = 1
+      metric_name        = "ExecutionsAborted"
+      namespace          = "AWS/States"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
+    }
+    "step-functions-file-transfer-workflow-throttles" = {
+      alarm_description   = "The file transfer workflow has experienced state transition throttling"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        StateMachineArn = module.step_function_file_transfer_workflow.state_machine_arn
+      }
+      evaluation_periods = 1
+      metric_name        = "ExecutionThrottled"
+      namespace          = "AWS/States"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
+    }
+    "dynamodb-file-transfer-workflow-idempotency-read-throttles" = {
+      alarm_description   = "The file transfer workflow idempotency table has throttled one or more read requests"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        TableName = module.dynamodb_file_transfer_workflow_idempotency.dynamodb_table_id
+      }
+      evaluation_periods = 1
+      metric_name        = "ReadThrottleEvents"
+      namespace          = "AWS/DynamoDB"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
+    }
+    "dynamodb-file-transfer-workflow-idempotency-write-throttles" = {
+      alarm_description   = "The file transfer workflow idempotency table has throttled one or more write requests"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        TableName = module.dynamodb_file_transfer_workflow_idempotency.dynamodb_table_id
+      }
+      evaluation_periods = 1
+      metric_name        = "WriteThrottleEvents"
+      namespace          = "AWS/DynamoDB"
+      period             = 300
+      statistic          = "Sum"
       threshold          = 0
     }
     "lambda-file-received-adapter-dlq-visible-messages" = {
@@ -168,8 +278,5 @@ locals {
     }
   }
 
-  cloudwatch_guardduty_malware_protection_dimensions = {
-    "Malware Protection Plan Id" = aws_guardduty_malware_protection_plan.this.id
-    "Resource Name"              = module.s3_bucket["processing"].s3_bucket_id
-  }
+  cloudwatch_retention_days = local.is-production ? 400 : 30
 }
