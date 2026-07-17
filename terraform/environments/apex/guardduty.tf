@@ -134,9 +134,9 @@ resource "aws_secretsmanager_secret" "guardduty_slack_secret" {
 resource "aws_secretsmanager_secret_version" "guardduty_slack_secret" {
   secret_id = aws_secretsmanager_secret.guardduty_slack_secret.id
   secret_string = jsonencode({
-    "slack_channel_webhook"                       = ""
-    "slack_channel_webhook_guardduty"             = ""
-    "slack_channel_webhook_s3"                    = ""
+    "slack_channel_webhook"           = ""
+    "slack_channel_webhook_guardduty" = ""
+    "slack_channel_webhook_s3"        = ""
   })
 
   lifecycle {
@@ -262,12 +262,13 @@ resource "aws_sns_topic_subscription" "guardduty_lambda" {
 # CloudWatch Logs Oracle Alerts -> Slack (development only)
 # ---------------------------------------------
 resource "aws_lambda_permission" "allow_logs_invoke_cloudwatch" {
-  count         = local.environment == "development" ? 1 : 0
-  statement_id  = "AllowExecutionFromCloudWatchLogs"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.guardduty_slack_notify.function_name
-  principal     = "logs.amazonaws.com"
-  source_arn    = aws_cloudwatch_log_group.database.arn
+  count          = local.environment == "development" ? 1 : 0
+  statement_id   = "AllowExecutionFromCloudWatchLogs"
+  action         = "lambda:InvokeFunction"
+  function_name  = aws_lambda_function.guardduty_slack_notify.function_name
+  principal      = "logs.amazonaws.com"
+  source_account = data.aws_caller_identity.current.account_id
+  source_arn     = "${aws_cloudwatch_log_group.database.arn}:*"
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "database_oracle_alerts" {
