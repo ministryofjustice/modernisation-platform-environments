@@ -11,26 +11,6 @@ Configuration is stored in RDS database and persists across container restarts.
 import os
 import sys
 import time
-import subprocess
-
-def wait_for_linotp():
-    """Wait for LinOTP to be ready."""
-    import urllib.request
-    import urllib.error
-
-    print("Waiting for LinOTP to be ready...")
-    for attempt in range(1, 31):
-        try:
-            urllib.request.urlopen('http://localhost:5000/manage/', timeout=5)
-            print("LinOTP is ready")
-            return True
-        except (urllib.error.URLError, TimeoutError):
-            print(f"Attempt {attempt}/30: LinOTP not ready yet, retrying in 10s...")
-            time.sleep(10)
-
-    print("ERROR: LinOTP failed to start after 5 minutes")
-    return False
-
 
 def set_admin_password_internal(db):
     """Set LinOTP admin user password using internal API."""
@@ -83,11 +63,28 @@ def set_admin_password_internal(db):
 
 
 def configure_linotp():
-    """Configure LinOTP resolver, realm, and policies."""
+    """Configure LinOTP resolver, realm, and policies.
 
-    # Create Flask application context
+    Runs before gunicorn starts (see entrypoint.sh), so it builds its own
+    Flask app/DB connection directly instead of waiting on a running
+    server. `linotp init database` has already completed synchronously by
+    this point, but retry a few times in case the DB connection isn't
+    immediately usable yet.
+    """
     from linotp.app import create_app
-    app = create_app()
+
+    app = None
+    for attempt in range(1, 16):
+        try:
+            app = create_app()
+            break
+        except Exception as e:
+            print(f"Attempt {attempt}/15: LinOTP app not ready yet ({e}), retrying in 5s...")
+            time.sleep(5)
+
+    if app is None:
+        print("ERROR: Could not initialise LinOTP app after 75s")
+        sys.exit(1)
 
     with app.app_context():
         # Import LinOTP modules within Flask application context
@@ -182,13 +179,20 @@ def _configure_linotp_internal(resolver, realm, getLinotpConfig, storeConfig, db
         # Create realm in database
         realm.createDBRealm(realm_name)
 
-        # Set as default realm
-        realm.setDefaultRealm(realm_name, check_if_exists=False)
-
         # Commit to database
         db.session.commit()
 
-        print(f"✓ Realm '{realm_name}' created and set as default")
+        print(f"✓ Realm '{realm_name}' created")
+
+    # Always reassert the default realm, even when it already existed.
+    # The `default` flag on the Realm table can end up unset (e.g. it isn't
+    # touched here on restarts since the block above is skipped once the
+    # realm exists), which leaves LinOTP with no default realm and RADIUS/PAP
+    # auth requests failing. Re-running this is idempotent and safe.
+    print(f"Ensuring '{realm_name}' is the default realm...")
+    realm.setDefaultRealm(realm_name, check_if_exists=False)
+    db.session.commit()
+    print(f"✓ Default realm is '{realm_name}'")
 
     # ==========================================
     # Step 3: Check and create policies
@@ -261,10 +265,6 @@ def _configure_linotp_internal(resolver, realm, getLinotpConfig, storeConfig, db
 
 if __name__ == '__main__':
     try:
-        # Wait for LinOTP to be ready
-        if not wait_for_linotp():
-            sys.exit(1)
-
         # Run configuration
         configure_linotp()
 
