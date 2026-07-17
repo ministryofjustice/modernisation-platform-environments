@@ -5,8 +5,11 @@ module "app_secrets" {
   kms_key_id = data.aws_kms_key.secrets_manager_common.arn
 
   secret_string = jsonencode({
-    secret_key = random_password.app_secrets.result
-    sentry_dsn = "CHANGEME"
+    secret_key          = random_password.app_secrets.result
+    sentry_dsn          = "CHANGEME"
+    azure_authority     = "CHANGEME"
+    azure_client_id     = "CHANGEME"
+    azure_client_secret = "CHANGEME"
   })
   ignore_secret_changes = true
 }
