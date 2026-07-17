@@ -50,7 +50,7 @@ data "aws_secretsmanager_secret_version" "trust_store_password" {
   secret_id = aws_secretsmanager_secret.trust_store_password.id
 }
 resource "aws_secretsmanager_secret" "soa_secrets" {
-  name        = "soa-password"
+  name        = "soa-secrets"
   description = "SOA Weblogic,EM Console for user weblogic, RDS Database Password for SOAPDB admin, PUI and other passwords in Key values"
 }
 
@@ -83,9 +83,10 @@ resource "aws_secretsmanager_secret_version" "ccms_soa_secrets_version" {
   # }
 }
 
-# data "aws_secretsmanager_secret_version" "soa_password" {
-#   secret_id = aws_secretsmanager_secret.soa_secrets.id
-# }
+data "aws_secretsmanager_secret" "soa_secrets" {
+  name = "soa-secrets"
+}
+
 # Slack Channel ID for Alerts
 resource "aws_secretsmanager_secret" "slack_channel_id" {
   name        = "guardduty_slack_channel_id"
