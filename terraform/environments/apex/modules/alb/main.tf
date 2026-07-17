@@ -151,28 +151,6 @@ module "s3-bucket" {
 }
 
 data "aws_iam_policy_document" "bucket_policy" {
-  # Deny any request that does not use TLS/HTTPS
-  statement {
-    sid    = "DenyInsecureTransport"
-    effect = "Deny"
-    actions = [
-      "s3:*"
-    ]
-    resources = [
-      var.existing_bucket_name != "" ? "arn:aws:s3:::${var.existing_bucket_name}" : module.s3-bucket[0].bucket.arn,
-      var.existing_bucket_name != "" ? "arn:aws:s3:::${var.existing_bucket_name}/*" : "${module.s3-bucket[0].bucket.arn}/*"
-    ]
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-      values   = ["false"]
-    }
-  }
-
   statement {
     effect = "Allow"
     actions = [
