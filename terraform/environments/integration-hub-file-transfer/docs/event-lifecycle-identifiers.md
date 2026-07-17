@@ -44,7 +44,7 @@ There is an important boundary here: Powertools only deduplicates retries of the
 
 Downstream consumers should therefore be idempotent on `fileId` rather than on the EventBridge `id` of the canonical event.
 
-The file-received Step Functions workflow uses a separate DynamoDB record keyed by the canonical event's `detail.metadata.idempotencyKey`, namespaced for the workflow. This is operation-level idempotency: duplicate canonical events for the same bucket, key and version resume or reuse the same durable checkpoints rather than creating another destination version. The record stores the current owner, a short in-progress lease, and copy checkpoints until it expires with the event-retention period.
+The file-transfer Step Functions workflow uses a separate DynamoDB record keyed by the canonical event's `detail.metadata.idempotencyKey`, namespaced for the workflow. This is operation-level idempotency: duplicate canonical events for the same bucket, key and version resume or reuse the same durable checkpoints rather than creating another destination version. The record stores the current owner, a short in-progress lease, and copy checkpoints until it expires with the event-retention period.
 
 The workflow copies the exact S3 version identified by `detail.data.object.versionId` from `incoming` to the same key in `processing`. Objects up to 5 GB use `CopyObject`; larger objects up to 5 TB use resumable multipart copy. The destination version is checked for size, encryption, metadata and tags before the workflow deletes only the exact source version. A failed or expired execution can therefore resume from the last successful checkpoint without deleting a newer source version.
 
@@ -56,7 +56,7 @@ Imagine `finance/april-payroll.csv` arrives in the `incoming` bucket with versio
 
 1. S3 emits a native `Object Created` event with its own EventBridge `id`, call it `native-1`.
 2. The file-received adapter hashes the incoming bucket, key and version ID to produce `file-1`, then publishes `FileReceived.v1`. EventBridge assigns this event `id = eb-1`. The event carries `fileId = file-1`, `correlationId = file-1`, and no `causationId`.
-3. The file-received workflow picks up `FileReceived.v1`, stages the exact object version to `processing/finance/april-payroll.csv`, verifies the destination version, and deletes the exact source version. Publication of `FileStagedForScanning.v1` is outside the current workflow scope.
+3. The file-transfer workflow picks up `FileReceived.v1`, stages the exact object version to `processing/finance/april-payroll.csv`, verifies the destination version, and deletes the exact source version. Publication of `FileStagedForScanning.v1` is outside the current workflow scope.
 
 Once the next lifecycle event is introduced, the scanner and router will continue the canonical chain by copying `fileId` and `correlationId` and setting each event's `causationId` to the preceding EventBridge event ID.
 
