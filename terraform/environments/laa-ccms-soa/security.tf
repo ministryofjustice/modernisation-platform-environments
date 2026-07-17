@@ -5,16 +5,6 @@ resource "aws_security_group" "alb_admin" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_security_group_rule" "alb_admin_ingress_80" {
-  security_group_id = aws_security_group.alb_admin.id
-  type              = "ingress"
-  description       = "Admin HTTP - Private Subnets" #--Why?
-  protocol          = "TCP"
-  from_port         = 80
-  to_port           = 80
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-}
-
 resource "aws_security_group_rule" "alb_admin_ingress_443" {
   security_group_id = aws_security_group.alb_admin.id
   type              = "ingress"
@@ -25,24 +15,14 @@ resource "aws_security_group_rule" "alb_admin_ingress_443" {
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
-resource "aws_security_group_rule" "alb_admin_ingress_7001" {
+resource "aws_security_group_rule" "alb_admin_ingress_7002" {
   security_group_id = aws_security_group.alb_admin.id
   type              = "ingress"
   description       = "Admin Weblogic - Internal Subnets"
   protocol          = "TCP"
-  from_port         = 7001
-  to_port           = 7001
+  from_port         = 7002
+  to_port           = 7002
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-}
-
-resource "aws_security_group_rule" "alb_admin_workspace_ingress_80" {
-  security_group_id = aws_security_group.alb_admin.id
-  type              = "ingress"
-  description       = "Admin Weblogic - AWS Workspaces" #--Why?
-  protocol          = "TCP"
-  from_port         = 80
-  to_port           = 80
-  cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace_cidr]
 }
 
 resource "aws_security_group_rule" "alb_admin_workspace_ingress_443" {
@@ -55,13 +35,13 @@ resource "aws_security_group_rule" "alb_admin_workspace_ingress_443" {
   cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace_cidr]
 }
 
-resource "aws_security_group_rule" "alb_admin_workspace_ingress_7001" {
+resource "aws_security_group_rule" "alb_admin_workspace_ingress_7002" {
   security_group_id = aws_security_group.alb_admin.id
   type              = "ingress"
   description       = "Admin Weblogic - AWS Workspaces"
   protocol          = "TCP"
-  from_port         = 7001
-  to_port           = 7001
+  from_port         = 7002
+  to_port           = 7002
   cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace_cidr]
 }
 
@@ -83,8 +63,8 @@ resource "aws_security_group_rule" "alb_admin_egress_ecs_targets" {
   type              = "egress"
   description       = "Egress to ECS Admin targets on WebLogic admin port (tcp/7001)"
   protocol          = "tcp"
-  from_port         = tonumber(local.application_data.accounts[local.environment].admin_server_port)
-  to_port           = tonumber(local.application_data.accounts[local.environment].admin_server_port)
+  from_port         = tonumber(local.application_data.accounts[local.environment].admin_ssl_port)
+  to_port           = tonumber(local.application_data.accounts[local.environment].admin_ssl_port)
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
@@ -93,16 +73,6 @@ resource "aws_security_group" "alb_managed" {
   name        = "${local.application_data.accounts[local.environment].app_name}_alb_managed"
   description = "Controls Traffic for SOA Managed Application"
   vpc_id      = data.aws_vpc.shared.id
-}
-
-resource "aws_security_group_rule" "alb_managed_ingress_80" {
-  security_group_id = aws_security_group.alb_managed.id
-  type              = "ingress"
-  description       = "EM HTTP - Internal Subnets" #--Why?
-  protocol          = "TCP"
-  from_port         = 80
-  to_port           = 80
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
 resource "aws_security_group_rule" "alb_managed_ingress_443" {
@@ -135,24 +105,14 @@ resource "aws_security_group_rule" "alb_managed_workspace_ingress_443" {
   cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace_cidr]
 }
 
-resource "aws_security_group_rule" "alb_managed_ingress_8001" {
+resource "aws_security_group_rule" "alb_managed_ingress_7002" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "ingress"
   description       = "EM Weblogic - Internal Subnets"
   protocol          = "TCP"
-  from_port         = 8001
-  to_port           = 8001
+  from_port         = 7002
+  to_port           = 7002
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-}
-
-resource "aws_security_group_rule" "alb_managed_ingress_cp80" {
-  security_group_id = aws_security_group.alb_managed.id
-  type              = "ingress"
-  description       = "EM HTTP - Cloud Platform" #--Why?
-  protocol          = "TCP"
-  from_port         = 80
-  to_port           = 80
-  cidr_blocks       = [local.application_data.accounts[local.environment].cloud_platform_cidr]
 }
 
 resource "aws_security_group_rule" "alb_managed_ingress_cp443" {
@@ -165,24 +125,14 @@ resource "aws_security_group_rule" "alb_managed_ingress_cp443" {
   cidr_blocks       = [local.application_data.accounts[local.environment].cloud_platform_cidr]
 }
 
-resource "aws_security_group_rule" "alb_managed_ingress_cp8001" {
+resource "aws_security_group_rule" "alb_managed_ingress_cp7002" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "ingress"
   description       = "EM Weblogic - Cloud Platform"
   protocol          = "TCP"
-  from_port         = 8001
-  to_port           = 8001
+  from_port         = 7002
+  to_port           = 7002
   cidr_blocks       = [local.application_data.accounts[local.environment].cloud_platform_cidr]
-}
-
-resource "aws_security_group_rule" "alb_managed_ingress_nec80" {
-  security_group_id = aws_security_group.alb_managed.id
-  type              = "ingress"
-  description       = "EM HTTP - NEC"
-  protocol          = "TCP"
-  from_port         = 80
-  to_port           = 80
-  cidr_blocks       = [local.application_data.accounts[local.environment].northgate_proxy]
 }
 
 resource "aws_security_group_rule" "alb_managed_ingress_nec443" {
@@ -199,10 +149,10 @@ resource "aws_security_group_rule" "alb_managed_ingress_nec443" {
 resource "aws_security_group_rule" "alb_managed_egress_ecs_targets" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "egress"
-  description       = "Egress to ECS Managed targets on WebLogic managed port (tcp/8001)"
+  description       = "Egress to ECS Managed targets on WebLogic managed port (tcp/7002)"
   protocol          = "tcp"
-  from_port         = tonumber(local.application_data.accounts[local.environment].managed_server_port)
-  to_port           = tonumber(local.application_data.accounts[local.environment].managed_server_port)
+  from_port         = tonumber(local.application_data.accounts[local.environment].managed_ssl_port)
+  to_port           = tonumber(local.application_data.accounts[local.environment].managed_ssl_port)
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
