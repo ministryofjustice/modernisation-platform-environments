@@ -210,7 +210,7 @@ resource "aws_cloudwatch_metric_alarm" "cloudwatch_sns_dlq_not_empty" {
   alarm_name          = "${local.application_name}-${local.environment}-cloudwatch-sns-dlq-not-empty"
   namespace           = "AWS/SQS"
   metric_name         = "ApproximateNumberOfMessagesVisible"
-  dimensions          = { QueueName = aws_sqs_queue.cloudwatch_sns_dlq.name }
+  dimensions          = { QueueName = aws_sqs_queue.cloudwatch_sns_dlq[0].name }
   statistic           = "Maximum"
   period              = 300
   evaluation_periods  = 1
