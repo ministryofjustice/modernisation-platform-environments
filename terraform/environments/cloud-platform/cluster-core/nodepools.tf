@@ -79,7 +79,7 @@ resource "kubectl_manifest" "default_nodepool" {
             Terraform: "true"
             "container-platform.justice.gov.uk/default-ng": "true"
             Cluster: "${terraform.workspace}"
-            Domain: ${local.cluster_domain}
+            Domain: ${local.workspace_slug}
       disruption:
         consolidationPolicy: WhenEmptyOrUnderutilized
         consolidateAfter: 60s
@@ -126,7 +126,7 @@ resource "kubectl_manifest" "system_nodepool" {
             Terraform: "true"
             "container-platform.justice.gov.uk/system-ng": "true"
             Cluster: "${terraform.workspace}"
-            Domain: ${local.cluster_domain}
+            Domain: ${local.workspace_slug}
       disruption:
         consolidationPolicy: WhenEmptyOrUnderutilized
         consolidateAfter: 60s
