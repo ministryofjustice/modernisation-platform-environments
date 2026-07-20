@@ -58,7 +58,6 @@ resource "aws_ecs_task_definition" "admin" {
     {
       app_name                              = local.application_data.accounts[local.environment].app_name
       app_image                             = local.application_data.accounts[local.environment].admin_app_image
-      admin_server_port                     = local.application_data.accounts[local.environment].admin_server_port
       admin_ssl_port                        = local.application_data.accounts[local.environment].admin_ssl_port
       aws_region                            = local.application_data.accounts[local.environment].aws_region
       container_version                     = local.application_data.accounts[local.environment].admin_container_version
@@ -177,7 +176,6 @@ resource "aws_ecs_task_definition" "managed" {
       app_name             = local.application_data.accounts[local.environment].app_name
       app_image            = local.application_data.accounts[local.environment].managed_app_image
       db_instance_endpoint = aws_db_instance.soa_db.endpoint
-      managed_server_port  = local.application_data.accounts[local.environment].managed_server_port
       managed_ssl_port     = local.application_data.accounts[local.environment].managed_ssl_port
       admin_server_port    = local.application_data.accounts[local.environment].admin_ssl_port
       aws_region           = local.application_data.accounts[local.environment].aws_region
