@@ -244,7 +244,7 @@ resource "aws_iam_policy" "ec2_instance_policy" {
                 "secretsmanager:PutSecretValue",
                 "secretsmanager:CreateSecret"
           ],
-          "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:soasandbox-secrets*"]
+          "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:soa-secrets*"]
         }
     ]
 }
