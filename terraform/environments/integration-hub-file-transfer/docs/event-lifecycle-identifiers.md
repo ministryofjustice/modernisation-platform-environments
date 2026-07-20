@@ -56,11 +56,14 @@ Imagine `finance/april-payroll.csv` arrives in the `incoming` bucket with versio
 
 1. S3 emits a native `Object Created` event with its own EventBridge `id`, call it `native-1`.
 2. The file-received adapter hashes the incoming bucket, key and version ID to produce `file-1`, then publishes `FileReceived.v1`. EventBridge assigns this event `id = eb-1`. The event carries `fileId = file-1`, `correlationId = file-1`, and no `causationId`.
-3. The file-transfer workflow picks up `FileReceived.v1`, stages the exact object version to `processing/finance/april-payroll.csv`, verifies the destination version, and deletes the exact source version. Publication of `FileStagedForScanning.v1` is outside the current workflow scope.
+3. The file-transfer workflow picks up `FileReceived.v1`, stages the exact object version to `processing/finance/april-payroll.csv`, verifies the destination version, and deletes the exact source version.
+4. The workflow publishes `FileStagedForScanning.v1` as an audit record that the object is ready for GuardDuty Malware Protection for S3. It copies `fileId` and `correlationId`, sets `causationId` to the `FileReceived.v1` EventBridge ID, and identifies the exact source and staged S3 versions.
 
-Once the next lifecycle event is introduced, the scanner and router will continue the canonical chain by copying `fileId` and `correlationId` and setting each event's `causationId` to the preceding EventBridge event ID.
+The future GuardDuty adapter and router will continue the canonical chain with `FileScanResultRecorded.v1` and `FileRouted.v1`, copying `fileId` and `correlationId` and setting each event's `causationId` to the preceding EventBridge event ID.
 
 At every stage, `fileId` and `correlationId` stay the same. The S3 location changes, the object version changes, and each EventBridge `id` is unique — but you can follow the whole chain.
+
+The workflow records a `PUBLISHED` checkpoint containing the `FileStagedForScanning.v1` EventBridge ID before marking the transfer `COMPLETED`. If EventBridge accepts the event but the checkpoint write fails, recovery can publish the event again. Consumers must therefore treat delivery as at least once and deduplicate using `detail.metadata.idempotencyKey`, which is derived from the exact processing bucket, key and version ID.
 
 ## Rules for event producers
 

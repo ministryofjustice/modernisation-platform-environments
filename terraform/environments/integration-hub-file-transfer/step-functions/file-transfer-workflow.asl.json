@@ -22,6 +22,7 @@
         "processingKmsKeyArn": ${processing_kms_key_arn},
         "partSize": ${part_size_bytes},
         "maximumSize": ${maximum_size_bytes},
+        "eventBusArn": ${event_bus_arn},
         "leaseSeconds": ${lease_seconds},
         "recordRetentionSeconds": ${record_retention_seconds},
         "nowEpoch": "{% $floor($toMillis($states.context.Execution.StartTime) / 1000) %}",
@@ -198,6 +199,10 @@
     "Route Stored Checkpoint": {
       "Type": "Choice",
       "Choices": [
+        {
+          "Condition": "{% $resumeStatus = 'PUBLISHED' %}",
+          "Next": "Checkpoint Completed"
+        },
         {
           "Condition": "{% $resumeStatus = 'VERIFIED' %}",
           "Next": "Delete Exact Incoming Object Version"
@@ -989,6 +994,68 @@
           "JitterStrategy": "FULL"
         }
       ],
+      "Next": "Prepare File Staged Event"
+    },
+    "Prepare File Staged Event": {
+      "Type": "Pass",
+      "Assign": {
+        "stagedEventIdempotencyKey": "{% $processingBucket & ':' & $incomingObjectKey & ':' & $processingObjectVersionId %}",
+        "fileStagedEventDetail": "{% {'metadata': {'correlationId': $correlationId, 'causationId': $eventId, 'idempotencyKey': $processingBucket & ':' & $incomingObjectKey & ':' & $processingObjectVersionId}, 'data': {'fileId': $fileId, 'sourceObject': {'bucket': $incomingObjectBucket, 'key': $incomingObjectKey, 'versionId': $incomingObjectVersionId, 'sizeBytes': $incomingObjectSizeBytes}, 'stagedObject': {'bucket': $processingBucket, 'key': $incomingObjectKey, 'versionId': $processingObjectVersionId, 'sizeBytes': $incomingObjectSizeBytes}, 'metadataPreserved': true, 'tagsPreserved': true, 'sourceDeleted': true}} %}"
+      },
+      "Next": "Publish File Staged Event"
+    },
+    "Publish File Staged Event": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::events:putEvents",
+      "Arguments": {
+        "Entries": [
+          {
+            "Detail": "{% $fileStagedEventDetail %}",
+            "DetailType": "FileStagedForScanning.v1",
+            "EventBusName": "{% $eventBusArn %}",
+            "Source": "uk.gov.justice.service.managed-file-transfer"
+          }
+        ]
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["EventBridge.FailedEntry", "States.Timeout"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 5,
+          "BackoffRate": 2,
+          "MaxDelaySeconds": 60,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Assign": {
+        "stagedEventId": "{% $states.result.Entries[0].EventId %}"
+      },
+      "Next": "Checkpoint Published"
+    },
+    "Checkpoint Published": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "Arguments": {
+        "TableName": ${idempotency_table_name},
+        "Key": {
+          "id": { "S": "{% $operationId %}" }
+        },
+        "UpdateExpression": "SET #status = :status, staged_event_id = :event_id, staged_event_idempotency_key = :idempotency_key, published_at = :published, updated_at = :updated, in_progress_expiration = :lease",
+        "ConditionExpression": "execution_arn = :execution AND #status = :verified",
+        "ExpressionAttributeNames": {
+          "#status": "status"
+        },
+        "ExpressionAttributeValues": {
+          ":status": { "S": "PUBLISHED" },
+          ":verified": { "S": "VERIFIED" },
+          ":execution": { "S": "{% $states.context.Execution.Id %}" },
+          ":event_id": { "S": "{% $stagedEventId %}" },
+          ":idempotency_key": { "S": "{% $stagedEventIdempotencyKey %}" },
+          ":published": { "S": "{% $now() %}" },
+          ":updated": { "S": "{% $now() %}" },
+          ":lease": { "N": "{% $string($floor($toMillis($now()) / 1000) + $leaseSeconds) %}" }
+        }
+      },
       "Next": "Checkpoint Completed"
     },
     "Checkpoint Completed": {
@@ -1000,13 +1067,13 @@
           "id": { "S": "{% $operationId %}" }
         },
         "UpdateExpression": "SET #status = :status, completed_at = :completed, updated_at = :updated REMOVE in_progress_expiration",
-        "ConditionExpression": "execution_arn = :execution AND #status = :verified",
+        "ConditionExpression": "execution_arn = :execution AND #status = :published",
         "ExpressionAttributeNames": {
           "#status": "status"
         },
         "ExpressionAttributeValues": {
           ":status": { "S": "COMPLETED" },
-          ":verified": { "S": "VERIFIED" },
+          ":published": { "S": "PUBLISHED" },
           ":execution": { "S": "{% $states.context.Execution.Id %}" },
           ":completed": { "S": "{% $now() %}" },
           ":updated": { "S": "{% $now() %}" }
