@@ -12,6 +12,10 @@ locals {
   # monitoring stack is disabled and the data source has no instances.
   grafana_api_token = try(jsondecode(data.aws_secretsmanager_secret_version.grafana_api_token[0].secret_string)["token"], "")
 
+  # PagerDuty integration key (routing key) for the Event Orchestrator. Managed
+  # in the data-platform-access repository.
+  pagerduty_integration_key = try(data.aws_secretsmanager_secret_version.pagerduty_integration_key[0].secret_string, "")
+
   # Dashboards as code, organised into Grafana folders. Each subdirectory of
   # src/helm/dashboards/ maps to one Grafana folder: the map key is the on-disk
   # directory name and the value is the folder's display name. Drop a dashboard
