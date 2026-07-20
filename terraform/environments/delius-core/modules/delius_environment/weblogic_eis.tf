@@ -18,14 +18,6 @@ module "weblogic_eis" {
 
   ecs_cluster_arn  = module.ecs.ecs_cluster_arn
 
-  # container_secrets_default = merge({
-  #   for name in local.weblogic_secrets : name => module.weblogic_ssm.arn_map[name]
-  #   }, {
-  #   "JDBC_PASSWORD"         = "${module.oracle_db_shared.database_application_passwords_secret_arn}:delius_pool::",
-  #   "USERMANAGEMENT_SECRET" = data.aws_ssm_parameter.usermanagement_secret.arn
-  #   }
-  # )
-
   cluster_security_group_id = aws_security_group.cluster.id
 
   alb_security_group_id      = aws_security_group.delius_frontend_alb_security_group.id
@@ -77,37 +69,6 @@ module "weblogic_eis" {
 
   platform_vars = var.platform_vars
   tags          = var.tags
-}
-
-
-#######################
-# Weblogic EIS Params #
-#######################
-
-resource "aws_ssm_parameter" "weblogic_eis_google_analytics_id" {
-  name  = "/${var.env_name}/delius/monitoring/analytics/google_id"
-  type  = "String"
-  value = "DEFAULT"
-  lifecycle {
-    ignore_changes = [value]
-  }
-}
-
-data "aws_ssm_parameter" "weblogic_eis_google_analytics_id" {
-  name = aws_ssm_parameter.weblogic_eis_google_analytics_id.name
-}
-
-resource "aws_ssm_parameter" "usermanagement_secret" {
-  name  = "/${var.env_name}/delius/umt/umt/delius_secret"
-  type  = "SecureString"
-  value = "DEFAULT"
-  lifecycle {
-    ignore_changes = [value]
-  }
-}
-
-data "aws_ssm_parameter" "usermanagement_secret" {
-  name = aws_ssm_parameter.usermanagement_secret.name
 }
 
 resource "aws_launch_template" "weblogic_eis" {

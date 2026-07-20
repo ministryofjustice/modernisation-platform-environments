@@ -17,13 +17,6 @@ module "weblogic" {
 
   ecs_cluster_arn  = module.ecs.ecs_cluster_arn
 
-  # container_secrets_default = merge({
-  #   for name in local.weblogic_secrets : name => module.weblogic_ssm.arn_map[name]
-  #   }, {
-  #   "JDBC_PASSWORD" = "${module.oracle_db_shared.database_application_passwords_secret_arn}:delius_pool::"
-  #   }
-  # )
-
   cluster_security_group_id = aws_security_group.cluster.id
 
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
