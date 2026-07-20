@@ -28,9 +28,10 @@ class FakeIdempotencyConfig:
         self.options = kwargs
 
 
-def fake_idempotent(**_kwargs):
+def fake_idempotent_function(*, data_keyword_argument, **_kwargs):
     def decorator(function):
-        def wrapped(operation):
+        def wrapped(**kwargs):
+            operation = kwargs[data_keyword_argument]
             key = operation["idempotencyKey"]
             payload = (operation["object"], operation["scanResultStatus"])
             if key in IDEMPOTENCY_CACHE:
@@ -38,7 +39,7 @@ def fake_idempotent(**_kwargs):
                     raise ValueError("Idempotency payload does not match the existing operation")
                 return IDEMPOTENCY_CACHE[key]["result"]
 
-            result = function(operation)
+            result = function(**{data_keyword_argument: operation})
             IDEMPOTENCY_CACHE[key] = {"payload": payload, "result": result}
             return result
 
@@ -65,7 +66,7 @@ class FileScanResultRecordedAdapterTest(unittest.TestCase):
                 "aws_lambda_powertools.utilities.idempotency": SimpleNamespace(
                     DynamoDBPersistenceLayer=lambda **_kwargs: SimpleNamespace(),
                     IdempotencyConfig=FakeIdempotencyConfig,
-                    idempotent=fake_idempotent,
+                    idempotent_function=fake_idempotent_function,
                 ),
             },
         )

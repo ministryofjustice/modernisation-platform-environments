@@ -7,7 +7,7 @@ from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.idempotency import (
     DynamoDBPersistenceLayer,
     IdempotencyConfig,
-    idempotent,
+    idempotent_function,
 )
 
 
@@ -168,12 +168,13 @@ def _build_detail(operation):
     }
 
 
-@idempotent(
+@idempotent_function(
+    data_keyword_argument="operation",
     persistence_store=persistence_layer,
     config=idempotency_config,
     key_prefix="managed-file-transfer/file-scan-result-recorded-adapter",
 )
-def _publish(operation):
+def _publish(*, operation):
     response = eventbridge.put_events(
         Entries=[
             {
@@ -217,4 +218,4 @@ def lambda_handler(event, _context):
         f"{scan['bucket']}:{scan['key']}:{scan['versionId']}"
     )
     workflow = _workflow_record(processing_object_lookup_key)
-    return _publish(_build_operation(scan, workflow))
+    return _publish(operation=_build_operation(scan, workflow))
