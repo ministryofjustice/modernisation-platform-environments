@@ -331,7 +331,7 @@ resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure_managed" {
 #--Alerts NLB (Admin)
 resource "aws_cloudwatch_metric_alarm" "Admin_UnHealthy_Hosts" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-admin-unhealthy-hosts-alarm"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | There is an unhealthy host in the target group ${aws_lb_target_group.admin.name} for over 15 minutes, this likely means that an admin host has failed to boot correctly"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There is an unhealthy host in the target group ${aws_lb_target_group.admin_https.name} for over 15 minutes, this likely means that an admin host has failed to boot correctly"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "UnHealthyHostCount"
   statistic           = "Average"
@@ -351,7 +351,7 @@ resource "aws_cloudwatch_metric_alarm" "Admin_UnHealthy_Hosts" {
 #--Alerts NLB (Managed)
 resource "aws_cloudwatch_metric_alarm" "Managed_UnHealthy_Hosts" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-unhealthy-hosts-alarm"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | There is an unhealthy host in the target group ${aws_lb_target_group.managed.name} for over 15 minutes, this likely means that a managed host has failed to boot correctly"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There is an unhealthy host in the target group ${aws_lb_target_group.managed_https.name} for over 15 minutes, this likely means that a managed host has failed to boot correctly"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "UnHealthyHostCount"
   statistic           = "Average"
