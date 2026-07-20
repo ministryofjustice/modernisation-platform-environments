@@ -163,16 +163,6 @@ resource "aws_security_group" "ecs_tasks_admin" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_security_group_rule" "ecs_tasks_admin_server" {
-  security_group_id = aws_security_group.ecs_tasks_admin.id
-  type              = "ingress"
-  description       = "SOA Admin Server"
-  protocol          = "TCP"
-  from_port         = local.application_data.accounts[local.environment].admin_server_port
-  to_port           = local.application_data.accounts[local.environment].admin_server_port
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-}
-
 resource "aws_security_group_rule" "ecs_tasks_admin_ssl_port" {
   security_group_id = aws_security_group.ecs_tasks_admin.id
   type              = "ingress"
@@ -198,16 +188,6 @@ resource "aws_security_group" "ecs_tasks_managed" {
   name_prefix = "${local.application_data.accounts[local.environment].app_name}_ecs_tasks_managed"
   description = "SOA Managed - Controls Traffic Between VPC and ECS Control Plane"
   vpc_id      = data.aws_vpc.shared.id
-}
-
-resource "aws_security_group_rule" "ecs_tasks_managed_server" {
-  security_group_id = aws_security_group.ecs_tasks_managed.id
-  type              = "ingress"
-  description       = "SOA Managed Server"
-  protocol          = "TCP"
-  from_port         = local.application_data.accounts[local.environment].managed_server_port
-  to_port           = local.application_data.accounts[local.environment].managed_server_port
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
 resource "aws_security_group_rule" "ecs_tasks_managed_ssl_port" {
