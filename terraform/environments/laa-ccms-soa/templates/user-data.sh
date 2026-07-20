@@ -25,8 +25,7 @@ yum install -y awscli
 
 # Configure SSH and pull git repo
 yum install git -y
-su ec2-user bash -c "aws secretsmanager get-secret-value --secret-id ccms/soa/deploy-github-ssh-key --query SecretString --output text --region eu-west-2 | base64 -d > /home/ec2-user/.ssh/id_rsa"
-chown ec2-user $EC2_USER_HOME_FOLDER/.ssh/id_rsa
+su ec2-user bash -c "aws secretsmanager get-secret-value --secret-id soa-secrets --query SecretString   --output text  | python3 -c 'import json,sys; print(json.load(sys.stdin)["deploy-github-ssh-key"])'| base64 -d > /home/ec2-user/.ssh/id_rsa"
 chgrp ec2-user $EC2_USER_HOME_FOLDER/.ssh/id_rsa
 chmod 400 $EC2_USER_HOME_FOLDER/.ssh/id_rsa
 cat <<EOF > $EC2_USER_HOME_FOLDER/.ssh/config
