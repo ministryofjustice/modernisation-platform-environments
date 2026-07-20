@@ -62,7 +62,6 @@ resource "aws_ecs_task_definition" "admin" {
       admin_ssl_port                        = local.application_data.accounts[local.environment].admin_ssl_port
       aws_region                            = local.application_data.accounts[local.environment].aws_region
       container_version                     = local.application_data.accounts[local.environment].admin_container_version
-      soa_password                          = "${aws_secretsmanager_secret.soa_secrets.arn}:ccms/soa/password::"
       db_user                               = local.application_data.accounts[local.environment].soa_db_user
       db_role                               = local.application_data.accounts[local.environment].soa_db_role
       db_instance_endpoint                  = aws_db_instance.soa_db.endpoint
@@ -72,35 +71,30 @@ resource "aws_ecs_task_definition" "admin" {
       xxsoa_ds_db                           = local.application_data.accounts[local.environment].tds_ds_db
       xxsoa_ds_username                     = local.application_data.accounts[local.environment].admin_xxsoa_ds_username
       xxsoa_ds_url                          = local.application_data.accounts[local.environment].xxsoa_ds_url
-      xxsoa_ds_password                     = "${aws_secretsmanager_secret.soa_secrets.arn}:ccms/soa/xxsoa/ds/password::"
       ebs_ds_url                            = local.application_data.accounts[local.environment].admin_ebs_ds_url
       ebs_ds_username                       = local.application_data.accounts[local.environment].admin_ebs_ds_username
-      ebs_ds_password                       = "${aws_secretsmanager_secret.soa_secrets.arn}:ccms/soa/ebs/ds/password::"
-      trust_store_password                  = "${aws_secretsmanager_secret.soa_secrets.arn}:ccms/soa/java/trust-store/password::"
       ebssms_ds_url                         = local.application_data.accounts[local.environment].admin_ebssms_ds_url
       ebssms_ds_username                    = local.application_data.accounts[local.environment].admin_ebs_ds_username
-      ebssms_ds_password                    = "${aws_secretsmanager_secret.soa_secrets.arn}:ccms/soa/ebs/sms/ds/password::"
-      pui_user_password                     = "${aws_secretsmanager_secret.soa_secrets.arn}:ccms/soa/pui/user/password::"
       ebs_user_username                     = local.application_data.accounts[local.environment].admin_ebs_user_username
-      ebs_user_password                     = "${aws_secretsmanager_secret.soa_secrets.arn}:ccms/soa/ebs/user/password::"
       run_rcu                               = local.application_data.accounts[local.environment].admin_run_rcu_bootstrap
       caab_user                             = local.application_data.accounts[local.environment].admin_caab_user
       pui_user                              = local.application_data.accounts[local.environment].admin_pui_user
       apply_user                            = local.application_data.accounts[local.environment].admin_apply_user
       keystore_secret_id                    = local.application_data.accounts[local.environment].admin_keystore_secret_id
-      soa_realm_apply_user_password         = "${aws_secretsmanager_secret.soa_secrets.arn}:ccms/soa/apply/password::"
-      soa_realm_caab_user_password          = "${aws_secretsmanager_secret.soa_secrets.arn}:ccms/soa/caab/password::"
-      keystorePassword                      = "${aws_secretsmanager_secret.soa__secrets.arn}:ccms/soa/keystore/password::"
-      truststorePassword                    = "${aws_secretsmanager_secret.soa__secrets.arn}:ccms/soa/truststore/password::"
-      admin_server_password                 = "${aws_secretsmanager_secret.soa_secrets.arn}:ccms/soa/admin/password::"
-      edrms_xxsoa_user_password             = "${aws_secretsmanager_secret.soa__secrets.arn}:ccms/soa/xxsoa/password::"
-      cwa_apps_user_password                = "${aws_secretsmanager_secret.soa_secrets.arn}:ccms/soa/cwa/apps/password::"
-      soa_realm_pui_user_password           = "${aws_secretsmanager_secret.soa_secrets.arn}:ccms/soa/pui/password::"
-      soa_realm_ebs_soa_super_user_password = "${aws_secretsmanager_secret.soa_secrets.arn}:ccms/soa/ebs/soa/super/user/password::"
-      soa_rds_admin_user_password           = "${aws_secretsmanager_secret.soa_secrets.arn}:ccms/soa/password::"
-      soa_rds_all_ccmssoa_schema_password   = "${aws_secretsmanager_secret.soa_secrets.arn}:ccms/soa/schema/password::"
-      extra_java_properties                 = "${aws_secretsmanager_secret.soa_secrets.arn}:ccms/soa/extra/java/properties::"
-
+      soa_rds_admin_user_password          = "${data.aws_secretsmanager_secret.soa_secrets.arn}:admin_server_password::"
+      soa_rds_all_ccmssoa_schema_password  = "${data.aws_secretsmanager_secret.soa_secrets.arn}:soa_rds_all_ccmssoa_schema_password::"
+      admin_server_password                = "${data.aws_secretsmanager_secret.soa_secrets.arn}:admin_server_password::"
+      edrms_xxsoa_user_password            = "${data.aws_secretsmanager_secret.soa_secrets.arn}:edrms_xxsoa_user_password::"
+      ccms_apps_user_password              = "${data.aws_secretsmanager_secret.soa_secrets.arn}:ccms_apps_user_password::"
+      cwa_apps_user_password               = "${data.aws_secretsmanager_secret.soa_secrets.arn}:cwa_apps_user_password::"
+      soa_realm_pui_user_password          = "${data.aws_secretsmanager_secret.soa_secrets.arn}:soa_realm_pui_user_password::"
+      soa_realm_apply_user_password        = "${data.aws_secretsmanager_secret.soa_secrets.arn}:soa_realm_apply_user_password::"
+      soa_realm_caab_user_password         = "${data.aws_secretsmanager_secret.soa_secrets.arn}:soa_realm_caab_user_password::"
+      soa_realm_ebs_soa_super_user_password = "${data.aws_secretsmanager_secret.soa_secrets.arn}:soa_realm_ebs_soa_super_user_password::"
+      extra_java_properties                = "${data.aws_secretsmanager_secret.soa_secrets.arn}:extra_java_properties::"
+      keystorePassword                     = "${data.aws_secretsmanager_secret.soa_secrets.arn}:keystorePassword::"
+      truststorePassword                   = "${data.aws_secretsmanager_secret.soa_secrets.arn}:truststorePassword::"
+      slack_channel_webhook                = "${data.aws_secretsmanager_secret.soa_secrets.arn}:slack_channel_webhook::"
     }
   )
 }
@@ -139,7 +133,7 @@ resource "aws_ecs_service" "admin" {
   load_balancer {
     target_group_arn = aws_lb_target_group.admin_https.id
     container_name   = "${local.application_data.accounts[local.environment].app_name}-admin"
-    container_port   = local.application_data.accounts[local.environment].admin_server_port
+    container_port   = local.application_data.accounts[local.environment].admin_ssl_port
   }
 
   depends_on = [
@@ -185,12 +179,15 @@ resource "aws_ecs_task_definition" "managed" {
       db_instance_endpoint = aws_db_instance.soa_db.endpoint
       managed_server_port  = local.application_data.accounts[local.environment].managed_server_port
       managed_ssl_port     = local.application_data.accounts[local.environment].managed_ssl_port
-      admin_server_port    = local.application_data.accounts[local.environment].admin_server_port
+      admin_server_port    = local.application_data.accounts[local.environment].admin_ssl_port
       aws_region           = local.application_data.accounts[local.environment].aws_region
       container_version    = local.application_data.accounts[local.environment].managed_container_version
       admin_host           = aws_route53_record.admin.fqdn
-      soa_password         = "${aws_secretsmanager_secret.soa_secrets.arn}:ccms/soa/password::"
-      trust_store_password = "${aws_secretsmanager_secret.soa_secrets.arn}:ccms/soa/java/trust-store/password::"
+      soa_password          = "${data.aws_secretsmanager_secret.soa_secrets.arn}:admin_server_password::"
+      extra_java_properties = "${data.aws_secretsmanager_secret.soa_secrets.arn}:extra_java_properties::"
+      keystorePassword      = "${data.aws_secretsmanager_secret.soa_secrets.arn}:keystorePassword::"
+      truststorePassword    = "${data.aws_secretsmanager_secret.soa_secrets.arn}:truststorePassword::"
+      slack_channel_webhook = "${data.aws_secretsmanager_secret.soa_secrets.arn}:slack_channel_webhook::"
       ms_hostname          = aws_route53_record.managed.fqdn
       wl_mem_args          = local.application_data.accounts[local.environment].managed_wl_mem_args
     }
@@ -206,7 +203,7 @@ resource "aws_ecs_service" "managed" {
   deployment_minimum_healthy_percent = 50
   launch_type                        = "EC2"
 
-  health_check_grace_period_seconds = 1800
+  health_check_grace_period_seconds = 3600
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
@@ -231,7 +228,7 @@ resource "aws_ecs_service" "managed" {
   load_balancer {
     target_group_arn = aws_lb_target_group.managed_https.id
     container_name   = "${local.application_data.accounts[local.environment].app_name}-managed"
-    container_port   = local.application_data.accounts[local.environment].managed_server_port
+    container_port   = local.application_data.accounts[local.environment].managed_ssl_port
   }
 
   depends_on = [
