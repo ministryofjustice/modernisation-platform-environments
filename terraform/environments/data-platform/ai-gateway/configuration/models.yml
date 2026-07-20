@@ -1,40 +1,170 @@
-bedrock:
+amazon_bedrock:
+  # Amazon
+  amazon-nova-lite:
+    model_id: "amazon.nova-lite-v1:0"
+    model_family: "Amazon Nova"
+    model_name: "Amazon Nova Lite"
+    region: eu-west-2
+    generally_available: true
+  amazon-nova-micro:
+    model_id: "amazon.nova-micro-v1:0"
+    model_family: "Amazon Nova"
+    model_name: "Amazon Nova Micro"
+    region: eu-west-2
+    generally_available: true
+  # Does not support on-demand throughput.
+  # amazon-nova-2-lite:
+  #   model_id: "amazon.nova-2-lite-v1:0"
+  #   region: eu-west-2
+  #   generally_available: false
+  amazon-nova-pro:
+    model_id: "amazon.nova-pro-v1:0"
+    model_family: "Amazon Nova"
+    model_name: "Amazon Nova Pro"
+    region: eu-west-2
+    generally_available: true
   amazon-titan-embed-text-v2:
     model_id: "amazon.titan-embed-text-v2:0"
+    model_family: "Amazon Titan"
+    model_name: "Amazon Titan Text Embeddings v2"
     region: eu-west-2
+    generally_available: true
+  # Does not support on-demand throughput.
+  # amazon-titan-embed-image-v1:
+  #   model_id: "amazon.titan-embed-image-v1:0"
+  #   region: eu-west-2
+  #   generally_available: false
+  # Anthropic
   claude-haiku-4-5:
     model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
+    model_family: "Anthropic Claude"
+    model_name: "Anthropic Claude Haiku 4.5 (EU)"
     region: eu-west-2
+    generally_available: true
+  claude-opus-4-5:
+    model_id: "eu.anthropic.claude-opus-4-5-20251101-v1:0"
+    model_family: "Anthropic Claude"
+    model_name: "Anthropic Claude Opus 4.5 (EU)"
+    region: eu-west-2
+    generally_available: true
   claude-opus-4-6:
     model_id: eu.anthropic.claude-opus-4-6-v1
+    model_family: "Anthropic Claude"
+    model_name: "Anthropic Claude Opus 4.6 (EU)"
     region: eu-west-2
+    generally_available: true
   claude-opus-4-7:
     model_id: eu.anthropic.claude-opus-4-7
+    model_family: "Anthropic Claude"
+    model_name: "Anthropic Claude Opus 4.7 (EU)"
     region: eu-west-2
+    generally_available: true
   claude-opus-4-8:
     model_id: eu.anthropic.claude-opus-4-8
+    model_family: "Anthropic Claude"
+    model_name: "Anthropic Claude Opus 4.8 (EU)"
     region: eu-west-2
-  claude-sonnet-4:
-    model_id: "eu.anthropic.claude-sonnet-4-20250514-v1:0"
-    region: eu-west-1
+    generally_available: true
   claude-sonnet-4-5:
     model_id: "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+    model_family: "Anthropic Claude"
+    model_name: "Anthropic Claude Sonnet 4.5 (EU)"
     region: eu-west-2
+    generally_available: true
   claude-sonnet-4-6:
     model_id: eu.anthropic.claude-sonnet-4-6
+    model_family: "Anthropic Claude"
+    model_name: "Anthropic Claude Sonnet 4.6 (EU)"
     region: eu-west-2
+    generally_available: true
+  claude-sonnet-5:
+    model_id: eu.anthropic.claude-sonnet-5
+    model_family: "Anthropic Claude"
+    model_name: "Anthropic Claude Sonnet 5 (EU)"
+    region: eu-west-2
+    generally_available: true
+  # Cohere
   cohere-embed-english-v3:
-    model_id: cohere.embed-english-v3
+    model_id: "cohere.embed-english-v3"
+    model_family: "Cohere Embed"
+    model_name: "Cohere Embed English v3"
     region: eu-west-2
+    generally_available: true
   cohere-embed-multilingual-v3:
-    model_id: cohere.embed-multilingual-v3
+    model_id: "cohere.embed-multilingual-v3"
+    model_family: "Cohere Embed"
+    model_name: "Cohere Embed Multilingual v3"
     region: eu-west-2
+    generally_available: true
+  cohere-embed-v4:
+    model_id: "eu.cohere.embed-v4:0"
+    model_family: "Cohere Embed"
+    model_name: "Cohere Embed v4 (EU)"
+    region: eu-west-2
+    generally_available: true
+  # Google
+  google-gemma-3-4b-it:
+    model_id: "google.gemma-3-4b-it"
+    model_family: "Google Gemma"
+    model_name: "Google Gemma 3 4B IT"
+    region: eu-west-2
+    generally_available: true
+  google-gemma-3-12-it:
+    model_id: "google.gemma-3-12b-it"
+    model_family: "Google Gemma"
+    model_name: "Google Gemma 3 12B IT"
+    region: eu-west-2
+    generally_available: true
+  google-gemma-3-27b-it:
+    model_id: "google.gemma-3-27b-it"
+    model_family: "Google Gemma"
+    model_name: "Google Gemma 3 27B IT"
+    region: eu-west-2
+    generally_available: true
+  # Meta
   meta-llama3-8b-instruct:
     model_id: "meta.llama3-8b-instruct-v1:0"
+    model_family: "Meta Llama"
+    model_name: "Meta Llama 3 8B Instruct"
     region: eu-west-2
+    generally_available: true
   meta-llama3-70b-instruct:
     model_id: "meta.llama3-70b-instruct-v1:0"
+    model_family: "Meta Llama"
+    model_name: "Meta Llama 3 70B Instruct"
     region: eu-west-2
-  qwen-qwen3-coder-30b-a3b:
-    model_id: "qwen.qwen3-coder-30b-a3b-v1:0"
+    generally_available: true
+  # Mistral
+  mistral-7b-instruct:
+    model_id: "mistral.mistral-7b-instruct-v0:2"
+    model_family: "Mistral"
+    model_name: "Mistral 7B Instruct"
     region: eu-west-2
+    generally_available: true
+  # OpenAI
+  openai-gpt-oss-20b:
+    model_id: "openai.gpt-oss-20b-1:0"
+    model_family: "OpenAI GPT OSS"
+    model_name: "OpenAI GPT OSS 20B"
+    region: eu-west-2
+    generally_available: true
+  openai-gpt-oss-safeguard-20b:
+    model_id: "openai.gpt-oss-safeguard-20b"
+    model_family: "OpenAI GPT OSS"
+    model_name: "OpenAI GPT OSS Safeguard 20B"
+    region: eu-west-2
+    generally_available: true
+  openai-gpt-oss-120b:
+    model_id: "openai.gpt-oss-120b-1:0"
+    model_family: "OpenAI GPT OSS"
+    model_name: "OpenAI GPT OSS 120B"
+    region: eu-west-2
+    generally_available: true
+  openai-gpt-oss-safeguard-120b:
+    model_id: "openai.gpt-oss-safeguard-120b"
+    model_family: "OpenAI GPT OSS"
+    model_name: "OpenAI GPT OSS Safeguard 120B"
+    region: eu-west-2
+    generally_available: true
+google_gemini_enterprise_agent_platform: {}
+microsoft_foundry: {}

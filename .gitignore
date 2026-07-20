@@ -3,6 +3,7 @@
 *.tfstate*
 .DS_Store
 tmp/
+.linked-repos/
 .vscode/*
 !.vscode/mcp.json
 .terraform.lock.hcl

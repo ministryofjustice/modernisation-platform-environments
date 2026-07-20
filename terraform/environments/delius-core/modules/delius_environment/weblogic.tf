@@ -217,7 +217,7 @@ locals {
 # 5. Create CNAME record in legacy that points ndelius.probation.service.justice.gov.uk -> ndelius.prod.delius-core.hmpps-production.modernisation-platform.service.justice.gov.uk
 resource "aws_acm_certificate" "legacy" {
   count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name != "prod" ? 1 : 0
- 
+
   domain_name       = "*.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"
   validation_method = "DNS"
   tags              = var.tags

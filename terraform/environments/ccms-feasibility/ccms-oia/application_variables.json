@@ -1,0 +1,61 @@
+{
+  "accounts": {
+    "development": {
+      "ami_image_id": "ami-02f77a03ec776dc35",
+
+      "ec2_instance_type": "m5.xlarge",
+      "ec2_min_capacity": 1,
+      "ec2_max_capacity": 2,
+      "ec2_desired_capacity": 1,
+      "root_volume_size": 30,
+
+      "opa_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-oia",
+      "opa_container_version": "ccms-oia-feasibility-placeholder",
+      "opa_server_port": 7001,
+      "opa_container_cpu": 2048,
+      "opa_container_memory": 6144,
+      "wl_mem_args": "-Xms512m -Xmx2048m",
+      "create_database": "false",
+
+      "connector_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-connector",
+      "connector_container_version": "laa-ccms-connector-feasibility-placeholder",
+      "connector_server_port": 8080,
+      "connector_container_cpu": 512,
+      "connector_container_memory": 2048,
+      "connector_desired_count": 1,
+      "environment_connector": "feasibility",
+      "ccms_soa_url_ebsReferenceDataEndpoint": "",
+      "ccms_pui_connector_assessservice_url_means": "",
+      "ccms_pui_connector_assessservice_url_merits": "",
+      "ccms_pui_connector_assessservice_url_billing": "",
+      "ccms_pui_connector_answerservice_url_means": "",
+      "ccms_pui_connector_answerservice_url_merits": "",
+      "ccms_pui_connector_answerservice_url_billing": "",
+      "aws_endpoint": "",
+      "logging_level_root": "INFO",
+      "logging_level_com_ezgov_model": "INFO",
+      "logging_level_com_ezgov_opa": "INFO",
+      "logging_level_oracle_ocs_opa_laa": "INFO",
+      "logging_level_uk_gov_laa_opa": "INFO",
+
+      "adaptor_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-service-adaptor",
+      "adaptor_container_version": "laa-ccms-assess-service-adaptor-feasibility-placeholder",
+      "adaptor_server_port": 8080,
+      "adaptor_container_cpu": 512,
+      "adaptor_container_memory": 2048,
+      "adaptor_desired_count": 1,
+      "adaptor_spring_profile": "aws",
+      "client_opa12assess_means_address": "",
+      "client_opa12assess_billing_address": "",
+      "logging_config": "classpath:logback-spring.xml",
+      "logging_level_uk_gov_justice_laa_ccms": "INFO",
+
+      "db_user": "opahubdb",
+      "db_instance_type": "db.t3.large",
+      "db_storage_gb": 100,
+      "db_deletion_protection": true,
+      "db_log_retention_days": 30,
+      "alb_deletion_protection": true
+    }
+  }
+}

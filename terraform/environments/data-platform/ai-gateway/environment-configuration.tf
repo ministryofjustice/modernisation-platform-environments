@@ -1,7 +1,7 @@
 locals {
   environment_configurations = {
     development = {
-      litellm_version     = "1.90.0"
+      litellm_version     = "1.92.0"
       ai_gateway_hostname = "development.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
@@ -20,6 +20,10 @@ locals {
         "51.149.2.0/24",      # 10SC
         # GitHub Actions
         "20.58.27.30/32" # octo-production
+      ]
+      ai_gateway_internal_ingress_allowlist = [
+        "10.0.0.0/8",   # MOJ internal network
+        "172.20.0.0/16" # Cloud Platform
       ]
       ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
@@ -55,7 +59,7 @@ locals {
       elasticache_node_type = "cache.t4g.medium"
     }
     test = {
-      litellm_version     = "1.90.0"
+      litellm_version     = "1.92.0"
       ai_gateway_hostname = "test.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
@@ -74,6 +78,10 @@ locals {
         "51.149.2.0/24",      # 10SC
         # GitHub Actions
         "20.58.27.30/32" # octo-production
+      ]
+      ai_gateway_internal_ingress_allowlist = [
+        "10.0.0.0/8",   # MOJ internal network
+        "172.20.0.0/16" # Cloud Platform
       ]
       ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
@@ -105,7 +113,7 @@ locals {
       elasticache_node_type = "cache.t4g.medium"
     }
     preproduction = {
-      litellm_version     = "1.90.0"
+      litellm_version     = "1.92.0"
       ai_gateway_hostname = "preproduction.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
@@ -124,6 +132,10 @@ locals {
         "51.149.2.0/24",      # 10SC
         # GitHub Actions
         "20.58.27.30/32" # octo-production
+      ]
+      ai_gateway_internal_ingress_allowlist = [
+        "10.0.0.0/8",   # MOJ internal network
+        "172.20.0.0/16" # Cloud Platform
       ]
       ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
@@ -155,7 +167,7 @@ locals {
       elasticache_node_type = "cache.t4g.medium"
     }
     production = {
-      litellm_version     = "1.90.0"
+      litellm_version     = "1.92.0"
       ai_gateway_hostname = "ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
@@ -174,6 +186,10 @@ locals {
         "51.149.2.0/24",      # 10SC
         # GitHub Actions
         "20.58.27.30/32" # octo-production
+      ]
+      ai_gateway_internal_ingress_allowlist = [
+        "10.0.0.0/8",   # MOJ internal network
+        "172.20.0.0/16" # Cloud Platform
       ]
       ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {

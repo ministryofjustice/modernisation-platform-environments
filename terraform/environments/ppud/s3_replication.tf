@@ -82,9 +82,9 @@ locals {
 
   # Log bucket ARN lookup used in replication bucket policies
   log_bucket_arns = {
-    "moj-log-files-dev"  = local.is-development ? aws_s3_bucket.moj-log-files-dev[0].arn : ""
-    "moj-log-files-uat"  = local.is-preproduction ? aws_s3_bucket.moj-log-files-uat[0].arn : ""
-    "moj-log-files-prod" = local.is-production ? aws_s3_bucket.moj-log-files-prod[0].arn : ""
+    "moj-general-logs-dev"  = local.is-development ? aws_s3_bucket.s3_general["general_logs_dev"].arn : ""
+    "moj-general-logs-uat"  = local.is-preproduction ? aws_s3_bucket.s3_general["general_logs_uat"].arn : ""
+    "moj-general-logs-prod" = local.is-production ? aws_s3_bucket.s3_general["general_logs_prod"].arn : ""
   }
 }
 

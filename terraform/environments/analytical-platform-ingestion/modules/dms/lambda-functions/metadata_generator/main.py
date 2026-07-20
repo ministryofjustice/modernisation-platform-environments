@@ -205,7 +205,7 @@ class MetadataExtractor:
         for column_name in set(metadata.column_names).intersection(map(str.lower, columns_to_keep_as_int)):
             logger.info("Keeping column %s as int in table %s in schema %s", column_name, table, schema)
             column = metadata.get_column(column_name)
-            column["type"] = "int"
+            column["type"] = "int32"
             metadata.update_column(column)
 
         return metadata

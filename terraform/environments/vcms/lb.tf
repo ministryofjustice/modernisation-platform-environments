@@ -24,31 +24,6 @@ resource "aws_lb_target_group" "frontend" {
   tags = local.tags
 }
 
-# Security group for ALB
-resource "aws_security_group" "alb_sg" {
-  name        = "alb-sg"
-  description = "Security group for ALB"
-  vpc_id      = local.account_info.vpc_id
-
-  dynamic "ingress" {
-    for_each = local.internal_security_group_cidrs
-    content {
-      from_port   = 443
-      to_port     = 443
-      protocol    = "tcp"
-      cidr_blocks = [ingress.value]
-    }
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = local.tags
-}
 
 # ALB
 resource "aws_lb" "frontend" {
@@ -87,5 +62,27 @@ resource "aws_lb_listener" "frontend_https" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.frontend.arn
+  }
+}
+
+# Legacy Redirect Rule
+resource "aws_lb_listener_rule" "legacy_redirect" {
+  listener_arn = aws_lb_listener.frontend_https.arn
+  priority     = 100
+
+  action {
+    type = "redirect"
+    redirect {
+      host        = "vcms.hmpps-development.modernisation-platform.service.justice.gov.uk"
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+
+  condition {
+    host_header {
+      values = ["www.dev.victim-case-management.service.justice.gov.uk"]
+    }
   }
 }

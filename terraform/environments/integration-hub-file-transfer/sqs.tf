@@ -1,10 +1,15 @@
-module "sqs_incoming_s3_events" {
+module "sqs_eventbridge_default_dlq" {
   source  = "terraform-aws-modules/sqs/aws"
   version = "5.2.2"
 
-  name            = "${local.application_name}-incoming-s3-notifications"
+  name            = "${local.application_name}-eventbridge-default-dlq"
   use_name_prefix = false
 
+  message_retention_seconds  = 1209600
+  visibility_timeout_seconds = 180
+  receive_wait_time_seconds  = 20
+
+  create_dlq          = false
   create_queue_policy = true
   queue_policy_statements = {
     eventbridge = {
@@ -20,64 +25,45 @@ module "sqs_incoming_s3_events" {
 
       condition = [
         {
-          test     = "StringEquals"
-          variable = "aws:SourceAccount"
-          values   = [data.aws_caller_identity.current.account_id]
-        },
-        {
           test     = "ArnEquals"
           variable = "aws:SourceArn"
-          values = [
-            for rule_key, rule in local.eventbridge_incoming_s3_rules : module.eventbridge_incoming_s3[rule_key].eventbridge_rule_arns[rule.name]
-          ]
+          values   = [module.eventbridge_default_bus.eventbridge_rule_arns["incoming-s3-object-created"]]
         }
       ]
     }
-    secure_transport = {
-      sid     = "DenyUnsecureTransport"
-      effect  = "Deny"
-      actions = ["sqs:*"]
-
-      principals = [
-        {
-          type        = "AWS"
-          identifiers = ["*"]
-        }
-      ]
-
-      condition = [
-        {
-          test     = "Bool"
-          variable = "aws:SecureTransport"
-          values   = ["false"]
-        }
-      ]
-    }
-  }
-
-  create_dlq = true
-  dlq_name   = "${local.application_name}-incoming-s3-notifications-dlq"
-
-  kms_master_key_id             = module.kms_sqs.key_arn
-  message_retention_seconds     = 259200
-  visibility_timeout_seconds    = 720
-  receive_wait_time_seconds     = 20
-  dlq_message_retention_seconds = 1209600
-
-  redrive_policy = {
-    maxReceiveCount = 5
   }
 
   tags = local.tags
 }
 
-module "sqs_guard_duty_malware_protection_for_s3_events" {
+module "sqs_lambda_file_received_adapter_dlq" {
   source  = "terraform-aws-modules/sqs/aws"
   version = "5.2.2"
 
-  name            = "${local.application_name}-guard-duty-malware-protection-for-s3-events"
+  name            = "${local.application_name}-lambda-file-received-adapter-dlq"
   use_name_prefix = false
 
+  message_retention_seconds  = 1209600
+  visibility_timeout_seconds = 180
+  receive_wait_time_seconds  = 20
+
+  create_dlq = false
+
+  tags = local.tags
+}
+
+module "sqs_eventbridge_file_transfer_workflow_dlq" {
+  source  = "terraform-aws-modules/sqs/aws"
+  version = "5.2.2"
+
+  name            = "${local.application_name}-file-transfer-workflow-dlq"
+  use_name_prefix = false
+
+  message_retention_seconds  = 1209600
+  visibility_timeout_seconds = 180
+  receive_wait_time_seconds  = 20
+
+  create_dlq          = false
   create_queue_policy = true
   queue_policy_statements = {
     eventbridge = {
@@ -93,52 +79,17 @@ module "sqs_guard_duty_malware_protection_for_s3_events" {
 
       condition = [
         {
+          test     = "ArnEquals"
+          variable = "aws:SourceArn"
+          values   = [module.eventbridge_file_transfer_bus.eventbridge_rule_arns["file-transfer-workflow"]]
+        },
+        {
           test     = "StringEquals"
           variable = "aws:SourceAccount"
           values   = [data.aws_caller_identity.current.account_id]
-        },
-        {
-          test     = "ArnEquals"
-          variable = "aws:SourceArn"
-          values = [
-            for rule_key, rule in local.eventbridge_guard_duty_malware_protection_for_s3_rules : module.eventbridge_guard_duty_malware_protection_for_s3[rule_key].eventbridge_rule_arns[rule.name]
-          ]
         }
       ]
     }
-    secure_transport = {
-      sid     = "DenyUnsecureTransport"
-      effect  = "Deny"
-      actions = ["sqs:*"]
-
-      principals = [
-        {
-          type        = "AWS"
-          identifiers = ["*"]
-        }
-      ]
-
-      condition = [
-        {
-          test     = "Bool"
-          variable = "aws:SecureTransport"
-          values   = ["false"]
-        }
-      ]
-    }
-  }
-
-  create_dlq = true
-  dlq_name   = "${local.application_name}-guard-duty-malware-protection-for-s3-events-dlq"
-
-  kms_master_key_id             = module.kms_sqs.key_arn
-  message_retention_seconds     = 259200
-  visibility_timeout_seconds    = 720
-  receive_wait_time_seconds     = 20
-  dlq_message_retention_seconds = 1209600
-
-  redrive_policy = {
-    maxReceiveCount = 5
   }
 
   tags = local.tags

@@ -1,53 +1,35 @@
-module "eventbridge_incoming_s3" {
-  for_each = local.eventbridge_incoming_s3_rules
-
+module "eventbridge_default_bus" {
   source  = "terraform-aws-modules/eventbridge/aws"
   version = "4.3.0"
 
+  bus_name                   = "default"
   create_bus                 = false
-  create_role                = false
-  create_log_delivery_source = false
   create_log_delivery        = false
-
-  bus_name            = "default"
-  append_rule_postfix = false
+  create_log_delivery_source = false
+  append_rule_postfix        = false
+  create_role                = false
 
   rules = {
-    (each.value.name) = {
-      description   = each.value.description
-      event_pattern = jsonencode(each.value.event_pattern)
+    "incoming-s3-object-created" = {
+      description = "Transform incoming S3 Object Created notifications into FileReceived.v1 events"
+      event_pattern = jsonencode({
+        source        = ["aws.s3"]
+        "detail-type" = ["Object Created"]
+        detail = {
+          bucket = {
+            name = [module.s3_bucket["incoming"].s3_bucket_id]
+          }
+        }
+      })
     }
   }
 
   targets = {
-    (each.value.name) = [
+    "incoming-s3-object-created" = [
       {
-        name = "${each.value.name}-to-sqs"
-        arn  = module.sqs_incoming_s3_events.queue_arn
-        input_transformer = {
-          input_paths = {
-            detail_type        = "$.detail-type"
-            event_id           = "$.id"
-            event_source       = "$.source"
-            event_time         = "$.time"
-            object_key         = "$.detail.object.key"
-            object_size_bytes  = "$.detail.object.size"
-            source_bucket_name = "$.detail.bucket.name"
-            version_id         = "$.detail.object.version-id"
-          }
-          input_template = <<-EOF
-              {
-                "time": "<event_time>",
-                "detail-type": "<detail_type>",
-                "id": "<event_id>",
-                "source": "<event_source>",
-                "source_bucket_name": "<source_bucket_name>",
-                "object_key": "<object_key>",
-                "object_size_bytes": <object_size_bytes>,
-                "version_id": "<version_id>"
-              }
-              EOF
-        }
+        name            = "file-received-v1"
+        dead_letter_arn = module.sqs_eventbridge_default_dlq.queue_arn
+        arn             = module.lambda_file_received_adapter.lambda_function_arn
       }
     ]
   }
@@ -55,60 +37,66 @@ module "eventbridge_incoming_s3" {
   tags = local.tags
 }
 
-module "eventbridge_guard_duty_malware_protection_for_s3" {
-  for_each = local.eventbridge_guard_duty_malware_protection_for_s3_rules
-
+module "eventbridge_file_transfer_bus" {
   source  = "terraform-aws-modules/eventbridge/aws"
   version = "4.3.0"
 
-  create_bus                 = false
-  create_role                = false
-  create_log_delivery_source = false
-  create_log_delivery        = false
-
-  bus_name            = "default"
+  bus_name            = local.application_name
+  create_archives     = true
   append_rule_postfix = false
 
+  attach_sfn_policy = true
+  sfn_target_arns   = [module.step_function_file_transfer_workflow.state_machine_arn]
+
   rules = {
-    (each.value.name) = {
-      description   = each.value.description
-      event_pattern = jsonencode(each.value.event_pattern)
+    "file-transfer-workflow" = {
+      description = "Start the file transfer workflow for canonical FileReceived.v1 events"
+      event_pattern = jsonencode({
+        account       = [data.aws_caller_identity.current.account_id]
+        source        = ["uk.gov.justice.service.managed-file-transfer"]
+        "detail-type" = ["FileReceived.v1"]
+        detail = {
+          data = {
+            object = {
+              bucket = [module.s3_bucket["incoming"].s3_bucket_id]
+            }
+          }
+        }
+      })
     }
   }
 
   targets = {
-    (each.value.name) = [
+    "file-transfer-workflow" = [
       {
-        name = "${each.value.name}-to-sqs"
-        arn  = module.sqs_guard_duty_malware_protection_for_s3_events.queue_arn
-        input_transformer = {
-          input_paths = {
-            detail_type        = "$.detail-type"
-            event_id           = "$.id"
-            event_source       = "$.source"
-            event_time         = "$.time"
-            object_key         = "$.detail.s3ObjectDetails.objectKey"
-            scan_result_status = "$.detail.scanResultDetails.scanResultStatus"
-            source_bucket_name = "$.detail.s3ObjectDetails.bucketName"
-            version_id         = "$.detail.s3ObjectDetails.versionId"
-          }
-          input_template = <<-EOF
-            {
-              "time": "<event_time>",
-              "detail-type": "<detail_type>",
-              "id": "<event_id>",
-              "source": "<event_source>",
-              "source_bucket_name": "<source_bucket_name>",
-              "destination_bucket_key": "${each.value.destination_bucket_key}",
-              "delete_source": ${jsonencode(each.value.delete_source)},
-              "object_key": "<object_key>",
-              "version_id": "<version_id>",
-              "scan_result_status": "<scan_result_status>"
-            }
-            EOF
+        name            = "file-transfer-workflow"
+        arn             = module.step_function_file_transfer_workflow.state_machine_arn
+        attach_role_arn = true
+        dead_letter_arn = module.sqs_eventbridge_file_transfer_workflow_dlq.queue_arn
+        retry_policy = {
+          maximum_event_age_in_seconds = 86400
+          maximum_retry_attempts       = 185
         }
       }
     ]
+  }
+
+  archives = {
+    "${local.application_name}-archive" = {
+      description    = "Archive of all file transfer events"
+      retention_days = local.cloudwatch_retention_days
+    }
+  }
+
+  log_config = {
+    include_detail = "FULL"
+    level          = "INFO"
+  }
+
+  log_delivery = {
+    cloudwatch_logs = {
+      destination_arn = module.cloudwatch_eventbridge.cloudwatch_log_group_arn
+    }
   }
 
   tags = local.tags

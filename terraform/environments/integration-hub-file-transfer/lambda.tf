@@ -1,226 +1,65 @@
-module "lambda_incoming_to_processing" {
+module "lambda_file_received_adapter" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.8.0"
 
-  function_name                  = "${local.application_name}-incoming-to-processing"
-  architectures                  = ["arm64"]
-  description                    = "Moves uploaded objects from the incoming bucket to the processing bucket"
-  handler                        = "lambda_function.lambda_handler"
-  memory_size                    = 256
-  reserved_concurrent_executions = 10
-  runtime                        = "python3.12"
-  source_path                    = "lambda/move-s3-object"
-  timeout                        = 120
-  tracing_mode                   = "Active"
-  trigger_on_package_timestamp   = false
-
-  event_source_mapping = {
-    sqs = {
-      event_source_arn = module.sqs_incoming_s3_events.queue_arn
-      batch_size       = 1
-      scaling_config = {
-        maximum_concurrency = 10
-      }
-    }
-  }
+  architectures                     = ["arm64"]
+  attach_dead_letter_policy         = true
+  attach_tracing_policy             = true
+  cloudwatch_logs_kms_key_id        = module.kms_cloudwatch_logs.key_arn
+  cloudwatch_logs_retention_in_days = local.cloudwatch_retention_days
+  create_async_event_config         = true
+  dead_letter_target_arn            = module.sqs_lambda_file_received_adapter_dlq.queue_arn
+  description                       = "Transforms incoming S3 Object Created notifications into FileReceived.v1 events"
+  function_name                     = "${local.application_name}-file-received-adapter"
+  handler                           = "lambda_function.lambda_handler"
+  maximum_event_age_in_seconds      = 21600
+  maximum_retry_attempts            = 2
+  memory_size                       = 128
+  reserved_concurrent_executions    = 10
+  runtime                           = "python3.12"
+  source_path                       = "lambda/file-received-adapter"
+  timeout                           = 30
+  tracing_mode                      = "Active"
+  trigger_on_package_timestamp      = false
 
   environment_variables = {
-    DESTINATION_BUCKET_NAME = module.s3_bucket["processing"].s3_bucket_id
-    IDEMPOTENCY_TABLE       = module.dynamodb_idempotency.dynamodb_table_id
+    EVENT_BUS_ARN              = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
+    IDEMPOTENCY_EXPIRY_SECONDS = tostring(local.cloudwatch_retention_days * 24 * 60 * 60)
+    IDEMPOTENCY_TABLE          = module.dynamodb_idempotency.dynamodb_table_id
+    INCOMING_BUCKET_NAME       = module.s3_bucket["incoming"].s3_bucket_id
+    POWERTOOLS_LOG_LEVEL       = "INFO"
+    POWERTOOLS_SERVICE_NAME    = "integration-hub-file-transfer-file-received-adapter"
   }
 
   attach_policy_statements = true
   policy_statements = {
-    source_bucket_get_delete = {
-      effect = "Allow"
-      actions = [
-        "s3:GetObject",
-        "s3:GetObjectVersion",
-        "s3:GetObjectTagging",
-        "s3:GetObjectVersionTagging",
-        "s3:DeleteObject",
-        "s3:DeleteObjectVersion",
-      ]
-      resources = [
-        "${module.s3_bucket["incoming"].s3_bucket_arn}/*",
-      ]
+    publish_file_received_events = {
+      effect    = "Allow"
+      actions   = ["events:PutEvents"]
+      resources = [module.eventbridge_file_transfer_bus.eventbridge_bus_arn]
     }
-    destination_bucket_write = {
+    use_idempotency_table = {
       effect = "Allow"
       actions = [
-        "s3:PutObject",
-        "s3:PutObjectTagging",
-        "s3:PutObjectVersionTagging",
-      ]
-      resources = [
-        "${module.s3_bucket["processing"].s3_bucket_arn}/*",
-      ]
-    }
-    bucket_kms_access = {
-      effect = "Allow"
-      actions = [
-        "kms:Decrypt",
-        "kms:DescribeKey",
-        "kms:Encrypt",
-        "kms:GenerateDataKey*",
-        "kms:ReEncrypt*",
-      ]
-      resources = [
-        module.kms_s3_bucket["incoming"].key_arn,
-        module.kms_s3_bucket["processing"].key_arn,
-      ]
-    }
-    idempotency_table_access = {
-      effect = "Allow"
-      actions = [
+        "dynamodb:DeleteItem",
         "dynamodb:GetItem",
         "dynamodb:PutItem",
         "dynamodb:UpdateItem",
-        "dynamodb:DeleteItem",
       ]
-      resources = [
-        module.dynamodb_idempotency.dynamodb_table_arn,
-      ]
-    }
-    sqs_kms_access = {
-      effect = "Allow"
-      actions = [
-        "kms:Decrypt",
-        "kms:DescribeKey",
-      ]
-      resources = [
-        module.kms_sqs.key_arn,
-      ]
+      resources = [module.dynamodb_idempotency.dynamodb_table_arn]
     }
   }
 
-  attach_policies       = true
-  attach_tracing_policy = true
-  number_of_policies    = 1
-  policies = [
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole",
-  ]
 
-  cloudwatch_logs_kms_key_id        = module.kms_cloudwatch_logs.key_arn
-  cloudwatch_logs_retention_in_days = local.lambda_cloudwatch_logs_retention_in_days["${local.environment}"]
 
   tags = local.tags
 }
 
-module "lambda_processing_to_post_scan" {
-  source  = "terraform-aws-modules/lambda/aws"
-  version = "8.8.0"
-
-  function_name                  = "${local.application_name}-processing-to-post-scan"
-  architectures                  = ["arm64"]
-  description                    = "Moves scanned objects from the processing bucket to the relevant post-scan destination bucket"
-  handler                        = "lambda_function.lambda_handler"
-  memory_size                    = 256
-  reserved_concurrent_executions = 10
-  runtime                        = "python3.12"
-  source_path                    = "lambda/move-guard-duty-scanned-object"
-  timeout                        = 120
-  tracing_mode                   = "Active"
-  trigger_on_package_timestamp   = false
-
-  event_source_mapping = {
-    sqs = {
-      event_source_arn = module.sqs_guard_duty_malware_protection_for_s3_events.queue_arn
-      batch_size       = 1
-      scaling_config = {
-        maximum_concurrency = 10
-      }
-    }
-  }
-
-  environment_variables = {
-    BUCKET_NAMES_BY_KEY = jsonencode({
-      processing    = module.s3_bucket["processing"].s3_bucket_id
-      clean         = module.s3_bucket["clean"].s3_bucket_id
-      quarantine    = module.s3_bucket["quarantine"].s3_bucket_id
-      investigation = module.s3_bucket["investigation"].s3_bucket_id
-    })
-    IDEMPOTENCY_TABLE = module.dynamodb_idempotency.dynamodb_table_id
-  }
-
-  attach_policy_statements = true
-  policy_statements = {
-    source_bucket_read_delete = {
-      effect = "Allow"
-      actions = [
-        "s3:GetObject",
-        "s3:GetObjectVersion",
-        "s3:GetObjectTagging",
-        "s3:GetObjectVersionTagging",
-        "s3:DeleteObject",
-        "s3:DeleteObjectVersion",
-      ]
-      resources = [
-        "${module.s3_bucket["processing"].s3_bucket_arn}/*",
-      ]
-    }
-    destination_bucket_write = {
-      effect = "Allow"
-      actions = [
-        "s3:PutObject",
-        "s3:PutObjectTagging",
-        "s3:PutObjectVersionTagging",
-      ]
-      resources = [
-        "${module.s3_bucket["clean"].s3_bucket_arn}/*",
-        "${module.s3_bucket["quarantine"].s3_bucket_arn}/*",
-        "${module.s3_bucket["investigation"].s3_bucket_arn}/*",
-      ]
-    }
-    bucket_kms_access = {
-      effect = "Allow"
-      actions = [
-        "kms:Decrypt",
-        "kms:DescribeKey",
-        "kms:Encrypt",
-        "kms:GenerateDataKey*",
-        "kms:ReEncrypt*",
-      ]
-      resources = [
-        module.kms_s3_bucket["clean"].key_arn,
-        module.kms_s3_bucket["investigation"].key_arn,
-        module.kms_s3_bucket["processing"].key_arn,
-        module.kms_s3_bucket["quarantine"].key_arn,
-      ]
-    }
-    idempotency_table_access = {
-      effect = "Allow"
-      actions = [
-        "dynamodb:GetItem",
-        "dynamodb:PutItem",
-        "dynamodb:UpdateItem",
-        "dynamodb:DeleteItem",
-      ]
-      resources = [
-        module.dynamodb_idempotency.dynamodb_table_arn,
-      ]
-    }
-    sqs_kms_access = {
-      effect = "Allow"
-      actions = [
-        "kms:Decrypt",
-        "kms:DescribeKey",
-      ]
-      resources = [
-        module.kms_sqs.key_arn,
-      ]
-    }
-  }
-
-  attach_policies       = true
-  attach_tracing_policy = true
-  number_of_policies    = 1
-  policies = [
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole",
-  ]
-
-  cloudwatch_logs_kms_key_id        = module.kms_cloudwatch_logs.key_arn
-  cloudwatch_logs_retention_in_days = local.lambda_cloudwatch_logs_retention_in_days["${local.environment}"]
-
-  tags = local.tags
+# Module-managed allowed_triggers would create a cycle between the Lambda and EventBridge target.
+resource "aws_lambda_permission" "eventbridge_file_received_adapter" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = module.lambda_file_received_adapter.lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = module.eventbridge_default_bus.eventbridge_rule_arns["incoming-s3-object-created"]
 }

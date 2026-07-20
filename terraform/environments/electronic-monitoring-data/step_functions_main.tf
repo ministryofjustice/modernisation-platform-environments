@@ -66,8 +66,8 @@ module "ears_sars_step_function" {
   iam_policies = tomap({ "ears_sars_step_function_policy" = aws_iam_policy.ears_sars_step_function_policy[0] })
   variable_dictionary = tomap(
     {
-      "ears_sars_request" = module.ears_sars_request[0].lambda_function_name,
-      "write_to_sharepoint" =  module.write_to_sharepoint[0].lambda_function_name,
+      "ears_sars_request"   = module.ears_sars_request[0].lambda_function_name,
+      "write_to_sharepoint" = module.write_to_sharepoint[0].lambda_function_name,
     }
   )
   type = "STANDARD"
@@ -120,6 +120,23 @@ module "iceberg_table_maintenance_step_function" {
       "security_groups_json"   = jsonencode([aws_security_group.ecs_generic.id])
       "subnets_json"           = jsonencode(data.aws_subnets.shared-private.ids)
       "athena_output_bucket"   = "s3://${module.s3-athena-bucket.bucket.id}/output/"
+    }
+  )
+  type = "STANDARD"
+}
+
+# ------------------------------------------
+# Insert into emdi position step function
+# ------------------------------------------
+
+
+module "insert_into_emdi_position" {
+  source       = "./modules/step_function"
+  name         = "insert_into_emdi_position"
+  iam_policies = tomap({ "insert_into_emdi_position_step_function_policy" = aws_iam_policy.insert_into_emdi_position })
+  variable_dictionary = tomap(
+    {
+      "merge_emdi_position"    = module.merge_emdi_position[0].lambda_function_arn
     }
   )
   type = "STANDARD"

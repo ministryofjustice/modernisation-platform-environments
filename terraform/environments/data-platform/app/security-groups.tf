@@ -1,5 +1,5 @@
 module "app_rds_security_group" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-security-group.git?ref=v6.0.0" # v6.0.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-security-group.git?ref=58d8e895915f5573767081142d063b7caf7a2b47" # v6.0.0
 
   name                   = "${local.component_name}-postgresql-rds"
   description            = "Security group for app RDS PostgreSQL"

@@ -205,6 +205,36 @@ data "aws_iam_policy_document" "ftp_user_policy" {
   }
 }
 
+data "aws_iam_policy_document" "ftp_bucket_secure_transport" {
+  for_each = local.build_s3 ? toset(local.ftp_directions) : toset([])
+
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      module.s3_bucket[each.key].bucket.arn,
+      "${module.s3_bucket[each.key].bucket.arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "ftp_bucket_secure_transport" {
+  for_each = local.build_s3 ? toset(local.ftp_directions) : toset([])
+
+  bucket = module.s3_bucket[each.key].bucket.id
+  policy = data.aws_iam_policy_document.ftp_bucket_secure_transport[each.key].json
+}
+
 
 
 
