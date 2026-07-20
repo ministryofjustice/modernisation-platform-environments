@@ -131,7 +131,7 @@ module "iceberg_table_maintenance_step_function" {
 
 module "insert_into_mdss_staged_position" {
   source       = "./modules/merge_into_reconciler"
-  function_to_iterate = "merge_function_name" = module.merge_mdss_staged_position[0]
+  function_to_iterate = module.merge_mdss_staged_position[0]
 }
 
 # ------------------------------------------
@@ -140,7 +140,7 @@ module "insert_into_mdss_staged_position" {
 
 module "insert_into_emdi_position" {
   source       = "./modules/merge_into_reconciler"
-  function_to_iterate = "merge_function_name" = module.merge_emdi_position[0]
+  function_to_iterate = module.merge_emdi_position[0]
 }
 
 # ------------------------------------------------------------------------------
