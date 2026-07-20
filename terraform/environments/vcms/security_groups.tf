@@ -12,6 +12,13 @@ resource "aws_security_group" "ecs_service" {
   description = "Security group for ECS service"
   vpc_id      = local.account_info.vpc_id
 
+  ingress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg.id]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -47,16 +54,6 @@ resource "aws_security_group" "alb_sg" {
 
   tags = local.tags
 }
-
-# resource "aws_security_group_rule" "ecs_from_alb" {
-#   type                     = "ingress"
-#   from_port                = 80
-#   to_port                  = 80
-#   protocol                 = "tcp"
-
-#   security_group_id        = aws_security_group.ecs_service.id
-#   source_security_group_id = aws_security_group.alb_sg.id
-# }
 
 resource "aws_security_group_rule" "alb_from_ecs" {
   type                     = "ingress"
