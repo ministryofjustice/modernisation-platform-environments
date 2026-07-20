@@ -83,8 +83,8 @@ resource "aws_secretsmanager_secret_version" "ccms_soa_secrets_version" {
   # }
 }
 
-data "aws_secretsmanager_secret" "soa_secrets" {
-  name = "soa-secrets"
+data "aws_secretsmanager_secret_version" "soa_secrets" {
+  secret_id = aws_secretsmanager_secret.soa_secrets.id
 }
 
 # Slack Channel ID for Alerts
@@ -93,9 +93,9 @@ resource "aws_secretsmanager_secret" "slack_channel_id" {
   description = "Slack Channel ID for GuardDuty Alerts"
 }
 
-# data "aws_secretsmanager_secret_version" "slack_channel_id" {
-#   secret_id = aws_secretsmanager_secret.slack_channel_id.id
-# }
+data "aws_secretsmanager_secret_version" "slack_channel_id" {
+  secret_id = aws_secretsmanager_secret.slack_channel_id.id
+}
 
 # data "aws_secretsmanager_secret" "oem_agent_credentials" {
 #   name = "ccms/soa/oem_agent_credentials"
