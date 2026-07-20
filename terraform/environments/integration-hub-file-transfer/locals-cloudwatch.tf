@@ -282,7 +282,7 @@ locals {
       threshold          = 0
     }
     "dynamodb-idempotency-read-throttles" = {
-      alarm_description   = "The idempotency DynamoDB table has throttled one or more read requests"
+      alarm_description   = "The adapter idempotency DynamoDB table has throttled one or more read requests"
       comparison_operator = "GreaterThanThreshold"
       dimensions = {
         TableName = module.dynamodb_adapter_idempotency.dynamodb_table_id
@@ -295,7 +295,7 @@ locals {
       threshold          = 0
     }
     "dynamodb-idempotency-write-throttles" = {
-      alarm_description   = "The idempotency DynamoDB table has throttled one or more write requests"
+      alarm_description   = "The adapter idempotency DynamoDB table has throttled one or more write requests"
       comparison_operator = "GreaterThanThreshold"
       dimensions = {
         TableName = module.dynamodb_adapter_idempotency.dynamodb_table_id

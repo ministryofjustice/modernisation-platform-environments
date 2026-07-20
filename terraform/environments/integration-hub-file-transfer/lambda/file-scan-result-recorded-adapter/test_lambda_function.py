@@ -137,6 +137,7 @@ class FileScanResultRecordedAdapterTest(unittest.TestCase):
 
         entry = self.events_client.put_events.call_args.kwargs["Entries"][0]
         detail = json.loads(entry["Detail"])
+        self.assertEqual(self.dynamodb_client.query.call_args.kwargs["Limit"], 2)
         self.assertEqual(entry["DetailType"], "FileScanResultRecorded.v1")
         self.assertEqual(
             detail["metadata"]["idempotencyKey"],

@@ -105,6 +105,7 @@ def _workflow_record(processing_object_id):
         ExpressionAttributeValues={
             ":processing_object_id": {"S": processing_object_id}
         },
+        Limit=2,
     )
     items = response.get("Items", [])
     if len(items) != 1:
