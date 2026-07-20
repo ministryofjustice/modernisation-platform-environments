@@ -326,7 +326,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_alarm" {
     Environment = var.env_name
   }
 
-  alarm_description = "Triggered when any DMS replication task is not running"
+  alarm_description = "Triggered when any ${var.env_name} DMS replication task is not running"
   actions_enabled   = true
   alarm_actions     = [aws_sns_topic.dms_alerts_topic.arn]
   ok_actions        = [aws_sns_topic.dms_alerts_topic.arn]
