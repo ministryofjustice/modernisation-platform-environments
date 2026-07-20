@@ -39,15 +39,15 @@ module "dynamodb_file_transfer_workflow_idempotency" {
       type = "S"
     },
     {
-      name = "processing_object_id"
+      name = "processing_object_lookup_key"
       type = "S"
     }
   ]
 
   global_secondary_indexes = [
     {
-      name            = "processing-object-id-index"
-      hash_key        = "processing_object_id"
+      name            = "processing-object-lookup-key-index"
+      hash_key        = "processing_object_lookup_key"
       projection_type = "ALL"
     }
   ]

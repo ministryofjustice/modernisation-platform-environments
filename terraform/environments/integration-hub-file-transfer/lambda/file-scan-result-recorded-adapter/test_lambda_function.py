@@ -78,7 +78,7 @@ class FileScanResultRecordedAdapterTest(unittest.TestCase):
                 "IDEMPOTENCY_TABLE": "adapter-idempotency",
                 "MALWARE_PROTECTION_PLAN_ARN": "arn:aws:guardduty:eu-west-2:123456789012:malware-protection-plan/example",
                 "PROCESSING_BUCKET_NAME": PROCESSING_BUCKET,
-                "PROCESSING_OBJECT_INDEX_NAME": "processing-object-id-index",
+                "PROCESSING_OBJECT_LOOKUP_KEY_INDEX_NAME": "processing-object-lookup-key-index",
                 "WORKFLOW_IDEMPOTENCY_TABLE": "workflow-idempotency",
             }
         )

@@ -80,16 +80,16 @@ module "lambda_file_scan_result_recorded_adapter" {
   trigger_on_package_timestamp      = false
 
   environment_variables = {
-    AWS_ACCOUNT_ID               = data.aws_caller_identity.current.account_id
-    EVENT_BUS_ARN                = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
-    IDEMPOTENCY_EXPIRY_SECONDS   = tostring(local.cloudwatch_retention_days * 24 * 60 * 60)
-    IDEMPOTENCY_TABLE            = module.dynamodb_adapter_idempotency.dynamodb_table_id
-    MALWARE_PROTECTION_PLAN_ARN  = aws_guardduty_malware_protection_plan.this.arn
-    PROCESSING_BUCKET_NAME       = module.s3_bucket["processing"].s3_bucket_id
-    PROCESSING_OBJECT_INDEX_NAME = "processing-object-id-index"
-    POWERTOOLS_LOG_LEVEL         = "INFO"
-    POWERTOOLS_SERVICE_NAME      = "integration-hub-file-transfer-file-scan-result-recorded-adapter"
-    WORKFLOW_IDEMPOTENCY_TABLE   = module.dynamodb_file_transfer_workflow_idempotency.dynamodb_table_id
+    AWS_ACCOUNT_ID                          = data.aws_caller_identity.current.account_id
+    EVENT_BUS_ARN                           = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
+    IDEMPOTENCY_EXPIRY_SECONDS              = tostring(local.cloudwatch_retention_days * 24 * 60 * 60)
+    IDEMPOTENCY_TABLE                       = module.dynamodb_adapter_idempotency.dynamodb_table_id
+    MALWARE_PROTECTION_PLAN_ARN             = aws_guardduty_malware_protection_plan.this.arn
+    PROCESSING_BUCKET_NAME                  = module.s3_bucket["processing"].s3_bucket_id
+    PROCESSING_OBJECT_LOOKUP_KEY_INDEX_NAME = "processing-object-lookup-key-index"
+    POWERTOOLS_LOG_LEVEL                    = "INFO"
+    POWERTOOLS_SERVICE_NAME                 = "integration-hub-file-transfer-file-scan-result-recorded-adapter"
+    WORKFLOW_IDEMPOTENCY_TABLE              = module.dynamodb_file_transfer_workflow_idempotency.dynamodb_table_id
   }
 
   attach_policy_statements = true
@@ -112,7 +112,7 @@ module "lambda_file_scan_result_recorded_adapter" {
     lookup_workflow_record = {
       effect    = "Allow"
       actions   = ["dynamodb:Query"]
-      resources = ["${module.dynamodb_file_transfer_workflow_idempotency.dynamodb_table_arn}/index/processing-object-id-index"]
+      resources = ["${module.dynamodb_file_transfer_workflow_idempotency.dynamodb_table_arn}/index/processing-object-lookup-key-index"]
     }
   }
 

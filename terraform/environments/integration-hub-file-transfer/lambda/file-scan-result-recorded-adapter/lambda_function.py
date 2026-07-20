@@ -97,27 +97,29 @@ def _attribute(item, name, attribute_type="S"):
     return _required(value, f"workflow record {name}")
 
 
-def _workflow_record(processing_object_id):
+def _workflow_record(processing_object_lookup_key):
     response = dynamodb.query(
         TableName=os.environ["WORKFLOW_IDEMPOTENCY_TABLE"],
-        IndexName=os.environ["PROCESSING_OBJECT_INDEX_NAME"],
-        KeyConditionExpression="processing_object_id = :processing_object_id",
+        IndexName=os.environ["PROCESSING_OBJECT_LOOKUP_KEY_INDEX_NAME"],
+        KeyConditionExpression=(
+            "processing_object_lookup_key = :processing_object_lookup_key"
+        ),
         ExpressionAttributeValues={
-            ":processing_object_id": {"S": processing_object_id}
+            ":processing_object_lookup_key": {"S": processing_object_lookup_key}
         },
         Limit=2,
     )
     items = response.get("Items", [])
     if len(items) != 1:
         raise RuntimeError(
-            f"Expected one workflow record for processing object {processing_object_id}, found {len(items)}"
+            f"Expected one workflow record for processing object {processing_object_lookup_key}, found {len(items)}"
         )
 
     item = items[0]
     status = _attribute(item, "status")
     if status not in _COMPLETE_WORKFLOW_STATUSES:
         raise RuntimeError(
-            f"Workflow record for processing object {processing_object_id} is not published"
+            f"Workflow record for processing object {processing_object_lookup_key} is not published"
         )
 
     return {
@@ -199,7 +201,7 @@ def _publish(operation):
         extra={
             "destination_event_id": destination_event_id,
             "source_event_id": operation["sourceEventId"],
-            "processing_object_id": (
+            "processing_object_lookup_key": (
                 f"{operation['object']['bucket']}:{operation['object']['key']}:"
                 f"{operation['object']['versionId']}"
             ),
@@ -211,6 +213,8 @@ def _publish(operation):
 @logger.inject_lambda_context(clear_state=True, log_event=False)
 def lambda_handler(event, _context):
     scan = _validate_event(event)
-    processing_object_id = f"{scan['bucket']}:{scan['key']}:{scan['versionId']}"
-    workflow = _workflow_record(processing_object_id)
+    processing_object_lookup_key = (
+        f"{scan['bucket']}:{scan['key']}:{scan['versionId']}"
+    )
+    workflow = _workflow_record(processing_object_lookup_key)
     return _publish(_build_operation(scan, workflow))
