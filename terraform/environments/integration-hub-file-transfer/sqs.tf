@@ -27,7 +27,10 @@ module "sqs_eventbridge_default_dlq" {
         {
           test     = "ArnEquals"
           variable = "aws:SourceArn"
-          values   = [module.eventbridge_default_bus.eventbridge_rule_arns["incoming-s3-object-created"]]
+          values = [
+            module.eventbridge_default_bus.eventbridge_rule_arns["incoming-s3-object-created"],
+            module.eventbridge_default_bus.eventbridge_rule_arns["guardduty-malware-scan-result"],
+          ]
         }
       ]
     }
@@ -41,6 +44,22 @@ module "sqs_lambda_file_received_adapter_dlq" {
   version = "5.2.2"
 
   name            = "${local.application_name}-lambda-file-received-adapter-dlq"
+  use_name_prefix = false
+
+  message_retention_seconds  = 1209600
+  visibility_timeout_seconds = 180
+  receive_wait_time_seconds  = 20
+
+  create_dlq = false
+
+  tags = local.tags
+}
+
+module "sqs_lambda_file_scan_result_recorded_adapter_dlq" {
+  source  = "terraform-aws-modules/sqs/aws"
+  version = "5.2.2"
+
+  name            = "${local.application_name}-lambda-file-scan-result-recorded-adapter-dlq"
   use_name_prefix = false
 
   message_retention_seconds  = 1209600

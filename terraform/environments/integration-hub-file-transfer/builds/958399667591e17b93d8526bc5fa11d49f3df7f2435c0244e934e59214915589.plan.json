@@ -1,0 +1,1 @@
+{"filename": "builds/958399667591e17b93d8526bc5fa11d49f3df7f2435c0244e934e59214915589.zip", "runtime": "python3.12", "artifacts_dir": "builds", "build_plan": [[["pip", "python3.12", "lambda/file-scan-result-recorded-adapter/requirements.txt", null, null], ["zip", "lambda/file-scan-result-recorded-adapter", null]]], "quiet": "true"}

@@ -67,6 +67,7 @@
           "incoming_bucket": { "S": "{% $incomingObjectBucket %}" },
           "incoming_key": { "S": "{% $incomingObjectKey %}" },
           "incoming_version_id": { "S": "{% $incomingObjectVersionId %}" },
+          "incoming_size_bytes": { "N": "{% $string($incomingObjectSizeBytes) %}" },
           "created_at": { "S": "{% $states.context.Execution.StartTime %}" },
           "updated_at": { "S": "{% $states.context.Execution.StartTime %}" },
           "expiration": { "N": "{% $string($nowEpoch + $recordRetentionSeconds) %}" },
@@ -683,7 +684,7 @@
         "Key": {
           "id": { "S": "{% $operationId %}" }
         },
-        "UpdateExpression": "SET #status = :status, copy_method = :copy_method, processing_bucket = :processing_bucket, processing_key = :processing_key, processing_version_id = :processing_version_id, updated_at = :updated, in_progress_expiration = :lease",
+        "UpdateExpression": "SET #status = :status, copy_method = :copy_method, processing_bucket = :processing_bucket, processing_key = :processing_key, processing_version_id = :processing_version_id, processing_object_id = :processing_object_id, updated_at = :updated, in_progress_expiration = :lease",
         "ConditionExpression": "execution_arn = :execution AND #status IN (:inprogress, :parts, :copied)",
         "ExpressionAttributeNames": {
           "#status": "status"
@@ -698,6 +699,7 @@
           ":processing_bucket": { "S": "{% $processingBucket %}" },
           ":processing_key": { "S": "{% $incomingObjectKey %}" },
           ":processing_version_id": { "S": "{% $processingObjectVersionId %}" },
+          ":processing_object_id": { "S": "{% $processingBucket & ':' & $incomingObjectKey & ':' & $processingObjectVersionId %}" },
           ":updated": { "S": "{% $now() %}" },
           ":lease": { "N": "{% $string($floor($toMillis($now()) / 1000) + $leaseSeconds) %}" }
         }
