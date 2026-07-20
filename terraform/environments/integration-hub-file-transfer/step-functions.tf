@@ -7,6 +7,7 @@ module "step_function_file_transfer_workflow" {
 
   definition = templatefile("${path.module}/step-functions/file-transfer-workflow.asl.json", {
     account_id                 = jsonencode(data.aws_caller_identity.current.account_id)
+    event_bus_arn              = jsonencode(local.file_transfer_event_bus_arn)
     processing_kms_key_arn     = jsonencode(module.kms_s3_bucket["processing"].key_arn)
     idempotency_table_name     = jsonencode(module.dynamodb_file_transfer_workflow_idempotency.dynamodb_table_id)
     incoming_bucket_name       = jsonencode(module.s3_bucket["incoming"].s3_bucket_id)
@@ -84,6 +85,11 @@ module "step_function_file_transfer_workflow" {
         "kms:GenerateDataKey*",
       ]
       resources = [module.kms_s3_bucket["processing"].key_arn]
+    }
+    publish_file_staged_events = {
+      effect    = "Allow"
+      actions   = ["events:PutEvents"]
+      resources = [local.file_transfer_event_bus_arn]
     }
   }
 
