@@ -69,7 +69,7 @@ resource "aws_iam_role_policy" "ecs_execution_secret_access" {
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"
         ]
-        Resource = data.aws_secretsmanager_secret.pull_soa_password.arn
+        Resource = data.aws_secretsmanager_secret.soa_password.arn
       }
     ]
   })
