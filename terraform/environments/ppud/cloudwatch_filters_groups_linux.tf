@@ -44,3 +44,37 @@ resource "aws_cloudwatch_log_metric_filter" "Linux-ServiceStatus-NotRunning" {
     }
   }
 }
+
+# Network Connectivity Metric Filters
+
+resource "aws_cloudwatch_log_metric_filter" "CJSM-Port25-True" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "CJSM-Port25-True"
+  log_group_name = aws_cloudwatch_log_group.Network-Connectivity-Logs[count.index].name
+  pattern        = "[date, time, Instance, port25, status=True]"
+  metric_transformation {
+    name      = "PortStatus"
+    namespace = "Port"
+    value     = "1"
+    dimensions = {
+      Instance = "$Instance"
+      Port     = "$Port"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "CJSM-Port25-False" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "CJSM-Port25-False"
+  log_group_name = aws_cloudwatch_log_group.Network-Connectivity-Logs[count.index].name
+  pattern        = "[date, time, Instance, port25, status=False]"
+  metric_transformation {
+    name      = "PortStatus"
+    namespace = "Port"
+    value     = "0"
+    dimensions = {
+      Instance = "$Instance"
+      Port     = "$Port"
+    }
+  }
+}

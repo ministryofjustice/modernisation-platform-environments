@@ -1049,6 +1049,7 @@ resource "aws_instance" "s265903rgsl401-cjsm" {
     is-production  = true
     patch_group    = "prod_lin_patch"
     docker_service = "true"
+    port25_cjsm    = "true"
   }
 }
 
@@ -1204,6 +1205,7 @@ resource "aws_instance" "cjsm-mail-relay" {
     is-production  = true
     patch_group    = "prod_lin_patch"
     docker_service = "true"
+    port25_cjsm    = "true"
   }
 }
 

@@ -52,6 +52,18 @@ resource "aws_kms_key_policy" "shared_kms_key_policy" {
           "kms:Encrypt"
         ],
         "Resource" : "*"
+      },
+      {
+        Sid    = "AllowS3ReplicationRole",
+        Effect = "Allow",
+        Principal = {
+          "AWS" : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/property-datahub-staging-replication"
+        },
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey"
+        ],
+        "Resource" : "*"
       }
     ]
   })

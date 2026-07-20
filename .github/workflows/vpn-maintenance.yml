@@ -14,7 +14,7 @@ permissions:
 
 jobs:
     fetch-secrets:
-            uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@3f4b0b80deea0ac74630e80189e1edeee3378793 # v6.1.5
+            uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@d682f41c6f6b8c6bc0e06ae38ef41a464aa8a204 # v6.1.6
             secrets:
                 MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
                 PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -35,7 +35,7 @@ jobs:
                 uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
               - name: Decrypt Secrets
-                uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@3f4b0b80deea0ac74630e80189e1edeee3378793 # v6.1.5
+                uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@d682f41c6f6b8c6bc0e06ae38ef41a464aa8a204 # v6.1.6
                 with:
                     environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
                     slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }} 
@@ -64,7 +64,7 @@ jobs:
                     echo vpn_environment=$VPN_ENVIRONMENT >> $GITHUB_OUTPUT
                     echo "VPN Environment is $VPN_ENVIRONMENT"
               - name: Slack failure notification
-                uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
+                uses: slackapi/slack-github-action@0d95c9a7becc1e6e297d76df9bc735c44f4cbcbc # v3.0.5
                 with:
                   webhook-type: incoming-webhook
                   payload: |
@@ -88,7 +88,7 @@ jobs:
                 uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
               - name: Decrypt Secrets
-                uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@3f4b0b80deea0ac74630e80189e1edeee3378793 # v6.1.5
+                uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@d682f41c6f6b8c6bc0e06ae38ef41a464aa8a204 # v6.1.6
                 with:
                     environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
                     slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }}
@@ -112,7 +112,7 @@ jobs:
                     ./scripts/replace-vpn-tunnel.sh "${{ env.VPN_ID }}"
               
               - name: Slack failure notification
-                uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
+                uses: slackapi/slack-github-action@0d95c9a7becc1e6e297d76df9bc735c44f4cbcbc # v3.0.5
                 with:
                   webhook-type: incoming-webhook
                   payload: |
