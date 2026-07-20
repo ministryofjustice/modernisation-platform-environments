@@ -1,5 +1,5 @@
 module "merge_into_this" {
-  source       = "./step_function"
+  source       = "../step_function"
   name         = "merge_into_${local.name}"
   iam_policies = tomap({ "merge_into_${local.name}_step_function_policy" = aws_iam_policy.merge_into_this })
   variable_dictionary = tomap(
