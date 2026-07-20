@@ -21,11 +21,11 @@
         }
       ]
     },
-    "description": "",
+    "description": "Kyverno policy-management insights for a single Data Platform account, using its Amazon Managed Prometheus workspace. Choose an Account and Cluster at the top. Based on the community Kyverno dashboard; see https://kyverno.io/docs/monitoring/ for metric details.",
     "editable": true,
     "fiscalYearStartMonth": 0,
     "graphTooltip": 0,
-    "id": 472,
+    "id": null,
     "links": [],
     "panels": [
       {
@@ -3377,20 +3377,24 @@
         "type": "stat"
       }
     ],
-    "refresh": false,
+    "refresh": "5m",
     "schemaVersion": 39,
-    "tags": [],
+    "tags": [
+      "data-platform",
+      "kyverno",
+      "prometheus"
+    ],
     "templating": {
       "list": [
         {
-          "current": null,
+          "current": {},
           "hide": 0,
           "includeAll": false,
-          "label": "datasource",
+          "label": "Account",
           "multi": false,
           "name": "DS_PROMETHEUS_KYVERNO",
           "options": [],
-          "query": "prometheus",
+          "query": "grafana-amazonprometheus-datasource",
           "refresh": 1,
           "regex": "",
           "skipUrlSync": false,
@@ -3427,13 +3431,13 @@
       ]
     },
     "time": {
-      "from": "now-1h",
+      "from": "now-6h",
       "to": "now"
     },
     "timepicker": {},
-    "timezone": "",
-    "title": "Kyverno Metrics",
-    "uid": "Rg8lWBG7k",
-    "version": 2,
+    "timezone": "browser",
+    "title": "Data Platform — Kyverno",
+    "uid": "data-platform-kyverno",
+    "version": 1,
     "weekStart": ""
   }
