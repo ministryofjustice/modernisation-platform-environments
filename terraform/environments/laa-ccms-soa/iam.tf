@@ -18,9 +18,9 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
 }
 
 #--Secrets access policy for ECS tasks
-data "aws_secretsmanager_secret" "pull_soa_password" {
-  name = "soa-secrets"
-}
+# data "aws_secretsmanager_secret" "pull_soa_password" {
+#   name = "soa-secrets"
+# }
 
 resource "aws_iam_role" "ecs_task_execution_role" {
   name               = "${local.application_data.accounts[local.environment].app_name}-WorldTaskExecutionRole"
@@ -69,7 +69,7 @@ resource "aws_iam_role_policy" "ecs_execution_secret_access" {
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"
         ]
-        Resource = data.aws_secretsmanager_secret.pull_soa_password.arn
+        Resource = aws_secretsmanager_secret.soa_secrets.arn
       }
     ]
   })
