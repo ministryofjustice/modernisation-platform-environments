@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
 }
 
 #--Secrets access policy for ECS tasks
-data "aws_secretsmanager_secret" "pull_soa_password" {
+data "aws_secretsmanager_secret" "soa_password" {
   name = "soa-secrets"
 }
 
