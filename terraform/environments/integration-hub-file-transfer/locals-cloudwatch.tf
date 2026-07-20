@@ -165,7 +165,7 @@ locals {
       threshold          = 0
     }
     "eventbridge-file-routing-workflow-failed-invocations" = {
-      alarm_description   = "The FileScanResultRecorded.v1 EventBridge rule has failed to start the file transfer workflow"
+      alarm_description   = "The FileScanResultRecorded.v1 EventBridge rule has failed to start the file routing workflow"
       comparison_operator = "GreaterThanThreshold"
       dimensions = {
         EventBusName = module.eventbridge_file_transfer_bus.eventbridge_bus_name
