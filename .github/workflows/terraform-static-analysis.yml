@@ -36,7 +36,6 @@ jobs:
           checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
           tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none
-          use_trivy_ecr_database: true
 
   terraform-static-analysis-full-scan:
     permissions:
@@ -61,7 +60,6 @@ jobs:
           checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
           tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none
-          use_trivy_ecr_database: true
 
   terraform-static-analysis-scheduled-scan:
     name: Terraform Static Analysis - scheduled scan of all directories
@@ -81,4 +79,3 @@ jobs:
           checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
           tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none
-          use_trivy_ecr_database: true
