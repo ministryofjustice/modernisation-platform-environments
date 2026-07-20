@@ -68,6 +68,22 @@ module "s3_bucket" {
 
   bucket_policy_v2 = [
     for stmt in [
+      {
+        effect  = "Deny"
+        actions = ["s3:*"]
+        principals = {
+          type        = "AWS"
+          identifiers = ["*"]
+        }
+        conditions = [
+          {
+            test     = "Bool"
+            variable = "aws:SecureTransport"
+            values   = ["false"]
+          }
+        ]
+      },
+
       length(aws_iam_role.ftp_lambda_role) > 0 ? {
         effect  = "Allow"
         actions = ["s3:GetObject", "s3:DeleteObject"]
