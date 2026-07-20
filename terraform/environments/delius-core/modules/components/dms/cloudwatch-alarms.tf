@@ -281,6 +281,7 @@ resource "aws_lambda_function" "dms_checker" {
 
   environment {
     variables = {
+      ENV_NAME      = var.env_name
       SNS_TOPIC_ARN = aws_sns_topic.dms_alerts_topic.arn
     }
   }
@@ -321,6 +322,9 @@ resource "aws_cloudwatch_metric_alarm" "dms_alarm" {
   period              = 300
   statistic           = "Maximum"
   threshold           = 1
+  dimensions = {
+    Environment = var.env_name
+  }
 
   alarm_description = "Triggered when any DMS replication task is not running"
   actions_enabled   = true
