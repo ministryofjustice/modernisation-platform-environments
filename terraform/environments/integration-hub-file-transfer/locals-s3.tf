@@ -91,7 +91,6 @@ locals {
             abort_incomplete_multipart_upload_days = 1
           },
         ]
-
         quarantine = [
           {
             id                                     = "abort-incomplete-multipart-uploads-after-1-day"

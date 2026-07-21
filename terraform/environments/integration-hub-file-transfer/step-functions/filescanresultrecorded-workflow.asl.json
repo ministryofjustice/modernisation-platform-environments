@@ -171,7 +171,7 @@
     "Plan Multipart Parts": {
       "Type": "Pass",
       "Assign": {
-        "parts": "{% $map($range(0, $ceil($sourceSize / $partSize) - 1, 1), function($index) { {'PartNumber': $index + 1, 'RangeStart': $index * $partSize, 'RangeEnd': $min([(($index + 1) * $partSize) - 1, $sourceSize - 1])} }) %}"
+        "parts": "{% $append([], $map($range(0, $ceil($sourceSize / $partSize) - 1, 1), function($index) { {'PartNumber': $index + 1, 'RangeStart': $index * $partSize, 'RangeEnd': $min([(($index + 1) * $partSize) - 1, $sourceSize - 1])} })) %}"
       },
       "Next": "Copy Multipart Parts"
     },
