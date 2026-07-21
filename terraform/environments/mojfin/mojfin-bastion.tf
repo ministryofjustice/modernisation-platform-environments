@@ -27,8 +27,9 @@ module "bastion_linux" {
   region             = "eu-west-2"
 
   # Tags
-  tags_common = merge (local.tags, 
-   { "Name" = "bastion-${local.application_name}-README.txt" }
-  )
+  tags_common = local.tags
+  # tags_common = merge (local.tags, 
+  #  { "Name" = "bastion-${local.application_name}-README.txt" }
+  # )
   tags_prefix = terraform.workspace
 }
