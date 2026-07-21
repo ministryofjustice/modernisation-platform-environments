@@ -164,6 +164,20 @@ locals {
       statistic          = "Sum"
       threshold          = 0
     }
+    "eventbridge-file-routing-workflow-failed-invocations" = {
+      alarm_description   = "The FileScanResultRecorded.v1 EventBridge rule has failed to start the file routing workflow"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        EventBusName = module.eventbridge_file_transfer_bus.eventbridge_bus_name
+        RuleName     = module.eventbridge_file_transfer_bus.eventbridge_rules["file-routing-workflow"].name
+      }
+      evaluation_periods = 1
+      metric_name        = "FailedInvocations"
+      namespace          = "AWS/Events"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
+    }
     "eventbridge-file-transfer-workflow-dlq-visible-messages" = {
       alarm_description   = "The file transfer workflow EventBridge dead-letter queue contains failed events"
       comparison_operator = "GreaterThanThreshold"
