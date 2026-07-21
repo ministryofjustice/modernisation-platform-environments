@@ -51,17 +51,15 @@ module "argocd" {
 ###############################################################################
 # Argo CD — Spoke Cluster Registration (ADR-002 — Spoke-Driven Model)
 #
-# When this cluster is designated as a spoke (argocd_register_as_spoke = true),
-# it grants the hub's ArgoCD spoke-access role an EKS Access Entry with
-# AmazonEKSClusterAdminPolicy. This allows the hub's managed ArgoCD to
-# deploy workloads to this cluster without VPC peering or TGW.
+# Any non-hub cluster is a spoke (see local.is_argocd_spoke). A spoke grants
+# the hub's ArgoCD spoke-access role an EKS Access Entry with
+# AmazonEKSClusterAdminPolicy. This allows the hub's managed ArgoCD to deploy
+# workloads to this cluster without VPC peering or TGW.
 #
-# The hub's role ARN is determined by convention:
-#   arn:aws:iam::<hub-account-id>:role/<hub-cluster-name>-argocd-spoke-access
-#
-# This can be overridden via var.argocd_hub_spoke_access_role_arn for cases
-# where the hub doesn't follow the naming convention (e.g., testing with an
-# ephemeral dev cluster as hub).
+# The hub's role ARN is resolved by local.resolved_hub_spoke_access_role_arn:
+#   - Permanent hubs (development/production): convention-based, no input needed
+#   - Ephemeral/test hubs: engineer passes the ARN as a workflow input
+#     (TF_VAR_argocd_hub_spoke_access_role_arn), which takes precedence.
 #
 # Cross-account: EKS Access Entries natively support cross-account IAM
 # principals — no VPC peering, TGW, or additional IAM trust policy changes
@@ -73,21 +71,20 @@ module "argocd" {
 ###############################################################################
 
 locals {
-  # Resolve the hub spoke-access role ARN: explicit override takes precedence,
-  # otherwise use the convention-based construction from hub config in locals.tf
-  resolved_hub_spoke_access_role_arn = coalesce(
-    var.argocd_hub_spoke_access_role_arn,
-    local.argocd_hub_spoke_access_role_arn
-  )
+  # Resolve the hub spoke-access role ARN:
+  # 1. Explicit workflow input (var) — used for ephemeral/test hubs
+  # 2. Convention-based ARN for the spoke's tier — used for permanent hubs
+  resolved_hub_spoke_access_role_arn = var.argocd_hub_spoke_access_role_arn != "" ? var.argocd_hub_spoke_access_role_arn : local.argocd_hub_convention_role_arn
 
-  # A cluster is a spoke if:
-  # 1. Explicitly flagged via variable, OR
-  # 2. The workspace is a BU account (listed in accounts.json) — these are
-  #    always spokes by convention
-  # A cluster cannot be both a hub and a spoke.
-  is_argocd_spoke = (
-    var.argocd_register_as_spoke || contains(local.bu_accounts.accounts, terraform.workspace)
-  ) && !var.enable_argocd
+  # Any cluster that is not the hub is a spoke — provided we know which hub to
+  # register with. That is true when either:
+  #   1. This is a permanent cluster (in mp_environments) → hub known by convention, OR
+  #   2. An explicit hub role ARN was supplied (ephemeral/test clusters)
+  # Ad-hoc ephemeral clusters with no hub ARN are neither hub nor spoke, so they
+  # do not attempt registration against a hub that may not exist yet.
+  is_argocd_spoke = !var.enable_argocd && (
+    contains(local.mp_environments, terraform.workspace) || var.argocd_hub_spoke_access_role_arn != ""
+  )
 }
 
 resource "aws_eks_access_entry" "argocd_spoke" {
@@ -101,6 +98,13 @@ resource "aws_eks_access_entry" "argocd_spoke" {
     Name    = "${module.eks.cluster_name}-argocd-spoke-access"
     Purpose = "argocd-hub-spoke-registration"
   })
+
+  lifecycle {
+    precondition {
+      condition     = local.resolved_hub_spoke_access_role_arn != ""
+      error_message = "Could not resolve the ArgoCD hub spoke-access role ARN. For a permanent hub, ensure the tier is present in local.argocd_hubs; for an ephemeral hub, pass the ARN via the workflow input (TF_VAR_argocd_hub_spoke_access_role_arn)."
+    }
+  }
 }
 
 resource "aws_eks_access_policy_association" "argocd_spoke" {

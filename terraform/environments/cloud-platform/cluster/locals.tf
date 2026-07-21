@@ -17,21 +17,34 @@ locals {
   cluster_environment       = contains(local.mp_environments, terraform.workspace) ? local.workspace_environment : "development_cluster"
 
   #-----------------------------------------------------------------------------
-  # ArgoCD Hub Configuration (ADR-002)
+  # ArgoCD Hub Configuration (ADR-002 — dual-hub model)
   #
-  # Defines the hub cluster's identity for spoke registration. Spoke clusters
-  # construct the hub's spoke-access role ARN from this configuration using a
-  # predictable naming convention: <hub_cluster_name>-argocd-spoke-access
+  # Permanent hubs (development + production) are located by convention: spokes
+  # construct the hub's spoke-access role ARN from the hub identity for their
+  # environment tier. No manual input is needed for these.
   #
-  # This is infrastructure configuration, not dynamic discovery. When the hub
-  # moves from development to a dedicated production account, update these
-  # values and re-apply spoke clusters.
+  # Ephemeral/test hubs are NOT covered by the convention — for those, the
+  # engineer passes the hub role ARN explicitly as a workflow input, which
+  # arrives as var.argocd_hub_spoke_access_role_arn and takes precedence.
+  #
+  # IMPORTANT: cluster_name MUST equal the hub cluster's Terraform workspace
+  # name, because the hub's role is created as "<workspace>-argocd-spoke-access"
+  # (see modules/argo-cd — aws_iam_role.argocd_spoke_access).
   #-----------------------------------------------------------------------------
-  argocd_hub = {
-    account_id   = local.environment_management.account_ids["cloud-platform-development"]
-    cluster_name = "development" # Stable hub cluster name (update when permanent hub is provisioned)
+  argocd_hubs = {
+    nonlive = {
+      account_id   = local.environment_management.account_ids["cloud-platform-development"]
+      cluster_name = "cloud-platform-development"
+    }
+    live = {
+      account_id   = local.environment_management.account_ids["cloud-platform-live"]
+      cluster_name = "cloud-platform-live"
+    }
   }
 
-  # Constructed spoke-access role ARN for the hub — used by spoke registration
-  argocd_hub_spoke_access_role_arn = "arn:aws:iam::${local.argocd_hub.account_id}:role/${local.argocd_hub.cluster_name}-argocd-spoke-access"
+  # Environment tier of this spoke (last segment of the workspace name).
+  argocd_spoke_tier = local.workspace_environment == "live" ? "live" : "nonlive"
+
+  # Convention-based hub role ARN for this spoke's tier.
+  argocd_hub_convention_role_arn = "arn:aws:iam::${local.argocd_hubs[local.argocd_spoke_tier].account_id}:role/${local.argocd_hubs[local.argocd_spoke_tier].cluster_name}-argocd-spoke-access"
 }

@@ -62,13 +62,7 @@ variable "argocd_codeconnection_arn" {
 variable "argocd_hub_spoke_access_role_arn" {
   type        = string
   default     = ""
-  description = "ARN of the hub cluster's ArgoCD spoke-access IAM role. When set, registers this cluster as a spoke by granting the hub role an EKS Access Entry with AmazonEKSClusterAdminPolicy. Cross-account: the role is in the hub account."
-}
-
-variable "argocd_register_as_spoke" {
-  type        = bool
-  default     = false
-  description = "Register this cluster as an ArgoCD spoke. Uses the hub configuration in locals to construct the spoke-access role ARN. Mutually exclusive with enable_argocd (a cluster is either a hub or a spoke, not both)."
+  description = "Override for the hub cluster's ArgoCD spoke-access IAM role ARN. Leave empty for permanent hubs (development/production) — the ARN is resolved by convention from local.argocd_hubs. Set this only for ephemeral/test hubs, passed as a workflow input when launching the cluster."
 }
 
 resource "null_resource" "created_by_tag" {
