@@ -54,6 +54,7 @@ module "step_function_filereceived_workflow" {
       actions = [
         "s3:PutObject",
         "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging",
       ]
       resources = ["${module.s3_bucket["processing"].s3_bucket_arn}/*"]
     }
@@ -142,6 +143,7 @@ module "step_function_filescanresultrecorded_workflow" {
       actions = [
         "s3:PutObject",
         "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging",
       ]
       resources = [
         "${module.s3_bucket["clean"].s3_bucket_arn}/*",
