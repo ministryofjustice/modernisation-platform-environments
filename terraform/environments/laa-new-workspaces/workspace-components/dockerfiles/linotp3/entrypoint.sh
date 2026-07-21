@@ -26,22 +26,24 @@ linotp init database 2>&1 || echo "Database already initialized"
 # Generate audit keys (idempotent)
 linotp init audit-keys 2>&1 || echo "Audit keys already exist"
 
-echo "--- Starting LinOTP ---"
-
-# Run LinOTP configuration in background using Python
+# Run LinOTP configuration BEFORE starting gunicorn. LinOTP only loads its
+# config from the database once per worker process (it doesn't re-check the
+# DB unless linotp.enableReplication is set), so if this ran in the
+# background against an already-started gunicorn, that worker could cache
+# empty/pre-bootstrap config permanently the moment anything hit it first -
+# leaving the running server never seeing the resolver/realm/policies this
+# script creates, e.g. RADIUS auth failing with "No default realm defined"
+# even though the database itself was configured correctly.
 if [ "${ENABLE_AUTO_CONFIG:-true}" = "true" ]; then
-    (
-        sleep 30  # Give LinOTP time to start
-        echo "Starting LinOTP automated configuration (Python)..."
-        python3 /usr/local/bin/configure_linotp_python.py
-        if [ $? -eq 0 ]; then
-            echo "✅ LinOTP configuration completed successfully"
-        else
-            echo "WARNING: LinOTP configuration failed, check logs"
-        fi
-    ) &
+    echo "Running LinOTP automated configuration (Python)..."
+    if python3 /usr/local/bin/configure_linotp_python.py; then
+        echo "✅ LinOTP configuration completed successfully"
+    else
+        echo "WARNING: LinOTP configuration failed, check logs"
+    fi
 fi
 
+echo "--- Starting LinOTP ---"
 echo "Starting gunicorn on 0.0.0.0:5000 ..."
 # Start gunicorn with LinOTP app
 exec gunicorn --bind 0.0.0.0:5000 --workers 1 --threads 4 --timeout 120 'linotp.app:create_app()'

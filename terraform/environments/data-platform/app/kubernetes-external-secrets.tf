@@ -31,6 +31,40 @@ resource "kubernetes_manifest" "app_secrets_secret" {
             "property" = "sentry_dsn"
           }
           "secretKey" = "sentry-dsn"
+        },
+        {
+          "remoteRef" = {
+            "key"      = tostring(module.app_secrets.secret_id)
+            "property" = "azure_authority"
+          }
+          "secretKey" = "azure-authority" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
+        },
+        {
+          "remoteRef" = {
+            "key"      = tostring(module.app_secrets.secret_id)
+            "property" = "azure_client_id"
+          }
+          "secretKey" = "azure-client-id" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
+        },
+        {
+          "remoteRef" = {
+            "key"      = tostring(module.app_secrets.secret_id)
+            "property" = "azure_client_secret"
+          }
+          "secretKey" = "azure-client-secret" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
+        },
+        {
+          "remoteRef" = {
+            "key"      = tostring(module.app_secrets.secret_id)
+            "property" = "field_encryption_key"
+          }
+          "secretKey" = "field-encryption-key" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
+        },
+        {
+          "remoteRef" = {
+            "key" = data.aws_secretsmanager_secret.ai_gateway_litellm_master_key.id
+          }
+          "secretKey" = format("ai-gateway-%s", "master-key")
         }
       ]
     }

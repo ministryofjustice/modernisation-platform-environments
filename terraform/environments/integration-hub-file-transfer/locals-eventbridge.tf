@@ -1,6 +1,5 @@
 locals {
   eventbridge_schema_directory = "${path.module}/schemas"
   eventbridge_schemas          = fileset("${path.module}/schemas", "*.json")
-
-  eventbridge_retention_days = local.is-production ? 400 : 30
+  file_transfer_event_bus_arn  = "arn:aws:events:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:event-bus/${local.application_name}"
 }
