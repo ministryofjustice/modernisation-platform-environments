@@ -3,41 +3,44 @@
 #
 # Deploys ArgoCD control plane resources (Level 1) on the hub cluster:
 # - Per-BU AppProjects with sourceRepos and destination restrictions
-# - Platform AppProject for infrastructure add-ons
-# - Per-BU ApplicationSets using git-directory-generator
+# - Platform AppProject for infrastructure add-ons and namespace baselines
+# - Per-BU ApplicationSets using git-directory-generator (workloads)
+# - Per-BU baseline ApplicationSets using git-file-generator (product.yaml)
 #
 # Only created when the cluster has the argocd-role=hub tag (set by the
 # cluster component when enable_argocd=true).
 #
 # References:
 #   - ADR-002: AppProject Hierarchy and BU Isolation Guardrails
-#   - ADR-015: Per-BU Workload Repos with Shared Platform Config Repo
+#   - ADR-015: Shared Monorepo with Product-Based Structure (amended)
 #   - US-015b: Spoke Registration and GitOps Configuration
+#   - product-onboarding-tier2-design.md: Tier 2 design document
 ###############################################################################
 
 locals {
   # Detect if this cluster is an ArgoCD hub by checking the cluster tag
   is_argocd_hub = lookup(data.aws_eks_cluster.cluster.tags, "argocd-role", "") == "hub"
 
-  # BU configuration — defines the spoke clusters and their source repos
+  # Shared monorepo for all BU workload manifests and baseline chart
+  environments_repo = "https://github.com/ministryofjustice/container-platform-environments"
+
+  # BU configuration — defines the spoke clusters and path within the monorepo
   # Each BU gets a nonlive and live AppProject + ApplicationSet pair
+  # All BUs share the same source repo; isolation is via path prefix + AppProject destinations
   bu_configs = {
     octo = {
-      source_repo = "https://github.com/ministryofjustice/container-platform-environments"
       clusters = {
         nonlive = "container-platform-octo-nonlive"
         live    = "container-platform-octo-live"
       }
     }
     laa = {
-      source_repo = "https://github.com/ministryofjustice/container-platform-laa"
       clusters = {
         nonlive = "container-platform-laa-nonlive"
         live    = "container-platform-laa-live"
       }
     }
     hmpps = {
-      source_repo = "https://github.com/ministryofjustice/container-platform-hmpps"
       clusters = {
         nonlive = "container-platform-hmpps-nonlive"
         live    = "container-platform-hmpps-live"
@@ -52,8 +55,10 @@ locals {
       "${bu_name}-${env}" => {
         bu_name           = bu_name
         environment       = env
-        source_repo       = bu_config.source_repo
+        source_repo       = local.environments_repo
         cluster_workspace = cluster_workspace
+        # Path prefix within monorepo for this BU's products
+        path_prefix = "namespaces/${bu_name}"
         # Cluster ARN constructed from account ID + cluster name
         cluster_arn = "arn:aws:eks:eu-west-2:${local.environment_management.account_ids[cluster_workspace]}:cluster/${element(reverse(split("-", cluster_workspace)), 0)}"
         auto_sync   = env == "nonlive" ? true : false
@@ -61,8 +66,6 @@ locals {
     }
   ]...)
 
-  # GitHub org base URL for sourceRepos patterns
-  github_org = "https://github.com/ministryofjustice"
 }
 
 #------------------------------------------------------------------------------
@@ -81,8 +84,8 @@ resource "kubectl_manifest" "argocd_project_platform_nonlive" {
     spec = {
       description = "Platform infrastructure add-ons deployed to all non-live spoke clusters"
       sourceRepos = [
-        "${local.github_org}/container-platform-config",
-        "${local.github_org}/container-platform-config.git",
+        local.environments_repo,
+        "${local.environments_repo}.git",
       ]
       destinations = [
         for bu_name, bu_config in local.bu_configs : {
@@ -117,8 +120,8 @@ resource "kubectl_manifest" "argocd_project_platform_live" {
     spec = {
       description = "Platform infrastructure add-ons deployed to all live spoke clusters"
       sourceRepos = [
-        "${local.github_org}/container-platform-config",
-        "${local.github_org}/container-platform-config.git",
+        local.environments_repo,
+        "${local.environments_repo}.git",
       ]
       destinations = [
         for bu_name, bu_config in local.bu_configs : {
@@ -204,8 +207,10 @@ resource "kubectl_manifest" "argocd_project_bu" {
 
 
 #------------------------------------------------------------------------------
-# Per-BU ApplicationSets — git-directory-generator creates Applications
-# automatically when new app directories appear in the BU repo
+# Per-BU Workload ApplicationSets — git-directory-generator creates Applications
+# automatically when new app deployment directories appear in the monorepo.
+# Path: namespaces/<bu>/<product>/<app>/deployment/<env>
+# Segments: [namespaces, <bu>, <product>, <app>, deployment, <env>]
 #------------------------------------------------------------------------------
 resource "kubectl_manifest" "argocd_applicationset_bu" {
   for_each = local.is_argocd_hub ? local.bu_appprojects : {}
@@ -220,6 +225,7 @@ resource "kubectl_manifest" "argocd_applicationset_bu" {
         "argocd.argoproj.io/managed-by"  = "terraform"
         "container-platform/bu"          = each.value.bu_name
         "container-platform/environment" = each.value.environment
+        "container-platform/type"        = "workload"
       }
     }
     spec = {
@@ -230,19 +236,24 @@ resource "kubectl_manifest" "argocd_applicationset_bu" {
           git = {
             repoURL  = each.value.source_repo
             revision = "main"
-            directories = [
-              { path = "*/deployment/${each.value.environment}" }
+            # One values file per (service, environment) on this cluster tier.
+            # File path: namespaces/<bu>/<product>/<service>/deployment/values/<tier>/<env>.yaml
+            files = [
+              { path = "${each.value.path_prefix}/*/*/deployment/values/${each.value.environment}/*.yaml" }
             ]
           }
         }
       ]
       template = {
         metadata = {
-          name = "${each.value.bu_name}-{{ index .path.segments 0 }}-${each.value.environment}"
+          # dir segments: [namespaces, bu, product, service, deployment, values, tier]
+          # filename: <env>.yaml (dev|staging|prod)
+          name = "${each.value.bu_name}-{{ index .path.segments 3 }}-{{ trimSuffix \".yaml\" .path.filename }}"
           labels = {
             "container-platform/bu"          = each.value.bu_name
-            "container-platform/environment" = each.value.environment
-            "container-platform/app"         = "{{ index .path.segments 0 }}"
+            "container-platform/environment" = "{{ trimSuffix \".yaml\" .path.filename }}"
+            "container-platform/product"     = "{{ index .path.segments 2 }}"
+            "container-platform/app"         = "{{ index .path.segments 3 }}"
           }
         }
         spec = {
@@ -250,11 +261,16 @@ resource "kubectl_manifest" "argocd_applicationset_bu" {
           source = {
             repoURL        = each.value.source_repo
             targetRevision = "main"
-            path           = "{{ .path.path }}"
+            # Chart dir is the values file's directory minus /values/<tier>
+            path = "{{ trimSuffix \"/values/${each.value.environment}\" .path.path }}"
+            helm = {
+              valueFiles = ["values/${each.value.environment}/{{ .path.filename }}"]
+            }
           }
           destination = {
-            server    = each.value.cluster_arn
-            namespace = "{{ index .path.segments 0 }}"
+            server = each.value.cluster_arn
+            # Namespace comes from the routing key inside the values file
+            namespace = "{{ .namespace }}"
           }
           syncPolicy = each.value.auto_sync ? {
             automated = {
@@ -262,13 +278,13 @@ resource "kubectl_manifest" "argocd_applicationset_bu" {
               selfHeal = true
             }
             syncOptions = [
-              "CreateNamespace=true",
+              "CreateNamespace=false",
               "PrunePropagationPolicy=foreground",
             ]
             } : {
             automated = null
             syncOptions = [
-              "CreateNamespace=true",
+              "CreateNamespace=false",
             ]
           }
         }
@@ -277,4 +293,95 @@ resource "kubectl_manifest" "argocd_applicationset_bu" {
   })
 
   depends_on = [kubectl_manifest.argocd_project_bu]
+}
+
+
+#------------------------------------------------------------------------------
+# Per-BU Baseline ApplicationSets — git-file-generator reads product.yaml
+# and renders the app-baseline Helm chart to create Namespace + RoleBinding +
+# default-deny NetworkPolicy for each environment on this cluster tier.
+#
+# Runs under the platform-<env> AppProject (can create Namespaces).
+# Always auto-syncs with self-heal to enforce baseline compliance.
+#------------------------------------------------------------------------------
+resource "kubectl_manifest" "argocd_applicationset_baseline" {
+  for_each = local.is_argocd_hub ? local.bu_appprojects : {}
+
+  yaml_body = yamlencode({
+    apiVersion = "argoproj.io/v1alpha1"
+    kind       = "ApplicationSet"
+    metadata = {
+      name      = "${each.key}-baselines"
+      namespace = "argocd"
+      labels = {
+        "argocd.argoproj.io/managed-by"  = "terraform"
+        "container-platform/bu"          = each.value.bu_name
+        "container-platform/environment" = each.value.environment
+        "container-platform/type"        = "baseline"
+      }
+    }
+    spec = {
+      goTemplate        = true
+      goTemplateOptions = ["missingkey=error"]
+      generators = [
+        {
+          git = {
+            repoURL  = each.value.source_repo
+            revision = "main"
+            files = [
+              { path = "${each.value.path_prefix}/*/product.yaml" }
+            ]
+          }
+        }
+      ]
+      template = {
+        metadata = {
+          name = "baseline-${each.value.bu_name}-{{ .product }}-${each.value.environment}"
+          labels = {
+            "container-platform/bu"          = each.value.bu_name
+            "container-platform/environment" = each.value.environment
+            "container-platform/type"        = "baseline"
+            "container-platform/product"     = "{{ .product }}"
+          }
+        }
+        spec = {
+          project = "platform-${each.value.environment}"
+          source = {
+            repoURL        = each.value.source_repo
+            targetRevision = "main"
+            path           = "charts/app-baseline"
+            helm = {
+              valuesObject = {
+                product       = "{{ .product }}"
+                bu            = "{{ .bu }}"
+                targetCluster = each.value.cluster_workspace
+                owner         = "{{ .owner | toJson }}"
+                access        = "{{ .access | toJson }}"
+                environments  = "{{ .environments | toJson }}"
+              }
+            }
+          }
+          destination = {
+            server    = each.value.cluster_arn
+            namespace = "default"
+          }
+          syncPolicy = {
+            automated = {
+              prune    = true
+              selfHeal = true
+            }
+            syncOptions = [
+              "CreateNamespace=false",
+              "ServerSideApply=true",
+            ]
+          }
+        }
+      }
+    }
+  })
+
+  depends_on = [
+    kubectl_manifest.argocd_project_platform_nonlive,
+    kubectl_manifest.argocd_project_platform_live,
+  ]
 }
