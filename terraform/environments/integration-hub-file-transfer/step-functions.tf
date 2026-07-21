@@ -9,8 +9,6 @@ module "step_function_filereceived_workflow" {
     account_id                = jsonencode(data.aws_caller_identity.current.account_id)
     event_bus_arn             = jsonencode(local.file_transfer_event_bus_arn)
     idempotency_table_name    = jsonencode(module.dynamodb_file_transfer_idempotency.dynamodb_table_id)
-    incoming_bucket_name      = jsonencode(module.s3_bucket["incoming"].s3_bucket_id)
-    maximum_size_bytes        = local.file_transfer_workflow_maximum_size_bytes
     multipart_max_concurrency = 4
     part_size_bytes           = local.file_transfer_workflow_part_size_bytes
     processing_bucket_name    = jsonencode(module.s3_bucket["processing"].s3_bucket_id)
@@ -32,12 +30,8 @@ module "step_function_filereceived_workflow" {
   attach_policy_statements = true
   policy_statements = {
     workflow_idempotency = {
-      effect = "Allow"
-      actions = [
-        "dynamodb:GetItem",
-        "dynamodb:PutItem",
-        "dynamodb:UpdateItem",
-      ]
+      effect    = "Allow"
+      actions   = ["dynamodb:UpdateItem"]
       resources = [module.dynamodb_file_transfer_idempotency.dynamodb_table_arn]
     }
     incoming_object_read = {
@@ -58,13 +52,6 @@ module "step_function_filereceived_workflow" {
     processing_object = {
       effect = "Allow"
       actions = [
-        "s3:AbortMultipartUpload",
-        "s3:DeleteObjectVersion",
-        "s3:GetObject",
-        "s3:GetObjectTagging",
-        "s3:GetObjectVersion",
-        "s3:GetObjectVersionTagging",
-        "s3:ListMultipartUploadParts",
         "s3:PutObject",
         "s3:PutObjectTagging",
       ]

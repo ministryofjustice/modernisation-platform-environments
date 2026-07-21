@@ -1,5 +1,5 @@
 {
-  "Comment": "Stage an exact incoming S3 object version for malware scanning",
+  "Comment": "Idempotently move an exact incoming S3 object version for malware scanning",
   "QueryLanguage": "JSONata",
   "StartAt": "Initialise Event",
   "TimeoutSeconds": ${timeout_seconds},
@@ -7,74 +7,22 @@
     "Initialise Event": {
       "Type": "Pass",
       "Assign": {
-        "event": "{% $states.input %}",
-        "eventId": "{% $exists($states.input.id) ? $states.input.id : null %}",
-        "concurrencyId": "{% $exists($states.input.detail.metadata.correlationId) ? $states.input.detail.metadata.correlationId : null %}",
-        "fileId": "{% $exists($states.input.detail.data.fileId) ? $states.input.detail.data.fileId : null %}",
-        "sourceBucket": "{% $exists($states.input.detail.data.object.bucket) ? $states.input.detail.data.object.bucket : null %}",
-        "sourceKey": "{% $exists($states.input.detail.data.object.key) ? $states.input.detail.data.object.key : null %}",
-        "sourceVersionId": "{% $exists($states.input.detail.data.object.versionId) ? $states.input.detail.data.object.versionId : null %}",
-        "sourceSize": "{% $exists($states.input.detail.data.object.sizeBytes) ? $states.input.detail.data.object.sizeBytes : null %}",
+        "eventId": "{% $states.input.id %}",
+        "concurrencyId": "{% $states.input.detail.metadata.correlationId %}",
+        "fileId": "{% $states.input.detail.data.fileId %}",
+        "sourceBucket": "{% $states.input.detail.data.object.bucket %}",
+        "sourceKey": "{% $states.input.detail.data.object.key %}",
+        "sourceVersionId": "{% $states.input.detail.data.object.versionId %}",
+        "sourceSize": "{% $states.input.detail.data.object.sizeBytes %}",
         "expectedAccountId": ${account_id},
-        "incomingBucket": ${incoming_bucket_name},
         "processingBucket": ${processing_bucket_name},
         "processingKmsKeyArn": ${processing_kms_key_arn},
         "idempotencyTable": ${idempotency_table_name},
         "eventBusArn": ${event_bus_arn},
         "partSize": ${part_size_bytes},
-        "maximumSize": ${maximum_size_bytes},
-        "recordRetentionSeconds": ${record_retention_seconds},
-        "uploadId": null,
-        "processingVersionId": null,
-        "failureError": null,
-        "failureCause": null,
-        "failedState": null
+        "recordRetentionSeconds": ${record_retention_seconds}
       },
-      "Next": "Validate Event"
-    },
-    "Validate Event": {
-      "Type": "Choice",
-      "Choices": [
-        {
-          "Condition": "{% $event.version = '0' and $event.`detail-type` = 'FileReceived.v1' and $event.source = 'uk.gov.justice.service.managed-file-transfer' and $event.account = $expectedAccountId and $sourceBucket = $incomingBucket and $type($eventId) = 'string' and $length($eventId) > 0 and $type($concurrencyId) = 'string' and $length($concurrencyId) = 36 and $type($fileId) = 'string' and $length($fileId) > 0 and $type($sourceKey) = 'string' and $length($sourceKey) > 0 and $type($sourceVersionId) = 'string' and $length($sourceVersionId) > 0 and $type($sourceSize) = 'number' and $floor($sourceSize) = $sourceSize and $sourceSize >= 0 and $sourceSize <= $maximumSize %}",
-          "Next": "Claim Stage Operation"
-        }
-      ],
-      "Default": "Record Invalid Event"
-    },
-    "Record Invalid Event": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::dynamodb:putItem",
-      "Arguments": {
-        "TableName": "{% $idempotencyTable %}",
-        "Item": {
-          "concurrencyId": {
-            "S": "{% $type($concurrencyId) = 'string' and $length($concurrencyId) > 0 ? $concurrencyId : ($type($eventId) = 'string' and $length($eventId) > 0 ? $eventId : $states.context.Execution.Name) %}"
-          },
-          "operation": {
-            "S": "{% 'INVALID#' & ($type($eventId) = 'string' and $length($eventId) > 0 ? $eventId : $states.context.Execution.Name) %}"
-          },
-          "status": { "S": "INVALID" },
-          "error": { "S": "InvalidFileReceivedEvent" },
-          "details": { "S": "{% $string($event) %}" },
-          "recordedAt": { "S": "{% $now() %}" },
-          "expiration": {
-            "N": "{% $string($floor($toMillis($now()) / 1000) + $recordRetentionSeconds) %}"
-          }
-        }
-      },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Next": "Invalid Event Failure"
-        }
-      ],
-      "Next": "Invalid Event Failure"
-    },
-    "Invalid Event Failure": {
-      "Type": "Fail",
-      "Error": "InvalidFileReceivedEvent",
-      "Cause": "The event does not satisfy the FileReceived.v1 workflow contract"
+      "Next": "Claim Stage Operation"
     },
     "Claim Stage Operation": {
       "Type": "Task",
@@ -85,14 +33,13 @@
           "concurrencyId": { "S": "{% $concurrencyId %}" },
           "operation": { "S": "STAGE" }
         },
-        "UpdateExpression": "SET #status = :in_progress, execution_arn = :execution_arn, event_id = :event_id, file_id = :file_id, correlation_id = :correlation_id, incoming_bucket = :source_bucket, incoming_key = :source_key, incoming_version_id = :source_version_id, incoming_size_bytes = :source_size, created_at = if_not_exists(created_at, :now), updated_at = :now REMOVE expiration, failure_error, failure_cause, failed_state",
-        "ConditionExpression": "attribute_not_exists(concurrencyId) OR #status = :failed",
+        "UpdateExpression": "SET #status = :in_progress, execution_arn = :execution_arn, event_id = :event_id, file_id = :file_id, correlation_id = :correlation_id, incoming_bucket = :source_bucket, incoming_key = :source_key, incoming_version_id = :source_version_id, incoming_size_bytes = :source_size, created_at = :now, updated_at = :now",
+        "ConditionExpression": "attribute_not_exists(concurrencyId)",
         "ExpressionAttributeNames": {
           "#status": "status"
         },
         "ExpressionAttributeValues": {
           ":in_progress": { "S": "IN_PROGRESS" },
-          ":failed": { "S": "FAILED" },
           ":execution_arn": { "S": "{% $states.context.Execution.Id %}" },
           ":event_id": { "S": "{% $eventId %}" },
           ":file_id": { "S": "{% $fileId %}" },
@@ -102,97 +49,18 @@
           ":source_version_id": { "S": "{% $sourceVersionId %}" },
           ":source_size": { "N": "{% $string($sourceSize) %}" },
           ":now": { "S": "{% $now() %}" }
-        },
-        "ReturnValues": "ALL_NEW"
-      },
-      "Assign": {
-        "resumePoint": "{% $exists($states.result.Attributes.resume_point.S) ? $states.result.Attributes.resume_point.S : 'COPY' %}",
-        "processingVersionId": "{% $exists($states.result.Attributes.resume_point.S) and $states.result.Attributes.resume_point.S = 'PUBLISH' and $exists($states.result.Attributes.processing_version_id.S) ? $states.result.Attributes.processing_version_id.S : null %}"
+        }
       },
       "Catch": [
         {
           "ErrorEquals": ["DynamoDB.ConditionalCheckFailedException"],
-          "Next": "Read Existing Stage Operation"
+          "Next": "Stage Operation Already Claimed"
         }
       ],
-      "Next": "Resume Claimed Operation"
+      "Next": "Head Source Object"
     },
-    "Read Existing Stage Operation": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::dynamodb:getItem",
-      "Arguments": {
-        "TableName": "{% $idempotencyTable %}",
-        "ConsistentRead": true,
-        "Key": {
-          "concurrencyId": { "S": "{% $concurrencyId %}" },
-          "operation": { "S": "STAGE" }
-        }
-      },
-      "Assign": {
-        "existingOperation": "{% $exists($states.result.Item) ? $states.result.Item : {} %}"
-      },
-      "Next": "Evaluate Existing Stage Operation"
-    },
-    "Evaluate Existing Stage Operation": {
-      "Type": "Choice",
-      "Choices": [
-        {
-          "Condition": "{% $exists($existingOperation.status.S) and $existingOperation.status.S = 'COMPLETED' %}",
-          "Next": "Already Staged"
-        },
-        {
-          "Condition": "{% $exists($existingOperation.status.S) and $existingOperation.status.S = 'IN_PROGRESS' %}",
-          "Next": "Stage Operation Active"
-        }
-      ],
-      "Default": "Record Idempotency Conflict"
-    },
-    "Already Staged": {
+    "Stage Operation Already Claimed": {
       "Type": "Succeed"
-    },
-    "Stage Operation Active": {
-      "Type": "Succeed"
-    },
-    "Record Idempotency Conflict": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::dynamodb:putItem",
-      "Arguments": {
-        "TableName": "{% $idempotencyTable %}",
-        "Item": {
-          "concurrencyId": { "S": "{% $concurrencyId %}" },
-          "operation": { "S": "{% 'CONFLICT#' & $eventId %}" },
-          "status": { "S": "CONFLICT" },
-          "existingStatus": {
-            "S": "{% $exists($existingOperation.status.S) ? $existingOperation.status.S : 'MISSING' %}"
-          },
-          "recordedAt": { "S": "{% $now() %}" },
-          "expiration": {
-            "N": "{% $string($floor($toMillis($now()) / 1000) + $recordRetentionSeconds) %}"
-          }
-        }
-      },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Next": "Idempotency Conflict Failure"
-        }
-      ],
-      "Next": "Idempotency Conflict Failure"
-    },
-    "Idempotency Conflict Failure": {
-      "Type": "Fail",
-      "Error": "StageIdempotencyConflict",
-      "Cause": "The existing STAGE operation is neither completed nor in progress"
-    },
-    "Resume Claimed Operation": {
-      "Type": "Choice",
-      "Choices": [
-        {
-          "Condition": "{% $resumePoint = 'PUBLISH' and $type($processingVersionId) = 'string' and $length($processingVersionId) > 0 %}",
-          "Next": "Build File Staged Event"
-        }
-      ],
-      "Default": "Head Source Object"
     },
     "Head Source Object": {
       "Type": "Task",
@@ -206,17 +74,6 @@
       "Assign": {
         "sourceHead": "{% $states.result %}"
       },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Assign": {
-            "failureError": "{% $states.errorOutput.Error %}",
-            "failureCause": "{% $exists($states.errorOutput.Cause) ? $states.errorOutput.Cause : 'No cause returned' %}",
-            "failedState": "Head Source Object"
-          },
-          "Next": "Select Pre-delete Cleanup"
-        }
-      ],
       "Next": "Get Source Object Tags"
     },
     "Get Source Object Tags": {
@@ -229,40 +86,9 @@
         "ExpectedBucketOwner": "{% $expectedAccountId %}"
       },
       "Assign": {
-        "sourceTags": "{% $exists($states.result.TagSet) ? $states.result.TagSet : [] %}",
-        "sourceTagFingerprint": "{% $exists($states.result.TagSet) and $count($states.result.TagSet) > 0 ? $join($sort($map($states.result.TagSet, function($tag) { $encodeUrlComponent($tag.Key) & '=' & $encodeUrlComponent($tag.Value) })), '&') : '' %}"
+        "sourceTags": "{% $exists($states.result.TagSet) ? $states.result.TagSet : [] %}"
       },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Assign": {
-            "failureError": "{% $states.errorOutput.Error %}",
-            "failureCause": "{% $exists($states.errorOutput.Cause) ? $states.errorOutput.Cause : 'No cause returned' %}",
-            "failedState": "Get Source Object Tags"
-          },
-          "Next": "Select Pre-delete Cleanup"
-        }
-      ],
-      "Next": "Validate Source Object"
-    },
-    "Validate Source Object": {
-      "Type": "Choice",
-      "Choices": [
-        {
-          "Condition": "{% $sourceHead.ContentLength = $sourceSize and $not($exists($lookup(($exists($sourceHead.Metadata) ? $sourceHead.Metadata : {}), 'mft-correlation-id'))) %}",
-          "Next": "Select Copy Method"
-        }
-      ],
-      "Default": "Prepare Source Validation Failure"
-    },
-    "Prepare Source Validation Failure": {
-      "Type": "Pass",
-      "Assign": {
-        "failureError": "SourceObjectMismatch",
-        "failureCause": "The exact source version size does not match FileReceived.v1 or uses reserved metadata",
-        "failedState": "Validate Source Object"
-      },
-      "Next": "Select Pre-delete Cleanup"
+      "Next": "Select Copy Method"
     },
     "Select Copy Method": {
       "Type": "Choice",
@@ -281,18 +107,7 @@
       "Assign": {
         "processingVersionId": "{% $states.result.VersionId %}"
       },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Assign": {
-            "failureError": "{% $states.errorOutput.Error %}",
-            "failureCause": "{% $exists($states.errorOutput.Cause) ? $states.errorOutput.Cause : 'No cause returned' %}",
-            "failedState": "Copy Empty Object"
-          },
-          "Next": "Select Pre-delete Cleanup"
-        }
-      ],
-      "Next": "Capture Destination Version"
+      "Next": "Delete Exact Source Version"
     },
     "Create Multipart Upload": {
       "Type": "Task",
@@ -301,23 +116,11 @@
       "Assign": {
         "uploadId": "{% $states.result.UploadId %}"
       },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Assign": {
-            "failureError": "{% $states.errorOutput.Error %}",
-            "failureCause": "{% $exists($states.errorOutput.Cause) ? $states.errorOutput.Cause : 'No cause returned' %}",
-            "failedState": "Create Multipart Upload"
-          },
-          "Next": "Select Pre-delete Cleanup"
-        }
-      ],
       "Next": "Plan Multipart Parts"
     },
     "Plan Multipart Parts": {
       "Type": "Pass",
       "Assign": {
-        "partCount": "{% $ceil($sourceSize / $partSize) %}",
         "parts": "{% $map($range(0, $ceil($sourceSize / $partSize) - 1, 1), function($index) { {'PartNumber': $index + 1, 'RangeStart': $index * $partSize, 'RangeEnd': $min([(($index + 1) * $partSize) - 1, $sourceSize - 1])} }) %}"
       },
       "Next": "Copy Multipart Parts"
@@ -365,17 +168,6 @@
       "Assign": {
         "copiedParts": "{% $states.result %}"
       },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Assign": {
-            "failureError": "{% $states.errorOutput.Error %}",
-            "failureCause": "{% $exists($states.errorOutput.Cause) ? $states.errorOutput.Cause : 'No cause returned' %}",
-            "failedState": "Copy Multipart Parts"
-          },
-          "Next": "Select Pre-delete Cleanup"
-        }
-      ],
       "Next": "Complete Multipart Upload"
     },
     "Complete Multipart Upload": {
@@ -394,17 +186,6 @@
       "Assign": {
         "processingVersionId": "{% $states.result.VersionId %}"
       },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Assign": {
-            "failureError": "{% $states.errorOutput.Error %}",
-            "failureCause": "{% $exists($states.errorOutput.Cause) ? $states.errorOutput.Cause : 'No cause returned' %}",
-            "failedState": "Complete Multipart Upload"
-          },
-          "Next": "Select Pre-delete Cleanup"
-        }
-      ],
       "Next": "Apply Source Tags"
     },
     "Apply Source Tags": {
@@ -419,91 +200,7 @@
           "TagSet": "{% $sourceTags %}"
         }
       },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Assign": {
-            "failureError": "{% $states.errorOutput.Error %}",
-            "failureCause": "{% $exists($states.errorOutput.Cause) ? $states.errorOutput.Cause : 'No cause returned' %}",
-            "failedState": "Apply Source Tags"
-          },
-          "Next": "Select Pre-delete Cleanup"
-        }
-      ],
-      "Next": "Capture Destination Version"
-    },
-    "Capture Destination Version": {
-      "Type": "Pass",
-      "Next": "Head Destination Object"
-    },
-    "Head Destination Object": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::aws-sdk:s3:headObject",
-      "Arguments": {
-        "Bucket": "{% $processingBucket %}",
-        "Key": "{% $sourceKey %}",
-        "VersionId": "{% $processingVersionId %}",
-        "ExpectedBucketOwner": "{% $expectedAccountId %}"
-      },
-      "Assign": {
-        "destinationHead": "{% $states.result %}"
-      },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Assign": {
-            "failureError": "{% $states.errorOutput.Error %}",
-            "failureCause": "{% $exists($states.errorOutput.Cause) ? $states.errorOutput.Cause : 'No cause returned' %}",
-            "failedState": "Head Destination Object"
-          },
-          "Next": "Select Pre-delete Cleanup"
-        }
-      ],
-      "Next": "Get Destination Object Tags"
-    },
-    "Get Destination Object Tags": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::aws-sdk:s3:getObjectTagging",
-      "Arguments": {
-        "Bucket": "{% $processingBucket %}",
-        "Key": "{% $sourceKey %}",
-        "VersionId": "{% $processingVersionId %}",
-        "ExpectedBucketOwner": "{% $expectedAccountId %}"
-      },
-      "Assign": {
-        "destinationTagFingerprint": "{% $exists($states.result.TagSet) and $count($states.result.TagSet) > 0 ? $join($sort($map($states.result.TagSet, function($tag) { $encodeUrlComponent($tag.Key) & '=' & $encodeUrlComponent($tag.Value) })), '&') : '' %}"
-      },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Assign": {
-            "failureError": "{% $states.errorOutput.Error %}",
-            "failureCause": "{% $exists($states.errorOutput.Cause) ? $states.errorOutput.Cause : 'No cause returned' %}",
-            "failedState": "Get Destination Object Tags"
-          },
-          "Next": "Select Pre-delete Cleanup"
-        }
-      ],
-      "Next": "Compare Source And Destination"
-    },
-    "Compare Source And Destination": {
-      "Type": "Choice",
-      "Choices": [
-        {
-          "Condition": "{% $destinationHead.ContentLength = $sourceHead.ContentLength and $count($keys($exists($destinationHead.Metadata) ? $destinationHead.Metadata : {})) = $count($keys($exists($sourceHead.Metadata) ? $sourceHead.Metadata : {})) + 1 and $count($filter($keys($exists($sourceHead.Metadata) ? $sourceHead.Metadata : {}), function($key) { $lookup($destinationHead.Metadata, $key) = $lookup($sourceHead.Metadata, $key) })) = $count($keys($exists($sourceHead.Metadata) ? $sourceHead.Metadata : {})) and $lookup($destinationHead.Metadata, 'mft-correlation-id') = $concurrencyId and $destinationTagFingerprint = $sourceTagFingerprint and $exists($destinationHead.CacheControl) = $exists($sourceHead.CacheControl) and ($not($exists($sourceHead.CacheControl)) or $destinationHead.CacheControl = $sourceHead.CacheControl) and $exists($destinationHead.ContentDisposition) = $exists($sourceHead.ContentDisposition) and ($not($exists($sourceHead.ContentDisposition)) or $destinationHead.ContentDisposition = $sourceHead.ContentDisposition) and $exists($destinationHead.ContentEncoding) = $exists($sourceHead.ContentEncoding) and ($not($exists($sourceHead.ContentEncoding)) or $destinationHead.ContentEncoding = $sourceHead.ContentEncoding) and $exists($destinationHead.ContentLanguage) = $exists($sourceHead.ContentLanguage) and ($not($exists($sourceHead.ContentLanguage)) or $destinationHead.ContentLanguage = $sourceHead.ContentLanguage) and $exists($destinationHead.ContentType) = $exists($sourceHead.ContentType) and ($not($exists($sourceHead.ContentType)) or $destinationHead.ContentType = $sourceHead.ContentType) and $exists($destinationHead.Expires) = $exists($sourceHead.Expires) and ($not($exists($sourceHead.Expires)) or $destinationHead.Expires = $sourceHead.Expires) %}",
-          "Next": "Delete Exact Source Version"
-        }
-      ],
-      "Default": "Prepare Copy Verification Failure"
-    },
-    "Prepare Copy Verification Failure": {
-      "Type": "Pass",
-      "Assign": {
-        "failureError": "CopyVerificationFailed",
-        "failureCause": "The processing version does not exactly match the source size, metadata and tags",
-        "failedState": "Compare Source And Destination"
-      },
-      "Next": "Select Pre-delete Cleanup"
+      "Next": "Delete Exact Source Version"
     },
     "Delete Exact Source Version": {
       "Type": "Task",
@@ -514,63 +211,6 @@
         "VersionId": "{% $sourceVersionId %}",
         "ExpectedBucketOwner": "{% $expectedAccountId %}"
       },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Assign": {
-            "failureError": "{% $states.errorOutput.Error %}",
-            "failureCause": "{% $exists($states.errorOutput.Cause) ? $states.errorOutput.Cause : 'No cause returned' %}",
-            "failedState": "Delete Exact Source Version"
-          },
-          "Next": "Select Pre-delete Cleanup"
-        }
-      ],
-      "Next": "Record Source Deleted"
-    },
-    "Record Source Deleted": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::dynamodb:updateItem",
-      "Arguments": {
-        "TableName": "{% $idempotencyTable %}",
-        "Key": {
-          "concurrencyId": { "S": "{% $concurrencyId %}" },
-          "operation": { "S": "STAGE" }
-        },
-        "UpdateExpression": "SET #status = :source_deleted, processing_bucket = :processing_bucket, processing_key = :processing_key, processing_version_id = :processing_version_id, resume_point = :publish, source_deleted_at = :now, updated_at = :now",
-        "ConditionExpression": "execution_arn = :execution_arn AND #status = :in_progress",
-        "ExpressionAttributeNames": {
-          "#status": "status"
-        },
-        "ExpressionAttributeValues": {
-          ":source_deleted": { "S": "SOURCE_DELETED" },
-          ":in_progress": { "S": "IN_PROGRESS" },
-          ":execution_arn": { "S": "{% $states.context.Execution.Id %}" },
-          ":processing_bucket": { "S": "{% $processingBucket %}" },
-          ":processing_key": { "S": "{% $sourceKey %}" },
-          ":processing_version_id": { "S": "{% $processingVersionId %}" },
-          ":publish": { "S": "PUBLISH" },
-          ":now": { "S": "{% $now() %}" }
-        }
-      },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Assign": {
-            "failureError": "{% $states.errorOutput.Error %}",
-            "failureCause": "{% $exists($states.errorOutput.Cause) ? $states.errorOutput.Cause : 'No cause returned' %}",
-            "failedState": "Record Source Deleted"
-          },
-          "Next": "Record Post-delete Failure"
-        }
-      ],
-      "Next": "Build File Staged Event"
-    },
-    "Build File Staged Event": {
-      "Type": "Pass",
-      "Assign": {
-        "stagedEventIdempotencyKey": "{% 'stage:' & $concurrencyId & ':' & $processingVersionId %}",
-        "stagedEventDetail": "{% {'metadata': {'correlationId': $concurrencyId, 'causationId': $eventId, 'idempotencyKey': 'stage:' & $concurrencyId & ':' & $processingVersionId}, 'data': {'fileId': $fileId, 'sourceObject': {'bucket': $sourceBucket, 'key': $sourceKey, 'versionId': $sourceVersionId, 'sizeBytes': $sourceSize}, 'stagedObject': {'bucket': $processingBucket, 'key': $sourceKey, 'versionId': $processingVersionId, 'sizeBytes': $sourceSize}, 'metadataPreserved': true, 'tagsPreserved': true, 'sourceDeleted': true}} %}"
-      },
       "Next": "Publish File Staged Event"
     },
     "Publish File Staged Event": {
@@ -579,7 +219,7 @@
       "Arguments": {
         "Entries": [
           {
-            "Detail": "{% $stagedEventDetail %}",
+            "Detail": "{% {'metadata': {'correlationId': $concurrencyId, 'causationId': $eventId, 'idempotencyKey': 'stage:' & $concurrencyId & ':' & $processingVersionId}, 'data': {'fileId': $fileId, 'sourceObject': {'bucket': $sourceBucket, 'key': $sourceKey, 'versionId': $sourceVersionId, 'sizeBytes': $sourceSize}, 'stagedObject': {'bucket': $processingBucket, 'key': $sourceKey, 'versionId': $processingVersionId, 'sizeBytes': $sourceSize}, 'metadataPreserved': true, 'tagsPreserved': true, 'sourceDeleted': true}} %}",
             "DetailType": "FileStagedForScanning.v1",
             "EventBusName": "{% $eventBusArn %}",
             "Source": "uk.gov.justice.service.managed-file-transfer"
@@ -598,17 +238,6 @@
       "Assign": {
         "stagedEventId": "{% $states.result.Entries[0].EventId %}"
       },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Assign": {
-            "failureError": "{% $states.errorOutput.Error %}",
-            "failureCause": "{% $exists($states.errorOutput.Cause) ? $states.errorOutput.Cause : 'No cause returned' %}",
-            "failedState": "Publish File Staged Event"
-          },
-          "Next": "Record Post-delete Failure"
-        }
-      ],
       "Next": "Record Stage Completed"
     },
     "Record Stage Completed": {
@@ -620,203 +249,30 @@
           "concurrencyId": { "S": "{% $concurrencyId %}" },
           "operation": { "S": "STAGE" }
         },
-        "UpdateExpression": "SET #status = :completed, staged_event_id = :event_id, staged_event_idempotency_key = :idempotency_key, completed_at = :now, updated_at = :now, expiration = :expiration REMOVE resume_point",
-        "ConditionExpression": "execution_arn = :execution_arn AND #status IN (:source_deleted, :in_progress)",
+        "UpdateExpression": "SET #status = :completed, processing_bucket = :processing_bucket, processing_key = :processing_key, processing_version_id = :processing_version_id, staged_event_id = :event_id, staged_event_idempotency_key = :idempotency_key, completed_at = :now, updated_at = :now, expiration = :expiration",
+        "ConditionExpression": "execution_arn = :execution_arn AND #status = :in_progress",
         "ExpressionAttributeNames": {
           "#status": "status"
         },
         "ExpressionAttributeValues": {
           ":completed": { "S": "COMPLETED" },
-          ":source_deleted": { "S": "SOURCE_DELETED" },
           ":in_progress": { "S": "IN_PROGRESS" },
           ":execution_arn": { "S": "{% $states.context.Execution.Id %}" },
+          ":processing_bucket": { "S": "{% $processingBucket %}" },
+          ":processing_key": { "S": "{% $sourceKey %}" },
+          ":processing_version_id": { "S": "{% $processingVersionId %}" },
           ":event_id": { "S": "{% $stagedEventId %}" },
-          ":idempotency_key": { "S": "{% $stagedEventIdempotencyKey %}" },
+          ":idempotency_key": { "S": "{% 'stage:' & $concurrencyId & ':' & $processingVersionId %}" },
           ":now": { "S": "{% $now() %}" },
           ":expiration": {
             "N": "{% $string($floor($toMillis($now()) / 1000) + $recordRetentionSeconds) %}"
           }
         }
       },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Assign": {
-            "failureError": "{% $states.errorOutput.Error %}",
-            "failureCause": "{% $exists($states.errorOutput.Cause) ? $states.errorOutput.Cause : 'No cause returned' %}",
-            "failedState": "Record Stage Completed"
-          },
-          "Next": "Record Post-delete Failure"
-        }
-      ],
       "Next": "Stage Workflow Succeeded"
     },
     "Stage Workflow Succeeded": {
       "Type": "Succeed"
-    },
-    "Select Pre-delete Cleanup": {
-      "Type": "Choice",
-      "Choices": [
-        {
-          "Condition": "{% $type($uploadId) = 'string' and $length($uploadId) > 0 %}",
-          "Next": "Abort Multipart Upload"
-        }
-      ],
-      "Default": "Select Destination Cleanup"
-    },
-    "Abort Multipart Upload": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::aws-sdk:s3:abortMultipartUpload",
-      "Arguments": {
-        "Bucket": "{% $processingBucket %}",
-        "Key": "{% $sourceKey %}",
-        "UploadId": "{% $uploadId %}",
-        "ExpectedBucketOwner": "{% $expectedAccountId %}"
-      },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Next": "Select Destination Cleanup"
-        }
-      ],
-      "Next": "Select Destination Cleanup"
-    },
-    "Select Destination Cleanup": {
-      "Type": "Choice",
-      "Choices": [
-        {
-          "Condition": "{% $type($processingVersionId) = 'string' and $length($processingVersionId) > 0 %}",
-          "Next": "Delete Processing Destination"
-        }
-      ],
-      "Default": "Record Pre-delete Failure"
-    },
-    "Delete Processing Destination": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::aws-sdk:s3:deleteObject",
-      "Arguments": {
-        "Bucket": "{% $processingBucket %}",
-        "Key": "{% $sourceKey %}",
-        "VersionId": "{% $processingVersionId %}",
-        "ExpectedBucketOwner": "{% $expectedAccountId %}"
-      },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Next": "Record Pre-delete Failure"
-        }
-      ],
-      "Next": "Record Pre-delete Failure"
-    },
-    "Record Pre-delete Failure": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::dynamodb:updateItem",
-      "Arguments": {
-        "TableName": "{% $idempotencyTable %}",
-        "Key": {
-          "concurrencyId": { "S": "{% $concurrencyId %}" },
-          "operation": { "S": "STAGE" }
-        },
-        "UpdateExpression": "SET #status = :failed, resume_point = :copy, failure_error = :error, failure_cause = :cause, failed_state = :failed_state, failed_at = :now, updated_at = :now",
-        "ExpressionAttributeNames": {
-          "#status": "status"
-        },
-        "ExpressionAttributeValues": {
-          ":failed": { "S": "FAILED" },
-          ":copy": { "S": "COPY" },
-          ":error": { "S": "{% $string($failureError) %}" },
-          ":cause": { "S": "{% $string($failureCause) %}" },
-          ":failed_state": { "S": "{% $failedState %}" },
-          ":now": { "S": "{% $now() %}" }
-        }
-      },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Next": "Publish Pre-delete Failure Event"
-        }
-      ],
-      "Next": "Publish Pre-delete Failure Event"
-    },
-    "Publish Pre-delete Failure Event": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::events:putEvents",
-      "Arguments": {
-        "Entries": [
-          {
-            "Detail": "{% {'metadata': {'correlationId': $concurrencyId, 'causationId': $eventId, 'idempotencyKey': 'manual:stage:' & $concurrencyId}, 'data': {'fileId': $fileId, 'object': {'bucket': $sourceBucket, 'key': $sourceKey, 'versionId': $sourceVersionId, 'sizeBytes': $sourceSize}, 'reasonCode': 'PROCESSING_ERROR', 'description': $string($failureError) & ' in ' & $failedState & ': ' & $string($failureCause), 'requiredAt': $now()}} %}",
-            "DetailType": "FileManualInterventionRequired.v1",
-            "EventBusName": "{% $eventBusArn %}",
-            "Source": "uk.gov.justice.service.managed-file-transfer"
-          }
-        ]
-      },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Next": "Stage Workflow Failed"
-        }
-      ],
-      "Next": "Stage Workflow Failed"
-    },
-    "Record Post-delete Failure": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::dynamodb:updateItem",
-      "Arguments": {
-        "TableName": "{% $idempotencyTable %}",
-        "Key": {
-          "concurrencyId": { "S": "{% $concurrencyId %}" },
-          "operation": { "S": "STAGE" }
-        },
-        "UpdateExpression": "SET #status = :failed, resume_point = :publish, processing_bucket = :processing_bucket, processing_key = :processing_key, processing_version_id = :processing_version_id, failure_error = :error, failure_cause = :cause, failed_state = :failed_state, failed_at = :now, updated_at = :now",
-        "ExpressionAttributeNames": {
-          "#status": "status"
-        },
-        "ExpressionAttributeValues": {
-          ":failed": { "S": "FAILED" },
-          ":publish": { "S": "PUBLISH" },
-          ":processing_bucket": { "S": "{% $processingBucket %}" },
-          ":processing_key": { "S": "{% $sourceKey %}" },
-          ":processing_version_id": { "S": "{% $processingVersionId %}" },
-          ":error": { "S": "{% $string($failureError) %}" },
-          ":cause": { "S": "{% $string($failureCause) %}" },
-          ":failed_state": { "S": "{% $failedState %}" },
-          ":now": { "S": "{% $now() %}" }
-        }
-      },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Next": "Publish Post-delete Failure Event"
-        }
-      ],
-      "Next": "Publish Post-delete Failure Event"
-    },
-    "Publish Post-delete Failure Event": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::events:putEvents",
-      "Arguments": {
-        "Entries": [
-          {
-            "Detail": "{% {'metadata': {'correlationId': $concurrencyId, 'causationId': $eventId, 'idempotencyKey': 'manual:stage:' & $concurrencyId}, 'data': {'fileId': $fileId, 'object': {'bucket': $processingBucket, 'key': $sourceKey, 'versionId': $processingVersionId, 'sizeBytes': $sourceSize}, 'reasonCode': 'PROCESSING_ERROR', 'description': $string($failureError) & ' in ' & $failedState & ': ' & $string($failureCause), 'requiredAt': $now()}} %}",
-            "DetailType": "FileManualInterventionRequired.v1",
-            "EventBusName": "{% $eventBusArn %}",
-            "Source": "uk.gov.justice.service.managed-file-transfer"
-          }
-        ]
-      },
-      "Catch": [
-        {
-          "ErrorEquals": ["States.ALL"],
-          "Next": "Stage Workflow Failed"
-        }
-      ],
-      "Next": "Stage Workflow Failed"
-    },
-    "Stage Workflow Failed": {
-      "Type": "Fail",
-      "Error": "FileStagingFailed",
-      "Cause": "The file could not be staged safely"
     }
   }
 }

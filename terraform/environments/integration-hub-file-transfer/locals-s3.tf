@@ -54,8 +54,15 @@ locals {
     production = {
       default = local.s3_bucket_lifecycle_defaults.production.default
       buckets = {
-        incoming   = []
-        processing = []
+        incoming = []
+        processing = [
+          {
+            id                                     = "abort-incomplete-multipart-uploads-after-1-day"
+            status                                 = "Enabled"
+            filter                                 = {}
+            abort_incomplete_multipart_upload_days = 1
+          },
+        ]
         clean = [
           {
             id     = "expire-clean-after-14-days"
