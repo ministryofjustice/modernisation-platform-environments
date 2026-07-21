@@ -1,10 +1,15 @@
+locals {
+  nodeclass_name = "${local.workspace_slug}-nodeclass"
+  default_nodepool_name  = "${local.workspace_slug}-default-nodepool"
+  system_nodepool_name   = "${local.workspace_slug}-system-nodepool"
+}
 
 resource "kubectl_manifest" "default_nodeclass" {
   yaml_body = <<-YAML
     apiVersion: eks.amazonaws.com/v1
     kind: NodeClass
     metadata:
-      name: default-nodeclass
+      name: ${local.nodeclass_name}
     spec:
       role: ${local.node_role_name}
 
@@ -41,7 +46,7 @@ resource "kubectl_manifest" "default_nodepool" {
     apiVersion: karpenter.sh/v1
     kind: NodePool
     metadata:
-      name: default-nodepool
+      name: ${local.default_nodepool_name}
     spec:
       template:
         spec:
@@ -68,13 +73,13 @@ resource "kubectl_manifest" "default_nodepool" {
           nodeClassRef:
             group: eks.amazonaws.com
             kind: NodeClass
-            name: default-nodeclass
+            name: ${local.nodeclass_name}
         metadata:
           labels:
             Terraform: "true"
             "container-platform.justice.gov.uk/default-ng": "true"
             Cluster: "${terraform.workspace}"
-            Domain: "${terraform.workspace}.container-platform.service.justice.gov.uk"
+            Domain: ${local.workspace_slug}
       disruption:
         consolidationPolicy: WhenEmptyOrUnderutilized
         consolidateAfter: 60s
@@ -90,7 +95,7 @@ resource "kubectl_manifest" "system_nodepool" {
     apiVersion: karpenter.sh/v1
     kind: NodePool
     metadata:
-      name: system-nodepool
+      name: ${local.system_nodepool_name}
     spec:
       template:
         spec:
@@ -111,7 +116,7 @@ resource "kubectl_manifest" "system_nodepool" {
           nodeClassRef:
             group: eks.amazonaws.com
             kind: NodeClass
-            name: default-nodeclass
+            name: ${local.nodeclass_name}
           taints:
             - key: system-node
               value: "true"
@@ -121,7 +126,7 @@ resource "kubectl_manifest" "system_nodepool" {
             Terraform: "true"
             "container-platform.justice.gov.uk/system-ng": "true"
             Cluster: "${terraform.workspace}"
-            Domain: "${terraform.workspace}.container-platform.service.justice.gov.uk"
+            Domain: ${local.workspace_slug}
       disruption:
         consolidationPolicy: WhenEmptyOrUnderutilized
         consolidateAfter: 60s
