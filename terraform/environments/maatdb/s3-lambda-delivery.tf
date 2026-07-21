@@ -44,6 +44,20 @@ resource "aws_s3_bucket_policy" "shared_bucket_policy" {
     Version = "2012-10-17",
     Statement = [
       {
+        Sid    = "DenyInsecureTransport",
+        Effect = "Deny",
+        Principal = {
+          AWS = "*"
+        },
+        Action   = "s3:*",
+        Resource = ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      },
+      {
         Sid    = "EnforceTLSv12orHigher",
         Effect = "Deny",
         Principal = {
