@@ -188,12 +188,13 @@ def extract_ora_events_from_log_payload(log_payload: Dict[str, Any]) -> list[Dic
 class NotificationService:
     """Service for sending notifications to Slack."""
 
-    def __init__(self, webhook_url: str, function_name: str = "CloudWatch SNS Alarm to Lambda"):
+    def __init__(self, webhook_url: str, function_name: str = "CloudWatch SNS Alarm to Lambda", environment_name: str = "Unknown"):
         if not webhook_url:
             raise ValueError("Slack webhook URL is required for notifications")
 
         self.webhook_url = webhook_url
         self.function_name = function_name
+        self.environment_name = environment_name or "Unknown"
         logger.info("Slack notifications configured")
 
     def send_notification(
@@ -398,13 +399,14 @@ class NotificationService:
             blocks = [
                 {
                     "type": "header",
-                    "text": {"type": "plain_text", "text": ":warning: Oracle Alert Log Events Detected"}
+                    "text": {"type": "plain_text", "text": f":warning: Oracle Alert Log Events Detected [{self.environment_name}]"}
                 },
                 {
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
                         "text": (
+                            f"*Environment:* {self.environment_name}\n"
                             f"*Log Group:* {log_group}\n"
                             f"*Log Stream:* <{log_stream_url}|{log_stream}>\n"
                             f"*Matched Events:* {len(matched_events)}"
@@ -574,6 +576,7 @@ def lambda_handler(event, context):
 
     # Get secret name from environment or event
     secret_name = os.environ.get("SECRET_NAME", event.get("secret_name"))
+    environment_name = os.environ.get("ENVIRONMENT", "Unknown")
     if not secret_name:
         raise ValueError("SECRET_NAME not found in environment or event")
     if not isinstance(secret_name, str):
@@ -613,7 +616,7 @@ def lambda_handler(event, context):
             "logStream": log_payload.get("logStream", ""),
             "matchedEvents": matched_events,
         }
-        notification_service = NotificationService(channelconfig, context.function_name)
+        notification_service = NotificationService(channelconfig, context.function_name, environment_name)
         notification_service.send_notification(
             "CloudWatch Logs Oracle Alert Notification",
             alarm_details,
@@ -729,7 +732,7 @@ def lambda_handler(event, context):
 
         # Initialize services
         notification_service = NotificationService(
-            channelconfig, context.function_name
+            channelconfig, context.function_name, environment_name
         )
 
         notification_service.send_notification(
