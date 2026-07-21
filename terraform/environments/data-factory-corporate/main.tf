@@ -6,7 +6,7 @@ terraform{
 
 module "glue "{
 
-    source="./corporate_data/modules/glue_catalog"
+    source="https://github.com/ministryofjustice/modernisation-platform-environments/tree/dedzo_dev_v2/terraform/environments/data-factory-corporate/corporate_data/modules/glue_catalog"
     description ="glue_table"
 
     database_name = "corporate_database"
