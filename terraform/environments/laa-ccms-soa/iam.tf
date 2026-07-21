@@ -42,7 +42,7 @@ resource "aws_iam_policy" "ecs_secrets_policy" {
     {
       "Effect": "Allow",
       "Action": ["secretsmanager:GetSecretValue"],
-      "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:soa-secrets*"]
+      "Resource": ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:soa-secrets*"]
     }
   ]
 }
