@@ -58,6 +58,59 @@ locals {
       statistic          = "Sum"
       threshold          = 0
     }
+    "lambda-file-scan-result-recorded-adapter-errors" = {
+      alarm_description   = "The file scan result recorded adapter Lambda function has failed to process one or more events"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        FunctionName = module.lambda_file_scan_result_recorded_adapter.lambda_function_name
+      }
+      evaluation_periods = 1
+      metric_name        = "Errors"
+      namespace          = "AWS/Lambda"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
+    }
+    "lambda-file-scan-result-recorded-adapter-throttles" = {
+      alarm_description   = "The file scan result recorded adapter Lambda function has been throttled"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        FunctionName = module.lambda_file_scan_result_recorded_adapter.lambda_function_name
+      }
+      evaluation_periods = 1
+      metric_name        = "Throttles"
+      namespace          = "AWS/Lambda"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
+    }
+    "lambda-file-scan-result-recorded-adapter-duration" = {
+      alarm_description   = "The file scan result recorded adapter Lambda function duration is approaching its timeout"
+      comparison_operator = "GreaterThanThreshold"
+      datapoints_to_alarm = 2
+      dimensions = {
+        FunctionName = module.lambda_file_scan_result_recorded_adapter.lambda_function_name
+      }
+      evaluation_periods = 2
+      metric_name        = "Duration"
+      namespace          = "AWS/Lambda"
+      period             = 300
+      statistic          = "Average"
+      threshold          = 25000
+    }
+    "lambda-file-scan-result-recorded-adapter-dead-letter-errors" = {
+      alarm_description   = "The file scan result recorded adapter Lambda function could not send a failed event to its dead-letter queue"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        FunctionName = module.lambda_file_scan_result_recorded_adapter.lambda_function_name
+      }
+      evaluation_periods = 1
+      metric_name        = "DeadLetterErrors"
+      namespace          = "AWS/Lambda"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
+    }
     "eventbridge-default-rule-failed-invocations" = {
       alarm_description   = "The incoming S3 Object Created EventBridge rule has failed to invoke its target"
       comparison_operator = "GreaterThanThreshold"
@@ -84,12 +137,39 @@ locals {
       statistic          = "Maximum"
       threshold          = 0
     }
+    "eventbridge-guardduty-malware-scan-result-failed-invocations" = {
+      alarm_description   = "The GuardDuty malware scan result EventBridge rule has failed to invoke its target"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        RuleName = module.eventbridge_default_bus.eventbridge_rules["guardduty-malware-scan-result"].name
+      }
+      evaluation_periods = 1
+      metric_name        = "FailedInvocations"
+      namespace          = "AWS/Events"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
+    }
     "eventbridge-file-transfer-workflow-failed-invocations" = {
       alarm_description   = "The FileReceived.v1 EventBridge rule has failed to start the file transfer workflow"
       comparison_operator = "GreaterThanThreshold"
       dimensions = {
         EventBusName = module.eventbridge_file_transfer_bus.eventbridge_bus_name
         RuleName     = module.eventbridge_file_transfer_bus.eventbridge_rules["file-transfer-workflow"].name
+      }
+      evaluation_periods = 1
+      metric_name        = "FailedInvocations"
+      namespace          = "AWS/Events"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
+    }
+    "eventbridge-file-routing-workflow-failed-invocations" = {
+      alarm_description   = "The FileScanResultRecorded.v1 EventBridge rule has failed to start the file routing workflow"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        EventBusName = module.eventbridge_file_transfer_bus.eventbridge_bus_name
+        RuleName     = module.eventbridge_file_transfer_bus.eventbridge_rules["file-routing-workflow"].name
       }
       evaluation_periods = 1
       metric_name        = "FailedInvocations"
@@ -202,11 +282,24 @@ locals {
       statistic          = "Maximum"
       threshold          = 0
     }
-    "dynamodb-idempotency-read-throttles" = {
-      alarm_description   = "The idempotency DynamoDB table has throttled one or more read requests"
+    "lambda-file-scan-result-recorded-adapter-dlq-visible-messages" = {
+      alarm_description   = "The file scan result recorded adapter Lambda dead-letter queue contains failed events"
       comparison_operator = "GreaterThanThreshold"
       dimensions = {
-        TableName = module.dynamodb_idempotency.dynamodb_table_id
+        QueueName = module.sqs_lambda_file_scan_result_recorded_adapter_dlq.queue_name
+      }
+      evaluation_periods = 1
+      metric_name        = "ApproximateNumberOfMessagesVisible"
+      namespace          = "AWS/SQS"
+      period             = 300
+      statistic          = "Maximum"
+      threshold          = 0
+    }
+    "dynamodb-idempotency-read-throttles" = {
+      alarm_description   = "The adapter idempotency DynamoDB table has throttled one or more read requests"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        TableName = module.dynamodb_adapter_idempotency.dynamodb_table_id
       }
       evaluation_periods = 1
       metric_name        = "ReadThrottleEvents"
@@ -216,10 +309,10 @@ locals {
       threshold          = 0
     }
     "dynamodb-idempotency-write-throttles" = {
-      alarm_description   = "The idempotency DynamoDB table has throttled one or more write requests"
+      alarm_description   = "The adapter idempotency DynamoDB table has throttled one or more write requests"
       comparison_operator = "GreaterThanThreshold"
       dimensions = {
-        TableName = module.dynamodb_idempotency.dynamodb_table_id
+        TableName = module.dynamodb_adapter_idempotency.dynamodb_table_id
       }
       evaluation_periods = 1
       metric_name        = "WriteThrottleEvents"
