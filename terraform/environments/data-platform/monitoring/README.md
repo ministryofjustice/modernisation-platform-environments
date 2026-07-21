@@ -23,8 +23,7 @@ alerting-defaults.tf           Threshold values (warning/critical) referenced
 
 alerting-rules.tf              The engine: expands golden signals into one
                                 Grafana alert rule per resource/account/severity,
-                                builds the CloudWatch/Prometheus query pipeline,
-                                and resolves Slack routing.
+                                builds the CloudWatch/Prometheus query pipeline.
 
 alerting.tf                    Terraform resources (grafana_folder,
                                 grafana_rule_group) that actually create the
@@ -135,7 +134,7 @@ alerts_configured_accounts = [
 ]
 ```
 
-This same entry is where every other account-level lives — resourse lists for the `dim_key` fan-out, threshold overrides, Slack routing, disabled rules, and query settings. Every field below is optional; add only what you need. See [Account configuration fields](#account-configuration-fields-alerts_configured_accounts)
+This same entry is where every other account-level lives — resourse lists for the `dim_key` fan-out, threshold overrides, disabled rules, and query settings. Every field below is optional; add only what you need. See [Account configuration fields](#account-configuration-fields-alerts_configured_accounts)
 for the full reference.
 
 ```hcl
@@ -159,18 +158,6 @@ alerts_configured_accounts = [
     threshold_overrides = {
       rds_cpu_warn = 85
       rds_cpu_crit = 95
-    }
-
-    # Account-wide fallback Slack channel, used when a golden signal has no
-    # slack_channel of its own
-    slack_channel = "dev-slack"
-
-    # Per-rule, per-severity Slack overrides — the key is the combo_key
-    # (rule key plus resource suffix, e.g.
-    # "s3_bucket_5xx_errors_data-platform-dev-landing")
-    slack_channel_overrides = {
-      rds_cpu_utilization  = { critical = "dev-slack-critical" }
-      s3_bucket_5xx_errors = { warning = "disabled" } # suppresses the label entirely
     }
 
     # How often Grafana evaluates rules for this account (defaults to "1m")
@@ -204,7 +191,6 @@ Every key inside `alerting_golden_signals` (in `alerting-golden-signals.tf`) is 
 | `capacity_metric` | with `use_metric_math` | CloudWatch metric name used as the denominator (`A2`) in the metric-math expression, e.g. `"PermittedThroughput"`. |
 | `capacity_statistic` | no (default `"Minimum"`) | CloudWatch statistic applied to the capacity metric. Only used with `use_metric_math`. |
 | `ok_when_nodata` | no (default `false`) | If `true`, sets `noDataState: OK` so the rule resolves to Normal when CloudWatch/Prometheus returns nothing (e.g. zero failed nodes), rather than going to `NoData`. |
-| `slack_channel` | no | Slack channel(s) for this signal. Either a string (same channel both severities) or an object `{ warning = "...", critical = "..." }` (omit a key to emit no label for that severity). Resolution order per severity: rule's per-severity key → rule's string value → the account's `slack_channel` default. If nothing resolves, no `slack-channel` label is set and Grafana's catch-all policy handles routing. |
 | `warning` | one of `warning`/`critical` required | Key into `alert_defaults` (or an account's `threshold_overrides`) for the warning threshold. Omit to make the rule critical-only. |
 | `critical` | one of `warning`/`critical` required | Same, for the critical threshold. Omit to make the rule warning-only. |
 | `query_window_seconds` | no (default `300`) | Lookback window, in seconds, for the current-value queries (refs `A`, `A2`, `B`, `C`). |
@@ -241,8 +227,6 @@ Each entry in `alerts_configured_accounts` (in `environment-configuration.tf`) c
 | `efs_file_systems` | with `FileSystemId`-dimensioned rules | `[]` | List of EFS file system IDs. One rule per filesystem for `dim_key = "FileSystemId"`. |
 | `disabled_rules` | no | `[]` | List of golden-signal rule keys (the keys in `alerting_golden_signals`) to skip entirely for this account — no rule, no Grafana UID, regardless of `enabled_groups`. |
 | `threshold_overrides` | no | `{}` | Map of threshold key → value, merged over `alert_defaults` for this account only (`merge(alert_defaults, threshold_overrides)`). Use the same keys referenced by golden signals' `warning`/`critical` fields. |
-| `slack_channel` | no | none | Account-wide fallback Slack channel. Used for a rule's severity only when neither the golden signal's own `slack_channel` nor a `slack_channel_overrides` entry resolves one. |
-| `slack_channel_overrides` | no | `{}` | Map keyed by `combo_key` (the rule key, plus a resource suffix such as `_<bucket-name>` when the rule is dimensioned) → `{ warning = "...", critical = "..." }`. Takes priority over everything else, including the golden signal's own `slack_channel`. Set a severity's value to `"disabled"` to force no Slack label for that severity (overriding even the account's `slack_channel` fallback). |
 | `evaluation_interval` | no | `"1m"` (`local.evaluation_interval`) | How often Grafana evaluates every rule group for this account. Accepts `"30s"`, `"1m"`, `"5m"`, `"2h"`-style duration strings. |
 | `prometheus_datasource_uid` | no | `"<uid>-prometheus"` | Grafana datasource UID used for Prometheus (`datasource_type = "prometheus"`) queries. Override if the Amazon Managed Prometheus datasource was provisioned under a different UID. |
 | `aws_region` | no | current provider region (`data.aws_region.current.region`) | AWS region passed to CloudWatch queries for this account. Override for accounts monitored cross-region. |
@@ -265,21 +249,6 @@ disabled_rules = ["rds_cpu_utilization", "litellm_provider_state"]
 threshold_overrides = {
   rds_cpu_warn = 85
   rds_cpu_crit = 95
-}
-```
-
-**`slack_channel`** — account-wide fallback channel, used whenever a rule's severity has no more specific channel resolved:
-
-```hcl
-slack_channel = "dev-alerts"
-```
-
-**`slack_channel_overrides`** — redirect (or silence) one specific rule's severity for this account, keyed by `combo_key` (rule key + resource suffix if the rule is dimensioned):
-
-```hcl
-slack_channel_overrides = {
-  rds_cpu_utilization                          = { critical = "oncall-critical" }
-  s3_bucket_5xx_errors_data-platform-dev-landing = { warning = "disabled" }
 }
 ```
 

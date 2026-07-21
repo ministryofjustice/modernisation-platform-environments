@@ -74,30 +74,7 @@ locals {
     }
   }
 
-  # ── 4. SLACK CHANNEL RESOLUTION ───────────────────────────────────────────
-  # Resolves alert routing by evaluating hierarchy:
-  # 1. Custom rule override per severity -> 2. Rule default -> 3. Account fallback.
-  sc_resolved = {
-    for env, cfg in local.grafana_monitored_accounts_by_uid :
-    env => {
-      for combo_key, combo in local.rule_combos_by_env[env] :
-      combo_key => {
-        for severity in local.active_severities_by_combo[env][combo_key] :
-        severity => (
-          try(cfg.slack_channel_overrides[combo_key][severity], null) == "disabled" ? null :
-          try(cfg.slack_channel_overrides[combo_key][severity], null) != null
-          ? cfg.slack_channel_overrides[combo_key][severity] :
-          try(combo.rule.slack_channel[severity], null) != null
-          ? combo.rule.slack_channel[severity]
-          : try(tostring(combo.rule.slack_channel), null) != null && try(tostring(combo.rule.slack_channel), null) != "null"
-          ? tostring(combo.rule.slack_channel)
-          : try(cfg.slack_channel, null)
-        )
-      }
-    }
-  }
-
-  # ── 5. BASELINE MATHEMATICAL EXPRESSIONS ──────────────────────────────────
+  # ── 4. BASELINE MATHEMATICAL EXPRESSIONS ──────────────────────────────────
   # Generates the Grafana math string used to evaluate baseline drift alerts
   # (e.g., checking if deviation is worse than a specific percentage threshold).
   baseline_math_expr = {
@@ -115,7 +92,7 @@ locals {
     }
   }
 
-  # ── 6. GRAFANA ALERT QUERY PIPELINE (rule_data) ───────────────────────────
+  # ── 5. GRAFANA ALERT QUERY PIPELINE (rule_data) ───────────────────────────
   # Constructs the block of queries, reducers, and expressions for the Grafana Alerting API.
   rule_data = {
     for env, cfg in local.grafana_monitored_accounts_by_uid :
@@ -291,7 +268,7 @@ locals {
     }
   }
 
-  # ── 7. FINAL GRAFANA RULE DEFINITIONS ──────────────────────────────────────
+  # ── 6. FINAL GRAFANA RULE DEFINITIONS ──────────────────────────────────────
   # Builds structural configurations for individual alerts, generating deterministic
   # UIDs based on md5 hashing, and establishing threshold routing logic (C vs D).
   rule_objects = {
@@ -313,10 +290,7 @@ locals {
               service     = lower(replace(combo.rule.group, " ", "_"))
               component   = combo.rule.group
               metric      = combo.rule.metric
-            },
-            local.sc_resolved[env][combo_key][severity] != null
-            ? { "slack-channel" = local.sc_resolved[env][combo_key][severity] }
-            : {}
+            }
           )
           data = local.rule_data[env][combo_key][severity]
         }
@@ -324,7 +298,7 @@ locals {
     }
   }
 
-  # ── 8. ACCOUNT RULE GROUPS ─────────────────────────────────────────────────
+  # ── 7. ACCOUNT RULE GROUPS ─────────────────────────────────────────────────
   # Segregates rule objects into environment-specific structures, ensuring
   # groups are only created if they contain active generated rules.
   group_blocks_by_env = {
@@ -349,7 +323,7 @@ locals {
     ]
   }
 
-  # ── 9. FLAT MAP OUTPUT ─────────────────────────────────────────────────────
+  # ── 8. FLAT MAP OUTPUT ─────────────────────────────────────────────────────
   # Flattens nested group maps into a unified root-level map, perfect for consumption 
   # inside a `for_each` loop in standard `grafana_rule_group` resource declarations.
   rule_groups_flat = merge([
