@@ -12,6 +12,5 @@ module "glue "{
     database_name = "corporate_database"
     database_description = "Corporate Glue database for S3 datasets"
 
-    location_uri=
 
 }
