@@ -4,7 +4,11 @@
 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
 ##############################################################
 
+# The *.equip.service.justice.gov.uk certificate only exists in the production account,
+# so the ACM lookup and everything that depends on it (HTTPS listener + host-based rules)
+# is gated on local.is-production.
 data "aws_acm_certificate" "equip_cert" {
+  count       = local.is-production ? 1 : 0
   domain      = "*.equip.service.justice.gov.uk"
   statuses    = ["ISSUED"]
   most_recent = true
@@ -150,11 +154,12 @@ resource "aws_lb_target_group_attachment" "lb_tga_analytics" {
 
 resource "aws_lb_listener" "lb_listener_https" {
   #checkov:skip=CKV_AWS_103
+  count             = local.is-production ? 1 : 0
   load_balancer_arn = aws_lb.citrix_alb.arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-  certificate_arn   = data.aws_acm_certificate.equip_cert.arn
+  certificate_arn   = data.aws_acm_certificate.equip_cert[0].arn
 
   default_action {
     target_group_arn = aws_lb_target_group.lb_tg_gateway.arn
@@ -179,7 +184,8 @@ resource "aws_lb_listener" "lb_listener_http" {
 }
 
 resource "aws_lb_listener_rule" "equip-portal-equip-service-justice-gov-uk" {
-  listener_arn = aws_lb_listener.lb_listener_https.arn
+  count        = local.is-production ? 1 : 0
+  listener_arn = aws_lb_listener.lb_listener_https[0].arn
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.lb_tg_equip-portal.arn
@@ -192,7 +198,8 @@ resource "aws_lb_listener_rule" "equip-portal-equip-service-justice-gov-uk" {
 }
 
 resource "aws_lb_listener_rule" "gateway-equip-service-justice-gov-uk" {
-  listener_arn = aws_lb_listener.lb_listener_https.arn
+  count        = local.is-production ? 1 : 0
+  listener_arn = aws_lb_listener.lb_listener_https[0].arn
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.lb_tg_gateway.arn
@@ -205,7 +212,8 @@ resource "aws_lb_listener_rule" "gateway-equip-service-justice-gov-uk" {
 }
 
 resource "aws_lb_listener_rule" "portal-equip-service-justice-gov-uk" {
-  listener_arn = aws_lb_listener.lb_listener_https.arn
+  count        = local.is-production ? 1 : 0
+  listener_arn = aws_lb_listener.lb_listener_https[0].arn
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.lb_tg_portal.arn
@@ -218,7 +226,8 @@ resource "aws_lb_listener_rule" "portal-equip-service-justice-gov-uk" {
 }
 
 resource "aws_lb_listener_rule" "analytics-equip-service-justice-gov-uk" {
-  listener_arn = aws_lb_listener.lb_listener_https.arn
+  count        = local.is-production ? 1 : 0
+  listener_arn = aws_lb_listener.lb_listener_https[0].arn
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.lb_tg_analytics.arn
@@ -231,7 +240,8 @@ resource "aws_lb_listener_rule" "analytics-equip-service-justice-gov-uk" {
 }
 
 resource "aws_lb_listener_rule" "equip-analytics-rocstac-com" {
-  listener_arn = aws_lb_listener.lb_listener_https.arn
+  count        = local.is-production ? 1 : 0
+  listener_arn = aws_lb_listener.lb_listener_https[0].arn
   action {
     type = "redirect"
     redirect {
@@ -247,7 +257,8 @@ resource "aws_lb_listener_rule" "equip-analytics-rocstac-com" {
 }
 
 resource "aws_lb_listener_rule" "equip-gateway-rocstac-com" {
-  listener_arn = aws_lb_listener.lb_listener_https.arn
+  count        = local.is-production ? 1 : 0
+  listener_arn = aws_lb_listener.lb_listener_https[0].arn
   action {
     type = "redirect"
     redirect {
@@ -263,7 +274,8 @@ resource "aws_lb_listener_rule" "equip-gateway-rocstac-com" {
 }
 
 resource "aws_lb_listener_rule" "equip-portal-rocstac-com" {
-  listener_arn = aws_lb_listener.lb_listener_https.arn
+  count        = local.is-production ? 1 : 0
+  listener_arn = aws_lb_listener.lb_listener_https[0].arn
   action {
     type = "redirect"
     redirect {
@@ -276,4 +288,46 @@ resource "aws_lb_listener_rule" "equip-portal-rocstac-com" {
       values = ["equip-portal.rocstac.com"]
     }
   }
+}
+
+# Preserve state for the production account when adding count to the HTTPS listener
+# and its rules. Without these blocks Terraform would plan a destroy/recreate.
+moved {
+  from = aws_lb_listener.lb_listener_https
+  to   = aws_lb_listener.lb_listener_https[0]
+}
+
+moved {
+  from = aws_lb_listener_rule.equip-portal-equip-service-justice-gov-uk
+  to   = aws_lb_listener_rule.equip-portal-equip-service-justice-gov-uk[0]
+}
+
+moved {
+  from = aws_lb_listener_rule.gateway-equip-service-justice-gov-uk
+  to   = aws_lb_listener_rule.gateway-equip-service-justice-gov-uk[0]
+}
+
+moved {
+  from = aws_lb_listener_rule.portal-equip-service-justice-gov-uk
+  to   = aws_lb_listener_rule.portal-equip-service-justice-gov-uk[0]
+}
+
+moved {
+  from = aws_lb_listener_rule.analytics-equip-service-justice-gov-uk
+  to   = aws_lb_listener_rule.analytics-equip-service-justice-gov-uk[0]
+}
+
+moved {
+  from = aws_lb_listener_rule.equip-analytics-rocstac-com
+  to   = aws_lb_listener_rule.equip-analytics-rocstac-com[0]
+}
+
+moved {
+  from = aws_lb_listener_rule.equip-gateway-rocstac-com
+  to   = aws_lb_listener_rule.equip-gateway-rocstac-com[0]
+}
+
+moved {
+  from = aws_lb_listener_rule.equip-portal-rocstac-com
+  to   = aws_lb_listener_rule.equip-portal-rocstac-com[0]
 }

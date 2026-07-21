@@ -11,14 +11,14 @@
         "input.$": "$"
       },
       "Iterator": {
-        "StartAt": "MergeIntoEmdiPosition",
+        "StartAt": "MergeInto${table_name}",
         "States": {
-          "MergeIntoEmdiPosition": {
+          "MergeInto${table_name}": {
             "Type": "Task",
             "Resource": "arn:aws:states:::lambda:invoke",
             "ResultPath": "$.merge_result",
             "Parameters": {
-              "FunctionName": "${merge_emdi_position}",
+              "FunctionName": "${merge_function_name}",
               "Payload": {
                 "resource": "/request/",
                 "path": "/request/",
