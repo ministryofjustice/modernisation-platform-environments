@@ -1,0 +1,44 @@
+[project]
+name = "cloudwatch-slack-integration-v2"
+version = "0.1.0"
+description = "Cloudwatch-Slack integration V2"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "boto3>=1.43.36",
+    "mypy-boto3-lambda>=1.43.35",
+    "mypy-boto3-secretsmanager>=1.43.0",
+]
+
+# Dev-only tooling. NOT bundled into the Lambda deployment package; used for local
+# testing only. Install with `uv sync` (the `dev` group is enabled by default).
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "pytest-cov>=5",
+    "mypy>=1.11",
+    "ruff>=0.6",
+]
+
+[tool.ruff]
+# 120 accommodates the wide Slack block-dict literals so this pass fixes quotes and
+# whitespace without reflowing them. (Python version inferred from requires-python.)
+line-length = 120
+
+[tool.pytest.ini_options]
+testpaths = ["."]
+python_files = ["test_*.py"]
+addopts = "-q --cov=lambda_function --cov-report=term-missing"
+# Escalate DeprecationWarnings originating in our module to errors, so a reintroduced
+# deprecated API (e.g. datetime.utcnow()) fails the suite. Scoped to lambda_function
+# so dependency deprecations don't cause false failures.
+filterwarnings = ["error::DeprecationWarning:lambda_function"]
+
+[tool.coverage.run]
+# Measure coverage of the Lambda module only (not the tests themselves).
+source = ["lambda_function"]
+
+[tool.coverage.report]
+# Show the % and which line numbers are still uncovered.
+show_missing = true
+skip_covered = false

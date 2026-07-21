@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "FileRouted.v1",
-  "description": "A processing object has been copied to clean, quarantine or investigation; required metadata and GuardDuty status tags have been verified; and the source object was deleted. The managed file transfer flow has moved the object to a destination based on a GuardDuty Malware Protection for S3 scan outcome.",
+  "description": "A processing object has been copied to clean, quarantine or investigation; its metadata and source tags have been preserved and verified; and the exact source version was deleted. The authoritative scan-result event determines the route; final GuardDuty tag-status comparison is deferred.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -131,7 +131,7 @@
         "metadata": {
           "correlationId": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
           "causationId": "c5dc9cb4-3b1f-4f01-a4c6-41b30e11d790",
-          "idempotencyKey": "route:clean:example/report.csv:4Mh..."
+          "idempotencyKey": "route:clean:clean:example/report.csv:5Ni..."
         },
         "data": {
           "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",

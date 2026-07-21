@@ -27,6 +27,12 @@ echo -e "Account ID: ${ACCOUNT_ID}\n"
 
 export ECR_BASE=${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
+# Computed up front and baked into both images as a build-arg, so every run
+# produces a genuinely distinct image/digest in ECR - even if the rest of
+# the build context is unchanged and every other layer cache-hits - instead
+# of silently collapsing onto a prior identical build.
+TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+
 # Authenticate to ECR
 echo -e "${GREEN}Authenticating to ECR...${NC}"
 aws ecr get-login-password --region ${AWS_REGION} --profile ${AWS_PROFILE} \
@@ -35,20 +41,21 @@ aws ecr get-login-password --region ${AWS_REGION} --profile ${AWS_PROFILE} \
 # Build LinOTP
 echo -e "\n${GREEN}Building LinOTP image...${NC}"
 cd linotp3 || exit 1
-docker build --platform linux/amd64 -f Dockerfile.opensource -t laa-new-workspaces/linotp3:latest . || exit 1
+docker build --platform linux/amd64 --build-arg BUILD_TIMESTAMP=${TIMESTAMP} \
+  -f Dockerfile.opensource -t laa-new-workspaces/linotp3:latest . || exit 1
 echo -e "${GREEN}✓ LinOTP image built${NC}"
 
 # Build FreeRADIUS
 echo -e "\n${GREEN}Building FreeRADIUS image...${NC}"
 cd ../freeradius || exit 1
-docker build --platform linux/amd64 -t laa-new-workspaces/freeradius-linotp:latest . || exit 1
+docker build --platform linux/amd64 --build-arg BUILD_TIMESTAMP=${TIMESTAMP} \
+  -t laa-new-workspaces/freeradius-linotp:latest . || exit 1
 echo -e "${GREEN}✓ FreeRADIUS image built${NC}"
 
 cd .. || exit 1
 
 # Tag images
 echo -e "\n${GREEN}Tagging images...${NC}"
-TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 
 docker tag laa-new-workspaces/linotp3:latest ${ECR_BASE}/laa-new-workspaces/linotp3:latest
 docker tag laa-new-workspaces/linotp3:latest ${ECR_BASE}/laa-new-workspaces/linotp3:${TIMESTAMP}
