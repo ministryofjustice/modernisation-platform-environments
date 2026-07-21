@@ -1,6 +1,5 @@
 module "s3_dbbackup" {
-  # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0dd18aaef0d7c5565d93cc8997aad79636"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
 
   bucket_name        = "${local.component_name}-${local.env_label}-dbbackup"
   versioning_enabled = false
