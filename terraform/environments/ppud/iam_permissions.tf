@@ -279,7 +279,7 @@ locals {
           "describe_cloudwatch",
           "suppress_sechub_findings",
           "get_list_waf_web_acls",
-          "filter_waf_log_events"
+          "filter_waf_log_events",
           "update_ses_access_key",
           "update_ses_secrets_value",
           "ssm_send_command",

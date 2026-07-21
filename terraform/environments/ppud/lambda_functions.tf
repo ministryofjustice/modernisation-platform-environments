@@ -330,7 +330,7 @@ locals {
       description  = "Function to perform a deeper analysis WAM WAF Web ACL rule AWSManagedRulesBotControlRuleSet for bot traffic and save a report to S3."
       role_key     = "filter_waf_log_events"
       environments = ["development"]
-      layers       = ["xlsxwriter","requests", "pandas"]
+      layers       = ["xlsxwriter", "requests", "pandas"]
       permissions = [{
         principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"
