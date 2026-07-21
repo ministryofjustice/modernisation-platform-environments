@@ -19,7 +19,7 @@ resource "aws_kms_key_policy" "shared_kms_key_policy" {
 
   policy = jsonencode({
     Version = "2012-10-17",
-    Statement = [
+    Statement = concat([
       {
         Sid    = "AllowSNSUsage",
         Effect = "Allow",
@@ -52,19 +52,24 @@ resource "aws_kms_key_policy" "shared_kms_key_policy" {
           "kms:Encrypt"
         ],
         "Resource" : "*"
-      },
-      {
-        Sid    = "AllowS3ReplicationRole",
-        Effect = "Allow",
-        Principal = {
-          "AWS" : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/property-datahub-staging-replication"
-        },
-        Action = [
-          "kms:Decrypt",
-          "kms:GenerateDataKey"
-        ],
-        "Resource" : "*"
       }
-    ]
+      ],
+      # Replication role is only created in production (see iam.tf), so only
+      # reference it in the key policy there; otherwise KMS rejects the policy
+      # with "invalid principals" because the role does not exist.
+      local.is-production ? [
+        {
+          Sid    = "AllowS3ReplicationRole",
+          Effect = "Allow",
+          Principal = {
+            "AWS" : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/property-datahub-staging-replication"
+          },
+          Action = [
+            "kms:Decrypt",
+            "kms:GenerateDataKey"
+          ],
+          "Resource" : "*"
+        }
+    ] : [])
   })
 }
