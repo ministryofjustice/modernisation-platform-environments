@@ -3,7 +3,7 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 data "external" "glue_tables_by_database" {
-  for_each = concat(var.databases, var.dbt_databases)
+  for_each = concat(tolist(var.databases), tolist(var.dbt_databases))
 
   program = ["bash", "${path.module}/scripts/list_glue_tables.sh"]
 
