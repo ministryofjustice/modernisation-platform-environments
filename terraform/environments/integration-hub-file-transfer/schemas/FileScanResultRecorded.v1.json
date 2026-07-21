@@ -36,7 +36,13 @@
         "data": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["fileId", "object", "scanResultStatus", "recordedAt"],
+          "required": [
+            "fileId",
+            "object",
+            "scanResultStatus",
+            "tagStatus",
+            "recordedAt"
+          ],
           "properties": {
             "fileId": {
               "type": "string",
@@ -52,6 +58,18 @@
                 "UNSUPPORTED",
                 "ACCESS_DENIED",
                 "FAILED"
+              ]
+            },
+            "tagStatus": {
+              "type": "string",
+              "description": "GuardDutyMalwareScanStatus from the exact object version, or MISMATCH when the tag is absent or differs from scanResultStatus.",
+              "enum": [
+                "NO_THREATS_FOUND",
+                "THREATS_FOUND",
+                "UNSUPPORTED",
+                "ACCESS_DENIED",
+                "FAILED",
+                "MISMATCH"
               ]
             },
             "statusReasons": {
@@ -113,6 +131,7 @@
             "sizeBytes": 4096
           },
           "scanResultStatus": "NO_THREATS_FOUND",
+          "tagStatus": "NO_THREATS_FOUND",
           "recordedAt": "2026-07-10T14:02:00Z"
         }
       }

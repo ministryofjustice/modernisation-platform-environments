@@ -1,0 +1,328 @@
+{
+  "Comment": "Idempotently move an exact processing S3 object version after malware scanning",
+  "QueryLanguage": "JSONata",
+  "StartAt": "Initialise Event",
+  "TimeoutSeconds": ${timeout_seconds},
+  "States": {
+    "Initialise Event": {
+      "Type": "Pass",
+      "Assign": {
+        "eventId": "{% $states.input.id %}",
+        "concurrencyId": "{% $states.input.detail.metadata.correlationId %}",
+        "fileId": "{% $states.input.detail.data.fileId %}",
+        "sourceBucket": "{% $states.input.detail.data.object.bucket %}",
+        "sourceKey": "{% $states.input.detail.data.object.key %}",
+        "sourceVersionId": "{% $states.input.detail.data.object.versionId %}",
+        "sourceSize": "{% $states.input.detail.data.object.sizeBytes %}",
+        "scanResultStatus": "{% $states.input.detail.data.scanResultStatus %}",
+        "tagStatus": "{% $states.input.detail.data.tagStatus %}",
+        "expectedAccountId": ${account_id},
+        "cleanBucket": ${clean_bucket_name},
+        "cleanKmsKeyArn": ${clean_kms_key_arn},
+        "quarantineBucket": ${quarantine_bucket_name},
+        "quarantineKmsKeyArn": ${quarantine_kms_key_arn},
+        "investigationBucket": ${investigation_bucket_name},
+        "investigationKmsKeyArn": ${investigation_kms_key_arn},
+        "idempotencyTable": ${idempotency_table_name},
+        "eventBusArn": ${event_bus_arn},
+        "partSize": ${part_size_bytes},
+        "recordRetentionSeconds": ${record_retention_seconds}
+      },
+      "Next": "Select Route"
+    },
+    "Select Route": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Condition": "{% $tagStatus = 'NO_THREATS_FOUND' %}",
+          "Next": "Select Clean Destination"
+        },
+        {
+          "Condition": "{% $tagStatus = 'THREATS_FOUND' %}",
+          "Next": "Select Quarantine Destination"
+        }
+      ],
+      "Default": "Select Investigation Destination"
+    },
+    "Select Clean Destination": {
+      "Type": "Pass",
+      "Assign": {
+        "route": "clean",
+        "destinationBucket": "{% $cleanBucket %}",
+        "destinationKmsKeyArn": "{% $cleanKmsKeyArn %}"
+      },
+      "Next": "Claim Route Operation"
+    },
+    "Select Quarantine Destination": {
+      "Type": "Pass",
+      "Assign": {
+        "route": "quarantine",
+        "destinationBucket": "{% $quarantineBucket %}",
+        "destinationKmsKeyArn": "{% $quarantineKmsKeyArn %}"
+      },
+      "Next": "Claim Route Operation"
+    },
+    "Select Investigation Destination": {
+      "Type": "Pass",
+      "Assign": {
+        "route": "investigation",
+        "destinationBucket": "{% $investigationBucket %}",
+        "destinationKmsKeyArn": "{% $investigationKmsKeyArn %}"
+      },
+      "Next": "Claim Route Operation"
+    },
+    "Claim Route Operation": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "Arguments": {
+        "TableName": "{% $idempotencyTable %}",
+        "Key": {
+          "concurrencyId": { "S": "{% $concurrencyId %}" },
+          "operation": { "S": "ROUTE" }
+        },
+        "UpdateExpression": "SET #status = :in_progress, execution_arn = :execution_arn, event_id = :event_id, file_id = :file_id, correlation_id = :correlation_id, processing_bucket = :source_bucket, processing_key = :source_key, processing_version_id = :source_version_id, processing_size_bytes = :source_size, scan_result_status = :scan_result_status, tag_status = :tag_status, route = :route, created_at = :now, updated_at = :now",
+        "ConditionExpression": "attribute_not_exists(concurrencyId)",
+        "ExpressionAttributeNames": {
+          "#status": "status"
+        },
+        "ExpressionAttributeValues": {
+          ":in_progress": { "S": "IN_PROGRESS" },
+          ":execution_arn": { "S": "{% $states.context.Execution.Id %}" },
+          ":event_id": { "S": "{% $eventId %}" },
+          ":file_id": { "S": "{% $fileId %}" },
+          ":correlation_id": { "S": "{% $concurrencyId %}" },
+          ":source_bucket": { "S": "{% $sourceBucket %}" },
+          ":source_key": { "S": "{% $sourceKey %}" },
+          ":source_version_id": { "S": "{% $sourceVersionId %}" },
+          ":source_size": { "N": "{% $string($sourceSize) %}" },
+          ":scan_result_status": { "S": "{% $scanResultStatus %}" },
+          ":tag_status": { "S": "{% $tagStatus %}" },
+          ":route": { "S": "{% $route %}" },
+          ":now": { "S": "{% $now() %}" }
+        }
+      },
+      "Catch": [
+        {
+          "ErrorEquals": ["DynamoDB.ConditionalCheckFailedException"],
+          "Next": "Route Operation Already Claimed"
+        }
+      ],
+      "Next": "Head Source Object"
+    },
+    "Route Operation Already Claimed": {
+      "Type": "Succeed"
+    },
+    "Head Source Object": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:headObject",
+      "Arguments": {
+        "Bucket": "{% $sourceBucket %}",
+        "Key": "{% $sourceKey %}",
+        "VersionId": "{% $sourceVersionId %}",
+        "ExpectedBucketOwner": "{% $expectedAccountId %}"
+      },
+      "Assign": {
+        "sourceHead": "{% $states.result %}"
+      },
+      "Next": "Get Source Object Tags"
+    },
+    "Get Source Object Tags": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:getObjectTagging",
+      "Arguments": {
+        "Bucket": "{% $sourceBucket %}",
+        "Key": "{% $sourceKey %}",
+        "VersionId": "{% $sourceVersionId %}",
+        "ExpectedBucketOwner": "{% $expectedAccountId %}"
+      },
+      "Assign": {
+        "sourceTags": "{% $exists($states.result.TagSet) ? $states.result.TagSet : [] %}"
+      },
+      "Next": "Select Copy Method"
+    },
+    "Select Copy Method": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Condition": "{% $sourceSize = 0 %}",
+          "Next": "Copy Empty Object"
+        }
+      ],
+      "Default": "Create Multipart Upload"
+    },
+    "Copy Empty Object": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:copyObject",
+      "Arguments": "{% $merge([{'Bucket': $destinationBucket, 'Key': $sourceKey, 'CopySource': $sourceBucket & '/' & $encodeUrlComponent($sourceKey) & '?versionId=' & $encodeUrlComponent($sourceVersionId), 'ExpectedBucketOwner': $expectedAccountId, 'ExpectedSourceBucketOwner': $expectedAccountId, 'MetadataDirective': 'REPLACE', 'Metadata': $exists($sourceHead.Metadata) ? $sourceHead.Metadata : {}, 'TaggingDirective': 'COPY', 'ServerSideEncryption': 'aws:kms', 'SsekmsKeyId': $destinationKmsKeyArn}, $exists($sourceHead.CacheControl) ? {'CacheControl': $sourceHead.CacheControl} : {}, $exists($sourceHead.ContentDisposition) ? {'ContentDisposition': $sourceHead.ContentDisposition} : {}, $exists($sourceHead.ContentEncoding) ? {'ContentEncoding': $sourceHead.ContentEncoding} : {}, $exists($sourceHead.ContentLanguage) ? {'ContentLanguage': $sourceHead.ContentLanguage} : {}, $exists($sourceHead.ContentType) ? {'ContentType': $sourceHead.ContentType} : {}, $exists($sourceHead.Expires) ? {'Expires': $sourceHead.Expires} : {}]) %}",
+      "Assign": {
+        "destinationVersionId": "{% $states.result.VersionId %}"
+      },
+      "Next": "Delete Exact Source Version"
+    },
+    "Create Multipart Upload": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:createMultipartUpload",
+      "Arguments": "{% $merge([{'Bucket': $destinationBucket, 'Key': $sourceKey, 'ExpectedBucketOwner': $expectedAccountId, 'Metadata': $exists($sourceHead.Metadata) ? $sourceHead.Metadata : {}, 'ServerSideEncryption': 'aws:kms', 'SsekmsKeyId': $destinationKmsKeyArn}, $exists($sourceHead.CacheControl) ? {'CacheControl': $sourceHead.CacheControl} : {}, $exists($sourceHead.ContentDisposition) ? {'ContentDisposition': $sourceHead.ContentDisposition} : {}, $exists($sourceHead.ContentEncoding) ? {'ContentEncoding': $sourceHead.ContentEncoding} : {}, $exists($sourceHead.ContentLanguage) ? {'ContentLanguage': $sourceHead.ContentLanguage} : {}, $exists($sourceHead.ContentType) ? {'ContentType': $sourceHead.ContentType} : {}, $exists($sourceHead.Expires) ? {'Expires': $sourceHead.Expires} : {}]) %}",
+      "Assign": {
+        "uploadId": "{% $states.result.UploadId %}"
+      },
+      "Next": "Plan Multipart Parts"
+    },
+    "Plan Multipart Parts": {
+      "Type": "Pass",
+      "Assign": {
+        "parts": "{% $map($range(0, $ceil($sourceSize / $partSize) - 1, 1), function($index) { {'PartNumber': $index + 1, 'RangeStart': $index * $partSize, 'RangeEnd': $min([(($index + 1) * $partSize) - 1, $sourceSize - 1])} }) %}"
+      },
+      "Next": "Copy Multipart Parts"
+    },
+    "Copy Multipart Parts": {
+      "Type": "Map",
+      "Items": "{% $parts %}",
+      "MaxConcurrency": ${multipart_max_concurrency},
+      "ItemProcessor": {
+        "ProcessorConfig": {
+          "Mode": "INLINE"
+        },
+        "StartAt": "Copy Multipart Part",
+        "States": {
+          "Copy Multipart Part": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::aws-sdk:s3:uploadPartCopy",
+            "Arguments": {
+              "Bucket": "{% $destinationBucket %}",
+              "Key": "{% $sourceKey %}",
+              "UploadId": "{% $uploadId %}",
+              "PartNumber": "{% $states.input.PartNumber %}",
+              "CopySource": "{% $sourceBucket & '/' & $encodeUrlComponent($sourceKey) & '?versionId=' & $encodeUrlComponent($sourceVersionId) %}",
+              "CopySourceRange": "{% 'bytes=' & $string($states.input.RangeStart) & '-' & $string($states.input.RangeEnd) %}",
+              "ExpectedBucketOwner": "{% $expectedAccountId %}",
+              "ExpectedSourceBucketOwner": "{% $expectedAccountId %}"
+            },
+            "Retry": [
+              {
+                "ErrorEquals": ["S3.InternalErrorException", "S3.ServiceUnavailableException", "S3.SlowDownException", "States.Timeout"],
+                "IntervalSeconds": 2,
+                "MaxAttempts": 3,
+                "BackoffRate": 2,
+                "JitterStrategy": "FULL"
+              }
+            ],
+            "Output": {
+              "PartNumber": "{% $states.input.PartNumber %}",
+              "ETag": "{% $states.result.CopyPartResult.ETag %}"
+            },
+            "End": true
+          }
+        }
+      },
+      "Assign": {
+        "copiedParts": "{% $states.result %}"
+      },
+      "Next": "Complete Multipart Upload"
+    },
+    "Complete Multipart Upload": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:completeMultipartUpload",
+      "Arguments": {
+        "Bucket": "{% $destinationBucket %}",
+        "Key": "{% $sourceKey %}",
+        "UploadId": "{% $uploadId %}",
+        "ExpectedBucketOwner": "{% $expectedAccountId %}",
+        "MpuObjectSize": "{% $sourceSize %}",
+        "MultipartUpload": {
+          "Parts": "{% $sort($copiedParts, function($left, $right) { $left.PartNumber > $right.PartNumber }) %}"
+        }
+      },
+      "Assign": {
+        "destinationVersionId": "{% $states.result.VersionId %}"
+      },
+      "Next": "Apply Source Tags"
+    },
+    "Apply Source Tags": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:putObjectTagging",
+      "Arguments": {
+        "Bucket": "{% $destinationBucket %}",
+        "Key": "{% $sourceKey %}",
+        "VersionId": "{% $destinationVersionId %}",
+        "ExpectedBucketOwner": "{% $expectedAccountId %}",
+        "Tagging": {
+          "TagSet": "{% $sourceTags %}"
+        }
+      },
+      "Next": "Delete Exact Source Version"
+    },
+    "Delete Exact Source Version": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:deleteObject",
+      "Arguments": {
+        "Bucket": "{% $sourceBucket %}",
+        "Key": "{% $sourceKey %}",
+        "VersionId": "{% $sourceVersionId %}",
+        "ExpectedBucketOwner": "{% $expectedAccountId %}"
+      },
+      "Next": "Publish File Routed Event"
+    },
+    "Publish File Routed Event": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::events:putEvents",
+      "Arguments": {
+        "Entries": [
+          {
+            "Detail": "{% {'metadata': {'correlationId': $concurrencyId, 'causationId': $eventId, 'idempotencyKey': 'route:' & $route & ':' & $destinationBucket & ':' & $sourceKey & ':' & $destinationVersionId}, 'data': {'fileId': $fileId, 'sourceObject': {'bucket': $sourceBucket, 'key': $sourceKey, 'versionId': $sourceVersionId, 'sizeBytes': $sourceSize}, 'destinationObject': {'bucket': $destinationBucket, 'key': $sourceKey, 'versionId': $destinationVersionId, 'sizeBytes': $sourceSize}, 'route': $route, 'scanResultStatus': $scanResultStatus, 'tagStatus': $tagStatus, 'sourceDeleted': true}} %}",
+            "DetailType": "FileRouted.v1",
+            "EventBusName": "{% $eventBusArn %}",
+            "Source": "uk.gov.justice.service.managed-file-transfer"
+          }
+        ]
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["EventBridge.FailedEntry", "States.Timeout"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Assign": {
+        "routedEventId": "{% $states.result.Entries[0].EventId %}"
+      },
+      "Next": "Record Route Completed"
+    },
+    "Record Route Completed": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "Arguments": {
+        "TableName": "{% $idempotencyTable %}",
+        "Key": {
+          "concurrencyId": { "S": "{% $concurrencyId %}" },
+          "operation": { "S": "ROUTE" }
+        },
+        "UpdateExpression": "SET #status = :completed, destination_bucket = :destination_bucket, destination_key = :destination_key, destination_version_id = :destination_version_id, routed_event_id = :event_id, routed_event_idempotency_key = :idempotency_key, completed_at = :now, updated_at = :now, expiration = :expiration",
+        "ConditionExpression": "execution_arn = :execution_arn AND #status = :in_progress",
+        "ExpressionAttributeNames": {
+          "#status": "status"
+        },
+        "ExpressionAttributeValues": {
+          ":completed": { "S": "COMPLETED" },
+          ":in_progress": { "S": "IN_PROGRESS" },
+          ":execution_arn": { "S": "{% $states.context.Execution.Id %}" },
+          ":destination_bucket": { "S": "{% $destinationBucket %}" },
+          ":destination_key": { "S": "{% $sourceKey %}" },
+          ":destination_version_id": { "S": "{% $destinationVersionId %}" },
+          ":event_id": { "S": "{% $routedEventId %}" },
+          ":idempotency_key": { "S": "{% 'route:' & $route & ':' & $destinationBucket & ':' & $sourceKey & ':' & $destinationVersionId %}" },
+          ":now": { "S": "{% $now() %}" },
+          ":expiration": {
+            "N": "{% $string($floor($toMillis($now()) / 1000) + $recordRetentionSeconds) %}"
+          }
+        }
+      },
+      "Next": "Route Workflow Succeeded"
+    },
+    "Route Workflow Succeeded": {
+      "Type": "Succeed"
+    }
+  }
+}

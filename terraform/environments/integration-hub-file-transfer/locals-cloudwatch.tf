@@ -164,6 +164,20 @@ locals {
       statistic          = "Sum"
       threshold          = 0
     }
+    "eventbridge-file-routing-workflow-failed-invocations" = {
+      alarm_description   = "The FileScanResultRecorded.v1 EventBridge rule has failed to start the file routing workflow"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        EventBusName = module.eventbridge_file_transfer_bus.eventbridge_bus_name
+        RuleName     = module.eventbridge_file_transfer_bus.eventbridge_rules["file-routing-workflow"].name
+      }
+      evaluation_periods = 1
+      metric_name        = "FailedInvocations"
+      namespace          = "AWS/Events"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
+    }
     "eventbridge-file-transfer-workflow-dlq-visible-messages" = {
       alarm_description   = "The file transfer workflow EventBridge dead-letter queue contains failed events"
       comparison_operator = "GreaterThanThreshold"
@@ -221,6 +235,58 @@ locals {
       comparison_operator = "GreaterThanThreshold"
       dimensions = {
         StateMachineArn = module.step_function_filereceived_workflow.state_machine_arn
+      }
+      evaluation_periods = 1
+      metric_name        = "ExecutionThrottled"
+      namespace          = "AWS/States"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
+    }
+    "step-functions-file-routing-workflow-failures" = {
+      alarm_description   = "The file routing workflow has failed one or more executions"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        StateMachineArn = module.step_function_filescanresultrecorded_workflow.state_machine_arn
+      }
+      evaluation_periods = 1
+      metric_name        = "ExecutionsFailed"
+      namespace          = "AWS/States"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
+    }
+    "step-functions-file-routing-workflow-timeouts" = {
+      alarm_description   = "The file routing workflow has timed out one or more executions"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        StateMachineArn = module.step_function_filescanresultrecorded_workflow.state_machine_arn
+      }
+      evaluation_periods = 1
+      metric_name        = "ExecutionsTimedOut"
+      namespace          = "AWS/States"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
+    }
+    "step-functions-file-routing-workflow-aborts" = {
+      alarm_description   = "The file routing workflow has aborted one or more executions"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        StateMachineArn = module.step_function_filescanresultrecorded_workflow.state_machine_arn
+      }
+      evaluation_periods = 1
+      metric_name        = "ExecutionsAborted"
+      namespace          = "AWS/States"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
+    }
+    "step-functions-file-routing-workflow-throttles" = {
+      alarm_description   = "The file routing workflow has experienced state transition throttling"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        StateMachineArn = module.step_function_filescanresultrecorded_workflow.state_machine_arn
       }
       evaluation_periods = 1
       metric_name        = "ExecutionThrottled"

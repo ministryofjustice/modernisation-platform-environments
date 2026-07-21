@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "FileRouted.v1",
-  "description": "A processing object has been copied to clean, quarantine or investigation; its metadata and source tags have been preserved and verified; and the exact source version was deleted. The authoritative scan-result event determines the route; final GuardDuty tag-status comparison is deferred.",
+  "description": "A processing object has been moved to clean, quarantine or investigation according to its GuardDuty tag status.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -42,26 +42,32 @@
             "destinationObject",
             "route",
             "scanResultStatus",
+            "tagStatus",
             "sourceDeleted"
           ],
           "oneOf": [
             {
               "properties": {
                 "route": { "enum": ["clean"] },
-                "scanResultStatus": { "enum": ["NO_THREATS_FOUND"] }
+                "tagStatus": { "enum": ["NO_THREATS_FOUND"] }
               }
             },
             {
               "properties": {
                 "route": { "enum": ["quarantine"] },
-                "scanResultStatus": { "enum": ["THREATS_FOUND"] }
+                "tagStatus": { "enum": ["THREATS_FOUND"] }
               }
             },
             {
               "properties": {
                 "route": { "enum": ["investigation"] },
-                "scanResultStatus": {
-                  "enum": ["UNSUPPORTED", "ACCESS_DENIED", "FAILED"]
+                "tagStatus": {
+                  "enum": [
+                    "UNSUPPORTED",
+                    "ACCESS_DENIED",
+                    "FAILED",
+                    "MISMATCH"
+                  ]
                 }
               }
             }
@@ -86,6 +92,17 @@
                 "UNSUPPORTED",
                 "ACCESS_DENIED",
                 "FAILED"
+              ]
+            },
+            "tagStatus": {
+              "type": "string",
+              "enum": [
+                "NO_THREATS_FOUND",
+                "THREATS_FOUND",
+                "UNSUPPORTED",
+                "ACCESS_DENIED",
+                "FAILED",
+                "MISMATCH"
               ]
             },
             "sourceDeleted": { "type": "boolean", "enum": [true] }
@@ -149,6 +166,7 @@
           },
           "route": "clean",
           "scanResultStatus": "NO_THREATS_FOUND",
+          "tagStatus": "NO_THREATS_FOUND",
           "sourceDeleted": true
         }
       }

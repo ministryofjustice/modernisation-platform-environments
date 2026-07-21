@@ -84,10 +84,30 @@ locals {
               days = 3
             }
           },
+          {
+            id                                     = "abort-incomplete-multipart-uploads-after-1-day"
+            status                                 = "Enabled"
+            filter                                 = {}
+            abort_incomplete_multipart_upload_days = 1
+          },
         ]
 
-        quarantine    = []
-        investigation = []
+        quarantine = [
+          {
+            id                                     = "abort-incomplete-multipart-uploads-after-1-day"
+            status                                 = "Enabled"
+            filter                                 = {}
+            abort_incomplete_multipart_upload_days = 1
+          },
+        ]
+        investigation = [
+          {
+            id                                     = "abort-incomplete-multipart-uploads-after-1-day"
+            status                                 = "Enabled"
+            filter                                 = {}
+            abort_incomplete_multipart_upload_days = 1
+          },
+        ]
       }
     }
   }
