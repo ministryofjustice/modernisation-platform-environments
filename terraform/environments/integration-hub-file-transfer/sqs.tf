@@ -29,7 +29,6 @@ module "sqs_eventbridge_default_dlq" {
           variable = "aws:SourceArn"
           values = [
             module.eventbridge_default_bus.eventbridge_rule_arns["incoming-s3-object-created"],
-            module.eventbridge_default_bus.eventbridge_rule_arns["guardduty-malware-scan-result"],
           ]
         }
       ]
