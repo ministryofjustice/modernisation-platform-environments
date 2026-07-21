@@ -151,7 +151,7 @@ locals {
         "publish_to_sns",
         "send_logs_to_cloudwatch",
         "filter_waf_log_events",
-        "put_data_s3",
+        "get_data_s3",
         "get_cloudwatch_metrics"
       ]
     }
@@ -388,7 +388,7 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         } : each.value.policy_name == "filter_waf_log_events" ? {
         Effect   = "Allow"
         Action   = ["logs:FilterLogEvents"]
-        Resource = ["arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        Resource = ["arn:aws:logs:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
         } : each.value.policy_name == "update_ses_access_key" ? {
         Effect   = "Allow"
         Action   = ["iam:CreateAccessKey", "iam:DeleteAccessKey", "iam:ListAccessKeys", "iam:UpdateAccessKey"]
