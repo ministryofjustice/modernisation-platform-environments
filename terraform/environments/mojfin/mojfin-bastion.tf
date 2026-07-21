@@ -28,8 +28,5 @@ module "bastion_linux" {
 
   # Tags
   tags_common = local.tags
-  # tags_common = merge (local.tags, 
-  #  { "Name" = "bastion-${local.application_name}-README.txt" }
-  # )
   tags_prefix = terraform.workspace
 }
