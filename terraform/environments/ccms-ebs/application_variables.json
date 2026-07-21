@@ -137,14 +137,21 @@
       "ec2_disk_size_ssogen_mserver": 50,
       "ec2_disk_size_ssogen_temp": 20,
       "instance_role_ssogen": "ssogen",
-      "red_button_lambda_boom": false,
-      "red_button_lambda_debug": true,
       "oem": {
         "agent_port": "3872",
         "oms_port": "4903",
         "oms_host": "laa-oem-app.laa-development.modernisation-platform.service.justice.gov.uk",
         "oms_platform_cidr": "10.26.60.231/32",
         "oem_db_platform_cidr": "10.26.60.169/32"
+      },
+      "lambda": {
+        "cloudwatch-slack-integration-v2": {
+          "debug": true
+        },
+        "red-button": {
+          "boom": false,
+          "debug": true
+        }
       }
     },
     "test": {
@@ -279,14 +286,21 @@
       "ec2_disk_size_ssogen_mserver": 50,
       "ec2_disk_size_ssogen_temp": 20,
       "instance_role_ssogen": "ssogen",
-      "red_button_lambda_boom": false,
-      "red_button_lambda_debug": true,
       "oem": {
         "agent_port": "3872",
         "oms_port": "4903",
         "oms_host": "laa-oem-app.laa-test.modernisation-platform.service.justice.gov.uk",
         "oms_platform_cidr": "10.26.100.179/32",
         "oem_db_platform_cidr": "10.26.100.249/32"
+      },
+      "lambda": {
+        "cloudwatch-slack-integration-v2": {
+          "debug": true
+        },
+        "red-button": {
+          "boom": false,
+          "debug": true
+        }
       }
     },
     "preproduction": {
@@ -413,14 +427,21 @@
       "ec2_oracle_instance_cores_ssogen": 2,
       "ec2_oracle_instance_threads_ssogen": 1,
       "instance_role_ssogen": "ssogen",
-      "red_button_lambda_boom": false,
-      "red_button_lambda_debug": true,
       "oem": {
         "agent_port": "3872",
         "oms_port": "4903",
         "oms_host": "laa-oem-app.laa-preproduction.modernisation-platform.service.justice.gov.uk",
         "oms_platform_cidr": "10.27.76.154/32",
         "oem_db_platform_cidr": "10.27.76.135/32"
+      },
+      "lambda": {
+        "cloudwatch-slack-integration-v2": {
+          "debug": true
+        },
+        "red-button": {
+          "boom": false,
+          "debug": true
+        }
       }
     },
     "production": {
@@ -549,14 +570,21 @@
       "ec2_oracle_instance_cores_ssogen": 2,
       "ec2_oracle_instance_threads_ssogen": 1,
       "instance_role_ssogen": "ssogen",
-      "red_button_lambda_boom": false,
-      "red_button_lambda_debug": true,
       "oem": {
         "agent_port": "3872",
         "oms_port": "4903",
         "oms_host": "laa-oem-app.laa-production.modernisation-platform.service.justice.gov.uk",
         "oms_platform_cidr": "10.27.68.228/32",
         "oem_db_platform_cidr": "10.27.68.193/32"
+      },
+      "lambda": {
+        "cloudwatch-slack-integration-v2": {
+          "debug": true
+        },
+        "red-button": {
+          "boom": false,
+          "debug": true
+        }
       }
     }
   },
