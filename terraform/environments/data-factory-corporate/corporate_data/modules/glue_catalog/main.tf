@@ -10,7 +10,7 @@ terraform{
 
 
 module "glue_catalog_database" {
-  source = "git::https://github.com/cloudposse/terraform-aws-glue.git//modules/glue-catalog-database?ref=e04ac37bd44efcf29ad0a8fc94149bccc9162a6d"
+  source = "source = "git::https://github.com/ministryofjustice/modernisation-platform-environments.git//terraform/environments/data-factory-corporate/corporate_data/modules/glue_catalog?ref=abc1234567890abc1234567890abc1234567890a"
 
   catalog_database_name        = "analytics"
   catalog_database_description = "Glue Catalog database using data located in an S3 bucket"
