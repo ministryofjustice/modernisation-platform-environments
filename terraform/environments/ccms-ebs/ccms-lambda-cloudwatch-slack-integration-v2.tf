@@ -105,7 +105,7 @@ resource "aws_lambda_function" "cloudwatch_slack_integration_v2" {
     variables = {
       # This secret now contains slack_channel_webhook, slack_channel_webhook_guardduty, slack_channel_webhook_s3
       SECRET_NAME             = aws_secretsmanager_secret.ebs_cw_alerts_secrets.name
-      DEBUG                   = false
+      DEBUG                   = local.application_data.accounts[local.environment].lambda.cloudwatch-slack-integration-v2.debug
       METRICS_ENABLED         = true
       METRICS_NAMESPACE       = "CcmsEbs/SlackNotifier"
       NOTIFY_UNRECOGNISED     = true
