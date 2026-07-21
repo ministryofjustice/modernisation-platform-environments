@@ -385,7 +385,7 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Effect   = "Allow"
         Action   = ["wafv2:GetWebACL", "wafv2:ListWebACLs"]
         Resource = ["arn:aws:wafv2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
-        } : each.value.policy_name == "filter_log_events" ? {
+        } : each.value.policy_name == "filter_waf_log_events" ? {
         Effect   = "Allow"
         Action   = ["logs:FilterLogEvents"]
         Resource = ["arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
