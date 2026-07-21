@@ -144,6 +144,17 @@ locals {
         "get_list_waf_web_acls"
       ]
     }
+    filter_waf_log_events = {
+      description = "Lambda Function Role for retrieving and analysing waf log data"
+      policies = [
+        "send_message_to_sqs",
+        "publish_to_sns",
+        "send_logs_to_cloudwatch",
+        "filter_waf_log_events",
+        "put_data_s3",
+        "get_cloudwatch_metrics"
+      ]
+    }
     file_server_analysis = {
       description = "Lambda Function Role for retrieving and analysing data from S3"
       policies = [
@@ -268,6 +279,7 @@ locals {
           "describe_cloudwatch",
           "suppress_sechub_findings",
           "get_list_waf_web_acls",
+          "filter_waf_log_events",
           "update_ses_access_key",
           "update_ses_secrets_value",
           "ssm_send_command",
@@ -373,6 +385,10 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Effect   = "Allow"
         Action   = ["wafv2:GetWebACL", "wafv2:ListWebACLs"]
         Resource = ["arn:aws:wafv2:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        } : each.value.policy_name == "filter_waf_log_events" ? {
+        Effect   = "Allow"
+        Action   = ["logs:FilterLogEvents"]
+        Resource = ["arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
         } : each.value.policy_name == "update_ses_access_key" ? {
         Effect   = "Allow"
         Action   = ["iam:CreateAccessKey", "iam:DeleteAccessKey", "iam:ListAccessKeys", "iam:UpdateAccessKey"]

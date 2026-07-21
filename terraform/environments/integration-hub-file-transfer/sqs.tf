@@ -100,7 +100,10 @@ module "sqs_eventbridge_file_transfer_workflow_dlq" {
         {
           test     = "ArnEquals"
           variable = "aws:SourceArn"
-          values   = [module.eventbridge_file_transfer_bus.eventbridge_rule_arns["file-transfer-workflow"]]
+          values = [
+            module.eventbridge_file_transfer_bus.eventbridge_rule_arns["file-transfer-workflow"],
+            module.eventbridge_file_transfer_bus.eventbridge_rule_arns["file-routing-workflow"],
+          ]
         },
         {
           test     = "StringEquals"
