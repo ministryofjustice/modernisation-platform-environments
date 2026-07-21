@@ -20,8 +20,8 @@ locals {
         {
           database_name       = database_name
           table_name          = table_name
-          raw_database_prefix = local.raw_prefix_by_database[database_name]
-          dbt_domain          = local.domain_by_database[database_name]
+          raw_database_prefix = lookup(local.raw_prefix_by_database, database_name, null)
+          dbt_domain          = lookup(local.domain_by_database, database_name, null)
         }
       )
     }

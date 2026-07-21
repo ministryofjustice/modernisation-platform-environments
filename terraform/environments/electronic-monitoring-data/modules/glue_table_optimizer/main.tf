@@ -8,7 +8,7 @@ data "external" "glue_tables_by_database" {
   program = ["bash", "${path.module}/scripts/list_glue_tables.sh"]
 
   query = {
-    database_name = each.key
+    database_name = each.value
     region        = data.aws_region.current.name
   }
 }
