@@ -151,7 +151,7 @@ locals {
         "publish_to_sns",
         "send_logs_to_cloudwatch",
         "filter_waf_log_events",
-        "put_data_s3",
+        "get_data_s3",
         "get_cloudwatch_metrics"
       ]
     }
