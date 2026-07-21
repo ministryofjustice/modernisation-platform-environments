@@ -112,7 +112,7 @@ data "aws_iam_policy_document" "glue_table_optimizer_policy" {
 }
 
 resource "aws_iam_policy" "glue_table_optimizer_policy" {
-  name   = "glue-table-optimizer-policy"
+  name   = "glue-table-optimiser-policy"
   policy = data.aws_iam_policy_document.glue_table_optimizer_policy.json
 }
 
