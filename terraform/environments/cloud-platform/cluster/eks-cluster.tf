@@ -22,7 +22,7 @@ module "eks" {
   # enable_cluster_creator_admin_permissions = true ## CP GitHub actions access to cluster, Adds to access entries
   compute_config = {
     enabled    = true
-    node_pools = ["system", "general-purpose"] # general-purpose temporarily re-added to resolve cluster failures
+    node_pools = ["system"]
   }
   enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
