@@ -90,12 +90,39 @@ module "eventbridge_file_transfer_bus" {
         }
       })
     }
+    "file-routing-workflow" = {
+      description = "Route scanned processing objects for canonical FileScanResultRecorded.v1 events"
+      event_pattern = jsonencode({
+        account       = [data.aws_caller_identity.current.account_id]
+        source        = ["uk.gov.justice.service.managed-file-transfer"]
+        "detail-type" = ["FileScanResultRecorded.v1"]
+        detail = {
+          data = {
+            object = {
+              bucket = [module.s3_bucket["processing"].s3_bucket_id]
+            }
+          }
+        }
+      })
+    }
   }
 
   targets = {
     "file-transfer-workflow" = [
       {
         name            = "file-transfer-workflow"
+        arn             = module.step_function_file_transfer_workflow.state_machine_arn
+        attach_role_arn = true
+        dead_letter_arn = module.sqs_eventbridge_file_transfer_workflow_dlq.queue_arn
+        retry_policy = {
+          maximum_event_age_in_seconds = 86400
+          maximum_retry_attempts       = 185
+        }
+      }
+    ]
+    "file-routing-workflow" = [
+      {
+        name            = "file-routing-workflow"
         arn             = module.step_function_file_transfer_workflow.state_machine_arn
         attach_role_arn = true
         dead_letter_arn = module.sqs_eventbridge_file_transfer_workflow_dlq.queue_arn
