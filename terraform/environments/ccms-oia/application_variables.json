@@ -250,7 +250,7 @@
     "production": {
       "app_name": "ccms-oia",
       "aws_region": "eu-west-2",
-      "ami_image_id": "ami-0d6d764bbe794b8ca",
+      "ami_image_id": "ami-02f77a03ec776dc35",
       "gh_runner_ami_id": "ami-0336cdd409ab5eec4",
       "ec2_instance_type_gh_runner": "t2.small",
       "instance_role_gh_runner": "gh-runner",

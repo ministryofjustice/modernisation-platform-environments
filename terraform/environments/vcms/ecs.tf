@@ -6,15 +6,6 @@ module "ecs" {
   tags = local.tags
 }
 
-resource "aws_security_group" "cluster" {
-  name_prefix = "ecs-cluster-${local.environment}"
-  vpc_id      = local.account_config.shared_vpc_id
-  description = "ECS cluster SG"
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 module "ecs_service" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v6.0.0"
 
@@ -151,28 +142,4 @@ resource "aws_cloudwatch_log_group" "vcms" {
   retention_in_days = local.app_config.log_retention_in_days
   tags              = local.tags
 }
-
-resource "aws_security_group" "ecs_service" {
-  name        = "vcms-ecs"
-  description = "Security group for ECS service"
-  vpc_id      = local.account_info.vpc_id
-
-  ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = [aws_security_group.alb_sg.id]
-
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = local.tags
-}
-
 

@@ -1,10 +1,10 @@
-data "aws_route53_zone" "network-services-production" {
-  count    = local.is-production ? 1 : 0
-  provider = aws.core-network-services
+# data "aws_route53_zone" "network-services-production" {
+#   count    = local.is-production ? 1 : 0
+#   provider = aws.core-network-services
 
-  name         = "${local.domain}."
-  private_zone = false
-}
+#   name         = "${local.domain}."
+#   private_zone = false
+# }
 
 resource "aws_route53_record" "external" {
   count    = local.is-production ? 0 : 1
