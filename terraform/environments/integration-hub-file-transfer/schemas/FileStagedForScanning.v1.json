@@ -109,7 +109,7 @@
         "metadata": {
           "correlationId": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
           "causationId": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
-          "idempotencyKey": "processing/example/report.csv:3Lg..."
+          "idempotencyKey": "processing:example/report.csv:4Mh..."
         },
         "data": {
           "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",

@@ -7,41 +7,15 @@ module "weblogic" {
   }
 
   name              = "weblogic"
-  container_image   = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic:${var.delius_microservice_configs.weblogic.image_tag}"
+  create_service    = "false"
   env_name          = var.env_name
   account_config    = var.account_config
   account_info      = var.account_info
   capacity_provider = aws_ecs_capacity_provider.weblogic.name
 
-  desired_count = var.delius_microservice_configs.weblogic.task_count
-
   force_new_deployment = false
 
-  pin_task_definition_revision           = try(var.delius_microservice_configs.weblogic.task_definition_revision, 0)
-  ignore_changes_service_task_definition = false
-
   ecs_cluster_arn  = module.ecs.ecs_cluster_arn
-  container_memory = var.delius_microservice_configs.weblogic.container_memory
-  container_cpu    = var.delius_microservice_configs.weblogic.container_cpu
-
-  container_vars_default = var.delius_microservice_configs.weblogic_params
-
-  container_vars_env_specific = try(var.delius_microservice_configs.weblogic.container_vars_env_specific, {})
-
-  container_secrets_default = merge({
-    for name in local.weblogic_secrets : name => module.weblogic_ssm.arn_map[name]
-    }, {
-    "JDBC_PASSWORD" = "${module.oracle_db_shared.database_application_passwords_secret_arn}:delius_pool::"
-    }
-  )
-  container_secrets_env_specific = try(var.delius_microservice_configs.weblogic.container_secrets_env_specific, {})
-
-  container_port_config = [
-    {
-      containerPort = var.delius_microservice_configs.weblogic.container_port
-      protocol      = "tcp"
-    }
-  ]
 
   cluster_security_group_id = aws_security_group.cluster.id
 

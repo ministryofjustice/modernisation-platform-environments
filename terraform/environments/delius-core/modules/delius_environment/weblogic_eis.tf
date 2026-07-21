@@ -8,7 +8,7 @@ module "weblogic_eis" {
   }
 
   name              = "weblogic-eis"
-  container_image   = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic:${var.delius_microservice_configs.weblogic_eis.image_tag}"
+  create_service    = "false"
   env_name          = var.env_name
   account_config    = var.account_config
   account_info      = var.account_info
@@ -16,34 +16,7 @@ module "weblogic_eis" {
 
   force_new_deployment = false
 
-  desired_count = var.delius_microservice_configs.weblogic_eis.task_count
-
-  pin_task_definition_revision           = try(var.delius_microservice_configs.weblogic_eis.task_definition_revision, 0)
-  ignore_changes_service_task_definition = false
-
   ecs_cluster_arn  = module.ecs.ecs_cluster_arn
-  container_memory = var.delius_microservice_configs.weblogic_eis.container_memory
-  container_cpu    = var.delius_microservice_configs.weblogic_eis.container_cpu
-
-  container_vars_default = var.delius_microservice_configs.weblogic_params
-
-  container_vars_env_specific = try(var.delius_microservice_configs.weblogic_eis.container_vars_env_specific, {})
-
-  container_secrets_default = merge({
-    for name in local.weblogic_secrets : name => module.weblogic_ssm.arn_map[name]
-    }, {
-    "JDBC_PASSWORD"         = "${module.oracle_db_shared.database_application_passwords_secret_arn}:delius_pool::",
-    "USERMANAGEMENT_SECRET" = data.aws_ssm_parameter.usermanagement_secret.arn
-    }
-  )
-  container_secrets_env_specific = try(var.delius_microservice_configs.weblogic_eis.container_secrets_env_specific, {})
-
-  container_port_config = [
-    {
-      containerPort = var.delius_microservice_configs.weblogic_eis.container_port
-      protocol      = "tcp"
-    }
-  ]
 
   cluster_security_group_id = aws_security_group.cluster.id
 
@@ -96,37 +69,6 @@ module "weblogic_eis" {
 
   platform_vars = var.platform_vars
   tags          = var.tags
-}
-
-
-#######################
-# Weblogic EIS Params #
-#######################
-
-resource "aws_ssm_parameter" "weblogic_eis_google_analytics_id" {
-  name  = "/${var.env_name}/delius/monitoring/analytics/google_id"
-  type  = "String"
-  value = "DEFAULT"
-  lifecycle {
-    ignore_changes = [value]
-  }
-}
-
-data "aws_ssm_parameter" "weblogic_eis_google_analytics_id" {
-  name = aws_ssm_parameter.weblogic_eis_google_analytics_id.name
-}
-
-resource "aws_ssm_parameter" "usermanagement_secret" {
-  name  = "/${var.env_name}/delius/umt/umt/delius_secret"
-  type  = "SecureString"
-  value = "DEFAULT"
-  lifecycle {
-    ignore_changes = [value]
-  }
-}
-
-data "aws_ssm_parameter" "usermanagement_secret" {
-  name = aws_ssm_parameter.usermanagement_secret.name
 }
 
 resource "aws_launch_template" "weblogic_eis" {
