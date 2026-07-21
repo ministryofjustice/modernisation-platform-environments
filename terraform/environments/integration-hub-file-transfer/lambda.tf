@@ -80,14 +80,13 @@ module "lambda_file_scan_result_recorded_adapter" {
   trigger_on_package_timestamp      = false
 
   environment_variables = {
-    AWS_ACCOUNT_ID              = data.aws_caller_identity.current.account_id
-    EVENT_BUS_ARN               = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
-    IDEMPOTENCY_EXPIRY_SECONDS  = tostring(local.cloudwatch_retention_days * 24 * 60 * 60)
-    IDEMPOTENCY_TABLE           = module.dynamodb_adapter_idempotency.dynamodb_table_id
-    MALWARE_PROTECTION_PLAN_ARN = aws_guardduty_malware_protection_plan.this.arn
-    PROCESSING_BUCKET_NAME      = module.s3_bucket["processing"].s3_bucket_id
-    POWERTOOLS_LOG_LEVEL        = "INFO"
-    POWERTOOLS_SERVICE_NAME     = "integration-hub-file-transfer-file-scan-result-recorded-adapter"
+    AWS_ACCOUNT_ID             = data.aws_caller_identity.current.account_id
+    EVENT_BUS_ARN              = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
+    IDEMPOTENCY_EXPIRY_SECONDS = tostring(local.cloudwatch_retention_days * 24 * 60 * 60)
+    IDEMPOTENCY_TABLE          = module.dynamodb_adapter_idempotency.dynamodb_table_id
+    POWERTOOLS_LOG_LEVEL       = "INFO"
+    POWERTOOLS_SERVICE_NAME    = "integration-hub-file-transfer-file-scan-result-recorded-adapter"
+    WORKFLOW_IDEMPOTENCY_TABLE = module.dynamodb_file_transfer_idempotency.dynamodb_table_id
   }
 
   attach_policy_statements = true
@@ -107,6 +106,19 @@ module "lambda_file_scan_result_recorded_adapter" {
       ]
       resources = [module.dynamodb_adapter_idempotency.dynamodb_table_arn]
     }
+    read_staging_record = {
+      effect    = "Allow"
+      actions   = ["dynamodb:GetItem"]
+      resources = [module.dynamodb_file_transfer_idempotency.dynamodb_table_arn]
+    }
+    read_processing_object = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:GetObjectVersion",
+      ]
+      resources = ["${module.s3_bucket["processing"].s3_bucket_arn}/*"]
+    }
   }
 
   tags = local.tags
@@ -119,4 +131,12 @@ resource "aws_lambda_permission" "eventbridge_file_received_adapter" {
   function_name = module.lambda_file_received_adapter.lambda_function_name
   principal     = "events.amazonaws.com"
   source_arn    = module.eventbridge_default_bus.eventbridge_rule_arns["incoming-s3-object-created"]
+}
+
+resource "aws_lambda_permission" "eventbridge_file_scan_result_recorded_adapter" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = module.lambda_file_scan_result_recorded_adapter.lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = module.eventbridge_default_bus.eventbridge_rule_arns["guardduty-malware-scan-result"]
 }

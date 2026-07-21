@@ -249,7 +249,7 @@
       "Type": "Choice",
       "Choices": [
         {
-          "Condition": "{% $sourceHead.ContentLength = $sourceSize %}",
+          "Condition": "{% $sourceHead.ContentLength = $sourceSize and $not($exists($lookup(($exists($sourceHead.Metadata) ? $sourceHead.Metadata : {}), 'mft-correlation-id'))) %}",
           "Next": "Select Copy Method"
         }
       ],
@@ -259,7 +259,7 @@
       "Type": "Pass",
       "Assign": {
         "failureError": "SourceObjectMismatch",
-        "failureCause": "The exact source version size does not match FileReceived.v1",
+        "failureCause": "The exact source version size does not match FileReceived.v1 or uses reserved metadata",
         "failedState": "Validate Source Object"
       },
       "Next": "Select Pre-delete Cleanup"
@@ -277,17 +277,7 @@
     "Copy Empty Object": {
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:copyObject",
-      "Arguments": {
-        "Bucket": "{% $processingBucket %}",
-        "Key": "{% $sourceKey %}",
-        "CopySource": "{% $sourceBucket & '/' & $encodeUrlComponent($sourceKey) & '?versionId=' & $encodeUrlComponent($sourceVersionId) %}",
-        "ExpectedBucketOwner": "{% $expectedAccountId %}",
-        "ExpectedSourceBucketOwner": "{% $expectedAccountId %}",
-        "MetadataDirective": "COPY",
-        "TaggingDirective": "COPY",
-        "ServerSideEncryption": "aws:kms",
-        "SsekmsKeyId": "{% $processingKmsKeyArn %}"
-      },
+      "Arguments": "{% $merge([{'Bucket': $processingBucket, 'Key': $sourceKey, 'CopySource': $sourceBucket & '/' & $encodeUrlComponent($sourceKey) & '?versionId=' & $encodeUrlComponent($sourceVersionId), 'ExpectedBucketOwner': $expectedAccountId, 'ExpectedSourceBucketOwner': $expectedAccountId, 'MetadataDirective': 'REPLACE', 'Metadata': $merge([$exists($sourceHead.Metadata) ? $sourceHead.Metadata : {}, {'mft-correlation-id': $concurrencyId}]), 'TaggingDirective': 'COPY', 'ServerSideEncryption': 'aws:kms', 'SsekmsKeyId': $processingKmsKeyArn}, $exists($sourceHead.CacheControl) ? {'CacheControl': $sourceHead.CacheControl} : {}, $exists($sourceHead.ContentDisposition) ? {'ContentDisposition': $sourceHead.ContentDisposition} : {}, $exists($sourceHead.ContentEncoding) ? {'ContentEncoding': $sourceHead.ContentEncoding} : {}, $exists($sourceHead.ContentLanguage) ? {'ContentLanguage': $sourceHead.ContentLanguage} : {}, $exists($sourceHead.ContentType) ? {'ContentType': $sourceHead.ContentType} : {}, $exists($sourceHead.Expires) ? {'Expires': $sourceHead.Expires} : {}]) %}",
       "Assign": {
         "processingVersionId": "{% $states.result.VersionId %}"
       },
@@ -307,7 +297,7 @@
     "Create Multipart Upload": {
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:createMultipartUpload",
-      "Arguments": "{% $merge([{'Bucket': $processingBucket, 'Key': $sourceKey, 'ExpectedBucketOwner': $expectedAccountId, 'Metadata': ($exists($sourceHead.Metadata) ? $sourceHead.Metadata : {}), 'ServerSideEncryption': 'aws:kms', 'SsekmsKeyId': $processingKmsKeyArn}, $exists($sourceHead.CacheControl) ? {'CacheControl': $sourceHead.CacheControl} : {}, $exists($sourceHead.ContentDisposition) ? {'ContentDisposition': $sourceHead.ContentDisposition} : {}, $exists($sourceHead.ContentEncoding) ? {'ContentEncoding': $sourceHead.ContentEncoding} : {}, $exists($sourceHead.ContentLanguage) ? {'ContentLanguage': $sourceHead.ContentLanguage} : {}, $exists($sourceHead.ContentType) ? {'ContentType': $sourceHead.ContentType} : {}, $exists($sourceHead.Expires) ? {'Expires': $sourceHead.Expires} : {}]) %}",
+      "Arguments": "{% $merge([{'Bucket': $processingBucket, 'Key': $sourceKey, 'ExpectedBucketOwner': $expectedAccountId, 'Metadata': $merge([$exists($sourceHead.Metadata) ? $sourceHead.Metadata : {}, {'mft-correlation-id': $concurrencyId}]), 'ServerSideEncryption': 'aws:kms', 'SsekmsKeyId': $processingKmsKeyArn}, $exists($sourceHead.CacheControl) ? {'CacheControl': $sourceHead.CacheControl} : {}, $exists($sourceHead.ContentDisposition) ? {'ContentDisposition': $sourceHead.ContentDisposition} : {}, $exists($sourceHead.ContentEncoding) ? {'ContentEncoding': $sourceHead.ContentEncoding} : {}, $exists($sourceHead.ContentLanguage) ? {'ContentLanguage': $sourceHead.ContentLanguage} : {}, $exists($sourceHead.ContentType) ? {'ContentType': $sourceHead.ContentType} : {}, $exists($sourceHead.Expires) ? {'Expires': $sourceHead.Expires} : {}]) %}",
       "Assign": {
         "uploadId": "{% $states.result.UploadId %}"
       },
@@ -500,7 +490,7 @@
       "Type": "Choice",
       "Choices": [
         {
-          "Condition": "{% $destinationHead.ContentLength = $sourceHead.ContentLength and $count($keys($exists($destinationHead.Metadata) ? $destinationHead.Metadata : {})) = $count($keys($exists($sourceHead.Metadata) ? $sourceHead.Metadata : {})) and $count($filter($keys($exists($sourceHead.Metadata) ? $sourceHead.Metadata : {}), function($key) { $lookup($destinationHead.Metadata, $key) = $lookup($sourceHead.Metadata, $key) })) = $count($keys($exists($sourceHead.Metadata) ? $sourceHead.Metadata : {})) and $destinationTagFingerprint = $sourceTagFingerprint and $exists($destinationHead.CacheControl) = $exists($sourceHead.CacheControl) and ($not($exists($sourceHead.CacheControl)) or $destinationHead.CacheControl = $sourceHead.CacheControl) and $exists($destinationHead.ContentDisposition) = $exists($sourceHead.ContentDisposition) and ($not($exists($sourceHead.ContentDisposition)) or $destinationHead.ContentDisposition = $sourceHead.ContentDisposition) and $exists($destinationHead.ContentEncoding) = $exists($sourceHead.ContentEncoding) and ($not($exists($sourceHead.ContentEncoding)) or $destinationHead.ContentEncoding = $sourceHead.ContentEncoding) and $exists($destinationHead.ContentLanguage) = $exists($sourceHead.ContentLanguage) and ($not($exists($sourceHead.ContentLanguage)) or $destinationHead.ContentLanguage = $sourceHead.ContentLanguage) and $exists($destinationHead.ContentType) = $exists($sourceHead.ContentType) and ($not($exists($sourceHead.ContentType)) or $destinationHead.ContentType = $sourceHead.ContentType) and $exists($destinationHead.Expires) = $exists($sourceHead.Expires) and ($not($exists($sourceHead.Expires)) or $destinationHead.Expires = $sourceHead.Expires) %}",
+          "Condition": "{% $destinationHead.ContentLength = $sourceHead.ContentLength and $count($keys($exists($destinationHead.Metadata) ? $destinationHead.Metadata : {})) = $count($keys($exists($sourceHead.Metadata) ? $sourceHead.Metadata : {})) + 1 and $count($filter($keys($exists($sourceHead.Metadata) ? $sourceHead.Metadata : {}), function($key) { $lookup($destinationHead.Metadata, $key) = $lookup($sourceHead.Metadata, $key) })) = $count($keys($exists($sourceHead.Metadata) ? $sourceHead.Metadata : {})) and $lookup($destinationHead.Metadata, 'mft-correlation-id') = $concurrencyId and $destinationTagFingerprint = $sourceTagFingerprint and $exists($destinationHead.CacheControl) = $exists($sourceHead.CacheControl) and ($not($exists($sourceHead.CacheControl)) or $destinationHead.CacheControl = $sourceHead.CacheControl) and $exists($destinationHead.ContentDisposition) = $exists($sourceHead.ContentDisposition) and ($not($exists($sourceHead.ContentDisposition)) or $destinationHead.ContentDisposition = $sourceHead.ContentDisposition) and $exists($destinationHead.ContentEncoding) = $exists($sourceHead.ContentEncoding) and ($not($exists($sourceHead.ContentEncoding)) or $destinationHead.ContentEncoding = $sourceHead.ContentEncoding) and $exists($destinationHead.ContentLanguage) = $exists($sourceHead.ContentLanguage) and ($not($exists($sourceHead.ContentLanguage)) or $destinationHead.ContentLanguage = $sourceHead.ContentLanguage) and $exists($destinationHead.ContentType) = $exists($sourceHead.ContentType) and ($not($exists($sourceHead.ContentType)) or $destinationHead.ContentType = $sourceHead.ContentType) and $exists($destinationHead.Expires) = $exists($sourceHead.Expires) and ($not($exists($sourceHead.Expires)) or $destinationHead.Expires = $sourceHead.Expires) %}",
           "Next": "Delete Exact Source Version"
         }
       ],

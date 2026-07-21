@@ -137,6 +137,19 @@ locals {
       statistic          = "Maximum"
       threshold          = 0
     }
+    "eventbridge-guardduty-malware-scan-result-failed-invocations" = {
+      alarm_description   = "The GuardDuty malware scan result EventBridge rule has failed to invoke its target"
+      comparison_operator = "GreaterThanThreshold"
+      dimensions = {
+        RuleName = module.eventbridge_default_bus.eventbridge_rules["guardduty-malware-scan-result"].name
+      }
+      evaluation_periods = 1
+      metric_name        = "FailedInvocations"
+      namespace          = "AWS/Events"
+      period             = 300
+      statistic          = "Sum"
+      threshold          = 0
+    }
     "eventbridge-file-transfer-workflow-failed-invocations" = {
       alarm_description   = "The FileReceived.v1 EventBridge rule has failed to start the file transfer workflow"
       comparison_operator = "GreaterThanThreshold"

@@ -63,15 +63,13 @@ The GuardDuty adapter records every terminal scan result as `FileScanResultRecor
 
 At every stage, `fileId` and `correlationId` stay the same. The S3 location changes, the object version changes, and each EventBridge `id` is unique — but you can follow the whole chain.
 
-The workflow records a `PUBLISHED` checkpoint containing the `FileStagedForScanning.v1` EventBridge ID before marking the transfer `COMPLETED`. If EventBridge accepts the event but the checkpoint write fails, recovery can publish the event again. Consumers must therefore treat delivery as at least once and deduplicate using `detail.metadata.idempotencyKey`, which is derived from the exact processing bucket, key and version ID.
+The workflow records the `FileStagedForScanning.v1` EventBridge ID when marking the transfer `COMPLETED`. If EventBridge accepts the event but the completion write fails, recovery can publish the event again. Consumers must therefore treat delivery as at least once and deduplicate using `detail.metadata.idempotencyKey`, which is derived from the correlation ID and exact processing version ID.
 
-The GuardDuty adapter uses the exact processing bucket, key, and version ID to retrieve the durable workflow record. It publishes `FileScanResultRecorded.v1` only once the staged event ID is available, preserving causal ordering. Its idempotency key is `scan:{correlationId}:{processingVersionId}`, so retries produce one canonical scan result while a future rescan of another processing version remains distinct.
+The staging workflow writes `mft-correlation-id` as reserved metadata on the processing object. The GuardDuty adapter reads that metadata from the exact bucket, key and version ID, then retrieves the durable `STAGE` record by its `(correlationId, operation)` primary key. It publishes `FileScanResultRecorded.v1` only for a completed staging record, preserving causal ordering. Each native GuardDuty event ID is processed idempotently. Repeated native notifications can republish the same canonical `scan:{correlationId}:{processingVersionId}` idempotency key, so consumers must deduplicate on that key.
 
 The workflow treats this scan-result event as authoritative: `NO_THREATS_FOUND` routes to `clean`, `THREATS_FOUND` routes to `quarantine`, and `UNSUPPORTED`, `ACCESS_DENIED`, or `FAILED` route to `investigation`. It copies the exact processing version, preserving and verifying all source metadata and tags before deleting that exact source version. It does not compare GuardDuty status tags during routing; that final tag-status comparison is deferred.
 
 Routing has an independent idempotency record keyed as `file-routing-workflow#{FileScanResultRecorded.idempotencyKey}`. After the source-delete checkpoint, it publishes `FileRouted.v1` with an idempotency key of `route:{route}:{destinationBucket}:{key}:{destinationVersionId}`, then records `PUBLISHED` before completing. As with staging, a checkpoint failure after EventBridge accepts the event can lead to a duplicate publication, so consumers must deduplicate on this key.
-
-When introducing the processing-object lookup index, wait for workflows started with the previous state-machine definition to finish before enabling the GuardDuty EventBridge rule. Earlier executions do not write the lookup key and their scan results cannot be joined to the canonical lifecycle record.
 
 ## Rules for event producers
 

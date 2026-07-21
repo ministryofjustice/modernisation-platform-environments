@@ -22,6 +22,21 @@ module "eventbridge_default_bus" {
         }
       })
     }
+    "guardduty-malware-scan-result" = {
+      description = "Transform GuardDuty malware scan results into FileScanResultRecorded.v1 events"
+      event_pattern = jsonencode({
+        account       = [data.aws_caller_identity.current.account_id]
+        source        = ["aws.guardduty"]
+        "detail-type" = ["GuardDuty Malware Protection Object Scan Result"]
+        resources     = [aws_guardduty_malware_protection_plan.this.arn]
+        detail = {
+          resourceType = ["S3_OBJECT"]
+          s3ObjectDetails = {
+            bucketName = [module.s3_bucket["processing"].s3_bucket_id]
+          }
+        }
+      })
+    }
   }
 
   targets = {
@@ -30,6 +45,17 @@ module "eventbridge_default_bus" {
         name            = "file-received-v1"
         dead_letter_arn = module.sqs_eventbridge_default_dlq.queue_arn
         arn             = module.lambda_file_received_adapter.lambda_function_arn
+      }
+    ]
+    "guardduty-malware-scan-result" = [
+      {
+        name            = "file-scan-result-recorded-v1"
+        dead_letter_arn = module.sqs_eventbridge_default_dlq.queue_arn
+        arn             = module.lambda_file_scan_result_recorded_adapter.lambda_function_arn
+        retry_policy = {
+          maximum_event_age_in_seconds = 21600
+          maximum_retry_attempts       = 185
+        }
       }
     ]
   }
