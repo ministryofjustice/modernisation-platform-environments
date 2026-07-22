@@ -83,6 +83,14 @@ module "rotate_iam_key" {
   timeout                 = 900
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
+
+  environment_variables = {
+    ROTATION_COMPLETION_EVENT_ENABLED = tostring(
+      local.serco_fms_rotation_completion_events_enabled
+    )
+
+    ROTATION_EVENT_BUS_NAME = local.serco_fms_rotation_event_bus_name
+  }
 }
 
 #-----------------------------------------------------------------------------------
