@@ -5,6 +5,10 @@
         "cors_allowed_origins": [],
         "max_presigned_url_expiry_seconds": 3600,
         "presigned_url_expiry_seconds": 900,
+        "throttling": {
+          "burst_limit": 100,
+          "rate_limit": 200
+        },
         "multipart_upload": {
           "single_put_limit_bytes": 5368709120,
           "multipart_default_part_size_bytes": 67108864,
@@ -44,6 +48,10 @@
         "cors_allowed_origins": [],
         "max_presigned_url_expiry_seconds": 3600,
         "presigned_url_expiry_seconds": 900,
+        "throttling": {
+          "burst_limit": 100,
+          "rate_limit": 200
+        },
         "multipart_upload": {
           "single_put_limit_bytes": 5368709120,
           "multipart_default_part_size_bytes": 67108864,
@@ -63,6 +71,10 @@
         "cors_allowed_origins": [],
         "max_presigned_url_expiry_seconds": 3600,
         "presigned_url_expiry_seconds": 900,
+        "throttling": {
+          "burst_limit": 100,
+          "rate_limit": 200
+        },
         "multipart_upload": {
           "single_put_limit_bytes": 5368709120,
           "multipart_default_part_size_bytes": 67108864,
@@ -82,6 +94,10 @@
         "cors_allowed_origins": [],
         "max_presigned_url_expiry_seconds": 3600,
         "presigned_url_expiry_seconds": 900,
+        "throttling": {
+          "burst_limit": 100,
+          "rate_limit": 200
+        },
         "multipart_upload": {
           "single_put_limit_bytes": 5368709120,
           "multipart_default_part_size_bytes": 67108864,

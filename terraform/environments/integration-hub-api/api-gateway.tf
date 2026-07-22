@@ -103,8 +103,9 @@ resource "aws_apigatewayv2_stage" "default" {
 
   default_route_settings {
     detailed_metrics_enabled = true
+    throttling_burst_limit   = local.api_gateway_throttling_configuration.burst_limit
+    throttling_rate_limit    = local.api_gateway_throttling_configuration.rate_limit
   }
-
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.api_access.arn
     format = jsonencode({
