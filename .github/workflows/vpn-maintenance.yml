@@ -64,7 +64,7 @@ jobs:
                     echo vpn_environment=$VPN_ENVIRONMENT >> $GITHUB_OUTPUT
                     echo "VPN Environment is $VPN_ENVIRONMENT"
               - name: Slack failure notification
-                uses: slackapi/slack-github-action@0d95c9a7becc1e6e297d76df9bc735c44f4cbcbc # v3.0.5
+                uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4.0.0
                 with:
                   webhook-type: incoming-webhook
                   payload: |
@@ -112,7 +112,7 @@ jobs:
                     ./scripts/replace-vpn-tunnel.sh "${{ env.VPN_ID }}"
               
               - name: Slack failure notification
-                uses: slackapi/slack-github-action@0d95c9a7becc1e6e297d76df9bc735c44f4cbcbc # v3.0.5
+                uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4.0.0
                 with:
                   webhook-type: incoming-webhook
                   payload: |
