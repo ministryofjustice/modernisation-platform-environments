@@ -25,30 +25,23 @@ module "dynamodb_adapter_idempotency" {
   }
 }
 
-module "dynamodb_file_transfer_workflow_idempotency" {
+module "dynamodb_file_transfer_idempotency" {
   source  = "terraform-aws-modules/dynamodb-table/aws"
   version = "5.5.0"
 
-  name         = "${local.application_name}-${local.environment}-file-transfer-workflow-idempotency"
+  name         = "${local.application_name}-${local.environment}-file-transfer-idempotency"
   billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "id"
+  hash_key     = "concurrencyId"
+  range_key    = "operation"
 
   attributes = [
     {
-      name = "id"
+      name = "concurrencyId"
       type = "S"
     },
     {
-      name = "processing_object_lookup_key"
+      name = "operation"
       type = "S"
-    }
-  ]
-
-  global_secondary_indexes = [
-    {
-      name            = "processing-object-lookup-key-index"
-      hash_key        = "processing_object_lookup_key"
-      projection_type = "ALL"
     }
   ]
 

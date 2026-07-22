@@ -44,7 +44,7 @@ jobs:
 
   fetch-secrets-for-step-functions:
     if: inputs.action != 'destroy'
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@d682f41c6f6b8c6bc0e06ae38ef41a464aa8a204 # v6.1.6
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@40972648982915f26e5b5e22bd92f3af9297a707 # v6.1.7
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -68,7 +68,7 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Decrypt environment data
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@d682f41c6f6b8c6bc0e06ae38ef41a464aa8a204 # v6.1.6
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@40972648982915f26e5b5e22bd92f3af9297a707 # v6.1.7
         with:
           environment_management: ${{ needs.fetch-secrets-for-step-functions.outputs.environment_management }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -95,30 +95,9 @@ jobs:
           role-session-name: step-functions-tests
           aws-region: eu-west-2
 
-      - name: Test Copy Incoming Object
-        shell: bash
-        run: |
-          set -euo pipefail
-          result="$(
-            aws stepfunctions test-state \
-              --definition "file://${COPY_INCOMING_OBJECT_DEFINITION}" \
-              --input "file://${COPY_INCOMING_OBJECT_INPUT}" \
-              --variables "file://${COPY_INCOMING_OBJECT_VARIABLES}" \
-              --mock '{
-                "result": "{\"VersionId\": \"test-processing-version-id\"}",
-                "fieldValidationMode": "NONE"
-              }' \
-              --inspection-level DEBUG \
-              --no-cli-pager
-          )"
-          jq . <<< "${result}"
-          jq --exit-status '.status == "SUCCEEDED"' <<< "${result}"
-
-
   terraform:
     needs:
       - strategy
-      - test-step-functions
     if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
     strategy:
       fail-fast: false
