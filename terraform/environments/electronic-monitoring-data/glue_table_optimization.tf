@@ -45,13 +45,18 @@ module "glue_table_optimiser" {
   source = "./modules/glue_table_optimiser"
 
   databases                           = local.live_feed_dbs_to_grant
-  data_bucket_lf_resource_arn         = aws_lakeformation_resource.data_bucket.arn
   optimizer_bucket_id                 = module.s3-create-a-derived-table-bucket.bucket.id
   orphan_prefix_overrides_by_database = local.orphan_prefix_overrides_by_database
   role_arn                            = aws_iam_role.glue_table_optimiser.arn
   environment                         = local.environment_shorthand
   dbt_databases                       = local.dbt_dbs_to_grant
   dbt_domain_name_by_database         = local.dbt_domain_name_by_database
+  
+  depends_on = [
+    aws_lakeformation_permissions.glue_table_optimizer_database_permissions,
+    aws_lakeformation_permissions.glue_table_optimizer_permissions,
+    aws_lakeformation_permissions.glue_table_optimizer_table_permissions
+  ]
 }
 
 

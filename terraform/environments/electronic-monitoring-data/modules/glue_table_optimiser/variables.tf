@@ -2,10 +2,6 @@ variable "databases" {
   type = set(string)
 }
 
-variable "data_bucket_lf_resource_arn" {
-  type = string
-}
-
 variable "optimizer_bucket_id" {
   type = string
 }
