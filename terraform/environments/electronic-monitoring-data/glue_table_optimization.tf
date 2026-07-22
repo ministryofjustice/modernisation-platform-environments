@@ -124,3 +124,33 @@ resource "aws_iam_role_policy_attachment" "glue_table_optimiser_policy_attachmen
   role       = aws_iam_role.glue_table_optimiser.name
   policy_arn = aws_iam_policy.glue_table_optimiser_policy.arn
 }
+
+resource "aws_lakeformation_permissions" "glue_table_optimizer_permissions" {
+  principal   = aws_iam_role.glue_table_optimiser.arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+
+  data_location {
+    arn = aws_lakeformation_resource.data_bucket.arn
+  }
+}
+
+resource "aws_lakeformation_permissions" "glue_table_optimizer_table_permissions" {
+  for_each    = setunion(local.live_feed_dbs_to_grant, local.dbt_dbs_to_grant)
+  principal   = aws_iam_role.glue_table_optimiser.arn
+  permissions = ["ALTER", "DESCRIBE", "INSERT", "DELETE"]
+
+  table {
+    database_name = each.key
+    wildcard      = true
+  }
+}
+
+resource "aws_lakeformation_permissions" "glue_table_optimizer_database_permissions" {
+  for_each    = setunion(local.live_feed_dbs_to_grant, local.dbt_dbs_to_grant)
+  principal   = aws_iam_role.glue_table_optimiser.arn
+  permissions = ["DESCRIBE"]
+
+  database {
+    name = each.key
+  }
+}

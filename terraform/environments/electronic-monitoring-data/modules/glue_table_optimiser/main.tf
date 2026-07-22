@@ -74,33 +74,3 @@ resource "aws_glue_catalog_table_optimizer" "standard_orphan_file_deletion" {
     aws_lakeformation_permissions.glue_table_optimizer_table_permissions
   ]
 }
-
-resource "aws_lakeformation_permissions" "glue_table_optimizer_permissions" {
-  principal   = var.role_arn
-  permissions = ["DATA_LOCATION_ACCESS"]
-
-  data_location {
-    arn = var.data_bucket_lf_resource_arn
-  }
-}
-
-resource "aws_lakeformation_permissions" "glue_table_optimizer_table_permissions" {
-  for_each    = var.databases
-  principal   = var.role_arn
-  permissions = ["ALTER", "DESCRIBE", "INSERT", "DELETE"]
-
-  table {
-    database_name = each.key
-    wildcard      = true
-  }
-}
-
-resource "aws_lakeformation_permissions" "glue_table_optimizer_database_permissions" {
-  for_each    = var.databases
-  principal   = var.role_arn
-  permissions = ["DESCRIBE"]
-
-  database {
-    name = each.key
-  }
-}
