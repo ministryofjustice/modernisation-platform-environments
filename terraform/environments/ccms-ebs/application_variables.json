@@ -146,7 +146,7 @@
       },
       "lambda": {
         "cloudwatch-slack-integration-v2": {
-          "debug": true
+          "debug": false
         },
         "red-button": {
           "boom": false,
@@ -295,7 +295,7 @@
       },
       "lambda": {
         "cloudwatch-slack-integration-v2": {
-          "debug": true
+          "debug": false
         },
         "red-button": {
           "boom": false,
@@ -436,7 +436,7 @@
       },
       "lambda": {
         "cloudwatch-slack-integration-v2": {
-          "debug": true
+          "debug": false
         },
         "red-button": {
           "boom": false,
@@ -579,7 +579,7 @@
       },
       "lambda": {
         "cloudwatch-slack-integration-v2": {
-          "debug": true
+          "debug": false
         },
         "red-button": {
           "boom": false,
