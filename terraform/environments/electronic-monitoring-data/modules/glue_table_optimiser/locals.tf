@@ -13,6 +13,7 @@ locals {
   }
 
   dbt_suffix = var.environment == "prod" ? "" : "_${var.environment}_dbt"
+  db_suffix = var.environment == "prod" ? "" : "_${var.environment}"
 
 
   tables_to_optimize_flat = length(keys(data.external.glue_tables_by_database)) == 0 ? {} : merge([
@@ -22,7 +23,7 @@ locals {
         {
           database_name       = database_name
           table_name          = table_name
-          raw_database_prefix = lookup(local.raw_prefix_by_database, trimsuffix(database_name, local.dbt_suffix), null)
+          raw_database_prefix = lookup(local.raw_prefix_by_database, trimsuffix(database_name, local.db_suffix), null)
           dbt_domain          = lookup(local.domain_by_database, trimsuffix(database_name, local.dbt_suffix), null)
         }
       )
