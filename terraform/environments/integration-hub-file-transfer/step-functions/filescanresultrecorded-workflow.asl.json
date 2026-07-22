@@ -80,7 +80,7 @@
           "concurrencyId": { "S": "{% $concurrencyId %}" },
           "operation": { "S": "ROUTE" }
         },
-        "UpdateExpression": "SET #status = :in_progress, execution_arn = :execution_arn, event_id = :event_id, file_id = :file_id, correlation_id = :correlation_id, processing_bucket = :source_bucket, processing_key = :source_key, processing_version_id = :source_version_id, processing_size_bytes = :source_size, scan_result_status = :scan_result_status, tag_status = :tag_status, route = :route, created_at = :now, updated_at = :now",
+        "UpdateExpression": "SET #status = :in_progress, execution_arn = :execution_arn, event_id = :event_id, file_id = :file_id, correlation_id = :correlation_id, processing_bucket = :source_bucket, processing_key = :source_key, processing_version_id = :source_version_id, processing_size_bytes = :source_size, scan_result_status = :scan_result_status, tag_status = :tag_status, route = :route, created_at = :now, updated_at = :now, expiration = :expiration",
         "ConditionExpression": "attribute_not_exists(concurrencyId)",
         "ExpressionAttributeNames": {
           "#status": "status"
@@ -98,7 +98,10 @@
           ":scan_result_status": { "S": "{% $scanResultStatus %}" },
           ":tag_status": { "S": "{% $tagStatus %}" },
           ":route": { "S": "{% $route %}" },
-          ":now": { "S": "{% $now() %}" }
+          ":now": { "S": "{% $now() %}" },
+          ":expiration": {
+            "N": "{% $string($floor($toMillis($now()) / 1000) + $recordRetentionSeconds) %}"
+          }
         }
       },
       "Catch": [
