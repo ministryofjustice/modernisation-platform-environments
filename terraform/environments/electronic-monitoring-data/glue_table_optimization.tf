@@ -118,5 +118,5 @@ resource "aws_iam_policy" "glue_table_optimiser_policy" {
 
 resource "aws_iam_role_policy_attachment" "glue_table_optimizer_policy_attachment" {
   role       = aws_iam_role.glue_table_optimizer.name
-  policy_arn = aws_iam_policy.glue_table_optimizer_policy.arn
+  policy_arn = aws_iam_policy.glue_table_optimiser_policy.arn
 }
