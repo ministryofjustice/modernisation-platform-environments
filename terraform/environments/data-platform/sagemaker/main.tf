@@ -86,8 +86,8 @@ module "elevenlabs_asr_sagemaker_execution_iam_role" {
         "logs:PutLogEvents",
       ]
       resources = [
-        "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/sagemaker/Endpoints/${local.deployment_name}-endpoint",
-        "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/sagemaker/Endpoints/${local.deployment_name}-endpoint:log-stream:*",
+        "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/sagemaker/Endpoints/${local.deployment_name}",
+        "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/sagemaker/Endpoints/${local.deployment_name}:log-stream:*",
       ]
     }
     KMSAccess = {
