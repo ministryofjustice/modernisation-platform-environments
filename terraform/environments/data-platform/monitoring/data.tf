@@ -32,3 +32,11 @@ data "aws_secretsmanager_secret_version" "grafana_api_token" {
 
   secret_id = module.grafana_api_token_secret[0].secret_id
 }
+
+# PagerDuty integration key (routing key) for the Event Orchestrator. The secret
+# is managed in the data-platform-pagerduty repository.
+data "aws_secretsmanager_secret_version" "pagerduty_integration_key" {
+  count = local.grafana_alerting_manageable ? 1 : 0
+
+  secret_id = "pagerduty/global/integration-keys/grafana"
+}
