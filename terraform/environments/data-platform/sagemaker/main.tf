@@ -1,6 +1,10 @@
 locals {
-  deployment_name   = "elevenlabs-asr"
-  elevenlabs_config = terraform.workspace == "data-platform-development" ? jsondecode(data.aws_secretsmanager_secret_version.elevenlabs_configuration_secret[0].secret_string) : {}
+  deployment_name = "elevenlabs-asr"
+  elevenlabs_config = terraform.workspace == "data-platform-development" ? jsondecode(data.aws_secretsmanager_secret_version.elevenlabs_configuration_secret[0].secret_string) : {
+    model_name        = ""
+    model_package_arn = ""
+    instance_type     = ""
+  }
 }
 
 module "elevenlabs_configuration_secret" {
