@@ -26,6 +26,7 @@ locals {
           dbt_domain          = lookup(local.domain_by_database, trimsuffix(database_name, local.dbt_suffix), null)
         }
       )
+      if !contains(["test_results", "metrics"], trimsuffix(database_name, local.dbt_suffix))
     }
   ]...)
 }

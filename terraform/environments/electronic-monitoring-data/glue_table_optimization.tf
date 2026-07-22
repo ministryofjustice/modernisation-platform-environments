@@ -34,6 +34,10 @@ locals {
     "data_insights" = "consumption"
     "datamart" = "consumption"
     "derived" = "consumption"
+    "curated_fms" = "curated"
+    "preprocessed_fms" = "preprocessed"
+    "staged_fms" = "staged"
+
   }
 }
 
