@@ -36,5 +36,5 @@ module "apex-ecs" {
   # Note: use the same secret ARN as the ECS task definition template.
   # Previous SSM parameter ARN kept for rollback:
   # database_tad_password_arn  = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.app_db_password_name}"
-  database_tad_password_arn  = local.db_secret_arn
+  database_tad_password_arn = local.db_secret_arn
 }
