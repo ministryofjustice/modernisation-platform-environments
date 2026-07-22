@@ -1,13 +1,13 @@
 module "oracle_ebs_apps" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/08ee30f
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/oracle-ec2?ref=08ee30f"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/5674fd2
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/oracle-ec2?ref=5674fd2"
   count  = 2
 
   name          = "ec2-${local.component_name}-${local.env_label}-ebsapps-${count.index + 1}"
   instance_profile_name = aws_iam_instance_profile.ebsapps.name
 
   instance_type      = local.application_data.accounts[local.environment].ec2_instance_type_ebsapps
-  ami_id             = local.application_data.accounts[local.environment].ebsapps_ami_id
+  ami_id             = local.application_data.accounts[local.environment].ebsapps_ami_ids[count.index]
   key_name           = local.application_data.accounts[local.environment].key_name
   subnet_id          = local.private_subnets[count.index]
   security_group_ids = [aws_security_group.ebsapps.id]

@@ -1,6 +1,6 @@
 module "oracle_ebs_db" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/08ee30f
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/oracle-ec2?ref=08ee30f"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/5674fd2
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/oracle-ec2?ref=5674fd2"
 
   name          = "ec2-${local.component_name}-${local.env_label}-ebsdb"
   instance_profile_name = aws_iam_instance_profile.ebsdb.name

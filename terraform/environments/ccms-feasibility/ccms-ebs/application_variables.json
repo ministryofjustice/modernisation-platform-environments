@@ -3,11 +3,10 @@
     "development": {
       "key_name": "ccms-feasibility",
       "ec2_instance_type_ebsdb": "r5.2xlarge",
-      "ebsdb_ami_id": "ami-PLACEHOLDER",
+      "ebsdb_ami_id": "ami-01321d07947791ee8",
       "ec2_instance_type_ebsapps": "r5.2xlarge",
-      "ebsapps_ami_id": "ami-PLACEHOLDER",
+      "ebsapps_ami_ids": ["ami-0932e4d9484436e47", "ami-011e346b2cd58cdc8"],
       "tg_apps_port": 8000,
-
       "ebs_size_ebsdb_swap": 20,
       "ebs_iops_ebsdb_swap": 3000,
       "ebs_size_ebsdb_exhome": 100,
