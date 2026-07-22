@@ -1,4 +1,5 @@
 module "cloudwatch_eventbridge" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
   version = "5.7.2"
 
@@ -10,6 +11,7 @@ module "cloudwatch_eventbridge" {
 }
 
 module "cloudwatch_metric_alarms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   for_each = local.cloudwatch_metric_alarms
 
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
