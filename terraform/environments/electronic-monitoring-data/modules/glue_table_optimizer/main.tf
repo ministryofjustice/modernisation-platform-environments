@@ -1,18 +1,3 @@
-data "aws_caller_identity" "current" {}
-
-data "aws_region" "current" {}
-
-data "external" "glue_tables_by_database" {
-  for_each = setunion(var.databases, var.dbt_databases)
-
-  program = ["bash", "${path.module}/scripts/list_glue_tables.sh"]
-
-  query = {
-    database_name = each.value
-    region        = data.aws_region.current.name
-  }
-}
-
 resource "aws_glue_catalog_table_optimizer" "standard_compaction" {
   for_each      = local.tables_to_optimize_flat
   catalog_id    = data.aws_caller_identity.current.account_id
