@@ -1,10 +1,11 @@
 module "waf" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/08ee30f
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/waf?ref=08ee30f"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/21c239b
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/waf?ref=21c239b"
 
-  name    = "${local.component_name}-${local.env_label}"
-  alb_arn = module.alb.alb_arn
-  tags    = local.tags
+  name                 = "${local.component_name}-${local.env_label}"
+  alb_arn              = module.alb.alb_arn
+  enable_managed_rules = false
+  tags                 = local.tags
 
   ip_allowlist = [
     data.aws_vpc.shared.cidr_block,
