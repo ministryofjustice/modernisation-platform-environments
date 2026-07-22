@@ -174,7 +174,7 @@ class FileScanResultRecordedAdapterTest(unittest.TestCase):
             detail["metadata"]["causationId"], "6dce6b40-6e43-49f0-a2cf-1da1d43bce22"
         )
         self.assertEqual(detail["data"]["scanResultStatus"], "NO_THREATS_FOUND")
-        self.assertEqual(detail["data"]["tagStatus"], "NO_THREATS_FOUND")
+        self.assertTrue(detail["data"]["scanResultStatusMatchesTag"])
         self.assertEqual(detail["data"]["object"]["sizeBytes"], 4096)
         self.assertEqual(entry["Time"], datetime(2026, 7, 10, 14, 2, tzinfo=timezone.utc))
         self.assertEqual(result, {"eventId": "scan-result-event-id"})
@@ -243,7 +243,7 @@ class FileScanResultRecordedAdapterTest(unittest.TestCase):
             ["PASSWORD_PROTECTED"],
         )
 
-    def test_publishes_mismatch_without_changing_scan_result_status(self):
+    def test_reports_tag_mismatch_without_changing_scan_result_status(self):
         for tag_set in [
             [],
             [
@@ -260,7 +260,7 @@ class FileScanResultRecordedAdapterTest(unittest.TestCase):
                 entry = self.events_client.put_events.call_args.kwargs["Entries"][0]
                 data = json.loads(entry["Detail"])["data"]
                 self.assertEqual(data["scanResultStatus"], "NO_THREATS_FOUND")
-                self.assertEqual(data["tagStatus"], "MISMATCH")
+                self.assertFalse(data["scanResultStatusMatchesTag"])
                 IDEMPOTENCY_CACHE.clear()
 
     def test_rejects_processing_object_without_correlation_metadata(self):

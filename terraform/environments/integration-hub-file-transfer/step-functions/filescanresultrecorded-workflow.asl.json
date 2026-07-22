@@ -15,7 +15,7 @@
         "sourceVersionId": "{% $states.input.detail.data.object.versionId %}",
         "sourceSize": "{% $states.input.detail.data.object.sizeBytes %}",
         "scanResultStatus": "{% $states.input.detail.data.scanResultStatus %}",
-        "tagStatus": "{% $states.input.detail.data.tagStatus %}",
+        "scanResultStatusMatchesTag": "{% $states.input.detail.data.scanResultStatusMatchesTag %}",
         "expectedAccountId": ${account_id},
         "cleanBucket": ${clean_bucket_name},
         "cleanKmsKeyArn": ${clean_kms_key_arn},
@@ -34,11 +34,11 @@
       "Type": "Choice",
       "Choices": [
         {
-          "Condition": "{% $tagStatus = 'NO_THREATS_FOUND' %}",
+          "Condition": "{% $scanResultStatusMatchesTag and $scanResultStatus = 'NO_THREATS_FOUND' %}",
           "Next": "Select Clean Destination"
         },
         {
-          "Condition": "{% $tagStatus = 'THREATS_FOUND' %}",
+          "Condition": "{% $scanResultStatusMatchesTag and $scanResultStatus = 'THREATS_FOUND' %}",
           "Next": "Select Quarantine Destination"
         }
       ],
@@ -80,7 +80,7 @@
           "concurrencyId": { "S": "{% $concurrencyId %}" },
           "operation": { "S": "ROUTE" }
         },
-        "UpdateExpression": "SET #status = :in_progress, execution_arn = :execution_arn, event_id = :event_id, file_id = :file_id, correlation_id = :correlation_id, processing_bucket = :source_bucket, processing_key = :source_key, processing_version_id = :source_version_id, processing_size_bytes = :source_size, scan_result_status = :scan_result_status, tag_status = :tag_status, route = :route, created_at = :now, updated_at = :now, expiration = :expiration",
+        "UpdateExpression": "SET #status = :in_progress, execution_arn = :execution_arn, event_id = :event_id, file_id = :file_id, correlation_id = :correlation_id, processing_bucket = :source_bucket, processing_key = :source_key, processing_version_id = :source_version_id, processing_size_bytes = :source_size, scan_result_status = :scan_result_status, scan_result_status_matches_tag = :scan_result_status_matches_tag, route = :route, created_at = :now, updated_at = :now, expiration = :expiration",
         "ConditionExpression": "attribute_not_exists(concurrencyId)",
         "ExpressionAttributeNames": {
           "#status": "status"
@@ -96,7 +96,7 @@
           ":source_version_id": { "S": "{% $sourceVersionId %}" },
           ":source_size": { "N": "{% $string($sourceSize) %}" },
           ":scan_result_status": { "S": "{% $scanResultStatus %}" },
-          ":tag_status": { "S": "{% $tagStatus %}" },
+          ":scan_result_status_matches_tag": { "BOOL": "{% $scanResultStatusMatchesTag %}" },
           ":route": { "S": "{% $route %}" },
           ":now": { "S": "{% $now() %}" },
           ":expiration": {
@@ -156,7 +156,7 @@
     "Copy Empty Object": {
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:copyObject",
-      "Arguments": "{% $merge([{'Bucket': $destinationBucket, 'Key': $sourceKey, 'CopySource': $sourceBucket & '/' & $encodeUrlComponent($sourceKey) & '?versionId=' & $encodeUrlComponent($sourceVersionId), 'ExpectedBucketOwner': $expectedAccountId, 'ExpectedSourceBucketOwner': $expectedAccountId, 'MetadataDirective': 'REPLACE', 'Metadata': $exists($sourceHead.Metadata) ? $sourceHead.Metadata : {}, 'TaggingDirective': 'COPY', 'ServerSideEncryption': 'aws:kms', 'SsekmsKeyId': $destinationKmsKeyArn}, $exists($sourceHead.CacheControl) ? {'CacheControl': $sourceHead.CacheControl} : {}, $exists($sourceHead.ContentDisposition) ? {'ContentDisposition': $sourceHead.ContentDisposition} : {}, $exists($sourceHead.ContentEncoding) ? {'ContentEncoding': $sourceHead.ContentEncoding} : {}, $exists($sourceHead.ContentLanguage) ? {'ContentLanguage': $sourceHead.ContentLanguage} : {}, $exists($sourceHead.ContentType) ? {'ContentType': $sourceHead.ContentType} : {}, $exists($sourceHead.Expires) ? {'Expires': $sourceHead.Expires} : {}, $exists($sourceHead.WebsiteRedirectLocation) ? {'WebsiteRedirectLocation': $sourceHead.WebsiteRedirectLocation} : {}]) %}"
+      "Arguments": "{% $merge([{'Bucket': $destinationBucket, 'Key': $sourceKey, 'CopySource': $sourceBucket & '/' & $encodeUrlComponent($sourceKey) & '?versionId=' & $encodeUrlComponent($sourceVersionId), 'ExpectedBucketOwner': $expectedAccountId, 'ExpectedSourceBucketOwner': $expectedAccountId, 'MetadataDirective': 'REPLACE', 'Metadata': $exists($sourceHead.Metadata) ? $sourceHead.Metadata : {}, 'TaggingDirective': 'COPY', 'ServerSideEncryption': 'aws:kms', 'SsekmsKeyId': $destinationKmsKeyArn}, $exists($sourceHead.CacheControl) ? {'CacheControl': $sourceHead.CacheControl} : {}, $exists($sourceHead.ContentDisposition) ? {'ContentDisposition': $sourceHead.ContentDisposition} : {}, $exists($sourceHead.ContentEncoding) ? {'ContentEncoding': $sourceHead.ContentEncoding} : {}, $exists($sourceHead.ContentLanguage) ? {'ContentLanguage': $sourceHead.ContentLanguage} : {}, $exists($sourceHead.ContentType) ? {'ContentType': $sourceHead.ContentType} : {}, $exists($sourceHead.Expires) ? {'Expires': $sourceHead.Expires} : {}, $exists($sourceHead.WebsiteRedirectLocation) ? {'WebsiteRedirectLocation': $sourceHead.WebsiteRedirectLocation} : {}]) %}",
       "Assign": {
         "destinationVersionId": "{% $states.result.VersionId %}"
       },
@@ -165,7 +165,7 @@
     "Create Multipart Upload": {
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:createMultipartUpload",
-      "Arguments": "{% $merge([{'Bucket': $destinationBucket, 'Key': $sourceKey, 'ExpectedBucketOwner': $expectedAccountId, 'Metadata': $exists($sourceHead.Metadata) ? $sourceHead.Metadata : {}, 'ServerSideEncryption': 'aws:kms', 'SsekmsKeyId': $destinationKmsKeyArn}, $exists($sourceHead.CacheControl) ? {'CacheControl': $sourceHead.CacheControl} : {}, $exists($sourceHead.ContentDisposition) ? {'ContentDisposition': $sourceHead.ContentDisposition} : {}, $exists($sourceHead.ContentEncoding) ? {'ContentEncoding': $sourceHead.ContentEncoding} : {}, $exists($sourceHead.ContentLanguage) ? {'ContentLanguage': $sourceHead.ContentLanguage} : {}, $exists($sourceHead.ContentType) ? {'ContentType': $sourceHead.ContentType} : {}, $exists($sourceHead.Expires) ? {'Expires': $sourceHead.Expires} : {}, $exists($sourceHead.WebsiteRedirectLocation) ? {'WebsiteRedirectLocation': $sourceHead.WebsiteRedirectLocation} : {}]) %}"
+      "Arguments": "{% $merge([{'Bucket': $destinationBucket, 'Key': $sourceKey, 'ExpectedBucketOwner': $expectedAccountId, 'Metadata': $exists($sourceHead.Metadata) ? $sourceHead.Metadata : {}, 'ServerSideEncryption': 'aws:kms', 'SsekmsKeyId': $destinationKmsKeyArn}, $exists($sourceHead.CacheControl) ? {'CacheControl': $sourceHead.CacheControl} : {}, $exists($sourceHead.ContentDisposition) ? {'ContentDisposition': $sourceHead.ContentDisposition} : {}, $exists($sourceHead.ContentEncoding) ? {'ContentEncoding': $sourceHead.ContentEncoding} : {}, $exists($sourceHead.ContentLanguage) ? {'ContentLanguage': $sourceHead.ContentLanguage} : {}, $exists($sourceHead.ContentType) ? {'ContentType': $sourceHead.ContentType} : {}, $exists($sourceHead.Expires) ? {'Expires': $sourceHead.Expires} : {}, $exists($sourceHead.WebsiteRedirectLocation) ? {'WebsiteRedirectLocation': $sourceHead.WebsiteRedirectLocation} : {}]) %}",
       "Assign": {
         "uploadId": "{% $states.result.UploadId %}"
       },
@@ -272,7 +272,7 @@
       "Arguments": {
         "Entries": [
           {
-            "Detail": "{% {'metadata': {'correlationId': $concurrencyId, 'causationId': $eventId, 'idempotencyKey': 'route:' & $route & ':' & $destinationBucket & ':' & $sourceKey & ':' & $destinationVersionId}, 'data': {'fileId': $fileId, 'sourceObject': {'bucket': $sourceBucket, 'key': $sourceKey, 'versionId': $sourceVersionId, 'sizeBytes': $sourceSize}, 'destinationObject': {'bucket': $destinationBucket, 'key': $sourceKey, 'versionId': $destinationVersionId, 'sizeBytes': $sourceSize}, 'route': $route, 'scanResultStatus': $scanResultStatus, 'tagStatus': $tagStatus, 'sourceDeleted': true}} %}",
+            "Detail": "{% {'metadata': {'correlationId': $concurrencyId, 'causationId': $eventId, 'idempotencyKey': 'route:' & $route & ':' & $destinationBucket & ':' & $sourceKey & ':' & $destinationVersionId}, 'data': {'fileId': $fileId, 'sourceObject': {'bucket': $sourceBucket, 'key': $sourceKey, 'versionId': $sourceVersionId, 'sizeBytes': $sourceSize}, 'destinationObject': {'bucket': $destinationBucket, 'key': $sourceKey, 'versionId': $destinationVersionId, 'sizeBytes': $sourceSize}, 'route': $route, 'scanResultStatus': $scanResultStatus, 'scanResultStatusMatchesTag': $scanResultStatusMatchesTag, 'sourceDeleted': true}} %}",
             "DetailType": "FileRouted.v1",
             "EventBusName": "{% $eventBusArn %}",
             "Source": "uk.gov.justice.service.managed-file-transfer"

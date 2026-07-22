@@ -68,7 +68,7 @@ def _attribute(item, name, attribute_type="S"):
     return _required(value, f"workflow record {name}")
 
 
-def _tag_status(scan):
+def _scan_result_status_matches_tag(scan):
     response = s3.get_object_tagging(
         Bucket=scan["bucket"],
         Key=scan["key"],
@@ -83,7 +83,7 @@ def _tag_status(scan):
         ),
         None,
     )
-    return tag_status if tag_status == scan["scanResultStatus"] else "MISMATCH"
+    return tag_status == scan["scanResultStatus"]
 
 
 def _workflow_record(scan):
@@ -126,12 +126,12 @@ def _workflow_record(scan):
     }
 
 
-def _build_detail(scan, workflow, tag_status, recorded_at):
+def _build_detail(scan, workflow, scan_result_status_matches_tag, recorded_at):
     data = {
         "fileId": workflow["fileId"],
         "object": workflow["object"],
         "scanResultStatus": scan["scanResultStatus"],
-        "tagStatus": tag_status,
+        "scanResultStatusMatchesTag": scan_result_status_matches_tag,
         "recordedAt": recorded_at.isoformat().replace("+00:00", "Z"),
     }
     if scan["statusReasons"]:
@@ -159,7 +159,7 @@ def _build_detail(scan, workflow, tag_status, recorded_at):
 def lambda_handler(event, _context):
     scan = _scan(event)
     workflow = _workflow_record(scan)
-    tag_status = _tag_status(scan)
+    scan_result_status_matches_tag = _scan_result_status_matches_tag(scan)
     recorded_at = _event_time(event)
     response = eventbridge.put_events(
         Entries=[
@@ -167,7 +167,12 @@ def lambda_handler(event, _context):
                 "Source": "uk.gov.justice.service.managed-file-transfer",
                 "DetailType": "FileScanResultRecorded.v1",
                 "Detail": json.dumps(
-                    _build_detail(scan, workflow, tag_status, recorded_at),
+                    _build_detail(
+                        scan,
+                        workflow,
+                        scan_result_status_matches_tag,
+                        recorded_at,
+                    ),
                     separators=(",", ":"),
                 ),
                 "EventBusName": os.environ["EVENT_BUS_ARN"],

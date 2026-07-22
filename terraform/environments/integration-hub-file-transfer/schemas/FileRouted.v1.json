@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "FileRouted.v1",
-  "description": "A processing object has been moved to clean, quarantine or investigation according to its GuardDuty tag status.",
+  "description": "A processing object has been moved to clean, quarantine or investigation according to its GuardDuty scan result and the matching object tag breadcrumb.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -42,34 +42,42 @@
             "destinationObject",
             "route",
             "scanResultStatus",
-            "tagStatus",
+            "scanResultStatusMatchesTag",
             "sourceDeleted"
           ],
           "oneOf": [
             {
               "properties": {
                 "route": { "enum": ["clean"] },
-                "tagStatus": { "enum": ["NO_THREATS_FOUND"] }
+                "scanResultStatus": { "enum": ["NO_THREATS_FOUND"] },
+                "scanResultStatusMatchesTag": { "enum": [true] }
               }
             },
             {
               "properties": {
                 "route": { "enum": ["quarantine"] },
-                "tagStatus": { "enum": ["THREATS_FOUND"] }
+                "scanResultStatus": { "enum": ["THREATS_FOUND"] },
+                "scanResultStatusMatchesTag": { "enum": [true] }
               }
             },
             {
               "properties": {
-                "route": { "enum": ["investigation"] },
-                "tagStatus": {
-                  "enum": [
-                    "UNSUPPORTED",
-                    "ACCESS_DENIED",
-                    "FAILED",
-                    "MISMATCH"
-                  ]
+                "route": { "enum": ["investigation"] }
+              },
+              "anyOf": [
+                {
+                  "properties": {
+                    "scanResultStatusMatchesTag": { "enum": [false] }
+                  }
+                },
+                {
+                  "properties": {
+                    "scanResultStatus": {
+                      "enum": ["UNSUPPORTED", "ACCESS_DENIED", "FAILED"]
+                    }
+                  }
                 }
-              }
+              ]
             }
           ],
           "properties": {
@@ -94,16 +102,8 @@
                 "FAILED"
               ]
             },
-            "tagStatus": {
-              "type": "string",
-              "enum": [
-                "NO_THREATS_FOUND",
-                "THREATS_FOUND",
-                "UNSUPPORTED",
-                "ACCESS_DENIED",
-                "FAILED",
-                "MISMATCH"
-              ]
+            "scanResultStatusMatchesTag": {
+              "type": "boolean"
             },
             "sourceDeleted": { "type": "boolean", "enum": [true] }
           }
@@ -166,7 +166,7 @@
           },
           "route": "clean",
           "scanResultStatus": "NO_THREATS_FOUND",
-          "tagStatus": "NO_THREATS_FOUND",
+          "scanResultStatusMatchesTag": true,
           "sourceDeleted": true
         }
       }

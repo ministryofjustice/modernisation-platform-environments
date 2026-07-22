@@ -40,7 +40,7 @@
             "fileId",
             "object",
             "scanResultStatus",
-            "tagStatus",
+            "scanResultStatusMatchesTag",
             "recordedAt"
           ],
           "properties": {
@@ -60,17 +60,9 @@
                 "FAILED"
               ]
             },
-            "tagStatus": {
-              "type": "string",
-              "description": "GuardDutyMalwareScanStatus from the exact object version, or MISMATCH when the tag is absent or differs from scanResultStatus.",
-              "enum": [
-                "NO_THREATS_FOUND",
-                "THREATS_FOUND",
-                "UNSUPPORTED",
-                "ACCESS_DENIED",
-                "FAILED",
-                "MISMATCH"
-              ]
+            "scanResultStatusMatchesTag": {
+              "type": "boolean",
+              "description": "Whether scanResultStatus matches the GuardDutyMalwareScanStatus tag on the exact object version. False when the tag is absent or differs."
             },
             "statusReasons": {
               "type": "array",
@@ -131,7 +123,7 @@
             "sizeBytes": 4096
           },
           "scanResultStatus": "NO_THREATS_FOUND",
-          "tagStatus": "NO_THREATS_FOUND",
+          "scanResultStatusMatchesTag": true,
           "recordedAt": "2026-07-10T14:02:00Z"
         }
       }
