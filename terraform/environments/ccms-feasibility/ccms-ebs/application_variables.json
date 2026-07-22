@@ -35,7 +35,12 @@
       "ebsapps_u01_size": 200,
       "ebsapps_u03_size": 200,
       "ebsapps_stage_size": 100,
-      "ebsapps_default_iops": 3000
+      "ebsapps_default_iops": 3000,
+
+      "lz_aws_workspace_nonprod_prod": "10.200.0.0/19",
+      "mojo_devices": "10.184.0.0/14",
+      "dom1_devices": "10.172.68.144/29",
+      "moj_wifi": "10.148.0.0/14"
     }
   }
 }
