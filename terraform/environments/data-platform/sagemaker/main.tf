@@ -1,9 +1,9 @@
 locals {
   deployment_name = "elevenlabs-asr"
   elevenlabs_config = terraform.workspace == "data-platform-development" ? jsondecode(data.aws_secretsmanager_secret_version.elevenlabs_configuration_secret[0].secret_string) : {
-    model_name        = ""
-    model_package_arn = ""
-    instance_type     = ""
+    model_name        = "placeholder"
+    model_package_arn = "placeholder"
+    instance_type     = "ml.m5.large"
   }
 }
 
