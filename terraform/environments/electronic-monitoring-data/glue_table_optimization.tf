@@ -51,12 +51,6 @@ module "glue_table_optimiser" {
   environment                         = local.environment_shorthand
   dbt_databases                       = local.dbt_dbs_to_grant
   dbt_domain_name_by_database         = local.dbt_domain_name_by_database
-  
-  depends_on = [
-    aws_lakeformation_permissions.glue_table_optimizer_database_permissions,
-    aws_lakeformation_permissions.glue_table_optimizer_permissions,
-    aws_lakeformation_permissions.glue_table_optimizer_table_permissions
-  ]
 }
 
 
