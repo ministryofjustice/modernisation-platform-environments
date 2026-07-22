@@ -1112,3 +1112,198 @@ module "write_to_sharepoint" {
     SECRET_AZURE_CLIENT_SECRET = jsondecode(data.aws_secretsmanager_secret_version.entra_app_details[0].secret_string)["client_secret"]
   }
 }
+
+# ------------------------------------------------------------------------------
+# Serco FMS encrypted-key distribution Lambda
+# ------------------------------------------------------------------------------
+
+module "send_serco_fms_keys" {
+  source   = "./modules/lambdas"
+  is_image = true
+
+  function_name = "send_serco_fms_keys"
+  handler       = "send_serco_fms_keys.handler"
+
+  role_name = aws_iam_role.send_serco_fms_keys.name
+  role_arn  = aws_iam_role.send_serco_fms_keys.arn
+
+  memory_size                    = 512
+  timeout                        = 120
+  reserved_concurrent_executions = 1
+  cloudwatch_retention_days      = 7
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.env_name
+
+  environment_variables = {
+    POWERTOOLS_LOG_LEVEL = "INFO"
+
+    SERCO_KEY_DISTRIBUTION_ENABLED = tostring(
+      local.serco_fms_key_distribution_enabled
+    )
+
+    ENVIRONMENT = local.environment_shorthand
+
+    SECRET_SPEC_JSON = jsonencode(
+      local.serco_fms_key_distribution_secret_specs
+    )
+
+    GOVUK_NOTIFY_API_KEY_SECRET_ARN = (
+      aws_secretsmanager_secret.govuk_notify_serco_fms_api_key.arn
+    )
+
+    GOVUK_NOTIFY_EMAIL_TEMPLATE_ID = (
+      local.serco_fms_notify_email_template_id
+    )
+
+    GOVUK_NOTIFY_SMS_TEMPLATE_ID = (
+      local.serco_fms_notify_sms_template_id
+    )
+
+    CLAIM_PAGE_URL = aws_lambda_function_url.serco_fms_claim_page.function_url
+
+    CLAIM_TOKEN_TTL_HOURS = "168"
+
+    DISTRIBUTION_BUCKET = (
+      module.s3-serco-fms-key-distribution-bucket.bucket.id
+    )
+
+    FILES_PREFIX = local.serco_fms_key_distribution_files_prefix
+
+    STATE_BUCKET = module.s3-serco-fms-key-distribution-bucket.bucket.id
+
+    STATE_PREFIX = local.serco_fms_key_distribution_state_prefix
+
+    EVENTS_PREFIX = local.serco_fms_key_distribution_events_prefix
+
+    PASSWORD_BUCKET = (
+      module.s3-serco-fms-key-distribution-bucket.bucket.id
+    )
+
+    PASSWORDS_PREFIX = local.serco_fms_key_distribution_passwords_prefix
+
+    PASSWORD_KMS_KEY_ARN = (
+      aws_kms_key.serco_fms_key_distribution_passwords.arn
+    )
+
+    ALLOWLIST_BUCKET = (
+      module.s3-serco-fms-key-distribution-bucket.bucket.id
+    )
+
+    ALLOWLIST_KEY = local.serco_fms_key_distribution_allowlist_key
+
+    MAX_SECRET_AGE_HOURS = "48"
+
+    FILE_CLAIM_WARNING_HOURS = "24"
+
+    KEY_ACCESS_WARNING_HOURS = "48"
+
+    SNS_TOPIC_ARN = aws_sns_topic.emds_alerts.arn
+  }
+}
+
+
+# ------------------------------------------------------------------------------
+# Serco FMS encrypted-file claim page
+# ------------------------------------------------------------------------------
+
+module "serco_fms_claim_page" {
+  source   = "./modules/lambdas"
+  is_image = true
+
+  function_name = "serco_fms_claim_page"
+  handler       = "serco_fms_claim_page.handler"
+
+  role_name = aws_iam_role.serco_fms_claim_page.name
+  role_arn  = aws_iam_role.serco_fms_claim_page.arn
+
+  memory_size                    = 256
+  timeout                        = 30
+  reserved_concurrent_executions = 5
+  cloudwatch_retention_days      = 7
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.env_name
+
+  environment_variables = {
+    POWERTOOLS_LOG_LEVEL = "INFO"
+
+    ENVIRONMENT = local.environment_shorthand
+
+    STATE_BUCKET = module.s3-serco-fms-key-distribution-bucket.bucket.id
+
+    STATE_PREFIX = local.serco_fms_key_distribution_state_prefix
+
+    EVENTS_PREFIX = local.serco_fms_key_distribution_events_prefix
+
+    ALLOWLIST_BUCKET = (
+      module.s3-serco-fms-key-distribution-bucket.bucket.id
+    )
+
+    ALLOWLIST_KEY = local.serco_fms_key_distribution_allowlist_key
+
+    FILE_URL_TTL_SECONDS = "900"
+
+    SNS_TOPIC_ARN = aws_sns_topic.emds_alerts.arn
+  }
+}
+
+resource "aws_lambda_function_url" "serco_fms_claim_page" {
+  function_name = module.serco_fms_claim_page.lambda_function_name
+
+  authorization_type = "NONE"
+  invoke_mode         = "BUFFERED"
+}
+
+
+# ------------------------------------------------------------------------------
+# Serco FMS rotated-key access observer
+# ------------------------------------------------------------------------------
+
+module "serco_fms_key_access_observer" {
+  source   = "./modules/lambdas"
+  is_image = true
+
+  function_name = "serco_fms_key_access_observer"
+  handler       = "serco_fms_key_access_observer.handler"
+
+  role_name = aws_iam_role.serco_fms_key_access_observer.name
+  role_arn  = aws_iam_role.serco_fms_key_access_observer.arn
+
+  memory_size                    = 256
+  timeout                        = 60
+  reserved_concurrent_executions = 5
+  cloudwatch_retention_days      = 7
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.env_name
+
+  environment_variables = {
+    POWERTOOLS_LOG_LEVEL = "INFO"
+
+    ENVIRONMENT = local.environment_shorthand
+
+    STATE_BUCKET = module.s3-serco-fms-key-distribution-bucket.bucket.id
+
+    STATE_PREFIX = local.serco_fms_key_distribution_state_prefix
+
+    EVENTS_PREFIX = local.serco_fms_key_distribution_events_prefix
+
+    STATE_SCAN_LIMIT = "25"
+
+    FMS_LANDING_BUCKETS_JSON = jsonencode(
+      local.serco_fms_landing_bucket_ids
+    )
+
+    SNS_TOPIC_ARN = aws_sns_topic.emds_alerts.arn
+  }
+}

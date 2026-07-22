@@ -56,6 +56,16 @@ locals {
     { id = module.s3-lambda-store-bucket.bucket.id, arn = module.s3-lambda-store-bucket.bucket.arn }
   ]
 
+  bucket_logging_source_arns = concat(
+    [
+      for bucket in local.buckets_to_log :
+      bucket.arn
+    ],
+    [
+      module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+    ],
+  )
+
   cross_account_recieve_mapping = local.is-development ? "test" : local.is-preproduction ? "production" : local.is-test ? "preproduction" : null
   cross_env_bucket_policy = {
     (module.s3-dms-target-store-bucket.bucket.id) = module.s3-dms-target-store-bucket.bucket.arn
@@ -153,30 +163,133 @@ module "s3-logging-bucket" {
   tags = merge(local.tags, { resource-type = "logging" })
 }
 
+# ------------------------------------------------------------------------------
+# Logging-bucket policy
+# ------------------------------------------------------------------------------
+
 data "aws_iam_policy_document" "log_bucket_policy" {
+  # ---------------------------------------------------------------------------
+  # S3 server-access log delivery
+  # ---------------------------------------------------------------------------
+
   statement {
     sid    = "AllowS3Logging"
     effect = "Allow"
 
     principals {
-      type        = "Service"
-      identifiers = ["logging.s3.amazonaws.com"]
+      type = "Service"
+
+      identifiers = [
+        "logging.s3.amazonaws.com",
+      ]
     }
 
-    actions = ["s3:PutObject"]
+    actions = [
+      "s3:PutObject",
+    ]
 
-    resources = ["${module.s3-logging-bucket.bucket.arn}/*"]
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/*",
+    ]
 
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values   = [for bucket in local.buckets_to_log : bucket.arn]
+
+      values = local.bucket_logging_source_arns
     }
 
     condition {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
-      values   = [data.aws_caller_identity.current.account_id]
+
+      values = [
+        data.aws_caller_identity.current.account_id,
+      ]
+    }
+  }
+
+
+  # ---------------------------------------------------------------------------
+  # CloudTrail bucket validation
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "AllowSercoFmsCloudTrailAclCheck"
+    effect = "Allow"
+
+    principals {
+      type = "Service"
+
+      identifiers = [
+        "cloudtrail.amazonaws.com",
+      ]
+    }
+
+    actions = [
+      "s3:GetBucketAcl",
+    ]
+
+    resources = [
+      module.s3-logging-bucket.bucket.arn,
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+
+      values = [
+        local.serco_fms_key_access_trail_arn,
+      ]
+    }
+  }
+
+
+  # ---------------------------------------------------------------------------
+  # CloudTrail log delivery
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "AllowSercoFmsCloudTrailLogDelivery"
+    effect = "Allow"
+
+    principals {
+      type = "Service"
+
+      identifiers = [
+        "cloudtrail.amazonaws.com",
+      ]
+    }
+
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      format(
+        "%s/%s/AWSLogs/%s/*",
+        module.s3-logging-bucket.bucket.arn,
+        local.serco_fms_key_access_trail_log_prefix,
+        data.aws_caller_identity.current.account_id,
+      ),
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+
+      values = [
+        "bucket-owner-full-control",
+      ]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+
+      values = [
+        local.serco_fms_key_access_trail_arn,
+      ]
     }
   }
 }
@@ -1688,4 +1801,97 @@ module "s3-macie-results-bucket" {
   ]
 
   tags = local.tags
+}
+
+# ------------------------------------------------------------------------------
+# Serco FMS credential-distribution bucket
+# ------------------------------------------------------------------------------
+
+module "s3-serco-fms-key-distribution-bucket" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9f"
+
+  bucket_prefix = local.serco_fms_key_distribution_bucket_prefix
+
+  versioning_enabled = true
+
+  ownership_controls = "BucketOwnerEnforced"
+
+  replication_enabled = false
+
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "expire-encrypted-key-files"
+      enabled = "Enabled"
+
+      prefix = (
+        "${local.serco_fms_key_distribution_files_prefix}/"
+      )
+
+      tags = {
+        rule      = "serco-fms-key-distribution-files"
+        autoclean = "true"
+      }
+
+      expiration = {
+        days = 7
+      }
+
+      noncurrent_version_expiration = {
+        days = 7
+      }
+    },
+    {
+      id      = "expire-temporary-pdf-passwords"
+      enabled = "Enabled"
+
+      prefix = (
+        "${local.serco_fms_key_distribution_passwords_prefix}/"
+      )
+
+      tags = {
+        rule      = "serco-fms-key-distribution-passwords"
+        autoclean = "true"
+      }
+
+      expiration = {
+        days = 7
+      }
+
+      noncurrent_version_expiration = {
+        days = 7
+      }
+    },
+  ]
+
+  tags = merge(
+    local.tags,
+    {
+      resource-type = "serco-fms-key-distribution"
+      purpose       = "serco-fms-key-distribution"
+    },
+  )
+}
+
+
+# ------------------------------------------------------------------------------
+# Serco FMS distribution-bucket server-access logging
+#
+# Keep the resource name and target prefix stable while moving this block.
+# ------------------------------------------------------------------------------
+
+resource "aws_s3_bucket_logging" "serco_fms_key_distribution" {
+  bucket = module.s3-serco-fms-key-distribution-bucket.bucket.id
+
+  target_bucket = module.s3-logging-bucket.bucket.id
+  target_prefix = "logs/"
+
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
 }

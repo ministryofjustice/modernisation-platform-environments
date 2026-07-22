@@ -2824,3 +2824,555 @@ resource "aws_iam_role_policy_attachment" "write_to_sharepoint_iam_role_attach" 
   role       = aws_iam_role.write_to_sharepoint[0].name
   policy_arn = aws_iam_policy.write_to_sharepoint_iam_policy[0].arn
 }
+
+# ------------------------------------------------------------------------------
+# Serco FMS Lambda execution roles
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "send_serco_fms_keys" {
+  name = format(
+    "send_serco_fms_keys_lambda_role_%s",
+    local.environment_shorthand,
+  )
+
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_role" "serco_fms_claim_page" {
+  name = format(
+    "serco_fms_claim_page_lambda_role_%s",
+    local.environment_shorthand,
+  )
+
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_role" "serco_fms_key_access_observer" {
+  name = format(
+    "serco_fms_key_access_observer_lambda_role_%s",
+    local.environment_shorthand,
+  )
+
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+
+# ------------------------------------------------------------------------------
+# Basic Lambda execution permissions
+#
+# These Lambdas are not attached to the VPC. Application permissions are
+# defined by the custom policies below.
+# ------------------------------------------------------------------------------
+
+locals {
+  serco_fms_lambda_execution_roles = {
+    distribution = aws_iam_role.send_serco_fms_keys.name
+    claim_page   = aws_iam_role.serco_fms_claim_page.name
+    access_observer = (
+      aws_iam_role.serco_fms_key_access_observer.name
+    )
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "serco_fms_basic_execution" {
+  for_each = local.serco_fms_lambda_execution_roles
+
+  role = each.value
+
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+
+# ------------------------------------------------------------------------------
+# Distribution Lambda permissions
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "send_serco_fms_keys" {
+  statement {
+    sid    = "ReadCredentialAndNotifySecrets"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:ListSecretVersionIds",
+    ]
+
+    resources = local.serco_fms_key_distribution_secret_arns
+  }
+
+  statement {
+    sid    = "ListDistributionState"
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+    ]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+
+      values = [
+        format(
+          "%s/%s",
+          local.serco_fms_key_distribution_state_prefix,
+          local.environment_shorthand,
+        ),
+        format(
+          "%s/%s/*",
+          local.serco_fms_key_distribution_state_prefix,
+          local.environment_shorthand,
+        ),
+      ]
+    }
+  }
+
+  statement {
+    sid    = "ReadWriteDistributionState"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_state_prefix,
+        local.environment_shorthand,
+      ),
+    ]
+  }
+
+  statement {
+    sid    = "WriteDistributionAuditEvents"
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_events_prefix,
+        local.environment_shorthand,
+      ),
+    ]
+  }
+
+  statement {
+    sid    = "ReadDistributionAllowlist"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+    ]
+
+    resources = [
+      format(
+        "%s/%s",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_allowlist_key,
+      ),
+    ]
+  }
+
+  statement {
+    sid    = "WriteEncryptedDistributionFiles"
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectTagging",
+    ]
+
+    resources = [
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_files_prefix,
+        local.environment_shorthand,
+      ),
+    ]
+  }
+
+  statement {
+    sid    = "ReadWriteTemporaryPasswords"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+      "s3:PutObject",
+      "s3:PutObjectTagging",
+    ]
+
+    resources = [
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_passwords_prefix,
+        local.environment_shorthand,
+      ),
+    ]
+  }
+
+  statement {
+    sid    = "UseTemporaryPasswordKmsKey"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:Encrypt",
+      "kms:GenerateDataKey",
+    ]
+
+    resources = [
+      aws_kms_key.serco_fms_key_distribution_passwords.arn,
+    ]
+  }
+
+  statement {
+    sid    = "PublishDistributionNotifications"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [
+      aws_sns_topic.emds_alerts.arn,
+    ]
+  }
+
+  statement {
+    sid    = "UseAlertsKmsKey"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+      "kms:GenerateDataKey*",
+    ]
+
+    resources = [
+      aws_kms_key.emds_alerts.arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "send_serco_fms_keys" {
+  name = format(
+    "send_serco_fms_keys_lambda_policy_%s",
+    local.environment_shorthand,
+  )
+
+  policy = data.aws_iam_policy_document.send_serco_fms_keys.json
+}
+
+resource "aws_iam_role_policy_attachment" "send_serco_fms_keys" {
+  role       = aws_iam_role.send_serco_fms_keys.name
+  policy_arn = aws_iam_policy.send_serco_fms_keys.arn
+}
+
+
+# ------------------------------------------------------------------------------
+# Claim-page Lambda permissions
+#
+# This policy deliberately has no access to:
+# - supplier credential secrets
+# - temporary password objects
+# - the temporary-password KMS key
+# - the GOV.UK Notify API key
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "serco_fms_claim_page" {
+  statement {
+    sid    = "ListClaimState"
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+    ]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+
+      values = [
+        format(
+          "%s/%s",
+          local.serco_fms_key_distribution_state_prefix,
+          local.environment_shorthand,
+        ),
+        format(
+          "%s/%s/*",
+          local.serco_fms_key_distribution_state_prefix,
+          local.environment_shorthand,
+        ),
+      ]
+    }
+  }
+
+  statement {
+    sid    = "ReadWriteClaimState"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_state_prefix,
+        local.environment_shorthand,
+      ),
+    ]
+  }
+
+  statement {
+    sid    = "WriteClaimAuditEvents"
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_events_prefix,
+        local.environment_shorthand,
+      ),
+    ]
+  }
+
+  statement {
+    sid    = "ReadDistributionAllowlist"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+    ]
+
+    resources = [
+      format(
+        "%s/%s",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_allowlist_key,
+      ),
+    ]
+  }
+
+  statement {
+    sid    = "ReadEncryptedDistributionFiles"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+    ]
+
+    resources = [
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_files_prefix,
+        local.environment_shorthand,
+      ),
+    ]
+  }
+
+  statement {
+    sid    = "PublishClaimNotifications"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [
+      aws_sns_topic.emds_alerts.arn,
+    ]
+  }
+
+  statement {
+    sid    = "UseAlertsKmsKey"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+      "kms:GenerateDataKey*",
+    ]
+
+    resources = [
+      aws_kms_key.emds_alerts.arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "serco_fms_claim_page" {
+  name = format(
+    "serco_fms_claim_page_lambda_policy_%s",
+    local.environment_shorthand,
+  )
+
+  policy = data.aws_iam_policy_document.serco_fms_claim_page.json
+}
+
+resource "aws_iam_role_policy_attachment" "serco_fms_claim_page" {
+  role       = aws_iam_role.serco_fms_claim_page.name
+  policy_arn = aws_iam_policy.serco_fms_claim_page.arn
+}
+
+
+# ------------------------------------------------------------------------------
+# Key-access observer Lambda permissions
+#
+# This policy deliberately has no access to:
+# - supplier credential secrets
+# - encrypted distribution files
+# - temporary password objects
+# - the temporary-password KMS key
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "serco_fms_key_access_observer" {
+  statement {
+    sid    = "ListDistributionState"
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+    ]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+
+      values = [
+        format(
+          "%s/%s",
+          local.serco_fms_key_distribution_state_prefix,
+          local.environment_shorthand,
+        ),
+        format(
+          "%s/%s/*",
+          local.serco_fms_key_distribution_state_prefix,
+          local.environment_shorthand,
+        ),
+      ]
+    }
+  }
+
+  statement {
+    sid    = "ReadWriteAccessState"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_state_prefix,
+        local.environment_shorthand,
+      ),
+    ]
+  }
+
+  statement {
+    sid    = "WriteAccessAuditEvents"
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_events_prefix,
+        local.environment_shorthand,
+      ),
+    ]
+  }
+
+  statement {
+    sid    = "PublishAccessNotifications"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [
+      aws_sns_topic.emds_alerts.arn,
+    ]
+  }
+
+  statement {
+    sid    = "UseAlertsKmsKey"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+      "kms:GenerateDataKey*",
+    ]
+
+    resources = [
+      aws_kms_key.emds_alerts.arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "serco_fms_key_access_observer" {
+  name = format(
+    "serco_fms_key_access_observer_lambda_policy_%s",
+    local.environment_shorthand,
+  )
+
+  policy = (
+    data.aws_iam_policy_document.serco_fms_key_access_observer.json
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "serco_fms_key_access_observer" {
+  role = aws_iam_role.serco_fms_key_access_observer.name
+
+  policy_arn = (
+    aws_iam_policy.serco_fms_key_access_observer.arn
+  )
+}
