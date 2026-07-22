@@ -33,7 +33,7 @@
           "concurrencyId": { "S": "{% $concurrencyId %}" },
           "operation": { "S": "STAGE" }
         },
-        "UpdateExpression": "SET #status = :in_progress, execution_arn = :execution_arn, event_id = :event_id, file_id = :file_id, correlation_id = :correlation_id, incoming_bucket = :source_bucket, incoming_key = :source_key, incoming_version_id = :source_version_id, incoming_size_bytes = :source_size, created_at = :now, updated_at = :now",
+        "UpdateExpression": "SET #status = :in_progress, execution_arn = :execution_arn, event_id = :event_id, file_id = :file_id, correlation_id = :correlation_id, incoming_bucket = :source_bucket, incoming_key = :source_key, incoming_version_id = :source_version_id, incoming_size_bytes = :source_size, created_at = :now, updated_at = :now, expiration = :expiration",
         "ConditionExpression": "attribute_not_exists(concurrencyId)",
         "ExpressionAttributeNames": {
           "#status": "status"
@@ -48,7 +48,10 @@
           ":source_key": { "S": "{% $sourceKey %}" },
           ":source_version_id": { "S": "{% $sourceVersionId %}" },
           ":source_size": { "N": "{% $string($sourceSize) %}" },
-          ":now": { "S": "{% $now() %}" }
+          ":now": { "S": "{% $now() %}" },
+          ":expiration": {
+            "N": "{% $string($floor($toMillis($now()) / 1000) + $recordRetentionSeconds) %}"
+          }
         }
       },
       "Catch": [
