@@ -103,7 +103,7 @@ module "s3-bucket" {
 
   bucket_prefix       = "${var.application_name}-lb-access-logs"
   bucket_policy       = [data.aws_iam_policy_document.bucket_policy.json]
-  sse_algorithm = "AES256"
+  sse_algorithm       = "AES256"
   replication_enabled = false
   versioning_enabled  = true
   force_destroy       = var.force_destroy_bucket

@@ -20,6 +20,7 @@ module "elb-logs-s3" {
 
   bucket_prefix       = "${local.application_name_short}-lb-access-logs"
   bucket_policy       = [data.aws_iam_policy_document.bucket_policy.json]
+  sse_algorithm       = "AES256"
   replication_enabled = false
   versioning_enabled  = true
   force_destroy       = local.force_destroy_lb_logs_bucket
