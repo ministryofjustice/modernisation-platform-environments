@@ -16,9 +16,9 @@ table_locations_json='{}'
 
 while true; do
   if [[ -n "$next_token" ]]; then
-    response="$(aws glue get-tables --region "$region" --database-name "$database_name" --next-token "$next_token" --output json)"
+    response="$(aws glue get-tables --region "$region" --database-name "$database_name" --query "{TableList: TableList[?Parameters.presto_view=='true'], NextToken: NextToken}" --next-token "$next_token" --output json)"
   else
-    response="$(aws glue get-tables --region "$region" --database-name "$database_name" --output json)"
+    response="$(aws glue get-tables --region "$region" --database-name "$database_name" --query "{TableList: TableList[?Parameters.presto_view=='true'], NextToken: NextToken}" --output json)"
   fi
 
   page_table_names="$(echo "$response" | jq -c '[.TableList[]?.Name]')"
