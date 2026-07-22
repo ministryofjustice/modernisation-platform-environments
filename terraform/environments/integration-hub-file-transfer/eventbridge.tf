@@ -72,7 +72,10 @@ module "eventbridge_file_transfer_bus" {
   append_rule_postfix = false
 
   attach_sfn_policy = true
-  sfn_target_arns   = [module.step_function_file_transfer_workflow.state_machine_arn]
+  sfn_target_arns = [
+    module.step_function_filereceived_workflow.state_machine_arn,
+    module.step_function_filescanresultrecorded_workflow.state_machine_arn,
+  ]
 
   rules = {
     "file-transfer-workflow" = {
@@ -91,7 +94,7 @@ module "eventbridge_file_transfer_bus" {
       })
     }
     "file-routing-workflow" = {
-      description = "Route scanned processing objects for canonical FileScanResultRecorded.v1 events"
+      description = "Start the file routing workflow for canonical FileScanResultRecorded.v1 events"
       event_pattern = jsonencode({
         account       = [data.aws_caller_identity.current.account_id]
         source        = ["uk.gov.justice.service.managed-file-transfer"]
@@ -111,7 +114,7 @@ module "eventbridge_file_transfer_bus" {
     "file-transfer-workflow" = [
       {
         name            = "file-transfer-workflow"
-        arn             = module.step_function_file_transfer_workflow.state_machine_arn
+        arn             = module.step_function_filereceived_workflow.state_machine_arn
         attach_role_arn = true
         dead_letter_arn = module.sqs_eventbridge_file_transfer_workflow_dlq.queue_arn
         retry_policy = {
@@ -123,7 +126,7 @@ module "eventbridge_file_transfer_bus" {
     "file-routing-workflow" = [
       {
         name            = "file-routing-workflow"
-        arn             = module.step_function_file_transfer_workflow.state_machine_arn
+        arn             = module.step_function_filescanresultrecorded_workflow.state_machine_arn
         attach_role_arn = true
         dead_letter_arn = module.sqs_eventbridge_file_transfer_workflow_dlq.queue_arn
         retry_policy = {
