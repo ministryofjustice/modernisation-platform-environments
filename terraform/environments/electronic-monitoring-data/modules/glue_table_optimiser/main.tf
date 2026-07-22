@@ -10,6 +10,12 @@ resource "aws_glue_catalog_table_optimizer" "standard_compaction" {
   }
 
   type = "compaction"
+
+  depends_on = [
+    aws_lakeformation_permissions.glue_table_optimizer_database_permissions,
+    aws_lakeformation_permissions.glue_table_optimizer_permissions,
+    aws_lakeformation_permissions.glue_table_optimizer_table_permissions
+  ]
 }
 
 resource "aws_glue_catalog_table_optimizer" "standard_retention" {
@@ -33,6 +39,12 @@ resource "aws_glue_catalog_table_optimizer" "standard_retention" {
   }
 
   type = "retention"
+
+  depends_on = [
+    aws_lakeformation_permissions.glue_table_optimizer_database_permissions,
+    aws_lakeformation_permissions.glue_table_optimizer_permissions,
+    aws_lakeformation_permissions.glue_table_optimizer_table_permissions
+  ]
 }
 
 resource "aws_glue_catalog_table_optimizer" "standard_orphan_file_deletion" {
@@ -55,6 +67,12 @@ resource "aws_glue_catalog_table_optimizer" "standard_orphan_file_deletion" {
   }
 
   type = "orphan_file_deletion"
+
+  depends_on = [
+    aws_lakeformation_permissions.glue_table_optimizer_database_permissions,
+    aws_lakeformation_permissions.glue_table_optimizer_permissions,
+    aws_lakeformation_permissions.glue_table_optimizer_table_permissions
+  ]
 }
 
 resource "aws_lakeformation_permissions" "glue_table_optimizer_permissions" {
