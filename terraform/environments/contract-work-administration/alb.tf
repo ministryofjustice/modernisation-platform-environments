@@ -11,7 +11,7 @@ locals {
 
 module "elb-logs-s3" {
   count  = local.lb_logs_bucket == "" ? 1 : 0
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=c8889e65f4d8a3d53d2cbd93b7be714e990020b7" # v10.2.1
 
 
   providers = {
