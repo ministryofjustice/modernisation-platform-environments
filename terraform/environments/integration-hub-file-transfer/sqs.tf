@@ -1,4 +1,5 @@
 module "sqs_eventbridge_default_dlq" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/sqs/aws"
   version = "5.2.2"
 
@@ -41,6 +42,7 @@ module "sqs_eventbridge_default_dlq" {
 }
 
 module "sqs_lambda_file_received_adapter_dlq" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/sqs/aws"
   version = "5.2.2"
 
@@ -58,6 +60,7 @@ module "sqs_lambda_file_received_adapter_dlq" {
 }
 
 module "sqs_lambda_file_scan_result_recorded_adapter_dlq" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/sqs/aws"
   version = "5.2.2"
 
@@ -75,6 +78,7 @@ module "sqs_lambda_file_scan_result_recorded_adapter_dlq" {
 }
 
 module "sqs_eventbridge_file_transfer_workflow_dlq" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/sqs/aws"
   version = "5.2.2"
 
