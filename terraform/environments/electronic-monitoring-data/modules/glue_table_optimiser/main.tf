@@ -51,7 +51,7 @@ resource "aws_glue_catalog_table_optimizer" "standard_orphan_file_deletion" {
       iceberg_configuration {
         orphan_file_retention_period_in_days = each.value.orphan_file_retention_period_in_days
         run_rate_in_hours                    = each.value.orphan_file_deletion_run_rate_in_hours
-        location                             = contains(var.dbt_databases, each.value.database_name) ? "s3://${var.optimizer_bucket_id}/data/${var.environment}/models/domain_name=${each.value.dbt_domain}/database_name=${each.value.database_name}/table_name=${each.value.table_name}/" : "s3://${var.optimizer_bucket_id}/${each.value.raw_database_prefix}/${each.value.table_name}/"
+        location                             = each.value.table_location
       }
     }
   }
