@@ -22,8 +22,8 @@ locals {
         {
           database_name       = database_name
           table_name          = table_name
-          raw_database_prefix = lookup(local.raw_prefix_by_database, "${database_name}${local.dbt_suffix}", null)
-          dbt_domain          = lookup(local.domain_by_database, "${database_name}${local.dbt_suffix}", null)
+          raw_database_prefix = lookup(local.raw_prefix_by_database, trimsuffix(database_name, local.dbt_suffix), null)
+          dbt_domain          = lookup(local.domain_by_database, trimsuffix(database_name, local.dbt_suffix), null)
         }
       )
     }
