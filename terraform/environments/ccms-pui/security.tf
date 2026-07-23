@@ -69,23 +69,40 @@ resource "aws_security_group_rule" "ecs_tasks_egress_443" {
 resource "aws_security_group_rule" "ecs_tasks_egress_1522" {
   security_group_id = aws_security_group.ecs_tasks_pui.id
   type              = "egress"
-  description       = "Allow ECS task egress to 0.0.0.0/0 on port 1522"
+  description       = "Allow ECS task egress to protected subnets on port 1522"
   protocol          = "tcp"
   from_port         = 1522
   to_port           = 1522
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks = [
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block,
+  ]
 }
 
 resource "aws_security_group_rule" "ecs_tasks_egress_1521" {
   security_group_id = aws_security_group.ecs_tasks_pui.id
   type              = "egress"
-  description       = "Allow ECS task egress to 0.0.0.0/0 on port 1521"
+  description       = "Allow ECS task egress to protected subnets on port 1521"
   protocol          = "tcp"
   from_port         = 1521
   to_port           = 1521
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks = [
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block,
+  ]
 }
 
+resource "aws_security_group_rule" "ecs_tasks_egress_3310_clamav" {
+  security_group_id = aws_security_group.ecs_tasks_pui.id
+  type              = "egress"
+  description       = "Allow ECS task egress to ClamAV on port 3310"
+  protocol          = "tcp"
+  from_port         = 3310
+  to_port           = 3310
+  referenced_security_group_id = aws_security_group.ec2_sg_clamav.id
+}
 
 # EC2 Instances Security Group
 resource "aws_security_group" "cluster_ec2" {
@@ -111,19 +128,37 @@ resource "aws_security_group_rule" "cluster_ec2_egress_443" {
 resource "aws_security_group_rule" "cluster_ec2_egress_1522" {
   security_group_id = aws_security_group.cluster_ec2.id
   type              = "egress"
-  description       = "Allow EC2 instance egress to 0.0.0.0/0 on port 1522"
+  description       = "Allow EC2 instance egress to protected subnets on port 1522"
   protocol          = "tcp"
   from_port         = 1522
   to_port           = 1522
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks = [
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block,
+  ]
 }
 
 resource "aws_security_group_rule" "cluster_ec2_egress_1521" {
   security_group_id = aws_security_group.cluster_ec2.id
   type              = "egress"
-  description       = "Allow EC2 instance egress to 0.0.0.0/0 on port 1521"
+  description       = "Allow EC2 instance egress to protected subnets on port 1521"
   protocol          = "tcp"
   from_port         = 1521
   to_port           = 1521
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks = [
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block,
+  ]
+}
+
+resource "aws_security_group_rule" "cluster_ec2_egress_3310_clamav" {
+  security_group_id = aws_security_group.cluster_ec2.id
+  type              = "egress"
+  description       = "Allow EC2 instance egress to ClamAV on port 3310"
+  protocol          = "tcp"
+  from_port         = 3310
+  to_port           = 3310
+  referenced_security_group_id = aws_security_group.ec2_sg_clamav.id
 }
