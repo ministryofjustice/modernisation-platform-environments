@@ -1,4 +1,5 @@
 module "lambda_file_received_adapter" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.8.0"
 
@@ -56,6 +57,7 @@ module "lambda_file_received_adapter" {
 }
 
 module "lambda_file_scan_result_recorded_adapter" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.8.0"
 

@@ -1,4 +1,5 @@
 module "step_function_filereceived_workflow" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/step-functions/aws"
   version = "5.1.0"
 
@@ -84,6 +85,7 @@ module "step_function_filereceived_workflow" {
 }
 
 module "step_function_filescanresultrecorded_workflow" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/step-functions/aws"
   version = "5.1.0"
 
