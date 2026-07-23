@@ -2868,13 +2868,13 @@ module "trigger_cadt_iam" {
   
   name = "trigger-cadt-iam-role"
   trust_policy_permissions = {
-    actions = [
+   LambdaAssume = { actions = [
       "sts:AssumeRole",
     ]
     principals = [{
       type = "Service"
       identifier = "lambda.amazonaws.com"
-    }]
+    }]}
   }
 
   policies = {

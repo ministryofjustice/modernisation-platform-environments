@@ -1121,8 +1121,8 @@ module "trigger_cadt" {
   source                  = "./modules/lambdas"
   is_image                = true
   function_name           = "trigger_cadt"
-  role_name               = aws_iam_role.trigger_cadt.name
-  role_arn                = aws_iam_role.trigger_cadt.arn
+  role_name               = module.trigger_cadt_iam.name
+  role_arn                = module.trigger_cadt_iam.arn
   handler                 = "trigger_cadt.handler"
   memory_size             = 10240
   timeout                 = 900
@@ -1133,6 +1133,6 @@ module "trigger_cadt" {
     CLUSTER_NAME        = aws_ecs_cluster.cadt.name
     TASK_DEFINITION_ARN = aws_ecs_task_definition.create_a_derived_table.arn
     SUBNET_IDS          = data.aws_subnets.shared-private.ids
-    SECURITY_GROUPS     = [aws_security_group.gdpr_batch_sg.id]
+    SECURITY_GROUPS     = [aws_security_group.gdpr_batch_sg[0].id]
 }
   }
