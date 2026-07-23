@@ -51,45 +51,43 @@ module "elevenlabs_asr_sagemaker_execution_iam_role" {
   }
 }
 
-# module "elevenlabs_asr_entra_invoke_iam_role" {
-#   count = terraform.workspace == "data-platform-development" ? 1 : 0
+module "justice_transcribe_backend_iam_role" {
+  count = terraform.workspace == "data-platform-development" ? 1 : 0
 
-#   source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=5b962b1163790398605f2b17447cf5b6cc512237" # v6.6.1
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=5b962b1163790398605f2b17447cf5b6cc512237" # v6.6.1
 
-#   name            = "${local.deployment_name}-entra-invoke-role"
-#   use_name_prefix = false
+  name            = "${local.deployment_name}-justice-transcribe-backend-execution-role"
+  use_name_prefix = false
 
-#   trust_policy_permissions = {
-#     EntraAssumeRoleWithWebIdentity = {
-#       actions = ["sts:AssumeRoleWithWebIdentity"]
-#       principals = [{
-#         type        = "Federated"
-#         identifiers = [data.aws_iam_openid_connect_provider.justiceuk_entra[0].arn]
-#       }]
-#       condition = [
-#         {
-#           test     = "StringEquals"
-#           variable = "sts.windows.net/${jsondecode(data.aws_secretsmanager_secret_version.justiceuk_entra[0].secret_string)["tenant_id"]}/:aud"
-#           values   = [try(jsondecode(data.aws_secretsmanager_secret_version.justiceuk_entra[0].secret_string)["audience"], "CHANGEME")]
-#         },
-#         {
-#           test     = "StringEquals"
-#           variable = "sts.windows.net/${jsondecode(data.aws_secretsmanager_secret_version.justiceuk_entra[0].secret_string)["tenant_id"]}/:sub"
-#           values   = [try(jsondecode(data.aws_secretsmanager_secret_version.justiceuk_entra[0].secret_string)["subject"], "CHANGEME")]
-#         }
-#       ]
-#     }
-#   }
+  trust_policy_permissions = {
+    EntraAssumeRoleWithWebIdentity = {
+      actions = ["sts:AssumeRoleWithWebIdentity"]
+      principals = [{
+        type        = "Federated"
+        identifiers = [data.aws_iam_openid_connect_provider.justiceuk_entra[0].arn]
+      }]
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "sts.windows.net/${jsondecode(data.aws_secretsmanager_secret_version.justice_transcribe_backend_secret[0].secret_string)["tenant_id"]}/:aud"
+          values   = [jsondecode(data.aws_secretsmanager_secret_version.justice_transcribe_backend_secret[0].secret_string)["audience"]]
+        },
+        {
+          test     = "StringEquals"
+          variable = "sts.windows.net/${jsondecode(data.aws_secretsmanager_secret_version.justice_transcribe_backend_secret[0].secret_string)["tenant_id"]}/:sub"
+          values   = [jsondecode(data.aws_secretsmanager_secret_version.justice_transcribe_backend_secret[0].secret_string)["subject"]]
+        }
+      ]
+    }
+  }
 
-#   create_inline_policy = true
-#   inline_policy_permissions = {
-#     InvokeElevenLabsEndpoint = {
-#       sid     = "InvokeElevenLabsEndpoint"
-#       effect  = "Allow"
-#       actions = ["sagemaker:InvokeEndpoint"]
-#       resources = [
-#         "arn:aws:sagemaker:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:endpoint/${local.deployment_name}",
-#       ]
-#     }
-#   }
-# }
+  create_inline_policy = true
+  inline_policy_permissions = {
+    InvokeElevenLabsEndpoint = {
+      sid       = "InvokeElevenLabsEndpoint"
+      effect    = "Allow"
+      actions   = ["sagemaker:InvokeEndpoint"]
+      resources = [aws_sagemaker_endpoint.elevenlabs_asr[0].arn]
+    }
+  }
+}

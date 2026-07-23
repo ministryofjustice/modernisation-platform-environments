@@ -4,8 +4,8 @@ data "aws_secretsmanager_secret_version" "elevenlabs_configuration_secret" {
   secret_id = module.elevenlabs_configuration_secret[0].secret_id
 }
 
-data "aws_secretsmanager_secret_version" "justiceai_entra_application_secret" {
+data "aws_secretsmanager_secret_version" "justice_transcribe_backend_secret" {
   count = terraform.workspace == "data-platform-development" ? 1 : 0
 
-  secret_id = module.justiceai_entra_application_secret[0].secret_id
+  secret_id = module.justice_transcribe_backend_secret[0].secret_id
 }
