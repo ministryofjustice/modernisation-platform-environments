@@ -141,7 +141,7 @@ module "maatdb_pagerduty_core_alerts" {
   depends_on = [
     aws_sns_topic.maatdb_alerting_topic
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=0179859e6fafc567843cd55c0b05d325d5012dc4" #v2.0.0
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=d88bd90d490268896670a898edfaba24bba2f8ab" # v3.0.0
   sns_topics                = [aws_sns_topic.maatdb_alerting_topic.name]
   pagerduty_integration_key = local.maatdb_pagerduty_integration_keys[local.maatdb_pagerduty_integration_key_name]
 }
