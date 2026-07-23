@@ -22,6 +22,9 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
 # Grant the staging export Lambda role Lake Formation permissions on the property database
 # SSO admin grants (sandbox/data-eng) are managed via data-engineering-datalake-access YAML
 resource "aws_lakeformation_permissions" "staging-export-database" {
+  # The property/planetfm/concept Glue databases only exist in development and production.
+  count = local.lakeformation_databases_present ? 1 : 0
+
   principal   = module.lambda-staging-export.role_arn
   permissions = ["DESCRIBE"]
 
@@ -31,6 +34,8 @@ resource "aws_lakeformation_permissions" "staging-export-database" {
 }
 
 resource "aws_lakeformation_permissions" "staging-export-tables" {
+  count = local.lakeformation_databases_present ? 1 : 0
+
   principal   = module.lambda-staging-export.role_arn
   permissions = ["SELECT", "DESCRIBE"]
 
@@ -42,6 +47,8 @@ resource "aws_lakeformation_permissions" "staging-export-tables" {
 
 # The property views chain through planetfm staging tables - grant LF access to that database too
 resource "aws_lakeformation_permissions" "staging-export-planetfm-database" {
+  count = local.lakeformation_databases_present ? 1 : 0
+
   principal   = module.lambda-staging-export.role_arn
   permissions = ["DESCRIBE"]
 
@@ -51,6 +58,8 @@ resource "aws_lakeformation_permissions" "staging-export-planetfm-database" {
 }
 
 resource "aws_lakeformation_permissions" "staging-export-planetfm-tables" {
+  count = local.lakeformation_databases_present ? 1 : 0
+
   principal   = module.lambda-staging-export.role_arn
   permissions = ["SELECT", "DESCRIBE"]
 
@@ -61,6 +70,8 @@ resource "aws_lakeformation_permissions" "staging-export-planetfm-tables" {
 }
 
 resource "aws_lakeformation_permissions" "staging-export-concept-database" {
+  count = local.lakeformation_databases_present ? 1 : 0
+
   principal   = module.lambda-staging-export.role_arn
   permissions = ["DESCRIBE"]
 
@@ -70,6 +81,8 @@ resource "aws_lakeformation_permissions" "staging-export-concept-database" {
 }
 
 resource "aws_lakeformation_permissions" "staging-export-concept-tables" {
+  count = local.lakeformation_databases_present ? 1 : 0
+
   principal   = module.lambda-staging-export.role_arn
   permissions = ["SELECT", "DESCRIBE"]
 
