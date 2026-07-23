@@ -44,6 +44,10 @@ There is an important boundary here: Powertools only deduplicates retries of the
 
 Downstream consumers should therefore be idempotent on `fileId` rather than on the EventBridge `id` of the canonical event.
 
+The file-transfer Step Functions workflow claims a DynamoDB record keyed by the event's correlation ID and the `STAGE` operation. This is operation-level idempotency: duplicate canonical events terminate without creating another destination version. The completed record is retained for the event-retention period and correlates the exact processing version with later GuardDuty scan results.
+
+The workflow copies the exact S3 version identified by `detail.data.object.versionId` from `incoming` to the same key in `processing`. A zero-byte object uses `CopyObject` as an edge-case patch; every object larger than zero bytes uses multipart copy. Source metadata and tags are applied to the processing object before the workflow deletes only the exact source version. Workflow failures surface directly through Step Functions monitoring rather than custom recovery states.
+
 Idempotency records expire after 30 days in non-production environments and 400 days in production, matching event retention.
 
 ## Following a file through the lifecycle
@@ -52,11 +56,20 @@ Imagine `finance/april-payroll.csv` arrives in the `incoming` bucket with versio
 
 1. S3 emits a native `Object Created` event with its own EventBridge `id`, call it `native-1`.
 2. The file-received adapter hashes the incoming bucket, key and version ID to produce `file-1`, then publishes `FileReceived.v1`. EventBridge assigns this event `id = eb-1`. The event carries `fileId = file-1`, `correlationId = file-1`, and no `causationId`.
-3. The scanning component picks up `FileReceived.v1` and stages the file to `processing/finance/april-payroll.csv` (a new S3 key and version). It publishes `FileStagedForScanning.v1` with `id = eb-2`, `fileId = file-1`, `correlationId = file-1`, and `causationId = eb-1`.
-4. The scanner records a clean result and publishes `FileScanResultRecorded.v1` with `id = eb-3` and `causationId = eb-2`.
-5. The router delivers the file and publishes `FileRouted.v1` with `id = eb-4` and `causationId = eb-3`.
+3. The file-transfer workflow picks up `FileReceived.v1`, stages the exact object version to `processing/finance/april-payroll.csv`, and deletes the exact source version.
+4. The workflow publishes `FileStagedForScanning.v1` as an audit record that the object is ready for GuardDuty Malware Protection for S3. It copies `fileId` and `correlationId`, sets `causationId` to the `FileReceived.v1` EventBridge ID, and identifies the exact source and staged S3 versions.
+
+The GuardDuty adapter records every terminal scan result as `FileScanResultRecorded.v1`, copying `fileId` and `correlationId` and setting `causationId` to the preceding `FileStagedForScanning.v1` EventBridge ID. The file-transfer workflow then routes that exact processing version and publishes `FileRouted.v1`, retaining the same `fileId` and `correlationId` and setting `causationId` to the scan-result event ID.
 
 At every stage, `fileId` and `correlationId` stay the same. The S3 location changes, the object version changes, and each EventBridge `id` is unique — but you can follow the whole chain.
+
+The workflow records the `FileStagedForScanning.v1` EventBridge ID when marking the transfer `COMPLETED`. Consumers must treat EventBridge delivery as at least once and deduplicate using `detail.metadata.idempotencyKey`, which is derived from the correlation ID and exact processing version ID.
+
+The staging workflow writes `mft-correlation-id` as reserved metadata on the processing object. The GuardDuty adapter reads that metadata from the exact bucket, key and version ID, then retrieves the durable `STAGE` record by its `(correlationId, operation)` primary key. It publishes `FileScanResultRecorded.v1` only for a completed staging record, preserving causal ordering. Each native GuardDuty event ID is processed idempotently. Repeated native notifications can republish the same canonical `scan:{correlationId}:{processingVersionId}` idempotency key, so consumers must deduplicate on that key.
+
+The GuardDuty adapter records the native event result as `scanResultStatus`. It also compares that result with the exact object's `GuardDutyMalwareScanStatus` tag and records the outcome as `scanResultStatusMatchesTag`. The tag is a breadcrumb used to detect possible manipulation; it is not a second source of scan-result status. A matching `NO_THREATS_FOUND` result routes to `clean`, and a matching `THREATS_FOUND` result routes to `quarantine`. A missing or different tag, or a result of `UNSUPPORTED`, `ACCESS_DENIED`, or `FAILED`, routes to `investigation`. The workflow copies the exact processing version, preserving its metadata and tags before deleting that exact source version.
+
+Routing claims an independent DynamoDB record using the file's correlation ID and the `ROUTE` operation. A duplicate claim terminates without creating another destination version. After deleting the exact processing version, the workflow publishes `FileRouted.v1` with an idempotency key of `route:{route}:{destinationBucket}:{key}:{destinationVersionId}`, then marks the route operation `COMPLETED`. Workflow failures surface through Step Functions monitoring and are redriven by retriggering the execution rather than by custom recovery states.
 
 ## Rules for event producers
 

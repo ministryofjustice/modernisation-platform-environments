@@ -191,6 +191,7 @@ resource "aws_iam_policy" "gdpr_delete_iam_policy" {
   policy = data.aws_iam_policy_document.gdpr_delete_policy_document[0].json
 }
 
+
 # ------------------------------------------------------------------------------
 # Staging DB janitor Step Function
 # ------------------------------------------------------------------------------
