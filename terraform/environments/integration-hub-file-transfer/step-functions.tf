@@ -8,7 +8,7 @@ module "step_function_filereceived_workflow" {
 
   definition = templatefile("${path.module}/step-functions/filereceived-workflow.asl.json", {
     account_id                = jsonencode(data.aws_caller_identity.current.account_id)
-    event_bus_arn             = jsonencode(local.file_transfer_event_bus_arn)
+    event_bus_arn             = jsonencode(module.eventbridge_file_transfer_bus.eventbridge_bus_arn)
     idempotency_table_name    = jsonencode(module.dynamodb_file_transfer_idempotency.dynamodb_table_id)
     multipart_max_concurrency = 4
     part_size_bytes           = local.file_transfer_workflow_part_size_bytes
@@ -77,7 +77,7 @@ module "step_function_filereceived_workflow" {
     publish_workflow_events = {
       effect    = "Allow"
       actions   = ["events:PutEvents"]
-      resources = [local.file_transfer_event_bus_arn]
+      resources = [module.eventbridge_file_transfer_bus.eventbridge_bus_arn]
     }
   }
 
@@ -96,7 +96,7 @@ module "step_function_filescanresultrecorded_workflow" {
     account_id                = jsonencode(data.aws_caller_identity.current.account_id)
     clean_bucket_name         = jsonencode(module.s3_bucket["clean"].s3_bucket_id)
     clean_kms_key_arn         = jsonencode(module.kms_s3_bucket["clean"].key_arn)
-    event_bus_arn             = jsonencode(local.file_transfer_event_bus_arn)
+    event_bus_arn             = jsonencode(module.eventbridge_file_transfer_bus.eventbridge_bus_arn)
     idempotency_table_name    = jsonencode(module.dynamodb_file_transfer_idempotency.dynamodb_table_id)
     investigation_bucket_name = jsonencode(module.s3_bucket["investigation"].s3_bucket_id)
     investigation_kms_key_arn = jsonencode(module.kms_s3_bucket["investigation"].key_arn)
@@ -175,7 +175,7 @@ module "step_function_filescanresultrecorded_workflow" {
     publish_workflow_events = {
       effect    = "Allow"
       actions   = ["events:PutEvents"]
-      resources = [local.file_transfer_event_bus_arn]
+      resources = [module.eventbridge_file_transfer_bus.eventbridge_bus_arn]
     }
   }
 
