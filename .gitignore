@@ -28,6 +28,7 @@ out/
 
 terraform/modules/**/*.zip
 terraform/environments/integration-hub/managed-file-transfer/builds
+terraform/environments/integration-hub-file-transfer/builds
 terraform/environments/youth-justice-app-framework/modules/quicksight/assets/run_time
 
 megalinter-reports
