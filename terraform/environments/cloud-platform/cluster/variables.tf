@@ -30,19 +30,39 @@ variable "argocd_idc_region" {
   description = "Region of the IAM Identity Center instance."
 }
 
-variable "argocd_rbac_admin_identities" {
-  type = list(object({
+variable "argocd_admin_group_id" {
+  type        = string
+  default     = ""
+  description = "IAM Identity Center Group ID for the platform-engineer-admin SSO group. Grants ADMIN role in Argo CD. For BU team access (EDITOR/VIEWER), add groups to argocd_rbac_role_mappings."
+}
+
+variable "argocd_rbac_role_mappings" {
+  type = map(list(object({
     id   = string
     type = string
-  }))
-  default     = []
-  description = "List of Identity Center identities (SSO_USER or SSO_GROUP) to grant ADMIN role in Argo CD."
+  })))
+  default     = {}
+  description = <<-EOT
+    Additional RBAC role mappings for ArgoCD beyond the admin group.
+    Keys: ADMIN, EDITOR, VIEWER. Values: list of IDC identity objects.
+    Used to grant BU teams access to the ArgoCD UI.
+    Example: { VIEWER = [{ id = "hmpps-sre-group-id", type = "SSO_GROUP" }] }
+  EOT
 }
 
 variable "argocd_codeconnection_arn" {
   type        = string
   default     = ""
   description = "AWS CodeConnections ARN for GitHub repository access from Argo CD."
+}
+
+#------------------------------------------------------------------------------
+# Argo CD Spoke Registration (ADR-002 — Spoke-Driven Model)
+#------------------------------------------------------------------------------
+variable "argocd_hub_spoke_access_role_arn" {
+  type        = string
+  default     = ""
+  description = "Override for the hub cluster's ArgoCD spoke-access IAM role ARN. Leave empty for permanent hubs (development/production) — the ARN is resolved by convention from local.argocd_hubs. Set this only for ephemeral/test hubs, passed as a workflow input when launching the cluster."
 }
 
 resource "null_resource" "created_by_tag" {

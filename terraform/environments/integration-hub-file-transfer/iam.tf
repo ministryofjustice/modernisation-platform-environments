@@ -1,4 +1,5 @@
 module "iam_policy_guardduty_s3" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "6.6.1"
 
@@ -12,6 +13,7 @@ module "iam_policy_guardduty_s3" {
 }
 
 module "iam_role_guardduty_s3" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.6.1"
 
@@ -65,7 +67,7 @@ data "aws_iam_policy_document" "guardduty_s3_permissions" {
       "s3:ListBucket"
     ]
     resources = [
-      "arn:aws:s3:::*"
+      module.s3_bucket["processing"].s3_bucket_arn
     ]
   }
   statement {
@@ -87,7 +89,7 @@ data "aws_iam_policy_document" "guardduty_s3_permissions" {
       "s3:GetBucketNotification"
     ]
     resources = [
-      "${module.s3_bucket["processing"].s3_bucket_arn}"
+      module.s3_bucket["processing"].s3_bucket_arn
     ]
   }
   statement {
@@ -122,6 +124,7 @@ data "aws_iam_policy_document" "guardduty_s3_permissions" {
 }
 
 module "iam_role_transfer" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.6.1"
 

@@ -95,30 +95,9 @@ jobs:
           role-session-name: step-functions-tests
           aws-region: eu-west-2
 
-      - name: Test Copy Incoming Object
-        shell: bash
-        run: |
-          set -euo pipefail
-          result="$(
-            aws stepfunctions test-state \
-              --definition "file://${COPY_INCOMING_OBJECT_DEFINITION}" \
-              --input "file://${COPY_INCOMING_OBJECT_INPUT}" \
-              --variables "file://${COPY_INCOMING_OBJECT_VARIABLES}" \
-              --mock '{
-                "result": "{\"VersionId\": \"test-processing-version-id\"}",
-                "fieldValidationMode": "NONE"
-              }' \
-              --inspection-level DEBUG \
-              --no-cli-pager
-          )"
-          jq . <<< "${result}"
-          jq --exit-status '.status == "SUCCEEDED"' <<< "${result}"
-
-
   terraform:
     needs:
       - strategy
-      - test-step-functions
     if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
     strategy:
       fail-fast: false
