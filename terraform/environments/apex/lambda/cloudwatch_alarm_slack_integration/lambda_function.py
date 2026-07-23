@@ -3,14 +3,18 @@ AWS Lambda function to pull CloudWatch Alarm from SNS Topic and
 publish into Slack. This will also publish GuardDuty findings, EventBridge events and S3 events into Slack.
 """
 
+import base64
+import gzip
 import json
 import os
 import logging
 import io
 import tracemalloc
+import re
 from dataclasses import dataclass
 from typing import Any, Dict, Optional, Union, cast
 from datetime import datetime
+from urllib.parse import quote_plus
 import boto3
 import pycurl
 from botocore.exceptions import ClientError
@@ -153,15 +157,44 @@ def parse_config_from_env_and_secrets(
     return config
 
 
+def decode_cloudwatch_logs_payload(encoded_data: str) -> Dict[str, Any]:
+    """Decode CloudWatch Logs subscription payload from AWS Logs format."""
+    decoded_bytes = base64.b64decode(encoded_data)
+    with gzip.GzipFile(fileobj=io.BytesIO(decoded_bytes)) as gzip_file:
+        payload = gzip_file.read()
+    return json.loads(payload)
+
+
+def extract_ora_events_from_log_payload(log_payload: Dict[str, Any]) -> list[Dict[str, Any]]:
+    """Extract ORA-XXXXX events from decoded CloudWatch Logs payload."""
+    events: list[Dict[str, Any]] = []
+    ora_pattern = re.compile(r"(ORA-\d{5})", re.IGNORECASE)
+
+    for log_event in log_payload.get("logEvents", []):
+        message = log_event.get("message", "")
+        matched_codes = ora_pattern.findall(message)
+        if matched_codes:
+            cleaned_message = re.sub(r"\s+", " ", message).strip()
+            events.append({
+                "timestamp": log_event.get("timestamp"),
+                "logStream": log_payload.get("logStream", ""),
+                "message": cleaned_message,
+                "codes": matched_codes,
+            })
+
+    return events
+
+
 class NotificationService:
     """Service for sending notifications to Slack."""
 
-    def __init__(self, webhook_url: str, function_name: str = "CloudWatch SNS Alarm to Lambda"):
+    def __init__(self, webhook_url: str, function_name: str = "CloudWatch SNS Alarm to Lambda", environment_name: str = "Unknown"):
         if not webhook_url:
             raise ValueError("Slack webhook URL is required for notifications")
 
         self.webhook_url = webhook_url
         self.function_name = function_name
+        self.environment_name = environment_name or "Unknown"
         logger.info("Slack notifications configured")
 
     def send_notification(
@@ -351,6 +384,54 @@ class NotificationService:
                 ]
             }
 
+        elif type == "CloudWatch Logs":
+            log_group = alarmdetails.get("logGroup", "Unknown Log Group")
+            log_stream = alarmdetails.get("logStream", "Unknown Log Stream")
+            matched_events = alarmdetails.get("matchedEvents", [])
+            region = os.environ.get("AWS_REGION", "eu-west-2")
+            escaped_group = quote_plus(log_group)
+            escaped_stream = quote_plus(log_stream)
+            log_stream_url = (
+                f"https://console.aws.amazon.com/cloudwatch/home?region={region}"
+                f"#logsV2:log-groups/log-group/{escaped_group}/log-events/{escaped_stream}"
+            )
+
+            blocks = [
+                {
+                    "type": "header",
+                    "text": {"type": "plain_text", "text": f":warning: Oracle Alert Log Events Detected [{self.environment_name}]"}
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": (
+                            f"*Environment:* {self.environment_name}\n"
+                            f"*Log Group:* {log_group}\n"
+                            f"*Log Stream:* <{log_stream_url}|{log_stream}>\n"
+                            f"*Matched Events:* {len(matched_events)}"
+                        )
+                    }
+                }
+            ]
+
+            for event in matched_events:
+                codes = ", ".join(event.get("codes", []))
+                message = event.get("message", "")
+                blocks.extend([
+                    {"type": "divider"},
+                    {
+                        "type": "section",
+                        "text": {"type": "mrkdwn", "text": f"*ORA Code(s):* {codes}"}
+                    },
+                    {
+                        "type": "section",
+                        "text": {"type": "mrkdwn", "text": f"```{message}```"}
+                    }
+                ])
+
+            payload = {"blocks": blocks}
+
         elif type == "S3 Event":
             if "Records" not in alarmdetails or not alarmdetails["Records"]:
                 s3_info = alarmdetails.get("detail", {})
@@ -495,6 +576,7 @@ def lambda_handler(event, context):
 
     # Get secret name from environment or event
     secret_name = os.environ.get("SECRET_NAME", event.get("secret_name"))
+    environment_name = os.environ.get("ENVIRONMENT", "Unknown")
     if not secret_name:
         raise ValueError("SECRET_NAME not found in environment or event")
     if not isinstance(secret_name, str):
@@ -515,6 +597,35 @@ def lambda_handler(event, context):
     missing_secrets = [key for key in required_secrets if key not in secrets_data]
     if missing_secrets:
         raise ValueError(f"Missing required secrets: {', '.join(missing_secrets)}")
+
+    # Handle CloudWatch Logs subscription events first
+    if "awslogs" in event:
+        logger.info("CloudWatch Logs subscription event detected")
+        log_payload = decode_cloudwatch_logs_payload(event["awslogs"]["data"])
+        matched_events = extract_ora_events_from_log_payload(log_payload)
+
+        if not matched_events:
+            logger.info("No ORA events found in CloudWatch Logs payload")
+            return {"statusCode": 200, "body": {"message": "No ORA-XXXX events found"}}
+
+        channelconfig = ConfigValidator.get_mandatory_secret(
+            secrets_data, "slack_channel_webhook"
+        )
+        alarm_details = {
+            "logGroup": log_payload.get("logGroup", ""),
+            "logStream": log_payload.get("logStream", ""),
+            "matchedEvents": matched_events,
+        }
+        notification_service = NotificationService(channelconfig, context.function_name, environment_name)
+        notification_service.send_notification(
+            "CloudWatch Logs Oracle Alert Notification",
+            alarm_details,
+            formatted,
+            "CloudWatch Logs",
+            is_error=True,
+        )
+
+        return {"statusCode": 200, "body": {"message": "Successfully published CloudWatch Logs notification"}}
 
     # Parse combined configuration
     logger.info("Parsing configuration from environment and secrets")
@@ -621,7 +732,7 @@ def lambda_handler(event, context):
 
         # Initialize services
         notification_service = NotificationService(
-            channelconfig, context.function_name
+            channelconfig, context.function_name, environment_name
         )
 
         notification_service.send_notification(

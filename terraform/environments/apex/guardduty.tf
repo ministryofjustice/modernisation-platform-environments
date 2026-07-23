@@ -232,6 +232,7 @@ resource "aws_lambda_function" "guardduty_slack_notify" {
   environment {
     variables = {
       SECRET_NAME = aws_secretsmanager_secret.guardduty_slack_secret.name
+      ENVIRONMENT = local.environment
     }
   }
 
@@ -256,6 +257,27 @@ resource "aws_sns_topic_subscription" "guardduty_lambda" {
   topic_arn = aws_sns_topic.guardduty_alerts.arn
   protocol  = "lambda"
   endpoint  = aws_lambda_function.guardduty_slack_notify.arn
+}
+
+# ---------------------------------------------
+# CloudWatch Logs Oracle Alerts -> Slack
+# ---------------------------------------------
+resource "aws_lambda_permission" "allow_logs_invoke_cloudwatch" {
+  statement_id   = "AllowExecutionFromCloudWatchLogs"
+  action         = "lambda:InvokeFunction"
+  function_name  = aws_lambda_function.guardduty_slack_notify.function_name
+  principal      = "logs.amazonaws.com"
+  source_account = data.aws_caller_identity.current.account_id
+  source_arn     = "${aws_cloudwatch_log_group.database.arn}:*"
+}
+
+resource "aws_cloudwatch_log_subscription_filter" "database_oracle_alerts" {
+  name            = "${local.application_name}-${local.environment}-database-oracle-alerts-subscription"
+  log_group_name  = aws_cloudwatch_log_group.database.name
+  filter_pattern  = "\"ORA-\""
+  destination_arn = aws_lambda_function.guardduty_slack_notify.arn
+
+  depends_on = [aws_lambda_permission.allow_logs_invoke_cloudwatch]
 }
 
 # ---------------------------------------------
