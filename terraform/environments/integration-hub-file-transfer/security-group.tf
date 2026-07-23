@@ -1,5 +1,6 @@
 module "security_group_transfer" {
-  source  = "terraform-aws-modules/security-group/aws//"
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  source  = "terraform-aws-modules/security-group/aws"
   version = "6.0.0"
 
   vpc_id = data.aws_vpc.shared.id
