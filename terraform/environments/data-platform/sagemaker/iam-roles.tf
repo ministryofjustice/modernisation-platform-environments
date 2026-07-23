@@ -69,12 +69,12 @@ module "justice_transcribe_backend_iam_role" {
       condition = [
         {
           test     = "StringEquals"
-          variable = "sts.windows.net/${jsondecode(data.aws_secretsmanager_secret_version.justice_transcribe_backend_secret[0].secret_string)["tenant_id"]}/:aud"
+          variable = "sts.windows.net/${jsondecode(data.aws_secretsmanager_secret_version.justiceuk_entra_secret[0].secret_string)["tenant_id"]}/:aud"
           values   = [jsondecode(data.aws_secretsmanager_secret_version.justice_transcribe_backend_secret[0].secret_string)["audience"]]
         },
         {
           test     = "StringEquals"
-          variable = "sts.windows.net/${jsondecode(data.aws_secretsmanager_secret_version.justice_transcribe_backend_secret[0].secret_string)["tenant_id"]}/:sub"
+          variable = "sts.windows.net/${jsondecode(data.aws_secretsmanager_secret_version.justiceuk_entra_secret[0].secret_string)["tenant_id"]}/:sub"
           values   = [jsondecode(data.aws_secretsmanager_secret_version.justice_transcribe_backend_secret[0].secret_string)["subject"]]
         }
       ]
