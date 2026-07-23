@@ -90,8 +90,9 @@ locals {
     "file-transfer-workflow" = [
       {
         name            = "file-transfer-workflow"
-        dead_letter_arn = module.sqs_eventbridge_file_transfer_workflow_dlq.queue_arn
         arn             = module.step_function_filereceived_workflow.state_machine_arn
+        attach_role_arn = true
+        dead_letter_arn = module.sqs_eventbridge_file_transfer_workflow_dlq.queue_arn
         retry_policy = {
           maximum_event_age_in_seconds = 86400
           maximum_retry_attempts       = 185
@@ -101,8 +102,9 @@ locals {
     "file-routing-workflow" = [
       {
         name            = "file-routing-workflow"
-        dead_letter_arn = module.sqs_eventbridge_file_transfer_workflow_dlq.queue_arn
         arn             = module.step_function_filescanresultrecorded_workflow.state_machine_arn
+        attach_role_arn = true
+        dead_letter_arn = module.sqs_eventbridge_file_transfer_workflow_dlq.queue_arn
         retry_policy = {
           maximum_event_age_in_seconds = 86400
           maximum_retry_attempts       = 185
