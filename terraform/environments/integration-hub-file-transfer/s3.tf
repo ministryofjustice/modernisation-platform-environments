@@ -42,6 +42,8 @@ module "s3_audit_bucket" {
     status     = true
     mfa_delete = false
   }
+
+  tags = local.tags
 }
 
 module "s3_bucket" {
