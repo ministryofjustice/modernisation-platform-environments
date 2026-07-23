@@ -63,6 +63,7 @@ module "ecs_execution_role" {
   policies = {
     custom =  aws_iam_policy.ecs_execution_policy.arn
   }
+  use_name_prefix = false
 }
 
 resource "aws_ecs_cluster" "cadt" {
