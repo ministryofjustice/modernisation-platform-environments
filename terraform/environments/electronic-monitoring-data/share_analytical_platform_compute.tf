@@ -262,7 +262,7 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
   }
   statement {
     effect = "Allow"
-    actions ["sts:AssumeRole"]
+    actions = ["sts:AssumeRole"]
     principals {
       type = "Service"
       values = ["ecs-tasks.amazonaws.com"]
