@@ -74,9 +74,9 @@ resource "aws_security_group_rule" "ecs_tasks_egress_1522" {
   from_port         = 1522
   to_port           = 1522
   cidr_blocks = [
-    data.aws_subnet.private_subnets_a.cidr_block,
-    data.aws_subnet.private_subnets_b.cidr_block,
-    data.aws_subnet.private_subnets_c.cidr_block,
+    data.aws_subnet.data_subnets_a.cidr_block,
+    data.aws_subnet.data_subnets_b.cidr_block,
+    data.aws_subnet.data_subnets_c.cidr_block,
   ]
 }
 
