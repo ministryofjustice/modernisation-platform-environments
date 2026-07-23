@@ -12,13 +12,14 @@ resource "aws_security_group" "ec2_sg_clamav" {
 
 ### ClamAV
 
-resource "aws_vpc_security_group_ingress_rule" "ingress_traffic_clamav_3310" {
-  security_group_id = aws_security_group.ec2_sg_clamav.id
-  referenced_security_group_id = aws_security_group.ecs_tasks_pui.id
-  description = "Allow ClamAV from ECS tasks security group"
-  ip_protocol = "tcp"
-  from_port   = 3310
-  to_port     = 3310
+resource "aws_security_group_rule" "ingress_traffic_clamav_3310" {
+  security_group_id        = aws_security_group.ec2_sg_clamav.id
+  type                     = "ingress"
+  description              = "Allow ClamAV from ECS tasks security group"
+  protocol                 = "tcp"
+  from_port                = 3310
+  to_port                  = 3310
+  source_security_group_id = aws_security_group.ecs_tasks_pui.id
 }
 
 # EGRESS Rules
