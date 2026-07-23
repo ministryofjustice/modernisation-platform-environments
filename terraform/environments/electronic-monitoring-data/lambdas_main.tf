@@ -1164,6 +1164,30 @@ module "send_serco_fms_keys" {
       .arn
     )
 
+    GOVUK_NOTIFY_API_KEY_SECRET_ARN = (
+      aws_secretsmanager_secret.serco_fms_notify_api_key.arn
+    )
+
+    GOVUK_NOTIFY_EMAIL_TEMPLATE_ID = (
+      local.serco_fms_notify_email_template_id
+    )
+
+    GOVUK_NOTIFY_ACK_SMS_TEMPLATE_ID = (
+      local.serco_fms_notify_ack_sms_template_id
+    )
+
+    GOVUK_NOTIFY_PASSWORD_SMS_TEMPLATE_ID = (
+      local.serco_fms_notify_password_sms_template_id
+    )
+
+    ACKNOWLEDGEMENT_TTL_HOURS = tostring(
+      local.serco_fms_acknowledgement_ttl_hours
+    )
+
+    NOTIFY_FILE_RETENTION_PERIOD = (
+      local.serco_fms_notify_file_retention_period
+    )
+
     STATE_BUCKET = (
       module.s3-serco-fms-key-distribution-bucket.bucket.id
     )
