@@ -4,6 +4,7 @@ module "security_group_transfer" {
 
   vpc_id = data.aws_vpc.shared.id
 
+/*
   ingress_rules = {
     ssh-from-internet = {
       from_port   = 22
@@ -27,4 +28,5 @@ module "security_group_transfer" {
       description = "FTPS data from Internet"
     }
   }
+*/
 }
