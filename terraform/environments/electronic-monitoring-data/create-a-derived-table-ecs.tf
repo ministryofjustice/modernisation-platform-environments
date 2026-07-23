@@ -64,3 +64,11 @@ module "ecs_execution_role" {
     custom =  aws_iam_policy.ecs_execution_policy.arn
   }
 }
+
+resource "aws_ecs_cluster" "cadt" {
+    name = "create-a-derived-table"
+    setting {
+        name = "containerInsights"
+        value = "enabled"
+    }
+}
