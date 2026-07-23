@@ -265,7 +265,7 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
     actions = ["sts:AssumeRole"]
     principals {
       type = "Service"
-      values = ["ecs-tasks.amazonaws.com"]
+      identifiers = ["ecs-tasks.amazonaws.com"]
     }
   }
 }
