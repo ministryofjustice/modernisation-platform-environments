@@ -1,7 +1,7 @@
 locals {
 
   application_name = "data-factory-corporate"
-  component_name = "commercial"
+  component_name   = "commercial"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
