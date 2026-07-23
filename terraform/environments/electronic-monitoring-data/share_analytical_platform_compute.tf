@@ -16,7 +16,6 @@ locals {
     "intermediate_fms",
     "intermediate_mdss",
     "preprocessed_fms",
-    "serco_fms",
     "serco_fms_curated",
     "serco_fms_deduped",
     "staged_fms",

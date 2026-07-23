@@ -20,7 +20,9 @@ data "aws_iam_policy_document" "s3_bucket_policy" {
       values = [
         module.data_platform_access_iam_role[0].arn,
         "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*/AWSReservedSSO_platform-engineer-admin_*",
-        "arn:aws:iam::*:role/MemberInfrastructureAccess"
+        "arn:aws:iam::*:role/MemberInfrastructureAccess",
+        "arn:aws:iam::*:role/github-actions-plan",
+        "arn:aws:iam::*:role/github-actions-apply"
       ]
     }
     condition {
@@ -164,7 +166,9 @@ data "aws_iam_policy_document" "octo_s3_bucket_policy" {
       values = [
         module.octo_access_iam_role[0].arn,
         "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*/AWSReservedSSO_platform-engineer-admin_*",
-        "arn:aws:iam::*:role/MemberInfrastructureAccess"
+        "arn:aws:iam::*:role/MemberInfrastructureAccess",
+        "arn:aws:iam::*:role/github-actions-plan",
+        "arn:aws:iam::*:role/github-actions-apply"
       ]
     }
     condition {

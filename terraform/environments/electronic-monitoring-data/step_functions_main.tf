@@ -125,6 +125,24 @@ module "iceberg_table_maintenance_step_function" {
   type = "STANDARD"
 }
 
+# ------------------------------------------
+# Merge into emdi position step function
+# ------------------------------------------
+
+module "merge_into_mdss_staged_position" {
+  source       = "./modules/merge_into_reconciler"
+  function_to_iterate = module.merge_mdss_staged_position[0]
+}
+
+# ------------------------------------------
+# Merge into emdi position step function
+# ------------------------------------------
+
+module "merge_into_emdi_position" {
+  source       = "./modules/merge_into_reconciler"
+  function_to_iterate = module.merge_emdi_position[0]
+}
+
 # ------------------------------------------------------------------------------
 # Staging DB janitor Step Function
 # ------------------------------------------------------------------------------

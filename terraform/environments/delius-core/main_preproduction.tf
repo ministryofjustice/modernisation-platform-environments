@@ -30,7 +30,7 @@ module "environment_stage" {
 
   ldap_config        = local.ldap_config_stage
   db_config          = local.db_config_stage
-  create_backup_role = false
+  create_account_service_roles = false
   create_ecs_lambda  = false
 
   delius_microservice_configs = local.delius_microservices_configs_stage
@@ -73,7 +73,7 @@ module "environment_preprod" {
 
   ldap_config        = local.ldap_config_preprod
   db_config          = local.db_config_preprod
-  create_backup_role = true
+  create_account_service_roles = true
   create_ecs_lambda  = true
 
   delius_microservice_configs = local.delius_microservices_configs_preprod

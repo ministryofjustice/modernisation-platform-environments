@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "FileRouted.v1",
-  "description": "A processing object has been copied to clean, quarantine or investigation; required metadata and GuardDuty status tags have been verified; and the source object was deleted. The managed file transfer flow has moved the object to a destination based on a GuardDuty Malware Protection for S3 scan outcome.",
+  "description": "A processing object has been moved to clean, quarantine or investigation according to its GuardDuty scan result and the matching object tag breadcrumb.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -42,28 +42,42 @@
             "destinationObject",
             "route",
             "scanResultStatus",
+            "scanResultStatusMatchesTag",
             "sourceDeleted"
           ],
           "oneOf": [
             {
               "properties": {
                 "route": { "enum": ["clean"] },
-                "scanResultStatus": { "enum": ["NO_THREATS_FOUND"] }
+                "scanResultStatus": { "enum": ["NO_THREATS_FOUND"] },
+                "scanResultStatusMatchesTag": { "enum": [true] }
               }
             },
             {
               "properties": {
                 "route": { "enum": ["quarantine"] },
-                "scanResultStatus": { "enum": ["THREATS_FOUND"] }
+                "scanResultStatus": { "enum": ["THREATS_FOUND"] },
+                "scanResultStatusMatchesTag": { "enum": [true] }
               }
             },
             {
               "properties": {
-                "route": { "enum": ["investigation"] },
-                "scanResultStatus": {
-                  "enum": ["UNSUPPORTED", "ACCESS_DENIED", "FAILED"]
+                "route": { "enum": ["investigation"] }
+              },
+              "anyOf": [
+                {
+                  "properties": {
+                    "scanResultStatusMatchesTag": { "enum": [false] }
+                  }
+                },
+                {
+                  "properties": {
+                    "scanResultStatus": {
+                      "enum": ["UNSUPPORTED", "ACCESS_DENIED", "FAILED"]
+                    }
+                  }
                 }
-              }
+              ]
             }
           ],
           "properties": {
@@ -87,6 +101,9 @@
                 "ACCESS_DENIED",
                 "FAILED"
               ]
+            },
+            "scanResultStatusMatchesTag": {
+              "type": "boolean"
             },
             "sourceDeleted": { "type": "boolean", "enum": [true] }
           }
@@ -131,7 +148,7 @@
         "metadata": {
           "correlationId": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
           "causationId": "c5dc9cb4-3b1f-4f01-a4c6-41b30e11d790",
-          "idempotencyKey": "route:clean:example/report.csv:4Mh..."
+          "idempotencyKey": "route:clean:clean:example/report.csv:5Ni..."
         },
         "data": {
           "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
@@ -149,6 +166,7 @@
           },
           "route": "clean",
           "scanResultStatus": "NO_THREATS_FOUND",
+          "scanResultStatusMatchesTag": true,
           "sourceDeleted": true
         }
       }

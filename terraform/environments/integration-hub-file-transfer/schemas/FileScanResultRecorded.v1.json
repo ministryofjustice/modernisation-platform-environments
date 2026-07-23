@@ -36,7 +36,13 @@
         "data": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["fileId", "object", "scanResultStatus", "recordedAt"],
+          "required": [
+            "fileId",
+            "object",
+            "scanResultStatus",
+            "scanResultStatusMatchesTag",
+            "recordedAt"
+          ],
           "properties": {
             "fileId": {
               "type": "string",
@@ -53,6 +59,15 @@
                 "ACCESS_DENIED",
                 "FAILED"
               ]
+            },
+            "scanResultStatusMatchesTag": {
+              "type": "boolean",
+              "description": "Whether scanResultStatus matches the GuardDutyMalwareScanStatus tag on the exact object version. False when the tag is absent or differs."
+            },
+            "statusReasons": {
+              "type": "array",
+              "description": "GuardDuty reasons associated with a skipped or failed scan.",
+              "items": { "type": "string", "minLength": 1 }
             },
             "recordedAt": { "type": "string", "format": "date-time" }
           }
@@ -97,7 +112,7 @@
         "metadata": {
           "correlationId": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
           "causationId": "6dce6b40-6e43-49f0-a2cf-1da1d43bce22",
-          "idempotencyKey": "scan:processing:example/report.csv:4Mh..."
+          "idempotencyKey": "scan:7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1:4Mh..."
         },
         "data": {
           "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
@@ -108,6 +123,7 @@
             "sizeBytes": 4096
           },
           "scanResultStatus": "NO_THREATS_FOUND",
+          "scanResultStatusMatchesTag": true,
           "recordedAt": "2026-07-10T14:02:00Z"
         }
       }

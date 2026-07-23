@@ -34,7 +34,7 @@ locals {
         log_prefix               = "s3-logs/moj-general-infrastructure-dev/"
         lifecycle_id             = "delete-moj-general-infrastructure-dev"
         ec2_account              = "ppud-development"
-        enable_versioning        = true
+        enable_versioning        = false
         enable_logging           = true
         expiration_days          = null
         is_infrastructure_bucket = true
@@ -60,7 +60,7 @@ locals {
         log_prefix               = "s3-logs/moj-general-infrastructure-uat/"
         lifecycle_id             = "delete-moj-general-infrastructure-uat"
         ec2_account              = "ppud-preproduction"
-        enable_versioning        = true
+        enable_versioning        = false
         enable_logging           = true
         expiration_days          = null
         is_infrastructure_bucket = true
@@ -86,7 +86,7 @@ locals {
         log_prefix               = "s3-logs/moj-general-infrastructure-prod/"
         lifecycle_id             = "delete-moj-general-infrastructure-prod"
         ec2_account              = "ppud-production"
-        enable_versioning        = true
+        enable_versioning        = false
         enable_logging           = true
         expiration_days          = null
         is_infrastructure_bucket = true
@@ -112,7 +112,7 @@ locals {
         log_prefix               = "s3-logs/moj-ppud-files-prod/"
         lifecycle_id             = "delete-moj-ppud-files-prod"
         ec2_account              = "ppud-production"
-        enable_versioning        = true
+        enable_versioning        = false
         enable_logging           = true
         expiration_days          = null
         is_infrastructure_bucket = false
@@ -265,7 +265,7 @@ resource "aws_s3_bucket_policy" "s3_general" {
         {
           Sid    = "EC2Access"
           Effect = "Allow"
-          Action = ["s3:GetBucketAcl", "s3:DeleteObject", "s3:GetObject", "s3:PutObject", "s3:ListBucket"]
+          Action = ["s3:GetBucketAcl", "s3:DeleteObject", "s3:GetObject", "s3:PutObject", "s3:ListBucket", "s3:GetObjectTagging", "s3:PutObjectTagging"]
           Resource = [
             aws_s3_bucket.s3_general[each.key].arn,
             "${aws_s3_bucket.s3_general[each.key].arn}/*"

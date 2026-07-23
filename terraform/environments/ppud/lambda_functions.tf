@@ -326,6 +326,18 @@ locals {
         source_arn_suffix = "*"
       }]
     }
+    waf_web_acl_deep_bot_analysis = {
+      description  = "Function to perform a deeper analysis WAM WAF Web ACL rule AWSManagedRulesBotControlRuleSet for bot traffic and save a report to S3."
+      timeout      = 900
+      memory_size  = 1024
+      role_key     = "filter_waf_log_events"
+      environments = ["development"]
+      layers       = ["xlsxwriter", "requests", "numpy", "pandas"]
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
     file_server_analysis = {
       description  = "Function to analyse metadata from the PPUD file server and generate a report."
       timeout      = 900

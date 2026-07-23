@@ -1,10 +1,14 @@
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
+locals {
+  step_function_definition = startswith(var.name, "merge_into_") ? "step_function_definitions/merge_into.json.tmpl"  : "step_function_definitions/${var.name}.json.tmpl" 
+}
+
 resource "aws_sfn_state_machine" "this" {
   name       = var.name
   role_arn   = aws_iam_role.step_function_role.arn
-  definition = templatefile("step_function_definitions/${var.name}.json.tmpl", var.variable_dictionary)
+  definition = templatefile(local.step_function_definition, var.variable_dictionary)
   type       = var.type
   logging_configuration {
     log_destination        = "${aws_cloudwatch_log_group.this_log_group.arn}:*"
