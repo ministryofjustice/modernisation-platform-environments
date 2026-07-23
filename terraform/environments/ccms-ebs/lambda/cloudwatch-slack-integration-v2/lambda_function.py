@@ -58,9 +58,9 @@ _NOTIFY_UNRECOGNISED = os.environ.get("NOTIFY_UNRECOGNISED", "true").lower() in 
 # Suppression: which environments, and the raw HH:MM window bounds (semantics and
 # validation are in the suppression section below).
 # Empty SUPPRESSED_ENVIRONMENTS disables suppression.
-# DEFAULT: "dev-,test-,prep-"
+# DEFAULT: "dev-,test-,tst-,prep-"
 _SUPPRESSED_ENVIRONMENTS = tuple(
-    p.strip() for p in os.environ.get("SUPPRESSED_ENVIRONMENTS", "dev-,test-,prep-").split(",") if p.strip()
+    p.strip() for p in os.environ.get("SUPPRESSED_ENVIRONMENTS", "dev-,test-,tst-,prep-").split(",") if p.strip()
 )
 # DEFAULT: 19:00
 _SUPPRESSION_TIME_START = os.environ.get("SUPPRESSION_TIME_START", "19:00")
