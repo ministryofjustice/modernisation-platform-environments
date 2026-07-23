@@ -1,8 +1,8 @@
-------------------------------------------------------------------------------
-PAGERDUTY CONTACT POINT
-Creates a Grafana contact point that sends alerts to PagerDuty Event
-Orchestrator. The routing key is read from Secrets Manager.
-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# PAGERDUTY CONTACT POINT
+# Creates a Grafana contact point that sends alerts to PagerDuty Event
+# Orchestrator. The routing key is read from Secrets Manager.
+# ------------------------------------------------------------------------------
 resource "grafana_contact_point" "pagerduty" {
   count = local.grafana_alerting_manageable && local.pagerduty_integration_key != "" ? 1 : 0
 
@@ -29,11 +29,11 @@ resource "grafana_contact_point" "pagerduty" {
   depends_on = [helm_release.grafana]
 }
 
-------------------------------------------------------------------------------
-NOTIFICATION POLICY
-Routes alerts to the PagerDuty contact point. Each alert fires individually
-without grouping.
-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# NOTIFICATION POLICY
+# Routes alerts to the PagerDuty contact point. Each alert fires individually
+# without grouping.
+# ------------------------------------------------------------------------------
 resource "grafana_notification_policy" "pagerduty" {
   count = local.grafana_alerting_manageable && local.pagerduty_integration_key != "" ? 1 : 0
 
