@@ -1,6 +1,6 @@
-##########################################################################################
-# SSM Patch Management Groups, Baselines, Maintenance Windows and Maintenance Window Tasks
-##########################################################################################
+##################################################################################################
+# Windows SSM Patch Management Groups, Baselines, Maintenance Windows and Maintenance Window Tasks
+##################################################################################################
 
 # SSM Patch Groups - All Environments
 
@@ -105,12 +105,16 @@ resource "aws_ssm_maintenance_window_task" "patch_maintenance_window_task" {
 
 # SSM Maintenance Window Task Pre Patch Health Check - All Environments
 
+data "aws_ssm_document" "pre_patch_healthcheck" {
+  name = "Pre_Patch_Windows_Health_Check_Report"
+}
+
 resource "aws_ssm_maintenance_window_task" "pre_healthcheck_maintenance_window_task" {
   window_id        = aws_ssm_maintenance_window.patch_maintenance_window.id
   name             = "Pre-Health-Check-Report-Instance-Patch"
   description      = "Export Health Check Report to S3"
   task_type        = "RUN_COMMAND"
-  task_arn         = aws_ssm_document.perform_healthcheck_s3.arn
+  task_arn         = data.aws_ssm_document.pre_patch_healthcheck.arn
   priority         = local.application_data.accounts[local.environment].pre_healthcheck_Priority
   service_role_arn = aws_iam_role.patching_role.arn
   max_concurrency  = "100%"
@@ -123,21 +127,23 @@ resource "aws_ssm_maintenance_window_task" "pre_healthcheck_maintenance_window_t
 
   task_invocation_parameters {
     run_command_parameters {
-      output_s3_bucket     = local.application_data.accounts[local.environment].ssm_health_check_reports_s3
-      output_s3_key_prefix = "health-check-reports/windows/"
-      timeout_seconds      = 600
+      timeout_seconds = 600
     }
   }
 }
 
 # SSM Maintenance Window Task Post Patch Health Check - All Environments
 
+data "aws_ssm_document" "post_patch_healthcheck" {
+  name = "Post_Patch_Windows_Health_Check_Report"
+}
+
 resource "aws_ssm_maintenance_window_task" "post_healthcheck_maintenance_window_task" {
   window_id        = aws_ssm_maintenance_window.patch_maintenance_window.id
   name             = "Post-Health-Check-Report-Instance-Patch"
   description      = "Export Health Check Report to S3"
   task_type        = "RUN_COMMAND"
-  task_arn         = aws_ssm_document.perform_healthcheck_s3.arn
+  task_arn         = data.aws_ssm_document.post_patch_healthcheck.arn
   priority         = local.application_data.accounts[local.environment].post_healthcheck_Priority
   service_role_arn = aws_iam_role.patching_role.arn
   max_concurrency  = "100%"
@@ -150,31 +156,9 @@ resource "aws_ssm_maintenance_window_task" "post_healthcheck_maintenance_window_
 
   task_invocation_parameters {
     run_command_parameters {
-      output_s3_bucket     = local.application_data.accounts[local.environment].ssm_health_check_reports_s3
-      output_s3_key_prefix = "health-check-reports/windows/"
-      timeout_seconds      = 600
+      timeout_seconds = 600
     }
   }
 }
 
-# SSM Document for Healthcheck Report (to S3 Bucket) - All Environments
 
-resource "aws_ssm_document" "perform_healthcheck_s3" {
-  name          = "perform_health_check"
-  document_type = "Command"
-  content = jsonencode(
-    {
-      "schemaVersion" = "2.2",
-      "description"   = "Execute Powershell Command",
-      "mainSteps" = [
-        {
-          "action" = "aws:runPowerShellScript",
-          "name"   = "health_check_reports",
-          "inputs" = {
-            "runCommand" = ["powershell.exe -file 'c:\\scripts\\windows_health_check.ps1'"]
-          }
-        }
-      ]
-    }
-  )
-}
