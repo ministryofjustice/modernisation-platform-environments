@@ -67,7 +67,7 @@ data "aws_iam_policy_document" "guardduty_s3_permissions" {
       "s3:ListBucket"
     ]
     resources = [
-      "arn:aws:s3:::*"
+      module.s3_bucket["processing"].s3_bucket_arn
     ]
   }
   statement {
