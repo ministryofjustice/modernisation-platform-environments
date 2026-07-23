@@ -12,17 +12,13 @@ resource "aws_transfer_server" "this" {
 
   endpoint_details {
     vpc_id     = data.aws_vpc.shared.id
-    subnet_ids = data.aws_subnets.shared-public.ids
+    subnet_ids = local.transfer_subnet_ids
     address_allocation_ids = [
       for key, value in aws_eip.this : value.id
     ]
     security_group_ids = [
       module.security_group_transfer.id
     ]
-  }
-
-  protocol_details {
-    passive_ip = "AUTO"
   }
 
   tags = {

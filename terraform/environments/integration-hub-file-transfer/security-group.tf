@@ -4,7 +4,17 @@ module "security_group_transfer" {
 
   vpc_id = data.aws_vpc.shared.id
 
-/*
+  egress_rules = {
+    all-ipv4 = {
+      ip_protocol = "-1"
+      cidr_ipv4   = "0.0.0.0/0"
+      description = "Allow all outbound IPv4 traffic"
+    }
+  }
+
+  tags = local.tags
+
+  /*
   ingress_rules = {
     ssh-from-internet = {
       from_port   = 22
