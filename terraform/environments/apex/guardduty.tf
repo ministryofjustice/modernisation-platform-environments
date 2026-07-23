@@ -263,7 +263,7 @@ resource "aws_sns_topic_subscription" "guardduty_lambda" {
 # CloudWatch Logs Oracle Alerts -> Slack
 # ---------------------------------------------
 resource "aws_lambda_permission" "allow_logs_invoke_cloudwatch" {
-  count          = local.environment == "development" || local.environment == "test" || local.environment == "preproduction" || local.environment == "production" ? 1 : 0
+  count          = local.environment == "development" || local.environment == "test" ? 1 : 0
   statement_id   = "AllowExecutionFromCloudWatchLogs"
   action         = "lambda:InvokeFunction"
   function_name  = aws_lambda_function.guardduty_slack_notify.function_name
@@ -273,7 +273,7 @@ resource "aws_lambda_permission" "allow_logs_invoke_cloudwatch" {
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "database_oracle_alerts" {
-  count           = local.environment == "development" || local.environment == "test" || local.environment == "preproduction" || local.environment == "production" ? 1 : 0
+  count           = local.environment == "development" || local.environment == "test" ? 1 : 0
   name            = "${local.application_name}-${local.environment}-database-oracle-alerts-subscription"
   log_group_name  = aws_cloudwatch_log_group.database.name
   filter_pattern  = "\"ORA-\""
