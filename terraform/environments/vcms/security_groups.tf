@@ -55,6 +55,31 @@ resource "aws_security_group" "alb_sg" {
   tags = local.tags
 }
 
+resource "aws_security_group" "private_alb_sg" {
+  name        = "private-alb-sg"
+  description = "Security group for private ALB"
+  vpc_id      = local.account_info.vpc_id
+
+  dynamic "ingress" {
+    for_each = local.internal_security_group_cidrs
+    content {
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = local.tags
+}
+
 resource "aws_security_group_rule" "alb_from_ecs" {
   type                     = "ingress"
   from_port                = 443
@@ -106,4 +131,43 @@ resource "aws_security_group" "redis_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+resource "aws_security_group" "efs" {
+  name        = "vcms-${local.environment}-efs"
+  description = "Allow traffic between vcms service and efs"
+  vpc_id      = local.account_info.vpc_id
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "vcms-efs-${local.environment}"
+    }
+  )
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_security_group_rule" "efs_ingress_vpc" {
+  security_group_id = aws_security_group.efs.id
+  description       = "ingress vpc rules"
+
+  type        = "ingress"
+  from_port   = 2049
+  to_port     = 2049
+  protocol    = "tcp"
+  cidr_blocks = [local.account_config.shared_vpc_cidr]
+}
+
+resource "aws_security_group_rule" "efs_egress_vpc" {
+  security_group_id = aws_security_group.efs.id
+  description       = "egress vpc rules"
+
+  type        = "egress"
+  from_port   = 2049
+  to_port     = 2049
+  protocol    = "tcp"
+  cidr_blocks = [local.account_config.shared_vpc_cidr]
 }
