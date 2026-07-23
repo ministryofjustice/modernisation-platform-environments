@@ -16,7 +16,7 @@ locals {
 
 module "s3_bucket" {
   for_each = local.build_s3 ? toset(local.ftp_directions) : toset([])
-  source   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=474f27a3f9bf542a8826c76fb049cc84b5cf136f"
+  source   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=c8889e65f4d8a3d53d2cbd93b7be714e990020b7" # v10.2.1
 
   bucket_prefix       = "${local.application_name}-${local.environment}-ftp-${each.key}"
   versioning_enabled  = false
