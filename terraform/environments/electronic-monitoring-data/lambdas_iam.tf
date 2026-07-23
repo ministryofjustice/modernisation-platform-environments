@@ -2873,7 +2873,7 @@ module "trigger_cadt_iam" {
     ]
     principals = [{
       type = "Service"
-      identifier = "lambda.amazonaws.com"
+      identifiers = ["lambda.amazonaws.com"]
     }]}
   }
 
