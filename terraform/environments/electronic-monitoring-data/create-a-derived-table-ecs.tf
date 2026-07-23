@@ -2,6 +2,8 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
   family = "create-a-derived-table"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
+  cpu = 10
+  memory = 512
 
   container_definitions = jsonencode([
     {
