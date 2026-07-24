@@ -4,7 +4,7 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
   network_mode             = "awsvpc"
   cpu = 2048
   memory = 4096
-
+ # leave this for now, but it should be in the lambda later
   container_definitions = jsonencode([
     {
       name      = "first"
@@ -43,7 +43,7 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
         },
         {
           name = "DBT_SELECT_CRITERIA"
-          value = "tag:emd_live" # leave this for now, but it should be in the lambda later
+          value = "tag:emd_live"
         },
         {
           name = "S3_BUCKET"
@@ -51,7 +51,7 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
         },
         {
           name = "STATE_MODE"
-          value = "false" # leave this for now, but it should be in the lambda later
+          value = "false"
         },
         {
           name = "WORKFLOW_NAME"
