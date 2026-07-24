@@ -26,10 +26,6 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
           value = data.aws_region.current.name
         },
         {
-          name  = "REPOSITORY_PATH"
-          value = "."
-        },
-        {
           name  = "MODE"
           value = "build"
         },
