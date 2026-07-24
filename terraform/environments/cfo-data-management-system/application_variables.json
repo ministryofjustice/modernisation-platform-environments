@@ -1,16 +1,37 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
-    },
-    "test": {
-      "example_var": "test-data"
+      "rds": {
+        "db_instance_class": "db.m7i.large",
+        "db_allocated_storage": 100,
+        "db_multi_az": false,
+        "performance_insights_enabled": false,
+        "skip_final_snapshot": true
+      },
+      "api_domain": "api.cfo-data-management-system.hmpps-development.modernisation-platform.service.justice.gov.uk",
+      "visualiser_domain": "visualiser.cfo-data-management-system.hmpps-development.modernisation-platform.service.justice.gov.uk"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "rds": {
+        "db_instance_class": "db.m7i.large",
+        "db_allocated_storage": 100,
+        "db_multi_az": false,
+        "performance_insights_enabled": true,
+        "skip_final_snapshot": true
+      },
+      "api_domain": "api.cfo-data-management-system.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
+      "visualiser_domain": "visualiser.cfo-data-management-system.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"
     },
     "production": {
-      "example_var": "production-data"
+      "rds": {
+        "db_instance_class": "db.m7i.xlarge",
+        "db_allocated_storage": 200,
+        "db_multi_az": true,
+        "performance_insights_enabled": true,
+        "skip_final_snapshot": false
+      },
+      "api_domain": "api.cfo-data-management-system.service.justice.gov.uk",
+      "visualiser_domain": "visualiser.manage-external-funded-offender-provision.service.justice.gov.uk"
     }
   }
 }
