@@ -49,6 +49,7 @@ locals {
 
   cloud_platform_cidr   = "172.20.0.0/16"
   enable_dpr_cloudtrail = local.application_data.accounts[local.environment].enable_cloud_trail
+  enable_bedrock        = local.application_data.accounts[local.environment].enable_bedrock
   generic_lambda        = "${local.project}-generic-lambda"
 
   lambda_log_retention_in_days = local.application_data.accounts[local.environment].lambda_log_retention_in_days
@@ -522,6 +523,9 @@ locals {
       analytical_platform_runner_suffix = ""
     }
   }
+
+  # Single production AI Gateway assumes into each DPR environment's Bedrock role
+  ai_gateway_role_arn = "arn:aws:iam::${local.environment_management.account_ids["data-platform-production"]}:role/ai-gateway"
 
 
   all_tags = merge(
