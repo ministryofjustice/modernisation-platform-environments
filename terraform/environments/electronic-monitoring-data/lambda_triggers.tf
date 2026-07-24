@@ -458,3 +458,86 @@ resource "aws_lambda_permission" "update_p1_export_api_gw" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*/*"
 }
+
+# ------------------------------------------------------------------------------
+# Serco FMS rotation completion and acknowledgement polling
+# ------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "serco_fms_key_rotation_completed" {
+  name = "serco-fms-key-rotation-completed-${local.environment_shorthand}"
+
+  description = "Sends the Serco FMS credential batch after an FMS key rotation completes"
+
+  event_bus_name = local.serco_fms_rotation_event_bus_name
+
+  state = local.serco_fms_key_distribution_enabled ? "ENABLED" : "DISABLED"
+
+  event_pattern = jsonencode({
+    source = [
+      "emds.iam-key-rotation",
+    ]
+
+    detail-type = [
+      "IAM Key Rotation Completed",
+    ]
+
+    resources = local.serco_fms_key_distribution_feed_secret_arns
+  })
+}
+
+resource "aws_cloudwatch_event_target" "serco_fms_key_rotation_completed" {
+  rule = aws_cloudwatch_event_rule.serco_fms_key_rotation_completed.name
+
+  event_bus_name = local.serco_fms_rotation_event_bus_name
+
+  arn = module.send_serco_fms_keys.lambda_function_arn
+
+  input = jsonencode({
+    action = "prepare_and_send"
+  })
+}
+
+resource "aws_lambda_permission" "serco_fms_key_rotation_completed" {
+  statement_id = "AllowExecutionFromEventBridgeSercoFmsKeyRotation"
+
+  action = "lambda:InvokeFunction"
+
+  function_name = module.send_serco_fms_keys.lambda_function_name
+
+  principal = "events.amazonaws.com"
+
+  source_arn = aws_cloudwatch_event_rule.serco_fms_key_rotation_completed.arn
+}
+
+
+resource "aws_cloudwatch_event_rule" "serco_fms_acknowledgement_poll" {
+  name = "serco-fms-acknowledgement-poll-${local.environment_shorthand}"
+
+  description = "Checks GOV.UK Notify replies for a valid Serco FMS acknowledgement"
+
+  schedule_expression = local.serco_fms_acknowledgement_schedule_expression
+
+  state = local.serco_fms_key_distribution_enabled ? "ENABLED" : "DISABLED"
+}
+
+resource "aws_cloudwatch_event_target" "serco_fms_acknowledgement_poll" {
+  rule = aws_cloudwatch_event_rule.serco_fms_acknowledgement_poll.name
+
+  arn = module.send_serco_fms_keys.lambda_function_arn
+
+  input = jsonencode({
+    action = "process_acknowledgements"
+  })
+}
+
+resource "aws_lambda_permission" "serco_fms_acknowledgement_poll" {
+  statement_id = "AllowExecutionFromEventBridgeSercoFmsAcknowledgement"
+
+  action = "lambda:InvokeFunction"
+
+  function_name = module.send_serco_fms_keys.lambda_function_name
+
+  principal = "events.amazonaws.com"
+
+  source_arn = aws_cloudwatch_event_rule.serco_fms_acknowledgement_poll.arn
+}

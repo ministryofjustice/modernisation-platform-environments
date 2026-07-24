@@ -83,6 +83,14 @@ module "rotate_iam_key" {
   timeout                 = 900
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
+
+  environment_variables = {
+    ROTATION_COMPLETION_EVENT_ENABLED = tostring(
+      local.serco_fms_rotation_completion_events_enabled
+    )
+
+    ROTATION_EVENT_BUS_NAME = local.serco_fms_rotation_event_bus_name
+  }
 }
 
 #-----------------------------------------------------------------------------------
@@ -1110,5 +1118,110 @@ module "write_to_sharepoint" {
     SECRET_AZURE_TENANT_ID     = jsondecode(data.aws_secretsmanager_secret_version.entra_app_details[0].secret_string)["tenant_id"]
     SECRET_AZURE_CLIENT_ID     = jsondecode(data.aws_secretsmanager_secret_version.entra_app_details[0].secret_string)["client_id"]
     SECRET_AZURE_CLIENT_SECRET = jsondecode(data.aws_secretsmanager_secret_version.entra_app_details[0].secret_string)["client_secret"]
+  }
+}
+# ------------------------------------------------------------------------------
+# Serco FMS distribution-preparation Lambda
+# ------------------------------------------------------------------------------
+
+module "send_serco_fms_keys" {
+  source   = "./modules/lambdas"
+  is_image = true
+
+  function_name = "send_serco_fms_keys"
+  handler       = "send_serco_fms_keys.handler"
+
+  role_name = aws_iam_role.send_serco_fms_keys.name
+  role_arn  = aws_iam_role.send_serco_fms_keys.arn
+
+  memory_size                    = 512
+  timeout                        = 120
+  reserved_concurrent_executions = 1
+  cloudwatch_retention_days      = 7
+
+  core_shared_services_id = (
+    local.environment_management.account_ids[
+      "core-shared-services-production"
+    ]
+  )
+
+  production_dev = local.env_name
+
+  environment_variables = {
+    SERCO_KEY_DISTRIBUTION_ENABLED = tostring(
+      local.serco_fms_key_distribution_enabled
+    )
+
+    ENVIRONMENT = local.environment_shorthand
+
+    SECRET_SPEC_JSON = jsonencode(
+      local.serco_fms_key_distribution_secret_specs
+    )
+
+    RECIPIENT_CONFIG_SECRET_ARN = (
+      aws_secretsmanager_secret
+      .serco_fms_recipient_configuration
+      .arn
+    )
+
+    GOVUK_NOTIFY_API_KEY_SECRET_ARN = (
+      aws_secretsmanager_secret
+      .serco_fms_notify_api_key
+      .arn
+    )
+
+    GOVUK_NOTIFY_EMAIL_TEMPLATE_ID = (
+      local.serco_fms_notify_email_template_id
+    )
+
+    GOVUK_NOTIFY_ACK_SMS_TEMPLATE_ID = (
+      local.serco_fms_notify_ack_sms_template_id
+    )
+
+    GOVUK_NOTIFY_PASSWORD_SMS_TEMPLATE_ID = (
+      local.serco_fms_notify_password_sms_template_id
+    )
+
+    ACKNOWLEDGEMENT_TTL_HOURS = tostring(
+      local.serco_fms_acknowledgement_ttl_hours
+    )
+
+    NOTIFY_FILE_RETENTION_PERIOD = (
+      local.serco_fms_notify_file_retention_period
+    )
+
+    STATE_BUCKET = (
+      module.s3-serco-fms-key-distribution-bucket.bucket.id
+    )
+
+    STATE_PREFIX = (
+      local.serco_fms_key_distribution_state_prefix
+    )
+
+    EVENTS_PREFIX = (
+      local.serco_fms_key_distribution_events_prefix
+    )
+
+    FILES_PREFIX = (
+      local.serco_fms_key_distribution_files_prefix
+    )
+
+    PASSWORDS_PREFIX = (
+      local.serco_fms_key_distribution_passwords_prefix
+    )
+
+    DISTRIBUTION_KMS_KEY_ARN = (
+      aws_kms_key.serco_fms_key_distribution.arn
+    )
+
+    MAX_SECRET_AGE_HOURS = "48"
+
+    CLOUDTRAIL_LOG_BUCKET = (
+      module.s3-logging-bucket.bucket.id
+    )
+
+    CLOUDTRAIL_LOG_PREFIX = (
+      local.serco_fms_key_access_trail_log_prefix
+    )
   }
 }
