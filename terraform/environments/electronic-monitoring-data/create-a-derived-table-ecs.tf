@@ -47,7 +47,7 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
         },
         {
           name = "S3_BUCKET"
-          value = module.s3-create-a-derived-table-bucket.bucket
+          value = module.s3-create-a-derived-table-bucket.bucket.idß
         },
         {
           name = "STATE_MODE"
@@ -73,7 +73,6 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
           name = "DEPLOY_ENV"
           value = local.environment_shorthand
         }
-
       ]
     }
   ])
