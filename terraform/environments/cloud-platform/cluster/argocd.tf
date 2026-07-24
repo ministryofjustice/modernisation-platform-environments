@@ -9,6 +9,13 @@
 #   - US-015a: Provision Hub Cluster to support Argo CD Deployment
 ###############################################################################
 
+# TODO: rename to data.aws_codeconnections_connection when the AWS provider adds
+# the data source equivalent (currently only the resource exists under that name).
+data "aws_codestarconnections_connection" "github" {
+  count = var.enable_argocd ? 1 : 0
+  name  = "github-ministryofjustice"
+}
+
 module "argocd" {
   source = "./modules/argo-cd"
   count  = var.enable_argocd ? 1 : 0
@@ -37,7 +44,7 @@ module "argocd" {
   )
 
   # GitHub access via CodeConnections
-  codeconnection_arn = var.argocd_codeconnection_arn
+  codeconnection_arn = data.aws_codestarconnections_connection.github[0].arn
 
   # Enable pre-destroy cleanup for dev clusters (prevents cluster deletion hang)
   # Production hubs should set this to false to prevent accidental capability removal
@@ -80,9 +87,12 @@ locals {
   # register with. That is true when either:
   #   1. This is a permanent cluster (in mp_environments) → hub known by convention, OR
   #   2. An explicit hub role ARN was supplied (ephemeral/test clusters)
-  # Ad-hoc ephemeral clusters with no hub ARN are neither hub nor spoke, so they
-  # do not attempt registration against a hub that may not exist yet.
-  is_argocd_spoke = !var.enable_argocd && (
+  # Hub clusters (preproduction, live) are never spokes — even before ArgoCD is
+  # enabled on them. Ephemeral clusters without an explicit hub ARN are neither
+  # hub nor spoke, so they do not attempt registration.
+  is_argocd_hub_cluster = contains(values(local.argocd_hubs)[*].cluster_name, terraform.workspace)
+
+  is_argocd_spoke = !var.enable_argocd && !local.is_argocd_hub_cluster && (
     contains(local.mp_environments, terraform.workspace) || var.argocd_hub_spoke_access_role_arn != ""
   )
 }
