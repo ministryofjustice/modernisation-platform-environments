@@ -6,7 +6,7 @@ module "sqs_eventbridge_default_dlq" {
   name            = "${local.application_name}-eventbridge-default-dlq"
   use_name_prefix = false
 
-  kms_master_key_id         = module.kms_sqs.key_arn
+  kms_master_key_id          = module.kms_sqs.key_arn
   message_retention_seconds  = 1209600
   visibility_timeout_seconds = 180
   receive_wait_time_seconds  = 20
@@ -49,7 +49,7 @@ module "sqs_lambda_file_received_adapter_dlq" {
   name            = "${local.application_name}-lambda-file-received-adapter-dlq"
   use_name_prefix = false
 
-  kms_master_key_id         = module.kms_sqs.key_arn
+  kms_master_key_id          = module.kms_sqs.key_arn
   message_retention_seconds  = 1209600
   visibility_timeout_seconds = 180
   receive_wait_time_seconds  = 20
@@ -67,7 +67,7 @@ module "sqs_lambda_file_scan_result_recorded_adapter_dlq" {
   name            = "${local.application_name}-lambda-file-scan-result-recorded-adapter-dlq"
   use_name_prefix = false
 
-  kms_master_key_id         = module.kms_sqs.key_arn
+  kms_master_key_id          = module.kms_sqs.key_arn
   message_retention_seconds  = 1209600
   visibility_timeout_seconds = 180
   receive_wait_time_seconds  = 20
@@ -85,7 +85,7 @@ module "sqs_eventbridge_file_transfer_workflow_dlq" {
   name            = "${local.application_name}-file-transfer-workflow-dlq"
   use_name_prefix = false
 
-  kms_master_key_id         = module.kms_sqs.key_arn
+  kms_master_key_id          = module.kms_sqs.key_arn
   message_retention_seconds  = 1209600
   visibility_timeout_seconds = 180
   receive_wait_time_seconds  = 20
