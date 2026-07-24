@@ -27,65 +27,65 @@ locals {
     }
 
     lbs = {
-      private = merge(local.lbs.private, {
+      # private = merge(local.lbs.private, {
 
-        listeners = merge(local.lbs.private.listeners, {
-          https = merge(local.lbs.private.listeners.https, {
-            certificate_names_or_arns = ["dev_vcms_cert"]
+      #   listeners = merge(local.lbs.private.listeners, {
+      #     https = merge(local.lbs.private.listeners.https, {
+      #       certificate_names_or_arns = ["dev_vcms_cert"]
 
-            default_action = {
-              type = "redirect"
-              redirect = {
-                host        = "int.vcms.hmpps-development.modernisation-platform.service.justice.gov.uk",
-                port        = "443"
-                protocol    = "HTTPS"
-                status_code = "HTTP_302"
-              }
-            }
+      #       default_action = {
+      #         type = "redirect"
+      #         redirect = {
+      #           host        = "int.vcms.hmpps-development.modernisation-platform.service.justice.gov.uk",
+      #           port        = "443"
+      #           protocol    = "HTTPS"
+      #           status_code = "HTTP_302"
+      #         }
+      #       }
 
-            rules = {
-              legacy_redirect = {
-                priority = 100
-                actions = [{
-                  type              = "redirect"
-                  redirect = {
-                    host        = "int.vcms.hmpps-development.modernisation-platform.service.justice.gov.uk"
-                    port        = "443"
-                    protocol    = "HTTPS"
-                    status_code = "HTTP_301"
-                  }
-                  target_group_name = "vcms-frontend-private"
-                }]
-                conditions = [
-                  {
-                    host_header = {
-                      values = [ # max of 5
-                        "int.dev.victim-case-management.service.justice.gov.uk",
-                      ]
-                    }
-                  }
-                ]
-              }
-              forward = {
-                priority = 200
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "vcms-frontend-private"
-                }]
-                conditions = [
-                  {
-                    host_header = {
-                      values = [ # max of 5
-                        "int.vcms.hmpps-development.modernisation-platform.service.justice.gov.uk",
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          })
-        })
-      })
+      #       rules = {
+      #         legacy_redirect = {
+      #           priority = 100
+      #           actions = [{
+      #             type              = "redirect"
+      #             redirect = {
+      #               host        = "int.vcms.hmpps-development.modernisation-platform.service.justice.gov.uk"
+      #               port        = "443"
+      #               protocol    = "HTTPS"
+      #               status_code = "HTTP_301"
+      #             }
+      #             target_group_name = "vcms-frontend-private"
+      #           }]
+      #           conditions = [
+      #             {
+      #               host_header = {
+      #                 values = [ # max of 5
+      #                   "int.dev.victim-case-management.service.justice.gov.uk",
+      #                 ]
+      #               }
+      #             }
+      #           ]
+      #         }
+      #         forward = {
+      #           priority = 200
+      #           actions = [{
+      #             type              = "forward"
+      #             target_group_name = "vcms-frontend-private"
+      #           }]
+      #           conditions = [
+      #             {
+      #               host_header = {
+      #                 values = [ # max of 5
+      #                   "int.vcms.hmpps-development.modernisation-platform.service.justice.gov.uk",
+      #                 ]
+      #               }
+      #             }
+      #           ]
+      #         }
+      #       }
+      #     })
+      #   })
+      # })
     }
 
   }

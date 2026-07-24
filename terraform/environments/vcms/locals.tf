@@ -65,7 +65,7 @@ locals {
     security_groups = local.security_groups
   }
 
-    account_info = {
+  account_info = {
     business_unit    = var.networking[0].business-unit
     region           = "eu-west-2"
     vpc_id           = data.aws_vpc.shared.id
