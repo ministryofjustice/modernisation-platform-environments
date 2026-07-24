@@ -3171,3 +3171,174 @@ resource "aws_iam_role_policy_attachment" "send_serco_fms_keys" {
 
   policy_arn = aws_iam_policy.send_serco_fms_keys.arn
 }
+
+# ------------------------------------------------------------------------------
+# Serco FMS key-distribution dashboard Lambda IAM
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "serco_fms_key_distribution_dashboard" {
+  name = format(
+    "serco_fms_dashboard_lambda_role_%s",
+    local.environment_shorthand,
+  )
+
+  assume_role_policy = (
+    data.aws_iam_policy_document.lambda_assume_role.json
+  )
+
+  tags = merge(
+    local.tags,
+    {
+      resource-type = "serco-fms-key-distribution"
+      purpose       = "serco-fms-dashboard"
+    },
+  )
+}
+
+data "aws_iam_policy_document" "serco_fms_key_distribution_dashboard" {
+  # ---------------------------------------------------------------------------
+  # List only the workflow state and audit-event prefixes
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "ListDistributionDashboardData"
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+    ]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+
+      values = [
+        format(
+          "%s/%s/*",
+          local.serco_fms_key_distribution_state_prefix,
+          local.environment_shorthand,
+        ),
+        format(
+          "%s/%s/*",
+          local.serco_fms_key_distribution_events_prefix,
+          local.environment_shorthand,
+        ),
+      ]
+    }
+  }
+
+  # ---------------------------------------------------------------------------
+  # Read only manifests and immutable audit events
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "ReadDistributionDashboardData"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_state_prefix,
+        local.environment_shorthand,
+      ),
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_events_prefix,
+        local.environment_shorthand,
+      ),
+    ]
+  }
+
+  # ---------------------------------------------------------------------------
+  # Read secret-version metadata without reading credential values
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "ListFmsCredentialSecretVersions"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:ListSecretVersionIds",
+    ]
+
+    resources = (
+      local.serco_fms_key_distribution_feed_secret_arns
+    )
+  }
+
+  # ---------------------------------------------------------------------------
+  # Decrypt dashboard S3 objects only through the S3 service
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "DecryptDashboardDataThroughS3"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+    ]
+
+    resources = [
+      aws_kms_key.serco_fms_key_distribution.arn,
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:ViaService"
+
+      values = [
+        format(
+          "s3.%s.amazonaws.com",
+          data.aws_region.current.name,
+        ),
+      ]
+    }
+  }
+}
+
+resource "aws_iam_policy" "serco_fms_key_distribution_dashboard" {
+  name = format(
+    "serco_fms_dashboard_lambda_policy_%s",
+    local.environment_shorthand,
+  )
+
+  description = (
+    "Read-only access for the Serco FMS distribution dashboard"
+  )
+
+  policy = (
+    data
+    .aws_iam_policy_document
+    .serco_fms_key_distribution_dashboard
+    .json
+  )
+
+  tags = merge(
+    local.tags,
+    {
+      resource-type = "serco-fms-key-distribution"
+      purpose       = "serco-fms-dashboard"
+    },
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "serco_fms_key_distribution_dashboard" {
+  role = aws_iam_role.serco_fms_key_distribution_dashboard.name
+
+  policy_arn = (
+    aws_iam_policy
+    .serco_fms_key_distribution_dashboard
+    .arn
+  )
+}
