@@ -36,10 +36,10 @@ locals {
       # db_backup_more_permissions                  = true
       # enable_backup_plan_daily_and_weekly         = true
       # enable_business_unit_kms_cmks               = true
-      # enable_ec2_cloud_watch_agent                = true
+      enable_ec2_cloud_watch_agent                = true
       # enable_ec2_oracle_enterprise_managed_server = true
       # enable_ec2_security_groups                  = true
-      # enable_ec2_self_provision                   = true
+      enable_ec2_self_provision                   = true
       # enable_ec2_session_manager_cloudwatch_logs  = true
       # enable_ec2_ssm_agent_update                 = true
       # enable_ec2_user_keypair                     = true
