@@ -21,9 +21,13 @@ resource "aws_transfer_server" "this" {
     ]
   }
 
-  tags = {
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-transfer-server"
     #"transfer:customHostname"      = local.is-production == false ? "sftp.${local.environment}.managed-file-transfer.service.justice.gov.uk" : "sftp.managed-file-transfer.service.justice.gov.uk"
     #"transfer:route53HostedZoneId" = "/hostedzone/${data.aws_route53_zone.service.zone_id}"
-  }
+    }
+  )
 
 }
