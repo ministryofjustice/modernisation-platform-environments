@@ -1112,3 +1112,27 @@ module "write_to_sharepoint" {
     SECRET_AZURE_CLIENT_SECRET = jsondecode(data.aws_secretsmanager_secret_version.entra_app_details[0].secret_string)["client_secret"]
   }
 }
+
+#-----------------------------------------------------------------------------------
+# Trigger cadt ecs job
+#-----------------------------------------------------------------------------------
+
+module "trigger_cadt" {
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "trigger_cadt"
+  role_name               = module.trigger_cadt_iam.name
+  role_arn                = module.trigger_cadt_iam.arn
+  handler                 = "trigger_cadt.handler"
+  memory_size             = 10240
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    CLUSTER_NAME        = aws_ecs_cluster.cadt.name
+    TASK_DEFINITION_ARN = aws_ecs_task_definition.create_a_derived_table.arn
+    SUBNET_IDS          = jsonencode(data.aws_subnets.shared-private.ids)
+    SECURITY_GROUPS     = jsonencode([aws_security_group.gdpr_batch_sg[0].id])
+}
+  }

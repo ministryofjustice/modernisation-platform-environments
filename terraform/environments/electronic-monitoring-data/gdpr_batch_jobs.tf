@@ -320,7 +320,7 @@ resource "aws_iam_role_policy_attachment" "gdpr_batch_jobs_s3_access_policy_atta
 
 resource "aws_security_group" "gdpr_batch_sg" {
   #checkov:skip=CKV2_AWS_5
-  count       = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
+  count       = 1
   name_prefix = "emds-gdpr-batch-sg-"
   description = "Secuity Group for GDPR Batch Compute Environment"
   vpc_id      = data.aws_vpc.shared.id
@@ -335,7 +335,7 @@ resource "aws_security_group" "gdpr_batch_sg" {
 }
 
 resource "aws_security_group_rule" "gdpr_batch_egress_s3" {
-  for_each          = local.is-production || local.is-development || local.is-preproduction ? toset([for port in var.sqlserver_https_ports : tostring(port)]) : toset([])
+  for_each          = toset([for port in var.sqlserver_https_ports : tostring(port)])
   security_group_id = aws_security_group.gdpr_batch_sg[0].id
   type              = "egress"
   cidr_blocks       = data.aws_ip_ranges.london_s3.cidr_blocks
@@ -346,7 +346,7 @@ resource "aws_security_group_rule" "gdpr_batch_egress_s3" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "gdpr_batch_egress_vpc" {
-  count             = local.is-production || local.is-development || local.is-preproduction ? 1 : 0
+  count             = 1
   security_group_id = aws_security_group.gdpr_batch_sg[0].id
   description       = "AWS Batch -----[https]-----+ AWS APIs via NAT Gateway"
   ip_protocol       = "tcp"
