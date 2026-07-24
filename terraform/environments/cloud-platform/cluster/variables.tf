@@ -53,7 +53,12 @@ variable "argocd_rbac_role_mappings" {
 variable "argocd_codeconnection_arn" {
   type        = string
   default     = ""
-  description = "AWS CodeConnections ARN for GitHub repository access from Argo CD."
+  description = <<-EOT
+    AWS CodeConnections ARN for GitHub repository access from Argo CD.
+    When empty, looks up the connection by name (github-ministryofjustice)
+    via data source. Falls back to empty (no CodeConnection) if neither is
+    available.
+  EOT
 }
 
 #------------------------------------------------------------------------------
