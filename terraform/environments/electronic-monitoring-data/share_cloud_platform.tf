@@ -87,7 +87,7 @@ locals {
   iam_role_data_api = local.is-test ? [
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-21220dacf93f9ac4-live",
   ] : []
-  iam_role_ear_sar_db = local.is-preproduction ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live" : ""
+  iam_role_ear_sar_db    = local.is-development ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live" : ""
   emdi_cp_roles = local.is-development || local.is-test ? [
     var.cloud-platform-emdi-iam-dev
     ] : local.is-preproduction ? [var.cloud-platform-emdi-iam-preprod] : [
@@ -223,7 +223,7 @@ module "emd_data_api_role" {
 module "emd_update_p1_cp_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-  count   = local.is-preproduction || local.is-production ? 1 : 0
+  count   = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.48.0"
 
@@ -242,7 +242,7 @@ module "emd_update_p1_cp_role" {
 
 
 data "aws_iam_policy_document" "em_dashboard_update_p1_permissions" {
-  count = local.is-preproduction ? 1 : 0
+  count = local.is-preproduction || local.is-development ? 1 : 0
   statement {
     sid       = "AllowAccessToTriggerUpdateP1API"
     effect    = "Allow"
@@ -267,14 +267,14 @@ data "aws_iam_policy_document" "em_dashboard_update_p1_permissions" {
 }
 
 resource "aws_iam_policy" "em_dashboard_update_p1_permissions" {
-  count       = local.is-preproduction ? 1 : 0
+  count       = local.is-preproduction || local.is-development ? 1 : 0
   name_prefix = "em_dashboard_update_p1_permissions"
   description = "Permissions for updating p1 export."
   policy      = data.aws_iam_policy_document.em_dashboard_update_p1_permissions[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "em_dashboard_update_p1_permissions" {
-  count      = local.is-preproduction ? 1 : 0
+  count      = local.is-preproduction || local.is-development? 1 : 0
   policy_arn = aws_iam_policy.em_dashboard_update_p1_permissions[0].arn
   role       = module.emd_update_p1_cp_role[0].iam_role_name
 }
