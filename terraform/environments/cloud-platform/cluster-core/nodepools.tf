@@ -13,6 +13,9 @@ resource "kubectl_manifest" "default_nodeclass" {
     spec:
       role: ${local.node_role_name}
 
+      #Enable EKS Auto Mode Network Policy Event Logs
+      networkPolicyEventLogs: Enabled
+
       # Node subnets (primary CIDR)
       subnetSelectorTerms:
         - tags:
@@ -133,6 +136,20 @@ resource "kubectl_manifest" "system_nodepool" {
       limits:
         nodes: 10
   YAML
-
   depends_on = [kubectl_manifest.default_nodeclass]
+}
+
+resource "kubectl_manifest" "amazon_vpc_cni_config" {
+  yaml_body = <<YAML
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: amazon-vpc-cni
+      namespace: kube-system
+    data:
+      enable-network-policy-controller: "true"
+YAML
+
+  # Ensures Terraform updates the ConfigMap cleanly if EKS initialized it first
+  force_new = false
 }
