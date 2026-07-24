@@ -159,29 +159,128 @@ module "s3-logging-bucket" {
 }
 
 data "aws_iam_policy_document" "log_bucket_policy" {
+  # ---------------------------------------------------------------------------
+  # Existing S3 server-access log delivery
+  # ---------------------------------------------------------------------------
+
   statement {
     sid    = "AllowS3Logging"
     effect = "Allow"
 
     principals {
-      type        = "Service"
-      identifiers = ["logging.s3.amazonaws.com"]
+      type = "Service"
+
+      identifiers = [
+        "logging.s3.amazonaws.com",
+      ]
     }
 
-    actions = ["s3:PutObject"]
+    actions = [
+      "s3:PutObject",
+    ]
 
-    resources = ["${module.s3-logging-bucket.bucket.arn}/*"]
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/*",
+    ]
 
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values   = local.bucket_logging_source_arns
+
+      values = local.bucket_logging_source_arns
     }
 
     condition {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
-      values   = [data.aws_caller_identity.current.account_id]
+
+      values = [
+        data.aws_caller_identity.current.account_id,
+      ]
+    }
+  }
+
+
+  # ---------------------------------------------------------------------------
+  # Allow CloudTrail to validate the destination bucket
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "AllowSercoFmsCloudTrailAclCheck"
+    effect = "Allow"
+
+    principals {
+      type = "Service"
+
+      identifiers = [
+        "cloudtrail.amazonaws.com",
+      ]
+    }
+
+    actions = [
+      "s3:GetBucketAcl",
+    ]
+
+    resources = [
+      module.s3-logging-bucket.bucket.arn,
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+
+      values = [
+        local.serco_fms_key_access_trail_arn,
+      ]
+    }
+  }
+
+
+  # ---------------------------------------------------------------------------
+  # Allow CloudTrail to deliver logs for only this account and trail
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "AllowSercoFmsCloudTrailLogDelivery"
+    effect = "Allow"
+
+    principals {
+      type = "Service"
+
+      identifiers = [
+        "cloudtrail.amazonaws.com",
+      ]
+    }
+
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      format(
+        "%s/%s/AWSLogs/%s/*",
+        module.s3-logging-bucket.bucket.arn,
+        local.serco_fms_key_access_trail_log_prefix,
+        data.aws_caller_identity.current.account_id,
+      ),
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+
+      values = [
+        "bucket-owner-full-control",
+      ]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+
+      values = [
+        local.serco_fms_key_access_trail_arn,
+      ]
     }
   }
 }
