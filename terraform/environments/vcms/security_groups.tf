@@ -55,31 +55,6 @@ resource "aws_security_group" "alb_sg" {
   tags = local.tags
 }
 
-resource "aws_security_group" "private_alb_sg" {
-  name        = "private-alb-sg"
-  description = "Security group for private ALB"
-  vpc_id      = local.account_info.vpc_id
-
-  dynamic "ingress" {
-    for_each = local.internal_security_group_cidrs
-    content {
-      from_port   = 443
-      to_port     = 443
-      protocol    = "tcp"
-      cidr_blocks = [ingress.value]
-    }
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = local.tags
-}
-
 resource "aws_security_group_rule" "alb_from_ecs" {
   type                     = "ingress"
   from_port                = 443
