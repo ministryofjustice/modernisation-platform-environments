@@ -34,9 +34,12 @@ data "aws_iam_policy_document" "transfer_user" {
   }
 
   statement {
-    sid     = "AllowS3ListBucket"
-    effect  = "Allow"
-    actions = ["s3:ListBucket"]
+    sid    = "AllowS3ListBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+    ]
     resources = [
       module.s3_bucket["incoming"].s3_bucket_arn
     ]
@@ -68,12 +71,16 @@ data "aws_iam_policy_document" "transfer_user_session" {
   }
 
   statement {
-    sid    = "AllowListOwnHomeDirectory"
-    effect = "Allow"
-    actions = [
-      "s3:GetBucketLocation",
-      "s3:ListBucket"
-    ]
+    sid       = "AllowGetBucketLocation"
+    effect    = "Allow"
+    actions   = ["s3:GetBucketLocation"]
+    resources = [module.s3_bucket["incoming"].s3_bucket_arn]
+  }
+
+  statement {
+    sid     = "AllowListOwnHomeDirectory"
+    effect  = "Allow"
+    actions = ["s3:ListBucket"]
     resources = [
       module.s3_bucket["incoming"].s3_bucket_arn,
     ]
@@ -101,7 +108,8 @@ data "aws_iam_policy_document" "transfer_user_session" {
   }
 }
 
-module "iam_policy_transfer_usery" {
+module "iam_policy_transfer_user" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "6.6.1"
 
@@ -115,6 +123,7 @@ module "iam_policy_transfer_usery" {
 }
 
 module "iam_role_transfer_user" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.6.1"
 
@@ -134,6 +143,6 @@ module "iam_role_transfer_user" {
   }
 
   policies = {
-    transfer_user_policy = module.iam_policy_transfer_usery.arn
+    transfer_user_policy = module.iam_policy_transfer_user.arn
   }
 }
