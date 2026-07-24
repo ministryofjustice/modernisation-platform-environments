@@ -3,7 +3,7 @@ resource "aws_transfer_user" "this" {
 
   server_id           = aws_transfer_server.this.id
   user_name           = each.key
-  role                = module.transfer_user_role.arn
+  role                = module.iam_role_transfer_user.arn
   policy              = data.aws_iam_policy_document.transfer_user_session.json
   home_directory_type = "LOGICAL"
 
@@ -11,6 +11,12 @@ resource "aws_transfer_user" "this" {
     entry  = "/"
     target = "/${module.s3_bucket["incoming"].s3_bucket_id}/${each.key}"
   }
+
+  tags = merge(
+    {
+      Name = "${each.key}"
+    }
+  )
 }
 
 data "aws_iam_policy_document" "transfer_user" {
@@ -95,11 +101,11 @@ data "aws_iam_policy_document" "transfer_user_session" {
   }
 }
 
-module "transfer_user_policy" {
+module "iam_policy_transfer_usery" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "6.6.1"
 
-  name        = "${local.application_name}-transfer-user-policy"
+  name        = "${local.environment}-transfer-user-policy"
   description = "AWS Transfer User policy"
   path        = "/"
 
@@ -108,11 +114,11 @@ module "transfer_user_policy" {
   tags = local.tags
 }
 
-module "transfer_user_role" {
+module "iam_role_transfer_user" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.6.1"
 
-  name            = "${local.application_name}-transfer-user"
+  name            = "${local.environment}-transfer-user"
   description     = "AWS Transfer User role"
   use_name_prefix = true
 
@@ -128,6 +134,6 @@ module "transfer_user_role" {
   }
 
   policies = {
-    transfer_user_policy = module.transfer_user_policy.arn
+    transfer_user_policy = module.iam_policy_transfer_usery.arn
   }
 }
