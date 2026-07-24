@@ -36,11 +36,9 @@ locals {
 
   # Connection ID is the last path segment of the CodeConnection ARN
   # (arn:aws:codeconnections:<region>:<account>:connection/<connection-id>)
-  argocd_codeconnection_id = local.resolved_codeconnection_arn != "" ? element(reverse(split("/", local.resolved_codeconnection_arn)), 0) : ""
+  argocd_codeconnection_id = element(reverse(split("/", local.argocd_codeconnection_arn)), 0)
 
-  environments_repo = local.resolved_codeconnection_arn != "" ? (
-    "https://codeconnections.${data.aws_region.current.region}.amazonaws.com/git-http/${data.aws_caller_identity.current.account_id}/${data.aws_region.current.region}/${local.argocd_codeconnection_id}/${local.environments_repo_org}/${local.environments_repo_name}.git"
-  ) : "https://github.com/${local.environments_repo_org}/${local.environments_repo_name}"
+  environments_repo = "https://codeconnections.${data.aws_region.current.region}.amazonaws.com/git-http/${data.aws_caller_identity.current.account_id}/${data.aws_region.current.region}/${local.argocd_codeconnection_id}/${local.environments_repo_org}/${local.environments_repo_name}.git"
 
   # BU configuration — defines the spoke clusters and path within the monorepo
   # Each BU gets a nonlive and live AppProject + ApplicationSet pair

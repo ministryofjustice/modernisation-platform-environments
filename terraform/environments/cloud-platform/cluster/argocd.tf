@@ -9,16 +9,11 @@
 #   - US-015a: Provision Hub Cluster to support Argo CD Deployment
 ###############################################################################
 
-# Resolve CodeConnections ARN: explicit variable > data source lookup
 # TODO: rename to data.aws_codeconnections_connection when the AWS provider adds
 # the data source equivalent (currently only the resource exists under that name).
 data "aws_codestarconnections_connection" "github" {
-  count = var.argocd_codeconnection_arn == "" && var.enable_argocd ? 1 : 0
+  count = var.enable_argocd ? 1 : 0
   name  = "github-ministryofjustice"
-}
-
-locals {
-  resolved_codeconnection_arn = var.argocd_codeconnection_arn != "" ? var.argocd_codeconnection_arn : try(data.aws_codestarconnections_connection.github[0].arn, "")
 }
 
 module "argocd" {
@@ -49,7 +44,7 @@ module "argocd" {
   )
 
   # GitHub access via CodeConnections
-  codeconnection_arn = local.resolved_codeconnection_arn
+  codeconnection_arn = data.aws_codestarconnections_connection.github[0].arn
 
   # Enable pre-destroy cleanup for dev clusters (prevents cluster deletion hang)
   # Production hubs should set this to false to prevent accidental capability removal
