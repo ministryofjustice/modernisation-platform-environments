@@ -27,7 +27,7 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
         },
         {
           name  = "REPOSITORY_PATH"
-          value = "./create-a-derived-table"
+          value = "."
         },
         {
           name  = "MODE"
