@@ -1225,3 +1225,85 @@ module "send_serco_fms_keys" {
     )
   }
 }
+
+# ------------------------------------------------------------------------------
+# Serco FMS key-distribution dashboard Lambda
+# ------------------------------------------------------------------------------
+
+module "serco_fms_key_distribution_dashboard" {
+  source   = "./modules/lambdas"
+  is_image = true
+
+  function_name = "serco_fms_key_distribution_dashboard"
+  handler       = "serco_fms_key_distribution_dashboard.handler"
+
+  role_name = (
+    aws_iam_role
+    .serco_fms_key_distribution_dashboard
+    .name
+  )
+
+  role_arn = (
+    aws_iam_role
+    .serco_fms_key_distribution_dashboard
+    .arn
+  )
+
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 5
+  cloudwatch_retention_days      = 30
+
+  core_shared_services_id = (
+    local.environment_management.account_ids[
+      "core-shared-services-production"
+    ]
+  )
+
+  production_dev = local.env_name
+
+  environment_variables = {
+    POWERTOOLS_LOG_LEVEL = "INFO"
+
+    ENVIRONMENT = local.environment_shorthand
+
+    FEATURE_ENABLED = tostring(
+      local.serco_fms_key_distribution_enabled
+    )
+
+    STATE_BUCKET = (
+      module.s3-serco-fms-key-distribution-bucket.bucket.id
+    )
+
+    STATE_PREFIX = (
+      local.serco_fms_key_distribution_state_prefix
+    )
+
+    EVENTS_PREFIX = (
+      local.serco_fms_key_distribution_events_prefix
+    )
+
+    SECRET_SPEC_JSON = jsonencode(
+      local.serco_fms_key_distribution_secret_specs
+    )
+
+    ROTATION_MONTHS_JSON = jsonencode([
+      2,
+      5,
+      8,
+      11,
+    ])
+
+    # Python weekday index: Monday = 0, Tuesday = 1.
+    ROTATION_WEEKDAY = "1"
+
+    ROTATION_OCCURRENCE = "2"
+
+    # The Secrets Manager rotation schedule is configured in UTC.
+    ROTATION_HOUR     = "10"
+    ROTATION_MINUTE   = "0"
+    ROTATION_TIMEZONE = "UTC"
+
+    MAX_EVENTS = "30"
+  }
+}
