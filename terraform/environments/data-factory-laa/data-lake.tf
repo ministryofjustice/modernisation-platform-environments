@@ -1,5 +1,6 @@
 locals {
-  name = "laa-data-factory"
+  name      = "laa-data-factory"
+  databases = ["raw", "processedraw", "staging", "intermediate", "datamarts", "derived"]
   environments = {
     development = {
       lakeformation_admins = [
@@ -41,61 +42,36 @@ resource "aws_kms_alias" "data_lake_kms_alias" {
   target_key_id = aws_kms_key.data_lake_kms_key.id
 }
 
-module "data_lake_bronze_bucket" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f72f8d5"
+module "data_lake_buckets" {
+  for_each = toset(local.databases)
+  source   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=ccc457c"
 
-  bucket_prefix      = "${local.name}-bronze-"
-  versioning_enabled = true
-
+  bucket_prefix       = "${local.name}-${each.key}"
+  bucket_namespace    = "account-regional"
+  versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
+  sse_algorithm       = "aws:kms"
+  custom_kms_key      = aws_kms_key.data_lake_kms_key.arn
 
   providers = {
     aws.bucket-replication = aws
   }
-
-  sse_algorithm  = "aws:kms"
-  custom_kms_key = aws_kms_key.data_lake_kms_key.arn
 
   tags = local.tags
 }
 
-module "data_lake_silver_bucket" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f72f8d5"
+module "databases" {
+  for_each = toset(local.databases)
+  source   = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/data-factory-glue-database?ref=ef60504"
 
-  bucket_prefix      = "${local.name}-silver-"
-  versioning_enabled = true
+  database_name = each.key
 
-  ownership_controls  = "BucketOwnerEnforced"
-  replication_enabled = false
-
-  providers = {
-    aws.bucket-replication = aws
+  storage = {
+    bucket_name = module.data_lake_buckets[each.key].bucket.id
+    prefix      = each.key
+    kms_key_arn = aws_kms_key.data_lake_kms_key.arn
   }
-
-  sse_algorithm  = "aws:kms"
-  custom_kms_key = aws_kms_key.data_lake_kms_key.arn
-
-  tags = local.tags
-}
-
-module "data_lake_gold_bucket" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f72f8d5"
-
-  bucket_prefix      = "${local.name}-gold-"
-  versioning_enabled = true
-
-  providers = {
-    aws.bucket-replication = aws
-  }
-
-  ownership_controls  = "BucketOwnerEnforced"
-  replication_enabled = false
-
-  sse_algorithm  = "aws:kms"
-  custom_kms_key = aws_kms_key.data_lake_kms_key.arn
-
-  tags = local.tags
 }
 
 data "aws_iam_policy_document" "data_lake_access_action_assume_role" {
