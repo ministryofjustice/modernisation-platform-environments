@@ -17,7 +17,7 @@ resource "aws_transfer_server" "this" {
       for key, value in aws_eip.this : value.id
     ]
     security_group_ids = [
-      module.security_group_transfer.id
+      aws_security_group.transfer.id
     ]
   }
 
@@ -25,8 +25,8 @@ resource "aws_transfer_server" "this" {
     local.tags,
     {
       Name = "${local.application_name}-transfer-server"
-    #"transfer:customHostname"      = local.is-production == false ? "sftp.${local.environment}.managed-file-transfer.service.justice.gov.uk" : "sftp.managed-file-transfer.service.justice.gov.uk"
-    #"transfer:route53HostedZoneId" = "/hostedzone/${data.aws_route53_zone.service.zone_id}"
+      #"transfer:customHostname"      = local.is-production == false ? "sftp.${local.environment}.managed-file-transfer.service.justice.gov.uk" : "sftp.managed-file-transfer.service.justice.gov.uk"
+      #"transfer:route53HostedZoneId" = "/hostedzone/${data.aws_route53_zone.service.zone_id}"
     }
   )
 
