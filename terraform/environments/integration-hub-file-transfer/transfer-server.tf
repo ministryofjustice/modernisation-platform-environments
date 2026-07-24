@@ -2,7 +2,8 @@ resource "aws_transfer_server" "this" {
   #certificate            = aws_acm_certificate.ftps.arn
   domain                 = "S3"
   endpoint_type          = "VPC"
-  identity_provider_type = "SERVICE_MANAGED"
+  function               = module.lambda_custom_idp.lambda_function_arn
+  identity_provider_type = "AWS_LAMBDA"
   logging_role           = module.iam_role_transfer.arn
   protocols              = ["SFTP"]
   security_policy_name   = "TransferSecurityPolicy-2025-03"

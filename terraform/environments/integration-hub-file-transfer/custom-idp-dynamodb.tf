@@ -1,8 +1,9 @@
 module "dynamodb_custom_idp_users" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/dynamodb-table/aws"
   version = "5.5.0"
 
-  name         = "${local.application_name}-custom-idp-users"
+  name         = "${local.application_name}-${local.environment}-custom-idp-users"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "user"
   range_key    = "identity_provider_key"
@@ -30,10 +31,11 @@ module "dynamodb_custom_idp_users" {
 }
 
 module "dynamodb_custom_idp_identity_providers" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/dynamodb-table/aws"
   version = "5.5.0"
 
-  name         = "${local.application_name}-custom-idp-identity-providers"
+  name         = "${local.application_name}-${local.environment}-custom-idp-identity-providers"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "provider"
 
@@ -80,48 +82,62 @@ resource "aws_dynamodb_table_item" "custom_idp_identity_provider_secrets" {
 }
 
 resource "aws_dynamodb_table_item" "custom_idp_user" {
-  for_each = local.custom_idp_users
+  for_each = local.environment_transfer_server_users
 
   table_name = module.dynamodb_custom_idp_users.dynamodb_table_id
   hash_key   = "user"
   range_key  = "identity_provider_key"
 
-  item = jsonencode({
-    user = {
-      S = each.key
-    }
-    identity_provider_key = {
-      S = try(each.value.identity_provider_key, "secrets")
-    }
-    ipv4_allow_list = {
-      SS = try(each.value.ipv4_allow_list, local.custom_idp_configuration.ingress_cidr_blocks)
-    }
-    config = {
-      M = {
-        Role = {
-          S = module.transfer_user_role.arn
+  item = jsonencode(
+    merge(
+      {
+        user = {
+          S = each.key
         }
-        Policy = {
-          S = data.aws_iam_policy_document.transfer_user_session.json
+        identity_provider_key = {
+          S = each.value.identity_provider_key
         }
-        HomeDirectoryType = {
-          S = "LOGICAL"
+        idp_username = {
+          S = each.value.idp_username
         }
-        HomeDirectoryDetails = {
-          L = [
-            {
-              M = {
-                Entry = {
-                  S = "/"
-                }
-                Target = {
-                  S = "/${module.s3_bucket["unscanned"].s3_bucket_id}/${trimprefix(try(each.value.home_directory_target, each.key), "/")}"
-                }
-              }
+        config = {
+          M = {
+            Role = {
+              S = module.iam_role_transfer_user.arn
             }
-          ]
+            Policy = {
+              S = data.aws_iam_policy_document.transfer_user_session.json
+            }
+            HomeDirectoryType = {
+              S = "LOGICAL"
+            }
+            HomeDirectoryDetails = {
+              L = [
+                {
+                  M = {
+                    Entry = {
+                      S = "/"
+                    }
+                    Target = {
+                      S = "/${module.s3_bucket["incoming"].s3_bucket_id}/${trimprefix(each.value.home_directory_target, "/")}"
+                    }
+                  }
+                }
+              ]
+            }
+          }
         }
-      }
-    }
-  })
+      },
+      length(each.value.cidr_blocks) > 0 ? {
+        ipv4_allow_list = {
+          SS = each.value.cidr_blocks
+        }
+      } : {},
+      length(each.value.server_id_allow_list) > 0 ? {
+        server_id_allow_list = {
+          SS = each.value.server_id_allow_list
+        }
+      } : {}
+    )
+  )
 }

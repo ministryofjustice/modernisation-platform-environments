@@ -1,33 +1,3 @@
-resource "aws_transfer_user" "this" {
-  for_each = { for k, v in local.transfer_server_users : k => v if contains(v.environments, local.environment) }
-
-  server_id           = aws_transfer_server.this.id
-  user_name           = each.key
-  role                = module.iam_role_transfer_user.arn
-  policy              = data.aws_iam_policy_document.transfer_user_session.json
-  home_directory_type = "LOGICAL"
-
-  home_directory_mappings {
-    entry  = "/"
-    target = "/${module.s3_bucket["incoming"].s3_bucket_id}/${each.key}"
-  }
-
-  tags = merge(
-    {
-      Name = "${each.key}"
-    }
-  )
-}
-
-
-resource "aws_transfer_ssh_key" "this" {
-  for_each = { for k, v in local.transfer_server_users : k => v if contains(v.environments, local.environment) }
-
-  server_id = aws_transfer_server.this.id
-  user_name = aws_transfer_user.this[each.key].user_name
-  body      = each.value.ssh_public_key
-}
-
 data "aws_iam_policy_document" "transfer_user" {
   statement {
     sid    = "AllowKMS"
@@ -154,4 +124,31 @@ module "iam_role_transfer_user" {
   policies = {
     transfer_user_policy = module.iam_policy_transfer_user.arn
   }
+}
+
+module "iam_role_transfer" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.6.1"
+
+  create          = true
+  use_name_prefix = true
+  name            = "transfer-logging"
+
+  trust_policy_permissions = {
+    AllowTransferService = {
+      effect  = "Allow"
+      actions = ["sts:AssumeRole"]
+      principals = [{
+        type        = "Service"
+        identifiers = ["transfer.amazonaws.com"]
+      }]
+    }
+  }
+
+  policies = {
+    transfer_logging = "arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"
+  }
+
+  tags = local.tags
 }
