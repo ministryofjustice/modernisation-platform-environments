@@ -19,6 +19,15 @@ resource "aws_transfer_user" "this" {
   )
 }
 
+
+resource "aws_transfer_ssh_key" "this" {
+  for_each = { for k, v in local.transfer_server_users : k => v if contains(v.environments, local.environment) }
+
+  server_id = aws_transfer_server.this.id
+  user_name = aws_transfer_user.this[each.key].user_name
+  body      = each.value.ssh_public_key
+}
+
 data "aws_iam_policy_document" "transfer_user" {
   statement {
     sid    = "AllowKMS"
