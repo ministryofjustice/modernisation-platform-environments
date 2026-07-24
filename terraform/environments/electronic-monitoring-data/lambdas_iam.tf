@@ -2886,6 +2886,23 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
   }
 
   # ---------------------------------------------------------------------------
+  # Read the GOV.UK Notify API key
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "ReadNotifyApiKey"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      aws_secretsmanager_secret.serco_fms_notify_api_key.arn,
+    ]
+  }
+
+  # ---------------------------------------------------------------------------
   # Read and conditionally update batch state
   # ---------------------------------------------------------------------------
 
@@ -2937,6 +2954,31 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
         "%s/%s/%s/*",
         module.s3-serco-fms-key-distribution-bucket.bucket.arn,
         local.serco_fms_key_distribution_events_prefix,
+        local.environment_shorthand,
+      ),
+    ]
+  }
+
+  statement {
+    sid    = "ReadDistributionArtifacts"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+    ]
+
+    resources = [
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_files_prefix,
+        local.environment_shorthand,
+      ),
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_passwords_prefix,
         local.environment_shorthand,
       ),
     ]
@@ -3017,8 +3059,41 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
     }
   }
 
+  statement {
+    sid    = "DecryptDistributionPassword"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+    ]
+
+    resources = [
+      aws_kms_key.serco_fms_key_distribution.arn,
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:EncryptionContext:environment"
+
+      values = [
+        local.environment_shorthand,
+      ]
+    }
+
+    condition {
+      test     = "ForAllValues:StringEquals"
+      variable = "kms:EncryptionContextKeys"
+
+      values = [
+        "attempt",
+        "batch_id",
+        "environment",
+      ]
+    }
+  }
+
   # ---------------------------------------------------------------------------
-  # Decrypt the recipient secret through Secrets Manager
+  # Decrypt the recipient and Notify secrets through Secrets Manager
   # ---------------------------------------------------------------------------
 
   statement {
@@ -3055,7 +3130,7 @@ resource "aws_iam_policy" "send_serco_fms_keys" {
   )
 
   description = (
-    "Least-privilege access for Serco FMS distribution preparation"
+    "Least-privilege access for Serco FMS distribution delivery"
   )
 
   policy = data.aws_iam_policy_document.send_serco_fms_keys.json

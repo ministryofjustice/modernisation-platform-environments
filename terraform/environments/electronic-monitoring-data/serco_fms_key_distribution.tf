@@ -3,13 +3,23 @@
 # ------------------------------------------------------------------------------
 
 locals {
-  # Keep the preparation Lambda disabled until the recipient secret is populated
-  # and the Notify workflow is added.
-  serco_fms_key_distribution_enabled = false
+  # Enable the workflow in development only while the end-to-end integration
+  # is tested. Other environments remain disabled.
+  serco_fms_key_distribution_enabled = local.is-development
 
-  serco_fms_key_distribution_bucket_prefix = (
-    "${local.bucket_prefix}-serco-fms-keys-"
-  )
+  serco_fms_notify_email_template_id = "f547eba8-a5d4-4218-b5ff-a238bc054136"
+
+  serco_fms_notify_ack_sms_template_id = "6ac304b0-bc7e-43f6-a192-826345d8bd17"
+
+  serco_fms_notify_password_sms_template_id = "ee1ee19f-7cf9-45ac-97a8-eb4c8c3ff7fd"
+
+  serco_fms_acknowledgement_schedule_expression = "rate(5 minutes)"
+
+  serco_fms_acknowledgement_ttl_hours = 24
+
+  serco_fms_notify_file_retention_period = "1 week"
+
+  serco_fms_key_distribution_bucket_prefix = "${local.bucket_prefix}-serco-fms-keys-"
 
   serco_fms_key_distribution_files_prefix = "files"
 
@@ -27,29 +37,17 @@ locals {
     {
       label = "General"
 
-      secret_arn = (
-        module
-        .s3-fms-general-landing-bucket-iam-user
-        .secret_arn
-      )
+      secret_arn = module.s3-fms-general-landing-bucket-iam-user.secret_arn
     },
     {
       label = "Home Office"
 
-      secret_arn = (
-        module
-        .s3-fms-ho-landing-bucket-iam-user
-        .secret_arn
-      )
+      secret_arn = module.s3-fms-ho-landing-bucket-iam-user.secret_arn
     },
     {
       label = "Specials"
 
-      secret_arn = (
-        module
-        .s3-fms-specials-landing-bucket-iam-user
-        .secret_arn
-      )
+      secret_arn = module.s3-fms-specials-landing-bucket-iam-user.secret_arn
     },
   ]
 
@@ -66,13 +64,12 @@ locals {
 # This key protects:
 # - the distribution S3 bucket;
 # - the temporary PDF-password ciphertext;
-# - the recipient-configuration secret.
+# - the recipient-configuration secret;
+# - the GOV.UK Notify API-key secret.
 # ------------------------------------------------------------------------------
 
 resource "aws_kms_key" "serco_fms_key_distribution" {
-  description = (
-    "Encrypts Serco FMS distribution artifacts and configuration"
-  )
+  description = "Encrypts Serco FMS distribution artifacts and configuration"
 
   enable_key_rotation     = true
   deletion_window_in_days = 30
@@ -87,10 +84,7 @@ resource "aws_kms_key" "serco_fms_key_distribution" {
 }
 
 resource "aws_kms_alias" "serco_fms_key_distribution" {
-  name = format(
-    "alias/serco-fms-key-distribution-%s",
-    local.environment_shorthand,
-  )
+  name = "alias/serco-fms-key-distribution-${local.environment_shorthand}"
 
   target_key_id = aws_kms_key.serco_fms_key_distribution.key_id
 }
@@ -106,14 +100,9 @@ resource "aws_kms_alias" "serco_fms_key_distribution" {
 resource "aws_secretsmanager_secret" "serco_fms_recipient_configuration" {
   #checkov:skip=CKV_AWS_66:Contact configuration is manually versioned and is not a rotatable credential.
 
-  name = format(
-    "serco-fms-notify-recipients-%s",
-    local.environment_shorthand,
-  )
+  name = "serco-fms-notify-recipients-${local.environment_shorthand}"
 
-  description = (
-    "Approved email and SMS recipients for Serco FMS key distribution"
-  )
+  description = "Approved email and SMS recipients for Serco FMS key distribution"
 
   kms_key_id = aws_kms_key.serco_fms_key_distribution.arn
 
@@ -124,6 +113,34 @@ resource "aws_secretsmanager_secret" "serco_fms_recipient_configuration" {
     {
       resource-type = "serco-fms-key-distribution"
       purpose       = "serco-fms-recipient-configuration"
+    },
+  )
+}
+
+
+# ------------------------------------------------------------------------------
+# GOV.UK Notify API key
+#
+# Terraform creates only the secret container. The API key is inserted manually
+# after apply so it never enters Terraform state.
+# ------------------------------------------------------------------------------
+
+resource "aws_secretsmanager_secret" "serco_fms_notify_api_key" {
+  #checkov:skip=CKV_AWS_66:GOV.UK Notify API keys are rotated manually because AWS automatic rotation is not supported.
+
+  name = "serco-fms-notify-api-key-${local.environment_shorthand}"
+
+  description = "GOV.UK Notify API key for Serco FMS key distribution"
+
+  kms_key_id = aws_kms_key.serco_fms_key_distribution.arn
+
+  recovery_window_in_days = 30
+
+  tags = merge(
+    local.tags,
+    {
+      resource-type = "serco-fms-key-distribution"
+      purpose       = "serco-fms-notify-api-key"
     },
   )
 }
