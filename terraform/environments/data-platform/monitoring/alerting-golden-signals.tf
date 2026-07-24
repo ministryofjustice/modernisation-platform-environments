@@ -65,19 +65,6 @@ locals {
   #   ok_when_nodata = (optional, default: false)
   #                    if true, sets noDataState: OK so rules resolve to Normal
   #                    when CloudWatch emits nothing (e.g. zero failed nodes)
-  #   slack_channel  = (optional) Slack channel to route this signal's alerts.
-  #                    Two forms accepted:
-  #                      a) string — same channel for both severities
-  #                         slack_channel = "dev-slack"
-  #                      b) object — different channel per severity;
-  #                         omit a key to emit no label for that severity
-  #                         slack_channel = { warning = "dev-slack", critical = "dev-slack-critical" }
-  #                    Resolution order per severity (first non-null wins):
-  #                      1. per-severity key on this field  (e.g. .critical)
-  #                      2. string value on this field
-  #                      3. slack_channel in environment_configurations  (env default)
-  #                    If none of the above is set the label is omitted entirely
-  #                    and Grafana's root / catch-all policy handles the alert.
   #   warning        = key in locals.defaults (or threshold_overrides) for warning level
   #   critical       = key in locals.defaults (or threshold_overrides) for critical level
   #   query_window_seconds    = (optional, default: 300) lookback window for the

@@ -24,6 +24,15 @@ data "aws_secretsmanager_secret_version" "grafana_entra_id" {
   secret_id = module.grafana_entra_id_secret[0].secret_id
 }
 
+# PagerDuty Event Orchestration routing key used by the Grafana contact point.
+# The secret is created and populated in the data-platform-products repo and
+# read here to configure the PagerDuty alerting contact point.
+data "aws_secretsmanager_secret_version" "pagerduty_grafana_routing_key" {
+  count = local.environment_configuration.monitoring_stack_enabled ? 1 : 0
+
+  secret_id = "pagerduty/global/integration-keys/grafana"
+}
+
 # Grafana service-account token used by the Terraform grafana provider. The secret
 # is created with a placeholder value in secrets.tf and populated out-of-band, so
 # it is read back here to configure the provider in providers.tf.
@@ -32,3 +41,4 @@ data "aws_secretsmanager_secret_version" "grafana_api_token" {
 
   secret_id = module.grafana_api_token_secret[0].secret_id
 }
+
