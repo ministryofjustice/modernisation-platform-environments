@@ -48,8 +48,6 @@ jobs:
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
-
-  test-step-functions:
     name: Test Step Functions
     needs:
       - fetch-secrets-for-step-functions
