@@ -47,7 +47,7 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
         },
         {
           name = "S3_BUCKET"
-          value = module.s3-cadt-bucket.bucket.id
+          value = module.s3-create-a-derived-table-bucket.bucket
         },
         {
           name = "STATE_MODE"
