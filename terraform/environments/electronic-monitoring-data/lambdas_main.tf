@@ -1165,7 +1165,9 @@ module "send_serco_fms_keys" {
     )
 
     GOVUK_NOTIFY_API_KEY_SECRET_ARN = (
-      aws_secretsmanager_secret.serco_fms_notify_api_key.arn
+      aws_secretsmanager_secret
+      .serco_fms_notify_api_key
+      .arn
     )
 
     GOVUK_NOTIFY_EMAIL_TEMPLATE_ID = (
@@ -1213,5 +1215,13 @@ module "send_serco_fms_keys" {
     )
 
     MAX_SECRET_AGE_HOURS = "48"
+
+    CLOUDTRAIL_LOG_BUCKET = (
+      module.s3-logging-bucket.bucket.id
+    )
+
+    CLOUDTRAIL_LOG_PREFIX = (
+      local.serco_fms_key_access_trail_log_prefix
+    )
   }
 }

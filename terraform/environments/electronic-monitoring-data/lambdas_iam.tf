@@ -3121,6 +3121,29 @@ data "aws_iam_policy_document" "send_serco_fms_keys" {
       ]
     }
   }
+  
+  # ---------------------------------------------------------------------------
+  # Read versioned CloudTrail event-log objects for adoption observation
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "ReadSercoFmsCloudTrailLogs"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+    ]
+
+    resources = [
+      format(
+        "%s/%s/AWSLogs/%s/CloudTrail/*",
+        module.s3-logging-bucket.bucket.arn,
+        local.serco_fms_key_access_trail_log_prefix,
+        data.aws_caller_identity.current.account_id,
+      ),
+    ]
+  }
 }
 
 resource "aws_iam_policy" "send_serco_fms_keys" {
