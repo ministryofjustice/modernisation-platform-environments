@@ -1,6 +1,21 @@
 locals {
   transfer_subnet_ids = local.is-production ? sort(data.aws_subnets.shared-public.ids) : slice(sort(data.aws_subnets.shared-public.ids), 0, 1)
 
+  # Custom IdP user configuration. Add users by username and list every
+  # environment in which they may authenticate. Terraform stores routing and
+  # access controls in DynamoDB, while Secrets Manager stores credentials.
+  #
+  # environments          - environments in which Terraform creates the user
+  # identity_provider_key - DynamoDB identity provider record to use
+  # idp_username          - username used to look up credentials in Secrets Manager
+  # home_directory_target - prefix in the incoming bucket mapped to logical "/"
+  # server_id_allow_list  - Transfer server IDs permitted for the user; empty allows any
+  # cidr_blocks           - source networks permitted by the security group and IdP;
+  #                         empty creates no ingress rules
+  # ssh_public_keys       - public keys written to the user's Secrets Manager secret
+  #
+  # Passwords are deliberately not configured here. Populate the password field
+  # directly in the generated Secrets Manager secret when password access is needed.
   transfer_server_users = {
     dms1981 = {
       environments          = ["development"]

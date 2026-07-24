@@ -32,7 +32,10 @@ module "secrets_custom_idp_user" {
   }
 
   secret_string = jsonencode({
-    password   = null
-    publicKeys = each.value.ssh_public_keys
+    home_directory_target = try(each.value.home_directory_target, each.key)
+    identity_provider_key = try(each.value.identity_provider_key, "secrets")
+    ipv4_allow_list       = try(each.value.cidr_blocks, [])
+    password              = null                       # populate the key, but never set a value
+    publicKeys            = each.value.ssh_public_keys # public keys used for passwordless SFTP
   })
 }
