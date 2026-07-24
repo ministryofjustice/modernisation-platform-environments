@@ -122,30 +122,3 @@ data "aws_iam_policy_document" "guardduty_s3_permissions" {
     resources = [module.kms_s3_bucket["processing"].key_arn]
   }
 }
-
-module "iam_role_transfer" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.1"
-
-  create          = true
-  use_name_prefix = true
-  name            = "transfer-logging"
-
-  trust_policy_permissions = {
-    AllowTransferService = {
-      effect  = "Allow"
-      actions = ["sts:AssumeRole"]
-      principals = [{
-        type        = "Service"
-        identifiers = ["transfer.amazonaws.com"]
-      }]
-    }
-  }
-
-  policies = {
-    transfer_logging = "arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"
-  }
-
-  tags = local.tags
-}

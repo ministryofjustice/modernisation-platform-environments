@@ -1,43 +1,43 @@
-module "security_group_transfer" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  source  = "terraform-aws-modules/security-group/aws"
-  version = "6.0.0"
+resource "aws_security_group" "transfer" {
+  name        = "${local.application_name}-${local.environment}-transfer"
+  description = "Allow SFTP and FTPS access to the Transfer Family server"
+  vpc_id      = data.aws_vpc.shared.id
 
-  vpc_id = data.aws_vpc.shared.id
+  dynamic "ingress" {
+    for_each = local.transfer_user_cidr_blocks
 
-  egress_rules = {
-    all-ipv4 = {
-      ip_protocol = "-1"
-      cidr_ipv4   = "0.0.0.0/0"
-      description = "Allow all outbound IPv4 traffic"
+    content {
+      description = "SFTP from ${ingress.key}"
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = ingress.value
+    }
+  }
+
+  dynamic "ingress" {
+    for_each = local.transfer_user_cidr_blocks
+
+    content {
+      description = "FTPS control from ${ingress.key}"
+      from_port   = 21
+      to_port     = 21
+      protocol    = "tcp"
+      cidr_blocks = ingress.value
+    }
+  }
+
+  dynamic "ingress" {
+    for_each = local.transfer_user_cidr_blocks
+
+    content {
+      description = "FTPS data from ${ingress.key}"
+      from_port   = 8192
+      to_port     = 8200
+      protocol    = "tcp"
+      cidr_blocks = ingress.value
     }
   }
 
   tags = local.tags
-
-  /*
-  ingress_rules = {
-    ssh-from-internet = {
-      from_port   = 22
-      to_port     = 22
-      ip_protocol = "tcp"
-      cidr_ipv4   = "0.0.0.0/0"
-      description = "SSH from Internet"
-    }
-    ftps-control-from-internet = {
-      from_port   = 21
-      to_port     = 21
-      ip_protocol = "tcp"
-      cidr_ipv4   = "0.0.0.0/0"
-      description = "FTPS control from Internet"
-    }
-    ftps-data-from-internet = {
-      from_port   = 8192
-      to_port     = 8200
-      ip_protocol = "tcp"
-      cidr_ipv4   = "0.0.0.0/0"
-      description = "FTPS data from Internet"
-    }
-  }
-*/
 }
