@@ -2,7 +2,7 @@ module "dynamodb_custom_idp_users" {
   source  = "terraform-aws-modules/dynamodb-table/aws"
   version = "5.5.0"
 
-  name         = "${local.application_name}-custom-idp-users"
+  name         = "${local.application_name}-${local.component_name}-custom-idp-users"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "user"
   range_key    = "identity_provider_key"
@@ -33,7 +33,7 @@ module "dynamodb_custom_idp_identity_providers" {
   source  = "terraform-aws-modules/dynamodb-table/aws"
   version = "5.5.0"
 
-  name         = "${local.application_name}-custom-idp-identity-providers"
+  name         = "${local.application_name}-${local.component_name}-custom-idp-identity-providers"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "provider"
 
