@@ -185,7 +185,7 @@ resource "aws_db_instance" "appdb1" {
   backup_retention_period               = var.backup_retention_period
   backup_window                         = var.backup_window
   maintenance_window                    = var.maintenance_window
-  character_set_name                    = var.character_set_name
+  character_set_name                    = var.std_snapshot_arn == "" ? var.character_set_name : null
   multi_az                              = var.multi_az
   username                              = var.username
   password                              = random_password.rds_password[0].result
@@ -532,7 +532,7 @@ resource "aws_db_instance" "appdb1_std" {
   backup_retention_period               = var.backup_retention_period
   backup_window                         = var.backup_window
   maintenance_window                    = var.maintenance_window
-  character_set_name                    = var.character_set_name
+  character_set_name                    = var.std_snapshot_arn == "" ? var.character_set_name : null
   multi_az                              = var.multi_az
   username                              = var.username
   password                              = random_password.rds_std_password[0].result

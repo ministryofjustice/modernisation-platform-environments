@@ -15,6 +15,7 @@
       "backup_retention_period": 25,
       "backup_window": "22:00-01:00",
       "maintenance_window": "Mon:01:15-Mon:06:00",
+      "character_set_name": "WE8MSWIN1252",
       "multi_az": true,
       "username": "admin",
       "db_password_rotation_period": 30,
