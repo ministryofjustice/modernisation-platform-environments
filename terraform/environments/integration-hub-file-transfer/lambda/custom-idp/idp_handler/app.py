@@ -121,7 +121,10 @@ def get_identity_provider_record(identity_provider_name):
 
 def validate_request_context(event, username, user_record, identity_provider_record):
     server_id = event["serverId"]
-    source_ip = event.get("sourceIp", "0.0.0.0")
+    source_ip = event.get("sourceIp")
+
+    if not source_ip:
+        raise AuthenticationError("Source IP is missing")
 
     if not server_id_in_allow_list(server_id, user_record.get("server_id_allow_list")):
         raise AuthenticationError(f"User {username} is not allowed on this server")

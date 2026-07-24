@@ -8,11 +8,14 @@ AWS_REGION = os.environ.get("AWS_REGION", os.environ.get("AWS_DEFAULT_REGION", "
 
 
 def ip_in_cidr_list(ip_address, cidr_list):
-    if not cidr_list:
-        return True
+    try:
+        source_ip = ipaddress.ip_address(ip_address)
+        if not cidr_list:
+            return True
 
-    source_ip = ipaddress.ip_address(ip_address)
-    return any(source_ip in ipaddress.ip_network(cidr) for cidr in cidr_list)
+        return any(source_ip in ipaddress.ip_network(cidr, strict=True) for cidr in cidr_list)
+    except ValueError:
+        return False
 
 
 def server_id_in_allow_list(server_id, allow_list):

@@ -36,6 +36,8 @@ data "aws_iam_policy_document" "transfer_user" {
 }
 
 data "aws_iam_policy_document" "transfer_user_session" {
+  for_each = local.environment_transfer_server_users
+
   statement {
     sid    = "AllowKMS"
     effect = "Allow"
@@ -67,9 +69,9 @@ data "aws_iam_policy_document" "transfer_user_session" {
       test     = "StringLike"
       variable = "s3:prefix"
       values = [
-        "$${transfer:UserName}",
-        "$${transfer:UserName}/",
-        "$${transfer:UserName}/*",
+        trimprefix(each.value.home_directory_target, "/"),
+        "${trimprefix(each.value.home_directory_target, "/")}/",
+        "${trimprefix(each.value.home_directory_target, "/")}/*",
       ]
     }
   }
@@ -82,7 +84,7 @@ data "aws_iam_policy_document" "transfer_user_session" {
       "s3:PutObject",
     ]
     resources = [
-      "${module.s3_bucket["incoming"].s3_bucket_arn}/$${transfer:UserName}/*",
+      "${module.s3_bucket["incoming"].s3_bucket_arn}/${trimprefix(each.value.home_directory_target, "/")}/*",
     ]
   }
 }

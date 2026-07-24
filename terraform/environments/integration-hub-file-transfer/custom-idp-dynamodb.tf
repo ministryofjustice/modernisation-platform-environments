@@ -106,7 +106,7 @@ resource "aws_dynamodb_table_item" "custom_idp_user" {
               S = module.iam_role_transfer_user.arn
             }
             Policy = {
-              S = data.aws_iam_policy_document.transfer_user_session.json
+              S = data.aws_iam_policy_document.transfer_user_session[each.key].json
             }
             HomeDirectoryType = {
               S = "LOGICAL"
