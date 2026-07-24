@@ -12,6 +12,13 @@ resource "aws_security_group" "ecs_service" {
   description = "Security group for ECS service"
   vpc_id      = local.account_info.vpc_id
 
+  ingress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg.id]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -48,16 +55,6 @@ resource "aws_security_group" "alb_sg" {
   tags = local.tags
 }
 
-resource "aws_security_group_rule" "ecs_from_alb" {
-  type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
-
-  security_group_id        = aws_security_group.ecs_service.id
-  source_security_group_id = aws_security_group.alb_sg.id
-}
-
 resource "aws_security_group_rule" "alb_from_ecs" {
   type                     = "ingress"
   from_port                = 443
@@ -66,4 +63,86 @@ resource "aws_security_group_rule" "alb_from_ecs" {
 
   security_group_id        = aws_security_group.alb_sg.id
   source_security_group_id = aws_security_group.ecs_service.id
+}
+
+resource "aws_security_group" "mariadb" {
+  name        = "rds-mariadb-sg"
+  description = "SG for mariadb"
+  vpc_id      = local.account_info.vpc_id
+
+  ingress {
+    description     = "MySQL from ECS tasks"
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
+    security_groups = [aws_security_group.ecs_service.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = local.tags
+}
+
+resource "aws_security_group" "redis_sg" {
+  name        = "redis-sg"
+  description = "allow access to Redis"
+  vpc_id      = local.account_info.vpc_id
+
+  ingress {
+    from_port       = 6379
+    to_port         = 6379
+    protocol        = "tcp"
+    security_groups = [aws_security_group.ecs_service.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "efs" {
+  name        = "vcms-${local.environment}-efs"
+  description = "Allow traffic between vcms service and efs"
+  vpc_id      = local.account_info.vpc_id
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "vcms-efs-${local.environment}"
+    }
+  )
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_security_group_rule" "efs_ingress_vpc" {
+  security_group_id = aws_security_group.efs.id
+  description       = "ingress vpc rules"
+
+  type        = "ingress"
+  from_port   = 2049
+  to_port     = 2049
+  protocol    = "tcp"
+  cidr_blocks = [local.account_config.shared_vpc_cidr]
+}
+
+resource "aws_security_group_rule" "efs_egress_vpc" {
+  security_group_id = aws_security_group.efs.id
+  description       = "egress vpc rules"
+
+  type        = "egress"
+  from_port   = 2049
+  to_port     = 2049
+  protocol    = "tcp"
+  cidr_blocks = [local.account_config.shared_vpc_cidr]
 }
