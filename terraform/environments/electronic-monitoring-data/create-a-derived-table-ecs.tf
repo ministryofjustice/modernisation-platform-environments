@@ -22,17 +22,58 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
       } }
       environment = [
         {
-          name  = "ATHENA_OUTPUT_BUCKET"
-          value = "s3://${module.s3-athena-bucket.bucket.id}/output/"
+          name  = "AWS_DEFAULT_REGION"
+          value = data.aws_region.current.name
         },
         {
-          name  = "SNS_TOPIC_ARN"
-          value = aws_sns_topic.emds_alerts.arn
+          name  = "REPOSITORY_PATH"
+          value = "./create-a-derived-table"
         },
         {
-          name  = "GDPR_REPORT_BUCKET"
-          value = module.s3-gdpr-audit-bucket.bucket.id
+          name  = "MODE"
+          value = "build"
+        },
+        {
+          name = "DBT_PROFILE_WORKGROUP"
+          value = aws_athena_workgroup.cadt.name
+        },
+        {
+          name = "DBT_PROJECT"
+          value = "hmpps_electronic_monitoring_data_tables"
+        },
+        {
+          name = "DBT_SELECT_CRITERIA"
+          value = "tag:emd_live" # leave this for now, but it should be in the lambda later
+        },
+        {
+          name = "S3_BUCKET"
+          value = module.s3-cadt-bucket.bucket.id
+        },
+        {
+          name = "STATE_MODE"
+          value = "false" # leave this for now, but it should be in the lambda later
+        },
+        {
+          name = "WORKFLOW_NAME"
+          value = "cadet-em-prod"
+        },
+        {
+          name = "EM_REMOVE_HISTORIC"
+          value = "true"
+        },
+        {
+          name = "EM_REMOVE_LIVE"
+          value = "false"
+        },
+        {
+          name = "DBT_PROFILE"
+          value = "emd"
+        },
+        {
+          name = "DEPLOY_ENV"
+          value = local.environment_shorthand
         }
+
       ]
     }
   ])
