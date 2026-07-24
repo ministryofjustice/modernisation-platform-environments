@@ -25,8 +25,7 @@ locals {
   #
   # The EKS-managed Argo CD capability runs in AWS-managed infrastructure and
   # cannot reach github.com directly — it clones repositories through the
-  # CodeConnections git-http proxy. When a CodeConnection ARN is supplied we
-  # build the proxy URL; otherwise we fall back to the direct GitHub URL.
+  # CodeConnections git-http proxy.
   #
   # Proxy URL format (see AWS docs — "Connect to Git repositories with AWS
   # CodeConnections"):
