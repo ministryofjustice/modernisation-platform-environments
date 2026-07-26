@@ -2,10 +2,11 @@
 # DMS Oracle Test - Development only
 # Deploys terraform-dms-module against the throwaway Oracle RDS instance
 #
-# Oracle DMS user minimum grants for full-load:
+# Oracle DMS user minimum grants for full-load + CDC:
 #   GRANT CONNECT TO dms_user;
 #   GRANT SELECT ANY TABLE TO dms_user;
 #   GRANT SELECT_CATALOG_ROLE TO dms_user;
+#   GRANT LOGMINING TO dms_user;
 #
 # Module quirks (ministryofjustice/terraform-dms-module):
 #   - Requires hashicorp/tls provider (via Lambda sub-module) — add to versions.tf
@@ -26,7 +27,7 @@
 
 data "aws_secretsmanager_secret" "dms_oracle_credentials" {
   count = local.is-development ? 1 : 0
-  name  = "laa-df-dev/oracle-dms-test/dms-user"
+  name  = "oracle-dms-example/oracle-dms-test/dms-user"
 }
 
 data "aws_iam_policy_document" "oracle_dms_kms" {
@@ -249,12 +250,14 @@ module "dms_oracle" {
   # checkov:skip=CKV_TF_1: using branch ref for testing
   # checkov:skip=CKV_TF_2: using branch ref for testing
   count  = local.is-development ? 1 : 0
-  source = "github.com/ministryofjustice/terraform-dms-module?ref=bc5a588"
+  source = "github.com/ministryofjustice/terraform-dms-module?ref=0933e0512e10527e0ba72ba07e1e20162b6ed3be"
 
   vpc_id      = data.aws_vpc.shared.id
   environment = local.environment
   db          = "oracle-dms-test"
   tags        = local.tags
+
+  manage_dms_service_roles = false
 
   validation_sqs_kms_key_arn = aws_kms_key.oracle_dms[0].arn
 
@@ -264,7 +267,8 @@ module "dms_oracle" {
 
   dms_replication_instance = {
     replication_instance_id    = "${local.application_name}-oracle-dms-test"
-    subnet_ids                 = data.aws_subnets.shared-private.ids
+    subnet_group_name          = "oracle-dms-test-data"
+    subnet_ids                 = data.aws_subnets.shared-data.ids
     allocated_storage          = 50
     availability_zone          = "eu-west-2a"
     engine_version             = "3.5.4"
@@ -281,14 +285,32 @@ module "dms_oracle" {
     secrets_manager_kms_arn = aws_kms_key.oracle_dms[0].arn
     sid                     = "DMSTEST"
     # Oracle extra_connection_attributes:
-    #   addSupplementalLogging=N - not needed for full-load only (no CDC)
-    #   useBfile=Y              - use BFILE for reading LOBs (faster than API)
-    #   useLogminerReader=N     - not needed without CDC; avoids requiring LOGMINING grant
-    extra_connection_attributes = "addSupplementalLogging=N;useBfile=Y;useLogminerReader=N;"
+    #   addSupplementalLogging=N - supplemental logging is managed on the RDS instance
+    #   useLogminerReader=Y      - use LogMiner, which reads redo through the DB
+    #                              engine (SQL/PLSQL). REQUIRED for Amazon RDS Oracle.
+    #   useBfile=N               - explicitly disable Binary Reader / BFILE access.
+    #
+    # Why NOT Binary Reader (useBfile=Y;useLogminerReader=N) on RDS:
+    #   Binary Reader opens the redo log FILES directly off disk via Oracle BFILE
+    #   directory objects. RDS Oracle gives no filesystem access, so DMS cannot open
+    #   /rdsdbdata/db/.../onlinelog/*.log and CDC fails with
+    #   "file ... cannot be opened (errno 2)". LogMiner is the AWS-recommended mode.
+    #
+    # Operational notes (this ECA alone is necessary but not sufficient):
+    #   1. Changing this on an EXISTING endpoint is a ModifyEndpoint and may not flip
+    #      the structured reader mode - the source endpoint AND the CDC task must be
+    #      recreated once for LogMiner to take effect (DMS bakes reader mode in at
+    #      task-create time).
+    #   2. dms_user needs LogMiner grants in the database: EXECUTE on DBMS_LOGMNR,
+    #      SELECT on the V_$LOGMNR_*/V_$LOG views, LOGMINING, and
+    #      SELECT ANY TRANSACTION / SELECT ANY DICTIONARY (see the Oracle DB setup
+    #      runbook). Without them CDC fails with ORA-00942.
+    extra_connection_attributes = "addSupplementalLogging=N;useLogminerReader=Y;useBfile=N;"
   }
 
   replication_task_id = {
     full_load = "${local.application_name}-oracle-dms-test-full-load"
+    cdc       = "${local.application_name}-oracle-dms-test-cdc"
   }
 
   dms_mapping_rules = {
@@ -502,12 +524,14 @@ module "dms_postgres" {
   # checkov:skip=CKV_TF_1: using branch ref for testing
   # checkov:skip=CKV_TF_2: using branch ref for testing
   count  = local.is-development ? 1 : 0
-  source = "github.com/ministryofjustice/terraform-dms-module?ref=54b49927f5b3eaee6610209528bda186b0201c7d"
+  source = "github.com/ministryofjustice/terraform-dms-module?ref=0933e0512e10527e0ba72ba07e1e20162b6ed3be"
 
   vpc_id      = data.aws_vpc.shared.id
   environment = local.environment
   db          = "postgres-dms-test"
   tags        = local.tags
+
+  manage_dms_service_roles = false
 
   validation_sqs_kms_key_arn = aws_kms_key.postgres_dms[0].arn
 
@@ -517,7 +541,8 @@ module "dms_postgres" {
 
   dms_replication_instance = {
     replication_instance_id    = "${local.application_name}-postgres-dms-test"
-    subnet_ids                 = data.aws_subnets.shared-private.ids
+    subnet_group_name          = "postgres-dms-test-data"
+    subnet_ids                 = data.aws_subnets.shared-data.ids
     allocated_storage          = 50
     availability_zone          = "eu-west-2a"
     engine_version             = "3.5.4"
@@ -536,8 +561,15 @@ module "dms_postgres" {
     # Postgres extra_connection_attributes:
     #   PluginName=test_decoding — built-in logical decoding plugin on RDS;
     #                              no pg_logical extension needed
+    #   CaptureDDLs=N            — do NOT create the awsdms_intercept_ddl event
+    #                              trigger; dms_user lacks rights to create it,
+    #                              which otherwise blocks CDC from starting
+    #   HeartbeatEnable=true     — periodic heartbeat stops the replication slot
+    #                              pinning WAL when there is no source activity
     #   sslMode=require          — RDS enforces SSL via pg_hba.conf
-    extra_connection_attributes = "PluginName=test_decoding;sslMode=require;"
+    # NB: this string fully replaces the module default (coalesce), so it must
+    #     reproduce the module's CaptureDDLs/Heartbeat settings, not just TLS.
+    extra_connection_attributes = "PluginName=test_decoding;CaptureDDLs=N;HeartbeatEnable=true;HeartbeatFrequency=5;HeartbeatSchema=public;sslMode=require;"
   }
 
   replication_task_id = {
