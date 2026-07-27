@@ -5,7 +5,7 @@ data "aws_identitystore_group" "this" {
   alternate_identifier {
     unique_attribute {
       attribute_path  = "DisplayName"
-      attribute_value = "integration-hub"
+      attribute_value = each.key
     }
   }
 }

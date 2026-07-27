@@ -1,9 +1,3 @@
-data "in" "integration_hub" {
-  provider          = aws.sso-readonly
-  identity_store_id = tolist(data.aws_ssoadmin_instances.this.identity_store_ids)[0]
-  group_id          = "8662e2b4-3021-7017-56ba-8794aa2047cd" # "integration-hub" group ID in AWS SSO Identity Store
-}
-
 resource "aws_transfer_web_app" "this" {
   identity_provider_details {
     identity_center_config {
@@ -123,7 +117,7 @@ data "aws_iam_policy_document" "s3_access_grants_location" {
   }
 }
 
-module "s3_access_grants_location_policy" {
+module "iam_policy_s3_access_grants_location" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "6.6.1"
 
@@ -134,7 +128,7 @@ module "s3_access_grants_location_policy" {
   policy = data.aws_iam_policy_document.s3_access_grants_location.json
 }
 
-module "s3_access_grants_location_role" {
+module "iam_role_s3_access_grants_location" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "6.6.1"
 
@@ -172,27 +166,29 @@ module "s3_access_grants_location_role" {
   }
 
   policies = {
-    incoming_access = module.s3_access_grants_location_policy.arn
+    incoming_access = module.iam_policy_s3_access_grants_location.arn
   }
 }
 
 resource "aws_s3control_access_grants_location" "incoming" {
   depends_on = [aws_s3control_access_grants_instance.this]
 
-  iam_role_arn   = module.s3_access_grants_location_role.arn
+  iam_role_arn   = module.iam_role_s3_access_grants_location.arn
   location_scope = "s3://${module.s3_bucket["incoming"].s3_bucket_id}"
 }
 
 resource "aws_s3control_access_grant" "incoming_uploaders" {
+  for_each = data.aws_identitystore_group.this
+
   access_grants_location_id = aws_s3control_access_grants_location.incoming.access_grants_location_id
   permission                = "READWRITE"
 
   access_grants_location_configuration {
-    s3_sub_prefix = "*"
+    s3_sub_prefix = "group/${each.key}/*"
   }
 
   grantee {
     grantee_type       = "DIRECTORY_GROUP"
-    grantee_identifier = data.aws_identitystore_group.integration_hub.group_id
+    grantee_identifier = each.value.group_id
   }
 }
