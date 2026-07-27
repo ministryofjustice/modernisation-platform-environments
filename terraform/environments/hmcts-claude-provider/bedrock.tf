@@ -19,6 +19,7 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
           # Regional foundation models
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-sonnet-5",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-fable-5",
+          "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-opus-5",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-opus-4-8",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-opus-4-6-v1",
           "arn:aws:bedrock:eu-*::foundation-model/anthropic.claude-sonnet-4-6",
@@ -49,6 +50,7 @@ resource "aws_iam_policy" "bedrock_claude_policy" {
           # EU inference profiles (routes only within EU regions)
           "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/eu.anthropic.claude-sonnet-5",
           "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/eu.anthropic.claude-fable-5",
+          "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/eu.anthropic.claude-opus-5",
           "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/eu.anthropic.claude-opus-4-8",
           "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/eu.anthropic.claude-opus-4-6-v1",
           "arn:aws:bedrock:eu-west-1:313941174580:inference-profile/eu.anthropic.claude-sonnet-4-6",
