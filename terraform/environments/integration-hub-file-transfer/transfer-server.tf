@@ -12,8 +12,8 @@ resource "aws_transfer_server" "this" {
   ]
 
   endpoint_details {
-    vpc_id     = data.aws_vpc.shared.id
-    subnet_ids = local.transfer_subnet_ids
+    vpc_id     = module.vpc_isolated.vpc_id
+    subnet_ids = module.vpc_isolated.public_subnets
     address_allocation_ids = [
       for key, value in aws_eip.this : value.id
     ]
