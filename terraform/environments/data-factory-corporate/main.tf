@@ -1,16 +1,20 @@
 terraform{
 
-    required_version = ">=1.7.0"
+    required_version = ">=1.5.0"
+    
 }
 
 
 module "glue"{
 
-    source="git::https://github.com/ministryofjustice/modernisation-platform-environments.git//terraform/environments/data-factory-corporate/corporate_data/modules/glue_catalog?ref=abc1234567890abc1234567890abc1234567890a"
-    description ="glue_table"
+    source="github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/data-factory-glue-database?ref=<git-sha>"
 
-    database_name = "corporate_database"
-    database_description = "Corporate Glue database for S3 datasets"
-    location_uri=""
+  database_name = "example"
 
+  storage = {
+    bucket_name = <bucket_name>
+    prefix      = "example"
+    kms_key_arn = "arn:aws:kms:eu-west-2:1234567890:key/example"
+  }
+  tags          = local.tags
 }
