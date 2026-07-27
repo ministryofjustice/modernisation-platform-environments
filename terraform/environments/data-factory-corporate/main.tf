@@ -7,8 +7,7 @@ terraform{
 
 module "glue"{
 
-    source="git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules/blob/7cef415e42eb66482c2c1ea88de49ee44bd5481a/modules/data-factory-glue-database/main.tf"
-
+    source= "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/data-factory-glue-database?ref=7cef415e42eb66482c2c1ea88de49ee44bd5481a"
     catalog_database_name = "example"
 
     storage = {
