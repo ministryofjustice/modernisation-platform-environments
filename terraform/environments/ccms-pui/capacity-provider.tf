@@ -4,7 +4,22 @@ resource "aws_ecs_capacity_provider" "capacity-provider" {
   name = "${local.application_name}-capacity-provider"
 
   auto_scaling_group_provider {
-    auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
+    auto_scaling_group_arn         = aws_autoscaling_group.cluster-scaling-group.arn
+    managed_termination_protection = "DISABLED"
+
+    # Lets ECS automatically scale the ASG out (up to ec2_max_capacity) when
+    # it needs extra instance capacity to place the new task revision
+    # alongside the old one during a rolling deployment, then scale back in
+    # once the deployment completes. Without this, ec2_min_capacity/
+    # ec2_max_capacity are only static bounds - nothing actually triggers a
+    # scale-out event, so rolling deployments stall when there is no spare
+    # capacity.
+    managed_scaling {
+      status                    = "ENABLED"
+      target_capacity           = 100
+      minimum_scaling_step_size = 1
+      maximum_scaling_step_size = 1
+    }
   }
 
   tags = merge(local.tags,
