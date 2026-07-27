@@ -238,9 +238,6 @@ locals {
       /* EKS */
       eks_cluster_version = "1.35"
 
-      /* ArgoCD */
-      enable_argocd = true
-
       /* Addons */
       eks_cluster_addon_versions = {
         kube_proxy             = "v1.34.2-eksbuild.1"
@@ -474,9 +471,6 @@ locals {
     live = {
       /* EKS */
       eks_cluster_version = "1.35"
-
-      /* ArgoCD */
-      enable_argocd = true
 
       /* Addons */
       eks_cluster_addon_versions = {
