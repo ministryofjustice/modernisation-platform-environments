@@ -19,9 +19,10 @@ variable "enable_argocd" {
 }
 
 variable "argocd_idc_instance_arn" {
-  type        = string
-  default     = "" # Set to your org's IAM Identity Center instance ARN
-  description = "ARN of the AWS IAM Identity Center instance for Argo CD authentication. Required when enable_argocd is true."
+  type = string
+  # Org-wide IAM Identity Center instance — the same ARN across all MoJ accounts.
+  default     = "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26"
+  description = "ARN of the AWS IAM Identity Center instance for Argo CD authentication. Required when enable_argocd is true. Defaults to the org-wide IDC instance."
 }
 
 variable "argocd_idc_region" {
