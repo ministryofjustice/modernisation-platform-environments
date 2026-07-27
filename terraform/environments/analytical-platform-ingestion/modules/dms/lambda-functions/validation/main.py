@@ -433,10 +433,18 @@ class FileValidator:
                 agnostic_parquet_type = return_agnostic_type(
                     data_type=parquet_cols[col], column_name=col
                 )
-                agnostic_metadata_type = strip_data_type(metadata_cols[col])
-                if agnostic_metadata_type not in type_lookup.values():
+                stripped_metadata_type = strip_data_type(metadata_cols[col])
+                if stripped_metadata_type in type_lookup.values():
+                    agnostic_metadata_type = stripped_metadata_type
+                elif stripped_metadata_type in type_lookup:
+                    # The metadata can carry a non-agnostic type such as "int"
+                    # (e.g. columns preserved via columns_to_keep_as_int). Normalise
+                    # it to its agnostic equivalent so it can be compared like any
+                    # other column.
+                    agnostic_metadata_type = type_lookup[stripped_metadata_type]
+                else:
                     raise MetadataTypeMismatchException(
-                        f"'{agnostic_metadata_type}' is not a valid agnostic type.'"
+                        f"'{stripped_metadata_type}' is not a valid agnostic type.'"
                     )
                 if agnostic_parquet_type != agnostic_metadata_type:
                     self._add_error(
