@@ -1,7 +1,24 @@
+data "aws_ssoadmin_instances" "this" {
+  provider = aws.sso-readonly
+}
+
+data "aws_identitystore_group" "this" {
+  for_each          = local.transfer_iam_identity_center_groups
+  provider          = aws.sso-readonly
+  identity_store_id = one(data.aws_ssoadmin_instances.this.identity_store_ids)
+
+  alternate_identifier {
+    unique_attribute {
+      attribute_path  = "DisplayName"
+      attribute_value = each.key
+    }
+  }
+}
+
 resource "aws_transfer_web_app" "this" {
   identity_provider_details {
     identity_center_config {
-      instance_arn = tolist(data.aws_ssoadmin_instances.this.arns)[0]
+      instance_arn = one(data.aws_ssoadmin_instances.this.arns)
       role         = module.iam_role_transfer_web_app.arn
     }
   }
@@ -11,163 +28,7 @@ resource "aws_transfer_web_app" "this" {
 }
 
 resource "aws_s3control_access_grants_instance" "this" {
-  identity_center_arn = tolist(data.aws_ssoadmin_instances.this.arns)[0]
-}
-
-data "aws_iam_policy_document" "s3_access_grants_location" {
-  statement {
-    sid    = "AllowIncomingBucketReads"
-    effect = "Allow"
-    actions = [
-      "s3:ListBucket",
-    ]
-    resources = [
-      module.s3_bucket["incoming"].s3_bucket_arn,
-    ]
-
-    condition {
-      test     = "StringEquals"
-      values   = [data.aws_caller_identity.current.account_id]
-      variable = "aws:ResourceAccount"
-    }
-
-    condition {
-      test     = "ArnEquals"
-      values   = [aws_s3control_access_grants_instance.this.access_grants_instance_arn]
-      variable = "s3:AccessGrantsInstanceArn"
-    }
-  }
-
-  statement {
-    sid    = "AllowIncomingObjectReads"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:GetObjectTagging",
-      "s3:GetObjectVersion",
-      "s3:ListMultipartUploadParts",
-    ]
-    resources = [
-      "${module.s3_bucket["incoming"].s3_bucket_arn}/*",
-    ]
-
-    condition {
-      test     = "StringEquals"
-      values   = [data.aws_caller_identity.current.account_id]
-      variable = "aws:ResourceAccount"
-    }
-
-    condition {
-      test     = "ArnEquals"
-      values   = [aws_s3control_access_grants_instance.this.access_grants_instance_arn]
-      variable = "s3:AccessGrantsInstanceArn"
-    }
-  }
-
-  statement {
-    sid    = "AllowIncomingObjectWrites"
-    effect = "Allow"
-    actions = [
-      "s3:AbortMultipartUpload",
-      "s3:ListMultipartUploadParts",
-      "s3:PutObject",
-      "s3:PutObjectTagging",
-    ]
-    resources = [
-      "${module.s3_bucket["incoming"].s3_bucket_arn}/*",
-    ]
-
-    condition {
-      test     = "StringEquals"
-      values   = [data.aws_caller_identity.current.account_id]
-      variable = "aws:ResourceAccount"
-    }
-
-    condition {
-      test     = "ArnEquals"
-      values   = [aws_s3control_access_grants_instance.this.access_grants_instance_arn]
-      variable = "s3:AccessGrantsInstanceArn"
-    }
-  }
-
-  statement {
-    sid    = "AllowIncomingKMSAccess"
-    effect = "Allow"
-    actions = [
-      "kms:DescribeKey",
-      "kms:Decrypt",
-      "kms:Encrypt",
-      "kms:GenerateDataKey*",
-    ]
-    resources = [
-      module.kms_s3_bucket["incoming"].key_arn,
-    ]
-
-    condition {
-      test     = "StringEquals"
-      values   = [data.aws_caller_identity.current.account_id]
-      variable = "kms:CallerAccount"
-    }
-
-    condition {
-      test     = "StringEquals"
-      values   = ["s3.${data.aws_region.current.region}.amazonaws.com"]
-      variable = "kms:ViaService"
-    }
-  }
-}
-
-module "iam_policy_s3_access_grants_location" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.1"
-
-  name        = "${local.application_name}-s3-access-grants-location-policy"
-  description = "AWS S3 Access Grants read/write access to the incoming bucket"
-  path        = "/"
-
-  policy = data.aws_iam_policy_document.s3_access_grants_location.json
-}
-
-module "iam_role_s3_access_grants_location" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.1"
-
-  name            = "transfer-s3-access-grants-location"
-  use_name_prefix = false
-  description     = "Role to allow AWS S3 Access Grants to read and write to the incoming bucket"
-
-  trust_policy_permissions = {
-    AllowAccessGrants = {
-      effect = "Allow"
-      actions = [
-        "sts:AssumeRole",
-        "sts:SetContext",
-        "sts:SetSourceIdentity",
-      ]
-
-      principals = [{
-        type        = "Service"
-        identifiers = ["access-grants.s3.amazonaws.com"]
-      }]
-
-      condition = [
-        {
-          test     = "StringEquals"
-          values   = [data.aws_caller_identity.current.account_id]
-          variable = "aws:SourceAccount"
-        },
-        {
-          test     = "ArnEquals"
-          values   = [aws_s3control_access_grants_instance.this.access_grants_instance_arn]
-          variable = "aws:SourceArn"
-        }
-      ]
-    }
-  }
-
-  policies = {
-    incoming_access = module.iam_policy_s3_access_grants_location.arn
-  }
+  identity_center_arn = one(data.aws_ssoadmin_instances.this.arns)
 }
 
 resource "aws_s3control_access_grants_location" "incoming" {
