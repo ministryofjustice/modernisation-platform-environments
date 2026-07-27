@@ -1,5 +1,6 @@
 locals {
-  transfer_subnet_ids = local.is-production ? sort(data.aws_subnets.shared-public.ids) : slice(sort(data.aws_subnets.shared-public.ids), 0, 1)
+  transfer_address_allocation_ids = [for key, value in aws_eip.this : value.id]
+  transfer_subnet_ids             = local.is-production ? sort(module.vpc_isolated.public_subnets) : slice(sort(module.vpc_isolated.public_subnets), 0, 1)
 
   # Custom IdP user configuration. Add users by username and list every
   # environment in which they may authenticate. Terraform stores routing and

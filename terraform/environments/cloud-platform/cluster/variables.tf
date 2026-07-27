@@ -50,12 +50,6 @@ variable "argocd_rbac_role_mappings" {
   EOT
 }
 
-variable "argocd_codeconnection_arn" {
-  type        = string
-  default     = ""
-  description = "AWS CodeConnections ARN for GitHub repository access from Argo CD."
-}
-
 #------------------------------------------------------------------------------
 # Argo CD Spoke Registration (ADR-002 — Spoke-Driven Model)
 #------------------------------------------------------------------------------
