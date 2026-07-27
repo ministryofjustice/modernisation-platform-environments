@@ -68,7 +68,6 @@ data "aws_iam_policy_document" "ai_gateway_bedrock" {
     sid    = "AwsMarketplaceAccess"
     effect = "Allow"
     actions = [
-      "aws-marketplace:Subscribe",
       "aws-marketplace:ViewSubscriptions"
     ]
     resources = ["*"]
@@ -85,10 +84,13 @@ data "aws_iam_policy_document" "ai_gateway_bedrock" {
   }
 
   statement {
-    sid       = "BedrockFoundationModelAccess"
-    effect    = "Allow"
-    actions   = ["bedrock:InvokeModel*"]
-    resources = ["arn:aws:bedrock:eu-*::foundation-model/*"]
+    sid     = "BedrockFoundationModelAccess"
+    effect  = "Allow"
+    actions = ["bedrock:InvokeModel*"]
+    resources = formatlist(
+      "arn:aws:bedrock:%s::foundation-model/*",
+      ["eu-west-1", "eu-west-2"]
+    )
   }
 }
 
