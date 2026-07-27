@@ -53,6 +53,17 @@ variable "argocd_rbac_role_mappings" {
 #------------------------------------------------------------------------------
 # Argo CD Spoke Registration (ADR-002 — Spoke-Driven Model)
 #------------------------------------------------------------------------------
+variable "enable_argocd_spoke_registration" {
+  type        = bool
+  default     = false
+  description = <<-EOT
+    Enable spoke registration with the hub cluster's ArgoCD. Set to true once
+    the hub cluster for this spoke's tier (preproduction for nonlive, live for
+    live) has ArgoCD enabled and the spoke-access role exists. Defaults to false
+    to prevent failures when the hub is not yet operational.
+  EOT
+}
+
 variable "argocd_hub_spoke_access_role_arn" {
   type        = string
   default     = ""

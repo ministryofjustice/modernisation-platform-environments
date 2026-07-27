@@ -88,6 +88,6 @@ module "eks" {
   tags = merge(
     local.tags,
     null_resource.created_by_tag.triggers.created_by == "__unset__" ? {} : { "created-by" = null_resource.created_by_tag.triggers.created_by },
-    var.enable_argocd ? { "argocd-role" = "hub" } : {}
+    local.enable_argocd ? { "argocd-role" = "hub" } : {}
   )
 }

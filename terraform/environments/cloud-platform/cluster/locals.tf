@@ -16,6 +16,9 @@ locals {
   cluster_name              = terraform.workspace
   cluster_environment       = contains(local.mp_environments, terraform.workspace) ? local.workspace_environment : "development_cluster"
 
+  # ArgoCD is enabled if set in environment config OR via TF_VAR (ephemeral clusters)
+  enable_argocd = var.enable_argocd || lookup(local.environment_configuration, "enable_argocd", false)
+
   #-----------------------------------------------------------------------------
   # ArgoCD Hub Configuration (ADR-002 — dual-hub model)
   #
