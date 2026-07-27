@@ -20,8 +20,9 @@ module "weblogic_eis" {
 
   cluster_security_group_id = aws_security_group.cluster.id
 
-  alb_security_group_id      = aws_security_group.delius_frontend_alb_security_group.id
+  alb_security_group_id         = aws_security_group.delius_frontend_alb_security_group.id
   alb_listener_rule_host_header = "interface.${var.env_name}.${var.account_config.dns_suffix}"
+  alb_listener_rule_priority    = 40
   alb_health_check = {
     path                 = "/NDelius-war/delius/javax.faces.resource/health/healthcheck.json"
     healthy_threshold    = 5
@@ -128,31 +129,3 @@ resource "aws_ecs_capacity_provider" "weblogic_eis" {
     managed_termination_protection = "ENABLED"
   }
 }
-
-# resource "aws_lb_listener_rule" "interface_redirect" {
-#   count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name != "prod" ? 1 : 0
-
-#   listener_arn = aws_lb_listener.listener_https.arn
-#   priority     = 100
-
-#   condition {
-#     host_header {
-#       values = [
-#         "interface.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"
-#       ]
-#     }
-#   }
-
-#   action {
-#     type = "redirect"
-
-#     redirect {
-#       protocol    = "HTTPS"
-#       port        = "443"
-#       host        = "ndelius.${var.env_name}.${var.account_config.dns_suffix}"
-#       path        = "/eis/#{path}"
-#       query       = "#{query}"
-#       status_code = "HTTP_301"
-#     }
-#   }
-# }
