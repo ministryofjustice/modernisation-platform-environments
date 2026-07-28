@@ -25,7 +25,6 @@ locals {
         "10.0.0.0/8",   # MOJ internal network
         "172.20.0.0/16" # Cloud Platform
       ]
-      ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
         min_replicas                      = 1
         max_replicas                      = 3
@@ -83,7 +82,6 @@ locals {
         "10.0.0.0/8",   # MOJ internal network
         "172.20.0.0/16" # Cloud Platform
       ]
-      ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
         min_replicas                      = 1
         max_replicas                      = 3
@@ -137,7 +135,6 @@ locals {
         "10.0.0.0/8",   # MOJ internal network
         "172.20.0.0/16" # Cloud Platform
       ]
-      ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
         min_replicas                      = 1
         max_replicas                      = 3
@@ -191,7 +188,6 @@ locals {
         "10.0.0.0/8",   # MOJ internal network
         "172.20.0.0/16" # Cloud Platform
       ]
-      ai_gateway_models = local.ai_gateway_models
       ai_gateway_autoscaling = {
         min_replicas                      = 2
         max_replicas                      = 10
