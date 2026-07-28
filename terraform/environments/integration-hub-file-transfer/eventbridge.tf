@@ -12,7 +12,7 @@ module "eventbridge_default_bus" {
 
   rules = local.eventbridge_default_bus_rules
 
-    targets = local.eventbridge_default_bus_targets
+  targets = local.eventbridge_default_bus_targets
 
   tags = local.tags
 }
