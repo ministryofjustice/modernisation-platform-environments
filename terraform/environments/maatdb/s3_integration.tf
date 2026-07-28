@@ -73,14 +73,25 @@ module "s3_bucket" {
         effect  = "Deny"
         actions = ["s3:*"]
         principals = {
-          AWS = "*"
+          type        = "AWS"
+          identifiers = ["*"]
         }
         conditions = [
           {
             test     = "NumericLessThan"
-            variable = "aws:TlsVersion"
+            variable = "s3:TlsVersion"
             values   = ["1.2"]
-          },
+          }
+        ]
+      },
+      {
+        effect  = "Deny"
+        actions = ["s3:*"]
+        principals = {
+          type        = "AWS"
+          identifiers = ["*"]
+        }
+        conditions = [
           {
             test     = "Bool"
             variable = "aws:SecureTransport"
