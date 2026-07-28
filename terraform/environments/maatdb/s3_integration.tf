@@ -69,6 +69,7 @@ module "s3_bucket" {
   bucket_policy_v2 = [
     for stmt in [
       {
+        sid     = "EnforceTLSv12orHigher"
         effect  = "Deny"
         actions = ["s3:*"]
         principals = {
@@ -80,17 +81,7 @@ module "s3_bucket" {
             test     = "NumericLessThan"
             variable = "aws:TlsVersion"
             values   = ["1.2"]
-          }
-        ]
-      },
-      {
-        effect  = "Deny"
-        actions = ["s3:*"]
-        principals = {
-          type        = "AWS"
-          identifiers = ["*"]
-        }
-        conditions = [
+          },
           {
             test     = "Bool"
             variable = "aws:SecureTransport"
