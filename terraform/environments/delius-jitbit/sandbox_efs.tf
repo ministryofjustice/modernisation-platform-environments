@@ -1,4 +1,4 @@
-resource "aws_efs_file_system" "jitbit_lucene" {
+resource "aws_efs_file_system" "lucene_sandbox" {
   count = local.is-development ? 1 : 0
 
   creation_token = "${local.application_name}-efs-sandbox"
@@ -14,20 +14,20 @@ resource "aws_efs_file_system" "jitbit_lucene" {
   }
 }
 
-resource "aws_efs_mount_target" "jitbit_lucene" {
+resource "aws_efs_mount_target" "lucene_sandbox" {
   for_each = local.is-development ? toset(data.aws_subnets.shared-private.ids) : toset([])
 
-  file_system_id  = aws_efs_file_system.jitbit_lucene[0].id
+  file_system_id  = aws_efs_file_system.lucene_sandbox[0].id
   subnet_id       = each.value
   security_groups = [
-    aws_security_group.efs[0].id
+    aws_security_group.efs_sandbox[0].id
   ]
 }
 
-resource "aws_efs_access_point" "jitbit_lucene" {
+resource "aws_efs_access_point" "lucene_sandbox" {
   count = local.is-development ? 1 : 0
 
-  file_system_id = aws_efs_file_system.jitbit_lucene[0].id
+  file_system_id = aws_efs_file_system.lucene_sandbox[0].id
 
   root_directory {
     path = "/"
@@ -49,21 +49,21 @@ resource "aws_efs_access_point" "jitbit_lucene" {
   }
 }
 
-resource "aws_ssm_parameter" "efs_id" {
+resource "aws_ssm_parameter" "efs_id_sandbox" {
   count = local.is-development ? 1 : 0
   name  = "/${local.application_name}/sandbox/efs-id"
   type  = "String"
-  value = aws_efs_file_system.jitbit_lucene[0].id
+  value = aws_efs_file_system.lucene_sandbox[0].id
 }
 
-resource "aws_ssm_parameter" "efs_ap_id" {
+resource "aws_ssm_parameter" "efs_ap_id_sandbox" {
   count = local.is-development ? 1 : 0
   name  = "/${local.application_name}/sandbox/efs-access-point-id"
   type  = "String"
-  value = aws_efs_access_point.jitbit_lucene[0].id
+  value = aws_efs_access_point.lucene_sandbox[0].id
 }
 
-resource "aws_security_group" "efs" {
+resource "aws_security_group" "efs_sandbox" {
   count = local.is-development ? 1 : 0
 
   name   = "${local.application_name}-efs-sandbox"
