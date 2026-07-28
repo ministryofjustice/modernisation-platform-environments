@@ -195,10 +195,10 @@ resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_ec2" {
   description                  = "Allow MySQL access from ECS Cluster EC2s"
 }
 
-# Allow all outbound
-resource "aws_vpc_security_group_egress_rule" "opahub_db_egress_all" {
-  security_group_id = aws_security_group.opahub_db.id
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1"
-  description       = "Allow all outbound traffic"
-}
+# # Allow all outbound
+# resource "aws_vpc_security_group_egress_rule" "opahub_db_egress_all" {
+#   security_group_id = aws_security_group.opahub_db.id
+#   cidr_ipv4         = "0.0.0.0/0"
+#   ip_protocol       = "-1"
+#   description       = "Allow all outbound traffic"
+# }
