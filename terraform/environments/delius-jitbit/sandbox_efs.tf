@@ -30,7 +30,7 @@ resource "aws_efs_access_point" "lucene_sandbox" {
   file_system_id = aws_efs_file_system.lucene_sandbox[0].id
 
   root_directory {
-    path = "/"
+    path = "/SearchIndex"
 
     creation_info {
       owner_gid   = 1001
