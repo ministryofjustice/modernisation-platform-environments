@@ -3,7 +3,7 @@
 
 * @ministryofjustice/modernisation-platform
 /terraform/environments/analytical-platform-common @ministryofjustice/analytical-platform-engineers @ministryofjustice/modernisation-platform
-/terraform/environments/analytical-platform-compute @ministryofjustice/analytical-platform-engineers @ministryofjustice/modernisation-platform
+/terraform/environments/analytical-platform-compute @ministryofjustice/analytical-platform-engineers @ministryofjustice/data-platform-engineering @ministryofjustice/modernisation-platform
 /terraform/environments/analytical-platform-ingestion @ministryofjustice/analytical-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/analytical-platform-ingestion/transfer-family @ministryofjustice/analytical-platform @ministryofjustice/modernisation-platform
 /terraform/environments/analytical-platform-next-poc-hub @ministryofjustice/analytical-platform-engineers @ministryofjustice/modernisation-platform
