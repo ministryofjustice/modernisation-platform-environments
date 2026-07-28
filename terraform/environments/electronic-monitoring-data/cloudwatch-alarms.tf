@@ -172,3 +172,58 @@ resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
     aws_sns_topic.emds_alerts.arn
   ]
 }
+
+# ------------------------------------------------------------------------------
+# Serco FMS secure-handover Lambda alarms
+# ------------------------------------------------------------------------------
+
+locals {
+  serco_fms_key_distribution_lambda_names = {
+    distribution = module.send_serco_fms_keys.lambda_function_name
+    dashboard    = module.serco_fms_key_distribution_dashboard.lambda_function_name
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "serco_fms_key_distribution_errors" {
+  for_each = local.serco_fms_key_distribution_lambda_names
+
+  alarm_name = format(
+    "serco_fms_key_distribution_%s_errors_%s",
+    each.key,
+    local.environment_shorthand,
+  )
+
+  alarm_description = format(
+    "Triggered when the Serco FMS %s Lambda records an error",
+    each.key,
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  # EventBridge and the alarm threader own Slack delivery.
+  actions_enabled = false
+
+  metric_name = "Errors"
+  namespace   = "AWS/Lambda"
+  period      = 60
+  statistic   = "Sum"
+
+  dimensions = {
+    FunctionName = each.value
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+
+  tags = merge(
+    local.tags,
+    {
+      resource-type = "serco-fms-key-distribution"
+      purpose       = "serco-fms-monitoring"
+    },
+  )
+}

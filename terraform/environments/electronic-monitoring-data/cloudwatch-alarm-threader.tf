@@ -32,18 +32,21 @@ resource "aws_cloudwatch_event_rule" "alarm_state_change_threader" {
       "detail-type" : ["CloudWatch Alarm State Change"],
       "detail" : {
         "alarmName" : concat(
-          [
-            aws_cloudwatch_metric_alarm.glue_database_count_high.alarm_name,
-            aws_cloudwatch_metric_alarm.mdss_reconciler_errors_alarm[0].alarm_name
-          ],
-          [
-            for _, alarm in aws_cloudwatch_metric_alarm.sqs_dlq_has_messages :
-            alarm.alarm_name
-          ]
-        )
-      }
+        [
+          aws_cloudwatch_metric_alarm.glue_database_count_high.alarm_name,
+          aws_cloudwatch_metric_alarm.mdss_reconciler_errors_alarm[0].alarm_name,
+        ],
+        [
+          for _, alarm in aws_cloudwatch_metric_alarm.sqs_dlq_has_messages :
+          alarm.alarm_name
+        ],
+        [
+          for _, alarm in aws_cloudwatch_metric_alarm.serco_fms_key_distribution_errors :
+          alarm.alarm_name
+        ],
+      )
     }
-  )
+  })
 }
 
 resource "aws_cloudwatch_event_target" "alarm_state_change_threader" {
