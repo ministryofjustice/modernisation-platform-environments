@@ -79,7 +79,7 @@ module "s3_bucket" {
           {
             test     = "NumericLessThan"
             variable = "aws:TlsVersion"
-            values   = "1.2"
+            values   = ["1.2"]
           }
         ]
       },
