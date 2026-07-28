@@ -81,3 +81,10 @@ module "metrics_server_namespace" {
   name     = "metrics-server"
   workload = "system"
 }
+
+module "test_namespace" {
+  source = "./modules/kubernetes/namespace"
+
+  name     = "test"
+  workload = "system"
+}
