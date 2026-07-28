@@ -15,7 +15,7 @@ resource "aws_ecs_capacity_provider" "capacity-provider" {
     # scale-out event, so rolling deployments stall when there is no spare
     # capacity.
     managed_scaling {
-      status                    = "ENABLED"
+      status                    = "DISABLED"
       target_capacity           = 100
       minimum_scaling_step_size = 1
       maximum_scaling_step_size = 1
