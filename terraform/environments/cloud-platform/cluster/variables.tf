@@ -19,9 +19,10 @@ variable "enable_argocd" {
 }
 
 variable "argocd_idc_instance_arn" {
-  type        = string
-  default     = "" # Set to your org's IAM Identity Center instance ARN
-  description = "ARN of the AWS IAM Identity Center instance for Argo CD authentication. Required when enable_argocd is true."
+  type = string
+  # Org-wide IAM Identity Center instance — the same ARN across all MoJ accounts.
+  default     = "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26"
+  description = "ARN of the AWS IAM Identity Center instance for Argo CD authentication. Required when enable_argocd is true. Defaults to the org-wide IDC instance."
 }
 
 variable "argocd_idc_region" {
@@ -53,6 +54,17 @@ variable "argocd_rbac_role_mappings" {
 #------------------------------------------------------------------------------
 # Argo CD Spoke Registration (ADR-002 — Spoke-Driven Model)
 #------------------------------------------------------------------------------
+variable "enable_argocd_spoke_registration" {
+  type        = bool
+  default     = false
+  description = <<-EOT
+    Enable spoke registration with the hub cluster's ArgoCD. Set to true once
+    the hub cluster for this spoke's tier (preproduction for nonlive, live for
+    live) has ArgoCD enabled and the spoke-access role exists. Defaults to false
+    to prevent failures when the hub is not yet operational.
+  EOT
+}
+
 variable "argocd_hub_spoke_access_role_arn" {
   type        = string
   default     = ""

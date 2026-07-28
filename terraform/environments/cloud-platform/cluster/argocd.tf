@@ -2,7 +2,7 @@
 # Argo CD — Hub Cluster EKS Capability (ADR-002)
 #
 # Conditionally enables the AWS-managed Argo CD Capability on this cluster.
-# Set var.enable_argocd = true to designate this cluster as a hub.
+# Set local.enable_argocd = true to designate this cluster as a hub.
 #
 # References:
 #   - ADR-002: GitOps Fleet Management — EKS Capability for Argo CD
@@ -12,13 +12,13 @@
 # TODO: rename to data.aws_codeconnections_connection when the AWS provider adds
 # the data source equivalent (currently only the resource exists under that name).
 data "aws_codestarconnections_connection" "github" {
-  count = var.enable_argocd ? 1 : 0
+  count = local.enable_argocd ? 1 : 0
   name  = "github-ministryofjustice"
 }
 
 module "argocd" {
   source = "./modules/argo-cd"
-  count  = var.enable_argocd ? 1 : 0
+  count  = local.enable_argocd ? 1 : 0
 
   cluster_name = module.eks.cluster_name
   cluster_arn  = module.eks.cluster_arn
@@ -92,7 +92,11 @@ locals {
   # hub nor spoke, so they do not attempt registration.
   is_argocd_hub_cluster = contains(values(local.argocd_hubs)[*].cluster_name, terraform.workspace)
 
-  is_argocd_spoke = !var.enable_argocd && !local.is_argocd_hub_cluster && (
+  # Spoke registration requires the hub's spoke-access role to exist (created
+  # when ArgoCD is enabled on the hub). Until the hub is operational, spokes
+  # cannot register. Set local.enable_argocd_spoke_registration = true once the
+  # hub cluster has ArgoCD enabled and the spoke-access role exists.
+  is_argocd_spoke = var.enable_argocd_spoke_registration && !local.enable_argocd && !local.is_argocd_hub_cluster && (
     contains(local.mp_environments, terraform.workspace) || var.argocd_hub_spoke_access_role_arn != ""
   )
 }
