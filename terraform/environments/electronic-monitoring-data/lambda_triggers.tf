@@ -458,3 +458,73 @@ resource "aws_lambda_permission" "update_p1_export_api_gw" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*/*"
 }
+
+# --------------------------------------------------------
+# create-a-derived-table
+# --------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "schedule_cadt" {
+  name        = "create-a-derived-table"
+  description = "Trigger the creation of cadt run."
+
+  schedule_expression = "cron(0 7 * * ? *)"
+}
+
+resource "aws_cloudwatch_event_target" "schedule_cadt_target" {
+  rule = aws_cloudwatch_event_rule.schedule_cadt.name
+  arn  = aws_sqs_queue.cadt_queue.arn
+}
+
+resource "aws_sqs_queue" "cadt_queue_dlq" {
+  name                    = "create-a-derived-table-queue-dlq"
+  sqs_managed_sse_enabled = true
+}
+
+resource "aws_sqs_queue" "cadt_queue" {
+  name                       = "create-a-derived-table-queue"
+  visibility_timeout_seconds = 15 * 60
+  message_retention_seconds  = 1209600 # 14 days
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.cadt_queue_dlq.arn
+    maxReceiveCount     = 2
+  })
+  sqs_managed_sse_enabled = true
+}
+
+data "aws_iam_policy_document" "cadt_trigger" {
+  statement {
+    sid    = "SendMessagesToTriggerCADT"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+
+    actions   = ["sqs:SendMessage"]
+    resources = [aws_sqs_queue.cadt_queue.arn]
+
+    condition {
+      test     = "ArnEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_cloudwatch_event_rule.schedule_cadt.arn]
+    }
+  }
+}
+
+resource "aws_sqs_queue_policy" "cadt_queue_policy" {
+  queue_url = aws_sqs_queue.cadt_queue.id
+  policy    = data.aws_iam_policy_document.cadt_trigger.json
+}
+
+
+resource "aws_lambda_event_source_mapping" "cadt_trigger" {
+  event_source_arn = aws_sqs_queue.cadt_queue.arn
+  function_name    = module.trigger_cadt.lambda_function_name
+
+  batch_size = 2
+
+  scaling_config {
+    maximum_concurrency = 2
+  }
+}

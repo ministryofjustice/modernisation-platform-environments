@@ -55,7 +55,7 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
         },
         {
           name = "EM_REMOVE_HISTORIC"
-          value = "True"
+          value = local.is-production ? "False" : "True"
         },
         {
           name = "EM_REMOVE_LIVE"
