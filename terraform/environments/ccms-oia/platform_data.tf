@@ -140,6 +140,10 @@ data "aws_subnet" "vpce_subnets_c" {
   }
 }
 
+data "aws_prefix_list" "s3" {
+  name = "com.amazonaws.${data.aws_region.current.name}.s3"
+}
+
 # Route53 DNS data
 data "aws_route53_zone" "external" {
   provider = aws.core-vpc
