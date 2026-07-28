@@ -65,6 +65,12 @@ amazon_bedrock:
     model_name: "Anthropic Claude Opus 4.8 (EU)"
     region: eu-west-2
     generally_available: true
+  claude-opus-5:
+    model_id: eu.anthropic.claude-opus-5
+    model_family: "Anthropic Claude"
+    model_name: "Anthropic Claude Opus 5 (EU)"
+    region: eu-west-2
+    generally_available: true
   claude-sonnet-4-5:
     model_id: "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
     model_family: "Anthropic Claude"
