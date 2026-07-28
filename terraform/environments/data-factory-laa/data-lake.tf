@@ -35,6 +35,7 @@ module "data_lake_settings" {
 resource "aws_kms_key" "data_lake_kms_key" {
   description             = "KMS key for encrypting data in the data lake"
   deletion_window_in_days = 10
+  enable_key_rotation     = true
 }
 
 resource "aws_kms_alias" "data_lake_kms_alias" {
