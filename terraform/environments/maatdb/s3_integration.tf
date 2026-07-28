@@ -73,8 +73,7 @@ module "s3_bucket" {
         effect  = "Deny"
         actions = ["s3:*"]
         principals = {
-          type        = "AWS"
-          identifiers = ["*"]
+          AWS = "*"
         }
         conditions = [
           {
