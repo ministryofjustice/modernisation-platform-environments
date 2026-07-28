@@ -45,6 +45,7 @@
 /terraform/environments/corporate-staff-rostering @ministryofjustice/azure-aws-sso-csr-access @ministryofjustice/azure-aws-sso-csr-application-support @ministryofjustice/azure-aws-sso-digital-studio-operations @ministryofjustice/csr-application-support @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform-audit @ministryofjustice/studio-webops @ministryofjustice/syscon-devs @ministryofjustice/modernisation-platform
 /terraform/environments/dacp @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-corporate @ministryofjustice/corporate-data-factory-admins @ministryofjustice/data-factory-cloud-security @ministryofjustice/modernisation-platform
+/terraform/environments/data-factory-corporate/people @ministryofjustice/corporate-data-factory-admins @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-laa @ministryofjustice/laa-data-factory-engineering @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-moj @ministryofjustice/data-engineering @ministryofjustice/data-platform-engineering @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-moj/streaming-poc @ministryofjustice/data-factory-aker-team @ministryofjustice/modernisation-platform

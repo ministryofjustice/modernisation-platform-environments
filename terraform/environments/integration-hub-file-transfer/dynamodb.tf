@@ -24,6 +24,8 @@ module "dynamodb_adapter_idempotency" {
     "delete" : "60m",
     "update" : "60m"
   }
+
+  tags = local.tags
 }
 
 module "dynamodb_file_transfer_idempotency" {
