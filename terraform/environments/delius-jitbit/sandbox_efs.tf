@@ -20,7 +20,7 @@ resource "aws_efs_mount_target" "jitbit_lucene" {
   file_system_id  = aws_efs_file_system.jitbit_lucene[0].id
   subnet_id       = each.value
   security_groups = [
-    aws_security_group.jitbit_sandbox[0].id
+    aws_security_group.efs[0].id
   ]
 }
 
@@ -30,7 +30,7 @@ resource "aws_efs_access_point" "jitbit_lucene" {
   file_system_id = aws_efs_file_system.jitbit_lucene[0].id
 
   root_directory {
-    path = "/lucene"
+    path = "/"
 
     creation_info {
       owner_gid   = 1001
