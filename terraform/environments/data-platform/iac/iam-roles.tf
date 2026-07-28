@@ -49,7 +49,7 @@ module "data_platform_access_iam_role" {
         module.pagerduty_api_key_secret[0].secret_arn,
         module.slack_token_secret[0].secret_arn,
         module.pagerduty_slack_connection_api_key_secret[0].secret_arn,
-        module.pagerduty_orchestrator_integration_key_secret[0].secret_arn
+        # module.pagerduty_orchestrator_integration_key_secret[0].secret_arn
       ]
     }
     SecretsManagerWriteAccess = {
