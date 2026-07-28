@@ -20,9 +20,9 @@ module "weblogic_eis" {
 
   cluster_security_group_id = aws_security_group.cluster.id
 
-  alb_security_group_id      = aws_security_group.delius_frontend_alb_security_group.id
-  alb_listener_rule_paths    = ["/eis"]
-  alb_listener_rule_priority = 40
+  alb_security_group_id         = aws_security_group.delius_frontend_alb_security_group.id
+  alb_listener_rule_host_header = "interface.${var.env_name}.${var.account_config.dns_suffix}"
+  alb_listener_rule_priority    = 40
   alb_health_check = {
     path                 = "/NDelius-war/delius/javax.faces.resource/health/healthcheck.json"
     healthy_threshold    = 5
