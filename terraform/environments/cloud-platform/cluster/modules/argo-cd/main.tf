@@ -279,12 +279,18 @@ resource "aws_iam_role" "argocd_spoke_access" {
 
 #------------------------------------------------------------------------------
 # CodeConnections for GitHub repository access
+#
+# The EKS-managed Argo CD reposerver runs under the capability role
+# (aws_iam_role.argocd_capability) and reaches Git providers through the
+# CodeConnections git-http proxy. These permissions MUST be on the capability
+# role — not the spoke-access role — or the reposerver cannot authenticate to
+# the connection and fails to clone repositories.
 #------------------------------------------------------------------------------
 resource "aws_iam_role_policy" "argocd_codeconnection" {
   count = var.codeconnection_arn != "" ? 1 : 0
 
   name = "codeconnection-access"
-  role = aws_iam_role.argocd_spoke_access.id
+  role = aws_iam_role.argocd_capability.id
 
   policy = jsonencode({
     Version = "2012-10-17"

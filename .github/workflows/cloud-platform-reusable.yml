@@ -71,8 +71,21 @@ jobs:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
-  cluster-core-terraform:
+  cluster-base-terraform:
     needs: cluster-terraform
+    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+    with:
+      application: ${{ inputs.application }}
+      environment: ${{ inputs.environment }}
+      action: ${{ inputs.action }}
+      component: "cluster-base"
+      account_name: ${{ inputs.account_name }}
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+  cluster-core-terraform:
+    needs: cluster-base-terraform
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: ${{ inputs.application }}
