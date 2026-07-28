@@ -2824,3 +2824,521 @@ resource "aws_iam_role_policy_attachment" "write_to_sharepoint_iam_role_attach" 
   role       = aws_iam_role.write_to_sharepoint[0].name
   policy_arn = aws_iam_policy.write_to_sharepoint_iam_policy[0].arn
 }
+
+# ------------------------------------------------------------------------------
+# Serco FMS distribution-preparation Lambda IAM
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "send_serco_fms_keys" {
+  name = format(
+    "send_serco_fms_keys_lambda_role_%s",
+    local.environment_shorthand,
+  )
+
+  assume_role_policy = (
+    data.aws_iam_policy_document.lambda_assume_role.json
+  )
+
+  tags = merge(
+    local.tags,
+    {
+      resource-type = "serco-fms-key-distribution"
+    },
+  )
+}
+
+data "aws_iam_policy_document" "send_serco_fms_keys" {
+  # ---------------------------------------------------------------------------
+  # Read the exact three current supplier credential secrets
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "ReadFmsCredentialSecrets"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:ListSecretVersionIds",
+    ]
+
+    resources = (
+      local.serco_fms_key_distribution_feed_secret_arns
+    )
+  }
+
+  # ---------------------------------------------------------------------------
+  # Read approved recipient configuration
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "ReadRecipientConfiguration"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      aws_secretsmanager_secret
+      .serco_fms_recipient_configuration
+      .arn,
+    ]
+  }
+
+  # ---------------------------------------------------------------------------
+  # Read the GOV.UK Notify API key
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "ReadNotifyApiKey"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      aws_secretsmanager_secret.serco_fms_notify_api_key.arn,
+    ]
+  }
+
+  # ---------------------------------------------------------------------------
+  # Read and conditionally update batch state
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "ReadWriteDistributionState"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_state_prefix,
+        local.environment_shorthand,
+      ),
+    ]
+  }
+
+  # ---------------------------------------------------------------------------
+  # Write encrypted files, password ciphertext and immutable audit events
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "WriteDistributionArtifacts"
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_files_prefix,
+        local.environment_shorthand,
+      ),
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_passwords_prefix,
+        local.environment_shorthand,
+      ),
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_events_prefix,
+        local.environment_shorthand,
+      ),
+    ]
+  }
+
+  statement {
+    sid    = "ReadDistributionArtifacts"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+    ]
+
+    resources = [
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_files_prefix,
+        local.environment_shorthand,
+      ),
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_passwords_prefix,
+        local.environment_shorthand,
+      ),
+    ]
+  }
+
+  # ---------------------------------------------------------------------------
+  # Use the distribution key through S3
+  #
+  # This permits encrypted object writes and state reads only when KMS is
+  # called through the regional S3 service.
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "UseDistributionKeyThroughS3"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:Encrypt",
+      "kms:GenerateDataKey",
+    ]
+
+    resources = [
+      aws_kms_key.serco_fms_key_distribution.arn,
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:ViaService"
+
+      values = [
+        format(
+          "s3.%s.amazonaws.com",
+          data.aws_region.current.name,
+        ),
+      ]
+    }
+  }
+
+  # ---------------------------------------------------------------------------
+  # Encrypt the temporary PDF password directly
+  #
+  # The Lambda supplies all three encryption-context values. Restricting the
+  # context prevents this permission being reused for unrelated data.
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "EncryptDistributionPassword"
+    effect = "Allow"
+
+    actions = [
+      "kms:Encrypt",
+    ]
+
+    resources = [
+      aws_kms_key.serco_fms_key_distribution.arn,
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:EncryptionContext:environment"
+
+      values = [
+        local.environment_shorthand,
+      ]
+    }
+
+    condition {
+      test     = "ForAllValues:StringEquals"
+      variable = "kms:EncryptionContextKeys"
+
+      values = [
+        "attempt",
+        "batch_id",
+        "environment",
+      ]
+    }
+  }
+
+  statement {
+    sid    = "DecryptDistributionPassword"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+    ]
+
+    resources = [
+      aws_kms_key.serco_fms_key_distribution.arn,
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:EncryptionContext:environment"
+
+      values = [
+        local.environment_shorthand,
+      ]
+    }
+
+    condition {
+      test     = "ForAllValues:StringEquals"
+      variable = "kms:EncryptionContextKeys"
+
+      values = [
+        "attempt",
+        "batch_id",
+        "environment",
+      ]
+    }
+  }
+
+  # ---------------------------------------------------------------------------
+  # Decrypt the recipient and Notify secrets through Secrets Manager
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "UseRecipientKeyThroughSecretsManager"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+    ]
+
+    resources = [
+      aws_kms_key.serco_fms_key_distribution.arn,
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:ViaService"
+
+      values = [
+        format(
+          "secretsmanager.%s.amazonaws.com",
+          data.aws_region.current.name,
+        ),
+      ]
+    }
+  }
+  
+  # ---------------------------------------------------------------------------
+  # Read versioned CloudTrail event-log objects for adoption observation
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "ReadSercoFmsCloudTrailLogs"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+    ]
+
+    resources = [
+      format(
+        "%s/%s/AWSLogs/%s/CloudTrail/*",
+        module.s3-logging-bucket.bucket.arn,
+        local.serco_fms_key_access_trail_log_prefix,
+        data.aws_caller_identity.current.account_id,
+      ),
+    ]
+  }
+}
+
+resource "aws_iam_policy" "send_serco_fms_keys" {
+  name = format(
+    "send_serco_fms_keys_lambda_policy_%s",
+    local.environment_shorthand,
+  )
+
+  description = (
+    "Least-privilege access for Serco FMS distribution delivery"
+  )
+
+  policy = data.aws_iam_policy_document.send_serco_fms_keys.json
+
+  tags = merge(
+    local.tags,
+    {
+      resource-type = "serco-fms-key-distribution"
+    },
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "send_serco_fms_keys" {
+  role = aws_iam_role.send_serco_fms_keys.name
+
+  policy_arn = aws_iam_policy.send_serco_fms_keys.arn
+}
+
+# ------------------------------------------------------------------------------
+# Serco FMS key-distribution dashboard Lambda IAM
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "serco_fms_key_distribution_dashboard" {
+  name = format(
+    "serco_fms_dashboard_lambda_role_%s",
+    local.environment_shorthand,
+  )
+
+  assume_role_policy = (
+    data.aws_iam_policy_document.lambda_assume_role.json
+  )
+
+  tags = merge(
+    local.tags,
+    {
+      resource-type = "serco-fms-key-distribution"
+      purpose       = "serco-fms-dashboard"
+    },
+  )
+}
+
+data "aws_iam_policy_document" "serco_fms_key_distribution_dashboard" {
+  # ---------------------------------------------------------------------------
+  # List only the workflow state and audit-event prefixes
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "ListDistributionDashboardData"
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+    ]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+
+      values = [
+        format(
+          "%s/%s/*",
+          local.serco_fms_key_distribution_state_prefix,
+          local.environment_shorthand,
+        ),
+        format(
+          "%s/%s/*",
+          local.serco_fms_key_distribution_events_prefix,
+          local.environment_shorthand,
+        ),
+      ]
+    }
+  }
+
+  # ---------------------------------------------------------------------------
+  # Read only manifests and immutable audit events
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "ReadDistributionDashboardData"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_state_prefix,
+        local.environment_shorthand,
+      ),
+      format(
+        "%s/%s/%s/*",
+        module.s3-serco-fms-key-distribution-bucket.bucket.arn,
+        local.serco_fms_key_distribution_events_prefix,
+        local.environment_shorthand,
+      ),
+    ]
+  }
+
+  # ---------------------------------------------------------------------------
+  # Read secret-version metadata without reading credential values
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "ListFmsCredentialSecretVersions"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:ListSecretVersionIds",
+    ]
+
+    resources = (
+      local.serco_fms_key_distribution_feed_secret_arns
+    )
+  }
+
+  # ---------------------------------------------------------------------------
+  # Decrypt dashboard S3 objects only through the S3 service
+  # ---------------------------------------------------------------------------
+
+  statement {
+    sid    = "DecryptDashboardDataThroughS3"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+    ]
+
+    resources = [
+      aws_kms_key.serco_fms_key_distribution.arn,
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:ViaService"
+
+      values = [
+        format(
+          "s3.%s.amazonaws.com",
+          data.aws_region.current.name,
+        ),
+      ]
+    }
+  }
+}
+
+resource "aws_iam_policy" "serco_fms_key_distribution_dashboard" {
+  name = format(
+    "serco_fms_dashboard_lambda_policy_%s",
+    local.environment_shorthand,
+  )
+
+  description = (
+    "Read-only access for the Serco FMS distribution dashboard"
+  )
+
+  policy = (
+    data
+    .aws_iam_policy_document
+    .serco_fms_key_distribution_dashboard
+    .json
+  )
+
+  tags = merge(
+    local.tags,
+    {
+      resource-type = "serco-fms-key-distribution"
+      purpose       = "serco-fms-dashboard"
+    },
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "serco_fms_key_distribution_dashboard" {
+  role = aws_iam_role.serco_fms_key_distribution_dashboard.name
+
+  policy_arn = (
+    aws_iam_policy
+    .serco_fms_key_distribution_dashboard
+    .arn
+  )
+}
