@@ -120,7 +120,7 @@ resource "aws_ecs_service" "pui" {
   # the new task revision alongside the old one.
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.capacity-provider.name
-    weight            = 100
+    weight            = 1
     base              = 1
   }
 
