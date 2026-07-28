@@ -6,21 +6,18 @@ teams:
   justice-data-platform:
     alias: Justice Data Platform
     organisation: ministryofjustice
-    budget_duration: 30
     max_budget: 10000
     models: ["no-default-models"]
     unified_access_groups: ["generally-available-models"]
   justice-engineering-ai-enablement:
     alias: Justice Engineering AI Enablement
     organisation: ministryofjustice
-    budget_duration: 30
     max_budget: 10000
     models: ["no-default-models"]
     unified_access_groups: ["generally-available-models"]
   pom-e-supervision:
     alias: POM Phased Implementation - E-Supervision
     organisation: ministryofjustice
-    budget_duration: 30
     max_budget: 2000
     models: ["no-default-models"]
     unified_access_groups: ["generally-available-models"]

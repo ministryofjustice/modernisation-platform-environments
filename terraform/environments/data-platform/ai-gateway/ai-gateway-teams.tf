@@ -3,8 +3,8 @@ resource "litellm_team" "teams" {
 
   team_alias      = try(each.value.alias, each.key)
   organization_id = litellm_organization.organisations[each.value.organisation].id
-  budget_duration = try(each.value.budget_duration, null)
-  max_budget      = try(each.value.max_budget, null)
+  budget_duration = try(each.value.budget_duration, 30)
+  max_budget      = try(each.value.max_budget, 500)
   models          = try(each.value.models, null)
   model_aliases = try(
     { for item in each.value.model_aliases : item.alias => item.model },
