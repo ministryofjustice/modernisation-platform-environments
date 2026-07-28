@@ -55,11 +55,11 @@ resource "aws_ecs_task_definition" "create_a_derived_table" {
         },
         {
           name = "EM_REMOVE_HISTORIC"
-          value = "true"
+          value = "True"
         },
         {
           name = "EM_REMOVE_LIVE"
-          value = "false"
+          value = "False"
         },
         {
           name = "DBT_PROFILE"
