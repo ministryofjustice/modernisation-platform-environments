@@ -42,9 +42,92 @@ resource "aws_vpc_security_group_ingress_rule" "cluster_ec2_service_adaptor_lb" 
 
 # EGRESS Rules
 
-resource "aws_vpc_security_group_egress_rule" "cluster_ec2_all" {
+resource "aws_security_group_rule" "cluster_ec2_egress_vpce" {
   security_group_id = aws_security_group.cluster_ec2.id
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1"
-  description       = "Allow all outbound IPv4 traffic"
+  type              = "egress"
+  description       = "Allow egress to VPC endpoints (logs/ecs/secrets)"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks = [
+    data.aws_subnet.vpce_subnets_a.cidr_block,
+    data.aws_subnet.vpce_subnets_b.cidr_block,
+    data.aws_subnet.vpce_subnets_c.cidr_block,
+  ]
+}
+
+resource "aws_security_group_rule" "cluster_ec2_egress_s3" {
+  security_group_id = aws_security_group.cluster_ec2.id
+  type              = "egress"
+  description       = "Allow S3 access via gateway endpoint (prefix list)"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  prefix_list_ids   = [data.aws_prefix_list.s3.id]
+}
+
+resource "aws_security_group_rule" "cluster_ec2_egress_443" {
+  security_group_id = aws_security_group.cluster_ec2.id
+  type              = "egress"
+  description       = "HTTPS"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks = [
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block
+  ]
+}
+
+resource "aws_security_group_rule" "cluster_ec2_egress_mysql" {
+  security_group_id = aws_security_group.cluster_ec2.id
+  type              = "egress"
+  description       = "MySQL"
+  protocol          = "tcp"
+  from_port         = 3306
+  to_port           = 3306
+  cidr_blocks = [
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block
+  ]
+}
+
+resource "aws_security_group_rule" "cluster_ec2_egress_subnets" {
+  security_group_id = aws_security_group.cluster_ec2.id
+  type              = "egress"
+  description       = "Allow egress to protected subnets"
+  protocol          = "tcp"
+  from_port         = 1521
+  to_port           = 1521
+  cidr_blocks = [
+    data.aws_subnet.data_subnets_a.cidr_block,
+    data.aws_subnet.data_subnets_b.cidr_block,
+    data.aws_subnet.data_subnets_c.cidr_block,
+  ]
+}
+
+resource "aws_security_group_rule" "cluster_ec2_egress_1522" {
+  security_group_id = aws_security_group.cluster_ec2.id
+  type              = "egress"
+  description       = "Allow egress to protected subnets on port 1522"
+  protocol          = "tcp"
+  from_port         = 1522
+  to_port           = 1522
+  cidr_blocks = [
+    data.aws_subnet.data_subnets_a.cidr_block,
+    data.aws_subnet.data_subnets_b.cidr_block,
+    data.aws_subnet.data_subnets_c.cidr_block,
+  ]
+}
+
+resource "aws_security_group_rule" "cluster_ec2_egress_2049_efs" {
+  security_group_id        = aws_security_group.cluster_ec2.id
+  type                     = "egress"
+  description              = "Allow egress to EFS security group on port 2049"
+  protocol                 = "tcp"
+  from_port                = 2049
+  to_port                  = 2049
+  source_security_group_id = aws_security_group.oia-efs-security-group.id
 }
