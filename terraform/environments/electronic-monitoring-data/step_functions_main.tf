@@ -390,7 +390,8 @@ module "trigger_cadt_step_function" {
   iam_policies = tomap({ "trigger_cadt_step_function_policy" = aws_iam_policy.trigger_cadt_step_function_policy })
   variable_dictionary = tomap(
     {
-      "trigger_cadt"   = module.trigger_cadt.lambda_function_name,
+      "trigger_cadt"  = module.trigger_cadt.lambda_function_name,
+      "environment"   = local.environment,
     }
   )
   type = "STANDARD"
