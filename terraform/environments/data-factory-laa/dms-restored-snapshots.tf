@@ -36,8 +36,11 @@
 # ---------------------------------------------------------------------------
 # KMS key for the Access DMS test resources (SQS validation queue, secret)
 # ---------------------------------------------------------------------------
-
 data "aws_iam_policy_document" "access_dms_kms" {
+  #checkov:skip=CKV_AWS_111: Allowing root full access
+  #checkov:skip=CKV_AWS_356: Allowing root full access
+  #checkov:skip=CKV_AWS_109: Allowing root full access
+
   count = local.is-test ? 1 : 0
 
   statement {
@@ -178,9 +181,10 @@ resource "aws_s3_object" "access_dms_mappings" {
 
 #checkov:skip=CKV2_AWS_57: Automatic rotation not needed for test webhook
 resource "aws_secretsmanager_secret" "access_dms_slack_webhook" {
-  count = local.is-test ? 1 : 0
-  name  = "${local.application_name}-${local.environment}/access-dms/slack-webhook"
-  tags  = local.tags
+  count      = local.is-test ? 1 : 0
+  name       = "${local.application_name}-${local.environment}/access-dms/slack-webhook"
+  kms_key_id = aws_kms_key.access_dms[0].arn
+  tags       = local.tags
 }
 
 resource "aws_secretsmanager_secret_version" "access_dms_slack_webhook" {
