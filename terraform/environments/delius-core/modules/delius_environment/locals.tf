@@ -36,7 +36,13 @@ locals {
     "217.138.45.109/32", # Unilink AOVPN
     "217.138.45.110/32", # Unilink AOVPN
   ]
-  all_ingress_ips = concat(local.moj_ips, local.unilink_ips)
+  cp_ips = [
+    "35.178.209.113/32", #cloudplatform-live1-1
+    "3.8.51.207/32", # cloudplatform-live1-2
+    "35.177.252.54/32" # cloudplatform-live1-3
+  ]
+
+  all_ingress_ips = concat(local.moj_ips, local.unilink_ips, local.cp_ips)
 
   legacy_test_natgw_ips = [
     "35.176.126.163/32",
@@ -58,9 +64,5 @@ locals {
     primarydb  = try(module.oracle_db_primary[0].oracle_db_server_name, "none"),
     standbydb1 = try(module.oracle_db_standby[0].oracle_db_server_name, "none"),
     standbydb2 = try(module.oracle_db_standby[1].oracle_db_server_name, "none")
-  }
-
-  container_vars_default = {
-    for key, name in var.delius_microservice_configs.weblogic_params : key => data.aws_ssm_parameter.weblogic_ssm[key].value
   }
 }

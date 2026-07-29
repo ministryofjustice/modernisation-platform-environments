@@ -53,24 +53,37 @@ COPY --from=builder /usr/local/lib/x86_64-linux-gnu/perl /usr/local/lib/x86_64-l
 COPY --from=builder /usr/share/linotp/linotp-auth-freeradius-perl /usr/share/linotp/linotp-auth-freeradius-perl
 
 # Copy configuration files
-COPY config/sites-available/linotp /etc/freeradius/3.0/sites-available/linotp
-COPY config/mods-available/perl /etc/freeradius/3.0/mods-available/perl
+#
+# NOTE: this image's actual confdir is /etc/freeradius (radiusd.conf lives
+# there and $INCLUDEs clients.conf/sites-enabled/mods-enabled from there
+# directly) - it is NOT /etc/freeradius/3.0. An earlier version of this
+# Dockerfile wrote everything under .../3.0, which radiusd never reads, so
+# clients.conf/sites-enabled/mods-enabled here always fell back to the
+# stock defaults (only "client localhost", no linotp site, no perl module).
+COPY config/sites-available/linotp /etc/freeradius/sites-available/linotp
+COPY config/mods-available/perl /etc/freeradius/mods-available/perl
 COPY config/rlm_perl.ini /etc/linotp/rlm_perl.ini
 COPY entrypoint.sh /entrypoint.sh
 
 # Set up FreeRADIUS configuration
 RUN chmod +x /entrypoint.sh && \
     mkdir -p /etc/linotp && \
-    mkdir -p /etc/freeradius/3.0/sites-enabled && \
-    mkdir -p /etc/freeradius/3.0/mods-enabled && \
-    rm -f /etc/freeradius/3.0/sites-enabled/default \
-          /etc/freeradius/3.0/sites-enabled/inner-tunnel \
-          /etc/freeradius/3.0/mods-enabled/eap && \
-    ln -sf /etc/freeradius/3.0/sites-available/linotp \
-          /etc/freeradius/3.0/sites-enabled/linotp && \
-    ln -sf /etc/freeradius/3.0/mods-available/perl \
-          /etc/freeradius/3.0/mods-enabled/perl
+    mkdir -p /etc/freeradius/sites-enabled && \
+    mkdir -p /etc/freeradius/mods-enabled && \
+    rm -f /etc/freeradius/sites-enabled/default \
+          /etc/freeradius/sites-enabled/inner-tunnel \
+          /etc/freeradius/mods-enabled/eap && \
+    ln -sf /etc/freeradius/sites-available/linotp \
+          /etc/freeradius/sites-enabled/linotp && \
+    ln -sf /etc/freeradius/mods-available/perl \
+          /etc/freeradius/mods-enabled/perl
 
 EXPOSE 1812/udp 1813/udp
+
+# Forces a unique layer/digest per build invocation, so every push gets its
+# own distinct ECR image entry instead of collapsing onto a prior identical
+# build when the rest of the context is unchanged and fully cache-hits.
+ARG BUILD_TIMESTAMP=unknown
+LABEL build.timestamp="${BUILD_TIMESTAMP}"
 
 ENTRYPOINT ["/entrypoint.sh"]

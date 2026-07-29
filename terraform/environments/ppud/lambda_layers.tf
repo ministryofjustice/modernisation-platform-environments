@@ -22,7 +22,7 @@ locals {
   lambda_layers = {
     matplotlib = "matplotlib_layer.zip"
     boto3      = "boto3_layer.zip"
-    pandas     = "pandas_layer.zip"
+    pandas     = "pandas_v2.3.3_layer.zip"
     xlsxwriter = "xlsxwriter_layer.zip"
     requests   = "requests_v2.34.2_layer.zip"
     pillow     = "pillow_v12.3.0_layer.zip"

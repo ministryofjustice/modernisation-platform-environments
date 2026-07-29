@@ -1,4 +1,5 @@
 module "cloudwatch_eventbridge" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
   version = "5.7.2"
 
@@ -10,6 +11,7 @@ module "cloudwatch_eventbridge" {
 }
 
 module "cloudwatch_metric_alarms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   for_each = local.cloudwatch_metric_alarms
 
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
@@ -27,6 +29,18 @@ module "cloudwatch_metric_alarms" {
   statistic           = each.value.statistic
   threshold           = each.value.threshold
   treat_missing_data  = "notBreaching"
+
+  tags = local.tags
+}
+
+module "cloudwatch_transfer" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
+  version = "5.7.2"
+
+  name              = "/aws/transfer/${local.application_name}"
+  kms_key_id        = module.kms_cloudwatch_logs.key_arn
+  retention_in_days = local.cloudwatch_retention_days
 
   tags = local.tags
 }

@@ -157,6 +157,32 @@ resource "aws_s3_bucket_versioning" "backup_lambda" {
   }
 }
 
+data "aws_iam_policy_document" "backup_lambda_secure_transport" {
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.backup_lambda.arn,
+      "${aws_s3_bucket.backup_lambda.arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "backup_lambda_secure_transport" {
+  bucket = aws_s3_bucket.backup_lambda.id
+  policy = data.aws_iam_policy_document.backup_lambda_secure_transport.json
+}
+
 #####################################
 ### Provision scripts to S3 bucket
 #####################################

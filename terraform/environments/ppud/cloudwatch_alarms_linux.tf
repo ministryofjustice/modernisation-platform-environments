@@ -205,15 +205,41 @@ resource "aws_cloudwatch_metric_alarm" "service_status_docker" {
   }
 }
 
+# Container Service Status
+
+resource "aws_cloudwatch_metric_alarm" "service_status_container" {
+  for_each = local.is-production ? {
+    for id, instance in data.aws_instance.linux_instance_details :
+    id => instance if lookup(instance.tags, "container_service", "false") == "true"
+  } : {}
+
+  alarm_name          = "Service-Status-Container-${each.key}"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 1
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the container service status. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance = each.key
+    Service  = "container"
+  }
+}
+
 # Port 25 Connectivity to CJSM mail relay or internal mail relay (rgsl200)
 
 resource "aws_cloudwatch_metric_alarm" "port_25_status_check" {
   for_each = local.is-production ? {
     for id, instance in data.aws_instance.linux_instance_details :
-    id => instance if lookup(instance.tags, "port25_cjsm", "false") == "true"
+    id => instance if lookup(instance.tags, "port25_check", "false") == "true"
   } : {}
 
-  alarm_name          = "CJSM-Port-25-Status-Check-${each.key}"
+  alarm_name          = "Port-25-Status-Check-${each.key}"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = 1
   datapoints_to_alarm = 1
@@ -223,10 +249,36 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check" {
   statistic           = "Average"
   threshold           = 1
   treat_missing_data  = "notBreaching"
-  alarm_description   = "This metric monitors the port 25 status check to smtp.cjsm.net . If the metric falls to 0 [unable to connect] then the alarm will trigger."
+  alarm_description   = "This metric monitors the port 25 status check to smtp.cjsm.net | colt-net.mail.protection.outlook.com. If the metric falls to 0 [unable to connect] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     Instance = each.key
     Port     = "port25"
+  }
+}
+
+# Mail Queue Threshold
+
+resource "aws_cloudwatch_metric_alarm" "mail_queue_threshold_check" {
+  for_each = local.is-production ? {
+    for id, instance in data.aws_instance.linux_instance_details :
+    id => instance if lookup(instance.tags, "mail_queue", "false") == "true"
+  } : {}
+
+  alarm_name          = "Mail-Queue-Threshold-Check-${each.key}"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  metric_name         = "MailQueueThreshold"
+  namespace           = "MailQueue"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 1
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the docker container mail queue. If the metric falls to 0 [exceeds 50 emails in the queue] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance  = each.key
+    MailQueue = "mailqueue"
   }
 }

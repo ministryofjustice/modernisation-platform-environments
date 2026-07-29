@@ -1049,7 +1049,7 @@ resource "aws_instance" "s265903rgsl401-cjsm" {
     is-production  = true
     patch_group    = "prod_lin_patch"
     docker_service = "true"
-    port25_cjsm    = "true"
+    port25_check   = "true"
   }
 }
 
@@ -1146,11 +1146,13 @@ resource "aws_instance" "internal-mail-relay" {
   }
 
   tags = {
-    Name           = "internal-mail-relay"
-    is-production  = true
-    patch_group    = "prod_lin_patch"
-    docker_service = "true"
-    archive_volume = "true"
+    Name              = "internal-mail-relay"
+    is-production     = true
+    patch_group       = "prod_lin_patch"
+    docker_service    = "true"
+    container_service = "true"
+    archive_volume    = "true"
+    mail_queue        = "true"
   }
 }
 
@@ -1174,10 +1176,13 @@ resource "aws_instance" "non-cjsm-mail-relay" {
   }
 
   tags = {
-    Name           = "non-cjsm-mail-relay"
-    is-production  = true
-    patch_group    = "prod_lin_patch"
-    docker_service = "true"
+    Name              = "non-cjsm-mail-relay"
+    is-production     = true
+    patch_group       = "prod_lin_patch"
+    docker_service    = "true"
+    container_service = "true"
+    port25_check      = "true"
+    mail_queue        = "true"
   }
 }
 
@@ -1201,11 +1206,13 @@ resource "aws_instance" "cjsm-mail-relay" {
   }
 
   tags = {
-    Name           = "cjsm-mail-relay"
-    is-production  = true
-    patch_group    = "prod_lin_patch"
-    docker_service = "true"
-    port25_cjsm    = "true"
+    Name              = "cjsm-mail-relay"
+    is-production     = true
+    patch_group       = "prod_lin_patch"
+    docker_service    = "true"
+    container_service = "true"
+    port25_check      = "true"
+    mail_queue        = "true"
   }
 }
 

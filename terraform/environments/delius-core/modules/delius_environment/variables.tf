@@ -115,9 +115,9 @@ variable "env_name_to_dms_config_map" {
   type        = any
 }
 
-# Only create one per account
-variable "create_backup_role" {
-  description = "Role used to run AWS Backups i.e. AWSBackupDefaultServiceRole"
+# Only create one set of account-wide service roles per account
+variable "create_account_service_roles" {
+  description = "Create the account-wide service IAM roles shared by DMS and AWS Backup"
   type        = bool
   default     = false
 }

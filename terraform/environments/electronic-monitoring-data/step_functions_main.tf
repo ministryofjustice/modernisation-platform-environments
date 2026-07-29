@@ -126,20 +126,21 @@ module "iceberg_table_maintenance_step_function" {
 }
 
 # ------------------------------------------
-# Insert into emdi position step function
+# Merge into emdi position step function
 # ------------------------------------------
 
+module "merge_into_mdss_staged_position" {
+  source       = "./modules/merge_into_reconciler"
+  function_to_iterate = module.merge_mdss_staged_position[0]
+}
 
-module "insert_into_emdi_position" {
-  source       = "./modules/step_function"
-  name         = "insert_into_emdi_position"
-  iam_policies = tomap({ "insert_into_emdi_position_step_function_policy" = aws_iam_policy.insert_into_emdi_position })
-  variable_dictionary = tomap(
-    {
-      "merge_emdi_position"    = module.merge_emdi_position[0].lambda_function_arn
-    }
-  )
-  type = "STANDARD"
+# ------------------------------------------
+# Merge into emdi position step function
+# ------------------------------------------
+
+module "merge_into_emdi_position" {
+  source       = "./modules/merge_into_reconciler"
+  function_to_iterate = module.merge_emdi_position[0]
 }
 
 # ------------------------------------------------------------------------------

@@ -29,7 +29,7 @@ module "environment_dev" {
 
   ldap_config        = local.ldap_config_dev
   db_config          = local.db_config_dev
-  create_backup_role = true
+  create_account_service_roles = true
   create_ecs_lambda  = true
 
   delius_microservice_configs = local.delius_microservices_configs_dev
@@ -72,7 +72,7 @@ module "environment_poc" {
 
   ldap_config        = local.ldap_config_poc
   db_config          = local.db_config_poc
-  create_backup_role = false
+  create_account_service_roles = false
   create_ecs_lambda  = false
 
   delius_microservice_configs = local.delius_microservices_configs_poc

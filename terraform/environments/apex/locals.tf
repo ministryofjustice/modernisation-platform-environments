@@ -84,6 +84,11 @@ locals {
     sha256(file("${path.module}/lambda/cloudwatch_alarm_slack_integration/${f}"))
   ]
 
+  oracle_lambda_source_hashes = [
+    for f in fileset("./lambda/oracle_log_slack_integration", "**") :
+    sha256(file("${path.module}/lambda/oracle_log_slack_integration/${f}"))
+  ]
+
   lambda_folder_name = ["lambda_delivery", "cloudwatch_sns_layer"]
 
   backup_schedule_tags       = local.environment == "production" ? { "snapshot-35-day-retention" = "yes" } : null

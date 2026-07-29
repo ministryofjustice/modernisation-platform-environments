@@ -51,7 +51,8 @@
       "health_check_grace_period_seconds": 60,
       "image_tag": "tm-1408-composer-19577361514-1",
       "db_snapshot_identifier": "",
-      "log_retention_in_days": 90
+      "log_retention_in_days": 90,
+      "legacy_url": "www.victim-case-management.service.justice.gov.uk"
     }
   }
 }
