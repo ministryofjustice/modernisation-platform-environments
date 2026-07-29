@@ -176,7 +176,7 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_eis" {
   }
   action {
     type             = "forward"
-    target_group_arn = module.weblogic.target_group_arn
+    target_group_arn = module.weblogic_eis.target_group_arn
   }
   depends_on = [aws_lb_listener_rule.blocked_paths_listener_rule]
 }
