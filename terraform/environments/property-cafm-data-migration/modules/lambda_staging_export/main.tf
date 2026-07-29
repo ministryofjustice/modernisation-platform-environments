@@ -142,7 +142,7 @@ resource "aws_iam_role_policy" "lambda" {
 
 resource "aws_cloudwatch_log_group" "this" {
   name              = "/aws/lambda/${var.function_name}"
-  retention_in_days = 30
+  retention_in_days = 365
 
   tags = var.tags
 }
@@ -154,6 +154,9 @@ data "archive_file" "lambda" {
 }
 
 resource "aws_lambda_function" "this" {
+  # checkov:skip=CKV_AWS_116: DLQ not required - the function is invoked synchronously, so failures are returned to the caller rather than retried asynchronously.
+  # checkov:skip=CKV_AWS_117: VPC not required - the function only calls AWS service APIs (Athena, Glue, S3) via public service endpoints.
+  # checkov:skip=CKV_AWS_272: Code-signing not used - the deployment package is built and managed in-repo via archive_file.
   function_name = var.function_name
   description   = var.description
   role          = aws_iam_role.lambda.arn
