@@ -86,6 +86,31 @@ resource "aws_iam_policy" "ec2_automation" {
   tags = local.tags
 }
 
+data "aws_iam_policy_document" "ec2_nextcloud" {
+  statement {
+    sid    = "EC2LegacyNextCloudEFS"
+    effect = "Allow"
+    actions = [
+      "elasticfilesystem:ClientMount",
+      "elasticfilesystem:ClientWrite",
+    ]
+    resources = [
+      "arn:aws:elasticfilesystem:eu-west-2:*:file-system/*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "ec2_nextcloud" {
+  name        = "${var.env_name}-ec2-nextcloud"
+  path        = "/"
+  description = "Allow ec2 instance to access NextCloud"
+  policy      = data.aws_iam_policy_document.ec2_nextcloud.json
+
+  tags = merge(local.tags, {
+    Name = "${var.env_name}-ec2-nextcloud"
+  })
+}
+
 # AWS Backup Role
 resource "aws_iam_role" "aws_backup_default_service_role" {
   count = var.create_backup_role ? 1 : 0
