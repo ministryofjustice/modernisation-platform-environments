@@ -2,17 +2,8 @@ variable "databases" {
   type = set(string)
 }
 
-variable "data_bucket_lf_resource_arn" {
-  type = string
-}
-
 variable "optimizer_bucket_id" {
   type = string
-}
-
-variable "orphan_prefix_overrides_by_database" {
-  type    = map(string)
-  default = {}
 }
 
 variable "table_optimizer_defaults" {
@@ -46,7 +37,3 @@ variable "dbt_databases" {
   default = []
 }
 
-variable "dbt_domain_name_by_database" {
-  type    = map(string)
-  default = {}
-}
