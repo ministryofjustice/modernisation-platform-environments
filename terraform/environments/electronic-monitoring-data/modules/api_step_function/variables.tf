@@ -68,3 +68,9 @@ variable "api_version" {
   description = "The version of the API Gateway"
   type        = string
 }
+
+variable "api_gateway_endpoint" {
+  description = "API Gateway endpoint"
+  type        = string
+}
+

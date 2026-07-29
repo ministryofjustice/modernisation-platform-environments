@@ -25,6 +25,7 @@ module "get_zipped_file_api_api" {
     required = ["file_name", "zip_file_name"]
   }
   api_version = "0.1.1"
+  api_gateway_endpoint = data.aws_vpc_endpoint.api_gateway.id 
 }
 
 module "ears_sars_api" {
@@ -72,6 +73,7 @@ module "ears_sars_api" {
     ]
   }
   api_version = "0.1.1"
+  api_gateway_endpoint = data.aws_vpc_endpoint.api_gateway.id 
 }
 
 resource "aws_api_gateway_account" "global_usage" {
@@ -271,7 +273,7 @@ resource "aws_api_gateway_method" "update_p1_export_remove_post" {
 resource "aws_api_gateway_request_validator" "update_p1_export" {
   count                       = local.is-development || local.is-preproduction || local.is-production ? 1 : 0
   rest_api_id                 = aws_api_gateway_rest_api.update_p1_export[0].id
-  name                        = "≈RequestValidator"
+  name                        = "RequestValidator"
   validate_request_body       = true
   validate_request_parameters = true
 }
@@ -458,4 +460,40 @@ resource "aws_api_gateway_method_response" "remove_status_404" {
   resource_id = aws_api_gateway_resource.update_p1_export_remove[0].id
   http_method = aws_api_gateway_method.update_p1_export_remove_post[0].http_method
   status_code = "404"
+}
+
+
+module "trigger_cadt_api" {
+  source              = "./modules/api_step_function"
+  api_name            = "trigger_cadt_api"
+  api_description     = "Trigger CADT API"
+  api_path            = "execute"
+  step_function       = module.trigger_cadt_step_function
+  sfn_type            = "standard"
+  enable_status_check = true
+  stages = [
+    {
+      stage_name             = "request",
+      stage_description      = "API Stage for testing",
+      burst_limit            = 20,
+      rate_limit             = 200,
+      throttling_burst_limit = 20,
+      throttling_rate_limit  = 200
+
+    }
+  ]
+  schema = {
+    type = "object"
+    properties = {
+      full_refresh           = { type = "boolean" }
+      all_models             = { type = "boolean" }
+    }
+    required = [
+      "full_refresh",
+      "all_models",
+    ]
+  }
+  api_version = "0.1.0"
+
+  api_gateway_endpoint = data.aws_vpc_endpoint.api_gateway.id 
 }

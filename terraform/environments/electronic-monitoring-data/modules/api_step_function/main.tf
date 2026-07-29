@@ -25,6 +25,12 @@ resource "aws_api_gateway_rest_api" "api_gateway" {
   name        = var.api_name
   description = var.api_description
 
+  endpoint_configuration {
+    types            = ["PRIVATE"]
+    vpc_endpoint_ids = [var.api_gateway_endpoint]
+    ip_address_type  = "dualstack"
+  }
+
   lifecycle {
     create_before_destroy = true
   }
