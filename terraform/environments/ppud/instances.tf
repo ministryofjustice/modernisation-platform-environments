@@ -1049,7 +1049,7 @@ resource "aws_instance" "s265903rgsl401-cjsm" {
     is-production  = true
     patch_group    = "prod_lin_patch"
     docker_service = "true"
-    port25_cjsm    = "true"
+    port25_check   = "true"
   }
 }
 
@@ -1152,6 +1152,7 @@ resource "aws_instance" "internal-mail-relay" {
     docker_service    = "true"
     container_service = "true"
     archive_volume    = "true"
+    mail_queue        = "true"
   }
 }
 
@@ -1180,6 +1181,8 @@ resource "aws_instance" "non-cjsm-mail-relay" {
     patch_group       = "prod_lin_patch"
     docker_service    = "true"
     container_service = "true"
+    port25_check      = "true"
+    mail_queue        = "true"
   }
 }
 
@@ -1208,7 +1211,8 @@ resource "aws_instance" "cjsm-mail-relay" {
     patch_group       = "prod_lin_patch"
     docker_service    = "true"
     container_service = "true"
-    port25_cjsm       = "true"
+    port25_check      = "true"
+    mail_queue        = "true"
   }
 }
 
