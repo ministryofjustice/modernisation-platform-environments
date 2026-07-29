@@ -20,7 +20,7 @@ module "weblogic_eis" {
 
   cluster_security_group_id = aws_security_group.cluster.id
 
-  alb_security_group_id         = aws_security_group.delius_frontend_alb_security_group.id
+  alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   alb_health_check = {
     path                 = "/NDelius-war/delius/javax.faces.resource/health/healthcheck.json"
     healthy_threshold    = 5
@@ -130,7 +130,7 @@ resource "aws_ecs_capacity_provider" "weblogic_eis" {
 
 resource "aws_lb_listener_rule" "blocked_paths_listener_rule_weblogic_eis" {
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 21 # must be before ndelius_allowed_paths_rule
+  priority     = 20 # must be before ndelius_allowed_paths_rule
   condition {
     host_header {
       values = [
@@ -157,7 +157,7 @@ resource "aws_lb_listener_rule" "blocked_paths_listener_rule_weblogic_eis" {
 
 resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_eis" {
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 31
+  priority     = 30
   condition {
     host_header {
       values = [
