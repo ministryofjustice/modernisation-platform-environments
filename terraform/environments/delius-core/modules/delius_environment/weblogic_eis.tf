@@ -130,12 +130,12 @@ resource "aws_ecs_capacity_provider" "weblogic_eis" {
 
 resource "aws_lb_listener_rule" "blocked_paths_listener_rule_weblogic_eis" {
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 20 # must be before ndelius_allowed_paths_rule
+  priority     = 21 # must be before ndelius_allowed_paths_rule
   condition {
     host_header {
       values = [
-        "ndelius.${var.env_name}.${var.account_config.dns_suffix}",
-        "ndelius.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
+        "interface.${var.env_name}.${var.account_config.dns_suffix}",
+        "interface.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
       ]
     }
   }
@@ -157,7 +157,7 @@ resource "aws_lb_listener_rule" "blocked_paths_listener_rule_weblogic_eis" {
 
 resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_eis" {
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 30
+  priority     = 31
   condition {
     host_header {
       values = [

@@ -200,7 +200,7 @@ resource "aws_ecs_capacity_provider" "weblogic" {
 
 resource "aws_lb_listener_rule" "blocked_paths_listener_rule" {
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 50 # must be before ndelius_allowed_paths_rule
+  priority     = 51 # must be before ndelius_allowed_paths_rule
   condition {
     host_header {
       values = [
@@ -227,7 +227,7 @@ resource "aws_lb_listener_rule" "blocked_paths_listener_rule" {
 
 resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 60
+  priority     = 61
   condition {
     host_header {
       values = [
