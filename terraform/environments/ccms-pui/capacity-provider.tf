@@ -5,7 +5,7 @@ resource "aws_ecs_capacity_provider" "capacity-provider" {
 
   auto_scaling_group_provider {
     auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
-    managed_termination_protection = "ENABLED"
+    managed_termination_protection = "DISABLED"
 
     # Lets ECS automatically scale the ASG out (up to ec2_max_capacity) when
     # it needs extra instance capacity to place the new task revision
