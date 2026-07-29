@@ -40,8 +40,8 @@ module "weblogic" {
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
-  deployment_maximum_percent         = 200
-  deployment_minimum_healthy_percent = 100
+  deployment_minimum_healthy_percent = 50
+  deployment_maximum_percent         = 100
 
   ecs_service_ingress_security_group_ids = []
   ecs_service_egress_security_group_ids = [

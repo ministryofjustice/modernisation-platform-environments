@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "FileStagedForScanning.v1",
-  "description": "A file has been copied from the incoming bucket to the processing bucket. The source object's metadata and existing tags have been preserved and verified on the processing object, and the source object has been deleted.",
+  "description": "A file has been copied from the incoming bucket to the processing bucket. The source object's metadata and existing tags have been preserved on the processing object, and the source object has been deleted.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -55,17 +55,17 @@
             "metadataPreserved": {
               "type": "boolean",
               "enum": [true],
-              "description": "The source object's metadata was preserved and verified on the staged object."
+              "description": "The source object's metadata was preserved on the staged object."
             },
             "tagsPreserved": {
               "type": "boolean",
               "enum": [true],
-              "description": "The source object's pre-scan tags were preserved and verified on the staged object. This does not refer to GuardDuty scan-result tags."
+              "description": "The source object's pre-scan tags were preserved on the staged object. This does not refer to GuardDuty scan-result tags."
             },
             "sourceDeleted": {
               "type": "boolean",
               "enum": [true],
-              "description": "The source object version was deleted after the staged object was verified."
+              "description": "The source object version was deleted after the staged object was created."
             }
           }
         }
