@@ -86,9 +86,14 @@ resource "aws_iam_policy" "ec2_automation" {
   tags = local.tags
 }
 
+locals {
+  legacy_nextcloud_allowed_resource = lookup(var.environment_config, "legacy_nextcloud_efs_id", "none")
+}
+
 data "aws_iam_policy_document" "ec2_nextcloud" {
   # From AmazonElasticFileSystemsUtils without CreateLogGroup etc.
   statement {
+    sid    = "AmazonElasticFileSystemsUtils-1"
     effect = "Allow"
     actions = [
       "ssm:DescribeAssociation",
@@ -110,6 +115,7 @@ data "aws_iam_policy_document" "ec2_nextcloud" {
     resources = ["*"]
   }
   statement {
+    sid    = "AmazonElasticFileSystemsUtils-2"
     effect = "Allow"
     actions = [
       "ssmmessages:CreateControlChannel",
@@ -120,6 +126,7 @@ data "aws_iam_policy_document" "ec2_nextcloud" {
     resources = ["*"]
   }
   statement {
+    sid    = "AmazonElasticFileSystemsUtils-3"
     effect = "Allow"
     actions = [
       "ec2messages:AcknowledgeMessage",
@@ -132,6 +139,7 @@ data "aws_iam_policy_document" "ec2_nextcloud" {
     resources = ["*"]
   }
   statement {
+    sid    = "AmazonElasticFileSystemsUtils-4"
     effect = "Allow"
     actions = [
       "elasticfilesystem:DescribeMountTargets"
@@ -139,6 +147,7 @@ data "aws_iam_policy_document" "ec2_nextcloud" {
     resources = ["*"]
   }
   statement {
+    sid    = "AmazonElasticFileSystemsUtils-5"
     effect = "Allow"
     actions = [
       "ec2:DescribeAvailabilityZones"
@@ -146,6 +155,7 @@ data "aws_iam_policy_document" "ec2_nextcloud" {
     resources = ["*"]
   }
   statement {
+    sid    = "AmazonElasticFileSystemsUtils-6"
     effect = "Allow"
     actions = [
       "logs:PutLogEvents",
@@ -158,6 +168,7 @@ data "aws_iam_policy_document" "ec2_nextcloud" {
     resources = ["*"]
   }
   statement {
+    sid    = "AmazonElasticFileSystemsUtils-7"
     effect = "Allow"
     actions = [
       "cloudwatch:PutMetricData"
@@ -168,6 +179,15 @@ data "aws_iam_policy_document" "ec2_nextcloud" {
       variable = "cloudwatch:namespace"
       values   = ["efs-utils/S3Files", "efs-utils/EFS"]
     }
+  }
+  statement {
+    sid    = "CrossAccountMount"
+    effect = "Allow"
+    actions = [
+      "elasticfilesystem:ClientMount",
+      "elasticfilesystem:ClientWrite",
+    ]
+    resources = ["arn:aws:elasticfilesystem:eu-west-2:*:file-system/${local.legacy_nextcloud_allowed_resource}"]
   }
 }
 
