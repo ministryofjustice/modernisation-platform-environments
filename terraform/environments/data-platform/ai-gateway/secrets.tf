@@ -37,3 +37,14 @@ module "litellm_entra_id_secret" {
   ignore_secret_changes = true
 }
 
+module "microsoft_foundry_jedigw_development_secret" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
+
+  name = "${local.component_name}/microsoft-foundry/jedigw/development"
+
+  secret_string = jsonencode({
+    api_key  = "CHANGEME"
+    endpoint = "CHANGEME"
+  })
+  ignore_secret_changes = true
+}
