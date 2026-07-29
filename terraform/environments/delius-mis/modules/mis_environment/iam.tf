@@ -87,17 +87,87 @@ resource "aws_iam_policy" "ec2_automation" {
 }
 
 data "aws_iam_policy_document" "ec2_nextcloud" {
+  # From AmazonElasticFileSystemsUtils without CreateLogGroup etc.
   statement {
-    sid    = "EC2LegacyNextCloudEFS"
     effect = "Allow"
     actions = [
-      "elasticfilesystem:ClientMount",
-      "elasticfilesystem:ClientWrite",
+      "ssm:DescribeAssociation",
+      "ssm:GetDeployablePatchSnapshotForInstance",
+      "ssm:GetDocument",
+      "ssm:DescribeDocument",
+      "ssm:GetManifest",
+      "ssm:GetParameter",
+      "ssm:GetParameters",
+      "ssm:ListAssociations",
+      "ssm:ListInstanceAssociations",
+      "ssm:PutInventory",
+      "ssm:PutComplianceItems",
+      "ssm:PutConfigurePackageResult",
+      "ssm:UpdateAssociationStatus",
+      "ssm:UpdateInstanceAssociationStatus",
+      "ssm:UpdateInstanceInformation"
     ]
-    resources = [
-      "arn:aws:elasticfilesystem:eu-west-2:*:file-system/*",
-      "arn:aws:elasticfilesystem:eu-west-2:*:access-point/*",
+    resources = ["*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "ssmmessages:CreateControlChannel",
+      "ssmmessages:CreateDataChannel",
+      "ssmmessages:OpenControlChannel",
+      "ssmmessages:OpenDataChannel"
     ]
+    resources = ["*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2messages:AcknowledgeMessage",
+      "ec2messages:DeleteMessage",
+      "ec2messages:FailMessage",
+      "ec2messages:GetEndpoint",
+      "ec2messages:GetMessages",
+      "ec2messages:SendReply"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "elasticfilesystem:DescribeMountTargets"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeAvailabilityZones"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:PutLogEvents",
+      "logs:DescribeLogStreams",
+      "logs:DescribeLogGroups",
+      # "logs:CreateLogStream",
+      # "logs:CreateLogGroup",
+      # "logs:PutRetentionPolicy"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "cloudwatch:PutMetricData"
+    ]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "cloudwatch:namespace"
+      values   = ["efs-utils/S3Files", "efs-utils/EFS"]
+    }
   }
 }
 
