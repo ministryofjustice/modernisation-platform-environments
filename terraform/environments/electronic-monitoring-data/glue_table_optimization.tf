@@ -82,7 +82,6 @@ resource "aws_iam_role_policy_attachment" "glue_table_optimiser_policy_attachmen
 resource "aws_lakeformation_permissions" "glue_table_optimizer_permissions" {
   principal   = aws_iam_role.glue_table_optimiser.arn
   permissions = ["DATA_LOCATION_ACCESS"]
-
   data_location {
     arn = aws_lakeformation_resource.data_bucket.arn
   }
