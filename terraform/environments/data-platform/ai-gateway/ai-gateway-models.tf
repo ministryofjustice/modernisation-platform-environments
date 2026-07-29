@@ -1,5 +1,6 @@
 resource "litellm_model" "amazon_bedrock" {
-  for_each            = tomap(local.ai_gateway_models.amazon_bedrock)
+  for_each = try(tomap(local.ai_gateway_configuration.models.amazon_bedrock), {})
+
   custom_llm_provider = "bedrock"
   model_name          = "bedrock-${each.key}"
   base_model          = each.value.model_id
@@ -24,7 +25,8 @@ resource "litellm_model" "amazon_bedrock" {
 }
 
 resource "litellm_model" "google_gemini_enterprise_agent_platform" {
-  for_each            = tomap(local.ai_gateway_models.google_gemini_enterprise_agent_platform)
+  for_each = try(tomap(local.ai_gateway_configuration.models.google_gemini_enterprise_agent_platform), {})
+
   custom_llm_provider = "gemini"
   model_name          = "gemini-${each.key}"
   base_model          = each.value.model_id
@@ -46,7 +48,8 @@ resource "litellm_model" "google_gemini_enterprise_agent_platform" {
 }
 
 resource "litellm_model" "microsoft_foundry" {
-  for_each            = tomap(local.ai_gateway_models.microsoft_foundry)
+  for_each = try(tomap(local.ai_gateway_configuration.models.microsoft_foundry), {})
+
   custom_llm_provider = "azure"
   model_name          = "azure-${each.key}"
   base_model          = each.value.model_id
