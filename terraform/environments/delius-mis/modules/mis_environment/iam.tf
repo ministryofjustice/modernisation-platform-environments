@@ -95,7 +95,8 @@ data "aws_iam_policy_document" "ec2_nextcloud" {
       "elasticfilesystem:ClientWrite",
     ]
     resources = [
-      "arn:aws:elasticfilesystem:eu-west-2:*:file-system/*"
+      "arn:aws:elasticfilesystem:eu-west-2:*:file-system/*",
+      "arn:aws:elasticfilesystem:eu-west-2:*:access-point/*",
     ]
   }
 }
