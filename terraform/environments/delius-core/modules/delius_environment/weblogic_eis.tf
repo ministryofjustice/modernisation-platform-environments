@@ -32,7 +32,8 @@ module "weblogic_eis" {
     grace_period_seconds = 300
   }
 
-  certificate_arn = aws_acm_certificate.external.arn
+  certificate_arn               = aws_acm_certificate.external.arn
+  target_group_protocol_version = "HTTP1"
 
   db_ingress_security_groups = []
 
