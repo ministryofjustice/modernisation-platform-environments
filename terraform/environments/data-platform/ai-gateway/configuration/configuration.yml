@@ -16,6 +16,13 @@ teams:
     max_budget: 10000
     models: ["no-default-models"]
     unified_access_groups: ["generally-available-models"]
+    model_aliases:
+        - alias: "claude-haiku-4.5"
+          model: "bedrock-claude-haiku-4-5"
+        - alias: "claude-opus-5"
+          model: "bedrock-claude-opus-5"
+        - alias: "claude-sonnet-5"
+          model: "bedrock-claude-sonnet-5"
   pom-e-supervision:
     alias: POM Phased Implementation - E-Supervision
     organisation: ministryofjustice
