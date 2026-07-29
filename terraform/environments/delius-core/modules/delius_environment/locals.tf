@@ -45,7 +45,7 @@ locals {
     "10.26.8.0/21" # HMPPS Test
   ]
 
-  all_ingress_ips = concat(local.moj_ips, local.unilink_ips, local.cp_ips)
+  all_ingress_ips = concat(local.moj_ips, local.unilink_ips, local.cp_ips, local.mp)
 
   legacy_test_natgw_ips = [
     "35.176.126.163/32",
