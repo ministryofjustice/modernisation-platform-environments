@@ -41,6 +41,9 @@ locals {
     "3.8.51.207/32", # cloudplatform-live1-2
     "35.177.252.54/32" # cloudplatform-live1-3
   ]
+  mp = [
+    "10.26.8.0/21" # HMPPS Test
+  ]
 
   all_ingress_ips = concat(local.moj_ips, local.unilink_ips, local.cp_ips)
 
