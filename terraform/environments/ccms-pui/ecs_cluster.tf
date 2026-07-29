@@ -111,7 +111,7 @@ resource "aws_ecs_service" "pui" {
   # # added/changed on an existing service (here: switching from launch_type
   # # to capacity_provider_strategy), so the change is applied via a fresh
   # # deployment rather than an in-place update.
-  # force_new_deployment = true
+  force_new_deployment = true
 
   # Use the cluster's capacity provider (with managed scaling enabled)
   # instead of a bare EC2 launch type, so ECS can grow the ASG automatically
