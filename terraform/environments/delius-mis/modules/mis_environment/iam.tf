@@ -93,7 +93,7 @@ locals {
 data "aws_iam_policy_document" "ec2_nextcloud" {
   # From AmazonElasticFileSystemsUtils without CreateLogGroup etc.
   statement {
-    sid    = "AmazonElasticFileSystemsUtils-1"
+    sid    = "AmazonElasticFileSystemsUtils1"
     effect = "Allow"
     actions = [
       "ssm:DescribeAssociation",
@@ -115,7 +115,7 @@ data "aws_iam_policy_document" "ec2_nextcloud" {
     resources = ["*"]
   }
   statement {
-    sid    = "AmazonElasticFileSystemsUtils-2"
+    sid    = "AmazonElasticFileSystemsUtils2"
     effect = "Allow"
     actions = [
       "ssmmessages:CreateControlChannel",
@@ -126,7 +126,7 @@ data "aws_iam_policy_document" "ec2_nextcloud" {
     resources = ["*"]
   }
   statement {
-    sid    = "AmazonElasticFileSystemsUtils-3"
+    sid    = "AmazonElasticFileSystemsUtils3"
     effect = "Allow"
     actions = [
       "ec2messages:AcknowledgeMessage",
@@ -139,7 +139,7 @@ data "aws_iam_policy_document" "ec2_nextcloud" {
     resources = ["*"]
   }
   statement {
-    sid    = "AmazonElasticFileSystemsUtils-4"
+    sid    = "AmazonElasticFileSystemsUtils4"
     effect = "Allow"
     actions = [
       "elasticfilesystem:DescribeMountTargets"
@@ -147,7 +147,7 @@ data "aws_iam_policy_document" "ec2_nextcloud" {
     resources = ["*"]
   }
   statement {
-    sid    = "AmazonElasticFileSystemsUtils-5"
+    sid    = "AmazonElasticFileSystemsUtils5"
     effect = "Allow"
     actions = [
       "ec2:DescribeAvailabilityZones"
@@ -155,7 +155,7 @@ data "aws_iam_policy_document" "ec2_nextcloud" {
     resources = ["*"]
   }
   statement {
-    sid    = "AmazonElasticFileSystemsUtils-6"
+    sid    = "AmazonElasticFileSystemsUtils6"
     effect = "Allow"
     actions = [
       "logs:PutLogEvents",
@@ -168,7 +168,7 @@ data "aws_iam_policy_document" "ec2_nextcloud" {
     resources = ["*"]
   }
   statement {
-    sid    = "AmazonElasticFileSystemsUtils-7"
+    sid    = "AmazonElasticFileSystemsUtils7"
     effect = "Allow"
     actions = [
       "cloudwatch:PutMetricData"
