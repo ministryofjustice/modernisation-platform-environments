@@ -8,6 +8,7 @@ locals {
       # whitelist-source-range annotation (values.yml.tftpl).
       mlflow_ingress_allowlist = [
         "128.77.75.64/26", # Prisma Corporate
+        "20.58.27.30/32",  # GitHub Runner (octo-production)
         # GlobalProtect (Alpha)
         "35.176.93.186/32",
         "18.169.147.172/32",
