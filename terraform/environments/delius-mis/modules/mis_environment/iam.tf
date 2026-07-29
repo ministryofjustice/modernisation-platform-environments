@@ -91,53 +91,56 @@ locals {
 }
 
 data "aws_iam_policy_document" "ec2_nextcloud" {
-  # From AmazonElasticFileSystemsUtils without CreateLogGroup etc.
-  statement {
-    sid    = "AmazonElasticFileSystemsUtils1"
-    effect = "Allow"
-    actions = [
-      "ssm:DescribeAssociation",
-      "ssm:GetDeployablePatchSnapshotForInstance",
-      "ssm:GetDocument",
-      "ssm:DescribeDocument",
-      "ssm:GetManifest",
-      "ssm:GetParameter",
-      "ssm:GetParameters",
-      "ssm:ListAssociations",
-      "ssm:ListInstanceAssociations",
-      "ssm:PutInventory",
-      "ssm:PutComplianceItems",
-      "ssm:PutConfigurePackageResult",
-      "ssm:UpdateAssociationStatus",
-      "ssm:UpdateInstanceAssociationStatus",
-      "ssm:UpdateInstanceInformation"
-    ]
-    resources = ["*"]
-  }
-  statement {
-    sid    = "AmazonElasticFileSystemsUtils2"
-    effect = "Allow"
-    actions = [
-      "ssmmessages:CreateControlChannel",
-      "ssmmessages:CreateDataChannel",
-      "ssmmessages:OpenControlChannel",
-      "ssmmessages:OpenDataChannel"
-    ]
-    resources = ["*"]
-  }
-  statement {
-    sid    = "AmazonElasticFileSystemsUtils3"
-    effect = "Allow"
-    actions = [
-      "ec2messages:AcknowledgeMessage",
-      "ec2messages:DeleteMessage",
-      "ec2messages:FailMessage",
-      "ec2messages:GetEndpoint",
-      "ec2messages:GetMessages",
-      "ec2messages:SendReply"
-    ]
-    resources = ["*"]
-  }
+  # Copied AmazonElasticFileSystemsUtils with an additional policy for cross-account mount and commenting out
+  # - update of the efs-utils via SSM since we install via ansible
+  # - automatic creation of log group since we add this via terraform
+
+  #statement {
+  #  sid    = "AmazonElasticFileSystemsUtils1"
+  #  effect = "Allow"
+  #  actions = [
+  #    "ssm:DescribeAssociation",
+  #    "ssm:GetDeployablePatchSnapshotForInstance",
+  #    "ssm:GetDocument",
+  #    "ssm:DescribeDocument",
+  #    "ssm:GetManifest",
+  #    "ssm:GetParameter",
+  #    "ssm:GetParameters",
+  #    "ssm:ListAssociations",
+  #    "ssm:ListInstanceAssociations",
+  #    "ssm:PutInventory",
+  #    "ssm:PutComplianceItems",
+  #    "ssm:PutConfigurePackageResult",
+  #    "ssm:UpdateAssociationStatus",
+  #    "ssm:UpdateInstanceAssociationStatus",
+  #    "ssm:UpdateInstanceInformation"
+  #  ]
+  #  resources = ["*"]
+  #}
+  #statement {
+  #  sid    = "AmazonElasticFileSystemsUtils2"
+  #  effect = "Allow"
+  #  actions = [
+  #    "ssmmessages:CreateControlChannel",
+  #    "ssmmessages:CreateDataChannel",
+  #    "ssmmessages:OpenControlChannel",
+  #    "ssmmessages:OpenDataChannel"
+  #  ]
+  #  resources = ["*"]
+  #}
+  #statement {
+  #  sid    = "AmazonElasticFileSystemsUtils3"
+  #  effect = "Allow"
+  #  actions = [
+  #    "ec2messages:AcknowledgeMessage",
+  #    "ec2messages:DeleteMessage",
+  #    "ec2messages:FailMessage",
+  #    "ec2messages:GetEndpoint",
+  #    "ec2messages:GetMessages",
+  #    "ec2messages:SendReply"
+  #  ]
+  #  resources = ["*"]
+  #}
   statement {
     sid    = "AmazonElasticFileSystemsUtils4"
     effect = "Allow"
@@ -180,6 +183,7 @@ data "aws_iam_policy_document" "ec2_nextcloud" {
       values   = ["efs-utils/S3Files", "efs-utils/EFS"]
     }
   }
+
   statement {
     sid    = "CrossAccountMount"
     effect = "Allow"
