@@ -37,6 +37,7 @@
 /terraform/environments/cloud-platform-non-live @ministryofjustice/cloud-platform-engineers @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/cloud-platform @ministryofjustice/cloud-platform-engineers @ministryofjustice/container-platform-aws @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/coat @ministryofjustice/cloud-optimisation-and-accountability @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
+/terraform/environments/container-platform-cd @ministryofjustice/cloud-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/container-platform-hmpps @ministryofjustice/cloud-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/container-platform-laa @ministryofjustice/cloud-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/container-platform-octo @ministryofjustice/cloud-platform-engineers @ministryofjustice/container-platform-aws @ministryofjustice/modernisation-platform
@@ -54,7 +55,7 @@
 /terraform/environments/data-factory-moj/streaming-poc-maf @ministryofjustice/data-factory-aker-team @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-moj/streaming-poc-opensearch-config @ministryofjustice/data-factory-aker-team @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-moj/streaming-poc-devops @ministryofjustice/data-factory-aker-team @ministryofjustice/modernisation-platform
-/terraform/environments/data-platform-governance @ministryofjustice/azure-aws-sso-data-platform-engineering @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
+/terraform/environments/data-platform-governance @ministryofjustice/azure-aws-sso-data-platform-engineering @ministryofjustice/data-platform-engineering @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform @ministryofjustice/data-platform-engineering @ministryofjustice/modernisation-platform
 /terraform/environments/delius-alfresco @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform
 /terraform/environments/delius-core-training @ministryofjustice/hmpps-migration @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform
