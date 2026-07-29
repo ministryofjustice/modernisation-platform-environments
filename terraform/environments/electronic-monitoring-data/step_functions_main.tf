@@ -387,7 +387,7 @@ resource "aws_cloudwatch_event_target" "landing_dlq_redriver" {
 module "trigger_cadt_step_function" {
   source       = "./modules/step_function"
   name         = "trigger-create-a-derived-table"
-  iam_policies = tomap({ "trigger_cadt_sf_policy" = aws_iam_policy.trigger_cadt_sf_policy })
+  iam_policies = tomap({ "trigger_cadt_step_function_policy" = aws_iam_policy.trigger_cadt_step_function_policy })
   variable_dictionary = tomap(
     {
       "trigger_cadt"   = module.trigger_cadt.lambda_function_name,
