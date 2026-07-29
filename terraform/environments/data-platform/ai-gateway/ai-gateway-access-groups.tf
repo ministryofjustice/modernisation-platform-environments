@@ -18,11 +18,4 @@ resource "litellm_unified_access_group" "generally_available_models" {
       if try(local.ai_gateway_configuration.models.microsoft_foundry[key].generally_available, false)
     ]
   )
-
-  # This didn't have the intended effect
-  assigned_team_ids = [
-    for team_name in sort(keys(try(local.ai_gateway_configuration.teams, {}))) :
-    litellm_team.teams[team_name].id
-    if contains(try(local.ai_gateway_configuration.teams[team_name].unified_access_groups, []), "generally-available-models")
-  ]
 }

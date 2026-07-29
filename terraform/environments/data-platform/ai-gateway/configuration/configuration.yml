@@ -3,6 +3,7 @@ organisations:
     alias: Ministry of Justice
 
 teams:
+  # litellm_team is currently missing the option to attach unified access groups, so for now we have to manually add them in the admin console.
   justice-data-platform:
     alias: Justice Data Platform
     organisation: ministryofjustice
