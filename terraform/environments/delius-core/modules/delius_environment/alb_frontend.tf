@@ -27,6 +27,16 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
   cidr_ipv4         = each.key # Global Protect VPN
 }
 
+resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_http_mp_allowlist" {
+  for_each          = toset(local.mp_natgw_ips)
+  security_group_id = aws_security_group.delius_frontend_alb_security_group.id
+  description       = "MP access into delius core frontend alb over http"
+  from_port         = "80"
+  to_port           = "80"
+  ip_protocol       = "tcp"
+  cidr_ipv4         = each.key
+}
+
 # temporary rule to allow traffic from legacy preprod nat gateway for testing
 # to be removed once testing is over and nat gateway removed
 resource "aws_vpc_security_group_ingress_rule" "preprod_alb_legacy_natgw_ing" {
