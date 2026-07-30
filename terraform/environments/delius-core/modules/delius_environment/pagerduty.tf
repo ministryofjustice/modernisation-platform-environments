@@ -1,5 +1,6 @@
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "delius_core_alarms" {
+  #checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
   name = "delius-core-${var.env_name}-alarms-topic"
   tags = var.tags
 }
