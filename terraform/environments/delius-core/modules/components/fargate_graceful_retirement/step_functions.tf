@@ -40,6 +40,7 @@ resource "aws_iam_role_policy_attachment" "step_function_policy_attachment" {
 }
 
 resource "aws_cloudwatch_log_group" "log_group_for_sfn" {
+  #checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
   name = "/aws/states/ecs_restart_state_machine/${var.environment}"
 }
 

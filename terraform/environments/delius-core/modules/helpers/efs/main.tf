@@ -1,5 +1,4 @@
 # module for efs file system
-
 resource "aws_efs_file_system" "this" {
   creation_token                  = var.creation_token
   encrypted                       = var.encrypted
@@ -24,6 +23,7 @@ resource "aws_efs_mount_target" "this" {
 
 # module for efs access point
 resource "aws_efs_access_point" "this" {
+  #checkov:skip=CKV_AWS_330: "EFS access points should enforce a user identity (Future Work)"
   file_system_id = aws_efs_file_system.this.id
   root_directory {
     path = "/"

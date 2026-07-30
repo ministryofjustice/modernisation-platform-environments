@@ -195,6 +195,7 @@ resource "aws_route53_record" "pwm_amazonses_dmarc_record" {
 #####################
 
 resource "aws_iam_user" "pwm_ses_smtp_user" {
+  #checkov:skip=CKV_AWS_273: SES SMTP authentication requires IAM user credentials; no human access is granted
   name = "${var.env_name}-pwm-smtp-user"
 }
 

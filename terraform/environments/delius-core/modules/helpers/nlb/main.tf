@@ -33,6 +33,7 @@ resource "aws_lb_listener" "ldaps" {
   load_balancer_arn = aws_lb.this.arn
   port              = var.secure_port
   protocol          = "TLS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
 
   default_action {
     type             = "forward"

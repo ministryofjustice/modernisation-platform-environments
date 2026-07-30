@@ -373,6 +373,7 @@ resource "aws_acm_certificate_validation" "ldap_external" {
 }
 
 resource "aws_cloudwatch_log_group" "ldap_automation" {
+  #checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
   name              = "/ecs/ldap-automation-${var.env_name}"
   retention_in_days = 7
   tags              = var.tags
