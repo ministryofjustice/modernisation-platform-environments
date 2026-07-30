@@ -90,6 +90,7 @@ module "bps_instance" {
     aws_iam_policy.secrets_manager.arn,
     aws_iam_policy.business_unit_kms_key_access[0].arn,
     aws_iam_policy.ec2_automation.arn,
+    aws_iam_policy.ec2_nextcloud.arn,
   ]
 
   user_data_cloud_init = {
