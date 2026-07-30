@@ -206,7 +206,7 @@ locals {
   # Maintenance Window configuration
 
   # Single source of truth for where MW resources should exist.
-  ssm_mw_environments = toset(["test", "production"])
+  ssm_mw_environments = toset(["production"])
   ssm_mw_enabled      = contains(local.ssm_mw_environments, local.environment)
   mw_config_by_environment = {
     production = {
