@@ -90,7 +90,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "ssm:GetParameter",
           "ssm:GetParameters"
         ],
-        "Resource" : "${aws_ssm_parameter.ldap_circuit_breaker.arn}"
+        "Resource" : "aws_ssm_parameter.ldap_circuit_breaker.arn"
       }
     ]
   })
