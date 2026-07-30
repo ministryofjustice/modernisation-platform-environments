@@ -8,6 +8,7 @@ locals {
     legacy_dns_ip_addrs                    = ["10.160.35.243", "10.160.38.128"]
     legacy_resolver_ip_addrs               = ["10.160.35.130", "10.160.37.70", "10.160.42.118"]
     legacy_nextcloud_efs_dns_name          = "fs-aaef805b.efs.eu-west-2.amazonaws.com"
+    legacy_nextcloud_efs_id                = "fs-aaef805b"
     ad_domain_name                         = "delius-mis-stage.internal"
     ad_trust_domain_name                   = "azure.hmpp.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
