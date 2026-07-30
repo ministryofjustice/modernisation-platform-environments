@@ -26,7 +26,7 @@ module "get_zipped_file_api_api" {
   }
   api_version = "0.1.1"
   api_gateway_endpoint = data.aws_vpc_endpoint.api_gateway.id 
-  roles_to_allow = [module.cmt_front_end_assumable_role.iam_role_name]
+  roles_to_allow = [module.cmt_front_end_assumable_role.arn]
 }
 
 module "ears_sars_api" {
@@ -75,7 +75,7 @@ module "ears_sars_api" {
   }
   api_version = "0.1.1"
   api_gateway_endpoint = data.aws_vpc_endpoint.api_gateway.id
-  roles_to_allow = local.is-preproduction ? [module.emd_ears_sars_cp_role[0].iam_role_name] : []
+  roles_to_allow = local.is-preproduction ? [module.emd_ears_sars_cp_role[0].iam_role_name] : tolist(data.aws_iam_roles.mod_plat_roles.arns)
 }
 
 resource "aws_api_gateway_account" "global_usage" {
@@ -498,5 +498,5 @@ module "trigger_cadt_api" {
   api_version = "0.1.0"
 
   api_gateway_endpoint = data.aws_vpc_endpoint.api_gateway.id
-  roles_to_allow = []
+  roles_to_allow = tolist(data.aws_iam_roles.mod_plat_roles.arns)
 }
