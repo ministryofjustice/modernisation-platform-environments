@@ -40,3 +40,7 @@ data "aws_secretsmanager_secret_version" "litellm_entra_id" {
 }
 
 data "aws_elb_service_account" "current" {}
+
+data "aws_secretsmanager_secret_version" "microsoft_foundry_jedi_gateway_development" {
+  secret_id = module.microsoft_foundry_jedi_gateway_development_secret.secret_id
+}

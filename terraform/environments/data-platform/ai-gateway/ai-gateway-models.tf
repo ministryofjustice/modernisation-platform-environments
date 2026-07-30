@@ -50,10 +50,14 @@ resource "litellm_model" "google_gemini_enterprise_agent_platform" {
 resource "litellm_model" "microsoft_foundry" {
   for_each = try(tomap(local.ai_gateway_configuration.models.microsoft_foundry), {})
 
-  custom_llm_provider = "azure"
+  custom_llm_provider = each.value.model_provider
   model_name          = "azure-${each.key}"
   base_model          = each.value.model_id
   tier                = "paid"
+
+  model_api_base = "${jsondecode(data.aws_secretsmanager_secret_version.microsoft_foundry_jedi_gateway_development.secret_string)["endpoint"]}/${each.value.model_endpoint}"
+  model_api_key  = jsondecode(data.aws_secretsmanager_secret_version.microsoft_foundry_jedi_gateway_development.secret_string)["api_key"]
+  api_version    = try(each.value.model_api_version, null)
 
   additional_litellm_params = {
     ai_model_provider            = "Microsoft Foundry"
