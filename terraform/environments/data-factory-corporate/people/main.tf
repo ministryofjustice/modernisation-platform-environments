@@ -1,5 +1,5 @@
 module "sherlock_landing_bucket" {
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/s3-bucket?ref=d349d84388ff71e70a2bf7e3076b1d31795ecc23"
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/s3-bucket?ref=313b46a604dc6aaee1d7309990388c6687272b6e"
 
   bucket_prefix = "landing-sherlock"
   kms_key_arn   = module.sherlock_kms_key.key_arn
