@@ -33,6 +33,30 @@ spec:
         apiVersions: ["v1"]
         operations: ["CREATE", "UPDATE"]
         resources: ["pods"]
+  matchConditions:
+    # Mirrors resourceFiltersIncludeNamespaces; ValidatingPolicy ignores the Kyverno ConfigMap filters.
+    - name: exclude-namespaces
+      expression: >-
+        !request.namespace.startsWith('kube-') &&
+        ![
+          'ai-gateway',
+          'amazon-guardduty',
+          'amazon-network-flow-monitor',
+          'app',
+          'aws-cloudwatch-observability',
+          'cert-manager',
+          'cilium-secrets',
+          'cluster-autoscaler',
+          'external-dns',
+          'external-secrets',
+          'fluent-bit',
+          'karpenter',
+          'keda',
+          'kyverno',
+          'metrics-server',
+          'prometheus',
+          'shared-services'
+        ].exists(ns, ns == request.namespace)
   variables:
     - name: labels
       expression: object.metadata.?labels.orValue({})

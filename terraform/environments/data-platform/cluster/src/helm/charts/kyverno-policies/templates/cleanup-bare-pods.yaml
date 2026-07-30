@@ -23,5 +23,28 @@ spec:
     - name: is-bare-pod
       expression: >-
         !has(object.metadata.ownerReferences) || size(object.metadata.ownerReferences) == 0
+    # DeletingPolicy runs in background; object.metadata.namespace is used instead of request.namespace.
+    - name: exclude-namespaces
+      expression: >-
+        !object.metadata.namespace.startsWith('kube-') &&
+        ![
+          'ai-gateway',
+          'amazon-guardduty',
+          'amazon-network-flow-monitor',
+          'app',
+          'aws-cloudwatch-observability',
+          'cert-manager',
+          'cilium-secrets',
+          'cluster-autoscaler',
+          'external-dns',
+          'external-secrets',
+          'fluent-bit',
+          'karpenter',
+          'keda',
+          'kyverno',
+          'metrics-server',
+          'prometheus',
+          'shared-services'
+        ].exists(ns, ns == object.metadata.namespace)
   # Runs daily at 02:00 UTC.
   schedule: "0 2 * * *"

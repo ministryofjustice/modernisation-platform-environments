@@ -28,6 +28,30 @@ spec:
         # Scope the webhook to just the auto-created 'default' ServiceAccount,
         # so Kyverno is only invoked for it rather than every ServiceAccount.
         resourceNames: ["default"]
+  matchConditions:
+    # Mirrors resourceFiltersIncludeNamespaces; MutatingPolicy ignores the Kyverno ConfigMap filters.
+    - name: exclude-namespaces
+      expression: >-
+        !request.namespace.startsWith('kube-') &&
+        ![
+          'ai-gateway',
+          'amazon-guardduty',
+          'amazon-network-flow-monitor',
+          'app',
+          'aws-cloudwatch-observability',
+          'cert-manager',
+          'cilium-secrets',
+          'cluster-autoscaler',
+          'external-dns',
+          'external-secrets',
+          'fluent-bit',
+          'karpenter',
+          'keda',
+          'kyverno',
+          'metrics-server',
+          'prometheus',
+          'shared-services'
+        ].exists(ns, ns == request.namespace)
   mutations:
     - patchType: ApplyConfiguration
       applyConfiguration:
