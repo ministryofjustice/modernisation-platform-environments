@@ -26,7 +26,7 @@ module "get_zipped_file_api_api" {
   }
   api_version = "0.1.1"
   api_gateway_endpoint = data.aws_vpc_endpoint.api_gateway.id 
-  roles_to_allow = [module.cmt_front_end_assumable_role.this_iam_role_arn]
+  roles_to_allow = [module.cmt_front_end_assumable_role.iam_role_arn]
 }
 
 module "ears_sars_api" {
