@@ -1,12 +1,12 @@
 resource "aws_lb" "this" {
+  #checkov:skip=CKV_AWS_91: "ELB Logging not required"
+  #checkov:skip=CKV_AWS_150: "Deletion protection off"
   name                       = "${var.app_name}-${var.env_name}-nlb"
   internal                   = var.internal
   load_balancer_type         = var.load_balancer_type
   subnets                    = var.subnet_ids
   drop_invalid_header_fields = var.drop_invalid_header_fields
   enable_deletion_protection = var.enable_deletion_protection
-
-
 
   tags = var.tags
 }

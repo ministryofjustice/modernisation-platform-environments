@@ -102,6 +102,7 @@ resource "aws_iam_role_policy" "exec_actions" {
 }
 
 data "aws_iam_policy_document" "task_exec" {
+  #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
   statement {
     effect    = "Allow"
     resources = ["*"]

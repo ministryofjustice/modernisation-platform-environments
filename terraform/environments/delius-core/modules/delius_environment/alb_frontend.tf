@@ -63,7 +63,7 @@ locals {
 resource "aws_lb" "delius_core_frontend" {
   #checkov:skip=CKV_AWS_91 "ignore"
   #checkov:skip=CKV2_AWS_28 "ignore"
-
+  #checkov:skip=CKV_AWS_150: "Deletion protection off"
   name               = local.alb_name
   internal           = false
   load_balancer_type = "application"

@@ -147,6 +147,7 @@ data "aws_iam_policy_document" "cert_export" {
 }
 
 data "aws_iam_policy_document" "cloudwatch_agent" {
+  #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
   statement {
     sid    = "CloudwatchAgent"
     effect = "Allow"

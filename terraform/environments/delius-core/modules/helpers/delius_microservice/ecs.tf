@@ -49,7 +49,7 @@ module "ecs_policies" {
 module "ecs_service" {
   count = var.create_service ? 1 : 0
 
-  source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v697b010957fabc36b7f648bc535021231f748674" #v6.0.2
+  source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=697b010957fabc36b7f648bc535021231f748674" #v6.0.2
   container_definitions = nonsensitive(module.container_definition[0].json_encoded_list)
   cluster_arn           = var.ecs_cluster_arn
   name                  = "${var.env_name}-${var.name}"
