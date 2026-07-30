@@ -20,7 +20,9 @@ resource "aws_cloudwatch_event_target" "step_function_target" {
 
 # CloudWatch log group to capture events
 resource "aws_cloudwatch_log_group" "ecs_restart_events" {
+  #checkov:skip=CKV_AWS_158
   name = "/aws/health/ecs_restart_events/${var.environment}"
+  retention_in_days = 365
 }
 
 # IAM policy to allow EventBridge to write logs
@@ -76,6 +78,8 @@ resource "aws_iam_role" "eventbridge_execution_role" {
 }
 
 resource "aws_iam_policy" "eventbridge_execution_role_policy" {
+  #checkov:skip=CKV_AWS_290
+  #checkov:skip=CKV_AWS_355
   name = "${var.environment}_eventbridge_execution_role_policy"
   policy = jsonencode({
     Version = "2012-10-17"

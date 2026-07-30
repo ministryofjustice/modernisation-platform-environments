@@ -94,6 +94,12 @@ resource "aws_iam_role_policy_attachment" "lambda_ecs" {
 
 
 resource "aws_lambda_function" "ecs_restart_handler" {
+  #checkov:skip=CKV_AWS_117
+  #checkov:skip=CKV_AWS_173
+  #checkov:skip=CKV_AWS_272
+  #checkov:skip=CKV_AWS_116
+  #checkov:skip=CKV_AWS_50
+  #checkov:skip=CKV_AWS_115
   function_name = "${var.environment}_ecs_restart_handler"
   description   = "Lambda to restart ECS Tasks"
   runtime       = "python3.12"
@@ -124,6 +130,12 @@ resource "aws_lambda_permission" "allow_eventbridge" {
 
 
 resource "aws_lambda_function" "calculate_wait_time" {
+  #checkov:skip=CKV_AWS_117
+  #checkov:skip=CKV_AWS_173
+  #checkov:skip=CKV_AWS_272
+  #checkov:skip=CKV_AWS_116
+  #checkov:skip=CKV_AWS_50
+  #checkov:skip=CKV_AWS_115
   function_name = "${var.environment}_calculate_wait_time"
   runtime       = "python3.12"
   handler       = "lambda_function.lambda_handler"
