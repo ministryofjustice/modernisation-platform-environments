@@ -323,7 +323,6 @@ resource "aws_cloudwatch_metric_alarm" "dms_alarm" {
   evaluation_periods = 8
   datapoints_to_alarm = 8
 
-  evaluation_periods  = 1
   metric_name         = "DMSTaskNotRunning"
   namespace           = "Custom/DMS"
   period              = 300
