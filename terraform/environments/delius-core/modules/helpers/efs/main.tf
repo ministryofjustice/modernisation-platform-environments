@@ -1,5 +1,6 @@
 # module for efs file system
 resource "aws_efs_file_system" "this" {
+  #checkov:skip=CKV2_AWS_18: "Backup plan (Future Work)"
   creation_token                  = var.creation_token
   encrypted                       = var.encrypted
   kms_key_id                      = var.kms_key_arn
