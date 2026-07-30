@@ -7,6 +7,7 @@ module "ecs" {
 }
 
 resource "aws_security_group" "cluster" {
+  #checkov:skip=CKV2_AWS_5: "SG passed to ecs service module"
   name_prefix = "ecs-cluster-${var.env_name}"
   vpc_id      = var.account_config.shared_vpc_id
   description = "ECS cluster SG"

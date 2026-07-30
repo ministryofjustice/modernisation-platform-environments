@@ -8,6 +8,7 @@ locals {
 
 resource "aws_ssm_parameter" "plain" {
   #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
+  #checkov:skip=CKV2_AWS_34: "Standard KMS is fine"
   for_each = local.params_plain
   name     = "/${var.environment_name}/${var.application_name}/${each.key}"
   type     = "String"

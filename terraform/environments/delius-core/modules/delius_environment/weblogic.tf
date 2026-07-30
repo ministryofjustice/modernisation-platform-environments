@@ -242,9 +242,13 @@ resource "aws_lb_listener_certificate" "legacy" {
 resource "aws_acm_certificate" "legacy_prod" {
   count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name == "prod" ? 1 : 0
 
-  domain_name       = "*.probation.service.justice.gov.uk"
+  domain_name       = "ndelius.probation.service.justice.gov.uk"
   validation_method = "DNS"
   tags              = var.tags
+
+  subject_alternative_names = [
+    "interface.probation.service.justice.gov.uk"
+  ]
 
   lifecycle {
     create_before_destroy = true
