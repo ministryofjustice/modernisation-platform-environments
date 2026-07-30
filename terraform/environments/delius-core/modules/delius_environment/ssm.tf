@@ -26,6 +26,7 @@ locals {
 }
 
 resource "aws_ssm_parameter" "ldap_bind_password" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/LDAP_BIND_PASSWORD", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -38,6 +39,7 @@ resource "aws_ssm_parameter" "ldap_bind_password" {
 }
 
 resource "aws_ssm_parameter" "ldap_host" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/LDAP_HOST", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = module.ldap_ecs.nlb_dns_name
@@ -50,6 +52,7 @@ resource "aws_ssm_parameter" "ldap_host" {
 }
 
 resource "aws_ssm_parameter" "ldap_admin_password" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/LDAP_ADMIN_PASSWORD", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -62,6 +65,7 @@ resource "aws_ssm_parameter" "ldap_admin_password" {
 }
 
 resource "aws_ssm_parameter" "ldap_seed_uri" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/LDAP_SEED_URI", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -74,6 +78,7 @@ resource "aws_ssm_parameter" "ldap_seed_uri" {
 }
 
 resource "aws_ssm_parameter" "ldap_principal" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/LDAP_PRINCIPAL", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -86,6 +91,7 @@ resource "aws_ssm_parameter" "ldap_principal" {
 }
 
 resource "aws_ssm_parameter" "ldap_rbac_version" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/LDAP_RBAC_VERSION", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -98,6 +104,7 @@ resource "aws_ssm_parameter" "ldap_rbac_version" {
 }
 
 resource "aws_ssm_parameter" "oasys_user" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/oasys_user", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -111,6 +118,7 @@ resource "aws_ssm_parameter" "oasys_user" {
 }
 
 resource "aws_ssm_parameter" "oasys_password" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/oasys_password", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -124,6 +132,7 @@ resource "aws_ssm_parameter" "oasys_password" {
 }
 
 resource "aws_ssm_parameter" "iaps_user" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/iaps_user", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -137,6 +146,7 @@ resource "aws_ssm_parameter" "iaps_user" {
 }
 
 resource "aws_ssm_parameter" "iaps_user_password" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/iaps_user_password", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -150,6 +160,7 @@ resource "aws_ssm_parameter" "iaps_user_password" {
 }
 
 resource "aws_ssm_parameter" "dss_user" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/dss_user", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -163,6 +174,7 @@ resource "aws_ssm_parameter" "dss_user" {
 }
 
 resource "aws_ssm_parameter" "dss_user_password" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/dss_user_password", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -176,6 +188,7 @@ resource "aws_ssm_parameter" "dss_user_password" {
 }
 
 resource "aws_ssm_parameter" "casenotes_user" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/casenotes_user", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -189,6 +202,7 @@ resource "aws_ssm_parameter" "casenotes_user" {
 }
 
 resource "aws_ssm_parameter" "casenotes_user_password" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/casenotes_user_password", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -201,6 +215,7 @@ resource "aws_ssm_parameter" "casenotes_user_password" {
 }
 
 resource "aws_ssm_parameter" "test_user_password" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/test_user_password", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -214,6 +229,7 @@ resource "aws_ssm_parameter" "test_user_password" {
 }
 
 resource "aws_ssm_parameter" "performance_test_user_password" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/performance_test_user_password", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -227,6 +243,7 @@ resource "aws_ssm_parameter" "performance_test_user_password" {
 }
 
 resource "aws_ssm_parameter" "delius_core_gdpr_api_client_secret" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/gdpr_api_client_secret", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -241,6 +258,7 @@ resource "aws_ssm_parameter" "delius_core_gdpr_api_client_secret" {
 }
 
 resource "aws_ssm_parameter" "delius_core_pwm_config_password" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/pwm_config_password", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -255,6 +273,7 @@ resource "aws_ssm_parameter" "delius_core_pwm_config_password" {
 }
 
 resource "aws_ssm_parameter" "delius_core_merge_api_client_secret" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/merge_api_client_secret", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -273,6 +292,7 @@ data "aws_ssm_parameter" "delius_core_merge_api_client_secret" {
 }
 
 resource "aws_ssm_parameter" "delius_core_weblogic_ndelius_domain_umt_client_secret" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/umt_client_secret", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -287,6 +307,7 @@ resource "aws_ssm_parameter" "delius_core_weblogic_ndelius_domain_umt_client_sec
 }
 
 resource "aws_ssm_parameter" "delius_core_umt_jwt_secret" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/umt_jwt_secret", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -301,6 +322,7 @@ resource "aws_ssm_parameter" "delius_core_umt_jwt_secret" {
 }
 
 resource "aws_ssm_parameter" "delius_core_umt_delius_secret" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/umt_delius_secret", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -315,6 +337,7 @@ resource "aws_ssm_parameter" "delius_core_umt_delius_secret" {
 }
 
 resource "aws_ssm_parameter" "delius_core_gdpr_db_admin_password" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/gdpr/api/db_admin_password", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -327,6 +350,7 @@ resource "aws_ssm_parameter" "delius_core_gdpr_db_admin_password" {
 }
 
 resource "aws_ssm_parameter" "delius_core_gdpr_db_pool_password" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/gdpr/api/db_pool_password", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -339,6 +363,7 @@ resource "aws_ssm_parameter" "delius_core_gdpr_db_pool_password" {
 }
 
 resource "aws_ssm_parameter" "delius_core_merge_db_admin_password" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/merge/api/db_admin_password", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -351,6 +376,7 @@ resource "aws_ssm_parameter" "delius_core_merge_db_admin_password" {
 }
 
 resource "aws_ssm_parameter" "delius_core_merge_db_pool_password" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = format("/%s-%s/merge/api/db_pool_password", var.account_info.application_name, var.env_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"

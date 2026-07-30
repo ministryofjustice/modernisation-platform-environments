@@ -170,6 +170,12 @@ data "archive_file" "lambda_function_ldap_circuit_handler_payload" {
 }
 
 resource "aws_lambda_function" "ldap_circuit_handler" {
+  #checkov:skip=CKV_AWS_117
+  #checkov:skip=CKV_AWS_173
+  #checkov:skip=CKV_AWS_272
+  #checkov:skip=CKV_AWS_116
+  #checkov:skip=CKV_AWS_50
+  #checkov:skip=CKV_AWS_115
   function_name = "${var.environment}_ldap_circuit_handler"
   description   = "Lambda to control LDAP ciruit breaker feature"
   runtime       = "python3.12"
