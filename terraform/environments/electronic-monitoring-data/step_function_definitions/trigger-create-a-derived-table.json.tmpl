@@ -14,7 +14,7 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "Output": "{% $states.result.Payload %}",
       "Arguments": {
-        "Payload": "{% $states.input %}",
+        "Payload": "$",
         "FunctionName": "${trigger_cadt}"
       },
       "Retry": [
