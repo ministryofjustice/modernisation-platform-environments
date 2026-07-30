@@ -32,13 +32,39 @@ resource "aws_vpc_security_group_ingress_rule" "alb_ingress_7001_preproduction_a
   description       = "7001 from AWS Workspaces"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "alb_ingress_443_all" {
+resource "aws_security_group_rule" "alb_ingress_443_private_subnets" {
   security_group_id = aws_security_group.opahub_load_balancer.id
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "tcp"
+  type              = "ingress"
+  description       = "HTTPS from private subnets"
+  protocol          = "tcp"
   from_port         = 443
   to_port           = 443
-  description       = "HTTPS from anywhere (WAF controlled)"
+  cidr_blocks = [
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block
+  ]
+}
+
+resource "aws_security_group_rule" "alb_ingress_443_production_cidr" {
+  count             = local.is-production ? 1 : 0
+  security_group_id = aws_security_group.opahub_load_balancer.id
+  type              = "ingress"
+  description       = "HTTPS from production CIDR"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = ["172.31.192.0/18"]
+}
+
+resource "aws_security_group_rule" "alb_ingress_443_workspace" {
+  security_group_id = aws_security_group.opahub_load_balancer.id
+  type              = "ingress"
+  description       = "HTTPS from AWS Workspaces"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace]
 }
 
 resource "aws_security_group_rule" "alb_egress_oia_ec2" {
