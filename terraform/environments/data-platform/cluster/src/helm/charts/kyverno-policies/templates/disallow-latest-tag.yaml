@@ -39,25 +39,7 @@ spec:
     - name: exclude-namespaces
       expression: >-
         !request.namespace.startsWith('kube-') &&
-        ![
-          'ai-gateway',
-          'amazon-guardduty',
-          'amazon-network-flow-monitor',
-          'app',
-          'aws-cloudwatch-observability',
-          'cert-manager',
-          'cilium-secrets',
-          'cluster-autoscaler',
-          'external-dns',
-          'external-secrets',
-          'fluent-bit',
-          'karpenter',
-          'keda',
-          'kyverno',
-          'metrics-server',
-          'prometheus',
-          'shared-services'
-        ].exists(ns, ns == request.namespace)
+        !{{ .Values.excludedNamespaces | toJson }}.exists(ns, ns == request.namespace)
   variables:
     - name: allContainers
       expression: >-

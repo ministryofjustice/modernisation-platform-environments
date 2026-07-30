@@ -30,25 +30,7 @@ spec:
     - name: exclude-namespaces
       expression: >-
         !request.name.startsWith('kube-') &&
-        ![
-          'ai-gateway',
-          'amazon-guardduty',
-          'amazon-network-flow-monitor',
-          'app',
-          'aws-cloudwatch-observability',
-          'cert-manager',
-          'cilium-secrets',
-          'cluster-autoscaler',
-          'external-dns',
-          'external-secrets',
-          'fluent-bit',
-          'karpenter',
-          'keda',
-          'kyverno',
-          'metrics-server',
-          'prometheus',
-          'shared-services'
-        ].exists(ns, ns == request.name)
+        !{{ .Values.excludedNamespaces | toJson }}.exists(ns, ns == request.name)
   variables:
     - name: nsName
       expression: object.metadata.name

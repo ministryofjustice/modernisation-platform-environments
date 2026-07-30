@@ -33,6 +33,24 @@ environment:
       metrics_server: "3.13.1"
     kyverno_policies:
       validation_action: "Audit"
+      excluded_namespaces:
+        - ai-gateway
+        - amazon-guardduty
+        - amazon-network-flow-monitor
+        - app
+        - aws-cloudwatch-observability
+        - cert-manager
+        - cilium-secrets
+        - cluster-autoscaler
+        - external-dns
+        - external-secrets
+        - fluent-bit
+        - karpenter
+        - keda
+        - kyverno
+        - metrics-server
+        - prometheus
+        - shared-services
     route53_zones:
       - "development.data-platform.service.justice.gov.uk"
       - "development.ai-gateway.justice.gov.uk"
@@ -71,6 +89,24 @@ environment:
       metrics_server: "3.13.1"
     kyverno_policies:
       validation_action: "Audit"
+      excluded_namespaces:
+        - ai-gateway
+        - amazon-guardduty
+        - amazon-network-flow-monitor
+        - app
+        - aws-cloudwatch-observability
+        - cert-manager
+        - cilium-secrets
+        - cluster-autoscaler
+        - external-dns
+        - external-secrets
+        - fluent-bit
+        - karpenter
+        - keda
+        - kyverno
+        - metrics-server
+        - prometheus
+        - shared-services
     route53_zones:
       - "test.data-platform.service.justice.gov.uk"
       - "test.ai-gateway.justice.gov.uk"
@@ -109,6 +145,24 @@ environment:
       metrics_server: "3.13.1"
     kyverno_policies:
       validation_action: "Audit"
+      excluded_namespaces:
+        - ai-gateway
+        - amazon-guardduty
+        - amazon-network-flow-monitor
+        - app
+        - aws-cloudwatch-observability
+        - cert-manager
+        - cilium-secrets
+        - cluster-autoscaler
+        - external-dns
+        - external-secrets
+        - fluent-bit
+        - karpenter
+        - keda
+        - kyverno
+        - metrics-server
+        - prometheus
+        - shared-services
     route53_zones:
       - "preproduction.data-platform.service.justice.gov.uk"
       - "preproduction.ai-gateway.justice.gov.uk"
@@ -147,6 +201,24 @@ environment:
       metrics_server: "3.13.1"
     kyverno_policies:
       validation_action: "Audit"
+      excluded_namespaces:
+        - ai-gateway
+        - amazon-guardduty
+        - amazon-network-flow-monitor
+        - app
+        - aws-cloudwatch-observability
+        - cert-manager
+        - cilium-secrets
+        - cluster-autoscaler
+        - external-dns
+        - external-secrets
+        - fluent-bit
+        - karpenter
+        - keda
+        - kyverno
+        - metrics-server
+        - prometheus
+        - shared-services
     route53_zones:
       - "data-platform.service.justice.gov.uk"
       - "ai-gateway.justice.gov.uk"
