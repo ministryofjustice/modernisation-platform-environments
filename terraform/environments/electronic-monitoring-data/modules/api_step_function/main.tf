@@ -79,6 +79,41 @@ resource "aws_api_gateway_method" "get_status" {
   }
 }
 
+data "aws_iam_policy_document" "vpc_policy" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = var.roles_to_allow
+    }
+
+    actions   = ["execute-api:Invoke"]
+    resources = ["${aws_api_gateway_rest_api.api_gateway.execution_arn}/*"]
+  }
+  statement {
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["execute-api:Invoke"]
+    condition {
+      test     = "StringNotEquals"
+      variable = "aws:sourceVpce"
+      values = [
+        var.api_gateway_endpoint
+      ]
+    }
+    resources = ["${aws_api_gateway_rest_api.api_gateway.execution_arn}/*"]
+  }
+}
+
+resource "aws_api_gateway_rest_api_policy" "vpc_policy" {
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+  policy      = data.aws_iam_policy_document.vpc_policy.json
+}
+
 # --------------------------------------------------------
 # API Validator
 # --------------------------------------------------------

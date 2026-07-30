@@ -74,3 +74,7 @@ variable "api_gateway_endpoint" {
   type        = string
 }
 
+variable "roles_to_allow" {
+  description = "Role ARNs to allow to trigger the API"
+  type = list(string)
+}
