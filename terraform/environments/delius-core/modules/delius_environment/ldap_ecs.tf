@@ -316,6 +316,7 @@ resource "aws_lb_listener" "ldaps" {
   load_balancer_arn = module.ldap_ecs.nlb_arn
   port              = 636
   protocol          = "TLS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
 
   default_action {
     type             = "forward"

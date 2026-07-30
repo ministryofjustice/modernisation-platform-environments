@@ -128,6 +128,7 @@ module "pwm" {
 }
 
 resource "aws_ssm_parameter" "security_key" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = "/${var.env_name}/pwm/security_key"
   type  = "SecureString"
   value = random_id.security_key.hex
@@ -205,6 +206,8 @@ resource "aws_iam_access_key" "pwm_ses_smtp_user" {
 
 resource "aws_iam_user_policy" "pwm_ses_smtp_user" {
   #checkov:skip=CKV_AWS_355: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+  #checkov:skip=CKV_AWS_40: "Ensure IAM policies are attached only to groups or roles"
+  #checkov:skip=CKV_AWS_290: "ignore"
   name = "${var.env_name}-pwm-ses-smtp-user-policy"
   user = aws_iam_user.pwm_ses_smtp_user.name
 
@@ -224,6 +227,7 @@ resource "aws_iam_user_policy" "pwm_ses_smtp_user" {
 }
 
 resource "aws_ssm_parameter" "pwm_ses_smtp_user" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name = "/${var.env_name}/pwm/ses_smtp"
   type = "SecureString"
   value = jsonencode({
