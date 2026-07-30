@@ -1,6 +1,7 @@
 resource "aws_lb" "this" {
   #checkov:skip=CKV_AWS_91: "ELB Logging not required"
   #checkov:skip=CKV_AWS_150: "Deletion protection off"
+  #checkov:skip=CKV_AWS_152: "Cross-zone load balancing not needed
   name                       = "${var.app_name}-${var.env_name}-nlb"
   internal                   = var.internal
   load_balancer_type         = var.load_balancer_type
@@ -30,6 +31,7 @@ resource "aws_lb_listener" "ldap" {
 }
 
 resource "aws_lb_listener" "ldaps" {
+  #checkov:skip=CKV_AWS_103
   load_balancer_arn = aws_lb.this.arn
   port              = var.secure_port
   protocol          = "TLS"

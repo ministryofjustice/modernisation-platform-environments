@@ -21,7 +21,7 @@ resource "aws_cloudwatch_event_target" "step_function_target" {
 # CloudWatch log group to capture events
 resource "aws_cloudwatch_log_group" "ecs_restart_events" {
   #checkov:skip=CKV_AWS_158
-  name = "/aws/health/ecs_restart_events/${var.environment}"
+  name              = "/aws/health/ecs_restart_events/${var.environment}"
   retention_in_days = 365
 }
 

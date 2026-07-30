@@ -31,6 +31,7 @@ resource "aws_dms_endpoint" "dms_audit_source_endpoint_db" {
 # The endpoint for user (USER_) is the Delius database.
 resource "aws_dms_endpoint" "dms_user_source_endpoint_db" {
   #checkov:skip=CKV_AWS_296
+  #checkov:skip=CKV2_AWS_49: "We use NNE instead of SSL"
   count         = try(var.dms_config.user_source_endpoint.read_database, null) == null ? 0 : 1
   database_name = var.dms_config.user_source_endpoint.read_database
   endpoint_id   = "${var.env_name}-user-data-from-${lower(var.dms_config.user_source_endpoint.read_database)}"

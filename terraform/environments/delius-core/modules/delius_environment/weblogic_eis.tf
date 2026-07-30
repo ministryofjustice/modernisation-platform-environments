@@ -16,7 +16,7 @@ module "weblogic_eis" {
 
   force_new_deployment = false
 
-  ecs_cluster_arn  = module.ecs.ecs_cluster_arn
+  ecs_cluster_arn = module.ecs.ecs_cluster_arn
 
   cluster_security_group_id = aws_security_group.cluster.id
 

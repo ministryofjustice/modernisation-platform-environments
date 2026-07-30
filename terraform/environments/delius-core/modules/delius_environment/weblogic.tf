@@ -15,7 +15,7 @@ module "weblogic" {
 
   force_new_deployment = false
 
-  ecs_cluster_arn  = module.ecs.ecs_cluster_arn
+  ecs_cluster_arn = module.ecs.ecs_cluster_arn
 
   cluster_security_group_id = aws_security_group.cluster.id
 
@@ -219,9 +219,13 @@ locals {
 resource "aws_acm_certificate" "legacy" {
   count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name != "prod" ? 1 : 0
 
-  domain_name       = "*.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"
+  domain_name       = "ndelius.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"
   validation_method = "DNS"
   tags              = var.tags
+
+  subject_alternative_names = [
+    "interface.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"
+  ]
 
   lifecycle {
     create_before_destroy = true

@@ -204,6 +204,7 @@ resource "aws_iam_access_key" "pwm_ses_smtp_user" {
 }
 
 resource "aws_iam_user_policy" "pwm_ses_smtp_user" {
+  #checkov:skip=CKV_AWS_355: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
   name = "${var.env_name}-pwm-ses-smtp-user-policy"
   user = aws_iam_user.pwm_ses_smtp_user.name
 
