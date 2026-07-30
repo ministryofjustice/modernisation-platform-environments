@@ -73,6 +73,8 @@ app:
         secretKeyRef:
           name: app-secrets
           key: ai-gateway-master-key
+    - name: GOOGLE_ANALYTICS_ID
+      value: ${app_google_analytics_id}
 
 tolerations:
   - key: compute.data-platform.service.justice.gov.uk/node-pool

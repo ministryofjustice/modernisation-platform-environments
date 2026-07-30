@@ -13,6 +13,7 @@ resource "helm_release" "app" {
         app_env                    = local.environment,
         app_django_settings_module = "data_platform_app.settings.${local.environment == "production" ? "production" : "development"}"
         app_hostname               = local.environment_configuration.app_hostname,
+        app_google_analytics_id    = local.environment_configuration.app_google_analytics_id,
       }
     )
   ]
