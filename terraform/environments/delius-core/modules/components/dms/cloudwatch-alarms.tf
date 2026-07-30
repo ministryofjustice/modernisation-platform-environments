@@ -316,6 +316,13 @@ resource "aws_lambda_permission" "allow_eventbridge" {
 resource "aws_cloudwatch_metric_alarm" "dms_alarm" {
   alarm_name          = "dms-cdc-task-not-running-in-${var.env_name}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
+
+  # Allow a task to not be running for up to 40 minutes (8*300 seconds)
+  # to allow for weekly password rotation.  Any replication lag will
+  # catch up once it has resumed.
+  evaluation_periods = 8
+  datapoints_to_alarm = 8
+
   evaluation_periods  = 1
   metric_name         = "DMSTaskNotRunning"
   namespace           = "Custom/DMS"
