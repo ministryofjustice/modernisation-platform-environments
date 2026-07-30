@@ -75,7 +75,7 @@ module "ears_sars_api" {
   }
   api_version = "0.1.1"
   api_gateway_endpoint = data.aws_vpc_endpoint.api_gateway.id
-  roles_to_allow = [module.emd_ears_sars_cp_role[0].iam_role_name]
+  roles_to_allow = local.is-preproduction ? [module.emd_ears_sars_cp_role[0].iam_role_name] : []
 }
 
 resource "aws_api_gateway_account" "global_usage" {
