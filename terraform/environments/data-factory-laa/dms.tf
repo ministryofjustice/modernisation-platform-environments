@@ -30,10 +30,6 @@ data "aws_secretsmanager_secret" "dms_oracle_credentials" {
 }
 
 data "aws_iam_policy_document" "oracle_dms_kms" {
-  #checkov:skip=CKV_AWS_111: Allowing root full access
-  #checkov:skip=CKV_AWS_356: Allowing root full access
-  #checkov:skip=CKV_AWS_109: Allowing root full access
-
   count = local.is-development ? 1 : 0
 
   statement {
@@ -151,10 +147,9 @@ resource "aws_s3_object" "oracle_dms_mappings" {
 
 #checkov:skip=CKV2_AWS_57: Automatic rotation not needed for test webhook
 resource "aws_secretsmanager_secret" "dms_slack_webhook" {
-  count      = local.is-development ? 1 : 0
-  name       = "${local.application_name}-${local.environment}/dms/slack-webhook"
-  kms_key_id = aws_kms_key.oracle_dms[0].arn
-  tags       = local.tags
+  count = local.is-development ? 1 : 0
+  name  = "${local.application_name}-${local.environment}/dms/slack-webhook"
+  tags  = local.tags
 }
 
 resource "aws_secretsmanager_secret_version" "dms_slack_webhook" {
@@ -355,10 +350,6 @@ data "aws_kms_alias" "dms_postgres_example" {
 }
 
 data "aws_iam_policy_document" "postgres_dms_kms" {
-  #checkov:skip=CKV_AWS_111: Allowing root full access
-  #checkov:skip=CKV_AWS_356: Allowing root full access
-  #checkov:skip=CKV_AWS_109: Allowing root full access
-
   count = local.is-development ? 1 : 0
 
   statement {
@@ -511,12 +502,19 @@ module "dms_postgres" {
   # checkov:skip=CKV_TF_1: using branch ref for testing
   # checkov:skip=CKV_TF_2: using branch ref for testing
   count  = local.is-development ? 1 : 0
-  source = "github.com/ministryofjustice/terraform-dms-module?ref=54b49927f5b3eaee6610209528bda186b0201c7d"
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/database-migration-service?ref=dab774b1a1b9315936ecb6388b8b7387a04a60a5"
 
   vpc_id      = data.aws_vpc.shared.id
   environment = local.environment
   db          = "postgres-dms-test"
   tags        = local.tags
+
+  # Oracle pipeline and the manual aws_iam_role.dms_vpc_role own the account-level
+  # dms-vpc-role singleton; look it up by name rather than recreate it here.
+  manage_dms_service_roles = false
+
+  # Enables the replication-slot lag / transaction-log CloudWatch alarms for CDC.
+  source_rds_instance_id = "postgres-dms-example"
 
   validation_sqs_kms_key_arn = aws_kms_key.postgres_dms[0].arn
 
@@ -526,7 +524,7 @@ module "dms_postgres" {
 
   dms_replication_instance = {
     replication_instance_id    = "${local.application_name}-postgres-dms-test"
-    subnet_ids                 = data.aws_subnets.shared-private.ids
+    subnet_ids                 = data.aws_subnets.shared-data.ids
     allocated_storage          = 50
     availability_zone          = "eu-west-2a"
     engine_version             = "3.5.4"
