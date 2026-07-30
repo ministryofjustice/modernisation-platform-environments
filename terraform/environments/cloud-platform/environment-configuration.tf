@@ -27,5 +27,11 @@ locals {
     container-platform-hmpps-live = {
       account_subdomain_name = "hmpps-live.${local.base_domain}"
     }
+    container-platform-cd-nonlive = {
+      account_subdomain_name = "cd-nonlive.${local.base_domain}"
+    }
+    container-platform-cd-live = {
+      account_subdomain_name = "cd-live.${local.base_domain}"
+    }
   }
 }
