@@ -57,7 +57,7 @@ resource "aws_iam_role_policy" "lambda_edrms_connect_exception_policy" {
 resource "aws_lambda_layer_version" "lambda_layer" {
   # filename                 = "lambda/layerV1.zip"
   layer_name               = "${local.application_name}-${local.environment}-edrms-connect-exception-layer"
-  s3_key                   = "lambda_delivery/${local.application_name}-connect-exception-layer/layerV1.zip"
+  s3_key                   = "lambda_delivery/${local.application_name}-docs-connect-layer/layerV1.zip"
   s3_bucket                = module.s3-bucket-shared.bucket.id
   compatible_runtimes      = ["python3.13"]
   compatible_architectures = ["x86_64"]
