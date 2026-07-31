@@ -109,3 +109,31 @@ resource "aws_ecs_cluster" "cadt" {
         value = "enabled"
     }
 }
+
+data "aws_iam_roles" "mod-plat-oidc-cicd" {
+  name = "modernisation-platform-oidc-cicd"
+}
+
+module "cadt_api_trigger" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.48.0"
+
+  trusted_role_arns = flatten(data.aws_iam_roles.mod-plat-oidc-cicd.arns)
+
+  create_role       = true
+  role_requires_mfa = false
+
+  role_name = "cadt_api_trigger_${local.environment_shorthand}"
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "cadt_api_trigger" {
+  statement {
+    effect = "Allow"
+    actions = ["apigateway:POST"]
+    resources = [module.trigger_cadt_api.api_gateway_arn]
+  }
+}
