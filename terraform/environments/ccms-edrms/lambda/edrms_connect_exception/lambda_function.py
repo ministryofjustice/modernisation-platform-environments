@@ -1,4 +1,4 @@
-#This lambda has been created to handle notification to slack channel on EdrmsDocumentException
+#This lambda has been created to handle notification to slack channel on EdrmsConnectException
 # import sys
 # import os
 # sys.path.append(os.path.join(os.path.dirname(__file__), "python"))
@@ -117,7 +117,7 @@ class ValidateConfig:
 class NotificationService:
     """Service for sending notifications to Slack."""
 
-    def __init__(self, webhook_url: str, function_name: str = "EDRMS Document Exception Lambda"):
+    def __init__(self, webhook_url: str, function_name: str = "EDRMS Connect Exception Lambda"):
         if not webhook_url:
             raise ValueError("Slack webhook URL is required for notifications")
 
@@ -142,7 +142,7 @@ class NotificationService:
                         "color": color,
                         "title": f"{emoji} [{self.function_name}] {title}",
                         "text": message,
-                        "footer": "EDRMS Document Exception Lambda",
+                        "footer": "EDRMS Connect Exception Lambda",
                         "ts": int(time.time()),
                     }
                 ]
@@ -263,10 +263,10 @@ def lambda_handler(event, context):
     """
     Main Lambda handler function. 
     
-     This function gets triggered by CloudWatch Logs subscription filter for EdrmsDocumentException logs:
+     This function gets triggered by CloudWatch Logs subscription filter for EdrmsConnectException logs:
     1. Loading configuration from both environment variables and AWS Secrets Manager
     2. Loading and parsing log data from CloudWatch Logs
-    3. Accumulate log lines related to EdrmsDocumentException
+    3. Accumulate log lines related to EdrmsConnectException
     4. Sending notifications about the results
     Args:
         event: Lambda event data (can override SECRET_NAME via 'secret_name' key)
@@ -276,7 +276,7 @@ def lambda_handler(event, context):
         Response dictionary with status and results
     """
     tracemalloc.start()
-    logger.info("Starting Notification to Slack for edrms document exceptions")
+    logger.info("Starting Notification to Slack for edrms connect exceptions")
     slack_channel_webhook_docs: str
 
     # Initialize notification service early with None as default
@@ -343,7 +343,7 @@ def lambda_handler(event, context):
                 response = {
                     "statusCode": 200,
                     "body": {
-                        "message": f"Successfully completed publishing notifications for EdrmsDocumentException logs"
+                        "message": f"Successfully completed publishing notifications for EdrmsConnectException logs"
                     },
                 }
 
