@@ -137,3 +137,13 @@ data "aws_iam_policy_document" "cadt_api_trigger" {
     resources = [module.trigger_cadt_api.api_gateway_arn]
   }
 }
+
+resource "aws_iam_policy" "cadt_api_trigger" {
+  name = "trigger_cadt_api"
+  policy = data.aws_iam_policy_document.cadt_api_trigger.json
+}
+
+resource "aws_iam_role_policy_attachment" "cadt_api_trigger" {
+  role = module.cadt_api_trigger.iam_role_name
+  policy_arn = aws_iam_policy.cadt_api_trigger.arn
+}
