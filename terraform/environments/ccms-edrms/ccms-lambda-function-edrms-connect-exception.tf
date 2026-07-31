@@ -73,7 +73,7 @@ data "archive_file" "edrms_connect_exception_zip" {
 resource "aws_lambda_function" "edrms_connect_exception_monitor" {
   filename         = data.archive_file.edrms_connect_exception_zip.output_path
   source_code_hash = data.archive_file.edrms_connect_exception_zip.output_base64sha256
-  function_name    = "${local.application_name}-${local.environment}-edrms-docs-exception-monitor"
+  function_name    = "${local.application_name}-${local.environment}-edrms-connect-exception-monitor"
   role             = aws_iam_role.lambda_edrms_connect_exception_role.arn
   handler          = "lambda_function.lambda_handler"
   layers           = [aws_lambda_layer_version.lambda_layer.arn]
