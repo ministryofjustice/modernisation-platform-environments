@@ -1,9 +1,7 @@
-/*
-
 # Clone of PROD App1 server for Weblogic build: CDI-388
 resource "aws_instance" "tariff_app_prod_clone" {
   count = local.environment == "production" ? 1 : 0
-  ami   = "ami-???" # tbc <------------ UPDATE THIS!
+  ami   = "ami-072bac695fba3a78d" # (ec2-cica-tariff-production-app-clone-20260731)
   lifecycle {
     ignore_changes = [user_data] # ami removed to allow restore
   }
@@ -52,5 +50,3 @@ resource "aws_security_group_rule" "temp_prod_ssm_only_egress" {
   protocol                 = "TCP"
   source_security_group_id = data.aws_security_group.core_vpc_protected.id
 }
-
-*/
