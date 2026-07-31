@@ -120,7 +120,7 @@ module "cadt_api_trigger" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.48.0"
 
-  trusted_role_arns = flatten([data.aws_iam_roles.mod-plat-oidc-cicd.arn])
+  trusted_role_arns = flatten([data.aws_iam_role.mod-plat-oidc-cicd.arn])
 
   create_role       = true
   role_requires_mfa = false
