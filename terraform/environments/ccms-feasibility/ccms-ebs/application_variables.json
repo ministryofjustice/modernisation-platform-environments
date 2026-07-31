@@ -1,7 +1,7 @@
 {
   "accounts": {
     "development": {
-      "key_name": "ccms-feasibility",
+      "key_name": "",
       "ec2_instance_type_ebsdb": "r5.2xlarge",
       "ebsdb_ami_id": "ami-01321d07947791ee8",
       "ec2_instance_type_ebsapps": "r5.2xlarge",
