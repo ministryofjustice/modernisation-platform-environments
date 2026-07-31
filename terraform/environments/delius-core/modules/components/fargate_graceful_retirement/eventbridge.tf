@@ -17,10 +17,9 @@ resource "aws_cloudwatch_event_target" "step_function_target" {
   role_arn = aws_iam_role.eventbridge_execution_role.arn
 }
 
-
 # CloudWatch log group to capture events
 resource "aws_cloudwatch_log_group" "ecs_restart_events" {
-  #checkov:skip=CKV_AWS_158
+  #checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
   name              = "/aws/health/ecs_restart_events/${var.environment}"
   retention_in_days = 365
 }
@@ -78,17 +77,10 @@ resource "aws_iam_role" "eventbridge_execution_role" {
 }
 
 resource "aws_iam_policy" "eventbridge_execution_role_policy" {
-  #checkov:skip=CKV_AWS_290
-  #checkov:skip=CKV_AWS_355
   name = "${var.environment}_eventbridge_execution_role_policy"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      {
-        Effect   = "Allow"
-        Action   = "logs:*",
-        Resource = "*"
-      },
       {
         Effect   = "Allow"
         Action   = "states:StartExecution",
