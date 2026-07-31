@@ -23,5 +23,10 @@ spec:
     - name: is-bare-pod
       expression: >-
         !has(object.metadata.ownerReferences) || size(object.metadata.ownerReferences) == 0
+    # DeletingPolicy runs in background; object.metadata.namespace is used instead of request.namespace.
+    - name: exclude-namespaces
+      expression: >-
+        !object.metadata.namespace.startsWith('kube-') &&
+        !{{ .Values.excludedNamespaces | toJson }}.exists(ns, ns == object.metadata.namespace)
   # Runs daily at 02:00 UTC.
   schedule: "0 2 * * *"

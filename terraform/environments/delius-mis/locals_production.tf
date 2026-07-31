@@ -6,6 +6,9 @@ locals {
     legacy_counterpart_vpc_cidr            = "10.160.16.0/20"
     legacy_ad_domain_name                  = "delius-prod.local"
     legacy_dns_ip_addrs                    = ["10.160.17.254", "10.160.22.121"]
+    legacy_resolver_ip_addrs               = ["10.160.16.135", "10.160.23.111", "10.160.27.249"]
+    legacy_nextcloud_efs_dns_name          = "fs-8a54e77b.efs.eu-west-2.amazonaws.com"
+    legacy_nextcloud_efs_id                = "fs-8a54e77b"
     ad_domain_name                         = "delius-mis-prod.internal"
     ad_trust_domain_name                   = "azure.hmpp.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers

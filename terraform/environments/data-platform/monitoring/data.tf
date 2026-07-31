@@ -32,3 +32,13 @@ data "aws_secretsmanager_secret_version" "grafana_api_token" {
 
   secret_id = module.grafana_api_token_secret[0].secret_id
 }
+
+# PagerDuty event orchestration routing key used to send alerts. The secret is
+# created with a placeholder value in the iac component and populated out-of-band,
+# so it is read back here to configure alerting.
+data "aws_secretsmanager_secret_version" "pagerduty_orchestrator_integration_key_secret" {
+  count = local.environment_configuration.monitoring_stack_enabled ? 1 : 0
+
+  secret_id = "pagerduty/orchestrator-integration-key"
+}
+

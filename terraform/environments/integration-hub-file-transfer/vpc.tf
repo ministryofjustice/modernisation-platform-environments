@@ -1,3 +1,7 @@
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 module "vpc_isolated" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
