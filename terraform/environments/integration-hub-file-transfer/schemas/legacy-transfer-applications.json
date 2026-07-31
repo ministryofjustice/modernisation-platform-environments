@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://modernisation-platform.service.justice.gov.uk/schemas/integration-hub-file-transfer/legacy-transfer-applications.json",
+  "title": "Legacy Transfer applications",
+  "description": "Application identities accessing AWS Transfer Family endpoints through the custom identity provider.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "applications"
+  ],
+  "properties": {
+    "version": {
+      "description": "Version of this configuration contract.",
+      "const": 1
+    },
+    "applications": {
+      "description": "Transfer Family application identities, keyed by the username presented when connecting to an SFTP or FTPS endpoint.",
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z0-9][a-z0-9-]{0,62}$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/application"
+      }
+    }
+  },
+  "$defs": {
+    "application": {
+      "description": "Configuration for one application identity using the custom identity provider.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "description",
+        "owner",
+        "enabled",
+        "identity_provider_key",
+        "idp_username",
+        "home_directory_prefix",
+        "server_id_allow_list",
+        "cidr_blocks",
+        "ssh_public_keys"
+      ],
+      "properties": {
+        "description": {
+          "description": "Human-readable purpose of the application identity.",
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "description": "Free-text name of the team, service or organisation responsible for the identity.",
+          "type": "string",
+          "minLength": 1
+        },
+        "enabled": {
+          "description": "Whether Terraform should provision this identity in the current environment.",
+          "type": "boolean"
+        },
+        "expires_on": {
+          "description": "Optional review or expiry date in YYYY-MM-DD format. This is recorded for governance but is not currently enforced by Terraform.",
+          "type": "string",
+          "format": "date"
+        },
+        "identity_provider_key": {
+          "description": "Key of the custom identity provider configuration stored in DynamoDB. Use secrets for credentials held in Secrets Manager.",
+          "type": "string",
+          "minLength": 1
+        },
+        "idp_username": {
+          "description": "Username passed to the selected identity provider and used to look up credentials in Secrets Manager. The custom IdP delimiter @@ is not permitted.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^@]+$"
+        },
+        "home_directory_prefix": {
+          "description": "Bucket-relative prefix mapped to the identity's logical root directory. Do not include a leading slash or wildcard; access includes all objects beneath this prefix.",
+          "$ref": "#/$defs/prefix"
+        },
+        "server_id_allow_list": {
+          "description": "Transfer Family server IDs on which this identity may authenticate. An empty list permits any Transfer server using this identity provider.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^s-[0-9a-f]{17}$"
+          }
+        },
+        "cidr_blocks": {
+          "description": "IPv4 CIDR blocks permitted by both the Transfer endpoint security group and custom identity provider. An empty list creates no ingress rule for this identity.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "ssh_public_keys": {
+          "description": "SSH public keys stored in the identity's Secrets Manager secret for passwordless SFTP authentication. Private keys and passwords must never be committed; Terraform creates a null password entry for optional manual population.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^(ssh-(rsa|ed25519)|ecdsa-sha2-nistp(256|384|521)) [A-Za-z0-9+/]+={0,3}( .*)?$"
+          }
+        }
+      }
+    },
+    "prefix": {
+      "description": "An S3 bucket-relative prefix without a leading slash, trailing slash or wildcard.",
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9!_.'()/-]*[A-Za-z0-9!_.'()-])?$"
+    }
+  },
+  "examples": [
+    {
+      "version": 1,
+      "applications": {
+        "example-application": {
+          "description": "Example application uploading files for processing",
+          "owner": "Example service team",
+          "enabled": true,
+          "expires_on": "2027-07-31",
+          "identity_provider_key": "secrets",
+          "idp_username": "example-application",
+          "home_directory_prefix": "example-application",
+          "server_id_allow_list": [
+            "s-0123456789abcdef0"
+          ],
+          "cidr_blocks": [
+            "1.2.3.4/32"
+          ],
+          "ssh_public_keys": [
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExamplePublicKeyMaterial0123456789 example-application"
+          ]
+        }
+      }
+    }
+  ]
+}

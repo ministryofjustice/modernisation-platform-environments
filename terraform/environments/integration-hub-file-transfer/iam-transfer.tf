@@ -69,9 +69,9 @@ data "aws_iam_policy_document" "transfer_user_session" {
       test     = "StringLike"
       variable = "s3:prefix"
       values = [
-        trimprefix(each.value.home_directory_target, "/"),
-        "${trimprefix(each.value.home_directory_target, "/")}/",
-        "${trimprefix(each.value.home_directory_target, "/")}/*",
+        trimprefix(each.value.home_directory_prefix, "/"),
+        "${trimprefix(each.value.home_directory_prefix, "/")}/",
+        "${trimprefix(each.value.home_directory_prefix, "/")}/*",
       ]
     }
   }
@@ -84,7 +84,7 @@ data "aws_iam_policy_document" "transfer_user_session" {
       "s3:PutObject",
     ]
     resources = [
-      "${module.s3_bucket["incoming"].s3_bucket_arn}/${trimprefix(each.value.home_directory_target, "/")}/*",
+      "${module.s3_bucket["incoming"].s3_bucket_arn}/${trimprefix(each.value.home_directory_prefix, "/")}/*",
     ]
   }
 }

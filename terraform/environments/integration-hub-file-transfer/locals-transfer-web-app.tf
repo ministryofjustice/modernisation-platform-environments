@@ -6,12 +6,25 @@ data "aws_identitystore_group" "this" {
   for_each          = local.transfer_iam_identity_center_groups
   provider          = aws.sso-readonly
   identity_store_id = one(data.aws_ssoadmin_instances.this.identity_store_ids)
-  group_id          = each.value
+  group_id          = each.value.identity_center_group_id
 }
 
 locals {
-  # GetGroupId does not reliably resolve groups by display name, so IDs are explicit here.
+  transfer_web_app_configuration = jsondecode(file("${path.module}/configuration/${local.environment}/transfer-web-app-groups.json"))
+
   transfer_iam_identity_center_groups = {
-    integration-hub = "8662e2b4-3021-7017-56ba-8794aa2047cd"
+    for group_name, group in local.transfer_web_app_configuration.groups : group_name => group
+    if group.enabled
+  }
+
+  transfer_web_app_group_grants = {
+    for grant in flatten([
+      for group_name, group in local.transfer_iam_identity_center_groups : [
+        for prefix in distinct(concat(["group/${group_name}"], group.additional_prefixes)) : {
+          group_name = group_name
+          prefix     = prefix
+        }
+      ]
+    ]) : "${grant.group_name}:${grant.prefix}" => grant
   }
 }

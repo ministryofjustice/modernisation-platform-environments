@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://modernisation-platform.service.justice.gov.uk/schemas/integration-hub-file-transfer/transfer-web-app-groups.json",
+  "title": "Transfer Web App groups",
+  "description": "IAM Identity Center groups granted read-write access through the AWS Transfer Family Web App.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "groups"
+  ],
+  "properties": {
+    "version": {
+      "description": "Version of this configuration contract.",
+      "const": 1
+    },
+    "groups": {
+      "description": "Transfer Family Web App access definitions, keyed by a stable logical group name used to derive the default group/<name> S3 prefix.",
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z0-9][a-z0-9-]{0,62}$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/group"
+      }
+    }
+  },
+  "$defs": {
+    "group": {
+      "description": "Configuration for one IAM Identity Center group using the Transfer Family Web App.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "description",
+        "owner",
+        "enabled",
+        "identity_center_group_id",
+        "additional_prefixes"
+      ],
+      "properties": {
+        "description": {
+          "description": "Human-readable purpose of the Web App group access.",
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "description": "Free-text name of the team, service or organisation responsible for the group access.",
+          "type": "string",
+          "minLength": 1
+        },
+        "enabled": {
+          "description": "Whether Terraform should provision grants for this group in the current environment.",
+          "type": "boolean"
+        },
+        "expires_on": {
+          "description": "Optional review or expiry date in YYYY-MM-DD format. This is recorded for governance but is not currently enforced by Terraform.",
+          "type": "string",
+          "format": "date"
+        },
+        "identity_center_group_id": {
+          "description": "Immutable IAM Identity Center group ID. Display-name lookup is deliberately not used because it is not reliable for these groups.",
+          "type": "string",
+          "pattern": "^[0-9a-f-]{36}$"
+        },
+        "additional_prefixes": {
+          "description": "Additional bucket-relative prefixes granted READWRITE access. Terraform always grants group/<logical-group-name>; do not repeat it here or include leading slashes, trailing slashes or wildcards.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/prefix"
+          }
+        }
+      }
+    },
+    "prefix": {
+      "description": "An S3 bucket-relative prefix without a leading slash, trailing slash or wildcard.",
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9!_.'()/-]*[A-Za-z0-9!_.'()-])?$"
+    }
+  },
+  "examples": [
+    {
+      "version": 1,
+      "groups": {
+        "example-uploaders": {
+          "description": "Example users uploading files through the Transfer Family Web App",
+          "owner": "Example service team",
+          "enabled": true,
+          "expires_on": "2027-07-31",
+          "identity_center_group_id": "01234567-89ab-cdef-0123-456789abcdef",
+          "additional_prefixes": [
+            "shared/example-uploads"
+          ]
+        }
+      }
+    }
+  ]
+}

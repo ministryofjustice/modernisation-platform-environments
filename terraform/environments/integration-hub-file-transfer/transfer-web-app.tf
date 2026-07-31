@@ -22,17 +22,17 @@ resource "aws_s3control_access_grants_location" "incoming" {
 }
 
 resource "aws_s3control_access_grant" "incoming_uploaders" {
-  for_each = data.aws_identitystore_group.this
+  for_each = local.transfer_web_app_group_grants
 
   access_grants_location_id = aws_s3control_access_grants_location.incoming.access_grants_location_id
   permission                = "READWRITE"
 
   access_grants_location_configuration {
-    s3_sub_prefix = "group/${each.key}/*"
+    s3_sub_prefix = "${each.value.prefix}/*"
   }
 
   grantee {
     grantee_type       = "DIRECTORY_GROUP"
-    grantee_identifier = each.value.group_id
+    grantee_identifier = data.aws_identitystore_group.this[each.value.group_name].group_id
   }
 }

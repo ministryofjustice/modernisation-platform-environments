@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "groups": {
+    "integration-hub": {
+      "description": "Integration Hub file uploaders",
+      "owner": "Integration Hub",
+      "enabled": true,
+      "identity_center_group_id": "8662e2b4-3021-7017-56ba-8794aa2047cd",
+      "additional_prefixes": []
+    }
+  }
+}
