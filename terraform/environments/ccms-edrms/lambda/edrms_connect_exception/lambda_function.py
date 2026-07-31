@@ -332,14 +332,7 @@ def lambda_handler(event, context):
             timestamp = log_event['timestamp']
             
             logger.info(f"Log Stream: {log_stream_name}, Timestamp: {timestamp}, Message: {exceptionmessage}")
-            response = logs_client.get_log_events(
-                logGroupName=config.LOG_GROUP_NAME,
-                logStreamName=log_stream_name,
-                startTime=timestamp
-            )
-
-            log_lines = [e['message'] for e in response['events']]
-            result = f"EXCEPTION LOGS:\n{exceptionmessage}\n" + "\n".join(log_lines)
+            result = f"EXCEPTION LOGS:\n{exceptionmessage}\n"
             if should_notify():
 
                 notification_service.send_notification(
