@@ -50,13 +50,3 @@ resource "aws_secretsmanager_secret_version" "edrms_secrets" {
     ]
   }
 }
-
-moved {
-  from = aws_secretsmanager_secret.edrms_docs_exception_secrets
-  to   = aws_secretsmanager_secret.edrms_secrets
-}
-
-moved {
-  from = aws_secretsmanager_secret_version.edrms_docs_exception_secrets
-  to   = aws_secretsmanager_secret_version.edrms_secrets
-}
