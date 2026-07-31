@@ -1,24 +1,8 @@
-data "aws_ami" "ebsdb" {
-  owners = ["self"]
-  filter {
-    name   = "image-id"
-    values = [local.application_data.accounts[local.environment].ebsdb_ami_id]
-  }
-}
-
-locals {
-  ebsdb_snapshots = {
-    for bdm in data.aws_ami.ebsdb.block_device_mappings :
-    bdm.device_name => bdm.ebs.snapshot_id
-    if try(bdm.ebs.snapshot_id, "") != ""
-  }
-}
-
 module "oracle_ebs_db" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b8a4f6f
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/oracle-ec2?ref=b8a4f6f"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/646ef03
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/oracle-ec2?ref=646ef03"
 
-  name          = "ec2-${local.component_name}-${local.env_label}-ebsdb"
+  name                  = "ec2-${local.component_name}-${local.env_label}-ebsdb"
   instance_profile_name = aws_iam_instance_profile.ebsdb.name
 
   instance_type      = local.application_data.accounts[local.environment].ec2_instance_type_ebsdb
@@ -26,8 +10,6 @@ module "oracle_ebs_db" {
   key_name           = local.application_data.accounts[local.environment].key_name
   subnet_id          = data.aws_subnet.data_subnets_a.id
   security_group_ids = [aws_security_group.ebsdb.id]
-
-  no_device_names = ["/dev/sdp", "/dev/sdq", "/dev/sdr", "/dev/sds"]
 
   tags = merge(local.tags, {
     instance-role = "ebsdb"
@@ -259,9 +241,8 @@ resource "aws_volume_attachment" "ebsdb_redoB" {
 }
 
 resource "aws_ebs_volume" "ebsdb_diag" {
-  lifecycle { ignore_changes = [kms_key_id, snapshot_id] }
+  lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_db.availability_zone
-  snapshot_id       = local.ebsdb_snapshots["/dev/sdp"]
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_diag
   type              = "gp3"
   iops              = 3000
@@ -277,9 +258,8 @@ resource "aws_volume_attachment" "ebsdb_diag" {
 }
 
 resource "aws_ebs_volume" "ebsdb_appshare" {
-  lifecycle { ignore_changes = [kms_key_id, snapshot_id] }
+  lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_db.availability_zone
-  snapshot_id       = local.ebsdb_snapshots["/dev/sdq"]
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_appshare
   type              = "gp3"
   iops              = 3000
@@ -295,9 +275,8 @@ resource "aws_volume_attachment" "ebsdb_appshare" {
 }
 
 resource "aws_ebs_volume" "ebsdb_home" {
-  lifecycle { ignore_changes = [kms_key_id, snapshot_id] }
+  lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_db.availability_zone
-  snapshot_id       = local.ebsdb_snapshots["/dev/sdr"]
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_home
   type              = "gp3"
   iops              = 3000
@@ -313,9 +292,8 @@ resource "aws_volume_attachment" "ebsdb_home" {
 }
 
 resource "aws_ebs_volume" "ebsdb_temp" {
-  lifecycle { ignore_changes = [kms_key_id, snapshot_id] }
+  lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_db.availability_zone
-  snapshot_id       = local.ebsdb_snapshots["/dev/sds"]
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_temp
   type              = "gp3"
   iops              = 3000
@@ -329,4 +307,5 @@ resource "aws_volume_attachment" "ebsdb_temp" {
   volume_id   = aws_ebs_volume.ebsdb_temp.id
   instance_id = module.oracle_ebs_db.instance_id
 }
+
 
