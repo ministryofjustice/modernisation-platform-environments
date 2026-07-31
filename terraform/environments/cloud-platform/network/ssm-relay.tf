@@ -119,9 +119,17 @@ resource "aws_instance" "ssm_relay" {
   iam_instance_profile   = aws_iam_instance_profile.ssm_relay[0].name
   vpc_security_group_ids = [aws_security_group.ssm_relay[0].id]
 
+  # Dedicated EBS throughput (CKV_AWS_135).
+  ebs_optimized = true
+
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
+  }
+
+  # Encrypt the root volume at rest (CKV_AWS_8).
+  root_block_device {
+    encrypted = true
   }
 
   tags = merge({
