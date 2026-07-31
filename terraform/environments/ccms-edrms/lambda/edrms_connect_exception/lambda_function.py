@@ -25,6 +25,17 @@ sns_client = boto3.client('sns')
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+last_notification_time = 0
+
+def should_notify():
+    global last_notification_time
+    current_time = time.time()
+    # Check if 5 minutes (300 seconds) have passed since the last notification
+    if current_time - last_notification_time >= 300:
+        last_notification_time = current_time
+        return True
+    return False
+
 @dataclass
 class Config:
     """Configuration settings for the Lambda function."""    
@@ -330,20 +341,22 @@ def lambda_handler(event, context):
 
             log_lines = [e['message'] for e in response['events']]
             result = f"EXCEPTION LOGS:\n{exceptionmessage}\n" + "\n".join(log_lines)
-            notification_service.send_notification(
-                        "EDRMS Document Exception",
-                        result, is_error=True
-                    )
-            # Prepare response
-            response = {
-                "statusCode": 200,
-                "body": {
-                    "message": f"Successfully completed publishing notifications for EdrmsDocumentException logs"
-                },
-            }
+            if should_notify():
 
-            logger.info(f"Lambda execution completed successfully: {response}")
-            return response
+                notification_service.send_notification(
+                            "EDRMS NEC Connection is down",
+                            result, is_error=True
+                        )
+                # Prepare response
+                response = {
+                    "statusCode": 200,
+                    "body": {
+                        "message": f"Successfully completed publishing notifications for EdrmsDocumentException logs"
+                    },
+                }
+
+                logger.info(f"Lambda execution completed successfully: {response}")
+                return response
     except Exception as e:
         error_msg = f"Lambda execution failed:\n{str(e)}"
         logger.error(error_msg, exc_info=True)
