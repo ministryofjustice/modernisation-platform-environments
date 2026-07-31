@@ -86,4 +86,10 @@ locals {
     "2600:1f18:7fff:f800::/53", # us-east-1 Region
     "2600:1f18:3fff:f800::/53", # us-east-1 Region
   ]
+
+  # Add environments that require the blue-green deployment solution
+  create_blue_green = local.is-development || local.is-test
+
+  # Add environments that require the Lucene EFS solution
+  create_efs = local.is-development
 }
