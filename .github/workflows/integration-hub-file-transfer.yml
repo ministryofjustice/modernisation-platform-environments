@@ -36,6 +36,48 @@ permissions:
   contents: read  # This is required for actions/checkout
 
 jobs:
+  validate-configuration-schemas:
+    name: Validate ${{ matrix.schema }} (${{ matrix.environment }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        schema:
+          - legacy-transfer-identities
+          - transfer-web-app-groups
+        environment:
+          - development
+          - test
+          - preproduction
+          - production
+    defaults:
+      run:
+        working-directory: terraform/environments/integration-hub-file-transfer
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Set Up UV
+        id: setup_uv
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+        with:
+          activate-environment: true
+
+      - name: Validate Schema
+        id: validate_schema
+        env:
+          ENVIRONMENT: ${{ matrix.environment }}
+          SCHEMA: ${{ matrix.schema }}
+        run: |
+          uvx check-jsonschema \
+            --schemafile "schemas/${SCHEMA}.json" \
+            "configuration/${ENVIRONMENT}/${SCHEMA}.json"
+
   strategy:
     uses: ./.github/workflows/reusable_terraform_components_strategy.yml
     if: inputs.action != 'destroy'
