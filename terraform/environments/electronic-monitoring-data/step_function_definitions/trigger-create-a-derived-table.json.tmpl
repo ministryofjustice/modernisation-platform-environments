@@ -1,5 +1,5 @@
 {
-  "Comment": "Trugger ",
+  "Comment": "TriggerCreateADerivedTable",
   "StartAt": "${environment != "development" ? "WaitUntil11pm" : "Lambda Invoke"}",
   "States": {
     %{ if environment != "development" }
