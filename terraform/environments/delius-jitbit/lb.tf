@@ -150,7 +150,7 @@ resource "aws_ssm_parameter" "active_deployment_colour" {
   count = local.create_blue_green ? 1 : 0
 
   name  = "/delius-jitbit/blue-green-active-colour"
-  type  = "String"
+  type  = "SecureString"
   value = "blue"
   key_id = data.aws_kms_key.general_shared.arn
 

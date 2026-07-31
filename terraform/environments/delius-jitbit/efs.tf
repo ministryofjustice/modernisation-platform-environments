@@ -53,7 +53,7 @@ resource "aws_efs_access_point" "lucene" {
 resource "aws_ssm_parameter" "efs_id" {
   count = local.create_efs ? 1 : 0
   name  = "/${local.application_name}/${local.environment}/efs-id"
-  type  = "String"
+  type  = "SecureString"
   value = aws_efs_file_system.lucene[0].id
   key_id = data.aws_kms_key.general_shared.arn
 }
@@ -61,7 +61,7 @@ resource "aws_ssm_parameter" "efs_id" {
 resource "aws_ssm_parameter" "efs_ap_id" {
   count = local.create_efs ? 1 : 0
   name  = "/${local.application_name}/${local.environment}/efs-access-point-id"
-  type  = "String"
+  type  = "SecureString"
   value = aws_efs_access_point.lucene[0].id
   key_id = data.aws_kms_key.general_shared.arn
 }
