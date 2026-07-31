@@ -246,6 +246,13 @@ models:
       model_provider: "azure_ai"
       model_endpoint: "anthropic"
       generally_available: false
+    claude-opus-5:
+      model_id: "claude-opus-5"
+      model_family: "Claude Opus"
+      model_name: "Claude Opus 5 (Sweden)"
+      model_provider: "azure_ai"
+      model_endpoint: "anthropic"
+      generally_available: false
     claude-sonnet-4-6:
       model_id: "claude-sonnet-4-6"
       model_family: "Claude Sonnet"

@@ -37,10 +37,10 @@ module "litellm_entra_id_secret" {
   ignore_secret_changes = true
 }
 
-module "microsoft_foundry_jedi_gateway_development_secret" {
+module "microsoft_foundry_jedi_gateway_secret" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
 
-  name = "${local.component_name}/microsoft-foundry/jedi-gateway/development"
+  name = "${local.component_name}/microsoft-foundry/jedi-gateway"
 
   secret_string = jsonencode({
     api_key  = "CHANGEME"
