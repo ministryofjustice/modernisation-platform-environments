@@ -15,7 +15,7 @@ resource "aws_sns_topic_policy" "guarduty_default" {
 resource "aws_sns_topic_subscription" "guardduty_alerts" {
   topic_arn = aws_sns_topic.guardduty_alerts.arn
   protocol  = "lambda"
-  endpoint  = aws_lambda_function.cloudwatch_slack_integration_v2.arn
+  endpoint  = aws_lambda_function.cloudwatch_slack_integration_v2[0].arn
 }
 
 resource "aws_cloudwatch_event_rule" "guardduty" {
@@ -42,5 +42,5 @@ resource "aws_cloudwatch_event_rule" "certificate_expiration_warning" {
 resource "aws_cloudwatch_event_target" "certificate_expiration_warning_to_lambda_target" {
   rule      = aws_cloudwatch_event_rule.certificate_expiration_warning.name
   target_id = "certificate-expiration-warning-target"
-  arn       = aws_lambda_function.cloudwatch_slack_integration_v2.arn
+  arn       = aws_lambda_function.cloudwatch_slack_integration_v2[0].arn
 }
