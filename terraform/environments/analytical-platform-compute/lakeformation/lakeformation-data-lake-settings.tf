@@ -1,5 +1,8 @@
 resource "aws_lakeformation_data_lake_settings" "london" {
   admins = [
+    /* Modernisation Platform */
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan",
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply",
     "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess",
     module.lake_formation_share_role.iam_role_arn,
     # module.analytical_platform_ui_service_role.iam_role_arn,
@@ -14,6 +17,9 @@ resource "aws_lakeformation_data_lake_settings" "london" {
 resource "aws_lakeformation_data_lake_settings" "ireland" {
   provider = aws.analytical-platform-compute-eu-west-1
   admins = [
+    /* Modernisation Platform */
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan",
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply",
     "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess",
     module.lake_formation_share_role.iam_role_arn,
     # module.analytical_platform_ui_service_role.iam_role_arn,
