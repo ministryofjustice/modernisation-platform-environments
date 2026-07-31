@@ -55,16 +55,19 @@ resource "aws_db_instance" "jitbit" {
   snapshot_identifier = try(local.application_data.accounts[local.environment].db_snapshot_identifier, null)
 
   # tflint-ignore: aws_db_instance_default_parameter_group
-  parameter_group_name        = "default.sqlserver-se-15.0"
-  ca_cert_identifier          = local.application_data.accounts[local.environment].db_ca_cert_identifier
-  deletion_protection         = local.application_data.accounts[local.environment].db_deletion_protection
-  delete_automated_backups    = local.application_data.accounts[local.environment].db_delete_automated_backups
-  skip_final_snapshot         = local.skip_final_snapshot
-  final_snapshot_identifier   = !local.skip_final_snapshot ? "${local.application_name}-${local.environment}-database-final-snapshot" : null
-  allocated_storage           = local.application_data.accounts[local.environment].db_allocated_storage
-  max_allocated_storage       = local.application_data.accounts[local.environment].db_max_allocated_storage
-  storage_type                = local.application_data.accounts[local.environment].db_storage_type
-  maintenance_window          = local.application_data.accounts[local.environment].db_maintenance_window
+  parameter_group_name = "default.sqlserver-se-15.0"
+  #checkov:skip=CKV_AWS_211: "CA cert varies by environment"
+  ca_cert_identifier = local.application_data.accounts[local.environment].db_ca_cert_identifier
+  #checkov:skip=CKV_AWS_293: "Deletion protection varies by environment"
+  deletion_protection       = local.application_data.accounts[local.environment].db_deletion_protection
+  delete_automated_backups  = local.application_data.accounts[local.environment].db_delete_automated_backups
+  skip_final_snapshot       = local.skip_final_snapshot
+  final_snapshot_identifier = !local.skip_final_snapshot ? "${local.application_name}-${local.environment}-database-final-snapshot" : null
+  allocated_storage         = local.application_data.accounts[local.environment].db_allocated_storage
+  max_allocated_storage     = local.application_data.accounts[local.environment].db_max_allocated_storage
+  storage_type              = local.application_data.accounts[local.environment].db_storage_type
+  maintenance_window        = local.application_data.accounts[local.environment].db_maintenance_window
+  #checkov:skip=CKV_AWS_226: "Auto minor upgrade varies by environment"
   auto_minor_version_upgrade  = local.application_data.accounts[local.environment].db_auto_minor_version_upgrade
   allow_major_version_upgrade = local.application_data.accounts[local.environment].db_allow_major_version_upgrade
   backup_window               = local.application_data.accounts[local.environment].db_backup_window
@@ -79,9 +82,11 @@ resource "aws_db_instance" "jitbit" {
   monitoring_interval = local.application_data.accounts[local.environment].db_monitoring_interval
   monitoring_role_arn = local.application_data.accounts[local.environment].db_monitoring_interval == 0 ? "" : aws_iam_role.rds_enhanced_monitoring[0].arn
   #checkov:skip=CKV_AWS_118: "enhanced monitoring is enabled, but optional"
-  storage_encrypted               = true
+  storage_encrypted = true
+  #checkov:skip=CKV_AWS_353: "Performance Insights varies by environment"
   performance_insights_enabled    = local.application_data.accounts[local.environment].db_performance_insights_enabled
-  performance_insights_kms_key_id = "" #tfsec:ignore:aws-rds-enable-performance-insights-encryption Left empty so that it will run, however should be populated with real key in scenario.
+  performance_insights_kms_key_id = local.application_data.accounts[local.environment].db_performance_insights_enabled ? data.aws_kms_key.general_shared.arn : null
+  #checkov:skip=CKV_AWS_129: "Cloudwatch log exports varies by environment"
   enabled_cloudwatch_logs_exports = local.application_data.accounts[local.environment].db_enabled_cloudwatch_logs_exports
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-database", local.application_name, local.environment)) }

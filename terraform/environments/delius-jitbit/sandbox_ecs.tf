@@ -1,7 +1,7 @@
 module "ecs_sandbox" {
   count = local.is-development ? 1 : 0
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v6.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=948cb6a1d0d08448fd53f195c0522ed35bbf4242" # v6.0.0
 
   name = "hmpps-${local.environment}-${local.application_name}-sandbox"
 
@@ -11,7 +11,7 @@ module "ecs_sandbox" {
 module "s3_bucket_app_deployment_sandbox" {
   count = local.is-development ? 1 : 0
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399" # v9.0.0
 
   providers = {
     aws.bucket-replication = aws
@@ -65,6 +65,7 @@ resource "aws_security_group" "jitbit_sandbox" {
 }
 
 resource "aws_security_group_rule" "allow_all_egress_sandbox" {
+  #checkov:skip=CKV_AWS_382:"Required for ECS tasks to access external services"
   count = local.is-development ? 1 : 0
 
   description       = "Allow all outbound traffic to any IPv4 address"
@@ -89,8 +90,10 @@ resource "aws_security_group_rule" "alb_sandbox" {
 }
 
 resource "aws_cloudwatch_log_group" "jitbit_sandbox" {
+  #checkov:skip=CKV_AWS_338: "Logs required for 30 days"
   count = local.is-development ? 1 : 0
 
   name              = format("%s-%s-ecs", local.application_name, "sandbox")
   retention_in_days = 30
+  kms_key_id        = data.aws_kms_key.general_shared.arn
 }

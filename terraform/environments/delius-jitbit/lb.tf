@@ -1,6 +1,3 @@
-# checkov:skip=CKV_AWS_226
-# checkov:skip=CKV2_AWS_28
-
 locals {
   blue_green_target_groups = {
     blue  = try(aws_lb_target_group.target_group_fargate_blue[0].id, null)
