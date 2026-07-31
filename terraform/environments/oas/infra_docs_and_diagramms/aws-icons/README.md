@@ -10,6 +10,14 @@
    password-rotation + security-alerting automation, drawn as Mermaid flowcharts/sequence
    diagrams (rendered natively by GitHub/GitLab in the web UI).
 
+### Combined with edw-19c
+
+Both apps share the Modernisation Platform VPC and have a declared-but-inactive direct
+link, so there's also a single combined HLD and combined DFD covering both:
+
+0. [Combined General Infrastructure](00-combined-general-infrastructure.md) (AWS icons) ·
+   [Combined Data Flow](00-combined-data-flow.md) (Mermaid)
+
 The general infrastructure diagram is a static PNG generated with the
 [`diagrams`](https://diagrams.mingrammer.com/) Python library (Graphviz + official-style
 AWS service icons). Regenerate with `python3 generate.py` (requires
