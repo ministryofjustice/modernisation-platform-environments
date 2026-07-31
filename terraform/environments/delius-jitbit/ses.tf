@@ -131,7 +131,7 @@ resource "aws_iam_user_policy" "jitbit_ses_smtp_user" {
 resource "aws_ssm_parameter" "jitbit_ses_smtp_user" {
   name   = "/${local.environment}/jitbit/ses_smtp"
   type   = "SecureString"
-  key_id = aws_kms_key.ssm.arn
+  key_id = data.aws_kms_key.general_shared.arn
   value = jsonencode({
     user              = aws_iam_user.jitbit_ses_smtp_user.name,
     key               = aws_iam_access_key.jitbit_ses_smtp_user.id,

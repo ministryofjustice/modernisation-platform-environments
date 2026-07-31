@@ -152,6 +152,7 @@ resource "aws_ssm_parameter" "active_deployment_colour" {
   name  = "/delius-jitbit/blue-green-active-colour"
   type  = "String"
   value = "blue"
+  key_id = data.aws_kms_key.general_shared.arn
 
   lifecycle {
     ignore_changes = [value]

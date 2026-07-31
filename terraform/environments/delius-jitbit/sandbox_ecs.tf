@@ -52,6 +52,7 @@ module "s3_bucket_app_deployment_sandbox" {
 }
 
 resource "aws_security_group" "jitbit_sandbox" {
+  #checkov:skip=CKV2_AWS_5 "SG is referenced by hmpps-cr-ancillary-jitbit-app repo"
   count = local.is-development ? 1 : 0
 
   vpc_id      = data.aws_vpc.shared.id

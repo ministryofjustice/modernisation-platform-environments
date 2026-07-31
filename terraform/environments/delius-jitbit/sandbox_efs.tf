@@ -55,6 +55,7 @@ resource "aws_ssm_parameter" "efs_id_sandbox" {
   name  = "/${local.application_name}/sandbox/efs-id"
   type  = "String"
   value = aws_efs_file_system.lucene_sandbox[0].id
+  key_id = data.aws_kms_key.general_shared.arn
 }
 
 resource "aws_ssm_parameter" "efs_ap_id_sandbox" {
@@ -62,6 +63,7 @@ resource "aws_ssm_parameter" "efs_ap_id_sandbox" {
   name  = "/${local.application_name}/sandbox/efs-access-point-id"
   type  = "String"
   value = aws_efs_access_point.lucene_sandbox[0].id
+  key_id = data.aws_kms_key.general_shared.arn
 }
 
 resource "aws_security_group" "efs_sandbox" {
