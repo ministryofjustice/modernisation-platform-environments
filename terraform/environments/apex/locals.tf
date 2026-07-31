@@ -73,7 +73,8 @@ locals {
     db_secret_arn     = local.db_secret_arn
   })
 
-  db_secret_arn = local.environment == "development" ? try(aws_secretsmanager_secret.app_apex_dbpassword_tad[0].arn, "") : "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.app_db_password_name}"
+  # ECS task definition consumes this ARN via task_definition.json.
+  db_secret_arn = local.environment == "test" ? data.aws_secretsmanager_secret.app_apex_dbpassword_tad[0].arn : aws_secretsmanager_secret.app_apex_dbpassword_tad[0].arn
 
   env_account_id       = local.environment_management.account_ids[terraform.workspace]
   app_db_password_name = "APP_APEX_DBPASSWORD_TAD"
