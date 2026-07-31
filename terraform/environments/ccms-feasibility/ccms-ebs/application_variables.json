@@ -31,6 +31,8 @@
       "ebs_size_ebsdb_home": 100,
       "ebs_size_ebsdb_temp": 100,
 
+      "ebsapps_swap_size": 20,
+      "ebsapps_temp_size": 100,
       "ebsapps_exhome_size": 100,
       "ebsapps_u01_size": 200,
       "ebsapps_u03_size": 200,

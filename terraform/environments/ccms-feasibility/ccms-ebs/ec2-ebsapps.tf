@@ -1,6 +1,25 @@
+data "aws_ami" "ebsapps" {
+  count  = 2
+  owners = ["self"]
+  filter {
+    name   = "image-id"
+    values = [local.application_data.accounts[local.environment].ebsapps_ami_ids[count.index]]
+  }
+}
+
+locals {
+  ebsapps_snapshots = [
+    for ami in data.aws_ami.ebsapps : {
+      for bdm in ami.block_device_mappings :
+      bdm.device_name => bdm.ebs.snapshot_id
+      if try(bdm.ebs.snapshot_id, "") != ""
+    }
+  ]
+}
+
 module "oracle_ebs_apps" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/5674fd2
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/oracle-ec2?ref=5674fd2"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b8a4f6f
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/oracle-ec2?ref=b8a4f6f"
   count  = 2
 
   name          = "ec2-${local.component_name}-${local.env_label}-ebsapps-${count.index + 1}"
@@ -12,6 +31,8 @@ module "oracle_ebs_apps" {
   subnet_id          = local.private_subnets[count.index]
   security_group_ids = [aws_security_group.ebsapps.id]
 
+  no_device_names = ["/dev/sdb", "/dev/sdc"]
+
   tags = merge(local.tags, {
     instance-role = "ebsapps"
     backup        = "true"
@@ -21,9 +42,10 @@ module "oracle_ebs_apps" {
 # EBS Volumes
 resource "aws_ebs_volume" "ebsapps_swap" {
   count             = 2
-  lifecycle { ignore_changes = [kms_key_id] }
+  lifecycle { ignore_changes = [kms_key_id, snapshot_id] }
   availability_zone = module.oracle_ebs_apps[count.index].availability_zone
-  size              = 20
+  snapshot_id       = local.ebsapps_snapshots[count.index]["/dev/sdb"]
+  size              = local.application_data.accounts[local.environment].ebsapps_swap_size
   type              = "gp3"
   iops              = 3000
   encrypted         = true
@@ -41,9 +63,10 @@ resource "aws_volume_attachment" "ebsapps_swap" {
 
 resource "aws_ebs_volume" "ebsapps_temp" {
   count             = 2
-  lifecycle { ignore_changes = [kms_key_id] }
+  lifecycle { ignore_changes = [kms_key_id, snapshot_id] }
   availability_zone = module.oracle_ebs_apps[count.index].availability_zone
-  size              = 100
+  snapshot_id       = local.ebsapps_snapshots[count.index]["/dev/sdc"]
+  size              = local.application_data.accounts[local.environment].ebsapps_temp_size
   type              = "gp3"
   iops              = 3000
   encrypted         = true
