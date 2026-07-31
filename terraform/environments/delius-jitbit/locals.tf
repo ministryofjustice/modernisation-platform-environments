@@ -71,7 +71,7 @@ locals {
       local.domain_name_sub_sandbox_green[0],
     ] : []
   )
-  
+
   internal_security_group_cidrs = distinct(flatten([
     module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
     module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
@@ -107,5 +107,5 @@ locals {
   create_blue_green = local.is-development || local.is-test
 
   # Add environments that require the Lucene EFS solution
-  create_efs = local.is-development
+  create_efs = local.is-development || local.is-test
 }
