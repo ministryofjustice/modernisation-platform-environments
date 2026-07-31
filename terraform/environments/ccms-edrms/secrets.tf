@@ -41,6 +41,7 @@ resource "aws_secretsmanager_secret_version" "edrms_secrets" {
     "slack_channel_webhook"           = ""
     "slack_channel_webhook_guardduty" = ""
     "slack_channel_webhook_docs"      = ""
+    "slack_channel_webhook_s3"        = ""
   })
 
   lifecycle {
