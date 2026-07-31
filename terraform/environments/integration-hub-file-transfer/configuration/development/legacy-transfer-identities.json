@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "applications": {
+  "identities": {
     "dms1981": {
       "description": "Development custom identity provider user",
       "owner": "Integration Hub",

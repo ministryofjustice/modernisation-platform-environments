@@ -1,33 +1,33 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://modernisation-platform.service.justice.gov.uk/schemas/integration-hub-file-transfer/legacy-transfer-applications.json",
-  "title": "Legacy Transfer applications",
-  "description": "Application identities accessing AWS Transfer Family endpoints through the custom identity provider.",
+  "$id": "https://modernisation-platform.service.justice.gov.uk/schemas/integration-hub-file-transfer/legacy-transfer-identities.json",
+  "title": "Legacy Transfer identities",
+  "description": "Identities accessing AWS Transfer Family endpoints through the custom identity provider.",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "version",
-    "applications"
+    "identities"
   ],
   "properties": {
     "version": {
       "description": "Version of this configuration contract.",
       "const": 1
     },
-    "applications": {
-      "description": "Transfer Family application identities, keyed by the username presented when connecting to an SFTP or FTPS endpoint.",
+    "identities": {
+      "description": "Transfer Family identities, keyed by the username presented when connecting to an SFTP or FTPS endpoint.",
       "type": "object",
       "propertyNames": {
         "pattern": "^[a-z0-9][a-z0-9-]{0,62}$"
       },
       "additionalProperties": {
-        "$ref": "#/$defs/application"
+        "$ref": "#/$defs/identity"
       }
     }
   },
   "$defs": {
-    "application": {
-      "description": "Configuration for one application identity using the custom identity provider.",
+    "identity": {
+      "description": "Configuration for one identity using the custom identity provider.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -43,7 +43,7 @@
       ],
       "properties": {
         "description": {
-          "description": "Human-readable purpose of the application identity.",
+          "description": "Human-readable purpose of the identity.",
           "type": "string",
           "minLength": 1
         },
@@ -115,15 +115,15 @@
   "examples": [
     {
       "version": 1,
-      "applications": {
-        "example-application": {
-          "description": "Example application uploading files for processing",
+      "identities": {
+        "example-identity": {
+          "description": "Example identity used to upload files for processing",
           "owner": "Example service team",
           "enabled": true,
           "expires_on": "2027-07-31",
           "identity_provider_key": "secrets",
-          "idp_username": "example-application",
-          "home_directory_prefix": "example-application",
+          "idp_username": "example-identity",
+          "home_directory_prefix": "example-identity",
           "server_id_allow_list": [
             "s-0123456789abcdef0"
           ],
@@ -131,7 +131,7 @@
             "1.2.3.4/32"
           ],
           "ssh_public_keys": [
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExamplePublicKeyMaterial0123456789 example-application"
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExamplePublicKeyMaterial0123456789 example-identity"
           ]
         }
       }

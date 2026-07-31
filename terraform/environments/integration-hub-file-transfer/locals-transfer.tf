@@ -2,10 +2,10 @@ locals {
   transfer_address_allocation_ids = [for key, value in aws_eip.this : value.id]
   transfer_subnet_ids             = local.is-production ? sort(module.vpc_isolated.public_subnets) : slice(sort(module.vpc_isolated.public_subnets), 0, 1)
 
-  legacy_transfer_configuration = jsondecode(file("${path.module}/configuration/${local.environment}/legacy-transfer-applications.json"))
+  legacy_transfer_configuration = jsondecode(file("${path.module}/configuration/${local.environment}/legacy-transfer-identities.json"))
 
   environment_transfer_server_users = {
-    for username, user in local.legacy_transfer_configuration.applications : username => user
+    for username, user in local.legacy_transfer_configuration.identities : username => user
     if user.enabled
   }
 
