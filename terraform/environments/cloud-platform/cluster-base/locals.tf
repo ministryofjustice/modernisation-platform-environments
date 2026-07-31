@@ -1,5 +1,7 @@
 locals {
-    mp_environments = concat(
+  bu_accounts = jsondecode(file("${path.module}/../accounts.json"))
+
+  mp_environments = concat(
     [
       "cloud-platform-preproduction",
       "cloud-platform-nonlive",
