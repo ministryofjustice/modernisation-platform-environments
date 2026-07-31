@@ -106,7 +106,7 @@ data "aws_iam_policy_document" "lambda_policy_bounce_email_notification" {
     actions = [
       "kms:Decrypt"
     ]
-    resources = [data.aws_kms_key.general_shared.arn]
+    resources = [data.aws_kms_key.general_shared.arn, aws_kms_key.cloudwatch_logs.arn]
   }
 }
 
@@ -128,7 +128,7 @@ resource "aws_cloudwatch_log_group" "bounce_email_notification" {
   #checkov:skip=CKV_AWS_338: "Logs required for 3 days"
   name              = "/aws/lambda/bounce_email_notification"
   retention_in_days = 3
-  kms_key_id        = data.aws_kms_key.general_shared.arn
+  kms_key_id        = aws_kms_key.cloudwatch_logs.arn
 
   tags = local.tags
 }

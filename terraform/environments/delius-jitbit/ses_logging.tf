@@ -70,7 +70,7 @@ resource "aws_cloudwatch_log_group" "sns_logs" {
   #checkov:skip=CKV_AWS_338: "Log retention varies per environment"
   name              = format("%s-ses-logs", local.application_name)
   retention_in_days = local.application_data.accounts[local.environment].ses_log_retention_days
-  kms_key_id        = data.aws_kms_key.general_shared.arn
+  kms_key_id        = aws_kms_key.cloudwatch_logs.arn
 
   tags = local.tags
 }
@@ -79,7 +79,7 @@ resource "aws_cloudwatch_log_group" "execution_logs" {
   #checkov:skip=CKV_AWS_338: "Logs required for 3 days"
   name              = format("/aws/lambda/%s", aws_lambda_function.sns_to_cloudwatch.function_name)
   retention_in_days = 3
-  kms_key_id        = data.aws_kms_key.general_shared.arn
+  kms_key_id        = aws_kms_key.cloudwatch_logs.arn
 
   tags = local.tags
 }

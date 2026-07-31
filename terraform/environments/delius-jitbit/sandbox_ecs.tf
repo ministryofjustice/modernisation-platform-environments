@@ -96,5 +96,5 @@ resource "aws_cloudwatch_log_group" "jitbit_sandbox" {
 
   name              = format("%s-%s-ecs", local.application_name, "sandbox")
   retention_in_days = 30
-  kms_key_id        = data.aws_kms_key.general_shared.arn
+  kms_key_id        = aws_kms_key.cloudwatch_logs.arn
 }

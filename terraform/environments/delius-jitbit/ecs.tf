@@ -90,7 +90,7 @@ resource "aws_cloudwatch_log_group" "jitbit" {
   #checkov:skip=CKV_AWS_338: "Logs required for 30 days"
   name              = format("%s-ecs", local.application_name)
   retention_in_days = 30
-  kms_key_id        = data.aws_kms_key.general_shared.arn
+  kms_key_id        = aws_kms_key.cloudwatch_logs.arn
 }
 
 output "s3_bucket_app_deployment_name" {
