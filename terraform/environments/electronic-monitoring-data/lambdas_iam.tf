@@ -2882,3 +2882,52 @@ module "trigger_cadt_iam" {
   }
 
 }
+
+
+
+# ---------------------------------
+# Poll CADT iam role
+# ---------------------------------
+
+data "aws_iam_policy_document" "poll_cadt_policy_document" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecs:DescribeTasks"
+    ]
+    resources = [
+      "*"
+    ]
+    condition {
+      test     = "ArnEquals"
+      variable = "ecs:cluster"
+      values = [aws_ecs_cluster.cadt.arn]
+    }
+  }
+}
+
+resource "aws_iam_policy" "poll_cadt_iam_policy" {
+  name   = "poll_cadt_lambda_policy"
+  policy = data.aws_iam_policy_document.cadt_policy_document.json
+}
+
+
+module "poll_cadt_iam" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-role"
+  
+  name = "poll-cadt-iam-role"
+  trust_policy_permissions = {
+   LambdaAssume = { actions = [
+      "sts:AssumeRole",
+    ]
+    principals = [{
+      type = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }]}
+  }
+
+  policies = {
+    custom = aws_iam_policy.poll_cadt_iam_policy.arn
+  }
+
+}
