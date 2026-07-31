@@ -33,8 +33,26 @@
           "JitterStrategy": "FULL"
         }
       ],
-      "End": true
+      "Next": "PollCadt"
     }
+  },
+  "PollCadt": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${poll_cadt}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed", "Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2.0
+        }
+      ],
+      "End": true
   },
   "QueryLanguage": "JSONata"
 }

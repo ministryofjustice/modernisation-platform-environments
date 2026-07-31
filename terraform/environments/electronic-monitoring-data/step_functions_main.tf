@@ -392,6 +392,7 @@ module "trigger_cadt_step_function" {
     {
       "trigger_cadt"  = module.trigger_cadt.lambda_function_name,
       "environment"   = local.environment,
+      "poll_cadt"     = module.poll_cadt.lambda_function_name,
     }
   )
   type = "STANDARD"
