@@ -113,7 +113,6 @@ resource "kubernetes_manifest" "external_secret_litellm_entra_id" {
   }
 }
 
-
 resource "kubernetes_manifest" "external_secret_aurora" {
   depends_on = [module.ai_gateway_namespace]
 

@@ -32,6 +32,12 @@ spec:
         apiVersions: ["v1"]
         operations: ["CREATE", "UPDATE"]
         resources: ["pods"]
+  matchConditions:
+    # Mirrors resourceFiltersIncludeNamespaces; ValidatingPolicy ignores the Kyverno ConfigMap filters.
+    - name: exclude-namespaces
+      expression: >-
+        !request.namespace.startsWith('kube-') &&
+        !{{ .Values.excludedNamespaces | toJson }}.exists(ns, ns == request.namespace)
   variables:
     - name: allContainers
       expression: >-
