@@ -33,6 +33,24 @@ environment:
       metrics_server: "3.13.1"
     kyverno_policies:
       validation_action: "Audit"
+      excluded_namespaces:
+        - ai-gateway
+        - amazon-guardduty
+        - amazon-network-flow-monitor
+        - app
+        - aws-cloudwatch-observability
+        - cert-manager
+        - cilium-secrets
+        - cluster-autoscaler
+        - external-dns
+        - external-secrets
+        - fluent-bit
+        - karpenter
+        - keda
+        - kyverno
+        - metrics-server
+        - prometheus
+        - shared-services
     route53_zones:
       - "development.data-platform.service.justice.gov.uk"
       - "development.ai-gateway.justice.gov.uk"
@@ -71,21 +89,39 @@ environment:
       metrics_server: "3.13.1"
     kyverno_policies:
       validation_action: "Audit"
+      excluded_namespaces:
+        - ai-gateway
+        - amazon-guardduty
+        - amazon-network-flow-monitor
+        - app
+        - aws-cloudwatch-observability
+        - cert-manager
+        - cilium-secrets
+        - cluster-autoscaler
+        - external-dns
+        - external-secrets
+        - fluent-bit
+        - karpenter
+        - keda
+        - kyverno
+        - metrics-server
+        - prometheus
+        - shared-services
     route53_zones:
       - "test.data-platform.service.justice.gov.uk"
       - "test.ai-gateway.justice.gov.uk"
     shared_services_gateway_hostname: "*.test.data-platform.service.justice.gov.uk"
   preproduction:
     kubernetes_version: "1.36"
-    bottlerocket_version: "1.62.1-ea1afdd6"
+    bottlerocket_version: "1.63.0-d4932ff8"
     node_update_config:
       max_unavailable: 1
     addon_versions:
-      aws_ebs_csi_driver: "v1.62.0-eksbuild.1"
-      aws_efs_csi_driver: "v3.3.0-eksbuild.1"
-      aws_guardduty_agent: "v1.15.0-eksbuild.2"
-      aws_network_flow_monitoring_agent: "v1.1.4-eksbuild.1"
-      eks_node_monitoring_agent: "v1.6.6-eksbuild.1"
+      aws_ebs_csi_driver: "v1.63.0-eksbuild.1"
+      aws_efs_csi_driver: "v3.4.1-eksbuild.1"
+      aws_guardduty_agent: "v1.16.0-eksbuild.2"
+      aws_network_flow_monitoring_agent: "v1.1.6-eksbuild.1"
+      eks_node_monitoring_agent: "v1.6.7-eksbuild.1"
       eks_pod_identity_agent: "v1.3.10-eksbuild.3"
     crd_versions:
       aws_load_balancer_controller: "v0.0.237"
@@ -109,21 +145,39 @@ environment:
       metrics_server: "3.13.1"
     kyverno_policies:
       validation_action: "Audit"
+      excluded_namespaces:
+        - ai-gateway
+        - amazon-guardduty
+        - amazon-network-flow-monitor
+        - app
+        - aws-cloudwatch-observability
+        - cert-manager
+        - cilium-secrets
+        - cluster-autoscaler
+        - external-dns
+        - external-secrets
+        - fluent-bit
+        - karpenter
+        - keda
+        - kyverno
+        - metrics-server
+        - prometheus
+        - shared-services
     route53_zones:
       - "preproduction.data-platform.service.justice.gov.uk"
       - "preproduction.ai-gateway.justice.gov.uk"
     shared_services_gateway_hostname: "*.preproduction.data-platform.service.justice.gov.uk"
   production:
     kubernetes_version: "1.36"
-    bottlerocket_version: "1.62.1-ea1afdd6"
+    bottlerocket_version: "1.63.0-d4932ff8"
     node_update_config:
       max_unavailable: 1
     addon_versions:
-      aws_ebs_csi_driver: "v1.62.0-eksbuild.1"
-      aws_efs_csi_driver: "v3.3.0-eksbuild.1"
-      aws_guardduty_agent: "v1.15.0-eksbuild.2"
-      aws_network_flow_monitoring_agent: "v1.1.4-eksbuild.1"
-      eks_node_monitoring_agent: "v1.6.6-eksbuild.1"
+      aws_ebs_csi_driver: "v1.63.0-eksbuild.1"
+      aws_efs_csi_driver: "v3.4.1-eksbuild.1"
+      aws_guardduty_agent: "v1.16.0-eksbuild.2"
+      aws_network_flow_monitoring_agent: "v1.1.6-eksbuild.1"
+      eks_node_monitoring_agent: "v1.6.7-eksbuild.1"
       eks_pod_identity_agent: "v1.3.10-eksbuild.3"
     crd_versions:
       aws_load_balancer_controller: "v0.0.237"
@@ -147,6 +201,24 @@ environment:
       metrics_server: "3.13.1"
     kyverno_policies:
       validation_action: "Audit"
+      excluded_namespaces:
+        - ai-gateway
+        - amazon-guardduty
+        - amazon-network-flow-monitor
+        - app
+        - aws-cloudwatch-observability
+        - cert-manager
+        - cilium-secrets
+        - cluster-autoscaler
+        - external-dns
+        - external-secrets
+        - fluent-bit
+        - karpenter
+        - keda
+        - kyverno
+        - metrics-server
+        - prometheus
+        - shared-services
     route53_zones:
       - "data-platform.service.justice.gov.uk"
       - "ai-gateway.justice.gov.uk"

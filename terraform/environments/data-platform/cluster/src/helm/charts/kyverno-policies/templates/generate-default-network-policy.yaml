@@ -25,6 +25,12 @@ spec:
         apiVersions: ["v1"]
         operations: ["CREATE"]
         resources: ["namespaces"]
+  matchConditions:
+    # Namespaces are cluster-scoped; request.name holds the namespace name, not request.namespace.
+    - name: exclude-namespaces
+      expression: >-
+        !request.name.startsWith('kube-') &&
+        !{{ .Values.excludedNamespaces | toJson }}.exists(ns, ns == request.name)
   variables:
     - name: nsName
       expression: object.metadata.name

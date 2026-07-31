@@ -51,6 +51,14 @@ locals {
       primary   = "10.41.16.0/20"
       secondary = "100.81.0.0/16"
     }
+    container-platform-cd-nonlive = {
+      primary   = "10.195.96.0/20"
+      secondary = "100.71.0.0/16"
+    }
+    container-platform-cd-live = {
+      primary   = "10.41.48.0/20"
+      secondary = "100.83.0.0/16"
+    }
   }
 
   vpc_flow_log_cloudwatch_log_group_name_prefix       = "/aws/vpc-flow-log/"
