@@ -335,8 +335,7 @@ def lambda_handler(event, context):
             response = logs_client.get_log_events(
                 logGroupName=config.LOG_GROUP_NAME,
                 logStreamName=log_stream_name,
-                startTime=timestamp,
-                limit=5
+                startTime=timestamp
             )
 
             log_lines = [e['message'] for e in response['events']]
