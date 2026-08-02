@@ -12,8 +12,9 @@ module "oracle_ebs_db" {
   security_group_ids = [aws_security_group.ebsdb.id]
 
   tags = merge(local.tags, {
-    instance-role = "ebsdb"
-    backup        = "true"
+    instance-role        = "ebsdb"
+    backup               = "true"
+    instance-scheduling  = "skip-scheduling"
   })
 }
 

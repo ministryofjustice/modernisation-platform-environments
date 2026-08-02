@@ -13,8 +13,9 @@ module "oracle_ebs_apps" {
   security_group_ids = [aws_security_group.ebsapps.id]
 
   tags = merge(local.tags, {
-    instance-role = "ebsapps"
-    backup        = "true"
+    instance-role        = "ebsapps"
+    backup               = "true"
+    instance-scheduling  = "skip-scheduling"
   })
 }
 
