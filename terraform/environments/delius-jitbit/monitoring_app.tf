@@ -1,6 +1,8 @@
 resource "aws_cloudwatch_log_group" "app_logs" {
+  #checkov:skip=CKV_AWS_338: "Logs required for 30 days"
   name              = "delius-jitbit-ecs"
   retention_in_days = 30
+  kms_key_id        = aws_kms_key.cloudwatch_logs.arn
 
   tags = local.tags
 }

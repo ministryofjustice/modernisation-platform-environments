@@ -16,13 +16,11 @@ module "weblogic_eis" {
 
   force_new_deployment = false
 
-  ecs_cluster_arn  = module.ecs.ecs_cluster_arn
+  ecs_cluster_arn = module.ecs.ecs_cluster_arn
 
   cluster_security_group_id = aws_security_group.cluster.id
 
-  alb_security_group_id      = aws_security_group.delius_frontend_alb_security_group.id
-  alb_listener_rule_paths    = ["/eis"]
-  alb_listener_rule_priority = 40
+  alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   alb_health_check = {
     path                 = "/NDelius-war/delius/javax.faces.resource/health/healthcheck.json"
     healthy_threshold    = 5
@@ -34,7 +32,8 @@ module "weblogic_eis" {
     grace_period_seconds = 300
   }
 
-  certificate_arn = aws_acm_certificate.external.arn
+  certificate_arn               = aws_acm_certificate.external.arn
+  target_group_protocol_version = "HTTP1"
 
   db_ingress_security_groups = []
 
@@ -128,4 +127,57 @@ resource "aws_ecs_capacity_provider" "weblogic_eis" {
 
     managed_termination_protection = "ENABLED"
   }
+}
+
+resource "aws_lb_listener_rule" "blocked_paths_listener_rule_weblogic_eis" {
+  listener_arn = aws_lb_listener.listener_https.arn
+  priority     = 21 # must be before ndelius_allowed_paths_rule
+  condition {
+    host_header {
+      values = [
+        "interface.${var.env_name}.${var.account_config.dns_suffix}",
+        "interface.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
+      ]
+    }
+  }
+  condition {
+    path_pattern {
+      values = [
+        "/NDelius*/delius/a4j/g/3_3_3.Final*DATA*", # mitigates CVE-2018-12533
+      ]
+    }
+  }
+  action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      status_code  = "404"
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_eis" {
+  listener_arn = aws_lb_listener.listener_https.arn
+  priority     = 31
+  condition {
+    host_header {
+      values = [
+        "interface.${var.env_name}.${var.account_config.dns_suffix}",
+        "interface.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
+      ]
+    }
+  }
+  condition {
+    path_pattern {
+      values = [
+        "/NDelius*",
+        "/jspellhtml/*"
+      ]
+    }
+  }
+  action {
+    type             = "forward"
+    target_group_arn = module.weblogic_eis.target_group_arn
+  }
+  depends_on = [aws_lb_listener_rule.blocked_paths_listener_rule]
 }
