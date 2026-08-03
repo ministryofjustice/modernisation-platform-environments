@@ -37,9 +37,9 @@ locals {
     "217.138.45.110/32", # Unilink AOVPN
   ]
   cp_ips = [
-    "35.178.209.113/32", #cloudplatform-live1-1
-    "3.8.51.207/32", # cloudplatform-live1-2
-    "35.177.252.54/32" # cloudplatform-live1-3
+    "35.178.209.113/32", # cloudplatform-live1-1
+    "3.8.51.207/32",     # cloudplatform-live1-2
+    "35.177.252.54/32"   # cloudplatform-live1-3
   ]
 
   all_ingress_ips = concat(local.moj_ips, local.unilink_ips, local.cp_ips)

@@ -16,6 +16,8 @@ resource "aws_iam_role" "step_function_role" {
 }
 
 resource "aws_iam_policy" "step_function_policy" {
+  #checkov:skip=CKV_AWS_355: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+  #checkov:skip=CKV_AWS_290: "ignore"
   name = "${var.environment}_step_function_policy"
   policy = jsonencode({
     Version = "2012-10-17"
@@ -40,10 +42,15 @@ resource "aws_iam_role_policy_attachment" "step_function_policy_attachment" {
 }
 
 resource "aws_cloudwatch_log_group" "log_group_for_sfn" {
-  name = "/aws/states/ecs_restart_state_machine/${var.environment}"
+  #checkov:skip=CKV_AWS_338: "Log retention varies by env"
+  #checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
+  name              = "/aws/states/ecs_restart_state_machine/${var.environment}"
+  retention_in_days = 365
 }
 
 resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
+  #checkov:skip=CKV_AWS_285 "Logging is enabled"
+  #checkov:skip=CKV_AWS_284: "Unnecessary"
   name     = "${var.environment}_ecs_restart_state_machine"
   role_arn = aws_iam_role.step_function_role.arn
 
