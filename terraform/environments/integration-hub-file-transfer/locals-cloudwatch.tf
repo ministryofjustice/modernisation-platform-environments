@@ -4,7 +4,7 @@ locals {
     "Resource Name"              = module.s3_bucket["processing"].s3_bucket_id
   }
 
-  cloudwatch_metric_alarms = {
+  cloudwatch_metric_alarms = merge({
     "lambda-file-received-adapter-errors" = {
       alarm_description   = "The file received adapter Lambda function has failed to process one or more events"
       comparison_operator = "GreaterThanThreshold"
@@ -421,7 +421,21 @@ locals {
       statistic          = "Sum"
       threshold          = 0
     }
-  }
+    }, {
+    for index, eip in aws_eip.this : "shield-transfer-eip-${index + 1}-ddos-detected" => {
+      alarm_description   = "Shield Advanced detected a DDoS event targeting Transfer server Elastic IP ${index + 1}"
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      dimensions = {
+        ResourceArn = "arn:aws:ec2:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:eip-allocation/${eip.id}"
+      }
+      evaluation_periods = 1
+      metric_name        = "DDoSDetected"
+      namespace          = "AWS/DDoSProtection"
+      period             = 60
+      statistic          = "Maximum"
+      threshold          = 1
+    }
+  })
 
   cloudwatch_retention_days = local.is-production ? 400 : 30
 }

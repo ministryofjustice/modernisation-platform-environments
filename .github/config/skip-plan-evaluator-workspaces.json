@@ -14,5 +14,7 @@
   "container-platform-laa-nonlive",
   "container-platform-laa-live",
   "container-platform-hmpps-nonlive",
-  "container-platform-hmpps-live"
+  "container-platform-hmpps-live",
+  "container-platform-cd-nonlive",
+  "container-platform-cd-live"
 ]
