@@ -30,6 +30,10 @@ data "aws_secretsmanager_secret" "dms_oracle_credentials" {
 }
 
 data "aws_iam_policy_document" "oracle_dms_kms" {
+  #checkov:skip=CKV_AWS_111: Allowing root full access
+  #checkov:skip=CKV_AWS_356: Allowing root full access
+  #checkov:skip=CKV_AWS_109: Allowing root full access
+
   count = local.is-development ? 1 : 0
 
   statement {
@@ -147,9 +151,10 @@ resource "aws_s3_object" "oracle_dms_mappings" {
 
 #checkov:skip=CKV2_AWS_57: Automatic rotation not needed for test webhook
 resource "aws_secretsmanager_secret" "dms_slack_webhook" {
-  count = local.is-development ? 1 : 0
-  name  = "${local.application_name}-${local.environment}/dms/slack-webhook"
-  tags  = local.tags
+  count      = local.is-development ? 1 : 0
+  name       = "${local.application_name}-${local.environment}/dms/slack-webhook"
+  kms_key_id = aws_kms_key.oracle_dms[0].arn
+  tags       = local.tags
 }
 
 resource "aws_secretsmanager_secret_version" "dms_slack_webhook" {
@@ -350,6 +355,10 @@ data "aws_kms_alias" "dms_postgres_example" {
 }
 
 data "aws_iam_policy_document" "postgres_dms_kms" {
+  #checkov:skip=CKV_AWS_111: Allowing root full access
+  #checkov:skip=CKV_AWS_356: Allowing root full access
+  #checkov:skip=CKV_AWS_109: Allowing root full access
+
   count = local.is-development ? 1 : 0
 
   statement {
