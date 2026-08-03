@@ -29,7 +29,7 @@
 #         targets = [
 #           # "wam-idb.eu-west-2.amazonaws.com",
 #           # "wam-ps.eu-west-2.amazonaws.com",
-#           # ".s3.amazonaws.com", # covers s3.amazonaws.com and *.s3.amazonaws.com
+#           # ".s3.amazonaws.com", # covers s3.amazonaws.com and ".s3.amazonaws.com
 #           # ".s3-external-1.amazonaws.com",
 #           # ".s3-eu-west-2.amazonaws.com",
 #           # "sqs.eu-west-2.amazonaws.com",
@@ -51,13 +51,13 @@
 #         CDN delivery networks
 #
 # Key consolidations vs original list:
-#   ".microsoft.com"     — replaces all individual *.microsoft.com entries
-#   ".windows.net"       — replaces *.blob.core.windows.net, *.queue.core.windows.net,
-#                          *.table.core.windows.net, *.servicebus.windows.net,
+#   ".microsoft.com"     — replaces all individual ".microsoft.com entries
+#   ".windows.net"       — replaces ".blob.core.windows.net, ".queue.core.windows.net,
+#                          ".table.core.windows.net, ".servicebus.windows.net,
 #                          login.windows.net, enterpriseregistration.windows.net etc.
 #   ".office.com"        — replaces all individual portal/admin/forms/teams subdomains
-#   ".office.net"        — replaces *.cdn.office.net, *.osi.office.net entries etc.
-#   ".office365.com"     — replaces outlook.office365.com, *.res.office365.com etc.
+#   ".office.net"        — replaces ".cdn.office.net, ".osi.office.net entries etc.
+#   ".office365.com"     — replaces outlook.office365.com, ".res.office365.com etc.
 #   ".officeapps.live.com" — replaces all nexus/odc/broadcast/excel/word etc. subdomains
 #   ".microsoftonline.com" — replaces all individual Azure AD endpoint entries
 # -----------------------------------------------------------------------------
@@ -76,67 +76,64 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
         target_types         = ["TLS_SNI", "HTTP_HOST"]
         targets = [
           # Windows Update & Defender
-          ".windowsupdate.com", # covers *.windowsupdate.com and *.download.windowsupdate.com
+          ".windowsupdate.com", # covers ".windowsupdate.com and ".download.windowsupdate.com
           "wustat.windows.com",
           "client.wns.windows.com",
           "skydrive.wns.windows.com",
           "adldefinitionupdates-wu.azurewebsites.net",
 
-          # Microsoft (broad — mirrors original list; covers all *.microsoft.com at any depth)
+          # OneDrive and SharePoint - https://learn.microsoft.com/en-us/sharepoint/required-urls-and-ports
+          ".onedrive.com",
+          "onedrive.live.com",
+          "login.live.com",
+          "g.live.com",
+          "spoprod-a.akamaihd.net",
+          ".mesh.com",
+          "p.sfx.ms",
+          "oneclient.sfx.ms",
           ".microsoft.com",
-          "c.s-microsoft.com", # root is s-microsoft.com, NOT covered by .microsoft.com
-
-          # Azure / Windows platform
-          # ".windows.net", # covers all *.windows.net subdomains
-          # "management.azure.com",
-          # "amp.azure.net",
-          # ".adhybridhealth.azure.com",
-          # ".informationprotection.azure.com",
-          # "informationprotection.hosting.portal.azure.net",
-          # ".portal.cloudappsecurity.com",
-          # ".cloudapp.net",
-          # ".aadrm.com",
-          # ".azurerms.com",
-
-          # Azure AD / Identity
-          # ".microsoftonline.com", # covers all individual Azure AD endpoint subdomains
-          # ".microsoftonline-p.com",
-          # ".microsoftonline-p.net",
-          # "autologon.microsoftazuread-sso.com",
-          # "policykeyservice.dc.ad.msft.net",
-          # ".msauth.net",
-          # ".msauthimages.net",
-          # ".msftauth.net",
-          # ".msftauthimages.net",
-          # ".phonefactor.net",
-          # ".msappproxy.net",
-
-          # Office 365 (covers portal, admin, forms, SharePoint, Teams, StaffHub etc.)
+          "fabric.io",
+          ".crashlytics.com",
+          "vortex.data.microsoft.com",
+          "posarprodcssservice.accesscontrol.windows.net",
+          "redemptionservices.accesscontrol.windows.net",
+          "token.cp.microsoft.com",
+          "tokensit.cp.microsoft-tst.com",
           ".office.com",
-          ".office.net",
-          ".office365.com",
-          ".officeapps.live.com", # covers all broadcast/excel/word/nexus/odc subdomains
-          ".outlook.com",
-          ".onenote.com",
-          ".sharepointonline.com",
-
-          # CDN / delivery
-          # ".msecnd.net",
-          # ".akamaized.net",
-          # "spoprod-a.akamaihd.net",
-          # "ajax.aspnetcdn.com",
-          # "assets.onestore.ms",
-          # "auth.gfx.ms",
-          # "mem.gfx.ms",
-          # "prod.msocdn.com",
-          # "shellprod.msocdn.com",
-          # ".hockeyapp.net",
-
-          # Misc Microsoft-adjacent services
-          # "dc.services.visualstudio.com",
-          # "ecn.dev.virtualearth.net",
-          # "platform.linkedin.com",
-          # "tokensit.cp.microsoft-tst.com", # Microsoft test tenant CP endpoint
+          ".officeapps.live.com",
+          ".aria.microsoft.com",
+          ".mobileengagement.windows.net",
+          ".branch.io",
+          ".adjust.com",
+          ".servicebus.windows.net",
+          "vas.samsungapps.com",
+          "odc.officeapps.live.com",
+          "login.windows.net",
+          "login.microsoftonline.com",
+          ".files.1drv.com",
+          ".onedrive.live.com",
+          "storage.live.com",
+          ".storage.live.com",
+          ".groups.office.live.com",
+          ".groups.photos.live.com",
+          ".groups.skydrive.live.com",
+          "favorites.live.com",
+          "oauth.live.com",
+          "photos.live.com",
+          "skydrive.live.com",
+          "api.live.net",
+          "apis.live.net",
+          "docs.live.net",
+          ".docs.live.net",
+          "policies.live.net",
+          ".policies.live.net",
+          "settings.live.net",
+          ".settings.live.net",
+          "skyapi.live.net",
+          "snapi.live.net",
+          ".livefilestore.com",
+          "storage.msn.com",
+          ".storage.msn.com"
         ]
       }
     }
@@ -191,9 +188,9 @@ resource "aws_networkfirewall_rule_group" "workspaces_onedrive_live_misc" {
           "wu.client.hip.live.com",
           "oauth.live.com",
           "favorites.live.com",
-          ".office.live.com",   # covers *.groups.office.live.com etc.
-          ".photos.live.com",   # covers *.groups.photos.live.com etc.
-          ".skydrive.live.com", # covers *.groups.skydrive.live.com etc.
+          ".office.live.com",   # covers ".groups.office.live.com etc.
+          ".photos.live.com",   # covers ".groups.photos.live.com etc.
+          ".skydrive.live.com", # covers ".groups.skydrive.live.com etc.
 
           # live.net
           "api.live.net",
@@ -267,9 +264,9 @@ resource "aws_networkfirewall_rule_group" "workspaces_onedrive_live_misc" {
 #   ".digicert.com"    — replaces cacerts/crl3/crl4/ocsp/ocspx/www.digicert.com
 #   ".globalsign.com"  — replaces crl/ocsp/ocsp2/secure.globalsign.com
 #   ".identrust.com"   — replaces apps/crl/isrg.trustid.ocsp.identrust.com
-#   ".verisign.com"    — replaces all evintl-*/evsecure-* entries
+#   ".verisign.com"    — replaces all evintl-"/evsecure-" entries
 #   ".usertrust.com"   — replaces crl/ocsp/crt.usertrust.com
-#   ".omniroot.com"    — replaces cacert/cacert.a/ocsp/vassg142.* entries
+#   ".omniroot.com"    — replaces cacert/cacert.a/ocsp/vassg142." entries
 #   ".letsencrypt.org" — replaces cert.int-x3 and ocsp.int-x3 entries
 # -----------------------------------------------------------------------------
 # resource "aws_networkfirewall_rule_group" "workspaces_certificate_authorities" {
