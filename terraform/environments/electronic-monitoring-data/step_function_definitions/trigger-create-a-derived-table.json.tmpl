@@ -40,7 +40,7 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "Output": "{% $states.result.Payload %}",
       "Arguments": {
-        "Payload.$": {
+        "Payload": {
             "body.$": "States.JsonToString($)"
         },
         "FunctionName": "${poll_cadt}"
