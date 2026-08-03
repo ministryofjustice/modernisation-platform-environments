@@ -9,6 +9,12 @@ data "aws_secretsmanager_secret_version" "spring_datasource_password" {
   secret_id = aws_secretsmanager_secret.spring_datasource_password.id
 }
 
+#Secret for EDRMS
+resource "aws_secretsmanager_secret" "edrms_secrets" {
+  name        = "${local.application_name}-secrets"
+  description = "EDRMS Secret"
+}
+
 resource "aws_secretsmanager_secret_version" "edrms_secrets" {
   secret_id = aws_secretsmanager_secret.edrms_secrets.id
   secret_string = jsonencode({
