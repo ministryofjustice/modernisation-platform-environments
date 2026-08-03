@@ -48,6 +48,24 @@ module "elevenlabs_asr_sagemaker_execution_iam_role" {
       ]
       resources = [module.elevenlabs_asr_kms_key[0].key_arn]
     }
+    S3AsyncTranscription = {
+      sid    = "S3AsyncTranscription"
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:PutObject",
+      ]
+      resources = ["${module.async_transcription[0].s3_bucket_arn}/*"]
+    }
+    AsyncTranscriptionKMSAccess = {
+      sid    = "AsyncTranscriptionKMSAccess"
+      effect = "Allow"
+      actions = [
+        "kms:Decrypt",
+        "kms:GenerateDataKey",
+      ]
+      resources = [module.justice_transcribe_async_kms_key[0].key_arn]
+    }
   }
 }
 
@@ -56,7 +74,7 @@ module "justice_transcribe_backend_iam_role" {
 
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=5b962b1163790398605f2b17447cf5b6cc512237" # v6.6.1
 
-  name            = "${local.deployment_name}-justice-transcribe-backend-execution-role"
+  name            = "${local.component_name}-justice-transcribe-backend-execution-role"
   use_name_prefix = false
 
   trust_policy_permissions = {
@@ -84,10 +102,35 @@ module "justice_transcribe_backend_iam_role" {
   create_inline_policy = true
   inline_policy_permissions = {
     InvokeElevenLabsEndpoint = {
-      sid       = "InvokeElevenLabsEndpoint"
-      effect    = "Allow"
-      actions   = ["sagemaker:InvokeEndpoint"]
+      sid    = "InvokeElevenLabsEndpoint"
+      effect = "Allow"
+      actions = [
+        "sagemaker:InvokeEndpoint",
+        "sagemaker:InvokeEndpointAsync",
+      ]
       resources = [aws_sagemaker_endpoint.elevenlabs_asr[0].arn]
+    }
+    S3AsyncTranscriptionInput = {
+      sid       = "S3AsyncTranscriptionInput"
+      effect    = "Allow"
+      actions   = ["s3:PutObject"]
+      resources = ["${module.async_transcription[0].s3_bucket_arn}/input/*"]
+    }
+    S3AsyncTranscriptionOutput = {
+      sid       = "S3AsyncTranscriptionOutput"
+      effect    = "Allow"
+      actions   = ["s3:GetObject"]
+      resources = ["${module.async_transcription[0].s3_bucket_arn}/output/*"]
+    }
+    AsyncTranscriptionKMSAccess = {
+      sid    = "AsyncTranscriptionKMSAccess"
+      effect = "Allow"
+      actions = [
+        "kms:Decrypt",
+        "kms:Encrypt",
+        "kms:GenerateDataKey",
+      ]
+      resources = [module.justice_transcribe_async_kms_key[0].key_arn]
     }
   }
 }
