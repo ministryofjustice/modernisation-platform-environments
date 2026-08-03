@@ -4,7 +4,8 @@ locals {
 
   environment_configurations = {
     development = {
-      app_hostname = "development.data-platform.service.justice.gov.uk"
+      app_hostname            = "development.data-platform.service.justice.gov.uk"
+      app_google_analytics_id = "G-2SDQPC682J"
       app_ingress_allowlist = [
         "128.77.75.64/26", # Prisma Corporate
       ]
@@ -19,7 +20,8 @@ locals {
       }
     }
     test = {
-      app_hostname = "test.data-platform.service.justice.gov.uk"
+      app_hostname            = "test.data-platform.service.justice.gov.uk"
+      app_google_analytics_id = "G-L4KMR1DY8G"
       app_ingress_allowlist = [
         "128.77.75.64/26", # Prisma Corporate
       ]
@@ -34,7 +36,8 @@ locals {
       }
     }
     preproduction = {
-      app_hostname = "preproduction.data-platform.service.justice.gov.uk"
+      app_hostname            = "preproduction.data-platform.service.justice.gov.uk"
+      app_google_analytics_id = "G-LQW8L51Z8E"
       app_ingress_allowlist = [
         "128.77.75.64/26", # Prisma Corporate
       ]
@@ -49,7 +52,8 @@ locals {
       }
     }
     production = {
-      app_hostname = "data-platform.service.justice.gov.uk"
+      app_hostname            = "data-platform.service.justice.gov.uk"
+      app_google_analytics_id = "G-KWQSR1Q3VN"
       app_ingress_allowlist = [
         "128.77.75.64/26", # Prisma Corporate
       ]

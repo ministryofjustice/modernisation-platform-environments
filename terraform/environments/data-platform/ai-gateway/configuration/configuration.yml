@@ -203,4 +203,67 @@ models:
       region: eu-west-2
       generally_available: true
   google_gemini_enterprise_agent_platform: {}
-  microsoft_foundry: {}
+  microsoft_foundry: # {}
+    claude-fable-5:
+      model_id: "claude-fable-5"
+      model_family: "Claude Fable"
+      model_name: "Claude Fable 5 (Sweden)"
+      model_provider: "azure_ai"
+      model_endpoint: "anthropic"
+      generally_available: false
+    claude-haiku-4-5:
+      model_id: "claude-haiku-4-5"
+      model_family: "Claude Haiku"
+      model_name: "Claude Haiku 4.5 (Sweden)"
+      model_provider: "azure_ai"
+      model_endpoint: "anthropic"
+      generally_available: false
+    claude-opus-4-5:
+      model_id: "claude-opus-4-5"
+      model_family: "Claude Opus"
+      model_name: "Claude Opus 4.5 (Sweden)"
+      model_provider: "azure_ai"
+      model_endpoint: "anthropic"
+      generally_available: false
+    claude-opus-4-6:
+      model_id: "claude-opus-4-6"
+      model_family: "Claude Opus"
+      model_name: "Claude Opus 4.6 (Sweden)"
+      model_provider: "azure_ai"
+      model_endpoint: "anthropic"
+      generally_available: false
+    claude-opus-4-7:
+      model_id: "claude-opus-4-7"
+      model_family: "Claude Opus"
+      model_name: "Claude Opus 4.7 (Sweden)"
+      model_provider: "azure_ai"
+      model_endpoint: "anthropic"
+      generally_available: false
+    claude-opus-4-8:
+      model_id: "claude-opus-4-8"
+      model_family: "Claude Opus"
+      model_name: "Claude Opus 4.8 (Sweden)"
+      model_provider: "azure_ai"
+      model_endpoint: "anthropic"
+      generally_available: false
+    claude-opus-5:
+      model_id: "claude-opus-5"
+      model_family: "Claude Opus"
+      model_name: "Claude Opus 5 (Sweden)"
+      model_provider: "azure_ai"
+      model_endpoint: "anthropic"
+      generally_available: false
+    claude-sonnet-4-6:
+      model_id: "claude-sonnet-4-6"
+      model_family: "Claude Sonnet"
+      model_name: "Claude Sonnet 4.6 (Sweden)"
+      model_provider: "azure_ai"
+      model_endpoint: "anthropic"
+      generally_available: false
+    claude-sonnet-5:
+      model_id: "claude-sonnet-5"
+      model_family: "Claude Sonnet"
+      model_name: "Claude Sonnet 5 (Sweden)"
+      model_provider: "azure_ai"
+      model_endpoint: "anthropic"
+      generally_available: false
