@@ -13,10 +13,8 @@
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "Output": "{% $states.result.Payload %}",
-      "Arguments": {
-        "Payload": {
-            "body.$": "States.JsonToString($)"
-        },
+      "Parameters": {
+        "Payload.$": "$",
         "FunctionName": "${trigger_cadt}"
       },
       "Retry": [
@@ -38,11 +36,9 @@
   "PollCadt": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
-      "Output": "{% $states.result.Payload %}",
-      "Arguments": {
-        "Payload": {
-            "body.$": "States.JsonToString($)"
-        },
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
         "FunctionName": "${poll_cadt}"
       },
       "Retry": [
