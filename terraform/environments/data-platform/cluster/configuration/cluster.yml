@@ -12,10 +12,10 @@ environment:
       eks_node_monitoring_agent: "v1.6.7-eksbuild.1"
       eks_pod_identity_agent: "v1.3.10-eksbuild.3"
     crd_versions:
-      aws_load_balancer_controller: "v0.0.237"
+      aws_load_balancer_controller: "v0.0.241"
       gateway_api: "v1.5.1"
-      karpenter: "1.13.0"
-      prometheus: "v0.91.0"
+      karpenter: "1.14.0"
+      prometheus: "v0.93.0"
     helm_chart_versions:
       aws_cloudwatch_observability: "5.4.0"
       aws_load_balancer_controller: "v3.4.3"
@@ -68,10 +68,10 @@ environment:
       eks_node_monitoring_agent: "v1.6.7-eksbuild.1"
       eks_pod_identity_agent: "v1.3.10-eksbuild.3"
     crd_versions:
-      aws_load_balancer_controller: "v0.0.237"
+      aws_load_balancer_controller: "v0.0.241"
       gateway_api: "v1.5.1"
-      karpenter: "1.13.0"
-      prometheus: "v0.91.0"
+      karpenter: "1.14.0"
+      prometheus: "v0.93.0"
     helm_chart_versions:
       aws_cloudwatch_observability: "5.4.0"
       aws_load_balancer_controller: "v3.4.3"
