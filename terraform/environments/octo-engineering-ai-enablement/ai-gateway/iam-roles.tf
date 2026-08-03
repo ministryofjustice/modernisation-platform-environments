@@ -17,6 +17,6 @@ module "iam_role" {
   }
 
   policies = {
-    ai-gateway = module.ai_gateway_iam_policy.arn
+    ai-gateway = module.iam_policy.arn
   }
 }
