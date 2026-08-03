@@ -38,9 +38,11 @@
   "PollCadt": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
-      "OutputPath": "$.Payload",
-      "Parameters": {
-        "Payload.$": "$",
+      "Output": "{% $states.result.Payload %}",
+      "Arguments": {
+        "Payload.$": {
+            "body.$": "States.JsonToString($)"
+        },
         "FunctionName": "${poll_cadt}"
       },
       "Retry": [
