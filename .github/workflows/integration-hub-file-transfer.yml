@@ -37,7 +37,7 @@ permissions:
 
 jobs:
   validate-configuration-schemas:
-    name: Validate ${{ matrix.schema }} (${{ matrix.environment }})
+    name: 📐 Validate ${{ matrix.schema }} (${{ matrix.environment }})
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -64,21 +64,27 @@ jobs:
 
       - name: Set Up UV
         id: setup_uv
-        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
-          activate-environment: true
+          python-version: "3.13"
 
-      - name: Validate Schema
+      - name: Install Dependencies
+        id: install_dependencies
+        run: |
+          uv sync
+
+      - name: Validate Schema (${{ matrix.schema }} / ${{ matrix.environment }})
         id: validate_schema
         env:
           ENVIRONMENT: ${{ matrix.environment }}
           SCHEMA: ${{ matrix.schema }}
         run: |
-          uvx check-jsonschema \
+          uv run check-jsonschema \
             --schemafile "schemas/${SCHEMA}.json" \
             "configuration/${ENVIRONMENT}/${SCHEMA}.json"
 
   strategy:
+    needs: [validate-configuration-schemas]
     uses: ./.github/workflows/reusable_terraform_components_strategy.yml
     if: inputs.action != 'destroy'
     with:
