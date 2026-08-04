@@ -56,7 +56,26 @@ locals {
       queue_name = local.live_feed_dlq_names.push_data_export_to_p1
     }
   }
+  merge_lambdas = {
+    staged_position = {
+      lambda_name = module.merge_mdss_staged_position[0].lambda_function_name
+      threshold   = 1000000000
+    }
+    staged_event = {
+      lambda_name = module.merge_mdss_staged_event[0].lambda_function_name
+      threshold   = 1000000000
+    }
+    ac_position = {
+      lambda_name = module.merge_ac_position[0].lambda_function_name
+      threshold   = 1000000000
+    }
+    emdi_position = {
+      lambda_name = module.merge_emdi_position[0].lambda_function_name
+      threshold   = 1000000000
+    }
+  }
 }
+
 
 resource "aws_cloudwatch_metric_alarm" "sqs_dlq_has_messages" {
   for_each = local.sqs_dlq_alarm_queues
@@ -166,6 +185,174 @@ resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
 
   dimensions = {
     Environment = local.environment_shorthand
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
+################
+# Merge Lambdas
+################
+
+resource "aws_cloudwatch_metric_alarm" "none_succeeded" {
+  for_each = local.merge_lambdas
+
+  alarm_name          = "none_succeeded_${each.key}"
+  alarm_description   = "Detects no queries completed across 15 minutes."
+  comparison_operator = "LessThanOrEqualToThreshold"
+  threshold           = 0
+  evaluation_periods  = 1
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_query {
+    id          = "total"
+    expression  = "succeeded + failed"
+    label       = "Combined total"
+    return_data = true
+  }
+
+  metric_query {
+    id          = "succeeded"
+    return_data = false
+
+    metric {
+      namespace   = "EM/MergeLambdas"
+      metric_name = "SucceededQueries"
+      period      = 900
+      stat        = "Sum"
+
+      dimensions = {
+        FunctionName = each.value.lambda_name
+      }
+    }
+  }
+
+  metric_query {
+    id          = "failed"
+    return_data = false
+
+    metric {
+      namespace   = "EM/MergeLambdas"
+      metric_name = "FailedQueries"
+      period      = 900
+      stat        = "Sum"
+
+      dimensions = {
+        FunctionName = each.value.lambda_name
+      }
+    }
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
+
+resource "aws_cloudwatch_metric_alarm" "queries_failing" {
+  for_each = local.merge_lambdas
+
+  alarm_name          = "queries_failing_${each.key}"
+  alarm_description   = "Detects 3 failed queries within 15 minutes."
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  threshold           = 3
+  period              = 900
+  statistic           = "Sum"
+  evaluation_periods  = 1
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_name = "FailedQueries"
+  namespace   = "EM/MergeLambdas"
+
+  dimensions = {
+    FunctionName = each.value.lambda_name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "excessive_scanning" {
+  for_each = local.merge_lambdas
+
+  alarm_name          = "excessive_scanning_${each.key}"
+  alarm_description   = "Detects when average scan across an hour is excessive."
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  threshold           = each.value.threshold
+  unit                = "Bytes"
+  period              = 3600
+  statistic           = "Average"
+  evaluation_periods  = 1
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_name = "DataScanned"
+  namespace   = "EM/MergeLambdas"
+
+  dimensions = {
+    FunctionName = each.value.lambda_name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "slow_execution" {
+  for_each = local.merge_lambdas
+
+  alarm_name          = "slow_execution_${each.key}"
+  alarm_description   = "Detects when average run time over half an hour is slow."
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  threshold           = 120000
+  unit                = "Milliseconds"
+  period              = 1800
+  statistic           = "Average"
+  evaluation_periods  = 1
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_name = "TotalExecutionTime"
+  namespace   = "EM/MergeLambdas"
+
+  dimensions = {
+    FunctionName = each.value.lambda_name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "long_queue" {
+  for_each = local.merge_lambdas
+
+  alarm_name          = "long_queue_${each.key}"
+  alarm_description   = "Detects when average queue time over 15 minutes is slow."
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  threshold           = 60000
+  unit                = "Milliseconds"
+  period              = 900
+  statistic           = "Average"
+  evaluation_periods  = 1
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_name = "QueryQueueTime"
+  namespace   = "EM/MergeLambdas"
+
+  dimensions = {
+    FunctionName = each.value.lambda_name
   }
 
   alarm_actions = [
