@@ -327,7 +327,10 @@ data "aws_iam_policy_document" "trigger_cadt_step_function_policy_document" {
   statement {
     effect  = "Allow"
     actions = ["lambda:InvokeFunction"]
-    resources = [module.trigger_cadt.lambda_function_arn]
+    resources = [
+      module.trigger_cadt.lambda_function_arn,
+      module.poll_cadt.lambda_function_arn
+    ]
   }
 }
 
