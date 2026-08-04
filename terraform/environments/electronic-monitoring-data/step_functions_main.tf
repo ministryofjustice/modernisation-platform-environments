@@ -152,6 +152,15 @@ module "merge_into_emdi_position" {
   function_to_iterate = module.merge_emdi_position[0]
 }
 
+# ------------------------------------------
+# Merge into ac position step function
+# ------------------------------------------
+
+module "merge_into_mdss_ac_position" {
+  source       = "./modules/merge_into_reconciler"
+  function_to_iterate = module.merge_ac_position[0]
+}
+
 # ------------------------------------------------------------------------------
 # Staging DB janitor Step Function
 # ------------------------------------------------------------------------------

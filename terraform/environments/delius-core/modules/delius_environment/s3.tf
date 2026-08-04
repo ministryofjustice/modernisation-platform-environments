@@ -15,7 +15,7 @@ module "weblogic_ecs_remote_state" {
   tags = local.tags
 }
 
-locals{
+locals {
   bucket_policy = [
     jsonencode({
       Version = "2012-10-17"

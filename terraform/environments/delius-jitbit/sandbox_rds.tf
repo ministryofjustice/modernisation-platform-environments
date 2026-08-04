@@ -25,6 +25,9 @@ resource "aws_security_group" "database_security_group_sandbox" {
 }
 
 resource "aws_db_instance" "jitbit_sandbox" {
+  #checkov:skip=CKV_AWS_353: "Performance Insights unnecessary"
+  #checkov:skip=CKV_AWS_118: "Enhanced Monitoring unnecessary"
+  #checkov:skip=CKV_AWS_129: "Cloudwatch log exports unnecessary"
   count = local.is-development ? 1 : 0
 
   engine         = "sqlserver-se"
@@ -39,16 +42,19 @@ resource "aws_db_instance" "jitbit_sandbox" {
   snapshot_identifier = try(local.application_data.accounts["sandbox"].db_snapshot_identifier, null)
 
   # tflint-ignore: aws_db_instance_default_parameter_group
-  parameter_group_name        = "default.sqlserver-se-15.0"
-  ca_cert_identifier          = local.application_data.accounts["sandbox"].db_ca_cert_identifier
-  deletion_protection         = local.application_data.accounts["sandbox"].db_deletion_protection
-  delete_automated_backups    = local.application_data.accounts["sandbox"].db_delete_automated_backups
-  skip_final_snapshot         = local.application_data.accounts["sandbox"].db_skip_final_snapshot
-  final_snapshot_identifier   = !local.skip_final_snapshot ? "${local.application_name}-sandbox-database-final-snapshot" : null
-  allocated_storage           = local.application_data.accounts["sandbox"].db_allocated_storage
-  max_allocated_storage       = local.application_data.accounts["sandbox"].db_max_allocated_storage
-  storage_type                = local.application_data.accounts["sandbox"].db_storage_type
-  maintenance_window          = local.application_data.accounts["sandbox"].db_maintenance_window
+  parameter_group_name = "default.sqlserver-se-15.0"
+  #checkov:skip=CKV_AWS_211: "CA cert varies by environment"
+  ca_cert_identifier = local.application_data.accounts["sandbox"].db_ca_cert_identifier
+  #checkov:skip=CKV_AWS_293: "Deletion protection varies by environment"
+  deletion_protection       = local.application_data.accounts["sandbox"].db_deletion_protection
+  delete_automated_backups  = local.application_data.accounts["sandbox"].db_delete_automated_backups
+  skip_final_snapshot       = local.application_data.accounts["sandbox"].db_skip_final_snapshot
+  final_snapshot_identifier = !local.skip_final_snapshot ? "${local.application_name}-sandbox-database-final-snapshot" : null
+  allocated_storage         = local.application_data.accounts["sandbox"].db_allocated_storage
+  max_allocated_storage     = local.application_data.accounts["sandbox"].db_max_allocated_storage
+  storage_type              = local.application_data.accounts["sandbox"].db_storage_type
+  maintenance_window        = local.application_data.accounts["sandbox"].db_maintenance_window
+  #checkov:skip=CKV_AWS_226: "Auto minor upgrade varies by environment"
   auto_minor_version_upgrade  = local.application_data.accounts["sandbox"].db_auto_minor_version_upgrade
   allow_major_version_upgrade = local.application_data.accounts["sandbox"].db_allow_major_version_upgrade
   backup_window               = local.application_data.accounts["sandbox"].db_backup_window
@@ -61,6 +67,7 @@ resource "aws_db_instance" "jitbit_sandbox" {
   multi_az               = local.application_data.accounts["sandbox"].db_multi_az
   #checkov:skip=CKV_AWS_157: "multi-az enabled, but optional"
   storage_encrypted = true
+  copy_tags_to_snapshot = true
 
   tags = merge(
     local.tags,

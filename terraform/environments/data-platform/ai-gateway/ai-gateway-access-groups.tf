@@ -1,3 +1,25 @@
+resource "litellm_unified_access_group" "amazon_bedrock" {
+  for_each = try(tomap(local.ai_gateway_configuration.models.amazon_bedrock), {})
+
+  access_group_name  = "bedrock-${each.key}"
+  access_model_names = [litellm_model.amazon_bedrock[each.key].model_name]
+}
+
+resource "litellm_unified_access_group" "google_gemini_enterprise_agent_platform" {
+  for_each = try(tomap(local.ai_gateway_configuration.models.google_gemini_enterprise_agent_platform), {})
+
+  access_group_name  = "gemini-${each.key}"
+  access_model_names = [litellm_model.google_gemini_enterprise_agent_platform[each.key].model_name]
+}
+
+resource "litellm_unified_access_group" "microsoft_foundry" {
+  # This is gated to non-production environments only, we don't have a Microsoft Foundry subscription in production yet
+  for_each = contains(["data-platform-development", "data-platform-test", "data-platform-preproduction"], terraform.workspace) ? try(tomap(local.ai_gateway_configuration.models.microsoft_foundry), {}) : {}
+
+  access_group_name  = "azure-${each.key}"
+  access_model_names = [litellm_model.microsoft_foundry[each.key].model_name]
+}
+
 resource "litellm_unified_access_group" "generally_available_models" {
   access_group_name = "generally-available-models"
 

@@ -1,4 +1,4 @@
-#This lambda has been created to handle notification to slack channel on EdrmsDocumentException
+#This lambda has been created to handle notification to slack channel on EdrmsConnectException
 # import sys
 # import os
 # sys.path.append(os.path.join(os.path.dirname(__file__), "python"))
@@ -24,6 +24,17 @@ sns_client = boto3.client('sns')
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+last_notification_time = 0
+
+def should_notify():
+    global last_notification_time
+    current_time = time.time()
+    # Check if 5 minutes (300 seconds) have passed since the last notification
+    if current_time - last_notification_time >= 300:
+        last_notification_time = current_time
+        return True
+    return False
 
 @dataclass
 class Config:
@@ -106,7 +117,7 @@ class ValidateConfig:
 class NotificationService:
     """Service for sending notifications to Slack."""
 
-    def __init__(self, webhook_url: str, function_name: str = "EDRMS Document Exception Lambda"):
+    def __init__(self, webhook_url: str, function_name: str = "EDRMS Connect Exception Lambda"):
         if not webhook_url:
             raise ValueError("Slack webhook URL is required for notifications")
 
@@ -131,7 +142,7 @@ class NotificationService:
                         "color": color,
                         "title": f"{emoji} [{self.function_name}] {title}",
                         "text": message,
-                        "footer": "EDRMS Document Exception Lambda",
+                        "footer": "EDRMS Connect Exception Lambda",
                         "ts": int(time.time()),
                     }
                 ]
@@ -252,10 +263,10 @@ def lambda_handler(event, context):
     """
     Main Lambda handler function. 
     
-     This function gets triggered by CloudWatch Logs subscription filter for EdrmsDocumentException logs:
+     This function gets triggered by CloudWatch Logs subscription filter for EdrmsConnectException logs:
     1. Loading configuration from both environment variables and AWS Secrets Manager
     2. Loading and parsing log data from CloudWatch Logs
-    3. Accumulate log lines related to EdrmsDocumentException
+    3. Accumulate log lines related to EdrmsConnectException
     4. Sending notifications about the results
     Args:
         event: Lambda event data (can override SECRET_NAME via 'secret_name' key)
@@ -265,7 +276,7 @@ def lambda_handler(event, context):
         Response dictionary with status and results
     """
     tracemalloc.start()
-    logger.info("Starting Notification to Slack for edrms document exceptions")
+    logger.info("Starting Notification to Slack for edrms connect exceptions")
     slack_channel_webhook_docs: str
 
     # Initialize notification service early with None as default
@@ -321,29 +332,23 @@ def lambda_handler(event, context):
             timestamp = log_event['timestamp']
             
             logger.info(f"Log Stream: {log_stream_name}, Timestamp: {timestamp}, Message: {exceptionmessage}")
-            response = logs_client.get_log_events(
-                logGroupName=config.LOG_GROUP_NAME,
-                logStreamName=log_stream_name,
-                startTime=timestamp,
-                limit=5
-            )
+            result = f"EXCEPTION LOGS:\n{exceptionmessage}\n"
+            if should_notify():
 
-            log_lines = [e['message'] for e in response['events']]
-            result = f"EXCEPTION LOGS:\n{exceptionmessage}\n" + "\n".join(log_lines)
-            notification_service.send_notification(
-                        "EDRMS Document Exception",
-                        result, is_error=True
-                    )
-            # Prepare response
-            response = {
-                "statusCode": 200,
-                "body": {
-                    "message": f"Successfully completed publishing notifications for EdrmsDocumentException logs"
-                },
-            }
+                notification_service.send_notification(
+                            "EDRMS NEC Connection is down",
+                            result, is_error=True
+                        )
+                # Prepare response
+                response = {
+                    "statusCode": 200,
+                    "body": {
+                        "message": f"Successfully completed publishing notifications for EdrmsConnectException logs"
+                    },
+                }
 
-            logger.info(f"Lambda execution completed successfully: {response}")
-            return response
+                logger.info(f"Lambda execution completed successfully: {response}")
+                return response
     except Exception as e:
         error_msg = f"Lambda execution failed:\n{str(e)}"
         logger.error(error_msg, exc_info=True)

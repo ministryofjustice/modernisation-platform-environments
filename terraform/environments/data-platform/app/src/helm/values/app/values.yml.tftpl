@@ -75,6 +75,21 @@ app:
           key: ai-gateway-master-key
     - name: GOOGLE_ANALYTICS_ID
       value: ${app_google_analytics_id}
+    - name: NOTIFY_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: app-secrets
+          key: notify-api-key
+    - name: NOTIFY_PROJECT_MEMBER_ADDED_TEMPLATE_ID
+      valueFrom:
+        secretKeyRef:
+          name: app-secrets
+          key: notify-project-member-added-template-id
+    - name: NOTIFY_PROJECT_MEMBER_REMOVED_TEMPLATE_ID
+      valueFrom:
+        secretKeyRef:
+          name: app-secrets
+          key: notify-project-member-removed-template-id
 
 tolerations:
   - key: compute.data-platform.service.justice.gov.uk/node-pool
