@@ -299,7 +299,7 @@ locals {
 
       nomis-db19c-1-a = merge(local.ec2_instances.db19c, {
         config = merge(local.ec2_instances.db19c.config, {
-          availability_zone = "eu-west-2b"
+          availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.db19c.config.instance_profile_policies, [
             "Ec2DevDatabasePolicy",
           ])
