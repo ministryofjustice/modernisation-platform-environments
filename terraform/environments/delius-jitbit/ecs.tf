@@ -4,7 +4,7 @@ moved {
 }
 
 module "ecs" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v6.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=948cb6a1d0d08448fd53f195c0522ed35bbf4242" # v6.0.0
 
   name = "hmpps-${local.environment}-${local.application_name}"
 
@@ -13,8 +13,7 @@ module "ecs" {
 
 #Create s3 bucket for deployment state
 module "s3_bucket_app_deployment" {
-
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399" # v9.0.0
 
   providers = {
     aws.bucket-replication = aws
@@ -55,6 +54,7 @@ module "s3_bucket_app_deployment" {
 }
 
 resource "aws_security_group" "jitbit" {
+  #checkov:skip=CKV2_AWS_5 "SG is referenced by hmpps-cr-ancillary-jitbit-app repo"
   vpc_id      = data.aws_vpc.shared.id
   name        = format("hmpps-%s-%s-service", local.environment, local.application_name)
   description = "Security group for the ${local.application_name} service"
@@ -66,6 +66,7 @@ resource "aws_security_group" "jitbit" {
 }
 
 resource "aws_security_group_rule" "allow_all_egress" {
+  #checkov:skip=CKV_AWS_382:"Required for ECS tasks to access external services"
   description       = "Allow all outbound traffic to any IPv4 address"
   type              = "egress"
   from_port         = 0
@@ -86,8 +87,10 @@ resource "aws_security_group_rule" "alb" {
 }
 
 resource "aws_cloudwatch_log_group" "jitbit" {
+  #checkov:skip=CKV_AWS_338: "Logs required for 30 days"
   name              = format("%s-ecs", local.application_name)
   retention_in_days = 30
+  kms_key_id        = aws_kms_key.cloudwatch_logs.arn
 }
 
 output "s3_bucket_app_deployment_name" {
