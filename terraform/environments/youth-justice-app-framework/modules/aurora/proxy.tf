@@ -85,7 +85,6 @@ resource "aws_iam_role_policy" "rds_proxy_secrets" {
 }
 
 resource "aws_db_proxy" "rds_proxy" {
-  #checkov:skip=CKV_SECRET_6:Auth type enum, not a secret
   name                = "${var.name}-proxy"
   engine_family       = "POSTGRESQL"
   idle_client_timeout = var.proxy_idle_client_timeout
@@ -99,7 +98,7 @@ resource "aws_db_proxy" "rds_proxy" {
   auth {
     auth_scheme               = "SECRETS"
     iam_auth                  = "REQUIRED"
-    client_password_auth_type = "POSTGRES_SCRAM_SHA_256"
+    client_password_auth_type = "POSTGRES_SCRAM_SHA_256" # checkov:skip=CKV_SECRET_6:Auth type enum, not a secret
     secret_arn                = var.proxy_secret_arn
   }
 
