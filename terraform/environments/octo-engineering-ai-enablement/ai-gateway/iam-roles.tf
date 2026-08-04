@@ -11,8 +11,13 @@ module "iam_role" {
         "sts:TagSession",
       ]
       principals = [{
-        type        = "AWS"
-        identifiers = ["arn:aws:iam::${local.environment_management.account_ids["data-platform-production"]}:role/ai-gateway"]
+        type = "AWS"
+        identifiers = [
+          "arn:aws:iam::${local.environment_management.account_ids["data-platform-development"]}:role/ai-gateway",
+          "arn:aws:iam::${local.environment_management.account_ids["data-platform-test"]}:role/ai-gateway",
+          "arn:aws:iam::${local.environment_management.account_ids["data-platform-preproduction"]}:role/ai-gateway",
+          "arn:aws:iam::${local.environment_management.account_ids["data-platform-production"]}:role/ai-gateway",
+        ]
       }]
     }
   }
