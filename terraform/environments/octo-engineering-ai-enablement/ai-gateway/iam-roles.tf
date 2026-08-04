@@ -11,7 +11,7 @@ module "iam_role" {
       ]
       principals = [{
         type        = "AWS"
-        identifiers = ["arn:aws:iam::${local.environment_management.account_ids["data-platform-production"]}:role/ai-gateway-20260501124346396300000007"]
+        identifiers = ["arn:aws:iam::${local.environment_management.account_ids["data-platform-production"]}:role/ai-gateway"]
       }]
     }
   }
