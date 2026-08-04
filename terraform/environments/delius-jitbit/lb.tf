@@ -114,7 +114,7 @@ moved {
 resource "aws_lb_target_group" "target_group_fargate" {
   # checkov:skip=CKV_AWS_261
 
-  count = local.create_blue_green ? 1 : 0
+  count = local.create_blue_green ? 0 : 1
 
   name                 = local.application_name
   port                 = local.app_port
