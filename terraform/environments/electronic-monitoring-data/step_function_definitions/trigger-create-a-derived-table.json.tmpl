@@ -12,9 +12,9 @@
     "Lambda Invoke": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
-      "Output": "{% $states.result.Payload %}",
-      "Parameters": {
-        "Payload.$": "$",
+      "Output": "{% $states.input.payload %}",
+      "Arguments": {
+        "Payload": "{% $states.input %}",
         "FunctionName": "${trigger_cadt}"
       },
       "Retry": [
@@ -36,9 +36,9 @@
   "PollCadt": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
-      "OutputPath": "$.Payload",
-      "Parameters": {
-        "Payload.$": "$",
+      "Output": "{% $states.input.payload %}",
+      "Arguments": {
+        "Payload": "{% $states.input %}",
         "FunctionName": "${poll_cadt}"
       },
       "Retry": [
