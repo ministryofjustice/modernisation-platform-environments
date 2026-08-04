@@ -20,6 +20,11 @@ on:
         type: string
         required: false
         description: "Optional: account name override for ACCOUNT_NAME env var."
+      observability_tfargs:
+        type: string
+        required: false
+        description: "Optional: Terraform var flags to enable observability PoC features, e.g. '-var=enable_amp_adot=true -var=enable_cloudwatch_observability=true -var=enable_amg=true'"
+        default: ""
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID:
         required: true
@@ -97,8 +102,22 @@ jobs:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
-  cluster-components-terraform:
+  cluster-observability-terraform:
     needs: cluster-core-terraform
+    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+    with:
+      application: ${{ inputs.application }}
+      environment: ${{ inputs.environment }}
+      action: ${{ inputs.action }}
+      component: "cluster-observability"
+      plan_apply_tfargs: ${{ inputs.observability_tfargs }}
+      account_name: ${{ inputs.account_name }}
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+  cluster-components-terraform:
+    needs: cluster-observability-terraform
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: ${{ inputs.application }}
