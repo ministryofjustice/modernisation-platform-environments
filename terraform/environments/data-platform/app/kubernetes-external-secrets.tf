@@ -87,7 +87,6 @@ resource "kubernetes_manifest" "app_secrets_secret" {
           }
           "secretKey" = "notify-project-member-removed-template-id" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
         },
-
       ]
     }
   }
