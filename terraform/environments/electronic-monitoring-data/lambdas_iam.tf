@@ -2908,7 +2908,7 @@ data "aws_iam_policy_document" "poll_cadt_policy_document" {
 
 resource "aws_iam_policy" "poll_cadt_iam_policy" {
   name   = "poll_cadt_lambda_policy"
-  policy = data.aws_iam_policy_document.cadt_policy_document.json
+  policy = data.aws_iam_policy_document.poll_cadt_policy_document.json
 }
 
 
