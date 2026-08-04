@@ -12,11 +12,7 @@ resource "aws_sns_topic_policy" "guarduty_default" {
   policy = data.aws_iam_policy_document.guardduty_alerting_sns.json
 }
 
-# CC-4660: aws_lambda_function.cloudwatch_slack_integration_v2 only exists for
-# non-production (see ccms-lambda-cloudwatch-slack-integration-v2.tf), so this
-# subscription must be guarded the same way or production plans fail with "Invalid index".
 resource "aws_sns_topic_subscription" "guardduty_alerts" {
-  count     = local.is-production ? 0 : 1
   topic_arn = aws_sns_topic.guardduty_alerts.arn
   protocol  = "lambda"
   endpoint  = aws_lambda_function.cloudwatch_slack_integration_v2[0].arn
@@ -43,9 +39,7 @@ resource "aws_cloudwatch_event_rule" "certificate_expiration_warning" {
   })
 }
 
-# CC-4660: guarded for the same reason as aws_sns_topic_subscription.guardduty_alerts above.
 resource "aws_cloudwatch_event_target" "certificate_expiration_warning_to_lambda_target" {
-  count     = local.is-production ? 0 : 1
   rule      = aws_cloudwatch_event_rule.certificate_expiration_warning.name
   target_id = "certificate-expiration-warning-target"
   arn       = aws_lambda_function.cloudwatch_slack_integration_v2[0].arn
