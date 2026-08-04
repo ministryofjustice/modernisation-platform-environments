@@ -252,6 +252,49 @@ module "kms_s3_bucket" {
   tags = local.tags
 }
 
+module "kms_secrets" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  source  = "terraform-aws-modules/kms/aws"
+  version = "4.2.0"
+
+  aliases                 = ["secrets/${local.application_name}-${local.environment}"]
+  description             = "KMS CMK for Secrets Manager encryption"
+  enable_default_policy   = true
+  enable_key_rotation     = true
+  deletion_window_in_days = 30
+  key_usage               = "ENCRYPT_DECRYPT"
+  is_enabled              = true
+
+  key_administrators = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+
+  key_users = [
+    "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
+  ]
+
+  key_statements = [
+    {
+      sid = "AllowSecretsManagerService"
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+        "kms:ReEncrypt*"
+      ]
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["secretsmanager.amazonaws.com"]
+        }
+      ]
+    }
+  ]
+
+  tags = local.tags
+}
+
 module "kms_sqs" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/kms/aws"

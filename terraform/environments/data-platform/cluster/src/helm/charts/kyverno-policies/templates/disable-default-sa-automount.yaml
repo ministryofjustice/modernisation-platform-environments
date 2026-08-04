@@ -28,6 +28,12 @@ spec:
         # Scope the webhook to just the auto-created 'default' ServiceAccount,
         # so Kyverno is only invoked for it rather than every ServiceAccount.
         resourceNames: ["default"]
+  matchConditions:
+    # Mirrors resourceFiltersIncludeNamespaces; MutatingPolicy ignores the Kyverno ConfigMap filters.
+    - name: exclude-namespaces
+      expression: >-
+        !request.namespace.startsWith('kube-') &&
+        !{{ .Values.excludedNamespaces | toJson }}.exists(ns, ns == request.namespace)
   mutations:
     - patchType: ApplyConfiguration
       applyConfiguration:

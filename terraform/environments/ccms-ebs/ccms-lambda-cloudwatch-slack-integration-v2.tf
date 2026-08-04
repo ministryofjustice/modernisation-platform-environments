@@ -109,7 +109,7 @@ resource "aws_lambda_function" "cloudwatch_slack_integration_v2" {
       METRICS_ENABLED         = true
       METRICS_NAMESPACE       = "CcmsEbs/SlackNotifier"
       NOTIFY_UNRECOGNISED     = true
-      SUPPRESSED_ENVIRONMENTS = "dev-,test-,prep-"
+      SUPPRESSED_ENVIRONMENTS = "dev-,test-,tst-,prep-"
       SUPPRESSION_TIME_START  = "19:00"
       SUPPRESSION_TIME_END    = "07:00"
     }

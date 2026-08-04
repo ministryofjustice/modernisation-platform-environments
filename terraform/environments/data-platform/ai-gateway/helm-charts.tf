@@ -64,6 +64,8 @@ resource "helm_release" "litellm_admin" {
     )
   ]
 
+  timeout = 700
+
   depends_on = [
     module.ai_gateway_aurora,
     module.iam_role,
@@ -133,6 +135,8 @@ resource "helm_release" "litellm" {
       }
     )
   ]
+
+  timeout = 700
 
   depends_on = [
     helm_release.litellm_admin,
