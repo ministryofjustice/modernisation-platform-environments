@@ -18,7 +18,7 @@
 /terraform/environments/ccms-ebs/ccms-ebs-ssogen @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs/ccms-file-transfer @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-edrms @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
-/terraform/environments/ccms-feasibility @ministryofjustice/laa-ccms-ebs-developers @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
+/terraform/environments/ccms-feasibility @ministryofjustice/laa-dba @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-feasibility/ccms-ebs @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-feasibility/ccms-pui @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-feasibility/ccms-oia @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
