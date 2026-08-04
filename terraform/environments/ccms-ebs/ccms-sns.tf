@@ -68,7 +68,11 @@ resource "aws_sns_topic" "s3_topic" {
 }
 
 # S3 SNS -> Lambda (Slack) instead of email
+# CC-4660: aws_lambda_function.cloudwatch_slack_integration_v2 only exists for
+# non-production (see ccms-lambda-cloudwatch-slack-integration-v2.tf), so this
+# subscription must be guarded the same way or production plans fail with "Invalid index".
 resource "aws_sns_topic_subscription" "s3_subscription" {
+  count     = local.is-production ? 0 : 1
   topic_arn = aws_sns_topic.s3_topic.arn
   protocol  = "lambda"
   endpoint  = aws_lambda_function.cloudwatch_slack_integration_v2[0].arn
@@ -83,7 +87,9 @@ resource "aws_sns_topic" "ddos_alarm" {
 }
 
 # DDoS SNS -> Lambda (Slack) instead of email
+# CC-4660: guarded for the same reason as aws_sns_topic_subscription.s3_subscription above.
 resource "aws_sns_topic_subscription" "ddos_subscription" {
+  count     = local.is-production ? 0 : 1
   topic_arn = aws_sns_topic.ddos_alarm.arn
   protocol  = "lambda"
   endpoint  = aws_lambda_function.cloudwatch_slack_integration_v2[0].arn

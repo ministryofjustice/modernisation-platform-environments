@@ -205,12 +205,27 @@ module "s3-bucket-dbbackup" {
           }
         },
         "Principal" : "*"
+      },
+      {
+        # CC-4660: require uploads to use SSE-KMS with the approved CMK
+        "Sid" : "DenyIncorrectEncryptionHeader",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:PutObject",
+        "Resource" : "${module.s3-bucket-dbbackup.bucket.arn}/*",
+        "Condition" : {
+          "StringNotEquals" : {
+            "s3:x-amz-server-side-encryption-aws-kms-key-id" : aws_kms_key.s3_cmk.arn
+          }
+        }
       }
     ]
   })]
 
-  log_bucket = local.logging_bucket_name
-  log_prefix = "s3access/${local.rsync_bucket_name}"
+  log_bucket     = local.logging_bucket_name
+  log_prefix     = "s3access/${local.rsync_bucket_name}"
+  sse_algorithm  = "aws:kms"
+  custom_kms_key = aws_kms_key.s3_cmk.arn
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
@@ -307,6 +322,19 @@ resource "aws_s3_bucket_logging" "ccms_ebs_shared" {
   target_prefix = "s3-access-logs/${aws_s3_bucket.ccms_ebs_shared.id}/"
 }
 
+# CC-4660: SSE-KMS with the customer-managed key (aws_kms_key.s3_cmk in ccms-kms.tf)
+resource "aws_s3_bucket_server_side_encryption_configuration" "ccms_ebs_shared" {
+  bucket = aws_s3_bucket.ccms_ebs_shared.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.s3_cmk.arn
+    }
+    bucket_key_enabled = true
+  }
+}
+
 data "aws_iam_policy_document" "shared_bucket_secure_transport" {
   statement {
     sid    = "DenyInsecureTransport"
@@ -324,6 +352,23 @@ data "aws_iam_policy_document" "shared_bucket_secure_transport" {
       test     = "Bool"
       variable = "aws:SecureTransport"
       values   = ["false"]
+    }
+  }
+
+  # CC-4660: require uploads to use SSE-KMS with the approved CMK
+  statement {
+    sid    = "DenyIncorrectEncryptionHeader"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions   = ["s3:PutObject"]
+    resources = ["${aws_s3_bucket.ccms_ebs_shared.arn}/*"]
+    condition {
+      test     = "StringNotEquals"
+      variable = "s3:x-amz-server-side-encryption-aws-kms-key-id"
+      values   = [aws_kms_key.s3_cmk.arn]
     }
   }
 }
@@ -366,6 +411,19 @@ resource "aws_s3_bucket_logging" "lambda_payment_load" {
 
   target_bucket = local.logging_bucket_name
   target_prefix = "s3-access-logs/${aws_s3_bucket.lambda_payment_load.id}/"
+}
+
+# CC-4660: SSE-KMS with the customer-managed key (aws_kms_key.s3_cmk in ccms-kms.tf)
+resource "aws_s3_bucket_server_side_encryption_configuration" "lambda_payment_load" {
+  bucket = aws_s3_bucket.lambda_payment_load.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.s3_cmk.arn
+    }
+    bucket_key_enabled = true
+  }
 }
 
 # Lifecycle configuration: expire current objects and noncurrent versions after 30 days
@@ -421,6 +479,23 @@ data "aws_iam_policy_document" "payment_load_bucket_secure_transport" {
       test     = "Bool"
       variable = "aws:SecureTransport"
       values   = ["false"]
+    }
+  }
+
+  # CC-4660: require uploads to use SSE-KMS with the approved CMK
+  statement {
+    sid    = "DenyIncorrectEncryptionHeader"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions   = ["s3:PutObject"]
+    resources = ["${aws_s3_bucket.lambda_payment_load.arn}/*"]
+    condition {
+      test     = "StringNotEquals"
+      variable = "s3:x-amz-server-side-encryption-aws-kms-key-id"
+      values   = [aws_kms_key.s3_cmk.arn]
     }
   }
 }
