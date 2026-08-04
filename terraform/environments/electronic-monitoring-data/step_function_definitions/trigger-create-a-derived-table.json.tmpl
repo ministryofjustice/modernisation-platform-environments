@@ -36,7 +36,7 @@
   "PollCadt": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
-      "Output": "{% $states.input.payload %}",
+      "Output": "{% $merge([$states.input, {'task_arns': $states.result.Payload}]) %}",
       "Arguments": {
         "Payload": "{% $states.input %}",
         "FunctionName": "${poll_cadt}"
