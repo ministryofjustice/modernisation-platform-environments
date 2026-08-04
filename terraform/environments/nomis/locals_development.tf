@@ -321,7 +321,7 @@ locals {
           })
         })
         tags = merge(local.ec2_instances.db19c.tags, {
-          description         = "syscon nomis dev, qa and rel Oracle 19c databases"
+          description         = "syscon nomis dev qa and rel Oracle 19c databases"
           instance-scheduling = "skip-scheduling"
           nomis-environment   = "dev"
           oracle-sids         = ""
