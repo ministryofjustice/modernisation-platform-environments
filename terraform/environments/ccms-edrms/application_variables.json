@@ -114,7 +114,7 @@
     "production": {
       "app_name": "ccms-edrms",
       "aws_region": "eu-west-2",
-      "ami_image_id": "ami-0d6d764bbe794b8ca",
+      "ami_image_id": "ami-02f77a03ec776dc35",
       "app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-edrms",
       "container_version": "latest",
       "ec2_instance_type": "m5.large",

@@ -80,15 +80,15 @@ locals {
   delius_microservices_configs_dev = {
     # Weblogic/EIS ECS config managed here: https://github.com/ministryofjustice/delius-releases
     weblogic = {
-      ec2_instance_type        = "r7i.large"
-      asg_min_size             = 1
-      asg_max_size             = 1
+      ec2_instance_type = "r7i.large"
+      asg_min_size      = 1
+      asg_max_size      = 1
     }
 
     weblogic_eis = {
-      ec2_instance_type        = "r7i.large"
-      asg_min_size             = 1
-      asg_max_size             = 1
+      ec2_instance_type = "r7i.large"
+      asg_min_size      = 1
+      asg_max_size      = 1
     }
 
     pwm = {
