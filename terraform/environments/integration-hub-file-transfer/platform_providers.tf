@@ -75,6 +75,7 @@ provider "aws" {
       ApplicationAccount = data.aws_caller_identity.original_session.account_id
     }
   }
+  default_tags { tags = local.tags }
 }
 # AWS provider for managing Business Unit secrets and parameters
 provider "aws" {
@@ -84,4 +85,5 @@ provider "aws" {
   assume_role {
     role_arn = "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:role/${local.vpc_name}-shared-configuration-access"
   }
+  default_tags { tags = local.tags }
 }
