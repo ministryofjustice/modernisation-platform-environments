@@ -66,7 +66,7 @@ resource "kubernetes_manifest" "app_secrets_secret" {
           }
           "secretKey" = format("ai-gateway-%s", "master-key")
         },
-                {
+        {
           "remoteRef" = {
             "key"      = tostring(module.app_secrets.secret_id)
             "property" = "notify_api_key"
