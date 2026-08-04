@@ -104,8 +104,8 @@ locals {
   ]
 
   # Add environments that require the blue-green deployment solution
-  create_blue_green = local.is-development || local.is-test
+  create_blue_green = local.is-development || local.is-test || local.is-preproduction
 
   # Add environments that require the Lucene EFS solution
-  create_efs = local.is-development || local.is-test || local.is-preproduction
+  create_efs = local.is-development || local.is-test || local.is-preproduction || local.is-production
 }
