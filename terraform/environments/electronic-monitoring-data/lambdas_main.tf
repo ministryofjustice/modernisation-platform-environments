@@ -1134,3 +1134,31 @@ module "live_feed_github_app" {
 
   tags = local.tags
 }
+
+module "live_feed_incident_manager" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "live_feed_incident_manager"
+  role_name                      = aws_iam_role.live_feed_incident_manager.name
+  role_arn                       = aws_iam_role.live_feed_incident_manager.arn
+  handler                        = "live_feed_incident_manager.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 2
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+
+  environment_variables = {
+    ENVIRONMENT             = local.environment_shorthand
+    POWERTOOLS_LOG_LEVEL    = "INFO"
+    POWERTOOLS_SERVICE_NAME = "live-feed-incident-manager"
+  }
+}
