@@ -6,11 +6,18 @@ locals {
 
   active_colour = local.create_blue_green ? aws_ssm_parameter.active_deployment_colour[0].value : null
 
-  active_target_group_arn = local.create_blue_green ? lookup(
+  # active_target_group_arn = local.create_blue_green ? lookup(
+  #   local.blue_green_target_groups,
+  #   local.active_colour,
+  #   null
+  # ) : aws_lb_target_group.target_group_fargate[0].id
+
+  # One time terrraform apply in preprod to fix target_group dependency issue
+  active_target_group_arn = lookup(
     local.blue_green_target_groups,
     local.active_colour,
     null
-  ) : aws_lb_target_group.target_group_fargate[0].id
+  )
 }
 
 module "ip_addresses" {
