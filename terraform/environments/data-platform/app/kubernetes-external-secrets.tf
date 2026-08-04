@@ -65,7 +65,29 @@ resource "kubernetes_manifest" "app_secrets_secret" {
             "key" = data.aws_secretsmanager_secret.ai_gateway_litellm_master_key.id
           }
           "secretKey" = format("ai-gateway-%s", "master-key")
-        }
+        },
+                {
+          "remoteRef" = {
+            "key"      = tostring(module.app_secrets.secret_id)
+            "property" = "notify_api_key"
+          }
+          "secretKey" = "notify-api-key" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
+        },
+        {
+          "remoteRef" = {
+            "key"      = tostring(module.app_secrets.secret_id)
+            "property" = "notify_project_member_added_template_id"
+          }
+          "secretKey" = "notify-project-member-added-template-id" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
+        },
+        {
+          "remoteRef" = {
+            "key"      = tostring(module.app_secrets.secret_id)
+            "property" = "notify_project_member_removed_template_id"
+          }
+          "secretKey" = "notify-project-member-removed-template-id" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
+        },
+
       ]
     }
   }
