@@ -33,12 +33,12 @@ output "aws_sns_topic_s3_topic_arn" {
 
 output "aws_sns_topic_subscription_s3_subscription_arn" {
   description = "aws_sns_topic_subscription s3_subscription arn"
-  value       = aws_sns_topic_subscription.s3_subscription.arn
+  value       = one(aws_sns_topic_subscription.s3_subscription[*].arn)
 }
 
 output "aws_sns_topic_subscription_s3_subscription_owner_id" {
   description = "aws_sns_topic_subscription s3_subscription owner_id"
-  value       = aws_sns_topic_subscription.s3_subscription.owner_id
+  value       = one(aws_sns_topic_subscription.s3_subscription[*].owner_id)
 }
 
 #
@@ -52,10 +52,10 @@ output "aws_sns_topic_ddos_alarm_arn" {
 
 output "aws_sns_topic_subscription_ddos_subscription_arn" {
   description = "aws_sns_topic_subscription ddos_subscription arn"
-  value       = aws_sns_topic_subscription.ddos_subscription.arn
+  value       = one(aws_sns_topic_subscription.ddos_subscription[*].arn)
 }
 
 output "aws_sns_topic_subscription_ddos_subscription_owner_id" {
   description = "aws_sns_topic_subscription ddos_subscription owner_id"
-  value       = aws_sns_topic_subscription.ddos_subscription.owner_id
+  value       = one(aws_sns_topic_subscription.ddos_subscription[*].owner_id)
 }
