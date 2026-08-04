@@ -5,6 +5,7 @@
 data "aws_region" "current" {}
 
 resource "aws_security_group" "rds_proxy" {
+  #checkov:skip=CKV2_AWS_5:SG is attached to aws_db_proxy.rds_proxy via vpc_security_group_ids this is a false alert
   name_prefix = "RDS Proxy Security Group"
   description = "Controls access to the RDS Proxy for ${var.name}"
   vpc_id      = var.vpc_id
@@ -84,6 +85,7 @@ resource "aws_iam_role_policy" "rds_proxy_secrets" {
 }
 
 resource "aws_db_proxy" "rds_proxy" {
+  #checkov:skip=CKV_SECRET_6:Auth type enum, not a secret
   name                = "${var.name}-proxy"
   engine_family       = "POSTGRESQL"
   idle_client_timeout = var.proxy_idle_client_timeout
