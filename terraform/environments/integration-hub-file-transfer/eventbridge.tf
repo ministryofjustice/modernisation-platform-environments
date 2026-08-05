@@ -26,8 +26,6 @@ module "eventbridge_file_transfer_bus" {
   create_archives     = true
   append_rule_postfix = false
 
-  attach_sfn_policy = true
-
   rules = local.eventbridge_file_transfer_bus_rules
 
   archives = {
