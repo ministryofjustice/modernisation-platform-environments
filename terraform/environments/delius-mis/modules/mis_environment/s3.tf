@@ -111,11 +111,6 @@ data "aws_iam_policy_document" "dfi_report_bucket_policy" {
         type        = "AWS"
         identifiers = ["arn:aws:iam::${statement.value}:root"]
       }
-      condition {
-        test     = "StringEquals"
-        variable = "s3:x-amz-acl"
-        values   = ["bucket-owner-full-control"]
-      }
     }
   }
 
