@@ -37,6 +37,17 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
   cidr_ipv4         = each.key
 }
 
+# Neccessary for Codebuild pipelines (UI Automation Tests etc)
+resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_https_legacy_allowlist" {
+  for_each          = toset(var.environment_config.migration_environment_private_cidr)
+  security_group_id = aws_security_group.delius_frontend_alb_security_group.id
+  description       = "Legacy access into delius core frontend alb over https"
+  from_port         = "443"
+  to_port           = "443"
+  ip_protocol       = "tcp"
+  cidr_ipv4         = each.key
+}
+
 # temporary rule to allow traffic from legacy preprod nat gateway for testing
 # to be removed once testing is over and nat gateway removed
 resource "aws_vpc_security_group_ingress_rule" "preprod_alb_legacy_natgw_ing" {
