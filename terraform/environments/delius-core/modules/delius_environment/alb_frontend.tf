@@ -28,7 +28,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_http_mp_allowlist" {
-  for_each          = toset(var.account_config.private_subnet_cidrs)
+  for_each          = toset(local.mp_natgw_ips)
   security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   description       = "MP access into delius core frontend alb over http"
   from_port         = "80"

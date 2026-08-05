@@ -36,10 +36,22 @@ locals {
     "217.138.45.109/32", # Unilink AOVPN
     "217.138.45.110/32", # Unilink AOVPN
   ]
+  mp_non_live_natgw_ips = [
+    "13.42.163.245/32", # mod-platform-non-live-eu-west-2b-nat
+    "13.43.9.198/32",   # mod-platform-non-live-eu-west-2a-nat
+    "18.132.208.127/32" # mod-platform-non-live-eu-west-2c-nat
+  ]
+  mp_live_natgw_ips = [ 
+    "13.41.38.176/32", # mod-platform-live-eu-west-2b-nat
+    "3.11.197.133/32", # mod-platform-live-eu-west-2c-nat
+    "3.8.81.175/32"    # mod-platform-live-eu-west-2c-nat
+  ]
+  mp_natgw_ips = contains(["poc", "dev", "test"], var.env_name) ? local.mp_non_live_natgw_ips : local.mp_live_natgw_ips
 
   all_ingress_ips = concat(
     local.moj_ips, 
-    local.unilink_ips, 
+    local.unilink_ips,
+    local.mp_natgw_ips,
     [var.account_info.cp_cidr]
   )
 
