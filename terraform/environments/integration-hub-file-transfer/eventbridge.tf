@@ -28,6 +28,8 @@ module "eventbridge_file_transfer_bus" {
 
   rules = local.eventbridge_file_transfer_bus_rules
 
+  targets = local.eventbridge_file_transfer_bus_targets
+
   archives = {
     "${local.application_name}-archive" = {
       description    = "Archive of all file transfer events"
