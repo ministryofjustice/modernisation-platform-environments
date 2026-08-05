@@ -36,17 +36,24 @@
   "PollCadt": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
-      "Output": "{% $merge([$states.input, {'task_arns': $states.result.Payload}]) %}",
+      "Output": "{% $states.result.Payload %}",
       "Arguments": {
         "Payload": "{% $states.input %}",
         "FunctionName": "${poll_cadt}"
       },
       "Retry": [
         {
-          "ErrorEquals": ["States.TaskFailed", "Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException"],
-          "IntervalSeconds": 2,
+          "ErrorEquals": ["NotCompleteError"],
+          "IntervalSeconds": 60,
+          "MaxAttempts": 480,
+          "BackoffRate": 1
+        },
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 5,
           "MaxAttempts": 3,
-          "BackoffRate": 2.0
+          "BackoffRate": 2,
+          "JitterStrategy": "FULL"
         }
       ],
       "End": true
