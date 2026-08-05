@@ -112,7 +112,6 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
           "login.microsoftonline.com",
           ".files.1drv.com",
           ".onedrive.live.com",
-          "storage.live.com",
           ".storage.live.com",
           ".groups.office.live.com",
           ".groups.photos.live.com",
@@ -123,16 +122,12 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
           "skydrive.live.com",
           "api.live.net",
           "apis.live.net",
-          "docs.live.net",
           ".docs.live.net",
-          "policies.live.net",
           ".policies.live.net",
-          "settings.live.net",
           ".settings.live.net",
           "skyapi.live.net",
           "snapi.live.net",
           ".livefilestore.com",
-          "storage.msn.com",
           ".storage.msn.com"
         ]
       }
@@ -173,45 +168,45 @@ resource "aws_networkfirewall_rule_group" "workspaces_onedrive_live_misc" {
         target_types         = ["TLS_SNI", "HTTP_HOST"]
         targets = [
           # OneDrive
-          ".onedrive.com",
-          ".onedrive.live.com",
-          ".storage.live.com",
-          ".livefilestore.com",
-          ".storage.msn.com",
+          # ".onedrive.com",
+          # ".onedrive.live.com",
+          # ".storage.live.com",
+          # ".livefilestore.com",
+          # ".storage.msn.com",
 
-          # live.com services
-          "login.live.com",
-          "g.live.com",
-          "ssw.live.com",
-          "msagfx.live.com",
-          "client.hip.live.com",
-          "wu.client.hip.live.com",
-          "oauth.live.com",
-          "favorites.live.com",
-          ".office.live.com",   # covers ".groups.office.live.com etc.
-          ".photos.live.com",   # covers ".groups.photos.live.com etc.
-          ".skydrive.live.com", # covers ".groups.skydrive.live.com etc.
+          # # live.com services
+          # "login.live.com",
+          # "g.live.com",
+          # "ssw.live.com",
+          # "msagfx.live.com",
+          # "client.hip.live.com",
+          # "wu.client.hip.live.com",
+          # "oauth.live.com",
+          # "favorites.live.com",
+          # ".office.live.com",   # covers ".groups.office.live.com etc.
+          # ".photos.live.com",   # covers ".groups.photos.live.com etc.
+          # ".skydrive.live.com", # covers ".groups.skydrive.live.com etc.
 
-          # live.net
-          "api.live.net",
-          "apis.live.net",
-          ".docs.live.net",
-          ".policies.live.net",
-          ".settings.live.net",
-          "skyapi.live.net",
-          "snapi.live.net",
+          # # live.net
+          # "api.live.net",
+          # "apis.live.net",
+          # ".docs.live.net",
+          # ".policies.live.net",
+          # ".settings.live.net",
+          # "skyapi.live.net",
+          # "snapi.live.net",
 
-          # OneDrive delivery / SFX
-          "oneclient.sfx.ms",
-          "p.sfx.ms",
-          ".files.1drv.com",
+          # # OneDrive delivery / SFX
+          # "oneclient.sfx.ms",
+          # "p.sfx.ms",
+          # ".files.1drv.com",
 
           # MOJ specific
           "sts.justice.gov.uk",
           "justiceuk-my.sharepoint.com",
 
           # Windows network connectivity test
-          "www.msftconnecttest.com",
+          # "www.msftconnecttest.com",
 
           # CyberDuck update check
           # "version.cyberduck.io",
