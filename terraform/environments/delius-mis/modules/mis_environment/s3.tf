@@ -95,6 +95,35 @@ data "aws_iam_policy_document" "dfi_report_bucket_policy" {
   }
 
   dynamic "statement" {
+    for_each = length(aws_iam_role.datasync_s3_role) == 1 ? [aws_iam_role.datasync_s3_role[0].arn] : []
+    content {
+      sid    = "DataSyncReadPolicy"
+      effect = "Allow"
+      actions = [
+        "s3:GetBucketLocation",
+        "s3:ListBucket",
+        "s3:ListBucketMultipartUploads",
+        "s3:ListBucketVersions",
+        "s3:GetBucketVersioning",
+        "s3:GetObject",
+        "s3:GetObjectTagging",
+        "s3:GetObjectVersion",
+        "s3:GetObjectVersionTagging",
+        "s3:GetObjectAcl",
+        "s3:GetObjectVersionAcl"
+      ]
+      resources = [
+        "${module.s3-dfi-report-bucket[0].bucket.arn}/*",
+        module.s3-dfi-report-bucket[0].bucket.arn
+      ]
+      principals {
+        type        = "AWS"
+        identifiers = [statement.value]
+      }
+    }
+  }
+
+  dynamic "statement" {
     for_each = local.dfi_account_id != null ? [local.dfi_account_id] : []
     content {
       sid    = "DfiS3PutPolicy"
