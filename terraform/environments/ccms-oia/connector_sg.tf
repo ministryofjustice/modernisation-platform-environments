@@ -119,7 +119,7 @@ resource "aws_security_group_rule" "ecs_tasks_connector_egress_443" {
   ]
 }
 
-resource "aws_security_group_rule" "ecs_tasks_connector_egress_subnets" {
+resource "aws_security_group_rule" "ecs_tasks_connector_egress_1521" {
   security_group_id = aws_security_group.ecs_tasks_connector.id
   type              = "egress"
   description       = "Allow egress to protected subnets"
