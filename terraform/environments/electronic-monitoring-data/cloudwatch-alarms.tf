@@ -357,6 +357,9 @@ resource "aws_cloudwatch_metric_alarm" "merge_lambdas_long_queue" {
 
   alarm_actions = [
     aws_sns_topic.emds_alerts.arn
+  ]
+}
+
 # ------------------------------------------------------------------------------
 # Live-feed incident automation DLQ alarm
 #
