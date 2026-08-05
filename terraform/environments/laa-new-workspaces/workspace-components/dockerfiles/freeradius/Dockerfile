@@ -62,12 +62,16 @@ COPY --from=builder /usr/share/linotp/linotp-auth-freeradius-perl /usr/share/lin
 # stock defaults (only "client localhost", no linotp site, no perl module).
 COPY config/sites-available/linotp /etc/freeradius/sites-available/linotp
 COPY config/mods-available/perl /etc/freeradius/mods-available/perl
-COPY config/rlm_perl.ini /etc/linotp/rlm_perl.ini
+# linotp_module.pm hardcodes its config path as /etc/linotp2/rlm_perl.ini
+# (no override available) - it silently falls back to broken built-in
+# defaults (HTTPS on :443, which nothing listens on) if this exact path
+# isn't present, so the file must live under /etc/linotp2, not /etc/linotp.
+COPY config/rlm_perl.ini /etc/linotp2/rlm_perl.ini
 COPY entrypoint.sh /entrypoint.sh
 
 # Set up FreeRADIUS configuration
 RUN chmod +x /entrypoint.sh && \
-    mkdir -p /etc/linotp && \
+    mkdir -p /etc/linotp2 && \
     mkdir -p /etc/freeradius/sites-enabled && \
     mkdir -p /etc/freeradius/mods-enabled && \
     rm -f /etc/freeradius/sites-enabled/default \
