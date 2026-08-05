@@ -172,3 +172,43 @@ resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
     aws_sns_topic.emds_alerts.arn
   ]
 }
+
+# ------------------------------------------------------------------------------
+# Live-feed incident automation DLQ alarm
+#
+# This alarm publishes directly to the alerts topic. It is deliberately not
+# included in local.sqs_dlq_alarm_queues because failures in incident automation
+# must not recursively create another automated incident.
+# ------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_metric_alarm" "live_feed_incident_events_dlq" {
+  alarm_name = "live_feed_incident_events_dlq_has_messages"
+
+  alarm_description = (
+    "Triggered when live-feed incident automation messages reach its DLQ"
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = true
+
+  metric_name = "ApproximateNumberOfMessagesVisible"
+  namespace   = "AWS/SQS"
+  period      = 60
+  statistic   = "Maximum"
+
+  dimensions = {
+    QueueName = aws_sqs_queue.live_feed_incident_events_dlq.name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+
+  ok_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+}
