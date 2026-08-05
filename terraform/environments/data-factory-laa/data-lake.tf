@@ -32,10 +32,52 @@ module "data_lake_settings" {
   read_only_admins = local.environments[local.environment].lakeformation_read_only_admins
 }
 
+data "aws_iam_policy_document" "data_lake_kms_key" {
+  # Enables IAM policies in this AWS account to delegate access to the key.
+  statement {
+    sid    = "EnableRootAccountPermissions"
+    effect = "Allow"
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root",
+      ]
+    }
+
+    actions = [
+      "kms:*",
+    ]
+
+    resources = ["*"]
+  }
+
+  # Allows S3 event notifications to publish to an encrypted SQS queue.
+  statement {
+    sid    = "AllowS3EventNotifications"
+    effect = "Allow"
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "s3.amazonaws.com",
+      ]
+    }
+
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+    ]
+
+    resources = ["*"]
+  }
+}
+
 resource "aws_kms_key" "data_lake_kms_key" {
   description             = "KMS key for encrypting data in the data lake"
   deletion_window_in_days = 10
   enable_key_rotation     = true
+  policy                  = data.aws_iam_policy_document.data_lake_kms_key.json
 }
 
 resource "aws_kms_alias" "data_lake_kms_alias" {
