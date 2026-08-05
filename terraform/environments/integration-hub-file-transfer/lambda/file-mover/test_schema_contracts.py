@@ -26,10 +26,9 @@ class CompletionEventSchemaTest(unittest.TestCase):
 
     def test_route_completion_events_match_all_schema_branches(self):
         cases = [
-            ("clean", "NO_THREATS_FOUND", True),
-            ("quarantine", "THREATS_FOUND", True),
+            ("clean", "NO_THREATS_FOUND", False),
+            ("quarantine", "THREATS_FOUND", False),
             ("investigation", "FAILED", True),
-            ("investigation", "NO_THREATS_FOUND", False),
         ]
         service = self._service("ROUTE")
         for route, status, matches_tag in cases:

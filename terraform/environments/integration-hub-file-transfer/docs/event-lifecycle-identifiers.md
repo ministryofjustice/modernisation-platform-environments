@@ -38,11 +38,13 @@ The mover publishes `FileStagedForScanning.v1` with the original `fileId` and `c
 
 The GuardDuty adapter reads `mft-correlation-id` from the exact processing version and requires the durable STAGE record to be `COMPLETED`. It publishes terminal scan outcomes as `FileScanResultRecorded.v1`.
 
-The ROUTE Lambda mover consumes that event and claims a separate `(correlationId, ROUTE)` record. It reads the exact object's current `GuardDutyMalwareScanStatus` tag again before selecting the route:
+The ROUTE Lambda mover consumes that event and claims a separate `(correlationId, ROUTE)` record. The canonical event is authoritative, so `detail.data.scanResultStatus` selects the route:
 
-- matching `NO_THREATS_FOUND` routes to `clean`;
-- matching `THREATS_FOUND` routes to `quarantine`; and
-- a missing or different tag, or `UNSUPPORTED`, `ACCESS_DENIED` or `FAILED`, routes to `investigation`.
+- `NO_THREATS_FOUND` routes to `clean`;
+- `THREATS_FOUND` routes to `quarantine`; and
+- `UNSUPPORTED`, `ACCESS_DENIED` or `FAILED` routes to `investigation`.
+
+`scanResultStatusMatchesTag` is retained as diagnostic provenance from the adapter, but it does not select or override the destination route.
 
 ROUTE copies and verifies the exact processing version with destination SSE-KMS encryption before deleting that exact source version. It then publishes `FileRouted.v1` with an idempotency key of `route:{route}:{destinationBucket}:{key}:{destinationVersionId}`.
 

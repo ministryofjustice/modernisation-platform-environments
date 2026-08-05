@@ -76,7 +76,7 @@ class FileMoverServiceTest(unittest.TestCase):
         self.assertEqual(completed_fields["processing_version_id"], "destination-version")
         self.assertEqual(completed_fields["staged_event_id"], "completion-event-id")
 
-    def test_route_uses_the_current_guardduty_tag_and_publishes_clean(self):
+    def test_route_uses_the_event_status_and_preserves_the_tag_match_flag(self):
         route_event = {
             **self.event,
             "detail-type": "FileScanResultRecorded.v1",
@@ -126,7 +126,7 @@ class FileMoverServiceTest(unittest.TestCase):
             self.eventbridge.put_events.call_args.kwargs["Entries"][0]["Detail"]
         )
         self.assertEqual(published["data"]["route"], "clean")
-        self.assertTrue(published["data"]["scanResultStatusMatchesTag"])
+        self.assertFalse(published["data"]["scanResultStatusMatchesTag"])
         self.copy_engine.delete_source.assert_called_once()
 
     def test_enabled_stage_receipt_is_created_after_source_deletion(self):

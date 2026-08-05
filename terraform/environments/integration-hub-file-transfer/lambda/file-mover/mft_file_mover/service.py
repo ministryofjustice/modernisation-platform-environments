@@ -78,7 +78,7 @@ class FileMoverService:
                     {"ignored_receipt": True},
                 )
 
-        destination, item = self._destination(operation_event, item, owner, snapshot)
+        destination, item = self._destination(operation_event, item, owner)
         token = self.copy_engine.copy_token(
             operation_event, self.operation, destination.bucket
         )
@@ -144,28 +144,16 @@ class FileMoverService:
             item = self._complete(item, owner)
         return item
 
-    def _destination(self, operation_event, item, owner, snapshot):
+    def _destination(self, operation_event, item, owner):
         if self.operation == "STAGE":
             return self.config.destinations["processing"], item
         if "route" in item:
             return self.config.destinations[item["route"]], item
-        guardduty_status = next(
-            (
-                tag["Value"]
-                for tag in snapshot.tags
-                if tag["Key"] == "GuardDutyMalwareScanStatus"
-            ),
-            None,
-        )
-        matches_tag = guardduty_status == operation_event.scan_result_status
-        route = select_route(operation_event.scan_result_status, matches_tag)
+        route = select_route(operation_event.scan_result_status)
         item = self.store.update_fields(
             item,
             owner,
-            {
-                "route": route,
-                "scan_result_status_matches_tag": matches_tag,
-            },
+            {"route": route},
         )
         return self.config.destinations[route], item
 
