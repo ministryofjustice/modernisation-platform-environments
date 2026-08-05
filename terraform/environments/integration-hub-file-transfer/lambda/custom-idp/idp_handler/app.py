@@ -115,6 +115,7 @@ def validate_user_record(username, user_record):
         if not isinstance(field_value, list) or not all(isinstance(value, str) for value in field_value):
             raise AuthenticationError(f"User {field_name} is invalid")
 
+
 def validate_request_context(event, username, user_record):
     server_id = event["serverId"]
     source_ip = event.get("sourceIp")
@@ -135,7 +136,16 @@ def build_transfer_response():
     except json.JSONDecodeError as error:
         raise AuthenticationError("Transfer home directory configuration is invalid") from error
 
-    if not isinstance(home_directory_details, list) or not home_directory_details:
+    if (
+        not isinstance(home_directory_details, list)
+        or not home_directory_details
+        or any(
+            not isinstance(detail, dict)
+            or not isinstance(detail.get("Entry"), str)
+            or not isinstance(detail.get("Target"), str)
+            for detail in home_directory_details
+        )
+    ):
         raise AuthenticationError("Transfer home directory configuration is invalid")
 
     return {

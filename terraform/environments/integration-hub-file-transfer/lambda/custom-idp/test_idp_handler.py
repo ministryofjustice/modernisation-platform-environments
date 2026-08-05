@@ -136,6 +136,21 @@ class CustomIdpTest(unittest.TestCase):
             response["HomeDirectoryDetails"],
         )
 
+    def test_invalid_home_directory_configuration_is_denied(self):
+        self.add_user_secret()
+        invalid_configurations = [
+            "not-json",
+            "{}",
+            "[]",
+            '[{"Entry": "/"}]',
+            '[{"Entry": 1, "Target": "/bucket/example-user"}]',
+        ]
+
+        for configuration in invalid_configurations:
+            with self.subTest(configuration=configuration):
+                with patch.object(self.handler, "TRANSFER_HOME_DIRECTORY_DETAILS", configuration):
+                    self.assertEqual({}, self.handler.lambda_handler(self.event(), None))
+
     def test_wrong_or_missing_password_is_denied(self):
         self.add_user_secret()
 

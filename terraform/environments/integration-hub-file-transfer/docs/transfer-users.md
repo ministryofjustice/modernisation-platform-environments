@@ -12,8 +12,9 @@ secret contains authentication and connection restriction data only.
 Terraform provides the shared Transfer role, session policy, and logical home
 directory configuration to the custom IdP Lambda. The Lambda returns these
 Terraform-managed values after authenticating the user. AWS Transfer assumes
-the role and applies the session policy, which restricts the user to the S3
-prefix matching their lower-cased username. The logical home directory maps:
+the role and applies the session policy, which uses `${transfer:UserName}` to
+restrict the user to their S3 prefix. The Lambda uses the lower-cased username
+for the logical home directory mapping:
 
 ```text
 / -> /<incoming-bucket>/<username>
