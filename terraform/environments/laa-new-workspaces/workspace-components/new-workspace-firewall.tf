@@ -111,7 +111,6 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
           "login.windows.net",
           "login.microsoftonline.com",
           ".files.1drv.com",
-          ".onedrive.live.com",
           ".storage.live.com",
           ".groups.office.live.com",
           ".groups.photos.live.com",
