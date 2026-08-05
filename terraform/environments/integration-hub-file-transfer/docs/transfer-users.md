@@ -7,7 +7,14 @@ both FTPS password authentication and SFTP public-key authentication.
 
 The current secret version must be a JSON object containing `username`,
 `password`, `publicKeys`, `Role`, `Policy`, `HomeDirectoryType`,
-`HomeDirectoryDetails`, `ipv4_allow_list`, and `server_id_allow_list`.
+`ipv4_allow_list`, and `server_id_allow_list`.
+
+For `HomeDirectoryType = "LOGICAL"`, include `HomeDirectoryDetails` to map
+virtual paths, such as `/`, to specific S3 locations. This lets the user see a
+simple directory structure without exposing the underlying bucket path. For
+`HomeDirectoryType = "PATH"`, include `HomeDirectory` to place the user directly
+at that path. `PosixProfile` is optional.
+
 Terraform creates the initial record with a null password. A user cannot use
 FTPS password authentication until an operator publishes a complete new secret
 version with a non-null password.
