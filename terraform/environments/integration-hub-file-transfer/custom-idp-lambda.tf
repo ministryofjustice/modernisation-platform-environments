@@ -36,8 +36,15 @@ module "lambda_custom_idp" {
   trigger_on_package_timestamp   = false
 
   environment_variables = {
-    LOGLEVEL      = local.custom_idp_configuration.log_level
-    SECRET_PREFIX = local.custom_idp_configuration.secret_prefix
+    LOGLEVEL                = local.custom_idp_configuration.log_level
+    SECRET_PREFIX           = local.custom_idp_configuration.secret_prefix
+    AWS_ACCOUNT_ID          = data.aws_caller_identity.current.account_id
+    TRANSFER_ROLE_ARN       = module.iam_role_transfer_user.arn
+    TRANSFER_SESSION_POLICY = data.aws_iam_policy_document.transfer_user_session.json
+    TRANSFER_HOME_DIRECTORY_DETAILS = jsonencode([{
+      Entry  = "/"
+      Target = "/${module.s3_bucket["incoming"].s3_bucket_id}/{{USERNAME}}"
+    }])
   }
 
   attach_policy_statements = true
