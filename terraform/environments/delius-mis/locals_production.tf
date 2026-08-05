@@ -31,21 +31,14 @@ locals {
     extra_user_data_content = "yum install -y openldap-clients"
   }
 
-  boe_efs_config_production = null
-
-  # boe_efs_config_production = {
-  #   availability_zone_name = "eu-west-2a"
-  #   mount_targets_subnet_ids = {
-  #     single-az = data.aws_subnets.shared-private-a.ids[0]
-  #   }
-  #   # For multi-az, use:
-  #   # availability_zone_name = null
-  #   # mount_targets_subnet_ids = {
-  #   #   multi-az-a = data.aws_subnets.shared-private-a.ids[0]
-  #   #   multi-az-b = data.aws_subnets.shared-private-b.ids[0]
-  #   #   multi-az-c = data.aws_subnets.shared-private-c.ids[0]
-  #   # }
-  # }
+  boe_efs_config_production = {
+    availability_zone_name = null
+    mount_targets_subnet_ids = {
+      multi-az-a = data.aws_subnets.shared-private-a.ids[0]
+      multi-az-b = data.aws_subnets.shared-private-b.ids[0]
+      multi-az-c = data.aws_subnets.shared-private-c.ids[0]
+    }
+  }
 
   bcs_config_production = {
     instance_count = 0
