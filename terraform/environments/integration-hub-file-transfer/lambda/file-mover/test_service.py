@@ -1,5 +1,6 @@
 import json
 import unittest
+from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
@@ -190,6 +191,40 @@ class FileMoverServiceTest(unittest.TestCase):
             call for call in self.store.transition.call_args_list if call.args[3] == "PUBLISHED"
         ]
         self.assertEqual(published_transitions, [])
+
+    def test_publish_serializes_integral_dynamodb_decimals_as_json_integers(self):
+        service = self._stage_service()
+        item = {
+            **self.base_item,
+            "destination_bucket": "processing",
+            "output_detail_type": "FileStagedForScanning.v1",
+            "output_detail": {
+                "data": {
+                    "sourceObject": {"sizeBytes": Decimal("12")},
+                    "stagedObject": {"sizeBytes": Decimal("12")},
+                }
+            },
+        }
+
+        service._publish(item)
+
+        detail = json.loads(
+            self.eventbridge.put_events.call_args.kwargs["Entries"][0]["Detail"]
+        )
+        self.assertEqual(detail["data"]["sourceObject"]["sizeBytes"], 12)
+        self.assertIsInstance(detail["data"]["sourceObject"]["sizeBytes"], int)
+
+    def test_publish_rejects_a_fractional_dynamodb_decimal(self):
+        service = self._stage_service()
+        item = {
+            **self.base_item,
+            "destination_bucket": "processing",
+            "output_detail_type": "FileStagedForScanning.v1",
+            "output_detail": {"data": {"sourceObject": {"sizeBytes": Decimal("1.5")}}},
+        }
+
+        with self.assertRaisesRegex(TypeError, "Decimal is not JSON serializable"):
+            service._publish(item)
 
     def _stage_service(self, receipt_enabled=False):
         config = SimpleNamespace(

@@ -1,5 +1,6 @@
 import json
 import time
+from decimal import Decimal
 
 from mft_file_mover.events import EVENT_SOURCE, parse_file_mover_event
 from mft_file_mover.model import select_route
@@ -220,7 +221,11 @@ class FileMoverService:
                 {
                     "Source": EVENT_SOURCE,
                     "DetailType": item["output_detail_type"],
-                    "Detail": json.dumps(item["output_detail"], separators=(",", ":")),
+                    "Detail": json.dumps(
+                        item["output_detail"],
+                        default=_event_detail_json_default,
+                        separators=(",", ":"),
+                    ),
                     "EventBusName": self.config.event_bus_arn,
                     "Resources": [
                         f"arn:aws:s3:::{item['destination_bucket']}/{item['source_key']}"
@@ -255,3 +260,9 @@ class FileMoverService:
         if item.get("ignored_receipt"):
             result["ignoredReceipt"] = True
         return result
+
+
+def _event_detail_json_default(value):
+    if isinstance(value, Decimal) and value == value.to_integral_value():
+        return int(value)
+    raise TypeError(f"Object of type {value.__class__.__name__} is not JSON serializable")
