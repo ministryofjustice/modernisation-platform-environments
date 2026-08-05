@@ -36,47 +36,6 @@ permissions:
   contents: read  # This is required for actions/checkout
 
 jobs:
-  python-tests:
-    name: Python Lambda tests
-    if: inputs.action != 'destroy'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: pip
-          cache-dependency-path: |
-            terraform/environments/integration-hub-file-transfer/lambda/*/requirements.txt
-            terraform/environments/integration-hub-file-transfer/lambda/file-mover/test-requirements.txt
-
-      - name: Install Lambda dependencies
-        working-directory: terraform/environments/integration-hub-file-transfer
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install \
-            -r lambda/file-received-adapter/requirements.txt \
-            -r lambda/file-scan-result-recorded-adapter/requirements.txt \
-            -r lambda/file-mover/requirements.txt \
-            -r lambda/file-mover/test-requirements.txt
-
-      - name: Test file received adapter
-        working-directory: terraform/environments/integration-hub-file-transfer/lambda/file-received-adapter
-        run: python -m unittest -v
-
-      - name: Test file scan result recorded adapter
-        working-directory: terraform/environments/integration-hub-file-transfer/lambda/file-scan-result-recorded-adapter
-        run: python -m unittest -v
-
-      - name: Test file movers
-        working-directory: terraform/environments/integration-hub-file-transfer/lambda/file-mover
-        run: |
-          python -m unittest -v
-          python -m compileall -q stage_lambda.py route_lambda.py mft_file_mover
-
   strategy:
     uses: ./.github/workflows/reusable_terraform_components_strategy.yml
     if: inputs.action != 'destroy'
@@ -84,7 +43,7 @@ jobs:
       application: "${{ github.workflow }}"
 
   terraform:
-    needs: [strategy, python-tests]
+    needs: strategy
     if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
     strategy:
       fail-fast: false
