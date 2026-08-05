@@ -35,16 +35,9 @@ module "secrets_custom_idp_user" {
   # complete secret versions managed outside Terraform so that credentials
   # remain out of state.
   secret_string = jsonencode({
-    username          = each.key
-    password          = null
-    publicKeys        = each.value.ssh_public_keys
-    Role              = module.iam_role_transfer_user.arn
-    Policy            = data.aws_iam_policy_document.transfer_user_session[each.key].json
-    HomeDirectoryType = "LOGICAL"
-    HomeDirectoryDetails = [{
-      Entry  = "/"
-      Target = "/${module.s3_bucket["incoming"].s3_bucket_id}/${trimprefix(each.value.home_directory_target, "/")}"
-    }]
+    username             = each.key
+    password             = null
+    publicKeys           = each.value.ssh_public_keys
     ipv4_allow_list      = each.value.cidr_blocks
     server_id_allow_list = each.value.server_id_allow_list
   })
