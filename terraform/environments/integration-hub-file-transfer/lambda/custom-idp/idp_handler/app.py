@@ -15,13 +15,15 @@ from custom_idp_common import (
 
 LOG_LEVEL = os.environ.get("LOGLEVEL", "INFO")
 SECRET_PREFIX = os.environ["SECRET_PREFIX"]
+AWS_ACCOUNT_ID = os.environ["AWS_ACCOUNT_ID"]
+TRANSFER_ROLE_ARN = os.environ["TRANSFER_ROLE_ARN"]
+TRANSFER_SESSION_POLICY = os.environ["TRANSFER_SESSION_POLICY"]
+TRANSFER_HOME_DIRECTORY_DETAILS = os.environ["TRANSFER_HOME_DIRECTORY_DETAILS"]
 
 logger = logging.getLogger()
 logger.setLevel(LOG_LEVEL)
 
-sts_client = boto3.client("sts")
 secretsmanager_client = boto3.client("secretsmanager")
-account_id = sts_client.get_caller_identity()["Account"]
 
 
 class AuthenticationError(Exception):
@@ -41,7 +43,7 @@ def lambda_handler(event, context):
         user_record = get_user_record(username)
         validate_user_record(username, user_record)
         validate_request_context(event, username, user_record)
-        response_data = build_transfer_response(user_record)
+        response_data = build_transfer_response()
 
         password = event.get("password")
         if isinstance(password, str) and password.strip():
@@ -53,7 +55,7 @@ def lambda_handler(event, context):
             response_data["PublicKeys"] = public_keys
 
         response_data = normalise_home_directory_details(response_data)
-        response_data = replace_response_variables(response_data, username, account_id, event["serverId"])
+        response_data = replace_response_variables(response_data, username, AWS_ACCOUNT_ID, event["serverId"])
         logger.info("Authentication succeeded for user %s", username)
         return response_data
     except AuthenticationError as error:
@@ -104,12 +106,6 @@ def validate_user_record(username, user_record):
     if user_record.get("username") != username:
         raise AuthenticationError("User secret username does not match request")
 
-    if not isinstance(user_record.get("Role"), str) or not user_record["Role"]:
-        raise AuthenticationError("Transfer role is not configured")
-
-    if not isinstance(user_record.get("Policy"), str):
-        raise AuthenticationError("Transfer policy is invalid")
-
     password = user_record.get("password")
     if password is not None and not isinstance(password, str):
         raise AuthenticationError("User password is invalid")
@@ -118,27 +114,6 @@ def validate_user_record(username, user_record):
         field_value = user_record.get(field_name)
         if not isinstance(field_value, list) or not all(isinstance(value, str) for value in field_value):
             raise AuthenticationError(f"User {field_name} is invalid")
-
-    home_directory_type = user_record.get("HomeDirectoryType")
-    if home_directory_type == "LOGICAL":
-        home_directory_details = user_record.get("HomeDirectoryDetails")
-        if not isinstance(home_directory_details, list) or not home_directory_details:
-            raise AuthenticationError("Logical home directory is invalid")
-        for home_directory_detail in home_directory_details:
-            if (
-                not isinstance(home_directory_detail, dict)
-                or not isinstance(home_directory_detail.get("Entry"), str)
-                or not isinstance(home_directory_detail.get("Target"), str)
-            ):
-                raise AuthenticationError("Logical home directory is invalid")
-    elif home_directory_type == "PATH":
-        if not isinstance(user_record.get("HomeDirectory"), str) or not user_record["HomeDirectory"]:
-            raise AuthenticationError("Path home directory is invalid")
-    else:
-        raise AuthenticationError("Home directory type is invalid")
-
-    if "PosixProfile" in user_record and not isinstance(user_record["PosixProfile"], dict):
-        raise AuthenticationError("Posix profile is invalid")
 
 
 def validate_request_context(event, username, user_record):
@@ -155,16 +130,30 @@ def validate_request_context(event, username, user_record):
         raise AuthenticationError("Source IP is not allowed for this user")
 
 
-def build_transfer_response(user_record):
-    response_fields = [
-        "Role",
-        "Policy",
-        "HomeDirectoryType",
-        "HomeDirectoryDetails",
-        "HomeDirectory",
-        "PosixProfile",
-    ]
-    return {field_name: user_record[field_name] for field_name in response_fields if field_name in user_record}
+def build_transfer_response():
+    try:
+        home_directory_details = json.loads(TRANSFER_HOME_DIRECTORY_DETAILS)
+    except json.JSONDecodeError as error:
+        raise AuthenticationError("Transfer home directory configuration is invalid") from error
+
+    if (
+        not isinstance(home_directory_details, list)
+        or not home_directory_details
+        or any(
+            not isinstance(detail, dict)
+            or not isinstance(detail.get("Entry"), str)
+            or not isinstance(detail.get("Target"), str)
+            for detail in home_directory_details
+        )
+    ):
+        raise AuthenticationError("Transfer home directory configuration is invalid")
+
+    return {
+        "Role": TRANSFER_ROLE_ARN,
+        "Policy": TRANSFER_SESSION_POLICY,
+        "HomeDirectoryType": "LOGICAL",
+        "HomeDirectoryDetails": home_directory_details,
+    }
 
 
 def authenticate_password(input_password, user_record):
