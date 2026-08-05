@@ -63,7 +63,7 @@
 # -----------------------------------------------------------------------------
 resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
   name     = "workspaces-microsoft-services"
-  capacity = 60
+  capacity = 300
   type     = "STATEFUL"
 
   rule_group {
