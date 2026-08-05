@@ -93,6 +93,12 @@ resource "aws_lb" "delius_core_frontend" {
 
   enable_deletion_protection = false
   drop_invalid_header_fields = true
+
+  access_logs {
+    bucket  = module.weblogic_alb_access_logs.bucket.id
+    prefix  = "weblogic-${var.env_name}-alb"
+    enabled = true
+  }
 }
 
 resource "aws_lb_listener" "listener_https" {
