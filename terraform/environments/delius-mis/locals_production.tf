@@ -41,10 +41,10 @@ locals {
   }
 
   bcs_config_production = {
-    instance_count = 0
+    instance_count = 1
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
     ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
-    ansible_branch = "TM-2058/delius-mis/preprod-config"
+    ansible_branch = "PLAT-54/delius-mis/prod-build-v1"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 150, type = "gp3" } # 100GB would be OK
       "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }
