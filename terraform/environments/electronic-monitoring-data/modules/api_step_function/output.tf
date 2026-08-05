@@ -11,9 +11,9 @@ output "resource_request_id" {
 }
 
 output "resource_status_id" {
-  value = aws_api_gateway_resource.status.id
+  value = aws_api_gateway_resource.status[0].id
 }
 
 output "resource_execution_id_id" {
-  value = aws_api_gateway_resource.execution_id.id
+  value = aws_api_gateway_resource.execution_id[0].id
 }
