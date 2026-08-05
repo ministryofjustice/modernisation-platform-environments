@@ -94,7 +94,7 @@ resource "aws_security_group_rule" "cluster_ec2_egress_mysql" {
   ]
 }
 
-resource "aws_security_group_rule" "cluster_ec2_egress_subnets" {
+resource "aws_security_group_rule" "cluster_ec2_egress_1521" {
   security_group_id = aws_security_group.cluster_ec2.id
   type              = "egress"
   description       = "Allow egress to protected subnets"
