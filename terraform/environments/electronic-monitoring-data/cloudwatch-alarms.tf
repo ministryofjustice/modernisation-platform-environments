@@ -59,19 +59,19 @@ locals {
   merge_lambdas = {
     staged_position = {
       lambda_name = module.merge_mdss_staged_position[0].lambda_function_name
-      threshold   = 1000000000
+      threshold   = 20000000000
     }
     staged_event = {
       lambda_name = module.merge_mdss_staged_event[0].lambda_function_name
-      threshold   = 1000000000
+      threshold   = 20000000000
     }
     ac_position = {
       lambda_name = module.merge_ac_position[0].lambda_function_name
-      threshold   = 1000000000
+      threshold   = 20000000000
     }
     emdi_position = {
       lambda_name = module.merge_emdi_position[0].lambda_function_name
-      threshold   = 1000000000
+      threshold   = 20000000000
     }
   }
 }
@@ -196,13 +196,13 @@ resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
 # Merge Lambdas
 ################
 
-resource "aws_cloudwatch_metric_alarm" "none_succeeded" {
+resource "aws_cloudwatch_metric_alarm" "merge_lambdas_not_running" {
   for_each = local.merge_lambdas
 
-  alarm_name          = "none_succeeded_${each.key}"
+  alarm_name          = "${each.key}_not_running"
   alarm_description   = "Detects no queries completed across 15 minutes."
-  comparison_operator = "LessThanOrEqualToThreshold"
-  threshold           = 0
+  comparison_operator = "LessThanThreshold"
+  threshold           = 1
   evaluation_periods  = 1
   treat_missing_data  = "notBreaching"
 
@@ -253,10 +253,10 @@ resource "aws_cloudwatch_metric_alarm" "none_succeeded" {
 }
 
 
-resource "aws_cloudwatch_metric_alarm" "queries_failing" {
+resource "aws_cloudwatch_metric_alarm" "merge_lambdas_queries_failing" {
   for_each = local.merge_lambdas
 
-  alarm_name          = "queries_failing_${each.key}"
+  alarm_name          = "${each.key}_queries_failing"
   alarm_description   = "Detects 3 failed queries within 15 minutes."
   comparison_operator = "GreaterThanOrEqualToThreshold"
   threshold           = 3
@@ -279,10 +279,10 @@ resource "aws_cloudwatch_metric_alarm" "queries_failing" {
   ]
 }
 
-resource "aws_cloudwatch_metric_alarm" "excessive_scanning" {
+resource "aws_cloudwatch_metric_alarm" "merge_lambdas_excessive_scanning" {
   for_each = local.merge_lambdas
 
-  alarm_name          = "excessive_scanning_${each.key}"
+  alarm_name          = "_${each.key}_excessive_scanning"
   alarm_description   = "Detects when average scan across an hour is excessive."
   comparison_operator = "GreaterThanOrEqualToThreshold"
   threshold           = each.value.threshold
@@ -306,10 +306,10 @@ resource "aws_cloudwatch_metric_alarm" "excessive_scanning" {
   ]
 }
 
-resource "aws_cloudwatch_metric_alarm" "slow_execution" {
+resource "aws_cloudwatch_metric_alarm" "merge_lambdas_slow_execution" {
   for_each = local.merge_lambdas
 
-  alarm_name          = "slow_execution_${each.key}"
+  alarm_name          = "_${each.key}_slow_execution"
   alarm_description   = "Detects when average run time over half an hour is slow."
   comparison_operator = "GreaterThanOrEqualToThreshold"
   threshold           = 120000
@@ -333,10 +333,10 @@ resource "aws_cloudwatch_metric_alarm" "slow_execution" {
   ]
 }
 
-resource "aws_cloudwatch_metric_alarm" "long_queue" {
+resource "aws_cloudwatch_metric_alarm" "merge_lambdas_long_queue" {
   for_each = local.merge_lambdas
 
-  alarm_name          = "long_queue_${each.key}"
+  alarm_name          = "${each.key}_long_queue"
   alarm_description   = "Detects when average queue time over 15 minutes is slow."
   comparison_operator = "GreaterThanOrEqualToThreshold"
   threshold           = 60000
