@@ -51,13 +51,15 @@ locals {
     "3.11.197.133/32", # mod-platform-live-eu-west-2c-nat
     "3.8.81.175/32"    # mod-platform-live-eu-west-2c-nat
   ]
+  legacy_test_natgw_ip = ["35.178.162.73/32"]
   mp_natgw_ips = contains(["poc", "dev", "test"], var.env_name) ? local.mp_non_live_natgw_ips : local.mp_live_natgw_ips
 
   all_ingress_ips = concat(
     local.moj_ips, 
     local.unilink_ips, 
     local.cp_ips,
-    local.mp_natgw_ips
+    local.mp_natgw_ips,
+    local.legacy_test_natgw_ip
   )
 
   legacy_test_natgw_ips = [
