@@ -12,7 +12,6 @@ locals {
   account_config = {
     shared_vpc_cidr               = data.aws_vpc.shared.cidr_block
     private_subnet_ids            = data.aws_subnets.shared-private.ids
-    private_subnet_cidrs          = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
     public_subnet_ids             = data.aws_subnets.shared-public.ids
     ordered_private_subnet_ids    = local.ordered_subnet_ids
     ordered_subnets               = [local.ordered_subnet_ids]
