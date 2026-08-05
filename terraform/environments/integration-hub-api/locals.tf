@@ -1,6 +1,13 @@
 locals {
   api_configuration   = try(local.application_data.accounts[local.environment].api_configuration, {})
   bootstrap_code_root = "${path.module}/bootstrap-lambdas"
+  api_gateway_throttling_configuration = merge(
+    {
+      burst_limit = 100
+      rate_limit  = 200
+    },
+    try(local.api_configuration.throttling, {})
+  )
   api_docs_configuration = merge(
     {
       basic_auth_username = "api-docs"
