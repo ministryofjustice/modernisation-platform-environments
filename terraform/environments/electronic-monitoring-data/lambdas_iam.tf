@@ -1823,6 +1823,17 @@ data "aws_iam_policy_document" "cloudwatch_alarm_threader_policy_document" {
     ]
     resources = [aws_sfn_state_machine.staging_db_janitor.arn]
   }
+
+  statement {
+    sid    = "AllowSendIncidentEvents"
+    effect = "Allow"
+    actions = [
+      "sqs:SendMessage",
+    ]
+    resources = [
+      aws_sqs_queue.live_feed_incident_events.arn,
+    ]
+  }
 }
 
 resource "aws_iam_policy" "cloudwatch_alarm_threader" {
@@ -1834,6 +1845,7 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_alarm_threader_attach" {
   role       = aws_iam_role.cloudwatch_alarm_threader.name
   policy_arn = aws_iam_policy.cloudwatch_alarm_threader.arn
 }
+
 
 
 # ------------------------------------------------------------------------------
@@ -2851,16 +2863,39 @@ data "aws_iam_policy_document" "live_feed_incident_manager_policy_document" {
       aws_sqs_queue.live_feed_incident_events.arn,
     ]
   }
+
+  statement {
+    sid    = "ReadGitHubAppSecret"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      module.live_feed_github_app.secret_arn,
+    ]
+  }
+
+  statement {
+    sid    = "StoreIncidentEpisodeState"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${local.alarm_thread_state_bucket}/incident-automation/episodes/${local.environment_shorthand}/*"
+    ]
+  }
 }
 
 resource "aws_iam_policy" "live_feed_incident_manager" {
-  name = "live_feed_incident_manager_lambda_policy"
-
-  policy = (
-    data.aws_iam_policy_document
-      .live_feed_incident_manager_policy_document
-      .json
-  )
+  name   = "live_feed_incident_manager_lambda_policy"
+  policy = data.aws_iam_policy_document.live_feed_incident_manager_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "live_feed_incident_manager_attach" {
