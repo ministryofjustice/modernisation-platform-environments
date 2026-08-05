@@ -49,7 +49,13 @@ locals {
             "s3:PutObject"
           ]
 
-          Resource = "${module.weblogic_alb_access_logs.bucket.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*"
+          Resource = "${module.weblogic_alb_access_logs.bucket.arn}/*"
+          
+          Condition = {
+            StringEquals = {
+              "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+            }
+          }
         },
         {
           Sid    = "AllowDeveloperSSOReadAccess"
