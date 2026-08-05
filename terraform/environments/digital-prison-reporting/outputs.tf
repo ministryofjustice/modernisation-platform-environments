@@ -152,6 +152,6 @@ output "domain_builder_rds_endpoint" {
 
 ## Bedrock
 output "ai_gateway_bedrock_role_arn" {
-  description = "IAM role ARN assumed by the production AI Gateway to invoke Bedrock"
+  description = "IAM role ARN assumed by the Data Platform AI Gateway to invoke Bedrock"
   value       = local.enable_bedrock ? aws_iam_role.ai_gateway_bedrock[0].arn : null
 }
