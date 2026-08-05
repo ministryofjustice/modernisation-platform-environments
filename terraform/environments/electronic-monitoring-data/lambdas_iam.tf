@@ -2824,3 +2824,46 @@ resource "aws_iam_role_policy_attachment" "write_to_sharepoint_iam_role_attach" 
   role       = aws_iam_role.write_to_sharepoint[0].name
   policy_arn = aws_iam_policy.write_to_sharepoint_iam_policy[0].arn
 }
+
+# ------------------------------------------------------------------------------
+# IAM role and policy for the live-feed incident manager Lambda
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "live_feed_incident_manager" {
+  name               = "live_feed_incident_manager_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "live_feed_incident_manager_policy_document" {
+  statement {
+    sid    = "ConsumeIncidentEvents"
+    effect = "Allow"
+
+    actions = [
+      "sqs:ChangeMessageVisibility",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+      "sqs:ReceiveMessage",
+    ]
+
+    resources = [
+      aws_sqs_queue.live_feed_incident_events.arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "live_feed_incident_manager" {
+  name = "live_feed_incident_manager_lambda_policy"
+
+  policy = (
+    data.aws_iam_policy_document
+      .live_feed_incident_manager_policy_document
+      .json
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "live_feed_incident_manager_attach" {
+  role       = aws_iam_role.live_feed_incident_manager.name
+  policy_arn = aws_iam_policy.live_feed_incident_manager.arn
+}

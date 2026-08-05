@@ -196,6 +196,31 @@ models:
       model_name: "OpenAI GPT OSS Safeguard 120B"
       region: eu-west-2
       generally_available: true
+    # Justice Engineering AI Enablement
+    jeaie-claude-haiku-4-5:
+      model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Haiku 4.5 (EU)"
+      region: eu-west-2
+      aws_account_name: octo-engineering-ai-enablement-production
+      aws_role_name: ai-gateway
+      generally_available: false
+    jeaie-claude-opus-5:
+      model_id: eu.anthropic.claude-opus-5
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Opus 5 (EU)"
+      region: eu-west-2
+      aws_account_name: octo-engineering-ai-enablement-production
+      aws_role_name: ai-gateway
+      generally_available: false
+    jeaie-claude-sonnet-5:
+      model_id: eu.anthropic.claude-sonnet-5
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 5 (EU)"
+      region: eu-west-2
+      aws_account_name: octo-engineering-ai-enablement-production
+      aws_role_name: ai-gateway
+      generally_available: false
   google_gemini_enterprise_agent_platform: {}
   microsoft_foundry:
     # Anthropic
