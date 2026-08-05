@@ -12,6 +12,12 @@ CUSTOM_IDP_DIRECTORY = Path(__file__).parent
 HANDLER_FILE = CUSTOM_IDP_DIRECTORY / "idp_handler" / "app.py"
 LAYER_DIRECTORY = CUSTOM_IDP_DIRECTORY / "layer" / "python"
 SECRET_PREFIX = "integration-hub-file-transfer/development/transfer-users/"
+AWS_ACCOUNT_ID = "123456789012"
+TRANSFER_ROLE_ARN = "arn:aws:iam::123456789012:role/transfer-user"
+TRANSFER_SESSION_POLICY = '{"Version":"2012-10-17","Statement":[]}'
+TRANSFER_HOME_DIRECTORY_DETAILS = (
+    '[{"Entry":"/","Target":"/integration-hub-file-transfer-development-incoming/{{USERNAME}}"}]'
+)
 
 
 class ResourceNotFoundException(Exception):
@@ -23,22 +29,22 @@ class CustomIdpTest(unittest.TestCase):
     def setUpClass(cls):
         sys.path.insert(0, str(LAYER_DIRECTORY))
 
-        sts_client = MagicMock()
-        sts_client.get_caller_identity.return_value = {"Account": "123456789012"}
         secretsmanager_client = MagicMock()
         secretsmanager_client.exceptions = SimpleNamespace(
             ResourceNotFoundException=ResourceNotFoundException
         )
 
         boto3 = ModuleType("boto3")
-        boto3.client = MagicMock(
-            side_effect=lambda service: sts_client if service == "sts" else secretsmanager_client
-        )
+        boto3.client = MagicMock(return_value=secretsmanager_client)
 
         cls.modules_patch = patch.dict(sys.modules, {"boto3": boto3})
         cls.modules_patch.start()
 
         os.environ["SECRET_PREFIX"] = SECRET_PREFIX
+        os.environ["AWS_ACCOUNT_ID"] = AWS_ACCOUNT_ID
+        os.environ["TRANSFER_ROLE_ARN"] = TRANSFER_ROLE_ARN
+        os.environ["TRANSFER_SESSION_POLICY"] = TRANSFER_SESSION_POLICY
+        os.environ["TRANSFER_HOME_DIRECTORY_DETAILS"] = TRANSFER_HOME_DIRECTORY_DETAILS
 
         spec = importlib.util.spec_from_file_location("custom_idp_handler", HANDLER_FILE)
         cls.handler = importlib.util.module_from_spec(spec)
@@ -64,10 +70,6 @@ class CustomIdpTest(unittest.TestCase):
             "username": "example-user",
             "password": "super-secret",
             "publicKeys": ["ssh-ed25519 AAAATEST"],
-            "Role": "arn:aws:iam::123456789012:role/transfer-user",
-            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[]}",
-            "HomeDirectoryType": "LOGICAL",
-            "HomeDirectoryDetails": [{"Entry": "/", "Target": "/bucket/example-user"}],
             "ipv4_allow_list": [],
             "server_id_allow_list": [],
         }
@@ -93,10 +95,11 @@ class CustomIdpTest(unittest.TestCase):
 
         response = self.handler.lambda_handler(self.event(), None)
 
-        self.assertEqual("arn:aws:iam::123456789012:role/transfer-user", response["Role"])
+        self.assertEqual(TRANSFER_ROLE_ARN, response["Role"])
+        self.assertEqual(TRANSFER_SESSION_POLICY, response["Policy"])
         self.assertEqual("LOGICAL", response["HomeDirectoryType"])
         self.assertEqual(
-            '[{"Entry": "/", "Target": "/bucket/example-user"}]',
+            '[{"Entry": "/", "Target": "/integration-hub-file-transfer-development-incoming/example-user"}]',
             response["HomeDirectoryDetails"],
         )
         self.assertEqual(1, self.handler.secretsmanager_client.get_secret_value.call_count)
@@ -105,6 +108,8 @@ class CustomIdpTest(unittest.TestCase):
         )
         self.assertNotIn("password", response)
         self.assertNotIn("ipv4_allow_list", response)
+        self.assertNotIn("Role", self.secrets[f"{SECRET_PREFIX}example-user"])
+        self.assertNotIn("Policy", self.secrets[f"{SECRET_PREFIX}example-user"])
 
     def test_ssh_authentication_returns_keys(self):
         self.add_user_secret()
@@ -112,6 +117,39 @@ class CustomIdpTest(unittest.TestCase):
         response = self.handler.lambda_handler(self.event(password=""), None)
 
         self.assertEqual(["ssh-ed25519 AAAATEST"], response["PublicKeys"])
+
+    def test_secret_cannot_override_terraform_authorisation(self):
+        self.add_user_secret(
+            self.user_record(
+                Role="arn:aws:iam::123456789012:role/untrusted",
+                Policy="untrusted-policy",
+                HomeDirectoryDetails=[{"Entry": "/", "Target": "/untrusted"}],
+            )
+        )
+
+        response = self.handler.lambda_handler(self.event(), None)
+
+        self.assertEqual(TRANSFER_ROLE_ARN, response["Role"])
+        self.assertEqual(TRANSFER_SESSION_POLICY, response["Policy"])
+        self.assertEqual(
+            '[{"Entry": "/", "Target": "/integration-hub-file-transfer-development-incoming/example-user"}]',
+            response["HomeDirectoryDetails"],
+        )
+
+    def test_invalid_home_directory_configuration_is_denied(self):
+        self.add_user_secret()
+        invalid_configurations = [
+            "not-json",
+            "{}",
+            "[]",
+            '[{"Entry": "/"}]',
+            '[{"Entry": 1, "Target": "/bucket/example-user"}]',
+        ]
+
+        for configuration in invalid_configurations:
+            with self.subTest(configuration=configuration):
+                with patch.object(self.handler, "TRANSFER_HOME_DIRECTORY_DETAILS", configuration):
+                    self.assertEqual({}, self.handler.lambda_handler(self.event(), None))
 
     def test_wrong_or_missing_password_is_denied(self):
         self.add_user_secret()
@@ -136,7 +174,7 @@ class CustomIdpTest(unittest.TestCase):
         self.assertEqual({}, self.handler.lambda_handler(self.event(), None))
         self.add_user_secret(self.user_record(username="another-user"))
         self.assertEqual({}, self.handler.lambda_handler(self.event(), None))
-        self.secrets[f"{SECRET_PREFIX}example-user"] = self.user_record(HomeDirectoryDetails=[])
+        self.secrets[f"{SECRET_PREFIX}example-user"] = self.user_record(publicKeys="not-a-list")
         self.assertEqual({}, self.handler.lambda_handler(self.event(), None))
 
     def test_rejects_request_without_source_ip(self):
