@@ -1158,3 +1158,99 @@ module "poll_cadt" {
   }
 }
 
+
+#-----------------------------------------------------------------------------------
+# Trigger cadt ecs job
+#-----------------------------------------------------------------------------------
+
+module "trigger_cadt" {
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "trigger_cadt"
+  role_name               = module.trigger_cadt_iam.name
+  role_arn                = module.trigger_cadt_iam.arn
+  handler                 = "trigger_cadt.handler"
+  memory_size             = 10240
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    CLUSTER_NAME        = aws_ecs_cluster.cadt.name
+    TASK_DEFINITION_ARN = aws_ecs_task_definition.create_a_derived_table.arn
+    SUBNET_IDS          = jsonencode(data.aws_subnets.shared-private.ids)
+    SECURITY_GROUPS     = jsonencode([aws_security_group.gdpr_batch_sg[0].id])
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# Poll cadt ecs job
+#-----------------------------------------------------------------------------------
+
+module "poll_cadt" {
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "poll_cadt"
+  role_name               = module.poll_cadt_iam.name
+  role_arn                = module.poll_cadt_iam.arn
+  handler                 = "poll_cadt.handler"
+  memory_size             = 10240
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    CLUSTER_NAME        = aws_ecs_cluster.cadt.name
+  }
+}
+
+
+# ------------------------------------------------------------------------------
+# Live-feed incident manager
+# ------------------------------------------------------------------------------
+
+module "live_feed_github_app" {
+  source  = "terraform-aws-modules/secrets-manager/aws"
+  version = "1.3.1"
+
+  name = "live-feed-github-app-${local.environment_shorthand}"
+
+  description = (
+    "GitHub App credentials for live-feed incident automation"
+  )
+
+  recovery_window_in_days = 7
+
+  ignore_secret_changes = true
+  secret_string         = jsonencode({})
+
+  tags = local.tags
+}
+
+module "live_feed_incident_manager" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "live_feed_incident_manager"
+  role_name                      = aws_iam_role.live_feed_incident_manager.name
+  role_arn                       = aws_iam_role.live_feed_incident_manager.arn
+  handler                        = "live_feed_incident_manager.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 2
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+
+  environment_variables = {
+    ENVIRONMENT             = local.environment_shorthand
+    POWERTOOLS_LOG_LEVEL    = "INFO"
+    POWERTOOLS_SERVICE_NAME = "live-feed-incident-manager"
+  }
+}
