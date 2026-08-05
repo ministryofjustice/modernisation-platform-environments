@@ -26,7 +26,7 @@ locals {
   }
 
   environment_transfer_server_users = {
-    for username, user in local.transfer_server_users : username => user
+    for username, user in local.transfer_server_users : lower(username) => user
     if contains(user.environments, local.environment)
   }
 
