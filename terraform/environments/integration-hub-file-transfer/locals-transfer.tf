@@ -20,7 +20,7 @@ locals {
       environments          = ["development"]
       home_directory_target = "dms1981"
       server_id_allow_list  = []
-      cidr_blocks           = []
+      cidr_blocks           = ["139.28.208.0/22"]
       ssh_public_keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPE6XyQIDh5gt+7HOrUQymtsfl3+NZqUM5p7BQqi9uso"
       ]
