@@ -63,7 +63,7 @@
 # -----------------------------------------------------------------------------
 resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
   name     = "workspaces-microsoft-services"
-  capacity = 60
+  capacity = 1000
   type     = "STATEFUL"
 
   rule_group {
@@ -349,14 +349,14 @@ resource "aws_networkfirewall_firewall_policy" "workspaces_web_allowlist" {
       rule_order = "STRICT_ORDER"
     }
 
-    # stateful_rule_group_reference {
-    #   resource_arn = aws_networkfirewall_rule_group.workspaces_microsoft_services.arn
-    #   priority     = 1
-    # }
+    stateful_rule_group_reference {
+      resource_arn = aws_networkfirewall_rule_group.workspaces_microsoft_services.arn
+      priority     = 1
+    }
 
     stateful_rule_group_reference {
       resource_arn = aws_networkfirewall_rule_group.workspaces_onedrive_live_misc.arn
-      priority     = 1
+      priority     = 2
     }
 
     # stateful_rule_group_reference {
