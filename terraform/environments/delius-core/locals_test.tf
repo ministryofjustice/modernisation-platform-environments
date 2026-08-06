@@ -81,15 +81,15 @@ locals {
 
   delius_microservices_configs_test = {
     weblogic = {
-      ec2_instance_type        = "r7i.xlarge"
-      asg_min_size             = 2
-      asg_max_size             = 2
+      ec2_instance_type = "r7i.xlarge"
+      asg_min_size      = 2
+      asg_max_size      = 2
     }
 
     weblogic_eis = {
-      ec2_instance_type        = "r7i.large"
-      asg_min_size             = 1
-      asg_max_size             = 1
+      ec2_instance_type = "r7i.large"
+      asg_min_size      = 1
+      asg_max_size      = 1
     }
 
     pwm = {

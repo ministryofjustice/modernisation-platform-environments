@@ -1,7 +1,7 @@
 resource "aws_security_group" "transfer" {
   name        = "${local.application_name}-${local.environment}-transfer"
   description = "Allow SFTP and FTPS access to the Transfer Family server"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = module.vpc_isolated.vpc_id
 
   dynamic "ingress" {
     for_each = local.transfer_user_cidr_blocks
