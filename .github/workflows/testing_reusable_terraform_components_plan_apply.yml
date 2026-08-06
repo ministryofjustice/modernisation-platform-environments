@@ -65,7 +65,6 @@
     permissions:
       id-token: write
       contents: read
-      pull-requests: write
     concurrency:
       group: ${{ inputs.account_name && format('{0}-{1}', inputs.account_name, inputs.component) || format('{0}-{1}-{2}', inputs.application, inputs.environment, inputs.component) }}
     jobs:
