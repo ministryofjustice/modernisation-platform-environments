@@ -26,15 +26,7 @@ module "eventbridge_file_transfer_bus" {
   create_archives     = true
   append_rule_postfix = false
 
-  attach_sfn_policy = true
-  sfn_target_arns = [
-    module.step_function_filereceived_workflow.state_machine_arn,
-    module.step_function_filescanresultrecorded_workflow.state_machine_arn,
-  ]
-
   rules = local.eventbridge_file_transfer_bus_rules
-
-  targets = local.eventbridge_file_transfer_bus_targets
 
   archives = {
     "${local.application_name}-archive" = {
