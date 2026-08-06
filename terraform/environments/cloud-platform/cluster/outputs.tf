@@ -22,10 +22,15 @@ output "cluster_endpoint" {
 #------------------------------------------------------------------------------
 output "argocd_capability_arn" {
   description = "ARN of the Argo CD EKS Capability (empty if ArgoCD not enabled)"
-  value       = var.enable_argocd ? module.argocd[0].capability_arn : ""
+  value       = local.enable_argocd ? module.argocd[0].capability_arn : ""
 }
 
 output "argocd_spoke_access_role_arn" {
   description = "ARN of the IAM role for spoke cluster access (register this in spoke Access Entries)"
-  value       = var.enable_argocd ? module.argocd[0].spoke_access_role_arn : ""
+  value       = local.enable_argocd ? module.argocd[0].spoke_access_role_arn : ""
+}
+
+output "argocd_spoke_registered" {
+  description = "Whether this cluster is registered as an ArgoCD spoke"
+  value       = local.is_argocd_spoke
 }

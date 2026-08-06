@@ -686,7 +686,7 @@ resource "aws_instance" "s618358rgvw019" {
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-01d04f2e4f8cea4dd"
-  instance_type          = "c5.xlarge"
+  instance_type          = "m5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
@@ -715,7 +715,7 @@ resource "aws_instance" "s618358rgvw020" {
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0e49fc9838fdf33c4"
-  instance_type          = "c5.xlarge"
+  instance_type          = "m5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
@@ -1049,7 +1049,7 @@ resource "aws_instance" "s265903rgsl401-cjsm" {
     is-production  = true
     patch_group    = "prod_lin_patch"
     docker_service = "true"
-    port25_cjsm    = "true"
+    port25_check   = "true"
   }
 }
 
@@ -1152,6 +1152,7 @@ resource "aws_instance" "internal-mail-relay" {
     docker_service    = "true"
     container_service = "true"
     archive_volume    = "true"
+    mail_queue        = "true"
   }
 }
 
@@ -1180,6 +1181,8 @@ resource "aws_instance" "non-cjsm-mail-relay" {
     patch_group       = "prod_lin_patch"
     docker_service    = "true"
     container_service = "true"
+    port25_check      = "true"
+    mail_queue        = "true"
   }
 }
 
@@ -1208,7 +1211,8 @@ resource "aws_instance" "cjsm-mail-relay" {
     patch_group       = "prod_lin_patch"
     docker_service    = "true"
     container_service = "true"
-    port25_cjsm       = "true"
+    port25_check      = "true"
+    mail_queue        = "true"
   }
 }
 

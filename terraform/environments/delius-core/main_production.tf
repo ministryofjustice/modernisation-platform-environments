@@ -28,10 +28,10 @@ module "environment_prod" {
 
   bastion_config = local.bastion_config_prod
 
-  ldap_config        = local.ldap_config_prod
-  db_config          = local.db_config_prod
+  ldap_config                  = local.ldap_config_prod
+  db_config                    = local.db_config_prod
   create_account_service_roles = true
-  create_ecs_lambda  = true
+  create_ecs_lambda            = true
 
   delius_microservice_configs = local.delius_microservices_configs_prod
 
