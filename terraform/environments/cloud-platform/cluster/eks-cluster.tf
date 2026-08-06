@@ -10,7 +10,8 @@ module "eks" {
   enable_irsa        = true
 
   endpoint_private_access = true
-  endpoint_public_access  = true
+  # Public access is disabled when private_endpoint_mode is enabled.
+  endpoint_public_access = !local.environment_configuration.private_endpoint_mode
   # endpoint_public_access_cidrs = ["0.0.0.0/0"]
 
   iam_role_name            = "${trimprefix(trimprefix(terraform.workspace, "cloud-platform-"), "container-platform-")}-cluster"

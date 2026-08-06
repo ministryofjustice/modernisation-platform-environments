@@ -2,7 +2,10 @@ locals {
   environment_configurations = {
     development_cluster = {
       /* EKS */
-      eks_cluster_version = "1.35"
+      # private_endpoint_mode: single source of truth for private cluster access.
+      # true = private-only API + SSM relay deployed (via network); false = public endpoint, no relay.
+      eks_cluster_version   = "1.35"
+      private_endpoint_mode = true
 
       /* Addons */
       eks_cluster_addon_versions = {
@@ -119,7 +122,9 @@ locals {
     }
     development = {
       /* EKS */
-      eks_cluster_version = "1.35"
+      # private_endpoint_mode: see development_cluster above.
+      eks_cluster_version   = "1.35"
+      private_endpoint_mode = true
 
       /* Addons */
       eks_cluster_addon_versions = {
@@ -236,7 +241,9 @@ locals {
     }
     preproduction = {
       /* EKS */
-      eks_cluster_version = "1.35"
+      # private_endpoint_mode: see development_cluster above. false until opted in.
+      eks_cluster_version   = "1.35"
+      private_endpoint_mode = false
 
       /* Addons */
       eks_cluster_addon_versions = {
@@ -353,7 +360,9 @@ locals {
     }
     nonlive = {
       /* EKS */
-      eks_cluster_version = "1.35"
+      # private_endpoint_mode: see development_cluster above. false until opted in.
+      eks_cluster_version   = "1.35"
+      private_endpoint_mode = false
 
       /* ArgoCD — spokes registered with the preproduction hub */
       argocd_registered_spokes = [
@@ -475,7 +484,9 @@ locals {
     }
     live = {
       /* EKS */
-      eks_cluster_version = "1.35"
+      # private_endpoint_mode: see development_cluster above. false until opted in.
+      eks_cluster_version   = "1.35"
+      private_endpoint_mode = false
 
       /* ArgoCD — spokes registered with the live hub */
       argocd_registered_spokes = []
