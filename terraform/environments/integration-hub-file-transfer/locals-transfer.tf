@@ -4,10 +4,9 @@ locals {
 
   # Custom IdP user configuration. Add users by username and list every
   # environment in which they may authenticate. Terraform creates the initial
-  # complete user record in Secrets Manager.
+  # authentication record in Secrets Manager.
   #
   # environments          - environments in which Terraform creates the user
-  # home_directory_target - prefix in the incoming bucket mapped to logical "/"
   # server_id_allow_list  - Transfer server IDs permitted for the user; empty allows any
   # cidr_blocks           - source networks permitted by the security group and IdP;
   #                         empty creates no ingress rules
@@ -17,10 +16,9 @@ locals {
   # directly in the generated Secrets Manager secret when password access is needed.
   transfer_server_users = {
     dms1981 = {
-      environments          = ["development"]
-      home_directory_target = "dms1981"
-      server_id_allow_list  = []
-      cidr_blocks           = []
+      environments         = ["development"]
+      server_id_allow_list = []
+      cidr_blocks          = ["139.28.208.0/22"]
       ssh_public_keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPE6XyQIDh5gt+7HOrUQymtsfl3+NZqUM5p7BQqi9uso"
       ]
@@ -28,7 +26,7 @@ locals {
   }
 
   environment_transfer_server_users = {
-    for username, user in local.transfer_server_users : username => user
+    for username, user in local.transfer_server_users : lower(username) => user
     if contains(user.environments, local.environment)
   }
 
