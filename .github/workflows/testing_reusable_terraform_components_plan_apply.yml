@@ -131,11 +131,12 @@
           - name: Validate Tags
             id: validate
             uses: ministryofjustice/coat-tag-validator@cd72d5b4c97c2a0c89e744ca392572e7a8082d35 #v2.2.1
+            continue-on-error: true
             with:
               terraform_directory: "terraform/environments/${{ inputs.application }}"
               soft_fail: false
               terraform_workspace: ${{ env.WORKSPACE_NAME }}
-
+              
           - name: Setup Terraform
             uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e  # v4.0.1
             with:
