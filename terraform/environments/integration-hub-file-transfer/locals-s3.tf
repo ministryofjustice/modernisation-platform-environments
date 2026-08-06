@@ -99,6 +99,7 @@ locals {
             id     = "expire-objects-after-7-days"
             status = "Enabled"
             filter = {}
+            expiration = {
               days = 7
             }
             noncurrent_version_expiration = {
