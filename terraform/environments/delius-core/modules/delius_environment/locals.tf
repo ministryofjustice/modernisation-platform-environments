@@ -55,9 +55,10 @@ locals {
 
   all_ingress_ips = concat(
     local.moj_ips, 
-    local.unilink_ips, 
+    local.unilink_ips,
     local.cp_ips,
-    local.mp_natgw_ips
+    local.mp_natgw_ips,
+    [var.account_info.cp_cidr]
   )
 
   legacy_test_natgw_ips = [

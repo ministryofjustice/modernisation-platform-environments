@@ -55,7 +55,7 @@ locals {
 
   eventbridge_file_transfer_bus_rules = {
     "file-transfer-workflow" = {
-      description = "Start the file transfer workflow for canonical FileReceived.v1 events"
+      description = "Invoke the STAGE Lambda for canonical FileReceived.v1 events"
       event_pattern = jsonencode({
         account       = [data.aws_caller_identity.current.account_id]
         source        = ["uk.gov.justice.service.managed-file-transfer"]
@@ -70,7 +70,7 @@ locals {
       })
     }
     "file-routing-workflow" = {
-      description = "Start the file routing workflow for canonical FileScanResultRecorded.v1 events"
+      description = "Invoke the ROUTE Lambda for canonical FileScanResultRecorded.v1 events"
       event_pattern = jsonencode({
         account       = [data.aws_caller_identity.current.account_id]
         source        = ["uk.gov.justice.service.managed-file-transfer"]
@@ -89,24 +89,22 @@ locals {
   eventbridge_file_transfer_bus_targets = {
     "file-transfer-workflow" = [
       {
-        name            = "file-transfer-workflow"
-        arn             = module.step_function_filereceived_workflow.state_machine_arn
-        attach_role_arn = true
+        name            = "stage"
         dead_letter_arn = module.sqs_eventbridge_file_transfer_workflow_dlq.queue_arn
+        arn             = module.lambda_stage.lambda_function_arn
         retry_policy = {
-          maximum_event_age_in_seconds = 86400
+          maximum_event_age_in_seconds = 21600
           maximum_retry_attempts       = 185
         }
       }
     ]
     "file-routing-workflow" = [
       {
-        name            = "file-routing-workflow"
-        arn             = module.step_function_filescanresultrecorded_workflow.state_machine_arn
-        attach_role_arn = true
+        name            = "route"
         dead_letter_arn = module.sqs_eventbridge_file_transfer_workflow_dlq.queue_arn
+        arn             = module.lambda_route.lambda_function_arn
         retry_policy = {
-          maximum_event_age_in_seconds = 86400
+          maximum_event_age_in_seconds = 21600
           maximum_retry_attempts       = 185
         }
       }

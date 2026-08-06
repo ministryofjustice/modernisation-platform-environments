@@ -9,33 +9,42 @@ teams:
     organisation: ministryofjustice
     max_budget: 10000
     models: ["no-default-models"]
-    unified_access_groups: ["generally-available-models"]
+    unified_access_groups:
+      - generally-available-models
   justice-engineering-ai-enablement:
     alias: Justice Engineering AI Enablement
     organisation: ministryofjustice
     max_budget: 10000
     models: ["no-default-models"]
-    unified_access_groups: ["generally-available-models"]
+    unified_access_groups:
+      - generally-available-models
+      - bedrock-jeaie-claude-haiku-4-5
+      - bedrock-jeaie-claude-opus-5
+      - bedrock-jeaie-claude-sonnet-5
     model_aliases:
-        - alias: "claude-haiku-4.5"
-          model: "bedrock-claude-haiku-4-5"
-        - alias: "claude-opus-5"
-          model: "bedrock-claude-opus-5"
-        - alias: "claude-sonnet-5"
-          model: "bedrock-claude-sonnet-5"
+      - alias: "claude-haiku-4.5"
+        model: "bedrock-jeaie-claude-haiku-4-5"
+      - alias: "claude-opus-5"
+        model: "bedrock-jeaie-claude-opus-5"
+      - alias: "claude-sonnet-5"
+        model: "bedrock-jeaie-claude-sonnet-5"
   pom-e-supervision:
     alias: POM Phased Implementation - E-Supervision
     organisation: ministryofjustice
     max_budget: 2000
     models: ["no-default-models"]
-    unified_access_groups: ["generally-available-models"]
+    unified_access_groups:
+      - generally-available-models
+      - bedrock-jeaie-claude-haiku-4-5
+      - bedrock-jeaie-claude-opus-5
+      - bedrock-jeaie-claude-sonnet-5
     model_aliases:
       - alias: "claude-haiku-4.5"
-        model: "bedrock-claude-haiku-4-5"
+        model: "bedrock-jeaie-claude-haiku-4-5"
       - alias: "claude-opus-5"
-        model: "bedrock-claude-opus-5"
+        model: "bedrock-jeaie-claude-opus-5"
       - alias: "claude-sonnet-5"
-        model: "bedrock-claude-sonnet-5"
+        model: "bedrock-jeaie-claude-sonnet-5"
 
 models:
   amazon_bedrock:
@@ -201,6 +210,22 @@ models:
       model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
       model_family: "Anthropic Claude"
       model_name: "Anthropic Claude Haiku 4.5 (EU)"
+      region: eu-west-2
+      aws_account_name: octo-engineering-ai-enablement-production
+      aws_role_name: ai-gateway
+      generally_available: false
+    jeaie-claude-opus-5:
+      model_id: eu.anthropic.claude-opus-5
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Opus 5 (EU)"
+      region: eu-west-2
+      aws_account_name: octo-engineering-ai-enablement-production
+      aws_role_name: ai-gateway
+      generally_available: false
+    jeaie-claude-sonnet-5:
+      model_id: eu.anthropic.claude-sonnet-5
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 5 (EU)"
       region: eu-west-2
       aws_account_name: octo-engineering-ai-enablement-production
       aws_role_name: ai-gateway
