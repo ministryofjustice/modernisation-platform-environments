@@ -66,30 +66,30 @@ resource "aws_ecs_service" "opahub" {
   desired_count   = local.application_data.accounts[local.environment].opa_app_count
   
 
-  # # Required by the AWS provider whenever capacity_provider_strategy is
-  # # added/changed on an existing service (here: switching from launch_type
-  # # to capacity_provider_strategy), so the change is applied via a fresh
-  # # deployment rather than an in-place update.
+  # Required by the AWS provider whenever capacity_provider_strategy is
+  # added/changed on an existing service (here: switching from launch_type
+  # to capacity_provider_strategy), so the change is applied via a fresh
+  # deployment rather than an in-place update.
   force_new_deployment = true
 
-  # # Use the cluster's capacity provider (with managed scaling enabled)
-  # # instead of a bare EC2 launch type, so ECS can grow the ASG automatically
-  # # to provide extra instance capacity for rolling deployments instead of
-  # # stalling with "insufficient resources" because there is no room to place
-  # # the new task revision alongside the old one.
-  # capacity_provider_strategy {
-  #   capacity_provider = aws_ecs_capacity_provider.capacity_provider.name
-  #   weight            = 1
-  #   base              = 1
-  # }
+  # Use the cluster's capacity provider (with managed scaling enabled)
+  # instead of a bare EC2 launch type, so ECS can grow the ASG automatically
+  # to provide extra instance capacity for rolling deployments instead of
+  # stalling with "insufficient resources" because there is no room to place
+  # the new task revision alongside the old one.
+  capacity_provider_strategy {
+    capacity_provider = aws_ecs_capacity_provider.capacity_provider.name
+    weight            = 1
+    base              = 1
+  }
 
-  # health_check_grace_period_seconds = 120
+  health_check_grace_period_seconds = 120
 
-  # lifecycle {
-  #   ignore_changes = [
-  #     task_definition
-  #   ]
-  # }
+  lifecycle {
+    ignore_changes = [
+      task_definition
+    ]
+  }
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
