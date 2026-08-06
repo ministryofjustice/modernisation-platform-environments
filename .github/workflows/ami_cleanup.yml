@@ -94,7 +94,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@40972648982915f26e5b5e22bd92f3af9297a707 # v6.1.7
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@0d6fd59fa082417466d12e0e1a5e76da3f1712db # v6.1.8
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -338,7 +338,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@40972648982915f26e5b5e22bd92f3af9297a707 # v6.1.7
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@0d6fd59fa082417466d12e0e1a5e76da3f1712db # v6.1.8
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
@@ -595,7 +595,7 @@ jobs:
           fi
 
       - name: Decrypt Secrets (ENVIRONMENT_MANAGEMENT)
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@40972648982915f26e5b5e22bd92f3af9297a707 # v6.1.7
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@0d6fd59fa082417466d12e0e1a5e76da3f1712db # v6.1.8
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           github_ci_user_environments_repo_pat: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
