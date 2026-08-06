@@ -358,6 +358,9 @@ locals {
       /* ArgoCD — spokes registered with the preproduction hub */
       argocd_registered_spokes = [
         "container-platform-octo-nonlive",
+        "container-platform-laa-nonlive",
+        "container-platform-cd-nonlive",
+        "container-platform-hmpps-nonlive"
       ]
 
       /* Addons */
