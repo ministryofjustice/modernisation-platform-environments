@@ -27,7 +27,7 @@ locals {
           }
           abort_incomplete_multipart_upload_days = 1
           noncurrent_version_expiration = {
-            days = 1
+            noncurrent_days = 1
           }
         },
       ]
@@ -87,14 +87,18 @@ locals {
               days = 3
             }
           },
+          {
+            id                                     = "abort-incomplete-multipart-uploads-after-1-day"
+            status                                 = "Enabled"
+            filter                                 = {}
+            abort_incomplete_multipart_upload_days = 1
+          },
         ]
         quarantine = [
           {
             id     = "expire-objects-after-7-days"
             status = "Enabled"
-            filter = {
-            }
-            expiration = {
+            filter = {}
               days = 7
             }
             noncurrent_version_expiration = {
