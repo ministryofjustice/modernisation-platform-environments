@@ -38,20 +38,23 @@ class FileMoverEventTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "non-negative integer"):
             parse_file_mover_event(self.event, "STAGE", "123456789012", "incoming")
 
-    def test_route_requires_a_supported_result_and_tag_match(self):
+    def test_route_accepts_supported_result_with_either_tag_match_value(self):
         self.event["detail-type"] = "FileScanResultRecorded.v1"
-        self.event["detail"]["data"].update(
-            {
-                "scanResultStatus": "NO_THREATS_FOUND",
-                "scanResultStatusMatchesTag": True,
-            }
-        )
+        for matches_tag in (True, False):
+            with self.subTest(matches_tag=matches_tag):
+                self.event["detail"]["data"].update(
+                    {
+                        "scanResultStatus": "NO_THREATS_FOUND",
+                        "scanResultStatusMatchesTag": matches_tag,
+                    }
+                )
 
-        parsed = parse_file_mover_event(
-            self.event, "ROUTE", "123456789012", "incoming"
-        )
+                parsed = parse_file_mover_event(
+                    self.event, "ROUTE", "123456789012", "incoming"
+                )
 
-        self.assertEqual(parsed.scan_result_status, "NO_THREATS_FOUND")
+                self.assertEqual(parsed.scan_result_status, "NO_THREATS_FOUND")
+                self.assertEqual(parsed.scan_result_status_matches_tag, matches_tag)
 
 
 if __name__ == "__main__":

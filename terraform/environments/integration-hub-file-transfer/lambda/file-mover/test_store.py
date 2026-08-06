@@ -114,6 +114,25 @@ class OperationStoreTest(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "source_key"):
             self.store.claim(self.event, "STAGE", "request-2", 900, 3600)
 
+    def test_rejects_a_route_claim_with_conflicting_tag_match_provenance(self):
+        self.event.scan_result_status = "NO_THREATS_FOUND"
+        self.event.scan_result_status_matches_tag = True
+        self.table.put_item.side_effect = ConditionalFailure()
+        self.table.get_item.return_value = {
+            "Item": {
+                **self.existing_input,
+                "concurrencyId": "correlation-id",
+                "operation": "ROUTE",
+                "status": "COMPLETED",
+                "owner": "request-1",
+                "scan_result_status": "NO_THREATS_FOUND",
+                "scan_result_status_matches_tag": False,
+            }
+        }
+
+        with self.assertRaisesRegex(RuntimeError, "scan_result_status_matches_tag"):
+            self.store.claim(self.event, "ROUTE", "request-2", 900, 3600)
+
 
 if __name__ == "__main__":
     unittest.main()

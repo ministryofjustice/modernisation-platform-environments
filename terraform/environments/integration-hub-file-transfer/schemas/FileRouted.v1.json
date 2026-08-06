@@ -136,7 +136,7 @@
         "metadata": {
           "correlationId": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
           "causationId": "c5dc9cb4-3b1f-4f01-a4c6-41b30e11d790",
-          "idempotencyKey": "route:clean:example/report.csv:5Ni..."
+          "idempotencyKey": "route:clean:clean-bucket:example/report.csv:5Ni..."
         },
         "data": {
           "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",

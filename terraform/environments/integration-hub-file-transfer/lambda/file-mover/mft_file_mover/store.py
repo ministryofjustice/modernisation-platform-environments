@@ -176,6 +176,9 @@ class OperationStore:
         }
         if operation_event.scan_result_status is not None:
             expected["scan_result_status"] = operation_event.scan_result_status
+            expected["scan_result_status_matches_tag"] = (
+                operation_event.scan_result_status_matches_tag
+            )
         conflicts = [name for name, value in expected.items() if item.get(name) != value]
         if conflicts:
             raise RuntimeError(
