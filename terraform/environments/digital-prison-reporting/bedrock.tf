@@ -22,9 +22,19 @@ data "aws_iam_policy_document" "ai_gateway_bedrock_assume" {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
 
+    # Reference the account root rather than the specific role ARN to avoid
+    # "Invalid principal" errors when the ai-gateway role does not yet exist
+    # in the data-platform-production account. The condition restricts access
+    # to only the ai-gateway role, so this is functionally equivalent.
     principals {
       type        = "AWS"
-      identifiers = [local.ai_gateway_role_arn]
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["data-platform-production"]}:root"]
+    }
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:PrincipalArn"
+      values   = [local.ai_gateway_role_arn]
     }
   }
 }
