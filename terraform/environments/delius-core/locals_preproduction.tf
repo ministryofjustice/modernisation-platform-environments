@@ -192,7 +192,7 @@ locals {
       read_database = "PRENDAS2"
     }
     audit_target_endpoint = {
-      write_environment = "prod" 
+      write_environment = "prod"
     }
     user_source_endpoint = {}
     user_target_endpoint = {

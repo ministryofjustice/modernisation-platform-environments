@@ -50,6 +50,13 @@ locals {
   }
   environment_shorthand = local.environment_map[local.environment]
 
+  # The property/planetfm/concept Glue databases are created via a manual
+  # process. They currently exist in development and production only; we've had
+  # no reason to create them in preproduction yet. Lake Formation grants are
+  # only applied in environments where the databases are present, so add an
+  # environment here if the databases are later created there.
+  lakeformation_databases_present = contains(["development", "production"], local.environment)
+
   # S3 replication configuration for property-datahub-staging bucket
   replication_configuration = lookup(local.replication_configurations, local.environment, null)
 

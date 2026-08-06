@@ -20,10 +20,13 @@ serviceAccount:
 resources:
   requests:
     cpu: 250m
-    memory: 1Gi
+    memory: 2Gi
   limits:
     cpu: 500m
-    memory: 2Gi
+    memory: 4Gi
+
+startupProbe:
+  failureThreshold: 60
 
 db:
   deployStandalone: false
