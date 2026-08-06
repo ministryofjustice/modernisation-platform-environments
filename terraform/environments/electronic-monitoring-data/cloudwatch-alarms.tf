@@ -59,19 +59,19 @@ locals {
   merge_lambdas = {
     staged_position = {
       lambda_name = module.merge_mdss_staged_position[0].lambda_function_name
-      threshold   = 20000000000
+      threshold   = local.is-production || local.is-preproduction ? 20000000000 : 1000000000
     }
     staged_event = {
       lambda_name = module.merge_mdss_staged_event[0].lambda_function_name
-      threshold   = 20000000000
+      threshold   = local.is-production || local.is-preproduction ? 20000000000 : 1000000000
     }
     ac_position = {
       lambda_name = module.merge_ac_position[0].lambda_function_name
-      threshold   = 20000000000
+      threshold   = local.is-production || local.is-preproduction ? 20000000000 : 1000000000
     }
     emdi_position = {
       lambda_name = module.merge_emdi_position[0].lambda_function_name
-      threshold   = 20000000000
+      threshold   = local.is-production || local.is-preproduction ? 20000000000 : 1000000000
     }
   }
 }
@@ -192,9 +192,9 @@ resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
   ]
 }
 
-################
+# ------------------------------------------------------------------------------
 # Merge Lambdas
-################
+# ------------------------------------------------------------------------------
 
 resource "aws_cloudwatch_metric_alarm" "merge_lambdas_not_running" {
   for_each = local.merge_lambdas
@@ -221,7 +221,7 @@ resource "aws_cloudwatch_metric_alarm" "merge_lambdas_not_running" {
     metric {
       namespace   = "EM/MergeLambdas"
       metric_name = "SucceededQueries"
-      period      = 900
+      period      = 180
       stat        = "Sum"
       unit        = "Count"
 
@@ -237,7 +237,7 @@ resource "aws_cloudwatch_metric_alarm" "merge_lambdas_not_running" {
     metric {
       namespace   = "EM/MergeLambdas"
       metric_name = "FailedQueries"
-      period      = 900
+      period      = 180
       stat        = "Sum"
       unit        = "Count"
 
