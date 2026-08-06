@@ -9,33 +9,42 @@ teams:
     organisation: ministryofjustice
     max_budget: 10000
     models: ["no-default-models"]
-    unified_access_groups: ["generally-available-models"]
+    unified_access_groups:
+      - generally-available-models
   justice-engineering-ai-enablement:
     alias: Justice Engineering AI Enablement
     organisation: ministryofjustice
     max_budget: 10000
     models: ["no-default-models"]
-    unified_access_groups: ["generally-available-models"]
+    unified_access_groups:
+      - generally-available-models
+      - bedrock-jeaie-claude-haiku-4-5
+      - bedrock-jeaie-claude-opus-5
+      - bedrock-jeaie-claude-sonnet-5
     model_aliases:
-        - alias: "claude-haiku-4.5"
-          model: "bedrock-claude-haiku-4-5"
-        - alias: "claude-opus-5"
-          model: "bedrock-claude-opus-5"
-        - alias: "claude-sonnet-5"
-          model: "bedrock-claude-sonnet-5"
+      - alias: "claude-haiku-4.5"
+        model: "bedrock-jeaie-claude-haiku-4-5"
+      - alias: "claude-opus-5"
+        model: "bedrock-jeaie-claude-opus-5"
+      - alias: "claude-sonnet-5"
+        model: "bedrock-jeaie-claude-sonnet-5"
   pom-e-supervision:
     alias: POM Phased Implementation - E-Supervision
     organisation: ministryofjustice
     max_budget: 2000
     models: ["no-default-models"]
-    unified_access_groups: ["generally-available-models"]
+    unified_access_groups:
+      - generally-available-models
+      - bedrock-jeaie-claude-haiku-4-5
+      - bedrock-jeaie-claude-opus-5
+      - bedrock-jeaie-claude-sonnet-5
     model_aliases:
       - alias: "claude-haiku-4.5"
-        model: "bedrock-claude-haiku-4-5"
+        model: "bedrock-jeaie-claude-haiku-4-5"
       - alias: "claude-opus-5"
-        model: "bedrock-claude-opus-5"
+        model: "bedrock-jeaie-claude-opus-5"
       - alias: "claude-sonnet-5"
-        model: "bedrock-claude-sonnet-5"
+        model: "bedrock-jeaie-claude-sonnet-5"
 
 models:
   amazon_bedrock:
@@ -56,12 +65,6 @@ models:
       model_id: "amazon.nova-pro-v1:0"
       model_family: "Amazon Nova"
       model_name: "Amazon Nova Pro"
-      region: eu-west-2
-      generally_available: true
-    amazon-titan-embed-text-v2:
-      model_id: "amazon.titan-embed-text-v2:0"
-      model_family: "Amazon Titan"
-      model_name: "Amazon Titan Text Embeddings v2"
       region: eu-west-2
       generally_available: true
     # Anthropic
@@ -202,68 +205,149 @@ models:
       model_name: "OpenAI GPT OSS Safeguard 120B"
       region: eu-west-2
       generally_available: true
+    # Justice Engineering AI Enablement
+    jeaie-claude-haiku-4-5:
+      model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Haiku 4.5 (EU)"
+      region: eu-west-2
+      aws_account_name: octo-engineering-ai-enablement-production
+      aws_role_name: ai-gateway
+      generally_available: false
+    jeaie-claude-opus-5:
+      model_id: eu.anthropic.claude-opus-5
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Opus 5 (EU)"
+      region: eu-west-2
+      aws_account_name: octo-engineering-ai-enablement-production
+      aws_role_name: ai-gateway
+      generally_available: false
+    jeaie-claude-sonnet-5:
+      model_id: eu.anthropic.claude-sonnet-5
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 5 (EU)"
+      region: eu-west-2
+      aws_account_name: octo-engineering-ai-enablement-production
+      aws_role_name: ai-gateway
+      generally_available: false
   google_gemini_enterprise_agent_platform: {}
-  microsoft_foundry: # {}
+  microsoft_foundry:
+    # Anthropic
     claude-fable-5:
       model_id: "claude-fable-5"
-      model_family: "Claude Fable"
-      model_name: "Claude Fable 5 (Sweden)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Fable 5 (Sweden)"
       model_provider: "azure_ai"
       model_endpoint: "anthropic"
       generally_available: false
     claude-haiku-4-5:
       model_id: "claude-haiku-4-5"
-      model_family: "Claude Haiku"
-      model_name: "Claude Haiku 4.5 (Sweden)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Haiku 4.5 (Sweden)"
       model_provider: "azure_ai"
       model_endpoint: "anthropic"
       generally_available: false
     claude-opus-4-5:
       model_id: "claude-opus-4-5"
-      model_family: "Claude Opus"
-      model_name: "Claude Opus 4.5 (Sweden)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Opus 4.5 (Sweden)"
       model_provider: "azure_ai"
       model_endpoint: "anthropic"
       generally_available: false
     claude-opus-4-6:
       model_id: "claude-opus-4-6"
-      model_family: "Claude Opus"
-      model_name: "Claude Opus 4.6 (Sweden)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Opus 4.6 (Sweden)"
       model_provider: "azure_ai"
       model_endpoint: "anthropic"
       generally_available: false
     claude-opus-4-7:
       model_id: "claude-opus-4-7"
-      model_family: "Claude Opus"
-      model_name: "Claude Opus 4.7 (Sweden)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Opus 4.7 (Sweden)"
       model_provider: "azure_ai"
       model_endpoint: "anthropic"
       generally_available: false
     claude-opus-4-8:
       model_id: "claude-opus-4-8"
-      model_family: "Claude Opus"
-      model_name: "Claude Opus 4.8 (Sweden)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Opus 4.8 (Sweden)"
       model_provider: "azure_ai"
       model_endpoint: "anthropic"
       generally_available: false
     claude-opus-5:
       model_id: "claude-opus-5"
-      model_family: "Claude Opus"
-      model_name: "Claude Opus 5 (Sweden)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Opus 5 (Sweden)"
       model_provider: "azure_ai"
       model_endpoint: "anthropic"
       generally_available: false
     claude-sonnet-4-6:
       model_id: "claude-sonnet-4-6"
-      model_family: "Claude Sonnet"
-      model_name: "Claude Sonnet 4.6 (Sweden)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 4.6 (Sweden)"
       model_provider: "azure_ai"
       model_endpoint: "anthropic"
       generally_available: false
     claude-sonnet-5:
       model_id: "claude-sonnet-5"
-      model_family: "Claude Sonnet"
-      model_name: "Claude Sonnet 5 (Sweden)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 5 (Sweden)"
       model_provider: "azure_ai"
       model_endpoint: "anthropic"
+      generally_available: false
+    # OpenAI
+    gpt-5-3-codex:
+      model_id: "gpt-5.3-codex"
+      model_family: "OpenAI GPT 5.3"
+      model_name: "OpenAI GPT 5.3 Codex (Sweden)"
+      model_provider: "azure"
+      generally_available: false
+    gpt-5-4:
+      model_id: "gpt-5.4"
+      model_family: "OpenAI GPT 5.4"
+      model_name: "OpenAI GPT 5.4 (Sweden)"
+      model_provider: "azure"
+      generally_available: false
+    gpt-5-4-mini:
+      model_id: "gpt-5.4-mini"
+      model_family: "OpenAI GPT 5.4"
+      model_name: "OpenAI GPT 5.4 Mini (Sweden)"
+      model_provider: "azure"
+      generally_available: false
+    gpt-5-4-nano:
+      model_id: "gpt-5.4-nano"
+      model_family: "OpenAI GPT 5.4"
+      model_name: "OpenAI GPT 5.4 Nano (Sweden)"
+      model_provider: "azure"
+      generally_available: false
+    gpt-5-4-pro:
+      model_id: "gpt-5.4-pro"
+      model_family: "OpenAI GPT 5.4"
+      model_name: "OpenAI GPT 5.4 Pro (Sweden)"
+      model_provider: "azure"
+      generally_available: false
+    gpt-5-5:
+      model_id: "gpt-5.5"
+      model_family: "OpenAI GPT 5.5"
+      model_name: "OpenAI GPT 5.5 (Sweden)"
+      model_provider: "azure"
+      generally_available: false
+    gpt-5-6-luna:
+      model_id: "gpt-5.6-luna"
+      model_family: "OpenAI GPT 5.6"
+      model_name: "OpenAI GPT 5.6 Luna (Sweden)"
+      model_provider: "azure"
+      generally_available: false
+    gpt-5-6-sol:
+      model_id: "gpt-5.6-sol"
+      model_family: "OpenAI GPT 5.6"
+      model_name: "OpenAI GPT 5.6 Sol (Sweden)"
+      model_provider: "azure"
+      generally_available: false
+    gpt-5-6-terra:
+      model_id: "gpt-5.6-terra"
+      model_family: "OpenAI GPT 5.6"
+      model_name: "OpenAI GPT 5.6 Terra (Sweden)"
+      model_provider: "azure"
       generally_available: false

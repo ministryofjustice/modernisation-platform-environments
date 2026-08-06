@@ -7,7 +7,7 @@ resource "litellm_model" "amazon_bedrock" {
   tier                = "paid"
 
   aws_region_name = each.value.region
-  aws_role_name   = try(each.value.role_name, module.iam_role.arn)
+  aws_role_name   = can(each.value.aws_role_name) ? "arn:aws:iam::${local.environment_management.account_ids[each.value.aws_account_name]}:role/${each.value.aws_role_name}" : module.iam_role.arn
 
   additional_litellm_params = {
     ai_model_provider            = "Amazon Bedrock"
@@ -56,7 +56,7 @@ resource "litellm_model" "microsoft_foundry" {
   base_model          = each.value.model_id
   tier                = "paid"
 
-  model_api_base = "${jsondecode(data.aws_secretsmanager_secret_version.microsoft_foundry_jedi_gateway.secret_string)["endpoint"]}/${each.value.model_endpoint}"
+  model_api_base = can(each.value.model_endpoint) ? "${jsondecode(data.aws_secretsmanager_secret_version.microsoft_foundry_jedi_gateway.secret_string)["endpoint"]}/${each.value.model_endpoint}" : jsondecode(data.aws_secretsmanager_secret_version.microsoft_foundry_jedi_gateway.secret_string)["endpoint"]
   model_api_key  = jsondecode(data.aws_secretsmanager_secret_version.microsoft_foundry_jedi_gateway.secret_string)["api_key"]
   api_version    = try(each.value.model_api_version, null)
 

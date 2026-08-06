@@ -97,7 +97,8 @@
         "dps-cvl",
         "dps-adjudications",
         "dps-acc-pro-custody",
-        "dps-manage-offences"
+        "dps-manage-offences",
+        "dps-offences"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -331,7 +332,8 @@
         "dps-cvl",
         "dps-adjudications",
         "dps-acc-pro-custody",
-        "dps-manage-offences"
+        "dps-manage-offences",
+        "dps-offences"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -548,7 +550,8 @@
         "dps-cvl",
         "dps-adjudications",
         "dps-acc-pro-custody",
-        "dps-manage-offences"
+        "dps-manage-offences",
+        "dps-offences"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -777,7 +780,9 @@
         "dps-san",
         "dps-cvl",
         "dps-adjudications",
-        "dps-acc-pro-custody"
+        "dps-acc-pro-custody",
+        "dps-manage-offences",
+        "dps-offences"
       ],
       "alarms": {
         "setup_cw_alarms": true,
