@@ -46,20 +46,7 @@
 
 # -----------------------------------------------------------------------------
 # Rule Group 2 — Microsoft Services
-# Covers: Windows Update, Windows Defender, Office 365, Azure AD / Identity,
-#         SharePoint Online, Teams, OneDrive (via officeapps), Azure platform,
-#         CDN delivery networks
-#
-# Key consolidations vs original list:
-#   ".microsoft.com"     — replaces all individual ".microsoft.com entries
-#   ".windows.net"       — replaces ".blob.core.windows.net, ".queue.core.windows.net,
-#                          ".table.core.windows.net, ".servicebus.windows.net,
-#                          login.windows.net, enterpriseregistration.windows.net etc.
-#   ".office.com"        — replaces all individual portal/admin/forms/teams subdomains
-#   ".office.net"        — replaces ".cdn.office.net, ".osi.office.net entries etc.
-#   ".office365.com"     — replaces outlook.office365.com, ".res.office365.com etc.
-#   ".officeapps.live.com" — replaces all nexus/odc/broadcast/excel/word etc. subdomains
-#   ".microsoftonline.com" — replaces all individual Azure AD endpoint entries
+# Taken from https://learn.microsoft.com/en-us/microsoft-365/enterprise/urls-and-ip-address-ranges?view=o365-worldwide
 # -----------------------------------------------------------------------------
 resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
   name     = "workspaces-microsoft-services"
@@ -82,53 +69,149 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
           "skydrive.wns.windows.com",
           "adldefinitionupdates-wu.azurewebsites.net",
 
-          # OneDrive and SharePoint - https://learn.microsoft.com/en-us/sharepoint/required-urls-and-ports
-          ".onedrive.com",
-          "onedrive.live.com",
-          "login.live.com",
+          ".cloud.microsoft",
+          ".static.microsoft",
+          ".usercontent.microsoft",
+          ".sharepoint.com",
+          # "storage.live.com",
+          ".wns.windows.com",
+          "admin.onedrive.com",
+          "officeclient.microsoft.com",
           "g.live.com",
-          "spoprod-a.akamaihd.net",
-          ".mesh.com",
-          "p.sfx.ms",
           "oneclient.sfx.ms",
-          ".microsoft.com",
-          "fabric.io",
-          ".crashlytics.com",
-          "vortex.data.microsoft.com",
-          "posarprodcssservice.accesscontrol.windows.net",
-          "redemptionservices.accesscontrol.windows.net",
-          "token.cp.microsoft.com",
-          "tokensit.cp.microsoft-tst.com",
-          ".office.com",
+          ".sharepointonline.com",
+          "spoprod-a.akamaihd.net",
+          ".svc.ms",
           ".officeapps.live.com",
-          ".aria.microsoft.com",
-          ".mobileengagement.windows.net",
-          ".branch.io",
-          ".adjust.com",
-          ".servicebus.windows.net",
-          "vas.samsungapps.com",
-          "odc.officeapps.live.com",
-          "login.windows.net",
-          "login.microsoftonline.com",
-          ".files.1drv.com",
-          ".storage.live.com",
-          ".groups.office.live.com",
-          ".groups.photos.live.com",
-          ".groups.skydrive.live.com",
-          "favorites.live.com",
-          "oauth.live.com",
-          "photos.live.com",
-          "skydrive.live.com",
-          "api.live.net",
+          ".online.office.com",
+          "office.live.com",
+          ".office.net",
+          ".onenote.com",
+          # "cdn.onenote.net",
+          "ajax.aspnetcdn.com",
           "apis.live.net",
-          ".docs.live.net",
-          ".policies.live.net",
-          ".settings.live.net",
-          "skyapi.live.net",
-          "snapi.live.net",
-          ".livefilestore.com",
-          ".storage.msn.com",
-          ".onecdn.static.microsoft"
+          "officeapps.live.com",
+          "www.onedrive.com",
+          ".auth.microsoft.com",
+          ".msftidentity.com",
+          ".msidentity.com",
+          "account.activedirectory.windowsazure.com",
+          "accounts.accesscontrol.windows.net",
+          "adminwebservice.microsoftonline.com",
+          "api.passwordreset.microsoftonline.com",
+          "autologon.microsoftazuread-sso.com",
+          "becws.microsoftonline.com",
+          "ccs.login.microsoftonline.com",
+          "clientconfig.microsoftonline-p.net",
+          "companymanager.microsoftonline.com",
+          "device.login.microsoftonline.com",
+          "graph.microsoft.com",
+          "graph.windows.net",
+          "login-us.microsoftonline.com",
+          "login.microsoft.com",
+          "login.microsoftonline-p.com",
+          "login.microsoftonline.com",
+          "login.windows.net",
+          "logincert.microsoftonline.com",
+          "loginex.microsoftonline.com",
+          "nexus.microsoftonline-p.com",
+          "passwordreset.microsoftonline.com",
+          "provisioningapi.microsoftonline.com",
+          ".hip.live.com",
+          ".microsoftonline-p.com",
+          ".microsoftonline.com",
+          ".msauth.net",
+          ".msauthimages.net",
+          ".msecnd.net",
+          ".msftauth.net",
+          ".msftauthimages.net",
+          ".phonefactor.net",
+          "enterpriseregistration.windows.net",
+          ".protection.office.com",
+          ".security.microsoft.com",
+          "compliance.microsoft.com",
+          "defender.microsoft.com",
+          "protection.office.com",
+          "purview.microsoft.com",
+          "security.microsoft.com",
+          ".portal.cloudappsecurity.com",
+          ".aria.microsoft.com",
+          ".events.data.microsoft.com",
+          ".o365weve.com",
+          "amp.azure.net",
+          "appsforoffice.microsoft.com",
+          "assets.onestore.ms",
+          "auth.gfx.ms",
+          "c1.microsoft.com",
+          "dgps.support.microsoft.com",
+          "docs.microsoft.com",
+          "msdn.microsoft.com",
+          "platform.linkedin.com",
+          "prod.msocdn.com",
+          "shellprod.msocdn.com",
+          "support.microsoft.com",
+          "technet.microsoft.com",
+          ".office365.com",
+          ".aadrm.com",
+          ".azurerms.com",
+          ".informationprotection.azure.com",
+          "ecn.dev.virtualearth.net",
+          "informationprotection.hosting.portal.azure.net",
+          "o15.officeredir.microsoft.com",
+          "officepreviewredir.microsoft.com",
+          "officeredir.microsoft.com",
+          "r.office.microsoft.com",
+          "activation.sls.microsoft.com",
+          "crl.microsoft.com",
+          "office15client.microsoft.com",
+          "officeclient.microsoft.com",
+          "go.microsoft.com",
+          "ajax.aspnetcdn.com",
+          "cdn.odc.officeapps.live.com",
+          "officecdn.microsoft.com",
+          "otelrules.azureedge.net",
+          ".entrust.net",
+          ".geotrust.com",
+          ".omniroot.com",
+          ".public-trust.com",
+          ".symcb.com",
+          ".symcd.com",
+          ".verisign.com",
+          ".verisign.net",
+          "cacerts.digicert.com",
+          "cert.int-x3.letsencrypt.org",
+          "crl.globalsign.com",
+          "crl.globalsign.net",
+          "crl.identrust.com",
+          "crl3.digicert.com",
+          "crl4.digicert.com",
+          "isrg.trustid.ocsp.identrust.com",
+          "mscrl.microsoft.com",
+          "ocsp.digicert.com",
+          "ocsp.globalsign.com",
+          "ocsp.msocsp.com",
+          "ocsp2.globalsign.com",
+          "ocspx.digicert.com",
+          "oneocsp.microsoft.com",
+          "secure.globalsign.com",
+          "www.digicert.com",
+          "www.microsoft.com",
+          ".office.com",
+          "www.microsoft365.com",
+          ".azure-apim.net",
+          ".flow.microsoft.com",
+          ".powerapps.com",
+          ".powerautomate.com",
+          ".activity.windows.com",
+          "activity.windows.com",
+          # ".cortana.ai",
+          "admin.microsoft.com",
+          "cdn.odc.officeapps.live.com",
+          "cdn.uci.officeapps.live.com",
+          ".cloud.microsoft",
+          ".static.microsoft",
+          ".usercontent.microsoft"
+
         ]
       }
     }
@@ -167,75 +250,11 @@ resource "aws_networkfirewall_rule_group" "workspaces_onedrive_live_misc" {
         generated_rules_type = "ALLOWLIST"
         target_types         = ["TLS_SNI", "HTTP_HOST"]
         targets = [
-          # OneDrive
-          # ".onedrive.com",
-          # ".onedrive.live.com",
-          # ".storage.live.com",
-          # ".livefilestore.com",
-          # ".storage.msn.com",
-
-          # # live.com services
-          # "login.live.com",
-          # "g.live.com",
-          # "ssw.live.com",
-          # "msagfx.live.com",
-          # "client.hip.live.com",
-          # "wu.client.hip.live.com",
-          # "oauth.live.com",
-          # "favorites.live.com",
-          # ".office.live.com",   # covers ".groups.office.live.com etc.
-          # ".photos.live.com",   # covers ".groups.photos.live.com etc.
-          # ".skydrive.live.com", # covers ".groups.skydrive.live.com etc.
-
-          # # live.net
-          # "api.live.net",
-          # "apis.live.net",
-          # ".docs.live.net",
-          # ".policies.live.net",
-          # ".settings.live.net",
-          # "skyapi.live.net",
-          # "snapi.live.net",
-
-          # # OneDrive delivery / SFX
-          # "oneclient.sfx.ms",
-          # "p.sfx.ms",
-          # ".files.1drv.com",
 
           # MOJ specific
           "sts.justice.gov.uk",
-          "justiceuk-my.sharepoint.com",
+          "justiceuk-my.sharepoint.com"
 
-          # Windows network connectivity test
-          # "www.msftconnecttest.com",
-
-          # CyberDuck update check
-          # "version.cyberduck.io",
-
-          # Office first-party add-in delivery
-          # "firstpartyapps.oaspapps.com",
-          # "telemetryservice.firstpartyapps.oaspapps.com",
-          # "prod.firstpartyapps.oaspapps.com.akadns.net",
-          # "wus-firstpartyapps.oaspapps.com",
-
-          # StaffHub (legacy) # REVIEW — Microsoft retired StaffHub Jan 2020
-          # "staffhub.ms",
-          # "staffhub.uservoice.com",
-          # "staffhubweb.azureedge.net",
-          # "outlook.uservoice.com",
-
-          # Analytics / engagement SDKs # REVIEW — mobile-oriented, likely not needed for desktop WorkSpaces
-          # ".helpshift.com",
-          # ".localytics.com",
-          # "cdn.optimizely.com",
-          # ".log.optimizely.com",
-          # ".o365weve.com",
-          # ".branch.io",
-          # ".adjust.com",
-          # ".crashlytics.com",
-          # "fabric.io",
-          # ".mesh.com",
-          # "vas.samsungapps.com",
-          # "connect.facebook.net", # REVIEW — used by some Office add-ins
         ]
       }
     }
