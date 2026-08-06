@@ -677,6 +677,7 @@ module "cloudwatch_alarm_threader" {
     ENVIRONMENT           = local.environment_shorthand
     INCLUDE_REASON        = "true"
     ENABLE_CUSTOM_ACTIONS = "false"
+    INCIDENT_QUEUE_URL    = aws_sqs_queue.live_feed_incident_events.id
     GLUE_DB_JANITOR_STATE_MACHINE_ARN = (
       aws_sfn_state_machine.staging_db_janitor.arn
     )
@@ -1160,5 +1161,25 @@ module "live_feed_incident_manager" {
     ENVIRONMENT             = local.environment_shorthand
     POWERTOOLS_LOG_LEVEL    = "INFO"
     POWERTOOLS_SERVICE_NAME = "live-feed-incident-manager"
+
+    GITHUB_SECRET_ARN     = module.live_feed_github_app.secret_arn
+    GITHUB_OWNER          = "moj-analytical-services"
+    GITHUB_REPOSITORY     = "dmet-em"
+    GITHUB_PROJECT_NUMBER = "290"
+    GITHUB_ISSUE_TYPE     = "Bug"
+
+    GITHUB_PROJECT_STATUS_FIELD     = "Status"
+    GITHUB_PROJECT_PRIORITY_FIELD   = "Priority"
+    GITHUB_PROJECT_SPRINT_FIELD     = "Sprint"
+    GITHUB_PROJECT_TODO_OPTION      = "👀 To do"
+    GITHUB_PROJECT_DONE_OPTION      = "✅ Done"
+    GITHUB_PROJECT_PRIORITY_OPTION  = "🚨 Urgent"
+
+    PAGERDUTY_SCHEDULE_ID = "P3MCA8L"
+    PAGERDUTY_TIME_ZONE   = "Europe/London"
+
+    INCIDENT_STATE_BUCKET = local.alarm_thread_state_bucket
+    INCIDENT_STATE_PREFIX = "incident-automation/episodes"
+    AWS_ACCOUNT_ID        = data.aws_caller_identity.current.account_id
   }
 }
