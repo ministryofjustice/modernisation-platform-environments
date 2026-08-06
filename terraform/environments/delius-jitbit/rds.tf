@@ -85,7 +85,7 @@ resource "aws_db_instance" "jitbit" {
   storage_encrypted = true
   #checkov:skip=CKV_AWS_353: "Performance Insights varies by environment"
   performance_insights_enabled    = local.application_data.accounts[local.environment].db_performance_insights_enabled
-  performance_insights_kms_key_id = local.application_data.accounts[local.environment].db_performance_insights_enabled ? data.aws_kms_key.general_shared.arn : null
+  performance_insights_kms_key_id = "" # Prod RDS instance was created with default aws/rds KMS key, so we cannot change it to a custom KMS key without recreating the instance
   #checkov:skip=CKV_AWS_129: "Cloudwatch log exports varies by environment"
   enabled_cloudwatch_logs_exports = local.application_data.accounts[local.environment].db_enabled_cloudwatch_logs_exports
   copy_tags_to_snapshot = true
