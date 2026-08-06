@@ -1,9 +1,48 @@
-module "sherlock_landing_bucket" {
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/s3-bucket?ref=313b46a604dc6aaee1d7309990388c6687272b6e"
+# module "sherlock_landing_bucket" {
+#   source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/s3-bucket?ref=313b46a604dc6aaee1d7309990388c6687272b6e"
 
-  bucket_prefix = "landing-sherlock"
-  kms_key_arn   = module.sherlock_kms_key.key_arn
-  enable_malware_protection = true
+#   bucket_prefix = "landing-sherlock"
+#   kms_key_arn   = module.sherlock_kms_key.key_arn
+#   enable_malware_protection = true
+#   tags = {
+#     Environment = terraform.workspace
+#     Application = "data-factory-corporate"
+#     Component   = "people"
+#     Infrastructure = "sherlock-landing-bucket"
+#   }
+# }
+
+locals {
+  glue_catalog_arn = "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog"
+}
+
+module "sherlock_landing_bucket" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v11.1.0"
+
+  bucket_prefix      = "landing-sherlock-test"
+  bucket_namespace   = "account-regional"
+  versioning_enabled = true
+
+  ownership_controls = "BucketOwnerEnforced"
+
+  replication_enabled = false
+  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
+  # replication_region  = "eu-west-2"
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  # Default/recommended encryption mode
+  sse_algorithm  = "aws:kms"
+  custom_kms_key = module.sherlock_kms_key.key_arn
+
+  # Optional compatibility mode for uploaders that rely on bucket default
+  # SSE-KMS encryption and do not send explicit SSE-KMS request headers.
+  # enforce_kms_request_headers = false
+
+  # Optional compatibility mode for services that cannot use SSE-KMS
+  # sse_algorithm = "AES256"
+
   tags = {
     Environment = terraform.workspace
     Application = "data-factory-corporate"
@@ -17,3 +56,74 @@ module "sherlock_kms_key" {
 
   aliases = ["sherlock-landing"]
 }
+
+module "sherlock_glue_database" {
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/data-factory-glue-database?ref=glue_outputs"
+  
+  database_name = "sherlock_glue_database"
+
+  storage = {
+    bucket_name = module.sherlock_landing_bucket.bucket.bucket
+
+    #currently the prefix is not optional, but should be.
+    prefix      = "avature-sherlock"
+    kms_key_arn = module.sherlock_kms_key.key_arn
+  }
+  tags = {
+    Environment = terraform.workspace
+    Application = "data-factory-corporate"
+    Component   = "people"
+    Infrastructure = "sherlock-glue-database"
+  }
+}
+
+module "assume_iam_role" {
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/external-i-am-role?ref=external-iam-dev"
+  
+  role_name = "datafactory_dev_assume_role"
+
+  trusted_account_id = "446677926185"
+
+  bucket_arn = module.sherlock_landing_bucket.bucket.arn
+
+  s3_prefix = "avature-sherlock"
+
+  s3_object_actions = [
+    "s3:GetObject",
+    "s3:PutObject",
+    "s3:ListBucket"
+  ]
+
+  kms_key_arn = module.sherlock_kms_key.key_arn
+
+  kms_actions = [
+    "kms:Decrypt",
+    "kms:Encrypt",
+    "kms:GenerateDataKey",
+    "kms:DescribeKey",
+    "kms:ReEncryptFrom",
+    "kms:ReEncryptTo"
+  ]
+
+  glue_database_arn = module.sherlock_glue_database.glue_database_arn
+  glue_catalog_arn = local.glue_catalog_arn
+  glue_table_name = "*"
+
+  glue_actions =[
+    "glue:GetDatabase",
+    "glue:GetTable",
+    "glue:SearchTables",
+    "glue:DeleteTable",
+    "glue:CreateTable",
+    "glue:UpdateTable"
+  ]
+
+  tags = {
+    Environment = terraform.workspace
+    Application = "data-factory-corporate"
+    Component   = "people"
+    Infrastructure = "assume-iam-role"
+  }
+
+  }
+
