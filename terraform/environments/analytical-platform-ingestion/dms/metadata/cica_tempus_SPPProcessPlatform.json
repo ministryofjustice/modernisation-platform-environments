@@ -730,6 +730,11 @@
       "object_name": "dbo.JOB_HISTORY",
       "column_name": "OVERDUE",
       "apply_to_environments": ["development", "production"]
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "JOB_STATUS",
+      "apply_to_environments": ["development", "production"]
     }
   ]
 }

@@ -46,6 +46,7 @@
       "domain_builder_rds_parameter_group": "default.postgres14",
       "enable_domain_builder_agent": false,
       "enable_cloud_trail": false,
+      "enable_bedrock": true,
       "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": true,
       "enable_dbuilder_apikey": true,
@@ -96,7 +97,8 @@
         "dps-cvl",
         "dps-adjudications",
         "dps-acc-pro-custody",
-        "dps-manage-offences"
+        "dps-manage-offences",
+        "dps-offences"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -285,6 +287,7 @@
       "domain_builder_rds_parameter_group": "default.postgres14",
       "enable_domain_builder_agent": false,
       "enable_cloud_trail": false,
+      "enable_bedrock": false,
       "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": true,
       "enable_dbuilder_apikey": true,
@@ -329,7 +332,8 @@
         "dps-cvl",
         "dps-adjudications",
         "dps-acc-pro-custody",
-        "dps-manage-offences"
+        "dps-manage-offences",
+        "dps-offences"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -499,6 +503,7 @@
       "domain_builder_rds_parameter_group": "default.postgres14",
       "enable_domain_builder_agent": false,
       "enable_cloud_trail": false,
+      "enable_bedrock": false,
       "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": true,
       "enable_dbuilder_apikey": true,
@@ -545,7 +550,8 @@
         "dps-cvl",
         "dps-adjudications",
         "dps-acc-pro-custody",
-        "dps-manage-offences"
+        "dps-manage-offences",
+        "dps-offences"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -730,6 +736,7 @@
       "domain_builder_rds_parameter_group": "default.postgres15",
       "enable_domain_builder_agent": false,
       "enable_cloud_trail": false,
+      "enable_bedrock": false,
       "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": true,
       "enable_dbuilder_apikey": true,
@@ -773,7 +780,9 @@
         "dps-san",
         "dps-cvl",
         "dps-adjudications",
-        "dps-acc-pro-custody"
+        "dps-acc-pro-custody",
+        "dps-manage-offences",
+        "dps-offences"
       ],
       "alarms": {
         "setup_cw_alarms": true,
