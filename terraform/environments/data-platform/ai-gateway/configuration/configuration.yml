@@ -22,12 +22,12 @@ teams:
       - bedrock-jeaie-claude-opus-5
       - bedrock-jeaie-claude-sonnet-5
     model_aliases:
-        - alias: "claude-haiku-4.5"
-          model: "bedrock-jeaie-claude-haiku-4-5"
-        - alias: "claude-opus-5"
-          model: "bedrock-jeaie-claude-opus-5"
-        - alias: "claude-sonnet-5"
-          model: "bedrock-jeaie-claude-sonnet-5"
+      - alias: "claude-haiku-4.5"
+        model: "bedrock-jeaie-claude-haiku-4-5"
+      - alias: "claude-opus-5"
+        model: "bedrock-jeaie-claude-opus-5"
+      - alias: "claude-sonnet-5"
+        model: "bedrock-jeaie-claude-sonnet-5"
   pom-e-supervision:
     alias: POM Phased Implementation - E-Supervision
     organisation: ministryofjustice
@@ -39,12 +39,12 @@ teams:
       - bedrock-jeaie-claude-opus-5
       - bedrock-jeaie-claude-sonnet-5
     model_aliases:
-        - alias: "claude-haiku-4.5"
-          model: "bedrock-jeaie-claude-haiku-4-5"
-        - alias: "claude-opus-5"
-          model: "bedrock-jeaie-claude-opus-5"
-        - alias: "claude-sonnet-5"
-          model: "bedrock-jeaie-claude-sonnet-5"
+      - alias: "claude-haiku-4.5"
+        model: "bedrock-jeaie-claude-haiku-4-5"
+      - alias: "claude-opus-5"
+        model: "bedrock-jeaie-claude-opus-5"
+      - alias: "claude-sonnet-5"
+        model: "bedrock-jeaie-claude-sonnet-5"
 
 models:
   amazon_bedrock:
