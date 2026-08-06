@@ -90,7 +90,6 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
           # "cdn.onenote.net",
           "ajax.aspnetcdn.com",
           "apis.live.net",
-          "officeapps.live.com",
           "www.onedrive.com",
           ".auth.microsoft.com",
           ".msftidentity.com",
@@ -131,9 +130,7 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
           ".security.microsoft.com",
           "compliance.microsoft.com",
           "defender.microsoft.com",
-          "protection.office.com",
           "purview.microsoft.com",
-          "security.microsoft.com",
           ".portal.cloudappsecurity.com",
           ".aria.microsoft.com",
           ".events.data.microsoft.com",
@@ -164,9 +161,7 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
           "activation.sls.microsoft.com",
           "crl.microsoft.com",
           "office15client.microsoft.com",
-          "officeclient.microsoft.com",
           "go.microsoft.com",
-          "ajax.aspnetcdn.com",
           "cdn.odc.officeapps.live.com",
           "officecdn.microsoft.com",
           "otelrules.azureedge.net",
@@ -203,14 +198,9 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
           ".powerapps.com",
           ".powerautomate.com",
           ".activity.windows.com",
-          "activity.windows.com",
           # ".cortana.ai",
           "admin.microsoft.com",
-          "cdn.odc.officeapps.live.com",
-          "cdn.uci.officeapps.live.com",
-          ".cloud.microsoft",
-          ".static.microsoft",
-          ".usercontent.microsoft"
+          "cdn.uci.officeapps.live.com"
 
         ]
       }
