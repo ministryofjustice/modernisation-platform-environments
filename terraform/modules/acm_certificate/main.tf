@@ -6,6 +6,7 @@ locals {
 }
 
 resource "aws_acm_certificate" "this" {
+  #checkov:skip=CKV_AWS_234: transparency logging enabled by default but can be disabled if there is a requirement to do so
   domain_name               = var.domain_name
   validation_method         = "DNS"
   subject_alternative_names = var.subject_alternate_names
