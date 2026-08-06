@@ -40,7 +40,7 @@ resource "aws_vpc_security_group_egress_rule" "bps_ec2" {
     https-to-all         = { ip_protocol = "TCP", port = 443, cidr_ipv4 = "0.0.0.0/0" }
     smb-to-core-internal = { ip_protocol = "TCP", port = 445, cidr_ipv4 = "10.0.0.0/8" }
     oracle1521-to-vpc    = { ip_protocol = "TCP", port = 1521, cidr_ipv4 = var.account_config.shared_vpc_cidr }
-    nfs-to-efs           = { ip_protocol = "TCP", port = 2049, referenced_security_group_id = aws_security_group.efs.id }
+    nfs-to-internal      = { ip_protocol = "TCP", port = 2049, cidr_ipv4 = "10.0.0.0/8" }
   }
 
   description       = each.key
@@ -90,6 +90,7 @@ module "bps_instance" {
     aws_iam_policy.secrets_manager.arn,
     aws_iam_policy.business_unit_kms_key_access[0].arn,
     aws_iam_policy.ec2_automation.arn,
+    aws_iam_policy.ec2_nextcloud.arn,
   ]
 
   user_data_cloud_init = {
