@@ -28,10 +28,10 @@ module "environment_test" {
 
   bastion_config = local.bastion_config_test
 
-  ldap_config        = local.ldap_config_test
-  db_config          = local.db_config_test
+  ldap_config                  = local.ldap_config_test
+  db_config                    = local.db_config_test
   create_account_service_roles = true
-  create_ecs_lambda  = true
+  create_ecs_lambda            = true
 
   delius_microservice_configs = local.delius_microservices_configs_test
 

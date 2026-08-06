@@ -126,12 +126,21 @@ module "iceberg_table_maintenance_step_function" {
 }
 
 # ------------------------------------------
-# Merge into emdi position step function
+# Merge into staged position step function
 # ------------------------------------------
 
 module "merge_into_mdss_staged_position" {
   source       = "./modules/merge_into_reconciler"
   function_to_iterate = module.merge_mdss_staged_position[0]
+}
+
+# ------------------------------------------
+# Merge into staged event step function
+# ------------------------------------------
+
+module "merge_into_mdss_staged_event" {
+  source       = "./modules/merge_into_reconciler"
+  function_to_iterate = module.merge_mdss_staged_event[0]
 }
 
 # ------------------------------------------
@@ -141,6 +150,15 @@ module "merge_into_mdss_staged_position" {
 module "merge_into_emdi_position" {
   source       = "./modules/merge_into_reconciler"
   function_to_iterate = module.merge_emdi_position[0]
+}
+
+# ------------------------------------------
+# Merge into ac position step function
+# ------------------------------------------
+
+module "merge_into_mdss_ac_position" {
+  source       = "./modules/merge_into_reconciler"
+  function_to_iterate = module.merge_ac_position[0]
 }
 
 # ------------------------------------------------------------------------------

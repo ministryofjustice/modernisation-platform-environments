@@ -77,7 +77,8 @@ resource "helm_release" "kyverno_policies" {
     templatefile(
       "${path.module}/configuration/helm/kyverno-policies/values.yml.tftpl",
       {
-        validation_action = local.cluster_configuration.kyverno_policies.validation_action
+        validation_action   = local.cluster_configuration.kyverno_policies.validation_action
+        excluded_namespaces = local.cluster_configuration.kyverno_policies.excluded_namespaces
       }
     )
   ]

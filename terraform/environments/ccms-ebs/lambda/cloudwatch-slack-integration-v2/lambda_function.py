@@ -9,19 +9,21 @@ and S3 events into Slack.
 # 3.14+ (which defers natively via PEP 649).
 
 from __future__ import annotations
+
 import functools
 import json
-import os
 import logging
+import os
 import time
 import tracemalloc
-import urllib.request
 import urllib.error
 import urllib.parse
+import urllib.request
 from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from typing import TYPE_CHECKING, Any
-from datetime import datetime, timezone, timedelta
+
 import boto3
 from botocore.exceptions import ClientError
 
@@ -136,6 +138,7 @@ class EventType(StrEnum):
 # If a SUPPRESSION_TIME_* value is invalid, suppression is disabled (fail-safe —
 # alerts still flow) and affected notifications carry a config-error note so the
 #  operator fixes it.
+
 
 def _parse_hhmm(value: str | None) -> int | None:
     """Parse 'H:MM'/'HH:MM' into minutes since midnight [0, 1440); None if invalid."""
@@ -666,8 +669,8 @@ class NotificationService:
             logger.info("Slack notification sent successfully: %s", title)
             return True
 
-        except Exception as e:
-            logger.error("Failed to send Slack notification: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Failed to send Slack notification")
             return False
 
 
@@ -762,7 +765,7 @@ def lambda_handler(event: dict, context: Any) -> dict | None:
         tracemalloc.start()
 
     notification_service = None
-    formatted = datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S UTC")
+    formatted = datetime.now(UTC).strftime("%a, %d %b %Y %H:%M:%S UTC")
     event_type = EventType.UNKNOWN
     is_error = True
 
@@ -771,7 +774,11 @@ def lambda_handler(event: dict, context: Any) -> dict | None:
     if not secret_name:
         raise ValueError("SECRET_NAME not found in environment or event")
     if not isinstance(secret_name, str):
-        raise ValueError(f"SECRET_NAME must be a string, got: {type(secret_name).__name__}")
+        # ValueError (not TypeError) is deliberate: it mirrors the "not found" ValueError
+        # above so callers catch one type for "SECRET_NAME is bad", and it is locked by a
+        # regression test (the old code raised an opaque TypeError here). See test
+        # test_non_string_secret_name_raises_clear_valueerror.
+        raise ValueError(f"SECRET_NAME must be a string, got: {type(secret_name).__name__}")  # noqa: TRY004
 
     secrets_data = get_credentials(secret_name)
     config = ValidateConfig.from_secrets(secrets_data)
@@ -822,7 +829,7 @@ def lambda_handler(event: dict, context: Any) -> dict | None:
                 is_error = True
 
             case _:  # CloudWatch (default; also catches unknown sources)
-                alarm_time = datetime.now(timezone.utc)  # fallback if timestamp is missing
+                alarm_time = datetime.now(UTC)  # fallback if timestamp is missing
                 timestamp_str = sns_message.get("Timestamp")
                 if timestamp_str:
                     formatted = format_event_time(timestamp_str, fallback=formatted)
@@ -863,8 +870,8 @@ def lambda_handler(event: dict, context: Any) -> dict | None:
         return response
 
     except Exception as e:
-        error_msg = f"Lambda execution failed:\n{str(e)}"
-        logger.error(error_msg, exc_info=True)
+        error_msg = f"Lambda execution failed:\n{e!s}"
+        logger.exception(error_msg)
 
         # Best-effort: try to post an error notification to Slack.
         if notification_service is not None:
@@ -872,8 +879,8 @@ def lambda_handler(event: dict, context: Any) -> dict | None:
                 notification_service.send_notification(
                     "Lambda Execution Failed", {"error": error_msg}, formatted, event_type, is_error=True
                 )
-            except Exception as notification_error:
-                logger.error("Failed to send error notification: %s", notification_error)
+            except Exception:
+                logger.exception("Failed to send error notification")
 
         # Re-raise so the invocation fails and Lambda dead-letters the event.
         raise

@@ -4,7 +4,7 @@ locals {
     "Resource Name"              = module.s3_bucket["processing"].s3_bucket_id
   }
 
-  cloudwatch_metric_alarms = {
+  cloudwatch_metric_alarms = merge({
     "lambda-file-received-adapter-errors" = {
       alarm_description   = "The file received adapter Lambda function has failed to process one or more events"
       comparison_operator = "GreaterThanThreshold"
@@ -191,110 +191,6 @@ locals {
       statistic          = "Maximum"
       threshold          = 0
     }
-    "step-functions-file-transfer-workflow-failures" = {
-      alarm_description   = "The file transfer workflow has failed one or more executions"
-      comparison_operator = "GreaterThanThreshold"
-      dimensions = {
-        StateMachineArn = module.step_function_filereceived_workflow.state_machine_arn
-      }
-      evaluation_periods = 1
-      metric_name        = "ExecutionsFailed"
-      namespace          = "AWS/States"
-      period             = 300
-      statistic          = "Sum"
-      threshold          = 0
-    }
-    "step-functions-file-transfer-workflow-timeouts" = {
-      alarm_description   = "The file transfer workflow has timed out one or more executions"
-      comparison_operator = "GreaterThanThreshold"
-      dimensions = {
-        StateMachineArn = module.step_function_filereceived_workflow.state_machine_arn
-      }
-      evaluation_periods = 1
-      metric_name        = "ExecutionsTimedOut"
-      namespace          = "AWS/States"
-      period             = 300
-      statistic          = "Sum"
-      threshold          = 0
-    }
-    "step-functions-file-transfer-workflow-aborts" = {
-      alarm_description   = "The file transfer workflow has aborted one or more executions"
-      comparison_operator = "GreaterThanThreshold"
-      dimensions = {
-        StateMachineArn = module.step_function_filereceived_workflow.state_machine_arn
-      }
-      evaluation_periods = 1
-      metric_name        = "ExecutionsAborted"
-      namespace          = "AWS/States"
-      period             = 300
-      statistic          = "Sum"
-      threshold          = 0
-    }
-    "step-functions-file-transfer-workflow-throttles" = {
-      alarm_description   = "The file transfer workflow has experienced state transition throttling"
-      comparison_operator = "GreaterThanThreshold"
-      dimensions = {
-        StateMachineArn = module.step_function_filereceived_workflow.state_machine_arn
-      }
-      evaluation_periods = 1
-      metric_name        = "ExecutionThrottled"
-      namespace          = "AWS/States"
-      period             = 300
-      statistic          = "Sum"
-      threshold          = 0
-    }
-    "step-functions-file-routing-workflow-failures" = {
-      alarm_description   = "The file routing workflow has failed one or more executions"
-      comparison_operator = "GreaterThanThreshold"
-      dimensions = {
-        StateMachineArn = module.step_function_filescanresultrecorded_workflow.state_machine_arn
-      }
-      evaluation_periods = 1
-      metric_name        = "ExecutionsFailed"
-      namespace          = "AWS/States"
-      period             = 300
-      statistic          = "Sum"
-      threshold          = 0
-    }
-    "step-functions-file-routing-workflow-timeouts" = {
-      alarm_description   = "The file routing workflow has timed out one or more executions"
-      comparison_operator = "GreaterThanThreshold"
-      dimensions = {
-        StateMachineArn = module.step_function_filescanresultrecorded_workflow.state_machine_arn
-      }
-      evaluation_periods = 1
-      metric_name        = "ExecutionsTimedOut"
-      namespace          = "AWS/States"
-      period             = 300
-      statistic          = "Sum"
-      threshold          = 0
-    }
-    "step-functions-file-routing-workflow-aborts" = {
-      alarm_description   = "The file routing workflow has aborted one or more executions"
-      comparison_operator = "GreaterThanThreshold"
-      dimensions = {
-        StateMachineArn = module.step_function_filescanresultrecorded_workflow.state_machine_arn
-      }
-      evaluation_periods = 1
-      metric_name        = "ExecutionsAborted"
-      namespace          = "AWS/States"
-      period             = 300
-      statistic          = "Sum"
-      threshold          = 0
-    }
-    "step-functions-file-routing-workflow-throttles" = {
-      alarm_description   = "The file routing workflow has experienced state transition throttling"
-      comparison_operator = "GreaterThanThreshold"
-      dimensions = {
-        StateMachineArn = module.step_function_filescanresultrecorded_workflow.state_machine_arn
-      }
-      evaluation_periods = 1
-      metric_name        = "ExecutionThrottled"
-      namespace          = "AWS/States"
-      period             = 300
-      statistic          = "Sum"
-      threshold          = 0
-    }
     "dynamodb-file-transfer-workflow-idempotency-read-throttles" = {
       alarm_description   = "The file transfer workflow idempotency table has throttled one or more read requests"
       comparison_operator = "GreaterThanThreshold"
@@ -421,7 +317,21 @@ locals {
       statistic          = "Sum"
       threshold          = 0
     }
-  }
+    }, {
+    for index, eip in aws_eip.this : "shield-transfer-eip-${index + 1}-ddos-detected" => {
+      alarm_description   = "Shield Advanced detected a DDoS event targeting Transfer server Elastic IP ${index + 1}"
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      dimensions = {
+        ResourceArn = "arn:aws:ec2:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:eip-allocation/${eip.id}"
+      }
+      evaluation_periods = 1
+      metric_name        = "DDoSDetected"
+      namespace          = "AWS/DDoSProtection"
+      period             = 60
+      statistic          = "Maximum"
+      threshold          = 1
+    }
+  })
 
   cloudwatch_retention_days = local.is-production ? 400 : 30
 }
