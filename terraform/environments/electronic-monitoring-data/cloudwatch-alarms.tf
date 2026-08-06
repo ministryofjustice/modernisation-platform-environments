@@ -210,20 +210,20 @@ resource "aws_cloudwatch_metric_alarm" "merge_lambdas_not_running" {
 
   metric_query {
     id          = "total"
-    expression  = "succeeded + failed"
+    expression  = "s + f"
     label       = "Combined total"
     return_data = true
   }
 
   metric_query {
-    id          = "succeeded"
-    return_data = false
+    id          = "s"
 
     metric {
       namespace   = "EM/MergeLambdas"
       metric_name = "SucceededQueries"
       period      = 900
       stat        = "Sum"
+      unit        = "Count"
 
       dimensions = {
         FunctionName = each.value.lambda_name
@@ -232,14 +232,14 @@ resource "aws_cloudwatch_metric_alarm" "merge_lambdas_not_running" {
   }
 
   metric_query {
-    id          = "failed"
-    return_data = false
+    id          = "f"
 
     metric {
       namespace   = "EM/MergeLambdas"
       metric_name = "FailedQueries"
       period      = 900
       stat        = "Sum"
+      unit        = "Count"
 
       dimensions = {
         FunctionName = each.value.lambda_name

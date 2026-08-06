@@ -24,7 +24,7 @@ locals {
           title  = "Total Successful Queries"
           region = "eu-west-2"
           stat   = "Sum"
-          period = 900
+          period = 120
           metrics = [
             [
               "EM/MergeLambdas",
@@ -51,7 +51,7 @@ locals {
           title  = "Total Failed Queries"
           region = "eu-west-2"
           stat   = "Sum"
-          period = 900
+          period = 120
           metrics = [
             [
               "EM/MergeLambdas",
