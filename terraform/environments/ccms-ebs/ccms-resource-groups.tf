@@ -93,25 +93,6 @@ JSON
   }
 }
 
-resource "aws_resourcegroups_group" "mailrelay" {
-  name        = "mailrelay"
-  description = "MailRelay instances"
-
-  resource_query {
-    query = <<JSON
-{
-  "ResourceTypeFilters": [ "AWS::EC2::Instance" ],
-  "TagFilters": [
-    {
-      "Key": "instance-role",
-      "Values": ["mailrelay"]
-    }
-  ]
-}
-JSON
-  }
-}
-
 # resource "aws_resourcegroups_group" "webgate" {
 #   name        = "webgate"
 #   description = "Webgate instances"
@@ -154,11 +135,6 @@ output "aws_resourcegroups_group_ebsdb_arn" {
 output "aws_resourcegroups_group_ftp_arn" {
   description = "aws_resourcegroups_group ftp arn"
   value       = "aws_resourcegroups_group.ftp.arn"
-}
-
-output "aws_resourcegroups_group_mailrelay_arn" {
-  description = "aws_resourcegroups_group mailrelay arn"
-  value       = "aws_resourcegroups_group.mailrelay.arn"
 }
 
 # output "aws_resourcegroups_group_webgate_arn" {

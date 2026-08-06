@@ -20,4 +20,4 @@ EOF
 chmod 640 /etc/freeradius/clients.conf
 chown root:freerad /etc/freeradius/clients.conf
 
-exec freeradius -f
+exec freeradius -f -l stdout
