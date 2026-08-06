@@ -140,14 +140,20 @@ data "aws_iam_policy_document" "cadt_api_trigger" {
   }
   statement {
     effect = "Allow"
-    actions = ["apigateway:GET"]
+    actions = [
+      "apigateway:GET",
+      "apigateway:POST"
+    ]
     resources = [
       "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_status_id}/methods/GET"
     ]
   }
   statement {
     effect = "Allow"
-    actions = ["apigateway:GET"]
+    actions = [
+      "apigateway:GET",
+      "apigateway:POST"
+    ]
     resources = [
       "${module.trigger_cadt_api.api_gateway_arn}/resources/${module.trigger_cadt_api.resource_execution_id_id}/methods/GET"
     ]
