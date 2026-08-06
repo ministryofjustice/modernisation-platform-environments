@@ -23,7 +23,7 @@ module "s3_bucket" {
     {
       allowed_headers = ["*"]
       allowed_methods = ["GET", "PUT", "POST", "DELETE", "HEAD"]
-      allowed_origins = [aws_transfer_web_app.this.access_endpoint]
+      allowed_origins = [local.web_app_origin]
       expose_headers = [
         "last-modified",
         "content-length",

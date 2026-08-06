@@ -66,7 +66,8 @@ module "ears_sars_step_function" {
   iam_policies = tomap({ "ears_sars_step_function_policy" = aws_iam_policy.ears_sars_step_function_policy[0] })
   variable_dictionary = tomap(
     {
-      "ears_sars_request" = module.ears_sars_request[0].lambda_function_name,
+      "ears_sars_request"   = module.ears_sars_request[0].lambda_function_name,
+      "write_to_sharepoint" = module.write_to_sharepoint[0].lambda_function_name,
     }
   )
   type = "STANDARD"
@@ -93,6 +94,8 @@ module "gdpr_deletion_step_function" {
       "control_lambda_arn"       = module.gdpr_unstructured_control_lambda[0].lambda_function_arn
       "batch_job_queue_arn"      = aws_batch_job_queue.shred_unstructured_from_zip_batch_queue[0].arn
       "batch_job_definition_arn" = aws_batch_job_definition.shred_unstructured_from_zip_job.arn
+      "sns_topic_arn"            = aws_sns_topic.emds_alerts.arn
+      "environment_name"         = local.environment_shorthand
     }
   )
   type = "STANDARD"
@@ -120,6 +123,42 @@ module "iceberg_table_maintenance_step_function" {
     }
   )
   type = "STANDARD"
+}
+
+# ------------------------------------------
+# Merge into staged position step function
+# ------------------------------------------
+
+module "merge_into_mdss_staged_position" {
+  source       = "./modules/merge_into_reconciler"
+  function_to_iterate = module.merge_mdss_staged_position[0]
+}
+
+# ------------------------------------------
+# Merge into staged event step function
+# ------------------------------------------
+
+module "merge_into_mdss_staged_event" {
+  source       = "./modules/merge_into_reconciler"
+  function_to_iterate = module.merge_mdss_staged_event[0]
+}
+
+# ------------------------------------------
+# Merge into emdi position step function
+# ------------------------------------------
+
+module "merge_into_emdi_position" {
+  source       = "./modules/merge_into_reconciler"
+  function_to_iterate = module.merge_emdi_position[0]
+}
+
+# ------------------------------------------
+# Merge into ac position step function
+# ------------------------------------------
+
+module "merge_into_mdss_ac_position" {
+  source       = "./modules/merge_into_reconciler"
+  function_to_iterate = module.merge_ac_position[0]
 }
 
 # ------------------------------------------------------------------------------

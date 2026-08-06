@@ -1,4 +1,16 @@
+moved {
+  from = module.container_definition
+  to   = module.container_definition[0]
+}
+
+moved {
+  from = module.ecs_service
+  to   = module.ecs_service[0]
+}
+
 module "container_definition" {
+  count = var.create_service ? 1 : 0
+
   source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=v5.0.0"
   name                     = var.name
   image                    = var.container_image
@@ -35,8 +47,10 @@ module "ecs_policies" {
 }
 
 module "ecs_service" {
+  count = var.create_service ? 1 : 0
+
   source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v6.0.2"
-  container_definitions = nonsensitive(module.container_definition.json_encoded_list)
+  container_definitions = nonsensitive(module.container_definition[0].json_encoded_list)
   cluster_arn           = var.ecs_cluster_arn
   name                  = "${var.env_name}-${var.name}"
 

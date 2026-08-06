@@ -149,7 +149,6 @@ locals {
     ["dso-modernisation-platform-automation", "planetfm_gfsl_data_extract", "dso-pipelines-pagerduty", {}],
     ["dso-modernisation-platform-automation", "nomis_environment_start", "nomis-preproduction-pagerduty", {}],
     ["dso-modernisation-platform-automation", "certificate_renewal", "dso-pipelines-pagerduty", {}],
-    ["dso-modernisation-platform-automation", "azure_sas_token_refresh", "nomis-data-hub-production-pagerduty", {}],
     ["dso-modernisation-platform-automation", "jump_server_start", "dso-pipelines-pagerduty", {}],
     ["dso-modernisation-platform-automation", "jump_server_stop", "dso-pipelines-pagerduty", {}],
     ["dso-modernisation-platform-automation", "ncr_environment_start", "nomis-combined-reporting-preproduction-pagerduty", {}],

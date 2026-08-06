@@ -51,7 +51,7 @@ data "aws_iam_policy_document" "processing" {
       test     = "ArnNotEquals"
       variable = "aws:PrincipalArn"
       values = [
-        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.iam_configuration.guardduty_role_name}",
+        module.guardduty_s3_plan_role.arn,
       ]
     }
 
@@ -86,7 +86,7 @@ data "aws_iam_policy_document" "processing" {
       test     = "ArnNotEquals"
       variable = "aws:PrincipalArn"
       values = [
-        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.iam_configuration.guardduty_role_name}",
+        module.guardduty_s3_plan_role.arn,
       ]
     }
 

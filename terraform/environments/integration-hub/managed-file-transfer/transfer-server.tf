@@ -13,9 +13,9 @@ resource "aws_transfer_server" "this" {
 
   endpoint_details {
     vpc_id     = module.isolated_vpc.vpc_id
-    subnet_ids = slice(module.isolated_vpc.public_subnets, 0, 1)
+    subnet_ids = module.isolated_vpc.public_subnets
     address_allocation_ids = [
-      aws_eip.this[0].id
+      for key, value in aws_eip.this : value.id
     ]
     security_group_ids = [
       aws_security_group.transfer.id
@@ -23,20 +23,13 @@ resource "aws_transfer_server" "this" {
   }
 
   protocol_details {
-    passive_ip = aws_eip.this[0].public_ip
+    passive_ip = "AUTO"
   }
 
   tags = {
     "transfer:customHostname"      = local.is-production == false ? "sftp.${local.environment}.managed-file-transfer.service.justice.gov.uk" : "sftp.managed-file-transfer.service.justice.gov.uk"
     "transfer:route53HostedZoneId" = "/hostedzone/${data.aws_route53_zone.service.zone_id}"
   }
-
-  depends_on = [aws_acm_certificate.ftps]
-}
-
-resource "aws_eip" "this" {
-  count  = 1
-  domain = "vpc"
 
   depends_on = [aws_acm_certificate.ftps]
 }

@@ -113,7 +113,7 @@ data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
   statement {
     sid    = "AllowAccessToLegacyS3OracleBackups"
     effect = "Allow"
-    actions = [
+    actions = var.environment_config.migration_environment_full_name == "del-prod" ? ["s3:*"] : [
       "s3:Get*",
       "s3:List*"
     ]

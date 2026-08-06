@@ -91,3 +91,87 @@ resource "aws_route53_record" "octo_live_ns" {
     "ns-691.awsdns-22.net.",
   ]
 }
+
+resource "aws_route53_record" "laa_nonlive_ns" {
+  count   = terraform.workspace == "cloud-platform-live" ? 1 : 0
+  zone_id = aws_route53_zone.container_platform_service_justice_gov_uk[0].zone_id
+  name    = "laa-nonlive.${local.base_domain}"
+  type    = "NS"
+  ttl     = 172800
+  records = [
+    "ns-849.awsdns-42.net.",
+    "ns-84.awsdns-10.com.",
+    "ns-1915.awsdns-47.co.uk.",
+    "ns-1027.awsdns-00.org.",
+  ]
+}
+
+resource "aws_route53_record" "laa_live_ns" {
+  count   = terraform.workspace == "cloud-platform-live" ? 1 : 0
+  zone_id = aws_route53_zone.container_platform_service_justice_gov_uk[0].zone_id
+  name    = "laa-live.${local.base_domain}"
+  type    = "NS"
+  ttl     = 172800
+  records = [
+    "ns-687.awsdns-21.net.",
+    "ns-157.awsdns-19.com.",
+    "ns-1197.awsdns-21.org.",
+    "ns-1996.awsdns-57.co.uk.",
+  ]
+}
+
+resource "aws_route53_record" "hmpps_nonlive_ns" {
+  count   = terraform.workspace == "cloud-platform-live" ? 1 : 0
+  zone_id = aws_route53_zone.container_platform_service_justice_gov_uk[0].zone_id
+  name    = "hmpps-nonlive.${local.base_domain}"
+  type    = "NS"
+  ttl     = 172800
+  records = [
+    "ns-2039.awsdns-62.co.uk.",
+    "ns-1120.awsdns-12.org.",
+    "ns-548.awsdns-04.net.",
+    "ns-416.awsdns-52.com.",
+  ]
+}
+
+resource "aws_route53_record" "hmpps_live_ns" {
+  count   = terraform.workspace == "cloud-platform-live" ? 1 : 0
+  zone_id = aws_route53_zone.container_platform_service_justice_gov_uk[0].zone_id
+  name    = "hmpps-live.${local.base_domain}"
+  type    = "NS"
+  ttl     = 172800
+  records = [
+    "ns-1969.awsdns-54.co.uk.",
+    "ns-991.awsdns-59.net.",
+    "ns-241.awsdns-30.com.",
+    "ns-1290.awsdns-33.org.",
+  ]
+}
+
+resource "aws_route53_record" "cd_nonlive_ns" {
+  count   = terraform.workspace == "cloud-platform-live" ? 1 : 0
+  zone_id = aws_route53_zone.container_platform_service_justice_gov_uk[0].zone_id
+  name    = "cd-nonlive.${local.base_domain}"
+  type    = "NS"
+  ttl     = 172800
+  records = [
+    "ns-849.awsdns-42.net.",
+    "ns-214.awsdns-26.com.",
+    "ns-1808.awsdns-34.co.uk.",
+    "ns-1298.awsdns-34.org.",
+  ]
+}
+
+resource "aws_route53_record" "cd_live_ns" {
+  count   = terraform.workspace == "cloud-platform-live" ? 1 : 0
+  zone_id = aws_route53_zone.container_platform_service_justice_gov_uk[0].zone_id
+  name    = "cd-live.${local.base_domain}"
+  type    = "NS"
+  ttl     = 172800
+  records = [
+    "ns-1164.awsdns-17.org.",
+    "ns-370.awsdns-46.com.",
+    "ns-1767.awsdns-28.co.uk.",
+    "ns-788.awsdns-34.net.",
+  ]
+}

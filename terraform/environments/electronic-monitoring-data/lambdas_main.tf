@@ -677,6 +677,7 @@ module "cloudwatch_alarm_threader" {
     ENVIRONMENT           = local.environment_shorthand
     INCLUDE_REASON        = "true"
     ENABLE_CUSTOM_ACTIONS = "false"
+    INCIDENT_QUEUE_URL    = aws_sqs_queue.live_feed_incident_events.id
     GLUE_DB_JANITOR_STATE_MACHINE_ARN = (
       aws_sfn_state_machine.staging_db_janitor.arn
     )
@@ -924,11 +925,11 @@ module "landing_file_dlq_redriver" {
 }
 
 #-----------------------------------------------------------------------------------
-# lambda merge loads - staged_mdss__position, staged_mdss__event, acquisitive_crime__position
+# lambda merge loads - staged_mdss__position, staged_mdss__event, acquisitive_crime__position, data_insights__position
 #-----------------------------------------------------------------------------------
 
 module "merge_mdss_staged_event" {
-  count                          = local.is-production ? 0 : 1
+  count                          = 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_mdss_staged_event"
@@ -950,7 +951,7 @@ module "merge_mdss_staged_event" {
 }
 
 module "merge_mdss_staged_position" {
-  count                          = local.is-production ? 0 : 1
+  count                          = 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_mdss_staged_position"
@@ -972,13 +973,35 @@ module "merge_mdss_staged_position" {
 }
 
 module "merge_ac_position" {
-  count                          = local.is-production ? 0 : 1
+  count                          = 1
   source                         = "./modules/lambdas"
   is_image                       = true
   function_name                  = "merge_ac_position"
   role_name                      = aws_iam_role.merge_load_ac.name
   role_arn                       = aws_iam_role.merge_load_ac.arn
   handler                        = "merge_ac_position.handler"
+  memory_size                    = 1024
+  timeout                        = 900
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids             = [aws_security_group.lambda_generic.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+  cloudwatch_retention_days      = 7
+  environment_variables = {
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
+  }
+}
+
+module "merge_emdi_position" {
+  count                          = 1
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "merge_emdi_position"
+  role_name                      = aws_iam_role.merge_load_emdi.name
+  role_arn                       = aws_iam_role.merge_load_emdi.arn
+  handler                        = "merge_emdi_position.handler"
   memory_size                    = 1024
   timeout                        = 900
   reserved_concurrent_executions = 1
@@ -1064,5 +1087,99 @@ module "gdpr_unstructured_control_lambda" {
     GDPR_AUDIT_BUCKET           = module.s3-gdpr-audit-bucket.bucket.id
     ATHENA_QUERY_RESULTS_BUCKET = module.s3-athena-bucket.bucket.id
     ENVIRONMENT_NAME            = local.environment_shorthand
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# Write EAR/SAR data to SharePoint
+#-----------------------------------------------------------------------------------
+
+module "write_to_sharepoint" {
+  count                   = local.is-test ? 0 : 1
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "write_to_sharepoint"
+  role_name               = aws_iam_role.write_to_sharepoint[0].name
+  role_arn                = aws_iam_role.write_to_sharepoint[0].arn
+  handler                 = "write_to_sharepoint.handler"
+  memory_size             = 10240
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    SECRET_AZURE_TENANT_ID     = jsondecode(data.aws_secretsmanager_secret_version.entra_app_details[0].secret_string)["tenant_id"]
+    SECRET_AZURE_CLIENT_ID     = jsondecode(data.aws_secretsmanager_secret_version.entra_app_details[0].secret_string)["client_id"]
+    SECRET_AZURE_CLIENT_SECRET = jsondecode(data.aws_secretsmanager_secret_version.entra_app_details[0].secret_string)["client_secret"]
+  }
+}
+
+# ------------------------------------------------------------------------------
+# Live-feed incident manager
+# ------------------------------------------------------------------------------
+
+module "live_feed_github_app" {
+  source  = "terraform-aws-modules/secrets-manager/aws"
+  version = "1.3.1"
+
+  name = "live-feed-github-app-${local.environment_shorthand}"
+
+  description = (
+    "GitHub App credentials for live-feed incident automation"
+  )
+
+  recovery_window_in_days = 7
+
+  ignore_secret_changes = true
+  secret_string         = jsonencode({})
+
+  tags = local.tags
+}
+
+module "live_feed_incident_manager" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "live_feed_incident_manager"
+  role_name                      = aws_iam_role.live_feed_incident_manager.name
+  role_arn                       = aws_iam_role.live_feed_incident_manager.arn
+  handler                        = "live_feed_incident_manager.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 2
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+
+  environment_variables = {
+    ENVIRONMENT             = local.environment_shorthand
+    POWERTOOLS_LOG_LEVEL    = "INFO"
+    POWERTOOLS_SERVICE_NAME = "live-feed-incident-manager"
+
+    GITHUB_SECRET_ARN     = module.live_feed_github_app.secret_arn
+    GITHUB_OWNER          = "moj-analytical-services"
+    GITHUB_REPOSITORY     = "dmet-em"
+    GITHUB_PROJECT_NUMBER = "290"
+    GITHUB_ISSUE_TYPE     = "Bug"
+
+    GITHUB_PROJECT_STATUS_FIELD     = "Status"
+    GITHUB_PROJECT_PRIORITY_FIELD   = "Priority"
+    GITHUB_PROJECT_SPRINT_FIELD     = "Sprint"
+    GITHUB_PROJECT_TODO_OPTION      = "👀 To do"
+    GITHUB_PROJECT_DONE_OPTION      = "✅ Done"
+    GITHUB_PROJECT_PRIORITY_OPTION  = "🚨 Urgent"
+
+    PAGERDUTY_SCHEDULE_ID = "P3MCA8L"
+    PAGERDUTY_TIME_ZONE   = "Europe/London"
+
+    INCIDENT_STATE_BUCKET = local.alarm_thread_state_bucket
+    INCIDENT_STATE_PREFIX = "incident-automation/episodes"
+    AWS_ACCOUNT_ID        = data.aws_caller_identity.current.account_id
   }
 }

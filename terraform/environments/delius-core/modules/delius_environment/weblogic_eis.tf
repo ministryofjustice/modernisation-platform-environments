@@ -8,7 +8,7 @@ module "weblogic_eis" {
   }
 
   name              = "weblogic-eis"
-  container_image   = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic:${var.delius_microservice_configs.weblogic_eis.image_tag}"
+  create_service    = "false"
   env_name          = var.env_name
   account_config    = var.account_config
   account_info      = var.account_info
@@ -16,40 +16,11 @@ module "weblogic_eis" {
 
   force_new_deployment = false
 
-  desired_count = var.delius_microservice_configs.weblogic_eis.task_count
-
-  pin_task_definition_revision           = try(var.delius_microservice_configs.weblogic_eis.task_definition_revision, 0)
-  ignore_changes_service_task_definition = false
-
-  ecs_cluster_arn  = module.ecs.ecs_cluster_arn
-  container_memory = var.delius_microservice_configs.weblogic_eis.container_memory
-  container_cpu    = var.delius_microservice_configs.weblogic_eis.container_cpu
-
-  container_vars_default = var.delius_microservice_configs.weblogic_params
-
-  container_vars_env_specific = try(var.delius_microservice_configs.weblogic_eis.container_vars_env_specific, {})
-
-  container_secrets_default = merge({
-    for name in local.weblogic_secrets : name => module.weblogic_ssm.arn_map[name]
-    }, {
-    "JDBC_PASSWORD"         = "${module.oracle_db_shared.database_application_passwords_secret_arn}:delius_pool::",
-    "USERMANAGEMENT_SECRET" = data.aws_ssm_parameter.usermanagement_secret.arn
-    }
-  )
-  container_secrets_env_specific = try(var.delius_microservice_configs.weblogic_eis.container_secrets_env_specific, {})
-
-  container_port_config = [
-    {
-      containerPort = var.delius_microservice_configs.weblogic_eis.container_port
-      protocol      = "tcp"
-    }
-  ]
+  ecs_cluster_arn = module.ecs.ecs_cluster_arn
 
   cluster_security_group_id = aws_security_group.cluster.id
 
-  alb_security_group_id      = aws_security_group.delius_frontend_alb_security_group.id
-  alb_listener_rule_paths    = ["/eis"]
-  alb_listener_rule_priority = 40
+  alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   alb_health_check = {
     path                 = "/NDelius-war/delius/javax.faces.resource/health/healthcheck.json"
     healthy_threshold    = 5
@@ -61,7 +32,8 @@ module "weblogic_eis" {
     grace_period_seconds = 300
   }
 
-  certificate_arn = aws_acm_certificate.external.arn
+  certificate_arn               = aws_acm_certificate.external.arn
+  target_group_protocol_version = "HTTP1"
 
   db_ingress_security_groups = []
 
@@ -96,37 +68,6 @@ module "weblogic_eis" {
 
   platform_vars = var.platform_vars
   tags          = var.tags
-}
-
-
-#######################
-# Weblogic EIS Params #
-#######################
-
-resource "aws_ssm_parameter" "weblogic_eis_google_analytics_id" {
-  name  = "/${var.env_name}/delius/monitoring/analytics/google_id"
-  type  = "String"
-  value = "DEFAULT"
-  lifecycle {
-    ignore_changes = [value]
-  }
-}
-
-data "aws_ssm_parameter" "weblogic_eis_google_analytics_id" {
-  name = aws_ssm_parameter.weblogic_eis_google_analytics_id.name
-}
-
-resource "aws_ssm_parameter" "usermanagement_secret" {
-  name  = "/${var.env_name}/delius/umt/umt/delius_secret"
-  type  = "SecureString"
-  value = "DEFAULT"
-  lifecycle {
-    ignore_changes = [value]
-  }
-}
-
-data "aws_ssm_parameter" "usermanagement_secret" {
-  name = aws_ssm_parameter.usermanagement_secret.name
 }
 
 resource "aws_launch_template" "weblogic_eis" {
@@ -186,4 +127,57 @@ resource "aws_ecs_capacity_provider" "weblogic_eis" {
 
     managed_termination_protection = "ENABLED"
   }
+}
+
+resource "aws_lb_listener_rule" "blocked_paths_listener_rule_weblogic_eis" {
+  listener_arn = aws_lb_listener.listener_https.arn
+  priority     = 21 # must be before ndelius_allowed_paths_rule
+  condition {
+    host_header {
+      values = [
+        "interface.${var.env_name}.${var.account_config.dns_suffix}",
+        "interface.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
+      ]
+    }
+  }
+  condition {
+    path_pattern {
+      values = [
+        "/NDelius*/delius/a4j/g/3_3_3.Final*DATA*", # mitigates CVE-2018-12533
+      ]
+    }
+  }
+  action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      status_code  = "404"
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_eis" {
+  listener_arn = aws_lb_listener.listener_https.arn
+  priority     = 31
+  condition {
+    host_header {
+      values = [
+        "interface.${var.env_name}.${var.account_config.dns_suffix}",
+        "interface.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
+      ]
+    }
+  }
+  condition {
+    path_pattern {
+      values = [
+        "/NDelius*",
+        "/jspellhtml/*"
+      ]
+    }
+  }
+  action {
+    type             = "forward"
+    target_group_arn = module.weblogic_eis.target_group_arn
+  }
+  depends_on = [aws_lb_listener_rule.blocked_paths_listener_rule]
 }

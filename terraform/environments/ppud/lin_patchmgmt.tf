@@ -1,7 +1,8 @@
-# Create Patch Group
-# PROD LINUX
-# Linux instances only exist in production but using the local.environment variable allows
-# for future linux instances to be added into dev and uat with their own patch groups
+################################################################################################
+# LINUX SSM Patch Management Groups, Baselines, Maintenance Windows and Maintenance Window Tasks
+################################################################################################
+
+# SSM Patch Groups - Production
 
 resource "aws_ssm_patch_group" "lin_patch_group" {
   count       = local.is-production == true ? 1 : 0
@@ -9,7 +10,7 @@ resource "aws_ssm_patch_group" "lin_patch_group" {
   patch_group = local.application_data.accounts[local.environment].lin_patch_group
 }
 
-# Create Linux Patch Baseline
+# Amazon Linux 2 Patch Baseline
 
 resource "aws_ssm_patch_baseline" "linux_os_baseline" {
   count            = local.is-production == true ? 1 : 0
@@ -96,7 +97,12 @@ resource "aws_ssm_maintenance_window_task" "prod_lin_patch_maintenance_window_ta
   }
 }
 
+
 # Maintenance Window Pre Health Check Task for Linux
+
+data "aws_ssm_document" "pre_patch_lin_healthcheck" {
+  name = "Pre_Patch_Linux_Health_Check_Report"
+}
 
 resource "aws_ssm_maintenance_window_task" "pre_lin_healthcheck_maintenance_window_task" {
   count            = local.is-production == true ? 1 : 0
@@ -104,7 +110,7 @@ resource "aws_ssm_maintenance_window_task" "pre_lin_healthcheck_maintenance_wind
   name             = "Pre-Health-Check-Report-Instance-Patch"
   description      = "Export Health Check Report to S3"
   task_type        = "RUN_COMMAND"
-  task_arn         = aws_ssm_document.linux_health_check_s3[0].arn
+  task_arn         = data.aws_ssm_document.pre_patch_lin_healthcheck.arn
   priority         = local.application_data.accounts[local.environment].pre_healthcheck_Priority
   service_role_arn = aws_iam_role.patching_role.arn
   max_concurrency  = "100%"
@@ -117,14 +123,16 @@ resource "aws_ssm_maintenance_window_task" "pre_lin_healthcheck_maintenance_wind
 
   task_invocation_parameters {
     run_command_parameters {
-      output_s3_bucket     = local.application_data.accounts[local.environment].ssm_health_check_reports_s3
-      output_s3_key_prefix = "health-check-reports/linux/"
-      timeout_seconds      = 600
+      timeout_seconds = 600
     }
   }
 }
 
 # Maintenance Window Post Health Check Task for Linux
+
+data "aws_ssm_document" "post_patch_lin_healthcheck" {
+  name = "Post_Patch_Linux_Health_Check_Report"
+}
 
 resource "aws_ssm_maintenance_window_task" "post_lin_healthcheck_maintenance_window_task" {
   count            = local.is-production == true ? 1 : 0
@@ -132,7 +140,7 @@ resource "aws_ssm_maintenance_window_task" "post_lin_healthcheck_maintenance_win
   name             = "Post-Health-Check-Report-Instance-Patch"
   description      = "Export Health Check Report to S3"
   task_type        = "RUN_COMMAND"
-  task_arn         = aws_ssm_document.linux_health_check_s3[0].arn
+  task_arn         = data.aws_ssm_document.post_patch_lin_healthcheck.arn
   priority         = local.application_data.accounts[local.environment].post_healthcheck_Priority
   service_role_arn = aws_iam_role.patching_role.arn
   max_concurrency  = "100%"
@@ -145,32 +153,7 @@ resource "aws_ssm_maintenance_window_task" "post_lin_healthcheck_maintenance_win
 
   task_invocation_parameters {
     run_command_parameters {
-      output_s3_bucket     = local.application_data.accounts[local.environment].ssm_health_check_reports_s3
-      output_s3_key_prefix = "health-check-reports/linux/"
-      timeout_seconds      = 600
+      timeout_seconds = 600
     }
   }
-}
-
-# Create perform_healthcheck_S3 document
-
-resource "aws_ssm_document" "linux_health_check_s3" {
-  count         = local.is-production == true ? 1 : 0
-  name          = "linux_health_check"
-  document_type = "Command"
-  content = jsonencode(
-    {
-      "schemaVersion" = "2.2",
-      "description"   = "Execute Shell Command",
-      "mainSteps" = [
-        {
-          "action" = "aws:runShellScript",
-          "name"   = "linux_health_check",
-          "inputs" = {
-            "runCommand" = ["/usr/local/bin/Linux_Health_Check.sh"]
-          }
-        }
-      ]
-    }
-  )
 }

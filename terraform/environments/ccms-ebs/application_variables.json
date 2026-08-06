@@ -22,7 +22,7 @@
       "ec2_instance_type_ftp": "c5d.large",
       "ftp_ami_id": "ami-0841b1152f02fa85e",
       "ec2_instance_type_clamav": "c5d.large",
-      "clamav_ami_id": "ami-0965b5afb3ac7174e",
+      "clamav_ami_id": "ami-0971f6afca696ace6",
       "ebsdb_ami_id": "ami-0df5f31cae1c86635",
       "ebsapps_ami_id-1": "ami-0d4b266f7ae87bbfc",
       "ebsapps_ami_id-2": "ami-0d4b266f7ae87bbfc",
@@ -35,8 +35,6 @@
       "orace_db_ami_name": "Oracle79-prereqs-v1_8",
       "webgate_ami_name": "ebs-webgate-v2_0",
       "accessgate_ami_name": "ebs-accessgate-v2_0",
-      "ec2_instance_type_mailrelay": "c4.large",
-      "mailrelay_ami_id": "ami-0e183a740dfc54442",
       "key_name": "oracle-base-dev",
       "lz_aws_account_id_env": "411213865113",
       "lz_aws_subnet_env": "10.202.0.0/20",
@@ -56,6 +54,7 @@
       "lz_domain_name": "*.dev.legalservices.gov.uk",
       "ebs_new_url": "https://ccmsebs.laa-development.modernisation-platform.service.justice.gov.uk/OA_HTML/AppsLocalLogin.jsp",
       "mp_aws_subnet_env": "10.200.0.0/20",
+      "mp_v1_workspaces_cidr": "10.26.130.0/24",
       "ebs_default_iops": 12000,
       "webgate_no_instances": 2,
       "webgate_default_iops": 3000,
@@ -103,7 +102,6 @@
       "instance_role_ebsapps": "apps",
       "instance_role_ebsdb": "db",
       "instance_role_ftp": "ftp",
-      "instance_role_mailrelay": "mailrelay",
       "instance_role_webgate": "webgate",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
       "s3_lifecycle_days_expiration_current": 730,
@@ -136,14 +134,21 @@
       "ec2_disk_size_ssogen_mserver": 50,
       "ec2_disk_size_ssogen_temp": 20,
       "instance_role_ssogen": "ssogen",
-      "red_button_lambda_boom": false,
-      "red_button_lambda_debug": true,
       "oem": {
         "agent_port": "3872",
         "oms_port": "4903",
         "oms_host": "laa-oem-app.laa-development.modernisation-platform.service.justice.gov.uk",
         "oms_platform_cidr": "10.26.60.231/32",
         "oem_db_platform_cidr": "10.26.60.169/32"
+      },
+      "lambda": {
+        "cloudwatch-slack-integration-v2": {
+          "debug": false
+        },
+        "red-button": {
+          "boom": false,
+          "debug": true
+        }
       }
     },
     "test": {
@@ -167,7 +172,7 @@
       "ec2_instance_type_ftp": "c5d.large",
       "ftp_ami_id": "ami-0841b1152f02fa85e",
       "ec2_instance_type_clamav": "c5d.large",
-      "clamav_ami_id": "ami-03e88be9ecff64781",
+      "clamav_ami_id": "ami-0971f6afca696ace6",
       "ebsdb_ami_id": "ami-00f388bac07735df0",
       "ebsapps_ami_id-1": "ami-00f388bac07735df0",
       "ebsapps_ami_id-2": "ami-00f388bac07735df0",
@@ -179,8 +184,6 @@
       "orace_db_ami_name": "Oracle79-prereqs-v1_7",
       "webgate_ami_name": "ebs-webgate-v1_2",
       "accessgate_ami_name": "ebs-accessgate-v1_2",
-      "ec2_instance_type_mailrelay": "c4.large",
-      "mailrelay_ami_id": "ami-0a242269c4b530c5e",
       "key_name": "",
       "lz_aws_account_id_env": "140455166311",
       "lz_aws_subnet_env": "10.204.0.0/14",
@@ -245,7 +248,6 @@
       "instance_role_ebsapps": "apps",
       "instance_role_ebsdb": "db",
       "instance_role_ftp": "ftp",
-      "instance_role_mailrelay": "mailrelay",
       "instance_role_webgate": "webgate",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
       "s3_lifecycle_days_expiration_current": 730,
@@ -278,14 +280,21 @@
       "ec2_disk_size_ssogen_mserver": 50,
       "ec2_disk_size_ssogen_temp": 20,
       "instance_role_ssogen": "ssogen",
-      "red_button_lambda_boom": false,
-      "red_button_lambda_debug": true,
       "oem": {
         "agent_port": "3872",
         "oms_port": "4903",
         "oms_host": "laa-oem-app.laa-test.modernisation-platform.service.justice.gov.uk",
         "oms_platform_cidr": "10.26.100.179/32",
         "oem_db_platform_cidr": "10.26.100.249/32"
+      },
+      "lambda": {
+        "cloudwatch-slack-integration-v2": {
+          "debug": false
+        },
+        "red-button": {
+          "boom": false,
+          "debug": true
+        }
       }
     },
     "preproduction": {
@@ -309,7 +318,7 @@
       "ec2_instance_type_ftp": "c5d.large",
       "ftp_ami_id": "ami-0841b1152f02fa85e",
       "ec2_instance_type_clamav": "c5d.large",
-      "clamav_ami_id": "ami-03e88be9ecff64781",
+      "clamav_ami_id": "ami-0971f6afca696ace6",
       "ebsdb_ami_id": "ami-04631d406fcf89620",
       "ebsapps_ami_id-1": "ami-04631d406fcf89620",
       "ebsapps_ami_id-2": "ami-04631d406fcf89620",
@@ -321,8 +330,6 @@
       "orace_db_ami_name": "Oracle79-prereqs-v1_8",
       "webgate_ami_name": "ebs-webgate-v1_3",
       "accessgate_ami_name": "ebs-accessgate-v1_3",
-      "ec2_instance_type_mailrelay": "c4.large",
-      "mailrelay_ami_id": "ami-0a242269c4b530c5e",
       "key_name": "",
       "lz_aws_account_id_env": "484221692666",
       "lz_aws_subnet_env": "10.204.0.0/20",
@@ -387,7 +394,6 @@
       "instance_role_ebsapps": "apps",
       "instance_role_ebsdb": "db",
       "instance_role_ftp": "ftp",
-      "instance_role_mailrelay": "mailrelay",
       "instance_role_webgate": "webgate",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
       "s3_lifecycle_days_expiration_current": 730,
@@ -412,14 +418,21 @@
       "ec2_oracle_instance_cores_ssogen": 2,
       "ec2_oracle_instance_threads_ssogen": 1,
       "instance_role_ssogen": "ssogen",
-      "red_button_lambda_boom": false,
-      "red_button_lambda_debug": true,
       "oem": {
         "agent_port": "3872",
         "oms_port": "4903",
         "oms_host": "laa-oem-app.laa-preproduction.modernisation-platform.service.justice.gov.uk",
         "oms_platform_cidr": "10.27.76.154/32",
         "oem_db_platform_cidr": "10.27.76.135/32"
+      },
+      "lambda": {
+        "cloudwatch-slack-integration-v2": {
+          "debug": false
+        },
+        "red-button": {
+          "boom": false,
+          "debug": true
+        }
       }
     },
     "production": {
@@ -455,8 +468,6 @@
       "orace_db_ami_name": "Oracle79-prereqs-v1_8",
       "webgate_ami_name": "ebs-webgate-v1_3",
       "accessgate_ami_name": "ebs-accessgate-v1_3",
-      "ec2_instance_type_mailrelay": "c4.large",
-      "mailrelay_ami_id": "ami-0a242269c4b530c5e",
       "key_name": "",
       "lz_aws_account_id_env": "842522700642",
       "lz_aws_subnet_env": "10.205.0.0/20",
@@ -523,7 +534,6 @@
       "instance_role_ebsapps": "apps",
       "instance_role_ebsdb": "db",
       "instance_role_ftp": "ftp",
-      "instance_role_mailrelay": "mailrelay",
       "instance_role_webgate": "webgate",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
       "s3_lifecycle_days_expiration_current": 730,
@@ -548,14 +558,21 @@
       "ec2_oracle_instance_cores_ssogen": 2,
       "ec2_oracle_instance_threads_ssogen": 1,
       "instance_role_ssogen": "ssogen",
-      "red_button_lambda_boom": false,
-      "red_button_lambda_debug": true,
       "oem": {
         "agent_port": "3872",
         "oms_port": "4903",
         "oms_host": "laa-oem-app.laa-production.modernisation-platform.service.justice.gov.uk",
         "oms_platform_cidr": "10.27.68.228/32",
         "oem_db_platform_cidr": "10.27.68.193/32"
+      },
+      "lambda": {
+        "cloudwatch-slack-integration-v2": {
+          "debug": false
+        },
+        "red-button": {
+          "boom": false,
+          "debug": true
+        }
       }
     }
   },

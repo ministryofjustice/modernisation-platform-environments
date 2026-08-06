@@ -74,6 +74,28 @@ def get_log_fields(operation):
     }
 
 
+def get_copy_extra_args(operation):
+    head_object_kwargs = {
+        "Bucket": operation["source_bucket_name"],
+        "Key": operation["source_key"],
+    }
+
+    if operation["source_version_id"]:
+        head_object_kwargs["VersionId"] = operation["source_version_id"]
+
+    source_object = s3.head_object(**head_object_kwargs)
+    extra_args = {
+        "MetadataDirective": "REPLACE",
+        "Metadata": source_object.get("Metadata", {}),
+        "TaggingDirective": "COPY",
+    }
+
+    if source_object.get("ContentType"):
+        extra_args["ContentType"] = source_object["ContentType"]
+
+    return extra_args
+
+
 def get_s3_test_event_log_fields(record):
     return {
         "event_name": record.get("Event"),
@@ -103,10 +125,7 @@ def process_record(*, operation):
         CopySource=copy_source,
         Bucket=operation["destination_bucket_name"],
         Key=operation["source_key"],
-        ExtraArgs={
-            "MetadataDirective": "COPY",
-            "TaggingDirective": "COPY",
-        },
+        ExtraArgs=get_copy_extra_args(operation),
     )
 
     if operation["source_version_id"]:

@@ -176,7 +176,7 @@ A user exists as **two** linked things: a record in the users DynamoDB table (wh
 
    - `identity_provider_key` → `secrets` (authenticate against Secrets Manager)
    - `ipv4_allow_list` → `local.custom_idp_configuration.ingress_cidr_blocks` (the shared ingress allow-list)
-  - `home_directory_target` → `<username>` (the user's own prefix in the `unscanned` bucket)
+- `home_directory_target` → `<username>` (the user's own prefix in the `unscanned` bucket)
 
    To override any of them, give the user an object instead of `{}`:
 

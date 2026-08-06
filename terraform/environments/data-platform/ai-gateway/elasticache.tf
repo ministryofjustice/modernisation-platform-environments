@@ -28,8 +28,8 @@ module "ai_gateway_elasticache" {
   security_group_description     = "Security group for AI Gateway Valkey"
   security_group_rules = {
     ingress_valkey = {
-      description = "Allow Valkey access from EKS pods"
-      cidr_ipv4   = data.aws_vpc.eks.cidr_block
+      description                  = "Allow Valkey access from EKS pods"
+      referenced_security_group_id = data.aws_eks_cluster.cluster.vpc_config[0].cluster_security_group_id
     }
   }
 

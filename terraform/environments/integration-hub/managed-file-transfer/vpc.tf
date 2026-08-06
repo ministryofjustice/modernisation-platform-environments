@@ -22,3 +22,10 @@ module "isolated_vpc" {
 
   tags = local.tags
 }
+
+resource "aws_eip" "this" {
+  count  = length(module.isolated_vpc.public_subnets)
+  domain = "vpc"
+
+  depends_on = [aws_acm_certificate.ftps]
+}

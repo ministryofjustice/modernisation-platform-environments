@@ -26,6 +26,11 @@ variable "egress_bucket_kms_key" {
   type = string
 }
 
+variable "egress_folder_path" {
+  type    = string
+  default = null
+}
+
 variable "supplier_data_kms_key" {
   type = string
 }

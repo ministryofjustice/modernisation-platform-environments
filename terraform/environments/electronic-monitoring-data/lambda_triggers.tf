@@ -372,11 +372,11 @@ resource "aws_lambda_event_source_mapping" "p1_creation_trigger" {
 
 
 #-----------------------------------------------------------------------------------
-# Schedule merge load lambda - dev, test and preprod (dual running)
+# Schedule merge load lambda
 #-----------------------------------------------------------------------------------
 
 resource "aws_cloudwatch_event_rule" "merge_load_schedule" {
-  count               = local.is-production ? 0 : 1
+  count               = 1
   name                = "merge_load_schedule"
   description         = "Runs merge_load Lambdas for MDSS tables on a schedule"
   schedule_expression = "rate(3 minutes)"
@@ -384,13 +384,13 @@ resource "aws_cloudwatch_event_rule" "merge_load_schedule" {
 
 # target mdss_staged_event
 resource "aws_cloudwatch_event_target" "merge_mdss_staged_event" {
-  count = local.is-production ? 0 : 1
+  count = 1
   rule  = aws_cloudwatch_event_rule.merge_load_schedule[0].name
   arn   = module.merge_mdss_staged_event[0].lambda_function_arn
 }
 
 resource "aws_lambda_permission" "allow_eventbridge_merge_mdss_staged_event" {
-  count         = local.is-production ? 0 : 1
+  count         = 1
   statement_id  = "AllowExecutionFromEventBridgeStagedMdssStaged"
   action        = "lambda:InvokeFunction"
   function_name = module.merge_mdss_staged_event[0].lambda_function_name
@@ -400,13 +400,13 @@ resource "aws_lambda_permission" "allow_eventbridge_merge_mdss_staged_event" {
 
 # target mdss_staged_position
 resource "aws_cloudwatch_event_target" "merge_mdss_staged_position" {
-  count = local.is-production ? 0 : 1
+  count = 1
   rule  = aws_cloudwatch_event_rule.merge_load_schedule[0].name
   arn   = module.merge_mdss_staged_position[0].lambda_function_arn
 }
 
 resource "aws_lambda_permission" "allow_eventbridge_merge_mdss_staged_position" {
-  count         = local.is-production ? 0 : 1
+  count         = 1
   statement_id  = "AllowExecutionFromEventBridgeStagedMdssStaged"
   action        = "lambda:InvokeFunction"
   function_name = module.merge_mdss_staged_position[0].lambda_function_name
@@ -416,7 +416,7 @@ resource "aws_lambda_permission" "allow_eventbridge_merge_mdss_staged_position" 
 
 # target merge_ac_position
 resource "aws_cloudwatch_event_target" "merge_ac_position" {
-  count = local.is-production ? 0 : 1
+  count = 1
   rule  = aws_cloudwatch_event_rule.merge_load_schedule[0].name
   arn   = module.merge_ac_position[0].lambda_function_arn
 }
@@ -426,6 +426,22 @@ resource "aws_lambda_permission" "allow_eventbridge_acquisitive_crime_position" 
   statement_id  = "AllowExecutionFromEventBridgeAcquisitiveCrimePosition"
   action        = "lambda:InvokeFunction"
   function_name = module.merge_ac_position[0].lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.merge_load_schedule[0].arn
+}
+
+# target merge_emdi_position
+resource "aws_cloudwatch_event_target" "merge_emdi_position" {
+  count = 1
+  rule  = aws_cloudwatch_event_rule.merge_load_schedule[0].name
+  arn   = module.merge_emdi_position[0].lambda_function_arn
+}
+
+resource "aws_lambda_permission" "allow_eventbridge_emdi_position" {
+  count         = 1
+  statement_id  = "AllowExecutionFromEventBridgeEmdiPosition"
+  action        = "lambda:InvokeFunction"
+  function_name = module.merge_emdi_position[0].lambda_function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.merge_load_schedule[0].arn
 }
@@ -441,4 +457,59 @@ resource "aws_lambda_permission" "update_p1_export_api_gw" {
   function_name = module.update_p1_export[0].lambda_function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*/*"
+}
+
+# ------------------------------------------------------------------------------
+# Live-feed incident event queue
+# ------------------------------------------------------------------------------
+
+resource "aws_sqs_queue" "live_feed_incident_events_dlq" {
+  name = "live-feed-incident-events-dlq"
+
+  message_retention_seconds = 1209600
+  sqs_managed_sse_enabled   = true
+}
+
+resource "aws_sqs_queue" "live_feed_incident_events" {
+  name = "live-feed-incident-events"
+
+  visibility_timeout_seconds = 365
+  message_retention_seconds  = 1209600
+  sqs_managed_sse_enabled    = true
+
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.live_feed_incident_events_dlq.arn
+    maxReceiveCount     = 5
+  })
+}
+
+resource "aws_sqs_queue_redrive_allow_policy" "live_feed_incident_events" {
+  queue_url = aws_sqs_queue.live_feed_incident_events_dlq.id
+
+  redrive_allow_policy = jsonencode({
+    redrivePermission = "byQueue"
+    sourceQueueArns = [
+      aws_sqs_queue.live_feed_incident_events.arn,
+    ]
+  })
+}
+
+resource "aws_lambda_event_source_mapping" "live_feed_incident_events" {
+  event_source_arn = aws_sqs_queue.live_feed_incident_events.arn
+  function_name    = module.live_feed_incident_manager.lambda_function_name
+
+  batch_size                         = 10
+  maximum_batching_window_in_seconds = 5
+
+  function_response_types = [
+    "ReportBatchItemFailures",
+  ]
+
+  scaling_config {
+    maximum_concurrency = 2
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.live_feed_incident_manager_attach,
+  ]
 }

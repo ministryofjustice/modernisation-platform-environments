@@ -62,6 +62,39 @@ variable "waf_IP_rules_cf" {
   default = {}
 }
 
+variable "waf_header_allow_rules" {
+  description = "A map of allow rules for regional WAF (evaluated before managed rule groups). A request matches when its URI path is exactly one of `paths` AND it carries the header named waf_header_allow_header_name with value waf_header_allow_header_value."
+  type = map(object({
+    name     = string
+    priority = number
+    paths    = list(string)
+  }))
+  default = {}
+}
+
+variable "waf_header_allow_rules_cf" {
+  description = "Same as waf_header_allow_rules, for the CloudFront-scoped WAF."
+  type = map(object({
+    name     = string
+    priority = number
+    paths    = list(string)
+  }))
+  default = {}
+}
+
+variable "waf_header_allow_header_name" {
+  description = "Header name checked by waf_header_allow_rules / waf_header_allow_rules_cf"
+  type        = string
+  default     = "X-Internal-Service"
+}
+
+variable "waf_header_allow_header_value" {
+  description = "Expected header value (shared secret) for waf_header_allow_rules / waf_header_allow_rules_cf. Pass this in from a Secrets Manager lookup -- never hardcode it here or in a .tfvars file."
+  type        = string
+  sensitive   = true
+  default     = null
+}
+
 variable "waf_geoIP_rules" {
   description = "A list of GeoIP rules to add to the waf"
   type = list(object({

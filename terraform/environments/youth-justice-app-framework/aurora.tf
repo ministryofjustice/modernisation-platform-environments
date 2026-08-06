@@ -51,6 +51,8 @@ module "aurora" {
   kms_key_arn = module.kms.key_arn
   kms_key_id  = module.kms.key_id
 
+  proxy_secret_arn = aws_secretsmanager_secret.proxy_account.arn
+
   iam_roles = {
     rds_export_to_s3_role = {
       role_arn     = aws_iam_role.rds_export_to_s3_role.arn

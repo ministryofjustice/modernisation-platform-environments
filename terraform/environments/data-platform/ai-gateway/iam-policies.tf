@@ -20,7 +20,7 @@ data "aws_iam_policy_document" "ai_gateway" {
     sid       = "BedrockFoundationModelAccess"
     effect    = "Allow"
     actions   = ["bedrock:InvokeModel*"]
-    resources = ["arn:aws:bedrock:*::foundation-model/*"]
+    resources = ["arn:aws:bedrock:eu-*::foundation-model/*"]
   }
 
   statement {
@@ -40,6 +40,26 @@ data "aws_iam_policy_document" "ai_gateway" {
     resources = [module.ai_gateway_audit_logs_kms_key.key_arn]
   }
 
+  statement {
+    sid    = "RDSIAMConnect"
+    effect = "Allow"
+    actions = [
+      "rds-db:connect"
+    ]
+    resources = [
+      "arn:aws:rds-db:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:dbuser:*/litellm"
+    ]
+  }
+
+  # DEBUG
+  statement {
+    sid     = "AssumeOCTOEngineeringAIEnablementRole"
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    resources = [
+      "arn:aws:iam::${local.environment_management.account_ids["octo-engineering-ai-enablement-production"]}:role/ai-gateway"
+    ]
+  }
 }
 
 module "ai_gateway_iam_policy" {

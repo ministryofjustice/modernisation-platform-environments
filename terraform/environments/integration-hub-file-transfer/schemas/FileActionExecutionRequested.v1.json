@@ -1,0 +1,122 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "FileActionExecutionRequested.v1",
+  "description": "A routed object has matched a configured follow-up action. The platform has determined that a particular action should be performed and identifies both the configured actionDefinitionId and unique actionExecutionId.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "id",
+    "detail-type",
+    "source",
+    "account",
+    "time",
+    "region",
+    "detail"
+  ],
+  "properties": {
+    "version": { "type": "string", "enum": ["0"] },
+    "id": { "type": "string", "format": "uuid" },
+    "detail-type": {
+      "type": "string",
+      "enum": ["FileActionExecutionRequested.v1"]
+    },
+    "source": {
+      "type": "string",
+      "enum": ["uk.gov.justice.service.managed-file-transfer"]
+    },
+    "account": { "type": "string", "pattern": "^[0-9]{12}$" },
+    "time": { "type": "string", "format": "date-time" },
+    "region": { "type": "string" },
+    "resources": { "type": "array", "items": { "type": "string" } },
+    "replay-name": { "type": "string", "minLength": 1 },
+    "detail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metadata", "data"],
+      "properties": {
+        "metadata": { "$ref": "#/definitions/eventMetadata" },
+        "data": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "fileId",
+            "object",
+            "actionDefinitionId",
+            "actionExecutionId",
+            "requestedAt"
+          ],
+          "properties": {
+            "fileId": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Stable logical file identifier inherited from FileReceived.v1."
+            },
+            "object": { "$ref": "#/definitions/s3Object" },
+            "actionDefinitionId": { "type": "string", "minLength": 1 },
+            "actionExecutionId": { "type": "string", "format": "uuid" },
+            "requestedAt": { "type": "string", "format": "date-time" },
+            "parameters": { "type": "object" }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "eventMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["correlationId", "causationId", "idempotencyKey"],
+      "properties": {
+        "correlationId": { "type": "string", "format": "uuid" },
+        "causationId": { "type": "string", "format": "uuid" },
+        "idempotencyKey": { "type": "string", "minLength": 1 }
+      }
+    },
+    "s3Object": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A particular version of an object stored in Amazon S3.",
+      "required": ["bucket", "key", "versionId", "sizeBytes"],
+      "properties": {
+        "bucket": { "type": "string", "minLength": 3 },
+        "key": { "type": "string", "minLength": 1 },
+        "versionId": { "type": "string", "minLength": 1 },
+        "sizeBytes": { "type": "integer", "minimum": 0 }
+      }
+    }
+  },
+  "examples": [
+    {
+      "version": "0",
+      "id": "2bd32cbb-c3e2-4b62-8b53-90ea0a7a4de5",
+      "detail-type": "FileActionExecutionRequested.v1",
+      "source": "uk.gov.justice.service.managed-file-transfer",
+      "account": "123456789012",
+      "time": "2026-07-10T14:04:00Z",
+      "region": "eu-west-2",
+      "detail": {
+        "metadata": {
+          "correlationId": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
+          "causationId": "aa88e95a-159c-40c1-9e7b-38d00b0b6169",
+          "idempotencyKey": "action-request:3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501:send-to-consumer"
+        },
+        "data": {
+          "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+          "object": {
+            "bucket": "clean",
+            "key": "example/report.csv",
+            "versionId": "5Ni...",
+            "sizeBytes": 4096
+          },
+          "actionDefinitionId": "send-to-consumer",
+          "actionExecutionId": "b1d4e7c2-f073-4ed4-9565-a4c31c54bd7f",
+          "requestedAt": "2026-07-10T14:04:00Z",
+          "parameters": {
+            "endpoint": "consumer-a"
+          }
+        }
+      }
+    }
+  ]
+}

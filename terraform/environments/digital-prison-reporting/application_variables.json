@@ -46,6 +46,7 @@
       "domain_builder_rds_parameter_group": "default.postgres14",
       "enable_domain_builder_agent": false,
       "enable_cloud_trail": false,
+      "enable_bedrock": true,
       "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": true,
       "enable_dbuilder_apikey": true,
@@ -63,10 +64,6 @@
       "probation_domains": {
         "pr-test-domain": {
           "share_with_cloud_platform": false,
-          "create_glue_connection": true
-        },
-        "pr-assessment-view": {
-          "share_with_cloud_platform": true,
           "create_glue_connection": true
         },
         "pr-assess-view": {
@@ -100,7 +97,8 @@
         "dps-cvl",
         "dps-adjudications",
         "dps-acc-pro-custody",
-        "dps-manage-offences"
+        "dps-manage-offences",
+        "dps-offences"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -289,6 +287,7 @@
       "domain_builder_rds_parameter_group": "default.postgres14",
       "enable_domain_builder_agent": false,
       "enable_cloud_trail": false,
+      "enable_bedrock": false,
       "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": true,
       "enable_dbuilder_apikey": true,
@@ -304,10 +303,6 @@
       "setup_redshift_schedule": true,
       "scheduled_dataset_lambda_version": "vLatest",
       "probation_domains": {
-        "pr-assessment-view": {
-          "share_with_cloud_platform": true,
-          "create_glue_connection": true
-        },
         "pr-assess-view": {
           "share_with_cloud_platform": true,
           "create_glue_connection": true
@@ -337,7 +332,8 @@
         "dps-cvl",
         "dps-adjudications",
         "dps-acc-pro-custody",
-        "dps-manage-offences"
+        "dps-manage-offences",
+        "dps-offences"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -507,6 +503,7 @@
       "domain_builder_rds_parameter_group": "default.postgres14",
       "enable_domain_builder_agent": false,
       "enable_cloud_trail": false,
+      "enable_bedrock": false,
       "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": true,
       "enable_dbuilder_apikey": true,
@@ -524,10 +521,6 @@
       "enable_redshift_health_check": true,
       "scheduled_dataset_lambda_version": "vLatest",
       "probation_domains": {
-        "pr-assessment-view": {
-          "share_with_cloud_platform": true,
-          "create_glue_connection": true
-        },
         "pr-assess-view": {
           "share_with_cloud_platform": true,
           "create_glue_connection": true
@@ -557,7 +550,8 @@
         "dps-cvl",
         "dps-adjudications",
         "dps-acc-pro-custody",
-        "dps-manage-offences"
+        "dps-manage-offences",
+        "dps-offences"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -742,6 +736,7 @@
       "domain_builder_rds_parameter_group": "default.postgres15",
       "enable_domain_builder_agent": false,
       "enable_cloud_trail": false,
+      "enable_bedrock": false,
       "include_dbuilder_gw_vpclink": false,
       "enable_dbuilder_serverless_gw": true,
       "enable_dbuilder_apikey": true,
@@ -757,10 +752,6 @@
       "setup_redshift_schedule": false,
       "scheduled_dataset_lambda_version": "vLatest",
       "probation_domains": {
-        "pr-assessment-view": {
-          "share_with_cloud_platform": true,
-          "create_glue_connection": false
-        },
         "pr-assess-view": {
           "share_with_cloud_platform": true,
           "create_glue_connection": true
@@ -789,7 +780,9 @@
         "dps-san",
         "dps-cvl",
         "dps-adjudications",
-        "dps-acc-pro-custody"
+        "dps-acc-pro-custody",
+        "dps-manage-offences",
+        "dps-offences"
       ],
       "alarms": {
         "setup_cw_alarms": true,

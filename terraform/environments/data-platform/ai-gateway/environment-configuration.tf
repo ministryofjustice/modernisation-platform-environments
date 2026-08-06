@@ -1,17 +1,7 @@
 locals {
-  environment_configuration = local.environment_configurations[local.environment]
-  ai_gateway_models         = yamldecode(file("${path.module}/configuration/models.yml"))
-  has_reader                = contains(keys(local.environment_configuration.aurora_instances), "reader")
   environment_configurations = {
-    proxy_admin_emails = [
-      "Muhammad.Ahmad@justice.gov.uk",
-      "Jeremy.Collins@justice.gov.uk",
-      "Gary.Henderson1@justice.gov.uk",
-      "Lauren.Taylor-Brown@justice.gov.uk",
-      "Jacob.Woffenden@justice.gov.uk"
-    ]
     development = {
-      litellm_version     = "1.87.0"
+      litellm_version     = "1.95.0"
       ai_gateway_hostname = "development.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
@@ -27,9 +17,14 @@ locals {
         "35.176.93.186/32", # GlobalProtect (Alpha)
         # Sites
         "213.121.161.112/28", # 102PF
-        "51.149.2.0/24"       # 10SC
+        "51.149.2.0/24",      # 10SC
+        # GitHub Actions
+        "20.58.27.30/32" # octo-production
       ]
-      ai_gateway_models = local.ai_gateway_models
+      ai_gateway_internal_ingress_allowlist = [
+        "10.0.0.0/8",   # MOJ internal network
+        "172.20.0.0/16" # Cloud Platform
+      ]
       ai_gateway_autoscaling = {
         min_replicas                      = 1
         max_replicas                      = 3
@@ -46,7 +41,7 @@ locals {
       elasticache_node_type = "cache.t4g.medium"
     }
     test = {
-      litellm_version     = "1.87.0"
+      litellm_version     = "1.95.0"
       ai_gateway_hostname = "test.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
@@ -62,9 +57,14 @@ locals {
         "35.176.93.186/32", # GlobalProtect (Alpha)
         # Sites
         "213.121.161.112/28", # 102PF
-        "51.149.2.0/24"       # 10SC
+        "51.149.2.0/24",      # 10SC
+        # GitHub Actions
+        "20.58.27.30/32" # octo-production
       ]
-      ai_gateway_models = local.ai_gateway_models
+      ai_gateway_internal_ingress_allowlist = [
+        "10.0.0.0/8",   # MOJ internal network
+        "172.20.0.0/16" # Cloud Platform
+      ]
       ai_gateway_autoscaling = {
         min_replicas                      = 1
         max_replicas                      = 3
@@ -81,7 +81,7 @@ locals {
       elasticache_node_type = "cache.t4g.medium"
     }
     preproduction = {
-      litellm_version     = "1.87.0"
+      litellm_version     = "1.95.0"
       ai_gateway_hostname = "preproduction.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
@@ -97,9 +97,14 @@ locals {
         "35.176.93.186/32", # GlobalProtect (Alpha)
         # Sites
         "213.121.161.112/28", # 102PF
-        "51.149.2.0/24"       # 10SC
+        "51.149.2.0/24",      # 10SC
+        # GitHub Actions
+        "20.58.27.30/32" # octo-production
       ]
-      ai_gateway_models = local.ai_gateway_models
+      ai_gateway_internal_ingress_allowlist = [
+        "10.0.0.0/8",   # MOJ internal network
+        "172.20.0.0/16" # Cloud Platform
+      ]
       ai_gateway_autoscaling = {
         min_replicas                      = 1
         max_replicas                      = 3
@@ -116,7 +121,7 @@ locals {
       elasticache_node_type = "cache.t4g.medium"
     }
     production = {
-      litellm_version     = "1.87.0"
+      litellm_version     = "1.95.0"
       ai_gateway_hostname = "ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
@@ -132,9 +137,14 @@ locals {
         "35.176.93.186/32", # GlobalProtect (Alpha)
         # Sites
         "213.121.161.112/28", # 102PF
-        "51.149.2.0/24"       # 10SC
+        "51.149.2.0/24",      # 10SC
+        # GitHub Actions
+        "20.58.27.30/32" # octo-production
       ]
-      ai_gateway_models = local.ai_gateway_models
+      ai_gateway_internal_ingress_allowlist = [
+        "10.0.0.0/8",   # MOJ internal network
+        "172.20.0.0/16" # Cloud Platform
+      ]
       ai_gateway_autoscaling = {
         min_replicas                      = 2
         max_replicas                      = 10

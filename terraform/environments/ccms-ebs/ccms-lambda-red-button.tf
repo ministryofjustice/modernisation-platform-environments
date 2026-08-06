@@ -77,8 +77,8 @@ resource "aws_lambda_function" "red_button_trigger" {
   environment {
     variables = {
       S3_BUCKET_REDBUTTON = aws_s3_bucket.red_button_data.id
-      BOOM                = local.application_data.accounts[local.environment].red_button_lambda_boom
-      DEBUG               = local.application_data.accounts[local.environment].red_button_lambda_debug
+      BOOM                = local.application_data.accounts[local.environment].lambda.red-button.boom
+      DEBUG               = local.application_data.accounts[local.environment].lambda.red-button.debug
     }
   }
 
@@ -175,6 +175,32 @@ resource "aws_s3_bucket_lifecycle_configuration" "red_button_data_lifecycle" {
 
   }
 
+}
+
+data "aws_iam_policy_document" "red_button_data_secure_transport" {
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.red_button_data.arn,
+      "${aws_s3_bucket.red_button_data.arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "red_button_data_secure_transport" {
+  bucket = aws_s3_bucket.red_button_data.id
+  policy = data.aws_iam_policy_document.red_button_data_secure_transport.json
 }
 
 # Outputs

@@ -13,6 +13,11 @@ module "opensearch" {
     dedicated_master_type = var.instance_type
   }
 
+  domain_endpoint_options = {
+    enforce_https       = true
+    tls_security_policy = "Policy-Min-TLS-1-2-PFS-2023-10"
+  }
+
   advanced_security_options = {
     enabled                        = true
     internal_user_database_enabled = true

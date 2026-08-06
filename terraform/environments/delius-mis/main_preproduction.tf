@@ -46,7 +46,7 @@ module "environment_stage" {
 
   pagerduty_integration_key = local.pagerduty_integration_key
 
-  create_backup_role = false # since already created in stage
+  create_backup_role = false # since already created in stage
 
   tags = local.tags
 
