@@ -154,21 +154,22 @@ module "lambda_stage" {
   trigger_on_package_timestamp      = false
 
   environment_variables = {
-    AWS_ACCOUNT_ID             = data.aws_caller_identity.current.account_id
-    EVENT_BUS_ARN              = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
-    IDEMPOTENCY_EXPIRY_SECONDS = tostring(local.cloudwatch_retention_days * 24 * 60 * 60)
-    IDEMPOTENCY_TABLE          = module.dynamodb_adapter_idempotency.dynamodb_table_id
-    INCOMING_BUCKET_NAME       = module.s3_bucket["incoming"].s3_bucket_id
-    INCOMING_KMS_KEY_ARN       = module.kms_s3_bucket["incoming"].key_arn
-    MULTIPART_MAX_PARTS        = "1000"
-    MULTIPART_PART_SIZE_BYTES  = "1073741824"
-    MULTIPART_WORKERS          = "4"
-    POWERTOOLS_LOG_LEVEL       = "INFO"
-    POWERTOOLS_SERVICE_NAME    = "integration-hub-file-transfer-stage"
-    PROCESSING_BUCKET_NAME     = module.s3_bucket["processing"].s3_bucket_id
-    PROCESSING_KMS_KEY_ARN     = module.kms_s3_bucket["processing"].key_arn
-    RECEIPT                    = "false"
-    WORKFLOW_IDEMPOTENCY_TABLE = module.dynamodb_file_transfer_idempotency.dynamodb_table_id
+    AWS_ACCOUNT_ID               = data.aws_caller_identity.current.account_id
+    EVENT_BUS_ARN                = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
+    IDEMPOTENCY_EXPIRY_SECONDS   = tostring(local.cloudwatch_retention_days * 24 * 60 * 60)
+    IDEMPOTENCY_TABLE            = module.dynamodb_adapter_idempotency.dynamodb_table_id
+    INCOMING_BUCKET_NAME         = module.s3_bucket["incoming"].s3_bucket_id
+    INCOMING_KMS_KEY_ARN         = module.kms_s3_bucket["incoming"].key_arn
+    MULTIPART_MAX_PARTS          = "1000"
+    MULTIPART_PART_SIZE_BYTES    = "1073741824"
+    MULTIPART_WORKERS            = "4"
+    POWERTOOLS_LOG_LEVEL         = "INFO"
+    POWERTOOLS_METRICS_NAMESPACE = "IntegrationHubFileTransfer"
+    POWERTOOLS_SERVICE_NAME      = "integration-hub-file-transfer-stage"
+    PROCESSING_BUCKET_NAME       = module.s3_bucket["processing"].s3_bucket_id
+    PROCESSING_KMS_KEY_ARN       = module.kms_s3_bucket["processing"].key_arn
+    RECEIPT                      = "false"
+    WORKFLOW_IDEMPOTENCY_TABLE   = module.dynamodb_file_transfer_idempotency.dynamodb_table_id
   }
 
   attach_policy_statements = true
@@ -278,23 +279,24 @@ module "lambda_route" {
   trigger_on_package_timestamp      = false
 
   environment_variables = {
-    AWS_ACCOUNT_ID             = data.aws_caller_identity.current.account_id
-    CLEAN_BUCKET_NAME          = module.s3_bucket["clean"].s3_bucket_id
-    CLEAN_KMS_KEY_ARN          = module.kms_s3_bucket["clean"].key_arn
-    EVENT_BUS_ARN              = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
-    IDEMPOTENCY_EXPIRY_SECONDS = tostring(local.cloudwatch_retention_days * 24 * 60 * 60)
-    IDEMPOTENCY_TABLE          = module.dynamodb_adapter_idempotency.dynamodb_table_id
-    INVESTIGATION_BUCKET_NAME  = module.s3_bucket["investigation"].s3_bucket_id
-    INVESTIGATION_KMS_KEY_ARN  = module.kms_s3_bucket["investigation"].key_arn
-    MULTIPART_MAX_PARTS        = "1000"
-    MULTIPART_PART_SIZE_BYTES  = "1073741824"
-    MULTIPART_WORKERS          = "4"
-    POWERTOOLS_LOG_LEVEL       = "INFO"
-    POWERTOOLS_SERVICE_NAME    = "integration-hub-file-transfer-route"
-    PROCESSING_BUCKET_NAME     = module.s3_bucket["processing"].s3_bucket_id
-    QUARANTINE_BUCKET_NAME     = module.s3_bucket["quarantine"].s3_bucket_id
-    QUARANTINE_KMS_KEY_ARN     = module.kms_s3_bucket["quarantine"].key_arn
-    WORKFLOW_IDEMPOTENCY_TABLE = module.dynamodb_file_transfer_idempotency.dynamodb_table_id
+    AWS_ACCOUNT_ID               = data.aws_caller_identity.current.account_id
+    CLEAN_BUCKET_NAME            = module.s3_bucket["clean"].s3_bucket_id
+    CLEAN_KMS_KEY_ARN            = module.kms_s3_bucket["clean"].key_arn
+    EVENT_BUS_ARN                = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
+    IDEMPOTENCY_EXPIRY_SECONDS   = tostring(local.cloudwatch_retention_days * 24 * 60 * 60)
+    IDEMPOTENCY_TABLE            = module.dynamodb_adapter_idempotency.dynamodb_table_id
+    INVESTIGATION_BUCKET_NAME    = module.s3_bucket["investigation"].s3_bucket_id
+    INVESTIGATION_KMS_KEY_ARN    = module.kms_s3_bucket["investigation"].key_arn
+    MULTIPART_MAX_PARTS          = "1000"
+    MULTIPART_PART_SIZE_BYTES    = "1073741824"
+    MULTIPART_WORKERS            = "4"
+    POWERTOOLS_LOG_LEVEL         = "INFO"
+    POWERTOOLS_METRICS_NAMESPACE = "IntegrationHubFileTransfer"
+    POWERTOOLS_SERVICE_NAME      = "integration-hub-file-transfer-route"
+    PROCESSING_BUCKET_NAME       = module.s3_bucket["processing"].s3_bucket_id
+    QUARANTINE_BUCKET_NAME       = module.s3_bucket["quarantine"].s3_bucket_id
+    QUARANTINE_KMS_KEY_ARN       = module.kms_s3_bucket["quarantine"].key_arn
+    WORKFLOW_IDEMPOTENCY_TABLE   = module.dynamodb_file_transfer_idempotency.dynamodb_table_id
   }
 
   attach_policy_statements = true

@@ -1,7 +1,8 @@
 import os
 
 import boto3
-from aws_lambda_powertools import Logger
+from aws_lambda_powertools import Logger, Metrics
+from aws_lambda_powertools.metrics import MetricUnit
 from aws_lambda_powertools.utilities.idempotency import (
     DynamoDBPersistenceLayer,
     IdempotencyConfig,
@@ -16,6 +17,7 @@ from mft_file_mover.store import OperationStore
 
 config = Configuration.for_route()
 logger = Logger(service="integration-hub-file-transfer-route")
+metrics = Metrics(service="integration-hub-file-transfer-route")
 persistence_layer = DynamoDBPersistenceLayer(table_name=os.environ["IDEMPOTENCY_TABLE"])
 idempotency_config = IdempotencyConfig(
     event_key_jmespath="id",
@@ -40,6 +42,7 @@ service = FileMoverService(
 
 
 @logger.inject_lambda_context(clear_state=True, log_event=False)
+@metrics.log_metrics
 @idempotent(
     persistence_store=persistence_layer,
     config=idempotency_config,
@@ -48,12 +51,19 @@ service = FileMoverService(
 def lambda_handler(event, context):
     try:
         result = service.handle(event, context)
+        metrics.add_metric(name="OperationCompleted", unit=MetricUnit.Count, value=1)
+        metrics.add_metric(
+            name="BytesTransferred",
+            unit=MetricUnit.Bytes,
+            value=event["detail"]["data"]["object"]["sizeBytes"],
+        )
         logger.info(
             "ROUTE operation handled",
             extra={"source_event_id": event.get("id"), **result},
         )
         return result
     except Exception:
+        metrics.add_metric(name="OperationFailed", unit=MetricUnit.Count, value=1)
         logger.exception(
             "ROUTE operation failed",
             extra={"source_event_id": event.get("id")},
