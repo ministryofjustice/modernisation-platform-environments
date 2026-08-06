@@ -1,9 +1,7 @@
-/*
-
 # Clone of PROD App1 server for Weblogic build: CDI-388
 resource "aws_instance" "tariff_app_prod_clone" {
   count = local.environment == "production" ? 1 : 0
-  ami   = "ami-???" # tbc <------------ UPDATE THIS!
+  ami   = "ami-072bac695fba3a78d" # (ec2-cica-tariff-production-app-clone-20260731)
   lifecycle {
     ignore_changes = [user_data] # ami removed to allow restore
   }
@@ -15,8 +13,8 @@ resource "aws_instance" "tariff_app_prod_clone" {
   key_name               = aws_key_pair.key_pair_app.key_name
   monitoring             = true
   subnet_id              = data.aws_subnet.private_subnets_a.id
-  #vpc_security_group_ids = [module.tariff_app_security_group[0].security_group_id]
-  vpc_security_group_ids = [aws_security_group.temp_prod_ssm_only[0].id] # TEMPORARY ASSIGNMENT FOR NO NETWORK (except SSM)
+  vpc_security_group_ids = [module.tariff_app_prod_security_group[0].security_group_id]
+  #vpc_security_group_ids = [aws_security_group.temp_prod_ssm_only[0].id] # TEMPORARY ASSIGNMENT FOR NO NETWORK (except SSM)
 
   # private_ip = ""
 
@@ -26,8 +24,8 @@ resource "aws_instance" "tariff_app_prod_clone" {
     }), local.tags, local.environment != "test" ? tomap({ "backup" = "true" }) : tomap({})
   )
 }
-
 # Temporary SG to restrict access to/from Clone above during configuration phase
+/*
 resource "aws_security_group" "temp_prod_ssm_only" {
   count       = local.environment == "production" ? 1 : 0
   name        = "temp-ssm-only"
@@ -52,5 +50,4 @@ resource "aws_security_group_rule" "temp_prod_ssm_only_egress" {
   protocol                 = "TCP"
   source_security_group_id = data.aws_security_group.core_vpc_protected.id
 }
-
 */
