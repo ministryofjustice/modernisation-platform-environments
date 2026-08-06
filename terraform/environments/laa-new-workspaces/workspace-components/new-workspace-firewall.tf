@@ -127,7 +127,8 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
           "skyapi.live.net",
           "snapi.live.net",
           ".livefilestore.com",
-          ".storage.msn.com"
+          ".storage.msn.com",
+          ".onecdn.static.microsoft"
         ]
       }
     }
