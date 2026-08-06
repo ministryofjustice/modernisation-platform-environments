@@ -2888,7 +2888,7 @@ data "aws_iam_policy_document" "live_feed_incident_manager_policy_document" {
     ]
 
     resources = [
-      "arn:aws:s3:::${local.alarm_thread_state_bucket}/incident-automation/episodes/${local.environment_shorthand}/*"
+      "${module.s3-logging-bucket.bucket.arn}/incident-automation/episodes/${local.environment_shorthand}/*"
     ]
   }
 }
