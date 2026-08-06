@@ -8,6 +8,7 @@ locals {
     legacy_dns_ip_addrs                    = ["10.160.17.254", "10.160.22.121"]
     legacy_resolver_ip_addrs               = ["10.160.16.135", "10.160.23.111", "10.160.27.249"]
     legacy_nextcloud_efs_dns_name          = "fs-8a54e77b.efs.eu-west-2.amazonaws.com"
+    legacy_nextcloud_efs_id                = "fs-8a54e77b"
     ad_domain_name                         = "delius-mis-prod.internal"
     ad_trust_domain_name                   = "azure.hmpp.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
@@ -30,27 +31,20 @@ locals {
     extra_user_data_content = "yum install -y openldap-clients"
   }
 
-  boe_efs_config_production = null
-
-  # boe_efs_config_production = {
-  #   availability_zone_name = "eu-west-2a"
-  #   mount_targets_subnet_ids = {
-  #     single-az = data.aws_subnets.shared-private-a.ids[0]
-  #   }
-  #   # For multi-az, use:
-  #   # availability_zone_name = null
-  #   # mount_targets_subnet_ids = {
-  #   #   multi-az-a = data.aws_subnets.shared-private-a.ids[0]
-  #   #   multi-az-b = data.aws_subnets.shared-private-b.ids[0]
-  #   #   multi-az-c = data.aws_subnets.shared-private-c.ids[0]
-  #   # }
-  # }
+  boe_efs_config_production = {
+    availability_zone_name = null
+    mount_targets_subnet_ids = {
+      multi-az-a = data.aws_subnets.shared-private-a.ids[0]
+      multi-az-b = data.aws_subnets.shared-private-b.ids[0]
+      multi-az-c = data.aws_subnets.shared-private-c.ids[0]
+    }
+  }
 
   bcs_config_production = {
-    instance_count = 0
+    instance_count = 2
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
     ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
-    ansible_branch = "TM-2058/delius-mis/preprod-config"
+    ansible_branch = "PLAT-54/delius-mis/prod-build-v1"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 150, type = "gp3" } # 100GB would be OK
       "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }
@@ -78,10 +72,10 @@ locals {
   }
 
   bps_config_production = {
-    instance_count = 0
+    instance_count = 4
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
     ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
-    ansible_branch = "TM-2058/delius-mis/preprod-config"
+    ansible_branch = "PLAT-54/delius-mis/prod-build-v1"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100, type = "gp3" }
       "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }

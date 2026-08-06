@@ -69,6 +69,18 @@ module "external_dns" {
       aws_zone_cache_duration = local.aws_zone_cache_duration.production
       log_level               = "info"
     }
+    container-platform-cd-nonlive = {
+      domain_name_prefix      = "cd-nonlive"
+      sync_interval           = local.sync_interval.production
+      aws_zone_cache_duration = local.aws_zone_cache_duration.production
+      log_level               = "info"
+    }
+    container-platform-cd-live = {
+      domain_name_prefix      = "cd-live"
+      sync_interval           = local.sync_interval.production
+      aws_zone_cache_duration = local.aws_zone_cache_duration.production
+      log_level               = "info"
+    }
   }
   tags = {
     application   = "External DNS"
