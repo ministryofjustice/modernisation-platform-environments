@@ -200,7 +200,9 @@ resource "aws_networkfirewall_rule_group" "workspaces_microsoft_services" {
           ".activity.windows.com",
           # ".cortana.ai",
           "admin.microsoft.com",
-          "cdn.uci.officeapps.live.com"
+          "cdn.uci.officeapps.live.com",
+          "account.live.com",
+          "login.live.com"
 
         ]
       }
@@ -353,7 +355,8 @@ resource "aws_networkfirewall_firewall_policy" "workspaces_web_allowlist" {
   firewall_policy {
     stateless_default_actions          = ["aws:forward_to_sfe"]
     stateless_fragment_default_actions = ["aws:forward_to_sfe"]
-    stateful_default_actions           = ["aws:alert_strict", "aws:drop_established"]
+    # stateful_default_actions           = ["aws:alert_strict", "aws:drop_established"]
+    stateful_default_actions           = ["aws:alert_strict", "aws:none"] # Temp to allow traffic for testing
 
     stateful_engine_options {
       rule_order = "STRICT_ORDER"
