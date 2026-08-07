@@ -31,12 +31,6 @@ variable "argocd_idc_region" {
   description = "Region of the IAM Identity Center instance."
 }
 
-variable "argocd_admin_group_id" {
-  type        = string
-  default     = ""
-  description = "IAM Identity Center Group ID for the platform-engineer-admin SSO group. Grants ADMIN role in Argo CD. For BU team access (EDITOR/VIEWER), add groups to argocd_rbac_role_mappings."
-}
-
 variable "argocd_rbac_role_mappings" {
   type = map(list(object({
     id   = string
