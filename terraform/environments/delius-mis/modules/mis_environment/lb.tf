@@ -15,6 +15,7 @@ locals {
   bws_enabled    = var.lb_config != null && var.bws_config != null && var.bws_config.instance_count > 0
   bws_fqdn       = "${var.env_name}.${var.account_config.dns_suffix}"
   bws_admin_fqdn = "admin.${var.env_name}.${var.account_config.dns_suffix}"
+  bws_fqdn_alias = var.bws_config != null ? lookup(var.bws_config, "fqdn", null) : null
 
   bws_sso_enabled = var.lb_config != null && var.bws_sso_config != null && var.bws_sso_config.instance_count > 0
   bws_sso_fqdn    = "sso.${var.env_name}.${var.account_config.dns_suffix}"
@@ -536,10 +537,10 @@ resource "aws_lb_listener_rule" "bws_https" {
 
   condition {
     host_header {
-      values = [
+      values = concat(local.bws_fqdn_alias != null ? [local.bws_fqdn_alias, "admin.${local.bws_fqdn_alias}"] : [], [
         local.bws_fqdn,
         local.bws_admin_fqdn,
-      ]
+      ])
     }
   }
 
@@ -605,11 +606,11 @@ resource "aws_lb_listener_rule" "maintenance" {
 
   condition {
     host_header {
-      values = [
+      values = concat(local.bws_fqdn_alias != null ? [local.bws_fqdn_alias] : [], [
         local.bws_fqdn,
         local.bws_sso_fqdn,
         local.maintenance_rule_fqdn,
-      ]
+      ])
     }
   }
 
@@ -628,10 +629,10 @@ module "acm_certificate" {
 
   name        = "${local.lb_name}-cert"
   domain_name = var.acm_certificate.domain_name
-  subject_alternate_names = [
+  subject_alternate_names = concat(var.acm_certificate.additional_subject_alternate_names, [
     "${var.env_name}.${var.account_config.dns_suffix}",
     "*.${var.env_name}.${var.account_config.dns_suffix}"
-  ]
+  ])
 
   external_validation_records_created = var.acm_certificate.external_validation_records_created
 
