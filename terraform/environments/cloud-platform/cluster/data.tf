@@ -38,6 +38,25 @@ data "aws_iam_roles" "platform_engineer_admin_sso_role" {
 #   private_zone = false
 # }
 
+#------------------------------------------------------------------------------
+# IAM Identity Center — resolve cloud-platform-engineers group ID for ArgoCD RBAC
+#------------------------------------------------------------------------------
+data "aws_ssoadmin_instances" "this" {
+  provider = aws.sso-readonly
+}
+
+data "aws_identitystore_group" "cloud_platform_engineers" {
+  provider          = aws.sso-readonly
+  identity_store_id = one(data.aws_ssoadmin_instances.this.identity_store_ids)
+
+  alternate_identifier {
+    unique_attribute {
+      attribute_path  = "DisplayName"
+      attribute_value = "cloud-platform-engineers"
+    }
+  }
+}
+
 data "aws_eks_cluster" "cluster" {
   name       = module.eks.cluster_name
   depends_on = [module.eks]
