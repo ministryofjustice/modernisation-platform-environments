@@ -162,6 +162,11 @@ data "aws_network_interface" "execute_api_endpoint_eni" {
   id       = each.value
 }
 
+resource "aws_vpc_endpoint_security_group_association" "cp_access" {
+  vpc_endpoint_id   = data.aws_vpc_endpoint.api_gateway.id
+  security_group_id = aws_security_group.allow_cp_access.id
+}
+
 resource "aws_route53_record" "private_api" {
   provider = aws.core-vpc
 
