@@ -2,7 +2,7 @@ module "oracle_ebs_db" {
   # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/646ef03
   source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/oracle-ec2?ref=646ef03"
 
-  name                  = "ec2-${local.component_name}-${local.env_label}-ebsdb"
+  name                  = "${local.component_name}-${local.env_label}-ebsdb"
   instance_profile_name = aws_iam_instance_profile.ebsdb.name
 
   instance_type      = local.application_data.accounts[local.environment].ec2_instance_type_ebsdb
@@ -12,9 +12,9 @@ module "oracle_ebs_db" {
   security_group_ids = [aws_security_group.ebsdb.id]
 
   tags = merge(local.tags, {
-    instance-role        = "ebsdb"
-    backup               = "true"
-    instance-scheduling  = "skip-scheduling"
+    instance-role       = "ebsdb"
+    backup              = "true"
+    instance-scheduling = "skip-scheduling"
   })
 }
 
@@ -28,7 +28,7 @@ resource "aws_ebs_volume" "ebsdb_swap" {
   iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_swap
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags, { Name = "ec2-${local.component_name}-${local.env_label}-ebsdb-swap", device-name = "/dev/sdb" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-swap", device-name = "/dev/sdb" })
 }
 
 resource "aws_volume_attachment" "ebsdb_swap" {
@@ -45,7 +45,7 @@ resource "aws_ebs_volume" "ebsdb_export_home" {
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags, { Name = "ec2-${local.component_name}-${local.env_label}-ebsdb-export-home", device-name = "/dev/sdh" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-export-home", device-name = "/dev/sdh" })
 }
 
 resource "aws_volume_attachment" "ebsdb_export_home" {
@@ -62,7 +62,7 @@ resource "aws_ebs_volume" "ebsdb_u01" {
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags, { Name = "ec2-${local.component_name}-${local.env_label}-ebsdb-u01", device-name = "/dev/sdi" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-u01", device-name = "/dev/sdi" })
 }
 
 resource "aws_volume_attachment" "ebsdb_u01" {
@@ -79,7 +79,7 @@ resource "aws_ebs_volume" "ebsdb_arch" {
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags, { Name = "ec2-${local.component_name}-${local.env_label}-ebsdb-arch", device-name = "/dev/sdj" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-arch", device-name = "/dev/sdj" })
 }
 
 resource "aws_volume_attachment" "ebsdb_arch" {
@@ -96,7 +96,7 @@ resource "aws_ebs_volume" "ebsdb_dbf" {
   iops              = local.application_data.accounts[local.environment].ebs_default_iops
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags, { Name = "ec2-${local.component_name}-${local.env_label}-ebsdb-dbf", device-name = "/dev/sdk" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-dbf", device-name = "/dev/sdk" })
 }
 
 resource "aws_volume_attachment" "ebsdb_dbf" {
@@ -113,7 +113,7 @@ resource "aws_ebs_volume" "ebsdb_dbf01" {
   iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf01
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags, { Name = "ec2-${local.component_name}-${local.env_label}-ebsdb-dbf01", device-name = "/dev/sde" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-dbf01", device-name = "/dev/sde" })
 }
 
 resource "aws_volume_attachment" "ebsdb_dbf01" {
@@ -130,7 +130,7 @@ resource "aws_ebs_volume" "ebsdb_dbf02" {
   iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf02
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags, { Name = "ec2-${local.component_name}-${local.env_label}-ebsdb-dbf02", device-name = "/dev/sdf" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-dbf02", device-name = "/dev/sdf" })
 }
 
 resource "aws_volume_attachment" "ebsdb_dbf02" {
@@ -147,7 +147,7 @@ resource "aws_ebs_volume" "ebsdb_dbf03" {
   iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf03
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags, { Name = "ec2-${local.component_name}-${local.env_label}-ebsdb-dbf03", device-name = "/dev/sdg" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-dbf03", device-name = "/dev/sdg" })
 }
 
 resource "aws_volume_attachment" "ebsdb_dbf03" {
@@ -164,7 +164,7 @@ resource "aws_ebs_volume" "ebsdb_dbf04" {
   iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_dbf04
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags, { Name = "ec2-${local.component_name}-${local.env_label}-ebsdb-dbf04", device-name = "/dev/sdt" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-dbf04", device-name = "/dev/sdt" })
 }
 
 resource "aws_volume_attachment" "ebsdb_dbf04" {
@@ -181,7 +181,7 @@ resource "aws_ebs_volume" "ebsdb_redoA" {
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags, { Name = "ec2-${local.component_name}-${local.env_label}-ebsdb-redoA", device-name = "/dev/sdl" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-redoA", device-name = "/dev/sdl" })
 }
 
 resource "aws_volume_attachment" "ebsdb_redoA" {
@@ -198,7 +198,7 @@ resource "aws_ebs_volume" "ebsdb_techst" {
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags, { Name = "ec2-${local.component_name}-${local.env_label}-ebsdb-techst", device-name = "/dev/sdm" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-techst", device-name = "/dev/sdm" })
 }
 
 resource "aws_volume_attachment" "ebsdb_techst" {
@@ -215,7 +215,7 @@ resource "aws_ebs_volume" "ebsdb_backup" {
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags, { Name = "ec2-${local.component_name}-${local.env_label}-ebsdb-backup", device-name = "/dev/sdn" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-backup", device-name = "/dev/sdn" })
 }
 
 resource "aws_volume_attachment" "ebsdb_backup" {
@@ -232,7 +232,7 @@ resource "aws_ebs_volume" "ebsdb_redoB" {
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags, { Name = "ec2-${local.component_name}-${local.env_label}-ebsdb-redoB", device-name = "/dev/sdo" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-redoB", device-name = "/dev/sdo" })
 }
 
 resource "aws_volume_attachment" "ebsdb_redoB" {
@@ -249,7 +249,7 @@ resource "aws_ebs_volume" "ebsdb_diag" {
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags, { Name = "ec2-${local.component_name}-${local.env_label}-ebsdb-diag", device-name = "/dev/sdp" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-diag", device-name = "/dev/sdp" })
 }
 
 resource "aws_volume_attachment" "ebsdb_diag" {
@@ -266,7 +266,7 @@ resource "aws_ebs_volume" "ebsdb_appshare" {
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags, { Name = "ec2-${local.component_name}-${local.env_label}-ebsdb-appshare", device-name = "/dev/sdq" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-appshare", device-name = "/dev/sdq" })
 }
 
 resource "aws_volume_attachment" "ebsdb_appshare" {
@@ -283,7 +283,7 @@ resource "aws_ebs_volume" "ebsdb_home" {
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags, { Name = "ec2-${local.component_name}-${local.env_label}-ebsdb-home", device-name = "/dev/sdr" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-home", device-name = "/dev/sdr" })
 }
 
 resource "aws_volume_attachment" "ebsdb_home" {
@@ -300,7 +300,7 @@ resource "aws_ebs_volume" "ebsdb_temp" {
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags, { Name = "ec2-${local.component_name}-${local.env_label}-ebsdb-temp", device-name = "/dev/sds" })
+  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-temp", device-name = "/dev/sds" })
 }
 
 resource "aws_volume_attachment" "ebsdb_temp" {
