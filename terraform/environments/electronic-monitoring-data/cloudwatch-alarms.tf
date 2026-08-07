@@ -221,7 +221,7 @@ resource "aws_cloudwatch_metric_alarm" "merge_lambdas_not_running" {
     metric {
       namespace   = "EM/MergeLambdas"
       metric_name = "SucceededQueries"
-      period      = 180
+      period      = 120
       stat        = "Sum"
       unit        = "Count"
 
@@ -237,7 +237,7 @@ resource "aws_cloudwatch_metric_alarm" "merge_lambdas_not_running" {
     metric {
       namespace   = "EM/MergeLambdas"
       metric_name = "FailedQueries"
-      period      = 180
+      period      = 120
       stat        = "Sum"
       unit        = "Count"
 
@@ -251,7 +251,6 @@ resource "aws_cloudwatch_metric_alarm" "merge_lambdas_not_running" {
     aws_sns_topic.emds_alerts.arn
   ]
 }
-
 
 resource "aws_cloudwatch_metric_alarm" "merge_lambdas_queries_failing" {
   for_each = local.merge_lambdas
