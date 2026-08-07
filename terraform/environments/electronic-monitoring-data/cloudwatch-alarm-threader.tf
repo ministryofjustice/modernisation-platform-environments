@@ -41,7 +41,7 @@ resource "aws_cloudwatch_event_rule" "alarm_state_change_threader" {
             alarm.alarm_name
           ],
           [
-            for _, alarm in aws_cloudwatch_metric_alarm.merge_lambdas_not_running :
+            for _, alarm in aws_cloudwatch_metric_alarm.merge_lambda_dlq_has_messages :
             alarm.alarm_name
           ],
           [

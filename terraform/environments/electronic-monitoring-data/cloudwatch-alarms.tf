@@ -196,7 +196,7 @@ resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
 # Merge Lambdas
 # ------------------------------------------------------------------------------
 
-resource "aws_cloudwatch_metric_alarm" "_dlq_has_messages" {
+resource "aws_cloudwatch_metric_alarm" "merge_lambda_dlq_has_messages" {
   for_each = local.merge_lambdas
 
   alarm_name          = "${each.key}_dlq_messages"
