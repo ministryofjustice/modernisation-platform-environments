@@ -103,7 +103,8 @@ locals {
   }
 
   bws_config_production = {
-    external_fqdn  = "reporting.probation.service.justice.gov.uk"
+    external_fqdn       = "reporting.probation.service.justice.gov.uk"
+    external_admin_fqdn = "admin.reporting.probation.service.justice.gov.uk"
 
     instance_count = 1
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
