@@ -196,61 +196,90 @@ resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
 # Merge Lambdas
 # ------------------------------------------------------------------------------
 
-resource "aws_cloudwatch_metric_alarm" "merge_lambdas_not_running" {
+resource "aws_cloudwatch_metric_alarm" "_dlq_has_messages" {
   for_each = local.merge_lambdas
 
-  alarm_name          = "${each.key}_not_running"
-  alarm_description   = "Detects no queries completed across 15 minutes."
-  comparison_operator = "LessThanThreshold"
-  threshold           = 1
+  alarm_name          = "${each.key}_dlq_messages"
+  alarm_description   = "Checks messages in the DLQ every 15 mins"
+  comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
+  threshold           = 0
   treat_missing_data  = "notBreaching"
 
   actions_enabled = false
 
   metric_query {
-    id          = "total"
-    expression  = "s + f"
-    label       = "Combined total"
-    return_data = true
-  }
-
-  metric_query {
-    id          = "s"
+    id          = "visible"
+    return_data = false
 
     metric {
-      namespace   = "EM/MergeLambdas"
-      metric_name = "SucceededQueries"
-      period      = 120
+      metric_name = "ApproximateNumberOfMessagesVisible"
+      namespace   = "AWS/SQS"
+      period      = 60
       stat        = "Sum"
-      unit        = "Count"
 
       dimensions = {
-        FunctionName = each.value.lambda_name
+        QueueName = "${each.value.lambda_name}-dlq"
       }
     }
   }
-
-  metric_query {
-    id          = "f"
-
-    metric {
-      namespace   = "EM/MergeLambdas"
-      metric_name = "FailedQueries"
-      period      = 120
-      stat        = "Sum"
-      unit        = "Count"
-
-      dimensions = {
-        FunctionName = each.value.lambda_name
-      }
-    }
-  }
-
-  alarm_actions = [
-    aws_sns_topic.emds_alerts.arn
-  ]
 }
+
+# resource "aws_cloudwatch_metric_alarm" "merge_lambdas_not_running" {
+#   for_each = local.merge_lambdas
+
+#   alarm_name          = "${each.key}_not_running"
+#   alarm_description   = "Detects no queries completed across 15 minutes."
+#   comparison_operator = "LessThanThreshold"
+#   threshold           = 1
+#   evaluation_periods  = 1
+#   treat_missing_data  = "notBreaching"
+
+#   actions_enabled = false
+
+#   metric_query {
+#     id          = "total"
+#     expression  = "s + f"
+#     label       = "Combined total"
+#     return_data = true
+#   }
+
+#   metric_query {
+#     id          = "s"
+
+#     metric {
+#       namespace   = "EM/MergeLambdas"
+#       metric_name = "SucceededQueries"
+#       period      = 120
+#       stat        = "Sum"
+#       unit        = "Count"
+
+#       dimensions = {
+#         FunctionName = each.value.lambda_name
+#       }
+#     }
+#   }
+
+#   metric_query {
+#     id          = "f"
+
+#     metric {
+#       namespace   = "EM/MergeLambdas"
+#       metric_name = "FailedQueries"
+#       period      = 120
+#       stat        = "Sum"
+#       unit        = "Count"
+
+#       dimensions = {
+#         FunctionName = each.value.lambda_name
+#       }
+#     }
+#   }
+
+#   alarm_actions = [
+#     aws_sns_topic.emds_alerts.arn
+#   ]
+# }
 
 resource "aws_cloudwatch_metric_alarm" "merge_lambdas_queries_failing" {
   for_each = local.merge_lambdas
