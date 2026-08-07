@@ -82,7 +82,7 @@ module "assume_iam_role" {
   
   role_name = "datafactory_dev_assume_role"
 
-  trusted_account_id = "446677926185"
+  trusted_account_id = ""
 
   bucket_arn = module.sherlock_landing_bucket.bucket.arn
 
