@@ -196,35 +196,6 @@ resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
 # Merge Lambdas
 # ------------------------------------------------------------------------------
 
-resource "aws_cloudwatch_metric_alarm" "merge_lambda_dlq_has_messages" {
-  for_each = local.merge_lambdas
-
-  alarm_name          = "${each.key}_dlq_messages"
-  alarm_description   = "Checks messages in the DLQ every 15 mins"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 1
-  threshold           = 0
-  treat_missing_data  = "notBreaching"
-
-  actions_enabled = false
-
-  metric_query {
-    id          = "visible"
-    return_data = false
-
-    metric {
-      metric_name = "ApproximateNumberOfMessagesVisible"
-      namespace   = "AWS/SQS"
-      period      = 60
-      stat        = "Sum"
-
-      dimensions = {
-        QueueName = "${each.value.lambda_name}-dlq"
-      }
-    }
-  }
-}
-
 # resource "aws_cloudwatch_metric_alarm" "merge_lambdas_not_running" {
 #   for_each = local.merge_lambdas
 
@@ -280,6 +251,32 @@ resource "aws_cloudwatch_metric_alarm" "merge_lambda_dlq_has_messages" {
 #     aws_sns_topic.emds_alerts.arn
 #   ]
 # }
+
+resource "aws_cloudwatch_metric_alarm" "merge_lambda_dlq_has_messages" {
+  for_each = local.merge_lambdas
+
+  alarm_name          = "${each.key}_dlq_messages"
+  alarm_description   = "Checks messages in the DLQ every 15 mins"
+  comparison_operator = "GreaterThanThreshold"
+  threshold           = 0
+  period              = 900
+  statistic           = "Sum"
+  evaluation_periods  = 1
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_name = "ApproximateNumberOfMessagesVisible"
+  namespace   = "AWS/SQS"
+
+  dimensions = {
+    QueueName = "${each.value.lambda_name}-dlq"
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
 
 resource "aws_cloudwatch_metric_alarm" "merge_lambdas_queries_failing" {
   for_each = local.merge_lambdas
