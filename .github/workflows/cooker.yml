@@ -29,7 +29,7 @@ on:
 permissions:
   id-token: write  # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
-
+  pull-requests: write
 jobs:
   strategy:
     uses: ./.github/workflows/reusable_terraform_components_strategy.yml
@@ -43,7 +43,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
-    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+    uses: ./.github/workflows/testing_reusable_terraform_components_plan_apply.yml
     with:
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
