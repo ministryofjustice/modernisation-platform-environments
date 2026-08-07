@@ -540,8 +540,8 @@ resource "aws_lb_listener_rule" "bws_https" {
   condition {
     host_header {
       values = [
-        local.bws_external_fqdn,
-        local.bws_external_admin_fqdn,
+        nonsensitive(local.bws_external_fqdn),
+        nonsensitive(local.bws_external_admin_fqdn),
       ]
     }
   }
@@ -609,7 +609,7 @@ resource "aws_lb_listener_rule" "maintenance" {
   condition {
     host_header {
       values = [
-        local.bws_external_fqdn,
+        nonsensitive(local.bws_external_fqdn),
         local.bws_sso_fqdn,
         local.maintenance_rule_fqdn,
       ]
