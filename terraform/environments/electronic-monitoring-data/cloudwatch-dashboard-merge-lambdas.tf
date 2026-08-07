@@ -294,7 +294,7 @@ locals {
           title  = "Messages in DLQ"
           region = "eu-west-2"
           stat   = "Sum"
-          period = 120
+          period = 900
           metrics = [
             [
               "AWS/SQS",
