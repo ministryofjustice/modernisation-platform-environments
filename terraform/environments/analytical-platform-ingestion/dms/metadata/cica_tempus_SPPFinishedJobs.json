@@ -1,7 +1,12 @@
 {
   "objects_from": "tempus_spp_finished_jobs",
   "extraction_date": "2025-03-26T14:26:16.931099",
-  "objects": ["dbo.FINISHED_JOB_HISTORY", "dbo.FINISHED_JOB_VARIABLE"],
+  "objects": [
+    "dbo.FINISHED_JOB_HISTORY", 
+    "dbo.FINISHED_JOB_VARIABLE",
+    "SPPFINISHEDJOBS.FINISHED_CASE_INSTANCE",
+    "SPPFINISHEDJOBS.FINISHED_JOB"
+  ],
   "blobs": [],
   "columns_to_exclude": [
     {
