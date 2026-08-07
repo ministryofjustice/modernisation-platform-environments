@@ -49,11 +49,9 @@ data "aws_identitystore_group" "cloud_platform_engineers" {
   provider          = aws.sso-readonly
   identity_store_id = one(data.aws_ssoadmin_instances.this.identity_store_ids)
 
-  alternate_identifier {
-    unique_attribute {
-      attribute_path  = "DisplayName"
-      attribute_value = "cloud-platform-engineers"
-    }
+  filter {
+    attribute_path  = "DisplayName"
+    attribute_value = "cloud-platform-engineers"
   }
 }
 
