@@ -17,7 +17,7 @@ locals {
 }
 
 module "sherlock_landing_bucket_test" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v11.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
 
   bucket_prefix      = "landing-sherlock-test"
   bucket_namespace   = "account-regional"
@@ -60,6 +60,7 @@ module "sherlock_kms_key" {
 resource "aws_secretsmanager_secret" "external_account" {
   name        = "external-aws-account"
   description = "AWS account permitted to assume the external role"
+  kms_key_id = module.sherlock_kms_key.key_arn
 
   tags = {
     Environment = terraform.workspace
