@@ -50,7 +50,7 @@ module "argocd" {
   idc_region       = var.argocd_idc_region
   rbac_role_mappings = merge(
     {
-      ADMIN = [{ id = data.aws_identitystore_group.cloud_platform_engineers.group_id, type = "SSO_GROUP" }]
+      ADMIN = [{ id = local.cloud_platform_engineers_group_id, type = "SSO_GROUP" }]
     },
     var.argocd_rbac_role_mappings
   )

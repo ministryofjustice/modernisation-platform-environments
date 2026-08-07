@@ -39,20 +39,15 @@ data "aws_iam_roles" "platform_engineer_admin_sso_role" {
 # }
 
 #------------------------------------------------------------------------------
-# IAM Identity Center — resolve cloud-platform-engineers group ID for ArgoCD RBAC
+# IAM Identity Center — cloud-platform-engineers group ID for ArgoCD RBAC
+#
+# Hardcoded because the ModernisationPlatformSSOReadOnly role returns
+# ResourceNotFoundException when calling GetGroupId despite having the
+# identitystore:Get* permission. TODO: investigate and switch back to
+# data.aws_identitystore_group lookup.
 #------------------------------------------------------------------------------
-data "aws_ssoadmin_instances" "this" {
-  provider = aws.sso-readonly
-}
-
-data "aws_identitystore_group" "cloud_platform_engineers" {
-  provider          = aws.sso-readonly
-  identity_store_id = one(data.aws_ssoadmin_instances.this.identity_store_ids)
-
-  filter {
-    attribute_path  = "DisplayName"
-    attribute_value = "cloud-platform-engineers"
-  }
+locals {
+  cloud_platform_engineers_group_id = "664252b4-7021-701e-49b9-6c46ccc7899e"
 }
 
 data "aws_eks_cluster" "cluster" {
