@@ -628,10 +628,10 @@ module "acm_certificate" {
 
   name        = "${local.lb_name}-cert"
   domain_name = var.acm_certificate.domain_name
-  subject_alternate_names = [
+  subject_alternate_names = concat(var.acm_certificate.additional_subject_alternate_names, [
     "${var.env_name}.${var.account_config.dns_suffix}",
     "*.${var.env_name}.${var.account_config.dns_suffix}"
-  ]
+  ])
 
   external_validation_records_created = var.acm_certificate.external_validation_records_created
 

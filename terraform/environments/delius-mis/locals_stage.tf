@@ -464,6 +464,7 @@ locals {
   acm_certificate_stage = {
     domain_name                         = "modernisation-platform.service.justice.gov.uk"
     external_validation_records_created = true
+    additional_subject_alternate_names  = []
   }
 
   lb_config_stage = {

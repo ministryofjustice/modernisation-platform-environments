@@ -427,12 +427,11 @@ locals {
     bucket_policy_enabled = true
   }
 
-  acm_certificate_production = null
-
-  # acm_certificate_production = {
-  #   domain_name                         = "reporting.probation.service.justice.gov.uk"
-  #   external_validation_records_created = false
-  # }
+  acm_certificate_production = {
+    domain_name                         = "reporting.probation.service.justice.gov.uk"
+    external_validation_records_created = false
+    additional_subject_alternate_names  = ["*.reporting.probation.service.justice.gov.uk"]
+  }
 
   lb_config_production = {
     bucket_policy_enabled = true

@@ -433,6 +433,7 @@ locals {
   acm_certificate_preprod = {
     domain_name                         = "modernisation-platform.service.justice.gov.uk"
     external_validation_records_created = true
+    additional_subject_alternate_names  = []
   }
 
   lb_config_preprod = {
