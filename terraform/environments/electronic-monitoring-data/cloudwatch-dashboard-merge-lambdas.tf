@@ -281,6 +281,33 @@ locals {
           ]
         }
       },
+      {
+        # --------------------------
+        # DLQ messages
+        # --------------------------
+        type   = "metric"
+        x      = 0
+        y      = 0
+        width  = 24
+        height = 6
+        properties = {
+          title  = "Messages in DLQ"
+          region = "eu-west-2"
+          stat   = "Sum"
+          period = 120
+          metrics = [
+            [
+              "AWS/SQS",
+              "ApproximateNumberOfMessagesVisible",
+              "QueueName",
+              "${lambda_name}-dlq",
+              {
+                color = "#00008B"
+              }
+            ],
+          ]
+        }
+      },
     ]
   }
 }
