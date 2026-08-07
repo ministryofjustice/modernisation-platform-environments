@@ -150,7 +150,10 @@ class FileMoverService:
             return self.config.destinations["processing"], item
         if "route" in item:
             return self.config.destinations[item["route"]], item
-        route = select_route(operation_event.scan_result_status)
+        route = select_route(
+            operation_event.scan_result_status,
+            operation_event.scan_result_status_matches_tag,
+        )
         item = self.store.update_fields(
             item,
             owner,

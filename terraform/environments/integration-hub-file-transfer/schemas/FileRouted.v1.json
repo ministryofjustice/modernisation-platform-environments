@@ -49,13 +49,21 @@
             {
               "properties": {
                 "route": { "enum": ["clean"] },
-                "scanResultStatus": { "enum": ["NO_THREATS_FOUND"] }
+                "scanResultStatus": { "enum": ["NO_THREATS_FOUND"] },
+                "scanResultStatusMatchesTag": { "enum": [true] }
               }
             },
             {
               "properties": {
                 "route": { "enum": ["quarantine"] },
-                "scanResultStatus": { "enum": ["THREATS_FOUND"] }
+                "scanResultStatus": { "enum": ["THREATS_FOUND"] },
+                "scanResultStatusMatchesTag": { "enum": [true] }
+              }
+            },
+            {
+              "properties": {
+                "route": { "enum": ["investigation"] },
+                "scanResultStatusMatchesTag": { "enum": [false] }
               }
             },
             {
@@ -63,7 +71,8 @@
                 "route": { "enum": ["investigation"] },
                 "scanResultStatus": {
                   "enum": ["UNSUPPORTED", "ACCESS_DENIED", "FAILED"]
-                }
+                },
+                "scanResultStatusMatchesTag": { "enum": [true] }
               }
             }
           ],
@@ -91,7 +100,7 @@
             },
             "scanResultStatusMatchesTag": {
               "type": "boolean",
-              "description": "Diagnostic value copied from FileScanResultRecorded.v1; it does not select the route."
+              "description": "Whether scanResultStatus matched the exact object's GuardDutyMalwareScanStatus tag. A mismatch routes the object to investigation."
             },
             "sourceDeleted": { "type": "boolean", "enum": [true] }
           }

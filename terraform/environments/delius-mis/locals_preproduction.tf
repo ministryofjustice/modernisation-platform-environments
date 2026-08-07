@@ -430,6 +430,12 @@ locals {
 
   dfi_report_bucket_config_preprod = null
 
+  acm_certificate_preprod = {
+    domain_name                         = "modernisation-platform.service.justice.gov.uk"
+    external_validation_records_created = true
+    additional_subject_alternate_names  = []
+  }
+
   lb_config_preprod = {
     bucket_policy_enabled = true
     maintenance_message   = "NDMIS Reporting Pre-Production is currently unavailable due to planned maintenance or out-of-hours shutdown (7pm-7am)."
