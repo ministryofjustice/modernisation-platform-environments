@@ -16,7 +16,7 @@ resource "aws_security_group_rule" "sftp_lb_ingress_443" {
   protocol          = "tcp"
   from_port         = 443
   to_port           = 443
-  cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace]
+  cidr_blocks       = [local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod]
 }
 
 resource "aws_vpc_security_group_ingress_rule" "sftp_lb_ingress_from_lambda_443" {
