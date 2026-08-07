@@ -38,6 +38,15 @@ resource "aws_iam_role_policy" "red_button_lambda_policy" {
       {
         Effect = "Allow"
         Action = [
+          "kms:GenerateDataKey*",
+          "kms:Decrypt",
+          "kms:DescribeKey"
+        ]
+        Resource = aws_kms_key.cloudwatch_logs.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "ec2:AuthorizeSecurityGroupEgress",
           "ec2:AuthorizeSecurityGroupIngress",
           "ec2:DescribeInstances",
