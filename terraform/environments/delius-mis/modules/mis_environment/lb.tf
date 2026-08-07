@@ -16,6 +16,9 @@ locals {
   bws_fqdn       = "${var.env_name}.${var.account_config.dns_suffix}"
   bws_admin_fqdn = "admin.${var.env_name}.${var.account_config.dns_suffix}"
 
+  bws_external_fqdn       = var.bws_config != null ? lookup(var.bws_config, "external_fqdn", local.bws_fqdn) : null
+  bws_external_admin_fqdn = var.bws_config != null ? lookup(var.bws_config, "external_admin_fqdn", local.bws_admin_fqdn) : null
+
   bws_sso_enabled = var.lb_config != null && var.bws_sso_config != null && var.bws_sso_config.instance_count > 0
   bws_sso_fqdn    = "sso.${var.env_name}.${var.account_config.dns_suffix}"
 
@@ -537,8 +540,8 @@ resource "aws_lb_listener_rule" "bws_https" {
   condition {
     host_header {
       values = [
-        local.bws_fqdn,
-        local.bws_admin_fqdn,
+        nonsensitive(local.bws_external_fqdn),
+        nonsensitive(local.bws_external_admin_fqdn),
       ]
     }
   }
@@ -606,7 +609,7 @@ resource "aws_lb_listener_rule" "maintenance" {
   condition {
     host_header {
       values = [
-        local.bws_fqdn,
+        nonsensitive(local.bws_external_fqdn),
         local.bws_sso_fqdn,
         local.maintenance_rule_fqdn,
       ]
