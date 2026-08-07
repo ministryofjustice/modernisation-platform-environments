@@ -103,6 +103,7 @@ locals {
   }
 
   bws_config_production = {
+    fqdn           = "reporting.probation.service.justice.gov.uk"
     instance_count = 1
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
     ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
@@ -430,6 +431,7 @@ locals {
   acm_certificate_production = {
     domain_name                         = "reporting.probation.service.justice.gov.uk"
     external_validation_records_created = false
+    additional_subject_alternate_names  = ["*.reporting.probation.service.justice.gov.uk"]
   }
 
   lb_config_production = {
