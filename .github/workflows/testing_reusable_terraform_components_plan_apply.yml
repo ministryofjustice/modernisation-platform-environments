@@ -74,10 +74,6 @@
           MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
       plan:
-        permissions:
-          id-token: write
-          contents: read
-          pull-requests: write
         name: "plan ${{ inputs.component}}"
         runs-on: ${{ inputs.runner }}
         needs: fetch-secrets
@@ -138,7 +134,6 @@
             continue-on-error: true
             with:
               terraform_directory: "terraform/environments/${{ inputs.application }}"
-              soft_fail: false
               terraform_workspace: ${{ env.WORKSPACE_NAME }}
               
           - name: Setup Terraform
