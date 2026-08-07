@@ -5,7 +5,7 @@
     "dbo.FINISHED_JOB_HISTORY",
     "dbo.FINISHED_JOB_VARIABLE",
     "dbo.FINISHED_CASE_INSTANCE",
-    "dbo.FINISHED_JOB"
+    "dbo.FINISHED_JOB"
   ],
   "blobs": [],
   "columns_to_exclude": [
