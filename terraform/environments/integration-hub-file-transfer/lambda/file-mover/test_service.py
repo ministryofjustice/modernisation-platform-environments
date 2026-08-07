@@ -77,7 +77,7 @@ class FileMoverServiceTest(unittest.TestCase):
         self.assertEqual(completed_fields["processing_version_id"], "destination-version")
         self.assertEqual(completed_fields["staged_event_id"], "completion-event-id")
 
-    def test_route_uses_the_event_status_and_preserves_the_tag_match_flag(self):
+    def test_route_sends_a_tag_mismatch_to_investigation(self):
         route_event = {
             **self.event,
             "detail-type": "FileScanResultRecorded.v1",
@@ -114,8 +114,8 @@ class FileMoverServiceTest(unittest.TestCase):
         self.copy_engine.copy.side_effect = lambda item, *_args: {
             **item,
             "status": "COPIED",
-            "destination_bucket": "clean",
-            "destination_version_id": "clean-version",
+            "destination_bucket": "investigation",
+            "destination_version_id": "investigation-version",
             "copy_token": "copy-token",
         }
         service = self._route_service()
@@ -126,7 +126,7 @@ class FileMoverServiceTest(unittest.TestCase):
         published = json.loads(
             self.eventbridge.put_events.call_args.kwargs["Entries"][0]["Detail"]
         )
-        self.assertEqual(published["data"]["route"], "clean")
+        self.assertEqual(published["data"]["route"], "investigation")
         self.assertFalse(published["data"]["scanResultStatusMatchesTag"])
         self.copy_engine.delete_source.assert_called_once()
 

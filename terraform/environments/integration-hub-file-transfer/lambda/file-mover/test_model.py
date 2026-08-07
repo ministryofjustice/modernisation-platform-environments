@@ -29,15 +29,20 @@ class MultipartCopyPlanTest(unittest.TestCase):
 
 class RouteSelectionTest(unittest.TestCase):
     def test_selects_clean_for_a_clean_event_result(self):
-        self.assertEqual(select_route("NO_THREATS_FOUND"), "clean")
+        self.assertEqual(select_route("NO_THREATS_FOUND", True), "clean")
 
     def test_selects_quarantine_for_a_threat_event_result(self):
-        self.assertEqual(select_route("THREATS_FOUND"), "quarantine")
+        self.assertEqual(select_route("THREATS_FOUND", True), "quarantine")
 
     def test_selects_investigation_for_non_terminal_routes(self):
         for status in ["UNSUPPORTED", "ACCESS_DENIED", "FAILED"]:
             with self.subTest(status=status):
-                self.assertEqual(select_route(status), "investigation")
+                self.assertEqual(select_route(status, True), "investigation")
+
+    def test_selects_investigation_when_the_scan_result_does_not_match_the_tag(self):
+        for status in ["NO_THREATS_FOUND", "THREATS_FOUND"]:
+            with self.subTest(status=status):
+                self.assertEqual(select_route(status, False), "investigation")
 
 
 if __name__ == "__main__":
