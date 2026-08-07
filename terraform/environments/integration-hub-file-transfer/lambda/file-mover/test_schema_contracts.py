@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 from types import SimpleNamespace
 
-from jsonschema import Draft4Validator, FormatChecker
+from jsonschema import Draft4Validator, FormatChecker, ValidationError
 
 from mft_file_mover.config import Destination
 from mft_file_mover.service import EVENT_SOURCE, FileMoverService
@@ -26,9 +26,11 @@ class CompletionEventSchemaTest(unittest.TestCase):
 
     def test_route_completion_events_match_all_schema_branches(self):
         cases = [
-            ("clean", "NO_THREATS_FOUND", False),
-            ("quarantine", "THREATS_FOUND", False),
+            ("clean", "NO_THREATS_FOUND", True),
+            ("quarantine", "THREATS_FOUND", True),
             ("investigation", "FAILED", True),
+            ("investigation", "NO_THREATS_FOUND", False),
+            ("investigation", "THREATS_FOUND", False),
         ]
         service = self._service("ROUTE")
         for route, status, matches_tag in cases:
@@ -46,6 +48,28 @@ class CompletionEventSchemaTest(unittest.TestCase):
                 detail, detail_type, _ = service._completion_event(item)
 
                 self._validate(detail_type, detail)
+
+    def test_route_completion_rejects_a_tag_mismatch_outside_investigation(self):
+        cases = [
+            ("clean", "NO_THREATS_FOUND"),
+            ("quarantine", "THREATS_FOUND"),
+        ]
+        service = self._service("ROUTE")
+        for route, status in cases:
+            with self.subTest(route=route, status=status):
+                item = self._item(
+                    operation="ROUTE",
+                    source_bucket="processing",
+                    destination_bucket=route,
+                    destination_version_id=f"{route}-version",
+                    route=route,
+                    scan_result_status=status,
+                    scan_result_status_matches_tag=False,
+                )
+                detail, detail_type, _ = service._completion_event(item)
+
+                with self.assertRaises(ValidationError):
+                    self._validate(detail_type, detail)
 
     def _validate(self, detail_type, detail):
         schema = json.loads((SCHEMA_DIRECTORY / f"{detail_type}.json").read_text())
