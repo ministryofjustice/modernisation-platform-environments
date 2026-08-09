@@ -60,26 +60,3 @@ resource "aws_db_subnet_group" "mariadb" {
   tags = local.tags
 }
 
-
-resource "aws_security_group" "mariadb" {
-  name        = "rds-mariadb-sg"
-  description = "SG for mariadb"
-  vpc_id      = local.account_info.vpc_id
-
-  ingress {
-    description     = "MySQL from ECS tasks"
-    from_port       = 3306
-    to_port         = 3306
-    protocol        = "tcp"
-    security_groups = [aws_security_group.ecs_service.id]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = local.tags
-}
