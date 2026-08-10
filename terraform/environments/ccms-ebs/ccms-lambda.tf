@@ -32,7 +32,7 @@ resource "aws_security_group" "lambda_security_group" {
 # }
 
 # Explicit Lambda egress rules for private and data subnets
-resource "aws_security_group_rule" "egress_private_traffic_lambda" {
+resource "aws_security_group_rule" "egress_private_traffic_lambda_https" {
   security_group_id = aws_security_group.lambda_security_group.id
   type              = "egress"
   description       = "allow all tcp traffic to private subnets"
@@ -46,7 +46,7 @@ resource "aws_security_group_rule" "egress_private_traffic_lambda" {
   ]
 }
 
-resource "aws_security_group_rule" "egress_data_traffic_ebsdb" {
+resource "aws_security_group_rule" "egress_data_traffic_lambda_ebsdb" {
   security_group_id = aws_security_group.lambda_security_group.id
   type              = "egress"
   description       = "allow TCP traffic to ebsdb subnets"
@@ -60,7 +60,7 @@ resource "aws_security_group_rule" "egress_data_traffic_ebsdb" {
   ]
 }
 
-resource "aws_security_group_rule" "egress_https_internet" {
+resource "aws_security_group_rule" "egress_https_lambda_internet" {
   security_group_id = aws_security_group.lambda_security_group.id
   type              = "egress"
   description       = "allow HTTPS traffic to the internet"
