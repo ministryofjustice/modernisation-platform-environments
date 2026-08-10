@@ -37,8 +37,8 @@ locals {
   #-----------------------------------------------------------------------------
   argocd_hubs = {
     nonlive = {
-      account_id   = local.environment_management.account_ids["cloud-platform-preproduction"]
-      cluster_name = "cloud-platform-preproduction"
+      account_id   = local.environment_management.account_ids["cloud-platform-nonlive"]
+      cluster_name = "cloud-platform-nonlive"
     }
     live = {
       account_id   = local.environment_management.account_ids["cloud-platform-live"]
