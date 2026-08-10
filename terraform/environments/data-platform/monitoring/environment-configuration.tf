@@ -7,18 +7,12 @@ locals {
       grafana_namespace        = "data-platform-monitoring-development"
       grafana_chart_version    = "12.4.8"
 
-      # Let the grafana provider manage dashboards as code (grafana-dashboards.tf).
-      # Keep false until a valid service-account token is stored in the
-      # monitoring/grafana-api-token secret; flip to true to start managing them.
+      # Enable dashboard management in grafana-dashboards.tf (keep false until monitoring/grafana-api-token is populated).
       grafana_dashboards_enabled = true
 
-      # Accounts Grafana reads by assuming the data-platform-monitoring role in
-      # each (defined in ../modules/monitoring). Account IDs are resolved by name
-      # from the Modernisation Platform environment_management map in
-      # helm-release.tf, so only the name is listed here. Every account exposes
-      # CloudWatch and X-Ray; set prometheus_workspace_id to an account's Amazon
-      # Managed Prometheus workspace ID (ws-...) to add a Prometheus data source,
-      # or leave it empty to omit one.
+      # Monitored accounts. Grafana assumes data-platform-monitoring in each account;
+      # account IDs are resolved from environment_management. Use ws-... to add AMP,
+      # leave prometheus_workspace_id empty for CloudWatch/X-Ray only.
       grafana_monitored_accounts = [
         { name = "data-platform-development", prometheus_workspace_id = "ws-1103e531-1155-4d18-ad5f-87ba29e2a38b7a" },
         { name = "data-platform-test", prometheus_workspace_id = "ws-80d995fc-475d-4232-ad3f-80e2342e428902" },
@@ -28,9 +22,7 @@ locals {
         { name = "data-platform-governance-preproduction", prometheus_workspace_id = "" },
       ]
 
-      # CIDRs allowed to reach Grafana; joined into the ingress
-      # whitelist-source-range annotation (values.yml.tftpl). Limited to the
-      # MoJ VPN, office sites and the octo-production GitHub runner.
+      # CIDRs allowed to reach Grafana (rendered into ingress whitelist-source-range).
       grafana_ingress_allowlist = [
         "128.77.75.64/26", # Prisma Corporate
         "20.58.27.30/32",  # GitHub Runner (octo-production)
@@ -39,7 +31,7 @@ locals {
         "51.149.2.0/24",      # 10SC
       ]
 
-      # Alert Routing Blocks: Scopes rules, disables specific metrics, and configures resource overrides
+      # Alert routing by account: enabled groups, scoped namespaces, and overrides.
       alerts_configured_accounts = [
         { name = "data-platform-development", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] },
         { name = "data-platform-test", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] },
@@ -58,9 +50,7 @@ locals {
       grafana_namespace        = "data-platform-monitoring-production"
       grafana_chart_version    = "12.4.8"
 
-      # Let the grafana provider manage dashboards as code (grafana-dashboards.tf).
-      # Keep false until a valid service-account token is stored in the
-      # monitoring/grafana-api-token secret; flip to true to start managing them.
+      # Enable dashboard management in grafana-dashboards.tf (keep false until monitoring/grafana-api-token is populated).
       grafana_dashboards_enabled = true
 
       grafana_monitored_accounts = [
@@ -74,9 +64,7 @@ locals {
         { name = "data-platform-governance-production", prometheus_workspace_id = "" },
       ]
 
-      # CIDRs allowed to reach Grafana; joined into the ingress
-      # whitelist-source-range annotation (values.yml.tftpl). Limited to the
-      # MoJ VPN, office sites and the octo-production GitHub runner.
+      # CIDRs allowed to reach Grafana (rendered into ingress whitelist-source-range).
       grafana_ingress_allowlist = [
         "128.77.75.64/26", # Prisma Corporate
         "20.58.27.30/32",  # GitHub Runner (octo-production)
@@ -84,7 +72,7 @@ locals {
         "213.121.161.112/28", # 102PF
         "51.149.2.0/24",      # 10SC
       ]
-      # Alert Routing Blocks: Scopes rules, disables specific metrics, and configures resource overrides
+      # Alert routing by account: enabled groups, scoped namespaces, and overrides.
       alerts_configured_accounts = [
         { name = "data-platform-development", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] },
         { name = "data-platform-test", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] },
