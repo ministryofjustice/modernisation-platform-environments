@@ -40,9 +40,9 @@ resource "helm_release" "grafana" {
           tenant_id      = local.grafana_entra_id.tenant_id
           monitored_accounts = [
             for account in local.environment_configuration.grafana_monitored_accounts : {
-              name                   = account.name
+              name                    = account.name
               prometheus_workspace_id = account.prometheus_workspace_id
-              account_id             = local.environment_management.account_ids[account.name]
+              account_id              = local.environment_management.account_ids[account.name]
             }
           ]
         }))
