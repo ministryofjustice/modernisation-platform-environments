@@ -188,7 +188,6 @@ resource "aws_cloudwatch_log_group" "transfer_family_waf_logs" {
   provider          = aws.us-east-1
   name              = "aws-waf-logs-transfer-family/transfer-family-waf-logs"
   retention_in_days = 30
-  kms_key_id        = aws_kms_key.cloudwatch_logs_us_east_1.arn
 
   tags = merge(local.tags,
     { Name = lower(format("cf-%s-%s-transfer-family-waf-logs", local.application_name, local.environment)) }
