@@ -684,7 +684,6 @@ resource "aws_iam_policy" "redshift_dataapi_cross_policy" {
   policy      = data.aws_iam_policy_document.redshift_dataapi.json
 }
 
-
 ## Athena API Policy Document
 # Policy Document
 data "aws_iam_policy_document" "athena_api" {
@@ -695,7 +694,9 @@ data "aws_iam_policy_document" "athena_api" {
       "athena:GetQueryResults",
       "athena:GetWorkGroup",
       "athena:StartQueryExecution",
-      "athena:StopQueryExecution"
+      "athena:StopQueryExecution",
+      "athena:ListQueryExecutions",
+      "athena:BatchGetQueryExecution"
     ]
     resources = [
       "arn:aws:athena:${local.account_region}:${local.account_id}:*/*"
