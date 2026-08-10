@@ -1,40 +1,27 @@
 # Grafana Helm chart values
 # Chart: https://github.com/grafana-community/helm-charts/tree/main/charts/grafana
-# (the grafana-community fork, pulled via oci://ghcr.io/grafana-community/helm-charts in helm-release.tf)
-#
-# Single sign-on is provided by Microsoft Entra ID (Azure AD). The OAuth client
-# ID and secret are injected as environment variables via the `set_sensitive`
-# block in helm-release.tf, so they are deliberately absent from this file.
+# Pulled from oci://ghcr.io/grafana-community/helm-charts in helm-charts.tf.
+# Entra ID client credentials are injected via set_sensitive, not stored here.
 
 replicas: 1
 
-# Cloud Platform is a shared, multi-tenant cluster and only grants
-# namespace-scoped permissions. The chart defaults to creating a cluster-scoped
-# ClusterRole/ClusterRoleBinding, which the namespace service account is not
-# permitted to create, so RBAC creation is disabled. Grafana itself does not
-# need in-cluster API access in this configuration.
+# Cloud Platform namespaces cannot create cluster-scoped RBAC; Grafana does not
+# require in-cluster API access here, so chart RBAC is disabled.
 rbac:
   create: false
 
-# The grafana-irsa service account is pre-provisioned in the Cloud Platform
-# namespace (annotated with the IAM role for IRSA), so the chart references it by
-# name rather than creating its own.
+# Use the pre-provisioned IRSA service account in the namespace.
 serviceAccount:
   create: false
   name: grafana-irsa
 
-# Create a ServiceMonitor (a Prometheus Operator CRD that Cloud Platform
-# reconciles for tenant namespaces) so the cluster's Prometheus scrapes Grafana's
-# own /metrics endpoint and we can observe Grafana itself. This is the legitimate
-# in-cluster scrape path; the ingress below separately blackholes /metrics so the
-# endpoint stays unreachable from outside the cluster.
+# Enable ServiceMonitor so in-cluster Prometheus can scrape Grafana metrics.
+# Ingress still blackholes /metrics externally.
 serviceMonitor:
   enabled: true
 
-# Cloud Platform enforces (via a Gatekeeper policy) that every ingress carries
-# external-dns weight and set-identifier annotations so Route 53 records are
-# weighted across its blue/green clusters. The set-identifier must be unique:
-# <ingress-name>-<namespace>-<cluster-colour>.
+# Cloud Platform requires external-dns weight and unique set-identifier
+# annotations for weighted blue/green Route 53 records.
 ingress:
   enabled: true
   ingressClassName: default
@@ -42,15 +29,10 @@ ingress:
     external-dns.alpha.kubernetes.io/aws-weight: "100"
     external-dns.alpha.kubernetes.io/set-identifier: ${ingress_set_identifier}
     external-dns.alpha.kubernetes.io/hostname: ${hostname}
-    # Restrict ingress to the allowlisted CIDRs (grafana_ingress_allowlist in
-    # environment-configuration.tf) so Grafana is reachable from the MoJ network
-    # and the cluster rather than the public internet.
+    # Restrict ingress to allowlisted CIDRs from environment-configuration.tf.
     nginx.ingress.kubernetes.io/whitelist-source-range: ${join(",", ingress_allowlist)}
-  # Route /metrics to the deliberately non-existent "blackhole" service so
-  # Grafana's metrics endpoint cannot be reached through the ingress from outside
-  # the cluster. The service does not exist anywhere, so nginx has no upstream and
-  # returns 503 for /metrics (the port is therefore irrelevant). extraPaths render
-  # ahead of the main "/" path.
+  # Route /metrics to a non-existent service to block external access (503).
+  # extraPaths are rendered before the main "/" path.
   extraPaths:
     - path: /metrics
       pathType: Exact
@@ -61,23 +43,18 @@ ingress:
             number: 80
   hosts:
     - ${hostname}
-  # The TLS certificate is provisioned on the Cloud Platform side; reference the
-  # resulting secret here so the ingress terminates TLS for the hostname.
+  # TLS certificate secret provisioned by Cloud Platform.
   tls:
     - secretName: monitoring-tls
       hosts:
         - ${hostname}
 
 persistence:
-  # Grafana's state (dashboards, users, preferences) lives in the external Cloud
-  # Platform RDS Postgres database configured below, so the pod is stateless and
-  # needs no persistent volume.
+  # Grafana state is stored in external RDS Postgres, so no PV is required.
   enabled: false
 
-# Host, database name, user and password for the external Cloud Platform RDS
-# Postgres backend are injected from the grafana-rds Kubernetes secret (created
-# from the RDS instance), so the password is never written into this file. The
-# non-sensitive settings (type, ssl_mode) live under grafana.ini.database below.
+# RDS connection values come from the grafana-rds secret; sensitive values are
+# not stored in this file.
 envValueFrom:
   GF_DATABASE_HOST:
     secretKeyRef:
@@ -97,22 +74,19 @@ envValueFrom:
       key: database_password
 
 grafana.ini:
-  # Use the external RDS Postgres instance as Grafana's backend database instead
-  # of the default ephemeral SQLite. Cloud Platform RDS mandates TLS, hence
-  # ssl_mode=require; the connection details come from envValueFrom above.
+  # Use external RDS Postgres (TLS required) instead of ephemeral SQLite.
   database:
     type: postgres
     ssl_mode: require
   server:
     root_url: https://${hostname}
   auth:
-    # Pure SSO: the local login form is disabled, so all sign-in is via Entra ID.
+    # SSO-only login via Entra ID.
     disable_login_form: true
   auth.basic:
     enabled: false
   security:
-    # Pure SSO: do not create the default local admin user. Admin rights are
-    # granted through the GrafanaAdmin/Admin Entra ID App Role (see auth.azuread).
+    # SSO-only: no local admin user; admin is granted via Entra app roles.
     disable_initial_admin_creation: true
   auth.azuread:
     name: Microsoft Entra ID
@@ -121,29 +95,20 @@ grafana.ini:
     auth_url: https://login.microsoftonline.com/${entra_id_tenant_id}/oauth2/v2.0/authorize
     token_url: https://login.microsoftonline.com/${entra_id_tenant_id}/oauth2/v2.0/token
     scopes: openid email profile
-    # Grafana maps Entra ID App Roles (the token's "roles" claim) to its own
-    # roles, so admins are granted in Entra rather than configured here. Define
-    # App Roles with the values Viewer, Editor, Admin and GrafanaAdmin on the app
-    # registration and assign users/groups to them. role_attribute_strict=false
-    # lets users with no mapped role sign in as Viewer; allow_assign_grafana_admin
-    # lets the GrafanaAdmin app role grant the server (super) admin role.
+    # Map Entra app roles (Viewer/Editor/Admin/GrafanaAdmin) to Grafana roles.
+    # Unmapped users default to Viewer; GrafanaAdmin can grant server admin.
     role_attribute_strict: false
     allow_assign_grafana_admin: true
 
-# Grafana plugins for the AWS data sources below. CloudWatch is built in; X-Ray
-# and Amazon Managed Prometheus are provided by these plugins.
+  # Plugins for X-Ray and Amazon Managed Prometheus (CloudWatch is built in).
 plugins:
   - grafana-x-ray-datasource
   - grafana-amazonprometheus-datasource
 
-# AWS data sources. Grafana runs as the grafana-irsa service account, whose IAM
-# role assumes the data-platform-monitoring role in each monitored account
-# (defined in ../modules/monitoring) to read its data. Every account gets a
-# CloudWatch and an X-Ray data source; accounts with an Amazon Managed
-# Prometheus workspace (prometheus_workspace_id set) also get a Prometheus data
-# source. Driven from grafana_monitored_accounts in environment-configuration.tf.
-# Each data source UID uses account.uid (the account name with the shared
-# data-platform- prefix removed) to stay within Grafana's 40-character limit.
+# Datasources are generated from grafana_monitored_accounts.
+# Grafana assumes data-platform-monitoring in each account via IRSA.
+# Each account gets CloudWatch + X-Ray; AMP is added when workspace ID is set.
+# UIDs use account.uid (without data-platform- prefix) to stay within 40 chars.
 datasources:
   datasources.yaml:
     apiVersion: 1
@@ -157,7 +122,7 @@ datasources:
         jsonData:
           defaultRegion: eu-west-2
           assumeRoleArn: arn:aws:iam::${account.account_id}:role/data-platform-monitoring
-          # Surface the matching X-Ray traces from CloudWatch logs and metrics.
+          # Link CloudWatch metrics/logs to the matching X-Ray datasource.
           tracingDatasourceUid: ${account.uid}-xray
       - name: ${account.name}-xray
         type: grafana-x-ray-datasource
@@ -183,8 +148,5 @@ datasources:
 %{ endif ~}
 %{ endfor ~}
 
-# Dashboards are managed as code by the Terraform grafana provider (see
-# grafana-dashboards.tf and the JSON files in src/helm/dashboards/, where each
-# subdirectory maps to a Grafana folder), not by this chart. Their panels pick
-# one of the CloudWatch data sources above through an "Account" data source
-# template variable, so a single dashboard works across every monitored account.
+# Dashboards are managed by the Terraform Grafana provider, not this chart.
+# Panels select account-specific datasources via an Account template variable.

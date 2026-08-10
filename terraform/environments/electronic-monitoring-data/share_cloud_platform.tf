@@ -135,7 +135,7 @@ variable "cloud-platform-crime-matching-api-iam-preprod" {
 variable "cloud-platform-crime-matching-algorithm-iam-preprod" {
   type        = string
   description = "IAM role that the crime matching algorithm in Cloud Platform will use to connect to this role."
-  default     = "cloud-platform-irsa-65e2e0ef1e64c470-live"
+  default     = "cloud-platform-irsa-6ca3fa16de5344f0-live"
 }
 
 variable "cloud-platform-emdi-iam-dev" {

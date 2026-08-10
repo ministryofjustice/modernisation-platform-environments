@@ -38,6 +38,18 @@ data "aws_iam_roles" "platform_engineer_admin_sso_role" {
 #   private_zone = false
 # }
 
+#------------------------------------------------------------------------------
+# IAM Identity Center — cloud-platform-engineers group ID for ArgoCD RBAC
+#
+# Hardcoded because the ModernisationPlatformSSOReadOnly role returns
+# ResourceNotFoundException when calling GetGroupId despite having the
+# identitystore:Get* permission. TODO: investigate and switch back to
+# data.aws_identitystore_group lookup.
+#------------------------------------------------------------------------------
+locals {
+  cloud_platform_engineers_group_id = "664252b4-7021-701e-49b9-6c46ccc7899e"
+}
+
 data "aws_eks_cluster" "cluster" {
   name       = module.eks.cluster_name
   depends_on = [module.eks]
