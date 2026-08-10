@@ -93,7 +93,7 @@ resource "aws_security_group" "ec2_sg_ftp" {
 #   local.application_data.accounts[local.environment].lz_aws_subnet_env]
 # }
 
-resource "aws_security_group_rule" "ingress_private_traffic_lambda" {
+resource "aws_security_group_rule" "ingress_private_traffic_lambda_ec2" {
   security_group_id = aws_security_group.ec2_sg_ftp.id
   type              = "ingress"
   description       = "allow all tcp traffic from lambda"
@@ -103,7 +103,7 @@ resource "aws_security_group_rule" "ingress_private_traffic_lambda" {
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
-resource "aws_security_group_rule" "ingress_data_traffic_ebsdb" {
+resource "aws_security_group_rule" "ingress_data_traffic_ebsdb_ec2" {
   security_group_id = aws_security_group.ec2_sg_ftp.id
   type              = "ingress"
   description       = "allow all tcp traffic from ebsdb"
@@ -200,7 +200,7 @@ resource "aws_security_group_rule" "egress_traffic_ftp_8022" {
 }
 ### HTTPS
 
-resource "aws_security_group_rule" "egress_private_traffic_lambda" {
+resource "aws_security_group_rule" "egress_private_traffic_lambda_ec2" {
   security_group_id = aws_security_group.ec2_sg_ftp.id
   type              = "egress"
   description       = "allow all tcp traffic to lambda"
@@ -210,7 +210,7 @@ resource "aws_security_group_rule" "egress_private_traffic_lambda" {
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
-resource "aws_security_group_rule" "egress_data_traffic_ebsdb" {
+resource "aws_security_group_rule" "egress_data_traffic_ebsdb_ec2" {
   security_group_id = aws_security_group.ec2_sg_ftp.id
   type              = "egress"
   description       = "allow all tcp traffic to ebsdb"
@@ -220,7 +220,7 @@ resource "aws_security_group_rule" "egress_data_traffic_ebsdb" {
   cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
 }
 
-resource "aws_security_group_rule" "egress_vpce_traffic" {
+resource "aws_security_group_rule" "egress_vpce_traffic_ec2" {
   security_group_id = aws_security_group.ec2_sg_ftp.id
   type              = "egress"
   description       = "Allow egress to VPC endpoints (S3 / Secrets Manager)"
@@ -234,7 +234,7 @@ resource "aws_security_group_rule" "egress_vpce_traffic" {
   ]
 }
 
-resource "aws_security_group_rule" "egress_s3_traffic" {
+resource "aws_security_group_rule" "egress_s3_traffic_ec2" {
   security_group_id = aws_security_group.ec2_sg_ftp.id
   type              = "egress"
   description       = "Allow S3 access via gateway endpoint (prefix list)"
