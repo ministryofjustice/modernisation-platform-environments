@@ -21,22 +21,53 @@ resource "aws_security_group" "lambda_security_group" {
   )
 }
 
-# hashicorp recommened Ingress rule of lambda_security_group
-resource "aws_vpc_security_group_ingress_rule" "lambda_ingress" {
+# # hashicorp recommened Ingress rule of lambda_security_group
+# resource "aws_vpc_security_group_ingress_rule" "lambda_ingress" {
+#   security_group_id = aws_security_group.lambda_security_group.id
+#   description       = "Allow FTP lambda inbound traffic"
+#   cidr_ipv4         = data.aws_vpc.shared.cidr_block
+#   from_port         = 1521
+#   ip_protocol       = "tcp"
+#   to_port           = 1522
+# }
+
+# Explicit Lambda egress rules for private and data subnets
+resource "aws_security_group_rule" "egress_private_traffic_lambda" {
   security_group_id = aws_security_group.lambda_security_group.id
-  description       = "Allow FTP lambda inbound traffic"
-  cidr_ipv4         = data.aws_vpc.shared.cidr_block
-  from_port         = 1521
-  ip_protocol       = "tcp"
-  to_port           = 1522
+  type              = "egress"
+  description       = "allow all tcp traffic to private subnets"
+  protocol          = "TCP"
+  from_port         = 0
+  to_port           = 65535
+  cidr_blocks       = [
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block,
+  ]
 }
 
-# hashicorp recommened egress rule of lambda_security_group
-resource "aws_vpc_security_group_egress_rule" "lambda_egress" {
+resource "aws_security_group_rule" "egress_data_traffic_ebsdb" {
   security_group_id = aws_security_group.lambda_security_group.id
-  description       = "Allow FTP lambdaall outbound traffic"
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1"
+  type              = "egress"
+  description       = "allow TCP traffic to ebsdb subnets"
+  protocol          = "TCP"
+  from_port         = 1521
+  to_port           = 1522
+  cidr_blocks       = [
+    data.aws_subnet.data_subnets_a.cidr_block,
+    data.aws_subnet.data_subnets_b.cidr_block,
+    data.aws_subnet.data_subnets_c.cidr_block,
+  ]
+}
+
+resource "aws_security_group_rule" "egress_https_internet" {
+  security_group_id = aws_security_group.lambda_security_group.id
+  type              = "egress"
+  description       = "allow HTTPS traffic to the internet"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 # Lambda Function
