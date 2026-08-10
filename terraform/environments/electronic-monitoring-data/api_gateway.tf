@@ -163,7 +163,6 @@ data "aws_network_interface" "execute_api_endpoint_eni" {
 }
 
 resource "aws_vpc_endpoint_security_group_association" "cp_access" {
-  provider = aws.core-vpc
   vpc_endpoint_id   = data.aws_vpc_endpoint.api_gateway.id
   security_group_id = aws_security_group.allow_cp_access.id
 }
