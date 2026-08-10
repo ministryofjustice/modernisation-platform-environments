@@ -536,3 +536,39 @@ resource "aws_cloudwatch_log_group" "waf_log_group" {
   name              = "aws-waf-logs-${var.api_name}"
   retention_in_days = 400
 }
+
+data "aws_iam_policy_document" "api_gateway_vpc_policy" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = roles_to_allow
+    }
+
+    actions   = ["execute-api:Invoke"]
+    resources = ["${aws_api_gateway_rest_api.api_gateway.execution_arn}/*"]
+  }
+  statement {
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["execute-api:Invoke"]
+    condition {
+      test     = "StringNotEquals"
+      variable = "aws:sourceVpce"
+      values = [
+        var.api_gateway_endpoint
+      ]
+    }
+    resources = ["${aws_api_gateway_rest_api.api_gateway.execution_arn}/*"]
+  }
+}
+
+
+resource "aws_api_gateway_rest_api_policy" "api_gateway_vpc" {
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+  policy      = data.aws_iam_policy_document.api_gateway_vpc_policy.json
+}
