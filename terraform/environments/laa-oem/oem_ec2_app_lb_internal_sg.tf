@@ -13,14 +13,28 @@ resource "aws_security_group" "load_balancer_internal" {
 }
 
 # EGRESS
+# TODO: remove once Flow Logs confirm no traffic outside tcp/443 needs egress-all
 resource "aws_vpc_security_group_egress_rule" "lb_int_egress_all_0_0_cidr" {
   security_group_id = aws_security_group.load_balancer_internal.id
-  description       = "Allow all outbound traffic"
+  description       = "Allow all outbound traffic (pending removal, see TODO)"
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
 
   tags = {
     Name = "Allow all outbound traffic"
+  }
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_int_egress_tcp_443_443_cidr" {
+  security_group_id = aws_security_group.load_balancer_internal.id
+  description       = "HTTPS outbound only"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = "0.0.0.0/0"
+
+  tags = {
+    Name = "HTTPS outbound"
   }
 }
 
