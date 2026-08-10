@@ -543,7 +543,7 @@ data "aws_iam_policy_document" "api_gateway_vpc_policy" {
 
     principals {
       type        = "AWS"
-      identifiers = roles_to_allow
+      identifiers = var.roles_to_allow
     }
 
     actions   = ["execute-api:Invoke"]
