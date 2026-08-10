@@ -320,14 +320,14 @@ resource "aws_cloudwatch_metric_alarm" "dms_alarm" {
   # Allow a task to not be running for up to 40 minutes (8*300 seconds)
   # to allow for weekly password rotation.  Any replication lag will
   # catch up once it has resumed.
-  evaluation_periods = 8
+  evaluation_periods  = 8
   datapoints_to_alarm = 8
 
-  metric_name         = "DMSTaskNotRunning"
-  namespace           = "Custom/DMS"
-  period              = 300
-  statistic           = "Maximum"
-  threshold           = 1
+  metric_name = "DMSTaskNotRunning"
+  namespace   = "Custom/DMS"
+  period      = 300
+  statistic   = "Maximum"
+  threshold   = 1
   dimensions = {
     Environment = var.env_name
   }
