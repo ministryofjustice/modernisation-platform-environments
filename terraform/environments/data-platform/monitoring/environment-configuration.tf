@@ -23,6 +23,9 @@ locals {
         { name = "data-platform-development", prometheus_workspace_id = "ws-1103e531-1155-4d18-ad5f-87ba29e2a38b7a" },
         { name = "data-platform-test", prometheus_workspace_id = "ws-80d995fc-475d-4232-ad3f-80e2342e428902" },
         { name = "data-platform-preproduction", prometheus_workspace_id = "ws-007c0bbe-4cc7-484b-a012-0105073723ba72" },
+        { name = "data-platform-governance-development", prometheus_workspace_id = "" },
+        { name = "data-platform-governance-test", prometheus_workspace_id = "" },
+        { name = "data-platform-governance-preproduction", prometheus_workspace_id = "" },
       ]
 
       # CIDRs allowed to reach Grafana; joined into the ingress
@@ -61,10 +64,14 @@ locals {
       grafana_dashboards_enabled = true
 
       grafana_monitored_accounts = [
-        { name = "data-platform-production", prometheus_workspace_id = "ws-d3a32572-9e85-49f9-8654-bffcf5877783a2" },
         { name = "data-platform-development", prometheus_workspace_id = "ws-1103e531-1155-4d18-ad5f-87ba29e2a38b7a" },
         { name = "data-platform-test", prometheus_workspace_id = "ws-80d995fc-475d-4232-ad3f-80e2342e428902" },
         { name = "data-platform-preproduction", prometheus_workspace_id = "ws-007c0bbe-4cc7-484b-a012-0105073723ba72" },
+        { name = "data-platform-production", prometheus_workspace_id = "ws-d3a32572-9e85-49f9-8654-bffcf5877783a2" },
+        { name = "data-platform-governance-development", prometheus_workspace_id = "" },
+        { name = "data-platform-governance-test", prometheus_workspace_id = "" },
+        { name = "data-platform-governance-preproduction", prometheus_workspace_id = "" },
+        { name = "data-platform-governance-production", prometheus_workspace_id = "" },
       ]
 
       # CIDRs allowed to reach Grafana; joined into the ingress
