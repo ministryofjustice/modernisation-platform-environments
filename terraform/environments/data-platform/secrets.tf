@@ -18,6 +18,9 @@ module "justiceuk_entra_secret" {
 
   secret_string = jsonencode({
     tenant_id = "CHANGEME"
+    client_id_map = {
+      amazon_sts = "sts.amazonaws.com"
+    }
   })
   ignore_secret_changes = true
 }

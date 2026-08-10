@@ -677,6 +677,7 @@ module "cloudwatch_alarm_threader" {
     ENVIRONMENT           = local.environment_shorthand
     INCLUDE_REASON        = "true"
     ENABLE_CUSTOM_ACTIONS = "false"
+    INCIDENT_QUEUE_URL    = aws_sqs_queue.live_feed_incident_events.id
     GLUE_DB_JANITOR_STATE_MACHINE_ARN = (
       aws_sfn_state_machine.staging_db_janitor.arn
     )
@@ -1113,6 +1114,53 @@ module "write_to_sharepoint" {
   }
 }
 
+
+#-----------------------------------------------------------------------------------
+# Trigger cadt ecs job
+#-----------------------------------------------------------------------------------
+
+module "trigger_cadt" {
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "trigger_cadt"
+  role_name               = module.trigger_cadt_iam.name
+  role_arn                = module.trigger_cadt_iam.arn
+  handler                 = "trigger_cadt.handler"
+  memory_size             = 10240
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    CLUSTER_NAME        = aws_ecs_cluster.cadt.name
+    TASK_DEFINITION_ARN = aws_ecs_task_definition.create_a_derived_table.arn
+    SUBNET_IDS          = jsonencode(data.aws_subnets.shared-private.ids)
+    SECURITY_GROUPS     = jsonencode([aws_security_group.gdpr_batch_sg[0].id])
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# Poll cadt ecs job
+#-----------------------------------------------------------------------------------
+
+module "poll_cadt" {
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "poll_cadt"
+  role_name               = module.poll_cadt_iam.name
+  role_arn                = module.poll_cadt_iam.arn
+  handler                 = "poll_cadt.handler"
+  memory_size             = 10240
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    CLUSTER_NAME        = aws_ecs_cluster.cadt.name
+  }
+}
+
+
 # ------------------------------------------------------------------------------
 # Live-feed incident manager
 # ------------------------------------------------------------------------------
@@ -1160,5 +1208,25 @@ module "live_feed_incident_manager" {
     ENVIRONMENT             = local.environment_shorthand
     POWERTOOLS_LOG_LEVEL    = "INFO"
     POWERTOOLS_SERVICE_NAME = "live-feed-incident-manager"
+
+    GITHUB_SECRET_ARN     = module.live_feed_github_app.secret_arn
+    GITHUB_OWNER          = "moj-analytical-services"
+    GITHUB_REPOSITORY     = "dmet-em"
+    GITHUB_PROJECT_NUMBER = "290"
+    GITHUB_ISSUE_TYPE     = "Bug"
+
+    GITHUB_PROJECT_STATUS_FIELD     = "Status"
+    GITHUB_PROJECT_PRIORITY_FIELD   = "Priority"
+    GITHUB_PROJECT_SPRINT_FIELD     = "Sprint"
+    GITHUB_PROJECT_TODO_OPTION      = "👀 To do"
+    GITHUB_PROJECT_DONE_OPTION      = "✅ Done"
+    GITHUB_PROJECT_PRIORITY_OPTION  = "🚨 Urgent"
+
+    PAGERDUTY_SCHEDULE_ID = "P3MCA8L"
+    PAGERDUTY_TIME_ZONE   = "Europe/London"
+
+    INCIDENT_STATE_BUCKET = local.alarm_thread_state_bucket
+    INCIDENT_STATE_PREFIX = "incident-automation/episodes"
+    AWS_ACCOUNT_ID        = data.aws_caller_identity.current.account_id
   }
 }

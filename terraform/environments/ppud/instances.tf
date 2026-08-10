@@ -704,7 +704,6 @@ resource "aws_instance" "s618358rgvw019" {
     iisadmin_service = "true"
     wwwpub_service   = "true"
     ppudlive_service = "true"
-    port25_check     = "true"
   }
 }
 
@@ -733,7 +732,6 @@ resource "aws_instance" "s618358rgvw020" {
     iisadmin_service = "true"
     wwwpub_service   = "true"
     ppudlive_service = "true"
-    port25_check     = "true"
   }
 }
 
@@ -766,7 +764,6 @@ resource "aws_instance" "s618358rgvw021" {
     e_volume          = "true"
     f_volume          = "true"
     g_volume          = "true"
-    port25_check      = "true"
   }
 }
 
@@ -796,7 +793,6 @@ resource "aws_instance" "s618358rgvw022" {
     ppudlive_service    = "true"
     ppudcrawler_service = "true"
     spooler_service     = "true"
-    port25_check        = "true"
     emailsender_check   = "true"
     e_volume            = "true"
     f_volume            = "true"
@@ -856,7 +852,6 @@ resource "aws_instance" "s618358rgvw027" {
     is-production   = true
     wwwpub_service  = "true"
     spooler_service = "true"
-    port25_check    = "true"
     e_volume        = "true"
     f_volume        = "true"
     g_volume        = "true"

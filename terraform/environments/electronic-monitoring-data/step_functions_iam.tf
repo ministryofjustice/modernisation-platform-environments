@@ -318,3 +318,23 @@ resource "aws_iam_role_policy" "landing_dlq_redriver_eventbridge_start" {
     ]
   })
 }
+
+# ------------------------------------------------------------------------------
+# cadt trigger policy
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "trigger_cadt_step_function_policy_document" {
+  statement {
+    effect  = "Allow"
+    actions = ["lambda:InvokeFunction"]
+    resources = [
+      module.trigger_cadt.lambda_function_arn,
+      module.poll_cadt.lambda_function_arn
+    ]
+  }
+}
+
+resource "aws_iam_policy" "trigger_cadt_step_function_policy" {
+  name   = "trigger_cadt_step_function_role"
+  policy = data.aws_iam_policy_document.trigger_cadt_step_function_policy_document.json
+}

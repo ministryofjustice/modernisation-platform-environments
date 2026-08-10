@@ -77,6 +77,7 @@ locals {
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-algorithm-iam-dev}",
     ] : local.is-preproduction ? [
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-api-iam-preprod}",
+    "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-algorithm-iam-preprod}",
   ] : []
   iam_role_validation_db = local.is-test ? [
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live",
@@ -134,7 +135,7 @@ variable "cloud-platform-crime-matching-api-iam-preprod" {
 variable "cloud-platform-crime-matching-algorithm-iam-preprod" {
   type        = string
   description = "IAM role that the crime matching algorithm in Cloud Platform will use to connect to this role."
-  default     = "cloud-platform-irsa-65e2e0ef1e64c470-live"
+  default     = "cloud-platform-irsa-6ca3fa16de5344f0-live"
 }
 
 variable "cloud-platform-emdi-iam-dev" {
