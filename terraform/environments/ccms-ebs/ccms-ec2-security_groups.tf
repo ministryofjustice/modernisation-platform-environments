@@ -4,7 +4,9 @@ locals {
     aws_security_group.sftp_load_balancer.id,
     aws_security_group.cluster_ec2.id,
     aws_security_group.ecs_tasks_sftp_security_group.id,
-  ]
+    aws_security_group.ec2_sg_ftp.id,
+    aws_security_group.lambda_security_group.id
+    ]
 }
 
 # Rule for all ingress/egress within the environment
