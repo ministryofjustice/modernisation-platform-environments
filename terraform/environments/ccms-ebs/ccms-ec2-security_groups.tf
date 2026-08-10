@@ -1,9 +1,41 @@
+data "aws_security_group" "process_file_from_bucket_lambda_sg" {
+  filter {
+    name   = "tag:Name"
+    values = [format("%s-sftp-process-file-from-bucket-lambda-security-group", local.application_name)]
+  }
+  vpc_id = data.aws_vpc.shared.id
+}
+
+data "aws_security_group" "sftp_load_balancer" {
+  filter {
+    name   = "tag:Name"
+    values = [format("%s-sftp-load-balancer-sg", local.application_name)]
+  }
+  vpc_id = data.aws_vpc.shared.id
+}
+
+data "aws_security_group" "cluster_ec2" {
+  filter {
+    name   = "tag:Name"
+    values = [format("%s-sftp-cluster-ec2-security-group", local.application_name)]
+  }
+  vpc_id = data.aws_vpc.shared.id
+}
+
+data "aws_security_group" "ecs_tasks_sftp_security_group" {
+  filter {
+    name   = "tag:Name"
+    values = [format("%s-sftp-ecs-tasks-security-group", local.application_name)]
+  }
+  vpc_id = data.aws_vpc.shared.id
+}
+
 locals {
   excluded_sgs = [
-    aws_security_group.process_file_from_bucket_lambda_sg.id,
-    aws_security_group.sftp_load_balancer.id,
-    aws_security_group.cluster_ec2.id,
-    aws_security_group.ecs_tasks_sftp_security_group.id,
+    data.aws_security_group.process_file_from_bucket_lambda_sg.id,
+    data.aws_security_group.sftp_load_balancer.id,
+    data.aws_security_group.cluster_ec2.id,
+    data.aws_security_group.ecs_tasks_sftp_security_group.id,
     aws_security_group.ec2_sg_ftp.id,
     aws_security_group.lambda_security_group.id
     ]
