@@ -2837,6 +2837,113 @@ resource "aws_iam_role_policy_attachment" "write_to_sharepoint_iam_role_attach" 
   policy_arn = aws_iam_policy.write_to_sharepoint_iam_policy[0].arn
 }
 
+# ---------------------------------
+# Trigger CADT iam role
+# ---------------------------------
+
+data "aws_iam_policy_document" "cadt_policy_document" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecs:RunTask"
+    ]
+    resources = [
+      "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task-definition/${aws_ecs_task_definition.create_a_derived_table.family}:*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "iam:PassRole"
+    ]
+    resources = [
+      module.ecs_execution_role.arn,
+      aws_iam_role.dataapi_cross_role.arn
+    ]
+    condition {
+      test     = "StringLike"
+      variable = "iam:PassedToService"
+      values   = ["ecs-tasks.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_policy" "trigger_cadt_iam_policy" {
+  name   = "trigger_cadt_lambda_policy"
+  policy = data.aws_iam_policy_document.cadt_policy_document.json
+}
+
+
+module "trigger_cadt_iam" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-role"
+  
+  name = "trigger-cadt-iam-role"
+  trust_policy_permissions = {
+   LambdaAssume = { actions = [
+      "sts:AssumeRole",
+    ]
+    principals = [{
+      type = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }]}
+  }
+
+  policies = {
+    custom = aws_iam_policy.trigger_cadt_iam_policy.arn
+  }
+
+}
+
+
+
+# ---------------------------------
+# Poll CADT iam role
+# ---------------------------------
+
+data "aws_iam_policy_document" "poll_cadt_policy_document" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecs:DescribeTasks"
+    ]
+    resources = [
+      "*"
+    ]
+    condition {
+      test     = "ArnEquals"
+      variable = "ecs:cluster"
+      values = [aws_ecs_cluster.cadt.arn]
+    }
+  }
+}
+
+resource "aws_iam_policy" "poll_cadt_iam_policy" {
+  name   = "poll_cadt_lambda_policy"
+  policy = data.aws_iam_policy_document.poll_cadt_policy_document.json
+}
+
+
+module "poll_cadt_iam" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-role"
+  
+  name = "poll-cadt-iam-role"
+  trust_policy_permissions = {
+   LambdaAssume = { actions = [
+      "sts:AssumeRole",
+    ]
+    principals = [{
+      type = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }]}
+  }
+
+  policies = {
+    custom = aws_iam_policy.poll_cadt_iam_policy.arn
+  }
+
+}
+
 # ------------------------------------------------------------------------------
 # IAM role and policy for the live-feed incident manager Lambda
 # ------------------------------------------------------------------------------

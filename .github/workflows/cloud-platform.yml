@@ -55,6 +55,9 @@ jobs:
             environment: preproduction
             action: "plan"
           - application: cloud-platform
+            environment: nonlive
+            action: "plan"
+          - application: cloud-platform
             environment: live
             action: "plan"
     uses: ./.github/workflows/cloud-platform-reusable.yml
@@ -74,6 +77,9 @@ jobs:
         include:
           - application: cloud-platform
             environment: preproduction
+            action: "plan_apply"
+          - application: cloud-platform
+            environment: nonlive
             action: "plan_apply"
           - application: cloud-platform
             environment: live

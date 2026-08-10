@@ -54,9 +54,11 @@ def plan_multipart_copy(size_bytes, part_size_bytes, maximum_parts):
     ]
 
 
-def select_route(scan_result_status):
+def select_route(scan_result_status, scan_result_status_matches_tag):
     if scan_result_status not in SUPPORTED_SCAN_RESULTS:
         raise ValueError(f"Unsupported scan result status: {scan_result_status}")
+    if not scan_result_status_matches_tag:
+        return "investigation"
     if scan_result_status == "NO_THREATS_FOUND":
         return "clean"
     if scan_result_status == "THREATS_FOUND":

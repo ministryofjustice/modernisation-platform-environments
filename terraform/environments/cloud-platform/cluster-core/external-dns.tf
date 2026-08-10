@@ -27,6 +27,12 @@ module "external_dns" {
       aws_zone_cache_duration = local.aws_zone_cache_duration.development
       log_level               = "info"
     }
+    cloud-platform-nonlive = {
+      domain_name_prefix      = "nonlive"
+      sync_interval           = local.sync_interval.production
+      aws_zone_cache_duration = local.aws_zone_cache_duration.production
+      log_level               = "info"
+    }
     cloud-platform-live = {
       domain_name_prefix      = "live"
       sync_interval           = local.sync_interval.production

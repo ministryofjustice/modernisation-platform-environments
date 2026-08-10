@@ -5,26 +5,6 @@
 # endpoint without a public endpoint or VPN. Development account only.
 ###############################################################################
 
-# Look up the existing cluster VPC (spike uses local state, so not via module).
-data "aws_vpc" "cluster" {
-  filter {
-    name   = "tag:Name"
-    values = [local.cp_vpc_name]
-  }
-}
-
-# Look up the existing private (node) subnets in that VPC.
-data "aws_subnets" "private" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.cluster.id]
-  }
-  filter {
-    name   = "tag:SubnetType"
-    values = ["Private"]
-  }
-}
-
 # IAM role assumed by the SSM relay EC2 instance (dev account only).
 resource "aws_iam_role" "ssm_relay" {
   count = local.is-development ? 1 : 0
@@ -67,7 +47,7 @@ resource "aws_security_group" "ssm_relay" {
 
   name_prefix = "ssm-relay-"
   description = "SSM relay for private EKS API access - outbound HTTPS only"
-  vpc_id      = data.aws_vpc.cluster.id
+  vpc_id      = module.cluster_vpc.vpc_id
 
   egress {
     description = "HTTPS to SSM endpoints and EKS API"
@@ -115,7 +95,7 @@ resource "aws_instance" "ssm_relay" {
 
   ami                    = data.aws_ami.al2023.id
   instance_type          = "t3.micro"
-  subnet_id              = data.aws_subnets.private.ids[0]
+  subnet_id              = module.cluster_vpc.private_subnets[0]
   iam_instance_profile   = aws_iam_instance_profile.ssm_relay[0].name
   vpc_security_group_ids = [aws_security_group.ssm_relay[0].id]
 

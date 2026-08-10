@@ -1114,6 +1114,53 @@ module "write_to_sharepoint" {
   }
 }
 
+
+#-----------------------------------------------------------------------------------
+# Trigger cadt ecs job
+#-----------------------------------------------------------------------------------
+
+module "trigger_cadt" {
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "trigger_cadt"
+  role_name               = module.trigger_cadt_iam.name
+  role_arn                = module.trigger_cadt_iam.arn
+  handler                 = "trigger_cadt.handler"
+  memory_size             = 10240
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    CLUSTER_NAME        = aws_ecs_cluster.cadt.name
+    TASK_DEFINITION_ARN = aws_ecs_task_definition.create_a_derived_table.arn
+    SUBNET_IDS          = jsonencode(data.aws_subnets.shared-private.ids)
+    SECURITY_GROUPS     = jsonencode([aws_security_group.gdpr_batch_sg[0].id])
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# Poll cadt ecs job
+#-----------------------------------------------------------------------------------
+
+module "poll_cadt" {
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "poll_cadt"
+  role_name               = module.poll_cadt_iam.name
+  role_arn                = module.poll_cadt_iam.arn
+  handler                 = "poll_cadt.handler"
+  memory_size             = 10240
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    CLUSTER_NAME        = aws_ecs_cluster.cadt.name
+  }
+}
+
+
 # ------------------------------------------------------------------------------
 # Live-feed incident manager
 # ------------------------------------------------------------------------------
