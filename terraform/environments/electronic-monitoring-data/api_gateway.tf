@@ -141,6 +141,7 @@ data "aws_vpc_endpoint" "api_gateway" {
 }
 
 resource "aws_security_group" "allow_cp_access" {
+  provider    = aws.core-vpc
   name        = "allow_cp_access"
   description = "allow cp access"
   vpc_id      = data.aws_vpc.shared.id
@@ -148,6 +149,7 @@ resource "aws_security_group" "allow_cp_access" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "allow_cp_access" {
+  provider          = aws.core-vpc
   security_group_id = aws_security_group.allow_cp_access.id
 
   cidr_ipv4   = "172.20.0.0/16"
@@ -163,6 +165,7 @@ data "aws_network_interface" "execute_api_endpoint_eni" {
 }
 
 resource "aws_vpc_endpoint_security_group_association" "cp_access" {
+  provider          = aws.core-vpc
   vpc_endpoint_id   = data.aws_vpc_endpoint.api_gateway.id
   security_group_id = aws_security_group.allow_cp_access.id
 }
