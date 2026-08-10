@@ -40,7 +40,7 @@
       "ebsapps_default_iops": 3000,
 
       "ec2_instance_type_ftp": "c5d.large",
-      "ftp_ami_id": "",
+      "ftp_ami_id": "ami-002aab1cab5a08e35",
       "ftp_data_volume_size": 20,
 
       "lz_aws_workspace_nonprod_prod": "10.200.0.0/19",

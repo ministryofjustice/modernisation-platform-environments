@@ -2,7 +2,6 @@
 
 exec > /tmp/userdata.log 2>&1
 
-amazon-linux-extras install -y epel
 yum install -y wget unzip vsftpd
 
 echo "pasv_enable=YES" >> /etc/vsftpd/vsftpd.conf
