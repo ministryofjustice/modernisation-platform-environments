@@ -196,7 +196,7 @@ resource "aws_route53_record" "pwm_amazonses_dmarc_record" {
 #####################
 
 resource "aws_iam_user" "pwm_ses_smtp_user" {
-  #checkov:skip=CKV_AWS_273: SES SMTP authentication requires IAM user credentials; no human access is granted
+  #checkov:skip=CKV_AWS_273: "SES SMTP authentication requires IAM user credentials; no human access is granted"
   name = "${var.env_name}-pwm-smtp-user"
 }
 
@@ -205,9 +205,9 @@ resource "aws_iam_access_key" "pwm_ses_smtp_user" {
 }
 
 resource "aws_iam_user_policy" "pwm_ses_smtp_user" {
-  #checkov:skip=CKV_AWS_355: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
-  #checkov:skip=CKV_AWS_40: "Ensure IAM policies are attached only to groups or roles"
-  #checkov:skip=CKV_AWS_290: "ignore"
+  #checkov:skip=CKV_AWS_355: "SES email-sending APIs intentionally use Resource "*" because this dedicated SMTP user must be able to send from any verified SES identity""
+  #checkov:skip=CKV_AWS_40: "SES SMTP credentials require an IAM user; this inline policy is intentionally attached directly to the dedicated SMTP user"
+  #checkov:skip=CKV_AWS_290: "Resource "*" is required for SES SendEmail and SendRawEmail actions, as they do not support resource-level permissions"
   name = "${var.env_name}-pwm-ses-smtp-user-policy"
   user = aws_iam_user.pwm_ses_smtp_user.name
 

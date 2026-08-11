@@ -45,15 +45,24 @@ resource "aws_iam_role_policy_attachment" "lambda_ssm" {
 }
 
 data "aws_iam_policy_document" "lambda_elb_policy_document" {
-  #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
-  #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
   statement {
+    sid = "DescribeTargetHealth"
     actions = [
-      "elasticloadbalancing:DescribeTargetHealth",
+      "elasticloadbalancing:DescribeTargetHealth"
+    ]
+    resources = [
+      var.target_arn
+    ]
+  }
+  statement {
+    sid = "RegisterDeregisterTargets"
+    actions = [
       "elasticloadbalancing:RegisterTargets",
       "elasticloadbalancing:DeregisterTargets"
     ]
-    resources = ["*"]
+    resources = [
+      var.target_arn
+    ]
   }
 }
 resource "aws_iam_policy" "lambda_elb_policy" {
@@ -96,17 +105,18 @@ resource "aws_iam_role_policy_attachment" "lambda_ecs" {
 
 
 resource "aws_lambda_function" "ecs_restart_handler" {
-  #checkov:skip=CKV_AWS_117
-  #checkov:skip=CKV_AWS_173
-  #checkov:skip=CKV_AWS_272
-  #checkov:skip=CKV_AWS_116
-  #checkov:skip=CKV_AWS_50
-  #checkov:skip=CKV_AWS_115
+  #checkov:skip=CKV_AWS_117: "VPC not required - Lambda only calls AWS APIs via service endpoints"
+  #checkov:skip=CKV_AWS_173: "Env Vars are not sensitive"
+  #checkov:skip=CKV_AWS_272: "Doesn't require code signing"
+  #checkov:skip=CKV_AWS_116: "DLQ not required"
+  #checkov:skip=CKV_AWS_50: "X-Ray tracing not required"
   function_name = "${var.environment}_ecs_restart_handler"
   description   = "Lambda to restart ECS Tasks"
   runtime       = "python3.12"
   handler       = "lambda_function.lambda_handler"
   role          = aws_iam_role.lambda_execution_role.arn
+
+  reserved_concurrent_executions = 10
 
   environment {
     variables = merge(
@@ -132,16 +142,18 @@ resource "aws_lambda_permission" "allow_eventbridge" {
 
 
 resource "aws_lambda_function" "calculate_wait_time" {
-  #checkov:skip=CKV_AWS_117
-  #checkov:skip=CKV_AWS_173
-  #checkov:skip=CKV_AWS_272
-  #checkov:skip=CKV_AWS_116
-  #checkov:skip=CKV_AWS_50
+  #checkov:skip=CKV_AWS_117: "VPC not required - Lambda only calls AWS APIs via service endpoints"
+  #checkov:skip=CKV_AWS_173: "Env Vars are not sensitive"
+  #checkov:skip=CKV_AWS_272: "Doesn't require code signing"
+  #checkov:skip=CKV_AWS_116: "DLQ not required"
+  #checkov:skip=CKV_AWS_50: "X-Ray tracing not required"
   #checkov:skip=CKV_AWS_115
   function_name = "${var.environment}_calculate_wait_time"
   runtime       = "python3.12"
   handler       = "lambda_function.lambda_handler"
   role          = aws_iam_role.lambda_execution_role.arn
+
+  reserved_concurrent_executions = 10
 
   environment {
     variables = merge(
@@ -172,18 +184,19 @@ data "archive_file" "lambda_function_ldap_circuit_handler_payload" {
 }
 
 resource "aws_lambda_function" "ldap_circuit_handler" {
-  #checkov:skip=CKV_AWS_117
-  #checkov:skip=CKV_AWS_173
-  #checkov:skip=CKV_AWS_272
-  #checkov:skip=CKV_AWS_116
-  #checkov:skip=CKV_AWS_50
-  #checkov:skip=CKV_AWS_115
+  #checkov:skip=CKV_AWS_117: "VPC not required - Lambda only calls AWS APIs via service endpoints"
+  #checkov:skip=CKV_AWS_173: "Env Vars are not sensitive"
+  #checkov:skip=CKV_AWS_272: "Doesn't require code signing"
+  #checkov:skip=CKV_AWS_116: "DLQ not required"
+  #checkov:skip=CKV_AWS_50: "X-Ray tracing not required"
   function_name = "${var.environment}_ldap_circuit_handler"
   description   = "Lambda to control LDAP ciruit breaker feature"
   runtime       = "python3.12"
   handler       = "lambda_function.lambda_handler"
   role          = aws_iam_role.lambda_execution_role.arn
   timeout       = 600
+
+  reserved_concurrent_executions = 10
 
   environment {
     variables = merge(

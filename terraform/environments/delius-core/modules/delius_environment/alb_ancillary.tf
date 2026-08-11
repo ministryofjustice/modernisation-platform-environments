@@ -1,5 +1,5 @@
 resource "aws_security_group" "ancillary_alb_security_group" {
-  name        = format("%s - Delius Core Ancilliary Load Balancer", var.env_name)
+  name        = format("%s - Delius Core Ancillary Load Balancer", var.env_name)
   description = "controls access to and from delius front-end load balancer"
   vpc_id      = var.account_config.shared_vpc_id
   tags        = local.tags
@@ -51,11 +51,11 @@ resource "aws_vpc_security_group_egress_rule" "ancillary_alb_egress_private" {
 
 # tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "delius_core_ancillary" {
-  #checkov:skip=CKV_AWS_91 "ignore"
-  #checkov:skip=CKV2_AWS_28 "ignore"
-  #checkov:skip=CKV_AWS_150
+  #checkov:skip=CKV_AWS_91 "Access logging not required"
+  #checkov:skip=CKV2_AWS_28 "WAF configuration is managed automatically by Shield Advanced"
+  #checkov:skip=CKV_AWS_150 "Deletion protenction not required"
 
-  name               = "${var.env_name}-ancilliary-alb"
+  name               = "${var.env_name}-ancillary-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.ancillary_alb_security_group.id]

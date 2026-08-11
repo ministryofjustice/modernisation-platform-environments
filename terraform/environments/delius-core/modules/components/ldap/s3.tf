@@ -1,6 +1,4 @@
 module "s3_bucket_migration" {
-  #checkov:skip=CKV_TF_1
-
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399" # v9.0.0
 
   providers = {
@@ -101,8 +99,6 @@ module "s3_bucket_migration" {
 
 # Create s3 bucket for deployment state
 module "s3_bucket_app_deployment" {
-  #checkov:skip=CKV_TF_1
-
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399" # v9.0.0
 
   bucket_prefix      = "ldap-${var.env_name}-deployment-state"

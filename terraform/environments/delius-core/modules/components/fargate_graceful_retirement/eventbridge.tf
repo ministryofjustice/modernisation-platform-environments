@@ -32,11 +32,9 @@ data "aws_iam_policy_document" "ecs_restart_logging" {
       "logs:CreateLogStream",
       "logs:PutLogEvents"
     ]
-
     resources = [
       "${aws_cloudwatch_log_group.ecs_restart_events.arn}:*"
     ]
-
     principals {
       type = "Service"
       identifiers = [
@@ -51,7 +49,6 @@ resource "aws_cloudwatch_log_resource_policy" "ecs_restart_logging_policy" {
   policy_document = data.aws_iam_policy_document.ecs_restart_logging.json
   policy_name     = "ecs-restart-events-log-policy-${var.environment}"
 }
-
 
 # event bridge target to push to log groups
 resource "aws_cloudwatch_event_target" "ecs_restart_logging_target" {
@@ -81,6 +78,14 @@ resource "aws_iam_policy" "eventbridge_execution_role_policy" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "${aws_cloudwatch_log_group.ecs_restart_events.arn}:*"
+      },
       {
         Effect   = "Allow"
         Action   = "states:StartExecution",

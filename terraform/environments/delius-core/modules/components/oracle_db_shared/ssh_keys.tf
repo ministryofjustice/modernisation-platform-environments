@@ -1,7 +1,5 @@
 # Create s3 bucket for s3 keys
 module "s3_bucket_ssh_keys" {
-  #checkov:skip=CKV_TF_1
-
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399" # v9.0.0
 
   bucket_name = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-ssh-keys"

@@ -16,7 +16,6 @@ resource "aws_iam_role" "step_function_role" {
 }
 
 resource "aws_iam_policy" "step_function_policy" {
-  #checkov:skip=CKV_AWS_355: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
   #checkov:skip=CKV_AWS_290: "ignore"
   name = "${var.environment}_step_function_policy"
   policy = jsonencode({
@@ -28,10 +27,13 @@ resource "aws_iam_policy" "step_function_policy" {
         Resource = [aws_lambda_function.ecs_restart_handler.arn, aws_lambda_function.calculate_wait_time.arn, aws_lambda_function.ldap_circuit_handler.arn]
       },
       {
-        Effect   = "Allow"
-        Action   = "logs:*",
-        Resource = "*"
-      }
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "${aws_cloudwatch_log_group.log_group_for_sfn.arn}:*"
+      },
     ]
   })
 }
@@ -49,8 +51,7 @@ resource "aws_cloudwatch_log_group" "log_group_for_sfn" {
 }
 
 resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
-  #checkov:skip=CKV_AWS_285 "Logging is enabled"
-  #checkov:skip=CKV_AWS_284: "Unnecessary"
+  #checkov:skip=CKV_AWS_284: "X-Ray tracing not required"
   name     = "${var.environment}_ecs_restart_state_machine"
   role_arn = aws_iam_role.step_function_role.arn
 

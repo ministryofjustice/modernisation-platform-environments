@@ -16,7 +16,7 @@ locals {
 # SSM parameter (default value CLOSED)
 ##########################
 resource "aws_ssm_parameter" "ldap_circuit_breaker" {
-  #checkov:skip=CKV2_AWS_34 "ignore"
+  #checkov:skip=CKV2_AWS_34 "Nonsensitive value, doesn't require encryption"
   name  = local.ssm_parameter_name
   type  = "String"
   value = "CLOSED" # CLOSED = traffic flows, OPEN = circuit broken, no traffic

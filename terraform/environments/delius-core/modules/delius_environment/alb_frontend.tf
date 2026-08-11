@@ -84,9 +84,9 @@ locals {
 
 # tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "delius_core_frontend" {
-  #checkov:skip=CKV_AWS_91 "ignore"
-  #checkov:skip=CKV2_AWS_28 "ignore"
-  #checkov:skip=CKV_AWS_150: "Deletion protection off"
+  #checkov:skip=CKV_AWS_91 "Access logging not required"
+  #checkov:skip=CKV2_AWS_28 "WAF configuration is managed automatically by Shield Advanced"
+  #checkov:skip=CKV_AWS_150 "Deletion protenction not required"
   name               = local.alb_name
   internal           = false
   load_balancer_type = "application"

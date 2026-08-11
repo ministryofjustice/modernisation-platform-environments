@@ -24,7 +24,6 @@ data "aws_iam_policy_document" "s3_bucket_oracledb_backups" {
 }
 
 module "s3_bucket_oracledb_backups" {
-  #checkov:skip=CKV_TF_1 "ignore"
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399" # v9.0.0
   bucket_name         = local.oracle_backup_bucket_prefix
   versioning_enabled  = true
@@ -213,7 +212,6 @@ resource "aws_iam_policy" "oracledb_backup_bucket_access" {
 }
 
 module "s3_bucket_oracledb_backups_inventory" {
-  #checkov:skip=CKV_TF_1 "ignore"
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399" # v9.0.0
   bucket_name         = "${local.oracle_backup_bucket_prefix}-inventory"
   versioning_enabled  = false
@@ -346,7 +344,6 @@ data "aws_iam_policy_document" "s3_bucket_oracle_statistics" {
 }
 
 module "s3_bucket_oracle_statistics" {
-  #checkov:skip=CKV_TF_1 "ignore"
   count = var.deploy_oracle_stats ? 1 : 0
 
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399" # v9.0.0
