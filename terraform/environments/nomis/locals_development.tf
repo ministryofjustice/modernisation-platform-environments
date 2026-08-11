@@ -405,6 +405,9 @@ locals {
       qa-nomis-web12-a = merge(local.ec2_instances.web_12, {
         config = merge(local.ec2_instances.web_12.config, {
           availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.web_12.config.instance_profile_policies, [
+            "Ec2QAWeblogicPolicy",
+          ])
         })
         user_data_cloud_init = merge(local.ec2_instances.web_12.user_data_cloud_init, {
           args = merge(local.ec2_instances.web_12.user_data_cloud_init.args, {
@@ -482,6 +485,36 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/dev/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/dev/weblogic-*",
+            ]
+          }
+        ])
+      }
+      Ec2QAWeblogicPolicy = {
+        description = "Permissions required for QA Weblogic EC2s"
+        statements = concat(local.iam_policy_statements_ec2.web, [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa/*",
+            ]
+          }
+        ])
+      }
+      Ec2RelWeblogicPolicy = {
+        description = "Permissions required for REL Weblogic EC2s"
+        statements = concat(local.iam_policy_statements_ec2.web, [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/rel/*",
             ]
           }
         ])
