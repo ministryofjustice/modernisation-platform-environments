@@ -16,7 +16,7 @@ data "aws_secretsmanager_secret" "external_account_id" {
   name = "external-aws-account"
 }
 
-data "aws_secretsmanager_secret_version" "external_account_id" {
+data "aws_secretsmanager_secret_version" "external_ account_id" {
   secret_id = data.aws_secretsmanager_secret.external_account_id.id
 }
 
@@ -138,7 +138,6 @@ module "assume_iam_role" {
   ]
 
   tags = {
-    Environment = terraform.workspace
     Application = "data-factory-corporate"
     Component   = "people"
     Infrastructure = "assume-iam-role"
