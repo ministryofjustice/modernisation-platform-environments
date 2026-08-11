@@ -216,7 +216,6 @@ resource "aws_iam_role" "lambda_exec" {
 # IAM Policy for Lambda (permissions to describe DMS tasks and write to the clodwatch logs)
 resource "aws_iam_role_policy" "lambda_policy" {
   #checkov:skip=CKV_AWS_290 "ignore"
-  #checkov:skip=CKV_AWS_50 "ignore"
   #checkov:skip=CKV_AWS_355 "ignore"
   name = "${var.env_name}-dms-checker-policy"
   role = aws_iam_role.lambda_exec.id
@@ -262,18 +261,19 @@ data "archive_file" "lambda_dms_replication_stopped_zip" {
 
 # Lambda Function to check DMS replication is not running (source in Zip archive)
 resource "aws_lambda_function" "dms_checker" {
-  #checkov:skip=CKV_AWS_117 "ignore"
-  #checkov:skip=CKV_AWS_116 "ignore"
-  #checkov:skip=CKV_AWS_115 "ignore"
-  #checkov:skip=CKV_AWS_173 "ignore"
-  #checkov:skip=CKV_AWS_50 "ignore"
-  #checkov:skip=CKV_AWS_272 "ignore"
+  #checkov:skip=CKV_AWS_117: "VPC not required - Lambda only calls AWS APIs via service endpoints"
+  #checkov:skip=CKV_AWS_116: "DLQ not required"
+  #checkov:skip=CKV_AWS_173: "Env Vars are not sensitive"
+  #checkov:skip=CKV_AWS_50: "X-Ray tracing not required"
+  #checkov:skip=CKV_AWS_272: "Doesn't require code signing"
   function_name = "${var.env_name}-dms-task-health-checker"
   role          = aws_iam_role.lambda_exec.arn
   handler       = "detect_stopped_replication.lambda_handler"
   runtime       = "python3.11"
   timeout       = 30
   filename      = "${path.module}/lambda/detect_stopped_replication.zip"
+
+  reserved_concurrent_executions = 10
 
   # Automatically triggers redeploy when code changes
   source_code_hash = data.archive_file.lambda_dms_replication_stopped_zip.output_base64sha256

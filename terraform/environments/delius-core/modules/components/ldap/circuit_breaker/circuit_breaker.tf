@@ -97,12 +97,11 @@ resource "aws_iam_role_policy" "lambda_policy" {
 }
 
 resource "aws_lambda_function" "circuit_breaker" {
-  #checkov:skip=CKV_AWS_272 "ignore"
-  #checkov:skip=CKV_AWS_115 "ignore"
-  #checkov:skip=CKV_AWS_173 "ignore"
-  #checkov:skip=CKV_AWS_50 "ignore"
-  #checkov:skip=CKV_AWS_116 "ignore"
-  #checkov:skip=CKV_AWS_117 "ignore"
+  #checkov:skip=CKV_AWS_272: "Doesn't require code signing"
+  #checkov:skip=CKV_AWS_173: "Env Vars are not sensitive"
+  #checkov:skip=CKV_AWS_50: "X-Ray tracing not required"
+  #checkov:skip=CKV_AWS_116: "DLQ not required"
+  #checkov:skip=CKV_AWS_117: "VPC not required - Lambda only calls AWS APIs via service endpoints"
   filename         = data.archive_file.lambda_zip.output_path
   function_name    = "${var.env_name}-ldap-circuit-breaker"
   description      = "Lambda to control circuit for ldap service"
@@ -110,6 +109,8 @@ resource "aws_lambda_function" "circuit_breaker" {
   handler          = "circuit_breaker.lambda_handler"
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
   runtime          = "python3.11"
+
+  reserved_concurrent_executions = 10
 
   environment {
     variables = {

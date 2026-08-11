@@ -147,7 +147,6 @@ resource "aws_lambda_function" "calculate_wait_time" {
   #checkov:skip=CKV_AWS_272: "Doesn't require code signing"
   #checkov:skip=CKV_AWS_116: "DLQ not required"
   #checkov:skip=CKV_AWS_50: "X-Ray tracing not required"
-  #checkov:skip=CKV_AWS_115
   function_name = "${var.environment}_calculate_wait_time"
   runtime       = "python3.12"
   handler       = "lambda_function.lambda_handler"

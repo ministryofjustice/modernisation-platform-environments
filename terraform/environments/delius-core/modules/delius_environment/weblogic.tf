@@ -100,7 +100,7 @@ data "aws_ami" "ecs_ami" {
 }
 
 resource "aws_launch_template" "weblogic" {
-  #checkov:skip=CKV_AWS_341
+  #checkov:skip=CKV_AWS_341: "To Do: Test required hop limit"
   name_prefix   = "weblogic-${var.env_name}-ecs-"
   image_id      = data.aws_ami.ecs_ami.id
   instance_type = var.delius_microservice_configs.weblogic.ec2_instance_type
