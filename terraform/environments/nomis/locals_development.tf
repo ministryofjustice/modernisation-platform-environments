@@ -402,6 +402,24 @@ locals {
         })
       })
 
+      dev-nomis-web12-a = merge(local.ec2_instances.web_12, {
+        config = merge(local.ec2_instances.web_12.config, {
+          availability_zone = "eu-west-2a"
+        })
+        user_data_cloud_init = merge(local.ec2_instances.web_12.user_data_cloud_init, {
+          args = merge(local.ec2_instances.web_12.user_data_cloud_init.args, {
+            branch = "PLAT-6"
+          })
+        })
+        tags = merge(local.ec2_instances.web_12.tags, {
+          instance-scheduling  = "skip-scheduling"
+          nomis-environment    = "dev"
+          oracle-db-hostname-a = "dev-nomis-db-1-a"
+          oracle-db-hostname-b = "none"
+          oracle-db-name       = "dev"
+        })
+      })
+
       qa11r-nomis-web-a = merge(local.ec2_instances.web, {
         config = merge(local.ec2_instances.web.config, {
           availability_zone = "eu-west-2a"
