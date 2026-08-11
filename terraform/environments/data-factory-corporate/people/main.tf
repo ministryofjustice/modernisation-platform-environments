@@ -97,7 +97,7 @@ module "sherlock_glue_database" {
 }
 
 module "assume_iam_role" {
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/external-i-am-role?ref=external-iam-dev"
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/external-i-am-role?ref=5a63095dcff8fceeac1b28e7ec4e8c8753345ed7"
   
   role_name = "datafactory_dev_assume_role"
 
