@@ -137,11 +137,7 @@ module "assume_iam_role" {
     "glue:UpdateTable"
   ]
 
-  tags = {
-    Application = "data-factory-corporate"
-    Component   = "people"
-    Infrastructure = "assume-iam-role"
-  }
+
 
   }
 
