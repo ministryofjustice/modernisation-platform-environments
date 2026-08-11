@@ -12,13 +12,13 @@ module "sherlock_landing_bucket" {
   }
 }
 
-# data "aws_secretsmanager_secret" "external_account_id" {
-#   name = "external-aws-account"
-# }
+data "aws_secretsmanager_secret" "external_account_id" {
+  name = "external-aws-account"
+}
 
-# data "aws_secretsmanager_secret_version" "external_account_id" {
-#   secret_id = data.aws_secretsmanager_secret.external_account_id.id
-# }
+data "aws_secretsmanager_secret_version" "external_account_id" {
+  secret_id = data.aws_secretsmanager_secret.external_account_id.id
+}
 
 locals {
   glue_catalog_arn = "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog"
@@ -89,60 +89,60 @@ module "sherlock_glue_database" {
   storage = {
     bucket_name = module.sherlock_landing_bucket_test.bucket.bucket
 
-    #currently the prefix is not optional, but should be.
+    #currently the prefix is not optional
     prefix      = "avature-sherlock"
     kms_key_arn = module.sherlock_kms_key.key_arn
   }
 
 }
 
-# module "assume_iam_role" {
-#   source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/external-i-am-role?ref=external-iam-dev"
+module "assume_iam_role" {
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/external-i-am-role?ref=external-iam-dev"
   
-#   role_name = "datafactory_dev_assume_role"
+  role_name = "datafactory_dev_assume_role"
 
-#   trusted_account_id = data.aws_secretsmanager_secret_version.external_account_id.secret_string
+  trusted_account_id = data.aws_secretsmanager_secret_version.external_account_id.secret_string
 
-#   bucket_arn = module.sherlock_landing_bucket_test.bucket.arn
+  bucket_arn = module.sherlock_landing_bucket_test.bucket.arn
 
-#   s3_prefix = "avature-sherlock"
+  s3_prefix = "avature-sherlock"
 
-#   s3_object_actions = [
-#     "s3:GetObject",
-#     "s3:PutObject",
-#     "s3:ListBucket"
-#   ]
+  s3_object_actions = [
+    "s3:GetObject",
+    "s3:PutObject",
+    "s3:ListBucket"
+  ]
 
-#   kms_key_arn = module.sherlock_kms_key.key_arn
+  kms_key_arn = module.sherlock_kms_key.key_arn
 
-#   kms_actions = [
-#     "kms:Decrypt",
-#     "kms:Encrypt",
-#     "kms:GenerateDataKey",
-#     "kms:DescribeKey",
-#     "kms:ReEncryptFrom",
-#     "kms:ReEncryptTo"
-#   ]
+  kms_actions = [
+    "kms:Decrypt",
+    "kms:Encrypt",
+    "kms:GenerateDataKey",
+    "kms:DescribeKey",
+    "kms:ReEncryptFrom",
+    "kms:ReEncryptTo"
+  ]
 
-#   glue_database_arn = module.sherlock_glue_database.glue_database_arn
-#   glue_catalog_arn = local.glue_catalog_arn
-#   glue_table_name = "*"
+  glue_database_arn = module.sherlock_glue_database.glue_database_arn
+  glue_catalog_arn = local.glue_catalog_arn
+  glue_table_name = "*"
 
-#   glue_actions =[
-#     "glue:GetDatabase",
-#     "glue:GetTable",
-#     "glue:SearchTables",
-#     "glue:DeleteTable",
-#     "glue:CreateTable",
-#     "glue:UpdateTable"
-#   ]
+  glue_actions =[
+    "glue:GetDatabase",
+    "glue:GetTable",
+    "glue:SearchTables",
+    "glue:DeleteTable",
+    "glue:CreateTable",
+    "glue:UpdateTable"
+  ]
 
-#   tags = {
-#     Environment = terraform.workspace
-#     Application = "data-factory-corporate"
-#     Component   = "people"
-#     Infrastructure = "assume-iam-role"
-#   }
+  tags = {
+    Environment = terraform.workspace
+    Application = "data-factory-corporate"
+    Component   = "people"
+    Infrastructure = "assume-iam-role"
+  }
 
-#   }
+  }
 
