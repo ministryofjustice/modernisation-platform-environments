@@ -416,7 +416,7 @@ locals {
           nomis-environment    = "dev"
           oracle-db-hostname-a = "nomis-db19c-1-a"
           oracle-db-hostname-b = "none"
-          oracle-db-name       = "dev"
+          oracle-db-name       = "qa19c"
         })
       })
 
