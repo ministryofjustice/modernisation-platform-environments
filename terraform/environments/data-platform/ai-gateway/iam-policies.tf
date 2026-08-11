@@ -51,14 +51,15 @@ data "aws_iam_policy_document" "ai_gateway" {
     ]
   }
 
-  # DEBUG
   statement {
-    sid     = "AssumeOCTOEngineeringAIEnablementRole"
+    sid     = "AssumeAmazonBedrockModelRoles"
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
-    resources = [
-      "arn:aws:iam::${local.environment_management.account_ids["octo-engineering-ai-enablement-production"]}:role/ai-gateway"
-    ]
+    resources = distinct([
+      for model in values(try(local.ai_gateway_configuration.models.amazon_bedrock, {})) :
+      "arn:aws:iam::${local.environment_management.account_ids[model.aws_account_name]}:role/${model.aws_role_name}"
+      if can(model.aws_account_name) && can(model.aws_role_name)
+    ])
   }
 }
 

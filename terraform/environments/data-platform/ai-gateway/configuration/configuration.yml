@@ -230,6 +230,25 @@ models:
       aws_account_name: octo-engineering-ai-enablement-production
       aws_role_name: ai-gateway
       generally_available: false
+    # Digital Prison Reporting
+    dpr-development-claude-haiku-4-5:
+      model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Development)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Haiku 4.5 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-development
+      aws_role_name: ai-gateway
+      generally_available: false
+    dpr-production-claude-haiku-4-5:
+      model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Production)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Haiku 4.5 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-production
+      aws_role_name: ai-gateway
+      generally_available: false
   google_gemini_enterprise_agent_platform: {}
   microsoft_foundry:
     # Anthropic

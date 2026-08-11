@@ -10,7 +10,7 @@ resource "litellm_model" "amazon_bedrock" {
   aws_role_name   = can(each.value.aws_role_name) ? "arn:aws:iam::${local.environment_management.account_ids[each.value.aws_account_name]}:role/${each.value.aws_role_name}" : module.iam_role.arn
 
   additional_litellm_params = {
-    ai_model_provider            = "Amazon Bedrock"
+    ai_model_provider            = try(each.value.model_provider, "Amazon Bedrock")
     ai_model_family              = each.value.model_family
     ai_model_name                = each.value.model_name
     ai_model_generally_available = each.value.generally_available
