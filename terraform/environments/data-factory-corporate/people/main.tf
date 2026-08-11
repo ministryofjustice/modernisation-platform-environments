@@ -12,8 +12,18 @@ module "sherlock_landing_bucket" {
   }
 }
 
+data "aws_secretsmanager_secret" "external_account_id" {
+  name = "external-aws-account"
+}
+
+data "aws_secretsmanager_secret_version" "external_account_id" {
+  secret_id = data.aws_secretsmanager_secret.external_account_id.id
+}
+
 locals {
-  glue_catalog_arn = "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog"
+  glue_catalog_arn = "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog"
+
+  external_account_id = data.aws_secretsmanager_secret_version.external_account_id.secret_string
 }
 
 module "sherlock_landing_bucket_test" {
@@ -71,32 +81,32 @@ resource "aws_secretsmanager_secret" "external_account" {
   }
 }
 
-# module "sherlock_glue_database" {
-#   source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/data-factory-glue-database?ref=glue_outputs"
+module "sherlock_glue_database" {
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/data-factory-glue-database?ref=glue_outputs"
   
-#   database_name = "sherlock_glue_database"
+  database_name = "sherlock_glue_database"
 
-#   storage = {
-#     bucket_name = module.sherlock_landing_bucket_test.bucket.bucket
+  storage = {
+    bucket_name = module.sherlock_landing_bucket_test.bucket.bucket
 
-#     #currently the prefix is not optional, but should be.
-#     prefix      = "avature-sherlock"
-#     kms_key_arn = module.sherlock_kms_key.key_arn
-#   }
-#   tags = {
-#     Environment = terraform.workspace
-#     Application = "data-factory-corporate"
-#     Component   = "people"
-#     Infrastructure = "sherlock-glue-database"
-#   }
-# }
+    #currently the prefix is not optional, but should be.
+    prefix      = "avature-sherlock"
+    kms_key_arn = module.sherlock_kms_key.key_arn
+  }
+  tags = {
+    Environment = terraform.workspace
+    Application = "data-factory-corporate"
+    Component   = "people"
+    Infrastructure = "sherlock-glue-database"
+  }
+}
 
 # module "assume_iam_role" {
 #   source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/external-i-am-role?ref=external-iam-dev"
   
 #   role_name = "datafactory_dev_assume_role"
 
-#   trusted_account_id = ""
+#   trusted_account_id = data.aws_secretsmanager_secret_version.external_account_id.secret_string
 
 #   bucket_arn = module.sherlock_landing_bucket_test.bucket.arn
 
