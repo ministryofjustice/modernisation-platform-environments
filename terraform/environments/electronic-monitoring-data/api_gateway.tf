@@ -126,6 +126,7 @@ resource "aws_iam_role_policy" "cloudwatch" {
 # --------------------------------------------------------------------------------
 # update_p1_export
 # --------------------------------------------------------------------------------
+
 locals {
   endpoint_type = local.is-development ? { "REGIONAL" : null } : { "PRIVATE" : data.aws_vpc_endpoint.api_gateway.cidr_blocks }
 }
