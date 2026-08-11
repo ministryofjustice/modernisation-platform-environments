@@ -279,12 +279,12 @@ resource "aws_cloudwatch_metric_alarm" "merge_lambdas_slow_execution" {
   for_each = local.merge_lambdas
 
   alarm_name          = "${each.key}_slow_execution"
-  alarm_description   = "Detects when average run time over half an hour is slow."
+  alarm_description   = "Detects a slow maximum runtime."
   comparison_operator = "GreaterThanOrEqualToThreshold"
   threshold           = 120000
   unit                = "Milliseconds"
-  period              = 1800
-  statistic           = "Average"
+  period              = 180
+  statistic           = "Maximum"
   evaluation_periods  = 1
   treat_missing_data  = "notBreaching"
 

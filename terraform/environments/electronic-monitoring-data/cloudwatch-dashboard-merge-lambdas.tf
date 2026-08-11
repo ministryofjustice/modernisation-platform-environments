@@ -75,7 +75,7 @@ locals {
         width  = 24
         height = 6
         properties = {
-          title  = "Total Data Scanned"
+          title  = "Average Data Scanned"
           region = "eu-west-2"
           stat   = "Average"
           period = 120
