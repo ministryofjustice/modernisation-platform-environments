@@ -137,7 +137,9 @@ module "assume_iam_role" {
     "glue:UpdateTable"
   ]
 
+  tags = {
 
+  }
 
   }
 
