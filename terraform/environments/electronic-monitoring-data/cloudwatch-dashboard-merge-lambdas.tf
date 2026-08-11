@@ -24,7 +24,7 @@ locals {
           title  = "Total Successful Queries"
           region = "eu-west-2"
           stat   = "Sum"
-          period = 60
+          period = 120
           metrics = [
             [
               "EM/MergeLambdas",
@@ -51,7 +51,7 @@ locals {
           title  = "Total Failed Queries"
           region = "eu-west-2"
           stat   = "Sum"
-          period = 60
+          period = 120
           metrics = [
             [
               "EM/MergeLambdas",
@@ -75,10 +75,10 @@ locals {
         width  = 24
         height = 6
         properties = {
-          title  = "Total Data Scanned"
+          title  = "Average Data Scanned"
           region = "eu-west-2"
-          stat   = "Sum"
-          period = 180
+          stat   = "Average"
+          period = 120
           metrics = [
             [
               "EM/MergeLambdas",
@@ -105,7 +105,7 @@ locals {
           title  = "Average Total Execution Time"
           region = "eu-west-2"
           stat   = "Average"
-          period = 180
+          period = 120
           metrics = [
             [
               "EM/MergeLambdas",
@@ -141,7 +141,7 @@ locals {
           title  = "Average Engine Execution Time"
           region = "eu-west-2"
           stat   = "Average"
-          period = 180
+          period = 120
           metrics = [
             [
               "EM/MergeLambdas",
@@ -177,7 +177,7 @@ locals {
           title  = "Average Service Processing Time"
           region = "eu-west-2"
           stat   = "Average"
-          period = 180
+          period = 120
           metrics = [
             [
               "EM/MergeLambdas",
@@ -213,7 +213,7 @@ locals {
           title  = "Average Service Pre-Processing Time"
           region = "eu-west-2"
           stat   = "Average"
-          period = 180
+          period = 120
           metrics = [
             [
               "EM/MergeLambdas",
@@ -240,7 +240,7 @@ locals {
           title  = "Average Query Queue Time"
           region = "eu-west-2"
           stat   = "Average"
-          period = 180
+          period = 120
           metrics = [
             [
               "EM/MergeLambdas",
@@ -267,7 +267,7 @@ locals {
           title  = "Average Query Plan Time"
           region = "eu-west-2"
           stat   = "Average"
-          period = 180
+          period = 120
           metrics = [
             [
               "EM/MergeLambdas",
@@ -278,6 +278,33 @@ locals {
                 color = "#00008B"
               }
             ]
+          ]
+        }
+      },
+      {
+        # --------------------------
+        # DLQ messages
+        # --------------------------
+        type   = "metric"
+        x      = 0
+        y      = 0
+        width  = 24
+        height = 6
+        properties = {
+          title  = "Messages in DLQ"
+          region = "eu-west-2"
+          stat   = "Sum"
+          period = 900
+          metrics = [
+            [
+              "AWS/SQS",
+              "ApproximateNumberOfMessagesVisible",
+              "QueueName",
+              "${lambda_name}-dlq",
+              {
+                color = "#00008B"
+              }
+            ],
           ]
         }
       },
