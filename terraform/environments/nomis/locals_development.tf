@@ -402,7 +402,7 @@ locals {
         })
       })
 
-      dev-nomis-web12-a = merge(local.ec2_instances.web_12, {
+      qa-nomis-web12-a = merge(local.ec2_instances.web_12, {
         config = merge(local.ec2_instances.web_12.config, {
           availability_zone = "eu-west-2a"
         })
@@ -413,7 +413,7 @@ locals {
         })
         tags = merge(local.ec2_instances.web_12.tags, {
           instance-scheduling  = "skip-scheduling"
-          nomis-environment    = "dev"
+          nomis-environment    = "qa"
           oracle-db-hostname-a = "nomis-db19c-1-a"
           oracle-db-hostname-b = "none"
           oracle-db-name       = "qa19c"
