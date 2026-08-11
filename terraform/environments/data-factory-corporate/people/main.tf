@@ -82,7 +82,7 @@ resource "aws_secretsmanager_secret" "external_account" {
 }
 
 module "sherlock_glue_database" {
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/data-factory-glue-database?ref=dccbc7b4e67e60e5c80e0ea163d1e98a0d386245"
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/data-factory-glue-database?ref=75a5fd1ccb6c1858508b98651030cc4c919b9d03"
   
   database_name = "sherlock_glue_database"
 
