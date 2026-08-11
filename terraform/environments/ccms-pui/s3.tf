@@ -5,6 +5,10 @@ module "s3_pui_docs" {
   versioning_enabled = true
   ownership_controls = "BucketOwnerEnforced"
 
+  # Enable server access logging for this bucket
+  log_bucket = module.s3-bucket-logging.bucket.id
+  log_prefix = "s3access/${local.application_name}-docs-${local.environment}"
+
   lifecycle_rule = [
     {
       id      = "pui_docs_lifecycle"
@@ -193,6 +197,20 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         Condition = {
           StringEquals = {
             "s3:x-amz-acl"      = "bucket-owner-full-control",
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      },
+      {
+        Sid    = "AllowS3ServerAccessLogDeliveryPutObject",
+        Effect = "Allow",
+        Principal = {
+          Service = "logging.s3.amazonaws.com"
+        },
+        Action   = "s3:PutObject",
+        Resource = "${module.s3-bucket-logging.bucket.arn}/*",
+        Condition = {
+          StringEquals = {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
           }
         }
