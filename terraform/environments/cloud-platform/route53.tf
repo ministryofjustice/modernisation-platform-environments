@@ -47,10 +47,10 @@ resource "aws_route53_record" "nonlive_ns" {
   type    = "NS"
   ttl     = 172800
   records = [
-    "ns-955.awsdns-55.net.",
-    "ns-1523.awsdns-62.org.",
-    "ns-303.awsdns-37.com.",
-    "ns-1718.awsdns-22.co.uk.",
+    "ns-227.awsdns-28.com.",
+    "ns-627.awsdns-14.net.",
+    "ns-1434.awsdns-51.org.",
+    "ns-1733.awsdns-24.co.uk.",
   ]
 }
 

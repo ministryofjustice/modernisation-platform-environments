@@ -450,10 +450,6 @@
     },
     {
       "object_name": "dbo.LIVE_ACTIVITY",
-      "column_name": "ACTIVITY_STATUS"
-    },
-    {
-      "object_name": "dbo.LIVE_ACTIVITY",
       "column_name": "ASSOCIATED_FILE"
     },
     {
@@ -639,10 +635,6 @@
     {
       "object_name": "dbo.LIVE_ACTIVITY_RESOURCE",
       "column_name": "SERVER_ID"
-    },
-    {
-      "object_name": "dbo.LIVE_ACTIVITY_RESOURCE",
-      "column_name": "STATUS"
     },
     {
       "object_name": "dbo.LIVE_ACTIVITY_RESOURCE",

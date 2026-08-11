@@ -50,7 +50,7 @@ locals {
           ]
 
           Resource = "${module.weblogic_alb_access_logs.bucket.arn}/*"
-          
+
           Condition = {
             StringEquals = {
               "aws:SourceAccount" = data.aws_caller_identity.current.account_id
