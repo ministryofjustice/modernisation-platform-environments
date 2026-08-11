@@ -12,18 +12,18 @@ module "sherlock_landing_bucket" {
   }
 }
 
-data "aws_secretsmanager_secret" "external_account_id" {
-  name = "external-aws-account"
-}
+# data "aws_secretsmanager_secret" "external_account_id" {
+#   name = "external-aws-account"
+# }
 
-data "aws_secretsmanager_secret_version" "external_account_id" {
-  secret_id = data.aws_secretsmanager_secret.external_account_id.id
-}
+# data "aws_secretsmanager_secret_version" "external_account_id" {
+#   secret_id = data.aws_secretsmanager_secret.external_account_id.id
+# }
 
 locals {
   glue_catalog_arn = "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog"
 
-  external_account_id = data.aws_secretsmanager_secret_version.external_account_id.secret_string
+  #external_account_id = data.aws_secretsmanager_secret_version.external_account_id.secret_string
 }
 
 module "sherlock_landing_bucket_test" {
