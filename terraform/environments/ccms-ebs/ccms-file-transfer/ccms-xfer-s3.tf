@@ -110,6 +110,12 @@ module "s3-bucket-sftp-bc" {
   )
 }
 
+resource "aws_s3_bucket_logging" "s3_bucket_sftp_bc" {
+  bucket        = module.s3-bucket-sftp-bc.bucket.id
+  target_bucket = local.logging_bucket_name
+  target_prefix = "s3access/${local.sftp_bc_bucket_name}/"
+}
+
 resource "aws_s3_bucket_notification" "sftp_bucket_notification" {
   bucket      = module.s3-bucket-sftp-bc.bucket.id
   eventbridge = true
