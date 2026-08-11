@@ -204,7 +204,7 @@ resource "aws_cloudwatch_metric_alarm" "merge_lambda_dlq_has_messages" {
   comparison_operator = "GreaterThanThreshold"
   threshold           = 0
   period              = 900
-  statistic           = "Sum"
+  statistic           = "Maximum"
   evaluation_periods  = 1
   treat_missing_data  = "notBreaching"
 
