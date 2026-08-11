@@ -708,6 +708,8 @@ locals {
     secretsmanager_secrets = {
       "/oracle/weblogic/dev"    = local.secretsmanager_secrets.web
       "/oracle/database/dev"    = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/qa"     = local.secretsmanager_secrets.web
+      "/oracle/weblogic/rel"    = local.secretsmanager_secrets.web
       "/oracle/weblogic/qa11g"  = local.secretsmanager_secrets.web
       "/oracle/database/qa11g"  = local.secretsmanager_secrets.db_cnom
       "/oracle/weblogic/qa11g2" = local.secretsmanager_secrets.web
