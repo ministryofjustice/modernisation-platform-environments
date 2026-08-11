@@ -73,6 +73,12 @@ module "s3_pui_docs" {
   }
 }
 
+resource "aws_s3_bucket_logging" "s3_pui_docs" {
+  bucket        = module.s3_pui_docs.bucket.id
+  target_bucket = module.s3-bucket-logging.bucket.id
+  target_prefix = "s3access/${local.application_name}-${local.environment}-docs/"
+}
+
 
 
 # S3 for Load Balancer access logs
