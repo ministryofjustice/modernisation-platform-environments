@@ -33,9 +33,9 @@ locals {
 
       # Alert routing by account: enabled groups, scoped namespaces, and overrides.
       alerts_configured_accounts = [
-        { name = "data-platform-development", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] },
-        { name = "data-platform-test", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] },
-        { name = "data-platform-preproduction", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] }
+        { name = "data-platform-development", enabled_groups = ["AI Gateway","Bedrock"], namespaces = ["ai-gateway"] },
+        { name = "data-platform-test", enabled_groups = ["AI Gateway","Bedrock"], namespaces = ["ai-gateway"] },
+        { name = "data-platform-preproduction", enabled_groups = ["AI Gateway","Bedrock"], namespaces = ["ai-gateway"] }
       ]
     }
     test = {

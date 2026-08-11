@@ -195,6 +195,7 @@ Every key inside `alerting_golden_signals` (in `alerting-golden-signals.tf`) is 
 | `critical` | one of `warning`/`critical` required | Same, for the critical threshold. Omit to make the rule warning-only. |
 | `query_window_seconds` | no (default `300`) | Lookback window, in seconds, for the current-value queries (refs `A`, `A2`, `B`, `C`). |
 | `baseline_window_seconds` | no (default `3600`) | Lookback window and CloudWatch period, in seconds, for the baseline pipeline (refs `BASE`, `BASE_R`, `D`). Only relevant for `baseline_gt`/`baseline_lt` types. |
+| `for_duration` | no (default `"5m"`) | How long the alert condition must hold true before the Grafana rule transitions to `Alerting` (the rule's `for` field). Accepts `"30s"`, `"1m"`, `"5m"`, `"2h"`-style duration strings. |
 
 ### Supported `dim_key` values
 
