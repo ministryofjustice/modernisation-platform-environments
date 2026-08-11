@@ -348,6 +348,12 @@ locals {
     throughtput_capacity = 16
   }
 
+  acm_certificate_dev = {
+    domain_name                         = "modernisation-platform.service.justice.gov.uk"
+    external_validation_records_created = true
+    additional_subject_alternate_names  = []
+  }
+
   lb_config_dev = {
     bucket_policy_enabled = true
     maintenance_message   = "NDMIS Reporting Dev is currently unavailable due to planned maintenance or out-of-hours shutdown (7pm-7am)."

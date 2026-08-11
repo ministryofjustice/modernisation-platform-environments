@@ -49,9 +49,9 @@ module "argocd" {
   idc_instance_arn = var.argocd_idc_instance_arn
   idc_region       = var.argocd_idc_region
   rbac_role_mappings = merge(
-    var.argocd_admin_group_id != "" ? {
-      ADMIN = [{ id = var.argocd_admin_group_id, type = "SSO_GROUP" }]
-    } : {},
+    {
+      ADMIN = [{ id = local.cloud_platform_engineers_group_id, type = "SSO_GROUP" }]
+    },
     var.argocd_rbac_role_mappings
   )
 

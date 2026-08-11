@@ -101,7 +101,7 @@ resource "aws_security_group" "cluster_ec2" {
 
 data "aws_ssm_parameter" "ecs_optimized_ami" {
   # This gets the recommended image of amzn2-ami-ecs-hvm-2.0.<date>-x86_64-ebs
-  name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
+  name = "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended"
 }
 
 resource "aws_launch_template" "ec2-launch-template" {

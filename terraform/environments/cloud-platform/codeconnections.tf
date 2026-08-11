@@ -9,7 +9,7 @@
 # Only created in hub accounts (cloud-platform-* workspaces). BU spoke accounts
 # (container-platform-* workspaces) do not run ArgoCD and do not need a
 # connection. The workspace prefix convention distinguishes the two:
-#   - cloud-platform-*       → hub accounts (development, preproduction, live)
+#   - cloud-platform-*       → hub accounts (development, nonlive, live)
 #   - container-platform-*   → BU spoke accounts (octo, laa, hmpps)
 #
 # After Terraform creates this resource it will be in PENDING status.

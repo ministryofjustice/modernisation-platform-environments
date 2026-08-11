@@ -20,11 +20,11 @@ resource "aws_vpc_security_group_ingress_rule" "ancillary_alb_ingress_https_glob
 
 # Necessary for Unit tests from Legacy
 resource "aws_vpc_security_group_ingress_rule" "test_ingress" {
-  #checkov:skip=CKV_AWS_23 "ignore"
   for_each = var.env_name == "test" ? {
-    for cidr in local.legacy_test_natgw_ips : cidr => cidr
+    for cidr in local.legacy_natgw_ips[var.env_name] : cidr => cidr
   } : {}
 
+  description       = "allow ingress from codebuilder to delius core ancillary alb for testing purposes"
   security_group_id = aws_security_group.ancillary_alb_security_group.id
   cidr_ipv4         = each.value
   from_port         = "443"
@@ -102,11 +102,11 @@ resource "aws_lb_listener" "ancillary_http" {
 # temporary rule to allow traffic from legacy preprod nat gateway for testing
 # to be removed once testing is over and nat gateway removed
 resource "aws_vpc_security_group_ingress_rule" "preprod_legacy_natgw_ing" {
-  #checkov:skip=CKV_AWS_23 "ignore"
   for_each = var.env_name == "preprod" ? {
-    for cidr in local.legacy_preprod_natgw_ips : cidr => cidr
+    for cidr in local.legacy_natgw_ips[var.env_name] : cidr => cidr
   } : {}
 
+  description       = "allow ingress from legacy preprod nat gateway to delius core ancillary alb for testing purposes"
   security_group_id = aws_security_group.ancillary_alb_security_group.id
   cidr_ipv4         = each.value
   from_port         = "443"
