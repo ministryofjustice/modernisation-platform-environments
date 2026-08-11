@@ -1,8 +1,8 @@
 # Security group for the RDS instance
 resource "aws_security_group" "db" {
   # checkov:skip=CKV2_AWS_5: Attached to VPC
-  name        = "${local.component_name}-${local.environment}"
-  description = "Security group for RDS instance ${local.component_name}-${local.environment}"
+  name        = "${local.name}-${local.environment}"
+  description = "Security group for RDS instance ${local.name}-${local.environment}"
   vpc_id      = data.aws_vpc.shared.id
 
   tags = local.tags
@@ -27,7 +27,7 @@ module "rds_export" {
     aws = aws
   }
 
-  name                     = local.component_name
+  name                     = local.name
   database_refresh_mode    = "incremental"
   vpc_id                   = data.aws_vpc.shared.id
   database_subnet_ids      = data.aws_subnets.shared-private.ids

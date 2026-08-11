@@ -5,7 +5,7 @@ module "rds_export_secret" {
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "2.1.0"
 
-  name       = "rds_export_${local.component_name}_${local.environment}"
+  name       = "rds_export_${local.name}_${local.environment}"
   kms_key_id = module.rds_export_kms.key_arn
 
   ignore_secret_changes  = true
@@ -22,7 +22,7 @@ module "slack_webhook_secret" {
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "2.1.0"
 
-  name = "slack_webhook_${local.component_name}_${local.environment}"
+  name = "slack_webhook_${local.name}_${local.environment}"
 
   create_random_password = true
   random_password_length = 10
