@@ -79,7 +79,17 @@ resource "aws_s3_bucket_logging" "s3_pui_docs" {
   target_prefix = "s3access/${local.application_name}-${local.environment}-docs/"
 }
 
+resource "aws_s3_bucket_logging" "s3_bucket_logging" {
+  bucket        = module.s3-bucket-logging.bucket.id
+  target_bucket = module.s3-bucket-logging.bucket.id
+  target_prefix = "s3access/${local.application_name}-${local.environment}-logging/"
+}
 
+resource "aws_s3_bucket_logging" "s3_bucket_shared" {
+  bucket        = module.s3-bucket-shared.bucket.id
+  target_bucket = module.s3-bucket-logging.bucket.id
+  target_prefix = "s3access/${local.application_name}-${local.environment}-shared/"
+}
 
 # S3 for Load Balancer access logs
 
