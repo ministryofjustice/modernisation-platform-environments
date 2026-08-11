@@ -93,12 +93,7 @@ module "sherlock_glue_database" {
     prefix      = "avature-sherlock"
     kms_key_arn = module.sherlock_kms_key.key_arn
   }
-  tags = {
-    Environment = terraform.workspace
-    Application = "data-factory-corporate"
-    Component   = "people"
-    Infrastructure = "sherlock-glue-database"
-  }
+
 }
 
 # module "assume_iam_role" {
