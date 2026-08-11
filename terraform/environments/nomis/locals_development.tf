@@ -414,7 +414,7 @@ locals {
         tags = merge(local.ec2_instances.web_12.tags, {
           instance-scheduling  = "skip-scheduling"
           nomis-environment    = "dev"
-          oracle-db-hostname-a = "dev-nomis-db-1-a"
+          oracle-db-hostname-a = "nomis-db19c-1-a"
           oracle-db-hostname-b = "none"
           oracle-db-name       = "dev"
         })
