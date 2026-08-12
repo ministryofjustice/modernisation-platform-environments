@@ -10,7 +10,7 @@ module "s3_pui_docs" {
   log_buckets = {
   log_bucket_name = module.s3-bucket-logging.bucket.id
   log_bucket_arn  = module.s3-bucket-logging.bucket.arn
-  log_bucket_policy = {}
+  log_bucket_policy = aws_s3_bucket_policy.lb_access_logs.policy
      }
   log_prefix = "s3access/${local.application_name}-docs-${local.environment}"
 
