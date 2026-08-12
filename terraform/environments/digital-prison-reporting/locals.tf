@@ -524,9 +524,8 @@ locals {
     }
   }
 
-  # 1:1 mapping — this DPR environment trusts only the matching Data Platform AI Gateway IRSA role.
-  # Controlled by application_variables.json enable_bedrock.
-  ai_gateway_role_arn = "arn:aws:iam::${local.environment_management.account_ids["data-platform-${local.environment}"]}:role/ai-gateway"
+  # All AI Gateway traffic uses data-platform-production; non-prod DPR environments still trust only that role.
+  ai_gateway_role_arn = "arn:aws:iam::${local.environment_management.account_ids["data-platform-production"]}:role/ai-gateway"
 
 
   all_tags = merge(
