@@ -9,10 +9,9 @@ resource "aws_glue_catalog_table_optimizer" "standard_compaction" {
     enabled  = true
   }
 
-    compaction_configuration {
-      iceberg_configuration {
-        strategy              = "sort"
-      }
+  compaction_configuration {
+    iceberg_configuration {
+      strategy = "sort"
     }
   }
 
