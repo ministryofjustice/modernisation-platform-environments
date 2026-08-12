@@ -1,8 +1,7 @@
 ### Bedrock Resources
 
 ## AI Gateway Cross Account Role
-# Allows the matching Data Platform AI Gateway environment to assume into this account and invoke Bedrock
-# (e.g. DPR development trusts data-platform-development only).
+# Allows the Data Platform production AI Gateway to assume into this account and invoke Bedrock.
 # Controlled per environment via application_variables.json enable_bedrock.
 
 # AI Gateway Bedrock Assume Policy
