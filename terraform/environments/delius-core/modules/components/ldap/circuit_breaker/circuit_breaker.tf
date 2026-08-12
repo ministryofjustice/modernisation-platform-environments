@@ -16,7 +16,7 @@ locals {
 # SSM parameter (default value CLOSED)
 ##########################
 resource "aws_ssm_parameter" "ldap_circuit_breaker" {
-  #checkov:skip=CKV_AWS_34 "ignore"
+  #checkov:skip=CKV2_AWS_34 "ignore"
   name  = local.ssm_parameter_name
   type  = "String"
   value = "CLOSED" # CLOSED = traffic flows, OPEN = circuit broken, no traffic
@@ -90,7 +90,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "ssm:GetParameter",
           "ssm:GetParameters"
         ],
-        "Resource" : "${aws_ssm_parameter.ldap_circuit_breaker.arn}"
+        "Resource" : aws_ssm_parameter.ldap_circuit_breaker.arn
       }
     ]
   })

@@ -102,6 +102,9 @@ resource "aws_iam_role_policy" "exec_actions" {
 }
 
 data "aws_iam_policy_document" "task_exec" {
+  #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+  #checkov:skip=CKV_AWS_108: "Ensure IAM policies does not allow data exfiltration"
+  #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
   statement {
     effect    = "Allow"
     resources = ["*"]

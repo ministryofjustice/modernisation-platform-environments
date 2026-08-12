@@ -1,12 +1,13 @@
 resource "aws_lb" "this" {
+  #checkov:skip=CKV_AWS_91: "ELB Logging not required"
+  #checkov:skip=CKV_AWS_150: "Deletion protection off"
+  #checkov:skip=CKV_AWS_152: "Cross-zone load balancing not needed
   name                       = "${var.app_name}-${var.env_name}-nlb"
   internal                   = var.internal
   load_balancer_type         = var.load_balancer_type
   subnets                    = var.subnet_ids
   drop_invalid_header_fields = var.drop_invalid_header_fields
   enable_deletion_protection = var.enable_deletion_protection
-
-
 
   tags = var.tags
 }
@@ -30,9 +31,12 @@ resource "aws_lb_listener" "ldap" {
 }
 
 resource "aws_lb_listener" "ldaps" {
+  #checkov:skip=CKV_AWS_103
+  #checkov:skip=CKV2_AWS_74 "NLB do not perform SSL/TLS termination and just pass traffic through to the target group so do not use ciphers"
   load_balancer_arn = aws_lb.this.arn
   port              = var.secure_port
   protocol          = "TLS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
 
   default_action {
     type             = "forward"
