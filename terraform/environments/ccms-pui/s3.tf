@@ -6,7 +6,11 @@ module "s3_pui_docs" {
   ownership_controls = "BucketOwnerEnforced"
 
   # Enable server access logging for this bucket
-  log_bucket = module.s3-bucket-logging.bucket.id
+  #log_bucket = module.s3-bucket-logging.bucket.id
+  log_buckets = {
+  log_bucket_name = local.logging_bucket_name
+  log_bucket_arn  = aws_s3_bucket.logging_bucket.arn
+     }
   log_prefix = "s3access/${local.application_name}-docs-${local.environment}"
 
   lifecycle_rule = [
@@ -73,23 +77,23 @@ module "s3_pui_docs" {
   }
 }
 
-resource "aws_s3_bucket_logging" "s3_pui_docs" {
-  bucket        = module.s3_pui_docs.bucket.id
-  target_bucket = module.s3-bucket-logging.bucket.id
-  target_prefix = "s3access/${local.application_name}-${local.environment}-docs/"
-}
+# resource "aws_s3_bucket_logging" "s3_pui_docs" {
+#   bucket        = module.s3_pui_docs.bucket.id
+#   target_bucket = module.s3-bucket-logging.bucket.id
+#   target_prefix = "s3access/${local.application_name}-${local.environment}-docs/"
+# }
 
-resource "aws_s3_bucket_logging" "s3_bucket_logging" {
-  bucket        = module.s3-bucket-logging.bucket.id
-  target_bucket = module.s3-bucket-logging.bucket.id
-  target_prefix = "s3access/${local.application_name}-${local.environment}-logging/"
-}
+# resource "aws_s3_bucket_logging" "s3_bucket_logging" {
+#   bucket        = module.s3-bucket-logging.bucket.id
+#   target_bucket = module.s3-bucket-logging.bucket.id
+#   target_prefix = "s3access/${local.application_name}-${local.environment}-logging/"
+# }
 
-resource "aws_s3_bucket_logging" "s3_bucket_shared" {
-  bucket        = module.s3-bucket-shared.bucket.id
-  target_bucket = module.s3-bucket-logging.bucket.id
-  target_prefix = "s3access/${local.application_name}-${local.environment}-shared/"
-}
+# resource "aws_s3_bucket_logging" "s3_bucket_shared" {
+#   bucket        = module.s3-bucket-shared.bucket.id
+#   target_bucket = module.s3-bucket-logging.bucket.id
+#   target_prefix = "s3access/${local.application_name}-${local.environment}-shared/"
+# }
 
 # S3 for Load Balancer access logs
 
