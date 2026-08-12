@@ -5819,8 +5819,8 @@
       {
         "current": {
           "selected": true,
-          "text": "eu-west-1",
-          "value": "eu-west-1"
+          "text": "eu-west-2",
+          "value": "eu-west-2"
         },
         "datasource": {
           "type": "cloudwatch",
