@@ -28,6 +28,7 @@ module "oracle_db_shared" {
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
   deploy_oracle_stats = false
+  deploy_oracle_rat   = false
 
   providers = {
     aws                       = aws
@@ -80,6 +81,7 @@ module "oracle_db_dsd" {
   instance_profile_policies = local.dsd_instance_policies
 
   deploy_oracle_stats = false
+  deploy_oracle_rat   = false
 
   enable_cloudwatch_alarms = try(var.dsd_db_config.enable_cloudwatch_alarms, true)
 
@@ -134,6 +136,7 @@ module "oracle_db_dsd_shared" {
   instance_profile_policies = local.dsd_instance_policies
 
   deploy_oracle_stats = false
+  deploy_oracle_rat   = false
 
   enable_cloudwatch_alarms = try(var.dsd_db_config.enable_cloudwatch_alarms, true)
 
@@ -187,6 +190,7 @@ module "oracle_db_boe" {
   instance_profile_policies = local.boe_instance_policies
 
   deploy_oracle_stats = false
+  deploy_oracle_rat   = false
 
   enable_cloudwatch_alarms = try(var.boe_db_config.enable_cloudwatch_alarms, true)
 
@@ -241,6 +245,7 @@ module "oracle_db_boe_shared" {
   instance_profile_policies = local.boe_instance_policies
 
   deploy_oracle_stats = false
+  deploy_oracle_rat   = false
 
   enable_cloudwatch_alarms = try(var.boe_db_config.enable_cloudwatch_alarms, true)
 
@@ -294,6 +299,7 @@ module "oracle_db_mis" {
   instance_profile_policies = local.mis_instance_policies
 
   deploy_oracle_stats = false
+  deploy_oracle_rat   = false
 
   enable_cloudwatch_alarms = try(var.mis_db_config.enable_cloudwatch_alarms, true)
 
@@ -348,6 +354,7 @@ module "oracle_db_mis_shared" {
   instance_profile_policies = local.mis_instance_policies
 
   deploy_oracle_stats = false
+  deploy_oracle_rat   = false
 
   enable_cloudwatch_alarms = try(var.mis_db_config.enable_cloudwatch_alarms, true)
 
