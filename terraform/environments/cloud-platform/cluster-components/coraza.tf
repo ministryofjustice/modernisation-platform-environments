@@ -112,33 +112,33 @@ resource "kubernetes_manifest" "starter-pack-coraza-waf-off" {
   )
 }
 
-# Example 5: Invalid configuration that will cause compilation errors
-# This demonstrates what happens when using incorrect SecAction/SecRule syntax
-resource "kubernetes_manifest" "starter-pack-coraza-waf-invalid" {
-  manifest = yamldecode(<<-YAML
-    apiVersion: gateway.envoyproxy.io/v1alpha1
-    kind: EnvoyExtensionPolicy
-    metadata:
-      name: starter-pack-coraza-waf-invalid
-      namespace: starter-pack-5
-    spec:
-      targetRefs:
-        - group: gateway.networking.k8s.io
-          kind: HTTPRoute
-          name: starter-pack-route
-          namespace: starter-pack-5
-      dynamicModule:
-        - name: composer
-          filterName: coraza-waf
-          config:
-            directives:
-              - Include @coraza.conf
-              - SecRuleEngine On
-              # INVALID: Using IP collection instead of TX collection
-              - SecAction "id:1002,phase:1,pass,setvar:ip.requests=+1,expirevar:ip.requests=60"
-  YAML
-  )
-}
+# # Example 5: Invalid configuration that will cause compilation errors
+# # This demonstrates what happens when using incorrect SecAction/SecRule syntax
+# resource "kubernetes_manifest" "starter-pack-coraza-waf-invalid" {
+#   manifest = yamldecode(<<-YAML
+#     apiVersion: gateway.envoyproxy.io/v1alpha1
+#     kind: EnvoyExtensionPolicy
+#     metadata:
+#       name: starter-pack-coraza-waf-invalid
+#       namespace: starter-pack-5
+#     spec:
+#       targetRefs:
+#         - group: gateway.networking.k8s.io
+#           kind: HTTPRoute
+#           name: starter-pack-route
+#           namespace: starter-pack-5
+#       dynamicModule:
+#         - name: composer
+#           filterName: coraza-waf
+#           config:
+#             directives:
+#               - Include @coraza.conf
+#               - SecRuleEngine On
+#               # INVALID: Using IP collection instead of TX collection
+#               - SecAction "id:1002,phase:1,pass,setvar:ip.requests=+1,expirevar:ip.requests=60"
+#   YAML
+#   )
+# }
 
 # Example 6: Team adds custom rules WITHOUT OWASP CRS, after bad configuration previously caused compilation errors
 resource "kubernetes_manifest" "starter-pack-coraza-waf-with-custom-rules_after_bad_config" {
