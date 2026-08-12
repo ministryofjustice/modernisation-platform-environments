@@ -38,15 +38,6 @@ resource "aws_iam_role_policy" "red_button_lambda_policy" {
       {
         Effect = "Allow"
         Action = [
-          "kms:GenerateDataKey*",
-          "kms:Decrypt",
-          "kms:DescribeKey"
-        ]
-        Resource = aws_kms_key.cloudwatch_logs.arn
-      },
-      {
-        Effect = "Allow"
-        Action = [
           "ec2:AuthorizeSecurityGroupEgress",
           "ec2:AuthorizeSecurityGroupIngress",
           "ec2:DescribeInstances",
@@ -143,7 +134,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "red_button_data" 
 resource "aws_cloudwatch_log_group" "red_button_logs" {
   name              = "/aws/lambda/${aws_lambda_function.red_button_trigger.function_name}"
   retention_in_days = 14
-  kms_key_id        = aws_kms_key.cloudwatch_logs.arn
   tags = merge(local.tags, {
     Name = "${local.application_name}-${local.environment}-red-button-trigger"
   })
