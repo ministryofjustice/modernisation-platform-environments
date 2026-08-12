@@ -69,8 +69,8 @@ module "s3-bucket-sftp-bc" {
 
   #log_bucket     = local.logging_bucket_name
   log_buckets = {
-   log_bucket_name = module.s3-bucket-logging.bucket.id
-   log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+   log_bucket_name = local.logging_bucket_name
+   log_bucket_arn  = "arn:aws:s3:::${local.logging_bucket_name}"
    log_bucket_policy = "{}" 
      }
   log_prefix     = "s3access/${local.sftp_bc_bucket_name}"
