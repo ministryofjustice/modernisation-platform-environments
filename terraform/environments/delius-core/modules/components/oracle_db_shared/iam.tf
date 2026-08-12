@@ -147,6 +147,8 @@ data "aws_iam_policy_document" "cert_export" {
 }
 
 data "aws_iam_policy_document" "cloudwatch_agent" {
+  #checkov:skip=CKV_AWS_111: "CloudWatch Agent "requires write permissions for CloudWatch metrics and Logs"
+  #checkov:skip=CKV_AWS_356: "CloudWatch Agent requires Resource "*" for actions that do not support resource-level permissions"
   statement {
     sid    = "CloudwatchAgent"
     effect = "Allow"
