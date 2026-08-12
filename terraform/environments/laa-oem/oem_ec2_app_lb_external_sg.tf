@@ -13,29 +13,141 @@ resource "aws_security_group" "load_balancer_security_group" {
 }
 
 # EGRESS
-# TODO: remove once Flow Logs confirm no traffic outside tcp/443 needs egress-all
-resource "aws_vpc_security_group_egress_rule" "lb_sg_egress_all_0_0_cidr" {
+# Restricted to the data subnets: aws_lb_target_group_attachment resources below only
+# forward to the app instance in data_subnets_a, on ports 8000/3872/4903/7102/7803.
+resource "aws_vpc_security_group_egress_rule" "lb_sg_egress_tcp_8000_8000_cidr_1" {
   security_group_id = aws_security_group.load_balancer_security_group.id
-  description       = "Allow all outbound traffic (pending removal, see TODO)"
-  ip_protocol       = "-1"
-  cidr_ipv4         = "0.0.0.0/0"
-
-  tags = {
-    Name = "Allow all outbound traffic"
-  }
+  description       = "HTTP to app target group - data subnet a"
+  ip_protocol       = "tcp"
+  from_port         = 8000
+  to_port           = 8000
+  cidr_ipv4         = data.aws_subnet.data_subnets_a.cidr_block
 }
 
-resource "aws_vpc_security_group_egress_rule" "lb_sg_egress_tcp_443_443_cidr" {
+resource "aws_vpc_security_group_egress_rule" "lb_sg_egress_tcp_8000_8000_cidr_2" {
   security_group_id = aws_security_group.load_balancer_security_group.id
-  description       = "HTTPS outbound only"
+  description       = "HTTP to app target group - data subnet b"
   ip_protocol       = "tcp"
-  from_port         = 443
-  to_port           = 443
-  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 8000
+  to_port           = 8000
+  cidr_ipv4         = data.aws_subnet.data_subnets_b.cidr_block
+}
 
-  tags = {
-    Name = "HTTPS outbound"
-  }
+resource "aws_vpc_security_group_egress_rule" "lb_sg_egress_tcp_8000_8000_cidr_3" {
+  security_group_id = aws_security_group.load_balancer_security_group.id
+  description       = "HTTP to app target group - data subnet c"
+  ip_protocol       = "tcp"
+  from_port         = 8000
+  to_port           = 8000
+  cidr_ipv4         = data.aws_subnet.data_subnets_c.cidr_block
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_sg_egress_tcp_3872_3872_cidr_1" {
+  security_group_id = aws_security_group.load_balancer_security_group.id
+  description       = "Oracle EM Console HTTP to app target group - data subnet a"
+  ip_protocol       = "tcp"
+  from_port         = 3872
+  to_port           = 3872
+  cidr_ipv4         = data.aws_subnet.data_subnets_a.cidr_block
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_sg_egress_tcp_3872_3872_cidr_2" {
+  security_group_id = aws_security_group.load_balancer_security_group.id
+  description       = "Oracle EM Console HTTP to app target group - data subnet b"
+  ip_protocol       = "tcp"
+  from_port         = 3872
+  to_port           = 3872
+  cidr_ipv4         = data.aws_subnet.data_subnets_b.cidr_block
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_sg_egress_tcp_3872_3872_cidr_3" {
+  security_group_id = aws_security_group.load_balancer_security_group.id
+  description       = "Oracle EM Console HTTP to app target group - data subnet c"
+  ip_protocol       = "tcp"
+  from_port         = 3872
+  to_port           = 3872
+  cidr_ipv4         = data.aws_subnet.data_subnets_c.cidr_block
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_sg_egress_tcp_4903_4903_cidr_1" {
+  security_group_id = aws_security_group.load_balancer_security_group.id
+  description       = "Oracle EM Console HTTPS to app target group - data subnet a"
+  ip_protocol       = "tcp"
+  from_port         = 4903
+  to_port           = 4903
+  cidr_ipv4         = data.aws_subnet.data_subnets_a.cidr_block
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_sg_egress_tcp_4903_4903_cidr_2" {
+  security_group_id = aws_security_group.load_balancer_security_group.id
+  description       = "Oracle EM Console HTTPS to app target group - data subnet b"
+  ip_protocol       = "tcp"
+  from_port         = 4903
+  to_port           = 4903
+  cidr_ipv4         = data.aws_subnet.data_subnets_b.cidr_block
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_sg_egress_tcp_4903_4903_cidr_3" {
+  security_group_id = aws_security_group.load_balancer_security_group.id
+  description       = "Oracle EM Console HTTPS to app target group - data subnet c"
+  ip_protocol       = "tcp"
+  from_port         = 4903
+  to_port           = 4903
+  cidr_ipv4         = data.aws_subnet.data_subnets_c.cidr_block
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_sg_egress_tcp_7102_7102_cidr_1" {
+  security_group_id = aws_security_group.load_balancer_security_group.id
+  description       = "Oracle EM OMS to app target group - data subnet a"
+  ip_protocol       = "tcp"
+  from_port         = 7102
+  to_port           = 7102
+  cidr_ipv4         = data.aws_subnet.data_subnets_a.cidr_block
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_sg_egress_tcp_7102_7102_cidr_2" {
+  security_group_id = aws_security_group.load_balancer_security_group.id
+  description       = "Oracle EM OMS to app target group - data subnet b"
+  ip_protocol       = "tcp"
+  from_port         = 7102
+  to_port           = 7102
+  cidr_ipv4         = data.aws_subnet.data_subnets_b.cidr_block
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_sg_egress_tcp_7102_7102_cidr_3" {
+  security_group_id = aws_security_group.load_balancer_security_group.id
+  description       = "Oracle EM OMS to app target group - data subnet c"
+  ip_protocol       = "tcp"
+  from_port         = 7102
+  to_port           = 7102
+  cidr_ipv4         = data.aws_subnet.data_subnets_c.cidr_block
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_sg_egress_tcp_7803_7803_cidr_1" {
+  security_group_id = aws_security_group.load_balancer_security_group.id
+  description       = "Oracle EM port 7803 to app target group - data subnet a"
+  ip_protocol       = "tcp"
+  from_port         = 7803
+  to_port           = 7803
+  cidr_ipv4         = data.aws_subnet.data_subnets_a.cidr_block
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_sg_egress_tcp_7803_7803_cidr_2" {
+  security_group_id = aws_security_group.load_balancer_security_group.id
+  description       = "Oracle EM port 7803 to app target group - data subnet b"
+  ip_protocol       = "tcp"
+  from_port         = 7803
+  to_port           = 7803
+  cidr_ipv4         = data.aws_subnet.data_subnets_b.cidr_block
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_sg_egress_tcp_7803_7803_cidr_3" {
+  security_group_id = aws_security_group.load_balancer_security_group.id
+  description       = "Oracle EM port 7803 to app target group - data subnet c"
+  ip_protocol       = "tcp"
+  from_port         = 7803
+  to_port           = 7803
+  cidr_ipv4         = data.aws_subnet.data_subnets_c.cidr_block
 }
 
 # INGRESS
@@ -117,6 +229,19 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_3872_3872_cidr
   }
 }
 
+# resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_3872_3872_cidr_any" {
+#   security_group_id = aws_security_group.load_balancer_security_group.id
+#   description       = "Oracle EM Console HTTP from internet (public access)"
+#   ip_protocol       = "tcp"
+#   from_port         = 3872
+#   to_port           = 3872
+#   cidr_ipv4         = "0.0.0.0/0"
+#
+#   tags = {
+#     Name = "Oracle EM Console HTTP from anywhere"
+#   }
+# }
+
 resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_4903_4903_cidr_1" {
   security_group_id = aws_security_group.load_balancer_security_group.id
   description       = "Oracle EM Console HTTPS from shared VPC"
@@ -155,6 +280,19 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_4903_4903_cidr
     Name = "Oracle EM Console HTTPS from prod workspaces"
   }
 }
+
+# resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_4903_4903_cidr_any" {
+#   security_group_id = aws_security_group.load_balancer_security_group.id
+#   description       = "Oracle EM Console HTTPS from internet (public access)"
+#   ip_protocol       = "tcp"
+#   from_port         = 4903
+#   to_port           = 4903
+#   cidr_ipv4         = "0.0.0.0/0"
+#
+#   tags = {
+#     Name = "Oracle EM Console HTTPS from anywhere"
+#   }
+# }
 
 resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_7102_7102_cidr_1" {
   security_group_id = aws_security_group.load_balancer_security_group.id
@@ -234,3 +372,15 @@ resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_7803_7803_cidr
   }
 }
 
+# resource "aws_vpc_security_group_ingress_rule" "lb_sg_ingress_tcp_7803_7803_cidr_any" {
+#   security_group_id = aws_security_group.load_balancer_security_group.id
+#   description       = "Oracle EM additional port from internet (public access)"
+#   ip_protocol       = "tcp"
+#   from_port         = 7803
+#   to_port           = 7803
+#   cidr_ipv4         = "0.0.0.0/0"
+#
+#   tags = {
+#     Name = "Oracle EM port 7803 from anywhere"
+#   }
+# }
