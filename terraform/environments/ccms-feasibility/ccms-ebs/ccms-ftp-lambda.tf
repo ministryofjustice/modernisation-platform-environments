@@ -29,8 +29,8 @@ resource "aws_secretsmanager_secret" "ftp_lambda_secrets" {
 }
 
 module "allpay_ftp_lambda_outbound" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/REPLACE_WITH_MERGED_SHA
-  source = "/Users/sahid.khan/Documents/repos/laa-ccms-terraform-modules/modules/ftp"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/33b20cb
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ftp?ref=33b20cb"
 
   lambda_name                  = lower(format("LAA-ftp-allpay-outbound-ccms-%s", local.env_label))
   vpc_id                       = data.aws_vpc.shared.id
@@ -51,8 +51,8 @@ module "allpay_ftp_lambda_outbound" {
 }
 
 module "allpay_ftp_lambda_inbound" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/REPLACE_WITH_MERGED_SHA
-  source = "/Users/sahid.khan/Documents/repos/laa-ccms-terraform-modules/modules/ftp"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/33b20cb
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ftp?ref=33b20cb"
 
   lambda_name                  = lower(format("LAA-ftp-allpay-inbound-ccms-%s", local.env_label))
   vpc_id                       = data.aws_vpc.shared.id
@@ -73,8 +73,8 @@ module "allpay_ftp_lambda_inbound" {
 }
 
 module "xerox_ftp_lambda_outbound" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/REPLACE_WITH_MERGED_SHA
-  source = "/Users/sahid.khan/Documents/repos/laa-ccms-terraform-modules/modules/ftp"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/33b20cb
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ftp?ref=33b20cb"
 
   lambda_name                  = lower(format("LAA-ftp-xerox-ccms-outbound-%s", local.env_label))
   vpc_id                       = data.aws_vpc.shared.id
@@ -96,8 +96,8 @@ module "xerox_ftp_lambda_outbound" {
 }
 
 module "xerox_ftp_lambda_outbound_peterborough" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/REPLACE_WITH_MERGED_SHA
-  source = "/Users/sahid.khan/Documents/repos/laa-ccms-terraform-modules/modules/ftp"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/33b20cb
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ftp?ref=33b20cb"
 
   lambda_name                  = lower(format("LAA-ftp-xerox-ccms-outbound-peterborough-%s", local.env_label))
   vpc_id                       = data.aws_vpc.shared.id
@@ -118,8 +118,8 @@ module "xerox_ftp_lambda_outbound_peterborough" {
 }
 
 module "eckoh_ftp_lambda_outbound" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/REPLACE_WITH_MERGED_SHA
-  source = "/Users/sahid.khan/Documents/repos/laa-ccms-terraform-modules/modules/ftp"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/33b20cb
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ftp?ref=33b20cb"
 
   lambda_name                  = lower(format("LAA-ftp-eckoh-outbound-ccms-%s", local.env_label))
   vpc_id                       = data.aws_vpc.shared.id
@@ -140,8 +140,8 @@ module "eckoh_ftp_lambda_outbound" {
 }
 
 module "eckoh_ftp_lambda_inbound" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/REPLACE_WITH_MERGED_SHA
-  source = "/Users/sahid.khan/Documents/repos/laa-ccms-terraform-modules/modules/ftp"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/33b20cb
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ftp?ref=33b20cb"
 
   lambda_name                  = lower(format("LAA-ftp-eckoh-inbound-ccms-%s", local.env_label))
   vpc_id                       = data.aws_vpc.shared.id
@@ -162,8 +162,8 @@ module "eckoh_ftp_lambda_inbound" {
 }
 
 module "rossendales_ftp_lambda_inbound" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/REPLACE_WITH_MERGED_SHA
-  source = "/Users/sahid.khan/Documents/repos/laa-ccms-terraform-modules/modules/ftp"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/33b20cb
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ftp?ref=33b20cb"
 
   lambda_name                  = lower(format("LAA-ftp-rossendales-ccms-inbound-%s", local.env_label))
   vpc_id                       = data.aws_vpc.shared.id
@@ -184,8 +184,8 @@ module "rossendales_ftp_lambda_inbound" {
 }
 
 module "onestlocate_ftp_lambda_inbound" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/REPLACE_WITH_MERGED_SHA
-  source = "/Users/sahid.khan/Documents/repos/laa-ccms-terraform-modules/modules/ftp"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/33b20cb
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ftp?ref=33b20cb"
 
   lambda_name                  = lower(format("LAA-ftp-1stlocate-ccms-inbound-%s", local.env_label))
   vpc_id                       = data.aws_vpc.shared.id
