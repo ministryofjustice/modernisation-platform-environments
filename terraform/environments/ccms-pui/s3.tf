@@ -8,8 +8,8 @@ module "s3_pui_docs" {
   # Enable server access logging for this bucket
   #log_bucket = module.s3-bucket-logging.bucket.id
   log_buckets = {
-  log_bucket_name = local.logging_bucket_name
-  log_bucket_arn  = aws_s3_bucket.logging_bucket.arn
+  log_bucket_name = module.s3-bucket-logging.bucket.id
+  log_bucket_arn  = module.s3-bucket-logging.bucket.arn
      }
   log_prefix = "s3access/${local.application_name}-docs-${local.environment}"
 
