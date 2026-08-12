@@ -65,7 +65,7 @@ resource "aws_ecs_service" "opahub" {
   task_definition = aws_ecs_task_definition.opahub.arn
   desired_count   = local.application_data.accounts[local.environment].opa_app_count
   
-  # launch_type = "EC2"
+  launch_type = "EC2"
   # Required by the AWS provider whenever capacity_provider_strategy is
   # added/changed on an existing service (here: switching from launch_type
   # to capacity_provider_strategy), so the change is applied via a fresh
@@ -77,11 +77,11 @@ resource "aws_ecs_service" "opahub" {
   # to provide extra instance capacity for rolling deployments instead of
   # stalling with "insufficient resources" because there is no room to place
   # the new task revision alongside the old one.
-  capacity_provider_strategy {
-    capacity_provider = aws_ecs_capacity_provider.capacity_provider.name
-    weight            = 1
-    base              = 1
-  }
+  # capacity_provider_strategy {
+  #   capacity_provider = aws_ecs_capacity_provider.capacity_provider.name
+  #   weight            = 1
+  #   base              = 1
+  # }
 
   health_check_grace_period_seconds = 120
 
