@@ -10,6 +10,11 @@ resource "helm_release" "grafana" {
 
   values = [
     templatefile("${path.module}/src/helm/values/grafana/values.yml.tftpl", {
+
+      azure_monitor_workload_identity_client_id       = jsondecode(data.aws_secretsmanager_secret_version.grafana_azure_monitor[0].secret_string).client_id
+      azure_monitor_workload_identity_subscription_id = jsondecode(data.aws_secretsmanager_secret_version.grafana_azure_monitor[0].secret_string).subscription_id
+      azure_monitor_workload_identity_tenant_id       = jsondecode(data.aws_secretsmanager_secret_version.grafana_azure_monitor[0].secret_string).tenant_id
+
       hostname           = local.environment_configuration.monitoring_hostname
       entra_id_tenant_id = local.grafana_entra_id.tenant_id
       # Cloud Platform requires a unique external-dns set-identifier per ingress:
