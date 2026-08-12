@@ -1,3 +1,11 @@
+locals {
+  ai_gateway_bedrock_assume_role_arns = distinct([
+    for model in values(try(local.ai_gateway_models_filtered.amazon_bedrock, {})) :
+    "arn:aws:iam::${local.environment_management.account_ids[model.aws_account_name]}:role/${model.aws_role_name}"
+    if can(model.aws_account_name) && can(model.aws_role_name)
+  ])
+}
+
 data "aws_iam_policy_document" "ai_gateway" {
   statement {
     sid    = "AwsMarketplaceAccess"
@@ -51,15 +59,15 @@ data "aws_iam_policy_document" "ai_gateway" {
     ]
   }
 
-  statement {
-    sid     = "AssumeAmazonBedrockModelRoles"
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-    resources = distinct([
-      for model in values(try(local.ai_gateway_models_filtered.amazon_bedrock, {})) :
-      "arn:aws:iam::${local.environment_management.account_ids[model.aws_account_name]}:role/${model.aws_role_name}"
-      if can(model.aws_account_name) && can(model.aws_role_name)
-    ])
+  dynamic "statement" {
+    for_each = length(local.ai_gateway_bedrock_assume_role_arns) > 0 ? [1] : []
+
+    content {
+      sid       = "AssumeAmazonBedrockModelRoles"
+      effect    = "Allow"
+      actions   = ["sts:AssumeRole"]
+      resources = local.ai_gateway_bedrock_assume_role_arns
+    }
   }
 }
 
