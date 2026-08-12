@@ -94,7 +94,7 @@
       "ec2_instance_type_gh_runner": "t2.small",
       "instance_role_gh_runner": "gh-runner",
       "ec2_desired_capacity": "3",
-      "ec2_max_size": "3",
+      "ec2_max_size": "4",
       "ec2_min_size": "2",
       "opa_app_count": "3",
       "opa_server_port": "7001",
