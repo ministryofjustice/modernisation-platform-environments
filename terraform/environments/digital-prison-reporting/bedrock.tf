@@ -1,7 +1,7 @@
 ### Bedrock Resources
 
 ## AI Gateway Cross Account Role
-# Allows the Data Platform production AI Gateway to assume into this account and invoke Bedrock.
+# Allows the Justice AI Gateway (production) to assume into this account and invoke Bedrock.
 # Controlled per environment via application_variables.json enable_bedrock.
 
 # AI Gateway Bedrock Assume Policy
