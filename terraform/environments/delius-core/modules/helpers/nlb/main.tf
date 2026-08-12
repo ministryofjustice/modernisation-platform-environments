@@ -31,8 +31,8 @@ resource "aws_lb_listener" "ldap" {
 }
 
 resource "aws_lb_listener" "ldaps" {
-  #checkov:skip=CKV_AWS_103
-  #checkov:skip=CKV2_AWS_74 "NLB do not perform SSL/TLS termination and just pass traffic through to the target group so do not use ciphers"
+  #checkov:skip=CKV_AWS_103: "To Do: Look up compatible TLS versions for LDAP"
+  #checkov:skip=CKV2_AWS_74: "NLB do not perform SSL/TLS termination and just pass traffic through to the target group so do not use ciphers"
   load_balancer_arn = aws_lb.this.arn
   port              = var.secure_port
   protocol          = "TLS"

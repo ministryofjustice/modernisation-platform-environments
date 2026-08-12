@@ -153,7 +153,7 @@ resource "aws_iam_instance_profile" "weblogic" {
 }
 
 resource "aws_security_group" "ecs_host_sg" {
-  #checkov:skip=CKV_AWS_382
+  #checkov:skip=CKV_AWS_382: "Required for ECS tasks to access external services"
   name        = "weblogic-${var.env_name}-ecscluster-private-sg"
   description = "Shared ECS Cluster Hosts Security Group"
   vpc_id      = var.account_info.vpc_id

@@ -1,5 +1,5 @@
 resource "aws_ebs_volume" "this" {
-  #checkov:skip=CKV2_AWS_9: "AWS Backup plan"
+  #checkov:skip=CKV2_AWS_9: "Backups controlled by tags"
   availability_zone = var.availability_zone
   type              = var.type
   iops              = var.iops
