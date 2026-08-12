@@ -1,6 +1,6 @@
 # Gateway resources (Gateway, GatewayClass, ListenerSet, etc)
 module "gateway_api" {
-  source = "github.com/ministryofjustice/container-platform-terraform-gateway-api?ref=33be8f18154b51efcbcc2493020ac74384f80462" #1.0.0
+  source = "github.com/ministryofjustice/container-platform-terraform-gateway-api?ref=085b885fb01575f92ffeee742f11e27116d027b3" #1.1.0
 
   lb_name_prefix      = local.workspace_slug
   cluster_base_domain = local.cluster_domain

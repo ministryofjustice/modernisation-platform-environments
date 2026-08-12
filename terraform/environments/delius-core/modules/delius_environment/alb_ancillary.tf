@@ -51,9 +51,9 @@ resource "aws_vpc_security_group_egress_rule" "ancillary_alb_egress_private" {
 
 # tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "delius_core_ancillary" {
-  #checkov:skip=CKV_AWS_91 "ignore"
-  #checkov:skip=CKV2_AWS_28 "ignore"
-  #checkov:skip=CKV_AWS_150
+  #checkov:skip=CKV_AWS_91: "Access logging not required"
+  #checkov:skip=CKV2_AWS_28: "WAF configuration is managed automatically by Shield Advanced"
+  #checkov:skip=CKV_AWS_150: "Deletion protenction not required"
 
   name               = "${var.env_name}-ancilliary-alb"
   internal           = false

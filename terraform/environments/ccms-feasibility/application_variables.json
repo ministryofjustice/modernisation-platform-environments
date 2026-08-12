@@ -1,16 +1,9 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
-    },
-    "test": {
-      "example_var": "test-data"
-    },
-    "preproduction": {
-      "example_var": "preproduction-data"
-    },
-    "production": {
-      "example_var": "production-data"
+      "clamav_ami_id": "ami-002aab1cab5a08e35",
+      "clamav_ec2_instance_type": "c5d.large",
+      "clamav_instance_role": "clamav"
     }
   }
 }
