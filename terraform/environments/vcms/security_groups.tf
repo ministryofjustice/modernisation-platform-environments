@@ -19,7 +19,7 @@ resource "aws_security_group" "ecs_service" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = local.tags
+  tags = merge(local.tags, { Name = "vcms-ecs"})
 }
 
 # Security group for ALB
@@ -39,13 +39,27 @@ resource "aws_security_group" "alb_sg" {
   }
 
   egress {
+    description = "Allow all out"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = local.tags
+  tags = merge(local.tags, { Name = "alb-sg"})
+}
+
+resource "aws_vpc_security_group_ingress_rule" "alb_https_private" {
+  for_each = private_subnet_ips
+
+  description = "Allow HTTPS in: ${each.value}"
+  security_group_id = aws_security_group.alb_sg.id
+
+  ip_protocol = "tcp"
+  from_port   = 443
+  to_port     = 443
+
+  cidr_ipv4 = each.value
 }
 
 resource "aws_security_group_rule" "ecs_from_alb" {
