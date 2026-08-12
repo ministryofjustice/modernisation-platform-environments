@@ -52,6 +52,7 @@ resource "aws_cloudwatch_log_group" "log_group_for_sfn" {
 
 resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
   #checkov:skip=CKV_AWS_284: "X-Ray tracing not required"
+  #checkov:skip=CKV_AWS_285: "False psoitive: Logging is enabled"
   name     = "${var.environment}_ecs_restart_state_machine"
   role_arn = aws_iam_role.step_function_role.arn
 
