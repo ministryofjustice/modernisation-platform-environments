@@ -11,7 +11,10 @@ module "ftp" {
   subnet_id          = data.aws_subnet.private_subnets_a.id
   security_group_ids = [aws_security_group.ftp.id]
 
-  user_data = base64encode(templatefile("./templates/ec2_user_data_ftp.sh", {}))
+  user_data = base64encode(templatefile("./templates/ec2_user_data_ftp.sh", {
+    ftp_inbound_bucket  = module.s3_inbound.bucket.id
+    ftp_outbound_bucket = module.s3_outbound.bucket.id
+  }))
 
   tags = merge(local.tags, {
     instance-role       = "ftp"
