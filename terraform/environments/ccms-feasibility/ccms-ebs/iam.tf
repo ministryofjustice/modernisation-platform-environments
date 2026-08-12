@@ -264,6 +264,44 @@ resource "aws_iam_role_policy_attachment" "ftp_cw_logging" {
   policy_arn = aws_iam_policy.ftp_cw_logging.arn
 }
 
+resource "aws_iam_policy" "ftp_s3_buckets" {
+  name        = "${local.component_name}-${local.env_label}-ftp-s3-buckets"
+  description = "Allow the FTP instance to mount the inbound/outbound S3 buckets via s3fs"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket",
+        ]
+        Resource = [
+          module.s3_inbound.bucket.arn,
+          module.s3_outbound.bucket.arn,
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+        ]
+        Resource = [
+          "${module.s3_inbound.bucket.arn}/*",
+          "${module.s3_outbound.bucket.arn}/*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ftp_s3_buckets" {
+  role       = aws_iam_role.ftp.name
+  policy_arn = aws_iam_policy.ftp_s3_buckets.arn
+}
+
 resource "aws_iam_policy" "ec2_operations" {
   name        = "${local.component_name}-${local.env_label}-ebsdb-ec2-operations"
   description = "Allow the EBS DB instance to create and manage EBS snapshots"
