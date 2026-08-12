@@ -162,5 +162,7 @@ envVars: {
     STORE_MODEL_IN_DB: "True",
     AZURE_TENANT_ID: "${microsoft_foundry_tenant_id}",
     AZURE_CLIENT_ID: "${microsoft_foundry_client_id}",
-    AZURE_FEDERATED_TOKEN_FILE: "/var/run/secrets/sts.windows.net/azure-identity-token"
+    AZURE_FEDERATED_TOKEN_FILE: "/var/run/secrets/sts.windows.net/azure-identity-token", 
+    AZURE_AD_TOKEN: "oidc/azure/",
+    AZURE_OPENAI_AD_TOKEN: "oidc/azure/",
 }
