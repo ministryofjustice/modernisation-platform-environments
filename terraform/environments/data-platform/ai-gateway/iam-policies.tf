@@ -56,7 +56,7 @@ data "aws_iam_policy_document" "ai_gateway" {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
     resources = distinct([
-      for model in values(try(local.ai_gateway_configuration.models.amazon_bedrock, {})) :
+      for model in values(try(local.ai_gateway_models_filtered.amazon_bedrock, {})) :
       "arn:aws:iam::${local.environment_management.account_ids[model.aws_account_name]}:role/${model.aws_role_name}"
       if can(model.aws_account_name) && can(model.aws_role_name)
     ])
