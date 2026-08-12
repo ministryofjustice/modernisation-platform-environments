@@ -69,15 +69,6 @@ data "aws_iam_policy_document" "ai_gateway" {
       resources = local.ai_gateway_bedrock_assume_role_arns
     }
   }
-
-  statement {
-    sid     = "AssumeDigitalPrisonReportingBedrockRole"
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-    resources = [
-      "arn:aws:iam::${local.environment_management.account_ids["digital-prison-reporting-${local.environment}"]}:role/ai-gateway",
-    ]
-  }
 }
 
 module "ai_gateway_iam_policy" {
