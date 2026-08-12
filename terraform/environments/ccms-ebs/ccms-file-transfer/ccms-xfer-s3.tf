@@ -67,7 +67,12 @@ module "s3-bucket-sftp-bc" {
     ]
   })]
 
-  log_bucket     = local.logging_bucket_name
+  #log_bucket     = local.logging_bucket_name
+  log_buckets = {
+   log_bucket_name = module.s3-bucket-logging.bucket.id
+   log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+   log_bucket_policy = "{}" 
+     }
   log_prefix     = "s3access/${local.sftp_bc_bucket_name}"
   custom_kms_key = aws_kms_key.s3_sftp_kms_key.arn
   sse_algorithm  = "aws:kms"
@@ -110,11 +115,11 @@ module "s3-bucket-sftp-bc" {
   )
 }
 
-resource "aws_s3_bucket_logging" "s3_bucket_sftp_bc" {
-  bucket        = module.s3-bucket-sftp-bc.bucket.id
-  target_bucket = local.logging_bucket_name
-  target_prefix = "s3access/${local.sftp_bc_bucket_name}/"
-}
+# resource "aws_s3_bucket_logging" "s3_bucket_sftp_bc" {
+#   bucket        = module.s3-bucket-sftp-bc.bucket.id
+#   target_bucket = local.logging_bucket_name
+#   target_prefix = "s3access/${local.sftp_bc_bucket_name}/"
+# }
 
 resource "aws_s3_bucket_notification" "sftp_bucket_notification" {
   bucket      = module.s3-bucket-sftp-bc.bucket.id
