@@ -21,8 +21,7 @@ module "justice_transcribe_backend_secret" {
   name = "${local.component_name}/justice-transcribe-backend"
 
   secret_string = jsonencode({
-    audience = "CHANGEME"
-    subject  = "CHANGEME"
+    client_map = {}
   })
   ignore_secret_changes = true
 }

@@ -88,12 +88,12 @@ module "justice_transcribe_backend_iam_role" {
         {
           test     = "StringEquals"
           variable = "sts.windows.net/${jsondecode(data.aws_secretsmanager_secret_version.justiceuk_entra_secret[0].secret_string)["tenant_id"]}/:aud"
-          values   = [jsondecode(data.aws_secretsmanager_secret_version.justice_transcribe_backend_secret[0].secret_string)["audience"]]
+          values   = [for client in values(tomap(jsondecode(data.aws_secretsmanager_secret_version.justice_transcribe_backend_secret[0].secret_string)["client_map"])) : client["audience"]]
         },
         {
           test     = "StringEquals"
           variable = "sts.windows.net/${jsondecode(data.aws_secretsmanager_secret_version.justiceuk_entra_secret[0].secret_string)["tenant_id"]}/:sub"
-          values   = [jsondecode(data.aws_secretsmanager_secret_version.justice_transcribe_backend_secret[0].secret_string)["subject"]]
+          values   = compact([for client in values(tomap(jsondecode(data.aws_secretsmanager_secret_version.justice_transcribe_backend_secret[0].secret_string)["client_map"])) : try(client["subject"], null)])
         }
       ]
     }
