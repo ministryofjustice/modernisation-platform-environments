@@ -1165,6 +1165,15 @@ module "poll_cadt" {
 # Live-feed incident manager
 # ------------------------------------------------------------------------------
 
+locals {
+  live_feed_pagerduty_to_github = {
+    PEYIF4Q = "matt-heery"
+    PSYDXO9 = "kraihanmoj"
+    PLV2QS6 = "lucy-astley-jones"
+    PREPU2L = "mrixson-moj"
+  }
+}
+
 module "live_feed_github_app" {
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "1.3.1"
@@ -1215,15 +1224,18 @@ module "live_feed_incident_manager" {
     GITHUB_PROJECT_NUMBER = "290"
     GITHUB_ISSUE_TYPE     = "Bug"
 
-    GITHUB_PROJECT_STATUS_FIELD     = "Status"
-    GITHUB_PROJECT_PRIORITY_FIELD   = "Priority"
-    GITHUB_PROJECT_SPRINT_FIELD     = "Sprint"
-    GITHUB_PROJECT_TODO_OPTION      = "👀 To do"
-    GITHUB_PROJECT_DONE_OPTION      = "✅ Done"
-    GITHUB_PROJECT_PRIORITY_OPTION  = "🚨 Urgent"
+    GITHUB_PROJECT_STATUS_FIELD    = "Status"
+    GITHUB_PROJECT_PRIORITY_FIELD  = "Priority"
+    GITHUB_PROJECT_SPRINT_FIELD    = "Sprint"
+    GITHUB_PROJECT_TODO_OPTION     = "👀 To do"
+    GITHUB_PROJECT_DONE_OPTION     = "✅ Done"
+    GITHUB_PROJECT_PRIORITY_OPTION = "🚨 Urgent"
 
     PAGERDUTY_SCHEDULE_ID = "P3MCA8L"
     PAGERDUTY_TIME_ZONE   = "Europe/London"
+    PAGERDUTY_TO_GITHUB = jsonencode(
+      local.live_feed_pagerduty_to_github
+    )
 
     INCIDENT_STATE_BUCKET = local.alarm_thread_state_bucket
     INCIDENT_STATE_PREFIX = "incident-automation/episodes"

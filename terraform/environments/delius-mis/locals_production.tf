@@ -438,6 +438,7 @@ locals {
 
   lb_config_production = {
     bucket_policy_enabled = true
+    maintenance_message   = "NDMIS Reporting is currently unavailable due to planned maintenance. Please try again later."
   }
 
   datasync_config_production = {

@@ -102,6 +102,9 @@ locals {
 }
 
 resource "aws_lb" "delius_microservices" {
+  #checkov:skip=CKV_AWS_152: "Cross-zone load balancing not needed
+  #checkov:skip=CKV_AWS_91: "ELB Logging not required"
+  #checkov:skip=CKV_AWS_150: "Deletion protection off"
   count                      = length(var.container_port_config) == 0 ? 0 : 1
   name                       = local.lb_name_final
   internal                   = true

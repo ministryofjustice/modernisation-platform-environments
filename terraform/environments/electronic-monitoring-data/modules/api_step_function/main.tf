@@ -84,8 +84,8 @@ data "aws_iam_policy_document" "vpc_policy" {
     effect = "Allow"
 
     principals {
-      type        = "AWS"
-      identifiers = var.roles_to_allow
+      type        = "*"
+      identifiers = ["*"]
     }
 
     actions   = ["execute-api:Invoke"]

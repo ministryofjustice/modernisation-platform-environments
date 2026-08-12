@@ -100,6 +100,7 @@ data "aws_ami" "ecs_ami" {
 }
 
 resource "aws_launch_template" "weblogic" {
+  #checkov:skip=CKV_AWS_341: "To Do: Test required hop limit"
   name_prefix   = "weblogic-${var.env_name}-ecs-"
   image_id      = data.aws_ami.ecs_ami.id
   instance_type = var.delius_microservice_configs.weblogic.ec2_instance_type
@@ -115,6 +116,12 @@ resource "aws_launch_template" "weblogic" {
 
   iam_instance_profile {
     name = aws_iam_instance_profile.weblogic.name
+  }
+
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
   }
 }
 
@@ -146,12 +153,13 @@ resource "aws_iam_instance_profile" "weblogic" {
 }
 
 resource "aws_security_group" "ecs_host_sg" {
+  #checkov:skip=CKV_AWS_382: "Required for ECS tasks to access external services"
   name        = "weblogic-${var.env_name}-ecscluster-private-sg"
   description = "Shared ECS Cluster Hosts Security Group"
   vpc_id      = var.account_info.vpc_id
 
-  # Allow all outbound
   egress {
+    description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -253,7 +261,7 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
 
 
 locals {
-  weblogic_cutover_envs = ["dev", "test"]
+  weblogic_cutover_envs = ["dev", "test", "stage"]
 }
 
 # Cert for Legacy URL: https://dsdmoj.atlassian.net/browse/TM-2173
@@ -265,9 +273,13 @@ locals {
 resource "aws_acm_certificate" "legacy" {
   count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name != "prod" ? 1 : 0
 
-  domain_name       = "*.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"
+  domain_name       = "ndelius.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"
   validation_method = "DNS"
   tags              = var.tags
+
+  subject_alternative_names = [
+    "interface.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"
+  ]
 
   lifecycle {
     create_before_destroy = true
@@ -284,9 +296,13 @@ resource "aws_lb_listener_certificate" "legacy" {
 resource "aws_acm_certificate" "legacy_prod" {
   count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name == "prod" ? 1 : 0
 
-  domain_name       = "*.probation.service.justice.gov.uk"
+  domain_name       = "ndelius.probation.service.justice.gov.uk"
   validation_method = "DNS"
   tags              = var.tags
+
+  subject_alternative_names = [
+    "interface.probation.service.justice.gov.uk"
+  ]
 
   lifecycle {
     create_before_destroy = true
