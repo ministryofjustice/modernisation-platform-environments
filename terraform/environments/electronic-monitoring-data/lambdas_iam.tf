@@ -2986,6 +2986,19 @@ data "aws_iam_policy_document" "live_feed_incident_manager_policy_document" {
   }
 
   statement {
+    sid    = "ListIncidentEpisodeStateBucket"
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      module.s3-logging-bucket.bucket.arn,
+    ]
+  }
+
+  statement {
     sid    = "StoreIncidentEpisodeState"
     effect = "Allow"
 
