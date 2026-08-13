@@ -27,7 +27,7 @@ resource "aws_security_group_rule" "ppud_db_ingress" {
 
 # Sets up RDS export infrastructure for PPUD pipeline
 module "ppud_rds_export" {
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=26c16ad6944e91a147280d4bff088929d17f6b21"
+  source = "github.com/ministryofjustice/terraform-rds-export?ref=bf54b5dd6041348cb6d0486c046e6b97c9631d76"
 
   providers = {
     aws = aws
@@ -43,6 +43,7 @@ module "ppud_rds_export" {
   output_parquet_file_size = 50
   db_name                  = "${local.short_name}_${local.environment}"
   get_views                = true
+  bucket_namespace         = "account-regional"
 
   tags = merge(
     local.tags,

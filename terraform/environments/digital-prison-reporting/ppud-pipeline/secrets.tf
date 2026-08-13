@@ -7,7 +7,7 @@ module "ppud_rds_export_secret" {
   name       = "ppud_rds_export_password"
   kms_key_id = module.ppud_kms.key_arn
 
-  ignore_secret_changes   = true
+  ignore_secret_changes  = true
   create_random_password = true
   random_password_length = 13
 
