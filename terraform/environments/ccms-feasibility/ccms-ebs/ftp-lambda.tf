@@ -84,7 +84,6 @@ module "allpay_ftp_lambda_outbound" {
   s3_bucket_layer_ftp          = module.s3_ftp_lambda.bucket.id
   s3_object_ftp_clientlibs     = "lambda_delivery/ftp_lambda_layer/ftp_lambda_layer.zip"
   s3_object_ftp_client         = "lambda/ftp-client-v3.1.zip"
-  ftp_cron                     = "cron(0 10 ? * MON-FRI *)"
   enabled_cron_in_environments = local.ftp_lambda_enabled_cron_in_environments
   tags                         = local.tags
 }
@@ -107,7 +106,6 @@ module "allpay_ftp_lambda_inbound" {
   s3_bucket_layer_ftp          = module.s3_ftp_lambda.bucket.id
   s3_object_ftp_clientlibs     = "lambda_delivery/ftp_lambda_layer/ftp_lambda_layer.zip"
   s3_object_ftp_client         = "lambda/ftp-client-v3.1.zip"
-  ftp_cron                     = "cron(0 10 ? * MON-FRI *)"
   enabled_cron_in_environments = local.ftp_lambda_enabled_cron_in_environments
   tags                         = local.tags
 }
@@ -131,7 +129,6 @@ module "xerox_ftp_lambda_outbound" {
   s3_bucket_layer_ftp          = module.s3_ftp_lambda.bucket.id
   s3_object_ftp_clientlibs     = "lambda_delivery/ftp_lambda_layer/ftp_lambda_layer.zip"
   s3_object_ftp_client         = "lambda/ftp-client-v3.1.zip"
-  ftp_cron                     = "cron(5 5 * * ? *)"
   enabled_cron_in_environments = local.ftp_lambda_enabled_cron_in_environments
   tags                         = local.tags
 }
@@ -154,7 +151,6 @@ module "xerox_ftp_lambda_outbound_peterborough" {
   s3_bucket_layer_ftp          = module.s3_ftp_lambda.bucket.id
   s3_object_ftp_clientlibs     = "lambda_delivery/ftp_lambda_layer/ftp_lambda_layer.zip"
   s3_object_ftp_client         = "lambda/ftp-client-v3.1.zip"
-  ftp_cron                     = "cron(0 10 ? * MON-FRI *)"
   enabled_cron_in_environments = local.ftp_lambda_enabled_cron_in_environments
   tags                         = local.tags
 }
@@ -177,7 +173,6 @@ module "eckoh_ftp_lambda_outbound" {
   s3_bucket_layer_ftp          = module.s3_ftp_lambda.bucket.id
   s3_object_ftp_clientlibs     = "lambda_delivery/ftp_lambda_layer/ftp_lambda_layer.zip"
   s3_object_ftp_client         = "lambda/ftp-client-v3.1.zip"
-  ftp_cron                     = "cron(0 10 ? * MON-FRI *)"
   enabled_cron_in_environments = local.ftp_lambda_enabled_cron_in_environments
   tags                         = local.tags
 }
@@ -200,7 +195,6 @@ module "eckoh_ftp_lambda_inbound" {
   s3_bucket_layer_ftp          = module.s3_ftp_lambda.bucket.id
   s3_object_ftp_clientlibs     = "lambda_delivery/ftp_lambda_layer/ftp_lambda_layer.zip"
   s3_object_ftp_client         = "lambda/ftp-client-v3.1.zip"
-  ftp_cron                     = "cron(0 10 ? * MON-FRI *)"
   enabled_cron_in_environments = local.ftp_lambda_enabled_cron_in_environments
   tags                         = local.tags
 }
@@ -223,12 +217,11 @@ module "rossendales_ftp_lambda_inbound" {
   s3_bucket_layer_ftp          = module.s3_ftp_lambda.bucket.id
   s3_object_ftp_clientlibs     = "lambda_delivery/ftp_lambda_layer/ftp_lambda_layer.zip"
   s3_object_ftp_client         = "lambda/ftp-client-v3.1.zip"
-  ftp_cron                     = "cron(0 10 ? * MON-FRI *)"
   enabled_cron_in_environments = local.ftp_lambda_enabled_cron_in_environments
   tags                         = local.tags
 }
 
-module "onestlocate_ftp_lambda_inbound" {
+module "firstlocate_ftp_lambda_inbound" {
   # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/0d7e3b9
   source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ftp?ref=0d7e3b9"
 
@@ -247,7 +240,6 @@ module "onestlocate_ftp_lambda_inbound" {
   s3_bucket_layer_ftp          = module.s3_ftp_lambda.bucket.id
   s3_object_ftp_clientlibs     = "lambda_delivery/ftp_lambda_layer/ftp_lambda_layer.zip"
   s3_object_ftp_client         = "lambda/ftp-client-v3.1.zip"
-  ftp_cron                     = "cron(0 10 ? * MON-FRI *)"
   enabled_cron_in_environments = local.ftp_lambda_enabled_cron_in_environments
   tags                         = local.tags
 }
