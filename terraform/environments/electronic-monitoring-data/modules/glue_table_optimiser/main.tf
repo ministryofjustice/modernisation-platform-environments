@@ -10,7 +10,7 @@ resource "aws_glue_catalog_table_optimizer" "standard_compaction" {
 
     compaction_configuration {
       iceberg_configuration {
-        strategy = "sort"
+        strategy = database_name == "staged_mdss_dev_dbt "  && table_name == "event" ? "sort" : "binpack" 
       }
     }
   }
