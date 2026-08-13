@@ -15,7 +15,7 @@ locals {
         aws_network_flow_monitoring_agent = "v1.1.6-eksbuild.1"
         eks_node_monitoring_agent         = "v1.7.0-eksbuild.1"
         coredns                           = "v1.14.3-eksbuild.3"
-        eks_pod_identity_agent            = "v1.3.10-eksbuild.3"
+        eks_pod_identity_agent            = "v1.4.0-eksbuild.1"
         aws_guardduty_agent               = "v1.16.0-eksbuild.2"
         aws_ebs_csi_driver                = "v1.63.1-eksbuild.1"
         vpc_cni                           = "v1.22.4-eksbuild.3"
