@@ -1,7 +1,8 @@
+# KMS key for ppud pipeline
 module "ppud_kms" {
 
   # v4.2.1
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms?ref=af1d45558a6073c017a732d2273efcc733b34d0f"
+  source = "github.com/terraform-aws-modules/terraform-aws-kms?ref=af1d45558a6073c017a732d2273efcc733b34d0f"
 
   aliases               = ["ppud-pipeline-kms"]
   description           = "KMS key for PPUD pipeline resources"
