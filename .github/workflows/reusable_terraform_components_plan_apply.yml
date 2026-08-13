@@ -103,7 +103,7 @@
               aws-region: "eu-west-2"
 
           - name: Validate Tags
-            id: validate-tags
+            id: validate
             uses: ministryofjustice/checkov-tag-validator@debug-delete-old-comment
             with:
               terraform_directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
