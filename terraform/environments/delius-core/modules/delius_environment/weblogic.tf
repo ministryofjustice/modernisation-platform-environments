@@ -261,7 +261,7 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
 
 
 locals {
-  weblogic_cutover_envs = ["dev", "test", "stage"]
+  weblogic_cutover_envs = ["dev", "test", "stage", "preprod"]
 }
 
 # Cert for Legacy URL: https://dsdmoj.atlassian.net/browse/TM-2173
