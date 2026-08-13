@@ -110,16 +110,6 @@ resource "aws_security_group" "alb_internal_sg" {
     }
   }
 
-  dynamic "ingress" {
-    for_each = local.account_config.private_subnet_ips
-    content {
-      from_port   = 443
-      to_port     = 443
-      protocol    = "tcp"
-      cidr_blocks = [ingress.value]
-    }
-  }
-
   egress {
     description = "Allow all out"
     from_port   = 0

@@ -15,13 +15,12 @@ resource "aws_lb" "frontend_internal" {
   tags = local.tags
 }
 
-resource "aws_lb_listener" "frontend_internal_https" {
+resource "aws_lb_listener" "frontend_internal_http" {
   load_balancer_arn = aws_lb.frontend_internal.arn
-  port              = 443
-  protocol          = "HTTPS"
+  port              = 80
+  protocol          = "HTTP"
 
   ssl_policy      = "ELBSecurityPolicy-2016-08"
-  certificate_arn = aws_acm_certificate.internal.arn
 
   default_action {
     type             = "forward"
