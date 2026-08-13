@@ -65,45 +65,45 @@ resource "aws_acm_certificate_validation" "external" {
 }
 
 # Internal ALB
-resource "aws_acm_certificate" "internal" {
-  domain_name       = local.account_config.internal_dns_suffix
-  validation_method = "DNS"
+# resource "aws_acm_certificate" "internal" {
+#   domain_name       = local.account_config.internal_dns_suffix
+#   validation_method = "DNS"
 
-  tags = merge(local.tags, {
-    Name = "frontend-internal"
-  })
+#   tags = merge(local.tags, {
+#     Name = "frontend-internal"
+#   })
 
-  lifecycle {
-    create_before_destroy = true
-  }
-}
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
 
-resource "aws_route53_record" "internal_cert_validation" {
-  provider = aws.core-vpc
+# resource "aws_route53_record" "internal_cert_validation" {
+#   provider = aws.core-vpc
 
-  for_each = {
-    for dvo in aws_acm_certificate.internal.domain_validation_options :
-    dvo.domain_name => {
-      name   = dvo.resource_record_name
-      type   = dvo.resource_record_type
-      record = dvo.resource_record_value
-    }
-  }
+#   for_each = {
+#     for dvo in aws_acm_certificate.internal.domain_validation_options :
+#     dvo.domain_name => {
+#       name   = dvo.resource_record_name
+#       type   = dvo.resource_record_type
+#       record = dvo.resource_record_value
+#     }
+#   }
 
-  zone_id = local.account_config.route53_inner_zone.zone_id
-  name    = each.value.name
-  type    = each.value.type
-  records = [each.value.record]
+#   zone_id = local.account_config.route53_inner_zone.zone_id
+#   name    = each.value.name
+#   type    = each.value.type
+#   records = [each.value.record]
 
-  ttl = 60
-}
+#   ttl = 60
+# }
 
-resource "aws_acm_certificate_validation" "internal" {
-  provider = aws.core-vpc
-  certificate_arn = aws_acm_certificate.internal.arn
+# resource "aws_acm_certificate_validation" "internal" {
+#   provider = aws.core-vpc
+#   certificate_arn = aws_acm_certificate.internal.arn
 
-  validation_record_fqdns = [
-    for record in aws_route53_record.internal_cert_validation :
-    record.fqdn
-  ]
-}
+#   validation_record_fqdns = [
+#     for record in aws_route53_record.internal_cert_validation :
+#     record.fqdn
+#   ]
+# }
