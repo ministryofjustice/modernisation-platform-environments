@@ -60,6 +60,7 @@ proxy_config:
     database_connection_pool_limit: 10
   litellm_settings:
     drop_params: true
+    enable_azure_ad_token_refresh: true
     request_timeout: 600
     json_logs: true
     store_audit_logs: true
@@ -196,7 +197,5 @@ envVars: {
     AZURE_TENANT_ID: "${microsoft_foundry_tenant_id}",
     AZURE_CLIENT_ID: "${microsoft_foundry_client_id}",
     AZURE_FEDERATED_TOKEN_FILE: "/var/run/secrets/sts.windows.net/azure-identity-token",
-    AZURE_FEDERATED_TOKEN_FILE: "/var/run/secrets/sts.windows.net/azure-identity-token", 
-    AZURE_AD_TOKEN: "oidc/azure/",
-    AZURE_OPENAI_AD_TOKEN: "oidc/azure/",
+    AZURE_AD_TOKEN: "oidc/azure/"
 }
