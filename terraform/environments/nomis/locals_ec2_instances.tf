@@ -328,6 +328,10 @@ locals {
           backup-plan = "daily-and-weekly"
         }
       }
+      route53_records = {
+        create_internal_record = true
+        create_external_record = true
+      }
       user_data_cloud_init = {
         args = {
           branch       = "main"
