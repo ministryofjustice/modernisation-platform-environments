@@ -8,12 +8,13 @@ module "s3_pui_docs" {
    log_buckets = {
    log_bucket_name = module.s3-bucket-logging.bucket.id
    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
-   log_bucket_policy = aws_s3_bucket_policy.lb_access_logs.policy
+   #log_bucket_policy = aws_s3_bucket_policy.lb_access_logs.policy
+   log_bucket_policy = jsonencode({Version   = "2012-10-17", Statement = []})
      }
 
    log_prefix = "s3access/${local.application_name}-docs-${local.environment}"
 
-  lifecycle_rule = [
+    lifecycle_rule = [
     {
       id      = "pui_docs_lifecycle"
       enabled = "Enabled"
@@ -93,12 +94,7 @@ module "s3-bucket-logging" {
   sse_algorithm      = "AES256"
   custom_kms_key     = ""
 
-  #log_bucket = "${local.application_name}-${local.environment}-logging"
-  log_buckets = {
-   log_bucket_name = module.s3-bucket-logging.bucket.id
-   log_bucket_arn  = module.s3-bucket-logging.bucket.arn
-   log_bucket_policy = aws_s3_bucket_policy.lb_access_logs.policy
-     }
+  log_bucket = "${local.application_name}-${local.environment}-logging"
   log_prefix = "s3access/${local.application_name}-${local.environment}-logging"
 
   # Refer to the below section "Replication" before enabling replication
@@ -180,6 +176,20 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         }
       },
       {
+        Sid    = "EnforceTLSv12orHigher",
+        Effect = "Deny",
+        Principal = {
+          AWS = "*"
+        },
+        Action   = "s3:*",
+        Resource = ["${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}"],
+        Condition = {
+          NumericLessThan = {
+            "s3:TlsVersion" = "1.2"
+          }
+        }
+      },
+      {
         Sid    = "AllowELBLogDeliveryPutObject",
         Effect = "Allow",
         Principal = {
@@ -207,16 +217,11 @@ module "s3-bucket-shared" {
 
   bucket_name        = "${local.application_name}-${local.environment}-shared"
   versioning_enabled = true
-  #bucket_policy      = [aws_s3_bucket_policy.shared_bucket_policy.policy]
+  bucket_policy      = [aws_s3_bucket_policy.shared_bucket_policy.policy]
   sse_algorithm      = "AES256"
   custom_kms_key     = ""
 
-  #log_bucket = module.s3-bucket-logging.bucket.id
-  log_buckets = {
-   log_bucket_name = module.s3-bucket-logging.bucket.id
-   log_bucket_arn  = module.s3-bucket-logging.bucket.arn
-   log_bucket_policy = aws_s3_bucket_policy.lb_access_logs.policy
-     }
+  log_bucket = module.s3-bucket-logging.bucket.id
   log_prefix = "s3access/${local.application_name}-${local.environment}-shared"
 
   # Refer to the below section "Replication" before enabling replication
@@ -246,7 +251,15 @@ module "s3-bucket-shared" {
     }
   ]
 
-  bucket_policy = [jsonencode({
+  tags = merge(local.tags,
+    { Name = "${local.application_name}-${local.environment}-shared" }
+  )
+}
+
+resource "aws_s3_bucket_policy" "shared_bucket_policy" {
+  bucket = module.s3-bucket-shared.bucket.id
+
+  policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
@@ -254,45 +267,30 @@ module "s3-bucket-shared" {
         "Effect" : "Deny",
         "Principal" : "*",
         "Action" : "s3:*",
-        "Resource" : [
-          module.s3-bucket-shared.bucket.arn,
-          "${module.s3-bucket-shared.bucket.arn}/*"
-        ],
+        "Resource" : ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
         "Condition" : {
           "Bool" : {
             "aws:SecureTransport" : "false"
           }
         }
+      },
+      {
+        Sid    = "EnforceTLSv12orHigher",
+        Effect = "Deny",
+        Principal = {
+          AWS = "*"
+        },
+        Action   = "s3:*",
+        Resource = ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
+        Condition = {
+          NumericLessThan = {
+            "s3:TlsVersion" = "1.2"
+          }
+        }
       }
     ]
-  })]
-
-  tags = merge(local.tags,
-    { Name = "${local.application_name}-${local.environment}-shared" }
-  )
+  })
 }
-
-# resource "aws_s3_bucket_policy" "shared_bucket_policy" {
-#   bucket = module.s3-bucket-shared.bucket.id
-
-#   policy = jsonencode({
-#     Version = "2012-10-17",
-#     Statement = [
-#       {
-#         "Sid" : "DenyInsecureTransport",
-#         "Effect" : "Deny",
-#         "Principal" : "*",
-#         "Action" : "s3:*",
-#         "Resource" : ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
-#         "Condition" : {
-#           "Bool" : {
-#             "aws:SecureTransport" : "false"
-#           }
-#         }
-#       }
-#     ]
-#   })
-# }
 
 resource "aws_s3_object" "folder" {
   bucket = module.s3-bucket-shared.bucket.id
