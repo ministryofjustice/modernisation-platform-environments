@@ -302,6 +302,27 @@ resource "aws_iam_role_policy_attachment" "ftp_s3_buckets" {
   policy_arn = aws_iam_policy.ftp_s3_buckets.arn
 }
 
+resource "aws_iam_policy" "ftp_test_user_secret" {
+  name        = "${local.component_name}-${local.env_label}-ftp-test-user-secret"
+  description = "Allow the FTP instance to read its own SSH test user credentials at boot"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue"]
+        Resource = aws_secretsmanager_secret.ftp_test_user.arn
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ftp_test_user_secret" {
+  role       = aws_iam_role.ftp.name
+  policy_arn = aws_iam_policy.ftp_test_user_secret.arn
+}
+
 resource "aws_iam_policy" "ec2_operations" {
   name        = "${local.component_name}-${local.env_label}-ebsdb-ec2-operations"
   description = "Allow the EBS DB instance to create and manage EBS snapshots"
