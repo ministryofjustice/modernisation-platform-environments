@@ -24,23 +24,23 @@ locals {
       helm_chart_version = {
         aws_cloudwatch_metrics = "0.0.11"
         aws_for_fluent_bit     = "0.2.0"
-        cert_manager           = "v1.19.2"
-        cluster_autoscaler     = "9.56.0"
-        external_dns           = "1.20.0"
-        external_secrets       = "2.2.0"
+        cert_manager           = "v1.20.2"
+        cluster_autoscaler     = "9.59.0"
+        external_dns           = "1.21.1"
+        external_secrets       = "2.7.0"
         ingress_nginx          = "4.15.0"
-        karpenter              = "1.10.0"
-        keda                   = "2.18.3"
-        kube_prometheus_stack  = "82.16.0"
-        kyverno                = "3.6.2"
-        velero                 = "12.0.0"
+        karpenter              = "1.14.0"
+        keda                   = "2.20.2"
+        kube_prometheus_stack  = "88.3.0"
+        kyverno                = "3.8.1"
+        velero                 = "12.1.0"
       }
 
       /* Velero */
       velero_aws_plugin_version = "v1.14.0"
 
       /* Kube Prometheus Stack */
-      prometheus_operator_crd_version = "v0.89.0"
+      prometheus_operator_crd_version = "v0.93.0"
 
       /* Data Engineering Airflow */
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-dev-execution-role"
