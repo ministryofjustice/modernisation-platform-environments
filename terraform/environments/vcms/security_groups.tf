@@ -50,7 +50,7 @@ resource "aws_security_group" "alb_sg" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "alb_https_private" {
-  for_each = private_subnet_ips
+  for_each = local.account_config.private_subnet_ips
 
   description = "Allow HTTPS in: ${each.value}"
   security_group_id = aws_security_group.alb_sg.id
