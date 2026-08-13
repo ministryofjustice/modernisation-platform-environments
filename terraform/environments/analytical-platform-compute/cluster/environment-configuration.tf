@@ -18,7 +18,7 @@ locals {
         eks_pod_identity_agent            = "v1.4.0-eksbuild.1"
         aws_guardduty_agent               = "v1.16.0-eksbuild.2"
         aws_ebs_csi_driver                = "v1.63.1-eksbuild.1"
-        vpc_cni                           = "v1.22.4-eksbuild.3"
+        vpc_cni                           = "v1.23.0-eksbuild.1"
       }
 
       helm_chart_version = {
@@ -53,18 +53,18 @@ locals {
 
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
-      eks_cluster_version = "1.35"
-      eks_node_version    = "1.57.0-beaadc52"
+      eks_cluster_version = "1.36"
+      eks_node_version    = "1.64.0-ad9d4847"
       eks_cluster_addon_versions = {
-        kube_proxy                        = "v1.35.2-eksbuild.4"
+        kube_proxy                        = "v1.36.0-eksbuild.14"
         aws_efs_csi_driver                = "v3.4.1-eksbuild.1"
-        aws_network_flow_monitoring_agent = "v1.1.3-eksbuild.2"
-        eks_node_monitoring_agent         = "v1.6.2-eksbuild.1"
-        coredns                           = "v1.13.2-eksbuild.4"
-        eks_pod_identity_agent            = "v1.3.10-eksbuild.2"
+        aws_network_flow_monitoring_agent = "v1.1.6-eksbuild.1"
+        eks_node_monitoring_agent         = "v1.7.0-eksbuild.1"
+        coredns                           = "v1.14.3-eksbuild.3"
+        eks_pod_identity_agent            = "v1.4.0-eksbuild.1"
         aws_guardduty_agent               = "v1.16.0-eksbuild.2"
-        aws_ebs_csi_driver                = "v1.57.1-eksbuild.1"
-        vpc_cni                           = "v1.21.1-eksbuild.5"
+        aws_ebs_csi_driver                = "v1.63.1-eksbuild.1"
+        vpc_cni                           = "v1.23.0-eksbuild.1"
       }
 
       helm_chart_version = {
