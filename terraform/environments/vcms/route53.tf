@@ -79,6 +79,8 @@ resource "aws_acm_certificate" "internal" {
 }
 
 resource "aws_route53_record" "internal_cert_validation" {
+  provider = aws.core-vpc
+
   for_each = {
     for dvo in aws_acm_certificate.internal.domain_validation_options :
     dvo.domain_name => {
@@ -97,6 +99,7 @@ resource "aws_route53_record" "internal_cert_validation" {
 }
 
 resource "aws_acm_certificate_validation" "internal" {
+  provider = aws.core-vpc
   certificate_arn = aws_acm_certificate.internal.arn
 
   validation_record_fqdns = [
