@@ -311,7 +311,7 @@ resource "aws_lakeformation_permissions" "em_data_validation_s3" {
 
 resource "aws_iam_role_policy_attachment" "athena_access_em_data_validation" {
   count      = local.is-test || local.is-production ? 1 : 0
-  policy_arn = aws_iam_policy.validation_athena_access.arn
+  policy_arn = aws_iam_policy.data_validation_athena_access.arn
   role       = module.emd_validation_db_role[0].iam_role_name
 }
 
