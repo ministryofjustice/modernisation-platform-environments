@@ -134,7 +134,7 @@
 
           - name: Validate Tags
             id: validate
-            uses: ministryofjustice/coat-tag-validator@354cc92dc6a1ebcca99ad3a0db4bd36a9c8418c4 #v2.2.2
+            uses: ministryofjustice/coat-tag-validator@254f10be6e560e52545cc2736146959c2e2dcb4c #v2.2.3
             continue-on-error: true
             with:
               terraform_directory: "terraform/environments/${{ inputs.application }}"
