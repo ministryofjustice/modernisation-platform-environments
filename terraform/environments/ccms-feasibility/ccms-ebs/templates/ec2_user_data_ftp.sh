@@ -4,7 +4,7 @@ set -e
 exec > /tmp/userdata.log 2>&1
 
 yum install -y wget unzip vsftpd jq
-dnf install -y git gcc libstdc++-devel automake libtool fuse fuse-devel curl-devel openssl-devel make libxml2-devel gcc-c++
+dnf install -y git gcc libstdc++-devel automake libtool fuse3 fuse3-devel curl-devel openssl-devel make libxml2-devel gcc-c++
 
 # s3fs-fuse isn't in AL2023's package repos, so build it from source.
 cd /usr/local/src
