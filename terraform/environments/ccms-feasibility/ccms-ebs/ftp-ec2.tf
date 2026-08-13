@@ -15,6 +15,7 @@ module "ftp" {
     ftp_inbound_bucket        = module.s3_inbound.bucket.id
     ftp_outbound_bucket       = module.s3_outbound.bucket.id
     ftp_test_user_secret_name = aws_secretsmanager_secret.ftp_test_user.name
+    ftp_role_name             = aws_iam_role.ftp.name
   }))
 
   tags = merge(local.tags, {
