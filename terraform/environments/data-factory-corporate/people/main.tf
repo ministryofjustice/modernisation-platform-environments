@@ -26,37 +26,23 @@ locals {
   #external_account_id = data.aws_secretsmanager_secret_version.external_account_id.secret_string
 }
 
+# v3 fix: switched from the modernisation-platform-terraform-s3-bucket module to the
+# moj-data-factory-modules//s3-bucket module (same one used by sherlock_landing_bucket).
+# The previous module required `providers = { aws.bucket-replication = aws }`, which forced
+# full evaluation of the default aws provider whose assume_role.role_arn resolves to null in
+# CI, causing the "The argument \"role_arn\" is required" plan error. This module does not
+# require that provider passthrough, so the plan no longer trips over the empty role_arn.
 module "sherlock_landing_bucket_test" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/s3-bucket?ref=313b46a604dc6aaee1d7309990388c6687272b6e"
 
-  bucket_prefix      = "landing-sherlock-test"
-  bucket_namespace   = "account-regional"
-  versioning_enabled = true
-
-  ownership_controls = "BucketOwnerEnforced"
-
-  replication_enabled = false
-  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
-  # replication_region  = "eu-west-2"
-  providers = {
-    aws.bucket-replication = aws
-  }
-
-  # Default/recommended encryption mode
-  sse_algorithm  = "aws:kms"
-  custom_kms_key = module.sherlock_kms_key.key_arn
-
-  # Optional compatibility mode for uploaders that rely on bucket default
-  # SSE-KMS encryption and do not send explicit SSE-KMS request headers.
-  # enforce_kms_request_headers = false
-
-  # Optional compatibility mode for services that cannot use SSE-KMS
-  # sse_algorithm = "AES256"
+  bucket_prefix             = "landing-sherlock-test"
+  kms_key_arn               = module.sherlock_kms_key.key_arn
+  enable_malware_protection = true
 
   tags = {
-    Environment = terraform.workspace
-    Application = "data-factory-corporate"
-    Component   = "people"
+    Environment    = terraform.workspace
+    Application    = "data-factory-corporate"
+    Component      = "people"
     Infrastructure = "sherlock-landing-bucket-test"
   }
 }
@@ -87,7 +73,7 @@ module "sherlock_glue_database" {
   database_name = "sherlock_glue_database"
 
   storage = {
-    bucket_name = module.sherlock_landing_bucket_test.bucket.bucket
+    bucket_name = module.sherlock_landing_bucket_test.bucket_name
 
     #currently the prefix is not optional
     prefix      = "avature-sherlock"
@@ -103,7 +89,7 @@ module "assume_iam_role" {
 
   trusted_account_id = data.aws_secretsmanager_secret_version.external_account_id.secret_string
 
-  bucket_arn = module.sherlock_landing_bucket_test.bucket.arn
+  bucket_arn = module.sherlock_landing_bucket_test.bucket_arn
 
   s3_prefix = "avature-sherlock"
 
@@ -142,4 +128,3 @@ module "assume_iam_role" {
   }
 
   }
-
