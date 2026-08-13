@@ -11,3 +11,9 @@ resource "aws_secretsmanager_secret" "external_account" {
     Infrastructure = "sherlock-secret-id"
   }
 }
+
+module "sherlock_kms_key" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git//?ref=496d8bd559afebb43b78af0034ec74d8b32378ca"
+
+  aliases = ["sherlock-landing"]
+}
