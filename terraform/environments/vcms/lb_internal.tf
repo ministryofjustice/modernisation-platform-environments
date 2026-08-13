@@ -20,8 +20,6 @@ resource "aws_lb_listener" "frontend_internal_http" {
   port              = 80
   protocol          = "HTTP"
 
-  ssl_policy      = "ELBSecurityPolicy-2016-08"
-
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.frontend.arn
