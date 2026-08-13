@@ -207,7 +207,7 @@ module "s3-bucket-shared" {
 
   bucket_name        = "${local.application_name}-${local.environment}-shared"
   versioning_enabled = true
-  bucket_policy      = [aws_s3_bucket_policy.shared_bucket_policy.policy]
+  #bucket_policy      = [aws_s3_bucket_policy.shared_bucket_policy.policy]
   sse_algorithm      = "AES256"
   custom_kms_key     = ""
 
@@ -246,15 +246,7 @@ module "s3-bucket-shared" {
     }
   ]
 
-  tags = merge(local.tags,
-    { Name = "${local.application_name}-${local.environment}-shared" }
-  )
-}
-
-resource "aws_s3_bucket_policy" "shared_bucket_policy" {
-  bucket = module.s3-bucket-shared.bucket.id
-
-  policy = jsonencode({
+  bucket_policy = [jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
@@ -262,7 +254,10 @@ resource "aws_s3_bucket_policy" "shared_bucket_policy" {
         "Effect" : "Deny",
         "Principal" : "*",
         "Action" : "s3:*",
-        "Resource" : ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
+        "Resource" : [
+          module.s3-bucket-shared.bucket.arn,
+          "${module.s3-bucket-shared.bucket.arn}/*"
+        ],
         "Condition" : {
           "Bool" : {
             "aws:SecureTransport" : "false"
@@ -270,8 +265,34 @@ resource "aws_s3_bucket_policy" "shared_bucket_policy" {
         }
       }
     ]
-  })
+  })]
+
+  tags = merge(local.tags,
+    { Name = "${local.application_name}-${local.environment}-shared" }
+  )
 }
+
+# resource "aws_s3_bucket_policy" "shared_bucket_policy" {
+#   bucket = module.s3-bucket-shared.bucket.id
+
+#   policy = jsonencode({
+#     Version = "2012-10-17",
+#     Statement = [
+#       {
+#         "Sid" : "DenyInsecureTransport",
+#         "Effect" : "Deny",
+#         "Principal" : "*",
+#         "Action" : "s3:*",
+#         "Resource" : ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
+#         "Condition" : {
+#           "Bool" : {
+#             "aws:SecureTransport" : "false"
+#           }
+#         }
+#       }
+#     ]
+#   })
+# }
 
 resource "aws_s3_object" "folder" {
   bucket = module.s3-bucket-shared.bucket.id
