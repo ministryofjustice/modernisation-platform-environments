@@ -12,8 +12,9 @@ module "ftp" {
   security_group_ids = [aws_security_group.ftp.id]
 
   user_data = base64encode(templatefile("./templates/ec2_user_data_ftp.sh", {
-    ftp_inbound_bucket  = module.s3_inbound.bucket.id
-    ftp_outbound_bucket = module.s3_outbound.bucket.id
+    ftp_inbound_bucket        = module.s3_inbound.bucket.id
+    ftp_outbound_bucket       = module.s3_outbound.bucket.id
+    ftp_test_user_secret_name = aws_secretsmanager_secret.ftp_test_user.name
   }))
 
   tags = merge(local.tags, {
