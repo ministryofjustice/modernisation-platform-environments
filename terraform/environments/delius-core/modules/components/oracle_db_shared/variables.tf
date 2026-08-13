@@ -48,6 +48,12 @@ variable "deploy_oracle_stats" {
   type        = bool
 }
 
+variable "deploy_oracle_rat" {
+  description = "for deploying Oracle RAT capture bucket"
+  default     = true
+  type        = bool
+}
+
 variable "db_suffix" {
   description = "identifier to append to name e.g. dsd, boe"
   type        = string

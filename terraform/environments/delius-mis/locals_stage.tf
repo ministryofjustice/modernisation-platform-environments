@@ -461,6 +461,12 @@ locals {
     bucket_policy_enabled = true
   }
 
+  acm_certificate_stage = {
+    domain_name                         = "modernisation-platform.service.justice.gov.uk"
+    external_validation_records_created = true
+    additional_subject_alternate_names  = []
+  }
+
   lb_config_stage = {
     bucket_policy_enabled = true
     maintenance_message   = "NDMIS Reporting Stage is currently unavailable due to planned maintenance or out-of-hours shutdown (7pm-7am)."

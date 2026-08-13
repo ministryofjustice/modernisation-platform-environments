@@ -37,12 +37,25 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
   cidr_ipv4         = each.key
 }
 
+# Neccessary for Codebuild UI Automation Tests
+resource "aws_vpc_security_group_ingress_rule" "test_alb_legacy_natgw_ing" {
+  for_each = contains(["test", "stage"], var.env_name) ? {
+    for cidr in local.legacy_natgw_ips[var.env_name] : cidr => cidr
+  } : {}
+
+  description       = "allow ingress from codebuilder to delius core frontend alb for testing purposes"
+  security_group_id = aws_security_group.delius_frontend_alb_security_group.id
+  cidr_ipv4         = each.value
+  from_port         = "443"
+  to_port           = "443"
+  ip_protocol       = "tcp"
+}
+
 # temporary rule to allow traffic from legacy preprod nat gateway for testing
 # to be removed once testing is over and nat gateway removed
 resource "aws_vpc_security_group_ingress_rule" "preprod_alb_legacy_natgw_ing" {
-  #checkov:skip=CKV_AWS_23 "ignore"
   for_each = var.env_name == "preprod" ? {
-    for cidr in local.legacy_preprod_natgw_ips : cidr => cidr
+    for cidr in local.legacy_natgw_ips[var.env_name] : cidr => cidr
   } : {}
 
   description       = "allow ingress from codebuilder to delius core frontend alb for testing purposes"
@@ -71,9 +84,9 @@ locals {
 
 # tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "delius_core_frontend" {
-  #checkov:skip=CKV_AWS_91 "ignore"
-  #checkov:skip=CKV2_AWS_28 "ignore"
-
+  #checkov:skip=CKV_AWS_91: "Access logging not required"
+  #checkov:skip=CKV2_AWS_28: "WAF configuration is managed automatically by Shield Advanced"
+  #checkov:skip=CKV_AWS_150: "Deletion protenction not required"
   name               = local.alb_name
   internal           = false
   load_balancer_type = "application"
@@ -82,6 +95,12 @@ resource "aws_lb" "delius_core_frontend" {
 
   enable_deletion_protection = false
   drop_invalid_header_fields = true
+
+  access_logs {
+    bucket  = module.weblogic_alb_access_logs.bucket.id
+    prefix  = "weblogic-${var.env_name}-alb"
+    enabled = true
+  }
 }
 
 resource "aws_lb_listener" "listener_https" {
