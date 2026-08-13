@@ -104,7 +104,7 @@
 
           - name: Validate Tags
             id: validate
-            uses: ministryofjustice/checkov-tag-validator@v2.2.2
+            uses: ministryofjustice/checkov-tag-validator@debug-delete-old-comment
             with:
               terraform_directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
               terraform_workspace: ${{ env.WORKSPACE_NAME }}
