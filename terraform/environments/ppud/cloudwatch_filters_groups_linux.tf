@@ -11,6 +11,13 @@ resource "aws_cloudwatch_log_group" "Linux-Services-Logs" {
   retention_in_days = 365
 }
 
+resource "aws_cloudwatch_log_group" "Mail-Queue-Logs" {
+  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
+  count             = local.is-production == true ? 1 : 0
+  name              = "Mail-Queue-Logs"
+  retention_in_days = 365
+}
+
 # Linux Services Metric Filters
 
 resource "aws_cloudwatch_log_metric_filter" "Linux-ServiceStatus-Running" {
@@ -75,6 +82,40 @@ resource "aws_cloudwatch_log_metric_filter" "CJSM-Port25-False" {
     dimensions = {
       Instance = "$Instance"
       Port     = "$Port"
+    }
+  }
+}
+
+# Mail Queue Metric Filters
+
+resource "aws_cloudwatch_log_metric_filter" "MailQueue-NotExceeded" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MailQueue-NotExceeded"
+  log_group_name = aws_cloudwatch_log_group.Mail-Queue-Logs[count.index].name
+  pattern        = "[date, time, Instance, MailQueue, status!=NotExceeded]"
+  metric_transformation {
+    name      = "MailQueueThreshold"
+    namespace = "MailQueue"
+    value     = "1"
+    dimensions = {
+      Instance  = "$Instance"
+      MailQueue = "$MailQueue"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "MailQueue-Exceeded" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "MailQueue-Exceeded"
+  log_group_name = aws_cloudwatch_log_group.Mail-Queue-Logs[count.index].name
+  pattern        = "[date, time, Instance, MailQueue, status=Exceeded]"
+  metric_transformation {
+    name      = "MailQueueThreshold"
+    namespace = "MailQueue"
+    value     = "0"
+    dimensions = {
+      Instance  = "$Instance"
+      MailQueue = "$MailQueue"
     }
   }
 }

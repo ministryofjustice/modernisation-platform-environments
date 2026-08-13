@@ -5,6 +5,7 @@ locals {
     [
       "cloud-platform-development",
       "cloud-platform-preproduction",
+      "cloud-platform-nonlive",
       "cloud-platform-live"
     ],
     local.bu_accounts.accounts
@@ -22,6 +23,10 @@ locals {
     cloud-platform-preproduction = {
       primary   = "10.195.16.0/20"
       secondary = "100.65.0.0/16"
+    }
+    cloud-platform-nonlive = {
+      primary   = "10.195.192.0/20"
+      secondary = "100.67.0.0/16"
     }
     cloud-platform-live = {
       primary   = "10.195.0.0/20"
@@ -50,6 +55,14 @@ locals {
     container-platform-hmpps-live = {
       primary   = "10.41.16.0/20"
       secondary = "100.81.0.0/16"
+    }
+    container-platform-cd-nonlive = {
+      primary   = "10.195.96.0/20"
+      secondary = "100.71.0.0/16"
+    }
+    container-platform-cd-live = {
+      primary   = "10.41.48.0/20"
+      secondary = "100.83.0.0/16"
     }
   }
 

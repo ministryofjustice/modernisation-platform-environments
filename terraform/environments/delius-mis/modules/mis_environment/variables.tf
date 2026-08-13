@@ -19,6 +19,10 @@ variable "environment_config" {
   type = any
 }
 
+variable "acm_certificate" {
+  type = any
+}
+
 variable "bastion_config" {
   type = any
 }

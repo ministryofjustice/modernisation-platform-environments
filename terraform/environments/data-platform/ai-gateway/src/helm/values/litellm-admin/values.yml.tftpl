@@ -20,10 +20,13 @@ serviceAccount:
 resources:
   requests:
     cpu: 250m
-    memory: 1Gi
+    memory: 2Gi
   limits:
     cpu: 500m
-    memory: 2Gi
+    memory: 4Gi
+
+startupProbe:
+  failureThreshold: 60
 
 db:
   deployStandalone: false
@@ -118,6 +121,14 @@ volumes:
   - name: migrations
     emptyDir:
       sizeLimit: 64Mi
+  - name: azure-workload-identity-token
+    projected:
+      defaultMode: 420
+      sources:
+        - serviceAccountToken:
+            path: azure-identity-token
+            audience: api://AzureADTokenExchange
+            expirationSeconds: 3600
 
 volumeMounts:
   - name: ui
@@ -128,6 +139,9 @@ volumeMounts:
     mountPath: /app/cache
   - name: migrations
     mountPath: /app/migrations
+  - name: azure-workload-identity-token
+    mountPath: /var/run/secrets/sts.windows.net
+    readOnly: true
 
 extraInitContainers:
   - name: setup-ui

@@ -21,8 +21,23 @@ locals {
   # Detect if this cluster is an ArgoCD hub by checking the cluster tag
   is_argocd_hub = lookup(data.aws_eks_cluster.cluster.tags, "argocd-role", "") == "hub"
 
-  # Shared monorepo for all BU workload manifests and baseline chart
-  environments_repo = "https://github.com/ministryofjustice/container-platform-environments"
+  # Shared monorepo for all BU workload manifests and baseline chart.
+  #
+  # The EKS-managed Argo CD capability runs in AWS-managed infrastructure and
+  # cannot reach github.com directly — it clones repositories through the
+  # CodeConnections git-http proxy.
+  #
+  # Proxy URL format (see AWS docs — "Connect to Git repositories with AWS
+  # CodeConnections"):
+  #   https://codeconnections.<region>.amazonaws.com/git-http/<account-id>/<region>/<connection-id>/<org>/<repo>
+  environments_repo_org  = "ministryofjustice"
+  environments_repo_name = "container-platform-environments"
+
+  # Connection ID is the last path segment of the CodeConnection ARN
+  # (arn:aws:codeconnections:<region>:<account>:connection/<connection-id>)
+  argocd_codeconnection_id = element(reverse(split("/", local.argocd_codeconnection_arn)), 0)
+
+  environments_repo = "https://codeconnections.${data.aws_region.current.region}.amazonaws.com/git-http/${data.aws_caller_identity.current.account_id}/${data.aws_region.current.region}/${local.argocd_codeconnection_id}/${local.environments_repo_org}/${local.environments_repo_name}.git"
 
   # BU configuration — defines the spoke clusters and path within the monorepo
   # Each BU gets a nonlive and live AppProject + ApplicationSet pair
@@ -60,7 +75,7 @@ locals {
         # Path prefix within monorepo for this BU's products
         path_prefix = "namespaces/${bu_name}"
         # Cluster ARN constructed from account ID + cluster name
-        cluster_arn = "arn:aws:eks:eu-west-2:${local.environment_management.account_ids[cluster_workspace]}:cluster/${element(reverse(split("-", cluster_workspace)), 0)}"
+        cluster_arn = "arn:aws:eks:eu-west-2:${local.environment_management.account_ids[cluster_workspace]}:cluster/${cluster_workspace}"
         auto_sync   = env == "nonlive" ? true : false
       }
     }
@@ -351,14 +366,15 @@ resource "kubectl_manifest" "argocd_applicationset_baseline" {
             targetRevision = "main"
             path           = "charts/app-baseline"
             helm = {
-              valuesObject = {
-                product       = "{{ .product }}"
-                bu            = "{{ .bu }}"
-                targetCluster = each.value.cluster_workspace
-                owner         = "{{ .owner | toJson }}"
-                access        = "{{ .access | toJson }}"
-                environments  = "{{ .environments | toJson }}"
-              }
+              valueFiles = [
+                "../../${each.value.path_prefix}/{{ .product }}/product.yaml"
+              ]
+              parameters = [
+                {
+                  name  = "targetCluster"
+                  value = each.value.cluster_workspace
+                }
+              ]
             }
           }
           destination = {

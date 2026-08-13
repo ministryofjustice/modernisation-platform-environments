@@ -26,9 +26,11 @@ def lambda_handler(event, context):
     )
     username = current_secret["username"]
 
+    # Oracle master user passwords additionally forbid & (SQL*Plus substitution
+    # variable prefix), on top of RDS's general /, ", @ restriction.
     new_password = secretsmanager.get_random_password(
         PasswordLength=30,
-        ExcludeCharacters="\"@/\\'",
+        ExcludeCharacters="\"@/\\'&",
     )["RandomPassword"]
 
     logger.info("Setting new master password on RDS instance %s", db_instance_identifier)

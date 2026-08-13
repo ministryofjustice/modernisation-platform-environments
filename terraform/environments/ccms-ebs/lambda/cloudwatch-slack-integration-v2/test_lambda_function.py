@@ -370,9 +370,11 @@ def test_missing_webhook_secret_raises(monkeypatch):
     incomplete = {"slack_channel_webhook": "https://hooks.test/main"}  # missing gd + s3
     client = mock.MagicMock()
     client.get_secret_value.return_value = {"SecretString": json.dumps(incomplete)}
-    with mock.patch.object(lf.boto3, "client", return_value=client):
-        with pytest.raises(ValueError, match="must be a non-empty string"):
-            lf.lambda_handler(sns_event(cw_message()), FakeContext())
+    with (
+        mock.patch.object(lf.boto3, "client", return_value=client),
+        pytest.raises(ValueError, match="must be a non-empty string"),
+    ):
+        lf.lambda_handler(sns_event(cw_message()), FakeContext())
 
 
 def test_get_credentials_wraps_clienterror():
@@ -381,18 +383,22 @@ def test_get_credentials_wraps_clienterror():
     err = ClientError({"Error": {"Code": "ResourceNotFoundException"}}, "GetSecretValue")
     client = mock.MagicMock()
     client.get_secret_value.side_effect = err
-    with mock.patch.object(lf.boto3, "client", return_value=client):
-        with pytest.raises(lf.SecretRetrievalError) as exc_info:
-            lf.get_credentials("test-secret")
+    with (
+        mock.patch.object(lf.boto3, "client", return_value=client),
+        pytest.raises(lf.SecretRetrievalError) as exc_info,
+    ):
+        lf.get_credentials("test-secret")
     assert exc_info.value.__cause__ is err  # cause chain preserved
 
 
 def test_get_credentials_wraps_json_error():
     client = mock.MagicMock()
     client.get_secret_value.return_value = {"SecretString": "not-valid-json{"}
-    with mock.patch.object(lf.boto3, "client", return_value=client):
-        with pytest.raises(lf.SecretRetrievalError) as exc_info:
-            lf.get_credentials("test-secret")
+    with (
+        mock.patch.object(lf.boto3, "client", return_value=client),
+        pytest.raises(lf.SecretRetrievalError) as exc_info,
+    ):
+        lf.get_credentials("test-secret")
     assert isinstance(exc_info.value.__cause__, json.JSONDecodeError)
 
 
@@ -411,9 +417,9 @@ def test_handler_raises_when_delivery_fails(monkeypatch):
     with (
         mock.patch.object(lf.boto3, "client", return_value=client),
         mock.patch.object(lf, "_post", mock.Mock(return_value=500)),
+        pytest.raises(lf.SlackNotificationError),
     ):
-        with pytest.raises(lf.SlackNotificationError):
-            lf.lambda_handler(sns_event(cw_message()), FakeContext())
+        lf.lambda_handler(sns_event(cw_message()), FakeContext())
 
 
 def test_handler_reraises_unexpected_errors(monkeypatch):
@@ -429,9 +435,9 @@ def test_handler_reraises_unexpected_errors(monkeypatch):
     with (
         mock.patch.object(lf.boto3, "client", return_value=client),
         mock.patch.object(lf, "_post", mock.Mock(return_value=200)),
+        pytest.raises(json.JSONDecodeError),
     ):
-        with pytest.raises(json.JSONDecodeError):
-            lf.lambda_handler(bad, FakeContext())
+        lf.lambda_handler(bad, FakeContext())
 
 
 def test_secret_and_client_cached_across_warm_invocations(monkeypatch):
@@ -710,9 +716,12 @@ def test_post_does_not_retry_on_400():
 
 def test_post_retries_network_error_then_raises():
     err = urllib.error.URLError("connection reset")
-    with mock.patch("urllib.request.urlopen", side_effect=[err] * 10) as u, mock.patch.object(lf.time, "sleep"):
-        with pytest.raises(urllib.error.URLError):
-            lf._post("http://x", {})
+    with (
+        mock.patch("urllib.request.urlopen", side_effect=[err] * 10) as u,
+        mock.patch.object(lf.time, "sleep"),
+        pytest.raises(urllib.error.URLError),
+    ):
+        lf._post("http://x", {})
     assert u.call_count == lf._MAX_POST_ATTEMPTS
 
 
@@ -887,7 +896,7 @@ def test_invalid_suppression_time_disables_and_annotates(monkeypatch):
         assert lf._SUPPRESSION_WINDOW is None  # suppression disabled
         assert "SUPPRESSION_TIME_END" in lf._SUPPRESSION_CONFIG_ERROR
         assert "suppression mechanism inactive" in lf._SUPPRESSION_CONFIG_ERROR
-        response, post = _run(event)
+        _, post = _run(event)
     assert post.call_count == 1  # fail-safe: still delivered
     _, payload = post.call_args.args
     blob = json.dumps(payload)
@@ -1066,8 +1075,8 @@ def test_s3_event_timestamp():
 
 def test_should_suppress():
     # default config: suppressed envs dev-/tst-/prep-, window 19:00–07:00 UTC
-    at_0300 = lf.datetime(2026, 6, 22, 3, 0, tzinfo=lf.timezone.utc)
-    at_noon = lf.datetime(2026, 6, 22, 12, 0, tzinfo=lf.timezone.utc)
+    at_0300 = lf.datetime(2026, 6, 22, 3, 0, tzinfo=lf.UTC)
+    at_noon = lf.datetime(2026, 6, 22, 12, 0, tzinfo=lf.UTC)
     assert lf._should_suppress("dev-web", at_0300) is True  # suppressed env, in window
     assert lf._should_suppress("dev-web", at_noon) is False  # out of window
     assert lf._should_suppress("prod-web", at_0300) is False  # not a suppressed env
@@ -1112,9 +1121,9 @@ def test_metric_notifications_failed(monkeypatch):
         mock.patch.object(lf.boto3, "client", return_value=client),
         mock.patch.object(lf, "_post", mock.Mock(return_value=500)),
         mock.patch.object(lf, "_emit_metric") as emit,
+        pytest.raises(lf.SlackNotificationError),
     ):
-        with pytest.raises(lf.SlackNotificationError):
-            lf.lambda_handler(sns_event(cw_message()), FakeContext())
+        lf.lambda_handler(sns_event(cw_message()), FakeContext())
     assert "NotificationsFailed" in _emitted_names(emit)
 
 

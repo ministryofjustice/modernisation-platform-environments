@@ -355,6 +355,11 @@ locals {
       /* EKS */
       eks_cluster_version = "1.35"
 
+      /* ArgoCD — spokes registered with the nonlive hub */
+      argocd_registered_spokes = [
+        "container-platform-octo-nonlive",
+      ]
+
       /* Addons */
       eks_cluster_addon_versions = {
         kube_proxy             = "v1.34.2-eksbuild.1"
@@ -471,6 +476,9 @@ locals {
     live = {
       /* EKS */
       eks_cluster_version = "1.35"
+
+      /* ArgoCD — spokes registered with the live hub */
+      argocd_registered_spokes = []
 
       /* Addons */
       eks_cluster_addon_versions = {

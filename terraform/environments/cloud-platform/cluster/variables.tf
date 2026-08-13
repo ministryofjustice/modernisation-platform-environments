@@ -19,21 +19,16 @@ variable "enable_argocd" {
 }
 
 variable "argocd_idc_instance_arn" {
-  type        = string
-  default     = "" # Set to your org's IAM Identity Center instance ARN
-  description = "ARN of the AWS IAM Identity Center instance for Argo CD authentication. Required when enable_argocd is true."
+  type = string
+  # Org-wide IAM Identity Center instance — the same ARN across all MoJ accounts.
+  default     = "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26"
+  description = "ARN of the AWS IAM Identity Center instance for Argo CD authentication. Required when enable_argocd is true. Defaults to the org-wide IDC instance."
 }
 
 variable "argocd_idc_region" {
   type        = string
   default     = "eu-west-2"
   description = "Region of the IAM Identity Center instance."
-}
-
-variable "argocd_admin_group_id" {
-  type        = string
-  default     = ""
-  description = "IAM Identity Center Group ID for the platform-engineer-admin SSO group. Grants ADMIN role in Argo CD. For BU team access (EDITOR/VIEWER), add groups to argocd_rbac_role_mappings."
 }
 
 variable "argocd_rbac_role_mappings" {
@@ -50,15 +45,9 @@ variable "argocd_rbac_role_mappings" {
   EOT
 }
 
-variable "argocd_codeconnection_arn" {
-  type        = string
-  default     = ""
-  description = "AWS CodeConnections ARN for GitHub repository access from Argo CD."
-}
-
 #------------------------------------------------------------------------------
 # Argo CD Spoke Registration (ADR-002 — Spoke-Driven Model)
-#------------------------------------------------------------------------------
+
 variable "argocd_hub_spoke_access_role_arn" {
   type        = string
   default     = ""

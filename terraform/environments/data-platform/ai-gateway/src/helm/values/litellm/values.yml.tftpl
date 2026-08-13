@@ -120,12 +120,23 @@ volumes:
   - name: migrations
     emptyDir:
       sizeLimit: 64Mi
+  - name: azure-workload-identity-token
+    projected:
+      defaultMode: 420
+      sources:
+        - serviceAccountToken:
+            path: azure-identity-token
+            audience: api://AzureADTokenExchange
+            expirationSeconds: 3600
 
 volumeMounts:
   - name: app-cache
     mountPath: /app/cache
   - name: migrations
     mountPath: /app/migrations
+  - name: azure-workload-identity-token
+    mountPath: /var/run/secrets/sts.windows.net
+    readOnly: true
 
 migrationJob:
   enabled: false

@@ -12,6 +12,20 @@ resource "aws_route53_record" "alb_frontend" {
   }
 }
 
+resource "aws_route53_record" "alb_frontend_eis" {
+  provider = aws.core-vpc
+
+  zone_id = var.account_config.route53_external_zone.zone_id
+  name    = "interface.${var.env_name}.${var.account_config.dns_suffix}"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.delius_core_frontend.dns_name
+    zone_id                = aws_lb.delius_core_frontend.zone_id
+    evaluate_target_health = true
+  }
+}
+
 resource "aws_route53_record" "external_validation" {
   provider = aws.core-network-services
 

@@ -39,9 +39,6 @@ locals {
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
     }
-    instance_policies = {
-      "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
-    }
     primary_instance_count = 1
     standby_count          = 2
     ebs_volumes = {
@@ -192,7 +189,7 @@ locals {
       read_database = "PRENDAS2"
     }
     audit_target_endpoint = {
-      write_environment = "prod" 
+      write_environment = "prod"
     }
     user_source_endpoint = {}
     user_target_endpoint = {

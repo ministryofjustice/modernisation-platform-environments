@@ -5,8 +5,16 @@
 # The keepers ensure the password is only recreated when the RDS instance identifier changes
 ##################################################################################################################
 
+locals {
+  # Keep EDW available in non-live for integration testing, including DEV.
+  enable_edw_rds = contains(["development", "preproduction"], local.environment)
+
+  # Legacy cross-account replication from ECP is no longer required.
+  enable_ecp_replication = false
+}
+
 resource "random_password" "rds_password_new" {
-  count   = local.environment == "preproduction" ? 1 : 0
+  count   = local.enable_edw_rds ? 1 : 0
   length  = 16
   special = false
 
@@ -24,7 +32,7 @@ resource "random_password" "rds_password_new" {
 
 
 resource "aws_secretsmanager_secret" "rds_password_secret_new" {
-  count       = local.environment == "preproduction" ? 1 : 0
+  count       = local.enable_edw_rds ? 1 : 0
   name        = "${local.application_name}/app/db-master-password"
   description = "This secret has a dynamically generated password."
   tags = merge(
@@ -35,7 +43,7 @@ resource "aws_secretsmanager_secret" "rds_password_secret_new" {
 
 
 resource "aws_secretsmanager_secret_version" "rds_password_secret_version_new" {
-  count     = local.environment == "preproduction" ? 1 : 0
+  count     = local.enable_edw_rds ? 1 : 0
   secret_id = aws_secretsmanager_secret.rds_password_secret_new[0].id
   secret_string = jsonencode(
     {
@@ -56,7 +64,7 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version_new" {
 ### RDS Subnet Group
 ##################################################################################################################
 resource "aws_db_subnet_group" "appdbsubnetgroup_new" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = local.enable_edw_rds ? 1 : 0
 
   name       = "appdbsubnetgroup"
   subnet_ids = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
@@ -75,7 +83,7 @@ resource "aws_db_subnet_group" "appdbsubnetgroup_new" {
 ### RDS Parameter Group
 ##################################################################################################################
 resource "aws_db_parameter_group" "appdbparametergroup19_new" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = local.enable_edw_rds ? 1 : 0
 
   name        = "appdbparametergroup19"
   family      = "oracle-ee-19"
@@ -104,7 +112,7 @@ resource "aws_db_parameter_group" "appdbparametergroup19_new" {
 ### RDS Option Group
 ##################################################################################################################
 resource "aws_db_option_group" "appdboptiongroup19_new" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = local.enable_edw_rds ? 1 : 0
 
   name                     = "appdboptiongroup19"
   option_group_description = "${local.application_name}-${local.environment}-optiongroup"
@@ -135,7 +143,7 @@ resource "aws_db_option_group" "appdboptiongroup19_new" {
 ### EDW RDS INSTANCE - Preproduction environment
 ##################################################################################################################
 resource "aws_db_instance" "edw_rds_instance" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = local.enable_edw_rds ? 1 : 0
 
   # Instance identification
   identifier     = "${local.application_name}-${local.environment}"
@@ -159,8 +167,8 @@ resource "aws_db_instance" "edw_rds_instance" {
   username           = local.application_data.accounts[local.environment].username
   password           = random_password.rds_password_new[0].result
 
-  # Restore from snapshot
-  snapshot_identifier = "arn:aws:rds:eu-west-2:758955050340:snapshot:before-db-name-change-06-march-2026"
+  # DEV must be provisioned empty; only PREPROD keeps the historical snapshot restore.
+  snapshot_identifier = local.environment == "preproduction" ? "arn:aws:rds:eu-west-2:758955050340:snapshot:before-db-name-change-06-march-2026" : null
 
   # Network configuration
   db_subnet_group_name   = aws_db_subnet_group.appdbsubnetgroup_new[0].name
@@ -220,7 +228,7 @@ resource "aws_db_instance" "edw_rds_instance" {
 ##################################################################################################################
 
 resource "aws_db_instance_role_association" "edw_rds_instance_role_association" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = local.enable_ecp_replication ? 1 : 0
 
   db_instance_identifier = aws_db_instance.edw_rds_instance[0].identifier
   role_arn               = aws_iam_role.rds_s3_access_role[0].arn
