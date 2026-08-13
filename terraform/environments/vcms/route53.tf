@@ -58,7 +58,7 @@ resource "aws_acm_certificate_validation" "external" {
 
 # Internal ALB
 resource "aws_acm_certificate" "internal" {
-  domain_name       = "vcms.${local.account_config.internal_dns_suffix}"
+  domain_name       = local.account_config.internal_dns_suffix
   validation_method = "DNS"
 
   tags = merge(local.tags, {
