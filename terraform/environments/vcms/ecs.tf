@@ -7,7 +7,7 @@ module "ecs" {
 }
 
 module "ecs_service" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=add-ecs-service-registries"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v6.0.0"
 
   container_definitions = module.container_definition.json_encoded_list
   cluster_arn           = module.ecs.ecs_cluster_arn
@@ -50,12 +50,6 @@ module "ecs_service" {
       }]
     }
   ]
-
-  service_registries = {
-    registry_arn   = aws_service_discovery_service.frontend.arn
-    container_name = "frontend"
-    container_port = 80
-  }
 
   security_groups = [aws_security_group.ecs_service.id]
 
