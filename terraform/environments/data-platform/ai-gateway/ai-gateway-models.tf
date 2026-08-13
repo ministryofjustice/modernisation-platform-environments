@@ -56,8 +56,7 @@ resource "litellm_model" "microsoft_foundry" {
   tier                = "paid"
 
   model_api_base = can(each.value.model_endpoint) ? "${jsondecode(data.aws_secretsmanager_secret_version.microsoft_foundry_jedi_gateway.secret_string)["endpoint"]}/${each.value.model_endpoint}" : jsondecode(data.aws_secretsmanager_secret_version.microsoft_foundry_jedi_gateway.secret_string)["endpoint"]
-  model_api_key  = jsondecode(data.aws_secretsmanager_secret_version.microsoft_foundry_jedi_gateway.secret_string)["api_key"]
-  api_version    = try(each.value.model_api_version, null)
+  api_version    = try(each.value.model_api_version, each.value.model_provider == "azure" ? "v1" : null)
 
   additional_litellm_params = {
     ai_model_provider            = "Microsoft Foundry"
