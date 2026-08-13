@@ -49,7 +49,6 @@ module "pwm" {
   microservice_lb                    = aws_lb.delius_core_ancillary
   microservice_lb_https_listener_arn = aws_lb_listener.ancillary_https.arn
 
-
   alb_listener_rule_host_header = "pwm.${var.env_name}.${var.account_config.dns_suffix}"
 
   platform_vars = var.platform_vars
