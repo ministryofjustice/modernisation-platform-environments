@@ -47,26 +47,26 @@ module "s3_pui_docs" {
     }
   ]
 
-  bucket_policy = [jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        "Sid" : "DenyInsecureTransport",
-        "Effect" : "Deny",
-        "Principal" : "*",
-        "Action" : "s3:*",
-        "Resource" : [
-          module.s3_pui_docs.bucket.arn,
-          "${module.s3_pui_docs.bucket.arn}/*"
-        ],
-        "Condition" : {
-          "Bool" : {
-            "aws:SecureTransport" : "false"
-          }
-        }
-      }
-    ]
-  })]
+  # bucket_policy = [jsonencode({
+  #   Version = "2012-10-17",
+  #   Statement = [
+  #     {
+  #       "Sid" : "DenyInsecureTransport",
+  #       "Effect" : "Deny",
+  #       "Principal" : "*",
+  #       "Action" : "s3:*",
+  #       "Resource" : [
+  #         module.s3_pui_docs.bucket.arn,
+  #         "${module.s3_pui_docs.bucket.arn}/*"
+  #       ],
+  #       "Condition" : {
+  #         "Bool" : {
+  #           "aws:SecureTransport" : "false"
+  #         }
+  #       }
+  #     }
+  #   ]
+  # })]
 
   tags = merge(local.tags,
     { Name = lower(format("%s-docs-%s", local.application_name, local.environment)) }
@@ -239,41 +239,41 @@ module "s3-bucket-shared" {
   )
 }
 
-resource "aws_s3_bucket_policy" "shared_bucket_policy" {
-  bucket = module.s3-bucket-shared.bucket.id
+# resource "aws_s3_bucket_policy" "shared_bucket_policy" {
+#   bucket = module.s3-bucket-shared.bucket.id
 
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        "Sid" : "DenyInsecureTransport",
-        "Effect" : "Deny",
-        "Principal" : "*",
-        "Action" : "s3:*",
-        "Resource" : ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
-        "Condition" : {
-          "Bool" : {
-            "aws:SecureTransport" : "false"
-          }
-        }
-      },
-      {
-        Sid    = "EnforceTLSv12orHigher",
-        Effect = "Deny",
-        Principal = {
-          AWS = "*"
-        },
-        Action   = "s3:*",
-        Resource = ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
-        Condition = {
-          NumericLessThan = {
-            "s3:TlsVersion" = "1.2"
-          }
-        }
-      }
-    ]
-  })
-}
+#   policy = jsonencode({
+#     Version = "2012-10-17",
+#     Statement = [
+#       {
+#         "Sid" : "DenyInsecureTransport",
+#         "Effect" : "Deny",
+#         "Principal" : "*",
+#         "Action" : "s3:*",
+#         "Resource" : ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
+#         "Condition" : {
+#           "Bool" : {
+#             "aws:SecureTransport" : "false"
+#           }
+#         }
+#       },
+#       {
+#         Sid    = "EnforceTLSv12orHigher",
+#         Effect = "Deny",
+#         Principal = {
+#           AWS = "*"
+#         },
+#         Action   = "s3:*",
+#         Resource = ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
+#         Condition = {
+#           NumericLessThan = {
+#             "s3:TlsVersion" = "1.2"
+#           }
+#         }
+#       }
+#     ]
+#   })
+# }
 
 resource "aws_s3_object" "folder" {
   bucket = module.s3-bucket-shared.bucket.id
