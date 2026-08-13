@@ -70,7 +70,7 @@ locals {
     }
   }
 
-  domain                  = local.is-production ? "vcms.probation.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
+  domain                  = "modernisation-platform.service.justice.gov.uk"
   domain_name_main        = [for k, v in local.domain_types : v.name if k == local.domain]
   domain_record_main      = [for k, v in local.domain_types : v.record if k == local.domain]
   domain_type_main        = [for k, v in local.domain_types : v.type if k == local.domain]

@@ -16,6 +16,12 @@ variable "deploy_oracle_stats" {
   type        = bool
 }
 
+variable "deploy_oracle_rat" {
+  description = "for deploying Oracle RAT capture bucket"
+  default     = true
+  type        = bool
+}
+
 variable "ec2_instance_type" {
   description = "EC2 instance type"
   type        = string
