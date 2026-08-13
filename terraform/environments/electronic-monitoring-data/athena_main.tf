@@ -51,7 +51,7 @@ resource "aws_athena_workgroup" "data_validation_db" {
   state       = "ENABLED"
 
   configuration {
-    bytes_scanned_cutoff_per_query     = 1073741824000 # 1 TB
+    bytes_scanned_cutoff_per_query     = 10737418240 # 10 GB
     enforce_workgroup_configuration    = true
     publish_cloudwatch_metrics_enabled = true
 
