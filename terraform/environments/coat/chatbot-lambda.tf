@@ -163,6 +163,7 @@ module "rag_lambda" {
       ":zip",
     ]
   }]
+  artifacts_dir                = "${abspath(path.root)}/builds"
   trigger_on_package_timestamp = false
 
   reserved_concurrent_executions = 10
