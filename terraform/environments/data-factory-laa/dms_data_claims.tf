@@ -97,7 +97,7 @@ resource "aws_iam_role_policy" "glue_access_dms" {
 
 module "data_claims_dms" {
   count                    = local.is-test ? 1 : 0
-  source                   = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service?ref=dab774b1a1b9315936ecb6388b8b7387a04a60a5"
+  source                   = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service?ref=57ec02cdc2872b5f779bdd8ff364b6eb63038898"
   vpc_id                   = data.aws_vpc.shared.id
   environment              = local.environment
   manage_dms_service_roles = false
@@ -127,6 +127,7 @@ module "data_claims_dms" {
     secrets_manager_arn     = aws_secretsmanager_secret.data_claims_database[0].arn
     secrets_manager_kms_arn = aws_kms_key.data_lake_kms_key.arn
     database_name           = "db36c8528316c5b918"
+    ssl_mode                = "require"
   }
 
   replication_task_id = {
