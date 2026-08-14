@@ -8,7 +8,7 @@ module "s3_pui_docs" {
   log_buckets = {
    log_bucket_name = module.s3-bucket-logging.bucket.id
    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
-   log_bucket_policy = aws_s3_bucket_policy.lb_access_logs_logging.policy
+   log_bucket_policy = aws_s3_bucket_policy.lb_access_logs.policy
      }
 
     log_prefix = "s3access/${local.application_name}-docs-${local.environment}"
@@ -163,18 +163,6 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
     Version = "2012-10-17",
     Statement = [
       {
-        "Sid" : "DenyInsecureTransport",
-        "Effect" : "Deny",
-        "Principal" : "*",
-        "Action" : "s3:*",
-        "Resource" : ["${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}"],
-        "Condition" : {
-          "Bool" : {
-            "aws:SecureTransport" : "false"
-          }
-        }
-      },
-      {
         Sid    = "EnforceTLSv12orHigher",
         Effect = "Deny",
         Principal = {
@@ -185,6 +173,18 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         Condition = {
           NumericLessThan = {
             "s3:TlsVersion" = "1.2"
+          }
+        }
+      },
+      {
+        "Sid" : "DenyInsecureTransport",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : ["${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}"],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
           }
         }
       },
@@ -204,17 +204,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
           }
         }
-      }
-    ]
-  })
-}
-
-resource "aws_s3_bucket_policy" "lb_access_logs_logging" {
-  bucket = module.s3-bucket-logging.bucket.id
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
+      },
       {
         Sid    = "AllowS3Logging PUI Docs"
         Effect = "Allow"
@@ -244,8 +234,46 @@ resource "aws_s3_bucket_policy" "lb_access_logs_logging" {
        }
       }
     ]
-  })  
+  })
 }
+
+# resource "aws_s3_bucket_policy" "lb_access_logs_logging" {
+#   bucket = module.s3-bucket-logging.bucket.id
+
+#   policy = jsonencode({
+#     Version = "2012-10-17",
+#     Statement = [
+#       {
+#         Sid    = "AllowS3Logging PUI Docs"
+#         Effect = "Allow"
+#         Principal = {
+#           Service = "logging.s3.amazonaws.com"
+#         }
+#         Action   = "s3:PutObject"
+#         Resource = "${module.s3-bucket-logging.bucket.arn}/*"
+#         Condition = {
+#           ArnLike = {
+#            "aws:SourceArn" = module.s3_pui_docs.bucket.arn
+#           }
+#        }
+#       },
+#       {
+#         Sid    = "AllowS3Logging Shared Bucket"
+#         Effect = "Allow"
+#         Principal = {
+#           Service = "logging.s3.amazonaws.com"
+#         }
+#         Action   = "s3:PutObject"
+#         Resource = "${module.s3-bucket-logging.bucket.arn}/*"
+#         Condition = {
+#           ArnLike = {
+#            "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
+#           }
+#        }
+#       }
+#     ]
+#   })  
+# }
 
 # S3 Bucket - Logging
 module "s3-bucket-shared" {
@@ -264,7 +292,7 @@ module "s3-bucket-shared" {
   log_buckets = {
    log_bucket_name = module.s3-bucket-logging.bucket.id
    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
-   log_bucket_policy = aws_s3_bucket_policy.lb_access_logs_logging.policy
+   log_bucket_policy = aws_s3_bucket_policy.lb_access_logs.policy
      }
 
   log_prefix = "s3access/${local.application_name}-${local.environment}-shared"
