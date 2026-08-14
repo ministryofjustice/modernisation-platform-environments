@@ -286,7 +286,7 @@ data "aws_iam_policy_document" "apply_sort_order" {
     actions = [
       "s3:ListBucket"
     ]
-    resources = [module.s3-create-a-derived-table-bucket.arn]
+    resources = [module.s3-create-a-derived-table-bucket.bucket.arn]
   }
   statement {
     sid    = "GluePermissions"
