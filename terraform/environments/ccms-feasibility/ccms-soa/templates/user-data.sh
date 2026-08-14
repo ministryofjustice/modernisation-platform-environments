@@ -1,4 +1,10 @@
 #!/bin/bash
 echo "ECS_CLUSTER=${cluster_name}" >> /etc/ecs/ecs.config
 echo 'ECS_ENABLE_CONTAINER_METADATA=true' >> /etc/ecs/ecs.config
-echo 'ECS_INSTANCE_ATTRIBUTES={"server": "${server}","latest": "true"}' >> /etc/ecs/ecs.config
+echo 'ECS_VOLUME_PLUGIN_CAPABILITIES=["efsAuth"]' >> /etc/ecs/ecs.config
+echo 'ECS_INSTANCE_ATTRIBUTES={"server": "${server}"}' >> /etc/ecs/ecs.config
+
+yum install -y amazon-efs-utils
+mkdir -p /home/ec2-user/efs
+mount -t efs -o tls ${efs_id}:/ /home/ec2-user/efs
+chmod go+rw /home/ec2-user/efs
