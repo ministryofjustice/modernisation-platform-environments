@@ -80,7 +80,7 @@ resource "aws_ecs_service" "opahub" {
   # stalling with "insufficient resources" because there is no room to place
   # the new task revision alongside the old one.
   capacity_provider_strategy {
-    capacity_provider = aws_ecs_capacity_provider.capacity_provider.name
+    capacity_provider = aws_ecs_capacity_provider.main_capacity_provider.name
     weight            = 1
     base              = 1
   }
@@ -99,6 +99,12 @@ resource "aws_ecs_service" "opahub" {
   }
 
   load_balancer {
+    target_group_arn = aws_lb_target_group.opahub_ssl_target_group.id
+    container_name   = "${local.opa_app_name}-ssl-container"
+    container_port   = local.application_data.accounts[local.environment].opa_ssl_port
+  }
+
+  load_balancer {
     target_group_arn = aws_lb_target_group.opahub_target_group.id
     container_name   = "${local.opa_app_name}-container"
     container_port   = local.application_data.accounts[local.environment].opa_server_port
@@ -107,6 +113,6 @@ resource "aws_ecs_service" "opahub" {
   depends_on = [
     aws_lb_listener.opahub_listener,
     aws_iam_role_policy_attachment.ecs_task_execution_role,
-    aws_autoscaling_group.cluster_scaling_group
+    aws_autoscaling_group.main_cluster_scaling_group
   ]
 }

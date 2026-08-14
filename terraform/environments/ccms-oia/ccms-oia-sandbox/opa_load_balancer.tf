@@ -52,6 +52,33 @@ resource "aws_lb_target_group" "opahub_target_group" {
   )
 }
 
+resource "aws_lb_target_group" "opahub_ssl_target_group" {
+  name                 = "${local.opa_app_name}-ssl-tg"
+  port                 = local.application_data.accounts[local.environment].opa_ssl_port
+  protocol             = "HTTPS"
+  vpc_id               = data.aws_vpc.shared.id
+  target_type          = "instance"
+  deregistration_delay = 30
+
+  stickiness {
+    type = "lb_cookie"
+  }
+
+  health_check {
+    path                = "/weblogic/ready"
+    port                = local.application_data.accounts[local.environment].opa_health_check_port
+    healthy_threshold   = 5
+    interval            = 120
+    protocol            = "HTTPS"
+    unhealthy_threshold = 5
+    matcher             = "200"
+    timeout             = 5
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("%s-tg", local.opa_app_name)) }
+  )
+}
 ########################################
 # Listeners
 ########################################
@@ -64,7 +91,7 @@ resource "aws_lb_listener" "opahub_listener" {
   certificate_arn   = aws_acm_certificate.external.arn
 
   default_action {
-    target_group_arn = aws_lb_target_group.opahub_target_group.id
+    target_group_arn = aws_lb_target_group.opahub_ssl_target_group.id
     type             = "forward"
   }
 }

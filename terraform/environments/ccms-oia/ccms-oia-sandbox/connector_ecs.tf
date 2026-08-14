@@ -80,7 +80,7 @@ resource "aws_ecs_service" "ecs_connector_service" {
   # stalling with "insufficient resources" because there is no room to place
   # the new task revision alongside the old one.
   capacity_provider_strategy {
-    capacity_provider = aws_ecs_capacity_provider.capacity_provider.name
+    capacity_provider = aws_ecs_capacity_provider.additional_capacity_provider.name
     weight            = 1
     base              = 1
   }
