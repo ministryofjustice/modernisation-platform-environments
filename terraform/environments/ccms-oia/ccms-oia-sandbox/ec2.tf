@@ -2,20 +2,22 @@ data "template_file" "launch-template-main" {
   template = file("${path.module}/templates/user-data-main.sh")
   vars = {
     cluster_name       = "${local.first_cluster_name}"
-    # efs_id             = aws_efs_file_system.oia-storage.id
+
+
     deploy_environment = local.environment
   }
 }
+# efs_id             = aws_efs_file_system.oia-storage.id
 
 data "template_file" "launch-template-additional" {
   template = file("${path.module}/templates/user-data-additional.sh")
   vars = {
     cluster_name       = "${local.second_cluster_name}"
-    # efs_id             = aws_efs_file_system.oia-storage.id
     deploy_environment = local.environment
   }
 }
 
+    # efs_id             = aws_efs_file_system.oia-storage.id
 resource "aws_launch_template" "ec2_launch_template_main" {
   name_prefix   = local.first_cluster_name
   image_id      = local.application_data.accounts[local.environment].ami_image_id
