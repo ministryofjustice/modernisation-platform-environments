@@ -86,14 +86,12 @@ data "aws_iam_policy_document" "ai_gateway_bedrock" {
     )
   }
 
+  # Match AI Gateway / OCTO and allow all eu-* foundation models
   statement {
-    sid     = "BedrockFoundationModelAccess"
-    effect  = "Allow"
-    actions = ["bedrock:InvokeModel*"]
-    resources = formatlist(
-      "arn:aws:bedrock:%s::foundation-model/*",
-      ["eu-west-1", "eu-west-2"]
-    )
+    sid       = "BedrockFoundationModelAccess"
+    effect    = "Allow"
+    actions   = ["bedrock:InvokeModel*"]
+    resources = ["arn:aws:bedrock:eu-*::foundation-model/*"]
   }
 }
 
