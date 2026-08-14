@@ -30,7 +30,7 @@
         "oemagent",
         "trace"
       ],
-      "managementcidr": "10.200.16.0/20"
+      "managementcidr": "10.200.0.0/20"
     },
     "test": {},
     "preproduction": {
