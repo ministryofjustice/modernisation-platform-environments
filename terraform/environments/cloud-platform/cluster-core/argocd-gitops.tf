@@ -75,7 +75,7 @@ locals {
         # Path prefix within monorepo for this BU's products
         path_prefix = "namespaces/${bu_name}"
         # Cluster ARN constructed from account ID + cluster name
-        cluster_arn = "arn:aws:eks:eu-west-2:${local.environment_management.account_ids[cluster_workspace]}:cluster/${element(reverse(split("-", cluster_workspace)), 0)}"
+        cluster_arn = "arn:aws:eks:eu-west-2:${local.environment_management.account_ids[cluster_workspace]}:cluster/${cluster_workspace}"
         auto_sync   = env == "nonlive" ? true : false
       }
     }

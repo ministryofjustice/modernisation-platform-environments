@@ -46,7 +46,7 @@ locals {
     "13.43.9.198/32",   # mod-platform-non-live-eu-west-2a-nat
     "18.132.208.127/32" # mod-platform-non-live-eu-west-2c-nat
   ]
-  mp_live_natgw_ips = [ 
+  mp_live_natgw_ips = [
     "13.41.38.176/32", # mod-platform-live-eu-west-2b-nat
     "3.11.197.133/32", # mod-platform-live-eu-west-2c-nat
     "3.8.81.175/32"    # mod-platform-live-eu-west-2c-nat
@@ -54,24 +54,33 @@ locals {
   mp_natgw_ips = contains(["poc", "dev", "test"], var.env_name) ? local.mp_non_live_natgw_ips : local.mp_live_natgw_ips
 
   all_ingress_ips = concat(
-    local.moj_ips, 
+    local.moj_ips,
     local.unilink_ips,
     local.cp_ips,
     local.mp_natgw_ips,
     [var.account_info.cp_cidr]
   )
 
-  legacy_test_natgw_ips = [
-    "35.176.126.163/32",
-    "35.178.162.73/32",
-    "52.56.195.113/32"
-  ]
-
-  legacy_preprod_natgw_ips = [
-    "52.56.240.62/32",
-    "18.130.110.168/32",
-    "35.178.44.184/32"
-  ]
+  legacy_natgw_ips = {
+    poc = null
+    dev = null
+    test = [
+      "35.176.126.163/32",
+      "35.178.162.73/32",
+      "52.56.195.113/32"
+    ]
+    stage = [
+      "3.11.26.150/32",
+      "18.130.189.137/32",
+      "3.10.104.193/32"
+    ]
+    preprod = [
+      "52.56.240.62/32",
+      "18.130.110.168/32",
+      "35.178.44.184/32"
+    ]
+    prod = null
+  }
 
   secret_prefix           = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}"
   application_secret_name = "${local.secret_prefix}-application-passwords"

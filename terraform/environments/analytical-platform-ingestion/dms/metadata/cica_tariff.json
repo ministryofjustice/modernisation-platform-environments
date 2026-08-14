@@ -933,6 +933,10 @@
     },
     {
       "object_name": "CLAIMS.CASES",
+      "column_name": "SPP_ID"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
       "column_name": "SPP_TRIM_URI"
     },
     {
