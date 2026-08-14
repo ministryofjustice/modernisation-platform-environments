@@ -94,8 +94,6 @@ resource "aws_cloudwatch_log_group" "ssogen_console_waf_logs" {
   count             = local.ssogen_enabled ? 1 : 0
   name              = "aws-waf-logs-ssogen/ssogen-console-waf-logs"
   retention_in_days = 30
-  # CC-4662: CMK encryption excluded here pending a follow-up bug ticket.
-  # Pick up once Saanchi is back from holidays.
 
   tags = merge(local.tags,
     { Name = lower(format("lb-%s-console-%s-waf-logs", local.application_name_ssogen, local.environment)) }
