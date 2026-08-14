@@ -1,12 +1,35 @@
-resource "aws_efs_file_system" "lucene" {
-  count = local.create_efs ? 1 : 0
+moved {
+  from = aws_efs_file_system.lucene[0]
+  to   = aws_efs_file_system.lucene
+}
 
+moved {
+  from = aws_efs_access_point.lucene[0]
+  to   = aws_efs_access_point.lucene
+}
+
+moved {
+  from = aws_ssm_parameter.efs_id[0]
+  to   = aws_ssm_parameter.efs_id
+}
+
+moved {
+  from = aws_ssm_parameter.efs_ap_id[0]
+  to   = aws_ssm_parameter.efs_ap_id
+}
+
+moved {
+  from = aws_security_group.efs[0]
+  to   = aws_security_group.efs
+}
+
+resource "aws_efs_file_system" "lucene" {
   creation_token = "${local.application_name}-efs"
 
   encrypted  = true
   kms_key_id = data.aws_kms_key.general_shared.arn
 
-  throughput_mode = "elastic"
+  throughput_mode = local.is-production ? "elastic" : "bursting"
 
   lifecycle_policy {
     transition_to_ia = "AFTER_30_DAYS"
@@ -18,19 +41,17 @@ resource "aws_efs_file_system" "lucene" {
 }
 
 resource "aws_efs_mount_target" "lucene" {
-  for_each = local.create_efs ? toset(data.aws_subnets.shared-private.ids) : toset([])
+  for_each = toset(data.aws_subnets.shared-private.ids)
 
-  file_system_id = aws_efs_file_system.lucene[0].id
+  file_system_id = aws_efs_file_system.lucene.id
   subnet_id      = each.value
   security_groups = [
-    aws_security_group.efs[0].id
+    aws_security_group.efs.id
   ]
 }
 
 resource "aws_efs_access_point" "lucene" {
-  count = local.create_efs ? 1 : 0
-
-  file_system_id = aws_efs_file_system.lucene[0].id
+  file_system_id = aws_efs_file_system.lucene.id
 
   root_directory {
     path = "/SearchIndex"
@@ -53,24 +74,21 @@ resource "aws_efs_access_point" "lucene" {
 }
 
 resource "aws_ssm_parameter" "efs_id" {
-  count = local.create_efs ? 1 : 0
   name  = "/${local.application_name}/${local.environment}/efs-id"
   type  = "SecureString"
-  value = aws_efs_file_system.lucene[0].id
+  value = aws_efs_file_system.lucene.id
   key_id = data.aws_kms_key.general_shared.arn
 }
 
 resource "aws_ssm_parameter" "efs_ap_id" {
-  count = local.create_efs ? 1 : 0
   name  = "/${local.application_name}/${local.environment}/efs-access-point-id"
   type  = "SecureString"
-  value = aws_efs_access_point.lucene[0].id
+  value = aws_efs_access_point.lucene.id
   key_id = data.aws_kms_key.general_shared.arn
 }
 
 resource "aws_security_group" "efs" {
   #checkov:skip=CKV_AWS_382:"Required for ECS tasks to access external services"
-  count = local.create_efs ? 1 : 0
 
   name        = "${local.application_name}-efs"
   description = "EFS SG"
