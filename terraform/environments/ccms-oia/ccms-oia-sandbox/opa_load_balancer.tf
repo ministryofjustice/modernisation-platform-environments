@@ -12,14 +12,14 @@ resource "aws_lb" "opahub" {
   security_groups            = [aws_security_group.opahub_load_balancer.id]
   enable_deletion_protection = true
   access_logs {
-    bucket  = module.s3-bucket-logging.bucket.id
+    bucket  = data.aws_s3_bucket.ccms_oia_logging_bucket.id
     prefix  = "${local.opa_app_name}-lb"
     enabled = true
   }
   tags = merge(local.tags,
     { Name = lower(format("%s-lb", local.opa_app_name)) }
   )
-  depends_on = [module.s3-bucket-logging]
+  depends_on = [data.aws_s3_bucket.ccms_oia_logging_bucket]
 }
 
 ########################################

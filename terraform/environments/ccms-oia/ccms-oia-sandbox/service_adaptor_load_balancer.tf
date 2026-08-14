@@ -12,14 +12,14 @@ resource "aws_lb" "adaptor" {
   security_groups            = [aws_security_group.adaptor_load_balancer.id]
   enable_deletion_protection = true
   access_logs {
-    bucket  = module.s3-bucket-logging.bucket.id
+    bucket  = data.aws_s3_bucket.ccms_oia_logging_bucket.id
     prefix  = "${local.adaptor_app_name}-internal-lb"
     enabled = true
   }
   tags = merge(local.tags,
     { Name = lower(format("%s-lb", local.adaptor_app_name)) }
   )
-  depends_on = [module.s3-bucket-logging]
+  depends_on = [data.aws_s3_bucket.ccms_oia_logging_bucket]
 }
 
 ########################################

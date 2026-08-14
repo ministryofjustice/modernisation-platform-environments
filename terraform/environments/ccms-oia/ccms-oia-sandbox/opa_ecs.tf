@@ -25,12 +25,12 @@ resource "aws_ecs_task_definition" "opahub" {
   cpu    = local.application_data.accounts[local.environment].opa_container_cpu
   memory = local.application_data.accounts[local.environment].opa_container_memory
 
-  volume {
-    name = "opa_volume"
-    efs_volume_configuration {
-      file_system_id = aws_efs_file_system.oia-storage.id
-    }
-  }
+  # volume {
+  #   name = "opa_volume"
+  #   efs_volume_configuration {
+  #     file_system_id = aws_efs_file_system.oia-storage.id
+  #   }
+  # }
 
 
   container_definitions = templatefile(
@@ -39,6 +39,8 @@ resource "aws_ecs_task_definition" "opahub" {
       app_name          = local.opa_app_name
       app_image         = local.application_data.accounts[local.environment].opa_app_image
       server_port       = local.application_data.accounts[local.environment].opa_server_port
+      ssl_port          = local.application_data.accounts[local.environment].opa_ssl_port
+      health_check_port = local.application_data.accounts[local.environment].opa_health_check_port
       aws_region        = local.application_data.accounts[local.environment].aws_region
       container_version = local.application_data.accounts[local.environment].opa_container_version
       opahub_password   = "${aws_secretsmanager_secret.opahub_secrets.arn}:opahub_password::"

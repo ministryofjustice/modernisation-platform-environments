@@ -1,3 +1,7 @@
+data aws_s3_bucket "ccms_oia_logging_bucket" {
+  bucket = local.logging_bucket_name
+}
+
 # module "s3_ccms_oia" {
 #   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
 
