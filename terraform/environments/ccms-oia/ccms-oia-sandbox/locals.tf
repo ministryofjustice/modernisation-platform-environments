@@ -3,7 +3,8 @@
 #######################################
 
 locals {
-  logging_bucket_name = "${local.application_name}-${local.environment}-logging"
+  application_name_root = "ccms-oia"
+  logging_bucket_name = "${local.application_name_root}-${local.environment}-logging"
   opa_app_name        = "ccms-opa-sandbox"
   connector_app_name  = "ccms-connector-sandbox"
   adaptor_app_name    = "ccms-service-adaptor-sandbox"
@@ -36,7 +37,8 @@ locals {
   # prod_domain    = "laa.service.justice.gov.uk"
 
   # Primary domain name based on environment
-  primary_domain = local.is-production ? local.prod_domain : local.nonprod_domain
+  # primary_domain = local.is-production ? local.prod_domain : local.nonprod_domain
+  primary_domain = local.nonprod_domain
 
   # Subject Alternative Names based on environment
   nonprod_sans = [
