@@ -200,6 +200,7 @@ resource "aws_eks_access_entry" "argocd_spoke_capability" {
 # Cluster-wide read: required by Argo CD for resource discovery, health
 # assessment and diffing desired vs live state.
 resource "kubernetes_cluster_role_v1" "argocd_hub_read" {
+  # checkov:skip=CKV_K8S_49:Cluster-wide read (get/list/watch) on all kinds is required by Argo CD for resource discovery, health and drift detection, including CRDs added later. This matches AWS's documented argocd-read-all ClusterRole for the managed Argo CD capability. Write access is scoped to specific kinds in argocd_hub_deploy; this role grants no write verbs.
   count = local.is_argocd_spoke ? 1 : 0
 
   metadata {
