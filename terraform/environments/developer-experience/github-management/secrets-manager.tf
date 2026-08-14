@@ -5,7 +5,7 @@ module "github_app_secret" {
 
   name = "${local.component_name}/github-app"
 
-  kms_key_id = module.kms_key[0].kms_key_arn
+  kms_key_id = module.kms_key[0].key_arn
 
   secret_string = jsonencode({
     app_id          = "CHANGEME"
