@@ -57,11 +57,23 @@ resource "aws_acm_certificate_validation" "external" {
 }
 
 # Internal ALB
-resource "aws_route53_record" "internal" {
+resource "aws_route53_zone" "internal" {
+  name = "victim-case-management.service.justice.gov.uk"
+
+  vpc {
+    vpc_id = local.account_info.vpc_id
+  }
+
+  tags = merge(local.tags, {
+    Name = "victim-case-management-internal"
+  })
+}
+
+resource "aws_route53_record" "internal_alb" {
   provider = aws.core-vpc
 
-  zone_id = local.account_config.route53_inner_zone.zone_id
-  name    = local.account_config.internal_dns_suffix
+  zone_id = aws_route53_zone.internal.zone_id
+  name    = "www.${local.environment_short}.victim-case-management.service.justice.gov.uk"
   type    = "A"
 
   alias {
@@ -70,6 +82,20 @@ resource "aws_route53_record" "internal" {
     evaluate_target_health = true
   }
 }
+
+# resource "aws_route53_record" "internal" {
+#   provider = aws.core-vpc
+
+#   zone_id = local.account_config.route53_inner_zone.zone_id
+#   name    = local.account_config.internal_dns_suffix
+#   type    = "A"
+
+#   alias {
+#     name                   = aws_lb.frontend_internal.dns_name
+#     zone_id                = aws_lb.frontend_internal.zone_id
+#     evaluate_target_health = true
+#   }
+# }
 
 # resource "aws_ssm_parameter" "internal_ca_arn" {
 #   name        = "internal-ca-arn"
@@ -87,7 +113,7 @@ resource "aws_route53_record" "internal" {
 # }
 
 resource "aws_acm_certificate" "internal" {
-  domain_name               = local.account_config.internal_dns_suffix
+  domain_name               = "www.${local.environment_short}.victim-case-management.service.justice.gov.uk"
   certificate_authority_arn = data.aws_ssm_parameter.internal_ca_arn.value
 
   tags = merge(local.tags, {
