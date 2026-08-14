@@ -95,10 +95,15 @@ locals {
     "-argocd-capability"
   )
 
-  # Access entries expose the principal to Kubernetes RBAC as a group named
-  # "eks-access-entry:<principal-arn>". Binding custom RBAC to this group is
-  # how we avoid attaching AmazonEKSClusterAdminPolicy (= system:masters).
-  argocd_hub_capability_rbac_group = "eks-access-entry:${local.resolved_hub_capability_role_arn}"
+  # Kubernetes RBAC group that the hub capability role is placed into on this spoke.
+  # The access entry declares this group explicitly via kubernetes_groups (EKS
+  # does NOT auto-create an "eks-access-entry:<arn>" group), and the custom
+  # ClusterRoles below bind to it. This is how we grant scoped access without
+  # attaching AmazonEKSClusterAdminPolicy.
+  #
+  # Must be a valid Kubernetes group name (<= 63 chars), so it is a short fixed
+  # label rather than anything derived from the role ARN.
+  argocd_hub_capability_rbac_group = "argocd-hub"
 
   # A cluster never self-identifies as both hub and spoke.
   is_argocd_hub_cluster = contains(values(local.argocd_hubs)[*].cluster_name, terraform.workspace)
@@ -173,6 +178,11 @@ resource "aws_eks_access_entry" "argocd_spoke_capability" {
   cluster_name  = module.eks.cluster_name
   principal_arn = local.resolved_hub_capability_role_arn
   type          = "STANDARD"
+
+  # Place the capability role into the RBAC group the ClusterRoleBindings below
+  # bind to. Without this the principal is mapped to a username only, in no
+  # group, and the scoped RBAC never applies (every API call is forbidden).
+  kubernetes_groups = [local.argocd_hub_capability_rbac_group]
 
   tags = merge(local.tags, {
     Name    = "${module.eks.cluster_name}-argocd-capability-access"
