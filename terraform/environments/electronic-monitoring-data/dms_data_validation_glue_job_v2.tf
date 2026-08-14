@@ -886,3 +886,47 @@ EOF
   )
 
 }
+
+#------------------
+# Apply sort order 
+#------------------
+
+resource "aws_glue_job" "apply_sort_order" {
+  count = local.is-development ? 1 : 0
+
+  name              = "apply-sort-order"
+  description       = "Use Spark to apply sort order to Iceberg table."
+  role_arn          = aws_iam_role.apply_sort_order_iam_role.arn
+  glue_version      = "4.0"
+  worker_type       = "G.1X"
+  number_of_workers = 2
+  default_arguments = {
+    "--catalog"       = "arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:catalog"
+    "--database"      = "staged_mdss${local.dbt_suffix}"
+    "--table"         = "event"
+    "--order_col"     = "_load_timestamp"
+    "--order"         = "ASC"
+    "--order_cols"    = ""
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--continuous-log-logGroup" = aws_cloudwatch_log_group.apply_sort_order[0].name
+  }
+  command {
+    python_version  = "3"
+    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/apply_sort_order.py"
+  }
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration[0].name
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "Glue job that applies sort order to Iceberg table",
+    }
+  )
+
+}
+resource "aws_cloudwatch_log_group" "apply_sort_order" {
+  count             = local.is-development ? 1 : 0
+  name              = "apply-sort-order"
+  retention_in_days = 30
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key[0].arn
+}
