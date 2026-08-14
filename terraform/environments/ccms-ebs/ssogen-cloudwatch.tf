@@ -5,7 +5,8 @@ resource "aws_cloudwatch_log_group" "ssogen_groups" {
   for_each          = local.ssogen_enabled ? local.application_data.ssogen_cw_log_groups : {}
   name              = each.key
   retention_in_days = each.value.retention_days
-  kms_key_id        = aws_kms_key.cloudwatch_logs.arn
+  # CC-4662: CMK encryption excluded here pending a follow-up bug ticket.
+  # Pick up once Saanchi is back from holidays.
 
   tags = merge(
     local.tags,

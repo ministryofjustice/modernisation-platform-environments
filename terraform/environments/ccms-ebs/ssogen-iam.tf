@@ -178,11 +178,6 @@ resource "aws_iam_policy" "ssogen_ec2_instance_policy" {
       "Effect": "Allow",
       "Action": ["kms:CreateGrant", "kms:DescribeKey", "kms:ReEncrypt", "kms:GenerateDataKeyWithoutPlainText", "kms:Decrypt"],
       "Resource": "${aws_kms_key.ssogen_kms_key[count.index].arn}"
-    },
-    {
-      "Effect": "Allow",
-      "Action": ["kms:GenerateDataKey*", "kms:Decrypt", "kms:DescribeKey"],
-      "Resource": "${aws_kms_key.cloudwatch_logs.arn}"
     }
   ]
 }
