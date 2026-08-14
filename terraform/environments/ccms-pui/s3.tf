@@ -223,7 +223,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs_logging" {
         Resource = "${module.s3-bucket-logging.bucket.arn}/*"
         Condition = {
           ArnLike = {
-           "aws:SourceArn" = aws_s3_bucket.default.arn
+           "aws:SourceArn" = module.s3_pui_docs.bucket.arn
           }
        }
       },
