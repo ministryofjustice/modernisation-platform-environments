@@ -57,19 +57,19 @@ resource "aws_acm_certificate_validation" "external" {
 }
 
 # Internal ALB
-resource "aws_route53_record" "internal" {
-  provider = aws.core-vpc
+# resource "aws_route53_record" "internal" {
+#   provider = aws.core-vpc
 
-  zone_id = local.account_config.route53_inner_zone.zone_id
-  name    = local.account_config.internal_dns_suffix
-  type    = "A"
+#   zone_id = local.account_config.route53_inner_zone.zone_id
+#   name    = local.account_config.internal_dns_suffix
+#   type    = "A"
 
-  alias {
-    name                   = aws_lb.frontend_internal.dns_name
-    zone_id                = aws_lb.frontend_internal.zone_id
-    evaluate_target_health = true
-  }
-}
+#   alias {
+#     name                   = aws_lb.frontend_internal.dns_name
+#     zone_id                = aws_lb.frontend_internal.zone_id
+#     evaluate_target_health = true
+#   }
+# }
 
 # resource "aws_acm_certificate" "internal" {
 #   domain_name       = local.account_config.internal_dns_suffix
