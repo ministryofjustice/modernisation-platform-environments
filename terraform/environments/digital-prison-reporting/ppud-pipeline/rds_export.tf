@@ -1,6 +1,35 @@
+locals {
+  rds_export_bucket_lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Disabled"
+      prefix  = ""
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "INTELLIGENT_TIERING"
+        }
+      ]
+      expiration = {
+        days = 730
+      }
+      noncurrent_version_transition = [
+        {
+          days          = 90
+          storage_class = "INTELLIGENT_TIERING"
+        }
+      ]
+      noncurrent_version_expiration = {
+        days = 730
+      }
+  }]
+
+}
+
 # Security group for the rds instance
 resource "aws_security_group" "ppud_db" {
-  # checkov:skip=CKV2_AWS_5: Attached to VPC
+  # checkov:skip=CKV2_AWS_5:Ensure that Security Groups are attached to another resource; skip as attached to VPC
   name        = "ppud_pipeline_sg"
   description = "Security group for RDS instance in the PPUD pipeline"
   vpc_id      = data.aws_vpc.shared.id
@@ -34,17 +63,20 @@ module "ppud_rds_export" {
     aws = aws
   }
 
-  name                     = local.short_name
-  database_refresh_mode    = "incremental"
-  vpc_id                   = data.aws_vpc.shared.id
-  database_subnet_ids      = data.aws_subnets.shared-private.ids
-  kms_key_arn              = module.ppud_kms.key_arn
-  master_user_secret_id    = module.ppud_rds_export_secret.secret_id
-  environment              = local.environment
-  output_parquet_file_size = 50
-  db_name                  = "${local.short_name}_${local.environment}"
-  get_views                = true
-  bucket_namespace         = "account-regional"
+  name                           = local.short_name
+  database_refresh_mode          = "incremental"
+  vpc_id                         = data.aws_vpc.shared.id
+  database_subnet_ids            = data.aws_subnets.shared-private.ids
+  kms_key_arn                    = module.ppud_kms.key_arn
+  master_user_secret_id          = module.ppud_rds_export_secret.secret_id
+  environment                    = local.environment
+  output_parquet_file_size       = 50
+  db_name                        = "${local.short_name}_${local.environment}"
+  get_views                      = true
+  bucket_namespace               = "account-regional"
+  lifecycle_rule_backup_uploads  = local.rds_export_bucket_lifecycle_rule
+  lifecycle_rule_parquet_exports = local.rds_export_bucket_lifecycle_rule
+
 
   tags = merge(
     local.tags,
