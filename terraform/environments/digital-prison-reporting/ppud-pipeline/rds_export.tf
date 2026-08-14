@@ -1,5 +1,6 @@
 # Security group for the rds instance
 resource "aws_security_group" "ppud_db" {
+  # checkov:skip=CKV2_AWS_5: Attached to VPC
   name        = "ppud_pipeline_sg"
   description = "Security group for RDS instance in the PPUD pipeline"
   vpc_id      = data.aws_vpc.shared.id
@@ -27,7 +28,7 @@ resource "aws_security_group_rule" "ppud_db_ingress" {
 
 # Sets up RDS export infrastructure for PPUD pipeline
 module "ppud_rds_export" {
-  source = "github.com/ministryofjustice/terraform-rds-export?ref=bf54b5dd6041348cb6d0486c046e6b97c9631d76"
+  source = "git::https://github.com/ministryofjustice/terraform-rds-export?ref=bf54b5dd6041348cb6d0486c046e6b97c9631d76"
 
   providers = {
     aws = aws

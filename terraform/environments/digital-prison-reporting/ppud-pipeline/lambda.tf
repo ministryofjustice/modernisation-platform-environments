@@ -28,7 +28,7 @@ data "aws_iam_policy_document" "copy_object" {
 
 module "copy_object" {
   # v8.8.1
-  source = "github.com/terraform-aws-modules/terraform-aws-lambda?ref=23d00f7daef40091e87ed2f9dc5d8532e9d2cc22"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda?ref=23d00f7daef40091e87ed2f9dc5d8532e9d2cc22"
 
   function_name   = "${local.component_name}-copy"
   description     = "Lambda to copy a file from the bak replication destination bucket to rds export bak upload bucket"
@@ -107,7 +107,7 @@ resource "aws_s3_bucket_notification" "land_bucket" {
 
 # module "check_recent_file" {
 #   # Commit hash for v8.8.1
-#   source = "github.com/terraform-aws-modules/terraform-aws-lambda?ref=23d00f7daef40091e87ed2f9dc5d8532e9d2cc22"
+#   source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda?ref=23d00f7daef40091e87ed2f9dc5d8532e9d2cc22"
 
 #   function_name   = "${local.component_name}-check-recent-file"
 #   description     = "Lambda to check most recent replication destination bucket file date and notify Slack if stale"

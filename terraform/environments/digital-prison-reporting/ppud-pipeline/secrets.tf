@@ -2,7 +2,7 @@
 module "ppud_rds_export_secret" {
 
   # v2.1.0
-  source = "github.com/terraform-aws-modules/terraform-aws-secrets-manager?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea"
 
   name       = "ppud_rds_export_password"
   kms_key_id = module.ppud_kms.key_arn
@@ -24,7 +24,7 @@ module "ppud_rds_export_secret" {
 module "ppud_slack_webhook" {
 
   # v2.1.0
-  source = "github.com/terraform-aws-modules/terraform-aws-secrets-manager?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea"
 
   name = "ppud_notifications_slack_webhook"
 
