@@ -16,11 +16,11 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
 }
 
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name               = "${local.application_name}-ecs-task-execution-role"
+  name               = "${local.opa_app_name}-ecs-task-execution-role"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_execution_role.json
 
   tags = merge(local.tags,
-    { Name = lower(format("%s-%s-ecs-role", local.application_name, local.environment)) }
+    { Name = lower(format("%s-%s-ecs-role", local.opa_app_name, local.environment)) }
   )
 }
 

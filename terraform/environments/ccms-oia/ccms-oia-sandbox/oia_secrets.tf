@@ -3,7 +3,7 @@
 # OIA AWS Secrets
 
 resource "aws_secretsmanager_secret" "oia_secrets" {
-  name        = "${local.application_name}-secrets"
+  name        = "${local.opa_app_name}-secrets"
   description = "OIA Secrets"
 }
 
