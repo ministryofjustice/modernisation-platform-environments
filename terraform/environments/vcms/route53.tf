@@ -71,9 +71,24 @@ resource "aws_route53_record" "internal" {
   }
 }
 
+# resource "aws_ssm_parameter" "internal_ca_arn" {
+#   name        = "internal-ca-arn"
+#   description = "ARN of the Private CA used for internal VCMS certificates"
+#   type        = "String"
+#   value       = "change_me"
+
+#   lifecycle {
+#     ignore_changes = [value]
+#   }
+
+#   tags = merge(local.tags, {
+#     Name = "vcms-internal-ca-arn"
+#   })
+# }
+
 resource "aws_acm_certificate" "internal" {
-  domain_name       = local.account_config.internal_dns_suffix
-  validation_method = "DNS"
+  domain_name               = local.account_config.internal_dns_suffix
+  certificate_authority_arn = data.aws_ssm_parameter.internal_ca_arn.value
 
   tags = merge(local.tags, {
     Name = "frontend-internal-https"
@@ -84,32 +99,45 @@ resource "aws_acm_certificate" "internal" {
   }
 }
 
-resource "aws_route53_record" "internal_cert_validation" {
-  provider = aws.core-vpc
+# resource "aws_acm_certificate" "internal" {
+#   domain_name       = local.account_config.internal_dns_suffix
+#   validation_method = "DNS"
 
-  for_each = {
-    for dvo in aws_acm_certificate.internal.domain_validation_options :
-    dvo.domain_name => {
-      name   = dvo.resource_record_name
-      type   = dvo.resource_record_type
-      record = dvo.resource_record_value
-    }
-  }
+#   tags = merge(local.tags, {
+#     Name = "frontend-internal-https"
+#   })
 
-  zone_id = local.account_config.route53_inner_zone.zone_id
-  name    = each.value.name
-  type    = each.value.type
-  records = [each.value.record]
-  ttl     = 60
-}
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
 
-resource "aws_acm_certificate_validation" "internal" {
-  provider = aws.core-vpc
+# resource "aws_route53_record" "internal_cert_validation" {
+#   provider = aws.core-vpc
 
-  certificate_arn = aws_acm_certificate.internal.arn
+#   for_each = {
+#     for dvo in aws_acm_certificate.internal.domain_validation_options :
+#     dvo.domain_name => {
+#       name   = dvo.resource_record_name
+#       type   = dvo.resource_record_type
+#       record = dvo.resource_record_value
+#     }
+#   }
 
-  validation_record_fqdns = [
-    for record in aws_route53_record.internal_cert_validation :
-    record.fqdn
-  ]
-}
+#   zone_id = local.account_config.route53_inner_zone.zone_id
+#   name    = each.value.name
+#   type    = each.value.type
+#   records = [each.value.record]
+#   ttl     = 60
+# }
+
+# resource "aws_acm_certificate_validation" "internal" {
+#   provider = aws.core-vpc
+
+#   certificate_arn = aws_acm_certificate.internal.arn
+
+#   validation_record_fqdns = [
+#     for record in aws_route53_record.internal_cert_validation :
+#     record.fqdn
+#   ]
+# }
