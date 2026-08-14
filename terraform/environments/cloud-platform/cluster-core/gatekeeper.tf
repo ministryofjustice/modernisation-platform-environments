@@ -1,5 +1,5 @@
 module "gatekeeper" {
-  source = "github.com/ministryofjustice/container-platform-terraform-gatekeeper?ref=ef17291131e00fecb747073f72fa5d3a5b374659" #1.2.1
+  source = "github.com/ministryofjustice/container-platform-terraform-gatekeeper?ref=block-imds" #1.2.1
 
   # boolean expression for applying opa valid hostname for test clusters only.
   dryrun_map = {
@@ -8,6 +8,7 @@ module "gatekeeper" {
     user_ns_requires_psa_label         = false,
     lock_priv_capabilities             = false,
     warn_kubectl_create_sa             = false,
+    block_host_network                 = false,
   }
 
   constraint_violations_max_to_display = 25
