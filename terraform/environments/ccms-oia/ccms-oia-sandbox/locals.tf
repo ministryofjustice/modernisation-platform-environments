@@ -3,6 +3,7 @@
 #######################################
 
 locals {
+  environment         = "development"
   application_name_root = "ccms-oia"
   logging_bucket_name = "${local.application_name_root}-${local.environment}-logging"
   opa_app_name        = "ccms-opa-sandbox"

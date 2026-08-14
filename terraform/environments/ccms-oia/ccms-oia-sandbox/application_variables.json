@@ -1,6 +1,6 @@
 {
   "accounts": {
-    "ccms-oia-development": {
+    "development": {
       "app_name": "ccms-oia-sandbox",
       "aws_region": "eu-west-2",
       "ami_image_id": "ami-02f77a03ec776dc35",
@@ -88,7 +88,7 @@
       "client_opa12assess_billing_address": "https://ccms-opa-sandbox.laa-development.modernisation-platform.service.justice.gov.uk/opa/determinations-server/assess/soap/generic/12.2.1/BillingAssessment",
       "server_opa10assess_security_user_name": "admin"
     },
-    "ccms-oia-test": {
+    "test": {
       "app_name": "ccms-oia",
       "aws_region": "eu-west-2",
       "ami_image_id": "ami-02f77a03ec776dc35",
