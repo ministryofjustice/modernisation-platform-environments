@@ -901,14 +901,14 @@ resource "aws_glue_job" "apply_sort_order" {
   worker_type       = "G.1X"
   number_of_workers = 2
   default_arguments = {
-    "--catalog"       = "arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:catalog"
-    "--database"      = "staged_mdss${local.dbt_suffix}"
-    "--table"         = "event"
-    "--order_col"     = "_load_timestamp"
-    "--order"         = "ASC"
-    "--order_cols"    = ""
+    "--catalog"                          = "arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:catalog"
+    "--database"                         = "staged_mdss${local.dbt_suffix}"
+    "--table"                            = "event"
+    "--order_col"                        = "_load_timestamp"
+    "--order"                            = "ASC"
+    "--order_cols"                       = ""
     "--enable-continuous-cloudwatch-log" = "true"
-    "--continuous-log-logGroup" = aws_cloudwatch_log_group.apply_sort_order[0].name
+    "--continuous-log-logGroup"          = aws_cloudwatch_log_group.apply_sort_order[0].name
   }
   command {
     python_version  = "3"
