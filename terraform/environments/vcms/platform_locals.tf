@@ -23,6 +23,13 @@ locals {
   )
 
   environment     = trimprefix(terraform.workspace, "${var.networking[0].application}-")
+  environment_short_map = {
+    development = "dev"
+    preprod     = "preprod"
+    test        = "test"
+    prod        = "prod"
+  }
+  environment_short = local.environment_short_map[local.environment]
   vpc_name        = var.networking[0].business-unit
   subnet_set      = var.networking[0].set
   vpc_all         = "${local.vpc_name}-${local.environment}"

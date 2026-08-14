@@ -57,60 +57,30 @@ resource "aws_acm_certificate_validation" "external" {
 }
 
 # Internal ALB
-# resource "aws_route53_record" "internal" {
-#   provider = aws.core-vpc
+resource "aws_route53_record" "internal" {
+  provider = aws.core-vpc
 
-#   zone_id = local.account_config.route53_inner_zone.zone_id
-#   name    = local.account_config.internal_dns_suffix
-#   type    = "A"
+  zone_id = local.account_config.route53_inner_zone.zone_id
+  name    = local.account_config.internal_dns_suffix
+  type    = "A"
 
-#   alias {
-#     name                   = aws_lb.frontend_internal.dns_name
-#     zone_id                = aws_lb.frontend_internal.zone_id
-#     evaluate_target_health = true
-#   }
-# }
+  alias {
+    name                   = aws_lb.frontend_internal.dns_name
+    zone_id                = aws_lb.frontend_internal.zone_id
+    evaluate_target_health = true
+  }
+}
 
-# resource "aws_acm_certificate" "internal" {
-#   domain_name       = local.account_config.internal_dns_suffix
-#   validation_method = "DNS"
+# Validate manually in legacy hosted zone
+resource "aws_acm_certificate" "internal" {
+  domain_name       = "www.${local.environment_short}.victim-case-management.service.justice.gov.uk"
+  validation_method = "DNS"
 
-#   tags = merge(local.tags, {
-#     Name = "frontend-internal"
-#   })
+  tags = merge(local.tags, {
+    Name = "frontend-internal"
+  })
 
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-# }
-
-# resource "aws_route53_record" "internal_cert_validation" {
-#   provider = aws.core-vpc
-
-#   for_each = {
-#     for dvo in aws_acm_certificate.internal.domain_validation_options :
-#     dvo.domain_name => {
-#       name   = dvo.resource_record_name
-#       type   = dvo.resource_record_type
-#       record = dvo.resource_record_value
-#     }
-#   }
-
-#   zone_id = local.account_config.route53_inner_zone.zone_id
-#   name    = each.value.name
-#   type    = each.value.type
-#   records = [each.value.record]
-
-#   ttl = 60
-# }
-
-# resource "aws_acm_certificate_validation" "internal" {
-#   provider = aws.core-vpc
-  
-#   certificate_arn = aws_acm_certificate.internal.arn
-
-#   validation_record_fqdns = [
-#     for record in aws_route53_record.internal_cert_validation :
-#     record.fqdn
-#   ]
-# }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
