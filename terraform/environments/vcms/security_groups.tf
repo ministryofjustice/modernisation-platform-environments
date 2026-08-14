@@ -38,6 +38,28 @@ resource "aws_security_group" "alb_sg" {
     }
   }
 
+  dynamic "ingress" {
+    for_each = local.mp_natgw_ips
+    content {
+      description = "HTTP IN: MP NATGW"
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
+  }
+
+  dynamic "ingress" {
+    for_each = local.mp_natgw_ips
+    content {
+      description = "HTTPS IN: MP NATGW"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
+  }
+
   egress {
     description = "Allow all out"
     from_port   = 0
@@ -93,41 +115,6 @@ resource "aws_security_group_rule" "alb_from_ecs" {
 
   security_group_id        = aws_security_group.alb_sg.id
   source_security_group_id = aws_security_group.ecs_service.id
-}
-
-# Enables access from smoke-test ECS task
-resource "aws_security_group" "alb_internal_sg" {
-  name        = "alb-internal-sg"
-  description = "Security group for internal ALB"
-  vpc_id      = local.account_info.vpc_id
-
-  dynamic "ingress" {
-    for_each = local.mp_natgw_ips
-    content {
-      from_port   = 80
-      to_port     = 80
-      protocol    = "tcp"
-      cidr_blocks = [ingress.value]
-    }
-  }
-
-  dynamic "ingress" {
-    for_each = local.mp_natgw_ips
-    content {
-      from_port   = 443
-      to_port     = 443
-      protocol    = "tcp"
-      cidr_blocks = [ingress.value]
-    }
-  }
-
-  egress {
-    description = "Allow all out"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }
 
 # resource "aws_security_group" "alb_internal_sg" {
