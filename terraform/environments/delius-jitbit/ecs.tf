@@ -91,6 +91,8 @@ resource "aws_cloudwatch_log_group" "jitbit" {
   name              = format("%s-ecs", local.application_name)
   retention_in_days = 30
   kms_key_id        = aws_kms_key.cloudwatch_logs.arn
+
+  tags = local.tags
 }
 
 output "s3_bucket_app_deployment_name" {
