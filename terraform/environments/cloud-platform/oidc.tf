@@ -236,7 +236,10 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
       "sso:DeleteApplicationAccessScope",
       "sso:DeleteApplicationAuthenticationMethod",
       "sso:DeleteApplicationGrant",
-      "sso:PutApplicationAssignmentConfiguration"
+      "sso:PutApplicationAssignmentConfiguration",
+      "sso:CreateApplicationAssignment",
+      "sso:DeleteApplicationAssignment",
+      "sso:ListApplicationAssignments"
     ]
     resources = ["*"]
   }
