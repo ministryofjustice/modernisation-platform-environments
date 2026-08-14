@@ -1,28 +1,3 @@
-moved {
-  from = aws_efs_file_system.lucene[0]
-  to   = aws_efs_file_system.lucene
-}
-
-moved {
-  from = aws_efs_access_point.lucene[0]
-  to   = aws_efs_access_point.lucene
-}
-
-moved {
-  from = aws_ssm_parameter.efs_id[0]
-  to   = aws_ssm_parameter.efs_id
-}
-
-moved {
-  from = aws_ssm_parameter.efs_ap_id[0]
-  to   = aws_ssm_parameter.efs_ap_id
-}
-
-moved {
-  from = aws_security_group.efs[0]
-  to   = aws_security_group.efs
-}
-
 resource "aws_efs_file_system" "lucene" {
   creation_token = "${local.application_name}-efs"
 

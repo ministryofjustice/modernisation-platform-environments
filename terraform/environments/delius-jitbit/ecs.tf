@@ -1,8 +1,3 @@
-moved {
-  from = module.ecs.module.ecs_cluster.aws_ecs_cluster.default[0]
-  to   = module.ecs.aws_ecs_cluster.this
-}
-
 module "ecs" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=948cb6a1d0d08448fd53f195c0522ed35bbf4242" # v6.0.0
 
