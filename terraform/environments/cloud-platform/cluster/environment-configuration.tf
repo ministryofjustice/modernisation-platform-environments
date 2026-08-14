@@ -4,11 +4,6 @@ locals {
       /* EKS */
       eks_cluster_version = "1.35"
 
-      /* ArgoCD — TEST ONLY: register ephemeral spoke(s) with an ephemeral hub.
-         Revert before merging this PR. The -hub/-spoke convention proposed for
-         step 2 will remove the need for this list on dev clusters. */
-      argocd_registered_spokes = ["cp-1408-1705-spoke"]
-
       /* Addons */
       eks_cluster_addon_versions = {
         kube_proxy             = "v1.34.2-eksbuild.1"
