@@ -6,6 +6,8 @@ resource "aws_efs_file_system" "lucene" {
   encrypted  = true
   kms_key_id = data.aws_kms_key.general_shared.arn
 
+  throughput_mode = "elastic"
+
   lifecycle_policy {
     transition_to_ia = "AFTER_30_DAYS"
   }
