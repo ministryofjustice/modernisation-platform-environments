@@ -460,6 +460,19 @@ resource "aws_lambda_permission" "update_p1_export_api_gw" {
 }
 
 # ------------------------------------------------------------------------------
+# GitHub Project webhook
+# ------------------------------------------------------------------------------
+
+resource "aws_lambda_permission" "live_feed_github_webhook" {
+  statement_id  = "AllowGitHubWebhookApiGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = module.live_feed_incident_manager.lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_apigatewayv2_api.live_feed_github_webhook.execution_arn}/*/POST/github/project-status"
+}
+
+# ------------------------------------------------------------------------------
 # Live-feed incident event queue
 # ------------------------------------------------------------------------------
 
