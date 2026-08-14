@@ -1,7 +1,7 @@
 ### Bedrock Resources
 
 ## AI Gateway Cross Account Role
-# Allows the production Data Platform AI Gateway to assume into this account and invoke Bedrock.
+# Allows the Justice AI Gateway (production) to assume into this account and invoke Bedrock.
 # Controlled per environment via application_variables.json enable_bedrock.
 
 # AI Gateway Bedrock Assume Policy
@@ -20,21 +20,14 @@ data "aws_iam_policy_document" "ai_gateway_bedrock_assume" {
 
   statement {
     effect  = "Allow"
-    actions = ["sts:AssumeRole"]
+    actions = [
+      "sts:AssumeRole",
+      "sts:TagSession",
+    ]
 
-    # Reference the account root rather than the specific role ARN to avoid
-    # "Invalid principal" errors when the ai-gateway role does not yet exist
-    # in the data-platform-production account. The condition restricts access
-    # to only the ai-gateway role, so this is functionally equivalent.
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["data-platform-production"]}:root"]
-    }
-
-    condition {
-      test     = "ArnLike"
-      variable = "aws:PrincipalArn"
-      values   = [local.ai_gateway_role_arn]
+      identifiers = [local.ai_gateway_role_arn]
     }
   }
 }
@@ -47,7 +40,7 @@ resource "aws_iam_role" "ai_gateway_bedrock" {
   #checkov:skip=CKV_AWS_60:Ensure IAM role allows only specific services or principals to assume it
   #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy
 
-  name                  = "${local.project}-ai-gateway-bedrock-role"
+  name                  = "ai-gateway"
   description           = "AI Gateway Bedrock Cross Account Role"
   assume_role_policy    = data.aws_iam_policy_document.ai_gateway_bedrock_assume[0].json
   force_detach_policies = true
@@ -55,7 +48,7 @@ resource "aws_iam_role" "ai_gateway_bedrock" {
   tags = merge(
     local.all_tags,
     {
-      dpr-name           = "${local.project}-ai-gateway-bedrock-role"
+      dpr-name           = "ai-gateway"
       dpr-resource-type  = "iam"
       dpr-resource-group = "AI"
     }
@@ -93,14 +86,12 @@ data "aws_iam_policy_document" "ai_gateway_bedrock" {
     )
   }
 
+  # Match AI Gateway / OCTO and allow all eu-* foundation models
   statement {
-    sid     = "BedrockFoundationModelAccess"
-    effect  = "Allow"
-    actions = ["bedrock:InvokeModel*"]
-    resources = formatlist(
-      "arn:aws:bedrock:%s::foundation-model/*",
-      ["eu-west-1", "eu-west-2"]
-    )
+    sid       = "BedrockFoundationModelAccess"
+    effect    = "Allow"
+    actions   = ["bedrock:InvokeModel*"]
+    resources = ["arn:aws:bedrock:eu-*::foundation-model/*"]
   }
 }
 
@@ -108,7 +99,7 @@ data "aws_iam_policy_document" "ai_gateway_bedrock" {
 resource "aws_iam_policy" "ai_gateway_bedrock" {
   count = local.enable_bedrock ? 1 : 0
 
-  name        = "${local.project}-ai-gateway-bedrock-policy"
+  name        = "ai-gateway"
   description = "Permissions for the AI Gateway to invoke Bedrock"
   policy      = data.aws_iam_policy_document.ai_gateway_bedrock[0].json
 }
