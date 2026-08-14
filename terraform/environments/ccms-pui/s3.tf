@@ -194,7 +194,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         Principal = {
           Service = "logdelivery.elasticloadbalancing.amazonaws.com"
         }
-        Action   = ["s3:PutObject"]
+        Action   = "s3:PutObject"
         Resource = "${module.s3-bucket-logging.bucket.arn}/*",
         Condition = {
           StringEquals = {
