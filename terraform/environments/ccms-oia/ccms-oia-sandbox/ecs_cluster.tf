@@ -19,10 +19,10 @@ resource "aws_ecs_cluster" "additional" {
 
 resource "aws_ecs_cluster_capacity_providers" "main" {
   cluster_name       = aws_ecs_cluster.main.name
-  capacity_providers = [aws_ecs_capacity_provider.main_capacity_provider.name]
+  capacity_providers = [aws_ecs_capacity_provider.capacity_provider_main.name]
 }
 
 resource "aws_ecs_cluster_capacity_providers" "additional" {
   cluster_name       = aws_ecs_cluster.additional.name
-  capacity_providers = [aws_ecs_capacity_provider.additional_capacity_provider.name]
+  capacity_providers = [aws_ecs_capacity_provider.capacity_provider_additional.name]
 }
