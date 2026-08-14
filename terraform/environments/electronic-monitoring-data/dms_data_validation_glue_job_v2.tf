@@ -930,3 +930,10 @@ resource "aws_cloudwatch_log_group" "apply_sort_order" {
   retention_in_days = 30
   kms_key_id        = aws_kms_key.cloudwatch_log_group_key[0].arn
 }
+
+resource "aws_s3_object" "apply_sort_order_script" {
+  count  = local.is-development ? 1 : 0
+  bucket = module.s3-glue-job-script-bucket.bucket.id
+  key    = "apply_sort_order.py"
+  source = "glue-job/apply_sort_order.py"
+}
