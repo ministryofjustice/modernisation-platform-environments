@@ -2,35 +2,13 @@
 # SSM Relay — Private EKS API access (ADR-016, #8370, #8425)
 #
 # Lightweight SSM Session Manager relay for accessing the private EKS API
-# endpoint without a public endpoint or VPN. Deployed only when the cluster in
-# this VPC has private_endpoint_mode enabled — see cluster/private-endpoint-mode.tf.
+# endpoint without a public endpoint or VPN. Deployed when private_endpoint_mode
+# is set for this VPC in locals.tf.
 ###############################################################################
-
-# parameters_by_path rather than the aws_ssm_parameter data source: a missing
-# parameter errors there but returns empty here, so the relay defaults to not
-# deployed before the cluster component's first apply.
-data "aws_ssm_parameters_by_path" "private_endpoint" {
-  path            = "/cloud-platform/${local.cp_vpc_name}"
-  with_decryption = false
-}
-
-locals {
-  # Map of parameter name -> value for everything under this VPC's path.
-  private_endpoint_params = nonsensitive(zipmap(
-    data.aws_ssm_parameters_by_path.private_endpoint.names,
-    data.aws_ssm_parameters_by_path.private_endpoint.values
-  ))
-
-  # Deploy the relay only when the flag exists and is "true".
-  enable_ssm_relay = try(
-    local.private_endpoint_params["/cloud-platform/${local.cp_vpc_name}/private-endpoint-mode"] == "true",
-    false
-  )
-}
 
 # IAM role assumed by the SSM relay EC2 instance.
 resource "aws_iam_role" "ssm_relay" {
-  count = local.enable_ssm_relay ? 1 : 0
+  count = local.private_endpoint_mode ? 1 : 0
 
   name = "ssm-relay-${local.cp_vpc_name}"
 
@@ -50,7 +28,7 @@ resource "aws_iam_role" "ssm_relay" {
 
 # Grants the SSM agent core permissions to register with Systems Manager.
 resource "aws_iam_role_policy_attachment" "ssm_core" {
-  count = local.enable_ssm_relay ? 1 : 0
+  count = local.private_endpoint_mode ? 1 : 0
 
   role       = aws_iam_role.ssm_relay[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
@@ -58,7 +36,7 @@ resource "aws_iam_role_policy_attachment" "ssm_core" {
 
 # Instance profile that lets the EC2 relay instance use the SSM role.
 resource "aws_iam_instance_profile" "ssm_relay" {
-  count = local.enable_ssm_relay ? 1 : 0
+  count = local.private_endpoint_mode ? 1 : 0
 
   name = "ssm-relay-${local.cp_vpc_name}"
   role = aws_iam_role.ssm_relay[0].name
@@ -66,7 +44,7 @@ resource "aws_iam_instance_profile" "ssm_relay" {
 
 # Security group for the relay: no inbound, outbound HTTPS only (SSM is outbound).
 resource "aws_security_group" "ssm_relay" {
-  count = local.enable_ssm_relay ? 1 : 0
+  count = local.private_endpoint_mode ? 1 : 0
 
   name_prefix = "ssm-relay-"
   description = "SSM relay for private EKS API access - outbound HTTPS only"
@@ -114,7 +92,7 @@ data "aws_ami" "al2023" {
 
 # The SSM relay instance (t3.micro) in a private subnet, IMDSv2 enforced.
 resource "aws_instance" "ssm_relay" {
-  count = local.enable_ssm_relay ? 1 : 0
+  count = local.private_endpoint_mode ? 1 : 0
 
   ami                    = data.aws_ami.al2023.id
   instance_type          = "t3.micro"
