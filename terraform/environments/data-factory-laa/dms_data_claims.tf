@@ -97,7 +97,7 @@ resource "aws_iam_role_policy" "glue_access_dms" {
 
 module "data_claims_dms" {
   count                    = local.is-test ? 1 : 0
-  source                   = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service?ref=57ec02cdc2872b5f779bdd8ff364b6eb63038898"
+  source                   = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service?ref=ecac7ff983b302b199122a94b026a5c8aa6dd02f"
   vpc_id                   = data.aws_vpc.shared.id
   environment              = local.environment
   manage_dms_service_roles = false
@@ -106,6 +106,7 @@ module "data_claims_dms" {
   slack_webhook_secret_id    = aws_secretsmanager_secret.slack_webhook_dms.id
   output_key_prefix          = "data_claims"
   output_bucket              = module.data_lake_buckets["raw"].bucket.id
+  output_bucket_kms_key_arn  = aws_kms_key.data_lake_kms_key.arn
   validation_sqs_kms_key_arn = aws_kms_key.data_lake_kms_key.arn
 
   dms_replication_instance = {
