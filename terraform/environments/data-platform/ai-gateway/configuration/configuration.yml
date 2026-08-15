@@ -364,63 +364,63 @@ models:
     # OpenAI
     gpt-5-3-codex:
       model_id: "gpt-5.3-codex"
-      model_family: "OpenAI GPT 5.3"
+      model_family: "OpenAI GPT"
       model_name: "OpenAI GPT 5.3 Codex (Global)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-4:
       model_id: "gpt-5.4"
-      model_family: "OpenAI GPT 5.4"
+      model_family: "OpenAI GPT"
       model_name: "OpenAI GPT 5.4 (Global)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-4-mini:
       model_id: "gpt-5.4-mini"
-      model_family: "OpenAI GPT 5.4"
+      model_family: "OpenAI GPT"
       model_name: "OpenAI GPT 5.4 Mini (Global)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-4-nano:
       model_id: "gpt-5.4-nano"
-      model_family: "OpenAI GPT 5.4"
+      model_family: "OpenAI GPT"
       model_name: "OpenAI GPT 5.4 Nano (Global)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-4-pro:
       model_id: "gpt-5.4-pro"
-      model_family: "OpenAI GPT 5.4"
+      model_family: "OpenAI GPT"
       model_name: "OpenAI GPT 5.4 Pro (Global)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-5:
       model_id: "gpt-5.5"
-      model_family: "OpenAI GPT 5.5"
+      model_family: "OpenAI GPT"
       model_name: "OpenAI GPT 5.5 (Global)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-6-luna:
       model_id: "gpt-5.6-luna"
-      model_family: "OpenAI GPT 5.6"
+      model_family: "OpenAI GPT"
       model_name: "OpenAI GPT 5.6 Luna (Global)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-6-sol:
       model_id: "gpt-5.6-sol"
-      model_family: "OpenAI GPT 5.6"
+      model_family: "OpenAI GPT"
       model_name: "OpenAI GPT 5.6 Sol (Global)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-6-terra:
       model_id: "gpt-5.6-terra"
-      model_family: "OpenAI GPT 5.6"
+      model_family: "OpenAI GPT"
       model_name: "OpenAI GPT 5.6 Terra (Global)"
       model_provider: "azure"
       generally_available: false

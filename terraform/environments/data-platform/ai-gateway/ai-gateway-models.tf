@@ -28,7 +28,7 @@ resource "litellm_model" "google_gemini_enterprise_agent_platform" {
   for_each = try(local.ai_gateway_models_filtered.google_gemini_enterprise_agent_platform, {})
 
   custom_llm_provider = "vertex_ai"
-  model_name          = "gemini-${each.key}"
+  model_name          = startswith(each.key, "gemini-") ? each.key : "gemini-${each.key}"
   base_model          = each.value.model_id
   tier                = "paid"
 
