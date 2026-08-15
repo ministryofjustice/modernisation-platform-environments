@@ -1,7 +1,7 @@
 module "aws_vpc_cni_pod_identity" {
 
   source  = "terraform-aws-modules/eks-pod-identity/aws"
-  version = "2.5.0"
+  version = "2.8.0"
 
   name = "aws-vpc-cni"
 
