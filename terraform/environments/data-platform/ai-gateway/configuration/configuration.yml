@@ -257,7 +257,15 @@ models:
       aws_role_name: ai-gateway
       generally_available: false
       environments_available: ["production"]
-  google_gemini_enterprise_agent_platform: {}
+  google_gemini_enterprise_agent_platform:
+    # Gemini
+    gemini-2-5-flash:
+      model_id: "gemini-2.5-flash"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 2.5 Flash"
+      location: "europe-west2"
+      generally_available: false
+      environments_available: ["development"]
   microsoft_foundry:
     # Anthropic
     claude-fable-5:
