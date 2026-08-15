@@ -9,7 +9,7 @@ module "mwaa_execution_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name            = "mwaa-execution"
   use_name_prefix = false
@@ -37,7 +37,7 @@ module "gha_mojas_airflow_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name            = "github-actions-mojas-airflow"
   use_name_prefix = false
@@ -56,7 +56,7 @@ module "gha_moj_ap_airflow_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name            = "github-actions-ministryofjustice-analytical-platform-airflow"
   use_name_prefix = false

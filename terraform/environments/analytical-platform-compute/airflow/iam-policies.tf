@@ -114,7 +114,7 @@ module "mwaa_execution_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source      = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version     = "6.6.0"
+  version     = "6.6.1"
   description = "IAM Policy"
   name        = "mwaa-execution"
   policy      = data.aws_iam_policy_document.mwaa_execution_policy.json
@@ -144,7 +144,7 @@ module "mwaa_ses_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source      = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version     = "6.6.0"
+  version     = "6.6.1"
   description = "IAM Policy"
   name        = "mwaa-ses"
   policy      = data.aws_iam_policy_document.mwaa_ses.json
@@ -197,7 +197,7 @@ module "gha_moj_ap_airflow_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source      = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version     = "6.6.0"
+  version     = "6.6.1"
   description = "IAM Policy"
 
   name = "github-actions-ministryofjustice-analytical-platform-airflow"
@@ -221,7 +221,7 @@ module "gha_mojas_airflow_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name_prefix = "github-actions-mojas-airflow"
   description = "IAM Policy"
@@ -245,7 +245,7 @@ module "create_airflow_token_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name_prefix = "create-airflow-token-"
   description = "IAM Policy"

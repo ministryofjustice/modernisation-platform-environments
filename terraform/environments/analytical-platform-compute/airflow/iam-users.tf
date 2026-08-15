@@ -3,7 +3,7 @@ module "mwaa_ses_iam_user" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-user"
-  version = "6.6.0"
+  version = "6.6.1"
 
   name                 = "mwaa-ses"
   create_login_profile = false
