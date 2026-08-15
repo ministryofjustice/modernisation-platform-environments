@@ -266,12 +266,33 @@ models:
       location: "europe-west2"
       generally_available: false
       environments_available: ["development"]
+    gemini-3-5-flash:
+      model_id: "gemini-3.5-flash"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 3.5 Flash"
+      location: "europe-west2"
+      generally_available: false
+      environments_available: ["development"]
+    gemini-3-6-flash:
+      model_id: "gemini-3.6-flash"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 3.6 Flash (EU)"
+      location: "eu"
+      generally_available: false
+      environments_available: ["development"]
+    gemini-3-7-flash:
+      model_id: "gemini-3.7-flash"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 3.7 Flash (EU)"
+      location: "eu"
+      generally_available: false
+      environments_available: ["development"]
   microsoft_foundry:
     # Anthropic
     claude-fable-5:
       model_id: "claude-fable-5"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Fable 5 (Sweden)"
+      model_name: "Anthropic Claude Fable 5 (Global)"
       model_provider: "azure_ai"
       model_endpoint: "anthropic"
       generally_available: false
@@ -279,7 +300,7 @@ models:
     claude-haiku-4-5:
       model_id: "claude-haiku-4-5"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Haiku 4.5 (Sweden)"
+      model_name: "Anthropic Claude Haiku 4.5 (Global)"
       model_provider: "azure_ai"
       model_endpoint: "anthropic"
       generally_available: false
@@ -287,7 +308,7 @@ models:
     claude-opus-4-5:
       model_id: "claude-opus-4-5"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Opus 4.5 (Sweden)"
+      model_name: "Anthropic Claude Opus 4.5 (Global)"
       model_provider: "azure_ai"
       model_endpoint: "anthropic"
       generally_available: false
@@ -295,7 +316,7 @@ models:
     claude-opus-4-6:
       model_id: "claude-opus-4-6"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Opus 4.6 (Sweden)"
+      model_name: "Anthropic Claude Opus 4.6 (Global)"
       model_provider: "azure_ai"
       model_endpoint: "anthropic"
       generally_available: false
@@ -303,7 +324,7 @@ models:
     claude-opus-4-7:
       model_id: "claude-opus-4-7"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Opus 4.7 (Sweden)"
+      model_name: "Anthropic Claude Opus 4.7 (Global)"
       model_provider: "azure_ai"
       model_endpoint: "anthropic"
       generally_available: false
@@ -311,7 +332,7 @@ models:
     claude-opus-4-8:
       model_id: "claude-opus-4-8"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Opus 4.8 (Sweden)"
+      model_name: "Anthropic Claude Opus 4.8 (Global)"
       model_provider: "azure_ai"
       model_endpoint: "anthropic"
       generally_available: false
@@ -319,7 +340,7 @@ models:
     claude-opus-5:
       model_id: "claude-opus-5"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Opus 5 (Sweden)"
+      model_name: "Anthropic Claude Opus 5 (Global)"
       model_provider: "azure_ai"
       model_endpoint: "anthropic"
       generally_available: false
@@ -327,7 +348,7 @@ models:
     claude-sonnet-4-6:
       model_id: "claude-sonnet-4-6"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 4.6 (Sweden)"
+      model_name: "Anthropic Claude Sonnet 4.6 (Global)"
       model_provider: "azure_ai"
       model_endpoint: "anthropic"
       generally_available: false
@@ -335,7 +356,7 @@ models:
     claude-sonnet-5:
       model_id: "claude-sonnet-5"
       model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 5 (Sweden)"
+      model_name: "Anthropic Claude Sonnet 5 (Global)"
       model_provider: "azure_ai"
       model_endpoint: "anthropic"
       generally_available: false
@@ -344,63 +365,63 @@ models:
     gpt-5-3-codex:
       model_id: "gpt-5.3-codex"
       model_family: "OpenAI GPT 5.3"
-      model_name: "OpenAI GPT 5.3 Codex (Sweden)"
+      model_name: "OpenAI GPT 5.3 Codex (Global)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-4:
       model_id: "gpt-5.4"
       model_family: "OpenAI GPT 5.4"
-      model_name: "OpenAI GPT 5.4 (Sweden)"
+      model_name: "OpenAI GPT 5.4 (Global)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-4-mini:
       model_id: "gpt-5.4-mini"
       model_family: "OpenAI GPT 5.4"
-      model_name: "OpenAI GPT 5.4 Mini (Sweden)"
+      model_name: "OpenAI GPT 5.4 Mini (Global)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-4-nano:
       model_id: "gpt-5.4-nano"
       model_family: "OpenAI GPT 5.4"
-      model_name: "OpenAI GPT 5.4 Nano (Sweden)"
+      model_name: "OpenAI GPT 5.4 Nano (Global)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-4-pro:
       model_id: "gpt-5.4-pro"
       model_family: "OpenAI GPT 5.4"
-      model_name: "OpenAI GPT 5.4 Pro (Sweden)"
+      model_name: "OpenAI GPT 5.4 Pro (Global)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-5:
       model_id: "gpt-5.5"
       model_family: "OpenAI GPT 5.5"
-      model_name: "OpenAI GPT 5.5 (Sweden)"
+      model_name: "OpenAI GPT 5.5 (Global)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-6-luna:
       model_id: "gpt-5.6-luna"
       model_family: "OpenAI GPT 5.6"
-      model_name: "OpenAI GPT 5.6 Luna (Sweden)"
+      model_name: "OpenAI GPT 5.6 Luna (Global)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-6-sol:
       model_id: "gpt-5.6-sol"
       model_family: "OpenAI GPT 5.6"
-      model_name: "OpenAI GPT 5.6 Sol (Sweden)"
+      model_name: "OpenAI GPT 5.6 Sol (Global)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-6-terra:
       model_id: "gpt-5.6-terra"
       model_family: "OpenAI GPT 5.6"
-      model_name: "OpenAI GPT 5.6 Terra (Sweden)"
+      model_name: "OpenAI GPT 5.6 Terra (Global)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
