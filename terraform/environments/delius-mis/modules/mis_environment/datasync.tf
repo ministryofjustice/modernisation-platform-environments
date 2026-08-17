@@ -93,7 +93,7 @@ resource "aws_iam_role_policy" "datasync_password_updater_policy" {
         Resource = "arn:aws:fsx:*:*:*"
       },
       {
-        Effect = "Aloow"
+        Effect = "Allow"
         Action = [
           "secretsmanager:UpdateSecret"
         ],
