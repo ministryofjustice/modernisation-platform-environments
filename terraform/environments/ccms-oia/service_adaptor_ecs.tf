@@ -44,24 +44,24 @@ resource "aws_ecs_service" "ecs_adaptor_service" {
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.ecs_adaptor_task_definition.arn
   desired_count   = local.application_data.accounts[local.environment].adaptor_app_count
-  launch_type    = "EC2"
   
-  # # Required by the AWS provider whenever capacity_provider_strategy is
-  # # added/changed on an existing service (here: switching from launch_type
-  # # to capacity_provider_strategy), so the change is applied via a fresh
-  # # deployment rather than an in-place update.
-  # force_new_deployment = true
+  
+  # Required by the AWS provider whenever capacity_provider_strategy is
+  # added/changed on an existing service (here: switching from launch_type
+  # to capacity_provider_strategy), so the change is applied via a fresh
+  # deployment rather than an in-place update.
+  force_new_deployment = true
 
-  # # Use the cluster's capacity provider (with managed scaling enabled)
-  # # instead of a bare EC2 launch type, so ECS can grow the ASG automatically
-  # # to provide extra instance capacity for rolling deployments instead of
-  # # stalling with "insufficient resources" because there is no room to place
-  # # the new task revision alongside the old one.
-  # capacity_provider_strategy {
-  #   capacity_provider = aws_ecs_capacity_provider.capacity_provider.name
-  #   weight            = 1
-  #   base              = 1
-  # }
+  # Use the cluster's capacity provider (with managed scaling enabled)
+  # instead of a bare EC2 launch type, so ECS can grow the ASG automatically
+  # to provide extra instance capacity for rolling deployments instead of
+  # stalling with "insufficient resources" because there is no room to place
+  # the new task revision alongside the old one.
+  capacity_provider_strategy {
+    capacity_provider = aws_ecs_capacity_provider.capacity_provider.name
+    weight            = 1
+    base              = 1
+  }
 
 
   health_check_grace_period_seconds = 300
