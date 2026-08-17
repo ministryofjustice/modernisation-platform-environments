@@ -88,7 +88,7 @@ module "ppud_rds_export" {
 }
 
 # Create a resource to subscribe to SNS topic
-# Slack notifications
+# and send Slack notifications
 resource "aws_sns_topic_subscription" "sfn_events" {
   topic_arn = module.ppud_rds_export.sns_topic_arn
   protocol  = "https"
