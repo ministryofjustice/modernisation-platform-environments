@@ -904,12 +904,11 @@ resource "aws_glue_job" "apply_sort_order" {
     "--catalog"                          = "arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:catalog"
     "--database"                         = "staged_mdss${local.dbt_suffix}"
     "--table"                            = "event"
-    "--order_col"                        = "_load_timestamp"
-    "--order"                            = "ASC"
-    "--order_cols"                       = ""
     "--remove_sort_order"                = "false"
+    "--order"                            = "ASC"
+    "--order_col"                        = "false"
+    "--order_cols"                       = "false"
     "--enable-continuous-cloudwatch-log" = "true"
-    # "--continuous-log-logGroup"          = aws_cloudwatch_log_group.apply_sort_order[0].name
   }
   command {
     python_version  = "3"
@@ -932,10 +931,3 @@ resource "aws_s3_object" "apply_sort_order_script" {
   key    = "apply_sort_order.py"
   source = "glue-job/apply_sort_order.py"
 }
-
-# resource "aws_cloudwatch_log_group" "apply_sort_order" {
-#   count             = local.is-development ? 1 : 0
-#   name              = "apply-sort-order"
-#   retention_in_days = 30
-#   kms_key_id        = aws_kms_key.cloudwatch_log_group_key[0].arn
-# }
