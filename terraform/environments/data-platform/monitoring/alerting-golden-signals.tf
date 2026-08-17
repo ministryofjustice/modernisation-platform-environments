@@ -5,6 +5,7 @@ locals {
   # ---------------------------------------------------------------------------
   group_folders = {
     "AI Gateway" = { folder = "internal/compute/ai-gateway", name_suffix = "litellm" }
+    "Bedrock"    = { folder = "internal/data/bedrock", name_suffix = "bedrock" }
   }
 
   # ---------------------------------------------------------------------------
@@ -36,6 +37,7 @@ locals {
   #                      "Namespace"            → cfg.namespaces        (list of k8s namespaces)
   #                      "ClusterName"          → ["*"]                 (wildcard — all clusters)
   #                      "NodeName"             → ["*"]                 (wildcard — all nodes)
+  #                      "ModelId"             → ["*"]                 (wildcard — all models)
   #                      "FileSystemId"         → cfg.efs_file_systems  (list of EFS file system IDs)
   #                    One alert rule is generated per value in the resolved list;
   #                    the value is appended as a suffix to the rule name.
@@ -72,6 +74,10 @@ locals {
   #   baseline_window_seconds = (optional, default: 3600) lookback window and
   #                              CloudWatch period for the baseline pipeline
   #                              (Refs BASE, BASE_R, D)
+  #   for_duration   = (optional, default: "5m") how long the alert condition must
+  #                    hold before the Grafana rule transitions to Alerting (the
+  #                    rule's `for` field). Accepts "30s", "1m", "5m", "2h"-style
+  #                    duration strings.
   # ---------------------------------------------------------------------------
   alerting_golden_signals = {
     # -------------------------------------------------------------------------
@@ -130,5 +136,11 @@ locals {
     # ── Pod Saturation (ContainerInsights, CloudWatch) ───────────────────────
     litellm_pod_restarts           = { group = "AI Gateway", namespace = "ContainerInsights", metric = "pod_number_of_container_restarts", statistic = "Sum", type = "gt", dim_key = "Namespace", dim_key2 = "ClusterName", warning = "litellm_pod_restarts_warn", critical = "litellm_pod_restarts_crit" }
     litellm_pod_memory_utilization = { group = "AI Gateway", namespace = "ContainerInsights", metric = "pod_memory_utilization", statistic = "Maximum", type = "gt", dim_key = "Namespace", dim_key2 = "ClusterName", warning = "litellm_pod_memory_warn", critical = "litellm_pod_memory_crit" }
+
+    # ── Bedrock ───────────────────────────────────────────────────────────────
+    bedrock_client_errors = { group = "Bedrock", namespace = "AWS/Bedrock", metric = "InvocationClientErrors", statistic = "Sum", type = "gt", dim_key = "ModelId", warning = "bedrock_client_errors_warn", critical = "bedrock_client_errors_crit" }
+    bedrock_server_errors = { group = "Bedrock", namespace = "AWS/Bedrock", metric = "InvocationServerErrors", statistic = "Sum", type = "gt", dim_key = "ModelId", warning = "bedrock_server_errors_warn", critical = "bedrock_server_errors_crit" }
+    bedrock_legacy_model  = { group = "Bedrock", namespace = "AWS/Bedrock", metric = "LegacyModelInvocations", statistic = "Sum", type = "gt", dim_key = "ModelId", warning = "bedrock_legacy_model_warn", critical = "bedrock_legacy_model_crit" }
+    bedrock_invocations   = { group = "Bedrock", namespace = "AWS/Bedrock", metric = "Invocations", statistic = "Sum", type = "baseline_gt", dim_key = "ModelId", warning = "bedrock_invocations_baseline_warn", critical = "bedrock_invocations_baseline_crit" }
   }
 }

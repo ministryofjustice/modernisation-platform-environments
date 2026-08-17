@@ -60,6 +60,7 @@ proxy_config:
     database_connection_pool_limit: 10
   litellm_settings:
     drop_params: true
+    enable_azure_ad_token_refresh: true
     request_timeout: 600
     json_logs: true
     store_audit_logs: true
@@ -121,6 +122,14 @@ volumes:
   - name: migrations
     emptyDir:
       sizeLimit: 64Mi
+  - name: azure-workload-identity-token
+    projected:
+      defaultMode: 420
+      sources:
+        - serviceAccountToken:
+            path: azure-identity-token
+            audience: api://AzureADTokenExchange
+            expirationSeconds: 3600
 
 volumeMounts:
   - name: ui
@@ -131,6 +140,9 @@ volumeMounts:
     mountPath: /app/cache
   - name: migrations
     mountPath: /app/migrations
+  - name: azure-workload-identity-token
+    mountPath: /var/run/secrets/sts.windows.net
+    readOnly: true
 
 extraInitContainers:
   - name: setup-ui
@@ -181,5 +193,9 @@ envVars: {
     XDG_CACHE_HOME: "/app/cache",
     IAM_TOKEN_DB_AUTH: "True",
     DATABASE_USER: "${databaseUsername}",
-    STORE_MODEL_IN_DB: "True"
+    STORE_MODEL_IN_DB: "True",
+    AZURE_TENANT_ID: "${microsoft_foundry_tenant_id}",
+    AZURE_CLIENT_ID: "${microsoft_foundry_client_id}",
+    AZURE_FEDERATED_TOKEN_FILE: "/var/run/secrets/sts.windows.net/azure-identity-token",
+    AZURE_AD_TOKEN: "oidc/azure/"
 }

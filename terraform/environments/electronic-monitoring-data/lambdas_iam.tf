@@ -1825,6 +1825,16 @@ data "aws_iam_policy_document" "cloudwatch_alarm_threader_policy_document" {
   }
 
   statement {
+    sid    = "AllowStartLandingDlqRedriverWorkflow"
+    effect = "Allow"
+    actions = [
+      "states:StartExecution",
+    ]
+    resources = [
+      aws_sfn_state_machine.landing_dlq_redriver.arn,
+    ]
+  }
+  statement {
     sid    = "AllowSendIncidentEvents"
     effect = "Allow"
     actions = [
@@ -2982,6 +2992,19 @@ data "aws_iam_policy_document" "live_feed_incident_manager_policy_document" {
 
     resources = [
       module.live_feed_github_app.secret_arn,
+    ]
+  }
+
+  statement {
+    sid    = "ListIncidentEpisodeStateBucket"
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      module.s3-logging-bucket.bucket.arn,
     ]
   }
 

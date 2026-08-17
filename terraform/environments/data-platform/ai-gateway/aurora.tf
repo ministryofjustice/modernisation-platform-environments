@@ -42,6 +42,7 @@ module "ai_gateway_aurora" {
   iam_role_name               = "${local.component_name}-monitoring"
   iam_role_use_name_prefix    = true
 
+  allow_major_version_upgrade         = true
   iam_database_authentication_enabled = true
   apply_immediately                   = false
 }
