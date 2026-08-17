@@ -906,6 +906,7 @@ resource "aws_glue_job" "apply_sort_order" {
     "--table"                            = "event"
     "--remove_sort_order"                = "false"
     "--order"                            = "ASC"
+    # Optional args set to false
     "--order_col"                        = "false"
     "--order_cols"                       = "false"
     "--enable-continuous-cloudwatch-log" = "true"

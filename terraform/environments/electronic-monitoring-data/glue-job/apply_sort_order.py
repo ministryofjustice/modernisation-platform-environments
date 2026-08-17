@@ -24,23 +24,23 @@ logger = glue_context.get_logger()
 
 spark = glue_context.spark_session
 
-sort_order_command = f"""ALTER TABLE {args['catalog']}.{args['database']}.{args['table']} WRITE ORDERED BY ({args['order_col']} {args['order']});"""
-z_sort_command = f"""ALTER TABLE {args['catalog']}.{args['database']}.{args['table']} WRITE ORDERED BY {args['order_cols']};"""
-remove_sort_order_command = f"""ALTER TABLE {args['catalog']}.{args['database']}.{args['table']} WRITE UNORDERED;"""
+sort_order = f"""ALTER TABLE {args['catalog']}.{args['database']}.{args['table']} WRITE ORDERED BY ({args['order_col']} {args['order']});"""
+z_sort = f"""ALTER TABLE {args['catalog']}.{args['database']}.{args['table']} WRITE ORDERED BY {args['order_cols']};"""
+remove_sort_order = f"""ALTER TABLE {args['catalog']}.{args['database']}.{args['table']} WRITE UNORDERED;"""
 
 try:
     logger.info("Attempting to apply sort order...")
 
     if args['remove_sort_order'] == "true":
-        spark.sql(remove_sort_order_command)
+        spark.sql(remove_sort_order)
         logger.info("Sort order removed.")
 
     elif args['order_col'] != "false":
-        spark.sql(sort_order_command)
+        spark.sql(sort_order)
         logger.info("Sort order set.")
 
     elif args['order_cols'] != "false":
-        spark.sql(z_sort_command)
+        spark.sql(z_sort)
         logger.info("Z-Sort order applied.")
 
     else:
