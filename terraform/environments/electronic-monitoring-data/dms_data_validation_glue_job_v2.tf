@@ -909,7 +909,7 @@ resource "aws_glue_job" "apply_sort_order" {
     "--order_cols"                       = ""
     "--remove_sort_order"                = "false"
     "--enable-continuous-cloudwatch-log" = "true"
-    "--continuous-log-logGroup"          = aws_cloudwatch_log_group.apply_sort_order[0].name
+    "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.apply_sort_order[0].name}"
   }
   command {
     python_version  = "3"
