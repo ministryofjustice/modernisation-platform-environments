@@ -76,6 +76,11 @@ resource "aws_ecs_service" "ecs_adaptor_service" {
     type  = "spread"
   }
 
+  network_configuration {
+    security_groups = [aws_security_group.ecs_tasks_adaptor.id]
+    subnets         = data.aws_subnets.shared-private.ids
+  }
+
   load_balancer {
     target_group_arn = aws_lb_target_group.adaptor_target_group.id
     container_name   = "${local.adaptor_app_name}-container"
