@@ -13,15 +13,15 @@
     "portMappings": [
       {
         "containerPort": ${server_port},
-        "hostPort: ${server_port}
+        "hostPort": ${server_port}
       },
       {
         "containerPort": ${ssl_port},
-        "hostPort: ${ssl_port}
+        "hostPort": ${ssl_port}
       },
       {
         "containerPort": ${health_check_port},
-        "hostPort: ${health_check_port}
+        "hostPort": ${health_check_port}
       }
     ],
     "mountPoints": [
