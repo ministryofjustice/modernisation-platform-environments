@@ -360,6 +360,13 @@ locals {
         "container-platform-octo-nonlive",
       ]
 
+      /* ArgoCD — additional RBAC role mappings for this tier (beyond the
+         always-present ADMIN mapping added in locals.tf). Keys: EDITOR, VIEWER
+         (ADMIN may also be extended). Values: list of { id, type } IDC
+         identities. Used to grant BU teams access to the ArgoCD UI.
+         Example: { VIEWER = [{ id = "hmpps-sre-group-id", type = "SSO_GROUP" }] } */
+      argocd_rbac_role_mappings = {}
+
       /* Addons */
       eks_cluster_addon_versions = {
         kube_proxy             = "v1.34.2-eksbuild.1"

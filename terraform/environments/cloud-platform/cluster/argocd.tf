@@ -46,14 +46,9 @@ module "argocd" {
   cluster_name = module.eks.cluster_name
   cluster_arn  = module.eks.cluster_arn
 
-  idc_instance_arn = var.argocd_idc_instance_arn
-  idc_region       = var.argocd_idc_region
-  rbac_role_mappings = merge(
-    {
-      ADMIN = [{ id = local.cloud_platform_engineers_group_id, type = "SSO_GROUP" }]
-    },
-    var.argocd_rbac_role_mappings
-  )
+  idc_instance_arn   = local.argocd_idc_instance_arn
+  idc_region         = local.argocd_idc_region
+  rbac_role_mappings = local.argocd_rbac_role_mappings
 
   codeconnection_arn     = data.aws_codestarconnections_connection.github[0].arn
   enable_destroy_cleanup = local.cluster_environment == "development_cluster"
@@ -72,27 +67,8 @@ module "argocd" {
 # is native to EKS Access Entries.
 #------------------------------------------------------------------------------
 
-locals {
-  # Hub's spoke-access role ARN — resolved by convention or explicit override.
-  resolved_hub_spoke_access_role_arn = (
-    var.argocd_hub_spoke_access_role_arn != ""
-    ? var.argocd_hub_spoke_access_role_arn
-    : local.argocd_hub_convention_role_arn
-  )
-
-  # A cluster never self-identifies as both hub and spoke.
-  is_argocd_hub_cluster = contains(values(local.argocd_hubs)[*].cluster_name, terraform.workspace)
-
-  # Spoke registration: workspace must appear in the argocd_registered_spokes
-  # allowlist AND must not be a hub AND must be a known permanent cluster (or
-  # have an explicit hub ARN for ephemeral spokes).
-  is_argocd_spoke = contains(
-    lookup(local.environment_configuration, "argocd_registered_spokes", []),
-    terraform.workspace
-    ) && !local.enable_argocd && !local.is_argocd_hub_cluster && (
-    contains(local.mp_environments, terraform.workspace) || var.argocd_hub_spoke_access_role_arn != ""
-  )
-}
+# Hub/spoke detection locals (resolved_hub_spoke_access_role_arn,
+# is_argocd_hub_cluster, is_argocd_spoke) are defined in locals.tf.
 
 resource "aws_eks_access_entry" "argocd_spoke" {
   count = local.is_argocd_spoke ? 1 : 0
