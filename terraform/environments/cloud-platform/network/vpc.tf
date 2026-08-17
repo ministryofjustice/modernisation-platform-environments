@@ -85,3 +85,16 @@ resource "aws_subnet" "pod_private" {
     Cluster    = local.cp_vpc_name
   }, local.tags)
 }
+
+# Shared DB subnet group for platform-managed RDS instances (US-005c).
+# All RDS instances use the private subnets. Security groups are per-database.
+resource "aws_db_subnet_group" "platform" {
+  name        = "platform-db-subnet-group"
+  description = "Shared DB subnet group for platform-managed RDS instances"
+  subnet_ids  = module.cluster_vpc.private_subnets
+
+  tags = merge({
+    Name      = "platform-db-subnet-group"
+    Terraform = "true"
+  }, local.tags)
+}
