@@ -30,7 +30,7 @@ resource "aws_lb_target_group" "opahub_target_group" {
   port                 = local.application_data.accounts[local.environment].opa_server_port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
-  target_type          = "instance"
+  target_type          = "ip"
   deregistration_delay = 30
 
   stickiness {
@@ -57,7 +57,7 @@ resource "aws_lb_target_group" "opahub_ssl_target_group" {
   port                 = local.application_data.accounts[local.environment].opa_ssl_port
   protocol             = "HTTPS"
   vpc_id               = data.aws_vpc.shared.id
-  target_type          = "instance"
+  target_type          = "ip"
   deregistration_delay = 30
 
   stickiness {
