@@ -5,3 +5,4 @@ echo 'ECS_VOLUME_PLUGIN_CAPABILITIES=["efsAuth"]' >> /etc/ecs/ecs.config
 start ecs
 
 yum install -y awscli
+
