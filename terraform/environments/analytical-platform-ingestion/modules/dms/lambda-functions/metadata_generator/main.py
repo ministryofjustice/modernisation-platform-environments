@@ -15,6 +15,7 @@ from mojap_metadata.converters.etl_manager_converter import EtlManagerConverter
 from mojap_metadata.converters.glue_converter import GlueConverter
 from mojap_metadata.converters.sqlalchemy_converter import SQLAlchemyConverter
 from sqlalchemy import create_engine
+from sqlalchemy.exc import NoSuchTableError
 
 patch_all()
 
@@ -149,6 +150,7 @@ class MetadataExtractor:
         self.emc = EtlManagerConverter()
         self.sqlc = SQLAlchemyConverter(engine)
         self.blobs = []
+        self.missing_objects = []
         self.upper_case_dialects = ["oracle"]
 
     def _columns_to_keep_as_int(self, schema: str, table: str) -> set[str]:
@@ -351,9 +353,29 @@ class MetadataExtractor:
             raise ValueError(f"Expected object to be of format `table` or `schema.table` but got {obj_str}")
 
     def get_database_metadata(self, output_bucket):
-        tables = [self.get_table_metadata (*self.get_schema_and_table_from_object(obj)) for obj in self.objects]
+        tables = []
+        self.missing_objects = []
+
+        for obj in self.objects:
+            schema, table = self.get_schema_and_table_from_object(obj)
+            try:
+                tables.append(self.get_table_metadata(schema, table))
+            except NoSuchTableError:
+                missing_object = f"{schema}.{table}".lower()
+                self.missing_objects.append(missing_object)
+                logger.exception("Could not reflect configured database object: %s", missing_object)
+
         self._write_database_objects(output_bucket)
         return tables
+
+    def raise_for_missing_objects(self):
+        if not self.missing_objects:
+            return
+
+        missing = ", ".join(sorted(self.missing_objects))
+        raise NoSuchTableError(
+            f"Failed to reflect configured database object(s): {missing}"
+        )
 
 
 def handler(event, context):  # pylint: disable=unused-argument
@@ -484,6 +506,9 @@ def handler(event, context):  # pylint: disable=unused-argument
             Bucket=metadata_bucket,
             Key=f"{table.name}.json",
         )
+
+    metadata.raise_for_missing_objects()
+
     if retry_failed_after_recreate_metadata:
         reprocess_failed_records()
 
