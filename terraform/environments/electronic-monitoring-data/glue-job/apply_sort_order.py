@@ -23,7 +23,7 @@ logger = glue_context.get_logger()
 spark = glue_context.spark_session
 
 
-sort_order_command = f"ALTER TABLE {args["catalog"]}.{args["database"]}.{args["table"]} WRITE ORDERED BY ({args["order_col"]} {args["order"]});"
+sort_order_command = f"ALTER TABLE {args['catalog']}.{args['database']}.{args['table']} WRITE ORDERED BY ({args['order_col']} {args['order']});"
 # z_sort_command = f"ALTER TABLE {args["catalog"]}.{args["database"]}.{args["table"]} WRITE ORDERED BY {args["order_cols"]};"
 
 try:
