@@ -909,7 +909,7 @@ resource "aws_glue_job" "apply_sort_order" {
     "--order_cols"                       = ""
     "--remove_sort_order"                = "false"
     "--enable-continuous-cloudwatch-log" = "true"
-    "--continuous-log-logGroup"          = aws_cloudwatch_log_group.apply_sort_order[0].name
+    # "--continuous-log-logGroup"          = aws_cloudwatch_log_group.apply_sort_order[0].name
   }
   command {
     python_version  = "3"
@@ -933,9 +933,9 @@ resource "aws_s3_object" "apply_sort_order_script" {
   source = "glue-job/apply_sort_order.py"
 }
 
-resource "aws_cloudwatch_log_group" "apply_sort_order" {
-  count             = local.is-development ? 1 : 0
-  name              = "apply-sort-order"
-  retention_in_days = 30
-  kms_key_id        = aws_kms_key.cloudwatch_log_group_key[0].arn
-}
+# resource "aws_cloudwatch_log_group" "apply_sort_order" {
+#   count             = local.is-development ? 1 : 0
+#   name              = "apply-sort-order"
+#   retention_in_days = 30
+#   kms_key_id        = aws_kms_key.cloudwatch_log_group_key[0].arn
+# }
