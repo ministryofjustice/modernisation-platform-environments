@@ -98,6 +98,11 @@ resource "aws_ecs_service" "opahub" {
     type  = "spread"
   }
 
+  network_configuration {
+    security_groups = [aws_security_group.ecs_tasks_opa.id]
+    subnets         = data.aws_subnets.shared-private.ids
+  }
+
   load_balancer {
     target_group_arn = aws_lb_target_group.opahub_ssl_target_group.id
     container_name   = "${local.opa_app_name}-ssl-container"
