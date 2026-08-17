@@ -931,5 +931,5 @@ resource "aws_s3_object" "apply_sort_order_script" {
   bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "apply_sort_order.py"
   source = "glue-job/apply_sort_order.py"
-  etag   = filemd5("glue-job/apply_sort_order.py")
+  source_hash   = filemd5("glue-job/apply_sort_order.py")
 }
