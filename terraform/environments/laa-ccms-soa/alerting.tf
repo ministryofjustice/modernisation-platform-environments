@@ -342,7 +342,7 @@ resource "aws_cloudwatch_metric_alarm" "Admin_UnHealthy_Hosts" {
   treat_missing_data  = "breaching"
   dimensions = {
     LoadBalancer = aws_lb.admin.arn_suffix
-    TargetGroup  = aws_lb_target_group.admin.arn_suffix
+    TargetGroup  = aws_lb_target_group.admin_https.arn_suffix
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
   ok_actions    = [aws_sns_topic.alerts.arn]
@@ -362,7 +362,7 @@ resource "aws_cloudwatch_metric_alarm" "Managed_UnHealthy_Hosts" {
   treat_missing_data  = "breaching"
   dimensions = {
     LoadBalancer = aws_lb.managed.arn_suffix
-    TargetGroup  = aws_lb_target_group.managed.arn_suffix
+    TargetGroup  = aws_lb_target_group.managed_https.arn_suffix
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
   ok_actions    = [aws_sns_topic.alerts.arn]
