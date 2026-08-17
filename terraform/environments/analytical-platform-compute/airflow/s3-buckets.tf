@@ -3,7 +3,7 @@ module "mwaa_bucket" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.13.0"
+  version = "5.14.1"
 
   bucket = "mojap-compute-${local.environment}-mwaa"
 
