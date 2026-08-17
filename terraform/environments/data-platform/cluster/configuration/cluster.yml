@@ -1,16 +1,16 @@
 environment:
   development:
     kubernetes_version: "1.36"
-    bottlerocket_version: "1.63.0-d4932ff8"
+    bottlerocket_version: "1.64.0-ad9d4847"
     node_update_config:
       max_unavailable: 2
     addon_versions:
-      aws_ebs_csi_driver: "v1.63.0-eksbuild.1"
+      aws_ebs_csi_driver: "v1.63.1-eksbuild.1"
       aws_efs_csi_driver: "v3.4.1-eksbuild.1"
       aws_guardduty_agent: "v1.16.0-eksbuild.2"
       aws_network_flow_monitoring_agent: "v1.1.6-eksbuild.1"
-      eks_node_monitoring_agent: "v1.6.7-eksbuild.1"
-      eks_pod_identity_agent: "v1.3.10-eksbuild.3"
+      eks_node_monitoring_agent: "v1.7.0-eksbuild.1"
+      eks_pod_identity_agent: "v1.4.0-eksbuild.1"
     crd_versions:
       aws_load_balancer_controller: "v0.0.241"
       gateway_api: "v1.5.1"
@@ -57,16 +57,16 @@ environment:
     shared_services_gateway_hostname: "*.development.data-platform.service.justice.gov.uk"
   test:
     kubernetes_version: "1.36"
-    bottlerocket_version: "1.63.0-d4932ff8"
+    bottlerocket_version: "1.64.0-ad9d4847"
     node_update_config:
       max_unavailable: 2
     addon_versions:
-      aws_ebs_csi_driver: "v1.63.0-eksbuild.1"
+      aws_ebs_csi_driver: "v1.63.1-eksbuild.1"
       aws_efs_csi_driver: "v3.4.1-eksbuild.1"
       aws_guardduty_agent: "v1.16.0-eksbuild.2"
       aws_network_flow_monitoring_agent: "v1.1.6-eksbuild.1"
-      eks_node_monitoring_agent: "v1.6.7-eksbuild.1"
-      eks_pod_identity_agent: "v1.3.10-eksbuild.3"
+      eks_node_monitoring_agent: "v1.7.0-eksbuild.1"
+      eks_pod_identity_agent: "v1.4.0-eksbuild.1"
     crd_versions:
       aws_load_balancer_controller: "v0.0.241"
       gateway_api: "v1.5.1"
