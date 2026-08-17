@@ -3,7 +3,7 @@ module "secrets_custom_idp_user" {
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "2.1.0"
 
-  for_each = local.environment_transfer_server_users
+  for_each = local.environment_transfer_server_identities
 
   # The custom IdP Lambda looks up each user's credentials at
   # "<secret_prefix><username>" (see lambda/custom-idp/idp_handler/app.py), so

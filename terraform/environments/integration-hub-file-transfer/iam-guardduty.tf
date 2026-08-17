@@ -1,7 +1,7 @@
 module "iam_policy_guardduty_s3" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.1"
+  version = "6.8.0"
 
   name        = "${local.application_name}-${local.environment}-guardduty-s3-plan"
   description = "GuardDuty S3 malware protection plan policy"
@@ -15,7 +15,7 @@ module "iam_policy_guardduty_s3" {
 module "iam_role_guardduty_s3" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.1"
+  version = "6.8.0"
 
   create          = true
   use_name_prefix = false
