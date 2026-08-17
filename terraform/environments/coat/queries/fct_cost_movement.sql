@@ -50,7 +50,6 @@ monthly_shifted as (
 )
 
 select
-  coalesce(curr.billing_period, prev.billing_period) as billing_period,
   coalesce(curr.account_name, prev.account_name) as account_name,
   coalesce(curr.product_region_code, prev.product_region_code) as product_region_code,
   coalesce(curr.environment, prev.environment) as environment,
@@ -74,7 +73,8 @@ select
     when curr.daily_cost > prev.prior_cost then 'increased'
     when curr.daily_cost < prev.prior_cost then 'decreased'
     else 'ongoing'
-  end as movement_type
+  end as movement_type,
+  coalesce(curr.billing_period, prev.billing_period) as billing_period
 from usage_cost curr
 full outer join monthly_shifted prev
   on coalesce(curr.billing_period, 'UNKNOWN') = coalesce(prev.billing_period, 'UNKNOWN')
