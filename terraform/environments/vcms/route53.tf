@@ -69,19 +69,19 @@ resource "aws_acm_certificate_validation" "external" {
 #   })
 # }
 
-resource "aws_route53_record" "internal" {
-  provider = aws.core-vpc
+# resource "aws_route53_record" "internal" {
+#   provider = aws.core-vpc
 
-  zone_id = local.account_config.route53_inner_zone.zone_id
-  name    = local.account_config.internal_dns_suffix
-  type    = "A"
+#   zone_id = local.account_config.route53_inner_zone.zone_id
+#   name    = local.account_config.internal_dns_suffix
+#   type    = "A"
 
-  alias {
-    name                   = aws_lb.frontend_internal.dns_name
-    zone_id                = aws_lb.frontend_internal.zone_id
-    evaluate_target_health = true
-  }
-}
+#   alias {
+#     name                   = aws_lb.frontend_internal.dns_name
+#     zone_id                = aws_lb.frontend_internal.zone_id
+#     evaluate_target_health = true
+#   }
+# }
 
 # resource "aws_route53_record" "internal_alb" {
 #   provider = aws.core-vpc
@@ -126,18 +126,18 @@ resource "aws_route53_record" "internal" {
 #   })
 # }
 
-resource "aws_acm_certificate" "internal" {
-  domain_name               = local.account_config.internal_dns_suffix
-  certificate_authority_arn = data.aws_ssm_parameter.internal_ca_arn.value
+# resource "aws_acm_certificate" "internal" {
+#   domain_name       = "www.${local.environment_short}.victim-case-management.service.justice.gov.uk"
+#   validation_method = "DNS"
 
-  tags = merge(local.tags, {
-    Name = "frontend-internal-https"
-  })
+#   tags = merge(local.tags, {
+#     Name = "frontend-internal-https"
+#   })
 
-  lifecycle {
-    create_before_destroy = true
-  }
-}
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
 
 # resource "aws_acm_certificate" "internal" {
 #   domain_name       = local.account_config.internal_dns_suffix
