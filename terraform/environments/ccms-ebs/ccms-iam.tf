@@ -119,6 +119,17 @@ resource "aws_iam_policy" "cw_logging_policy" {
           "Resource" : [
             "arn:aws:logs:*:*:*"
           ]
+        },
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "kms:GenerateDataKey*",
+            "kms:Decrypt",
+            "kms:DescribeKey"
+          ],
+          "Resource" : [
+            aws_kms_key.cloudwatch_logs.arn
+          ]
         }
       ]
     }
