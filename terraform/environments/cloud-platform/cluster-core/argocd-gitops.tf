@@ -411,3 +411,59 @@ resource "kubectl_manifest" "argocd_applicationset_baseline" {
     kubectl_manifest.argocd_project_platform_live,
   ]
 }
+
+#------------------------------------------------------------------------------
+# Spoke cluster registration Secrets — required for Argo CD to treat each
+# spoke as a deployment target. Without this Secret, Applications targeting
+# the spoke's cluster ARN sit in "Unknown" sync state indefinitely: Argo CD
+# never attempts to connect until the cluster is registered.
+#
+# Minimal form only — name + server (the spoke's EKS cluster ARN). No
+# config / awsAuthConfig / roleARN block: the EKS-managed Argo CD capability
+# authenticates to spoke clusters natively as the hub's capability role (see
+# cluster/argocd.tf — aws_eks_access_entry.argocd_spoke_capability), the same
+# principal an awsAuthConfig roleARN would otherwise name. That block is only
+# needed for self-managed Argo CD assuming a separate cross-account role,
+# which this platform does not use.
+#------------------------------------------------------------------------------
+locals {
+  # TEST ONLY: additional spoke(s) to register a cluster Secret for, used to
+  # verify Secret creation end-to-end against an ephemeral hub/spoke pair.
+  # Same-account ARN construction only suits ephemeral testing (hub and spoke
+  # share the dev account) — real BU spokes are cross-account and go through
+  # bu_appprojects. Revert before merging this PR.
+  test_ephemeral_spokes = {
+    "cp-1708-2235-spoke" = {
+      bu_name           = "test"
+      environment       = "ephemeral"
+      cluster_workspace = "cp-1708-2235-spoke"
+      cluster_arn       = "arn:aws:eks:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:cluster/cp-1708-2235-spoke"
+    }
+  }
+
+  registered_spokes = merge(local.bu_appprojects, local.test_ephemeral_spokes)
+}
+
+resource "kubectl_manifest" "argocd_cluster_secret_bu" {
+  for_each = local.is_argocd_hub ? local.registered_spokes : {}
+
+  yaml_body = yamlencode({
+    apiVersion = "v1"
+    kind       = "Secret"
+    metadata = {
+      name      = each.value.cluster_workspace
+      namespace = "argocd"
+      labels = {
+        "argocd.argoproj.io/secret-type" = "cluster"
+        "argocd.argoproj.io/managed-by"  = "terraform"
+        "container-platform/bu"          = each.value.bu_name
+        "container-platform/environment" = each.value.environment
+      }
+    }
+    type = "Opaque"
+    stringData = {
+      name   = each.value.cluster_workspace
+      server = each.value.cluster_arn
+    }
+  })
+}
