@@ -23,9 +23,9 @@ logger = glue_context.get_logger()
 
 spark = glue_context.spark_session
 
-sort_order_command = f"""ALTER TABLE {args["catalog"]}.{args["database"]}.{args["table"]} WRITE ORDERED BY ({args["order_col"]} {args["order"]});"""
-z_sort_command = f"""ALTER TABLE {args["catalog"]}.{args["database"]}.{args["table"]} WRITE ORDERED BY {args["order_cols"]};"""
-remove_sort_order_command = f"""ALTER TABLE {args["catalog"]}.{args["database"]}.{args["table"]} WRITE UNORDERED;"""
+sort_order_command = f"""ALTER TABLE {args['catalog']}.{args['database']}.{args['table']} WRITE ORDERED BY ({args['order_col']} {args['order']});"""
+z_sort_command = f"""ALTER TABLE {args['catalog']}.{args['database']}.{args['table']} WRITE ORDERED BY {args['order_cols']};"""
+remove_sort_order_command = f"""ALTER TABLE {args['catalog']}.{args['database']}.{args['table']} WRITE UNORDERED;"""
 
 try:
     logger.info("Attempting to apply sort order...")
