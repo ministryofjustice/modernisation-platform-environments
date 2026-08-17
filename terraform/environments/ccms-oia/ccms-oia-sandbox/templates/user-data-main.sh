@@ -6,3 +6,7 @@ start ecs
 
 
 yum install -y awscli
+
+mkdir /home/ec2-user/efs
+mount -t efs -o tls ${efs_id}:/ /home/ec2-user/efs
+chmod go+rw /home/ec2-user/efs
