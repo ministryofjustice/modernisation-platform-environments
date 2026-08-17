@@ -34,7 +34,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
 #######################################
 
 resource "aws_iam_policy" "ecs_secrets_policy" {
-  name = "${local.application_name}-${local.environment}-ecs-secrets-policy"
+  name = "${local.opa_app_name}-${local.environment}-ecs-secrets-policy"
 
   policy = <<EOF
 {
@@ -63,12 +63,12 @@ resource "aws_iam_role_policy_attachment" "ecs_secrets_policy_attachment" {
 #######################################
 
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
-  name = "${local.application_name}-ec2-instance-profile"
+  name = "${local.opa_app_name}-ec2-instance-profile"
   role = aws_iam_role.ec2_instance_role.name
 }
 
 resource "aws_iam_role" "ec2_instance_role" {
-  name = "${local.application_name}-ec2-instance-role"
+  name = "${local.opa_app_name}-ec2-instance-role"
 
   assume_role_policy = <<EOF
 {
@@ -85,7 +85,7 @@ EOF
 }
 
 resource "aws_iam_policy" "ec2_instance_policy" {
-  name = "${local.application_name}-ec2-instance-policy"
+  name = "${local.opa_app_name}-ec2-instance-policy"
 
   policy = <<EOF
 {
