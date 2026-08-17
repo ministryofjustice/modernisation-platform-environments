@@ -271,14 +271,26 @@ resource "aws_iam_role_policy_attachment" "apply_sort_order_glue_service_role" {
 
 data "aws_iam_policy_document" "apply_sort_order" {
   statement {
-    sid    = "S3ObjectPermissions"
+    sid    = "S3DataObjectPermissions"
     effect = "Allow"
     actions = [
       "s3:PutObject",
       "s3:GetObject",
       "s3:DeleteObject"
     ]
-    resources = ["${module.s3-create-a-derived-table-bucket.bucket.arn}/data/dev/models/domain_name=staged/table_name=event/*"]
+    resources = [
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/data/dev/models/domain_name=staged/table_name=event/*"
+      ]
+  }
+  statement {
+    sid    = "S3ScriptObjectPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+    ]
+    resources = [
+      "${module.s3-glue-job-script-bucket.bucket.arn}/*"
+      ]
   }
   statement {
     sid    = "S3BucketPermissions"
