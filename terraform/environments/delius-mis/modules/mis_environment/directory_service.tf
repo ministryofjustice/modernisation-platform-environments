@@ -26,28 +26,9 @@ resource "aws_directory_service_directory" "mis_ad" {
   }
 }
 
-data "aws_iam_policy_document" "ad_admin_password" {
-  statement {
-    sid    = "AllowDataSyncToReadSecret"
-    effect = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["://amazonaws.com"]
-    }
-
-    actions = [
-      "secretsmanager:GetSecretValue"
-    ]
-
-    resources = ["*"]
-  }
-}
-
 resource "aws_secretsmanager_secret" "ad_admin_password" {
   description             = "Directory service admin password"
   name                    = "${var.app_name}-${var.env_name}-ad-admin-password"
-  policy                  = data.aws_iam_policy_document.ad_admin_password.json
   recovery_window_in_days = 0
 
   tags = merge(
