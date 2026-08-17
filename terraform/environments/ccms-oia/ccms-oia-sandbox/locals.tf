@@ -3,14 +3,13 @@
 #######################################
 
 locals {
-  environment         = "development"
-  application_name_root = "ccms-oia"
-  logging_bucket_name = "${local.application_name_root}-${local.environment}-logging"
+  # environment         = "development"
+  logging_bucket_name = "${local.application_name}-${local.environment}-logging"
   opa_app_name        = "ccms-opa-sandbox"
   connector_app_name  = "ccms-connector-sandbox"
   adaptor_app_name    = "ccms-service-adaptor-sandbox"
-  first_cluster_name  = "${local.application_name}-cluster-${local.opa_app_name}"
-  second_cluster_name = "${local.application_name}-cluster-${local.connector_app_name}-${local.adaptor_app_name}"
+  first_cluster_name  = "${local.opa_app_name}-cluster"
+  second_cluster_name = "${local.connector_app_name}-${local.adaptor_app_name}-cluster"
 
 
   # Subnet CIDR blocks
