@@ -28,8 +28,7 @@ module "ppud_slack_webhook" {
 
   name = "ppud_notifications_slack_webhook"
 
-  secret_string         = "CHANGEME"
-  ignore_secret_changes = false
+  secret_string           = "CHANGEME"
   recovery_window_in_days = 0
 
   tags = merge(
