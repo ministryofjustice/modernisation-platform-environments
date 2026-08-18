@@ -897,7 +897,7 @@ resource "aws_glue_job" "apply_sort_order" {
   name              = "apply-sort-order"
   description       = "Use Spark to apply sort order to Iceberg table."
   role_arn          = aws_iam_role.apply_sort_order_iam_role.arn
-  glue_version      = "4.0"
+  glue_version      = "5.0"
   worker_type       = "G.1X"
   number_of_workers = 2
   default_arguments = {
@@ -905,7 +905,7 @@ resource "aws_glue_job" "apply_sort_order" {
     "--database"                         = "staged_mdss${local.dbt_suffix}"
     "--table"                            = "event"
     "--remove_sort_order"                = "false"
-    "--order"                            = "ASC"
+    "--order"                            = "DESC"
     # Optional args set to false
     "--order_col"                        = "false"
     "--order_cols"                       = "false"
@@ -916,8 +916,6 @@ spark.sql.extensions=org.apache.iceberg.spark.extensions.IcebergSparkSessionExte
 --conf spark.sql.catalog.glue_catalog=org.apache.iceberg.spark.SparkCatalog
 --conf spark.sql.catalog.glue_catalog.catalog-impl=org.apache.iceberg.aws.glue.GlueCatalog 
 --conf spark.sql.catalog.glue_catalog.io-impl=org.apache.iceberg.aws.s3.S3FileIO
---conf spark.sql.catalog.glue_catalog.glue.lakeformation-enabled=true
---conf spark.sql.catalog.glue_catalog.glue.id=${local.env_account_id}
 EOF
 
   }
