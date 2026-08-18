@@ -10,7 +10,7 @@ data "aws_iam_policy_document" "ses_identity_policy" {
   statement {
     sid = "2023052401"
     principals {
-      identifiers = ["*"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
       type        = "AWS"
     }
     actions   = ["SES:SendEmail", "SES:SendRawEmail"]
