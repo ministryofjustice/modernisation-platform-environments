@@ -300,6 +300,59 @@ locals {
       }
     }
 
+    web_12 = {
+      config = {
+        ami_name                  = "base_ol_8_5*"
+        iam_resource_names_prefix = "ec2-instance"
+        instance_profile_policies = [
+          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
+          "EC2Default",
+          "EC2S3BucketWriteAndDeleteAccessPolicy",
+          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+          "Ec2Qa11GWeblogicPolicy",
+          "Ec2Qa11G2WeblogicPolicy",
+          "Ec2Qa19CWeblogicPolicy"
+        ]
+        subnet_name = "private"
+      }
+      ebs_volumes = {
+        "/dev/sdb" = { label = "app", type = "gp3", size = 100 }
+      }
+      instance = {
+        disable_api_termination      = false
+        instance_type                = "t3.large"
+        key_name                     = "ec2-user"
+        metadata_options_http_tokens = "required"
+        vpc_security_group_ids       = ["private-web"]
+        tags = {
+          backup-plan = "daily-and-weekly"
+        }
+      }
+      route53_records = {
+        create_internal_record = true
+        create_external_record = true
+      }
+      user_data_cloud_init = {
+        args = {
+          branch       = "main"
+          ansible_args = "--tags ec2provision"
+        }
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
+        ]
+      }
+      tags = {
+        backup           = "false"
+        component        = "web"
+        description      = "NOMIS Weblogic 12 Web Server"
+        os-type          = "Linux"
+        server-type      = "nomis-web12"
+        update-ssm-agent = "patchgroup1"
+      }
+    }
+
     xtag = {
       config = {
         ami_name                  = "nomis_rhel_7_9_weblogic_xtag_10_3_release_2023-07-19T09-01-29.168Z"
