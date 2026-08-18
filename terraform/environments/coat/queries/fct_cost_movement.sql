@@ -68,12 +68,12 @@ select
     else coalesce(curr.daily_cost, 0) - prev.prior_cost
   end as net_change,
   case
-    when (prev.prior_cost is null or prev.prior_cost = 0) and curr.daily_cost > 0 then 'new'
-    when curr.daily_cost is null and prev.prior_cost > 0 then 'removed'
-    when curr.daily_cost > prev.prior_cost then 'increased'
-    when curr.daily_cost < prev.prior_cost then 'decreased'
+    when coalesce(prev.prior_cost, 0) = 0 and coalesce(curr.daily_cost, 0) > 0 then 'new'
+    when coalesce(curr.daily_cost, 0) = 0 and coalesce(prev.prior_cost, 0) > 0 then 'removed'
+    when coalesce(curr.daily_cost, 0) > coalesce(prev.prior_cost, 0) then 'increased'
+    when coalesce(curr.daily_cost, 0) < coalesce(prev.prior_cost, 0) then 'decreased'
     else 'ongoing'
-  end as movement_type,
+end as movement_type,
   coalesce(curr.billing_period, prev.billing_period) as billing_period
 from usage_cost curr
 full outer join monthly_shifted prev
