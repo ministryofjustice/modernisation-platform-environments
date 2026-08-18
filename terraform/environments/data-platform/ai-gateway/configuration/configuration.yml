@@ -266,6 +266,13 @@ models:
       location: "europe-west2"
       generally_available: false
       environments_available: ["development"]
+    gemini-2-5-pro:
+      model_id: "gemini-2.5-pro"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 2.5 Pro (EU)"
+      location: "europe-west1"
+      generally_available: false
+      environments_available: ["development"]
     gemini-3-5-flash:
       model_id: "gemini-3.5-flash"
       model_family: "Google Gemini"
