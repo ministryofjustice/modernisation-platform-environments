@@ -1164,7 +1164,7 @@ module "poll_cadt" {
   production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
 
   environment_variables = {
-    CLUSTER_NAME        = aws_ecs_cluster.cadt.name
+    CLUSTER_NAME = aws_ecs_cluster.cadt.name
   }
 }
 
@@ -1248,5 +1248,10 @@ module "live_feed_incident_manager" {
     INCIDENT_STATE_BUCKET = local.alarm_thread_state_bucket
     INCIDENT_STATE_PREFIX = "incident-automation/episodes"
     AWS_ACCOUNT_ID        = data.aws_caller_identity.current.account_id
+
+    ENVIRONMENT_SNS_TOPIC_ARN = aws_sns_topic.emds_alerts.arn
+    OPERATIONAL_SNS_TOPIC_ARN = (
+      aws_sns_topic.operational_incident_updates.arn
+    )
   }
 }
