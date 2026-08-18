@@ -1825,6 +1825,16 @@ data "aws_iam_policy_document" "cloudwatch_alarm_threader_policy_document" {
   }
 
   statement {
+    sid    = "AllowStartLandingDlqRedriverWorkflow"
+    effect = "Allow"
+    actions = [
+      "states:StartExecution",
+    ]
+    resources = [
+      aws_sfn_state_machine.landing_dlq_redriver.arn,
+    ]
+  }
+  statement {
     sid    = "AllowSendIncidentEvents"
     effect = "Allow"
     actions = [
