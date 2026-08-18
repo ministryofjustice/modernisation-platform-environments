@@ -128,7 +128,8 @@ resource "aws_wafv2_ip_set" "ssogen_waf_ip_set" {
     data.aws_vpc.shared.cidr_block,
     local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
     local.application_data.accounts[local.environment].mojo_devices,
-    local.application_data.accounts[local.environment].dom1_devices
+    local.application_data.accounts[local.environment].dom1_devices,
+    local.application_data.accounts[local.environment].mp_v1_workspaces_cidr
     # local.application_data.accounts[local.environment].sb_vpc
   ]
 
