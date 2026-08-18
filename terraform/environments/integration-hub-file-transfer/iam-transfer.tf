@@ -118,6 +118,18 @@ module "iam_role_transfer_user" {
         type        = "Service"
         identifiers = ["transfer.amazonaws.com"]
       }]
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "aws:SourceAccount"
+          values   = [data.aws_caller_identity.current.account_id]
+        },
+        {
+          test     = "ArnLike"
+          variable = "aws:SourceArn"
+          values   = ["arn:aws:transfer:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:server/*"]
+        },
+      ]
     }
   }
 
@@ -143,6 +155,18 @@ module "iam_role_transfer" {
         type        = "Service"
         identifiers = ["transfer.amazonaws.com"]
       }]
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "aws:SourceAccount"
+          values   = [data.aws_caller_identity.current.account_id]
+        },
+        {
+          test     = "ArnLike"
+          variable = "aws:SourceArn"
+          values   = ["arn:aws:transfer:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:server/*"]
+        },
+      ]
     }
   }
 
