@@ -97,7 +97,7 @@ resource "aws_iam_role_policy" "glue_access_dms" {
 
 module "data_claims_dms" {
   count                    = local.is-test ? 1 : 0
-  source                   = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service?ref=ecac7ff983b302b199122a94b026a5c8aa6dd02f"
+  source                   = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service?ref=5af822545b8c47096e979c5c07e2fc1bc2579eb1"
   vpc_id                   = data.aws_vpc.shared.id
   environment              = local.environment
   manage_dms_service_roles = false
