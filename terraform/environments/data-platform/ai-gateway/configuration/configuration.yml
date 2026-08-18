@@ -265,35 +265,35 @@ models:
       model_name: "Google Gemini 2.5 Flash"
       location: "europe-west2"
       generally_available: false
-      environments_available: ["development"]
+      environments_available: ["development", "production"]
     gemini-2-5-pro:
       model_id: "gemini-2.5-pro"
       model_family: "Google Gemini"
       model_name: "Google Gemini 2.5 Pro (EU)"
       location: "europe-west1"
       generally_available: false
-      environments_available: ["development"]
+      environments_available: ["development", "production"]
     gemini-3-5-flash:
       model_id: "gemini-3.5-flash"
       model_family: "Google Gemini"
       model_name: "Google Gemini 3.5 Flash"
       location: "europe-west2"
       generally_available: false
-      environments_available: ["development"]
+      environments_available: ["development", "production"]
     gemini-3-6-flash:
       model_id: "gemini-3.6-flash"
       model_family: "Google Gemini"
       model_name: "Google Gemini 3.6 Flash (EU)"
       location: "eu"
       generally_available: false
-      environments_available: ["development"]
+      environments_available: ["development", "production"]
     gemini-3-7-flash:
       model_id: "gemini-3.7-flash"
       model_family: "Google Gemini"
       model_name: "Google Gemini 3.7 Flash (EU)"
       location: "eu"
       generally_available: false
-      environments_available: ["development"]
+      environments_available: ["development", "production"]
   microsoft_foundry:
     # Anthropic
     claude-fable-5:
