@@ -45,10 +45,7 @@ data "aws_iam_policy_document" "data_lake_kms_key" {
       ]
     }
 
-    actions = [
-      "kms:*",
-    ]
-
+    actions   = ["kms:*"]
     resources = ["*"]
   }
 
