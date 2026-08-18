@@ -22,10 +22,24 @@ glue_context = GlueContext(sc)
 logger = glue_context.get_logger()
 
 spark = glue_context.spark_session
+spark.sparkContext.setLogLevel("DEBUG")
 
-sort_order = f"""ALTER TABLE {args['database']}.{args['table']} WRITE ORDERED BY {args['order_col']} {args['order']}"""
+# debugging
+logger.info(f"SPARK VERSION: {spark.version}")
+# iceberg_version = spark._jvm.org.apache.iceberg.Version.getVersion()
+# logger.info(f"ICEBERG VERSION: {iceberg_version}")
+logger.info(f"SPARK CONTEXT CONFIG: {spark.sparkContext.getConf().getAll()}")
+logger.info(f'SPARK SQL EXTENSIONS: {spark.conf.get("spark.sql.extensions", "NOT SET")}')
+
+sort_order = f"""ALTER TABLE `{args['catalog']}`.{args['database']}.{args['table']} WRITE ORDERED BY {args['order_col']} {args['order']}"""
 z_sort = f"""ALTER TABLE {args['database']}.{args['table']} WRITE ORDERED BY {args['order_cols']}"""
 remove_sort_order = f"""ALTER TABLE {args['database']}.{args['table']} WRITE UNORDERED"""
+
+# spark.sql(f"""
+# EXPLAIN EXTENDED
+# ALTER TABLE {args['database']}.{args['table']}
+# WRITE ORDERED BY {args['order_col']} ASC
+# """).show(truncate=False)
 
 try:
     logger.info("Attempting to apply sort order...")
