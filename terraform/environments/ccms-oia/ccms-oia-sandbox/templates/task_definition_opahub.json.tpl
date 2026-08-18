@@ -58,7 +58,7 @@
       },
       {
         "name": "ADMINISTRATION_PORT_ENABLED",
-        "value": "false"
+        "value": "true"
       },
       {
         "name": "CREATE_DATABASE",
