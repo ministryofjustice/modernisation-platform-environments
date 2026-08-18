@@ -70,6 +70,26 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opa_ingress" {
   description                  = "Allow ALB to reach ECS app port"
 }
 
+resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opa_ingress" {
+  security_group_id            = aws_security_group.ecs_tasks_opa.id
+  referenced_security_group_id = aws_security_group.opahub_load_balancer.id
+  ip_protocol                  = "tcp"
+  from_port                    = local.application_data.accounts[local.environment].opa_ssl_port
+  to_port                      = local.application_data.accounts[local.environment].opa_ssl_port
+  description                  = "Allow ALB to reach ECS app port"
+}
+
+
+resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opa_ingress" {
+  security_group_id            = aws_security_group.ecs_tasks_opa.id
+  referenced_security_group_id = aws_security_group.opahub_load_balancer.id
+  ip_protocol                  = "tcp"
+  from_port                    = local.application_data.accounts[local.environment].opa_health_check_port
+  to_port                      = local.application_data.accounts[local.environment].opa_health_check_port
+  description                  = "Allow ALB to reach ECS app port"
+}
+
+
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opa_egress_all" {
   security_group_id = aws_security_group.ecs_tasks_opa.id
   cidr_ipv4         = "0.0.0.0/0"
@@ -104,6 +124,16 @@ resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_workspaces" {
 resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_ec2" {
   security_group_id            = aws_security_group.opahub_db.id
   referenced_security_group_id = aws_security_group.cluster_ec2.id
+  ip_protocol                  = "tcp"
+  from_port                    = 3306
+  to_port                      = 3306
+  description                  = "Allow MySQL access from ECS Cluster EC2s"
+}
+
+# Ingress from ECS Cluster EC2s
+resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_ecs" {
+  security_group_id            = aws_security_group.opahub_db.id
+  referenced_security_group_id = aws_security_group.ecs_tasks_opa.id
   ip_protocol                  = "tcp"
   from_port                    = 3306
   to_port                      = 3306
