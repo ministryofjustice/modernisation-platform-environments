@@ -32,8 +32,8 @@ logger.info(f"SPARK CONTEXT CONFIG: {spark.sparkContext.getConf().getAll()}")
 logger.info(f'SPARK SQL EXTENSIONS: {spark.conf.get("spark.sql.extensions", "NOT SET")}')
 
 sort_order = f"""ALTER TABLE `{args['catalog']}`.{args['database']}.{args['table']} WRITE ORDERED BY {args['order_col']} {args['order']}"""
-z_sort = f"""ALTER TABLE {args['database']}.{args['table']} WRITE ORDERED BY {args['order_cols']}"""
-remove_sort_order = f"""ALTER TABLE {args['database']}.{args['table']} WRITE UNORDERED"""
+z_sort = f"""ALTER TABLE `{args['catalog']}`.{args['database']}.{args['table']} WRITE ORDERED BY {args['order_cols']}"""
+remove_sort_order = f"""ALTER TABLE `{args['catalog']}`.{args['database']}.{args['table']} WRITE UNORDERED"""
 
 # spark.sql(f"""
 # EXPLAIN EXTENDED
