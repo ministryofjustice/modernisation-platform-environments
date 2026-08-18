@@ -163,7 +163,7 @@ data "aws_iam_policy_document" "log_bucket_policy" {
       identifiers = ["logging.s3.amazonaws.com"]
     }
 
-    actions =ç
+    actions = ["s3:PutObject"]
     resources = ["${module.s3-logging-bucket.bucket.arn}/*"]
 
     condition {
