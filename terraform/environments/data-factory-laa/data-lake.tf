@@ -1,6 +1,6 @@
 locals {
   name      = "laa-data-factory"
-  databases = ["raw", "processedraw", "staging", "intermediate", "datamarts", "derived"]
+  databases = ["aws-athena-query-results", "raw", "processedraw", "staging", "intermediate", "datamarts", "derived"]
   environments = {
     development = {
       lakeformation_admins = [
@@ -84,9 +84,9 @@ resource "aws_kms_alias" "data_lake_kms_alias" {
 
 module "data_lake_buckets" {
   for_each = toset(local.databases)
-  source   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=ccc457c"
+  source   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=4f72896323ec7f06e293f1f75732549b3248f841"
 
-  bucket_prefix       = "${local.name}-${each.key}"
+  bucket_prefix       = each.key == "aws-athena-query-results" ? "aws-athena-query-results" : "${local.name}-${each.key}"
   bucket_namespace    = "account-regional"
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
