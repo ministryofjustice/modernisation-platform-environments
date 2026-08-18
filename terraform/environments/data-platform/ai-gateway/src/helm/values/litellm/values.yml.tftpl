@@ -88,7 +88,7 @@ proxy_config:
       budget_duration: 30d
       models: []
   router_settings:
-    routing_strategy: simple-shuffle
+    routing_strategy: cost-based-routing
     redis_host: os.environ/primary_endpoint_address
     redis_port: 6379
     redis_password: os.environ/auth_token

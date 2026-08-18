@@ -83,7 +83,7 @@ proxy_config:
       port: 6379
       password: os.environ/auth_token
   router_settings:
-    routing_strategy: simple-shuffle
+    routing_strategy: cost-based-routing
     redis_host: os.environ/primary_endpoint_address
     redis_port: 6379
     redis_password: os.environ/auth_token

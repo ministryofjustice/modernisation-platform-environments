@@ -98,6 +98,8 @@ models:
       model_name: "Anthropic Claude Opus 4.8 (EU)"
       region: eu-west-2
       generally_available: true
+      # Opt-in: shares a public model_name with the Azure claude-opus-4-8 deployment for cost-based routing.
+      shared_model_name: "claude-opus-4-8"
     claude-opus-5:
       model_id: eu.anthropic.claude-opus-5
       model_family: "Anthropic Claude"
@@ -344,6 +346,8 @@ models:
       model_endpoint: "anthropic"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
+      # Opt-in: shares a public model_name with the Bedrock claude-opus-4-8 deployment for cost-based routing.
+      shared_model_name: "claude-opus-4-8"
     claude-opus-5:
       model_id: "claude-opus-5"
       model_family: "Anthropic Claude"

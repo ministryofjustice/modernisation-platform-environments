@@ -2,7 +2,7 @@ resource "litellm_model" "amazon_bedrock" {
   for_each = try(local.ai_gateway_models_filtered.amazon_bedrock, {})
 
   custom_llm_provider = "bedrock"
-  model_name          = "bedrock-${each.key}"
+  model_name          = try(each.value.shared_model_name, "bedrock-${each.key}")
   base_model          = each.value.model_id
   tier                = "paid"
 
@@ -57,7 +57,7 @@ resource "litellm_model" "microsoft_foundry" {
   for_each = try(local.ai_gateway_models_filtered.microsoft_foundry, {})
 
   custom_llm_provider = each.value.model_provider
-  model_name          = "azure-${each.key}"
+  model_name          = try(each.value.shared_model_name, "azure-${each.key}")
   base_model          = each.value.model_id
   tier                = "paid"
 

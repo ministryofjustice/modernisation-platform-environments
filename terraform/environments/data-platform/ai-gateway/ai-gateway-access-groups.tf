@@ -22,7 +22,8 @@ resource "litellm_unified_access_group" "microsoft_foundry" {
 resource "litellm_unified_access_group" "generally_available_models" {
   access_group_name = "generally-available-models"
 
-  access_model_names = concat(
+  # distinct(): a shared_model_name can make a model appear in more than one provider loop below.
+  access_model_names = distinct(concat(
     [
       for key in sort(keys(litellm_model.amazon_bedrock)) :
       litellm_model.amazon_bedrock[key].model_name
@@ -38,5 +39,5 @@ resource "litellm_unified_access_group" "generally_available_models" {
       litellm_model.microsoft_foundry[key].model_name
       if try(local.ai_gateway_models_filtered.microsoft_foundry[key].generally_available, false)
     ]
-  )
+  ))
 }
