@@ -1,4 +1,3 @@
-
 """Apply a sort_order to an Iceberg table to allow sort compaction."""
 import sys
 from awsglue.utils import getResolvedOptions
@@ -24,9 +23,9 @@ logger = glue_context.get_logger()
 
 spark = glue_context.spark_session
 
-sort_order = f"""ALTER TABLE "{args['database']}"."{args['table']}" WRITE ORDERED BY {args['order_col']};"""
-z_sort = f"""ALTER TABLE "{args['database']}"."{args['table']}" WRITE ORDERED BY {args['order_cols']};"""
-remove_sort_order = f"""ALTER TABLE "{args['database']}"."{args['table']}" WRITE UNORDERED;"""
+sort_order = f"""ALTER TABLE {args['database']}.{args['table']} WRITE ORDERED BY {args['order_col']} {args['order']}"""
+z_sort = f"""ALTER TABLE {args['database']}.{args['table']} WRITE ORDERED BY {args['order_cols']}"""
+remove_sort_order = f"""ALTER TABLE {args['database']}.{args['table']} WRITE UNORDERED"""
 
 try:
     logger.info("Attempting to apply sort order...")
