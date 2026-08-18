@@ -10,7 +10,7 @@ module "web_alb" {
   access_logs_bucket = aws_s3_bucket.alb_access_logs.bucket
   certificate_arn    = null # placeholder: normally sourced from core-vpc strategic public SSL outputs
 
-  target_group_name = "london-unpaid-work-web-target-group"
+  target_group_name = "london-unpaid-work-web-http"
   target_group_port = 80
   healthcheck_path  = "/index.html"
 }
@@ -27,7 +27,7 @@ module "api_alb" {
   access_logs_bucket = aws_s3_bucket.alb_access_logs.bucket
   certificate_arn    = null # placeholder: normally sourced from core-vpc strategic public SSL outputs
 
-  target_group_name = "london-unpaid-work-api-target-group"
+  target_group_name = "london-unpaid-work-api-http"
   target_group_port = 80
   healthcheck_path  = "/karma.html" # legacy API health check path
 }
