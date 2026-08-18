@@ -38,15 +38,15 @@ resource "aws_security_group" "alb_sg" {
     }
   }
 
-  dynamic "ingress" {
-    for_each = local.mp_natgw_ips
-    content {
-      from_port   = 80
-      to_port     = 80
-      protocol    = "tcp"
-      cidr_blocks = [ingress.value]
-    }
-  }
+  # dynamic "ingress" {
+  #   for_each = local.mp_natgw_ips
+  #   content {
+  #     from_port   = 80
+  #     to_port     = 80
+  #     protocol    = "tcp"
+  #     cidr_blocks = [ingress.value]
+  #   }
+  # }
 
   dynamic "ingress" {
     for_each = local.mp_natgw_ips
@@ -70,31 +70,31 @@ resource "aws_security_group" "alb_sg" {
   tags = merge(local.tags, { Name = "alb-sg"})
 }
 
-resource "aws_vpc_security_group_ingress_rule" "alb_http_private" {
-  for_each = local.account_config.private_subnet_ips
+# resource "aws_vpc_security_group_ingress_rule" "alb_http_private" {
+#   for_each = local.account_config.private_subnet_ips
 
-  description       = "Allow HTTP in: ${each.value}"
-  security_group_id = aws_security_group.alb_sg.id
+#   description       = "Allow HTTP in: ${each.value}"
+#   security_group_id = aws_security_group.alb_sg.id
 
-  ip_protocol = "tcp"
-  from_port   = 80
-  to_port     = 80
+#   ip_protocol = "tcp"
+#   from_port   = 80
+#   to_port     = 80
 
-  cidr_ipv4 = each.value
-}
+#   cidr_ipv4 = each.value
+# }
 
-resource "aws_vpc_security_group_ingress_rule" "alb_https_private" {
-  for_each = local.account_config.private_subnet_ips
+# resource "aws_vpc_security_group_ingress_rule" "alb_https_private" {
+#   for_each = local.account_config.private_subnet_ips
 
-  description = "Allow HTTPS in: ${each.value}"
-  security_group_id = aws_security_group.alb_sg.id
+#   description = "Allow HTTPS in: ${each.value}"
+#   security_group_id = aws_security_group.alb_sg.id
 
-  ip_protocol = "tcp"
-  from_port   = 443
-  to_port     = 443
+#   ip_protocol = "tcp"
+#   from_port   = 443
+#   to_port     = 443
 
-  cidr_ipv4 = each.value
-}
+#   cidr_ipv4 = each.value
+# }
 
 resource "aws_security_group_rule" "ecs_from_alb" {
   type                     = "ingress"

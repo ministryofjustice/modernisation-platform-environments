@@ -38,58 +38,6 @@ resource "aws_lb" "frontend" {
   tags = local.tags
 }
 
-# HTTP Listener
-# resource "aws_lb_listener" "frontend_http" {
-#   load_balancer_arn = aws_lb.frontend.arn
-
-#   port     = 80
-#   protocol = "HTTP"
-
-#   # Anything that doesn't match the NAT Gateway rule gets rejected.
-#   default_action {
-#     type = "fixed-response"
-
-#     fixed_response {
-#       content_type = "text/plain"
-#       message_body = "Forbidden"
-#       status_code  = "403"
-#     }
-#   }
-# }
-
-# resource "aws_lb_listener_rule" "http_redirect" {
-#   listener_arn = aws_lb_listener.frontend_http.arn
-#   priority     = 100
-
-#   action {
-#     type = "redirect"
-
-#     redirect {
-#       protocol    = "HTTPS"
-#       port        = "443"
-#       host        = "#{host}"
-#       path        = "/#{path}"
-#       query       = "#{query}"
-#       status_code = "HTTP_301"
-#     }
-#   }
-
-#   condition {
-#     source_ip {
-#       values = local.mp_natgw_ips
-#     }
-#   }
-
-#   condition {
-#     host_header {
-#       values = [
-#         "www.dev.victim-case-management.service.justice.gov.uk"
-#       ]
-#     }
-#   }
-# }
-
-
 # HTTPS Listener
 resource "aws_lb_listener" "frontend_https" {
   load_balancer_arn = aws_lb.frontend.arn
@@ -103,25 +51,3 @@ resource "aws_lb_listener" "frontend_https" {
     target_group_arn = aws_lb_target_group.frontend.arn
   }
 }
-
-# Legacy Redirect Rule
-# resource "aws_lb_listener_rule" "legacy_redirect" {
-#   listener_arn = aws_lb_listener.frontend_https.arn
-#   priority     = 100
-
-#   action {
-#     type = "redirect"
-#     redirect {
-#       host        = "vcms.hmpps-development.modernisation-platform.service.justice.gov.uk"
-#       port        = "443"
-#       protocol    = "HTTPS"
-#       status_code = "HTTP_301"
-#     }
-#   }
-
-#   condition {
-#     host_header {
-#       values = ["www.dev.victim-case-management.service.justice.gov.uk"]
-#     }
-#   }
-# }
