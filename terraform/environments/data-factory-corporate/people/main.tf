@@ -12,6 +12,8 @@ resource "aws_secretsmanager_secret" "external_account" {
   }
 }
 
+
+
 module "sherlock_kms_key" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git//?ref=496d8bd559afebb43b78af0034ec74d8b32378ca"
 
@@ -140,4 +142,43 @@ module "assume_iam_role" {
   tags = {
   }
 
+}
+
+
+resource "aws_iam_role" "assume_external_role" {
+  name = "datafactory_assume_external_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [{
+      Effect = "Allow"
+
+      Principal = {
+        AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+      }
+
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+data "aws_iam_policy_document" "allow_assume_external_role" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "sts:AssumeRole"
+    ]
+
+    resources = [
+      "arn:aws:iam::${data.aws_secretsmanager_secret_version.external_account_id.secret_string}:role/datafactory_dev_assume_role"
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "allow_assume_external_role" {
+  name   = "allow-assume-external-role"
+  role   = aws_iam_role.assume_external_role.name
+  policy = data.aws_iam_policy_document.allow_assume_external_role.json
 }
