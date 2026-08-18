@@ -287,7 +287,8 @@ data "aws_iam_policy_document" "apply_sort_order" {
     sid    = "S3BucketPermissions"
     effect = "Allow"
     actions = [
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:GetObject",
     ]
     resources = [module.s3-create-a-derived-table-bucket.bucket.arn]
   }
@@ -316,8 +317,16 @@ data "aws_iam_policy_document" "apply_sort_order" {
     ]
     resources = ["*"]
   }
+  statement {
+    sid    = "GlueCatalogAccess"
+    effect = "Allow"
+    actions = [
+      "glue:Get*",
+      "glue:Create*",
+      "glue:Update*"
+    ]
+    resources = ["*"]
 }
-
 resource "aws_iam_role_policy" "apply_sort_order_iam_role_policy" {
   name   = "apply-sort-order-iam-role-policy"
   role   = aws_iam_role.apply_sort_order_iam_role.name
