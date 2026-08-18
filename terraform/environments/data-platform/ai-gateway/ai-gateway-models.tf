@@ -2,7 +2,7 @@ resource "litellm_model" "amazon_bedrock" {
   for_each = try(local.ai_gateway_models_filtered.amazon_bedrock, {})
 
   custom_llm_provider = "bedrock"
-  model_name          = try(each.value.shared_model_name, "bedrock-${each.key}")
+  model_name          = "bedrock-${each.key}"
   base_model          = each.value.model_id
   tier                = "paid"
 
@@ -57,7 +57,61 @@ resource "litellm_model" "microsoft_foundry" {
   for_each = try(local.ai_gateway_models_filtered.microsoft_foundry, {})
 
   custom_llm_provider = each.value.model_provider
-  model_name          = try(each.value.shared_model_name, "azure-${each.key}")
+  model_name          = "azure-${each.key}"
+  base_model          = each.value.model_id
+  tier                = "paid"
+
+  model_api_base = can(each.value.model_endpoint) ? "${jsondecode(data.aws_secretsmanager_secret_version.microsoft_foundry_jedi_gateway.secret_string)["endpoint"]}/${each.value.model_endpoint}" : jsondecode(data.aws_secretsmanager_secret_version.microsoft_foundry_jedi_gateway.secret_string)["endpoint"]
+  api_version    = try(each.value.model_api_version, each.value.model_provider == "azure" ? "v1" : null)
+
+  additional_litellm_params = {
+    ai_model_provider            = "Microsoft Foundry"
+    ai_model_family              = each.value.model_family
+    ai_model_name                = each.value.model_name
+    ai_model_generally_available = each.value.generally_available
+    additional_drop_params       = "[\"ai_model_provider\",\"ai_model_family\",\"ai_model_name\",\"ai_model_generally_available\"]"
+  }
+
+  depends_on = [
+    helm_release.ai_gateway_configuration,
+    helm_release.litellm,
+    helm_release.litellm_admin
+  ]
+}
+
+# Opt-in second registration of the same deployment under a shared public alias, so LiteLLM's
+# cost-based router can pick between providers. The provider-specific model above is untouched.
+resource "litellm_model" "amazon_bedrock_shared" {
+  for_each = { for key, model in try(local.ai_gateway_models_filtered.amazon_bedrock, {}) : key => model if can(model.shared_model_name) }
+
+  custom_llm_provider = "bedrock"
+  model_name          = each.value.shared_model_name
+  base_model          = each.value.model_id
+  tier                = "paid"
+
+  aws_region_name = each.value.region
+  aws_role_name   = can(each.value.aws_role_name) ? "arn:aws:iam::${local.environment_management.account_ids[each.value.aws_account_name]}:role/${each.value.aws_role_name}" : module.iam_role.arn
+
+  additional_litellm_params = {
+    ai_model_provider            = try(each.value.model_provider, "Amazon Bedrock")
+    ai_model_family              = each.value.model_family
+    ai_model_name                = each.value.model_name
+    ai_model_generally_available = each.value.generally_available
+    additional_drop_params       = "[\"ai_model_provider\",\"ai_model_family\",\"ai_model_name\",\"ai_model_generally_available\"]"
+  }
+
+  depends_on = [
+    helm_release.ai_gateway_configuration,
+    helm_release.litellm,
+    helm_release.litellm_admin
+  ]
+}
+
+resource "litellm_model" "microsoft_foundry_shared" {
+  for_each = { for key, model in try(local.ai_gateway_models_filtered.microsoft_foundry, {}) : key => model if can(model.shared_model_name) }
+
+  custom_llm_provider = each.value.model_provider
+  model_name          = each.value.shared_model_name
   base_model          = each.value.model_id
   tier                = "paid"
 
