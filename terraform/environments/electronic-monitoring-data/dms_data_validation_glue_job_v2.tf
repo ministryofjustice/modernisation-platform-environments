@@ -913,10 +913,13 @@ resource "aws_glue_job" "apply_sort_order" {
     "--datalake-formats"                 = "iceberg"
     "--conf"                             = <<EOF
 spark.sql.extensions=org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions 
---conf spark.sql.catalog.glue_catalog=org.apache.iceberg.spark.SparkCatalog
+--conf spark.sql.catalog.spark_catalog=org.apache.iceberg.spark.SparkSessionCatalog
 --conf spark.sql.catalog.glue_catalog.catalog-impl=org.apache.iceberg.aws.glue.GlueCatalog 
 --conf spark.sql.catalog.glue_catalog.io-impl=org.apache.iceberg.aws.s3.S3FileIO
---conf spark.sql.catalog.glue_catalog.warehouse=s3:/${module.s3-create-a-derived-table-bucket.bucket.arn}/data/${local.environment_shorthand}/*",
+--conf spark.sql.catalog.spark_catalog.warehouse=s3:/${module.s3-create-a-derived-table-bucket.bucket.arn}/data/${local.environment_shorthand}/*",
+--conf spark.sql.catalog.spark_catalog.glue.endpoint=https://glue.${data.aws_region.current.name}.amazonaws.com
+--conf spark.sql.catalog.spark_catalog.glue.account-id="${local.env_account_id}"
+--conf spark.sql.catalog.spark_catalog.client.region=${data.aws_region.current.name} 
 EOF
 
   }
