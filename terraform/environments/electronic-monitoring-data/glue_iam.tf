@@ -281,7 +281,7 @@ data "aws_iam_policy_document" "apply_sort_order" {
     resources = [
       "${module.s3-create-a-derived-table-bucket.bucket.arn}/data/dev/models/domain_name=staged/table_name=event/*",
       "${module.s3-glue-job-script-bucket.bucket.arn}/*"
-      ]
+    ]
   }
   statement {
     sid    = "S3BucketPermissions"
@@ -326,6 +326,7 @@ data "aws_iam_policy_document" "apply_sort_order" {
       "glue:Update*"
     ]
     resources = ["*"]
+  }
 }
 resource "aws_iam_role_policy" "apply_sort_order_iam_role_policy" {
   name   = "apply-sort-order-iam-role-policy"
