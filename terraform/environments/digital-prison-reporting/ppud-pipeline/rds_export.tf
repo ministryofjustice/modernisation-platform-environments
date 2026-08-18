@@ -87,10 +87,10 @@ module "ppud_rds_export" {
 
 }
 
-# # Create a resource to subscribe to SNS topic
-# # for Slack notifications
-# resource "aws_sns_topic_subscription" "sfn_events" {
-#   topic_arn = module.ppud_rds_export.sns_topic_arn
-#   protocol  = "https"
-#   endpoint  = module.ppud_slack_webhook.secret_string
-# }
+# Create a resource to subscribe to SNS topic
+# for Slack notifications
+resource "aws_sns_topic_subscription" "sfn_events" {
+  topic_arn = module.ppud_rds_export.sns_topic_arn
+  protocol  = "https"
+  endpoint  = data.aws_secretsmanager_secret_version.ppud_slack_webhook.secret_string
+}
