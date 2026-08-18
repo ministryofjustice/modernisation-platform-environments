@@ -916,6 +916,7 @@ spark.sql.extensions=org.apache.iceberg.spark.extensions.IcebergSparkSessionExte
 --conf spark.sql.catalog.glue_catalog=org.apache.iceberg.spark.SparkCatalog
 --conf spark.sql.catalog.glue_catalog.catalog-impl=org.apache.iceberg.aws.glue.GlueCatalog 
 --conf spark.sql.catalog.glue_catalog.io-impl=org.apache.iceberg.aws.s3.S3FileIO
+--conf spark.sql.catalog.glue_catalog.warehouse=s3:/${module.s3-create-a-derived-table-bucket.bucket.arn}/data/${local.environment_shorthand}/*",
 EOF
 
   }
