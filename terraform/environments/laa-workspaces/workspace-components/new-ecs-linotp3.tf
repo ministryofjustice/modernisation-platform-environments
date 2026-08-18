@@ -48,47 +48,10 @@ resource "aws_security_group" "ecs_linotp3" {
   count = local.environment == "development" ? 1 : 0
 
   name_prefix = "${local.application_name}-${local.environment}-ecs-linotp3-"
-  description = "ECS Fargate tasks: LinOTP 3.x (port 80) + FreeRADIUS (1812/1813 UDP)"
+  description = "ECS Fargate tasks: LinOTP 3.x (port 5000) + FreeRADIUS (1812/1813 UDP)"
   vpc_id      = aws_vpc.workspaces[0].id
 
-  ingress {
-    description     = "LinOTP HTTP from ALB"
-    from_port       = 5000
-    to_port         = 5000
-    protocol        = "tcp"
-    security_groups = [aws_security_group.radius_alb[0].id]
-  }
-
-  ingress {
-    description = "LinOTP HTTP from NLB (health checks)"
-    from_port   = 5000
-    to_port     = 5000
-    protocol    = "tcp"
-    cidr_blocks = [aws_vpc.workspaces[0].cidr_block]
-  }
-
-  ingress {
-    description = "RADIUS auth from VPC"
-    from_port   = 1812
-    to_port     = 1812
-    protocol    = "udp"
-    cidr_blocks = [aws_vpc.workspaces[0].cidr_block]
-  }
-
-  ingress {
-    description = "RADIUS accounting from VPC"
-    from_port   = 1813
-    to_port     = 1813
-    protocol    = "udp"
-    cidr_blocks = [aws_vpc.workspaces[0].cidr_block]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  revoke_rules_on_delete = true
 
   lifecycle {
     create_before_destroy = true
@@ -98,6 +61,66 @@ resource "aws_security_group" "ecs_linotp3" {
     local.tags,
     { "Name" = "${local.application_name}-${local.environment}-ecs-linotp3" }
   )
+}
+
+resource "aws_security_group_rule" "ecs_linotp3_ingress_alb" {
+  count = local.environment == "development" ? 1 : 0
+
+  type                     = "ingress"
+  security_group_id        = aws_security_group.ecs_linotp3[0].id
+  from_port                = 5000
+  to_port                  = 5000
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.radius_alb[0].id
+  description              = "LinOTP HTTP from ALB"
+}
+
+resource "aws_security_group_rule" "ecs_linotp3_ingress_nlb_healthcheck" {
+  count = local.environment == "development" ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ecs_linotp3[0].id
+  from_port         = 5000
+  to_port           = 5000
+  protocol          = "tcp"
+  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
+  description       = "LinOTP HTTP from NLB (health checks)"
+}
+
+resource "aws_security_group_rule" "ecs_linotp3_ingress_radius_auth" {
+  count = local.environment == "development" ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ecs_linotp3[0].id
+  from_port         = 1812
+  to_port           = 1812
+  protocol          = "udp"
+  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
+  description       = "RADIUS auth from VPC"
+}
+
+resource "aws_security_group_rule" "ecs_linotp3_ingress_radius_accounting" {
+  count = local.environment == "development" ? 1 : 0
+
+  type              = "ingress"
+  security_group_id = aws_security_group.ecs_linotp3[0].id
+  from_port         = 1813
+  to_port           = 1813
+  protocol          = "udp"
+  cidr_blocks       = [aws_vpc.workspaces[0].cidr_block]
+  description       = "RADIUS accounting from VPC"
+}
+
+resource "aws_security_group_rule" "ecs_linotp3_egress_all" {
+  count = local.environment == "development" ? 1 : 0
+
+  type              = "egress"
+  security_group_id = aws_security_group.ecs_linotp3[0].id
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Allow all outbound traffic"
 }
 
 ##############################################

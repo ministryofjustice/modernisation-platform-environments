@@ -10,7 +10,7 @@ locals {
 }
 
 module "external_dns" {
-  source = "github.com/ministryofjustice/container-platform-terraform-external-dns?ref=1.1.0"
+  source = "github.com/ministryofjustice/container-platform-terraform-external-dns?ref=1eb83cb5fe74482ca4dc2caad313a53c0e7a4e6b" #1.1.0
 
   eks_cluster_name = local.cluster_name
 
@@ -25,6 +25,12 @@ module "external_dns" {
       domain_name_prefix      = "preproduction"
       sync_interval           = local.sync_interval.development
       aws_zone_cache_duration = local.aws_zone_cache_duration.development
+      log_level               = "info"
+    }
+    cloud-platform-nonlive = {
+      domain_name_prefix      = "nonlive"
+      sync_interval           = local.sync_interval.production
+      aws_zone_cache_duration = local.aws_zone_cache_duration.production
       log_level               = "info"
     }
     cloud-platform-live = {
@@ -65,6 +71,18 @@ module "external_dns" {
     }
     container-platform-hmpps-live = {
       domain_name_prefix      = "hmpps-live"
+      sync_interval           = local.sync_interval.production
+      aws_zone_cache_duration = local.aws_zone_cache_duration.production
+      log_level               = "info"
+    }
+    container-platform-cd-nonlive = {
+      domain_name_prefix      = "cd-nonlive"
+      sync_interval           = local.sync_interval.production
+      aws_zone_cache_duration = local.aws_zone_cache_duration.production
+      log_level               = "info"
+    }
+    container-platform-cd-live = {
+      domain_name_prefix      = "cd-live"
       sync_interval           = local.sync_interval.production
       aws_zone_cache_duration = local.aws_zone_cache_duration.production
       log_level               = "info"

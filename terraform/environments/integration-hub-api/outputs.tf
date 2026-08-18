@@ -52,6 +52,21 @@ output "app_deploy_role_arn" {
   value       = aws_iam_role.app_deploy.arn
 }
 
+output "observability_dashboard_name" {
+  description = "CloudWatch dashboard name for API platform operational monitoring"
+  value       = aws_cloudwatch_dashboard.api_platform.dashboard_name
+}
+
+output "observability_high_priority_topic_arn" {
+  description = "SNS topic ARN for high priority API platform alarms"
+  value       = local.enable_alerting ? data.aws_sns_topic.mft_cloudwatch_alarms_high_priority[0].arn : null
+}
+
+output "observability_low_priority_topic_arn" {
+  description = "SNS topic ARN for low priority API platform alarms"
+  value       = local.enable_alerting ? data.aws_sns_topic.mft_cloudwatch_alarms_low_priority[0].arn : null
+}
+
 output "user_auth_secret_names" {
   description = "HTTPS upload credential secret names keyed by username"
   value = {

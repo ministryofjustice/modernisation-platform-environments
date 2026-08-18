@@ -125,6 +125,42 @@ module "iceberg_table_maintenance_step_function" {
   type = "STANDARD"
 }
 
+# ------------------------------------------
+# Merge into staged position step function
+# ------------------------------------------
+
+module "merge_into_mdss_staged_position" {
+  source       = "./modules/merge_into_reconciler"
+  function_to_iterate = module.merge_mdss_staged_position[0]
+}
+
+# ------------------------------------------
+# Merge into staged event step function
+# ------------------------------------------
+
+module "merge_into_mdss_staged_event" {
+  source       = "./modules/merge_into_reconciler"
+  function_to_iterate = module.merge_mdss_staged_event[0]
+}
+
+# ------------------------------------------
+# Merge into emdi position step function
+# ------------------------------------------
+
+module "merge_into_emdi_position" {
+  source       = "./modules/merge_into_reconciler"
+  function_to_iterate = module.merge_emdi_position[0]
+}
+
+# ------------------------------------------
+# Merge into ac position step function
+# ------------------------------------------
+
+module "merge_into_mdss_ac_position" {
+  source       = "./modules/merge_into_reconciler"
+  function_to_iterate = module.merge_ac_position[0]
+}
+
 # ------------------------------------------------------------------------------
 # Staging DB janitor Step Function
 # ------------------------------------------------------------------------------
@@ -355,8 +391,20 @@ resource "aws_sfn_state_machine" "landing_dlq_redriver" {
   })
 }
 
-resource "aws_cloudwatch_event_target" "landing_dlq_redriver" {
-  rule     = aws_cloudwatch_event_rule.alarm_state_change_threader.name
-  arn      = aws_sfn_state_machine.landing_dlq_redriver.arn
-  role_arn = aws_iam_role.landing_dlq_redriver_eventbridge.arn
+# ------------------------------------------
+# Trigger cadt Step funtion
+# ------------------------------------------
+
+module "trigger_cadt_step_function" {
+  source       = "./modules/step_function"
+  name         = "trigger-create-a-derived-table"
+  iam_policies = tomap({ "trigger_cadt_step_function_policy" = aws_iam_policy.trigger_cadt_step_function_policy })
+  variable_dictionary = tomap(
+    {
+      "trigger_cadt"  = module.trigger_cadt.lambda_function_name,
+      "environment"   = local.environment,
+      "poll_cadt"     = module.poll_cadt.lambda_function_name,
+    }
+  )
+  type = "STANDARD"
 }

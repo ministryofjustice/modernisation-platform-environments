@@ -271,12 +271,13 @@ locals {
           ])
         })
         ebs_volumes = {
-          "/dev/sdb" = { label = "app", size = 200 }  # /u01
-          "/dev/sdc" = { label = "app", size = 1000 } # /u02
-          "/dev/sde" = { label = "data", size = 3000, iops = 12000, throughput = 750 }
-          "/dev/sdf" = { label = "data", size = 3000, iops = 12000, throughput = 750 }
-          "/dev/sdj" = { label = "flash", size = 1000, iops = 5000, throughput = 500 }
-          "/dev/sds" = { label = "swap", size = 2 }
+          "/dev/sdb" = { label = "app", type = "gp3", size = 200 }                                   # /u01
+          "/dev/sdc" = { label = "app", type = "gp3", size = 1000 }                                  # /u02
+          "/dev/sde" = { label = "data", type = "gp3", size = 3000, iops = 12000, throughput = 750 } # 3000 hits partition OS limit
+          "/dev/sdf" = { label = "data", type = "gp3", size = 3000, iops = 12000, throughput = 750 }
+          "/dev/sdg" = { label = "data", type = "gp3", size = 2000, iops = 12000, throughput = 750 }
+          "/dev/sdj" = { label = "flash", type = "gp3", size = 1000, iops = 5000, throughput = 500 }
+          "/dev/sds" = { label = "swap", type = "gp3", size = 2 }
         }
         instance = merge(local.ec2_instances.db19c.instance, {
           disable_api_termination = true
@@ -306,12 +307,13 @@ locals {
           ])
         })
         ebs_volumes = {
-          "/dev/sdb" = { label = "app", size = 200 }  # /u01
-          "/dev/sdc" = { label = "app", size = 1000 } # /u02
-          "/dev/sde" = { label = "data", size = 3000, iops = 12000, throughput = 750 }
-          "/dev/sdf" = { label = "data", size = 3000, iops = 12000, throughput = 750 }
-          "/dev/sdj" = { label = "flash", size = 1000, iops = 5000, throughput = 500 }
-          "/dev/sds" = { label = "swap", size = 2 }
+          "/dev/sdb" = { label = "app", type = "gp3", size = 200 }                                   # /u01
+          "/dev/sdc" = { label = "app", type = "gp3", size = 1000 }                                  # /u02
+          "/dev/sde" = { label = "data", type = "gp3", size = 3000, iops = 12000, throughput = 750 } # 3000 hits partition OS limit
+          "/dev/sdf" = { label = "data", type = "gp3", size = 3000, iops = 12000, throughput = 750 }
+          "/dev/sdg" = { label = "data", type = "gp3", size = 2000, iops = 12000, throughput = 750 }
+          "/dev/sdj" = { label = "flash", type = "gp3", size = 1000, iops = 5000, throughput = 500 }
+          "/dev/sds" = { label = "swap", type = "gp3", size = 2 }
         }
         instance = merge(local.ec2_instances.db19c.instance, {
           disable_api_termination = true

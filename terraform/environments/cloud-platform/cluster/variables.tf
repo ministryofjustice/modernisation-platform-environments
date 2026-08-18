@@ -19,9 +19,10 @@ variable "enable_argocd" {
 }
 
 variable "argocd_idc_instance_arn" {
-  type        = string
-  default     = "" # Set to your org's IAM Identity Center instance ARN
-  description = "ARN of the AWS IAM Identity Center instance for Argo CD authentication. Required when enable_argocd is true."
+  type = string
+  # Org-wide IAM Identity Center instance — the same ARN across all MoJ accounts.
+  default     = "arn:aws:sso:::instance/ssoins-7535d9af4f41fb26"
+  description = "ARN of the AWS IAM Identity Center instance for Argo CD authentication. Required when enable_argocd is true. Defaults to the org-wide IDC instance."
 }
 
 variable "argocd_idc_region" {
@@ -30,19 +31,27 @@ variable "argocd_idc_region" {
   description = "Region of the IAM Identity Center instance."
 }
 
-variable "argocd_rbac_admin_identities" {
-  type = list(object({
+variable "argocd_rbac_role_mappings" {
+  type = map(list(object({
     id   = string
     type = string
-  }))
-  default     = []
-  description = "List of Identity Center identities (SSO_USER or SSO_GROUP) to grant ADMIN role in Argo CD."
+  })))
+  default     = {}
+  description = <<-EOT
+    Additional RBAC role mappings for ArgoCD beyond the admin group.
+    Keys: ADMIN, EDITOR, VIEWER. Values: list of IDC identity objects.
+    Used to grant BU teams access to the ArgoCD UI.
+    Example: { VIEWER = [{ id = "hmpps-sre-group-id", type = "SSO_GROUP" }] }
+  EOT
 }
 
-variable "argocd_codeconnection_arn" {
+#------------------------------------------------------------------------------
+# Argo CD Spoke Registration (ADR-002 — Spoke-Driven Model)
+
+variable "argocd_hub_spoke_access_role_arn" {
   type        = string
   default     = ""
-  description = "AWS CodeConnections ARN for GitHub repository access from Argo CD."
+  description = "Override for the hub cluster's ArgoCD spoke-access IAM role ARN. Leave empty for permanent hubs (development/production) — the ARN is resolved by convention from local.argocd_hubs. Set this only for ephemeral/test hubs, passed as a workflow input when launching the cluster."
 }
 
 resource "null_resource" "created_by_tag" {

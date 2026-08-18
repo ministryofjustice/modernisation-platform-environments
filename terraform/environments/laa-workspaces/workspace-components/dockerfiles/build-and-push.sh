@@ -35,7 +35,7 @@ aws ecr get-login-password --region ${AWS_REGION} --profile ${AWS_PROFILE} \
 # Build LinOTP
 echo -e "\n${GREEN}Building LinOTP image...${NC}"
 cd linotp3 || exit 1
-docker build --platform linux/amd64 -t laa-workspaces/linotp3:latest . || exit 1
+docker build --platform linux/amd64 -f Dockerfile.opensource -t laa-workspaces/linotp3:latest . || exit 1
 echo -e "${GREEN}✓ LinOTP image built${NC}"
 
 # Build FreeRADIUS
@@ -75,6 +75,4 @@ echo -e "${YELLOW}ECR will automatically scan the images (takes 5-10 minutes)${N
 echo ""
 echo "Check scan results:"
 echo "  aws ecr describe-image-scan-findings --repository-name laa-workspaces/linotp3 --image-id imageTag=latest --region ${AWS_REGION} --profile ${AWS_PROFILE} --no-cli-pager --query 'imageScanFindings.findingSeverityCounts'"
-echo ""
-echo "Deploy to ECS:"
-echo "  aws ecs update-service --cluster laa-workspaces-development --service laa-workspaces-development-linotp3 --force-new-deployment --region ${AWS_REGION} --profile ${AWS_PROFILE} --no-cli-pager"
+

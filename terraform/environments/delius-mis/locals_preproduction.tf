@@ -6,6 +6,9 @@ locals {
     legacy_counterpart_vpc_cidr            = "10.160.0.0/20"
     legacy_ad_domain_name                  = "delius-pre-prod.local"
     legacy_dns_ip_addrs                    = ["10.160.0.163", "10.160.6.66"]
+    legacy_resolver_ip_addrs               = ["10.160.3.177", "10.160.6.87", "10.160.8.61"]
+    legacy_nextcloud_efs_dns_name          = "fs-1ef14cef.efs.eu-west-2.amazonaws.com"
+    legacy_nextcloud_efs_id                = "fs-1ef14cef"
     ad_domain_name                         = "delius-mis-preprod.internal"
     ad_trust_domain_name                   = "azure.hmpp.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
@@ -426,6 +429,12 @@ locals {
   }
 
   dfi_report_bucket_config_preprod = null
+
+  acm_certificate_preprod = {
+    domain_name                         = "modernisation-platform.service.justice.gov.uk"
+    external_validation_records_created = true
+    additional_subject_alternate_names  = []
+  }
 
   lb_config_preprod = {
     bucket_policy_enabled = true

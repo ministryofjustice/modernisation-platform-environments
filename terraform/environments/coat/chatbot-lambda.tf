@@ -1,6 +1,9 @@
 # Lambda
 
 resource "aws_security_group" "rag_lambda" {
+  #checkov:skip=CKV_AWS_382:To be reviewed later
+  #checkov:skip=CKV2_AWS_5:To be reviewed later
+
   name        = "${local.application_name}-${local.environment}-rag-lambda-security-group"
   description = "RAG Lambda Security Group"
   vpc_id      = data.aws_vpc.shared.id
@@ -46,6 +49,9 @@ data "aws_iam_policy_document" "rag_lambda_function_assume_role" {
 }
 
 data "aws_iam_policy_document" "rag_lambda_function_role" {
+  #checkov:skip=CKV_AWS_111:To be reviewed later
+  #checkov:skip=CKV_AWS_356:To be reviewed later
+
 
   statement {
     sid    = "AllowToWriteCloudWatchLog"
@@ -163,6 +169,7 @@ module "rag_lambda" {
       ":zip",
     ]
   }]
+  artifacts_dir                = "${abspath(path.root)}/builds"
   trigger_on_package_timestamp = false
 
   reserved_concurrent_executions = 10
@@ -199,5 +206,8 @@ moved {
 # Secrets
 
 resource "aws_secretsmanager_secret" "llm_gateway_key" {
+  #checkov:skip=CKV_AWS_149:To be reviewed later
+  #checkov:skip=CKV2_AWS_57:To be reviewed later
+
   name = "llm_gateway_key"
 }

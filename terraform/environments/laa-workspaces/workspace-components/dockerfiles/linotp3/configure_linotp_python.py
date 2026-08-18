@@ -98,6 +98,10 @@ def _configure_linotp_internal(resolver, realm, getLinotpConfig, storeConfig, db
     resolver_name = os.environ.get('LINOTP_RESOLVER_NAME', 'ad-resolver')
     realm_name = os.environ.get('LINOTP_REALM_NAME', 'laa-workspaces')
 
+    # Build LDAP URI from AD DNS IPs
+    ad_dns_ips = os.environ.get('AD_DNS_IPS', '10.200.1.245,10.200.2.11')  # Fallback to dev IPs
+    ldap_uris = ', '.join([f'ldap://{ip.strip()}' for ip in ad_dns_ips.split(',')])
+
     # ==========================================
     # Step 1: Check and create LDAP resolver
     # ==========================================
@@ -113,7 +117,7 @@ def _configure_linotp_internal(resolver, realm, getLinotpConfig, storeConfig, db
 
         # Build resolver configuration
         resolver_config = {
-            f'linotp.ldapresolver.LDAPURI.{resolver_name}': 'ldap://10.200.1.245, ldap://10.200.2.11',
+            f'linotp.ldapresolver.LDAPURI.{resolver_name}': ldap_uris,
             f'linotp.ldapresolver.LDAPBASE.{resolver_name}': 'OU=Users,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local',
             f'linotp.ldapresolver.BINDDN.{resolver_name}': 'CN=Admin,OU=Users,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local',
             f'linotp.ldapresolver.BINDPW.{resolver_name}': os.environ['AD_BIND_PASSWORD'],

@@ -52,20 +52,7 @@ resource "aws_security_group" "rds_linotp3" {
   description = "Allow MySQL access from LinOTP 3.x ECS tasks only"
   vpc_id      = aws_vpc.workspaces[0].id
 
-  ingress {
-    description     = "MySQL from ECS LinOTP tasks"
-    from_port       = 3306
-    to_port         = 3306
-    protocol        = "tcp"
-    security_groups = [aws_security_group.ecs_linotp3[0].id]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  revoke_rules_on_delete = true
 
   lifecycle {
     create_before_destroy = true
@@ -75,6 +62,30 @@ resource "aws_security_group" "rds_linotp3" {
     local.tags,
     { "Name" = "${local.application_name}-${local.environment}-rds-linotp3" }
   )
+}
+
+resource "aws_security_group_rule" "rds_linotp3_ingress_ecs" {
+  count = local.environment == "development" ? 1 : 0
+
+  type                     = "ingress"
+  security_group_id        = aws_security_group.rds_linotp3[0].id
+  from_port                = 3306
+  to_port                  = 3306
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.ecs_linotp3[0].id
+  description              = "MySQL from ECS LinOTP tasks"
+}
+
+resource "aws_security_group_rule" "rds_linotp3_egress_all" {
+  count = local.environment == "development" ? 1 : 0
+
+  type              = "egress"
+  security_group_id = aws_security_group.rds_linotp3[0].id
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Allow all outbound traffic"
 }
 
 resource "aws_db_instance" "linotp3" {

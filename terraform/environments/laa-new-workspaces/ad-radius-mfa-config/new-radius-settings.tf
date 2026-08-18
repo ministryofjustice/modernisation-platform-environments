@@ -11,13 +11,13 @@
 ###
 ### Remote state consumed:
 ###   - root module: directory_id
-###   - workspace-components: radius_server_private_ips, radius_shared_secret_arn
+###   - workspace-components: radius_nlb_private_ips, radius_shared_secret_arn
 ##############################################
 
 resource "aws_directory_service_radius_settings" "workspaces_ad_radius" {
 
   directory_id   = data.terraform_remote_state.root.outputs.directory_id
-  radius_servers = data.terraform_remote_state.workspace_components.outputs.radius_server_private_ips
+  radius_servers = data.terraform_remote_state.workspace_components.outputs.radius_nlb_private_ips
 
   radius_port             = 1812
   radius_timeout          = 5

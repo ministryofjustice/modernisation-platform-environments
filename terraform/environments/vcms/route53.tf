@@ -1,13 +1,5 @@
-data "aws_route53_zone" "network-services-production" {
-  count    = local.is-production ? 1 : 0
-  provider = aws.core-network-services
-
-  name         = "${local.domain}."
-  private_zone = false
-}
-
 resource "aws_route53_record" "external" {
-  count    = local.is-production ? 0 : 1
+  count    = local.is-production ? 1 : 1
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
@@ -36,7 +28,7 @@ resource "aws_acm_certificate" "external" {
 }
 
 resource "aws_route53_record" "external_validation" {
-  count    = local.is-production ? 0 : 1
+  count    = local.is-production ? 1 : 1
   provider = aws.core-network-services
 
   allow_overwrite = true
@@ -48,7 +40,7 @@ resource "aws_route53_record" "external_validation" {
 }
 
 resource "aws_route53_record" "external_validation_subdomain" {
-  count    = local.is-production ? 0 : 1
+  count    = local.is-production ? 1 : 1
   provider = aws.core-vpc
 
   allow_overwrite = true

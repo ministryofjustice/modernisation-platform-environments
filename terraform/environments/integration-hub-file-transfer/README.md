@@ -3,39 +3,37 @@
 <!-- This is a template that should be populated by the development team when moving to the modernisation platform, but also reviewed and kept up to date.
 To ensure that people looking at your runbook can get the information they need quickly, your runbook should be short but clear. Throughout, only use acronyms if you’re confident that someone who has just been woken up at 3am would understand them. -->
 
-_If you have any questions surrounding this page please post in the `#team-name` channel._
+_If you have any questions surrounding this page please post in the `#ask-integration-hub` channel._
 
 ## Mandatory Information
 
 ### **Last review date:**
 
-<!-- Adding the last date this page was reviewed, with any accompanying information -->
+2026-07-22
 
 ### **Description:**
 
-<!-- A short (less than 50 word) description of what your service does, and who it’s for.-->
+A one-way managed file transfer service, provided by the Integration Hub, to all MOJ agencies.
 
 ### **Service URLs:**
 
-<!--  The URL(s) of the service’s production environment, and test environments if possible-->
+> *.managed-file-transfer.service.justice.gov.uk
 
 ### **Incident response hours:**
 
-<!-- When your service receives support for urgent issues. This should be written in a clear, unambiguous way. For example: 24/7/365, Office hours, usually 9am-6pm on working days, or 7am-10pm, 365 days a year. -->
+Office hours, usually 9am-5pm on week days
 
 ### **Incident contact details:**
 
-<!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. -->
+_If you have an urgent issue with the service, please post in the `#ask-integration-hub` channel._
 
 ### **Service team contact:**
 
-<!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
+You can contact the Integration Hub team via the `#ask-integration-hub` channel on Slack.
 
 ### **Hosting environment:**
 
 Modernisation Platform
-
-<!-- If your service is hosted on another MOJ team’s infrastructure, link to their runbook. If your service has another arrangement or runs its own infrastructure, you should list the supplier of that infrastructure (ideally linking to your account’s login page) and describe, simply and briefly, how to raise an issue with them. -->
 
 ## Optional
 
@@ -43,35 +41,34 @@ Modernisation Platform
 
 <!--  If you can, provide links to the service’s monitoring dashboard(s), health checks, documentation (ideally describing how to run/work with the service), and main GitHub repository. -->
 
-- [Event lifecycle identifiers](docs/event-lifecycle-identifiers.md)
-
 ### **Expected speed and frequency of releases:**
 
-<!-- How often are you able to release changes to your service, and how long do those changes take? -->
+We expect to make regular changes until October 1st, 2026.
 
 ### **Automatic alerts:**
 
-<!-- List, briefly, problems (or types of problem) that will automatically alert your team when they occur. -->
+You can see the CloudWatch alarms configured for the service [here](./locals-cloudwatch.tf).
+As the service matures we will integrate alarms with PagerDuty to ensure that the right people are notified when an alarm is triggered.
 
 ### **Impact of an outage:**
 
-<!-- A short description of the risks if your service is down for an extended period of time. -->
+At present no impact as the service is under development.
 
 ### **Out of hours response types:**
 
-<!-- Describe how incidents that page a person on call are responded to. How long are out-of-hours responders expected to spend trying to resolve issues before they stop working, put the service into maintenance mode, and hand the issue to in-hours support? -->
+No out-of-hours support at present.
 
 ### **Consumers of this service:**
 
-<!-- List which other services (with links to their runbooks) rely on this service. If your service is considered a platform, these may be too numerous to reasonably list. -->
+None yet; the service is still under development.
 
 ### **Services consumed by this:**
 
-<!-- List which other services (with links to their runbooks) this service relies on. -->
+None yet; the service is still under development.
 
 ### **Restrictions on access:**
 
-<!-- Describe any conditions which restrict access to the service, such as if it’s IP-restricted or only accessible from a private network.-->
+You must be a Ministry of Justice service. You may request access on behalf of a third party which needs to send files to you.
 
 ### **How to resolve specific issues:**
 

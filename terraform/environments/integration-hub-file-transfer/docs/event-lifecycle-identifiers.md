@@ -1,78 +1,73 @@
 # Tracking a file across its lifecycle
 
-When a file arrives in the `incoming` S3 bucket, this service starts emitting events. Those events travel through scanning, routing, and delivery, each produced by a different component. To make sense of them — whether you are debugging a stuck file or building a new consumer — you need to understand how events are tied together.
+When a file arrives in the `incoming` S3 bucket, this service emits canonical events as the file is staged, scanned and routed. Stable identifiers link those events even though the S3 bucket and object version change.
 
-This guide explains the identifiers used, how they are set, and how to use them in practice.
+## Identifiers
 
-## The problem these identifiers solve
+**`detail.data.fileId`** is the stable logical file identifier. It is created at ingress and copied into every later event.
 
-A single file moves between S3 buckets as it progresses through the service. Its S3 location changes at each stage, and its object version ID changes with it. If events only recorded the current S3 location, there would be no way to link `FileReceived.v1` to `FileRouted.v1` without knowing the full chain of object copies in advance.
+**`detail.metadata.correlationId`** groups the events in one file lifecycle. It currently has the same value as `fileId`, but remains a separate tracing concept.
 
-Instead, events carry a stable logical identity that never changes, no matter how many times the underlying object moves.
+**`detail.metadata.causationId`** is the top-level EventBridge `id` of the event that caused the current event. `FileReceived.v1` has no causation ID because it starts the canonical chain.
 
-## The identifiers and what they mean
+**`detail.metadata.idempotencyKey`** identifies a producer operation. Consumers must use it to deduplicate retries. EventBridge publication and the mover's `PUBLISHED` DynamoDB checkpoint are not atomic, so two envelopes may have different EventBridge IDs but the same deterministic idempotency key.
 
-**`detail.data.fileId`** is the stable identifier for the logical file. It is set once when the file first arrives and copied into every event thereafter. If you want to find all events for a particular file, filter by this value.
+The top-level EventBridge **`id`** identifies one event envelope. It is not stable across separate publications and must not be used as the logical file identifier.
 
-**`detail.metadata.correlationId`** serves the same purpose as `fileId` at present — it groups every event in a file's lifecycle. Both are set to the same value at ingress. They are kept separate because `fileId` is owned by the data domain and `correlationId` is a tracing concept; a future workflow might produce events spanning more than one file, in which case `correlationId` would be shared while `fileId` would differ.
+## Ingress
 
-**`detail.metadata.causationId`** records which event caused this one. It is the EventBridge `id` of the preceding event in the chain. The very first event, `FileReceived.v1`, has no `causationId` because nothing in the canonical chain preceded it. Every later event must carry one.
+S3 sends an `Object Created` event to EventBridge when a file lands in `incoming`. The file-received adapter publishes `FileReceived.v1` to the file-transfer event bus.
 
-**`detail.metadata.idempotencyKey`** identifies a specific producer operation so that it can be safely retried. If a Lambda function times out after publishing an event but before Lambda considers the invocation complete, EventBridge will retry it. The idempotency key prevents that retry from publishing a duplicate.
+The adapter calculates `fileId` and `correlationId` as a deterministic UUID derived from the bucket, key and exact S3 version ID. Its idempotency key is `bucket:key:versionId`. Two uploads at the same key therefore remain distinct files.
 
-The top-level EventBridge **`id`** is different from all of the above. It identifies the event envelope itself, generated fresh by EventBridge each time an event is published. You will see it in raw event records but it is not a stable identifier across retries — use `fileId` or `correlationId` for that.
+AWS Lambda Powertools deduplicates retries of the same native EventBridge event ID. S3 can still emit separate notifications for one object version; those notifications have different EventBridge IDs but produce the same stable file identity. Delivery is at least once.
 
-## How identifiers are set at ingress
+## Staging
 
-When a file lands in the `incoming` bucket, S3 sends a native `Object Created` notification to EventBridge. A Lambda adapter picks this up and publishes `FileReceived.v1` to the file-transfer event bus.
+The STAGE Lambda mover consumes `FileReceived.v1` and claims a leased DynamoDB record keyed by `(correlationId, STAGE)`. Immutable source fields are checked whenever an existing operation is claimed.
 
-The adapter calculates both `fileId` and `correlationId` as a deterministic UUID derived from a SHA-256 hash of the bucket name, object key and S3 version ID. This gives the same logical file the same identity even when S3 emits more than one notification for that exact object version.
+The mover copies the exact source version to the same key in `processing`. Every positive-size object uses multipart copy, including a one-byte object. A legitimate zero-byte business object uses `CopyObject`.
 
-The `idempotencyKey` is set to `bucket:key:versionId`, for example:
+The mover preserves user metadata, tags and supported content headers, adds reserved correlation and copy-token metadata, and applies the processing bucket's SSE-KMS key. It verifies the exact destination version before deleting only the exact incoming version.
 
-```
-integration-hub-file-transfer-production-incoming:finance/april-payroll.csv:3Lg4fHkJ9bO1
-```
+When STAGE receipts are enabled, the mover creates the receipt only after source deletion. An incoming object is exempt as an existing receipt only when its key ends in `.receipt` and that exact object version has the tag `Receipt=TRUE`.
 
-The version ID is essential here. Two uploads of a file with the same name get different version IDs and are treated as separate files. Without the version ID, retrying a failed ingestion of a new version could incorrectly match the idempotency record from the previous version.
+The mover publishes `FileStagedForScanning.v1` with the original `fileId` and `correlationId`, the `FileReceived.v1` EventBridge ID as `causationId`, and both exact S3 versions.
 
-## What "no duplicate events" actually means
+## Scanning and routing
 
-AWS Lambda Powertools records a DynamoDB entry keyed on the native S3 EventBridge event `id`. If Lambda receives the same native event a second time — because EventBridge retried a failed invocation — Powertools returns the stored result immediately without calling `put_events` again.
+The GuardDuty adapter reads `mft-correlation-id` from the exact processing version and requires the durable STAGE record to be `COMPLETED`. It publishes terminal scan outcomes as `FileScanResultRecorded.v1`.
 
-There is an important boundary here: Powertools only deduplicates retries of the *same native event*. If S3 emits two separate `Object Created` notifications for the same object (which can happen in rare cases), each notification has a different native event `id`, so the adapter may publish two `FileReceived.v1` events. Both events will carry the same `fileId` and `correlationId`, because both describe the same S3 object version. This is an at-least-once guarantee, not exactly-once.
+The ROUTE Lambda mover consumes that event and claims a separate `(correlationId, ROUTE)` record. The canonical event is authoritative, so `detail.data.scanResultStatus` selects the route:
 
-Downstream consumers should therefore be idempotent on `fileId` rather than on the EventBridge `id` of the canonical event.
+- `NO_THREATS_FOUND` routes to `clean`;
+- `THREATS_FOUND` routes to `quarantine`; and
+- `UNSUPPORTED`, `ACCESS_DENIED` or `FAILED` routes to `investigation`.
+
+`scanResultStatusMatchesTag` is retained as diagnostic provenance from the adapter, but it does not select or override the destination route.
+
+ROUTE copies and verifies the exact processing version with destination SSE-KMS encryption before deleting that exact source version. It then publishes `FileRouted.v1` with an idempotency key of `route:{route}:{destinationBucket}:{key}:{destinationVersionId}`.
+
+## Durable recovery
+
+The mover records these operation checkpoints:
+
+- `IN_PROGRESS`
+- `MULTIPART_CREATED`
+- `MULTIPART_ABORTED`
+- `COPIED`
+- `VERIFIED`
+- `SOURCE_DELETED`
+- optional `RECEIPT_CREATED`
+- `PUBLISHED`
+- `COMPLETED`
+
+A retry resumes the recorded multipart upload, destination version or later checkpoint instead of starting the operation again. Failures are recovered through Lambda retries or DLQ redrive after the lease expires. Do not delete or reset operation records to force a replay.
 
 Idempotency records expire after 30 days in non-production environments and 400 days in production, matching event retention.
 
-## Following a file through the lifecycle
+## Following and diagnosing a file
 
-Imagine `finance/april-payroll.csv` arrives in the `incoming` bucket with version ID `v1`. Here is what the event chain looks like:
+Query the file-transfer event bus archive or CloudWatch Logs for `detail.data.fileId` to find the complete lifecycle. To reconstruct causality, start with `FileReceived.v1` and find the event whose `causationId` matches each preceding EventBridge ID.
 
-1. S3 emits a native `Object Created` event with its own EventBridge `id`, call it `native-1`.
-2. The file-received adapter hashes the incoming bucket, key and version ID to produce `file-1`, then publishes `FileReceived.v1`. EventBridge assigns this event `id = eb-1`. The event carries `fileId = file-1`, `correlationId = file-1`, and no `causationId`.
-3. The scanning component picks up `FileReceived.v1` and stages the file to `processing/finance/april-payroll.csv` (a new S3 key and version). It publishes `FileStagedForScanning.v1` with `id = eb-2`, `fileId = file-1`, `correlationId = file-1`, and `causationId = eb-1`.
-4. The scanner records a clean result and publishes `FileScanResultRecorded.v1` with `id = eb-3` and `causationId = eb-2`.
-5. The router delivers the file and publishes `FileRouted.v1` with `id = eb-4` and `causationId = eb-3`.
-
-At every stage, `fileId` and `correlationId` stay the same. The S3 location changes, the object version changes, and each EventBridge `id` is unique — but you can follow the whole chain.
-
-## Rules for event producers
-
-If you are writing a component that consumes a canonical event and produces another:
-
-- Copy `fileId` and `correlationId` from the event you consumed. Do not regenerate them.
-- Set `causationId` to the `id` field of the event you consumed — the top-level EventBridge envelope ID, not any field inside `detail`.
-- Choose an `idempotencyKey` that is specific to the operation you are performing, not to the file in general. For example, a scan result key might be `scan-result:{jobId}` rather than reusing `fileId`.
-- Do not derive logical file identity from the current S3 bucket or key. The file moves; the identifiers do not.
-
-## Finding events when something goes wrong
-
-**To find all events for a file:** query the file-transfer event bus archive or CloudWatch Logs for `detail.data.fileId`. If you know the `fileId`, this gives you the complete history.
-
-**To reconstruct the chain:** start with `FileReceived.v1`, note its EventBridge `id`, and look for the event whose `causationId` matches it. Repeat for each subsequent event.
-
-**When `FileReceived.v1` is missing:** check Lambda logs for the file-received adapter. Each invocation logs the native S3 event `id` alongside the canonical event `id` it published. A failed invocation will also appear here.
-
-**When you see two `FileReceived.v1` events for the same object:** compare their `fileId` values. Matching values mean both events describe the same bucket, key and version ID; check whether S3 emitted a second notification. Different values mean the object was a different version, key, or bucket.
+When two canonical events describe the same operation, compare `fileId`, `correlationId` and `idempotencyKey`. Matching values identify at-least-once delivery of the same logical operation; different source version IDs identify distinct uploads.

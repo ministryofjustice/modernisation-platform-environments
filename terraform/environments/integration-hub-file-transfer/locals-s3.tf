@@ -26,6 +26,9 @@ locals {
             days = 1
           }
           abort_incomplete_multipart_upload_days = 1
+          noncurrent_version_expiration = {
+            noncurrent_days = 1
+          }
         },
       ]
     }
@@ -33,13 +36,16 @@ locals {
     production = {
       default = [
         {
-          id     = "expire-objects-after-1-day"
+          id     = "expire-objects-after-7-days"
           status = "Enabled"
           filter = {}
           expiration = {
-            days = 14
+            days = 7
           }
           abort_incomplete_multipart_upload_days = 1
+          noncurrent_version_expiration = {
+            days = 1
+          }
         },
       ]
     }
@@ -54,17 +60,18 @@ locals {
     production = {
       default = local.s3_bucket_lifecycle_defaults.production.default
       buckets = {
-        incoming   = []
-        processing = []
         clean = [
           {
-            id     = "expire-clean-after-14-days"
+            id     = "expire-clean-after-7-days"
             status = "Enabled"
             filter = {
               prefix = "clean/"
             }
             expiration = {
-              days = 14
+              days = 7
+            }
+            noncurrent_version_expiration = {
+              days = 7
             }
           },
           {
@@ -76,11 +83,56 @@ locals {
             expiration = {
               days = 3
             }
+            noncurrent_version_expiration = {
+              days = 3
+            }
+          },
+          {
+            id                                     = "abort-incomplete-multipart-uploads-after-1-day"
+            status                                 = "Enabled"
+            filter                                 = {}
+            abort_incomplete_multipart_upload_days = 1
           },
         ]
-
-        quarantine    = []
-        investigation = []
+        quarantine = [
+          {
+            id     = "expire-objects-after-7-days"
+            status = "Enabled"
+            filter = {}
+            expiration = {
+              days = 7
+            }
+            noncurrent_version_expiration = {
+              days = 7
+            }
+          },
+          {
+            id                                     = "abort-incomplete-multipart-uploads-after-1-day"
+            status                                 = "Enabled"
+            filter                                 = {}
+            abort_incomplete_multipart_upload_days = 1
+          },
+        ]
+        investigation = [
+          {
+            id     = "expire-objects-after-7-days"
+            status = "Enabled"
+            filter = {
+            }
+            expiration = {
+              days = 7
+            }
+            noncurrent_version_expiration = {
+              days = 7
+            }
+          },
+          {
+            id                                     = "abort-incomplete-multipart-uploads-after-1-day"
+            status                                 = "Enabled"
+            filter                                 = {}
+            abort_incomplete_multipart_upload_days = 1
+          },
+        ]
       }
     }
   }

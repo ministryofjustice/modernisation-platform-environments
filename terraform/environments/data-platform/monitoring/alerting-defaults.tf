@@ -34,7 +34,7 @@ locals {
     litellm_ttft_p99_crit                     = 8    # time-to-first-token p99, seconds
     litellm_in_flight_requests_warn           = 100  # concurrent in-flight requests across all pods
     litellm_in_flight_requests_crit           = 250  # concurrent in-flight requests across all pods
-    litellm_overhead_latency_p99_warn         = 10    # LiteLLM-added processing overhead p99, seconds
+    litellm_overhead_latency_p99_warn         = 10   # LiteLLM-added processing overhead p99, seconds
     litellm_overhead_latency_p99_crit         = 20   # LiteLLM-added processing overhead p99, seconds
     litellm_deployment_latency_per_token_warn = 0.75 # seconds per output token, p99
     litellm_deployment_latency_per_token_crit = 1.5  # seconds per output token, p99
@@ -86,6 +86,26 @@ locals {
     litellm_pod_restarts_crit = 3
     litellm_pod_memory_warn   = 80 # % of container memory limit
     litellm_pod_memory_crit   = 95 # % of container memory limit
+
+    # -------------------------------------------------------------------------
+    # Bedrock
+    # -------------------------------------------------------------------------
+    # Errors: Bad requests from callers (client-side)
+    bedrock_client_errors_warn = 5
+    bedrock_client_errors_crit = 20
+
+    # Errors: Failures on AWS/Bedrock's side
+    bedrock_server_errors_warn = 5
+    bedrock_server_errors_crit = 20
+
+    # Errors: Calls to deprecated models
+    bedrock_legacy_model_warn = 1
+    bedrock_legacy_model_crit = 10
+
+    # Traffic: Invocation volume vs hourly baseline — Warning Baseline +100%,
+    # Critical Baseline +300%
+    bedrock_invocations_baseline_warn = 100
+    bedrock_invocations_baseline_crit = 300
   }
   # Per-account effective thresholds: defaults merged with any account-specific
   # overrides (alert_account_configs[uid].threshold_overrides).
