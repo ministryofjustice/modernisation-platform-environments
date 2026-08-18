@@ -39,6 +39,7 @@ resource "aws_s3_object" "data_claims_mapping_file" {
 
 # TODO: Move to shared file
 resource "aws_secretsmanager_secret" "slack_webhook_dms" {
+  #checkov:skip=CKV2_AWS_57: Automatic rotation not needed for test webhook
   name       = "dms/slack-webhook"
   kms_key_id = aws_kms_key.data_lake_kms_key.arn
   tags       = local.tags

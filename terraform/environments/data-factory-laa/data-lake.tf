@@ -33,6 +33,9 @@ module "data_lake_settings" {
 }
 
 data "aws_iam_policy_document" "data_lake_kms_key" {
+  #checkov:skip=CKV_AWS_356: Delegates access to the root account for KMS key management
+  #checkov:skip=CKV_AWS_109: Delegates access to the root account for KMS key management
+  #checkov:skip=CKV_AWS_111: Delegates access to the root account for KMS key management
   # Enables IAM policies in this AWS account to delegate access to the key.
   statement {
     sid    = "EnableRootAccountPermissions"
