@@ -152,6 +152,11 @@ resource "aws_lb" "execute_api" {
   internal           = true
   load_balancer_type = "network"
   subnets            = data.aws_subnets.shared-private.ids
+  access_logs {
+    bucket  = module.s3-logging-bucket.bucket.id
+    prefix  = "cloud-platform-lb"
+    enabled = true
+  }
 }
 
 resource "aws_lb_target_group" "execute_api" {
