@@ -13,7 +13,9 @@
 #       → Never register as a spoke
 #
 #     NO → Is this workspace in argocd_registered_spokes (environment config)?
-#       YES → Register with the hub (create EKS Access Entry for hub role)
+#       YES → Register with the hub (create EKS Access Entry for the hub's
+#             Argo CD Capability role, the identity the EKS-managed Argo CD
+#             actually authenticates as)
 #       NO  → Do nothing (cluster is neither hub nor spoke)
 #
 # WHERE TO MAKE CHANGES:
@@ -21,7 +23,7 @@
 #   - To register a spoke: add its workspace name to argocd_registered_spokes
 #     in environment-configuration.tf (under the nonlive or live block)
 #   - For ephemeral test hubs: pass TF_VAR_enable_argocd=true at deploy time
-#   - For ephemeral test spokes: pass TF_VAR_argocd_hub_spoke_access_role_arn
+#   - For ephemeral test spokes: pass TF_VAR_argocd_hub_capability_role_arn
 #
 # References:
 #   - ADR-002: GitOps Fleet Management — EKS Capability for Argo CD
@@ -44,13 +46,15 @@ module "argocd" {
   count  = local.enable_argocd ? 1 : 0
 
   cluster_name = module.eks.cluster_name
-  cluster_arn  = module.eks.cluster_arn
 
   idc_instance_arn = var.argocd_idc_instance_arn
   idc_region       = var.argocd_idc_region
   rbac_role_mappings = merge(
     {
-      ADMIN = [{ id = local.cloud_platform_engineers_group_id, type = "SSO_GROUP" }]
+      ADMIN = [
+        { id = local.cloud_platform_engineers_group_id, type = "SSO_GROUP" },
+        { id = local.container_platform_aws_group_id, type = "SSO_GROUP" },
+      ]
     },
     var.argocd_rbac_role_mappings
   )
@@ -66,33 +70,27 @@ module "argocd" {
 #------------------------------------------------------------------------------
 # Spoke: Register with the hub's ArgoCD
 #
-# A spoke grants the hub's spoke-access role an EKS Access Entry with
-# AmazonEKSClusterAdminPolicy. This allows the hub's managed ArgoCD to deploy
-# workloads to this cluster without VPC peering or TGW. Cross-account access
-# is native to EKS Access Entries.
+# A spoke grants the hub's Argo CD Capability role an EKS Access Entry,
+# authorised by the scoped Kubernetes RBAC below (no AmazonEKSClusterAdminPolicy
+# access policy — see the access entry resource for the security rationale).
+# This is the only principal a spoke needs to register: the EKS-managed Argo
+# CD authenticates to spoke clusters as its capability role, not a separate
+# cross-account role. Cross-account access is native to EKS Access Entries, so
+# no VPC peering or TGW is required.
 #------------------------------------------------------------------------------
 
 locals {
-  # Hub's spoke-access role ARN — resolved by convention or explicit override.
-  resolved_hub_spoke_access_role_arn = (
-    var.argocd_hub_spoke_access_role_arn != ""
-    ? var.argocd_hub_spoke_access_role_arn
-    : local.argocd_hub_convention_role_arn
-  )
-
-  # Hub's ArgoCD Capability role ARN. The EKS-managed Argo CD authenticates to
-  # spoke clusters as its capability role, so the spoke must grant that role
-  # access — without it, API calls from the hub fail with Unauthorized and
-  # Applications sit in Unknown sync state.
-  #
-  # Both hub roles follow the module naming "<hub-cluster>-argocd-<suffix>"
-  # (see modules/argo-cd), so the capability ARN is derived from the resolved
-  # spoke-access ARN. This holds for convention-based permanent hubs and for
-  # explicit ephemeral-hub overrides, since both roles live in the hub account.
-  resolved_hub_capability_role_arn = replace(
-    local.resolved_hub_spoke_access_role_arn,
-    "-argocd-spoke-access",
-    "-argocd-capability"
+  # Hub's Argo CD Capability role ARN — resolved by convention or explicit
+  # override. Permanent hubs (nonlive/live) follow the module naming
+  # "<hub-cluster>-argocd-capability" (see modules/argo-cd), so the ARN is
+  # constructed directly for the spoke's tier via local.argocd_hubs. Ephemeral
+  # hubs are NOT covered by that convention — for those, the engineer passes
+  # the ARN explicitly as a workflow input, which arrives as
+  # var.argocd_hub_capability_role_arn and takes precedence.
+  resolved_hub_capability_role_arn = (
+    var.argocd_hub_capability_role_arn != ""
+    ? var.argocd_hub_capability_role_arn
+    : local.argocd_hub_capability_convention_role_arn
   )
 
   # Kubernetes RBAC group that the hub capability role is placed into on this spoke.
@@ -115,42 +113,8 @@ locals {
     lookup(local.environment_configuration, "argocd_registered_spokes", []),
     terraform.workspace
     ) && !local.enable_argocd && !local.is_argocd_hub_cluster && (
-    contains(local.mp_environments, terraform.workspace) || var.argocd_hub_spoke_access_role_arn != ""
+    contains(local.mp_environments, terraform.workspace) || var.argocd_hub_capability_role_arn != ""
   )
-}
-
-resource "aws_eks_access_entry" "argocd_spoke" {
-  count = local.is_argocd_spoke ? 1 : 0
-
-  cluster_name  = module.eks.cluster_name
-  principal_arn = local.resolved_hub_spoke_access_role_arn
-  type          = "STANDARD"
-
-  tags = merge(local.tags, {
-    Name    = "${module.eks.cluster_name}-argocd-spoke-access"
-    Purpose = "argocd-hub-spoke-registration"
-  })
-
-  lifecycle {
-    precondition {
-      condition     = local.resolved_hub_spoke_access_role_arn != ""
-      error_message = "Could not resolve the hub spoke-access role ARN. Ensure the spoke's tier has a hub in local.argocd_hubs, or pass TF_VAR_argocd_hub_spoke_access_role_arn."
-    }
-  }
-}
-
-resource "aws_eks_access_policy_association" "argocd_spoke" {
-  count = local.is_argocd_spoke ? 1 : 0
-
-  cluster_name  = module.eks.cluster_name
-  principal_arn = local.resolved_hub_spoke_access_role_arn
-  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-
-  access_scope {
-    type = "cluster"
-  }
-
-  depends_on = [aws_eks_access_entry.argocd_spoke]
 }
 
 #------------------------------------------------------------------------------
@@ -192,7 +156,7 @@ resource "aws_eks_access_entry" "argocd_spoke_capability" {
   lifecycle {
     precondition {
       condition     = local.resolved_hub_capability_role_arn != ""
-      error_message = "Could not resolve the hub capability role ARN. Ensure the spoke's tier has a hub in local.argocd_hubs, or pass TF_VAR_argocd_hub_spoke_access_role_arn."
+      error_message = "Could not resolve the hub capability role ARN. Ensure the spoke's tier has a hub in local.argocd_hubs, or pass TF_VAR_argocd_hub_capability_role_arn."
     }
   }
 }

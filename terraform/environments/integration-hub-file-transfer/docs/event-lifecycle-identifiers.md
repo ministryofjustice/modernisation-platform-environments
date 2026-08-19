@@ -44,7 +44,7 @@ The ROUTE Lambda mover consumes that event and claims a separate `(correlationId
 - `THREATS_FOUND` routes to `quarantine`; and
 - `UNSUPPORTED`, `ACCESS_DENIED` or `FAILED` routes to `investigation`.
 
-`scanResultStatusMatchesTag` is retained as diagnostic provenance from the adapter, but it does not select or override the destination route.
+`scanResultStatusMatchesTag` is retained as diagnostic provenance from the adapter. A mismatch overrides the reported scan result and routes the object to `investigation`.
 
 ROUTE copies and verifies the exact processing version with destination SSE-KMS encryption before deleting that exact source version. It then publishes `FileRouted.v1` with an idempotency key of `route:{route}:{destinationBucket}:{key}:{destinationVersionId}`.
 

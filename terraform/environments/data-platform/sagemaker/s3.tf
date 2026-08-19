@@ -3,7 +3,7 @@ locals {
 }
 
 module "async_transcription" {
-  count = terraform.workspace == "data-platform-development" ? 1 : 0
+  count = local.is-test ? 0 : 1
 
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=c526035d69d47b68ac896cb5f98c18b21074edae" # v5.15.1
 
@@ -24,4 +24,18 @@ module "async_transcription" {
   versioning = {
     status = "Enabled"
   }
+
+  lifecycle_rule = [
+    {
+      id     = "expire-objects-after-seven-days"
+      status = "Enabled"
+      filter = {}
+      expiration = {
+        days = 7
+      }
+      noncurrent_version_expiration = {
+        noncurrent_days = 7
+      }
+    }
+  ]
 }
