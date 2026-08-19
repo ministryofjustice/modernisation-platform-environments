@@ -886,3 +886,58 @@ EOF
   )
 
 }
+
+#------------------
+# Apply sort order 
+#------------------
+
+resource "aws_glue_job" "apply_sort_order" {
+  count = local.is-development ? 1 : 0
+
+  name              = "apply-sort-order"
+  description       = "Use Spark to apply sort order to Iceberg table."
+  role_arn          = aws_iam_role.apply_sort_order_iam_role.arn
+  glue_version      = "5.0"
+  worker_type       = "G.1X"
+  number_of_workers = 2
+  default_arguments = {
+    "--catalog"                          = "${local.env_account_id}"
+    "--database"                         = "staged_mdss${local.dbt_suffix}"
+    "--table"                            = "false"
+    "--remove_sort_order"                = "false"
+    "--order"                            = "DESC"
+    # Optional args set to false
+    "--order_col"                        = "false"
+    "--order_cols"                       = "false"
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--datalake-formats"                 = "iceberg"
+    "--conf"                             = <<EOF
+spark.sql.extensions=org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions 
+--conf spark.sql.catalog.glue_catalog=org.apache.iceberg.spark.SparkCatalog 
+--conf spark.sql.catalog.glue_catalog.catalog-impl=org.apache.iceberg.aws.glue.GlueCatalog 
+--conf spark.sql.catalog.glue_catalog.io-impl=org.apache.iceberg.aws.s3.S3FileIO
+EOF
+
+  }
+  command {
+    python_version  = "3"
+    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/apply_sort_order.py"
+  }
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration[0].name
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "placeholder",
+    }
+  )
+
+}
+
+resource "aws_s3_object" "apply_sort_order_script" {
+  count  = local.is-development ? 1 : 0
+  bucket = module.s3-glue-job-script-bucket.bucket.id
+  key    = "apply_sort_order.py"
+  source = "glue-job/apply_sort_order.py"
+  source_hash   = filemd5("glue-job/apply_sort_order.py")
+}
