@@ -158,7 +158,7 @@ module "data_claims_dms" {
 resource "aws_lakeformation_permissions" "claims_de" {
   count       = local.is-test ? 1 : 0
   permissions = ["SELECT", "DESCRIBE"]
-  principal   = "arn:aws:iam::766696030771:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-developer_f6defe724ee76f07"
+  principal   = "arn:aws:iam::307869868585:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-sandbox_c38cf78de39ef4d0"
 
   table_with_columns {
     database_name = "data-claims"
