@@ -81,13 +81,57 @@ locals {
     }
   ]...)
 
+  #-----------------------------------------------------------------------------
+  # Hub tier scoping (ADR-002 — dual-hub isolation)
+  #
+  # A hub must only register the spokes it owns: the nonlive hub manages nonlive
+  # spokes, the live hub manages live spokes. Without this, every hub creates
+  # ArgoCD control-plane objects (AppProjects, ApplicationSets and — critically
+  # — cluster registration Secrets) for the OTHER tier's spokes, breaking tier
+  # isolation.
+  #
+  # Permanent hubs derive their tier from the workspace name (last segment,
+  # computed as local.workspace_environment: "nonlive" or "live"). Ephemeral
+  # dev hubs (cluster_environment == "development_cluster") are not a permanent
+  # tier and must NOT register any real BU spoke — they register only their
+  # convention-paired spoke, "<hub-workspace-minus-hub-suffix>spoke".
+  #-----------------------------------------------------------------------------
+  hub_tier = local.workspace_environment == "live" ? "live" : "nonlive"
+
+  is_ephemeral_hub = local.cluster_environment == "development_cluster"
+
+  # Real BU spokes this permanent hub owns — its own tier only. Empty on
+  # ephemeral hubs (they own no real spokes).
+  hub_bu_appprojects = local.is_ephemeral_hub ? {} : {
+    for key, spoke in local.bu_appprojects : key => spoke
+    if spoke.environment == local.hub_tier
+  }
+
+  # Convention-paired ephemeral spoke for a dev hub: same account/region,
+  # "<prefix>-spoke" derived from the hub's "<prefix>-hub" workspace name.
+  ephemeral_spoke_workspace = replace(terraform.workspace, "-hub", "-spoke")
+  ephemeral_spoke_registration = local.is_ephemeral_hub ? {
+    "${local.ephemeral_spoke_workspace}" = {
+      bu_name           = "ephemeral"
+      environment       = "nonlive"
+      source_repo       = local.environments_repo
+      cluster_workspace = local.ephemeral_spoke_workspace
+      path_prefix       = "namespaces/ephemeral"
+      cluster_arn       = "arn:aws:eks:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:cluster/${local.ephemeral_spoke_workspace}"
+      auto_sync         = true
+    }
+  } : {}
+
+  # Spokes this hub registers: its tier's real BU spokes (permanent hub) or its
+  # single convention-paired spoke (ephemeral hub).
+  hub_registered_spokes = merge(local.hub_bu_appprojects, local.ephemeral_spoke_registration)
 }
 
 #------------------------------------------------------------------------------
 # Platform AppProject — deploys infrastructure add-ons to all spoke clusters
 #------------------------------------------------------------------------------
 resource "kubectl_manifest" "argocd_project_platform_nonlive" {
-  count = local.is_argocd_hub ? 1 : 0
+  count = local.is_argocd_hub && local.hub_tier == "nonlive" ? 1 : 0
 
   yaml_body = yamlencode({
     apiVersion = "argoproj.io/v1alpha1"
@@ -106,9 +150,11 @@ resource "kubectl_manifest" "argocd_project_platform_nonlive" {
         local.environments_repo,
         "${local.environments_repo}.git",
       ]
+      # Destinations restricted to the spokes this hub owns (its own tier, or
+      # the paired ephemeral spoke on a dev hub).
       destinations = [
-        for bu_name, bu_config in local.bu_configs : {
-          server    = local.bu_appprojects["${bu_name}-nonlive"].cluster_arn
+        for key, spoke in local.hub_registered_spokes : {
+          server    = spoke.cluster_arn
           namespace = "*"
         }
       ]
@@ -127,7 +173,7 @@ resource "kubectl_manifest" "argocd_project_platform_nonlive" {
 }
 
 resource "kubectl_manifest" "argocd_project_platform_live" {
-  count = local.is_argocd_hub ? 1 : 0
+  count = local.is_argocd_hub && local.hub_tier == "live" ? 1 : 0
 
   yaml_body = yamlencode({
     apiVersion = "argoproj.io/v1alpha1"
@@ -145,9 +191,10 @@ resource "kubectl_manifest" "argocd_project_platform_live" {
         local.environments_repo,
         "${local.environments_repo}.git",
       ]
+      # Destinations restricted to the spokes this hub owns (its own tier).
       destinations = [
-        for bu_name, bu_config in local.bu_configs : {
-          server    = local.bu_appprojects["${bu_name}-live"].cluster_arn
+        for key, spoke in local.hub_registered_spokes : {
+          server    = spoke.cluster_arn
           namespace = "*"
         }
       ]
@@ -170,7 +217,7 @@ resource "kubectl_manifest" "argocd_project_platform_live" {
 # Per-BU AppProjects — isolates each BU's workloads to their own cluster and repos
 #------------------------------------------------------------------------------
 resource "kubectl_manifest" "argocd_project_bu" {
-  for_each = local.is_argocd_hub ? local.bu_appprojects : {}
+  for_each = local.is_argocd_hub ? local.hub_registered_spokes : {}
 
   yaml_body = yamlencode({
     apiVersion = "argoproj.io/v1alpha1"
@@ -238,7 +285,7 @@ resource "kubectl_manifest" "argocd_project_bu" {
 # Segments: [namespaces, <bu>, <product>, <app>, deployment, <env>]
 #------------------------------------------------------------------------------
 resource "kubectl_manifest" "argocd_applicationset_bu" {
-  for_each = local.is_argocd_hub ? local.bu_appprojects : {}
+  for_each = local.is_argocd_hub ? local.hub_registered_spokes : {}
 
   yaml_body = yamlencode({
     apiVersion = "argoproj.io/v1alpha1"
@@ -330,7 +377,7 @@ resource "kubectl_manifest" "argocd_applicationset_bu" {
 # Always auto-syncs with self-heal to enforce baseline compliance.
 #------------------------------------------------------------------------------
 resource "kubectl_manifest" "argocd_applicationset_baseline" {
-  for_each = local.is_argocd_hub ? local.bu_appprojects : {}
+  for_each = local.is_argocd_hub ? local.hub_registered_spokes : {}
 
   yaml_body = yamlencode({
     apiVersion = "argoproj.io/v1alpha1"
@@ -410,4 +457,42 @@ resource "kubectl_manifest" "argocd_applicationset_baseline" {
     kubectl_manifest.argocd_project_platform_nonlive,
     kubectl_manifest.argocd_project_platform_live,
   ]
+}
+
+#------------------------------------------------------------------------------
+# Spoke cluster registration Secrets — required for Argo CD to treat each
+# spoke as a deployment target. Without this Secret, Applications targeting
+# the spoke's cluster ARN sit in "Unknown" sync state indefinitely: Argo CD
+# never attempts to connect until the cluster is registered.
+#
+# Minimal form only — name + server (the spoke's EKS cluster ARN). No
+# config / awsAuthConfig / roleARN block: the EKS-managed Argo CD capability
+# authenticates to spoke clusters natively as the hub's capability role (see
+# cluster/argocd.tf — aws_eks_access_entry.argocd_spoke_capability), the same
+# principal an awsAuthConfig roleARN would otherwise name. That block is only
+# needed for self-managed Argo CD assuming a separate cross-account role,
+# which this platform does not use.
+#------------------------------------------------------------------------------
+resource "kubectl_manifest" "argocd_cluster_secret_bu" {
+  for_each = local.is_argocd_hub ? local.hub_registered_spokes : {}
+
+  yaml_body = yamlencode({
+    apiVersion = "v1"
+    kind       = "Secret"
+    metadata = {
+      name      = each.value.cluster_workspace
+      namespace = "argocd"
+      labels = {
+        "argocd.argoproj.io/secret-type" = "cluster"
+        "argocd.argoproj.io/managed-by"  = "terraform"
+        "container-platform/bu"          = each.value.bu_name
+        "container-platform/environment" = each.value.environment
+      }
+    }
+    type = "Opaque"
+    stringData = {
+      name   = each.value.cluster_workspace
+      server = each.value.cluster_arn
+    }
+  })
 }
