@@ -30,7 +30,7 @@ resource "aws_lb_target_group" "adaptor_target_group" {
   port                 = local.application_data.accounts[local.environment].adaptor_server_port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
-  target_type          = "ip"
+  target_type          = "instance"
   deregistration_delay = 30
 
   health_check {
