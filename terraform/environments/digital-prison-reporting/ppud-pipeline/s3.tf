@@ -20,7 +20,7 @@ module "ppud_replication_destination" {
   lifecycle_rule = [
     {
       id      = "main"
-      enabled = "Disabled"
+      enabled = "Enabled"
       prefix  = ""
 
       transition = [

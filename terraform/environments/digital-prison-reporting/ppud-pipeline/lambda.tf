@@ -1,4 +1,16 @@
-data "aws_iam_policy_document" "copy_object" {
+resource "aws_sqs_queue" "ppud_copy_object_dlq" {
+  name              = "${local.component_name}-copy-dlq"
+  kms_master_key_id = module.ppud_kms.key_arn
+
+  tags = merge(
+    local.tags,
+    {
+      resource-type = "SQS Queue"
+    }
+  )
+}
+
+data "aws_iam_policy_document" "ppud_copy_object" {
   statement {
     // Allow the lambda to read and copy the files from the replication destination S3 bucket
     actions = [
@@ -24,9 +36,20 @@ data "aws_iam_policy_document" "copy_object" {
       "${module.ppud_rds_export.backup_uploads_s3_bucket_arn}/*"
     ]
   }
+
+  statement {
+    // Allow the lambda to send failed events to the DLQ
+    actions = [
+      "sqs:SendMessage"
+    ]
+
+    resources = [
+      aws_sqs_queue.ppud_copy_object_dlq.arn
+    ]
+  }
 }
 
-module "copy_object" {
+module "ppud_copy_object" {
   # v8.8.1
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda?ref=23d00f7daef40091e87ed2f9dc5d8532e9d2cc22"
 
@@ -39,8 +62,10 @@ module "copy_object" {
   architectures   = ["x86_64"]
   build_in_docker = false
 
+  destination_on_failure = aws_sqs_queue.ppud_copy_object_dlq.arn
+
   attach_policy_json = true
-  policy_json        = data.aws_iam_policy_document.copy_object.json
+  policy_json        = data.aws_iam_policy_document.ppud_copy_object.json
 
   environment_variables = {
     LAND_BUCKET           = module.ppud_replication_destination.bucket.id
@@ -61,24 +86,24 @@ module "copy_object" {
 
 }
 
-resource "aws_lambda_permission" "allow_bucket" {
+resource "aws_lambda_permission" "ppud_allow_bucket" {
   statement_id  = "AllowExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
-  function_name = module.copy_object.lambda_function_arn
+  function_name = module.ppud_copy_object.lambda_function_arn
   principal     = "s3.amazonaws.com"
   source_arn    = module.ppud_replication_destination.bucket.arn
 }
 
 # Bucket Notification to trigger Lambda function
-resource "aws_s3_bucket_notification" "land_bucket" {
+resource "aws_s3_bucket_notification" "ppud_land_bucket" {
   bucket = module.ppud_replication_destination.bucket.id
 
   lambda_function {
-    lambda_function_arn = module.copy_object.lambda_function_arn
+    lambda_function_arn = module.ppud_copy_object.lambda_function_arn
     events              = ["s3:ObjectCreated:*"]
   }
 
-  depends_on = [aws_lambda_permission.allow_bucket]
+  depends_on = [aws_lambda_permission.ppud_allow_bucket]
 }
 
 # data "aws_iam_policy_document" "check_recent_file" {
