@@ -19,7 +19,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_critical_threshold" {
   comparison_operator = "GreaterThanThreshold"
 
   dimensions = {
-    ServiceName = var.name
+    ServiceName = "${var.env_name}-${var.name}"
     ClusterName = local.cluster_name
   }
 
@@ -42,7 +42,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_over_critical_threshold" {
   comparison_operator = "GreaterThanThreshold"
 
   dimensions = {
-    ServiceName = var.name
+    ServiceName = "${var.env_name}-${var.name}"
     ClusterName = local.cluster_name
   }
 
@@ -53,29 +53,6 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_over_critical_threshold" {
 resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_warning_threshold" {
   alarm_name          = "${var.name}-${var.env_name}-ecs-cpu-threshold"
   alarm_description   = "Triggers alarm if ECS CPU crosses a threshold"
-  namespace           = "AWS/ECS"
-  metric_name         = "MemoryUtilization"
-  statistic           = "Average"
-  period              = "60"
-  evaluation_periods  = "5"
-  alarm_actions       = [var.sns_topic_arn]
-  ok_actions          = [var.sns_topic_arn]
-  threshold           = "80"
-  treat_missing_data  = "missing"
-  comparison_operator = "GreaterThanThreshold"
-
-  dimensions = {
-    ServiceName = var.name
-    ClusterName = local.cluster_name
-  }
-
-  tags = merge(var.tags, { "app" = var.name })
-}
-
-# Alarm for warning memory usage
-resource "aws_cloudwatch_metric_alarm" "ecs_memory_over_warning_threshold" {
-  alarm_name          = "${var.name}-${var.env_name}-ecs-memory-threshold"
-  alarm_description   = "Triggers alarm if ECS memory crosses a threshold"
   namespace           = "AWS/ECS"
   metric_name         = "CPUUtilization"
   statistic           = "Average"
@@ -88,7 +65,30 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_over_warning_threshold" {
   comparison_operator = "GreaterThanThreshold"
 
   dimensions = {
-    ServiceName = var.name
+    ServiceName = "${var.env_name}-${var.name}"
+    ClusterName = local.cluster_name
+  }
+
+  tags = merge(var.tags, { "app" = var.name })
+}
+
+# Alarm for warning memory usage
+resource "aws_cloudwatch_metric_alarm" "ecs_memory_over_warning_threshold" {
+  alarm_name          = "${var.name}-${var.env_name}-ecs-memory-threshold"
+  alarm_description   = "Triggers alarm if ECS memory crosses a threshold"
+  namespace           = "AWS/ECS"
+  metric_name         = "MemoryUtilization"
+  statistic           = "Average"
+  period              = "60"
+  evaluation_periods  = "5"
+  alarm_actions       = [var.sns_topic_arn]
+  ok_actions          = [var.sns_topic_arn]
+  threshold           = "80"
+  treat_missing_data  = "missing"
+  comparison_operator = "GreaterThanThreshold"
+
+  dimensions = {
+    ServiceName = "${var.env_name}-${var.name}"
     ClusterName = local.cluster_name
   }
 
@@ -246,7 +246,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
   statistic           = "Minimum"
 
   dimensions = {
-    ServiceName = var.name
+    ServiceName = "${var.env_name}-${var.name}"
     ClusterName = local.cluster_name
   }
 
