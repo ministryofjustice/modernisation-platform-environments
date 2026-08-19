@@ -412,7 +412,7 @@ locals {
       "/sap/bip/t2"              = local.secretsmanager_secrets.bip
       "/oracle/database/T2BOSYS" = local.secretsmanager_secrets.db
       "/oracle/database/T2BOAUD" = local.secretsmanager_secrets.db
-      "/rclone/" = {
+      "/rclone" = {
         recovery_window_in_days = 0
         secrets = {
           config = { description = "RClone Configuration" }
