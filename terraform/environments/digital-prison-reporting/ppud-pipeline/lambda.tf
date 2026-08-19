@@ -137,7 +137,7 @@ module "check_recent_file" {
 
   environment_variables = {
     LAND_BUCKET               = module.ppud_replication_destination.bucket.id
-    REGION                    = data.aws_region.current.current
+    REGION                    = data.aws_region.current.region
     SLACK_WEBHOOK_SECRET_NAME = module.ppud_slack_webhook.secret_id
     DAYS_BACK                 = local.days_back
   }
@@ -161,7 +161,7 @@ resource "aws_lambda_permission" "allow_eventbridge_check_recent_file" {
   action        = "lambda:InvokeFunction"
   function_name = module.check_recent_file.lambda_function_arn
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.check_recent_file_daily.arn
+  source_arn    = aws_cloudwatch_event_rule.check_recent_file_daily[count.index].arn
 }
 
 resource "aws_cloudwatch_event_rule" "check_recent_file_daily" {
@@ -173,7 +173,7 @@ resource "aws_cloudwatch_event_rule" "check_recent_file_daily" {
 
 resource "aws_cloudwatch_event_target" "check_recent_file_daily" {
   count = local.is-test ? 0 : 1
-  rule      = aws_cloudwatch_event_rule.check_recent_file_daily.name
+  rule      = aws_cloudwatch_event_rule.check_recent_file_daily[count.index].name
   target_id = "check-recent-file-lambda"
   arn       = module.check_recent_file.lambda_function_arn
 }
