@@ -1,4 +1,5 @@
 # Secret to restore database
+# https://github.com/awsdocs/aws-cloudformation-user-guide/blob/c03a45977c5a506e09a22dbe05ff980bec79b805/doc_source/aws-properties-rds-database-instance.md#cfn-rds-dbinstance-masteruserpassword
 module "ppud_rds_export_secret" {
 
   # v2.1.0
@@ -10,6 +11,7 @@ module "ppud_rds_export_secret" {
   ignore_secret_changes  = true
   create_random_password = true
   random_password_length = 13
+  random_password_override_special = "!#$&*?"
 
   tags = merge(
     local.tags,

@@ -70,7 +70,7 @@ module "ppud_rds_export" {
   master_user_secret_id          = module.ppud_rds_export_secret.secret_id
   environment                    = local.environment
   output_parquet_file_size       = 50
-  db_name                        = "${local.short_name}-${local.environment}"
+  db_name                        = "${local.short_name}_${local.environment}"
   get_views                      = true
   bucket_namespace               = "account-regional"
   lifecycle_rule_backup_uploads  = local.rds_export_bucket_lifecycle_rule
