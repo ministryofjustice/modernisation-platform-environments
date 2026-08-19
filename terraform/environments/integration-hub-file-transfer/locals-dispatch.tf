@@ -36,6 +36,14 @@ locals {
             teams = null
           }
         }
+        "/example/subdirectory/" = {
+          action = null
+          notifications = {
+            email = null
+            slack = null
+            teams = null
+          }
+        }
       }
     }
     test          = {}
