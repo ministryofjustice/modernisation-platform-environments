@@ -84,29 +84,40 @@ resource "aws_s3_bucket_notification" "ppud_land_bucket" {
   depends_on = [aws_lambda_permission.ppud_allow_bucket]
 }
 
-# data "aws_iam_policy_document" "check_recent_file" {
-#   statement {
-#     // Allow the lambda to list objects from the replication destination S3 bucket
-#     actions = [
-#       "s3:ListBucket",
-#     ]
+data "aws_iam_policy_document" "check_recent_file" {
+  statement {
+    // Allow the lambda to list objects from the replication destination S3 bucket
+    actions = [
+      "s3:ListBucket",
+    ]
 
-#     resources = [
-#       module.ppud_replication_destination.bucket.arn,
-#     ]
-#   }
+    resources = [
+      module.ppud_replication_destination.bucket.arn,
+    ]
+  }
 
-#   statement {
-#     // Allow the lambda to fetch the Slack webhook secret
-#     actions = [
-#       "secretsmanager:GetSecretValue",
-#     ]
+  statement {
+    // Allow the lambda to fetch the Slack webhook secret
+    actions = [
+      "secretsmanager:GetSecretValue",
+    ]
 
-#     resources = [
-#       module.ppud_slack_webhook.secret_arn,
-#     ]
-#   }
-# }
+    resources = [
+      module.ppud_slack_webhook.secret_arn,
+    ]
+  }
+
+  statement {
+    // Allow the lambda to decrypt the Slack webhook secret using the KMS key
+    actions = [
+      "kms:Decrypt",
+    ]
+
+    resources = [
+      module.ppud_kms.key_arn,
+    ]
+  }
+}
 
 # module "check_recent_file" {
 #   # Commit hash for v8.8.1
@@ -128,7 +139,7 @@ resource "aws_s3_bucket_notification" "ppud_land_bucket" {
 #     LAND_BUCKET               = module.ppud_replication_destination.bucket.id
 #     REGION                    = data.aws_region.current.current
 #     SLACK_WEBHOOK_SECRET_NAME = module.ppud_slack_webhook.secret_id
-#     DAYS_BACK                 = "1"
+#     DAYS_BACK                 = local.days_back
 #   }
 
 #   source_path = [{
@@ -145,6 +156,7 @@ resource "aws_s3_bucket_notification" "ppud_land_bucket" {
 # }
 
 # resource "aws_lambda_permission" "allow_eventbridge_check_recent_file" {
+#   count = local.is-test ? 0 : 1
 #   statement_id  = "AllowExecutionFromEventBridgeCheckRecentFile"
 #   action        = "lambda:InvokeFunction"
 #   function_name = module.check_recent_file.lambda_function_arn
@@ -153,12 +165,14 @@ resource "aws_s3_bucket_notification" "ppud_land_bucket" {
 # }
 
 # resource "aws_cloudwatch_event_rule" "check_recent_file_daily" {
+#   count = local.is-test ? 0 : 1
 #   name                = "${local.component_name}-check-recent-file-daily"
 #   description         = "Invoke recent-file checker daily at 15:15 UTC"
-#   schedule_expression = "cron(15 15 * * ? *)"
+#   schedule_expression = local.cron_schedule
 # }
 
 # resource "aws_cloudwatch_event_target" "check_recent_file_daily" {
+#   count = local.is-test ? 0 : 1
 #   rule      = aws_cloudwatch_event_rule.check_recent_file_daily.name
 #   target_id = "check-recent-file-lambda"
 #   arn       = module.check_recent_file.lambda_function_arn
