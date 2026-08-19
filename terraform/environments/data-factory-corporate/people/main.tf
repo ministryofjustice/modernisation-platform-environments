@@ -53,6 +53,7 @@ module "sherlock_landing_bucket_mp" {
   bucket_prefix      = "landing-sherlock-test-mp"
   bucket_namespace   = "account-regional"
   versioning_enabled = true
+  force_destroy      = true
 
   ownership_controls = "BucketOwnerEnforced"
 
