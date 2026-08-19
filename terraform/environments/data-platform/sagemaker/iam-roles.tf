@@ -1,5 +1,5 @@
 module "elevenlabs_asr_sagemaker_execution_iam_role" {
-  count = terraform.workspace == "data-platform-development" ? 1 : 0
+  count = local.is-test ? 0 : 1
 
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=5b962b1163790398605f2b17447cf5b6cc512237" # v6.6.1
 
@@ -70,7 +70,7 @@ module "elevenlabs_asr_sagemaker_execution_iam_role" {
 }
 
 module "justice_transcribe_backend_iam_role" {
-  count = terraform.workspace == "data-platform-development" ? 1 : 0
+  count = local.is-test ? 0 : 1
 
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=5b962b1163790398605f2b17447cf5b6cc512237" # v6.6.1
 
