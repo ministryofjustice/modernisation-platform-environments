@@ -71,7 +71,7 @@
       {
         "name": "JAVA_OPTS",
         "value": "{java_options}"        
-      }
+      },
       {
         "name": "CREATE_DATABASE",
         "value": "${create_database}"
