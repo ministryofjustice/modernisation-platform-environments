@@ -1,16 +1,3 @@
-# # SQS for failed events
-# resource "aws_sqs_queue" "ppud_copy_object_dlq" {
-#   name              = "${local.component_name}-copy-dlq"
-#   kms_master_key_id = module.ppud_kms.key_arn
-
-#   tags = merge(
-#     local.tags,
-#     {
-#       resource-type = "SQS Queue"
-#     }
-#   )
-# }
-
 data "aws_iam_policy_document" "ppud_copy_object" {
   statement {
     // Allow the lambda to read and copy the files from the replication destination S3 bucket
@@ -38,16 +25,6 @@ data "aws_iam_policy_document" "ppud_copy_object" {
     ]
   }
 
-  # statement {
-  #   // Allow the lambda to send failed events to the DLQ
-  #   actions = [
-  #     "sqs:SendMessage"
-  #   ]
-
-  #   resources = [
-  #     aws_sqs_queue.ppud_copy_object_dlq.arn
-  #   ]
-  # }
 }
 
 # Copy replicated .bak ppud file from replication destination bucket to landing bucket
@@ -63,8 +40,6 @@ module "ppud_copy_object" {
   timeout         = 900
   architectures   = ["x86_64"]
   build_in_docker = false
-
-  // destination_on_failure = aws_sqs_queue.ppud_copy_object_dlq.arn
 
   attach_policy_json = true
   policy_json        = data.aws_iam_policy_document.ppud_copy_object.json
