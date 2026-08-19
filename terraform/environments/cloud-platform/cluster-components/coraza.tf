@@ -1,31 +1,31 @@
-# Gateway-level WAF policy with OWASP CRS
-# This applies to ALL routes through the Gateway by default
-# Teams can override this at the HTTPRoute level if needed
-resource "kubernetes_manifest" "default-coraza-waf" {
-  manifest = yamldecode(<<-YAML
-    apiVersion: gateway.envoyproxy.io/v1alpha1
-    kind: EnvoyExtensionPolicy
-    metadata:
-      name: default-coraza-waf
-      namespace: envoy-gateway-system
-    spec:
-      targetRefs:
-        - group: gateway.networking.k8s.io
-          kind: Gateway
-          name: default
-          namespace: envoy-gateway-system
-      dynamicModule:
-        - name: composer
-          filterName: coraza-waf
-          config:
-            directives:
-              - Include @coraza.conf
-              - SecRuleEngine On
-              - Include @crs-setup.conf
-              - Include @owasp_crs/*.conf        
-  YAML
-  )
-}
+# # Gateway-level WAF policy with OWASP CRS
+# # This is now applied from the Gateway API module, so this is commented out to avoid duplication
+# # This applies to ALL routes through the Gateway by default
+# resource "kubernetes_manifest" "default-coraza-waf" {
+#   manifest = yamldecode(<<-YAML
+#     apiVersion: gateway.envoyproxy.io/v1alpha1
+#     kind: EnvoyExtensionPolicy
+#     metadata:
+#       name: default-coraza-waf
+#       namespace: envoy-gateway-system
+#     spec:
+#       targetRefs:
+#         - group: gateway.networking.k8s.io
+#           kind: Gateway
+#           name: default
+#           namespace: envoy-gateway-system
+#       dynamicModule:
+#         - name: composer
+#           filterName: coraza-waf
+#           config:
+#             directives:
+#               - Include @coraza.conf
+#               - SecRuleEngine On
+#               - Include @crs-setup.conf
+#               - Include @owasp_crs/*.conf        
+#   YAML
+#   )
+# }
 
 # # Example 1: Team deploys a httproute without EnvoyExtensionPolicy, so the Gateway-level OWASP CRS protection applies
 
@@ -43,7 +43,6 @@ resource "kubernetes_manifest" "starter-pack-coraza-waf-with-custom-rules" {
         - group: gateway.networking.k8s.io
           kind: HTTPRoute
           name: starter-pack-route
-          namespace: starter-pack-2
       dynamicModule:
         - name: composer
           filterName: coraza-waf
@@ -72,7 +71,6 @@ resource "kubernetes_manifest" "starter-pack-coraza-waf-detection" {
         - group: gateway.networking.k8s.io
           kind: HTTPRoute
           name: starter-pack-route
-          namespace: starter-pack-3
       dynamicModule:
         - name: composer
           filterName: coraza-waf
@@ -100,7 +98,6 @@ resource "kubernetes_manifest" "starter-pack-coraza-waf-off" {
         - group: gateway.networking.k8s.io
           kind: HTTPRoute
           name: starter-pack-route
-          namespace: starter-pack-4
       dynamicModule:
         - name: composer
           filterName: coraza-waf
@@ -112,7 +109,35 @@ resource "kubernetes_manifest" "starter-pack-coraza-waf-off" {
   )
 }
 
-# # Example 5: Invalid configuration that will cause compilation errors
+
+# Example 5: Team adds custom rules WITH OWASP CRS, and disables specific rules that are causing false positives
+resource "kubernetes_manifest" "starter-pack-coraza-waf-with-owasp-crs-and-exclusion" {
+  manifest = yamldecode(<<-YAML
+    apiVersion: gateway.envoyproxy.io/v1alpha1
+    kind: EnvoyExtensionPolicy
+    metadata:
+      name: starter-pack-coraza-waf-with-owasp-crs-and-exclusion
+      namespace: starter-pack-5
+    spec:
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: starter-pack-route
+      dynamicModule:
+        - name: composer
+          filterName: coraza-waf
+          config:
+            directives:
+              - Include @coraza.conf
+              - SecRuleEngine On
+              - Include @crs-setup.conf
+              - Include @owasp_crs/*.conf
+              - SecRuleRemoveById 949110
+  YAML
+  )
+}
+
+# # Example 6: Invalid configuration that will cause compilation errors
 # # This demonstrates what happens when using incorrect SecAction/SecRule syntax
 # resource "kubernetes_manifest" "starter-pack-coraza-waf-invalid" {
 #   manifest = yamldecode(<<-YAML
@@ -120,13 +145,12 @@ resource "kubernetes_manifest" "starter-pack-coraza-waf-off" {
 #     kind: EnvoyExtensionPolicy
 #     metadata:
 #       name: starter-pack-coraza-waf-invalid
-#       namespace: starter-pack-5
+#       namespace: starter-pack-6
 #     spec:
 #       targetRefs:
 #         - group: gateway.networking.k8s.io
 #           kind: HTTPRoute
 #           name: starter-pack-route
-#           namespace: starter-pack-5
 #       dynamicModule:
 #         - name: composer
 #           filterName: coraza-waf
@@ -140,20 +164,19 @@ resource "kubernetes_manifest" "starter-pack-coraza-waf-off" {
 #   )
 # }
 
-# Example 6: Team adds custom rules WITHOUT OWASP CRS, after bad configuration previously caused compilation errors
-resource "kubernetes_manifest" "starter-pack-coraza-waf-with-custom-rules_after_bad_config" {
+# Example 7: Team adds custom rules WITHOUT OWASP CRS, after bad configuration previously caused compilation errors
+resource "kubernetes_manifest" "starter-pack-coraza-waf-with-custom-rules-after-bad-config" {
   manifest = yamldecode(<<-YAML
     apiVersion: gateway.envoyproxy.io/v1alpha1
     kind: EnvoyExtensionPolicy
     metadata:
       name: starter-pack-coraza-waf-with-custom-rules-after-bad-config
-      namespace: starter-pack-6
+      namespace: starter-pack-7
     spec:
       targetRefs:
         - group: gateway.networking.k8s.io
           kind: HTTPRoute
           name: starter-pack-route
-          namespace: starter-pack-6
       dynamicModule:
         - name: composer
           filterName: coraza-waf
