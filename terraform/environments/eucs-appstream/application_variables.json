@@ -1,16 +1,77 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "deploy_workspaces": true,
+      "ad_connector_secret_name": "equip-local-domain-join-account",
+      "domain_name": "equip.local",
+      "ad_connector_size": "Small",
+      "ad_connector_username": "svc_appstream",
+      "dns_ips": ["10.27.9.225", "10.27.8.147"],
+      "default_ou": "OU=Amazon Workspaces,OU=MoJ_AWS,OU=Server Infrastructure,DC=equip,DC=local",
+      "bundle_id": "wsb-0tm7gqlsn",
+      "running_mode": "AUTO_STOP",
+      "auto_stop_timeout": 60,
+      "security_group_name": "eucs-appstream-test-sg",
+      "ip_group_name": "MOJ Network",
+      "ip_group_description": "MOJ Network",
+      "ip_group_allowed_cidrs": [
+        {
+          "source": "128.77.75.64/26",
+          "description": "MOJ Network"
+        }
+      ],
+      "workspace_users": {
+        "arron-ruecroft": "arron.ruecroft",
+        "svc-appstream": "svc_appstream",
+        "dragen-letic": "dragen.letic"
+      }
     },
     "test": {
-      "example_var": "test-data"
+      "deploy_workspaces": false
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "deploy_workspaces": false
     },
     "production": {
-      "example_var": "production-data"
+      "deploy_workspaces": true,
+      "ad_connector_secret_name": "equip-local-domain-join-account",
+      "domain_name": "equip.local",
+      "ad_connector_size": "Small",
+      "ad_connector_username": "svc_workspaces",
+      "dns_ips": ["10.27.9.225", "10.27.8.147"],
+      "default_ou": "OU=Amazon Workspaces,OU=MoJ_AWS,OU=Server Infrastructure,DC=equip,DC=local",
+      "bundle_id": "wsb-5kg12ypdk",
+      "running_mode": "AUTO_STOP",
+      "auto_stop_timeout": 60,
+      "security_group_name": "workspaces-equip-sg",
+      "ip_group_name": "MOJ Network",
+      "ip_group_description": "MOJ Network",
+      "ip_group_allowed_cidrs": [
+        {
+          "source": "128.77.75.64/26",
+          "description": "MOJ Network"
+        }
+      ],
+      "workspace_users": {
+        "asha-sonani": "asha.sonani",
+        "leanne-ingleson": "LeanneInglesonNPS",
+        "megan-thomas": "Megan.Thomas",
+        "aniza-khan": "Aniza.Khan",
+        "judith-adams": "JudithAdamsNPS",
+        "oluwaseun-ajiboye": "Oluwaseun.Ajiboye",
+        "rajesh-gupta": "Rajesh.Gupta",
+        "workspaces-imagebuild": "workspaces.imagebuild",
+        "workspace-user": "workspace.user",
+        "michelle-reed": "michelle.reed",
+        "sarah-lumsdon": "sarah.lumsdon",
+        "ryan-templeman": "ryan.templeman",
+        "gbenga-familugba": "gbenga.familugba",
+        "ben-davidson": "ben.davidson",
+        "dragan-letic": "dragan.letic",
+        "pamela-miller": "pamela.miller",
+        "john-birks": "John.Birks",
+        "christopher-hughes": "Christopher.hughes"
+      }
     }
   }
 }
