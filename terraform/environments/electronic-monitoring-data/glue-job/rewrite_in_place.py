@@ -27,7 +27,7 @@ logger.info(f"SPARK VERSION: {spark.version}")
 logger.info(f"SPARK CONTEXT CONFIG: {spark.sparkContext.getConf().getAll()}")
 logger.info(f'SPARK SQL EXTENSIONS: {spark.conf.get("spark.sql.extensions", "NOT SET")}')
 
-replace = f"""REPLACE TABLE `{args['catalog']}`.{args['database']}.{args['table']} AS SELECT * FROM {args['catalog']}`.{args['database']}.{args['table']}"""
+replace = f"""REPLACE TABLE `{args['catalog']}`.{args['database']}.{args['table']} AS SELECT * FROM `{args['catalog']}`.{args['database']}.{args['table']}"""
 alter = f"""ALTER TABLE `{args['catalog']}`.{args['database']}.{args['table']} WRITE ORDERED BY {args['order_cols']}"""
 insert = f"""INSERT TABLE `{args['catalog']}`.{args['database']}.{args['table']} SELECT * FROM `{args['catalog']}`.{args['database']}.{args['table']};"""
 
