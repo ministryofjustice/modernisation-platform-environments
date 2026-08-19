@@ -95,7 +95,7 @@ resource "aws_directory_service_directory" "ad_connector" {
 resource "aws_security_group" "workspaces" {
   name        = var.security_group_name != "" ? var.security_group_name : "${var.application_name}-${var.environment}-workspaces-sg"
   description = var.security_group_description != "" ? var.security_group_description : "Security group for ${var.application_name} WorkSpaces"
-  vpc_id      = var.vpc_id
+  vpc_id      = var.security_group_vpc_id != "" ? var.security_group_vpc_id : var.vpc_id
 
   tags = merge(var.tags, {
     "Name" = var.security_group_name != "" ? var.security_group_name : "${var.application_name}-${var.environment}-workspaces-sg"
@@ -204,4 +204,8 @@ resource "aws_workspaces_workspace" "this" {
     "Name" = "${var.application_name}-${var.environment}-workspace-${each.key}"
     "User" = each.value
   })
+
+  lifecycle {
+    ignore_changes = [bundle_id, workspace_properties]
+  }
 }

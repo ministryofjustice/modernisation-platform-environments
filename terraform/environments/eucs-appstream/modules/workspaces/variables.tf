@@ -87,6 +87,12 @@ variable "security_group_description" {
   default = ""
 }
 
+variable "security_group_vpc_id" {
+  type        = string
+  description = "Override VPC for the security group. Defaults to vpc_id."
+  default     = ""
+}
+
 variable "ad_connector_description" {
   type    = string
   default = ""

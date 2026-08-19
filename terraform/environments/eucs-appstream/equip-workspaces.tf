@@ -25,6 +25,7 @@ module "equip_workspaces" {
   ip_group_description       = try(local.application_data.accounts[local.environment].ip_group_description, "")
   security_group_name        = try(local.application_data.accounts[local.environment].security_group_name, "")
   security_group_description = try(local.application_data.accounts[local.environment].security_group_description, "")
+  security_group_vpc_id      = try(local.application_data.accounts[local.environment].security_group_vpc_id, "")
   workspace_users            = local.application_data.accounts[local.environment].workspace_users
 
   create_service_role = false
