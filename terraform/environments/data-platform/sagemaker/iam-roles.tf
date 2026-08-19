@@ -111,15 +111,21 @@ module "justice_transcribe_backend_iam_role" {
       resources = [aws_sagemaker_endpoint.elevenlabs_asr[0].arn]
     }
     S3AsyncTranscriptionInput = {
-      sid       = "S3AsyncTranscriptionInput"
-      effect    = "Allow"
-      actions   = ["s3:PutObject"]
+      sid    = "S3AsyncTranscriptionInput"
+      effect = "Allow"
+      actions = [
+        "s3:DeleteObject",
+        "s3:PutObject",
+      ]
       resources = ["${module.async_transcription[0].s3_bucket_arn}/input/*"]
     }
     S3AsyncTranscriptionOutput = {
-      sid       = "S3AsyncTranscriptionOutput"
-      effect    = "Allow"
-      actions   = ["s3:GetObject"]
+      sid    = "S3AsyncTranscriptionOutput"
+      effect = "Allow"
+      actions = [
+        "s3:DeleteObject",
+        "s3:GetObject",
+      ]
       resources = ["${module.async_transcription[0].s3_bucket_arn}/output/*"]
     }
     AsyncTranscriptionKMSAccess = {

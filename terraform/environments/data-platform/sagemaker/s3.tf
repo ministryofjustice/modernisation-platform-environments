@@ -24,4 +24,18 @@ module "async_transcription" {
   versioning = {
     status = "Enabled"
   }
+
+  lifecycle_rule = [
+    {
+      id     = "expire-objects-after-seven-days"
+      status = "Enabled"
+      filter = {}
+      expiration = {
+        days = 7
+      }
+      noncurrent_version_expiration = {
+        noncurrent_days = 7
+      }
+    }
+  ]
 }
