@@ -29,10 +29,9 @@ instead:
 
 The Lambda itself never handles key material - it only triggers the script and checks the
 result. Key generation and the Secrets Manager write both happen on the instance, under the
-instance's own IAM role. This mirrors the trust model already used for
-`ec2_instance_connect_key_push` in `new-ec2-iam.tf`: the instance is trusted to vouch for
-its own new key material, rather than have the Lambda transit private key bytes through its
-own execution environment or logs.
+instance's own IAM role: the instance is trusted to vouch for its own new key material,
+rather than have the Lambda transit private key bytes through its own execution environment
+or logs.
 
 Terraform is defined in [`../../new_lambda_rotate_ssh_key.tf`](../../new_lambda_rotate_ssh_key.tf).
 Deploys one function per environment: `oas-rotate-ssh-key-<environment>` (currently

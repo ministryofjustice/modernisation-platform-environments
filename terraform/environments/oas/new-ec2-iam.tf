@@ -76,42 +76,11 @@ resource "aws_iam_role_policy" "ec2_instance_policy_new" {
 }
 
 ######################################
-### EC2 IAM - Instance Connect
-### Lets the instance authorise ephemeral SSH public keys for itself, so the
-### team can push a short-lived key via SSM Run Command (using this role) and
-### then transfer files over an SSM port-forwarding tunnel, without a
-### persistent SSH key or granting SendSSHPublicKey to any human identity.
-######################################
-resource "aws_iam_role_policy" "ec2_instance_connect_key_push" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
-
-  name = "${local.application_name}-ec2-instance-connect-policy"
-  role = aws_iam_role.ec2_instance_role_new[0].name
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect   = "Allow"
-        Action   = "ec2-instance-connect:SendSSHPublicKey"
-        Resource = aws_instance.oas_app_instance_new[0].arn
-        Condition = {
-          StringEquals = {
-            "ec2:osuser" = "ec2-user"
-          }
-        }
-      }
-    ]
-  })
-}
-
-######################################
 ### EC2 IAM - SSH Key Rotation Secret Write
 ### Lets the instance write its own freshly-generated SSH key pair back into
 ### Secrets Manager when the oas-rotate-ssh-key Lambda triggers rotation via
-### SSM RunShellScript. Same self-authorisation trust model as Instance
-### Connect above: the instance vouches for its own new key material, the
-### Lambda never handles key material directly.
+### SSM RunShellScript - the instance vouches for its own new key material,
+### the Lambda never handles key material directly.
 ######################################
 resource "aws_iam_role_policy" "ec2_ssh_key_rotation_secret_write" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
