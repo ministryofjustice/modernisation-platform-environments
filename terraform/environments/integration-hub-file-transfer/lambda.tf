@@ -394,7 +394,7 @@ module "lambda_file_action_dispatcher" {
   handler                           = "lambda_function.lambda_handler"
   maximum_event_age_in_seconds      = 21600
   maximum_retry_attempts            = 2
-  memory_size                       = 256
+  memory_size                       = 128
   reserved_concurrent_executions    = 10
   runtime                           = "python3.12"
   source_path                       = "lambda/file-action-dispatcher"
@@ -403,15 +403,12 @@ module "lambda_file_action_dispatcher" {
   trigger_on_package_timestamp      = false
 
   environment_variables = {
-    AWS_ACCOUNT_ID               = data.aws_caller_identity.current.account_id
-    CLEAN_BUCKET_NAME            = module.s3_bucket["clean"].s3_bucket_id
-    DISPATCH_SECRET_NAME_PREFIX  = local.file_dispatch_secret_name_prefix
-    EVENT_BUS_ARN                = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
-    IDEMPOTENCY_EXPIRY_SECONDS   = tostring(local.cloudwatch_retention_days * 24 * 60 * 60)
-    IDEMPOTENCY_TABLE            = module.dynamodb_adapter_idempotency.dynamodb_table_id
-    POWERTOOLS_LOG_LEVEL         = "INFO"
-    POWERTOOLS_METRICS_NAMESPACE = "IntegrationHubFileTransfer"
-    POWERTOOLS_SERVICE_NAME      = "integration-hub-file-transfer-file-action-dispatcher"
+    DISPATCH_SECRET_NAME_PREFIX = local.file_dispatch_secret_name_prefix
+    EVENT_BUS_ARN               = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
+    IDEMPOTENCY_EXPIRY_SECONDS  = tostring(local.cloudwatch_retention_days * 24 * 60 * 60)
+    IDEMPOTENCY_TABLE           = module.dynamodb_adapter_idempotency.dynamodb_table_id
+    POWERTOOLS_LOG_LEVEL        = "INFO"
+    POWERTOOLS_SERVICE_NAME     = "integration-hub-file-transfer-file-action-dispatcher"
   }
 
   attach_policy_statements = true

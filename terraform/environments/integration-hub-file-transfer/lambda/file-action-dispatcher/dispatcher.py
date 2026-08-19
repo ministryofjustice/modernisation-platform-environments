@@ -5,7 +5,6 @@ from datetime import datetime, timezone
 
 
 EVENT_SOURCE = "uk.gov.justice.service.managed-file-transfer"
-FILE_ROUTED_DETAIL_TYPE = "FileRouted.v1"
 REQUESTED_DETAIL_TYPE = "FileActionExecutionRequested.v1"
 
 
@@ -116,68 +115,15 @@ def parse_dispatch_configuration(response):
     )
 
 
-def parse_file_routed_event(event, account_id, clean_bucket_name):
-    if event.get("source") != EVENT_SOURCE:
-        raise ValueError(f"Event source must be {EVENT_SOURCE}")
-    if event.get("detail-type") != FILE_ROUTED_DETAIL_TYPE:
-        raise ValueError(f"Event detail-type must be {FILE_ROUTED_DETAIL_TYPE}")
-    if event.get("account") != account_id:
-        raise ValueError("Event account does not match the configured AWS account")
-
-    source_event_id = _required_string(event.get("id"), "id")
-    detail = event.get("detail")
-    if not isinstance(detail, dict):
-        raise ValueError("detail must be an object")
-
-    metadata = detail.get("metadata")
-    if not isinstance(metadata, dict):
-        raise ValueError("detail.metadata must be an object")
-    correlation_id = _required_string(
-        metadata.get("correlationId"), "detail.metadata.correlationId"
-    )
-    source_idempotency_key = _required_string(
-        metadata.get("idempotencyKey"), "detail.metadata.idempotencyKey"
-    )
-
-    data = detail.get("data")
-    if not isinstance(data, dict):
-        raise ValueError("detail.data must be an object")
-    if data.get("route") != "clean":
-        raise ValueError("FileRouted route must be clean")
-
-    file_id = _required_string(data.get("fileId"), "detail.data.fileId")
-    destination_object = data.get("destinationObject")
-    if not isinstance(destination_object, dict):
-        raise ValueError("detail.data.destinationObject must be an object")
-    if destination_object.get("bucket") != clean_bucket_name:
-        raise ValueError(
-            "FileRouted destination bucket does not match the configured clean bucket"
-        )
-
-    object_key = _required_string(
-        destination_object.get("key"), "detail.data.destinationObject.key"
-    )
-    version_id = _required_string(
-        destination_object.get("versionId"),
-        "detail.data.destinationObject.versionId",
-    )
-    size_bytes = destination_object.get("sizeBytes")
-    if isinstance(size_bytes, bool) or not isinstance(size_bytes, int) or size_bytes < 0:
-        raise ValueError(
-            "detail.data.destinationObject.sizeBytes must be a non-negative integer"
-        )
-
+def parse_file_routed_event(event):
+    metadata = event["detail"]["metadata"]
+    data = event["detail"]["data"]
     return RoutedFile(
-        source_event_id=source_event_id,
-        source_idempotency_key=source_idempotency_key,
-        correlation_id=correlation_id,
-        file_id=file_id,
-        destination_object={
-            "bucket": clean_bucket_name,
-            "key": object_key,
-            "versionId": version_id,
-            "sizeBytes": size_bytes,
-        },
+        source_event_id=event["id"],
+        source_idempotency_key=metadata["idempotencyKey"],
+        correlation_id=metadata["correlationId"],
+        file_id=data["fileId"],
+        destination_object=data["destinationObject"],
     )
 
 

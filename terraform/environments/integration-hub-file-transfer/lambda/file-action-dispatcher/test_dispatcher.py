@@ -136,7 +136,7 @@ class DispatcherTest(unittest.TestCase):
         )
 
         configuration = parse_dispatch_configuration(self.secret_response)
-        routed_file = parse_file_routed_event(self.event, ACCOUNT_ID, CLEAN_BUCKET)
+        routed_file = parse_file_routed_event(self.event)
         details = build_requested_event_details(routed_file, configuration)
 
         self.assertEqual(len(configuration.operations), 2)
@@ -147,7 +147,7 @@ class DispatcherTest(unittest.TestCase):
         )
 
     def test_builds_deterministic_events_without_sensitive_values(self):
-        routed_file = parse_file_routed_event(self.event, ACCOUNT_ID, CLEAN_BUCKET)
+        routed_file = parse_file_routed_event(self.event)
         configuration = parse_dispatch_configuration(self.secret_response)
         requested_at = datetime(2026, 8, 19, 12, 30, tzinfo=timezone.utc)
 
@@ -175,7 +175,7 @@ class DispatcherTest(unittest.TestCase):
         self.assertNotIn("sensitive-target", json.dumps(first))
 
     def test_changed_secret_version_changes_execution_id(self):
-        routed_file = parse_file_routed_event(self.event, ACCOUNT_ID, CLEAN_BUCKET)
+        routed_file = parse_file_routed_event(self.event)
         first_configuration = parse_dispatch_configuration(self.secret_response)
         self.secret_response["VersionId"] = "new-secret-version"
         second_configuration = parse_dispatch_configuration(self.secret_response)
@@ -190,23 +190,10 @@ class DispatcherTest(unittest.TestCase):
 
     def test_empty_operations_is_a_successful_no_op(self):
         self.secret_response["SecretString"] = json.dumps({"operations": []})
-        routed_file = parse_file_routed_event(self.event, ACCOUNT_ID, CLEAN_BUCKET)
+        routed_file = parse_file_routed_event(self.event)
         configuration = parse_dispatch_configuration(self.secret_response)
 
         self.assertEqual(build_requested_event_details(routed_file, configuration), [])
-
-    def test_rejects_non_clean_route(self):
-        self.event["detail"]["data"]["route"] = "quarantine"
-
-        with self.assertRaisesRegex(ValueError, "route must be clean"):
-            parse_file_routed_event(self.event, ACCOUNT_ID, CLEAN_BUCKET)
-
-    def test_rejects_boolean_object_size(self):
-        self.event["detail"]["data"]["destinationObject"]["sizeBytes"] = True
-
-        with self.assertRaisesRegex(ValueError, "non-negative integer"):
-            parse_file_routed_event(self.event, ACCOUNT_ID, CLEAN_BUCKET)
-
 
 if __name__ == "__main__":
     unittest.main()

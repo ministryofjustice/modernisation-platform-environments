@@ -11,6 +11,7 @@ ACCOUNT_ID = "123456789012"
 CLEAN_BUCKET = "integration-hub-file-transfer-development-clean"
 IDEMPOTENCY_CACHE = {}
 IDEMPOTENCY_DECORATORS = []
+LOGS = []
 
 
 class FakeLogger:
@@ -18,24 +19,13 @@ class FakeLogger:
         pass
 
     def info(self, *_args, **_kwargs):
-        return None
+        LOGS.append(("info", _args, _kwargs))
 
     def exception(self, *_args, **_kwargs):
-        return None
+        LOGS.append(("exception", _args, _kwargs))
 
     def inject_lambda_context(self, **_kwargs):
         return lambda function: function
-
-
-class FakeMetrics:
-    def __init__(self, **_kwargs):
-        pass
-
-    def add_metric(self, **_kwargs):
-        return None
-
-    def log_metrics(self, function):
-        return function
 
 
 class FakeIdempotencyConfig:
@@ -72,8 +62,7 @@ class FileActionDispatcherHandlerTest(unittest.TestCase):
             "secretsmanager": cls.secrets_client,
         }[service]
 
-        powertools = SimpleNamespace(Logger=FakeLogger, Metrics=FakeMetrics)
-        powertools_metrics = SimpleNamespace(MetricUnit=SimpleNamespace(Count="Count"))
+        powertools = SimpleNamespace(Logger=FakeLogger)
         powertools_idempotency = SimpleNamespace(
             DynamoDBPersistenceLayer=lambda **_kwargs: SimpleNamespace(),
             IdempotencyConfig=FakeIdempotencyConfig,
@@ -83,7 +72,6 @@ class FileActionDispatcherHandlerTest(unittest.TestCase):
             sys.modules,
             {
                 "aws_lambda_powertools": powertools,
-                "aws_lambda_powertools.metrics": powertools_metrics,
                 "aws_lambda_powertools.utilities.idempotency": powertools_idempotency,
                 "boto3": boto3,
             },
@@ -91,8 +79,6 @@ class FileActionDispatcherHandlerTest(unittest.TestCase):
         cls.modules_patch.start()
         os.environ.update(
             {
-                "AWS_ACCOUNT_ID": ACCOUNT_ID,
-                "CLEAN_BUCKET_NAME": CLEAN_BUCKET,
                 "DISPATCH_SECRET_NAME_PREFIX": "integration-hub-file-transfer/file-dispatch/",
                 "EVENT_BUS_ARN": "arn:aws:events:eu-west-2:123456789012:event-bus/file-transfer",
                 "IDEMPOTENCY_EXPIRY_SECONDS": "2592000",
@@ -107,6 +93,7 @@ class FileActionDispatcherHandlerTest(unittest.TestCase):
 
     def setUp(self):
         IDEMPOTENCY_CACHE.clear()
+        LOGS.clear()
         self.events_client.reset_mock()
         self.secrets_client.reset_mock()
         self.events_client.put_events.side_effect = None
@@ -162,6 +149,21 @@ class FileActionDispatcherHandlerTest(unittest.TestCase):
         self.assertEqual(detail["data"]["actionDefinitionId"], "notify")
         self.assertNotIn("sensitive-target", entry["Detail"])
         self.assertEqual(result, {"eventIds": ["requested-event-id"], "status": "PUBLISHED"})
+        log_entry = LOGS[-1][2]["extra"]
+        self.assertEqual(
+            log_entry["correlation_id"],
+            "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
+        )
+        self.assertEqual(log_entry["operation_count"], 1)
+        self.assertEqual(
+            log_entry["action_requests"][0]["action_execution_id"],
+            detail["data"]["actionExecutionId"],
+        )
+        self.assertEqual(
+            log_entry["action_requests"][0]["destination_event_id"],
+            "requested-event-id",
+        )
+        self.assertNotIn("sensitive-target", json.dumps(log_entry))
 
     def test_uses_source_logical_idempotency_key(self):
         self.assertEqual(

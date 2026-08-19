@@ -40,9 +40,7 @@ class RequestedEventSchemaContractTest(unittest.TestCase):
                 },
             },
         }
-        routed_file = parse_file_routed_event(
-            source_event, "123456789012", "clean"
-        )
+        routed_file = parse_file_routed_event(source_event)
         configuration = DispatchConfiguration(
             secret_arn=(
                 "arn:aws:secretsmanager:eu-west-2:123456789012:"

@@ -37,6 +37,14 @@ The first existing secret wins. A missing candidate is expected and lookup conti
 
 Only clean `FileRouted.v1` events for the configured clean bucket reach the dispatcher. Quarantine and investigation routes do not produce action requests.
 
+## Delivery and idempotency
+
+One requested event may be routed to multiple downstream queues, for example an action queue and a notification queue. Every downstream consumer must use `actionExecutionId` or `detail.metadata.idempotencyKey` to make processing idempotent. Consumers handling the same request share the file lifecycle `correlationId`, while separate configured operations have separate `actionExecutionId` values.
+
+EventBridge publication is at least once. If part of a publication batch succeeds before another entry fails, the dispatcher retries the source event and may republish successful requests under new EventBridge envelope IDs. The deterministic action execution identity allows each downstream consumer to perform the action or notification once.
+
 ## Security boundary
 
-The dispatcher validates only the JSON structure and required string fields. Action-specific interpretation of `value` belongs to the downstream executor. Secret values must not be written to EventBridge, CloudWatch Logs or dead-letter queues.
+The dispatcher trusts the canonical `FileRouted.v1` input selected by its EventBridge rule. It validates the matched secret's JSON structure and required string fields. Action-specific interpretation of `value` belongs to the downstream executor. Secret values must not be written to EventBridge, CloudWatch Logs or dead-letter queues.
+
+Dispatcher logs use `correlation_id` as the primary lifecycle search field and include only non-sensitive object, secret-version and action-request identifiers. They never include an operation's `value`.
