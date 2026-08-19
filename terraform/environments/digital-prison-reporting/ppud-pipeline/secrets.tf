@@ -4,7 +4,7 @@ module "ppud_rds_export_secret" {
   # v2.1.0
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea"
 
-  name       = "ppud_rds_export_password"
+  name       = "ppud-rds-export-password"
   kms_key_id = module.ppud_kms.key_arn
 
   ignore_secret_changes  = true
@@ -14,7 +14,7 @@ module "ppud_rds_export_secret" {
   tags = merge(
     local.tags,
     {
-      resource_type = "Secrets Manager"
+      resource-type = "Secrets Manager"
     }
   )
 
@@ -26,7 +26,8 @@ module "ppud_slack_webhook" {
   # v2.1.0
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea"
 
-  name = "ppud_notifications_slack_webhook"
+  name       = "ppud-notifications-slack-webhook"
+  kms_key_id = module.ppud_kms.key_arn
 
   secret_string         = "CHANGEME"
   ignore_secret_changes = true
@@ -34,7 +35,7 @@ module "ppud_slack_webhook" {
   tags = merge(
     local.tags,
     {
-      resource_type = "Secrets Manager"
+      resource-type = "Secrets Manager"
     }
   )
 
