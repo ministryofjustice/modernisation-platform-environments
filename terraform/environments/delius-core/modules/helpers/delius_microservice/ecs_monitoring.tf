@@ -22,6 +22,8 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_critical_threshold" {
     ServiceName = var.name
     ClusterName = local.cluster_name
   }
+
+  tags = merge(var.tags, { "app" = "${var.name}" })
 }
 
 # Alarm for critical memory usage
@@ -44,6 +46,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_over_critical_threshold" {
     ClusterName = local.cluster_name
   }
 
+  tags = merge(var.tags, { "app" = "${var.name}" })
 }
 
 # Alarm for warning CPU usage
@@ -65,6 +68,8 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_over_warning_threshold" {
     ServiceName = var.name
     ClusterName = local.cluster_name
   }
+
+  tags = merge(var.tags, { "app" = "${var.name}" })
 }
 
 # Alarm for warning memory usage
@@ -86,6 +91,8 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_over_warning_threshold" {
     ServiceName = var.name
     ClusterName = local.cluster_name
   }
+
+  tags = merge(var.tags, { "app" = "${var.name}" })
 }
 
 resource "aws_cloudwatch_log_metric_filter" "ecs_log_error_filter" {
@@ -115,6 +122,8 @@ resource "aws_cloudwatch_metric_alarm" "ecs_critical_error_volume" {
   threshold           = var.log_error_threshold_config.critical.threshold
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
+
+  tags = merge(var.tags, { "app" = "${var.name}" })
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecs_warning_error_volume" {
@@ -131,6 +140,8 @@ resource "aws_cloudwatch_metric_alarm" "ecs_warning_error_volume" {
   threshold           = var.log_error_threshold_config.warning.threshold
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
+
+  tags = merge(var.tags, { "app" = "${var.name}" })
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecs_healthy_hosts_fatal_alarm" {
@@ -150,6 +161,8 @@ resource "aws_cloudwatch_metric_alarm" "ecs_healthy_hosts_fatal_alarm" {
     LoadBalancer = var.frontend_lb_arn_suffix
     TargetGroup  = aws_lb_target_group.frontend[0].arn_suffix
   }
+
+  tags = merge(var.tags, { "app" = "${var.name}" })
 }
 
 # Response time alarms
@@ -170,6 +183,8 @@ resource "aws_cloudwatch_metric_alarm" "alb_response_time_critical_alarm" {
     LoadBalancer = var.frontend_lb_arn_suffix
     TargetGroup  = aws_lb_target_group.frontend[0].arn_suffix
   }
+
+  tags = merge(var.tags, { "app" = "${var.name}" })
 }
 
 # Response code alarms
@@ -190,6 +205,8 @@ resource "aws_cloudwatch_metric_alarm" "alb_response_code_5xx_warning_alarm" {
     LoadBalancer = var.frontend_lb_arn_suffix
     TargetGroup  = aws_lb_target_group.frontend[0].arn_suffix
   }
+
+  tags = merge(var.tags, { "app" = "${var.name}" })
 }
 
 resource "aws_cloudwatch_metric_alarm" "alb_response_code_5xx_critical_alarm" {
@@ -209,6 +226,8 @@ resource "aws_cloudwatch_metric_alarm" "alb_response_code_5xx_critical_alarm" {
     LoadBalancer = var.frontend_lb_arn_suffix
     TargetGroup  = aws_lb_target_group.frontend[0].arn_suffix
   }
+
+  tags = merge(var.tags, { "app" = "${var.name}" })
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
@@ -230,6 +249,8 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
     ServiceName = var.name
     ClusterName = local.cluster_name
   }
+
+  tags = merge(var.tags, { "app" = "${var.name}" })
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecs_root_volume_usage_high" {
@@ -257,6 +278,8 @@ resource "aws_cloudwatch_metric_alarm" "ecs_root_volume_usage_high" {
         AND path = '/'
     EOT
   }
+
+  tags = merge(var.tags, { "app" = "${var.name}" })
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecs_root_volume_usage_critical" {
@@ -284,4 +307,6 @@ resource "aws_cloudwatch_metric_alarm" "ecs_root_volume_usage_critical" {
         AND path = '/'
     EOT
   }
+
+  tags = merge(var.tags, { "app" = "${var.name}" })
 }
