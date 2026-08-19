@@ -76,16 +76,16 @@ resource "aws_iam_role_policy" "ec2_instance_policy_new" {
 }
 
 ######################################
-### EC2 IAM - Instance Connect
-### Lets the instance authorise ephemeral SSH public keys for itself, so the
-### team can push a short-lived key via SSM Run Command (using this role) and
-### then transfer files over an SSM port-forwarding tunnel, without a
-### persistent SSH key or granting SendSSHPublicKey to any human identity.
+### EC2 IAM - SSH Key Rotation Secret Write
+### Lets the instance write its own freshly-generated SSH key pair back into
+### Secrets Manager when the oas-rotate-ssh-key Lambda triggers rotation via
+### SSM RunShellScript - the instance vouches for its own new key material,
+### the Lambda never handles key material directly.
 ######################################
-resource "aws_iam_role_policy" "ec2_instance_connect_key_push" {
+resource "aws_iam_role_policy" "ec2_ssh_key_rotation_secret_write" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
-  name = "${local.application_name}-ec2-instance-connect-policy"
+  name = "${local.application_name}-ec2-ssh-key-rotation-policy"
   role = aws_iam_role.ec2_instance_role_new[0].name
 
   policy = jsonencode({
@@ -93,13 +93,8 @@ resource "aws_iam_role_policy" "ec2_instance_connect_key_push" {
     Statement = [
       {
         Effect   = "Allow"
-        Action   = "ec2-instance-connect:SendSSHPublicKey"
-        Resource = aws_instance.oas_app_instance_new[0].arn
-        Condition = {
-          StringEquals = {
-            "ec2:osuser" = "ec2-user"
-          }
-        }
+        Action   = "secretsmanager:PutSecretValue"
+        Resource = aws_secretsmanager_secret.ec2_ssh_private_key[0].arn
       }
     ]
   })
