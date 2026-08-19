@@ -20,19 +20,19 @@ module "sherlock_kms_key" {
   aliases = ["sherlock-landing"]
 }
 
-module "sherlock_landing_bucket" {
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/s3-bucket?ref=313b46a604dc6aaee1d7309990388c6687272b6e"
+# module "sherlock_landing_bucket" {
+#   source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/s3-bucket?ref=313b46a604dc6aaee1d7309990388c6687272b6e"
 
-  bucket_prefix             = "landing-sherlock"
-  kms_key_arn               = module.sherlock_kms_key.key_arn
-  enable_malware_protection = true
-  tags = {
-    Environment    = terraform.workspace
-    Application    = "data-factory-corporate"
-    Component      = "people"
-    Infrastructure = "sherlock-landing-bucket"
-  }
-}
+#   bucket_prefix             = "landing-sherlock"
+#   kms_key_arn               = module.sherlock_kms_key.key_arn
+#   enable_malware_protection = true
+#   tags = {
+#     Environment    = terraform.workspace
+#     Application    = "data-factory-corporate"
+#     Component      = "people"
+#     Infrastructure = "sherlock-landing-bucket"
+#   }
+# }
 
 data "aws_secretsmanager_secret" "external_account_id" {
   name = "external-aws-account"
@@ -48,7 +48,7 @@ locals {
   #external_account_id = data.aws_secretsmanager_secret_version.external_account_id.secret_string
 }
 
-module "sherlock_landing_bucket_test" {
+module "sherlock_landing_bucket_mp" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
 
   bucket_prefix      = "landing-sherlock-test"
@@ -89,7 +89,7 @@ module "sherlock_glue_database" {
   database_name = "sherlock_glue_database"
 
   storage = {
-    bucket_name = module.sherlock_landing_bucket_test.bucket.bucket
+    bucket_name = module.sherlock_landing_bucket_mp.bucket.bucket
 
     #currently the prefix is not optional
     prefix      = "avature-sherlock"
@@ -105,7 +105,7 @@ module "assume_iam_role" {
 
   trusted_account_id = data.aws_secretsmanager_secret_version.external_account_id.secret_string
 
-  bucket_arn = module.sherlock_landing_bucket_test.bucket.arn
+  bucket_arn = module.sherlock_landing_bucket_mp.bucket.arn
 
   s3_prefix = "avature-sherlock"
 
