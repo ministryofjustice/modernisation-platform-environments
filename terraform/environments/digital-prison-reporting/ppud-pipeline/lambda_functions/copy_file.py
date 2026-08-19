@@ -7,7 +7,6 @@ import boto3
 logger = logging.getLogger()
 logger.setLevel(os.getenv("LOG_LEVEL", "INFO"))
 
-# Adding comment to test impact
 def handler(event, context):  # pylint: disable=unused-argument
     bak_upload_bucket = os.environ["BACKUP_UPLOADS_BUCKET"]
     land_bucket = os.environ["LAND_BUCKET"]
