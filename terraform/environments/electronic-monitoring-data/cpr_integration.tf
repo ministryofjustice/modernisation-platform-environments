@@ -83,7 +83,7 @@ resource "aws_iam_policy" "emd_cpr_integration_policy" {
   policy      = data.aws_iam_policy_document.cpr_integration.json
 }
 
-resource "aws_iam_role_policy_attachment" "em_dashboard_ear_sar_permissions" {
+resource "aws_iam_role_policy_attachment" "emd_cpr_integration_permissions" {
   policy_arn = aws_iam_policy.emd_cpr_integration_policy.arn
   role       = module.emd_cpr_integration_role.iam_role_name
 }
