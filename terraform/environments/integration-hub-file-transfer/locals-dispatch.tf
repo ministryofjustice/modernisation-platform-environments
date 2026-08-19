@@ -1,12 +1,13 @@
 locals {
   file_dispatch_prefixes = {
     development = {
+      # NB. When we create a secret, we set ignore_changes = true. This is because we don't want to expose secret information (e.g. webhooks) in code.
       # example-transfer-identity = {
       #   "/" = {
       #     action = null
       #     notifications = {
       #       email = null # email address
-      #       slack = null # slack webhook URL
+      #       slack = null # slack channel ID
       #       teams = null # teams webhook URL
       #     }
       #   }
@@ -26,6 +27,24 @@ locals {
       #     notifications = {}
       #   }
       # }
+      dms1981 = {
+        "/" = {
+          action = null
+          notifications = {
+            email = null
+            slack = null
+            teams = null
+          }
+        }
+        "/example/subdirectory/" = {
+          action = null
+          notifications = {
+            email = null
+            slack = null
+            teams = null
+          }
+        }
+      }
     }
     test          = {}
     preproduction = {}
