@@ -3,7 +3,7 @@ module "secrets_file_dispatch_prefix" {
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "2.1.0"
 
-  for_each = local.environment_file_dispatch_prefixes
+  for_each = merge(local.environment_file_dispatch_prefixes...)
 
   name                    = each.key
   description             = "File dispatch configuration for the ${each.key} object key prefix"

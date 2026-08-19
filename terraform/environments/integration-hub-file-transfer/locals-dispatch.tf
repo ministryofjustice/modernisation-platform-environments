@@ -1,27 +1,27 @@
 locals {
   file_dispatch_prefixes = {
     development = {
-      # synergy = {
+      # example-transfer-identity = {
       #   "/" = {
       #     action = null
       #     notifications = {
-      #       email = null
-      #       slack = null
-      #       teams = null
+      #       email = null # email address
+      #       slack = null # slack webhook URL
+      #       teams = null # teams webhook URL
       #     }
       #   }
-      #   "/pensions/" = {
+      #   "/app-1/" = {
       #     action        = null
       #     notifications = {}
       #   }
-      #   "/routes/1/" = {
+      #   "/app-2/1/" = {
       #     action        = null
       #     notifications = {}
       #   }
       # }
       #
-      # web_app = {
-      #   "/group/group-1/" = {
+      # example-web-app-group = {
+      #   "/group/group-name/" = {
       #     action        = null
       #     notifications = {}
       #   }
@@ -32,13 +32,10 @@ locals {
     production    = {}
   }
 
-  environment_file_dispatch_prefixes = merge(
-    {},
-    [
-      for identity, prefixes in local.file_dispatch_prefixes[local.environment] : {
-        for prefix, configuration in prefixes :
-        "${identity}${prefix}" => configuration
-      }
-    ]...
-  )
+  environment_file_dispatch_prefixes = [
+    for identity, prefixes in local.file_dispatch_prefixes[local.environment] : {
+      for prefix, configuration in prefixes :
+      "${identity}${prefix}" => configuration
+    }
+  ]
 }
