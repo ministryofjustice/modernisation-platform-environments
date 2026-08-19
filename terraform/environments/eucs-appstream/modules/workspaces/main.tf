@@ -36,6 +36,8 @@ resource "aws_iam_role_policy_attachment" "workspaces_self_service_access" {
 #checkov:skip=CKV_AWS_355: DS actions do not support resource-level constraints
 #checkov:skip=CKV_AWS_290: DS actions do not support resource-level constraints
 resource "aws_iam_role_policy" "workspaces_ds_access" {
+  #checkov:skip=CKV_AWS_355: DS actions do not support resource-level constraints
+  #checkov:skip=CKV_AWS_290: DS actions do not support resource-level constraints
   count = var.create_service_role ? 1 : 0
   name  = "workspaces-directory-service-access"
   role  = aws_iam_role.workspaces_default[0].id
@@ -93,6 +95,7 @@ resource "aws_directory_service_directory" "ad_connector" {
 
 #checkov:skip=CKV2_AWS_5: SG is attached via workspace_creation_properties.custom_security_group_id
 resource "aws_security_group" "workspaces" {
+  #checkov:skip=CKV2_AWS_5: SG is attached via workspace_creation_properties.custom_security_group_id
   name        = var.security_group_name != "" ? var.security_group_name : "${var.application_name}-${var.environment}-workspaces-sg"
   description = var.security_group_description != "" ? var.security_group_description : "Security group for ${var.application_name} WorkSpaces"
   vpc_id      = var.security_group_vpc_id != "" ? var.security_group_vpc_id : var.vpc_id
@@ -104,6 +107,7 @@ resource "aws_security_group" "workspaces" {
 
 #checkov:skip=CKV_AWS_382: WorkSpaces requires broad outbound for streaming, DC connectivity, and Windows Update
 resource "aws_security_group_rule" "egress" {
+  #checkov:skip=CKV_AWS_382: WorkSpaces requires broad outbound for streaming, DC connectivity, and Windows Update
   security_group_id = aws_security_group.workspaces.id
   type              = "egress"
   description       = "Allow all outbound traffic"
@@ -189,6 +193,8 @@ resource "aws_workspaces_directory" "this" {
 #checkov:skip=CKV_AWS_156: Existing workspaces were provisioned without encryption; enabling requires rebuild
 #checkov:skip=CKV_AWS_155: Existing workspaces were provisioned without encryption; enabling requires rebuild
 resource "aws_workspaces_workspace" "this" {
+  #checkov:skip=CKV_AWS_156: Existing workspaces were provisioned without encryption; enabling requires rebuild
+  #checkov:skip=CKV_AWS_155: Existing workspaces were provisioned without encryption; enabling requires rebuild
   for_each = var.bundle_id != "" ? var.workspace_users : {}
 
   directory_id = aws_workspaces_directory.this.id
