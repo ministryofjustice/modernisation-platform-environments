@@ -1,7 +1,7 @@
 module "iam_role_shield_srt_access" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.1"
+  version = "6.8.0"
 
   create          = true
   use_name_prefix = true
