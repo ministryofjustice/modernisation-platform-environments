@@ -13,7 +13,6 @@ resource "aws_secretsmanager_secret" "external_account" {
 }
 
 
-
 module "sherlock_kms_key" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git//?ref=496d8bd559afebb43b78af0034ec74d8b32378ca"
 
@@ -51,7 +50,7 @@ locals {
 module "sherlock_landing_bucket_mp" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
 
-  bucket_prefix      = "landing-sherlock-test"
+  bucket_prefix      = "landing-sherlock-test-mp"
   bucket_namespace   = "account-regional"
   versioning_enabled = true
 
@@ -81,6 +80,20 @@ module "sherlock_landing_bucket_mp" {
     Component      = "people"
     Infrastructure = "sherlock-landing-bucket-test"
   }
+}
+
+
+data "aws_iam_roles" "modernisation_platform_sandbox_role" {
+  name_regex  = "AWSReservedSSO_modernisation-platform-sandbox_.*"
+  path_prefix = "/aws-reserved/sso.amazonaws.com/"
+}
+
+resource "aws_lakeformation_data_lake_settings" "your_lake_settings_name" {
+  admins = [
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${one(data.aws_iam_roles.modernisation_platform_sandbox_role.names)}",
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan",
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply",
+  ]
 }
 
 module "sherlock_glue_database" {
