@@ -45,6 +45,14 @@ resource "helm_release" "litellm_admin" {
         databaseName              = module.ai_gateway_aurora.cluster_database_name
         databaseUsername          = module.ai_gateway_aurora.cluster_master_username
 
+        # Azure
+        microsoft_foundry_tenant_id = jsondecode(data.aws_secretsmanager_secret_version.microsoft_foundry_jedi_gateway.secret_string)["tenant_id"]
+        microsoft_foundry_client_id = jsondecode(data.aws_secretsmanager_secret_version.microsoft_foundry_jedi_gateway.secret_string)["client_id"]
+
+        # Google
+        googleWorkloadIdentityAudience        = local.google_workload_identity_audience
+        googleApplicationCredentialsConfigMap = kubernetes_config_map_v1.google_application_credentials.metadata[0].name
+
         # LiteLLM
         masterkeySecretName = kubernetes_secret_v1.litellm_master_key.metadata[0].name
         masterkeySecretKey  = "master-key" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
@@ -71,6 +79,7 @@ resource "helm_release" "litellm_admin" {
     module.iam_role,
     kubernetes_service_account_v1.ai_gateway,
     kubernetes_secret_v1.litellm_master_key,
+    kubernetes_config_map_v1.google_application_credentials,
     kubernetes_manifest.external_secret_litellm_license,
     kubernetes_manifest.external_secret_litellm_salt_key,
     kubernetes_manifest.external_secret_litellm_entra_id,
@@ -115,8 +124,13 @@ resource "helm_release" "litellm" {
           "elasticache"
         ]
 
-        # AWS
-        iamRole = module.iam_role.arn
+        # Azure
+        microsoft_foundry_tenant_id = jsondecode(data.aws_secretsmanager_secret_version.microsoft_foundry_jedi_gateway.secret_string)["tenant_id"]
+        microsoft_foundry_client_id = jsondecode(data.aws_secretsmanager_secret_version.microsoft_foundry_jedi_gateway.secret_string)["client_id"]
+
+        # Google
+        googleWorkloadIdentityAudience        = local.google_workload_identity_audience
+        googleApplicationCredentialsConfigMap = kubernetes_config_map_v1.google_application_credentials.metadata[0].name
 
         # Autoscaling
         minReplicas                    = local.environment_configuration.ai_gateway_autoscaling.min_replicas
@@ -143,6 +157,7 @@ resource "helm_release" "litellm" {
     module.iam_role,
     kubernetes_service_account_v1.ai_gateway,
     kubernetes_secret_v1.litellm_master_key,
+    kubernetes_config_map_v1.google_application_credentials,
     kubernetes_manifest.external_secret_litellm_license,
     kubernetes_manifest.external_secret_litellm_salt_key,
     kubernetes_manifest.external_secret_litellm_entra_id,

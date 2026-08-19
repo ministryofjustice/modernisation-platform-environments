@@ -106,11 +106,6 @@ resource "aws_lb_listener" "listener" {
   )
 }
 
-moved {
-  from = aws_lb_target_group.target_group_fargate
-  to   = aws_lb_target_group.target_group_fargate[0]
-}
-
 resource "aws_lb_target_group" "target_group_fargate" {
   # checkov:skip=CKV_AWS_261
 

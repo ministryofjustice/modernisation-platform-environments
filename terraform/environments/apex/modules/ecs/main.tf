@@ -27,6 +27,11 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   min_size              = var.ec2_min_size
   protect_from_scale_in = true
 
+  # desired_capacity is managed live by the ECS capacity provider; don't let apply reset it
+  lifecycle {
+    ignore_changes = [desired_capacity]
+  }
+
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id
     version = "$Latest"
@@ -337,22 +342,6 @@ resource "aws_iam_policy" "ecs_task_execution_policy" { #tfsec:ignore:aws-iam-no
       Name = "${var.app_name}-ecs-task-execution-policy"
     }
   )
-  # Previous policy used SSM parameter store to retrieve the secret.
-  # Keep the old block commented out for rollback.
-  # policy = <<EOF
-  # {
-  #   "Version": "2012-10-17",
-  #   "Statement": [
-  #     {
-  #       "Effect": "Allow",
-  #       "Action": [
-  #         "ssm:GetParameters"
-  #       ],
-  #       "Resource": ["${var.database_tad_password_arn}"]
-  #     }
-  #   ]
-  # }
-  # EOF
   policy = <<EOF
 {
   "Version": "2012-10-17",

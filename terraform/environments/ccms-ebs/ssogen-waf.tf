@@ -94,6 +94,7 @@ resource "aws_cloudwatch_log_group" "ssogen_console_waf_logs" {
   count             = local.ssogen_enabled ? 1 : 0
   name              = "aws-waf-logs-ssogen/ssogen-console-waf-logs"
   retention_in_days = 30
+  kms_key_id        = aws_kms_key.cloudwatch_logs.arn
 
   tags = merge(local.tags,
     { Name = lower(format("lb-%s-console-%s-waf-logs", local.application_name_ssogen, local.environment)) }
@@ -213,6 +214,7 @@ resource "aws_cloudwatch_log_group" "ssogen_waf_logs" {
   count             = local.ssogen_enabled ? 1 : 0
   name              = "aws-waf-logs-ssogen/ssogen-waf-logs"
   retention_in_days = 30
+  kms_key_id        = aws_kms_key.cloudwatch_logs.arn
 
   tags = merge(local.tags,
     { Name = lower(format("lb-%s-%s-waf-logs", local.application_name_ssogen, local.environment)) }
