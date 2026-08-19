@@ -908,7 +908,6 @@ resource "aws_glue_job" "apply_sort_order" {
     "--order"                            = "DESC"
     # Optional args set to false
     "--order_col"                        = "false"
-    "--order_cols"                       = "false"
     "--enable-continuous-cloudwatch-log" = "true"
     "--datalake-formats"                 = "iceberg"
     "--conf"                             = <<EOF
