@@ -1,0 +1,7 @@
+skip-check:
+  - CKV_AWS_382  # WorkSpaces requires broad outbound for streaming, DC connectivity, and Windows Update
+  - CKV_AWS_155  # Existing workspaces provisioned without encryption; enabling requires rebuild
+  - CKV_AWS_156  # Existing workspaces provisioned without encryption; enabling requires rebuild
+  - CKV2_AWS_5   # SG is attached via workspace_creation_properties.custom_security_group_id
+  - CKV_AWS_355  # DS actions do not support resource-level constraints
+  - CKV_AWS_290  # DS actions do not support resource-level constraints

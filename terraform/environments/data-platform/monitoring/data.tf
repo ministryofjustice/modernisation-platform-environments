@@ -42,3 +42,14 @@ data "aws_secretsmanager_secret_version" "pagerduty_orchestrator_integration_key
   secret_id = "pagerduty/orchestrator-integration-key"
 }
 
+data "aws_secretsmanager_secret_version" "grafana_azure_monitor" {
+  count = local.environment_configuration.monitoring_stack_enabled ? 1 : 0
+
+  secret_id = module.grafana_azure_monitor_secret[0].secret_id
+}
+
+data "aws_secretsmanager_secret_version" "google_cloud_monitoring" {
+  count = local.environment_configuration.monitoring_stack_enabled ? 1 : 0
+
+  secret_id = module.google_cloud_monitoring_secret[0].secret_id
+}

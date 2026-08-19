@@ -28,16 +28,16 @@ locals {
   # ArgoCD Hub Configuration (ADR-002 — dual-hub model)
   #
   # Permanent hubs (development + production) are located by convention: spokes
-  # construct the hub's spoke-access role ARN from the hub identity for their
-  # environment tier. No manual input is needed for these.
+  # construct the hub's Argo CD Capability role ARN from the hub identity for
+  # their environment tier. No manual input is needed for these.
   #
   # Ephemeral/test hubs are NOT covered by the convention — for those, the
   # engineer passes the hub role ARN explicitly as a workflow input, which
-  # arrives as var.argocd_hub_spoke_access_role_arn and takes precedence.
+  # arrives as var.argocd_hub_capability_role_arn and takes precedence.
   #
   # IMPORTANT: cluster_name MUST equal the hub cluster's Terraform workspace
-  # name, because the hub's role is created as "<workspace>-argocd-spoke-access"
-  # (see modules/argo-cd — aws_iam_role.argocd_spoke_access).
+  # name, because the hub's role is created as "<workspace>-argocd-capability"
+  # (see modules/argo-cd — aws_iam_role.argocd_capability).
   #-----------------------------------------------------------------------------
   argocd_hubs = {
     nonlive = {
@@ -53,6 +53,6 @@ locals {
   # Environment tier of this spoke (last segment of the workspace name).
   argocd_spoke_tier = local.workspace_environment == "live" ? "live" : "nonlive"
 
-  # Convention-based hub role ARN for this spoke's tier.
-  argocd_hub_convention_role_arn = "arn:aws:iam::${local.argocd_hubs[local.argocd_spoke_tier].account_id}:role/${local.argocd_hubs[local.argocd_spoke_tier].cluster_name}-argocd-spoke-access"
+  # Convention-based hub Argo CD Capability role ARN for this spoke's tier.
+  argocd_hub_capability_convention_role_arn = "arn:aws:iam::${local.argocd_hubs[local.argocd_spoke_tier].account_id}:role/${local.argocd_hubs[local.argocd_spoke_tier].cluster_name}-argocd-capability"
 }
