@@ -904,10 +904,8 @@ resource "aws_glue_job" "apply_sort_order" {
     "--catalog"                          = "${local.env_account_id}"
     "--database"                         = "staged_mdss${local.dbt_suffix}"
     "--table"                            = "false"
-    "--remove_sort_order"                = "false"
     "--order"                            = "DESC"
     # Optional args set to false
-    "--order_col"                        = "false"
     "--order_cols"                       = "false"
     "--enable-continuous-cloudwatch-log" = "true"
     "--datalake-formats"                 = "iceberg"
@@ -921,23 +919,23 @@ EOF
   }
   command {
     python_version  = "3"
-    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/apply_sort_order.py"
+    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/rewrite_in_place.py"
   }
   security_configuration = aws_glue_security_configuration.em_glue_security_configuration[0].name
 
   tags = merge(
     local.tags,
     {
-      Resource_Type = "placeholder",
+      Resource_Type = "Rewrite table with sort order in place.",
     }
   )
 
 }
 
-resource "aws_s3_object" "apply_sort_order_script" {
+resource "aws_s3_object" "rewrite_in_place_script" {
   count  = local.is-development ? 1 : 0
   bucket = module.s3-glue-job-script-bucket.bucket.id
-  key    = "apply_sort_order.py"
-  source = "glue-job/apply_sort_order.py"
-  source_hash   = filemd5("glue-job/apply_sort_order.py")
+  key    = "rewrite_in_place.py"
+  source = "glue-job/rewrite_in_place.py"
+  source_hash   = filemd5("glue-job/rewrite_in_place.py")
 }
