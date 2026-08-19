@@ -90,7 +90,7 @@ data "aws_iam_policy_document" "transfer_user_session" {
 module "iam_policy_transfer_user" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.1"
+  version = "6.8.0"
 
   name        = "${local.environment}-transfer-user-policy"
   description = "AWS Transfer User policy"
@@ -104,7 +104,7 @@ module "iam_policy_transfer_user" {
 module "iam_role_transfer_user" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.1"
+  version = "6.8.0"
 
   name            = "${local.environment}-transfer-user"
   description     = "AWS Transfer User role"
@@ -118,6 +118,18 @@ module "iam_role_transfer_user" {
         type        = "Service"
         identifiers = ["transfer.amazonaws.com"]
       }]
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "aws:SourceAccount"
+          values   = [data.aws_caller_identity.current.account_id]
+        },
+        {
+          test     = "ArnLike"
+          variable = "aws:SourceArn"
+          values   = ["arn:aws:transfer:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:server/*"]
+        },
+      ]
     }
   }
 
@@ -129,7 +141,7 @@ module "iam_role_transfer_user" {
 module "iam_role_transfer" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.1"
+  version = "6.8.0"
 
   create          = true
   use_name_prefix = true
@@ -143,6 +155,18 @@ module "iam_role_transfer" {
         type        = "Service"
         identifiers = ["transfer.amazonaws.com"]
       }]
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "aws:SourceAccount"
+          values   = [data.aws_caller_identity.current.account_id]
+        },
+        {
+          test     = "ArnLike"
+          variable = "aws:SourceArn"
+          values   = ["arn:aws:transfer:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:server/*"]
+        },
+      ]
     }
   }
 
