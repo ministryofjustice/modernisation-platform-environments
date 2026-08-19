@@ -164,7 +164,6 @@ data "aws_iam_policy_document" "log_bucket_policy" {
     }
 
     actions = ["s3:PutObject"]
-
     resources = ["${module.s3-logging-bucket.bucket.arn}/*"]
 
     condition {
@@ -178,6 +177,16 @@ data "aws_iam_policy_document" "log_bucket_policy" {
       variable = "aws:SourceAccount"
       values   = [data.aws_caller_identity.current.account_id]
     }
+  }
+  statement {
+    sid    = "AllowLoadBalancerLogs"
+    effect = "Allow"
+    principals {
+      type = "Service"
+      identifiers = ["logdelivery.elasticloadbalancing.amazonaws.com"]
+    }
+    actions = ["s3:PutObject"]
+    resources = ["${module.s3-logging-bucket.bucket.arn}/*"]
   }
 }
 
