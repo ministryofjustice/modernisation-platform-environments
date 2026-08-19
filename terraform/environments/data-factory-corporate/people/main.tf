@@ -90,11 +90,11 @@ data "aws_iam_roles" "modernisation_platform_sandbox_role" {
 
 resource "aws_lakeformation_data_lake_settings" "your_lake_settings_name" {
   admins = [
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.region}/${one(data.aws_iam_roles.modernisation_platform_sandbox_role.names)}",
     "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan",
     "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply",
   ]
 }
+
 
 module "sherlock_glue_database" {
   source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/data-factory-glue-database?ref=75a5fd1ccb6c1858508b98651030cc4c919b9d03"
