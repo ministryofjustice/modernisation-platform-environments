@@ -71,6 +71,27 @@ data "aws_iam_policy_document" "data_lake_kms_key" {
 
     resources = ["*"]
   }
+
+  # Allow developers to use the key for encrypting and decrypting data in the data lake.
+  statement {
+    sid    = "AllowDevelopersToUseKey"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = local.environments[local.environment].lakeformation_admins
+    }
+
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+    ]
+
+    resources = ["*"]
+  }
 }
 
 resource "aws_kms_key" "data_lake_kms_key" {
