@@ -41,6 +41,8 @@ resource "aws_ecs_task_definition" "opahub" {
       server_port       = local.application_data.accounts[local.environment].opa_server_port
       ssl_port          = local.application_data.accounts[local.environment].opa_ssl_port
       health_check_port = local.application_data.accounts[local.environment].opa_health_check_port
+      java_options      = local.application_data.accounts[local.environment].java_options
+      config_jvm_args   = local.application_data.accounts[local.environment].config_jvm_args
       aws_region        = local.application_data.accounts[local.environment].aws_region
       container_version = local.application_data.accounts[local.environment].opa_container_version
       opahub_password   = "${aws_secretsmanager_secret.opahub_secrets.arn}:opahub_password::"
