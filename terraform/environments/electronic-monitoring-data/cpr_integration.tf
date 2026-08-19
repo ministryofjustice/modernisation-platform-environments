@@ -77,6 +77,19 @@ data "aws_iam_policy_document" "cpr_integration" {
   }
 }
 
+resource "aws_glue_catalog_database" "person_record" {
+    name = "person_record${local.db_suffix}"
+    lifecycle {
+        prevent_destroy = true
+        ignore_changes = [
+        description,
+        location_uri,
+        parameters,
+        target_database
+        ]
+    }
+}
+
 resource "aws_iam_policy" "emd_cpr_integration_policy" {
   name_prefix = "emd-cpr-integrations"
   description = "Permissions for cpr integration."
