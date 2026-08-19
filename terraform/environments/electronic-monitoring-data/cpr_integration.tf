@@ -89,7 +89,7 @@ resource "aws_iam_role_policy_attachment" "emd_cpr_integration_permissions" {
 }
 
 resource "aws_lakeformation_permissions" "cpr_integration_int_fms" {
-  principal   = module..iam_role_arn
+  principal   = module.emd_cpr_integration_role.iam_role_arn
   permissions = ["DESCRIBE"]
   database {
     name = "intermediate_fms${local.dbt_suffix}"
@@ -106,7 +106,7 @@ resource "aws_lakeformation_permissions" "cpr_integration_int_fms_tables" {
 }
 
 resource "aws_lakeformation_permissions" "cpr_integration_db" {
-  principal   = module..iam_role_arn
+  principal   = module.emd_cpr_integration_role.iam_role_arn
   permissions = ["DESCRIBE"]
   database {
     name = "person_record${local.db_suffix}"
