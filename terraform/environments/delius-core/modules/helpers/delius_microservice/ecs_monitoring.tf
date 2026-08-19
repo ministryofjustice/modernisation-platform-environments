@@ -231,3 +231,57 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
     ClusterName = local.cluster_name
   }
 }
+
+resource "aws_cloudwatch_metric_alarm" "ecs_root_volume_usage_high" {
+  count               = var.asg_name != null ? 1 : 0
+  alarm_name          = "${var.name}-${var.env_name}-root-volume-usage-warning"
+  actions_enabled     = true
+  alarm_actions       = [var.sns_topic_arn]
+  ok_actions          = [var.sns_topic_arn]
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  threshold           = 70
+  treat_missing_data  = "missing"
+
+  metric_query {
+    id          = "root_volume_usage"
+    label       = "Highest root volume usage (%)"
+    return_data = true
+    period      = 300
+
+    expression = <<-EOT
+      SELECT MAX(disk_used_percent)
+      FROM SCHEMA(CWAgent, AutoScalingGroupName, InstanceId, device, fstype, path)
+      WHERE AutoScalingGroupName = '${var.asg_name}'
+        AND path = '/'
+    EOT
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "ecs_root_volume_usage_critical" {
+  count               = var.asg_name != null ? 1 : 0
+  alarm_name          = "${var.name}-${var.env_name}-root-volume-usage-critical"
+  actions_enabled     = true
+  alarm_actions       = [var.sns_topic_arn]
+  ok_actions          = [var.sns_topic_arn]
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  threshold           = 80
+  treat_missing_data  = "missing"
+
+  metric_query {
+    id          = "root_volume_usage"
+    label       = "Highest root volume usage (%)"
+    return_data = true
+    period      = 300
+
+    expression = <<-EOT
+      SELECT MAX(disk_used_percent)
+      FROM SCHEMA(CWAgent, AutoScalingGroupName, InstanceId, device, fstype, path)
+      WHERE AutoScalingGroupName = '${var.asg_name}'
+        AND path = '/'
+    EOT
+  }
+}
