@@ -33,6 +33,8 @@ resource "aws_iam_role_policy_attachment" "workspaces_self_service_access" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonWorkSpacesSelfServiceAccess"
 }
 
+#checkov:skip=CKV_AWS_355: DS actions do not support resource-level constraints
+#checkov:skip=CKV_AWS_290: DS actions do not support resource-level constraints
 resource "aws_iam_role_policy" "workspaces_ds_access" {
   count = var.create_service_role ? 1 : 0
   name  = "workspaces-directory-service-access"
@@ -63,10 +65,11 @@ resource "aws_iam_role_policy" "workspaces_ds_access" {
 ###############################################################################
 
 resource "aws_directory_service_directory" "ad_connector" {
-  name     = var.domain_name
-  password = var.ad_connector_password
-  size     = var.ad_connector_size
-  type     = "ADConnector"
+  name        = var.domain_name
+  description = var.ad_connector_description != "" ? var.ad_connector_description : null
+  password    = var.ad_connector_password
+  size        = var.ad_connector_size
+  type        = "ADConnector"
 
   connect_settings {
     customer_dns_ips  = var.dns_ips
@@ -88,9 +91,10 @@ resource "aws_directory_service_directory" "ad_connector" {
 # Security group
 ###############################################################################
 
+#checkov:skip=CKV2_AWS_5: SG is attached via workspace_creation_properties.custom_security_group_id
 resource "aws_security_group" "workspaces" {
   name        = var.security_group_name != "" ? var.security_group_name : "${var.application_name}-${var.environment}-workspaces-sg"
-  description = "Security group for ${var.application_name} WorkSpaces"
+  description = var.security_group_description != "" ? var.security_group_description : "Security group for ${var.application_name} WorkSpaces"
   vpc_id      = var.vpc_id
 
   tags = merge(var.tags, {
@@ -98,6 +102,7 @@ resource "aws_security_group" "workspaces" {
   })
 }
 
+#checkov:skip=CKV_AWS_382: WorkSpaces requires broad outbound for streaming, DC connectivity, and Windows Update
 resource "aws_security_group_rule" "egress" {
   security_group_id = aws_security_group.workspaces.id
   type              = "egress"
@@ -181,6 +186,8 @@ resource "aws_workspaces_directory" "this" {
 # Individual workspaces — only provisioned when a bundle_id is set
 ###############################################################################
 
+#checkov:skip=CKV_AWS_156: Existing workspaces were provisioned without encryption; enabling requires rebuild
+#checkov:skip=CKV_AWS_155: Existing workspaces were provisioned without encryption; enabling requires rebuild
 resource "aws_workspaces_workspace" "this" {
   for_each = var.bundle_id != "" ? var.workspace_users : {}
 

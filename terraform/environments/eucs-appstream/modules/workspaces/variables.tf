@@ -82,6 +82,16 @@ variable "security_group_name" {
   default     = ""
 }
 
+variable "security_group_description" {
+  type    = string
+  default = ""
+}
+
+variable "ad_connector_description" {
+  type    = string
+  default = ""
+}
+
 variable "ip_group_name" {
   type        = string
   description = "Override the IP access control group name."
