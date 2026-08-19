@@ -891,7 +891,7 @@ EOF
 # Apply sort order 
 #------------------
 
-resource "aws_glue_job" "apply_sort_order" {
+resource "aws_glue_job" "rewrite_in_place" {
   count = local.is-development ? 1 : 0
 
   name              = "apply-sort-order"
