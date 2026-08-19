@@ -111,7 +111,7 @@ locals {
         target_cpu_utilization_percentage = 60
       }
       aurora_instance_class = "db.serverless"
-      aurora_engine_version = "17.9"
+      aurora_engine_version = "18.4"
       aurora_instances      = { writer = {} }
       aurora_serverlessv2_scaling_configuration = {
         min_capacity             = 0
