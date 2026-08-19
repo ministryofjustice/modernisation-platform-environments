@@ -23,6 +23,7 @@ locals {
         pagerduty_integrations = {
           corporate-staff-rostering-preproduction-pagerduty = "corporate-staff-rostering-preproduction"
           corporate-staff-rostering-production-pagerduty    = "corporate-staff-rostering-production"
+          delius-mis-preproduction-pagerduty                = "delius_core_nonprod_alarms"
           hmpps-domain-services-preproduction-pagerduty     = "hmpps-domain-services-preproduction"
           nomis-combined-reporting-preproduction-pagerduty  = "nomis-combined-reporting-preproduction"
           nomis-preproduction-pagerduty                     = "nomis-preproduction"
