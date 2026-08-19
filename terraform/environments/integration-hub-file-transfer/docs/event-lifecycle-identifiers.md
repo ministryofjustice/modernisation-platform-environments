@@ -48,6 +48,14 @@ The ROUTE Lambda mover consumes that event and claims a separate `(correlationId
 
 ROUTE copies and verifies the exact processing version with destination SSE-KMS encryption before deleting that exact source version. It then publishes `FileRouted.v1` with an idempotency key of `route:{route}:{destinationBucket}:{key}:{destinationVersionId}`.
 
+## Action dispatch
+
+The file action dispatcher consumes clean `FileRouted.v1` events and uses the source event's `idempotencyKey` for Lambda-level deduplication. Replaying the same logical route under a different EventBridge envelope ID therefore does not republish requests while its idempotency record exists.
+
+Each configured operation produces a `FileActionExecutionRequested.v1` event. Its `actionExecutionId` is a deterministic UUID derived from the source route idempotency key, matched secret ARN, exact secret version ID and stable operation ID. Its output idempotency key is `action-request:{actionExecutionId}`. Rotating the configuration to a new secret version intentionally produces a new execution identity.
+
+The requested event retains the original `fileId` and `correlationId`, and uses the `FileRouted.v1` EventBridge ID as `causationId`.
+
 ## Durable recovery
 
 The mover records these operation checkpoints:

@@ -44,7 +44,8 @@
             "object",
             "actionDefinitionId",
             "actionExecutionId",
-            "requestedAt"
+            "requestedAt",
+            "parameters"
           ],
           "properties": {
             "fileId": {
@@ -56,7 +57,19 @@
             "actionDefinitionId": { "type": "string", "minLength": 1 },
             "actionExecutionId": { "type": "string", "format": "uuid" },
             "requestedAt": { "type": "string", "format": "date-time" },
-            "parameters": { "type": "object" }
+            "parameters": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["secretArn", "secretVersionId", "operationId"],
+              "properties": {
+                "secretArn": {
+                  "type": "string",
+                  "pattern": "^arn:aws[a-zA-Z-]*:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:.+$"
+                },
+                "secretVersionId": { "type": "string", "minLength": 1 },
+                "operationId": { "type": "string", "minLength": 1 }
+              }
+            }
           }
         }
       }
@@ -99,7 +112,7 @@
         "metadata": {
           "correlationId": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
           "causationId": "aa88e95a-159c-40c1-9e7b-38d00b0b6169",
-          "idempotencyKey": "action-request:3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501:send-to-consumer"
+          "idempotencyKey": "action-request:b1d4e7c2-f073-4ed4-9565-a4c31c54bd7f"
         },
         "data": {
           "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
@@ -113,7 +126,9 @@
           "actionExecutionId": "b1d4e7c2-f073-4ed4-9565-a4c31c54bd7f",
           "requestedAt": "2026-07-10T14:04:00Z",
           "parameters": {
-            "endpoint": "consumer-a"
+            "secretArn": "arn:aws:secretsmanager:eu-west-2:123456789012:secret:integration-hub-file-transfer/file-dispatch/example-AbCdEf",
+            "secretVersionId": "EXAMPLE1-90ab-cdef-fedc-ba9876543210",
+            "operationId": "send-to-consumer-a"
           }
         }
       }
