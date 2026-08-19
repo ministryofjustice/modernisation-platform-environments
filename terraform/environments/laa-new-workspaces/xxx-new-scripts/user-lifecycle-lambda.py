@@ -96,6 +96,9 @@ def create_user(user, region):
             FunctionName=os.environ['USER_CREATION_LAMBDA'],
             InvocationType='Event',
             Payload=json.dumps({
+                # Legacy behavior (for quick rollback):
+                # omit 'Username' so user-creation lambda reconstructs from first/last names
+                'Username': username,
                 'Firstname': user['firstname'],
                 'Lastname': user['lastname'],
                 'Email': user['email'],
