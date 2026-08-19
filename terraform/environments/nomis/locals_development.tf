@@ -158,7 +158,11 @@ locals {
           })
         })
         tags = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12.tags, {
-          nomis-environment = "qa11g"
+          nomis-environment       = "dev"
+          oracle-db-name          = "qa11g"
+          oracle-db-hostname-a    = "dev-nomis-db19c-1-a"
+          oracle-db-hostname-b    = "none"
+          weblogic-config-target  = "qa11g"
         })
       })
 
@@ -399,7 +403,11 @@ locals {
           })
         })
         tags = merge(local.ec2_instances.qa11g-nomis-web12.tags, {
-          nomis-environment = "qa11g"
+          nomis-environment       = "dev"
+          oracle-db-name          = "qa11g"
+          oracle-db-hostname-a    = "dev-nomis-db19c-1-a"
+          oracle-db-hostname-b    = "none"
+          weblogic-config-target  = "qa11g"
         })
       })
 
