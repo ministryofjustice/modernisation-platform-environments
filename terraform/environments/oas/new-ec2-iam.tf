@@ -104,3 +104,29 @@ resource "aws_iam_role_policy" "ec2_instance_connect_key_push" {
     ]
   })
 }
+
+######################################
+### EC2 IAM - SSH Key Rotation Secret Write
+### Lets the instance write its own freshly-generated SSH key pair back into
+### Secrets Manager when the oas-rotate-ssh-key Lambda triggers rotation via
+### SSM RunShellScript. Same self-authorisation trust model as Instance
+### Connect above: the instance vouches for its own new key material, the
+### Lambda never handles key material directly.
+######################################
+resource "aws_iam_role_policy" "ec2_ssh_key_rotation_secret_write" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  name = "${local.application_name}-ec2-ssh-key-rotation-policy"
+  role = aws_iam_role.ec2_instance_role_new[0].name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "secretsmanager:PutSecretValue"
+        Resource = aws_secretsmanager_secret.ec2_ssh_private_key[0].arn
+      }
+    ]
+  })
+}
