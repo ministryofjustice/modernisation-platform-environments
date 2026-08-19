@@ -119,10 +119,11 @@ resource "aws_cloudwatch_log_group" "auto_mode" {
   tags = merge(local.tags, { Name = "/aws/vendedlogs/eks/cluster/${each.key}/${local.cluster_name}" })
 }
 
-## Each source triggers an async EKS cluster update and EKS allows only one at a
-## time, so these are chained with waits. for_each creates them in parallel and
-## three of four fail with ConflictException; depends_on alone is not enough
-## because the API returns before the cluster update completes.
+## The CloudWatch delivery API only enables one log type at a time (confirmed by
+## AWS), and each one triggers an async EKS cluster update. So these are chained
+## with waits. for_each creates them in parallel and three of four fail with
+## ConflictException; depends_on alone is not enough because the API call returns
+## before the cluster update finishes.
 resource "aws_cloudwatch_log_delivery_source" "auto_mode_compute" {
   name         = "${local.cluster_name}-compute"
   log_type     = "AUTO_MODE_COMPUTE_LOGS"
@@ -133,7 +134,7 @@ resource "aws_cloudwatch_log_delivery_source" "auto_mode_compute" {
 
 resource "time_sleep" "auto_mode_after_compute" {
   depends_on      = [aws_cloudwatch_log_delivery_source.auto_mode_compute]
-  create_duration = "120s"
+  create_duration = "100s"
 }
 
 resource "aws_cloudwatch_log_delivery_source" "auto_mode_block_storage" {
@@ -148,7 +149,7 @@ resource "aws_cloudwatch_log_delivery_source" "auto_mode_block_storage" {
 
 resource "time_sleep" "auto_mode_after_block_storage" {
   depends_on      = [aws_cloudwatch_log_delivery_source.auto_mode_block_storage]
-  create_duration = "120s"
+  create_duration = "100s"
 }
 
 resource "aws_cloudwatch_log_delivery_source" "auto_mode_load_balancing" {
@@ -163,7 +164,7 @@ resource "aws_cloudwatch_log_delivery_source" "auto_mode_load_balancing" {
 
 resource "time_sleep" "auto_mode_after_load_balancing" {
   depends_on      = [aws_cloudwatch_log_delivery_source.auto_mode_load_balancing]
-  create_duration = "120s"
+  create_duration = "100s"
 }
 
 resource "aws_cloudwatch_log_delivery_source" "auto_mode_ipam" {
