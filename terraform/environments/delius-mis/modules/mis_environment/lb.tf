@@ -530,7 +530,7 @@ resource "aws_lb_listener_rule" "dis_https" {
 resource "aws_lb_listener_rule" "bws_https" {
   count        = length(aws_lb_listener.mis_https) == 1 && local.bws_enabled ? 1 : 0
   listener_arn = aws_lb_listener.mis_https[0].arn
-  priority     = 300
+  priority     = lookup(var.lb_config, "bws_lb_rule_priority", 300)
 
   action {
     type             = "forward"
