@@ -94,27 +94,25 @@ resource "aws_directory_service_directory" "ad_connector" {
 ###############################################################################
 
 #checkov:skip=CKV2_AWS_5: SG is attached via workspace_creation_properties.custom_security_group_id
+#checkov:skip=CKV_AWS_382: WorkSpaces requires broad outbound for streaming, DC connectivity, and Windows Update
 resource "aws_security_group" "workspaces" {
   #checkov:skip=CKV2_AWS_5: SG is attached via workspace_creation_properties.custom_security_group_id
+  #checkov:skip=CKV_AWS_382: WorkSpaces requires broad outbound for streaming, DC connectivity, and Windows Update
   name        = var.security_group_name != "" ? var.security_group_name : "${var.application_name}-${var.environment}-workspaces-sg"
   description = var.security_group_description != "" ? var.security_group_description : "Security group for ${var.application_name} WorkSpaces"
   vpc_id      = var.security_group_vpc_id != "" ? var.security_group_vpc_id : var.vpc_id
 
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all outbound traffic"
+  }
+
   tags = merge(var.tags, {
     "Name" = var.security_group_name != "" ? var.security_group_name : "${var.application_name}-${var.environment}-workspaces-sg"
   })
-}
-
-#checkov:skip=CKV_AWS_382: WorkSpaces requires broad outbound for streaming, DC connectivity, and Windows Update
-resource "aws_security_group_rule" "egress" {
-  #checkov:skip=CKV_AWS_382: WorkSpaces requires broad outbound for streaming, DC connectivity, and Windows Update
-  security_group_id = aws_security_group.workspaces.id
-  type              = "egress"
-  description       = "Allow all outbound traffic"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 ###############################################################################
@@ -170,7 +168,6 @@ resource "aws_workspaces_directory" "this" {
     enable_maintenance_mode             = true
     user_enabled_as_local_administrator = false
     default_ou                          = var.default_ou
-    custom_security_group_id            = aws_security_group.workspaces.id
   }
 
   ip_group_ids = [aws_workspaces_ip_group.this.id]
@@ -184,6 +181,10 @@ resource "aws_workspaces_directory" "this" {
   tags = merge(var.tags, {
     "Name" = "${var.application_name}-${var.environment}-workspaces-directory"
   })
+
+  lifecycle {
+    ignore_changes = [workspace_creation_properties[0].custom_security_group_id]
+  }
 }
 
 ###############################################################################
