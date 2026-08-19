@@ -50,12 +50,17 @@ locals {
   cloud_platform_engineers_group_id = "664252b4-7021-701e-49b9-6c46ccc7899e"
 }
 
+# NOTE: do NOT add `depends_on = [module.eks]` to these EKS data sources. The
+# `name` reference already creates an implicit dependency on the cluster, so
+# they read only after it exists. An explicit depends_on additionally forces
+# Terraform to DEFER the read whenever module.eks shows any planned change,
+# making endpoint/token unknown at plan time. The kubernetes/helm providers
+# (providers.tf) then fall back to localhost, breaking plan-time refresh of the
+# kubernetes_* resources in this component (e.g. the ArgoCD spoke RBAC).
 data "aws_eks_cluster" "cluster" {
-  name       = module.eks.cluster_name
-  depends_on = [module.eks]
+  name = module.eks.cluster_name
 }
 
 data "aws_eks_cluster_auth" "cluster" {
-  name       = module.eks.cluster_name
-  depends_on = [module.eks]
+  name = module.eks.cluster_name
 }
