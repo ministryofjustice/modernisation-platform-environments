@@ -1,7 +1,7 @@
 resource "helm_release" "ai_gateway_configuration" {
   name      = "${local.component_name}-configuration"
   chart     = "${path.module}/src/helm/charts/${local.component_name}-configuration"
-  version   = "1.5.0"
+  version   = "1.6.0"
   namespace = module.ai_gateway_namespace.name
 
   values = [
@@ -13,6 +13,8 @@ resource "helm_release" "ai_gateway_configuration" {
         internal_hostname = "internal.${local.environment_configuration.ai_gateway_hostname}"
         certificate_arn   = module.acm_ai_gateway.acm_certificate_arn
         alb_logs_bucket   = module.alb_access_logs.s3_bucket_id
+        # Default is 60s; large file uploads (e.g. audio transcription) can take longer to process.
+        idle_timeout_seconds = try(local.environment_configuration.ai_gateway_alb_idle_timeout_seconds, 300)
       }
     )
   ]
