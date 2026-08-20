@@ -177,16 +177,16 @@ resource "aws_cloudwatch_metric_alarm" "ecs_root_volume_usage_warning" {
   tags = merge(var.tags, { "app" = var.name })
 }
 
-resource "aws_cloudwatch_metric_alarm" "ecs_root_volume_usage_critical" {
+resource "aws_cloudwatch_metric_alarm" "ecs_host_volume_usage_critical" {
   count               = var.asg_name != null ? 1 : 0
-  alarm_name          = "${var.name}-${var.env_name}-root-volume-usage-critical"
+  alarm_name          = "${var.name}-${var.env_name}-ecs-host-volume-usage-critical"
   actions_enabled     = true
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
   evaluation_periods  = 1
   datapoints_to_alarm = 1
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  threshold           = 80
+  threshold           = 85
   treat_missing_data  = "missing"
 
   metric_query {
@@ -209,20 +209,16 @@ resource "aws_cloudwatch_metric_alarm" "ecs_root_volume_usage_critical" {
 resource "aws_cloudwatch_metric_alarm" "ecs_host_cpu_warning" {
   count = var.asg_name != null ? 1 : 0
 
-  alarm_name        = "${var.name}-${var.env_name}-ecs-host-cpu-warning"
-  alarm_description = "ECS EC2 host CPU utilization is high"
-
-  actions_enabled = true
-  alarm_actions   = [var.sns_topic_arn]
-  ok_actions      = [var.sns_topic_arn]
-
+  alarm_name          = "${var.name}-${var.env_name}-ecs-host-cpu-warning"
+  alarm_description   = "ECS EC2 host CPU utilization crossed 70%"
+  actions_enabled     = true
+  alarm_actions       = [var.sns_topic_arn]
+  ok_actions          = [var.sns_topic_arn]
   evaluation_periods  = 3
   datapoints_to_alarm = 3
-
   comparison_operator = "GreaterThanOrEqualToThreshold"
   threshold           = 70
-
-  treat_missing_data = "notBreaching"
+  treat_missing_data  = "notBreaching"
 
   metric_query {
     id          = "cpu_usage"
@@ -243,20 +239,16 @@ resource "aws_cloudwatch_metric_alarm" "ecs_host_cpu_warning" {
 resource "aws_cloudwatch_metric_alarm" "ecs_host_cpu_critical" {
   count = var.asg_name != null ? 1 : 0
 
-  alarm_name        = "${var.name}-${var.env_name}-ecs-host-cpu-critical"
-  alarm_description = "ECS EC2 host CPU utilization is high"
-
-  actions_enabled = true
-  alarm_actions   = [var.sns_topic_arn]
-  ok_actions      = [var.sns_topic_arn]
-
+  alarm_name          = "${var.name}-${var.env_name}-ecs-host-cpu-critical"
+  alarm_description   = "ECS EC2 host CPU utilization crossed 85%"
+  actions_enabled     = true
+  alarm_actions       = [var.sns_topic_arn]
+  ok_actions          = [var.sns_topic_arn]
   evaluation_periods  = 3
   datapoints_to_alarm = 3
-
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  threshold           = 70
-
-  treat_missing_data = "notBreaching"
+  threshold           = 85
+  treat_missing_data  = "notBreaching"
 
   metric_query {
     id          = "cpu_usage"
@@ -267,6 +259,66 @@ resource "aws_cloudwatch_metric_alarm" "ecs_host_cpu_critical" {
     expression = <<-EOT
       SELECT MAX(CPUUtilization)
       FROM SCHEMA(AWS/EC2, AutoScalingGroupName, InstanceId)
+      WHERE AutoScalingGroupName = '${var.asg_name}'
+    EOT
+  }
+
+  tags = merge(var.tags, { app = var.name })
+}
+
+resource "aws_cloudwatch_metric_alarm" "ecs_host_memory_warning" {
+  count = var.asg_name != null ? 1 : 0
+
+  alarm_name          = "${var.name}-${var.env_name}-ecs-host-memory-warning"
+  alarm_description   = "ECS EC2 host memory utilization crossed 75%"
+  actions_enabled     = true
+  alarm_actions       = [var.sns_topic_arn]
+  ok_actions          = [var.sns_topic_arn]
+  evaluation_periods  = 3
+  datapoints_to_alarm = 3
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  threshold           = 75
+  treat_missing_data  = "notBreaching"
+
+  metric_query {
+    id          = "memory_usage"
+    label       = "Highest ECS host memory utilization (%)"
+    return_data = true
+    period      = 300
+
+    expression = <<-EOT
+      SELECT MAX(mem_used_percent)
+      FROM SCHEMA(CWAgent, AutoScalingGroupName, InstanceId)
+      WHERE AutoScalingGroupName = '${var.asg_name}'
+    EOT
+  }
+
+  tags = merge(var.tags, { app = var.name })
+}
+
+resource "aws_cloudwatch_metric_alarm" "ecs_host_memory_critical" {
+  count = var.asg_name != null ? 1 : 0
+
+  alarm_name          = "${var.name}-${var.env_name}-ecs-host-memory-critical"
+  alarm_description   = "ECS EC2 host memory utilization crossed 85%"
+  actions_enabled     = true
+  alarm_actions       = [var.sns_topic_arn]
+  ok_actions          = [var.sns_topic_arn]
+  evaluation_periods  = 3
+  datapoints_to_alarm = 3
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  threshold           = 85
+  treat_missing_data  = "notBreaching"
+
+  metric_query {
+    id          = "memory_usage"
+    label       = "Highest ECS host memory utilization (%)"
+    return_data = true
+    period      = 300
+
+    expression = <<-EOT
+      SELECT MAX(mem_used_percent)
+      FROM SCHEMA(CWAgent, AutoScalingGroupName, InstanceId)
       WHERE AutoScalingGroupName = '${var.asg_name}'
     EOT
   }
