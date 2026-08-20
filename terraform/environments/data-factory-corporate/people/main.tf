@@ -235,7 +235,7 @@ resource "aws_iam_role_policy" "allow_assume_external_role" {
 # Eventbridge rule
 
 module "data_factory_guardduty_eventbridge" {
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/guardduty-eventbridge?ref=fc527a175226decd7bf0db4be5c69f69c9eb2afe"
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/guardduty-eventbridge?ref=9dc8fb57d5f96f92b6155c7c2a4deb1b2d4d22a7"
 
   name = "eventbridge_malware_rule"
 
@@ -260,7 +260,7 @@ module "data_factory_guardduty_eventbridge" {
 
 module "data_factory_guardduty_scan" {
 
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/guardduty-malware-scan?ref=fc527a175226decd7bf0db4be5c69f69c9eb2afe"
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/guardduty-malware-scan?ref=9dc8fb57d5f96f92b6155c7c2a4deb1b2d4d22a7"
 
 
     bucket_name = module.sherlock_landing_bucket_mp.bucket.bucket
@@ -282,7 +282,7 @@ module "data_factory_guardduty_scan" {
 
 module "data_factory_guardduty_lambda" {
 
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/guardduty-lambda?ref=545aadd3150ea7ba2e3d92bc6a7bc5d6fc7e7d2c"
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/guardduty-lambda?ref=5a7c9ee3b60871f82ac63a19fc38e3131ac75dcc"
 
     name = "guardduty_lambda"
 
