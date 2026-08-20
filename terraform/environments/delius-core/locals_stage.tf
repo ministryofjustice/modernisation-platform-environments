@@ -178,7 +178,7 @@ locals {
     extra_user_data_content = "yum install -y openldap-clients"
   }
 
-dms_config_stage = {
+  dms_config_stage = {
     deploy_dms                 = true
     replication_instance_class = "dms.t3.medium"
     engine_version             = "3.5.4"

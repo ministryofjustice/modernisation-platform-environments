@@ -66,15 +66,25 @@ webhooksCleanup:
       effect: NoSchedule
 
 config:
-  resourceFiltersExcludeNamespaces:
-    # System and platform namespaces excluded from Kyverno resource filtering.
-    - kube-system
-    - cilium-secrets
+  resourceFiltersIncludeNamespaces:
+    # System and platform namespaces excluded from Kyverno admission processing.
+    - ai-gateway
     - amazon-guardduty
     - amazon-network-flow-monitor
+    - app
+    - aws-cloudwatch-observability
+    - cert-manager
+    - cilium-secrets
     - cluster-autoscaler
-    - prometheus
+    - external-dns
+    - external-secrets
     - fluent-bit
+    - karpenter
+    - keda
+    - kyverno
+    - metrics-server
+    - prometheus
+    - shared-services
 
 features:
   controllerRuntimeMetrics:

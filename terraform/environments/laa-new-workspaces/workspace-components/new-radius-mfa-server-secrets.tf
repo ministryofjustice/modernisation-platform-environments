@@ -60,31 +60,3 @@ resource "aws_secretsmanager_secret_version" "linotp_admin_password" {
   secret_id     = aws_secretsmanager_secret.linotp_admin_password.id
   secret_string = random_password.linotp_admin_password.result
 }
-
-##############################################
-### MariaDB Root Password
-##############################################
-
-resource "random_password" "mariadb_root_password" {
-  length  = 32
-  special = true
-}
-
-resource "aws_secretsmanager_secret" "mariadb_root_password" {
-  name_prefix             = "${local.application_name}-${local.environment}-mariadb-root-"
-  description             = "MariaDB root password for LinOTP database"
-  recovery_window_in_days = 0
-
-  tags = merge(
-    local.tags,
-    {
-      "Name" = "${local.application_name}-${local.environment}-mariadb-root-password"
-      "Type" = "MariaDB"
-    }
-  )
-}
-
-resource "aws_secretsmanager_secret_version" "mariadb_root_password" {
-  secret_id     = aws_secretsmanager_secret.mariadb_root_password.id
-  secret_string = random_password.mariadb_root_password.result
-}

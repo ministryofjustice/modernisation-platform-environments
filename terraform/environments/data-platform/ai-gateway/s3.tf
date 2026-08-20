@@ -15,6 +15,18 @@ data "aws_iam_policy_document" "alb_access_logs_bucket_policy" {
       identifiers = [data.aws_elb_service_account.current.arn]
     }
   }
+
+  statement {
+    sid       = "AllowInternalALBPutObject"
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
+    resources = ["arn:aws:s3:::${local.alb_access_logs_bucket_name}/${local.component_name}-internal/AWSLogs/${data.aws_caller_identity.current.account_id}/*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [data.aws_elb_service_account.current.arn]
+    }
+  }
 }
 
 #trivy:ignore:AVD-AWS-0132: ALB access log buckets cannot use SSE-KMS (https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html)

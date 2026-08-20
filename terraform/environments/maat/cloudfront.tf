@@ -164,6 +164,32 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
   }
 }
 
+data "aws_iam_policy_document" "cloudfront_bucket_secure_transport" {
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.cloudfront.arn,
+      "${aws_s3_bucket.cloudfront.arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "cloudfront_bucket_secure_transport" {
+  bucket = aws_s3_bucket.cloudfront.id
+  policy = data.aws_iam_policy_document.cloudfront_bucket_secure_transport.json
+}
+
 resource "aws_cloudfront_distribution" "external" {
   http_version = "http2"
   origin {

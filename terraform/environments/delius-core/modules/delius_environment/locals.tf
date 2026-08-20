@@ -36,19 +36,51 @@ locals {
     "217.138.45.109/32", # Unilink AOVPN
     "217.138.45.110/32", # Unilink AOVPN
   ]
-  all_ingress_ips = concat(local.moj_ips, local.unilink_ips)
-
-  legacy_test_natgw_ips = [
-    "35.176.126.163/32",
-    "35.178.162.73/32",
-    "52.56.195.113/32"
+  cp_ips = [
+    "35.178.209.113/32", # cloudplatform-live1-1
+    "3.8.51.207/32",     # cloudplatform-live1-2
+    "35.177.252.54/32"   # cloudplatform-live1-3
   ]
-
-  legacy_preprod_natgw_ips = [
-    "52.56.240.62/32",
-    "18.130.110.168/32",
-    "35.178.44.184/32"
+  mp_non_live_natgw_ips = [
+    "13.42.163.245/32", # mod-platform-non-live-eu-west-2b-nat
+    "13.43.9.198/32",   # mod-platform-non-live-eu-west-2a-nat
+    "18.132.208.127/32" # mod-platform-non-live-eu-west-2c-nat
   ]
+  mp_live_natgw_ips = [
+    "13.41.38.176/32", # mod-platform-live-eu-west-2b-nat
+    "3.11.197.133/32", # mod-platform-live-eu-west-2c-nat
+    "3.8.81.175/32"    # mod-platform-live-eu-west-2c-nat
+  ]
+  mp_natgw_ips = contains(["poc", "dev", "test"], var.env_name) ? local.mp_non_live_natgw_ips : local.mp_live_natgw_ips
+
+  all_ingress_ips = concat(
+    local.moj_ips,
+    local.unilink_ips,
+    local.cp_ips,
+    local.mp_natgw_ips,
+    [var.account_info.cp_cidr]
+  )
+
+  legacy_natgw_ips = {
+    poc = null
+    dev = null
+    test = [
+      "35.176.126.163/32",
+      "35.178.162.73/32",
+      "52.56.195.113/32"
+    ]
+    stage = [
+      "3.11.26.150/32",
+      "18.130.189.137/32",
+      "3.10.104.193/32"
+    ]
+    preprod = [
+      "52.56.240.62/32",
+      "18.130.110.168/32",
+      "35.178.44.184/32"
+    ]
+    prod = null
+  }
 
   secret_prefix           = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}"
   application_secret_name = "${local.secret_prefix}-application-passwords"
@@ -58,9 +90,5 @@ locals {
     primarydb  = try(module.oracle_db_primary[0].oracle_db_server_name, "none"),
     standbydb1 = try(module.oracle_db_standby[0].oracle_db_server_name, "none"),
     standbydb2 = try(module.oracle_db_standby[1].oracle_db_server_name, "none")
-  }
-
-  container_vars_default = {
-    for key, name in var.delius_microservice_configs.weblogic_params : key => data.aws_ssm_parameter.weblogic_ssm[key].value
   }
 }

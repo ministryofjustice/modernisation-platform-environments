@@ -15,6 +15,7 @@ from mojap_metadata.converters.etl_manager_converter import EtlManagerConverter
 from mojap_metadata.converters.glue_converter import GlueConverter
 from mojap_metadata.converters.sqlalchemy_converter import SQLAlchemyConverter
 from sqlalchemy import create_engine
+from sqlalchemy.exc import NoSuchTableError
 
 patch_all()
 
@@ -124,6 +125,10 @@ class MetadataExtractor:
         self.dialect = db_options["dialect"]
         self.objects = db_options["objects"]
         self.deleted_tables = db_options.get("deleted_tables", [])
+        self.environment = os.getenv("ENVIRONMENT", "").lower()
+        self.dms_mapping_rules = {}
+        self.excluded_columns_by_object = defaultdict(set)
+        self.columns_to_keep_as_int_by_object = defaultdict(set)
         lambda_bucket_name = os.getenv("LAMBDA_BUCKET")
         path_to_dms_mapping_rules = db_options.get("path_to_dms_mapping_rules", "")
         if path_to_dms_mapping_rules:
@@ -133,15 +138,29 @@ class MetadataExtractor:
                 Key=path_to_dms_mapping_rules
             )
             self.dms_mapping_rules = json.loads(b"".join(response['Body'].readlines()).decode("utf-8"))
-        self.excluded_columns_by_object = defaultdict(set)
         for object_column in self.dms_mapping_rules.get("columns_to_exclude", []):
             self.excluded_columns_by_object[object_column["object_name"].upper()].add(object_column["column_name"].upper())
+        for object_column in self.dms_mapping_rules.get("columns_to_keep_as_int", []):
+            applies_to_environments = [environment.lower() for environment in object_column.get("apply_to_environments", [])]
+            if applies_to_environments and self.environment not in applies_to_environments:
+                continue
+            self.columns_to_keep_as_int_by_object[object_column["object_name"].upper()].add(object_column["column_name"].upper())
 
         logger.info("Excluded columns loaded as %s", self.excluded_columns_by_object)
         self.emc = EtlManagerConverter()
         self.sqlc = SQLAlchemyConverter(engine)
         self.blobs = []
+        self.missing_objects = []
         self.upper_case_dialects = ["oracle"]
+
+    def _columns_to_keep_as_int(self, schema: str, table: str) -> set[str]:
+        if f"{schema}.{table}".upper() in self.columns_to_keep_as_int_by_object:
+            return self.columns_to_keep_as_int_by_object[f"{schema}.{table}".upper()]
+
+        if table.upper() in self.columns_to_keep_as_int_by_object:
+            return self.columns_to_keep_as_int_by_object[table.upper()]
+
+        return set()
 
     def _manage_blob_columns(self, metadata: Metadata) -> Metadata:
         logger.info("Managing blob columns for metadata: %s", metadata.to_dict())
@@ -168,7 +187,7 @@ class MetadataExtractor:
         logger.info("Converting integer columns for metadata: %s", metadata.to_dict())
     
         integral_types = {"int", "integer", "bigint", "smallint", "tinyint"}
-    
+
         for column_name in metadata.column_names:
             column_int = metadata.get_column(column_name)
             column_type = str(column_int.get("type", "")).lower()
@@ -177,6 +196,20 @@ class MetadataExtractor:
                 column_int["type"] = "decimal128(38,0)"
                 metadata.update_column(column_int)
     
+        return metadata
+
+    def _preserve_int_columns(self, metadata: Metadata, schema: str, table: str) -> Metadata:
+        columns_to_keep_as_int = self._columns_to_keep_as_int(schema, table)
+
+        if not columns_to_keep_as_int:
+            return metadata
+
+        for column_name in set(metadata.column_names).intersection(map(str.lower, columns_to_keep_as_int)):
+            logger.info("Keeping column %s as int in table %s in schema %s", column_name, table, schema)
+            column = metadata.get_column(column_name)
+            column["type"] = "int32"
+            metadata.update_column(column)
+
         return metadata
         
     def _dialect_is_mssql(self) -> bool:
@@ -244,9 +277,15 @@ class MetadataExtractor:
         if self.dialect in self.upper_case_dialects:
             etlmeta.location = etlmeta.location.upper()
         etl_dict = etlmeta.to_dict()
+        columns_to_keep_as_int = {
+            column.lower() for column in self._columns_to_keep_as_int(metadata.database_name, metadata.name)
+        }
 
         if self._dialect_is_mssql():
             for column in etl_dict.get("columns", []):
+                if str(column.get("name", "")).lower() in columns_to_keep_as_int:
+                    continue
+
                 if str(column.get("type", "")).lower() == "int":
                     logger.info(
                         "Converting ETL metadata column %s type from int to decimal",
@@ -278,6 +317,7 @@ class MetadataExtractor:
         table_meta = self._process_exclusions(table_meta, schema, table)
         table_meta.database_name = schema
         table_meta.file_format = "parquet"
+        table_meta = self._preserve_int_columns(table_meta, schema, table)
         return table_meta
 
     def _write_database_objects(self, bucket):
@@ -313,9 +353,29 @@ class MetadataExtractor:
             raise ValueError(f"Expected object to be of format `table` or `schema.table` but got {obj_str}")
 
     def get_database_metadata(self, output_bucket):
-        tables = [self.get_table_metadata (*self.get_schema_and_table_from_object(obj)) for obj in self.objects]
+        tables = []
+        self.missing_objects = []
+
+        for obj in self.objects:
+            schema, table = self.get_schema_and_table_from_object(obj)
+            try:
+                tables.append(self.get_table_metadata(schema, table))
+            except NoSuchTableError:
+                missing_object = f"{schema}.{table}".lower()
+                self.missing_objects.append(missing_object)
+                logger.exception("Could not reflect configured database object: %s", missing_object)
+
         self._write_database_objects(output_bucket)
         return tables
+
+    def raise_for_missing_objects(self):
+        if not self.missing_objects:
+            return
+
+        missing = ", ".join(sorted(self.missing_objects))
+        raise NoSuchTableError(
+            f"Failed to reflect configured database object(s): {missing}"
+        )
 
 
 def handler(event, context):  # pylint: disable=unused-argument
@@ -446,6 +506,9 @@ def handler(event, context):  # pylint: disable=unused-argument
             Bucket=metadata_bucket,
             Key=f"{table.name}.json",
         )
+
+    metadata.raise_for_missing_objects()
+
     if retry_failed_after_recreate_metadata:
         reprocess_failed_records()
 

@@ -85,8 +85,10 @@ import lambda_function as handler
 
 
 class FakeS3Client:
-    def __init__(self, metadata):
+    def __init__(self, metadata, content_length=28, content_type="text/csv"):
         self.metadata = metadata
+        self.content_length = content_length
+        self.content_type = content_type
         self.head_calls = []
         self.get_calls = []
         self.presign_calls = []
@@ -94,8 +96,8 @@ class FakeS3Client:
     def head_object(self, **kwargs):
         self.head_calls.append(kwargs)
         return {
-            "ContentLength": 28,
-            "ContentType": "text/csv",
+            "ContentLength": self.content_length,
+            "ContentType": self.content_type,
             "Metadata": self.metadata,
         }
 
@@ -190,7 +192,7 @@ class CleanFileNotifierTests(unittest.TestCase):
                                     "eventSource": "aws:s3",
                                     "s3": {
                                         "bucket": {"name": "clean-bucket"},
-                                        "object": {"key": "products-poc/uploads/2026/06/25/test.csv"},
+                                        "object": {"key": "products-poc/uploads/2026/06/25/uuid-prefix-test.csv"},
                                     },
                                 }
                             ]
@@ -231,8 +233,12 @@ class CleanFileNotifierTests(unittest.TestCase):
         handler.lambda_handler(self._event(), SimpleNamespace())
 
         self.assertEqual(2, len(fake_sns.publish_calls))
+        slack_publish = fake_sns.publish_calls[0]
+        slack_message = json.loads(slack_publish["Message"])
         client_publish = fake_sns.publish_calls[1]
         message = json.loads(client_publish["Message"])
+        self.assertIn("*File name:* `test.csv`", slack_message["content"]["description"])
+        self.assertIn("Download URL: <https://example.test/download|test.csv>", slack_message["content"]["description"])
         self.assertEqual(handler.CLIENT_NOTIFICATION_SNS_TOPIC_ARN, client_publish["TopicArn"])
         self.assertEqual("products-poc", message["clientId"])
         self.assertEqual("ticket-123", message["transferTicket"])
@@ -294,6 +300,42 @@ class CleanFileNotifierTests(unittest.TestCase):
         handler.lambda_handler(self._event(), SimpleNamespace())
 
         self.assertEqual(2, len(fake_sns.publish_calls))
+
+    @patch.object(handler, "s3")
+    @patch.object(handler, "sns")
+    @patch.object(handler, "secrets_manager")
+    @patch.object(handler, "requests")
+    def test_skips_destination_delivery_for_large_objects_and_still_publishes_notifications(
+        self,
+        patched_requests,
+        patched_secrets_manager,
+        patched_sns,
+        patched_s3,
+    ):
+        fake_s3 = FakeS3Client(
+            {
+                "client-id": "products-poc",
+                "original-file-name": "sample_6gb.dat",
+                "transfer-ticket": "ticket-large",
+            },
+            content_length=6_442_450_944,
+            content_type="application/octet-stream",
+        )
+        fake_sns = FakeSnsClient()
+        fake_requests = FakeRequests()
+        fake_secrets_manager = FakeSecretsManager()
+        patched_s3.head_object = fake_s3.head_object
+        patched_s3.generate_presigned_url = fake_s3.generate_presigned_url
+        patched_s3.get_object = fake_s3.get_object
+        patched_sns.publish = fake_sns.publish
+        patched_requests.request = fake_requests.request
+        patched_secrets_manager.get_secret_value = fake_secrets_manager.get_secret_value
+
+        handler.lambda_handler(self._event(), SimpleNamespace())
+
+        self.assertEqual(2, len(fake_sns.publish_calls))
+        self.assertEqual([], fake_secrets_manager.calls)
+        self.assertEqual(0, len(fake_requests.calls))
 
 
 if __name__ == "__main__":

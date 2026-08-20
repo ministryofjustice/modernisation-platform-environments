@@ -134,7 +134,7 @@ module "sqs_clean_file_notifications" {
   dlq_name   = "${local.resource_name_prefix}-clean-file-notifications-dlq"
 
   message_retention_seconds     = 1209600
-  visibility_timeout_seconds    = 180
+  visibility_timeout_seconds    = 960
   receive_wait_time_seconds     = 20
   dlq_message_retention_seconds = 1209600
 
@@ -208,8 +208,10 @@ module "lambda_clean_file_presigned_url_notifier" {
   function_name                = "${local.resource_name_prefix}-clean-file-presigned-url-notifier"
   description                  = "Generates a presigned download URL for clean files, optionally pushes them to a client destination, and publishes notifications"
   handler                      = "lambda_function.lambda_handler"
+  memory_size                  = 1024
   runtime                      = "python3.12"
   source_path                  = "${path.module}/lambda/clean-file-presigned-url-notifier"
+  timeout                      = 900
   trigger_on_package_timestamp = false
 
   event_source_mapping = {

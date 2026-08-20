@@ -1,0 +1,17 @@
+{
+  "accounts": {
+    "development": {
+      "admin_ami_image_id": "ami-02f77a03ec776dc35",
+      "admin_ec2_instance_type": "m5.xlarge",
+      "admin_ec2_min_capacity": 1,
+      "admin_ec2_max_capacity": 1,
+      "admin_ec2_desired_capacity": 1,
+      "managed_ami_image_id": "ami-02f77a03ec776dc35",
+      "managed_ec2_instance_type": "m5.2xlarge",
+      "managed_ec2_min_capacity": 1,
+      "managed_ec2_max_capacity": 1,
+      "managed_ec2_desired_capacity": 1,
+      "root_volume_size": 30
+    }
+  }
+}

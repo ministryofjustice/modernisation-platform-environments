@@ -7,41 +7,16 @@ module "weblogic" {
   }
 
   name              = "weblogic"
-  container_image   = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic:${var.delius_microservice_configs.weblogic.image_tag}"
+  create_service    = "false"
   env_name          = var.env_name
   account_config    = var.account_config
   account_info      = var.account_info
   capacity_provider = aws_ecs_capacity_provider.weblogic.name
-
-  desired_count = var.delius_microservice_configs.weblogic.task_count
+  asg_name          = aws_autoscaling_group.weblogic.name
 
   force_new_deployment = false
 
-  pin_task_definition_revision           = try(var.delius_microservice_configs.weblogic.task_definition_revision, 0)
-  ignore_changes_service_task_definition = false
-
-  ecs_cluster_arn  = module.ecs.ecs_cluster_arn
-  container_memory = var.delius_microservice_configs.weblogic.container_memory
-  container_cpu    = var.delius_microservice_configs.weblogic.container_cpu
-
-  container_vars_default = var.delius_microservice_configs.weblogic_params
-
-  container_vars_env_specific = try(var.delius_microservice_configs.weblogic.container_vars_env_specific, {})
-
-  container_secrets_default = merge({
-    for name in local.weblogic_secrets : name => module.weblogic_ssm.arn_map[name]
-    }, {
-    "JDBC_PASSWORD" = "${module.oracle_db_shared.database_application_passwords_secret_arn}:delius_pool::"
-    }
-  )
-  container_secrets_env_specific = try(var.delius_microservice_configs.weblogic.container_secrets_env_specific, {})
-
-  container_port_config = [
-    {
-      containerPort = var.delius_microservice_configs.weblogic.container_port
-      protocol      = "tcp"
-    }
-  ]
+  ecs_cluster_arn = module.ecs.ecs_cluster_arn
 
   cluster_security_group_id = aws_security_group.cluster.id
 
@@ -66,8 +41,8 @@ module "weblogic" {
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
-  deployment_maximum_percent         = 200
-  deployment_minimum_healthy_percent = 100
+  deployment_minimum_healthy_percent = 50
+  deployment_maximum_percent         = 100
 
   ecs_service_ingress_security_group_ids = []
   ecs_service_egress_security_group_ids = [
@@ -126,6 +101,7 @@ data "aws_ami" "ecs_ami" {
 }
 
 resource "aws_launch_template" "weblogic" {
+  #checkov:skip=CKV_AWS_341: "To Do: Test required hop limit"
   name_prefix   = "weblogic-${var.env_name}-ecs-"
   image_id      = data.aws_ami.ecs_ami.id
   instance_type = var.delius_microservice_configs.weblogic.ec2_instance_type
@@ -141,6 +117,12 @@ resource "aws_launch_template" "weblogic" {
 
   iam_instance_profile {
     name = aws_iam_instance_profile.weblogic.name
+  }
+
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
   }
 }
 
@@ -172,12 +154,13 @@ resource "aws_iam_instance_profile" "weblogic" {
 }
 
 resource "aws_security_group" "ecs_host_sg" {
+  #checkov:skip=CKV_AWS_382: "Required for ECS tasks to access external services"
   name        = "weblogic-${var.env_name}-ecscluster-private-sg"
   description = "Shared ECS Cluster Hosts Security Group"
   vpc_id      = var.account_info.vpc_id
 
-  # Allow all outbound
   egress {
+    description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -224,8 +207,62 @@ resource "aws_ecs_capacity_provider" "weblogic" {
   }
 }
 
+resource "aws_lb_listener_rule" "blocked_paths_listener_rule" {
+  listener_arn = aws_lb_listener.listener_https.arn
+  priority     = 51 # must be before ndelius_allowed_paths_rule
+  condition {
+    host_header {
+      values = [
+        "ndelius.${var.env_name}.${var.account_config.dns_suffix}",
+        "ndelius.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
+      ]
+    }
+  }
+  condition {
+    path_pattern {
+      values = [
+        "/NDelius*/delius/a4j/g/3_3_3.Final*DATA*", # mitigates CVE-2018-12533
+      ]
+    }
+  }
+  action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      status_code  = "404"
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
+  listener_arn = aws_lb_listener.listener_https.arn
+  priority     = 61
+  condition {
+    host_header {
+      values = [
+        "ndelius.${var.env_name}.${var.account_config.dns_suffix}",
+        "ndelius.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
+      ]
+    }
+  }
+  condition {
+    path_pattern {
+      values = [
+        "/NDelius*",
+        "/jspellhtml/*"
+      ]
+    }
+  }
+  action {
+    type             = "forward"
+    target_group_arn = module.weblogic.target_group_arn
+  }
+  depends_on = [aws_lb_listener_rule.blocked_paths_listener_rule]
+}
+
+
 locals {
-  weblogic_cutover_envs = ["dev", "test"]
+  weblogic_cutover_envs = ["dev", "test", "stage"]
 }
 
 # Cert for Legacy URL: https://dsdmoj.atlassian.net/browse/TM-2173
@@ -236,10 +273,14 @@ locals {
 # 5. Create CNAME record in legacy that points ndelius.probation.service.justice.gov.uk -> ndelius.prod.delius-core.hmpps-production.modernisation-platform.service.justice.gov.uk
 resource "aws_acm_certificate" "legacy" {
   count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name != "prod" ? 1 : 0
- 
-  domain_name       = "*.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"
+
+  domain_name       = "ndelius.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"
   validation_method = "DNS"
   tags              = var.tags
+
+  subject_alternative_names = [
+    "interface.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"
+  ]
 
   lifecycle {
     create_before_destroy = true
@@ -256,9 +297,13 @@ resource "aws_lb_listener_certificate" "legacy" {
 resource "aws_acm_certificate" "legacy_prod" {
   count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name == "prod" ? 1 : 0
 
-  domain_name       = "*.probation.service.justice.gov.uk"
+  domain_name       = "ndelius.probation.service.justice.gov.uk"
   validation_method = "DNS"
   tags              = var.tags
+
+  subject_alternative_names = [
+    "interface.probation.service.justice.gov.uk"
+  ]
 
   lifecycle {
     create_before_destroy = true

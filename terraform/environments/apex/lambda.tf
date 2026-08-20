@@ -5,22 +5,7 @@ locals {
   hash_value                        = "Y/4+i1hcHvLBzOaCHJ/m9bQLuVtQwr8gnF//AJ2j+S4="
 }
 
-resource "aws_ssm_parameter" "ssh_key" {
-  name        = "EC2_SSH_KEY" # This needs to match the name supplied to the dbconnect.js script
-  description = "SSH Key used by Lambda function to access database instance for backup. Value is updated manually."
-  type        = "SecureString"
-  value       = "Placeholder"
-
-  tags = merge(
-    local.tags,
-    { Name = "EC2_SSH_KEY" }
-  )
-  lifecycle {
-    ignore_changes = [
-      value,
-    ]
-  }
-}
+# EC2_SSH_KEY secret resource for Lambda SSH access is managed in secrets.tf.
 
 ##################################
 ### IAM Role for BackUp Lambda
@@ -76,6 +61,7 @@ resource "aws_iam_policy" "backup_lambda" { #tfsec:ignore:aws-iam-no-policy-wild
                 "ec2:DescribeSnapshots",
                 "ec2:CreateTags",
                 "s3:*",
+                "secretsmanager:GetSecretValue",
                 "ssm:*",
                 "ses:*",
                 "logs:*",
@@ -155,6 +141,32 @@ resource "aws_s3_bucket_versioning" "backup_lambda" {
   versioning_configuration {
     status = "Enabled"
   }
+}
+
+data "aws_iam_policy_document" "backup_lambda_secure_transport" {
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.backup_lambda.arn,
+      "${aws_s3_bucket.backup_lambda.arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "backup_lambda_secure_transport" {
+  bucket = aws_s3_bucket.backup_lambda.id
+  policy = data.aws_iam_policy_document.backup_lambda_secure_transport.json
 }
 
 #####################################
