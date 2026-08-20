@@ -19,17 +19,17 @@ module "sherlock_kms_key" {
   aliases = ["sherlock-landing"]
 }
 
-# module "sherlock_landing_bucket" {
+# module "sherlock_quarantine_bucket" {
 #   source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/s3-bucket?ref=313b46a604dc6aaee1d7309990388c6687272b6e"
 
-#   bucket_prefix             = "landing-sherlock"
+#   bucket_prefix             = "quarantine-sherlock"
 #   kms_key_arn               = module.sherlock_kms_key.key_arn
 #   enable_malware_protection = true
 #   tags = {
 #     Environment    = terraform.workspace
 #     Application    = "data-factory-corporate"
 #     Component      = "people"
-#     Infrastructure = "sherlock-landing-bucket"
+#     Infrastructure = "sherlock-quarantine-bucket"
 #   }
 # }
 
@@ -83,6 +83,41 @@ module "sherlock_landing_bucket_mp" {
   }
 }
 
+module "sherlock_quarantine_bucket" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
+
+  bucket_prefix      = "landing-sherlock-quarantine-test-mp"
+  bucket_namespace   = "account-regional"
+  versioning_enabled = true
+  force_destroy      = true
+
+  ownership_controls = "BucketOwnerEnforced"
+
+  replication_enabled = false
+  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
+  # replication_region  = "eu-west-2"
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  # Default/recommended encryption mode
+  sse_algorithm  = "aws:kms"
+  custom_kms_key = module.sherlock_kms_key.key_arn
+
+  # Optional compatibility mode for uploaders that rely on bucket default
+  # SSE-KMS encryption and do not send explicit SSE-KMS request headers.
+  # enforce_kms_request_headers = false
+
+  # Optional compatibility mode for services that cannot use SSE-KMS
+  # sse_algorithm = "AES256"
+
+  tags = {
+    Environment    = terraform.workspace
+    Application    = "data-factory-corporate"
+    Component      = "people"
+    Infrastructure = "sherlock-quarantine-bucket-test"
+  }
+}
 
 data "aws_iam_roles" "modernisation_platform_sandbox_role" {
   name_regex  = "AWSReservedSSO_modernisation-platform-sandbox_.*"
@@ -195,4 +230,76 @@ resource "aws_iam_role_policy" "allow_assume_external_role" {
   name   = "allow-assume-external-role"
   role   = aws_iam_role.assume_external_role.name
   policy = data.aws_iam_policy_document.allow_assume_external_role.json
+}
+
+# Eventbridge rule
+
+module "data_factory_guardduty_eventbridge" {
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/guardduty-eventbridge?ref=fc527a175226decd7bf0db4be5c69f69c9eb2afe"
+
+  name = "eventbridge_malware_rule"
+
+  bucket_names = [module.sherlock_landing_bucket_mp.bucket.bucket]
+
+  scan_result_statuses = ["THREATS_FOUND","FAILED", "ACCESS_DENIED"]
+
+  target_lambda_name = module.data_factory_guardduty_lambda.name
+
+    target_lambda_arn = module.data_factory_guardduty_lambda.arn
+
+  tags = {
+    Environment    = terraform.workspace
+    Application    = "data-factory-corporate"
+    Component      = "people"
+    Infrastructure = "sherlock-eventbridge-rule"
+  }
+}
+
+# guardduty malware scan
+
+
+module "data_factory_guardduty_scan" {
+
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/guardduty-malware-scan?ref=fc527a175226decd7bf0db4be5c69f69c9eb2afe"
+
+
+    bucket_name = module.sherlock_landing_bucket_mp.bucket.bucket
+    bucket_arn = module.sherlock_landing_bucket_mp.bucket.arn
+    object_prefixes = []
+
+    kms_key_arn = module.sherlock_kms_key.key_arn
+
+
+  tags = {
+    Environment    = terraform.workspace
+    Application    = "data-factory-corporate"
+    Component      = "people"
+    Infrastructure = "sherlock-guardduty-malware-scan"
+  }
+  }
+
+# lambda function for guardduty malware scan
+
+module "data_factory_guardduty_lambda" {
+
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/guardduty-lambda?ref=545aadd3150ea7ba2e3d92bc6a7bc5d6fc7e7d2c"
+
+    name = "guardduty_lambda"
+
+    tags = {
+        Project     = "Avature"
+        Owner       = "CorporateDataEngineering"
+        Environment = terraform.workspace
+        }
+
+    eventbridge_rule_arn = module.data_factory_guardduty_eventbridge.rule_arn
+
+    quarantine_bucket_name = module.sherlock_quarantine_bucket.bucket.bucket
+    quarantine_bucket_arn = module.sherlock_quarantine_bucket.bucket.arn
+    quarantine_kms_key_arn = module.sherlock_kms_key.key_arn
+
+    s3_bucket_name = module.sherlock_landing_bucket_mp.bucket.bucket
+    s3_bucket_arn = module.sherlock_landing_bucket_mp.bucket.arn
+    s3_bucket_kms_key_arn = module.sherlock_kms_key.key_arn
+
 }
