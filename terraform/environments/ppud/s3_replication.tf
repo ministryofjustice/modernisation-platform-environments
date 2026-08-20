@@ -168,8 +168,9 @@ resource "aws_s3_bucket_replication_configuration" "s3_replication" {
     )
 
     content {
-      id       = rule.value.rule_id
-      priority = rule.value.priority
+      id = rule.value.rule_id
+      # priority is only required (and only set) when a bucket has more than one rule
+      priority = length(try(each.value.additional_replication_rules, [])) > 0 ? rule.value.priority : null
       status   = "Enabled"
 
       filter {
