@@ -1,7 +1,7 @@
 locals {
   environment_configurations = {
     development = {
-      litellm_version     = "1.96.2"
+      litellm_version     = "1.97.0"
       ai_gateway_hostname = "development.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
@@ -41,7 +41,7 @@ locals {
       elasticache_node_type = "cache.t4g.medium"
     }
     test = {
-      litellm_version     = "1.96.2"
+      litellm_version     = "1.97.0"
       ai_gateway_hostname = "test.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
