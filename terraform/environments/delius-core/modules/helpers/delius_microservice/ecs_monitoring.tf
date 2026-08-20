@@ -326,6 +326,30 @@ resource "aws_cloudwatch_metric_alarm" "ecs_host_memory_critical" {
   tags = merge(var.tags, { app = var.name })
 }
 
+resource "aws_cloudwatch_metric_alarm" "ecs_desired-task-count-warning" {
+  alarm_name          = "${var.name}-${var.env_name}-desired-task-count-warning"
+  alarm_description   = "ECS service tasks below desired amount"
+  actions_enabled     = true
+  alarm_actions       = [var.sns_topic_arn]
+  ok_actions          = [var.sns_topic_arn]
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  period              = 60
+  comparison_operator = "LessThanThreshold"
+  threshold           = var.desired_count
+  treat_missing_data  = "missing"
+  metric_name         = "RunningTaskCount"
+  namespace           = "ECS/ContainerInsights"
+  statistic           = "Minimum"
+
+  dimensions = {
+    ServiceName = "${var.env_name}-${var.name}"
+    ClusterName = local.cluster_name
+  }
+
+  tags = merge(var.tags, { "app" = var.name })
+}
+
 ######################################
 ###           ALB Alarms           ###
 ######################################
@@ -390,29 +414,6 @@ resource "aws_cloudwatch_metric_alarm" "alb_response_code_5xx_critical" {
   dimensions = {
     LoadBalancer = var.frontend_lb_arn_suffix
     TargetGroup  = aws_lb_target_group.frontend[0].arn_suffix
-  }
-
-  tags = merge(var.tags, { "app" = var.name })
-}
-
-resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks_less_than_desired" {
-  alarm_name          = "${var.name}-${var.env_name}-running-tasks-lt-desired"
-  actions_enabled     = true
-  alarm_actions       = [var.sns_topic_arn]
-  ok_actions          = [var.sns_topic_arn]
-  evaluation_periods  = 1
-  datapoints_to_alarm = 1
-  period              = 60
-  comparison_operator = "LessThanThreshold"
-  threshold           = var.desired_count
-  treat_missing_data  = "missing"
-  metric_name         = "RunningTaskCount"
-  namespace           = "ECS/ContainerInsights"
-  statistic           = "Minimum"
-
-  dimensions = {
-    ServiceName = "${var.env_name}-${var.name}"
-    ClusterName = local.cluster_name
   }
 
   tags = merge(var.tags, { "app" = var.name })
