@@ -94,4 +94,10 @@ resource "kubernetes_manifest" "aws_load_balancer_controller_gateway_crds" {
   for_each = local.aws_load_balancer_controller_gateway_crd_manifests
 
   manifest = each.value
+
+  # These CRDs were originally auto-installed by the Helm chart's own crds/ directory, which Helm
+  # only applies on first install and never upgrades, so take over field ownership to update them.
+  field_manager {
+    force_conflicts = true
+  }
 }
