@@ -8,6 +8,10 @@ resource "aws_bedrock_guardrail" "prompt_attack" {
   }
 
   content_policy_config {
+    tier_config {
+      tier_name = "STANDARD"
+    }
+
     filters_config {
       type            = "PROMPT_ATTACK"
       input_enabled   = true
