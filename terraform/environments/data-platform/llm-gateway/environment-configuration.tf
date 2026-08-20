@@ -70,6 +70,10 @@ locals {
             model_id = "eu.anthropic.claude-opus-4-6-v1"
             region   = "eu-west-2"
           }
+          claude-opus-4-7 = {
+            model_id = "eu.anthropic.claude-opus-4-7"
+            region   = "eu-west-2"
+          }
           claude-sonnet-4 = {
             model_id = "eu.anthropic.claude-sonnet-4-20250514-v1:0"
             region   = "eu-west-1"

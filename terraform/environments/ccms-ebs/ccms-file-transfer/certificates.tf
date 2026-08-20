@@ -5,7 +5,7 @@
 #   *.laa.service.justice.gov.uk
 
 # Certificate
-resource "aws_acm_certificate" "external_sftp_bc" {
+resource "aws_acm_certificate" "external_sftp" {
   validation_method         = "DNS"
   domain_name               = local.primary_domain
   subject_alternative_names = local.subject_alternative_names
@@ -16,7 +16,7 @@ resource "aws_acm_certificate" "external_sftp_bc" {
 }
 
 ## Validation Records
-resource "aws_route53_record" "external_validation_sftp_bc_nonprod" {
+resource "aws_route53_record" "external_validation_sftp_nonprod" {
   count    = local.is-production ? 0 : length(local.modernisation_platform_validations)
   provider = aws.core-vpc
 
@@ -28,7 +28,7 @@ resource "aws_route53_record" "external_validation_sftp_bc_nonprod" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
-resource "aws_route53_record" "external_validation_sftp_bc_prod" {
+resource "aws_route53_record" "external_validation_sftp_prod" {
   count    = local.is-production ? length(local.laa_validations) : 0
   provider = aws.core-network-services
 
@@ -41,30 +41,30 @@ resource "aws_route53_record" "external_validation_sftp_bc_prod" {
 }
 
 ## Certificate Validation
-resource "aws_acm_certificate_validation" "external_sftp_bc_nonprod" {
+resource "aws_acm_certificate_validation" "external_sftp_nonprod" {
   count = local.is-production ? 0 : 1
 
   depends_on = [
-    aws_route53_record.external_validation_sftp_bc_nonprod
+    aws_route53_record.external_validation_sftp_nonprod
   ]
 
-  certificate_arn         = aws_acm_certificate.external_sftp_bc.arn
-  validation_record_fqdns = [for record in aws_route53_record.external_validation_sftp_bc_nonprod : record.fqdn]
+  certificate_arn         = aws_acm_certificate.external_sftp.arn
+  validation_record_fqdns = [for record in aws_route53_record.external_validation_sftp_nonprod : record.fqdn]
 
   timeouts {
     create = "10m"
   }
 }
 
-resource "aws_acm_certificate_validation" "external_sftp_bc_prod" {
+resource "aws_acm_certificate_validation" "external_sftp_prod" {
   count = local.is-production ? 1 : 0
 
   depends_on = [
-    aws_route53_record.external_validation_sftp_bc_prod
+    aws_route53_record.external_validation_sftp_prod
   ]
 
-  certificate_arn         = aws_acm_certificate.external_sftp_bc.arn
-  validation_record_fqdns = [for record in aws_route53_record.external_validation_sftp_bc_prod : record.fqdn]
+  certificate_arn         = aws_acm_certificate.external_sftp.arn
+  validation_record_fqdns = [for record in aws_route53_record.external_validation_sftp_prod : record.fqdn]
 
   timeouts {
     create = "10m"

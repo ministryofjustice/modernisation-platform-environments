@@ -49,13 +49,7 @@ resource "aws_nat_gateway" "main" {
 }
 
 ##############################################
-### Add NAT Gateway Route to Private Route Table
+### NAT Gateway routes are handled by the private and firewall route tables
+### so all private subnet traffic is routed through Network Firewall endpoints
+### and the firewall subnets can egress via the NAT gateway.
 ##############################################
-
-resource "aws_route" "private_nat_gateway" {
-  count = local.environment == "development" ? 1 : 0
-
-  route_table_id         = aws_route_table.private[0].id
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.main[0].id
-}

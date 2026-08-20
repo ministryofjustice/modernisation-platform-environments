@@ -11,12 +11,13 @@
 resource "aws_instance" "PPUDWEBSERVER2" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
-  count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-0852d4d5313264225"
-  instance_type          = "m5.large"
-  source_dest_check      = true
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+  count                = local.is-development == true ? 1 : 0
+  ami                  = "ami-0852d4d5313264225"
+  instance_type        = "m5.large"
+  source_dest_check    = true
+  iam_instance_profile = aws_iam_instance_profile.ec2_profile.id
+  # vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+  vpc_security_group_ids = [aws_security_group.all["PPUD-Web-Portal-Server-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
 
   metadata_options {
@@ -25,9 +26,11 @@ resource "aws_instance" "PPUDWEBSERVER2" {
   }
 
   tags = {
-    Name        = "PPUDWEBSERVER2"
-    patch_group = "dev_win_patch"
-    backup      = true
+    Name            = "PPUDWEBSERVER2"
+    patch_group     = "dev_win_patch"
+    role            = "ses_web_config"
+    web_config_path = "D:\\IIS\\PPUDWeb\\web.config"
+    backup          = true
   }
 }
 
@@ -38,10 +41,10 @@ resource "aws_instance" "s609693lo6vw100" {
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0fbad994892c0f0c4"
-  instance_type          = "m5.large"
+  instance_type          = "m5.xlarge"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-Database-Server[0].id]
+  vpc_security_group_ids = [aws_security_group.conditional["PPUD-Database-Server-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
@@ -52,6 +55,7 @@ resource "aws_instance" "s609693lo6vw100" {
   tags = {
     Name        = "s609693lo6vw100"
     patch_group = "dev_win_patch"
+    role        = "ses_sql_config"
     backup      = true
   }
 }
@@ -61,12 +65,13 @@ resource "aws_instance" "s609693lo6vw100" {
 resource "aws_instance" "s609693lo6vw101" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
-  count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-07315ed3a1b524be8"
-  instance_type          = "m5.large"
-  source_dest_check      = true
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+  count                = local.is-development == true ? 1 : 0
+  ami                  = "ami-07315ed3a1b524be8"
+  instance_type        = "m5.large"
+  source_dest_check    = true
+  iam_instance_profile = aws_iam_instance_profile.ec2_profile.id
+  # vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+  vpc_security_group_ids = [aws_security_group.all["PPUD-Web-Portal-Server-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
 
   metadata_options {
@@ -75,9 +80,11 @@ resource "aws_instance" "s609693lo6vw101" {
   }
 
   tags = {
-    Name        = "s609693lo6vw101"
-    patch_group = "dev_win_patch"
-    backup      = true
+    Name            = "s609693lo6vw101"
+    patch_group     = "dev_win_patch"
+    role            = "ses_web_config"
+    web_config_path = "D:\\IIS\\PPUDWeb\\web.config"
+    backup          = true
   }
 }
 
@@ -91,7 +98,7 @@ resource "aws_instance" "s609693lo6vw102" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Live-DOC-Server[0].id]
+  vpc_security_group_ids = [aws_security_group.all["Document-Service-Server-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
 
   metadata_options {
@@ -116,7 +123,7 @@ resource "aws_instance" "s609693lo6vw103" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Archive-DOC-Server[0].id]
+  vpc_security_group_ids = [aws_security_group.all["Document-Service-Server-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
 
   metadata_options {
@@ -125,9 +132,10 @@ resource "aws_instance" "s609693lo6vw103" {
   }
 
   tags = {
-    Name        = "s609693lo6vw103"
-    patch_group = "dev_win_patch"
-    backup      = true
+    Name                = "s609693lo6vw103"
+    patch_group         = "dev_win_patch"
+    backup              = true
+    ses_service_restart = "PPUDAutomatedProcessManagerTEST"
   }
 }
 
@@ -141,7 +149,7 @@ resource "aws_instance" "s609693lo6vw104" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
+  vpc_security_group_ids = [aws_security_group.all["WAM-Data-Access-Server-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
@@ -166,8 +174,9 @@ resource "aws_instance" "s609693lo6vw105" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  vpc_security_group_ids = [aws_security_group.all["WAM-Web-Portal-Server-Security-Group"].id]
+  # vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+  subnet_id = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -191,7 +200,7 @@ resource "aws_instance" "s609693lo6vw106" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
+  vpc_security_group_ids = [aws_security_group.conditional["Development-Servers-Standard-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
 
   metadata_options {
@@ -216,7 +225,7 @@ resource "aws_instance" "s609693lo6vw107" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
+  vpc_security_group_ids = [aws_security_group.conditional["Development-Servers-Standard-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
 
   metadata_options {
@@ -241,7 +250,7 @@ resource "aws_instance" "s609693lo6vw108" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
+  vpc_security_group_ids = [aws_security_group.conditional["Development-Servers-Standard-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
 
   metadata_options {
@@ -263,11 +272,11 @@ resource "aws_instance" "s609693lo6vw109" {
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-05d3600bb677c98cd"
-  instance_type          = "m5.large"
-  vpc_security_group_ids = [aws_security_group.SCR-Team-Foundation-Server[0].id]
+  instance_type          = "m5.xlarge"
   source_dest_check      = true
-  subnet_id              = data.aws_subnet.private_subnets_a.id
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.conditional["Team-Foundation-Server-Security-Group"].id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -277,6 +286,7 @@ resource "aws_instance" "s609693lo6vw109" {
   tags = {
     Name        = "s609693lo6vw109"
     patch_group = "dev_win_patch"
+    role        = "ses_tfs_config"
     backup      = true
   }
 }
@@ -291,7 +301,7 @@ resource "aws_instance" "s609693lo6vw110" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
+  vpc_security_group_ids = [aws_security_group.conditional["Development-Servers-Standard-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
 
   metadata_options {
@@ -300,10 +310,12 @@ resource "aws_instance" "s609693lo6vw110" {
   }
 
   tags = {
-    Name        = "s609693lo6vw110"
-    patch_group = "dev_win_patch"
-    lse_server  = "true"
-    backup      = true
+    Name             = "s609693lo6vw110"
+    patch_group      = "dev_win_patch"
+    test_role        = "ses_test_config"
+    test_config_path = "C:\\Scripts\\Test_SES_Email.ps1"
+    lse_server       = "true"
+    backup           = true
   }
 }
 
@@ -317,7 +329,7 @@ resource "aws_instance" "s609693lo6vw111" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Archive-DOC-Server[0].id]
+  vpc_security_group_ids = [aws_security_group.all["Document-Service-Server-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
 
   metadata_options {
@@ -345,7 +357,7 @@ resource "aws_instance" "s609693lo6vw112" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
+  vpc_security_group_ids = [aws_security_group.conditional["Development-Servers-Standard-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
@@ -370,7 +382,7 @@ resource "aws_instance" "s609693lo6vw113" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
+  vpc_security_group_ids = [aws_security_group.conditional["Development-Servers-Standard-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
 
   metadata_options {
@@ -395,7 +407,7 @@ resource "aws_instance" "s609693lo6vw114" {
   instance_type          = "m5.xlarge"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
+  vpc_security_group_ids = [aws_security_group.conditional["Development-Servers-Standard-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
 
   metadata_options {
@@ -420,8 +432,9 @@ resource "aws_instance" "s609693lo6vw115" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  vpc_security_group_ids = [aws_security_group.all["Certificate-Authority-Server-Security-Group"].id]
+  # vpc_security_group_ids = [aws_security_group.conditional["Development-Servers-Standard-Security-Group"].id]
+  subnet_id = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -448,7 +461,7 @@ resource "aws_instance" "s609693lo6vw116" {
   instance_type          = "m5.xlarge"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-Database-Server[0].id]
+  vpc_security_group_ids = [aws_security_group.conditional["PPUD-Database-Server-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
@@ -459,6 +472,7 @@ resource "aws_instance" "s609693lo6vw116" {
   tags = {
     Name        = "s609693lo6vw116"
     patch_group = "dev_win_patch"
+    role        = "ses_sql_config"
     backup      = true
   }
 }
@@ -472,12 +486,13 @@ resource "aws_instance" "s609693lo6vw116" {
 resource "aws_instance" "s618358rgvw023" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
-  count                  = local.is-preproduction == true ? 1 : 0
-  ami                    = "ami-0f073b401ba3f1cff"
-  instance_type          = "c5.large"
-  source_dest_check      = true
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+  count                = local.is-preproduction == true ? 1 : 0
+  ami                  = "ami-0f073b401ba3f1cff"
+  instance_type        = "c5.large"
+  source_dest_check    = true
+  iam_instance_profile = aws_iam_instance_profile.ec2_profile.id
+  # vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+  vpc_security_group_ids = [aws_security_group.all["PPUD-Web-Portal-Server-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
 
   metadata_options {
@@ -486,10 +501,12 @@ resource "aws_instance" "s618358rgvw023" {
   }
 
   tags = {
-    Name        = "s618358rgvw023"
-    patch_group = "uat_win_patch"
-    backup      = true
-    cpu_alarm   = true
+    Name            = "s618358rgvw023"
+    patch_group     = "uat_win_patch"
+    role            = "ses_web_config"
+    web_config_path = "D:\\inetpub\\wwwroot\\web.config"
+    backup          = true
+    cpu_alarm       = true
   }
 }
 
@@ -503,8 +520,9 @@ resource "aws_instance" "s618358rgvw024" {
   instance_type          = "m6i.2xlarge"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.UAT-Document-Service[0].id]
-  subnet_id              = data.aws_subnet.data_subnets_a.id
+  vpc_security_group_ids = [aws_security_group.conditional["Database-and-Document-Service-Security-Group"].id]
+  # vpc_security_group_ids = [aws_security_group.UAT-Document-Service[0].id]
+  subnet_id = data.aws_subnet.data_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -512,11 +530,15 @@ resource "aws_instance" "s618358rgvw024" {
   }
 
   tags = {
-    Name               = "s618358rgvw024"
-    patch_group        = "uat_win_patch"
-    backup             = true
-    cpu_alarm          = true
-    cpu_lambda_trigger = true
+    Name                = "s618358rgvw024"
+    patch_group         = "uat_win_patch"
+    role                = "ses_sql_config"
+    test_role           = "ses_test_config"
+    ses_service_restart = "PPUDAutomatedProcessManagerUAT"
+    test_config_path    = "C:\\Scripts\\Test_SES_Email.ps1"
+    backup              = true
+    cpu_alarm           = true
+    cpu_lambda_trigger  = true
   }
 }
 
@@ -530,8 +552,9 @@ resource "aws_instance" "s618358rgsw025" {
   instance_type          = "c5.4xlarge"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  vpc_security_group_ids = [aws_security_group.all["WAM-Data-Access-Server-Security-Group"].id]
+  # vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
+  subnet_id = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -555,8 +578,9 @@ resource "aws_instance" "s618358rgvw026" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
-  subnet_id              = data.aws_subnet.data_subnets_b.id
+  vpc_security_group_ids = [aws_security_group.all["Certificate-Authority-Server-Security-Group"].id]
+  # vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+  subnet_id = data.aws_subnet.data_subnets_b.id
 
   metadata_options {
     http_tokens   = "required"
@@ -583,8 +607,9 @@ resource "aws_instance" "s618358rgvw028" {
   instance_type          = "m5.xlarge"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.UAT-Document-Servers[0].id]
-  subnet_id              = data.aws_subnet.data_subnets_b.id
+  vpc_security_group_ids = [aws_security_group.all["Document-Service-Server-Security-Group"].id]
+  # vpc_security_group_ids = [aws_security_group.UAT-Document-Servers[0].id]
+  subnet_id = data.aws_subnet.data_subnets_b.id
 
   metadata_options {
     http_tokens   = "required"
@@ -603,12 +628,13 @@ resource "aws_instance" "s618358rgvw028" {
 resource "aws_instance" "s618358rgvw201" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
-  count                  = local.is-preproduction == true ? 1 : 0
-  ami                    = "ami-0d1cb68fb6c1f131b"
-  instance_type          = "c5.large"
-  source_dest_check      = true
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+  count                = local.is-preproduction == true ? 1 : 0
+  ami                  = "ami-0d1cb68fb6c1f131b"
+  instance_type        = "c5.large"
+  source_dest_check    = true
+  iam_instance_profile = aws_iam_instance_profile.ec2_profile.id
+  # vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+  vpc_security_group_ids = [aws_security_group.all["WAM-Web-Portal-Server-Security-Group"].id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
@@ -633,8 +659,9 @@ resource "aws_instance" "S618358RGVW202" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Bridge-Server[0].id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  vpc_security_group_ids = [aws_security_group.conditional["WAM-Bridge-Server-Security-Group"].id]
+  # vpc_security_group_ids = [aws_security_group.Bridge-Server[0].id]
+  subnet_id = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -659,7 +686,7 @@ resource "aws_instance" "s618358rgvw019" {
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-01d04f2e4f8cea4dd"
-  instance_type          = "c5.xlarge"
+  instance_type          = "m5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
@@ -677,7 +704,6 @@ resource "aws_instance" "s618358rgvw019" {
     iisadmin_service = "true"
     wwwpub_service   = "true"
     ppudlive_service = "true"
-    port25_check     = "true"
   }
 }
 
@@ -688,7 +714,7 @@ resource "aws_instance" "s618358rgvw020" {
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0e49fc9838fdf33c4"
-  instance_type          = "c5.xlarge"
+  instance_type          = "m5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
@@ -706,7 +732,6 @@ resource "aws_instance" "s618358rgvw020" {
     iisadmin_service = "true"
     wwwpub_service   = "true"
     ppudlive_service = "true"
-    port25_check     = "true"
   }
 }
 
@@ -739,7 +764,6 @@ resource "aws_instance" "s618358rgvw021" {
     e_volume          = "true"
     f_volume          = "true"
     g_volume          = "true"
-    port25_check      = "true"
   }
 }
 
@@ -769,7 +793,6 @@ resource "aws_instance" "s618358rgvw022" {
     ppudlive_service    = "true"
     ppudcrawler_service = "true"
     spooler_service     = "true"
-    port25_check        = "true"
     emailsender_check   = "true"
     e_volume            = "true"
     f_volume            = "true"
@@ -829,7 +852,6 @@ resource "aws_instance" "s618358rgvw027" {
     is-production   = true
     wwwpub_service  = "true"
     spooler_service = "true"
-    port25_check    = "true"
     e_volume        = "true"
     f_volume        = "true"
     g_volume        = "true"
@@ -847,8 +869,9 @@ resource "aws_instance" "s618358rgvw030" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  vpc_security_group_ids = [aws_security_group.all["Certificate-Authority-Server-Security-Group"].id]
+  # vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+  subnet_id = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
     http_tokens   = "required"
@@ -862,6 +885,31 @@ resource "aws_instance" "s618358rgvw030" {
     adcs_service     = "true"
     iisadmin_service = "true"
     wwwpub_service   = "true"
+  }
+}
+
+# Data Analytics Server
+
+resource "aws_instance" "s618358rgvw031" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-038a9d01a2c2c0cea"
+  instance_type          = "c6i.xlarge"
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.all["Document-Service-Server-Security-Group"].id]
+  subnet_id              = data.aws_subnet.private_subnets_c.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name          = "s618358rgvw031"
+    patch_group   = "prod_win_patch"
+    is-production = true
   }
 }
 
@@ -996,6 +1044,7 @@ resource "aws_instance" "s265903rgsl401-cjsm" {
     is-production  = true
     patch_group    = "prod_lin_patch"
     docker_service = "true"
+    port25_check   = "true"
   }
 }
 
@@ -1009,9 +1058,10 @@ resource "aws_instance" "docker-build-server" {
   instance_type          = "m5.large"
   source_dest_check      = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.docker-build-server[0].id]
-  subnet_id              = data.aws_subnet.private_subnets_c.id
-  key_name               = aws_key_pair.cjms_instance[0].key_name
+  vpc_security_group_ids = [aws_security_group.conditional["Docker-Build-Server-Security-Group"].id]
+  # vpc_security_group_ids = [aws_security_group.docker-build-server[0].id]
+  subnet_id = data.aws_subnet.private_subnets_c.id
+  key_name  = aws_key_pair.cjms_instance[0].key_name
   root_block_device {
     delete_on_termination = true
     volume_size           = "40"
@@ -1065,4 +1115,158 @@ resource "aws_eip_association" "s265903rgsl401-eip-association-cjsm" {
   count         = local.is-production == true ? 1 : 0
   instance_id   = aws_instance.s265903rgsl401-cjsm[0].id
   allocation_id = aws_eip.s265903rgsl401-cjsm[0].id
+}
+
+#########################################################################################################################
+# New Amazon Linux 2023 Instances (to replace Amazon Linux 2 EOL instances)
+#########################################################################################################################
+
+# Internal Mail Relay
+
+resource "aws_instance" "internal-mail-relay" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-002aab1cab5a08e35"
+  instance_type          = "m5.large"
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.conditional["Internal-Mail-Relay-Security-Group"].id]
+  subnet_id              = data.aws_subnet.private_subnets_b.id
+  key_name               = aws_key_pair.cjms_instance[0].key_name
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name              = "internal-mail-relay"
+    is-production     = true
+    patch_group       = "prod_lin_patch"
+    docker_service    = "true"
+    container_service = "true"
+    archive_volume    = "true"
+    mail_queue        = "true"
+  }
+}
+
+# External non-CJSM Mail Relay
+
+resource "aws_instance" "non-cjsm-mail-relay" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-002aab1cab5a08e35"
+  instance_type          = "m5.large"
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.conditional["External-Mail-Relay-Security-Group"].id]
+  subnet_id              = data.aws_subnet.public_subnets_b.id
+  key_name               = aws_key_pair.cjms_instance[0].key_name
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name              = "non-cjsm-mail-relay"
+    is-production     = true
+    patch_group       = "prod_lin_patch"
+    docker_service    = "true"
+    container_service = "true"
+    port25_check      = "true"
+    mail_queue        = "true"
+  }
+}
+
+# External CJSM Mail Relay
+
+resource "aws_instance" "cjsm-mail-relay" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-002aab1cab5a08e35"
+  instance_type          = "m5.large"
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.conditional["External-Mail-Relay-Security-Group"].id]
+  subnet_id              = data.aws_subnet.public_subnets_c.id
+  key_name               = aws_key_pair.cjms_instance[0].key_name
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name              = "cjsm-mail-relay"
+    is-production     = true
+    patch_group       = "prod_lin_patch"
+    docker_service    = "true"
+    container_service = "true"
+    port25_check      = "true"
+    mail_queue        = "true"
+  }
+}
+
+# Docker Build Instance
+
+resource "aws_instance" "docker-build-instance" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-002aab1cab5a08e35"
+  instance_type          = "m5.large"
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.conditional["Docker-Build-Server-Security-Group"].id]
+  subnet_id              = data.aws_subnet.private_subnets_c.id
+  key_name               = aws_key_pair.cjms_instance[0].key_name
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name          = "docker-build-instance"
+    is-production = true
+    patch_group   = "prod_lin_patch"
+  }
+}
+
+
+# Elastic IP Addresses for External Mail Relays
+
+resource "aws_eip" "non-cjsm-mail-relay-eip" {
+  count  = local.is-production == true ? 1 : 0
+  domain = "vpc"
+  tags = {
+    Name = "non-cjsm-mail-relay-eip"
+  }
+}
+
+resource "aws_eip" "cjsm-mail-relay-eip" {
+  count  = local.is-production == true ? 1 : 0
+  domain = "vpc"
+  tags = {
+    Name = "cjsm-mail-relay-eip"
+  }
+}
+
+
+# Associate EIP for Mail Relay EC2 Instances
+
+resource "aws_eip_association" "non-cjsm-mail-relay-eip-association" {
+  count         = local.is-production == true ? 1 : 0
+  instance_id   = aws_instance.non-cjsm-mail-relay[0].id
+  allocation_id = aws_eip.non-cjsm-mail-relay-eip[0].id
+}
+
+resource "aws_eip_association" "cjsm-mail-relay-eip-association" {
+  count         = local.is-production == true ? 1 : 0
+  instance_id   = aws_instance.cjsm-mail-relay[0].id
+  allocation_id = aws_eip.cjsm-mail-relay-eip[0].id
 }

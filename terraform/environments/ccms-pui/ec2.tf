@@ -73,7 +73,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   desired_capacity    = local.application_data.accounts[local.environment].ec2_desired_capacity
   max_size            = local.application_data.accounts[local.environment].ec2_max_capacity
   min_size            = local.application_data.accounts[local.environment].ec2_min_capacity
-
+  protect_from_scale_in = true
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id
     version = "$Latest"

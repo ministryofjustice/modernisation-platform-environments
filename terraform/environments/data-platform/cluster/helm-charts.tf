@@ -66,6 +66,25 @@ resource "helm_release" "kyverno" {
   ]
 }
 
+resource "helm_release" "kyverno_policies" {
+  /* https://github.com/kyverno/kyverno/tree/main/charts/kyverno-policies */
+
+  name      = "kyverno-policies"
+  chart     = "./src/helm/charts/kyverno-policies"
+  namespace = module.kyverno_namespace.name
+
+  values = [
+    templatefile(
+      "${path.module}/configuration/helm/kyverno-policies/values.yml.tftpl",
+      {
+        validation_action   = local.cluster_configuration.kyverno_policies.validation_action
+        excluded_namespaces = local.cluster_configuration.kyverno_policies.excluded_namespaces
+      }
+    )
+  ]
+  depends_on = [helm_release.kyverno]
+}
+
 resource "helm_release" "cluster_autoscaler" {
   /* https://artifacthub.io/packages/helm/cluster-autoscaler/cluster-autoscaler */
 
@@ -194,7 +213,10 @@ resource "helm_release" "aws_load_balancer_controller" {
     )
   ]
 
-  depends_on = [kubernetes_manifest.aws_load_balancer_controller_crds]
+  depends_on = [
+    kubernetes_manifest.aws_load_balancer_controller_crds,
+    kubernetes_manifest.aws_load_balancer_controller_gateway_crds
+  ]
 }
 
 resource "helm_release" "gateway_configuration" {
@@ -394,5 +416,27 @@ resource "helm_release" "keda" {
     templatefile(
       "${path.module}/configuration/helm/keda/values.yml.tftpl", {}
     )
+  ]
+}
+
+resource "helm_release" "metrics_server" {
+  /* https://artifacthub.io/packages/helm/metrics-server/metrics-server */
+
+  name       = "metrics-server"
+  repository = "https://kubernetes-sigs.github.io/metrics-server"
+  chart      = "metrics-server"
+  version    = local.cluster_configuration.helm_chart_versions.metrics_server
+  namespace  = module.metrics_server_namespace.name
+
+  values = [
+    templatefile(
+      "${path.module}/configuration/helm/metrics-server/values.yml.tftpl",
+      {}
+    )
+  ]
+
+  depends_on = [
+    helm_release.cilium,
+    helm_release.coredns
   ]
 }

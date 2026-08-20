@@ -6,12 +6,14 @@ module "mlra-ecs" {
 
   source = "./modules/ecs"
 
-  subnet_set_name                = local.subnet_set_name
-  vpc_all                        = local.vpc_all
-  app_name                       = local.application_name
-  container_instance_type        = local.application_data.accounts[local.environment].container_instance_type
-  instance_type                  = local.application_data.accounts[local.environment].instance_type
+  subnet_set_name         = local.subnet_set_name
+  vpc_all                 = local.vpc_all
+  app_name                = local.application_name
+  container_instance_type = local.application_data.accounts[local.environment].container_instance_type
+  instance_type           = local.application_data.accounts[local.environment].instance_type
+  # TODO LASB-5089 Replace with AL2023 user data
   user_data                      = local.user_data
+  user_data_al2023               = local.user_data_al2023
   key_name                       = local.application_data.accounts[local.environment].key_name
   task_definition                = local.task_definition
   ec2_desired_capacity           = local.application_data.accounts[local.environment].ec2_desired_capacity

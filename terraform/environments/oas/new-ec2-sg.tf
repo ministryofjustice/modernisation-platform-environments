@@ -55,6 +55,18 @@ resource "aws_security_group_rule" "ingress_from_lb_9500" {
   source_security_group_id = aws_security_group.lb_security_group[0].id
 }
 
+resource "aws_security_group_rule" "ingress_from_lb_9501" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  type                     = "ingress"
+  security_group_id        = aws_security_group.ec2_sg[0].id
+  description              = "Allow traffic from load balancer to EC2 on port 9501"
+  from_port                = 9501
+  to_port                  = 9501
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.lb_security_group[0].id
+}
+
 resource "aws_security_group_rule" "ingress_from_lb_9502" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
@@ -63,6 +75,18 @@ resource "aws_security_group_rule" "ingress_from_lb_9502" {
   description              = "Allow traffic from load balancer to EC2 on port 9502"
   from_port                = 9502
   to_port                  = 9502
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.lb_security_group[0].id
+}
+
+resource "aws_security_group_rule" "ingress_from_lb_9503" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  type                     = "ingress"
+  security_group_id        = aws_security_group.ec2_sg[0].id
+  description              = "Allow traffic from load balancer to EC2 on port 9503"
+  from_port                = 9503
+  to_port                  = 9503
   protocol                 = "tcp"
   source_security_group_id = aws_security_group.lb_security_group[0].id
 }
@@ -116,18 +140,6 @@ resource "aws_security_group_rule" "egress_https_s3" {
   to_port           = 443
   protocol          = "tcp"
   prefix_list_ids   = [local.application_data.accounts[local.environment].s3_vpc_endpoint_prefix]
-}
-
-resource "aws_security_group_rule" "egress_http_internet" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
-
-  type              = "egress"
-  security_group_id = aws_security_group.ec2_sg[0].id
-  description       = "Outbound HTTP for yum repositories"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 resource "aws_security_group_rule" "egress_https_internet" {

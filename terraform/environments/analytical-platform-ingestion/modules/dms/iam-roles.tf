@@ -76,7 +76,7 @@ resource "aws_iam_role_policy" "dms" {
           "secretsmanager:GetSecretValue"
         ],
         "Effect" : "Allow",
-        "Resource" : "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:secret:managed_pipelines/${var.environment}/slack_notifications*",
+        "Resource" : "arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.id}:secret:managed_pipelines/${var.environment}/slack_notifications*",
         "Sid" : "AllowGetSecretValue"
       }
     ]
@@ -91,7 +91,7 @@ resource "aws_iam_role" "dms_source" {
       {
         "Effect" : "Allow",
         "Principal" : {
-          "Service" : "dms.${data.aws_region.current.name}.amazonaws.com"
+          "Service" : "dms.${data.aws_region.current.region}.amazonaws.com"
         },
         "Action" : "sts:AssumeRole"
       }

@@ -2,6 +2,7 @@ module "rds" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
+  # module (version 7.2.0) is currently unsupported due to this open issue: https://github.com/hashicorp/terraform-provider-aws/issues/42582
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
   source  = "terraform-aws-modules/rds/aws"

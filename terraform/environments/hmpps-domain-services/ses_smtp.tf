@@ -1,3 +1,5 @@
+# This is used for internal DSO emails such as the Entra ID reminder idle account emails
+
 locals {
   ses_domain = "hmpps-domain.service.justice.gov.uk"
 }
@@ -51,6 +53,10 @@ resource "aws_iam_user" "ses_smtp_user" {
   count = local.is-production == true ? 1 : 0
 
   name = "ses_smtp_user"
+
+  tags = merge(local.tags, {
+    Name = "ses_smtp_user"
+  })
 }
 
 resource "aws_iam_user_policy" "ses_smtp_user" {
@@ -91,5 +97,9 @@ resource "aws_ssm_parameter" "ses_smtp_user" {
     # See the AWS Management Console for server details -- hostname, port, etc.
     ses_smtp_user     = aws_iam_access_key.ses_smtp_user[0].id
     ses_smtp_password = aws_iam_access_key.ses_smtp_user[0].ses_smtp_password_v4
+  })
+
+  tags = merge(local.tags, {
+    Name = "/ses-smtp-user"
   })
 }

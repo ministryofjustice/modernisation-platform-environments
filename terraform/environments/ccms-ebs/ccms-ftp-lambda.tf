@@ -25,6 +25,7 @@ locals {
   ]
 
   # Folders in the FTP lambda inbound and outbound S3 buckets(ensure trailing slash)
+  # Added SOA Sanbox folder to transfer the laa-ccms-app-soa(composite) git repo via S3 bucket
   target_prefixes = [
     "CCMS_PRD_Allpay/Inbound/",
     "CCMS_PRD_Allpay/Outbound/",
@@ -119,6 +120,32 @@ resource "aws_s3_bucket_versioning" "s3_versioning" {
   }
 }
 
+data "aws_iam_policy_document" "ftp_lambda_bucket_secure_transport" {
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].arn,
+      "${aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "ftp_lambda_bucket_secure_transport" {
+  bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  policy = data.aws_iam_policy_document.ftp_lambda_bucket_secure_transport.json
+}
+
 
 resource "aws_s3_bucket_lifecycle_configuration" "outbound_bucket_lifecycle_delete_noncurrent_versions" {
 
@@ -203,6 +230,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "inbound_bucket_lifecycle" {
 
 
 #--Dynamic blocks for transfer family policy in production only
+#Added SOA Sanbox IAM role permision to transfer the laa-ccms-app-soa(composite) git repo via S3 bucket
 data "aws_iam_policy_document" "inbound_bucket_policy" {
   statement {
     sid    = "Access_for_ccms-ebs_and_soa"
@@ -218,10 +246,11 @@ data "aws_iam_policy_document" "inbound_bucket_policy" {
     ]
     principals {
       type = "AWS"
-      identifiers = [
+      identifiers = compact([
         "arn:aws:iam::${local.environment_management.account_ids["laa-ccms-soa-${local.environment}"]}:role/ccms-soa-ec2-instance-role",
+        local.environment == "development" ? "arn:aws:iam::${local.environment_management.account_ids["laa-ccms-soa-${local.environment}"]}:role/ccms-soa-sandbox-development-ec2-instance-role" : null,
         "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/role_stsassume_oracle_base"
-      ]
+      ])
     }
     resources = [
       aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn,
@@ -270,6 +299,25 @@ data "aws_iam_policy_document" "inbound_bucket_policy" {
       resources = [
         "${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn}/*"
       ]
+    }
+  }
+
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn,
+      "${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
     }
   }
 }
@@ -332,6 +380,21 @@ resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
           aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn,
           "${aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn}/*"
         ]
+      },
+      {
+        "Sid" : "DenyInsecureTransport",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn,
+          "${aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
       }
     ]
     }

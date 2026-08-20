@@ -1,0 +1,494 @@
+organisations:
+  ministryofjustice:
+    alias: Ministry of Justice
+
+teams:
+  # litellm_team is currently missing the option to attach unified access groups, so for now we have to manually add them in the admin console.
+  justice-data-platform:
+    alias: Justice Data Platform
+    organisation: ministryofjustice
+    max_budget: 10000
+    models: ["no-default-models"]
+    unified_access_groups:
+      - generally-available-models
+  justice-engineering-ai-enablement:
+    alias: Justice Engineering AI Enablement
+    organisation: ministryofjustice
+    max_budget: 10000
+    models: ["no-default-models"]
+    unified_access_groups:
+      - generally-available-models
+      - bedrock-jeaie-claude-haiku-4-5
+      - bedrock-jeaie-claude-opus-5
+      - bedrock-jeaie-claude-sonnet-5
+    model_aliases:
+      - alias: "claude-haiku-4.5"
+        model: "bedrock-jeaie-claude-haiku-4-5"
+      - alias: "claude-opus-5"
+        model: "bedrock-jeaie-claude-opus-5"
+      - alias: "claude-sonnet-5"
+        model: "bedrock-jeaie-claude-sonnet-5"
+  pom-e-supervision:
+    alias: POM Phased Implementation - E-Supervision
+    organisation: ministryofjustice
+    max_budget: 2000
+    models: ["no-default-models"]
+    unified_access_groups:
+      - generally-available-models
+      - bedrock-jeaie-claude-haiku-4-5
+      - bedrock-jeaie-claude-opus-5
+      - bedrock-jeaie-claude-sonnet-5
+    model_aliases:
+      - alias: "claude-haiku-4.5"
+        model: "bedrock-jeaie-claude-haiku-4-5"
+      - alias: "claude-opus-5"
+        model: "bedrock-jeaie-claude-opus-5"
+      - alias: "claude-sonnet-5"
+        model: "bedrock-jeaie-claude-sonnet-5"
+
+models:
+  amazon_bedrock:
+    # Amazon
+    amazon-nova-lite:
+      model_id: "amazon.nova-lite-v1:0"
+      model_family: "Amazon Nova"
+      model_name: "Amazon Nova Lite"
+      region: eu-west-2
+      generally_available: true
+    amazon-nova-micro:
+      model_id: "amazon.nova-micro-v1:0"
+      model_family: "Amazon Nova"
+      model_name: "Amazon Nova Micro"
+      region: eu-west-2
+      generally_available: true
+    amazon-nova-pro:
+      model_id: "amazon.nova-pro-v1:0"
+      model_family: "Amazon Nova"
+      model_name: "Amazon Nova Pro"
+      region: eu-west-2
+      generally_available: true
+    # Anthropic
+    claude-haiku-4-5:
+      model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Haiku 4.5 (EU)"
+      region: eu-west-2
+      generally_available: true
+    claude-opus-4-5:
+      model_id: "eu.anthropic.claude-opus-4-5-20251101-v1:0"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Opus 4.5 (EU)"
+      region: eu-west-2
+      generally_available: true
+    claude-opus-4-6:
+      model_id: eu.anthropic.claude-opus-4-6-v1
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Opus 4.6 (EU)"
+      region: eu-west-2
+      generally_available: true
+    claude-opus-4-7:
+      model_id: eu.anthropic.claude-opus-4-7
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Opus 4.7 (EU)"
+      region: eu-west-2
+      generally_available: true
+    claude-opus-4-8:
+      model_id: eu.anthropic.claude-opus-4-8
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Opus 4.8 (EU)"
+      region: eu-west-2
+      generally_available: true
+    claude-opus-5:
+      model_id: eu.anthropic.claude-opus-5
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Opus 5 (EU)"
+      region: eu-west-2
+      generally_available: true
+    claude-sonnet-4-5:
+      model_id: "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 4.5 (EU)"
+      region: eu-west-2
+      generally_available: true
+    claude-sonnet-4-6:
+      model_id: eu.anthropic.claude-sonnet-4-6
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 4.6 (EU)"
+      region: eu-west-2
+      generally_available: true
+    claude-sonnet-5:
+      model_id: eu.anthropic.claude-sonnet-5
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 5 (EU)"
+      region: eu-west-2
+      generally_available: true
+    # Cohere
+    cohere-embed-english-v3:
+      model_id: "cohere.embed-english-v3"
+      model_family: "Cohere Embed"
+      model_name: "Cohere Embed English v3"
+      region: eu-west-2
+      generally_available: true
+    cohere-embed-multilingual-v3:
+      model_id: "cohere.embed-multilingual-v3"
+      model_family: "Cohere Embed"
+      model_name: "Cohere Embed Multilingual v3"
+      region: eu-west-2
+      generally_available: true
+    cohere-embed-v4:
+      model_id: "eu.cohere.embed-v4:0"
+      model_family: "Cohere Embed"
+      model_name: "Cohere Embed v4 (EU)"
+      region: eu-west-2
+      generally_available: true
+    # Google
+    google-gemma-3-4b-it:
+      model_id: "google.gemma-3-4b-it"
+      model_family: "Google Gemma"
+      model_name: "Google Gemma 3 4B IT"
+      region: eu-west-2
+      generally_available: true
+    google-gemma-3-12-it:
+      model_id: "google.gemma-3-12b-it"
+      model_family: "Google Gemma"
+      model_name: "Google Gemma 3 12B IT"
+      region: eu-west-2
+      generally_available: true
+    google-gemma-3-27b-it:
+      model_id: "google.gemma-3-27b-it"
+      model_family: "Google Gemma"
+      model_name: "Google Gemma 3 27B IT"
+      region: eu-west-2
+      generally_available: true
+    # Meta
+    meta-llama3-8b-instruct:
+      model_id: "meta.llama3-8b-instruct-v1:0"
+      model_family: "Meta Llama"
+      model_name: "Meta Llama 3 8B Instruct"
+      region: eu-west-2
+      generally_available: true
+    meta-llama3-70b-instruct:
+      model_id: "meta.llama3-70b-instruct-v1:0"
+      model_family: "Meta Llama"
+      model_name: "Meta Llama 3 70B Instruct"
+      region: eu-west-2
+      generally_available: true
+    # Mistral
+    mistral-7b-instruct:
+      model_id: "mistral.mistral-7b-instruct-v0:2"
+      model_family: "Mistral"
+      model_name: "Mistral 7B Instruct"
+      region: eu-west-2
+      generally_available: true
+    # OpenAI
+    openai-gpt-oss-20b:
+      model_id: "openai.gpt-oss-20b-1:0"
+      model_family: "OpenAI GPT OSS"
+      model_name: "OpenAI GPT OSS 20B"
+      region: eu-west-2
+      generally_available: true
+    openai-gpt-oss-safeguard-20b:
+      model_id: "openai.gpt-oss-safeguard-20b"
+      model_family: "OpenAI GPT OSS"
+      model_name: "OpenAI GPT OSS Safeguard 20B"
+      region: eu-west-2
+      generally_available: true
+    openai-gpt-oss-120b:
+      model_id: "openai.gpt-oss-120b-1:0"
+      model_family: "OpenAI GPT OSS"
+      model_name: "OpenAI GPT OSS 120B"
+      region: eu-west-2
+      generally_available: true
+    openai-gpt-oss-safeguard-120b:
+      model_id: "openai.gpt-oss-safeguard-120b"
+      model_family: "OpenAI GPT OSS"
+      model_name: "OpenAI GPT OSS Safeguard 120B"
+      region: eu-west-2
+      generally_available: true
+    # Justice Engineering AI Enablement
+    jeaie-claude-haiku-4-5:
+      model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
+      model_provider: "Amazon Bedrock (Justice Engineering AI Enablement)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Haiku 4.5 (EU)"
+      region: eu-west-2
+      aws_account_name: octo-engineering-ai-enablement-production
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    jeaie-claude-opus-5:
+      model_id: eu.anthropic.claude-opus-5
+      model_provider: "Amazon Bedrock (Justice Engineering AI Enablement)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Opus 5 (EU)"
+      region: eu-west-2
+      aws_account_name: octo-engineering-ai-enablement-production
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    jeaie-claude-sonnet-5:
+      model_id: eu.anthropic.claude-sonnet-5
+      model_provider: "Amazon Bedrock (Justice Engineering AI Enablement)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 5 (EU)"
+      region: eu-west-2
+      aws_account_name: octo-engineering-ai-enablement-production
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    # Digital Prison Reporting
+    dpr-development-claude-haiku-4-5:
+      model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Development)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Haiku 4.5 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-development
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    dpr-development-claude-sonnet-4-5:
+      model_id: "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Development)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 4.5 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-development
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    dpr-development-claude-sonnet-4-6:
+      model_id: eu.anthropic.claude-sonnet-4-6
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Development)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 4.6 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-development
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    dpr-development-claude-sonnet-5:
+      model_id: eu.anthropic.claude-sonnet-5
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Development)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 5 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-development
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    dpr-production-claude-haiku-4-5:
+      model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Production)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Haiku 4.5 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-production
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    dpr-production-claude-sonnet-4-5:
+      model_id: "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Production)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 4.5 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-production
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    dpr-production-claude-sonnet-4-6:
+      model_id: eu.anthropic.claude-sonnet-4-6
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Production)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 4.6 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-production
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    dpr-production-claude-sonnet-5:
+      model_id: eu.anthropic.claude-sonnet-5
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Production)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 5 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-production
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+  google_gemini_enterprise_agent_platform:
+    # Gemini
+    gemini-2-5-flash:
+      model_id: "gemini-2.5-flash"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 2.5 Flash"
+      location: "europe-west2"
+      generally_available: false
+      environments_available: ["development", "production"]
+    gemini-2-5-pro:
+      model_id: "gemini-2.5-pro"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 2.5 Pro (EU)"
+      location: "europe-west1"
+      generally_available: false
+      environments_available: ["development", "production"]
+    gemini-3-5-flash:
+      model_id: "gemini-3.5-flash"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 3.5 Flash"
+      location: "europe-west2"
+      generally_available: false
+      environments_available: ["development", "production"]
+    gemini-3-6-flash:
+      model_id: "gemini-3.6-flash"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 3.6 Flash (EU)"
+      location: "eu"
+      generally_available: false
+      environments_available: ["development", "production"]
+    gemini-3-7-flash:
+      model_id: "gemini-3.7-flash"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 3.7 Flash (EU)"
+      location: "eu"
+      generally_available: false
+      environments_available: ["development", "production"]
+  microsoft_foundry:
+    # Anthropic
+    claude-fable-5:
+      model_id: "claude-fable-5"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Fable 5 (Global)"
+      model_provider: "azure_ai"
+      model_endpoint: "anthropic"
+      generally_available: false
+      environments_available: ["development", "test", "preproduction"]
+    claude-haiku-4-5:
+      model_id: "claude-haiku-4-5"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Haiku 4.5 (Global)"
+      model_provider: "azure_ai"
+      model_endpoint: "anthropic"
+      generally_available: false
+      environments_available: ["development", "test", "preproduction"]
+    claude-opus-4-5:
+      model_id: "claude-opus-4-5"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Opus 4.5 (Global)"
+      model_provider: "azure_ai"
+      model_endpoint: "anthropic"
+      generally_available: false
+      environments_available: ["development", "test", "preproduction"]
+    claude-opus-4-6:
+      model_id: "claude-opus-4-6"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Opus 4.6 (Global)"
+      model_provider: "azure_ai"
+      model_endpoint: "anthropic"
+      generally_available: false
+      environments_available: ["development", "test", "preproduction"]
+    claude-opus-4-7:
+      model_id: "claude-opus-4-7"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Opus 4.7 (Global)"
+      model_provider: "azure_ai"
+      model_endpoint: "anthropic"
+      generally_available: false
+      environments_available: ["development", "test", "preproduction"]
+    claude-opus-4-8:
+      model_id: "claude-opus-4-8"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Opus 4.8 (Global)"
+      model_provider: "azure_ai"
+      model_endpoint: "anthropic"
+      generally_available: false
+      environments_available: ["development", "test", "preproduction"]
+    claude-opus-5:
+      model_id: "claude-opus-5"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Opus 5 (Global)"
+      model_provider: "azure_ai"
+      model_endpoint: "anthropic"
+      generally_available: false
+      environments_available: ["development", "test", "preproduction"]
+    claude-sonnet-4-6:
+      model_id: "claude-sonnet-4-6"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 4.6 (Global)"
+      model_provider: "azure_ai"
+      model_endpoint: "anthropic"
+      generally_available: false
+      environments_available: ["development", "test", "preproduction"]
+    claude-sonnet-5:
+      model_id: "claude-sonnet-5"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 5 (Global)"
+      model_provider: "azure_ai"
+      model_endpoint: "anthropic"
+      generally_available: false
+      environments_available: ["development", "test", "preproduction"]
+    # OpenAI
+    gpt-5-3-codex:
+      model_id: "gpt-5.3-codex"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 5.3 Codex (Global)"
+      model_provider: "azure"
+      generally_available: false
+      environments_available: ["development", "test", "preproduction"]
+    gpt-5-4:
+      model_id: "gpt-5.4"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 5.4 (Global)"
+      model_provider: "azure"
+      generally_available: false
+      environments_available: ["development", "test", "preproduction"]
+    gpt-5-4-mini:
+      model_id: "gpt-5.4-mini"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 5.4 Mini (Global)"
+      model_provider: "azure"
+      generally_available: false
+      environments_available: ["development", "test", "preproduction"]
+    gpt-5-4-nano:
+      model_id: "gpt-5.4-nano"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 5.4 Nano (Global)"
+      model_provider: "azure"
+      generally_available: false
+      environments_available: ["development", "test", "preproduction"]
+    gpt-5-4-pro:
+      model_id: "gpt-5.4-pro"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 5.4 Pro (Global)"
+      model_provider: "azure"
+      generally_available: false
+      environments_available: ["development", "test", "preproduction"]
+    gpt-5-5:
+      model_id: "gpt-5.5"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 5.5 (Global)"
+      model_provider: "azure"
+      generally_available: false
+      environments_available: ["development", "test", "preproduction"]
+    gpt-5-6-luna:
+      model_id: "gpt-5.6-luna"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 5.6 Luna (Global)"
+      model_provider: "azure"
+      generally_available: false
+      environments_available: ["development", "test", "preproduction"]
+    gpt-5-6-sol:
+      model_id: "gpt-5.6-sol"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 5.6 Sol (Global)"
+      model_provider: "azure"
+      generally_available: false
+      environments_available: ["development", "test", "preproduction"]
+    gpt-5-6-terra:
+      model_id: "gpt-5.6-terra"
+      model_family: "OpenAI GPT"
+      model_name: "OpenAI GPT 5.6 Terra (Global)"
+      model_provider: "azure"
+      generally_available: false
+      environments_available: ["development", "test", "preproduction"]

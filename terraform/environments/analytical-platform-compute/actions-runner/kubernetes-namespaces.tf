@@ -1,4 +1,4 @@
-resource "kubernetes_namespace" "actions_runners" {
+resource "kubernetes_namespace_v1" "actions_runners" {
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   metadata {

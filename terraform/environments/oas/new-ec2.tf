@@ -76,7 +76,7 @@ resource "aws_instance" "oas_app_instance_new" {
   key_name                    = aws_key_pair.ec2_key_pair[0].key_name
   monitoring                  = true
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile_new[0].id
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
   user_data                   = base64encode(local.userdata_new)
 
   network_interface {

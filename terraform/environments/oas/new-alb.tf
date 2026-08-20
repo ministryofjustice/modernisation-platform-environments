@@ -15,13 +15,6 @@ locals {
   ]
 
   loadbalancer_ingress_rules = {
-    "lb_ingress_80" = {
-      description = "Loadbalancer ingress rule for HTTP (redirects to HTTPS)"
-      from_port   = 80
-      to_port     = 80
-      protocol    = "tcp"
-      cidr_blocks = local.moj_cidr_blocks
-    }
     "lb_ingress_443" = {
       description = "Loadbalancer ingress rule for HTTPS from MOJO devices, LZ Shared-Service Workspaces and OAS EC2 Instance"
       from_port   = 443
@@ -29,17 +22,17 @@ locals {
       protocol    = "tcp"
       cidr_blocks = local.moj_cidr_blocks
     }
-    "lb_ingress_9500" = {
-      description = "Loadbalancer ingress rule for HTTP 9500 (Console/EM)"
-      from_port   = 9500
-      to_port     = 9500
+    "lb_ingress_9501" = {
+      description = "Loadbalancer ingress rule for HTTPS 9501 (Console/EM)"
+      from_port   = 9501
+      to_port     = 9501
       protocol    = "tcp"
       cidr_blocks = local.moj_cidr_blocks
     }
-    "lb_ingress_9502" = {
-      description = "Loadbalancer ingress rule for HTTP 9502 (Analytics/DV)"
-      from_port   = 9502
-      to_port     = 9502
+    "lb_ingress_9503" = {
+      description = "Loadbalancer ingress rule for HTTPS 9503 (Analytics/DV)"
+      from_port   = 9503
+      to_port     = 9503
       protocol    = "tcp"
       cidr_blocks = local.moj_cidr_blocks
     }
@@ -308,12 +301,14 @@ resource "aws_lb" "oas_lb" {
   )
 }
 
-resource "aws_lb_target_group" "oas_ec2_target_group" {
+# Target Group for port 9501 HTTPS
+
+resource "aws_lb_target_group" "oas_ec2_https_9501_target_group" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
-  name_prefix          = "oas-ec"
-  port                 = 9500
-  protocol             = "HTTP"
+  name_prefix          = "oas-2"
+  port                 = 9501
+  protocol             = "HTTPS"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "instance"
   deregistration_delay = 30
@@ -325,10 +320,10 @@ resource "aws_lb_target_group" "oas_ec2_target_group" {
 
   health_check {
     path                = "/console"
-    port                = "9500"
+    port                = "9501"
     healthy_threshold   = 3
     interval            = 30
-    protocol            = "HTTP"
+    protocol            = "HTTPS"
     unhealthy_threshold = 3
     matcher             = "200-399"
     timeout             = 5
@@ -340,25 +335,27 @@ resource "aws_lb_target_group" "oas_ec2_target_group" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-ec2-target-group" }
+    { "Name" = "${local.application_name}-ec2-target-group-https" }
   )
 }
 
-resource "aws_lb_target_group_attachment" "oas_ec2_attachment" {
+resource "aws_lb_target_group_attachment" "oas_ec2_https_9501_attachment" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
-  target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+  target_group_arn = aws_lb_target_group.oas_ec2_https_9501_target_group[0].arn
   target_id        = aws_instance.oas_app_instance_new[0].id
-  port             = 9500
+  port             = 9501
 }
 
-# Target Group for Analytics (port 9502)
-resource "aws_lb_target_group" "oas_analytics_target_group" {
+
+# Target Group for Analytics port 9503 HTTPS
+
+resource "aws_lb_target_group" "oas_analytics_https_9503_target_group" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
-  name_prefix          = "oas-an"
-  port                 = 9502
-  protocol             = "HTTP"
+  name_prefix          = "oas-3"
+  port                 = 9503
+  protocol             = "HTTPS"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "instance"
   deregistration_delay = 30
@@ -370,10 +367,10 @@ resource "aws_lb_target_group" "oas_analytics_target_group" {
 
   health_check {
     path                = "/analytics"
-    port                = "9502"
+    port                = "9503"
     healthy_threshold   = 3
     interval            = 30
-    protocol            = "HTTP"
+    protocol            = "HTTPS"
     unhealthy_threshold = 3
     matcher             = "200-399"
     timeout             = 5
@@ -385,34 +382,19 @@ resource "aws_lb_target_group" "oas_analytics_target_group" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}-analytics-target-group" }
+    { "Name" = "${local.application_name}-analytics-target-group-https" }
   )
 }
 
-resource "aws_lb_target_group_attachment" "oas_analytics_attachment" {
+resource "aws_lb_target_group_attachment" "oas_ec2_https_9503_attachment" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
-  target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
   target_id        = aws_instance.oas_app_instance_new[0].id
-  port             = 9502
+  port             = 9503
 }
 
-resource "aws_lb_listener" "http_listener" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
-  load_balancer_arn = aws_lb.oas_lb[0].arn
-  port              = 80
-  protocol          = "HTTP"
-
-  default_action {
-    type = "redirect"
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
-  }
-}
 
 resource "aws_lb_listener" "https_listener" {
   #checkov:skip=CKV_AWS_103
@@ -436,30 +418,52 @@ resource "aws_lb_listener" "https_listener" {
   }
 }
 
-# HTTP Listener on port 9500 for WebLogic Console and Enterprise Manager
-resource "aws_lb_listener" "http_9500_listener" {
+resource "aws_lb_listener" "https_9501_listener" {
+  #checkov:skip=CKV_AWS_103
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
+  depends_on        = [aws_acm_certificate_validation.external]
   load_balancer_arn = aws_lb.oas_lb[0].arn
-  port              = 9500
-  protocol          = "HTTP"
+  port              = 9501
+  protocol          = "HTTPS"
+  certificate_arn   = aws_acm_certificate.external[0].arn
+
+  routing_http_response_content_security_policy_header_value = "upgrade-insecure-requests"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_ec2_https_9501_target_group[0].arn
   }
 }
 
-# Listener rule for /console on port 9500
-resource "aws_lb_listener_rule" "console_9500_rule" {
+resource "aws_lb_listener" "https_9503_listener" {
+  #checkov:skip=CKV_AWS_103
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
-  listener_arn = aws_lb_listener.http_9500_listener[0].arn
+  depends_on        = [aws_acm_certificate_validation.external]
+  load_balancer_arn = aws_lb.oas_lb[0].arn
+  port              = 9503
+  protocol          = "HTTPS"
+  certificate_arn   = aws_acm_certificate.external[0].arn
+
+  routing_http_response_content_security_policy_header_value = "upgrade-insecure-requests"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+  }
+}
+
+# Listener rule for /console on port 9501
+resource "aws_lb_listener_rule" "console_9501_rule" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.https_9501_listener[0].arn
   priority     = 100
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_ec2_https_9501_target_group[0].arn
   }
 
   condition {
@@ -469,16 +473,16 @@ resource "aws_lb_listener_rule" "console_9500_rule" {
   }
 }
 
-# Listener rule for /em on port 9500
-resource "aws_lb_listener_rule" "em_9500_rule" {
+# Listener rule for /em on port 9501
+resource "aws_lb_listener_rule" "em_9501_rule" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
-  listener_arn = aws_lb_listener.http_9500_listener[0].arn
-  priority     = 101
+  listener_arn = aws_lb_listener.https_9501_listener[0].arn
+  priority     = 110
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_ec2_https_9501_target_group[0].arn
   }
 
   condition {
@@ -488,30 +492,16 @@ resource "aws_lb_listener_rule" "em_9500_rule" {
   }
 }
 
-# HTTP Listener on port 9502 for Analytics and Data Visualization
-resource "aws_lb_listener" "http_9502_listener" {
+# Listener rule for /analytics on port 9503
+resource "aws_lb_listener_rule" "analytics_9503_rule" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
-  load_balancer_arn = aws_lb.oas_lb[0].arn
-  port              = 9502
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
-  }
-}
-
-# Listener rule for /analytics on port 9502
-resource "aws_lb_listener_rule" "analytics_9502_rule" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
-
-  listener_arn = aws_lb_listener.http_9502_listener[0].arn
+  listener_arn = aws_lb_listener.https_9503_listener[0].arn
   priority     = 200
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
   }
 
   condition {
@@ -521,16 +511,16 @@ resource "aws_lb_listener_rule" "analytics_9502_rule" {
   }
 }
 
-# Listener rule for /analytics-ws on port 9502
-resource "aws_lb_listener_rule" "analytics_ws_9502_rule" {
+# Listener rule for /analytics-ws on port 9503
+resource "aws_lb_listener_rule" "analytics_ws_9503_rule" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
-  listener_arn = aws_lb_listener.http_9502_listener[0].arn
+  listener_arn = aws_lb_listener.https_9503_listener[0].arn
   priority     = 205
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
   }
 
   condition {
@@ -540,16 +530,16 @@ resource "aws_lb_listener_rule" "analytics_ws_9502_rule" {
   }
 }
 
-# Listener rule for /dv on port 9502
-resource "aws_lb_listener_rule" "dv_9502_rule" {
+# Listener rule for /dv on port 9503
+resource "aws_lb_listener_rule" "dv_9503_rule" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
-  listener_arn = aws_lb_listener.http_9502_listener[0].arn
+  listener_arn = aws_lb_listener.https_9503_listener[0].arn
   priority     = 210
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
   }
 
   condition {
@@ -559,16 +549,16 @@ resource "aws_lb_listener_rule" "dv_9502_rule" {
   }
 }
 
-# Listener rule for /bi-security-login on port 9502
-resource "aws_lb_listener_rule" "bi_security_login_9502_rule" {
+# Listener rule for /bi-security-login on port 9503
+resource "aws_lb_listener_rule" "bi_security_login_9503_rule" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
-  listener_arn = aws_lb_listener.http_9502_listener[0].arn
+  listener_arn = aws_lb_listener.https_9503_listener[0].arn
   priority     = 220
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
   }
 
   condition {
@@ -578,24 +568,43 @@ resource "aws_lb_listener_rule" "bi_security_login_9502_rule" {
   }
 }
 
-# Listener rule for /static on port 9502
-resource "aws_lb_listener_rule" "static_9502_rule" {
+# Listener rule for /bi-sac-config-mgr on port 9503
+resource "aws_lb_listener_rule" "bi_sac_config_mgr_9503_rule" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
-  listener_arn = aws_lb_listener.http_9502_listener[0].arn
+  listener_arn = aws_lb_listener.https_9503_listener[0].arn
   priority     = 230
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
   }
 
   condition {
     path_pattern {
-      values = ["/static*"]
+      values = ["/bi-sac-config-mgr*"]
     }
   }
 }
+
+# # Listener rule for /static on port 9503
+# resource "aws_lb_listener_rule" "static_9503_rule" {
+#   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+#   listener_arn = aws_lb_listener.https_9503_listener[0].arn
+#   priority     = 230
+
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
+#   }
+
+#   condition {
+#     path_pattern {
+#       values = ["/static*"]
+#     }
+#   }
+# }
 
 # HTTPS Listener rules (keeping for SSL access)
 # Listener rule for /console on HTTPS
@@ -607,7 +616,7 @@ resource "aws_lb_listener_rule" "console_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_ec2_https_9501_target_group[0].arn
   }
 
   condition {
@@ -626,7 +635,7 @@ resource "aws_lb_listener_rule" "em_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_ec2_https_9501_target_group[0].arn
   }
 
   condition {
@@ -645,7 +654,7 @@ resource "aws_lb_listener_rule" "analytics_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
   }
 
   condition {
@@ -664,7 +673,7 @@ resource "aws_lb_listener_rule" "analytics_ws_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
   }
 
   condition {
@@ -683,7 +692,7 @@ resource "aws_lb_listener_rule" "dv_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
   }
 
   condition {
@@ -702,7 +711,7 @@ resource "aws_lb_listener_rule" "bi_security_login_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
   }
 
   condition {
@@ -721,7 +730,7 @@ resource "aws_lb_listener_rule" "biinfer_login_https_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
   }
 
   condition {
@@ -731,21 +740,21 @@ resource "aws_lb_listener_rule" "biinfer_login_https_rule" {
   }
 }
 
-# Listener rule for /static on HTTPS
-resource "aws_lb_listener_rule" "static_https_rule" {
+# Listener rule for /bi-sac-config-mgr on HTTPS
+resource "aws_lb_listener_rule" "bi_sac_config_mgr_https_rule" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 
   listener_arn = aws_lb_listener.https_listener[0].arn
-  priority     = 240
+  priority     = 260
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+    target_group_arn = aws_lb_target_group.oas_analytics_https_9503_target_group[0].arn
   }
 
   condition {
     path_pattern {
-      values = ["/static*"]
+      values = ["/bi-sac-config-mgr*"]
     }
   }
 }

@@ -203,8 +203,20 @@ locals {
     }
   ]
 
-  mw_ami_target_id = local.environment == "development" ? "i-07e8ab8df178e58aa" : local.environment == "production" ? "i-06a75f5adc84dab2e" : ""
-  mw_date_time     = "2025-12-05T03:10:00"
+  # Maintenance Window configuration
+
+  # Single source of truth for where MW resources should exist.
+  ssm_mw_environments = toset(["production"])
+  ssm_mw_enabled      = contains(local.ssm_mw_environments, local.environment)
+  mw_config_by_environment = {
+    production = {
+      ami_target_id = "i-09e042424e8f558bc"
+      date_time     = "2026-07-31T04:00:00"
+    }
+  }
+
+  # Safe defaults for environments where MW is not enabled.
+  mw_ami_target_id = try(local.mw_config_by_environment[local.environment].ami_target_id, "")
+  mw_date_time     = try(local.mw_config_by_environment[local.environment].date_time, "")
 
 }
-#

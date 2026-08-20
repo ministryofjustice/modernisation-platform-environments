@@ -30,7 +30,7 @@ resource "aws_iam_role_policy" "lambda_cloudwatch_sns_policy" {
           "secretsmanager:DescribeSecret",
           "secretsmanager:ListSecretVersionIds"
         ]
-        Resource = [aws_secretsmanager_secret.edrms_docs_exception_secrets.arn]
+        Resource = [aws_secretsmanager_secret.edrms_secrets.arn]
       },
       {
         Effect = "Allow"
@@ -99,7 +99,7 @@ resource "aws_lambda_function" "cloudwatch_sns" {
 
   environment {
     variables = {
-      SECRET_NAME = aws_secretsmanager_secret.edrms_docs_exception_secrets.name
+      SECRET_NAME = aws_secretsmanager_secret.edrms_secrets.name
     }
   }
 
@@ -118,6 +118,14 @@ resource "aws_lambda_permission" "allow_sns_invoke" {
   function_name = aws_lambda_function.cloudwatch_sns.function_name
   principal     = "sns.amazonaws.com"
   source_arn    = aws_sns_topic.cloudwatch_slack.arn
+}
+
+resource "aws_lambda_permission" "allow_eventbridge_invoke" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cloudwatch_sns.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.certificate_expiration_warning.arn
 }
 
 resource "aws_lambda_permission" "allow_sns_invoke_guardduty" {

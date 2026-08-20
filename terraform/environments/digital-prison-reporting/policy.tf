@@ -480,7 +480,7 @@ data "aws_iam_policy_document" "redshift_federated_query" {
     actions = [
       "secretsmanager:GetSecretValue"
     ]
-    resources = [for s in data.aws_secretsmanager_secret.probation : s.arn]
+    resources = [for s in module.probation_source_secret : s.secret_arn]
   }
 }
 
@@ -684,7 +684,6 @@ resource "aws_iam_policy" "redshift_dataapi_cross_policy" {
   policy      = data.aws_iam_policy_document.redshift_dataapi.json
 }
 
-
 ## Athena API Policy Document
 # Policy Document
 data "aws_iam_policy_document" "athena_api" {
@@ -695,7 +694,9 @@ data "aws_iam_policy_document" "athena_api" {
       "athena:GetQueryResults",
       "athena:GetWorkGroup",
       "athena:StartQueryExecution",
-      "athena:StopQueryExecution"
+      "athena:StopQueryExecution",
+      "athena:ListQueryExecutions",
+      "athena:BatchGetQueryExecution"
     ]
     resources = [
       "arn:aws:athena:${local.account_region}:${local.account_id}:*/*"

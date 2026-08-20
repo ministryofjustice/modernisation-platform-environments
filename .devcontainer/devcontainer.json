@@ -4,6 +4,7 @@
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:": {},
     "ghcr.io/devcontainers/features/github-cli:": {},
+    "ghcr.io/ministryofjustice/devcontainer-feature/apm:": {},
     "ghcr.io/ministryofjustice/devcontainer-feature/astral:": {},
     "ghcr.io/ministryofjustice/devcontainer-feature/aws:": {},
     "ghcr.io/ministryofjustice/devcontainer-feature/kubernetes:": {},

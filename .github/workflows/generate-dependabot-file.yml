@@ -22,7 +22,7 @@ permissions:
 
 jobs:
   fetch-secrets:
-        uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@d2d07632db53d17c9760c0c2c06f22a37bd3f0a1 # v6.0.1
+        uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@0d6fd59fa082417466d12e0e1a5e76da3f1712db # v6.1.8
         permissions:
           id-token: write
           contents: read
@@ -33,9 +33,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: fetch-secrets   
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Decrypt Secrets
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@d2d07632db53d17c9760c0c2c06f22a37bd3f0a1 # v6.0.1
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@0d6fd59fa082417466d12e0e1a5e76da3f1712db # v6.1.8
         with:
           slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -47,14 +47,14 @@ jobs:
         run: bash ./scripts/git-setup.sh
 
       - name: Commit and Create PR with Signed Commit
-        uses: ministryofjustice/modernisation-platform-github-actions/signed-commit@d2d07632db53d17c9760c0c2c06f22a37bd3f0a1 # v6.0.1
+        uses: ministryofjustice/modernisation-platform-github-actions/signed-commit@0d6fd59fa082417466d12e0e1a5e76da3f1712db # v6.1.8
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           pr_title: "Automated Update: Dependabot File"
           pr_body: "This PR updates the Dependabot configuration file."
 
       - name: Slack failure notification
-        uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v1.26.0
+        uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v1.26.0
         with:
           webhook-type: incoming-webhook
           payload: |

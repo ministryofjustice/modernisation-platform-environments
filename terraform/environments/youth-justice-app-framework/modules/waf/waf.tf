@@ -12,6 +12,65 @@ resource "aws_wafv2_web_acl" "waf" {
   }
 
   dynamic "rule" {
+    for_each = var.waf_header_allow_rules
+    content {
+      name     = rule.value.name
+      priority = rule.value.priority
+
+      action {
+        allow {}
+      }
+
+      statement {
+        and_statement {
+          statement {
+            or_statement {
+              dynamic "statement" {
+                for_each = rule.value.paths
+                content {
+                  byte_match_statement {
+                    search_string = statement.value
+                    field_to_match {
+                      uri_path {}
+                    }
+                    text_transformation {
+                      priority = 0
+                      type     = "NONE"
+                    }
+                    positional_constraint = "EXACTLY"
+                  }
+                }
+              }
+            }
+          }
+
+          statement {
+            byte_match_statement {
+              search_string = var.waf_header_allow_header_value
+              field_to_match {
+                single_header {
+                  name = lower(var.waf_header_allow_header_name)
+                }
+              }
+              text_transformation {
+                priority = 0
+                type     = "NONE"
+              }
+              positional_constraint = "EXACTLY"
+            }
+          }
+        }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = rule.value.name
+        sampled_requests_enabled   = true
+      }
+    }
+  }
+
+  dynamic "rule" {
     for_each = var.waf_IP_rules
     content {
       name     = rule.value.name
@@ -142,6 +201,65 @@ resource "aws_wafv2_web_acl" "cf" {
 
   default_action {
     allow {}
+  }
+
+  dynamic "rule" {
+    for_each = var.waf_header_allow_rules_cf
+    content {
+      name     = rule.value.name
+      priority = rule.value.priority
+
+      action {
+        allow {}
+      }
+
+      statement {
+        and_statement {
+          statement {
+            or_statement {
+              dynamic "statement" {
+                for_each = rule.value.paths
+                content {
+                  byte_match_statement {
+                    search_string = statement.value
+                    field_to_match {
+                      uri_path {}
+                    }
+                    text_transformation {
+                      priority = 0
+                      type     = "NONE"
+                    }
+                    positional_constraint = "EXACTLY"
+                  }
+                }
+              }
+            }
+          }
+
+          statement {
+            byte_match_statement {
+              search_string = var.waf_header_allow_header_value
+              field_to_match {
+                single_header {
+                  name = lower(var.waf_header_allow_header_name)
+                }
+              }
+              text_transformation {
+                priority = 0
+                type     = "NONE"
+              }
+              positional_constraint = "EXACTLY"
+            }
+          }
+        }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = rule.value.name
+        sampled_requests_enabled   = true
+      }
+    }
   }
 
   dynamic "rule" {

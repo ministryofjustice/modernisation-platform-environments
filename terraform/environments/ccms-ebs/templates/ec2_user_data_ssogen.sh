@@ -1,40 +1,82 @@
 #!/bin/bash
-set -euxo pipefail
+set -exuo pipefail
 
 # === Set hostname ===
 hostnamectl set-hostname "${hostname}"
-echo "127.0.0.1   ${hostname}" >> /etc/hosts
 
+# === Configure resolv.conf ===
+nmcli con modify "System eth0" ipv4.ignore-auto-dns no
+nmcli con modify "System eth0" ipv4.dns-search "${mp_fqdn} eu-west-2.compute.internal"
+nmcli con up "System eth0"
 # === Base updates and packages ===
 yum update -y
-yum install -y unzip wget curl git lsof tree java-1.8.0-openjdk
 
-# Install AWS SSM Agent
-yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:ssogen-cloud-watch-config
 
-systemctl stop amazon-ssm-agent
-rm -rf /var/lib/amazon/ssm/ipc/
-systemctl enable amazon-ssm-agent
-systemctl start amazon-ssm-agent
+# Wait for disks to appear
+sleep 25
 
+IFS=',' read -r -a DISKS_ARRAY <<< "${DISKSARRAY}"
 
-# === Install AWS CLI ===
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-./aws/install
+for entry in "$${DISKS_ARRAY[@]}"; do
+  IFS=":" read -r disk mount <<< "$entry"
+  echo "Processing $disk -> $mount"
+  # Ensure directory exists
+  mkdir -p "$mount"
 
-# === Install Amazon CloudWatch Agent ===
-wget https://s3.amazonaws.com/amazoncloudwatch-agent/oracle_linux/amd64/latest/amazon-cloudwatch-agent.rpm
-rpm -U ./amazon-cloudwatch-agent.rpm
-/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:cloud-watch-config
+  if [[ $mount != "/tmp" ]] ; then
+    # Get UUID for persistent mount
+    uuid=$(blkid -s UUID -o value "$${disk}")
+    # Remove from fstab 
+    sed -i "\|$mount|d" /etc/fstab
+    # Add to fstab
+    echo "Adding to /etc/fstab"
+    echo "UUID=$uuid $mount xfs defaults,nofail 0 2" >> /etc/fstab
+  fi
+done
 
-# === Optional: Create oracle user & dirs ===
-mkdir -p /oracle
-useradd -g dba -m oracle || true
-chown -R oracle:dba /oracle
-chmod 775 /oracle
+deploy_cortex() {
+  CORTEX_DIR=/tmp/CortexAgent
+  CORTEX_VERSION=linux_8_8_0_133595_rpm
 
-# 
+  #--Prep
+  mkdir -p $CORTEX_DIR/linux_8_8_0_133595_rpm
+  mkdir /etc/panw
+  aws s3 sync s3://ccms-shared/CortexAgent/ $CORTEX_DIR #--ccms-shared is in the EBS dev account 767123802783. Bucket is shared at the ORG LEVEL.
+  tar zxf $CORTEX_DIR/$CORTEX_VERSION.tar.gz -C $CORTEX_DIR/$CORTEX_VERSION
+  cp $CORTEX_DIR/$CORTEX_VERSION/cortex.conf /etc/panw/cortex.conf
+  sed -i -e '$a\' /etc/panw/cortex.conf && echo "--endpoint-tags ccms,ssogen" >> /etc/panw/cortex.conf
 
-# === Final logs ===
-echo "SSOGEN instance bootstrap completed for ${hostname}" >> /var/log/user-data.log
+  #--Installs
+  yum install -y selinux-policy-devel
+  rpm -Uvh $CORTEX_DIR/$CORTEX_VERSION/cortex-*.rpm
+  systemctl status traps_pmd
+  echo "Cortex Install Routine Complete. Installation Is NOT GUARANTEED -- Check Logs For Success"
+}
+
+if [[ "${deploy_environment}" = "production" ]]; then
+  deploy_cortex
+fi
+
+#--Configure EFS
+mkdir -p /mnt/efs
+mount -t efs -o tls ${efs_id}:/ /mnt/efs
+IFS=',' read -r -a EFS_MP_ARRAY <<< "${EFS_MOUNT_POINT_ARRAY}"
+
+for var in "$${EFS_MP_ARRAY[@]}"; do
+  IFS=":" read -r efsmount localmount <<< "$var"
+  mkdir -p /mnt/efs/$efsmount
+  mkdir -p $localmount
+  mount -t efs -o tls ${efs_id}:/$efsmount $localmount
+  chmod go+rw $localmount
+  # create large file for better EFS performance 
+  # https://docs.aws.amazon.com/efs/latest/ug/performance.html
+  dd if=/dev/urandom of=$localmount/large_file_for_efs_performance bs=1024k count=10000
+  echo "Removing existing mount point /etc/fstab"
+  sed -i "\|$localmount|d" /etc/fstab
+  echo "Adding to /etc/fstab"
+  echo "${efs_id}:/$efsmount $localmount efs _netdev,tls,nofail 0 0" >> /etc/fstab
+done
+
+umount /mnt/efs
+echo "SSOGEN instance bootstrap completed" >> /var/log/user-data.log

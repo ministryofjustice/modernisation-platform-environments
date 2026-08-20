@@ -1,5 +1,5 @@
 module "aws_cloudwatch_observability_eks_pod_identity" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks-pod-identity.git?ref=776d089cf8b13dbff25e32e78272f8f693f5cb29" # v2.7.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks-pod-identity.git?ref=2cbd87e243fcbf74385331dcf983e273eeb7aa36" # v2.8.1
 
   name = "aws-cloudwatch-observability"
 
@@ -16,7 +16,7 @@ module "aws_cloudwatch_observability_eks_pod_identity" {
 
 
 module "aws_load_balancer_controller_eks_pod_identity" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks-pod-identity.git?ref=776d089cf8b13dbff25e32e78272f8f693f5cb29" # v2.7.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks-pod-identity.git?ref=2cbd87e243fcbf74385331dcf983e273eeb7aa36" # v2.8.1
 
   name = "aws-load-balancer-controller"
 

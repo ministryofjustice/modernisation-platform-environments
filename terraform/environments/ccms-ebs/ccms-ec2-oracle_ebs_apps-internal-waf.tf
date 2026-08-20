@@ -7,7 +7,7 @@ resource "aws_wafv2_ip_set" "ebsapps_waf_ip_set" {
   description        = "List of trusted IP Addresses allowing access via WAF for EBS Apps Internal ALB"
 
   addresses = jsondecode(data.aws_secretsmanager_secret_version.ebs_secrets.secret_string).ebs_internal_waf_ip_set
-  
+
   tags = merge(local.tags,
     { Name = lower(format("ebsapp-internal-ip-set")) }
   )
@@ -57,6 +57,7 @@ resource "aws_wafv2_web_acl" "ebsapps_internal_web_acl" {
 resource "aws_cloudwatch_log_group" "ebs_internal_waf_logs" {
   name              = "aws-waf-logs-ebs/ebs-waf-internal-logs"
   retention_in_days = 180
+  kms_key_id        = aws_kms_key.cloudwatch_logs.arn
 
   tags = merge(local.tags,
     { Name = lower(format("ebs-waf-logs")) }

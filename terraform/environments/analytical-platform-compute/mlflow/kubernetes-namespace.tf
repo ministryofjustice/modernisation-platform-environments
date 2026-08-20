@@ -1,4 +1,4 @@
-resource "kubernetes_namespace" "mlflow" {
+resource "kubernetes_namespace_v1" "mlflow" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
   metadata {

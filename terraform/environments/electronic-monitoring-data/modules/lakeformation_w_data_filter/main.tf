@@ -67,9 +67,7 @@ resource "aws_lakeformation_data_cells_filter" "data_filter" {
     name             = "filter-for-${var.role_arn}-${each.key}-${each.value != "" ? each.value : "all-rows"}"
     table_catalog_id = data.aws_caller_identity.current.account_id
     table_name       = each.key
-    column_wildcard {
-      excluded_column_names = []
-    }
+    column_wildcard {}
     dynamic "row_filter" {
       for_each = each.value != "" ? [each.value] : []
       content {

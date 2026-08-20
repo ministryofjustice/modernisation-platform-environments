@@ -9,11 +9,15 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 50
   - package-ecosystem: "devcontainers"
     directory: "/"
     schedule:
       interval: "daily"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 50
     reviewers:
       - "ministryofjustice/devcontainer-community"
@@ -23,9 +27,13 @@ updates:
     schedule:
       interval: "daily"
     open-pull-requests-limit: 150
+    cooldown:
+      default-days: 7
   - package-ecosystem: "gomod"
     directories:
       - "scripts/**/*"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7

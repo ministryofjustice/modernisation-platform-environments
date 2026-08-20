@@ -32,6 +32,12 @@ resource "aws_directory_service_radius_settings" "workspaces_ad_radius" {
   depends_on = [
     aws_directory_service_directory.workspaces_ad
   ]
+
+  # Prevent Terraform from updating RADIUS settings after initial creation
+  # AWS validation often fails even when RADIUS is working correctly
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 ##############################################

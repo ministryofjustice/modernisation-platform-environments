@@ -44,6 +44,34 @@ data "aws_secretsmanager_secret_version" "pui_secrets" {
   secret_id = aws_secretsmanager_secret.pui_secrets.id
 }
 
+# WAF IP Set Secrets - this is used to store the list of trusted IP addresses for WAF access, allowing us to update the list without changing the Terraform code
+resource "aws_secretsmanager_secret" "pui_waf_ip_set" {
+  name        = "pui_waf_ip_set"
+  description = "WAF IP Set for PUI Application"
+}
+
+resource "aws_secretsmanager_secret_version" "pui_waf_ip_set" {
+  secret_id = aws_secretsmanager_secret.pui_waf_ip_set.id
+  secret_string = jsonencode({
+    "pui_waf_ip_set" = ["${local.application_data.accounts[local.environment].aws_workspace}", "${data.aws_subnet.private_subnets_a.cidr_block}",
+      "${data.aws_subnet.private_subnets_b.cidr_block}",
+      "${data.aws_subnet.private_subnets_c.cidr_block}",
+    "${local.application_data.accounts[local.environment].sb_vpc}"]
+  })
+
+  lifecycle {
+    ignore_changes = [
+      secret_string
+    ]
+  }
+}
+
+
+data "aws_secretsmanager_secret_version" "pui_waf_ip_set" {
+  secret_id = aws_secretsmanager_secret.pui_waf_ip_set.id
+}
+
+
 # # IP Secrets
 # resource "aws_secretsmanager_secret" "ip_secrets" {
 #   name        = "${local.application_name}-ip-secrets"

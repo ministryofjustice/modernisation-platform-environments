@@ -3,7 +3,7 @@
 # }
 locals {
   # Skip preproduction environment
-  create_resources = contains(["development", "test", "production"], local.environment)
+  create_resources = contains(["development", "test", "production", "preproduction"], local.environment)
 
   portals = {
     "external_1" = "laa-workspaces-web-external-1"

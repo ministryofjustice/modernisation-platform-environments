@@ -1,6 +1,6 @@
 # Set up CloudWatch group and log stream and retain logs for 90 days
-resource "aws_cloudwatch_log_group" "log_group_sftp_bc" {
-  name              = "${local.application_name}-sftp-barclaycard-ecs"
+resource "aws_cloudwatch_log_group" "sftp_log_group" {
+  name              = "${local.application_data.accounts[local.environment].app_name}-ecs"
   retention_in_days = 90
 
   tags = merge(local.tags,
@@ -8,7 +8,7 @@ resource "aws_cloudwatch_log_group" "log_group_sftp_bc" {
   )
 }
 
-resource "aws_cloudwatch_log_stream" "log_stream_sftp_bc" {
-  name           = "${local.application_name}-sftp-bc-log-stream"
-  log_group_name = aws_cloudwatch_log_group.log_group_sftp_bc.name
+resource "aws_cloudwatch_log_stream" "sftp_log_stream" {
+  name           = "${local.application_data.accounts[local.environment].app_name}-log-stream"
+  log_group_name = aws_cloudwatch_log_group.sftp_log_group.name
 }

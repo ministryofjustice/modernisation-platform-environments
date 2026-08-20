@@ -56,7 +56,26 @@ locals {
       queue_name = local.live_feed_dlq_names.push_data_export_to_p1
     }
   }
+  merge_lambdas = {
+    staged_position = {
+      lambda_name = module.merge_mdss_staged_position[0].lambda_function_name
+      threshold   = local.is-production || local.is-preproduction ? 20000000000 : 1000000000
+    }
+    staged_event = {
+      lambda_name = module.merge_mdss_staged_event[0].lambda_function_name
+      threshold   = local.is-production || local.is-preproduction ? 20000000000 : 1000000000
+    }
+    ac_position = {
+      lambda_name = module.merge_ac_position[0].lambda_function_name
+      threshold   = local.is-production || local.is-preproduction ? 20000000000 : 1000000000
+    }
+    emdi_position = {
+      lambda_name = module.merge_emdi_position[0].lambda_function_name
+      threshold   = local.is-production || local.is-preproduction ? 20000000000 : 1000000000
+    }
+  }
 }
+
 
 resource "aws_cloudwatch_metric_alarm" "sqs_dlq_has_messages" {
   for_each = local.sqs_dlq_alarm_queues
@@ -80,13 +99,43 @@ resource "aws_cloudwatch_metric_alarm" "sqs_dlq_has_messages" {
   # Disable direct alarm actions to avoid duplicate Slack messages.
   actions_enabled = false
 
-  metric_name = "ApproximateNumberOfMessagesVisible"
-  namespace   = "AWS/SQS"
-  period      = 60
-  statistic   = "Sum"
+  metric_query {
+    id          = "visible"
+    return_data = false
 
-  dimensions = {
-    QueueName = each.value.queue_name
+    metric {
+      metric_name = "ApproximateNumberOfMessagesVisible"
+      namespace   = "AWS/SQS"
+      period      = 60
+      stat        = "Sum"
+
+      dimensions = {
+        QueueName = each.value.queue_name
+      }
+    }
+  }
+
+  metric_query {
+    id          = "not_visible"
+    return_data = false
+
+    metric {
+      metric_name = "ApproximateNumberOfMessagesNotVisible"
+      namespace   = "AWS/SQS"
+      period      = 60
+      stat        = "Sum"
+
+      dimensions = {
+        QueueName = each.value.queue_name
+      }
+    }
+  }
+
+  metric_query {
+    id          = "total_messages"
+    expression  = "visible + not_visible"
+    label       = "Messages visible or in flight"
+    return_data = true
   }
 
   alarm_actions = [
@@ -111,7 +160,7 @@ resource "aws_cloudwatch_metric_alarm" "mdss_reconciler_errors_alarm" {
   statistic   = "Sum"
 
   dimensions = {
-    FunctionName = module.mdss_reconciler[0].lambda_function_name
+    FunctionName = module.mdss_load_redrive_controller[0].lambda_function_name
   }
 
   alarm_actions = [
@@ -140,5 +189,182 @@ resource "aws_cloudwatch_metric_alarm" "glue_database_count_high" {
 
   alarm_actions = [
     aws_sns_topic.emds_alerts.arn
+  ]
+}
+
+# ------------------------------------------------------------------------------
+# Merge Lambdas
+# ------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_metric_alarm" "merge_lambda_dlq_has_messages" {
+  for_each = local.merge_lambdas
+
+  alarm_name          = "${each.key}_dlq_messages"
+  alarm_description   = "Checks messages in the DLQ every 15 mins"
+  comparison_operator = "GreaterThanThreshold"
+  threshold           = 0
+  period              = 900
+  statistic           = "Maximum"
+  evaluation_periods  = 1
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_name = "ApproximateNumberOfMessagesVisible"
+  namespace   = "AWS/SQS"
+
+  dimensions = {
+    QueueName = "${each.value.lambda_name}-dlq"
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "merge_lambdas_queries_failing" {
+  for_each = local.merge_lambdas
+
+  alarm_name          = "${each.key}_queries_failing"
+  alarm_description   = "Detects 3 failed queries within 15 minutes."
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  threshold           = 3
+  period              = 900
+  statistic           = "Sum"
+  evaluation_periods  = 1
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_name = "FailedQueries"
+  namespace   = "EM/MergeLambdas"
+
+  dimensions = {
+    FunctionName = each.value.lambda_name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "merge_lambdas_excessive_scanning" {
+  for_each = local.merge_lambdas
+
+  alarm_name          = "${each.key}_excessive_scanning"
+  alarm_description   = "Detects when average scan across an hour is excessive."
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  threshold           = each.value.threshold
+  unit                = "Bytes"
+  period              = 3600
+  statistic           = "Average"
+  evaluation_periods  = 1
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_name = "DataScanned"
+  namespace   = "EM/MergeLambdas"
+
+  dimensions = {
+    FunctionName = each.value.lambda_name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "merge_lambdas_slow_execution" {
+  for_each = local.merge_lambdas
+
+  alarm_name          = "${each.key}_slow_execution"
+  alarm_description   = "Detects a slow maximum runtime."
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  threshold           = 120000
+  unit                = "Milliseconds"
+  period              = 180
+  statistic           = "Maximum"
+  evaluation_periods  = 1
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_name = "TotalExecutionTime"
+  namespace   = "EM/MergeLambdas"
+
+  dimensions = {
+    FunctionName = each.value.lambda_name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
+resource "aws_cloudwatch_metric_alarm" "merge_lambdas_long_queue" {
+  for_each = local.merge_lambdas
+
+  alarm_name          = "${each.key}_long_queue"
+  alarm_description   = "Detects when average queue time over 15 minutes is slow."
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  threshold           = 60000
+  unit                = "Milliseconds"
+  period              = 900
+  statistic           = "Average"
+  evaluation_periods  = 1
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = false
+
+  metric_name = "QueryQueueTime"
+  namespace   = "EM/MergeLambdas"
+
+  dimensions = {
+    FunctionName = each.value.lambda_name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn
+  ]
+}
+
+# ------------------------------------------------------------------------------
+# Live-feed incident automation DLQ alarm
+#
+# This alarm publishes directly to the alerts topic. It is deliberately not
+# included in local.sqs_dlq_alarm_queues because failures in incident automation
+# must not recursively create another automated incident.
+# ------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_metric_alarm" "live_feed_incident_events_dlq" {
+  alarm_name = "live_feed_incident_events_dlq_has_messages"
+
+  alarm_description = (
+    "Triggered when live-feed incident automation messages reach its DLQ"
+  )
+
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "notBreaching"
+
+  actions_enabled = true
+
+  metric_name = "ApproximateNumberOfMessagesVisible"
+  namespace   = "AWS/SQS"
+  period      = 60
+  statistic   = "Maximum"
+
+  dimensions = {
+    QueueName = aws_sqs_queue.live_feed_incident_events_dlq.name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.emds_alerts.arn,
+  ]
+
+  ok_actions = [
+    aws_sns_topic.emds_alerts.arn,
   ]
 }

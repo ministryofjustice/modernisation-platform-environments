@@ -44,6 +44,7 @@ EOF
 ######################################
 
 resource "aws_instance" "smtp" {
+  count                       = local.is-development ? 0 : 1
   ami                         = local.application_data.accounts[local.environment].smtp_ami_id
   availability_zone           = "eu-west-2a"
   instance_type               = local.application_data.accounts[local.environment].smtp_instance_type
@@ -67,6 +68,7 @@ resource "aws_instance" "smtp" {
     aws_secretsmanager_secret_version.smtp_user, aws_secretsmanager_secret_version.smtp_password
   ]
 }
+
 
 #################################
 # smtp Security Group Rules
@@ -101,10 +103,11 @@ resource "aws_vpc_security_group_ingress_rule" "smtp_vpc" {
 
 # Domain A record for SMTP server
 resource "aws_route53_record" "smtp" {
+  count    = local.is-development ? 0 : 1
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "laa-mail.${data.aws_route53_zone.external.name}"
   type     = "A"
   ttl      = "60"
-  records  = [aws_instance.smtp.private_ip]
+  records  = [aws_instance.smtp[0].private_ip]
 }

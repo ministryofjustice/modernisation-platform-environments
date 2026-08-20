@@ -16,7 +16,7 @@ locals {
   character_set_name         = "WE8MSWIN1252"
   instance_class             = "db.m5.xlarge"
   engine                     = "oracle-se2"
-  engine_version             = "19.0.0.0.ru-2026-01.rur-2026-01.r3"
+  engine_version             = local.application_data.accounts[local.environment].engine_version
   username                   = "sysdba"
   backup_window              = "22:00-01:00"
   maintenance_window = (
@@ -90,4 +90,11 @@ locals {
   }
 
   prod_domain_name = "laa-finance-data.service.justice.gov.uk"
+
+  lambda_source_hashes = [
+    for f in fileset("./lambda/cloudwatch_alarm_slack_integration", "**") :
+    sha256(file("${path.module}/lambda/cloudwatch_alarm_slack_integration/${f}"))
+  ]
+
+  lambda_folder_name = ["lambda_delivery", "cloudwatch_sns_layer"]
 }

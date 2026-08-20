@@ -18,8 +18,7 @@ locals {
 
       sns_topics = {
         pagerduty_integrations = {
-          dso-pipelines-pagerduty = "dso-pipelines"
-          pagerduty               = "hmpps-oem-development"
+          pagerduty = "hmpps-oem-development"
         }
       }
     }

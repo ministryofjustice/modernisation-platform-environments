@@ -120,7 +120,8 @@ locals {
           # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
           "EC2Db",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
-          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
+          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+          "Ec2DeliusIntegrationPolicy",
         ]
         secretsmanager_secrets_prefix = "ec2/"
         subnet_name                   = "data"

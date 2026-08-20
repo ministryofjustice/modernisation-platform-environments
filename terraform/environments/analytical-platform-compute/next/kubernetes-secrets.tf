@@ -1,10 +1,10 @@
-resource "kubernetes_secret" "rds" {
+resource "kubernetes_secret_v1" "rds" {
 
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
   metadata {
     name      = "rds"
-    namespace = kubernetes_namespace.main[0].metadata[0].name
+    namespace = kubernetes_namespace_v1.main[0].metadata[0].name
   }
 
   type = "Opaque"

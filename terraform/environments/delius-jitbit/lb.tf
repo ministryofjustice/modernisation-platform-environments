@@ -1,6 +1,3 @@
-# checkov:skip=CKV_AWS_226
-# checkov:skip=CKV2_AWS_28
-
 locals {
   blue_green_target_groups = {
     blue  = try(aws_lb_target_group.target_group_fargate_blue[0].id, null)
@@ -109,11 +106,6 @@ resource "aws_lb_listener" "listener" {
   )
 }
 
-moved {
-  from = aws_lb_target_group.target_group_fargate
-  to   = aws_lb_target_group.target_group_fargate[0]
-}
-
 resource "aws_lb_target_group" "target_group_fargate" {
   # checkov:skip=CKV_AWS_261
 
@@ -153,8 +145,9 @@ resource "aws_ssm_parameter" "active_deployment_colour" {
   count = local.create_blue_green ? 1 : 0
 
   name  = "/delius-jitbit/blue-green-active-colour"
-  type  = "String"
+  type  = "SecureString"
   value = "blue"
+  key_id = data.aws_kms_key.general_shared.arn
 
   lifecycle {
     ignore_changes = [value]

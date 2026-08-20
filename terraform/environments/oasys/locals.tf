@@ -67,6 +67,37 @@ locals {
       enable_resource_explorer = true
     }
 
+    iam_policies = {
+      Ec2DeliusIntegrationPolicy = {
+        descriptions = "Permissions required for EC2s for delius integration"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "sqs:ReceiveMessage",
+              "sqs:SendMessage",
+              "sqs:DeleteMessage",
+              "sqs:GetQueueAttributes",
+              "sqs:GetQueueUrl",
+              "sqs:ChangeMessageVisibility",
+            ]
+            resources = [
+              "arn:aws:sqs:eu-west-2:*:*"
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/delius_oasys/*",
+            ]
+          },
+        ]
+      }
+    }
+
     security_groups = local.security_groups
   }
 

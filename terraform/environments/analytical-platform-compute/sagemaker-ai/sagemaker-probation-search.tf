@@ -164,6 +164,7 @@ resource "aws_appautoscaling_policy" "probation_search" {
 # ------------------------------------------------------------------------------
 # IAM Permissions
 # ------------------------------------------------------------------------------
+# Upgrading the IAM module from v5.x to v6.x introduces breaking changes that cause IAM roles and policies to be replaced. Therefore, we are not proceeding with the version upgrade.
 
 module "probation_search_sagemaker_execution_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions

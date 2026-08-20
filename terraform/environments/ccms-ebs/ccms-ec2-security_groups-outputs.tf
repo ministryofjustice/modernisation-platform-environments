@@ -12,24 +12,24 @@ output "aws_security_group_ec2_sg_ebsapps_arn" {
 
 #
 
-output "aws_security_group_ec2_sg_webgate_arn" {
-  description = "aws_security_group ec2_sg_webgate arn"
-  value       = aws_security_group.ec2_sg_webgate.arn
-}
+# output "aws_security_group_ec2_sg_webgate_arn" {
+#   description = "aws_security_group ec2_sg_webgate arn"
+#   value       = aws_security_group.ec2_sg_webgate.arn
+# }
+
+# #
+
+# output "aws_security_group_ec2_sg_accessgate_arn" {
+#   description = "aws_security_group ec2_sg_accessgate arn"
+#   value       = aws_security_group.ec2_sg_accessgate.arn
+# }
 
 #
 
-output "aws_security_group_ec2_sg_accessgate_arn" {
-  description = "aws_security_group ec2_sg_accessgate arn"
-  value       = aws_security_group.ec2_sg_accessgate.arn
-}
-
-#
-
-output "aws_security_group_sg_ebsapps_lb_arn" {
-  description = "aws_security_group sg_ebsapps_lb arn"
-  value       = local.is-production ? aws_security_group.sg_ebsapps_lb[0].arn : null
-}
+# output "aws_security_group_sg_ebsapps_lb_arn" {
+#   description = "aws_security_group sg_ebsapps_lb arn"
+#   value       = local.is-production ? aws_security_group.sg_ebsapps_lb[0].arn : null
+# }
 
 #
 

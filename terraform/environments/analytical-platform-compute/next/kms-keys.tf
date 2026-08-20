@@ -5,7 +5,7 @@ module "rds_kms" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.0.0"
+  version = "4.2.0"
 
   aliases               = ["rds/${local.component_name}"]
   enable_default_policy = true

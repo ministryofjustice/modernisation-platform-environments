@@ -65,8 +65,10 @@ resource "aws_networkfirewall_firewall_policy" "strict" {
       rule_order = "STRICT_ORDER"
     }
 
-    # Recommended for STRICT_ORDER so TCP can establish and app-layer rules can match
-    stateful_default_actions = [
+    # In permissive mode, omit drop_established so return-path traffic is not blocked
+    stateful_default_actions = try(local.network_configuration.network_firewall.permissive_mode, false) ? [
+      "aws:alert_established",
+      ] : [
       "aws:drop_established",
       "aws:alert_established",
     ]

@@ -23,8 +23,8 @@ locals {
   }
 
   alarm_name_prefix = "${local.application_name}-alarm"
-  storage = local.application_data.accounts[local.environment].allocated_storage * 0.2 * 1024 * 1024 * 1024
-  FreeMemory = local.application_data.accounts[local.environment].ram_size * 0.1 * 1024 * 1024 * 1024
+  storage           = local.application_data.accounts[local.environment].allocated_storage * 0.2 * 1024 * 1024 * 1024
+  FreeMemory        = local.application_data.accounts[local.environment].ram_size * 0.1 * 1024 * 1024 * 1024
 }
 
 
@@ -32,19 +32,20 @@ resource "aws_cloudwatch_metric_alarm" "rds_alarms" {
   for_each = toset(local.rds_oracle_metrics)
 
   alarm_name          = "${local.alarm_name_prefix}-${each.key}"
-  comparison_operator = contains(["FreeStorageSpace","FreeableMemory"], each.key) ? "LessThanThreshold" : local.common_rds_config.comparison_operator
+  comparison_operator = contains(["FreeStorageSpace", "FreeableMemory"], each.key) ? "LessThanThreshold" : local.common_rds_config.comparison_operator
   evaluation_periods  = local.common_rds_config.evaluation_periods
   metric_name         = each.key
   namespace           = local.common_rds_config.namespace
   period              = local.common_rds_config.period
   statistic           = local.common_rds_config.statistic
   threshold           = each.key == "FreeStorageSpace" ? local.storage : each.key == "FreeableMemory" ? local.FreeMemory : local.common_rds_config.threshold
-  alarm_description   = "Alarm for RDS Oracle metric: ${each.key}"
-  alarm_actions       = [aws_sns_topic.maatdb_alerting_topic.arn]
-  ok_actions          = [aws_sns_topic.maatdb_alerting_topic.arn]
+  alarm_description  = "Alarm for RDS Oracle metric: ${each.key}"
+  alarm_actions      = [aws_sns_topic.maatdb_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.maatdb_alerting_topic.arn]
+  treat_missing_data = each.key == "DatabaseConnections" ? "missing" : "notBreaching"
 
   dimensions = {
-    DBInstanceIdentifier = module.rds.create_std_instance ? module.rds.db_instance_identifier_std : module.rds.db_instance_identifier
+    DBInstanceIdentifier = module.rds.db_instance_identifier
   }
 
   depends_on = [
@@ -69,7 +70,7 @@ resource "aws_cloudwatch_metric_alarm" "ftp_lambda_error" {
   period              = 300
   statistic           = "Sum"
   threshold           = 0
-  treat_missing_data  = "missing"
+  treat_missing_data  = "notBreaching"
 
   dimensions = {
     FunctionName = aws_lambda_function.ftp[0].function_name
@@ -89,7 +90,7 @@ resource "aws_cloudwatch_metric_alarm" "zip_lambda_error" {
   period              = 300
   statistic           = "Sum"
   threshold           = 0
-  treat_missing_data  = "missing"
+  treat_missing_data  = "notBreaching"
 
   dimensions = {
     FunctionName = aws_lambda_function.zip[0].function_name
@@ -140,7 +141,7 @@ module "maatdb_pagerduty_core_alerts" {
   depends_on = [
     aws_sns_topic.maatdb_alerting_topic
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=0179859e6fafc567843cd55c0b05d325d5012dc4" #v2.0.0
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=d88bd90d490268896670a898edfaba24bba2f8ab" # v3.0.0
   sns_topics                = [aws_sns_topic.maatdb_alerting_topic.name]
   pagerduty_integration_key = local.maatdb_pagerduty_integration_keys[local.maatdb_pagerduty_integration_key_name]
 }

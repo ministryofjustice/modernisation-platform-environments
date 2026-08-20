@@ -1,3 +1,4 @@
+# Upgrading the IAM module from v5.x to v6.x introduces breaking changes that cause IAM roles and policies to be replaced. Therefore, we are not proceeding with the version upgrade.
 data "aws_iam_policy_document" "quicksight_vpc_connection" {
   #checkov:skip=CKV_AWS_111:Policy suggested by AWS documentation
   #checkov:skip=CKV_AWS_356:Policy suggested by AWS documentation

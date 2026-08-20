@@ -91,6 +91,13 @@ resource "aws_iam_role_policy" "datasync_password_updater_policy" {
           "fsx:DescribeFileSystems",
         ]
         Resource = "arn:aws:fsx:*:*:*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:UpdateSecret"
+        ],
+        Resource = "arn:aws:secretsmanager:eu-west-2:*:secret:aws-datasync!*"
       }
     ]
   })
@@ -359,7 +366,7 @@ resource "aws_datasync_location_fsx_windows_file_system" "dfi_fsx_destination" {
   count = var.datasync_config != null ? 1 : 0
 
   # Use FSX file system ARN and specific subdirectory for DFI reports
-  fsx_filesystem_arn = aws_fsx_windows_file_system.mis_share.arn
+  fsx_filesystem_arn = aws_fsx_windows_file_system.mis_share[0].arn
   subdirectory       = "/share/dfiinterventions/dfi/"
 
   # Authentication details - using the existing AD admin credentials

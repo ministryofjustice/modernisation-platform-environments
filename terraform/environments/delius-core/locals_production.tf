@@ -90,8 +90,10 @@ locals {
       container_port    = 8080
       container_memory  = 4096
       container_cpu     = 2048
-      ec2_instance_type = "r7i.2xlarge"
-      task_count        = 8
+      ec2_instance_type = "r7i.xlarge"
+      task_count        = 2
+      asg_min_size      = 1
+      asg_max_size      = 1
     }
 
     weblogic_params = {
@@ -101,8 +103,8 @@ locals {
       BREACH_NOTICE_UI_URL_FORMAT = "https://breach-notice-prod.hmpps.service.justice.gov.uk/breach-notice/%s"
       COOKIE_SECURE               = "true"
       # DELIUS_API_URL                    = "" # No longer needed
-      DMS_HOST                          = "https://hmpps-delius-alfresco-prod.apps.live.cloud-platform.service.justice.gov.uk"
-      DMS_OFFICE_URI_HOST               = "https://hmpps-delius-alfresco-prod.apps.live.cloud-platform.service.justice.gov.uk"
+      DMS_HOST                          = "hmpps-delius-alfresco-prod.apps.live.cloud-platform.service.justice.gov.uk"
+      DMS_OFFICE_URI_HOST               = "hmpps-delius-alfresco-prod.apps.live.cloud-platform.service.justice.gov.uk"
       DMS_OFFICE_URI_PORT               = "443"
       DMS_PORT                          = "443"
       DMS_PROTOCOL                      = "https"
@@ -113,7 +115,7 @@ locals {
       JDBC_CONNECTION_POOL_MIN_CAPACITY = "50"
       JDBC_URL                          = ""
       JDBC_USERNAME                     = "delius_pool"
-      LDAP_HOST                         = "https://ldap.prod.delius-core.hmpps-production.modernisation-platform.service.justice.gov.uk"
+      LDAP_HOST                         = "ldap.prod.delius-core.hmpps-production.modernisation-platform.service.justice.gov.uk"
       LDAP_PRINCIPAL                    = "cn=admin,dc=moj,dc=com"
       LOG_LEVEL_NDELIUS                 = "DEBUG"
       MERGE_API_URL                     = "https://delius-merge-api-prod.hmpps.service.justice.gov.uk"
@@ -145,8 +147,8 @@ locals {
       container_port    = 8080
       container_memory  = 2048
       container_cpu     = 1024
-      ec2_instance_type = "r7i.large"
-      task_count        = 1
+      ec2_instance_type = "r7i.xlarge"
+      task_count        = 2
     }
 
     pwm = {
@@ -178,29 +180,22 @@ locals {
   }
 
   dms_config_prod = {
-    deploy_dms                 = false
+    deploy_dms                 = true
     replication_enabled        = false
     replication_instance_class = "dms.t3.medium"
     engine_version             = "3.5.4"
     # This map overlaps with the Ansible database configuration in delius-environment-configuration-management/ansible/group_vars
     # Please ensure any changes made here are consistent with Ansible variables.
-    audit_source_endpoint = {
-      read_host     = "standbydb1"
-      read_database = "PRENDAS1"
-    }
+    audit_source_endpoint = {}
     audit_target_endpoint = {
-      write_environment = "prod" # Until production exists set dummy replication target
-      write_database    = "NONE" # Remove this dummy attribute once production target exists
+      write_database = "PRDNDA"
     }
-    user_source_endpoint = { # Set this map to {} once production exists
-      read_host     = "primarydb"
-      read_database = "NONE"
+    user_source_endpoint = {
+      read_host     = "standbydb2"
+      read_database = "PRDNDAS2"
     }
-    user_target_endpoint = {
-      write_database = "PRENDA"
-    }
-    # Auditing from the Pre-Prod environment is considered production data
-    is-production = true
+    user_target_endpoint = {}
+    is-production        = true
   }
 
   db_backup_config_prod = {

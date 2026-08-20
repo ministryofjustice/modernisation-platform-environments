@@ -49,6 +49,7 @@ locals {
 
   cloud_platform_cidr   = "172.20.0.0/16"
   enable_dpr_cloudtrail = local.application_data.accounts[local.environment].enable_cloud_trail
+  enable_bedrock        = local.application_data.accounts[local.environment].enable_bedrock
   generic_lambda        = "${local.project}-generic-lambda"
 
   lambda_log_retention_in_days = local.application_data.accounts[local.environment].lambda_log_retention_in_days
@@ -107,6 +108,7 @@ locals {
   create_rds_replica             = local.application_data.accounts[local.environment].dpr_rds_db.create_replica
   dpr_rds_engine                 = local.application_data.accounts[local.environment].dpr_rds_db.engine
   dpr_rds_engine_version         = local.application_data.accounts[local.environment].dpr_rds_db.engine_version
+  dpr_rds_replica_engine_version = local.application_data.accounts[local.environment].dpr_rds_db.replica_engine_version
   dpr_rds_init_size              = local.application_data.accounts[local.environment].dpr_rds_db.init_size
   dpr_rds_max_size               = local.application_data.accounts[local.environment].dpr_rds_db.max_size
   dpr_rds_name                   = local.application_data.accounts[local.environment].dpr_rds_db.name
@@ -437,16 +439,7 @@ locals {
     heartbeat_endpoint = "0.0.0.0"
   }
 
-  probation_domains_list = local.application_data.accounts[local.environment].probation_domains
-  probation_secrets_placeholder = {
-    db_name            = "dps"
-    password           = "placeholder"
-    user               = "placeholder"
-    username           = "placeholder"
-    endpoint           = "0.0.0.0"
-    port               = "5432"
-    heartbeat_endpoint = "0.0.0.0"
-  }
+  probation_domains = local.application_data.accounts[local.environment].probation_domains
 
   # Operational DataStore Secrets PlaceHolder
   operational_datastore_secrets_placeholder = {
@@ -530,6 +523,9 @@ locals {
       analytical_platform_runner_suffix = ""
     }
   }
+
+  # AI Gateway assumes into each DPR environment's Bedrock role.
+  ai_gateway_role_arn = "arn:aws:iam::${local.environment_management.account_ids["data-platform-production"]}:role/ai-gateway"
 
 
   all_tags = merge(

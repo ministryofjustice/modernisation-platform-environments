@@ -55,8 +55,8 @@ data "aws_iam_policy_document" "cloudwatch_sns_encryption" {
 
 # SNS topic for GuardDuty findings
 resource "aws_sns_topic" "guardduty_alerts" {
-  name = "${local.application_name}-guardduty-alerts"
-  delivery_policy = <<EOF
+  name              = "${local.application_name}-guardduty-alerts"
+  delivery_policy   = <<EOF
 {
   "http": {
     "defaultHealthyRetryPolicy": {

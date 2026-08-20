@@ -1,3 +1,4 @@
+# Upgrading the IAM module from v5.x to v6.x introduces breaking changes that cause IAM roles and policies to be replaced. Therefore, we are not proceeding with the version upgrade.
 data "aws_iam_policy_document" "mlflow" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 

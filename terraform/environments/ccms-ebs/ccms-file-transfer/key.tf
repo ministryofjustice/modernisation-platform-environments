@@ -1,5 +1,5 @@
 
-data "aws_iam_policy_document" "s3_sftp_bc_kms_policy" {
+data "aws_iam_policy_document" "s3_sftp_kms_policy" {
   statement {
     sid = "AllowRootAccountAdmin"
     principals {
@@ -52,14 +52,14 @@ data "aws_iam_policy_document" "s3_sftp_bc_kms_policy" {
   }
 }
 
-resource "aws_kms_alias" "s3_sftp_bc_kms_alias" {
+resource "aws_kms_alias" "s3_sftp_kms_alias" {
   name          = "alias/s3-sftp-bc-alias"
-  target_key_id = aws_kms_key.s3_sftp_bc_kms_key.key_id
+  target_key_id = aws_kms_key.s3_sftp_kms_key.key_id
 }
 
-resource "aws_kms_key" "s3_sftp_bc_kms_key" {
-  description         = "KMS for S3 Bucket used by SFTP bc application in ${local.environment} environment"
+resource "aws_kms_key" "s3_sftp_kms_key" {
+  description         = "KMS for S3 Bucket used by SFTP application in ${local.environment} environment"
   enable_key_rotation = true
-  policy              = data.aws_iam_policy_document.s3_sftp_bc_kms_policy.json
+  policy              = data.aws_iam_policy_document.s3_sftp_kms_policy.json
   tags                = merge(local.tags, { Environment = local.environment })
 }

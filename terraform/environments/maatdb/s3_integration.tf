@@ -16,7 +16,7 @@ locals {
 
 module "s3_bucket" {
   for_each = local.build_s3 ? toset(local.ftp_directions) : toset([])
-  source   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=474f27a3f9bf542a8826c76fb049cc84b5cf136f"
+  source   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=c8889e65f4d8a3d53d2cbd93b7be714e990020b7" # v10.2.1
 
   bucket_prefix       = "${local.application_name}-${local.environment}-ftp-${each.key}"
   versioning_enabled  = false
@@ -68,6 +68,38 @@ module "s3_bucket" {
 
   bucket_policy_v2 = [
     for stmt in [
+      {
+        sid     = "EnforceTLSv12orHigher"
+        effect  = "Deny"
+        actions = ["s3:*"]
+        principals = {
+          type        = "AWS"
+          identifiers = ["*"]
+        }
+        conditions = [
+          {
+            test     = "NumericLessThan"
+            variable = "s3:TlsVersion"
+            values   = ["1.2"]
+          }
+        ]
+      },
+      {
+        effect  = "Deny"
+        actions = ["s3:*"]
+        principals = {
+          type        = "AWS"
+          identifiers = ["*"]
+        }
+        conditions = [
+          {
+            test     = "Bool"
+            variable = "aws:SecureTransport"
+            values   = ["false"]
+          }
+        ]
+      },
+
       length(aws_iam_role.ftp_lambda_role) > 0 ? {
         effect  = "Allow"
         actions = ["s3:GetObject", "s3:DeleteObject"]
@@ -203,6 +235,36 @@ data "aws_iam_policy_document" "ftp_user_policy" {
     ]
     resources = [local.laa_general_kms_arn]
   }
+}
+
+data "aws_iam_policy_document" "ftp_bucket_secure_transport" {
+  for_each = local.build_s3 ? toset(local.ftp_directions) : toset([])
+
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      module.s3_bucket[each.key].bucket.arn,
+      "${module.s3_bucket[each.key].bucket.arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "ftp_bucket_secure_transport" {
+  for_each = local.build_s3 ? toset(local.ftp_directions) : toset([])
+
+  bucket = module.s3_bucket[each.key].bucket.id
+  policy = data.aws_iam_policy_document.ftp_bucket_secure_transport[each.key].json
 }
 
 
