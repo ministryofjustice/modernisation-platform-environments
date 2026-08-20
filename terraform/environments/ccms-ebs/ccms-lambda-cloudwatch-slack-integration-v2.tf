@@ -213,5 +213,5 @@ resource "aws_sns_topic" "notifier_dlq_alerts" {
 resource "aws_sns_topic_subscription" "notifier_dlq_email" {
   topic_arn = aws_sns_topic.notifier_dlq_alerts.arn
   protocol  = "email"
-  endpoint  = "laa-sres@justice.gov.uk"
+  endpoint  = "ApplicationOperations@justice.gov.uk"
 }
