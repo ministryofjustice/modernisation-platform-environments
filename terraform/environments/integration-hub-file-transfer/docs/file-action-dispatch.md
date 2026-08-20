@@ -1,28 +1,30 @@
-# File action dispatch
+# File action execution requested adapter
 
-After a file is routed to the clean bucket, the file action dispatcher finds the most specific dispatch configuration for the destination object key and publishes one `FileActionExecutionRequested.v1` event for each configured operation.
+After a file is routed to the clean bucket, the file action execution requested adapter finds the most specific dispatch configuration for the destination object key and publishes one `FileActionExecutionRequested.v1` event for that configuration.
 
 ## Configuration
 
 Terraform creates dispatch secrets from `file_dispatch_prefixes` in `locals-dispatch.tf`. The identity and configured prefix form an opaque full-object-key prefix. For example, identity `example-transfer-identity` and prefix `/app-1/` match keys beneath `example-transfer-identity/app-1/`.
 
-Each secret contains an `operations` list:
+Each secret contains an optional action and the supported notification destinations:
 
 ```json
 {
-  "operations": [
-    {
-      "id": "send-to-consumer-a",
-      "action": "send-to-consumer",
-      "value": "sensitive action configuration"
-    }
-  ]
+  "action": {
+    "name": "place-on-sqs",
+    "queueArn": "arn:aws:sqs:eu-west-2:123456789012:destination"
+  },
+  "notifications": {
+    "email": "consumer@example.invalid",
+    "slack": null,
+    "teams": "https://example.invalid/teams-webhook"
+  }
 }
 ```
 
-`id` must be stable for the logical operation. `action` becomes `actionDefinitionId` in the requested event and allows EventBridge to route the request to an action-specific target. `value` remains in Secrets Manager and is retrieved by the downstream executor using the secret ARN, exact version ID and operation ID from the event.
+`action` is either `null` or an object with a non-empty `name`. Other properties are private configuration interpreted by the selected executor. Each notification is either `null` or its private destination value. Null means that action or notification is not configured.
 
-Validate duplicate or conflicting operations when populating a secret. The dispatcher deliberately does not compare or deduplicate entries; every structurally valid list entry produces a request.
+The dispatcher publishes at most one event for a matched secret. The event includes only `action.name`, the names of configured notification types, and an immutable reference to the exact secret version. Action configuration and notification destinations remain in Secrets Manager. A notification-only secret is valid; a secret with no action and no notification destinations is a successful no-op.
 
 ## Matching
 
@@ -39,12 +41,12 @@ Only clean `FileRouted.v1` events for the configured clean bucket reach the disp
 
 ## Delivery and idempotency
 
-One requested event may be routed to multiple downstream queues, for example an action queue and a notification queue. Every downstream consumer must use `actionExecutionId` or `detail.metadata.idempotencyKey` to make processing idempotent. Consumers handling the same request share the file lifecycle `correlationId`, while separate configured operations have separate `actionExecutionId` values.
+EventBridge rules can route requested events using `detail.data.action.name` or configured names in `detail.data.notifications`. The exact routing rules and action-specific configuration are intentionally deferred until executors are introduced.
 
-EventBridge publication is at least once. If part of a publication batch succeeds before another entry fails, the dispatcher retries the source event and may republish successful requests under new EventBridge envelope IDs. The deterministic action execution identity allows each downstream consumer to perform the action or notification once.
+Every downstream consumer must use `actionExecutionId` or `detail.metadata.idempotencyKey` to make processing idempotent. EventBridge publication is at least once. The dispatcher derives a deterministic execution identity from the source idempotency key and exact secret identity, so a retry may create a new EventBridge envelope while retaining the same logical request identity.
 
 ## Security boundary
 
-The dispatcher trusts the canonical `FileRouted.v1` input selected by its EventBridge rule. It validates the matched secret's JSON structure and required string fields. Action-specific interpretation of `value` belongs to the downstream executor. Secret values must not be written to EventBridge, CloudWatch Logs or dead-letter queues.
+The dispatcher trusts the canonical `FileRouted.v1` input selected by its EventBridge rule. It validates the matched secret's JSON structure and action name. Action-specific interpretation belongs to downstream executors, which retrieve the exact secret using `configurationReference.secretArn` and `configurationReference.secretVersionId`.
 
-Dispatcher logs use `correlation_id` as the primary lifecycle search field and include only non-sensitive object, secret-version and action-request identifiers. They never include an operation's `value`.
+Secret values must not be written to EventBridge, CloudWatch Logs or dead-letter queues. Dispatcher logs include only non-sensitive object identifiers, secret-version identifiers, the action name and configured notification type names.

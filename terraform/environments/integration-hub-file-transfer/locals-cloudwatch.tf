@@ -243,11 +243,11 @@ locals {
       statistic          = "Sum"
       threshold          = 0
     }
-    "lambda-file-action-dispatcher-errors" = {
-      alarm_description   = "The file action dispatcher Lambda function has failed to process one or more events"
+    "lambda-file-action-execution-requested-adapter-errors" = {
+      alarm_description   = "The file action execution requested adapter Lambda function has failed to process one or more events"
       comparison_operator = "GreaterThanThreshold"
       dimensions = {
-        FunctionName = module.lambda_file_action_dispatcher.lambda_function_name
+        FunctionName = module.lambda_file_action_execution_requested_adapter.lambda_function_name
       }
       evaluation_periods = 1
       metric_name        = "Errors"
@@ -256,11 +256,11 @@ locals {
       statistic          = "Sum"
       threshold          = 0
     }
-    "lambda-file-action-dispatcher-throttles" = {
-      alarm_description   = "The file action dispatcher Lambda function has been throttled"
+    "lambda-file-action-execution-requested-adapter-throttles" = {
+      alarm_description   = "The file action execution requested adapter Lambda function has been throttled"
       comparison_operator = "GreaterThanThreshold"
       dimensions = {
-        FunctionName = module.lambda_file_action_dispatcher.lambda_function_name
+        FunctionName = module.lambda_file_action_execution_requested_adapter.lambda_function_name
       }
       evaluation_periods = 1
       metric_name        = "Throttles"
@@ -269,12 +269,12 @@ locals {
       statistic          = "Sum"
       threshold          = 0
     }
-    "lambda-file-action-dispatcher-duration" = {
-      alarm_description   = "The file action dispatcher Lambda function duration is approaching its timeout"
+    "lambda-file-action-execution-requested-adapter-duration" = {
+      alarm_description   = "The file action execution requested adapter Lambda function duration is approaching its timeout"
       comparison_operator = "GreaterThanThreshold"
       datapoints_to_alarm = 2
       dimensions = {
-        FunctionName = module.lambda_file_action_dispatcher.lambda_function_name
+        FunctionName = module.lambda_file_action_execution_requested_adapter.lambda_function_name
       }
       evaluation_periods = 2
       metric_name        = "Duration"
@@ -283,11 +283,11 @@ locals {
       statistic          = "Average"
       threshold          = 25000
     }
-    "lambda-file-action-dispatcher-dead-letter-errors" = {
-      alarm_description   = "The file action dispatcher Lambda function could not send a failed event to its dead-letter queue"
+    "lambda-file-action-execution-requested-adapter-dead-letter-errors" = {
+      alarm_description   = "The file action execution requested adapter Lambda function could not send a failed event to its dead-letter queue"
       comparison_operator = "GreaterThanThreshold"
       dimensions = {
-        FunctionName = module.lambda_file_action_dispatcher.lambda_function_name
+        FunctionName = module.lambda_file_action_execution_requested_adapter.lambda_function_name
       }
       evaluation_periods = 1
       metric_name        = "DeadLetterErrors"
@@ -296,11 +296,11 @@ locals {
       statistic          = "Sum"
       threshold          = 0
     }
-    "lambda-file-action-dispatcher-async-events-dropped" = {
-      alarm_description   = "The file action dispatcher Lambda function has dropped one or more asynchronous events"
+    "lambda-file-action-execution-requested-adapter-async-events-dropped" = {
+      alarm_description   = "The file action execution requested adapter Lambda function has dropped one or more asynchronous events"
       comparison_operator = "GreaterThanThreshold"
       dimensions = {
-        FunctionName = module.lambda_file_action_dispatcher.lambda_function_name
+        FunctionName = module.lambda_file_action_execution_requested_adapter.lambda_function_name
       }
       evaluation_periods = 1
       metric_name        = "AsyncEventsDropped"
@@ -377,7 +377,7 @@ locals {
       threshold          = 0
     }
     "eventbridge-file-action-dispatch-workflow-failed-invocations" = {
-      alarm_description   = "The FileRouted.v1 EventBridge rule has failed to invoke the file action dispatcher Lambda function"
+      alarm_description   = "The FileRouted.v1 EventBridge rule has failed to invoke the file action execution requested adapter Lambda function"
       comparison_operator = "GreaterThanThreshold"
       dimensions = {
         EventBusName = module.eventbridge_file_transfer_bus.eventbridge_bus_name
@@ -481,11 +481,11 @@ locals {
       statistic          = "Maximum"
       threshold          = 0
     }
-    "lambda-file-action-dispatcher-dlq-visible-messages" = {
-      alarm_description   = "The file action dispatcher Lambda dead-letter queue contains failed events"
+    "lambda-file-action-execution-requested-adapter-dlq-visible-messages" = {
+      alarm_description   = "The file action execution requested adapter Lambda dead-letter queue contains failed events"
       comparison_operator = "GreaterThanThreshold"
       dimensions = {
-        QueueName = module.sqs_lambda_file_action_dispatcher_dlq.queue_name
+        QueueName = module.sqs_lambda_file_action_execution_requested_adapter_dlq.queue_name
       }
       evaluation_periods = 1
       metric_name        = "ApproximateNumberOfMessagesVisible"

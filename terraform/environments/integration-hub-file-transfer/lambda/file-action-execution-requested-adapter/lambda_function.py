@@ -13,7 +13,7 @@ from aws_lambda_powertools.utilities.idempotency import (
 from dispatcher import (
     EVENT_SOURCE,
     REQUESTED_DETAIL_TYPE,
-    build_requested_event_details,
+    build_requested_event_detail,
     find_dispatch_configuration,
     parse_file_routed_event,
 )
@@ -21,7 +21,7 @@ from dispatcher import (
 
 eventbridge = boto3.client("events")
 secretsmanager = boto3.client("secretsmanager")
-logger = Logger(service="integration-hub-file-transfer-file-action-dispatcher")
+logger = Logger(service="file-action-execution-requested-adapter")
 persistence_layer = DynamoDBPersistenceLayer(
     table_name=os.environ["IDEMPOTENCY_TABLE"]
 )
@@ -33,51 +33,36 @@ idempotency_config = IdempotencyConfig(
 )
 
 
-def _eventbridge_entries(routed_file, details, requested_at):
+def _eventbridge_entry(routed_file, detail, requested_at):
     resource = (
         f"arn:aws:s3:::{routed_file.destination_object['bucket']}/"
         f"{routed_file.destination_object['key']}"
     )
-    return [
-        {
-            "Source": EVENT_SOURCE,
-            "DetailType": REQUESTED_DETAIL_TYPE,
-            "Detail": json.dumps(detail, separators=(",", ":")),
-            "EventBusName": os.environ["EVENT_BUS_ARN"],
-            "Resources": [resource],
-            "Time": requested_at,
-        }
-        for detail in details
-    ]
+    return {
+        "Source": EVENT_SOURCE,
+        "DetailType": REQUESTED_DETAIL_TYPE,
+        "Detail": json.dumps(detail, separators=(",", ":")),
+        "EventBusName": os.environ["EVENT_BUS_ARN"],
+        "Resources": [resource],
+        "Time": requested_at,
+    }
 
 
-def _publish(entries):
-    event_ids = []
-    for index in range(0, len(entries), 10):
-        response = eventbridge.put_events(Entries=entries[index : index + 10])
-        if response.get("FailedEntryCount", 0) > 0:
-            failures = [
-                {
-                    "error_code": entry.get("ErrorCode"),
-                    "error_message": entry.get("ErrorMessage"),
-                }
-                for entry in response.get("Entries", [])
-                if entry.get("ErrorCode")
-            ]
-            raise RuntimeError(
-                f"Failed to publish {REQUESTED_DETAIL_TYPE} events: {failures}"
-            )
+def _publish(entry):
+    response = eventbridge.put_events(Entries=[entry])
+    if response.get("FailedEntryCount", 0) > 0:
+        raise RuntimeError(
+            f"Failed to publish {REQUESTED_DETAIL_TYPE} event: {response['Entries']}"
+        )
 
-        event_ids.extend(entry["EventId"] for entry in response["Entries"])
-
-    return event_ids
+    return response["Entries"][0]["EventId"]
 
 
 @logger.inject_lambda_context(clear_state=True, log_event=False)
 @idempotent(
     persistence_store=persistence_layer,
     config=idempotency_config,
-    key_prefix="managed-file-transfer/file-action-dispatcher",
+    key_prefix="managed-file-transfer/file-action-execution-requested-adapter",
 )
 def lambda_handler(event, _context):
     source_event_id = event.get("id")
@@ -107,7 +92,7 @@ def lambda_handler(event, _context):
                 "No file action configuration matched",
                 extra=log_context,
             )
-            return {"eventIds": [], "status": "NO_MATCH"}
+            return {"eventId": None, "status": "NO_MATCH"}
 
         log_context.update(
             {
@@ -116,38 +101,30 @@ def lambda_handler(event, _context):
             }
         )
         requested_at = datetime.now(timezone.utc)
-        details = build_requested_event_details(
+        detail = build_requested_event_detail(
             routed_file, configuration, requested_at=requested_at
         )
-        if not details:
+        if detail is None:
             logger.info(
-                "Matched file action configuration has no operations",
+                "Matched file action configuration has no configured work",
                 extra=log_context,
             )
-            return {"eventIds": [], "status": "NO_OPERATIONS"}
+            return {"eventId": None, "status": "NO_ACTIONS"}
 
-        entries = _eventbridge_entries(routed_file, details, requested_at)
-        action_requests = [
-            {
-                "action_definition_id": operation.action,
-                "action_execution_id": detail["data"]["actionExecutionId"],
-                "operation_id": operation.operation_id,
-            }
-            for operation, detail in zip(
-                configuration.operations,
-                details,
-            )
-        ]
-        log_context["action_requests"] = action_requests
-        log_context["operation_count"] = len(action_requests)
-        event_ids = _publish(entries)
-        for action_request, destination_event_id in zip(action_requests, event_ids):
-            action_request["destination_event_id"] = destination_event_id
+        entry = _eventbridge_entry(routed_file, detail, requested_at)
+        action_request = {
+            "action_name": configuration.action_name,
+            "action_execution_id": detail["data"]["actionExecutionId"],
+            "notifications": list(configuration.notifications),
+        }
+        log_context["action_request"] = action_request
+        event_id = _publish(entry)
+        action_request["destination_event_id"] = event_id
         logger.info(
-            "Published file action execution requests",
+            "Published file action execution request",
             extra=log_context,
         )
-        return {"eventIds": event_ids, "status": "PUBLISHED"}
+        return {"eventId": event_id, "status": "PUBLISHED"}
     except Exception:
         logger.exception(
             "Failed to dispatch file actions",

@@ -6,28 +6,34 @@ locals {
       # NB. When we create a secret, we set ignore_changes = true. This is because we don't want to expose secret information (e.g. webhooks) in code.
       # example-transfer-identity = {
       #   "/" = {
-      #     operations = [
-      #       {
-      #         id     = "notify-consumer-a"
-      #         action = "notify"
-      #         value  = "sensitive action configuration"
-      #       }
-      #     ]
+      #     action = {
+      #       name     = "place-on-sqs"
+      #       queueArn = "sensitive queue ARN"
+      #     }
+      #     notifications = {
+      #       email = "sensitive email address"
+      #       slack = null
+      #       teams = null
+      #     }
       #   }
       #   "/app-1/" = {
-      #     operations = []
+      #     action = null
+      #     notifications = {
+      #       email = null
+      #       slack = null
+      #       teams = "sensitive Teams webhook"
+      #     }
       #   }
       # }
       #
       # example-web-app-group = {
       #   "/group/group-name/" = {
-      #     operations = [
-      #       {
-      #         id     = "send-to-consumer-a"
-      #         action = "send-to-consumer"
-      #         value  = "sensitive action configuration"
-      #       }
-      #     ]
+      #     action = null
+      #     notifications = {
+      #       email = "sensitive email address"
+      #       slack = null
+      #       teams = null
+      #     }
       #   }
       # }
       dms1981 = {

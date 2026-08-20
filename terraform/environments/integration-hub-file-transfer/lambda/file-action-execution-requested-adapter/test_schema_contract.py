@@ -7,8 +7,7 @@ from jsonschema import Draft4Validator, FormatChecker
 
 from dispatcher import (
     DispatchConfiguration,
-    Operation,
-    build_requested_event_details,
+    build_requested_event_detail,
     parse_file_routed_event,
 )
 
@@ -47,13 +46,14 @@ class RequestedEventSchemaContractTest(unittest.TestCase):
                 "secret:integration-hub-file-transfer/file-dispatch/identity-AbCdEf"
             ),
             secret_version_id="EXAMPLE1-90ab-cdef-fedc-ba9876543210",
-            operations=(Operation("notify-consumer", "notify"),),
+            action_name="place-on-sqs",
+            notifications=("email",),
         )
-        detail = build_requested_event_details(
+        detail = build_requested_event_detail(
             routed_file,
             configuration,
             requested_at=datetime(2026, 8, 19, 12, 30, tzinfo=timezone.utc),
-        )[0]
+        )
         envelope = {
             "version": "0",
             "id": "2bd32cbb-c3e2-4b62-8b53-90ea0a7a4de5",

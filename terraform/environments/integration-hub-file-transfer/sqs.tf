@@ -113,12 +113,12 @@ module "sqs_lambda_route_dlq" {
   tags = local.tags
 }
 
-module "sqs_lambda_file_action_dispatcher_dlq" {
+module "sqs_lambda_file_action_execution_requested_adapter_dlq" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/sqs/aws"
   version = "5.2.2"
 
-  name            = "${local.application_name}-lambda-file-action-dispatcher-dlq"
+  name            = "file-action-execution-requested-adapter-dlq"
   use_name_prefix = false
 
   kms_master_key_id          = module.kms_sqs.key_arn

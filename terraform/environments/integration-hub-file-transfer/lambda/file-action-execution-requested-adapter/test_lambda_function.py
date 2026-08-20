@@ -51,7 +51,7 @@ def fake_idempotent(**kwargs):
     return decorator
 
 
-class FileActionDispatcherHandlerTest(unittest.TestCase):
+class FileActionExecutionRequestedAdapterHandlerTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.events_client = MagicMock()
@@ -107,13 +107,15 @@ class FileActionDispatcherHandlerTest(unittest.TestCase):
             "VersionId": "secret-version",
             "SecretString": json.dumps(
                 {
-                    "operations": [
-                        {
-                            "id": "notify-consumer",
-                            "action": "notify",
-                            "value": "sensitive-target",
-                        }
-                    ]
+                    "action": {
+                        "name": "place-on-sqs",
+                        "queueArn": "sensitive-queue-arn",
+                    },
+                    "notifications": {
+                        "email": "sensitive-recipient",
+                        "slack": None,
+                        "teams": None,
+                    },
                 }
             ),
         }
@@ -146,24 +148,26 @@ class FileActionDispatcherHandlerTest(unittest.TestCase):
         entry = self.events_client.put_events.call_args.kwargs["Entries"][0]
         detail = json.loads(entry["Detail"])
         self.assertEqual(entry["DetailType"], "FileActionExecutionRequested.v1")
-        self.assertEqual(detail["data"]["actionDefinitionId"], "notify")
-        self.assertNotIn("sensitive-target", entry["Detail"])
-        self.assertEqual(result, {"eventIds": ["requested-event-id"], "status": "PUBLISHED"})
+        self.assertEqual(detail["data"]["action"], {"name": "place-on-sqs"})
+        self.assertEqual(detail["data"]["notifications"], ["email"])
+        self.assertNotIn("sensitive-queue-arn", entry["Detail"])
+        self.assertNotIn("sensitive-recipient", entry["Detail"])
+        self.assertEqual(result, {"eventId": "requested-event-id", "status": "PUBLISHED"})
         log_entry = LOGS[-1][2]["extra"]
         self.assertEqual(
             log_entry["correlation_id"],
             "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
         )
-        self.assertEqual(log_entry["operation_count"], 1)
         self.assertEqual(
-            log_entry["action_requests"][0]["action_execution_id"],
+            log_entry["action_request"]["action_execution_id"],
             detail["data"]["actionExecutionId"],
         )
         self.assertEqual(
-            log_entry["action_requests"][0]["destination_event_id"],
+            log_entry["action_request"]["destination_event_id"],
             "requested-event-id",
         )
-        self.assertNotIn("sensitive-target", json.dumps(log_entry))
+        self.assertNotIn("sensitive-queue-arn", json.dumps(log_entry))
+        self.assertNotIn("sensitive-recipient", json.dumps(log_entry))
 
     def test_uses_source_logical_idempotency_key(self):
         self.assertEqual(
@@ -189,32 +193,21 @@ class FileActionDispatcherHandlerTest(unittest.TestCase):
 
         result = self.handler.lambda_handler(self.event, None)
 
-        self.assertEqual(result, {"eventIds": [], "status": "NO_MATCH"})
+        self.assertEqual(result, {"eventId": None, "status": "NO_MATCH"})
         self.events_client.put_events.assert_not_called()
 
-    def test_batches_more_than_ten_operations(self):
-        operations = [
-            {"id": f"operation-{index}", "action": "notify", "value": "secret"}
-            for index in range(11)
-        ]
+    def test_returns_no_actions_for_an_all_null_configuration(self):
         self.secrets_client.get_secret_value.return_value["SecretString"] = json.dumps(
-            {"operations": operations}
-        )
-        self.events_client.put_events.side_effect = [
             {
-                "FailedEntryCount": 0,
-                "Entries": [{"EventId": f"event-{index}"} for index in range(10)],
-            },
-            {"FailedEntryCount": 0, "Entries": [{"EventId": "event-10"}]},
-        ]
+                "action": None,
+                "notifications": {"email": None, "slack": None, "teams": None},
+            }
+        )
 
         result = self.handler.lambda_handler(self.event, None)
 
-        self.assertEqual(
-            [len(call.kwargs["Entries"]) for call in self.events_client.put_events.call_args_list],
-            [10, 1],
-        )
-        self.assertEqual(len(result["eventIds"]), 11)
+        self.assertEqual(result, {"eventId": None, "status": "NO_ACTIONS"})
+        self.events_client.put_events.assert_not_called()
 
     def test_raises_when_any_publish_entry_fails(self):
         self.events_client.put_events.return_value = {

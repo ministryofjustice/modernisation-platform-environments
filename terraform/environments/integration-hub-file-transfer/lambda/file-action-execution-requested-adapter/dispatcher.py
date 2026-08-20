@@ -2,6 +2,7 @@ import json
 import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from typing import Optional
 
 
 EVENT_SOURCE = "uk.gov.justice.service.managed-file-transfer"
@@ -9,16 +10,11 @@ REQUESTED_DETAIL_TYPE = "FileActionExecutionRequested.v1"
 
 
 @dataclass(frozen=True)
-class Operation:
-    operation_id: str
-    action: str
-
-
-@dataclass(frozen=True)
 class DispatchConfiguration:
     secret_arn: str
     secret_version_id: str
-    operations: tuple[Operation, ...]
+    action_name: Optional[str]
+    notifications: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -88,30 +84,32 @@ def parse_dispatch_configuration(response):
     if not isinstance(configuration, dict):
         raise ValueError("secret configuration must be an object")
 
-    operations = configuration.get("operations")
-    if not isinstance(operations, list):
-        raise ValueError("secret.operations must be a list")
+    action = configuration.get("action")
+    if action is not None and not isinstance(action, dict):
+        raise ValueError("secret.action must be an object or null")
+    action_name = (
+        _required_string(action.get("name"), "secret.action.name")
+        if action is not None
+        else None
+    )
 
-    parsed_operations = []
-    for index, operation in enumerate(operations):
-        if not isinstance(operation, dict):
-            raise ValueError(f"secret.operations[{index}] must be an object")
+    notifications = configuration.get("notifications")
+    if not isinstance(notifications, dict):
+        raise ValueError("secret.notifications must be an object")
 
-        operation_id = _required_string(
-            operation.get("id"), f"secret.operations[{index}].id"
-        )
-        action = _required_string(
-            operation.get("action"), f"secret.operations[{index}].action"
-        )
-        _required_string(
-            operation.get("value"), f"secret.operations[{index}].value"
-        )
-        parsed_operations.append(Operation(operation_id, action))
+    configured_notifications = []
+    for notification_name, destination in notifications.items():
+        if destination is None:
+            continue
+        _required_string(notification_name, "secret.notifications key")
+        _required_string(destination, f"secret.notifications.{notification_name}")
+        configured_notifications.append(notification_name)
 
     return DispatchConfiguration(
         secret_arn=secret_arn,
         secret_version_id=secret_version_id,
-        operations=tuple(parsed_operations),
+        action_name=action_name,
+        notifications=tuple(configured_notifications),
     )
 
 
@@ -127,45 +125,43 @@ def parse_file_routed_event(event):
     )
 
 
-def action_execution_id(routed_file, configuration, operation):
+def action_execution_id(routed_file, configuration):
     identity = ":".join(
         [
             routed_file.source_idempotency_key,
             configuration.secret_arn,
             configuration.secret_version_id,
-            operation.operation_id,
         ]
     )
     return str(uuid.uuid5(uuid.NAMESPACE_URL, identity))
 
 
-def build_requested_event_details(routed_file, configuration, requested_at=None):
+def build_requested_event_detail(routed_file, configuration, requested_at=None):
+    if configuration.action_name is None and not configuration.notifications:
+        return None
+
     requested_at = requested_at or datetime.now(timezone.utc)
     timestamp = requested_at.isoformat().replace("+00:00", "Z")
-    details = []
+    execution_id = action_execution_id(routed_file, configuration)
+    data = {
+        "fileId": routed_file.file_id,
+        "object": routed_file.destination_object,
+        "actionExecutionId": execution_id,
+        "requestedAt": timestamp,
+        "notifications": list(configuration.notifications),
+        "configurationReference": {
+            "secretArn": configuration.secret_arn,
+            "secretVersionId": configuration.secret_version_id,
+        },
+    }
+    if configuration.action_name is not None:
+        data["action"] = {"name": configuration.action_name}
 
-    for operation in configuration.operations:
-        execution_id = action_execution_id(routed_file, configuration, operation)
-        details.append(
-            {
-                "metadata": {
-                    "correlationId": routed_file.correlation_id,
-                    "causationId": routed_file.source_event_id,
-                    "idempotencyKey": f"action-request:{execution_id}",
-                },
-                "data": {
-                    "fileId": routed_file.file_id,
-                    "object": routed_file.destination_object,
-                    "actionDefinitionId": operation.action,
-                    "actionExecutionId": execution_id,
-                    "requestedAt": timestamp,
-                    "parameters": {
-                        "secretArn": configuration.secret_arn,
-                        "secretVersionId": configuration.secret_version_id,
-                        "operationId": operation.operation_id,
-                    },
-                },
-            }
-        )
-
-    return details
+    return {
+        "metadata": {
+            "correlationId": routed_file.correlation_id,
+            "causationId": routed_file.source_event_id,
+            "idempotencyKey": f"action-request:{execution_id}",
+        },
+        "data": data,
+    }

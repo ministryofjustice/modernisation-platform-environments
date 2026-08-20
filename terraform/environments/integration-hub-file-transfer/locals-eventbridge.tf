@@ -85,7 +85,7 @@ locals {
       })
     }
     "file-action-dispatch-workflow" = {
-      description = "Invoke the file action dispatcher for clean FileRouted.v1 events"
+      description = "Invoke the file action execution requested adapter for clean FileRouted.v1 events"
       event_pattern = jsonencode({
         account       = [data.aws_caller_identity.current.account_id]
         source        = ["uk.gov.justice.service.managed-file-transfer"]
@@ -127,9 +127,9 @@ locals {
     ]
     "file-action-dispatch-workflow" = [
       {
-        name            = "file-action-dispatcher"
+        name            = "file-action-execution-requested-adapter"
         dead_letter_arn = module.sqs_eventbridge_file_transfer_workflow_dlq.queue_arn
-        arn             = module.lambda_file_action_dispatcher.lambda_function_arn
+        arn             = module.lambda_file_action_execution_requested_adapter.lambda_function_arn
         retry_policy = {
           maximum_event_age_in_seconds = 21600
           maximum_retry_attempts       = 185

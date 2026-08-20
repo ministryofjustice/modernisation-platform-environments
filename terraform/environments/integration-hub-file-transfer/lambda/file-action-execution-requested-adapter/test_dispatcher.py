@@ -5,7 +5,7 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock
 
 from dispatcher import (
-    build_requested_event_details,
+    build_requested_event_detail,
     find_dispatch_configuration,
     parse_dispatch_configuration,
     parse_file_routed_event,
@@ -53,13 +53,15 @@ class DispatcherTest(unittest.TestCase):
             "VersionId": "secret-version",
             "SecretString": json.dumps(
                 {
-                    "operations": [
-                        {
-                            "id": "send-to-consumer-a",
-                            "action": "send-to-consumer",
-                            "value": "sensitive-target",
-                        }
-                    ]
+                    "action": {
+                        "name": "place-on-sqs",
+                        "queueArn": "sensitive-queue-arn",
+                    },
+                    "notifications": {
+                        "email": "sensitive-recipient",
+                        "slack": None,
+                        "teams": "sensitive-webhook",
+                    },
                 }
             ),
         }
@@ -120,59 +122,36 @@ class DispatcherTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "valid JSON"):
             parse_dispatch_configuration(self.secret_response)
 
-    def test_accepts_identical_action_and_value_entries(self):
-        operation = {
-            "id": "first-operation",
-            "action": "notify",
-            "value": "sensitive-target",
-        }
-        self.secret_response["SecretString"] = json.dumps(
-            {
-                "operations": [
-                    operation,
-                    {**operation, "id": "second-operation"},
-                ]
-            }
-        )
-
-        configuration = parse_dispatch_configuration(self.secret_response)
-        routed_file = parse_file_routed_event(self.event)
-        details = build_requested_event_details(routed_file, configuration)
-
-        self.assertEqual(len(configuration.operations), 2)
-        self.assertEqual(len(details), 2)
-        self.assertNotEqual(
-            details[0]["data"]["actionExecutionId"],
-            details[1]["data"]["actionExecutionId"],
-        )
-
     def test_builds_deterministic_events_without_sensitive_values(self):
         routed_file = parse_file_routed_event(self.event)
         configuration = parse_dispatch_configuration(self.secret_response)
         requested_at = datetime(2026, 8, 19, 12, 30, tzinfo=timezone.utc)
 
-        first = build_requested_event_details(
+        first = build_requested_event_detail(
             routed_file, configuration, requested_at=requested_at
         )
-        second = build_requested_event_details(
+        second = build_requested_event_detail(
             routed_file, configuration, requested_at=requested_at
         )
 
         self.assertEqual(first, second)
-        detail = first[0]
+        detail = first
         execution_id = detail["data"]["actionExecutionId"]
         self.assertEqual(
             detail["metadata"]["idempotencyKey"], f"action-request:{execution_id}"
         )
         self.assertEqual(
-            detail["data"]["parameters"],
+            detail["data"]["configurationReference"],
             {
                 "secretArn": self.secret_response["ARN"],
                 "secretVersionId": "secret-version",
-                "operationId": "send-to-consumer-a",
             },
         )
-        self.assertNotIn("sensitive-target", json.dumps(first))
+        self.assertEqual(detail["data"]["action"], {"name": "place-on-sqs"})
+        self.assertEqual(detail["data"]["notifications"], ["email", "teams"])
+        self.assertNotIn("sensitive-queue-arn", json.dumps(detail))
+        self.assertNotIn("sensitive-recipient", json.dumps(detail))
+        self.assertNotIn("sensitive-webhook", json.dumps(detail))
 
     def test_changed_secret_version_changes_execution_id(self):
         routed_file = parse_file_routed_event(self.event)
@@ -180,20 +159,69 @@ class DispatcherTest(unittest.TestCase):
         self.secret_response["VersionId"] = "new-secret-version"
         second_configuration = parse_dispatch_configuration(self.secret_response)
 
-        first = build_requested_event_details(routed_file, first_configuration)
-        second = build_requested_event_details(routed_file, second_configuration)
+        first = build_requested_event_detail(routed_file, first_configuration)
+        second = build_requested_event_detail(routed_file, second_configuration)
 
         self.assertNotEqual(
-            first[0]["data"]["actionExecutionId"],
-            second[0]["data"]["actionExecutionId"],
+            first["data"]["actionExecutionId"],
+            second["data"]["actionExecutionId"],
         )
 
-    def test_empty_operations_is_a_successful_no_op(self):
-        self.secret_response["SecretString"] = json.dumps({"operations": []})
-        routed_file = parse_file_routed_event(self.event)
-        configuration = parse_dispatch_configuration(self.secret_response)
+    def test_all_null_configuration_is_a_successful_no_op(self):
+        self.secret_response["SecretString"] = json.dumps(
+            {
+                "action": None,
+                "notifications": {"email": None, "slack": None, "teams": None},
+            }
+        )
 
-        self.assertEqual(build_requested_event_details(routed_file, configuration), [])
+        configuration = parse_dispatch_configuration(self.secret_response)
+        routed_file = parse_file_routed_event(self.event)
+
+        self.assertIsNone(configuration.action_name)
+        self.assertEqual(configuration.notifications, ())
+        self.assertIsNone(build_requested_event_detail(routed_file, configuration))
+
+    def test_builds_notification_only_event(self):
+        self.secret_response["SecretString"] = json.dumps(
+            {
+                "action": None,
+                "notifications": {
+                    "email": "sensitive-recipient",
+                    "slack": None,
+                    "teams": None,
+                },
+            }
+        )
+
+        configuration = parse_dispatch_configuration(self.secret_response)
+        routed_file = parse_file_routed_event(self.event)
+        detail = build_requested_event_detail(routed_file, configuration)
+
+        self.assertNotIn("action", detail["data"])
+        self.assertEqual(detail["data"]["notifications"], ["email"])
+
+    def test_rejects_action_without_a_name(self):
+        self.secret_response["SecretString"] = json.dumps(
+            {
+                "action": {"queueArn": "sensitive-queue-arn"},
+                "notifications": {"email": None, "slack": None, "teams": None},
+            }
+        )
+
+        with self.assertRaisesRegex(ValueError, "secret.action.name"):
+            parse_dispatch_configuration(self.secret_response)
+
+    def test_rejects_empty_configured_notification_name(self):
+        self.secret_response["SecretString"] = json.dumps(
+            {
+                "action": None,
+                "notifications": {"": "sensitive-recipient"},
+            }
+        )
+
+        with self.assertRaisesRegex(ValueError, "secret.notifications key"):
+            parse_dispatch_configuration(self.secret_response)
 
 if __name__ == "__main__":
     unittest.main()
