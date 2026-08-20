@@ -258,7 +258,7 @@
       "opa_container_version": "ccms-oia-prod-f2903ef-SNAPSHOT",
       "ec2_instance_type": "m5.2xlarge",
       "ec2_desired_capacity": "5",
-      "ec2_max_size": "7",
+      "ec2_max_size": "6",
       "ec2_min_size": "4",
       "opa_app_count": "6",
       "opa_server_port": "7001",

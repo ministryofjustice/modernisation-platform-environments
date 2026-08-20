@@ -265,6 +265,7 @@ resource "kubectl_manifest" "argocd_project_bu" {
         { group = "networking.k8s.io", kind = "NetworkPolicy" },
         { group = "gateway.networking.k8s.io", kind = "HTTPRoute" },
         { group = "gateway.networking.k8s.io", kind = "GRPCRoute" },
+        { group = "gateway.networking.k8s.io", kind = "ListenerSet" },
       ]
       # BU projects cannot create cluster-scoped resources
       clusterResourceBlacklist = [
