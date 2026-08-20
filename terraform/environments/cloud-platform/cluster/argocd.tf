@@ -281,7 +281,7 @@ resource "kubernetes_cluster_role_v1" "argocd_hub_deploy" {
   # Gateway API routes used by product workloads.
   rule {
     api_groups = ["gateway.networking.k8s.io"]
-    resources  = ["httproutes", "grpcroutes"]
+    resources  = ["httproutes", "grpcroutes", "listenersets"]
     verbs      = ["create", "update", "patch", "delete", "deletecollection"]
   }
 

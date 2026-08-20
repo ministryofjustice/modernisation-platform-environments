@@ -145,20 +145,24 @@ locals {
       })
 
       # remember to delete associated backup plan
-      qa11g-nomis-web12-a = merge(local.ec2_autoscaling_groups.web12, {
+      qa11g-nomis-web12-a = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12, {
         autoscaling_schedules = {}
-        config = merge(local.ec2_autoscaling_groups.web12.config, {
+        config = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12.config, {
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
             "Ec2Qa11GWeblogicPolicy",
           ])
         })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init.args, {
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12.user_data_cloud_init.args, {
             branch = "main"
           })
         })
-        tags = merge(local.ec2_autoscaling_groups.web12.tags, {
-          nomis-environment = "qa11g"
+        tags = merge(local.ec2_autoscaling_groups.qa11g-nomis-web12.tags, {
+          nomis-environment       = "dev"
+          oracle-db-name          = "qa11g"
+          oracle-db-hostname-a    = "dev-nomis-db19c-1-a"
+          oracle-db-hostname-b    = "none"
+          weblogic-config-target  = "qa11g"
         })
       })
 
@@ -177,10 +181,11 @@ locals {
           })
         })
         tags = merge(local.ec2_autoscaling_groups.qa12c-nomis-web.tags, {
-          nomis-environment    = "dev"
-          oracle-db-name       = "qa19c"
-          oracle-db-hostname-a = "dev-nomis-db19c-1-b"
-          oracle-db-hostname-b = "none"
+          nomis-environment       = "dev"
+          oracle-db-name          = "qa19c"
+          oracle-db-hostname-a    = "dev-nomis-db19c-1-b"
+          oracle-db-hostname-b    = "none"
+          weblogic-config-target  = "qa19c"
         })
       })
     }
@@ -385,20 +390,24 @@ locals {
       })
 
       # built by code and then handed over to Syscon for remaining manual configuration
-      qa11g-nomis-web12-b = merge(local.ec2_instances.web12, {
-        config = merge(local.ec2_instances.web12.config, {
+      qa11g-nomis-web12-b = merge(local.ec2_instances.qa11g-nomis-web12, {
+        config = merge(local.ec2_instances.qa11g-nomis-web12.config, {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
             "Ec2Qa11GWeblogicPolicy",
           ])
         })
-        user_data_cloud_init = merge(local.ec2_instances.web12.user_data_cloud_init, {
-          args = merge(local.ec2_instances.web12.user_data_cloud_init.args, {
+        user_data_cloud_init = merge(local.ec2_instances.qa11g-nomis-web12.user_data_cloud_init, {
+          args = merge(local.ec2_instances.qa11g-nomis-web12.user_data_cloud_init.args, {
             branch = "main"
           })
         })
-        tags = merge(local.ec2_instances.web12.tags, {
-          nomis-environment = "qa11g"
+        tags = merge(local.ec2_instances.qa11g-nomis-web12.tags, {
+          nomis-environment       = "dev"
+          oracle-db-name          = "qa11g"
+          oracle-db-hostname-a    = "dev-nomis-db19c-1-a"
+          oracle-db-hostname-b    = "none"
+          weblogic-config-target  = "qa11g"
         })
       })
 
@@ -415,11 +424,12 @@ locals {
           })
         })
         tags = merge(local.ec2_instances.web_12.tags, {
-          instance-scheduling  = "skip-scheduling"
-          nomis-environment    = "qa"
-          oracle-db-hostname-a = "nomis-db19c-1-a"
-          oracle-db-hostname-b = "none"
-          oracle-db-name       = "qa19c"
+          instance-scheduling     = "skip-scheduling"
+          nomis-environment       = "qa"
+          oracle-db-hostname-a    = "nomis-db19c-1-a"
+          oracle-db-hostname-b    = "none"
+          oracle-db-name          = "qa19c"
+          weblogic-config-target  = "qa"
         })
       })
 

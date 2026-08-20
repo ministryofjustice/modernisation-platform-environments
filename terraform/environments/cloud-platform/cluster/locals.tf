@@ -16,6 +16,10 @@ locals {
   cluster_name              = terraform.workspace
   cluster_environment       = contains(local.mp_environments, terraform.workspace) ? local.workspace_environment : "development_cluster"
 
+  ## Read from the VPC tag set by the network component, which owns this flag
+  ## because the SSM relay lives there. Defaults to false if the tag is absent.
+  private_endpoint_mode = lookup(data.aws_vpc.selected.tags, "private-endpoint-mode", "false") == "true"
+
   # ArgoCD is enabled on hub clusters (identified by workspace name in argocd_hubs)
   # or via TF_VAR for ephemeral test hubs.
   enable_argocd = var.enable_argocd || local.is_argocd_hub_cluster
