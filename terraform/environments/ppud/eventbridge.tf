@@ -20,7 +20,7 @@ locals {
 }
 
 resource "aws_cloudwatch_event_bus" "ppud_malware_events" {
-  name = "ppud-malware-events"
+  name = "ppud_malware_events"
 }
 
 resource "aws_cloudwatch_event_rule" "ppud_malware_scan_completed" {
