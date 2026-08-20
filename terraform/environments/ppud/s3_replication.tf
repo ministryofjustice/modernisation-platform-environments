@@ -258,6 +258,14 @@ resource "aws_s3_bucket_policy" "s3_replication" {
 
 locals {
   s3_replication_configs = local.s3_replication_buckets
+
+  # All replication destinations (primary + additional rules) per bucket, used for IAM destination permissions
+  s3_replication_destinations = {
+    for k, v in local.s3_replication_configs : k => concat(
+      [v.replication_destination],
+      [for r in try(v.additional_replication_rules, []) : r.destination]
+    )
+  }
 }
 
 resource "aws_iam_role" "s3_replication" {
@@ -309,10 +317,12 @@ resource "aws_iam_policy" "s3_replication" {
           "s3:ReplicateTags",
           "s3:ReplicateDelete"
         ]
-        Resource = [
-          each.value.replication_destination,
-          "${each.value.replication_destination}/*"
-        ]
+        Resource = flatten([
+          for destination in local.s3_replication_destinations[each.key] : [
+            destination,
+            "${destination}/*"
+          ]
+        ])
       }
     ]
   })
