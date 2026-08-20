@@ -94,20 +94,23 @@ resource "aws_directory_service_directory" "ad_connector" {
 ###############################################################################
 
 #checkov:skip=CKV2_AWS_5: SG is attached via workspace_creation_properties.custom_security_group_id
-#checkov:skip=CKV_AWS_382: WorkSpaces requires broad outbound for streaming, DC connectivity, and Windows Update
+#checkov:skip=CKV_AWS_382: Egress rules are environment-specific and defined in application_variables.json
 resource "aws_security_group" "workspaces" {
   #checkov:skip=CKV2_AWS_5: SG is attached via workspace_creation_properties.custom_security_group_id
-  #checkov:skip=CKV_AWS_382: WorkSpaces requires broad outbound for streaming, DC connectivity, and Windows Update
+  #checkov:skip=CKV_AWS_382: Egress rules are environment-specific and defined in application_variables.json
   name        = var.security_group_name != "" ? var.security_group_name : "${var.application_name}-${var.environment}-workspaces-sg"
   description = var.security_group_description != "" ? var.security_group_description : "Security group for ${var.application_name} WorkSpaces"
   vpc_id      = var.security_group_vpc_id != "" ? var.security_group_vpc_id : var.vpc_id
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow all outbound traffic"
+  dynamic "egress" {
+    for_each = var.security_group_egress_rules
+    content {
+      from_port   = egress.value.from_port
+      to_port     = egress.value.to_port
+      protocol    = egress.value.protocol
+      cidr_blocks = egress.value.cidr_blocks
+      description = egress.value.description
+    }
   }
 
   tags = merge(var.tags, {
@@ -183,7 +186,12 @@ resource "aws_workspaces_directory" "this" {
   })
 
   lifecycle {
-    ignore_changes = [workspace_creation_properties[0].custom_security_group_id]
+    ignore_changes = [
+      workspace_creation_properties[0].custom_security_group_id,
+      workspace_creation_properties[0].default_ou,
+      self_service_permissions,
+      workspace_access_properties,
+    ]
   }
 }
 

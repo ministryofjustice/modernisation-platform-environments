@@ -15,6 +15,15 @@
       "auto_stop_timeout": 60,
       "security_group_name": "eucs-appstream-test-sg",
       "security_group_description": "eucs-appstream-test-sg",
+      "security_group_egress_rules": [
+        {
+          "from_port": 0,
+          "to_port": 0,
+          "protocol": "-1",
+          "cidr_blocks": ["0.0.0.0/0"],
+          "description": "Allow all outbound traffic"
+        }
+      ],
       "ip_group_name": "MOJ Network",
       "ip_group_description": "MOJ Network",
       "ip_group_allowed_cidrs": [
@@ -51,6 +60,29 @@
       "auto_stop_timeout": 60,
       "security_group_name": "workspaces-equip-sg",
       "security_group_description": "Allows workspaces personal to equip infrastructure",
+      "security_group_egress_rules": [
+        {
+          "from_port": 443,
+          "to_port": 443,
+          "protocol": "tcp",
+          "cidr_blocks": ["0.0.0.0/0"],
+          "description": "HTTPS outbound"
+        },
+        {
+          "from_port": 80,
+          "to_port": 80,
+          "protocol": "tcp",
+          "cidr_blocks": ["0.0.0.0/0"],
+          "description": "HTTP outbound"
+        },
+        {
+          "from_port": 0,
+          "to_port": 0,
+          "protocol": "-1",
+          "cidr_blocks": ["10.27.8.0/24", "10.27.9.0/24", "10.27.10.0/24"],
+          "description": "All traffic to equip.local domain controller subnets"
+        }
+      ],
       "ip_group_name": "MOJ Network",
       "ip_group_description": "MOJ Network",
       "ip_group_allowed_cidrs": [
