@@ -1,6 +1,14 @@
-##############################################################
-# Eventbridge Rules and Schedules (to invoke Lambda functions)
-##############################################################
+#####################################################################
+# Eventbridge Buses, Rules and Schedules (to invoke Lambda functions)
+#####################################################################
+
+######################################################
+# EventBridge Custom Bus for Malware Events
+######################################################
+
+resource "aws_cloudwatch_event_bus" "ppud_malware_events" {
+  name = "ppud_malware_events"
+}
 
 ####################
 # Eventbridge Rules 
