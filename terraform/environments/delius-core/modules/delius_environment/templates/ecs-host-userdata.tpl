@@ -35,6 +35,11 @@ cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<'EOF'
         "resources": [
           "/"
         ]
+      },
+      "mem": {
+        "measurement": [
+          "mem_used_percent"
+        ]
       }
     }
   }
