@@ -21,6 +21,7 @@ as with usage_cost as (
     billing_period
   from data
   where line_item_line_item_type in ('Usage', 'DiscountedUsage', 'SavingsPlanCoveredUsage')
+    and billing_period < (select max(billing_period) from data)
   group by
     billing_period,
     line_item_usage_account_name,
@@ -46,6 +47,11 @@ monthly_shifted as (
     tag_application, tag_namespace, tag_environment, tag_service_area, tag_owner,
     product_name, charge_type,
     daily_cost as prior_cost
+  from usage_cost
+),
+
+source_bounds as (
+  select max(billing_period) as max_billing_period
   from usage_cost
 )
 
@@ -73,7 +79,7 @@ select
     when coalesce(curr.daily_cost, 0) > coalesce(prev.prior_cost, 0) then 'increased'
     when coalesce(curr.daily_cost, 0) < coalesce(prev.prior_cost, 0) then 'decreased'
     else 'ongoing'
-end as movement_type,
+  end as movement_type,
   coalesce(curr.billing_period, prev.billing_period) as billing_period
 from usage_cost curr
 full outer join monthly_shifted prev
@@ -88,4 +94,5 @@ full outer join monthly_shifted prev
   and coalesce(curr.tag_service_area, 'UNKNOWN') = coalesce(prev.tag_service_area, 'UNKNOWN')
   and coalesce(curr.tag_owner, 'UNKNOWN') = coalesce(prev.tag_owner, 'UNKNOWN')
   and coalesce(curr.product_name, 'UNKNOWN') = coalesce(prev.product_name, 'UNKNOWN')
-  and coalesce(curr.charge_type, 'UNKNOWN') = coalesce(prev.charge_type, 'UNKNOWN');
+  and coalesce(curr.charge_type, 'UNKNOWN') = coalesce(prev.charge_type, 'UNKNOWN')
+where coalesce(curr.billing_period, prev.billing_period) <= (select max_billing_period from source_bounds);
