@@ -186,7 +186,12 @@ resource "aws_workspaces_directory" "this" {
   })
 
   lifecycle {
-    ignore_changes = [workspace_creation_properties[0].custom_security_group_id]
+    ignore_changes = [
+      workspace_creation_properties[0].custom_security_group_id,
+      workspace_creation_properties[0].default_ou,
+      self_service_permissions,
+      workspace_access_properties,
+    ]
   }
 }
 
