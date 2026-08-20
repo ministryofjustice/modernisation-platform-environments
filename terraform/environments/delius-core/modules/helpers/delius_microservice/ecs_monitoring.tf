@@ -228,7 +228,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_host_cpu_warning" {
 
     expression = <<-EOT
       SELECT MAX(CPUUtilization)
-      FROM SCHEMA(AWS/EC2, AutoScalingGroupName, InstanceId)
+      FROM SCHEMA("AWS/EC2", AutoScalingGroupName, InstanceId)
       WHERE AutoScalingGroupName = '${var.asg_name}'
     EOT
   }
