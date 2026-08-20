@@ -115,7 +115,7 @@ resource "aws_iam_policy" "ec2_put_malware_events" {
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [{
-      "Action" : ["events:PutEvents, events:DescribeEvents"]
+      "Action" : ["events:PutEvents", "events:DescribeEvents"]
       "Effect" : "Allow",
       "Resource" : [
         "arn:aws:events:eu-west-2:${data.aws_caller_identity.current.account_id}:event-bus/ppud_malware_events"
