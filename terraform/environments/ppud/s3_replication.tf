@@ -29,6 +29,18 @@ locals {
         iam_role_key            = "report_source_dev"
         ec2_account             = "ppud-development"
       }
+      database_source_dev_mp = {
+        condition               = local.is-development
+        bucket_name             = "moj-database-source-dev"
+        log_bucket              = "moj-general-logs-dev"
+        log_prefix              = "s3-logs/moj-database-source-dev/"
+        lifecycle_id            = "delete-moj-database-source-dev"
+        expiration_days         = 6
+        replication_destination = "arn:aws:s3:::ppud-bak-replication-development-771283872747-eu-west-2-an"
+        replication_rule_id     = "ppud-database-replication-rule-dev"
+        iam_role_key            = "database_source_dev"
+        ec2_account             = "ppud-development"
+      }
       database_source_uat = {
         condition               = local.is-preproduction
         bucket_name             = "moj-database-source-uat"
