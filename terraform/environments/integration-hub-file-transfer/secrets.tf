@@ -7,7 +7,7 @@ module "secrets_file_dispatch_prefix" {
 
   name                    = each.key
   description             = "File dispatch configuration for the ${trimprefix(each.key, local.file_dispatch_secret_name_prefix)} object key prefix"
-  recovery_window_in_days = 7
+  recovery_window_in_days = 0
   kms_key_id              = module.kms_secrets.key_arn
   create_policy           = true
   block_public_policy     = true
