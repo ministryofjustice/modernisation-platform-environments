@@ -118,7 +118,7 @@ resource "aws_iam_policy" "ec2_put_malware_events" {
       "Action" : "events:PutEvents",
       "Effect" : "Allow",
       "Resource" : [
-        "arn:aws:events:eu-west-2:${data.aws_caller_identity.current.account_id}:ppud_malware_events"
+        "arn:aws:events:eu-west-2:${data.aws_caller_identity.current.account_id}:event-bus/ppud_malware_events"
       ]
     }]
   })
