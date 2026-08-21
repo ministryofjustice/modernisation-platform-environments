@@ -2,14 +2,11 @@
   "accounts": {
     "development": {
       "days_back": "3",
-      "cron_schedule": "cron(30 07 * * MON *)"
-    },
-    "test": {
-      "days_back": "0"
+      "cron_schedule": "cron(30 07 ? * MON *)"
     },
     "preproduction": {
       "days_back": "1",
-      "cron_schedule": "cron(30 07 * * TUE *)"
+      "cron_schedule": "cron(30 07 ? * TUE *)"
     },
     "production": {
       "days_back": "1",
