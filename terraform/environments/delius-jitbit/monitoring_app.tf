@@ -75,7 +75,7 @@ resource "aws_cloudwatch_log_metric_filter" "error_blue" {
   log_group_name = aws_cloudwatch_log_group.app_logs_blue[0].name
 
   metric_transformation {
-    name          = "ErrorCount"
+    name          = "ErrorCountBlue"
     namespace     = "JitbitMetrics"
     value         = "1"
 
@@ -94,7 +94,7 @@ resource "aws_cloudwatch_log_metric_filter" "error_green" {
   log_group_name = aws_cloudwatch_log_group.app_logs_green[0].name
 
   metric_transformation {
-    name          = "ErrorCount"
+    name          = "ErrorCountGreen"
     namespace     = "JitbitMetrics"
     value         = "1"
 
@@ -127,7 +127,24 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume_blue" {
   alarm_name          = "jitbit-high-error-count-blue"
   alarm_description   = "Triggers alarm if there are more than 10 errors for 2 consecutive periods"
   namespace           = "JitbitMetrics"
-  metric_name         = "ErrorCount"
+  metric_name         = "ErrorCountBlue"
+  statistic           = "Sum"
+  period              = "300"
+  evaluation_periods  = "2" # number of periods over which CloudWatch evaluates the metric data
+  alarm_actions       = [aws_sns_topic.jitbit_alerting.arn]
+  ok_actions          = [aws_sns_topic.jitbit_alerting.arn]
+  threshold           = "10"
+  treat_missing_data  = "missing"
+  comparison_operator = "GreaterThanThreshold"
+}
+
+resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume_green" {
+  count = local.create_blue_green ? 1 : 0
+
+  alarm_name          = "jitbit-high-error-count-green"
+  alarm_description   = "Triggers alarm if there are more than 10 errors for 2 consecutive periods"
+  namespace           = "JitbitMetrics"
+  metric_name         = "ErrorCountGreen"
   statistic           = "Sum"
   period              = "300"
   evaluation_periods  = "2" # number of periods over which CloudWatch evaluates the metric data

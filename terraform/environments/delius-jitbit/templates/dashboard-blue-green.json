@@ -106,9 +106,18 @@
         "metrics": [
           [
             "JitbitMetrics",
-            "ErrorCount",
+            "ErrorCountBlue",
             {
-              "color": "#d62728"
+              "label": "Blue",
+              "color": "#1f77b4"
+            }
+          ],
+          [
+            ".",
+            "ErrorCountGreen",
+            {
+              "label": "Green",
+              "color": "#2ca02c"
             }
           ]
         ],
