@@ -55,4 +55,3 @@ resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external.arn
   validation_record_fqdns = local.validation_record_fqdns
 }
-
