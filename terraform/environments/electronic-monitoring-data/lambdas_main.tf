@@ -1255,3 +1255,25 @@ module "live_feed_incident_manager" {
     )
   }
 }
+
+#-----------------------------------------------------------------------------------
+# Trigger cpr integration
+#-----------------------------------------------------------------------------------
+
+module "trigger_cpr_integration" {
+  count =  local.is-development || local.is-test ? 1 : 0
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "trigger_cpr_job"
+  role_name               = module.trigger_cpr_job_iam_role.name
+  role_arn                = module.trigger_cpr_job_iam_role.arn
+  handler                 = "trigger_cpr_job.handler"
+  memory_size             = 10240
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+
+  environment_variables = {
+    API_BASE_URL = local.is-development || local.is-test ? "https://electronic-monitoring-data-person-match-api-dev.internal-non-prod.cloud-platform.service.justice.gov.uk" : ""
+  }
+}
