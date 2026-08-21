@@ -77,6 +77,7 @@ locals {
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-algorithm-iam-dev}",
     ] : local.is-preproduction ? [
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-api-iam-preprod}",
+    "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-algorithm-iam-preprod}",
   ] : []
   iam_role_validation_db = local.is-test ? [
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live",
@@ -134,7 +135,7 @@ variable "cloud-platform-crime-matching-api-iam-preprod" {
 variable "cloud-platform-crime-matching-algorithm-iam-preprod" {
   type        = string
   description = "IAM role that the crime matching algorithm in Cloud Platform will use to connect to this role."
-  default     = "cloud-platform-irsa-65e2e0ef1e64c470-live"
+  default     = "cloud-platform-irsa-6ca3fa16de5344f0-live"
 }
 
 variable "cloud-platform-emdi-iam-dev" {
@@ -308,9 +309,9 @@ resource "aws_lakeformation_permissions" "em_data_validation_s3" {
 }
 
 
-resource "aws_iam_role_policy_attachment" "standard_athena_access_em_data_validation" {
+resource "aws_iam_role_policy_attachment" "athena_access_em_data_validation" {
   count      = local.is-test || local.is-production ? 1 : 0
-  policy_arn = aws_iam_policy.standard_athena_access.arn
+  policy_arn = aws_iam_policy.data_validation_athena_access.arn
   role       = module.emd_validation_db_role[0].iam_role_name
 }
 
@@ -729,6 +730,55 @@ resource "aws_lakeformation_permissions" "ac_derived_tables" {
 }
 
 
+data "aws_iam_policy_document" "validation_athena_access" {
+  statement {
+    actions = [
+      "athena:GetDataCatalog",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:GetWorkGroup",
+      "athena:StartQueryExecution",
+      "athena:StopQueryExecution",
+      "athena:CreatePreparedStatement",
+      "athena:UpdatePreparedStatement",
+      "athena:GetPreparedStatement",
+      "athena:ListPreparedStatements",
+      "athena:DeletePreparedStatement",
+    ]
+    resources = [aws_athena_workgroup.data_validation_db.arn]
+  }
+  statement {
+    actions   = ["athena:ListWorkGroups"]
+    resources = ["*"]
+  }
+  statement {
+    actions   = ["lakeformation:GetDataAccess"]
+    resources = ["*"]
+  }
+  statement {
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:ListMultipartUploadParts"
+    ]
+    resources = [module.s3-athena-bucket.bucket.arn]
+  }
+  statement {
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:ListMultipartUploadParts"
+    ]
+    resources = ["${module.s3-athena-bucket.bucket.arn}/output/data_validation/*"]
+  }
+}
+
+
+
 data "aws_iam_policy_document" "standard_athena_access" {
   statement {
     actions = [
@@ -797,6 +847,11 @@ data "aws_iam_policy_document" "cmt_permissions" {
 }
 
 
+resource "aws_iam_policy" "data_validation_athena_access" {
+  name_prefix = "athena_access_data_validation_db"
+  description = "Data Validation DB permissions for Athena"
+  policy      = data.aws_iam_policy_document.validation_athena_access.json
+}
 
 data "aws_iam_policy_document" "emac_di_permissions" {
   statement {

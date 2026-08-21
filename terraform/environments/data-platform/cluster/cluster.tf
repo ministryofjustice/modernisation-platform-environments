@@ -12,6 +12,8 @@ module "eks" {
   control_plane_subnet_ids = data.aws_subnets.private.ids
   subnet_ids               = data.aws_subnets.private.ids
 
+  deletion_protection = true
+
   create_node_security_group = false
 
   authentication_mode = "API"

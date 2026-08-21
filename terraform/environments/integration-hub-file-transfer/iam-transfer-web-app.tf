@@ -29,7 +29,7 @@ data "aws_iam_policy_document" "transfer_web_app" {
 module "iam_policy_transfer_web_app" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.1"
+  version = "6.8.0"
 
   name        = "${local.application_name}-transfer-web-app-policy"
   description = "AWS Transfer web app access grants policy"
@@ -43,7 +43,7 @@ module "iam_policy_transfer_web_app" {
 module "iam_role_transfer_web_app" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.1"
+  version = "6.8.0"
 
   create          = true
   use_name_prefix = false
@@ -179,7 +179,7 @@ data "aws_iam_policy_document" "s3_access_grants_location" {
 module "iam_policy_s3_access_grants_location" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.1"
+  version = "6.8.0"
 
   name        = "${local.application_name}-s3-access-grants-location-policy"
   description = "AWS S3 Access Grants read/write access to the incoming bucket"
@@ -193,7 +193,7 @@ module "iam_policy_s3_access_grants_location" {
 module "iam_role_s3_access_grants_location" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.1"
+  version = "6.8.0"
 
   name            = "transfer-s3-access-grants-location"
   use_name_prefix = false

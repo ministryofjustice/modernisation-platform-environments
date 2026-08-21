@@ -40,6 +40,7 @@ module "environment_production" {
   boe_db_config = local.boe_db_config_production
   mis_db_config = local.mis_db_config_production
 
+  acm_certificate          = local.acm_certificate_production
   fsx_config               = local.fsx_config_production
   dfi_report_bucket_config = local.dfi_report_bucket_config_production
   lb_config                = local.lb_config_production

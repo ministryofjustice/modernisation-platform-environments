@@ -5,6 +5,7 @@
 data "aws_region" "current" {}
 
 resource "aws_security_group" "rds_proxy" {
+  #checkov:skip=CKV2_AWS_5:SG is attached to aws_db_proxy.rds_proxy via vpc_security_group_ids this is a false alert
   name_prefix = "RDS Proxy Security Group"
   description = "Controls access to the RDS Proxy for ${var.name}"
   vpc_id      = var.vpc_id
@@ -97,7 +98,7 @@ resource "aws_db_proxy" "rds_proxy" {
   auth {
     auth_scheme               = "SECRETS"
     iam_auth                  = "REQUIRED"
-    client_password_auth_type = "POSTGRES_SCRAM_SHA_256"
+    client_password_auth_type = "POSTGRES_SCRAM_SHA_256" # checkov:skip=CKV_SECRET_6:Auth type enum, not a secret
     secret_arn                = var.proxy_secret_arn
   }
 

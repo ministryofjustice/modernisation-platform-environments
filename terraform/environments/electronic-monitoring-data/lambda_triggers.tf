@@ -422,7 +422,7 @@ resource "aws_cloudwatch_event_target" "merge_ac_position" {
 }
 
 resource "aws_lambda_permission" "allow_eventbridge_acquisitive_crime_position" {
-  count         = local.is-development ? 1 : 0
+  count         = local.is-production ? 0 : 1
   statement_id  = "AllowExecutionFromEventBridgeAcquisitiveCrimePosition"
   action        = "lambda:InvokeFunction"
   function_name = module.merge_ac_position[0].lambda_function_name
@@ -457,4 +457,72 @@ resource "aws_lambda_permission" "update_p1_export_api_gw" {
   function_name = module.update_p1_export[0].lambda_function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.update_p1_export[0].execution_arn}/*/*"
+}
+
+# ------------------------------------------------------------------------------
+# GitHub Project webhook
+# ------------------------------------------------------------------------------
+
+resource "aws_lambda_permission" "live_feed_github_webhook" {
+  statement_id  = "AllowGitHubWebhookApiGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = module.live_feed_incident_manager.lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_apigatewayv2_api.live_feed_github_webhook.execution_arn}/*/POST/github/project-status"
+}
+
+# ------------------------------------------------------------------------------
+# Live-feed incident event queue
+# ------------------------------------------------------------------------------
+
+resource "aws_sqs_queue" "live_feed_incident_events_dlq" {
+  name = "live-feed-incident-events-dlq"
+
+  message_retention_seconds = 1209600
+  sqs_managed_sse_enabled   = true
+}
+
+resource "aws_sqs_queue" "live_feed_incident_events" {
+  name = "live-feed-incident-events"
+
+  visibility_timeout_seconds = 365
+  message_retention_seconds  = 1209600
+  sqs_managed_sse_enabled    = true
+
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.live_feed_incident_events_dlq.arn
+    maxReceiveCount     = 5
+  })
+}
+
+resource "aws_sqs_queue_redrive_allow_policy" "live_feed_incident_events" {
+  queue_url = aws_sqs_queue.live_feed_incident_events_dlq.id
+
+  redrive_allow_policy = jsonencode({
+    redrivePermission = "byQueue"
+    sourceQueueArns = [
+      aws_sqs_queue.live_feed_incident_events.arn,
+    ]
+  })
+}
+
+resource "aws_lambda_event_source_mapping" "live_feed_incident_events" {
+  event_source_arn = aws_sqs_queue.live_feed_incident_events.arn
+  function_name    = module.live_feed_incident_manager.lambda_function_name
+
+  batch_size                         = 10
+  maximum_batching_window_in_seconds = 5
+
+  function_response_types = [
+    "ReportBatchItemFailures",
+  ]
+
+  scaling_config {
+    maximum_concurrency = 2
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.live_feed_incident_manager_attach,
+  ]
 }

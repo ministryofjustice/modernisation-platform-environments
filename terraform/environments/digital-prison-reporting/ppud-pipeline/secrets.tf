@@ -23,6 +23,8 @@ module "ppud_rds_export_secret" {
 }
 
 # Secret for slack webhook for notifications/alerts
+# Note: This is initialized with a placeholder value and must be updated
+# in AWS Secrets Manager after deployment with the actual webhook URL.
 module "ppud_slack_webhook" {
 
   # v2.1.0

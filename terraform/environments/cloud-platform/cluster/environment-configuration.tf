@@ -355,7 +355,7 @@ locals {
       /* EKS */
       eks_cluster_version = "1.35"
 
-      /* ArgoCD — spokes registered with the preproduction hub */
+      /* ArgoCD — spokes registered with the nonlive hub */
       argocd_registered_spokes = [
         "container-platform-octo-nonlive",
       ]
