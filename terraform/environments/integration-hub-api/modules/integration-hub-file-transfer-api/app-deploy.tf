@@ -4,7 +4,7 @@ data "aws_iam_policy_document" "app_deploy_assume_role" {
 
     principals {
       type        = "Federated"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"]
+      identifiers = ["arn:aws:iam::${local.account_id}:oidc-provider/token.actions.githubusercontent.com"]
     }
 
     actions = ["sts:AssumeRoleWithWebIdentity"]
@@ -18,16 +18,9 @@ data "aws_iam_policy_document" "app_deploy_assume_role" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:ministryofjustice/integration-hub-file-transfer-api:environment:${local.resource_application_name}-${local.environment}*"]
+      values   = ["repo:ministryofjustice/integration-hub-file-transfer-api:environment:${local.resource_application_name}-${var.environment}*"]
     }
   }
-}
-
-resource "aws_iam_role" "app_deploy" {
-  name               = "${local.resource_name_prefix}-app-deploy"
-  assume_role_policy = data.aws_iam_policy_document.app_deploy_assume_role.json
-
-  tags = local.tags
 }
 
 data "aws_iam_policy_document" "app_deploy" {
@@ -46,8 +39,16 @@ data "aws_iam_policy_document" "app_deploy" {
   }
 }
 
-resource "aws_iam_role_policy" "app_deploy" {
-  name   = "${local.resource_name_prefix}-app-deploy"
-  role   = aws_iam_role.app_deploy.id
-  policy = data.aws_iam_policy_document.app_deploy.json
+module "app_deploy" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "6.8.0"
+
+  name            = "${local.resource_name_prefix}-app-deploy"
+  use_name_prefix = false
+  tags            = var.tags
+
+  source_trust_policy_documents = [data.aws_iam_policy_document.app_deploy_assume_role.json]
+
+  create_inline_policy           = true
+  source_inline_policy_documents = [data.aws_iam_policy_document.app_deploy.json]
 }
