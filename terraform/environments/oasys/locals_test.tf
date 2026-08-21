@@ -1,6 +1,9 @@
 locals {
 
   locals_test = {
+    arns_integration = {
+      database_hostname = "hmpps-arns-assessment-view-db-test"
+    }
     delius_oasys_queues = {
       "t2" = {
         sns_topic_arn_configured = true # set to true when sns_topic_arn has been populated in config secret
