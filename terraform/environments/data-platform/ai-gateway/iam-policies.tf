@@ -32,6 +32,16 @@ data "aws_iam_policy_document" "ai_gateway" {
   }
 
   statement {
+    sid     = "BedrockGuardrailAccess"
+    effect  = "Allow"
+    actions = ["bedrock:ApplyGuardrail"]
+    resources = [
+      "arn:aws:bedrock:*:${data.aws_caller_identity.current.account_id}:guardrail/*",
+      "arn:aws:bedrock:eu-west-2:${data.aws_caller_identity.current.account_id}:guardrail-profile/uk.guardrail.v1:0"
+    ]
+  }
+
+  statement {
     sid       = "AuditLogS3Access"
     effect    = "Allow"
     actions   = ["s3:PutObject"]
