@@ -606,7 +606,6 @@ module "cmt_front_end_assumable_role" {
 module "acquisitive_crime_assumable_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-  count   = local.is-production ? 0 : 1
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.48.0"
 
@@ -674,7 +673,7 @@ module "specials_cmt_front_end_assumable_role" {
 
 resource "aws_lakeformation_permissions" "ac_allied_db" {
   count       = local.is-development ? 1 : 0
-  principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
+  principal   = module.acquisitive_crime_assumable_role.iam_role_arn
   permissions = ["DESCRIBE"]
   database {
     name = "allied_mdss_${local.environment_shorthand}"
@@ -683,7 +682,7 @@ resource "aws_lakeformation_permissions" "ac_allied_db" {
 
 resource "aws_lakeformation_permissions" "ac_allied_tables" {
   count       = local.is-development ? 1 : 0
-  principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
+  principal   = module.acquisitive_crime_assumable_role.iam_role_arn
   permissions = ["SELECT", "DESCRIBE"]
   table {
     database_name = "allied_mdss_${local.environment_shorthand}"
@@ -693,7 +692,7 @@ resource "aws_lakeformation_permissions" "ac_allied_tables" {
 
 resource "aws_lakeformation_permissions" "ac_fms_db" {
   count       = local.is-development ? 1 : 0
-  principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
+  principal   = module.acquisitive_crime_assumable_role.iam_role_arn
   permissions = ["DESCRIBE"]
   database {
     name = "serco_fms_${local.environment_shorthand}"
@@ -702,7 +701,7 @@ resource "aws_lakeformation_permissions" "ac_fms_db" {
 
 resource "aws_lakeformation_permissions" "ac_fms_tables" {
   count       = local.is-development ? 1 : 0
-  principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
+  principal   = module.acquisitive_crime_assumable_role.iam_role_arn
   permissions = ["SELECT", "DESCRIBE"]
   table {
     database_name = "serco_fms_${local.environment_shorthand}"
@@ -711,8 +710,7 @@ resource "aws_lakeformation_permissions" "ac_fms_tables" {
 }
 
 resource "aws_lakeformation_permissions" "ac_derived_db" {
-  count       = local.is-production ? 0 : 1
-  principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
+  principal   = module.acquisitive_crime_assumable_role.iam_role_arn
   permissions = ["DESCRIBE"]
   database {
     name = "acquisitive_crime${local.dbt_suffix}"
@@ -720,8 +718,7 @@ resource "aws_lakeformation_permissions" "ac_derived_db" {
 }
 
 resource "aws_lakeformation_permissions" "ac_derived_tables" {
-  count       = local.is-production ? 0 : 1
-  principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
+  principal   = module.acquisitive_crime_assumable_role.iam_role_arn
   permissions = ["SELECT", "DESCRIBE"]
   table {
     database_name = "acquisitive_crime${local.dbt_suffix}"
@@ -938,13 +935,11 @@ resource "aws_iam_role_policy_attachment" "specials_role_standard_athena_access"
 }
 
 resource "aws_iam_role_policy_attachment" "standard_athena_access_ac" {
-  count      = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   policy_arn = aws_iam_policy.standard_athena_access.arn
-  role       = module.acquisitive_crime_assumable_role[0].iam_role_name
+  role       = module.acquisitive_crime_assumable_role.iam_role_name
 }
 
 resource "aws_iam_role_policy_attachment" "ac_specific_access" {
-  count      = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   policy_arn = aws_iam_policy.emac_di_permissions.arn
-  role       = module.acquisitive_crime_assumable_role[0].iam_role_name
+  role       = module.acquisitive_crime_assumable_role.iam_role_name
 }
