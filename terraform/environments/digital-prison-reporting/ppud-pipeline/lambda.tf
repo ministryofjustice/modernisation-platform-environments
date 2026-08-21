@@ -139,7 +139,7 @@ module "check_recent_file" {
     LAND_BUCKET               = module.ppud_replication_destination.bucket.id
     REGION                    = data.aws_region.current.region
     SLACK_WEBHOOK_SECRET_NAME = module.ppud_slack_webhook.secret_id
-    DAYS_BACK                 = local.is-test ? 1 : local.days_back
+    DAYS_BACK                 = local.days_back
   }
 
   source_path = [{
@@ -168,7 +168,7 @@ resource "aws_cloudwatch_event_rule" "check_recent_file_daily" {
   count               = local.is-test ? 0 : 1
   name                = "${local.component_name}-check-recent-file-daily"
   description         = "Invoke recent-file checker daily at 15:15 UTC"
-  schedule_expression = local.is-test ? "rate(1 day)" : local.cron_schedule
+  schedule_expression = local.cron_schedule
 }
 
 resource "aws_cloudwatch_event_target" "check_recent_file_daily" {
