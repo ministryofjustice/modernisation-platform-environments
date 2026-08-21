@@ -50,7 +50,7 @@ data "aws_iam_policy_document" "arns_integration_kms_policy" {
 
       principals {
         type        = "AWS"
-        identifiers = ["arn:aws:iam::${each.value}:root"]
+        identifiers = ["arn:aws:iam::${statement.value}:root"]
       }
 
       condition {
