@@ -119,61 +119,61 @@ data "aws_iam_policy_document" "check_recent_file" {
   }
 }
 
-# module "check_recent_file" {
-#   # Commit hash for v8.8.1
-#   source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda?ref=23d00f7daef40091e87ed2f9dc5d8532e9d2cc22"
+module "check_recent_file" {
+  # Commit hash for v8.8.1
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda?ref=23d00f7daef40091e87ed2f9dc5d8532e9d2cc22"
 
-#   function_name   = "${local.component_name}-check-recent-file"
-#   description     = "Lambda to check most recent replication destination bucket file date and notify Slack if stale"
-#   handler         = "check_recent_file.handler"
-#   runtime         = "python3.12"
-#   memory_size     = 256
-#   timeout         = 120
-#   architectures   = ["x86_64"]
-#   build_in_docker = false
+  function_name   = "${local.component_name}-check-recent-file"
+  description     = "Lambda to check most recent replication destination bucket file date and notify Slack if stale"
+  handler         = "check_recent_file.handler"
+  runtime         = "python3.12"
+  memory_size     = 256
+  timeout         = 120
+  architectures   = ["x86_64"]
+  build_in_docker = false
 
-#   attach_policy_json = true
-#   policy_json        = data.aws_iam_policy_document.check_recent_file.json
+  attach_policy_json = true
+  policy_json        = data.aws_iam_policy_document.check_recent_file.json
 
-#   environment_variables = {
-#     LAND_BUCKET               = module.ppud_replication_destination.bucket.id
-#     REGION                    = data.aws_region.current.current
-#     SLACK_WEBHOOK_SECRET_NAME = module.ppud_slack_webhook.secret_id
-#     DAYS_BACK                 = local.days_back
-#   }
+  environment_variables = {
+    LAND_BUCKET               = module.ppud_replication_destination.bucket.id
+    REGION                    = data.aws_region.current.region
+    SLACK_WEBHOOK_SECRET_NAME = module.ppud_slack_webhook.secret_id
+    DAYS_BACK                 = local.days_back
+  }
 
-#   source_path = [{
-#     path = "${path.module}/lambda_functions/check_recent_file.py"
-#   }]
+  source_path = [{
+    path = "${path.module}/lambda_functions/check_recent_file.py"
+  }]
 
-#   tags = merge(
-#     local.tags,
-#     {
-#       resource-type = "Lambda"
-#     }
-#   )
+  tags = merge(
+    local.tags,
+    {
+      resource-type = "Lambda"
+    }
+  )
 
-# }
+}
 
-# resource "aws_lambda_permission" "allow_eventbridge_check_recent_file" {
-#   count = local.is-test ? 0 : 1
-#   statement_id  = "AllowExecutionFromEventBridgeCheckRecentFile"
-#   action        = "lambda:InvokeFunction"
-#   function_name = module.check_recent_file.lambda_function_arn
-#   principal     = "events.amazonaws.com"
-#   source_arn    = aws_cloudwatch_event_rule.check_recent_file_daily.arn
-# }
+resource "aws_lambda_permission" "allow_eventbridge_check_recent_file" {
+  count         = local.is-test ? 0 : 1
+  statement_id  = "AllowExecutionFromEventBridgeCheckRecentFile"
+  action        = "lambda:InvokeFunction"
+  function_name = module.check_recent_file.lambda_function_arn
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.check_recent_file_daily[count.index].arn
+}
 
-# resource "aws_cloudwatch_event_rule" "check_recent_file_daily" {
-#   count = local.is-test ? 0 : 1
-#   name                = "${local.component_name}-check-recent-file-daily"
-#   description         = "Invoke recent-file checker daily at 15:15 UTC"
-#   schedule_expression = local.cron_schedule
-# }
+resource "aws_cloudwatch_event_rule" "check_recent_file_daily" {
+  count               = local.is-test ? 0 : 1
+  name                = "${local.component_name}-check-recent-file-daily"
+  description         = "Invoke recent-file checker daily at 15:15 UTC"
+  schedule_expression = local.cron_schedule
+}
 
-# resource "aws_cloudwatch_event_target" "check_recent_file_daily" {
-#   count = local.is-test ? 0 : 1
-#   rule      = aws_cloudwatch_event_rule.check_recent_file_daily.name
-#   target_id = "check-recent-file-lambda"
-#   arn       = module.check_recent_file.lambda_function_arn
-# }
+resource "aws_cloudwatch_event_target" "check_recent_file_daily" {
+  count     = local.is-test ? 0 : 1
+  rule      = aws_cloudwatch_event_rule.check_recent_file_daily[count.index].name
+  target_id = "check-recent-file-lambda"
+  arn       = module.check_recent_file.lambda_function_arn
+}

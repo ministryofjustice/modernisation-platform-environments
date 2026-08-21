@@ -8,9 +8,9 @@ module "ppud_rds_export_secret" {
   name       = "ppud-rds-export-password"
   kms_key_id = module.ppud_kms.key_arn
 
-  ignore_secret_changes  = true
-  create_random_password = true
-  random_password_length = 13
+  ignore_secret_changes            = true
+  create_random_password           = true
+  random_password_length           = 13
   random_password_override_special = "!#$&*?"
 
   tags = merge(
