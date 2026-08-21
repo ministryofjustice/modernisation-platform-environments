@@ -18,6 +18,10 @@ locals {
 }
 
 data "aws_iam_policy_document" "arns_integration_kms_policy" {
+  #checkov:skip=CKV_AWS_356:skip "Ensure no IAM policies documents allow *" - policy is attached directly to resource
+  #checkov:skip=CKV_AWS_109:skip "Ensure IAM policies does not allow permissions management" - constraint is added for cross-account access
+  #checkov:skip=CKV_AWS_111:skip "Ensure IAM policies does not allow write access without constraints" - ditto
+
   statement {
     sid       = "AllowLocalAccess"
     effect    = "Allow"
@@ -59,6 +63,9 @@ data "aws_iam_policy_document" "arns_integration_kms_policy" {
 }
 
 data "aws_iam_policy_document" "arns_integration_secret_policy" {
+  #checkov:skip=CKV_AWS_356:skip "Ensure no IAM policies documents allow *" - policy is attached directly to resource
+  #checkov:skip=CKV_AWS_108:skip "Ensure IAM policies does not allow data exfiltration" - access restricted to specific cross-account role
+  #checkov:skip=CKV_AWS_111:skip "Ensure IAM policies does not allow write access without constraints" - ditto
   count = local.arns_cross_account_config != null ? 1 : 0
 
   statement {
