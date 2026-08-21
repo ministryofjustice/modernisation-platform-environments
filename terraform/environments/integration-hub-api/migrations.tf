@@ -1,6 +1,6 @@
 moved {
   from = aws_cloudwatch_log_group.api_access
-  to   = module.integration_hub_file_transfer_api.module.api_access_log_group.aws_cloudwatch_log_group.this[0]
+  to   = module.integration_hub_file_transfer_api.aws_cloudwatch_log_group.api_access
 }
 
 moved {
