@@ -1,5 +1,7 @@
 # policy to allow replication in destination bucket
 data "aws_iam_policy_document" "ppud_replication_destination_bucket_policy" {
+  count = local.is-test ? 0 : 1
+
   statement {
     sid    = "Set-permissions-for-objects"
     effect = "Allow"
@@ -54,7 +56,7 @@ module "ppud_replication_destination" {
 
   sse_algorithm = "AES256"
 
-  bucket_policy = [data.aws_iam_policy_document.ppud_replication_destination_bucket_policy.json]
+  bucket_policy = local.is-test ? [] : [data.aws_iam_policy_document.ppud_replication_destination_bucket_policy[0].json]
 
   lifecycle_rule = [
     {
