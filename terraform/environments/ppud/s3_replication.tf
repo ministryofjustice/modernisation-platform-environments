@@ -16,7 +16,7 @@ locals {
         replication_rule_id     = "ppud-database-replication-rule-dev"
         additional_replication_rules = [
           {
-            destination = "arn:aws:s3:::ppud-bak-replication-development-771283872747-eu-west-2-an"
+            destination = "arn:aws:s3:::ppud-bak-replication-development-${local.environment_management.account_ids["digital-prison-reporting-development"]}-eu-west-2-an"
             rule_id     = "ppud-database-replication-rule-dev-mp"
             priority    = 2
           }
