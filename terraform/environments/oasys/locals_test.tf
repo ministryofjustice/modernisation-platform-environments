@@ -1,8 +1,10 @@
 locals {
 
-  delius_oasys_queues_test = {
-    "t2" = {
-      sns_topic_arn_configured = true # set to true when sns_topic_arn has been populated in config secret
+  locals_test = {
+    delius_oasys_queues = {
+      "t2" = {
+        sns_topic_arn_configured = true # set to true when sns_topic_arn has been populated in config secret
+      }
     }
   }
 

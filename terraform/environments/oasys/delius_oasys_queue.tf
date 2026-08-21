@@ -1,5 +1,6 @@
 locals {
   # don't create infra until the SNS topic ARN has been populated
+  delius_oasys_queues = lookup(local.locals_environment_specific, "delius_oasys_queues", {})
   delius_oasys_queues_with_topic_arns = {
     for key, value in local.delius_oasys_queues :
     key => value if lookup(value, "sns_topic_arn_configured", true)
