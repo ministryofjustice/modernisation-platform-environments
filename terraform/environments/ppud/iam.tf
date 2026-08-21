@@ -67,6 +67,13 @@ resource "aws_iam_policy_attachment" "ec2_put_malware_events" {
   policy_arn = aws_iam_policy.ec2_put_malware_events.arn
 }
 
+resource "aws_iam_policy_attachment" "ec2_describe_instances" {
+  depends_on = [aws_iam_policy.ec2_describe_instances]
+  name       = "ec2-describe-instances-attachment"
+  roles      = [aws_iam_role.ec2_iam_role.id]
+  policy_arn = aws_iam_policy.ec2_describe_instances.arn
+}
+
 resource "aws_iam_policy_attachment" "CloudWatchAgentAdminPolicy" {
   count      = local.is-production == true ? 1 : 0
   depends_on = [aws_iam_policy.production-s3-access]
@@ -119,6 +126,25 @@ resource "aws_iam_policy" "ec2_put_malware_events" {
       "Effect" : "Allow",
       "Resource" : [
         "arn:aws:events:eu-west-2:${data.aws_caller_identity.current.account_id}:event-bus/ppud_malware_events"
+      ]
+    }]
+  })
+}
+
+#######################################
+# IAM Policy for EC2 Describe Instances
+#######################################
+
+resource "aws_iam_policy" "ec2_describe_instances" {
+  name        = "ec2-describe-instances"
+  description = "Allow EC2 instances the permission to extract metadata from other EC2 instances"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [{
+      "Action" : ["ec2:DescribeInstances"]
+      "Effect" : "Allow",
+      "Resource" : [
+        "arn:aws:ec2:eu-west-2:${data.aws_caller_identity.current.account_id}:instance/*"
       ]
     }]
   })
