@@ -78,7 +78,6 @@ resource "aws_cloudwatch_log_metric_filter" "error_blue" {
     name          = "ErrorCount"
     namespace     = "JitbitMetrics"
     value         = "1"
-    default_value = "0"
 
     dimensions = {
       Service = "${local.service_name}-blue"
@@ -98,7 +97,6 @@ resource "aws_cloudwatch_log_metric_filter" "error_green" {
     name          = "ErrorCount"
     namespace     = "JitbitMetrics"
     value         = "1"
-    default_value = "0"
 
     dimensions = {
       Service = "${local.service_name}-green"
