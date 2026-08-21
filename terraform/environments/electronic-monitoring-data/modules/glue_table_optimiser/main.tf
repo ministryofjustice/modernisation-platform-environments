@@ -7,6 +7,12 @@ resource "aws_glue_catalog_table_optimizer" "standard_compaction" {
   configuration {
     role_arn = var.role_arn
     enabled  = true
+
+    compaction_configuration {
+      iceberg_configuration {
+        strategy = database_name == "staged_mdss${local.dbt_suffix}"  && table_name == "event" ? "sort" : "binpack" 
+      }
+    }
   }
 
   type = "compaction"
