@@ -6573,7 +6573,7 @@
             "value": "moj-gcp-ai-gateway-production"
           }
         ],
-        "query": "Development : moj-gcp-ai-gateway-development,Production : ai-gateway-production",
+        "query": "Development : moj-gcp-ai-gateway-development,Production : moj-gcp-ai-gateway-production",
         "queryValue": "",
         "skipUrlSync": false,
         "type": "custom"
