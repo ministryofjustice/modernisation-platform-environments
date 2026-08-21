@@ -48,7 +48,7 @@ resource "aws_cloudwatch_log_group" "app_logs_blue" {
   #checkov:skip=CKV_AWS_338: "Logs required for 30 days"
   count = local.create_blue_green ? 1 : 0
 
-  name              = "delius-jitbit-blue-ecs"
+  name              = "delius-jitbit-ecs-blue"
   retention_in_days = 30
   kms_key_id        = aws_kms_key.cloudwatch_logs.arn
 
@@ -59,7 +59,7 @@ resource "aws_cloudwatch_log_group" "app_logs_green" {
   #checkov:skip=CKV_AWS_338: "Logs required for 30 days"
   count = local.create_blue_green ? 1 : 0
 
-  name              = "delius-jitbit-green-ecs"
+  name              = "delius-jitbit-ecs-green"
   retention_in_days = 30
   kms_key_id        = aws_kms_key.cloudwatch_logs.arn
 
