@@ -8,9 +8,8 @@ locals {
 }
 
 resource "aws_secretsmanager_secret" "delius_oasys_config" {
+  #checkov:skip=CKV2_AWS_57: skip "Ensure Secrets Manager secrets should have automatic rotation enabled" as contains static config
   for_each = local.is-development ? {} : local.delius_oasys_queues
-
-  #checkov:skip=CKV2_AWS_57:Ensure Secrets Manager secrets should have automatic rotation enabled
 
   name                    = "/delius_oasys/${each.key}/config"
   description             = "Configuration for delius_oasys queue integration"
@@ -29,6 +28,7 @@ data "aws_secretsmanager_secret_version" "delius_oasys_config" {
 }
 
 resource "aws_sns_topic" "delius_oasys" {
+  #checkov:skip=CKV_AWS_26: skip "Ensure all data stored in the SNS topic is encrypted" to simplify access from Delius
   for_each = local.is-development ? local.delius_oasys_queues : {}
 
   name = "${each.key}-delius-oasys-topic"
@@ -48,6 +48,7 @@ locals {
 }
 
 resource "aws_sqs_queue" "delius_oasys" {
+  #checkov:skip=CKV_AWS_27: skip "Ensure all data stored in the SQS queue is encrypted" to simplify access from Delius
   for_each = local.delius_oasys_queues
 
   name = "${each.key}-delius-oasys-queue"
@@ -94,6 +95,7 @@ resource "aws_sns_topic_subscription" "delius_oasys" {
 }
 
 resource "aws_iam_user" "delius_oasys" {
+  #checkov:skip=CKV_AWS_273: skip "Ensure access is controlled through SSO" as we need to provide access to Capita Azure dev environment
   for_each = local.is-development ? local.delius_oasys_queues : {}
 
   name = "${each.key}-delius-oasys-queue-user"
@@ -143,6 +145,7 @@ resource "aws_iam_policy" "delius_oasys" {
 }
 
 resource "aws_iam_user_policy_attachment" "delius_oasys" {
+  #checkov:skip=CKV_AWS_40: skip "Ensure IAM policies are attached only to groups or roles" this is dev only to simplify Capita access
   for_each = local.is-development ? local.delius_oasys_queues : {}
 
   user       = aws_iam_user.delius_oasys[each.key].name
@@ -150,9 +153,8 @@ resource "aws_iam_user_policy_attachment" "delius_oasys" {
 }
 
 resource "aws_secretsmanager_secret" "delius_oasys" {
+  #checkov:skip=CKV2_AWS_57: skip "Ensure Secrets Manager secrets should have automatic rotation enabled" as populated by terraform
   for_each = local.delius_oasys_queues
-
-  #checkov:skip=CKV2_AWS_57:Ensure Secrets Manager secrets should have automatic rotation enabled
 
   name                    = "/delius_oasys/${each.key}/queue"
   description             = "Secrets for delius_oasys SQS queue"

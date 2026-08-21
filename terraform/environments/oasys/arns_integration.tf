@@ -106,6 +106,7 @@ resource "aws_kms_alias" "arns_integration" {
 }
 
 resource "aws_secretsmanager_secret" "arns_integration_cross_account_config" {
+  #checkov:skip=CKV2_AWS_57: skip "Ensure Secrets Manager secrets should have automatic rotation enabled" as secret used to store static config
   count = local.arns_integration.database_hostname != null ? 1 : 0
 
   name                    = "/postgres/database/${local.arns_integration.database_hostname}/cross-account-config"
@@ -125,6 +126,7 @@ data "aws_secretsmanager_secret_version" "arns_integration_cross_account_config"
 }
 
 resource "aws_secretsmanager_secret" "arns_integration_cloud_platform_config" {
+  #checkov:skip=CKV2_AWS_57: skip "Ensure Secrets Manager secrets should have automatic rotation enabled" as secret managed by ARNS terraform
   count = local.arns_integration.database_hostname != null ? 1 : 0
 
   name                    = "/postgres/database/${local.arns_integration.database_hostname}/cloud-platform-config"
