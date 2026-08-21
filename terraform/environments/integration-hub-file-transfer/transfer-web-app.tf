@@ -36,3 +36,12 @@ resource "aws_s3control_access_grant" "incoming_uploaders" {
     grantee_identifier = each.value.group_id
   }
 }
+
+resource "aws_ssoadmin_application_assignment" "this" {
+  provider = aws.sso-application-assignment
+  for_each = data.aws_identitystore_group.this
+
+  application_arn = aws_transfer_web_app.this.identity_provider_details[0].identity_center_config[0].application_arn
+  principal_id    = each.value.group_id
+  principal_type  = "GROUP"
+}

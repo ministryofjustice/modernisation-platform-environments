@@ -8,7 +8,7 @@
       "deployment_maximum_percent": 100,
       "deployment_minimum_healthy_percent": 0,
       "health_check_grace_period_seconds": 60,
-      "image_tag": "tm-1408-composer-19577361514-1",
+      "image_tag": "dave-test-32038019155-5",
       "db_snapshot_identifier": "rds-vcmsdev-db-backup-2025-09-26-14-04-mpcp",
       "log_retention_in_days": 14,
       "legacy_url": "www.dev.victim-case-management.service.justice.gov.uk",
@@ -52,7 +52,8 @@
       "image_tag": "tm-1408-composer-19577361514-1",
       "db_snapshot_identifier": "rds-vcmsdev-db-backup-2025-09-26-14-04-mpcp",
       "log_retention_in_days": 90,
-      "legacy_url": "www.victim-case-management.service.justice.gov.uk"
+      "legacy_url": "www.victim-case-management.service.justice.gov.uk",
+      "legacy_validation_record": "_e2ff3c75cf8f7224e2c0a232dd22f9ab.www.victim-case-management.service.justice.gov.uk"
     }
   }
 }

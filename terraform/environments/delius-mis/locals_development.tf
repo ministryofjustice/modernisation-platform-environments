@@ -348,9 +348,16 @@ locals {
     throughtput_capacity = 16
   }
 
+  acm_certificate_dev = {
+    domain_name                         = "modernisation-platform.service.justice.gov.uk"
+    external_validation_records_created = true
+    additional_subject_alternate_names  = []
+  }
+
   lb_config_dev = {
     bucket_policy_enabled = true
-    maintenance_message   = "NDMIS Reporting Dev is currently unavailable due to planned maintenance or out-of-hours shutdown (7pm-7am)."
+    bws_lb_rule_priority  = 1300
+    maintenance_message   = "NDMIS Reporting Dev is rarely used so is started on demand. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C032BQQHJE5\">#ask-probation-hosting</a> slack channel if you need the environment starting."
   }
 
   datasync_config_dev = {

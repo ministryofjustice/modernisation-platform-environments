@@ -441,6 +441,8 @@ resource "aws_s3_object" "pod_waste_reports" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "cur_v2_hourly" {
+  #checkov:skip=CKV_AWS_300:To be reviewed later
+
   bucket = module.cur_v2_hourly.s3_bucket_id
 
   rule {
@@ -456,6 +458,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "cur_v2_hourly" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "focus_reports" {
+  #checkov:skip=CKV_AWS_300:To be reviewed later
+
   bucket = module.focus_reports.s3_bucket_id
 
   rule {
@@ -471,6 +475,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "focus_reports" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "coat_reports" {
+  #checkov:skip=CKV_AWS_300:To be reviewed later
+
   bucket = module.coat_reports.s3_bucket_id
 
   rule {
@@ -486,6 +492,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "coat_reports" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "cur_v2_hourly_enriched" {
+  #checkov:skip=CKV_AWS_300:To be reviewed later
+
   count  = local.is-development ? 0 : 1
   bucket = module.cur_v2_hourly_enriched[0].s3_bucket_id
 

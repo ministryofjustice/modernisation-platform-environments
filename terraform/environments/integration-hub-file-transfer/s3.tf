@@ -1,7 +1,7 @@
 module "s3_audit_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.14.1"
+  version = "5.15.4"
 
   allowed_kms_key_arn                   = module.kms_s3_audit.key_arn
   attach_deny_insecure_transport_policy = true
@@ -52,7 +52,7 @@ module "s3_bucket" {
     for key, value in local.s3_bucket_configuration : key => value
   }
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.14.1"
+  version = "5.15.4"
 
   allowed_kms_key_arn                   = module.kms_s3_bucket[each.key].key_arn
   attach_deny_insecure_transport_policy = true

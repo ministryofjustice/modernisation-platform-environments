@@ -165,9 +165,9 @@ resource "aws_iam_policy" "rman_to_s3" {
     Statement = [
       {
         # ListAllMyBuckets cannot be scoped to a specific bucket
-        Effect    = "Allow"
-        Action    = ["s3:ListAllMyBuckets"]
-        Resource  = "arn:aws:s3:::*"
+        Effect   = "Allow"
+        Action   = ["s3:ListAllMyBuckets"]
+        Resource = "arn:aws:s3:::*"
       },
       {
         Effect = "Allow"
@@ -190,6 +190,139 @@ resource "aws_iam_policy" "rman_to_s3" {
   })
 }
 
+# FTP IAM role
+
+resource "aws_iam_role" "ftp" {
+  name                 = "${local.component_name}-${local.env_label}-ftp-role"
+  path                 = "/"
+  max_session_duration = 3600
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "ec2.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+      Condition = {}
+    }]
+  })
+
+  tags = merge(local.tags, {
+    Name = "${local.component_name}-${local.env_label}-ftp-role"
+  })
+}
+
+resource "aws_iam_instance_profile" "ftp" {
+  name = "${local.component_name}-${local.env_label}-ftp-role"
+  role = aws_iam_role.ftp.name
+  path = "/"
+
+  tags = merge(local.tags, {
+    Name = "${local.component_name}-${local.env_label}-ftp-role"
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ftp_ssm" {
+  role       = aws_iam_role.ftp.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_policy" "ftp_cw_logging" {
+  name        = "${local.component_name}-${local.env_label}-ftp-cw-logging"
+  description = "Allow FTP instance to write CloudWatch logs"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        # Describe APIs cannot be scoped to specific log groups
+        Effect = "Allow"
+        Action = [
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams",
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+        ]
+        Resource = [
+          "arn:aws:logs:*:*:log-group:/${local.component_name}/*",
+          "arn:aws:logs:*:*:log-group:/${local.component_name}/*:log-stream:*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ftp_cw_logging" {
+  role       = aws_iam_role.ftp.name
+  policy_arn = aws_iam_policy.ftp_cw_logging.arn
+}
+
+resource "aws_iam_policy" "ftp_s3_buckets" {
+  name        = "${local.component_name}-${local.env_label}-ftp-s3-buckets"
+  description = "Allow the FTP instance to mount the inbound/outbound S3 buckets via s3fs"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket",
+        ]
+        Resource = [
+          module.s3_inbound.bucket.arn,
+          module.s3_outbound.bucket.arn,
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+        ]
+        Resource = [
+          "${module.s3_inbound.bucket.arn}/*",
+          "${module.s3_outbound.bucket.arn}/*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ftp_s3_buckets" {
+  role       = aws_iam_role.ftp.name
+  policy_arn = aws_iam_policy.ftp_s3_buckets.arn
+}
+
+resource "aws_iam_policy" "ftp_test_user_secret" {
+  name        = "${local.component_name}-${local.env_label}-ftp-test-user-secret"
+  description = "Allow the FTP instance to read its own SSH test user credentials at boot"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue"]
+        Resource = aws_secretsmanager_secret.ftp_test_user.arn
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ftp_test_user_secret" {
+  role       = aws_iam_role.ftp.name
+  policy_arn = aws_iam_policy.ftp_test_user_secret.arn
+}
+
 resource "aws_iam_policy" "ec2_operations" {
   name        = "${local.component_name}-${local.env_label}-ebsdb-ec2-operations"
   description = "Allow the EBS DB instance to create and manage EBS snapshots"
@@ -205,8 +338,8 @@ resource "aws_iam_policy" "ec2_operations" {
       },
       {
         # Restrict snapshot creation to volumes tagged to this component
-        Effect = "Allow"
-        Action = ["ec2:CreateSnapshot", "ec2:CreateSnapshots"]
+        Effect   = "Allow"
+        Action   = ["ec2:CreateSnapshot", "ec2:CreateSnapshots"]
         Resource = "arn:aws:ec2:eu-west-2:*:volume/*"
         Condition = {
           StringEquals = {
@@ -215,14 +348,14 @@ resource "aws_iam_policy" "ec2_operations" {
         }
       },
       {
-        Effect = "Allow"
-        Action = ["ec2:CreateSnapshot", "ec2:CreateSnapshots"]
+        Effect   = "Allow"
+        Action   = ["ec2:CreateSnapshot", "ec2:CreateSnapshots"]
         Resource = "arn:aws:ec2:eu-west-2:*:snapshot/*"
       },
       {
         # Restrict snapshot deletion to snapshots tagged to this component
-        Effect = "Allow"
-        Action = ["ec2:DeleteSnapshot"]
+        Effect   = "Allow"
+        Action   = ["ec2:DeleteSnapshot"]
         Resource = "arn:aws:ec2:eu-west-2:*:snapshot/*"
         Condition = {
           StringEquals = {
@@ -232,8 +365,8 @@ resource "aws_iam_policy" "ec2_operations" {
       },
       {
         # Allow tagging only at snapshot creation time, not arbitrary resources
-        Effect = "Allow"
-        Action = ["ec2:CreateTags"]
+        Effect   = "Allow"
+        Action   = ["ec2:CreateTags"]
         Resource = "arn:aws:ec2:eu-west-2:*:snapshot/*"
         Condition = {
           StringEquals = {

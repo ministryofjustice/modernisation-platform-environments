@@ -71,7 +71,7 @@ resource "aws_sns_topic" "s3_topic" {
 resource "aws_sns_topic_subscription" "s3_subscription" {
   topic_arn = aws_sns_topic.s3_topic.arn
   protocol  = "lambda"
-  endpoint  = aws_lambda_function.cloudwatch_slack_integration_v2[0].arn
+  endpoint  = aws_lambda_function.cloudwatch_slack_integration_v2.arn
 }
 
 resource "aws_sns_topic" "ddos_alarm" {
@@ -86,7 +86,7 @@ resource "aws_sns_topic" "ddos_alarm" {
 resource "aws_sns_topic_subscription" "ddos_subscription" {
   topic_arn = aws_sns_topic.ddos_alarm.arn
   protocol  = "lambda"
-  endpoint  = aws_lambda_function.cloudwatch_slack_integration_v2[0].arn
+  endpoint  = aws_lambda_function.cloudwatch_slack_integration_v2.arn
 }
 
 resource "aws_sns_topic" "guardduty_alerts" {

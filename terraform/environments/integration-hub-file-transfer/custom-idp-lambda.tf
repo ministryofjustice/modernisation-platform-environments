@@ -24,7 +24,7 @@ module "lambda_custom_idp" {
 
   function_name                  = "${local.application_name}-custom-idp"
   architectures                  = ["arm64"]
-  description                    = "Authenticates AWS Transfer users with DynamoDB metadata and Secrets Manager credentials"
+  description                    = "Authenticates AWS Transfer users with Secrets Manager"
   handler                        = "app.lambda_handler"
   layers                         = [module.lambda_custom_idp_layer.lambda_layer_arn]
   memory_size                    = 256
@@ -36,25 +36,19 @@ module "lambda_custom_idp" {
   trigger_on_package_timestamp   = false
 
   environment_variables = {
-    IDENTITY_PROVIDERS_TABLE = module.dynamodb_custom_idp_identity_providers.dynamodb_table_id
-    LOGLEVEL                 = local.custom_idp_configuration.log_level
-    USER_NAME_DELIMITER      = local.custom_idp_configuration.user_name_delimiter
-    USERS_TABLE              = module.dynamodb_custom_idp_users.dynamodb_table_id
+    LOGLEVEL                = local.custom_idp_configuration.log_level
+    SECRET_PREFIX           = local.custom_idp_configuration.secret_prefix
+    AWS_ACCOUNT_ID          = data.aws_caller_identity.current.account_id
+    TRANSFER_ROLE_ARN       = module.iam_role_transfer_user.arn
+    TRANSFER_SESSION_POLICY = data.aws_iam_policy_document.transfer_user_session.json
+    TRANSFER_HOME_DIRECTORY_DETAILS = jsonencode([{
+      Entry  = "/"
+      Target = "/${module.s3_bucket["incoming"].s3_bucket_id}/{{USERNAME}}"
+    }])
   }
 
   attach_policy_statements = true
   policy_statements = {
-    custom_idp_tables = {
-      effect = "Allow"
-      actions = [
-        "dynamodb:GetItem",
-        "dynamodb:Query",
-      ]
-      resources = [
-        module.dynamodb_custom_idp_identity_providers.dynamodb_table_arn,
-        module.dynamodb_custom_idp_users.dynamodb_table_arn,
-      ]
-    }
     custom_idp_secrets = {
       effect = "Allow"
       actions = [
@@ -72,15 +66,6 @@ module "lambda_custom_idp" {
       ]
       resources = [
         module.kms_secrets.key_arn,
-      ]
-    }
-    describe_transfer_servers = {
-      effect = "Allow"
-      actions = [
-        "transfer:DescribeServer",
-      ]
-      resources = [
-        "arn:aws:transfer:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:server/*",
       ]
     }
   }

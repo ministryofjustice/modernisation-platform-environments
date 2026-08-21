@@ -1,5 +1,6 @@
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "delius_core_alarms" {
+  #checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
   name = "delius-core-${var.env_name}-alarms-topic"
   tags = var.tags
 }
@@ -11,7 +12,7 @@ module "pagerduty_core_alerts" {
     aws_sns_topic.delius_core_alarms
   ]
 
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=d88bd90d490268896670a898edfaba24bba2f8ab" #v3.0.0
   sns_topics                = [aws_sns_topic.delius_core_alarms.name]
   pagerduty_integration_key = var.pagerduty_integration_key
 }
