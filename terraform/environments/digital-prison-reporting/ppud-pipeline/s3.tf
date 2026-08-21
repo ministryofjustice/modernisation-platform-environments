@@ -54,7 +54,7 @@ module "ppud_replication_destination" {
 
   sse_algorithm = "AES256"
 
-  bucket_policy = data.aws_iam_policy_document.ppud_replication_destination_bucket_policy.json
+  bucket_policy = [data.aws_iam_policy_document.ppud_replication_destination_bucket_policy.json]
 
   lifecycle_rule = [
     {
