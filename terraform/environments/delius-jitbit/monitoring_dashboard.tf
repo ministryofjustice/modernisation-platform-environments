@@ -19,7 +19,7 @@ resource "aws_cloudwatch_dashboard" "jitbit" {
 resource "aws_cloudwatch_dashboard" "jitbit_blue" {
   count = local.create_blue_green ? 1 : 0
 
-  dashboard_name = local.application_name
+  dashboard_name = "${local.application_name}-blue"
   dashboard_body = templatefile(
     "${path.module}/templates/dashboard.json",
     {
@@ -37,7 +37,7 @@ resource "aws_cloudwatch_dashboard" "jitbit_blue" {
 resource "aws_cloudwatch_dashboard" "jitbit_green" {
   count = local.create_blue_green ? 1 : 0
 
-  dashboard_name = local.application_name
+  dashboard_name = "${local.application_name}-green"
   dashboard_body = templatefile(
     "${path.module}/templates/dashboard.json",
     {
