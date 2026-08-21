@@ -55,17 +55,18 @@ locals {
   container_platform_aws_group_id   = "7682a204-00f1-7031-257e-713bb28289c6"
 }
 
-# NOTE: do NOT add `depends_on = [module.eks]` to these EKS data sources. The
-# `name` reference already creates an implicit dependency on the cluster, so
-# they read only after it exists. An explicit depends_on additionally forces
-# Terraform to DEFER the read whenever module.eks shows any planned change,
-# making endpoint/token unknown at plan time. The kubernetes/helm providers
-# (providers.tf) then fall back to localhost, breaking plan-time refresh of the
-# kubernetes_* resources in this component (e.g. the ArgoCD spoke RBAC).
-data "aws_eks_cluster" "cluster" {
-  name = module.eks.cluster_name
-}
-
+# Auth token for the kubernetes/helm providers (providers.tf).
+# aws_eks_cluster_auth generates a token from the cluster name and the caller's
+# credentials; it does NOT call the EKS API to look the cluster up, so it is
+# safe on a brand-new cluster that does not exist yet.
+#
+# NOTE: the cluster endpoint and CA are read from module.eks outputs in
+# providers.tf, NOT from a data.aws_eks_cluster lookup. A data source performs
+# an eager API read at plan and fails on a first-time deploy ("reading EKS
+# Cluster: couldn't find resource") because the cluster does not exist yet.
+# Module outputs are known from state for existing clusters (so the providers
+# reach the API at plan — preserving the #8462 plan-time refresh fix) and are
+# known-after-apply on create.
 data "aws_eks_cluster_auth" "cluster" {
   name = module.eks.cluster_name
 }
