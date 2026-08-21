@@ -2,7 +2,7 @@ locals {
 
   locals_preproduction = {
     arns_integration = {
-      cross_account_secret_configured = false
+      cross_account_secret_configured = true
       database_hostname               = "hmpps-arns-assessment-view-db-preprod"
     }
     delius_oasys_queues = {
