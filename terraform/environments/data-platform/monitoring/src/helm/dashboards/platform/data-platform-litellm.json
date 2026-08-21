@@ -6570,7 +6570,7 @@
           {
             "selected": false,
             "text": "Production",
-            "value": "ai-gateway-production"
+            "value": "moj-gcp-ai-gateway-production"
           }
         ],
         "query": "Development : moj-gcp-ai-gateway-development,Production : ai-gateway-production",
