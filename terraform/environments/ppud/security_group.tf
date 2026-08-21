@@ -1283,6 +1283,7 @@ locals {
       description = "Development servers standard security group for the development environment"
       ingress = [
         { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
+        { port = 445, cidr = "vpc", description = "Allow port 445 inbound" },
         { port = 80, cidr = "vpc", description = "Allow port 80 inbound" },
       ]
       egress = [
