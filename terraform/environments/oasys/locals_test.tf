@@ -2,7 +2,8 @@ locals {
 
   locals_test = {
     arns_integration = {
-      database_hostname = "hmpps-arns-assessment-view-db-test"
+      cross_account_secret_configured = true
+      database_hostname               = "hmpps-arns-assessment-view-db-test"
     }
     delius_oasys_queues = {
       "t2" = {
