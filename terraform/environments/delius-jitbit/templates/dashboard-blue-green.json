@@ -12,18 +12,29 @@
             "ECS/ContainerInsights",
             "CpuUtilized",
             "ServiceName",
-            "hmpps-${environment}-${app_name}",
+            "hmpps-${environment}-${app_name}-blue",
             "ClusterName",
             "hmpps-${environment}-${app_name}",
             {
-              "label": "${app_name}-service"
+              "label": "${app_name}-service-blue"
             }
           ],
           [
-            ".",
-            ".",
+            "ECS/ContainerInsights",
+            "CpuUtilized",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}-green",
             "ClusterName",
-            ".",
+            "hmpps-${environment}-${app_name}",
+            {
+              "label": "${app_name}-service-green"
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "CpuUtilized",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
             {
               "label": "${app_name}-cluster"
             }
@@ -49,18 +60,29 @@
             "ECS/ContainerInsights",
             "MemoryUtilized",
             "ServiceName",
-            "hmpps-${environment}-${app_name}",
+            "hmpps-${environment}-${app_name}-blue",
             "ClusterName",
             "hmpps-${environment}-${app_name}",
             {
-              "label": "${app_name}-service"
+              "label": "${app_name}-service-blue"
             }
           ],
           [
-            ".",
-            ".",
+            "ECS/ContainerInsights",
+            "MemoryUtilized",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}-green",
             "ClusterName",
-            ".",
+            "hmpps-${environment}-${app_name}",
+            {
+              "label": "${app_name}-service-green"
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "MemoryUtilized",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
             {
               "label": "${app_name}-cluster"
             }
@@ -84,9 +106,18 @@
         "metrics": [
           [
             "JitbitMetrics",
-            "ErrorCount",
+            "ErrorCountBlue",
             {
-              "color": "#d62728"
+              "label": "Blue",
+              "color": "#1f77b4"
+            }
+          ],
+          [
+            ".",
+            "ErrorCountGreen",
+            {
+              "label": "Green",
+              "color": "#2ca02c"
             }
           ]
         ],
@@ -105,7 +136,7 @@
       "width": 12,
       "height": 6,
       "properties": {
-        "query": "SOURCE '${app_name}-ecs' | fields @timestamp, @message, @logStream, @log\n| filter @message like /Error in Helpdesk/\n| sort @timestamp desc\n| limit 20",
+        "query": "SOURCE '${app_log_group_name_blue}' | SOURCE '${app_log_group_name_green}' | fields @timestamp, @message, @logStream, @log\n| filter @message like /Error in Helpdesk/\n| sort @timestamp desc\n| limit 20",
         "region": "eu-west-2",
         "stacked": false,
         "view": "table",
@@ -146,9 +177,23 @@
             "AWS/ApplicationELB",
             "HealthyHostCount",
             "TargetGroup",
-            "${target_group_arn}",
+            "${target_group_arn_blue}",
             "LoadBalancer",
-            "${load_balancer_arn}"
+            "${load_balancer_arn}",
+            {
+              "label": "Blue Target Group"
+            }
+          ],
+          [
+            "AWS/ApplicationELB",
+            "HealthyHostCount",
+            "TargetGroup",
+            "${target_group_arn_green}",
+            "LoadBalancer",
+            "${load_balancer_arn}",
+            {
+              "label": "Green Target Group"
+            }
           ]
         ],
         "region": "eu-west-2"
@@ -400,7 +445,7 @@
       "width": 24,
       "height": 6,
       "properties": {
-        "query": "SOURCE '${app_name}-ecs' | fields @timestamp, @message, @logStream\n| sort @timestamp desc\n| filter @message like /useless/\n| limit 1000",
+        "query": "SOURCE '${app_log_group_name_blue}' | SOURCE '${app_log_group_name_green}' | fields @timestamp, @message, @logStream, @log\n| sort @timestamp desc\n| filter @message like /useless/\n| limit 1000",
         "region": "eu-west-2",
         "stacked": false,
         "title": "Useless Filter Matches",
