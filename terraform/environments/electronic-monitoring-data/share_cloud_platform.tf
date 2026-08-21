@@ -78,7 +78,10 @@ locals {
     ] : local.is-preproduction ? [
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-api-iam-preprod}",
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-algorithm-iam-preprod}",
-  ] : []
+  ] : [
+    "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-api-iam-prod}",
+    "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-algorithm-iam-prod}",
+  ]
   iam_role_validation_db = local.is-test ? [
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live",
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-21220dacf93f9ac4-live",
@@ -136,6 +139,18 @@ variable "cloud-platform-crime-matching-algorithm-iam-preprod" {
   type        = string
   description = "IAM role that the crime matching algorithm in Cloud Platform will use to connect to this role."
   default     = "cloud-platform-irsa-6ca3fa16de5344f0-live"
+}
+
+variable "cloud-platform-crime-matching-api-iam-prod" {
+  type        = string
+  description = "IAM role that the crime matching API in Cloud Platform will use to connect to this role."
+  default     = "cloud-platform-irsa-ac8e98221b4a2318-live"
+}
+
+variable "cloud-platform-crime-matching-algorithm-iam-prod" {
+  type        = string
+  description = "IAM role that the crime matching algorithm in Cloud Platform will use to connect to this role."
+  default     = "cloud-platform-irsa-17b37c1d3aaf1334-live"
 }
 
 variable "cloud-platform-emdi-iam-dev" {
