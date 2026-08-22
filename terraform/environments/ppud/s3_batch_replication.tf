@@ -57,6 +57,7 @@ resource "aws_iam_policy" "s3_batch_replication_dev" {
         Sid    = "SourceObjectReadForReplication"
         Effect = "Allow"
         Action = [
+          "s3:InitiateReplication",
           "s3:GetObjectVersionForReplication",
           "s3:GetObjectVersionAcl",
           "s3:GetObjectVersionTagging",
@@ -87,6 +88,7 @@ resource "aws_iam_policy" "s3_batch_replication_dev" {
         Action = [
           "s3:PutObject",
           "s3:GetObject",
+          "s3:GetObjectVersion",
           "s3:ListBucket"
         ]
         Resource = [
