@@ -31,7 +31,7 @@ resource "aws_iam_role" "s3_batch_replication_dev" {
 resource "aws_iam_policy" "s3_batch_replication_dev" {
   count = local.s3_batch_replication_dev_enabled ? 1 : 0
 
-  name        = "iam_policy_s3_batch_replication_moj_database_source_dev"
+  name        = "s3-batch-replication-moj-database-source-dev"
   path        = "/"
   description = "IAM policy for S3 Batch Replication from moj-database-source-dev"
 
