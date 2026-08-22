@@ -11,7 +11,7 @@ locals {
 resource "aws_iam_role" "s3_batch_replication_dev" {
   count = local.s3_batch_replication_dev_enabled ? 1 : 0
 
-  name = "iam_role_s3_batch_replication_moj_database_source_dev"
+  name = "s3-batch-replication-moj-database-source-dev"
   path = "/service-role/"
 
   assume_role_policy = jsonencode({
