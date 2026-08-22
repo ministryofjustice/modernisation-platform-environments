@@ -5,7 +5,7 @@
 locals {
   s3_batch_replication_dev_enabled = local.is-development
 
-  s3_batch_replication_dev_destination = "arn:aws:s3:::ppud-bak-replication-development-${local.environment_management.account_ids["digital-prison-reporting-development"]}-eu-west-2-an"
+  s3_batch_replication_dev_destination = "arn:aws:s3:::ppud-bak-replication-development-${local.environment_management.account_ids[\"digital-prison-reporting-development\"]}-eu-west-2-an"
 }
 
 resource "aws_iam_role" "s3_batch_replication_dev" {
