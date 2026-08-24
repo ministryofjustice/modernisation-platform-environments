@@ -1,13 +1,14 @@
 resource "aws_cloudwatch_log_group" "api_access" {
   name              = "/aws/apigateway/${local.resource_name_prefix}"
-  retention_in_days = 30
+  kms_key_id        = var.kms_key_arn
+  retention_in_days = 365
   tags              = local.tags
 }
 
 resource "aws_apigatewayv2_vpc_link" "service" {
   name               = "${local.resource_name_prefix}-${local.environment}"
   security_group_ids = [aws_security_group.api_gateway_vpc_link.id]
-  subnet_ids         = data.aws_subnets.shared-private.ids
+  subnet_ids         = var.private_subnet_ids
   tags               = local.tags
 }
 
@@ -29,12 +30,14 @@ resource "aws_apigatewayv2_integration" "service" {
 }
 
 resource "aws_apigatewayv2_route" "root" {
+  #checkov:skip=CKV_AWS_309:Authentication is enforced by the downstream application using Basic auth
   api_id    = aws_apigatewayv2_api.service.id
   route_key = "ANY /"
   target    = "integrations/${aws_apigatewayv2_integration.service.id}"
 }
 
 resource "aws_apigatewayv2_route" "proxy" {
+  #checkov:skip=CKV_AWS_309:Authentication is enforced by the downstream application using Basic auth
   api_id    = aws_apigatewayv2_api.service.id
   route_key = "ANY /{proxy+}"
   target    = "integrations/${aws_apigatewayv2_integration.service.id}"

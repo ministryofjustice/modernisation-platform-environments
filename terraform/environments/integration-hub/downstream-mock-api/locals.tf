@@ -1,4 +1,6 @@
 locals {
+  resource_application_name = "integration-hub-downstream-mock-api"
+
   service_configuration = merge(
     {
       desired_count       = 1

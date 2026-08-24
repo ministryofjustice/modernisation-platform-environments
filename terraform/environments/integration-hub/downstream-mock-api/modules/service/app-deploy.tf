@@ -4,7 +4,7 @@ data "aws_iam_policy_document" "app_deploy_assume_role" {
 
     principals {
       type        = "Federated"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"]
+      identifiers = ["arn:aws:iam::${var.account_id}:oidc-provider/token.actions.githubusercontent.com"]
     }
 
     actions = ["sts:AssumeRoleWithWebIdentity"]
@@ -30,6 +30,8 @@ resource "aws_iam_role" "app_deploy" {
 }
 
 data "aws_iam_policy_document" "app_deploy" {
+  #checkov:skip=CKV_AWS_111:ECR authentication and ECS task registration require wildcard resources; deployment access is limited by the OIDC trust policy
+  #checkov:skip=CKV_AWS_356:ECR authentication and ECS task registration do not support resource-level permissions
   statement {
     effect = "Allow"
     actions = [

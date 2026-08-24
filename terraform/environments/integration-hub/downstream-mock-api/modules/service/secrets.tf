@@ -1,4 +1,5 @@
 module "downstream_basic_auth_secret" {
+  #checkov:skip=CKV_TF_1:Terraform Registry modules are version-pinned and do not support commit hash references
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "2.1.0"
 

@@ -1,27 +1,29 @@
 resource "aws_security_group" "api_gateway_vpc_link" {
   name        = "${local.resource_name_prefix}-${local.environment}-apigw-vpc-link"
   description = "Security group for API Gateway VPC Link"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = var.vpc.id
   tags        = local.tags
 }
 
 resource "aws_security_group_rule" "api_gateway_vpc_link_egress" {
+  description       = "Allow the VPC link to reach the internal load balancer"
   type              = "egress"
   from_port         = 80
   to_port           = 80
   protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  cidr_blocks       = [var.vpc.cidr_block]
   security_group_id = aws_security_group.api_gateway_vpc_link.id
 }
 
 resource "aws_security_group" "load_balancer" {
   name        = "${local.resource_name_prefix}-${local.environment}-alb"
   description = "Security group for internal load balancer"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = var.vpc.id
   tags        = local.tags
 }
 
 resource "aws_security_group_rule" "load_balancer_ingress_from_vpc_link" {
+  description              = "Allow requests from the API Gateway VPC link"
   type                     = "ingress"
   from_port                = 80
   to_port                  = 80
@@ -33,11 +35,12 @@ resource "aws_security_group_rule" "load_balancer_ingress_from_vpc_link" {
 resource "aws_security_group" "ecs_service" {
   name        = "${local.resource_name_prefix}-${local.environment}-ecs"
   description = "Security group for downstream mock API ECS service"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = var.vpc.id
   tags        = local.tags
 }
 
 resource "aws_security_group_rule" "load_balancer_egress_to_ecs" {
+  description              = "Allow the load balancer to reach the ECS service"
   type                     = "egress"
   from_port                = local.service_configuration.container_port
   to_port                  = local.service_configuration.container_port
@@ -47,6 +50,7 @@ resource "aws_security_group_rule" "load_balancer_egress_to_ecs" {
 }
 
 resource "aws_security_group_rule" "ecs_ingress_from_load_balancer" {
+  description              = "Allow requests from the internal load balancer"
   type                     = "ingress"
   from_port                = local.service_configuration.container_port
   to_port                  = local.service_configuration.container_port
@@ -55,21 +59,45 @@ resource "aws_security_group_rule" "ecs_ingress_from_load_balancer" {
   source_security_group_id = aws_security_group.load_balancer.id
 }
 
-resource "aws_security_group_rule" "ecs_egress_any" {
+resource "aws_security_group_rule" "ecs_egress_https" {
+  description       = "Allow the ECS service to reach AWS APIs over HTTPS"
   type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.ecs_service.id
 }
 
+resource "aws_security_group_rule" "ecs_egress_dns_udp" {
+  description       = "Allow DNS queries within the VPC"
+  type              = "egress"
+  from_port         = 53
+  to_port           = 53
+  protocol          = "udp"
+  cidr_blocks       = [var.vpc.cidr_block]
+  security_group_id = aws_security_group.ecs_service.id
+}
+
+resource "aws_security_group_rule" "ecs_egress_dns_tcp" {
+  description       = "Allow TCP DNS queries within the VPC"
+  type              = "egress"
+  from_port         = 53
+  to_port           = 53
+  protocol          = "tcp"
+  cidr_blocks       = [var.vpc.cidr_block]
+  security_group_id = aws_security_group.ecs_service.id
+}
+
 resource "aws_lb" "internal" {
+  #checkov:skip=CKV_AWS_91:Development-only MVP uses API Gateway and ECS access logs; ALB access logging will be added before production
+  #checkov:skip=CKV_AWS_150:Deletion protection is intentionally disabled for the development-only MVP
+  #checkov:skip=CKV2_AWS_20:Traffic reaches this internal ALB only through the API Gateway VPC link
   name                       = "ih-bc-mock-${local.environment}-alb"
   load_balancer_type         = "application"
   internal                   = true
   security_groups            = [aws_security_group.load_balancer.id]
-  subnets                    = data.aws_subnets.shared-private.ids
+  subnets                    = var.private_subnet_ids
   enable_deletion_protection = false
   drop_invalid_header_fields = true
 
@@ -77,11 +105,12 @@ resource "aws_lb" "internal" {
 }
 
 resource "aws_lb_target_group" "service" {
+  #checkov:skip=CKV_AWS_378:Traffic is confined to the VPC between the internal ALB and ECS task
   name        = "ih-bc-mock-${local.environment}-tg"
   port        = local.service_configuration.container_port
   protocol    = "HTTP"
   target_type = "ip"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = var.vpc.id
 
   health_check {
     enabled             = true
@@ -98,6 +127,8 @@ resource "aws_lb_target_group" "service" {
 }
 
 resource "aws_lb_listener" "service" {
+  #checkov:skip=CKV_AWS_2:Traffic reaches this internal listener only through the API Gateway VPC link
+  #checkov:skip=CKV_AWS_103:TLS terminates at API Gateway; the internal VPC link uses HTTP
   load_balancer_arn = aws_lb.internal.arn
   port              = 80
   protocol          = "HTTP"

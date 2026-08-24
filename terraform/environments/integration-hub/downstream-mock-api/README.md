@@ -2,6 +2,8 @@
 
 This environment hosts the independently deployed downstream mock benefit-checker API for the Integration Hub flow.
 
+The service module is enabled only in the `integration-hub-development` workspace while the MVP deployment location is being validated. Other Integration Hub workspaces retain only the platform-generated component configuration.
+
 ## Target architecture
 
 - API Gateway HTTP API provides the external endpoint.
@@ -21,6 +23,8 @@ terraform plan
 ## Runtime configuration
 
 The ECS service expects the companion application repository to publish a container image to the created ECR repository.
+
+The Modernisation Platform component workflow owns the generated `platform_*.tf`, backend, provider, networking and version files at the component root. Service-specific infrastructure is isolated in `modules/service`.
 
 After apply, use the outputs to retrieve:
 

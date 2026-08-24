@@ -1,13 +1,14 @@
 resource "aws_ecr_repository" "application" {
   name                 = local.resource_application_name
-  image_tag_mutability = "MUTABLE"
+  image_tag_mutability = "IMMUTABLE"
 
   image_scanning_configuration {
     scan_on_push = true
   }
 
   encryption_configuration {
-    encryption_type = "AES256"
+    encryption_type = "KMS"
+    kms_key         = var.kms_key_arn
   }
 
   tags = local.tags
@@ -15,7 +16,8 @@ resource "aws_ecr_repository" "application" {
 
 resource "aws_cloudwatch_log_group" "ecs" {
   name              = "/aws/ecs/${local.resource_name_prefix}"
-  retention_in_days = 30
+  kms_key_id        = var.kms_key_arn
+  retention_in_days = 365
   tags              = local.tags
 }
 
@@ -145,7 +147,7 @@ resource "aws_ecs_task_definition" "service" {
         logDriver = "awslogs",
         options = {
           awslogs-group         = aws_cloudwatch_log_group.ecs.name,
-          awslogs-region        = data.aws_region.current.region,
+          awslogs-region        = var.region,
           awslogs-stream-prefix = "app"
         }
       }
@@ -171,7 +173,7 @@ resource "aws_ecs_service" "service" {
   }
 
   network_configuration {
-    subnets          = data.aws_subnets.shared-private.ids
+    subnets          = var.private_subnet_ids
     security_groups  = [aws_security_group.ecs_service.id]
     assign_public_ip = false
   }
