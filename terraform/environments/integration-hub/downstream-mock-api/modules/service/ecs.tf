@@ -121,6 +121,7 @@ resource "aws_ecs_task_definition" "service" {
       image                  = "${aws_ecr_repository.application.repository_url}:${local.service_configuration.bootstrap_image_tag}",
       essential              = true,
       readonlyRootFilesystem = true,
+      user                   = "0",
       mountPoints = [
         {
           sourceVolume  = "tmp",
