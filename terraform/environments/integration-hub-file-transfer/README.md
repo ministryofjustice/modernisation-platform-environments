@@ -73,3 +73,5 @@ You must be a Ministry of Justice service. You may request access on behalf of a
 ### **How to resolve specific issues:**
 
 <!-- Describe the steps someone might take to resolve a specific issue or incident, often for use when on call. This may be a large amount of information, so may need to be split out into multiple pages, or link to other documents.-->
+
+See [file action dispatch](./docs/file-action-dispatch.md) for dispatch configuration, matching and failure behaviour.

@@ -94,6 +94,17 @@ locals {
         source_arn_suffix = "*"
       }]
     }
+    send_malware_scan_notification = {
+      description  = "Function to send notification of malware scan completion on the PPUD document service."
+      role_key     = "get_cloudwatch"
+      environments = ["development", "production"]
+      layers       = ["numpy", "pillow", "matplotlib"]
+      vpc_config   = { prod = true }
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
     wam_waf_analysis = {
       description  = "Function to analyse WAM WAF ACL traffic and email a report."
       role_key     = "get_cloudwatch"

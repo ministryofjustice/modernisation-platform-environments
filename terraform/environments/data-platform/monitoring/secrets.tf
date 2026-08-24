@@ -81,3 +81,36 @@ module "pagerduty_slack_connection_api_key_secret" {
     { "credential-expiration" = "none" }
   )
 }
+
+module "grafana_azure_monitor_secret" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
+
+  count = local.environment_configuration.monitoring_stack_enabled ? 1 : 0
+
+  name = "${local.component_name}/grafana-azure-monitor"
+
+  secret_string = jsonencode({
+    client_id       = "CHANGEME"
+    subscription_id = "CHANGEME"
+    tenant_id       = "CHANGEME"
+  })
+
+  ignore_secret_changes = true
+}
+
+# Google Cloud project used for Grafana's Google Cloud Monitoring datasource via
+# workload identity federation (see the ai-gateway component for the same pattern).
+module "google_cloud_monitoring_secret" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
+
+  count = local.environment_configuration.monitoring_stack_enabled ? 1 : 0
+
+  name = "${local.component_name}/google-cloud-platform/moj-gcp-ai-gateway"
+
+  secret_string = jsonencode({
+    project_name = "CHANGEME"
+    project_id   = "CHANGEME"
+  })
+
+  ignore_secret_changes = true
+}

@@ -678,11 +678,19 @@ module "cloudwatch_alarm_threader" {
     INCLUDE_REASON        = "true"
     ENABLE_CUSTOM_ACTIONS = "false"
     INCIDENT_QUEUE_URL    = aws_sqs_queue.live_feed_incident_events.id
+
     GLUE_DB_JANITOR_STATE_MACHINE_ARN = (
       aws_sfn_state_machine.staging_db_janitor.arn
     )
     GLUE_DB_JANITOR_STALE_MINUTES = "60"
     GLUE_DB_JANITOR_BATCH_SIZE    = "2000"
+
+    LANDING_DLQ_REDRIVER_STATE_MACHINE_ARN = (
+      aws_sfn_state_machine.landing_dlq_redriver.arn
+    )
+    LANDING_DLQ_ALARM_NAMES = jsonencode(
+      keys(local.landing_dlq_redriver_config)
+    )
   }
 }
 
@@ -1156,7 +1164,7 @@ module "poll_cadt" {
   production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
 
   environment_variables = {
-    CLUSTER_NAME        = aws_ecs_cluster.cadt.name
+    CLUSTER_NAME = aws_ecs_cluster.cadt.name
   }
 }
 
@@ -1240,5 +1248,10 @@ module "live_feed_incident_manager" {
     INCIDENT_STATE_BUCKET = local.alarm_thread_state_bucket
     INCIDENT_STATE_PREFIX = "incident-automation/episodes"
     AWS_ACCOUNT_ID        = data.aws_caller_identity.current.account_id
+
+    ENVIRONMENT_SNS_TOPIC_ARN = aws_sns_topic.emds_alerts.arn
+    OPERATIONAL_SNS_TOPIC_ARN = (
+      aws_sns_topic.operational_incident_updates.arn
+    )
   }
 }

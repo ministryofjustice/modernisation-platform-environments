@@ -51,18 +51,18 @@ resource "aws_efs_access_point" "lucene_sandbox" {
 }
 
 resource "aws_ssm_parameter" "efs_id_sandbox" {
-  count = local.is-development ? 1 : 0
-  name  = "/${local.application_name}/sandbox/efs-id"
-  type  = "SecureString"
-  value = aws_efs_file_system.lucene_sandbox[0].id
+  count  = local.is-development ? 1 : 0
+  name   = "/${local.application_name}/sandbox/efs-id"
+  type   = "SecureString"
+  value  = aws_efs_file_system.lucene_sandbox[0].id
   key_id = data.aws_kms_key.general_shared.arn
 }
 
 resource "aws_ssm_parameter" "efs_ap_id_sandbox" {
-  count = local.is-development ? 1 : 0
-  name  = "/${local.application_name}/sandbox/efs-access-point-id"
-  type  = "SecureString"
-  value = aws_efs_access_point.lucene_sandbox[0].id
+  count  = local.is-development ? 1 : 0
+  name   = "/${local.application_name}/sandbox/efs-access-point-id"
+  type   = "SecureString"
+  value  = aws_efs_access_point.lucene_sandbox[0].id
   key_id = data.aws_kms_key.general_shared.arn
 }
 
