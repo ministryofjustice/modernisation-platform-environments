@@ -60,6 +60,7 @@ resource "aws_apigatewayv2_route" "assessment" {
 }
 
 resource "aws_apigatewayv2_route" "health" {
+  #checkov:skip=CKV_AWS_309:The health endpoint is intentionally public and returns no sensitive data
   count = local.create_service ? 1 : 0
 
   api_id             = aws_apigatewayv2_api.benefit_checker[0].id
