@@ -36,11 +36,11 @@ locals {
     production = {
       default = [
         {
-          id     = "expire-objects-after-7-days"
+          id     = "expire-objects-after-1-day"
           status = "Enabled"
           filter = {}
           expiration = {
-            days = 7
+            days = 1
           }
           abort_incomplete_multipart_upload_days = 1
           noncurrent_version_expiration = {
@@ -60,40 +60,6 @@ locals {
     production = {
       default = local.s3_bucket_lifecycle_defaults.production.default
       buckets = {
-        clean = [
-          {
-            id     = "expire-clean-after-7-days"
-            status = "Enabled"
-            filter = {
-              prefix = "clean/"
-            }
-            expiration = {
-              days = 7
-            }
-            noncurrent_version_expiration = {
-              days = 7
-            }
-          },
-          {
-            id     = "expire-example-after-3-days"
-            status = "Enabled"
-            filter = {
-              prefix = "example/"
-            }
-            expiration = {
-              days = 3
-            }
-            noncurrent_version_expiration = {
-              days = 3
-            }
-          },
-          {
-            id                                     = "abort-incomplete-multipart-uploads-after-1-day"
-            status                                 = "Enabled"
-            filter                                 = {}
-            abort_incomplete_multipart_upload_days = 1
-          },
-        ]
         quarantine = [
           {
             id     = "expire-objects-after-7-days"
