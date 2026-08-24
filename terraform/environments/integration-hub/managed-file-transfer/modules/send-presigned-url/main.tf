@@ -4,7 +4,7 @@ locals {
 
 module "dynamodb_idempotency" {
   source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "5.5.0"
+  version = "5.5.1"
 
   name         = "${local.resource_name_prefix}-presigned-url-idempotency"
   billing_mode = "PAY_PER_REQUEST"
