@@ -20,13 +20,14 @@ module "equip_workspaces" {
   running_mode      = local.application_data.accounts[local.environment].running_mode
   auto_stop_timeout = local.application_data.accounts[local.environment].auto_stop_timeout
 
-  ip_group_allowed_cidrs     = local.application_data.accounts[local.environment].ip_group_allowed_cidrs
-  ip_group_name              = try(local.application_data.accounts[local.environment].ip_group_name, "")
-  ip_group_description       = try(local.application_data.accounts[local.environment].ip_group_description, "")
-  security_group_name        = try(local.application_data.accounts[local.environment].security_group_name, "")
-  security_group_description = try(local.application_data.accounts[local.environment].security_group_description, "")
-  security_group_vpc_id      = try(local.application_data.accounts[local.environment].security_group_vpc_id, "")
-  workspace_users            = local.application_data.accounts[local.environment].workspace_users
+  ip_group_allowed_cidrs      = local.application_data.accounts[local.environment].ip_group_allowed_cidrs
+  ip_group_name               = try(local.application_data.accounts[local.environment].ip_group_name, "")
+  ip_group_description        = try(local.application_data.accounts[local.environment].ip_group_description, "")
+  security_group_name         = try(local.application_data.accounts[local.environment].security_group_name, "")
+  security_group_description  = try(local.application_data.accounts[local.environment].security_group_description, "")
+  security_group_vpc_id       = try(local.application_data.accounts[local.environment].security_group_vpc_id, "")
+  security_group_egress_rules = try(local.application_data.accounts[local.environment].security_group_egress_rules, [])
+  workspace_users             = local.application_data.accounts[local.environment].workspace_users
 
   create_service_role = false
 

@@ -93,6 +93,17 @@ variable "security_group_vpc_id" {
   default     = ""
 }
 
+variable "security_group_egress_rules" {
+  type = list(object({
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+    description = string
+  }))
+  default = []
+}
+
 variable "ad_connector_description" {
   type    = string
   default = ""

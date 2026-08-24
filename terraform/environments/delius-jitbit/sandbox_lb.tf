@@ -57,9 +57,9 @@ resource "aws_lb_listener" "listener_sandbox" {
 resource "aws_ssm_parameter" "sandbox_active_deployment_colour" {
   count = local.is-development ? 1 : 0
 
-  name  = "/delius-jitbit/sandbox-blue-green-active-colour"
-  type  = "SecureString"
-  value = "blue"
+  name   = "/delius-jitbit/sandbox-blue-green-active-colour"
+  type   = "SecureString"
+  value  = "blue"
   key_id = data.aws_kms_key.general_shared.arn
 
   lifecycle {
