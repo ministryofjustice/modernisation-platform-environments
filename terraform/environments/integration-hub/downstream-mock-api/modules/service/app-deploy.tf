@@ -16,12 +16,10 @@ data "aws_iam_policy_document" "app_deploy_assume_role" {
     }
 
     condition {
-      test     = "StringLike"
+      test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
       values = [
-        "repo:ministryofjustice/integration-hub-downstream-mock-api:environment:${local.resource_application_name}-${local.environment}*",
-        "repo:ministryofjustice/integration-hub-downstream-mock-api:ref:refs/heads/main",
-        "repo:ministryofjustice/integration-hub-downstream-mock-api:ref:refs/heads/aws-ecs-deployment"
+        "repo:ministryofjustice@2203574/integration-hub-downstream-mock-api@1337550338:environment:${local.resource_application_name}-${local.environment}"
       ]
     }
   }
