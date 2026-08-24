@@ -101,6 +101,26 @@ data "aws_iam_policy_document" "cpr_integration" {
     actions   = ["lakeformation:GetDataAccess"]
     resources = ["*"]
   }
+  statement {
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:ListMultipartUploadParts"
+    ]
+    resources = [module.s3-athena-bucket.bucket.arn]
+  }
+  statement {
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:ListMultipartUploadParts"
+    ]
+    resources = ["${module.s3-athena-bucket.bucket.arn}/*"]
+  }
 }
 
 resource "aws_glue_catalog_database" "person_record" {
