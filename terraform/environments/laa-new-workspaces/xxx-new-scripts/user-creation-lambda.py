@@ -3,6 +3,16 @@ import boto3
 import time
 import os
 
+
+def escape_powershell_string(value):
+    return value.replace("'", "''")
+
+
+def get_username(event):
+    # Legacy behavior (for quick rollback):
+    # return f"{event['Firstname']}.{event['Lastname']}"
+    return event.get('Username') or f"{event['Firstname']}.{event['Lastname']}"
+
 def wait_for_ssm_command(ssm_client, command_id, instance_id, max_wait=300):
     """Poll SSM command status until it reaches a terminal state."""
     terminal_statuses = {'Success', 'Failed', 'TimedOut', 'Cancelled', 'DeliveryTimedOut'}
@@ -35,11 +45,18 @@ def create_ad_user(event):
     instance_id = os.environ['EC2_INSTANCE_ID']
     region = os.environ['REGION']
 
+    username = get_username(event)
     firstname = event['Firstname']
     lastname = event['Lastname']
     email = event['Email']
 
-    powershell_command = f"powershell.exe -File 'C:\\Windows\\system32\\user-creation.ps1' -Firstname '{firstname}' -Lastname '{lastname}' -Email '{email}'"
+    powershell_command = (
+        "powershell.exe -File 'C:\\Windows\\system32\\user-creation.ps1' "
+        f"-Username '{escape_powershell_string(username)}' "
+        f"-Firstname '{escape_powershell_string(firstname)}' "
+        f"-Lastname '{escape_powershell_string(lastname)}' "
+        f"-Email '{escape_powershell_string(email)}'"
+    )
 
     ssm_client = boto3.client('ssm', region_name=region)
     response = ssm_client.send_command(
@@ -176,9 +193,11 @@ def create_workspace(event):
     bundle_id = bundle_map.get(workspace_type, os.environ['BUNDLE_ID_STANDARD'])
     print(f"Using workspace type: {workspace_type} (bundle: {bundle_id})")
 
-    firstname = event['Firstname']
-    lastname = event['Lastname']
-    Username = f"{firstname}.{lastname}"
+    # Legacy behavior (for quick rollback):
+    # firstname = event['Firstname']
+    # lastname = event['Lastname']
+    # username = f"{firstname}.{lastname}"
+    username = get_username(event)
     
     workspaces = boto3.client('workspaces', region_name=region)
     
@@ -187,7 +206,7 @@ def create_workspace(event):
             Workspaces=[
                 {
                     'DirectoryId': directory_id,
-                    'UserName': Username,
+                    'UserName': username,
                     'BundleId': bundle_id,
                     'UserVolumeEncryptionEnabled': True,
                     'RootVolumeEncryptionEnabled': True,
@@ -242,7 +261,9 @@ def lambda_handler(event, context):
         firstname = event['Firstname']
         lastname = event['Lastname']
         email = event['Email']
-        username = f"{firstname}.{lastname}"
+        # Legacy behavior (for quick rollback):
+        # username = f"{firstname}.{lastname}"
+        username = get_username(event)
 
         password = create_ad_user(event)
 

@@ -69,8 +69,8 @@ resource "aws_route" "transit_gateway_to_network_firewall" {
         for subnet_key, subnet in local.subnets : {
           key              = "${attachment_key}-${subnet_key}"
           attachment_key   = attachment_key
-          attachment_az    = attachment.az
           destination_cidr = subnet.cidr_block
+          destination_az   = subnet.az
         } if subnet.type == "private"
       ]
     ]) : route.key => route
@@ -78,7 +78,7 @@ resource "aws_route" "transit_gateway_to_network_firewall" {
 
   route_table_id         = aws_route_table.additional[each.value.attachment_key].id
   destination_cidr_block = each.value.destination_cidr
-  vpc_endpoint_id        = data.aws_vpc_endpoint.network_firewall[each.value.attachment_az].id
+  vpc_endpoint_id        = data.aws_vpc_endpoint.network_firewall[each.value.destination_az].id
 
   depends_on = [aws_networkfirewall_firewall.main]
 }
