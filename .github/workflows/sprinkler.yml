@@ -14,6 +14,7 @@ on:
     paths:
       - 'terraform/environments/sprinkler/**'
       - '.github/workflows/sprinkler.yml'
+      - '.github/workflows/reusable_terraform_components_plan_apply.yml'
 
   workflow_dispatch:
     inputs:
