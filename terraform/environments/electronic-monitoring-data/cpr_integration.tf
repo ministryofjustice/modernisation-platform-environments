@@ -150,7 +150,7 @@ resource "aws_lakeformation_permissions" "cpr_integration_db" {
 
 resource "aws_lakeformation_permissions" "cpr_integration_db_tables" {
   principal   = module.emd_cpr_integration_role.iam_role_arn
-  permissions = ["SELECT", "DESCRIBE", "CREATE"]
+  permissions = ["SELECT", "DESCRIBE", "CREATE_TABLE"]
   table {
     database_name = "person_record${local.db_suffix}"
     wildcard      = true
