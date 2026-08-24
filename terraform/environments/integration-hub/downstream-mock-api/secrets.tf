@@ -1,0 +1,18 @@
+module "downstream_basic_auth_secret" {
+  source  = "terraform-aws-modules/secrets-manager/aws"
+  version = "2.1.0"
+
+  name                    = "${local.resource_name_prefix}-${local.environment}-basic-auth"
+  description             = "Basic auth credentials for the downstream mock API"
+  recovery_window_in_days = 7
+  create_policy           = false
+  block_public_policy     = true
+  ignore_secret_changes   = true
+
+  secret_string = jsonencode({
+    username = "orchestration-client"
+    password = "replace-me"
+  })
+
+  tags = local.tags
+}

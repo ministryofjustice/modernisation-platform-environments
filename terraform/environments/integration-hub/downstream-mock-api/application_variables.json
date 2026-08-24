@@ -1,0 +1,44 @@
+{
+  "accounts": {
+    "development": {
+      "service_configuration": {
+        "desired_count": 1,
+        "task_cpu": 512,
+        "task_memory": 1024,
+        "container_port": 8080,
+        "health_check_path": "/health/ping",
+        "bootstrap_image_tag": "latest"
+      }
+    },
+    "test": {
+      "service_configuration": {
+        "desired_count": 1,
+        "task_cpu": 512,
+        "task_memory": 1024,
+        "container_port": 8080,
+        "health_check_path": "/health/ping",
+        "bootstrap_image_tag": "latest"
+      }
+    },
+    "preproduction": {
+      "service_configuration": {
+        "desired_count": 2,
+        "task_cpu": 512,
+        "task_memory": 1024,
+        "container_port": 8080,
+        "health_check_path": "/health/ping",
+        "bootstrap_image_tag": "latest"
+      }
+    },
+    "production": {
+      "service_configuration": {
+        "desired_count": 2,
+        "task_cpu": 512,
+        "task_memory": 1024,
+        "container_port": 8080,
+        "health_check_path": "/health/ping",
+        "bootstrap_image_tag": "latest"
+      }
+    }
+  }
+}
