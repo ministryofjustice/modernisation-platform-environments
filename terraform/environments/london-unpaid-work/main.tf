@@ -29,7 +29,26 @@ module "baseline_presets" {
   ip_addresses = module.ip_addresses
 
   options = merge(
-    local.baseline_presets_all_environments.options
-    # local.baseline_presets_environment_specific.options
+    local.baseline_presets_all_environments.options,
+    local.baseline_presets_environment_specific.options
   )
 }
+
+module "baseline" {
+  source = "../../modules/baseline"
+
+  providers = {
+    aws                       = aws
+    aws.core-network-services = aws.core-network-services
+    aws.core-vpc              = aws.core-vpc
+    aws.us-east-1             = aws.us-east-1
+  }
+
+  environment = module.environment
+
+  lbs = merge(
+    lookup(local.baseline_all_environments, "lbs", {}),
+    lookup(local.baseline_environment_specific, "lbs", {})
+  )
+}
+
