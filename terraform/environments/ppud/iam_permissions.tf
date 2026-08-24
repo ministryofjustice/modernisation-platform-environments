@@ -86,7 +86,7 @@ locals {
       description = "Lambda Function Role for SES logging"
       policies = [
         "send_message_to_sqs",
-        "sns_send_message_to_sqs",
+        "sns_publish",
         "send_logs_to_cloudwatch",
         "publish_to_sns",
         "put_data_s3"
@@ -96,7 +96,7 @@ locals {
       description = "Lambda Function Role for retrieving ELB metrics from S3"
       policies = [
         "send_message_to_sqs",
-        "sns_send_message_to_sqs",
+        "sns_publish",
         "send_logs_to_cloudwatch",
         "get_data_s3",
         "get_cloudwatch_metrics"
