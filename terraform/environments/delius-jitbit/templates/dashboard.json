@@ -16,25 +16,70 @@
             "ClusterName",
             "hmpps-${environment}-${app_name}",
             {
-              "label": "${app_name}-service"
+              "id": "service_used",
+              "visible": false
             }
           ],
           [
-            ".",
-            ".",
+            "ECS/ContainerInsights",
+            "CpuReserved",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}",
             "ClusterName",
-            ".",
+            "hmpps-${environment}-${app_name}",
             {
-              "label": "${app_name}-cluster"
+              "id": "service_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(service_used / service_reserved) * 100",
+              "label": "${app_name}-service",
+              "id": "service_pct"
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "CpuUtilized",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "cluster_used",
+              "visible": false
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "CpuReserved",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "cluster_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(cluster_used / cluster_reserved) * 100",
+              "label": "${app_name}-cluster",
+              "id": "cluster_pct"
             }
           ]
         ],
         "view": "timeSeries",
-        "stacked": true,
+        "stacked": false,
         "region": "eu-west-2",
         "title": "CPU Utilization",
         "stat": "Average",
-        "period": 300
+        "period": 300,
+        "yAxis": {
+          "left": {
+            "label": "%",
+            "min": 0,
+            "max": 100
+          }
+        }
       }
     },
     {
@@ -53,25 +98,70 @@
             "ClusterName",
             "hmpps-${environment}-${app_name}",
             {
-              "label": "${app_name}-service"
+              "id": "service_used",
+              "visible": false
             }
           ],
           [
-            ".",
-            ".",
+            "ECS/ContainerInsights",
+            "MemoryReserved",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}",
             "ClusterName",
-            ".",
+            "hmpps-${environment}-${app_name}",
             {
-              "label": "${app_name}-cluster"
+              "id": "service_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(service_used / service_reserved) * 100",
+              "label": "${app_name}-service",
+              "id": "service_pct"
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "MemoryUtilized",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "cluster_used",
+              "visible": false
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "MemoryReserved",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "cluster_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(cluster_used / cluster_reserved) * 100",
+              "label": "${app_name}-cluster",
+              "id": "cluster_pct"
             }
           ]
         ],
         "view": "timeSeries",
-        "stacked": true,
+        "stacked": false,
         "region": "eu-west-2",
         "title": "Memory Utilization",
         "stat": "Average",
-        "period": 300
+        "period": 300,
+        "yAxis": {
+          "left": {
+            "label": "%",
+            "min": 0,
+            "max": 100
+          }
+        }
       }
     },
     {
