@@ -1,18 +1,3 @@
-moved {
-  from = aws_cloudwatch_log_group.app_logs
-  to   = aws_cloudwatch_log_group.app_logs[0]
-}
-
-moved {
-  from = aws_cloudwatch_log_metric_filter.error
-  to   = aws_cloudwatch_log_metric_filter.error[0]
-}
-
-moved {
-  from = aws_cloudwatch_metric_alarm.jitbit_high_error_volume
-  to   = aws_cloudwatch_metric_alarm.jitbit_high_error_volume[0]
-}
-
 locals {
   service_name = "hmpps-${local.environment}-${local.application_name}"
 }
@@ -75,9 +60,9 @@ resource "aws_cloudwatch_log_metric_filter" "error_blue" {
   log_group_name = aws_cloudwatch_log_group.app_logs_blue[0].name
 
   metric_transformation {
-    name          = "ErrorCountBlue"
-    namespace     = "JitbitMetrics"
-    value         = "1"
+    name      = "ErrorCountBlue"
+    namespace = "JitbitMetrics"
+    value     = "1"
   }
 }
 
@@ -90,16 +75,16 @@ resource "aws_cloudwatch_log_metric_filter" "error_green" {
   log_group_name = aws_cloudwatch_log_group.app_logs_green[0].name
 
   metric_transformation {
-    name          = "ErrorCountGreen"
-    namespace     = "JitbitMetrics"
-    value         = "1"
+    name      = "ErrorCountGreen"
+    namespace = "JitbitMetrics"
+    value     = "1"
   }
 }
 
 resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume" {
   count = local.create_blue_green ? 0 : 1
 
-  alarm_name          = "jitbit-high-error-count"
+  alarm_name          = "${local.environment}-jitbit-high-error-count"
   alarm_description   = "Triggers alarm if there are more than 10 errors for 2 consecutive periods"
   namespace           = "JitbitMetrics"
   metric_name         = "ErrorCount"
@@ -111,12 +96,14 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume" {
   threshold           = "10"
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
+
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume_blue" {
   count = local.create_blue_green ? 1 : 0
 
-  alarm_name          = "jitbit-high-error-count-blue"
+  alarm_name          = "${local.environment}-jitbit-high-error-count-blue"
   alarm_description   = "Triggers alarm if there are more than 10 errors for 2 consecutive periods"
   namespace           = "JitbitMetrics"
   metric_name         = "ErrorCountBlue"
@@ -128,12 +115,14 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume_blue" {
   threshold           = "10"
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
+
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume_green" {
   count = local.create_blue_green ? 1 : 0
 
-  alarm_name          = "jitbit-high-error-count-green"
+  alarm_name          = "${local.environment}-jitbit-high-error-count-green"
   alarm_description   = "Triggers alarm if there are more than 10 errors for 2 consecutive periods"
   namespace           = "JitbitMetrics"
   metric_name         = "ErrorCountGreen"
@@ -145,4 +134,6 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume_green" {
   threshold           = "10"
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
+
+  tags = merge(local.tags, { Name = local.application_name })
 }
