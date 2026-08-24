@@ -196,7 +196,9 @@ data "aws_iam_policy_document" "dpd_github_redshift_policy" {
     actions = [
       "redshift-data:ExecuteStatement",
       "redshift-data:DescribeStatement",
-      "redshift-data:GetStatementResult"
+      "redshift-data:GetStatementResult",
+      "redshift-data:BatchExecuteStatement",
+      "redshift-data:ListStatements"
     ]
     resources = [
       "arn:aws:redshift:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster:*"
@@ -208,9 +210,24 @@ data "aws_iam_policy_document" "dpd_github_redshift_policy" {
     effect = "Allow"
     actions = [
       "redshift-data:DescribeStatement",
-      "redshift-data:GetStatementResult"
+      "redshift-data:GetStatementResult",
+      "redshift-data:CancelStatement"
     ]
     resources = ["*"]
+  }
+
+  statement {
+    sid    = "RedshiftGetClusterCredentials"
+    effect = "Allow"
+    actions = [
+      "redshift:GetClusterCredentials",
+      "redshift:DescribeClusters"
+    ]
+    resources = [
+      "arn:aws:redshift:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster:dpr-redshift-*",
+      "arn:aws:redshift:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:dbuser:dpr-redshift-*/dpruser",
+      "arn:aws:redshift:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:dbname:dpr-redshift-*/datamart"
+    ]
   }
 }
 
