@@ -186,5 +186,5 @@ resource "aws_lakeformation_permissions" "cpr_integration_db_tables" {
 resource "aws_lakeformation_permissions" "cpr_integration_create_dbs" {
   principal   = module.emd_cpr_integration_role.iam_role_arn
   permissions = ["CREATE_DATABASE"]
-  catalog_resource {}
+  catalog_resource = true
 }
