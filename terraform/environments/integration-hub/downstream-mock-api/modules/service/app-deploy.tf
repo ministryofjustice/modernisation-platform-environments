@@ -1,4 +1,5 @@
 data "aws_iam_policy_document" "app_deploy_assume_role" {
+  #checkov:skip=CKV_AWS_358:MoJ customises the OIDC subject with immutable organisation and repository IDs; the exact environment subject is safer than Checkov's expected default GitHub format
   statement {
     effect = "Allow"
 
