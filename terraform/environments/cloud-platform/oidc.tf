@@ -135,18 +135,17 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     sid    = "CloudWatchLogging"
     effect = "Allow"
     actions = [
-      # "logs:CreateLogGroup",
-      # "logs:DeleteLogGroup",
-      # "logs:CreateLogStream",
-      # "logs:CreateLogDelivery",
-      # "logs:CreateDelivery",
-      # "logs:DeleteDelivery*",
-      # "logs:PutLogEvents",
-      # "logs:PutRetentionPolicy",
-      # "logs:Describe*",
-      # "logs:PutDelivery*",
-      # "logs:TagResource",
-      "logs:*",
+      "logs:CreateLogGroup",
+      "logs:DeleteLogGroup",
+      "logs:CreateLogStream",
+      "logs:CreateLogDelivery",
+      "logs:CreateDelivery",
+      "logs:DeleteDelivery*",
+      "logs:PutLogEvents",
+      "logs:PutRetentionPolicy",
+      "logs:Describe*",
+      "logs:PutDelivery*",
+      "logs:TagResource",
       "cloudwatch:PutMetricData"
     ]
     resources = ["*"]
