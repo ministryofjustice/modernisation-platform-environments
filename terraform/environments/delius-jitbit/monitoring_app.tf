@@ -60,9 +60,9 @@ resource "aws_cloudwatch_log_metric_filter" "error_blue" {
   log_group_name = aws_cloudwatch_log_group.app_logs_blue[0].name
 
   metric_transformation {
-    name          = "ErrorCountBlue"
-    namespace     = "JitbitMetrics"
-    value         = "1"
+    name      = "ErrorCountBlue"
+    namespace = "JitbitMetrics"
+    value     = "1"
   }
 }
 
@@ -75,9 +75,9 @@ resource "aws_cloudwatch_log_metric_filter" "error_green" {
   log_group_name = aws_cloudwatch_log_group.app_logs_green[0].name
 
   metric_transformation {
-    name          = "ErrorCountGreen"
-    namespace     = "JitbitMetrics"
-    value         = "1"
+    name      = "ErrorCountGreen"
+    namespace = "JitbitMetrics"
+    value     = "1"
   }
 }
 
@@ -96,6 +96,8 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume" {
   threshold           = "10"
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
+
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume_blue" {
@@ -113,6 +115,8 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume_blue" {
   threshold           = "10"
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
+
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume_green" {
@@ -130,4 +134,6 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume_green" {
   threshold           = "10"
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
+
+  tags = merge(local.tags, { Name = local.application_name })
 }

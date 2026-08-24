@@ -25,12 +25,7 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_cpu_over_threshold" {
     ServiceName = local.cluster_name
   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = local.application_name
-    }
-  )
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 # Alarm for high memory usage
@@ -55,12 +50,7 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_memory_over_threshold" {
     ServiceName = local.cluster_name
   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = local.application_name
-    }
-  )
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 # Alarm for high CPU usage
@@ -85,12 +75,7 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_cpu_over_threshold_blue" {
     ServiceName = "${local.cluster_name}-blue"
   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-blue"
-    }
-  )
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 # Alarm for high CPU usage
@@ -115,12 +100,7 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_cpu_over_threshold_green" {
     ServiceName = "${local.cluster_name}-green"
   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-green"
-    }
-  )
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 # Alarm for high memory usage
@@ -145,12 +125,7 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_memory_over_threshold_blue" {
     ServiceName = "${local.cluster_name}-blue"
   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-blue"
-    }
-  )
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 # Alarm for high memory usage
@@ -175,10 +150,5 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_memory_over_threshold_green" {
     ServiceName = "${local.cluster_name}-green"
   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-green"
-    }
-  )
+  tags = merge(local.tags, { Name = local.application_name })
 }

@@ -15,6 +15,8 @@ resource "aws_cloudwatch_metric_alarm" "lb_high_5XX_count" {
   dimensions = {
     LoadBalancer = aws_lb.external.arn
   }
+
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 resource "aws_cloudwatch_metric_alarm" "lb_high_4XX_count" {
@@ -34,6 +36,8 @@ resource "aws_cloudwatch_metric_alarm" "lb_high_4XX_count" {
   dimensions = {
     LoadBalancer = aws_lb.external.arn
   }
+
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 resource "aws_cloudwatch_metric_alarm" "lb_high_target_response_time" {
@@ -53,6 +57,8 @@ resource "aws_cloudwatch_metric_alarm" "lb_high_target_response_time" {
   dimensions = {
     LoadBalancer = aws_lb.external.arn
   }
+
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 resource "aws_cloudwatch_metric_alarm" "lb_high_unhealthy_host_count" {
@@ -75,6 +81,8 @@ resource "aws_cloudwatch_metric_alarm" "lb_high_unhealthy_host_count" {
     LoadBalancer = aws_lb.external.arn_suffix
     TargetGroup  = aws_lb_target_group.target_group_fargate[0].arn_suffix
   }
+
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 resource "aws_cloudwatch_metric_alarm" "lb_high_unhealthy_host_count_blue" {
@@ -97,6 +105,8 @@ resource "aws_cloudwatch_metric_alarm" "lb_high_unhealthy_host_count_blue" {
     LoadBalancer = aws_lb.external.arn_suffix
     TargetGroup  = aws_lb_target_group.target_group_fargate_blue[0].arn_suffix
   }
+
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 resource "aws_cloudwatch_metric_alarm" "lb_high_unhealthy_host_count_green" {
@@ -119,6 +129,8 @@ resource "aws_cloudwatch_metric_alarm" "lb_high_unhealthy_host_count_green" {
     LoadBalancer = aws_lb.external.arn_suffix
     TargetGroup  = aws_lb_target_group.target_group_fargate_green[0].arn_suffix
   }
+
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 resource "aws_cloudwatch_metric_alarm" "target_group_high_4XX_error_rate" {
@@ -140,6 +152,8 @@ resource "aws_cloudwatch_metric_alarm" "target_group_high_4XX_error_rate" {
     LoadBalancer   = aws_lb.external.arn_suffix
     TargetGroupArn = aws_lb_target_group.target_group_fargate[0].arn_suffix
   }
+
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 resource "aws_cloudwatch_metric_alarm" "target_group_high_4XX_error_rate_blue" {
@@ -161,6 +175,8 @@ resource "aws_cloudwatch_metric_alarm" "target_group_high_4XX_error_rate_blue" {
     LoadBalancer   = aws_lb.external.arn_suffix
     TargetGroupArn = aws_lb_target_group.target_group_fargate_blue[0].arn_suffix
   }
+
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 resource "aws_cloudwatch_metric_alarm" "target_group_high_4XX_error_rate_green" {
@@ -182,6 +198,8 @@ resource "aws_cloudwatch_metric_alarm" "target_group_high_4XX_error_rate_green" 
     LoadBalancer   = aws_lb.external.arn_suffix
     TargetGroupArn = aws_lb_target_group.target_group_fargate_green[0].arn_suffix
   }
+
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 resource "aws_cloudwatch_metric_alarm" "target_group_high_5XX_error_rate" {
@@ -203,6 +221,8 @@ resource "aws_cloudwatch_metric_alarm" "target_group_high_5XX_error_rate" {
     LoadBalancer   = aws_lb.external.arn
     TargetGroupArn = aws_lb_target_group.target_group_fargate[0].arn
   }
+
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 resource "aws_cloudwatch_metric_alarm" "target_group_high_5XX_error_rate_blue" {
@@ -224,6 +244,8 @@ resource "aws_cloudwatch_metric_alarm" "target_group_high_5XX_error_rate_blue" {
     LoadBalancer   = aws_lb.external.arn
     TargetGroupArn = aws_lb_target_group.target_group_fargate_blue[0].arn
   }
+
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
 resource "aws_cloudwatch_metric_alarm" "target_group_high_5XX_error_rate_green" {
@@ -245,5 +267,7 @@ resource "aws_cloudwatch_metric_alarm" "target_group_high_5XX_error_rate_green" 
     LoadBalancer   = aws_lb.external.arn
     TargetGroupArn = aws_lb_target_group.target_group_fargate_green[0].arn
   }
+
+  tags = merge(local.tags, { Name = local.application_name })
 }
 
