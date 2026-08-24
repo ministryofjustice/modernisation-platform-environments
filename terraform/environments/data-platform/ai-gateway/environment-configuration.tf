@@ -1,7 +1,7 @@
 locals {
   environment_configurations = {
     development = {
-      litellm_version     = "1.96.2"
+      litellm_version     = "1.97.0"
       ai_gateway_hostname = "development.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
@@ -31,7 +31,7 @@ locals {
         target_cpu_utilization_percentage = 60
       }
       aurora_instance_class = "db.serverless"
-      aurora_engine_version = "17.9"
+      aurora_engine_version = "18.4"
       aurora_instances      = { writer = {} }
       aurora_serverlessv2_scaling_configuration = {
         min_capacity             = 0
@@ -41,7 +41,7 @@ locals {
       elasticache_node_type = "cache.t4g.medium"
     }
     test = {
-      litellm_version     = "1.96.2"
+      litellm_version     = "1.97.0"
       ai_gateway_hostname = "test.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
@@ -71,7 +71,7 @@ locals {
         target_cpu_utilization_percentage = 60
       }
       aurora_instance_class = "db.serverless"
-      aurora_engine_version = "17.9"
+      aurora_engine_version = "18.4"
       aurora_instances      = { writer = {} }
       aurora_serverlessv2_scaling_configuration = {
         min_capacity             = 0
@@ -81,7 +81,7 @@ locals {
       elasticache_node_type = "cache.t4g.medium"
     }
     preproduction = {
-      litellm_version     = "1.96.2"
+      litellm_version     = "1.97.0"
       ai_gateway_hostname = "preproduction.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
@@ -111,7 +111,7 @@ locals {
         target_cpu_utilization_percentage = 60
       }
       aurora_instance_class = "db.serverless"
-      aurora_engine_version = "17.9"
+      aurora_engine_version = "18.4"
       aurora_instances      = { writer = {} }
       aurora_serverlessv2_scaling_configuration = {
         min_capacity             = 0
@@ -121,7 +121,7 @@ locals {
       elasticache_node_type = "cache.t4g.medium"
     }
     production = {
-      litellm_version     = "1.96.2"
+      litellm_version     = "1.97.0"
       ai_gateway_hostname = "ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
@@ -129,7 +129,11 @@ locals {
         "35.176.93.186/32", # GlobalProtect (Alpha)
         # Sites
         "213.121.161.112/28", # 102PF
-        "51.149.2.0/24"       # 10SC
+        "51.149.2.0/24",      # 10SC
+        # Cloud Platform
+        "35.178.209.113/32",
+        "3.8.51.207/32",
+        "35.177.252.54/32"
       ]
       ai_gateway_admin_ingress_allowlist = [
         # VPN
