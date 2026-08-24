@@ -16,9 +16,30 @@
             "ClusterName",
             "hmpps-${environment}-${app_name}",
             {
-              "label": "${app_name}-service-blue"
+              "id": "blue_used",
+              "visible": false
             }
           ],
+          [
+            "ECS/ContainerInsights",
+            "CpuReserved",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}-blue",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "blue_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(blue_used / blue_reserved) * 100",
+              "label": "${app_name}-service-blue",
+              "id": "blue_pct"
+            }
+          ],
+
           [
             "ECS/ContainerInsights",
             "CpuUtilized",
@@ -27,25 +48,71 @@
             "ClusterName",
             "hmpps-${environment}-${app_name}",
             {
-              "label": "${app_name}-service-green"
+              "id": "green_used",
+              "visible": false
             }
           ],
+          [
+            "ECS/ContainerInsights",
+            "CpuReserved",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}-green",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "green_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(green_used / green_reserved) * 100",
+              "label": "${app_name}-service-green",
+              "id": "green_pct"
+            }
+          ],
+
           [
             "ECS/ContainerInsights",
             "CpuUtilized",
             "ClusterName",
             "hmpps-${environment}-${app_name}",
             {
-              "label": "${app_name}-cluster"
+              "id": "cluster_used",
+              "visible": false
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "CpuReserved",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "cluster_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(cluster_used / cluster_reserved) * 100",
+              "label": "${app_name}-cluster",
+              "id": "cluster_pct"
             }
           ]
         ],
         "view": "timeSeries",
-        "stacked": true,
+        "stacked": false,
         "region": "eu-west-2",
         "title": "CPU Utilization",
         "stat": "Average",
-        "period": 300
+        "period": 300,
+        "yAxis": {
+          "left": {
+            "label": "%",
+            "min": 0,
+            "max": 100
+          }
+        }
       }
     },
     {
@@ -64,7 +131,27 @@
             "ClusterName",
             "hmpps-${environment}-${app_name}",
             {
-              "label": "${app_name}-service-blue"
+              "id": "blue_used",
+              "visible": false
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "MemoryReserved",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}-blue",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "blue_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(blue_used / blue_reserved) * 100",
+              "label": "${app_name}-service-blue",
+              "id": "blue_pct"
             }
           ],
           [
@@ -75,7 +162,27 @@
             "ClusterName",
             "hmpps-${environment}-${app_name}",
             {
-              "label": "${app_name}-service-green"
+              "id": "green_used",
+              "visible": false
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "MemoryReserved",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}-green",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "green_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(green_used / green_reserved) * 100",
+              "label": "${app_name}-service-green",
+              "id": "green_pct"
             }
           ],
           [
@@ -84,49 +191,41 @@
             "ClusterName",
             "hmpps-${environment}-${app_name}",
             {
-              "label": "${app_name}-cluster"
-            }
-          ]
-        ],
-        "view": "timeSeries",
-        "stacked": true,
-        "region": "eu-west-2",
-        "title": "Memory Utilization",
-        "stat": "Average",
-        "period": 300
-      }
-    },
-    {
-      "type": "metric",
-      "x": 0,
-      "y": 7,
-      "width": 12,
-      "height": 6,
-      "properties": {
-        "metrics": [
-          [
-            "JitbitMetrics",
-            "ErrorCountBlue",
-            {
-              "label": "Blue",
-              "color": "#1f77b4"
+              "id": "cluster_used",
+              "visible": false
             }
           ],
           [
-            ".",
-            "ErrorCountGreen",
+            "ECS/ContainerInsights",
+            "MemoryReserved",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
             {
-              "label": "Green",
-              "color": "#2ca02c"
+              "id": "cluster_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(cluster_used / cluster_reserved) * 100",
+              "label": "${app_name}-cluster",
+              "id": "cluster_pct"
             }
           ]
         ],
         "view": "timeSeries",
-        "stacked": true,
+        "stacked": false,
         "region": "eu-west-2",
+        "title": "Memory Utilization",
         "stat": "Average",
         "period": 300,
-        "title": "Jitbit Application Errors"
+        "yAxis": {
+          "left": {
+            "label": "%",
+            "min": 0,
+            "max": 100
+          }
+        }
       }
     },
     {
