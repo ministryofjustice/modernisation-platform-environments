@@ -44,6 +44,7 @@ data "aws_iam_policy_document" "cpr_integration" {
       "glue:GetDatabase",
       "glue:GetTables",
       "glue:GetTable",
+      "glue:CreateDatabase",
     ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
@@ -55,7 +56,6 @@ data "aws_iam_policy_document" "cpr_integration" {
       "glue:GetDatabase",
       "glue:GetTables",
       "glue:GetTable",
-      "glue:CreateDatabase",
     ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/person_record${local.db_suffix}",
@@ -167,7 +167,7 @@ resource "aws_lakeformation_permissions" "cpr_integration_int_fms_tables" {
 
 resource "aws_lakeformation_permissions" "cpr_integration_db" {
   principal   = module.emd_cpr_integration_role.iam_role_arn
-  permissions = ["DESCRIBE"]
+  permissions = ["DESCRIBE", "CREATE_TABLE"]
   database {
     name = "person_record${local.db_suffix}"
   }
@@ -175,9 +175,16 @@ resource "aws_lakeformation_permissions" "cpr_integration_db" {
 
 resource "aws_lakeformation_permissions" "cpr_integration_db_tables" {
   principal   = module.emd_cpr_integration_role.iam_role_arn
-  permissions = ["SELECT", "DESCRIBE", "CREATE_TABLE"]
+  permissions = ["SELECT", "DESCRIBE"]
   table {
     database_name = "person_record${local.db_suffix}"
     wildcard      = true
   }
+}
+
+
+resource "aws_lakeformation_permissions" "cpr_integration_create_dbs" {
+  principal   = module.emd_cpr_integration_role.iam_role_arn
+  permissions = ["CREATE_DATABASE"]
+  catalog_resource {}
 }
