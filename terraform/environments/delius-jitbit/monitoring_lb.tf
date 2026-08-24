@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_metric_alarm" "lb_high_5XX_count" {
-  alarm_name                = "${local.application_name}-lb-5XX-count--critical"
+  alarm_name                = "${local.environment}-${local.application_name}-lb-5XX-count--critical"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "2"
   metric_name               = "HTTPCode_ELB_5XX_Count"
@@ -18,7 +18,7 @@ resource "aws_cloudwatch_metric_alarm" "lb_high_5XX_count" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "lb_high_4XX_count" {
-  alarm_name                = "${local.application_name}-lb-4XX-count--critical"
+  alarm_name                = "${local.environment}-${local.application_name}-lb-4XX-count--critical"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "2"
   metric_name               = "HTTPCode_ELB_4XX_Count"
@@ -37,7 +37,7 @@ resource "aws_cloudwatch_metric_alarm" "lb_high_4XX_count" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "lb_high_target_response_time" {
-  alarm_name                = "${local.application_name}-lb-target-response-time--critical"
+  alarm_name                = "${local.environment}-${local.application_name}-lb-target-response-time--critical"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "2"
   metric_name               = "TargetResponseTime"
@@ -58,7 +58,7 @@ resource "aws_cloudwatch_metric_alarm" "lb_high_target_response_time" {
 resource "aws_cloudwatch_metric_alarm" "lb_high_unhealthy_host_count" {
   count = local.create_blue_green ? 0 : 1
 
-  alarm_name                = "${local.application_name}-unhealthy-host-count--critical"
+  alarm_name                = "${local.environment}-${local.application_name}-unhealthy-host-count--critical"
   comparison_operator       = "LessThanOrEqualToThreshold"
   evaluation_periods        = "1"
   metric_name               = "HealthyHostCount"
@@ -80,7 +80,7 @@ resource "aws_cloudwatch_metric_alarm" "lb_high_unhealthy_host_count" {
 resource "aws_cloudwatch_metric_alarm" "lb_high_unhealthy_host_count_blue" {
   count = local.create_blue_green ? 1 : 0
 
-  alarm_name                = "${local.application_name}-blue-unhealthy-host-count--critical"
+  alarm_name                = "${local.environment}-${local.application_name}-blue-unhealthy-host-count--critical"
   comparison_operator       = "LessThanOrEqualToThreshold"
   evaluation_periods        = "1"
   metric_name               = "HealthyHostCount"
@@ -102,7 +102,7 @@ resource "aws_cloudwatch_metric_alarm" "lb_high_unhealthy_host_count_blue" {
 resource "aws_cloudwatch_metric_alarm" "lb_high_unhealthy_host_count_green" {
   count = local.create_blue_green ? 1 : 0
 
-  alarm_name                = "${local.application_name}-green-unhealthy-host-count--critical"
+  alarm_name                = "${local.environment}-${local.application_name}-green-unhealthy-host-count--critical"
   comparison_operator       = "LessThanOrEqualToThreshold"
   evaluation_periods        = "1"
   metric_name               = "HealthyHostCount"
@@ -124,7 +124,7 @@ resource "aws_cloudwatch_metric_alarm" "lb_high_unhealthy_host_count_green" {
 resource "aws_cloudwatch_metric_alarm" "target_group_high_4XX_error_rate" {
   count = local.create_blue_green ? 0 : 1
 
-  alarm_name          = "${local.application_name}-target-group-high-4XX-error-rate--critical"
+  alarm_name          = "${local.environment}-${local.application_name}-target-group-high-4XX-error-rate--critical"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
   metric_name         = "HTTPCode_Target_4XX_Count"
@@ -145,7 +145,7 @@ resource "aws_cloudwatch_metric_alarm" "target_group_high_4XX_error_rate" {
 resource "aws_cloudwatch_metric_alarm" "target_group_high_4XX_error_rate_blue" {
   count = local.create_blue_green ? 1 : 0
 
-  alarm_name          = "${local.application_name}-blue-target-group-high-4XX-error-rate--critical"
+  alarm_name          = "${local.environment}-${local.application_name}-blue-target-group-high-4XX-error-rate--critical"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
   metric_name         = "HTTPCode_Target_4XX_Count"
@@ -166,7 +166,7 @@ resource "aws_cloudwatch_metric_alarm" "target_group_high_4XX_error_rate_blue" {
 resource "aws_cloudwatch_metric_alarm" "target_group_high_4XX_error_rate_green" {
   count = local.create_blue_green ? 1 : 0
 
-  alarm_name          = "${local.application_name}-green-target-group-high-4XX-error-rate--critical"
+  alarm_name          = "${local.environment}-${local.application_name}-green-target-group-high-4XX-error-rate--critical"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
   metric_name         = "HTTPCode_Target_4XX_Count"
@@ -187,7 +187,7 @@ resource "aws_cloudwatch_metric_alarm" "target_group_high_4XX_error_rate_green" 
 resource "aws_cloudwatch_metric_alarm" "target_group_high_5XX_error_rate" {
   count = local.create_blue_green ? 0 : 1
 
-  alarm_name          = "${local.application_name}-target-group-high-5XX-error-rate--critical"
+  alarm_name          = "${local.environment}-${local.application_name}-target-group-high-5XX-error-rate--critical"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
   metric_name         = "HTTPCode_Target_5XX_Count"
@@ -208,7 +208,7 @@ resource "aws_cloudwatch_metric_alarm" "target_group_high_5XX_error_rate" {
 resource "aws_cloudwatch_metric_alarm" "target_group_high_5XX_error_rate_blue" {
   count = local.create_blue_green ? 1 : 0
 
-  alarm_name          = "${local.application_name}-blue-target-group-high-5XX-error-rate--critical"
+  alarm_name          = "${local.environment}-${local.application_name}-blue-target-group-high-5XX-error-rate--critical"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
   metric_name         = "HTTPCode_Target_5XX_Count"
@@ -229,7 +229,7 @@ resource "aws_cloudwatch_metric_alarm" "target_group_high_5XX_error_rate_blue" {
 resource "aws_cloudwatch_metric_alarm" "target_group_high_5XX_error_rate_green" {
   count = local.create_blue_green ? 1 : 0
 
-  alarm_name          = "${local.application_name}-green-target-group-high-5XX-error-rate--critical"
+  alarm_name          = "${local.environment}-${local.application_name}-green-target-group-high-5XX-error-rate--critical"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
   metric_name         = "HTTPCode_Target_5XX_Count"

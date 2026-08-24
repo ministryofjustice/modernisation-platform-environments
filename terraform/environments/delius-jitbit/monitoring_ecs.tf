@@ -1,13 +1,3 @@
-moved {
-  from = aws_cloudwatch_metric_alarm.jitbit_memory_over_threshold
-  to   = aws_cloudwatch_metric_alarm.jitbit_memory_over_threshold[0]
-}
-
-moved {
-  from = aws_cloudwatch_metric_alarm.jitbit_cpu_over_threshold
-  to   = aws_cloudwatch_metric_alarm.jitbit_cpu_over_threshold[0]
-}
-
 # Terraform alarms for ECS Cluster
 locals {
   cluster_name = split("/", module.ecs.ecs_cluster_arn)[1]
@@ -17,7 +7,7 @@ locals {
 resource "aws_cloudwatch_metric_alarm" "jitbit_cpu_over_threshold" {
   count = local.create_blue_green ? 0 : 1
 
-  alarm_name          = "jitbit-ecs-cpu-threshold"
+  alarm_name          = "${local.environment}-jitbit-ecs-cpu-threshold"
   alarm_description   = "Triggers alarm if ECS CPU crosses a threshold"
   namespace           = "AWS/ECS"
   metric_name         = "CPUUtilization"
@@ -47,7 +37,7 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_cpu_over_threshold" {
 resource "aws_cloudwatch_metric_alarm" "jitbit_memory_over_threshold" {
   count = local.create_blue_green ? 0 : 1
 
-  alarm_name          = "jitbit-ecs-memory-threshold"
+  alarm_name          = "${local.environment}-jitbit-ecs-memory-threshold"
   alarm_description   = "Triggers alarm if ECS memory crosses a threshold"
   namespace           = "AWS/ECS"
   metric_name         = "MemoryUtilization"
@@ -77,7 +67,7 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_memory_over_threshold" {
 resource "aws_cloudwatch_metric_alarm" "jitbit_cpu_over_threshold_blue" {
   count = local.create_blue_green ? 1 : 0
 
-  alarm_name          = "jitbit-ecs-cpu-threshold-blue"
+  alarm_name          = "${local.environment}-jitbit-ecs-cpu-threshold-blue"
   alarm_description   = "Triggers alarm if ECS CPU crosses a threshold"
   namespace           = "AWS/ECS"
   metric_name         = "CPUUtilization"
@@ -107,7 +97,7 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_cpu_over_threshold_blue" {
 resource "aws_cloudwatch_metric_alarm" "jitbit_cpu_over_threshold_green" {
   count = local.create_blue_green ? 1 : 0
 
-  alarm_name          = "jitbit-ecs-cpu-threshold-green"
+  alarm_name          = "${local.environment}-jitbit-ecs-cpu-threshold-green"
   alarm_description   = "Triggers alarm if ECS CPU crosses a threshold"
   namespace           = "AWS/ECS"
   metric_name         = "CPUUtilization"
@@ -137,7 +127,7 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_cpu_over_threshold_green" {
 resource "aws_cloudwatch_metric_alarm" "jitbit_memory_over_threshold_blue" {
   count = local.create_blue_green ? 1 : 0
 
-  alarm_name          = "jitbit-ecs-memory-threshold-blue"
+  alarm_name          = "${local.environment}-jitbit-ecs-memory-threshold-blue"
   alarm_description   = "Triggers alarm if ECS memory crosses a threshold"
   namespace           = "AWS/ECS"
   metric_name         = "MemoryUtilization"
@@ -167,7 +157,7 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_memory_over_threshold_blue" {
 resource "aws_cloudwatch_metric_alarm" "jitbit_memory_over_threshold_green" {
   count = local.create_blue_green ? 1 : 0
 
-  alarm_name          = "jitbit-ecs-memory-threshold-green"
+  alarm_name          = "${local.environment}-jitbit-ecs-memory-threshold-green"
   alarm_description   = "Triggers alarm if ECS memory crosses a threshold"
   namespace           = "AWS/ECS"
   metric_name         = "MemoryUtilization"

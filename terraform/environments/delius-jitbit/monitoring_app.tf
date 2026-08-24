@@ -1,18 +1,3 @@
-moved {
-  from = aws_cloudwatch_log_group.app_logs
-  to   = aws_cloudwatch_log_group.app_logs[0]
-}
-
-moved {
-  from = aws_cloudwatch_log_metric_filter.error
-  to   = aws_cloudwatch_log_metric_filter.error[0]
-}
-
-moved {
-  from = aws_cloudwatch_metric_alarm.jitbit_high_error_volume
-  to   = aws_cloudwatch_metric_alarm.jitbit_high_error_volume[0]
-}
-
 locals {
   service_name = "hmpps-${local.environment}-${local.application_name}"
 }
@@ -99,7 +84,7 @@ resource "aws_cloudwatch_log_metric_filter" "error_green" {
 resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume" {
   count = local.create_blue_green ? 0 : 1
 
-  alarm_name          = "jitbit-high-error-count"
+  alarm_name          = "${local.environment}-jitbit-high-error-count"
   alarm_description   = "Triggers alarm if there are more than 10 errors for 2 consecutive periods"
   namespace           = "JitbitMetrics"
   metric_name         = "ErrorCount"
@@ -116,7 +101,7 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume" {
 resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume_blue" {
   count = local.create_blue_green ? 1 : 0
 
-  alarm_name          = "jitbit-high-error-count-blue"
+  alarm_name          = "${local.environment}-jitbit-high-error-count-blue"
   alarm_description   = "Triggers alarm if there are more than 10 errors for 2 consecutive periods"
   namespace           = "JitbitMetrics"
   metric_name         = "ErrorCountBlue"
@@ -133,7 +118,7 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume_blue" {
 resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume_green" {
   count = local.create_blue_green ? 1 : 0
 
-  alarm_name          = "jitbit-high-error-count-green"
+  alarm_name          = "${local.environment}-jitbit-high-error-count-green"
   alarm_description   = "Triggers alarm if there are more than 10 errors for 2 consecutive periods"
   namespace           = "JitbitMetrics"
   metric_name         = "ErrorCountGreen"
