@@ -51,7 +51,7 @@ variable "argocd_rbac_role_mappings" {
 variable "argocd_hub_capability_role_arn" {
   type        = string
   default     = ""
-  description = "Override for the hub cluster's ArgoCD Capability IAM role ARN. Leave empty for permanent hubs (development/production) — the ARN is resolved by convention from local.argocd_hubs. Set this only for ephemeral/test hubs, passed as a workflow input when launching the cluster."
+  description = "Optional override for the hub cluster's ArgoCD Capability IAM role ARN. Leave empty in the normal cases: permanent spokes resolve the ARN by convention from local.argocd_hubs (their tier hub), and ephemeral '-spoke' dev clusters resolve it from their convention-paired '<prefix>-hub' in the same account. Set this only to pair an ephemeral spoke with a hub that does not follow the naming convention."
 }
 
 resource "null_resource" "created_by_tag" {
