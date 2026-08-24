@@ -75,6 +75,28 @@ data "aws_iam_policy_document" "cpr_integration" {
 
     ]
   }
+  statement {
+    actions = [
+      "athena:GetDataCatalog",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:GetWorkGroup",
+      "athena:StartQueryExecution",
+      "athena:StopQueryExecution",
+      "athena:CreatePreparedStatement",
+      "athena:UpdatePreparedStatement",
+      "athena:GetPreparedStatement",
+      "athena:ListPreparedStatements",
+      "athena:DeletePreparedStatement",
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:*/*"
+    ]
+  }
+  statement {
+    actions   = ["athena:ListWorkGroups"]
+    resources = ["*"]
+  }
 }
 
 resource "aws_glue_catalog_database" "person_record" {
@@ -128,7 +150,7 @@ resource "aws_lakeformation_permissions" "cpr_integration_db" {
 
 resource "aws_lakeformation_permissions" "cpr_integration_db_tables" {
   principal   = module.emd_cpr_integration_role.iam_role_arn
-  permissions = ["SELECT", "DESCRIBE"]
+  permissions = ["SELECT", "DESCRIBE", "CREATE"]
   table {
     database_name = "person_record${local.db_suffix}"
     wildcard      = true

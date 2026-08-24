@@ -149,14 +149,3 @@ resource "aws_security_group_rule" "cloud_platform_access" {
   cidr_blocks       = ["172.16.0.0/12"]
   security_group_id = aws_security_group.lambda_cp_sg.id
 }
-
-
-resource "aws_security_group_rule" "dns_resolution" {
-  type              = "egress"
-  description       = "allow dns resolution"
-  from_port         = 53
-  to_port           = 53
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.lambda_cp_sg.id
-}
