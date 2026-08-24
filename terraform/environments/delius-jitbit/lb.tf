@@ -108,7 +108,6 @@ resource "aws_lb_listener" "listener" {
 
 resource "aws_lb_target_group" "target_group_fargate" {
   # checkov:skip=CKV_AWS_261
-
   count = local.create_blue_green ? 0 : 1
 
   name                 = local.application_name
@@ -144,9 +143,9 @@ resource "aws_lb_target_group" "target_group_fargate" {
 resource "aws_ssm_parameter" "active_deployment_colour" {
   count = local.create_blue_green ? 1 : 0
 
-  name  = "/delius-jitbit/blue-green-active-colour"
-  type  = "SecureString"
-  value = "blue"
+  name   = "/delius-jitbit/blue-green-active-colour"
+  type   = "SecureString"
+  value  = "blue"
   key_id = data.aws_kms_key.general_shared.arn
 
   lifecycle {
