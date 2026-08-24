@@ -97,6 +97,10 @@ data "aws_iam_policy_document" "cpr_integration" {
     actions   = ["athena:ListWorkGroups"]
     resources = ["*"]
   }
+  statement {
+    actions   = ["lakeformation:GetDataAccess"]
+    resources = ["*"]
+  }
 }
 
 resource "aws_glue_catalog_database" "person_record" {
