@@ -107,7 +107,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dev" {
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
-  name       = "actions-runner-mojas-create-a-derived-table-dev"
+  name       = "actions-runner-mojas-cadet-dev"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "2.330.0-8"
   chart      = "actions-runner"
@@ -131,7 +131,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dev_non_spo
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
-  name       = "actions-runner-mojas-create-a-derived-table-dev-non-spot"
+  name       = "actions-runner-mojas-cadet-dev-non-spot"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "2.330.0-8"
   chart      = "actions-runner"
