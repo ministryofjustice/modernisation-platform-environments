@@ -48,7 +48,7 @@ data "aws_sns_topic" "mft_cloudwatch_alarms_low_priority" {
 
 module "kms_cloudwatch_logs" {
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.0"
+  version = "4.2.1"
 
   aliases                 = ["integration-hub-api/logs/${local.component_name}"]
   description             = "KMS CMK for Integration Hub API CloudWatch Logs encryption"
