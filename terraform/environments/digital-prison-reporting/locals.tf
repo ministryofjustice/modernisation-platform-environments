@@ -1,5 +1,5 @@
 #### This file can be used to store locals specific to the member account ####
-#### DPR Specific ####
+#### DPR Specific #####
 locals {
 
   is_dev_or_test       = local.is-development || local.is-test
@@ -524,7 +524,7 @@ locals {
     }
   }
 
-  # Single production AI Gateway assumes into each DPR environment's Bedrock role
+  # AI Gateway assumes into each DPR environment's Bedrock role.
   ai_gateway_role_arn = "arn:aws:iam::${local.environment_management.account_ids["data-platform-production"]}:role/ai-gateway"
 
 

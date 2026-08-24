@@ -1,12 +1,12 @@
 {
   "accounts": {
     "development": {
-      "ec2amiid": "ami-0ba3282d5565f70f3",
+      "ec2amiid": "ami-0588e0553459c81da",
       "ec2instancetype": "r5a.large",
       "orahomesize": "300",
-      "orahome_snapshot": "snap-08fd6bd9669b6011f",
+      "orahome_snapshot": "snap-0f78c5578bb2271dc",
       "stageesize": "300",
-      "stage_snapshot": "snap-0b174a2c77fccf827",
+      "stage_snapshot": "snap-010cae7213fa9eede",
       "managementcidr": "10.200.0.0/20",
       "allocated_storage": "50",
       "engine": "oracle-ee",

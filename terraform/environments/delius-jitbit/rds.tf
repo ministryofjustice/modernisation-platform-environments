@@ -88,7 +88,7 @@ resource "aws_db_instance" "jitbit" {
   performance_insights_kms_key_id = "" # Prod RDS instance was created with default aws/rds KMS key, so we cannot change it to a custom KMS key without recreating the instance
   #checkov:skip=CKV_AWS_129: "Cloudwatch log exports varies by environment"
   enabled_cloudwatch_logs_exports = local.application_data.accounts[local.environment].db_enabled_cloudwatch_logs_exports
-  copy_tags_to_snapshot = true
+  copy_tags_to_snapshot           = true
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-database", local.application_name, local.environment)) }
   )
