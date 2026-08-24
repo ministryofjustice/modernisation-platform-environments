@@ -36,7 +36,8 @@
             {
               "expression": "(blue_used / blue_reserved) * 100",
               "label": "${app_name}-service-blue",
-              "id": "blue_pct"
+              "id": "blue_pct",
+              "color": "#1f77b4"
             }
           ],
 
@@ -68,7 +69,8 @@
             {
               "expression": "(green_used / green_reserved) * 100",
               "label": "${app_name}-service-green",
-              "id": "green_pct"
+              "id": "green_pct",
+              "color": "#2ca02c"
             }
           ],
 
@@ -96,7 +98,8 @@
             {
               "expression": "(cluster_used / cluster_reserved) * 100",
               "label": "${app_name}-cluster",
-              "id": "cluster_pct"
+              "id": "cluster_pct",
+              "color": "#9467BD"
             }
           ]
         ],
@@ -151,7 +154,8 @@
             {
               "expression": "(blue_used / blue_reserved) * 100",
               "label": "${app_name}-service-blue",
-              "id": "blue_pct"
+              "id": "blue_pct",
+              "color": "#1f77b4"
             }
           ],
           [
@@ -182,7 +186,8 @@
             {
               "expression": "(green_used / green_reserved) * 100",
               "label": "${app_name}-service-green",
-              "id": "green_pct"
+              "id": "green_pct",
+              "color": "#2ca02c"
             }
           ],
           [
@@ -209,7 +214,8 @@
             {
               "expression": "(cluster_used / cluster_reserved) * 100",
               "label": "${app_name}-cluster",
-              "id": "cluster_pct"
+              "id": "cluster_pct",
+              "color": "#9467BD"
             }
           ]
         ],
@@ -226,6 +232,39 @@
             "max": 100
           }
         }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 7,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [
+            "JitbitMetrics",
+            "ErrorCountBlue",
+            {
+              "label": "${app_name}-errors-blue",
+              "color": "#1f77b4"
+            }
+          ],
+          [
+            "JitbitMetrics",
+            "ErrorCountGreen",
+            {
+              "label": "${app_name}-errors-green",
+              "color": "#2ca02c"
+            }
+          ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "eu-west-2",
+        "stat": "Sum",
+        "period": 300,
+        "title": "Jitbit Application Errors"
       }
     },
     {
@@ -270,7 +309,7 @@
       "height": 6,
       "properties": {
         "view": "timeSeries",
-        "stacked": true,
+        "stacked": false,
         "metrics": [
           [
             "AWS/ApplicationELB",
@@ -280,7 +319,8 @@
             "LoadBalancer",
             "${load_balancer_arn}",
             {
-              "label": "Blue Target Group"
+              "label": "Blue Target Group",
+              "color": "#1f77b4"
             }
           ],
           [
@@ -291,7 +331,8 @@
             "LoadBalancer",
             "${load_balancer_arn}",
             {
-              "label": "Green Target Group"
+              "label": "Green Target Group",
+              "color": "#2ca02c"
             }
           ]
         ],
@@ -511,10 +552,25 @@
             "AWS/ApplicationELB",
             "HTTPCode_Target_4XX_Count",
             "LoadBalancer",
-            "${load_balancer_arn}"
+            "${load_balancer_arn}",
+            {
+              "id": "errors",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "FILL(errors, 0)",
+              "label": "Target 4XX Errors",
+              "color": "#d62728",
+              "id": "errors_filled"
+            }
           ]
         ],
-        "region": "eu-west-2"
+        "region": "eu-west-2",
+        "stat": "Sum",
+        "period": 300,
+        "title": "Target HTTP 4XX Errors"
       }
     },
     {
@@ -530,11 +586,32 @@
           [
             "AWS/ApplicationELB",
             "TargetResponseTime",
+            "TargetGroup",
+            "${target_group_arn_blue}",
             "LoadBalancer",
-            "${load_balancer_arn}"
+            "${load_balancer_arn}",
+            {
+              "label": "Blue Target Group",
+              "color": "#1f77b4"
+            }
+          ],
+          [
+            "AWS/ApplicationELB",
+            "TargetResponseTime",
+            "TargetGroup",
+            "${target_group_arn_green}",
+            "LoadBalancer",
+            "${load_balancer_arn}",
+            {
+              "label": "Green Target Group",
+              "color": "#2ca02c"
+            }
           ]
         ],
-        "region": "eu-west-2"
+        "region": "eu-west-2",
+        "stat": "Average",
+        "period": 300,
+        "title": "Target Response Time"
       }
     },
     {
