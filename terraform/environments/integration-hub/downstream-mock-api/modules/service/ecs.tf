@@ -117,9 +117,10 @@ resource "aws_ecs_task_definition" "service" {
 
   container_definitions = jsonencode([
     {
-      name      = local.resource_application_name,
-      image     = "${aws_ecr_repository.application.repository_url}:${local.service_configuration.bootstrap_image_tag}",
-      essential = true,
+      name                   = local.resource_application_name,
+      image                  = "${aws_ecr_repository.application.repository_url}:${local.service_configuration.bootstrap_image_tag}",
+      essential              = true,
+      readonlyRootFilesystem = true,
       portMappings = [
         {
           containerPort = local.service_configuration.container_port,
