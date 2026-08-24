@@ -66,6 +66,18 @@ resource "aws_vpc_security_group_ingress_rule" "preprod_alb_legacy_natgw_ing" {
   ip_protocol       = "tcp"
 }
 
+# Rule for uservision access in test
+resource "aws_vpc_security_group_ingress_rule" "test_alb_uservision_ingress" {
+  count = var.env_name == "test" ? 1 : 0
+
+  description       = "allow ingress from uservision VPN to delius core frontend alb for testing purposes"
+  security_group_id = aws_security_group.delius_frontend_alb_security_group.id
+  cidr_ipv4         = local.uservision_ips
+  from_port         = "443"
+  to_port           = "443"
+  ip_protocol       = "tcp"
+}
+
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_to_ecs_cluster" {
   security_group_id            = aws_security_group.delius_frontend_alb_security_group.id
   description                  = "egress from delius core frontend alb to ecs cluster"
