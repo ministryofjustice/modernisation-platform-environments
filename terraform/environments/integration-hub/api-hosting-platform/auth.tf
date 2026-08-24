@@ -1,8 +1,7 @@
 module "api_user_credentials_secret" {
   for_each = local.create_service ? local.auth_users : {}
 
-  source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "2.1.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
 
   name                    = "${local.application_name}-${local.component_name}-${local.environment}-user-${each.key}"
   description             = "API platform Basic authentication credentials for ${each.key}"
@@ -21,8 +20,7 @@ module "api_user_credentials_secret" {
 module "api_system_bearer_token_secret" {
   for_each = local.create_service ? local.auth_system_principals : {}
 
-  source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "2.1.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
 
   name                    = "${local.application_name}-${local.component_name}-${local.environment}-system-${each.key}"
   description             = "API platform bearer token for ${each.key}"

@@ -1,8 +1,7 @@
 module "dynamodb_auth_roles" {
   count = local.create_service ? 1 : 0
 
-  source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "5.5.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-dynamodb-table.git?ref=45c9cb10c2f6209e7362bba92cadd5ab3c9e2003" # v5.5.0
 
   name         = "${local.application_name}-${local.component_name}-auth-roles"
   billing_mode = "PAY_PER_REQUEST"
@@ -17,8 +16,7 @@ module "dynamodb_auth_roles" {
 module "dynamodb_auth_principals" {
   count = local.create_service ? 1 : 0
 
-  source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "5.5.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-dynamodb-table.git?ref=45c9cb10c2f6209e7362bba92cadd5ab3c9e2003" # v5.5.0
 
   name         = "${local.application_name}-${local.component_name}-auth-principals"
   billing_mode = "PAY_PER_REQUEST"

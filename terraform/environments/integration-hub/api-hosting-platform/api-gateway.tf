@@ -2,7 +2,8 @@ resource "aws_cloudwatch_log_group" "api_access" {
   count = local.create_service ? 1 : 0
 
   name              = "/aws/apigateway/${local.application_name}-${local.component_name}"
-  retention_in_days = 30
+  kms_key_id        = module.kms_cloudwatch_logs[0].key_arn
+  retention_in_days = 365
   tags              = local.tags
 }
 
@@ -61,9 +62,10 @@ resource "aws_apigatewayv2_route" "assessment" {
 resource "aws_apigatewayv2_route" "health" {
   count = local.create_service ? 1 : 0
 
-  api_id    = aws_apigatewayv2_api.benefit_checker[0].id
-  route_key = "GET /health"
-  target    = "integrations/${aws_apigatewayv2_integration.benefit_orchestrator[0].id}"
+  api_id             = aws_apigatewayv2_api.benefit_checker[0].id
+  route_key          = "GET /health"
+  target             = "integrations/${aws_apigatewayv2_integration.benefit_orchestrator[0].id}"
+  authorization_type = "NONE"
 }
 
 resource "aws_apigatewayv2_stage" "default" {

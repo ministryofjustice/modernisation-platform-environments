@@ -6,8 +6,7 @@ data "aws_secretsmanager_secret" "downstream_basic_auth" {
 module "lambda_benefit_orchestrator" {
   count = local.create_service ? 1 : 0
 
-  source  = "terraform-aws-modules/lambda/aws"
-  version = "8.8.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda.git?ref=b842374147fc07731d79028517223e9e0cbaab6d" # v8.8.0
 
   function_name                = "${local.application_name}-${local.component_name}-benefit-orchestrator"
   description                  = "Orchestrates requests to the downstream mock benefit checker"
@@ -38,8 +37,7 @@ module "lambda_benefit_orchestrator" {
 module "lambda_api_authorizer" {
   count = local.create_service ? 1 : 0
 
-  source  = "terraform-aws-modules/lambda/aws"
-  version = "8.8.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda.git?ref=b842374147fc07731d79028517223e9e0cbaab6d" # v8.8.0
 
   function_name                = "${local.application_name}-${local.component_name}-authorizer"
   description                  = "Authenticates API hosting platform clients"
