@@ -16,7 +16,7 @@ resource "aws_ecr_repository" "application" {
 
 resource "aws_cloudwatch_log_group" "ecs" {
   name              = "/aws/ecs/${local.resource_name_prefix}"
-  kms_key_id        = var.kms_key_arn
+  kms_key_id        = module.kms_cloudwatch_logs.key_arn
   retention_in_days = 365
   tags              = local.tags
 }
