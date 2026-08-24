@@ -1,7 +1,7 @@
 resource "helm_release" "ai_gateway_configuration" {
   name      = "${local.component_name}-configuration"
   chart     = "${path.module}/src/helm/charts/${local.component_name}-configuration"
-  version   = "1.5.0"
+  version   = "1.6.0"
   namespace = module.ai_gateway_namespace.name
 
   values = [
@@ -13,6 +13,8 @@ resource "helm_release" "ai_gateway_configuration" {
         internal_hostname = "internal.${local.environment_configuration.ai_gateway_hostname}"
         certificate_arn   = module.acm_ai_gateway.acm_certificate_arn
         alb_logs_bucket   = module.alb_access_logs.s3_bucket_id
+        # Default is 60s; large file uploads (e.g. audio transcription) can take longer to process.
+        idle_timeout_seconds = try(local.environment_configuration.ai_gateway_alb_idle_timeout_seconds, 300)
       }
     )
   ]
@@ -49,6 +51,10 @@ resource "helm_release" "litellm_admin" {
         microsoft_foundry_tenant_id = jsondecode(data.aws_secretsmanager_secret_version.microsoft_foundry_jedi_gateway.secret_string)["tenant_id"]
         microsoft_foundry_client_id = jsondecode(data.aws_secretsmanager_secret_version.microsoft_foundry_jedi_gateway.secret_string)["client_id"]
 
+        # Google
+        googleWorkloadIdentityAudience        = local.google_workload_identity_audience
+        googleApplicationCredentialsConfigMap = kubernetes_config_map_v1.google_application_credentials.metadata[0].name
+
         # LiteLLM
         masterkeySecretName = kubernetes_secret_v1.litellm_master_key.metadata[0].name
         masterkeySecretKey  = "master-key" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
@@ -75,6 +81,7 @@ resource "helm_release" "litellm_admin" {
     module.iam_role,
     kubernetes_service_account_v1.ai_gateway,
     kubernetes_secret_v1.litellm_master_key,
+    kubernetes_config_map_v1.google_application_credentials,
     kubernetes_manifest.external_secret_litellm_license,
     kubernetes_manifest.external_secret_litellm_salt_key,
     kubernetes_manifest.external_secret_litellm_entra_id,
@@ -123,6 +130,10 @@ resource "helm_release" "litellm" {
         microsoft_foundry_tenant_id = jsondecode(data.aws_secretsmanager_secret_version.microsoft_foundry_jedi_gateway.secret_string)["tenant_id"]
         microsoft_foundry_client_id = jsondecode(data.aws_secretsmanager_secret_version.microsoft_foundry_jedi_gateway.secret_string)["client_id"]
 
+        # Google
+        googleWorkloadIdentityAudience        = local.google_workload_identity_audience
+        googleApplicationCredentialsConfigMap = kubernetes_config_map_v1.google_application_credentials.metadata[0].name
+
         # Autoscaling
         minReplicas                    = local.environment_configuration.ai_gateway_autoscaling.min_replicas
         maxReplicas                    = local.environment_configuration.ai_gateway_autoscaling.max_replicas
@@ -148,6 +159,7 @@ resource "helm_release" "litellm" {
     module.iam_role,
     kubernetes_service_account_v1.ai_gateway,
     kubernetes_secret_v1.litellm_master_key,
+    kubernetes_config_map_v1.google_application_credentials,
     kubernetes_manifest.external_secret_litellm_license,
     kubernetes_manifest.external_secret_litellm_salt_key,
     kubernetes_manifest.external_secret_litellm_entra_id,

@@ -1825,6 +1825,16 @@ data "aws_iam_policy_document" "cloudwatch_alarm_threader_policy_document" {
   }
 
   statement {
+    sid    = "AllowStartLandingDlqRedriverWorkflow"
+    effect = "Allow"
+    actions = [
+      "states:StartExecution",
+    ]
+    resources = [
+      aws_sfn_state_machine.landing_dlq_redriver.arn,
+    ]
+  }
+  statement {
     sid    = "AllowSendIncidentEvents"
     effect = "Allow"
     actions = [
@@ -2877,16 +2887,16 @@ resource "aws_iam_policy" "trigger_cadt_iam_policy" {
 
 module "trigger_cadt_iam" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role"
-  
+
   name = "trigger-cadt-iam-role"
   trust_policy_permissions = {
-   LambdaAssume = { actions = [
+    LambdaAssume = { actions = [
       "sts:AssumeRole",
-    ]
-    principals = [{
-      type = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }]}
+      ]
+      principals = [{
+        type        = "Service"
+        identifiers = ["lambda.amazonaws.com"]
+    }] }
   }
 
   policies = {
@@ -2913,7 +2923,7 @@ data "aws_iam_policy_document" "poll_cadt_policy_document" {
     condition {
       test     = "ArnEquals"
       variable = "ecs:cluster"
-      values = [aws_ecs_cluster.cadt.arn]
+      values   = [aws_ecs_cluster.cadt.arn]
     }
   }
 }
@@ -2926,16 +2936,16 @@ resource "aws_iam_policy" "poll_cadt_iam_policy" {
 
 module "poll_cadt_iam" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role"
-  
+
   name = "poll-cadt-iam-role"
   trust_policy_permissions = {
-   LambdaAssume = { actions = [
+    LambdaAssume = { actions = [
       "sts:AssumeRole",
-    ]
-    principals = [{
-      type = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }]}
+      ]
+      principals = [{
+        type        = "Service"
+        identifiers = ["lambda.amazonaws.com"]
+    }] }
   }
 
   policies = {
@@ -3009,6 +3019,34 @@ data "aws_iam_policy_document" "live_feed_incident_manager_policy_document" {
 
     resources = [
       "${module.s3-logging-bucket.bucket.arn}/incident-automation/episodes/${local.environment_shorthand}/*"
+    ]
+  }
+
+  statement {
+    sid    = "PublishIncidentNotifications"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [
+      aws_sns_topic.emds_alerts.arn,
+      aws_sns_topic.operational_incident_updates.arn,
+    ]
+  }
+
+  statement {
+    sid    = "UseIncidentNotificationKmsKey"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey*",
+    ]
+
+    resources = [
+      aws_kms_key.emds_alerts.arn,
     ]
   }
 }

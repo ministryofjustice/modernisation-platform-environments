@@ -161,8 +161,15 @@ resource "aws_athena_named_query" "fct_daily_cost" {
 
 resource "null_resource" "execute_create_table_query" {
   triggers = {
-    query_ids   = aws_athena_named_query.fct_daily_cost.id
+    query_id    = aws_athena_named_query.fct_daily_cost.id
     script_hash = filesha256("${path.module}/queries/fct_daily_cost.sql")
+
+    # Ensure the CTAS re-runs when these execution parameters change.
+    bucket     = "coat-${local.environment}-cur-v2-hourly"
+    workgroup  = aws_athena_workgroup.ctas_athena_workgroup.name
+    output_s3  = "s3://coat-${local.environment}-cur-v2-hourly/ctas/fct-daily-cost/"
+    database   = aws_glue_catalog_database.cur_v2_database.name
+    region     = data.aws_region.current.region
   }
 
   provisioner "local-exec" {
@@ -181,4 +188,47 @@ EOF
   }
 
   depends_on = [aws_athena_named_query.fct_daily_cost]
+}
+
+# Create a derived table for COAT API
+resource "aws_athena_named_query" "fct_cost_movement" {
+  name     = "fct-cost-movement"
+  database = aws_glue_catalog_database.cur_v2_database.name
+  query = templatefile(
+    "${path.module}/queries/fct_cost_movement.sql",
+    {
+      bucket = "coat-${local.environment}-cur-v2-hourly"
+    }
+  )
+}
+
+resource "null_resource" "execute_create_cost_movement_query" {
+  triggers = {
+    query_id    = aws_athena_named_query.fct_cost_movement.id
+    script_hash = filesha256("${path.module}/queries/fct_cost_movement.sql")
+
+    # Ensure the CTAS re-runs when these execution parameters change.
+    bucket     = "coat-${local.environment}-cur-v2-hourly"
+    workgroup   = aws_athena_workgroup.ctas_athena_workgroup.name
+    output_s3   = "s3://coat-${local.environment}-cur-v2-hourly/ctas/fct-cost-movement/"
+    database    = aws_glue_catalog_database.cur_v2_database.name
+    region      = data.aws_region.current.region
+  }
+
+  provisioner "local-exec" {
+    command = <<EOF
+CREDS=$(aws sts assume-role --role-arn arn:aws:iam::${data.aws_caller_identity.current.id}:role/MemberInfrastructureAccess --role-session-name github-actions-session)
+export AWS_ACCESS_KEY_ID=$(echo $CREDS | jq -r '.Credentials.AccessKeyId')
+export AWS_SECRET_ACCESS_KEY=$(echo $CREDS | jq -r '.Credentials.SecretAccessKey')
+export AWS_SESSION_TOKEN=$(echo $CREDS | jq -r '.Credentials.SessionToken')
+aws athena start-query-execution \
+  --query-string "$(aws athena get-named-query --named-query-id ${aws_athena_named_query.fct_cost_movement.id} --query 'NamedQuery.QueryString' --output text)" \
+  --work-group ${aws_athena_workgroup.ctas_athena_workgroup.name} \
+  --result-configuration OutputLocation=s3://coat-${local.environment}-cur-v2-hourly/ctas/fct-cost-movement/ \
+  --query-execution-context Database=${aws_glue_catalog_database.cur_v2_database.name} \
+  --region ${data.aws_region.current.region}
+EOF
+  }
+
+  depends_on = [aws_athena_named_query.fct_cost_movement]
 }

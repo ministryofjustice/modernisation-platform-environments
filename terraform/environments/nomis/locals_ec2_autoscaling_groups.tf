@@ -151,7 +151,7 @@ locals {
       tags                 = local.ec2_instances.web.tags
     }
 
-    web12 = {
+    qa11g-nomis-web12 = {
       autoscaling_group = {
         desired_capacity          = 1
         force_delete              = true

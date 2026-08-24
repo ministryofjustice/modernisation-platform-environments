@@ -48,7 +48,7 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "# AI Gateway\n\nThis dashboard monitors the **AI Gateway** \u2014 the internal proxy that routes, load-balances, and tracks spend for all LLM API traffic across teams \u2014 plus **Amazon Bedrock** invocation metrics broken out per model.\n\n**What to look at first:**\n- **Overview** \u2014 total requests, failures, spend, and token usage over the selected time range, plus current model/provider health.\n- **Deployment Health** \u2014 health-check failure rates and cooldown events per model deployment.\n- **Proxy Overview** \u2014 request/failure rates and latency for the proxy itself.\n- **Budget** \u2014 remaining budget per team and per virtual API key.\n- **Latency / Redis & Postgres / Spend Queue Backpressure** \u2014 infrastructure-level performance and backpressure indicators.\n- **Usage by Model & Virtual Key** \u2014 token and spend breakdowns for cost attribution.\n- **LLM API Rate Limits** \u2014 remaining rate-limit headroom reported by upstream providers.\n- **Amazon Bedrock** \u2014 invocation count and latency, token usage (input/output, per model and daily), throttles, client/server errors, and estimated TPM quota usage, broken out per Bedrock model via CloudWatch metric-math \u2014 new models appear automatically.\n\nExpand the **AI Gateway** and **Amazon Bedrock** sections below to see their panels.",
+        "content": "# AI Gateway\n\nThis dashboard monitors the **AI Gateway** \u2014 the internal proxy that routes, load-balances, and tracks spend for all LLM API traffic across teams \u2014 plus **Amazon Bedrock** and **Google Vertex AI (aiplatform)** invocation metrics broken out per model.\n\n**What to look at first:**\n- **Overview** \u2014 total requests, failures, spend, and token usage over the selected time range, plus current model/provider health.\n- **Deployment Health** \u2014 health-check failure rates and cooldown events per model deployment.\n- **Proxy Overview** \u2014 request/failure rates and latency for the proxy itself.\n- **Budget** \u2014 remaining budget per team and per virtual API key.\n- **Latency / Redis & Postgres / Spend Queue Backpressure** \u2014 infrastructure-level performance and backpressure indicators.\n- **Usage by Model & Virtual Key** \u2014 token and spend breakdowns for cost attribution.\n- **LLM API Rate Limits** \u2014 remaining rate-limit headroom reported by upstream providers.\n- **Amazon Bedrock** \u2014 invocation count and latency, token usage (input/output, per model and daily), throttles, client/server errors, and estimated TPM quota usage, broken out per Bedrock model via CloudWatch metric-math \u2014 new models appear automatically.\n- **Google Vertex AI (aiplatform)** \u2014 invocation count and latency, first-token latency, token and character usage (input/output), errors by response code, and Provisioned Throughput consumption.\n\nExpand the **AI Gateway**, **Amazon Bedrock**, and **Google Vertex AI (aiplatform)** sections below to see their panels.",
         "mode": "markdown"
       },
       "pluginVersion": "13.0.2",
@@ -5769,6 +5769,693 @@
       ],
       "title": "Amazon Bedrock",
       "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 11
+      },
+      "id": 9002,
+      "panels": [
+        {
+          "id": 1101,
+          "title": "Invocation Count",
+          "description": "Number of Vertex AI publisher-model (Gemini and Model Garden partner models) invocations, broken out per model via an MQL group_by \u2014 new models appear automatically, nothing to update here when Vertex AI adds one.",
+          "type": "timeseries",
+          "datasource": {
+            "type": "stackdriver",
+            "uid": "${DS_STACKDRIVER}"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "stackdriver",
+                "uid": "${DS_STACKDRIVER}"
+              },
+              "aliasBy": "{{resource.label.model_user_id}}",
+              "queryType": "timeSeriesList",
+              "timeSeriesList": {
+                "projectName": "${project}",
+                "crossSeriesReducer": "REDUCE_SUM",
+                "perSeriesAligner": "ALIGN_RATE",
+                "alignmentPeriod": "cloud-monitoring-auto",
+                "groupBys": [
+                  "resource.label.model_user_id"
+                ],
+                "filters": [
+                  "metric.type",
+                  "=",
+                  "aiplatform.googleapis.com/publisher/online_serving/model_invocation_count",
+                  "AND",
+                  "resource.type",
+                  "=",
+                  "aiplatform.googleapis.com/PublisherModel"
+                ]
+              },
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 1102,
+          "title": "Invocation Latency",
+          "description": "p99 model invocation latency per model (time from request received to full response returned).",
+          "type": "timeseries",
+          "datasource": {
+            "type": "stackdriver",
+            "uid": "${DS_STACKDRIVER}"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 8
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "ms"
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "stackdriver",
+                "uid": "${DS_STACKDRIVER}"
+              },
+              "aliasBy": "{{resource.label.model_user_id}}",
+              "queryType": "timeSeriesList",
+              "timeSeriesList": {
+                "projectName": "${project}",
+                "crossSeriesReducer": "REDUCE_PERCENTILE_99",
+                "perSeriesAligner": "ALIGN_DELTA",
+                "alignmentPeriod": "cloud-monitoring-auto",
+                "groupBys": [
+                  "resource.label.model_user_id"
+                ],
+                "filters": [
+                  "metric.type",
+                  "=",
+                  "aiplatform.googleapis.com/publisher/online_serving/model_invocation_latencies",
+                  "AND",
+                  "resource.type",
+                  "=",
+                  "aiplatform.googleapis.com/PublisherModel"
+                ]
+              },
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 1103,
+          "title": "Token Counts by Model",
+          "description": "Accumulated input and output token counts per model, per period (Sum), split by the 'type' label (input/output).",
+          "type": "timeseries",
+          "datasource": {
+            "type": "stackdriver",
+            "uid": "${DS_STACKDRIVER}"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 24
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "stackdriver",
+                "uid": "${DS_STACKDRIVER}"
+              },
+              "aliasBy": "{{resource.label.model_user_id}} ({{metric.label.type}})",
+              "queryType": "timeSeriesList",
+              "timeSeriesList": {
+                "projectName": "${project}",
+                "crossSeriesReducer": "REDUCE_SUM",
+                "perSeriesAligner": "ALIGN_RATE",
+                "alignmentPeriod": "cloud-monitoring-auto",
+                "groupBys": [
+                  "resource.label.model_user_id",
+                  "metric.label.type"
+                ],
+                "filters": [
+                  "metric.type",
+                  "=",
+                  "aiplatform.googleapis.com/publisher/online_serving/token_count",
+                  "AND",
+                  "resource.type",
+                  "=",
+                  "aiplatform.googleapis.com/PublisherModel"
+                ]
+              },
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 1104,
+          "title": "Character Counts by Model",
+          "description": "Accumulated input and output character counts per model \u2014 Vertex AI bills and quotas some models (e.g. Gemini on-demand) by character count rather than tokens, so this is the direct cost/quota signal, split by 'type' (input/output).",
+          "type": "timeseries",
+          "datasource": {
+            "type": "stackdriver",
+            "uid": "${DS_STACKDRIVER}"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 32
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "stackdriver",
+                "uid": "${DS_STACKDRIVER}"
+              },
+              "aliasBy": "{{resource.label.model_user_id}} ({{metric.label.type}})",
+              "queryType": "timeSeriesList",
+              "timeSeriesList": {
+                "projectName": "${project}",
+                "crossSeriesReducer": "REDUCE_SUM",
+                "perSeriesAligner": "ALIGN_RATE",
+                "alignmentPeriod": "cloud-monitoring-auto",
+                "groupBys": [
+                  "resource.label.model_user_id",
+                  "metric.label.type"
+                ],
+                "filters": [
+                  "metric.type",
+                  "=",
+                  "aiplatform.googleapis.com/publisher/online_serving/character_count",
+                  "AND",
+                  "resource.type",
+                  "=",
+                  "aiplatform.googleapis.com/PublisherModel"
+                ]
+              },
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 1105,
+          "title": "Errors by Model and Response Code",
+          "description": "Model invocations broken out by non-200 response code, per model \u2014 the Vertex AI equivalent of Bedrock's client/server error panels. Any non-zero value here means requests to that model are failing.",
+          "type": "timeseries",
+          "datasource": {
+            "type": "stackdriver",
+            "uid": "${DS_STACKDRIVER}"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 40
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "stackdriver",
+                "uid": "${DS_STACKDRIVER}"
+              },
+              "aliasBy": "{{resource.label.model_user_id}} ({{metric.label.response_code}})",
+              "queryType": "timeSeriesList",
+              "timeSeriesList": {
+                "projectName": "${project}",
+                "crossSeriesReducer": "REDUCE_SUM",
+                "perSeriesAligner": "ALIGN_RATE",
+                "alignmentPeriod": "cloud-monitoring-auto",
+                "groupBys": [
+                  "resource.label.model_user_id",
+                  "metric.label.response_code"
+                ],
+                "filters": [
+                  "metric.type",
+                  "=",
+                  "aiplatform.googleapis.com/publisher/online_serving/model_invocation_count",
+                  "AND",
+                  "resource.type",
+                  "=",
+                  "aiplatform.googleapis.com/PublisherModel",
+                  "AND",
+                  "metric.label.response_code",
+                  "!=",
+                  "200"
+                ]
+              },
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 1106,
+          "title": "Provisioned Throughput Consumption",
+          "description": "Overall throughput consumed per model (accounting for burndown rate), in characters \u2014 the Vertex AI equivalent of Bedrock's EstimatedTPMQuotaUsage. Only meaningful for models with Provisioned Throughput purchased; on-demand-only models will show flat/no data here.",
+          "type": "timeseries",
+          "datasource": {
+            "type": "stackdriver",
+            "uid": "${DS_STACKDRIVER}"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 48
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "stackdriver",
+                "uid": "${DS_STACKDRIVER}"
+              },
+              "aliasBy": "{{resource.label.model_user_id}}",
+              "queryType": "timeSeriesList",
+              "timeSeriesList": {
+                "projectName": "${project}",
+                "crossSeriesReducer": "REDUCE_MEAN",
+                "perSeriesAligner": "ALIGN_MEAN",
+                "alignmentPeriod": "cloud-monitoring-auto",
+                "groupBys": [
+                  "resource.label.model_user_id"
+                ],
+                "filters": [
+                  "metric.type",
+                  "=",
+                  "aiplatform.googleapis.com/publisher/online_serving/consumed_throughput",
+                  "AND",
+                  "resource.type",
+                  "=",
+                  "aiplatform.googleapis.com/PublisherModel"
+                ]
+              },
+              "refId": "A"
+            }
+          ]
+        }
+      ],
+      "title": "Google Vertex AI (aiplatform)",
+      "type": "row"
     }
   ],
   "preload": false,
@@ -5782,7 +6469,11 @@
     "AWS",
     "Cloudwatch",
     "Bedrock",
-    "bedrock"
+    "bedrock",
+    "Google",
+    "GCP",
+    "Vertex AI",
+    "aiplatform"
   ],
   "templating": {
     "list": [
@@ -5843,6 +6534,49 @@
         "skipUrlSync": false,
         "sort": 0,
         "type": "query"
+      },
+      {
+        "allowCustomValue": true,
+        "current": {},
+        "hide": 0,
+        "includeAll": false,
+        "label": "Vertex AI Cloud Monitoring Datasource",
+        "multi": false,
+        "name": "DS_STACKDRIVER",
+        "options": [],
+        "query": "stackdriver",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "Development",
+          "value": "moj-gcp-ai-gateway-development"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Environment",
+        "multi": false,
+        "name": "project",
+        "options": [
+          {
+            "selected": true,
+            "text": "Development",
+            "value": "moj-gcp-ai-gateway-development"
+          },
+          {
+            "selected": false,
+            "text": "Production",
+            "value": "moj-gcp-ai-gateway-production"
+          }
+        ],
+        "query": "Development : moj-gcp-ai-gateway-development,Production : moj-gcp-ai-gateway-production",
+        "queryValue": "",
+        "skipUrlSync": false,
+        "type": "custom"
       }
     ]
   },

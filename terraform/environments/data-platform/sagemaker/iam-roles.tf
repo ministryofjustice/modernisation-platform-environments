@@ -1,5 +1,5 @@
 module "elevenlabs_asr_sagemaker_execution_iam_role" {
-  count = terraform.workspace == "data-platform-development" ? 1 : 0
+  count = local.is-test ? 0 : 1
 
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=5b962b1163790398605f2b17447cf5b6cc512237" # v6.6.1
 
@@ -70,7 +70,7 @@ module "elevenlabs_asr_sagemaker_execution_iam_role" {
 }
 
 module "justice_transcribe_backend_iam_role" {
-  count = terraform.workspace == "data-platform-development" ? 1 : 0
+  count = local.is-test ? 0 : 1
 
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=5b962b1163790398605f2b17447cf5b6cc512237" # v6.6.1
 
@@ -111,15 +111,21 @@ module "justice_transcribe_backend_iam_role" {
       resources = [aws_sagemaker_endpoint.elevenlabs_asr[0].arn]
     }
     S3AsyncTranscriptionInput = {
-      sid       = "S3AsyncTranscriptionInput"
-      effect    = "Allow"
-      actions   = ["s3:PutObject"]
+      sid    = "S3AsyncTranscriptionInput"
+      effect = "Allow"
+      actions = [
+        "s3:DeleteObject",
+        "s3:PutObject",
+      ]
       resources = ["${module.async_transcription[0].s3_bucket_arn}/input/*"]
     }
     S3AsyncTranscriptionOutput = {
-      sid       = "S3AsyncTranscriptionOutput"
-      effect    = "Allow"
-      actions   = ["s3:GetObject"]
+      sid    = "S3AsyncTranscriptionOutput"
+      effect = "Allow"
+      actions = [
+        "s3:DeleteObject",
+        "s3:GetObject",
+      ]
       resources = ["${module.async_transcription[0].s3_bucket_arn}/output/*"]
     }
     AsyncTranscriptionKMSAccess = {
