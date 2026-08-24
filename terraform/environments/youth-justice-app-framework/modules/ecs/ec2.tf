@@ -172,7 +172,7 @@ resource "aws_autoscaling_lifecycle_hook" "ecs_draining" {
 module "autoscaling_sg" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.1.2"
+  version = "6.0.0"
 
   name        = "${var.cluster_name}-ecs-autoscaling-group"
   description = "Autoscaling group security group"
