@@ -7,7 +7,7 @@
         "task_memory": 1024,
         "container_port": 8080,
         "health_check_path": "/health/ping",
-        "bootstrap_image_tag": "latest"
+        "bootstrap_image_tag": "bootstrap-2026-08-24"
       }
     },
     "test": {
