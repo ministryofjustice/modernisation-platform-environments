@@ -121,6 +121,13 @@ resource "aws_ecs_task_definition" "service" {
       image                  = "${aws_ecr_repository.application.repository_url}:${local.service_configuration.bootstrap_image_tag}",
       essential              = true,
       readonlyRootFilesystem = true,
+      mountPoints = [
+        {
+          sourceVolume  = "tmp",
+          containerPath = "/tmp",
+          readOnly      = false
+        }
+      ],
       portMappings = [
         {
           containerPort = local.service_configuration.container_port,
@@ -154,6 +161,10 @@ resource "aws_ecs_task_definition" "service" {
       }
     }
   ])
+
+  volume {
+    name = "tmp"
+  }
 
   tags = local.tags
 }
