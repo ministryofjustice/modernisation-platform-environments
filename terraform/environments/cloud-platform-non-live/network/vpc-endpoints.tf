@@ -1,7 +1,7 @@
 module "vpc_endpoints_security_group" {
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.3.1"
+  version = "6.0.0"
 
   name        = "${module.vpc.name}-vpc-endpoints"
   description = "VPC endpoints security group"
