@@ -13,6 +13,7 @@ module "weblogic_eis" {
   account_config    = var.account_config
   account_info      = var.account_info
   capacity_provider = aws_ecs_capacity_provider.weblogic_eis.name
+  asg_name          = aws_autoscaling_group.weblogic.name
 
   force_new_deployment = false
 
@@ -71,6 +72,7 @@ module "weblogic_eis" {
 }
 
 resource "aws_launch_template" "weblogic_eis" {
+  #checkov:skip=CKV_AWS_341: "To Do: Test required hop limit"
   name_prefix   = "weblogic-eis-${var.env_name}-ecs-"
   image_id      = data.aws_ami.ecs_ami.id
   instance_type = var.delius_microservice_configs.weblogic_eis.ec2_instance_type
@@ -86,6 +88,12 @@ resource "aws_launch_template" "weblogic_eis" {
 
   iam_instance_profile {
     name = aws_iam_instance_profile.weblogic.name
+  }
+
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
   }
 }
 

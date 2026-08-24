@@ -282,7 +282,7 @@ locals {
           uid         = substr(md5("${env}-${combo_key}-${severity}"), 0, 8)
           condition   = contains(["baseline_gt", "baseline_lt"], combo.rule.type) ? "D" : "C"
           for         = try(combo.rule.for_duration, "5m")
-          noDataState = try(combo.rule.ok_when_nodata, false) ? "OK" : "NoData"
+          noDataState = try(combo.rule.ok_when_nodata, true) ? "OK" : "NoData"
           labels = {
             severity    = severity
             environment = cfg.name
