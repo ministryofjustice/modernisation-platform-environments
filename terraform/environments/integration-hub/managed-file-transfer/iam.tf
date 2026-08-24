@@ -1,6 +1,6 @@
 module "guardduty_s3_plan_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "6.6.1"
+  version = "6.8.0"
 
   name        = "${local.application_name}-${local.environment}-guardduty-s3-plan"
   description = "GuardDuty S3 malware protection plan policy"
@@ -13,7 +13,7 @@ module "guardduty_s3_plan_policy" {
 
 module "guardduty_s3_plan_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.1"
+  version = "6.8.0"
 
   create          = true
   use_name_prefix = false
@@ -123,7 +123,7 @@ data "aws_iam_policy_document" "guardduty_s3_plan_permission_policy" {
 
 module "iam_for_transfer" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.6.1"
+  version = "6.8.0"
 
   create          = true
   use_name_prefix = true
