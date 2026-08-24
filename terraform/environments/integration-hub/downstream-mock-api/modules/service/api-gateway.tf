@@ -50,6 +50,8 @@ resource "aws_apigatewayv2_stage" "default" {
 
   default_route_settings {
     detailed_metrics_enabled = true
+    throttling_rate_limit    = 50
+    throttling_burst_limit   = 100
   }
 
   access_log_settings {
