@@ -1,6 +1,6 @@
 module "kms_cloudwatch_logs" {
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.0"
+  version = "4.2.1"
 
   aliases                 = ["transfer/logs/${local.component_name}"]
   description             = "KMS CMK for CloudWatch Logs encryption"
@@ -108,7 +108,7 @@ module "kms_cloudwatch_logs" {
 
 module "kms_sns" {
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.0"
+  version = "4.2.1"
 
   aliases                 = ["transfer/sns/${local.component_name}"]
   description             = "KMS CMK for SNS encryption"
@@ -171,7 +171,7 @@ module "kms_s3_bucket" {
     for key, value in local.bucket_configuration : key => value
   }
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.0"
+  version = "4.2.1"
 
   aliases                 = ["s3/${each.key}"]
   description             = "Key for cryptographic functions on ${trimsuffix(each.value.bucket_prefix, "-")} S3 bucket"
@@ -188,7 +188,7 @@ module "kms_s3_bucket" {
 
 module "kms_secrets" {
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.0"
+  version = "4.2.1"
 
   aliases                 = ["transfer/secrets"]
   description             = "KMS CMK for Secrets Manager encryption"
