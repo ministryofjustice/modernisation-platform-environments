@@ -343,6 +343,17 @@ data "aws_iam_policy_document" "redshift-additional-policy" {
     ]
   }
   statement {
+    sid = "S3WorkingBucketWriteAccess"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:DeleteObject"
+    ]
+    resources = [
+      "arn:aws:s3:::${local.project}-working-*/*"
+    ]
+  }
+  statement {
     actions = [
       "kms:*"
     ]
