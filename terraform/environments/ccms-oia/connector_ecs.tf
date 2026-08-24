@@ -67,6 +67,7 @@ resource "aws_ecs_service" "ecs_connector_service" {
   desired_count   = local.application_data.accounts[local.environment].connector_app_count
   
 
+
   # Required by the AWS provider whenever capacity_provider_strategy is
   # added/changed on an existing service (here: switching from launch_type
   # to capacity_provider_strategy), so the change is applied via a fresh

@@ -5,7 +5,7 @@ locals {
       monitoring_stack_enabled = true
       monitoring_hostname      = "monitoring.development.data-platform.service.justice.gov.uk"
       grafana_namespace        = "data-platform-monitoring-development"
-      grafana_chart_version    = "12.4.8"
+      grafana_chart_version    = "12.11.0"
 
       # Enable dashboard management in grafana-dashboards.tf (keep false until monitoring/grafana-api-token is populated).
       grafana_dashboards_enabled = true
@@ -33,9 +33,9 @@ locals {
 
       # Alert routing by account: enabled groups, scoped namespaces, and overrides.
       alerts_configured_accounts = [
-        { name = "data-platform-development", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] },
-        { name = "data-platform-test", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] },
-        { name = "data-platform-preproduction", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] }
+        { name = "data-platform-development", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] },
+        { name = "data-platform-test", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] },
+        { name = "data-platform-preproduction", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] }
       ]
     }
     test = {
@@ -48,7 +48,7 @@ locals {
       monitoring_stack_enabled = true
       monitoring_hostname      = "monitoring.data-platform.service.justice.gov.uk"
       grafana_namespace        = "data-platform-monitoring-production"
-      grafana_chart_version    = "12.4.8"
+      grafana_chart_version    = "12.11.0"
 
       # Enable dashboard management in grafana-dashboards.tf (keep false until monitoring/grafana-api-token is populated).
       grafana_dashboards_enabled = true
@@ -74,10 +74,10 @@ locals {
       ]
       # Alert routing by account: enabled groups, scoped namespaces, and overrides.
       alerts_configured_accounts = [
-        { name = "data-platform-development", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] },
-        { name = "data-platform-test", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] },
-        { name = "data-platform-preproduction", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] },
-        { name = "data-platform-production", enabled_groups = ["AI Gateway"], namespaces = ["ai-gateway"] }
+        { name = "data-platform-development", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] },
+        { name = "data-platform-test", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] },
+        { name = "data-platform-preproduction", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] },
+        { name = "data-platform-production", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] }
       ]
     }
   }

@@ -43,8 +43,24 @@ module "microsoft_foundry_jedi_gateway_secret" {
   name = "${local.component_name}/microsoft-foundry/jedi-gateway"
 
   secret_string = jsonencode({
-    api_key  = "CHANGEME"
-    endpoint = "CHANGEME"
+    # Legacy API key mechanism
+    api_key = "CHANGEME"
+    # New OIDC mechanism
+    endpoint  = "CHANGEME"
+    client_id = "CHANGEME"
+    tenant_id = "CHANGEME"
+  })
+  ignore_secret_changes = true
+}
+
+module "google_cloud_ai_gateway_secret" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
+
+  name = "${local.component_name}/google-cloud-platform/moj-gcp-ai-gateway"
+
+  secret_string = jsonencode({
+    project_name = "CHANGEME"
+    project_id   = "CHANGEME"
   })
   ignore_secret_changes = true
 }
