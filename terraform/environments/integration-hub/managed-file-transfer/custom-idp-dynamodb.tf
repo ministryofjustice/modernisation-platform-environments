@@ -1,6 +1,6 @@
 module "dynamodb_custom_idp_users" {
   source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "5.5.0"
+  version = "5.5.1"
 
   name         = "${local.application_name}-${local.component_name}-custom-idp-users"
   billing_mode = "PAY_PER_REQUEST"
@@ -31,7 +31,7 @@ module "dynamodb_custom_idp_users" {
 
 module "dynamodb_custom_idp_identity_providers" {
   source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "5.5.0"
+  version = "5.5.1"
 
   name         = "${local.application_name}-${local.component_name}-custom-idp-identity-providers"
   billing_mode = "PAY_PER_REQUEST"

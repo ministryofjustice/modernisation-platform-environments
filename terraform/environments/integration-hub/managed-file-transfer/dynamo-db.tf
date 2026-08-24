@@ -1,6 +1,6 @@
 module "dynamodb_idempotency" {
   source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "5.5.0"
+  version = "5.5.1"
 
   name         = "integration-hub-s3-idempotency"
   billing_mode = "PAY_PER_REQUEST"
