@@ -70,7 +70,7 @@ resource "aws_route53_record" "external_prod_blue" {
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
 
-  zone_id = data.aws_route53_zone.external.zone_id
+  zone_id = data.aws_route53_zone.network-services-production[0].zone_id
   name    = "blue-${local.app_url}"
   type    = "A"
 
@@ -85,7 +85,7 @@ resource "aws_route53_record" "external_prod_green" {
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
 
-  zone_id = data.aws_route53_zone.external.zone_id
+  zone_id = data.aws_route53_zone.network-services-production[0].zone_id
   name    = "green-${local.app_url}"
   type    = "A"
 
