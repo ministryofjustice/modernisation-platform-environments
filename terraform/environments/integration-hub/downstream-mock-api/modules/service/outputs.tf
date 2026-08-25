@@ -5,7 +5,7 @@ output "api_endpoint" {
 
 output "healthcheck_url" {
   description = "Health endpoint exposed through API Gateway"
-  value       = "${aws_apigatewayv2_api.service.api_endpoint}/health/ping"
+  value       = "${aws_apigatewayv2_api.service.api_endpoint}${local.service_configuration.health_check_path}"
 }
 
 output "basic_auth_secret_name" {

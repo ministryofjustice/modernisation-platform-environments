@@ -54,6 +54,36 @@ module "kms_cloudwatch_logs" {
         variable = "kms:ViaService"
         values   = ["logs.${var.region}.amazonaws.com"]
       }]
+    },
+    {
+      sid = "AllowPlatformUsersToReadEncryptedLogs"
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+        "kms:ReEncrypt*"
+      ]
+      resources = ["*"]
+      principals = [{
+        type        = "AWS"
+        identifiers = ["*"]
+      }]
+      condition = [
+        {
+          test     = "ArnLike"
+          variable = "aws:PrincipalArn"
+          values = [
+            "arn:aws:iam::${var.account_id}:role/MemberInfrastructureAccess",
+            "arn:aws:iam::${var.account_id}:role/aws-reserved/sso.amazonaws.com/${var.region}/AWSReservedSSO_*"
+          ]
+        },
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["logs.${var.region}.amazonaws.com"]
+        }
+      ]
     }
   ]
 

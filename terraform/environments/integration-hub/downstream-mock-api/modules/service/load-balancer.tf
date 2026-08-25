@@ -2,6 +2,7 @@ resource "aws_security_group" "api_gateway_vpc_link" {
   name        = "${local.resource_name_prefix}-${local.environment}-apigw-vpc-link"
   description = "Security group for API Gateway VPC Link"
   vpc_id      = var.vpc.id
+  egress      = []
   tags        = local.tags
 }
 
@@ -19,6 +20,7 @@ resource "aws_security_group" "load_balancer" {
   name        = "${local.resource_name_prefix}-${local.environment}-alb"
   description = "Security group for internal load balancer"
   vpc_id      = var.vpc.id
+  egress      = []
   tags        = local.tags
 }
 
@@ -36,6 +38,7 @@ resource "aws_security_group" "ecs_service" {
   name        = "${local.resource_name_prefix}-${local.environment}-ecs"
   description = "Security group for downstream mock API ECS service"
   vpc_id      = var.vpc.id
+  egress      = []
   tags        = local.tags
 }
 

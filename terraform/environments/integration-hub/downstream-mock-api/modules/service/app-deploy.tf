@@ -62,10 +62,31 @@ data "aws_iam_policy_document" "app_deploy" {
     effect = "Allow"
     actions = [
       "ecs:DescribeClusters",
+    ]
+    resources = [aws_ecs_cluster.service.arn]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
       "ecs:DescribeServices",
-      "ecs:DescribeTaskDefinition",
-      "ecs:RegisterTaskDefinition",
       "ecs:UpdateService"
+    ]
+    resources = [aws_ecs_service.service.arn]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecs:DescribeTaskDefinition"
+    ]
+    resources = ["arn:aws:ecs:${var.region}:${var.account_id}:task-definition/${aws_ecs_task_definition.service.family}:*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecs:RegisterTaskDefinition"
     ]
     resources = ["*"]
   }

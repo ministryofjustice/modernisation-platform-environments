@@ -33,4 +33,4 @@ After apply, use the outputs to retrieve:
 - `ecr_repository_url`
 - `app_deploy_role_arn`
 
-Populate the real Basic auth secret value directly in AWS Secrets Manager after the initial apply. Terraform intentionally ignores later secret value changes.
+Terraform bootstraps a generated Basic auth password in Secrets Manager for the initial deployment. Later secret value updates are intentionally ignored by Terraform, and ECS reads the secret only when a task starts, so rotate credentials by updating the secret in AWS Secrets Manager and forcing a new ECS deployment.

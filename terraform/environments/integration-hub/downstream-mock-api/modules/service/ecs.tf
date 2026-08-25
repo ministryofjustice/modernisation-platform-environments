@@ -14,6 +14,27 @@ resource "aws_ecr_repository" "application" {
   tags = local.tags
 }
 
+resource "aws_ecr_lifecycle_policy" "application" {
+  repository = aws_ecr_repository.application.name
+
+  policy = jsonencode({
+    rules = [
+      {
+        rulePriority = 1
+        description  = "Retain the 20 most recent images"
+        selection = {
+          tagStatus   = "any"
+          countType   = "imageCountMoreThan"
+          countNumber = 20
+        }
+        action = {
+          type = "expire"
+        }
+      }
+    ]
+  })
+}
+
 resource "aws_cloudwatch_log_group" "ecs" {
   name              = "/aws/ecs/${local.resource_name_prefix}"
   kms_key_id        = module.kms_cloudwatch_logs.key_arn
@@ -170,10 +191,16 @@ resource "aws_ecs_task_definition" "service" {
   tags = local.tags
 }
 
+data "aws_ecs_task_definition" "service_latest" {
+  task_definition = aws_ecs_task_definition.service.family
+
+  depends_on = [aws_ecs_task_definition.service]
+}
+
 resource "aws_ecs_service" "service" {
   name                              = local.resource_name_prefix
   cluster                           = aws_ecs_cluster.service.id
-  task_definition                   = aws_ecs_task_definition.service.arn
+  task_definition                   = data.aws_ecs_task_definition.service_latest.arn
   desired_count                     = local.service_configuration.desired_count
   launch_type                       = "FARGATE"
   enable_execute_command            = true

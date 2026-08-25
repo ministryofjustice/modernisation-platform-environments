@@ -1,3 +1,9 @@
+resource "random_password" "downstream_basic_auth_password" {
+  length           = 32
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
 module "downstream_basic_auth_secret" {
   #checkov:skip=CKV_TF_1:Terraform Registry modules are version-pinned and do not support commit hash references
   source  = "terraform-aws-modules/secrets-manager/aws"
@@ -12,7 +18,7 @@ module "downstream_basic_auth_secret" {
 
   secret_string = jsonencode({
     username = "orchestration-client"
-    password = "replace-me"
+    password = random_password.downstream_basic_auth_password.result
   })
 
   tags = local.tags
