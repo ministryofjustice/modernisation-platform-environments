@@ -66,6 +66,36 @@ resource "aws_route53_record" "external-prod" {
   }
 }
 
+resource "aws_route53_record" "external_prod_blue" {
+  count    = local.is-production ? 1 : 0
+  provider = aws.core-network-services
+
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "blue-${local.app_url}"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.external.dns_name
+    zone_id                = aws_lb.external.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "external_prod_green" {
+  count    = local.is-production ? 1 : 0
+  provider = aws.core-network-services
+
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "green-${local.app_url}"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.external.dns_name
+    zone_id                = aws_lb.external.zone_id
+    evaluate_target_health = true
+  }
+}
+
 resource "aws_acm_certificate" "external" {
   domain_name       = local.domain
   validation_method = "DNS"
