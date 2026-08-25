@@ -16,9 +16,31 @@
             "ClusterName",
             "hmpps-${environment}-${app_name}",
             {
-              "label": "${app_name}-service-blue"
+              "id": "blue_used",
+              "visible": false
             }
           ],
+          [
+            "ECS/ContainerInsights",
+            "CpuReserved",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}-blue",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "blue_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(blue_used / blue_reserved) * 100",
+              "label": "${app_name}-service-blue",
+              "id": "blue_pct",
+              "color": "#1f77b4"
+            }
+          ],
+
           [
             "ECS/ContainerInsights",
             "CpuUtilized",
@@ -27,25 +49,73 @@
             "ClusterName",
             "hmpps-${environment}-${app_name}",
             {
-              "label": "${app_name}-service-green"
+              "id": "green_used",
+              "visible": false
             }
           ],
+          [
+            "ECS/ContainerInsights",
+            "CpuReserved",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}-green",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "green_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(green_used / green_reserved) * 100",
+              "label": "${app_name}-service-green",
+              "id": "green_pct",
+              "color": "#2ca02c"
+            }
+          ],
+
           [
             "ECS/ContainerInsights",
             "CpuUtilized",
             "ClusterName",
             "hmpps-${environment}-${app_name}",
             {
-              "label": "${app_name}-cluster"
+              "id": "cluster_used",
+              "visible": false
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "CpuReserved",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "cluster_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(cluster_used / cluster_reserved) * 100",
+              "label": "${app_name}-cluster",
+              "id": "cluster_pct",
+              "color": "#9467BD"
             }
           ]
         ],
         "view": "timeSeries",
-        "stacked": true,
+        "stacked": false,
         "region": "eu-west-2",
         "title": "CPU Utilization",
         "stat": "Average",
-        "period": 300
+        "period": 300,
+        "yAxis": {
+          "left": {
+            "label": "%",
+            "min": 0,
+            "max": 100
+          }
+        }
       }
     },
     {
@@ -64,7 +134,28 @@
             "ClusterName",
             "hmpps-${environment}-${app_name}",
             {
-              "label": "${app_name}-service-blue"
+              "id": "blue_used",
+              "visible": false
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "MemoryReserved",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}-blue",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "blue_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(blue_used / blue_reserved) * 100",
+              "label": "${app_name}-service-blue",
+              "id": "blue_pct",
+              "color": "#1f77b4"
             }
           ],
           [
@@ -75,7 +166,28 @@
             "ClusterName",
             "hmpps-${environment}-${app_name}",
             {
-              "label": "${app_name}-service-green"
+              "id": "green_used",
+              "visible": false
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "MemoryReserved",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}-green",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "green_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(green_used / green_reserved) * 100",
+              "label": "${app_name}-service-green",
+              "id": "green_pct",
+              "color": "#2ca02c"
             }
           ],
           [
@@ -84,16 +196,42 @@
             "ClusterName",
             "hmpps-${environment}-${app_name}",
             {
-              "label": "${app_name}-cluster"
+              "id": "cluster_used",
+              "visible": false
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "MemoryReserved",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "cluster_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(cluster_used / cluster_reserved) * 100",
+              "label": "${app_name}-cluster",
+              "id": "cluster_pct",
+              "color": "#9467BD"
             }
           ]
         ],
         "view": "timeSeries",
-        "stacked": true,
+        "stacked": false,
         "region": "eu-west-2",
         "title": "Memory Utilization",
         "stat": "Average",
-        "period": 300
+        "period": 300,
+        "yAxis": {
+          "left": {
+            "label": "%",
+            "min": 0,
+            "max": 100
+          }
+        }
       }
     },
     {
@@ -108,23 +246,23 @@
             "JitbitMetrics",
             "ErrorCountBlue",
             {
-              "label": "Blue",
+              "label": "${app_name}-errors-blue",
               "color": "#1f77b4"
             }
           ],
           [
-            ".",
+            "JitbitMetrics",
             "ErrorCountGreen",
             {
-              "label": "Green",
+              "label": "${app_name}-errors-green",
               "color": "#2ca02c"
             }
           ]
         ],
         "view": "timeSeries",
-        "stacked": true,
+        "stacked": false,
         "region": "eu-west-2",
-        "stat": "Average",
+        "stat": "Sum",
         "period": 300,
         "title": "Jitbit Application Errors"
       }
@@ -171,7 +309,7 @@
       "height": 6,
       "properties": {
         "view": "timeSeries",
-        "stacked": true,
+        "stacked": false,
         "metrics": [
           [
             "AWS/ApplicationELB",
@@ -181,7 +319,8 @@
             "LoadBalancer",
             "${load_balancer_arn}",
             {
-              "label": "Blue Target Group"
+              "label": "Blue Target Group",
+              "color": "#1f77b4"
             }
           ],
           [
@@ -192,7 +331,8 @@
             "LoadBalancer",
             "${load_balancer_arn}",
             {
-              "label": "Green Target Group"
+              "label": "Green Target Group",
+              "color": "#2ca02c"
             }
           ]
         ],
@@ -412,10 +552,25 @@
             "AWS/ApplicationELB",
             "HTTPCode_Target_4XX_Count",
             "LoadBalancer",
-            "${load_balancer_arn}"
+            "${load_balancer_arn}",
+            {
+              "id": "errors",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "FILL(errors, 0)",
+              "label": "Target 4XX Errors",
+              "color": "#d62728",
+              "id": "errors_filled"
+            }
           ]
         ],
-        "region": "eu-west-2"
+        "region": "eu-west-2",
+        "stat": "Sum",
+        "period": 300,
+        "title": "Target HTTP 4XX Errors"
       }
     },
     {
@@ -431,11 +586,32 @@
           [
             "AWS/ApplicationELB",
             "TargetResponseTime",
+            "TargetGroup",
+            "${target_group_arn_blue}",
             "LoadBalancer",
-            "${load_balancer_arn}"
+            "${load_balancer_arn}",
+            {
+              "label": "Blue Target Group",
+              "color": "#1f77b4"
+            }
+          ],
+          [
+            "AWS/ApplicationELB",
+            "TargetResponseTime",
+            "TargetGroup",
+            "${target_group_arn_green}",
+            "LoadBalancer",
+            "${load_balancer_arn}",
+            {
+              "label": "Green Target Group",
+              "color": "#2ca02c"
+            }
           ]
         ],
-        "region": "eu-west-2"
+        "region": "eu-west-2",
+        "stat": "Average",
+        "period": 300,
+        "title": "Target Response Time"
       }
     },
     {
