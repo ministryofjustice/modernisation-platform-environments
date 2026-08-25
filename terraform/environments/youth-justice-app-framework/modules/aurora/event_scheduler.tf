@@ -34,6 +34,7 @@ resource "aws_iam_role_policy" "rds_scheduler" {
 
 
 resource "aws_scheduler_schedule" "rds_start" {
+  #checkov:skip=CKV_AWS_297:Target payload contains no sensitive data; AWS-managed key encryption is sufficient
   count                        = var.create_sheduler ? 1 : 0
   name                         = "rds-start-weekdays"
   schedule_expression_timezone = "Europe/London"
@@ -55,6 +56,7 @@ resource "aws_scheduler_schedule" "rds_start" {
 
 
 resource "aws_scheduler_schedule" "rds_stop" {
+  #checkov:skip=CKV_AWS_297:Target payload contains no sensitive data; AWS-managed key encryption is sufficient
   count                        = var.create_sheduler ? 1 : 0
   name                         = "rds-stop-weekdays"
   schedule_expression_timezone = "Europe/London"

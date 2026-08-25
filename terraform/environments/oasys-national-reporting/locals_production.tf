@@ -124,6 +124,7 @@ locals {
         })
         tags = merge(local.ec2_instances.bip_cms.tags, {
           oasys-national-reporting-environment = "pd"
+          owner                                = "mark.richardson@digital.justice.gov.uk" # remove this once user-data provider bug fixed
         })
       })
 
@@ -144,6 +145,7 @@ locals {
         })
         tags = merge(local.ec2_instances.bip_cms.tags, {
           oasys-national-reporting-environment = "pd"
+          owner                                = "mark.richardson@digital.justice.gov.uk" # remove this once user-data provider bug fixed
         })
       })
 
@@ -164,6 +166,7 @@ locals {
         })
         tags = merge(local.ec2_instances.bip_web.tags, {
           oasys-national-reporting-environment = "pd"
+          owner                                = "mark.richardson@digital.justice.gov.uk" # remove this once user-data provider bug fixed
         })
       })
 
@@ -184,6 +187,7 @@ locals {
         })
         tags = merge(local.ec2_instances.bip_web.tags, {
           oasys-national-reporting-environment = "pd"
+          owner                                = "mark.richardson@digital.justice.gov.uk" # remove this once user-data provider bug fixed
         })
       })
     }

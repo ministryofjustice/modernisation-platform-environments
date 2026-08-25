@@ -9,10 +9,12 @@ locals {
     "am_stg${local.dbt_suffix}",
     "intermediate_tasking${local.dbt_suffix}"
   ]
+
   load_lambda_databases = [
     "staged_mdss${local.dbt_suffix}",
     "acquisitive_crime${local.dbt_suffix}",
-    "allied_mdss_${local.dbt_suffix}",
+    "allied_mdss${local.db_suffix}",
+    "data_insights${local.dbt_suffix}"
   ]
 
 }
@@ -1102,8 +1104,7 @@ module "share_db_with_fms_lambda_role" {
   dbs_to_grant            = toset(["serco_fms${local.db_suffix}"])
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.load_fms.arn
-  db_exists               = !local.is-development
-  de_role_arn             = local.is-development ? try(one(data.aws_iam_roles.mod_plat_roles.arns)) : null
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 }
 
 resource "aws_lakeformation_permissions" "fms_add_create_db" {
@@ -1822,6 +1823,27 @@ data "aws_iam_policy_document" "cloudwatch_alarm_threader_policy_document" {
     ]
     resources = [aws_sfn_state_machine.staging_db_janitor.arn]
   }
+
+  statement {
+    sid    = "AllowStartLandingDlqRedriverWorkflow"
+    effect = "Allow"
+    actions = [
+      "states:StartExecution",
+    ]
+    resources = [
+      aws_sfn_state_machine.landing_dlq_redriver.arn,
+    ]
+  }
+  statement {
+    sid    = "AllowSendIncidentEvents"
+    effect = "Allow"
+    actions = [
+      "sqs:SendMessage",
+    ]
+    resources = [
+      aws_sqs_queue.live_feed_incident_events.arn,
+    ]
+  }
 }
 
 resource "aws_iam_policy" "cloudwatch_alarm_threader" {
@@ -1833,6 +1855,7 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_alarm_threader_attach" {
   role       = aws_iam_role.cloudwatch_alarm_threader.name
   policy_arn = aws_iam_policy.cloudwatch_alarm_threader.arn
 }
+
 
 
 # ------------------------------------------------------------------------------
@@ -2321,6 +2344,11 @@ resource "aws_iam_role" "merge_load_ac" {
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
+resource "aws_iam_role" "merge_load_emdi" {
+  name               = "merge_load_emdi_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
 data "aws_iam_policy_document" "merge_load_policy_document" {
   statement {
     sid    = "AthenaPermissions"
@@ -2443,7 +2471,7 @@ resource "aws_iam_role_policy_attachment" "merge_load_ac_attach" {
 
 
 resource "aws_lakeformation_permissions" "merge_load_ac_lambda_database_access" {
-  for_each    = local.is-development || local.is-test || local.is-preproduction ? toset(local.load_lambda_databases) : []
+  for_each    = toset(local.load_lambda_databases)
   principal   = aws_iam_role.merge_load_ac.arn
   permissions = ["DESCRIBE"]
   database {
@@ -2452,7 +2480,7 @@ resource "aws_lakeformation_permissions" "merge_load_ac_lambda_database_access" 
 }
 
 resource "aws_lakeformation_permissions" "merge_load_ac_lambda_table_access" {
-  for_each    = local.is-development || local.is-test || local.is-preproduction ? toset(local.load_lambda_databases) : []
+  for_each    = toset(local.load_lambda_databases)
   principal   = aws_iam_role.merge_load_ac.arn
   permissions = ["SELECT", "INSERT", "ALTER", "DESCRIBE"]
   table {
@@ -2462,7 +2490,7 @@ resource "aws_lakeformation_permissions" "merge_load_ac_lambda_table_access" {
 }
 
 resource "aws_lakeformation_permissions" "merge_load_ac_lambda_s3_access" {
-  count       = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
+  count       = 1
   principal   = aws_iam_role.merge_load_ac.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
@@ -2505,6 +2533,40 @@ resource "aws_lakeformation_permissions" "merge_load_event_lambda_s3_access" {
   }
 }
 
+# merge load emdi
+resource "aws_iam_role_policy_attachment" "merge_load_emdi_attach" {
+  role       = aws_iam_role.merge_load_emdi.name
+  policy_arn = aws_iam_policy.merge_load.arn
+}
+
+
+resource "aws_lakeformation_permissions" "merge_load_emdi_lambda_database_access" {
+  for_each    = toset(local.load_lambda_databases)
+  principal   = aws_iam_role.merge_load_emdi.arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = each.value
+  }
+}
+
+resource "aws_lakeformation_permissions" "merge_load_emdi_lambda_table_access" {
+  for_each    = toset(local.load_lambda_databases)
+  principal   = aws_iam_role.merge_load_emdi.arn
+  permissions = ["SELECT", "INSERT", "ALTER", "DESCRIBE"]
+  table {
+    database_name = each.value
+    wildcard      = true
+  }
+}
+
+resource "aws_lakeformation_permissions" "merge_load_emdi_lambda_s3_access" {
+  count       = 1
+  principal   = aws_iam_role.merge_load_emdi.arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+  data_location {
+    arn = aws_lakeformation_resource.data_bucket.arn
+  }
+}
 
 # -----------------------------------------------------------------------------------
 # Macie Unstructured Job
@@ -2743,4 +2805,258 @@ module "share_dbs_with_control_lambda_role" {
   role_arn                = aws_iam_role.gdpr_unstructured_control_lambda_iam_role[0].arn
   db_exists               = true
   de_role_arn             = null
+}
+
+
+# ---------------------------------
+# Write EAR/SAR data to SharePoint
+# ---------------------------------
+
+data "aws_iam_policy_document" "write_to_sharepoint_iam_role_policy_document" {
+  count = local.is-test ? 0 : 1
+  statement {
+    sid    = "S3BucketPerms"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetBucketLocation",
+      "s3:ListBucket"
+    ]
+    resources = [
+      "${module.s3-ears-sars-bucket.bucket.arn}/*",
+      module.s3-ears-sars-bucket.bucket.arn,
+    ]
+  }
+}
+
+resource "aws_iam_role" "write_to_sharepoint" {
+  count              = local.is-test ? 0 : 1
+  name               = "write-to-sharepoint-iam-role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "write_to_sharepoint_iam_policy" {
+  count  = local.is-test ? 0 : 1
+  name   = "write_to_sharepoint_lambda_policy"
+  policy = data.aws_iam_policy_document.write_to_sharepoint_iam_role_policy_document[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "write_to_sharepoint_iam_role_attach" {
+  count      = local.is-test ? 0 : 1
+  role       = aws_iam_role.write_to_sharepoint[0].name
+  policy_arn = aws_iam_policy.write_to_sharepoint_iam_policy[0].arn
+}
+
+# ---------------------------------
+# Trigger CADT iam role
+# ---------------------------------
+
+data "aws_iam_policy_document" "cadt_policy_document" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecs:RunTask"
+    ]
+    resources = [
+      "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task-definition/${aws_ecs_task_definition.create_a_derived_table.family}:*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "iam:PassRole"
+    ]
+    resources = [
+      module.ecs_execution_role.arn,
+      aws_iam_role.dataapi_cross_role.arn
+    ]
+    condition {
+      test     = "StringLike"
+      variable = "iam:PassedToService"
+      values   = ["ecs-tasks.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_policy" "trigger_cadt_iam_policy" {
+  name   = "trigger_cadt_lambda_policy"
+  policy = data.aws_iam_policy_document.cadt_policy_document.json
+}
+
+
+module "trigger_cadt_iam" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-role"
+
+  name = "trigger-cadt-iam-role"
+  trust_policy_permissions = {
+    LambdaAssume = { actions = [
+      "sts:AssumeRole",
+      ]
+      principals = [{
+        type        = "Service"
+        identifiers = ["lambda.amazonaws.com"]
+    }] }
+  }
+
+  policies = {
+    custom = aws_iam_policy.trigger_cadt_iam_policy.arn
+  }
+
+}
+
+
+
+# ---------------------------------
+# Poll CADT iam role
+# ---------------------------------
+
+data "aws_iam_policy_document" "poll_cadt_policy_document" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecs:DescribeTasks"
+    ]
+    resources = [
+      "*"
+    ]
+    condition {
+      test     = "ArnEquals"
+      variable = "ecs:cluster"
+      values   = [aws_ecs_cluster.cadt.arn]
+    }
+  }
+}
+
+resource "aws_iam_policy" "poll_cadt_iam_policy" {
+  name   = "poll_cadt_lambda_policy"
+  policy = data.aws_iam_policy_document.poll_cadt_policy_document.json
+}
+
+
+module "poll_cadt_iam" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-role"
+
+  name = "poll-cadt-iam-role"
+  trust_policy_permissions = {
+    LambdaAssume = { actions = [
+      "sts:AssumeRole",
+      ]
+      principals = [{
+        type        = "Service"
+        identifiers = ["lambda.amazonaws.com"]
+    }] }
+  }
+
+  policies = {
+    custom = aws_iam_policy.poll_cadt_iam_policy.arn
+  }
+
+}
+
+# ------------------------------------------------------------------------------
+# IAM role and policy for the live-feed incident manager Lambda
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "live_feed_incident_manager" {
+  name               = "live_feed_incident_manager_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "live_feed_incident_manager_policy_document" {
+  statement {
+    sid    = "ConsumeIncidentEvents"
+    effect = "Allow"
+
+    actions = [
+      "sqs:ChangeMessageVisibility",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+      "sqs:ReceiveMessage",
+    ]
+
+    resources = [
+      aws_sqs_queue.live_feed_incident_events.arn,
+    ]
+  }
+
+  statement {
+    sid    = "ReadGitHubAppSecret"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      module.live_feed_github_app.secret_arn,
+    ]
+  }
+
+  statement {
+    sid    = "ListIncidentEpisodeStateBucket"
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      module.s3-logging-bucket.bucket.arn,
+    ]
+  }
+
+  statement {
+    sid    = "StoreIncidentEpisodeState"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${module.s3-logging-bucket.bucket.arn}/incident-automation/episodes/${local.environment_shorthand}/*"
+    ]
+  }
+
+  statement {
+    sid    = "PublishIncidentNotifications"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [
+      aws_sns_topic.emds_alerts.arn,
+      aws_sns_topic.operational_incident_updates.arn,
+    ]
+  }
+
+  statement {
+    sid    = "UseIncidentNotificationKmsKey"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey*",
+    ]
+
+    resources = [
+      aws_kms_key.emds_alerts.arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "live_feed_incident_manager" {
+  name   = "live_feed_incident_manager_lambda_policy"
+  policy = data.aws_iam_policy_document.live_feed_incident_manager_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "live_feed_incident_manager_attach" {
+  role       = aws_iam_role.live_feed_incident_manager.name
+  policy_arn = aws_iam_policy.live_feed_incident_manager.arn
 }

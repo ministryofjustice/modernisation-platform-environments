@@ -18,13 +18,18 @@ module "waf-cf" {
     }
   }
 
-  waf_path_allow_rules_cf = {
+  waf_header_allow_rules_cf = {
     "allow-malware-notifier" = {
       name     = "allow-malware-notifier"
       priority = 1
-      path     = "/secure/api/v1/docs/threatDetected"
+      paths = [
+        "/secure/api/v1/auth",
+        "/secure/api/v1/docs/threatDetected"
+      ]
     }
   }
+  waf_header_allow_header_name  = "X-Internal-Service"
+  waf_header_allow_header_value = local.internal_service_token
 
   project_name = local.project_name
   tags         = local.tags

@@ -33,7 +33,7 @@ resource "aws_eip" "nat" {
 resource "aws_nat_gateway" "main" {
 
   allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.public_a.id
+  subnet_id     = aws_subnet.nat_a.id
 
   tags = merge(
     local.tags,
@@ -43,16 +43,4 @@ resource "aws_nat_gateway" "main" {
   )
 
   depends_on = [aws_internet_gateway.main]
-}
-
-##############################################
-### Add NAT Gateway Route to Private Route Table
-##############################################
-
-resource "aws_route" "private_nat_gateway" {
-  count = local.environment == "development" ? 1 : 0
-
-  route_table_id         = aws_route_table.private.id
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.main.id
 }

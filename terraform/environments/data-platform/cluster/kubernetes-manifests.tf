@@ -39,6 +39,17 @@ locals {
     }
     if trimspace(doc) != ""
   }
+
+  # gateway.k8s.aws Gateway API CRDs (LoadBalancerConfiguration, TargetGroupConfiguration,
+  # ListenerRuleConfiguration) live in a separate file to the rest of the controller's CRDs.
+  aws_load_balancer_controller_gateway_crd_manifests = {
+    for i, doc in split("\n---\n", data.http.aws_load_balancer_controller_gateway_crd.response_body) :
+    tostring(i) => {
+      for k, v in yamldecode(doc) :
+      k => v if k != "status"
+    }
+    if trimspace(doc) != ""
+  }
 }
 
 data "http" "gateway_api_crd" {
@@ -73,4 +84,20 @@ resource "kubernetes_manifest" "aws_load_balancer_controller_crds" {
   for_each = local.aws_load_balancer_controller_crd_manifests
 
   manifest = each.value
+}
+
+data "http" "aws_load_balancer_controller_gateway_crd" {
+  url = "https://raw.githubusercontent.com/aws/eks-charts/${local.cluster_configuration.crd_versions.aws_load_balancer_controller}/stable/aws-load-balancer-controller/crds/gateway-crds.yaml"
+}
+
+resource "kubernetes_manifest" "aws_load_balancer_controller_gateway_crds" {
+  for_each = local.aws_load_balancer_controller_gateway_crd_manifests
+
+  manifest = each.value
+
+  # These CRDs were originally auto-installed by the Helm chart's own crds/ directory, which Helm
+  # only applies on first install and never upgrades, so take over field ownership to update them.
+  field_manager {
+    force_conflicts = true
+  }
 }

@@ -1,3 +1,9 @@
+variable "create_service" {
+  description = "Create the ECS Container/Service"
+  type        = bool
+  default     = true
+}
+
 variable "account_config" {
   description = "Account config to pass to the instance"
   type        = any
@@ -222,6 +228,12 @@ variable "ecs_cluster_arn" {
   type        = string
 }
 
+variable "asg_name" {
+  type        = string
+  description = "Name of ASG (For cloudwatch monitoring)"
+  default     = null
+}
+
 variable "launch_type" {
   type        = string
   description = "Launch typ required by the task e.g. EC2, FARGATE etc"
@@ -246,6 +258,12 @@ variable "container_port_config" {
     containerPort = number
     protocol      = string
   }))
+  default = [
+    {
+      containerPort = 8080
+      protocol      = "tcp"
+    }
+  ]
 }
 
 variable "target_group_protocol" {
@@ -365,21 +383,25 @@ variable "elasticache_user_variable" {
 variable "container_vars_default" {
   description = "Environment variables to pass to the container"
   type        = map(any)
+  default     = {}
 }
 
 variable "container_vars_env_specific" {
   description = "Environment variables to pass to the container"
   type        = map(any)
+  default     = {}
 }
 
 variable "container_secrets_default" {
   description = "Secrets to pass to the container"
   type        = map(any)
+  default     = {}
 }
 
 variable "container_secrets_env_specific" {
   description = "Secrets to pass to the container"
   type        = map(any)
+  default     = {}
 }
 
 variable "alb_security_group_id" {
@@ -428,6 +450,7 @@ variable "cloudwatch_error_pattern" {
 variable "container_image" {
   description = "The container image to use"
   type        = string
+  default     = null
 }
 
 variable "container_memory" {

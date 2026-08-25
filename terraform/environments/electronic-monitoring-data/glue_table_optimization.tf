@@ -1,187 +1,15 @@
-locals {
-  database_to_optimize = local.live_feeds_dbs
+module "glue_table_optimiser" {
+  source = "./modules/glue_table_optimiser"
 
-  # Default settings applied to all tables unless overridden per-table.
-  # Set a value to null to use the provider default.
-  table_optimizer_defaults = {
-    snapshot_retention_period_in_days      = 7
-    number_of_snapshots_to_retain          = 3
-    orphan_file_retention_period_in_days   = 7
-    retention_run_rate_in_hours            = 24
-    orphan_file_deletion_run_rate_in_hours = 24
-  }
-
-  # Per-table overrides: supply any subset of the keys from
-  # table_optimizer_defaults to override that table's settings.
-  # Use an empty map {} for tables that should use all defaults.
-  tables_to_optimize = {
-    "allied_mdss" = {
-      "_dlt_loads" = {
-        snapshot_retention_period_in_days      = 3
-        number_of_snapshots_to_retain          = 3
-        orphan_file_retention_period_in_days   = 1
-        retention_run_rate_in_hours            = 3
-        orphan_file_deletion_run_rate_in_hours = 3
-      }
-      "_dlt_pipeline_state" = {}
-      "_dlt_version"        = {}
-      "curfew"              = {}
-      "curfew__rule"        = {}
-      "curfew__zone"        = {}
-      "device"              = {}
-      "device_activation"   = {}
-      "event"               = {}
-      "person"              = {}
-      "position"            = {}
-    }
-    "serco_fms" = {
-      "_dlt_loads" = {
-        snapshot_retention_period_in_days      = 3
-        number_of_snapshots_to_retain          = 3
-        orphan_file_retention_period_in_days   = 1
-        retention_run_rate_in_hours            = 3
-        orphan_file_deletion_run_rate_in_hours = 3
-      }
-      "_dlt_pipeline_state"                                  = {}
-      "_dlt_version"                                         = {}
-      "alm_asset"                                            = {}
-      "asmt_assessment_instance"                             = {}
-      "asmt_assessment_instance_question"                    = {}
-      "alm_hardware"                                         = {}
-      "alm_stockroom"                                        = {}
-      "alm_transfer_order"                                   = {}
-      "asmt_metric"                                          = {}
-      "asmt_metric_result"                                   = {}
-      "cmdb_hardware_product_model"                          = {}
-      "cmn_location"                                         = {}
-      "cmn_schedule"                                         = {}
-      "cmn_schedule_span"                                    = {}
-      "cmn_skill_level"                                      = {}
-      "csm_consumer"                                         = {}
-      "customer_account"                                     = {}
-      "customer_contact"                                     = {}
-      "interaction"                                          = {}
-      "m2m_kb_task"                                          = {}
-      "problem"                                              = {}
-      "sm_asset_usage"                                       = {}
-      "sm_part_requirement"                                  = {}
-      "sn_customerservice_task"                              = {}
-      "sys_dictionary"                                       = {}
-      "sys_db_object"                                        = {}
-      "wm_crew"                                              = {}
-      "wm_crew_member"                                       = {}
-      "wm_crew_skill"                                        = {}
-      "wm_order"                                             = {}
-      "wm_questionnaire"                                     = {}
-      "wm_task"                                              = {}
-      "wm_work_type"                                         = {}
-      "x_serg2_ems_am_cmdb_ci_alcohol_monitoring_device"     = {}
-      "x_serg2_ems_am_cmdb_ci_home_monitoring_unit"          = {}
-      "x_serg2_ems_am_cmdb_ci_gps_monitoring_device"         = {}
-      "x_serg2_ems_am_cmdb_ci_monitoring_device"             = {}
-      "x_serg2_ems_am_u_cmdb_ci_non_fitted_biometric_device" = {}
-      "x_serg2_ems_csm_al_device_maintenance"                = {}
-      "x_serg2_ems_csm_al_indication_fault"                  = {}
-      "x_serg2_ems_csm_al_indication_noncompliance"          = {}
-      "x_serg2_ems_csm_al_investigation_violation"           = {}
-      "x_serg2_ems_csm_al_investigation_special"             = {}
-      "x_serg2_ems_csm_al_notification_alert"                = {}
-      "x_serg2_ems_csm_auto"                                 = {}
-      "x_serg2_ems_csm_case"                                 = {}
-      "x_serg2_ems_csm_complaints"                           = {}
-      "x_serg2_ems_csm_compliments"                          = {}
-      "x_serg2_ems_csm_enforcement_action"                   = {}
-      "x_serg2_ems_csm_not_monitored"                        = {}
-      "x_serg2_ems_csm_profile_device_wearer"                = {}
-      "x_serg2_ems_csm_profile_sensitive"                    = {}
-      "x_serg2_ems_csm_sr"                                   = {}
-      "x_serg2_ems_csm_sr_info"                              = {}
-      "x_serg2_ems_csm_sr_mo_existing"                       = {}
-      "x_serg2_ems_csm_trials"                               = {}
-      "x_serg2_ems_mom_commited_offence"                     = {}
-      "x_serg2_ems_mom_mo"                                   = {}
-      "x_serg2_ems_mom_monitoring_configuration"             = {}
-      "x_serg2_ems_mom_mr"                                   = {}
-      "x_serg2_ems_mom_violation"                            = {}
-      "x_serg2_ems_mom_violation_mitigation"                 = {}
-      "x_serg2_mdss_em_event_type"                           = {}
-      "x_serg2_mdss_em_mdss_alert"                           = {}
-    }
-  }
-
-  # Flatten tables into a single map keyed by "database.table" with merged config.
-  tables_to_optimize_flat = merge([
-    for database_name in local.database_to_optimize : {
-      for table_name, config in local.tables_to_optimize[database_name] : "${database_name}.${table_name}" => merge(
-        local.table_optimizer_defaults,
-        config
-      )
-    }
-  ]...)
-}
-
-resource "aws_glue_catalog_table_optimizer" "standard_compaction" {
-  for_each      = local.tables_to_optimize_flat
-  catalog_id    = data.aws_caller_identity.current.account_id
-  database_name = "${split(".", each.key)[0]}${local.db_suffix}"
-  table_name    = split(".", each.key)[1]
-
-  configuration {
-    role_arn = aws_iam_role.glue_table_optimizer.arn
-    enabled  = true
-  }
-
-  type = "compaction"
-}
-
-resource "aws_glue_catalog_table_optimizer" "standard_retention" {
-  for_each      = local.tables_to_optimize_flat
-  catalog_id    = data.aws_caller_identity.current.account_id
-  database_name = "${split(".", each.key)[0]}${local.db_suffix}"
-  table_name    = split(".", each.key)[1]
-
-  configuration {
-    role_arn = aws_iam_role.glue_table_optimizer.arn
-    enabled  = true
-
-    retention_configuration {
-      iceberg_configuration {
-        snapshot_retention_period_in_days = each.value.snapshot_retention_period_in_days
-        number_of_snapshots_to_retain     = each.value.number_of_snapshots_to_retain
-        clean_expired_files               = true
-        run_rate_in_hours                 = each.value.retention_run_rate_in_hours
-      }
-    }
-  }
-
-  type = "retention"
+  databases                           = local.live_feed_dbs_to_grant
+  optimizer_bucket_id                 = module.s3-create-a-derived-table-bucket.bucket.id
+  role_arn                            = aws_iam_role.glue_table_optimiser.arn
+  environment                         = local.environment_shorthand
+  dbt_databases                       = local.dbt_dbs_to_grant
 }
 
 
-resource "aws_glue_catalog_table_optimizer" "standard_orphan_file_deletion" {
-  for_each      = local.tables_to_optimize_flat
-  catalog_id    = data.aws_caller_identity.current.account_id
-  database_name = "${split(".", each.key)[0]}${local.db_suffix}"
-  table_name    = split(".", each.key)[1]
-
-  configuration {
-    role_arn = aws_iam_role.glue_table_optimizer.arn
-    enabled  = true
-
-    orphan_file_deletion_configuration {
-      iceberg_configuration {
-        orphan_file_retention_period_in_days = each.value.orphan_file_retention_period_in_days
-        run_rate_in_hours                    = each.value.orphan_file_deletion_run_rate_in_hours
-        location                             = "s3://${module.s3-create-a-derived-table-bucket.bucket.id}/staging/${split(".", each.key)[0]}${local.db_suffix}_pipeline/${split(".", each.key)[0]}${local.db_suffix}/${split(".", each.key)[1]}/"
-      }
-    }
-
-  }
-
-  type = "orphan_file_deletion"
-}
-
-data "aws_iam_policy_document" "glue_table_optimizer_assume_role_policy" {
+data "aws_iam_policy_document" "glue_table_optimiser_assume_role_policy" {
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
@@ -192,12 +20,12 @@ data "aws_iam_policy_document" "glue_table_optimizer_assume_role_policy" {
   }
 }
 
-resource "aws_iam_role" "glue_table_optimizer" {
+resource "aws_iam_role" "glue_table_optimiser" {
   name               = "glue-table-optimizer-role"
-  assume_role_policy = data.aws_iam_policy_document.glue_table_optimizer_assume_role_policy.json
+  assume_role_policy = data.aws_iam_policy_document.glue_table_optimiser_assume_role_policy.json
 }
 
-data "aws_iam_policy_document" "glue_table_optimizer_policy" {
+data "aws_iam_policy_document" "glue_table_optimiser_policy" {
   statement {
     effect = "Allow"
     actions = [
@@ -241,18 +69,18 @@ data "aws_iam_policy_document" "glue_table_optimizer_policy" {
   }
 }
 
-resource "aws_iam_policy" "glue_table_optimizer_policy" {
-  name   = "glue-table-optimizer-policy"
-  policy = data.aws_iam_policy_document.glue_table_optimizer_policy.json
+resource "aws_iam_policy" "glue_table_optimiser_policy" {
+  name   = "glue-table-optimiser-policy"
+  policy = data.aws_iam_policy_document.glue_table_optimiser_policy.json
 }
 
-resource "aws_iam_role_policy_attachment" "glue_table_optimizer_policy_attachment" {
-  role       = aws_iam_role.glue_table_optimizer.name
-  policy_arn = aws_iam_policy.glue_table_optimizer_policy.arn
+resource "aws_iam_role_policy_attachment" "glue_table_optimiser_policy_attachment" {
+  role       = aws_iam_role.glue_table_optimiser.name
+  policy_arn = aws_iam_policy.glue_table_optimiser_policy.arn
 }
 
 resource "aws_lakeformation_permissions" "glue_table_optimizer_permissions" {
-  principal   = aws_iam_role.glue_table_optimizer.arn
+  principal   = aws_iam_role.glue_table_optimiser.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
     arn = aws_lakeformation_resource.data_bucket.arn
@@ -260,21 +88,22 @@ resource "aws_lakeformation_permissions" "glue_table_optimizer_permissions" {
 }
 
 resource "aws_lakeformation_permissions" "glue_table_optimizer_table_permissions" {
-  for_each    = toset(local.database_to_optimize)
-  principal   = aws_iam_role.glue_table_optimizer.arn
+  for_each    = setunion(local.live_feed_dbs_to_grant, local.dbt_dbs_to_grant)
+  principal   = aws_iam_role.glue_table_optimiser.arn
   permissions = ["ALTER", "DESCRIBE", "INSERT", "DELETE"]
+
   table {
-    database_name = "${each.key}${local.db_suffix}"
+    database_name = each.key
     wildcard      = true
   }
 }
 
-
 resource "aws_lakeformation_permissions" "glue_table_optimizer_database_permissions" {
-  for_each    = toset(local.database_to_optimize)
-  principal   = aws_iam_role.glue_table_optimizer.arn
+  for_each    = setunion(local.live_feed_dbs_to_grant, local.dbt_dbs_to_grant)
+  principal   = aws_iam_role.glue_table_optimiser.arn
   permissions = ["DESCRIBE"]
+
   database {
-    name = "${each.key}${local.db_suffix}"
+    name = each.key
   }
 }

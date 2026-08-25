@@ -74,6 +74,18 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_152x" {
   local.application_data.accounts[local.environment].cloud_platform_subnet]
 }
 
+# MP Workspaces (V1) - DEV only, EBS DB Oracle Net Listener access
+resource "aws_security_group_rule" "ingress_traffic_ebsdb_152x_mp_v1_workspaces" {
+  count             = local.environment == "development" ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "ingress"
+  description       = "Oracle Net Listener from MP Workspaces (V1) - DEV only"
+  protocol          = "TCP"
+  from_port         = 1521
+  to_port           = 1522
+  cidr_blocks       = [local.application_data.accounts[local.environment].mp_v1_workspaces_cidr]
+}
+
 ### Oracle
 
 resource "aws_security_group_rule" "ingress_traffic_ebsdb_5101" {

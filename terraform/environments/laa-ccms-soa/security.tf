@@ -65,6 +65,18 @@ resource "aws_security_group_rule" "alb_admin_workspace_ingress_7001" {
   cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace_cidr]
 }
 
+# MP Workspaces (V1) - DEV only, SOA Admin HTTPS access
+resource "aws_security_group_rule" "alb_admin_mp_v1_workspaces_ingress_443" {
+  count             = local.environment == "development" ? 1 : 0
+  security_group_id = aws_security_group.alb_admin.id
+  type              = "ingress"
+  description       = "Admin HTTPS from MP Workspaces (V1) - DEV only"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = [local.application_data.accounts[local.environment].mp_v1_workspaces_cidr]
+}
+
 #-- Tightened: ALB Admin egress restricted to ECS target port only (was 0.0.0.0/0 all-protocols)
 resource "aws_security_group_rule" "alb_admin_egress_ecs_targets" {
   security_group_id = aws_security_group.alb_admin.id

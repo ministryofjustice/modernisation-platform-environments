@@ -10,6 +10,9 @@ nameOverride: "litellm-admin"
 service:
   type: NodePort
 
+serviceMonitor:
+  enabled: true
+
 serviceAccount:
   create: false
   name: ${serviceAccountName}
@@ -17,15 +20,18 @@ serviceAccount:
 resources:
   requests:
     cpu: 250m
-    memory: 1Gi
+    memory: 2Gi
   limits:
     cpu: 500m
-    memory: 2Gi
+    memory: 4Gi
+
+startupProbe:
+  failureThreshold: 60
 
 db:
   deployStandalone: false
   useExisting: true
-  url: postgresql://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST)/$(DATABASE_NAME)
+  url: postgresql://$(DATABASE_USERNAME)@$(DATABASE_HOST)/$(DATABASE_NAME)
   database: ${databaseName}
   secret:
     name: ${databaseSecret}
@@ -53,6 +59,8 @@ proxy_config:
     proxy_batch_write_at: 60
     database_connection_pool_limit: 10
   litellm_settings:
+    drop_params: true
+    enable_azure_ad_token_refresh: true
     request_timeout: 600
     json_logs: true
     store_audit_logs: true
@@ -62,6 +70,11 @@ proxy_config:
       s3_region_name: ${auditLogsRegion}
       s3_path: litellm-audit
     cache: false
+    require_auth_for_metrics_endpoint: false
+    callbacks: ["prometheus"]
+    success_callback: ["prometheus"]
+    failure_callback: ["prometheus"]
+    service_callback: ["prometheus_system"]
     default_internal_user_params:
       user_role: proxy_admin
     cache_params:
@@ -74,14 +87,8 @@ proxy_config:
     redis_host: os.environ/primary_endpoint_address
     redis_port: 6379
     redis_password: os.environ/auth_token
-  model_list:
-%{ for key, profile in bedrockModels ~}
-    - model_name: bedrock-${key}
-      litellm_params:
-        model: bedrock/${profile.model_id}
-        aws_role_name: ${iamRole}
-        aws_region_name: ${profile.region}
-%{ endfor ~}
+
+  model_list: []
 
 tolerations:
   - key: compute.data-platform.service.justice.gov.uk/node-pool
@@ -115,6 +122,25 @@ volumes:
   - name: migrations
     emptyDir:
       sizeLimit: 64Mi
+  - name: google-application-credentials
+    configMap:
+      name: ${googleApplicationCredentialsConfigMap}
+  - name: azure-workload-identity-token
+    projected:
+      defaultMode: 420
+      sources:
+        - serviceAccountToken:
+            path: azure-identity-token
+            audience: api://AzureADTokenExchange
+            expirationSeconds: 3600
+  - name: google-workload-identity-token
+    projected:
+      defaultMode: 420
+      sources:
+        - serviceAccountToken:
+            path: google-identity-token
+            audience: ${googleWorkloadIdentityAudience}
+            expirationSeconds: 3600
 
 volumeMounts:
   - name: ui
@@ -125,6 +151,15 @@ volumeMounts:
     mountPath: /app/cache
   - name: migrations
     mountPath: /app/migrations
+  - name: google-application-credentials
+    mountPath: /var/run/secrets/iamcredentials.googleapis.com/credentials
+    readOnly: true
+  - name: azure-workload-identity-token
+    mountPath: /var/run/secrets/sts.windows.net
+    readOnly: true
+  - name: google-workload-identity-token
+    mountPath: /var/run/secrets/sts.googleapis.com
+    readOnly: true
 
 extraInitContainers:
   - name: setup-ui
@@ -161,7 +196,7 @@ envVars: {
     DISABLE_LLM_API_ENDPOINTS: "True",
     DOCS_DESCRIPTION: "Administration interface for the AI Gateway.",
     DOCS_FILTERED: "True",
-    DOCS_TITLE: "MOJ AI Gateway Admin",
+    DOCS_TITLE: "Justice AI Gateway Admin",
     LITELLM_ASSETS_PATH: "/app/var/litellm/assets",
     LITELLM_LOG: "ERROR",
     LITELLM_MIGRATION_DIR: "/app/migrations",
@@ -172,5 +207,13 @@ envVars: {
     PROXY_BASE_URL: "https://${ingressHostname}",
     REDIS_SSL: "True",
     USE_PRISMA_MIGRATE: "True",
-    XDG_CACHE_HOME: "/app/cache"
+    XDG_CACHE_HOME: "/app/cache",
+    IAM_TOKEN_DB_AUTH: "True",
+    DATABASE_USER: "${databaseUsername}",
+    STORE_MODEL_IN_DB: "True",
+    AZURE_TENANT_ID: "${microsoft_foundry_tenant_id}",
+    AZURE_CLIENT_ID: "${microsoft_foundry_client_id}",
+    AZURE_FEDERATED_TOKEN_FILE: "/var/run/secrets/sts.windows.net/azure-identity-token",
+    AZURE_AD_TOKEN: "oidc/azure/",
+    GOOGLE_APPLICATION_CREDENTIALS: "/var/run/secrets/iamcredentials.googleapis.com/credentials/credentials.json"
 }

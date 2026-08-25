@@ -54,7 +54,23 @@ locals {
   domain_type_sub_sandbox_blue    = [for k, v in local.domain_types : v.type if k == "blue-${local.sandbox_app_url}"]
   domain_type_sub_sandbox_green   = [for k, v in local.domain_types : v.type if k == "green-${local.sandbox_app_url}"]
 
-  validation_record_fqdns = local.is-development ? [local.domain_name_main[0], local.domain_name_sub[0], local.domain_name_sub_blue[0], local.domain_name_sub_green[0], local.domain_name_sub_sandbox[0], local.domain_name_sub_sandbox_blue[0], local.domain_name_sub_sandbox_green[0]] : [local.domain_name_main[0], local.domain_name_sub[0]]
+  validation_record_fqdns = concat(
+    [
+      local.domain_name_main[0],
+      local.domain_name_sub[0],
+    ],
+    local.create_blue_green ? [
+      local.domain_name_sub_blue[0],
+      local.domain_name_sub_green[0],
+    ] : [],
+    local.is-development ? [
+      local.domain_name_sub_sandbox[0],
+    ] : [],
+    local.is-development && local.create_blue_green ? [
+      local.domain_name_sub_sandbox_blue[0],
+      local.domain_name_sub_sandbox_green[0],
+    ] : []
+  )
 
   internal_security_group_cidrs = distinct(flatten([
     module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
@@ -86,4 +102,7 @@ locals {
     "2600:1f18:7fff:f800::/53", # us-east-1 Region
     "2600:1f18:3fff:f800::/53", # us-east-1 Region
   ]
+
+  # Add environments that require the blue-green deployment solution
+  create_blue_green = local.is-development || local.is-test || local.is-preproduction
 }

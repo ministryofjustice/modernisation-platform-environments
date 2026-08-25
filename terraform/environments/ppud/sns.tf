@@ -170,7 +170,7 @@ data "aws_iam_policy_document" "sns_topic_policy_s3_notifications_dev" {
     condition {
       test     = "ArnLike"
       variable = "AWS:SourceArn"
-      values   = ["arn:aws:s3:::moj-log-files-dev"]
+      values   = ["arn:aws:s3:::moj-general-logs-dev"]
     }
 
     resources = [

@@ -1,10 +1,61 @@
-##############################################################
-# Eventbridge Rules and Schedules (to invoke Lambda functions)
-##############################################################
+#####################################################################
+# Eventbridge Buses, Rules and Schedules (to invoke Lambda functions)
+#####################################################################
 
-####################
-# Eventbridge Rules 
-####################
+#############################
+# Eventbridge Rules and Buses
+#############################
+
+###########################################################
+# EventBridge Rule & Bus for Malware Scan Completion Events
+###########################################################
+
+
+locals {
+  send_malware_scan_notification_envs = {
+    for k, v in local.lambda_instances_map :
+    k => v
+    if startswith(k, "send_malware_scan_notification")
+  }
+}
+
+resource "aws_cloudwatch_event_bus" "ppud_malware_events" {
+  name = "ppud_malware_events"
+}
+
+resource "aws_cloudwatch_event_rule" "ppud_malware_scan_completed" {
+  for_each       = local.send_malware_scan_notification_envs
+  name           = "ppud-malware-scan-completed-${each.value.env}"
+  description    = "Capture malware scan completed events from EC2 instances"
+  event_bus_name = aws_cloudwatch_event_bus.ppud_malware_events.name
+  event_pattern  = <<EOF
+{
+  "source": ["ppud.malware"],
+  "detail-type": ["Malware Scan Completed"]
+}
+EOF
+  tags = {
+    Function    = each.value.func_name
+    Environment = each.value.env
+  }
+}
+
+resource "aws_cloudwatch_event_target" "trigger_lambda_malware_scan_completed" {
+  for_each       = local.send_malware_scan_notification_envs
+  rule           = aws_cloudwatch_event_rule.ppud_malware_scan_completed[each.key].name
+  event_bus_name = aws_cloudwatch_event_bus.ppud_malware_events.name
+  target_id      = "send_malware_scan_notification_${each.value.env}"
+  arn            = aws_lambda_function.lambda_functions[each.key].arn
+}
+
+resource "aws_lambda_permission" "allow_eventbridge_malware_scan_completed" {
+  for_each      = local.send_malware_scan_notification_envs
+  statement_id  = "AllowExecutionFromEventBridge-${each.value.env}"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_functions[each.key].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.ppud_malware_scan_completed[each.key].arn
+}
 
 #####################################################
 # Eventbridge Rule to check for Expiring Certificates
@@ -151,21 +202,24 @@ resource "aws_lambda_permission" "allow_eventbridge_ssm_patch_completion" {
   source_arn    = aws_cloudwatch_event_rule.ssm_patch_completion[each.key].arn
 }
 
-############################################################################
-# EventBridge Rule for S3 Replication Failures to Justice Digital S3 Buckets
-############################################################################
+######################################################
+# EventBridge Rule for S3 Replication Failures
+######################################################
 
 resource "aws_cloudwatch_event_rule" "s3_replication_failure" {
-  name        = "s3-replication-failure"
-  description = "Capture S3 replication failure events"
-
+  name          = "s3-replication-failure"
+  description   = "Capture S3 replication failure events"
   event_pattern = <<EOF
 {
   "source": ["aws.s3"],
-  "detail-type": ["Object Replication Event"],
+  "detail-type": ["AWS API Call via CloudTrail"],
   "detail": {
-    "replication-status": ["FAILED"]
-  }
+    "userIdentity": {
+      "invokedBy": ["s3.amazonaws.com"]
+    },
+    "errorCode": [{ "exists": true }],
+    "eventName": ["PutObject", "ReplicateObject", "ReplicateDelete", "ReplicateTags"]
+}
 }
 EOF
 }
@@ -416,6 +470,9 @@ locals {
       local.is-preproduction ? aws_lambda_function.lambda_functions["securityhub_critical_report_preproduction"].arn : (
         local.is-production ? aws_lambda_function.lambda_functions["securityhub_critical_report_production"].arn : null
     ))
+    send_malware_scan_notification = local.is-development ? aws_lambda_function.lambda_functions["send_malware_scan_notification_development"].arn : (
+      local.is-production ? aws_lambda_function.lambda_functions["send_malware_scan_notification_production"].arn : null
+    )
     securityhub_monthly_report = local.is-development ? aws_lambda_function.lambda_functions["securityhub_monthly_report_development"].arn : (
       local.is-preproduction ? aws_lambda_function.lambda_functions["securityhub_monthly_report_preproduction"].arn : (
         local.is-production ? aws_lambda_function.lambda_functions["securityhub_monthly_report_production"].arn : null

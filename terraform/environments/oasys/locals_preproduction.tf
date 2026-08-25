@@ -1,6 +1,16 @@
 locals {
 
-  delius_oasys_queues_preproduction = {}
+  locals_preproduction = {
+    arns_integration = {
+      cross_account_secret_configured = true
+      database_hostname               = "hmpps-arns-assessment-view-db-preprod"
+    }
+    delius_oasys_queues = {
+      "pp" = {
+        sns_topic_arn_configured = true # set to true when sns_topic_arn has been populated in config secret
+      }
+    }
+  }
 
   baseline_presets_preproduction = {
     options = {
@@ -107,12 +117,13 @@ locals {
           ])
         })
         ebs_volumes = {
-          "/dev/sdb" = { label = "app", size = 200 }  # /u01
-          "/dev/sdc" = { label = "app", size = 1000 } # /u02
-          "/dev/sde" = { label = "data", size = 2000, iops = 3000, throughput = 250 }
-          "/dev/sdf" = { label = "data", size = 2000, iops = 3000, throughput = 250 }
-          "/dev/sdj" = { label = "flash", size = 1000 }
-          "/dev/sds" = { label = "swap", size = 2 }
+          "/dev/sdb" = { label = "app", type = "gp3", size = 200 }                                  # /u01
+          "/dev/sdc" = { label = "app", type = "gp3", size = 1000 }                                 # /u02
+          "/dev/sde" = { label = "data", type = "gp3", size = 3000, iops = 3000, throughput = 250 } # 3000 hits partition OS limit
+          "/dev/sdf" = { label = "data", type = "gp3", size = 3000, iops = 3000, throughput = 250 }
+          "/dev/sdg" = { label = "data", type = "gp3", size = 2000, iops = 3000, throughput = 250 }
+          "/dev/sdj" = { label = "flash", type = "gp3", size = 1000 }
+          "/dev/sds" = { label = "swap", type = "gp3", size = 2 }
         }
         instance = merge(local.ec2_instances.db19c.instance, {
           disable_api_termination = true

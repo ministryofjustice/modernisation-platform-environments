@@ -8,20 +8,27 @@ locals {
       database_source_dev = {
         condition               = local.is-development
         bucket_name             = "moj-database-source-dev"
-        log_bucket              = "moj-log-files-dev"
-        log_prefix              = "s3-logs/moj-database-source-dev-logs/"
+        log_bucket              = "moj-general-logs-dev"
+        log_prefix              = "s3-logs/moj-database-source-dev/"
         lifecycle_id            = "delete-moj-database-source-dev"
         expiration_days         = 6
         replication_destination = "arn:aws:s3:::mojap-data-engineering-production-ppud-dev"
         replication_rule_id     = "ppud-database-replication-rule-dev"
-        iam_role_key            = "database_source_dev"
-        ec2_account             = "ppud-development"
+        additional_replication_rules = [
+          {
+            destination = "arn:aws:s3:::ppud-bak-replication-development-${local.environment_management.account_ids["digital-prison-reporting-development"]}-eu-west-2-an"
+            rule_id     = "ppud-database-replication-rule-dev-mp"
+            priority    = 2
+          }
+        ]
+        iam_role_key = "database_source_dev"
+        ec2_account  = "ppud-development"
       }
       report_source_dev = {
         condition               = local.is-development
         bucket_name             = "moj-report-source-dev"
-        log_bucket              = "moj-log-files-dev"
-        log_prefix              = "s3-logs/moj-report-source-dev-logs/"
+        log_bucket              = "moj-general-logs-dev"
+        log_prefix              = "s3-logs/moj-report-source-dev/"
         lifecycle_id            = "delete-moj-report-source-dev"
         expiration_days         = 6
         replication_destination = "arn:aws:s3:::cloud-platform-db973d65892f599f6e78cb90252d7dc9"
@@ -32,8 +39,8 @@ locals {
       database_source_uat = {
         condition               = local.is-preproduction
         bucket_name             = "moj-database-source-uat"
-        log_bucket              = "moj-log-files-uat"
-        log_prefix              = "s3-logs/moj-database-source-uat-logs/"
+        log_bucket              = "moj-general-logs-uat"
+        log_prefix              = "s3-logs/moj-database-source-uat/"
         lifecycle_id            = "delete-moj-database-source-uat"
         expiration_days         = 6
         replication_destination = "arn:aws:s3:::mojap-data-engineering-production-ppud-preprod"
@@ -44,8 +51,8 @@ locals {
       report_source_uat = {
         condition               = local.is-preproduction
         bucket_name             = "moj-report-source-uat"
-        log_bucket              = "moj-log-files-uat"
-        log_prefix              = "s3-logs/moj-report-source-uat-logs/"
+        log_bucket              = "moj-general-logs-uat"
+        log_prefix              = "s3-logs/moj-report-source-uat/"
         lifecycle_id            = "delete-moj-report-source-uat"
         expiration_days         = 6
         replication_destination = "arn:aws:s3:::cloud-platform-ffbd9073e2d0d537d825ebea31b441fc"
@@ -56,8 +63,8 @@ locals {
       database_source_prod = {
         condition               = local.is-production
         bucket_name             = "moj-database-source-prod"
-        log_bucket              = "moj-log-files-prod"
-        log_prefix              = "s3-logs/moj-database-source-prod-logs/"
+        log_bucket              = "moj-general-logs-prod"
+        log_prefix              = "s3-logs/moj-database-source-prod/"
         lifecycle_id            = "delete-moj-database-source-prod"
         expiration_days         = 6
         replication_destination = "arn:aws:s3:::mojap-data-engineering-production-ppud-prod"
@@ -68,8 +75,8 @@ locals {
       report_source_prod = {
         condition               = local.is-production
         bucket_name             = "moj-report-source-prod"
-        log_bucket              = "moj-log-files-prod"
-        log_prefix              = "s3-logs/moj-report-source-prod-logs/"
+        log_bucket              = "moj-general-logs-prod"
+        log_prefix              = "s3-logs/moj-report-source-prod/"
         lifecycle_id            = "delete-moj-report-source-prod"
         expiration_days         = 6
         replication_destination = "arn:aws:s3:::cloud-platform-9c7fd5fc774969b089e942111a7d5671"
@@ -82,9 +89,9 @@ locals {
 
   # Log bucket ARN lookup used in replication bucket policies
   log_bucket_arns = {
-    "moj-log-files-dev"  = local.is-development ? aws_s3_bucket.moj-log-files-dev[0].arn : ""
-    "moj-log-files-uat"  = local.is-preproduction ? aws_s3_bucket.moj-log-files-uat[0].arn : ""
-    "moj-log-files-prod" = local.is-production ? aws_s3_bucket.moj-log-files-prod[0].arn : ""
+    "moj-general-logs-dev"  = local.is-development ? aws_s3_bucket.s3_general["general_logs_dev"].arn : ""
+    "moj-general-logs-uat"  = local.is-preproduction ? aws_s3_bucket.s3_general["general_logs_uat"].arn : ""
+    "moj-general-logs-prod" = local.is-production ? aws_s3_bucket.s3_general["general_logs_prod"].arn : ""
   }
 }
 
@@ -148,20 +155,39 @@ resource "aws_s3_bucket_replication_configuration" "s3_replication" {
   role       = aws_iam_role.s3_replication[each.value.iam_role_key].arn
   bucket     = aws_s3_bucket.s3_replication[each.key].id
 
-  rule {
-    id     = each.value.replication_rule_id
-    status = "Enabled"
-    filter {
-      prefix = ""
-    }
-    delete_marker_replication {
-      status = "Disabled"
-    }
-    destination {
-      bucket        = each.value.replication_destination
-      storage_class = "STANDARD"
-      metrics {
-        status = "Enabled"
+  dynamic "rule" {
+    for_each = concat(
+      [
+        {
+          destination = each.value.replication_destination
+          rule_id     = each.value.replication_rule_id
+          priority    = 1
+        }
+      ],
+      try(each.value.additional_replication_rules, [])
+    )
+
+    content {
+      id = rule.value.rule_id
+      # priority is only required (and only set) when a bucket has more than one rule
+      priority = length(try(each.value.additional_replication_rules, [])) > 0 ? rule.value.priority : null
+      status   = "Enabled"
+
+      filter {
+        prefix = ""
+      }
+
+      delete_marker_replication {
+        status = "Disabled"
+      }
+
+      destination {
+        bucket        = rule.value.destination
+        storage_class = "STANDARD"
+
+        metrics {
+          status = "Enabled"
+        }
       }
     }
   }
@@ -233,6 +259,14 @@ resource "aws_s3_bucket_policy" "s3_replication" {
 
 locals {
   s3_replication_configs = local.s3_replication_buckets
+
+  # All replication destinations (primary + additional rules) per bucket, used for IAM destination permissions
+  s3_replication_destinations = {
+    for k, v in local.s3_replication_configs : k => concat(
+      [v.replication_destination],
+      [for r in try(v.additional_replication_rules, []) : r.destination]
+    )
+  }
 }
 
 resource "aws_iam_role" "s3_replication" {
@@ -284,10 +318,12 @@ resource "aws_iam_policy" "s3_replication" {
           "s3:ReplicateTags",
           "s3:ReplicateDelete"
         ]
-        Resource = [
-          each.value.replication_destination,
-          "${each.value.replication_destination}/*"
-        ]
+        Resource = flatten([
+          for destination in local.s3_replication_destinations[each.key] : [
+            destination,
+            "${destination}/*"
+          ]
+        ])
       }
     ]
   })

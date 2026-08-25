@@ -6,6 +6,9 @@ locals {
     legacy_counterpart_vpc_cidr            = "10.160.32.0/20"
     legacy_ad_domain_name                  = "delius-stage.local"
     legacy_dns_ip_addrs                    = ["10.160.35.243", "10.160.38.128"]
+    legacy_resolver_ip_addrs               = ["10.160.35.130", "10.160.37.70", "10.160.42.118"]
+    legacy_nextcloud_efs_dns_name          = "fs-aaef805b.efs.eu-west-2.amazonaws.com"
+    legacy_nextcloud_efs_id                = "fs-aaef805b"
     ad_domain_name                         = "delius-mis-stage.internal"
     ad_trust_domain_name                   = "azure.hmpp.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
@@ -458,8 +461,15 @@ locals {
     bucket_policy_enabled = true
   }
 
+  acm_certificate_stage = {
+    domain_name                         = "modernisation-platform.service.justice.gov.uk"
+    external_validation_records_created = true
+    additional_subject_alternate_names  = []
+  }
+
   lb_config_stage = {
     bucket_policy_enabled = true
+    maintenance_message   = "NDMIS Reporting Stage is currently unavailable due to planned maintenance or out-of-hours shutdown (7pm-7am)."
   }
 
   datasync_config_stage = {

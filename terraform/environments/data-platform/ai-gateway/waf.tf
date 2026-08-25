@@ -12,6 +12,12 @@ data "aws_lb" "ai_gateway" {
   depends_on = [helm_release.ai_gateway_configuration]
 }
 
+data "aws_lb" "ai_gateway_internal" {
+  name = "${local.component_name}-internal"
+
+  depends_on = [helm_release.ai_gateway_configuration]
+}
+
 module "waf_ip_set_ai_gateway_allowlist" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-wafv2.git//modules/ip-set?ref=36eceb918a237a80b69ce98e50b6f83fe17d2401" # v2.1.0
 
@@ -224,4 +230,121 @@ module "waf_ai_gateway" {
 
   create_logging_configuration    = true
   logging_log_destination_configs = [module.waf_ai_gateway_log_group.cloudwatch_log_group_arn]
+}
+
+module "waf_ip_set_ai_gateway_internal_allowlist" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-wafv2.git//modules/ip-set?ref=36eceb918a237a80b69ce98e50b6f83fe17d2401" # v2.1.0
+
+  name               = "${local.component_name}-internal-allowlist-${local.environment}"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV4"
+  addresses          = local.environment_configuration.ai_gateway_internal_ingress_allowlist
+}
+
+module "waf_ai_gateway_internal" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-wafv2.git?ref=36eceb918a237a80b69ce98e50b6f83fe17d2401" # v2.1.0
+
+  name  = "${local.component_name}-internal-${local.environment}"
+  scope = "REGIONAL"
+
+  default_action = "block"
+
+  association_resource_arns = {
+    alb = data.aws_lb.ai_gateway_internal.arn
+  }
+
+  rules = {
+    block-sensitive-paths = {
+      priority = 0
+      action   = "block"
+
+      statement = {
+        or_statement = {
+          statements = [for path in local.waf_blocked_paths : {
+            byte_match_statement = {
+              field_to_match = {
+                uri_path = {}
+              }
+              positional_constraint = "STARTS_WITH"
+              search_string         = path
+              text_transformations = [
+                {
+                  priority = 0
+                  type     = "LOWERCASE"
+                }
+              ]
+            }
+          }]
+        }
+      }
+
+      visibility_config = {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "${local.component_name}-internal-block-sensitive-paths"
+        sampled_requests_enabled   = true
+      }
+    }
+
+    ip-allowlist = {
+      priority = 3
+      action   = "allow"
+
+      statement = {
+        ip_set_reference_statement = {
+          arn = module.waf_ip_set_ai_gateway_internal_allowlist.arn
+        }
+      }
+
+      visibility_config = {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "${local.component_name}-internal-ip-allowlist"
+        sampled_requests_enabled   = true
+      }
+    }
+
+    aws-managed-common-rules = {
+      priority        = 10
+      override_action = "none"
+
+      statement = {
+        managed_rule_group_statement = {
+          name        = "AWSManagedRulesCommonRuleSet"
+          vendor_name = "AWS"
+        }
+      }
+
+      visibility_config = {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "${local.component_name}-internal-common-rules"
+        sampled_requests_enabled   = true
+      }
+    }
+
+    aws-managed-known-bad-inputs = {
+      priority        = 20
+      override_action = "none"
+
+      statement = {
+        managed_rule_group_statement = {
+          name        = "AWSManagedRulesKnownBadInputsRuleSet"
+          vendor_name = "AWS"
+        }
+      }
+
+      visibility_config = {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "${local.component_name}-internal-known-bad-inputs"
+        sampled_requests_enabled   = true
+      }
+    }
+  }
+
+  visibility_config = {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "${local.component_name}-internal-waf"
+    sampled_requests_enabled   = true
+  }
+
+  create_logging_configuration    = true
+  logging_log_destination_configs = [module.waf_ai_gateway_internal_log_group.cloudwatch_log_group_arn]
 }
