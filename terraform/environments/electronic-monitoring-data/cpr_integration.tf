@@ -56,6 +56,7 @@ data "aws_iam_policy_document" "cpr_integration" {
       "glue:GetDatabase",
       "glue:GetTables",
       "glue:GetTable",
+      "glue:CreateDatabase",
     ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/person_record${local.db_suffix}",
