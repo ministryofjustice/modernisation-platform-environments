@@ -45,6 +45,23 @@ teams:
         model: "bedrock-jeaie-claude-opus-5"
       - alias: "claude-sonnet-5"
         model: "bedrock-jeaie-claude-sonnet-5"
+  pom-probation-accounts:
+    alias: POM Phased Implementation - Probation Accounts
+    organisation: ministryofjustice
+    max_budget: 2000
+    models: ["no-default-models"]
+    unified_access_groups:
+      - generally-available-models
+      - bedrock-jeaie-claude-haiku-4-5
+      - bedrock-jeaie-claude-opus-5
+      - bedrock-jeaie-claude-sonnet-5
+    model_aliases:
+      - alias: "claude-haiku-4.5"
+        model: "bedrock-jeaie-claude-haiku-4-5"
+      - alias: "claude-opus-5"
+        model: "bedrock-jeaie-claude-opus-5"
+      - alias: "claude-sonnet-5"
+        model: "bedrock-jeaie-claude-sonnet-5"
 
 models:
   amazon_bedrock:
