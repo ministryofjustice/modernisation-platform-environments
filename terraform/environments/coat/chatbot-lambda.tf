@@ -172,7 +172,10 @@ module "rag_lambda" {
     ]
   }]
   artifacts_dir                = "${abspath(path.root)}/builds"
-  trigger_on_package_timestamp = false
+  # CI workspaces have no builds/ zip; ignore hash drift and allow missing packages to rebuild
+  ignore_source_code_hash      = true
+  recreate_missing_package     = true
+  trigger_on_package_timestamp = true
 
   reserved_concurrent_executions = 10
 
