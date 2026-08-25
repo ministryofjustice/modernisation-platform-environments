@@ -978,12 +978,12 @@ module "data_api_role" {
   tags = local.tags
 }
 
-resource "aws_iam_role_policy_attachment" "standard_athena_access" {
+resource "aws_iam_role_policy_attachment" "standard_athena_access_api" {
   policy_arn = aws_iam_policy.standard_athena_access.arn
   role       = module.data_api_role.iam_role_name
 }
 
-resource "aws_lakeformation_permissions" "emdi_di_db" {
+resource "aws_lakeformation_permissions" "em_api_db" {
   principal   = module.data_api_role.iam_role_arn
   permissions = ["DESCRIBE"]
   database {
@@ -991,11 +991,19 @@ resource "aws_lakeformation_permissions" "emdi_di_db" {
   }
 }
 
-resource "aws_lakeformation_permissions" "emdi_di_tables" {
+resource "aws_lakeformation_permissions" "em_api_tables" {
   principal   = module.data_api_role.iam_role_arn
   permissions = ["SELECT", "DESCRIBE"]
   table {
     database_name = "data_insights${local.dbt_suffix}"
     wildcard      = true
+  }
+}
+
+resource "aws_lakeformation_permissions" "em_data_api_s3" {
+  principal   = module.data_api_role.iam_role_arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+  data_location {
+    arn = module.s3-create-a-derived-table-bucket.bucket.arn
   }
 }
