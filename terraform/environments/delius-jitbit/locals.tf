@@ -13,10 +13,7 @@ locals {
     "blue-${local.sandbox_app_url}",
     "green-${local.sandbox_app_url}"
   ] : [local.app_url]
-  blue_green_urls = local.create_blue_green ? [
-    "blue-${local.app_url}",
-    "green-${local.app_url}"
-  ] : []
+  blue_green_urls = ["blue-${local.app_url}", "green-${local.app_url}"]
 
   acm_subject_alternative_names = concat(local.urls, local.blue_green_urls)
 
@@ -59,14 +56,14 @@ locals {
       local.domain_name_main[0],
       local.domain_name_sub[0],
     ],
-    local.create_blue_green ? [
+    [
       local.domain_name_sub_blue[0],
       local.domain_name_sub_green[0],
-    ] : [],
+    ],
     local.is-development ? [
       local.domain_name_sub_sandbox[0],
     ] : [],
-    local.is-development && local.create_blue_green ? [
+    local.is-development ? [
       local.domain_name_sub_sandbox_blue[0],
       local.domain_name_sub_sandbox_green[0],
     ] : []
@@ -102,7 +99,4 @@ locals {
     "2600:1f18:7fff:f800::/53", # us-east-1 Region
     "2600:1f18:3fff:f800::/53", # us-east-1 Region
   ]
-
-  # Add environments that require the blue-green deployment solution
-  create_blue_green = local.is-development || local.is-test || local.is-preproduction
 }

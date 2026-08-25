@@ -22,7 +22,7 @@ resource "aws_route53_record" "external" {
 }
 
 resource "aws_route53_record" "external_blue" {
-  count    = (!local.is-production && local.create_blue_green) ? 1 : 0
+  count    = !local.is-production ? 1 : 0
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
@@ -37,7 +37,7 @@ resource "aws_route53_record" "external_blue" {
 }
 
 resource "aws_route53_record" "external_green" {
-  count    = (!local.is-production && local.create_blue_green) ? 1 : 0
+  count    = !local.is-production ? 1 : 0
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
@@ -93,7 +93,7 @@ resource "aws_route53_record" "external_validation" {
 }
 
 resource "aws_route53_record" "external_validation_subdomain_blue" {
-  count    = (!local.is-production && local.create_blue_green) ? 1 : 0
+  count    = !local.is-production ? 1 : 0
   provider = aws.core-vpc
 
   allow_overwrite = true
@@ -105,7 +105,7 @@ resource "aws_route53_record" "external_validation_subdomain_blue" {
 }
 
 resource "aws_route53_record" "external_validation_subdomain_green" {
-  count    = (!local.is-production && local.create_blue_green) ? 1 : 0
+  count    = !local.is-production ? 1 : 0
   provider = aws.core-vpc
 
   allow_overwrite = true
