@@ -2,26 +2,32 @@ resource "aws_security_group" "api_gateway_vpc_link" {
   name        = "${local.resource_name_prefix}-${local.environment}-apigw-vpc-link"
   description = "Security group for API Gateway VPC Link"
   vpc_id      = var.vpc.id
-  egress      = []
-  tags        = local.tags
-}
 
-resource "aws_security_group_rule" "api_gateway_vpc_link_egress" {
-  description       = "Allow the VPC link to reach the internal load balancer"
-  type              = "egress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  cidr_blocks       = [var.vpc.cidr_block]
-  security_group_id = aws_security_group.api_gateway_vpc_link.id
+  egress {
+    description = "Allow the VPC link to reach the internal load balancer"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc.cidr_block]
+  }
+
+  tags = local.tags
 }
 
 resource "aws_security_group" "load_balancer" {
   name        = "${local.resource_name_prefix}-${local.environment}-alb"
   description = "Security group for internal load balancer"
   vpc_id      = var.vpc.id
-  egress      = []
-  tags        = local.tags
+
+  egress {
+    description     = "Allow the load balancer to reach the ECS service"
+    from_port       = local.service_configuration.container_port
+    to_port         = local.service_configuration.container_port
+    protocol        = "tcp"
+    security_groups = [aws_security_group.ecs_service.id]
+  }
+
+  tags = local.tags
 }
 
 resource "aws_security_group_rule" "load_balancer_ingress_from_vpc_link" {
@@ -38,18 +44,32 @@ resource "aws_security_group" "ecs_service" {
   name        = "${local.resource_name_prefix}-${local.environment}-ecs"
   description = "Security group for downstream mock API ECS service"
   vpc_id      = var.vpc.id
-  egress      = []
-  tags        = local.tags
-}
 
-resource "aws_security_group_rule" "load_balancer_egress_to_ecs" {
-  description              = "Allow the load balancer to reach the ECS service"
-  type                     = "egress"
-  from_port                = local.service_configuration.container_port
-  to_port                  = local.service_configuration.container_port
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.load_balancer.id
-  source_security_group_id = aws_security_group.ecs_service.id
+  egress {
+    description = "Allow the ECS service to reach AWS APIs over HTTPS"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "Allow DNS queries within the VPC"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = [var.vpc.cidr_block]
+  }
+
+  egress {
+    description = "Allow TCP DNS queries within the VPC"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc.cidr_block]
+  }
+
+  tags = local.tags
 }
 
 resource "aws_security_group_rule" "ecs_ingress_from_load_balancer" {
@@ -62,35 +82,6 @@ resource "aws_security_group_rule" "ecs_ingress_from_load_balancer" {
   source_security_group_id = aws_security_group.load_balancer.id
 }
 
-resource "aws_security_group_rule" "ecs_egress_https" {
-  description       = "Allow the ECS service to reach AWS APIs over HTTPS"
-  type              = "egress"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.ecs_service.id
-}
-
-resource "aws_security_group_rule" "ecs_egress_dns_udp" {
-  description       = "Allow DNS queries within the VPC"
-  type              = "egress"
-  from_port         = 53
-  to_port           = 53
-  protocol          = "udp"
-  cidr_blocks       = [var.vpc.cidr_block]
-  security_group_id = aws_security_group.ecs_service.id
-}
-
-resource "aws_security_group_rule" "ecs_egress_dns_tcp" {
-  description       = "Allow TCP DNS queries within the VPC"
-  type              = "egress"
-  from_port         = 53
-  to_port           = 53
-  protocol          = "tcp"
-  cidr_blocks       = [var.vpc.cidr_block]
-  security_group_id = aws_security_group.ecs_service.id
-}
 
 resource "aws_lb" "internal" {
   #checkov:skip=CKV_AWS_91:Development-only MVP uses API Gateway and ECS access logs; ALB access logging will be added before production
