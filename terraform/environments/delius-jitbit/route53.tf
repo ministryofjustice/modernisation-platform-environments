@@ -128,6 +128,30 @@ resource "aws_route53_record" "external_validation_prod" {
   zone_id         = data.aws_route53_zone.network-services-production[0].zone_id
 }
 
+resource "aws_route53_record" "external_validation_subdomain_prod_blue" {
+  count    = local.is-production ? 1 : 0
+  provider = aws.core-network-services
+
+  allow_overwrite = true
+  name            = local.domain_name_sub_blue[0]
+  records         = local.domain_record_sub_blue
+  ttl             = 60
+  type            = local.domain_type_sub_blue[0]
+  zone_id         = data.aws_route53_zone.network-services-production[0].zone_id
+}
+
+resource "aws_route53_record" "external_validation_subdomain_prod_green" {
+  count    = local.is-production ? 1 : 0
+  provider = aws.core-network-services
+
+  allow_overwrite = true
+  name            = local.domain_name_sub_green[0]
+  records         = local.domain_record_sub_green
+  ttl             = 60
+  type            = local.domain_type_sub_green[0]
+  zone_id         = data.aws_route53_zone.network-services-production[0].zone_id
+}
+
 resource "aws_route53_record" "external_validation_subdomain" {
   count    = local.is-production ? 0 : 1
   provider = aws.core-vpc
