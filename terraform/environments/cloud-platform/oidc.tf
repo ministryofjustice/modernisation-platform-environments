@@ -138,9 +138,16 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
       "logs:CreateLogGroup",
       "logs:DeleteLogGroup",
       "logs:CreateLogStream",
+      "logs:CreateLogDelivery",
+      "logs:CreateDelivery",
+      "logs:DeleteDelivery*",
+      "logs:GetDelivery*",
       "logs:PutLogEvents",
       "logs:PutRetentionPolicy",
       "logs:Describe*",
+      "logs:PutDelivery*",
+      "logs:UpdateDeliveryConfiguration",
+      "logs:TagResource",
       "cloudwatch:PutMetricData"
     ]
     resources = ["*"]
