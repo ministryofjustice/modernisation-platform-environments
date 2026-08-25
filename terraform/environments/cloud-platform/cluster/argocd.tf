@@ -54,17 +54,9 @@ module "argocd" {
 
   cluster_name = module.eks.cluster_name
 
-  idc_instance_arn = var.argocd_idc_instance_arn
-  idc_region       = var.argocd_idc_region
-  rbac_role_mappings = merge(
-    {
-      ADMIN = [
-        { id = local.cloud_platform_engineers_group_id, type = "SSO_GROUP" },
-        { id = local.container_platform_aws_group_id, type = "SSO_GROUP" },
-      ]
-    },
-    var.argocd_rbac_role_mappings
-  )
+  idc_instance_arn   = local.argocd_idc_instance_arn
+  idc_region         = local.argocd_idc_region
+  rbac_role_mappings = local.argocd_rbac_role_mappings
 
   codeconnection_arn     = data.aws_codestarconnections_connection.github[0].arn
   enable_destroy_cleanup = local.cluster_environment == "development_cluster"
@@ -86,67 +78,11 @@ module "argocd" {
 # no VPC peering or TGW is required.
 #------------------------------------------------------------------------------
 
-locals {
-  # A cluster never self-identifies as both hub and spoke.
-  is_argocd_hub_cluster = contains(values(local.argocd_hubs)[*].cluster_name, terraform.workspace)
-
-  # Ephemeral dev spoke — self-identifies by the "-spoke" suffix, strictly
-  # scoped to development_cluster. This mirrors the hub side (cluster-core/
-  # argocd-gitops.tf, issue #8457), where an ephemeral hub derives its paired
-  # spoke from the "-hub"/"-spoke" convention. No argocd_registered_spokes entry
-  # and no hub-ARN workflow input are required: an ephemeral hub/spoke pair
-  # shares a prefix and an account, so each partner is derivable from the
-  # workspace name. Confined to development_cluster so it can never affect a
-  # permanent cluster.
-  is_argocd_ephemeral_spoke = (
-    local.cluster_environment == "development_cluster" &&
-    endswith(terraform.workspace, "-spoke")
-  )
-
-  # Permanent spoke — must be explicitly listed in argocd_registered_spokes for
-  # its tier AND be a known permanent cluster. The allowlist is a deliberate,
-  # reviewed opt-in: a permanent cluster does not grant a hub elevated access to
-  # itself just because the hub exists, and it also gates phased BU onboarding.
-  is_argocd_permanent_spoke = contains(
-    lookup(local.environment_configuration, "argocd_registered_spokes", []),
-    terraform.workspace
-  ) && contains(local.mp_environments, terraform.workspace)
-
-  # This cluster registers with a hub if it is either a permanent registered
-  # spoke or an ephemeral convention spoke, and is not itself a hub.
-  is_argocd_spoke = (
-    (local.is_argocd_permanent_spoke || local.is_argocd_ephemeral_spoke) &&
-    !local.enable_argocd &&
-    !local.is_argocd_hub_cluster
-  )
-
-  # Ephemeral hub paired with this ephemeral spoke: "<prefix>-hub" in the SAME
-  # account. Its Argo CD Capability role follows the module naming convention
-  # "<hub-workspace>-argocd-capability" (see modules/argo-cd).
-  argocd_ephemeral_hub_workspace           = replace(terraform.workspace, "-spoke", "-hub")
-  argocd_ephemeral_hub_capability_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.argocd_ephemeral_hub_workspace}-argocd-capability"
-
-  # Hub's Argo CD Capability role ARN, resolved in precedence order:
-  #   1. Explicit override (var.argocd_hub_capability_role_arn) — escape hatch,
-  #      e.g. an ephemeral spoke pairing with a non-convention hub.
-  #   2. Ephemeral convention — the paired "<prefix>-hub" in this account.
-  #   3. Permanent convention — the tier hub (nonlive/live) from local.argocd_hubs.
-  resolved_hub_capability_role_arn = (
-    var.argocd_hub_capability_role_arn != "" ? var.argocd_hub_capability_role_arn :
-    local.is_argocd_ephemeral_spoke ? local.argocd_ephemeral_hub_capability_role_arn :
-    local.argocd_hub_capability_convention_role_arn
-  )
-
-  # Kubernetes RBAC group that the hub capability role is placed into on this spoke.
-  # The access entry declares this group explicitly via kubernetes_groups (EKS
-  # does NOT auto-create an "eks-access-entry:<arn>" group), and the custom
-  # ClusterRoles below bind to it. This is how we grant scoped access without
-  # attaching AmazonEKSClusterAdminPolicy.
-  #
-  # Must be a valid Kubernetes group name (<= 63 chars), so it is a short fixed
-  # label rather than anything derived from the role ARN.
-  argocd_hub_capability_rbac_group = "argocd-hub"
-}
+# Hub/spoke detection and resolution locals (is_argocd_hub_cluster,
+# is_argocd_ephemeral_spoke, is_argocd_permanent_spoke, is_argocd_spoke,
+# argocd_ephemeral_hub_*, resolved_hub_capability_role_arn,
+# argocd_hub_capability_rbac_group) are defined in locals.tf, matching the house
+# convention that resource files carry no locals.
 
 #------------------------------------------------------------------------------
 # Spoke: Register the hub's ArgoCD Capability role (least privilege)
