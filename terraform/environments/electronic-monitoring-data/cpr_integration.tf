@@ -117,7 +117,7 @@ data "aws_iam_policy_document" "cpr_integration" {
     ]
     resources = [
       module.s3-athena-bucket.bucket.arn,
-      module.s3-raw-formatted-data-bucket.arn
+      module.s3-raw-formatted-data-bucket.bucket.arn
     ]
   }
   statement {
@@ -129,7 +129,10 @@ data "aws_iam_policy_document" "cpr_integration" {
       "s3:ListBucketMultipartUploads",
       "s3:ListMultipartUploadParts"
     ]
-    resources = ["${module.s3-athena-bucket.bucket.arn}/*"]
+    resources = [
+      "${module.s3-athena-bucket.bucket.arn}/*",
+      "${module.s3-raw-formatted-data-bucket.bucket.arn}/*"
+    ]
   }
 }
 
