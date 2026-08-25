@@ -40,6 +40,8 @@ locals {
     "visit_details"
   ]
 
+  emd_api_role = []
+
   table_filters = merge(
     {
       for table in local.tables_to_share : table => "specials_flag=0"
