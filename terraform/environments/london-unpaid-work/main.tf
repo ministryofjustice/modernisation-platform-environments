@@ -50,5 +50,11 @@ module "baseline" {
     lookup(local.baseline_all_environments, "lbs", {}),
     lookup(local.baseline_environment_specific, "lbs", {})
   )
+
+  security_groups = merge(
+    module.baseline_presets.security_groups,
+    lookup(local.baseline_all_environments, "security_groups", {}),
+    lookup(local.baseline_environment_specific, "security_groups", {}),
+  )
 }
 
