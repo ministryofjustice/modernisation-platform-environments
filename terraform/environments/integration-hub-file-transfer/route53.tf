@@ -1,4 +1,5 @@
-module "r53_managed_file_transfer" {
+module "r53_file_transfer" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   providers = { aws = aws.core-network-services }
   source    = "terraform-aws-modules/route53/aws"
   version   = "6.5.1"
