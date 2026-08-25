@@ -133,7 +133,7 @@ locals {
         # Cloud Platform
         "35.178.209.113/32",
         "3.8.51.207/32",
-        "35.177.252.54/32"
+        "35.177.252.54/32",
         # Analytical Platform
         ## Compute
         ### Development
