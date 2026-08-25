@@ -56,7 +56,7 @@ resource "aws_vpc_security_group_ingress_rule" "ppud_db_ingress" {
 
 # Sets up RDS export infrastructure for PPUD pipeline
 module "ppud_rds_export" {
-  source = "git::https://github.com/ministryofjustice/terraform-rds-export?ref=ec51378f6e284526745ae277d85dcbf7033fe9d0"
+  source = "git::https://github.com/ministryofjustice/terraform-rds-export?ref=f689103b221b04aa2143198d6ffac4d8a971de7b"
 
   providers = {
     aws = aws
