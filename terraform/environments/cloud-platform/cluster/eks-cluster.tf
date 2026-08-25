@@ -137,7 +137,7 @@ resource "aws_cloudwatch_log_delivery_source" "auto_mode_compute" {
 
 resource "time_sleep" "auto_mode_after_compute" {
   depends_on      = [aws_cloudwatch_log_delivery_source.auto_mode_compute]
-  create_duration = "100s"
+  create_duration = "120s"
 }
 
 resource "aws_cloudwatch_log_delivery_source" "auto_mode_block_storage" {
@@ -152,7 +152,7 @@ resource "aws_cloudwatch_log_delivery_source" "auto_mode_block_storage" {
 
 resource "time_sleep" "auto_mode_after_block_storage" {
   depends_on      = [aws_cloudwatch_log_delivery_source.auto_mode_block_storage]
-  create_duration = "100s"
+  create_duration = "120s"
 }
 
 resource "aws_cloudwatch_log_delivery_source" "auto_mode_load_balancing" {
@@ -167,7 +167,7 @@ resource "aws_cloudwatch_log_delivery_source" "auto_mode_load_balancing" {
 
 resource "time_sleep" "auto_mode_after_load_balancing" {
   depends_on      = [aws_cloudwatch_log_delivery_source.auto_mode_load_balancing]
-  create_duration = "100s"
+  create_duration = "120s"
 }
 
 resource "aws_cloudwatch_log_delivery_source" "auto_mode_ipam" {
