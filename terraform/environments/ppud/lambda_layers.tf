@@ -7,9 +7,9 @@
 data "aws_s3_bucket" "layer_buckets" {
   for_each = {
     for env, bucket_name in {
-      development   = "moj-infrastructure-dev"
-      preproduction = "moj-infrastructure-uat"
-      production    = "moj-infrastructure"
+      development   = "moj-general-infrastructure-dev"
+      preproduction = "moj-general-infrastructure-uat"
+      production    = "moj-general-infrastructure-prod"
     } : env => bucket_name
     if env == local.environment
   }
@@ -22,10 +22,10 @@ locals {
   lambda_layers = {
     matplotlib = "matplotlib_layer.zip"
     boto3      = "boto3_layer.zip"
-    pandas     = "pandas_layer.zip"
+    pandas     = "pandas_v2.3.3_layer.zip"
     xlsxwriter = "xlsxwriter_layer.zip"
     requests   = "requests_v2.34.2_layer.zip"
-    pillow     = "pillow_v12.2.0_layer.zip"
+    pillow     = "pillow_v12.3.0_layer.zip"
     numpy      = "numpy_v2.4.4_u2_layer.zip"
   }
 

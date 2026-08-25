@@ -120,6 +120,32 @@ resource "aws_s3_bucket_versioning" "s3_versioning" {
   }
 }
 
+data "aws_iam_policy_document" "ftp_lambda_bucket_secure_transport" {
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].arn,
+      "${aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "ftp_lambda_bucket_secure_transport" {
+  bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  policy = data.aws_iam_policy_document.ftp_lambda_bucket_secure_transport.json
+}
+
 
 resource "aws_s3_bucket_lifecycle_configuration" "outbound_bucket_lifecycle_delete_noncurrent_versions" {
 
@@ -275,6 +301,25 @@ data "aws_iam_policy_document" "inbound_bucket_policy" {
       ]
     }
   }
+
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn,
+      "${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
 }
 
 resource "aws_s3_bucket_policy" "inbound_bucket_policy" {
@@ -335,6 +380,21 @@ resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
           aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn,
           "${aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn}/*"
         ]
+      },
+      {
+        "Sid" : "DenyInsecureTransport",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn,
+          "${aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
       }
     ]
     }

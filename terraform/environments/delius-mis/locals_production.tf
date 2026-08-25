@@ -2,12 +2,15 @@
 
 locals {
   environment_config_production = {
-    legacy_engineering_vpc_cidr = "10.160.98.0/25"
-    legacy_counterpart_vpc_cidr = "10.160.16.0/20"
-    legacy_ad_domain_name       = "delius-prod.local"
-    legacy_dns_ip_addrs         = ["10.160.17.254", "10.160.22.121"]
-    ad_domain_name              = "delius-mis-prod.internal"
-    # ad_trust_domain_name                   = "azure.hmpp.root"
+    legacy_engineering_vpc_cidr            = "10.160.98.0/25"
+    legacy_counterpart_vpc_cidr            = "10.160.16.0/20"
+    legacy_ad_domain_name                  = "delius-prod.local"
+    legacy_dns_ip_addrs                    = ["10.160.17.254", "10.160.22.121"]
+    legacy_resolver_ip_addrs               = ["10.160.16.135", "10.160.23.111", "10.160.27.249"]
+    legacy_nextcloud_efs_dns_name          = "fs-8a54e77b.efs.eu-west-2.amazonaws.com"
+    legacy_nextcloud_efs_id                = "fs-8a54e77b"
+    ad_domain_name                         = "delius-mis-prod.internal"
+    ad_trust_domain_name                   = "azure.hmpp.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.hmpp.domain_controllers
     ad_trust_dns_ip_addrs                  = module.ip_addresses.mp_ips.ad_fixngo_hmpp_domain_controllers
     core_shared_services_vpc_cidr          = module.ip_addresses.mp_cidr["core-shared-services-live-data-additional"]
@@ -18,37 +21,30 @@ locals {
     migration_environment_short_name       = "prod"
     migration_environment_private_cidr     = ["10.160.16.0/22", "10.160.20.0/22", "10.160.24.0/22"]
     migration_environment_db_cidr          = ["10.160.28.0/24", "10.160.29.0/24", "10.160.30.0/25"]
-    cloudwatch_alarm_schedule              = true
-    cloudwatch_alarm_disable_time          = "20:45"
-    cloudwatch_alarm_enable_time           = "06:15"
-    cloudwatch_alarm_disable_weekend       = true
+    cloudwatch_alarm_schedule              = false
+    cloudwatch_alarm_disable_time          = null
+    cloudwatch_alarm_enable_time           = null
+    cloudwatch_alarm_disable_weekend       = null
   }
 
   bastion_config_production = {
     extra_user_data_content = "yum install -y openldap-clients"
   }
 
-  boe_efs_config_production = null
-
-  # boe_efs_config_production = {
-  #   availability_zone_name = "eu-west-2a"
-  #   mount_targets_subnet_ids = {
-  #     single-az = data.aws_subnets.shared-private-a.ids[0]
-  #   }
-  #   # For multi-az, use:
-  #   # availability_zone_name = null
-  #   # mount_targets_subnet_ids = {
-  #   #   multi-az-a = data.aws_subnets.shared-private-a.ids[0]
-  #   #   multi-az-b = data.aws_subnets.shared-private-b.ids[0]
-  #   #   multi-az-c = data.aws_subnets.shared-private-c.ids[0]
-  #   # }
-  # }
+  boe_efs_config_production = {
+    availability_zone_name = null
+    mount_targets_subnet_ids = {
+      multi-az-a = data.aws_subnets.shared-private-a.ids[0]
+      multi-az-b = data.aws_subnets.shared-private-b.ids[0]
+      multi-az-c = data.aws_subnets.shared-private-c.ids[0]
+    }
+  }
 
   bcs_config_production = {
-    instance_count = 0
+    instance_count = 2
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
     ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
-    ansible_branch = "TM-2058/delius-mis/preprod-config"
+    ansible_branch = "PLAT-54/delius-mis/prod-build-v1"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 150, type = "gp3" } # 100GB would be OK
       "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }
@@ -76,10 +72,10 @@ locals {
   }
 
   bps_config_production = {
-    instance_count = 0
+    instance_count = 4
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
     ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
-    ansible_branch = "TM-2058/delius-mis/preprod-config"
+    ansible_branch = "PLAT-54/delius-mis/prod-build-v1"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100, type = "gp3" }
       "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }
@@ -107,10 +103,13 @@ locals {
   }
 
   bws_config_production = {
-    instance_count = 0
+    external_fqdn       = "reporting.probation.service.justice.gov.uk"
+    external_admin_fqdn = "admin.reporting.probation.service.justice.gov.uk"
+
+    instance_count = 1
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
     ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
-    ansible_branch = "TM-2058/delius-mis/preprod-config"
+    ansible_branch = "PLAT-54/delius-mis/prod-build-v1"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100, type = "gp3" }
       "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }
@@ -138,10 +137,10 @@ locals {
   }
 
   dis_config_production = {
-    instance_count    = 0
+    instance_count    = 1
     ami_name          = "delius_mis_windows_server_patch_2025-10-01T13-00-02.504Z"
     computer_name     = "NDMIS-PRD-DIS" # 15 char limit
-    powershell_branch = "TM-2016/delius-mis/preprod-dis-build"
+    powershell_branch = "TM-2156/delius-mis/build-dis-server-part-1"
 
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100 }
@@ -402,7 +401,7 @@ locals {
         type       = "gp3"
       }
       data = {
-        iops       = 7680
+        iops       = 15360
         throughput = 480
         type       = "gp3"
         total_size = 7000
@@ -422,22 +421,29 @@ locals {
     }
   }
 
-  fsx_config_production = null
+  fsx_config_production = {
+    storage_capacity     = 200
+    throughtput_capacity = 16
+  }
 
-  # fsx_config_production = {
-  #   storage_capacity     = 1000 # temporarily increasing for prod->stage migration, was 200
-  #   throughtput_capacity = 128  # temporarily increasing for prod->stage migration, was 16
-  # }
+  dfi_report_bucket_config_production = {
+    bucket_policy_enabled = true
+  }
 
-  dfi_report_bucket_config_production = null
+  acm_certificate_production = {
+    domain_name                         = "reporting.probation.service.justice.gov.uk"
+    external_validation_records_created = true
+    additional_subject_alternate_names  = ["*.reporting.probation.service.justice.gov.uk"]
+  }
 
-  lb_config_production = null
+  lb_config_production = {
+    bucket_policy_enabled = true
+    maintenance_message   = "NDMIS Reporting is currently unavailable due to planned maintenance. Please try again later."
+  }
 
-  # lb_config_production = {
-  #   bucket_policy_enabled = true
-  # }
-
-  datasync_config_production = null
+  datasync_config_production = {
+    source_s3_bucket_arn = "arn:aws:s3:::eu-west-2-delius-prod-dfi-extracts"
+  }
 
   db_backup_config_production = {
     object_lock_days             = 1

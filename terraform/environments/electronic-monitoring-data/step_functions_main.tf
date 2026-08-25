@@ -66,7 +66,8 @@ module "ears_sars_step_function" {
   iam_policies = tomap({ "ears_sars_step_function_policy" = aws_iam_policy.ears_sars_step_function_policy[0] })
   variable_dictionary = tomap(
     {
-      "ears_sars_request" = module.ears_sars_request[0].lambda_function_name,
+      "ears_sars_request"   = module.ears_sars_request[0].lambda_function_name,
+      "write_to_sharepoint" = module.write_to_sharepoint[0].lambda_function_name,
     }
   )
   type = "STANDARD"
@@ -93,6 +94,8 @@ module "gdpr_deletion_step_function" {
       "control_lambda_arn"       = module.gdpr_unstructured_control_lambda[0].lambda_function_arn
       "batch_job_queue_arn"      = aws_batch_job_queue.shred_unstructured_from_zip_batch_queue[0].arn
       "batch_job_definition_arn" = aws_batch_job_definition.shred_unstructured_from_zip_job.arn
+      "sns_topic_arn"            = aws_sns_topic.emds_alerts.arn
+      "environment_name"         = local.environment_shorthand
     }
   )
   type = "STANDARD"
@@ -120,6 +123,42 @@ module "iceberg_table_maintenance_step_function" {
     }
   )
   type = "STANDARD"
+}
+
+# ------------------------------------------
+# Merge into staged position step function
+# ------------------------------------------
+
+module "merge_into_mdss_staged_position" {
+  source       = "./modules/merge_into_reconciler"
+  function_to_iterate = module.merge_mdss_staged_position[0]
+}
+
+# ------------------------------------------
+# Merge into staged event step function
+# ------------------------------------------
+
+module "merge_into_mdss_staged_event" {
+  source       = "./modules/merge_into_reconciler"
+  function_to_iterate = module.merge_mdss_staged_event[0]
+}
+
+# ------------------------------------------
+# Merge into emdi position step function
+# ------------------------------------------
+
+module "merge_into_emdi_position" {
+  source       = "./modules/merge_into_reconciler"
+  function_to_iterate = module.merge_emdi_position[0]
+}
+
+# ------------------------------------------
+# Merge into ac position step function
+# ------------------------------------------
+
+module "merge_into_mdss_ac_position" {
+  source       = "./modules/merge_into_reconciler"
+  function_to_iterate = module.merge_ac_position[0]
 }
 
 # ------------------------------------------------------------------------------
@@ -352,8 +391,20 @@ resource "aws_sfn_state_machine" "landing_dlq_redriver" {
   })
 }
 
-resource "aws_cloudwatch_event_target" "landing_dlq_redriver" {
-  rule     = aws_cloudwatch_event_rule.alarm_state_change_threader.name
-  arn      = aws_sfn_state_machine.landing_dlq_redriver.arn
-  role_arn = aws_iam_role.landing_dlq_redriver_eventbridge.arn
+# ------------------------------------------
+# Trigger cadt Step funtion
+# ------------------------------------------
+
+module "trigger_cadt_step_function" {
+  source       = "./modules/step_function"
+  name         = "trigger-create-a-derived-table"
+  iam_policies = tomap({ "trigger_cadt_step_function_policy" = aws_iam_policy.trigger_cadt_step_function_policy })
+  variable_dictionary = tomap(
+    {
+      "trigger_cadt"  = module.trigger_cadt.lambda_function_name,
+      "environment"   = local.environment,
+      "poll_cadt"     = module.poll_cadt.lambda_function_name,
+    }
+  )
+  type = "STANDARD"
 }

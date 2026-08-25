@@ -439,7 +439,7 @@ module "ecs_container_sdg" {
   memory                   = 8192
   cpu                      = 2048
   essential                = true
-  readonly_root_filesystem = false
+  readonly_root_filesystem = true
   port_mappings            = []
   secrets = [
     {

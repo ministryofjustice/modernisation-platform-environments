@@ -42,7 +42,7 @@
       "type": "timeseries",
       "title": "ALB target response time",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 4 },
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 4 },
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -79,9 +79,9 @@
     {
       "id": 4,
       "type": "timeseries",
-      "title": "RDS read / write latency",
+      "title": "RDS read latency",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 4 },
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 4 },
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -112,10 +112,39 @@
           "metricQueryType": 1,
           "metricEditorMode": 1,
           "sqlExpression": "SELECT AVG(ReadLatency) FROM SCHEMA(\"AWS/RDS\", DBInstanceIdentifier) GROUP BY DBInstanceIdentifier ORDER BY AVG() DESC"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "type": "timeseries",
+      "title": "RDS write latency",
+      "datasource": { "type": "cloudwatch", "uid": "${account}" },
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 4 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "s"
         },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
         {
           "datasource": { "type": "cloudwatch", "uid": "${account}" },
-          "refId": "B",
+          "refId": "A",
           "region": "eu-west-2",
           "namespace": "AWS/RDS",
           "queryMode": "Metrics",
@@ -130,7 +159,7 @@
       "type": "timeseries",
       "title": "Lambda duration",
       "datasource": { "type": "cloudwatch", "uid": "${account}" },
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 4 },
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 4 },
       "fieldConfig": {
         "defaults": {
           "custom": {

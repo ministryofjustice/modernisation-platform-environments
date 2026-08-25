@@ -1,0 +1,121 @@
+locals {
+  s3_bucket_keys = [
+    "incoming",
+    "processing",
+    "clean",
+    "quarantine",
+    "investigation",
+  ]
+
+  s3_eventbridge_enabled = {
+    incoming      = true
+    processing    = true
+    clean         = true
+    quarantine    = true
+    investigation = true
+  }
+
+  s3_bucket_lifecycle_defaults = {
+    development = {
+      default = [
+        {
+          id     = "expire-objects-after-1-day"
+          status = "Enabled"
+          filter = {}
+          expiration = {
+            days = 1
+          }
+          abort_incomplete_multipart_upload_days = 1
+          noncurrent_version_expiration = {
+            noncurrent_days = 1
+          }
+        },
+      ]
+    }
+
+    production = {
+      default = [
+        {
+          id     = "expire-objects-after-1-day"
+          status = "Enabled"
+          filter = {}
+          expiration = {
+            days = 1
+          }
+          abort_incomplete_multipart_upload_days = 1
+          noncurrent_version_expiration = {
+            days = 1
+          }
+        },
+      ]
+    }
+  }
+
+  s3_bucket_lifecycle_per_prefix = {
+    development = {
+      default = local.s3_bucket_lifecycle_defaults.development.default
+      buckets = {}
+    }
+
+    production = {
+      default = local.s3_bucket_lifecycle_defaults.production.default
+      buckets = {
+        quarantine = [
+          {
+            id     = "expire-objects-after-7-days"
+            status = "Enabled"
+            filter = {}
+            expiration = {
+              days = 7
+            }
+            noncurrent_version_expiration = {
+              days = 7
+            }
+          },
+          {
+            id                                     = "abort-incomplete-multipart-uploads-after-1-day"
+            status                                 = "Enabled"
+            filter                                 = {}
+            abort_incomplete_multipart_upload_days = 1
+          },
+        ]
+        investigation = [
+          {
+            id     = "expire-objects-after-7-days"
+            status = "Enabled"
+            filter = {
+            }
+            expiration = {
+              days = 7
+            }
+            noncurrent_version_expiration = {
+              days = 7
+            }
+          },
+          {
+            id                                     = "abort-incomplete-multipart-uploads-after-1-day"
+            status                                 = "Enabled"
+            filter                                 = {}
+            abort_incomplete_multipart_upload_days = 1
+          },
+        ]
+      }
+    }
+  }
+
+  s3_lifecycle_rules = {
+    for key in local.s3_bucket_keys : key =>
+    try(
+      local.s3_bucket_lifecycle_per_prefix[local.environment].buckets[key],
+      local.s3_bucket_lifecycle_per_prefix[local.environment].default,
+    )
+  }
+
+  s3_bucket_configuration = {
+    for key in local.s3_bucket_keys : key => {
+      bucket          = "${local.application_name}-${local.environment}-${key}"
+      eventbridge     = local.s3_eventbridge_enabled[key]
+      lifecycle_rules = local.s3_lifecycle_rules[key]
+    }
+  }
+}

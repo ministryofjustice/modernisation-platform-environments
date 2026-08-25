@@ -36,7 +36,7 @@ resource "terraform_data" "lambda_service_account" {
   # Trigger replacement when password changes
   triggers_replace = [
     random_password.lambda_service_account.result,
-    "v1",
+    "v2",
   ]
 
   input = {
@@ -93,7 +93,7 @@ resource "terraform_data" "lambda_service_account_password_reset" {
   triggers_replace = [
     terraform_data.lambda_service_account.id,
     random_password.lambda_service_account.result,
-    "v1",
+    "v2",
   ]
 
   input = {
@@ -148,7 +148,7 @@ resource "terraform_data" "lambda_service_account_group_membership" {
 
   triggers_replace = [
     terraform_data.lambda_service_account_password_reset.id,
-    "v1",
+    "v2",
   ]
 
   input = {

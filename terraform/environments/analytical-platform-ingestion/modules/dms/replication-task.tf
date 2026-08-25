@@ -11,9 +11,11 @@ locals {
         rule-id     = idx + 1 # Using iteration number (1-based index)
         rule-name   = "include-${lower(obj)}"
         rule-action = "explicit"
+        # table-type "all" ensures views (not just tables) are migrated, e.g. pol_vict_details
         object-locator = {
           schema-name = length(split(".", obj)) > 1 ? split(".", obj)[0] : local.input_data.schema
           table-name  = length(split(".", obj)) > 1 ? split(".", obj)[1] : obj
+          table-type  = "all"
         }
       }
     ],
@@ -55,7 +57,7 @@ locals {
       # Generate transformation rules for removing columns
       for idx, column_to_exclude in local.columns_to_exclude : {
         rule-type   = "transformation"
-        rule-id     = (length(local.objects) * 2) + idx + 1
+        rule-id     = (length(local.objects) * 2) + length(local.blobs) + idx + 1
         rule-name   = "remove-${lower(column_to_exclude.column_name)}-from-${lower(column_to_exclude.object_name)}"
         rule-action = "remove-column"
         rule-target = "column"

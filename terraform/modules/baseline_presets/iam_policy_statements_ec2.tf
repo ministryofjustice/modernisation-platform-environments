@@ -306,25 +306,6 @@ locals {
       }
     ]
 
-    OracleLicenseTracking = [
-      {
-        sid    = "OracleLicenseTracking"
-        effect = "Allow"
-        actions = [
-          "s3:GetObject",
-          "s3:GetObjectTagging",
-          "s3:PutObject",
-          "s3:PutObjectAcl",
-          "s3:ListBucket",
-          "s3:DeleteObject"
-        ],
-        resources = [
-          "arn:aws:s3:::license-manager-artifact-bucket/*",
-          "arn:aws:s3:::license-manager-artifact-bucket"
-        ],
-      }
-    ]
-
     SSMManagedInstanceCoreReduced = [ # AmazonSSMManagedInstanceCore minus GetParameters
       {
         sid    = "SSMManagedSSM"

@@ -39,7 +39,27 @@ resource "aws_cloudwatch_event_rule" "alarm_state_change_threader" {
           [
             for _, alarm in aws_cloudwatch_metric_alarm.sqs_dlq_has_messages :
             alarm.alarm_name
-          ]
+          ],
+          [
+            for _, alarm in aws_cloudwatch_metric_alarm.merge_lambda_dlq_has_messages :
+            alarm.alarm_name
+          ],
+          [
+            for _, alarm in aws_cloudwatch_metric_alarm.merge_lambdas_queries_failing :
+            alarm.alarm_name
+          ],
+          [
+            for _, alarm in aws_cloudwatch_metric_alarm.merge_lambdas_excessive_scanning :
+            alarm.alarm_name
+          ],
+          [
+            for _, alarm in aws_cloudwatch_metric_alarm.merge_lambdas_slow_execution :
+            alarm.alarm_name
+          ],
+          [
+            for _, alarm in aws_cloudwatch_metric_alarm.merge_lambdas_long_queue :
+            alarm.alarm_name
+          ],
         )
       }
     }

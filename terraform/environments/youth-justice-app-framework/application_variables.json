@@ -15,7 +15,7 @@
       "tableau_blue_live": true,
       "tableau_test_active": true,
       "database_instance_class": "db.t4g.medium",
-      "rds_engine_version": "17.9",
+      "rds_engine_version": "18.3",
       "enable_datadog_agent_apm": false,
       "create_rds_sheduler": true,
       "create_svc_pilot": true,
@@ -35,7 +35,8 @@
         }
       },
       "quicksight_setup": true,
-      "malware_threat_endpoint_url": "https://yjaf.development.yjbservices.yjb.gov.uk/secure/api/v1/docs/threatDetected"
+      "malware_threat_endpoint_url": "https://yjaf.development.yjbservices.yjb.gov.uk/secure/api/v1/docs/threatDetected",
+      "malware_threat_auth_url": "https://yjaf.development.yjbservices.yjb.gov.uk/secure/api/v1/auth"
     },
     "test": {
       "allow_s3_replication": false,
@@ -52,7 +53,7 @@
       "tableau_blue_live": true,
       "tableau_test_active": true,
       "database_instance_class": "db.t4g.medium",
-      "rds_engine_version": "17.9",
+      "rds_engine_version": "18.3",
       "enable_datadog_agent_apm": false,
       "create_rds_sheduler": true,
       "create_svc_pilot": true,
@@ -72,7 +73,8 @@
         }
       },
       "quicksight_setup": true,
-      "malware_threat_endpoint_url": "https://yjaf.test.yjbservices.yjb.gov.uk/secure/api/v1/docs/threatDetected"
+      "malware_threat_endpoint_url": "https://yjaf.test.yjbservices.yjb.gov.uk/secure/api/v1/docs/threatDetected",
+      "malware_threat_auth_url": "https://yjaf.test.yjbservices.yjb.gov.uk/secure/api/v1/auth"
     },
     "preproduction": {
       "allow_s3_replication": false,
@@ -89,7 +91,7 @@
       "tableau_blue_live": true,
       "tableau_test_active": true,
       "database_instance_class": "db.r5.xlarge",
-      "rds_engine_version": "17.9",
+      "rds_engine_version": "18.3",
       "enable_datadog_agent_apm": false,
       "create_rds_sheduler": true,
       "create_svc_pilot": true,
@@ -109,7 +111,8 @@
         }
       },
       "quicksight_setup": true,
-      "malware_threat_endpoint_url": "https://yjaf.preproduction.yjbservices.yjb.gov.uk/secure/api/v1/docs/threatDetected"
+      "malware_threat_endpoint_url": "https://yjaf.preproduction.yjbservices.yjb.gov.uk/secure/api/v1/docs/threatDetected",
+      "malware_threat_auth_url": "https://yjaf.preproduction.yjbservices.yjb.gov.uk/secure/api/v1/auth"
     },
     "production": {
       "allow_s3_replication": false,
@@ -150,7 +153,8 @@
         }
       },
       "quicksight_setup": true,
-      "malware_threat_endpoint_url": "https://yjaf.yjbservices.yjb.gov.uk/secure/api/v1/docs/threatDetected"
+      "malware_threat_endpoint_url": "https://yjaf.yjbservices.yjb.gov.uk/secure/api/v1/docs/threatDetected",
+      "malware_threat_auth_url": "https://yjaf.yjbservices.yjb.gov.uk/secure/api/v1/auth"
     }
   }
 }

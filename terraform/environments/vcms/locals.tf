@@ -13,8 +13,6 @@ locals {
     shared_vpc_cidr    = data.aws_vpc.shared.cidr_block
     private_subnet_ids = data.aws_subnets.shared-private.ids
     public_subnet_ids  = data.aws_subnets.shared-public.ids
-    #    ordered_private_subnet_ids    = local.ordered_subnet_ids
-    #ordered_subnets               = [local.ordered_subnet_ids]
     data_subnet_ids               = data.aws_subnets.shared-data.ids
     data_subnet_a_id              = data.aws_subnet.data_subnets_a.id
     route53_inner_zone            = data.aws_route53_zone.inner
@@ -69,18 +67,29 @@ locals {
     }
   }
 
-  domain                  = local.is-production ? "vcms.probation.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
+  domain                  = "modernisation-platform.service.justice.gov.uk"
   domain_name_main        = [for k, v in local.domain_types : v.name if k == local.domain]
   domain_record_main      = [for k, v in local.domain_types : v.record if k == local.domain]
   domain_type_main        = [for k, v in local.domain_types : v.type if k == local.domain]
   domain_name_sub         = [for k, v in local.domain_types : v.name if k == local.app_url]
   domain_record_sub       = [for k, v in local.domain_types : v.record if k == local.app_url]
   domain_type_sub         = [for k, v in local.domain_types : v.type if k == local.app_url]
-  validation_record_fqdns = local.is-development ? [local.domain_name_main[0], local.domain_name_sub[0]] : [local.domain_name_main[0], local.domain_name_sub[0]]
+  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0], local.app_config.legacy_validation_record]
 
   app_url                       = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
-  acm_subject_alternative_names = [local.app_url]
+  acm_subject_alternative_names = [local.app_url, local.app_config.legacy_url]
 
+  mp_non_live_natgw_ips = [
+  "13.42.163.245/32", # mod-platform-non-live-eu-west-2b-nat
+  "13.43.9.198/32",   # mod-platform-non-live-eu-west-2a-nat
+  "18.132.208.127/32" # mod-platform-non-live-eu-west-2c-nat
+  ]
+  mp_live_natgw_ips = [
+    "13.41.38.176/32", # mod-platform-live-eu-west-2b-nat
+    "3.11.197.133/32", # mod-platform-live-eu-west-2c-nat
+    "3.8.81.175/32"    # mod-platform-live-eu-west-2c-nat
+  ]
+  mp_natgw_ips = contains(["development", "test"], local.environment) ? local.mp_non_live_natgw_ips : local.mp_live_natgw_ips
 }
 
 module "ip_addresses" {

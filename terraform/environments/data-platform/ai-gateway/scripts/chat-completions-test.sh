@@ -1,22 +1,26 @@
 #!/usr/bin/env bash
-set -euo pipefail
 
-if [[ $# -lt 2 ]]; then
-  echo "Usage: $0 <api-key> <environment>" >&2
-  echo "  environment: development, test, preproduction, production" >&2
+if [[ -z "${AWS_SSO_PROFILE}" ]]; then
+  echo "AWS_SSO_PROFILE not set, please run 'aws-sso exec ...' for example 'aws-sso exec --profile data-platform-development:platform-engineer-admin'"
   exit 1
 fi
 
-API_KEY="$1"
-ENV="$2"
+ENVIRONMENT="$(cut -d: -f1 <<< "${AWS_SSO_PROFILE#data-platform-}")"
 
-if [[ "${ENV}" == "production" ]]; then
-  BASE_URL="https://ai-gateway.justice.gov.uk"
+if [[ "${ENVIRONMENT}" == "production" ]]; then
+  AI_GATEWAY_URL="https://ai-gateway.justice.gov.uk"
+  AI_GATEWAY_ADMIN_URL="https://admin.ai-gateway.justice.gov.uk"
 else
-  BASE_URL="https://${ENV}.ai-gateway.justice.gov.uk"
+  AI_GATEWAY_URL="https://${ENVIRONMENT}.ai-gateway.justice.gov.uk"
+  AI_GATEWAY_ADMIN_URL="https://admin.${ENVIRONMENT}.ai-gateway.justice.gov.uk"
 fi
 
-curl -s ${BASE_URL}/chat/completions \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${API_KEY}" \
-  -d '{"model":"bedrock-claude-opus-4-7","messages":[{"role":"user","content":"This is a test script. Please ignore."}]}' | jq .
+AI_GATEWAY_MASTER_KEY=$(aws secretsmanager get-secret-value --secret-id ai-gateway/litellm-master-key --query SecretString --output text)
+
+curl \
+  --silent \
+  --request POST \
+  --url "${AI_GATEWAY_URL}/chat/completions" \
+  --header "Content-Type: application/json" \
+  --header "Authorization: Bearer ${AI_GATEWAY_MASTER_KEY}" \
+  --data '{"model":"bedrock-claude-haiku-4-5","messages":[{"role":"user","content":"PING 🏓"}]}' | jq .
