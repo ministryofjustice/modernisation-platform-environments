@@ -155,7 +155,7 @@ locals {
         target_cpu_utilization_percentage = 60
       }
       aurora_instance_class                     = "db.t4g.medium"
-      aurora_engine_version                     = "17.9"
+      aurora_engine_version                     = "18.4"
       aurora_instances                          = { writer = {}, reader = {} }
       aurora_serverlessv2_scaling_configuration = null
       elasticache_node_type                     = "cache.t4g.medium"
