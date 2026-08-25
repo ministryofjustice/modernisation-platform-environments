@@ -358,6 +358,9 @@ locals {
       /* ArgoCD — spokes registered with the nonlive hub */
       argocd_registered_spokes = [
         "container-platform-octo-nonlive",
+        "container-platform-hmpps-nonlive",
+        "container-platform-laa-nonlive",
+        "container-platform-cd-nonlive",
       ]
 
       /* ArgoCD — additional RBAC role mappings for this tier (beyond the

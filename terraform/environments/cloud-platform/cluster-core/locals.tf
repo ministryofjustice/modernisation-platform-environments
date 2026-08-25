@@ -78,6 +78,12 @@ locals {
         live    = "container-platform-hmpps-live"
       }
     }
+    cd = {
+      clusters = {
+        nonlive = "container-platform-cd-nonlive"
+        live    = "container-platform-cd-live"
+      }
+    }
   }
 
   # Flatten BU configs into per-environment AppProject entries
