@@ -18,13 +18,23 @@ locals {
   #   namespace      = CloudWatch namespace (omit for Prometheus signals)
   #   metric         = CloudWatch metric name / short label for Prometheus signals
   #   statistic      = CloudWatch statistic (Sum, Average, Maximum, Minimum, p99 …)
-  #   datasource_type = (optional) "prometheus" to use PromQL instead of CloudWatch, or
-  #                     "azure_monitor" to query the shared Azure Monitor datasource.
-  #                     When set to "prometheus", supply `expr` instead of
-  #                     namespace/metric/statistic. When set to "azure_monitor", supply
-  #                     namespace/metric/statistic as with CloudWatch (namespace is the
-  #                     Azure resource type, e.g. "microsoft.cognitiveservices/accounts";
-  #                     statistic is the Azure Monitor aggregation, e.g. "Average"/"Total").
+  #   datasource_type = (optional, default "cloudwatch") one of "cloudwatch" (default),
+  #                     "prometheus", "azure_monitor", or "stackdriver".
+  #                       "cloudwatch"    → supply namespace/metric/statistic.
+  #                       "prometheus"    → supply `expr` instead of
+  #                                         namespace/metric/statistic.
+  #                       "azure_monitor" → supply namespace/metric/statistic as with
+  #                                         CloudWatch (namespace is the Azure resource
+  #                                         type, e.g. "microsoft.cognitiveservices/accounts";
+  #                                         statistic is the Azure Monitor aggregation,
+  #                                         e.g. "Average"/"Total"). Queries the shared
+  #                                         Azure Monitor datasource (cfg.azure_monitor_
+  #                                         datasource_uid, default "azure-monitor-ai-foundry").
+  #                       "stackdriver"   → Google Cloud Monitoring. Supply namespace/metric
+  #                                         as with CloudWatch, plus resource_type/aligner/
+  #                                         reducer (and optionally filter) instead of
+  #                                         statistic. Queries cfg.stackdriver_datasource_uid
+  #                                         (default "google-cloud-monitoring").
   #   expr           = PromQL expression (datasource_type = "prometheus" only).
   #                    Use __NAMESPACES__ as a token where a namespace regex is needed;
   #                    it is replaced at render time with cfg.namespaces joined by "|".
@@ -57,9 +67,14 @@ locals {
   #                      lt          → fire when value < threshold         (condition C)
   #                      baseline_gt → fire when % above hourly baseline   (condition D)
   #                      baseline_lt → fire when % below hourly baseline   (condition D)
-  #   dim_key        = primary CloudWatch dimension key ("" = no dimension filter)
-  #                    Supported keys and the environment_configurations field they
-  #                    resolve against at render time:
+  #   dim_key        = primary dimension/grouping key ("" = no dimension filter). For
+  #                    cloudwatch/azure_monitor rules this becomes an actual dimension
+  #                    filter on the rendered query; the resolution happens in
+  #                    rule_combos_by_env (alerting-rules.tf), which lists each key
+  #                    explicitly — any key not listed there falls through to the
+  #                    default "" case with no dimension filter at all, even if a
+  #                    matching environment_configurations field exists elsewhere.
+  #                    Supported keys and what they resolve against at render time:
   #                      ""                     → no dimension filter (global aggregate)
   #                      "BucketName"           → cfg.s3_buckets        (list of bucket names)
   #                      "DBInstanceIdentifier" → cfg.rds_instances     (list of RDS instance IDs)
@@ -68,9 +83,18 @@ locals {
   #                      "Namespace"            → cfg.namespaces        (list of k8s namespaces)
   #                      "ClusterName"          → ["*"]                 (wildcard — all clusters)
   #                      "NodeName"             → ["*"]                 (wildcard — all nodes)
-  #                      "ModelId"             → ["*"]                 (wildcard — all models)
-  #                      "ModelDeploymentName" → cfg.azure_foundry_model_deployments
-  #                                               (list of Azure AI Foundry model deployment names)
+  #                      "ModelDeploymentName"  → ["*"]                 (wildcard — rendered as a
+  #                                               literal ModelDeploymentName="*" Azure Monitor
+  #                                               dimensionFilters entry; NOT scoped against
+  #                                               cfg.azure_foundry_model_deployments, which
+  #                                               is not a real config field)
+  #                      "ModelId"              → not one of the explicit cases above, so it
+  #                                               falls through to the "" default — no
+  #                                               CloudWatch dimension is emitted at all
+  #                                               (global aggregate across all models).
+  #                                               Practically equivalent to the wildcard
+  #                                               entries above, but via the no-filter path
+  #                                               rather than an actual ModelId="*" filter.
   #                      "FileSystemId"         → cfg.efs_file_systems  (list of EFS file system IDs)
   #                    One alert rule is generated per value in the resolved list;
   #                    the value is appended as a suffix to the rule name.
