@@ -82,28 +82,28 @@ resource "aws_route" "private_a_firewall" {
 
   route_table_id         = aws_route_table.private_a.id
   destination_cidr_block = "0.0.0.0/0"
-  vpc_endpoint_id = local.firewall_endpoints["eu-west-2a"]
+  vpc_endpoint_id        = local.firewall_endpoints["eu-west-2a"]
 }
 
 resource "aws_route" "private_b_firewall" {
 
   route_table_id         = aws_route_table.private_b.id
   destination_cidr_block = "0.0.0.0/0"
-  vpc_endpoint_id = local.firewall_endpoints["eu-west-2b"]
+  vpc_endpoint_id        = local.firewall_endpoints["eu-west-2b"]
 }
 
 resource "aws_route" "private_a_laa_vpc_dev" {
-  count = local.environment == "development" ? 1 : 0
+  count                  = local.environment == "development" ? 1 : 0
   route_table_id         = aws_route_table.private_a.id
   destination_cidr_block = "10.0.0.0/8"
-  transit_gateway_id = local.moj_tgw_id
+  transit_gateway_id     = local.moj_tgw_id
 }
 
 resource "aws_route" "private_b_laa_vpc_dev" {
-  count = local.environment == "development" ? 1 : 0
+  count                  = local.environment == "development" ? 1 : 0
   route_table_id         = aws_route_table.private_b.id
   destination_cidr_block = "10.0.0.0/8"
-  transit_gateway_id = local.moj_tgw_id
+  transit_gateway_id     = local.moj_tgw_id
 }
 
 ##############################################
@@ -192,24 +192,24 @@ resource "aws_route" "nat_igw" {
 
   route_table_id         = aws_route_table.nat.id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id      = aws_internet_gateway.main.id
-  
+  gateway_id             = aws_internet_gateway.main.id
+
 }
 
 resource "aws_route" "nat_firewall_a" {
 
   route_table_id         = aws_route_table.nat.id
   destination_cidr_block = local.application_data.accounts[local.environment].private_subnet_a_cidr
-  vpc_endpoint_id = local.firewall_endpoints["eu-west-2a"]
-  
+  vpc_endpoint_id        = local.firewall_endpoints["eu-west-2a"]
+
 }
 
 resource "aws_route" "nat_firewall_b" {
 
   route_table_id         = aws_route_table.nat.id
   destination_cidr_block = local.application_data.accounts[local.environment].private_subnet_b_cidr
-  vpc_endpoint_id = local.firewall_endpoints["eu-west-2b"]
-  
+  vpc_endpoint_id        = local.firewall_endpoints["eu-west-2b"]
+
 }
 
 ##############################################
@@ -267,7 +267,7 @@ resource "aws_route" "firewall_nat" {
   route_table_id         = aws_route_table.firewall.id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.main.id
-  
+
 }
 
 ##############################################

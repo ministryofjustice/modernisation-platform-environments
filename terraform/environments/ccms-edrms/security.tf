@@ -22,12 +22,12 @@ resource "aws_security_group_rule" "alb_ingress_443" {
 
 
 resource "aws_security_group_rule" "alb_egress_ec2" {
-  security_group_id = aws_security_group.load_balancer.id
-  type              = "egress"
-  description       = "Allow LB to reach EC2 cluster ephemeral ports"
-  protocol          = "TCP"
-  from_port         = 32768
-  to_port           = 61000
+  security_group_id        = aws_security_group.load_balancer.id
+  type                     = "egress"
+  description              = "Allow LB to reach EC2 cluster ephemeral ports"
+  protocol                 = "TCP"
+  from_port                = 32768
+  to_port                  = 61000
   source_security_group_id = aws_security_group.cluster_ec2.id
 }
 
@@ -82,12 +82,12 @@ resource "aws_security_group_rule" "ecs_tasks_egress_s3" {
 }
 
 resource "aws_security_group_rule" "ecs_tasks_egress_db" {
-  security_group_id = aws_security_group.ecs_tasks_edrms.id
-  type              = "egress"
-  description       = "Allow outbound DB access to TDS"
-  protocol          = "TCP"
-  from_port         = 1521
-  to_port           = 1521
+  security_group_id        = aws_security_group.ecs_tasks_edrms.id
+  type                     = "egress"
+  description              = "Allow outbound DB access to TDS"
+  protocol                 = "TCP"
+  from_port                = 1521
+  to_port                  = 1521
   source_security_group_id = aws_security_group.tds_db.id
 }
 
@@ -189,12 +189,12 @@ resource "aws_security_group_rule" "cluster_ec2_egress_s3" {
 }
 
 resource "aws_security_group_rule" "cluster_ec2_egress_db" {
-  security_group_id = aws_security_group.cluster_ec2.id
-  type              = "egress"
-  description       = "Allow outbound DB access to TDS"
-  protocol          = "TCP"
-  from_port         = 1521
-  to_port           = 1521
+  security_group_id        = aws_security_group.cluster_ec2.id
+  type                     = "egress"
+  description              = "Allow outbound DB access to TDS"
+  protocol                 = "TCP"
+  from_port                = 1521
+  to_port                  = 1521
   source_security_group_id = aws_security_group.tds_db.id
 }
 

@@ -168,3 +168,65 @@ resource "aws_vpc_endpoint" "s3" {
     }
   )
 }
+
+##############################################
+### ECR VPC Endpoints (for ECS Fargate to pull images)
+##############################################
+
+resource "aws_vpc_endpoint" "ecr_api" {
+  count = local.environment == "development" ? 1 : 0
+
+  vpc_id              = aws_vpc.workspaces[0].id
+  service_name        = "com.amazonaws.eu-west-2.ecr.api"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = [aws_subnet.private_a[0].id, aws_subnet.private_b[0].id]
+  security_group_ids  = [aws_security_group.vpc_endpoints[0].id]
+  private_dns_enabled = true
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.application_name}-${local.environment}-ecr-api-endpoint"
+    }
+  )
+}
+
+resource "aws_vpc_endpoint" "ecr_dkr" {
+  count = local.environment == "development" ? 1 : 0
+
+  vpc_id              = aws_vpc.workspaces[0].id
+  service_name        = "com.amazonaws.eu-west-2.ecr.dkr"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = [aws_subnet.private_a[0].id, aws_subnet.private_b[0].id]
+  security_group_ids  = [aws_security_group.vpc_endpoints[0].id]
+  private_dns_enabled = true
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.application_name}-${local.environment}-ecr-dkr-endpoint"
+    }
+  )
+}
+
+##############################################
+### CloudWatch Logs VPC Endpoint (for ECS task logging)
+##############################################
+
+resource "aws_vpc_endpoint" "logs" {
+  count = local.environment == "development" ? 1 : 0
+
+  vpc_id              = aws_vpc.workspaces[0].id
+  service_name        = "com.amazonaws.eu-west-2.logs"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = [aws_subnet.private_a[0].id, aws_subnet.private_b[0].id]
+  security_group_ids  = [aws_security_group.vpc_endpoints[0].id]
+  private_dns_enabled = true
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.application_name}-${local.environment}-logs-endpoint"
+    }
+  )
+}

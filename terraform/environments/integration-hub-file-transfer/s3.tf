@@ -1,6 +1,7 @@
 module "s3_audit_bucket" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.14.1"
+  version = "5.15.4"
 
   allowed_kms_key_arn                   = module.kms_s3_audit.key_arn
   attach_deny_insecure_transport_policy = true
@@ -41,18 +42,43 @@ module "s3_audit_bucket" {
     status     = true
     mfa_delete = false
   }
+
+  tags = local.tags
 }
 
 module "s3_bucket" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   for_each = {
     for key, value in local.s3_bucket_configuration : key => value
   }
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.14.1"
+  version = "5.15.4"
 
   allowed_kms_key_arn                   = module.kms_s3_bucket[each.key].key_arn
   attach_deny_insecure_transport_policy = true
   bucket                                = each.value.bucket
+
+  cors_rule = each.key == "incoming" ? [
+    {
+      allowed_headers = ["*"]
+      allowed_methods = ["GET", "PUT", "POST", "DELETE", "HEAD"]
+      allowed_origins = [aws_transfer_web_app.this.access_endpoint]
+      expose_headers = [
+        "last-modified",
+        "content-length",
+        "etag",
+        "x-amz-version-id",
+        "content-type",
+        "x-amz-request-id",
+        "x-amz-id-2",
+        "date",
+        "x-amz-cf-id",
+        "x-amz-storage-class",
+        "access-control-expose-headers",
+      ]
+      max_age_seconds = 3000
+    }
+  ] : []
 
   server_side_encryption_configuration = {
     rule = {

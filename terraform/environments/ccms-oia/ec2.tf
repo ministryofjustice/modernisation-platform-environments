@@ -58,11 +58,12 @@ resource "aws_launch_template" "ec2_launch_template" {
 }
 
 resource "aws_autoscaling_group" "cluster_scaling_group" {
-  name                = "${local.application_name}-auto-scaling-group"
-  vpc_zone_identifier = data.aws_subnets.shared-private.ids
-  desired_capacity    = local.application_data.accounts[local.environment].ec2_desired_capacity
-  max_size            = local.application_data.accounts[local.environment].ec2_max_size
-  min_size            = local.application_data.accounts[local.environment].ec2_min_size
+  name                  = "${local.application_name}-auto-scaling-group"
+  vpc_zone_identifier   = data.aws_subnets.shared-private.ids
+  desired_capacity      = local.application_data.accounts[local.environment].ec2_desired_capacity
+  max_size              = local.application_data.accounts[local.environment].ec2_max_size
+  min_size              = local.application_data.accounts[local.environment].ec2_min_size
+  protect_from_scale_in = true
 
   launch_template {
     id      = aws_launch_template.ec2_launch_template.id

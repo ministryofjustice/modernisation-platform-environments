@@ -151,7 +151,7 @@ locals {
       tags                 = local.ec2_instances.web.tags
     }
 
-    web12 = {
+    qa11g-nomis-web12 = {
       autoscaling_group = {
         desired_capacity          = 1
         force_delete              = true
@@ -169,7 +169,7 @@ locals {
         "scale_down" = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
       }
       config = {
-        ami_name                  = "base_ol_8_5*"
+        ami_name                  = "base_ol_8_5_2023-06-08T09-45-10.579Z"
         iam_resource_names_prefix = "ec2-instance"
         instance_profile_policies = [
           # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
@@ -252,7 +252,7 @@ locals {
         "scale_down" = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
       }
       config = {
-        ami_name                  = "base_ol_8_5*"
+        ami_name                  = "base_ol_8_5_2023-06-08T09-45-10.579Z"
         iam_resource_names_prefix = "ec2-instance"
         instance_profile_policies = [
           # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
@@ -334,7 +334,7 @@ locals {
         "scale_down" = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
       }
       config = {
-        ami_name                  = "base_ol_8_5*"
+        ami_name                  = "base_ol_8_5_2023-06-08T09-45-10.579Z"
         iam_resource_names_prefix = "ec2-instance"
         instance_profile_policies = [
           # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
