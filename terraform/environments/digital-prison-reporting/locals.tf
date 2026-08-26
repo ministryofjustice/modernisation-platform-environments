@@ -90,8 +90,9 @@ locals {
   secretsmanager_read_policy = "${local.project}_secretsmanager_read_policy"
 
 
-  trigger_glue_job_policy = "${local.project}_start_glue_job_policy"
-  start_dms_task_policy   = "${local.project}_start_dms_task_policy"
+  trigger_glue_job_policy                          = "${local.project}_start_glue_job_policy"
+  start_dms_task_policy                            = "${local.project}_start_dms_task_policy"
+  update_ingestion_pipeline_versions_dynamo_policy = "${local.project}_access_ingestion_version_dynamodb_table_policy"
 
   s3_all_object_actions_policy = "${local.project}_s3_all_object_actions_policy"
   all_state_machine_policy     = "${local.project}_all_state_machine_policy"

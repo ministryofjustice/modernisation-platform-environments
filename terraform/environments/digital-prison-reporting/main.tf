@@ -1080,6 +1080,35 @@ module "dynamo_table_step_functions_token" {
   )
 }
 
+# Dynamo table for Ingestion pipeline versions
+# An ingestion version is a run of the ingestion pipeline.
+# The table is keyed by the ingestion_domain.
+module "dynamo_table_ingestion_pipeline_versions" {
+  source              = "./modules/dynamo_tables"
+  create_table        = true
+  autoscaling_enabled = false
+  name                = "${local.project}-ingestion-pipeline-versions-${local.environment}"
+
+  hash_key    = "ingestion_domain"
+  table_class = "STANDARD"
+
+  attributes = [
+    {
+      name = "ingestion_domain"
+      type = "S"
+    }
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      dpr-name          = "${local.project}-ingestion-pipeline-versions-${local.environment}"
+      dpr-resource-type = "Dynamo Table"
+      dpr-jira          = "DHS-833"
+    }
+  )
+}
+
 ##########################
 # Application Backend TF # 
 ##########################
