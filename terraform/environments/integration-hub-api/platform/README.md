@@ -26,3 +26,5 @@ credential secret must exist before applying this stack.
    variable `AWS_DEPLOY_ROLE_ARN` to the `app_deploy_role_arn` output.
 5. Replace the generated client credential placeholder in Secrets Manager.
 6. Merge the application PR to deploy both Lambda packages.
+
+Note: this README line is intentionally present to retrigger GitHub Actions on PR `#18570` after the component refactor.
