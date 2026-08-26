@@ -142,6 +142,7 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
       "logs:CreateDelivery",
       "logs:DeleteDelivery*",
       "logs:PutLogEvents",
+      "logs:PutResourcePolicy",
       "logs:PutRetentionPolicy",
       "logs:Describe*",
       "logs:PutDelivery*",
