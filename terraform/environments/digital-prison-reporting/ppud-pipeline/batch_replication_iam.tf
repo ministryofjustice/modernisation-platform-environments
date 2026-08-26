@@ -2,7 +2,7 @@
 data "aws_iam_policy_document" "batch_replication_destination" {
 
   statement {
-    sid    = "AllowReplicationFromSourceRole"
+    sid    = "AllowBatchCopyToDestination"
     effect = "Allow"
 
     principals {
@@ -11,33 +11,13 @@ data "aws_iam_policy_document" "batch_replication_destination" {
     }
 
     actions = [
-      "s3:ReplicateObject",
-      "s3:ReplicateDelete",
-      "s3:ReplicateTags",
-      "s3:ObjectOwnerOverrideToBucketOwner"
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:PutObjectTagging"
     ]
 
     resources = [
       "${module.rds_export.parquet_exports_bucket_arn}/*"
-    ]
-  }
-
-  statement {
-    sid    = "AllowReplicationBucketPermissions"
-    effect = "Allow"
-
-    principals {
-      type        = "AWS"
-      identifiers = [local.source_bucket_role_arn]
-    }
-
-    actions = [
-      "s3:GetBucketVersioning",
-      "s3:PutBucketVersioning"
-    ]
-
-    resources = [
-      module.rds_export.parquet_exports_bucket_arn
     ]
   }
 }
