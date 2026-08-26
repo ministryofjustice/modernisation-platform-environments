@@ -409,6 +409,8 @@ module "load_fms_lambda" {
     CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
     SNS_TOPIC_ARN       = aws_sns_topic.emds_alerts.arn
     MAX_RECEIVE_COUNT   = tostring(local.load_sqs_max_receive_count)
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
   }
 }
 
