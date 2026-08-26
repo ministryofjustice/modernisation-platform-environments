@@ -2,6 +2,22 @@
 serviceMonitor:
   enabled: true
 
+service:
+  extraService: |
+    HTTP_Server On
+    HTTP_Listen 0.0.0.0
+    HTTP_PORT 2020
+    Health_Check On
+
+livenessProbe:
+  httpGet:
+    path: /api/v1/health
+    port: 2020
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+
 cloudWatchLogs:
   enabled: true
   match: kube.*
@@ -18,6 +34,8 @@ input:
 
 filter:
   bufferSize: 128k
+  extraFilters: |
+    Kube_Meta_Cache_TTL 300s
 
 serviceAccount:
   create: true
