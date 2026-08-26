@@ -6,6 +6,10 @@ cloudWatchLogs:
   enabled: true
   region: ${aws_region}
   logGroupName: ${cloudwatch_log_group_name}
+  logGroupTemplate: ${cloudwatch_log_group_name}/$kubernetes['namespace_name']
+  logStreamTemplate: $kubernetes['pod_name'].$kubernetes['container_name']
+  logRetentionDays: 365
+  autoCreateGroup: true
 
 input:
   extraInputs: |
