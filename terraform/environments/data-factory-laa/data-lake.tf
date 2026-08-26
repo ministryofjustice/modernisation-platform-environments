@@ -148,7 +148,23 @@ module "data_lake_buckets" {
   tags = local.tags
 }
 
+resource "aws_athena_workgroup" "laa" {
+  name = "laa"
 
+  configuration {
+    enforce_workgroup_configuration    = true
+    publish_cloudwatch_metrics_enabled = true
+
+    result_configuration {
+      output_location = "s3://${module.data_lake_buckets["aws-athena-query-results"].bucket.id}/athena-results/"
+
+      encryption_configuration {
+        encryption_option = "SSE_KMS"
+        kms_key_arn       = aws_kms_key.data_lake_kms_key.arn
+      }
+    }
+  }
+}
 
 module "databases" {
   for_each = toset(local.databases)
