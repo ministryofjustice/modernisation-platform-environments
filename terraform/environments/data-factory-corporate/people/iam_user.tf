@@ -30,10 +30,10 @@ resource "aws_iam_user_policy" "assume_external_role" {
 }
 
 
-resource "aws_iam_user_login_profile" "datafactory_user" {
-  user                    = aws_iam_user.datafactory_user.name
-  password_reset_required = false
-}
+# resource "aws_iam_user_login_profile" "datafactory_user" {
+#   user                    = aws_iam_user.datafactory_user.name
+#   password_reset_required = false
+# }
 
 # Create programmatic access credentials
 resource "aws_iam_access_key" "datafactory_user" {
@@ -47,11 +47,12 @@ resource "aws_secretsmanager_secret" "datafactory_user_credentials" {
 
 
 resource "aws_secretsmanager_secret_version" "datafactory_user_credentials" {
+  #checkov:skip=CKV2_AWS_57: "Secret only exists for testing — rotation not applicable"
   secret_id = aws_secretsmanager_secret.datafactory_user_credentials.id
 
   secret_string = jsonencode({
     username          = aws_iam_user.datafactory_user.name
-    password          = aws_iam_user_login_profile.datafactory_user.password
+    # password          = aws_iam_user_login_profile.datafactory_user.password
     access_key_id     = aws_iam_access_key.datafactory_user.id
     secret_access_key = aws_iam_access_key.datafactory_user.secret
   })
