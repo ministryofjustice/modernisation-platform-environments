@@ -112,7 +112,8 @@ locals {
   }
 }
 
-## /aws/vendedlogs/ prefix gets the delivery service write access automatically
+## Delivery destinations. The naming alone does not grant write access — see the
+## resource policy below.
 resource "aws_cloudwatch_log_group" "auto_mode" {
   for_each = local.auto_mode_log_types
 
@@ -122,11 +123,47 @@ resource "aws_cloudwatch_log_group" "auto_mode" {
   tags = merge(local.tags, { Name = "/aws/vendedlogs/eks/cluster/${each.key}/${local.cluster_name}" })
 }
 
-## The CloudWatch delivery API only enables one log type at a time (confirmed by
-## AWS), and each one triggers an async EKS cluster update. So these are chained
-## with waits. for_each creates them in parallel and three of four fail with
-## ConflictException; depends_on alone is not enough because the API call returns
-## before the cluster update finishes.
+## Allows the delivery service to write to the vendedlogs log groups.
+data "aws_iam_policy_document" "auto_mode_vendedlogs" {
+  statement {
+    sid    = "AWSLogDeliveryWriteVendedLogs"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["delivery.logs.amazonaws.com"]
+    }
+
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+
+    resources = [
+      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/vendedlogs/*:log-stream:*",
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"]
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_resource_policy" "auto_mode_vendedlogs" {
+  policy_name     = "auto-mode-vendedlogs-delivery"
+  policy_document = data.aws_iam_policy_document.auto_mode_vendedlogs.json
+}
+
+## Created one at a time with waits: each triggers an async EKS cluster update and
+## the API allows only one, so parallel creation hits ConflictException.
 resource "aws_cloudwatch_log_delivery_source" "auto_mode_compute" {
   name         = "${local.cluster_name}-compute"
   log_type     = "AUTO_MODE_COMPUTE_LOGS"
@@ -199,4 +236,7 @@ resource "aws_cloudwatch_log_delivery" "auto_mode" {
   delivery_destination_arn = aws_cloudwatch_log_delivery_destination.auto_mode[each.key].arn
 
   tags = local.tags
+
+  # CreateDelivery needs the destination log-group resource policy in place first.
+  depends_on = [aws_cloudwatch_log_resource_policy.auto_mode_vendedlogs]
 }
