@@ -179,6 +179,17 @@ module "databases" {
   }
 }
 
+
+module "file_ingestion" {
+  source = "./modules/file-ingestion"
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  database_name = "raw"
+  kms_key_arn = aws_kms_key.data_lake_kms_key.arn
+}
+
 data "aws_iam_policy_document" "data_lake_access_action_assume_role" {
   statement {
     effect  = "Allow"
