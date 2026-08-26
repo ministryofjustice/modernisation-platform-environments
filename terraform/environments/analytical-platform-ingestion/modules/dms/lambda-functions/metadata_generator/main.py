@@ -147,6 +147,7 @@ class MetadataExtractor:
             self.columns_to_keep_as_int_by_object[object_column["object_name"].upper()].add(object_column["column_name"].upper())
 
         logger.info("Excluded columns loaded as %s", self.excluded_columns_by_object)
+        logger.info("Integer type overrides loaded as %s", self.columns_to_keep_as_int_by_object)
         self.emc = EtlManagerConverter()
         self.sqlc = SQLAlchemyConverter(engine)
         self.blobs = []
@@ -205,7 +206,7 @@ class MetadataExtractor:
             return metadata
 
         for column_name in set(metadata.column_names).intersection(map(str.lower, columns_to_keep_as_int)):
-            logger.info("Keeping column %s as int in table %s in schema %s", column_name, table, schema)
+            logger.info("Applying explicit integer type override to %s.%s.%s", schema, table, column_name)
             column = metadata.get_column(column_name)
             column["type"] = "int32"
             metadata.update_column(column)

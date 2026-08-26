@@ -17,7 +17,9 @@ A one-way managed file transfer service, provided by the Integration Hub, to all
 
 ### **Service URLs:**
 
-> *.managed-file-transfer.service.justice.gov.uk
+> ftps.file-transfer.service.justice.gov.uk
+> sftp.file-transfer.service.justice.gov.uk
+> web.file-transfer.service.justice.gov.uk
 
 ### **Incident response hours:**
 

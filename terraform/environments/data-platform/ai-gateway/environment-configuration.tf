@@ -133,7 +133,26 @@ locals {
         # Cloud Platform
         "35.178.209.113/32",
         "3.8.51.207/32",
-        "35.177.252.54/32"
+        "35.177.252.54/32",
+        # Analytical Platform
+        ## Compute
+        ### Development
+        "18.133.132.50/32",
+        "18.132.51.177/32",
+        "13.42.93.133/32",
+        ### Test
+        "18.134.41.36/32",
+        "3.11.34.83/32",
+        "18.133.37.201/32",
+        ### Production
+        "18.168.85.104/32",
+        "13.42.220.232/32",
+        "18.168.158.203/32",
+        ## Tools
+        ### Production
+        "54.195.74.96/32",
+        "79.125.36.56/32",
+        "63.35.122.32/32"
       ]
       ai_gateway_admin_ingress_allowlist = [
         # VPN
@@ -155,7 +174,7 @@ locals {
         target_cpu_utilization_percentage = 60
       }
       aurora_instance_class                     = "db.t4g.medium"
-      aurora_engine_version                     = "17.9"
+      aurora_engine_version                     = "18.4"
       aurora_instances                          = { writer = {}, reader = {} }
       aurora_serverlessv2_scaling_configuration = null
       elasticache_node_type                     = "cache.t4g.medium"

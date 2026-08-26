@@ -1,16 +1,12 @@
 locals {
   blue_green_target_groups = {
-    blue  = try(aws_lb_target_group.target_group_fargate_blue[0].id, null)
-    green = try(aws_lb_target_group.target_group_fargate_green[0].id, null)
+    blue  = aws_lb_target_group.target_group_fargate_blue.id
+    green = aws_lb_target_group.target_group_fargate_green.id
   }
 
-  active_colour = local.create_blue_green ? aws_ssm_parameter.active_deployment_colour[0].value : null
+  active_colour = aws_ssm_parameter.active_deployment_colour.value
 
-  active_target_group_arn = local.create_blue_green ? lookup(
-    local.blue_green_target_groups,
-    local.active_colour,
-    null
-  ) : aws_lb_target_group.target_group_fargate[0].id
+  active_target_group_arn = lookup(local.blue_green_target_groups, local.active_colour, null)
 }
 
 module "ip_addresses" {
@@ -106,47 +102,11 @@ resource "aws_lb_listener" "listener" {
   )
 }
 
-resource "aws_lb_target_group" "target_group_fargate" {
-  # checkov:skip=CKV_AWS_261
-
-  count = local.create_blue_green ? 0 : 1
-
-  name                 = local.application_name
-  port                 = local.app_port
-  protocol             = "HTTP"
-  vpc_id               = data.aws_vpc.shared.id
-  target_type          = "ip"
-  deregistration_delay = 30
-
-  stickiness {
-    type = "lb_cookie"
-  }
-
-  health_check {
-    path                = "/User/Login?ReturnUrl=%2f"
-    healthy_threshold   = "5"
-    interval            = "120"
-    protocol            = "HTTP"
-    unhealthy_threshold = "2"
-    matcher             = "200-499"
-    timeout             = "5"
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      Name = local.application_name
-    }
-  )
-}
-
 # Default is blue but aws_ssm_parameter.active_deployment_colour.value will be whatever the actual parameter value is
 resource "aws_ssm_parameter" "active_deployment_colour" {
-  count = local.create_blue_green ? 1 : 0
-
-  name  = "/delius-jitbit/blue-green-active-colour"
-  type  = "SecureString"
-  value = "blue"
+  name   = "/delius-jitbit/blue-green-active-colour"
+  type   = "SecureString"
+  value  = "blue"
   key_id = data.aws_kms_key.general_shared.arn
 
   lifecycle {
@@ -156,9 +116,6 @@ resource "aws_ssm_parameter" "active_deployment_colour" {
 
 resource "aws_lb_target_group" "target_group_fargate_blue" {
   # checkov:skip=CKV_AWS_261
-
-  count = local.create_blue_green ? 1 : 0
-
   name                 = "${local.application_name}-blue"
   port                 = local.app_port
   protocol             = "HTTP"
@@ -190,9 +147,6 @@ resource "aws_lb_target_group" "target_group_fargate_blue" {
 
 resource "aws_lb_target_group" "target_group_fargate_green" {
   # checkov:skip=CKV_AWS_261
-
-  count = local.create_blue_green ? 1 : 0
-
   name                 = "${local.application_name}-green"
   port                 = local.app_port
   protocol             = "HTTP"
@@ -223,13 +177,11 @@ resource "aws_lb_target_group" "target_group_fargate_green" {
 }
 
 resource "aws_lb_listener_rule" "listener_rule_blue" {
-  count = local.create_blue_green ? 1 : 0
-
   listener_arn = aws_lb_listener.listener.arn
   priority     = 20
 
   action {
-    target_group_arn = aws_lb_target_group.target_group_fargate_blue[0].arn
+    target_group_arn = aws_lb_target_group.target_group_fargate_blue.arn
     type             = "forward"
   }
 
@@ -241,13 +193,11 @@ resource "aws_lb_listener_rule" "listener_rule_blue" {
 }
 
 resource "aws_lb_listener_rule" "listener_rule_green" {
-  count = local.create_blue_green ? 1 : 0
-
   listener_arn = aws_lb_listener.listener.arn
   priority     = 30
 
   action {
-    target_group_arn = aws_lb_target_group.target_group_fargate_green[0].arn
+    target_group_arn = aws_lb_target_group.target_group_fargate_green.arn
     type             = "forward"
   }
 
