@@ -7,6 +7,7 @@ locals {
     "AI Gateway"       = { folder = "internal/compute/ai-gateway", name_suffix = "litellm" }
     "Bedrock"          = { folder = "internal/data/bedrock", name_suffix = "bedrock" }
     "Azure AI Foundry" = { folder = "internal/compute/ai-foundry", name_suffix = "azure-foundry" }
+    "Vertex AI"        = { folder = "internal/compute/vertex-ai", name_suffix = "vertex-ai" }
   }
 
   # ---------------------------------------------------------------------------
@@ -33,6 +34,24 @@ locals {
   #                    filter_dimension/filter_value — "eq" or "ne". Defaults to "eq".
   #   filter_value     = (azure_monitor only, optional) value compared against
   #                    filter_dimension via filter_operator.
+  #   filter           = (stackdriver only, optional) raw Cloud Monitoring filter
+  #                    fragment ANDed onto the base metric.type + resource.type
+  #                    filters, e.g. 'metric.label.response_code != "200"'.
+  #   aligner          = (stackdriver only) Cloud Monitoring perSeriesAligner,
+  #                    e.g. "ALIGN_RATE", "ALIGN_MEAN". For percentile metrics on
+  #                    distribution-type data (e.g. latency), use "ALIGN_DELTA"
+  #                    paired with reducer = "REDUCE_PERCENTILE_99" — Cloud
+  #                    Monitoring computes percentiles via the reducer, not the
+  #                    aligner.
+  #   reducer          = (stackdriver only) Cloud Monitoring crossSeriesReducer,
+  #                    e.g. "REDUCE_SUM", "REDUCE_MEAN", "REDUCE_PERCENTILE_99".
+  #   resource_type    = (stackdriver only, required) Cloud Monitoring resource.type
+  #                    filter value, e.g. "aiplatform.googleapis.com/PublisherModel"
+  #                    for Vertex AI's foundation-model serving path
+  #                    (aiplatform.googleapis.com/publisher/online_serving/*).
+  #                    Different parts of Vertex AI (custom endpoints, training
+  #                    jobs, etc.) use a different resource.type — set explicitly
+  #                    per rule; there is no default in alerting-rules.tf.
   #   type           = alert logic:
   #                      gt          → fire when value > threshold         (condition C)
   #                      lt          → fire when value < threshold         (condition C)
@@ -165,6 +184,12 @@ locals {
     azure_foundry_latency_ttlb = { group = "Azure AI Foundry", datasource_type = "azure_monitor", namespace = "microsoft.cognitiveservices/accounts", metric = "TimeToLastByte", statistic = "Average", type = "gt", dim_key = "ModelDeploymentName", warning = "azure_foundry_latency_warn", critical = "azure_foundry_latency_crit" }
     azure_foundry_ttft         = { group = "Azure AI Foundry", datasource_type = "azure_monitor", namespace = "microsoft.cognitiveservices/accounts", metric = "TimeToResponse", statistic = "Average", type = "gt", dim_key = "ModelDeploymentName", warning = "azure_foundry_ttft_warn", critical = "azure_foundry_ttft_crit" }
     azure_foundry_ptu_util     = { group = "Azure AI Foundry", datasource_type = "azure_monitor", namespace = "microsoft.cognitiveservices/accounts", metric = "AzureOpenAIProvisionedManagedUtilizationV2", statistic = "Average", type = "gt", dim_key = "ModelDeploymentName", warning = "azure_foundry_ptu_warn", critical = "azure_foundry_ptu_crit" }
+
+    # -------------------------------------------------------------------------
+    # Vertex AI
+    # -------------------------------------------------------------------------
+    vertex_invocation_errors           = { group = "Vertex AI", datasource_type = "stackdriver", namespace = "aiplatform.googleapis.com/publisher/online_serving", metric = "model_invocation_count", resource_type = "aiplatform.googleapis.com/PublisherModel", aligner = "ALIGN_RATE", reducer = "REDUCE_SUM", filter = "metric.label.response_code != \"200\"", type = "gt", dim_key = "", ok_when_nodata = true, warning = "vertex_invocation_errors_warn", critical = "vertex_invocation_errors_crit" }
+    vertex_invocation_latency_p99      = { group = "Vertex AI", datasource_type = "stackdriver", namespace = "aiplatform.googleapis.com/publisher/online_serving", metric = "model_invocation_latencies", resource_type = "aiplatform.googleapis.com/PublisherModel", aligner = "ALIGN_DELTA", reducer = "REDUCE_PERCENTILE_99", type = "gt", dim_key = "", warning = "vertex_latency_p99_warn", critical = "vertex_latency_p99_crit" }
 
   }
 }

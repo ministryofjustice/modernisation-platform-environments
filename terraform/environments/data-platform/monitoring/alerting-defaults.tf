@@ -126,6 +126,15 @@ locals {
     azure_foundry_ptu_warn = 80 # % of provisioned managed throughput
     azure_foundry_ptu_crit = 95 # % of provisioned managed throughput
 
+    # -------------------------------------------------------------------------
+    # Vertex AI
+    # -------------------------------------------------------------------------
+    vertex_invocation_errors_warn = 5  # non-2xx invocations per 5m window, per model
+    vertex_invocation_errors_crit = 20 # non-2xx invocations per 5m window, per model
+    vertex_latency_p99_warn       = 3000 # invocation latency p99, ms
+    vertex_latency_p99_crit       = 9000 # invocation latency p99, ms
+
+
   }
   # Per-account effective thresholds: defaults merged with any account-specific
   # overrides (alert_account_configs[uid].threshold_overrides).

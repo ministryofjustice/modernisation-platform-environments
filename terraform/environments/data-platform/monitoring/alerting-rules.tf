@@ -187,7 +187,36 @@ locals {
             }]
           ]),
 
-          # Ref 'A2': Secondary Metric Query (e.g., Max capacity for utilization math)
+          # Ref 'A': Google Cloud Monitoring (Stackdriver) Instant Query
+          flatten([
+            for _once in(
+              try(combo.rule.datasource_type, "cloudwatch") == "stackdriver"
+              ? [true] : []
+              ) : [{
+                refId             = "A"
+                relativeTimeRange = { from = try(combo.rule.query_window_seconds, 300), to = 0 }
+                datasourceUid     = try(cfg.stackdriver_datasource_uid, "google-cloud-monitoring")
+                model = {
+                  type      = "timeSeriesQuery"
+                  refId     = "A"
+                  queryType = "timeSeriesList"
+                  timeSeriesList = {
+                    projectName        = local.google_cloud_project_id
+                    crossSeriesReducer = combo.rule.reducer
+                    perSeriesAligner   = combo.rule.aligner
+                    alignmentPeriod    = "cloud-monitoring-auto"
+                    groupBys           = ["resource.label.model_user_id"]
+                    filters = concat(
+                      [
+                        "metric.type", "=", "${combo.rule.namespace}/${combo.rule.metric}",
+                        "AND", "resource.type", "=", combo.rule.resource_type,
+                      ],
+                      try(combo.rule.filter, "") != "" ? ["AND", combo.rule.filter] : []
+                    )
+                  }
+                }
+            }]
+          ]),
           flatten([
             for _once in(
               try(combo.rule.datasource_type, "cloudwatch") == "cloudwatch" && try(combo.rule.use_metric_math, false) == true
