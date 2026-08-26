@@ -2,7 +2,7 @@ locals {
 
   application_name          = "integration-hub"
   resource_application_name = "integration-hub"
-  component_name            = "api-hosting-platform"
+  component_name            = "platform"
   workspace_application_prefixes = [
     "integration-hub-api-",
     "${local.resource_application_name}-",

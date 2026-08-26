@@ -1,9 +1,8 @@
-# Integration Hub API Hosting Platform
+# Integration Hub API Platform
 
-Development-only MVP infrastructure for the benefit-checker orchestration API.
-This component now lives under the dedicated `integration-hub-api`
-application tree so API-platform-adjacent infrastructure is no longer added to
-the legacy shared `integration-hub` application path.
+Development-only MVP infrastructure for the upstream-facing Integration Hub
+API platform. The platform currently exposes benefit-checker routes and is
+named generically so it can host additional downstream integrations over time.
 
 The stack creates an HTTP API Gateway, request-authorizer and orchestration
 Lambdas, DynamoDB authentication mappings, Secrets Manager client credentials,
@@ -23,7 +22,7 @@ credential secret must exist before applying this stack.
 2. Merge main into this branch to receive the automatically generated platform files.
 3. Plan and apply workspace `integration-hub-development` via the
    `integration-hub-api` workflow.
-4. Set repository environment `integration-hub-api-hosting-platform-development`
+4. Set repository environment `integration-hub-api-platform-development`
    variable `AWS_DEPLOY_ROLE_ARN` to the `app_deploy_role_arn` output.
 5. Replace the generated client credential placeholder in Secrets Manager.
 6. Merge the application PR to deploy both Lambda packages.
