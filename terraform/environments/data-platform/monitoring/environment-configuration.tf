@@ -24,7 +24,7 @@ locals {
 
       # Azure AI Foundry resource queried by the shared "azure-monitor-ai-foundry"
       azure_foundry_resource = {
-        subscription_id = "MoJ-AI-Devl-Enablement-Shared-Services"
+        subscription_id = "0cc7ff17-55e7-486f-9fc0-f32a4bc34b81"
         resource_group  = "rg-aif-jedigw"
         resource_name   = "aif-jedigw-rmgns"
       }

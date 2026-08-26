@@ -45,7 +45,7 @@ locals {
             rule.dim_key == "DBInstanceIdentifier" ? try(cfg.rds_instances, []) :
             rule.dim_key == "Namespace" ? try(cfg.namespaces, ["cpanel"]) :
             rule.dim_key == "FileSystemId" ? try(cfg.efs_file_systems, []) :
-            rule.dim_key == "ModelDeploymentName" ? try(cfg.azure_foundry_model_deployments, []) :
+            rule.dim_key == "ModelDeploymentName" ? ["*"]  :
             rule.dim_key == "ClusterName" ? ["*"] :
             rule.dim_key == "NodeName" ? ["*"] :
             [""]

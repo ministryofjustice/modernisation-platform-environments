@@ -26,10 +26,10 @@ locals {
     litellm_callback_logging_failures_crit      = 20   # raw count of callback logging failures per 5m
 
     # ── Latency (seconds) ───────────────────────────────────────────────────
-    litellm_proxy_latency_p99_warn            = 10   # total request latency p99, seconds
-    litellm_proxy_latency_p99_crit            = 15   # total request latency p99, seconds
-    litellm_llm_api_latency_p99_warn          = 10   # LLM API latency p99, seconds
-    litellm_llm_api_latency_p99_crit          = 30   # LLM API latency p99, seconds
+    litellm_proxy_latency_p99_warn            = 35   # total request latency p99, seconds
+    litellm_proxy_latency_p99_crit            = 55   # total request latency p99, seconds
+    litellm_llm_api_latency_p99_warn          = 25   # LLM API latency p99, seconds
+    litellm_llm_api_latency_p99_crit          = 45   # LLM API latency p99, seconds
     litellm_ttft_p99_warn                     = 3    # time-to-first-token p99, seconds
     litellm_ttft_p99_crit                     = 8    # time-to-first-token p99, seconds
     litellm_in_flight_requests_warn           = 100  # concurrent in-flight requests across all pods
@@ -46,8 +46,8 @@ locals {
     litellm_failed_fallbacks_crit = 5 # raw count of failed fallback attempts per 5m
 
     # ── Rate-Limit ──────────────────────────────────────────────────
-    litellm_remaining_requests_warn         = 50   # remaining requests before provider rate limit, per model/provider
-    litellm_remaining_requests_crit         = 10   # remaining requests before provider rate limit, per model/provider
+    litellm_remaining_requests_warn         = 20   # remaining requests before provider rate limit, per model/provider
+    litellm_remaining_requests_crit         = 5    # remaining requests before provider rate limit, per model/provider
     litellm_remaining_tokens_warn           = 5000 # remaining tokens before provider rate limit, per model/provider
     litellm_remaining_tokens_crit           = 1000 # remaining tokens before provider rate limit, per model/provider
     litellm_api_key_remaining_requests_warn = 20   # remaining requests before per-key model rate limit
@@ -68,8 +68,8 @@ locals {
     litellm_redis_latency_p99_crit  = 0.5 # Redis latency p99, seconds
 
     # ── Internal Self Latency ────────────────────────────────────────────────
-    litellm_self_latency_p99_warn = 5  # internal SDK latency p99, seconds
-    litellm_self_latency_p99_crit = 10 # internal SDK latency p99, seconds
+    litellm_self_latency_p99_warn = 35  # internal SDK latency p99, seconds
+    litellm_self_latency_p99_crit = 55 # internal SDK latency p99, seconds
 
     # ── Spend Queue Backpressure ────────────────────────────────────────────
     litellm_redis_spend_queue_warn           = 100  # queued spend updates in Redis
@@ -115,12 +115,12 @@ locals {
     azure_foundry_errors_crit = 5 # raw count of non-200 requests per 5m
 
     # Latency: TimeToLastByte, seconds
-    azure_foundry_latency_warn = 10 # seconds
-    azure_foundry_latency_crit = 20 # seconds
+    azure_foundry_latency_warn = 20 # seconds
+    azure_foundry_latency_crit = 35 # seconds
 
     # Latency: TimeToResponse (time-to-first-token), seconds
-    azure_foundry_ttft_warn = 3 # seconds
-    azure_foundry_ttft_crit = 8 # seconds
+    azure_foundry_ttft_warn = 10 # seconds
+    azure_foundry_ttft_crit = 20 # seconds
 
     # PTU utilisation: AzureOpenAIProvisionedManagedUtilizationV2, %
     azure_foundry_ptu_warn = 80 # % of provisioned managed throughput
