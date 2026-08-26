@@ -4,6 +4,7 @@ serviceMonitor:
 
 cloudWatchLogs:
   enabled: true
+  match: kube.*
   region: ${aws_region}
   logGroupName: ${cloudwatch_log_group_name}
   logGroupTemplate: ${cloudwatch_log_group_name}/$kubernetes['namespace_name']
@@ -14,6 +15,9 @@ cloudWatchLogs:
 input:
   extraInputs: |
     Read_from_Head On
+
+filter:
+  bufferSize: 128k
 
 serviceAccount:
   create: true
