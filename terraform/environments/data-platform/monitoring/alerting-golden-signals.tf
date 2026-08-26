@@ -4,8 +4,9 @@ locals {
   # the suffix used when naming the rule group in the YAML output.
   # ---------------------------------------------------------------------------
   group_folders = {
-    "AI Gateway" = { folder = "internal/compute/ai-gateway", name_suffix = "litellm" }
-    "Bedrock"    = { folder = "internal/data/bedrock", name_suffix = "bedrock" }
+    "AI Gateway"       = { folder = "internal/compute/ai-gateway", name_suffix = "litellm" }
+    "Bedrock"          = { folder = "internal/data/bedrock", name_suffix = "bedrock" }
+    "Azure AI Foundry" = { folder = "internal/compute/ai-foundry", name_suffix = "azure-foundry" }
   }
 
   # ---------------------------------------------------------------------------
@@ -16,11 +17,22 @@ locals {
   #   namespace      = CloudWatch namespace (omit for Prometheus signals)
   #   metric         = CloudWatch metric name / short label for Prometheus signals
   #   statistic      = CloudWatch statistic (Sum, Average, Maximum, Minimum, p99 …)
-  #   datasource_type = (optional) "prometheus" to use PromQL instead of CloudWatch.
-  #                     When set, supply `expr` instead of namespace/metric/statistic.
+  #   datasource_type = (optional) "prometheus" to use PromQL instead of CloudWatch, or
+  #                     "azure_monitor" to query the shared Azure Monitor datasource.
+  #                     When set to "prometheus", supply `expr` instead of
+  #                     namespace/metric/statistic. When set to "azure_monitor", supply
+  #                     namespace/metric/statistic as with CloudWatch (namespace is the
+  #                     Azure resource type, e.g. "microsoft.cognitiveservices/accounts";
+  #                     statistic is the Azure Monitor aggregation, e.g. "Average"/"Total").
   #   expr           = PromQL expression (datasource_type = "prometheus" only).
   #                    Use __NAMESPACES__ as a token where a namespace regex is needed;
   #                    it is replaced at render time with cfg.namespaces joined by "|".
+  #   filter_dimension = (azure_monitor only, optional) Azure Monitor dimension name to
+  #                    filter the metric on, e.g. "StatusCode".
+  #   filter_operator  = (azure_monitor only, optional) comparison operator for
+  #                    filter_dimension/filter_value — "eq" or "ne". Defaults to "eq".
+  #   filter_value     = (azure_monitor only, optional) value compared against
+  #                    filter_dimension via filter_operator.
   #   type           = alert logic:
   #                      gt          → fire when value > threshold         (condition C)
   #                      lt          → fire when value < threshold         (condition C)
@@ -38,6 +50,8 @@ locals {
   #                      "ClusterName"          → ["*"]                 (wildcard — all clusters)
   #                      "NodeName"             → ["*"]                 (wildcard — all nodes)
   #                      "ModelId"             → ["*"]                 (wildcard — all models)
+  #                      "ModelDeploymentName" → cfg.azure_foundry_model_deployments
+  #                                               (list of Azure AI Foundry model deployment names)
   #                      "FileSystemId"         → cfg.efs_file_systems  (list of EFS file system IDs)
   #                    One alert rule is generated per value in the resolved list;
   #                    the value is appended as a suffix to the rule name.
@@ -142,5 +156,15 @@ locals {
     bedrock_server_errors = { group = "Bedrock", namespace = "AWS/Bedrock", metric = "InvocationServerErrors", statistic = "Sum", type = "gt", dim_key = "ModelId", warning = "bedrock_server_errors_warn", critical = "bedrock_server_errors_crit" }
     bedrock_legacy_model  = { group = "Bedrock", namespace = "AWS/Bedrock", metric = "LegacyModelInvocations", statistic = "Sum", type = "gt", dim_key = "ModelId", warning = "bedrock_legacy_model_warn", critical = "bedrock_legacy_model_crit" }
     bedrock_invocations   = { group = "Bedrock", namespace = "AWS/Bedrock", metric = "Invocations", statistic = "Sum", type = "baseline_gt", dim_key = "ModelId", warning = "bedrock_invocations_baseline_warn", critical = "bedrock_invocations_baseline_crit" }
+
+
+    # -------------------------------------------------------------------------
+    # Azure AI Foundry
+    # -------------------------------------------------------------------------
+    azure_foundry_errors       = { group = "Azure AI Foundry", datasource_type = "azure_monitor", namespace = "microsoft.cognitiveservices/accounts", metric = "ModelRequests", statistic = "Total", filter_dimension = "StatusCode", filter_operator = "ne", filter_value = "200", type = "gt", dim_key = "ModelDeploymentName", ok_when_nodata = true, warning = "azure_foundry_errors_warn", critical = "azure_foundry_errors_crit" }
+    azure_foundry_latency_ttlb = { group = "Azure AI Foundry", datasource_type = "azure_monitor", namespace = "microsoft.cognitiveservices/accounts", metric = "TimeToLastByte", statistic = "Average", type = "gt", dim_key = "ModelDeploymentName", warning = "azure_foundry_latency_warn", critical = "azure_foundry_latency_crit" }
+    azure_foundry_ttft         = { group = "Azure AI Foundry", datasource_type = "azure_monitor", namespace = "microsoft.cognitiveservices/accounts", metric = "TimeToResponse", statistic = "Average", type = "gt", dim_key = "ModelDeploymentName", warning = "azure_foundry_ttft_warn", critical = "azure_foundry_ttft_crit" }
+    azure_foundry_ptu_util     = { group = "Azure AI Foundry", datasource_type = "azure_monitor", namespace = "microsoft.cognitiveservices/accounts", metric = "AzureOpenAIProvisionedManagedUtilizationV2", statistic = "Average", type = "gt", dim_key = "ModelDeploymentName", warning = "azure_foundry_ptu_warn", critical = "azure_foundry_ptu_crit" }
+
   }
 }

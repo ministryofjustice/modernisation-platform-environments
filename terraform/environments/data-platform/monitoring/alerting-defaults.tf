@@ -106,6 +106,26 @@ locals {
     # Critical Baseline +300%
     bedrock_invocations_baseline_warn = 100
     bedrock_invocations_baseline_crit = 300
+
+    # -------------------------------------------------------------------------
+    # Azure AI Foundry
+    # -------------------------------------------------------------------------
+    # Errors: non-200 ModelRequests responses, per model deployment
+    azure_foundry_errors_warn = 1 # raw count of non-200 requests per 5m
+    azure_foundry_errors_crit = 5 # raw count of non-200 requests per 5m
+
+    # Latency: TimeToLastByte, seconds
+    azure_foundry_latency_warn = 10 # seconds
+    azure_foundry_latency_crit = 20 # seconds
+
+    # Latency: TimeToResponse (time-to-first-token), seconds
+    azure_foundry_ttft_warn = 3 # seconds
+    azure_foundry_ttft_crit = 8 # seconds
+
+    # PTU utilisation: AzureOpenAIProvisionedManagedUtilizationV2, %
+    azure_foundry_ptu_warn = 80 # % of provisioned managed throughput
+    azure_foundry_ptu_crit = 95 # % of provisioned managed throughput
+
   }
   # Per-account effective thresholds: defaults merged with any account-specific
   # overrides (alert_account_configs[uid].threshold_overrides).

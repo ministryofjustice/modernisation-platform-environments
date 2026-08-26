@@ -22,6 +22,13 @@ locals {
         { name = "data-platform-governance-preproduction", prometheus_workspace_id = "" },
       ]
 
+      # Azure AI Foundry resource queried by the shared "azure-monitor-ai-foundry"
+      azure_foundry_resource = {
+        subscription_id = "MoJ-AI-Devl-Enablement-Shared-Services"
+        resource_group  = "rg-aif-jedigw"
+        resource_name   = "aif-jedigw-rmgns"
+      }
+
       # CIDRs allowed to reach Grafana (rendered into ingress whitelist-source-range).
       grafana_ingress_allowlist = [
         "128.77.75.64/26", # Prisma Corporate
@@ -33,7 +40,7 @@ locals {
 
       # Alert routing by account: enabled groups, scoped namespaces, and overrides.
       alerts_configured_accounts = [
-        { name = "data-platform-development", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] },
+        { name = "data-platform-development", enabled_groups = ["AI Gateway", "Bedrock","Azure AI Foundry"], namespaces = ["ai-gateway"] },
         { name = "data-platform-test", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] },
         { name = "data-platform-preproduction", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] }
       ]
