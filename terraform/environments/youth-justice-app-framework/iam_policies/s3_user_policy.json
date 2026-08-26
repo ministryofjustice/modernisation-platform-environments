@@ -1,0 +1,26 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+      {
+          "Effect": "Allow",
+          "Action": [
+              "s3:ListBucket",
+              "s3:GetBucketLocation"
+          ],
+          "Resource": ${dal_buckets}
+      },
+      {
+          "Effect": "Allow",
+          "Action": [
+              "s3:GetObject",
+              "s3:PutObject",
+              "s3:DeleteObject",
+              "s3:GetObjectAcl",
+              "s3:PutObjectAcl",
+              "s3:GetObjectTagging",
+              "s3:PutObjectTagging"
+          ],
+          "Resource": ${dal_buckets_wildcarded}
+      }
+  ]
+}

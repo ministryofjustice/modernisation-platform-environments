@@ -1,0 +1,20 @@
+# ccms-ssm-document-ebs-apps-service-stop.yaml
+---
+schemaVersion: "2.2"
+description: Execute the stopAPP.sh script.
+parameters:
+  action:
+    type: String
+    allowedValues:
+    - stop
+mainSteps:
+  - name: stopAPP
+    action: aws:runShellScript
+    isEnd: true
+    precondition:
+      StringEquals:
+        - "{{ action }}"
+        - stop
+    inputs:
+      runCommand:
+        - "/home/applmgr/scripts/stopAPP.sh"

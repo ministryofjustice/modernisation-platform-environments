@@ -1,0 +1,346 @@
+{
+  "id": null,
+  "uid": "${dashboard_uid}",
+  "title": "Transit Gateway Health - ${team_name} (${environment})",
+  "tags": ["core-network-services", "transit-gateway", "networking"],
+  "schemaVersion": 39,
+  "timezone": "browser",
+  "refresh": "1m",
+  "time": { "from": "now-6h", "to": "now" },
+
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "TGW Traffic Status (BytesIn/BytesOut > 0)",
+      "description": "Per Transit Gateway: RED if BytesIn or BytesOut is zero over the selected time range.",
+      "datasource": "core-network-services-production-cloudwatch",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+
+      "options": {
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "reduceOptions": {
+          "calcs": ["max"],
+          "fields": "",
+          "values": false
+        }
+      },
+
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "decimals": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          }
+        }
+      },
+
+      "targets": [
+        {
+          "refId": "C",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "eu-west-2",
+          "namespace": "AWS/TransitGateway",
+          "metricName": "BytesIn",
+          "statistic": "Sum",
+          "dimensions": { "TransitGateway": "*" },
+          "label": "{{TransitGateway}}",
+          "period": "",
+          "matchExact": true
+        },
+        {
+          "refId": "D",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "eu-west-2",
+          "namespace": "AWS/TransitGateway",
+          "metricName": "BytesOut",
+          "statistic": "Sum",
+          "dimensions": { "TransitGateway": "*" },
+          "label": "{{TransitGateway}}",
+          "period": "",
+          "matchExact": true
+        },
+        { "refId": "E", "expression": "MIN([C,D])" }
+      ]
+    },
+
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "TGW Drop Status (drops must be 0)",
+      "description": "Per Transit Gateway: GREEN if no routing drops (blackhole or no route), RED if any bytes were dropped.",
+      "datasource": "core-network-services-production-cloudwatch",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+
+      "options": {
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "reduceOptions": {
+          "calcs": ["max"],
+          "fields": "",
+          "values": false
+        }
+      },
+
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "decimals": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        }
+      },
+
+      "targets": [
+        {
+          "refId": "A",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "eu-west-2",
+          "namespace": "AWS/TransitGateway",
+          "metricName": "BytesDropCountBlackhole",
+          "statistic": "Sum",
+          "dimensions": { "TransitGateway": "*" },
+          "label": "{{TransitGateway}}",
+          "period": "",
+          "matchExact": true
+        },
+        {
+          "refId": "B",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "eu-west-2",
+          "namespace": "AWS/TransitGateway",
+          "metricName": "BytesDropCountNoRoute",
+          "statistic": "Sum",
+          "dimensions": { "TransitGateway": "*" },
+          "label": "{{TransitGateway}}",
+          "period": "",
+          "matchExact": true
+        },
+        { "refId": "C", "expression": "A + B" }
+      ]
+    },
+
+    {
+      "id": 10,
+      "type": "row",
+      "title": "Dropped Traffic History & Totals",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 16 },
+      "collapsed": false,
+      "panels": []
+    },
+
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "TGW Dropped Bytes Over Time",
+      "description": "Total dropped bytes (blackhole + no route) over time for each Transit Gateway.",
+      "datasource": "core-network-services-production-cloudwatch",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 17 },
+
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
+
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "decimals": 0
+        }
+      },
+
+      "targets": [
+        {
+          "refId": "A",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "eu-west-2",
+          "namespace": "AWS/TransitGateway",
+          "metricName": "BytesDropCountBlackhole",
+          "statistic": "Sum",
+          "dimensions": { "TransitGateway": "*" },
+          "label": "{{TransitGateway}}",
+          "period": "",
+          "matchExact": true
+        },
+        {
+          "refId": "B",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "eu-west-2",
+          "namespace": "AWS/TransitGateway",
+          "metricName": "BytesDropCountNoRoute",
+          "statistic": "Sum",
+          "dimensions": { "TransitGateway": "*" },
+          "label": "{{TransitGateway}}",
+          "period": "",
+          "matchExact": true
+        },
+        {
+          "refId": "C",
+          "expression": "A + B",
+          "label": "Dropped Bytes - {{TransitGateway}}"
+        }
+      ]
+    },
+
+    {
+      "id": 4,
+      "type": "barchart",
+      "title": "TGW Dropped Bytes – Daily Totals",
+      "description": "Daily sum of dropped bytes (blackhole + no route) for each Transit Gateway.",
+      "datasource": "core-network-services-production-cloudwatch",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 27 },
+
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "single", "sort": "none" },
+        "orientation": "horizontal",
+        "barWidth": 0.8,
+        "stacking": "none"
+      },
+
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "decimals": 0
+        }
+      },
+
+      "targets": [
+        {
+          "refId": "A",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "eu-west-2",
+          "namespace": "AWS/TransitGateway",
+          "metricName": "BytesDropCountBlackhole",
+          "statistic": "Sum",
+          "dimensions": { "TransitGateway": "*" },
+          "period": "86400",
+          "matchExact": true,
+          "label": "{{TransitGateway}}"
+        },
+        {
+          "refId": "B",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "eu-west-2",
+          "namespace": "AWS/TransitGateway",
+          "metricName": "BytesDropCountNoRoute",
+          "statistic": "Sum",
+          "dimensions": { "TransitGateway": "*" },
+          "period": "86400",
+          "matchExact": true,
+          "label": "{{TransitGateway}}"
+        },
+        {
+          "refId": "C",
+          "expression": "A + B",
+          "label": "Daily Dropped Bytes - {{TransitGateway}}"
+        }
+      ]
+    },
+
+    {
+      "id": 5,
+      "type": "barchart",
+      "title": "TGW Dropped Bytes – Weekly Totals",
+      "description": "Weekly sum of dropped bytes (blackhole + no route) for each Transit Gateway.",
+      "datasource": "core-network-services-production-cloudwatch",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 37 },
+
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "single", "sort": "none" },
+        "orientation": "horizontal",
+        "barWidth": 0.8,
+        "stacking": "none"
+      },
+
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "decimals": 0
+        }
+      },
+
+      "targets": [
+        {
+          "refId": "A",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "eu-west-2",
+          "namespace": "AWS/TransitGateway",
+          "metricName": "BytesDropCountBlackhole",
+          "statistic": "Sum",
+          "dimensions": { "TransitGateway": "*" },
+          "period": "604800",
+          "matchExact": true,
+          "label": "{{TransitGateway}}"
+        },
+        {
+          "refId": "B",
+          "queryMode": "Metrics",
+          "metricQueryType": 0,
+          "metricEditorMode": 0,
+          "region": "eu-west-2",
+          "namespace": "AWS/TransitGateway",
+          "metricName": "BytesDropCountNoRoute",
+          "statistic": "Sum",
+          "dimensions": { "TransitGateway": "*" },
+          "period": "604800",
+          "matchExact": true,
+          "label": "{{TransitGateway}}"
+        },
+        {
+          "refId": "C",
+          "expression": "A + B",
+          "label": "Weekly Dropped Bytes - {{TransitGateway}}"
+        }
+      ]
+    }
+  ]
+}

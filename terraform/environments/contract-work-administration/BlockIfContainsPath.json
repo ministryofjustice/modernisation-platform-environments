@@ -1,0 +1,109 @@
+{
+  "Name": "BlockIfContainsPath",
+  "Priority": 3,
+  "Statement": {
+    "AndStatement": {
+      "Statements": [
+        {
+          "ByteMatchStatement": {
+            "SearchString": "/OA_HTML/cabo/jsps/a.jsp",
+            "FieldToMatch": {
+              "UriPath": {}
+            },
+            "TextTransformations": [
+              {
+                "Priority": 0,
+                "Type": "NONE"
+              }
+            ],
+            "PositionalConstraint": "CONTAINS"
+          }
+        },
+        {
+          "NotStatement": {
+            "Statement": {
+              "OrStatement": {
+                "Statements": [
+                  {
+                    "ByteMatchStatement": {
+                      "SearchString": "redirect=/OA_HTML/OA.jsp",
+                      "FieldToMatch": {
+                        "QueryString": {}
+                      },
+                      "TextTransformations": [
+                        {
+                          "Priority": 0,
+                          "Type": "NONE"
+                        }
+                      ],
+                      "PositionalConstraint": "CONTAINS"
+                    }
+                  },
+                  {
+                    "AndStatement": {
+                      "Statements": [
+                        {
+                          "ByteMatchStatement": {
+                            "SearchString": "2FOA_HTML",
+                            "FieldToMatch": {
+                              "QueryString": {}
+                            },
+                            "TextTransformations": [
+                              {
+                                "Priority": 0,
+                                "Type": "NONE"
+                              }
+                            ],
+                            "PositionalConstraint": "CONTAINS"
+                          }
+                        },
+                        {
+                          "ByteMatchStatement": {
+                            "SearchString": "2FOA.jsp",
+                            "FieldToMatch": {
+                              "QueryString": {}
+                            },
+                            "TextTransformations": [
+                              {
+                                "Priority": 0,
+                                "Type": "NONE"
+                              }
+                            ],
+                            "PositionalConstraint": "CONTAINS"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "ByteMatchStatement": {
+            "SearchString": "redirect",
+            "FieldToMatch": {
+              "QueryString": {}
+            },
+            "TextTransformations": [
+              {
+                "Priority": 0,
+                "Type": "NONE"
+              }
+            ],
+            "PositionalConstraint": "CONTAINS"
+          }
+        }
+      ]
+    }
+  },
+  "Action": {
+    "Block": {}
+  },
+  "VisibilityConfig": {
+    "SampledRequestsEnabled": true,
+    "CloudWatchMetricsEnabled": true,
+    "MetricName": "JSPBlockWAFRule"
+  }
+}

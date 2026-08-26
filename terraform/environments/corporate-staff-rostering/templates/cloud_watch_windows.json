@@ -1,0 +1,141 @@
+{
+  "agent": {
+    "metrics_collection_interval": 60,
+    "logfile": "c:\\ProgramData\\Amazon\\AmazonCloudWatchAgent\\Logs\\amazon-cloudwatch-agent.log"
+  },
+  "metrics": {
+    "metrics_collected": {
+      "Processor": {
+        "measurement": [
+          {
+            "name": "% Idle Time",
+            "rename": "CPU_IDLE",
+            "unit": "Percent"
+          },
+          {
+            "name": "% Processor Time",
+            "rename": "PROCESSOR_TIME",
+            "unit": "Percent"
+          },
+          "% Interrupt Time",
+          "% User Time"
+        ],
+        "resources": ["*"]
+      },
+      "LogicalDisk": {
+        "measurement": [
+          {
+            "name": "% Free Space",
+            "rename": "DISK_FREE",
+            "unit": "Percent"
+          },
+          {
+            "name": "% Idle Time",
+            "unit": "Percent"
+          },
+          {
+            "name": "% Disk Read Time",
+            "rename": "DISK_READ"
+          },
+          "% Disk Write Time"
+        ],
+        "resources": ["*"]
+      },
+      "Memory": {
+        "metrics_collection_interval": 60,
+        "measurement": [
+          "% Committed Bytes In Use",
+          "Available Bytes",
+          "Cache Faults/sec",
+          "Page Faults/sec",
+          "Pages/sec"
+        ]
+      },
+      "Network Interface": {
+        "metrics_collection_interval": 60,
+        "measurement": [
+          "Bytes Received/sec",
+          "Bytes Sent/sec",
+          "Packets Received/sec",
+          "Packets Sent/sec"
+        ],
+        "resources": ["*"]
+      },
+      "System": {
+        "measurement": [
+          "Context Switches/sec",
+          "System Calls/sec",
+          "Processor Queue Length"
+        ]
+      },
+      "ASP.NET": {
+        "measurement": [
+          "Applications Requests in Application Queue",
+          "Requests Queued",
+          "Application Restarts"
+        ]
+      },
+      "procstat": [
+        {
+          "exe": "ssm-agent",
+          "measurement": [
+            "cpu_time_system",
+            "cpu_time_user",
+            "memory_rss",
+            "num_threads",
+            "pid_count",
+            "pid",
+            "read_bytes",
+            "write_bytes"
+          ]
+        },
+        {
+          "exe": "amazon-cloudwatch-agent",
+          "measurement": [
+            "cpu_time_system",
+            "cpu_time_user",
+            "memory_rss",
+            "num_threads",
+            "pid_count",
+            "pid",
+            "read_bytes",
+            "write_bytes"
+          ]
+        }
+      ]
+    },
+    "append_dimensions": {
+      "InstanceId": "${aws:InstanceId}",
+      "AutoScalingGroupName": "${aws:AutoScalingGroupName}"
+    },
+    "aggregation_dimensions": [["AutoScalingGroupName"], ["InstanceId"]]
+  },
+  "logs": {
+    "logs_collected": {
+      "windows_events": {
+        "collect_list": [
+          {
+            "event_name": "System",
+            "event_levels": ["INFORMATION", "WARNING", "ERROR", "CRITICAL"],
+            "log_group_name": "cwagent-windows-system",
+            "log_stream_name": "{instance_id}",
+            "event_format": "xml"
+          },
+          {
+            "event_name": "Application",
+            "event_levels": ["INFORMATION", "WARNING", "ERROR", "CRITICAL"],
+            "log_group_name": "cwagent-windows-application",
+            "log_stream_name": "{instance_id}",
+            "event_format": "xml"
+          },
+          {
+            "event_name": "Security",
+            "event_levels": ["INFORMATION", "WARNING", "ERROR", "CRITICAL"],
+            "log_group_name": "cwagent-windows-security",
+            "log_stream_name": "{instance_id}"
+          }
+        ]
+      }
+    }
+  }
+}

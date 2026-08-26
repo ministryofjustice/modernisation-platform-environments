@@ -1,0 +1,67 @@
+{
+  "accounts": {
+    "development": {
+      "excluded_protections": ["e9e3fbe2-6b74-4624-84e0-8e3e7ba62806"],
+      "app_name": "example",
+      "launch_type": "EC2",
+      "allow_major_version_upgrade": "false",
+      "ami_image_id": "ami-0d729d2846a86a9e7",
+      "backup_window": "16:00-17:00",
+      "db_instance_class": "db.t3.micro",
+      "db_user": "admin",
+      "db_allocated_storage": "50",
+      "db_max_allocated_storage": "100",
+      "db_multi_az": "false",
+      "db_iam_database_authentication_enabled": "true",
+      "db_monitoring_interval": "5",
+      "db_enabled_cloudwatch_logs_exports": [
+        "audit",
+        "error",
+        "general",
+        "slowquery"
+      ],
+      "db_performance_insights_enabled": "false",
+      "instance_type": "t3.micro",
+      "key_name": "example-development-ec2",
+      "lb_listener_protocol": "HTTP",
+      "maintenance_window": "Sun:00:00-Sun:03:00",
+      "region": "eu-west-2",
+      "retention_period": "14",
+      "server_port": "80",
+      "skip_final_snapshot": "true",
+      "container_instance_type": "t3.micro",
+      "container_os_type": "linux",
+      "container_ami_image_id": "ami-07bce8cc7445f0677",
+      "ecs_key_name": "",
+      "ec2_desired_capacity": "2",
+      "ec2_max_size": "4",
+      "ec2_min_size": "2",
+      "container_cpu": "256",
+      "container_memory": "1024",
+      "task_definition_volume": "application_volume",
+      "network_mode": "bridge",
+      "app_count": "1"
+    },
+    "test": {
+      "example_var": "test-data"
+    },
+    "preproduction": {
+      "example_var": "preproduction-data"
+    },
+    "production": {
+      "example_var": "production-data"
+    }
+  },
+  "example_ec2_sg_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    }
+  }
+}

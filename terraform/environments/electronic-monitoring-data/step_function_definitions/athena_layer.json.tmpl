@@ -1,0 +1,28 @@
+ {
+      "StartAt" : "GetMetadataList",
+      "States" : {
+        "GetMetadataList" : {
+          "Type" : "Task",
+          "Resource" : "${get_metadata_lambda_arn}",
+          "ResultPath" : "$.metadata_list",
+          "Next" : "LoopThroughMetadataList"
+        },
+        "LoopThroughMetadataList" : {
+          "Type" : "Map",
+          "ItemsPath" : "$.metadata_list.metadata_list",
+          "MaxConcurrency" : 4,
+          "Iterator" : {
+            "StartAt" : "CreateAthenaTable",
+            "States" : {
+              "CreateAthenaTable" : {
+                "Type" : "Task",
+                "Resource" : "${create_athena_table}",
+                "ResultPath" : "$.result",
+                "End" : true
+              }
+            }
+          },
+          "End" : true
+        }
+      }
+    }

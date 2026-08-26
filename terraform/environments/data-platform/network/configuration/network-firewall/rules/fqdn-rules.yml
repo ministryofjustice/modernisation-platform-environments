@@ -1,0 +1,29 @@
+---
+# yaml-language-server: $schema=../../schema/rules/fqdn-rules.json
+rules:
+  - name: allow-home-net-api-github-com-https
+    sid: 1
+    revision: 1
+    action: pass
+    protocol: tcp
+    source_ip: $HOME_NET
+    source_port: any
+    direction: ->
+    destination_ip: any
+    destination_port: 443
+    type: tls.sni
+    content: api.github.com
+    description: Allow HTTPS to api.github.com
+  - name: allow-home-net-raw-githubusercontent-com-https
+    sid: 2
+    revision: 1
+    action: pass
+    protocol: tcp
+    source_ip: $HOME_NET
+    source_port: any
+    direction: ->
+    destination_ip: any
+    destination_port: 443
+    type: tls.sni
+    content: raw.githubusercontent.com
+    description: Allow HTTPS to raw.githubusercontent.com

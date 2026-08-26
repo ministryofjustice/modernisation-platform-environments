@@ -1,0 +1,29 @@
+# ccms-ssm-document-service-actions.yaml
+---
+schemaVersion: "2.2"
+description: Perform an action on a selected service.
+parameters:
+  service:
+    type: String
+    allowedValues:
+    - chronyd
+    - postfix
+    - sshd
+  action:
+    type: String
+    allowedValues:
+    - status
+    - restart
+    - start
+    - stop
+mainSteps:
+  - name: ServiceActions
+    action: aws:runShellScript
+    isEnd: true
+    precondition:
+      StringEquals:
+        - platformType
+        - Linux
+    inputs:
+      runCommand:
+        - "systemctl {{ action }} {{ service }}"

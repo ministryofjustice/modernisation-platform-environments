@@ -1,0 +1,39 @@
+{  
+   "StartAt": "RunContainerTask",
+   "States": {  
+      "RunContainerTask": {  
+         "Type": "Task",
+         "Resource": "arn:aws:states:::ecs:runTask.sync",
+         "Parameters": {  
+            "LaunchType": "FARGATE",
+            "Cluster": "${cluster_arn}",
+            "TaskDefinition": "${task_definition_family}",
+            "NetworkConfiguration": {
+               "AwsvpcConfiguration": {
+                  "Subnets": ${subnets_json},
+                  "SecurityGroups": ${security_groups_json},
+                  "AssignPublicIp": "DISABLED"
+               }
+            },
+            "Overrides": {  
+               "ContainerOverrides": [  
+                  {
+                    "Name": "${container_name}",
+                    "Environment": [
+                      {
+                        "Name": "DEPLOY_VERSION",
+                        "Value": "latest"
+                      },
+                      {
+                        "Name": "ATHENA_OUTPUT_BUCKET",
+                        "Value": "${athena_output_bucket}"
+                      }
+                    ]
+                  }
+               ]
+            }
+         },
+         "End": true
+      }
+   }
+}

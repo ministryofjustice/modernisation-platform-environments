@@ -1,0 +1,20 @@
+{
+  "accounts": {
+    "development": {
+      "vpc_cidr": "10.0.0.0/16",
+      "enable_airflow_secret": true
+    },
+    "test": {
+      "vpc_cidr": "10.0.0.0/16",
+      "enable_airflow_secret": true
+    },
+    "preproduction": {
+      "vpc_cidr": "10.0.0.0/16",
+      "enable_airflow_secret": true
+    },
+    "production": {
+      "vpc_cidr": "10.0.0.0/16",
+      "enable_airflow_secret": true
+    }
+  }
+}

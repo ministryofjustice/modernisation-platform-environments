@@ -1,0 +1,66 @@
+---
+ingress:
+  enabled: true
+  className: "default"
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production-http01
+  hosts:
+    - host: ${dashboard_service_hostname}
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+    - secretName: ui-tls
+      hosts:
+        - ${dashboard_service_hostname}
+
+app:
+  environment:
+    - name: DJANGO_SETTINGS_MODULE
+      value: ${dashboard_service_django_settings_module}
+    - name: APP_ENV
+      value: ${dashboard_service_app_env}
+    - name: SECRET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: dashboard-service-app-secrets
+          key: secret-key
+    - name: SENTRY_DSN
+      valueFrom:
+        secretKeyRef:
+          name: dashboard-service-app-secrets
+          key: sentry-dsn
+    - name: AUTH0_CLIENT_ID
+      valueFrom:
+        secretKeyRef:
+          name: dashboard-service-app-secrets
+          key: auth0-client-id
+    - name: AUTH0_CLIENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: dashboard-service-app-secrets
+          key: auth0-client-secret
+    - name: AUTH0_DOMAIN
+      value: ${dashboard_service_auth0_domain}
+    - name: DB_USER
+      valueFrom:
+        secretKeyRef:
+          name: dashboard-service-rds
+          key: username
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: dashboard-service-rds
+          key: password
+    - name: DB_HOST
+      valueFrom:
+        secretKeyRef:
+          name: dashboard-service-rds
+          key: address
+    - name: DB_PORT
+      valueFrom:
+        secretKeyRef:
+          name: dashboard-service-rds
+          key: port
+    - name: DB_NAME
+      value: "dashboard_service"

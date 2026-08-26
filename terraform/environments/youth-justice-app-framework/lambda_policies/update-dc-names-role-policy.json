@@ -1,0 +1,22 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "logs:CreateLogGroup",
+      "Resource": "arn:aws:logs:eu-west-2:${account_number}:*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["logs:CreateLogStream", "logs:PutLogEvents"],
+      "Resource": [
+        "arn:aws:logs:eu-west-2:${account_number}:log-group:/aws/lambda/Update-DC-names:*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["secretsmanager:*"],
+      "Resource": ["${ldap_urls_secret_arn}"]
+    }
+  ]
+}

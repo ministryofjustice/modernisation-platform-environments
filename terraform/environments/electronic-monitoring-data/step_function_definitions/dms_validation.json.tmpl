@@ -1,0 +1,25 @@
+{
+  "StartAt": "DMSRetrieveMetadata",
+  "States": {
+    "DMSRetrieveMetadata": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${dms_retrieve_metadata}"
+      },
+      "Next": "DmsValidation"
+    },
+    "DmsValidation": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${dms_validation}"
+      },
+      "End": true
+    }
+  }
+}

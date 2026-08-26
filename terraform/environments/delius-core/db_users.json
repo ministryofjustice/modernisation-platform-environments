@@ -1,0 +1,15 @@
+{
+  "keys": {
+    "poc": {},
+    "dev": {
+      "teelingd": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB2wsGG4ARua0lelKw4Z5H1ossWVvrxFK8KhpgJBIguZ david.teeling@MJ006958",
+      "bathinas": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDe/ndYSutdPo+LbJdAq0vi+NWHxLevjg9V2ej24yV3S siva.bathina@MJ004028",
+      "manassist": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINJFPwwN1BGkVYxe04bp7V1Y/XQ+DwxotPhvOktIvkx6 theodorosmanassis@MJ003967",
+      "nagarurl": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPeTW/Il1VC0PC+u44Sa0u5F5cDBP6+OVAmiwI1pjA56 lalitha.nagarur@MJ003939"
+    },
+    "test": {},
+    "stage": {},
+    "preprod": {},
+    "prod": {}
+  }
+}

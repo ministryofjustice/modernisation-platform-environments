@@ -1,0 +1,18 @@
+{
+  "keys": {
+    "development": {
+      "vincent": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIrHS/9UPdtogPHfBQZaHRg3cwNf0otQFG9E95IUvJbw vincent.cheung@MJ004609",
+      "saanchi": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMAY8Vb7XTq4gpyAO1s7HsNpwlteXkuTTa+UpRQtaHW1 saanchi.dubey@L0517"
+    },
+    "test": {
+      "saanchi": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMAY8Vb7XTq4gpyAO1s7HsNpwlteXkuTTa+UpRQtaHW1 saanchi.dubey@L0517"
+    },
+    "preproduction": {
+      "saanchi": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMAY8Vb7XTq4gpyAO1s7HsNpwlteXkuTTa+UpRQtaHW1 saanchi.dubey@L0517"
+    },
+    "production": {
+      "vincent": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHSFcCOB9t3SES6asvoSMSQELOa6sy0E55DOOY+i+cYR vincent.cheung@MJ004609",
+      "saanchi": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMAY8Vb7XTq4gpyAO1s7HsNpwlteXkuTTa+UpRQtaHW1 saanchi.dubey@L0517"
+    }
+  }
+}

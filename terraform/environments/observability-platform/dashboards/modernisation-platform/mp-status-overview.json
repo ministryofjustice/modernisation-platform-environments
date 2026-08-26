@@ -1,0 +1,112 @@
+{
+  "title": "Modernisation Platform Status Overview",
+  "uid": "mp-status-overview",
+  "tags": ["modernisation-platform", "status", "overview"],
+  "panels": [
+    {
+      "id": 1,
+      "type": "text",
+      "title": "",
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "options": {
+        "mode": "html",
+        "content": "<h1 style=\"text-align: center; font-size: 36px; margin-top: 10px;\">Modernisation Platform Status Overview</h1>\n<p style=\"text-align: center; font-size: 16px; opacity: 0.8;\">Real-time monitoring and status of platform services</p>"
+      }
+    },
+    {
+      "id": 2,
+      "type": "text",
+      "title": "",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 3
+      },
+      "options": {
+        "mode": "html",
+        "content": "<a href=\"https://health.aws.amazon.com/health/status\" target=\"_blank\" style=\"text-decoration: none; color: inherit;\">\n  <div style=\"height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(255, 153, 0, 0.1) 0%, rgba(255, 153, 0, 0.05) 100%); border: 2px solid rgba(255, 153, 0, 0.3); border-radius: 8px; padding: 20px; transition: all 0.3s ease; cursor: pointer;\">\n    <div style=\"font-size: 48px; margin-bottom: 15px;\">☁️</div>\n    <h2 style=\"margin: 0 0 10px 0; font-size: 24px;\">AWS Service Health</h2>\n    <p style=\"margin: 0; opacity: 0.8; font-size: 14px;\">View current AWS service status</p>\n  </div>\n</a>"
+      }
+    },
+    {
+      "id": 5,
+      "type": "text",
+      "title": "",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 3
+      },
+      "options": {
+        "mode": "html",
+        "content": "<a href=\"https://status.modernisation-platform.service.justice.gov.uk/posts/dashboard\" target=\"_blank\" style=\"text-decoration: none; color: inherit;\">\n  <div style=\"height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(50, 116, 217, 0.1) 0%, rgba(50, 116, 217, 0.05) 100%); border: 2px solid rgba(50, 116, 217, 0.3); border-radius: 8px; padding: 20px; transition: all 0.3s ease; cursor: pointer;\">\n    <div style=\"font-size: 48px; margin-bottom: 15px;\">📊</div>\n    <h2 style=\"margin: 0 0 10px 0; font-size: 24px;\">MP Status Page</h2>\n    <p style=\"margin: 0; opacity: 0.8; font-size: 14px;\">Modernisation Platform status updates</p>\n  </div>\n</a>"
+      }
+    },
+    {
+      "id": 3,
+      "type": "text",
+      "title": "",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 3
+      },
+      "options": {
+        "mode": "html",
+        "content": "<a href=\"https://www.githubstatus.com/\" target=\"_blank\" style=\"text-decoration: none; color: inherit;\">\n  <div style=\"height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(136, 136, 136, 0.1) 0%, rgba(136, 136, 136, 0.05) 100%); border: 2px solid rgba(136, 136, 136, 0.3); border-radius: 8px; padding: 20px; transition: all 0.3s ease; cursor: pointer;\">\n    <div style=\"font-size: 48px; margin-bottom: 15px;\">🔧</div>\n    <h2 style=\"margin: 0 0 10px 0; font-size: 24px;\">GitHub Status</h2>\n    <p style=\"margin: 0; opacity: 0.8; font-size: 14px;\">View current GitHub service status</p>\n  </div>\n</a>"
+      }
+    },
+    {
+      "id": 6,
+      "type": "text",
+      "title": "",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 11
+      },
+      "options": {
+        "mode": "html",
+        "content": "<div style=\"display:flex; justify-content:center; align-items:center; height:100%;\">\n  <a href=\"/d/dfcwtr9nm2cxsb/security-hub-findings-for-core-accounts?orgId=1\"\n     style=\"\n       display:block;\n       width: 100%;\n       min-width: 0;\n       text-decoration:none;\n       background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 55%, #fb7185 100%);\n       color:#ffffff;\n       padding:44px 70px;\n       border-radius:18px;\n       box-shadow: 0 12px 35px rgba(220, 38, 38, 0.28);\n       transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;\n       text-align:center;\n       box-sizing: border-box;\n     \"\n     onmouseover=\"\n       this.style.transform='translateY(-6px)';\n       this.style.boxShadow='0 18px 45px rgba(220, 38, 38, 0.38)';\n       this.style.filter='brightness(1.05)';\n     \"\n     onmouseout=\"\n       this.style.transform='translateY(0)';\n       this.style.boxShadow='0 12px 35px rgba(220, 38, 38, 0.28)';\n       this.style.filter='brightness(1)';\n     \"\n  >\n    <div style=\"font-size:52px; margin-bottom:14px;\">🛡️</div>\n\n    <div style=\"\n      font-size:28px;\n      font-weight:900;\n      letter-spacing:-0.4px;\n      margin-bottom:12px;\n      line-height:1.1;\n    \"\n    >\n      Security Hub Findings\n    </div>\n\n    <div style=\"\n      font-size:16px;\n      opacity:0.95;\n      line-height:1.45;\n    \"\n    >\n      HIGH and CRITICAL findings across core AWS accounts\n    </div>\n  </a>\n</div>\n"
+      }
+    },
+    {
+      "id": 4,
+      "type": "dashlist",
+      "title": "📊 Modernisation Platform Dashboards",
+      "gridPos": {
+        "h": 20,
+        "w": 24,
+        "x": 0,
+        "y": 19
+      },
+      "options": {
+        "includeVars": false,
+        "keepTime": false,
+        "maxItems": 20,
+        "showHeadings": true,
+        "showRecentlyViewed": false,
+        "showSearch": true,
+        "showStarred": false
+      }
+    }
+  ],
+  "schemaVersion": 36,
+  "version": 1,
+  "refresh": "30s",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": ["10s", "30s", "1m", "5m", "15m", "30m", "1h"]
+  }
+}

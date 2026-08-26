@@ -1,0 +1,70 @@
+{
+  "accounts": {
+    "development": {
+      "db_name": "tipstaff_db_dev",
+      "identifier": "tipstaff-db-dev",
+      "db_username": "dbadmin",
+      "allocated_storage": "20",
+      "storage_type": "gp2",
+      "engine": "postgres",
+      "engine_version": "14",
+      "instance_class": "db.t3.micro",
+      "server_port_1": "80",
+      "lb_listener_protocol_1": "HTTP",
+      "server_port_2": "443",
+      "lb_listener_protocol_2": "HTTPS",
+      "client_id": "09730739-d16b-47e6-a8c6-007ad48bed2d",
+      "curserver": "DEVELOPMENT",
+      "support_team": "DTS Legacy Apps Support Team",
+      "support_email": "dts-legacy-apps-support-team@hmcts.net",
+      "rds_port": "5432",
+      "domain_name": "modernisation-platform.service.justice.gov.uk",
+      "tactical_products_db_secrets_arn": "ox3sNi"
+    },
+    "test": {
+      "example_var": "test-data"
+    },
+    "preproduction": {
+      "db_name": "tipstaff_db_pre_prod",
+      "identifier": "tipstaff-db-pre-prod",
+      "db_username": "dbadmin",
+      "allocated_storage": "20",
+      "storage_type": "gp2",
+      "engine": "postgres",
+      "engine_version": "14",
+      "instance_class": "db.t3.micro",
+      "server_port_1": "80",
+      "lb_listener_protocol_1": "HTTP",
+      "server_port_2": "443",
+      "lb_listener_protocol_2": "HTTPS",
+      "client_id": "ed4cc64a-d12d-4564-a7a9-3abeb844b903",
+      "curserver": "PREPRODUCTION",
+      "support_team": "DTS Legacy Apps Support Team",
+      "support_email": "dts-legacy-apps-support-team@hmcts.net",
+      "rds_port": "5432",
+      "domain_name": "modernisation-platform.service.justice.gov.uk",
+      "tactical_products_db_secrets_arn": "vhUrZe"
+    },
+    "production": {
+      "db_name": "tipstaff_db_prod",
+      "identifier": "tipstaff-db-prod",
+      "db_username": "dbadmin",
+      "allocated_storage": "20",
+      "storage_type": "gp2",
+      "engine": "postgres",
+      "engine_version": "14",
+      "instance_class": "db.t3.micro",
+      "server_port_1": "80",
+      "lb_listener_protocol_1": "HTTP",
+      "server_port_2": "443",
+      "lb_listener_protocol_2": "HTTPS",
+      "client_id": "2229496b-0b45-4ec7-8d64-d00d5019bc67",
+      "curserver": "PRODUCTION",
+      "support_team": "DTS Legacy Apps Support Team",
+      "support_email": "dts-legacy-apps-support-team@hmcts.net",
+      "rds_port": "5432",
+      "domain_name": "tipstaff.service.justice.gov.uk",
+      "tactical_products_db_secrets_arn": "EDIqYI"
+    }
+  }
+}

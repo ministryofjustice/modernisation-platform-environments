@@ -1,0 +1,4 @@
+.external_modules
+builds
+contrib/*.json
+github_conf

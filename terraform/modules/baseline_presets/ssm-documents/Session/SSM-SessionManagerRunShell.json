@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "1.0",
+  "description": "Document to hold regional settings for Session Manager",
+  "sessionType": "Standard_Stream",
+  "inputs": {
+    "cloudWatchLogGroupName": "session-manager-logs",
+    "cloudWatchEncryptionEnabled": false,
+    "cloudWatchStreamingEnabled": true,
+    "s3BucketName": "",
+    "s3KeyPrefix": "",
+    "s3EncryptionEnabled": false,
+    "idleSessionTimeout": "60",
+    "kmsKeyId": "",
+    "runAsEnabled": false,
+    "runAsDefaultUser": "",
+    "shellProfile": {
+      "windows": "",
+      "linux": ""
+    }
+  }
+}

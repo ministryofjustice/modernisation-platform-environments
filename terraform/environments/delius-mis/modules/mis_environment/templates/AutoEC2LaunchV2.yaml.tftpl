@@ -1,0 +1,158 @@
+version: 1.0
+tasks:
+- task: executeScript
+  inputs:
+    - frequency: once
+      type: powershell
+      runAs: admin
+      content: |-
+        # Wait for EBS volumes to be attached
+        Write-Output "Waiting 30 seconds for EBS volumes to attach..."
+        Start-Sleep -Seconds 30
+    - frequency: once
+      type: powershell
+      runAs: admin
+      content: |-
+        # AMI may have a D: drive attached for server 2022 disk image still so this needs removing
+        $volume = Get-WmiObject -Class Win32_Volume | Where-Object { $_.DriveLetter -eq "D:" }
+        if ($volume) { 
+          $volume.DriveLetter = $null 
+          $volume.Put() 
+          Write-Host "Drive D: unmount success" 
+        } else { 
+          Write-Host "Drive D: not found" 
+        }
+- task: initializeVolume
+  inputs:
+    initialize: devices
+    devices:
+    - device: xvdd
+      name: App
+      letter: D
+      partition: gpt
+- task: executeScript
+  inputs:
+    - frequency: once
+      type: powershell
+      runAs: admin
+      content: |-
+        # Install / upgrade chocolatey since the version installed can be very old
+        $ErrorActionPreference = "Stop"
+        if (Get-Command choco.exe -ErrorAction SilentlyContinue) {
+        $version=choco --version
+        if ($version -lt "2.2.2") {
+            Write-Output "Upgrading old version of chocolatey $version to 2.2.2"
+            choco upgrade chocolatey --version 2.2.2 -y
+        } else {
+            Write-Output "Chocolatey already installed version $version"
+        }
+        } else {
+        Write-Output "Installing Chocolatey"
+        Set-ExecutionPolicy Bypass -Scope Process -Force
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+        Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+        }
+        Start-Sleep -Seconds 1 # helps debugging as logs have different timestamps
+    - frequency: once
+      type: powershell
+      runAs: admin
+      content: |-
+        # Install WinRAR to un-pack executables - set specific version that's available
+        $ErrorActionPreference = "Stop"
+        choco install winrar --version=7.11.0 -y
+        
+        # Add WinRAR to the system PATH permanently
+        Write-Output "Adding WinRAR to system PATH..."
+        $winrarPath = "C:\Program Files\WinRAR"
+        
+        # Check if WinRAR directory exists
+        if (Test-Path $winrarPath) {
+            # Get current system PATH
+            $currentPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
+            
+            # Check if WinRAR path is already in PATH
+            if ($currentPath -notlike "*$winrarPath*") {
+                # Add WinRAR path to system PATH
+                $newPath = $currentPath + ";" + $winrarPath
+                [Environment]::SetEnvironmentVariable("PATH", $newPath, "Machine")
+                Write-Output "Successfully added WinRAR to system PATH"
+            } else {
+                Write-Output "WinRAR path already exists in system PATH"
+            }
+        } else {
+            Write-Output "Warning: WinRAR directory not found at $winrarPath"
+        }
+    - frequency: once
+      type: powershell
+      runAs: admin
+      content: |-
+        Write-Output "choco upgrade all -y"
+        choco upgrade all -y
+        Start-Sleep -Seconds 1 # helps debugging as logs have different timestamps
+    - frequency: once
+      type: powershell
+      runAs: admin
+      content: |-
+        # Join computer to domain if not already joined
+        if (! ((Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain) ) {
+          # Server is not joined to the domain
+          $domainJoinUserName = "${ad_domain_name}\Admin"
+          
+          $domainJoinPassword = ConvertTo-SecureString((Get-SECSecretValue -SecretId ${ad_password_secret_name}).SecretString) -AsPlainText -Force
+          
+          $domainJoinCredential = New-Object System.Management.Automation.PSCredential($domainJoinUserName, $domainJoinPassword)
+          
+          # Get the instance ID to look up Name tag value 
+          $token = invoke-restmethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds"=3600} -Method PUT -Uri http://169.254.169.254/latest/api/token
+          
+          $instanceId = invoke-restmethod -Headers @{"X-aws-ec2-metadata-token" = $token} -Method GET -uri http://169.254.169.254/latest/meta-data/instance-id
+          Write-Output "Instance ID: $instanceId"
+
+          $tagsJson = aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId"
+          Write-Output "Tags JSON: $tagsJson"
+
+          $nameTagValue = ($tagsJson | ConvertFrom-Json).Tags | Where-Object { $_.Key -eq "Name" } | Select-Object -ExpandProperty Value
+          Write-Output "Name tag value: $nameTagValue"
+
+          if (-not $nameTagValue) {
+            Write-Output "ERROR: Name tag not found for instance $instanceId"
+            exit 1
+          }
+
+          $newName = $nameTagValue -replace 'delius-mis','ndmis'
+          Write-Output "New name after replace: $newName"
+          
+          # Truncate name further to be <= 15 characters if needed
+          if ($newName.Length -gt 15) {
+            Write-Output "Truncating by removing hyphens"
+            $newName = $newName.Replace('-','')
+          }
+
+          # Rename computer to match the ndelius-mis naming convention
+          Add-Computer -DomainName "${ad_domain_name}" -Credential $domainJoinCredential -NewName $newName -Force
+          
+          # Install AD Management Tools
+          Install-WindowsFeature -Name RSAT-AD-PowerShell
+          Install-WindowsFeature -Name RSAT-ADDS-Tools
+
+          # Allow Domain Users to connect via RDP and give them local admin rights
+          Add-LocalGroupMember -Group "Administrators" -Member "Domain Users@${ad_domain_name}"
+
+          "Domain joined" | Out-File -FilePath C:\domain_join_log.txt
+          
+          exit 3010 # Reboot instance, see https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-exit-codes-reboots
+        }
+    - frequency: once
+      type: powershell
+      runAs: admin
+      content: |-
+        # Run UserData powershell from modernisation-platform-configuration-management repo
+        $ErrorActionPreference = "Stop"
+        Write-Output "Downloading and running Run-GitScript.ps1"
+        Set-Location -Path ([System.IO.Path]::GetTempPath())
+        $GitBranch = "${branch}"
+        $Script = "Invoke-UserDataScript.ps1"
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 # since powershell 4 uses Tls1 as default
+        Invoke-WebRequest "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/$${GitBranch}/powershell/Scripts/Run-GitScript.ps1" -OutFile "Run-GitScript.ps1"
+        . ./Run-GitScript.ps1 $Script -GitBranch $GitBranch
+        Exit $LASTEXITCODE

@@ -1,0 +1,69 @@
+{
+  "AwsAccountId": "${aws_account_id}",
+  "DataSetId": "7d6329ad-b523-4c4e-ad6b-86d8b1a06f81",
+  "Name": "RowLevelData",
+  "PhysicalTableMap": {
+    "4477ed2c-81c3-4f10-abb6-d7a8fd303be7": {
+      "CustomSql": {
+        "DataSourceArn": "arn:aws:quicksight:eu-west-2:${aws_account_id}:datasource/postgresql",
+        "Name": "RowLevelData",
+        "SqlQuery": "select distinct  \"GroupName\", CASE WHEN \"GroupName\" = 'yot_f00' then  ''   ELSE ltrim(rtrim(yotoucode)) END AS \"yotoucode\"\r\nfrom auth.quicksight_rls_yjs\r\ngroup by \"GroupName\", CASE WHEN \"GroupName\" = 'yot_f00' then  ''   ELSE ltrim(rtrim(yotoucode)) END \r\norder by \"GroupName\"",
+        "Columns": [
+          {
+            "Name": "GroupName",
+            "Type": "STRING"
+          },
+          {
+            "Name": "yotoucode",
+            "Type": "STRING"
+          }
+        ]
+      }
+    }
+  },
+  "LogicalTableMap": {
+    "b3345d60-4d9d-4b87-b976-f86096e338d1": {
+      "Alias": "RowLevelData",
+      "DataTransforms": [
+        {
+          "ProjectOperation": {
+            "ProjectedColumns": ["GroupName", "yotoucode"]
+          }
+        }
+      ],
+      "Source": {
+        "PhysicalTableId": "4477ed2c-81c3-4f10-abb6-d7a8fd303be7"
+      }
+    }
+  },
+  "ImportMode": "DIRECT_QUERY",
+  "Permissions": [
+    {
+      "Principal": "arn:aws:quicksight:eu-west-2:${aws_account_id}:user/default/quicksight-admin-access/david.seekins",
+      "Actions": [
+        "quicksight:DeleteDataSet",
+        "quicksight:UpdateDataSetPermissions",
+        "quicksight:PutDataSetRefreshProperties",
+        "quicksight:CreateRefreshSchedule",
+        "quicksight:CancelIngestion",
+        "quicksight:ListRefreshSchedules",
+        "quicksight:UpdateRefreshSchedule",
+        "quicksight:PassDataSet",
+        "quicksight:DeleteRefreshSchedule",
+        "quicksight:DescribeDataSetRefreshProperties",
+        "quicksight:DescribeDataSet",
+        "quicksight:CreateIngestion",
+        "quicksight:DescribeRefreshSchedule",
+        "quicksight:ListIngestions",
+        "quicksight:DescribeDataSetPermissions",
+        "quicksight:UpdateDataSet",
+        "quicksight:DeleteDataSetRefreshProperties",
+        "quicksight:DescribeIngestion"
+      ]
+    }
+  ],
+  "DataSetUsageConfiguration": {
+    "DisableUseAsDirectQuerySource": false,
+    "DisableUseAsImportedSource": false
+  }
+}

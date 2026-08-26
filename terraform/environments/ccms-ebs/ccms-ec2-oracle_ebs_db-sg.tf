@@ -1,0 +1,377 @@
+# Security Group for EBSDB
+
+resource "aws_security_group" "ec2_sg_ebsdb" {
+  name        = "ec2_sg_ebsdb"
+  description = "SG traffic control for EBSDB"
+  vpc_id      = data.aws_vpc.shared.id
+  tags = merge(local.tags,
+    { Name = lower(format("sg-%s-%s-ebsdb", local.application_name, local.environment)) }
+  )
+}
+
+# INGRESS Rules
+
+### HTTP
+
+resource "aws_security_group_rule" "ingress_traffic_ebsdb_80" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "ingress"
+  description       = "HTTP"
+  protocol          = "TCP"
+  from_port         = 80
+  to_port           = 80
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+### HTTPS
+
+resource "aws_security_group_rule" "ingress_traffic_ebsdb_443" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "ingress"
+  description       = "HTTPS"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+### SSH
+
+resource "aws_security_group_rule" "ingress_traffic_ebsdb_22" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "ingress"
+  description       = "SSH"
+  protocol          = "TCP"
+  from_port         = 22
+  to_port           = 22
+  cidr_blocks = [data.aws_vpc.shared.cidr_block,
+  local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod]
+}
+
+### Oracle LDAP
+
+resource "aws_security_group_rule" "ingress_traffic_ebsdb_1389" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "ingress"
+  description       = "Oracle LDAP"
+  protocol          = "TCP"
+  from_port         = 1389
+  to_port           = 1389
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+### Oracle Listerner Port
+
+resource "aws_security_group_rule" "ingress_traffic_ebsdb_152x" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "ingress"
+  description       = "Oracle Net Listener"
+  protocol          = "TCP"
+  from_port         = 1521
+  to_port           = 1522
+  cidr_blocks = [data.aws_vpc.shared.cidr_block,
+    local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod,
+  local.application_data.accounts[local.environment].cloud_platform_subnet]
+}
+
+# MP Workspaces (V1) - DEV only, EBS DB Oracle Net Listener access
+resource "aws_security_group_rule" "ingress_traffic_ebsdb_152x_mp_v1_workspaces" {
+  count             = local.environment == "development" ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "ingress"
+  description       = "Oracle Net Listener from MP Workspaces (V1) - DEV only"
+  protocol          = "TCP"
+  from_port         = 1521
+  to_port           = 1522
+  cidr_blocks       = [local.application_data.accounts[local.environment].mp_v1_workspaces_cidr]
+}
+
+### Oracle
+
+resource "aws_security_group_rule" "ingress_traffic_ebsdb_5101" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "ingress"
+  description       = "Oracle"
+  protocol          = "TCP"
+  from_port         = 5101
+  to_port           = 5101
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+### Oracle
+
+resource "aws_security_group_rule" "ingress_traffic_ebsdb_5401" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "ingress"
+  description       = "Oracle"
+  protocol          = "TCP"
+  from_port         = 5401
+  to_port           = 5401
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+### Oracle
+
+resource "aws_security_group_rule" "ingress_traffic_ebsdb_5575" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "ingress"
+  description       = "Oracle"
+  protocol          = "TCP"
+  from_port         = 5575
+  to_port           = 5575
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+### Oracle LDAP SSL
+
+resource "aws_security_group_rule" "ingress_traffic_ebsdb_1636" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "ingress"
+  description       = "Oracle LDAP SSL"
+  protocol          = "TCP"
+  from_port         = 1636
+  to_port           = 1636
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+### Oracle
+
+resource "aws_security_group_rule" "ingress_traffic_ebsdb_10401" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "ingress"
+  description       = "Oracle"
+  protocol          = "TCP"
+  from_port         = 10401
+  to_port           = 10401
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+### Oracle HTTP
+
+resource "aws_security_group_rule" "ingress_traffic_ebsdb_800x" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "ingress"
+  description       = "Oracle HTTP"
+  protocol          = "TCP"
+  from_port         = 8000
+  to_port           = 8005
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+### Oracle HTTPS
+
+resource "aws_security_group_rule" "ingress_traffic_ebsdb_4443" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "ingress"
+  description       = "Oracle HTTPS"
+  protocol          = "TCP"
+  from_port         = 4443
+  to_port           = 4444
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+
+# EGRESS Rules
+
+### HTTP
+
+resource "aws_security_group_rule" "egress_traffic_ebsdb_80" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "egress"
+  description       = "Oracle HTTPs"
+  protocol          = "TCP"
+  from_port         = 80
+  to_port           = 80
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+### HTTPS
+
+resource "aws_security_group_rule" "egress_traffic_ebsdb_443" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "egress"
+  description       = "HTTPS"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+### FTP
+
+resource "aws_security_group_rule" "egress_traffic_ebsdb_2x" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "egress"
+  description       = "FTP"
+  protocol          = "TCP"
+  from_port         = 20
+  to_port           = 21
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+### SSH
+
+resource "aws_security_group_rule" "egress_traffic_ebsdb_22" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "egress"
+  description       = "SSH"
+  protocol          = "TCP"
+  from_port         = 22
+  to_port           = 22
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+### ORACLE LDAP
+
+resource "aws_security_group_rule" "egress_traffic_ebsdb_1389" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "egress"
+  description       = "ORACLE LDAP"
+  protocol          = "TCP"
+  from_port         = 1389
+  to_port           = 1389
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+### ORACLE Net Listener
+
+resource "aws_security_group_rule" "egress_traffic_ebsdb_152x" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "egress"
+  description       = "ORACLE Net Listener"
+  protocol          = "TCP"
+  from_port         = 1521
+  to_port           = 1522
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+### Oracle
+
+resource "aws_security_group_rule" "egress_traffic_ebsdb_5101" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "egress"
+  description       = "Oracle"
+  protocol          = "TCP"
+  from_port         = 5101
+  to_port           = 5101
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+### Oracle
+
+resource "aws_security_group_rule" "egress_traffic_ebsdb_5401" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "egress"
+  description       = "Oracle"
+  protocol          = "TCP"
+  from_port         = 5401
+  to_port           = 5401
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+### Oracle
+
+resource "aws_security_group_rule" "egress_traffic_ebsdb_5575" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "egress"
+  description       = "Oracle"
+  protocol          = "TCP"
+  from_port         = 5575
+  to_port           = 5575
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+### Oracle LDAP SSL
+
+resource "aws_security_group_rule" "egress_traffic_ebsdb_1636" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "egress"
+  description       = "Oracle LDAP SSL"
+  protocol          = "TCP"
+  from_port         = 1636
+  to_port           = 1636
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+### Oracle
+
+resource "aws_security_group_rule" "egress_traffic_ebsdb_10401" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "egress"
+  description       = "Oracle"
+  protocol          = "TCP"
+  from_port         = 10401
+  to_port           = 10401
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+### Lloyds FTP
+
+resource "aws_security_group_rule" "egress_traffic_ebsdb_50000" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "egress"
+  description       = "Oracle"
+  protocol          = "TCP"
+  from_port         = 50000
+  to_port           = 51000
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+### Oracle HTTP
+
+resource "aws_security_group_rule" "egress_traffic_ebsdb_800x" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "egress"
+  description       = "Oracle HTTP"
+  protocol          = "TCP"
+  from_port         = 8000
+  to_port           = 8005
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+### Oracle HTTPS
+
+resource "aws_security_group_rule" "egress_traffic_ebsdb_4443" {
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "egress"
+  description       = "Oracle HTTPS"
+  protocol          = "TCP"
+  from_port         = 4443
+  to_port           = 4444
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+### SMTP
+
+resource "aws_security_group_rule" "egress_traffic_ebsdb_2525" {
+  count             = local.is-production ? 0 : 1
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "egress"
+  description       = "SMTP"
+  protocol          = "TCP"
+  from_port         = 2525
+  to_port           = 2525
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+### SES:587
+resource "aws_security_group_rule" "egress_traffic_ebsdb_587" {
+  count             = local.is-production ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "egress"
+  description       = "SES:587"
+  protocol          = "TCP"
+  from_port         = 587
+  to_port           = 587
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+#Ingress from ssogn ec2 instance security group to ebs db security group
+resource "aws_vpc_security_group_ingress_rule" "ingress_ssogen_to_ebsdb" {
+  count                        = local.ssogen_enabled ? 1 : 0
+  security_group_id            = aws_security_group.ec2_sg_ebsdb.id
+  description                  = "Allow ssogen ec2 instances to access ebs db"
+  from_port                    = local.application_data.accounts[local.environment].tg_db_port
+  to_port                      = local.application_data.accounts[local.environment].tg_db_port
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.ssogen_sg[count.index].id
+}

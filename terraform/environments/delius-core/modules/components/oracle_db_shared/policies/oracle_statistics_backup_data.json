@@ -1,0 +1,29 @@
+{
+  "Version": "2012-10-17",
+
+  "Statement": [
+    {
+      "Sid": "OracleStatisticsListPolicy",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::${oracle_statistics_delius_target_account_id}:role/instance-role-${application_name}-${oracle_statistics_delius_target_environment}-delius-db-1"
+      },
+      "Action": "s3:ListBucket",
+      "Resource": "${s3bucket_arn}"
+    },
+    {
+      "Sid": "OracleStatisticsObjectPolicy",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::${oracle_statistics_delius_target_account_id}:role/instance-role-${application_name}-${oracle_statistics_delius_target_environment}-delius-db-1"
+      },
+      "Action": [
+        "s3:PutObjectAcl",
+        "s3:PutObject",
+        "s3:GetObjectTagging",
+        "s3:GetObject"
+      ],
+      "Resource": "${s3bucket_arn}/*"
+    }
+  ]
+}

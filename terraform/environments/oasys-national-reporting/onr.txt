@@ -1,0 +1,64 @@
+
+http://localhost:28080/BOE/CMC
+# https://t2-bods.test.reporting.oasys.service.justice.gov.uk/DataServices/
+# https://t2-bods.test.reporting.oasys.service.justice.gov.uk/BOE/CMC
+
+C:\BODSReleases
+E:\  - anything you want copying
+
+Service Intelligence Agent
+Log On As ?
+- HMPP\svc_pprd_oasys_bods
+
+SAP Business Intelligence
+- Central Configuration Managemnt
+   -- Apache Tomcat for BI 4
+   -- Server Intelligent Agent (Log On As  HMPP\svc_pprd_oasys_bods)
+- Information Platform Services Central Management Console (web login BOE/CMC)
+- Upgrade Management Tool
+- wdeploy
+
+SAP Data Services 
+- Data Service Designer (issue opening log file) in E:\BODS_COMMON_DIR\log (tracelog and errorlog)
+   -- provide system - host username / password / Auth
+- Data Service Locale Selector
+- Data Services Management Console (remote access via web)
+- Data Services Repository Manager (do you use?)
+- Data Services Server Manager 
+	-- ONR_JobServer1 configured
+		-- Port 3500
+		-- TNS name: ONRBODS4
+		-- Username: ONR_BODS_OWNER
+		-- Associated Repositories ONRBODS4__ONR_BODS_OWNER
+		-- NOTE: cache folder does not exist E:\pCache
+                -- CERTS configured
+- Data Services Workbench (enter system, username, password, auth)
+
+E:\BODS_COMMON_DIR\log\tracelog -- looks like stuff co
+E:\ what do we need? Looks like stuff copied from other servers
+
+CURRENT SERVER
+SAP Business Intelligence
+- Central Configuration Managemnt
+   -- Apache Tomcat for BI 4
+   -- Server Intelligent Agent (Log On As System Account LocalSystem). No Certs configured)
+- Service I
+- TNS mistakes
+- Se
+
+-- Disk Layout
+- 3 100 GB disks but only 1 configured
+
+r6i.2xlarge
+r6i.2xlarge
+
+r4.2xlarge $6682 reserved / $8689
+
+
+
+
+
+
+
+
+

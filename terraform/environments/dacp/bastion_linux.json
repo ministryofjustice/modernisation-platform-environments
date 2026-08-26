@@ -1,0 +1,16 @@
+{
+  "keys": {
+    "development": {
+      "mgbutler": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDeRxdAAvyFpWSShknO5QoWnGeWYFDkJgvmgnuWXeLuW mark",
+      "tolubusi": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEMkw1lp7lwX72Ng7/rOPjx95ArMJW0/CYDftgimT5x0 timi"
+    },
+    "preproduction": {
+      "mgbutler": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDeRxdAAvyFpWSShknO5QoWnGeWYFDkJgvmgnuWXeLuW mark",
+      "tolubusi": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEMkw1lp7lwX72Ng7/rOPjx95ArMJW0/CYDftgimT5x0 timi"
+    },
+    "production": {
+      "mgbutler": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDeRxdAAvyFpWSShknO5QoWnGeWYFDkJgvmgnuWXeLuW mark",
+      "tolubusi": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEMkw1lp7lwX72Ng7/rOPjx95ArMJW0/CYDftgimT5x0 timi"
+    }
+  }
+}

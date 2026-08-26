@@ -1,0 +1,80 @@
+{
+  "StartAt": "GetValidatedTableList",
+  "States": {
+    "GetValidatedTableList": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::athena:startQueryExecution.sync",
+      "Parameters": {
+        "QueryString.$": "States.Format('SELECT database_name, split(validation_msg, \\' - \\', 2)[1] as table_name FROM \"dms_data_validation\".\"glue_df_output\" WHERE validation_msg like \\'%Validated%\\' and database_name = \\'{}\\' and table_to_ap = \\'False\\'', $.db_name)",
+        "WorkGroup": "${athena_workgroup}"
+      },
+      "ResultPath": "$.queryResult",
+      "Next": "GetQueryResults"
+    },
+    "GetQueryResults": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::athena:getQueryResults",
+      "Parameters": {
+        "QueryExecutionId.$": "$.queryResult.QueryExecution.QueryExecutionId"
+      },
+      "ResultPath": "$.queryOutput",
+      "Next": "QueryOutputToList"
+    },
+    "QueryOutputToList": {
+      "Type": "Task",
+      "Resource": "${query_output_to_list}",
+      "ResultPath": "$.queryOutputList",
+      "Next": "LoopThroughTables"
+    },
+    "LoopThroughTables": {
+      "Type": "Map",
+      "ItemsPath": "$.queryOutputList",
+      "MaxConcurrency": 4,
+      "Iterator": {
+        "StartAt": "GetTableFileNames",
+        "States": {
+          "GetTableFileNames": {
+            "Type": "Task",
+            "Resource": "${get_file_keys_for_table}",
+            "ResultPath": "$.fileKeys",
+            "Next": "LoopThroughFileKeys"
+          },
+          "LoopThroughFileKeys": {
+            "Type": "Map",
+            "ItemsPath": "$.fileKeys",
+            "MaxConcurrency": 4,
+            "OutputPath": "$[0].dbInfo",
+            "Iterator": {
+              "StartAt": "SendTableToAp",
+              "States": {
+                "SendTableToAp": {
+                  "Type": "Task",
+                  "Resource": "${send_table_to_ap}",
+                  "InputPath": "$",
+                  "ResultPath": "$.dbInfo",
+                  "End": true
+                }
+              }
+            },
+            "Next": "UpdateLogTable"
+          },
+          "UpdateLogTable": {
+            "Type": "Task",
+            "Resource": "${update_log_table}",
+            "End": true
+          }
+        }
+      },
+      "Next": "FixLogTable"
+    },
+    "FixLogTable": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::athena:startQueryExecution.sync",
+      "Parameters": {
+        "QueryString": "MSCK REPAIR TABLE dms_data_validation.glue_df_output",
+        "WorkGroup": "${athena_workgroup}"
+      },
+      "End": true
+    }
+  }
+}

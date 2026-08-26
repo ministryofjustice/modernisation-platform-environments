@@ -1,0 +1,181 @@
+{
+  "TableCount": 3,
+  "Tables": [
+    {
+      "TableName": "AUDITED_INTERACTION",
+      "TablePath": "DELIUS_APP_SCHEMA/AUDITED_INTERACTION/",
+      "TableOwner": "DELIUS_APP_SCHEMA",
+      "TableColumns": [
+        {
+          "ColumnName": "DMS_CDC_TIMESTAMP",
+          "ColumnType": "DATETIME",
+          "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss.F",
+          "ColumnNullable": "false",
+          "ColumnScale": "6"
+        },
+        {
+          "ColumnName": "DATE_TIME",
+          "ColumnType": "DATETIME",
+          "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss",
+          "ColumnNullable": "false"
+        },
+        {
+          "ColumnName": "OUTCOME",
+          "ColumnType": "STRING",
+          "ColumnLength": "1",
+          "ColumnNullable": "false"
+        },
+        {
+          "ColumnName": "INTERACTION_PARAMETERS",
+          "ColumnType": "STRING",
+          "ColumnLength": "4000",
+          "ColumnNullable": "true"
+        },
+        {
+          "ColumnName": "USER_ID",
+          "ColumnType": "INT8",
+          "ColumnNullable": "false"
+        },
+        {
+          "ColumnName": "BUSINESS_INTERACTION_ID",
+          "ColumnType": "INT8",
+          "ColumnNullable": "false"
+        },
+        {
+          "ColumnName": "SPG_USERNAME",
+          "ColumnType": "STRING",
+          "ColumnLength": "80",
+          "ColumnNullable": "true"
+        },
+        {
+          "ColumnName": "EXTERNAL_SERVICE_CODE",
+          "ColumnType": "STRING",
+          "ColumnLength": "100",
+          "ColumnNullable": "true"
+        },
+        {
+          "ColumnName": "CLIENT_DB",
+          "ColumnType": "STRING",
+          "ColumnLength": "20",
+          "ColumnNullable": "true"
+        }
+      ],
+      "TableColumnsTotal": "9"
+    },
+    {
+      "TableName": "BUSINESS_INTERACTION",
+      "TablePath": "DELIUS_APP_SCHEMA/BUSINESS_INTERACTION/",
+      "TableOwner": "DELIUS_APP_SCHEMA",
+      "TableColumns": [
+        {
+          "ColumnName": "DMS_CDC_TIMESTAMP",
+          "ColumnType": "DATETIME",
+          "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss.F",
+          "ColumnNullable": "false",
+          "ColumnScale": "6"
+        },
+        {
+          "ColumnName": "BUSINESS_INTERACTION_ID",
+          "ColumnType": "INT8",
+          "ColumnNullable": "false",
+          "ColumnIsPk": "true"
+        },
+        {
+          "ColumnName": "BUSINESS_INTERACTION_CODE",
+          "ColumnType": "STRING",
+          "ColumnLength": "20",
+          "ColumnNullable": "false"
+        },
+        {
+          "ColumnName": "DESCRIPTION",
+          "ColumnType": "STRING",
+          "ColumnLength": "500",
+          "ColumnNullable": "false"
+        },
+        {
+          "ColumnName": "ENABLED_DATE",
+          "ColumnType": "DATETIME",
+          "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss",
+          "ColumnNullable": "true"
+        },
+        {
+          "ColumnName": "AUDIT_INTERACTION_PARAMETER",
+          "ColumnType": "DATETIME",
+          "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss",
+          "ColumnNullable": "true"
+        },
+        {
+          "ColumnName": "ROW_VERSION",
+          "ColumnType": "INT8",
+          "ColumnNullable": "false"
+        },
+        {
+          "ColumnName": "CLIENT_DB",
+          "ColumnType": "STRING",
+          "ColumnLength": "20",
+          "ColumnNullable": "false",
+          "ColumnIsPk": "true"
+        }
+      ],
+      "TableColumnsTotal": "8"
+    },
+    {
+      "TableName": "AUDITED_INTERACTION_CHECKSUM",
+      "TablePath": "DELIUS_AUDIT_DMS_POOL/AUDITED_INTERACTION_CHECKSUM/",
+      "TableOwner": "DELIUS_AUDIT_DMS_POOL",
+      "TableColumns": [
+        {
+          "ColumnName": "DMS_CDC_TIMESTAMP",
+          "ColumnType": "DATETIME",
+          "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss.F",
+          "ColumnNullable": "false",
+          "ColumnScale": "6"
+        },
+        {
+          "ColumnName": "CLIENT_DB",
+          "ColumnType": "STRING",
+          "ColumnLength": "20",
+          "ColumnNullable": "false",
+          "ColumnIsPk": "true"
+        },
+        {
+          "ColumnName": "START_DATE_TIME",
+          "ColumnType": "DATETIME",
+          "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss",
+          "ColumnNullable": "false",
+          "ColumnIsPk": "true"
+        },
+        {
+          "ColumnName": "RESETLOGS",
+          "ColumnType": "STRING",
+          "ColumnLength": "1",
+          "ColumnNullable": "true"
+        },
+        {
+          "ColumnName": "END_DATE_TIME",
+          "ColumnType": "DATETIME",
+          "ColumnDateFormat": "YYYY-MM-dd HH:mm:ss",
+          "ColumnNullable": "false",
+          "ColumnIsPk": "true"
+        },
+        {
+          "ColumnName": "ROW_COUNT",
+          "ColumnType": "INT8",
+          "ColumnNullable": "false"
+        },
+        {
+          "ColumnName": "DATA_CHECKSUM",
+          "ColumnType": "INT8",
+          "ColumnNullable": "false"
+        },
+        {
+          "ColumnName": "CHECKSUM_VALIDATED",
+          "ColumnType": "STRING",
+          "ColumnLength": "1",
+          "ColumnNullable": "true"
+        }
+      ],
+      "TableColumnsTotal": "8"
+    }
+  ]
+}

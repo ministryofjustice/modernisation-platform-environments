@@ -1,0 +1,43 @@
+---
+schemaVersion: "2.2"
+description: "Powershell doc running commands against MGN-replicated Azure VMs." 
+parameters:
+  InstanceId:
+    type: "String"
+    description: "ID of the instance being targetted"
+mainSteps:  
+  - name: installTestPortModule
+    action: aws:runPowerShellScript
+    inputs: 
+      runCommand:
+        - |
+          $module = Get-Module -ListAvailable Test-Port
+          if (-not $module) {
+            Write-Host "Test-Port is not installed. Installing now..."
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+            Install-Module -Name Test-Port -Force
+          } else {
+            Write-Host "Test-Port module is already installed."             
+          }
+
+  - name: installWireshark
+    action: aws:runPowerShellScript
+    inputs:
+      runCommand:
+        - |
+          $source = "https://1.eu.dl.wireshark.org/win64/Wireshark-latest-x64.exe"
+          $downloadDir = "$ENV:TEMP\WiresharkInstaller"
+          $fileName = "Wireshark-win64-latest.exe"
+          $fullDownloadPath = "$downloadDir\$filename"
+          $wiresharkPath = "C:\\Program Files\\Wireshark\\Wireshark.exe"
+
+          if ($wiresharkPath -and (Test-Path $wiresharkPath -PathType Leaf)) {
+              Write-Host "Wireshark is installed."
+          } else {
+              Write-Host "Wireshark is not installed. Installing now..."
+              New-Item -ItemType Directory -Force -Path $downloadDir
+              Start-BitsTransfer -Source $source -Destination $fullDownloadPath
+              Start-Process -Wait -FilePath $fullDownloadPath -ArgumentList "/S"
+          }
+      timeoutSeconds: 14,400

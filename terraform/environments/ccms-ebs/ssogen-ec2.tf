@@ -1,0 +1,278 @@
+data "template_file" "launch-template1" {
+  count    = local.ssogen_enabled ? 1 : 0
+  template = file("${path.module}/templates/ec2_user_data_ssogen.sh")
+  vars = {
+    hostname              = lower(format("ccms-%s-as1", local.application_name_ssogen))
+    mp_fqdn               = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+    deploy_environment    = local.environment
+    DISKSARRAY            = local.disksmount_joined
+    EFS_MOUNT_POINT_ARRAY = local.efs_mount_points_joined
+    efs_id                = aws_efs_file_system.storage[count.index].id
+    ADMIN_LOG_PATH        = "/u01/shared/product/runtime/Domain/aserver/domains/EAGDomain/servers/AdminServer/logs"
+    OHS_LOG_PATH          = "/u01/product/runtime/Domain/mserver/instances/OHS_inst1/diagnostics/logs/OHS/ohs1"
+    MSERVER_LOG_PATH      = "/u01/product/runtime/Domain/mserver/domains/EAGDomain/servers/WLS_EAG1/logs"
+  }
+}
+
+data "template_file" "launch-template2" {
+  count    = local.ssogen_enabled ? 1 : 0
+  template = file("${path.module}/templates/ec2_user_data_ssogen.sh")
+  vars = {
+    hostname              = lower(format("ccms-%s-as2", local.application_name_ssogen))
+    mp_fqdn               = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+    deploy_environment    = local.environment
+    DISKSARRAY            = local.disksmount_joined
+    EFS_MOUNT_POINT_ARRAY = local.efs_mount_points_joined
+    efs_id                = aws_efs_file_system.storage[count.index].id
+    ADMIN_LOG_PATH        = "/u01/shared/product/runtime/Domain/aserver/domains/EAGDomain/servers/AdminServer/logs"
+    OHS_LOG_PATH          = "/u01/product/runtime/Domain/mserver/instances/OHS_inst2/diagnostics/logs/OHS/ohs2"
+    MSERVER_LOG_PATH      = "/u01/product/runtime/Domain/mserver/domains/EAGDomain/servers/WLS_EAG2/logs"
+  }
+}
+
+resource "aws_launch_template" "ssogen-ec2-launch-template-primary" {
+  count                  = local.ssogen_enabled ? 1 : 0
+  name_prefix            = local.application_name_ssogen
+  image_id               = local.application_data.accounts[local.environment].ssogen_ami_id-1
+  instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ssogen
+  key_name               = aws_key_pair.ssogen[count.index].key_name
+  ebs_optimized          = true
+  update_default_version = true
+
+  monitoring {
+    enabled = true
+  }
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ssogen_instance_profile[count.index].name
+  }
+
+  network_interfaces {
+    associate_public_ip_address = false
+    security_groups             = [aws_security_group.ssogen_sg[count.index].id]
+  }
+
+  block_device_mappings {
+    device_name = "/dev/sda1"
+    ebs {
+      delete_on_termination = true
+      encrypted             = true
+      volume_size           = local.application_data.accounts[local.environment].ec2_disk_size_ssogen
+      volume_type           = "gp2"
+      iops                  = 0
+      kms_key_id            = aws_kms_key.ssogen_kms_key[count.index].arn
+    }
+  }
+
+  block_device_mappings {
+    device_name = "/dev/sdb"
+    ebs {
+      delete_on_termination = true
+      encrypted             = true
+      volume_size           = local.application_data.accounts[local.environment].ec2_disk_size_ssogen_fmw
+      volume_type           = "gp2"
+      iops                  = 0
+      kms_key_id            = aws_kms_key.ssogen_kms_key[count.index].arn
+    }
+  }
+
+  block_device_mappings {
+    device_name = "/dev/sdc"
+    ebs {
+      delete_on_termination = true
+      encrypted             = true
+      volume_size           = local.application_data.accounts[local.environment].ec2_disk_size_ssogen_mserver
+      volume_type           = "gp2"
+      iops                  = 0
+      kms_key_id            = aws_kms_key.ssogen_kms_key[count.index].arn
+    }
+  }
+
+  block_device_mappings {
+    device_name = "/dev/sdd"
+    ebs {
+      delete_on_termination = true
+      encrypted             = true
+      volume_size           = local.application_data.accounts[local.environment].ec2_disk_size_ssogen_temp
+      volume_type           = "gp2"
+      iops                  = 0
+      kms_key_id            = aws_kms_key.ssogen_kms_key[count.index].arn
+    }
+  }
+  user_data = base64encode(data.template_file.launch-template1[count.index].rendered)
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = merge(local.tags,
+      { Name = lower(format("ec2-ccms-%s-%s-as1", local.application_name_ssogen, local.environment)) }
+    )
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = merge(local.tags,
+      { instance-role = aws_iam_instance_profile.ssogen_instance_profile[count.index].name },
+      { backup = "true" },
+      { instance-scheduling = "skip-scheduling" }
+    )
+  }
+
+  tag_specifications {
+    resource_type = "volume"
+    tags = merge(local.tags,
+      { Name = lower(format("%s-%s-primary", local.application_name_ssogen, local.environment)) }
+    )
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-launch-template-primary", local.application_name_ssogen, local.environment)) }
+  )
+
+}
+
+resource "aws_launch_template" "ssogen-ec2-launch-template-secondary" {
+  count                  = local.ssogen_enabled ? 1 : 0
+  name_prefix            = local.application_name_ssogen
+  image_id               = local.application_data.accounts[local.environment].ssogen_ami_id-2
+  instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ssogen
+  key_name               = aws_key_pair.ssogen[count.index].key_name
+  ebs_optimized          = true
+  update_default_version = true
+
+  monitoring {
+    enabled = true
+  }
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ssogen_instance_profile[count.index].name
+  }
+
+  network_interfaces {
+    associate_public_ip_address = false
+    security_groups             = [aws_security_group.ssogen_sg[count.index].id]
+  }
+
+  block_device_mappings {
+    device_name = "/dev/sda1"
+    ebs {
+      delete_on_termination = true
+      encrypted             = true
+      volume_size           = local.application_data.accounts[local.environment].ec2_disk_size_ssogen
+      volume_type           = "gp2"
+      iops                  = 0
+      kms_key_id            = aws_kms_key.ssogen_kms_key[count.index].arn
+    }
+  }
+
+  block_device_mappings {
+    device_name = "/dev/sdb"
+    ebs {
+      delete_on_termination = true
+      encrypted             = true
+      volume_size           = local.application_data.accounts[local.environment].ec2_disk_size_ssogen_fmw
+      volume_type           = "gp2"
+      iops                  = 0
+      kms_key_id            = aws_kms_key.ssogen_kms_key[count.index].arn
+    }
+  }
+
+  block_device_mappings {
+    device_name = "/dev/sdc"
+    ebs {
+      delete_on_termination = true
+      encrypted             = true
+      volume_size           = local.application_data.accounts[local.environment].ec2_disk_size_ssogen_mserver
+      volume_type           = "gp2"
+      iops                  = 0
+      kms_key_id            = aws_kms_key.ssogen_kms_key[count.index].arn
+    }
+  }
+
+  block_device_mappings {
+    device_name = "/dev/sdd"
+    ebs {
+      delete_on_termination = true
+      encrypted             = true
+      volume_size           = local.application_data.accounts[local.environment].ec2_disk_size_ssogen_temp
+      volume_type           = "gp2"
+      iops                  = 0
+      kms_key_id            = aws_kms_key.ssogen_kms_key[count.index].arn
+    }
+  }
+
+  user_data = base64encode(data.template_file.launch-template2[count.index].rendered)
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = merge(local.tags,
+      { Name = lower(format("ec2-ccms-%s-%s-as2", local.application_name_ssogen, local.environment)) }
+    )
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = merge(local.tags,
+      { instance-role = aws_iam_instance_profile.ssogen_instance_profile[count.index].name },
+      { backup = "true" },
+      { instance-scheduling = "skip-scheduling" }
+    )
+  }
+
+  tag_specifications {
+    resource_type = "volume"
+    tags = merge(local.tags,
+      { Name = lower(format("%s-%s-secondary", local.application_name_ssogen, local.environment)) }
+    )
+  }
+
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-launch-template-secondary", local.application_name_ssogen, local.environment)) }
+  )
+
+}
+
+resource "aws_autoscaling_group" "ssogen-scaling-group-primary" {
+  count               = local.ssogen_enabled ? 1 : 0
+  name                = "${local.application_name_ssogen}-asg-primary"
+  vpc_zone_identifier = data.aws_subnets.shared-private.ids
+  desired_capacity    = local.application_data.accounts[local.environment].ssogen_desired_capacity
+  max_size            = local.application_data.accounts[local.environment].ssogen_max_capacity
+  min_size            = local.application_data.accounts[local.environment].ssogen_min_capacity
+
+  target_group_arns = [
+    aws_lb_target_group.ssogen_internal_tg_ssogen_enc_app[count.index].arn,
+    aws_lb_target_group.ssogen_internal_tg_ssogen_console[count.index].arn
+  ]
+
+  health_check_type         = "EC2"
+  health_check_grace_period = 300
+
+  launch_template {
+    id      = aws_launch_template.ssogen-ec2-launch-template-primary[count.index].id
+    version = "$Latest"
+  }
+
+}
+
+resource "aws_autoscaling_group" "ssogen-scaling-group-secondary" {
+  count               = local.ssogen_enabled ? 1 : 0
+  name                = "${local.application_name_ssogen}-asg-secondary"
+  vpc_zone_identifier = data.aws_subnets.shared-private.ids
+  desired_capacity    = local.application_data.accounts[local.environment].ssogen_desired_capacity
+  max_size            = local.application_data.accounts[local.environment].ssogen_max_capacity
+  min_size            = local.application_data.accounts[local.environment].ssogen_min_capacity
+
+  target_group_arns = [
+    aws_lb_target_group.ssogen_internal_tg_ssogen_enc_app[count.index].arn,
+    aws_lb_target_group.ssogen_internal_tg_ssogen_console[count.index].arn
+  ]
+
+  health_check_type         = "EC2"
+  health_check_grace_period = 300
+
+  launch_template {
+    id      = aws_launch_template.ssogen-ec2-launch-template-secondary[count.index].id
+    version = "$Latest"
+  }
+
+}

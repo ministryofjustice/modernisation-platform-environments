@@ -1,0 +1,16 @@
+{"S3JobManifestGenerator": {
+    "ExpectedBucketOwner": "${source_account_number}",
+    "SourceBucket": "arn:aws:s3:::${source_bucket_name}",
+    "ManifestOutputLocation": {
+        "ExpectedManifestBucketOwner": "${source_account_number}",
+        "Bucket": "arn:aws:s3:::yjaf-${source_env_name}-replication-manifests",
+        "ManifestFormat": "S3InventoryReport_CSV_20211130"
+      },
+      "Filter": {
+        "EligibleForReplication": true,
+        "ObjectReplicationStatuses": ["NONE","FAILED"]
+      },
+      "EnableManifestOutput": true
+    }
+}
+

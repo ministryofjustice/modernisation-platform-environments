@@ -1,0 +1,130 @@
+[
+  {
+    "name": "xray-daemon",
+    "image": "${ecr_url}:xray-daemon",
+    "essential": false,
+    "cpu": 32,
+    "portMappings": [
+      {
+        "containerPort": 2000,
+        "protocol": "udp"
+      }
+    ],
+    "memory": 256,
+    "environment": [
+      {
+        "name": "AWS_REGION",
+        "value": "${region}"
+      }
+    ],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-region": "${region}",
+        "awslogs-stream-prefix": "${app_name}-app",
+        "awslogs-group": "${app_name}-ecs-log-group"
+      }
+    }
+  },
+  {
+    "name": "${app_name}",
+    "image": "${ecr_url}:${docker_image_tag}",
+    "essential": true,
+    "cpu": 992,
+    "portMappings": [
+      {
+        "containerPort": 8080
+      }
+    ],
+    "links": ["xray-daemon"],
+    "memory": 5000,
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-region": "${region}",
+        "awslogs-stream-prefix": "${app_name}-app",
+        "awslogs-group": "${app_name}-ecs-log-group"
+      }
+    },
+    "environment": [
+      {
+        "name": "AWS_REGION",
+        "value": "${region}"
+      },
+      {
+        "name": "APP_MAAT_API_END_POINT",
+        "value": "${maat_api_end_point}"
+      },
+      {
+        "name": "APP_MAAT_API_OAUTH_SCOPE",
+        "value": "${maat_api_oauth_scope}"
+      },
+      {
+        "name": "APP_MAAT_API_OAUTH_URL",
+        "value": "${maat_api_oauth_url}"
+      },
+      {
+        "name": "APP_DB_URL",
+        "value": "jdbc:oracle:thin:@${maat_db_url}"
+      },
+      {
+        "name": "APP_DB_USERID",
+        "value": "MLA"
+      },
+      {
+        "name": "APP_DB_POOL_MAX_CONNECTION",
+        "value": "130"
+      },
+      {
+        "name": "APP_LOG_LEVEL",
+        "value": "debug"
+      },
+      {
+        "name": "APP_LIBRA_WSDL_URL",
+        "value": "${maat_libra_wsdl_url}"
+      },
+      {
+        "name": "AWS_XRAY_DAEMON_ADDRESS",
+        "value": "xray-daemon:2000"
+      },
+      {
+        "name": "SENTRY_ENVIRONMENT",
+        "value": "${sentry_env}"
+      }
+    ],
+    "secrets": [
+      {
+        "name": "APP_DB_PASSWORD",
+        "valueFrom": "${db_secret_arn}"
+      },
+      {
+        "name": "APP_MLRA_GOOGLE_TAG_MANAGER_ID",
+        "valueFrom": "${google_tag_manager_id}"
+      },
+      {
+        "name": "APP_INFOX_CLIENT_SECRET",
+        "valueFrom": "${infox_client_secret}"
+      },
+      {
+        "name": "APP_MAAT_API_CLIENT_ID",
+        "valueFrom": "${maat_api_client_id}"
+      },
+      {
+        "name": "APP_MAAT_API_CLIENT_SECRET",
+        "valueFrom": "${maat_api_client_secret}"
+      },
+      {
+        "name": "APP_MASTER_PASSWORD",
+        "valueFrom": "${app_master_password}"
+      },
+      {
+        "name": "APP_SALT",
+        "valueFrom": "${app_salt}"
+      },
+      {
+        "name": "APP_DERIVATION_ITERATIONS",
+        "valueFrom": "${app_derivation_iterations}"
+      }
+    ]
+  }
+]

@@ -1,0 +1,144 @@
+{
+  "AwsAccountId": "${aws_account_id}",
+  "DataSetId": "03b1c5a2-fe9a-4219-b8cc-9b248cefd324",
+  "Name": "Personal Data",
+  "PhysicalTableMap": {
+    "1a694117-b814-4cba-9337-83fb7d9867d8": {
+      "CustomSql": {
+        "DataSourceArn": "arn:aws:quicksight:eu-west-2:${aws_account_id}:datasource/Redshift",
+        "Name": "Personal Data",
+        "SqlQuery": "-- Personal Data\r\n\r\n\r\nSELECT distinct \r\np.ypid,\r\ny.yotoucode,\r\ny.yot_name,\r\np.currentyotid,   \r\np.pncnumber, \r\n--year_number,\r\nCASE WHEN (CASE WHEN p.gender is null and p.sex is not null then p.sex else p.gender \r\nend ) = '1' THEN 'Male'\r\nWHEN (CASE WHEN p.gender is null and p.sex is not null then p.sex else p.gender \r\nend ) = '2' then 'Female' else 'Unknown' end as Gender_Name,\r\nCASE WHEN p.gender is null and p.sex is not null then p.sex else p.gender \r\nend as Gender_Sex,\r\nisnull(p.ethnicity,  'INFORMATION_NOT_OBTAINABLE') as ethnicity,\r\n--ETH.Ethnicitygroup,\r\n\r\nCASE WHEN ETH.Ethnicitygroup = 'Information not obtainable' THEN 'Not Known'\r\nWHEN ETH.Ethnicitygroup = 'Other Ethnic Group' THEN 'Other'\r\nWHEN ETH.Ethnicitygroup = 'Asian or Asian British' THEN 'Asian'\r\nWHEN ETH.Ethnicitygroup = 'Black or Black British' THEN 'Black'\r\nWHEN ETH.Ethnicitygroup IS NULL THEN 'Not Known' \r\nelse ETH.Ethnicitygroup END AS Ethnicitygroup,\r\n\r\nCASE WHEN ETH.Ethnicitygroup = 'Asian or Asian British' THEN 1\r\nWHEN ETH.Ethnicitygroup = 'Black or Black British' THEN 2\r\nWHEN ETH.Ethnicitygroup LIKE '%Mixed%' THEN 3\r\nWHEN ETH.Ethnicitygroup LIKE '%Other%' THEN 4\r\nWHEN ETH.Ethnicitygroup = 'White' THEN 5\r\nWHEN ETH.Ethnicitygroup = 'Information not obtainable' then 6\r\nWHEN ETH.Ethnicitygroup = 'Not Known'  then 6\r\nWHEN ETH.Ethnicitygroup is null THEN 6 else 7 end as SortOrder,\r\n\r\n\r\n\r\n--CAST(p.date_of_birth AS NVARCHAR) AS date_of_birth,\r\np.date_of_birth,\r\nmax(age_at_arrest_or_offence) as age_at_arrest_or_offence,\r\nmax(age_at_first_hearing) as age_at_first_hearing,\r\n --RANK() OVER(PARTITION BY p.ypid ORDER BY o.age_at_arrest_or_offence + o.age_at_first_hearing desc) as [AgeTotalFlag],\r\n--year(dateadd(month, -3, CAST(o.outcome_date AS DATE))) as FiscalYear,\r\n\r\n\r\n-- Need to point and Ref Table once Fin Year added\r\nCASE WHEN o.outcome_date::date BETWEEN '2016-04-01' AND '2017-03-31' THEN '2016/17' WHEN o.outcome_date::date BETWEEN '2017-04-01' AND '2018-03-31' THEN '2017/18' \r\nWHEN o.outcome_date::date BETWEEN '2018-04-01' AND '2019-03-31' THEN '2018/19' WHEN o.outcome_date::date BETWEEN '2019-04-01' AND '2020-03-31' THEN '2019/20' \r\nWHEN o.outcome_date::date BETWEEN '2020-04-01' AND '2021-03-31' THEN '2020/21' WHEN o.outcome_date::date BETWEEN '2021-04-01' AND '2022-03-31' THEN '2021/22' \r\nWHEN o.outcome_date::date BETWEEN '2022-04-01' AND '2023-03-31' THEN '2022/23' WHEN o.outcome_date::date BETWEEN '2023-04-01' AND '2024-03-31' THEN '2023/24' \r\nWHEN o.outcome_date::date BETWEEN '2024-04-01' AND '2025-03-31' THEN '2024/25' WHEN o.outcome_date::date BETWEEN '2025-04-01' AND '2026-03-31' THEN '2025/26' \r\nWHEN o.outcome_date::date BETWEEN '2026-04-01' AND '2027-03-31' THEN '2026/27' WHEN o.outcome_date::date BETWEEN '2027-04-01' AND '2028-03-31' THEN '2027/28' \r\nWHEN o.outcome_date::date BETWEEN '2028-04-01' AND '2029-03-31' THEN '2028/29' WHEN o.outcome_date::date BETWEEN '2029-04-01' AND '2030-03-31' THEN '2029/30' \r\nWHEN o.outcome_date::date BETWEEN '2030-04-01' AND '2031-03-31' THEN '2030/31' WHEN o.outcome_date::date BETWEEN '2031-04-01' AND '2032-03-31' THEN '2031/32' \r\nWHEN o.outcome_date::date BETWEEN '2032-04-01' AND '2033-03-31' THEN '2032/33' WHEN o.outcome_date::date BETWEEN '2033-04-01' AND '2034-03-31' THEN '2033/34' \r\nWHEN o.outcome_date::date BETWEEN '2034-04-01' AND '2035-03-31' THEN '2034/35' WHEN o.outcome_date::date BETWEEN '2035-04-01' AND '2036-03-31' THEN '2035/36' \r\nELSE '' END AS [FinYear],\r\n\r\n\r\n    --DateAdd(month,-10,o.outcome_date::date,2) as test\r\n    --convert(char(2),DateAdd(month,+ 2,o.outcome_date::date,2) as year,\r\n    \r\n--select * from refdata.date_table where day_date = '2023-04-01'\r\n\r\n--case when extract('month' from (to_date(o.outcome_date,'yy-mm'))) > 4\r\n  --then (to_date(o.outcome_date,'yy-mm')) + interval '-1' year\r\n--else (to_date(o.outcome_date,'yy-mm'))\r\n  --            end as test,\r\n\r\n \r\n1 as Number\r\n\r\nfrom yjb_case_reporting.mvw_yp_latest_record as l\r\ninner join yjb_case_reporting.mvw_yp_person_details as p on p.source_document_id = l.source_document_id\r\ninner join yjb_case_reporting.mvw_yp_offence as o on l.source_document_id = o.source_document_id\r\nleft join refdata.yotoucodes as y on y.yotoucode = p.yotoucode\r\nleft join refdata.ethnicity_group  as ETH on CAST(p.ethnicity AS NVARCHAR) = CAST(ETH.ethnicity AS NVARCHAR)\r\n\r\nleft join refdata.date_table as DT on o.outcome_date::date =  DT.day_date\r\n\r\n\r\nWhere legal_outcome_group in ('First-tier', 'Custody', 'Community', 'Pre-Court')\r\nand o.residence_on_legal_outcome_date <> 'OTHER' \r\nand o.outcome_appeal_status <> 'Changed on appeal'\r\nand o.age_at_arrest_or_offence >=10 and o.age_at_arrest_or_offence <=17\r\nand o.age_at_first_hearing <=17\r\nand o.outcome_date::date >= '2020-04-01'\r\n\r\n--and y.yot_name like '%Barking%'\r\n--AND ETH.Ethnicitygroup = 'White'\r\n\r\ngroup by \r\n\r\np.ypid,\r\ny.yotoucode,\r\ny.yot_name,\r\np.currentyotid,   \r\np.pncnumber, \r\nCASE WHEN (CASE WHEN p.gender is null and p.sex is not null then p.sex else p.gender \r\nend ) = '1' THEN 'Male'\r\nWHEN (CASE WHEN p.gender is null and p.sex is not null then p.sex else p.gender \r\nend ) = '2' then 'Female' else 'Unknown' end ,\r\nCASE WHEN p.gender is null and p.sex is not null then p.sex else p.gender \r\nend ,\r\nisnull(p.ethnicity,  'INFORMATION_NOT_OBTAINABLE'),\r\n--ETH.Ethnicitygroup,\r\n\r\n\r\nCASE WHEN ETH.Ethnicitygroup = 'Information not obtainable' THEN 'Not Known'\r\nWHEN ETH.Ethnicitygroup = 'Other Ethnic Group' THEN 'Other'\r\nWHEN ETH.Ethnicitygroup = 'Asian or Asian British' THEN 'Asian'\r\nWHEN ETH.Ethnicitygroup = 'Black or Black British' THEN 'Black'\r\nWHEN ETH.Ethnicitygroup IS NULL THEN 'Not Known' \r\nelse ETH.Ethnicitygroup END,\r\n\r\nCASE WHEN ETH.Ethnicitygroup = 'Asian or Asian British' THEN 1\r\nWHEN ETH.Ethnicitygroup = 'Black or Black British' THEN 2\r\nWHEN ETH.Ethnicitygroup LIKE '%Mixed%' THEN 3\r\nWHEN ETH.Ethnicitygroup LIKE '%Other%' THEN 4\r\nWHEN ETH.Ethnicitygroup = 'White' THEN 5\r\nWHEN ETH.Ethnicitygroup = 'Information not obtainable' then 6\r\nWHEN ETH.Ethnicitygroup = 'Not Known'  then 6\r\nWHEN ETH.Ethnicitygroup is null THEN 6 else 7 end ,\r\n\r\n--CAST(p.date_of_birth AS NVARCHAR),\r\np.date_of_birth,\r\nCASE WHEN o.outcome_date::date BETWEEN '2016-04-01' AND '2017-03-31' THEN '2016/17' WHEN o.outcome_date::date BETWEEN '2017-04-01' AND '2018-03-31' THEN '2017/18' \r\nWHEN o.outcome_date::date BETWEEN '2018-04-01' AND '2019-03-31' THEN '2018/19' WHEN o.outcome_date::date BETWEEN '2019-04-01' AND '2020-03-31' THEN '2019/20' \r\nWHEN o.outcome_date::date BETWEEN '2020-04-01' AND '2021-03-31' THEN '2020/21' WHEN o.outcome_date::date BETWEEN '2021-04-01' AND '2022-03-31' THEN '2021/22' \r\nWHEN o.outcome_date::date BETWEEN '2022-04-01' AND '2023-03-31' THEN '2022/23' WHEN o.outcome_date::date BETWEEN '2023-04-01' AND '2024-03-31' THEN '2023/24' \r\nWHEN o.outcome_date::date BETWEEN '2024-04-01' AND '2025-03-31' THEN '2024/25' WHEN o.outcome_date::date BETWEEN '2025-04-01' AND '2026-03-31' THEN '2025/26' \r\nWHEN o.outcome_date::date BETWEEN '2026-04-01' AND '2027-03-31' THEN '2026/27' WHEN o.outcome_date::date BETWEEN '2027-04-01' AND '2028-03-31' THEN '2027/28' \r\nWHEN o.outcome_date::date BETWEEN '2028-04-01' AND '2029-03-31' THEN '2028/29' WHEN o.outcome_date::date BETWEEN '2029-04-01' AND '2030-03-31' THEN '2029/30' \r\nWHEN o.outcome_date::date BETWEEN '2030-04-01' AND '2031-03-31' THEN '2030/31' WHEN o.outcome_date::date BETWEEN '2031-04-01' AND '2032-03-31' THEN '2031/32' \r\nWHEN o.outcome_date::date BETWEEN '2032-04-01' AND '2033-03-31' THEN '2032/33' WHEN o.outcome_date::date BETWEEN '2033-04-01' AND '2034-03-31' THEN '2033/34' \r\nWHEN o.outcome_date::date BETWEEN '2034-04-01' AND '2035-03-31' THEN '2034/35' WHEN o.outcome_date::date BETWEEN '2035-04-01' AND '2036-03-31' THEN '2035/36' \r\nELSE '' END",
+        "Columns": [
+          {
+            "Name": "ypid",
+            "Type": "STRING"
+          },
+          {
+            "Name": "yotoucode",
+            "Type": "STRING"
+          },
+          {
+            "Name": "yot_name",
+            "Type": "STRING"
+          },
+          {
+            "Name": "currentyotid",
+            "Type": "STRING"
+          },
+          {
+            "Name": "pncnumber",
+            "Type": "STRING"
+          },
+          {
+            "Name": "gender_name",
+            "Type": "STRING"
+          },
+          {
+            "Name": "gender_sex",
+            "Type": "INTEGER"
+          },
+          {
+            "Name": "ethnicity",
+            "Type": "STRING"
+          },
+          {
+            "Name": "ethnicitygroup",
+            "Type": "STRING"
+          },
+          {
+            "Name": "sortorder",
+            "Type": "INTEGER"
+          },
+          {
+            "Name": "date_of_birth",
+            "Type": "DATETIME"
+          },
+          {
+            "Name": "age_at_arrest_or_offence",
+            "Type": "INTEGER"
+          },
+          {
+            "Name": "age_at_first_hearing",
+            "Type": "INTEGER"
+          },
+          {
+            "Name": "finyear",
+            "Type": "STRING"
+          },
+          {
+            "Name": "number",
+            "Type": "INTEGER"
+          }
+        ]
+      }
+    }
+  },
+  "LogicalTableMap": {
+    "f9e27083-b13f-493f-baef-f65398131284": {
+      "Alias": "Personal Data",
+      "DataTransforms": [
+        {
+          "ProjectOperation": {
+            "ProjectedColumns": [
+              "ypid",
+              "yotoucode",
+              "yot_name",
+              "currentyotid",
+              "pncnumber",
+              "gender_name",
+              "gender_sex",
+              "ethnicity",
+              "ethnicitygroup",
+              "sortorder",
+              "date_of_birth",
+              "age_at_arrest_or_offence",
+              "age_at_first_hearing",
+              "finyear",
+              "number"
+            ]
+          }
+        }
+      ],
+      "Source": {
+        "PhysicalTableId": "1a694117-b814-4cba-9337-83fb7d9867d8"
+      }
+    }
+  },
+  "ImportMode": "SPICE",
+  "Permissions": [
+    {
+      "Principal": "arn:aws:quicksight:eu-west-2:${aws_account_id}:user/default/quicksight-admin-access/david.seekins",
+      "Actions": [
+        "quicksight:DeleteDataSet",
+        "quicksight:UpdateDataSetPermissions",
+        "quicksight:PutDataSetRefreshProperties",
+        "quicksight:CreateRefreshSchedule",
+        "quicksight:CancelIngestion",
+        "quicksight:DeleteRefreshSchedule",
+        "quicksight:ListRefreshSchedules",
+        "quicksight:UpdateRefreshSchedule",
+        "quicksight:PassDataSet",
+        "quicksight:DescribeDataSetRefreshProperties",
+        "quicksight:DescribeDataSet",
+        "quicksight:CreateIngestion",
+        "quicksight:DescribeRefreshSchedule",
+        "quicksight:ListIngestions",
+        "quicksight:UpdateDataSet",
+        "quicksight:DescribeDataSetPermissions",
+        "quicksight:DeleteDataSetRefreshProperties",
+        "quicksight:DescribeIngestion"
+      ]
+    }
+  ],
+  "RowLevelPermissionDataSet": {
+    "Namespace": "default",
+    "Arn": "arn:aws:quicksight:eu-west-2:${aws_account_id}:dataset/7d6329ad-b523-4c4e-ad6b-86d8b1a06f81",
+    "PermissionPolicy": "GRANT_ACCESS",
+    "FormatVersion": "VERSION_1",
+    "Status": "ENABLED"
+  },
+  "DataSetUsageConfiguration": {
+    "DisableUseAsDirectQuerySource": false,
+    "DisableUseAsImportedSource": false
+  }
+}

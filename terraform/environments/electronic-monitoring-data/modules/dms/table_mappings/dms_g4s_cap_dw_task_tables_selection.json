@@ -1,0 +1,17 @@
+{
+  "rules": [
+    {
+      "rule-type": "selection",
+      "rule-id": "01",
+      "rule-name": "all",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "D_Comments"
+      },
+      "rule-action": "include",
+      "filters": [],
+      "parallel-load": null,
+      "isAutoSegmentationChecked": false
+    }
+  ]
+}

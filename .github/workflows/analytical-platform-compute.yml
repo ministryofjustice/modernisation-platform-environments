@@ -1,0 +1,73 @@
+---
+  name: analytical-platform-compute
+
+  on:
+    push:
+      branches:
+        - main
+      paths:
+        - 'terraform/environments/analytical-platform-compute/**'
+        - '.github/workflows/analytical-platform-compute.yml'
+
+    pull_request:
+      branches:
+        - main
+      paths:
+        - 'terraform/environments/analytical-platform-compute/**'
+        - '.github/workflows/analytical-platform-compute.yml'
+
+    workflow_dispatch:
+      inputs:
+        action:
+          description: 'Set either [deploy|destroy].'
+          default: 'deploy'
+          required: true
+          type: choice
+          options:
+            - deploy
+            - destroy
+
+  permissions:
+    id-token: write  # Required for requesting the JWT
+    contents: read   # Required for actions/checkout
+
+  jobs:
+    strategy:
+      # This job generates a matrix of environments (and possibly components) by calling your reusable strategy workflow.
+      uses: ./.github/workflows/reusable_terraform_components_strategy.yml
+      if: inputs.action != 'destroy'
+      with:
+        # e.g. "analytical-platform-compute.json" must exist in the Modernisation Platform repo
+        # so the strategy can load environment info from it.
+        application: "${{ github.workflow }}"  # Typically: "analytical-platform-compute"
+
+    terraform:
+      needs: strategy
+      if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
+      strategy:
+        fail-fast: false
+        matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
+      # Calls the plan/apply reusable workflow with each item in the matrix
+      uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+      with:
+        # Pass along the "application" and "environment" from the matrix
+        application: "${{ github.workflow }}"
+        environment: "${{ matrix.target }}"
+        action: "${{ matrix.action }}"
+        component: "${{ matrix.component }}"      # If your strategy workflow also outputs "matrix.component"
+      secrets:
+        MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+        PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+    destroy-development:
+      if: inputs.action == 'destroy'
+      uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+      with:
+        application: "${{ github.workflow }}"
+        environment: "development"
+        action: "plan_apply"
+        plan_apply_tfargs: "-destroy"
+        # If you need component logic on destroy, pass it here as well, e.g. component: ...
+      secrets:
+        MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+        PASSPHRASE: ${{ secrets.PASSPHRASE }}

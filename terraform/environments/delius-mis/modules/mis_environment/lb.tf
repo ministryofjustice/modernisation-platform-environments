@@ -1,0 +1,809 @@
+locals {
+  lb_name = "${var.env_name}-mis-alb"
+
+  # remember to update cert if changing the DNS zone for the FQDN
+  # Example FQDNs:
+  #   ndl-dis.dev.delius-mis.hmpps-development.modernisation-platform.service.justice.gov.uk [DIS]
+  #   dev.delius-mis.hmpps-development.modernisation-platform.service.justice.gov.uk         [Reporting]
+
+  dfi_enabled = var.lb_config != null && var.dfi_config != null && var.dfi_config.instance_count > 0
+  dfi_fqdn    = "ndl-dfi.${var.env_name}.${var.account_config.dns_suffix}"
+
+  dis_enabled = var.lb_config != null && var.dis_config != null && var.dis_config.instance_count > 0
+  dis_fqdn    = "ndl-dis.${var.env_name}.${var.account_config.dns_suffix}"
+
+  bws_enabled    = var.lb_config != null && var.bws_config != null && var.bws_config.instance_count > 0
+  bws_fqdn       = "${var.env_name}.${var.account_config.dns_suffix}"
+  bws_admin_fqdn = "admin.${var.env_name}.${var.account_config.dns_suffix}"
+
+  bws_external_fqdn       = var.bws_config != null ? lookup(var.bws_config, "external_fqdn", local.bws_fqdn) : null
+  bws_external_admin_fqdn = var.bws_config != null ? lookup(var.bws_config, "external_admin_fqdn", local.bws_admin_fqdn) : null
+
+  bws_sso_enabled = var.lb_config != null && var.bws_sso_config != null && var.bws_sso_config.instance_count > 0
+  bws_sso_fqdn    = "sso.${var.env_name}.${var.account_config.dns_suffix}"
+
+  bcs_win_enabled = var.lb_config != null && var.bcs_config_win != null && var.bcs_config_win.instance_count > 0
+  bcs_win_fqdn    = "ndl-bcs.${var.env_name}.${var.account_config.dns_suffix}"
+
+  maintenance_rule_enabled = var.lb_config != null && lookup(var.lb_config, "maintenance_message", null) != null
+  maintenance_rule_fqdn    = "maintenance.${var.env_name}.${var.account_config.dns_suffix}"
+}
+
+# Main security group for ALB
+resource "aws_security_group" "mis_alb" {
+  name        = "${local.lb_name}-sg"
+  description = "Security group for ALB"
+  vpc_id      = var.account_info.vpc_id
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.lb_name}-sg"
+    },
+  )
+}
+
+# Security group for ALB - Staff access
+resource "aws_security_group" "mis_alb_staff" {
+  count       = var.lb_config != null ? 1 : 0
+  name        = "${local.lb_name}-staff-sg"
+  description = "Security group for MIS ALB - Staff access"
+  vpc_id      = var.account_config.shared_vpc_id
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.lb_name}-staff-sg"
+    },
+  )
+}
+
+# Security group for ALB - MOJO access
+resource "aws_security_group" "mis_alb_mojo" {
+  count       = var.lb_config != null ? 1 : 0
+  name        = "${local.lb_name}-mojo-sg"
+  description = "Security group for MIS ALB - MOJO access"
+  vpc_id      = var.account_config.shared_vpc_id
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.lb_name}-mojo-sg"
+    },
+  )
+}
+
+# Security group for ALB - Infrastructure access
+resource "aws_security_group" "mis_alb_infrastructure" {
+  count       = var.lb_config != null ? 1 : 0
+  name        = "${local.lb_name}-infra-sg"
+  description = "Security group for MIS ALB - Infrastructure access"
+  vpc_id      = var.account_config.shared_vpc_id
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.lb_name}-infra-sg"
+    },
+  )
+}
+
+resource "aws_vpc_security_group_egress_rule" "mis_alb_egress" {
+  for_each = {
+    http7777-to-bws = { referenced_security_group_id = aws_security_group.bws_ec2.id, ip_protocol = "tcp", port = 7777 }
+    http8080-to-dis = { referenced_security_group_id = aws_security_group.dis_ec2.id, ip_protocol = "tcp", port = 8080 }
+    http8080-to-dfi = { referenced_security_group_id = aws_security_group.dfi_ec2.id, ip_protocol = "tcp", port = 8080 }
+  }
+
+  description       = each.key
+  security_group_id = resource.aws_security_group.mis_alb.id
+
+  cidr_ipv4                    = lookup(each.value, "cidr_ipv4", null)
+  ip_protocol                  = lookup(each.value, "ip_protocol", "-1")
+  from_port                    = lookup(each.value, "port", lookup(each.value, "from_port", null))
+  to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
+  referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
+
+  tags = local.tags
+}
+
+resource "aws_vpc_security_group_egress_rule" "mis_alb_egress_bcs_win" {
+  for_each = local.bcs_win_enabled ? {
+    http8080-to-bcs-win = { referenced_security_group_id = aws_security_group.bcs_ec2.id, ip_protocol = "tcp", port = 8080 }
+  } : {}
+
+  description       = each.key
+  security_group_id = resource.aws_security_group.mis_alb.id
+
+  cidr_ipv4                    = lookup(each.value, "cidr_ipv4", null)
+  ip_protocol                  = lookup(each.value, "ip_protocol", "-1")
+  from_port                    = lookup(each.value, "port", lookup(each.value, "from_port", null))
+  to_port                      = lookup(each.value, "port", lookup(each.value, "to_port", null))
+  referenced_security_group_id = lookup(each.value, "referenced_security_group_id", null)
+
+  tags = local.tags
+}
+
+# HTTP rules for staff access
+resource "aws_vpc_security_group_ingress_rule" "mis_alb_http_staff" {
+  for_each          = var.lb_config != null ? toset(var.account_config.security_group_cidrs_staff) : []
+  security_group_id = aws_security_group.mis_alb_staff[0].id
+  cidr_ipv4         = each.value
+  ip_protocol       = "tcp"
+  from_port         = 80
+  to_port           = 80
+  description       = "Allow HTTP traffic from staff networks: ${each.value}"
+
+  tags = local.tags
+}
+
+# HTTPS rules for staff access
+resource "aws_vpc_security_group_ingress_rule" "mis_alb_https_staff" {
+  for_each          = var.lb_config != null ? toset(var.account_config.security_group_cidrs_staff) : []
+  security_group_id = aws_security_group.mis_alb_staff[0].id
+  cidr_ipv4         = each.value
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  description       = "Allow HTTPS traffic from staff networks: ${each.value}"
+
+  tags = local.tags
+}
+
+# HTTP rules for MOJO access
+resource "aws_vpc_security_group_ingress_rule" "mis_alb_http_mojo" {
+  for_each          = var.lb_config != null ? toset(var.account_config.security_group_cidrs_mojo) : []
+  security_group_id = aws_security_group.mis_alb_mojo[0].id
+  cidr_ipv4         = each.value
+  ip_protocol       = "tcp"
+  from_port         = 80
+  to_port           = 80
+  description       = "Allow HTTP traffic from MOJO networks: ${each.value}"
+
+  tags = local.tags
+}
+
+# HTTPS rules for MOJO access
+resource "aws_vpc_security_group_ingress_rule" "mis_alb_https_mojo" {
+  for_each          = var.lb_config != null ? toset(var.account_config.security_group_cidrs_mojo) : []
+  security_group_id = aws_security_group.mis_alb_mojo[0].id
+  cidr_ipv4         = each.value
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  description       = "Allow HTTPS traffic from MOJO networks: ${each.value}"
+
+  tags = local.tags
+}
+
+# HTTP rules for infrastructure access
+resource "aws_vpc_security_group_ingress_rule" "mis_alb_http_infrastructure" {
+  for_each          = var.lb_config != null ? toset(var.account_config.security_group_cidrs_infrastructure) : []
+  security_group_id = aws_security_group.mis_alb_infrastructure[0].id
+  cidr_ipv4         = each.value
+  ip_protocol       = "tcp"
+  from_port         = 80
+  to_port           = 80
+  description       = "Allow HTTP traffic from infrastructure networks: ${each.value}"
+
+  tags = local.tags
+}
+
+# HTTPS rules for infrastructure access
+resource "aws_vpc_security_group_ingress_rule" "mis_alb_https_infrastructure" {
+  for_each          = var.lb_config != null ? toset(var.account_config.security_group_cidrs_infrastructure) : []
+  security_group_id = aws_security_group.mis_alb_infrastructure[0].id
+  cidr_ipv4         = each.value
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  description       = "Allow HTTPS traffic from infrastructure networks: ${each.value}"
+
+  tags = local.tags
+}
+
+# HTTP rules for staff access
+resource "aws_vpc_security_group_ingress_rule" "mis_alb_http_additional" {
+  for_each          = var.lb_config != null ? toset(var.environment_config.lb_additional_allowed_public_cidrs) : []
+  security_group_id = aws_security_group.mis_alb_staff[0].id
+  cidr_ipv4         = each.value
+  ip_protocol       = "tcp"
+  from_port         = 80
+  to_port           = 80
+  description       = "Allow HTTP traffic from ${each.value}"
+
+  tags = local.tags
+}
+
+# HTTPS rules for staff access
+resource "aws_vpc_security_group_ingress_rule" "mis_alb_https_additional" {
+  for_each          = var.lb_config != null ? toset(var.environment_config.lb_additional_allowed_public_cidrs) : []
+  security_group_id = aws_security_group.mis_alb_staff[0].id
+  cidr_ipv4         = each.value
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  description       = "Allow HTTPS traffic from ${each.value}"
+
+  tags = local.tags
+}
+
+# Application Load Balancer - shared by DFI and DIS services
+resource "aws_lb" "mis" {
+  count              = var.lb_config != null ? 1 : 0
+  name               = local.lb_name
+  load_balancer_type = "application"
+  subnets            = var.account_config.public_subnet_ids
+  internal           = false
+  security_groups = compact([
+    aws_security_group.mis_alb.id,
+    aws_security_group.mis_alb_staff[0].id,
+    aws_security_group.mis_alb_mojo[0].id,
+    aws_security_group.mis_alb_infrastructure[0].id
+  ])
+
+  enable_cross_zone_load_balancing = true
+  idle_timeout                     = 300
+  enable_deletion_protection       = false
+
+  access_logs {
+    bucket  = module.s3_lb_logs_bucket[0].bucket.id
+    prefix  = local.lb_name
+    enabled = true
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = format("%s", local.lb_name)
+    },
+  )
+}
+
+# Target Group for DFI instances - only created if DFI instances exist
+resource "aws_lb_target_group" "dfi" {
+  count    = local.dfi_enabled ? 1 : 0
+  name     = "${local.lb_name}-dfi-tg"
+  port     = 8080
+  protocol = "HTTP"
+  vpc_id   = var.account_config.shared_vpc_id
+
+  # Deregistration delay - how long to wait before deregistering targets
+  deregistration_delay = 30
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+    timeout             = 10
+    interval            = 30
+    path                = "/DataServices/"
+    matcher             = "200,302,301"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+  }
+
+  stickiness {
+    type            = "lb_cookie"
+    enabled         = true
+    cookie_duration = 86400 # 1 day
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.lb_name}-dfi-tg"
+    },
+  )
+}
+
+# Target Group for DIS instances - only created if DIS instances exist
+resource "aws_lb_target_group" "dis" {
+  count    = local.dis_enabled ? 1 : 0
+  name     = "${local.lb_name}-dis-tg"
+  port     = 8080
+  protocol = "HTTP"
+  vpc_id   = var.account_config.shared_vpc_id
+
+  # Deregistration delay - how long to wait before deregistering targets
+  deregistration_delay = 30
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+    timeout             = 10
+    interval            = 30
+    path                = "/BOE/CMC/"
+    matcher             = "200,302,301"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+  }
+
+  stickiness {
+    type            = "lb_cookie"
+    enabled         = true
+    cookie_duration = 86400 # 1 day
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.lb_name}-dis-tg"
+    },
+  )
+}
+
+# Target Group for BWS instances - only created if BWS instances exist
+resource "aws_lb_target_group" "bws" {
+  count    = local.bws_enabled ? 1 : 0
+  name     = "${local.lb_name}-bws-tg"
+  port     = 7777
+  protocol = "HTTP"
+  vpc_id   = var.account_config.shared_vpc_id
+
+  # Deregistration delay - how long to wait before deregistering targets
+  deregistration_delay = 30
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+    timeout             = 10
+    interval            = 30
+    path                = "/BOE/CMC/"
+    matcher             = "200,302,301"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+  }
+
+  stickiness {
+    type            = "lb_cookie"
+    enabled         = true
+    cookie_duration = 86400 # 1 day
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.lb_name}-bws-tg"
+    },
+  )
+}
+
+# Target Group for BWS SSO instances - only created if BWS SSO instances exist
+resource "aws_lb_target_group" "bws_sso" {
+  count    = local.bws_sso_enabled ? 1 : 0
+  name     = "${local.lb_name}-bws-sso-tg"
+  port     = 7777
+  protocol = "HTTP"
+  vpc_id   = var.account_config.shared_vpc_id
+
+  # Deregistration delay - how long to wait before deregistering targets
+  deregistration_delay = 30
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+    timeout             = 10
+    interval            = 30
+    path                = "/BOE/CMC/"
+    matcher             = "200,302,301"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+  }
+
+  stickiness {
+    type            = "lb_cookie"
+    enabled         = true
+    cookie_duration = 86400 # 1 day
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.lb_name}-bws-sso-tg"
+    },
+  )
+}
+
+# Target Group for BCS_WIN instances - only created if BCS_WIN instances exist
+resource "aws_lb_target_group" "bcs_win" {
+  count    = local.bcs_win_enabled ? 1 : 0
+  name     = "${local.lb_name}-bcs-win-tg"
+  port     = 8080
+  protocol = "HTTP"
+  vpc_id   = var.account_config.shared_vpc_id
+
+  # Deregistration delay - how long to wait before deregistering targets
+  deregistration_delay = 30
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+    timeout             = 10
+    interval            = 30
+    path                = "/BOE/CMC/"
+    matcher             = "200,302,301"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+  }
+
+  stickiness {
+    type            = "lb_cookie"
+    enabled         = true
+    cookie_duration = 86400 # 1 day
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "${local.lb_name}-bcs-win-tg"
+    },
+  )
+}
+
+# HTTP listener - redirect to HTTPS
+resource "aws_lb_listener" "mis_http" {
+  count = var.lb_config != null ? 1 : 0
+
+  load_balancer_arn = aws_lb.mis[0].arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+
+  tags = local.tags
+}
+
+# HTTPS Listener (port 443) - default action is HTTP 501 if no rules are matched
+resource "aws_lb_listener" "mis_https" {
+  count = var.lb_config != null && var.acm_certificate != null ? 1 : 0
+
+  load_balancer_arn = aws_lb.mis[0].arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn   = module.acm_certificate[0].arn
+
+  default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Not implemented"
+      status_code  = "501"
+    }
+  }
+
+  tags = local.tags
+}
+
+resource "aws_lb_listener_rule" "dfi_https" {
+  count        = length(aws_lb_listener.mis_https) == 1 && local.dfi_enabled ? 1 : 0
+  listener_arn = aws_lb_listener.mis_https[0].arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.dfi[0].arn
+  }
+
+  condition {
+    host_header {
+      values = [local.dfi_fqdn]
+    }
+  }
+
+  tags = local.tags
+}
+
+resource "aws_lb_listener_rule" "dis_https" {
+  count        = length(aws_lb_listener.mis_https) == 1 && local.dis_enabled ? 1 : 0
+  listener_arn = aws_lb_listener.mis_https[0].arn
+  priority     = 200
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.dis[0].arn
+  }
+
+  condition {
+    host_header {
+      values = [local.dis_fqdn]
+    }
+  }
+
+  tags = local.tags
+}
+
+resource "aws_lb_listener_rule" "bws_https" {
+  count        = length(aws_lb_listener.mis_https) == 1 && local.bws_enabled ? 1 : 0
+  listener_arn = aws_lb_listener.mis_https[0].arn
+  priority     = lookup(var.lb_config, "bws_lb_rule_priority", 300)
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.bws[0].arn
+  }
+
+  condition {
+    host_header {
+      values = [
+        nonsensitive(local.bws_external_fqdn),
+        nonsensitive(local.bws_external_admin_fqdn),
+      ]
+    }
+  }
+
+  tags = local.tags
+}
+
+resource "aws_lb_listener_rule" "bws_sso_https" {
+  count        = length(aws_lb_listener.mis_https) == 1 && local.bws_sso_enabled ? 1 : 0
+  listener_arn = aws_lb_listener.mis_https[0].arn
+  priority     = 350
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.bws_sso[0].arn
+  }
+
+  condition {
+    host_header {
+      values = [local.bws_sso_fqdn]
+    }
+  }
+
+  tags = local.tags
+}
+
+resource "aws_lb_listener_rule" "bcs_win_https" {
+  count        = length(aws_lb_listener.mis_https) == 1 && local.bcs_win_enabled ? 1 : 0
+  listener_arn = aws_lb_listener.mis_https[0].arn
+  priority     = 400
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.bcs_win[0].arn
+  }
+
+  condition {
+    host_header {
+      values = [local.bcs_win_fqdn]
+    }
+  }
+
+  tags = local.tags
+}
+
+resource "aws_lb_listener_rule" "maintenance" {
+  count = length(aws_lb_listener.mis_https) == 1 && local.maintenance_rule_enabled ? 1 : 0
+
+  listener_arn = aws_lb_listener.mis_https[0].arn
+  priority     = 999
+
+  action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/html"
+      message_body = templatefile("${path.module}/templates/maintenance.html.tftpl", {
+        maintenance_title   = "NDMIS Reporting Maintenance Window"
+        maintenance_message = var.lb_config.maintenance_message
+      })
+      status_code = "200"
+    }
+  }
+
+  condition {
+    host_header {
+      values = [
+        nonsensitive(local.bws_external_fqdn),
+        local.bws_sso_fqdn,
+        local.maintenance_rule_fqdn,
+      ]
+    }
+  }
+
+  tags = local.tags
+}
+
+# ACM certificate using the modernisation platform pattern - dynamically includes SANs based on enabled services
+module "acm_certificate" {
+  count  = var.acm_certificate != null ? 1 : 0
+  source = "../../../../modules/acm_certificate"
+
+  providers = {
+    aws.core-vpc              = aws.core-vpc
+    aws.core-network-services = aws.core-network-services
+  }
+
+  name        = "${local.lb_name}-cert"
+  domain_name = var.acm_certificate.domain_name
+  subject_alternate_names = concat(var.acm_certificate.additional_subject_alternate_names, [
+    "${var.env_name}.${var.account_config.dns_suffix}",
+    "*.${var.env_name}.${var.account_config.dns_suffix}"
+  ])
+
+  external_validation_records_created = var.acm_certificate.external_validation_records_created
+
+  validation = {
+    "modernisation-platform.service.justice.gov.uk" = {
+      account   = "core-network-services"
+      zone_name = "modernisation-platform.service.justice.gov.uk."
+    }
+    "${var.env_name}.${var.account_config.dns_suffix}" = {
+      account   = "core-vpc"
+      zone_name = var.account_config.route53_external_zone.name
+    }
+    "*.${var.env_name}.${var.account_config.dns_suffix}" = {
+      account   = "core-vpc"
+      zone_name = var.account_config.route53_external_zone.name
+    }
+  }
+
+  tags = local.tags
+}
+
+# Attach DFI instances to the target group - only if DFI is enabled
+resource "aws_lb_target_group_attachment" "dfi_attachment" {
+  count            = local.dfi_enabled ? var.dfi_config.instance_count : 0
+  target_group_arn = aws_lb_target_group.dfi[0].arn
+  target_id        = module.dfi_instance[count.index].aws_instance.id
+  port             = 8080
+}
+
+# Attach DIS instances to the target group - only if DIS is enabled
+resource "aws_lb_target_group_attachment" "dis_attachment" {
+  count            = local.dis_enabled ? var.dis_config.instance_count : 0
+  target_group_arn = aws_lb_target_group.dis[0].arn
+  target_id        = module.dis_instance[count.index].aws_instance.id
+  port             = 8080
+}
+
+# Attach BWS instances to the target group - only if BWS is enabled
+resource "aws_lb_target_group_attachment" "bws_attachment" {
+  count            = local.bws_enabled ? var.bws_config.instance_count : 0
+  target_group_arn = aws_lb_target_group.bws[0].arn
+  target_id        = module.bws_instance[count.index].aws_instance.id
+  port             = 7777
+}
+
+# Attach BWS SSO instances to the target group - only if BWS SSO is enabled
+resource "aws_lb_target_group_attachment" "bws_sso_attachment" {
+  count            = local.bws_sso_enabled ? var.bws_sso_config.instance_count : 0
+  target_group_arn = aws_lb_target_group.bws_sso[0].arn
+  target_id        = module.bws_sso_instance[count.index].aws_instance.id
+  port             = 7777
+}
+
+# Attach BCS_WIN instances to the target group - only if BCS_WIN is enabled
+resource "aws_lb_target_group_attachment" "bcs_win_attachment" {
+  count            = local.bcs_win_enabled ? var.bcs_config_win.instance_count : 0
+  target_group_arn = aws_lb_target_group.bcs_win[0].arn
+  target_id        = module.bcs_win_instance[count.index].aws_instance.id
+  port             = 8080
+}
+
+# Create route53 entry for DFI - only if DFI is enabled
+resource "aws_route53_record" "dfi_entry" {
+  count    = local.dfi_enabled ? 1 : 0
+  provider = aws.core-vpc
+
+  zone_id = var.account_config.route53_external_zone.zone_id
+  name    = local.dfi_fqdn
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.mis[0].dns_name
+    zone_id                = aws_lb.mis[0].zone_id
+    evaluate_target_health = false
+  }
+}
+
+# Create route53 entry for DIS - only if DIS is enabled
+resource "aws_route53_record" "dis_entry" {
+  count    = local.dis_enabled ? 1 : 0
+  provider = aws.core-vpc
+
+  zone_id = var.account_config.route53_external_zone.zone_id
+  name    = local.dis_fqdn
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.mis[0].dns_name
+    zone_id                = aws_lb.mis[0].zone_id
+    evaluate_target_health = false
+  }
+}
+
+# Create route53 entry for BWS - only if BWS is enabled
+resource "aws_route53_record" "bws_entry" {
+  count    = local.bws_enabled ? 1 : 0
+  provider = aws.core-vpc
+
+  zone_id = var.account_config.route53_external_zone.zone_id
+  name    = local.bws_fqdn
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.mis[0].dns_name
+    zone_id                = aws_lb.mis[0].zone_id
+    evaluate_target_health = false
+  }
+}
+
+# Create route53 entry for BWS admin - only if BWS is enabled
+resource "aws_route53_record" "bws_admin_entry" {
+  count    = local.bws_enabled ? 1 : 0
+  provider = aws.core-vpc
+
+  zone_id = var.account_config.route53_external_zone.zone_id
+  name    = local.bws_admin_fqdn
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.mis[0].dns_name
+    zone_id                = aws_lb.mis[0].zone_id
+    evaluate_target_health = false
+  }
+}
+
+# Create route53 entry for BWS SSO - only if BWS SSO is enabled
+resource "aws_route53_record" "bws_sso_entry" {
+  count    = local.bws_sso_enabled ? 1 : 0
+  provider = aws.core-vpc
+
+  zone_id = var.account_config.route53_external_zone.zone_id
+  name    = local.bws_sso_fqdn
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.mis[0].dns_name
+    zone_id                = aws_lb.mis[0].zone_id
+    evaluate_target_health = false
+  }
+}
+
+# Create route53 entry for BCS_WIN - only if BCS_WIN is enabled
+resource "aws_route53_record" "bcs_win_entry" {
+  count    = local.bcs_win_enabled ? 1 : 0
+  provider = aws.core-vpc
+
+  zone_id = var.account_config.route53_external_zone.zone_id
+  name    = local.bcs_win_fqdn
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.mis[0].dns_name
+    zone_id                = aws_lb.mis[0].zone_id
+    evaluate_target_health = false
+  }
+}
+
+# Create route53 entry for testing maintenance mode page
+resource "aws_route53_record" "maintenance_entry" {
+  count    = local.maintenance_rule_enabled ? 1 : 0
+  provider = aws.core-vpc
+
+  zone_id = var.account_config.route53_external_zone.zone_id
+  name    = local.maintenance_rule_fqdn
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.mis[0].dns_name
+    zone_id                = aws_lb.mis[0].zone_id
+    evaluate_target_health = false
+  }
+}

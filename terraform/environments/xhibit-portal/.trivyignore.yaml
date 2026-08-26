@@ -1,0 +1,21 @@
+vulnerabilities:
+  - id: CVE-2025-27152
+    statement: Accept the risk of axios to pass the checks
+  - id: CVE-2022-23539
+    statement: Accept the risk of jsonwebtoken to pass the checks
+  - id: CVE-2022-25883
+    statement: Accept the risk of semver to pass the checks
+  - id: CVE-2025-27152
+    statement: Legacy system requires axios 0.21.4
+  - id: CVE-2022-25883
+    statement: Server usage does not expose ReDoS risk in our application
+
+misconfigurations:
+  - id: AVD-AWS-0047
+  - id: AVD-AWS-0052
+  - id: AVD-AWS-0053
+  - id: AVD-AWS-0086
+  - id: AVD-AWS-0087
+  - id: AVD-AWS-0091
+  - id: AVD-AWS-0093
+  - id: AVD-AWS-0107

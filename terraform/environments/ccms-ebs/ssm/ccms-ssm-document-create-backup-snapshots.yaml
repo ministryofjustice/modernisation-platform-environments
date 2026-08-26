@@ -1,0 +1,15 @@
+# ccms-ssm-create-backup-snapshots.yaml
+---
+schemaVersion: "2.2"
+description: Run the ec2-create-snapshots-with-tags.py script.
+mainSteps:
+  - name: OracleCreateBackupSnapshots
+    action: aws:runShellScript
+    isEnd: true
+    precondition:
+      StringEquals:
+        - platformType
+        - Linux
+    inputs:
+      runCommand:
+        - "/root/aws-scripts/ec2-create-snapshots-with-tags.py"

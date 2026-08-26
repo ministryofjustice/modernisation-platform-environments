@@ -1,0 +1,58 @@
+{
+  "accounts": {
+    "development": {
+      "environment_name": "development",
+      "container_port": 80,
+      "client_id": "7ee6af8d-ea3c-4349-8765-644f2a1edf3b",
+      "instance_type": "t3.xlarge",
+      "app_count": 1,
+      "ec2_desired_capacity": 1,
+      "ec2_max_size": 3,
+      "ec2_min_size": 1,
+      "db_instance_class": "db.t3.small",
+      "db_user": "dbadmin",
+      "db_allocated_storage": "100",
+      "db_name": "ifs-dev",
+      "env_name": "DEVELOPMENT",
+      "db_instance_identifier": "db-ifs-dev",
+      "s3_bucket_name": "ifs-dev-bucket",
+      "db_snapshot_identifier": "arn:aws:rds:eu-west-2:425030398367:snapshot:dev-staging-db-11-june-24-updated"
+    },
+    "preproduction": {
+      "environment_name": "staging",
+      "container_port": 80,
+      "client_id": "6a941975-c916-4189-b650-e7b1f1ed7975",
+      "instance_type": "m5.xlarge",
+      "app_count": 2,
+      "ec2_desired_capacity": 2,
+      "ec2_max_size": 4,
+      "ec2_min_size": 2,
+      "db_instance_class": "db.t3.small",
+      "db_user": "dbadmin",
+      "db_allocated_storage": "100",
+      "db_name": "ifs-staging",
+      "env_name": "STAGING",
+      "db_instance_identifier": "db-ifs-staging",
+      "s3_bucket_name": "ifs-staging-bucket",
+      "db_snapshot_identifier": "arn:aws:rds:eu-west-2:613903586696:snapshot:ifs-cdpt-dev-staging-feb-12-2024"
+    },
+    "production": {
+      "environment_name": "production",
+      "container_port": 80,
+      "client_id": "9cbaafe4-95bb-4175-8133-b6c53197c2b8",
+      "instance_type": "m5.xlarge",
+      "app_count": 2,
+      "ec2_desired_capacity": 2,
+      "ec2_max_size": 4,
+      "ec2_min_size": 2,
+      "db_instance_class": "db.t3.small",
+      "db_user": "dbadmin",
+      "db_allocated_storage": "100",
+      "db_name": "IntegratedFraud",
+      "env_name": "PRODUCTION",
+      "db_instance_identifier": "db-ifs-production",
+      "s3_bucket_name": "ifs-production-bucket",
+      "db_snapshot_identifier": "arn:aws:rds:eu-west-2:613903586696:snapshot:ifs-production-db-02-04-2024"
+    }
+  }
+}

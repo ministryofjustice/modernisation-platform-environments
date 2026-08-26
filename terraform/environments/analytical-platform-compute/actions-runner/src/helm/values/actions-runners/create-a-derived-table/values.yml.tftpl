@@ -1,0 +1,41 @@
+---
+github:
+  app:
+    applicationID: "${github_app_application_id}"
+    installationID: "${github_app_installation_id}"
+  organisation: ${github_organisation}
+  repository: ${github_repository}
+  runner:
+    labels: ${github_runner_labels}
+
+resources:
+  requests:
+    cpu: 2
+    memory: "16Gi"
+  limits:
+    cpu: 4
+    memory: "32Gi"
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: ${eks_role_arn}
+
+hostAliases:
+  - ip: "10.168.1.14"
+    hostnames:
+      - "mi-synapse-dev.sql.azuresynapse.net"
+  - ip: "10.168.1.15"
+    hostnames:
+      - "mi-synapse-dev.dev.azuresynapse.net"
+  - ip: "10.168.1.16"
+    hostnames:
+      - "mi-synapse-dev-ondemand.sql.azuresynapse.net"
+  - ip: "10.168.5.16"
+    hostnames:
+      - "mi-synapse-prod.sql.azuresynapse.net"
+  - ip: "10.168.5.17"
+    hostnames:
+      - "mi-synapse-prod-ondemand.sql.azuresynapse.net"
+  - ip: "10.168.5.18"
+    hostnames:
+      - "mi-synapse-prod.dev.azuresynapse.net"

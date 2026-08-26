@@ -1,0 +1,19 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+      {
+          "Sid": "VisualEditor0",
+          "Effect": "Allow",
+          "Action": [
+              "ses:SendEmail",
+              "ses:SendRawEmail"
+          ],
+          "Resource": "arn:aws:ses:*:*:identity/*",
+          "Condition": {
+              "IpAddress": {
+                  "aws:SourceIp": ${private_subnets}
+              }
+          }
+      }
+  ]
+}

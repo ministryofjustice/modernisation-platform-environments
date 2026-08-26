@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Default queue",
+    "query_group": [],
+    "query_group_wild_card": 0,
+    "user_group": [],
+    "user_group_wild_card": 0,
+    "auto_wlm": true,
+    "concurrency_scaling": "auto",
+    "rules": [
+      {
+        "rule_name": "rule_query_execution",
+        "predicate": [
+          {
+            "metric_name": "query_execution_time",
+            "operator": ">",
+            "value": 600
+          }
+        ],
+        "action": "abort"
+      }
+    ]
+  },
+  {
+    "short_query_queue": true
+  }
+]

@@ -1,0 +1,140 @@
+
+# YJSM EC2 Instance
+locals {
+  yjsm_buckets = jsonencode([
+    "arn:aws:s3:::yjaf-${local.environment}-cms",
+    "arn:aws:s3:::yjaf-${local.environment}-yjsm",
+    "arn:aws:s3:::yjaf-${local.environment}-mis",
+    "arn:aws:s3:::yjaf-${local.environment}-bedunlock",
+    "arn:aws:s3:::yjaf-${local.environment}-yjsm-artefact",
+    "arn:aws:s3:::yjaf-${local.environment}-bands",
+    "arn:aws:s3:::yjaf-${local.environment}-cmm",
+    "arn:aws:s3:::yjaf-${local.environment}-yjsm-backup/*"
+  ])
+  yjsm_buckets_wildcarded = jsonencode([
+    "arn:aws:s3:::yjaf-${local.environment}-cms/*",
+    "arn:aws:s3:::yjaf-${local.environment}-yjsm/*",
+    "arn:aws:s3:::yjaf-${local.environment}-mis/*",
+    "arn:aws:s3:::yjaf-${local.environment}-bedunlock/*",
+    "arn:aws:s3:::yjaf-${local.environment}-bands/*",
+    "arn:aws:s3:::yjaf-${local.environment}-yjsm-artefact/*",
+    "arn:aws:s3:::yjaf-${local.environment}-cmm/*",
+    "arn:aws:s3:::yjaf-${local.environment}-yjsm-backup/*"
+  ])
+}
+
+module "yjsm" {
+  source = "./modules/yjsm"
+
+  #Network details
+  vpc_id              = data.aws_vpc.shared.id
+  subnet_id           = one(tolist([for s in local.private_subnet_list : s.id if s.availability_zone == "eu-west-2a"]))
+  private_subnet_list = local.private_subnet_list
+  # create 2nd instance for updating AMI 
+  create_secondary = true
+  # Assigning private IP based on environment
+  private_ip = lookup(
+    {
+      development   = "10.26.144.61"
+      test          = "10.26.152.172"
+      preproduction = "10.27.144.83"
+      production    = "10.27.152.21"
+    },
+    local.environment,
+    null # Default to null, allowing AWS to auto-assign an IP
+  )
+  private_ip_secondary = lookup(
+    {
+      development   = "10.26.144.104"
+      test          = "10.26.152.145"
+      preproduction = "10.27.144.18"
+      production    = "10.27.152.34"
+    },
+    local.environment, null
+  )
+
+  ami = lookup(
+    {
+      development   = "ami-078b41f5b9f1cd570"
+      test          = "ami-0446119d598dab429"
+      preproduction = "ami-0db3f60945a0983d6"
+      production    = "ami-0be9396f2bf4f21c1"
+      # Add more environments when AMIs are known
+    },
+    local.environment,
+    "ami-01426769db5cd0a43" # Default AMI
+  )
+
+  project_name = local.project_name
+  environment  = local.environment
+  tags         = local.tags
+
+
+  secret_kms_key_arn = module.kms.key_arn
+  # Security Group IDs
+  ecs_service_internal_sg_id = module.ecs.ecs_service_internal_sg_id
+  ecs_service_external_sg_id = module.ecs.ecs_service_external_sg_id
+  #  esb_service_sg_id             = module.esb.esb_security_group_id
+  ecs_autoscaling_sg_id         = module.ecs.autoscaling_sg_id
+  rds_cluster_security_group_id = module.aurora.rds_cluster_security_group_id
+  rds_proxy_security_group_id   = module.aurora.rds_proxy_security_group_id
+  alb_security_group_id         = module.internal_alb.alb_security_group_id
+  connectivity_alb_sg_id        = module.connectivity_alb.alb_security_group_id
+  management_server_sg_id       = module.ds.management_server_sg_id
+  #Keep until prod images are done
+  tableau_sg_id = module.tableau.tableau_sg_id
+
+  region       = data.aws_region.current.name
+  account_id   = data.aws_caller_identity.current.account_id
+  cluster_name = "yjaf-cluster"
+
+  yjsm_role_additional_policies_arns = [
+    aws_iam_policy.yjsm-s3-access.arn,
+    aws_iam_policy.yjsm-ses-access.arn,
+    aws_iam_policy.yjsm-rds-iam-auth.arn
+  ]
+
+  yjsm_secrets_access_policy_secret_arns = jsonencode([
+    for s in [
+      module.aurora.app_rotated_postgres_secret_arn,
+      aws_secretsmanager_secret.auto_admit_secret.arn,
+      aws_secretsmanager_secret.jwt_secret.arn,
+      try(aws_secretsmanager_secret.yjsm_hub_doc_gateway_auth[0].arn, null)
+    ] : s if s != null
+  ])
+}
+
+
+resource "aws_iam_policy" "yjsm-s3-access" {
+  name        = "${local.project_name}-yjsm-s3-access"
+  description = "Policy for yjsm task role to access yjaf buckets"
+  policy = templatefile("${path.module}/iam_policies/s3_user_policy.json", {
+    dal_buckets            = local.yjsm_buckets
+    dal_buckets_wildcarded = local.yjsm_buckets_wildcarded
+  })
+}
+
+resource "aws_iam_policy" "yjsm-ses-access" {
+  name        = "${local.project_name}-yjsm-ses-access"
+  description = "Policy for yjsm task role to access SES"
+  policy      = file("${path.module}/iam_policies/ses_user_policy.json")
+}
+
+resource "aws_iam_policy" "yjsm-rds-iam-auth" {
+  name        = "${local.project_name}-yjsm-rds-iam-auth"
+  description = "Allows yjsm EC2 role to authenticate to the Aurora cluster and RDS Proxy via IAM database authentication"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "rds-db:connect"
+        Resource = [
+          "arn:aws:rds-db:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:dbuser:${module.aurora.cluster_resource_id}/yjaf_service_iam_user",
+          "arn:aws:rds-db:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:dbuser:${module.aurora.rds_proxy_resource_id}/yjaf_service_iam_user"
+        ]
+      }
+    ]
+  })
+}

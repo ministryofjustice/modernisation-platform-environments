@@ -1,0 +1,55 @@
+# Upgrading the IAM module from v5.x to v6.x introduces breaking changes that cause IAM roles and policies to be replaced. Therefore, we are not proceeding with the version upgrade.
+data "aws_iam_policy_document" "mlflow" {
+  count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
+
+  statement {
+    sid    = "AllowKMS"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt*",
+      "kms:Decrypt*",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:Describe*"
+    ]
+    resources = [module.mlflow_s3_kms[0].key_arn]
+  }
+  statement {
+    sid     = "AllowS3List"
+    effect  = "Allow"
+    actions = ["s3:ListBucket"]
+    resources = [
+      module.mlflow_bucket[0].s3_bucket_arn,
+      "arn:aws:s3:::${local.environment_configuration.mlflow_s3_bucket_name}"
+    ]
+  }
+  statement {
+    sid    = "AllowS3Write"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject"
+    ]
+    resources = [
+      "${module.mlflow_bucket[0].s3_bucket_arn}/*",
+      "arn:aws:s3:::${local.environment_configuration.mlflow_s3_bucket_name}/*"
+    ]
+  }
+}
+
+module "mlflow_iam_policy" {
+  count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
+
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.59.0"
+
+  name_prefix = "mlflow"
+
+  policy = data.aws_iam_policy_document.mlflow[0].json
+
+  tags = local.tags
+}

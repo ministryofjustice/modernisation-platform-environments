@@ -1,0 +1,79 @@
+---
+namespaceOverride: prometheus
+
+# These are handled by kubernetes_manifest.prometheus_operator_crds
+crds:
+  enabled: false
+
+defaultRules:
+  create: false
+
+alertmanager:
+  enabled: false
+
+grafana:
+  enabled: false
+
+kube-state-metrics:
+  replicas: 2
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+  extraArgs:
+    - --metric-labels-allowlist=pods=[*]
+
+prometheusOperator:
+  nodeSelector:
+    compute.data-platform.service.justice.gov.uk/node: system
+  tolerations:
+    - key: compute.data-platform.service.justice.gov.uk/node
+      operator: Equal
+      value: system
+      effect: NoSchedule
+  admissionWebhooks:
+    deployment:
+      nodeSelector:
+        compute.data-platform.service.justice.gov.uk/node: system
+      tolerations:
+        - key: compute.data-platform.service.justice.gov.uk/node
+          operator: Equal
+          value: system
+          effect: NoSchedule
+    patch:
+      nodeSelector:
+        compute.data-platform.service.justice.gov.uk/node: system
+      tolerations:
+        - key: compute.data-platform.service.justice.gov.uk/node
+          operator: Equal
+          value: system
+          effect: NoSchedule
+
+prometheus:
+  agentMode: true
+  serviceAccount:
+    create: true
+    name: prometheus
+    annotations:
+      eks.amazonaws.com/role-arn: ${eks_role_arn}
+  prometheusSpec:
+    nodeSelector:
+      compute.data-platform.service.justice.gov.uk/node: system
+    tolerations:
+      - key: compute.data-platform.service.justice.gov.uk/node
+        operator: Equal
+        value: system
+        effect: NoSchedule
+    podMonitorSelectorNilUsesHelmValues: {}
+    serviceMonitorSelectorNilUsesHelmValues: {}
+    remoteWrite:
+      - url: https://aps-workspaces.${aws_region}.amazonaws.com/workspaces/${amp_workspace_id}/api/v1/remote_write
+        sigv4:
+          region: ${aws_region}
+        queueConfig:
+          maxSamplesPerSend: 1000
+          maxShards: 200
+          capacity: 2500

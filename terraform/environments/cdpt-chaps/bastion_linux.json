@@ -1,0 +1,16 @@
+{
+  "keys": {
+    "development": {
+      "acurtis": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP7Z+QprFiensJ1Kw08i9shm5lfritcI3/71nrDu2S3H alistair.curtis@digital.justice.gov.uk",
+      "dpenny": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOq5+EA5EbAiS0A3M3gum9zKIx67uFmHfFlSjGOj9J+M daniel.penny@igital.justice.gov.uk"
+    },
+    "preproduction": {
+      "acurtis": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP7Z+QprFiensJ1Kw08i9shm5lfritcI3/71nrDu2S3H alistair.curtis@digital.justice.gov.uk",
+      "dpenny": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOq5+EA5EbAiS0A3M3gum9zKIx67uFmHfFlSjGOj9J+M daniel.penny@igital.justice.gov.uk"
+    },
+    "production": {
+      "acurtis": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP7Z+QprFiensJ1Kw08i9shm5lfritcI3/71nrDu2S3H alistair.curtis@digital.justice.gov.uk",
+      "dpenny": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOq5+EA5EbAiS0A3M3gum9zKIx67uFmHfFlSjGOj9J+M daniel.penny@igital.justice.gov.uk"
+    }
+  }
+}

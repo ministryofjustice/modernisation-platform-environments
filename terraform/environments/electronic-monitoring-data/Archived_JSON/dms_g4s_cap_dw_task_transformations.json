@@ -1,0 +1,50 @@
+{
+  "rules": [
+    {
+      "rule-type": "selection",
+      "rule-id": "01",
+      "rule-name": "select-table",
+      "object-locator": {
+        "schema-name": "dbo",
+        "table-name": "Log_LoadErrors"
+      },
+      "rule-action": "include",
+      "load-order": "1",
+      "filters": [],
+      "parallel-load": null,
+      "isAutoSegmentationChecked": false
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "011",
+      "rule-name": "add_column_011",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "dbo",
+        "table-name": "Log_LoadErrors"
+      },
+      "rule-action": "add-column",
+      "expression": "trim(replace(replace($ErrorMessage, char(13), ''), char(10), ''))",
+      "value": "ErrorMessage_V2",
+      "data-type": {
+        "type": "string",
+        "length": 700
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "012",
+      "rule-name": "remove_column_012",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "dbo",
+        "table-name": "Log_LoadErrors",
+        "column-name": "ErrorMessage"
+      },
+      "parallel-load": null,
+      "rule-action": "remove-column",
+      "value": null,
+      "old-value": null
+    }
+  ]
+}

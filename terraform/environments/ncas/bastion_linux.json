@@ -1,0 +1,19 @@
+{
+  "keys": {
+    "development": {
+      "mgbutler": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDeRxdAAvyFpWSShknO5QoWnGeWYFDkJgvmgnuWXeLuW mark.butler@hmcts.net",
+      "msearle": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICiTx+wk2mMk3StUKAcbEZFuDGvRyix6IlZrgfM9lS0G matthew.searle@hmcts.net",
+      "mkolakowski": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL73/Le9uGDjmXiVpPFtMmjbM2JkGmj3XVB9VPD6hweb mateusz.kolakowski@justice.gov.uk"
+    },
+    "preproduction": {
+      "mgbutler": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDeRxdAAvyFpWSShknO5QoWnGeWYFDkJgvmgnuWXeLuW mark.butler@hmcts.net",
+      "msearle": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICiTx+wk2mMk3StUKAcbEZFuDGvRyix6IlZrgfM9lS0G matthew.searle@hmcts.net",
+      "mkolakowski": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL73/Le9uGDjmXiVpPFtMmjbM2JkGmj3XVB9VPD6hweb mateusz.kolakowski@justice.gov.uk"
+    },
+    "production": {
+      "mgbutler": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDeRxdAAvyFpWSShknO5QoWnGeWYFDkJgvmgnuWXeLuW mark.butler@hmcts.net",
+      "msearle": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICiTx+wk2mMk3StUKAcbEZFuDGvRyix6IlZrgfM9lS0G matthew.searle@hmcts.net",
+      "mkolakowski": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL73/Le9uGDjmXiVpPFtMmjbM2JkGmj3XVB9VPD6hweb mateusz.kolakowski@justice.gov.uk"
+    }
+  }
+}

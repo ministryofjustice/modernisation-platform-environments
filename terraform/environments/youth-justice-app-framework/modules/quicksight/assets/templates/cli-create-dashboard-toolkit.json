@@ -1,0 +1,51 @@
+{
+  "AwsAccountId": "${aws_account_id}",
+  "DashboardId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5",
+  "Name": "Disparity_Toolkit_v1_2",
+  "Permissions": [
+    {
+      "Principal": "arn:aws:quicksight:eu-west-2:${aws_account_id}:user/default/quicksight-admin-access/david.seekins",
+      "Actions": [
+        "quicksight:DescribeDashboard",
+        "quicksight:ListDashboardVersions",
+        "quicksight:UpdateDashboardPermissions",
+        "quicksight:QueryDashboard",
+        "quicksight:UpdateDashboard",
+        "quicksight:DeleteDashboard",
+        "quicksight:DescribeDashboardPermissions",
+        "quicksight:UpdateDashboardPublishedVersion"
+      ]
+    }
+  ],
+  "SourceEntity": {
+    "SourceTemplate": {
+      "DataSetReferences": [
+        {
+          "DataSetPlaceholder": "Personal Data",
+          "DataSetArn": "arn:aws:quicksight:eu-west-2:${aws_account_id}:dataset/03b1c5a2-fe9a-4219-b8cc-9b248cefd324"
+        },
+        {
+          "DataSetPlaceholder": "Outcome Data",
+          "DataSetArn": "arn:aws:quicksight:eu-west-2:${aws_account_id}:dataset/b2717907-0301-4daa-b777-5f662a2ebd40"
+        },
+        {
+          "DataSetPlaceholder": "Offence Data",
+          "DataSetArn": "arn:aws:quicksight:eu-west-2:${aws_account_id}:dataset/d8ea9805-4eff-40c6-b6f5-8e11f566a7a0"
+        }
+      ],
+      "Arn": "arn:aws:quicksight:eu-west-2:066012302209:template/Disparity_Toolkit_v1_2"
+    }
+  },
+  "VersionDescription": "1",
+  "DashboardPublishOptions": {
+    "AdHocFilteringOption": {
+      "AvailabilityStatus": "DISABLED"
+    },
+    "ExportToCSVOption": {
+      "AvailabilityStatus": "ENABLED"
+    },
+    "SheetControlsOption": {
+      "VisibilityState": "EXPANDED"
+    }
+  }
+}

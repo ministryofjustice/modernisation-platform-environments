@@ -1,0 +1,358 @@
+resource "aws_sns_topic" "emds_alerts" {
+  name              = "emds-alerts-${local.environment_shorthand}"
+  kms_master_key_id = aws_kms_key.emds_alerts.arn
+
+  http_success_feedback_role_arn    = aws_iam_role.sns_delivery_logging.arn
+  http_failure_feedback_role_arn    = aws_iam_role.sns_delivery_logging.arn
+  http_success_feedback_sample_rate = 0
+}
+
+resource "aws_sns_topic" "operational_incident_updates" {
+  name              = "operational-incident-updates-${local.environment_shorthand}"
+  kms_master_key_id = aws_kms_key.emds_alerts.arn
+
+  http_success_feedback_role_arn    = aws_iam_role.sns_delivery_logging.arn
+  http_failure_feedback_role_arn    = aws_iam_role.sns_delivery_logging.arn
+  http_success_feedback_sample_rate = 0
+
+  tags = local.tags
+}
+
+resource "aws_kms_key" "emds_alerts" {
+  description         = "KMS key for EMDS SNS alerts"
+  enable_key_rotation = true
+  policy              = data.aws_iam_policy_document.emds_alerts_kms.json
+}
+
+data "aws_iam_policy_document" "emds_alerts_kms" {
+  statement {
+    sid       = "AllowAccountRootFullAccess"
+    effect    = "Allow"
+    actions   = ["kms:*"]
+    resources = ["*"]
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+      ]
+    }
+  }
+
+  statement {
+    sid       = "AllowSNSUseOfKey"
+    effect    = "Allow"
+    resources = ["*"]
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+    ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["sns.amazonaws.com"]
+    }
+  }
+
+  statement {
+    sid       = "AllowCloudWatchUseOfKey"
+    effect    = "Allow"
+    resources = ["*"]
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+    ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudwatch.amazonaws.com"]
+    }
+  }
+
+  statement {
+    sid       = "AllowMdssDailyFailureDigestUseOfKey"
+    effect    = "Allow"
+    resources = ["*"]
+    actions   = ["kms:Decrypt", "kms:GenerateDataKey"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.mdss_daily_failure_digest.arn]
+    }
+  }
+
+  statement {
+    sid       = "AllowCloudwatchAlarmThreaderUseOfKey"
+    effect    = "Allow"
+    resources = ["*"]
+    actions   = ["kms:Decrypt", "kms:GenerateDataKey"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.cloudwatch_alarm_threader.arn]
+    }
+  }
+
+  statement {
+    sid       = "AllowStagingDbJanitorUseOfKey"
+    effect    = "Allow"
+    resources = ["*"]
+    actions   = ["kms:Decrypt", "kms:GenerateDataKey"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.staging_db_janitor.arn]
+    }
+  }
+
+  statement {
+    sid       = "AllowLandingDlqRedriverUseOfKey"
+    effect    = "Allow"
+    resources = ["*"]
+    actions   = ["kms:Decrypt", "kms:GenerateDataKey"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.landing_dlq_redriver.arn]
+    }
+  }
+
+  statement {
+    sid       = "AllowLiveFeedIncidentManagerUseOfKey"
+    effect    = "Allow"
+    resources = ["*"]
+    actions   = ["kms:Decrypt", "kms:GenerateDataKey"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.live_feed_incident_manager.arn]
+    }
+  }
+}
+
+
+data "aws_iam_policy_document" "emds_alerts_topic_policy" {
+  version = "2012-10-17"
+
+  statement {
+    sid    = "AllowCloudWatchToPublish"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [aws_sns_topic.emds_alerts.arn]
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "cloudwatch.amazonaws.com",
+      ]
+    }
+  }
+
+  statement {
+    sid    = "AllowMdssDailyFailureDigestLambdaToPublish"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [aws_sns_topic.emds_alerts.arn]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.mdss_daily_failure_digest.arn]
+    }
+  }
+
+  statement {
+    sid    = "AllowCloudwatchAlarmThreaderLambdaToPublish"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [aws_sns_topic.emds_alerts.arn]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.cloudwatch_alarm_threader.arn]
+    }
+  }
+
+  statement {
+    sid    = "AllowStagingDbJanitorLambdaToPublish"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [aws_sns_topic.emds_alerts.arn]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.staging_db_janitor.arn]
+    }
+  }
+
+  statement {
+    sid    = "AllowLandingDlqRedriverLambdaToPublish"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [aws_sns_topic.emds_alerts.arn]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.landing_dlq_redriver.arn]
+    }
+  }
+
+  statement {
+    sid    = "AllowLiveFeedIncidentManagerLambdaToPublish"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [aws_sns_topic.emds_alerts.arn]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.live_feed_incident_manager.arn]
+    }
+  }
+
+  statement {
+    sid    = "AllowChatbotToConsume"
+    effect = "Allow"
+
+    actions = [
+      "sns:Subscribe",
+      "sns:Receive",
+      "sns:Publish",
+    ]
+
+    resources = [aws_sns_topic.emds_alerts.arn]
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "sns.amazonaws.com",
+        "events.amazonaws.com",
+        "chatbot.amazonaws.com",
+      ]
+    }
+  }
+}
+
+resource "aws_sns_topic_policy" "emds_alerts" {
+  arn    = aws_sns_topic.emds_alerts.arn
+  policy = data.aws_iam_policy_document.emds_alerts_topic_policy.json
+}
+data "aws_iam_policy_document" "operational_incident_updates_topic_policy" {
+  version = "2012-10-17"
+
+  statement {
+    sid    = "AllowLiveFeedIncidentManagerLambdaToPublish"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [
+      aws_sns_topic.operational_incident_updates.arn,
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.live_feed_incident_manager.arn]
+    }
+  }
+
+  statement {
+    sid    = "AllowChatbotToConsume"
+    effect = "Allow"
+
+    actions = [
+      "sns:Subscribe",
+      "sns:Receive",
+      "sns:Publish",
+    ]
+
+    resources = [
+      aws_sns_topic.operational_incident_updates.arn,
+    ]
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "sns.amazonaws.com",
+        "chatbot.amazonaws.com",
+      ]
+    }
+  }
+}
+
+resource "aws_sns_topic_policy" "operational_incident_updates" {
+  arn    = aws_sns_topic.operational_incident_updates.arn
+  policy = data.aws_iam_policy_document.operational_incident_updates_topic_policy.json
+}
+
+resource "aws_sqs_queue" "emds_alerts_dlq" {
+  name                       = "emds-alerts-dlq"
+  sqs_managed_sse_enabled    = true
+  visibility_timeout_seconds = 60
+  message_retention_seconds  = 1209600
+}
+
+# -----------------------------------------------------------------------------------
+# SNS delivery status logging role (for HTTPS / Chatbot)
+# -----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "sns_delivery_logging_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["sns.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "sns_delivery_logging" {
+  name               = "sns-delivery-status-logging-${local.environment_shorthand}"
+  assume_role_policy = data.aws_iam_policy_document.sns_delivery_logging_assume.json
+}
+
+data "aws_iam_policy_document" "sns_delivery_logging_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role_policy" "sns_delivery_logging" {
+  role   = aws_iam_role.sns_delivery_logging.id
+  policy = data.aws_iam_policy_document.sns_delivery_logging_policy.json
+}

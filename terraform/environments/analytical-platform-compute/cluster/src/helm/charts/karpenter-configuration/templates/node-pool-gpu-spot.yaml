@@ -1,0 +1,35 @@
+---
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: gpu-spot
+spec:
+  disruption:
+    consolidationPolicy: WhenEmpty
+    consolidateAfter: 5m
+  template:
+    metadata:
+      labels:
+        compute.analytical-platform.service.justice.gov.uk/karpenter-node-pool: "gpu-spot"
+    spec:
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: bottlerocket-gpu
+      taints:
+        - key: compute.analytical-platform.service.justice.gov.uk/karpenter-node-pool
+          value: "gpu-spot"
+          effect: NoSchedule
+      requirements:
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["amd64"]
+        - key: kubernetes.io/os
+          operator: In
+          values: ["linux"]
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["spot"]
+        - key: karpenter.k8s.aws/instance-family
+          operator: In
+          values: ["g5", "g6"]

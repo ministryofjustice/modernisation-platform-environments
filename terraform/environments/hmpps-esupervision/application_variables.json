@@ -1,0 +1,25 @@
+{
+  "accounts": {
+    "development": {
+      "example_var": "dev-data",
+      "developer_role_suffix": "912d55d6a0a637c8",
+      "service_account_roles": {
+        "CloudPlatformDev": "arn:aws:iam::754256621582:role/cloud-platform-irsa-32bf67b5a4984757-live",
+        "CloudPlatformTest": "arn:aws:iam::754256621582:role/cloud-platform-irsa-27ea034e8f3be2ca-live"
+      }
+    },
+    "test": {
+      "example_var": "test-data"
+    },
+    "preproduction": {
+      "example_var": "preproduction-data"
+    },
+    "production": {
+      "example_var": "production-data",
+      "service_account_roles": {
+        "CloudPlatformPreprod": "arn:aws:iam::754256621582:role/cloud-platform-irsa-7007cde073dea812-live",
+        "CloudPlatformProd": "arn:aws:iam::754256621582:role/cloud-platform-irsa-3d0b407608fa4fc8-live"
+      }
+    }
+  }
+}

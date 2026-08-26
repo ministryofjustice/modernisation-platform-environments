@@ -1,0 +1,1 @@
+terraform/environments/nomis/templates/jumpserver-user-data.yaml.tftpl linguist-language=YAML

@@ -1,0 +1,97 @@
+#### This file can be used to store locals specific to the member account ####
+
+locals {
+  account_info = {
+    business_unit    = var.networking[0].business-unit
+    region           = "eu-west-2"
+    vpc_id           = data.aws_vpc.shared.id
+    application_name = local.application_name
+    mp_environment   = local.environment
+    id               = data.aws_caller_identity.current.account_id
+  }
+  account_config = {
+    shared_vpc_cidr    = data.aws_vpc.shared.cidr_block
+    private_subnet_ids = data.aws_subnets.shared-private.ids
+    public_subnet_ids  = data.aws_subnets.shared-public.ids
+    data_subnet_ids               = data.aws_subnets.shared-data.ids
+    data_subnet_a_id              = data.aws_subnet.data_subnets_a.id
+    route53_inner_zone            = data.aws_route53_zone.inner
+    route53_network_services_zone = data.aws_route53_zone.network-services
+    route53_external_zone         = data.aws_route53_zone.external
+    shared_vpc_id                 = data.aws_vpc.shared.id
+    kms_keys = {
+      ebs_shared     = data.aws_kms_key.ebs_shared.arn
+      general_shared = data.aws_kms_key.general_shared.arn
+      rds_shared     = data.aws_kms_key.rds_shared.arn
+    }
+    dns_suffix          = "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+    internal_dns_suffix = "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.internal"
+  }
+
+  app_config = lookup(local.application_data["accounts"], terraform.workspace) # only use current env
+
+  bastion_config = {}
+  app_port       = 80
+  internal_security_group_cidrs = distinct(flatten([
+    module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
+    module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
+    module.ip_addresses.moj_cidrs.trusted_mojo_public,
+    module.ip_addresses.moj_cidr.ark_dc_external_internet,
+    module.ip_addresses.moj_cidr.vodafone_dia_networks,
+    module.ip_addresses.moj_cidr.palo_alto_prisma_access_corporate,
+    module.ip_addresses.moj_cidr.mojo_azure_landing_zone_egress,
+    [
+      # Route53 Healthcheck Access Cidrs
+      # London Region not support yet, so metrics are not yet publised, can be enabled at later stage for Route53 endpoint monitor
+      "15.177.0.0/18",     # GLOBAL Region
+      "54.251.31.128/26",  # ap-southeast-1 Region
+      "54.255.254.192/26", # ap-southeast-1 Region
+      "176.34.159.192/26", # eu-west-1 Region
+      "54.228.16.0/26",    # eu-west-1 Region
+      "107.23.255.0/26",   # us-east-1 Region
+      "54.243.31.192/26"   # us-east-1 Region
+    ],
+    [
+      # Civica secure development environment
+      "4.234.27.250/32",
+      "213.143.143.69/32",
+      "213.143.146.149/32"
+    ]
+  ]))
+  ipv6_cidr_blocks = []
+
+  domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
+    name   = dvo.resource_record_name
+    record = dvo.resource_record_value
+    type   = dvo.resource_record_type
+    }
+  }
+
+  domain                  = "modernisation-platform.service.justice.gov.uk"
+  domain_name_main        = [for k, v in local.domain_types : v.name if k == local.domain]
+  domain_record_main      = [for k, v in local.domain_types : v.record if k == local.domain]
+  domain_type_main        = [for k, v in local.domain_types : v.type if k == local.domain]
+  domain_name_sub         = [for k, v in local.domain_types : v.name if k == local.app_url]
+  domain_record_sub       = [for k, v in local.domain_types : v.record if k == local.app_url]
+  domain_type_sub         = [for k, v in local.domain_types : v.type if k == local.app_url]
+  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0], local.app_config.legacy_validation_record]
+
+  app_url                       = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
+  acm_subject_alternative_names = [local.app_url, local.app_config.legacy_url]
+
+  mp_non_live_natgw_ips = [
+  "13.42.163.245/32", # mod-platform-non-live-eu-west-2b-nat
+  "13.43.9.198/32",   # mod-platform-non-live-eu-west-2a-nat
+  "18.132.208.127/32" # mod-platform-non-live-eu-west-2c-nat
+  ]
+  mp_live_natgw_ips = [
+    "13.41.38.176/32", # mod-platform-live-eu-west-2b-nat
+    "3.11.197.133/32", # mod-platform-live-eu-west-2c-nat
+    "3.8.81.175/32"    # mod-platform-live-eu-west-2c-nat
+  ]
+  mp_natgw_ips = contains(["development", "test"], local.environment) ? local.mp_non_live_natgw_ips : local.mp_live_natgw_ips
+}
+
+module "ip_addresses" {
+  source = "../../modules/ip_addresses"
+}
