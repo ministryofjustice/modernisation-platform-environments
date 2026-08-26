@@ -209,11 +209,3 @@ data "aws_iam_policy_document" "ftp_user_policy" {
     resources = [local.laa_general_kms_arn]
   }
 }
-
-
-
-
-
-
-
-
