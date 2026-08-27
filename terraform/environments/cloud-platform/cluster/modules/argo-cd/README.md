@@ -42,14 +42,9 @@ module "argocd" {
 
   cluster_name = module.eks.cluster_name
 
-  idc_instance_arn = var.argocd_idc_instance_arn
-  idc_region       = var.argocd_idc_region
-
-  rbac_role_mappings = {
-    ADMIN = [
-      { id = local.cloud_platform_engineers_group_id, type = "SSO_GROUP" },
-    ]
-  }
+  idc_instance_arn   = local.argocd_idc_instance_arn
+  idc_region         = local.argocd_idc_region
+  rbac_role_mappings = local.argocd_rbac_role_mappings
 
   codeconnection_arn     = data.aws_codestarconnections_connection.github[0].arn
   enable_destroy_cleanup = local.cluster_environment == "development_cluster"

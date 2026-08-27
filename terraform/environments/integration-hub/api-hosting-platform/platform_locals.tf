@@ -1,6 +1,7 @@
 locals {
 
-  application_name = "laa-mail-relay"
+  application_name = "integration-hub"
+  component_name   = "api-hosting-platform"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 

@@ -5,7 +5,7 @@ resource "aws_security_group" "delius_frontend_alb_security_group" {
   lifecycle {
     create_before_destroy = true
   }
-  tags = merge(local.tags, { Name = "weblogic-${var.env_name}-frontened-alb" })
+  tags = merge(local.tags, { Name = "weblogic-${var.env_name}-frontend-alb" })
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_https_allowlist" {

@@ -422,7 +422,7 @@ resource "aws_cloudwatch_event_target" "merge_ac_position" {
 }
 
 resource "aws_lambda_permission" "allow_eventbridge_acquisitive_crime_position" {
-  count         = local.is-production ? 0 : 1
+  count         = 1
   statement_id  = "AllowExecutionFromEventBridgeAcquisitiveCrimePosition"
   action        = "lambda:InvokeFunction"
   function_name = module.merge_ac_position[0].lambda_function_name

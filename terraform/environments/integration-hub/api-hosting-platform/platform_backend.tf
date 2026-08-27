@@ -9,6 +9,6 @@ terraform {
     key                  = "terraform.tfstate"
     region               = "eu-west-2"
     use_lockfile         = true
-    workspace_key_prefix = "environments/members/laa-mail-relay" # This will store the object as environments/members/laa-mail-relay/${workspace}/terraform.tfstate
+    workspace_key_prefix = "environments/members/integration-hub/api-hosting-platform" # This will store the object as environments/members/<application>/<component>/${workspace}/terraform.tfstate
   }
 }

@@ -29,6 +29,8 @@ locals {
 
 # Security group for the rds instance
 resource "aws_security_group" "ppud_db" {
+  count = local.is-test ? 0 : 1
+
   # checkov:skip=CKV2_AWS_5:Ensure that Security Groups are attached to another resource; skip as attached to VPC
   name        = "ppud-pipeline-sg"
   description = "Security group for RDS instance in the PPUD pipeline"
@@ -45,7 +47,9 @@ resource "aws_security_group" "ppud_db" {
 
 # Allow access to the rds instance from the vpc
 resource "aws_vpc_security_group_ingress_rule" "ppud_db_ingress" {
-  security_group_id = aws_security_group.ppud_db.id
+  count = local.is-test ? 0 : 1
+
+  security_group_id = aws_security_group.ppud_db[0].id
   cidr_ipv4         = data.aws_vpc.shared.cidr_block
   from_port         = 1433
   to_port           = 1433
@@ -56,6 +60,8 @@ resource "aws_vpc_security_group_ingress_rule" "ppud_db_ingress" {
 
 # Sets up RDS export infrastructure for PPUD pipeline
 module "ppud_rds_export" {
+  count = local.is-test ? 0 : 1
+
   source = "git::https://github.com/ministryofjustice/terraform-rds-export?ref=ec51378f6e284526745ae277d85dcbf7033fe9d0"
 
   providers = {
@@ -66,11 +72,11 @@ module "ppud_rds_export" {
   database_refresh_mode          = "incremental"
   vpc_id                         = data.aws_vpc.shared.id
   database_subnet_ids            = data.aws_subnets.shared-private.ids
-  kms_key_arn                    = module.ppud_kms.key_arn
-  master_user_secret_id          = module.ppud_rds_export_secret.secret_id
+  kms_key_arn                    = module.ppud_kms[0].key_arn
+  master_user_secret_id          = module.ppud_rds_export_secret[0].secret_id
   environment                    = local.environment
   output_parquet_file_size       = 50
-  db_name                        = "${local.short_name}_${local.environment}"
+  db_name                        = "${local.short_name}_${local.short_name_environment}"
   get_views                      = true
   bucket_namespace               = "account-regional"
   lifecycle_rule_backup_uploads  = local.rds_export_bucket_lifecycle_rule
@@ -86,9 +92,11 @@ module "ppud_rds_export" {
 
 }
 
-# # Create a resource to subscribe to SNS topic for Slack notification
-# resource "aws_sns_topic_subscription" "sfn_events" {
-#   topic_arn = module.ppud_rds_export.sns_topic_arn
-#   protocol  = "https"
-#   endpoint  = data.aws_secretsmanager_secret_version.ppud_slack_webhook.secret_string
-# }
+# Create a resource to subscribe to SNS topic for Slack notification
+resource "aws_sns_topic_subscription" "sfn_events" {
+  count = local.is-test ? 0 : 1
+
+  topic_arn = module.ppud_rds_export[0].sns_topic_arn
+  protocol  = "https"
+  endpoint  = data.aws_secretsmanager_secret_version.ppud_slack_webhook[0].secret_string
+}
