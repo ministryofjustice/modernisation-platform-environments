@@ -51,7 +51,7 @@ module "cloud_platform_live_namespace_secret" {
 }
 
 module "pagerduty_orchestrator_integration_key_secret" {
-  count = contains(["data-platform-development", "data-platform-production"], terraform.workspace) ? 1 : 0
+  count = terraform.workspace == "data-platform-production" ? 1 : 0
 
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=82029345dea22bc49989a6f46c5d8d8e555b84c9" # v2.0.1
 
@@ -67,7 +67,7 @@ module "pagerduty_orchestrator_integration_key_secret" {
 }
 
 module "pagerduty_slack_connection_api_key_secret" {
-  count = contains(["data-platform-development", "data-platform-production"], terraform.workspace) ? 1 : 0
+  count = terraform.workspace == "data-platform-production" ? 1 : 0
 
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=82029345dea22bc49989a6f46c5d8d8e555b84c9" # v2.0.1
 
