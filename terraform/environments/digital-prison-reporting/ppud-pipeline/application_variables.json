@@ -15,7 +15,7 @@
     "production": {
       "days_back": "1",
       "cron_schedule": "cron(30 07 * * ? *)",
-"     source_bucket_role_name": "ppud-parquet-exports-replication-prod-role",
+      "source_bucket_role_name": "ppud-parquet-exports-replication-prod-role",
       "short_name_environment": "prod"
     }
   }
