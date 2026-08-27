@@ -50,7 +50,7 @@ locals {
     preproduction = {
       app_hostname            = "preproduction.data-platform.service.justice.gov.uk"
       app_google_analytics_id = "G-LQW8L51Z8E"
-      app_feature_ai_gateway_costs = "false"
+      app_feature_ai_gateway_costs = "true"
       app_ingress_allowlist = [
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
@@ -72,7 +72,7 @@ locals {
     production = {
       app_hostname            = "data-platform.service.justice.gov.uk"
       app_google_analytics_id = "G-KWQSR1Q3VN"
-      app_feature_ai_gateway_costs = "false"
+      app_feature_ai_gateway_costs = "true"
       app_ingress_allowlist = [
         # VPN
         "128.77.75.64/26",  # Prisma Corporate
