@@ -158,7 +158,7 @@ locals {
                   type         = "timeSeriesQuery"
                   refId        = "A"
                   queryType    = "Azure Monitor"
-                  subscription = local.environment_configuration.azure_foundry_resource.subscription_id
+                  subscription = try(local.environment_configuration.azure_foundry_resource.subscription_id, "")
                   azureMonitor = {
                     metricNamespace = combo.rule.namespace
                     metricName      = combo.rule.metric
@@ -177,9 +177,9 @@ locals {
                       }] : []
                     )
                     resources = [{
-                      subscription    = local.environment_configuration.azure_foundry_resource.subscription_id
-                      resourceGroup   = local.environment_configuration.azure_foundry_resource.resource_group
-                      resourceName    = local.environment_configuration.azure_foundry_resource.resource_name
+                      subscription    = try(local.environment_configuration.azure_foundry_resource.subscription_id, "")
+                      resourceGroup   = try(local.environment_configuration.azure_foundry_resource.resource_group, "")
+                      resourceName    = try(local.environment_configuration.azure_foundry_resource.resource_name, "")
                       metricNamespace = combo.rule.namespace
                     }]
                   }
