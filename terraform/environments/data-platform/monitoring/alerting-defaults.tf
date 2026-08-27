@@ -126,6 +126,14 @@ locals {
     azure_foundry_ptu_warn = 80 # % of provisioned managed throughput
     azure_foundry_ptu_crit = 95 # % of provisioned managed throughput
 
+    # 429s (throttling/quota), raw count per 5m, per model deployment
+    azure_foundry_rate_limited_warn = 5  # raw count of 429s per 5m
+    azure_foundry_rate_limited_crit = 20 # raw count of 429s per 5m
+
+    # Traffic: total ModelRequests floor treated as effectively zero — pairs with
+    # ok_when_nodata=false, same pattern as litellm_proxy_zero_traffic_crit
+    azure_foundry_zero_traffic_crit = 0.01
+
     # -------------------------------------------------------------------------
     # Vertex AI
     # -------------------------------------------------------------------------
@@ -134,6 +142,13 @@ locals {
     vertex_latency_p99_warn       = 3000 # invocation latency p99, ms
     vertex_latency_p99_crit       = 9000 # invocation latency p99, ms
 
+    # 429s (quota/rate-limit exhaustion), raw invocation-rate count per 5m
+    vertex_rate_limited_warn = 5  # raw count of 429 invocations per 5m
+    vertex_rate_limited_crit = 20 # raw count of 429 invocations per 5m
+
+    # Traffic: invocation-rate floor treated as effectively zero — pairs with
+    # ok_when_nodata=false, same pattern as litellm_proxy_zero_traffic_crit
+    vertex_zero_traffic_crit = 0.01
 
   }
   # Per-account effective thresholds: defaults merged with any account-specific
