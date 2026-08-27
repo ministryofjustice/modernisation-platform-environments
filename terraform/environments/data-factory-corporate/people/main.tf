@@ -1,3 +1,9 @@
+#split out
+locals {
+  aliases      = ["sherlock-landing"]
+  application = "data-factory-corporate"
+}
+
 resource "aws_secretsmanager_secret" "external_account" {
   #checkov:skip=CKV2_AWS_57: "Secret holds a static external AWS account ID — rotation not applicable"
   name        = "external-aws-account"
@@ -6,7 +12,7 @@ resource "aws_secretsmanager_secret" "external_account" {
 
   tags = {
     Environment    = terraform.workspace
-    Application    = "data-factory-corporate"
+    Application    = local.application
     Component      = "people"
     Infrastructure = "sherlock-secret-id"
   }
@@ -29,8 +35,6 @@ data "aws_secretsmanager_secret_version" "external_account_id" {
 
 locals {
   glue_catalog_arn = "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog"
-
-  #external_account_id = data.aws_secretsmanager_secret_version.external_account_id.secret_string
 }
 
 module "sherlock_landing_bucket_mp" {
@@ -188,7 +192,7 @@ module "data_factory_guardduty_eventbridge" {
 
   bucket_names = [module.sherlock_landing_bucket_mp.bucket.bucket]
 
-  scan_result_statuses = ["THREATS_FOUND","FAILED", "ACCESS_DENIED", "NO_THREATS_FOUND"]
+  scan_result_statuses = ["THREATS_FOUND","FAILED", "ACCESS_DENIED", "UNSUPPORTED", "NO_THREATS_FOUND"]
 
   target_lambda_name = module.data_factory_guardduty_lambda.name
 
@@ -229,7 +233,7 @@ module "data_factory_guardduty_scan" {
 
 module "data_factory_guardduty_lambda" {
 
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/guardduty-lambda?ref=2f6183f6c8f278bb97d25eb63e379cdce342f4f4"
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/guardduty-lambda?ref=1e7f1aa542eb1a4d91b9d1ec210ae3a555f858e9"
 
     name = "guardduty_lambda"
 
