@@ -71,6 +71,13 @@ locals {
         { name = "data-platform-governance-production", prometheus_workspace_id = "" },
       ]
 
+      # Azure AI Foundry - currently not yet deployed foundry in production so its commented out. Once deployed, uncomment and populate the values below.
+      #azure_foundry_resource = {
+      #  subscription_id = ""
+      #  resource_group  = ""
+      #  resource_name   = ""
+      #}
+
       # CIDRs allowed to reach Grafana (rendered into ingress whitelist-source-range).
       grafana_ingress_allowlist = [
         "128.77.75.64/26", # Prisma Corporate
@@ -84,7 +91,7 @@ locals {
         { name = "data-platform-development", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] },
         { name = "data-platform-test", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] },
         { name = "data-platform-preproduction", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] },
-        { name = "data-platform-production", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] }
+        { name = "data-platform-production", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway","Vertex AI"] }
       ]
     }
   }
