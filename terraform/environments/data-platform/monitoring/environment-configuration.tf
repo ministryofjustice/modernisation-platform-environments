@@ -91,7 +91,7 @@ locals {
         { name = "data-platform-development", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] },
         { name = "data-platform-test", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] },
         { name = "data-platform-preproduction", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] },
-        { name = "data-platform-production", enabled_groups = ["AI Gateway", "Bedrock","Vertex AI"], namespaces = ["ai-gateway"] }
+        { name = "data-platform-production", enabled_groups = ["AI Gateway", "Bedrock", "Vertex AI"], namespaces = ["ai-gateway"] }
       ]
     }
   }
