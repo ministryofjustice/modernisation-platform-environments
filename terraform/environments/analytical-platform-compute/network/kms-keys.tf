@@ -3,7 +3,7 @@ module "vpc_flow_logs_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.0"
+  version = "4.2.1"
 
   aliases                 = ["vpc/flow-logs"]
   description             = "VPC flow logs KMS key"
