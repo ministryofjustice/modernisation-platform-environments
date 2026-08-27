@@ -19,7 +19,7 @@ data "aws_iam_policy_document" "batch_replication_destination" {
     ]
 
     resources = [
-      "${module.rds_export.parquet_exports_bucket_arn}/*"
+      "${module.ppud_rds_export[0].parquet_exports_bucket_arn}/*"
     ]
   }
 }
@@ -28,6 +28,6 @@ resource "aws_s3_bucket_policy" "batch_replication_destination" {
 
   count = local.is-development ? 1 : 0
 
-  bucket = module.rds_export.parquet_exports_bucket_id
+  bucket = module.ppud_rds_export[0].parquet_exports_bucket_id
   policy = data.aws_iam_policy_document.batch_replication_destination[0].json
 }
