@@ -233,7 +233,7 @@ module "data_factory_guardduty_scan" {
 
 module "data_factory_guardduty_lambda" {
 
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/guardduty-lambda?ref=1e7f1aa542eb1a4d91b9d1ec210ae3a555f858e9"
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/guardduty-lambda?ref=a81f2767ed77d0bd4ddb5fed1204ba69587d35f4"
 
     name = "guardduty_lambda"
 
@@ -242,6 +242,8 @@ module "data_factory_guardduty_lambda" {
         Owner       = "CorporateDataEngineering"
         Environment = terraform.workspace
         }
+
+    quarantine_statuses = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED", "NO_THREATS_FOUND"]
 
     eventbridge_rule_arn = module.data_factory_guardduty_eventbridge.rule_arn
 
