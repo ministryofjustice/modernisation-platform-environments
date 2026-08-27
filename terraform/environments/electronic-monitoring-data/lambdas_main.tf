@@ -409,6 +409,7 @@ module "load_fms_lambda" {
     CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
     SNS_TOPIC_ARN       = aws_sns_topic.emds_alerts.arn
     MAX_RECEIVE_COUNT   = tostring(local.load_sqs_max_receive_count)
+    SCHEMA_BUCKET       = module.s3-metadata-bucket.bucket.id
   }
 }
 
