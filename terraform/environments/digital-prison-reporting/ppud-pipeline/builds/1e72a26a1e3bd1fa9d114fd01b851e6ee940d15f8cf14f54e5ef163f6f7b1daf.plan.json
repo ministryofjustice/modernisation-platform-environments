@@ -1,0 +1,1 @@
+{"filename": "builds/1e72a26a1e3bd1fa9d114fd01b851e6ee940d15f8cf14f54e5ef163f6f7b1daf.zip", "runtime": "python3.12", "artifacts_dir": "builds", "build_plan": [[["zip", "lambda_functions/check_recent_file.py", null]]], "quiet": "true"}

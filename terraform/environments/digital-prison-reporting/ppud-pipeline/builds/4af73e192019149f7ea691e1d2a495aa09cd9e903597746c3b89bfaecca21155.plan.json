@@ -1,0 +1,1 @@
+{"filename": "builds/4af73e192019149f7ea691e1d2a495aa09cd9e903597746c3b89bfaecca21155.zip", "runtime": "python3.12", "artifacts_dir": "builds", "build_plan": [[["zip", ".terraform/modules/ppud_rds_export/lambda_functions/transform_output/main.py", null]]], "quiet": "true"}
