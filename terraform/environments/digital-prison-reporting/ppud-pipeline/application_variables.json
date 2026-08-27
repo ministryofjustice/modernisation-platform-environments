@@ -3,19 +3,19 @@
     "development": {
       "days_back": "3",
       "cron_schedule": "cron(30 07 ? * MON *)",
-      "source_bucket_role_arn": "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-engineering-production"]}:role/ppud-parquet-exports-replication-dev-role",
+      "source_bucket_role_name": "ppud-parquet-exports-replication-dev-role",
       "short_name_environment": "dev"
     },
     "preproduction": {
       "days_back": "1",
       "cron_schedule": "cron(30 07 ? * TUE *)",
-      "source_bucket_role_arn": "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-engineering-production"]}:role/ppud-parquet-exports-replication-preprod-role",
+      "source_bucket_role_name": "ppud-parquet-exports-replication-preprod-role",
       "short_name_environment": "preprod"
     },
     "production": {
       "days_back": "1",
       "cron_schedule": "cron(30 07 * * ? *)",
-      "source_bucket_role_arn": "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-engineering-production"]}:role/ppud-parquet-exports-replication-prod-role",
+"     source_bucket_role_name": "ppud-parquet-exports-replication-prod-role",
       "short_name_environment": "prod"
     }
   }
