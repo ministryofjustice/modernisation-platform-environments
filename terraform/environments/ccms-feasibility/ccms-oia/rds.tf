@@ -1,6 +1,6 @@
 module "rds" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/1ab5fb0
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/rds?ref=1ab5fb0"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b63bde8
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/rds?ref=b63bde8"
 
   name           = "${local.component_name}-${local.env_label}-db"
   engine         = "mysql"
