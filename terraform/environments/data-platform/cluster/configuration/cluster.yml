@@ -34,10 +34,8 @@ environment:
     kyverno_policies:
       validation_action: "Audit"
       excluded_namespaces:
-        - ai-gateway
         - amazon-guardduty
         - amazon-network-flow-monitor
-        - app
         - aws-cloudwatch-observability
         - cert-manager
         - cilium-secrets
@@ -90,10 +88,8 @@ environment:
     kyverno_policies:
       validation_action: "Audit"
       excluded_namespaces:
-        - ai-gateway
         - amazon-guardduty
         - amazon-network-flow-monitor
-        - app
         - aws-cloudwatch-observability
         - cert-manager
         - cilium-secrets
@@ -146,10 +142,8 @@ environment:
     kyverno_policies:
       validation_action: "Audit"
       excluded_namespaces:
-        - ai-gateway
         - amazon-guardduty
         - amazon-network-flow-monitor
-        - app
         - aws-cloudwatch-observability
         - cert-manager
         - cilium-secrets
@@ -202,10 +196,8 @@ environment:
     kyverno_policies:
       validation_action: "Audit"
       excluded_namespaces:
-        - ai-gateway
         - amazon-guardduty
         - amazon-network-flow-monitor
-        - app
         - aws-cloudwatch-observability
         - cert-manager
         - cilium-secrets
