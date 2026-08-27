@@ -16,7 +16,8 @@ locals {
       lakeformation_admins = [
         "arn:aws:iam::766696030771:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_9e1f6f5fda83364d",
         "arn:aws:iam::766696030771:role/MemberInfrastructureAccess",
-        "arn:aws:iam::766696030771:role/github-actions-apply"
+        "arn:aws:iam::766696030771:role/github-actions-apply",
+        aws_iam_role.file_uploads_role.arn
       ]
       lakeformation_read_only_admins = [
         "arn:aws:iam::766696030771:role/github-actions-plan"
@@ -177,17 +178,6 @@ module "databases" {
     prefix      = each.key
     kms_key_arn = aws_kms_key.data_lake_kms_key.arn
   }
-}
-
-
-module "file_ingestion" {
-  source = "./modules/file-ingestion"
-  providers = {
-    aws.bucket-replication = aws
-  }
-
-  database_name = "raw"
-  kms_key_arn = aws_kms_key.data_lake_kms_key.arn
 }
 
 data "aws_iam_policy_document" "data_lake_access_action_assume_role" {
