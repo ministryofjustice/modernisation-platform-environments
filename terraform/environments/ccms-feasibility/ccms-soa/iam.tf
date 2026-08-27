@@ -50,6 +50,35 @@ resource "aws_iam_role_policy_attachment" "ecs_ec2_secrets" {
   policy_arn = aws_iam_policy.ecs_ec2_secrets.arn
 }
 
+resource "aws_iam_policy" "ecs_ec2_s3_fileops" {
+  name = "${local.component_name}-${local.env_label}-ecs-ec2-s3-fileops-policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject",
+        "s3:RestoreObject",
+      ]
+      Resource = [
+        data.aws_s3_bucket.inbound.arn,
+        "${data.aws_s3_bucket.inbound.arn}/*",
+        data.aws_s3_bucket.outbound.arn,
+        "${data.aws_s3_bucket.outbound.arn}/*",
+      ]
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_ec2_s3_fileops" {
+  role       = aws_iam_role.ecs_ec2.name
+  policy_arn = aws_iam_policy.ecs_ec2_s3_fileops.arn
+}
+
 resource "aws_iam_instance_profile" "ecs_ec2" {
   name = "${local.component_name}-${local.env_label}-ecs-ec2-profile"
   role = aws_iam_role.ecs_ec2.name

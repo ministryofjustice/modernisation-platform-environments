@@ -21,6 +21,14 @@
       {
         "containerPath": "/u01/oracle/user_projects",
         "sourceVolume": "soa_volume"
+      },
+      {
+        "containerPath": "/u03/oracle/fileops/inbound",
+        "sourceVolume": "inbound_volume"
+      },
+      {
+        "containerPath": "/u03/oracle/fileops/outbound",
+        "sourceVolume": "outbound_volume"
       }
     ],
     "environment": [

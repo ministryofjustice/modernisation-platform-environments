@@ -1,3 +1,12 @@
+# Inbound/outbound file-exchange S3 buckets, already built in this account by ccms-ebs
+data "aws_s3_bucket" "inbound" {
+  bucket = "${local.application_name}-inbound"
+}
+
+data "aws_s3_bucket" "outbound" {
+  bucket = "${local.application_name}-outbound"
+}
+
 module "ecs_cluster" {
   # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/c20a9496c059d1302b3bb7c3bd0dcd6792a0c8e0
   source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-cluster?ref=c20a9496c059d1302b3bb7c3bd0dcd6792a0c8e0"
@@ -19,9 +28,11 @@ module "ecs_cluster" {
       ebs_encrypted         = true
       kms_key_id            = data.aws_kms_key.ebs_shared.arn
       user_data = base64encode(templatefile("${path.module}/templates/user-data.sh", {
-        cluster_name = "${local.component_name}-${local.env_label}-cluster"
-        efs_id       = module.efs.file_system_id
-        server       = "admin"
+        cluster_name    = "${local.component_name}-${local.env_label}-cluster"
+        efs_id          = module.efs.file_system_id
+        server          = "admin"
+        inbound_bucket  = data.aws_s3_bucket.inbound.id
+        outbound_bucket = data.aws_s3_bucket.outbound.id
       }))
     }
     managed = {
@@ -37,17 +48,19 @@ module "ecs_cluster" {
       ebs_encrypted         = true
       kms_key_id            = data.aws_kms_key.ebs_shared.arn
       user_data = base64encode(templatefile("${path.module}/templates/user-data.sh", {
-        cluster_name = "${local.component_name}-${local.env_label}-cluster"
-        efs_id       = module.efs.file_system_id
-        server       = "managed"
+        cluster_name    = "${local.component_name}-${local.env_label}-cluster"
+        efs_id          = module.efs.file_system_id
+        server          = "managed"
+        inbound_bucket  = data.aws_s3_bucket.inbound.id
+        outbound_bucket = data.aws_s3_bucket.outbound.id
       }))
     }
   }
 }
 
 module "ecs_service_admin" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/c20a9496c059d1302b3bb7c3bd0dcd6792a0c8e0
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=c20a9496c059d1302b3bb7c3bd0dcd6792a0c8e0"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/bf7ac1c
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=bf7ac1c"
 
   name               = "${local.component_name}-admin-${local.env_label}"
   cluster_id         = module.ecs_cluster.cluster_id
@@ -113,8 +126,8 @@ module "ecs_service_admin" {
 }
 
 module "ecs_service_managed" {
-  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/c20a9496c059d1302b3bb7c3bd0dcd6792a0c8e0
-  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=c20a9496c059d1302b3bb7c3bd0dcd6792a0c8e0"
+  # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/bf7ac1c
+  source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ecs-service?ref=bf7ac1c"
 
   name               = "${local.component_name}-managed-${local.env_label}"
   cluster_id         = module.ecs_cluster.cluster_id
@@ -141,6 +154,17 @@ module "ecs_service_managed" {
     name           = "soa_volume"
     file_system_id = module.efs.file_system_id
   }]
+
+  host_volumes = [
+    {
+      name      = "inbound_volume"
+      host_path = "/home/ec2-user/inbound"
+    },
+    {
+      name      = "outbound_volume"
+      host_path = "/home/ec2-user/outbound"
+    },
+  ]
 
   container_definitions = templatefile("${path.module}/templates/task_definition_managed.json.tpl", {
     app_name          = local.component_name
