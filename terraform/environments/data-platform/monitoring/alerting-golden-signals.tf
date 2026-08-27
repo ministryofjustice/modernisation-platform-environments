@@ -200,6 +200,14 @@ locals {
     bedrock_legacy_model  = { group = "Bedrock", namespace = "AWS/Bedrock", metric = "LegacyModelInvocations", statistic = "Sum", type = "gt", dim_key = "ModelId", warning = "bedrock_legacy_model_warn", critical = "bedrock_legacy_model_crit" }
     bedrock_invocations   = { group = "Bedrock", namespace = "AWS/Bedrock", metric = "Invocations", statistic = "Sum", type = "baseline_gt", dim_key = "ModelId", warning = "bedrock_invocations_baseline_warn", critical = "bedrock_invocations_baseline_crit" }
 
+    # -------------------------------------------------------------------------
+    # Bedrock Guardrails
+    # -------------------------------------------------------------------------
+    bedrock_guardrail_interventions = { group = "Bedrock", namespace = "AWS/Bedrock/Guardrails", metric = "InvocationsIntervened", statistic = "Sum", type = "gt", dim_key = "", ok_when_nodata = true, warning = "bedrock_guardrail_interventions_warn", critical = "bedrock_guardrail_interventions_crit" }
+    bedrock_guardrail_client_errors = { group = "Bedrock", namespace = "AWS/Bedrock/Guardrails", metric = "InvocationClientErrors", statistic = "Sum", type = "gt", dim_key = "", ok_when_nodata = true, warning = "bedrock_guardrail_client_errors_warn", critical = "bedrock_guardrail_client_errors_crit" }
+    bedrock_guardrail_server_errors = { group = "Bedrock", namespace = "AWS/Bedrock/Guardrails", metric = "InvocationServerErrors", statistic = "Sum", type = "gt", dim_key = "", ok_when_nodata = true, warning = "bedrock_guardrail_server_errors_warn", critical = "bedrock_guardrail_server_errors_crit" }
+    bedrock_guardrail_throttles     = { group = "Bedrock", namespace = "AWS/Bedrock/Guardrails", metric = "InvocationThrottles", statistic = "Sum", type = "gt", dim_key = "", ok_when_nodata = true, warning = "bedrock_guardrail_throttles_warn", critical = "bedrock_guardrail_throttles_crit" }
+
 
     # -------------------------------------------------------------------------
     # Azure AI Foundry

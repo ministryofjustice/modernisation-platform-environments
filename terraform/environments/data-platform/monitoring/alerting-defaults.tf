@@ -150,6 +150,18 @@ locals {
     # ok_when_nodata=false, same pattern as litellm_proxy_zero_traffic_crit
     vertex_zero_traffic_crit = 0.01
 
+    # -------------------------------------------------------------------------
+    # Bedrock Guardrails
+    # -------------------------------------------------------------------------
+    bedrock_guardrail_interventions_warn = 5  # interventions per 5m window
+    bedrock_guardrail_interventions_crit = 20 # interventions per 5m window
+    bedrock_guardrail_client_errors_warn = 1  # client errors per 5m window
+    bedrock_guardrail_client_errors_crit = 5  # client errors per 5m window
+    bedrock_guardrail_server_errors_warn = 1  # server errors per 5m window
+    bedrock_guardrail_server_errors_crit = 5  # server errors per 5m window
+    bedrock_guardrail_throttles_warn     = 1  # throttled requests per 5m window
+    bedrock_guardrail_throttles_crit     = 5  # throttled requests per 5m window
+
   }
   # Per-account effective thresholds: defaults merged with any account-specific
   # overrides (alert_account_configs[uid].threshold_overrides).
