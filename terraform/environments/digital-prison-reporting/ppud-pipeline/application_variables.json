@@ -2,15 +2,18 @@
   "accounts": {
     "development": {
       "days_back": "3",
-      "cron_schedule": "cron(30 07 ? * MON *)"
+      "cron_schedule": "cron(30 07 ? * MON *)",
+      "short_name_environment": "dev"
     },
     "preproduction": {
       "days_back": "1",
-      "cron_schedule": "cron(30 07 ? * TUE *)"
+      "cron_schedule": "cron(30 07 ? * TUE *)",
+      "short_name_environment": "preprod"
     },
     "production": {
       "days_back": "1",
-      "cron_schedule": "cron(30 07 * * ? *)"  
+      "cron_schedule": "cron(30 07 * * ? *)",
+      "short_name_environment": "prod"
     }
   }
 }
