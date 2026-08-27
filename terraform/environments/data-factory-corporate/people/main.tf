@@ -19,20 +19,6 @@ module "sherlock_kms_key" {
   aliases = ["sherlock-landing"]
 }
 
-# module "sherlock_quarantine_bucket" {
-#   source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/s3-bucket?ref=313b46a604dc6aaee1d7309990388c6687272b6e"
-
-#   bucket_prefix             = "quarantine-sherlock"
-#   kms_key_arn               = module.sherlock_kms_key.key_arn
-#   enable_malware_protection = true
-#   tags = {
-#     Environment    = terraform.workspace
-#     Application    = "data-factory-corporate"
-#     Component      = "people"
-#     Infrastructure = "sherlock-quarantine-bucket"
-#   }
-# }
-
 data "aws_secretsmanager_secret" "external_account_id" {
   name = "external-aws-account"
 }
@@ -88,7 +74,7 @@ module "sherlock_quarantine_bucket" {
 
   bucket_prefix      = "landing-sherlock-quarantine-test-mp"
   bucket_namespace   = "account-regional"
-  versioning_enabled = true
+  versioning_enabled = false
   force_destroy      = true
 
   ownership_controls = "BucketOwnerEnforced"
@@ -193,45 +179,6 @@ module "assume_iam_role" {
 
 }
 
-
-# resource "aws_iam_role" "assume_external_role" {
-#   name = "datafactory_assume_external_role"
-
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-
-#     Statement = [{
-#       Effect = "Allow"
-
-#       Principal = {
-#         AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-#       }
-
-#       Action = "sts:AssumeRole"
-#     }]
-#   })
-# }
-
-# data "aws_iam_policy_document" "allow_assume_external_role" {
-#   statement {
-#     effect = "Allow"
-
-#     actions = [
-#       "sts:AssumeRole"
-#     ]
-
-#     resources = [
-#       "arn:aws:iam::${data.aws_secretsmanager_secret_version.external_account_id.secret_string}:role/datafactory_dev_assume_role"
-#     ]
-#   }
-# }
-
-# resource "aws_iam_role_policy" "allow_assume_external_role" {
-#   name   = "allow-assume-external-role"
-#   role   = aws_iam_role.assume_external_role.name
-#   policy = data.aws_iam_policy_document.allow_assume_external_role.json
-# }
-
 # Eventbridge rule
 
 module "data_factory_guardduty_eventbridge" {
@@ -241,7 +188,7 @@ module "data_factory_guardduty_eventbridge" {
 
   bucket_names = [module.sherlock_landing_bucket_mp.bucket.bucket]
 
-  scan_result_statuses = ["THREATS_FOUND","FAILED", "ACCESS_DENIED"]
+  scan_result_statuses = ["THREATS_FOUND","FAILED", "ACCESS_DENIED", "NO_THREATS_FOUND"]
 
   target_lambda_name = module.data_factory_guardduty_lambda.name
 
