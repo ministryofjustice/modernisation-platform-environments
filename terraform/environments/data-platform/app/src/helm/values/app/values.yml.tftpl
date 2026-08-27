@@ -75,6 +75,8 @@ app:
           key: ai-gateway-master-key
     - name: GOOGLE_ANALYTICS_ID
       value: ${app_google_analytics_id}
+    - name: FEATURE_AI_GATEWAY_COSTS
+      value: "${app_feature_ai_gateway_costs}"
     - name: NOTIFY_API_KEY
       valueFrom:
         secretKeyRef:
