@@ -79,7 +79,7 @@ module "ecs_service_admin" {
     app_name             = local.component_name
     app_image            = local.application_data.accounts[local.environment].admin_app_image
     container_version    = local.application_data.accounts[local.environment].admin_container_version
-    admin_server_port    = local.application_data.accounts[local.environment].admin_server_port
+    admin_ssl_port       = local.application_data.accounts[local.environment].admin_ssl_port
     aws_region           = data.aws_region.current.region
     log_group_name       = aws_cloudwatch_log_group.admin.name
     db_instance_endpoint = module.rds.db_endpoint
@@ -88,20 +88,19 @@ module "ecs_service_admin" {
     as_hostname          = aws_route53_record.admin.fqdn
     wl_admin_mem_args    = local.application_data.accounts[local.environment].admin_wl_mem_args
     run_rcu              = local.application_data.accounts[local.environment].admin_run_rcu_bootstrap
-    xxsoa_ds_url         = local.application_data.accounts[local.environment].xxsoa_ds_url
-    xxsoa_ds_username    = local.application_data.accounts[local.environment].admin_xxsoa_ds_username
-    ebs_ds_url           = local.application_data.accounts[local.environment].admin_ebs_ds_url
-    ebs_ds_username      = local.application_data.accounts[local.environment].admin_ebs_ds_username
-    ebssms_ds_url        = local.application_data.accounts[local.environment].admin_ebssms_ds_url
-    ebssms_ds_username   = local.application_data.accounts[local.environment].admin_ebssms_ds_username
-    ebs_user_username    = local.application_data.accounts[local.environment].admin_ebs_user_username
+    xxsoa_ds_url         = "jdbc:oracle:thin:@//${data.aws_db_instance.edrms_tds.address}:${data.aws_db_instance.edrms_tds.port}/EDRMSTDS"
+    xxsoa_ds_username    = "XXSOA"
+    pui_user             = local.application_data.accounts[local.environment].admin_pui_user
+    caab_user            = local.application_data.accounts[local.environment].admin_caab_user
+    apply_user           = local.application_data.accounts[local.environment].admin_apply_user
+    keystore_secret_id   = aws_secretsmanager_secret.soa.name
     soa_secret_arn       = aws_secretsmanager_secret.soa.arn
   })
 
   load_balancer = {
     target_group_arn = module.nlb_admin.target_group_arn
     container_name   = "${local.component_name}-admin"
-    container_port   = local.application_data.accounts[local.environment].admin_server_port
+    container_port   = local.application_data.accounts[local.environment].admin_ssl_port
   }
 
   depends_on = [
@@ -144,23 +143,23 @@ module "ecs_service_managed" {
   }]
 
   container_definitions = templatefile("${path.module}/templates/task_definition_managed.json.tpl", {
-    app_name            = local.component_name
-    app_image           = local.application_data.accounts[local.environment].managed_app_image
-    container_version   = local.application_data.accounts[local.environment].managed_container_version
-    managed_server_port = local.application_data.accounts[local.environment].managed_server_port
-    admin_server_port   = local.application_data.accounts[local.environment].admin_server_port
-    aws_region          = data.aws_region.current.region
-    log_group_name      = aws_cloudwatch_log_group.managed.name
-    admin_host          = aws_route53_record.admin.fqdn
-    ms_hostname         = aws_route53_record.managed.fqdn
-    wl_mem_args         = local.application_data.accounts[local.environment].managed_wl_mem_args
-    soa_secret_arn      = aws_secretsmanager_secret.soa.arn
+    app_name          = local.component_name
+    app_image         = local.application_data.accounts[local.environment].managed_app_image
+    container_version = local.application_data.accounts[local.environment].managed_container_version
+    managed_ssl_port  = local.application_data.accounts[local.environment].managed_ssl_port
+    admin_ssl_port    = local.application_data.accounts[local.environment].admin_ssl_port
+    aws_region        = data.aws_region.current.region
+    log_group_name    = aws_cloudwatch_log_group.managed.name
+    admin_host        = aws_route53_record.admin.fqdn
+    ms_hostname       = aws_route53_record.managed.fqdn
+    wl_mem_args       = local.application_data.accounts[local.environment].managed_wl_mem_args
+    soa_secret_arn    = aws_secretsmanager_secret.soa.arn
   })
 
   load_balancer = {
     target_group_arn = module.nlb_managed.target_group_arn
     container_name   = "${local.component_name}-managed"
-    container_port   = local.application_data.accounts[local.environment].managed_server_port
+    container_port   = local.application_data.accounts[local.environment].managed_ssl_port
   }
 
   depends_on = [

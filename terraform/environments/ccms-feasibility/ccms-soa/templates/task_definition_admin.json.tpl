@@ -2,6 +2,7 @@
   {
     "name": "${app_name}-admin",
     "image": "${app_image}:${container_version}",
+    "stopTimeout": 300,
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
@@ -12,8 +13,8 @@
     },
     "portMappings": [
       {
-        "containerPort": ${admin_server_port},
-        "hostPort": ${admin_server_port}
+        "containerPort": ${admin_ssl_port},
+        "hostPort": ${admin_ssl_port}
       }
     ],
     "mountPoints": [
@@ -34,24 +35,32 @@
       { "name": "USER_MEM_ARGS", "value": "${wl_admin_mem_args} -Djava.security.egd=file:/tmp/big.random.file" },
       { "name": "XXSOA_DS_URL", "value": "${xxsoa_ds_url}" },
       { "name": "XXSOA_DS_USERNAME", "value": "${xxsoa_ds_username}" },
-      { "name": "EBS_DS_URL", "value": "${ebs_ds_url}" },
-      { "name": "EBS_DS_USERNAME", "value": "${ebs_ds_username}" },
-      { "name": "EBSSMS_DS_URL", "value": "${ebssms_ds_url}" },
-      { "name": "EBSSMS_DS_USERNAME", "value": "${ebssms_ds_username}" },
-      { "name": "PUI_USER", "value": "pui_user" },
-      { "name": "EBS_USER", "value": "${ebs_user_username}" },
+      { "name": "PUI_USER", "value": "${pui_user}" },
+      { "name": "CAAB_USER", "value": "${caab_user}" },
+      { "name": "APPLY_USER", "value": "${apply_user}" },
+      { "name": "KEYSTORE_SECRET_ID", "value": "${keystore_secret_id}" },
       { "name": "TZ", "value": "GB" }
     ],
     "secrets": [
-      { "name": "DB_PASSWORD", "valueFrom": "${soa_secret_arn}:soa_password::" },
-      { "name": "DB_SCHEMA_PASSWORD", "valueFrom": "${soa_secret_arn}:soa_password::" },
-      { "name": "ADMIN_PASSWORD", "valueFrom": "${soa_secret_arn}:soa_password::" },
-      { "name": "XXSOA_DS_PASSWORD", "valueFrom": "${soa_secret_arn}:xxsoa_ds_password::" },
-      { "name": "EBS_DS_PASSWORD", "valueFrom": "${soa_secret_arn}:ebs_ds_password::" },
-      { "name": "EBSSMS_DS_PASSWORD", "valueFrom": "${soa_secret_arn}:ebssms_ds_password::" },
-      { "name": "PUI_USER_PASSWORD", "valueFrom": "${soa_secret_arn}:pui_user_password::" },
-      { "name": "EBS_USER_PASSWORD", "valueFrom": "${soa_secret_arn}:ebs_user_password::" },
-      { "name": "EXTRA_JAVA_PROPERTIES", "valueFrom": "${soa_secret_arn}:trust_store_password::" }
+      { "name": "DB_PASSWORD", "valueFrom": "${soa_secret_arn}:soa_rds_admin_user_password::" },
+      { "name": "DB_SCHEMA_PASSWORD", "valueFrom": "${soa_secret_arn}:soa_rds_all_ccmssoa_schema_password::" },
+      { "name": "ADMIN_PASSWORD", "valueFrom": "${soa_secret_arn}:admin_server_password::" },
+      { "name": "EBS_DS_URL", "valueFrom": "${soa_secret_arn}:admin_ebs_ds_url::" },
+      { "name": "EBS_DS_USERNAME", "valueFrom": "${soa_secret_arn}:admin_ebs_ds_username::" },
+      { "name": "EBSSMS_DS_URL", "valueFrom": "${soa_secret_arn}:admin_ebssms_ds_url::" },
+      { "name": "EBSSMS_DS_USERNAME", "valueFrom": "${soa_secret_arn}:admin_ebssms_ds_username::" },
+      { "name": "EBS_USER", "valueFrom": "${soa_secret_arn}:admin_ebs_user_username::" },
+      { "name": "XXSOA_DS_PASSWORD", "valueFrom": "${soa_secret_arn}:edrms_xxsoa_user_password::" },
+      { "name": "EBS_DS_PASSWORD", "valueFrom": "${soa_secret_arn}:ccms_apps_user_password::" },
+      { "name": "EBSSMS_DS_PASSWORD", "valueFrom": "${soa_secret_arn}:cwa_apps_user_password::" },
+      { "name": "PUI_USER_PASSWORD", "valueFrom": "${soa_secret_arn}:soa_realm_pui_user_password::" },
+      { "name": "APPLY_USER_PASSWORD", "valueFrom": "${soa_secret_arn}:soa_realm_apply_user_password::" },
+      { "name": "CAAB_USER_PASSWORD", "valueFrom": "${soa_secret_arn}:soa_realm_caab_user_password::" },
+      { "name": "EBS_USER_PASSWORD", "valueFrom": "${soa_secret_arn}:soa_realm_ebs_soa_super_user_password::" },
+      { "name": "EXTRA_JAVA_PROPERTIES", "valueFrom": "${soa_secret_arn}:extra_java_properties::" },
+      { "name": "KEYSTORE_PASSWORD", "valueFrom": "${soa_secret_arn}:keystorePassword::" },
+      { "name": "TRUSTSTORE_PASSWORD", "valueFrom": "${soa_secret_arn}:truststorePassword::" },
+      { "name": "SLACK_CHANNEL_WEBHOOK", "valueFrom": "${soa_secret_arn}:slack_channel_webhook::" }
     ]
   }
 ]

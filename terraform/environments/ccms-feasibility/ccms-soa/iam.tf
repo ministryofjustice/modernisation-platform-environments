@@ -27,6 +27,29 @@ resource "aws_iam_role_policy_attachment" "ecs_ec2_ssm" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+resource "aws_iam_policy" "ecs_ec2_secrets" {
+  name = "${local.component_name}-${local.env_label}-ecs-ec2-secrets-policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:PutSecretValue",
+        "secretsmanager:CreateSecret",
+      ]
+      Resource = ["arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:${local.component_name}*"]
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_ec2_secrets" {
+  role       = aws_iam_role.ecs_ec2.name
+  policy_arn = aws_iam_policy.ecs_ec2_secrets.arn
+}
+
 resource "aws_iam_instance_profile" "ecs_ec2" {
   name = "${local.component_name}-${local.env_label}-ecs-ec2-profile"
   role = aws_iam_role.ecs_ec2.name

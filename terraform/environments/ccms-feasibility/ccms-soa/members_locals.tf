@@ -1,5 +1,5 @@
 locals {
-  
+
   env_label = "feasibility"
 
   private_subnets_cidr_blocks = [

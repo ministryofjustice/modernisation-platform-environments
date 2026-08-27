@@ -1,10 +1,15 @@
+# EDRMS's own TDS Oracle RDS instance
+data "aws_db_instance" "edrms_tds" {
+  db_instance_identifier = "ccms-edrms-${local.env_label}-tds"
+}
+
 module "rds" {
   # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b09180b
   source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/rds?ref=b09180b"
 
   name                 = "${local.component_name}-${local.env_label}-soa"
-  engine               = "oracle-se2"
-  engine_version       = "19.0.0.0.ru-2024-01.rur-2024-01.r1"
+  engine               = "oracle-ee"
+  engine_version       = "19.0.0.0.ru-2026-04.rur-2026-04.r1"
   major_engine_version = "19"
 
   instance_class    = local.application_data.accounts[local.environment].soa_db_instance_type
@@ -12,7 +17,7 @@ module "rds" {
 
   db_name  = "SOADB"
   username = local.application_data.accounts[local.environment].soa_db_user
-  password = jsondecode(data.aws_secretsmanager_secret_version.soa.secret_string)["soa_password"]
+  password = jsondecode(data.aws_secretsmanager_secret_version.soa.secret_string)["soa_rds_admin_user_password"]
   port     = 1521
 
   character_set_name = "AL32UTF8"

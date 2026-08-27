@@ -10,17 +10,6 @@ resource "aws_security_group" "alb_admin" {
   })
 }
 
-resource "aws_vpc_security_group_ingress_rule" "alb_admin_http_private" {
-  for_each = toset(local.private_subnets_cidr_blocks)
-
-  security_group_id = aws_security_group.alb_admin.id
-  description       = "HTTP from private subnets"
-  ip_protocol       = "tcp"
-  from_port         = 80
-  to_port           = 80
-  cidr_ipv4         = each.value
-}
-
 resource "aws_vpc_security_group_ingress_rule" "alb_admin_https_private" {
   for_each = toset(local.private_subnets_cidr_blocks)
 
@@ -32,14 +21,14 @@ resource "aws_vpc_security_group_ingress_rule" "alb_admin_https_private" {
   cidr_ipv4         = each.value
 }
 
-resource "aws_vpc_security_group_ingress_rule" "alb_admin_server_port_private" {
+resource "aws_vpc_security_group_ingress_rule" "alb_admin_ssl_port_private" {
   for_each = toset(local.private_subnets_cidr_blocks)
 
   security_group_id = aws_security_group.alb_admin.id
-  description       = "WebLogic admin server port from private subnets"
+  description       = "WebLogic admin SSL port from private subnets"
   ip_protocol       = "tcp"
-  from_port         = local.application_data.accounts[local.environment].admin_server_port
-  to_port           = local.application_data.accounts[local.environment].admin_server_port
+  from_port         = local.application_data.accounts[local.environment].admin_ssl_port
+  to_port           = local.application_data.accounts[local.environment].admin_ssl_port
   cidr_ipv4         = each.value
 }
 
@@ -47,8 +36,8 @@ resource "aws_vpc_security_group_egress_rule" "alb_admin_egress_ecs_tasks" {
   security_group_id            = aws_security_group.alb_admin.id
   description                  = "Allow NLB to reach the admin ECS task"
   ip_protocol                  = "tcp"
-  from_port                    = local.application_data.accounts[local.environment].admin_server_port
-  to_port                      = local.application_data.accounts[local.environment].admin_server_port
+  from_port                    = local.application_data.accounts[local.environment].admin_ssl_port
+  to_port                      = local.application_data.accounts[local.environment].admin_ssl_port
   referenced_security_group_id = aws_security_group.ecs_tasks_admin.id
 }
 
@@ -64,17 +53,6 @@ resource "aws_security_group" "alb_managed" {
   })
 }
 
-resource "aws_vpc_security_group_ingress_rule" "alb_managed_http_private" {
-  for_each = toset(local.private_subnets_cidr_blocks)
-
-  security_group_id = aws_security_group.alb_managed.id
-  description       = "HTTP from private subnets"
-  ip_protocol       = "tcp"
-  from_port         = 80
-  to_port           = 80
-  cidr_ipv4         = each.value
-}
-
 resource "aws_vpc_security_group_ingress_rule" "alb_managed_https_private" {
   for_each = toset(local.private_subnets_cidr_blocks)
 
@@ -86,14 +64,14 @@ resource "aws_vpc_security_group_ingress_rule" "alb_managed_https_private" {
   cidr_ipv4         = each.value
 }
 
-resource "aws_vpc_security_group_ingress_rule" "alb_managed_server_port_private" {
+resource "aws_vpc_security_group_ingress_rule" "alb_managed_ssl_port_private" {
   for_each = toset(local.private_subnets_cidr_blocks)
 
   security_group_id = aws_security_group.alb_managed.id
-  description       = "WebLogic managed server port from private subnets"
+  description       = "WebLogic managed SSL port from private subnets"
   ip_protocol       = "tcp"
-  from_port         = local.application_data.accounts[local.environment].managed_server_port
-  to_port           = local.application_data.accounts[local.environment].managed_server_port
+  from_port         = local.application_data.accounts[local.environment].managed_ssl_port
+  to_port           = local.application_data.accounts[local.environment].managed_ssl_port
   cidr_ipv4         = each.value
 }
 
@@ -101,8 +79,8 @@ resource "aws_vpc_security_group_egress_rule" "alb_managed_egress_ecs_tasks" {
   security_group_id            = aws_security_group.alb_managed.id
   description                  = "Allow NLB to reach the managed ECS task"
   ip_protocol                  = "tcp"
-  from_port                    = local.application_data.accounts[local.environment].managed_server_port
-  to_port                      = local.application_data.accounts[local.environment].managed_server_port
+  from_port                    = local.application_data.accounts[local.environment].managed_ssl_port
+  to_port                      = local.application_data.accounts[local.environment].managed_ssl_port
   referenced_security_group_id = aws_security_group.ecs_tasks_managed.id
 }
 
@@ -120,11 +98,20 @@ resource "aws_security_group" "ecs_tasks_admin" {
 
 resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_admin_from_alb_admin" {
   security_group_id            = aws_security_group.ecs_tasks_admin.id
-  description                  = "Admin server port from the admin NLB"
+  description                  = "Admin SSL port from the admin NLB"
   ip_protocol                  = "tcp"
-  from_port                    = local.application_data.accounts[local.environment].admin_server_port
-  to_port                      = local.application_data.accounts[local.environment].admin_server_port
+  from_port                    = local.application_data.accounts[local.environment].admin_ssl_port
+  to_port                      = local.application_data.accounts[local.environment].admin_ssl_port
   referenced_security_group_id = aws_security_group.alb_admin.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_admin_from_ecs_tasks_managed" {
+  security_group_id            = aws_security_group.ecs_tasks_admin.id
+  description                  = "Admin SSL port from the managed ECS task (WebLogic domain/cluster coordination)"
+  ip_protocol                  = "tcp"
+  from_port                    = local.application_data.accounts[local.environment].admin_ssl_port
+  to_port                      = local.application_data.accounts[local.environment].admin_ssl_port
+  referenced_security_group_id = aws_security_group.ecs_tasks_managed.id
 }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_admin_egress_all" {
@@ -146,10 +133,10 @@ resource "aws_security_group" "ecs_tasks_managed" {
 
 resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_managed_from_alb_managed" {
   security_group_id            = aws_security_group.ecs_tasks_managed.id
-  description                  = "Managed server port from the managed NLB"
+  description                  = "Managed SSL port from the managed NLB"
   ip_protocol                  = "tcp"
-  from_port                    = local.application_data.accounts[local.environment].managed_server_port
-  to_port                      = local.application_data.accounts[local.environment].managed_server_port
+  from_port                    = local.application_data.accounts[local.environment].managed_ssl_port
+  to_port                      = local.application_data.accounts[local.environment].managed_ssl_port
   referenced_security_group_id = aws_security_group.alb_managed.id
 }
 
