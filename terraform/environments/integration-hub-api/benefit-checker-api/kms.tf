@@ -4,7 +4,7 @@ module "kms_cloudwatch_logs" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git?ref=407e3db34a65b384c20ef718f55d9ceacb97a846" # v4.2.0
 
   aliases                 = ["${local.application_name}/${local.component_name}/logs"]
-  description             = "KMS key for API hosting platform CloudWatch logs"
+  description             = "KMS key for benefit checker API CloudWatch logs"
   enable_default_policy   = true
   enable_key_rotation     = true
   deletion_window_in_days = 30

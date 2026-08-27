@@ -16,7 +16,7 @@ data "aws_iam_policy_document" "app_deploy_assume_role" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:ministryofjustice/integration-hub-api-platform:environment:integration-hub-api-platform-${local.environment}*"]
+      values   = ["repo:ministryofjustice/integration-hub-api-platform:environment:integration-hub-api-benefit-checker-api-${local.environment}*"]
     }
   }
 }

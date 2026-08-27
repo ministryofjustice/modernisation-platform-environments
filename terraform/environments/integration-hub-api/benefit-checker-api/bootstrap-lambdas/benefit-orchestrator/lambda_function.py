@@ -10,7 +10,7 @@ def lambda_handler(event, context):
             "requestId": request_id,
             "error": {
                 "code": "application_not_deployed",
-                "message": "Deploy application code from integration-hub-api-platform",
+                "message": "Deploy the benefit checker API application code",
             },
         }),
     }

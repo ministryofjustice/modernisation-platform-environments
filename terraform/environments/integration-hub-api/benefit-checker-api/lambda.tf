@@ -40,7 +40,7 @@ module "lambda_api_authorizer" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda.git?ref=b842374147fc07731d79028517223e9e0cbaab6d" # v8.8.0
 
   function_name                = "${local.application_name}-${local.component_name}-authorizer"
-  description                  = "Authenticates API hosting platform clients"
+  description                  = "Authenticates benefit checker API clients"
   handler                      = "lambda_function.lambda_handler"
   runtime                      = "python3.13"
   source_path                  = "${local.bootstrap_code_root}/request-authorizer"
