@@ -40,7 +40,7 @@
       "soa_db_deletion_protection": true,
       "db_log_retention_days": 7,
 
-      "alb_deletion_protection": true
+      "nlb_deletion_protection": true
     }
   }
 }

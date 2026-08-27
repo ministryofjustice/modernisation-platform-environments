@@ -4,7 +4,7 @@ module "nlb_admin" {
 
   name               = "${local.component_name}-admin-${local.env_label}"
   subnet_ids         = data.aws_subnets.shared-private.ids
-  security_group_ids = [aws_security_group.alb_admin.id]
+  security_group_ids = [aws_security_group.nlb_admin.id]
   vpc_id             = data.aws_vpc.shared.id
   certificate_arn    = data.aws_acm_certificate.wildcard.arn
   target_port        = local.application_data.accounts[local.environment].admin_ssl_port
@@ -17,7 +17,7 @@ module "nlb_admin" {
     path     = "/weblogic/ready"
   }
 
-  enable_deletion_protection = local.application_data.accounts[local.environment].alb_deletion_protection
+  enable_deletion_protection = local.application_data.accounts[local.environment].nlb_deletion_protection
 
   tags = local.tags
 }
@@ -28,7 +28,7 @@ module "nlb_managed" {
 
   name               = "${local.component_name}-managed-${local.env_label}"
   subnet_ids         = data.aws_subnets.shared-private.ids
-  security_group_ids = [aws_security_group.alb_managed.id]
+  security_group_ids = [aws_security_group.nlb_managed.id]
   vpc_id             = data.aws_vpc.shared.id
   certificate_arn    = data.aws_acm_certificate.wildcard.arn
   target_port        = local.application_data.accounts[local.environment].managed_ssl_port
@@ -41,7 +41,7 @@ module "nlb_managed" {
     path     = "/weblogic/ready"
   }
 
-  enable_deletion_protection = local.application_data.accounts[local.environment].alb_deletion_protection
+  enable_deletion_protection = local.application_data.accounts[local.environment].nlb_deletion_protection
 
   tags = local.tags
 }
