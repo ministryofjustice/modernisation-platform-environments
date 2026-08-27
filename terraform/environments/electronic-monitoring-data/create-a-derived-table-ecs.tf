@@ -118,7 +118,7 @@ module "cadt_api_trigger" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.48.0"
+  version = "6.8.0"
 
   trusted_role_arns = flatten([data.aws_iam_role.mod-plat-oidc-cicd.arn])
 

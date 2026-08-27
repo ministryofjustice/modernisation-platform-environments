@@ -181,7 +181,7 @@ module "emd_ears_sars_cp_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
   count   = local.is-preproduction ? 1 : 0
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.48.0"
+  version = "6.8.0"
 
   trusted_role_arns = flatten([
     data.aws_iam_roles.mod_plat_roles.arns,
@@ -201,7 +201,7 @@ module "emd_validation_db_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
   count   = local.is-test || local.is-production ? 1 : 0
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.48.0"
+  version = "6.8.0"
 
   trusted_role_arns = flatten([
     data.aws_iam_roles.mod_plat_roles.arns,
@@ -221,7 +221,7 @@ module "emd_data_api_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
   count   = local.is-test ? 1 : 0
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.48.0"
+  version = "6.8.0"
 
   trusted_role_arns = flatten([
     data.aws_iam_roles.mod_plat_roles.arns,
@@ -241,7 +241,7 @@ module "emd_update_p1_cp_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
   count   = local.is-preproduction || local.is-production ? 1 : 0
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.48.0"
+  version = "6.8.0"
 
   trusted_role_arns = flatten([
     data.aws_iam_roles.mod_plat_roles.arns,
@@ -515,7 +515,7 @@ module "emdi_trail_maps_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.48.0"
+  version = "6.8.0"
 
   trusted_role_arns = flatten([
     data.aws_iam_roles.mod_plat_roles.arns,
@@ -603,7 +603,7 @@ module "cmt_front_end_assumable_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.48.0"
+  version = "6.8.0"
 
   trusted_role_arns = flatten([
     local.resolved-cloud-platform-iam-roles,
@@ -622,7 +622,7 @@ module "acquisitive_crime_assumable_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.48.0"
+  version = "6.8.0"
 
   trusted_role_arns = flatten([
     data.aws_iam_roles.mod_plat_roles.arns,
@@ -641,7 +641,7 @@ module "specials_cmt_front_end_assumable_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.48.0"
+  version = "6.8.0"
 
   trusted_role_arns = flatten([
     local.resolved-cloud-platform-iam-roles,
