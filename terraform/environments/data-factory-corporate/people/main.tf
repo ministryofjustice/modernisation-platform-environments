@@ -233,7 +233,7 @@ module "data_factory_guardduty_scan" {
 
 module "data_factory_guardduty_lambda" {
 
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/guardduty-lambda?ref=d38dd4f6225e53de1e6f84157ea4761c0bc963d4"
+  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/guardduty-lambda?ref=4a4cc845069e39cd2a03c049dafcc11d8e0f97af"
 
     name = "guardduty_lambda"
 
