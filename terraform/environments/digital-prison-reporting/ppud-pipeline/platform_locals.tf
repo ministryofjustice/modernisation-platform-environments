@@ -40,10 +40,7 @@ locals {
   # example_data = local.application_data.accounts[local.environment].example_var
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
 
-  source_bucket_arn = local.is-development ? "arn:aws:s3:::ppud-parquet-exports-dev-20251002161459329900000002" : null
+  dpr_rds_engine                 = local.application_data.accounts[local.environment].dpr_rds_db.engine
 
-  ap_id = data.aws_ssm_parameter.ap_platform_account_id.value
-
-  source_bucket_role_arn = local.is-development ? "arn:aws:iam::${local.ap_id}:role/ppud-parquet-exports-replication-dev-role" : null
 
 }

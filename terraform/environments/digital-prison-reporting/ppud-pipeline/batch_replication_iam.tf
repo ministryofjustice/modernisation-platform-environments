@@ -1,6 +1,8 @@
 
 data "aws_iam_policy_document" "batch_replication_destination" {
 
+  count = local.is-development ? 1 : 0
+
   statement {
     sid    = "AllowBatchCopyToDestination"
     effect = "Allow"
@@ -24,6 +26,8 @@ data "aws_iam_policy_document" "batch_replication_destination" {
 
 resource "aws_s3_bucket_policy" "batch_replication_destination" {
 
+  count = local.is-development ? 1 : 0
+
   bucket = module.rds_export.parquet_exports_bucket_id
-  policy = data.aws_iam_policy_document.batch_replication_destination.json
+  policy = data.aws_iam_policy_document.batch_replication_destination[0].json
 }

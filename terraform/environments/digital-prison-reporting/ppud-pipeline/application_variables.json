@@ -1,3 +1,19 @@
 {
-
+  "accounts": {
+    "development": {
+      "days_back": "3",
+      "cron_schedule": "cron(30 07 ? * MON *)",
+      "source_bucket_role_arn": "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-engineering-production"]}:role/ppud-parquet-exports-replication-dev-role"
+    },
+    "preproduction": {
+      "days_back": "1",
+      "cron_schedule": "cron(30 07 ? * TUE *)",
+      "source_bucket_role_arn": "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-engineering-production"]}:role/ppud-parquet-exports-replication-preprod-role"
+    },
+    "production": {
+      "days_back": "1",
+      "cron_schedule": "cron(30 07 * * ? *)",
+      "source_bucket_role_arn": "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-engineering-production"]}:role/ppud-parquet-exports-replication-prod-role"
+    }
+  }
 }
