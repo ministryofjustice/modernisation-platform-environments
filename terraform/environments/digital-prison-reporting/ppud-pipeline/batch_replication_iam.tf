@@ -14,7 +14,6 @@ data "aws_iam_policy_document" "batch_replication_destination" {
 
     actions = [
       "s3:PutObject",
-      "s3:PutObjectAcl",
       "s3:PutObjectTagging"
     ]
 
