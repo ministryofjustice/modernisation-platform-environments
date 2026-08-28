@@ -46,7 +46,8 @@
       "lz_aws_workspace_nonprod_prod": "10.200.0.0/19",
       "mojo_devices": "10.184.0.0/14",
       "dom1_devices": "10.172.68.144/29",
-      "moj_wifi": "10.148.0.0/14"
+      "moj_wifi": "10.148.0.0/14",
+      "cloud_platform_subnet": "172.20.0.0/16"
     }
   }
 }
