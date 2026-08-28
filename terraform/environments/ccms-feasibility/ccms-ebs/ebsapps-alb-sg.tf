@@ -17,6 +17,15 @@ resource "aws_vpc_security_group_ingress_rule" "alb_https_vpc" {
   cidr_ipv4         = data.aws_vpc.shared.cidr_block
 }
 
+resource "aws_vpc_security_group_ingress_rule" "alb_https_mojo_devices" {
+  security_group_id = aws_security_group.ebsapps_alb.id
+  description       = "HTTPS from Mojo Devices"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = local.application_data.accounts[local.environment].mojo_devices
+}
+
 resource "aws_vpc_security_group_egress_rule" "alb_to_apps" {
   security_group_id            = aws_security_group.ebsapps_alb.id
   description                  = "Traffic to EBS apps on application port"
