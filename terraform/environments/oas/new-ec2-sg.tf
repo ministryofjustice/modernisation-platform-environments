@@ -142,6 +142,18 @@ resource "aws_security_group_rule" "egress_https_s3" {
   prefix_list_ids   = [local.application_data.accounts[local.environment].s3_vpc_endpoint_prefix]
 }
 
+resource "aws_security_group_rule" "egress_http_internet" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "Outbound HTTP for yum repositories"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
 resource "aws_security_group_rule" "egress_https_internet" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
 

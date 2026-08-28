@@ -15,6 +15,13 @@ locals {
   ]
 
   loadbalancer_ingress_rules = {
+    "lb_ingress_80" = {
+      description = "Loadbalancer ingress rule for HTTP (redirects to HTTPS)"
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_blocks = local.moj_cidr_blocks
+    }
     "lb_ingress_443" = {
       description = "Loadbalancer ingress rule for HTTPS from MOJO devices, LZ Shared-Service Workspaces and OAS EC2 Instance"
       from_port   = 443
@@ -22,15 +29,29 @@ locals {
       protocol    = "tcp"
       cidr_blocks = local.moj_cidr_blocks
     }
+    "lb_ingress_9500" = {
+      description = "Loadbalancer ingress rule for HTTP 9500 (Console/EM)"
+      from_port   = 9500
+      to_port     = 9500
+      protocol    = "tcp"
+      cidr_blocks = local.moj_cidr_blocks
+    }
     "lb_ingress_9501" = {
-      description = "Loadbalancer ingress rule for HTTPS 9501 (Console/EM)"
+      description = "Loadbalancer ingress rule for HTTP 9501 (Console/EM)"
       from_port   = 9501
       to_port     = 9501
       protocol    = "tcp"
       cidr_blocks = local.moj_cidr_blocks
     }
+    "lb_ingress_9502" = {
+      description = "Loadbalancer ingress rule for HTTP 9502 (Analytics/DV)"
+      from_port   = 9502
+      to_port     = 9502
+      protocol    = "tcp"
+      cidr_blocks = local.moj_cidr_blocks
+    }
     "lb_ingress_9503" = {
-      description = "Loadbalancer ingress rule for HTTPS 9503 (Analytics/DV)"
+      description = "Loadbalancer ingress rule for HTTP 9503 (Analytics/DV)"
       from_port   = 9503
       to_port     = 9503
       protocol    = "tcp"
@@ -301,6 +322,50 @@ resource "aws_lb" "oas_lb" {
   )
 }
 
+resource "aws_lb_target_group" "oas_ec2_target_group" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  name_prefix          = "oas-ec"
+  port                 = 9500
+  protocol             = "HTTP"
+  vpc_id               = data.aws_vpc.shared.id
+  target_type          = "instance"
+  deregistration_delay = 30
+
+  stickiness {
+    type            = "lb_cookie"
+    cookie_duration = 86400
+  }
+
+  health_check {
+    path                = "/console"
+    port                = "9500"
+    healthy_threshold   = 3
+    interval            = 30
+    protocol            = "HTTP"
+    unhealthy_threshold = 3
+    matcher             = "200-399"
+    timeout             = 5
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-ec2-target-group" }
+  )
+}
+
+resource "aws_lb_target_group_attachment" "oas_ec2_attachment" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+  target_id        = aws_instance.oas_app_instance_new[0].id
+  port             = 9500
+}
+
 # Target Group for port 9501 HTTPS
 
 resource "aws_lb_target_group" "oas_ec2_https_9501_target_group" {
@@ -347,6 +412,51 @@ resource "aws_lb_target_group_attachment" "oas_ec2_https_9501_attachment" {
   port             = 9501
 }
 
+
+# Target Group for Analytics (port 9502)
+resource "aws_lb_target_group" "oas_analytics_target_group" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  name_prefix          = "oas-an"
+  port                 = 9502
+  protocol             = "HTTP"
+  vpc_id               = data.aws_vpc.shared.id
+  target_type          = "instance"
+  deregistration_delay = 30
+
+  stickiness {
+    type            = "lb_cookie"
+    cookie_duration = 86400
+  }
+
+  health_check {
+    path                = "/analytics"
+    port                = "9502"
+    healthy_threshold   = 3
+    interval            = 30
+    protocol            = "HTTP"
+    unhealthy_threshold = 3
+    matcher             = "200-399"
+    timeout             = 5
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-analytics-target-group" }
+  )
+}
+
+resource "aws_lb_target_group_attachment" "oas_analytics_attachment" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  target_id        = aws_instance.oas_app_instance_new[0].id
+  port             = 9502
+}
 
 # Target Group for Analytics port 9503 HTTPS
 
@@ -395,6 +505,23 @@ resource "aws_lb_target_group_attachment" "oas_ec2_https_9503_attachment" {
 }
 
 
+
+resource "aws_lb_listener" "http_listener" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  load_balancer_arn = aws_lb.oas_lb[0].arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
 
 resource "aws_lb_listener" "https_listener" {
   #checkov:skip=CKV_AWS_103
@@ -454,6 +581,58 @@ resource "aws_lb_listener" "https_9503_listener" {
   }
 }
 
+# HTTP Listener on port 9500 for WebLogic Console and Enterprise Manager
+resource "aws_lb_listener" "http_9500_listener" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  load_balancer_arn = aws_lb.oas_lb[0].arn
+  port              = 9500
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+  }
+}
+
+# Listener rule for /console on port 9500
+resource "aws_lb_listener_rule" "console_9500_rule" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.http_9500_listener[0].arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/console*"]
+    }
+  }
+}
+
+# Listener rule for /em on port 9500
+resource "aws_lb_listener_rule" "em_9500_rule" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.http_9500_listener[0].arn
+  priority     = 110
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/em*"]
+    }
+  }
+}
+
 # Listener rule for /console on port 9501
 resource "aws_lb_listener_rule" "console_9501_rule" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
@@ -491,6 +670,134 @@ resource "aws_lb_listener_rule" "em_9501_rule" {
     }
   }
 }
+
+# HTTP Listener on port 9502 for Analytics and Data Visualization
+resource "aws_lb_listener" "http_9502_listener" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  load_balancer_arn = aws_lb.oas_lb[0].arn
+  port              = 9502
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
+}
+
+# Listener rule for /analytics on port 9502
+resource "aws_lb_listener_rule" "analytics_9502_rule" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.http_9502_listener[0].arn
+  priority     = 200
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/analytics*"]
+    }
+  }
+}
+
+# Listener rule for /analytics-ws on port 9502
+resource "aws_lb_listener_rule" "analytics_ws_9502_rule" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.http_9502_listener[0].arn
+  priority     = 205
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/analytics-ws*"]
+    }
+  }
+}
+
+# Listener rule for /dv on port 9502
+resource "aws_lb_listener_rule" "dv_9502_rule" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.http_9502_listener[0].arn
+  priority     = 210
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/dv*"]
+    }
+  }
+}
+
+# Listener rule for /bi-security-login on port 9502
+resource "aws_lb_listener_rule" "bi_security_login_9502_rule" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.http_9502_listener[0].arn
+  priority     = 220
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/bi-security-login*"]
+    }
+  }
+}
+
+# Listener rule for /bi-sac-config-mgr on port 9502
+resource "aws_lb_listener_rule" "bi_sac_config_mgr_9502_rule" {
+  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+  listener_arn = aws_lb_listener.http_9502_listener[0].arn
+  priority     = 235
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/bi-sac-config-mgr*"]
+    }
+  }
+}
+
+# # Listener rule for /static on port 9502
+# resource "aws_lb_listener_rule" "static_9502_rule" {
+#   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+
+#   listener_arn = aws_lb_listener.http_9502_listener[0].arn
+#   priority     = 230
+
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
+#   }
+
+#   condition {
+#     path_pattern {
+#       values = ["/static*"]
+#     }
+#   }
+# }
 
 # Listener rule for /analytics on port 9503
 resource "aws_lb_listener_rule" "analytics_9503_rule" {
