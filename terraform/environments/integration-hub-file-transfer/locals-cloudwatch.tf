@@ -584,5 +584,67 @@ locals {
     }
   })
 
+  high_priority_alarm_names = toset(concat(
+    [
+      "lambda-file-received-adapter-errors",
+      "lambda-file-received-adapter-dead-letter-errors",
+      "lambda-file-scan-result-recorded-adapter-errors",
+      "lambda-file-scan-result-recorded-adapter-dead-letter-errors",
+      "lambda-stage-errors",
+      "lambda-stage-dead-letter-errors",
+      "lambda-stage-async-events-dropped",
+      "lambda-route-errors",
+      "lambda-route-dead-letter-errors",
+      "lambda-route-async-events-dropped",
+      "lambda-file-action-execution-requested-adapter-errors",
+      "lambda-file-action-execution-requested-adapter-dead-letter-errors",
+      "lambda-file-action-execution-requested-adapter-async-events-dropped",
+      "eventbridge-default-rule-failed-invocations",
+      "eventbridge-default-dlq-visible-messages",
+      "eventbridge-guardduty-malware-scan-result-failed-invocations",
+      "eventbridge-file-transfer-workflow-failed-invocations",
+      "eventbridge-file-routing-workflow-failed-invocations",
+      "eventbridge-file-action-dispatch-workflow-failed-invocations",
+      "eventbridge-file-transfer-workflow-dlq-visible-messages",
+      "lambda-file-received-adapter-dlq-visible-messages",
+      "lambda-file-scan-result-recorded-adapter-dlq-visible-messages",
+      "lambda-stage-dlq-visible-messages",
+      "lambda-route-dlq-visible-messages",
+      "lambda-file-action-execution-requested-adapter-dlq-visible-messages",
+      "guardduty-failed-scans",
+      "guardduty-infected-scans",
+    ],
+    [
+      for index, eip in aws_eip.this : "shield-transfer-eip-${index + 1}-ddos-detected"
+    ],
+  ))
+
+  low_priority_alarm_names = toset([
+    "lambda-file-received-adapter-throttles",
+    "lambda-file-received-adapter-duration",
+    "lambda-file-scan-result-recorded-adapter-throttles",
+    "lambda-file-scan-result-recorded-adapter-duration",
+    "lambda-stage-throttles",
+    "lambda-stage-duration",
+    "lambda-route-throttles",
+    "lambda-route-duration",
+    "lambda-file-action-execution-requested-adapter-throttles",
+    "lambda-file-action-execution-requested-adapter-duration",
+    "dynamodb-file-transfer-workflow-idempotency-read-throttles",
+    "dynamodb-file-transfer-workflow-idempotency-write-throttles",
+    "dynamodb-idempotency-read-throttles",
+    "dynamodb-idempotency-write-throttles",
+    "guardduty-skipped-scans-missing-permissions",
+    "guardduty-skipped-scans-unsupported",
+  ])
+
+  high_priority_alarm_actions = local.is-production ? [module.sns_pagerduty_high_priority.topic_arn] : [module.sns_pagerduty_low_priority.topic_arn]
+  low_priority_alarm_actions  = local.is-production ? [module.sns_pagerduty_low_priority.topic_arn] : []
+
+  cloudwatch_alarm_actions = merge(
+    { for alarm_name in local.high_priority_alarm_names : alarm_name => local.high_priority_alarm_actions },
+    { for alarm_name in local.low_priority_alarm_names : alarm_name => local.low_priority_alarm_actions },
+  )
+
   cloudwatch_retention_days = local.is-production ? 400 : 30
 }
