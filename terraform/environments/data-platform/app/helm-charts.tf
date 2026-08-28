@@ -3,7 +3,7 @@ resource "helm_release" "app" {
   /* https://github.com/ministryofjustice/data-platform-app */
   name       = "app"
   repository = "oci://ghcr.io/ministryofjustice/data-platform-charts"
-  version    = "0.5.0"
+  version    = "0.5.1"
   chart      = "app"
   namespace  = module.app_namespace.name
   values = [
