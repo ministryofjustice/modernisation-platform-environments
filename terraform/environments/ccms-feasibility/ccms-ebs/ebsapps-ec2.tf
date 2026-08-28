@@ -7,6 +7,7 @@ module "oracle_ebs_apps" {
   instance_profile_name = aws_iam_instance_profile.ebsapps.name
 
   instance_type      = local.application_data.accounts[local.environment].ec2_instance_type_ebsapps
+  ebs_optimized      = true
   ami_id             = local.application_data.accounts[local.environment].ebsapps_ami_ids[count.index]
   key_name           = local.application_data.accounts[local.environment].key_name
   subnet_id          = local.private_subnets[count.index]
