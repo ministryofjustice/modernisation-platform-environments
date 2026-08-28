@@ -6,11 +6,13 @@ module "oracle_ebs_apps" {
   name                  = "${local.component_name}-${local.env_label}-ebsapps-${count.index + 1}"
   instance_profile_name = aws_iam_instance_profile.ebsapps.name
 
-  instance_type      = local.application_data.accounts[local.environment].ec2_instance_type_ebsapps
-  ami_id             = local.application_data.accounts[local.environment].ebsapps_ami_ids[count.index]
-  key_name           = local.application_data.accounts[local.environment].key_name
-  subnet_id          = local.private_subnets[count.index]
-  security_group_ids = [aws_security_group.ebsapps.id]
+  instance_type        = local.application_data.accounts[local.environment].ec2_instance_type_ebsapps
+  cpu_core_count       = local.application_data.accounts[local.environment].ec2_instance_cores_ebsapps
+  cpu_threads_per_core = local.application_data.accounts[local.environment].ec2_instance_threads_ebsapps
+  ami_id               = local.application_data.accounts[local.environment].ebsapps_ami_ids[count.index]
+  key_name             = local.application_data.accounts[local.environment].key_name
+  subnet_id            = local.private_subnets[count.index]
+  security_group_ids   = [aws_security_group.ebsapps.id]
 
   tags = merge(local.tags, {
     instance-role       = "ebsapps"
