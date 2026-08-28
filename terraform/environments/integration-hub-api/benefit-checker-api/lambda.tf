@@ -1,8 +1,3 @@
-data "aws_secretsmanager_secret" "downstream_basic_auth" {
-  count = local.create_service ? 1 : 0
-  name  = local.downstream_basic_auth_secret_id
-}
-
 module "lambda_benefit_orchestrator" {
   count = local.create_service ? 1 : 0
 
@@ -18,7 +13,7 @@ module "lambda_benefit_orchestrator" {
   trigger_on_package_timestamp = false
   environment_variables = {
     DOWNSTREAM_BENEFIT_CHECKER_URL  = local.downstream_benefit_checker_url
-    DOWNSTREAM_BASIC_AUTH_SECRET_ID = data.aws_secretsmanager_secret.downstream_basic_auth[0].name
+    DOWNSTREAM_BASIC_AUTH_SECRET_ID = module.downstream_basic_auth_secret[0].secret_name
     DOWNSTREAM_TIMEOUT_SECONDS      = "5"
     SECRET_CACHE_TTL_SECONDS        = "300"
   }
@@ -27,7 +22,7 @@ module "lambda_benefit_orchestrator" {
     downstream_secret_read = {
       effect    = "Allow"
       actions   = ["secretsmanager:GetSecretValue"]
-      resources = [data.aws_secretsmanager_secret.downstream_basic_auth[0].arn]
+      resources = [module.downstream_basic_auth_secret[0].secret_arn]
     }
   }
   cloudwatch_logs_retention_in_days = 30

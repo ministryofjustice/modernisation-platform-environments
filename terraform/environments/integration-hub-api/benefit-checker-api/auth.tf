@@ -35,3 +35,21 @@ module "api_system_bearer_token_secret" {
   })
   tags = local.tags
 }
+
+module "downstream_basic_auth_secret" {
+  count = local.create_service ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
+
+  name                    = "${local.application_name}-${local.component_name}-${local.environment}-downstream-basic-auth"
+  description             = "Consumer-owned copy of the downstream mock API Basic authentication credentials"
+  recovery_window_in_days = 7
+  create_policy           = false
+  block_public_policy     = true
+  ignore_secret_changes   = true
+  secret_string = jsonencode({
+    username = "orchestration-client"
+    password = "replace-me"
+  })
+  tags = local.tags
+}

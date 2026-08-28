@@ -20,8 +20,11 @@ The public health route is `GET /health`. The authenticated client route is
 `POST /v1/benefit-checks/assessments`. Application code and OpenAPI are in
 `ministryofjustice/integration-hub-api-platform`.
 
-Resources are gated by `local.is-development`. The downstream mock API and its
-credential secret must exist before applying this component.
+Resources are gated by `local.is-development`. The downstream mock API must
+exist before applying this component. The component creates a consumer-owned
+Secrets Manager secret for the downstream Basic credential because the mock
+provider is hosted in a separate AWS account. Its bootstrap value is unusable
+until it is populated operationally from the provider credential.
 
 ## Deployment sequence
 
@@ -34,8 +37,10 @@ credential secret must exist before applying this component.
 4. Apply the component and set the application repository environment
    `integration-hub-api-benefit-checker-api-development` variable
    `AWS_DEPLOY_ROLE_ARN` from the `app_deploy_role_arn` output.
-5. Replace the generated client credential placeholders in Secrets Manager.
-6. Deploy both application Lambda packages and execute the end-to-end test.
+5. Populate `downstream_basic_auth_secret_name` with the downstream mock
+   credential using an operational, out-of-band secret copy.
+6. Replace the generated client credential placeholders in Secrets Manager.
+7. Deploy both application Lambda packages and execute the end-to-end test.
 
 The previously deployed proof-of-concept resources remain in their legacy
 state until this isolated replacement has been tested. Their removal is a

@@ -4,7 +4,6 @@
       "api_configuration": {
         "cors_allowed_origins": [],
         "downstream_benefit_checker_url": "https://kic2y0kswe.execute-api.eu-west-2.amazonaws.com",
-        "downstream_basic_auth_secret_id": "integration-hub-downstream-mock-api-development-basic-auth",
         "rate_limit": 20,
         "burst_limit": 10
       },

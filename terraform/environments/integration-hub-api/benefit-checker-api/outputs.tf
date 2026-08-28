@@ -18,6 +18,11 @@ output "app_deploy_role_arn" {
   value       = try(aws_iam_role.app_deploy[0].arn, null)
 }
 
+output "downstream_basic_auth_secret_name" {
+  description = "Consumer-owned secret to populate operationally with the downstream mock API credentials"
+  value       = try(module.downstream_basic_auth_secret[0].secret_name, null)
+}
+
 output "user_auth_secret_names" {
   description = "Basic authentication secret names keyed by username"
   value       = { for username, secret in module.api_user_credentials_secret : username => secret.secret_name }
