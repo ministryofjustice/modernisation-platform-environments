@@ -81,7 +81,7 @@ locals {
       elasticache_node_type = "cache.t4g.medium"
     }
     preproduction = {
-      litellm_version     = "1.97.0"
+      litellm_version     = "1.98.0"
       ai_gateway_hostname = "preproduction.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
