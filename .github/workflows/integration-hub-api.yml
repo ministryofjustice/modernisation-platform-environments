@@ -52,6 +52,7 @@ jobs:
     with:
       application: "${{ github.workflow }}"
       account_name: "integration-hub-${{ matrix.target }}"
+      workspace_name: "integration-hub-api-${{ matrix.target }}"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
       component: "${{ matrix.component }}"     # If your strategy workflow also outputs "matrix.component"
@@ -65,6 +66,7 @@ jobs:
     with:
       application: "${{ github.workflow }}"
       account_name: "integration-hub-development"
+      workspace_name: "integration-hub-api-development"
       environment: "development"
       action: "plan_apply"
       plan_apply_tfargs: "-destroy"

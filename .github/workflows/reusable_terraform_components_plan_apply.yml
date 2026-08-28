@@ -36,6 +36,10 @@
             type: string
             required: false
             description: "Optional: account name override for ACCOUNT_NAME env var."
+          workspace_name:
+            type: string
+            required: false
+            description: "Optional: Terraform workspace override when it differs from the AWS account name."
           post_plan_to_pr:
             type: boolean
             required: false
@@ -70,7 +74,7 @@
 
     env:
       ACCOUNT_NAME: "${{ inputs.account_name || format('{0}-{1}', inputs.application, inputs.environment) }}"
-      WORKSPACE_NAME: "${{ inputs.account_name || format('{0}-{1}', inputs.application, inputs.environment) }}"
+      WORKSPACE_NAME: "${{ inputs.workspace_name || inputs.account_name || format('{0}-{1}', inputs.application, inputs.environment) }}"
       SKIP_PLAN_EVALUATOR: "[]"
       SKIP_PLAN_EVALUATOR_FILE: ".github/config/skip-plan-evaluator-workspaces.json"
     permissions:
@@ -100,6 +104,7 @@
               echo "application=${{ inputs.application }}"
               echo "environment=${{ inputs.environment }}"
               echo "account_name=${{ inputs.account_name }}"
+              echo "workspace_name=${{ inputs.workspace_name }}"
               echo "action=${{ inputs.action }}"
               echo "plan_apply_tfargs=${{ inputs.plan_apply_tfargs }}"
               echo "do_state_refresh_on_plan=${{ inputs.do_state_refresh_on_plan }}"
