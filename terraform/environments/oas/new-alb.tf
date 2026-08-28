@@ -37,7 +37,7 @@ locals {
       cidr_blocks = local.moj_cidr_blocks
     }
     "lb_ingress_9501" = {
-      description = "Loadbalancer ingress rule for HTTP 9501 (Console/EM)"
+      description = "Loadbalancer ingress rule for HTTPS 9501 (Console/EM)"
       from_port   = 9501
       to_port     = 9501
       protocol    = "tcp"
@@ -51,7 +51,7 @@ locals {
       cidr_blocks = local.moj_cidr_blocks
     }
     "lb_ingress_9503" = {
-      description = "Loadbalancer ingress rule for HTTP 9503 (Analytics/DV)"
+      description = "Loadbalancer ingress rule for HTTPS 9503 (Analytics/DV)"
       from_port   = 9503
       to_port     = 9503
       protocol    = "tcp"
@@ -323,7 +323,7 @@ resource "aws_lb" "oas_lb" {
 }
 
 resource "aws_lb_target_group" "oas_ec2_target_group" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+  count = contains(["development"], local.environment) ? 1 : 0
 
   name_prefix          = "oas-ec"
   port                 = 9500
@@ -359,7 +359,7 @@ resource "aws_lb_target_group" "oas_ec2_target_group" {
 }
 
 resource "aws_lb_target_group_attachment" "oas_ec2_attachment" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+  count = contains(["development"], local.environment) ? 1 : 0
 
   target_group_arn = aws_lb_target_group.oas_ec2_target_group[0].arn
   target_id        = aws_instance.oas_app_instance_new[0].id
@@ -415,7 +415,7 @@ resource "aws_lb_target_group_attachment" "oas_ec2_https_9501_attachment" {
 
 # Target Group for Analytics (port 9502)
 resource "aws_lb_target_group" "oas_analytics_target_group" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+  count = contains(["development"], local.environment) ? 1 : 0
 
   name_prefix          = "oas-an"
   port                 = 9502
@@ -451,7 +451,7 @@ resource "aws_lb_target_group" "oas_analytics_target_group" {
 }
 
 resource "aws_lb_target_group_attachment" "oas_analytics_attachment" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+  count = contains(["development"], local.environment) ? 1 : 0
 
   target_group_arn = aws_lb_target_group.oas_analytics_target_group[0].arn
   target_id        = aws_instance.oas_app_instance_new[0].id
@@ -507,7 +507,7 @@ resource "aws_lb_target_group_attachment" "oas_ec2_https_9503_attachment" {
 
 
 resource "aws_lb_listener" "http_listener" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+  count = contains(["development"], local.environment) ? 1 : 0
 
   load_balancer_arn = aws_lb.oas_lb[0].arn
   port              = 80
@@ -583,7 +583,7 @@ resource "aws_lb_listener" "https_9503_listener" {
 
 # HTTP Listener on port 9500 for WebLogic Console and Enterprise Manager
 resource "aws_lb_listener" "http_9500_listener" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+  count = contains(["development"], local.environment) ? 1 : 0
 
   load_balancer_arn = aws_lb.oas_lb[0].arn
   port              = 9500
@@ -597,7 +597,7 @@ resource "aws_lb_listener" "http_9500_listener" {
 
 # Listener rule for /console on port 9500
 resource "aws_lb_listener_rule" "console_9500_rule" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+  count = contains(["development"], local.environment) ? 1 : 0
 
   listener_arn = aws_lb_listener.http_9500_listener[0].arn
   priority     = 100
@@ -616,7 +616,7 @@ resource "aws_lb_listener_rule" "console_9500_rule" {
 
 # Listener rule for /em on port 9500
 resource "aws_lb_listener_rule" "em_9500_rule" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+  count = contains(["development"], local.environment) ? 1 : 0
 
   listener_arn = aws_lb_listener.http_9500_listener[0].arn
   priority     = 110
@@ -673,7 +673,7 @@ resource "aws_lb_listener_rule" "em_9501_rule" {
 
 # HTTP Listener on port 9502 for Analytics and Data Visualization
 resource "aws_lb_listener" "http_9502_listener" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+  count = contains(["development"], local.environment) ? 1 : 0
 
   load_balancer_arn = aws_lb.oas_lb[0].arn
   port              = 9502
@@ -687,7 +687,7 @@ resource "aws_lb_listener" "http_9502_listener" {
 
 # Listener rule for /analytics on port 9502
 resource "aws_lb_listener_rule" "analytics_9502_rule" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+  count = contains(["development"], local.environment) ? 1 : 0
 
   listener_arn = aws_lb_listener.http_9502_listener[0].arn
   priority     = 200
@@ -706,7 +706,7 @@ resource "aws_lb_listener_rule" "analytics_9502_rule" {
 
 # Listener rule for /analytics-ws on port 9502
 resource "aws_lb_listener_rule" "analytics_ws_9502_rule" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+  count = contains(["development"], local.environment) ? 1 : 0
 
   listener_arn = aws_lb_listener.http_9502_listener[0].arn
   priority     = 205
@@ -725,7 +725,7 @@ resource "aws_lb_listener_rule" "analytics_ws_9502_rule" {
 
 # Listener rule for /dv on port 9502
 resource "aws_lb_listener_rule" "dv_9502_rule" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+  count = contains(["development"], local.environment) ? 1 : 0
 
   listener_arn = aws_lb_listener.http_9502_listener[0].arn
   priority     = 210
@@ -744,7 +744,7 @@ resource "aws_lb_listener_rule" "dv_9502_rule" {
 
 # Listener rule for /bi-security-login on port 9502
 resource "aws_lb_listener_rule" "bi_security_login_9502_rule" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+  count = contains(["development"], local.environment) ? 1 : 0
 
   listener_arn = aws_lb_listener.http_9502_listener[0].arn
   priority     = 220
@@ -763,7 +763,7 @@ resource "aws_lb_listener_rule" "bi_security_login_9502_rule" {
 
 # Listener rule for /bi-sac-config-mgr on port 9502
 resource "aws_lb_listener_rule" "bi_sac_config_mgr_9502_rule" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+  count = contains(["development"], local.environment) ? 1 : 0
 
   listener_arn = aws_lb_listener.http_9502_listener[0].arn
   priority     = 235
@@ -782,7 +782,7 @@ resource "aws_lb_listener_rule" "bi_sac_config_mgr_9502_rule" {
 
 # # Listener rule for /static on port 9502
 # resource "aws_lb_listener_rule" "static_9502_rule" {
-#   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+#   count = contains(["development"], local.environment) ? 1 : 0
 
 #   listener_arn = aws_lb_listener.http_9502_listener[0].arn
 #   priority     = 230

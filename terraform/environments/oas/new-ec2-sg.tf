@@ -143,7 +143,7 @@ resource "aws_security_group_rule" "egress_https_s3" {
 }
 
 resource "aws_security_group_rule" "egress_http_internet" {
-  count = contains(["preproduction", "development"], local.environment) ? 1 : 0
+  count = contains(["development"], local.environment) ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.ec2_sg[0].id
