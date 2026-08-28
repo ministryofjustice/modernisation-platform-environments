@@ -1,6 +1,8 @@
 data "aws_iam_policy_document" "app_deploy_assume_role" {
   count = local.create_service ? 1 : 0
 
+  #checkov:skip=CKV_AWS_358:MoJ customises the OIDC subject with immutable organisation and repository IDs; the exact environment subject is safer than Checkov's expected default GitHub format
+
   statement {
     effect = "Allow"
     principals {
@@ -14,9 +16,9 @@ data "aws_iam_policy_document" "app_deploy_assume_role" {
       values   = ["sts.amazonaws.com"]
     }
     condition {
-      test     = "StringLike"
+      test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:ministryofjustice/integration-hub-api-platform:environment:integration-hub-api-benefit-checker-api-${local.environment}*"]
+      values   = ["repo:ministryofjustice@2203574/integration-hub-api-platform@1345214832:environment:integration-hub-api-benefit-checker-api-${local.environment}"]
     }
   }
 }
