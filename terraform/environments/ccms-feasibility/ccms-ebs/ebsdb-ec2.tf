@@ -5,13 +5,11 @@ module "oracle_ebs_db" {
   name                  = "${local.component_name}-${local.env_label}-ebsdb"
   instance_profile_name = aws_iam_instance_profile.ebsdb.name
 
-  instance_type        = local.application_data.accounts[local.environment].ec2_instance_type_ebsdb
-  cpu_core_count       = local.application_data.accounts[local.environment].ec2_instance_cores_ebsdb
-  cpu_threads_per_core = local.application_data.accounts[local.environment].ec2_instance_threads_ebsdb
-  ami_id               = local.application_data.accounts[local.environment].ebsdb_ami_id
-  key_name             = local.application_data.accounts[local.environment].key_name
-  subnet_id            = data.aws_subnet.data_subnets_a.id
-  security_group_ids   = [aws_security_group.ebsdb.id]
+  instance_type      = local.application_data.accounts[local.environment].ec2_instance_type_ebsdb
+  ami_id             = local.application_data.accounts[local.environment].ebsdb_ami_id
+  key_name           = local.application_data.accounts[local.environment].key_name
+  subnet_id          = data.aws_subnet.data_subnets_a.id
+  security_group_ids = [aws_security_group.ebsdb.id]
 
   tags = merge(local.tags, {
     instance-role       = "ebsdb"

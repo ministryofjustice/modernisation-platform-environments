@@ -3,12 +3,8 @@
     "development": {
       "key_name": "",
       "ec2_instance_type_ebsdb": "m5d.4xlarge",
-      "ec2_instance_cores_ebsdb": 8,
-      "ec2_instance_threads_ebsdb": 2,
       "ebsdb_ami_id": "ami-01321d07947791ee8",
       "ec2_instance_type_ebsapps": "m5d.2xlarge",
-      "ec2_instance_cores_ebsapps": 4,
-      "ec2_instance_threads_ebsapps": 2,
       "ebsapps_ami_ids": ["ami-0932e4d9484436e47", "ami-011e346b2cd58cdc8"],
       "tg_apps_port": 8000,
       "ebs_size_ebsdb_swap": 20,
