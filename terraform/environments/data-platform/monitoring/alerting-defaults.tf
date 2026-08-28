@@ -26,10 +26,10 @@ locals {
     litellm_callback_logging_failures_crit      = 20   # raw count of callback logging failures per 5m
 
     # ── Latency (seconds) ───────────────────────────────────────────────────
-    litellm_proxy_latency_p99_warn            = 10   # total request latency p99, seconds
-    litellm_proxy_latency_p99_crit            = 15   # total request latency p99, seconds
-    litellm_llm_api_latency_p99_warn          = 10   # LLM API latency p99, seconds
-    litellm_llm_api_latency_p99_crit          = 30   # LLM API latency p99, seconds
+    litellm_proxy_latency_p99_warn            = 35   # total request latency p99, seconds
+    litellm_proxy_latency_p99_crit            = 55   # total request latency p99, seconds
+    litellm_llm_api_latency_p99_warn          = 25   # LLM API latency p99, seconds
+    litellm_llm_api_latency_p99_crit          = 45   # LLM API latency p99, seconds
     litellm_ttft_p99_warn                     = 3    # time-to-first-token p99, seconds
     litellm_ttft_p99_crit                     = 8    # time-to-first-token p99, seconds
     litellm_in_flight_requests_warn           = 100  # concurrent in-flight requests across all pods
@@ -46,8 +46,8 @@ locals {
     litellm_failed_fallbacks_crit = 5 # raw count of failed fallback attempts per 5m
 
     # ── Rate-Limit ──────────────────────────────────────────────────
-    litellm_remaining_requests_warn         = 50   # remaining requests before provider rate limit, per model/provider
-    litellm_remaining_requests_crit         = 10   # remaining requests before provider rate limit, per model/provider
+    litellm_remaining_requests_warn         = 20   # remaining requests before provider rate limit, per model/provider
+    litellm_remaining_requests_crit         = 5    # remaining requests before provider rate limit, per model/provider
     litellm_remaining_tokens_warn           = 5000 # remaining tokens before provider rate limit, per model/provider
     litellm_remaining_tokens_crit           = 1000 # remaining tokens before provider rate limit, per model/provider
     litellm_api_key_remaining_requests_warn = 20   # remaining requests before per-key model rate limit
@@ -68,8 +68,8 @@ locals {
     litellm_redis_latency_p99_crit  = 0.5 # Redis latency p99, seconds
 
     # ── Internal Self Latency ────────────────────────────────────────────────
-    litellm_self_latency_p99_warn = 5  # internal SDK latency p99, seconds
-    litellm_self_latency_p99_crit = 10 # internal SDK latency p99, seconds
+    litellm_self_latency_p99_warn = 35  # internal SDK latency p99, seconds
+    litellm_self_latency_p99_crit = 55 # internal SDK latency p99, seconds
 
     # ── Spend Queue Backpressure ────────────────────────────────────────────
     litellm_redis_spend_queue_warn           = 100  # queued spend updates in Redis
@@ -106,6 +106,62 @@ locals {
     # Critical Baseline +300%
     bedrock_invocations_baseline_warn = 100
     bedrock_invocations_baseline_crit = 300
+
+    # -------------------------------------------------------------------------
+    # Azure AI Foundry
+    # -------------------------------------------------------------------------
+    # Errors: non-200 ModelRequests responses, per model deployment
+    azure_foundry_errors_warn = 1 # raw count of non-200 requests per 5m
+    azure_foundry_errors_crit = 5 # raw count of non-200 requests per 5m
+
+    # Latency: TimeToLastByte, seconds
+    azure_foundry_latency_warn = 20 # seconds
+    azure_foundry_latency_crit = 35 # seconds
+
+    # Latency: TimeToResponse (time-to-first-token), seconds
+    azure_foundry_ttft_warn = 10 # seconds
+    azure_foundry_ttft_crit = 20 # seconds
+
+    # PTU utilisation: AzureOpenAIProvisionedManagedUtilizationV2, %
+    azure_foundry_ptu_warn = 80 # % of provisioned managed throughput
+    azure_foundry_ptu_crit = 95 # % of provisioned managed throughput
+
+    # 429s (throttling/quota), raw count per 5m, per model deployment
+    azure_foundry_rate_limited_warn = 5  # raw count of 429s per 5m
+    azure_foundry_rate_limited_crit = 20 # raw count of 429s per 5m
+
+    # Traffic: total ModelRequests floor treated as effectively zero — pairs with
+    # ok_when_nodata=false, same pattern as litellm_proxy_zero_traffic_crit
+    azure_foundry_zero_traffic_crit = 0.01
+
+    # -------------------------------------------------------------------------
+    # Vertex AI
+    # -------------------------------------------------------------------------
+    vertex_invocation_errors_warn = 5  # non-2xx invocations per 5m window, per model
+    vertex_invocation_errors_crit = 20 # non-2xx invocations per 5m window, per model
+    vertex_latency_p99_warn       = 3000 # invocation latency p99, ms
+    vertex_latency_p99_crit       = 9000 # invocation latency p99, ms
+
+    # 429s (quota/rate-limit exhaustion), raw invocation-rate count per 5m
+    vertex_rate_limited_warn = 5  # raw count of 429 invocations per 5m
+    vertex_rate_limited_crit = 20 # raw count of 429 invocations per 5m
+
+    # Traffic: invocation-rate floor treated as effectively zero — pairs with
+    # ok_when_nodata=false, same pattern as litellm_proxy_zero_traffic_crit
+    vertex_zero_traffic_crit = 0.01
+
+    # -------------------------------------------------------------------------
+    # Bedrock Guardrails
+    # -------------------------------------------------------------------------
+    bedrock_guardrail_interventions_warn = 5  # interventions per 5m window
+    bedrock_guardrail_interventions_crit = 20 # interventions per 5m window
+    bedrock_guardrail_client_errors_warn = 1  # client errors per 5m window
+    bedrock_guardrail_client_errors_crit = 5  # client errors per 5m window
+    bedrock_guardrail_server_errors_warn = 1  # server errors per 5m window
+    bedrock_guardrail_server_errors_crit = 5  # server errors per 5m window
+    bedrock_guardrail_throttles_warn     = 1  # throttled requests per 5m window
+    bedrock_guardrail_throttles_crit     = 5  # throttled requests per 5m window
+
   }
   # Per-account effective thresholds: defaults merged with any account-specific
   # overrides (alert_account_configs[uid].threshold_overrides).

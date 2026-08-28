@@ -1,6 +1,6 @@
 # KMS key for ppud pipeline
 module "ppud_kms" {
-  count         = local.is-test ? 0 : 1
+  count = local.is-test ? 0 : 1
 
   # v4.2.1
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms?ref=af1d45558a6073c017a732d2273efcc733b34d0f"

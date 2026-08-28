@@ -4,8 +4,10 @@ locals {
   # the suffix used when naming the rule group in the YAML output.
   # ---------------------------------------------------------------------------
   group_folders = {
-    "AI Gateway" = { folder = "internal/compute/ai-gateway", name_suffix = "litellm" }
-    "Bedrock"    = { folder = "internal/data/bedrock", name_suffix = "bedrock" }
+    "AI Gateway"       = { folder = "internal/compute/ai-gateway", name_suffix = "litellm" }
+    "Bedrock"          = { folder = "internal/data/bedrock", name_suffix = "bedrock" }
+    "Azure AI Foundry" = { folder = "internal/compute/ai-foundry", name_suffix = "azure-foundry" }
+    "Vertex AI"        = { folder = "internal/compute/vertex-ai", name_suffix = "vertex-ai" }
   }
 
   # ---------------------------------------------------------------------------
@@ -16,19 +18,63 @@ locals {
   #   namespace      = CloudWatch namespace (omit for Prometheus signals)
   #   metric         = CloudWatch metric name / short label for Prometheus signals
   #   statistic      = CloudWatch statistic (Sum, Average, Maximum, Minimum, p99 …)
-  #   datasource_type = (optional) "prometheus" to use PromQL instead of CloudWatch.
-  #                     When set, supply `expr` instead of namespace/metric/statistic.
+  #   datasource_type = (optional, default "cloudwatch") one of "cloudwatch" (default),
+  #                     "prometheus", "azure_monitor", or "stackdriver".
+  #                       "cloudwatch"    → supply namespace/metric/statistic.
+  #                       "prometheus"    → supply `expr` instead of
+  #                                         namespace/metric/statistic.
+  #                       "azure_monitor" → supply namespace/metric/statistic as with
+  #                                         CloudWatch (namespace is the Azure resource
+  #                                         type, e.g. "microsoft.cognitiveservices/accounts";
+  #                                         statistic is the Azure Monitor aggregation,
+  #                                         e.g. "Average"/"Total"). Queries the shared
+  #                                         Azure Monitor datasource (cfg.azure_monitor_
+  #                                         datasource_uid, default "azure-monitor-ai-foundry").
+  #                       "stackdriver"   → Google Cloud Monitoring. Supply namespace/metric
+  #                                         as with CloudWatch, plus resource_type/aligner/
+  #                                         reducer (and optionally filter) instead of
+  #                                         statistic. Queries cfg.stackdriver_datasource_uid
+  #                                         (default "google-cloud-monitoring").
   #   expr           = PromQL expression (datasource_type = "prometheus" only).
   #                    Use __NAMESPACES__ as a token where a namespace regex is needed;
   #                    it is replaced at render time with cfg.namespaces joined by "|".
+  #   filter_dimension = (azure_monitor only, optional) Azure Monitor dimension name to
+  #                    filter the metric on, e.g. "StatusCode".
+  #   filter_operator  = (azure_monitor only, optional) comparison operator for
+  #                    filter_dimension/filter_value — "eq" or "ne". Defaults to "eq".
+  #   filter_value     = (azure_monitor only, optional) value compared against
+  #                    filter_dimension via filter_operator.
+  #   filter           = (stackdriver only, optional) raw Cloud Monitoring filter
+  #                    fragment ANDed onto the base metric.type + resource.type
+  #                    filters, e.g. 'metric.label.response_code != "200"'.
+  #   aligner          = (stackdriver only) Cloud Monitoring perSeriesAligner,
+  #                    e.g. "ALIGN_RATE", "ALIGN_MEAN". For percentile metrics on
+  #                    distribution-type data (e.g. latency), use "ALIGN_DELTA"
+  #                    paired with reducer = "REDUCE_PERCENTILE_99" — Cloud
+  #                    Monitoring computes percentiles via the reducer, not the
+  #                    aligner.
+  #   reducer          = (stackdriver only) Cloud Monitoring crossSeriesReducer,
+  #                    e.g. "REDUCE_SUM", "REDUCE_MEAN", "REDUCE_PERCENTILE_99".
+  #   resource_type    = (stackdriver only, required) Cloud Monitoring resource.type
+  #                    filter value, e.g. "aiplatform.googleapis.com/PublisherModel"
+  #                    for Vertex AI's foundation-model serving path
+  #                    (aiplatform.googleapis.com/publisher/online_serving/*).
+  #                    Different parts of Vertex AI (custom endpoints, training
+  #                    jobs, etc.) use a different resource.type — set explicitly
+  #                    per rule; there is no default in alerting-rules.tf.
   #   type           = alert logic:
   #                      gt          → fire when value > threshold         (condition C)
   #                      lt          → fire when value < threshold         (condition C)
   #                      baseline_gt → fire when % above hourly baseline   (condition D)
   #                      baseline_lt → fire when % below hourly baseline   (condition D)
-  #   dim_key        = primary CloudWatch dimension key ("" = no dimension filter)
-  #                    Supported keys and the environment_configurations field they
-  #                    resolve against at render time:
+  #   dim_key        = primary dimension/grouping key ("" = no dimension filter). For
+  #                    cloudwatch/azure_monitor rules this becomes an actual dimension
+  #                    filter on the rendered query; the resolution happens in
+  #                    rule_combos_by_env (alerting-rules.tf), which lists each key
+  #                    explicitly — any key not listed there falls through to the
+  #                    default "" case with no dimension filter at all, even if a
+  #                    matching environment_configurations field exists elsewhere.
+  #                    Supported keys and what they resolve against at render time:
   #                      ""                     → no dimension filter (global aggregate)
   #                      "BucketName"           → cfg.s3_buckets        (list of bucket names)
   #                      "DBInstanceIdentifier" → cfg.rds_instances     (list of RDS instance IDs)
@@ -37,7 +83,18 @@ locals {
   #                      "Namespace"            → cfg.namespaces        (list of k8s namespaces)
   #                      "ClusterName"          → ["*"]                 (wildcard — all clusters)
   #                      "NodeName"             → ["*"]                 (wildcard — all nodes)
-  #                      "ModelId"             → ["*"]                 (wildcard — all models)
+  #                      "ModelDeploymentName"  → ["*"]                 (wildcard — rendered as a
+  #                                               literal ModelDeploymentName="*" Azure Monitor
+  #                                               dimensionFilters entry; NOT scoped against
+  #                                               cfg.azure_foundry_model_deployments, which
+  #                                               is not a real config field)
+  #                      "ModelId"              → not one of the explicit cases above, so it
+  #                                               falls through to the "" default — no
+  #                                               CloudWatch dimension is emitted at all
+  #                                               (global aggregate across all models).
+  #                                               Practically equivalent to the wildcard
+  #                                               entries above, but via the no-filter path
+  #                                               rather than an actual ModelId="*" filter.
   #                      "FileSystemId"         → cfg.efs_file_systems  (list of EFS file system IDs)
   #                    One alert rule is generated per value in the resolved list;
   #                    the value is appended as a suffix to the rule name.
@@ -142,5 +199,33 @@ locals {
     bedrock_server_errors = { group = "Bedrock", namespace = "AWS/Bedrock", metric = "InvocationServerErrors", statistic = "Sum", type = "gt", dim_key = "ModelId", warning = "bedrock_server_errors_warn", critical = "bedrock_server_errors_crit" }
     bedrock_legacy_model  = { group = "Bedrock", namespace = "AWS/Bedrock", metric = "LegacyModelInvocations", statistic = "Sum", type = "gt", dim_key = "ModelId", warning = "bedrock_legacy_model_warn", critical = "bedrock_legacy_model_crit" }
     bedrock_invocations   = { group = "Bedrock", namespace = "AWS/Bedrock", metric = "Invocations", statistic = "Sum", type = "baseline_gt", dim_key = "ModelId", warning = "bedrock_invocations_baseline_warn", critical = "bedrock_invocations_baseline_crit" }
+
+    # -------------------------------------------------------------------------
+    # Bedrock Guardrails
+    # -------------------------------------------------------------------------
+    bedrock_guardrail_interventions = { group = "Bedrock", namespace = "AWS/Bedrock/Guardrails", metric = "InvocationsIntervened", statistic = "Sum", type = "gt", dim_key = "", ok_when_nodata = true, warning = "bedrock_guardrail_interventions_warn", critical = "bedrock_guardrail_interventions_crit" }
+    bedrock_guardrail_client_errors = { group = "Bedrock", namespace = "AWS/Bedrock/Guardrails", metric = "InvocationClientErrors", statistic = "Sum", type = "gt", dim_key = "", ok_when_nodata = true, warning = "bedrock_guardrail_client_errors_warn", critical = "bedrock_guardrail_client_errors_crit" }
+    bedrock_guardrail_server_errors = { group = "Bedrock", namespace = "AWS/Bedrock/Guardrails", metric = "InvocationServerErrors", statistic = "Sum", type = "gt", dim_key = "", ok_when_nodata = true, warning = "bedrock_guardrail_server_errors_warn", critical = "bedrock_guardrail_server_errors_crit" }
+    bedrock_guardrail_throttles     = { group = "Bedrock", namespace = "AWS/Bedrock/Guardrails", metric = "InvocationThrottles", statistic = "Sum", type = "gt", dim_key = "", ok_when_nodata = true, warning = "bedrock_guardrail_throttles_warn", critical = "bedrock_guardrail_throttles_crit" }
+
+
+    # -------------------------------------------------------------------------
+    # Azure AI Foundry
+    # -------------------------------------------------------------------------
+    azure_foundry_errors       = { group = "Azure AI Foundry", datasource_type = "azure_monitor", namespace = "microsoft.cognitiveservices/accounts", metric = "ModelRequests", statistic = "Total", filter_dimension = "StatusCode", filter_operator = "ne", filter_value = "200", type = "gt", dim_key = "ModelDeploymentName", ok_when_nodata = true, warning = "azure_foundry_errors_warn", critical = "azure_foundry_errors_crit" }
+    azure_foundry_latency_ttlb = { group = "Azure AI Foundry", datasource_type = "azure_monitor", namespace = "microsoft.cognitiveservices/accounts", metric = "TimeToLastByte", statistic = "Average", type = "gt", dim_key = "ModelDeploymentName", warning = "azure_foundry_latency_warn", critical = "azure_foundry_latency_crit" }
+    azure_foundry_ttft         = { group = "Azure AI Foundry", datasource_type = "azure_monitor", namespace = "microsoft.cognitiveservices/accounts", metric = "TimeToResponse", statistic = "Average", type = "gt", dim_key = "ModelDeploymentName", warning = "azure_foundry_ttft_warn", critical = "azure_foundry_ttft_crit" }
+    azure_foundry_ptu_util     = { group = "Azure AI Foundry", datasource_type = "azure_monitor", namespace = "microsoft.cognitiveservices/accounts", metric = "AzureOpenAIProvisionedManagedUtilizationV2", statistic = "Average", type = "gt", dim_key = "ModelDeploymentName", warning = "azure_foundry_ptu_warn", critical = "azure_foundry_ptu_crit" }
+    azure_foundry_rate_limited = { group = "Azure AI Foundry", datasource_type = "azure_monitor", namespace = "microsoft.cognitiveservices/accounts", metric = "ModelRequests", statistic = "Total", filter_dimension = "StatusCode", filter_operator = "eq", filter_value = "429", type = "gt", dim_key = "ModelDeploymentName", ok_when_nodata = true, warning = "azure_foundry_rate_limited_warn", critical = "azure_foundry_rate_limited_crit" }
+    azure_foundry_zero_traffic = { group = "Azure AI Foundry", datasource_type = "azure_monitor", namespace = "microsoft.cognitiveservices/accounts", metric = "ModelRequests", statistic = "Total", type = "lt", dim_key = "", ok_when_nodata = false, critical = "azure_foundry_zero_traffic_crit" }
+
+    # -------------------------------------------------------------------------
+    # Vertex AI
+    # -------------------------------------------------------------------------
+    vertex_invocation_errors           = { group = "Vertex AI", datasource_type = "stackdriver", namespace = "aiplatform.googleapis.com/publisher/online_serving", metric = "model_invocation_count", resource_type = "aiplatform.googleapis.com/PublisherModel", aligner = "ALIGN_RATE", reducer = "REDUCE_SUM", filter = "metric.label.response_code != \"200\"", type = "gt", dim_key = "", ok_when_nodata = true, warning = "vertex_invocation_errors_warn", critical = "vertex_invocation_errors_crit" }
+    vertex_invocation_latency_p99      = { group = "Vertex AI", datasource_type = "stackdriver", namespace = "aiplatform.googleapis.com/publisher/online_serving", metric = "model_invocation_latencies", resource_type = "aiplatform.googleapis.com/PublisherModel", aligner = "ALIGN_DELTA", reducer = "REDUCE_PERCENTILE_99", type = "gt", dim_key = "", warning = "vertex_latency_p99_warn", critical = "vertex_latency_p99_crit" }
+    vertex_rate_limited                = { group = "Vertex AI", datasource_type = "stackdriver", namespace = "aiplatform.googleapis.com/publisher/online_serving", metric = "model_invocation_count", resource_type = "aiplatform.googleapis.com/PublisherModel", aligner = "ALIGN_RATE", reducer = "REDUCE_SUM", filter = "metric.label.response_code = \"429\"", type = "gt", dim_key = "", ok_when_nodata = true, warning = "vertex_rate_limited_warn", critical = "vertex_rate_limited_crit" }
+    vertex_zero_traffic                = { group = "Vertex AI", datasource_type = "stackdriver", namespace = "aiplatform.googleapis.com/publisher/online_serving", metric = "model_invocation_count", resource_type = "aiplatform.googleapis.com/PublisherModel", aligner = "ALIGN_RATE", reducer = "REDUCE_SUM", type = "lt", dim_key = "", ok_when_nodata = false, critical = "vertex_zero_traffic_crit" }
+
   }
 }

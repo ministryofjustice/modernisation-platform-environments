@@ -409,6 +409,8 @@ module "load_fms_lambda" {
     CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
     SNS_TOPIC_ARN       = aws_sns_topic.emds_alerts.arn
     MAX_RECEIVE_COUNT   = tostring(local.load_sqs_max_receive_count)
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
   }
 }
 
@@ -1261,7 +1263,7 @@ module "live_feed_incident_manager" {
 #-----------------------------------------------------------------------------------
 
 module "trigger_cpr_integration" {
-  count =  local.is-development || local.is-test ? 1 : 0
+  count =  local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   source                  = "./modules/lambdas"
   is_image                = true
   function_name           = "trigger_cpr_job"
@@ -1276,6 +1278,6 @@ module "trigger_cpr_integration" {
   subnet_ids                     = data.aws_subnets.shared-private.ids
 
   environment_variables = {
-    API_BASE_URL = local.is-development || local.is-test ? "https://electronic-monitoring-data-person-match-api-dev.internal-non-prod.cloud-platform.service.justice.gov.uk" : ""
+    API_BASE_URL = local.is-development || local.is-test ? "https://electronic-monitoring-data-person-match-api-dev.internal-non-prod.cloud-platform.service.justice.gov.uk" : local.is-preproduction ? "https://electronic-monitoring-data-person-match-api-preprod.internal-non-prod.cloud-platform.service.justice.gov.uk" : ""
   }
 }

@@ -48,7 +48,7 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "# AI Gateway\n\nThis dashboard monitors the **AI Gateway** \u2014 the internal proxy that routes, load-balances, and tracks spend for all LLM API traffic across teams \u2014 plus **Amazon Bedrock** and **Google Vertex AI (aiplatform)** invocation metrics broken out per model.\n\n**What to look at first:**\n- **Overview** \u2014 total requests, failures, spend, and token usage over the selected time range, plus current model/provider health.\n- **Deployment Health** \u2014 health-check failure rates and cooldown events per model deployment.\n- **Proxy Overview** \u2014 request/failure rates and latency for the proxy itself.\n- **Budget** \u2014 remaining budget per team and per virtual API key.\n- **Latency / Redis & Postgres / Spend Queue Backpressure** \u2014 infrastructure-level performance and backpressure indicators.\n- **Usage by Model & Virtual Key** \u2014 token and spend breakdowns for cost attribution.\n- **LLM API Rate Limits** \u2014 remaining rate-limit headroom reported by upstream providers.\n- **Amazon Bedrock** \u2014 invocation count and latency, token usage (input/output, per model and daily), throttles, client/server errors, and estimated TPM quota usage, broken out per Bedrock model via CloudWatch metric-math \u2014 new models appear automatically.\n- **Google Vertex AI (aiplatform)** \u2014 invocation count and latency, first-token latency, token and character usage (input/output), errors by response code, and Provisioned Throughput consumption.\n\nExpand the **AI Gateway**, **Amazon Bedrock**, and **Google Vertex AI (aiplatform)** sections below to see their panels.",
+        "content": "# AI Gateway\n\nThis dashboard monitors the **AI Gateway** \u2014 the internal proxy that routes, load-balances, and tracks spend for all LLM API traffic across teams \u2014 plus **Amazon Bedrock**, **Google Vertex AI (aiplatform)**, and **Azure AI Foundry** invocation metrics broken out per model.\n\n**What to look at first:**\n- **Overview** \u2014 total requests, failures, spend, and token usage over the selected time range, plus current model/provider health.\n- **Deployment Health** \u2014 health-check failure rates and cooldown events per model deployment.\n- **Proxy Overview** \u2014 request/failure rates and latency for the proxy itself.\n- **Budget** \u2014 remaining budget per team and per virtual API key.\n- **Latency / Redis & Postgres / Spend Queue Backpressure** \u2014 infrastructure-level performance and backpressure indicators.\n- **Usage by Model & Virtual Key** \u2014 token and spend breakdowns for cost attribution.\n- **LLM API Rate Limits** \u2014 remaining rate-limit headroom reported by upstream providers.\n- **Amazon Bedrock** \u2014 invocation count and latency, token usage (input/output, per model and daily), throttles, client/server errors, and estimated TPM quota usage, broken out per Bedrock model via CloudWatch metric-math \u2014 new models appear automatically.\n- **Google Vertex AI (aiplatform)** \u2014 invocation count and latency, first-token latency, token and character usage (input/output), errors by response code, and Provisioned Throughput consumption.\n- **Azure AI Foundry** \u2014 invocation count and latency, time to first token, prompt/generated token usage, errors by model deployment and status code.\n\nExpand the **AI Gateway**, **Amazon Bedrock**, **Google Vertex AI (aiplatform)**, and **Azure AI Foundry** sections below to see their panels.",
         "mode": "markdown"
       },
       "pluginVersion": "13.0.2",
@@ -6456,6 +6456,627 @@
       ],
       "title": "Google Vertex AI (aiplatform)",
       "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 12
+      },
+      "id": 9003,
+      "panels": [
+        {
+          "id": 1201,
+          "title": "Invocation Count",
+          "description": "Number of Azure AI Foundry model calls (Models \u2192 HTTP Requests category, metric ModelRequests), broken out per model deployment via the ModelDeploymentName dimension \u2014 new deployments appear automatically, nothing to update here when a new model is deployed. Note: the legacy Cognitive Services TotalCalls/Latency metrics do NOT support splitting by ModelDeploymentName (only ApiName, OperationName, Region, RatelimitKey) \u2014 use the Models-category or Azure OpenAI-category metrics instead, as done here.",
+          "type": "timeseries",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource",
+            "uid": "azure-monitor-ai-foundry"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "azure-monitor-ai-foundry"
+              },
+              "queryType": "Azure Monitor",
+              "subscription": "$azure_subscription",
+              "azureMonitor": {
+                "resources": [
+                  {
+                    "subscription": "$azure_subscription",
+                    "resourceGroup": "$azure_resource_group",
+                    "resourceName": "$azure_resource"
+                  }
+                ],
+                "metricNamespace": "microsoft.cognitiveservices/accounts",
+                "metricName": "ModelRequests",
+                "aggregation": "Total",
+                "timeGrain": "auto",
+                "dimensionFilters": [
+                  {
+                    "dimension": "ModelDeploymentName",
+                    "operator": "eq",
+                    "filters": []
+                  }
+                ],
+                "alias": "{{ResourceName}} - {{ModelDeploymentName}}"
+              },
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 1202,
+          "title": "Invocation Latency",
+          "description": "Average time to last byte per model deployment \u2014 time from request received to the full response being returned (Models \u2192 Latency category, metric TimeToLastByte). Note: the legacy Cognitive Services 'Latency' metric isn't valid for Azure OpenAI/AI Foundry workloads and doesn't support the ModelDeploymentName dimension, so it isn't used here.",
+          "type": "timeseries",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource",
+            "uid": "azure-monitor-ai-foundry"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 8
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "ms"
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "azure-monitor-ai-foundry"
+              },
+              "queryType": "Azure Monitor",
+              "subscription": "$azure_subscription",
+              "azureMonitor": {
+                "resources": [
+                  {
+                    "subscription": "$azure_subscription",
+                    "resourceGroup": "$azure_resource_group",
+                    "resourceName": "$azure_resource"
+                  }
+                ],
+                "metricNamespace": "microsoft.cognitiveservices/accounts",
+                "metricName": "TimeToLastByte",
+                "aggregation": "Average",
+                "timeGrain": "auto",
+                "dimensionFilters": [
+                  {
+                    "dimension": "ModelDeploymentName",
+                    "operator": "eq",
+                    "filters": []
+                  }
+                ],
+                "alias": "{{ResourceName}} - {{ModelDeploymentName}}"
+              },
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 1203,
+          "title": "Time to First Token",
+          "description": "Average time-to-first-token per model deployment for streaming requests \u2014 the responsiveness signal for chat/completions traffic, distinct from overall Invocation Latency above.",
+          "type": "timeseries",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource",
+            "uid": "azure-monitor-ai-foundry"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 16
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "ms"
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "azure-monitor-ai-foundry"
+              },
+              "queryType": "Azure Monitor",
+              "subscription": "$azure_subscription",
+              "azureMonitor": {
+                "resources": [
+                  {
+                    "subscription": "$azure_subscription",
+                    "resourceGroup": "$azure_resource_group",
+                    "resourceName": "$azure_resource"
+                  }
+                ],
+                "metricNamespace": "microsoft.cognitiveservices/accounts",
+                "metricName": "TimeToResponse",
+                "aggregation": "Average",
+                "timeGrain": "auto",
+                "dimensionFilters": [
+                  {
+                    "dimension": "ModelDeploymentName",
+                    "operator": "eq",
+                    "filters": []
+                  }
+                ],
+                "alias": "{{ResourceName}} - {{ModelDeploymentName}}"
+              },
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 1204,
+          "title": "Token Counts by Model",
+          "description": "Accumulated prompt and generated (completion) token counts per model deployment \u2014 Azure OpenAI reports these as two separate metrics rather than a single metric split by type, so prompt and generated tokens are queried and aliased separately here.",
+          "type": "timeseries",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource",
+            "uid": "azure-monitor-ai-foundry"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 24
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "azure-monitor-ai-foundry"
+              },
+              "queryType": "Azure Monitor",
+              "subscription": "$azure_subscription",
+              "azureMonitor": {
+                "resources": [
+                  {
+                    "subscription": "$azure_subscription",
+                    "resourceGroup": "$azure_resource_group",
+                    "resourceName": "$azure_resource"
+                  }
+                ],
+                "metricNamespace": "microsoft.cognitiveservices/accounts",
+                "metricName": "ProcessedPromptTokens",
+                "aggregation": "Total",
+                "timeGrain": "auto",
+                "dimensionFilters": [
+                  {
+                    "dimension": "ModelDeploymentName",
+                    "operator": "eq",
+                    "filters": []
+                  }
+                ],
+                "alias": "{{ResourceName}} - {{ModelDeploymentName}} (prompt)"
+              },
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "azure-monitor-ai-foundry"
+              },
+              "queryType": "Azure Monitor",
+              "subscription": "$azure_subscription",
+              "azureMonitor": {
+                "resources": [
+                  {
+                    "subscription": "$azure_subscription",
+                    "resourceGroup": "$azure_resource_group",
+                    "resourceName": "$azure_resource"
+                  }
+                ],
+                "metricNamespace": "microsoft.cognitiveservices/accounts",
+                "metricName": "GeneratedTokens",
+                "aggregation": "Total",
+                "timeGrain": "auto",
+                "dimensionFilters": [
+                  {
+                    "dimension": "ModelDeploymentName",
+                    "operator": "eq",
+                    "filters": []
+                  }
+                ],
+                "alias": "{{ResourceName}} - {{ModelDeploymentName}} (generated)"
+              },
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "id": 1205,
+          "title": "Errors by Model and Status Code",
+          "description": "Model calls broken out by non-200 HTTP status code, per model deployment (Models \u2192 HTTP Requests category, metric ModelRequests, which supports both the ModelDeploymentName and StatusCode dimensions together) \u2014 the Azure AI Foundry equivalent of Bedrock/Vertex's error panels. Any non-zero value here means requests to that deployment are failing.",
+          "type": "timeseries",
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource",
+            "uid": "azure-monitor-ai-foundry"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 32
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-azure-monitor-datasource",
+                "uid": "azure-monitor-ai-foundry"
+              },
+              "queryType": "Azure Monitor",
+              "subscription": "$azure_subscription",
+              "azureMonitor": {
+                "resources": [
+                  {
+                    "subscription": "$azure_subscription",
+                    "resourceGroup": "$azure_resource_group",
+                    "resourceName": "$azure_resource"
+                  }
+                ],
+                "metricNamespace": "microsoft.cognitiveservices/accounts",
+                "metricName": "ModelRequests",
+                "aggregation": "Total",
+                "timeGrain": "auto",
+                "dimensionFilters": [
+                  {
+                    "dimension": "ModelDeploymentName",
+                    "operator": "eq",
+                    "filters": []
+                  },
+                  {
+                    "dimension": "StatusCode",
+                    "operator": "ne",
+                    "filters": [
+                      "200"
+                    ]
+                  }
+                ],
+                "alias": "{{ResourceName}} - {{ModelDeploymentName}} ({{StatusCode}})"
+              },
+              "refId": "A"
+            }
+          ]
+        }
+      ],
+      "title": "Azure AI Foundry",
+      "type": "row"
     }
   ],
   "preload": false,
@@ -6473,7 +7094,11 @@
     "Google",
     "GCP",
     "Vertex AI",
-    "aiplatform"
+    "aiplatform",
+    "Azure",
+    "Microsoft",
+    "AI Foundry",
+    "Azure OpenAI"
   ],
   "templating": {
     "list": [
@@ -6558,7 +7183,7 @@
         },
         "hide": 0,
         "includeAll": false,
-        "label": "Environment",
+        "label": "GCPEnvironment",
         "multi": false,
         "name": "project",
         "options": [
@@ -6577,6 +7202,66 @@
         "queryValue": "",
         "skipUrlSync": false,
         "type": "custom"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "grafana-azure-monitor-datasource",
+          "uid": "azure-monitor-ai-foundry"
+        },
+        "definition": "Subscriptions()",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Azure Subscription",
+        "multi": false,
+        "name": "azure_subscription",
+        "options": [],
+        "query": "Subscriptions()",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "grafana-azure-monitor-datasource",
+          "uid": "azure-monitor-ai-foundry"
+        },
+        "definition": "ResourceGroups($azure_subscription)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Azure Resource Group",
+        "multi": false,
+        "name": "azure_resource_group",
+        "options": [],
+        "query": "ResourceGroups($azure_subscription)",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "grafana-azure-monitor-datasource",
+          "uid": "azure-monitor-ai-foundry"
+        },
+        "definition": "ResourceNames($azure_subscription, $azure_resource_group, microsoft.cognitiveservices/accounts)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "AI Foundry Resource",
+        "multi": false,
+        "name": "azure_resource",
+        "options": [],
+        "query": "ResourceNames($azure_subscription, $azure_resource_group, microsoft.cognitiveservices/accounts)",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
       }
     ]
   },
@@ -6600,6 +7285,6 @@
   },
   "timezone": "browser",
   "title": "AI Gateway",
-  "version": 20,
+  "version": 21,
   "uid": "litellm-ai-gateway"
 }

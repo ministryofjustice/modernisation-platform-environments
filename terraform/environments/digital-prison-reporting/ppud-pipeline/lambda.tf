@@ -1,5 +1,5 @@
 data "aws_iam_policy_document" "ppud_copy_object" {
-  count         = local.is-test ? 0 : 1
+  count = local.is-test ? 0 : 1
   statement {
     // Allow the lambda to read and copy the files from the replication destination S3 bucket
     actions = [
@@ -30,7 +30,7 @@ data "aws_iam_policy_document" "ppud_copy_object" {
 
 # Copy replicated .bak ppud file from replication destination bucket to landing bucket
 module "ppud_copy_object" {
-  count         = local.is-test ? 0 : 1
+  count = local.is-test ? 0 : 1
 
   # v8.8.1
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda?ref=23d00f7daef40091e87ed2f9dc5d8532e9d2cc22"
@@ -68,7 +68,7 @@ module "ppud_copy_object" {
 
 # Grants permission for lambda to be invoked from S3 
 resource "aws_lambda_permission" "ppud_allow_bucket" {
-  count         = local.is-test ? 0 : 1
+  count = local.is-test ? 0 : 1
 
   statement_id  = "AllowExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
@@ -79,7 +79,7 @@ resource "aws_lambda_permission" "ppud_allow_bucket" {
 
 # Bucket Notification to trigger Lambda function
 resource "aws_s3_bucket_notification" "ppud_land_bucket" {
-  count         = local.is-test ? 0 : 1
+  count = local.is-test ? 0 : 1
 
   bucket = module.ppud_replication_destination[0].bucket.id
 
@@ -92,7 +92,7 @@ resource "aws_s3_bucket_notification" "ppud_land_bucket" {
 }
 
 data "aws_iam_policy_document" "check_recent_file" {
-  count         = local.is-development ? 1 : 0
+  count = local.is-development ? 1 : 0
   statement {
     // Allow the lambda to list objects from the replication destination S3 bucket
     actions = [
@@ -128,7 +128,7 @@ data "aws_iam_policy_document" "check_recent_file" {
 }
 
 module "check_recent_file" {
-  count         = local.is-development ? 1 : 0
+  count = local.is-development ? 1 : 0
 
   # Commit hash for v8.8.1
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda?ref=23d00f7daef40091e87ed2f9dc5d8532e9d2cc22"
@@ -175,14 +175,14 @@ resource "aws_lambda_permission" "allow_eventbridge_check_recent_file" {
 }
 
 resource "aws_cloudwatch_event_rule" "check_recent_file_daily" {
-  count         = local.is-development ? 1 : 0
+  count               = local.is-development ? 1 : 0
   name                = "${local.component_name}-check-recent-file-daily"
   description         = "Invoke recent-file checker daily at 15:15 UTC"
   schedule_expression = local.cron_schedule
 }
 
 resource "aws_cloudwatch_event_target" "check_recent_file_daily" {
-  count         = local.is-development ? 1 : 0
+  count     = local.is-development ? 1 : 0
   rule      = aws_cloudwatch_event_rule.check_recent_file_daily[0].name
   target_id = "check-recent-file-lambda"
   arn       = module.check_recent_file[0].lambda_function_arn
