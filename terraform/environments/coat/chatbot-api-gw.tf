@@ -128,7 +128,7 @@ resource "aws_cloudwatch_log_group" "chatbot_api_access_logs" {
   #checkov:skip=CKV_AWS_158:Default AWS encryption is sufficient for chatbot access logs
 
   name              = "/aws/apigateway/chatbot-${local.environment}"
-  retention_in_days = 120
+  retention_in_days = 365
 }
 
 resource "aws_iam_role" "chatbot_api_cloudwatch" {
@@ -163,6 +163,7 @@ resource "aws_api_gateway_client_certificate" "chatbot" {
 
 resource "aws_api_gateway_stage" "chatbot_api_stage" {
   #checkov:skip=CKV_AWS_120:Caching disabled - chatbot responses are dynamic per user question
+  #checkov:skip=CKV2_AWS_77:Log4j protection implemented via AWSManagedRulesKnownBadInputsRuleSet in associated WAF
 
   deployment_id         = aws_api_gateway_deployment.chatbot_api_deployment.id
   rest_api_id           = aws_api_gateway_rest_api.chatbot_api.id
@@ -191,6 +192,8 @@ resource "aws_api_gateway_stage" "chatbot_api_stage" {
 }
 
 resource "aws_api_gateway_method_settings" "chatbot_api_stage" {
+  #checkov:skip=CKV_AWS_225:Caching disabled - chatbot responses are dynamic per user question
+
   rest_api_id = aws_api_gateway_rest_api.chatbot_api.id
   stage_name  = aws_api_gateway_stage.chatbot_api_stage.stage_name
   method_path = "*/*"
@@ -272,7 +275,7 @@ resource "aws_cloudwatch_log_group" "chatbot_api_waf_logs" {
   #checkov:skip=CKV_AWS_158:Default AWS encryption is sufficient for WAF logs
 
   name              = "aws-waf-logs-chatbot-${local.environment}"
-  retention_in_days = 120
+  retention_in_days = 365
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "chatbot_api" {
