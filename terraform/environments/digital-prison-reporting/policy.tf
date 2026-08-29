@@ -185,6 +185,24 @@ resource "aws_iam_policy" "start_dms_task_policy" {
   })
 }
 
+# DynamoDB
+resource "aws_iam_policy" "update_ingestion_pipeline_versions_dynamo_policy" {
+  name        = local.update_ingestion_pipeline_versions_dynamo_policy
+  description = "Allows access to update the ingestion pipeline versions DynamoDB table, E.g. allows the ingestion pipeline Step Function execution role to atomically update the ingestion_version counter for the given pipeline"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "AllowIngestionVersionCounterAtomicUpdateAndGet"
+        Effect   = "Allow"
+        Action   = ["dynamodb:UpdateItem"]
+        Resource = module.dynamo_table_ingestion_pipeline_versions.dynamodb_table_arn
+      }
+    ]
+  })
+}
+
 # Trigger Glue Job Policy
 resource "aws_iam_policy" "trigger_glue_job_policy" {
   name = local.trigger_glue_job_policy
@@ -1147,6 +1165,11 @@ resource "aws_iam_role_policy_attachment" "step_function_role_policy_attachment"
 resource "aws_iam_role_policy_attachment" "step_function_role_dms_policy_attachment" {
   role       = aws_iam_role.step_function_execution_role.id
   policy_arn = aws_iam_policy.start_dms_task_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "step_function_role_ingestion_version_dynamo_policy_attachment" {
+  role       = aws_iam_role.step_function_execution_role.id
+  policy_arn = aws_iam_policy.update_ingestion_pipeline_versions_dynamo_policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "step_function_role_glue_policy_attachment" {
