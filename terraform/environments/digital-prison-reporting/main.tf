@@ -38,7 +38,7 @@ module "glue_hive_table_creation_job" {
   # Placeholder Script Location
   script_location = local.glue_placeholder_script_location
   project_id      = local.project
-  aws_kms_key     = local.s3_kms_arn
+  aws_kms_key     = local.s3_kms_arn 
 
   custom_metric_namespace     = local.custom_metric_namespace
   execution_class             = "STANDARD"
