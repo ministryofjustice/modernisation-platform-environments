@@ -37,7 +37,7 @@ data "aws_secretsmanager_secret_version" "grafana_api_token" {
 # created with a placeholder value in the iac component and populated out-of-band,
 # so it is read back here to configure alerting.
 data "aws_secretsmanager_secret_version" "pagerduty_orchestrator_integration_key_secret" {
-  count = terraform.workspace == "data-platform-production" && local.environment_configuration.monitoring_stack_enabled ? 1 : 0
+  count = local.environment_configuration.monitoring_stack_enabled ? 1 : 0
 
   secret_id = "pagerduty/orchestrator-integration-key"
 }
