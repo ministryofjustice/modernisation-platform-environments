@@ -5,6 +5,10 @@ locals {
       github_repo = "hmpps-dpr-activities-dpds"
       s3_prefix   = "activities"
     }
+    "incident-reporting" = {
+      github_repo = "hmpps-dpr-incident-reporting-dpds"
+      s3_prefix   = "incident-reporting"
+    }
   }
 }
 
