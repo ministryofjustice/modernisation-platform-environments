@@ -223,7 +223,7 @@ locals {
             actions = [
               "kms:Decrypt",
             ]
-            resources = ["alias/kms-arns-integration-${local.environment}"]
+            resources = ["*"]
           },
         ]
       }
