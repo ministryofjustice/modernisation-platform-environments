@@ -218,6 +218,13 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/postgres/database/hmpps-arns-assessment-view-db-preprod/*",
             ]
           },
+          {
+            effect = "Allow"
+            actions = [
+              "kms:Decrypt",
+            ]
+            resources = ["alias/kms-arns-integration-${local.environment}"]
+          },
         ]
       }
       Ec2PreprodWebPolicy = {

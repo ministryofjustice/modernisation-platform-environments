@@ -354,7 +354,14 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/*",
               "arn:aws:secretsmanager:*:*:secret:/postgres/database/hmpps-arns-assessment-view-db-test/*",
             ]
-          }
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "kms:Decrypt",
+            ]
+            resources = ["alias/kms-arns-integration-${local.environment}"]
+          },
         ]
       }
       Ec2T2WebPolicy = {
