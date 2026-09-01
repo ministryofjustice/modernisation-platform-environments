@@ -45,6 +45,23 @@ teams:
         model: "bedrock-jeaie-claude-opus-5"
       - alias: "claude-sonnet-5"
         model: "bedrock-jeaie-claude-sonnet-5"
+  pom-probation-accounts:
+    alias: POM Phased Implementation - Probation Accounts
+    organisation: ministryofjustice
+    max_budget: 2000
+    models: ["no-default-models"]
+    unified_access_groups:
+      - generally-available-models
+      - bedrock-jeaie-claude-haiku-4-5
+      - bedrock-jeaie-claude-opus-5
+      - bedrock-jeaie-claude-sonnet-5
+    model_aliases:
+      - alias: "claude-haiku-4.5"
+        model: "bedrock-jeaie-claude-haiku-4-5"
+      - alias: "claude-opus-5"
+        model: "bedrock-jeaie-claude-opus-5"
+      - alias: "claude-sonnet-5"
+        model: "bedrock-jeaie-claude-sonnet-5"
 
 models:
   amazon_bedrock:
@@ -257,6 +274,106 @@ models:
       aws_role_name: ai-gateway
       generally_available: false
       environments_available: ["production"]
+    dpr-development-claude-sonnet-4-6:
+      model_id: eu.anthropic.claude-sonnet-4-6
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Development)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 4.6 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-development
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    dpr-development-claude-sonnet-5:
+      model_id: eu.anthropic.claude-sonnet-5
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Development)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 5 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-development
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    dpr-test-claude-haiku-4-5:
+      model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Test)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Haiku 4.5 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-test
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    dpr-test-claude-sonnet-4-5:
+      model_id: "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Test)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 4.5 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-test
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    dpr-test-claude-sonnet-4-6:
+      model_id: eu.anthropic.claude-sonnet-4-6
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Test)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 4.6 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-test
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    dpr-test-claude-sonnet-5:
+      model_id: eu.anthropic.claude-sonnet-5
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Test)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 5 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-test
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    dpr-preproduction-claude-haiku-4-5:
+      model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Preproduction)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Haiku 4.5 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-preproduction
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    dpr-preproduction-claude-sonnet-4-5:
+      model_id: "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Preproduction)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 4.5 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-preproduction
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    dpr-preproduction-claude-sonnet-4-6:
+      model_id: eu.anthropic.claude-sonnet-4-6
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Preproduction)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 4.6 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-preproduction
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    dpr-preproduction-claude-sonnet-5:
+      model_id: eu.anthropic.claude-sonnet-5
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Preproduction)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 5 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-preproduction
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
     dpr-production-claude-haiku-4-5:
       model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
       model_provider: "Amazon Bedrock (Digital Prison Reporting Production)"
@@ -272,6 +389,26 @@ models:
       model_provider: "Amazon Bedrock (Digital Prison Reporting Production)"
       model_family: "Anthropic Claude"
       model_name: "Anthropic Claude Sonnet 4.5 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-production
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    dpr-production-claude-sonnet-4-6:
+      model_id: eu.anthropic.claude-sonnet-4-6
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Production)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 4.6 (EU)"
+      region: eu-west-2
+      aws_account_name: digital-prison-reporting-production
+      aws_role_name: ai-gateway
+      generally_available: false
+      environments_available: ["production"]
+    dpr-production-claude-sonnet-5:
+      model_id: eu.anthropic.claude-sonnet-5
+      model_provider: "Amazon Bedrock (Digital Prison Reporting Production)"
+      model_family: "Anthropic Claude"
+      model_name: "Anthropic Claude Sonnet 5 (EU)"
       region: eu-west-2
       aws_account_name: digital-prison-reporting-production
       aws_role_name: ai-gateway

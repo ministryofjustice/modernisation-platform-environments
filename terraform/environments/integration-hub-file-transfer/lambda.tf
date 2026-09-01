@@ -377,6 +377,83 @@ module "lambda_route" {
   tags = local.tags
 }
 
+module "lambda_file_action_execution_requested_adapter" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "8.8.0"
+
+  architectures                     = ["arm64"]
+  attach_dead_letter_policy         = true
+  attach_tracing_policy             = true
+  cloudwatch_logs_kms_key_id        = module.kms_cloudwatch_logs.key_arn
+  cloudwatch_logs_retention_in_days = local.cloudwatch_retention_days
+  create_async_event_config         = true
+  dead_letter_target_arn            = module.sqs_lambda_file_action_execution_requested_adapter_dlq.queue_arn
+  description                       = "Transforms configured FileRouted.v1 events into FileActionExecutionRequested.v1 events"
+  function_name                     = "file-action-execution-requested-adapter"
+  handler                           = "lambda_function.lambda_handler"
+  maximum_event_age_in_seconds      = 21600
+  maximum_retry_attempts            = 2
+  memory_size                       = 128
+  reserved_concurrent_executions    = 10
+  runtime                           = "python3.12"
+  source_path                       = "lambda/file-action-execution-requested-adapter"
+  timeout                           = 30
+  tracing_mode                      = "Active"
+  trigger_on_package_timestamp      = false
+
+  environment_variables = {
+    DISPATCH_SECRET_NAME_PREFIX = local.file_dispatch_secret_name_prefix
+    EVENT_BUS_ARN               = module.eventbridge_file_transfer_bus.eventbridge_bus_arn
+    IDEMPOTENCY_EXPIRY_SECONDS  = tostring(local.cloudwatch_retention_days * 24 * 60 * 60)
+    IDEMPOTENCY_TABLE           = module.dynamodb_adapter_idempotency.dynamodb_table_id
+    POWERTOOLS_LOG_LEVEL        = "INFO"
+    POWERTOOLS_SERVICE_NAME     = "file-action-execution-requested-adapter"
+  }
+
+  attach_policy_statements = true
+  policy_statements = {
+    publish_action_requests = {
+      effect    = "Allow"
+      actions   = ["events:PutEvents"]
+      resources = [module.eventbridge_file_transfer_bus.eventbridge_bus_arn]
+    }
+    use_idempotency_table = {
+      effect = "Allow"
+      actions = [
+        "dynamodb:DeleteItem",
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+      ]
+      resources = [module.dynamodb_adapter_idempotency.dynamodb_table_arn]
+    }
+    read_dispatch_configuration = {
+      effect  = "Allow"
+      actions = ["secretsmanager:GetSecretValue"]
+      resources = [
+        "arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:${local.file_dispatch_secret_name_prefix}*",
+      ]
+    }
+    decrypt_dispatch_configuration = {
+      effect    = "Allow"
+      actions   = ["kms:Decrypt", "kms:DescribeKey"]
+      resources = [module.kms_secrets.key_arn]
+    }
+    use_dlq_key = {
+      effect = "Allow"
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey*",
+      ]
+      resources = [module.kms_sqs.key_arn]
+    }
+  }
+
+  tags = local.tags
+}
+
 # Module-managed allowed_triggers would create a cycle between the Lambda and EventBridge target.
 resource "aws_lambda_permission" "eventbridge_file_received_adapter" {
   statement_id  = "AllowExecutionFromEventBridge"
@@ -408,4 +485,12 @@ resource "aws_lambda_permission" "eventbridge_route" {
   function_name = module.lambda_route.lambda_function_name
   principal     = "events.amazonaws.com"
   source_arn    = module.eventbridge_file_transfer_bus.eventbridge_rule_arns["file-routing-workflow"]
+}
+
+resource "aws_lambda_permission" "eventbridge_file_action_execution_requested_adapter" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = module.lambda_file_action_execution_requested_adapter.lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = module.eventbridge_file_transfer_bus.eventbridge_rule_arns["file-action-dispatch-workflow"]
 }

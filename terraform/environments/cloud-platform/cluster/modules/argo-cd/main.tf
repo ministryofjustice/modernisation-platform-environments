@@ -34,21 +34,6 @@ terraform {
 
 data "aws_region" "current" {}
 
-locals {
-  # Flatten the role -> identities map into a flat list for the dynamic block
-  # Input:  { ADMIN = [{id, type}], EDITOR = [{id, type}] }
-  # Output: [{role, id, type}, {role, id, type}, ...]
-  flattened_rbac_mappings = flatten([
-    for role, identities in var.rbac_role_mappings : [
-      for identity in identities : {
-        role = role
-        id   = identity.id
-        type = identity.type
-      }
-    ]
-  ])
-}
-
 #------------------------------------------------------------------------------
 # IAM Role for Argo CD Capability
 #
@@ -118,13 +103,22 @@ resource "aws_eks_capability" "argocd" {
 
       namespace = "argocd"
 
+      # One rbac_role_mapping block per role, with all of that role's identities
+      # nested as identity sub-blocks. AWS coalesces identities for a given role
+      # into a single rbac_role_mapping element; emitting one block per
+      # (role, identity) pair instead makes the applied result diverge from the
+      # plan whenever a role has more than one identity ("Provider produced
+      # inconsistent result after apply").
       dynamic "rbac_role_mapping" {
-        for_each = local.flattened_rbac_mappings
+        for_each = var.rbac_role_mappings
         content {
-          role = rbac_role_mapping.value.role
-          identity {
-            id   = rbac_role_mapping.value.id
-            type = rbac_role_mapping.value.type
+          role = rbac_role_mapping.key
+          dynamic "identity" {
+            for_each = rbac_role_mapping.value
+            content {
+              id   = identity.value.id
+              type = identity.value.type
+            }
           }
         }
       }

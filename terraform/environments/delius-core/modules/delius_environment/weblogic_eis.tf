@@ -13,6 +13,7 @@ module "weblogic_eis" {
   account_config    = var.account_config
   account_info      = var.account_info
   capacity_provider = aws_ecs_capacity_provider.weblogic_eis.name
+  asg_name          = aws_autoscaling_group.weblogic.name
 
   force_new_deployment = false
 

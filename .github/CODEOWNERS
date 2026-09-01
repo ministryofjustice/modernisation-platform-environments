@@ -8,7 +8,7 @@
 /terraform/environments/analytical-platform-ingestion/transfer-family @ministryofjustice/analytical-platform @ministryofjustice/modernisation-platform
 /terraform/environments/analytical-platform-next-poc-hub @ministryofjustice/analytical-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/analytical-platform-next-poc-producer @ministryofjustice/analytical-platform-engineers @ministryofjustice/modernisation-platform
-/terraform/environments/apex @ministryofjustice/laa-apex-developer @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-ccms-ebs-developers @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
+/terraform/environments/apex @ministryofjustice/laa-apex-developer @ministryofjustice/laa-ccms-ebs-developers @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs-ai @ministryofjustice/ccms-ai-team @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs-upgrade @ministryofjustice/laa-ccms-ebs-developers @ministryofjustice/laa-ccms-migration-team @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs-upgrade/anonymisation @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
@@ -82,10 +82,9 @@
 /terraform/environments/integration-hub-file-transfer @ministryofjustice/integration-hub @ministryofjustice/modernisation-platform
 /terraform/environments/integration-hub @ministryofjustice/integration-hub @ministryofjustice/modernisation-platform
 /terraform/environments/laa-ccms-soa @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
-/terraform/environments/laa-ccms-soa/ccms-soa-sandbox @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
+/terraform/environments/laa-ccms-soa/ccms-soa-sandbox @ministryofjustice/laa-soa-developers @ministryofjustice/modernisation-platform
 /terraform/environments/laa-cis @ministryofjustice/laa-sre-admins @ministryofjustice/v1-cis-mod @ministryofjustice/modernisation-platform
-/terraform/environments/laa-enterprise-service-bus @ministryofjustice/hub20-validation @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-sre-admins @ministryofjustice/v1-hub20-developers @ministryofjustice/modernisation-platform
-/terraform/environments/laa-mail-relay @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
+/terraform/environments/laa-enterprise-service-bus @ministryofjustice/hub20-validation @ministryofjustice/laa-sre-admins @ministryofjustice/v1-hub20-developers @ministryofjustice/modernisation-platform
 /terraform/environments/laa-new-workspaces @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/laa-oem @ministryofjustice/laa-ccms-ebs-developers @ministryofjustice/laa-ccms-migration-team @ministryofjustice/laa-dba @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/laa-pui-secure-browser @ministryofjustice/ecp-admin @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
@@ -98,7 +97,7 @@
 /terraform/environments/maat @ministryofjustice/laa-crime-apps-team @ministryofjustice/laa-sre-admins @ministryofjustice/octo-cyber-team @ministryofjustice/modernisation-platform
 /terraform/environments/maatdb @ministryofjustice/laa-crime-apps-team @ministryofjustice/laa-dba @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/mlra @ministryofjustice/laa-crime-apps-team @ministryofjustice/octo-cyber-team @ministryofjustice/modernisation-platform
-/terraform/environments/mojfin @ministryofjustice/azure-aws-sso-mojfin-security @ministryofjustice/azure-aws-sso-mojfin-ssm @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-ccms-ebs-developers @ministryofjustice/laa-mojfin-database-access @ministryofjustice/laa-mojfin-developers @ministryofjustice/laa-mojfin-security @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
+/terraform/environments/mojfin @ministryofjustice/azure-aws-sso-mojfin-security @ministryofjustice/azure-aws-sso-mojfin-ssm @ministryofjustice/laa-ccms-ebs-developers @ministryofjustice/laa-mojfin-database-access @ministryofjustice/laa-mojfin-developers @ministryofjustice/laa-mojfin-security @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ncas @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/nomis-combined-reporting @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/nomis-data-hub @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform

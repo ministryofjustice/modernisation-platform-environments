@@ -19,7 +19,7 @@ jobs:
           - ubuntu-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           token: '${{ secrets.GITHUB_TOKEN }}'
           fetch-depth: 0
@@ -38,7 +38,7 @@ jobs:
         run: tflint --disable-rule=terraform_unused_declarations --format sarif > tflint.sarif
       - name: Upload SARIF file
         if: success() || failure()
-        uses: github/codeql-action/upload-sarif@f205ea1c3313d32999d8d6a48b4f6530d4437b38 # v4.37.4
+        uses: github/codeql-action/upload-sarif@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28 # v4.37.8
         with:
           sarif_file: tflint.sarif
   trivy:
@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Run Trivy vulnerability scanner in repo mode
         run: |
@@ -65,13 +65,13 @@ jobs:
       security-events: write
     steps:
       - name: Checkout repo
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           token: '${{ secrets.GITHUB_TOKEN }}'
           fetch-depth: 0
       - name: Run Checkov action
         id: checkov
-        uses: bridgecrewio/checkov-action@7b972723c44fb3d256283fac96fae5d7c1894bb7 # v12.3114.0
+        uses: bridgecrewio/checkov-action@59b9d7edfcad5b87fbe3f473a9a134a721ad03f8 # v12.3119.0
         with:
           directory: ./
           framework: terraform
@@ -80,6 +80,6 @@ jobs:
           skip_check: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
       - name: Upload SARIF file
         if: success() || failure()
-        uses: github/codeql-action/upload-sarif@f205ea1c3313d32999d8d6a48b4f6530d4437b38 # v4.37.4
+        uses: github/codeql-action/upload-sarif@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28 # v4.37.8
         with:
           sarif_file: ./checkov.sarif

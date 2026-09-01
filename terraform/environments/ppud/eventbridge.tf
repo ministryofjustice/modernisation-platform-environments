@@ -1,10 +1,61 @@
-##############################################################
-# Eventbridge Rules and Schedules (to invoke Lambda functions)
-##############################################################
+#####################################################################
+# Eventbridge Buses, Rules and Schedules (to invoke Lambda functions)
+#####################################################################
 
-####################
-# Eventbridge Rules 
-####################
+#############################
+# Eventbridge Rules and Buses
+#############################
+
+###########################################################
+# EventBridge Rule & Bus for Malware Scan Completion Events
+###########################################################
+
+
+locals {
+  send_malware_scan_notification_envs = {
+    for k, v in local.lambda_instances_map :
+    k => v
+    if startswith(k, "send_malware_scan_notification")
+  }
+}
+
+resource "aws_cloudwatch_event_bus" "ppud_malware_events" {
+  name = "ppud_malware_events"
+}
+
+resource "aws_cloudwatch_event_rule" "ppud_malware_scan_completed" {
+  for_each       = local.send_malware_scan_notification_envs
+  name           = "ppud-malware-scan-completed-${each.value.env}"
+  description    = "Capture malware scan completed events from EC2 instances"
+  event_bus_name = aws_cloudwatch_event_bus.ppud_malware_events.name
+  event_pattern  = <<EOF
+{
+  "source": ["ppud.malware"],
+  "detail-type": ["Malware Scan Completed"]
+}
+EOF
+  tags = {
+    Function    = each.value.func_name
+    Environment = each.value.env
+  }
+}
+
+resource "aws_cloudwatch_event_target" "trigger_lambda_malware_scan_completed" {
+  for_each       = local.send_malware_scan_notification_envs
+  rule           = aws_cloudwatch_event_rule.ppud_malware_scan_completed[each.key].name
+  event_bus_name = aws_cloudwatch_event_bus.ppud_malware_events.name
+  target_id      = "send_malware_scan_notification_${each.value.env}"
+  arn            = aws_lambda_function.lambda_functions[each.key].arn
+}
+
+resource "aws_lambda_permission" "allow_eventbridge_malware_scan_completed" {
+  for_each      = local.send_malware_scan_notification_envs
+  statement_id  = "AllowExecutionFromEventBridge-${each.value.env}"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_functions[each.key].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.ppud_malware_scan_completed[each.key].arn
+}
 
 #####################################################
 # Eventbridge Rule to check for Expiring Certificates
@@ -241,6 +292,18 @@ locals {
       description  = "Trigger Lambda at 10:00 every Monday"
       timezone     = "Europe/London"
     }
+    start_malware_scanner = {
+      environments = ["production"]
+      schedule     = "cron(0 20 ? * FRI *)"
+      description  = "Trigger Lambda at 20:00 every Friday"
+      timezone     = "Europe/London"
+    }
+    stop_malware_scanner = {
+      environments = ["production"]
+      schedule     = "cron(0 6 ? * MON *)"
+      description  = "Trigger Lambda at 06:00 every Monday"
+      timezone     = "Europe/London"
+    }
     disk_info_report = {
       environments = ["production"]
       schedule     = "cron(0 7 ? * MON *)"
@@ -419,6 +482,9 @@ locals {
       local.is-preproduction ? aws_lambda_function.lambda_functions["securityhub_critical_report_preproduction"].arn : (
         local.is-production ? aws_lambda_function.lambda_functions["securityhub_critical_report_production"].arn : null
     ))
+    send_malware_scan_notification = local.is-development ? aws_lambda_function.lambda_functions["send_malware_scan_notification_development"].arn : (
+      local.is-production ? aws_lambda_function.lambda_functions["send_malware_scan_notification_production"].arn : null
+    )
     securityhub_monthly_report = local.is-development ? aws_lambda_function.lambda_functions["securityhub_monthly_report_development"].arn : (
       local.is-preproduction ? aws_lambda_function.lambda_functions["securityhub_monthly_report_preproduction"].arn : (
         local.is-production ? aws_lambda_function.lambda_functions["securityhub_monthly_report_production"].arn : null
@@ -449,6 +515,8 @@ locals {
     # check_elb_trt_alarm            = local.is-production ? aws_lambda_function.lambda_functions["check_elb_trt_alarm_production"].arn : null
     wam_waf_analysis_monthly       = local.is-development ? aws_lambda_function.lambda_functions["wam_waf_analysis_monthly_development"].arn : null
     send_cpu_graph                 = local.is-production ? aws_lambda_function.lambda_functions["send_cpu_graph_production"].arn : null
+    start_malware_scanner          = local.is-production ? aws_lambda_function.lambda_functions["start_malware_scanner_production"].arn : null
+    stop_malware_scanner           = local.is-production ? aws_lambda_function.lambda_functions["stop_malware_scanner_production"].arn : null
     disable_cpu_alarms             = local.is-production ? aws_lambda_function.lambda_functions["disable_cpu_alarm_production"].arn : null
     enable_cpu_alarms              = local.is-production ? aws_lambda_function.lambda_functions["enable_cpu_alarm_production"].arn : null
     disk_info_report               = local.is-production ? aws_lambda_function.lambda_functions["disk_info_report_production"].arn : null

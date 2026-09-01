@@ -10,15 +10,11 @@ locals {
 
   # This takes the name of the Terraform workspace (e.g. core-vpc-production), strips out the application name (e.g. core-vpc), and checks if
   # the string leftover is `-production`, if it isn't (e.g. core-vpc-non-production => -non-production) then it sets the var to false.
-  is-production    = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production"
-  is-preproduction = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction"
-  is-test          = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-test"
   is-development   = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-development"
 
   # Merge tags from the environment json file with additional ones
   tags = merge(
     jsondecode(data.http.environments_file.response_body).tags,
-    { "is-production" = local.is-production },
     { "environment-name" = terraform.workspace },
     { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
   )

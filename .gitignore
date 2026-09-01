@@ -11,6 +11,14 @@ tmp/
 **/package-lock.json
 **/*-draft.*
 
+# Python test and coverage artefacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
 ##########################
 ## IntelliJ
 ##########################

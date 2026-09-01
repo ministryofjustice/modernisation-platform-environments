@@ -206,6 +206,7 @@ resource "aws_cloudwatch_metric_alarm" "cloudwatch_sns_dlq_not_empty" {
 
 resource "aws_sns_topic" "notifier_dlq_alerts" {
   name  = "${local.application_name}-${local.environment}-notifier-dlq-alerts"
+  kms_master_key_id = aws_kms_key.cloudwatch_sns_alerts_key.id
   tags  = local.tags
 }
 

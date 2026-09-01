@@ -1,4 +1,5 @@
 import importlib.util
+import json
 import sys
 import types
 import unittest
@@ -88,6 +89,79 @@ class TestMetadataExtractor(unittest.TestCase):
         extractor.missing_objects = []
         extractor._write_database_objects = Mock()
         return extractor
+
+    def _build_type_extractor(self, columns_to_keep_as_int_by_object):
+        extractor = self.MetadataExtractor.__new__(self.MetadataExtractor)
+        extractor.columns_to_keep_as_int_by_object = columns_to_keep_as_int_by_object
+        extractor.dialect = "oracle"
+        return extractor
+
+    def _metadata(self, columns):
+        class FakeMetadata:
+            def __init__(self, columns):
+                self.columns = columns
+
+            @property
+            def column_names(self):
+                return list(self.columns)
+
+            def get_column(self, column_name):
+                return self.columns[column_name]
+
+            def to_dict(self):
+                return {"columns": list(self.columns.values())}
+
+            def update_column(self, column):
+                self.columns[column["name"]] = column
+
+        return FakeMetadata(columns)
+
+    def test_convert_int_columns_keeps_ordinary_integer_columns_as_decimal(self):
+        extractor = self._build_type_extractor({})
+        metadata = self._metadata(
+            {
+                "ordinary_integer": {"name": "ordinary_integer", "type": "int"},
+                "unrelated": {"name": "unrelated", "type": "string"},
+            }
+        )
+
+        extractor._convert_int_columns(metadata)
+
+        self.assertEqual(metadata.get_column("ordinary_integer")["type"], "decimal128(38,0)")
+        self.assertEqual(metadata.get_column("unrelated")["type"], "string")
+
+    def test_configured_tempus_columns_are_restored_to_int32_case_insensitively(self):
+        mapping_paths = [
+            Path(__file__).parents[4] / "dms/metadata/cica_tempus_SPPProcessPlatform.json",
+            Path(__file__).parents[4] / "dms/metadata/cica_tempus_SPPFinishedJobs.json",
+        ]
+        expected_columns = {
+            "dbo.live_activity": "activity_status",
+            "dbo.live_activity_resource": "status",
+            "dbo.finished_job": "job_status",
+        }
+
+        for mapping_path in mapping_paths:
+            mapping = json.loads(mapping_path.read_text())
+            keep_as_int = {}
+            for entry in mapping["columns_to_keep_as_int"]:
+                keep_as_int.setdefault(entry["object_name"].upper(), set()).add(entry["column_name"].upper())
+            extractor = self._build_type_extractor(keep_as_int)
+
+            for object_name, column_name in expected_columns.items():
+                if object_name.upper() not in keep_as_int:
+                    continue
+                metadata = self._metadata(
+                    {
+                        column_name: {"name": column_name, "type": "int"},
+                        "unrelated": {"name": "unrelated", "type": "string"},
+                    }
+                )
+                extractor._convert_int_columns(metadata)
+                extractor._preserve_int_columns(metadata, *object_name.split("."))
+
+                self.assertEqual(metadata.get_column(column_name)["type"], "int32")
+                self.assertEqual(metadata.get_column("unrelated")["type"], "string")
 
     def test_get_database_metadata_when_all_tables_exist(self):
         extractor = self._build_extractor(["claims.a", "claims.b"])

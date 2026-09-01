@@ -16,6 +16,7 @@ on:
       - 'terraform/environments/cloud-platform/**'
       - '.github/workflows/cloud-platform.yml'
       - '.github/workflows/cloud-platform-reusable.yml'
+      - '.github/workflows/reusable_terraform_components_plan_apply.yml'
 
 permissions:
   id-token: write  # This is required for requesting the JWT
@@ -23,29 +24,45 @@ permissions:
 
 jobs:
 
+  # Fetched once here and passed down to avoid hitting rate limits from repeated calls in the reusable workflows below
+  fetch-secrets:
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@2988728879704953e739f82ac926d37931c6d01b # v6.1.9
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
   development-root-terraform:
+    needs: fetch-secrets
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: cloud-platform
       environment: development
       action: "plan_apply"
       component: "root"
+      secrets_prefetched: true
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      ENVIRONMENT_MANAGEMENT: ${{ needs.fetch-secrets.outputs.environment_management }}
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
 
   development-network-terraform:
+    needs: fetch-secrets
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: cloud-platform
       environment: development
       action: "plan_apply"
       component: "network"
+      secrets_prefetched: true
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      ENVIRONMENT_MANAGEMENT: ${{ needs.fetch-secrets.outputs.environment_management }}
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
 
   terraform-pr:
+    needs: fetch-secrets
     if: github.event_name == 'pull_request'
     strategy:
       fail-fast: false
@@ -65,11 +82,15 @@ jobs:
       application: "${{ matrix.application }}"
       environment: "${{ matrix.environment }}"
       action: "${{ matrix.action }}"
+      secrets_prefetched: true
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      ENVIRONMENT_MANAGEMENT: ${{ needs.fetch-secrets.outputs.environment_management }}
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
 
   terraform-main:
+    needs: fetch-secrets
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     strategy:
       fail-fast: false
@@ -89,6 +110,9 @@ jobs:
       application: "${{ matrix.application }}"
       environment: "${{ matrix.environment }}"
       action: "${{ matrix.action }}"
+      secrets_prefetched: true
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      ENVIRONMENT_MANAGEMENT: ${{ needs.fetch-secrets.outputs.environment_management }}
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}

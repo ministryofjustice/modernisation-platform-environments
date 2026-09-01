@@ -127,7 +127,7 @@ module "iam_role_transfer_user" {
         {
           test     = "ArnLike"
           variable = "aws:SourceArn"
-          values   = ["arn:aws:transfer:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:server/*"]
+          values   = ["arn:aws:transfer:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:user/*"]
         },
       ]
     }

@@ -71,6 +71,7 @@ data "aws_iam_policy_document" "ai_gateway_bedrock" {
     sid    = "AwsMarketplaceAccess"
     effect = "Allow"
     actions = [
+      "aws-marketplace:Subscribe",
       "aws-marketplace:ViewSubscriptions"
     ]
     resources = ["*"]

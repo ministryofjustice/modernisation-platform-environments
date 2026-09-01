@@ -15,6 +15,18 @@ locals {
   cluster_environment   = contains(local.mp_environments, terraform.workspace) ? local.workspace_environment : "development_cluster"
   cp_vpc_name           = terraform.workspace
 
+  ## private_endpoint_mode: true = private-only cluster API, plus the SSM relay
+  ## for engineer access. Set per VPC because the relay lives in this component.
+  ## Published as a tag on the VPC (vpc.tf) and read by the cluster component,
+  ## so both settings always come from this one value.
+  ## BU spoke VPCs are not listed and default to false until opted in.
+  private_endpoint_mode = lookup({
+    cloud-platform-development   = false
+    cloud-platform-preproduction = false
+    cloud-platform-nonlive       = false
+    cloud-platform-live          = false
+  }, local.cp_vpc_name, false)
+
   vpc_cidr = {
     cloud-platform-development = {
       primary   = "10.195.32.0/20"

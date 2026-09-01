@@ -124,17 +124,163 @@ resource "aws_api_gateway_deployment" "chatbot_api_deployment" {
   ]
 }
 
-resource "aws_api_gateway_stage" "chatbot_api_stage" {
-  #checkov:skip=CKV_AWS_73:To be reviewed later
-  #checkov:skip=CKV_AWS_120:To be reviewed later
-  #checkov:skip=CKV_AWS_76:To be reviewed later
-  #checkov:skip=CKV2_AWS_4:To be reviewed later
-  #checkov:skip=CKV2_AWS_51:To be reviewed later
-  #checkov:skip=CKV2_AWS_29:To be reviewed later
+resource "aws_cloudwatch_log_group" "chatbot_api_access_logs" {
+  #checkov:skip=CKV_AWS_158:Default AWS encryption is sufficient for chatbot access logs
 
-  deployment_id = aws_api_gateway_deployment.chatbot_api_deployment.id
-  rest_api_id   = aws_api_gateway_rest_api.chatbot_api.id
-  stage_name    = local.environment
+  name              = "/aws/apigateway/chatbot-${local.environment}"
+  retention_in_days = 365
+}
+
+resource "aws_iam_role" "chatbot_api_cloudwatch" {
+  name = "chatbot-${local.environment}-apigw-cloudwatch"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "apigateway.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "chatbot_api_cloudwatch" {
+  role       = aws_iam_role.chatbot_api_cloudwatch.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+}
+
+resource "aws_api_gateway_account" "chatbot" {
+  cloudwatch_role_arn = aws_iam_role.chatbot_api_cloudwatch.arn
+
+  depends_on = [aws_iam_role_policy_attachment.chatbot_api_cloudwatch]
+}
+
+resource "aws_api_gateway_client_certificate" "chatbot" {
+  description = "Client certificate for chatbot-${local.environment} API Gateway"
+}
+
+resource "aws_api_gateway_stage" "chatbot_api_stage" {
+  #checkov:skip=CKV_AWS_120:Caching disabled - chatbot responses are dynamic per user question
+  #checkov:skip=CKV2_AWS_77:Log4j protection implemented via AWSManagedRulesKnownBadInputsRuleSet in associated WAF
+
+  deployment_id         = aws_api_gateway_deployment.chatbot_api_deployment.id
+  rest_api_id           = aws_api_gateway_rest_api.chatbot_api.id
+  stage_name            = local.environment
+  xray_tracing_enabled  = true
+  client_certificate_id = aws_api_gateway_client_certificate.chatbot.id
+
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.chatbot_api_access_logs.arn
+    format = jsonencode({
+      requestId      = "$context.requestId"
+      ip             = "$context.identity.sourceIp"
+      caller         = "$context.identity.caller"
+      user           = "$context.identity.user"
+      requestTime    = "$context.requestTime"
+      httpMethod     = "$context.httpMethod"
+      resourcePath   = "$context.resourcePath"
+      status         = "$context.status"
+      protocol       = "$context.protocol"
+      responseLength = "$context.responseLength"
+      apiKeyId       = "$context.identity.apiKeyId"
+    })
+  }
+
+  depends_on = [aws_api_gateway_account.chatbot]
+}
+
+resource "aws_api_gateway_method_settings" "chatbot_api_stage" {
+  #checkov:skip=CKV_AWS_225:Caching disabled - chatbot responses are dynamic per user question
+
+  rest_api_id = aws_api_gateway_rest_api.chatbot_api.id
+  stage_name  = aws_api_gateway_stage.chatbot_api_stage.stage_name
+  method_path = "*/*"
+
+  settings {
+    metrics_enabled = true
+    logging_level   = "INFO"
+  }
+
+  depends_on = [aws_api_gateway_account.chatbot]
+}
+
+resource "aws_wafv2_web_acl" "chatbot_api" {
+  name        = "chatbot-${local.environment}-api-waf"
+  description = "WAF for chatbot API Gateway"
+  scope       = "REGIONAL"
+
+  default_action {
+    allow {}
+  }
+
+  rule {
+    name     = "AWSManagedRulesAmazonIpReputationList"
+    priority = 1
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesAmazonIpReputationList"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "chatbot-${local.environment}-ip-reputation"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "AWSManagedRulesKnownBadInputsRuleSet"
+    priority = 2
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesKnownBadInputsRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "chatbot-${local.environment}-known-bad-inputs"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "chatbot-${local.environment}-api-waf"
+    sampled_requests_enabled   = true
+  }
+}
+
+resource "aws_wafv2_web_acl_association" "chatbot_api" {
+  resource_arn = aws_api_gateway_stage.chatbot_api_stage.arn
+  web_acl_arn  = aws_wafv2_web_acl.chatbot_api.arn
+}
+
+resource "aws_cloudwatch_log_group" "chatbot_api_waf_logs" {
+  #checkov:skip=CKV_AWS_158:Default AWS encryption is sufficient for WAF logs
+
+  name              = "aws-waf-logs-chatbot-${local.environment}"
+  retention_in_days = 365
+}
+
+resource "aws_wafv2_web_acl_logging_configuration" "chatbot_api" {
+  resource_arn            = aws_wafv2_web_acl.chatbot_api.arn
+  log_destination_configs = [aws_cloudwatch_log_group.chatbot_api_waf_logs.arn]
 }
 
 # Permissions

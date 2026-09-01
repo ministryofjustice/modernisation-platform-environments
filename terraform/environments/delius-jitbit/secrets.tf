@@ -7,7 +7,7 @@ resource "aws_secretsmanager_secret" "db_app_connection_string" {
   #checkov:skip=CKV2_AWS_57: "Rotation unnecessary"
   name                    = "${var.networking[0].application}-app-connection-string"
   recovery_window_in_days = 0
-  kms_key_id = data.aws_kms_key.general_shared.arn
+  kms_key_id              = data.aws_kms_key.general_shared.arn
   tags = merge(
     local.tags,
     {

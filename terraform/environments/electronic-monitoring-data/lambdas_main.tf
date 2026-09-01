@@ -409,6 +409,8 @@ module "load_fms_lambda" {
     CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
     SNS_TOPIC_ARN       = aws_sns_topic.emds_alerts.arn
     MAX_RECEIVE_COUNT   = tostring(local.load_sqs_max_receive_count)
+    MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
   }
 }
 
@@ -1253,5 +1255,29 @@ module "live_feed_incident_manager" {
     OPERATIONAL_SNS_TOPIC_ARN = (
       aws_sns_topic.operational_incident_updates.arn
     )
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# Trigger cpr integration
+#-----------------------------------------------------------------------------------
+
+module "trigger_cpr_integration" {
+  count =  local.is-development || local.is-test || local.is-preproduction ? 1 : 0
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "trigger_cpr_job"
+  role_name               = module.trigger_cpr_job_iam_role.name
+  role_arn                = module.trigger_cpr_job_iam_role.arn
+  handler                 = "trigger_cpr_job.handler"
+  memory_size             = 10240
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  security_group_ids      = [aws_security_group.lambda_cp_sg.id]
+  subnet_ids                     = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    API_BASE_URL = local.is-development || local.is-test ? "https://electronic-monitoring-data-person-match-api-dev.internal-non-prod.cloud-platform.service.justice.gov.uk" : local.is-preproduction ? "https://electronic-monitoring-data-person-match-api-preprod.internal-non-prod.cloud-platform.service.justice.gov.uk" : ""
   }
 }

@@ -113,6 +113,24 @@ module "sqs_lambda_route_dlq" {
   tags = local.tags
 }
 
+module "sqs_lambda_file_action_execution_requested_adapter_dlq" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  source  = "terraform-aws-modules/sqs/aws"
+  version = "5.2.2"
+
+  name            = "file-action-execution-requested-adapter-dlq"
+  use_name_prefix = false
+
+  kms_master_key_id          = module.kms_sqs.key_arn
+  message_retention_seconds  = 1209600
+  visibility_timeout_seconds = 30
+  receive_wait_time_seconds  = 20
+
+  create_dlq = false
+
+  tags = local.tags
+}
+
 module "sqs_eventbridge_file_transfer_workflow_dlq" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/sqs/aws"
@@ -145,6 +163,7 @@ module "sqs_eventbridge_file_transfer_workflow_dlq" {
           test     = "ArnEquals"
           variable = "aws:SourceArn"
           values = [
+            module.eventbridge_file_transfer_bus.eventbridge_rule_arns["file-action-dispatch-workflow"],
             module.eventbridge_file_transfer_bus.eventbridge_rule_arns["file-transfer-workflow"],
             module.eventbridge_file_transfer_bus.eventbridge_rule_arns["file-routing-workflow"],
           ]

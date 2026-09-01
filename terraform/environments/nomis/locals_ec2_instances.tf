@@ -254,7 +254,7 @@ locals {
       }
     }
 
-    web12 = {
+    qa11g-nomis-web12 = {
       config = {
         ami_name                  = "base_ol_8_5_2023-06-08T09-45-10.579Z"
         iam_resource_names_prefix = "ec2-instance"
@@ -302,7 +302,7 @@ locals {
 
     web_12 = {
       config = {
-        ami_name                  = "base_ol_8_5*"
+        ami_name                  = "base_ol_8_5_2023-06-08T09-45-10.579Z"
         iam_resource_names_prefix = "ec2-instance"
         instance_profile_policies = [
           # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module

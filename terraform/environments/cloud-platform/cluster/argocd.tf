@@ -12,18 +12,25 @@
 #       → Create ArgoCD Capability, CodeConnection IAM policy, hub tag
 #       → Never register as a spoke
 #
-#     NO → Is this workspace in argocd_registered_spokes (environment config)?
-#       YES → Register with the hub (create EKS Access Entry for the hub's
-#             Argo CD Capability role, the identity the EKS-managed Argo CD
-#             actually authenticates as)
-#       NO  → Do nothing (cluster is neither hub nor spoke)
+#     NO → Should this cluster register as a spoke?
+#       Permanent cluster listed in argocd_registered_spokes (environment config)?
+#         YES → Register with its tier's permanent hub
+#       OR ephemeral dev cluster whose workspace ends in "-spoke"?
+#         YES → Register with its convention-paired "<prefix>-hub" in the same
+#               account (mirrors the hub side — see cluster-core/argocd-gitops.tf)
+#       Registration creates an EKS Access Entry for the hub's Argo CD Capability
+#       role (the identity the EKS-managed Argo CD authenticates as) plus the
+#       scoped RBAC below. Otherwise: do nothing.
 #
 # WHERE TO MAKE CHANGES:
 #   - To add/remove a hub: edit argocd_hubs in locals.tf
-#   - To register a spoke: add its workspace name to argocd_registered_spokes
-#     in environment-configuration.tf (under the nonlive or live block)
-#   - For ephemeral test hubs: pass TF_VAR_enable_argocd=true at deploy time
-#   - For ephemeral test spokes: pass TF_VAR_argocd_hub_capability_role_arn
+#   - To register a permanent spoke: add its workspace name to
+#     argocd_registered_spokes in environment-configuration.tf (nonlive/live block)
+#   - For ephemeral test hubs: name the workspace "<prefix>-hub" (or pass
+#     TF_VAR_enable_argocd=true) at deploy time
+#   - For ephemeral test spokes: name the workspace "<prefix>-spoke" — it
+#     self-registers with "<prefix>-hub"; no allowlist edit or ARN input needed
+#     (TF_VAR_argocd_hub_capability_role_arn remains an optional override)
 #
 # References:
 #   - ADR-002: GitOps Fleet Management — EKS Capability for Argo CD
@@ -47,17 +54,9 @@ module "argocd" {
 
   cluster_name = module.eks.cluster_name
 
-  idc_instance_arn = var.argocd_idc_instance_arn
-  idc_region       = var.argocd_idc_region
-  rbac_role_mappings = merge(
-    {
-      ADMIN = [
-        { id = local.cloud_platform_engineers_group_id, type = "SSO_GROUP" },
-        { id = local.container_platform_aws_group_id, type = "SSO_GROUP" },
-      ]
-    },
-    var.argocd_rbac_role_mappings
-  )
+  idc_instance_arn   = local.argocd_idc_instance_arn
+  idc_region         = local.argocd_idc_region
+  rbac_role_mappings = local.argocd_rbac_role_mappings
 
   codeconnection_arn     = data.aws_codestarconnections_connection.github[0].arn
   enable_destroy_cleanup = local.cluster_environment == "development_cluster"
@@ -79,43 +78,11 @@ module "argocd" {
 # no VPC peering or TGW is required.
 #------------------------------------------------------------------------------
 
-locals {
-  # Hub's Argo CD Capability role ARN — resolved by convention or explicit
-  # override. Permanent hubs (nonlive/live) follow the module naming
-  # "<hub-cluster>-argocd-capability" (see modules/argo-cd), so the ARN is
-  # constructed directly for the spoke's tier via local.argocd_hubs. Ephemeral
-  # hubs are NOT covered by that convention — for those, the engineer passes
-  # the ARN explicitly as a workflow input, which arrives as
-  # var.argocd_hub_capability_role_arn and takes precedence.
-  resolved_hub_capability_role_arn = (
-    var.argocd_hub_capability_role_arn != ""
-    ? var.argocd_hub_capability_role_arn
-    : local.argocd_hub_capability_convention_role_arn
-  )
-
-  # Kubernetes RBAC group that the hub capability role is placed into on this spoke.
-  # The access entry declares this group explicitly via kubernetes_groups (EKS
-  # does NOT auto-create an "eks-access-entry:<arn>" group), and the custom
-  # ClusterRoles below bind to it. This is how we grant scoped access without
-  # attaching AmazonEKSClusterAdminPolicy.
-  #
-  # Must be a valid Kubernetes group name (<= 63 chars), so it is a short fixed
-  # label rather than anything derived from the role ARN.
-  argocd_hub_capability_rbac_group = "argocd-hub"
-
-  # A cluster never self-identifies as both hub and spoke.
-  is_argocd_hub_cluster = contains(values(local.argocd_hubs)[*].cluster_name, terraform.workspace)
-
-  # Spoke registration: workspace must appear in the argocd_registered_spokes
-  # allowlist AND must not be a hub AND must be a known permanent cluster (or
-  # have an explicit hub ARN for ephemeral spokes).
-  is_argocd_spoke = contains(
-    lookup(local.environment_configuration, "argocd_registered_spokes", []),
-    terraform.workspace
-    ) && !local.enable_argocd && !local.is_argocd_hub_cluster && (
-    contains(local.mp_environments, terraform.workspace) || var.argocd_hub_capability_role_arn != ""
-  )
-}
+# Hub/spoke detection and resolution locals (is_argocd_hub_cluster,
+# is_argocd_ephemeral_spoke, is_argocd_permanent_spoke, is_argocd_spoke,
+# argocd_ephemeral_hub_*, resolved_hub_capability_role_arn,
+# argocd_hub_capability_rbac_group) are defined in locals.tf, matching the house
+# convention that resource files carry no locals.
 
 #------------------------------------------------------------------------------
 # Spoke: Register the hub's ArgoCD Capability role (least privilege)
@@ -250,7 +217,7 @@ resource "kubernetes_cluster_role_v1" "argocd_hub_deploy" {
   # Gateway API routes used by product workloads.
   rule {
     api_groups = ["gateway.networking.k8s.io"]
-    resources  = ["httproutes", "grpcroutes"]
+    resources  = ["httproutes", "grpcroutes", "listenersets"]
     verbs      = ["create", "update", "patch", "delete", "deletecollection"]
   }
 

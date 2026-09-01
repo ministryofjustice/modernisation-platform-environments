@@ -6,7 +6,7 @@ When a file arrives in the `incoming` S3 bucket, this service emits canonical ev
 
 **`detail.data.fileId`** is the stable logical file identifier. It is created at ingress and copied into every later event.
 
-**`detail.metadata.correlationId`** groups the events in one file lifecycle. It currently has the same value as `fileId`, but remains a separate tracing concept.
+**`detail.metadata.correlationId`** is the primary operational search key and groups every event and action request in one file lifecycle. It currently has the same value as `fileId`, but remains a separate tracing concept.
 
 **`detail.metadata.causationId`** is the top-level EventBridge `id` of the event that caused the current event. `FileReceived.v1` has no causation ID because it starts the canonical chain.
 
@@ -48,6 +48,14 @@ The ROUTE Lambda mover consumes that event and claims a separate `(correlationId
 
 ROUTE copies and verifies the exact processing version with destination SSE-KMS encryption before deleting that exact source version. It then publishes `FileRouted.v1` with an idempotency key of `route:{route}:{destinationBucket}:{key}:{destinationVersionId}`.
 
+## Action dispatch
+
+The file action execution requested adapter consumes clean `FileRouted.v1` events and uses the source event's `idempotencyKey` for Lambda-level deduplication. Replaying the same logical route under a different EventBridge envelope ID therefore does not republish requests while its idempotency record exists.
+
+Each configured operation produces a `FileActionExecutionRequested.v1` event. Its `actionExecutionId` is a deterministic UUID derived from the source route idempotency key, matched secret ARN, exact secret version ID and stable operation ID. Its output idempotency key is `action-request:{actionExecutionId}`. Rotating the configuration to a new secret version intentionally produces a new execution identity.
+
+The requested event retains the original `fileId` and `correlationId`, and uses the `FileRouted.v1` EventBridge ID as `causationId`. One request may fan out to multiple downstream queues. Each consumer must deduplicate independently on `actionExecutionId` or the equivalent output `idempotencyKey`.
+
 ## Durable recovery
 
 The mover records these operation checkpoints:
@@ -68,6 +76,6 @@ Idempotency records expire after 30 days in non-production environments and 400 
 
 ## Following and diagnosing a file
 
-Query the file-transfer event bus archive or CloudWatch Logs for `detail.data.fileId` to find the complete lifecycle. To reconstruct causality, start with `FileReceived.v1` and find the event whose `causationId` matches each preceding EventBridge ID.
+Start operational investigation with `correlationId`: query the file-transfer event bus archive for `detail.metadata.correlationId` and CloudWatch Logs for `correlation_id` to find the complete lifecycle. To reconstruct causality, start with `FileReceived.v1` and find the event whose `causationId` matches each preceding EventBridge ID.
 
 When two canonical events describe the same operation, compare `fileId`, `correlationId` and `idempotencyKey`. Matching values identify at-least-once delivery of the same logical operation; different source version IDs identify distinct uploads.

@@ -124,12 +124,13 @@ resource "aws_kms_alias" "access_dms" {
 # S3 bucket for DMS mapping rules
 # ---------------------------------------------------------------------------
 
-#trivy:ignore:AVD-AWS-0089 No logging required for test config bucket
-#checkov:skip=CKV_AWS_18:Access logging not required for test config bucket
-#checkov:skip=CKV_AWS_144:Cross-region replication not required for test config bucket
-#checkov:skip=CKV2_AWS_61:Lifecycle configuration not required for test config bucket
-#checkov:skip=CKV2_AWS_62:Event notifications not required for test config bucket
 resource "aws_s3_bucket" "access_dms_config" {
+  #checkov:skip=CKV_AWS_18:Access logging not required for test config bucket
+  #checkov:skip=CKV_AWS_144:Cross-region replication not required for test config bucket
+  #checkov:skip=CKV_AWS_145:Test config bucket. Will be removed after test.
+  #checkov:skip=CKV2_AWS_61:Lifecycle configuration not required for test config bucket
+  #checkov:skip=CKV2_AWS_62:Event notifications not required for test config bucket
+
   count  = local.is-test ? 1 : 0
   bucket = "${local.application_name}-${local.environment}-access-dms-config"
   tags   = local.tags
@@ -179,8 +180,8 @@ resource "aws_s3_object" "access_dms_mappings" {
 # Slack webhook secret (placeholder for testing)
 # ---------------------------------------------------------------------------
 
-#checkov:skip=CKV2_AWS_57: Automatic rotation not needed for test webhook
 resource "aws_secretsmanager_secret" "access_dms_slack_webhook" {
+  #checkov:skip=CKV2_AWS_57: Automatic rotation not needed for test webhook
   count      = local.is-test ? 1 : 0
   name       = "${local.application_name}-${local.environment}/access-dms/slack-webhook"
   kms_key_id = aws_kms_key.access_dms[0].arn

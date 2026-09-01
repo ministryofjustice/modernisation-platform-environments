@@ -1,8 +1,14 @@
 locals {
 
-  delius_oasys_queues_preproduction = {
-    "pp" = {
-      sns_topic_arn_configured = true # set to true when sns_topic_arn has been populated in config secret
+  locals_preproduction = {
+    arns_integration = {
+      cross_account_secret_configured = true
+      database_hostname               = "hmpps-arns-assessment-view-db-preprod"
+    }
+    delius_oasys_queues = {
+      "pp" = {
+        sns_topic_arn_configured = true # set to true when sns_topic_arn has been populated in config secret
+      }
     }
   }
 

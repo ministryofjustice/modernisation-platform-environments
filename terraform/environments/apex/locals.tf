@@ -74,7 +74,7 @@ locals {
   })
 
   # ECS task definition consumes this ARN via task_definition.json.
-  db_secret_arn = local.environment == "test" ? data.aws_secretsmanager_secret.app_apex_dbpassword_tad[0].arn : aws_secretsmanager_secret.app_apex_dbpassword_tad[0].arn
+  db_secret_arn = data.aws_secretsmanager_secret.app_apex_dbpassword_tad.arn
 
   env_account_id       = local.environment_management.account_ids[terraform.workspace]
   app_db_password_name = "APP_APEX_DBPASSWORD_TAD"

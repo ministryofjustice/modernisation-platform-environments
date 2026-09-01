@@ -20,11 +20,22 @@ on:
         type: string
         required: false
         description: "Optional: account name override for ACCOUNT_NAME env var."
+      secrets_prefetched:
+        type: boolean
+        required: false
+        default: false
+        description: "Optional: set to true when the caller already fetched secrets and is passing them in via ENVIRONMENT_MANAGEMENT/GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT secrets."
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID:
         required: true
       PASSPHRASE:
         required: true
+      ENVIRONMENT_MANAGEMENT:
+        required: false
+        description: "Optional: pre-fetched environment_management secret, passed down to skip re-fetching in each component's plan/apply workflow."
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT:
+        required: false
+        description: "Optional: pre-fetched github_ci_user_environments_repo_pat secret, passed down to skip re-fetching in each component's plan/apply workflow."
 
 permissions:
   id-token: write  # This is required for requesting the JWT
@@ -40,9 +51,12 @@ jobs:
       action: ${{ inputs.action }}
       component: "root"
       account_name: ${{ inputs.account_name }}
+      secrets_prefetched: ${{ inputs.secrets_prefetched }}
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      ENVIRONMENT_MANAGEMENT: ${{ secrets.ENVIRONMENT_MANAGEMENT }}
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT: ${{ secrets.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
 
   network-terraform:
     needs: root-terraform
@@ -53,9 +67,12 @@ jobs:
       action: ${{ inputs.action }}
       component: "network"
       account_name: ${{ inputs.account_name }}
+      secrets_prefetched: ${{ inputs.secrets_prefetched }}
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      ENVIRONMENT_MANAGEMENT: ${{ secrets.ENVIRONMENT_MANAGEMENT }}
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT: ${{ secrets.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
 
   cluster-terraform:
     needs: network-terraform
@@ -67,9 +84,12 @@ jobs:
       plan_apply_tfargs: ${{ format('-var=created_by={0}/{1}/actions/runs/{2}/', github.server_url, github.repository, github.run_id) }}
       component: "cluster"
       account_name: ${{ inputs.account_name }}
+      secrets_prefetched: ${{ inputs.secrets_prefetched }}
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      ENVIRONMENT_MANAGEMENT: ${{ secrets.ENVIRONMENT_MANAGEMENT }}
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT: ${{ secrets.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
 
   cluster-base-terraform:
     needs: cluster-terraform
@@ -80,9 +100,12 @@ jobs:
       action: ${{ inputs.action }}
       component: "cluster-base"
       account_name: ${{ inputs.account_name }}
+      secrets_prefetched: ${{ inputs.secrets_prefetched }}
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      ENVIRONMENT_MANAGEMENT: ${{ secrets.ENVIRONMENT_MANAGEMENT }}
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT: ${{ secrets.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
 
   cluster-core-terraform:
     needs: cluster-base-terraform
@@ -93,9 +116,12 @@ jobs:
       action: ${{ inputs.action }}
       component: "cluster-core"
       account_name: ${{ inputs.account_name }}
+      secrets_prefetched: ${{ inputs.secrets_prefetched }}
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      ENVIRONMENT_MANAGEMENT: ${{ secrets.ENVIRONMENT_MANAGEMENT }}
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT: ${{ secrets.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}
 
   cluster-components-terraform:
     needs: cluster-core-terraform
@@ -106,6 +132,9 @@ jobs:
       action: ${{ inputs.action }}
       component: "cluster-components"
       account_name: ${{ inputs.account_name }}
+      secrets_prefetched: ${{ inputs.secrets_prefetched }}
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      ENVIRONMENT_MANAGEMENT: ${{ secrets.ENVIRONMENT_MANAGEMENT }}
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT: ${{ secrets.GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT }}

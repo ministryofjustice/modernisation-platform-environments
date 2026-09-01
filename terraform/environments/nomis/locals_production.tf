@@ -242,7 +242,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
-            branch = "662853f289cc0053f99ba458c3d9d3c4820f3640" # 2025-08-19 crypto requirement fix
+            branch = "main"
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {

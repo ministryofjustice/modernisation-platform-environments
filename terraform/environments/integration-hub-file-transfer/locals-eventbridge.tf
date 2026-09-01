@@ -84,6 +84,22 @@ locals {
         }
       })
     }
+    "file-action-dispatch-workflow" = {
+      description = "Invoke the file action execution requested adapter for clean FileRouted.v1 events"
+      event_pattern = jsonencode({
+        account       = [data.aws_caller_identity.current.account_id]
+        source        = ["uk.gov.justice.service.managed-file-transfer"]
+        "detail-type" = ["FileRouted.v1"]
+        detail = {
+          data = {
+            route = ["clean"]
+            destinationObject = {
+              bucket = [module.s3_bucket["clean"].s3_bucket_id]
+            }
+          }
+        }
+      })
+    }
   }
 
   eventbridge_file_transfer_bus_targets = {
@@ -103,6 +119,17 @@ locals {
         name            = "route"
         dead_letter_arn = module.sqs_eventbridge_file_transfer_workflow_dlq.queue_arn
         arn             = module.lambda_route.lambda_function_arn
+        retry_policy = {
+          maximum_event_age_in_seconds = 21600
+          maximum_retry_attempts       = 185
+        }
+      }
+    ]
+    "file-action-dispatch-workflow" = [
+      {
+        name            = "file-action-execution-requested-adapter"
+        dead_letter_arn = module.sqs_eventbridge_file_transfer_workflow_dlq.queue_arn
+        arn             = module.lambda_file_action_execution_requested_adapter.lambda_function_arn
         retry_policy = {
           maximum_event_age_in_seconds = 21600
           maximum_retry_attempts       = 185

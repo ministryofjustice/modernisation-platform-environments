@@ -2,6 +2,7 @@ locals {
 
   application_name = "digital-prison-reporting"
   component_name   = "ppud-pipeline"
+  short_name       = "ppud"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
@@ -20,7 +21,9 @@ locals {
     jsondecode(data.http.environments_file.response_body).tags,
     { "is-production" = local.is-production },
     { "environment-name" = terraform.workspace },
-    { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
+    { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" },
+    { "component-name" = local.component_name },
+    { "owner" = "Probation Data Engineering" }
   )
 
   environment     = trimprefix(terraform.workspace, "${var.networking[0].application}-")
@@ -36,4 +39,7 @@ locals {
   # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
+
+
+
 }

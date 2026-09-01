@@ -90,11 +90,20 @@ resource "aws_security_group_rule" "alb_sandbox" {
   security_group_id        = aws_security_group.jitbit_sandbox[0].id
 }
 
-resource "aws_cloudwatch_log_group" "jitbit_sandbox" {
+resource "aws_cloudwatch_log_group" "jitbit_sandbox_blue" {
   #checkov:skip=CKV_AWS_338: "Logs required for 30 days"
   count = local.is-development ? 1 : 0
 
-  name              = format("%s-%s-ecs", local.application_name, "sandbox")
+  name              = format("%s-%s-ecs-blue", local.application_name, "sandbox")
+  retention_in_days = 30
+  kms_key_id        = aws_kms_key.cloudwatch_logs.arn
+}
+
+resource "aws_cloudwatch_log_group" "jitbit_sandbox_green" {
+  #checkov:skip=CKV_AWS_338: "Logs required for 30 days"
+  count = local.is-development ? 1 : 0
+
+  name              = format("%s-%s-ecs-green", local.application_name, "sandbox")
   retention_in_days = 30
   kms_key_id        = aws_kms_key.cloudwatch_logs.arn
 }

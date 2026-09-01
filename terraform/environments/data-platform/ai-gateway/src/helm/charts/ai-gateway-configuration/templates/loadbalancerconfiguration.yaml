@@ -16,6 +16,9 @@ spec:
       value: {{ .Values.albLogsBucket }}
     - key: access_logs.s3.prefix
       value: "ai-gateway"
+    # Default is 60s, which is too short for large audio/file uploads and long-running model inference
+    - key: idle_timeout.timeout_seconds
+      value: "{{ .Values.idleTimeoutSeconds }}"
   listenerConfigurations:
     - protocolPort: HTTPS:443
       defaultCertificate: {{ .Values.certificateArn }}

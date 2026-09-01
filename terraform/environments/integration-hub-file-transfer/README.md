@@ -17,7 +17,9 @@ A one-way managed file transfer service, provided by the Integration Hub, to all
 
 ### **Service URLs:**
 
-> *.managed-file-transfer.service.justice.gov.uk
+> ftps.file-transfer.service.justice.gov.uk
+> sftp.file-transfer.service.justice.gov.uk
+> web.file-transfer.service.justice.gov.uk
 
 ### **Incident response hours:**
 
@@ -73,3 +75,5 @@ You must be a Ministry of Justice service. You may request access on behalf of a
 ### **How to resolve specific issues:**
 
 <!-- Describe the steps someone might take to resolve a specific issue or incident, often for use when on call. This may be a large amount of information, so may need to be split out into multiple pages, or link to other documents.-->
+
+See [file action dispatch](./docs/file-action-dispatch.md) for dispatch configuration, matching and failure behaviour.

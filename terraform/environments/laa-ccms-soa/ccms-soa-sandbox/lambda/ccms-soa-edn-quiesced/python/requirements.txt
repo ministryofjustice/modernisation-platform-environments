@@ -1,0 +1,6 @@
+mypy-boto3-secretsmanager==1.41.0
+pycurl==7.45.7
+urllib3==2.5.0
+python-dateutil==2.9.0.post0
+jmespath==1.0.1
+six==1.17.0

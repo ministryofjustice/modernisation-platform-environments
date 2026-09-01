@@ -36,6 +36,7 @@ locals {
     "217.138.45.109/32", # Unilink AOVPN
     "217.138.45.110/32", # Unilink AOVPN
   ]
+  uservision_ips = "5.181.59.114/32" # Uservision auditors: https://mojdt.slack.com/archives/C032BQQHJE5/p1787327498499259
   cp_ips = [
     "35.178.209.113/32", # cloudplatform-live1-1
     "3.8.51.207/32",     # cloudplatform-live1-2

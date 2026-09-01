@@ -10,7 +10,10 @@ module "eks" {
   enable_irsa        = true
 
   endpoint_private_access = true
-  endpoint_public_access  = true
+  ## Public access is off when the VPC is tagged private-endpoint-mode=true. The
+  ## network component sets that tag and deploys the SSM relay from the same
+  ## value, so the endpoint and the relay cannot disagree.
+  endpoint_public_access = !local.private_endpoint_mode
   # endpoint_public_access_cidrs = ["0.0.0.0/0"]
 
   iam_role_name            = "${trimprefix(trimprefix(terraform.workspace, "cloud-platform-"), "container-platform-")}-cluster"
