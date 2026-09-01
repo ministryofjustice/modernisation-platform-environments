@@ -24,10 +24,10 @@ resource "aws_transfer_server" "this" {
     local.tags,
     {
       Name = "${local.application_name}-transfer-server"
-      "transfer:customHostname"      = local.is-production == false ? "sftp.${local.environment}.managed-file-transfer.service.justice.gov.uk" : "sftp.managed-file-transfer.service.justice.gov.uk"
+      "transfer:customHostname"      = local.is-production == false ? "sftp.${local.environment}.file-transfer.service.justice.gov.uk" : "sftp.file-transfer.service.justice.gov.uk"
       "transfer:route53HostedZoneId" = "/hostedzone/${data.aws_route53_zone.service.zone_id}"
     }
   )
 
-  depends_on = [aws_acm_certificate.ftps]
+  depends_on = [aws_acm_certificate_validation.ftps]
 }
