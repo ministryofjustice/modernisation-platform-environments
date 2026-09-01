@@ -6,24 +6,27 @@ module "iam_role" {
   name            = local.component_name
   use_name_prefix = false
 
-  custom_role_trust_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Federated = module.iam_oidc_provider[0].arn
+  trust_policy_permissions = {
+    GitHubAuditLogOIDC = {
+      actions = ["sts:AssumeRoleWithWebIdentity"]
+      principals = [{
+        type        = "Federated"
+        identifiers = [module.iam_oidc_provider[0].arn]
+      }]
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "oidc-configuration.audit-log.githubusercontent.com:aud"
+          values   = ["sts.amazonaws.com"]
+        },
+        {
+          test     = "StringEquals"
+          variable = "oidc-configuration.audit-log.githubusercontent.com:sub"
+          values   = ["https://github.com/${local.global_config.github_enterprise_slug}"]
         }
-        Action = "sts:AssumeRoleWithWebIdentity"
-        Condition = {
-          StringEquals = {
-            "oidc-configuration.audit-log.githubusercontent.com:aud" = "sts.amazonaws.com"
-            "oidc-configuration.audit-log.githubusercontent.com:sub" = "https://github.com/${local.global_config.github_enterprise_slug}"
-          }
-        }
-      }
-    ]
-  })
+      ]
+    }
+  }
 
   create_inline_policy = true
   inline_policy_permissions = {
