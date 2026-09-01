@@ -453,7 +453,7 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PD/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PD*/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/DR*/*",
-              "arn:aws:secretsmanager:*:*:secret:/postgres/database/${local.arns_integration.database_hostname}/*",
+              "arn:aws:secretsmanager:*:*:secret:/postgres/database/hmpps-arns-assessment-view-db-prod/*",
             ]
           },
         ]
