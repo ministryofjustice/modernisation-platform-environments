@@ -215,6 +215,7 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/*",
+              "arn:aws:secretsmanager:*:*:secret:/postgres/database/${local.arns_integration.database_hostname}/*",
             ]
           },
         ]
