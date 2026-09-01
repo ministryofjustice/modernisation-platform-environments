@@ -48,14 +48,22 @@ resource "aws_vpc_security_group_ingress_rule" "connector_alb_ingress_workspace"
 }
 
 # Allow all outbound (to be restricted later)
-resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_all" {
-  security_group_id = aws_security_group.connector_load_balancer.id
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1"
-  description       = "Allow all outbound traffic (to be locked down later)"
+# resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_all" {
+#   security_group_id = aws_security_group.connector_load_balancer.id
+#   cidr_ipv4         = "0.0.0.0/0"
+#   ip_protocol       = "-1"
+#   description       = "Allow all outbound traffic (to be locked down later)"
+# }
+
+resource "aws_security_group_rule" "connector_alb_egress_oia_ec2" {
+  security_group_id        = aws_security_group.connector_load_balancer.id
+  type                     = "egress"
+  description              = "Allow ALB egress to OIA EC2 instances on ephemeral ports"
+  protocol                 = "tcp"
+  from_port                = 32768
+  to_port                  = 61000
+  source_security_group_id = aws_security_group.cluster_ec2.id
 }
-
-
 # Container Security Group
 
 resource "aws_security_group" "ecs_tasks_connector" {
@@ -79,9 +87,86 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_connector_ingress" {
 }
 
 # All outbound traffic from ECS containers
-resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_all" {
+# resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_all" {
+#   security_group_id = aws_security_group.ecs_tasks_connector.id
+#   cidr_ipv4         = "0.0.0.0/0"
+#   ip_protocol       = "-1"
+#   description       = "Allow all outbound traffic"
+# }
+
+resource "aws_security_group_rule" "ecs_tasks_connector_egress_vpce" {
   security_group_id = aws_security_group.ecs_tasks_connector.id
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1"
-  description       = "Allow all outbound traffic"
+  type              = "egress"
+  description       = "Allow egress to VPC endpoints (logs/ecs/secrets)"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks = [
+    data.aws_subnet.vpce_subnets_a.cidr_block,
+    data.aws_subnet.vpce_subnets_b.cidr_block,
+    data.aws_subnet.vpce_subnets_c.cidr_block,
+  ]
+}
+
+resource "aws_security_group_rule" "ecs_tasks_connector_egress_s3" {
+  security_group_id = aws_security_group.ecs_tasks_connector.id
+  type              = "egress"
+  description       = "Allow S3 access via gateway endpoint (prefix list)"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  prefix_list_ids   = [data.aws_prefix_list.s3.id]
+}
+
+resource "aws_security_group_rule" "ecs_tasks_connector_egress_443" {
+  security_group_id = aws_security_group.ecs_tasks_connector.id
+  type              = "egress"
+  description       = "HTTPS"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks = [
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block
+  ]
+}
+
+
+resource "aws_security_group_rule" "ecs_tasks_connector_egress_1521" {
+  security_group_id = aws_security_group.ecs_tasks_connector.id
+  type              = "egress"
+  description       = "Allow egress to protected subnets"
+  protocol          = "tcp"
+  from_port         = 1521
+  to_port           = 1521
+  cidr_blocks = [
+    data.aws_subnet.data_subnets_a.cidr_block,
+    data.aws_subnet.data_subnets_b.cidr_block,
+    data.aws_subnet.data_subnets_c.cidr_block,
+  ]
+}
+
+resource "aws_security_group_rule" "ecs_tasks_connector_egress_1522" {
+  security_group_id = aws_security_group.ecs_tasks_connector.id
+  type              = "egress"
+  description       = "Allow egress to protected subnets on port 1522"
+  protocol          = "tcp"
+  from_port         = 1522
+  to_port           = 1522
+  cidr_blocks = [
+    data.aws_subnet.data_subnets_a.cidr_block,
+    data.aws_subnet.data_subnets_b.cidr_block,
+    data.aws_subnet.data_subnets_c.cidr_block,
+  ]
+}
+
+resource "aws_security_group_rule" "ecs_tasks_connector_egress_2049_efs" {
+  security_group_id        = aws_security_group.ecs_tasks_connector.id
+  type                     = "egress"
+  description              = "Allow egress to EFS security group on port 2049"
+  protocol                 = "tcp"
+  from_port                = 2049
+  to_port                  = 2049
+  source_security_group_id = aws_security_group.oia-efs-security-group.id
 }

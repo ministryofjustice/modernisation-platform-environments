@@ -32,13 +32,28 @@ resource "aws_vpc_security_group_ingress_rule" "alb_ingress_7001_all" {
 #   description       = "7001 from AWS Workspaces"
 # }
 
-resource "aws_vpc_security_group_ingress_rule" "alb_ingress_443_all" {
+# resource "aws_vpc_security_group_ingress_rule" "alb_ingress_443_all" {
+#   security_group_id = aws_security_group.opahub_load_balancer.id
+#   cidr_ipv4         = "0.0.0.0/0"
+#   ip_protocol       = "tcp"
+#   from_port         = 443
+#   to_port           = 443
+#   description       = "HTTPS from anywhere (WAF controlled)"
+# }
+
+resource "aws_security_group_rule" "alb_ingress_443_private_subnets" {
   security_group_id = aws_security_group.opahub_load_balancer.id
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "tcp"
+
+  type              = "ingress"
+  description       = "HTTPS from private subnets"
+  protocol          = "tcp"
   from_port         = 443
   to_port           = 443
-  description       = "HTTPS from anywhere (WAF controlled)"
+  cidr_blocks = [
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block
+  ]
 }
 
 resource "aws_vpc_security_group_egress_rule" "alb_egress_all" {

@@ -14,9 +14,19 @@ resource "aws_security_group" "ec2_sg_gh_runner" {
 
 # EGRESS Rules
 
-resource "aws_vpc_security_group_egress_rule" "egress_traffic_gh_runner_443" {
+# resource "aws_vpc_security_group_egress_rule" "egress_traffic_gh_runner_443" {
+#   security_group_id = aws_security_group.ec2_sg_gh_runner.id
+#   cidr_ipv4         = "0.0.0.0/0"
+#   ip_protocol       = "-1"
+#   description       = "Allow all outbound traffic"
+# }
+
+resource "aws_security_group_rule" "gh_runner_egress_all_443" {
   security_group_id = aws_security_group.ec2_sg_gh_runner.id
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1"
-  description       = "Allow all outbound traffic"
+  type              = "egress"
+  description       = "Allow HTTPS to anywhere"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = ["0.0.0.0/0"]
 }
