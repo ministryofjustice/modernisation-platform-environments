@@ -65,14 +65,6 @@
         "value": "${health_check_port}"
       },
       {
-        "name": "CONFIG_JVM_ARGS",
-        "value": "${config_jvm_args}"
-      },
-      {
-        "name": "JAVA_OPTS",
-        "value": "${java_options}"        
-      },
-      {
         "name": "CREATE_DATABASE",
         "value": "${create_database}"
       }
@@ -101,6 +93,14 @@
       {
         "name": "WL_USER",
         "valueFrom": "${wl_user}"
+      },
+      {
+        "name": "KEYSTORE_PASSWORD",
+        "valueFrom": "${keystore_password}"
+      },
+      {
+        "name": "TRUSTSTORE_PASSWORD",
+        "valueFrom": "${truststore_password}"
       }
     ]
   }
