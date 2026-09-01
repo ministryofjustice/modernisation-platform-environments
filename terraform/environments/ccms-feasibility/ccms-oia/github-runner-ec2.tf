@@ -2,7 +2,7 @@ module "gh_runner" {
   # https://github.com/ministryofjustice/laa-ccms-terraform-modules/commit/b484555
   source = "github.com/ministryofjustice/laa-ccms-terraform-modules//modules/ec2?ref=b484555"
 
-  name                  = lower(format("github-runner-%s", local.environment))
+  name                  = "${local.component_name}-${local.env_label}-gh-runner"
   instance_profile_name = aws_iam_instance_profile.github_runner_instance_profile.name
 
   instance_type      = local.application_data.accounts[local.environment].ec2_instance_type_gh_runner

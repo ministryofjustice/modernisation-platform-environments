@@ -10,12 +10,12 @@ data "aws_iam_policy_document" "gh_runner_instance_assume_role_policy" {
 }
 
 resource "aws_iam_role" "github_runner_role" {
-  name = "github-runner-ec2-role"
+  name = "${local.component_name}-${local.env_label}-gh-runner-role"
 
   assume_role_policy = data.aws_iam_policy_document.gh_runner_instance_assume_role_policy.json
 
   tags = merge(local.tags,
-    { Name = lower(format("github-runner-ec2-role")) }
+    { Name = "${local.component_name}-${local.env_label}-gh-runner-role" }
   )
 }
 
@@ -27,6 +27,6 @@ resource "aws_iam_role_policy_attachment" "gh_runner_ssm_managed_policy" {
 
 # Instance Profile for GitHub Runner EC2 Instance
 resource "aws_iam_instance_profile" "github_runner_instance_profile" {
-  name = "github-runner-instance-profile"
+  name = "${local.component_name}-${local.env_label}-gh-runner-profile"
   role = aws_iam_role.github_runner_role.name
 }
