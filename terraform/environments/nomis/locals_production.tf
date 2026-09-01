@@ -242,7 +242,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
-            branch = "1e4298801a65dad5d391a57fe9b912ed553da849" # 2026-08-17 NEW Nomis Forms Artifacts
+            branch = "main"
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
