@@ -2,7 +2,7 @@ locals {
   rds_export_bucket_lifecycle_rule = [
     {
       id      = "main"
-      enabled = "Disabled"
+      enabled = "Enabled"
       prefix  = ""
 
       transition = [
@@ -14,14 +14,8 @@ locals {
       expiration = {
         days = 730
       }
-      noncurrent_version_transition = [
-        {
-          days          = 90
-          storage_class = "INTELLIGENT_TIERING"
-        }
-      ]
       noncurrent_version_expiration = {
-        days = 730
+        days = 90
       }
   }]
 
