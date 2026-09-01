@@ -1,6 +1,6 @@
 # ECS Cluster
 resource "aws_ecs_cluster" "main" {
-  name = "${local.first_cluster_name}"
+  name = local.first_cluster_name
 
   setting {
     name  = "containerInsights"
@@ -9,7 +9,7 @@ resource "aws_ecs_cluster" "main" {
 }
 
 resource "aws_ecs_cluster" "additional" {
-  name = "${local.second_cluster_name}"
+  name = local.second_cluster_name
 
   setting {
     name  = "containerInsights"

@@ -34,7 +34,7 @@ resource "aws_wafv2_ip_set" "opahub_waf_ip_set_web_determinations" {
     data.aws_subnet.private_subnets_c.cidr_block
 
   ]
-    # "172.31.192.0/18" # Secure Browser VPC
+  # "172.31.192.0/18" # Secure Browser VPC
   tags = merge(local.tags,
     { Name = lower(format("%s-ip-set-web-determinations", local.opa_app_name)) }
   )

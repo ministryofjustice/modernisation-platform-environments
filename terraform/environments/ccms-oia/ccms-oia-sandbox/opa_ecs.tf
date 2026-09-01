@@ -36,24 +36,24 @@ resource "aws_ecs_task_definition" "opahub" {
   container_definitions = templatefile(
     "${path.module}/templates/task_definition_opahub.json.tpl",
     {
-      app_name          = local.opa_app_name
-      app_image         = local.application_data.accounts[local.environment].opa_app_image
-      server_port       = local.application_data.accounts[local.environment].opa_server_port
-      ssl_port          = local.application_data.accounts[local.environment].opa_ssl_port
-      health_check_port = local.application_data.accounts[local.environment].opa_health_check_port
-      java_options      = local.application_data.accounts[local.environment].java_options
-      config_jvm_args   = local.application_data.accounts[local.environment].config_jvm_args
-      aws_region        = local.application_data.accounts[local.environment].aws_region
-      container_version = local.application_data.accounts[local.environment].opa_container_version
-      opahub_password   = "${aws_secretsmanager_secret.opahub_secrets.arn}:opahub_password::"
-      db_host           = aws_db_instance.opahub_db.endpoint
-      db_user           = "${aws_secretsmanager_secret.opahub_secrets.arn}:db_user::"
-      db_password       = "${aws_secretsmanager_secret.opahub_secrets.arn}:db_password::"
-      wl_user           = "${aws_secretsmanager_secret.opahub_secrets.arn}:wl_user::"
-      wl_password       = "${aws_secretsmanager_secret.opahub_secrets.arn}:wl_password::"
-      wl_mem_args       = local.application_data.accounts[local.environment].wl_mem_args
-      secret_key        = "${aws_secretsmanager_secret.opahub_secrets.arn}:secret_key::"
-      create_database   = local.application_data.accounts[local.environment].create_database
+      app_name            = local.opa_app_name
+      app_image           = local.application_data.accounts[local.environment].opa_app_image
+      server_port         = local.application_data.accounts[local.environment].opa_server_port
+      ssl_port            = local.application_data.accounts[local.environment].opa_ssl_port
+      health_check_port   = local.application_data.accounts[local.environment].opa_health_check_port
+      aws_region          = local.application_data.accounts[local.environment].aws_region
+      container_version   = local.application_data.accounts[local.environment].opa_container_version
+      opahub_password     = "${aws_secretsmanager_secret.opahub_secrets.arn}:opahub_password::"
+      db_host             = aws_db_instance.opahub_db.endpoint
+      db_user             = "${aws_secretsmanager_secret.opahub_secrets.arn}:db_user::"
+      db_password         = "${aws_secretsmanager_secret.opahub_secrets.arn}:db_password::"
+      wl_user             = "${aws_secretsmanager_secret.opahub_secrets.arn}:wl_user::"
+      wl_password         = "${aws_secretsmanager_secret.opahub_secrets.arn}:wl_password::"
+      wl_mem_args         = local.application_data.accounts[local.environment].wl_mem_args
+      secret_key          = "${aws_secretsmanager_secret.opahub_secrets.arn}:secret_key::"
+      keystore_password   = "${aws_secretsmanager_secret.opahub_secrets.arn}:keystore_password::"
+      truststore_password = "${aws_secretsmanager_secret.opahub_secrets.arn}:truststore_password::"
+      create_database     = local.application_data.accounts[local.environment].create_database
     }
   )
 
@@ -68,7 +68,7 @@ resource "aws_ecs_service" "opahub" {
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.opahub.arn
   desired_count   = local.application_data.accounts[local.environment].opa_app_count
-  
+
 
   # Required by the AWS provider whenever capacity_provider_strategy is
   # added/changed on an existing service (here: switching from launch_type

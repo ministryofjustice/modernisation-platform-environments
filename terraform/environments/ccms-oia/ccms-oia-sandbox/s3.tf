@@ -1,4 +1,4 @@
-data aws_s3_bucket "ccms_oia_logging_bucket" {
+data "aws_s3_bucket" "ccms_oia_logging_bucket" {
   bucket = local.logging_bucket_name
 }
 

@@ -44,8 +44,8 @@ resource "aws_ecs_service" "ecs_adaptor_service" {
   cluster         = aws_ecs_cluster.additional.id
   task_definition = aws_ecs_task_definition.ecs_adaptor_task_definition.arn
   desired_count   = local.application_data.accounts[local.environment].adaptor_app_count
-  
-  
+
+
   # Required by the AWS provider whenever capacity_provider_strategy is
   # added/changed on an existing service (here: switching from launch_type
   # to capacity_provider_strategy), so the change is applied via a fresh
