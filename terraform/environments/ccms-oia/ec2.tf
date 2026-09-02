@@ -65,6 +65,11 @@ resource "aws_autoscaling_group" "cluster_scaling_group" {
   min_size              = local.application_data.accounts[local.environment].ec2_min_size
   protect_from_scale_in = true
 
+  # desired_capacity is managed live by the ECS capacity provider; don't let apply reset it
+  lifecycle {
+    ignore_changes = [desired_capacity]
+  }
+
   launch_template {
     id      = aws_launch_template.ec2_launch_template.id
     version = "$Latest"
