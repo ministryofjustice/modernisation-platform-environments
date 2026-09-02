@@ -94,6 +94,16 @@ resource "aws_security_group_rule" "alb_egress_oia_ec2" {
   to_port                  = local.application_data.accounts[local.environment].opa_ssl_port
   source_security_group_id = aws_security_group.cluster_ec2.id
 }
+
+resource "aws_security_group_rule" "alb_egress_oia_ec2_health_check" {
+  security_group_id        = aws_security_group.opahub_load_balancer.id
+  type                     = "egress"
+  description              = "Allow ALB egress to OIA EC2 instances on ephemeral ports"
+  protocol                 = "tcp"
+  from_port                = local.application_data.accounts[local.environment].opa_health_check_port
+  to_port                  = local.application_data.accounts[local.environment].opa_health_check_port
+  source_security_group_id = aws_security_group.cluster_ec2.id
+}
 # Container Security Group
 
 resource "aws_security_group" "ecs_tasks_opa" {
@@ -133,14 +143,14 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opa_ingress_health_che
   description                  = "Allow ALB to reach ECS app port"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opa_ingress_health_check" {
-  security_group_id            = aws_security_group.ecs_tasks_opa.id
-  referenced_security_group_id = aws_security_group.opahub_load_balancer.id
-  ip_protocol                  = "tcp"
-  from_port                    = local.application_data.accounts[local.environment].opa_health_check_port
-  to_port                      = local.application_data.accounts[local.environment].opa_health_check_port
-  description                  = "Allow ALB to reach ECS app port"
-}
+# resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opa_ingress_health_check" {
+#   security_group_id            = aws_security_group.ecs_tasks_opa.id
+#   referenced_security_group_id = aws_security_group.opahub_load_balancer.id
+#   ip_protocol                  = "tcp"
+#   from_port                    = local.application_data.accounts[local.environment].opa_health_check_port
+#   to_port                      = local.application_data.accounts[local.environment].opa_health_check_port
+#   description                  = "Allow ALB to reach ECS app port"
+# }
 
 
 # resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opa_egress_all" {
