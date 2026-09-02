@@ -162,3 +162,12 @@ resource "aws_security_group_rule" "ecs_tasks_adaptor_egress_2049_efs" {
   to_port                  = 2049
   source_security_group_id = aws_security_group.oia-efs-security-group.id
 }
+
+resource "aws_security_group_rule" "ecs_tasks_adaptor_egress_ecs_tasks" {
+  security_group_id        = aws_security_group.ecs_tasks_adaptor.id
+  type                     = "egress"
+  description              = "Allow egress to container tasks"
+  protocol                 = "tcp"
+  from_port                = local.application_data.accounts[local.environment].adaptor_server_port
+  to_port                  = local.application_data.accounts[local.environment].adaptor_server_port
+}
