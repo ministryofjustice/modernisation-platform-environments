@@ -1,5 +1,5 @@
 resource "aws_transfer_server" "this" {
-  certificate            = aws_acm_certificate.ftps.arn
+  certificate                 = aws_acm_certificate.ftps.arn
   domain                      = "S3"
   endpoint_type               = "VPC"
   function                    = module.lambda_custom_idp.lambda_function_arn
@@ -23,7 +23,7 @@ resource "aws_transfer_server" "this" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-transfer-server"
+      Name                           = "${local.application_name}-transfer-server"
       "transfer:customHostname"      = local.is-production == false ? "sftp.${local.environment}.file-transfer.service.justice.gov.uk" : "sftp.file-transfer.service.justice.gov.uk"
       "transfer:route53HostedZoneId" = "/hostedzone/${data.aws_route53_zone.service.zone_id}"
     }
