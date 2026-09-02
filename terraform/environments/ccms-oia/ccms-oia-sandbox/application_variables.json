@@ -7,7 +7,7 @@
       "gh_runner_ami_id": "ami-0336cdd409ab5eec4",
       "opa_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-oia",
       "opa_container_version": "ccms-oia-dev-sandbox-snapshot-v3.17.3-custom-certs",
-      "ec2_instance_type": "m5.xlarge",
+      "ec2_instance_type": "m5.large",
       "ec2_instance_type_gh_runner": "t2.small",
       "instance_role_gh_runner": "gh-runner",
       "main_cluster_ec2_desired_capacity": "1",
