@@ -188,6 +188,33 @@ locals {
       statistic          = "Sum"
       threshold          = 0
     }
+    # ACM DNS validated certificates should be renewed 45 days before expiration
+    "ftps-certificate-expires-in-30-days" = {
+      alarm_description   = "The FTPS ACM certificate will expire in 30 days or less"
+      comparison_operator = "LessThanOrEqualToThreshold"
+      dimensions = {
+        CertificateArn = aws_acm_certificate.ftps.arn
+      }
+      evaluation_periods = 1
+      metric_name        = "DaysToExpiry"
+      namespace          = "AWS/CertificateManager"
+      period             = 300
+      statistic          = "Minimum"
+      threshold          = 30
+    }
+    "ftps-certificate-expires-in-7-days" = {
+      alarm_description   = "The FTPS ACM certificate will expire in 7 days or less"
+      comparison_operator = "LessThanOrEqualToThreshold"
+      dimensions = {
+        CertificateArn = aws_acm_certificate.ftps.arn
+      }
+      evaluation_periods = 1
+      metric_name        = "DaysToExpiry"
+      namespace          = "AWS/CertificateManager"
+      period             = 300
+      statistic          = "Minimum"
+      threshold          = 7
+    }
     "guardduty-failed-scans" = {
       alarm_description   = "GuardDuty Malware Protection for S3 failed to scan one or more objects"
       comparison_operator = "GreaterThanThreshold"
@@ -671,6 +698,7 @@ locals {
       "eventbridge-file-transfer-workflow-failed-invocations",
       "eventbridge-file-routing-workflow-failed-invocations",
       "eventbridge-guardduty-malware-scan-result-failed-invocations",
+      "ftps-certificate-expires-in-30-days",
       "guardduty-failed-scans",
       "guardduty-infected-scans",
       "lambda-file-action-execution-requested-adapter-async-events-dropped",
@@ -703,6 +731,7 @@ locals {
     "dynamodb-file-transfer-workflow-idempotency-write-throttles",
     "dynamodb-idempotency-read-throttles",
     "dynamodb-idempotency-write-throttles",
+    "ftps-certificate-expires-in-7-days",
     "guardduty-skipped-scans-missing-permissions",
     "guardduty-skipped-scans-unsupported",
     "lambda-custom-idp-duration",
