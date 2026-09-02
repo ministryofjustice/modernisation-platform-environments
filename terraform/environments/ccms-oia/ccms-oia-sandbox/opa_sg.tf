@@ -124,6 +124,14 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opa_ingress_ssl" {
   description                  = "Allow ALB to reach ECS app port"
 }
 
+resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opa_ingress_health_check" {
+  security_group_id            = aws_security_group.ecs_tasks_opa.id
+  referenced_security_group_id = aws_security_group.opahub_load_balancer.id
+  ip_protocol                  = "tcp"
+  from_port                    = local.application_data.accounts[local.environment].opa_health_check_port
+  to_port                      = local.application_data.accounts[local.environment].opa_health_check_port
+  description                  = "Allow ALB to reach ECS app port"
+}
 
 resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opa_ingress_health_check" {
   security_group_id            = aws_security_group.ecs_tasks_opa.id
