@@ -140,9 +140,9 @@ resource "aws_security_group_rule" "cluster_ec2_egress_ecs_tasks_opa" {
   from_port                = local.application_data.accounts[local.environment].opa_server_port
   to_port                  = local.application_data.accounts[local.environment].opa_ssl_port
     cidr_blocks = [
-    data.aws_subnet.data_subnets_a.cidr_block,
-    data.aws_subnet.data_subnets_b.cidr_block,
-    data.aws_subnet.data_subnets_c.cidr_block,
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block,
   ]
 }
 
@@ -154,8 +154,8 @@ resource "aws_security_group_rule" "cluster_ec2_egress_ecs_tasks_opa_health_chec
   from_port                = local.application_data.accounts[local.environment].opa_health_check_port
   to_port                  = local.application_data.accounts[local.environment].opa_health_check_port
     cidr_blocks = [
-    data.aws_subnet.data_subnets_a.cidr_block,
-    data.aws_subnet.data_subnets_b.cidr_block,
-    data.aws_subnet.data_subnets_c.cidr_block,
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block,
   ]
 }
