@@ -438,6 +438,7 @@ locals {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.web_12.config.instance_profile_policies, [
             "Ec2RelWeblogicPolicy",
+            "Ec2Rel19CWeblogicPolicy"
           ])
         })
         user_data_cloud_init = merge(local.ec2_instances.web_12.user_data_cloud_init, {
@@ -500,7 +501,9 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11g2/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa11r/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/dev19c/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa19c/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/rel19c/*"
             ]
           }
         ]
@@ -599,6 +602,22 @@ locals {
           }
         ])
       }
+      Ec2Dev19CWeblogicPolicy = {
+        description = "Permissions required for DEV19C Weblogic EC2s"
+        statements = concat(local.iam_policy_statements_ec2.web, [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/dev19c/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/dev19c/weblogic-*"
+            ]
+          }
+        ])
+      }
       Ec2Qa19CWeblogicPolicy = {
         description = "Permissions required for QA19C Weblogic EC2s"
         statements = concat(local.iam_policy_statements_ec2.web, [
@@ -611,6 +630,22 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/qa19c/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/qa19c/weblogic-*"
+            ]
+          }
+        ])
+      }
+      Ec2Rel19CWeblogicPolicy = {
+        description = "Permissions required for REL19C Weblogic EC2s"
+        statements = concat(local.iam_policy_statements_ec2.web, [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/weblogic/rel19c/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/rel19c/weblogic-*"
             ]
           }
         ])
