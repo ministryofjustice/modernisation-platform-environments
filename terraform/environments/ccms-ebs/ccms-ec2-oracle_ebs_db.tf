@@ -542,7 +542,7 @@ resource "aws_volume_attachment" "dbf2_att" {
 # Capacity Reservation for the EC2 instance in PROD
 resource "aws_ec2_capacity_reservation" "ebsdb_reservation" {
   count             = local.is-production ? 1 : 0
-  instance_type     = "x2iedn.32xlarge"
+  instance_type     = "x2iedn.8xlarge"
   availability_zone = "eu-west-2a"
   instance_platform = "Linux/UNIX"
   instance_count    = 1
