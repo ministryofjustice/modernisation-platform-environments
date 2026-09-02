@@ -77,7 +77,7 @@ resource "aws_ecs_service" "ecs_adaptor_service" {
   }
 
   network_configuration {
-    security_groups = [aws_security_group.ecs_tasks_adaptor.id]
+    security_groups = [aws_security_group.cluster_ec2.id]
     subnets         = data.aws_subnets.shared-private.ids
   }
 
