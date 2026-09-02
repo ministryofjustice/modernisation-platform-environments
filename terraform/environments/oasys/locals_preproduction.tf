@@ -215,6 +215,14 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
               "arn:aws:secretsmanager:*:*:secret:/postgres/database/hmpps-arns-assessment-view-db-preprod/*",
             ]
           },
@@ -223,7 +231,16 @@ locals {
             actions = [
               "kms:Decrypt",
             ]
-            resources = ["*"]
+            resources = [
+              aws_kms_key.arns_integration[0].arn,
+            ]
+            condition = {
+              test     = "StringEquals"
+              variable = "kms:ViaService"
+              values = [
+                "secretsmanager.eu-west-2.amazonaws.com",
+              ]
+            }
           },
         ]
       }
