@@ -2,7 +2,7 @@ locals {
   rds_export_bucket_lifecycle_rule = [
     {
       id      = "main"
-      enabled = "Disabled"
+      enabled = "Enabled"
       prefix  = ""
 
       transition = [
@@ -14,14 +14,8 @@ locals {
       expiration = {
         days = 730
       }
-      noncurrent_version_transition = [
-        {
-          days          = 90
-          storage_class = "INTELLIGENT_TIERING"
-        }
-      ]
       noncurrent_version_expiration = {
-        days = 730
+        days = 90
       }
   }]
 
@@ -62,7 +56,7 @@ resource "aws_vpc_security_group_ingress_rule" "ppud_db_ingress" {
 module "ppud_rds_export" {
   count = local.is-test ? 0 : 1
 
-  source = "git::https://github.com/ministryofjustice/terraform-rds-export?ref=ec51378f6e284526745ae277d85dcbf7033fe9d0"
+  source = "git::https://github.com/ministryofjustice/terraform-rds-export?ref=ce7ce1ad5cddf85f96fc175154d54097b1ca66c8"
 
   providers = {
     aws = aws
@@ -81,7 +75,7 @@ module "ppud_rds_export" {
   bucket_namespace               = "account-regional"
   lifecycle_rule_backup_uploads  = local.rds_export_bucket_lifecycle_rule
   lifecycle_rule_parquet_exports = local.rds_export_bucket_lifecycle_rule
-
+  parquet_exports_bucket_policy  = local.is-development ?[data.aws_iam_policy_document.batch_replication_destination[0].json] : ["{}"]
 
   tags = merge(
     local.tags,
