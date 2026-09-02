@@ -90,8 +90,8 @@ resource "aws_security_group_rule" "alb_egress_oia_ec2" {
   type                     = "egress"
   description              = "Allow ALB egress to OIA EC2 instances on ephemeral ports"
   protocol                 = "tcp"
-  from_port                = 32768
-  to_port                  = 61000
+  from_port                = local.application_data.accounts[local.environment].opa_server_port
+  to_port                  = local.application_data.accounts[local.environment].opa_ssl_port
   source_security_group_id = aws_security_group.cluster_ec2.id
 }
 # Container Security Group

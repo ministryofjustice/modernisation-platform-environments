@@ -50,9 +50,10 @@ resource "aws_vpc_security_group_ingress_rule" "connector_alb_ingress_workspace"
 # Allow all outbound (to be restricted later)
 resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_all" {
   security_group_id = aws_security_group.connector_load_balancer.id
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1"
+  ip_protocol       = "tcp"
   description       = "Allow all outbound traffic (to be locked down later)"
+  from_port         = local.application_data.accounts[local.environment].connector_server_port
+  to_port           = local.application_data.accounts[local.environment].connector_server_port
 }
 
 
