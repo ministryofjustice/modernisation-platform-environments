@@ -48,7 +48,7 @@ resource "aws_db_instance" "jitbit" {
   identifier     = "${local.application_name}-${local.environment}-database"
   username       = local.application_data.accounts[local.environment].db_user
 
-  apply_immediately = true
+  apply_immediately = true # temp switch to true for rds resize apply
 
   manage_master_user_password = true
 
