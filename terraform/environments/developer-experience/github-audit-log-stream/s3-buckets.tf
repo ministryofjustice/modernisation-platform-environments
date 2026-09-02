@@ -38,4 +38,44 @@ module "s3_bucket" {
   versioning = {
     status = "Enabled"
   }
+
+  lifecycle_rule = [{
+    /*
+      This lifecycle rule complies with the MOJ’s Security Policy for internal services logging as of 02/09/2026
+        - https://justiceuk.sharepoint.com/sites/SecurityPolicyandGuidance/SitePages/Policy%20and%20Guidance/Operations%20Security/Logging-and-Monitoring.aspx#logs-for-internal-services
+        - https://justiceuk.sharepoint.com/sites/SecurityPolicyandGuidance/SitePages/Policy%20and%20Guidance/Operations%20Security/Logging-and-Monitoring.aspx#maximum-retention-period
+    */
+    id     = "retain-github-audit-logs"
+    status = "Enabled"
+
+    transition = [
+      {
+        days          = 90
+        storage_class = "STANDARD_IA"
+      },
+      {
+        days          = 395
+        storage_class = "GLACIER_IR"
+      }
+    ]
+
+    expiration = {
+      days = 730
+    }
+
+    noncurrent_version_transition = [
+      {
+        noncurrent_days = 90
+        storage_class   = "STANDARD_IA"
+      },
+      {
+        noncurrent_days = 395
+        storage_class   = "GLACIER_IR"
+      }
+    ]
+
+    noncurrent_version_expiration = {
+      noncurrent_days = 730
+    }
+  }]
 }
