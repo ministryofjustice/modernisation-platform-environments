@@ -45,7 +45,7 @@ module "s3_bucket" {
         - https://justiceuk.sharepoint.com/sites/SecurityPolicyandGuidance/SitePages/Policy%20and%20Guidance/Operations%20Security/Logging-and-Monitoring.aspx#logs-for-internal-services
         - https://justiceuk.sharepoint.com/sites/SecurityPolicyandGuidance/SitePages/Policy%20and%20Guidance/Operations%20Security/Logging-and-Monitoring.aspx#maximum-retention-period
     */
-    id     = "retain-github-audit-logs"
+    id     = "audit-log-retention"
     status = "Enabled"
 
     transition = [
