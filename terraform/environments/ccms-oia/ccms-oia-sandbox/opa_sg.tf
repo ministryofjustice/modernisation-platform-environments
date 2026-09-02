@@ -231,6 +231,14 @@ resource "aws_security_group_rule" "ecs_tasks_opa_egress_2049_efs" {
   source_security_group_id = aws_security_group.oia-efs-security-group.id
 }
 
+resource "aws_security_group_rule" "ec2_tasks_opa_egress_ecs_tasks" {
+  security_group_id        = aws_security_group.ecs_tasks_opa.id
+  type                     = "egress"
+  description              = "Allow egress to container tasks"
+  protocol                 = "tcp"
+  from_port                = local.application_data.accounts[local.environment].opa_server_port
+  to_port                  = local.application_data.accounts[local.environment].ssl_server_port
+}
 # RDS Security Group
 
 resource "aws_security_group" "opahub_db" {
@@ -272,7 +280,18 @@ resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_ecs" {
   to_port                      = 3306
   description                  = "Allow MySQL access from ECS Cluster EC2s"
 }
+# Ingress from ECS Cluster EC2s
+resource "aws_vpc_security_group_ingress_rule" "ec2__ingress_ecs" {
+  security_group_id            = aws_security_group.opahub_db.id
+  referenced_security_group_id = aws_security_group.ecs_tasks_opa.id
+  ip_protocol                  = "tcp"
+  from_port                    = 3306
+  to_port                      = 3306
+  description                  = "Allow MySQL access from ECS Cluster EC2s"
+}
 
+  # from_port                = local.application_data.accounts[local.environment].opa_server_port
+  # to_port                  = local.application_data.accounts[local.environment].opa_ssl_port
 # Allow all outbound
 # resource "aws_vpc_security_group_egress_rule" "opahub_db_egress_all" {
 #   security_group_id = aws_security_group.opahub_db.id
