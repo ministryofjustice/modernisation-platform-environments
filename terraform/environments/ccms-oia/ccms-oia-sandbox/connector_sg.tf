@@ -48,32 +48,15 @@ resource "aws_vpc_security_group_ingress_rule" "connector_alb_ingress_workspace"
 }
 
 # Allow all outbound (to be restricted later)
-resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_priv_subnet_a" {
+resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_ec2" {
   security_group_id = aws_security_group.connector_load_balancer.id
-  cidr_ipv4         = data.aws_subnet.private_subnets_a.cidr_block
   ip_protocol       = "tcp"
   description       = "Allow all outbound traffic (to be locked down later)"
   from_port         = local.application_data.accounts[local.environment].connector_server_port
   to_port           = local.application_data.accounts[local.environment].connector_server_port
+  referenced_security_group_id = aws_security_group.cluster_ec2.id
 }
 
-resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_priv_subnet_b" {
-  security_group_id = aws_security_group.connector_load_balancer.id
-  cidr_ipv4         = data.aws_subnet.private_subnets_b.cidr_block
-  ip_protocol       = "tcp"
-  description       = "Allow all outbound traffic (to be locked down later)"
-  from_port         = local.application_data.accounts[local.environment].connector_server_port
-  to_port           = local.application_data.accounts[local.environment].connector_server_port
-}
-
-resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_priv_subnet_c" {
-  security_group_id = aws_security_group.connector_load_balancer.id
-  cidr_ipv4         = data.aws_subnet.private_subnets_c.cidr_block
-  ip_protocol       = "tcp"
-  description       = "Allow all outbound traffic (to be locked down later)"
-  from_port         = local.application_data.accounts[local.environment].connector_server_port
-  to_port           = local.application_data.accounts[local.environment].connector_server_port
-}
 # Container Security Group
 
 resource "aws_security_group" "ecs_tasks_connector" {
@@ -87,32 +70,15 @@ resource "aws_security_group" "ecs_tasks_connector" {
 }
 
 # Ingress from Connector ALB to ECS containers
-resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_connector_ingress_private_subnet_a" {
+resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_connector_ingress_ec2" {
   security_group_id            = aws_security_group.ecs_tasks_connector.id
+  referenced_security_group_id = aws_security_group.cluster_ec2.id
   ip_protocol                  = "tcp"
   from_port                    = local.application_data.accounts[local.environment].connector_server_port
   to_port                      = local.application_data.accounts[local.environment].connector_server_port
   description                  = "Allow ALB to reach Connector container port"
-  cidr_ipv4                 =  data.aws_subnet.private_subnets_a.cidr_block
 }
 
-resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_connector_ingress_private_subnet_b" {
-  security_group_id            = aws_security_group.ecs_tasks_connector.id
-  ip_protocol                  = "tcp"
-  from_port                    = local.application_data.accounts[local.environment].connector_server_port
-  to_port                      = local.application_data.accounts[local.environment].connector_server_port
-  description                  = "Allow ALB to reach Connector container port"
-  cidr_ipv4                 =  data.aws_subnet.private_subnets_b.cidr_block
-}
-
-resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_connector_ingress_private_subnet_c" {
-  security_group_id            = aws_security_group.ecs_tasks_connector.id
-  ip_protocol                  = "tcp"
-  from_port                    = local.application_data.accounts[local.environment].connector_server_port
-  to_port                      = local.application_data.accounts[local.environment].connector_server_port
-  description                  = "Allow ALB to reach Connector container port"
-  cidr_ipv4                 =  data.aws_subnet.private_subnets_c.cidr_block
-}
 # All outbound traffic from ECS containers
 # resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_all" {
 #   security_group_id = aws_security_group.ecs_tasks_connector.id

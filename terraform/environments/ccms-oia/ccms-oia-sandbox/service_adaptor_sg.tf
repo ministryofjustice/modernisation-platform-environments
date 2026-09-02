@@ -79,6 +79,16 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_adaptor_ingress" {
   description                  = "Allow ALB to reach adaptor container port"
 }
 
+# Ingress from ALB to ECS container port
+resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_adaptor_ingress_ec2" {
+  security_group_id            = aws_security_group.ecs_tasks_adaptor.id
+  referenced_security_group_id = aws_security_group.cluster_ec2.id
+  ip_protocol                  = "tcp"
+  from_port                    = local.application_data.accounts[local.environment].adaptor_server_port
+  to_port                      = local.application_data.accounts[local.environment].adaptor_server_port
+  description                  = "Allow ALB to reach adaptor container port"
+}
+
 # All outbound traffic from ECS tasks
 # resource "aws_vpc_security_group_egress_rule" "ecs_tasks_adaptor_egress_all" {
 #   security_group_id = aws_security_group.ecs_tasks_adaptor.id
