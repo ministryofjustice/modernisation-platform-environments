@@ -85,20 +85,40 @@ resource "aws_security_group_rule" "alb_ingress_443_workspace" {
   cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace]
 }
 
+# resource "aws_security_group_rule" "alb_egress_oia_ec2" {
+#   security_group_id        = aws_security_group.opahub_load_balancer.id
+#   type                     = "egress"
+#   description              = "Allow ALB egress to OIA EC2 instances on ephemeral ports"
+#   protocol                 = "tcp"
+#   from_port                = local.application_data.accounts[local.environment].opa_server_port
+#   to_port                  = local.application_data.accounts[local.environment].opa_ssl_port
+#   source_security_group_id = aws_security_group.cluster_ec2.id
+# }
+
 resource "aws_security_group_rule" "alb_egress_oia_ec2" {
   security_group_id        = aws_security_group.opahub_load_balancer.id
   type                     = "egress"
-  description              = "Allow ALB egress to OIA EC2 instances on ephemeral ports"
+  description              = "Allow ALB egress to OIA ECS instances on ephemeral ports"
   protocol                 = "tcp"
   from_port                = local.application_data.accounts[local.environment].opa_server_port
   to_port                  = local.application_data.accounts[local.environment].opa_ssl_port
-  source_security_group_id = aws_security_group.cluster_ec2.id
+  source_security_group_id = aws_security_group.ecs_tasks_opa.id
 }
+
+# resource "aws_security_group_rule" "alb_egress_oia_ec2_health_check" {
+#   security_group_id        = aws_security_group.opahub_load_balancer.id
+#   type                     = "egress"
+#   description              = "Allow ALB egress to OIA EC2 instances on ephemeral ports"
+#   protocol                 = "tcp"
+#   from_port                = local.application_data.accounts[local.environment].opa_health_check_port
+#   to_port                  = local.application_data.accounts[local.environment].opa_health_check_port
+#   source_security_group_id = aws_security_group.cluster_ec2.id
+# }
 
 resource "aws_security_group_rule" "alb_egress_oia_ecs_health_check" {
   security_group_id        = aws_security_group.opahub_load_balancer.id
   type                     = "egress"
-  description              = "Allow ALB egress to OIA EC2 instances on ephemeral ports"
+  description              = "Allow ALB egress to OIA ECS instances on ephemeral ports"
   protocol                 = "tcp"
   from_port                = local.application_data.accounts[local.environment].opa_health_check_port
   to_port                  = local.application_data.accounts[local.environment].opa_health_check_port
