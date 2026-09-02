@@ -41,10 +41,10 @@ locals {
   }
 
   bcs_config_production = {
-    instance_count = 2
+    instance_count = 0
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
     ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
-    ansible_branch = "PLAT-54/delius-mis/prod-build-v1"
+    ansible_branch = "main"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 150, type = "gp3" } # 100GB would be OK
       "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }
@@ -72,10 +72,10 @@ locals {
   }
 
   bps_config_production = {
-    instance_count = 4
+    instance_count = 0
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
     ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
-    ansible_branch = "PLAT-54/delius-mis/prod-build-v1"
+    ansible_branch = "main"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100, type = "gp3" }
       "/dev/sdb"  = { label = "data", size = 100, type = "gp3" }
@@ -106,7 +106,7 @@ locals {
     external_fqdn       = "reporting.probation.service.justice.gov.uk"
     external_admin_fqdn = "admin.reporting.probation.service.justice.gov.uk"
 
-    instance_count = 1
+    instance_count = 0
     ami_name       = "base_rhel_8_5_2023-07-01T00-00-47.469Z"
     ami_owner      = local.environment_management.account_ids["core-shared-services-production"]
     ansible_branch = "PLAT-54/delius-mis/prod-build-v1"
