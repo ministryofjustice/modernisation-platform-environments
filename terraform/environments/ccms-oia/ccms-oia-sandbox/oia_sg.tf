@@ -131,3 +131,23 @@ resource "aws_security_group_rule" "cluster_ec2_egress_2049_efs" {
   to_port                  = 2049
   source_security_group_id = aws_security_group.oia-efs-security-group.id
 }
+
+resource "aws_security_group_rule" "cluster_ec2_egress_ecs_tasks_opa" {
+  security_group_id        = aws_security_group.cluster_ec2.id
+  type                     = "egress"
+  description              = "Allow egress to ECS tasks security group"
+  protocol                 = "tcp"
+  from_port                = local.application_data.accounts[local.environment].opa_server_port
+  to_port                  = local.application_data.accounts[local.environment].opa_ssl_port
+  source_security_group_id = aws_security_group.oia-efs-security-group.id
+}
+
+resource "aws_security_group_rule" "cluster_ec2_egress_ecs_tasks_opa_health_check" {
+  security_group_id        = aws_security_group.cluster_ec2.id
+  type                     = "egress"
+  description              = "Allow egress to ECS tasks security group on health check port"
+  protocol                 = "tcp"
+  from_port                = local.application_data.accounts[local.environment].opa_health_check_port
+  to_port                  = local.application_data.accounts[local.environment].opa_health_check_port
+  source_security_group_id = aws_security_group.oia-efs-security-group.id
+}
