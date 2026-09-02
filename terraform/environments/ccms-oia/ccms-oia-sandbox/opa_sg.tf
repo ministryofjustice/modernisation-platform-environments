@@ -238,6 +238,11 @@ resource "aws_security_group_rule" "ec2_tasks_opa_egress_ecs_tasks" {
   protocol                 = "tcp"
   from_port                = local.application_data.accounts[local.environment].opa_server_port
   to_port                  = local.application_data.accounts[local.environment].ssl_server_port
+  cidr_blocks = [
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block
+  ]
 }
 # RDS Security Group
 
