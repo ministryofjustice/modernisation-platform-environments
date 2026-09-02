@@ -101,7 +101,7 @@ resource "aws_ecs_service" "opahub" {
   }
 
   network_configuration {
-    security_groups = [aws_security_group.cluster_ec2.id]
+    security_groups = [aws_security_group.ecs_tasks_opa.id]
     subnets         = data.aws_subnets.shared-private.ids
   }
 
