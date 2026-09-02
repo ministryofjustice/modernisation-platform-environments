@@ -3,7 +3,7 @@ module "sns_pagerduty_high_priority" {
   source  = "terraform-aws-modules/sns/aws"
   version = "7.1.1"
 
-  name = "pagerduty-high-priority"
+  name              = "pagerduty-high-priority"
   kms_master_key_id = module.kms_sns.key_arn
   subscriptions = {
     pagerduty = {
@@ -36,7 +36,7 @@ module "sns_pagerduty_low_priority" {
   source  = "terraform-aws-modules/sns/aws"
   version = "7.1.1"
 
-  name = "pagerduty-low-priority"
+  name              = "pagerduty-low-priority"
   kms_master_key_id = module.kms_sns.key_arn
   subscriptions = {
     pagerduty = {
