@@ -37,7 +37,7 @@
       "mp_nat_gateway_c": "18.132.208.127/32",
       "create_database": "false",
       "connector_ecr_repo": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-connector",
-      "connector_container_version": "0.0.41-dev",
+      "connector_container_version": "laa-ccms-connector-dev-0f85033-SNAPSHOT",
       "connector_server_port": "8080",
       "spring_profiles_active": "prod",
       "ccms_soa_soapHeaderUserName": "pui_user",
