@@ -370,3 +370,79 @@ module "kms_sqs" {
 
   tags = local.tags
 }
+
+module "kms_sns" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  source  = "terraform-aws-modules/kms/aws"
+  version = "4.2.1"
+
+  aliases                 = ["sns/${local.application_name}-${local.environment}"]
+  description             = "KMS CMK for SNS encryption"
+  enable_default_policy   = true
+  enable_key_rotation     = true
+  deletion_window_in_days = 30
+  key_usage               = "ENCRYPT_DECRYPT"
+  is_enabled              = true
+
+  key_administrators = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+
+  key_statements = [
+    {
+      sid = "AllowCloudWatchAlarmPublishers"
+      actions = [
+        "kms:Decrypt",
+        "kms:GenerateDataKey*",
+      ]
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["cloudwatch.amazonaws.com"]
+        }
+      ]
+    },
+    {
+      sid = "AllowEventBridgePublishers"
+      actions = [
+        "kms:Decrypt",
+        "kms:GenerateDataKey*",
+      ]
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["events.amazonaws.com"]
+        }
+      ]
+    },
+    {
+      sid = "AllowSNSService"
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+        "kms:ReEncrypt*"
+      ]
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["sns.amazonaws.com"]
+        }
+      ]
+      condition = [
+        {
+          test     = "ArnLike"
+          variable = "kms:EncryptionContext:aws:sns:topicArn"
+          values   = ["arn:aws:sns:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:*"]
+        }
+      ]
+    }
+  ]
+
+  tags = local.tags
+}

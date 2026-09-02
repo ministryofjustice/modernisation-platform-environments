@@ -4,6 +4,7 @@ module "sns_pagerduty_high_priority" {
   version = "7.1.1"
 
   name = "pagerduty-high-priority"
+  kms_master_key_id = module.kms_sns.key_arn
   subscriptions = {
     pagerduty = {
       protocol = "https"
@@ -36,6 +37,7 @@ module "sns_pagerduty_low_priority" {
   version = "7.1.1"
 
   name = "pagerduty-low-priority"
+  kms_master_key_id = module.kms_sns.key_arn
   subscriptions = {
     pagerduty = {
       protocol = "https"
