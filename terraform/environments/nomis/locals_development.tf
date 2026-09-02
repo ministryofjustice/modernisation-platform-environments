@@ -771,18 +771,22 @@ locals {
     }
 
     secretsmanager_secrets = {
-      "/oracle/weblogic/dev"    = local.secretsmanager_secrets.web
-      "/oracle/database/dev"    = local.secretsmanager_secrets.db_cnom
-      "/oracle/weblogic/qa"     = local.secretsmanager_secrets.web
-      "/oracle/weblogic/rel"    = local.secretsmanager_secrets.web
-      "/oracle/weblogic/qa11g"  = local.secretsmanager_secrets.web
-      "/oracle/database/qa11g"  = local.secretsmanager_secrets.db_cnom
-      "/oracle/weblogic/qa11g2" = local.secretsmanager_secrets.web
-      "/oracle/database/qa11g2" = local.secretsmanager_secrets.db_cnom
-      "/oracle/weblogic/qa11r"  = local.secretsmanager_secrets.web
-      "/oracle/database/qa11r"  = local.secretsmanager_secrets.db_cnom
-      "/oracle/weblogic/qa19c"  = local.secretsmanager_secrets.web
-      "/oracle/database/qa19c"  = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/dev"      = local.secretsmanager_secrets.web
+      "/oracle/database/dev"      = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/qa"       = local.secretsmanager_secrets.web
+      "/oracle/weblogic/rel"      = local.secretsmanager_secrets.web
+      "/oracle/weblogic/qa11g"    = local.secretsmanager_secrets.web
+      "/oracle/database/qa11g"    = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/qa11g2"   = local.secretsmanager_secrets.web
+      "/oracle/database/qa11g2"   = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/qa11r"    = local.secretsmanager_secrets.web
+      "/oracle/database/qa11r"    = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/qa19c"    = local.secretsmanager_secrets.web
+      "/oracle/database/qa19c"    = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/rel19c"   = local.secretsmanager_secrets.web
+      "/oracle/database/rel19c"   = local.secretsmanager_secrets.db_cnom
+      "/oracle/weblogic/dev19c"   = local.secretsmanager_secrets.web
+      "/oracle/database/dev19c"   = local.secretsmanager_secrets.db_cnom
     }
   }
 }
