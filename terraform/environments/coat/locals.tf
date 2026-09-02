@@ -17,6 +17,8 @@ locals {
 
   kms_master_key_id = "arn:aws:kms:${data.aws_region.current.region}:${local.environment_management.aws_organizations_root_account_id}:key/70d5523d-99d3-47ff-aa3a-70144c831fad"
 
+  coat_kms_key_id = local.is-development ? local.kms_dev_key_id : local.kms_prod_key_id
+
 
 
   oidc_provider = "token.actions.githubusercontent.com"
