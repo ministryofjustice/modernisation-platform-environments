@@ -285,7 +285,7 @@ locals {
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
             # Comment in instance refresh above if changing branch + want automated instance refresh
-            branch = "662853f289cc0053f99ba458c3d9d3c4820f3640" # 2025-08-19 crypto requirement fix
+            branch = "8eae91591f2a76dd9fa45cb029bbff3241b142ff" # 2026-09-02 Bump github/codeql-action/upload-sarif
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {

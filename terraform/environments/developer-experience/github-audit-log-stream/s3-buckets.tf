@@ -2,28 +2,9 @@ data "aws_iam_policy_document" "s3_bucket" {
   count = local.is-production ? 1 : 0
 
   statement {
-    sid    = "AllowBucketActions"
-    effect = "Allow"
-    actions = [
-      "s3:ListBucket",
-      "s3:GetBucketLocation",
-      "s3:ListBucketVersions"
-    ]
-    resources = ["arn:aws:s3:::${local.bucket_name}"]
-    principals {
-      type        = "AWS"
-      identifiers = [module.iam_role[0].arn]
-    }
-  }
-
-  statement {
-    sid    = "AllowObjectActions"
-    effect = "Allow"
-    actions = [
-      "s3:DeleteObject",
-      "s3:GetObject",
-      "s3:PutObject"
-    ]
+    sid       = "AllowObjectActions"
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
     resources = ["arn:aws:s3:::${local.bucket_name}/*"]
     principals {
       type        = "AWS"
