@@ -244,6 +244,20 @@ resource "aws_security_group_rule" "ec2_tasks_opa_egress_ecs_tasks" {
     data.aws_subnet.private_subnets_c.cidr_block
   ]
 }
+
+resource "aws_security_group_rule" "ec2_tasks_opa_egress_ecs_tasks_health_check" {
+  security_group_id        = aws_security_group.ecs_tasks_opa.id
+  type                     = "egress"
+  description              = "Allow egress to container tasks"
+  protocol                 = "tcp"
+  from_port                = local.application_data.accounts[local.environment].opa_health_check_port
+  to_port                  = local.application_data.accounts[local.environment].opa_health_check_port
+  cidr_blocks = [
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block
+  ]
+}
 # RDS Security Group
 
 resource "aws_security_group" "opahub_db" {
@@ -277,23 +291,23 @@ resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_ec2" {
 }
 
 # Ingress from ECS Cluster EC2s
-resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_ecs" {
-  security_group_id            = aws_security_group.opahub_db.id
-  referenced_security_group_id = aws_security_group.ecs_tasks_opa.id
-  ip_protocol                  = "tcp"
-  from_port                    = 3306
-  to_port                      = 3306
-  description                  = "Allow MySQL access from ECS Cluster EC2s"
-}
+# resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_ecs" {
+#   security_group_id            = aws_security_group.opahub_db.id
+#   referenced_security_group_id = aws_security_group.ecs_tasks_opa.id
+#   ip_protocol                  = "tcp"
+#   from_port                    = 3306
+#   to_port                      = 3306
+#   description                  = "Allow MySQL access from ECS Cluster EC2s"
+# }
 # Ingress from ECS Cluster EC2s
-resource "aws_vpc_security_group_ingress_rule" "ec2__ingress_ecs" {
-  security_group_id            = aws_security_group.opahub_db.id
-  referenced_security_group_id = aws_security_group.ecs_tasks_opa.id
-  ip_protocol                  = "tcp"
-  from_port                    = 3306
-  to_port                      = 3306
-  description                  = "Allow MySQL access from ECS Cluster EC2s"
-}
+# resource "aws_vpc_security_group_ingress_rule" "ec2__ingress_ecs" {
+#   security_group_id            = aws_security_group.opahub_db.id
+#   referenced_security_group_id = aws_security_group.ecs_tasks_opa.id
+#   ip_protocol                  = "tcp"
+#   from_port                    = 3306
+#   to_port                      = 3306
+#   description                  = "Allow MySQL access from ECS Cluster EC2s"
+# }
 
   # from_port                = local.application_data.accounts[local.environment].opa_server_port
   # to_port                  = local.application_data.accounts[local.environment].opa_ssl_port
