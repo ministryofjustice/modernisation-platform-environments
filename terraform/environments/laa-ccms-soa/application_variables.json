@@ -8,7 +8,7 @@
       "admin_server_port": "7001",
       "admin_container_version": "2caf61a86d3b37d4c318ea08e96174298778abe7",
       "admin_ami_image_id": "ami-02f77a03ec776dc35",
-      "admin_ec2_instance_type": "m5.xlarge",
+      "admin_ec2_instance_type": "m5.large",
       "admin_ec2_desired_capacity": "1",
       "admin_container_cpu": "4096",
       "admin_container_memory": "15360",
