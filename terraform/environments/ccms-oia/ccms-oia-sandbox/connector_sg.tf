@@ -48,7 +48,7 @@ resource "aws_vpc_security_group_ingress_rule" "connector_alb_ingress_workspace"
 }
 
 # Allow all outbound (to be restricted later)
-resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_all" {
+resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_priv_subnet_a" {
   security_group_id = aws_security_group.connector_load_balancer.id
   cidr_ipv4         = data.aws_subnet.private_subnets_a.cidr_block
   ip_protocol       = "tcp"
@@ -57,7 +57,7 @@ resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_all" {
   to_port           = local.application_data.accounts[local.environment].connector_server_port
 }
 
-resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_all" {
+resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_priv_subnet_b" {
   security_group_id = aws_security_group.connector_load_balancer.id
   cidr_ipv4         = data.aws_subnet.private_subnets_b.cidr_block
   ip_protocol       = "tcp"
@@ -66,7 +66,7 @@ resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_all" {
   to_port           = local.application_data.accounts[local.environment].connector_server_port
 }
 
-resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_all" {
+resource "aws_vpc_security_group_egress_rule" "connector_alb_egress_priv_subnet_c" {
   security_group_id = aws_security_group.connector_load_balancer.id
   cidr_ipv4         = data.aws_subnet.private_subnets_c.cidr_block
   ip_protocol       = "tcp"
