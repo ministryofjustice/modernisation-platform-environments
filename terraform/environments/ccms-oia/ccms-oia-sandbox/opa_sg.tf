@@ -334,6 +334,16 @@ resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_ec2" {
   description                  = "Allow MySQL access from ECS Cluster EC2s"
 }
 
+# Ingress from ECS Cluster
+resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_ecs" {
+  security_group_id            = aws_security_group.opahub_db.id
+  referenced_security_group_id = aws_security_group.ecs_tasks_opa.id
+  ip_protocol                  = "tcp"
+  from_port                    = 3306
+  to_port                      = 3306
+  description                  = "Allow MySQL access from ECS Cluster"
+}
+
 # Ingress from ECS Cluster EC2s
 # resource "aws_vpc_security_group_ingress_rule" "opahub_db_ingress_ecs" {
 #   security_group_id            = aws_security_group.opahub_db.id
