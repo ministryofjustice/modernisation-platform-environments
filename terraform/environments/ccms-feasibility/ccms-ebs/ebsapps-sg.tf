@@ -44,6 +44,24 @@ resource "aws_vpc_security_group_egress_rule" "ebsapps_to_db_oracle" {
   referenced_security_group_id = aws_security_group.ebsdb.id
 }
 
+resource "aws_vpc_security_group_ingress_rule" "ebsapps_from_db_fndfs" {
+  security_group_id            = aws_security_group.ebsapps.id
+  description                  = "Application Listener (FNDFS) from EBS db tier"
+  ip_protocol                  = "tcp"
+  from_port                    = 1626
+  to_port                      = 1626
+  referenced_security_group_id = aws_security_group.ebsdb.id
+}
+
+resource "aws_vpc_security_group_egress_rule" "ebsapps_to_db_fndfs" {
+  security_group_id            = aws_security_group.ebsapps.id
+  description                  = "Application Listener (FNDFS) to EBS db tier"
+  ip_protocol                  = "tcp"
+  from_port                    = 1626
+  to_port                      = 1626
+  referenced_security_group_id = aws_security_group.ebsdb.id
+}
+
 resource "aws_vpc_security_group_egress_rule" "ebsapps_https" {
   security_group_id = aws_security_group.ebsapps.id
   description       = "HTTPS outbound"

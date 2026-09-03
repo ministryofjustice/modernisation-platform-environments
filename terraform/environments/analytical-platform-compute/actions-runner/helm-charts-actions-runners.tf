@@ -121,7 +121,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dev" {
         github_organisation        = "moj-analytical-services"
         github_repository          = "create-a-derived-table"
         github_runner_labels       = "cadet-dev"
-        eks_role_arn               = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/mojas-create-a-derived-table-dev"
+        eks_role_arn               = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table-dev"
       }
     )
   ]
@@ -145,7 +145,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dev_non_spo
         github_organisation        = "moj-analytical-services"
         github_repository          = "create-a-derived-table"
         github_runner_labels       = "cadet-dev-non-spot"
-        eks_role_arn               = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/mojas-create-a-derived-table-dev"
+        eks_role_arn               = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table-dev"
       }
     )
   ]
