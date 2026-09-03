@@ -98,7 +98,7 @@
       "create_rds_sheduler": true,
       "create_svc_pilot": true,
       "disable_overnight_ecs_scheduler": false,
-      "yjsm_create_secondary_build": true,
+      "yjsm_create_secondary_build": false,
       "ses_domain_identities": {
         "preproduction.justice.gov.uk": {
           "identity": "preproduction.justice.gov.uk",
