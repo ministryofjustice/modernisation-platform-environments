@@ -329,44 +329,44 @@ resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure_managed" {
 }
 
 #--Alerts NLB (Admin)
-resource "aws_cloudwatch_metric_alarm" "Admin_UnHealthy_Hosts" {
-  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-${local.environment}-admin-unhealthy-hosts-alarm"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | There is an unhealthy host in the target group ${aws_lb_target_group.admin.name} for over 15 minutes, this likely means that an admin host has failed to boot correctly"
-  comparison_operator = "GreaterThanThreshold"
-  metric_name         = "UnHealthyHostCount"
-  statistic           = "Average"
-  namespace           = "AWS/NetworkELB"
-  period              = "60"
-  evaluation_periods  = "3"
-  threshold           = "0"
-  treat_missing_data  = "breaching"
-  dimensions = {
-    LoadBalancer = aws_lb.admin.arn_suffix
-    TargetGroup  = aws_lb_target_group.admin.arn_suffix
-  }
-  alarm_actions = [aws_sns_topic.alerts.arn]
-  ok_actions    = [aws_sns_topic.alerts.arn]
-}
+# resource "aws_cloudwatch_metric_alarm" "Admin_UnHealthy_Hosts" {
+#   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-${local.environment}-admin-unhealthy-hosts-alarm"
+#   alarm_description   = "${local.environment} | ${local.aws_account_id} | There is an unhealthy host in the target group ${aws_lb_target_group.admin.name} for over 15 minutes, this likely means that an admin host has failed to boot correctly"
+#   comparison_operator = "GreaterThanThreshold"
+#   metric_name         = "UnHealthyHostCount"
+#   statistic           = "Average"
+#   namespace           = "AWS/NetworkELB"
+#   period              = "60"
+#   evaluation_periods  = "3"
+#   threshold           = "0"
+#   treat_missing_data  = "breaching"
+#   dimensions = {
+#     LoadBalancer = aws_lb.admin.arn_suffix
+#     TargetGroup  = aws_lb_target_group.admin.arn_suffix
+#   }
+#   alarm_actions = [aws_sns_topic.alerts.arn]
+#   ok_actions    = [aws_sns_topic.alerts.arn]
+# }
 
 #--Alerts NLB (Managed)
-resource "aws_cloudwatch_metric_alarm" "Managed_UnHealthy_Hosts" {
-  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-${local.environment}-managed-unhealthy-hosts-alarm"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | There is an unhealthy host in the target group ${aws_lb_target_group.managed.name} for over 15 minutes, this likely means that a managed host has failed to boot correctly"
-  comparison_operator = "GreaterThanThreshold"
-  metric_name         = "UnHealthyHostCount"
-  statistic           = "Average"
-  namespace           = "AWS/NetworkELB"
-  period              = "60"
-  evaluation_periods  = "3"
-  threshold           = "0"
-  treat_missing_data  = "breaching"
-  dimensions = {
-    LoadBalancer = aws_lb.managed.arn_suffix
-    TargetGroup  = aws_lb_target_group.managed.arn_suffix
-  }
-  alarm_actions = [aws_sns_topic.alerts.arn]
-  ok_actions    = [aws_sns_topic.alerts.arn]
-}
+# resource "aws_cloudwatch_metric_alarm" "Managed_UnHealthy_Hosts" {
+#   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-${local.environment}-managed-unhealthy-hosts-alarm"
+#   alarm_description   = "${local.environment} | ${local.aws_account_id} | There is an unhealthy host in the target group ${aws_lb_target_group.managed.name} for over 15 minutes, this likely means that a managed host has failed to boot correctly"
+#   comparison_operator = "GreaterThanThreshold"
+#   metric_name         = "UnHealthyHostCount"
+#   statistic           = "Average"
+#   namespace           = "AWS/NetworkELB"
+#   period              = "60"
+#   evaluation_periods  = "3"
+#   threshold           = "0"
+#   treat_missing_data  = "breaching"
+#   dimensions = {
+#     LoadBalancer = aws_lb.managed.arn_suffix
+#     TargetGroup  = aws_lb_target_group.managed.arn_suffix
+#   }
+#   alarm_actions = [aws_sns_topic.alerts.arn]
+#   ok_actions    = [aws_sns_topic.alerts.arn]
+# }
 
 #--Alerts (EFS)
 resource "aws_cloudwatch_metric_alarm" "soa_low_efs_burst_balance" {

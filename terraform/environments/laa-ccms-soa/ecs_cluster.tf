@@ -118,11 +118,11 @@ resource "aws_ecs_service" "admin" {
     subnets         = data.aws_subnets.shared-private.ids
   }
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.admin.id
-    container_name   = "${local.application_data.accounts[local.environment].app_name}-admin"
-    container_port   = local.application_data.accounts[local.environment].admin_server_port
-  }
+  # load_balancer {
+  #   target_group_arn = aws_lb_target_group.admin.id
+  #   container_name   = "${local.application_data.accounts[local.environment].app_name}-admin"
+  #   container_port   = local.application_data.accounts[local.environment].admin_server_port
+  # }
 
   depends_on = [
     aws_lb_listener.admin80,
@@ -209,11 +209,11 @@ resource "aws_ecs_service" "managed" {
     subnets         = data.aws_subnets.shared-private.ids
   }
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.managed.id
-    container_name   = "${local.application_data.accounts[local.environment].app_name}-managed"
-    container_port   = local.application_data.accounts[local.environment].managed_server_port
-  }
+  # load_balancer {
+  #   target_group_arn = aws_lb_target_group.managed.id
+  #   container_name   = "${local.application_data.accounts[local.environment].app_name}-managed"
+  #   container_port   = local.application_data.accounts[local.environment].managed_server_port
+  # }
 
   depends_on = [
     aws_lb_listener.managed80,
