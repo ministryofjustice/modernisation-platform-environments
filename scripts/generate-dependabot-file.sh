@@ -68,7 +68,7 @@ if [[ -n "$tf_dirs" ]]; then
   
   echo "    schedule:" >> "$dependabot_file"
   echo "      interval: \"daily\"" >> "$dependabot_file"
-  echo "    open-pull-requests-limit: 150" >> "$dependabot_file"
+  echo "    open-pull-requests-limit: 200" >> "$dependabot_file"
   echo "    cooldown:" >> "$dependabot_file"
   echo "      default-days: ${dependabot_cooldown_default_days}" >> "$dependabot_file"
 fi

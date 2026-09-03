@@ -1,1 +1,3 @@
-#### This file can be used to store locals specific to the member account ####
+locals {
+  global_config = yamldecode(file("${path.module}/configuration/global.yml"))
+}

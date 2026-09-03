@@ -28,7 +28,7 @@ locals {
     # ── Latency (seconds) ───────────────────────────────────────────────────
     litellm_proxy_latency_p99_warn            = 35   # total request latency p99, seconds
     litellm_proxy_latency_p99_crit            = 55   # total request latency p99, seconds
-    litellm_llm_api_latency_p99_warn          = 25   # LLM API latency p99, seconds
+    litellm_llm_api_latency_p99_warn          = 35   # LLM API latency p99, seconds
     litellm_llm_api_latency_p99_crit          = 45   # LLM API latency p99, seconds
     litellm_ttft_p99_warn                     = 3    # time-to-first-token p99, seconds
     litellm_ttft_p99_crit                     = 8    # time-to-first-token p99, seconds
@@ -68,7 +68,7 @@ locals {
     litellm_redis_latency_p99_crit  = 0.5 # Redis latency p99, seconds
 
     # ── Internal Self Latency ────────────────────────────────────────────────
-    litellm_self_latency_p99_warn = 35  # internal SDK latency p99, seconds
+    litellm_self_latency_p99_warn = 35 # internal SDK latency p99, seconds
     litellm_self_latency_p99_crit = 55 # internal SDK latency p99, seconds
 
     # ── Spend Queue Backpressure ────────────────────────────────────────────
@@ -137,8 +137,8 @@ locals {
     # -------------------------------------------------------------------------
     # Vertex AI
     # -------------------------------------------------------------------------
-    vertex_invocation_errors_warn = 5  # non-2xx invocations per 5m window, per model
-    vertex_invocation_errors_crit = 20 # non-2xx invocations per 5m window, per model
+    vertex_invocation_errors_warn = 5    # non-2xx invocations per 5m window, per model
+    vertex_invocation_errors_crit = 20   # non-2xx invocations per 5m window, per model
     vertex_latency_p99_warn       = 3000 # invocation latency p99, ms
     vertex_latency_p99_crit       = 9000 # invocation latency p99, ms
 
