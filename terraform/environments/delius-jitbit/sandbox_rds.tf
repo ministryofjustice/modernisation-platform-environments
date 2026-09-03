@@ -37,7 +37,7 @@ resource "aws_db_instance" "jitbit_sandbox" {
   identifier     = "${local.application_name}-sandbox-database"
   username       = local.application_data.accounts["sandbox"].db_user
 
-  apply_immediately = true
+  apply_immediately = true ## temp - remove post cleanup
   
   manage_master_user_password = true
 
