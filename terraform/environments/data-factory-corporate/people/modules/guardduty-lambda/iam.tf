@@ -68,6 +68,24 @@ resource "aws_iam_role_policy" "quarantine_lambda" {
           var.s3_bucket_kms_key_arn,
           var.quarantine_kms_key_arn
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "sqs:SendMessage"
+        ]
+        Resource = aws_sqs_queue.quarantine_dlq.arn
+      },
+      {
+        Effect = "Allow"
+
+        Action = [
+          "kms:Decrypt",
+          "kms:Encrypt",
+          "kms:GenerateDataKey"
+        ]
+
+        Resource = var.lambda_kms_key_arn
       }
     ]
   })

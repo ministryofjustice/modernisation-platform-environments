@@ -233,9 +233,11 @@ module "data_factory_guardduty_scan" {
 
 module "data_factory_guardduty_lambda" {
 
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/guardduty-lambda?ref=4a4cc845069e39cd2a03c049dafcc11d8e0f97af"
+  source = "./modules/guardduty-lambda"
 
     name = "guardduty_lambda"
+
+    lambda_kms_key_arn = module.sherlock_kms_key.key_arn
 
     tags = {
         Project     = "Avature"
