@@ -74,11 +74,15 @@ if [[ -n "$tf_dirs" ]]; then
     # Group identifiers are used in branch names, so keep them to safe characters
     group_name=$(basename "$dir" | sed 's/[^A-Za-z0-9_-]/-/g')
 
+    echo "  - package-ecosystem: \"terraform\"" >> "$dependabot_file"
+    echo "    directories:" >> "$dependabot_file"
+
+    # Directories are listed explicitly; Dependabot rejects wildcards it cannot prove are non-overlapping
+    echo "$tf_dirs" | grep -E "^${dir}(/|\$)" | while IFS= read -r tf_dir; do
+      echo "      - \"$tf_dir\"" >> "$dependabot_file"
+    done
+
     cat >> "$dependabot_file" << EOL
-  - package-ecosystem: "terraform"
-    directories:
-      - "$dir"
-      - "$dir/**/*"
     schedule:
       interval: "daily"
     groups:
