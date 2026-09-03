@@ -4,7 +4,7 @@ data "aws_iam_role" "dataapi_cross_role" {
 }
 
 resource "aws_iam_policy" "s3_read_write_ppud_policy" {
-  name = local.s3_read_write_policy
+  name = "${local.environment}_${local.short_name}_s3_read_write_policy"
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
