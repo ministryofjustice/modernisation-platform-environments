@@ -26,7 +26,7 @@ updates:
       - "terraform/**/*"
     schedule:
       interval: "daily"
-    open-pull-requests-limit: 150
+    open-pull-requests-limit: 200
     cooldown:
       default-days: 7
   - package-ecosystem: "gomod"
