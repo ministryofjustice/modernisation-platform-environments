@@ -15,7 +15,7 @@
 ### Gateway VPC Endpoints ###
 module "vpc-gateway-endpoints" {
   source   = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
-  version  = "6.5.1"
+  version  = "6.7.0"
   for_each = toset(local.vpc_gateway_endpoint_service_names)
 
   vpc_id = module.cluster_vpc.vpc_id
