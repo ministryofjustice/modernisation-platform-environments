@@ -180,8 +180,13 @@ resource "aws_s3_bucket_policy" "cloudfront_bucket_secure_transport" {
   policy = data.aws_iam_policy_document.cloudfront_bucket_secure_transport.json
 }
 
+# Retains the production resource in state now the rule applies to every environment
+moved {
+  from = aws_s3_bucket_lifecycle_configuration.cloudfront[0]
+  to   = aws_s3_bucket_lifecycle_configuration.cloudfront
+}
+
 resource "aws_s3_bucket_lifecycle_configuration" "cloudfront" {
-  count  = local.environment == "production" ? 1 : 0
   bucket = aws_s3_bucket.cloudfront.id
 
   rule {
