@@ -25,9 +25,9 @@ data "archive_file" "quarantine_lambda" {
 }
 
 # Create the Lambda function.
-#checkov:skip=CKV_AWS_117: Lambda does not need VPC access; it only uses S3 and KMS APIs
-#checkov:skip=CKV_AWS_272: Code signing is not used for this small internal Lambda package
 resource "aws_lambda_function" "quarantine" {
+  # checkov:skip=CKV_AWS_117: Lambda does not need VPC access; it only uses S3 and KMS APIs
+  # checkov:skip=CKV_AWS_272: Code signing is not used for this small internal Lambda package
   dead_letter_config {
     target_arn = aws_sqs_queue.quarantine_dlq.arn
   }
