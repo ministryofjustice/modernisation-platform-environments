@@ -4,10 +4,10 @@
 
 locals {
   live_feed_pagerduty_to_slack = {
-    PEYIF4Q = "U_REPLACE_PEYIF4Q"
-    PSYDXO9 = "U_REPLACE_PSYDXO9"
-    PLV2QS6 = "U_REPLACE_PLV2QS6"
-    PREPU2L = "U_REPLACE_PREPU2L"
+    PEYIF4Q = "U0680GPDM2S"
+    PSYDXO9 = "U03U6CVFF4Z"
+    PLV2QS6 = "U09EH99R7AT"
+    PREPU2L = "U0851BJQCSW"
   }
 }
 
