@@ -1,9 +1,12 @@
 # S3 Read Write Policy
 data "aws_iam_role" "dataapi_cross_role" {
-  name = "dpr-data-api-cross-account-role"
+  count = local.is-test ? 0 : 1
+  name  = "dpr-data-api-cross-account-role"
 }
 
 resource "aws_iam_policy" "s3_read_write_ppud_policy" {
+  count = local.is-test ? 0 : 1
+
   name = "${local.environment}_${local.short_name}_s3_read_write_policy"
   policy = jsonencode({
     "Version" : "2012-10-17",
@@ -40,7 +43,8 @@ resource "aws_iam_policy" "s3_read_write_ppud_policy" {
 # S3 Read Write PPUD Policy Attachement
 resource "aws_iam_role_policy_attachment" "s3_read_write_ppud" {
   #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy
+  count = local.is-test ? 0 : 1
 
-  role       = data.aws_iam_role.dataapi_cross_role.name
-  policy_arn = aws_iam_policy.s3_read_write_ppud_policy.arn
+  role       = data.aws_iam_role.dataapi_cross_role[0].name
+  policy_arn = aws_iam_policy.s3_read_write_ppud_policy[0].arn
 }
