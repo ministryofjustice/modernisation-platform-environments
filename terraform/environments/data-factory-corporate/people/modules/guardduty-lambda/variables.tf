@@ -13,7 +13,18 @@ variable "quarantine_statuses" {
 variable "runtime" {
   description = "Runtime for the Lambda function."
   type        = string
-  default     = "python3.9"
+  default     = "python3.12"
+}
+
+variable "lambda_kms_key_arn" {
+  description = "KMS key ARN used to encrypt Lambda environment variables."
+  type        = string
+}
+
+variable "reserved_concurrent_executions" {
+  description = "Reserved concurrent executions for the Lambda function."
+  type        = number
+  default     = 5
 }
 
 # Lambda function handler, e.g., "lambda.lambda_handler" for a file named lambda.py with a function named lambda_handler.
