@@ -216,7 +216,7 @@ module "data_factory_guardduty_scan" {
 
     bucket_name = module.sherlock_landing_bucket_mp.bucket.bucket
     bucket_arn = module.sherlock_landing_bucket_mp.bucket.arn
-    object_prefixes = []
+    #object_prefixes = []
 
     kms_key_arn = module.sherlock_kms_key.key_arn
 
