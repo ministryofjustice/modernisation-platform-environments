@@ -12,8 +12,9 @@
 
 # Create Dead Letter Queue
 resource "aws_sqs_queue" "quarantine_dlq" {
-  name = "${var.name}-dlq"
-  tags = local.common_tags
+  name                  = "${var.name}-dlq"
+  kms_master_key_id     = var.lambda_kms_key_arn
+  tags                  = local.common_tags
 }
 
 # Create deployment package for the Lambda function.
