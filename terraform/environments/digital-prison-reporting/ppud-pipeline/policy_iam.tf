@@ -45,7 +45,7 @@ resource "aws_iam_policy" "s3_read_write_ppud_policy" {
 resource "aws_iam_policy" "glue_catalog_ppud_read_only_policy" {
   count = local.is-test ? 0 : 1
 
-  name = "${local.short_name}_glue_catalog_read_only__policy_${local.environment}"
+  name = "${local.short_name}_glue_catalog_read_only_policy_${local.environment}"
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
