@@ -186,7 +186,7 @@ module "assume_iam_role" {
 # Eventbridge rule
 
 module "data_factory_guardduty_eventbridge" {
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/guardduty-eventbridge?ref=9dc8fb57d5f96f92b6155c7c2a4deb1b2d4d22a7"
+  source = "./modules/guardduty-eventbridge"
 
   name = "eventbridge_malware_rule"
 
@@ -211,7 +211,7 @@ module "data_factory_guardduty_eventbridge" {
 
 module "data_factory_guardduty_scan" {
 
-  source = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules.git//modules/guardduty-malware-scan?ref=9dc8fb57d5f96f92b6155c7c2a4deb1b2d4d22a7"
+  source = "./modules/guardduty-malware-scan"
 
 
     bucket_name = module.sherlock_landing_bucket_mp.bucket.bucket
