@@ -49,7 +49,7 @@ resource "aws_s3_bucket_policy" "shared_bucket_policy" {
         "Principal" : "*",
         "Action" : "s3:*",
         "Resource" : [
-          "${module.s3-bucket-shared.bucket.arn}/*", 
+          "${module.s3-bucket-shared.bucket.arn}/*",
           module.s3-bucket-shared.bucket.arn
         ],
         "Condition" : {
@@ -64,9 +64,9 @@ resource "aws_s3_bucket_policy" "shared_bucket_policy" {
         Principal = {
           AWS = "*"
         },
-        Action   = "s3:*",
+        Action = "s3:*",
         Resource = [
-          "${module.s3-bucket-shared.bucket.arn}/*", 
+          "${module.s3-bucket-shared.bucket.arn}/*",
           module.s3-bucket-shared.bucket.arn
         ],
         Condition = {
