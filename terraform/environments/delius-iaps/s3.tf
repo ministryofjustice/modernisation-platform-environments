@@ -4,7 +4,7 @@
 module "s3-log-archive-bucket" { #tfsec:ignore:aws-s3-enable-versioning
   count = local.environment == "production" ? 1 : 0
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v11.1.1"
   providers = {
     aws.bucket-replication = aws
   }
