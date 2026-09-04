@@ -1,0 +1,213 @@
+---
+name: Sprinkler Config and GuardDuty SCP test
+
+on:
+  push:
+    branches:
+      - issue-116-test-narrow-config-guardduty-scp
+    paths:
+      - '.github/workflows/sprinkler-scp-test.yml'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  test-scp:
+    name: Test narrowed SCP actions
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCOUNT_ID: "348456244381"
+      AWS_REGION: "eu-west-2"
+      GUARDDUTY_DETECTOR_ID: "a6bbf6b911d5527903a206af8f8b9177"
+    steps:
+      - name: Mask AWS account ID
+        run: echo "::add-mask::$AWS_ACCOUNT_ID"
+
+      - name: Configure GitHub OIDC credentials
+        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c  # v6.2.3
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: "${{ env.AWS_REGION }}"
+
+      - name: Assume non-exempt test role
+        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c  # v6.2.3
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/issue-116-scp-test"
+          role-session-name: issue116narrowedscptest
+          aws-region: "${{ env.AWS_REGION }}"
+          role-chaining: true
+          role-skip-session-tagging: true
+
+      - name: Verify test identity
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          caller_arn=$(aws sts get-caller-identity --query Arn --output text)
+          echo "$caller_arn"
+          if [[ "$caller_arn" != *":assumed-role/issue-116-scp-test/"* ]]; then
+            echo "Unexpected test identity."
+            exit 1
+          fi
+
+      - name: Test GuardDuty UpdateDetector SCP deny
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          detector_status=$(aws guardduty get-detector \
+            --detector-id "$GUARDDUTY_DETECTOR_ID" \
+            --query Status \
+            --output text)
+          if [[ "$detector_status" != "ENABLED" ]]; then
+            echo "GuardDuty detector must already be enabled before this test."
+            exit 1
+          fi
+
+          set +e
+          deny_output=$(aws guardduty update-detector \
+            --detector-id "$GUARDDUTY_DETECTOR_ID" \
+            --enable 2>&1)
+          deny_exit_code=$?
+          set -e
+
+          echo "$deny_output"
+          if [[ $deny_exit_code -eq 0 ]]; then
+            echo "GuardDuty UpdateDetector unexpectedly succeeded."
+            exit 1
+          fi
+          if ! grep -q "explicit deny in a service control policy" <<< "$deny_output"; then
+            echo "UpdateDetector failed, but not because of an explicit SCP deny."
+            exit 1
+          fi
+
+          final_status=$(aws guardduty get-detector \
+            --detector-id "$GUARDDUTY_DETECTOR_ID" \
+            --query Status \
+            --output text)
+          if [[ "$final_status" != "ENABLED" ]]; then
+            echo "GuardDuty detector is not enabled after the test."
+            exit 1
+          fi
+
+          echo "GuardDuty UpdateDetector was explicitly denied by the SCP."
+
+      - name: Test GuardDuty DeleteDetector SCP deny
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          set +e
+          deny_output=$(aws guardduty delete-detector \
+            --detector-id "00000000000000000000000000000000" 2>&1)
+          deny_exit_code=$?
+          set -e
+
+          echo "$deny_output"
+          if [[ $deny_exit_code -eq 0 ]]; then
+            echo "GuardDuty DeleteDetector unexpectedly succeeded."
+            exit 1
+          fi
+          if ! grep -q "explicit deny in a service control policy" <<< "$deny_output"; then
+            echo "DeleteDetector failed, but not because of an explicit SCP deny."
+            exit 1
+          fi
+
+          echo "GuardDuty DeleteDetector was explicitly denied by the SCP."
+
+      - name: Test GuardDuty malware protection deletion is not denied
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          set +e
+          delete_output=$(aws guardduty delete-malware-protection-plan \
+            --malware-protection-plan-id "00000000000000000000" 2>&1)
+          delete_exit_code=$?
+          set -e
+
+          echo "$delete_output"
+          if grep -q "explicit deny in a service control policy" <<< "$delete_output"; then
+            echo "DeleteMalwareProtectionPlan is still explicitly denied by an SCP."
+            exit 1
+          fi
+          if [[ $delete_exit_code -eq 0 ]]; then
+            echo "DeleteMalwareProtectionPlan was not denied by an SCP."
+          else
+            echo "DeleteMalwareProtectionPlan reached GuardDuty and failed for a non-SCP reason, as expected."
+          fi
+
+      - name: Test Config PutConfigurationRecorder SCP deny
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          recorder=$(aws configservice describe-configuration-recorders \
+            --query 'ConfigurationRecorders[0].{name:name,roleARN:roleARN,recordingGroup:recordingGroup,recordingMode:recordingMode}' \
+            --output json | jq -c 'with_entries(select(.value != null))')
+          if [[ -z "$recorder" || "$recorder" == "null" ]]; then
+            echo "No AWS Config recorder found."
+            exit 1
+          fi
+
+          set +e
+          deny_output=$(aws configservice put-configuration-recorder \
+            --configuration-recorder "$recorder" 2>&1)
+          deny_exit_code=$?
+          set -e
+
+          echo "$deny_output"
+          if [[ $deny_exit_code -eq 0 ]]; then
+            echo "Config PutConfigurationRecorder unexpectedly succeeded."
+            exit 1
+          fi
+          if ! grep -q "explicit deny in a service control policy" <<< "$deny_output"; then
+            echo "PutConfigurationRecorder failed, but not because of an explicit SCP deny."
+            exit 1
+          fi
+
+          recording=$(aws configservice describe-configuration-recorder-status \
+            --query 'ConfigurationRecorders[0].recording' \
+            --output text)
+          if [[ "$recording" != "True" ]]; then
+            echo "AWS Config recorder is not recording after the test."
+            exit 1
+          fi
+
+          echo "Config PutConfigurationRecorder was explicitly denied by the SCP."
+
+      - name: Test Config stop and delete recorder SCP denies
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for operation in stop-configuration-recorder delete-configuration-recorder; do
+            set +e
+            deny_output=$(aws configservice "$operation" \
+              --configuration-recorder-name "issue-116-nonexistent-recorder" 2>&1)
+            deny_exit_code=$?
+            set -e
+
+            echo "$deny_output"
+            if [[ $deny_exit_code -eq 0 ]]; then
+              echo "Config $operation unexpectedly succeeded."
+              exit 1
+            fi
+            if ! grep -q "explicit deny in a service control policy" <<< "$deny_output"; then
+              echo "Config $operation failed, but not because of an explicit SCP deny."
+              exit 1
+            fi
+          done
+
+          recording=$(aws configservice describe-configuration-recorder-status \
+            --query 'ConfigurationRecorders[0].recording' \
+            --output text)
+          if [[ "$recording" != "True" ]]; then
+            echo "AWS Config recorder is not recording after the tests."
+            exit 1
+          fi
+
+          echo "Config StopConfigurationRecorder and DeleteConfigurationRecorder were explicitly denied by the SCP."

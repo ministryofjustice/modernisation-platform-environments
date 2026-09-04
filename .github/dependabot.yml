@@ -23,10 +23,1450 @@ updates:
       - "ministryofjustice/devcontainer-community"
   - package-ecosystem: "terraform"
     directories:
-      - "terraform/**/*"
+      - "terraform/environments/analytical-platform-common"
     schedule:
       interval: "daily"
-    open-pull-requests-limit: 150
+    groups:
+      analytical-platform-common:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/analytical-platform-compute"
+      - "terraform/environments/analytical-platform-compute/actions-runner"
+      - "terraform/environments/analytical-platform-compute/airflow"
+      - "terraform/environments/analytical-platform-compute/central-digital-bedrock"
+      - "terraform/environments/analytical-platform-compute/cluster"
+      - "terraform/environments/analytical-platform-compute/dashboard-service"
+      - "terraform/environments/analytical-platform-compute/lakeformation"
+      - "terraform/environments/analytical-platform-compute/mlflow"
+      - "terraform/environments/analytical-platform-compute/modules/network-monitoring"
+      - "terraform/environments/analytical-platform-compute/modules/routes"
+      - "terraform/environments/analytical-platform-compute/network"
+      - "terraform/environments/analytical-platform-compute/network/modules/routes"
+      - "terraform/environments/analytical-platform-compute/next"
+      - "terraform/environments/analytical-platform-compute/quicksight"
+      - "terraform/environments/analytical-platform-compute/sagemaker-ai"
+    schedule:
+      interval: "daily"
+    groups:
+      analytical-platform-compute:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/analytical-platform-ingestion"
+      - "terraform/environments/analytical-platform-ingestion/dms"
+      - "terraform/environments/analytical-platform-ingestion/modules/dms"
+      - "terraform/environments/analytical-platform-ingestion/modules/dms/examples/example-readme"
+      - "terraform/environments/analytical-platform-ingestion/modules/routes"
+      - "terraform/environments/analytical-platform-ingestion/modules/transfer-family/user"
+      - "terraform/environments/analytical-platform-ingestion/modules/transfer-family/user-with-egress"
+      - "terraform/environments/analytical-platform-ingestion/transfer-family"
+    schedule:
+      interval: "daily"
+    groups:
+      analytical-platform-ingestion:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/analytical-platform-next-poc-hub"
+    schedule:
+      interval: "daily"
+    groups:
+      analytical-platform-next-poc-hub:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/analytical-platform-next-poc-producer"
+    schedule:
+      interval: "daily"
+    groups:
+      analytical-platform-next-poc-producer:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/apex"
+      - "terraform/environments/apex/modules/alb"
+      - "terraform/environments/apex/modules/codebuild"
+      - "terraform/environments/apex/modules/ecs"
+      - "terraform/environments/apex/modules/lambdapolicy"
+      - "terraform/environments/apex/modules/s3"
+    schedule:
+      interval: "daily"
+    groups:
+      apex:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/ccms-ebs"
+      - "terraform/environments/ccms-ebs/ccms-ebs-ssogen"
+      - "terraform/environments/ccms-ebs/ccms-file-transfer"
+      - "terraform/environments/ccms-ebs/modules"
+      - "terraform/environments/ccms-ebs/modules/cw-ec2"
+      - "terraform/environments/ccms-ebs/modules/cw-logs"
+      - "terraform/environments/ccms-ebs/modules/ftp-lambda"
+      - "terraform/environments/ccms-ebs/modules/transfer-family"
+      - "terraform/environments/ccms-ebs/workspaces-secure-browser"
+    schedule:
+      interval: "daily"
+    groups:
+      ccms-ebs:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/ccms-ebs-ai"
+    schedule:
+      interval: "daily"
+    groups:
+      ccms-ebs-ai:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/ccms-ebs-upgrade"
+      - "terraform/environments/ccms-ebs-upgrade/anonymisation"
+      - "terraform/environments/ccms-ebs-upgrade/modules"
+      - "terraform/environments/ccms-ebs-upgrade/modules/cw-ec2"
+      - "terraform/environments/ccms-ebs-upgrade/modules/cw-logs"
+      - "terraform/environments/ccms-ebs-upgrade/sandbox"
+    schedule:
+      interval: "daily"
+    groups:
+      ccms-ebs-upgrade:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/ccms-edrms"
+    schedule:
+      interval: "daily"
+    groups:
+      ccms-edrms:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/ccms-feasibility"
+      - "terraform/environments/ccms-feasibility/ccms-ebs"
+      - "terraform/environments/ccms-feasibility/ccms-edrms"
+      - "terraform/environments/ccms-feasibility/ccms-oia"
+      - "terraform/environments/ccms-feasibility/ccms-pui"
+      - "terraform/environments/ccms-feasibility/ccms-soa"
+    schedule:
+      interval: "daily"
+    groups:
+      ccms-feasibility:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/ccms-oia"
+      - "terraform/environments/ccms-oia/ccms-oia-sandbox"
+    schedule:
+      interval: "daily"
+    groups:
+      ccms-oia:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/ccms-pui"
+    schedule:
+      interval: "daily"
+    groups:
+      ccms-pui:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/ccms-pui-internal"
+      - "terraform/environments/ccms-pui-internal/workspaces-secure-browser"
+    schedule:
+      interval: "daily"
+    groups:
+      ccms-pui-internal:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/cdpt-chaps"
+    schedule:
+      interval: "daily"
+    groups:
+      cdpt-chaps:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/cdpt-ifs"
+    schedule:
+      interval: "daily"
+    groups:
+      cdpt-ifs:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/cfo-data-management-system"
+    schedule:
+      interval: "daily"
+    groups:
+      cfo-data-management-system:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/cica-sandbox"
+    schedule:
+      interval: "daily"
+    groups:
+      cica-sandbox:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/cica-tariff"
+    schedule:
+      interval: "daily"
+    groups:
+      cica-tariff:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/cloud-platform"
+      - "terraform/environments/cloud-platform/cluster"
+      - "terraform/environments/cloud-platform/cluster-base"
+      - "terraform/environments/cloud-platform/cluster-components"
+      - "terraform/environments/cloud-platform/cluster-core"
+      - "terraform/environments/cloud-platform/cluster-observability"
+      - "terraform/environments/cloud-platform/cluster/modules/argo-cd"
+      - "terraform/environments/cloud-platform/network"
+    schedule:
+      interval: "daily"
+    groups:
+      cloud-platform:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/cloud-platform-live"
+      - "terraform/environments/cloud-platform-live/cluster"
+      - "terraform/environments/cloud-platform-live/cluster-components"
+      - "terraform/environments/cloud-platform-live/cluster-core"
+      - "terraform/environments/cloud-platform-live/network"
+    schedule:
+      interval: "daily"
+    groups:
+      cloud-platform-live:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/cloud-platform-non-live"
+      - "terraform/environments/cloud-platform-non-live/cluster"
+      - "terraform/environments/cloud-platform-non-live/cluster-components"
+      - "terraform/environments/cloud-platform-non-live/cluster-core"
+      - "terraform/environments/cloud-platform-non-live/network"
+    schedule:
+      interval: "daily"
+    groups:
+      cloud-platform-non-live:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/coat"
+    schedule:
+      interval: "daily"
+    groups:
+      coat:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/container-platform-cd"
+    schedule:
+      interval: "daily"
+    groups:
+      container-platform-cd:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/container-platform-hmpps"
+    schedule:
+      interval: "daily"
+    groups:
+      container-platform-hmpps:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/container-platform-laa"
+    schedule:
+      interval: "daily"
+    groups:
+      container-platform-laa:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/container-platform-octo"
+    schedule:
+      interval: "daily"
+    groups:
+      container-platform-octo:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/contract-work-administration"
+    schedule:
+      interval: "daily"
+    groups:
+      contract-work-administration:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/cooker"
+    schedule:
+      interval: "daily"
+    groups:
+      cooker:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/corporate-staff-rostering"
+    schedule:
+      interval: "daily"
+    groups:
+      corporate-staff-rostering:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/dacp"
+    schedule:
+      interval: "daily"
+    groups:
+      dacp:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/data-factory-corporate"
+      - "terraform/environments/data-factory-corporate/commercial"
+      - "terraform/environments/data-factory-corporate/finance"
+      - "terraform/environments/data-factory-corporate/people"
+    schedule:
+      interval: "daily"
+    groups:
+      data-factory-corporate:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/data-factory-laa"
+      - "terraform/environments/data-factory-laa/modules/airflow-data-ingestion-role"
+      - "terraform/environments/data-factory-laa/modules/airflow-oidc"
+      - "terraform/environments/data-factory-laa/modules/cadet-role"
+    schedule:
+      interval: "daily"
+    groups:
+      data-factory-laa:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/data-factory-moj"
+      - "terraform/environments/data-factory-moj/streaming-poc"
+      - "terraform/environments/data-factory-moj/streaming-poc-devops"
+      - "terraform/environments/data-factory-moj/streaming-poc-maf"
+      - "terraform/environments/data-factory-moj/streaming-poc-maf/modules/managed-apache-flink"
+      - "terraform/environments/data-factory-moj/streaming-poc-msk"
+      - "terraform/environments/data-factory-moj/streaming-poc-opensearch"
+      - "terraform/environments/data-factory-moj/streaming-poc-opensearch-config"
+      - "terraform/environments/data-factory-moj/streaming-poc-opensearch-config/os-resources"
+    schedule:
+      interval: "daily"
+    groups:
+      data-factory-moj:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/data-platform"
+      - "terraform/environments/data-platform/ai-gateway"
+      - "terraform/environments/data-platform/app"
+      - "terraform/environments/data-platform/cluster"
+      - "terraform/environments/data-platform/cluster/modules/kubernetes/namespace"
+      - "terraform/environments/data-platform/dns"
+      - "terraform/environments/data-platform/iac"
+      - "terraform/environments/data-platform/llm-gateway"
+      - "terraform/environments/data-platform/modules/monitoring"
+      - "terraform/environments/data-platform/monitoring"
+      - "terraform/environments/data-platform/network"
+      - "terraform/environments/data-platform/network/modules/aws/transit-gateway/routes"
+      - "terraform/environments/data-platform/sagemaker"
+    schedule:
+      interval: "daily"
+    groups:
+      data-platform:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/data-platform-governance"
+      - "terraform/environments/data-platform-governance/lakeformation"
+    schedule:
+      interval: "daily"
+    groups:
+      data-platform-governance:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/delius-alfresco"
+      - "terraform/environments/delius-alfresco/modules/alfresco"
+    schedule:
+      interval: "daily"
+    groups:
+      delius-alfresco:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/delius-core"
+      - "terraform/environments/delius-core/modules/components/dms"
+      - "terraform/environments/delius-core/modules/components/ecs_retirement"
+      - "terraform/environments/delius-core/modules/components/fargate_graceful_retirement"
+      - "terraform/environments/delius-core/modules/components/ldap"
+      - "terraform/environments/delius-core/modules/components/ldap/circuit_breaker"
+      - "terraform/environments/delius-core/modules/components/oracle_db_instance"
+      - "terraform/environments/delius-core/modules/components/oracle_db_shared"
+      - "terraform/environments/delius-core/modules/delius_environment"
+      - "terraform/environments/delius-core/modules/helpers/delius_microservice"
+      - "terraform/environments/delius-core/modules/helpers/ebs_volume"
+      - "terraform/environments/delius-core/modules/helpers/ecs_policies"
+      - "terraform/environments/delius-core/modules/helpers/efs"
+      - "terraform/environments/delius-core/modules/helpers/nlb"
+      - "terraform/environments/delius-core/modules/helpers/secret"
+      - "terraform/environments/delius-core/modules/helpers/ssm_params"
+    schedule:
+      interval: "daily"
+    groups:
+      delius-core:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/delius-core-training"
+    schedule:
+      interval: "daily"
+    groups:
+      delius-core-training:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/delius-iaps"
+    schedule:
+      interval: "daily"
+    groups:
+      delius-iaps:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/delius-jitbit"
+    schedule:
+      interval: "daily"
+    groups:
+      delius-jitbit:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/delius-mis"
+      - "terraform/environments/delius-mis/modules/mis_environment"
+    schedule:
+      interval: "daily"
+    groups:
+      delius-mis:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/developer-experience"
+      - "terraform/environments/developer-experience/github-audit-log-stream"
+      - "terraform/environments/developer-experience/github-management"
+    schedule:
+      interval: "daily"
+    groups:
+      developer-experience:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/digital-prison-reporting"
+      - "terraform/environments/digital-prison-reporting/modules/apigateway/serverless-lambda-gw"
+      - "terraform/environments/digital-prison-reporting/modules/athena_federated_query_connectors"
+      - "terraform/environments/digital-prison-reporting/modules/athena_workgroups"
+      - "terraform/environments/digital-prison-reporting/modules/compute_node"
+      - "terraform/environments/digital-prison-reporting/modules/compute_node_windows"
+      - "terraform/environments/digital-prison-reporting/modules/cw_alarm"
+      - "terraform/environments/digital-prison-reporting/modules/cw_insights"
+      - "terraform/environments/digital-prison-reporting/modules/data_source_secret"
+      - "terraform/environments/digital-prison-reporting/modules/domains/dms-endpoints"
+      - "terraform/environments/digital-prison-reporting/modules/domains/dms-instance"
+      - "terraform/environments/digital-prison-reporting/modules/domains/dms-task"
+      - "terraform/environments/digital-prison-reporting/modules/domains/ingestion-pipeline"
+      - "terraform/environments/digital-prison-reporting/modules/domains/maintenance-pipeline"
+      - "terraform/environments/digital-prison-reporting/modules/domains/pipeline-lambda"
+      - "terraform/environments/digital-prison-reporting/modules/domains/postgres-tickle-lambda"
+      - "terraform/environments/digital-prison-reporting/modules/domains/reload-pipeline"
+      - "terraform/environments/digital-prison-reporting/modules/domains/replay-pipeline"
+      - "terraform/environments/digital-prison-reporting/modules/domains/start-cdc-pipeline"
+      - "terraform/environments/digital-prison-reporting/modules/domains/stop-cdc-pipeline"
+      - "terraform/environments/digital-prison-reporting/modules/dynamo_tables"
+      - "terraform/environments/digital-prison-reporting/modules/ec2"
+      - "terraform/environments/digital-prison-reporting/modules/eventbridge"
+      - "terraform/environments/digital-prison-reporting/modules/glue_connection"
+      - "terraform/environments/digital-prison-reporting/modules/glue_database"
+      - "terraform/environments/digital-prison-reporting/modules/glue_job"
+      - "terraform/environments/digital-prison-reporting/modules/glue_registry"
+      - "terraform/environments/digital-prison-reporting/modules/lambda_trigger"
+      - "terraform/environments/digital-prison-reporting/modules/lambdas/container-image"
+      - "terraform/environments/digital-prison-reporting/modules/lambdas/generic"
+      - "terraform/environments/digital-prison-reporting/modules/lambdas/layer"
+      - "terraform/environments/digital-prison-reporting/modules/notifications/email"
+      - "terraform/environments/digital-prison-reporting/modules/notifications/eventbridge"
+      - "terraform/environments/digital-prison-reporting/modules/notifications/sns"
+      - "terraform/environments/digital-prison-reporting/modules/rds/aws-aurora"
+      - "terraform/environments/digital-prison-reporting/modules/rds/cluster_parameter_group"
+      - "terraform/environments/digital-prison-reporting/modules/rds/parameter_group"
+      - "terraform/environments/digital-prison-reporting/modules/rds/postgres"
+      - "terraform/environments/digital-prison-reporting/modules/redshift"
+      - "terraform/environments/digital-prison-reporting/modules/s3_bucket"
+      - "terraform/environments/digital-prison-reporting/modules/secrets_manager"
+      - "terraform/environments/digital-prison-reporting/modules/step_function"
+      - "terraform/environments/digital-prison-reporting/modules/vpc_endpoint"
+      - "terraform/environments/digital-prison-reporting/ppud-pipeline"
+    schedule:
+      interval: "daily"
+    groups:
+      digital-prison-reporting:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/edw-19c"
+    schedule:
+      interval: "daily"
+    groups:
+      edw-19c:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/electronic-monitoring-data"
+      - "terraform/environments/electronic-monitoring-data/modules/ap_airflow_iam_role"
+      - "terraform/environments/electronic-monitoring-data/modules/ap_airflow_load_data_iam_role"
+      - "terraform/environments/electronic-monitoring-data/modules/api_step_function"
+      - "terraform/environments/electronic-monitoring-data/modules/dms"
+      - "terraform/environments/electronic-monitoring-data/modules/export_bucket_presigned_url"
+      - "terraform/environments/electronic-monitoring-data/modules/export_bucket_push"
+      - "terraform/environments/electronic-monitoring-data/modules/glue_table_optimiser"
+      - "terraform/environments/electronic-monitoring-data/modules/lakeformation_database_share"
+      - "terraform/environments/electronic-monitoring-data/modules/lakeformation_w_data_filter"
+      - "terraform/environments/electronic-monitoring-data/modules/lambdas"
+      - "terraform/environments/electronic-monitoring-data/modules/landing_bucket"
+      - "terraform/environments/electronic-monitoring-data/modules/landing_bucket_iam_user_access"
+      - "terraform/environments/electronic-monitoring-data/modules/landing_zone"
+      - "terraform/environments/electronic-monitoring-data/modules/landing_zone_user"
+      - "terraform/environments/electronic-monitoring-data/modules/merge_into_reconciler"
+      - "terraform/environments/electronic-monitoring-data/modules/server_security_group"
+      - "terraform/environments/electronic-monitoring-data/modules/sqs_s3_lambda_trigger"
+      - "terraform/environments/electronic-monitoring-data/modules/step_function"
+    schedule:
+      interval: "daily"
+    groups:
+      electronic-monitoring-data:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/equip"
+      - "terraform/environments/equip/dlm-snapshot"
+      - "terraform/environments/equip/ec2-instance-module"
+    schedule:
+      interval: "daily"
+    groups:
+      equip:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/eucs-appstream"
+      - "terraform/environments/eucs-appstream/modules/workspaces"
+    schedule:
+      interval: "daily"
+    groups:
+      eucs-appstream:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/example"
+    schedule:
+      interval: "daily"
+    groups:
+      example:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/genesys-call-centre-data"
+      - "terraform/environments/genesys-call-centre-data/modules/ap_airflow_iam_role"
+      - "terraform/environments/genesys-call-centre-data/modules/ap_airflow_load_data_iam_role"
+    schedule:
+      interval: "daily"
+    groups:
+      genesys-call-centre-data:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/hmcts-claude-provider"
+    schedule:
+      interval: "daily"
+    groups:
+      hmcts-claude-provider:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/hmpps-court-data-ingestion-api"
+    schedule:
+      interval: "daily"
+    groups:
+      hmpps-court-data-ingestion-api:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/hmpps-domain-services"
+    schedule:
+      interval: "daily"
+    groups:
+      hmpps-domain-services:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/hmpps-esupervision"
+    schedule:
+      interval: "daily"
+    groups:
+      hmpps-esupervision:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/hmpps-oem"
+    schedule:
+      interval: "daily"
+    groups:
+      hmpps-oem:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/integration-hub"
+      - "terraform/environments/integration-hub/api-hosting-platform"
+      - "terraform/environments/integration-hub/api-platform"
+      - "terraform/environments/integration-hub/downstream-mock-api"
+      - "terraform/environments/integration-hub/downstream-mock-api/modules/service"
+      - "terraform/environments/integration-hub/events-platform"
+      - "terraform/environments/integration-hub/managed-file-transfer"
+    schedule:
+      interval: "daily"
+    groups:
+      integration-hub:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/integration-hub-api"
+      - "terraform/environments/integration-hub-api/benefit-checker-api"
+      - "terraform/environments/integration-hub-api/modules/integration-hub-file-transfer-api"
+    schedule:
+      interval: "daily"
+    groups:
+      integration-hub-api:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/integration-hub-file-transfer"
+    schedule:
+      interval: "daily"
+    groups:
+      integration-hub-file-transfer:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/laa-ccms-soa"
+      - "terraform/environments/laa-ccms-soa/ccms-soa-sandbox"
+    schedule:
+      interval: "daily"
+    groups:
+      laa-ccms-soa:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/laa-cis"
+    schedule:
+      interval: "daily"
+    groups:
+      laa-cis:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/laa-enterprise-service-bus"
+      - "terraform/environments/laa-enterprise-service-bus/lambda-files"
+    schedule:
+      interval: "daily"
+    groups:
+      laa-enterprise-service-bus:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/laa-new-workspaces"
+      - "terraform/environments/laa-new-workspaces/ad-radius-mfa-config"
+      - "terraform/environments/laa-new-workspaces/workspace-components"
+    schedule:
+      interval: "daily"
+    groups:
+      laa-new-workspaces:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/laa-oem"
+    schedule:
+      interval: "daily"
+    groups:
+      laa-oem:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/laa-pui-secure-browser"
+      - "terraform/environments/laa-pui-secure-browser/networking"
+      - "terraform/environments/laa-pui-secure-browser/workspaces-secure-browser"
+    schedule:
+      interval: "daily"
+    groups:
+      laa-pui-secure-browser:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/laa-stabilisation-cdc-poc"
+      - "terraform/environments/laa-stabilisation-cdc-poc/cwa-poc2"
+    schedule:
+      interval: "daily"
+    groups:
+      laa-stabilisation-cdc-poc:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/laa-workspaces"
+      - "terraform/environments/laa-workspaces/workspace-components"
+    schedule:
+      interval: "daily"
+    groups:
+      laa-workspaces:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/london-unpaid-work"
+    schedule:
+      interval: "daily"
+    groups:
+      london-unpaid-work:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/long-term-storage"
+    schedule:
+      interval: "daily"
+    groups:
+      long-term-storage:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/maat"
+    schedule:
+      interval: "daily"
+    groups:
+      maat:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/maatdb"
+      - "terraform/environments/maatdb/modules/rds"
+    schedule:
+      interval: "daily"
+    groups:
+      maatdb:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/mlra"
+      - "terraform/environments/mlra/modules/alb"
+      - "terraform/environments/mlra/modules/cloudwatch"
+      - "terraform/environments/mlra/modules/codebuild"
+      - "terraform/environments/mlra/modules/ecs"
+    schedule:
+      interval: "daily"
+    groups:
+      mlra:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/mojfin"
+    schedule:
+      interval: "daily"
+    groups:
+      mojfin:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/ncas"
+    schedule:
+      interval: "daily"
+    groups:
+      ncas:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/nomis"
+    schedule:
+      interval: "daily"
+    groups:
+      nomis:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/nomis-combined-reporting"
+    schedule:
+      interval: "daily"
+    groups:
+      nomis-combined-reporting:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/nomis-data-hub"
+    schedule:
+      interval: "daily"
+    groups:
+      nomis-data-hub:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/oas"
+    schedule:
+      interval: "daily"
+    groups:
+      oas:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/oasys"
+    schedule:
+      interval: "daily"
+    groups:
+      oasys:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/oasys-national-reporting"
+    schedule:
+      interval: "daily"
+    groups:
+      oasys-national-reporting:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/observability-platform"
+      - "terraform/environments/observability-platform/modules/grafana/amazon-prometheus-query-source"
+      - "terraform/environments/observability-platform/modules/grafana/athena-source"
+      - "terraform/environments/observability-platform/modules/grafana/cloudwatch-source"
+      - "terraform/environments/observability-platform/modules/grafana/contact-point/pagerduty"
+      - "terraform/environments/observability-platform/modules/grafana/contact-point/slack"
+      - "terraform/environments/observability-platform/modules/grafana/team"
+      - "terraform/environments/observability-platform/modules/grafana/xray-source"
+      - "terraform/environments/observability-platform/modules/observability-platform/tenant-configuration"
+      - "terraform/environments/observability-platform/modules/prometheus/iam-role"
+    schedule:
+      interval: "daily"
+    groups:
+      observability-platform:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/octo"
+    schedule:
+      interval: "daily"
+    groups:
+      octo:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/octo-engineering-ai-enablement"
+      - "terraform/environments/octo-engineering-ai-enablement/ai-gateway"
+    schedule:
+      interval: "daily"
+    groups:
+      octo-engineering-ai-enablement:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/panda-cyber-appsec-lab"
+    schedule:
+      interval: "daily"
+    groups:
+      panda-cyber-appsec-lab:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/performance-hub"
+      - "terraform/environments/performance-hub/module/ecs"
+    schedule:
+      interval: "daily"
+    groups:
+      performance-hub:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/planetfm"
+    schedule:
+      interval: "daily"
+    groups:
+      planetfm:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/ppud"
+    schedule:
+      interval: "daily"
+    groups:
+      ppud:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/pra-register"
+    schedule:
+      interval: "daily"
+    groups:
+      pra-register:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/prison-retail"
+    schedule:
+      interval: "daily"
+    groups:
+      prison-retail:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/property-cafm-data-migration"
+      - "terraform/environments/property-cafm-data-migration/modules/lambda_staging_export"
+      - "terraform/environments/property-cafm-data-migration/modules/transfer_family/server"
+      - "terraform/environments/property-cafm-data-migration/modules/transfer_family/ssh_key"
+      - "terraform/environments/property-cafm-data-migration/modules/transfer_family/users"
+    schedule:
+      interval: "daily"
+    groups:
+      property-cafm-data-migration:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/refer-monitor"
+    schedule:
+      interval: "daily"
+    groups:
+      refer-monitor:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/sprinkler"
+      - "terraform/environments/sprinkler/playground"
+      - "terraform/environments/sprinkler/testbed"
+    schedule:
+      interval: "daily"
+    groups:
+      sprinkler:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/testing-test"
+    schedule:
+      interval: "daily"
+    groups:
+      testing-test:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/tipstaff"
+    schedule:
+      interval: "daily"
+    groups:
+      tipstaff:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/tribunals"
+      - "terraform/environments/tribunals/modules/ecs_task"
+      - "terraform/environments/tribunals/modules/tribunal"
+      - "terraform/environments/tribunals/modules/tribunal_ftp"
+    schedule:
+      interval: "daily"
+    groups:
+      tribunals:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/vcms"
+    schedule:
+      interval: "daily"
+    groups:
+      vcms:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/wardship"
+    schedule:
+      interval: "daily"
+    groups:
+      wardship:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/xhibit-portal"
+    schedule:
+      interval: "daily"
+    groups:
+      xhibit-portal:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/youth-justice-app-framework"
+      - "terraform/environments/youth-justice-app-framework/modules/alb"
+      - "terraform/environments/youth-justice-app-framework/modules/aurora"
+      - "terraform/environments/youth-justice-app-framework/modules/cloudfront"
+      - "terraform/environments/youth-justice-app-framework/modules/cloudwatch"
+      - "terraform/environments/youth-justice-app-framework/modules/codedeploy"
+      - "terraform/environments/youth-justice-app-framework/modules/datadog"
+      - "terraform/environments/youth-justice-app-framework/modules/directory-service"
+      - "terraform/environments/youth-justice-app-framework/modules/dns/certs"
+      - "terraform/environments/youth-justice-app-framework/modules/dns/hosted_zone"
+      - "terraform/environments/youth-justice-app-framework/modules/ecs"
+      - "terraform/environments/youth-justice-app-framework/modules/esb"
+      - "terraform/environments/youth-justice-app-framework/modules/lambda"
+      - "terraform/environments/youth-justice-app-framework/modules/quicksight"
+      - "terraform/environments/youth-justice-app-framework/modules/redshift"
+      - "terraform/environments/youth-justice-app-framework/modules/s3"
+      - "terraform/environments/youth-justice-app-framework/modules/ses"
+      - "terraform/environments/youth-justice-app-framework/modules/tableau"
+      - "terraform/environments/youth-justice-app-framework/modules/tableau/add_rules_to_sg"
+      - "terraform/environments/youth-justice-app-framework/modules/waf"
+      - "terraform/environments/youth-justice-app-framework/modules/xsiam"
+      - "terraform/environments/youth-justice-app-framework/modules/yjsm"
+    schedule:
+      interval: "daily"
+    groups:
+      youth-justice-app-framework:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/youth-justice-networking"
+    schedule:
+      interval: "daily"
+    groups:
+      youth-justice-networking:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/modules/acm_certificate"
+      - "terraform/modules/baseline"
+      - "terraform/modules/baseline_presets"
+      - "terraform/modules/cloudwatch_dashboard"
+      - "terraform/modules/cost_usage_report"
+      - "terraform/modules/efs"
+      - "terraform/modules/environment"
+      - "terraform/modules/fsx_windows"
+      - "terraform/modules/ip_addresses"
+      - "terraform/modules/lb_listener"
+      - "terraform/modules/ncsc-aws-config-conformance-packs"
+      - "terraform/modules/schedule_alarms_lambda"
+      - "terraform/modules/shield_advanced"
+      - "terraform/modules/shield_advanced_v6"
+    schedule:
+      interval: "daily"
+    groups:
+      modules:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
     cooldown:
       default-days: 7
   - package-ecosystem: "gomod"
