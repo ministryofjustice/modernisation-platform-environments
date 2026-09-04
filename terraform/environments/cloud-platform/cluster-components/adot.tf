@@ -64,7 +64,9 @@ resource "kubectl_manifest" "adot_collector" {
     spec = {
       mode           = "daemonset"
       serviceAccount = "adot-collector"
-      config = yamlencode({
+      # v1beta1 OpenTelemetryCollector expects spec.config as a structured
+      # object, not an embedded YAML string, so this map is emitted directly.
+      config = {
         receivers = {
           prometheus = {
             config = {
@@ -215,7 +217,7 @@ resource "kubectl_manifest" "adot_collector" {
             }
           }
         }
-      })
+      }
     }
   })
 
