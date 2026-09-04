@@ -1,0 +1,4 @@
+skip-check:
+  # bastion_linux module — S3 bucket for SSH keys and logs
+  - CKV_AWS_144 # Cross-region replication not required for bastion logs (see module README)
+  - CKV_AWS_18  # S3 access logging not required — bucket is only used by the bastion server

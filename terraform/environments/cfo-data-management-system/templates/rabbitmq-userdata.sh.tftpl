@@ -1,0 +1,94 @@
+#!/bin/bash
+set -euo pipefail
+
+# Update system packages
+dnf update -y
+
+# Add Erlang and RabbitMQ repositories (CloudSmith, RHEL9/AL2023 compatible)
+# Both basearch and noarch sections are required — the RabbitMQ server package is noarch
+cat > /etc/yum.repos.d/rabbitmq.repo << 'EOF'
+[modern-erlang]
+name=modern-erlang
+baseurl=https://yum1.rabbitmq.com/erlang/el/9/$basearch
+        https://yum2.rabbitmq.com/erlang/el/9/$basearch
+gpgcheck=1
+gpgkey=https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-erlang.E495BB49CC4BBE5B.key
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+repo_gpgcheck=0
+enabled=1
+
+[modern-erlang-noarch]
+name=modern-erlang-noarch
+baseurl=https://yum1.rabbitmq.com/erlang/el/9/noarch
+        https://yum2.rabbitmq.com/erlang/el/9/noarch
+gpgcheck=1
+gpgkey=https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-erlang.E495BB49CC4BBE5B.key
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+repo_gpgcheck=0
+enabled=1
+
+[rabbitmq-server]
+name=rabbitmq-server
+baseurl=https://yum2.rabbitmq.com/rabbitmq/el/9/$basearch
+        https://yum1.rabbitmq.com/rabbitmq/el/9/$basearch
+gpgcheck=1
+gpgkey=https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-server.9F4587F226208342.key
+        https://github.com/rabbitmq/signing-keys/releases/download/3.0/rabbitmq-release-signing-key.asc
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+repo_gpgcheck=0
+enabled=1
+
+[rabbitmq-server-noarch]
+name=rabbitmq-server-noarch
+baseurl=https://yum2.rabbitmq.com/rabbitmq/el/9/noarch
+        https://yum1.rabbitmq.com/rabbitmq/el/9/noarch
+gpgcheck=1
+gpgkey=https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-server.9F4587F226208342.key
+        https://github.com/rabbitmq/signing-keys/releases/download/3.0/rabbitmq-release-signing-key.asc
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+repo_gpgcheck=0
+enabled=1
+EOF
+
+# Import signing keys
+rpm --import https://github.com/rabbitmq/signing-keys/releases/download/3.0/rabbitmq-release-signing-key.asc
+rpm --import https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-erlang.E495BB49CC4BBE5B.key
+rpm --import https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-server.9F4587F226208342.key
+
+# Install Erlang and RabbitMQ
+dnf install -y erlang rabbitmq-server
+
+# Configure systemd to restart RabbitMQ automatically on failure
+mkdir -p /etc/systemd/system/rabbitmq-server.service.d
+cat > /etc/systemd/system/rabbitmq-server.service.d/restart.conf << 'EOF'
+[Service]
+Restart=on-failure
+RestartSec=10
+EOF
+
+systemctl daemon-reload
+systemctl enable rabbitmq-server
+systemctl start rabbitmq-server
+
+# Wait for RabbitMQ to be ready before configuring users
+for i in {1..12}; do
+  rabbitmqctl status &>/dev/null && break
+  echo "Waiting for RabbitMQ... ($i/12)"
+  sleep 5
+done
+
+# Fetch password from Secrets Manager (IAM instance profile grants access)
+PASSWORD=$(aws secretsmanager get-secret-value \
+  --secret-id "${secret_arn}" \
+  --region "${region}" \
+  --query SecretString \
+  --output text)
+
+# Add admin user and remove the default insecure guest account
+rabbitmqctl add_user user "$PASSWORD"
+rabbitmqctl set_user_tags user administrator
+rabbitmqctl set_permissions -p / user ".*" ".*" ".*"
+rabbitmqctl delete_user guest
+
+# Enable management plugin (useful for browser UI via SSM port forwarding)
+rabbitmq-plugins enable rabbitmq_management
