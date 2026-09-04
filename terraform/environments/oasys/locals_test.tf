@@ -353,7 +353,32 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/*",
             ]
-          }
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/postgres/database/hmpps-arns-assessment-view-db-test/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "kms:Decrypt",
+            ]
+            resources = [
+              aws_kms_key.arns_integration[0].arn,
+            ]
+            condition = {
+              test     = "StringEquals"
+              variable = "kms:ViaService"
+              values = [
+                "secretsmanager.eu-west-2.amazonaws.com",
+              ]
+            }
+          },
         ]
       }
       Ec2T2WebPolicy = {

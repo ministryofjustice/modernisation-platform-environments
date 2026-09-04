@@ -6,7 +6,7 @@ module "vpc_isolated" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/vpc/aws"
-  version = "6.6.1"
+  version = "6.7.1"
 
   name            = "${local.application_name}-${local.environment}-isolated"
   azs             = local.vpc_availability_zones

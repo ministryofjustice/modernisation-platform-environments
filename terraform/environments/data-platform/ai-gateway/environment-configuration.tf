@@ -1,7 +1,7 @@
 locals {
   environment_configurations = {
     development = {
-      litellm_version     = "1.98.0"
+      litellm_version     = "1.97.0"
       ai_gateway_hostname = "development.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
@@ -41,7 +41,7 @@ locals {
       elasticache_node_type = "cache.t4g.medium"
     }
     test = {
-      litellm_version     = "1.98.0"
+      litellm_version     = "1.97.0"
       ai_gateway_hostname = "test.ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
@@ -110,18 +110,14 @@ locals {
         max_replicas                      = 3
         target_cpu_utilization_percentage = 60
       }
-      aurora_instance_class = "db.serverless"
-      aurora_engine_version = "18.4"
-      aurora_instances      = { writer = {} }
-      aurora_serverlessv2_scaling_configuration = {
-        min_capacity             = 0
-        max_capacity             = 4
-        seconds_until_auto_pause = 3600
-      }
-      elasticache_node_type = "cache.t4g.medium"
+      aurora_instance_class                     = "db.t4g.medium"
+      aurora_engine_version                     = "18.4"
+      aurora_instances                          = { writer = {}, reader = {} }
+      aurora_serverlessv2_scaling_configuration = null
+      elasticache_node_type                     = "cache.t4g.medium"
     }
     production = {
-      litellm_version     = "1.98.0"
+      litellm_version     = "1.97.0"
       ai_gateway_hostname = "ai-gateway.justice.gov.uk"
       ai_gateway_ingress_allowlist = [
         # VPN
