@@ -1,5 +1,5 @@
 module "s3_inbound" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v11.1.1"
 
   bucket_name        = "${local.application_name}-inbound"
   versioning_enabled = true
@@ -75,7 +75,7 @@ module "s3_inbound" {
 }
 
 module "s3_outbound" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v11.1.1"
 
   bucket_name        = "${local.application_name}-outbound"
   versioning_enabled = true
@@ -127,7 +127,7 @@ module "s3_outbound" {
 }
 
 module "s3_ftp_lambda" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v11.1.1"
 
   bucket_name        = "${local.application_name}-ftp-lambda"
   versioning_enabled = true
