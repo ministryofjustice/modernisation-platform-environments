@@ -15,11 +15,12 @@
       "tableau_blue_live": false,
       "tableau_test_active": true,
       "database_instance_class": "db.t4g.medium",
-      "rds_engine_version": "18.3",
+      "rds_engine_version": "18.4",
       "enable_datadog_agent_apm": false,
       "create_rds_sheduler": true,
       "create_svc_pilot": true,
       "disable_overnight_ecs_scheduler": false,
+      "yjsm_create_secondary_build": false,
       "ses_domain_identities": {
         "development.justice.gov.uk": {
           "identity": "development.justice.gov.uk",
@@ -53,11 +54,12 @@
       "tableau_blue_live": false,
       "tableau_test_active": true,
       "database_instance_class": "db.t4g.medium",
-      "rds_engine_version": "18.3",
+      "rds_engine_version": "18.4",
       "enable_datadog_agent_apm": false,
       "create_rds_sheduler": true,
       "create_svc_pilot": true,
       "disable_overnight_ecs_scheduler": false,
+      "yjsm_create_secondary_build": false,
       "ses_domain_identities": {
         "test.justice.gov.uk": {
           "identity": "test.justice.gov.uk",
@@ -91,11 +93,12 @@
       "tableau_blue_live": false,
       "tableau_test_active": true,
       "database_instance_class": "db.r5.xlarge",
-      "rds_engine_version": "18.3",
+      "rds_engine_version": "18.4",
       "enable_datadog_agent_apm": false,
       "create_rds_sheduler": true,
       "create_svc_pilot": true,
       "disable_overnight_ecs_scheduler": false,
+      "yjsm_create_secondary_build": false,
       "ses_domain_identities": {
         "preproduction.justice.gov.uk": {
           "identity": "preproduction.justice.gov.uk",
@@ -134,6 +137,7 @@
       "create_rds_sheduler": false,
       "create_svc_pilot": false,
       "disable_overnight_ecs_scheduler": true,
+      "yjsm_create_secondary_build": true,
       "ses_domain_identities": {
         "justice.gov.uk": {
           "identity": "justice.gov.uk",

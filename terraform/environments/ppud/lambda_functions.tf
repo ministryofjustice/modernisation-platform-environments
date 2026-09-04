@@ -115,7 +115,7 @@ locals {
     send_malware_scan_notification = {
       description  = "Function to send notification of malware scan completion on the PPUD document service."
       role_key     = "get_cloudwatch"
-      environments = ["development", "production"]
+      environments = ["development", "preproduction", "production"]
       layers       = ["numpy", "pillow", "matplotlib"]
       vpc_config   = { prod = true }
       permissions = [{
