@@ -5,7 +5,7 @@
       "storage_type": "gp2",
       "db_identifier": "tribunals-db-dev",
       "engine": "sqlserver-se",
-      "engine_version": "15.00.4470.1.v1",
+      "engine_version": "15.00.4480.2.v1",
       "instance_class": "db.m5.large",
       "username": "admin",
       "curserver": "DEVELOPMENT",
