@@ -633,6 +633,7 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/developer-experience"
+      - "terraform/environments/developer-experience/auth0-event-stream"
       - "terraform/environments/developer-experience/github-audit-log-stream"
       - "terraform/environments/developer-experience/github-management"
     schedule:
