@@ -35,19 +35,10 @@ resource "aws_eks_addon" "adot" {
 # Uses the service account bound to the AMP remote-write IAM role via Pod Identity.
 #------------------------------------------------------------------------------
 
-resource "kubernetes_namespace_v1" "adot" {
-  count = local.enable_amp_adot ? 1 : 0
-
-  metadata {
-    name = "opentelemetry-operator-system"
-    labels = {
-      "app.kubernetes.io/managed-by"       = "terraform"
-      "pod-security.kubernetes.io/enforce" = "privileged"
-    }
-  }
-
-  depends_on = [aws_eks_addon.adot]
-}
+# The opentelemetry-operator-system namespace is created and owned by the ADOT
+# EKS add-on itself, so Terraform must not manage it (doing so races the add-on
+# and fails with "namespace already exists"). The namespace is on the Gatekeeper
+# PSA-label exclusion list, so it does not need an explicit enforce label.
 
 resource "kubernetes_service_account_v1" "adot_collector" {
   count = local.enable_amp_adot ? 1 : 0
@@ -57,7 +48,7 @@ resource "kubernetes_service_account_v1" "adot_collector" {
     namespace = "opentelemetry-operator-system"
   }
 
-  depends_on = [kubernetes_namespace_v1.adot]
+  depends_on = [aws_eks_addon.adot]
 }
 
 resource "kubectl_manifest" "adot_collector" {
