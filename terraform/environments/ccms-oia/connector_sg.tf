@@ -80,14 +80,14 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_connector_ingress" {
 }
 
 # Ingress from OIA EC2 instances to ECS containers
-resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_connector_ingress_ec2" {
-  security_group_id            = aws_security_group.ecs_tasks_connector.id
-  referenced_security_group_id = aws_security_group.cluster_ec2.id
-  ip_protocol                  = "tcp"
-  from_port                    = local.application_data.accounts[local.environment].connector_server_port
-  to_port                      = local.application_data.accounts[local.environment].connector_server_port
-  description                  = "Allow EC2 access to Connector container port"
-}
+# resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_connector_ingress_ec2" {
+#   security_group_id            = aws_security_group.ecs_tasks_connector.id
+#   referenced_security_group_id = aws_security_group.cluster_ec2.id
+#   ip_protocol                  = "tcp"
+#   from_port                    = local.application_data.accounts[local.environment].connector_server_port
+#   to_port                      = local.application_data.accounts[local.environment].connector_server_port
+#   description                  = "Allow EC2 access to Connector container port"
+# }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_vpce" {
   for_each          = toset([

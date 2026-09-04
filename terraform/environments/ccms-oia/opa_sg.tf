@@ -96,14 +96,14 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opa_ingress" {
   description                  = "Allow ALB to reach ECS app port"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opa_ingress_cluster_ec2" {
-  security_group_id            = aws_security_group.ecs_tasks_opa.id
-  referenced_security_group_id = aws_security_group.cluster_ec2.id
-  ip_protocol                  = "tcp"
-  from_port                    = local.application_data.accounts[local.environment].opa_server_port
-  to_port                      = local.application_data.accounts[local.environment].opa_server_port
-  description                  = "Allow ECS cluster EC2 instances to reach OPA container port"
-}
+# resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_opa_ingress_cluster_ec2" {
+#   security_group_id            = aws_security_group.ecs_tasks_opa.id
+#   referenced_security_group_id = aws_security_group.cluster_ec2.id
+#   ip_protocol                  = "tcp"
+#   from_port                    = local.application_data.accounts[local.environment].opa_server_port
+#   to_port                      = local.application_data.accounts[local.environment].opa_server_port
+#   description                  = "Allow ECS cluster EC2 instances to reach OPA container port"
+# }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_opa_egress_vpce" {
   for_each          = toset([
