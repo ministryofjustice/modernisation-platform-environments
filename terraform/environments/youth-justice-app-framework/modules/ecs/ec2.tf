@@ -12,7 +12,7 @@ data "aws_ssm_parameter" "ecs_optimized_ami" {
 module "key_pair" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/key-pair/aws"
-  version = "2.0.3"
+  version = "3.0.1"
 
   key_name           = "${var.cluster_name}-ecs-ec2-keypair"
   create_private_key = true
@@ -71,7 +71,7 @@ resource "aws_iam_policy" "ecs-fetch-secrets-policy" {
 module "autoscaling" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/autoscaling/aws"
-  version = "7.6.1"
+  version = "9.3.1"
 
   # Autoscaling group settings
   name                        = "${var.cluster_name}-ecs-instances"
@@ -172,7 +172,7 @@ resource "aws_autoscaling_lifecycle_hook" "ecs_draining" {
 module "autoscaling_sg" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.1.2"
+  version = "6.0.0"
 
   name        = "${var.cluster_name}-ecs-autoscaling-group"
   description = "Autoscaling group security group"
