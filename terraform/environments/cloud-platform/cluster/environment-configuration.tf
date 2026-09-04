@@ -488,7 +488,9 @@ locals {
       eks_cluster_version = "1.35"
 
       /* ArgoCD — spokes registered with the live hub */
-      argocd_registered_spokes = []
+      argocd_registered_spokes = [
+        "container-platform-octo-live",
+      ]
 
       /* ArgoCD — additional RBAC role mappings for this tier (beyond the
          always-present ADMIN mapping added in locals.tf). Keys: EDITOR, VIEWER
