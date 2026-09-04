@@ -489,6 +489,7 @@ locals {
 
       /* ArgoCD — spokes registered with the live hub */
       argocd_registered_spokes = [
+        # Registers octo-live as a live spoke.
         "container-platform-octo-live",
       ]
 
