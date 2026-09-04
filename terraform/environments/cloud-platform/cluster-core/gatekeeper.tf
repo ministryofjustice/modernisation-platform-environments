@@ -8,7 +8,11 @@ module "gatekeeper" {
     user_ns_requires_psa_label         = false,
     lock_priv_capabilities             = false,
     warn_kubectl_create_sa             = false,
-    block_host_network                 = false,
+    # TEMPORARY (observability PoC, issue 8414): dryrun instead of deny so the
+    # amazon-cloudwatch-observability add-on's cloudwatch-agent DaemonSet
+    # (hostNetwork: true) can schedule. Revert to false once the gatekeeper
+    # module exempts amazon-cloudwatch from the disallow-host-network constraint.
+    block_host_network = true,
   }
 
   constraint_violations_max_to_display = 25
