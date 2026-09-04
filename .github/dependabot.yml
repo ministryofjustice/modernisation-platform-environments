@@ -237,6 +237,18 @@ updates:
       default-days: 7
   - package-ecosystem: "terraform"
     directories:
+      - "terraform/environments/ccms-upg"
+    schedule:
+      interval: "daily"
+    groups:
+      ccms-upg:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
       - "terraform/environments/cdpt-chaps"
     schedule:
       interval: "daily"
