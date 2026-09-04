@@ -40,6 +40,3 @@ data "aws_eks_cluster" "cluster" {
 data "aws_eks_cluster_auth" "cluster" {
   name = local.cluster_name
 }
-
-# Identity Store instance for AMG SSO integration
-data "aws_ssoadmin_instances" "this" {}

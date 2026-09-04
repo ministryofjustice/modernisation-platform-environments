@@ -139,25 +139,21 @@ resource "aws_grafana_workspace" "this" {
 # AMG workspace role association — platform engineers get ADMIN
 #------------------------------------------------------------------------------
 
-# Look up the platform-engineer-admin SSO group in Identity Store
-data "aws_identitystore_group" "platform_engineers" {
-  count = local.enable_amg ? 1 : 0
-
-  identity_store_id = tolist(data.aws_ssoadmin_instances.this.identity_store_ids)[0]
-
-  alternate_identifier {
-    unique_attribute {
-      attribute_path  = "DisplayName"
-      attribute_value = "platform-engineer-admin"
-    }
-  }
+# The cloud-platform-engineers IDC group ID is hardcoded because the
+# ModernisationPlatformSSOReadOnly role returns ResourceNotFoundException when
+# calling GetGroupId despite having identitystore:Get*. This mirrors the same
+# workaround used for ArgoCD RBAC in cluster/locals.tf.
+# TODO: switch back to a data.aws_identitystore_group lookup once the read role
+# permissions are fixed.
+locals {
+  cloud_platform_engineers_group_id = "664252b4-7021-701e-49b9-6c46ccc7899e"
 }
 
 resource "aws_grafana_role_association" "platform_admin" {
   count = local.enable_amg ? 1 : 0
 
   role         = "ADMIN"
-  group_ids    = [data.aws_identitystore_group.platform_engineers[0].group_id]
+  group_ids    = [local.cloud_platform_engineers_group_id]
   workspace_id = aws_grafana_workspace.this[0].id
 }
 
