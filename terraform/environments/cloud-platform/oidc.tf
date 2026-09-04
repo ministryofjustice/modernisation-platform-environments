@@ -155,6 +155,43 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
   }
 
   statement {
+    sid    = "ObservabilityAMPAndAMG"
+    effect = "Allow"
+    actions = [
+      # Amazon Managed Prometheus (AMP) workspace lifecycle for the metrics PoC
+      "aps:CreateWorkspace",
+      "aps:DeleteWorkspace",
+      "aps:DescribeWorkspace",
+      "aps:ListWorkspaces",
+      "aps:UpdateWorkspaceAlias",
+      "aps:DescribeLoggingConfiguration",
+      "aps:CreateLoggingConfiguration",
+      "aps:UpdateLoggingConfiguration",
+      "aps:DeleteLoggingConfiguration",
+      "aps:TagResource",
+      "aps:UntagResource",
+      "aps:ListTagsForResource",
+      # Amazon Managed Grafana (AMG) workspace lifecycle for the metrics PoC
+      "grafana:CreateWorkspace",
+      "grafana:DeleteWorkspace",
+      "grafana:DescribeWorkspace",
+      "grafana:DescribeWorkspaceAuthentication",
+      "grafana:DescribeWorkspaceConfiguration",
+      "grafana:ListWorkspaces",
+      "grafana:UpdateWorkspace",
+      "grafana:UpdateWorkspaceAuthentication",
+      "grafana:UpdateWorkspaceConfiguration",
+      "grafana:UpdatePermissions",
+      "grafana:ListPermissions",
+      "grafana:AssociateLicense",
+      "grafana:TagResource",
+      "grafana:UntagResource",
+      "grafana:ListTagsForResource"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
     sid    = "SupportingReadOnly"
     effect = "Allow"
     actions = [
