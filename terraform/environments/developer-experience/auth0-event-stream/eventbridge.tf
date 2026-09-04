@@ -32,6 +32,8 @@ resource "aws_cloudwatch_event_rule" "source" {
     source      = [data.aws_cloudwatch_event_source.this[0].name]
     detail-type = ["Auth0 log"]
   })
+
+  depends_on = [module.source_eventbridge]
 }
 
 resource "aws_cloudwatch_event_target" "cross_region" {
@@ -69,8 +71,9 @@ module "destination_eventbridge" {
   targets = {
     auth0_logs = [
       {
-        name = "auth0-log-archive"
-        arn  = aws_kinesis_firehose_delivery_stream.this[0].arn
+        name            = "auth0-log-archive"
+        arn             = aws_kinesis_firehose_delivery_stream.this[0].arn
+        attach_role_arn = true
       }
     ]
   }
