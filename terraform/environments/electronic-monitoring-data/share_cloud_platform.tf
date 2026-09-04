@@ -40,6 +40,8 @@ locals {
     "visit_details"
   ]
 
+  emd_api_role = []
+
   table_filters = merge(
     {
       for table in local.tables_to_share : table => "specials_flag=0"
@@ -957,4 +959,53 @@ resource "aws_iam_role_policy_attachment" "standard_athena_access_ac" {
 resource "aws_iam_role_policy_attachment" "ac_specific_access" {
   policy_arn = aws_iam_policy.emac_di_permissions.arn
   role       = module.acquisitive_crime_assumable_role.iam_role_name
+}
+
+module "data_api_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.48.0"
+
+  trusted_role_arns = flatten([
+    data.aws_iam_roles.mod_plat_roles.arns,
+    local.emd_api_role,
+  ])
+
+  create_role       = true
+  role_requires_mfa = false
+
+  role_name = "em_read_emds_data_${local.environment_shorthand}"
+
+  tags = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "standard_athena_access_api" {
+  policy_arn = aws_iam_policy.standard_athena_access.arn
+  role       = module.data_api_role.iam_role_name
+}
+
+resource "aws_lakeformation_permissions" "em_api_db" {
+  principal   = module.data_api_role.iam_role_arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = "data_insights${local.dbt_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "em_api_tables" {
+  principal   = module.data_api_role.iam_role_arn
+  permissions = ["SELECT", "DESCRIBE"]
+  table {
+    database_name = "data_insights${local.dbt_suffix}"
+    wildcard      = true
+  }
+}
+
+resource "aws_lakeformation_permissions" "em_data_api_s3" {
+  principal   = module.data_api_role.iam_role_arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+  data_location {
+    arn = module.s3-create-a-derived-table-bucket.bucket.arn
+  }
 }
