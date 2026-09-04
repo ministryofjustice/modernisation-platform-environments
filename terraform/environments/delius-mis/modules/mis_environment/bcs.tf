@@ -88,7 +88,7 @@ resource "aws_vpc_security_group_ingress_rule" "bcs_win_ec2" {
 }
 
 module "bcs_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.2.2"
 
   count = var.bcs_config.instance_count
 
@@ -153,7 +153,7 @@ module "bcs_instance" {
 }
 
 module "bcs_win_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.2.2"
 
   count = var.bcs_config_win != null ? var.bcs_config_win.instance_count : 0
 

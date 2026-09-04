@@ -65,7 +65,7 @@ resource "aws_vpc_security_group_egress_rule" "dfi_ec2_to_dc" {
 }
 
 module "dfi_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.2.2"
 
   # allow environment not to have this var set and still work
   count = var.dfi_config != null ? var.dfi_config.instance_count : 0
