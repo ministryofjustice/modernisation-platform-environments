@@ -10,11 +10,11 @@ terraform {
     }
     external = {
       source  = "hashicorp/external"
-      version = "~> 2.3.0" # Use the latest version or specify your desired version
+      version = "~> 2.4.1" # Use the latest version or specify your desired version
     }
     cloudinit = {
       source  = "hashicorp/cloudinit"
-      version = "~> 2.3.0" # Use the latest version or specify your desired version
+      version = "~> 2.4.0" # Use the latest version or specify your desired version
     }
     random = {
       source  = "hashicorp/random"
