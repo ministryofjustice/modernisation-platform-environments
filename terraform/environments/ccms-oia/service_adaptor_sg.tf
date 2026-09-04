@@ -73,14 +73,14 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_adaptor_ingress" {
 }
 
 # Ingress from ECS cluster EC2 instances to adaptor container port
-resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_adaptor_ingress_cluster_ec2" {
-  security_group_id            = aws_security_group.ecs_tasks_adaptor.id
-  referenced_security_group_id = aws_security_group.cluster_ec2.id
-  ip_protocol                  = "tcp"
-  from_port                    = local.application_data.accounts[local.environment].adaptor_server_port
-  to_port                      = local.application_data.accounts[local.environment].adaptor_server_port
-  description                  = "Allow ECS cluster EC2 instances to reach adaptor container port"
-}
+# resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_adaptor_ingress_cluster_ec2" {
+#   security_group_id            = aws_security_group.ecs_tasks_adaptor.id
+#   referenced_security_group_id = aws_security_group.cluster_ec2.id
+#   ip_protocol                  = "tcp"
+#   from_port                    = local.application_data.accounts[local.environment].adaptor_server_port
+#   to_port                      = local.application_data.accounts[local.environment].adaptor_server_port
+#   description                  = "Allow ECS cluster EC2 instances to reach adaptor container port"
+# }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_adaptor_egress_vpce" {
   for_each          = toset([
