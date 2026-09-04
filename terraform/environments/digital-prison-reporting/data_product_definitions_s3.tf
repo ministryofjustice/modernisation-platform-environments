@@ -34,7 +34,7 @@ module "s3_data_product_definitions_bucket" {
     }
   )
 }
-# Since July 2026 GitHub has enforced immutable OIDC subject claims which contain the owner and repository IDs for newly created repositories.
+# Since July 2026 GitHub has enforced immutable OIDC subject claims, which contain the owner and repository IDs, for all newly created repositories.
 # https://docs.github.com/en/actions/reference/security/oidc#immutable-subject-claims
 # CKV_AWS_358 does not recognise the new OWNER@OWNER-ID/REPO@REPO-ID format.
 data "aws_iam_policy_document" "dpd_s3_publisher_assume_role_policy" {
