@@ -3,16 +3,17 @@
 ##################################################################################################################
 
 resource "aws_iam_policy" "rds_s3_access_policy" {
-  count = local.enable_ecp_replication ? 1 : 0
+  count = local.enable_rds_s3_access ? 1 : 0
 
   name        = "${local.application_name}-rds-s3-access-policy"
-  description = "Policy to allow RDS access to S3 buckets for Data Pump imports"
+  description = "Policy to allow RDS access to S3 buckets for Data Pump imports/exports"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
         Effect = "Allow"
         Action = [
+          "s3:PutObject",
           "s3:GetObject",
           "s3:ListBucket"
         ]
@@ -27,7 +28,7 @@ resource "aws_iam_policy" "rds_s3_access_policy" {
 }
 
 resource "aws_iam_role" "rds_s3_access_role" {
-  count = local.enable_ecp_replication ? 1 : 0
+  count = local.enable_rds_s3_access ? 1 : 0
 
   name = "${local.application_name}-rds-s3-access-role"
   assume_role_policy = jsonencode({
@@ -45,7 +46,7 @@ resource "aws_iam_role" "rds_s3_access_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "rds_s3_access_attachment" {
-  count = local.enable_ecp_replication ? 1 : 0
+  count = local.enable_rds_s3_access ? 1 : 0
 
   role       = aws_iam_role.rds_s3_access_role[0].name
   policy_arn = aws_iam_policy.rds_s3_access_policy[0].arn
