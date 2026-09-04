@@ -443,7 +443,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_instances.web_12.user_data_cloud_init, {
           args = merge(local.ec2_instances.web_12.user_data_cloud_init.args, {
-            branch = "platops-27"
+            branch = "main"
           })
         })
         tags = merge(local.ec2_instances.web_12.tags, {
