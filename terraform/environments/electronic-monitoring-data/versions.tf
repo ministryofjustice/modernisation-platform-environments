@@ -10,11 +10,11 @@ terraform {
     }
     null = {
       source  = "hashicorp/null"
-      version = "3.2.2"
+      version = "3.3.1"
     }
     tls = {
       source  = "hashicorp/tls"
-      version = "4.0.5"
+      version = "4.3.0"
     }
     archive = {
       source  = "hashicorp/archive"
