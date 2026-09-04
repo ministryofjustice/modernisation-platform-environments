@@ -2,7 +2,7 @@
 
 module "secret_cloud_platform_account_id" {
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.1.0"
 
   name        = "cloud-platform-account-id"
   description = "The AWS Account ID for the Cloud Platform environment corresponding to this environment. Populate manually."
