@@ -102,28 +102,15 @@ jobs:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
-  cluster-observability-terraform:
+  cluster-components-terraform:
     needs: cluster-core-terraform
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: ${{ inputs.application }}
       environment: ${{ inputs.environment }}
       action: ${{ inputs.action }}
-      component: "cluster-observability"
-      plan_apply_tfargs: ${{ inputs.observability_tfargs }}
-      account_name: ${{ inputs.account_name }}
-    secrets:
-      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
-      PASSPHRASE: ${{ secrets.PASSPHRASE }}
-
-  cluster-components-terraform:
-    needs: cluster-observability-terraform
-    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
-    with:
-      application: ${{ inputs.application }}
-      environment: ${{ inputs.environment }}
-      action: ${{ inputs.action }}
       component: "cluster-components"
+      plan_apply_tfargs: ${{ inputs.observability_tfargs }}
       account_name: ${{ inputs.account_name }}
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}

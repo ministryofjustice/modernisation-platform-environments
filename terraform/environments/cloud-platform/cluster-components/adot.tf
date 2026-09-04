@@ -35,7 +35,7 @@ resource "aws_eks_addon" "adot" {
 # Uses the service account bound to the AMP remote-write IAM role via Pod Identity.
 #------------------------------------------------------------------------------
 
-resource "kubernetes_namespace" "adot" {
+resource "kubernetes_namespace_v1" "adot" {
   count = local.enable_amp_adot ? 1 : 0
 
   metadata {
@@ -49,7 +49,7 @@ resource "kubernetes_namespace" "adot" {
   depends_on = [aws_eks_addon.adot]
 }
 
-resource "kubernetes_service_account" "adot_collector" {
+resource "kubernetes_service_account_v1" "adot_collector" {
   count = local.enable_amp_adot ? 1 : 0
 
   metadata {
@@ -57,7 +57,7 @@ resource "kubernetes_service_account" "adot_collector" {
     namespace = "opentelemetry-operator-system"
   }
 
-  depends_on = [kubernetes_namespace.adot]
+  depends_on = [kubernetes_namespace_v1.adot]
 }
 
 resource "kubectl_manifest" "adot_collector" {
@@ -210,7 +210,7 @@ resource "kubectl_manifest" "adot_collector" {
         }
         extensions = {
           sigv4auth = {
-            region  = data.aws_region.current.name
+            region  = data.aws_region.current.region
             service = "aps"
           }
         }
@@ -230,7 +230,7 @@ resource "kubectl_manifest" "adot_collector" {
 
   depends_on = [
     aws_eks_addon.adot,
-    kubernetes_service_account.adot_collector,
+    kubernetes_service_account_v1.adot_collector,
     aws_eks_pod_identity_association.adot_amp
   ]
 }
