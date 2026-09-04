@@ -3,10 +3,12 @@ locals {
   dpd_publishing_teams = {
     activities = {
       github_repo = "hmpps-dpr-activities-dpds"
+      github_repo_id = "1277088899"
       s3_prefix   = "activities"
     }
     "incident-reporting" = {
       github_repo = "hmpps-dpr-incident-reporting-dpds"
+      github_repo_id = "1353761083"
       s3_prefix   = "incident-reporting"
     }
   }
@@ -48,9 +50,9 @@ data "aws_iam_policy_document" "dpd_s3_publisher_assume_role_policy" {
     }
 
     condition {
-      test = "StringLike"
+      test = "StringEquals"
       values = [
-        "repo:ministryofjustice/${each.value.github_repo}:environment:${local.env}"
+        "repo:ministryofjustice@2203574/${each.value.github_repo}@${each.value.github_repo_id}:environment:${local.env}"
       ]
       variable = "token.actions.githubusercontent.com:sub"
     }
