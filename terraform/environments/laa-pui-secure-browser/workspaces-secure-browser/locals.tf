@@ -45,11 +45,13 @@ locals {
   # Environment-specific application URLs
   pui_url = (
     local.environment == "production" ? "ccms-pui.laa.service.justice.gov.uk" :
+    local.environment == "preproduction" ? "ccms-pui.laa-preproduction.modernisation-platform.service.justice.gov.uk" :
     local.environment == "test" ? "ccms-pui.laa-test.modernisation-platform.service.justice.gov.uk" :
     "ccms-pui.laa-development.modernisation-platform.service.justice.gov.uk"
   )
   oia_url = (
     local.environment == "production" ? "ccms-opa.laa.service.justice.gov.uk" :
+    local.environment == "preproduction" ? "ccms-opa.laa-preproduction.modernisation-platform.service.justice.gov.uk" :
     local.environment == "test" ? "ccms-opa.laa-test.modernisation-platform.service.justice.gov.uk" :
     "ccms-opa.laa-development.modernisation-platform.service.justice.gov.uk"
   )
