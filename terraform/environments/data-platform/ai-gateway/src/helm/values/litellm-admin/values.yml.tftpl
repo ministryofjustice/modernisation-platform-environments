@@ -77,11 +77,6 @@ proxy_config:
     service_callback: ["prometheus_system"]
     default_internal_user_params:
       user_role: proxy_admin
-    cache_params:
-      type: redis
-      host: os.environ/primary_endpoint_address
-      port: 6379
-      password: os.environ/auth_token
   router_settings:
     routing_strategy: simple-shuffle
     redis_host: os.environ/primary_endpoint_address

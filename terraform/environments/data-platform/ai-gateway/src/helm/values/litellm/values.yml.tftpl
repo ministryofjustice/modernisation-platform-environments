@@ -67,11 +67,6 @@ proxy_config:
     request_timeout: 600
     json_logs: true
     cache: false
-    cache_params:
-      type: redis
-      host: os.environ/primary_endpoint_address
-      port: 6379
-      password: os.environ/auth_token
     require_auth_for_metrics_endpoint: false
     callbacks: ["prometheus"]
     success_callback: ["prometheus"]
