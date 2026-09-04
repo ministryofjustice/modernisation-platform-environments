@@ -153,6 +153,12 @@ jobs:
             exit 1
           fi
 
+          recorder_name=$(jq -r '.name' <<< "$recorder")
+          recording_before=$(aws configservice describe-configuration-recorder-status \
+            --configuration-recorder-names "$recorder_name" \
+            --query 'ConfigurationRecordersStatus[0].recording' \
+            --output text)
+
           set +e
           deny_output=$(aws configservice put-configuration-recorder \
             --configuration-recorder "$recorder" 2>&1)
@@ -169,11 +175,12 @@ jobs:
             exit 1
           fi
 
-          recording=$(aws configservice describe-configuration-recorder-status \
-            --query 'ConfigurationRecorders[0].recording' \
+          recording_after=$(aws configservice describe-configuration-recorder-status \
+            --configuration-recorder-names "$recorder_name" \
+            --query 'ConfigurationRecordersStatus[0].recording' \
             --output text)
-          if [[ "$recording" != "True" ]]; then
-            echo "AWS Config recorder is not recording after the test."
+          if [[ "$recording_after" != "$recording_before" ]]; then
+            echo "AWS Config recorder state changed during the test."
             exit 1
           fi
 
@@ -183,6 +190,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
+          recording_before=$(aws configservice describe-configuration-recorder-status \
+            --query 'ConfigurationRecordersStatus[0].recording' \
+            --output text)
 
           for operation in stop-configuration-recorder delete-configuration-recorder; do
             set +e
@@ -202,11 +213,11 @@ jobs:
             fi
           done
 
-          recording=$(aws configservice describe-configuration-recorder-status \
-            --query 'ConfigurationRecorders[0].recording' \
+          recording_after=$(aws configservice describe-configuration-recorder-status \
+            --query 'ConfigurationRecordersStatus[0].recording' \
             --output text)
-          if [[ "$recording" != "True" ]]; then
-            echo "AWS Config recorder is not recording after the tests."
+          if [[ "$recording_after" != "$recording_before" ]]; then
+            echo "AWS Config recorder state changed during the tests."
             exit 1
           fi
 
