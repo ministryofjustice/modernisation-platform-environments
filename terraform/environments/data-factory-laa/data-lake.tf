@@ -14,9 +14,10 @@ locals {
     }
     test = {
       lakeformation_admins = [
-        "arn:aws:iam::766696030771:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-developer_f6defe724ee76f07",
+        "arn:aws:iam::766696030771:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_9e1f6f5fda83364d",
         "arn:aws:iam::766696030771:role/MemberInfrastructureAccess",
-        "arn:aws:iam::766696030771:role/github-actions-apply"
+        "arn:aws:iam::766696030771:role/github-actions-apply",
+        aws_iam_role.file_uploads_role.arn
       ]
       lakeformation_read_only_admins = [
         "arn:aws:iam::766696030771:role/github-actions-plan"
@@ -71,6 +72,27 @@ data "aws_iam_policy_document" "data_lake_kms_key" {
 
     resources = ["*"]
   }
+
+  # Allow developers to use the key for encrypting and decrypting data in the data lake.
+  statement {
+    sid    = "AllowDevelopersToUseKey"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = local.environments[local.environment].lakeformation_admins
+    }
+
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+    ]
+
+    resources = ["*"]
+  }
 }
 
 resource "aws_kms_key" "data_lake_kms_key" {
@@ -101,7 +123,48 @@ module "data_lake_buckets" {
     aws.bucket-replication = aws
   }
 
+  # Attach policy to query results bucket to allow Athena to write query results to it
+  bucket_policy_v2 = each.key == "aws-athena-query-results" ? [
+    {
+      effect = "Allow"
+
+      actions = [
+        "s3:GetBucketLocation",
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:AbortMultipartUpload",
+        "s3:ListMultipartUploadParts",
+      ]
+
+      principals = {
+        type = "AWS"
+        identifiers = [
+          "arn:aws:iam::766696030771:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_9e1f6f5fda83364d"
+        ]
+      }
+    }
+  ] : []
+
   tags = local.tags
+}
+
+resource "aws_athena_workgroup" "laa" {
+  name = "laa"
+
+  configuration {
+    enforce_workgroup_configuration    = true
+    publish_cloudwatch_metrics_enabled = true
+
+    result_configuration {
+      output_location = "s3://${module.data_lake_buckets["aws-athena-query-results"].bucket.id}/athena-results/"
+
+      encryption_configuration {
+        encryption_option = "SSE_KMS"
+        kms_key_arn       = aws_kms_key.data_lake_kms_key.arn
+      }
+    }
+  }
 }
 
 module "databases" {
