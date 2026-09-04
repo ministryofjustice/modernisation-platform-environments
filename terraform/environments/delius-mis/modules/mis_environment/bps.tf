@@ -58,7 +58,7 @@ resource "aws_vpc_security_group_egress_rule" "bps_ec2" {
 }
 
 module "bps_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.2.2"
 
   count = var.bps_config.instance_count
 
