@@ -41,6 +41,8 @@ resource "aws_cloudwatch_event_target" "cross_region" {
 
   provider = aws.us-east-1
 
+  depends_on = [module.destination_eventbridge]
+
   rule           = aws_cloudwatch_event_rule.source[0].name
   event_bus_name = data.aws_cloudwatch_event_source.this[0].name
   arn            = module.destination_eventbridge[0].eventbridge_bus_arn
@@ -54,6 +56,13 @@ module "destination_eventbridge" {
 
   bus_name           = local.component_name
   kms_key_identifier = module.destination_kms_key[0].key_arn
+
+  create_permissions = true
+  permissions = {
+    "${data.aws_caller_identity.current.account_id} CrossRegionPutEvents" = {
+      action = "events:PutEvents"
+    }
+  }
 
   attach_kinesis_firehose_policy = true
   kinesis_firehose_target_arns   = [aws_kinesis_firehose_delivery_stream.this[0].arn]
