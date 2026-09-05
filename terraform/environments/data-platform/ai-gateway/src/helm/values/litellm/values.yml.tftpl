@@ -61,6 +61,7 @@ proxy_config:
     ui_access_mode: "admin_only"
     proxy_batch_write_at: 60
     database_connection_pool_limit: 10
+    allow_requests_on_db_unavailable: true
   litellm_settings:
     drop_params: true
     enable_azure_ad_token_refresh: true
