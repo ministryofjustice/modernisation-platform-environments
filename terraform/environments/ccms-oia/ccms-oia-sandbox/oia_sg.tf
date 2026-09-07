@@ -160,14 +160,14 @@ resource "aws_vpc_security_group_egress_rule" "second_cluster_ec2_egress_vpce" {
   cidr_ipv4         = each.value
 }
 
-resource "aws_vpc_security_group_egress_rule" "second_cluster_ec2_egress_s3" {
-  security_group_id = aws_security_group.second_cluster_ec2.id
-  description       = "Allow S3 access via gateway endpoint (prefix list)"
-  ip_protocol       = "tcp"
-  from_port         = 443
-  to_port           = 443
-  prefix_list_id    = data.aws_prefix_list.s3.id
-}
+# resource "aws_vpc_security_group_egress_rule" "second_cluster_ec2_egress_s3" {
+#   security_group_id = aws_security_group.second_cluster_ec2.id
+#   description       = "Allow S3 access via gateway endpoint (prefix list)"
+#   ip_protocol       = "tcp"
+#   from_port         = 443
+#   to_port           = 443
+#   prefix_list_id    = data.aws_prefix_list.s3.id
+# }
 
 # resource "aws_vpc_security_group_egress_rule" "second_cluster_ec2_egress_443" {
 #   for_each          = toset([
