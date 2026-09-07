@@ -12,7 +12,7 @@ locals {
     }
 
     secretsmanager_secrets = {
-      "/london-unpaid-work-dev/london-unpaid-work/test" = local.secretsmanager_secrets.london_unpaid_work_admin_credentials
+      "/london-unpaid-work-dev/london-unpaid-work/test" = merge(local.secretsmanager_secrets.london_unpaid_work_admin_credentials, local.secretsmanager_secrets.london_unpaid_work_test_credentials)
     }
 
     security_groups = local.security_groups
