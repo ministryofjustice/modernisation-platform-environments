@@ -120,10 +120,7 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
 
     actions = ["secretsmanager:GetSecretValue"]
 
-    resources = [
-      "arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:llm_gateway_key-USBFqg",
-      "arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:llm_gateway_key-1biv4G"
-    ]
+    resources = [aws_secretsmanager_secret.llm_gateway_key.arn]
   }
 
   statement {
@@ -138,9 +135,7 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
       "kms:Describe*"
     ]
 
-    resources = [
-      "arn:aws:kms:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:key/ef7e1dc9-dc2b-4733-9278-46885b7040c7"
-    ]
+    resources = [local.coat_kms_key_id]
   }
 }
 
@@ -211,8 +206,8 @@ moved {
 # Secrets
 
 resource "aws_secretsmanager_secret" "llm_gateway_key" {
-  #checkov:skip=CKV_AWS_149:To be reviewed later
-  #checkov:skip=CKV2_AWS_57:To be reviewed later
+  #checkov:skip=CKV2_AWS_57:API key is managed externally by the LLM gateway; AWS automatic rotation is not supported
 
-  name = "llm_gateway_key"
+  name       = "llm_gateway_key"
+  kms_key_id = local.coat_kms_key_id
 }

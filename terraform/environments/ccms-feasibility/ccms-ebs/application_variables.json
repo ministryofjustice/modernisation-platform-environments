@@ -2,9 +2,9 @@
   "accounts": {
     "development": {
       "key_name": "",
-      "ec2_instance_type_ebsdb": "r5.2xlarge",
+      "ec2_instance_type_ebsdb": "m5d.4xlarge",
       "ebsdb_ami_id": "ami-01321d07947791ee8",
-      "ec2_instance_type_ebsapps": "r5.2xlarge",
+      "ec2_instance_type_ebsapps": "m5d.2xlarge",
       "ebsapps_ami_ids": ["ami-0932e4d9484436e47", "ami-011e346b2cd58cdc8"],
       "tg_apps_port": 8000,
       "ebs_size_ebsdb_swap": 20,
@@ -46,7 +46,8 @@
       "lz_aws_workspace_nonprod_prod": "10.200.0.0/19",
       "mojo_devices": "10.184.0.0/14",
       "dom1_devices": "10.172.68.144/29",
-      "moj_wifi": "10.148.0.0/14"
+      "moj_wifi": "10.148.0.0/14",
+      "cloud_platform_subnet": "172.20.0.0/16"
     }
   }
 }

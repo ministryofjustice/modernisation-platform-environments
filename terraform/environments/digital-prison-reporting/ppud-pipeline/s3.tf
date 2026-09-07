@@ -39,7 +39,7 @@ data "aws_iam_policy_document" "ppud_replication_destination_bucket_policy" {
 
 # S3 destination bucket for .bak file replication from ppud AWS account
 module "ppud_replication_destination" {
-  count         = local.is-test ? 0 : 1
+  count = local.is-test ? 0 : 1
 
   # v11.1.0
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=66bd5c6aa0d0396442f0d4a63642029ff38d2a8a"
