@@ -72,6 +72,15 @@ locals {
         "invoke_ses"
       ]
     }
+    start_stop_ec2_instances = {
+      description = "Lambda Function Role for starting and stopping an EC2 instance"
+      policies = [
+        "send_message_to_sqs",
+        "sns_publish",
+        "send_logs_to_cloudwatch",
+        "start_stop_ec2_instances"
+      ]
+    }
     ssm_patch_notification = {
       description = "Lambda Function Role for sending SSM patch notifications via SES"
       policies = [
@@ -286,6 +295,7 @@ locals {
           "send_logs_to_cloudwatch",
           "get_cloudwatch_metrics",
           "invoke_ses",
+          "start_stop_ec2_instances",
           "ssm_patch_notification",
           "publish_to_sns",
           "get_command_invocation",
@@ -352,6 +362,10 @@ resource "aws_iam_policy" "lambda_policies_v2" {
         Effect   = "Allow"
         Action   = ["ses:*"]
         Resource = ["arn:aws:ses:eu-west-2:${local.environment_management.account_ids[each.value.env_config.account_key]}:*"]
+        } : each.value.policy_name == "start_stop_ec2_instances" ? {
+        Effect   = "Allow"
+        Action   = ["ec2:DescribeInstances","ec2:StartInstances","ec2:StopInstances"]
+        Resource = ["*"]
         } : each.value.policy_name == "ssm_patch_notification" ? {
         Effect   = "Allow"
         Action   = ["ssm:DescribeMaintenanceWindows", "ssm:DescribeMaintenanceWindowExecutions", "ssm:DescribeMaintenanceWindowExecutionTasks"]

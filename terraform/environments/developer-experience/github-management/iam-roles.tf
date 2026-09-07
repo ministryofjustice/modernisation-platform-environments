@@ -1,7 +1,7 @@
 module "iam_role" {
   count = local.is-production ? 1 : 0
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=d6e381ccfa95b944149c8b14ba4087e517c57ac7" # v6.8.0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=ba3fd6ded6911e0454092147fe3704171cc05e00" # v6.8.1
 
   name            = local.component_name
   use_name_prefix = false

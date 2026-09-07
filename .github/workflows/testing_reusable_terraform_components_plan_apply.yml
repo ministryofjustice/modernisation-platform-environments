@@ -105,7 +105,7 @@ jobs:
           echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c  # v6.2.3
+        uses: aws-actions/configure-aws-credentials@cbe3b392738ccf3f987d68400dafcf4b0624a56c  # v6.2.4
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions-environments-read-only"
           role-session-name: githubactionsrolesession
@@ -317,7 +317,7 @@ jobs:
           echo "Role to be used: ${{ env.OIDC_ROLE_NAME }}"
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c  # v6.2.3
+        uses: aws-actions/configure-aws-credentials@cbe3b392738ccf3f987d68400dafcf4b0624a56c  # v6.2.4
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/${{ env.OIDC_ROLE_NAME }}"
           role-session-name: githubactionsrolesession

@@ -6,6 +6,7 @@ module "oracle_ebs_db" {
   instance_profile_name = aws_iam_instance_profile.ebsdb.name
 
   instance_type      = local.application_data.accounts[local.environment].ec2_instance_type_ebsdb
+  ebs_optimized      = true
   ami_id             = local.application_data.accounts[local.environment].ebsdb_ami_id
   key_name           = local.application_data.accounts[local.environment].key_name
   subnet_id          = data.aws_subnet.data_subnets_a.id

@@ -40,7 +40,7 @@ locals {
 
       # Alert routing by account: enabled groups, scoped namespaces, and overrides.
       alerts_configured_accounts = [
-        { name = "data-platform-development", enabled_groups = ["AI Gateway", "Bedrock","Azure AI Foundry","Vertex AI"], namespaces = ["ai-gateway"] },
+        { name = "data-platform-development", enabled_groups = ["AI Gateway", "Bedrock", "Azure AI Foundry", "Vertex AI"], namespaces = ["ai-gateway"] },
         { name = "data-platform-test", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] },
         { name = "data-platform-preproduction", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] }
       ]
@@ -91,7 +91,15 @@ locals {
         { name = "data-platform-development", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] },
         { name = "data-platform-test", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] },
         { name = "data-platform-preproduction", enabled_groups = ["AI Gateway", "Bedrock"], namespaces = ["ai-gateway"] },
-        { name = "data-platform-production", enabled_groups = ["AI Gateway", "Bedrock", "Vertex AI"], namespaces = ["ai-gateway"] }
+        { name           = "data-platform-production",
+          enabled_groups = ["AI Gateway", "Bedrock", "Vertex AI"],
+          namespaces     = ["ai-gateway"]
+          threshold_overrides = {
+            vertex_latency_p99_warn                   = 4000
+            litellm_deployment_latency_per_token_warn = 1.5
+            litellm_deployment_latency_per_token_crit = 2.5
+          }
+        }
       ]
     }
   }

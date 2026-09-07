@@ -73,7 +73,7 @@ module "lambda_custom_idp" {
   attach_tracing_policy = true
 
   cloudwatch_logs_kms_key_id        = module.kms_cloudwatch_logs.key_arn
-  cloudwatch_logs_retention_in_days = 30
+  cloudwatch_logs_retention_in_days = local.cloudwatch_retention_days
 
   tags = local.tags
 }

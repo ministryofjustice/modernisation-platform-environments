@@ -52,3 +52,21 @@ resource "aws_secretsmanager_secret" "dis_passwords" {
 
   tags = local.tags
 }
+
+resource "aws_secretsmanager_secret" "sharepoint_appregistration" {
+  name = "${var.app_name}-${var.env_name}-sharepoint-app-registration"
+
+  description = "Credentials for AppRegistration used for sharepoint uploads"
+  kms_key_id  = var.account_config.kms_keys["general_shared"]
+
+  tags = local.tags
+}
+
+resource "aws_secretsmanager_secret" "sharepoint_driveids" {
+  name = "${var.app_name}-${var.env_name}-sharepoint-drive-ids"
+
+  description = "Sharepoint drive ids"
+  kms_key_id  = var.account_config.kms_keys["general_shared"]
+
+  tags = local.tags
+}

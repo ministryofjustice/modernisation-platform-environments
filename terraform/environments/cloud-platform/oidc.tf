@@ -145,6 +145,8 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
       "logs:PutLogEvents",
       "logs:PutResourcePolicy",
       "logs:PutRetentionPolicy",
+      "logs:DeleteResourcePolicy",
+      "logs:DeleteRetentionPolicy",
       "logs:Describe*",
       "logs:PutDelivery*",
       "logs:UpdateDeliveryConfiguration",
@@ -178,6 +180,31 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     ]
     resources = [
       "arn:aws:s3:::modernisation-platform-terraform-state/environments/members/cloud-platform*/*"
+    ]
+  }
+
+  statement {
+    sid    = "LogArchiveBucketManagement"
+    effect = "Allow"
+    actions = [
+      "s3:CreateBucket",
+      "s3:DeleteBucket",
+      "s3:Get*",
+      "s3:List*",
+      "s3:PutBucketPolicy",
+      "s3:DeleteBucketPolicy",
+      "s3:PutBucketTagging",
+      "s3:PutBucketVersioning",
+      "s3:PutBucketPublicAccessBlock",
+      "s3:PutEncryptionConfiguration",
+      "s3:PutLifecycleConfiguration",
+      "s3:PutBucketOwnershipControls",
+      "s3:PutObject",
+      "s3:DeleteObject"
+    ]
+    resources = [
+      "arn:aws:s3:::container-platform-*-fluentbit",
+      "arn:aws:s3:::container-platform-*-fluentbit/*"
     ]
   }
 

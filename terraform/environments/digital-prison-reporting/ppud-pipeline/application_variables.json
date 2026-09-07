@@ -3,16 +3,19 @@
     "development": {
       "days_back": "3",
       "cron_schedule": "cron(30 07 ? * MON *)",
+      "source_bucket_role_name": "ppud-parquet-exports-batch-copy-dev-role",
       "short_name_environment": "dev"
     },
     "preproduction": {
       "days_back": "1",
       "cron_schedule": "cron(30 07 ? * TUE *)",
+      "source_bucket_role_name": "ppud-parquet-exports-batch-copy-preprod-role",
       "short_name_environment": "preprod"
     },
     "production": {
       "days_back": "1",
       "cron_schedule": "cron(30 07 * * ? *)",
+      "source_bucket_role_name": "ppud-parquet-exports-batch-copy-prod-role",
       "short_name_environment": "prod"
     }
   }
