@@ -46,14 +46,13 @@ resource "aws_vpc_security_group_ingress_rule" "adaptor_alb_ingress_443_c" {
 #   description       = "Allow all outbound traffic (to be restricted later)"
 # }
 # Restricted outbound traffic to OIA EC2 instances
-resource "aws_security_group_rule" "adaptor_alb_egress_oia_ec2" {
-  security_group_id        = aws_security_group.adaptor_load_balancer.id
-  type                     = "egress"
-  description              = "Allow ALB egress to OIA EC2 instances on adaptor port"
-  protocol                 = "tcp"
-  from_port                = local.application_data.accounts[local.environment].adaptor_server_port
-  to_port                  = local.application_data.accounts[local.environment].adaptor_server_port
-  source_security_group_id = aws_security_group.ecs_tasks_adaptor.id
+resource "aws_vpc_security_group_egress_rule" "adaptor_alb_egress_oia_ec2" {
+  security_group_id            = aws_security_group.adaptor_load_balancer.id
+  description                  = "Allow ALB egress to OIA EC2 instances on ephemeral ports"
+  ip_protocol                  = "tcp"
+  from_port                    = local.application_data.accounts[local.environment].adaptor_server_port
+  to_port                      = local.application_data.accounts[local.environment].adaptor_server_port
+  referenced_security_group_id = aws_security_group.ecs_tasks_adaptor.id
 }
 
 # Adapter Security Group
