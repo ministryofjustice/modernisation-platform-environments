@@ -4,6 +4,16 @@ module "s3_pui_docs" {
   bucket_name        = "${local.application_name}-docs-${local.environment}"
   versioning_enabled = true
   ownership_controls = "BucketOwnerEnforced"
+  sse_algorithm      = "AES256"
+  custom_kms_key     = ""
+  log_buckets = {
+    log_bucket_name = module.s3-bucket-logging.bucket.id
+    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+    log_bucket_policy = aws_s3_bucket_policy.lb_access_logs.policy
+     }
+  manage_log_bucket_policy = false
+
+  log_prefix = "s3access/${local.application_name}-docs-${local.environment}"
 
   lifecycle_rule = [
     {
@@ -211,8 +221,13 @@ module "s3-bucket-shared" {
   bucket_policy      = [aws_s3_bucket_policy.shared_bucket_policy.policy]
   sse_algorithm      = "AES256"
   custom_kms_key     = ""
+  log_buckets = {
+    log_bucket_name = module.s3-bucket-logging.bucket.id
+    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+    log_bucket_policy = aws_s3_bucket_policy.lb_access_logs.policy
+     }
+  manage_log_bucket_policy = false
 
-  log_bucket = module.s3-bucket-logging.bucket.id
   log_prefix = "s3access/${local.application_name}-${local.environment}-shared"
 
   # Refer to the below section "Replication" before enabling replication
