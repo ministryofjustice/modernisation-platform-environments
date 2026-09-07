@@ -56,29 +56,29 @@ resource "aws_security_group_rule" "cluster_ec2_egress_vpce" {
   ]
 }
 
-# resource "aws_security_group_rule" "cluster_ec2_egress_s3" {
-#   security_group_id = aws_security_group.cluster_ec2.id
-#   type              = "egress"
-#   description       = "Allow S3 access via gateway endpoint (prefix list)"
-#   protocol          = "tcp"
-#   from_port         = 443
-#   to_port           = 443
-#   prefix_list_ids   = [data.aws_prefix_list.s3.id]
-# }
+resource "aws_security_group_rule" "cluster_ec2_egress_s3" {
+  security_group_id = aws_security_group.cluster_ec2.id
+  type              = "egress"
+  description       = "Allow S3 access via gateway endpoint (prefix list)"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  prefix_list_ids   = [data.aws_prefix_list.s3.id]
+}
 
-# resource "aws_security_group_rule" "cluster_ec2_egress_443" {
-#   security_group_id = aws_security_group.cluster_ec2.id
-#   type              = "egress"
-#   description       = "HTTPS"
-#   protocol          = "tcp"
-#   from_port         = 443
-#   to_port           = 443
-#   cidr_blocks = [
-#     data.aws_subnet.private_subnets_a.cidr_block,
-#     data.aws_subnet.private_subnets_b.cidr_block,
-#     data.aws_subnet.private_subnets_c.cidr_block
-#   ]
-# }
+resource "aws_security_group_rule" "cluster_ec2_egress_443" {
+  security_group_id = aws_security_group.cluster_ec2.id
+  type              = "egress"
+  description       = "HTTPS"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks = [
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block
+  ]
+}
 
 # resource "aws_security_group_rule" "cluster_ec2_egress_mysql" {
 #   security_group_id = aws_security_group.cluster_ec2.id
