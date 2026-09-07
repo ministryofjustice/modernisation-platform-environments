@@ -42,19 +42,19 @@ resource "aws_security_group" "cluster_ec2" {
 
 # EGRESS Rules
 
-# resource "aws_security_group_rule" "cluster_ec2_egress_vpce" {
-#   security_group_id = aws_security_group.cluster_ec2.id
-#   type              = "egress"
-#   description       = "Allow egress to VPC endpoints (logs/ecs/secrets)"
-#   protocol          = "tcp"
-#   from_port         = 443
-#   to_port           = 443
-#   cidr_blocks = [
-#     data.aws_subnet.vpce_subnets_a.cidr_block,
-#     data.aws_subnet.vpce_subnets_b.cidr_block,
-#     data.aws_subnet.vpce_subnets_c.cidr_block,
-#   ]
-# }
+resource "aws_security_group_rule" "cluster_ec2_egress_vpce" {
+  security_group_id = aws_security_group.cluster_ec2.id
+  type              = "egress"
+  description       = "Allow egress to VPC endpoints (logs/ecs/secrets)"
+  protocol          = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks = [
+    data.aws_subnet.vpce_subnets_a.cidr_block,
+    data.aws_subnet.vpce_subnets_b.cidr_block,
+    data.aws_subnet.vpce_subnets_c.cidr_block,
+  ]
+}
 
 # resource "aws_security_group_rule" "cluster_ec2_egress_s3" {
 #   security_group_id = aws_security_group.cluster_ec2.id
