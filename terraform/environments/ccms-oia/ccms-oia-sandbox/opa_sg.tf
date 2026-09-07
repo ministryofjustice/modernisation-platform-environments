@@ -41,7 +41,7 @@ resource "aws_vpc_security_group_ingress_rule" "alb_ingress_443_workspace" {
   cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
 }
 
-resource "aws_vpc_security_group_egress_rule" "alb_egress_oia_ec2" {
+resource "aws_vpc_security_group_egress_rule" "alb_egress_oia_ecs" {
   security_group_id            = aws_security_group.opahub_load_balancer.id
   description                  = "Allow ALB egress to OIA EC2 instances on ephemeral ports"
   ip_protocol                  = "tcp"
@@ -50,7 +50,7 @@ resource "aws_vpc_security_group_egress_rule" "alb_egress_oia_ec2" {
   referenced_security_group_id = aws_security_group.ecs_tasks_opa.id
 }
 
-resource "aws_vpc_security_group_egress_rule" "alb_egress_oia_ec2" {
+resource "aws_vpc_security_group_egress_rule" "alb_egress_oia_ecs_health_check" {
   security_group_id            = aws_security_group.opahub_load_balancer.id
   description                  = "Allow ALB egress to OIA EC2 instances on ephemeral ports"
   ip_protocol                  = "tcp"
