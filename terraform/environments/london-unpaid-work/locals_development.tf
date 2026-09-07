@@ -11,6 +11,10 @@ locals {
       web-alb = local.lbs.web-alb
     }
 
+    secretsmanager_secrets = {
+      "/london-unpaid-work-dev/london-unpaid-work/test" = local.secretsmanager_secrets.london_unpaid_work_admin_credentials
+    }
+
     security_groups = local.security_groups
   }
 
