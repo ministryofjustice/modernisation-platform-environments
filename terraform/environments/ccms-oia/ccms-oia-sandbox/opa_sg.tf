@@ -45,11 +45,19 @@ resource "aws_vpc_security_group_egress_rule" "alb_egress_oia_ec2" {
   security_group_id            = aws_security_group.opahub_load_balancer.id
   description                  = "Allow ALB egress to OIA EC2 instances on ephemeral ports"
   ip_protocol                  = "tcp"
-  from_port                    = 32768
-  to_port                      = 61000
-  referenced_security_group_id = aws_security_group.cluster_ec2.id
+  from_port                    = local.application_data.accounts[local.environment].opa_server_port
+  to_port                      = local.application_data.accounts[local.environment].opa_ssl_port
+  referenced_security_group_id = aws_security_group.ecs_tasks_opa.id
 }
 
+resource "aws_vpc_security_group_egress_rule" "alb_egress_oia_ec2" {
+  security_group_id            = aws_security_group.opahub_load_balancer.id
+  description                  = "Allow ALB egress to OIA EC2 instances on ephemeral ports"
+  ip_protocol                  = "tcp"
+  from_port                    = local.application_data.accounts[local.environment].opa_health_check_port
+  to_port                      = local.application_data.accounts[local.environment].opa_health_check_port
+  referenced_security_group_id = aws_security_group.ecs_tasks_opa.id
+}
 
 # Container Security Group
 
