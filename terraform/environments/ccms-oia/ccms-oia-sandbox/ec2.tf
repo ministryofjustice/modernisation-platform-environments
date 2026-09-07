@@ -32,7 +32,7 @@ resource "aws_launch_template" "ec2_launch_template_main" {
 
   network_interfaces {
     associate_public_ip_address = false
-    security_groups             = [aws_security_group.cluster_ec2.id]
+    security_groups             = [aws_security_group.first_cluster_ec2.id]
   }
 
   block_device_mappings {
@@ -102,7 +102,7 @@ resource "aws_launch_template" "ec2_launch_template_additional" {
 
   network_interfaces {
     associate_public_ip_address = false
-    security_groups             = [aws_security_group.cluster_ec2.id]
+    security_groups             = [aws_security_group.second_cluster_ec2.id]
   }
 
   block_device_mappings {
