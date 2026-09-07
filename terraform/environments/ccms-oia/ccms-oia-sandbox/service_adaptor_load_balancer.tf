@@ -26,7 +26,7 @@ resource "aws_lb" "adaptor" {
 # Target Group
 ########################################
 resource "aws_lb_target_group" "adaptor_target_group" {
-  name                 = "${local.adaptor_app_name}-tg-ssl"
+  name                 = "${local.adaptor_app_name}-stg"
   port                 = local.application_data.accounts[local.environment].opa_ssl_port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
