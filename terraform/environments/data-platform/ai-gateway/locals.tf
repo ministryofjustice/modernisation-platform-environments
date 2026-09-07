@@ -7,7 +7,8 @@ locals {
     "Jeremy.Collins@justice.gov.uk",
     "Gary.Henderson1@justice.gov.uk",
     "Lauren.Taylor-Brown@justice.gov.uk",
-    "Jacob.Woffenden@justice.gov.uk"
+    "Jacob.Woffenden@justice.gov.uk",
+    "Tamsin.Forbes@justice.gov.uk"
   ]
 
   ai_gateway_configuration = yamldecode(file("${path.module}/configuration/configuration.yml"))

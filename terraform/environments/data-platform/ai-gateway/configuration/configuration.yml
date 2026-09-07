@@ -450,6 +450,13 @@ models:
       location: "eu"
       generally_available: false
       environments_available: ["development", "production"]
+    gemini-3-8-flash:
+      model_id: "gemini-3.8-flash"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 3.8 Flash (EU)"
+      location: "eu"
+      generally_available: false
+      environments_available: ["development", "production"]
   microsoft_foundry:
     # Anthropic
     claude-fable-5:
