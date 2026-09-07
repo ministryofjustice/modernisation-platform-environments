@@ -6,12 +6,6 @@ locals {
         admin_username = { description = "london-unpaid-work admin username" }
       }
     }
-    london_unpaid_work_test_credentials = {
-      secrets = {
-        test_password = { description = "london-unpaid-work test password" }
-        test_username = { description = "london-unpaid-work test username" }
-      }
-    }
     london_unpaid_work_application_credentials = {
       secrets = {
         encryption_key = { description = "london-unpaid-work application encryption key" }
@@ -32,6 +26,12 @@ locals {
     london_unpaid_work_slack_credentials = {
       secrets = {
         token = { description = "london-unpaid-work slack token" }
+      }
+    }
+    london_unpaid_work_test_credentials = {
+      secrets = {
+        test_password = { description = "london-unpaid-work test password" }
+        test_username = { description = "london-unpaid-work test username" }
       }
     }
   }
