@@ -994,7 +994,7 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
     ]
     resources = [
       module.s3-raw-formatted-data-bucket.bucket.arn,
-      module.s3-create-a-derived-table-bucket.bucket.arn
+      module.s3-create-a-derived-table-bucket.bucket.arn,
       module.s3-metadata-bucket.bucket.arn
     ]
   }
