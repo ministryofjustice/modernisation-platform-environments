@@ -61,6 +61,8 @@ locals {
         statistic           = "Maximum"
         threshold           = "1"
         alarm_description   = "Triggers if rclone-sync metric collected via /opt/textfile_monitoring is in error, e.g. rclone-sync to sharepoint is failing"
+        alarm_actions       = []
+        ok_actions          = []
         #alarm_actions       = [aws_sns_topic.delius_mis_alarms.arn]
         #ok_actions          = [aws_sns_topic.delius_mis_alarms.arn]
         dimensions = {
@@ -79,6 +81,8 @@ locals {
         threshold           = "7200"
         treat_missing_data  = "breaching"
         alarm_description   = "Triggers if rclone-sync metric in /opt/textfile_monitoring hasn't been updated for over 2 hours, e.g. rclone-sync to sharepoint isn't running"
+        alarm_actions       = []
+        ok_actions          = []
         #alarm_actions       = [aws_sns_topic.delius_mis_alarms.arn]
         #ok_actions          = [aws_sns_topic.delius_mis_alarms.arn]
         dimensions = {
