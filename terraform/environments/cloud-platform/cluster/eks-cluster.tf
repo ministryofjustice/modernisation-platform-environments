@@ -112,7 +112,7 @@ resource "aws_cloudwatch_log_group" "auto_mode" {
   for_each = local.auto_mode_log_types
 
   name              = "/aws/vendedlogs/eks/cluster/${each.key}/${local.cluster_name}"
-  retention_in_days = 30
+  retention_in_days = 365
 
   tags = merge(local.tags, { Name = "/aws/vendedlogs/eks/cluster/${each.key}/${local.cluster_name}" })
 }
