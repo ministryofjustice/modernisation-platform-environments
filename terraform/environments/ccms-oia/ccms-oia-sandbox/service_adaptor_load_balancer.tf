@@ -27,7 +27,7 @@ resource "aws_lb" "adaptor" {
 ########################################
 resource "aws_lb_target_group" "adaptor_target_group" {
   name                 = "${local.adaptor_app_name}-tg"
-  port                 = local.application_data.accounts[local.environment].opa_adaptor_server_port
+  port                 = local.application_data.accounts[local.environment].adaptor_server_port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "ip"
