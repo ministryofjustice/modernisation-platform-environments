@@ -109,10 +109,13 @@ locals {
 ## Delivery destinations. The naming alone does not grant write access — see the
 ## resource policy below.
 resource "aws_cloudwatch_log_group" "auto_mode" {
+  #checkov:skip=CKV_AWS_338:Per ADR-017, CloudWatch is the 30-day operational tier; long-term retention lives in the S3 archive
+  #checkov:skip=CKV_AWS_158:Per ADR-017, CloudWatch encryption at rest is the default AES-256; customer-managed KMS is required only on the S3 archive
+
   for_each = local.auto_mode_log_types
 
   name              = "/aws/vendedlogs/eks/cluster/${each.key}/${local.cluster_name}"
-  retention_in_days = 365
+  retention_in_days = 30
 
   tags = merge(local.tags, { Name = "/aws/vendedlogs/eks/cluster/${each.key}/${local.cluster_name}" })
 }
