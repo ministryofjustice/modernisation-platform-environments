@@ -48,6 +48,7 @@ locals {
           aws_accounts = {
             "observability-platform-production" = {
               cloudwatch_enabled              = true
+              cloudwatch_shared_with_teams    = ["ccms"]
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = false
               xray_enabled                    = true
