@@ -153,3 +153,16 @@ module "data_claims_dms" {
     aws_s3_object.data_claims_mapping_file
   ]
 }
+
+# TODO: TEMP permissions
+resource "aws_lakeformation_permissions" "claims_de" {
+  count       = local.is-test ? 1 : 0
+  permissions = ["SELECT", "DESCRIBE"]
+  principal   = "arn:aws:iam::307869868585:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-sandbox_c38cf78de39ef4d0"
+
+  table_with_columns {
+    database_name = "data-claims"
+    name          = "claim"
+    wildcard      = true
+  }
+}
