@@ -129,11 +129,11 @@ resource "aws_ecs_service" "admin" {
     subnets         = data.aws_subnets.shared-private.ids
   }
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.admin_https.id
-    container_name   = "${local.application_data.accounts[local.environment].app_name}-admin"
-    container_port   = local.application_data.accounts[local.environment].admin_ssl_port
-  }
+  # load_balancer {
+  #   target_group_arn = aws_lb_target_group.admin_https.id
+  #   container_name   = "${local.application_data.accounts[local.environment].app_name}-admin"
+  #   container_port   = local.application_data.accounts[local.environment].admin_ssl_port
+  # }
 
   depends_on = [
     aws_iam_role_policy_attachment.ecs_task_execution_role,
@@ -224,11 +224,11 @@ resource "aws_ecs_service" "managed" {
     subnets         = data.aws_subnets.shared-private.ids
   }
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.managed_https.id
-    container_name   = "${local.application_data.accounts[local.environment].app_name}-managed"
-    container_port   = local.application_data.accounts[local.environment].managed_ssl_port
-  }
+  # load_balancer {
+  #   target_group_arn = aws_lb_target_group.managed_https.id
+  #   container_name   = "${local.application_data.accounts[local.environment].app_name}-managed"
+  #   container_port   = local.application_data.accounts[local.environment].managed_ssl_port
+  # }
 
   depends_on = [
     aws_iam_role_policy_attachment.ecs_task_execution_role,
