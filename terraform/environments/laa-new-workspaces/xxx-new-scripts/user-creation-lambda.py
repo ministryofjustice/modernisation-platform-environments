@@ -236,34 +236,6 @@ def create_workspace(event):
     try:
         response = workspaces.create_workspaces(
             Workspaces=[workspace_request]
-            Workspaces=[
-                {
-                    'DirectoryId': directory_id,
-                    'UserName': username,
-                    'BundleId': bundle_id,
-                    'UserVolumeEncryptionEnabled': True,
-                    'RootVolumeEncryptionEnabled': True,
-                    'VolumeEncryptionKey': kms_key_id,
-                    'WorkspaceProperties': {
-                        'RunningMode': 'AUTO_STOP',
-                        'RunningModeAutoStopTimeoutInMinutes': 60
-                    },
-                    'Tags': [
-                        {
-                            'Key': 'application',
-                            'Value': 'laa-workspaces'
-                        },
-                        {
-                            'Key': 'business-unit',
-                            'Value': 'LAA'
-                        },
-                        {
-                            'Key': 'infrastructure-support',
-                            'Value': 'laa_ops@digital.justice.gov.uk'
-                        }
-                    ]
-                }
-            ]
         )
         
         if 'FailedRequests' in response:
