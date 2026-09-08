@@ -83,6 +83,11 @@ module "destination_eventbridge" {
         name            = "auth0-log-archive"
         arn             = aws_kinesis_firehose_delivery_stream.this[0].arn
         attach_role_arn = true
+        dead_letter_arn = module.eventbridge_dlq[0].queue_arn
+        retry_policy = {
+          maximum_event_age_in_seconds = 300
+          maximum_retry_attempts       = 3
+        }
       }
     ]
   }
