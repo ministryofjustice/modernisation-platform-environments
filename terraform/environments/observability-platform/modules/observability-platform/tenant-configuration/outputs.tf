@@ -7,3 +7,8 @@ output "folder_uid" {
   description = "The Grafana folder UID for this team"
   value       = module.team.folder_uid
 }
+
+output "team_id" {
+  description = "The ID of the team"
+  value       = grafana_team.this.id
+}
