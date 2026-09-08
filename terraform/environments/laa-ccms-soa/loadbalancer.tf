@@ -42,9 +42,9 @@ resource "aws_lb_target_group" "admin_https" {
     unhealthy_threshold = 3
     matcher             = "200"
   }
-  lifecycle {
-    create_before_destroy = true
-  }
+  # lifecycle {
+  #   create_before_destroy = true
+  # }
 }
 
 resource "aws_lb_listener" "admin443" {
@@ -113,9 +113,9 @@ resource "aws_lb_target_group" "managed_https" {
     unhealthy_threshold = 3
     matcher             = "200"
   }
-  lifecycle {
-    create_before_destroy = true
-  }
+  # lifecycle {
+  #   create_before_destroy = true
+  # }
 }
 
 resource "aws_lb_listener" "managed443" {
