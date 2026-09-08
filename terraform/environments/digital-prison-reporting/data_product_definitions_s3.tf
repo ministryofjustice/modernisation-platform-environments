@@ -11,6 +11,11 @@ locals {
       github_repo_id = "1353761083"
       s3_prefix   = "incident-reporting"
     }
+    "move-a-prisoner" = {
+      github_repo = "hmpps-dpr-move-a-prisoner-dpds"
+      github_repo_id = "1361146782"
+      s3_prefix   = "move-a-prisoner"
+    }
   }
 }
 
