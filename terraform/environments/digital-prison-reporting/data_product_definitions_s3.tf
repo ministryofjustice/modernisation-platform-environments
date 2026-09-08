@@ -3,10 +3,12 @@ locals {
   dpd_publishing_teams = {
     activities = {
       github_repo = "hmpps-dpr-activities-dpds"
+      github_repo_id = "1277088899"
       s3_prefix   = "activities"
     }
     "incident-reporting" = {
       github_repo = "hmpps-dpr-incident-reporting-dpds"
+      github_repo_id = "1353761083"
       s3_prefix   = "incident-reporting"
     }
   }
@@ -32,8 +34,11 @@ module "s3_data_product_definitions_bucket" {
     }
   )
 }
-
+# Since July 2026 GitHub has enforced immutable OIDC subject claims, which contain the owner and repository IDs, for all newly created repositories.
+# https://docs.github.com/en/actions/reference/security/oidc#immutable-subject-claims
+# CKV_AWS_358 does not recognise the new OWNER@OWNER-ID/REPO@REPO-ID format.
 data "aws_iam_policy_document" "dpd_s3_publisher_assume_role_policy" {
+  # checkov:skip=CKV_AWS_358: "Ensure AWS GitHub Actions OIDC authorization policies only allow safe claims and claim order"
   for_each = local.dpd_publishing_teams
 
   statement {
@@ -48,9 +53,9 @@ data "aws_iam_policy_document" "dpd_s3_publisher_assume_role_policy" {
     }
 
     condition {
-      test = "StringLike"
+      test = "StringEquals"
       values = [
-        "repo:ministryofjustice/${each.value.github_repo}:environment:${local.env}"
+        "repo:ministryofjustice@2203574/${each.value.github_repo}@${each.value.github_repo_id}:environment:${local.env}"
       ]
       variable = "token.actions.githubusercontent.com:sub"
     }

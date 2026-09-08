@@ -3079,3 +3079,39 @@ module "trigger_cpr_job_iam_role" {
     }] }
   }
 }
+
+# ------------------------------------------------------------------------------
+# IAM role and policy for the rota personal digest Lambda
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "rota_personal_digest" {
+  name               = "rota_personal_digest_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "rota_personal_digest_policy_document" {
+  statement {
+    sid    = "ReadRotaDigestSecrets"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      module.live_feed_github_app.secret_arn,
+      module.rota_personal_digest_slack.secret_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "rota_personal_digest" {
+  name   = "rota_personal_digest_lambda_policy"
+  policy = data.aws_iam_policy_document.rota_personal_digest_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "rota_personal_digest_attach" {
+  role       = aws_iam_role.rota_personal_digest.name
+  policy_arn = aws_iam_policy.rota_personal_digest.arn
+}
