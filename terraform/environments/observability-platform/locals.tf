@@ -28,7 +28,11 @@ locals {
   securityhub_event_bus_name = "securityhub-central"
 
   ccms_account_ids = [
-    for account_name, _ in lookup(local.environment_configuration.tenant_configuration["ccms"], "aws_accounts", {}) :
+    for account_name, _ in lookup(
+      lookup(local.environment_configuration.tenant_configuration, "ccms", {}),
+      "aws_accounts",
+      {}
+    ) :
     local.all_account_ids[account_name]
     if contains(keys(local.all_account_ids), account_name)
   ]
