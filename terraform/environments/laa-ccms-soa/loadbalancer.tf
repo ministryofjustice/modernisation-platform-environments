@@ -42,12 +42,9 @@ resource "aws_lb_target_group" "admin_https" {
     unhealthy_threshold = 3
     matcher             = "200"
   }
-<<<<<<< HEAD
 
   # THe following lifecycle block is used to ensure that the target group is created before the listener is created.
   # This is to avoid the error "Error creating LB Listener:
-=======
->>>>>>> d59d38f5b2 (added tg changes)
   lifecycle {
     create_before_destroy = true
   }
@@ -125,9 +122,9 @@ resource "aws_lb_target_group" "managed_https" {
     unhealthy_threshold = 3
     matcher             = "200"
   }
-  lifecycle {
-    create_before_destroy = true
-  }
+  # lifecycle {
+  #   create_before_destroy = true
+  # }
 }
 
 resource "aws_lb_listener" "managed443" {
