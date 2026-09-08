@@ -118,10 +118,10 @@ resource "aws_ecs_service" "pui" {
   deployment_maximum_percent         = 150
   deployment_minimum_healthy_percent = 100
 
-  deployment_circuit_breaker {
-    enable   = true
-    rollback = true
-  }
+  # deployment_circuit_breaker {
+  #   enable   = true
+  #   rollback = true
+  # }
 
   # Use the cluster's capacity provider (with managed scaling enabled)
   # instead of a bare EC2 launch type, so ECS can grow the ASG automatically
@@ -147,10 +147,10 @@ resource "aws_ecs_service" "pui" {
 
   # Binpack tiebreaker so tasks consolidate after a deployment, letting
   # CapacityProviderReservation fall below target and trigger scale-in.
-  ordered_placement_strategy {
-    field = "memory"
-    type  = "binpack"
-  }
+  # ordered_placement_strategy {
+  #   field = "memory"
+  #   type  = "binpack"
+  # }
 
   network_configuration {
     security_groups = [aws_security_group.ecs_tasks_pui.id]
