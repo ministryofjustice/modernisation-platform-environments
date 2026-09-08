@@ -11,6 +11,14 @@ locals {
       web-alb = local.lbs.web-alb
     }
 
+    s3_buckets = {
+      artifacts-bucket = {
+        tags = {
+          backup = "false"
+        }
+      }
+    }
+
     secretsmanager_secrets = {
       "/london-unpaid-work-dev"             = local.secretsmanager_secrets.london_unpaid_work_dev_secrets
     }
