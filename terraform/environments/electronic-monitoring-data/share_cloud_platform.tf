@@ -258,7 +258,7 @@ module "emd_update_p1_cp_role" {
 
 
 data "aws_iam_policy_document" "em_dashboard_update_p1_permissions" {
-  count = local.is-preproduction ? 1 : 0
+  count = local.is-preproduction || local.is-production ? 1 : 0
   statement {
     sid       = "AllowAccessToTriggerUpdateP1API"
     effect    = "Allow"
@@ -283,14 +283,14 @@ data "aws_iam_policy_document" "em_dashboard_update_p1_permissions" {
 }
 
 resource "aws_iam_policy" "em_dashboard_update_p1_permissions" {
-  count       = local.is-preproduction ? 1 : 0
+  count       = local.is-preproduction || local.is-production ? 1 : 0
   name_prefix = "em_dashboard_update_p1_permissions"
   description = "Permissions for updating p1 export."
   policy      = data.aws_iam_policy_document.em_dashboard_update_p1_permissions[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "em_dashboard_update_p1_permissions" {
-  count      = local.is-preproduction ? 1 : 0
+  count      = local.is-preproduction || local.is-production ? 1 : 0
   policy_arn = aws_iam_policy.em_dashboard_update_p1_permissions[0].arn
   role       = module.emd_update_p1_cp_role[0].iam_role_name
 }
@@ -441,7 +441,7 @@ data "aws_iam_policy_document" "em_data_api_permissions" {
 }
 
 data "aws_iam_policy_document" "em_dashboard_ear_sar_permissions" {
-  count = local.is-preproduction ? 1 : 0
+  count = local.is-preproduction || local.is-production ? 1 : 0
   statement {
     sid       = "AllowAccessToTriggerEARSARAPI"
     effect    = "Allow"
@@ -466,14 +466,14 @@ data "aws_iam_policy_document" "em_dashboard_ear_sar_permissions" {
 }
 
 resource "aws_iam_policy" "em_dashboard_ear_sar_permissions" {
-  count       = local.is-preproduction ? 1 : 0
+  count       = local.is-preproduction || local.is-production ? 1 : 0
   name_prefix = "em_dashboard_ear_sar_permissions"
   description = "Permissions for ear sar tool."
   policy      = data.aws_iam_policy_document.em_dashboard_ear_sar_permissions[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "em_dashboard_ear_sar_permissions" {
-  count      = local.is-preproduction ? 1 : 0
+  count      = local.is-preproduction || local.is-production ? 1 : 0
   policy_arn = aws_iam_policy.em_dashboard_ear_sar_permissions[0].arn
   role       = module.emd_ears_sars_cp_role[0].iam_role_name
 }
