@@ -52,6 +52,12 @@ data "aws_secretsmanager_secret_version" "trust_store_password" {
 resource "aws_secretsmanager_secret" "soa_secrets" {
   name        = "soa-secrets"
   description = "SOA Weblogic,EM Console for user weblogic, RDS Database Password for SOAPDB admin, PUI and other passwords in Key values"
+
+  lifecycle {
+    ignore_changes = [
+      name
+    ]
+  }
 }
 
 resource "aws_secretsmanager_secret_version" "ccms_soa_secrets_version" {
