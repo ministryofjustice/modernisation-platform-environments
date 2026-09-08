@@ -45,6 +45,28 @@ resource "aws_cloudwatch_metric_alarm" "container_pui_count" {
   tags = local.tags
 }
 
+# Capacity provider stuck holding idle container instances
+resource "aws_cloudwatch_metric_alarm" "cp_reservation_low" {
+  alarm_name          = "${local.application_name}-${local.environment}-cp-reservation-low"
+  alarm_description   = "The ECS capacity provider reservation has been below target for an hour, so the ASG is not scaling in. Check the ASG activity history for instances stuck with scale-in protection. Runbook: https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+  comparison_operator = "LessThanThreshold"
+  namespace           = "AWS/ECS/ManagedScaling"
+  metric_name         = "CapacityProviderReservation"
+  statistic           = "Average"
+  period              = 300
+  evaluation_periods  = 12
+  threshold           = 75
+  treat_missing_data  = "notBreaching"
+  dimensions = {
+    CapacityProviderName = aws_ecs_capacity_provider.capacity-provider.name
+    ClusterName          = aws_ecs_cluster.main.name
+  }
+  alarm_actions = [aws_sns_topic.cloudwatch_alerts.arn]
+  ok_actions    = [aws_sns_topic.cloudwatch_alerts.arn]
+
+  tags = local.tags
+}
+
 # Underlying EC2 Instance Status Check Failure
 resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure" {
   alarm_name          = "${local.application_name}-${local.environment}-ec2-status-check-failure"

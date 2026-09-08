@@ -11,6 +11,12 @@ resource "aws_ecs_cluster" "main" {
 resource "aws_ecs_cluster_capacity_providers" "main" {
   cluster_name       = aws_ecs_cluster.main.name
   capacity_providers = [aws_ecs_capacity_provider.capacity-provider.name]
+
+  default_capacity_provider_strategy {
+    capacity_provider = aws_ecs_capacity_provider.capacity-provider.name
+    weight            = 1
+    base              = 1
+  }
 }
 
 # ECS Task Definition
@@ -107,11 +113,16 @@ resource "aws_ecs_service" "pui" {
   task_definition = aws_ecs_task_definition.pui.arn
   desired_count   = local.application_data.accounts[local.environment].app_count
 
-  
+  # Caps the rolling deployment burst so a deploy needs a couple of extra
+  # instances rather than doubling the cluster to ec2_max_capacity.
+  deployment_maximum_percent         = 150
+  deployment_minimum_healthy_percent = 100
+
+
+
   # Required by the AWS provider whenever capacity_provider_strategy is
-  # added/changed on an existing service (here: switching from launch_type
-  # to capacity_provider_strategy), so the change is applied via a fresh
-  # deployment rather than an in-place update.
+  # added/changed on an existing service, so the change is applied via a
+  # fresh deployment rather than an in-place update.
   force_new_deployment = true
 
   # Use the cluster's capacity provider (with managed scaling enabled)
@@ -125,7 +136,6 @@ resource "aws_ecs_service" "pui" {
     base              = 1
   }
 
-
   health_check_grace_period_seconds = 120
   lifecycle {
     ignore_changes = [
@@ -136,6 +146,8 @@ resource "aws_ecs_service" "pui" {
     field = "attribute:ecs.availability-zone"
     type  = "spread"
   }
+
+
 
   network_configuration {
     security_groups = [aws_security_group.ecs_tasks_pui.id]
