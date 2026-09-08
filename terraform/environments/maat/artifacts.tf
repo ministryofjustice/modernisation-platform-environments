@@ -30,49 +30,43 @@ module "artifacts-s3" {
     }
   ]
 
+  bucket_policy = [jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        "Sid" : "DenyInsecureTransport",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          module.s3-bucket-shared.bucket.arn,
+          "${module.s3-bucket-shared.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
+        "Sid" = "EnforceTLSv12orHigher",
+        "Action" : "s3:*",
+        "Effect" : "Deny",
+        "Resource" : [
+          module.s3-bucket-shared.bucket.arn,
+          "${module.s3-bucket-shared.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "NumericLessThan" : {
+            "s3:TlsVersion" : "1.2"
+          }
+        },
+        "Principal" : {
+          "AWS" : "*"
+        }
+      }
+    ]
+  })]
+
   tags = local.tags
-}
-
-data "aws_iam_policy_document" "artifacts_secure_transport" {
-  statement {
-    sid    = "DenyInsecureTransport"
-    effect = "Deny"
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-    actions = ["s3:*"]
-    resources = [
-      module.artifacts-s3.bucket.arn,
-      "${module.artifacts-s3.bucket.arn}/*",
-    ]
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-      values   = ["false"]
-    }
-  }
-  statement {
-    sid    = "RestrictToTLSRequestsOnly"
-    effect = "Deny"
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-    actions = ["s3:*"]
-    resources = [
-      module.artifacts-s3.bucket.arn,
-      "${module.artifacts-s3.bucket.arn}/*",
-    ]
-    condition {
-      test     = "NumericLessThan"
-      variable = "s3:TlsVersion"
-      values   = ["1.2"]
-    }
-  }
-}
-
-resource "aws_s3_bucket_policy" "artifacts_secure_transport" {
-  bucket = module.artifacts-s3.bucket.id
-  policy = data.aws_iam_policy_document.artifacts_secure_transport.json
 }
