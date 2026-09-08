@@ -204,7 +204,7 @@ def create_workspace(event):
     workspaces = boto3.client('workspaces', region_name=region)
     workspace_request = {
         'DirectoryId': directory_id,
-        'UserName': Username,
+        'UserName': username,
         'BundleId': bundle_id,
         'WorkspaceProperties': {
             'RunningMode': 'AUTO_STOP',
