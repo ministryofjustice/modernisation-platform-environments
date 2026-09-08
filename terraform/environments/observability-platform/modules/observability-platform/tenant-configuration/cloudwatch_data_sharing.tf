@@ -34,7 +34,7 @@ resource "grafana_data_source_permission" "shared_cloudwatch" {
   datasource_uid = data.grafana_data_source.shared_cloudwatch[each.key].uid
 
   permissions {
-    team_id    = data.grafana_team.shared_cloudwatch[each.value.team_name].id
+    team_id    = data.grafana_team.shared_cloudwatch[each.value.team_name].uid
     permission = "Query"
   }
 }
