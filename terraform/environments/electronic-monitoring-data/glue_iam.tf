@@ -244,3 +244,92 @@ resource "aws_iam_role_policy" "glue_mig_and_val_iam_role_ec2_policy" {
   role   = aws_iam_role.glue_mig_and_val_iam_role.name
   policy = data.aws_iam_policy_document.dms_dv_athena_iam_policy_document.json
 }
+
+#------------------
+# Apply sort order 
+#------------------
+
+resource "aws_iam_role" "apply_sort_order_iam_role" {
+  name               = "apply-sort-order-iam-role"
+  assume_role_policy = data.aws_iam_policy_document.glue_assume_role.json
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "Role having Glue-Job execution policies",
+    }
+  )
+  lifecycle {
+    create_before_destroy = false
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "apply_sort_order_glue_service_role" {
+  role       = aws_iam_role.apply_sort_order_iam_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+}
+
+data "aws_iam_policy_document" "apply_sort_order" {
+  statement {
+    sid    = "S3DataObjectPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject"
+    ]
+    resources = [
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/data/${local.environment_shorthand}/models/domain_name=staged/*",
+      "${module.s3-glue-job-script-bucket.bucket.arn}/*"
+    ]
+  }
+  statement {
+    sid    = "S3BucketPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObject",
+    ]
+    resources = [module.s3-create-a-derived-table-bucket.bucket.arn]
+  }
+  statement {
+    sid    = "GluePermissions"
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetTables",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:UpdateTable"
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:schema/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.region}:${local.env_account_id}:database/*"
+    ]
+  }
+  statement {
+    sid    = "LakeFormationPerms"
+    effect = "Allow"
+    actions = [
+      "lakeformation:GetDataAccess",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "GlueCatalogAccess"
+    effect = "Allow"
+    actions = [
+      "glue:Get*",
+      "glue:Create*",
+      "glue:Update*"
+    ]
+    resources = ["*"]
+  }
+}
+resource "aws_iam_role_policy" "apply_sort_order_iam_role_policy" {
+  name   = "apply-sort-order-iam-role-policy"
+  role   = aws_iam_role.apply_sort_order_iam_role.name
+  policy = data.aws_iam_policy_document.apply_sort_order.json
+}
