@@ -21,6 +21,17 @@ resource "aws_vpc_security_group_ingress_rule" "alb_ingress_7001_all" {
   description       = "7001 from AWS Workspaces"
 }
 
+# # Temp only for test
+resource "aws_vpc_security_group_ingress_rule" "alb_ingress_7001_all_test" {
+  count             = local.is-test ? 1 : 0
+  security_group_id = aws_security_group.opahub_load_balancer.id
+  cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
+  ip_protocol       = "tcp"
+  from_port         = 7001
+  to_port           = 7001
+  description       = "7001 from AWS Workspaces"
+}
+
 # # Temp only for DEV
 resource "aws_vpc_security_group_ingress_rule" "alb_ingress_7001_preproduction_all" {
   count             = local.is-preproduction ? 1 : 0
