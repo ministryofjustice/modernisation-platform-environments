@@ -1,6 +1,6 @@
 locals {
   create_db_snapshots_script_prefix = "dbsnapshot"
-  delete_db_snapshots_script_prefix = "deletesnapshots"
+  delete_db_snapshots_script_prefix = "deletesnapshots_v2"
   db_connect_script_prefix          = "dbconnect"
   hash_value                        = "Y/4+i1hcHvLBzOaCHJ/m9bQLuVtQwr8gnF//AJ2j+S4="
 }
@@ -194,7 +194,6 @@ data "archive_file" "connect_db" {
   output_path = "scripts/${local.db_connect_script_prefix}.zip"
 }
 
-
 ######################################
 ### Lambda Resources
 ######################################
@@ -232,7 +231,6 @@ resource "aws_lambda_layer_version" "backup_lambda" {
 }
 
 resource "aws_lambda_function" "create_db_snapshots" {
-
   description      = "Snapshot volumes for Oracle EC2"
   function_name    = "snapshotDBFunction"
   role             = aws_iam_role.backup_lambda.arn
@@ -251,10 +249,12 @@ resource "aws_lambda_function" "create_db_snapshots" {
       LD_LIBRARY_PATH = "/opt/nodejs/node_modules/lib"
     }
   }
+
   vpc_config {
     security_group_ids = [aws_security_group.backup_lambda.id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
+
   tags = merge(
     local.tags,
     { Name = "${local.application_name}-${local.environment}-lambda-create-snapshot" }
@@ -262,23 +262,29 @@ resource "aws_lambda_function" "create_db_snapshots" {
 }
 
 resource "aws_lambda_function" "delete_db_snapshots" {
-
   description      = "Clean up script to delete old unused snapshots"
   function_name    = "deletesnapshotFunction"
   role             = aws_iam_role.backup_lambda.arn
   handler          = "deletesnapshots.lambda_handler"
   source_code_hash = data.archive_file.delete_db_snapshots.output_base64sha256
-  runtime          = "python3.8"
+  runtime          = "python3.14"
   s3_bucket        = aws_s3_bucket.backup_lambda.id
   s3_key           = "${local.delete_db_snapshots_script_prefix}.zip"
   memory_size      = 3000
   timeout          = 900
   depends_on       = [time_sleep.wait_for_provision_files] # This resource creation will be delayed to ensure object exists in the bucket
 
+  environment {
+    variables = {
+      RETENTION_DAYS = 35
+    }
+  }
+
   vpc_config {
     security_group_ids = [aws_security_group.backup_lambda.id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
+
   tags = merge(
     local.tags,
     { Name = "${local.application_name}-${local.environment}-lambda-delete-snapshots" }
@@ -286,7 +292,6 @@ resource "aws_lambda_function" "delete_db_snapshots" {
 }
 
 resource "aws_lambda_function" "connect_db" {
-
   description      = "SSH to the DB EC2"
   function_name    = "connectDBFunction"
   role             = aws_iam_role.backup_lambda.arn
@@ -300,18 +305,17 @@ resource "aws_lambda_function" "connect_db" {
   timeout          = 900
   depends_on       = [time_sleep.wait_for_provision_files] # This resource creation will be delayed to ensure object exists in the bucket
 
-
-
   environment {
     variables = {
       LD_LIBRARY_PATH = "/opt/nodejs/node_modules/lib"
-
     }
   }
+
   vpc_config {
     security_group_ids = [aws_security_group.backup_lambda.id]
     subnet_ids         = [data.aws_subnet.data_subnets_a.id]
   }
+
   tags = merge(
     local.tags,
     { Name = "${local.application_name}-${local.environment}-lambda-connect-db" }
