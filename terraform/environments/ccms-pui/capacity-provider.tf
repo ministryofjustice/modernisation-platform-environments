@@ -17,16 +17,16 @@ resource "aws_ecs_capacity_provider" "capacity-provider" {
     # ec2_max_capacity are only static bounds - nothing actually triggers a
     # scale-out event, so rolling deployments stall when there is no spare
     # capacity.
-    # managed_scaling {
-    #   status          = "ENABLED"
-    #   target_capacity = 100
+    managed_scaling {
+      status          = "ENABLED"
+      target_capacity = 100
 
-    #   # Step size applies to scale-in as well as scale-out, so a value of 1
-    #   # makes reclaiming post-deployment capacity take hours.
-    #   minimum_scaling_step_size = 1
-    #   maximum_scaling_step_size = 3
-    #   instance_warmup_period    = 300
-    # }
+      # Step size applies to scale-in as well as scale-out, so a value of 1
+      # makes reclaiming post-deployment capacity take hours.
+      minimum_scaling_step_size = 1
+      maximum_scaling_step_size = 3
+      instance_warmup_period    = 300
+    }
   }
 
   tags = merge(local.tags,
