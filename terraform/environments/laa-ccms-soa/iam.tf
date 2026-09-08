@@ -17,6 +17,11 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
   }
 }
 
+#--Secrets access policy for ECS tasks
+# data "aws_secretsmanager_secret" "pull_soa_password" {
+#   name = "soa-secrets"
+# }
+
 resource "aws_iam_role" "ecs_task_execution_role" {
   name               = "${local.application_data.accounts[local.environment].app_name}-WorldTaskExecutionRole"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_execution_role.json
@@ -37,7 +42,7 @@ resource "aws_iam_policy" "ecs_secrets_policy" {
     {
       "Effect": "Allow",
       "Action": ["secretsmanager:GetSecretValue"],
-      "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa*"]
+      "Resource": ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:soa-secrets*"]
     }
   ]
 }
@@ -48,6 +53,26 @@ EOF
 resource "aws_iam_role_policy_attachment" "ecs_secrets_policy_attachment" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = aws_iam_policy.ecs_secrets_policy.arn
+}
+
+# resource to allow ECS tasks to access specific secrets
+resource "aws_iam_role_policy" "ecs_execution_secret_access" {
+  name = "ecs-exec-secret-access"
+  role = aws_iam_role.ecs_task_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ]
+        Resource = aws_secretsmanager_secret.soa_secrets.arn
+      }
+    ]
+  })
 }
 
 resource "aws_iam_policy" "soa_s3_policy" {
@@ -155,6 +180,8 @@ resource "aws_iam_policy" "ec2_instance_policy" {
                 "ecs:UpdateContainerInstancesState",
                 "ecs:Submit*",
                 "ecs:SubmitTaskStateChange",
+                "ecs:DescribeTasks",
+                "ecs:DescribeServices",
                 "ecr:GetAuthorizationToken",
                 "ecr:BatchCheckLayerAvailability",
                 "ecr:GetDownloadUrlForLayer",
@@ -212,12 +239,12 @@ resource "aws_iam_policy" "ec2_instance_policy" {
         },
         {
           "Effect": "Allow",
-          "Action": ["secretsmanager:GetSecretValue"],
-          "Resource": [
-            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa/deploy-*",
-            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa/password",
-            "arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa/xxsoa/ds/password"
-          ]
+          "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:PutSecretValue",
+                "secretsmanager:CreateSecret"
+          ],
+          "Resource": ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:soa-secrets*"]
         }
     ]
 }
@@ -392,7 +419,7 @@ data "aws_iam_policy_document" "rds_publish_to_sns" {
       test     = "ArnLike"
       variable = "aws:SourceArn"
       values = [
-        "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:db:${aws_db_instance.soa_db.id}"
+        "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:db:${aws_db_instance.soa_db.identifier}"
       ]
     }
   }

@@ -51,6 +51,7 @@ jobs:
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: "${{ github.workflow }}"
+      account_name: "integration-hub-${{ matrix.target }}"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
       component: "${{ matrix.component }}"     # If your strategy workflow also outputs "matrix.component"
@@ -63,6 +64,7 @@ jobs:
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: "${{ github.workflow }}"
+      account_name: "integration-hub-development"
       environment: "development"
       action: "plan_apply"
       plan_apply_tfargs: "-destroy"

@@ -65,7 +65,7 @@ while IFS= read -r -d '' dir; do
   if compgen -G "${dir}/*.tf" >/dev/null; then
     terraform_dirs+=("${dir}")
   fi
-done < <(find "${SCRIPT_DIR}" -mindepth 1 -type d ! -name ".terraform" ! -path "*/.terraform/*" -print0)
+done < <(find "${SCRIPT_DIR}" -mindepth 1 -type d ! -name ".terraform" ! -path "*/.terraform/*" ! -path "*/modules/*" -print0)
 
 if [ "${#terraform_dirs[@]}" -eq 0 ]; then
   echo "No Terraform folders found under ${SCRIPT_DIR}"

@@ -1,5 +1,8 @@
 param (
     [Parameter(Mandatory=$true)]
+    [string]$Username,
+
+    [Parameter(Mandatory=$true)]
     [string]$Firstname,
 
     [Parameter(Mandatory=$true)]
@@ -18,11 +21,14 @@ function Generate-password ($length)
 }
 
 Write-Host "Starting user creation process..."
+Write-Host "Username: $Username"
 Write-Host "Firstname: $Firstname"
 Write-Host "Lastname: $Lastname"
 Write-Host "Email: $Email"
 
-$username = "$Firstname.$Lastname"
+# Legacy behavior (for quick rollback):
+# $username = "$Firstname.$Lastname"
+$username = $Username
 $domain = "laa-workspaces.local"
 $OU = "OU=Users,OU=LAAWORKSPACES,DC=laa-workspaces,DC=local"
 $Password = Generate-password -length 14
@@ -50,15 +56,6 @@ if (Get-ADUser -Credential $adcredential -Filter {SamAccountName -eq $username} 
 {
     Write-Warning "A user account $username already exists in Active Directory."
 
-    try {
-        Set-ADUser -Credential $adcredential -Identity $username -ChangePasswordAtLogon $true -ErrorAction Stop
-        Write-Host "Set ChangePasswordAtLogon for existing user."
-    }
-    catch {
-        Write-Error "Failed to set ChangePasswordAtLogon for existing user: $_"
-        exit 1
-    }
-
     Write-Host "User creation skipped."
 }
 else
@@ -80,8 +77,6 @@ else
             -Description "$Firstname $Lastname - Created $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" `
             -AccountPassword (ConvertTo-SecureString $Password -AsPlainText -Force) `
             -PasswordNeverExpires $False
-
-        Set-ADUser -Credential $adcredential -Identity $username -ChangePasswordAtLogon $true -ErrorAction Stop
 
         Write-Host -ForegroundColor Green "User account created successfully!"
         Write-Host -ForegroundColor Cyan "Username: $username"

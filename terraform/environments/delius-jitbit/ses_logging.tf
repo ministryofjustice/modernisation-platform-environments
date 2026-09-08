@@ -2,7 +2,8 @@
 # SES Logging
 #####################
 resource "aws_sns_topic" "jitbit_ses_destination_topic" {
-  name = format("%s-ses-destination-topic", local.application_name)
+  name              = format("%s-ses-destination-topic", local.application_name)
+  kms_master_key_id = data.aws_kms_key.general_shared.arn
 
   tags = local.tags
 }
@@ -35,13 +36,18 @@ data "archive_file" "lambda_function_payload" {
 }
 
 resource "aws_lambda_function" "sns_to_cloudwatch" {
-  filename         = "${path.module}/lambda/sns_to_cloudwatch/sns_to_cloudwatch.zip"
-  function_name    = "sns_to_cloudwatch"
-  architectures    = ["arm64"]
-  role             = aws_iam_role.lambda_logging.arn
-  runtime          = "python3.12"
-  handler          = "sns_to_cloudwatch.handler"
-  source_code_hash = data.archive_file.lambda_function_payload.output_base64sha256
+  #checkov:skip=CKV_AWS_272: "Doesn't require code signing"
+  #checkov:skip=CKV_AWS_117: "VPC not required - Lambda only calls AWS APIs via service endpoints"
+  #checkov:skip=CKV_AWS_50: "X-Ray tracing not required"
+  filename                       = "${path.module}/lambda/sns_to_cloudwatch/sns_to_cloudwatch.zip"
+  function_name                  = "sns_to_cloudwatch"
+  architectures                  = ["arm64"]
+  role                           = aws_iam_role.lambda_logging.arn
+  runtime                        = "python3.12"
+  handler                        = "sns_to_cloudwatch.handler"
+  source_code_hash               = data.archive_file.lambda_function_payload.output_base64sha256
+  reserved_concurrent_executions = 10
+  kms_key_arn                    = data.aws_kms_key.general_shared.arn
 
   environment {
     variables = {
@@ -53,19 +59,27 @@ resource "aws_lambda_function" "sns_to_cloudwatch" {
     replace_triggered_by = [aws_iam_role.lambda_logging]
   }
 
+  dead_letter_config {
+    target_arn = aws_sqs_queue.sns_to_cloudwatch_dlq.arn
+  }
+
   tags = local.tags
 }
 
 resource "aws_cloudwatch_log_group" "sns_logs" {
+  #checkov:skip=CKV_AWS_338: "Log retention varies per environment"
   name              = format("%s-ses-logs", local.application_name)
   retention_in_days = local.application_data.accounts[local.environment].ses_log_retention_days
+  kms_key_id        = aws_kms_key.cloudwatch_logs.arn
 
   tags = local.tags
 }
 
 resource "aws_cloudwatch_log_group" "execution_logs" {
+  #checkov:skip=CKV_AWS_338: "Logs required for 3 days"
   name              = format("/aws/lambda/%s", aws_lambda_function.sns_to_cloudwatch.function_name)
   retention_in_days = 3
+  kms_key_id        = aws_kms_key.cloudwatch_logs.arn
 
   tags = local.tags
 }
@@ -116,4 +130,36 @@ resource "aws_sns_topic_subscription" "lambda" {
   topic_arn = aws_sns_topic.jitbit_ses_destination_topic.arn
   protocol  = "lambda"
   endpoint  = aws_lambda_function.sns_to_cloudwatch.arn
+}
+
+resource "aws_sqs_queue" "sns_to_cloudwatch_dlq" {
+  name              = "sns-to-cloudwatch-dlq"
+  kms_master_key_id = data.aws_kms_key.general_shared.arn
+
+  tags = local.tags
+}
+
+resource "aws_iam_role_policy" "lambda_dlq" {
+  role = aws_iam_role.lambda_logging.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "sqs:SendMessage"
+        ]
+        Resource = aws_sqs_queue.sns_to_cloudwatch_dlq.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Encrypt",
+          "kms:GenerateDataKey"
+        ]
+        Resource = data.aws_kms_key.general_shared.arn
+      }
+    ]
+  })
 }

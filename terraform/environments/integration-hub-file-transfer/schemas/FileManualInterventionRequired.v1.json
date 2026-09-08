@@ -1,0 +1,127 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "FileManualInterventionRequired.v1",
+  "description": "An object cannot continue automated processing. An object has failed its requested file actions or ended up in the investigation bucket without an appropriate exception action.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "id",
+    "detail-type",
+    "source",
+    "account",
+    "time",
+    "region",
+    "detail"
+  ],
+  "properties": {
+    "version": { "type": "string", "enum": ["0"] },
+    "id": { "type": "string", "format": "uuid" },
+    "detail-type": {
+      "type": "string",
+      "enum": ["FileManualInterventionRequired.v1"]
+    },
+    "source": {
+      "type": "string",
+      "enum": ["uk.gov.justice.service.managed-file-transfer"]
+    },
+    "account": { "type": "string", "pattern": "^[0-9]{12}$" },
+    "time": { "type": "string", "format": "date-time" },
+    "region": { "type": "string" },
+    "resources": { "type": "array", "items": { "type": "string" } },
+    "replay-name": { "type": "string", "minLength": 1 },
+    "detail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metadata", "data"],
+      "properties": {
+        "metadata": { "$ref": "#/definitions/eventMetadata" },
+        "data": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "fileId",
+            "object",
+            "reasonCode",
+            "description",
+            "requiredAt"
+          ],
+          "properties": {
+            "fileId": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Stable logical file identifier inherited from FileReceived.v1."
+            },
+            "object": { "$ref": "#/definitions/s3Object" },
+            "actionExecutionId": { "type": "string", "format": "uuid" },
+            "reasonCode": {
+              "type": "string",
+              "enum": [
+                "ACTION_FAILED",
+                "INVESTIGATION_REQUIRED",
+                "UNSUPPORTED_SCAN_RESULT",
+                "PROCESSING_ERROR"
+              ]
+            },
+            "description": { "type": "string", "minLength": 1 },
+            "requiredAt": { "type": "string", "format": "date-time" }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "eventMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["correlationId", "causationId", "idempotencyKey"],
+      "properties": {
+        "correlationId": { "type": "string", "format": "uuid" },
+        "causationId": { "type": "string", "format": "uuid" },
+        "idempotencyKey": { "type": "string", "minLength": 1 }
+      }
+    },
+    "s3Object": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A particular version of an object stored in Amazon S3.",
+      "required": ["bucket", "key", "versionId", "sizeBytes"],
+      "properties": {
+        "bucket": { "type": "string", "minLength": 3 },
+        "key": { "type": "string", "minLength": 1 },
+        "versionId": { "type": "string", "minLength": 1 },
+        "sizeBytes": { "type": "integer", "minimum": 0 }
+      }
+    }
+  },
+  "examples": [
+    {
+      "version": "0",
+      "id": "b6a791a8-cada-4fa0-9f49-26e25d4531ce",
+      "detail-type": "FileManualInterventionRequired.v1",
+      "source": "uk.gov.justice.service.managed-file-transfer",
+      "account": "123456789012",
+      "time": "2026-07-10T14:06:00Z",
+      "region": "eu-west-2",
+      "detail": {
+        "metadata": {
+          "correlationId": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
+          "causationId": "aa88e95a-159c-40c1-9e7b-38d00b0b6169",
+          "idempotencyKey": "manual-intervention:3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501"
+        },
+        "data": {
+          "fileId": "3f4e3d7a-4e2f-4bc2-9c4e-5f1ef2d4c501",
+          "object": {
+            "bucket": "investigation",
+            "key": "example/report.csv",
+            "versionId": "6Oj...",
+            "sizeBytes": 4096
+          },
+          "reasonCode": "INVESTIGATION_REQUIRED",
+          "description": "The object was routed to investigation after an inconclusive malware scan.",
+          "requiredAt": "2026-07-10T14:06:00Z"
+        }
+      }
+    }
+  ]
+}

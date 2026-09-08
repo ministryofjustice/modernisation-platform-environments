@@ -72,6 +72,24 @@ module "s3-bucket-athena-queries-output" {
 
 data "aws_iam_policy_document" "athena_bucket_policy" {
   statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      module.s3-bucket-athena-queries-output.bucket.arn,
+      "${module.s3-bucket-athena-queries-output.bucket.arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+  statement {
     effect = "Allow"
     actions = [
       "s3:PutObject",

@@ -104,6 +104,7 @@ resource "aws_db_instance" "this" {
   performance_insights_enabled    = var.rds_performance_insights_enabled
   performance_insights_kms_key_id = var.rds_performance_insights_enabled ? var.account_config.kms_keys.general_shared : null
   enabled_cloudwatch_logs_exports = var.rds_enabled_cloudwatch_logs_exports
+  copy_tags_to_snapshot           = true
   tags = merge(var.tags,
     { Name = lower(format("%s-%s-database", var.name, var.env_name)) },
     var.enable_platform_backups != null ? { "backup" = var.enable_platform_backups ? "true" : "false" } : {}

@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "replica" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = local.enable_ecp_replication ? 1 : 0
 
   bucket = "edw-19c-preprod-replica-bucket"
 
@@ -12,7 +12,7 @@ resource "aws_s3_bucket" "replica" {
 }
 
 resource "aws_s3_bucket_versioning" "replica" {
-  count  = local.environment == "preproduction" ? 1 : 0
+  count  = local.enable_ecp_replication ? 1 : 0
   bucket = aws_s3_bucket.replica[0].id
 
   versioning_configuration {
@@ -21,7 +21,7 @@ resource "aws_s3_bucket_versioning" "replica" {
 }
 
 resource "aws_s3_bucket_public_access_block" "replica" {
-  count  = local.environment == "preproduction" ? 1 : 0
+  count  = local.enable_ecp_replication ? 1 : 0
   bucket = aws_s3_bucket.replica[0].id
 
 
@@ -32,7 +32,7 @@ resource "aws_s3_bucket_public_access_block" "replica" {
 }
 
 resource "aws_s3_bucket_policy" "replica" {
-  count  = local.environment == "preproduction" ? 1 : 0
+  count  = local.enable_ecp_replication ? 1 : 0
   bucket = aws_s3_bucket.replica[0].id
 
   policy = jsonencode({

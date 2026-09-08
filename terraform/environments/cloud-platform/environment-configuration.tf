@@ -6,6 +6,9 @@ locals {
     cloud-platform-preproduction = {
       account_subdomain_name = "preproduction.${local.base_domain}"
     }
+    cloud-platform-nonlive = {
+      account_subdomain_name = "nonlive.${local.base_domain}"
+    }
     cloud-platform-live = {
       account_subdomain_name = "live.${local.base_domain}"
     }
@@ -26,6 +29,12 @@ locals {
     }
     container-platform-hmpps-live = {
       account_subdomain_name = "hmpps-live.${local.base_domain}"
+    }
+    container-platform-cd-nonlive = {
+      account_subdomain_name = "cd-nonlive.${local.base_domain}"
+    }
+    container-platform-cd-live = {
+      account_subdomain_name = "cd-live.${local.base_domain}"
     }
   }
 }

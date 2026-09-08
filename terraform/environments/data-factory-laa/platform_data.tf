@@ -3,6 +3,11 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
+# AZs
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 # VPC and subnet data
 data "aws_vpc" "shared" {
   tags = {

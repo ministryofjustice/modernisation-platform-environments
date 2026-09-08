@@ -1,0 +1,98 @@
+# Build from LinOTP GitHub source (AGPL-3.0, no license required)
+#
+# SECURITY FIX: Multi-stage build. The previous single-stage build kept the
+# full git-cloned LinOTP source tree (including requirements-dev.txt,
+# requirements-test.txt, requirements-all.txt) in the final image after
+# `pip install /opt/linotp` had already copied the package into the venv.
+# Nothing at runtime reads /opt/linotp - entrypoint.sh only invokes the
+# `linotp`/`gunicorn` console scripts installed into /opt/venv - but ECR
+# Inspector scans those leftover requirements-*.txt files as if their listed
+# packages (black, pytest, selenium, virtualenv, filelock, wheel, h11,
+# pygments, ...) were actually installed, none of which are. Dropping the
+# source tree and build-only tooling (git, build-essential, python3-dev,
+# pkg-config, *-dev libs) from the final image removes that phantom
+# vulnerability surface entirely, on top of shrinking the real attack
+# surface (no compiler toolchain shipped at runtime).
+FROM debian:bookworm-slim AS builder
+
+USER root
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
+    python3-venv \
+    python3-dev \
+    git \
+    build-essential \
+    libmariadb-dev \
+    libldap2-dev \
+    libsasl2-dev \
+    libsodium-dev \
+    pkg-config \
+    && apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Clone LinOTP from GitHub (open source, no license required)
+RUN git clone --depth 1 --branch release/3.4.4 https://github.com/LinOTP/LinOTP.git /opt/linotp
+
+# Create venv and install LinOTP with its pinned dependencies
+RUN python3 -m venv /opt/venv && \
+    /opt/venv/bin/pip install --upgrade pip setuptools && \
+    /opt/venv/bin/pip install -r /opt/linotp/requirements-prod.txt && \
+    /opt/venv/bin/pip install /opt/linotp && \
+    /opt/venv/bin/pip install pymysql gunicorn
+
+# SECURITY FIX: requirements-prod.txt is a pip-compile lockfile pinned to
+# whatever was latest when it was generated, not an actual compatibility
+# requirement - LinOTP's own setup.py declares these deps with no version
+# bound at all. Flask/Werkzeug/PyJWT are excluded here: those genuinely are
+# bounded (Flask<2.2, which caps Werkzeug/PyJWT transitively) and upgrading
+# them breaks the app. `pip check` below fails the build if any upgrade
+# turns out to violate a real constraint.
+RUN /opt/venv/bin/pip install --upgrade \
+    cryptography pyasn1 pyasn1-modules mako click urllib3 requests \
+    httplib2 idna zipp python-ldap setuptools && \
+    /opt/venv/bin/pip check
+
+# Runtime stage - only the venv and the runtime shared libraries it needs
+FROM debian:bookworm-slim
+
+USER root
+
+RUN apt-get update && \
+    apt-get upgrade -y --no-install-recommends && \
+    apt-get install -y --no-install-recommends \
+    python3 \
+    libmariadb3 \
+    libldap-2.5-0 \
+    libsasl2-2 \
+    libsodium23 \
+    curl \
+    openssl \
+    default-mysql-client \
+    && apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+COPY --from=builder /opt/venv /opt/venv
+
+ENV PATH="/opt/venv/bin:$PATH"
+ENV LINOTP_CFG="/etc/linotp/linotp.cfg"
+
+# Copy custom entrypoint, configuration script, and LinOTP config
+COPY entrypoint.sh /usr/local/bin/custom-entrypoint.sh
+COPY configure_linotp_python.py /usr/local/bin/configure_linotp_python.py
+COPY linotp.cfg /etc/linotp/linotp.cfg
+RUN chmod +x /usr/local/bin/custom-entrypoint.sh && \
+    chmod +x /usr/local/bin/configure_linotp_python.py && \
+    mkdir -p /etc/linotp /var/cache/linotp /var/log/linotp
+
+EXPOSE 5000
+
+# Forces a unique layer/digest per build invocation, so every push gets its
+# own distinct ECR image entry instead of collapsing onto a prior identical
+# build when the rest of the context is unchanged and fully cache-hits.
+ARG BUILD_TIMESTAMP=unknown
+LABEL build.timestamp="${BUILD_TIMESTAMP}"
+
+ENTRYPOINT ["/usr/local/bin/custom-entrypoint.sh"]

@@ -77,8 +77,8 @@ resource "aws_lambda_function" "red_button_trigger" {
   environment {
     variables = {
       S3_BUCKET_REDBUTTON = aws_s3_bucket.red_button_data.id
-      BOOM                = local.application_data.accounts[local.environment].red_button_lambda_boom
-      DEBUG               = local.application_data.accounts[local.environment].red_button_lambda_debug
+      BOOM                = local.application_data.accounts[local.environment].lambda.red-button.boom
+      DEBUG               = local.application_data.accounts[local.environment].lambda.red-button.debug
     }
   }
 

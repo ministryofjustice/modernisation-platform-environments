@@ -128,3 +128,24 @@ resource "aws_security_group_rule" "dms_validation_lambda_egress_generic" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block, ]
   security_group_id = aws_security_group.dms_validation_lambda_sg[0].id
 }
+
+
+resource "aws_security_group" "lambda_cp_sg" {
+  name_prefix = "${local.bucket_prefix}-cloud-platform-lambda-sg"
+  description = "Lambda Security Group for CP access"
+  vpc_id      = data.aws_vpc.shared.id
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_security_group_rule" "cloud_platform_access" {
+  type              = "egress"
+  description       = "allow CP egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["172.16.0.0/12"]
+  security_group_id = aws_security_group.lambda_cp_sg.id
+}

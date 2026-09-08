@@ -1,5 +1,9 @@
 # tflint-ignore-file: terraform_required_version, terraform_required_providers
 
+locals {
+  egress_folder_path = coalesce(var.egress_folder_path, var.name)
+}
+
 data "aws_iam_policy_document" "this" {
   statement {
     sid    = "AllowKMS"
@@ -43,7 +47,7 @@ data "aws_iam_policy_document" "this" {
       "s3:GetObjectAcl",
       "s3:GetObjectVersion"
     ]
-    resources = ["arn:aws:s3:::${var.egress_bucket}/${var.name}/*"]
+    resources = ["arn:aws:s3:::${var.egress_bucket}/${local.egress_folder_path}/*"]
   }
 }
 
@@ -99,7 +103,7 @@ resource "aws_transfer_user" "this" {
 
   home_directory_mappings {
     entry  = "/download"
-    target = "/${var.egress_bucket}/${var.name}"
+    target = "/${var.egress_bucket}/${local.egress_folder_path}"
   }
 }
 

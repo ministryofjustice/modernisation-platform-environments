@@ -15,7 +15,7 @@ locals {
     data.aws_subnet.private_subnets_c.cidr_block
   ]
 
-  lambda_folder_name = ["lambda_delivery", "ccms-edrms-docs-exception-layer", "cloudwatch_sns_layer"]
+  lambda_folder_name = ["lambda_delivery", "ccms-edrms-docs-connect-layer", "cloudwatch_sns_layer"]
 
   lambda_source_hashes = [
     for f in fileset("./lambda/cloudwatch_alarm_slack_integration", "**") :

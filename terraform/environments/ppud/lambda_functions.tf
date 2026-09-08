@@ -94,6 +94,17 @@ locals {
         source_arn_suffix = "*"
       }]
     }
+    send_malware_scan_notification = {
+      description  = "Function to send notification of malware scan completion on the PPUD document service."
+      role_key     = "get_cloudwatch"
+      environments = ["development", "production"]
+      layers       = ["numpy", "pillow", "matplotlib"]
+      vpc_config   = { prod = true }
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
     wam_waf_analysis = {
       description  = "Function to analyse WAM WAF ACL traffic and email a report."
       role_key     = "get_cloudwatch"
@@ -321,6 +332,18 @@ locals {
       description  = "Function to analyse WAM WAF Web ACL rule AWSManagedRulesBotControlRuleSet for bot traffic and email a report."
       role_key     = "get_waf_web_acl"
       environments = ["development", "preproduction"]
+      permissions = [{
+        principal         = "cloudwatch.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
+    waf_web_acl_deep_bot_analysis = {
+      description  = "Function to perform a deeper analysis WAM WAF Web ACL rule AWSManagedRulesBotControlRuleSet for bot traffic and save a report to S3."
+      timeout      = 900
+      memory_size  = 1024
+      role_key     = "filter_waf_log_events"
+      environments = ["development"]
+      layers       = ["xlsxwriter", "requests", "numpy", "pandas"]
       permissions = [{
         principal         = "cloudwatch.amazonaws.com"
         source_arn_suffix = "*"

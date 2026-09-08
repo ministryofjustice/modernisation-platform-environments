@@ -91,6 +91,13 @@ resource "aws_iam_role_policy" "datasync_password_updater_policy" {
           "fsx:DescribeFileSystems",
         ]
         Resource = "arn:aws:fsx:*:*:*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:UpdateSecret"
+        ],
+        Resource = "arn:aws:secretsmanager:eu-west-2:*:secret:aws-datasync!*"
       }
     ]
   })

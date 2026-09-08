@@ -3,7 +3,7 @@
 ##################################################################################################################
 
 resource "aws_iam_policy" "rds_s3_access_policy" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = local.enable_ecp_replication ? 1 : 0
 
   name        = "${local.application_name}-rds-s3-access-policy"
   description = "Policy to allow RDS access to S3 buckets for Data Pump imports"
@@ -27,7 +27,7 @@ resource "aws_iam_policy" "rds_s3_access_policy" {
 }
 
 resource "aws_iam_role" "rds_s3_access_role" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = local.enable_ecp_replication ? 1 : 0
 
   name = "${local.application_name}-rds-s3-access-role"
   assume_role_policy = jsonencode({
@@ -45,7 +45,7 @@ resource "aws_iam_role" "rds_s3_access_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "rds_s3_access_attachment" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = local.enable_ecp_replication ? 1 : 0
 
   role       = aws_iam_role.rds_s3_access_role[0].name
   policy_arn = aws_iam_policy.rds_s3_access_policy[0].arn

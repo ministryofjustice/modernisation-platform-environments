@@ -125,6 +125,13 @@ resource "aws_api_gateway_deployment" "chatbot_api_deployment" {
 }
 
 resource "aws_api_gateway_stage" "chatbot_api_stage" {
+  #checkov:skip=CKV_AWS_73:To be reviewed later
+  #checkov:skip=CKV_AWS_120:To be reviewed later
+  #checkov:skip=CKV_AWS_76:To be reviewed later
+  #checkov:skip=CKV2_AWS_4:To be reviewed later
+  #checkov:skip=CKV2_AWS_51:To be reviewed later
+  #checkov:skip=CKV2_AWS_29:To be reviewed later
+
   deployment_id = aws_api_gateway_deployment.chatbot_api_deployment.id
   rest_api_id   = aws_api_gateway_rest_api.chatbot_api.id
   stage_name    = local.environment

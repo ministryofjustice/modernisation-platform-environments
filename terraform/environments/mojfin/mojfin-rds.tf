@@ -80,6 +80,10 @@ resource "aws_db_instance" "appdb1" {
   #   source_db_instance_identifier = local.application_name
   # }
 
+  lifecycle {
+    ignore_changes = [final_snapshot_identifier]
+  }
+
   timeouts {
     create = "60m"
     delete = "2h"

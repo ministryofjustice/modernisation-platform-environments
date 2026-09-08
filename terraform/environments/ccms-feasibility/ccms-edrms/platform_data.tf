@@ -103,6 +103,30 @@ data "aws_subnet" "public_subnets_c" {
   }
 }
 
+data "aws_subnet" "vpce_subnets_a" {
+  provider = aws.core-vpc
+  vpc_id   = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-protected-${data.aws_region.current.region}a"
+  }
+}
+
+data "aws_subnet" "vpce_subnets_b" {
+  provider = aws.core-vpc
+  vpc_id   = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-protected-${data.aws_region.current.region}b"
+  }
+}
+
+data "aws_subnet" "vpce_subnets_c" {
+  provider = aws.core-vpc
+  vpc_id   = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-protected-${data.aws_region.current.region}c"
+  }
+}
+
 # Route53 DNS data
 data "aws_route53_zone" "external" {
   provider = aws.core-vpc

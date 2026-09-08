@@ -25,5 +25,6 @@ module "sftp_users_with_egress" {
   landing_bucket_kms_key = module.s3_landing_kms.key_arn
   egress_bucket          = each.value.egress_bucket
   egress_bucket_kms_key  = each.value.egress_bucket_kms_key
+  egress_folder_path     = try(each.value.egress_folder_path, each.key)
   supplier_data_kms_key  = module.supplier_data_kms.key_arn
 }

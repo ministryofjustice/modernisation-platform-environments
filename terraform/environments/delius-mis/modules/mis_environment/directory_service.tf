@@ -196,6 +196,34 @@ resource "aws_route53_resolver_rule_association" "vpc_r53_fwd_to_legacy_ad" {
   vpc_id           = var.account_config.shared_vpc_id
 }
 
+resource "aws_route53_resolver_rule" "r53_fwd_to_legacy_nextcloud_efs" {
+  count = lookup(var.environment_config, "legacy_nextcloud_efs_dns_name", null) != null ? 1 : 0
+
+  provider = aws.core-vpc
+
+  domain_name = var.environment_config.legacy_nextcloud_efs_dns_name
+  name        = "delius-mis-forward-for-legacy-nextcloud-efs"
+  rule_type   = "FORWARD"
+
+  resolver_endpoint_id = aws_route53_resolver_endpoint.resolve_local_entries_using_ad_dns.id
+
+  dynamic "target_ip" {
+    for_each = sort(var.environment_config.legacy_resolver_ip_addrs)
+    content {
+      ip = target_ip.value
+    }
+  }
+}
+
+resource "aws_route53_resolver_rule_association" "r53_fwd_to_legacy_nextcloud_efs" {
+  count = lookup(var.environment_config, "legacy_nextcloud_efs_dns_name", null) != null ? 1 : 0
+
+  provider = aws.core-vpc
+
+  resolver_rule_id = aws_route53_resolver_rule.r53_fwd_to_legacy_nextcloud_efs[0].id
+  vpc_id           = var.account_config.shared_vpc_id
+}
+
 ###
 # AD Join - Provide SG that EC2s can use if they need to join domain
 ###

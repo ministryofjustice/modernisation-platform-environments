@@ -267,6 +267,7 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/sap/bip/t2/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
+              "arn:aws:secretsmanager:*:*:secret:/rclone/*",
             ]
           },
           {
@@ -411,6 +412,12 @@ locals {
       "/sap/bip/t2"              = local.secretsmanager_secrets.bip
       "/oracle/database/T2BOSYS" = local.secretsmanager_secrets.db
       "/oracle/database/T2BOAUD" = local.secretsmanager_secrets.db
+      "/rclone" = {
+        recovery_window_in_days = 0
+        secrets = {
+          config = { description = "RClone Configuration" }
+        }
+      }
     }
   }
 }

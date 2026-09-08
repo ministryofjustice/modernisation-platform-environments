@@ -95,7 +95,7 @@ data "aws_iam_policy_document" "dpd_s3_publisher_policy" {
       test     = "StringLike"
       variable = "s3:prefix"
       values = [
-        "${each.value.s3_prefix}",
+        each.value.s3_prefix,
         "${each.value.s3_prefix}/*"
       ]
     }

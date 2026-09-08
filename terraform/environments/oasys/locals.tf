@@ -2,13 +2,13 @@
 # define environment specific configuration in locals_development.tf, locals_test.tf etc.
 
 locals {
-  delius_oasys_queues_environments_specific = {
-    development   = local.delius_oasys_queues_development
-    test          = local.delius_oasys_queues_test
-    preproduction = local.delius_oasys_queues_preproduction
-    production    = local.delius_oasys_queues_production
+  locals_environments_specific = {
+    development   = local.locals_development
+    test          = local.locals_test
+    preproduction = local.locals_preproduction
+    production    = local.locals_production
   }
-  delius_oasys_queues = local.delius_oasys_queues_environments_specific[local.environment]
+  locals_environment_specific = local.locals_environments_specific[local.environment]
 
   baseline_presets_environments_specific = {
     development   = local.baseline_presets_development

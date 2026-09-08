@@ -1,7 +1,17 @@
+output "acm_certificates_validation_records_external" {
+  description = "ACM validation records for external zones"
+  value       = length(module.acm_certificate) == 1 ? module.acm_certificate[0].validation_records_external : {}
+}
+
 # DataSync outputs
 output "datasync_task_arn" {
   description = "ARN of the DataSync task for S3 to FSX sync"
   value       = var.datasync_config != null ? aws_datasync_task.dfi_s3_to_fsx[0].arn : null
+}
+
+output "datasync_s3_role_arn" {
+  description = "ARN of the DataSync S3 role"
+  value       = var.datasync_config != null ? aws_iam_role.datasync_s3_role[0].arn : null
 }
 
 output "datasync_fsx_credentials_secret_arn" {

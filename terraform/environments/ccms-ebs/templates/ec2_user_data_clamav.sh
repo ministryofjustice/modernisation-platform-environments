@@ -19,7 +19,20 @@ systemctl stop amazon-ssm-agent
 rm -rf /var/lib/amazon/ssm/ipc/
 systemctl start amazon-ssm-agent
 
-yum install -y clamav clamav-update clamd
+dnf install -y clamav1.4 clamav1.4-freshclam clamav1.4-data clamav1.4-filesystem clamd1.4.x86_64
+
+cat << EOF > /etc/clamd.d/scan.conf
+## Minimal config
+LogFile /var/log/clamd.scan
+LogTime yes
+LogClean yes
+LogSyslog yes
+LogVerbose yes
+TCPSocket 3310
+StreamMaxLength 320M
+User clamscan
+EOF
+
 freshclam
 
 systemctl enable clamd@scan.service

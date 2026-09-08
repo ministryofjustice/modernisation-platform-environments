@@ -152,6 +152,12 @@ locals {
               ttl     = 300
               records = ["538403c0023ec96ea670ef9e55bf7c"]
             },
+            gh-ministryofjustice-o-txt = {
+              type    = "TXT"
+              name    = "_gh-ministryofjustice-o"
+              ttl     = 300
+              records = ["72ebf04267"]
+            },
             /* PagerDuty Status Page */
             pagerduty-dkim1-cname = {
               type    = "CNAME"

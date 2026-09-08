@@ -452,6 +452,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "cur_v2_hourly" {
     noncurrent_version_expiration {
       noncurrent_days = 1
     }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
   }
 }
 
@@ -466,6 +470,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "focus_reports" {
 
     noncurrent_version_expiration {
       noncurrent_days = 1
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
     }
   }
 }
@@ -482,6 +490,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "coat_reports" {
     noncurrent_version_expiration {
       noncurrent_days = 1
     }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
   }
 }
 
@@ -497,6 +509,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "cur_v2_hourly_enriched" {
 
     noncurrent_version_expiration {
       noncurrent_days = 1
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
     }
   }
 }

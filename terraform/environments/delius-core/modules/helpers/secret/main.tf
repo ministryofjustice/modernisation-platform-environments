@@ -1,4 +1,5 @@
 resource "aws_secretsmanager_secret" "this" {
+  #checkov:skip=CKV2_AWS_57: "Automatic rotation is not required for this secret"
   name        = var.name
   description = var.description
   kms_key_id  = var.kms_key_id

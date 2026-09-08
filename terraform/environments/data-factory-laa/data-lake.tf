@@ -1,5 +1,6 @@
 locals {
-  name = "laa-data-factory"
+  name      = "laa-data-factory"
+  databases = ["aws-athena-query-results", "raw", "processedraw", "staging", "intermediate", "datamarts", "derived"]
   environments = {
     development = {
       lakeformation_admins = [
@@ -31,9 +32,52 @@ module "data_lake_settings" {
   read_only_admins = local.environments[local.environment].lakeformation_read_only_admins
 }
 
+data "aws_iam_policy_document" "data_lake_kms_key" {
+  #checkov:skip=CKV_AWS_356: Delegates access to the root account for KMS key management
+  #checkov:skip=CKV_AWS_109: Delegates access to the root account for KMS key management
+  #checkov:skip=CKV_AWS_111: Delegates access to the root account for KMS key management
+  # Enables IAM policies in this AWS account to delegate access to the key.
+  statement {
+    sid    = "EnableRootAccountPermissions"
+    effect = "Allow"
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root",
+      ]
+    }
+
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+
+  # Allows S3 event notifications to publish to an encrypted SQS queue.
+  statement {
+    sid    = "AllowS3EventNotifications"
+    effect = "Allow"
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "s3.amazonaws.com",
+      ]
+    }
+
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+    ]
+
+    resources = ["*"]
+  }
+}
+
 resource "aws_kms_key" "data_lake_kms_key" {
   description             = "KMS key for encrypting data in the data lake"
   deletion_window_in_days = 10
+  enable_key_rotation     = true
+  policy                  = data.aws_iam_policy_document.data_lake_kms_key.json
 }
 
 resource "aws_kms_alias" "data_lake_kms_alias" {
@@ -41,61 +85,36 @@ resource "aws_kms_alias" "data_lake_kms_alias" {
   target_key_id = aws_kms_key.data_lake_kms_key.id
 }
 
-module "data_lake_bronze_bucket" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f72f8d5"
+module "data_lake_buckets" {
+  for_each = toset(local.databases)
+  source   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=4f72896323ec7f06e293f1f75732549b3248f841"
 
-  bucket_prefix      = "${local.name}-bronze-"
-  versioning_enabled = true
-
+  bucket_prefix       = each.key == "aws-athena-query-results" ? "aws-athena-query-results" : "${local.name}-${each.key}"
+  bucket_namespace    = "account-regional"
+  versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
+  sse_algorithm       = "aws:kms"
+  custom_kms_key      = aws_kms_key.data_lake_kms_key.arn
 
   providers = {
     aws.bucket-replication = aws
   }
-
-  sse_algorithm  = "aws:kms"
-  custom_kms_key = aws_kms_key.data_lake_kms_key.arn
 
   tags = local.tags
 }
 
-module "data_lake_silver_bucket" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f72f8d5"
+module "databases" {
+  for_each = toset(local.databases)
+  source   = "git::https://github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/data-factory-glue-database?ref=ef60504"
 
-  bucket_prefix      = "${local.name}-silver-"
-  versioning_enabled = true
+  database_name = each.key
 
-  ownership_controls  = "BucketOwnerEnforced"
-  replication_enabled = false
-
-  providers = {
-    aws.bucket-replication = aws
+  storage = {
+    bucket_name = module.data_lake_buckets[each.key].bucket.id
+    prefix      = each.key
+    kms_key_arn = aws_kms_key.data_lake_kms_key.arn
   }
-
-  sse_algorithm  = "aws:kms"
-  custom_kms_key = aws_kms_key.data_lake_kms_key.arn
-
-  tags = local.tags
-}
-
-module "data_lake_gold_bucket" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f72f8d5"
-
-  bucket_prefix      = "${local.name}-gold-"
-  versioning_enabled = true
-
-  providers = {
-    aws.bucket-replication = aws
-  }
-
-  ownership_controls  = "BucketOwnerEnforced"
-  replication_enabled = false
-
-  sse_algorithm  = "aws:kms"
-  custom_kms_key = aws_kms_key.data_lake_kms_key.arn
-
-  tags = local.tags
 }
 
 data "aws_iam_policy_document" "data_lake_access_action_assume_role" {

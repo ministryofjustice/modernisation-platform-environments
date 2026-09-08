@@ -12,7 +12,7 @@ resource "aws_wafv2_web_acl" "waf" {
   }
 
   dynamic "rule" {
-    for_each = var.waf_path_allow_rules
+    for_each = var.waf_header_allow_rules
     content {
       name     = rule.value.name
       priority = rule.value.priority
@@ -22,16 +22,43 @@ resource "aws_wafv2_web_acl" "waf" {
       }
 
       statement {
-        byte_match_statement {
-          search_string = rule.value.path
-          field_to_match {
-            uri_path {}
+        and_statement {
+          statement {
+            or_statement {
+              dynamic "statement" {
+                for_each = rule.value.paths
+                content {
+                  byte_match_statement {
+                    search_string = statement.value
+                    field_to_match {
+                      uri_path {}
+                    }
+                    text_transformation {
+                      priority = 0
+                      type     = "NONE"
+                    }
+                    positional_constraint = "EXACTLY"
+                  }
+                }
+              }
+            }
           }
-          text_transformation {
-            priority = 0
-            type     = "NONE"
+
+          statement {
+            byte_match_statement {
+              search_string = var.waf_header_allow_header_value
+              field_to_match {
+                single_header {
+                  name = lower(var.waf_header_allow_header_name)
+                }
+              }
+              text_transformation {
+                priority = 0
+                type     = "NONE"
+              }
+              positional_constraint = "EXACTLY"
+            }
           }
-          positional_constraint = "EXACTLY"
         }
       }
 
@@ -177,7 +204,7 @@ resource "aws_wafv2_web_acl" "cf" {
   }
 
   dynamic "rule" {
-    for_each = var.waf_path_allow_rules_cf
+    for_each = var.waf_header_allow_rules_cf
     content {
       name     = rule.value.name
       priority = rule.value.priority
@@ -187,16 +214,43 @@ resource "aws_wafv2_web_acl" "cf" {
       }
 
       statement {
-        byte_match_statement {
-          search_string = rule.value.path
-          field_to_match {
-            uri_path {}
+        and_statement {
+          statement {
+            or_statement {
+              dynamic "statement" {
+                for_each = rule.value.paths
+                content {
+                  byte_match_statement {
+                    search_string = statement.value
+                    field_to_match {
+                      uri_path {}
+                    }
+                    text_transformation {
+                      priority = 0
+                      type     = "NONE"
+                    }
+                    positional_constraint = "EXACTLY"
+                  }
+                }
+              }
+            }
           }
-          text_transformation {
-            priority = 0
-            type     = "NONE"
+
+          statement {
+            byte_match_statement {
+              search_string = var.waf_header_allow_header_value
+              field_to_match {
+                single_header {
+                  name = lower(var.waf_header_allow_header_name)
+                }
+              }
+              text_transformation {
+                priority = 0
+                type     = "NONE"
+              }
+              positional_constraint = "EXACTLY"
+            }
           }
-          positional_constraint = "EXACTLY"
         }
       }
 

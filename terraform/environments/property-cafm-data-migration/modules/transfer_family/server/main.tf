@@ -1,5 +1,6 @@
 resource "aws_transfer_server" "this" {
   # checkov:skip=CKV_AWS_164: "using public endpoint option for AWS Transfer"
+  # checkov:skip=CKV_AWS_380: Security policy pinned for SFTP client compatibility; to be reviewed and updated with partner sign-off.
   identity_provider_type = "SERVICE_MANAGED"
   endpoint_type          = "PUBLIC"
   security_policy_name   = "TransferSecurityPolicy-2024-01"
