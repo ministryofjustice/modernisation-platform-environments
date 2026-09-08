@@ -13,6 +13,7 @@ locals {
 
     s3_buckets = {
       artifacts-bucket = {
+        lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.default]
         tags = {
           backup = "false"
         }
