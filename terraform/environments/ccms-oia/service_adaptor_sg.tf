@@ -38,17 +38,6 @@ resource "aws_vpc_security_group_ingress_rule" "adaptor_alb_ingress_443_c" {
   description       = "HTTPS from private subnet C"
 }
 
-# Temp only for dev for security rule tightening 
-resource "aws_vpc_security_group_ingress_rule" "adaptor_alb_ingress_443_workspace_dev" {
-  count             = local.is-development ? 1 : 0
-  security_group_id = aws_security_group.adaptor_load_balancer.id
-  cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
-  ip_protocol       = "tcp"
-  from_port         = 443
-  to_port           = 443
-  description       = "HTTPS from AWS Workspaces"
-}
-
 # Temp only for test for security rule tightening 
 resource "aws_vpc_security_group_ingress_rule" "adaptor_alb_ingress_443_workspace_test" {
   count             = local.is-test ? 1 : 0
