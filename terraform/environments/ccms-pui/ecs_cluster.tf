@@ -121,6 +121,11 @@ resource "aws_ecs_service" "pui" {
   # capacity-provider.tf.
   launch_type = "EC2"
 
+  # Required by the AWS provider whenever a service switches between
+  # launch_type and capacity_provider_strategy - remove once restored to
+  # capacity_provider_strategy.
+  force_new_deployment = true
+
   health_check_grace_period_seconds = 120
   lifecycle {
     ignore_changes = [
