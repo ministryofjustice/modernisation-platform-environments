@@ -8,11 +8,15 @@ resource "aws_ecs_cluster" "main" {
   }
 }
 
-# Temporarily emptied while aws_ecs_capacity_provider.capacity-provider is
-# commented out for recreation - restore alongside capacity-provider.tf.
 resource "aws_ecs_cluster_capacity_providers" "main" {
   cluster_name       = aws_ecs_cluster.main.name
-  capacity_providers = []
+  capacity_providers = [aws_ecs_capacity_provider.capacity-provider.name]
+
+  default_capacity_provider_strategy {
+    capacity_provider = aws_ecs_capacity_provider.capacity-provider.name
+    weight            = 1
+    base              = 1
+  }
 }
 
 # ECS Task Definition
@@ -116,15 +120,21 @@ resource "aws_ecs_service" "pui" {
 
 
 
-  # Temporarily using launch_type while aws_ecs_capacity_provider.capacity-provider
-  # is commented out for recreation - restore capacity_provider_strategy alongside
-  # capacity-provider.tf.
-  launch_type = "EC2"
-
-  # Required by the AWS provider whenever a service switches between
-  # launch_type and capacity_provider_strategy - remove once restored to
-  # capacity_provider_strategy.
+  # Required by the AWS provider whenever capacity_provider_strategy is
+  # added/changed on an existing service, so the change is applied via a
+  # fresh deployment rather than an in-place update.
   force_new_deployment = true
+
+  # Use the cluster's capacity provider (with managed scaling enabled)
+  # instead of a bare EC2 launch type, so ECS can grow the ASG automatically
+  # to provide extra instance capacity for rolling deployments instead of
+  # stalling with "insufficient resources" because there is no room to place
+  # the new task revision alongside the old one.
+  capacity_provider_strategy {
+    capacity_provider = aws_ecs_capacity_provider.capacity-provider.name
+    weight            = 1
+    base              = 1
+  }
 
   health_check_grace_period_seconds = 120
   lifecycle {

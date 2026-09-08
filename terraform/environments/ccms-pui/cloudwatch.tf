@@ -58,7 +58,7 @@ resource "aws_cloudwatch_metric_alarm" "cp_reservation_low" {
   threshold           = 75
   treat_missing_data  = "notBreaching"
   dimensions = {
-    # CapacityProviderName = aws_ecs_capacity_provider.capacity-provider.name
+    CapacityProviderName = aws_ecs_capacity_provider.capacity-provider.name
     ClusterName          = aws_ecs_cluster.main.name
   }
   alarm_actions = [aws_sns_topic.cloudwatch_alerts.arn]
