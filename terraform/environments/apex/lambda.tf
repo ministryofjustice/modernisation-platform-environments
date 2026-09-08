@@ -265,7 +265,7 @@ resource "aws_lambda_function" "delete_db_snapshots" {
   description      = "Clean up script to delete old unused snapshots"
   function_name    = "deletesnapshotFunction"
   role             = aws_iam_role.backup_lambda.arn
-  handler          = "deletesnapshots.lambda_handler"
+  handler          = "deletesnapshots_v2.lambda_handler"
   source_code_hash = data.archive_file.delete_db_snapshots.output_base64sha256
   runtime          = "python3.14"
   s3_bucket        = aws_s3_bucket.backup_lambda.id
