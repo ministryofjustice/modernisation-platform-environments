@@ -38,6 +38,28 @@ resource "aws_vpc_security_group_ingress_rule" "adaptor_alb_ingress_443_c" {
   description       = "HTTPS from private subnet C"
 }
 
+# Temp only for dev for security rule tightening 
+resource "aws_vpc_security_group_ingress_rule" "adaptor_alb_ingress_443_workspace" {
+  count             = local.is-development ? 1 : 0
+  security_group_id = aws_security_group.adaptor_load_balancer.id
+  cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  description       = "HTTPS from AWS Workspaces"
+}
+
+# Temp only for test for security rule tightening 
+resource "aws_vpc_security_group_ingress_rule" "adaptor_alb_ingress_443_workspace" {
+  count             = local.is-test ? 1 : 0
+  security_group_id = aws_security_group.adaptor_load_balancer.id
+  cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  description       = "HTTPS from AWS Workspaces"
+}
+
 # Restricted outbound traffic to OIA EC2 instances
 resource "aws_vpc_security_group_egress_rule" "adaptor_alb_egress_oia_ec2" {
   security_group_id            = aws_security_group.adaptor_load_balancer.id
@@ -83,7 +105,7 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_adaptor_ingress" {
 # }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_adaptor_egress_vpce" {
-  for_each          = toset([
+  for_each = toset([
     data.aws_subnet.vpce_subnets_a.cidr_block,
     data.aws_subnet.vpce_subnets_b.cidr_block,
     data.aws_subnet.vpce_subnets_c.cidr_block,
@@ -106,7 +128,7 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_adaptor_egress_s3" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_adaptor_egress_443" {
-  for_each          = toset([
+  for_each = toset([
     data.aws_subnet.private_subnets_a.cidr_block,
     data.aws_subnet.private_subnets_b.cidr_block,
     data.aws_subnet.private_subnets_c.cidr_block,
@@ -120,7 +142,7 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_adaptor_egress_443" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_adaptor_egress_1521" {
-  for_each          = toset([
+  for_each = toset([
     data.aws_subnet.data_subnets_a.cidr_block,
     data.aws_subnet.data_subnets_b.cidr_block,
     data.aws_subnet.data_subnets_c.cidr_block,
@@ -134,7 +156,7 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_adaptor_egress_1521" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_adaptor_egress_1522" {
-  for_each          = toset([
+  for_each = toset([
     data.aws_subnet.data_subnets_a.cidr_block,
     data.aws_subnet.data_subnets_b.cidr_block,
     data.aws_subnet.data_subnets_c.cidr_block,
