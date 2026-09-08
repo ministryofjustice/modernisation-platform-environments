@@ -39,7 +39,7 @@ resource "aws_vpc_security_group_ingress_rule" "adaptor_alb_ingress_443_c" {
 }
 
 # Temp only for dev for security rule tightening 
-resource "aws_vpc_security_group_ingress_rule" "adaptor_alb_ingress_443_workspace" {
+resource "aws_vpc_security_group_ingress_rule" "adaptor_alb_ingress_443_workspace_dev" {
   count             = local.is-development ? 1 : 0
   security_group_id = aws_security_group.adaptor_load_balancer.id
   cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
@@ -50,7 +50,7 @@ resource "aws_vpc_security_group_ingress_rule" "adaptor_alb_ingress_443_workspac
 }
 
 # Temp only for test for security rule tightening 
-resource "aws_vpc_security_group_ingress_rule" "adaptor_alb_ingress_443_workspace" {
+resource "aws_vpc_security_group_ingress_rule" "adaptor_alb_ingress_443_workspace_test" {
   count             = local.is-test ? 1 : 0
   security_group_id = aws_security_group.adaptor_load_balancer.id
   cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
