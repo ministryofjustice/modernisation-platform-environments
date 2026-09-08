@@ -141,6 +141,49 @@ data "aws_vpc_endpoint" "api_gateway" {
   }
 }
 
+data "aws_network_interface" "execute_api" {
+  for_each = toset(data.aws_vpc_endpoint.api_gateway.network_interface_ids)
+  provider = aws.core-vpc
+  id       = each.value
+}
+
+resource "aws_lb" "execute_api" {
+  name               = "execute-api-nlb"
+  internal           = true
+  load_balancer_type = "network"
+  subnets            = data.aws_subnets.shared-private.ids
+  access_logs {
+    bucket  = module.s3-logging-bucket.bucket.id
+    prefix  = "cloud-platform-lb"
+    enabled = true
+  }
+}
+
+resource "aws_lb_target_group" "execute_api" {
+  name        = "execute-api-tg"
+  port        = 443
+  protocol    = "TCP"
+  target_type = "ip"
+  vpc_id      = data.aws_vpc.shared.id
+}
+
+resource "aws_lb_target_group_attachment" "execute_api" {
+  for_each         = data.aws_network_interface.execute_api
+  target_group_arn = aws_lb_target_group.execute_api.arn
+  target_id        = each.value.private_ip
+  port             = 443
+}
+
+resource "aws_lb_listener" "execute_api" {
+  load_balancer_arn = aws_lb.execute_api.arn
+  port              = 443
+  protocol          = "TCP"
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.execute_api.arn
+  }
+}
+
 resource "aws_security_group" "allow_cp_access" {
   name        = "allow_cp_access"
   description = "allow cp access"
