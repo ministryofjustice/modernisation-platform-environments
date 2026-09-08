@@ -228,6 +228,12 @@ variable "ecs_cluster_arn" {
   type        = string
 }
 
+variable "asg_name" {
+  type        = string
+  description = "Name of ASG (For cloudwatch monitoring)"
+  default     = null
+}
+
 variable "launch_type" {
   type        = string
   description = "Launch typ required by the task e.g. EC2, FARGATE etc"

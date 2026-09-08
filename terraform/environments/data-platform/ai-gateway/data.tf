@@ -44,3 +44,7 @@ data "aws_elb_service_account" "current" {}
 data "aws_secretsmanager_secret_version" "microsoft_foundry_jedi_gateway" {
   secret_id = module.microsoft_foundry_jedi_gateway_secret.secret_id
 }
+
+data "aws_secretsmanager_secret_version" "google_cloud_ai_gateway" {
+  secret_id = module.google_cloud_ai_gateway_secret.secret_id
+}

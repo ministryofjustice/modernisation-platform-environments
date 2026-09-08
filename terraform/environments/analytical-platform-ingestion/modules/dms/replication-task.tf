@@ -57,7 +57,7 @@ locals {
       # Generate transformation rules for removing columns
       for idx, column_to_exclude in local.columns_to_exclude : {
         rule-type   = "transformation"
-        rule-id     = (length(local.objects) * 2) + idx + 1
+        rule-id     = (length(local.objects) * 2) + length(local.blobs) + idx + 1
         rule-name   = "remove-${lower(column_to_exclude.column_name)}-from-${lower(column_to_exclude.object_name)}"
         rule-action = "remove-column"
         rule-target = "column"

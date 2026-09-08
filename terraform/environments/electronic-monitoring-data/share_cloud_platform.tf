@@ -78,7 +78,10 @@ locals {
     ] : local.is-preproduction ? [
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-api-iam-preprod}",
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-algorithm-iam-preprod}",
-  ] : []
+  ] : [
+    "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-api-iam-prod}",
+    "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/${var.cloud-platform-crime-matching-algorithm-iam-prod}",
+  ]
   iam_role_validation_db = local.is-test ? [
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live",
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-21220dacf93f9ac4-live",
@@ -88,7 +91,7 @@ locals {
   iam_role_data_api = local.is-test ? [
     "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-21220dacf93f9ac4-live",
   ] : []
-  iam_role_ear_sar_db = local.is-preproduction ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live" : ""
+  iam_role_ear_sar_db = local.is-preproduction ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live" : local.is-production ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-a7f6cc937a0f63ce-live" : ""
   emdi_cp_roles = local.is-development || local.is-test ? [
     var.cloud-platform-emdi-iam-dev
     ] : local.is-preproduction ? [var.cloud-platform-emdi-iam-preprod] : [
@@ -138,6 +141,18 @@ variable "cloud-platform-crime-matching-algorithm-iam-preprod" {
   default     = "cloud-platform-irsa-6ca3fa16de5344f0-live"
 }
 
+variable "cloud-platform-crime-matching-api-iam-prod" {
+  type        = string
+  description = "IAM role that the crime matching API in Cloud Platform will use to connect to this role."
+  default     = "cloud-platform-irsa-ac8e98221b4a2318-live"
+}
+
+variable "cloud-platform-crime-matching-algorithm-iam-prod" {
+  type        = string
+  description = "IAM role that the crime matching algorithm in Cloud Platform will use to connect to this role."
+  default     = "cloud-platform-irsa-17b37c1d3aaf1334-live"
+}
+
 variable "cloud-platform-emdi-iam-dev" {
   type        = string
   description = "IAM role that the EDMI API in Cloud Platform will use to connect to this role."
@@ -164,7 +179,7 @@ resource "aws_lakeformation_resource" "data_bucket" {
 module "emd_ears_sars_cp_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-  count   = local.is-preproduction ? 1 : 0
+  count   = local.is-preproduction || local.is-production ? 1 : 0
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.48.0"
 
@@ -243,7 +258,7 @@ module "emd_update_p1_cp_role" {
 
 
 data "aws_iam_policy_document" "em_dashboard_update_p1_permissions" {
-  count = local.is-preproduction ? 1 : 0
+  count = local.is-preproduction || local.is-production ? 1 : 0
   statement {
     sid       = "AllowAccessToTriggerUpdateP1API"
     effect    = "Allow"
@@ -268,14 +283,14 @@ data "aws_iam_policy_document" "em_dashboard_update_p1_permissions" {
 }
 
 resource "aws_iam_policy" "em_dashboard_update_p1_permissions" {
-  count       = local.is-preproduction ? 1 : 0
+  count       = local.is-preproduction || local.is-production ? 1 : 0
   name_prefix = "em_dashboard_update_p1_permissions"
   description = "Permissions for updating p1 export."
   policy      = data.aws_iam_policy_document.em_dashboard_update_p1_permissions[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "em_dashboard_update_p1_permissions" {
-  count      = local.is-preproduction ? 1 : 0
+  count      = local.is-preproduction || local.is-production ? 1 : 0
   policy_arn = aws_iam_policy.em_dashboard_update_p1_permissions[0].arn
   role       = module.emd_update_p1_cp_role[0].iam_role_name
 }
@@ -426,7 +441,7 @@ data "aws_iam_policy_document" "em_data_api_permissions" {
 }
 
 data "aws_iam_policy_document" "em_dashboard_ear_sar_permissions" {
-  count = local.is-preproduction ? 1 : 0
+  count = local.is-preproduction || local.is-production ? 1 : 0
   statement {
     sid       = "AllowAccessToTriggerEARSARAPI"
     effect    = "Allow"
@@ -451,14 +466,14 @@ data "aws_iam_policy_document" "em_dashboard_ear_sar_permissions" {
 }
 
 resource "aws_iam_policy" "em_dashboard_ear_sar_permissions" {
-  count       = local.is-preproduction ? 1 : 0
+  count       = local.is-preproduction || local.is-production ? 1 : 0
   name_prefix = "em_dashboard_ear_sar_permissions"
   description = "Permissions for ear sar tool."
   policy      = data.aws_iam_policy_document.em_dashboard_ear_sar_permissions[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "em_dashboard_ear_sar_permissions" {
-  count      = local.is-preproduction ? 1 : 0
+  count      = local.is-preproduction || local.is-production ? 1 : 0
   policy_arn = aws_iam_policy.em_dashboard_ear_sar_permissions[0].arn
   role       = module.emd_ears_sars_cp_role[0].iam_role_name
 }
@@ -606,7 +621,6 @@ module "cmt_front_end_assumable_role" {
 module "acquisitive_crime_assumable_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-  count   = local.is-production ? 0 : 1
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.48.0"
 
@@ -674,7 +688,7 @@ module "specials_cmt_front_end_assumable_role" {
 
 resource "aws_lakeformation_permissions" "ac_allied_db" {
   count       = local.is-development ? 1 : 0
-  principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
+  principal   = module.acquisitive_crime_assumable_role.iam_role_arn
   permissions = ["DESCRIBE"]
   database {
     name = "allied_mdss_${local.environment_shorthand}"
@@ -683,7 +697,7 @@ resource "aws_lakeformation_permissions" "ac_allied_db" {
 
 resource "aws_lakeformation_permissions" "ac_allied_tables" {
   count       = local.is-development ? 1 : 0
-  principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
+  principal   = module.acquisitive_crime_assumable_role.iam_role_arn
   permissions = ["SELECT", "DESCRIBE"]
   table {
     database_name = "allied_mdss_${local.environment_shorthand}"
@@ -693,7 +707,7 @@ resource "aws_lakeformation_permissions" "ac_allied_tables" {
 
 resource "aws_lakeformation_permissions" "ac_fms_db" {
   count       = local.is-development ? 1 : 0
-  principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
+  principal   = module.acquisitive_crime_assumable_role.iam_role_arn
   permissions = ["DESCRIBE"]
   database {
     name = "serco_fms_${local.environment_shorthand}"
@@ -702,7 +716,7 @@ resource "aws_lakeformation_permissions" "ac_fms_db" {
 
 resource "aws_lakeformation_permissions" "ac_fms_tables" {
   count       = local.is-development ? 1 : 0
-  principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
+  principal   = module.acquisitive_crime_assumable_role.iam_role_arn
   permissions = ["SELECT", "DESCRIBE"]
   table {
     database_name = "serco_fms_${local.environment_shorthand}"
@@ -711,8 +725,7 @@ resource "aws_lakeformation_permissions" "ac_fms_tables" {
 }
 
 resource "aws_lakeformation_permissions" "ac_derived_db" {
-  count       = local.is-production ? 0 : 1
-  principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
+  principal   = module.acquisitive_crime_assumable_role.iam_role_arn
   permissions = ["DESCRIBE"]
   database {
     name = "acquisitive_crime${local.dbt_suffix}"
@@ -720,8 +733,7 @@ resource "aws_lakeformation_permissions" "ac_derived_db" {
 }
 
 resource "aws_lakeformation_permissions" "ac_derived_tables" {
-  count       = local.is-production ? 0 : 1
-  principal   = module.acquisitive_crime_assumable_role[0].iam_role_arn
+  principal   = module.acquisitive_crime_assumable_role.iam_role_arn
   permissions = ["SELECT", "DESCRIBE"]
   table {
     database_name = "acquisitive_crime${local.dbt_suffix}"
@@ -938,13 +950,11 @@ resource "aws_iam_role_policy_attachment" "specials_role_standard_athena_access"
 }
 
 resource "aws_iam_role_policy_attachment" "standard_athena_access_ac" {
-  count      = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   policy_arn = aws_iam_policy.standard_athena_access.arn
-  role       = module.acquisitive_crime_assumable_role[0].iam_role_name
+  role       = module.acquisitive_crime_assumable_role.iam_role_name
 }
 
 resource "aws_iam_role_policy_attachment" "ac_specific_access" {
-  count      = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   policy_arn = aws_iam_policy.emac_di_permissions.arn
-  role       = module.acquisitive_crime_assumable_role[0].iam_role_name
+  role       = module.acquisitive_crime_assumable_role.iam_role_name
 }

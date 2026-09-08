@@ -4,7 +4,7 @@ This environment is the active Modernisation Platform home for the Integration H
 
 The Lambda application code, OpenAPI contract, and API request collections live in the companion repository `ministryofjustice/integration-hub-file-transfer-api`.
 
-This repository now stays infrastructure-only. Terraform creates the API Gateway, IAM, DynamoDB, and bootstrap Lambda resources here; the companion repository owns deployment of the real Lambda code through a separate app workflow using GitHub OIDC into the member account.
+This repository now stays infrastructure-only. The local `modules/integration-hub-file-transfer-api` module owns API Gateway, IAM, DynamoDB, authentication secrets, observability, and bootstrap Lambda resources. The environment root resolves Modernisation Platform and cross-stack dependencies, while the companion repository owns deployment of the real Lambda code through a separate app workflow using GitHub OIDC into the member account.
 
 It protects the API with:
 
@@ -48,7 +48,7 @@ Phase 1 note: this environment currently uses the legacy `integration-hub/api-pl
 
 ## Authentication configuration
 
-`application_variables.json` supports an `auth_configuration` block per environment:
+The module-owned [`application_variables.json`](modules/integration-hub-file-transfer-api/application_variables.json) supports an `auth_configuration` block per environment:
 
 ```json
 {

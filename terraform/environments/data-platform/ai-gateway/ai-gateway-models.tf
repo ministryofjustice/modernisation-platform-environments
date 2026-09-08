@@ -27,10 +27,16 @@ resource "litellm_model" "amazon_bedrock" {
 resource "litellm_model" "google_gemini_enterprise_agent_platform" {
   for_each = try(local.ai_gateway_models_filtered.google_gemini_enterprise_agent_platform, {})
 
-  custom_llm_provider = "gemini"
-  model_name          = "gemini-${each.key}"
+  custom_llm_provider = "vertex_ai"
+  model_name          = startswith(each.key, "gemini-") ? each.key : "gemini-${each.key}"
   base_model          = each.value.model_id
   tier                = "paid"
+
+  # vertex_credentials is deliberately omitted; the pod's GOOGLE_APPLICATION_CREDENTIALS (WIF) is used instead
+  # "eu" is a multi-region identifier, not a regional location, so it's routed via api_base rather than vertex_location
+  vertex_project  = local.google_cloud_project_name
+  vertex_location = each.value.location == "eu" ? null : each.value.location
+  model_api_base  = each.value.location == "eu" ? "https://aiplatform.eu.rep.googleapis.com" : null
 
   additional_litellm_params = {
     ai_model_provider            = "Google Gemini Enterprise Agent Platform"

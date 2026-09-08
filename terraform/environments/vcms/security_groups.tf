@@ -19,7 +19,7 @@ resource "aws_security_group" "ecs_service" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = local.tags
+  tags = merge(local.tags, { Name = "vcms-ecs"})
 }
 
 # Security group for ALB
@@ -38,14 +38,25 @@ resource "aws_security_group" "alb_sg" {
     }
   }
 
+  dynamic "ingress" {
+    for_each = local.mp_natgw_ips
+    content {
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
+  }
+
   egress {
+    description = "Allow all out"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = local.tags
+  tags = merge(local.tags, { Name = "alb-sg"})
 }
 
 resource "aws_security_group_rule" "ecs_from_alb" {

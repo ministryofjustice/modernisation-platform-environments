@@ -14,8 +14,15 @@ locals {
         expiration_days         = 6
         replication_destination = "arn:aws:s3:::mojap-data-engineering-production-ppud-dev"
         replication_rule_id     = "ppud-database-replication-rule-dev"
-        iam_role_key            = "database_source_dev"
-        ec2_account             = "ppud-development"
+        additional_replication_rules = [
+          {
+            destination = "arn:aws:s3:::ppud-bak-replication-development-${local.environment_management.account_ids["digital-prison-reporting-development"]}-eu-west-2-an"
+            rule_id     = "ppud-database-replication-rule-dev-mp"
+            priority    = 2
+          }
+        ]
+        iam_role_key = "database_source_dev"
+        ec2_account  = "ppud-development"
       }
       report_source_dev = {
         condition               = local.is-development
@@ -148,20 +155,39 @@ resource "aws_s3_bucket_replication_configuration" "s3_replication" {
   role       = aws_iam_role.s3_replication[each.value.iam_role_key].arn
   bucket     = aws_s3_bucket.s3_replication[each.key].id
 
-  rule {
-    id     = each.value.replication_rule_id
-    status = "Enabled"
-    filter {
-      prefix = ""
-    }
-    delete_marker_replication {
-      status = "Disabled"
-    }
-    destination {
-      bucket        = each.value.replication_destination
-      storage_class = "STANDARD"
-      metrics {
-        status = "Enabled"
+  dynamic "rule" {
+    for_each = concat(
+      [
+        {
+          destination = each.value.replication_destination
+          rule_id     = each.value.replication_rule_id
+          priority    = 1
+        }
+      ],
+      try(each.value.additional_replication_rules, [])
+    )
+
+    content {
+      id = rule.value.rule_id
+      # priority is only required (and only set) when a bucket has more than one rule
+      priority = length(try(each.value.additional_replication_rules, [])) > 0 ? rule.value.priority : null
+      status   = "Enabled"
+
+      filter {
+        prefix = ""
+      }
+
+      delete_marker_replication {
+        status = "Disabled"
+      }
+
+      destination {
+        bucket        = rule.value.destination
+        storage_class = "STANDARD"
+
+        metrics {
+          status = "Enabled"
+        }
       }
     }
   }
@@ -233,6 +259,14 @@ resource "aws_s3_bucket_policy" "s3_replication" {
 
 locals {
   s3_replication_configs = local.s3_replication_buckets
+
+  # All replication destinations (primary + additional rules) per bucket, used for IAM destination permissions
+  s3_replication_destinations = {
+    for k, v in local.s3_replication_configs : k => concat(
+      [v.replication_destination],
+      [for r in try(v.additional_replication_rules, []) : r.destination]
+    )
+  }
 }
 
 resource "aws_iam_role" "s3_replication" {
@@ -284,10 +318,12 @@ resource "aws_iam_policy" "s3_replication" {
           "s3:ReplicateTags",
           "s3:ReplicateDelete"
         ]
-        Resource = [
-          each.value.replication_destination,
-          "${each.value.replication_destination}/*"
-        ]
+        Resource = flatten([
+          for destination in local.s3_replication_destinations[each.key] : [
+            destination,
+            "${destination}/*"
+          ]
+        ])
       }
     ]
   })

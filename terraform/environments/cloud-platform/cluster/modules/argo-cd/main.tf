@@ -32,25 +32,7 @@ terraform {
   }
 }
 
-data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
-
-locals {
-  account_id = data.aws_caller_identity.current.account_id
-
-  # Flatten the role -> identities map into a flat list for the dynamic block
-  # Input:  { ADMIN = [{id, type}], EDITOR = [{id, type}] }
-  # Output: [{role, id, type}, {role, id, type}, ...]
-  flattened_rbac_mappings = flatten([
-    for role, identities in var.rbac_role_mappings : [
-      for identity in identities : {
-        role = role
-        id   = identity.id
-        type = identity.type
-      }
-    ]
-  ])
-}
 
 #------------------------------------------------------------------------------
 # IAM Role for Argo CD Capability
@@ -121,13 +103,22 @@ resource "aws_eks_capability" "argocd" {
 
       namespace = "argocd"
 
+      # One rbac_role_mapping block per role, with all of that role's identities
+      # nested as identity sub-blocks. AWS coalesces identities for a given role
+      # into a single rbac_role_mapping element; emitting one block per
+      # (role, identity) pair instead makes the applied result diverge from the
+      # plan whenever a role has more than one identity ("Provider produced
+      # inconsistent result after apply").
       dynamic "rbac_role_mapping" {
-        for_each = local.flattened_rbac_mappings
+        for_each = var.rbac_role_mappings
         content {
-          role = rbac_role_mapping.value.role
-          identity {
-            id   = rbac_role_mapping.value.id
-            type = rbac_role_mapping.value.type
+          role = rbac_role_mapping.key
+          dynamic "identity" {
+            for_each = rbac_role_mapping.value
+            content {
+              id   = identity.value.id
+              type = identity.value.type
+            }
           }
         }
       }
@@ -240,44 +231,6 @@ resource "null_resource" "argocd_destroy_cleanup" {
 }
 
 #------------------------------------------------------------------------------
-# Argo CD Cross-Account Spoke Access Role
-#
-# This role is assumed by the Argo CD Capability to deploy to spoke clusters.
-# Each spoke cluster registers this role as an EKS Access Entry with
-# AmazonEKSClusterAdminPolicy for GitOps deployments.
-#------------------------------------------------------------------------------
-resource "aws_iam_role" "argocd_spoke_access" {
-  name        = "${var.cluster_name}-argocd-spoke-access"
-  description = "Allows Argo CD Capability to access spoke EKS clusters"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Service = "eks.amazonaws.com"
-        }
-        Action = "sts:AssumeRole"
-        Condition = {
-          StringEquals = {
-            "aws:SourceAccount" = local.account_id
-          }
-          ArnEquals = {
-            "aws:SourceArn" = var.cluster_arn
-          }
-        }
-      }
-    ]
-  })
-
-  tags = merge(var.tags, {
-    Name    = "${var.cluster_name}-argocd-spoke-access"
-    Purpose = "cross-account-gitops"
-  })
-}
-
-#------------------------------------------------------------------------------
 # CodeConnections for GitHub repository access
 #
 # The EKS-managed Argo CD reposerver runs under the capability role
@@ -308,27 +261,4 @@ resource "aws_iam_role_policy" "argocd_codeconnection" {
   })
 }
 
-#------------------------------------------------------------------------------
-# Register Argo CD IAM role as Access Entry on the hub cluster
-#------------------------------------------------------------------------------
-resource "aws_eks_access_entry" "argocd_hub" {
-  cluster_name  = var.cluster_name
-  principal_arn = aws_iam_role.argocd_spoke_access.arn
-  type          = "STANDARD"
 
-  tags = merge(var.tags, {
-    Name = "${var.cluster_name}-argocd-hub-access"
-  })
-}
-
-resource "aws_eks_access_policy_association" "argocd_hub" {
-  cluster_name  = var.cluster_name
-  principal_arn = aws_iam_role.argocd_spoke_access.arn
-  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-
-  access_scope {
-    type = "cluster"
-  }
-
-  depends_on = [aws_eks_access_entry.argocd_hub]
-}

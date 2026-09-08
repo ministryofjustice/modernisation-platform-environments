@@ -25,9 +25,9 @@ output "argocd_capability_arn" {
   value       = local.enable_argocd ? module.argocd[0].capability_arn : ""
 }
 
-output "argocd_spoke_access_role_arn" {
-  description = "ARN of the IAM role for spoke cluster access (register this in spoke Access Entries)"
-  value       = local.enable_argocd ? module.argocd[0].spoke_access_role_arn : ""
+output "argocd_capability_role_arn" {
+  description = "ARN of the Argo CD Capability role (register this in spoke Access Entries)"
+  value       = local.enable_argocd ? module.argocd[0].capability_role_arn : ""
 }
 
 output "argocd_spoke_registered" {

@@ -26,6 +26,10 @@ module "s3_bucket" {
   ownership_controls  = "BucketOwnerEnforced"
   custom_kms_key      = local.laa_general_kms_arn
 
+  # Enforce KMS request headers for inbound bucket only, the outbound bucket is written to by MAAT DB Oracle PL/SQL which does not currently
+  # support the required KMS headers.
+  enforce_kms_request_headers = each.key == "inbound" ? true : false
+
   providers = {
     aws.bucket-replication = aws
   }
@@ -68,37 +72,6 @@ module "s3_bucket" {
 
   bucket_policy_v2 = [
     for stmt in [
-      {
-        sid     = "EnforceTLSv12orHigher"
-        effect  = "Deny"
-        actions = ["s3:*"]
-        principals = {
-          type        = "AWS"
-          identifiers = ["*"]
-        }
-        conditions = [
-          {
-            test     = "NumericLessThan"
-            variable = "s3:TlsVersion"
-            values   = ["1.2"]
-          }
-        ]
-      },
-      {
-        effect  = "Deny"
-        actions = ["s3:*"]
-        principals = {
-          type        = "AWS"
-          identifiers = ["*"]
-        }
-        conditions = [
-          {
-            test     = "Bool"
-            variable = "aws:SecureTransport"
-            values   = ["false"]
-          }
-        ]
-      },
 
       length(aws_iam_role.ftp_lambda_role) > 0 ? {
         effect  = "Allow"
@@ -236,40 +209,3 @@ data "aws_iam_policy_document" "ftp_user_policy" {
     resources = [local.laa_general_kms_arn]
   }
 }
-
-data "aws_iam_policy_document" "ftp_bucket_secure_transport" {
-  for_each = local.build_s3 ? toset(local.ftp_directions) : toset([])
-
-  statement {
-    sid    = "DenyInsecureTransport"
-    effect = "Deny"
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-    actions = ["s3:*"]
-    resources = [
-      module.s3_bucket[each.key].bucket.arn,
-      "${module.s3_bucket[each.key].bucket.arn}/*",
-    ]
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-      values   = ["false"]
-    }
-  }
-}
-
-resource "aws_s3_bucket_policy" "ftp_bucket_secure_transport" {
-  for_each = local.build_s3 ? toset(local.ftp_directions) : toset([])
-
-  bucket = module.s3_bucket[each.key].bucket.id
-  policy = data.aws_iam_policy_document.ftp_bucket_secure_transport[each.key].json
-}
-
-
-
-
-
-
-

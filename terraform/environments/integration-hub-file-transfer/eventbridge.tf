@@ -1,7 +1,7 @@
 module "eventbridge_default_bus" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/eventbridge/aws"
-  version = "4.3.1"
+  version = "4.3.2"
 
   bus_name                   = "default"
   create_bus                 = false
@@ -20,7 +20,7 @@ module "eventbridge_default_bus" {
 module "eventbridge_file_transfer_bus" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/eventbridge/aws"
-  version = "4.3.1"
+  version = "4.3.2"
 
   bus_name            = local.application_name
   create_archives     = true

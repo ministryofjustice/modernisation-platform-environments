@@ -1,13 +1,14 @@
 ###############################################################################
-# SSM Relay — Private EKS API access (ADR-016 spike, #8370)
+# SSM Relay — Private EKS API access (ADR-016, #8370, #8425)
 #
 # Lightweight SSM Session Manager relay for accessing the private EKS API
-# endpoint without a public endpoint or VPN. Development account only.
+# endpoint without a public endpoint or VPN. Deployed when private_endpoint_mode
+# is set for this VPC in locals.tf.
 ###############################################################################
 
-# IAM role assumed by the SSM relay EC2 instance (dev account only).
+# IAM role assumed by the SSM relay EC2 instance.
 resource "aws_iam_role" "ssm_relay" {
-  count = local.is-development ? 1 : 0
+  count = local.private_endpoint_mode ? 1 : 0
 
   name = "ssm-relay-${local.cp_vpc_name}"
 
@@ -27,7 +28,7 @@ resource "aws_iam_role" "ssm_relay" {
 
 # Grants the SSM agent core permissions to register with Systems Manager.
 resource "aws_iam_role_policy_attachment" "ssm_core" {
-  count = local.is-development ? 1 : 0
+  count = local.private_endpoint_mode ? 1 : 0
 
   role       = aws_iam_role.ssm_relay[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
@@ -35,7 +36,7 @@ resource "aws_iam_role_policy_attachment" "ssm_core" {
 
 # Instance profile that lets the EC2 relay instance use the SSM role.
 resource "aws_iam_instance_profile" "ssm_relay" {
-  count = local.is-development ? 1 : 0
+  count = local.private_endpoint_mode ? 1 : 0
 
   name = "ssm-relay-${local.cp_vpc_name}"
   role = aws_iam_role.ssm_relay[0].name
@@ -43,7 +44,7 @@ resource "aws_iam_instance_profile" "ssm_relay" {
 
 # Security group for the relay: no inbound, outbound HTTPS only (SSM is outbound).
 resource "aws_security_group" "ssm_relay" {
-  count = local.is-development ? 1 : 0
+  count = local.private_endpoint_mode ? 1 : 0
 
   name_prefix = "ssm-relay-"
   description = "SSM relay for private EKS API access - outbound HTTPS only"
@@ -91,7 +92,7 @@ data "aws_ami" "al2023" {
 
 # The SSM relay instance (t3.micro) in a private subnet, IMDSv2 enforced.
 resource "aws_instance" "ssm_relay" {
-  count = local.is-development ? 1 : 0
+  count = local.private_endpoint_mode ? 1 : 0
 
   ami                    = data.aws_ami.al2023.id
   instance_type          = "t3.micro"

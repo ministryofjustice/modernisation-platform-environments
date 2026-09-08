@@ -23,6 +23,7 @@ locals {
 # DF-owned CMK for the restored Access RDS
 # ---------------------------------------------------------------------------
 resource "aws_kms_key" "access_rds" {
+  #checkov:skip=CKV2_AWS_64: To be used for test only. Will be removed after test.
   count = local.is-test ? 1 : 0
 
   description         = "KMS key for the restored Access test Postgres RDS"
@@ -117,18 +118,21 @@ resource "aws_db_parameter_group" "access" {
 # ---------------------------------------------------------------------------
 # Restored DB instance (throwaway test copy)
 # ---------------------------------------------------------------------------
-#trivy:ignore:AVD-AWS-0133 Enhanced monitoring not required for throwaway test DB
-#trivy:ignore:AVD-AWS-0177 IAM auth not required for throwaway test DB
-#checkov:skip=CKV_AWS_118:Enhanced monitoring not required for throwaway test DB
-#checkov:skip=CKV_AWS_129:Log exports not required for throwaway test DB
-#checkov:skip=CKV_AWS_157:Multi-AZ not required for throwaway test DB
-#checkov:skip=CKV_AWS_161:IAM database authentication not required for throwaway test DB
-#checkov:skip=CKV_AWS_293:Deletion protection intentionally disabled for throwaway test DB
-#checkov:skip=CKV_AWS_353:Performance Insights not required for throwaway test DB
-#checkov:skip=CKV_AWS_354:Performance Insights encryption not required for throwaway test DB
-#checkov:skip=CKV2_AWS_30:Query logging not required for throwaway test DB
-#checkov:skip=CKV2_AWS_60:Copy tags to snapshot not required for throwaway test DB
 resource "aws_db_instance" "access" {
+  #checkov:skip=CKV_AWS_118:Enhanced monitoring not required for throwaway test DB
+  #checkov:skip=CKV_AWS_129:Log exports not required for throwaway test DB
+  #checkov:skip=CKV_AWS_157:Multi-AZ not required for throwaway test DB
+  #checkov:skip=CKV_AWS_161:IAM database authentication not required for throwaway test DB
+  #checkov:skip=CKV_AWS_293:Deletion protection intentionally disabled for throwaway test DB
+  #checkov:skip=CKV_AWS_353:Performance Insights not required for throwaway test DB
+  #checkov:skip=CKV_AWS_354:Performance Insights encryption not required for throwaway test DB
+  #checkov:skip=CKV2_AWS_30:Query logging not required for throwaway test DB
+  #checkov:skip=CKV2_AWS_60:Copy tags to snapshot not required for throwaway test DB
+  #checkov:skip=CKV_AWS_111:Temp DB. Upgrades not needed
+  #checkov:skip=CKV_AWS_226:Temp DB. Upgrades not needed
+  #checkov:skip=CKV_AWS_353:Temp DB. Performance Insights not needed
+  #checkov:skip=CKV2_AWS_69:Temp DB. TODO: Encryption in transit to be added later
+
   count = local.is-test ? 1 : 0
 
   identifier          = "${local.application_name}-access"
@@ -178,8 +182,8 @@ resource "random_password" "access_master" {
   special = false
 }
 
-#checkov:skip=CKV2_AWS_57: Automatic rotation not needed for throwaway test instance
 resource "aws_secretsmanager_secret" "access_master" {
+  #checkov:skip=CKV2_AWS_57: Automatic rotation not needed for throwaway test instance
   count      = local.is-test ? 1 : 0
   name       = "${local.application_name}-${local.environment}/access-rds/master"
   kms_key_id = aws_kms_key.access_rds[0].arn

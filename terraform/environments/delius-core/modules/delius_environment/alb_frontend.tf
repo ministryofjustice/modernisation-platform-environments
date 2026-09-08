@@ -2,10 +2,10 @@ resource "aws_security_group" "delius_frontend_alb_security_group" {
   name        = format("%s - Delius Core Frontend Load Balancer", var.env_name)
   description = "controls access to and from delius front-end load balancer"
   vpc_id      = var.account_config.shared_vpc_id
-  tags        = local.tags
   lifecycle {
     create_before_destroy = true
   }
+  tags = merge(local.tags, { Name = "weblogic-${var.env_name}-frontend-alb" })
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_https_allowlist" {
@@ -15,6 +15,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
   to_port           = "443"
   ip_protocol       = "tcp"
   cidr_ipv4         = "81.134.202.29/32" # MoJ Digital VPN
+  tags              = merge(local.tags, { Name = "moj-vpn-443" })
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_https_global_protect_allowlist" {
@@ -25,6 +26,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
   to_port           = "443"
   ip_protocol       = "tcp"
   cidr_ipv4         = each.key # Global Protect VPN
+  tags              = merge(local.tags, { Name = "global-protect-443" })
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_http_mp_allowlist" {
@@ -35,6 +37,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
   to_port           = "80"
   ip_protocol       = "tcp"
   cidr_ipv4         = each.key
+  tags              = merge(local.tags, { Name = "mp-natgw-80" })
 }
 
 # Neccessary for Codebuild UI Automation Tests
@@ -49,6 +52,7 @@ resource "aws_vpc_security_group_ingress_rule" "test_alb_legacy_natgw_ing" {
   from_port         = "443"
   to_port           = "443"
   ip_protocol       = "tcp"
+  tags              = merge(local.tags, { Name = "legacy-natgw-443" })
 }
 
 # temporary rule to allow traffic from legacy preprod nat gateway for testing
@@ -64,6 +68,20 @@ resource "aws_vpc_security_group_ingress_rule" "preprod_alb_legacy_natgw_ing" {
   from_port         = "443"
   to_port           = "443"
   ip_protocol       = "tcp"
+  tags              = merge(local.tags, { Name = "legacy-natgw-443" })
+}
+
+# Rule for uservision access in test
+resource "aws_vpc_security_group_ingress_rule" "test_alb_uservision_ingress" {
+  count = var.env_name == "test" ? 1 : 0
+
+  description       = "allow ingress from uservision VPN to delius core frontend alb for testing purposes"
+  security_group_id = aws_security_group.delius_frontend_alb_security_group.id
+  cidr_ipv4         = local.uservision_ips
+  from_port         = "443"
+  to_port           = "443"
+  ip_protocol       = "tcp"
+  tags              = merge(local.tags, { Name = "uservision-443" })
 }
 
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_to_ecs_cluster" {
@@ -71,6 +89,7 @@ resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_t
   description                  = "egress from delius core frontend alb to ecs cluster"
   ip_protocol                  = "-1"
   referenced_security_group_id = aws_security_group.cluster.id
+  tags                         = merge(local.tags, { Name = "uservision-443" })
 }
 
 locals {

@@ -45,6 +45,7 @@ locals {
             rule.dim_key == "DBInstanceIdentifier" ? try(cfg.rds_instances, []) :
             rule.dim_key == "Namespace" ? try(cfg.namespaces, ["cpanel"]) :
             rule.dim_key == "FileSystemId" ? try(cfg.efs_file_systems, []) :
+            rule.dim_key == "ModelDeploymentName" ? ["*"]  :
             rule.dim_key == "ClusterName" ? ["*"] :
             rule.dim_key == "NodeName" ? ["*"] :
             [""]
@@ -124,7 +125,7 @@ locals {
           # Ref 'A': CloudWatch Metric Query
           flatten([
             for _once in(
-              try(combo.rule.datasource_type, "cloudwatch") != "prometheus"
+              try(combo.rule.datasource_type, "cloudwatch") == "cloudwatch"
               ? [true] : []
               ) : [{
                 refId             = "A"
@@ -144,10 +145,81 @@ locals {
             }]
           ]),
 
-          # Ref 'A2': Secondary Metric Query (e.g., Max capacity for utilization math)
+          # Ref 'A': Azure Monitor Instant Query
           flatten([
             for _once in(
-              try(combo.rule.datasource_type, "cloudwatch") != "prometheus" && try(combo.rule.use_metric_math, false) == true
+              try(combo.rule.datasource_type, "cloudwatch") == "azure_monitor"
+              ? [true] : []
+              ) : [{
+                refId             = "A"
+                relativeTimeRange = { from = try(combo.rule.query_window_seconds, 300), to = 0 }
+                datasourceUid     = try(cfg.azure_monitor_datasource_uid, "azure-monitor-ai-foundry")
+                model = {
+                  type         = "timeSeriesQuery"
+                  refId        = "A"
+                  queryType    = "Azure Monitor"
+                  subscription = try(local.environment_configuration.azure_foundry_resource.subscription_id, "")
+                  azureMonitor = {
+                    metricNamespace = combo.rule.namespace
+                    metricName      = combo.rule.metric
+                    aggregation     = combo.rule.statistic
+                    timeGrain       = "auto"
+                    dimensionFilters = concat(
+                      combo.dim_value != "" ? [{
+                        dimension = "ModelDeploymentName"
+                        operator  = "eq"
+                        filters   = [combo.dim_value]
+                      }] : [],
+                      try(combo.rule.filter_dimension, "") != "" ? [{
+                        dimension = combo.rule.filter_dimension
+                        operator  = try(combo.rule.filter_operator, "eq")
+                        filters   = [try(combo.rule.filter_value, "")]
+                      }] : []
+                    )
+                    resources = [{
+                      subscription    = try(local.environment_configuration.azure_foundry_resource.subscription_id, "")
+                      resourceGroup   = try(local.environment_configuration.azure_foundry_resource.resource_group, "")
+                      resourceName    = try(local.environment_configuration.azure_foundry_resource.resource_name, "")
+                      metricNamespace = combo.rule.namespace
+                    }]
+                  }
+                }
+            }]
+          ]),
+
+          # Ref 'A': Google Cloud Monitoring (Stackdriver) Instant Query
+          flatten([
+            for _once in(
+              try(combo.rule.datasource_type, "cloudwatch") == "stackdriver"
+              ? [true] : []
+              ) : [{
+                refId             = "A"
+                relativeTimeRange = { from = try(combo.rule.query_window_seconds, 300), to = 0 }
+                datasourceUid     = try(cfg.stackdriver_datasource_uid, "google-cloud-monitoring")
+                model = {
+                  type      = "timeSeriesQuery"
+                  refId     = "A"
+                  queryType = "timeSeriesList"
+                  timeSeriesList = {
+                    projectName        = local.google_cloud_project_id
+                    crossSeriesReducer = combo.rule.reducer
+                    perSeriesAligner   = combo.rule.aligner
+                    alignmentPeriod    = "cloud-monitoring-auto"
+                    groupBys           = ["resource.label.model_user_id"]
+                    filters = concat(
+                      [
+                        "metric.type", "=", "${combo.rule.namespace}/${combo.rule.metric}",
+                        "AND", "resource.type", "=", combo.rule.resource_type,
+                      ],
+                      try(combo.rule.filter, "") != "" ? ["AND", combo.rule.filter] : []
+                    )
+                  }
+                }
+            }]
+          ]),
+          flatten([
+            for _once in(
+              try(combo.rule.datasource_type, "cloudwatch") == "cloudwatch" && try(combo.rule.use_metric_math, false) == true
               ? [true] : []
               ) : [{
                 refId             = "A2"
@@ -220,7 +292,7 @@ locals {
           flatten([
             for _once in(
               contains(["baseline_gt", "baseline_lt"], combo.rule.type) &&
-              try(combo.rule.datasource_type, "cloudwatch") != "prometheus"
+              try(combo.rule.datasource_type, "cloudwatch") == "cloudwatch"
               ? [true] : []
               ) : [
               {

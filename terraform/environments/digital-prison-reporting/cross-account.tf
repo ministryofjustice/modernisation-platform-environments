@@ -46,10 +46,17 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
     }
     condition {
       test = "StringLike"
-      values = [
-        "system:serviceaccount:actions-runners:actions-runner-mojas-create-a-derived-table-dpr${local.environment_configuration.analytical_platform_runner_suffix}",
-        "system:serviceaccount:mwaa:hmpps-cadet-deployer-dpr${local.environment_configuration.analytical_platform_runner_suffix}",
-      ]
+      values = concat(
+        [
+          "system:serviceaccount:actions-runners:actions-runner-mojas-create-a-derived-table-dpr${local.environment_configuration.analytical_platform_runner_suffix}",
+          "system:serviceaccount:mwaa:hmpps-cadet-deployer-dpr${local.environment_configuration.analytical_platform_runner_suffix}",
+          "system:serviceaccount:mwaa:hmpps-data-hub-dpr-daily${local.environment_configuration.analytical_platform_runner_suffix}",
+        ],
+        local.environment == "production" ? [
+          "system:serviceaccount:mwaa:hmpps-data-hub-dpr-daily-prod-dev",
+        ] : []
+      )
+
       variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.dbt_secrets.secret_string)["oidc_cluster_identifier"]}:sub"
     }
   }

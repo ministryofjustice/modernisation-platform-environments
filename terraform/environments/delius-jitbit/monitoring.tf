@@ -41,3 +41,19 @@ module "pagerduty_core_alerts" {
   sns_topics                = [aws_sns_topic.jitbit_alerting.name]
   pagerduty_integration_key = local.pagerduty_integration_key
 }
+
+# Use "awscc_cloudwatch_alarm_mute_rule" when it's supported in the standard aws provider
+module "disable_out_of_hours_alarms" {
+  count  = local.is-production ? 0 : 1
+  source = "../../modules/schedule_alarms_lambda"
+
+  lambda_function_name = "${local.application_name}-toggle-alarms"
+
+  start_time      = "19:59"
+  end_time        = "06:45"
+  disable_weekend = true
+
+  alarm_patterns = ["*high-error-count*"]
+
+  tags = local.tags
+}

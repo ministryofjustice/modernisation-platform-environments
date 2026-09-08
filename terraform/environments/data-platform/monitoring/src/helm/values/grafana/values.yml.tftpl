@@ -66,6 +66,30 @@ extraSecretMounts:
             path: azure-identity-token
             audience: api://AzureADTokenExchange
             expirationSeconds: 3600
+  # Mount Google Workload Identity Federation token for service authentication.
+  - name: google-workload-identity-token
+    mountPath: /var/run/secrets/sts.googleapis.com
+    readOnly: true
+    projected:
+      defaultMode: 420
+      sources:
+        - serviceAccountToken:
+            path: google-identity-token
+            audience: ${googleWorkloadIdentityAudience}
+            expirationSeconds: 3600
+
+extraVolumes:
+  - name: google-application-default-credentials
+    configMap:
+      name: ${googleApplicationCredentialsConfigMap}
+      items:
+        - key: credentials.json
+          path: application_default_credentials.json
+
+extraVolumeMounts:
+  - name: google-application-default-credentials
+    mountPath: /home/grafana/.config/gcloud
+    readOnly: true
 
 # RDS connection values come from the grafana-rds secret; sensitive values are
 # not stored in this file.
@@ -141,6 +165,15 @@ datasources:
         jsonData:
           azureAuthType: workloadidentity
           subscriptionId: ${azure_monitor_workload_identity_subscription_id}
+      - name: google-cloud-monitoring-moj-gcp-ai-gateway
+        type: stackdriver
+        access: proxy
+        uid: google-cloud-monitoring
+        isDefault: false
+        jsonData:
+          authenticationType: gce
+          defaultProject: ${googleCloudProjectName}
+          universeDomain: googleapis.com
 %{ for account in monitored_accounts ~}
       - name: ${account.name}-cloudwatch
         type: cloudwatch

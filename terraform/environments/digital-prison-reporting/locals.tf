@@ -1,5 +1,5 @@
 #### This file can be used to store locals specific to the member account ####
-#### DPR Specific ####
+#### DPR Specific #####
 locals {
 
   is_dev_or_test       = local.is-development || local.is-test

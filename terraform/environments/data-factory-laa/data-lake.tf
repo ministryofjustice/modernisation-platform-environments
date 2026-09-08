@@ -1,6 +1,6 @@
 locals {
   name      = "laa-data-factory"
-  databases = ["raw", "processedraw", "staging", "intermediate", "datamarts", "derived"]
+  databases = ["aws-athena-query-results", "raw", "processedraw", "staging", "intermediate", "datamarts", "derived"]
   environments = {
     development = {
       lakeformation_admins = [
@@ -32,10 +32,52 @@ module "data_lake_settings" {
   read_only_admins = local.environments[local.environment].lakeformation_read_only_admins
 }
 
+data "aws_iam_policy_document" "data_lake_kms_key" {
+  #checkov:skip=CKV_AWS_356: Delegates access to the root account for KMS key management
+  #checkov:skip=CKV_AWS_109: Delegates access to the root account for KMS key management
+  #checkov:skip=CKV_AWS_111: Delegates access to the root account for KMS key management
+  # Enables IAM policies in this AWS account to delegate access to the key.
+  statement {
+    sid    = "EnableRootAccountPermissions"
+    effect = "Allow"
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root",
+      ]
+    }
+
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+
+  # Allows S3 event notifications to publish to an encrypted SQS queue.
+  statement {
+    sid    = "AllowS3EventNotifications"
+    effect = "Allow"
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "s3.amazonaws.com",
+      ]
+    }
+
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+    ]
+
+    resources = ["*"]
+  }
+}
+
 resource "aws_kms_key" "data_lake_kms_key" {
   description             = "KMS key for encrypting data in the data lake"
   deletion_window_in_days = 10
   enable_key_rotation     = true
+  policy                  = data.aws_iam_policy_document.data_lake_kms_key.json
 }
 
 resource "aws_kms_alias" "data_lake_kms_alias" {
@@ -45,9 +87,9 @@ resource "aws_kms_alias" "data_lake_kms_alias" {
 
 module "data_lake_buckets" {
   for_each = toset(local.databases)
-  source   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=ccc457c"
+  source   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=4f72896323ec7f06e293f1f75732549b3248f841"
 
-  bucket_prefix       = "${local.name}-${each.key}"
+  bucket_prefix       = each.key == "aws-athena-query-results" ? "aws-athena-query-results" : "${local.name}-${each.key}"
   bucket_namespace    = "account-regional"
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"

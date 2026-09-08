@@ -20,6 +20,14 @@ terraform {
       version = "~> 2.8"
       source  = "hashicorp/archive"
     }
+    kubernetes = {
+      version = "~> 3.1"
+      source  = "hashicorp/kubernetes"
+    }
+    helm = {
+      version = "~> 3.1"
+      source  = "hashicorp/helm"
+    }
   }
   required_version = "~> 1.15"
 }

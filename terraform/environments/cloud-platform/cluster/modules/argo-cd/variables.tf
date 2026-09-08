@@ -10,11 +10,6 @@ variable "cluster_name" {
   type        = string
 }
 
-variable "cluster_arn" {
-  description = "ARN of the hub EKS cluster"
-  type        = string
-}
-
 #------------------------------------------------------------------------------
 # Identity Center (required for Argo CD authentication)
 #------------------------------------------------------------------------------

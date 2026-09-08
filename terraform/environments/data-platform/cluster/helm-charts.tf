@@ -68,7 +68,7 @@ resource "helm_release" "kyverno" {
 
 resource "helm_release" "kyverno_policies" {
   /* https://github.com/kyverno/kyverno/tree/main/charts/kyverno-policies */
-  
+
   name      = "kyverno-policies"
   chart     = "./src/helm/charts/kyverno-policies"
   namespace = module.kyverno_namespace.name
@@ -213,7 +213,10 @@ resource "helm_release" "aws_load_balancer_controller" {
     )
   ]
 
-  depends_on = [kubernetes_manifest.aws_load_balancer_controller_crds]
+  depends_on = [
+    kubernetes_manifest.aws_load_balancer_controller_crds,
+    kubernetes_manifest.aws_load_balancer_controller_gateway_crds
+  ]
 }
 
 resource "helm_release" "gateway_configuration" {

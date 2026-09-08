@@ -147,7 +147,6 @@ locals {
     ["dso-modernisation-platform-automation", "ssm_command_monitoring", "dso-pipelines-pagerduty", { threshold = "10" }], # pipeline sometimes fails due to API errors hence only alarm if it continually fails
     ["dso-modernisation-platform-automation", "github_workflow_monitoring", "dso-pipelines-pagerduty", { threshold = "10" }],
     ["dso-modernisation-platform-automation", "planetfm_gfsl_data_extract", "dso-pipelines-pagerduty", {}],
-    ["dso-modernisation-platform-automation", "nomis_environment_start", "nomis-preproduction-pagerduty", {}],
     ["dso-modernisation-platform-automation", "certificate_renewal", "dso-pipelines-pagerduty", {}],
     ["dso-modernisation-platform-automation", "jump_server_start", "dso-pipelines-pagerduty", {}],
     ["dso-modernisation-platform-automation", "jump_server_stop", "dso-pipelines-pagerduty", {}],
@@ -155,6 +154,9 @@ locals {
     ["dso-modernisation-platform-automation", "ncr_environment_stop", "nomis-combined-reporting-preproduction-pagerduty", {}],
     ["dso-modernisation-platform-automation", "ndh_offloc_cdecopy", "nomis-data-hub-production-pagerduty", {}],
     ["dso-modernisation-platform-automation", "ndh_offloc_cloudplatfom_copy", "nomis-data-hub-production-pagerduty", {}],
+    ["dso-modernisation-platform-automation", "ndmis_environment_start", "delius-mis-preproduction-pagerduty", {}],
+    ["dso-modernisation-platform-automation", "ndmis_environment_stop", "delius-mis-preproduction-pagerduty", {}],
+    ["dso-modernisation-platform-automation", "nomis_environment_start", "nomis-preproduction-pagerduty", {}],
     ["dso-modernisation-platform-automation", "nomis_environment_stop", "nomis-preproduction-pagerduty", {}],
     ["dso-modernisation-platform-automation", "nomis_database_refresh", "nomis-preproduction-pagerduty", {}],
     ["dso-modernisation-platform-automation", "oasys_database_refresh", "oasys-preproduction-pagerduty", {}],

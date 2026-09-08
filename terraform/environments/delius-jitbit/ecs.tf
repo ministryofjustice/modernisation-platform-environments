@@ -1,8 +1,3 @@
-moved {
-  from = module.ecs.module.ecs_cluster.aws_ecs_cluster.default[0]
-  to   = module.ecs.aws_ecs_cluster.this
-}
-
 module "ecs" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=948cb6a1d0d08448fd53f195c0522ed35bbf4242" # v6.0.0
 
@@ -91,6 +86,8 @@ resource "aws_cloudwatch_log_group" "jitbit" {
   name              = format("%s-ecs", local.application_name)
   retention_in_days = 30
   kms_key_id        = aws_kms_key.cloudwatch_logs.arn
+
+  tags = local.tags
 }
 
 output "s3_bucket_app_deployment_name" {

@@ -7,6 +7,15 @@ resource "aws_glue_catalog_table_optimizer" "standard_compaction" {
   configuration {
     role_arn = var.role_arn
     enabled  = true
+
+    compaction_configuration {
+      iceberg_configuration {
+        strategy              = "binpack"
+        min_input_files       = each.value.min_input_files
+        delete_file_threshold = each.value.delete_file_threshold
+      }
+    }
+  
   }
 
   type = "compaction"

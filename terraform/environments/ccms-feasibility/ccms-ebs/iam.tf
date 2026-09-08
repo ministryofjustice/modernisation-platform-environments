@@ -156,6 +156,36 @@ resource "aws_iam_role_policy_attachment" "ebsapps_cw_logging" {
   policy_arn = aws_iam_policy.ebsapps_cw_logging.arn
 }
 
+# Shared secret access for EBS DB and Apps instances
+# Covers secrets manually created (or created in future) under the ccms-ebs- naming prefix
+
+resource "aws_iam_policy" "ebs_shared_secrets" {
+  name        = "${local.component_name}-${local.env_label}-ebs-shared-secrets"
+  description = "Allow EBS DB and Apps instances to read secrets prefixed ccms-ebs-"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "ccmsebsfeasibilitysecret"
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue"]
+        Resource = "arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:ccms-ebs-*"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ebsdb_shared_secrets" {
+  role       = aws_iam_role.ebsdb.name
+  policy_arn = aws_iam_policy.ebs_shared_secrets.arn
+}
+
+resource "aws_iam_role_policy_attachment" "ebsapps_shared_secrets" {
+  role       = aws_iam_role.ebsapps.name
+  policy_arn = aws_iam_policy.ebs_shared_secrets.arn
+}
+
 resource "aws_iam_policy" "rman_to_s3" {
   name        = "${local.component_name}-${local.env_label}-ebsdb-rman-s3"
   description = "Allow the EBS DB instance to write RMAN backups to S3"
@@ -262,6 +292,65 @@ resource "aws_iam_policy" "ftp_cw_logging" {
 resource "aws_iam_role_policy_attachment" "ftp_cw_logging" {
   role       = aws_iam_role.ftp.name
   policy_arn = aws_iam_policy.ftp_cw_logging.arn
+}
+
+resource "aws_iam_policy" "ftp_s3_buckets" {
+  name        = "${local.component_name}-${local.env_label}-ftp-s3-buckets"
+  description = "Allow the FTP instance to mount the inbound/outbound S3 buckets via s3fs"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket",
+        ]
+        Resource = [
+          module.s3_inbound.bucket.arn,
+          module.s3_outbound.bucket.arn,
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+        ]
+        Resource = [
+          "${module.s3_inbound.bucket.arn}/*",
+          "${module.s3_outbound.bucket.arn}/*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ftp_s3_buckets" {
+  role       = aws_iam_role.ftp.name
+  policy_arn = aws_iam_policy.ftp_s3_buckets.arn
+}
+
+resource "aws_iam_policy" "ftp_test_user_secret" {
+  name        = "${local.component_name}-${local.env_label}-ftp-test-user-secret"
+  description = "Allow the FTP instance to read its own SSH test user credentials at boot"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue"]
+        Resource = aws_secretsmanager_secret.ftp_test_user.arn
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ftp_test_user_secret" {
+  role       = aws_iam_role.ftp.name
+  policy_arn = aws_iam_policy.ftp_test_user_secret.arn
 }
 
 resource "aws_iam_policy" "ec2_operations" {

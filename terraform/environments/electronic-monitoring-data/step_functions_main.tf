@@ -391,13 +391,6 @@ resource "aws_sfn_state_machine" "landing_dlq_redriver" {
   })
 }
 
-resource "aws_cloudwatch_event_target" "landing_dlq_redriver" {
-  rule     = aws_cloudwatch_event_rule.alarm_state_change_threader.name
-  arn      = aws_sfn_state_machine.landing_dlq_redriver.arn
-  role_arn = aws_iam_role.landing_dlq_redriver_eventbridge.arn
-}
-
-
 # ------------------------------------------
 # Trigger cadt Step funtion
 # ------------------------------------------

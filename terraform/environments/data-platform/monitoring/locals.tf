@@ -8,6 +8,28 @@ locals {
   # try() keeps this resolvable when monitoring is disabled.
   grafana_api_token = try(jsondecode(data.aws_secretsmanager_secret_version.grafana_api_token[0].secret_string)["token"], "")
 
+  # Google workload identity federation (used by Grafana's Google Cloud Monitoring
+  # datasource; same GCP project and pattern as the ai-gateway component).
+  # try() keeps these resolvable when monitoring is disabled.
+  google_cloud_project_name = try(jsondecode(data.aws_secretsmanager_secret_version.google_cloud_monitoring[0].secret_string)["project_name"], "")
+  google_cloud_project_id   = try(jsondecode(data.aws_secretsmanager_secret_version.google_cloud_monitoring[0].secret_string)["project_id"], "")
+
+  grafana_service_account_email     = "grafana@${local.google_cloud_project_name}.iam.gserviceaccount.com"
+  google_workload_identity_audience = "//iam.googleapis.com/projects/${local.google_cloud_project_id}/locations/global/workloadIdentityPools/amazon-eks/providers/data-platform-monitoring"
+
+  # No secret material here; external_account credentials only describe how to exchange the projected token, so a ConfigMap is fine
+  google_application_credentials = jsonencode({
+    type                              = "external_account"
+    audience                          = local.google_workload_identity_audience
+    subject_token_type                = "urn:ietf:params:oauth:token-type:jwt"
+    token_url                         = "https://sts.googleapis.com/v1/token"
+    service_account_impersonation_url = "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/${local.grafana_service_account_email}:generateAccessToken"
+    quota_project_id                  = local.google_cloud_project_name
+    credential_source = {
+      file = "/var/run/secrets/sts.googleapis.com/google-identity-token"
+    }
+  })
+
   pagerduty_routing_key = try(data.aws_secretsmanager_secret_version.pagerduty_orchestrator_integration_key_secret[0].secret_string, null)
   # Dashboards as code: each src/helm/dashboards subdirectory maps to one Grafana folder.
   grafana_dashboard_root = "${path.module}/src/helm/dashboards"

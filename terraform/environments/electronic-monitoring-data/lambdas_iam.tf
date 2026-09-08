@@ -1825,6 +1825,16 @@ data "aws_iam_policy_document" "cloudwatch_alarm_threader_policy_document" {
   }
 
   statement {
+    sid    = "AllowStartLandingDlqRedriverWorkflow"
+    effect = "Allow"
+    actions = [
+      "states:StartExecution",
+    ]
+    resources = [
+      aws_sfn_state_machine.landing_dlq_redriver.arn,
+    ]
+  }
+  statement {
     sid    = "AllowSendIncidentEvents"
     effect = "Allow"
     actions = [
@@ -2877,16 +2887,16 @@ resource "aws_iam_policy" "trigger_cadt_iam_policy" {
 
 module "trigger_cadt_iam" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role"
-  
+
   name = "trigger-cadt-iam-role"
   trust_policy_permissions = {
-   LambdaAssume = { actions = [
+    LambdaAssume = { actions = [
       "sts:AssumeRole",
-    ]
-    principals = [{
-      type = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }]}
+      ]
+      principals = [{
+        type        = "Service"
+        identifiers = ["lambda.amazonaws.com"]
+    }] }
   }
 
   policies = {
@@ -2913,7 +2923,7 @@ data "aws_iam_policy_document" "poll_cadt_policy_document" {
     condition {
       test     = "ArnEquals"
       variable = "ecs:cluster"
-      values = [aws_ecs_cluster.cadt.arn]
+      values   = [aws_ecs_cluster.cadt.arn]
     }
   }
 }
@@ -2926,16 +2936,16 @@ resource "aws_iam_policy" "poll_cadt_iam_policy" {
 
 module "poll_cadt_iam" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role"
-  
+
   name = "poll-cadt-iam-role"
   trust_policy_permissions = {
-   LambdaAssume = { actions = [
+    LambdaAssume = { actions = [
       "sts:AssumeRole",
-    ]
-    principals = [{
-      type = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }]}
+      ]
+      principals = [{
+        type        = "Service"
+        identifiers = ["lambda.amazonaws.com"]
+    }] }
   }
 
   policies = {
@@ -3011,6 +3021,34 @@ data "aws_iam_policy_document" "live_feed_incident_manager_policy_document" {
       "${module.s3-logging-bucket.bucket.arn}/incident-automation/episodes/${local.environment_shorthand}/*"
     ]
   }
+
+  statement {
+    sid    = "PublishIncidentNotifications"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [
+      aws_sns_topic.emds_alerts.arn,
+      aws_sns_topic.operational_incident_updates.arn,
+    ]
+  }
+
+  statement {
+    sid    = "UseIncidentNotificationKmsKey"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey*",
+    ]
+
+    resources = [
+      aws_kms_key.emds_alerts.arn,
+    ]
+  }
 }
 
 resource "aws_iam_policy" "live_feed_incident_manager" {
@@ -3021,4 +3059,59 @@ resource "aws_iam_policy" "live_feed_incident_manager" {
 resource "aws_iam_role_policy_attachment" "live_feed_incident_manager_attach" {
   role       = aws_iam_role.live_feed_incident_manager.name
   policy_arn = aws_iam_policy.live_feed_incident_manager.arn
+}
+
+# ---------------------------------
+# Trigger cpr job
+# ---------------------------------
+
+module "trigger_cpr_job_iam_role" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-role"
+
+  name = "trigger-cpr-job-iam-role"
+  trust_policy_permissions = {
+    LambdaAssume = { actions = [
+      "sts:AssumeRole",
+      ]
+      principals = [{
+        type        = "Service"
+        identifiers = ["lambda.amazonaws.com"]
+    }] }
+  }
+}
+
+# ------------------------------------------------------------------------------
+# IAM role and policy for the rota personal digest Lambda
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "rota_personal_digest" {
+  name               = "rota_personal_digest_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "rota_personal_digest_policy_document" {
+  statement {
+    sid    = "ReadRotaDigestSecrets"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      module.live_feed_github_app.secret_arn,
+      module.rota_personal_digest_slack.secret_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "rota_personal_digest" {
+  name   = "rota_personal_digest_lambda_policy"
+  policy = data.aws_iam_policy_document.rota_personal_digest_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "rota_personal_digest_attach" {
+  role       = aws_iam_role.rota_personal_digest.name
+  policy_arn = aws_iam_policy.rota_personal_digest.arn
 }

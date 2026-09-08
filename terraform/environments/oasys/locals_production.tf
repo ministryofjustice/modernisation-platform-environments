@@ -2,9 +2,15 @@ locals {
 
   web_live_side = "b"
 
-  delius_oasys_queues_production = {
-    "pd" = {
-      sns_topic_arn_configured = true # set to true when sns_topic_arn has been populated in config secret
+  locals_production = {
+    arns_integration = {
+      cross_account_secret_configured = true
+      database_hostname               = "hmpps-arns-assessment-view-db-prod"
+    }
+    delius_oasys_queues = {
+      "pd" = {
+        sns_topic_arn_configured = true # set to true when sns_topic_arn has been populated in config secret
+      }
     }
   }
 
@@ -448,6 +454,31 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PD*/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/DR*/*",
             ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/postgres/database/hmpps-arns-assessment-view-db-prod/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "kms:Decrypt",
+            ]
+            resources = [
+              aws_kms_key.arns_integration[0].arn,
+            ]
+            condition = {
+              test     = "StringEquals"
+              variable = "kms:ViaService"
+              values = [
+                "secretsmanager.eu-west-2.amazonaws.com",
+              ]
+            }
           },
         ]
       }
