@@ -358,7 +358,17 @@ locals {
       /* ArgoCD — spokes registered with the nonlive hub */
       argocd_registered_spokes = [
         "container-platform-octo-nonlive",
+        "container-platform-hmpps-nonlive",
+        "container-platform-laa-nonlive",
+        "container-platform-cd-nonlive",
       ]
+
+      /* ArgoCD — additional RBAC role mappings for this tier (beyond the
+         always-present ADMIN mapping added in locals.tf). Keys: EDITOR, VIEWER
+         (ADMIN may also be extended). Values: list of { id, type } IDC
+         identities. Used to grant BU teams access to the ArgoCD UI.
+         Example: { VIEWER = [{ id = "hmpps-sre-group-id", type = "SSO_GROUP" }] } */
+      argocd_rbac_role_mappings = {}
 
       /* Addons */
       eks_cluster_addon_versions = {
@@ -478,7 +488,17 @@ locals {
       eks_cluster_version = "1.35"
 
       /* ArgoCD — spokes registered with the live hub */
-      argocd_registered_spokes = []
+      argocd_registered_spokes = [
+        # Registers octo-live as a live spoke.
+        "container-platform-octo-live",
+      ]
+
+      /* ArgoCD — additional RBAC role mappings for this tier (beyond the
+         always-present ADMIN mapping added in locals.tf). Keys: EDITOR, VIEWER
+         (ADMIN may also be extended). Values: list of { id, type } IDC
+         identities. Used to grant BU teams access to the ArgoCD UI.
+         Example: { VIEWER = [{ id = "hmpps-sre-group-id", type = "SSO_GROUP" }] } */
+      argocd_rbac_role_mappings = {}
 
       /* Addons */
       eks_cluster_addon_versions = {

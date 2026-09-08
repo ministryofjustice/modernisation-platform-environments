@@ -66,7 +66,7 @@ resource "aws_db_instance" "jitbit_sandbox" {
   vpc_security_group_ids = [aws_security_group.database_security_group_sandbox[0].id]
   multi_az               = local.application_data.accounts["sandbox"].db_multi_az
   #checkov:skip=CKV_AWS_157: "multi-az enabled, but optional"
-  storage_encrypted = true
+  storage_encrypted     = true
   copy_tags_to_snapshot = true
 
   tags = merge(

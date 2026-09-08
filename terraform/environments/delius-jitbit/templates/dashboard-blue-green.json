@@ -1,0 +1,1010 @@
+{
+  "widgets": [
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 1,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [
+            "ECS/ContainerInsights",
+            "CpuUtilized",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}-blue",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "blue_used",
+              "visible": false
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "CpuReserved",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}-blue",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "blue_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(blue_used / blue_reserved) * 100",
+              "label": "${app_name}-service-blue",
+              "id": "blue_pct",
+              "color": "#1f77b4"
+            }
+          ],
+
+          [
+            "ECS/ContainerInsights",
+            "CpuUtilized",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}-green",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "green_used",
+              "visible": false
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "CpuReserved",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}-green",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "green_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(green_used / green_reserved) * 100",
+              "label": "${app_name}-service-green",
+              "id": "green_pct",
+              "color": "#2ca02c"
+            }
+          ],
+
+          [
+            "ECS/ContainerInsights",
+            "CpuUtilized",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "cluster_used",
+              "visible": false
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "CpuReserved",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "cluster_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(cluster_used / cluster_reserved) * 100",
+              "label": "${app_name}-cluster",
+              "id": "cluster_pct",
+              "color": "#9467BD"
+            }
+          ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "eu-west-2",
+        "title": "CPU Utilization",
+        "stat": "Average",
+        "period": 300,
+        "yAxis": {
+          "left": {
+            "label": "%",
+            "min": 0,
+            "max": 100
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 1,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [
+            "ECS/ContainerInsights",
+            "MemoryUtilized",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}-blue",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "blue_used",
+              "visible": false
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "MemoryReserved",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}-blue",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "blue_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(blue_used / blue_reserved) * 100",
+              "label": "${app_name}-service-blue",
+              "id": "blue_pct",
+              "color": "#1f77b4"
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "MemoryUtilized",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}-green",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "green_used",
+              "visible": false
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "MemoryReserved",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}-green",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "green_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(green_used / green_reserved) * 100",
+              "label": "${app_name}-service-green",
+              "id": "green_pct",
+              "color": "#2ca02c"
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "MemoryUtilized",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "cluster_used",
+              "visible": false
+            }
+          ],
+          [
+            "ECS/ContainerInsights",
+            "MemoryReserved",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "id": "cluster_reserved",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "(cluster_used / cluster_reserved) * 100",
+              "label": "${app_name}-cluster",
+              "id": "cluster_pct",
+              "color": "#9467BD"
+            }
+          ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "eu-west-2",
+        "title": "Memory Utilization",
+        "stat": "Average",
+        "period": 300,
+        "yAxis": {
+          "left": {
+            "label": "%",
+            "min": 0,
+            "max": 100
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 7,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [
+            "JitbitMetrics",
+            "ErrorCountBlue",
+            {
+              "label": "${app_name}-errors-blue",
+              "color": "#1f77b4"
+            }
+          ],
+          [
+            "JitbitMetrics",
+            "ErrorCountGreen",
+            {
+              "label": "${app_name}-errors-green",
+              "color": "#2ca02c"
+            }
+          ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "eu-west-2",
+        "stat": "Sum",
+        "period": 300,
+        "title": "Jitbit Application Errors"
+      }
+    },
+    {
+      "type": "log",
+      "x": 12,
+      "y": 7,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "query": "SOURCE '${app_log_group_name_blue}' | SOURCE '${app_log_group_name_green}' | fields @timestamp, @message, @logStream, @log\n| filter @message like /Error in Helpdesk/\n| sort @timestamp desc\n| limit 20",
+        "region": "eu-west-2",
+        "stacked": false,
+        "view": "table",
+        "title": "Jitbit Error Logs"
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 0,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "**App Metrics**"
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 13,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "**LB Metrics** [button:primary:EC2 Load balancer link](https://eu-west-2.console.aws.amazon.com/ec2/home?region=eu-west-2#LoadBalancer:loadBalancerArn=arn:aws:elasticloadbalancing:eu-west-2:${account_id}:loadbalancer/${load_balancer_arn};tab=listeners)"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 16,
+      "y": 14,
+      "width": 8,
+      "height": 6,
+      "properties": {
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          [
+            "AWS/ApplicationELB",
+            "HealthyHostCount",
+            "TargetGroup",
+            "${target_group_arn_blue}",
+            "LoadBalancer",
+            "${load_balancer_arn}",
+            {
+              "label": "Blue Target Group",
+              "color": "#1f77b4"
+            }
+          ],
+          [
+            "AWS/ApplicationELB",
+            "HealthyHostCount",
+            "TargetGroup",
+            "${target_group_arn_green}",
+            "LoadBalancer",
+            "${load_balancer_arn}",
+            {
+              "label": "Green Target Group",
+              "color": "#2ca02c"
+            }
+          ]
+        ],
+        "region": "eu-west-2"
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 20,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "**RDS Metrics** [button:primary:RDS Databases link](https://eu-west-2.console.aws.amazon.com/rds/home?region=eu-west-2#database:id=${app_name}-${environment}-database;is-cluster=false) [button:RDS Snapshots](https://eu-west-2.console.aws.amazon.com/rds/home?region=eu-west-2#snapshots-list:) "
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 21,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          [
+            "AWS/RDS",
+            "ReadIOPS",
+            "DBInstanceIdentifier",
+            "${app_name}-${environment}-database"
+          ],
+          [
+            ".",
+            "WriteIOPS",
+            ".",
+            "."
+          ]
+        ],
+        "region": "eu-west-2",
+        "title": "IOPS"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 6,
+      "y": 21,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          [
+            "AWS/RDS",
+            "CPUUtilization",
+            "DBInstanceIdentifier",
+            "${app_name}-${environment}-database"
+          ]
+        ],
+        "region": "eu-west-2",
+        "title": "CPU Utilization"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 21,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          [
+            "AWS/RDS",
+            "FreeStorageSpace",
+            "DBInstanceIdentifier",
+            "${app_name}-${environment}-database"
+          ]
+        ],
+        "region": "eu-west-2",
+        "title": "Free Storage Space"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 18,
+      "y": 21,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "view": "timeSeries",
+        "stacked": true,
+        "metrics": [
+          [
+            "AWS/RDS",
+            "DatabaseConnections",
+            "DBInstanceIdentifier",
+            "${app_name}-${environment}-database"
+          ]
+        ],
+        "region": "eu-west-2",
+        "title": "DB Connections"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 27,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "view": "timeSeries",
+        "stacked": true,
+        "metrics": [
+          [
+            "AWS/RDS",
+            "ReadLatency",
+            "DBInstanceIdentifier",
+            "${app_name}-${environment}-database"
+          ],
+          [
+            ".",
+            "WriteLatency",
+            ".",
+            "."
+          ]
+        ],
+        "region": "eu-west-2",
+        "title": "Latency"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 6,
+      "y": 27,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "view": "timeSeries",
+        "stacked": true,
+        "metrics": [
+          [
+            "AWS/RDS",
+            "NetworkTransmitThroughput",
+            "DBInstanceIdentifier",
+            "${app_name}-${environment}-database"
+          ],
+          [
+            ".",
+            "NetworkReceiveThroughput",
+            ".",
+            "."
+          ]
+        ],
+        "region": "eu-west-2",
+        "title": "Network Throughput"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 27,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          [
+            "AWS/RDS",
+            "FreeableMemory",
+            "DBInstanceIdentifier",
+            "${app_name}-${environment}-database"
+          ]
+        ],
+        "region": "eu-west-2"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 18,
+      "y": 27,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/RDS",
+            "DiskQueueDepth",
+            "DBInstanceIdentifier",
+            "${app_name}-${environment}-database",
+            {
+              "color": "#9467bd"
+            }
+          ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "eu-west-2",
+        "stat": "Average",
+        "period": 300
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 14,
+      "width": 8,
+      "height": 6,
+      "properties": {
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          [
+            "AWS/ApplicationELB",
+            "HTTPCode_Target_4XX_Count",
+            "LoadBalancer",
+            "${load_balancer_arn}",
+            {
+              "id": "errors",
+              "visible": false
+            }
+          ],
+          [
+            {
+              "expression": "FILL(errors, 0)",
+              "label": "Target 4XX Errors",
+              "color": "#d62728",
+              "id": "errors_filled"
+            }
+          ]
+        ],
+        "region": "eu-west-2",
+        "stat": "Sum",
+        "period": 300,
+        "title": "Target HTTP 4XX Errors"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 8,
+      "y": 14,
+      "width": 8,
+      "height": 6,
+      "properties": {
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          [
+            "AWS/ApplicationELB",
+            "TargetResponseTime",
+            "TargetGroup",
+            "${target_group_arn_blue}",
+            "LoadBalancer",
+            "${load_balancer_arn}",
+            {
+              "label": "Blue Target Group",
+              "color": "#1f77b4"
+            }
+          ],
+          [
+            "AWS/ApplicationELB",
+            "TargetResponseTime",
+            "TargetGroup",
+            "${target_group_arn_green}",
+            "LoadBalancer",
+            "${load_balancer_arn}",
+            {
+              "label": "Green Target Group",
+              "color": "#2ca02c"
+            }
+          ]
+        ],
+        "region": "eu-west-2",
+        "stat": "Average",
+        "period": 300,
+        "title": "Target Response Time"
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 40,
+      "width": 24,
+      "height": 6,
+      "properties": {
+        "query": "SOURCE '${app_log_group_name_blue}' | SOURCE '${app_log_group_name_green}' | fields @timestamp, @message, @logStream, @log\n| sort @timestamp desc\n| filter @message like /useless/\n| limit 1000",
+        "region": "eu-west-2",
+        "stacked": false,
+        "title": "Useless Filter Matches",
+        "view": "table"
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 50,
+      "width": 12,
+      "height": 5,
+      "properties": {
+        "query": "SOURCE 'delius-jitbit-ses-logs' | fields @timestamp, @message\n| sort @timestamp desc\n| filter @message like /bounce/\n| limit 1000",
+        "region": "eu-west-2",
+        "stacked": false,
+        "title": "Bounced Emails",
+        "view": "table"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 47,
+      "width": 12,
+      "height": 3,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/SES",
+            "Send",
+            {
+              "id": "m1",
+              "label": "Sent",
+              "region": "eu-west-2"
+            }
+          ],
+          [
+            ".",
+            "Bounce",
+            {
+              "region": "eu-west-2"
+            }
+          ],
+          [
+            ".",
+            "Delivery",
+            {
+              "region": "eu-west-2"
+            }
+          ]
+        ],
+        "sparkline": false,
+        "view": "singleValue",
+        "region": "eu-west-2",
+        "stat": "Sum",
+        "period": 86400,
+        "setPeriodToTimeRange": true,
+        "trend": false,
+        "liveData": true,
+        "title": "SES: Totals"
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 46,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "**Email** [button:primary:SES Dashboard link](https://eu-west-2.console.aws.amazon.com/ses/home?region=eu-west-2#/account) [button:SES Suppression list](https://eu-west-2.console.aws.amazon.com/ses/home?region=eu-west-2#/suppression-list) "
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 47,
+      "width": 12,
+      "height": 8,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/SES",
+            "Send",
+            {
+              "label": "Sent",
+              "region": "eu-west-2"
+            }
+          ],
+          [
+            ".",
+            "Delivery",
+            {
+              "region": "eu-west-2"
+            }
+          ],
+          [
+            ".",
+            "Bounce",
+            {
+              "region": "eu-west-2"
+            }
+          ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "eu-west-2",
+        "period": 900,
+        "stat": "Sum",
+        "liveData": true,
+        "title": "SES"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 34,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [
+            {
+              "expression": "(m1/1048576)/PERIOD(m1)",
+              "label": "Expression1",
+              "id": "e1",
+              "visible": false,
+              "region": "eu-west-2"
+            }
+          ],
+          [
+            {
+              "expression": "m2/1048576",
+              "label": "Expression2",
+              "id": "e2",
+              "visible": false,
+              "region": "eu-west-2"
+            }
+          ],
+          [
+            {
+              "expression": "e2-e1",
+              "label": "Expression3",
+              "id": "e3",
+              "visible": false,
+              "region": "eu-west-2"
+            }
+          ],
+          [
+            {
+              "expression": "((e1)*100)/(e2)",
+              "label": "Throughput utilization (%)",
+              "id": "e4",
+              "region": "eu-west-2"
+            }
+          ],
+          [
+            "AWS/EFS",
+            "MeteredIOBytes",
+            "FileSystemId",
+            "${efs_id}",
+            {
+              "id": "m1",
+              "period": 60,
+              "stat": "Sum",
+              "visible": false,
+              "region": "eu-west-2"
+            }
+          ],
+          [
+            ".",
+            "PermittedThroughput",
+            ".",
+            ".",
+            {
+              "id": "m2",
+              "period": 60,
+              "stat": "Average",
+              "visible": false,
+              "region": "eu-west-2"
+            }
+          ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "eu-west-2",
+        "period": 60,
+        "title": "Throughput utilization (%)",
+        "annotations": {
+          "horizontal": [
+            {
+              "visible": true,
+              "color": "#d13212",
+              "label": "Utilization warning",
+              "value": 75,
+              "fill": "above",
+              "yAxis": "left"
+            }
+          ]
+        },
+        "yAxis": {
+          "left": {
+            "max": 100
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 6,
+      "y": 34,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          [
+            "AWS/EFS",
+            "PercentIOLimit",
+            "FileSystemId",
+            "${efs_id}",
+            {
+              "label": "${efs_id}",
+              "region": "eu-west-2",
+              "id": "m1"
+            }
+          ]
+        ],
+        "region": "eu-west-2",
+        "title": "IOPS utilization (%)"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 34,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/EFS",
+            "StorageBytes",
+            "StorageClass",
+            "Total",
+            "FileSystemId",
+            "${efs_id}",
+            {
+              "id": "mTotal",
+              "visible": false,
+              "region": "eu-west-2"
+            }
+          ],
+          [
+            {
+              "expression": "IF(mTotal > 1000, IF(mTotal > 1000000, IF(mTotal > 1000000000, IF(mTotal > 1000000000000, IF(mTotal > 1000000000000000, 1, mTotal*0.9094947), mTotal*0.9313226), mTotal*0.9536743), mTotal*0.9765625), mTotal)",
+              "label": "Total",
+              "region": "eu-west-2",
+              "id": "e1"
+            }
+          ],
+          [
+            "AWS/EFS",
+            "StorageBytes",
+            "StorageClass",
+            "Standard",
+            "FileSystemId",
+            "${efs_id}",
+            {
+              "id": "mStandard",
+              "visible": false,
+              "region": "eu-west-2"
+            }
+          ],
+          [
+            {
+              "expression": "IF(mStandard > 1000, IF(mStandard > 1000000, IF(mStandard > 1000000000, IF(mStandard > 1000000000000, IF(mStandard > 1000000000000000, 1, mStandard*0.9094947), mStandard*0.9313226), mStandard*0.9536743), mStandard*0.9765625), mStandard)",
+              "label": "Standard",
+              "region": "eu-west-2",
+              "id": "e2"
+            }
+          ],
+          [
+            "AWS/EFS",
+            "StorageBytes",
+            "StorageClass",
+            "IA",
+            "FileSystemId",
+            "${efs_id}",
+            {
+              "id": "mIA",
+              "visible": false,
+              "region": "eu-west-2"
+            }
+          ],
+          [
+            {
+              "expression": "IF(mIA > 1000, IF(mIA > 1000000, IF(mIA > 1000000000, IF(mIA > 1000000000000, IF(mIA > 1000000000000000, 1, mIA*0.9094947), mIA*0.9313226), mIA*0.9536743), mIA*0.9765625), mIA)",
+              "label": "IA",
+              "region": "eu-west-2",
+              "id": "e3"
+            }
+          ],
+          [
+            "AWS/EFS",
+            "StorageBytes",
+            "StorageClass",
+            "IASizeOverhead",
+            "FileSystemId",
+            "${efs_id}",
+            {
+              "id": "mIASizeOverhead",
+              "visible": false,
+              "region": "eu-west-2"
+            }
+          ],
+          [
+            {
+              "expression": "IF(mIASizeOverhead > 1000, IF(mIASizeOverhead > 1000000, IF(mIASizeOverhead > 1000000000, IF(mIASizeOverhead > 1000000000000, IF(mIASizeOverhead > 1000000000000000, 1, mIASizeOverhead*0.9094947), mIASizeOverhead*0.9313226), mIASizeOverhead*0.9536743), mIASizeOverhead*0.9765625), mIASizeOverhead)",
+              "label": "IASizeOverhead",
+              "region": "eu-west-2",
+              "id": "e4"
+            }
+          ],
+          [
+            "AWS/EFS",
+            "StorageBytes",
+            "StorageClass",
+            "Archive",
+            "FileSystemId",
+            "${efs_id}",
+            {
+              "id": "mArchive",
+              "visible": false,
+              "region": "eu-west-2"
+            }
+          ],
+          [
+            {
+              "expression": "IF(mArchive > 1000, IF(mArchive > 1000000, IF(mArchive > 1000000000, IF(mArchive > 1000000000000, IF(mArchive > 1000000000000000, 1, mArchive*0.9094947), mArchive*0.9313226), mArchive*0.9536743), mArchive*0.9765625), mArchive)",
+              "label": "Archive",
+              "region": "eu-west-2",
+              "id": "e5"
+            }
+          ],
+          [
+            "AWS/EFS",
+            "StorageBytes",
+            "StorageClass",
+            "ArchiveSizeOverhead",
+            "FileSystemId",
+            "${efs_id}",
+            {
+              "id": "mArchiveSizeOverhead",
+              "visible": false,
+              "region": "eu-west-2"
+            }
+          ],
+          [
+            {
+              "expression": "IF(mArchiveSizeOverhead > 1000, IF(mArchiveSizeOverhead > 1000000, IF(mArchiveSizeOverhead > 1000000000, IF(mArchiveSizeOverhead > 1000000000000, IF(mArchiveSizeOverhead > 1000000000000000, 1, mArchiveSizeOverhead*0.9094947), mArchiveSizeOverhead*0.9313226), mArchiveSizeOverhead*0.9536743), mArchiveSizeOverhead*0.9765625), mArchiveSizeOverhead)",
+              "label": "ArchiveSizeOverhead",
+              "region": "eu-west-2",
+              "id": "e6"
+            }
+          ]
+        ],
+        "view": "timeSeries",
+        "stacked": false,
+        "region": "eu-west-2",
+        "title": "Storage bytes"
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 33,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "**EFS Metrics** [button:primary:EFS File Systems link](https://eu-west-2.console.aws.amazon.com/efs/home?region=eu-west-2#/file-systems) [button:EFS Graphs](https://eu-west-2.console.aws.amazon.com/efs/home?region=eu-west-2#/file-systems/${efs_id}?tabId=monitoring) "
+      }
+    }
+  ]
+}

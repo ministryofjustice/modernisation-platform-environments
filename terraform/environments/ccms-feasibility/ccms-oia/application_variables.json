@@ -2,8 +2,11 @@
   "accounts": {
     "development": {
       "ami_image_id": "ami-02f77a03ec776dc35",
+      "gh_runner_ami_id": "ami-002aab1cab5a08e35",
 
       "ec2_instance_type": "m5.xlarge",
+      "ec2_instance_type_gh_runner": "t2.small",
+      "instance_role_gh_runner": "gh-runner",
       "ec2_min_capacity": 1,
       "ec2_max_capacity": 2,
       "ec2_desired_capacity": 1,

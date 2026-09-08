@@ -124,6 +124,11 @@
   ],
   "columns_to_keep_as_int": [
     {
+      "object_name": "dbo.FINISHED_JOB",
+      "column_name": "JOB_STATUS",
+      "apply_to_environments": ["development", "production"]
+    },
+    {
       "object_name": "dbo.FINISHED_JOB_HISTORY",
       "column_name": "ACTIVITY_TYPE",
       "apply_to_environments": ["development", "production"]

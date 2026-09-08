@@ -1,6 +1,10 @@
 locals {
 
   locals_preproduction = {
+    arns_integration = {
+      cross_account_secret_configured = true
+      database_hostname               = "hmpps-arns-assessment-view-db-preprod"
+    }
     delius_oasys_queues = {
       "pp" = {
         sns_topic_arn_configured = true # set to true when sns_topic_arn has been populated in config secret
@@ -212,6 +216,31 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/*",
             ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/postgres/database/hmpps-arns-assessment-view-db-preprod/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "kms:Decrypt",
+            ]
+            resources = [
+              aws_kms_key.arns_integration[0].arn,
+            ]
+            condition = {
+              test     = "StringEquals"
+              variable = "kms:ViaService"
+              values = [
+                "secretsmanager.eu-west-2.amazonaws.com",
+              ]
+            }
           },
         ]
       }

@@ -49,16 +49,16 @@ resource "aws_efs_access_point" "lucene" {
 }
 
 resource "aws_ssm_parameter" "efs_id" {
-  name  = "/${local.application_name}/${local.environment}/efs-id"
-  type  = "SecureString"
-  value = aws_efs_file_system.lucene.id
+  name   = "/${local.application_name}/${local.environment}/efs-id"
+  type   = "SecureString"
+  value  = aws_efs_file_system.lucene.id
   key_id = data.aws_kms_key.general_shared.arn
 }
 
 resource "aws_ssm_parameter" "efs_ap_id" {
-  name  = "/${local.application_name}/${local.environment}/efs-access-point-id"
-  type  = "SecureString"
-  value = aws_efs_access_point.lucene.id
+  name   = "/${local.application_name}/${local.environment}/efs-access-point-id"
+  type   = "SecureString"
+  value  = aws_efs_access_point.lucene.id
   key_id = data.aws_kms_key.general_shared.arn
 }
 

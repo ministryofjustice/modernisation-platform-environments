@@ -6,7 +6,7 @@ resource "grafana_folder" "alert_rules" {
   for_each = (local.grafana_alerting_manageable && length(local.grafana_monitored_accounts_by_uid) > 0) ? local.alert_rule_folder_paths : toset([])
 
   uid   = "alert-rules-${replace(each.key, "/", "-")}"
-  title = each.key
+  title = replace(each.key, "/", "-")
 
   depends_on = [helm_release.grafana]
 }
@@ -45,6 +45,7 @@ resource "grafana_rule_group" "this" {
           datasource_uid = data.value.datasourceUid
 
           model = sensitive(jsonencode(data.value.model))
+          query_type = try(data.value.model.queryType,null)
 
           relative_time_range {
             from = data.value.relativeTimeRange.from

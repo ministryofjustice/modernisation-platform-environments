@@ -144,7 +144,7 @@ resource "aws_iam_policy" "ec2_describe_instances" {
       "Action" : ["ec2:DescribeInstances"]
       "Effect" : "Allow",
       "Resource" : [
-        "arn:aws:ec2:eu-west-2:${data.aws_caller_identity.current.account_id}:instance/*"
+        "*"
       ]
     }]
   })

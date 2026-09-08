@@ -35,6 +35,7 @@ locals {
   live_feeds_dbs = [
     "allied_mdss",
     "serco_fms",
+    # "person_record",
   ]
   historic_source_dbs = local.is-production ? [
     "buddi_buddi",

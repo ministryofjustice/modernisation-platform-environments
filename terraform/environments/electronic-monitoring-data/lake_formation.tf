@@ -117,12 +117,12 @@ module "lakeformation_registration_iam_role" {
     S3BucketAccess = {
       effect    = "Allow"
       actions   = ["s3:ListBucket"]
-      resources = [module.s3-create-a-derived-table-bucket.bucket.arn]
+      resources = [module.s3-create-a-derived-table-bucket.bucket.arn, module.s3-raw-formatted-data-bucket.bucket.arn]
     }
     S3ObjectAccess = {
       effect    = "Allow"
       actions   = ["s3:DeleteObject", "s3:GetObject", "s3:PutObject"]
-      resources = ["${module.s3-create-a-derived-table-bucket.bucket.arn}/*"]
+      resources = ["${module.s3-create-a-derived-table-bucket.bucket.arn}/*", "${module.s3-raw-formatted-data-bucket.bucket.arn}/*"]
     }
     KMSKeyAccess = {
       effect = "Allow"

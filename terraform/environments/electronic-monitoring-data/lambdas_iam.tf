@@ -3060,3 +3060,58 @@ resource "aws_iam_role_policy_attachment" "live_feed_incident_manager_attach" {
   role       = aws_iam_role.live_feed_incident_manager.name
   policy_arn = aws_iam_policy.live_feed_incident_manager.arn
 }
+
+# ---------------------------------
+# Trigger cpr job
+# ---------------------------------
+
+module "trigger_cpr_job_iam_role" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-role"
+
+  name = "trigger-cpr-job-iam-role"
+  trust_policy_permissions = {
+    LambdaAssume = { actions = [
+      "sts:AssumeRole",
+      ]
+      principals = [{
+        type        = "Service"
+        identifiers = ["lambda.amazonaws.com"]
+    }] }
+  }
+}
+
+# ------------------------------------------------------------------------------
+# IAM role and policy for the rota personal digest Lambda
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "rota_personal_digest" {
+  name               = "rota_personal_digest_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "rota_personal_digest_policy_document" {
+  statement {
+    sid    = "ReadRotaDigestSecrets"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      module.live_feed_github_app.secret_arn,
+      module.rota_personal_digest_slack.secret_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "rota_personal_digest" {
+  name   = "rota_personal_digest_lambda_policy"
+  policy = data.aws_iam_policy_document.rota_personal_digest_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "rota_personal_digest_attach" {
+  role       = aws_iam_role.rota_personal_digest.name
+  policy_arn = aws_iam_policy.rota_personal_digest.arn
+}

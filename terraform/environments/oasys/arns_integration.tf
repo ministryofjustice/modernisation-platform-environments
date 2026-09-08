@@ -131,7 +131,7 @@ resource "aws_secretsmanager_secret" "arns_integration_cloud_platform_config" {
 
   name                    = "/postgres/database/${local.arns_integration.database_hostname}/cloud-platform-config"
   description             = "Database configuration and passwords populated by Cloud Platform terraform"
-  kms_key_id              = aws_kms_key.arns_integration[0].key_id
+  kms_key_id              = aws_kms_key.arns_integration[0].arn
   policy                  = local.arns_cross_account_config != null ? data.aws_iam_policy_document.arns_integration_secret_policy[0].json : null
   recovery_window_in_days = 0
 

@@ -3,7 +3,6 @@ organisations:
     alias: Ministry of Justice
 
 teams:
-  # litellm_team is currently missing the option to attach unified access groups, so for now we have to manually add them in the admin console.
   justice-data-platform:
     alias: Justice Data Platform
     organisation: ministryofjustice
@@ -30,6 +29,23 @@ teams:
         model: "bedrock-jeaie-claude-sonnet-5"
   pom-e-supervision:
     alias: POM Phased Implementation - E-Supervision
+    organisation: ministryofjustice
+    max_budget: 2000
+    models: ["no-default-models"]
+    unified_access_groups:
+      - generally-available-models
+      - bedrock-jeaie-claude-haiku-4-5
+      - bedrock-jeaie-claude-opus-5
+      - bedrock-jeaie-claude-sonnet-5
+    model_aliases:
+      - alias: "claude-haiku-4.5"
+        model: "bedrock-jeaie-claude-haiku-4-5"
+      - alias: "claude-opus-5"
+        model: "bedrock-jeaie-claude-opus-5"
+      - alias: "claude-sonnet-5"
+        model: "bedrock-jeaie-claude-sonnet-5"
+  pom-probation-accounts:
+    alias: POM Phased Implementation - Probation Accounts
     organisation: ministryofjustice
     max_budget: 2000
     models: ["no-default-models"]
@@ -431,6 +447,13 @@ models:
       model_id: "gemini-3.7-flash"
       model_family: "Google Gemini"
       model_name: "Google Gemini 3.7 Flash (EU)"
+      location: "eu"
+      generally_available: false
+      environments_available: ["development", "production"]
+    gemini-3-8-flash:
+      model_id: "gemini-3.8-flash"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 3.8 Flash (EU)"
       location: "eu"
       generally_available: false
       environments_available: ["development", "production"]

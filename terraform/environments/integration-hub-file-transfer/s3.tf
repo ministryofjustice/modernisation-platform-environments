@@ -58,6 +58,28 @@ module "s3_bucket" {
   attach_deny_insecure_transport_policy = true
   bucket                                = each.value.bucket
 
+  cors_rule = each.key == "incoming" ? [
+    {
+      allowed_headers = ["*"]
+      allowed_methods = ["GET", "PUT", "POST", "DELETE", "HEAD"]
+      allowed_origins = [aws_transfer_web_app.this.access_endpoint]
+      expose_headers = [
+        "last-modified",
+        "content-length",
+        "etag",
+        "x-amz-version-id",
+        "content-type",
+        "x-amz-request-id",
+        "x-amz-id-2",
+        "date",
+        "x-amz-cf-id",
+        "x-amz-storage-class",
+        "access-control-expose-headers",
+      ]
+      max_age_seconds = 3000
+    }
+  ] : []
+
   server_side_encryption_configuration = {
     rule = {
       apply_server_side_encryption_by_default = {

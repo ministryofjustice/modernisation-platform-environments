@@ -1,18 +1,23 @@
-resource "aws_s3_bucket" "replica" {
-  count = local.enable_ecp_replication ? 1 : 0
+locals {
+  # Preprod bucket name is kept as-is (pre-dates this variable) to avoid forcing a bucket replacement.
+  replica_bucket_name = local.environment == "development" ? "edw-19c-dev-replica-bucket" : "edw-19c-preprod-replica-bucket"
+}
 
-  bucket = "edw-19c-preprod-replica-bucket"
+resource "aws_s3_bucket" "replica" {
+  count = local.enable_rds_s3_access ? 1 : 0
+
+  bucket = local.replica_bucket_name
 
   tags = {
-    Name        = "edw-19c-preprod-replica-bucket"
-    Environment = "preproduction"
-    Purpose     = "s3-replication-destination"
+    Name        = local.replica_bucket_name
+    Environment = local.environment
+    Purpose     = "rds-datapump-bucket"
     ManagedBy   = "terraform"
   }
 }
 
 resource "aws_s3_bucket_versioning" "replica" {
-  count  = local.enable_ecp_replication ? 1 : 0
+  count  = local.enable_rds_s3_access ? 1 : 0
   bucket = aws_s3_bucket.replica[0].id
 
   versioning_configuration {
@@ -21,7 +26,7 @@ resource "aws_s3_bucket_versioning" "replica" {
 }
 
 resource "aws_s3_bucket_public_access_block" "replica" {
-  count  = local.enable_ecp_replication ? 1 : 0
+  count  = local.enable_rds_s3_access ? 1 : 0
   bucket = aws_s3_bucket.replica[0].id
 
 
@@ -32,7 +37,8 @@ resource "aws_s3_bucket_public_access_block" "replica" {
 }
 
 resource "aws_s3_bucket_policy" "replica" {
-  count  = local.enable_ecp_replication ? 1 : 0
+  # Legacy cross-account replication from ECP; only ever applied to the preprod bucket.
+  count  = local.enable_rds_s3_access && local.environment == "preproduction" ? 1 : 0
   bucket = aws_s3_bucket.replica[0].id
 
   policy = jsonencode({

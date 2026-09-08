@@ -1,18 +1,17 @@
 # Lambda
 
 resource "aws_security_group" "rag_lambda" {
-  #checkov:skip=CKV_AWS_382:To be reviewed later
-  #checkov:skip=CKV2_AWS_5:To be reviewed later
+  #checkov:skip=CKV2_AWS_5:Attached to RAG Lambda via module.rag_lambda vpc_security_group_ids
 
   name        = "${local.application_name}-${local.environment}-rag-lambda-security-group"
   description = "RAG Lambda Security Group"
   vpc_id      = data.aws_vpc.shared.id
 
   egress {
-    description = "outbound access"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    description = "HTTPS to AWS APIs and LLM gateway"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
@@ -49,10 +48,6 @@ data "aws_iam_policy_document" "rag_lambda_function_assume_role" {
 }
 
 data "aws_iam_policy_document" "rag_lambda_function_role" {
-  #checkov:skip=CKV_AWS_111:To be reviewed later
-  #checkov:skip=CKV_AWS_356:To be reviewed later
-
-
   statement {
     sid    = "AllowToWriteCloudWatchLog"
     effect = "Allow"
@@ -77,7 +72,7 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
     ]
 
     resources = [
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*"
     ]
   }
@@ -93,7 +88,10 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
       "athena:StopQueryExecution"
     ]
 
-    resources = ["*"]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:workgroup/primary",
+      "arn:aws:athena:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:workgroup/${local.athena_workgroup}"
+    ]
   }
 
   statement {
@@ -109,7 +107,11 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
       "glue:GetPartitions"
     ]
 
-    resources = ["*"]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/${aws_glue_catalog_database.cur_v2_database.name}",
+      "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${aws_glue_catalog_database.cur_v2_database.name}/*"
+    ]
   }
 
   statement {
@@ -118,10 +120,7 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
 
     actions = ["secretsmanager:GetSecretValue"]
 
-    resources = [
-      "arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:llm_gateway_key-USBFqg",
-      "arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:llm_gateway_key-1biv4G"
-    ]
+    resources = [aws_secretsmanager_secret.llm_gateway_key.arn]
   }
 
   statement {
@@ -136,9 +135,7 @@ data "aws_iam_policy_document" "rag_lambda_function_role" {
       "kms:Describe*"
     ]
 
-    resources = [
-      "arn:aws:kms:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:key/ef7e1dc9-dc2b-4733-9278-46885b7040c7"
-    ]
+    resources = [local.coat_kms_key_id]
   }
 }
 
@@ -170,7 +167,10 @@ module "rag_lambda" {
     ]
   }]
   artifacts_dir                = "${abspath(path.root)}/builds"
-  trigger_on_package_timestamp = false
+  # CI workspaces have no builds/ zip; ignore hash drift and allow missing packages to rebuild
+  ignore_source_code_hash      = true
+  recreate_missing_package     = true
+  trigger_on_package_timestamp = true
 
   reserved_concurrent_executions = 10
 
@@ -206,8 +206,8 @@ moved {
 # Secrets
 
 resource "aws_secretsmanager_secret" "llm_gateway_key" {
-  #checkov:skip=CKV_AWS_149:To be reviewed later
-  #checkov:skip=CKV2_AWS_57:To be reviewed later
+  #checkov:skip=CKV2_AWS_57:API key is managed externally by the LLM gateway; AWS automatic rotation is not supported
 
-  name = "llm_gateway_key"
+  name       = "llm_gateway_key"
+  kms_key_id = local.coat_kms_key_id
 }

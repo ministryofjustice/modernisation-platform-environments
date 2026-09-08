@@ -33,27 +33,9 @@ data "aws_iam_roles" "platform_engineer_admin_sso_role" {
   path_prefix = "/aws-reserved/sso.amazonaws.com/"
 }
 
-# data "aws_route53_zone" "shared_parent_zone" {
-#   name         = trimprefix(terraform.workspace, "cloud-platform-") + ".temp.cloud-platform.service.justice.gov.uk"
-#   private_zone = false
-# }
-
-#------------------------------------------------------------------------------
-# IAM Identity Center — group IDs for ArgoCD RBAC
-#
-# Hardcoded because the ModernisationPlatformSSOReadOnly role returns
-# ResourceNotFoundException when calling GetGroupId despite having the
-# identitystore:Get* permission. TODO: investigate and switch back to
-# data.aws_identitystore_group lookup.
-#
-# - cloud-platform-engineers: the platform team, granted ArgoCD admin.
-# - container-platform-aws: the AWS ProServe team working on the project,
-#   granted ArgoCD admin so they can access the ArgoCD portal on hub clusters.
-#------------------------------------------------------------------------------
-locals {
-  cloud_platform_engineers_group_id = "664252b4-7021-701e-49b9-6c46ccc7899e"
-  container_platform_aws_group_id   = "7682a204-00f1-7031-257e-713bb28289c6"
-}
+# ArgoCD RBAC group IDs (cloud_platform_engineers_group_id,
+# container_platform_aws_group_id) and the assembled argocd_rbac_role_mappings
+# are defined in locals.tf alongside the other ArgoCD configuration.
 
 # Auth token for the kubernetes/helm providers (providers.tf).
 # aws_eks_cluster_auth generates a token from the cluster name and the caller's

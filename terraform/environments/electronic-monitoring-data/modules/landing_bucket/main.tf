@@ -242,8 +242,11 @@ data "aws_iam_policy_document" "process_landing_bucket_files_s3_policy_document"
     effect = "Allow"
     actions = [
       "s3:PutObjectTagging",
+      "s3:PutObjectVersionTagging",
       "s3:GetObject",
+      "s3:GetObjectVersion",
       "s3:GetObjectTagging",
+      "s3:GetObjectVersionTagging",
       "s3:DeleteObject"
     ]
     resources = [
