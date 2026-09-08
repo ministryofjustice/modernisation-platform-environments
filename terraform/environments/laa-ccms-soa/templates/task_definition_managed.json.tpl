@@ -13,10 +13,6 @@
     },
     "portMappings": [
       {
-        "containerPort": ${managed_server_port},
-        "hostPort": ${managed_server_port}
-      },
-      {
         "containerPort": ${managed_ssl_port},
         "hostPort": ${managed_ssl_port}
       },
