@@ -26,42 +26,42 @@ resource "aws_iam_role" "connector_ecs_task_role" {
 
 
 # S3 Access Policy
-# resource "aws_iam_policy" "s3_access_policy" {
-#   name        = "${local.connector_app_name}-${local.environment}-s3-access"
-#   description = "S3 access policy for ${local.connector_app_name} logs"
+resource "aws_iam_policy" "s3_access_policy" {
+  name        = "${local.connector_app_name}-${local.environment}-s3-access"
+  description = "S3 access policy for ${local.connector_app_name} logs"
 
-#   policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Sid    = "S3BucketAccess"
-#         Effect = "Allow"
-#         Action = [
-#           "s3:ListBucket",
-#           "s3:GetBucketLocation",
-#           "s3:GetBucketVersioning"
-#         ]
-#         Resource = module.s3_ccms_oia.bucket.arn
-#       },
-#       {
-#         Sid    = "S3ObjectAccess"
-#         Effect = "Allow"
-#         Action = [
-#           "s3:GetObject",
-#           "s3:GetObjectVersion",
-#           "s3:PutObject",
-#           "s3:PutObjectAcl"
-#         ]
-#         Resource = "${module.s3_ccms_oia.bucket.arn}/*"
-#       }
-#     ]
-#   })
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "S3BucketAccess"
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket",
+          "s3:GetBucketLocation",
+          "s3:GetBucketVersioning"
+        ]
+        Resource = module.s3_ccms_oia.bucket.arn
+      },
+      {
+        Sid    = "S3ObjectAccess"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:GetObjectVersion",
+          "s3:PutObject",
+          "s3:PutObjectAcl"
+        ]
+        Resource = "${module.s3_ccms_oia.bucket.arn}/*"
+      }
+    ]
+  })
 
-#   tags = local.tags
-# }
+  tags = local.tags
+}
 
 # Attach S3 policy to Connector ECS task role
-# resource "aws_iam_role_policy_attachment" "s3_access_connector_ecs" {
-#   role       = aws_iam_role.connector_ecs_task_role.name
-#   policy_arn = aws_iam_policy.s3_access_policy.arn
-# }
+resource "aws_iam_role_policy_attachment" "s3_access_connector_ecs" {
+  role       = aws_iam_role.connector_ecs_task_role.name
+  policy_arn = aws_iam_policy.s3_access_policy.arn
+}
