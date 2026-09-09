@@ -36,7 +36,7 @@ module "dms_core" {
 
     secrets_manager_arn = module.dms_test_harness[0].source_secret_arn
 
-    ssl_mode = "none"
+    ssl_mode = "require"
   }
 
   s3_target_endpoint = {
