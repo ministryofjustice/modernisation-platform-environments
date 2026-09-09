@@ -250,7 +250,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         Resource = "${module.s3-bucket-logging.bucket.arn}/*"
         Condition = {
           ArnLike = {
-           "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
+           "aws:SourceArn" = module.s3-bucket-logging.bucket.arn
           }
        }
       }
