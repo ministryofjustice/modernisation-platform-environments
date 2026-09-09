@@ -24,11 +24,31 @@ module "log_bucket" {
   tags = local.common_tags
 }
 
+resource "aws_cloudwatch_log_group" "cloudtrail" {
+  name              = "/aws/cloudtrail/${local.cloudtrail_name}"
+  retention_in_days = 30
+  kms_key_id        = var.kms_key_arn
+
+  tags = local.common_tags
+}
+
+resource "aws_sns_topic" "cloudtrail" {
+  name              = "${local.cloudtrail_name}-notifications"
+  kms_master_key_id = var.kms_key_arn
+
+  tags = local.common_tags
+}
+
 resource "aws_cloudtrail" "sherlock" {
   name = local.cloudtrail_name
 
   s3_bucket_name = module.log_bucket.bucket.id
   kms_key_id     = var.kms_key_arn
+
+  sns_topic_name = aws_sns_topic.cloudtrail.name
+
+  cloud_watch_logs_group_arn = "${aws_cloudwatch_log_group.cloudtrail.arn}:*"
+  cloud_watch_logs_role_arn = aws_iam_role.cloudtrail_logs.arn
 
   is_multi_region_trail         = true
   include_global_service_events = true
