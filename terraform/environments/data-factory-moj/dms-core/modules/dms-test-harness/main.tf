@@ -1,7 +1,7 @@
 # S3 target
 
 resource "aws_s3_bucket" "dms_target" {
-  bucket_prefix = "${var.name}-test-"
+  bucket_prefix = "dms-core-test-"
 
   # DMS writes objects into this bucket. The bucket belongs exclusively to
   # this disposable integration-test harness, so allow Terraform to remove
