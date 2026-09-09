@@ -176,6 +176,7 @@ module "sherlock_logging_bucket_cloudtrail" {
 
   bucket_prefix = "logging-sherlock-test-mp"
   kms_key_arn   = module.sherlock_kms_key.key_arn
+  cloudwatch_log_retention_in_days = 365
 
   providers = {
     aws = aws
