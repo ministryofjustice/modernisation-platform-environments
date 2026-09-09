@@ -47,7 +47,9 @@ module "dms_core" {
 
     compression_type = "GZIP"
     data_format      = "parquet"
-    encryption_mode  = "SSE_S3"
+
+    encryption_mode                    = "SSE_KMS"
+    server_side_encryption_kms_key_arn = module.dms_test_harness[0].target_kms_key_arn
   }
 
   replication_tasks = {
