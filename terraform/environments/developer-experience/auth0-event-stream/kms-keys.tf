@@ -24,6 +24,7 @@ module "destination_kms_key" {
       sid = "Firehose"
       actions = [
         "kms:Decrypt",
+        "kms:CreateGrant",
         "kms:DescribeKey",
         "kms:Encrypt",
         "kms:GenerateDataKey",
@@ -34,6 +35,13 @@ module "destination_kms_key" {
         {
           type        = "Service"
           identifiers = ["firehose.amazonaws.com"]
+        }
+      ]
+      condition = [
+        {
+          test     = "Bool"
+          variable = "kms:GrantIsForAWSResource"
+          values   = ["true"]
         }
       ]
     },
