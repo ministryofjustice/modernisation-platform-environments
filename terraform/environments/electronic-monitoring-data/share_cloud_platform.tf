@@ -97,6 +97,7 @@ locals {
     ] : local.is-preproduction ? [var.cloud-platform-emdi-iam-preprod] : [
     var.cloud-platform-emdi-iam-prod
   ]
+  test_tags_irsa = local.is-development ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-7255c33b35507f31-live" : local.is-test ? "arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-a7f6cc937a0f63ce-live" : ""
 }
 
 variable "cloud-platform-iam-dev" {
@@ -256,6 +257,28 @@ module "emd_update_p1_cp_role" {
   tags = local.tags
 }
 
+module "emd_test_tags_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  count   = local.is-development || local.is-test ? 1 : 0
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.48.0"
+
+  trusted_role_arns = flatten([
+    data.aws_iam_roles.mod_plat_roles.arns,
+    local.test_tags_irsa,
+  ])
+
+  create_role       = true
+  role_requires_mfa = false
+
+  role_name = "emd_test_tags_${local.environment_shorthand}"
+
+  tags = local.tags
+}
+
+
+
 
 data "aws_iam_policy_document" "em_dashboard_update_p1_permissions" {
   count = local.is-preproduction || local.is-production ? 1 : 0
@@ -328,6 +351,40 @@ resource "aws_iam_role_policy_attachment" "athena_access_em_data_validation" {
   count      = local.is-test || local.is-production ? 1 : 0
   policy_arn = aws_iam_policy.data_validation_athena_access.arn
   role       = module.emd_validation_db_role[0].iam_role_name
+}
+
+resource "aws_iam_role_policy_attachment" "athena_access_em_test_tags" {
+  count      = local.is-development || local.is-test ? 1 : 0
+  policy_arn = aws_iam_policy.data_validation_athena_access.arn
+  role       = module.emd_test_tags_role[0].iam_role_name
+}
+
+resource "aws_lakeformation_permissions" "em_test_tags_db" {
+  count      = local.is-development || local.is-test ? 1 : 0
+  principal   = module.emd_test_tags_role[0].iam_role_arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = "staged_mdss${local.dbt_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "em_test_tags_table" {
+  count      = local.is-development || local.is-test ? 1 : 0
+  principal   = module.emd_test_tags_role[0].iam_role_arn
+  permissions = ["DESCRIBE", "SELECT"]
+  table {
+    database_name = "staged_mdss${local.dbt_suffix}"
+    wildcard      = true
+  }
+}
+
+resource "aws_lakeformation_permissions" "em_test_tags_s3" {
+  count      = local.is-development || local.is-test ? 1 : 0
+  principal   = module.emd_test_tags_role[0].iam_role_arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+  data_location {
+    arn = module.s3-create-a-derived-table-bucket.bucket.arn
+  }
 }
 
 data "aws_iam_policy_document" "em_data_validation_permissions" {
