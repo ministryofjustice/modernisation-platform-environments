@@ -13,7 +13,7 @@ module "s3_pui_docs" {
      }
   manage_log_bucket_policy = false
 
-  log_prefix = "s3access/${local.application_name}-docs-${local.environment}"
+  log_prefix = "s3access/${local.application_name}-docs-${local.environment}/${local.application_name}-docs-${local.environment}"
 
   lifecycle_rule = [
     {
@@ -95,13 +95,13 @@ module "s3-bucket-logging" {
   sse_algorithm      = "AES256"
   custom_kms_key     = ""
 
-  log_buckets = {
-    log_bucket_name = module.s3-bucket-logging.bucket.id
-    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
-    log_bucket_policy = aws_s3_bucket_policy.lb_access_logs.policy
-     }
-  manage_log_bucket_policy = false
-  log_prefix = "s3access/${local.application_name}-${local.environment}-logging"
+  # log_buckets = {
+  #   log_bucket_name = module.s3-bucket-logging.bucket.id
+  #   log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+  #   log_bucket_policy = aws_s3_bucket_policy.lb_access_logs.policy
+  #    }
+  # manage_log_bucket_policy = false
+  # log_prefix = "s3access/${local.application_name}-${local.environment}-logging"
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
@@ -239,20 +239,6 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
            "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
           }
        }
-      },
-      {
-        Sid    = "AllowS3Logging logging Bucket"
-        Effect = "Allow"
-        Principal = {
-          Service = "logging.s3.amazonaws.com"
-        }
-        Action   = "s3:PutObject"
-        Resource = "${module.s3-bucket-logging.bucket.arn}/*"
-        Condition = {
-          ArnLike = {
-           "aws:SourceArn" = module.s3-bucket-logging.bucket.arn
-          }
-       }
       }
     ]
   })
@@ -275,7 +261,7 @@ module "s3-bucket-shared" {
      }
   manage_log_bucket_policy = false
 
-  log_prefix = "s3access/${local.application_name}-${local.environment}-shared"
+  log_prefix = "s3access/${local.application_name}-${local.environment}-shared/${local.application_name}-${local.environment}-shared"
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
