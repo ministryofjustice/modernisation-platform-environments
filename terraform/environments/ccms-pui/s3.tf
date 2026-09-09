@@ -13,7 +13,7 @@ module "s3_pui_docs" {
      }
   manage_log_bucket_policy = false
 
-  log_prefix = "s3access/${local.application_name}-docs-${local.environment}"
+  log_prefix = "s3access/${local.application_name}-docs-${local.environment}/${local.application_name}-docs-${local.environment}"
 
   lifecycle_rule = [
     {
@@ -263,7 +263,7 @@ module "s3-bucket-shared" {
      }
   manage_log_bucket_policy = false
 
-  log_prefix = "s3access/${local.application_name}-${local.environment}-shared"
+  log_prefix = "s3access/${local.application_name}-${local.environment}-shared/${local.application_name}-${local.environment}-shared"
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
