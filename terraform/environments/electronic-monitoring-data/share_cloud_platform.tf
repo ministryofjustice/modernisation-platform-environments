@@ -368,7 +368,7 @@ resource "aws_lakeformation_permissions" "em_test_tags_db" {
   }
 }
 
-resource "aws_lakeformation_permissions" "em_data_validation_table" {
+resource "aws_lakeformation_permissions" "em_test_tags_table" {
   count      = local.is-development || local.is-test ? 1 : 0
   principal   = module.emd_test_tags_role[0].iam_role_arn
   permissions = ["DESCRIBE", "SELECT"]
@@ -378,7 +378,7 @@ resource "aws_lakeformation_permissions" "em_data_validation_table" {
   }
 }
 
-resource "aws_lakeformation_permissions" "em_data_validation_s3" {
+resource "aws_lakeformation_permissions" "em_test_tags_s3" {
   count      = local.is-development || local.is-test ? 1 : 0
   principal   = module.emd_test_tags_role[0].iam_role_arn
   permissions = ["DATA_LOCATION_ACCESS"]
