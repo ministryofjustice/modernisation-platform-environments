@@ -95,14 +95,6 @@ module "s3-bucket-logging" {
   sse_algorithm      = "AES256"
   custom_kms_key     = ""
 
-  # log_buckets = {
-  #   log_bucket_name = module.s3-bucket-logging.bucket.id
-  #   log_bucket_arn  = module.s3-bucket-logging.bucket.arn
-  #   log_bucket_policy = aws_s3_bucket_policy.lb_access_logs.policy
-  #    }
-  # manage_log_bucket_policy = false
-  # log_prefix = "s3access/${local.application_name}-${local.environment}-logging"
-
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
   # Below three variables and providers configuration are only relevant if 'replication_enabled' is set to true
