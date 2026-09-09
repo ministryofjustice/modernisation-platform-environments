@@ -1,5 +1,5 @@
 resource "aws_glue_catalog_table_optimizer" "standard_compaction" {
-  for_each      = local.tables_to_optimize_flat
+  for_each      = local.tables_to_compact_flat
   catalog_id    = data.aws_caller_identity.current.account_id
   database_name = each.value.database_name
   table_name    = each.value.table_name
@@ -15,7 +15,7 @@ resource "aws_glue_catalog_table_optimizer" "standard_compaction" {
         delete_file_threshold = each.value.delete_file_threshold
       }
     }
-  
+
   }
 
   type = "compaction"

@@ -28,6 +28,12 @@ variable "table_optimizer_defaults" {
   }
 }
 
+variable "compaction_excluded_tables" {
+  description = "Fully qualified database.table names to exclude from Glue table compaction."
+  type        = set(string)
+  default     = []
+}
+
 variable "role_arn" {
   type = string
 }
