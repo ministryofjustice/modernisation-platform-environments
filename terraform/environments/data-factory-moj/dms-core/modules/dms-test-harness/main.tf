@@ -230,7 +230,10 @@ resource "aws_vpc_security_group_ingress_rule" "postgres_from_dms" {
 # The secret value is populated at runtime rather than by Terraform so that
 # the RDS master password is never read into Terraform state.
 resource "aws_secretsmanager_secret" "dms_source" {
+  # checkov:skip=CKV2_AWS_57: This is a temporary integration-test secret populated from the RDS-managed credential at bootstrap time; it does not have an independent rotation lifecycle.
+
   name_prefix = "${var.name}-dms-source-"
+  kms_key_id  = var.kms_key_arn
 
   tags = merge(
     var.tags,
