@@ -1,11 +1,12 @@
 module "glue_table_optimiser" {
   source = "./modules/glue_table_optimiser"
 
-  databases                           = local.live_feed_dbs_to_grant
-  optimizer_bucket_id                 = module.s3-create-a-derived-table-bucket.bucket.id
-  role_arn                            = aws_iam_role.glue_table_optimiser.arn
-  environment                         = local.environment_shorthand
-  dbt_databases                       = local.dbt_dbs_to_grant
+  databases                  = local.live_feed_dbs_to_grant
+  optimizer_bucket_id        = module.s3-create-a-derived-table-bucket.bucket.id
+  role_arn                   = aws_iam_role.glue_table_optimiser.arn
+  environment                = local.environment_shorthand
+  dbt_databases              = local.dbt_dbs_to_grant
+  compaction_excluded_tables = ["allied_mdss${local.db_suffix}._dlt_loads"]
 }
 
 
