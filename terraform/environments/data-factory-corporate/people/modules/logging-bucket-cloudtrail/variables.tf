@@ -13,3 +13,9 @@ variable "kms_key_arn" {
   description = "ARN of the KMS key used for the logging bucket and CloudTrail encryption."
   type        = string
 }
+
+variable "cloudwatch_log_retention_in_days" {
+  description = "Number of days to retain CloudWatch logs."
+  type        = number
+  default     = 365
+}

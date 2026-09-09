@@ -26,7 +26,7 @@ module "log_bucket" {
 
 resource "aws_cloudwatch_log_group" "cloudtrail" {
   name              = "/aws/cloudtrail/${local.cloudtrail_name}"
-  retention_in_days = 30
+  retention_in_days = var.cloudwatch_log_retention_in_days
   kms_key_id        = var.kms_key_arn
 
   tags = local.common_tags
