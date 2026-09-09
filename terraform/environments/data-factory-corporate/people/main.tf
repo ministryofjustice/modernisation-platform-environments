@@ -83,6 +83,37 @@ module "sherlock_kms_key" {
           values   = [local.cloudtrail_arn]
         }
       ]
+    },
+    {
+      sid    = "AllowCloudWatchLogsEncrypt"
+      effect = "Allow"
+
+      actions = [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey"
+      ]
+
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"]
+        }
+      ]
+
+      condition = [
+        {
+          test     = "ArnLike"
+          variable = "kms:EncryptionContext:aws:logs:arn"
+          values = [
+            "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:*"
+          ]
+        }
+      ]
     }
   ]
 }

@@ -8,7 +8,6 @@ locals {
     var.tags,
     {
       ManagedBy = "Terraform"
-      Region    = data.aws_region.current.region
     }
   )
 }
