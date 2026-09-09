@@ -86,8 +86,7 @@ data "aws_iam_policy_document" "cloudtrail_cloudwatch_logs" {
 resource "aws_iam_role" "cloudtrail_logs" {
   name               = "${local.cloudtrail_name}-cloudtrail-logs"
   assume_role_policy = data.aws_iam_policy_document.cloudtrail_assume_role.json
-
-  tags = local.common_tags
+  tags = var.tags
 }
 
 resource "aws_iam_role_policy" "cloudtrail_logs" {
