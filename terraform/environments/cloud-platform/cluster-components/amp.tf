@@ -102,3 +102,17 @@ resource "aws_eks_pod_identity_association" "adot_amp" {
     component = "observability-poc"
   })
 }
+
+#------------------------------------------------------------------------------
+# Outputs
+#------------------------------------------------------------------------------
+
+output "amp_workspace_endpoint" {
+  description = "AMP remote-write and query endpoint"
+  value       = local.enable_amp_adot ? aws_prometheus_workspace.this[0].prometheus_endpoint : null
+}
+
+output "amp_workspace_id" {
+  description = "AMP workspace ID"
+  value       = local.enable_amp_adot ? aws_prometheus_workspace.this[0].id : null
+}

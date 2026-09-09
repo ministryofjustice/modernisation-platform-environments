@@ -1,25 +1,28 @@
 #------------------------------------------------------------------------------
-# Amazon Managed Grafana (AMG) — Shared dashboard and alerting layer
+# Amazon Managed Grafana (AMG) — centralised dashboard and alerting layer
 #
-# A single AMG workspace serves both PoC options. It has two data sources:
-#   1. AMP (Prometheus) — for Option A queries via PromQL
-#   2. CloudWatch — for Option D queries via CloudWatch Metrics Insights
+# A single AMG workspace serves the whole platform (ADR-005, updated
+# 2026-09-07): it is deployed in the cloud-platform-live account in production
+# (and in cloud-platform-development for testing), and queries per-cluster
+# metrics backends (AMP workspaces and CloudWatch) as data sources. Metric data
+# stays in the source accounts; AMG is a query and visualisation layer only.
 #
-# For the PoC, everything is in the same account (cloud-platform-development).
-# In production, AMG would live in a dedicated Observability account and query
-# AMP/CloudWatch cross-account via IAM role assumption.
+# BU app engineers receive read-only (Viewer) access scoped to their BU's
+# folder. Logical separation of metrics between BUs is provided by folder
+# permissions and curated data sources, per the security team's requirement
+# for default-deny visibility across BUs.
 #
 # Authentication: IAM Identity Center (SSO) — aligned with ADR-004.
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-# AMG workspace IAM role — allows AMG to assume data source roles
+# AMG workspace IAM role — allows AMG to reach its data sources
 #------------------------------------------------------------------------------
 
 resource "aws_iam_role" "amg" {
   count = local.enable_amg ? 1 : 0
 
-  name = "${local.cluster_name}-amg"
+  name = "${terraform.workspace}-amg"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -40,16 +43,21 @@ resource "aws_iam_role" "amg" {
   })
 
   tags = merge(local.tags, {
-    component = "observability-poc"
+    component = "observability"
   })
 }
 
 #------------------------------------------------------------------------------
 # AMG data source permissions — AMP read + CloudWatch read
+#
+# Both are granted unconditionally: the central AMG must be able to query
+# whichever metrics backend a cluster runs (AMP for Option A, CloudWatch for
+# Option D), and both remain in play until the ADR-005 decision gate.
 #------------------------------------------------------------------------------
 
 resource "aws_iam_role_policy" "amg_amp_read" {
-  count = local.enable_amg && local.enable_amp_adot ? 1 : 0
+  # checkov:skip=CKV_AWS_355:AMG must query multiple AMP workspaces across BU accounts, and aps:ListWorkspaces is not resource-scopable. Per-BU resource scoping via dedicated data-source assume-roles is tracked in cloud-platform#8509 (BU metric isolation).
+  count = local.enable_amg ? 1 : 0
 
   name = "amp-query"
   role = aws_iam_role.amg[0].id
@@ -74,7 +82,8 @@ resource "aws_iam_role_policy" "amg_amp_read" {
 }
 
 resource "aws_iam_role_policy" "amg_cloudwatch_read" {
-  count = local.enable_amg && local.enable_cloudwatch_observability ? 1 : 0
+  # checkov:skip=CKV_AWS_355:AMG must query CloudWatch metrics/logs across BU accounts, and List/Describe actions here are not resource-scopable. Per-BU resource scoping via dedicated data-source assume-roles is tracked in cloud-platform#8509 (BU metric isolation).
+  count = local.enable_amg ? 1 : 0
 
   name = "cloudwatch-query"
   role = aws_iam_role.amg[0].id
@@ -115,23 +124,23 @@ resource "aws_iam_role_policy" "amg_cloudwatch_read" {
 resource "aws_grafana_workspace" "this" {
   count = local.enable_amg ? 1 : 0
 
-  name                     = "${local.cluster_name}-observability"
-  description              = "Observability PoC — metrics dashboards and alerting for ${local.cluster_name}"
+  name                     = local.amg_workspace_name
+  description              = "Centralised observability dashboards and alerting (${terraform.workspace})"
   account_access_type      = "CURRENT_ACCOUNT"
   authentication_providers = ["AWS_SSO"]
   permission_type          = "SERVICE_MANAGED"
   role_arn                 = aws_iam_role.amg[0].arn
   grafana_version          = "10.4"
 
-  data_sources = compact([
-    local.enable_amp_adot ? "PROMETHEUS" : "",
-    local.enable_cloudwatch_observability ? "CLOUDWATCH" : "",
-  ])
+  data_sources = [
+    "PROMETHEUS",
+    "CLOUDWATCH",
+  ]
 
   notification_destinations = ["SNS"]
 
   tags = merge(local.tags, {
-    component = "observability-poc"
+    component = "observability"
   })
 }
 
@@ -169,14 +178,4 @@ output "amg_workspace_endpoint" {
 output "amg_workspace_id" {
   description = "AMG workspace ID"
   value       = local.enable_amg ? aws_grafana_workspace.this[0].id : null
-}
-
-output "amp_workspace_endpoint" {
-  description = "AMP remote-write and query endpoint"
-  value       = local.enable_amp_adot ? aws_prometheus_workspace.this[0].prometheus_endpoint : null
-}
-
-output "amp_workspace_id" {
-  description = "AMP workspace ID"
-  value       = local.enable_amp_adot ? aws_prometheus_workspace.this[0].id : null
 }

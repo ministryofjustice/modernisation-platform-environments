@@ -25,7 +25,8 @@ locals {
   amp_workspace_alias = "${local.cluster_name}-metrics"
 
   # Observability feature flags — resolved from variables (default false, opt-in via -var flags)
+  # AMG is not deployed from this component; the centralised Grafana workspace
+  # lives in the standalone `observability` component.
   enable_amp_adot                 = var.enable_amp_adot
   enable_cloudwatch_observability = var.enable_cloudwatch_observability
-  enable_amg                      = var.enable_amg
 }
