@@ -239,6 +239,20 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
            "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
           }
        }
+      },
+      {
+        Sid    = "AllowS3Logging logging Bucket"
+        Effect = "Allow"
+        Principal = {
+          Service = "logging.s3.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "${module.s3-bucket-logging.bucket.arn}/*"
+        Condition = {
+          ArnLike = {
+           "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
+          }
+       }
       }
     ]
   })
