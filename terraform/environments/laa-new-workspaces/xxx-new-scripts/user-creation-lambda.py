@@ -190,7 +190,7 @@ def create_workspace(event):
         'standard':    os.environ['BUNDLE_ID_STANDARD'],
         'performance': os.environ['BUNDLE_ID_PERFORMANCE'],
         'power':       os.environ['BUNDLE_ID_POWER'],
-        'dba_standard': os.environ['BUNDLE_ID_DBA_STANDARD']
+        'developer_standard': os.environ['BUNDLE_ID_DEVELOPER_STANDARD']
     }
     bundle_id = bundle_map.get(workspace_type, os.environ['BUNDLE_ID_STANDARD'])
     print(f"Using workspace type: {workspace_type} (bundle: {bundle_id})")

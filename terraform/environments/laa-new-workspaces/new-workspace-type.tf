@@ -28,7 +28,7 @@ locals {
       running_mode                              = "AUTO_STOP"
       running_mode_auto_stop_timeout_in_minutes = 60
     }
-    dba_standard = {
+    developer_standard = {
       bundle_id                                 = "wsb-placeholder"
       running_mode                              = "AUTO_STOP"
       running_mode_auto_stop_timeout_in_minutes = 60
