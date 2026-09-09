@@ -237,6 +237,20 @@ updates:
       default-days: 7
   - package-ecosystem: "terraform"
     directories:
+      - "terraform/environments/ccms-upg"
+      - "terraform/environments/ccms-upg/ccms-ebs-fin"
+      - "terraform/environments/ccms-upg/ccms-ebs-ref"
+    schedule:
+      interval: "daily"
+    groups:
+      ccms-upg:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
       - "terraform/environments/cdpt-chaps"
     schedule:
       interval: "daily"
@@ -487,6 +501,7 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/data-factory-moj"
+      - "terraform/environments/data-factory-moj/dms-core"
       - "terraform/environments/data-factory-moj/streaming-poc"
       - "terraform/environments/data-factory-moj/streaming-poc-devops"
       - "terraform/environments/data-factory-moj/streaming-poc-maf"

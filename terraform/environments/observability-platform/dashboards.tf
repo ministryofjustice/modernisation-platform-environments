@@ -70,6 +70,10 @@ resource "grafana_dashboard" "json" {
   # - If file lives under "<team>/...", use that team's folder_id from module.tenant_configuration.
   # - If top-level, put it in Grafana "General" (folder = null).
   folder = each.value.team != null ? module.tenant_configuration[each.value.team].folder_id : null
+
+  # Make Terraform authoritative: force writes even if the dashboard was
+  # changed in the Grafana UI, avoiding 412 "version-mismatch" errors.
+  overwrite = true
 }
 
 ########################################
@@ -81,6 +85,10 @@ resource "grafana_dashboard" "templated" {
 
   # Same folder logic as above
   folder = each.value.team != null ? module.tenant_configuration[each.value.team].folder_id : null
+
+  # Make Terraform authoritative: force writes even if the dashboard was
+  # changed in the Grafana UI, avoiding 412 "version-mismatch" errors.
+  overwrite = true
 
   # Render the .json.tftpl into final JSON
   config_json = templatefile(
