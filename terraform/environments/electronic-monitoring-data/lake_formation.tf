@@ -79,6 +79,30 @@ resource "aws_lakeformation_permissions" "sensitive_grant" {
 }
 
 # ------------------------------------------------------------------------
+# Lake Formation for FMS validation reporter
+# The reporter only reads FMS audit and metadata tables.
+# ------------------------------------------------------------------------
+
+resource "aws_lakeformation_permissions" "fms_validation_reporter_database" {
+  principal   = aws_iam_role.fms_validation_reporter.arn
+  permissions = ["DESCRIBE"]
+
+  database {
+    name = "serco_fms${local.db_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "fms_validation_reporter_tables" {
+  principal   = aws_iam_role.fms_validation_reporter.arn
+  permissions = ["SELECT", "DESCRIBE"]
+
+  table {
+    database_name = "serco_fms${local.db_suffix}"
+    wildcard      = true
+  }
+}
+
+# ------------------------------------------------------------------------
 # Lake Formation - admin permissions
 # https://user-guide.modernisation-platform.service.justice.gov.uk/runbooks/adding-admin-data-lake-formation-permissions.html
 # ------------------------------------------------------------------------

@@ -3115,3 +3115,160 @@ resource "aws_iam_role_policy_attachment" "rota_personal_digest_attach" {
   role       = aws_iam_role.rota_personal_digest.name
   policy_arn = aws_iam_policy.rota_personal_digest.arn
 }
+
+#-----------------------------------------------------------------------------------
+# FMS validation reporter IAM
+#-----------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "fms_validation_reporter" {
+  statement {
+    sid    = "AthenaQueryAccess"
+    effect = "Allow"
+
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution",
+      "athena:GetWorkGroup",
+    ]
+
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:workgroup/${local.env_account_id}-default",
+    ]
+  }
+
+  statement {
+    sid    = "GlueReadAccess"
+    effect = "Allow"
+
+    actions = [
+      "glue:GetCatalog",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:GetTable",
+      "glue:GetTables",
+      "glue:GetPartition",
+      "glue:GetPartitions",
+    ]
+
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/serco_fms${local.db_suffix}",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/serco_fms${local.db_suffix}/*",
+    ]
+  }
+
+  statement {
+    sid    = "LakeFormationReadAccess"
+    effect = "Allow"
+
+    actions = [
+      "lakeformation:GetDataAccess",
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AthenaResultsBucketAccess"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      module.s3-athena-bucket.bucket.arn,
+    ]
+  }
+
+  statement {
+    sid    = "AthenaResultsObjectAccess"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${module.s3-athena-bucket.bucket.arn}/*",
+    ]
+  }
+
+  statement {
+    sid    = "DiscoverAthenaResultsBucket"
+    effect = "Allow"
+
+    actions = [
+      "s3:ListAllMyBuckets",
+    ]
+
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role" "fms_validation_reporter" {
+  name               = "fms_validation_reporter_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+resource "aws_iam_policy" "fms_validation_reporter" {
+  name   = "fms_validation_reporter_lambda_policy"
+  policy = data.aws_iam_policy_document.fms_validation_reporter.json
+}
+
+resource "aws_iam_role_policy_attachment" "fms_validation_reporter" {
+  role       = aws_iam_role.fms_validation_reporter.name
+  policy_arn = aws_iam_policy.fms_validation_reporter.arn
+}
+
+
+#-----------------------------------------------------------------------------------
+# FMS validation reporter scheduler IAM
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "fms_validation_reporter_scheduler" {
+  name = "fms_validation_reporter_scheduler_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+
+        Principal = {
+          Service = "scheduler.amazonaws.com"
+        }
+
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "fms_validation_reporter_scheduler" {
+  name = "fms_validation_reporter_scheduler_invoke_policy"
+  role = aws_iam_role.fms_validation_reporter_scheduler.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+
+        Action = [
+          "lambda:InvokeFunction",
+        ]
+
+        Resource = [
+          module.fms_validation_reporter.lambda_function_arn,
+        ]
+      }
+    ]
+  })
+}
