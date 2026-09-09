@@ -2,6 +2,8 @@
 locals {
   aliases      = ["sherlock-landing"]
   application = "data-factory-corporate"
+  cloudtrail_name = "sherlock"
+  cloudtrail_arn  = "arn:aws:cloudtrail:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:trail/${local.cloudtrail_name}"
 }
 
 resource "aws_secretsmanager_secret" "external_account" {
@@ -23,6 +25,66 @@ module "sherlock_kms_key" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git//?ref=496d8bd559afebb43b78af0034ec74d8b32378ca"
 
   aliases = ["sherlock-landing"]
+
+  key_statements = [
+    {
+      sid    = "AllowCloudTrailEncryptLogs"
+      effect = "Allow"
+
+      actions = [
+        "kms:GenerateDataKey*"
+      ]
+
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["cloudtrail.amazonaws.com"]
+        }
+      ]
+
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "aws:SourceArn"
+          values   = [local.cloudtrail_arn]
+        },
+        {
+          test     = "StringLike"
+          variable = "kms:EncryptionContext:aws:cloudtrail:arn"
+          values = [
+            "arn:aws:cloudtrail:*:${data.aws_caller_identity.current.account_id}:trail/*"
+          ]
+        }
+      ]
+    },
+    {
+      sid    = "AllowCloudTrailDescribeKey"
+      effect = "Allow"
+
+      actions = [
+        "kms:DescribeKey"
+      ]
+
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["cloudtrail.amazonaws.com"]
+        }
+      ]
+
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "aws:SourceArn"
+          values   = [local.cloudtrail_arn]
+        }
+      ]
+    }
+  ]
 }
 
 data "aws_secretsmanager_secret" "external_account_id" {
@@ -109,16 +171,22 @@ module "sherlock_quarantine_bucket" {
   }
 }
 
-data "aws_iam_roles" "modernisation_platform_sandbox_role" {
-  name_regex  = "AWSReservedSSO_modernisation-platform-sandbox_.*"
-  path_prefix = "/aws-reserved/sso.amazonaws.com/"
-}
+module "sherlock_logging_bucket_cloudtrail" {
+  source = "./modules/logging-bucket-cloudtrail"
 
-resource "aws_lakeformation_data_lake_settings" "your_lake_settings_name" {
-  admins = [
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-plan",
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-apply",
-  ]
+  bucket_prefix = "logging-sherlock-test-mp"
+  kms_key_arn   = module.sherlock_kms_key.key_arn
+
+  providers = {
+    aws = aws
+  }
+
+  tags = {
+    Environment    = terraform.workspace
+    Application    = "data-factory-corporate"
+    Component      = "people"
+    Infrastructure = "sherlock-logging-bucket-test"
+  }
 }
 
 
