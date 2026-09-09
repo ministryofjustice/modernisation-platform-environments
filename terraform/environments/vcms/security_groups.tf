@@ -59,15 +59,15 @@ resource "aws_security_group" "alb_sg" {
   tags = merge(local.tags, { Name = "alb-sg"})
 }
 
-resource "aws_security_group_rule" "ecs_from_alb" {
-  type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
+# resource "aws_security_group_rule" "ecs_from_alb" {
+#   type                     = "ingress"
+#   from_port                = 80
+#   to_port                  = 80
+#   protocol                 = "tcp"
 
-  security_group_id        = aws_security_group.ecs_service.id
-  source_security_group_id = aws_security_group.alb_sg.id
-}
+#   security_group_id        = aws_security_group.ecs_service.id
+#   source_security_group_id = aws_security_group.alb_sg.id
+# }
 
 resource "aws_security_group_rule" "alb_from_ecs" {
   type                     = "ingress"
