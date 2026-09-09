@@ -98,11 +98,17 @@ module "eks" {
 ## EKS Auto Mode component logs via CloudWatch Vended Logs
 locals {
   auto_mode_log_types = {
-    AUTO_MODE_COMPUTE_LOGS = "compute" # Karpenter
+    AUTO_MODE_COMPUTE_LOGS        = "compute"        # Karpenter
+    AUTO_MODE_BLOCK_STORAGE_LOGS  = "block-storage"  # EBS CSI
+    AUTO_MODE_LOAD_BALANCING_LOGS = "load-balancing" # AWS Load Balancer Controller
+    AUTO_MODE_IPAM_LOGS           = "ipam"           # VPC CNI IP address management
   }
 
   auto_mode_source_names = {
-    AUTO_MODE_COMPUTE_LOGS = aws_cloudwatch_log_delivery_source.auto_mode_compute.name
+    AUTO_MODE_COMPUTE_LOGS        = aws_cloudwatch_log_delivery_source.auto_mode_compute.name
+    AUTO_MODE_BLOCK_STORAGE_LOGS  = aws_cloudwatch_log_delivery_source.auto_mode_block_storage.name
+    AUTO_MODE_LOAD_BALANCING_LOGS = aws_cloudwatch_log_delivery_source.auto_mode_load_balancing.name
+    AUTO_MODE_IPAM_LOGS           = aws_cloudwatch_log_delivery_source.auto_mode_ipam.name
   }
 }
 
@@ -159,13 +165,147 @@ resource "aws_cloudwatch_log_resource_policy" "auto_mode_vendedlogs" {
   policy_document = data.aws_iam_policy_document.auto_mode_vendedlogs.json
 }
 
-## Compute only for now.
+## Gate: block until the cluster has no update in progress, so sources are created
+## one at a time and do not collide with ConflictException.
+resource "null_resource" "auto_mode_gate_compute" {
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = <<-EOT
+      set -euo pipefail
+      cluster="${local.cluster_name}"
+      region="${data.aws_region.current.region}"
+      for i in $(seq 1 120); do
+        running=0
+        for id in $(aws eks list-updates --name "$cluster" --region "$region" --query 'updateIds' --output text | tr '\t' '\n'); do
+          [ -z "$id" ] && continue
+          status=$(aws eks describe-update --name "$cluster" --update-id "$id" --region "$region" --query 'update.status' --output text 2>/dev/null || echo Unknown)
+          [ "$status" = "InProgress" ] && running=$((running + 1))
+        done
+        [ "$running" -eq 0 ] && exit 0
+        sleep 5
+      done
+      echo "auto_mode gate: cluster $cluster still updating after timeout" >&2
+      exit 1
+    EOT
+  }
+}
+
 resource "aws_cloudwatch_log_delivery_source" "auto_mode_compute" {
   name         = "${local.cluster_name}-compute"
   log_type     = "AUTO_MODE_COMPUTE_LOGS"
   resource_arn = module.eks.cluster_arn
 
   tags = local.tags
+
+  depends_on = [null_resource.auto_mode_gate_compute]
+}
+
+resource "null_resource" "auto_mode_gate_block_storage" {
+  triggers   = { after = aws_cloudwatch_log_delivery_source.auto_mode_compute.arn }
+  depends_on = [aws_cloudwatch_log_delivery_source.auto_mode_compute]
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = <<-EOT
+      set -euo pipefail
+      cluster="${local.cluster_name}"
+      region="${data.aws_region.current.region}"
+      for i in $(seq 1 120); do
+        running=0
+        for id in $(aws eks list-updates --name "$cluster" --region "$region" --query 'updateIds' --output text | tr '\t' '\n'); do
+          [ -z "$id" ] && continue
+          status=$(aws eks describe-update --name "$cluster" --update-id "$id" --region "$region" --query 'update.status' --output text 2>/dev/null || echo Unknown)
+          [ "$status" = "InProgress" ] && running=$((running + 1))
+        done
+        [ "$running" -eq 0 ] && exit 0
+        sleep 5
+      done
+      echo "auto_mode gate: cluster $cluster still updating after timeout" >&2
+      exit 1
+    EOT
+  }
+}
+
+resource "aws_cloudwatch_log_delivery_source" "auto_mode_block_storage" {
+  name         = "${local.cluster_name}-block-storage"
+  log_type     = "AUTO_MODE_BLOCK_STORAGE_LOGS"
+  resource_arn = module.eks.cluster_arn
+
+  tags = local.tags
+
+  depends_on = [null_resource.auto_mode_gate_block_storage]
+}
+
+resource "null_resource" "auto_mode_gate_load_balancing" {
+  triggers   = { after = aws_cloudwatch_log_delivery_source.auto_mode_block_storage.arn }
+  depends_on = [aws_cloudwatch_log_delivery_source.auto_mode_block_storage]
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = <<-EOT
+      set -euo pipefail
+      cluster="${local.cluster_name}"
+      region="${data.aws_region.current.region}"
+      for i in $(seq 1 120); do
+        running=0
+        for id in $(aws eks list-updates --name "$cluster" --region "$region" --query 'updateIds' --output text | tr '\t' '\n'); do
+          [ -z "$id" ] && continue
+          status=$(aws eks describe-update --name "$cluster" --update-id "$id" --region "$region" --query 'update.status' --output text 2>/dev/null || echo Unknown)
+          [ "$status" = "InProgress" ] && running=$((running + 1))
+        done
+        [ "$running" -eq 0 ] && exit 0
+        sleep 5
+      done
+      echo "auto_mode gate: cluster $cluster still updating after timeout" >&2
+      exit 1
+    EOT
+  }
+}
+
+resource "aws_cloudwatch_log_delivery_source" "auto_mode_load_balancing" {
+  name         = "${local.cluster_name}-load-balancing"
+  log_type     = "AUTO_MODE_LOAD_BALANCING_LOGS"
+  resource_arn = module.eks.cluster_arn
+
+  tags = local.tags
+
+  depends_on = [null_resource.auto_mode_gate_load_balancing]
+}
+
+resource "null_resource" "auto_mode_gate_ipam" {
+  triggers   = { after = aws_cloudwatch_log_delivery_source.auto_mode_load_balancing.arn }
+  depends_on = [aws_cloudwatch_log_delivery_source.auto_mode_load_balancing]
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = <<-EOT
+      set -euo pipefail
+      cluster="${local.cluster_name}"
+      region="${data.aws_region.current.region}"
+      for i in $(seq 1 120); do
+        running=0
+        for id in $(aws eks list-updates --name "$cluster" --region "$region" --query 'updateIds' --output text | tr '\t' '\n'); do
+          [ -z "$id" ] && continue
+          status=$(aws eks describe-update --name "$cluster" --update-id "$id" --region "$region" --query 'update.status' --output text 2>/dev/null || echo Unknown)
+          [ "$status" = "InProgress" ] && running=$((running + 1))
+        done
+        [ "$running" -eq 0 ] && exit 0
+        sleep 5
+      done
+      echo "auto_mode gate: cluster $cluster still updating after timeout" >&2
+      exit 1
+    EOT
+  }
+}
+
+resource "aws_cloudwatch_log_delivery_source" "auto_mode_ipam" {
+  name         = "${local.cluster_name}-ipam"
+  log_type     = "AUTO_MODE_IPAM_LOGS"
+  resource_arn = module.eks.cluster_arn
+
+  tags = local.tags
+
+  depends_on = [null_resource.auto_mode_gate_ipam]
 }
 
 resource "aws_cloudwatch_log_delivery_destination" "auto_mode" {
