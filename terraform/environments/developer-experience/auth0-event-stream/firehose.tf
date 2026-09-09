@@ -4,6 +4,12 @@ resource "aws_kinesis_firehose_delivery_stream" "this" {
   name        = local.component_name
   destination = "extended_s3"
 
+  server_side_encryption {
+    enabled  = true
+    key_type = "CUSTOMER_MANAGED_CMK"
+    key_arn  = module.destination_kms_key[0].key_arn
+  }
+
   extended_s3_configuration {
     role_arn            = module.firehose_iam_role[0].arn
     bucket_arn          = module.s3_bucket[0].s3_bucket_arn
