@@ -18,6 +18,11 @@ output "source_secret_arn" {
   value       = aws_db_instance.postgres.master_user_secret[0].secret_arn
 }
 
+output "dms_source_secret_arn" {
+  description = "ARN of the Secrets Manager secret used by DMS for source authentication."
+  value       = aws_secretsmanager_secret.dms_source.arn
+}
+
 output "source_endpoint_address" {
   description = "DNS endpoint of the temporary PostgreSQL source."
   value       = aws_db_instance.postgres.address
@@ -31,4 +36,9 @@ output "source_port" {
 output "dms_client_security_group_id" {
   description = "Security group to attach to DMS so it is permitted to connect to the temporary PostgreSQL source."
   value       = aws_security_group.dms_client.id
+}
+
+output "bootstrap_lambda_function_name" {
+  description = "Name of the Lambda function used to prepare the DMS integration test."
+  value       = aws_lambda_function.bootstrap.function_name
 }

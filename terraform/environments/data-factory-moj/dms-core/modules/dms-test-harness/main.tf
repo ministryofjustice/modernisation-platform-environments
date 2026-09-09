@@ -225,3 +225,18 @@ resource "aws_vpc_security_group_ingress_rule" "postgres_from_dms" {
 
   description = "Allow PostgreSQL connections from the DMS replication instance."
 }
+
+# Dedicated Secrets Manager secret used by AWS DMS for source authentication.
+# The secret value is populated at runtime rather than by Terraform so that
+# the RDS master password is never read into Terraform state.
+resource "aws_secretsmanager_secret" "dms_source" {
+  name_prefix = "${var.name}-dms-source-"
+
+  tags = merge(
+    var.tags,
+    {
+      Name    = "${var.name}-dms-source"
+      Purpose = "DMS integration test source credentials"
+    }
+  )
+}
