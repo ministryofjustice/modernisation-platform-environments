@@ -6,7 +6,7 @@ module "glue_table_optimiser" {
   role_arn                   = aws_iam_role.glue_table_optimiser.arn
   environment                = local.environment_shorthand
   dbt_databases              = local.dbt_dbs_to_grant
-  compaction_excluded_tables = ["allied_mdss${local.db_suffix}._dlt_loads"]
+  compaction_excluded_tables = []
 }
 
 
