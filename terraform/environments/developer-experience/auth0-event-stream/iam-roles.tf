@@ -39,12 +39,16 @@ module "firehose_iam_role" {
     KMSAccess = {
       effect = "Allow"
       actions = [
-        "kms:CreateGrant",
         "kms:Decrypt",
         "kms:DescribeKey",
         "kms:Encrypt",
         "kms:GenerateDataKey",
       ]
+      resources = [module.destination_kms_key[0].key_arn]
+    }
+    KMSGrant = {
+      effect    = "Allow"
+      actions   = ["kms:CreateGrant"]
       resources = [module.destination_kms_key[0].key_arn]
       condition = [
         {
