@@ -29,6 +29,9 @@
 /terraform/environments/ccms-pui-internal @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-pui-internal/workspaces-secure-browser @ministryofjustice/aws-root-account-admin-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-pui @ministryofjustice/laa-ccms-developers @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-audit @ministryofjustice/octo-cyber-team @ministryofjustice/modernisation-platform
+/terraform/environments/ccms-upg @ministryofjustice/laa-dba @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
+/terraform/environments/ccms-upg/ccms-ebs-ref @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
+/terraform/environments/ccms-upg/ccms-ebs-fin @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/cdpt-chaps @ministryofjustice/azure-aws-sso-cdpt @ministryofjustice/central-digital-product-team @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/cdpt-ifs @ministryofjustice/azure-aws-sso-cdpt @ministryofjustice/central-digital-product-team @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/cfo-data-management-system @ministryofjustice/hmpps-creating-future-opportunities-devs @ministryofjustice/hmpps-creating-future-opportunities-live @ministryofjustice/modernisation-platform
@@ -56,6 +59,7 @@
 /terraform/environments/data-factory-moj/streaming-poc-maf @ministryofjustice/data-factory-aker-team @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-moj/streaming-poc-opensearch-config @ministryofjustice/data-factory-aker-team @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-moj/streaming-poc-devops @ministryofjustice/data-factory-aker-team @ministryofjustice/modernisation-platform
+/terraform/environments/data-factory-moj/dms-core @ministryofjustice/probation-de @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform-governance @ministryofjustice/azure-aws-sso-data-platform-engineering @ministryofjustice/data-platform-engineering @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform @ministryofjustice/data-platform-engineering @ministryofjustice/modernisation-platform
 /terraform/environments/delius-alfresco @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform
@@ -82,7 +86,10 @@
 /terraform/environments/integration-hub-file-transfer @ministryofjustice/integration-hub @ministryofjustice/modernisation-platform
 /terraform/environments/integration-hub @ministryofjustice/integration-hub @ministryofjustice/modernisation-platform
 /terraform/environments/laa-ccms-soa @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
-/terraform/environments/laa-ccms-soa/ccms-soa-sandbox @ministryofjustice/laa-soa-developers @ministryofjustice/modernisation-platform
+/terraform/environments/laa-ccms-soa/ccms-soa-sandbox @ministryofjustice/laa-soa-developers
+laa-sre-admins @ministryofjustice/modernisation-platform
+/terraform/environments/laa-ccms-soa/ccms-soa-sandbox @ministryofjustice/laa-soa-developers
+laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/laa-cis @ministryofjustice/laa-sre-admins @ministryofjustice/v1-cis-mod @ministryofjustice/modernisation-platform
 /terraform/environments/laa-enterprise-service-bus @ministryofjustice/hub20-validation @ministryofjustice/laa-sre-admins @ministryofjustice/v1-hub20-developers @ministryofjustice/modernisation-platform
 /terraform/environments/laa-new-workspaces @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform

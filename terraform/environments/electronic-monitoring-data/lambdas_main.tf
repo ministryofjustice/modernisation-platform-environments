@@ -402,13 +402,13 @@ module "load_fms_lambda" {
   subnet_ids                     = data.aws_subnets.shared-private.ids
   cloudwatch_retention_days      = 7
   environment_variables = {
-    ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
-    ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
-    STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
-    ENVIRONMENT_NAME    = local.environment_shorthand
-    CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
-    SNS_TOPIC_ARN       = aws_sns_topic.emds_alerts.arn
-    MAX_RECEIVE_COUNT   = tostring(local.load_sqs_max_receive_count)
+    ATHENA_QUERY_BUCKET     = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER          = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET          = module.s3-create-a-derived-table-bucket.bucket.id
+    ENVIRONMENT_NAME        = local.environment_shorthand
+    CLEANUP_QUEUE_URL       = aws_sqs_queue.clean_dlt_load_queue.id
+    SNS_TOPIC_ARN           = aws_sns_topic.emds_alerts.arn
+    MAX_RECEIVE_COUNT       = tostring(local.load_sqs_max_receive_count)
     MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
     MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
   }
@@ -1263,7 +1263,7 @@ module "live_feed_incident_manager" {
 #-----------------------------------------------------------------------------------
 
 module "trigger_cpr_integration" {
-  count =  local.is-development || local.is-test || local.is-preproduction ? 1 : 0
+  count                   = local.is-development || local.is-test || local.is-preproduction ? 1 : 0
   source                  = "./modules/lambdas"
   is_image                = true
   function_name           = "trigger_cpr_job"
@@ -1275,9 +1275,56 @@ module "trigger_cpr_integration" {
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   security_group_ids      = [aws_security_group.lambda_cp_sg.id]
-  subnet_ids                     = data.aws_subnets.shared-private.ids
+  subnet_ids              = data.aws_subnets.shared-private.ids
 
   environment_variables = {
     API_BASE_URL = local.is-development || local.is-test ? "https://electronic-monitoring-data-person-match-api-dev.internal-non-prod.cloud-platform.service.justice.gov.uk" : local.is-preproduction ? "https://electronic-monitoring-data-person-match-api-preprod.internal-non-prod.cloud-platform.service.justice.gov.uk" : ""
+  }
+}
+
+# ------------------------------------------------------------------------------
+# Rota personal digest
+# ------------------------------------------------------------------------------
+
+module "rota_personal_digest" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "rota_personal_digest"
+  role_name                      = aws_iam_role.rota_personal_digest.name
+  role_arn                       = aws_iam_role.rota_personal_digest.arn
+  handler                        = "rota_personal_digest.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 1
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+
+  environment_variables = {
+    ENVIRONMENT             = local.environment_shorthand
+    POWERTOOLS_LOG_LEVEL    = "INFO"
+    POWERTOOLS_SERVICE_NAME = "rota-personal-digest"
+
+    GITHUB_SECRET_ARN = module.live_feed_github_app.secret_arn
+    GITHUB_OWNER      = "moj-analytical-services"
+    GITHUB_REPOSITORY = "dmet-em"
+
+    PAGERDUTY_SCHEDULE_ID = "P3MCA8L"
+    PAGERDUTY_TIME_ZONE   = "Europe/London"
+    PAGERDUTY_TO_GITHUB = jsonencode(
+      local.live_feed_pagerduty_to_github
+    )
+    PAGERDUTY_TO_SLACK = jsonencode(
+      local.live_feed_pagerduty_to_slack
+    )
+
+    SLACK_SECRET_ARN = module.rota_personal_digest_slack.secret_arn
   }
 }
