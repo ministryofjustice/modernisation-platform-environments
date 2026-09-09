@@ -10,15 +10,7 @@ module "s3-bucket-logging" {
   bucket_policy      = [aws_s3_bucket_policy.lb_access_logs.policy]
   sse_algorithm      = "AES256"
   custom_kms_key     = ""
-  
-  # log_buckets = {
-  #   log_bucket_name = module.s3-bucket-logging.bucket.id
-  #   log_bucket_arn  = module.s3-bucket-logging.bucket.arn
-  #   log_bucket_policy = aws_s3_bucket_policy.lb_access_logs.policy
-  #    }
-  # manage_log_bucket_policy = false
-  
-  # log_prefix = "s3access/${local.application_name}-${local.environment}-logging"
+
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
@@ -168,7 +160,7 @@ module "s3-bucket-shared" {
      }
   manage_log_bucket_policy = false
   
-  log_prefix = "s3access/${local.application_name}-${local.environment}-shared"
+  log_prefix = "s3access/${local.application_name}-${local.environment}-shared/${local.application_name}-${local.environment}-shared"
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
