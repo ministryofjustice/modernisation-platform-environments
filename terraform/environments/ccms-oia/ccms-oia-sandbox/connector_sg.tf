@@ -161,11 +161,11 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_1522" 
   cidr_ipv4         = each.value
 }
 
-resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_2049_efs" {
-  security_group_id            = aws_security_group.ecs_tasks_connector.id
-  description                  = "Allow egress to EFS security group on port 2049"
-  ip_protocol                  = "tcp"
-  from_port                    = 2049
-  to_port                      = 2049
-  referenced_security_group_id = aws_security_group.oia-efs-security-group.id
-}
+# resource "aws_vpc_security_group_egress_rule" "ecs_tasks_connector_egress_2049_efs" {
+#   security_group_id            = aws_security_group.ecs_tasks_connector.id
+#   description                  = "Allow egress to EFS security group on port 2049"
+#   ip_protocol                  = "tcp"
+#   from_port                    = 2049
+#   to_port                      = 2049
+#   referenced_security_group_id = aws_security_group.oia-efs-security-group.id
+# }

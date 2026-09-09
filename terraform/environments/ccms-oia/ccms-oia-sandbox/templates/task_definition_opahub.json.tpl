@@ -24,12 +24,6 @@
         "hostPort": ${health_check_port}
       }
     ],
-    "mountPoints": [
-      {
-        "containerPath": "/opa",
-        "sourceVolume": "opa_volume"
-      }
-    ],
     "essential": true,
     "environment": [
       {

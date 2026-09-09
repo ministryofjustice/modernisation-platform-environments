@@ -121,14 +121,14 @@ resource "aws_vpc_security_group_egress_rule" "first_cluster_ec2_egress_443" {
 #   cidr_ipv4         = each.value
 # }
 
-resource "aws_vpc_security_group_egress_rule" "first_cluster_ec2_egress_2049_efs" {
-  security_group_id            = aws_security_group.first_cluster_ec2.id
-  description                  = "Allow egress to EFS security group on port 2049"
-  ip_protocol                  = "tcp"
-  from_port                    = 2049
-  to_port                      = 2049
-  referenced_security_group_id = aws_security_group.oia-efs-security-group.id
-}
+# resource "aws_vpc_security_group_egress_rule" "first_cluster_ec2_egress_2049_efs" {
+#   security_group_id            = aws_security_group.first_cluster_ec2.id
+#   description                  = "Allow egress to EFS security group on port 2049"
+#   ip_protocol                  = "tcp"
+#   from_port                    = 2049
+#   to_port                      = 2049
+#   referenced_security_group_id = aws_security_group.oia-efs-security-group.id
+# }
 
 # Connector and Service Adaptor EC2 Instances Security Group
 
@@ -225,11 +225,11 @@ resource "aws_vpc_security_group_egress_rule" "second_cluster_ec2_egress_s3" {
 #   cidr_ipv4         = each.value
 # }
 
-resource "aws_vpc_security_group_egress_rule" "second_cluster_ec2_egress_2049_efs" {
-  security_group_id            = aws_security_group.second_cluster_ec2.id
-  description                  = "Allow egress to EFS security group on port 2049"
-  ip_protocol                  = "tcp"
-  from_port                    = 2049
-  to_port                      = 2049
-  referenced_security_group_id = aws_security_group.oia-efs-security-group.id
-}
+# resource "aws_vpc_security_group_egress_rule" "second_cluster_ec2_egress_2049_efs" {
+#   security_group_id            = aws_security_group.second_cluster_ec2.id
+#   description                  = "Allow egress to EFS security group on port 2049"
+#   ip_protocol                  = "tcp"
+#   from_port                    = 2049
+#   to_port                      = 2049
+#   referenced_security_group_id = aws_security_group.oia-efs-security-group.id
+# }
