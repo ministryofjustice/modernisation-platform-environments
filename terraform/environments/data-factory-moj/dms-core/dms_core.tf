@@ -1,7 +1,7 @@
 module "dms_core" {
   count = local.dms_core_enabled ? 1 : 0
 
-  source = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service/modules/dms-core?ref=105dbe96a51f53538b37732fab1e8b78019d65ef"
+  source = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service/modules/dms-core?ref=268b9f51e0e36f3a897cbdd5092751baa11e07b1"
 
   depends_on = [
     aws_iam_role_policy_attachment.dms_vpc,
