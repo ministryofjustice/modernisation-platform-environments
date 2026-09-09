@@ -26,15 +26,13 @@ data "grafana_team" "shared_cloudwatch" {
   name = each.value
 }
 
-resource "grafana_data_source_permission" "shared_cloudwatch" {
+resource "grafana_data_source_permission_item" "shared_cloudwatch" {
   for_each = {
     for item in local.shared_cloudwatch_permissions : item.key => item
   }
 
   datasource_uid = data.grafana_data_source.shared_cloudwatch[each.key].uid
 
-  permissions {
-    team_id    = data.grafana_team.shared_cloudwatch[each.value.team_name].id
-    permission = "Query"
-  }
+  team       = data.grafana_team.shared_cloudwatch[each.value.team_name].id
+  permission = "Query"
 }
