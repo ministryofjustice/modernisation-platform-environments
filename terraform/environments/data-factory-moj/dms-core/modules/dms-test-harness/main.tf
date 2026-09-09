@@ -1,5 +1,8 @@
 # S3 target
 
+#checkov:skip=CKV_AWS_18: Access logging is unnecessary for this disposable development integration-test bucket.
+#checkov:skip=CKV_AWS_144: Cross-region replication is unnecessary for disposable development integration-test data.
+#checkov:skip=CKV2_AWS_62: Event notifications are outside the scope of this DMS source-to-S3 integration test.
 resource "aws_s3_bucket" "dms_target" {
   bucket_prefix = "dms-core-test-"
 
@@ -44,6 +47,33 @@ resource "aws_s3_bucket_ownership_controls" "dms_target" {
   }
 }
 
+resource "aws_s3_bucket_versioning" "dms_target" {
+  bucket = aws_s3_bucket.dms_target.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "dms_target" {
+  bucket = aws_s3_bucket.dms_target.id
+
+  rule {
+    id     = "expire-integration-test-data"
+    status = "Enabled"
+
+    filter {}
+
+    expiration {
+      days = 7
+    }
+
+    noncurrent_version_expiration {
+      noncurrent_days = 7
+    }
+  }
+}
+
 # PostgreSQL networking
 
 resource "aws_db_subnet_group" "postgres" {
@@ -80,14 +110,20 @@ resource "aws_db_parameter_group" "postgres" {
   )
 }
 
+#checkov:skip=CKV_AWS_161: DMS authenticates to this temporary PostgreSQL source using the RDS-managed Secrets Manager credential.
+#checkov:skip=CKV_AWS_293: This development-only integration database is intentionally disposable and must be removable by Terraform.
+#checkov:skip=CKV_AWS_118: Enhanced monitoring is unnecessary for this short-lived development integration database.
+#checkov:skip=CKV_AWS_353: Performance Insights is unnecessary for this short-lived development integration database.
+#checkov:skip=CKV_AWS_157: Multi-AZ availability is outside the scope of this disposable DMS integration test.
+#checkov:skip=CKV2_AWS_60: This disposable database deliberately skips final snapshots, so snapshot tag propagation is not applicable.
 resource "aws_db_instance" "postgres" {
   identifier_prefix = "${var.name}-"
 
   engine         = "postgres"
   engine_version = var.postgres_engine_version
 
-  instance_class        = var.instance_class
-  allocated_storage     = var.allocated_storage
+  instance_class    = var.instance_class
+  allocated_storage = var.allocated_storage
 
   storage_type      = "gp3"
   storage_encrypted = true
@@ -102,6 +138,11 @@ resource "aws_db_instance" "postgres" {
   vpc_security_group_ids = [aws_security_group.postgres.id]
 
   parameter_group_name = aws_db_parameter_group.postgres.name
+
+  enabled_cloudwatch_logs_exports = [
+    "postgresql",
+    "upgrade"
+  ]
 
   publicly_accessible = false
   multi_az            = false
@@ -128,6 +169,7 @@ resource "aws_db_instance" "postgres" {
 
 # Networking Boundary
 
+#checkov:skip=CKV2_AWS_5: This security group is passed across the module boundary and attached to the DMS replication instance by dms-core.
 resource "aws_security_group" "dms_client" {
   name_prefix = "${var.name}-dms-client-"
   description = "Attached to DMS to permit access to the integration-test PostgreSQL source."
