@@ -26,7 +26,7 @@
       "db_snapshot_identifier": "rds-vcmsdev-db-backup-2025-09-26-14-04-mpcp",
       "log_retention_in_days": 14,
       "legacy_url": "www.test.victim-case-management.service.justice.gov.uk",
-      "legacy_validation_record": ""
+      "legacy_validation_record": "_522725ce5ab31662eb1ffc0227adf977.www.test.victim-case-management.service.justice.gov.uk"
     },
     "vcms-preproduction": {
       "container_port": 80,
