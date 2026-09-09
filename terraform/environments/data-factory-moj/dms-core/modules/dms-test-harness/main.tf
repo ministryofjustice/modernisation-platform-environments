@@ -132,7 +132,7 @@ resource "aws_db_instance" "postgres" {
   #checkov:skip=CKV_AWS_157: Multi-AZ availability is outside the scope of this disposable DMS integration test.
   #checkov:skip=CKV2_AWS_60: This disposable database deliberately skips final snapshots, so snapshot tag propagation is not applicable.
 
-  identifier_prefix = "${var.name}-"
+  identifier_prefix = "dms-core-test-"
 
   engine         = "postgres"
   engine_version = var.postgres_engine_version
