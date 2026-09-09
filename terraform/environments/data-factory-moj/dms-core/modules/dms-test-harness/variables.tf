@@ -18,6 +18,16 @@ variable "vpc_id" {
   }
 }
 
+variable "kms_key_arn" {
+  description = "ARN of the KMS key used to encrypt the temporary DMS integration-test S3 target."
+  type        = string
+
+  validation {
+    condition     = length(trimspace(var.kms_key_arn)) > 0
+    error_message = "kms_key_arn must not be empty."
+  }
+}
+
 variable "subnet_ids" {
   description = "Private/data subnet IDs used by the temporary PostgreSQL RDS subnet group."
   type        = list(string)

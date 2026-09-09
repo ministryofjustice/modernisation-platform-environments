@@ -3,6 +3,11 @@ output "target_bucket_name" {
   value       = aws_s3_bucket.dms_target.bucket
 }
 
+output "target_kms_key_arn" {
+  description = "ARN of the KMS key used to encrypt the temporary DMS integration-test S3 target."
+  value       = var.kms_key_arn
+}
+
 output "source_database_name" {
   description = "Database name exposed to the DMS source endpoint."
   value       = aws_db_instance.postgres.db_name
