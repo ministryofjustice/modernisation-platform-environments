@@ -25,32 +25,32 @@ resource "aws_lb" "opahub" {
 ########################################
 # Target Group
 ########################################
-resource "aws_lb_target_group" "opahub_target_group" {
-  name                 = "${local.opa_app_name}-tg"
-  port                 = local.application_data.accounts[local.environment].opa_server_port
-  protocol             = "HTTP"
-  vpc_id               = data.aws_vpc.shared.id
-  target_type          = "ip"
-  deregistration_delay = 30
+# resource "aws_lb_target_group" "opahub_target_group" {
+#   name                 = "${local.opa_app_name}-tg"
+#   port                 = local.application_data.accounts[local.environment].opa_server_port
+#   protocol             = "HTTP"
+#   vpc_id               = data.aws_vpc.shared.id
+#   target_type          = "ip"
+#   deregistration_delay = 30
 
-  stickiness {
-    type = "lb_cookie"
-  }
+#   stickiness {
+#     type = "lb_cookie"
+#   }
 
-  health_check {
-    path                = "/opa/opa-hub/manager"
-    healthy_threshold   = 5
-    interval            = 120
-    protocol            = "HTTP"
-    unhealthy_threshold = 5
-    matcher             = "200"
-    timeout             = 5
-  }
+#   health_check {
+#     path                = "/opa/opa-hub/manager"
+#     healthy_threshold   = 5
+#     interval            = 120
+#     protocol            = "HTTP"
+#     unhealthy_threshold = 5
+#     matcher             = "200"
+#     timeout             = 5
+#   }
 
-  tags = merge(local.tags,
-    { Name = lower(format("%s-tg", local.opa_app_name)) }
-  )
-}
+#   tags = merge(local.tags,
+#     { Name = lower(format("%s-tg", local.opa_app_name)) }
+#   )
+# }
 
 resource "aws_lb_target_group" "opahub_ssl_target_group" {
   name                 = "${local.opa_app_name}-ssl-tg"
@@ -97,17 +97,17 @@ resource "aws_lb_listener" "opahub_listener" {
 }
 
 # Temp only for DEV OIA
-resource "aws_lb_listener" "opahub_listener_7001" {
-  count             = local.is-development ? 1 : 0
-  load_balancer_arn = aws_lb.opahub.id
-  port              = "7001"
-  protocol          = "HTTP"
+# resource "aws_lb_listener" "opahub_listener_7001" {
+#   count             = local.is-development ? 1 : 0
+#   load_balancer_arn = aws_lb.opahub.id
+#   port              = "7001"
+#   protocol          = "HTTP"
 
-  default_action {
-    target_group_arn = aws_lb_target_group.opahub_target_group.id
-    type             = "forward"
-  }
-}
+#   default_action {
+#     target_group_arn = aws_lb_target_group.opahub_target_group.id
+#     type             = "forward"
+#   }
+# }
 
 # Temp only for DEV OIA
 # resource "aws_lb_listener" "opahub_listener__preproduction_7001" {

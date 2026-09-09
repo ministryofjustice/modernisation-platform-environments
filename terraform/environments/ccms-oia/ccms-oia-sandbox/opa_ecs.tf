@@ -111,11 +111,11 @@ resource "aws_ecs_service" "opahub" {
     container_port   = local.application_data.accounts[local.environment].opa_ssl_port
   }
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.opahub_target_group.id
-    container_name   = "${local.opa_app_name}-container"
-    container_port   = local.application_data.accounts[local.environment].opa_server_port
-  }
+  # load_balancer {
+  #   target_group_arn = aws_lb_target_group.opahub_target_group.id
+  #   container_name   = "${local.opa_app_name}-container"
+  #   container_port   = local.application_data.accounts[local.environment].opa_server_port
+  # }
 
   depends_on = [
     aws_lb_listener.opahub_listener,
