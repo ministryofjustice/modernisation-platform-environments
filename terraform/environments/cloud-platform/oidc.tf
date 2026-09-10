@@ -157,10 +157,15 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
   }
 
   statement {
-    sid    = "ObservabilityAMPAndAMG"
+    sid    = "ObservabilityAMP"
     effect = "Allow"
     actions = [
-      # Amazon Managed Prometheus (AMP) workspace lifecycle for the metrics PoC
+      # Amazon Managed Prometheus (AMP) workspace lifecycle — the ADOT metrics
+      # collectors in cluster-components create/manage a per-cluster AMP
+      # workspace, applied on ephemeral dev clusters via this role.
+      # AMG (grafana:*) is NOT included here: AMG is deployed at the
+      # cloud-platform root component via the main pipeline's apply role, not by
+      # this dev-cluster role.
       "aps:CreateWorkspace",
       "aps:DeleteWorkspace",
       "aps:DescribeWorkspace",
@@ -173,22 +178,6 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
       "aps:TagResource",
       "aps:UntagResource",
       "aps:ListTagsForResource",
-      # Amazon Managed Grafana (AMG) workspace lifecycle for the metrics PoC
-      "grafana:CreateWorkspace",
-      "grafana:DeleteWorkspace",
-      "grafana:DescribeWorkspace",
-      "grafana:DescribeWorkspaceAuthentication",
-      "grafana:DescribeWorkspaceConfiguration",
-      "grafana:ListWorkspaces",
-      "grafana:UpdateWorkspace",
-      "grafana:UpdateWorkspaceAuthentication",
-      "grafana:UpdateWorkspaceConfiguration",
-      "grafana:UpdatePermissions",
-      "grafana:ListPermissions",
-      "grafana:AssociateLicense",
-      "grafana:TagResource",
-      "grafana:UntagResource",
-      "grafana:ListTagsForResource"
     ]
     resources = ["*"]
   }
