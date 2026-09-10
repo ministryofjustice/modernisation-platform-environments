@@ -440,6 +440,73 @@ data "aws_iam_policy_document" "em_data_validation_permissions" {
   }
 }
 
+resource "aws_iam_policy" "em_test_tag_permissions" {
+  count = local.is-development || local.is-test ? 1 : 0
+  name_prefix = "em_test_tag_permissions"
+  description = "Permissions for updating p1 export."
+  policy      = data.aws_iam_policy_document.em_test_tag_permissions[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "em_test_tag_permissions" {
+  count = local.is-development || local.is-test ? 1 : 0
+  policy_arn = aws_iam_policy.em_test_tag_permissions[0].arn
+  role       = module.emd_test_tags_role[0].iam_role_name
+}
+
+data "aws_iam_policy_document" "em_test_tag_permissions" {
+  count = local.is-development || local.is-test ? 1 : 0
+  statement {
+    sid       = "ListAccountAliasForEnvironmentClass"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "ListAllBucketsForEnvironmentClass"
+    effect = "Allow"
+    actions = [
+      "s3:ListAllMyBuckets",
+      "s3:GetBucketLocation"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabases",
+      "glue:GetDatabase",
+      "glue:GetTables",
+      "glue:GetTable",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabase",
+      "glue:GetTables",
+      "glue:GetTable",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_mdss${local.dbt_suffix}",
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetTables",
+      "glue:GetTable",
+      "glue:GetPartition",
+      "glue:GetPartitions",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_mdss${local.dbt_suffix}/*",
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "em_data_api_permissions" {
   statement {
     sid       = "ListAccountAliasForEnvironmentClass"
