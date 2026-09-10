@@ -51,6 +51,12 @@ module "baseline" {
     lookup(local.baseline_environment_specific, "lbs", {})
   )
 
+  s3_buckets = merge(
+    module.baseline_presets.s3_buckets,
+    lookup(local.baseline_all_environments, "s3_buckets", {}),
+    lookup(local.baseline_environment_specific, "s3_buckets", {}),
+  )
+
   secretsmanager_secrets = merge(
     module.baseline_presets.secretsmanager_secrets,
     lookup(local.baseline_all_environments, "secretsmanager_secrets", {}),

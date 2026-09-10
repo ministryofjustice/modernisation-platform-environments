@@ -16,6 +16,10 @@
             {
               "glue_database": "public_protection_datamarts_dev_dbt",
               "glue_tables": ["*"]
+            },
+            {
+              "glue_database": "public_protection_derived_dev_dbt",
+              "glue_tables": ["*"]
             }
           ]
         }
