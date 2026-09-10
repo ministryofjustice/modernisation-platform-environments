@@ -159,8 +159,8 @@ locals {
     bedrock_guardrail_client_errors_crit = 5  # client errors per 5m window
     bedrock_guardrail_server_errors_warn = 1  # server errors per 5m window
     bedrock_guardrail_server_errors_crit = 5  # server errors per 5m window
-    bedrock_guardrail_throttles_warn     = 1  # throttled requests per 5m window
-    bedrock_guardrail_throttles_crit     = 5  # throttled requests per 5m window
+    bedrock_guardrail_throttles_warn     = 20  # throttled requests per 5m window
+    bedrock_guardrail_throttles_crit     = 25  # throttled requests per 5m window
 
   }
   # Per-account effective thresholds: defaults merged with any account-specific
