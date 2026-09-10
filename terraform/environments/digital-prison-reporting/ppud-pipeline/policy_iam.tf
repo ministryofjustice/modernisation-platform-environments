@@ -81,12 +81,10 @@ resource "aws_iam_role_policy_attachment" "s3_read_write_ppud" {
   policy_arn = aws_iam_policy.s3_read_write_ppud_policy[0].arn
 }
 
-
-
 # Glue Catalog Read-only attachment
 resource "aws_iam_role_policy_attachment" "glue_catalog_read_only_ppud" {
   #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy
-  count = local.is-development ? 1 : 0
+  count = local.is-test ? 0 : 1
 
   role       = data.aws_iam_role.dataapi_cross_role[0].name
   policy_arn = aws_iam_policy.glue_catalog_ppud_read_only_policy[0].arn
