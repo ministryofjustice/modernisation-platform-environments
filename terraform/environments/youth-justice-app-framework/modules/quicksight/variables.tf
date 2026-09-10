@@ -83,3 +83,8 @@ variable "postgres_quicksight_user_secret_arn" {
   description = "The ARN of the secret created for the Quicksight user in Postgres."
 }
 
+variable "disparity_toolkit_secret_arn" {
+  type        = string
+  description = "The ARN of the disparity toolkit Redshift Serverless secret that Quicksight needs read access to."
+}
+
