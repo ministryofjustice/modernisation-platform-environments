@@ -17,9 +17,3 @@ data "aws_iam_session_context" "current" {
 data "aws_iam_roles" "data_engineering_roles" {
   name_regex = "AWSReservedSSO_modernisation-platform-data-eng.*"
 }
-
-data "aws_iam_role" "analytical_platform_share_role" {
-  for_each = local.is-test ? {} : local.analytical_platform_share
-
-  name = "${each.key}-share-role"
-}
