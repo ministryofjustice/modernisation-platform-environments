@@ -60,8 +60,8 @@ resource "aws_iam_policy" "glue_catalog_ppud_read_only_policy" {
 
         ],
         "Resource" : [
-          "arn:aws:glue:${data.aws_region.current.region}:${local.modernisation_platform_account_id}:database/${local.short_name}_${local.short_name_environment}",
-          "arn:aws:glue:${data.aws_region.current.region}:${local.modernisation_platform_account_id}:table/${local.short_name}_${local.short_name_environment}/*"
+          "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/${local.short_name}_${local.short_name_environment}",
+          "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${local.short_name}_${local.short_name_environment}/*"
 
         ]
       },
@@ -81,8 +81,6 @@ resource "aws_iam_role_policy_attachment" "s3_read_write_ppud" {
   policy_arn = aws_iam_policy.s3_read_write_ppud_policy[0].arn
 }
 
-
-
 # Glue Catalog Read-only attachment
 resource "aws_iam_role_policy_attachment" "glue_catalog_read_only_ppud" {
   #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy
@@ -90,4 +88,43 @@ resource "aws_iam_role_policy_attachment" "glue_catalog_read_only_ppud" {
 
   role       = data.aws_iam_role.dataapi_cross_role[0].name
   policy_arn = aws_iam_policy.glue_catalog_ppud_read_only_policy[0].arn
+}
+
+# Update Analytical Platform Share Policy & Role
+data "aws_iam_role" "analytical_platform_share_role" {
+  for_each = local.is-development ? local.analytical_platform_share : {}
+  name     = "${each.value.target_account_name}-share-role"
+}
+
+data "aws_iam_policy_document" "analytical_platform_share_policy_ppud" {
+  for_each = local.is-development ? local.analytical_platform_share : {}
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetPartition",
+      "glue:GetTags",
+      "glue:DeleteDatabase",
+      "glue:TagResource",
+      "glue:UpdateDatabase"
+    ]
+    resources = flatten([
+      for resource in each.value.resource_shares : [
+        "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/${resource.glue_database}",
+        formatlist("arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${resource.glue_database}/%s", resource.glue_tables),
+        "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/${resource.glue_database}/*",
+        "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog"
+      ]
+    ])
+  }
+}
+
+resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment_ppud" {
+  for_each = local.is-development ? local.analytical_platform_share : {}
+
+  name   = "${each.value.target_account_name}-share-policy-ppud"
+  role   = data.aws_iam_role.analytical_platform_share_role[each.key].name
+  policy = data.aws_iam_policy_document.analytical_platform_share_policy_ppud[each.key].json
 }
