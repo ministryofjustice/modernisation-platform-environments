@@ -7,37 +7,6 @@ locals {
   ))
 }
 
-resource "aws_lakeformation_data_lake_settings" "lake_formation" {
-  count = local.is-test ? 0 : 1
-
-  admins = flatten([
-    [for share in
-      local.analytical_platform_share : data.aws_iam_role.analytical_platform_share_role[share.target_account_name].arn
-    ],
-    data.aws_iam_session_context.current.issuer_arn,
-    [data.aws_iam_role.dataapi_cross_role[0].arn],
-    tolist(try(data.aws_iam_roles.data_engineering_roles.arns, toset([])))
-  ])
-
-
-  # Account level setting for data catalogue
-  create_database_default_permissions {
-    # These settings should replicate current behaviour: LakeFormation is Ignored
-    permissions = ["ALL"]
-    principal   = "IAM_ALLOWED_PRINCIPALS"
-  }
-
-  create_table_default_permissions {
-    # These settings should replicate current behaviour: LakeFormation is Ignored
-    permissions = ["ALL"]
-    principal   = "IAM_ALLOWED_PRINCIPALS"
-  }
-
-  parameters = {
-    "CROSS_ACCOUNT_VERSION" = "5"
-  }
-}
-
 # Give the key roles role 'All' permissions on all DBs in 
 # application_variables.json
 resource "aws_lakeformation_permissions" "share_dbs_all_permissions" {
