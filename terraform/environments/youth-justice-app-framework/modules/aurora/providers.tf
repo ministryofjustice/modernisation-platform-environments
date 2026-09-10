@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source                = "hashicorp/aws"
-      version               = "~> 5.0"
+      version               = "~> 6.62"
       configuration_aliases = [aws.core-network-services]
     }
     archive = {
@@ -15,7 +15,7 @@ terraform {
     }
     null = {
       source  = "hashicorp/null"
-      version = "3.2.2"
+      version = "3.3.1"
     }
   }
   required_version = ">= 1.0.1"
