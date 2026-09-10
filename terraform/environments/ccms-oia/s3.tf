@@ -1,5 +1,5 @@
 module "s3_ccms_oia" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e"
 
   bucket_name        = "${local.application_name}-${local.environment}"
   versioning_enabled = true
@@ -101,7 +101,7 @@ module "s3_ccms_oia" {
 # S3 Bucket - Logging
 module "s3-bucket-logging" {
   # v9.0.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/9facf9fc8f8b8e3f93ffbda822028534b9a75399
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e"
 
   bucket_name        = local.logging_bucket_name
   versioning_enabled = true
@@ -256,7 +256,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
 # S3 Bucket - Logging
 module "s3-bucket-shared" {
   # v9.0.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/9facf9fc8f8b8e3f93ffbda822028534b9a75399
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e"
 
   bucket_name        = "${local.application_name}-${local.environment}-shared"
   versioning_enabled = true
