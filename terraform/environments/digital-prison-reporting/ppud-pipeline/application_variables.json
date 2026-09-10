@@ -4,7 +4,22 @@
       "days_back": "3",
       "cron_schedule": "cron(30 07 ? * MON *)",
       "source_bucket_role_name": "ppud-parquet-exports-batch-copy-dev-role",
-      "short_name_environment": "dev"
+      "short_name_environment": "dev",
+      "analytical_platform_share": [
+        {
+          "target_account_name": "analytical-platform-data-production",
+          "target_account_id": "593291632749",
+          "assume_account_name": "analytical-platform-management-production",
+          "assume_account_id": "042130406152",
+          "data_locations": ["dpr-structured-historical-development"],
+          "resource_shares": [
+            {
+              "glue_database": "public_protection_datamarts_dev_dbt",
+              "glue_tables": ["*"]
+            }
+          ]
+        }
+      ]
     },
     "preproduction": {
       "days_back": "1",
