@@ -1,8 +1,16 @@
-data "template_file" "launch-template-main" {
+# data "template_file" "launch-template-main" {
+#   template = file("${path.module}/templates/user-data-main.sh")
+#   vars = {
+#     cluster_name       = "${local.first_cluster_name}"
+#     efs_id             = "test"
+#     deploy_environment = local.environment
+#   }
+# }
+
+data "template_file" "launch-template-main-updated" {
   template = file("${path.module}/templates/user-data-main.sh")
   vars = {
     cluster_name       = "${local.first_cluster_name}"
-    efs_id             = "test"
     deploy_environment = local.environment
   }
 }
@@ -45,7 +53,7 @@ resource "aws_launch_template" "ec2_launch_template_main" {
     }
   }
 
-  user_data = base64encode(data.template_file.launch-template-main.rendered)
+  user_data = base64encode(data.template_file.launch-template-main-updated.rendered)
 
   tag_specifications {
     resource_type = "instance"
