@@ -69,7 +69,7 @@ resource "aws_lakeformation_permissions" "table_all_permissions" {
 
 # Grant DATA_LOCATION_ACCESS to analytical platform share roles on their configured S3 buckets
 resource "aws_lakeformation_permissions" "share_role_data_location_permissions" {
-  for_each = local.is-development ?  {
+  for_each = (local.is-development || local.is-preproduction) ?  {
     for pair in flatten([
       for share_index, share in local.analytical_platform_share : [
         for location_index, data_location in share.data_locations : {
@@ -91,7 +91,7 @@ resource "aws_lakeformation_permissions" "share_role_data_location_permissions" 
 
 # Give the cadet cross-account role LF data access
 resource "aws_iam_role_policy_attachment" "dataapi_cross_role_lake_formation_data_access" {
-  count = local.is-development ? 1 : 0
+  count = (local.is-development || local.is-preproduction) ? 1 : 0
 
   role       = data.aws_iam_role.dataapi_cross_role[0].name
   policy_arn = aws_iam_policy.lake_formation_data_access[0].arn
@@ -100,7 +100,7 @@ resource "aws_iam_role_policy_attachment" "dataapi_cross_role_lake_formation_dat
 # Give LF DATA_LOCATION_ACCESS on structured-historical to all (non LF admin) principals
 # Note: LF admin can't have ASSOCIATE permissions on LF tags
 resource "aws_lakeformation_permissions" "data_location_access_structured_historical" {
-  for_each    = local.is-development ? local.lf_principals_not_admin : toset([])
+  for_each    = (local.is-development || local.is-preproduction) ? local.lf_principals_not_admin : toset([])
   principal   = each.value
   permissions = ["DATA_LOCATION_ACCESS"]
 
@@ -112,7 +112,7 @@ resource "aws_lakeformation_permissions" "data_location_access_structured_histor
 # Give LF DATA_LOCATION_ACCESS on working to all (non LF admin) principals
 # Note: LF admin can't have ASSOCIATE permissions on LF tags
 resource "aws_lakeformation_permissions" "data_location_access_working" {
-  for_each    = local.is-development ? local.lf_principals_not_admin : toset([])
+  for_each    = (local.is-development || local.is-preproduction) ? local.lf_principals_not_admin : toset([])
   principal   = each.value
   permissions = ["DATA_LOCATION_ACCESS"]
 
