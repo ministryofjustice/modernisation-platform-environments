@@ -84,10 +84,10 @@ models:
       region: eu-west-2
       generally_available: true
     # Anthropic
-    # batch_available is only set on models confirmed against AWS's "Supported Regions and
-    # models for batch inference" table for the eu cross-region inference profile used here.
-    # claude-opus-4-7, claude-opus-4-8 and claude-sonnet-5 are deliberately left unset because
-    # they don't yet appear in that table - re-check before flipping them on.
+    # batch_available is deliberately set on claude-haiku-4-5 only, to keep the initial batch
+    # inference rollout scoped to a single model for testing. Other models here are confirmed
+    # against AWS's "Supported Regions and models for batch inference" table for the eu
+    # cross-region inference profile used here and can be flagged on once validated end-to-end.
     claude-haiku-4-5:
       model_id: "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
       model_family: "Anthropic Claude"
@@ -101,14 +101,12 @@ models:
       model_name: "Anthropic Claude Opus 4.5 (EU)"
       region: eu-west-2
       generally_available: true
-      batch_available: true
     claude-opus-4-6:
       model_id: eu.anthropic.claude-opus-4-6-v1
       model_family: "Anthropic Claude"
       model_name: "Anthropic Claude Opus 4.6 (EU)"
       region: eu-west-2
       generally_available: true
-      batch_available: true
     claude-opus-4-7:
       model_id: eu.anthropic.claude-opus-4-7
       model_family: "Anthropic Claude"
@@ -127,21 +125,18 @@ models:
       model_name: "Anthropic Claude Opus 5 (EU)"
       region: eu-west-2
       generally_available: true
-      batch_available: true
     claude-sonnet-4-5:
       model_id: "eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
       model_family: "Anthropic Claude"
       model_name: "Anthropic Claude Sonnet 4.5 (EU)"
       region: eu-west-2
       generally_available: true
-      batch_available: true
     claude-sonnet-4-6:
       model_id: eu.anthropic.claude-sonnet-4-6
       model_family: "Anthropic Claude"
       model_name: "Anthropic Claude Sonnet 4.6 (EU)"
       region: eu-west-2
       generally_available: true
-      batch_available: true
     claude-sonnet-5:
       model_id: eu.anthropic.claude-sonnet-5
       model_family: "Anthropic Claude"
