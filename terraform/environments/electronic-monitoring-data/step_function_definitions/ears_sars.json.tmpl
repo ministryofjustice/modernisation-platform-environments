@@ -26,8 +26,16 @@
           },
           "isBase64Encoded": false,
           "body.$": "States.JsonToString($)"
-        }
-      },
+        },
+      "Retry": [
+          {
+            "ErrorEquals": ["Lambda.AWSLambdaException"],
+            "IntervalSeconds": 2,
+            "BackoffRate": 2,
+            "MaxAttempts": 2
+          }
+        ],
+      }
       "Next": "WriteToSharepoint"
     },
     "WriteToSharepoint": {
@@ -38,6 +46,14 @@
         "FunctionName": "${write_to_sharepoint}",
         "Payload.$": "$"
       },
+      "Retry": [
+          {
+            "ErrorEquals": ["Lambda.AWSLambdaException"],
+            "IntervalSeconds": 2,
+            "BackoffRate": 2,
+            "MaxAttempts": 2
+          }
+        ],
       "End": true
     }
   }
