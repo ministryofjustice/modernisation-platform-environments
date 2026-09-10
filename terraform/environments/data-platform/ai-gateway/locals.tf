@@ -25,6 +25,15 @@ locals {
     }
   }
 
+  # Bedrock models eligible for batch inference: same-account only (batch inference for
+  # cross-account models, i.e. those with aws_account_name set, is out of scope for now)
+  # and explicitly opted in via `batch_available: true` in configuration.yml.
+  ai_gateway_bedrock_batch_models = {
+    for model_key, model in try(local.ai_gateway_models_filtered.amazon_bedrock, {}) :
+    model_key => model
+    if try(model.batch_available, false) && !can(model.aws_account_name)
+  }
+
   # RDS
   has_reader = contains(keys(local.environment_configuration.aurora_instances), "reader")
   # checkov:skip=CKV_SECRET_6: Dummy placeholder for IAM auth flow, not a real secret

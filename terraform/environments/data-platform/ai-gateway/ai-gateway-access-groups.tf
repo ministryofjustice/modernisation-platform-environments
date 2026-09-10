@@ -9,6 +9,17 @@ resource "litellm_unified_access_group" "amazon_bedrock" {
   ]
 }
 
+resource "litellm_unified_access_group" "amazon_bedrock_batch" {
+  for_each = local.ai_gateway_bedrock_batch_models
+
+  access_group_name  = "bedrock-batch-${each.key}"
+  access_model_names = [litellm_model.amazon_bedrock_batch[each.key].model_name]
+  assigned_team_ids = [
+    for team_key, team in local.ai_gateway_configuration.teams : litellm_team.teams[team_key].team_id
+    if contains(try(team.unified_access_groups, []), "bedrock-batch-${each.key}")
+  ]
+}
+
 resource "litellm_unified_access_group" "google_gemini_enterprise_agent_platform" {
   for_each = try(local.ai_gateway_models_filtered.google_gemini_enterprise_agent_platform, {})
 
