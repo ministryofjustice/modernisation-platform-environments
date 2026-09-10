@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     aws = {
-      version = "= 5.97.0"
+      version = "6.62.0"
       source  = "hashicorp/aws"
     }
     http = {
@@ -18,7 +18,7 @@ terraform {
     }
     github = {
       source  = "hashicorp/github"
-      version = "~> 5.0"
+      version = "~> 6.13"
     }
     archive = {
       source  = "hashicorp/archive"
