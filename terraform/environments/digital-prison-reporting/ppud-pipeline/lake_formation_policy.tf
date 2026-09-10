@@ -6,7 +6,7 @@ data "aws_iam_policy_document" "lake_formation_data_access" {
 }
 
 resource "aws_iam_policy" "lake_formation_data_access" {
-  count = local.is-test ? 0 : 1
+  count = local.is-development ? 1 : 0
 
   name        = "${local.project}-${local.short_name}-lake-formation-data-access-${local.environment}"
   description = "Lake Formation GetDataAccess policy"
