@@ -60,6 +60,21 @@ data "aws_iam_policy_document" "bootstrap" {
       aws_secretsmanager_secret.dms_source.arn
     ]
   }
+
+  statement {
+    sid    = "UseDMSSecretKMSKey"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:GenerateDataKey"
+    ]
+
+    resources = [
+      var.kms_key_arn
+    ]
+  }
 }
 
 resource "aws_iam_role_policy" "bootstrap" {
