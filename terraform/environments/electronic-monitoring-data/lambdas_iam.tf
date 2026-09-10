@@ -3199,6 +3199,19 @@ data "aws_iam_policy_document" "fms_validation_reporter" {
   }
 
   statement {
+    sid    = "FmsValidationAuditObjectReadAccess"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "${module.s3-data-bucket.bucket.arn}/fms_validation_audit/*",
+    ]
+  }
+
+  statement {
     sid    = "DiscoverAthenaResultsBucket"
     effect = "Allow"
 
