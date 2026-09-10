@@ -1,5 +1,5 @@
 module "gatekeeper" {
-  source = "github.com/ministryofjustice/container-platform-terraform-gatekeeper?ref=1e282d05902b17fa31f00e152aade64d86e7d181" #1.3.0
+  source = "github.com/ministryofjustice/container-platform-terraform-gatekeeper?ref=3f928feb8531922c8b3ebaa26f38c5d8bb776813" #1.4.0
 
   # boolean expression for applying opa valid hostname for test clusters only.
   dryrun_map = {
@@ -8,11 +8,7 @@ module "gatekeeper" {
     user_ns_requires_psa_label         = false,
     lock_priv_capabilities             = false,
     warn_kubectl_create_sa             = false,
-    # TEMPORARY (observability PoC, issue 8414): dryrun instead of deny so the
-    # amazon-cloudwatch-observability add-on's cloudwatch-agent DaemonSet
-    # (hostNetwork: true) can schedule. Revert to false once the gatekeeper
-    # module exempts amazon-cloudwatch from the disallow-host-network constraint.
-    block_host_network = true,
+    block_host_network                 = false,
   }
 
   constraint_violations_max_to_display = 25
