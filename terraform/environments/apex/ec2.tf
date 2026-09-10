@@ -29,7 +29,7 @@ resource "aws_instance" "apex_db_instance" {
     tags = merge(
       local.tags,
       { "Name" = "${local.application_name}db-ec2-root" },
-      { "backup" = "true" }
+      { "backup" = "false" }
     )
   }
 
@@ -191,7 +191,7 @@ resource "aws_ebs_volume" "u01-orahome" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}db-ec2-u01-orahome" },
-    { "backup" = "true" }
+    { "backup" = "false" }
   )
 }
 resource "aws_volume_attachment" "u01-orahome" {
@@ -213,7 +213,7 @@ resource "aws_ebs_volume" "u02-oradata" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}db-ec2-u02-oradata" },
-    { "backup" = "true" }
+    { "backup" = "false" }
   )
 }
 
@@ -238,7 +238,7 @@ resource "aws_ebs_volume" "u03-redo" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}db-ec2-u03-redo" },
-    { "backup" = "true" }
+    { "backup" = "false" }
   )
 }
 resource "aws_volume_attachment" "u03-redo" {
@@ -260,7 +260,7 @@ resource "aws_ebs_volume" "u04-arch" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}db-ec2-u04-arch" },
-    { "backup" = "true" }
+    { "backup" = "false" }
   )
 }
 resource "aws_volume_attachment" "u04-arch" {
