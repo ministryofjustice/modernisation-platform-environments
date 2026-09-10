@@ -75,7 +75,7 @@ module "ppud_rds_export" {
   bucket_namespace               = "account-regional"
   lifecycle_rule_backup_uploads  = local.rds_export_bucket_lifecycle_rule
   lifecycle_rule_parquet_exports = local.rds_export_bucket_lifecycle_rule
-  parquet_exports_bucket_policy  = local.is-development ?[data.aws_iam_policy_document.batch_replication_destination[0].json] : ["{}"]
+  parquet_exports_bucket_policy  = local.is-development ? [data.aws_iam_policy_document.batch_replication_destination[0].json] : ["{}"]
 
   tags = merge(
     local.tags,
