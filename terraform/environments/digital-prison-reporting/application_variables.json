@@ -202,6 +202,10 @@
             {
               "glue_database": "curated_prisons_history_dev_dbt",
               "glue_tables": ["*"]
+            },
+            {
+              "glue_database": "public_protection_datamarts_dev_dbt",
+              "glue_tables": ["*"]
             }
           ]
         }
