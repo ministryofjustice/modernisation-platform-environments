@@ -28,6 +28,16 @@ variable "kms_key_arn" {
   }
 }
 
+variable "seed_image_uri" {
+  description = "ECR image URI used by the database seed Lambda."
+  type        = string
+
+  validation {
+    condition     = length(trimspace(var.seed_image_uri)) > 0
+    error_message = "seed_image_uri must not be empty."
+  }
+}
+
 variable "subnet_ids" {
   description = "Private/data subnet IDs used by the temporary PostgreSQL RDS subnet group."
   type        = list(string)
