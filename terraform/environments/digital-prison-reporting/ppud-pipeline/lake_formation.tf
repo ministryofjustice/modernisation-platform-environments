@@ -1,19 +1,21 @@
 # Combine the SSO role(s) with the cross-account role used by 
 # create a derived table (cadet)
 locals {
-  lf_principals_not_admin = toset(concat(
-    [aws_iam_role.dataapi_cross_role.arn],
+  lf_principals_not_admin = local.is-test ? toset([]) : toset(concat(
+    [data.aws_iam_role.dataapi_cross_role[0].arn],
     tolist(try(data.aws_iam_roles.data_engineering_roles.arns, toset([])))
   ))
 }
 
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
+  count = local.is-test ? 0 : 1
+
   admins = flatten([
     [for share in
-      local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn
+      local.analytical_platform_share : data.aws_iam_role.analytical_platform_share_role[share.target_account_name].arn
     ],
     data.aws_iam_session_context.current.issuer_arn,
-    [aws_iam_role.dataapi_cross_role.arn],
+    [data.aws_iam_role.dataapi_cross_role[0].arn],
     tolist(try(data.aws_iam_roles.data_engineering_roles.arns, toset([])))
   ])
 
@@ -40,12 +42,12 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
 # application_variables.json
 resource "aws_lakeformation_permissions" "share_dbs_all_permissions" {
   # one instance per (database × principal)
-  for_each = {
+  for_each = local.is-test ? {} : {
     for combo in flatten([
       for share_index, share in local.analytical_platform_share : [
         for resource_share in share.resource_shares : [
           for principal in toset(concat(
-            [aws_iam_role.analytical_platform_share_role[share_index].arn],
+            [data.aws_iam_role.analytical_platform_share_role[share_index].arn],
             tolist(local.lf_principals_not_admin)
             )) : {
             key            = "db-${resource_share.glue_database}-${substr(md5(principal), 0, 10)}"
@@ -69,12 +71,12 @@ resource "aws_lakeformation_permissions" "share_dbs_all_permissions" {
 # Grant 'ALL' on *all tables* within each shared database
 resource "aws_lakeformation_permissions" "table_all_permissions" {
   # reuse the same keying pattern
-  for_each = {
+  for_each = local.is-test ? {} : {
     for combo in flatten([
       for share_index, share in local.analytical_platform_share : [
         for resource_share in share.resource_shares : [
           for principal in toset(concat(
-            [aws_iam_role.analytical_platform_share_role[share_index].arn],
+            [data.aws_iam_role.analytical_platform_share_role[share_index].arn],
             tolist(local.lf_principals_not_admin)
             )) : {
             key           = "tbl-${resource_share.glue_database}-${substr(md5(principal), 0, 10)}"
@@ -98,7 +100,7 @@ resource "aws_lakeformation_permissions" "table_all_permissions" {
 
 # Grant DATA_LOCATION_ACCESS to analytical platform share roles on their configured S3 buckets
 resource "aws_lakeformation_permissions" "share_role_data_location_permissions" {
-  for_each = {
+  for_each = local.is-test ? {} : {
     for pair in flatten([
       for share_index, share in local.analytical_platform_share : [
         for location_index, data_location in share.data_locations : {
@@ -110,7 +112,7 @@ resource "aws_lakeformation_permissions" "share_role_data_location_permissions" 
     ]) : pair.key => pair
   }
 
-  principal   = aws_iam_role.analytical_platform_share_role[each.value.share_index].arn
+  principal   = data.aws_iam_role.analytical_platform_share_role[each.value.share_index].arn
   permissions = ["DATA_LOCATION_ACCESS"]
 
   data_location {
@@ -120,14 +122,16 @@ resource "aws_lakeformation_permissions" "share_role_data_location_permissions" 
 
 # Give the cadet cross-account role LF data access
 resource "aws_iam_role_policy_attachment" "dataapi_cross_role_lake_formation_data_access" {
-  role       = aws_iam_role.dataapi_cross_role.name
-  policy_arn = aws_iam_policy.lake_formation_data_access.arn
+  count = local.is-test ? 0 : 1
+
+  role       = data.aws_iam_role.dataapi_cross_role[0].name
+  policy_arn = aws_iam_policy.lake_formation_data_access[0].arn
 }
 
 # Give LF DATA_LOCATION_ACCESS on structured-historical to all (non LF admin) principals
 # Note: LF admin can't have ASSOCIATE permissions on LF tags
 resource "aws_lakeformation_permissions" "data_location_access_structured_historical" {
-  for_each    = local.lf_principals_not_admin
+  for_each    = local.is-test ? toset([]) : local.lf_principals_not_admin
   principal   = each.value
   permissions = ["DATA_LOCATION_ACCESS"]
 
@@ -139,7 +143,7 @@ resource "aws_lakeformation_permissions" "data_location_access_structured_histor
 # Give LF DATA_LOCATION_ACCESS on working to all (non LF admin) principals
 # Note: LF admin can't have ASSOCIATE permissions on LF tags
 resource "aws_lakeformation_permissions" "data_location_access_working" {
-  for_each    = local.lf_principals_not_admin
+  for_each    = local.is-test ? toset([]) : local.lf_principals_not_admin
   principal   = each.value
   permissions = ["DATA_LOCATION_ACCESS"]
 

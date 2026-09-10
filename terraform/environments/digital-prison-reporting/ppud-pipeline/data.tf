@@ -19,7 +19,7 @@ data "aws_iam_roles" "data_engineering_roles" {
 }
 
 data "aws_iam_role" "analytical_platform_share_role" {
-  for_each = local.analytical_platform_share
+  for_each = local.is-test ? {} : local.analytical_platform_share
 
   name = "${each.key}-share-role"
 }
