@@ -16,6 +16,8 @@ resource "aws_vpc_security_group_egress_rule" "seed_lambda" {
 
   ip_protocol = "-1"
   cidr_ipv4   = "0.0.0.0/0"
+
+  description = "Allow the database seed Lambda outbound access."
 }
 
 resource "aws_vpc_security_group_ingress_rule" "postgres_from_seed_lambda" {

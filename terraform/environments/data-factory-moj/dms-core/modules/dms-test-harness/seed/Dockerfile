@@ -1,3 +1,6 @@
+# checkov:skip=CKV_DOCKER_2:AWS Lambda manages container health; Docker HEALTHCHECK is not used by the Lambda execution model.
+# checkov:skip=CKV_DOCKER_3:AWS Lambda runs functions using its managed least-privileged runtime user.
+
 FROM public.ecr.aws/lambda/python:3.12-arm64
 
 COPY requirements.txt ${LAMBDA_TASK_ROOT}/
