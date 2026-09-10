@@ -28,5 +28,7 @@ module "quicksight" {
   postgres_port                       = module.aurora.rds_cluster_port
   postgres_quicksight_user_secret_arn = module.aurora.rds_quicksight_secret_arn
 
+  disparity_toolkit_secret_arn = aws_secretsmanager_secret.disparity_toolkit.arn
+
   depends_on = [module.aurora, module.redshift]
 }
