@@ -3210,6 +3210,33 @@ data "aws_iam_policy_document" "fms_validation_reporter" {
       "${module.s3-data-bucket.bucket.arn}/fms_validation_audit/*",
     ]
   }
+  statement {
+    sid    = "AllowPublishToAlertsTopic"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [
+      aws_sns_topic.emds_alerts.arn,
+    ]
+  }
+
+  statement {
+    sid    = "AllowUseOfAlertsKmsKey"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+      "kms:GenerateDataKey*",
+    ]
+
+    resources = [
+      aws_kms_key.emds_alerts.arn,
+    ]
+  }
 
   statement {
     sid    = "DiscoverAthenaResultsBucket"
