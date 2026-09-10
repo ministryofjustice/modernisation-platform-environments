@@ -157,10 +157,35 @@ resource "aws_vpc_security_group_ingress_rule" "allow_cp_access" {
   to_port     = 443
 }
 
+resource "aws_security_group" "allow_cp_access_core" {
+  provider    = aws.core-vpc
+  name        = "core_allow_cp_access"
+  description = "allow cp access"
+  vpc_id      = data.aws_vpc.shared.id
+  tags        = local.tags
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_cp_access_core" {
+  provider          = aws.core-vpc
+  security_group_id = aws_security_group.allow_cp_access_core.id
+
+  cidr_ipv4   = "172.20.0.0/16"
+  from_port   = 443
+  ip_protocol = "tcp"
+  to_port     = 443
+}
+
+
 data "aws_network_interface" "execute_api_endpoint_eni" {
   provider = aws.core-vpc
   for_each = toset(data.aws_vpc_endpoint.api_gateway.network_interface_ids)
   id       = each.value
+}
+
+resource "aws_vpc_endpoint_security_group_association" "cp_access" {
+  provider          = aws.core-vpc
+  vpc_endpoint_id   = data.aws_vpc_endpoint.api_gateway.id
+  security_group_id = aws_security_group.allow_cp_access_core.id
 }
 
 resource "aws_route53_record" "private_api" {
