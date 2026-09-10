@@ -34,7 +34,8 @@ module "dms_core" {
 
     database_name = module.dms_test_harness[0].source_database_name
 
-    secrets_manager_arn = module.dms_test_harness[0].dms_source_secret_arn
+    secrets_manager_arn         = module.dms_test_harness[0].dms_source_secret_arn
+    secrets_manager_kms_key_arn = data.aws_kms_key.general_shared.arn
 
     ssl_mode = "require"
   }
