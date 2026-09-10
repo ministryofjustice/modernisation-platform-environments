@@ -45,13 +45,11 @@ resource "aws_security_group" "oia-efs-security-group" {
   }
 
   egress {
-    protocol  = "tcp"
-    from_port = 443
-    to_port   = 443
+    protocol  = "-1"
+    from_port = 0
+    to_port   = 0
     cidr_blocks = [
-      data.aws_subnet.private_subnets_a.cidr_block,
-      data.aws_subnet.private_subnets_b.cidr_block,
-      data.aws_subnet.private_subnets_c.cidr_block,
+      "0.0.0.0/0",
     ]
   }
 
