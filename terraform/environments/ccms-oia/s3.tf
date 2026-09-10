@@ -4,6 +4,8 @@ module "s3_ccms_oia" {
   bucket_name        = "${local.application_name}-${local.environment}"
   versioning_enabled = true
   ownership_controls = "BucketOwnerEnforced"
+  sse_algorithm      = "AES256"
+  custom_kms_key     = ""
 
   log_buckets = {
     log_bucket_name = module.s3-bucket-logging.bucket.id
