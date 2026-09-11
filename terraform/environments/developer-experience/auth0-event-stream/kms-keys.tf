@@ -24,12 +24,22 @@ module "destination_kms_key" {
       sid = "Firehose"
       actions = [
         "kms:Decrypt",
-        "kms:CreateGrant",
         "kms:DescribeKey",
         "kms:Encrypt",
         "kms:GenerateDataKey",
         "kms:ReEncrypt*",
       ]
+      resources = ["*"]
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["firehose.amazonaws.com"]
+        }
+      ]
+    },
+    {
+      sid       = "FirehoseGrant"
+      actions   = ["kms:CreateGrant"]
       resources = ["*"]
       principals = [
         {

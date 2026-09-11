@@ -39,20 +39,12 @@ module "firehose_iam_role" {
     KMSAccess = {
       effect = "Allow"
       actions = [
-        "kms:CreateGrant",
         "kms:Decrypt",
         "kms:DescribeKey",
         "kms:Encrypt",
         "kms:GenerateDataKey",
       ]
       resources = [module.destination_kms_key[0].key_arn]
-      condition = [
-        {
-          test     = "Bool"
-          variable = "kms:GrantIsForAWSResource"
-          values   = ["true"]
-        }
-      ]
     }
     CloudWatchLogsGroupAccess = {
       effect = "Allow"
@@ -96,4 +88,25 @@ module "cross_region_iam_role" {
       resources = [module.destination_eventbridge[0].eventbridge_bus_arn]
     }
   }
+}
+
+data "aws_iam_policy_document" "eventbridge_firehose_kms" {
+  count = local.is-production ? 1 : 0
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+    ]
+    resources = [module.destination_kms_key[0].key_arn]
+  }
+}
+
+resource "aws_iam_role_policy" "eventbridge_firehose_kms" {
+  count = local.is-production ? 1 : 0
+
+  name   = "${local.component_name}-eventbridge-firehose-kms"
+  role   = module.destination_eventbridge[0].eventbridge_role_name
+  policy = data.aws_iam_policy_document.eventbridge_firehose_kms[0].json
 }
