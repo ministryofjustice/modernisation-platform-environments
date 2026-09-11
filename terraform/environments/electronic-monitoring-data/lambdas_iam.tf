@@ -3199,6 +3199,41 @@ data "aws_iam_policy_document" "fms_validation_reporter" {
   }
 
   statement {
+    sid    = "FmsValidationAuditBucketLocationAccess"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetBucketLocation",
+    ]
+
+    resources = [
+      module.s3-metadata-bucket.bucket.arn,
+    ]
+  }
+
+  statement {
+    sid    = "FmsValidationAuditBucketListAccess"
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      module.s3-metadata-bucket.bucket.arn,
+    ]
+
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+
+      values = [
+        "fms_validation_audit/*",
+      ]
+    }
+  }
+
+  statement {
     sid    = "FmsValidationAuditObjectReadAccess"
     effect = "Allow"
 
@@ -3207,9 +3242,23 @@ data "aws_iam_policy_document" "fms_validation_reporter" {
     ]
 
     resources = [
-      "${module.s3-data-bucket.bucket.arn}/fms_validation_audit/*",
+      "${module.s3-metadata-bucket.bucket.arn}/fms_validation_audit/*",
     ]
   }
+
+  statement {
+    sid    = "AllowUseOfMetadataBucketKmsKey"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+    ]
+
+    resources = [
+      module.kms_metadata_key.key_arn,
+    ]
+  }
+
   statement {
     sid    = "AllowPublishToAlertsTopic"
     effect = "Allow"
