@@ -31,7 +31,7 @@ data "aws_iam_policy_document" "ppud_replication_destination_bucket_policy" {
     principals {
       type = "AWS"
       identifiers = [
-        "arn:aws:iam::${local.environment_management.account_ids["ppud-${local.environment}"]}:role/service-role/iam_role_s3_bucket_moj_database_source_dev"
+        "arn:aws:iam::${local.environment_management.account_ids["ppud-${local.environment}"]}:role/service-role/iam_role_s3_bucket_moj_database_source_${local.ppud_replication_environment}"
       ]
     }
   }
