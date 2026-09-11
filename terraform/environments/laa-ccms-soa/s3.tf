@@ -6,7 +6,8 @@ module "s3-bucket-logging" {
   bucket_name        = local.logging_bucket_name
   versioning_enabled = true
   bucket_policy      = [aws_s3_bucket_policy.lb_access_logs.policy]
-  
+  manage_log_bucket_policy = false
+
 
   sse_algorithm  = "AES256"
   custom_kms_key = ""
