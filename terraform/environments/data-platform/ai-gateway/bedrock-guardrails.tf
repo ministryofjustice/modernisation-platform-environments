@@ -16,7 +16,7 @@ resource "aws_bedrock_guardrail" "prompt_attack" {
       type            = "PROMPT_ATTACK"
       input_enabled   = true
       input_action    = "BLOCK"
-      input_strength  = "HIGH"
+      input_strength  = "MEDIUM"
       output_enabled  = false
       output_strength = "NONE"
     }
