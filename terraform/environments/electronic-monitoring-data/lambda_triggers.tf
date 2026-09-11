@@ -526,3 +526,49 @@ resource "aws_lambda_event_source_mapping" "live_feed_incident_events" {
     aws_iam_role_policy_attachment.live_feed_incident_manager_attach,
   ]
 }
+
+#-----------------------------------------------------------------------------------
+# FMS validation reporter schedules
+#-----------------------------------------------------------------------------------
+
+resource "aws_scheduler_schedule" "fms_validation_reporter_primary" {
+  name        = "fms_validation_reporter_0830"
+  description = "Runs the FMS validation reporter daily at 08:30 Europe/London"
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression          = "cron(30 8 * * ? *)"
+  schedule_expression_timezone = "Europe/London"
+
+  target {
+    arn      = module.fms_validation_reporter.lambda_function_arn
+    role_arn = aws_iam_role.fms_validation_reporter_scheduler.arn
+
+    input = jsonencode({
+      run_type = "primary"
+    })
+  }
+}
+
+resource "aws_scheduler_schedule" "fms_validation_reporter_catch_up" {
+  name        = "fms_validation_reporter_0930"
+  description = "Runs the FMS validation reporter daily at 09:30 Europe/London"
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression          = "cron(30 9 * * ? *)"
+  schedule_expression_timezone = "Europe/London"
+
+  target {
+    arn      = module.fms_validation_reporter.lambda_function_arn
+    role_arn = aws_iam_role.fms_validation_reporter_scheduler.arn
+
+    input = jsonencode({
+      run_type = "catch_up"
+    })
+  }
+}
