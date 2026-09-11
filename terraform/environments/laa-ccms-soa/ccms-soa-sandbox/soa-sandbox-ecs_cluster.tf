@@ -137,10 +137,14 @@ resource "aws_ecs_service" "soasandbox-admin" {
   }
 
   lifecycle {
-    ignore_changes = [
-      task_definition
-    ]
+    create_before_destroy = true
   }
+
+  # lifecycle {
+  #   ignore_changes = [
+  #     task_definition
+  #   ]
+  # }
   depends_on = [
     aws_iam_role_policy_attachment.ecs_task_execution_role,
     aws_db_instance.soa_db,
@@ -181,8 +185,7 @@ resource "aws_ecs_task_definition" "soasandbox-managed" {
     {
       app_name              = local.application_data.accounts[local.environment].app_name
       app_image             = local.application_data.accounts[local.environment].managed_app_image
-      db_instance_endpoint  = aws_db_instance.soa_db.endpoint
-      managed_server_port   = local.application_data.accounts[local.environment].managed_ssl_port
+      db_instance_endpoint  = aws_db_instance.soa_db.endpoint  
       managed_ssl_port      = local.application_data.accounts[local.environment].managed_ssl_port
       admin_server_port     = local.application_data.accounts[local.environment].admin_ssl_port
       aws_region            = local.application_data.accounts[local.environment].aws_region
@@ -237,10 +240,14 @@ resource "aws_ecs_service" "soasandbox-managed" {
   }
 
   lifecycle {
-    ignore_changes = [
-      task_definition
-    ]
+    create_before_destroy = true
   }
+
+  # lifecycle {
+  #   ignore_changes = [
+  #     task_definition
+  #   ]
+  # }
 
   depends_on = [
     aws_iam_role_policy_attachment.ecs_task_execution_role,
