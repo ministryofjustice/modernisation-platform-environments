@@ -26,7 +26,7 @@ locals {
     "sun:02:00-sun:05:00" # fallback default
   )
   storage_type        = "gp2"
-  rds_snapshot_name   = "laws3169-mojfin-migration-v1"
+  # rds_snapshot_name   = "laws3169-mojfin-migration-v1"
   deletion_production = local.application_data.accounts[local.environment].deletion_protection
   ca_cert_identifier  = "rds-ca-rsa4096-g1"
 
