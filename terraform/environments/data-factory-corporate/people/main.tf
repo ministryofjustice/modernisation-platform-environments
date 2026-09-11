@@ -85,6 +85,35 @@ module "sherlock_kms_key" {
       ]
     },
     {
+      # CloudTrail publishes notifications to a KMS-encrypted SNS topic, which uses the SNS encryption context rather than the CloudTrail one.
+      sid    = "AllowCloudTrailPublishToEncryptedSns"
+      effect = "Allow"
+
+      actions = [
+        "kms:GenerateDataKey*",
+        "kms:Decrypt"
+      ]
+
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["cloudtrail.amazonaws.com"]
+        }
+      ]
+
+      condition = [
+        {
+          test     = "StringLike"
+          variable = "kms:EncryptionContext:aws:sns:topicArn"
+          values = [
+            "arn:aws:sns:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:*"
+          ]
+        }
+      ]
+    },
+    {
       sid    = "AllowCloudWatchLogsEncrypt"
       effect = "Allow"
 
