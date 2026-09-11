@@ -16,11 +16,7 @@ locals {
   #-----------------------------------------------------------------------------
   amg_host_workspaces = [
     "cloud-platform-live",
-    # cloud-platform-development is temporarily disabled to destroy the existing
-    # Grafana 10.4 dev workspace, which cannot be upgraded in place to 12.4
-    # ("alerting must be enabled before upgrading to v12"). A follow-up change
-    # re-adds it so it is recreated fresh at 12.4 with unified alerting enabled.
-    # "cloud-platform-development",
+    "cloud-platform-development",
   ]
   enable_amg         = contains(local.amg_host_workspaces, terraform.workspace)
   amg_workspace_name = "${terraform.workspace}-observability"
