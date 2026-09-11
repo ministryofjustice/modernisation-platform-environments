@@ -24,7 +24,7 @@ resource "aws_bedrock_guardrail" "prompt_attack" {
 }
 
 resource "aws_bedrock_guardrail_version" "prompt_attack" {
-  description   = "Prompt-attack policy for the AI Gateway"
+  description   = "Prompt-attack policy for the AI Gateway - input strength MEDIUM"
   guardrail_arn = aws_bedrock_guardrail.prompt_attack.guardrail_arn
   skip_destroy  = true
 }
