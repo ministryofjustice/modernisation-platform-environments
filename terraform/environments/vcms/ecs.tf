@@ -1,5 +1,5 @@
 module "ecs" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v6.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v6.0.2"
 
   name = "vcms-${local.environment}-cluster"
 
@@ -7,7 +7,7 @@ module "ecs" {
 }
 
 module "ecs_service" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v6.0.0"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v6.0.2"
 
   container_definitions = module.container_definition.json_encoded_list
   cluster_arn           = module.ecs.ecs_cluster_arn
@@ -62,7 +62,7 @@ module "ecs_service" {
 
 
 module "container_definition" {
-  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=v6.0.0"
+  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=v6.0.2"
   name                     = "vcms"
   image                    = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/vcms:${local.app_config.image_tag}"
   memory                   = 512
