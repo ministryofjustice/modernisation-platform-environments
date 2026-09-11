@@ -9,3 +9,11 @@ data "aws_secretsmanager_secret_version" "ppud_slack_webhook" {
 
   secret_id = data.aws_secretsmanager_secret.ppud_slack_webhook[0].id
 }
+
+data "aws_iam_session_context" "current" {
+  arn = data.aws_caller_identity.current.arn
+}
+
+data "aws_iam_roles" "data_engineering_roles" {
+  name_regex = "AWSReservedSSO_modernisation-platform-data-eng.*"
+}
