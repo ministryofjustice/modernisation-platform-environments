@@ -41,7 +41,7 @@ data "aws_iam_policy_document" "app_deploy" {
 
 module "app_deploy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role"
-  version = "6.8.0"
+  version = "6.8.1"
 
   name            = "${local.resource_name_prefix}-app-deploy"
   use_name_prefix = false
