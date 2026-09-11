@@ -3,7 +3,7 @@ locals {
   application_name = "digital-prison-reporting"
   component_name   = "ppud-pipeline"
   short_name       = "ppud"
-  project = "dpr"
+
   
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
