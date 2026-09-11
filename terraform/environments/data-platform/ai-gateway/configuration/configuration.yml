@@ -10,6 +10,7 @@ teams:
     models: ["no-default-models"]
     unified_access_groups:
       - generally-available-models
+      - gemini-gemini-3-5-transcribe-preview
   justice-engineering-ai-enablement:
     alias: Justice Engineering AI Enablement
     organisation: ministryofjustice
@@ -434,6 +435,13 @@ models:
       model_family: "Google Gemini"
       model_name: "Google Gemini 3.5 Flash"
       location: "europe-west2"
+      generally_available: false
+      environments_available: ["development", "production"]
+    gemini-3-5-transcribe-preview:
+      model_id: "gemini-3.5-transcribe-preview"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 3.5 Transcribe Preview"
+      location: "global"
       generally_available: false
       environments_available: ["development", "production"]
     gemini-3-6-flash:
