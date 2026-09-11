@@ -102,7 +102,8 @@ def create_user(user, region):
                 'Firstname': user['firstname'],
                 'Lastname': user['lastname'],
                 'Email': user['email'],
-                'WorkspaceType': user.get('workspace_type', 'standard')
+                'WorkspaceType': user.get('workspace_type', 'standard'),
+                'encrypted': user.get('encrypted', True)
             })
         )
         print(f"Dispatched creation for {username} — check user-creation Lambda logs for result")
