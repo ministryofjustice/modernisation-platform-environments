@@ -1,5 +1,5 @@
 module "bws_sso_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.2.2"
 
   count = var.bws_sso_config != null ? var.bws_sso_config.instance_count : 0
 
