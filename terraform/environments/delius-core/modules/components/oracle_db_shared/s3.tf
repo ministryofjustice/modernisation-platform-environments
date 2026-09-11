@@ -464,7 +464,7 @@ module "s3_bucket_oracle_rat_capture" {
   #checkov:skip=CKV_TF_1 "ignore"
   count = var.deploy_oracle_rat ? 1 : 0
 
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v11.1.1"
   bucket_name         = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-rat-capture"
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
