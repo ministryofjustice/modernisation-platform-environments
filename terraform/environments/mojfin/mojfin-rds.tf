@@ -91,7 +91,7 @@ resource "aws_db_instance" "appdb1" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}" },
+    { "Name" = local.application_name },
     { "Keep" = "true" }
   )
 }
