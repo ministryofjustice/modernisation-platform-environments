@@ -48,7 +48,7 @@ resource "aws_cloudtrail" "sherlock" {
   sns_topic_name = aws_sns_topic.cloudtrail.name
 
   cloud_watch_logs_group_arn = "${aws_cloudwatch_log_group.cloudtrail.arn}:*"
-  cloud_watch_logs_role_arn = aws_iam_role.cloudtrail_logs.arn
+  cloud_watch_logs_role_arn  = aws_iam_role.cloudtrail_logs.arn
 
   is_multi_region_trail         = true
   include_global_service_events = true

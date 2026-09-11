@@ -107,12 +107,6 @@ data "aws_iam_policy_document" "cloudtrail_sns_publish" {
     actions = ["sns:Publish"]
 
     resources = [aws_sns_topic.cloudtrail.arn]
-
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceArn"
-      values   = [aws_cloudtrail.sherlock.arn]
-    }
   }
 }
 
