@@ -968,6 +968,7 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
       "${module.s3-athena-bucket.bucket.arn}/output/*",
       "${module.s3-athena-bucket.bucket.arn}/*",
       "${module.s3-raw-formatted-data-bucket.bucket.arn}/serco/fms/validation_rejected/*",
+      "${module.s3-metadata-bucket.bucket.arn}/schemas/serco/fms/*",
 
     ]
   }
@@ -993,7 +994,8 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
     ]
     resources = [
       module.s3-raw-formatted-data-bucket.bucket.arn,
-      module.s3-create-a-derived-table-bucket.bucket.arn
+      module.s3-create-a-derived-table-bucket.bucket.arn,
+      module.s3-metadata-bucket.bucket.arn
     ]
   }
   statement {
