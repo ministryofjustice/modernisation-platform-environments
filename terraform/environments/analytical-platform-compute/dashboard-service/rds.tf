@@ -6,7 +6,7 @@ module "dashboard_service_rds" {
   count = terraform.workspace == "analytical-platform-compute-test" ? 0 : 1
 
   source  = "terraform-aws-modules/rds/aws"
-  version = "6.12.0"
+  version = "7.2.1"
 
   identifier = "dashboard-service"
 
