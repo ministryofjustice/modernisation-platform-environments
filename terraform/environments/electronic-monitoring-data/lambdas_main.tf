@@ -1186,7 +1186,7 @@ locals {
 
 module "live_feed_github_app" {
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.1.0"
 
   name = "live-feed-github-app-${local.environment_shorthand}"
 
