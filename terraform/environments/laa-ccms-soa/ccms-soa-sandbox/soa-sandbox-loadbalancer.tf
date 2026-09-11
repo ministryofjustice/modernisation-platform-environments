@@ -74,16 +74,16 @@ resource "aws_lb_listener" "admin_ssl_port" {
 }
 
 #Temporary purpose for testing. It should be removed once the testing is done. 
-resource "aws_lb_listener" "admin80" {
-  load_balancer_arn = aws_lb.admin.id
-  port              = 80 #--Don't know why HTTP is being listened, is this a redirect? Why? - Revist. AW
-  protocol          = "TCP"
+# resource "aws_lb_listener" "admin80" {
+#   load_balancer_arn = aws_lb.admin.id
+#   port              = 80 #--Don't know why HTTP is being listened, is this a redirect? Why? - Revist. AW
+#   protocol          = "TCP"
 
-  default_action {
-    target_group_arn = aws_lb_target_group.admin_https.id
-    type             = "forward"
-  }
-}
+#   default_action {
+#     target_group_arn = aws_lb_target_group.admin_https.id
+#     type             = "forward"
+#   }
+# }
 
 
 #--Managed
@@ -159,14 +159,14 @@ resource "aws_lb_listener" "managed_ssl_port" {
   }
 }
 
-#Temporary purpose for testing. It should be removed once the testing is done.
-resource "aws_lb_listener" "managed80" {
-  load_balancer_arn = aws_lb.managed.id
-  port              = 80 #--Don't know why HTTP is being listened, is this a redirect? Why? - Revist. AW
-  protocol          = "TCP"
+# #Temporary purpose for testing. It should be removed once the testing is done.
+# resource "aws_lb_listener" "managed80" {
+#   load_balancer_arn = aws_lb.managed.id
+#   port              = 80 #--Don't know why HTTP is being listened, is this a redirect? Why? - Revist. AW
+#   protocol          = "TCP"
 
-  default_action {
-    target_group_arn = aws_lb_target_group.managed_https.id
-    type             = "forward"
-  }
-}
+#   default_action {
+#     target_group_arn = aws_lb_target_group.managed_https.id
+#     type             = "forward"
+#   }
+# }
