@@ -44,7 +44,7 @@ module "dms_core" {
     endpoint_id = "${local.application_name}-${local.environment}-${local.component_name}-target"
     bucket_name = module.dms_test_harness[0].target_bucket_name
 
-    bucket_folder = "integration-test"
+    bucket_folder = "integration-test-full-load-cdc"
 
     compression_type = "GZIP"
     data_format      = "parquet"
@@ -54,9 +54,9 @@ module "dms_core" {
   }
 
   replication_tasks = {
-    full_load = {
-      replication_task_id = "${local.application_name}-${local.environment}-${local.component_name}-full-load"
-      migration_type      = "full-load"
+    full_load_and_cdc = {
+      replication_task_id = "${local.application_name}-${local.environment}-${local.component_name}-full-load-and-cdc"
+      migration_type      = "full-load-and-cdc"
 
       table_mappings = jsonencode({
         rules = [
