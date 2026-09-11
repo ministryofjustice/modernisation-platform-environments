@@ -10,7 +10,6 @@ teams:
     models: ["no-default-models"]
     unified_access_groups:
       - generally-available-models
-      - gemini-gemini-3-5-transcribe-preview
   justice-engineering-ai-enablement:
     alias: Justice Engineering AI Enablement
     organisation: ministryofjustice
