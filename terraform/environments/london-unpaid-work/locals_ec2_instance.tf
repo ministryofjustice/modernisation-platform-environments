@@ -14,7 +14,7 @@ locals {
       ami                          = data.aws_ssm_parameter.amazon_linux_2023_ami.value
       disable_api_termination      = false
       instance_type                = "t2.small"
-      key_name                     = "ec2-user"
+      key_name                     = null
       metadata_options_http_tokens = "required"
       vpc_security_group_ids       = ["ec2-linux"]
   }
