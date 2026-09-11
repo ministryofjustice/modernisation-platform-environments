@@ -3,7 +3,7 @@
 module "alb" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/alb/aws"
-  version = "9.9.0"
+  version = "10.5.1"
 
   name               = "${var.alb_name}-${local.alb_suffix}"
   internal           = var.internal
@@ -29,7 +29,7 @@ module "alb" {
 module "log_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.1.2"
+  version = "5.15.4"
 
   bucket = "${var.project_name}-${var.environment}-${var.alb_name}-${local.alb_suffix}-logs"
   acl    = "log-delivery-write"
@@ -61,7 +61,7 @@ module "log_bucket" {
 module "alb_sg" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.1.2"
+  version = "6.0.0"
 
   name        = "${var.alb_name}-${local.alb_suffix}-lb-security-group"
   description = "ALB security group"
