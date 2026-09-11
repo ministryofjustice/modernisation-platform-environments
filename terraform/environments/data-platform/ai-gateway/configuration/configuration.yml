@@ -436,6 +436,13 @@ models:
       location: "europe-west2"
       generally_available: false
       environments_available: ["development", "production"]
+    gemini-3-5-transcribe-preview:
+      model_id: "gemini-3.5-transcribe-preview"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 3.5 Transcribe Preview"
+      location: "global"
+      generally_available: false
+      environments_available: ["development", "production"]
     gemini-3-6-flash:
       model_id: "gemini-3.6-flash"
       model_family: "Google Gemini"
