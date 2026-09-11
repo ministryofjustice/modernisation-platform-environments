@@ -1,5 +1,5 @@
 module "vcms_bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v11.1.1"
 
   bucket_prefix      = "${local.application_name}-${local.environment}-"
   versioning_enabled = true
@@ -47,7 +47,7 @@ module "vcms_bucket" {
 }
 
 module "vcms_testing_reports_bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v11.1.1"
 
   bucket_prefix      = "${local.application_name}-${local.environment}-testing-reports-"
   versioning_enabled = true
