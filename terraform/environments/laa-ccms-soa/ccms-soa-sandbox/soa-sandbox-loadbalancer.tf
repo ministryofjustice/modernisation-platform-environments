@@ -80,7 +80,7 @@ resource "aws_lb_listener" "admin80" {
   protocol          = "TCP"
 
   default_action {
-    target_group_arn = aws_lb_target_group.admin.id
+    target_group_arn = aws_lb_target_group.admin_https.id
     type             = "forward"
   }
 }
@@ -166,7 +166,7 @@ resource "aws_lb_listener" "managed80" {
   protocol          = "TCP"
 
   default_action {
-    target_group_arn = aws_lb_target_group.managed.id
+    target_group_arn = aws_lb_target_group.managed_https.id
     type             = "forward"
   }
 }
