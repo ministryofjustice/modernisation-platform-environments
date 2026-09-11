@@ -132,6 +132,15 @@ resource "aws_grafana_workspace" "this" {
   role_arn                 = aws_iam_role.amg[0].arn
   grafana_version          = "12.4"
 
+  # Grafana-managed (unified) alerting must be enabled before AMG will accept an
+  # upgrade to Grafana v12 (otherwise UpdateWorkspaceConfiguration returns
+  # "Grafana alerting must be enabled before upgrading to v12").
+  configuration = jsonencode({
+    unifiedAlerting = {
+      enabled = true
+    }
+  })
+
   data_sources = [
     "PROMETHEUS",
     "CLOUDWATCH",
