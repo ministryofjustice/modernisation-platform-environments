@@ -31,7 +31,7 @@ module "s3_bucket" {
 
   for_each = var.s3_buckets
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.1"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v11.1.1"
 
   providers = {
     aws.bucket-replication = aws
