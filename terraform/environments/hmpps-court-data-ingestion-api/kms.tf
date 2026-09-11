@@ -1,6 +1,6 @@
 module "secrets_kms" {
   source  = "terraform-aws-modules/kms/aws"
-  version = "4.2.0"
+  version = "4.2.1"
 
   aliases                 = ["${local.application_name}-secrets"]
   description             = "KMS key for ${local.application_name} secrets"

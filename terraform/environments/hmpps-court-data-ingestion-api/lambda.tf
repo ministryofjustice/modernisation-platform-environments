@@ -7,7 +7,7 @@ data "archive_file" "lambda_zip" {
 
 module "authorizer_lambda" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "8.5.0"
+  version = "8.8.0"
 
   function_name = "hmac-authorizer"
   description   = "Custom HMAC authorizer and method handler for API Gateway"
