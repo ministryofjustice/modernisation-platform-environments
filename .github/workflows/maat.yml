@@ -25,6 +25,11 @@ on:
         options:
           - deploy
           - destroy
+      do_state_refresh_on_plan:
+        description: 'Run terraform apply -refresh-only before plan'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   id-token: write  # This is required for requesting the JWT
@@ -48,6 +53,7 @@ jobs:
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
+      do_state_refresh_on_plan: "${{ inputs.do_state_refresh_on_plan }}"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
