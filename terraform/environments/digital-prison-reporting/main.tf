@@ -490,6 +490,11 @@ module "s3_glue_job_bucket" {
 }
 
 # S3 Raw Archive
+# Superseded by the Versioned Raw Archive bucket and will be decommissioned in the future.
+# See epic DHS-693 and associated solution design document.
+# This bucket is retained for the duration of the migration to the Versioned Raw Archive bucket.
+# Once all data is migrated to the Versioned Raw Archive bucket, and AP give the go ahead, then
+# this bucket can be deleted.
 module "s3_raw_archive_bucket" {
   source                    = "./modules/s3_bucket"
   create_s3                 = local.setup_buckets
@@ -504,6 +509,29 @@ module "s3_raw_archive_bucket" {
       dpr-name          = "${local.project}-raw-archive-${local.env}"
       dpr-resource-type = "S3 Bucket"
       dpr-jira          = "DPR2-209"
+    }
+  )
+}
+
+# S3 Versioned Raw Archive
+# Versioning was introduced to the Raw Archive, which required the old Raw archive
+# data to be migrated to this new Versioned Raw Archive bucket.
+# Once all data is migrated this will be the canonical Raw Archive.
+# See epic DHS-693 and associated solution design document.
+module "s3_raw_archive_versioned_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-raw-archive-versioned-${local.env}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      dpr-name          = "${local.project}-raw-archive-versioned-${local.env}"
+      dpr-resource-type = "S3 Bucket"
+      dpr-jira          = "DHS-833"
     }
   )
 }
@@ -1076,6 +1104,35 @@ module "dynamo_table_step_functions_token" {
       dpr-name          = "${local.project}-step-functions-${local.environment}"
       dpr-resource-type = "Dynamo Table"
       dpr-jira          = "DPR2-209"
+    }
+  )
+}
+
+# Dynamo table for Ingestion pipeline versions
+# An ingestion version is a run of the ingestion pipeline.
+# The table is keyed by the ingestion_domain.
+module "dynamo_table_ingestion_pipeline_versions" {
+  source              = "./modules/dynamo_tables"
+  create_table        = true
+  autoscaling_enabled = false
+  name                = "${local.project}-ingestion-pipeline-versions-${local.environment}"
+
+  hash_key    = "ingestion_domain"
+  table_class = "STANDARD"
+
+  attributes = [
+    {
+      name = "ingestion_domain"
+      type = "S"
+    }
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      dpr-name          = "${local.project}-ingestion-pipeline-versions-${local.environment}"
+      dpr-resource-type = "Dynamo Table"
+      dpr-jira          = "DHS-833"
     }
   )
 }
