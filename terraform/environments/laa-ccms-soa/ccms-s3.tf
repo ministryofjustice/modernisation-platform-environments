@@ -2,7 +2,7 @@
 # S3 Bucket - CCMS SOA Shared
 ############################
 module "s3-bucket-shared" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e"
 
   bucket_name        = "${local.application_name}-${local.environment}-shared"
   versioning_enabled = true
