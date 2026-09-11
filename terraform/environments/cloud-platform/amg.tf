@@ -130,7 +130,7 @@ resource "aws_grafana_workspace" "this" {
   authentication_providers = ["AWS_SSO"]
   permission_type          = "SERVICE_MANAGED"
   role_arn                 = aws_iam_role.amg[0].arn
-  grafana_version          = "10.4"
+  grafana_version          = "12.4"
 
   data_sources = [
     "PROMETHEUS",
@@ -148,21 +148,26 @@ resource "aws_grafana_workspace" "this" {
 # AMG workspace role association — platform engineers get ADMIN
 #------------------------------------------------------------------------------
 
-# The cloud-platform-engineers IDC group ID is hardcoded because the
-# ModernisationPlatformSSOReadOnly role returns ResourceNotFoundException when
-# calling GetGroupId despite having identitystore:Get*. This mirrors the same
-# workaround used for ArgoCD RBAC in cluster/locals.tf.
+# IDC group IDs are hardcoded because the ModernisationPlatformSSOReadOnly role
+# returns ResourceNotFoundException when calling GetGroupId despite having
+# identitystore:Get*. This mirrors the same workaround (and the same two groups)
+# used for ArgoCD RBAC in cluster/locals.tf.
 # TODO: switch back to a data.aws_identitystore_group lookup once the read role
 # permissions are fixed.
 locals {
   cloud_platform_engineers_group_id = "664252b4-7021-701e-49b9-6c46ccc7899e"
+  # AWS ProServe team building the platform; needs AMG access to inspect dashboards.
+  container_platform_aws_group_id = "7682a204-00f1-7031-257e-713bb28289c6"
 }
 
 resource "aws_grafana_role_association" "platform_admin" {
   count = local.enable_amg ? 1 : 0
 
-  role         = "ADMIN"
-  group_ids    = [local.cloud_platform_engineers_group_id]
+  role = "ADMIN"
+  group_ids = [
+    local.cloud_platform_engineers_group_id,
+    local.container_platform_aws_group_id,
+  ]
   workspace_id = aws_grafana_workspace.this[0].id
 }
 
