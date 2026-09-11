@@ -6,6 +6,8 @@ locals {
   }
 
   baseline_development = {
+    ec2_instances = local.ec2_instances
+    
     lbs = {
       api-alb = local.lbs.api-alb,
       web-alb = local.lbs.web-alb
