@@ -73,23 +73,25 @@ resource "aws_lambda_function" "waf_maintenance" {
 }
 
 # EventBridge schedule to trigger Lambda
-resource "aws_scheduler_schedule" "waf_allow_schedule" {
-  name       = "waf-allow-schedule"
-  group_name = "default"
-
-  schedule_expression_timezone = "Europe/London"
-  flexible_time_window {
-    mode = "OFF"
-  }
-
-  schedule_expression = "cron(00 07 ? * MON-SUN *)"
-
-  target {
-    arn      = aws_lambda_function.waf_maintenance.arn
-    input    = jsonencode({ mode = "ALLOW" })
-    role_arn = aws_iam_role.scheduler_invoke_lambda_role.arn
-  }
-}
+# Temporarily disabled from 2026-09-11: do not let the WAF re-open at 7am
+# over the weekend/Monday. Re-enable (uncomment) once ready to resume, review manually.
+# resource "aws_scheduler_schedule" "waf_allow_schedule" {
+#   name       = "waf-allow-schedule"
+#   group_name = "default"
+#
+#   schedule_expression_timezone = "Europe/London"
+#   flexible_time_window {
+#     mode = "OFF"
+#   }
+#
+#   schedule_expression = "cron(00 07 ? * MON-SUN *)"
+#
+#   target {
+#     arn      = aws_lambda_function.waf_maintenance.arn
+#     input    = jsonencode({ mode = "ALLOW" })
+#     role_arn = aws_iam_role.scheduler_invoke_lambda_role.arn
+#   }
+# }
 
 resource "aws_scheduler_schedule" "waf_block_schedule" {
   name       = "waf-block-schedule"
