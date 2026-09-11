@@ -7,8 +7,6 @@ module "s3-bucket-logging" {
   versioning_enabled = true
   bucket_policy      = [aws_s3_bucket_policy.lb_access_logs.policy]
 
-  log_bucket     = local.logging_bucket_name
-  log_prefix     = "s3access/${local.logging_bucket_name}"
   sse_algorithm  = "AES256"
   custom_kms_key = ""
   # Refer to the below section "Replication" before enabling replication
@@ -119,6 +117,20 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
           }
         }
+      },
+      {
+        Sid    = "AllowS3Logging Shared Bucket"
+        Effect = "Allow"
+        Principal = {
+          Service = "logging.s3.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "${module.s3-bucket-logging.bucket.arn}/*"
+        Condition = {
+          ArnLike = {
+           "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
+          }
+       }
       }
     ]
   })
