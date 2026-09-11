@@ -79,7 +79,7 @@ module "pagerduty_core_alerts" {
   depends_on = [
     aws_sns_topic.cdpt_chaps_ddos_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
   sns_topics                = [aws_sns_topic.cdpt_chaps_ddos_alarm.name]
   pagerduty_integration_key = local.pagerduty_integration_keys["ddos_cloudwatch"]
 }
