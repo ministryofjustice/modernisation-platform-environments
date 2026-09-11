@@ -130,3 +130,4 @@ def lambda_handler(event, _context):
             extra={"source_event_id": source_event_id},
         )
         raise
+    
