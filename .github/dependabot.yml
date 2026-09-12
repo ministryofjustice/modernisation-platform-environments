@@ -502,6 +502,7 @@ updates:
     directories:
       - "terraform/environments/data-factory-moj"
       - "terraform/environments/data-factory-moj/dms-core"
+      - "terraform/environments/data-factory-moj/dms-core/modules/dms-test-harness"
       - "terraform/environments/data-factory-moj/streaming-poc"
       - "terraform/environments/data-factory-moj/streaming-poc-devops"
       - "terraform/environments/data-factory-moj/streaming-poc-maf"
