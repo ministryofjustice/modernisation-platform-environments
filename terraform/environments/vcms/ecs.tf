@@ -109,7 +109,7 @@ module "container_definition" {
     },
     {
       name  = "DIR_DOCUMENTS"
-      value = "/mnt/vcmsdocs"
+      value = "/mnt/s3fs"
     }
   ]
 
@@ -130,7 +130,7 @@ module "container_definition" {
   mount_points = [
     {
       sourceVolume  = "vcms"
-      containerPath = "/mnt/vcmsdocs"
+      containerPath = "/mnt/s3fs"
       readOnly      = false
     }
   ]
