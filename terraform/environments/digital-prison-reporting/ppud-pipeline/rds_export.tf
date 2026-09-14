@@ -69,7 +69,7 @@ module "ppud_rds_export" {
   kms_key_arn                    = module.ppud_kms[0].key_arn
   master_user_secret_id          = module.ppud_rds_export_secret[0].secret_id
   environment                    = local.environment
-  output_parquet_file_size       = 50
+  output_parquet_file_size       = local.application_data.accounts[local.environment].rds_output_parquest_file_size
   db_name                        = "${local.short_name}_${local.short_name_environment}"
   get_views                      = true
   bucket_namespace               = "account-regional"
