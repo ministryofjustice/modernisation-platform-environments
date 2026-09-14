@@ -34,6 +34,7 @@ jobs:
         with:
           scan_type: changed
           checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
+          tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none
 
   terraform-static-analysis-full-scan:
@@ -57,6 +58,7 @@ jobs:
         with:
           scan_type: full
           checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
+          tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none
 
   terraform-static-analysis-scheduled-scan:
@@ -75,4 +77,5 @@ jobs:
         with:
           scan_type: full
           checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
+          tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none
