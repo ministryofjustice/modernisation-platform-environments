@@ -9,6 +9,11 @@ variable "bucket_prefix" {
   type        = string
 }
 
+variable "cloudtrail_name" {
+  description = "Name of the CloudTrail trail."
+  type        = string
+}
+
 variable "kms_key_arn" {
   description = "ARN of the KMS key used for the logging bucket and CloudTrail encryption."
   type        = string

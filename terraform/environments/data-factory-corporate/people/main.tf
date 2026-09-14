@@ -1,9 +1,8 @@
 #split out
 locals {
-  aliases      = ["sherlock-landing"]
+  aliases     = ["sherlock-landing"]
   application = "data-factory-corporate"
-  cloudtrail_name = "sherlock"
-  cloudtrail_arn  = "arn:aws:cloudtrail:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:trail/${local.cloudtrail_name}"
+  component   = "people"
 }
 
 resource "aws_secretsmanager_secret" "external_account" {
@@ -15,136 +14,28 @@ resource "aws_secretsmanager_secret" "external_account" {
   tags = {
     Environment    = terraform.workspace
     Application    = local.application
-    Component      = "people"
+    Component      = local.component
     Infrastructure = "sherlock-secret-id"
   }
 }
 
 
 module "sherlock_kms_key" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git//?ref=496d8bd559afebb43b78af0034ec74d8b32378ca"
+  source = "./modules/kms-key"
 
-  aliases = ["sherlock-landing"]
+  alias           = "sherlock-landing"
+  cloudtrail_name = "sherlock-cloudtrail"
 
-  key_statements = [
-    {
-      sid    = "AllowCloudTrailEncryptLogs"
-      effect = "Allow"
+  providers = {
+    aws = aws
+  }
 
-      actions = [
-        "kms:GenerateDataKey*"
-      ]
-
-      resources = ["*"]
-
-      principals = [
-        {
-          type        = "Service"
-          identifiers = ["cloudtrail.amazonaws.com"]
-        }
-      ]
-
-      condition = [
-        {
-          test     = "StringEquals"
-          variable = "aws:SourceArn"
-          values   = [local.cloudtrail_arn]
-        },
-        {
-          test     = "StringLike"
-          variable = "kms:EncryptionContext:aws:cloudtrail:arn"
-          values = [
-            "arn:aws:cloudtrail:*:${data.aws_caller_identity.current.account_id}:trail/*"
-          ]
-        }
-      ]
-    },
-    {
-      sid    = "AllowCloudTrailDescribeKey"
-      effect = "Allow"
-
-      actions = [
-        "kms:DescribeKey"
-      ]
-
-      resources = ["*"]
-
-      principals = [
-        {
-          type        = "Service"
-          identifiers = ["cloudtrail.amazonaws.com"]
-        }
-      ]
-
-      condition = [
-        {
-          test     = "StringEquals"
-          variable = "aws:SourceArn"
-          values   = [local.cloudtrail_arn]
-        }
-      ]
-    },
-    {
-      # CloudTrail publishes notifications to a KMS-encrypted SNS topic, which uses the SNS encryption context rather than the CloudTrail one.
-      sid    = "AllowCloudTrailPublishToEncryptedSns"
-      effect = "Allow"
-
-      actions = [
-        "kms:GenerateDataKey*",
-        "kms:Decrypt"
-      ]
-
-      resources = ["*"]
-
-      principals = [
-        {
-          type        = "Service"
-          identifiers = ["cloudtrail.amazonaws.com"]
-        }
-      ]
-
-      condition = [
-        {
-          test     = "StringLike"
-          variable = "kms:EncryptionContext:aws:sns:topicArn"
-          values = [
-            "arn:aws:sns:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:*"
-          ]
-        }
-      ]
-    },
-    {
-      sid    = "AllowCloudWatchLogsEncrypt"
-      effect = "Allow"
-
-      actions = [
-        "kms:Encrypt",
-        "kms:Decrypt",
-        "kms:ReEncrypt*",
-        "kms:GenerateDataKey*",
-        "kms:DescribeKey"
-      ]
-
-      resources = ["*"]
-
-      principals = [
-        {
-          type        = "Service"
-          identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"]
-        }
-      ]
-
-      condition = [
-        {
-          test     = "ArnLike"
-          variable = "kms:EncryptionContext:aws:logs:arn"
-          values = [
-            "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:*"
-          ]
-        }
-      ]
-    }
-  ]
+  tags = {
+    Environment    = terraform.workspace
+    Application    = local.application
+    Component      = local.component
+    Infrastructure = "sherlock-kms-key"
+  }
 }
 
 data "aws_secretsmanager_secret" "external_account_id" {
@@ -189,8 +80,8 @@ module "sherlock_landing_bucket_mp" {
 
   tags = {
     Environment    = terraform.workspace
-    Application    = "data-factory-corporate"
-    Component      = "people"
+    Application    = local.application
+    Component      = local.component
     Infrastructure = "sherlock-landing-bucket-test"
   }
 }
@@ -225,8 +116,8 @@ module "sherlock_quarantine_bucket" {
 
   tags = {
     Environment    = terraform.workspace
-    Application    = "data-factory-corporate"
-    Component      = "people"
+    Application    = local.application
+    Component      = local.component
     Infrastructure = "sherlock-quarantine-bucket-test"
   }
 }
@@ -234,8 +125,9 @@ module "sherlock_quarantine_bucket" {
 module "sherlock_logging_bucket_cloudtrail" {
   source = "./modules/logging-bucket-cloudtrail"
 
-  bucket_prefix = "logging-sherlock-test-mp"
-  kms_key_arn   = module.sherlock_kms_key.key_arn
+  bucket_prefix                    = "logging-sherlock-test-mp"
+  cloudtrail_name                  = "sherlock-cloudtrail"
+  kms_key_arn                      = module.sherlock_kms_key.key_arn
   cloudwatch_log_retention_in_days = 365
 
   providers = {
@@ -244,8 +136,8 @@ module "sherlock_logging_bucket_cloudtrail" {
 
   tags = {
     Environment    = terraform.workspace
-    Application    = "data-factory-corporate"
-    Component      = "people"
+    Application    = local.application
+    Component      = local.component
     Infrastructure = "sherlock-logging-bucket-test"
   }
 }
@@ -329,8 +221,8 @@ module "data_factory_guardduty_eventbridge" {
 
   tags = {
     Environment    = terraform.workspace
-    Application    = "data-factory-corporate"
-    Component      = "people"
+    Application    = local.application
+    Component      = local.component
     Infrastructure = "sherlock-eventbridge-rule"
   }
 }
@@ -352,8 +244,8 @@ module "data_factory_guardduty_scan" {
 
   tags = {
     Environment    = terraform.workspace
-    Application    = "data-factory-corporate"
-    Component      = "people"
+    Application    = local.application
+    Component      = local.component
     Infrastructure = "sherlock-guardduty-malware-scan"
   }
   }
@@ -368,11 +260,12 @@ module "data_factory_guardduty_lambda" {
 
     lambda_kms_key_arn = module.sherlock_kms_key.key_arn
 
-    tags = {
-        Project     = "Avature"
-        Owner       = "CorporateDataEngineering"
-        Environment = terraform.workspace
-        }
+  tags = {
+    Environment    = terraform.workspace
+    Application    = local.application
+    Component      = local.component
+    Infrastructure = "sherlock-guardduty-malware-scan"
+  }
 
     quarantine_statuses = ["THREATS_FOUND", "FAILED", "ACCESS_DENIED", "UNSUPPORTED", "NO_THREATS_FOUND"]
 
