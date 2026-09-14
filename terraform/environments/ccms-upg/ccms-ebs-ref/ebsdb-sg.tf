@@ -44,14 +44,6 @@ resource "aws_vpc_security_group_egress_rule" "ebsdb_to_apps_fndfs" {
   referenced_security_group_id = aws_security_group.ebsapps.id
 }
 
-resource "aws_vpc_security_group_ingress_rule" "ebsdb_ssh" {
-  security_group_id = aws_security_group.ebsdb.id
-  description       = "SSH from the shared VPC"
-  ip_protocol       = "tcp"
-  from_port         = 22
-  to_port           = 22
-  cidr_ipv4         = data.aws_vpc.shared.cidr_block
-}
 
 resource "aws_vpc_security_group_ingress_rule" "ebsdb_ssh_workspace" {
   security_group_id = aws_security_group.ebsdb.id
