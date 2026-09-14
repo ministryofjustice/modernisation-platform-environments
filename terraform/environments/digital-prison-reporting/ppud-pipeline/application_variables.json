@@ -3,6 +3,7 @@
     "development": {
       "days_back": "3",
       "cron_schedule": "cron(30 07 ? * MON *)",
+      "rds_output_parquest_file_size": 50,
       "source_bucket_role_name": "ppud-parquet-exports-batch-copy-dev-role",
       "short_name_environment": "dev",
       "ppud_replication_environment": "dev",
@@ -29,6 +30,7 @@
     "preproduction": {
       "days_back": "1",
       "cron_schedule": "cron(30 07 ? * TUE *)",
+      "rds_output_parquest_file_size": 200,
       "source_bucket_role_name": "ppud-parquet-exports-batch-copy-preprod-role",
       "short_name_environment": "preprod",
       "ppud_replication_environment": "uat"
@@ -36,6 +38,7 @@
     "production": {
       "days_back": "1",
       "cron_schedule": "cron(30 07 * * ? *)",
+      "rds_output_parquest_file_size": 200,
       "source_bucket_role_name": "ppud-parquet-exports-batch-copy-prod-role",
       "short_name_environment": "prod",
       "ppud_replication_environment": "prod"
