@@ -38,7 +38,7 @@ locals {
 
     web = {
       config = {
-        ami_name                  = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
+        ami_name                  = "hmpps_windows_server_2022_release_2025-*"
         availability_zone         = "eu-west-2a"
         iam_resource_names_prefix = "ec2-weblogic"
         instance_profile_policies = [
