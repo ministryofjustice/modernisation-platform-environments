@@ -8,8 +8,8 @@ locals {
     dev     = { day = "TUESDAY", time = "22:00" }
     poc     = { day = "MONDAY", time = "20:00" }
     test    = { day = "TUESDAY", time = "22:00" }
-    stage   = { day = "TUESDAY", time = "22:00" }
-    preprod = { day = "TUESDAY", time = "22:00" }
+    stage   = { day = "THURSDAY", time = "22:00" }
+    preprod = { day = "FRIDAY", time = "22:00" }
   }
 
   # Debug logging control per environment
