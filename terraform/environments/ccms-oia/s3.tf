@@ -1,5 +1,5 @@
 module "s3_ccms_oia" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v11.2.0"
 
   bucket_name        = "${local.application_name}-${local.environment}"
   versioning_enabled = true
