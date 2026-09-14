@@ -28,13 +28,12 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run Analysis
-        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@0767d5d19359746b0bf28b741eb12a8c407fcac3 # v6.2.5
+        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@546a44ac51da84f1e5c3cf0ff004d85c4326928b # v6.2.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           scan_type: changed
           checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
-          tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none
 
   terraform-static-analysis-full-scan:
@@ -52,13 +51,12 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run Analysis
-        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@0767d5d19359746b0bf28b741eb12a8c407fcac3 # v6.2.5
+        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@546a44ac51da84f1e5c3cf0ff004d85c4326928b # v6.2.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           scan_type: full
           checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
-          tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none
 
   terraform-static-analysis-scheduled-scan:
@@ -71,11 +69,10 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run Analysis
-        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@0767d5d19359746b0bf28b741eb12a8c407fcac3 # v6.2.5
+        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@546a44ac51da84f1e5c3cf0ff004d85c4326928b # v6.2.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           scan_type: full
           checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
-          tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none
