@@ -5,6 +5,7 @@
     "CLAIMS.APPLICANT_INJURIES",
     "CLAIMS.APPLICATION_INCIDENT",
     "CLAIMS.CASES",
+    "CLAIMS.NAMED_CASE_OFFICER_VW",
     "CLAIMS.CASE_DECISIONS",
     "CLAIMS.CASE_DECISION_OFFERS",
     "CLAIMS.CASE_IN_CASE_TYPES",
@@ -580,10 +581,6 @@
     },
     {
       "object_name": "CLAIMS.CASES",
-      "column_name": "NAMED_CASE_OFFICER"
-    },
-    {
-      "object_name": "CLAIMS.CASES",
       "column_name": "NIL_CASE"
     },
     {
@@ -932,10 +929,6 @@
     },
     {
       "object_name": "CLAIMS.CASES",
-      "column_name": "SPP_ID"
-    },
-    {
-      "object_name": "CLAIMS.CASES",
       "column_name": "SPP_TRIM_URI"
     },
     {
@@ -1037,10 +1030,6 @@
     {
       "object_name": "CLAIMS.CASE_DECISIONS",
       "column_name": "MITIGATION_PCNT"
-    },
-    {
-      "object_name": "CLAIMS.CASE_DECISIONS",
-      "column_name": "REASON_CODE"
     },
     {
       "object_name": "CLAIMS.CASE_DECISIONS",
@@ -1617,10 +1606,6 @@
     {
       "object_name": "CLAIMS.TARIFF_INJURIES",
       "column_name": "FULL_DESCRIPTION"
-    },
-    {
-      "object_name": "CLAIMS.TARIFF_INJURIES",
-      "column_name": "GUIDELINES"
     },
     {
       "object_name": "CLAIMS.TARIFF_INJURIES",
