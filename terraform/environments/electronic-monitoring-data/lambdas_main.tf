@@ -1328,3 +1328,39 @@ module "rota_personal_digest" {
     SLACK_SECRET_ARN = module.rota_personal_digest_slack.secret_arn
   }
 }
+
+#-----------------------------------------------------------------------------------
+# FMS validation reporter
+#-----------------------------------------------------------------------------------
+
+module "fms_validation_reporter" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "fms_validation_reporter"
+  role_name                      = aws_iam_role.fms_validation_reporter.name
+  role_arn                       = aws_iam_role.fms_validation_reporter.arn
+  handler                        = "fms_validation_reporter.handler"
+  memory_size                    = 512
+  timeout                        = 300
+  reserved_concurrent_executions = 1
+  core_shared_services_id        = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev                 = local.env_name
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+
+  cloudwatch_retention_days = 7
+
+  environment_variables = {
+    ATHENA_DATABASE             = "serco_fms"
+    ATHENA_RESULT_BUCKET_NAME   = "athena-query-results"
+    ATHENA_WORKGROUP            = "${local.env_account_id}-default"
+    FAILURE_AUDIT_TABLE         = "fms_validation_failure_audit"
+    RELOAD_AUDIT_TABLE          = "fms_validation_reload_audit"
+    SNS_TOPIC_ARN               = aws_sns_topic.emds_alerts.arn
+    MOD_PLAT_ACCOUNT_ALIAS      = terraform.workspace
+    MOD_PLAT_ACCOUNT_NUMBER     = local.env_account_id
+    POWERTOOLS_LOG_LEVEL        = "INFO"
+    POWERTOOLS_SERVICE_NAME     = "fms-validation-reporter"
+  }
+}
