@@ -92,19 +92,22 @@ def create_user(user, region):
 
     try:
         print(f"Dispatching async creation for user {username}...")
+        payload = {
+            # Legacy behavior (for quick rollback):
+            # omit 'Username' so user-creation lambda reconstructs from first/last names
+            'Username': username,
+            'Firstname': user['firstname'],
+            'Lastname': user['lastname'],
+            'Email': user['email'],
+            'WorkspaceType': user.get('workspace_type', 'standard')
+        }
+        if 'encrypted' in user:
+            payload['encrypted'] = user['encrypted']
+
         lambda_client.invoke(
             FunctionName=os.environ['USER_CREATION_LAMBDA'],
             InvocationType='Event',
-            Payload=json.dumps({
-                # Legacy behavior (for quick rollback):
-                # omit 'Username' so user-creation lambda reconstructs from first/last names
-                'Username': username,
-                'Firstname': user['firstname'],
-                'Lastname': user['lastname'],
-                'Email': user['email'],
-                'WorkspaceType': user.get('workspace_type', 'standard'),
-                'encrypted': user.get('encrypted', True)
-            })
+            Payload=json.dumps(payload)
         )
         print(f"Dispatched creation for {username} — check user-creation Lambda logs for result")
         return {'success': True, 'action': 'create', 'username': username}
