@@ -465,7 +465,6 @@ models:
       generally_available: false
       environments_available: ["development", "production"]
   microsoft_foundry:
-    # Anthropic
     # OpenAI
     gpt-5-4:
       model_id: "gpt-5.4"
