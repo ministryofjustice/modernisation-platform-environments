@@ -171,21 +171,9 @@ resource "null_resource" "auto_mode_gate_compute" {
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
     command     = <<-EOT
-      set -euo pipefail
-      cluster="${local.cluster_name}"
-      region="${data.aws_region.current.region}"
-      for i in $(seq 1 120); do
-        running=0
-        for id in $(aws eks list-updates --name "$cluster" --region "$region" --query 'updateIds' --output text | tr '\t' '\n'); do
-          [ -z "$id" ] && continue
-          status=$(aws eks describe-update --name "$cluster" --update-id "$id" --region "$region" --query 'update.status' --output text 2>/dev/null || echo Unknown)
-          [ "$status" = "InProgress" ] && running=$((running + 1))
-        done
-        [ "$running" -eq 0 ] && exit 0
-        sleep 5
-      done
-      echo "auto_mode gate: cluster $cluster still updating after timeout" >&2
-      exit 1
+      ${path.module}/scripts/auto_mode_gate_check.sh \
+        "${local.cluster_name}" \
+        "${data.aws_region.current.region}"
     EOT
   }
 }
@@ -207,21 +195,9 @@ resource "null_resource" "auto_mode_gate_block_storage" {
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
     command     = <<-EOT
-      set -euo pipefail
-      cluster="${local.cluster_name}"
-      region="${data.aws_region.current.region}"
-      for i in $(seq 1 120); do
-        running=0
-        for id in $(aws eks list-updates --name "$cluster" --region "$region" --query 'updateIds' --output text | tr '\t' '\n'); do
-          [ -z "$id" ] && continue
-          status=$(aws eks describe-update --name "$cluster" --update-id "$id" --region "$region" --query 'update.status' --output text 2>/dev/null || echo Unknown)
-          [ "$status" = "InProgress" ] && running=$((running + 1))
-        done
-        [ "$running" -eq 0 ] && exit 0
-        sleep 5
-      done
-      echo "auto_mode gate: cluster $cluster still updating after timeout" >&2
-      exit 1
+      ${path.module}/scripts/auto_mode_gate_check.sh \
+        "${local.cluster_name}" \
+        "${data.aws_region.current.region}"
     EOT
   }
 }
@@ -243,21 +219,9 @@ resource "null_resource" "auto_mode_gate_load_balancing" {
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
     command     = <<-EOT
-      set -euo pipefail
-      cluster="${local.cluster_name}"
-      region="${data.aws_region.current.region}"
-      for i in $(seq 1 120); do
-        running=0
-        for id in $(aws eks list-updates --name "$cluster" --region "$region" --query 'updateIds' --output text | tr '\t' '\n'); do
-          [ -z "$id" ] && continue
-          status=$(aws eks describe-update --name "$cluster" --update-id "$id" --region "$region" --query 'update.status' --output text 2>/dev/null || echo Unknown)
-          [ "$status" = "InProgress" ] && running=$((running + 1))
-        done
-        [ "$running" -eq 0 ] && exit 0
-        sleep 5
-      done
-      echo "auto_mode gate: cluster $cluster still updating after timeout" >&2
-      exit 1
+      ${path.module}/scripts/auto_mode_gate_check.sh \
+        "${local.cluster_name}" \
+        "${data.aws_region.current.region}"
     EOT
   }
 }
@@ -279,21 +243,9 @@ resource "null_resource" "auto_mode_gate_ipam" {
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
     command     = <<-EOT
-      set -euo pipefail
-      cluster="${local.cluster_name}"
-      region="${data.aws_region.current.region}"
-      for i in $(seq 1 120); do
-        running=0
-        for id in $(aws eks list-updates --name "$cluster" --region "$region" --query 'updateIds' --output text | tr '\t' '\n'); do
-          [ -z "$id" ] && continue
-          status=$(aws eks describe-update --name "$cluster" --update-id "$id" --region "$region" --query 'update.status' --output text 2>/dev/null || echo Unknown)
-          [ "$status" = "InProgress" ] && running=$((running + 1))
-        done
-        [ "$running" -eq 0 ] && exit 0
-        sleep 5
-      done
-      echo "auto_mode gate: cluster $cluster still updating after timeout" >&2
-      exit 1
+      ${path.module}/scripts/auto_mode_gate_check.sh \
+        "${local.cluster_name}" \
+        "${data.aws_region.current.region}"
     EOT
   }
 }
