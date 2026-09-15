@@ -2,6 +2,44 @@
 
 This environment provides AWS Bedrock access for Claude AI models in the eu-west-1 (Ireland) region.
 
+## LiteLLM Gateway
+
+A LiteLLM proxy runs on ECS Fargate at `https://claude-gateway.hmcts-development.modernisation-platform.service.justice.gov.uk`. It exposes Bedrock's own API under `/bedrock` (passthrough mode) and signs requests to Bedrock with its task role, so users only hold a LiteLLM virtual key.
+
+- Only `/bedrock/*` and `/health/liveliness` are reachable from the internet. The admin API and UI (`/ui`, `/key/*`, etc.) are restricted by WAF to MoJ networks plus `litellm_admin_cidrs` in `application_variables.json`.
+- The task role can only invoke Anthropic models, and that is the effective model allowlist: LiteLLM does not enforce per-key `models` restrictions on Bedrock passthrough.
+- The master key is in Secrets Manager as `litellm-gateway/master-key`.
+
+### Issue a key
+
+From an allowed network:
+
+```bash
+MASTER_KEY=$(aws secretsmanager get-secret-value --secret-id litellm-gateway/master-key --query SecretString --output text)
+
+curl -s https://claude-gateway.hmcts-development.modernisation-platform.service.justice.gov.uk/key/generate \
+  -H "Authorization: Bearer $MASTER_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"key_alias": "firstname.lastname", "max_budget": 100, "budget_duration": "30d"}'
+```
+
+### Configure Claude Code
+
+```bash
+export CLAUDE_CODE_USE_BEDROCK=1
+export CLAUDE_CODE_SKIP_BEDROCK_AUTH=1
+export ANTHROPIC_BEDROCK_BASE_URL=https://claude-gateway.hmcts-development.modernisation-platform.service.justice.gov.uk/bedrock
+export ANTHROPIC_AUTH_TOKEN='sk-...'
+export AWS_REGION=eu-west-1
+export ANTHROPIC_DEFAULT_OPUS_MODEL='eu.anthropic.claude-opus-5'
+export ANTHROPIC_DEFAULT_SONNET_MODEL='eu.anthropic.claude-sonnet-5'
+export ANTHROPIC_DEFAULT_HAIKU_MODEL='eu.anthropic.claude-haiku-4-5-20251001-v1:0'
+```
+
+`CLAUDE_CODE_SKIP_BEDROCK_AUTH` is required, otherwise Claude Code drops the `Authorization` header. `AWS_BEARER_TOKEN_BEDROCK` must be unset, as it takes precedence over the gateway key.
+
+Models registered with LiteLLM (for cost tracking) are listed in `litellm_ecs.tf` as `litellm_bedrock_models`, and must have Bedrock model access enabled in the account.
+
 ## AWS Bedrock Setup
 
 This environment is configured to use AWS Bedrock with Claude models. The following manual setup steps are required:
