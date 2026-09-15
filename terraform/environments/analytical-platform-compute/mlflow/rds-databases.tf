@@ -11,7 +11,7 @@ module "mlflow_auth_rds" {
   identifier = "mlflow-auth"
 
   engine               = "postgres"
-  engine_version       = "16"
+  engine_version       = "16.15"
   family               = "postgres16"
   major_engine_version = "16"
   instance_class       = "db.t4g.micro"
@@ -83,7 +83,7 @@ module "mlflow_rds" {
   identifier = "mlflow"
 
   engine               = "postgres"
-  engine_version       = "16"
+  engine_version       = "16.15"
   family               = "postgres16"
   major_engine_version = "16"
   instance_class       = "db.t4g.medium"
