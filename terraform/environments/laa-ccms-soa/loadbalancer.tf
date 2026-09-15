@@ -60,6 +60,9 @@ resource "aws_lb_listener" "admin443" {
     target_group_arn = aws_lb_target_group.admin_https.id
     type             = "forward"
   }
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lb_listener" "admin_ssl_port" {
@@ -72,6 +75,9 @@ resource "aws_lb_listener" "admin_ssl_port" {
   default_action {
     target_group_arn = aws_lb_target_group.admin_https.id
     type             = "forward"
+  }
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -132,6 +138,9 @@ resource "aws_lb_listener" "managed443" {
   default_action {
     target_group_arn = aws_lb_target_group.managed_https.id
     type             = "forward"
+  }  
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -146,4 +155,8 @@ resource "aws_lb_listener" "managed_ssl_port" {
     target_group_arn = aws_lb_target_group.managed_https.id
     type             = "forward"
   }
+  lifecycle {
+    create_before_destroy = true
+  }
+
 }
