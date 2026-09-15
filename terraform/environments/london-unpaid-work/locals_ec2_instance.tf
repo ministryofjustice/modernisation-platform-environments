@@ -8,7 +8,6 @@ locals {
         ebs_volumes_copy_all_from_ami = false
         iam_resource_names_prefix     = "ec2-london-unpaid-work"
         instance_profile_policies = [
-          # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
@@ -30,29 +29,15 @@ locals {
         metadata_options_http_tokens = "optional"
         vpc_security_group_ids       = ["ec2-windows"]
       }
-    #   route53_records = {
-    #     create_internal_record = true
-    #     create_external_record = true
-    #   }
-    #   user_data_cloud_init = {
-    #     args = {
-    #       branch       = "main"
-    #       ansible_args = "--tags ec2provision"
-    #     }
-    #     scripts = [ # paths are relative to templates/ dir
-    #       "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
-    #       "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
-    #       "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
-        # ]
-    #   }
+
       tags = {
         ami                    = "hmpps_windows_server_2022_release_2026-09-14T16-17-24.564Z"
         backup                 = "false" # disable mod platform backup since everything is in code
         component              = "web"
-        description            = "london-unpaid-work web instance"
+        description            = "London Unpaid Work Web Server"
         instance-access-policy = "limited"
         os-type                = "Windows"
-        server-type            = "web"
+        server-type            = "london-unpaid-work-web"
       }
     }
 
@@ -88,10 +73,10 @@ locals {
       tags = {
         backup                 = "false"
         component              = "api"
-        description            = "london-unpaid-work API server"
+        description            = "London Unpaid Work API Server"
         instance-access-policy = "limited"
         os-type                = "Windows"
-        server-type            = "api"
+        server-type            = "london-unpaid-work-api"
       }
     }
   }
