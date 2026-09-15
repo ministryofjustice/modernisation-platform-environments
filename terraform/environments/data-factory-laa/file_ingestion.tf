@@ -1,4 +1,5 @@
 module "file_ingestion" {
+  count  = local.is-test ? 1 : 0
   source = "./modules/file-ingestion"
   providers = {
     aws.bucket-replication = aws
@@ -11,6 +12,8 @@ module "file_ingestion" {
 # Role to allow uploading of files to the file uploads bucket
 # Will be assumable by the SSO role for the data engineering team
 resource "aws_iam_role" "file_uploads_role" {
+  count = local.is-test ? 1 : 0
+
   name = "file-uploads-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -27,6 +30,8 @@ resource "aws_iam_role" "file_uploads_role" {
 }
 
 data "aws_iam_policy_document" "file_uploads_role_policy" {
+  count = local.is-test ? 1 : 0
+
   statement {
     effect = "Allow"
     actions = [
@@ -36,8 +41,8 @@ data "aws_iam_policy_document" "file_uploads_role_policy" {
       "s3:ListBucket"
     ]
     resources = [
-      module.file_ingestion.file_uploads_bucket_arn,
-      "${module.file_ingestion.file_uploads_bucket_arn}/*"
+      module.file_ingestion[count.index].file_uploads_bucket_arn,
+      "${module.file_ingestion[count.index].file_uploads_bucket_arn}/*"
     ]
   }
 
@@ -54,18 +59,22 @@ data "aws_iam_policy_document" "file_uploads_role_policy" {
 }
 
 resource "aws_iam_role_policy" "file_uploads_role_policy" {
+  count = local.is-test ? 1 : 0
+
   name   = "file-uploads-role-policy"
-  role   = aws_iam_role.file_uploads_role.id
-  policy = data.aws_iam_policy_document.file_uploads_role_policy.json
+  role   = aws_iam_role.file_uploads_role[count.index].id
+  policy = data.aws_iam_policy_document.file_uploads_role_policy[count.index].json
 }
 
 
 resource "aws_lakeformation_permissions" "file_uploads_role_permissions_db" {
+  count = local.is-test ? 1 : 0
+
   permissions = [
     "CREATE_TABLE",
     "DESCRIBE"
   ]
-  principal = module.file_ingestion.lambda_role_arn
+  principal = module.file_ingestion[count.index].lambda_role_arn
 
   database {
     name = "raw"
@@ -73,6 +82,8 @@ resource "aws_lakeformation_permissions" "file_uploads_role_permissions_db" {
 }
 
 resource "aws_lakeformation_permissions" "file_uploads_role_permissions_table" {
+  count = local.is-test ? 1 : 0
+
   permissions = [
     "SELECT",
     "DESCRIBE",
@@ -81,7 +92,7 @@ resource "aws_lakeformation_permissions" "file_uploads_role_permissions_table" {
     "INSERT",
     "DELETE"
   ]
-  principal = module.file_ingestion.lambda_role_arn
+  principal = module.file_ingestion[count.index].lambda_role_arn
 
   table {
     database_name = "raw"
