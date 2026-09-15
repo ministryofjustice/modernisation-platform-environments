@@ -27,14 +27,12 @@ def lambda_handler(event, context):
 
     for directory in directories:
         table_name = directory.rstrip("/")
-
         print(f"Processing table: {table_name}")
 
         csv_path = f"s3://{FILE_UPLOADS_BUCKET}/{directory}*.csv"
 
         try:
             print(f"Reading {table_name} using UTF-8")
-
             df = wr.s3.read_csv(
                 path=csv_path,
                 encoding="utf-8",

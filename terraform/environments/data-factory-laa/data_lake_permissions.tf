@@ -1,7 +1,8 @@
 resource "aws_lakeformation_permissions" "data_engineer_access_db" {
   for_each = toset(local.environments[local.environment].lakeformation_admins)
   permissions = [
-    "DESCRIBE"
+    "DESCRIBE",
+    "CREATE_TABLE",
   ]
   principal = each.value
 
