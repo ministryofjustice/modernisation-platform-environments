@@ -92,12 +92,12 @@ resource "aws_iam_role_policy_attachment" "glue_catalog_read_only_ppud" {
 
 # Update Analytical Platform Share Policy & Role
 data "aws_iam_role" "analytical_platform_share_role" {
-  for_each = local.is-development ? local.analytical_platform_share : {}
+  for_each = (local.is-development || local.is-preproduction) ? local.analytical_platform_share : {}
   name     = "${each.value.target_account_name}-share-role"
 }
 
 data "aws_iam_policy_document" "analytical_platform_share_policy_ppud" {
-  for_each = local.is-development ? local.analytical_platform_share : {}
+  for_each = (local.is-development || local.is-preproduction) ? local.analytical_platform_share : {}
 
   statement {
     effect = "Allow"
@@ -122,7 +122,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy_ppud" {
 }
 
 resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment_ppud" {
-  for_each = local.is-development ? local.analytical_platform_share : {}
+  for_each = (local.is-development || local.is-preproduction) ? local.analytical_platform_share : {}
 
   name   = "${each.value.target_account_name}-share-policy-ppud"
   role   = data.aws_iam_role.analytical_platform_share_role[each.key].name
