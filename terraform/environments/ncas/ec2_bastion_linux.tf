@@ -1,5 +1,6 @@
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "bastion_linux" {
+  //v4.4.2
   source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=aa44d28a832a5071f7bde436646d4639b0444737"
 
   providers = {
