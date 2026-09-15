@@ -437,7 +437,8 @@ module "pagerduty_core_alerts_non_prod" {
   depends_on = [
     aws_sns_topic.tipstaff_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
+  //v3.0.0
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=d88bd90d490268896670a898edfaba24bba2f8ab"
   sns_topics                = [aws_sns_topic.tipstaff_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["tipstaff_non_prod_alarms"]
 }
@@ -448,7 +449,8 @@ module "pagerduty_core_alerts_prod" {
   depends_on = [
     aws_sns_topic.tipstaff_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
+  //v3.0.0
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=d88bd90d490268896670a898edfaba24bba2f8ab"
   sns_topics                = [aws_sns_topic.tipstaff_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["tipstaff_prod_alarms"]
 }
