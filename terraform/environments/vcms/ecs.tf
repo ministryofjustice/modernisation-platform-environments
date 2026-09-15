@@ -109,7 +109,7 @@ module "container_definition" {
     },
     {
       name  = "DIR_DOCUMENTS"
-      value = "/mnt/vcmsdocs"
+      value = "/mnt/s3fs"
     },
     {
       name  = "SESSION_DRIVER"
