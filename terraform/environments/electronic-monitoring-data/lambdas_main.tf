@@ -402,13 +402,15 @@ module "load_fms_lambda" {
   subnet_ids                     = data.aws_subnets.shared-private.ids
   cloudwatch_retention_days      = 7
   environment_variables = {
-    ATHENA_QUERY_BUCKET     = module.s3-athena-bucket.bucket.id
-    ACCOUNT_NUMBER          = data.aws_caller_identity.current.account_id
-    STAGING_BUCKET          = module.s3-create-a-derived-table-bucket.bucket.id
-    ENVIRONMENT_NAME        = local.environment_shorthand
-    CLEANUP_QUEUE_URL       = aws_sqs_queue.clean_dlt_load_queue.id
-    SNS_TOPIC_ARN           = aws_sns_topic.emds_alerts.arn
-    MAX_RECEIVE_COUNT       = tostring(local.load_sqs_max_receive_count)
+    ATHENA_QUERY_BUCKET = module.s3-athena-bucket.bucket.id
+    ACCOUNT_NUMBER      = data.aws_caller_identity.current.account_id
+    STAGING_BUCKET      = module.s3-create-a-derived-table-bucket.bucket.id
+    ENVIRONMENT_NAME    = local.environment_shorthand
+    CLEANUP_QUEUE_URL   = aws_sqs_queue.clean_dlt_load_queue.id
+    SNS_TOPIC_ARN       = aws_sns_topic.emds_alerts.arn
+    MAX_RECEIVE_COUNT   = tostring(local.load_sqs_max_receive_count)
+    SCHEMA_BUCKET       = module.s3-metadata-bucket.bucket.id
+    SCHEMA_PATH         = "schemas/serco/fms/",
     MOD_PLAT_ACCOUNT_ALIAS  = terraform.workspace
     MOD_PLAT_ACCOUNT_NUMBER = local.env_account_id
   }
