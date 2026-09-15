@@ -23,7 +23,7 @@ resource "aws_lb" "admin" {
 }
 
 resource "aws_lb_target_group" "admin_https" {
-  name                 = "${local.application_data.accounts[local.environment].app_name}-admin-https-target-tg"
+  name                 = "${local.application_data.accounts[local.environment].app_name}-admin-https-tg"
   port                 = 443
   protocol             = "TLS"
   vpc_id               = data.aws_vpc.shared.id
@@ -104,7 +104,7 @@ resource "aws_lb" "managed" {
 }
 
 resource "aws_lb_target_group" "managed_https" {
-  name                 = "${local.application_data.accounts[local.environment].app_name}-managed-https-target-tg"
+  name                 = "${local.application_data.accounts[local.environment].app_name}-managed-https-tg"
   port                 = 443
   protocol             = "TLS"
   vpc_id               = data.aws_vpc.shared.id
