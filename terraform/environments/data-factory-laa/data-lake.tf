@@ -152,7 +152,8 @@ resource "aws_athena_workgroup" "laa" {
   name = "laa"
 
   configuration {
-    enforce_workgroup_configuration    = true
+    #checkov:skip=CKV_AWS_82: CADET needs to output to specific buckets per DB
+    enforce_workgroup_configuration    = false
     publish_cloudwatch_metrics_enabled = true
 
     result_configuration {

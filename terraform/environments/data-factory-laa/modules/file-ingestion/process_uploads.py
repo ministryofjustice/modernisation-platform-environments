@@ -27,7 +27,6 @@ def lambda_handler(event, context):
 
     for directory in directories:
         table_name = directory.rstrip("/")
-
         print(f"Processing table: {table_name}")
 
         csv_path = f"s3://{FILE_UPLOADS_BUCKET}/{directory}*.csv"
