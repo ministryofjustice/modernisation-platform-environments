@@ -1,6 +1,6 @@
 # policy to allow replication in destination bucket
 data "aws_iam_policy_document" "ppud_replication_destination_bucket_policy" {
-  count = local.is-development ? 1 : 0
+  count = (local.is-development || local.is-preproduction) ? 1 : 0
 
   statement {
     sid    = "Set-permissions-for-objects"
@@ -13,7 +13,7 @@ data "aws_iam_policy_document" "ppud_replication_destination_bucket_policy" {
     principals {
       type = "AWS"
       identifiers = [
-        "arn:aws:iam::${local.environment_management.account_ids["ppud-${local.environment}"]}:role/service-role/iam_role_s3_bucket_moj_database_source_dev"
+        "arn:aws:iam::${local.environment_management.account_ids["ppud-${local.environment}"]}:role/service-role/iam_role_s3_bucket_moj_database_source_${local.ppud_replication_environment}"
       ]
     }
   }
@@ -31,7 +31,7 @@ data "aws_iam_policy_document" "ppud_replication_destination_bucket_policy" {
     principals {
       type = "AWS"
       identifiers = [
-        "arn:aws:iam::${local.environment_management.account_ids["ppud-${local.environment}"]}:role/service-role/iam_role_s3_bucket_moj_database_source_dev"
+        "arn:aws:iam::${local.environment_management.account_ids["ppud-${local.environment}"]}:role/service-role/iam_role_s3_bucket_moj_database_source_${local.ppud_replication_environment}"
       ]
     }
   }
@@ -57,7 +57,7 @@ module "ppud_replication_destination" {
 
   sse_algorithm = "AES256"
 
-  bucket_policy = local.is-development ? [data.aws_iam_policy_document.ppud_replication_destination_bucket_policy[0].json] : []
+  bucket_policy = (local.is-development || local.is-preproduction) ? [data.aws_iam_policy_document.ppud_replication_destination_bucket_policy[0].json] : []
 
   lifecycle_rule = [
     {

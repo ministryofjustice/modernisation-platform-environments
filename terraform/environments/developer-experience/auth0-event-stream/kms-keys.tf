@@ -38,6 +38,24 @@ module "destination_kms_key" {
       ]
     },
     {
+      sid       = "FirehoseGrant"
+      actions   = ["kms:CreateGrant"]
+      resources = ["*"]
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["firehose.amazonaws.com"]
+        }
+      ]
+      condition = [
+        {
+          test     = "Bool"
+          variable = "kms:GrantIsForAWSResource"
+          values   = ["true"]
+        }
+      ]
+    },
+    {
       sid = "CloudWatchLogs"
       actions = [
         "kms:Decrypt",

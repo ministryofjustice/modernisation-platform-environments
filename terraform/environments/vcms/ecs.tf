@@ -102,6 +102,14 @@ module "container_definition" {
     {
       name  = "DB_USERNAME"
       value = "vcms"
+    },
+    {
+      name  = "APP_DEBUG"
+      value = local.app_config.APP_DEBUG
+    },
+    {
+      name  = "DIR_DOCUMENTS"
+      value = "/mnt/vcmsdocs"
     }
   ]
 

@@ -98,23 +98,20 @@ module "eks" {
 ## EKS Auto Mode component logs via CloudWatch Vended Logs
 locals {
   auto_mode_log_types = {
-    AUTO_MODE_COMPUTE_LOGS        = "compute"        # Karpenter
-    AUTO_MODE_BLOCK_STORAGE_LOGS  = "block-storage"  # EBS CSI
-    AUTO_MODE_LOAD_BALANCING_LOGS = "load-balancing" # AWS Load Balancer Controller
-    AUTO_MODE_IPAM_LOGS           = "ipam"           # VPC CNI IP address management
+    AUTO_MODE_COMPUTE_LOGS = "compute" # Karpenter
   }
 
   auto_mode_source_names = {
-    AUTO_MODE_COMPUTE_LOGS        = aws_cloudwatch_log_delivery_source.auto_mode_compute.name
-    AUTO_MODE_BLOCK_STORAGE_LOGS  = aws_cloudwatch_log_delivery_source.auto_mode_block_storage.name
-    AUTO_MODE_LOAD_BALANCING_LOGS = aws_cloudwatch_log_delivery_source.auto_mode_load_balancing.name
-    AUTO_MODE_IPAM_LOGS           = aws_cloudwatch_log_delivery_source.auto_mode_ipam.name
+    AUTO_MODE_COMPUTE_LOGS = aws_cloudwatch_log_delivery_source.auto_mode_compute.name
   }
 }
 
 ## Delivery destinations. The naming alone does not grant write access — see the
 ## resource policy below.
 resource "aws_cloudwatch_log_group" "auto_mode" {
+  #checkov:skip=CKV_AWS_338:Per ADR-017, CloudWatch is the 30-day operational tier; long-term retention lives in the S3 archive
+  #checkov:skip=CKV_AWS_158:Per ADR-017, CloudWatch encryption at rest is the default AES-256; customer-managed KMS is required only on the S3 archive
+
   for_each = local.auto_mode_log_types
 
   name              = "/aws/vendedlogs/eks/cluster/${each.key}/${local.cluster_name}"
@@ -162,59 +159,13 @@ resource "aws_cloudwatch_log_resource_policy" "auto_mode_vendedlogs" {
   policy_document = data.aws_iam_policy_document.auto_mode_vendedlogs.json
 }
 
-## Created one at a time with waits: each triggers an async EKS cluster update and
-## the API allows only one, so parallel creation hits ConflictException.
+## Compute only for now.
 resource "aws_cloudwatch_log_delivery_source" "auto_mode_compute" {
   name         = "${local.cluster_name}-compute"
   log_type     = "AUTO_MODE_COMPUTE_LOGS"
   resource_arn = module.eks.cluster_arn
 
   tags = local.tags
-}
-
-resource "time_sleep" "auto_mode_after_compute" {
-  depends_on      = [aws_cloudwatch_log_delivery_source.auto_mode_compute]
-  create_duration = "120s"
-}
-
-resource "aws_cloudwatch_log_delivery_source" "auto_mode_block_storage" {
-  name         = "${local.cluster_name}-block-storage"
-  log_type     = "AUTO_MODE_BLOCK_STORAGE_LOGS"
-  resource_arn = module.eks.cluster_arn
-
-  tags = local.tags
-
-  depends_on = [time_sleep.auto_mode_after_compute]
-}
-
-resource "time_sleep" "auto_mode_after_block_storage" {
-  depends_on      = [aws_cloudwatch_log_delivery_source.auto_mode_block_storage]
-  create_duration = "120s"
-}
-
-resource "aws_cloudwatch_log_delivery_source" "auto_mode_load_balancing" {
-  name         = "${local.cluster_name}-load-balancing"
-  log_type     = "AUTO_MODE_LOAD_BALANCING_LOGS"
-  resource_arn = module.eks.cluster_arn
-
-  tags = local.tags
-
-  depends_on = [time_sleep.auto_mode_after_block_storage]
-}
-
-resource "time_sleep" "auto_mode_after_load_balancing" {
-  depends_on      = [aws_cloudwatch_log_delivery_source.auto_mode_load_balancing]
-  create_duration = "120s"
-}
-
-resource "aws_cloudwatch_log_delivery_source" "auto_mode_ipam" {
-  name         = "${local.cluster_name}-ipam"
-  log_type     = "AUTO_MODE_IPAM_LOGS"
-  resource_arn = module.eks.cluster_arn
-
-  tags = local.tags
-
-  depends_on = [time_sleep.auto_mode_after_load_balancing]
 }
 
 resource "aws_cloudwatch_log_delivery_destination" "auto_mode" {

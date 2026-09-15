@@ -23,15 +23,13 @@ data "grafana_data_source" "cloudwatch" {
   name = "${each.key}-cloudwatch"
 }
 
-resource "grafana_data_source_permission" "cloudwatch" {
+resource "grafana_data_source_permission_item" "cloudwatch" {
   for_each = var.aws_accounts
 
   datasource_uid = trimprefix(data.grafana_data_source.cloudwatch[each.key].id, "1:")
 
-  permissions {
-    team_id    = grafana_team.this.id
-    permission = "Query"
-  }
+  team       = grafana_team.this.id
+  permission = "Query"
 }
 
 data "grafana_data_source" "xray" {

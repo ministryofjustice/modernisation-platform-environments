@@ -52,6 +52,7 @@ proxyConfigMap:
   create: true
 proxy_config:
   general_settings:
+    allow_requests_on_db_unavailable: true
     litellm_license: os.environ/LITELLM_LICENSE
     master_key: os.environ/PROXY_MASTER_KEY
     proxy_admin_email: "${proxyAdminEmail}"

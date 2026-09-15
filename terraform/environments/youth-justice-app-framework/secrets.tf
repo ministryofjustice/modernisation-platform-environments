@@ -184,6 +184,22 @@ resource "aws_secretsmanager_secret_version" "jwt_secret" {
   }
 }
 
+resource "aws_secretsmanager_secret" "disparity_toolkit" {
+  #checkov:skip=CKV2_AWS_57:doesn't need rotation
+  name        = "${local.project_name}/disparity-toolkit/redshift-serverless"
+  description = "details for quicksight"
+  kms_key_id  = module.kms.key_id
+  tags        = local.tags
+}
+
+resource "aws_secretsmanager_secret_version" "disparity_toolkit" {
+  secret_id     = aws_secretsmanager_secret.disparity_toolkit.id
+  secret_string = "dummy" # InvalidRequestException: You must provide either SecretString or SecretBinary.
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
 resource "aws_secretsmanager_secret" "Root_CA_secret" {
   #checkov:skip=CKV2_AWS_57:doesn't need rotation
   name        = "${local.project_name}/Root_CA"
