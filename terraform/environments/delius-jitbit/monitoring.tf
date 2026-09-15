@@ -4,7 +4,8 @@ locals {
 
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "jitbit_alerting" {
-  name = "jitbit_alerting"
+  name              = "jitbit_alerting"
+  kms_master_key_id = data.aws_kms_key.general_shared.arn
 }
 
 resource "aws_sns_topic_subscription" "jitbit_pagerduty_subscription" {
@@ -12,8 +13,6 @@ resource "aws_sns_topic_subscription" "jitbit_pagerduty_subscription" {
   protocol  = "https"
   endpoint  = "https://events.pagerduty.com/integration/${local.pagerduty_integration_key}/enqueue"
 }
-
-
 
 # Pager duty integration
 
@@ -38,7 +37,23 @@ module "pagerduty_core_alerts" {
   depends_on = [
     aws_sns_topic.jitbit_alerting
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v3.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=d88bd90d490268896670a898edfaba24bba2f8ab" # v3.0.0
   sns_topics                = [aws_sns_topic.jitbit_alerting.name]
   pagerduty_integration_key = local.pagerduty_integration_key
+}
+
+# Use "awscc_cloudwatch_alarm_mute_rule" when it's supported in the standard aws provider
+module "disable_out_of_hours_alarms" {
+  count  = local.is-production ? 0 : 1
+  source = "../../modules/schedule_alarms_lambda"
+
+  lambda_function_name = "${local.application_name}-toggle-alarms"
+
+  start_time      = "19:59"
+  end_time        = "06:45"
+  disable_weekend = true
+
+  alarm_patterns = ["*high-error-count*"]
+
+  tags = local.tags
 }

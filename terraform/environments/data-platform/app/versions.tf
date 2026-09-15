@@ -20,6 +20,14 @@ terraform {
       version = "~> 3.0"
       source  = "hashicorp/random"
     }
+    kubernetes = {
+      version = "~> 3.1"
+      source  = "hashicorp/kubernetes"
+    }
+    helm = {
+      version = "~> 3.1"
+      source  = "hashicorp/helm"
+    }
   }
   required_version = "~> 1.0"
 }

@@ -55,3 +55,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "reserved_concurrent_executions" {
+  description = "Function-level reserved concurrent execution limit. 1 prevents overlapping export runs; must be >= 1 (0 disables the function, -1 removes the limit and fails CKV_AWS_115)."
+  type        = number
+  default     = 1
+}

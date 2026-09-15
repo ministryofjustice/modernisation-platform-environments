@@ -24,6 +24,10 @@ data "aws_availability_zones" "this" {
     name   = "opt-in-status"
     values = ["opt-in-not-required"]
   }
+  filter {
+    name   = "zone-name"
+    values = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
+  }
 }
 
 data "aws_vpc" "this" {

@@ -12,6 +12,8 @@ module "eks" {
   control_plane_subnet_ids = data.aws_subnets.private.ids
   subnet_ids               = data.aws_subnets.private.ids
 
+  deletion_protection = true
+
   create_node_security_group = false
 
   authentication_mode = "API"
@@ -167,9 +169,9 @@ module "eks_managed_node_group_system" {
   desired_size   = 3
   instance_types = ["m8g.large"]
 
-  # Rolling update: replace at most one node at a time to preserve capacity
+  # Rolling update: environment-specific max unavailable from cluster config
   update_config = {
-    max_unavailable = 1
+    max_unavailable = local.cluster_configuration.node_update_config.max_unavailable
     update_strategy = "DEFAULT"
   }
 

@@ -2,7 +2,7 @@
 ### RDS SG
 ######################################
 resource "aws_security_group" "rds_sg" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = local.enable_edw_rds ? 1 : 0
 
   name        = "${local.application_name}-${local.environment}-rds-security-group"
   description = "RDS Security Group"
@@ -34,7 +34,7 @@ resource "aws_security_group" "rds_sg" {
 # }
 
 resource "aws_security_group_rule" "ingress_rds_from_workspaces" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = local.enable_edw_rds ? 1 : 0
 
   type              = "ingress"
   security_group_id = aws_security_group.rds_sg[0].id
@@ -62,7 +62,7 @@ resource "aws_security_group_rule" "ingress_rds_from_workspaces" {
 # }
 
 resource "aws_security_group_rule" "rds_sg_egress_workspaces" {
-  count = local.environment == "preproduction" ? 1 : 0
+  count = local.enable_edw_rds ? 1 : 0
 
   type              = "egress"
   security_group_id = aws_security_group.rds_sg[0].id

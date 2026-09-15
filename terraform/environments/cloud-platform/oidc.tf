@@ -138,10 +138,46 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
       "logs:CreateLogGroup",
       "logs:DeleteLogGroup",
       "logs:CreateLogStream",
+      "logs:CreateLogDelivery",
+      "logs:CreateDelivery",
+      "logs:DeleteDelivery*",
+      "logs:GetDelivery*",
       "logs:PutLogEvents",
+      "logs:PutResourcePolicy",
       "logs:PutRetentionPolicy",
+      "logs:DeleteResourcePolicy",
+      "logs:DeleteRetentionPolicy",
       "logs:Describe*",
+      "logs:PutDelivery*",
+      "logs:UpdateDeliveryConfiguration",
+      "logs:TagResource",
       "cloudwatch:PutMetricData"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "ObservabilityAMP"
+    effect = "Allow"
+    actions = [
+      # Amazon Managed Prometheus (AMP) workspace lifecycle — the ADOT metrics
+      # collectors in cluster-components create/manage a per-cluster AMP
+      # workspace, applied on ephemeral dev clusters via this role.
+      # AMG (grafana:*) is NOT included here: AMG is deployed at the
+      # cloud-platform root component via the main pipeline's apply role, not by
+      # this dev-cluster role.
+      "aps:CreateWorkspace",
+      "aps:DeleteWorkspace",
+      "aps:DescribeWorkspace",
+      "aps:ListWorkspaces",
+      "aps:UpdateWorkspaceAlias",
+      "aps:DescribeLoggingConfiguration",
+      "aps:CreateLoggingConfiguration",
+      "aps:UpdateLoggingConfiguration",
+      "aps:DeleteLoggingConfiguration",
+      "aps:TagResource",
+      "aps:UntagResource",
+      "aps:ListTagsForResource",
     ]
     resources = ["*"]
   }
@@ -170,6 +206,31 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     ]
     resources = [
       "arn:aws:s3:::modernisation-platform-terraform-state/environments/members/cloud-platform*/*"
+    ]
+  }
+
+  statement {
+    sid    = "LogArchiveBucketManagement"
+    effect = "Allow"
+    actions = [
+      "s3:CreateBucket",
+      "s3:DeleteBucket",
+      "s3:Get*",
+      "s3:List*",
+      "s3:PutBucketPolicy",
+      "s3:DeleteBucketPolicy",
+      "s3:PutBucketTagging",
+      "s3:PutBucketVersioning",
+      "s3:PutBucketPublicAccessBlock",
+      "s3:PutEncryptionConfiguration",
+      "s3:PutLifecycleConfiguration",
+      "s3:PutBucketOwnershipControls",
+      "s3:PutObject",
+      "s3:DeleteObject"
+    ]
+    resources = [
+      "arn:aws:s3:::container-platform-*-fluentbit",
+      "arn:aws:s3:::container-platform-*-fluentbit/*"
     ]
   }
 
@@ -223,6 +284,27 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     resources = ["*"]
   }
 
+  statement {
+    sid    = "SSOForArgoCDCapability"
+    effect = "Allow"
+    actions = [
+      "sso:CreateApplication",
+      "sso:DeleteApplication",
+      "sso:DescribeApplication",
+      "sso:PutApplicationAccessScope",
+      "sso:PutApplicationAuthenticationMethod",
+      "sso:PutApplicationGrant",
+      "sso:DeleteApplicationAccessScope",
+      "sso:DeleteApplicationAuthenticationMethod",
+      "sso:DeleteApplicationGrant",
+      "sso:PutApplicationAssignmentConfiguration",
+      "sso:CreateApplicationAssignment",
+      "sso:DeleteApplicationAssignment",
+      "sso:ListApplicationAssignments"
+    ]
+    resources = ["*"]
+  }
+
 }
 
 
@@ -244,6 +326,140 @@ data "aws_iam_policy_document" "github_actions_cluster_reminder_oidc_policy" {
     actions = [
       "eks:ListClusters",
       "iam:ListAccountAliases"
+    ]
+    resources = ["*"]
+  }
+}
+
+# OIDC Role for GitHub Actions - Container Platform Identity Workflow Plan
+module "github_actions_container_platform_identity_oidc_role_plan" {
+  count               = terraform.workspace == "cloud-platform-live" ? 1 : 0
+  source              = "github.com/ministryofjustice/modernisation-platform-github-oidc-role?ref=b40748ec162b446f8f8d282f767a85b6501fd192" # v4.0.0
+  github_repositories = ["ministryofjustice/container-platform-environments"]
+  role_name           = "github-actions-container-platform-identity-plan"
+  policy_jsons        = [data.aws_iam_policy_document.github_actions_container_platform_identity_oidc_policy_plan.json]
+  subject_claim       = "pull_request"
+  tags                = merge({ "Name" = "GitHub Actions Container Platform Identity Role" }, local.tags)
+}
+
+data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_policy_plan" {
+  statement {
+    sid    = "AssumeSSOReadOnlyRole"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ContainerPlatformSSOReadOnly"]
+  }
+
+  statement {
+    sid    = "AssumeModernisationPlatformReadOnlyRole"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = ["arn:aws:iam::${data.aws_ssm_parameter.modernisation_platform_account_id.value}:role/modernisation-account-limited-read-member-access"]
+  }
+
+  statement {
+    sid    = "AssumeContainerPlatformEKSAccessRolesInOrganisation"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = ["arn:aws:iam::*:role/ContainerPlatformEKSAccess"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceOrgID"
+      values   = [data.aws_organizations_organization.root_account.id]
+    }
+  }
+  statement {
+    sid    = "IdentityRoleClusterStateBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:DeleteObject"
+    ]
+    resources = [
+      "arn:aws:s3:::modernisation-platform-terraform-state/environments/members/cloud-platform/container-platform-identity/*"
+    ]
+  }
+
+  statement {
+    sid    = "IdentityRoleClusterKMSKey"
+    effect = "Allow"
+    actions = [
+      "kms:*"
+    ]
+    resources = ["*"]
+  }
+}
+
+# OIDC Role for GitHub Actions - Container Platform Identity Workflow Apply
+module "github_actions_container_platform_identity_oidc_role_apply" {
+  count               = terraform.workspace == "cloud-platform-live" ? 1 : 0
+  source              = "github.com/ministryofjustice/modernisation-platform-github-oidc-role?ref=b40748ec162b446f8f8d282f767a85b6501fd192" # v4.0.0
+  github_repositories = ["ministryofjustice/container-platform-environments"]
+  role_name           = "github-actions-container-platform-identity-apply"
+  policy_jsons        = [data.aws_iam_policy_document.github_actions_container_platform_identity_oidc_policy_apply.json]
+  subject_claim       = "ref:refs/heads/*"
+  tags                = merge({ "Name" = "GitHub Actions Container Platform Identity Role" }, local.tags)
+}
+
+data "aws_iam_policy_document" "github_actions_container_platform_identity_oidc_policy_apply" {
+  statement {
+    sid    = "AssumeSSOAdminRole"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ContainerPlatformSSOAdministrator"]
+  }
+
+  statement {
+    sid    = "AssumeModernisationPlatformReadOnlyRole"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = ["arn:aws:iam::${data.aws_ssm_parameter.modernisation_platform_account_id.value}:role/modernisation-account-limited-read-member-access"]
+  }
+
+  statement {
+    sid    = "AssumeContainerPlatformEKSAccessRolesInOrganisation"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = ["arn:aws:iam::*:role/ContainerPlatformEKSAccess"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceOrgID"
+      values   = [data.aws_organizations_organization.root_account.id]
+    }
+  }
+  statement {
+    sid    = "IdentityRoleClusterStateBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:DeleteObject"
+    ]
+    resources = [
+      "arn:aws:s3:::modernisation-platform-terraform-state/environments/members/cloud-platform/container-platform-identity/*"
+    ]
+  }
+
+  statement {
+    sid    = "IdentityRoleClusterKMSKey"
+    effect = "Allow"
+    actions = [
+      "kms:*"
     ]
     resources = ["*"]
   }

@@ -37,8 +37,11 @@ module "cluster_vpc" {
     "kubernetes.io/role/internal-elb" = "1"
   }
 
+  ## private-endpoint-mode is read by the cluster component off this tag, so the
+  ## endpoint setting and the SSM relay always come from one value
   tags = merge({
-    Terraform = "true"
+    Terraform               = "true"
+    "private-endpoint-mode" = tostring(local.private_endpoint_mode)
   }, local.tags)
 }
 

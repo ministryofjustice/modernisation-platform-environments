@@ -125,6 +125,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
             | filter message.event = "MDSS_FILE_FAIL"
             | stats
                 latest(@timestamp) as ts,
+                latest(@logStream) as log_stream,
                 max(message.attempt) as max_attempt,
                 latest(message.max_receive_count) as max_receive_count,
                 latest(message.error_type) as error_type,
@@ -272,6 +273,7 @@ resource "aws_cloudwatch_dashboard" "mdss_ops" {
             | filter message.event = "MDSS_FILE_RETRY"
             | stats
                 latest(@timestamp) as ts,
+                latest(@logStream) as log_stream,
                 max(message.attempt) as attempt,
                 latest(message.max_receive_count) as max_receive_count,
                 latest(message.error_type) as error_type,

@@ -71,7 +71,7 @@ data "aws_iam_policy_document" "ears_sars_policy_document" {
   statement {
     effect    = "Allow"
     actions   = ["lambda:InvokeFunction"]
-    resources = [module.ears_sars_request[0].lambda_function_arn, module.write_to_sharepoint[0].lambda_function_arn,]
+    resources = [module.ears_sars_request[0].lambda_function_arn, module.write_to_sharepoint[0].lambda_function_arn, ]
   }
 }
 
@@ -182,7 +182,7 @@ data "aws_iam_policy_document" "gdpr_delete_policy_document" {
     resources = [
       aws_kms_key.emds_alerts.arn
     ]
-  }  
+  }
 }
 
 resource "aws_iam_policy" "gdpr_delete_iam_policy" {
@@ -190,6 +190,7 @@ resource "aws_iam_policy" "gdpr_delete_iam_policy" {
   name   = "gdpr_deletion_step_function_role"
   policy = data.aws_iam_policy_document.gdpr_delete_policy_document[0].json
 }
+
 
 # ------------------------------------------------------------------------------
 # Staging DB janitor Step Function
@@ -280,40 +281,23 @@ resource "aws_iam_role_policy" "landing_dlq_redriver_state_machine_invoke" {
   })
 }
 
-data "aws_iam_policy_document" "landing_dlq_redriver_eventbridge_assume" {
+
+# ------------------------------------------------------------------------------
+# cadt trigger policy
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "trigger_cadt_step_function_policy_document" {
   statement {
     effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["events.amazonaws.com"]
-    }
+    actions = ["lambda:InvokeFunction"]
+    resources = [
+      module.trigger_cadt.lambda_function_arn,
+      module.poll_cadt.lambda_function_arn
+    ]
   }
 }
 
-resource "aws_iam_role" "landing_dlq_redriver_eventbridge" {
-  name               = "landing_dlq_redriver_eventbridge_role"
-  assume_role_policy = data.aws_iam_policy_document.landing_dlq_redriver_eventbridge_assume.json
-}
-
-resource "aws_iam_role_policy" "landing_dlq_redriver_eventbridge_start" {
-  name = "landing_dlq_redriver_eventbridge_start_policy"
-  role = aws_iam_role.landing_dlq_redriver_eventbridge.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "AllowStartLandingDlqRedriverWorkflow"
-        Effect = "Allow"
-        Action = [
-          "states:StartExecution",
-        ]
-        Resource = [
-          aws_sfn_state_machine.landing_dlq_redriver.arn,
-        ]
-      }
-    ]
-  })
+resource "aws_iam_policy" "trigger_cadt_step_function_policy" {
+  name   = "trigger_cadt_step_function_role"
+  policy = data.aws_iam_policy_document.trigger_cadt_step_function_policy_document.json
 }

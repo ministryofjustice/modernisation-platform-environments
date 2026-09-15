@@ -24,11 +24,11 @@ jobs:
     if: github.event_name != 'workflow_dispatch' && github.event_name != 'schedule'
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
       - name: Run Analysis
-        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
+        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@d467c7fb1bbeb73162ea736ca13adc8ba2ae74f8 # v6.2.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -36,7 +36,6 @@ jobs:
           checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
           tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none
-          use_trivy_ecr_database: true
 
   terraform-static-analysis-full-scan:
     permissions:
@@ -49,11 +48,11 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
       - name: Run Analysis
-        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
+        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@d467c7fb1bbeb73162ea736ca13adc8ba2ae74f8 # v6.2.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -61,7 +60,6 @@ jobs:
           checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
           tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none
-          use_trivy_ecr_database: true
 
   terraform-static-analysis-scheduled-scan:
     name: Terraform Static Analysis - scheduled scan of all directories
@@ -69,11 +67,11 @@ jobs:
     if: github.event_name == 'schedule'
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
       - name: Run Analysis
-        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@91d5c1efbe43e1c8fdfc55fd39e8183fc6be8fa8 # v6.1.1
+        uses: ministryofjustice/modernisation-platform-github-actions/terraform-static-analysis@d467c7fb1bbeb73162ea736ca13adc8ba2ae74f8 # v6.2.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -81,4 +79,3 @@ jobs:
           checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
           tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none
-          use_trivy_ecr_database: true

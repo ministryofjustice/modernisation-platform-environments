@@ -25,6 +25,11 @@ variable "environment" {
   type        = string
 }
 
+variable "target_arn" {
+  description = "The ARN of the target to be drained"
+  type        = string
+}
+
 variable "extra_environment_vars" {
   description = "Optional env specific envs that needs to be injected."
   type        = map(string)

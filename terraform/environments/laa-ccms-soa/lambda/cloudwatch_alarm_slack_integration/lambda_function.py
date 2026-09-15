@@ -393,9 +393,10 @@ class NotificationService:
 
         # RDS miantenance event  
         elif type == "RDS Maintenance":
-            database_name = alarmdetails.get('SourceArn', '').split(':')[-1]
-            event_type = ', '.join(alarmdetails.get('EventCategories', ['maintenance']))
-            event_message = alarmdetails.get('Message', 'RDS maintenance event')
+            database_name = alarmdetails.get('Source ID', 'Unknown Database')
+            event_id = alarmdetails.get('Event ID', '')
+            event_type = event_id.split('#')[-1] if event_id else 'RDS Event'
+            event_message = alarmdetails.get('Event Message', 'RDS event')
             
             blocks = [
                 {
@@ -636,7 +637,7 @@ def lambda_handler(event, context):
             type = "Certificate Expiry"
             is_error = False   # Certificate expiry is informational
         # ---------------- RDS Maintenance Event ----------------
-        elif isinstance(alarm_details, dict) and "EventCategories" in alarm_details:
+        elif isinstance(alarm_details, dict) and alarm_details.get("Event Source") == "db-instance":
             logger.info("RDS maintenance event detected in SNS message")
             logger.info("Starting Notification to Slack for RDS Maintenance Event via SNS Topic")
 

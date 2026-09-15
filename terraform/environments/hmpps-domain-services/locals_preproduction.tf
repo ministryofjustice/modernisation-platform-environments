@@ -127,6 +127,9 @@ locals {
           ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
           availability_zone = "eu-west-2a"
         })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 200 }
+        }
         instance = merge(local.ec2_instances.jumpserver.instance, {
           instance_type = "r6i.xlarge"
           tags = {

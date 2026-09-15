@@ -3,6 +3,7 @@ locals {
     db_name            = "placeholder"
     username           = "placeholder"
     user               = "placeholder"
+    #checkov:skip=CKV_SECRET_6 This is a placeholder secret that is replaced with the real thing
     password           = "placeholder"
     endpoint           = "0.0.0.0"
     port               = "5432"

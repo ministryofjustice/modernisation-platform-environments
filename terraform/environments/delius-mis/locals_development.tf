@@ -6,6 +6,9 @@ locals {
     legacy_counterpart_vpc_cidr            = "10.162.32.0/20"
     legacy_ad_domain_name                  = null
     legacy_dns_ip_addrs                    = []
+    legacy_resolver_ip_addrs               = ["10.162.33.11", "10.162.38.123", "10.162.43.195"]
+    legacy_nextcloud_efs_dns_name          = "fs-92b7c763.efs.eu-west-2.amazonaws.com"
+    legacy_nextcloud_efs_id                = "fs-92b7c763"
     ad_domain_name                         = "delius-mis-dev.internal"
     ad_trust_domain_name                   = "azure.noms.root"
     ad_trust_dc_cidrs                      = module.ip_addresses.active_directory_cidrs.azure.domain_controllers
@@ -345,8 +348,16 @@ locals {
     throughtput_capacity = 16
   }
 
+  acm_certificate_dev = {
+    domain_name                         = "modernisation-platform.service.justice.gov.uk"
+    external_validation_records_created = true
+    additional_subject_alternate_names  = []
+  }
+
   lb_config_dev = {
     bucket_policy_enabled = true
+    bws_lb_rule_priority  = 1300
+    maintenance_message   = "NDMIS Reporting Dev is rarely used so is started on demand. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C032BQQHJE5\">#ask-probation-hosting</a> slack channel if you need the environment starting."
   }
 
   datasync_config_dev = {

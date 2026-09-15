@@ -32,3 +32,7 @@ data "aws_subnets" "eks_data" {
 data "aws_eks_cluster_auth" "cluster" {
   name = data.aws_eks_cluster.cluster.name
 }
+
+data "aws_secretsmanager_secret" "ai_gateway_litellm_master_key" {
+  name = "ai-gateway/litellm-master-key"
+}

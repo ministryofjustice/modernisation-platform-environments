@@ -1,5 +1,6 @@
 locals {
-  api_configuration = try(local.application_data.accounts[local.environment].api_configuration, {})
+  api_configuration   = try(local.application_data.accounts[local.environment].api_configuration, {})
+  bootstrap_code_root = "${path.module}/bootstrap-lambdas"
   api_docs_configuration = merge(
     {
       basic_auth_username = "api-docs"

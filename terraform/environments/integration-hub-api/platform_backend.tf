@@ -9,6 +9,6 @@ terraform {
     key                  = "terraform.tfstate"
     region               = "eu-west-2"
     use_lockfile         = true
-    workspace_key_prefix = "environments/members/integration-hub-api" # This will store the object as environments/members/integration-hub-api/${workspace}/terraform.tfstate
+    workspace_key_prefix = "environments/members/integration-hub/api-platform" # Phase 1 fallback: keep using the legacy state path until MP enables the new backend prefix.
   }
 }

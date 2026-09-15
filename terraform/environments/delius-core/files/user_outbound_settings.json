@@ -9,10 +9,10 @@
     "LobChunkSize": 64,
     "TaskRecoveryTableEnabled": false,
     "ParallelLoadThreads": 0,
-    "LobMaxSize": 0,
+    "LobMaxSize": 32768,
     "BatchApplyEnabled": false,
-    "FullLobMode": true,
-    "LimitedSizeLobMode": false,
+    "FullLobMode": false,
+    "LimitedSizeLobMode": true,
     "LoadMaxFileSize": 0,
     "ParallelLoadBufferSize": 0
   },

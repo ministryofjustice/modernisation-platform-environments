@@ -51,6 +51,7 @@
 # }
 
 resource "aws_ssm_parameter" "pdfcreation_secret" {
+  #checkov:skip=CKV_AWS_337: "Standard KMS is fine"
   name  = "/${var.env_name}/delius/newtech/web/params_secret_key"
   type  = "SecureString"
   value = "DEFAULT"

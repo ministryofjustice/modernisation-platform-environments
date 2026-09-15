@@ -1,1 +1,4 @@
-#### This file can be used to store locals specific to the member account ####
+locals {
+  mft_upload_bucket_parameter_prefix = "/${local.resource_application_name}/managed-file-transfer/${local.environment}/upload-bucket"
+  enable_alerting                    = contains(["development", "production"], local.environment)
+}

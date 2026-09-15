@@ -1,0 +1,19 @@
+{
+  "schema": "claims",
+  "objects_from": "data_claims",
+  "extraction_date": "2026-07-01T12:00:00.000000",
+  "objects": [
+    "bulk_submission",
+    "submission",
+    "claim",
+    "client",
+    "claim_case",
+    "claim_summary_fee",
+    "calculated_fee_detail",
+    "matter_start",
+    "replication_summary",
+    "assessment"
+  ],
+  "blobs": [],
+  "columns_to_exclude": []
+}

@@ -3,12 +3,21 @@
 *.tfstate*
 .DS_Store
 tmp/
+.linked-repos/
 .vscode/*
 !.vscode/mcp.json
 .terraform.lock.hcl
 **/node_modules
 **/package-lock.json
 **/*-draft.*
+
+# Python test and coverage artefacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
 
 ##########################
 ## IntelliJ
@@ -27,6 +36,7 @@ out/
 
 terraform/modules/**/*.zip
 terraform/environments/integration-hub/managed-file-transfer/builds
+terraform/environments/integration-hub-file-transfer/builds
 terraform/environments/youth-justice-app-framework/modules/quicksight/assets/run_time
 
 megalinter-reports

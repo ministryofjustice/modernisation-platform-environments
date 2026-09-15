@@ -623,6 +623,31 @@ resource "aws_instance" "s618358rgvw028" {
   }
 }
 
+# UAT Tooling Server
+
+resource "aws_instance" "s618358rgvw029" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-preproduction == true ? 1 : 0
+  ami                    = "ami-08a06c03d368d86da"
+  instance_type          = "c6i.xlarge"     # temporary instance type for testing - to be downgraded to an m5.large as a later date
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.all["Tooling-Service-Server-Security-Group"].id]
+  subnet_id              = data.aws_subnet.data_subnets_b.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s618358rgvw029"
+    patch_group = "uat_win_patch"
+    backup      = true
+  }
+}
+
 # WAN Portal Server
 
 resource "aws_instance" "s618358rgvw201" {
@@ -686,7 +711,7 @@ resource "aws_instance" "s618358rgvw019" {
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-01d04f2e4f8cea4dd"
-  instance_type          = "c5.xlarge"
+  instance_type          = "m5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
@@ -704,7 +729,6 @@ resource "aws_instance" "s618358rgvw019" {
     iisadmin_service = "true"
     wwwpub_service   = "true"
     ppudlive_service = "true"
-    port25_check     = "true"
   }
 }
 
@@ -715,7 +739,7 @@ resource "aws_instance" "s618358rgvw020" {
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0e49fc9838fdf33c4"
-  instance_type          = "c5.xlarge"
+  instance_type          = "m5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
@@ -733,7 +757,6 @@ resource "aws_instance" "s618358rgvw020" {
     iisadmin_service = "true"
     wwwpub_service   = "true"
     ppudlive_service = "true"
-    port25_check     = "true"
   }
 }
 
@@ -766,7 +789,6 @@ resource "aws_instance" "s618358rgvw021" {
     e_volume          = "true"
     f_volume          = "true"
     g_volume          = "true"
-    port25_check      = "true"
   }
 }
 
@@ -796,7 +818,6 @@ resource "aws_instance" "s618358rgvw022" {
     ppudlive_service    = "true"
     ppudcrawler_service = "true"
     spooler_service     = "true"
-    port25_check        = "true"
     emailsender_check   = "true"
     e_volume            = "true"
     f_volume            = "true"
@@ -856,7 +877,6 @@ resource "aws_instance" "s618358rgvw027" {
     is-production   = true
     wwwpub_service  = "true"
     spooler_service = "true"
-    port25_check    = "true"
     e_volume        = "true"
     f_volume        = "true"
     g_volume        = "true"
@@ -913,6 +933,31 @@ resource "aws_instance" "s618358rgvw031" {
 
   tags = {
     Name          = "s618358rgvw031"
+    patch_group   = "prod_win_patch"
+    is-production = true
+  }
+}
+
+# Prod Tooling Server
+
+resource "aws_instance" "s618358rgvw032" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-08a06c03d368d86da"
+  instance_type          = "m5.large"
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.all["Tooling-Service-Server-Security-Group"].id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name          = "s618358rgvw032"
     patch_group   = "prod_win_patch"
     is-production = true
   }
@@ -1049,6 +1094,7 @@ resource "aws_instance" "s265903rgsl401-cjsm" {
     is-production  = true
     patch_group    = "prod_lin_patch"
     docker_service = "true"
+    port25_check   = "true"
   }
 }
 
@@ -1119,4 +1165,158 @@ resource "aws_eip_association" "s265903rgsl401-eip-association-cjsm" {
   count         = local.is-production == true ? 1 : 0
   instance_id   = aws_instance.s265903rgsl401-cjsm[0].id
   allocation_id = aws_eip.s265903rgsl401-cjsm[0].id
+}
+
+#########################################################################################################################
+# New Amazon Linux 2023 Instances (to replace Amazon Linux 2 EOL instances)
+#########################################################################################################################
+
+# Internal Mail Relay
+
+resource "aws_instance" "internal-mail-relay" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-002aab1cab5a08e35"
+  instance_type          = "m5.large"
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.conditional["Internal-Mail-Relay-Security-Group"].id]
+  subnet_id              = data.aws_subnet.private_subnets_b.id
+  key_name               = aws_key_pair.cjms_instance[0].key_name
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name              = "internal-mail-relay"
+    is-production     = true
+    patch_group       = "prod_lin_patch"
+    docker_service    = "true"
+    container_service = "true"
+    archive_volume    = "true"
+    mail_queue        = "true"
+  }
+}
+
+# External non-CJSM Mail Relay
+
+resource "aws_instance" "non-cjsm-mail-relay" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-002aab1cab5a08e35"
+  instance_type          = "m5.large"
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.conditional["External-Mail-Relay-Security-Group"].id]
+  subnet_id              = data.aws_subnet.public_subnets_b.id
+  key_name               = aws_key_pair.cjms_instance[0].key_name
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name              = "non-cjsm-mail-relay"
+    is-production     = true
+    patch_group       = "prod_lin_patch"
+    docker_service    = "true"
+    container_service = "true"
+    port25_check      = "true"
+    mail_queue        = "true"
+  }
+}
+
+# External CJSM Mail Relay
+
+resource "aws_instance" "cjsm-mail-relay" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-002aab1cab5a08e35"
+  instance_type          = "m5.large"
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.conditional["External-Mail-Relay-Security-Group"].id]
+  subnet_id              = data.aws_subnet.public_subnets_c.id
+  key_name               = aws_key_pair.cjms_instance[0].key_name
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name              = "cjsm-mail-relay"
+    is-production     = true
+    patch_group       = "prod_lin_patch"
+    docker_service    = "true"
+    container_service = "true"
+    port25_check      = "true"
+    mail_queue        = "true"
+  }
+}
+
+# Docker Build Instance
+
+resource "aws_instance" "docker-build-instance" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-002aab1cab5a08e35"
+  instance_type          = "m5.large"
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.conditional["Docker-Build-Server-Security-Group"].id]
+  subnet_id              = data.aws_subnet.private_subnets_c.id
+  key_name               = aws_key_pair.cjms_instance[0].key_name
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name          = "docker-build-instance"
+    is-production = true
+    patch_group   = "prod_lin_patch"
+  }
+}
+
+
+# Elastic IP Addresses for External Mail Relays
+
+resource "aws_eip" "non-cjsm-mail-relay-eip" {
+  count  = local.is-production == true ? 1 : 0
+  domain = "vpc"
+  tags = {
+    Name = "non-cjsm-mail-relay-eip"
+  }
+}
+
+resource "aws_eip" "cjsm-mail-relay-eip" {
+  count  = local.is-production == true ? 1 : 0
+  domain = "vpc"
+  tags = {
+    Name = "cjsm-mail-relay-eip"
+  }
+}
+
+
+# Associate EIP for Mail Relay EC2 Instances
+
+resource "aws_eip_association" "non-cjsm-mail-relay-eip-association" {
+  count         = local.is-production == true ? 1 : 0
+  instance_id   = aws_instance.non-cjsm-mail-relay[0].id
+  allocation_id = aws_eip.non-cjsm-mail-relay-eip[0].id
+}
+
+resource "aws_eip_association" "cjsm-mail-relay-eip-association" {
+  count         = local.is-production == true ? 1 : 0
+  instance_id   = aws_instance.cjsm-mail-relay[0].id
+  allocation_id = aws_eip.cjsm-mail-relay-eip[0].id
 }

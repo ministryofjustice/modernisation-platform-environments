@@ -30,7 +30,7 @@ resource "aws_iam_role_policy" "lambda_cloudwatch_sns_policy" {
           "secretsmanager:DescribeSecret",
           "secretsmanager:ListSecretVersionIds"
         ]
-        Resource = [aws_secretsmanager_secret.edrms_docs_exception_secrets.arn]
+        Resource = [aws_secretsmanager_secret.edrms_secrets.arn]
       },
       {
         Effect = "Allow"
@@ -99,7 +99,7 @@ resource "aws_lambda_function" "cloudwatch_sns" {
 
   environment {
     variables = {
-      SECRET_NAME = aws_secretsmanager_secret.edrms_docs_exception_secrets.name
+      SECRET_NAME = aws_secretsmanager_secret.edrms_secrets.name
     }
   }
 

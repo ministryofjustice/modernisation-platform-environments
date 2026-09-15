@@ -68,3 +68,13 @@ variable "api_version" {
   description = "The version of the API Gateway"
   type        = string
 }
+
+variable "api_gateway_endpoint" {
+  description = "API Gateway endpoint"
+  type        = string
+}
+
+variable "roles_to_allow" {
+  description = "Role ARNs to allow to trigger the API"
+  type = list(string)
+}

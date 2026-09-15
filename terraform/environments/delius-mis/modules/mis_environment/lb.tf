@@ -12,14 +12,21 @@ locals {
   dis_enabled = var.lb_config != null && var.dis_config != null && var.dis_config.instance_count > 0
   dis_fqdn    = "ndl-dis.${var.env_name}.${var.account_config.dns_suffix}"
 
-  bws_enabled = var.lb_config != null && var.bws_config != null && var.bws_config.instance_count > 0
-  bws_fqdn    = "${var.env_name}.${var.account_config.dns_suffix}"
+  bws_enabled    = var.lb_config != null && var.bws_config != null && var.bws_config.instance_count > 0
+  bws_fqdn       = "${var.env_name}.${var.account_config.dns_suffix}"
+  bws_admin_fqdn = "admin.${var.env_name}.${var.account_config.dns_suffix}"
+
+  bws_external_fqdn       = var.bws_config != null ? lookup(var.bws_config, "external_fqdn", local.bws_fqdn) : null
+  bws_external_admin_fqdn = var.bws_config != null ? lookup(var.bws_config, "external_admin_fqdn", local.bws_admin_fqdn) : null
 
   bws_sso_enabled = var.lb_config != null && var.bws_sso_config != null && var.bws_sso_config.instance_count > 0
   bws_sso_fqdn    = "sso.${var.env_name}.${var.account_config.dns_suffix}"
 
   bcs_win_enabled = var.lb_config != null && var.bcs_config_win != null && var.bcs_config_win.instance_count > 0
   bcs_win_fqdn    = "ndl-bcs.${var.env_name}.${var.account_config.dns_suffix}"
+
+  maintenance_rule_enabled = var.lb_config != null && lookup(var.lb_config, "maintenance_message", null) != null
+  maintenance_rule_fqdn    = "maintenance.${var.env_name}.${var.account_config.dns_suffix}"
 }
 
 # Main security group for ALB
@@ -461,7 +468,7 @@ resource "aws_lb_listener" "mis_http" {
 
 # HTTPS Listener (port 443) - default action is HTTP 501 if no rules are matched
 resource "aws_lb_listener" "mis_https" {
-  count = var.lb_config != null ? 1 : 0
+  count = var.lb_config != null && var.acm_certificate != null ? 1 : 0
 
   load_balancer_arn = aws_lb.mis[0].arn
   port              = "443"
@@ -483,7 +490,7 @@ resource "aws_lb_listener" "mis_https" {
 }
 
 resource "aws_lb_listener_rule" "dfi_https" {
-  count        = local.dfi_enabled ? 1 : 0
+  count        = length(aws_lb_listener.mis_https) == 1 && local.dfi_enabled ? 1 : 0
   listener_arn = aws_lb_listener.mis_https[0].arn
   priority     = 100
 
@@ -502,7 +509,7 @@ resource "aws_lb_listener_rule" "dfi_https" {
 }
 
 resource "aws_lb_listener_rule" "dis_https" {
-  count        = local.dis_enabled ? 1 : 0
+  count        = length(aws_lb_listener.mis_https) == 1 && local.dis_enabled ? 1 : 0
   listener_arn = aws_lb_listener.mis_https[0].arn
   priority     = 200
 
@@ -521,9 +528,9 @@ resource "aws_lb_listener_rule" "dis_https" {
 }
 
 resource "aws_lb_listener_rule" "bws_https" {
-  count        = local.bws_enabled ? 1 : 0
+  count        = length(aws_lb_listener.mis_https) == 1 && local.bws_enabled ? 1 : 0
   listener_arn = aws_lb_listener.mis_https[0].arn
-  priority     = 300
+  priority     = lookup(var.lb_config, "bws_lb_rule_priority", 300)
 
   action {
     type             = "forward"
@@ -532,7 +539,10 @@ resource "aws_lb_listener_rule" "bws_https" {
 
   condition {
     host_header {
-      values = [local.bws_fqdn]
+      values = [
+        nonsensitive(local.bws_external_fqdn),
+        nonsensitive(local.bws_external_admin_fqdn),
+      ]
     }
   }
 
@@ -540,7 +550,7 @@ resource "aws_lb_listener_rule" "bws_https" {
 }
 
 resource "aws_lb_listener_rule" "bws_sso_https" {
-  count        = local.bws_sso_enabled ? 1 : 0
+  count        = length(aws_lb_listener.mis_https) == 1 && local.bws_sso_enabled ? 1 : 0
   listener_arn = aws_lb_listener.mis_https[0].arn
   priority     = 350
 
@@ -559,7 +569,7 @@ resource "aws_lb_listener_rule" "bws_sso_https" {
 }
 
 resource "aws_lb_listener_rule" "bcs_win_https" {
-  count        = local.bcs_win_enabled ? 1 : 0
+  count        = length(aws_lb_listener.mis_https) == 1 && local.bcs_win_enabled ? 1 : 0
   listener_arn = aws_lb_listener.mis_https[0].arn
   priority     = 400
 
@@ -577,9 +587,41 @@ resource "aws_lb_listener_rule" "bcs_win_https" {
   tags = local.tags
 }
 
+resource "aws_lb_listener_rule" "maintenance" {
+  count = length(aws_lb_listener.mis_https) == 1 && local.maintenance_rule_enabled ? 1 : 0
+
+  listener_arn = aws_lb_listener.mis_https[0].arn
+  priority     = 999
+
+  action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/html"
+      message_body = templatefile("${path.module}/templates/maintenance.html.tftpl", {
+        maintenance_title   = "NDMIS Reporting Maintenance Window"
+        maintenance_message = var.lb_config.maintenance_message
+      })
+      status_code = "200"
+    }
+  }
+
+  condition {
+    host_header {
+      values = [
+        nonsensitive(local.bws_external_fqdn),
+        local.bws_sso_fqdn,
+        local.maintenance_rule_fqdn,
+      ]
+    }
+  }
+
+  tags = local.tags
+}
+
 # ACM certificate using the modernisation platform pattern - dynamically includes SANs based on enabled services
 module "acm_certificate" {
-  count  = var.lb_config != null ? 1 : 0
+  count  = var.acm_certificate != null ? 1 : 0
   source = "../../../../modules/acm_certificate"
 
   providers = {
@@ -588,11 +630,13 @@ module "acm_certificate" {
   }
 
   name        = "${local.lb_name}-cert"
-  domain_name = "modernisation-platform.service.justice.gov.uk"
-  subject_alternate_names = [
+  domain_name = var.acm_certificate.domain_name
+  subject_alternate_names = concat(var.acm_certificate.additional_subject_alternate_names, [
     "${var.env_name}.${var.account_config.dns_suffix}",
     "*.${var.env_name}.${var.account_config.dns_suffix}"
-  ]
+  ])
+
+  external_validation_records_created = var.acm_certificate.external_validation_records_created
 
   validation = {
     "modernisation-platform.service.justice.gov.uk" = {
@@ -700,6 +744,22 @@ resource "aws_route53_record" "bws_entry" {
   }
 }
 
+# Create route53 entry for BWS admin - only if BWS is enabled
+resource "aws_route53_record" "bws_admin_entry" {
+  count    = local.bws_enabled ? 1 : 0
+  provider = aws.core-vpc
+
+  zone_id = var.account_config.route53_external_zone.zone_id
+  name    = local.bws_admin_fqdn
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.mis[0].dns_name
+    zone_id                = aws_lb.mis[0].zone_id
+    evaluate_target_health = false
+  }
+}
+
 # Create route53 entry for BWS SSO - only if BWS SSO is enabled
 resource "aws_route53_record" "bws_sso_entry" {
   count    = local.bws_sso_enabled ? 1 : 0
@@ -723,6 +783,22 @@ resource "aws_route53_record" "bcs_win_entry" {
 
   zone_id = var.account_config.route53_external_zone.zone_id
   name    = local.bcs_win_fqdn
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.mis[0].dns_name
+    zone_id                = aws_lb.mis[0].zone_id
+    evaluate_target_health = false
+  }
+}
+
+# Create route53 entry for testing maintenance mode page
+resource "aws_route53_record" "maintenance_entry" {
+  count    = local.maintenance_rule_enabled ? 1 : 0
+  provider = aws.core-vpc
+
+  zone_id = var.account_config.route53_external_zone.zone_id
+  name    = local.maintenance_rule_fqdn
   type    = "A"
 
   alias {

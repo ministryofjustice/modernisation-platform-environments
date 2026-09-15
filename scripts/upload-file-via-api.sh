@@ -149,7 +149,17 @@ AUTH_ARGS=()
 if [ -n "$BEARER_TOKEN" ]; then
   AUTH_ARGS=(-H "authorization: Bearer $BEARER_TOKEN")
 else
-  AUTH_ARGS=(-u "${BASIC_USERNAME}:${BASIC_PASSWORD}")
+  BASIC_AUTH_HEADER="$(
+    python3 - "$BASIC_USERNAME" "$BASIC_PASSWORD" <<'PY'
+import base64
+import sys
+
+username, password = sys.argv[1:]
+token = base64.b64encode(f"{username}:{password}".encode("utf-8")).decode("ascii")
+print(f"authorization: Basic {token}", end="")
+PY
+  )"
+  AUTH_ARGS=(-H "$BASIC_AUTH_HEADER")
 fi
 
 TRANSFER_TICKET_REQUEST_JSON="$OUTPUT_DIR/transfer-ticket-request.json"

@@ -1,0 +1,32 @@
+{
+  "accounts": {
+    "development": {
+      "ami_image_id": "ami-02f77a03ec776dc35",
+      "ec2_instance_type": "m5.large",
+      "ec2_min_capacity": 1,
+      "ec2_max_capacity": 3,
+      "ec2_desired_capacity": 1,
+      "root_volume_size": 30,
+      "app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-edrms",
+      "container_version": "latest",
+      "edrms_server_port": 8080,
+      "container_cpu": 1024,
+      "container_memory": 2048,
+      "app_count": 1,
+      "spring_profiles_active": "WithoutNorthgate",
+      "northgate_proxy": "10.120.0.147/32",
+      "target_northgate_hub_dime_url": "http://10.120.0.147/DocumentHub/dime",
+      "northgate_timeout": "300000",
+      "logging_level_root": "info",
+      "aws_workspace": "10.200.0.0/19",
+      "tds_db_user": "admin",
+      "tds_db_instance_type": "db.t3.small",
+      "tds_db_storage_gb": 50,
+      "tds_db_iops": null,
+      "tds_db_multi_az": false,
+      "alb_deletion_protection": true,
+      "tds_db_deletion_protection": true,
+      "db_log_retention_days": 7
+    }
+  }
+}

@@ -21,6 +21,7 @@ locals {
 
       sns_topics = {
         pagerduty_integrations = {
+          delius-mis-preproduction-pagerduty               = "delius_core_nonprod_alarms"
           dso-pipelines-pagerduty                          = "dso-pipelines"
           hmpps-domain-services-test-pagerduty             = "hmpps-domain-services-test"
           nomis-test-pagerduty                             = "nomis-test"

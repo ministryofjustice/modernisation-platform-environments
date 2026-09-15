@@ -1,5 +1,6 @@
 
 resource "aws_security_group" "ecs_service" {
+  #checkov:skip=CKV2_AWS_5: "SG passed to ecs service module"
   name        = "ecs-service-${var.name}-${var.env_name}"
   description = "Security group for the ${var.env_name} ${var.name} service"
   vpc_id      = var.account_config.shared_vpc_id

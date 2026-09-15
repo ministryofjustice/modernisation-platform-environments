@@ -49,3 +49,68 @@ module "cloud_platform_live_namespace_secret" {
   })
   ignore_secret_changes = true
 }
+
+module "pagerduty_orchestrator_integration_key_secret" {
+  count = contains(["data-platform-development", "data-platform-production"], terraform.workspace) ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=82029345dea22bc49989a6f46c5d8d8e555b84c9" # v2.0.1
+
+  name = "pagerduty/orchestrator-integration-key"
+
+  secret_string         = "CHANGEME"
+  ignore_secret_changes = true
+
+  tags = merge(
+    local.tags,
+    { "credential-expiration" = "none" }
+  )
+}
+
+module "pagerduty_slack_connection_api_key_secret" {
+  count = contains(["data-platform-development", "data-platform-production"], terraform.workspace) ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=82029345dea22bc49989a6f46c5d8d8e555b84c9" # v2.0.1
+
+  name = "pagerduty/slack-connection-api-key"
+
+  secret_string         = "CHANGEME"
+  ignore_secret_changes = true
+
+  tags = merge(
+    local.tags,
+    { "credential-expiration" = "none" }
+  )
+}
+
+module "grafana_azure_monitor_secret" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
+
+  count = local.environment_configuration.monitoring_stack_enabled ? 1 : 0
+
+  name = "${local.component_name}/grafana-azure-monitor"
+
+  secret_string = jsonencode({
+    client_id       = "CHANGEME"
+    subscription_id = "CHANGEME"
+    tenant_id       = "CHANGEME"
+  })
+
+  ignore_secret_changes = true
+}
+
+# Google Cloud project used for Grafana's Google Cloud Monitoring datasource via
+# workload identity federation (see the ai-gateway component for the same pattern).
+module "google_cloud_monitoring_secret" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
+
+  count = local.environment_configuration.monitoring_stack_enabled ? 1 : 0
+
+  name = "${local.component_name}/google-cloud-platform/moj-gcp-ai-gateway"
+
+  secret_string = jsonencode({
+    project_name = "CHANGEME"
+    project_id   = "CHANGEME"
+  })
+
+  ignore_secret_changes = true
+}

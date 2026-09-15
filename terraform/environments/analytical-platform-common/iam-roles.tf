@@ -11,8 +11,10 @@ module "ecr_access_iam_role" {
   name = "ecr-access"
 
   oidc_wildcard_subjects = [
-    "ministryofjustice/*",
-    "moj-analytical-services/*"
+    "ministryofjustice/*:*",
+    "ministryofjustice@*/*@*:*",
+    "moj-analytical-services/*:*",
+    "moj-analytical-services@*/*@*:*"
   ]
 
   policies = {

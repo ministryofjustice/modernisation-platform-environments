@@ -52,6 +52,27 @@ resource "aws_glue_connection" "glue_operational_datastore_connection" {
   }
 }
 
+# Operational DataStore (AZ-C) — used by nomis jobs only
+# nomis CDC/batch/reconciliation jobs are pinned to AZ-C (same AZ as glue_nomis_connection)
+# to keep all nomis Glue ENIs in a single AZ and free up AZ-B CIDR capacity.
+resource "aws_glue_connection" "glue_operational_datastore_connection_nomis" {
+  count           = local.create_glue_connection ? 1 : 0
+  name            = "${local.project}-operational-datastore-connection-nomis"
+  connection_type = "JDBC"
+
+  connection_properties = {
+    JDBC_CONNECTION_URL    = local.operational_db_jdbc_connection_string
+    JDBC_DRIVER_CLASS_NAME = "org.postgresql.Driver"
+    SECRET_ID              = data.aws_secretsmanager_secret.operational_db_secret.name
+  }
+
+  physical_connection_requirements {
+    availability_zone      = data.aws_subnet.private_subnets_c.availability_zone
+    security_group_id_list = [aws_security_group.glue_job_connection_sg.id]
+    subnet_id              = data.aws_subnet.private_subnets_c.id
+  }
+}
+
 # Nomis
 resource "aws_glue_connection" "glue_nomis_connection" {
   count           = local.create_glue_connection ? 1 : 0

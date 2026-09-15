@@ -30,6 +30,43 @@ module "artifacts-s3" {
     }
   ]
 
+  bucket_policy = [jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        "Sid" : "DenyInsecureTransport",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          module.artifacts-s3.bucket.arn,
+          "${module.artifacts-s3.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
+        "Sid" : "EnforceTLSv12orHigher",
+        "Action" : "s3:*",
+        "Effect" : "Deny",
+        "Resource" : [
+          module.artifacts-s3.bucket.arn,
+          "${module.artifacts-s3.bucket.arn}/*"
+        ],
+        "Condition" : {
+          "NumericLessThan" : {
+            "s3:TlsVersion" : "1.2"
+          }
+        },
+        "Principal" : {
+          "AWS" : "*"
+        }
+      }
+    ]
+  })]
+
   tags = local.tags
 }
-

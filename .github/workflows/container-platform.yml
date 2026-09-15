@@ -18,6 +18,7 @@ on:
       - 'terraform/environments/cloud-platform/accounts.json'
       - '.github/workflows/container-platform.yml'
       - '.github/workflows/cloud-platform-reusable.yml'
+      - '.github/workflows/reusable_terraform_components_plan_apply.yml'
 
 permissions:
   id-token: write  # This is required for requesting the JWT
@@ -30,7 +31,7 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - id: set-matrix
         run: |
           json="["
@@ -40,8 +41,15 @@ jobs:
           done < <(jq -r '.accounts[]' terraform/environments/cloud-platform/accounts.json)
           echo "matrix=${json%,}]" >> $GITHUB_OUTPUT
 
+  # Fetched once here and passed down to avoid hitting rate limits from repeated calls in the reusable workflows below
+  fetch-secrets:
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@2988728879704953e739f82ac926d37931c6d01b # v6.1.9
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
   terraform-pr:
-    needs: setup
+    needs: [setup, fetch-secrets]
     if: github.event_name == 'pull_request'
     strategy:
       fail-fast: false
@@ -53,12 +61,15 @@ jobs:
       environment: "${{ matrix.environment }}"
       action: "plan"
       account_name: "${{ matrix.account_name }}"
+      secrets_prefetched: true
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      ENVIRONMENT_MANAGEMENT: ${{ needs.fetch-secrets.outputs.environment_management }}
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}
 
   terraform-main:
-    needs: setup
+    needs: [setup, fetch-secrets]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     strategy:
       fail-fast: false
@@ -70,6 +81,9 @@ jobs:
       environment: "${{ matrix.environment }}"
       action: "plan_apply"
       account_name: "${{ matrix.account_name }}"
+      secrets_prefetched: true
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      ENVIRONMENT_MANAGEMENT: ${{ needs.fetch-secrets.outputs.environment_management }}
+      GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT: ${{ needs.fetch-secrets.outputs.github_ci_user_environments_repo_pat }}

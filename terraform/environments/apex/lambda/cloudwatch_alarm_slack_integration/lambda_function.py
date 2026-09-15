@@ -156,12 +156,13 @@ def parse_config_from_env_and_secrets(
 class NotificationService:
     """Service for sending notifications to Slack."""
 
-    def __init__(self, webhook_url: str, function_name: str = "CloudWatch SNS Alarm to Lambda"):
+    def __init__(self, webhook_url: str, function_name: str = "CloudWatch SNS Alarm to Lambda", environment_name: str = "Unknown"):
         if not webhook_url:
             raise ValueError("Slack webhook URL is required for notifications")
 
         self.webhook_url = webhook_url
         self.function_name = function_name
+        self.environment_name = environment_name or "Unknown"
         logger.info("Slack notifications configured")
 
     def send_notification(
@@ -495,6 +496,7 @@ def lambda_handler(event, context):
 
     # Get secret name from environment or event
     secret_name = os.environ.get("SECRET_NAME", event.get("secret_name"))
+    environment_name = os.environ.get("ENVIRONMENT", "Unknown")
     if not secret_name:
         raise ValueError("SECRET_NAME not found in environment or event")
     if not isinstance(secret_name, str):
@@ -621,7 +623,7 @@ def lambda_handler(event, context):
 
         # Initialize services
         notification_service = NotificationService(
-            channelconfig, context.function_name
+            channelconfig, context.function_name, environment_name
         )
 
         notification_service.send_notification(

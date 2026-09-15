@@ -1,6 +1,14 @@
 # Integration Hub API Platform
 
+This folder is now the legacy location for the original Integration Hub API Platform stack.
+
+The active Modernisation Platform environment for this service is [`terraform/environments/integration-hub-api`](../../integration-hub-api), with application code in `ministryofjustice/integration-hub-file-transfer-api`.
+
 This component provides a thin API layer for Managed File Transfer uploads.
+
+The infrastructure for this component stays in `modernisation-platform-environments`, but the Lambda application code, OpenAPI contract, and API request collections now live in the companion repository `ministryofjustice/integration-hub-file-transfer-api`.
+
+This environments repository now stays infrastructure-only. The Terraform here creates bootstrap Lambda resources only; the companion repository owns deployment of the real Lambda code through a separate app workflow.
 
 It now protects the API with:
 
@@ -282,7 +290,7 @@ curl -X DELETE "https://<api-endpoint>/transfer-tickets/<transfer-ticket>" \
 
 ## OpenAPI
 
-The source contract is documented in [`openapi.yaml`](openapi.yaml).
+The source contract is documented in the companion repository's `openapi.yaml`.
 
 After deployment, the same API publishes a protected Swagger UI and the raw OpenAPI document:
 

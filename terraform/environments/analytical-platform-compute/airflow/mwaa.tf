@@ -23,6 +23,7 @@ resource "aws_mwaa_environment" "main" {
 
   airflow_configuration_options = {
     "celery.worker_autoscale"            = local.environment_configuration.airflow_celery_worker_autoscale
+    "core.dagbag_import_timeout"         = local.environment_configuration.airflow_dagbag_import_timeout
     "secrets.backend"                    = "airflow.providers.amazon.aws.secrets.secrets_manager.SecretsManagerBackend"
     "secrets.backend_kwargs"             = "{\"connections_prefix\": \"airflow/connections\", \"variables_prefix\": \"airflow/variables\"}"
     "smtp.smtp_host"                     = "email-smtp.${data.aws_region.current.region}.amazonaws.com"

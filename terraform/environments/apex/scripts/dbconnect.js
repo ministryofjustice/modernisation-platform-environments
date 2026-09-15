@@ -13,8 +13,8 @@
 const SSH = require("simple-ssh");
 const AWS = require("aws-sdk");
 
-//SSM object with temp parms
-const ssm = new AWS.SSM({ apiVersion: "2014-11-06" });
+// Secrets Manager client for SSH private key retrieval
+const secretsManager = new AWS.SecretsManager({ apiVersion: "2017-10-17" });
 
 // Environment variables
 const pem = "EC2_SSH_KEY";
@@ -60,20 +60,20 @@ async function getIPaddress(appname) {
 }
 
 
-// Get SSH key from param store
+// Get SSH key from Secrets Manager
 
-async function getSSMparam() {
-  return await ssm.getParameter({ Name: pem, WithDecryption: true }).promise();
+async function getSecretValue() {
+  return await secretsManager.getSecretValue({ SecretId: pem }).promise();
 }
 
 // Trigger SSH connection to the EC2 instance
 // Run SSH command
 
 async function connSSH(action, appname) {
-  //get ssm key
-  const key = await getSSMparam();
+  // get secret value containing SSH private key
+  const key = await getSecretValue();
 
-  const myKey = key["Parameter"]["Value"];
+  const myKey = key["SecretString"];
 
   const addresses = await getIPaddress(appname);
   // all this config could be passed in via the event

@@ -70,6 +70,24 @@ module "lb-s3-access-logs" {
 
 data "aws_iam_policy_document" "bucket_policy" {
   statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      local.existing_bucket_name != "" ? "arn:aws:s3:::${local.existing_bucket_name}" : module.lb-s3-access-logs[0].bucket.arn,
+      local.existing_bucket_name != "" ? "arn:aws:s3:::${local.existing_bucket_name}/*" : "${module.lb-s3-access-logs[0].bucket.arn}/*",
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+  statement {
     effect = "Allow"
     actions = [
       "s3:PutObject"

@@ -37,7 +37,7 @@ resource "aws_instance" "apex_db_instance" {
     local.tags,
     { "Name" = local.database_ec2_name },
     { "instance-scheduling" = "skip-scheduling" },
-    { "backup" = "false" },
+    { "backup" = "true" },
     local.backup_schedule_tags
   )
 }

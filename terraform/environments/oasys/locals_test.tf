@@ -1,8 +1,14 @@
 locals {
 
-  delius_oasys_queues_test = {
-    "t2" = {
-      sns_topic_arn_configured = true # set to true when sns_topic_arn has been populated in config secret
+  locals_test = {
+    arns_integration = {
+      cross_account_secret_configured = true
+      database_hostname               = "hmpps-arns-assessment-view-db-test"
+    }
+    delius_oasys_queues = {
+      "t2" = {
+        sns_topic_arn_configured = true # set to true when sns_topic_arn has been populated in config secret
+      }
     }
   }
 
@@ -347,7 +353,32 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T2/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T2*/*",
             ]
-          }
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/postgres/database/hmpps-arns-assessment-view-db-test/*",
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "kms:Decrypt",
+            ]
+            resources = [
+              aws_kms_key.arns_integration[0].arn,
+            ]
+            condition = {
+              test     = "StringEquals"
+              variable = "kms:ViaService"
+              values = [
+                "secretsmanager.eu-west-2.amazonaws.com",
+              ]
+            }
+          },
         ]
       }
       Ec2T2WebPolicy = {

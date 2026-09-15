@@ -19,6 +19,8 @@ resource "aws_iam_role" "cadet" {
 }
 
 data "aws_iam_policy_document" "cadet_policy" {
+  #checkov:skip=CKV_AWS_356: LF requires "*". Resource level permissions handled by service
+  #checkov:skip=CKV_AWS_111: LF requires "*". Resource level permissions handled by service
   statement {
     effect = "Allow"
     actions = [
