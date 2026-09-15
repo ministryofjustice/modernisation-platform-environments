@@ -97,6 +97,15 @@ resource "aws_security_group" "backup_lambda" {
   )
 }
 
+resource "terraform_data" "detach_backup_lambda_networking" {
+  triggers_replace = [aws_security_group.backup_lambda.id, data.aws_region.current.name]
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "aws lambda update-function-configuration --function-name delete_snapshots --vpc-config 'SubnetIds=[],SecurityGroupIds=[]' --region ${self.triggers_replace[1]}"
+  }
+}
+
 ######################################
 ### EventBridge Resources
 ######################################
