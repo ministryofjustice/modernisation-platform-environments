@@ -61,7 +61,7 @@ locals {
       instance = {
         disable_api_termination      = false
         instance_type                = "t2.small"
-        key_name                     = "ec2-user"
+        key_name                     = null
         metadata_options_http_tokens = "optional"
         vpc_security_group_ids       = ["ec2-windows"]
       }
