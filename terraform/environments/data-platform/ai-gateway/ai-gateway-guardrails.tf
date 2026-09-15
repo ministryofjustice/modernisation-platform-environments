@@ -7,5 +7,8 @@ resource "litellm_guardrail" "prompt_attack" {
   litellm_params = jsonencode({
     guardrailIdentifier = aws_bedrock_guardrail.prompt_attack.guardrail_id
     guardrailVersion    = aws_bedrock_guardrail_version.prompt_attack.version
+    # Scan only the latest user message instead of the whole conversation history, to reduce false positives on long agentic sessions.
+    # https://docs.litellm.ai/docs/proxy/guardrails/bedrock#experimental-only-send-latest-user-message
+    experimental_use_latest_role_message_only = true
   })
 }
