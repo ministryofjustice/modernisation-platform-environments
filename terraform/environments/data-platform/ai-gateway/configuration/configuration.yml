@@ -442,7 +442,7 @@ models:
       model_name: "Google Gemini 3.5 Transcribe Preview"
       location: "global"
       generally_available: false
-      environments_available: ["development", "production"]
+      environments_available: ["development"]
     gemini-3-6-flash:
       model_id: "gemini-3.6-flash"
       model_family: "Google Gemini"
