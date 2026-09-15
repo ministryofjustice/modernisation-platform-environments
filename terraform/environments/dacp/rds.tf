@@ -22,10 +22,10 @@ resource "aws_db_instance" "dacp_db" {
   allow_major_version_upgrade     = false
   auto_minor_version_upgrade      = true
   ca_cert_identifier              = "rds-ca-rsa2048-g1"
-  apply_immediately               = true
+  apply_immediately               = local.is-production ? false : true
   copy_tags_to_snapshot           = true
   parameter_group_name            = local.is-production ? "default.postgres14" : aws_db_parameter_group.dacp_analyse.name
-  maintenance_window              = local.is-production ? null : "tue:19:20-tue:19:50"
+  maintenance_window              = local.is-production ? "sun:04:00-sun:04:30" : "wed:19:20-wed:19:50"
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
 }
 
