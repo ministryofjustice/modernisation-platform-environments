@@ -438,7 +438,7 @@ resource "aws_cloudwatch_event_target" "merge_emdi_position" {
 }
 
 resource "aws_lambda_permission" "allow_eventbridge_emdi_position" {
-  count         = local.is-production ? 0 : 1
+  count         = 1
   statement_id  = "AllowExecutionFromEventBridgeEmdiPosition"
   action        = "lambda:InvokeFunction"
   function_name = module.merge_emdi_position[0].lambda_function_name
