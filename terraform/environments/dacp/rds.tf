@@ -25,7 +25,7 @@ resource "aws_db_instance" "dacp_db" {
   apply_immediately               = true
   copy_tags_to_snapshot           = true
   parameter_group_name            = local.is-production ? "default.postgres14" : aws_db_parameter_group.dacp_analyse.name
-  maintenance_window              = local.is-production ? null : "tue:20:20-tue:20:50"
+  maintenance_window              = local.is-production ? null : "tue:19:20-tue:19:50"
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
 }
 
