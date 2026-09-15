@@ -54,7 +54,6 @@
         }
       ]
     },
-    },
     "production": {
       "days_back": "1",
       "cron_schedule": "cron(30 07 * * ? *)",
