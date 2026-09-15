@@ -38,9 +38,10 @@ locals {
 
     web = {
       config = {
-        ami_name                  = "hmpps_windows_server_2022_release_2026-09-14T16-17-24.564Z"
-        availability_zone         = "eu-west-2a"
-        iam_resource_names_prefix = "ec2-weblogic"
+        ami_name                      = "hmpps_windows_server_2022_release_2026-09-14T16-17-24.564Z"
+        availability_zone             = "eu-west-2a"
+        ebs_volumes_copy_all_from_ami = false
+        iam_resource_names_prefix     = "ec2-weblogic"
         instance_profile_policies = [
           # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
           "EC2Default",
@@ -49,6 +50,14 @@ locals {
         ]
         subnet_name = "private"
       }
+
+      ebs_volumes = {
+        "/dev/sda1" = {
+          size = 30
+          type = "gp3"
+        }
+      }
+
       instance = {
         disable_api_termination      = false
         instance_type                = "t2.small"
