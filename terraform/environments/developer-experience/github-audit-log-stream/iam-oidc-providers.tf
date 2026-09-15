@@ -13,3 +13,17 @@ module "iam_oidc_provider" {
     }
   )
 }
+
+data "tls_certificate" "cortex_xsiam" {
+  count = local.cortex_xsiam_enabled ? 1 : 0
+
+  url = var.cortex_xsiam_workload_identity.issuer_url
+}
+
+resource "aws_iam_openid_connect_provider" "cortex_xsiam" {
+  count = local.cortex_xsiam_enabled ? 1 : 0
+
+  url             = var.cortex_xsiam_workload_identity.issuer_url
+  client_id_list  = [var.cortex_xsiam_workload_identity.audience]
+  thumbprint_list = [data.tls_certificate.cortex_xsiam[0].certificates[0].sha1_fingerprint]
+}
