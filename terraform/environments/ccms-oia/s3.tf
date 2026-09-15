@@ -8,12 +8,12 @@ module "s3_ccms_oia" {
   custom_kms_key     = ""
 
   log_buckets = {
-    log_bucket_name = module.s3-bucket-logging.bucket.id
-    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+    log_bucket_name   = module.s3-bucket-logging.bucket.id
+    log_bucket_arn    = module.s3-bucket-logging.bucket.arn
     log_bucket_policy = aws_s3_bucket_policy.lb_access_logs.policy
-     }
+  }
   manage_log_bucket_policy = false
-  
+
   log_prefix = "s3access/${local.application_name}-${local.environment}/${local.application_name}-${local.environment}"
 
   lifecycle_rule = [
@@ -182,7 +182,10 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         "Effect" : "Deny",
         "Principal" : "*",
         "Action" : "s3:*",
-        "Resource" : ["${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}"],
+        "Resource" : [
+          "${module.s3-bucket-logging.bucket.arn}/*",
+          module.s3-bucket-logging.bucket.arn
+        ],
         "Condition" : {
           "Bool" : {
             "aws:SecureTransport" : "false"
@@ -195,8 +198,11 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         Principal = {
           AWS = "*"
         },
-        Action   = "s3:*",
-        Resource = ["${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}"],
+        Action = "s3:*",
+        Resource = [
+          "${module.s3-bucket-logging.bucket.arn}/*",
+          module.s3-bucket-logging.bucket.arn
+        ],
         Condition = {
           Bool = {
             "aws:SecureTransport" = "false"
@@ -223,7 +229,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
           }
         }
       },
-       {
+      {
         Sid    = "AllowS3Logging OIA Bucket"
         Effect = "Allow"
         Principal = {
@@ -233,9 +239,9 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         Resource = "${module.s3-bucket-logging.bucket.arn}/*"
         Condition = {
           ArnLike = {
-           "aws:SourceArn" = module.s3_ccms_oia.bucket.arn
+            "aws:SourceArn" = module.s3_ccms_oia.bucket.arn
           }
-       }
+        }
       },
       {
         Sid    = "AllowS3Logging Shared Bucket"
@@ -247,9 +253,9 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
         Resource = "${module.s3-bucket-logging.bucket.arn}/*"
         Condition = {
           ArnLike = {
-           "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
+            "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
           }
-       }
+        }
       }
     ]
   })
@@ -267,12 +273,12 @@ module "s3-bucket-shared" {
   custom_kms_key     = ""
 
   log_buckets = {
-    log_bucket_name = module.s3-bucket-logging.bucket.id
-    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+    log_bucket_name   = module.s3-bucket-logging.bucket.id
+    log_bucket_arn    = module.s3-bucket-logging.bucket.arn
     log_bucket_policy = aws_s3_bucket_policy.lb_access_logs.policy
-     }
+  }
   manage_log_bucket_policy = false
-  
+
   log_prefix = "s3access/${local.application_name}-${local.environment}-shared/${local.application_name}-${local.environment}-shared"
 
   # Refer to the below section "Replication" before enabling replication
@@ -302,7 +308,8 @@ module "s3-bucket-shared" {
     }
   ]
 
-  tags = merge(local.tags,
+  tags = merge(
+    local.tags,
     { Name = "${local.application_name}-${local.environment}-shared" }
   )
 }
@@ -318,7 +325,10 @@ resource "aws_s3_bucket_policy" "shared_bucket_policy" {
         "Effect" : "Deny",
         "Principal" : "*",
         "Action" : "s3:*",
-        "Resource" : ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
+        "Resource" : [
+          "${module.s3-bucket-shared.bucket.arn}/*",
+          module.s3-bucket-shared.bucket.arn
+        ],
         "Condition" : {
           "Bool" : {
             "aws:SecureTransport" : "false"
@@ -331,8 +341,11 @@ resource "aws_s3_bucket_policy" "shared_bucket_policy" {
         Principal = {
           AWS = "*"
         },
-        Action   = "s3:*",
-        Resource = ["${module.s3-bucket-shared.bucket.arn}/*", "${module.s3-bucket-shared.bucket.arn}"],
+        Action = "s3:*",
+        Resource = [
+          "${module.s3-bucket-shared.bucket.arn}/*",
+          module.s3-bucket-shared.bucket.arn
+        ],
         Condition = {
           Bool = {
             "aws:SecureTransport" = "false"
