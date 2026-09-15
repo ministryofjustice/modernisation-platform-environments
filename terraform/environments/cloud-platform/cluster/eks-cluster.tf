@@ -171,7 +171,7 @@ resource "null_resource" "auto_mode_gate_compute" {
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
     command     = <<-EOT
-      ${path.module}/scripts/auto_mode_gate_check.sh \
+      bash ${path.module}/scripts/auto_mode_gate_check.sh \
         "${local.cluster_name}" \
         "${data.aws_region.current.region}"
     EOT
@@ -195,7 +195,7 @@ resource "null_resource" "auto_mode_gate_block_storage" {
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
     command     = <<-EOT
-      ${path.module}/scripts/auto_mode_gate_check.sh \
+      bash ${path.module}/scripts/auto_mode_gate_check.sh \
         "${local.cluster_name}" \
         "${data.aws_region.current.region}"
     EOT
@@ -219,7 +219,7 @@ resource "null_resource" "auto_mode_gate_load_balancing" {
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
     command     = <<-EOT
-      ${path.module}/scripts/auto_mode_gate_check.sh \
+      bash ${path.module}/scripts/auto_mode_gate_check.sh \
         "${local.cluster_name}" \
         "${data.aws_region.current.region}"
     EOT
@@ -243,7 +243,7 @@ resource "null_resource" "auto_mode_gate_ipam" {
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
     command     = <<-EOT
-      ${path.module}/scripts/auto_mode_gate_check.sh \
+      bash ${path.module}/scripts/auto_mode_gate_check.sh \
         "${local.cluster_name}" \
         "${data.aws_region.current.region}"
     EOT
