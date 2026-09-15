@@ -72,7 +72,7 @@ locals {
         # ]
     #   }
       tags = {
-        ami                    = "nomis_rhel_6_10_weblogic_appserver_10_3"
+        ami                    = "hmpps_windows_server_2022_release_2026-09-14T16-17-24.564Z"
         backup                 = "false" # disable mod platform backup since everything is in code
         component              = "web"
         description            = "london-unpaid-work web instance"
