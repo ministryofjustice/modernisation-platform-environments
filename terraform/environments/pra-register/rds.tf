@@ -21,9 +21,9 @@ resource "aws_db_instance" "pra_db" {
   allow_major_version_upgrade     = false
   auto_minor_version_upgrade      = true
   ca_cert_identifier              = "rds-ca-rsa2048-g1"
-  apply_immediately               = true
+  apply_immediately               = local.is-production ? false : true
   copy_tags_to_snapshot           = true
-  maintenance_window              = local.is-production ? null : "tue:20:20-tue:20:50"
+  maintenance_window              = local.is-production ? "sun:04:00-sun:04:30" : "wed:19:20-wed:19:50"
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
 }
 
