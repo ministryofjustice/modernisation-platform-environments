@@ -1,9 +1,22 @@
+resource "aws_sqs_queue" "cortex_xsiam_dlq" {
+  count = local.is-production ? 1 : 0
+
+  name                      = "${local.component_name}-cortex-xsiam-dlq"
+  kms_master_key_id         = module.kms_key[0].key_arn
+  message_retention_seconds = 1209600
+}
+
 resource "aws_sqs_queue" "cortex_xsiam" {
   count = local.is-production ? 1 : 0
 
   name                      = "${local.component_name}-cortex-xsiam"
+  kms_master_key_id         = module.kms_key[0].key_arn
   message_retention_seconds = 1209600
   receive_wait_time_seconds = 20
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.cortex_xsiam_dlq[0].arn
+    maxReceiveCount     = 5
+  })
 }
 
 data "aws_iam_policy_document" "cortex_xsiam_sqs" {
