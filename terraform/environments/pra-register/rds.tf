@@ -20,6 +20,7 @@ resource "aws_db_instance" "pra_db" {
   db_subnet_group_name            = aws_db_subnet_group.dbsubnetgroup.name
   allow_major_version_upgrade     = false
   auto_minor_version_upgrade      = true
+  storage_encrypted               = true
   ca_cert_identifier              = "rds-ca-rsa2048-g1"
   apply_immediately               = local.is-production ? false : true
   copy_tags_to_snapshot           = true
