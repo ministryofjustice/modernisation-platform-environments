@@ -6,6 +6,7 @@ resource "aws_db_instance" "dacp_db" {
   #checkov:skip=CKV_AWS_293: "Ensure that AWS database instances have deletion protection enabled"
   #checkov:skip=CKV_AWS_353: "Ensure that RDS instances have performance insights enabled"
   #checkov:skip=CKV_AWS_354: "Ensure RDS Performance Insights are encrypted using KMS CMKs"
+  #checkov:skip=CKV2_AWS_69: "Ensure AWS RDS database instance configured with encryption in transit" - app does not yet support SSL & aws_db_parameter_group.dacp_analyse is for development only
   allocated_storage               = local.application_data.accounts[local.environment].allocated_storage
   db_name                         = local.application_data.accounts[local.environment].db_name
   storage_type                    = local.application_data.accounts[local.environment].storage_type
