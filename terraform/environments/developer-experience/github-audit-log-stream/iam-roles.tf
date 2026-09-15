@@ -42,3 +42,58 @@ module "iam_role" {
     }
   }
 }
+
+module "cortex_xsiam_role" {
+  count = local.cortex_xsiam_enabled ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=ba3fd6ded6911e0454092147fe3704171cc05e00" # v6.8.1
+
+  name            = "${local.component_name}-cortex-xsiam"
+  use_name_prefix = false
+
+  trust_policy_permissions = {
+    CortexXSIAMWorkloadIdentity = {
+      actions = ["sts:AssumeRoleWithWebIdentity"]
+      principals = [{
+        type        = "Federated"
+        identifiers = [aws_iam_openid_connect_provider.cortex_xsiam[0].arn]
+      }]
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "accounts.google.com:oaud"
+          values   = [local.cortex_xsiam_workload_identity.audience]
+        },
+        {
+          test     = "StringEquals"
+          variable = "${trimprefix(local.cortex_xsiam_workload_identity.issuer_url, "https://")}:sub"
+          values   = [local.cortex_xsiam_workload_identity.service_account]
+        }
+      ]
+    }
+  }
+
+  create_inline_policy = true
+  inline_policy_permissions = {
+    SQSRead = {
+      effect = "Allow"
+      actions = [
+        "sqs:ChangeMessageVisibility",
+        "sqs:DeleteMessage",
+        "sqs:GetQueueAttributes",
+        "sqs:ReceiveMessage",
+      ]
+      resources = [aws_sqs_queue.cortex_xsiam[0].arn]
+    }
+    S3Read = {
+      effect    = "Allow"
+      actions   = ["s3:GetObject", "s3:GetObjectVersion"]
+      resources = ["${module.s3_bucket[0].s3_bucket_arn}/*"]
+    }
+    KMSRead = {
+      effect    = "Allow"
+      actions   = ["kms:Decrypt", "kms:DescribeKey"]
+      resources = [module.kms_key[0].key_arn]
+    }
+  }
+}

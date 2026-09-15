@@ -13,3 +13,10 @@ module "iam_oidc_provider" {
     }
   )
 }
+
+resource "aws_iam_openid_connect_provider" "cortex_xsiam" {
+  count = local.cortex_xsiam_enabled ? 1 : 0
+
+  url            = local.cortex_xsiam_workload_identity.issuer_url
+  client_id_list = [local.cortex_xsiam_workload_identity.audience]
+}
