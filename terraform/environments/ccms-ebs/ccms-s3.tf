@@ -273,6 +273,15 @@ resource "aws_s3_bucket" "ccms_ebs_shared" {
   )
 }
 
+resource "aws_s3_bucket_logging" "access_logging_shared" {
+  for_each = aws_s3_bucket.buckets
+
+  bucket = "${local.application_name}-${local.environment}-shared"
+
+  target_bucket = local.logging_bucket_name
+  target_prefix = "s3-access-logs/${local.application_name}-${local.environment}-shared/"
+}
+
 resource "aws_s3_object" "folder" {
   bucket = aws_s3_bucket.ccms_ebs_shared.bucket
   for_each = {
@@ -334,6 +343,15 @@ resource "aws_s3_bucket" "lambda_payment_load" {
       Name = "${local.application_name}-${local.environment}-payment-load"
     }
   )
+}
+
+resource "aws_s3_bucket_logging" "access_logging_payment_load" {
+  for_each = aws_s3_bucket.buckets
+
+  bucket = "${local.application_name}-${local.environment}-payment-load"
+
+  target_bucket = local.logging_bucket_name
+  target_prefix = "s3-access-logs/${local.application_name}-${local.environment}-payment-load/"
 }
 
 resource "aws_s3_bucket_public_access_block" "lambda_payment_load" {
