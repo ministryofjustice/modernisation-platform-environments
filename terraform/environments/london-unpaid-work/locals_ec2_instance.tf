@@ -41,7 +41,7 @@ locals {
         ami_name                      = "hmpps_windows_server_2022_release_2026-09-14T16-17-24.564Z"
         availability_zone             = "eu-west-2a"
         ebs_volumes_copy_all_from_ami = false
-        iam_resource_names_prefix     = "ec2-weblogic"
+        iam_resource_names_prefix     = "ec2-london-unpaid-work"
         instance_profile_policies = [
           # "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore", # now included automatically by module
           "EC2Default",
@@ -63,7 +63,7 @@ locals {
         instance_type                = "t2.small"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "optional"
-        vpc_security_group_ids       = ["ec2-linux"]
+        vpc_security_group_ids       = ["ec2-windows"]
       }
     #   route53_records = {
     #     create_internal_record = true
