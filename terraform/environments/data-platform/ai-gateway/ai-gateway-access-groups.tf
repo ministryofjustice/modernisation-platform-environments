@@ -7,6 +7,11 @@ resource "litellm_unified_access_group" "amazon_bedrock" {
     for team_key, team in local.ai_gateway_configuration.teams : litellm_team.teams[team_key].team_id
     if contains(try(team.unified_access_groups, []), "bedrock-${each.key}")
   ]
+
+  # Teams can be assigned to access groups out-of-band via the LiteLLM UI/API; don't revoke those.
+  lifecycle {
+    ignore_changes = [assigned_team_ids]
+  }
 }
 
 resource "litellm_unified_access_group" "google_gemini_enterprise_agent_platform" {
@@ -18,6 +23,11 @@ resource "litellm_unified_access_group" "google_gemini_enterprise_agent_platform
     for team_key, team in local.ai_gateway_configuration.teams : litellm_team.teams[team_key].team_id
     if contains(try(team.unified_access_groups, []), "gemini-${each.key}")
   ]
+
+  # Teams can be assigned to access groups out-of-band via the LiteLLM UI/API; don't revoke those.
+  lifecycle {
+    ignore_changes = [assigned_team_ids]
+  }
 }
 
 resource "litellm_unified_access_group" "microsoft_foundry" {
@@ -29,6 +39,11 @@ resource "litellm_unified_access_group" "microsoft_foundry" {
     for team_key, team in local.ai_gateway_configuration.teams : litellm_team.teams[team_key].team_id
     if contains(try(team.unified_access_groups, []), "azure-${each.key}")
   ]
+
+  # Teams can be assigned to access groups out-of-band via the LiteLLM UI/API; don't revoke those.
+  lifecycle {
+    ignore_changes = [assigned_team_ids]
+  }
 }
 
 resource "litellm_unified_access_group" "generally_available_models" {
@@ -55,4 +70,9 @@ resource "litellm_unified_access_group" "generally_available_models" {
       if try(local.ai_gateway_models_filtered.microsoft_foundry[key].generally_available, false)
     ]
   )
+
+  # Teams can be assigned to access groups out-of-band via the LiteLLM UI/API; don't revoke those.
+  lifecycle {
+    ignore_changes = [assigned_team_ids]
+  }
 }
