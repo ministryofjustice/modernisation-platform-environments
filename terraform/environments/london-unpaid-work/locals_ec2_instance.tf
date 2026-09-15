@@ -38,7 +38,7 @@ locals {
 
     web = {
       config = {
-        ami_name                  = "hmpps_windows_server_2022_release_2025-*"
+        ami_name                  = "hmpps_windows_server_2022_release_2026-09-14T16-17-24.564Z"
         availability_zone         = "eu-west-2a"
         iam_resource_names_prefix = "ec2-weblogic"
         instance_profile_policies = [
