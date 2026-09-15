@@ -177,7 +177,7 @@ resource "aws_lambda_permission" "allow_eventbridge_check_recent_file" {
 resource "aws_cloudwatch_event_rule" "check_recent_file_daily" {
   count               = (local.is-development || local.is-preproduction) ? 1 : 0
   name                = "${local.component_name}-check-recent-file-daily"
-  description         = "Invoke recent-file checker daily at 15:15 UTC"
+  description         = "Invoke recent-file checker"
   schedule_expression = local.cron_schedule
 }
 
