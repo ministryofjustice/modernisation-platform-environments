@@ -274,8 +274,6 @@ resource "aws_s3_bucket" "ccms_ebs_shared" {
 }
 
 resource "aws_s3_bucket_logging" "access_logging_shared" {
-  for_each = aws_s3_bucket.buckets
-
   bucket = "${local.application_name}-${local.environment}-shared"
 
   target_bucket = local.logging_bucket_name
@@ -346,8 +344,6 @@ resource "aws_s3_bucket" "lambda_payment_load" {
 }
 
 resource "aws_s3_bucket_logging" "access_logging_payment_load" {
-  for_each = aws_s3_bucket.buckets
-
   bucket = "${local.application_name}-${local.environment}-payment-load"
 
   target_bucket = local.logging_bucket_name
