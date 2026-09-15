@@ -11,7 +11,7 @@ locals {
 # application_variables.json
 resource "aws_lakeformation_permissions" "share_dbs_all_permissions" {
   # one instance per (database × principal)
-  for_each = local.is-development ? {
+  for_each = (local.is-development || local.is-preproduction) ? {
     for combo in flatten([
       for share_index, share in local.analytical_platform_share : [
         for resource_share in share.resource_shares : [
@@ -40,7 +40,7 @@ resource "aws_lakeformation_permissions" "share_dbs_all_permissions" {
 # Grant 'ALL' on *all tables* within each shared database
 resource "aws_lakeformation_permissions" "table_all_permissions" {
   # reuse the same keying pattern
-  for_each = local.is-development ? {
+  for_each = (local.is-development || local.is-preproduction) ? {
     for combo in flatten([
       for share_index, share in local.analytical_platform_share : [
         for resource_share in share.resource_shares : [
