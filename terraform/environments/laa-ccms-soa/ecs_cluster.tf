@@ -135,9 +135,9 @@ resource "aws_ecs_service" "admin" {
     container_port   = local.application_data.accounts[local.environment].admin_ssl_port
   }
 
-  lifecycle {
-    create_before_destroy = true
-  }
+  # lifecycle {
+  #   create_before_destroy = true
+  # }
 
   depends_on = [
     aws_iam_role_policy_attachment.ecs_task_execution_role,
@@ -233,9 +233,9 @@ resource "aws_ecs_service" "managed" {
     container_port   = local.application_data.accounts[local.environment].managed_ssl_port
   }
 
-  lifecycle {
-    create_before_destroy = true
-  }
+  # lifecycle {
+  #   create_before_destroy = true
+  # }
 
   depends_on = [
     aws_iam_role_policy_attachment.ecs_task_execution_role,
