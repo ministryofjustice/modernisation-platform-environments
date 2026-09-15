@@ -77,6 +77,17 @@ resource "aws_security_group_rule" "alb_admin_mp_v1_workspaces_ingress_443" {
   cidr_blocks       = [local.application_data.accounts[local.environment].mp_v1_workspaces_cidr]
 }
 
+resource "aws_security_group_rule" "alb_admin_mp_v1_workspaces_ingress_7002" {
+  count             = local.environment == "development" ? 1 : 0
+  security_group_id = aws_security_group.alb_admin.id
+  type              = "ingress"
+  description       = "Admin 7002 from MP Workspaces (V1) - DEV only"
+  protocol          = "TCP"
+  from_port         = 7002
+  to_port           = 7002
+  cidr_blocks       = [local.application_data.accounts[local.environment].mp_v1_workspaces_cidr]
+}
+
 #-- Tightened: ALB Admin egress restricted to ECS target port only (was 0.0.0.0/0 all-protocols)
 resource "aws_security_group_rule" "alb_admin_egress_ecs_targets" {
   security_group_id = aws_security_group.alb_admin.id
@@ -123,6 +134,30 @@ resource "aws_security_group_rule" "alb_managed_ingress_443_databases" {
   from_port         = 443
   to_port           = 443
   cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
+}
+
+# MP Workspaces (V1) - DEV only, Managed HTTPS access
+resource "aws_security_group_rule" "alb_managed_mp_v1_workspaces_ingress_443" {
+  count             = local.environment == "development" ? 1 : 0
+  security_group_id = aws_security_group.alb_managed.id
+  type              = "ingress"
+  description       = "HTTPS - AWS Workspaces"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = [local.application_data.accounts[local.environment].mp_v1_workspaces_cidr]
+}
+
+# MP Workspaces (V1) - DEV only, Managed 7002 access
+resource "aws_security_group_rule" "alb_managed_workspace_ingress_7002" {
+  count             = local.environment == "development" ? 1 : 0
+  security_group_id = aws_security_group.alb_managed.id
+  type              = "ingress"
+  description       = "Managed 7002 - AWS Workspaces"
+  protocol          = "TCP"
+  from_port         = 7002
+  to_port           = 7002
+  cidr_blocks       = [local.application_data.accounts[local.environment].mp_v1_workspaces_cidr]
 }
 
 resource "aws_security_group_rule" "alb_managed_workspace_ingress_443" {
