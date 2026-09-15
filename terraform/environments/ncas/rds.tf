@@ -23,7 +23,7 @@ resource "aws_db_instance" "ncas_db" {
   ca_cert_identifier              = "rds-ca-rsa2048-g1"
   apply_immediately               = local.is-production ? false : true
   copy_tags_to_snapshot           = true
-  maintenance_window              = local.is-production ? "wed:04:00-wed:04:30" : "wed:19:20-wed:19:50"
+  maintenance_window              = local.is-production ? "sun:04:00-sun:04:30" : "wed:19:20-wed:19:50"
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
 }
 
