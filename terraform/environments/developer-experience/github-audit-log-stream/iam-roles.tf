@@ -62,12 +62,12 @@ module "cortex_xsiam_role" {
         {
           test     = "StringEquals"
           variable = "accounts.google.com:oaud"
-          values   = [var.cortex_xsiam_workload_identity.audience]
+          values   = [local.cortex_xsiam_workload_identity.audience]
         },
         {
           test     = "StringEquals"
-          variable = "${trimprefix(var.cortex_xsiam_workload_identity.issuer_url, "https://")}:sub"
-          values   = [var.cortex_xsiam_workload_identity.service_account]
+          variable = "${trimprefix(local.cortex_xsiam_workload_identity.issuer_url, "https://")}:sub"
+          values   = [local.cortex_xsiam_workload_identity.service_account]
         }
       ]
     }
