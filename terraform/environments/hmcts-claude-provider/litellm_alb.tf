@@ -43,6 +43,7 @@ resource "aws_vpc_security_group_egress_rule" "litellm_alb_to_tasks" {
 resource "aws_lb" "litellm" {
   #checkov:skip=CKV_AWS_91: "ELB access logging not required"
   #checkov:skip=CKV_AWS_150: "Deletion protection not required in development"
+  #checkov:skip=CKV2_AWS_76: "WAF includes AWSManagedRulesKnownBadInputsRuleSet, Log4JRCE_BODY is set to count because prompts contain code"
   name                       = "litellm-gateway"
   load_balancer_type         = "application"
   internal                   = false
