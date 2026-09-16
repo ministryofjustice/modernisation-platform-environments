@@ -3,7 +3,7 @@ module "acm_certificate" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/acm/aws"
-  version = "6.3.0"
+  version = "6.3.1"
 
   zone_id                   = module.route53_zone.id
   domain_name               = local.environment_configuration.route53_zone
