@@ -184,7 +184,7 @@ resource "aws_grafana_role_association" "platform_admin" {
 # AMG service account — used to manage Grafana-internal objects as code
 #
 # The Grafana Terraform provider (teams, data sources, data-source permissions,
-# folders — see the separate grafana-objects component / cloud-platform#8509)
+# folders — see grafana-objects.tf in this component / cloud-platform#8509)
 # authenticates to the workspace with a service account TOKEN. The account is
 # managed here (Terraform); the token is short-lived (AMG max 30 days) and is
 # minted per pipeline run, not stored. ADMIN role so it can manage teams,
