@@ -78,8 +78,10 @@ module "s3-bucket-sftp-bc" {
   
   log_prefix = "s3-access-logs/${local.sftp_bc_bucket_name}/"
 #  log_prefix     = "s3access/${local.sftp_bc_bucket_name}"
-  custom_kms_key = aws_kms_key.s3_sftp_kms_key.arn
-  sse_algorithm  = "aws:kms"
+#  custom_kms_key = aws_kms_key.s3_sftp_kms_key.arn
+#  sse_algorithm  = "aws:kms"
+   custom_kms_key = ""
+   sse_algorithm  = "AES256"
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
