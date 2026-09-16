@@ -21,6 +21,10 @@ terraform {
       source  = "hashicorp/random"
       version = "3.7.2"
     }
+    template = {
+      version = "~> 2.2"
+      source  = "hashicorp/template"
+    }
   }
   required_version = "~> 1.0"
 }
