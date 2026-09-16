@@ -56,6 +56,11 @@
             required: false
             default: false
             description: "Optional: set to true when the caller already fetched secrets and is passing them in via ENVIRONMENT_MANAGEMENT/GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT secrets, to skip fetching them again here."
+          mint_grafana_token:
+            type: boolean
+            required: false
+            default: false
+            description: "Optional: set to true when the component manages Amazon Managed Grafana objects with the Grafana provider. Mints a short-lived AMG service account token into GRAFANA_AUTH and sets TF_VAR_grafana_url. No-op when the workspace has no AMG workspace."
         secrets:
           MODERNISATION_PLATFORM_ACCOUNT_ID:
             required: true
@@ -166,6 +171,48 @@
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
               terraform workspace select "${WORKSPACE_NAME}"
+
+          #
+          # Mint AMG Service Account Token (Optional)
+          #
+          # Components that manage Grafana-internal objects need the Grafana
+          # provider authenticated. AMG service account tokens are short-lived
+          # (max 30 days), so one is minted per run rather than stored. The AMG
+          # workspace is discovered by name, so no extra inputs are needed, and
+          # this no-ops where there is no AMG workspace or service account.
+          #
+          - name: Mint AMG Service Account Token (Optional)
+            if: inputs.mint_grafana_token == true
+            run: |
+              set -euo pipefail
+              amg_name="${WORKSPACE_NAME}-observability"
+              ws_id=$(aws grafana list-workspaces --query "workspaces[?name=='${amg_name}'].id | [0]" --output text)
+              if [ -z "${ws_id}" ] || [ "${ws_id}" = "None" ]; then
+                echo "No AMG workspace named ${amg_name}; skipping Grafana token."
+                exit 0
+              fi
+              sa_id=$(aws grafana list-workspace-service-accounts --workspace-id "${ws_id}" \
+                --query "serviceAccounts[?name=='iac-grafana-objects'].id | [0]" --output text)
+              if [ -z "${sa_id}" ] || [ "${sa_id}" = "None" ]; then
+                echo "No iac-grafana-objects service account on ${amg_name}; skipping Grafana token."
+                exit 0
+              fi
+              endpoint=$(aws grafana describe-workspace --workspace-id "${ws_id}" \
+                --query 'workspace.endpoint' --output text)
+              # The plan role intentionally lacks CreateWorkspaceServiceAccountToken
+              # (only the apply role can mint). Do not fail the job if minting is
+              # denied; leave GRAFANA_AUTH unset and let Terraform surface it.
+              if ! token=$(aws grafana create-workspace-service-account-token \
+                --workspace-id "${ws_id}" --service-account-id "${sa_id}" \
+                --name "tf-${GITHUB_RUN_ID}-${GITHUB_JOB}" --seconds-to-live 3600 \
+                --query 'serviceAccountToken.key' --output text 2>&1); then
+                echo "Could not mint an AMG token (${token}); skipping Grafana provider auth."
+                exit 0
+              fi
+              echo "::add-mask::${token}"
+              echo "GRAFANA_AUTH=${token}" >> "${GITHUB_ENV}"
+              echo "TF_VAR_grafana_url=${endpoint}" >> "${GITHUB_ENV}"
+              echo "Grafana provider configured for ${amg_name} (token valid 1h)."
 
           #
           # Optional State Refresh
@@ -365,6 +412,40 @@
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
               terraform workspace select "${WORKSPACE_NAME}"
+
+          # See the equivalent step in the plan job for rationale.
+          - name: Mint AMG Service Account Token (Optional)
+            if: inputs.mint_grafana_token == true
+            run: |
+              set -euo pipefail
+              amg_name="${WORKSPACE_NAME}-observability"
+              ws_id=$(aws grafana list-workspaces --query "workspaces[?name=='${amg_name}'].id | [0]" --output text)
+              if [ -z "${ws_id}" ] || [ "${ws_id}" = "None" ]; then
+                echo "No AMG workspace named ${amg_name}; skipping Grafana token."
+                exit 0
+              fi
+              sa_id=$(aws grafana list-workspace-service-accounts --workspace-id "${ws_id}" \
+                --query "serviceAccounts[?name=='iac-grafana-objects'].id | [0]" --output text)
+              if [ -z "${sa_id}" ] || [ "${sa_id}" = "None" ]; then
+                echo "No iac-grafana-objects service account on ${amg_name}; skipping Grafana token."
+                exit 0
+              fi
+              endpoint=$(aws grafana describe-workspace --workspace-id "${ws_id}" \
+                --query 'workspace.endpoint' --output text)
+              # The plan role intentionally lacks CreateWorkspaceServiceAccountToken
+              # (only the apply role can mint). Do not fail the job if minting is
+              # denied; leave GRAFANA_AUTH unset and let Terraform surface it.
+              if ! token=$(aws grafana create-workspace-service-account-token \
+                --workspace-id "${ws_id}" --service-account-id "${sa_id}" \
+                --name "tf-${GITHUB_RUN_ID}-${GITHUB_JOB}" --seconds-to-live 3600 \
+                --query 'serviceAccountToken.key' --output text 2>&1); then
+                echo "Could not mint an AMG token (${token}); skipping Grafana provider auth."
+                exit 0
+              fi
+              echo "::add-mask::${token}"
+              echo "GRAFANA_AUTH=${token}" >> "${GITHUB_ENV}"
+              echo "TF_VAR_grafana_url=${endpoint}" >> "${GITHUB_ENV}"
+              echo "Grafana provider configured for ${amg_name} (token valid 1h)."
 
           - name: Terraform Plan
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
