@@ -80,20 +80,20 @@ resource "aws_ecs_task_definition" "admin" {
       pui_user                              = local.application_data.accounts[local.environment].admin_pui_user
       apply_user                            = local.application_data.accounts[local.environment].admin_apply_user
       keystore_secret_id                    = local.application_data.accounts[local.environment].admin_keystore_secret_id
-      soa_rds_admin_user_password          = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:admin_server_password::"
-      soa_rds_all_ccmssoa_schema_password  = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:soa_rds_all_ccmssoa_schema_password::"
-      admin_server_password                = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:admin_server_password::"
-      edrms_xxsoa_user_password            = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:edrms_xxsoa_user_password::"
-      ccms_apps_user_password              = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:ccms_apps_user_password::"
-      cwa_apps_user_password               = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:cwa_apps_user_password::"
-      soa_realm_pui_user_password          = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:soa_realm_pui_user_password::"
-      soa_realm_apply_user_password        = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:soa_realm_apply_user_password::"
-      soa_realm_caab_user_password         = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:soa_realm_caab_user_password::"
+      soa_rds_admin_user_password           = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:admin_server_password::"
+      soa_rds_all_ccmssoa_schema_password   = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:soa_rds_all_ccmssoa_schema_password::"
+      admin_server_password                 = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:admin_server_password::"
+      edrms_xxsoa_user_password             = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:edrms_xxsoa_user_password::"
+      ccms_apps_user_password               = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:ccms_apps_user_password::"
+      cwa_apps_user_password                = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:cwa_apps_user_password::"
+      soa_realm_pui_user_password           = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:soa_realm_pui_user_password::"
+      soa_realm_apply_user_password         = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:soa_realm_apply_user_password::"
+      soa_realm_caab_user_password          = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:soa_realm_caab_user_password::"
       soa_realm_ebs_soa_super_user_password = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:soa_realm_ebs_soa_super_user_password::"
-      extra_java_properties                = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:extra_java_properties::"
-      keystorePassword                     = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:keystorePassword::"
-      truststorePassword                   = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:truststorePassword::"
-      slack_channel_webhook                = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:slack_channel_webhook::"
+      extra_java_properties                 = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:extra_java_properties::"
+      keystorePassword                      = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:keystorePassword::"
+      truststorePassword                    = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:truststorePassword::"
+      slack_channel_webhook                 = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:slack_channel_webhook::"
     }
   )
 }
@@ -177,21 +177,21 @@ resource "aws_ecs_task_definition" "managed" {
   container_definitions = templatefile(
     "${path.module}/templates/task_definition_managed.json.tpl",
     {
-      app_name             = local.application_data.accounts[local.environment].app_name
-      app_image            = local.application_data.accounts[local.environment].managed_app_image
-      db_instance_endpoint = aws_db_instance.soa_db.endpoint
-      managed_ssl_port     = local.application_data.accounts[local.environment].managed_ssl_port
-      admin_server_port    = local.application_data.accounts[local.environment].admin_ssl_port
-      aws_region           = local.application_data.accounts[local.environment].aws_region
-      container_version    = local.application_data.accounts[local.environment].managed_container_version
-      admin_host           = aws_route53_record.admin.fqdn
+      app_name              = local.application_data.accounts[local.environment].app_name
+      app_image             = local.application_data.accounts[local.environment].managed_app_image
+      db_instance_endpoint  = aws_db_instance.soa_db.endpoint
+      managed_ssl_port      = local.application_data.accounts[local.environment].managed_ssl_port
+      admin_server_port     = local.application_data.accounts[local.environment].admin_ssl_port
+      aws_region            = local.application_data.accounts[local.environment].aws_region
+      container_version     = local.application_data.accounts[local.environment].managed_container_version
+      admin_host            = aws_route53_record.admin.fqdn
       soa_password          = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:admin_server_password::"
       extra_java_properties = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:extra_java_properties::"
       keystorePassword      = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:keystorePassword::"
       truststorePassword    = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:truststorePassword::"
       slack_channel_webhook = "${data.aws_secretsmanager_secret_version.soa_secrets.arn}:slack_channel_webhook::"
-      ms_hostname          = aws_route53_record.managed.fqdn
-      wl_mem_args          = local.application_data.accounts[local.environment].managed_wl_mem_args
+      ms_hostname           = aws_route53_record.managed.fqdn
+      wl_mem_args           = local.application_data.accounts[local.environment].managed_wl_mem_args
     }
   )
 }
