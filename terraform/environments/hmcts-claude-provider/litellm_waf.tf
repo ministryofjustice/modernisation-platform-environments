@@ -1,3 +1,11 @@
+resource "aws_wafv2_ip_set" "litellm_admin" {
+  name               = "litellm-admin"
+  description        = "Networks allowed to reach LiteLLM admin routes and UI"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV4"
+  addresses          = []
+}
+
 resource "aws_wafv2_web_acl" "litellm" {
   #checkov:skip=CKV_AWS_192: "Log4j rules are included via AWSManagedRulesKnownBadInputsRuleSet, body variants set to count"
   name  = "litellm-gateway"
