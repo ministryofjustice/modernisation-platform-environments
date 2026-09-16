@@ -328,7 +328,7 @@ resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure_managed" {
   ok_actions    = [aws_sns_topic.alerts.arn]
 }
 
-#Alerts NLB (Admin)
+#--Alerts NLB (Admin)
 resource "aws_cloudwatch_metric_alarm" "Admin_UnHealthy_Hosts" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-${local.environment}-admin-unhealthy-hosts-alarm"
   alarm_description   = "${local.environment} | ${local.aws_account_id} | There is an unhealthy host in the target group ${aws_lb_target_group.admin_https.name} for over 15 minutes, this likely means that an admin host has failed to boot correctly"
