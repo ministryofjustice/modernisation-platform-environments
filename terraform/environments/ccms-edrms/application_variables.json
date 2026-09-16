@@ -131,7 +131,7 @@
       "aws_workspace": "10.200.0.0/19",
       "tds_db_user": "admin",
       "tds_db_deploy_to_multi_azs": "false",
-      "tds_db_instance_type": "db.t3.large",
+      "tds_db_instance_type": "db.t3.small",
       "tds_db_storage_gb": "200",
       "tds_db_iops": "12000",
       "tds_db_deletion_protection": "true",
