@@ -181,8 +181,32 @@ resource "aws_grafana_role_association" "platform_admin" {
 }
 
 #------------------------------------------------------------------------------
+# AMG service account — used to manage Grafana-internal objects as code
+#
+# The Grafana Terraform provider (teams, data sources, data-source permissions,
+# folders — see the separate grafana-objects component / cloud-platform#8509)
+# authenticates to the workspace with a service account TOKEN. The account is
+# managed here (Terraform); the token is short-lived (AMG max 30 days) and is
+# minted per pipeline run, not stored. ADMIN role so it can manage teams,
+# data sources and their permissions.
+#------------------------------------------------------------------------------
+
+resource "aws_grafana_workspace_service_account" "iac" {
+  count = local.enable_amg ? 1 : 0
+
+  name         = "iac-grafana-objects"
+  grafana_role = "ADMIN"
+  workspace_id = aws_grafana_workspace.this[0].id
+}
+
+#------------------------------------------------------------------------------
 # Outputs
 #------------------------------------------------------------------------------
+
+output "amg_service_account_id" {
+  description = "AMG service account id used by the grafana-objects pipeline to mint short-lived API tokens"
+  value       = local.enable_amg ? aws_grafana_workspace_service_account.iac[0].service_account_id : null
+}
 
 output "amg_workspace_endpoint" {
   description = "AMG workspace URL for browser access"
