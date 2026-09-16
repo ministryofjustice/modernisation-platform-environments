@@ -237,6 +237,7 @@ resource "aws_security_group" "lb_sc_pingdom_2" {
 resource "aws_lb" "dacp_lb" {
   #checkov:skip=CKV_AWS_91: "ELB Logging not required"
   #checkov:skip=CKV_AWS_150: "Ensure that Load Balancer has deletion protection enabled"
+  #checkov:skip=CKV2_AWS_76: "Ensure AWS ALB attached WAFv2 WebACL is configured with AMR for Log4j Vulnerability" - false positive, AWSManagedRulesKnownBadInputsRuleSet is attached via aws_wafv2_web_acl_association in waf.tf
   name                       = "dacp-load-balancer"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.dacp_lb_sc.id, aws_security_group.lb_sc_pingdom.id, aws_security_group.lb_sc_pingdom_2.id]
