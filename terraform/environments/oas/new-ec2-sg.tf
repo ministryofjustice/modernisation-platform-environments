@@ -154,17 +154,17 @@ resource "aws_security_group_rule" "egress_https_internet" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-# resource "aws_security_group_rule" "egress_rds_to_mp_vpc_for_edw" {
-#   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
-#
-#   type              = "egress"
-#   security_group_id = aws_security_group.ec2_sg[0].id
-#   description       = "allow OAS to connect to RDS of EDW"
-#   from_port         = 1521
-#   to_port           = 1521
-#   protocol          = "tcp"
-#   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-# }
+resource "aws_security_group_rule" "egress_rds_to_mp_vpc_for_edw" {
+  count = contains(["development", "preproduction"], local.environment) ? 1 : 0
+
+  type              = "egress"
+  security_group_id = aws_security_group.ec2_sg[0].id
+  description       = "allow OAS to connect to RDS of EDW"
+  from_port         = 1521
+  to_port           = 1521
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
 
 resource "aws_security_group_rule" "egress_managed_9514_workspace" {
   count = contains(["preproduction", "development"], local.environment) ? 1 : 0
