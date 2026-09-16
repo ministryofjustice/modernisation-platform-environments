@@ -1,10 +1,7 @@
 module "cortex_xsiam_sqs" {
   count = local.is-production ? 1 : 0
 
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-  source  = "terraform-aws-modules/sqs/aws"
-  version = "5.1.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-sqs.git?ref=dd73a96c0155bc324dda5256f3e7a9ea2c710195" # v5.2.2
 
   name                = "${local.component_name}-cortex-xsiam"
   create_dlq          = true
