@@ -447,7 +447,7 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_test_paths" {
   namespace           = "CCMS-SOA-APP"
   period              = "300"
   evaluation_periods  = "1"
-  threshold           = "5"
+  threshold           = "1"
   datapoints_to_alarm = "1"
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.alerts.arn]
