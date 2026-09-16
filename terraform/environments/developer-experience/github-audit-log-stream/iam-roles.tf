@@ -56,7 +56,7 @@ module "cortex_xsiam_role" {
       actions = ["sts:AssumeRoleWithWebIdentity"]
       principals = [{
         type        = "Federated"
-        identifiers = [aws_iam_openid_connect_provider.cortex_xsiam[0].arn]
+        identifiers = [module.cortex_xsiam_oidc_provider[0].arn]
       }]
       condition = [
         {
@@ -83,11 +83,14 @@ module "cortex_xsiam_role" {
         "sqs:GetQueueAttributes",
         "sqs:ReceiveMessage",
       ]
-      resources = [aws_sqs_queue.cortex_xsiam[0].arn]
+      resources = [module.cortex_xsiam_sqs[0].queue_arn]
     }
     S3Read = {
-      effect    = "Allow"
-      actions   = ["s3:GetObject", "s3:GetObjectVersion"]
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:GetObjectVersion"
+      ]
       resources = ["${module.s3_bucket[0].s3_bucket_arn}/*"]
     }
     KMSRead = {
