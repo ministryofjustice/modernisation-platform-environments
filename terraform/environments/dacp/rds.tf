@@ -17,7 +17,7 @@ resource "aws_db_instance" "dacp_db" {
   username                        = local.application_data.accounts[local.environment].db_username
   password                        = random_password.password.result
   skip_final_snapshot             = true
-  publicly_accessible             = local.is-development ? true : false
+  publicly_accessible             = false
   vpc_security_group_ids          = [aws_security_group.postgresql_db_sc.id]
   db_subnet_group_name            = aws_db_subnet_group.dbsubnetgroup.name
   allow_major_version_upgrade     = false
@@ -81,17 +81,6 @@ resource "aws_security_group" "postgresql_db_sc" {
     ]
   }
 
-  dynamic "ingress" {
-    for_each = local.is-development ? [1] : []
-    content {
-      from_port   = 5432
-      to_port     = 5432
-      protocol    = "tcp"
-      description = "Allows Github Actions to access RDS"
-      cidr_blocks = ["${jsondecode(data.http.myip.response_body)["ip"]}/32"]
-    }
-  }
-
   egress {
     #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
     description = "allow all outbound traffic"
@@ -101,31 +90,6 @@ resource "aws_security_group" "postgresql_db_sc" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-}
-
-data "http" "myip" {
-  url = "http://ipinfo.io/json"
-}
-
-resource "null_resource" "setup_db" { # tflint-ignore: terraform_required_providers
-  count = local.is-development ? 1 : 0
-
-  depends_on = [aws_db_instance.dacp_db]
-
-  provisioner "local-exec" {
-    interpreter = ["bash", "-c"]
-    command     = "chmod +x ./setup-dev-db.sh; ./setup-dev-db.sh"
-
-    environment = {
-      DB_HOSTNAME      = aws_db_instance.dacp_db.address
-      DB_NAME          = aws_db_instance.dacp_db.db_name
-      DACP_DB_USERNAME = aws_db_instance.dacp_db.username
-      DACP_DB_PASSWORD = random_password.password.result
-    }
-  }
-  triggers = {
-    always_run = timestamp()
-  }
 }
 
 resource "aws_cloudwatch_log_group" "rds_logs" {
