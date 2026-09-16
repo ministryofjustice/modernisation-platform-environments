@@ -13,7 +13,7 @@ locals {
 
 module "rota_personal_digest_slack" {
   source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
+  version = "2.1.0"
 
   name = "rota-personal-digest-slack-${local.environment_shorthand}"
 
