@@ -46,23 +46,12 @@ resource "aws_iam_role_policy_attachment" "lambda_ssm" {
 
 data "aws_iam_policy_document" "lambda_elb_policy_document" {
   statement {
-    sid = "DescribeTargetHealth"
     actions = [
-      "elasticloadbalancing:DescribeTargetHealth"
-    ]
-    resources = [
-      var.target_arn
-    ]
-  }
-  statement {
-    sid = "RegisterDeregisterTargets"
-    actions = [
+      "elasticloadbalancing:DescribeTargetHealth",
       "elasticloadbalancing:RegisterTargets",
       "elasticloadbalancing:DeregisterTargets"
     ]
-    resources = [
-      var.target_arn
-    ]
+    resources = ["*"]
   }
 }
 resource "aws_iam_policy" "lambda_elb_policy" {
