@@ -8,25 +8,14 @@ resource "aws_security_group" "litellm_alb" {
   }
 }
 
-#trivy:ignore:AVD-AWS-0107: public gateway, requests are authenticated with LiteLLM keys and filtered by WAF
 resource "aws_vpc_security_group_ingress_rule" "litellm_alb_https" {
-  #checkov:skip=CKV_AWS_260: public gateway, requests are authenticated with LiteLLM keys and filtered by WAF
+  for_each = toset(local.application_data.accounts[local.environment].litellm_allowed_cidrs)
+
   security_group_id = aws_security_group.litellm_alb.id
-  description       = "HTTPS from anywhere"
-  cidr_ipv4         = "0.0.0.0/0"
+  description       = "HTTPS from HMCTS Azure proxy"
+  cidr_ipv4         = each.value
   from_port         = 443
   to_port           = 443
-  ip_protocol       = "tcp"
-}
-
-#trivy:ignore:AVD-AWS-0107: redirected to HTTPS
-resource "aws_vpc_security_group_ingress_rule" "litellm_alb_http" {
-  #checkov:skip=CKV_AWS_260: redirected to HTTPS
-  security_group_id = aws_security_group.litellm_alb.id
-  description       = "HTTP from anywhere for redirect to HTTPS"
-  cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 80
-  to_port           = 80
   ip_protocol       = "tcp"
 }
 
@@ -85,23 +74,5 @@ resource "aws_lb_listener" "litellm_https" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.litellm.arn
-  }
-}
-
-resource "aws_lb_listener" "litellm_http" {
-  #checkov:skip=CKV_AWS_2: "Redirects to HTTPS"
-  #checkov:skip=CKV_AWS_103: "Redirects to HTTPS"
-  load_balancer_arn = aws_lb.litellm.arn
-  port              = 80
-  protocol          = "HTTP"
-
-  default_action {
-    type = "redirect"
-
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
   }
 }

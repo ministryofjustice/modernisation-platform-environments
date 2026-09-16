@@ -1,18 +1,3 @@
-module "ip_addresses" {
-  source = "../../modules/ip_addresses"
-}
-
-resource "aws_wafv2_ip_set" "litellm_admin" {
-  name               = "litellm-admin"
-  description        = "Networks allowed to reach LiteLLM admin routes and UI"
-  scope              = "REGIONAL"
-  ip_address_version = "IPV4"
-  addresses = distinct(concat(
-    module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
-    local.application_data.accounts[local.environment].litellm_admin_cidrs
-  ))
-}
-
 resource "aws_wafv2_web_acl" "litellm" {
   #checkov:skip=CKV_AWS_192: "Log4j rules are included via AWSManagedRulesKnownBadInputsRuleSet, body variants set to count"
   name  = "litellm-gateway"
@@ -23,71 +8,8 @@ resource "aws_wafv2_web_acl" "litellm" {
   }
 
   rule {
-    name     = "admin-routes-restricted"
-    priority = 0
-
-    action {
-      block {}
-    }
-
-    statement {
-      and_statement {
-        statement {
-          not_statement {
-            statement {
-              or_statement {
-                statement {
-                  byte_match_statement {
-                    search_string         = "/bedrock/"
-                    positional_constraint = "STARTS_WITH"
-                    field_to_match {
-                      uri_path {}
-                    }
-                    text_transformation {
-                      priority = 0
-                      type     = "NORMALIZE_PATH"
-                    }
-                  }
-                }
-                statement {
-                  byte_match_statement {
-                    search_string         = "/health/liveliness"
-                    positional_constraint = "EXACTLY"
-                    field_to_match {
-                      uri_path {}
-                    }
-                    text_transformation {
-                      priority = 0
-                      type     = "NORMALIZE_PATH"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        statement {
-          not_statement {
-            statement {
-              ip_set_reference_statement {
-                arn = aws_wafv2_ip_set.litellm_admin.arn
-              }
-            }
-          }
-        }
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "litellm-admin-routes-restricted"
-      sampled_requests_enabled   = true
-    }
-  }
-
-  rule {
     name     = "rate-limit-per-key"
-    priority = 1
+    priority = 0
 
     action {
       block {}
@@ -120,7 +42,7 @@ resource "aws_wafv2_web_acl" "litellm" {
 
   rule {
     name     = "AWSManagedRulesAmazonIpReputationList"
-    priority = 2
+    priority = 1
 
     override_action {
       none {}
@@ -143,7 +65,7 @@ resource "aws_wafv2_web_acl" "litellm" {
   # Prompts routinely contain code, paths, URLs and markup, so body inspection rules only count
   rule {
     name     = "AWSManagedRulesCommonRuleSet"
-    priority = 3
+    priority = 2
 
     override_action {
       none {}
@@ -175,7 +97,7 @@ resource "aws_wafv2_web_acl" "litellm" {
 
   rule {
     name     = "AWSManagedRulesKnownBadInputsRuleSet"
-    priority = 4
+    priority = 3
 
     override_action {
       none {}

@@ -6,13 +6,14 @@ This environment provides AWS Bedrock access for Claude AI models in the eu-west
 
 A LiteLLM proxy runs on ECS Fargate at `https://claude-gateway.hmcts-development.modernisation-platform.service.justice.gov.uk`. It exposes Bedrock's own API under `/bedrock` (passthrough mode) and signs requests to Bedrock with its task role, so users only hold a LiteLLM virtual key.
 
-- Only `/bedrock/*` and `/health/liveliness` are reachable from the internet. The admin API and UI (`/ui`, `/key/*`, etc.) are restricted by WAF to MoJ networks plus `litellm_admin_cidrs` in `application_variables.json`.
+- The load balancer only accepts HTTPS from the HMCTS Azure proxy egress IPs listed in `litellm_allowed_cidrs` in `application_variables.json`. Users and admins reach the gateway through that proxy.
+- The proxy must connect to the hostname above (the certificate covers it) and allow idle connections of at least 900 seconds, matching the load balancer, so long streamed responses are not cut off.
 - The task role can only invoke Anthropic models, and that is the effective model allowlist: LiteLLM does not enforce per-key `models` restrictions on Bedrock passthrough.
 - The master key is in Secrets Manager as `litellm-gateway/master-key`.
 
 ### Issue a key
 
-From an allowed network:
+Through the HMCTS proxy:
 
 ```bash
 MASTER_KEY=$(aws secretsmanager get-secret-value --secret-id litellm-gateway/master-key --query SecretString --output text)
@@ -28,7 +29,7 @@ curl -s https://claude-gateway.hmcts-development.modernisation-platform.service.
 ```bash
 export CLAUDE_CODE_USE_BEDROCK=1
 export CLAUDE_CODE_SKIP_BEDROCK_AUTH=1
-export ANTHROPIC_BEDROCK_BASE_URL=https://claude-gateway.hmcts-development.modernisation-platform.service.justice.gov.uk/bedrock
+export ANTHROPIC_BEDROCK_BASE_URL=https://<hmcts-proxy-host>/bedrock
 export ANTHROPIC_AUTH_TOKEN='sk-...'
 export AWS_REGION=eu-west-1
 export ANTHROPIC_DEFAULT_OPUS_MODEL='eu.anthropic.claude-opus-5'

@@ -7,7 +7,7 @@
       "litellm_desired_count": 1,
       "litellm_db_instance_class": "db.t4g.micro",
       "litellm_rate_limit_per_key": 3000,
-      "litellm_admin_cidrs": []
+      "litellm_allowed_cidrs": ["20.50.108.242/32", "20.50.109.148/32"]
     },
     "test": {},
     "preproduction": {},
