@@ -20,14 +20,18 @@
 locals {
   # Per-workspace BU definitions, following the same per-workspace map idiom as
   # local.environment_configurations. Each entry maps a BU to its AMP workspace
-  # alias and the identity groups whose members form its Grafana team.
+  # alias and the identity groups (by NAME) whose members form its Grafana team.
   #
-  # idc_group_ids is a LIST because a BU has many delivery teams: every group
+  # idc_group_names is a LIST because a BU has many delivery teams: every group
   # granted access to any namespace in the BU should get Grafana access to that
   # BU's metrics. In future this list is expected to be derived from the
   # access[].group entries across that BU's product.yaml files in
   # container-platform-environments (deduplicated per BU). Isolation granularity
   # is the BU, which matches the requirement.
+  #
+  # Group names (not IDs) are used here; they are resolved to IdC group IDs by
+  # data.aws_identitystore_groups below. product.yaml carries names, and AMG
+  # team sync needs IDs, so resolving here avoids hardcoding IDs.
   #
   # cloud-platform-development currently holds the #8509 isolation PoC: two
   # simulated BUs backed by two ephemeral clusters' AMP workspaces. Production
@@ -36,19 +40,42 @@ locals {
     cloud-platform-development = {
       bu1 = {
         amp_workspace_alias = "cp-1609-0059-bu1-metrics"
-        # hmpps-probation-in-court (simulated BU A)
-        idc_group_ids = ["f692f244-e051-7096-ea04-14f8291f76f7"]
+        idc_group_names     = ["cloud-platform-engineers"] # simulated BU A
       }
       bu2 = {
         amp_workspace_alias = "cp-1609-0059-bu2-metrics"
-        # laa-access-data-stewardship (simulated BU B)
-        idc_group_ids = ["66122264-80d1-70f8-e357-e5abb0fe8a21"]
+        idc_group_names     = ["container-platform-aws"] # simulated BU B
       }
     }
   }
 
   # Only create Grafana objects where AMG exists and BUs are defined.
   grafana_bus = local.enable_amg ? lookup(local.bus_by_workspace, terraform.workspace, {}) : {}
+
+  # Map of IdC group display name -> group ID, resolved via the read-only
+  # Identity Center provider. Uses the plural aws_identitystore_groups data
+  # source (ListGroups API); the singular data source's GetGroupId /
+  # alternate_identifier path is denied for this role, and its filter{} block
+  # was removed in AWS provider v6. Verified via spike (cloud-platform#8509).
+  idc_group_id_by_name = local.enable_amg ? {
+    for g in data.aws_identitystore_groups.all[0].groups : g.display_name => g.group_id
+  } : {}
+}
+
+#------------------------------------------------------------------------------
+# Resolve IdC group names -> IDs (only where AMG exists)
+#------------------------------------------------------------------------------
+
+data "aws_ssoadmin_instances" "this" {
+  count    = local.enable_amg ? 1 : 0
+  provider = aws.sso-readonly
+}
+
+data "aws_identitystore_groups" "all" {
+  count    = local.enable_amg ? 1 : 0
+  provider = aws.sso-readonly
+
+  identity_store_id = tolist(data.aws_ssoadmin_instances.this[0].identity_store_ids)[0]
 }
 
 #------------------------------------------------------------------------------
@@ -83,9 +110,12 @@ resource "grafana_team_external_group" "bu" {
 
   team_id = grafana_team.bu[each.key].id
   # Many identity groups map into one BU team — every team with access to the BU
-  # gets that BU's metrics. distinct() because the same group can appear more
+  # gets that BU's metrics. Resolve each group name to its IdC group ID (AMG
+  # team sync matches on ID). distinct() because the same group can appear more
   # than once when derived from product.yaml (one entry per role/cluster).
-  groups = distinct(each.value.idc_group_ids)
+  groups = distinct([
+    for name in each.value.idc_group_names : local.idc_group_id_by_name[name]
+  ])
 }
 
 #------------------------------------------------------------------------------
