@@ -93,6 +93,11 @@ module "cortex_xsiam_role" {
       ]
       resources = ["${module.s3_bucket[0].s3_bucket_arn}/*"]
     }
+    S3List = {
+      effect    = "Allow"
+      actions   = ["s3:ListBucket"]
+      resources = [module.s3_bucket[0].s3_bucket_arn]
+    }
     KMSRead = {
       effect    = "Allow"
       actions   = ["kms:Decrypt", "kms:DescribeKey"]
