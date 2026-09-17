@@ -10,5 +10,7 @@ module "dms_test_harness" {
   kms_key_arn    = data.aws_kms_key.general_shared.arn
   seed_image_uri = "${aws_ecr_repository.dms_seed[0].repository_url}:dms-seed-v2"
 
+  allocated_storage = 30
+
   tags = local.tags
 }
