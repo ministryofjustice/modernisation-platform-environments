@@ -16,7 +16,7 @@ module "cortex_xsiam_role" {
       actions = ["sts:AssumeRole"]
       principals = [{
         type        = "AWS"
-        identifiers = ["arn:aws:iam::${aws_ssm_parameter.cortex_account_id[0].insecure_value}:root"]
+        identifiers = ["arn:aws:iam::${local.environment_management.cortex_account_id}:root"]
       }]
       condition = [{
         test     = "StringEquals"

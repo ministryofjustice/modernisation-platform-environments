@@ -94,10 +94,28 @@ locals {
         source_arn_suffix = "*"
       }]
     }
+    start_malware_scanner = {
+      description  = "Function to power on a dedicated anti-malware EC2 instance."
+      role_key     = "start_stop_ec2_instances"
+      environments = ["production"]
+      permissions = [{
+        principal         = "ec2.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
+    stop_malware_scanner = {
+      description  = "Function to power off a dedicated anti-malware EC2 instance."
+      role_key     = "start_stop_ec2_instances"
+      environments = ["production"]
+      permissions = [{
+        principal         = "ec2.amazonaws.com"
+        source_arn_suffix = "*"
+      }]
+    }
     send_malware_scan_notification = {
       description  = "Function to send notification of malware scan completion on the PPUD document service."
       role_key     = "get_cloudwatch"
-      environments = ["development", "production"]
+      environments = ["development", "preproduction", "production"]
       layers       = ["numpy", "pillow", "matplotlib"]
       vpc_config   = { prod = true }
       permissions = [{

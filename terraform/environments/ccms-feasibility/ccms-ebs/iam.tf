@@ -156,6 +156,36 @@ resource "aws_iam_role_policy_attachment" "ebsapps_cw_logging" {
   policy_arn = aws_iam_policy.ebsapps_cw_logging.arn
 }
 
+# Shared secret access for EBS DB and Apps instances
+# Covers secrets manually created (or created in future) under the ccms-ebs- naming prefix
+
+resource "aws_iam_policy" "ebs_shared_secrets" {
+  name        = "${local.component_name}-${local.env_label}-ebs-shared-secrets"
+  description = "Allow EBS DB and Apps instances to read secrets prefixed ccms-ebs-"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "ccmsebsfeasibilitysecret"
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue"]
+        Resource = "arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:ccms-ebs-*"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ebsdb_shared_secrets" {
+  role       = aws_iam_role.ebsdb.name
+  policy_arn = aws_iam_policy.ebs_shared_secrets.arn
+}
+
+resource "aws_iam_role_policy_attachment" "ebsapps_shared_secrets" {
+  role       = aws_iam_role.ebsapps.name
+  policy_arn = aws_iam_policy.ebs_shared_secrets.arn
+}
+
 resource "aws_iam_policy" "rman_to_s3" {
   name        = "${local.component_name}-${local.env_label}-ebsdb-rman-s3"
   description = "Allow the EBS DB instance to write RMAN backups to S3"

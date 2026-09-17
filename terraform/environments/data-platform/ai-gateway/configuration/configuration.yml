@@ -3,7 +3,6 @@ organisations:
     alias: Ministry of Justice
 
 teams:
-  # litellm_team is currently missing the option to attach unified access groups, so for now we have to manually add them in the admin console.
   justice-data-platform:
     alias: Justice Data Platform
     organisation: ministryofjustice
@@ -437,6 +436,13 @@ models:
       location: "europe-west2"
       generally_available: false
       environments_available: ["development", "production"]
+    gemini-3-5-transcribe-preview:
+      model_id: "gemini-3.5-transcribe-preview"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 3.5 Transcribe Preview"
+      location: "global"
+      generally_available: false
+      environments_available: ["development"]
     gemini-3-6-flash:
       model_id: "gemini-3.6-flash"
       model_family: "Google Gemini"
@@ -451,141 +457,54 @@ models:
       location: "eu"
       generally_available: false
       environments_available: ["development", "production"]
+    gemini-3-8-flash:
+      model_id: "gemini-3.8-flash"
+      model_family: "Google Gemini"
+      model_name: "Google Gemini 3.8 Flash (EU)"
+      location: "eu"
+      generally_available: false
+      environments_available: ["development", "production"]
   microsoft_foundry:
-    # Anthropic
-    claude-fable-5:
-      model_id: "claude-fable-5"
-      model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Fable 5 (Global)"
-      model_provider: "azure_ai"
-      model_endpoint: "anthropic"
-      generally_available: false
-      environments_available: ["development", "test", "preproduction"]
-    claude-haiku-4-5:
-      model_id: "claude-haiku-4-5"
-      model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Haiku 4.5 (Global)"
-      model_provider: "azure_ai"
-      model_endpoint: "anthropic"
-      generally_available: false
-      environments_available: ["development", "test", "preproduction"]
-    claude-opus-4-5:
-      model_id: "claude-opus-4-5"
-      model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Opus 4.5 (Global)"
-      model_provider: "azure_ai"
-      model_endpoint: "anthropic"
-      generally_available: false
-      environments_available: ["development", "test", "preproduction"]
-    claude-opus-4-6:
-      model_id: "claude-opus-4-6"
-      model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Opus 4.6 (Global)"
-      model_provider: "azure_ai"
-      model_endpoint: "anthropic"
-      generally_available: false
-      environments_available: ["development", "test", "preproduction"]
-    claude-opus-4-7:
-      model_id: "claude-opus-4-7"
-      model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Opus 4.7 (Global)"
-      model_provider: "azure_ai"
-      model_endpoint: "anthropic"
-      generally_available: false
-      environments_available: ["development", "test", "preproduction"]
-    claude-opus-4-8:
-      model_id: "claude-opus-4-8"
-      model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Opus 4.8 (Global)"
-      model_provider: "azure_ai"
-      model_endpoint: "anthropic"
-      generally_available: false
-      environments_available: ["development", "test", "preproduction"]
-    claude-opus-5:
-      model_id: "claude-opus-5"
-      model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Opus 5 (Global)"
-      model_provider: "azure_ai"
-      model_endpoint: "anthropic"
-      generally_available: false
-      environments_available: ["development", "test", "preproduction"]
-    claude-sonnet-4-6:
-      model_id: "claude-sonnet-4-6"
-      model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 4.6 (Global)"
-      model_provider: "azure_ai"
-      model_endpoint: "anthropic"
-      generally_available: false
-      environments_available: ["development", "test", "preproduction"]
-    claude-sonnet-5:
-      model_id: "claude-sonnet-5"
-      model_family: "Anthropic Claude"
-      model_name: "Anthropic Claude Sonnet 5 (Global)"
-      model_provider: "azure_ai"
-      model_endpoint: "anthropic"
-      generally_available: false
-      environments_available: ["development", "test", "preproduction"]
     # OpenAI
-    gpt-5-3-codex:
-      model_id: "gpt-5.3-codex"
-      model_family: "OpenAI GPT"
-      model_name: "OpenAI GPT 5.3 Codex (Global)"
-      model_provider: "azure"
-      generally_available: false
-      environments_available: ["development", "test", "preproduction"]
     gpt-5-4:
       model_id: "gpt-5.4"
       model_family: "OpenAI GPT"
-      model_name: "OpenAI GPT 5.4 (Global)"
+      model_name: "OpenAI GPT 5.4 (EU)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-4-mini:
       model_id: "gpt-5.4-mini"
       model_family: "OpenAI GPT"
-      model_name: "OpenAI GPT 5.4 Mini (Global)"
-      model_provider: "azure"
-      generally_available: false
-      environments_available: ["development", "test", "preproduction"]
-    gpt-5-4-nano:
-      model_id: "gpt-5.4-nano"
-      model_family: "OpenAI GPT"
-      model_name: "OpenAI GPT 5.4 Nano (Global)"
-      model_provider: "azure"
-      generally_available: false
-      environments_available: ["development", "test", "preproduction"]
-    gpt-5-4-pro:
-      model_id: "gpt-5.4-pro"
-      model_family: "OpenAI GPT"
-      model_name: "OpenAI GPT 5.4 Pro (Global)"
+      model_name: "OpenAI GPT 5.4 Mini (EU)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-5:
       model_id: "gpt-5.5"
       model_family: "OpenAI GPT"
-      model_name: "OpenAI GPT 5.5 (Global)"
+      model_name: "OpenAI GPT 5.5 (EU)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-6-luna:
       model_id: "gpt-5.6-luna"
       model_family: "OpenAI GPT"
-      model_name: "OpenAI GPT 5.6 Luna (Global)"
+      model_name: "OpenAI GPT 5.6 Luna (EU)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-6-sol:
       model_id: "gpt-5.6-sol"
       model_family: "OpenAI GPT"
-      model_name: "OpenAI GPT 5.6 Sol (Global)"
+      model_name: "OpenAI GPT 5.6 Sol (EU)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]
     gpt-5-6-terra:
       model_id: "gpt-5.6-terra"
       model_family: "OpenAI GPT"
-      model_name: "OpenAI GPT 5.6 Terra (Global)"
+      model_name: "OpenAI GPT 5.6 Terra (EU)"
       model_provider: "azure"
       generally_available: false
       environments_available: ["development", "test", "preproduction"]

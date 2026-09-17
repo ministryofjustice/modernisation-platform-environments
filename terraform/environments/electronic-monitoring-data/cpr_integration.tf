@@ -1,5 +1,5 @@
 locals {
-    irsa_name = local.is-development || local.is-test ? "cloud-platform-irsa-8d7b7a42d840ce59-live" : ""
+    irsa_name = local.is-development || local.is-test ? "cloud-platform-irsa-8d7b7a42d840ce59-live" : local.is-preproduction ? "cloud-platform-irsa-91f1480099494185-live" : ""
 }
 
 module "emd_cpr_integration_role" {

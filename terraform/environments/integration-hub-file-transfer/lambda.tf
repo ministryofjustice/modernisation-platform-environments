@@ -49,6 +49,15 @@ module "lambda_file_received_adapter" {
       ]
       resources = [module.dynamodb_adapter_idempotency.dynamodb_table_arn]
     }
+    use_dlq_key = {
+      effect = "Allow"
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey",
+      ]
+      resources = [module.kms_sqs.key_arn]
+    }
   }
 
 
@@ -122,6 +131,15 @@ module "lambda_file_scan_result_recorded_adapter" {
         "s3:GetObjectVersionTagging",
       ]
       resources = ["${module.s3_bucket["processing"].s3_bucket_arn}/*"]
+    }
+    use_dlq_key = {
+      effect = "Allow"
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey",
+      ]
+      resources = [module.kms_sqs.key_arn]
     }
   }
 

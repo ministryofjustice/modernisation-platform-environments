@@ -35,7 +35,7 @@ data "aws_iam_policy_document" "s3_bucket" {
 module "s3_bucket" {
   count = local.is-production ? 1 : 0
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=dd0c434de5e74d8864e249ee020d917b076b6e32" # v5.14.4
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=dd0c434de5e74d8864e249ee020d917b076b6e32" # v5.15.4
 
   bucket = local.bucket_name
 

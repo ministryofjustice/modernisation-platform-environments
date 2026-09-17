@@ -968,6 +968,7 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
       "${module.s3-athena-bucket.bucket.arn}/output/*",
       "${module.s3-athena-bucket.bucket.arn}/*",
       "${module.s3-raw-formatted-data-bucket.bucket.arn}/serco/fms/validation_rejected/*",
+      "${module.s3-metadata-bucket.bucket.arn}/schemas/serco/fms/*",
 
     ]
   }
@@ -993,7 +994,8 @@ data "aws_iam_policy_document" "load_fms_lambda_role_policy_document" {
     ]
     resources = [
       module.s3-raw-formatted-data-bucket.bucket.arn,
-      module.s3-create-a-derived-table-bucket.bucket.arn
+      module.s3-create-a-derived-table-bucket.bucket.arn,
+      module.s3-metadata-bucket.bucket.arn
     ]
   }
   statement {
@@ -3078,4 +3080,40 @@ module "trigger_cpr_job_iam_role" {
         identifiers = ["lambda.amazonaws.com"]
     }] }
   }
+}
+
+# ------------------------------------------------------------------------------
+# IAM role and policy for the rota personal digest Lambda
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role" "rota_personal_digest" {
+  name               = "rota_personal_digest_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "rota_personal_digest_policy_document" {
+  statement {
+    sid    = "ReadRotaDigestSecrets"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      module.live_feed_github_app.secret_arn,
+      module.rota_personal_digest_slack.secret_arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "rota_personal_digest" {
+  name   = "rota_personal_digest_lambda_policy"
+  policy = data.aws_iam_policy_document.rota_personal_digest_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "rota_personal_digest_attach" {
+  role       = aws_iam_role.rota_personal_digest.name
+  policy_arn = aws_iam_policy.rota_personal_digest.arn
 }

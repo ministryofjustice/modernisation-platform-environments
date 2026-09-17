@@ -1,5 +1,5 @@
 module "gatekeeper" {
-  source = "github.com/ministryofjustice/container-platform-terraform-gatekeeper?ref=1e282d05902b17fa31f00e152aade64d86e7d181" #1.3.0
+  source = "github.com/ministryofjustice/container-platform-terraform-gatekeeper?ref=3f928feb8531922c8b3ebaa26f38c5d8bb776813" #1.4.0
 
   # boolean expression for applying opa valid hostname for test clusters only.
   dryrun_map = {

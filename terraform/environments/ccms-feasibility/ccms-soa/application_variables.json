@@ -6,12 +6,41 @@
       "admin_ec2_min_capacity": 1,
       "admin_ec2_max_capacity": 1,
       "admin_ec2_desired_capacity": 1,
+      "admin_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/soa-admin",
+      "admin_container_version": "ccms-soa-admin-feasibility-placeholder",
+      "admin_ssl_port": 7002,
+      "admin_container_cpu": 2048,
+      "admin_container_memory": 6144,
+      "admin_wl_mem_args": "-Xms1024m -Xmx4096m",
+      "admin_run_rcu_bootstrap": true,
+      "admin_app_count": 1,
+      "admin_pui_user": "pui_user",
+      "admin_caab_user": "caab_soa_gateway_api",
+      "admin_apply_user": "apply_user",
+
       "managed_ami_image_id": "ami-02f77a03ec776dc35",
       "managed_ec2_instance_type": "m5.2xlarge",
       "managed_ec2_min_capacity": 1,
       "managed_ec2_max_capacity": 1,
       "managed_ec2_desired_capacity": 1,
-      "root_volume_size": 30
+      "managed_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/soa-managed",
+      "managed_container_version": "ccms-soa-managed-feasibility-placeholder",
+      "managed_ssl_port": 7002,
+      "managed_container_cpu": 2048,
+      "managed_container_memory": 6144,
+      "managed_wl_mem_args": "-Xms1024m -Xmx4096m",
+      "managed_app_count": 1,
+
+      "root_volume_size": 30,
+
+      "soa_db_user": "soapdb",
+      "soa_db_role": "system",
+      "soa_db_instance_type": "db.t3.large",
+      "soa_db_storage_gb": 100,
+      "soa_db_deletion_protection": true,
+      "db_log_retention_days": 7,
+
+      "nlb_deletion_protection": true
     }
   }
 }

@@ -148,7 +148,8 @@ module "bcs_instance" {
   })
 
   cloudwatch_metric_alarms = merge(
-    local.cloudwatch_metric_alarms.ec2
+    local.cloudwatch_metric_alarms.ec2,
+    lookup(var.bcs_config, "rclone_sync_alarms_enabled", false) ? local.cloudwatch_metric_alarms.rclone_sync : null,
   )
 }
 

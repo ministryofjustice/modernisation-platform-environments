@@ -107,6 +107,7 @@ module "justice_transcribe_backend_iam_role" {
       actions = [
         "sagemaker:InvokeEndpoint",
         "sagemaker:InvokeEndpointAsync",
+        "sagemaker:InvokeEndpointWithBidirectionalStream",
       ]
       resources = [aws_sagemaker_endpoint.elevenlabs_asr[0].arn]
     }

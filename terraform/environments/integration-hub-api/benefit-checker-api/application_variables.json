@@ -1,0 +1,41 @@
+{
+  "accounts": {
+    "development": {
+      "api_configuration": {
+        "cors_allowed_origins": [],
+        "downstream_benefit_checker_url": "https://kic2y0kswe.execute-api.eu-west-2.amazonaws.com",
+        "rate_limit": 20,
+        "burst_limit": 10
+      },
+      "auth_configuration": {
+        "roles": {
+          "benefit-checker-consumer": {}
+        },
+        "users": {
+          "benefit-checker-demo-user": {
+            "enabled": true,
+            "role_name": "benefit-checker-consumer"
+          }
+        },
+        "system_principals": {
+          "benefit-checker-demo-client": {
+            "enabled": true,
+            "role_name": "benefit-checker-consumer"
+          }
+        }
+      }
+    },
+    "test": {
+      "api_configuration": {},
+      "auth_configuration": { "roles": {}, "users": {}, "system_principals": {} }
+    },
+    "preproduction": {
+      "api_configuration": {},
+      "auth_configuration": { "roles": {}, "users": {}, "system_principals": {} }
+    },
+    "production": {
+      "api_configuration": {},
+      "auth_configuration": { "roles": {}, "users": {}, "system_principals": {} }
+    }
+  }
+}

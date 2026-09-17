@@ -12,7 +12,8 @@ When run, it:
 
 1. Reads the current secret (`oas/app/db-master-password`) from Secrets Manager to get
    the `username`.
-2. Generates a new random password with `secretsmanager:GetRandomPassword`.
+2. Generates a new 30-character, alphanumeric-only password with
+  `secretsmanager:GetRandomPassword`.
 3. Sets that password directly on the RDS instance via `rds:ModifyDBInstance`
    (`ApplyImmediately=true`). This does not require the current password — it resets it
    at the RDS control-plane level.

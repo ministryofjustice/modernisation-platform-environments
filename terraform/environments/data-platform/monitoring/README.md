@@ -181,10 +181,17 @@ Every key inside `alerting_golden_signals` (in `alerting-golden-signals.tf`) is 
 | `namespace` | CloudWatch only | CloudWatch namespace (e.g. `AWS/RDS`). Omit for Prometheus signals. |
 | `metric` | yes | CloudWatch metric name, or a short label used as the `metric` alert label for Prometheus signals. |
 | `statistic` | CloudWatch only | CloudWatch statistic — `Sum`, `Average`, `Maximum`, `Minimum`, `p99`, etc. |
-| `datasource_type` | no | Set to `"prometheus"` to use PromQL instead of CloudWatch. When set, supply `expr` instead of `namespace`/`metric`/`statistic`. |
+| `datasource_type` | no (default `"cloudwatch"`) | One of `"cloudwatch"` (default), `"prometheus"`, `"azure_monitor"`, or `"stackdriver"`. `"prometheus"` uses PromQL — supply `expr` instead of `namespace`/`metric`/`statistic`. `"azure_monitor"` queries the shared Azure Monitor datasource (`cfg.azure_monitor_datasource_uid`, default `"azure-monitor-ai-foundry"`) — supply `namespace`/`metric`/`statistic` as with CloudWatch. `"stackdriver"` queries Google Cloud Monitoring (`cfg.stackdriver_datasource_uid`, default `"google-cloud-monitoring"`) — supply `namespace`/`metric` plus `resource_type`/`aligner`/`reducer` instead of `statistic`. |
 | `expr` | Prometheus only | PromQL expression. Use the literal token `__NAMESPACES__` where a namespace regex is needed — it's replaced at render time with the account's `namespaces` list joined by `\|`. |
+| `filter_dimension` | azure_monitor only, optional | Azure Monitor dimension name to filter the metric on, e.g. `"StatusCode"`. |
+| `filter_operator` | azure_monitor only, optional (default `"eq"`) | Comparison operator for `filter_dimension`/`filter_value` — `"eq"` or `"ne"`. |
+| `filter_value` | azure_monitor only, optional | Value compared against `filter_dimension` via `filter_operator`. |
+| `resource_type` | stackdriver only, required with that datasource | Cloud Monitoring `resource.type` filter value, e.g. `"aiplatform.googleapis.com/PublisherModel"` for Vertex AI's foundation-model serving path. Different parts of Vertex AI (custom endpoints, training jobs, etc.) use a different `resource.type` — there's no default, so set it explicitly per rule. |
+| `aligner` | stackdriver only | Cloud Monitoring `perSeriesAligner`, e.g. `"ALIGN_RATE"`, `"ALIGN_MEAN"`. For percentile metrics on distribution-type data (e.g. latency), use `"ALIGN_DELTA"` paired with `reducer = "REDUCE_PERCENTILE_99"` — Cloud Monitoring computes percentiles via the reducer, not the aligner. |
+| `reducer` | stackdriver only | Cloud Monitoring `crossSeriesReducer`, e.g. `"REDUCE_SUM"`, `"REDUCE_MEAN"`, `"REDUCE_PERCENTILE_99"`. |
+| `filter` | stackdriver only, optional | Raw Cloud Monitoring filter fragment ANDed onto the base `metric.type` + `resource.type` filters, e.g. `metric.label.response_code != "200"`. |
 | `type` | yes | Alert logic: `gt` (fire when value > threshold), `lt` (fire when value < threshold), `baseline_gt` (fire when % above hourly baseline), `baseline_lt` (fire when % below hourly baseline). `gt`/`lt` evaluate condition `C`; `baseline_*` evaluate condition `D`. |
-| `dim_key` | yes | Primary CloudWatch dimension key. `""` = no dimension filter (a single global rule). Otherwise one of the supported keys below — one alert rule is generated per value in the resolved list, with the value appended as a suffix to the rule name. |
+| `dim_key` | yes | Primary dimension/grouping key. `""` = no dimension filter (a single global rule). Otherwise one of the supported keys below — one alert rule is generated per value in the resolved list, with the value appended as a suffix to the rule name. Resolution happens in `rule_combos_by_env` (`alerting-rules.tf`), which lists each key explicitly; any key not in that list falls through to the `""` default with no dimension filter at all, even if a matching config field exists elsewhere. |
 | `dim_key2` | no | Optional second dimension key, always matched against `"*"`. Used for ContainerInsights metrics that need e.g. `{Namespace=cpanel, ClusterName=*}` to get the namespace-level aggregate instead of per-pod series. |
 | `match_exact` | no (default `false`) | If `true`, CloudWatch returns only series whose dimension set exactly matches the supplied keys (no extra dimensions). Needed for ContainerInsights cluster-level aggregates to exclude per-pod series. |
 | `use_metric_math` | no (default `false`) | If `true`, adds a second CloudWatch query (`A2`) for a capacity/limit metric and computes `$A / $A2 * 100` as `EXPR`. The threshold is then evaluated against that utilisation percentage instead of the raw value from `A`. Requires `capacity_metric`. |
@@ -208,10 +215,20 @@ Every key inside `alerting_golden_signals` (in `alerting-golden-signals.tf`) is 
 | `Namespace` | `cfg.namespaces` — list of k8s namespaces |
 | `ClusterName` | `["*"]` — wildcard, all clusters |
 | `NodeName` | `["*"]` — wildcard, all nodes |
+| `ModelDeploymentName` | `["*"]` — wildcard, rendered as a literal `ModelDeploymentName="*"` Azure Monitor dimension filter. **Not** scoped against `cfg.azure_foundry_model_deployments` — that field doesn't exist. |
+| `ModelId` | Not handled explicitly, so it falls through to the `""` case above — no CloudWatch dimension is emitted at all (a plain global aggregate across all models), rather than an actual `ModelId="*"` filter. Practically similar to the wildcard rows, but via a different code path. |
 | `FileSystemId` | `cfg.efs_file_systems` — list of EFS file system IDs |
 
 One Grafana alert rule is created per value in the resolved list, and that value is appended as a suffix to the rule name (e.g.
 `s3_bucket_errors_my-bucket-name`).
+
+> `ModelDeploymentName` and `ModelId` both currently behave as "no per-resource
+> scoping" in practice — they exist to append a name suffix / satisfy the
+> `dim_key` requirement for Bedrock and Azure AI Foundry rules, not to filter
+> down to a specific model. If per-model or per-deployment scoping is needed,
+> `rule_combos_by_env` in `alerting-rules.tf` needs a new explicit case (and,
+> for `ModelId`, a real dimension filter would need adding to the CloudWatch
+> query block too).
 
 ## Account configuration fields (`alerts_configured_accounts`)
 
@@ -230,6 +247,8 @@ Each entry in `alerts_configured_accounts` (in `environment-configuration.tf`) c
 | `threshold_overrides` | no | `{}` | Map of threshold key → value, merged over `alert_defaults` for this account only (`merge(alert_defaults, threshold_overrides)`). Use the same keys referenced by golden signals' `warning`/`critical` fields. |
 | `evaluation_interval` | no | `"1m"` (`local.evaluation_interval`) | How often Grafana evaluates every rule group for this account. Accepts `"30s"`, `"1m"`, `"5m"`, `"2h"`-style duration strings. |
 | `prometheus_datasource_uid` | no | `"<uid>-prometheus"` | Grafana datasource UID used for Prometheus (`datasource_type = "prometheus"`) queries. Override if the Amazon Managed Prometheus datasource was provisioned under a different UID. |
+| `azure_monitor_datasource_uid` | no | `"azure-monitor-ai-foundry"` | Grafana datasource UID used for `datasource_type = "azure_monitor"` queries. |
+| `stackdriver_datasource_uid` | no | `"google-cloud-monitoring"` | Grafana datasource UID used for `datasource_type = "stackdriver"` queries. |
 | `aws_region` | no | current provider region (`data.aws_region.current.region`) | AWS region passed to CloudWatch queries for this account. Override for accounts monitored cross-region. |
 
 > `s3_buckets`, `rds_instances`, `cache_clusters`, `namespaces`, and

@@ -1208,6 +1208,19 @@ locals {
         { port = 80, to_port = 80, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
       ]
     }
+    "Tooling-Service-Server-Security-Group" = {
+      name        = "Tooling-Service-Server-Security-Group"
+      description = "Tooling Service server security group for all environments"
+      ingress = [
+        { port = 80, cidr = "vpc", description = "Allow port 80 inbound" },
+        { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
+      ]
+      egress = [
+        { port = 0, to_port = 0, protocol = "-1", cidr = "vpc", description = "Allow all outbound (VPC)" },
+        { port = 443, to_port = 443, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 443 outbound" },
+        { port = 80, to_port = 80, protocol = "tcp", cidr = "0.0.0.0/0", description = "Allow port 80 outbound" },
+      ]
+    }
     "WAM-Web-Portal-Server-Security-Group" = {
       name        = "WAM-Web-Portal-Server-Security-Group"
       description = "WAM Web Portal server security group for all environments"
@@ -1331,6 +1344,7 @@ locals {
       ingress = [
         { port = 80, cidr = "vpc", description = "Allow port 80 inbound" },
         { port = 1433, cidr = "vpc", description = "Allow port 1433 inbound" },
+        { port = 445, cidr = "vpc", description = "Allow port 445 inbound" }, #Temporarily allowed for development/testing purposes
         { port = 3389, cidr = "vpc", description = "Allow port 3389 inbound" },
       ]
       egress = [

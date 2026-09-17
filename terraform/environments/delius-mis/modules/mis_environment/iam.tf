@@ -13,7 +13,9 @@ data "aws_iam_policy_document" "secrets_manager" {
       "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-boe-config-*",
       "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-boe-passwords-*",
       "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-dis-config-*",
-      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-dis-passwords-*"
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-dis-passwords-*",
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sharepoint-app-registration-*",
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sharepoint-drive-ids-*"
     ]
   }
 
@@ -27,7 +29,8 @@ data "aws_iam_policy_document" "secrets_manager" {
       "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-boe-config-*",
       "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-boe-passwords-*",
       "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-dis-config-*",
-      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-dis-passwords-*"
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sap-dis-passwords-*",
+      "arn:aws:secretsmanager:*:*:secret:${var.app_name}-${var.env_name}-sharepoint-drive-ids-*"
     ]
   }
 }

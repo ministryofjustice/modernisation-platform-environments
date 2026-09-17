@@ -623,6 +623,31 @@ resource "aws_instance" "s618358rgvw028" {
   }
 }
 
+# UAT Tooling Server
+
+resource "aws_instance" "s618358rgvw029" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-preproduction == true ? 1 : 0
+  ami                    = "ami-08a06c03d368d86da"
+  instance_type          = "c6i.xlarge"     # temporary instance type for testing - to be downgraded to an m5.large as a later date
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.all["Tooling-Service-Server-Security-Group"].id]
+  subnet_id              = data.aws_subnet.data_subnets_b.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s618358rgvw029"
+    patch_group = "uat_win_patch"
+    backup      = true
+  }
+}
+
 # WAN Portal Server
 
 resource "aws_instance" "s618358rgvw201" {
@@ -908,6 +933,31 @@ resource "aws_instance" "s618358rgvw031" {
 
   tags = {
     Name          = "s618358rgvw031"
+    patch_group   = "prod_win_patch"
+    is-production = true
+  }
+}
+
+# Prod Tooling Server
+
+resource "aws_instance" "s618358rgvw032" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-08a06c03d368d86da"
+  instance_type          = "m5.large"
+  source_dest_check      = true
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.all["Tooling-Service-Server-Security-Group"].id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name          = "s618358rgvw032"
     patch_group   = "prod_win_patch"
     is-production = true
   }

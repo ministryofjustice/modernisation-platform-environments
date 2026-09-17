@@ -18,7 +18,6 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 229,
   "links": [],
   "panels": [
     {
@@ -89,7 +88,7 @@
           "queryMode": "Metrics",
           "refId": "A",
           "region": "default",
-          "sqlExpression": "SELECT SUM(SecurityHubFindings)\nFROM SCHEMA(\"ObservabilityPlatform/SecurityHub\", SeverityLabel, AwsAccountId, Region, AccountName)\nWHERE SeverityLabel = 'CRITICAL'\n  AND Region = 'eu-west-2'\nGROUP BY AccountName\n",
+          "sqlExpression": "SELECT SUM(SecurityHubFindings)\nFROM SCHEMA(\"ObservabilityPlatform/SecurityHub\", SeverityLabel, AwsAccountId, Region, AccountName)\nWHERE SeverityLabel = 'CRITICAL'\n  AND Region = 'eu-west-2'\nGROUP BY AccountName",
           "statistic": "Average"
         }
       ],
@@ -194,7 +193,7 @@
           "queryMode": "Metrics",
           "refId": "A",
           "region": "default",
-          "sqlExpression": "SELECT SUM(SecurityHubFindings)\nFROM SCHEMA(\"ObservabilityPlatform/SecurityHub\", SeverityLabel, AwsAccountId, Region, AccountName)\nWHERE SeverityLabel = 'CRITICAL'\n  AND Region = 'eu-west-2'\nGROUP BY AccountName\n",
+          "sqlExpression": "SELECT SUM(SecurityHubFindings)\nFROM SCHEMA(\"ObservabilityPlatform/SecurityHub\", SeverityLabel, AwsAccountId, Region, AccountName)\nWHERE SeverityLabel = 'CRITICAL'\n  AND Region = 'eu-west-2'\nGROUP BY AccountName",
           "statistic": "Sum"
         }
       ],
@@ -275,7 +274,7 @@
               "type": "function"
             }
           },
-          "sqlExpression": "SELECT SUM(SecurityHubFindings)\nFROM SCHEMA(\"ObservabilityPlatform/SecurityHub\", SeverityLabel, AwsAccountId, Region, AccountName)\nWHERE SeverityLabel = 'HIGH'\n  AND Region = 'eu-west-2'\nGROUP BY AccountName\n",
+          "sqlExpression": "SELECT SUM(SecurityHubFindings)\nFROM SCHEMA(\"ObservabilityPlatform/SecurityHub\", SeverityLabel, AwsAccountId, Region, AccountName)\nWHERE SeverityLabel = 'HIGH'\n  AND Region = 'eu-west-2'\nGROUP BY AccountName",
           "statistic": "Average"
         }
       ],
@@ -407,6 +406,5 @@
   "timezone": "browser",
   "title": "Security Hub findings for core accounts",
   "uid": "dfcwtr9nm2cxsb",
-  "version": 4,
   "weekStart": ""
 }

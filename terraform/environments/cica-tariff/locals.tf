@@ -141,7 +141,7 @@ locals {
   tariffdb_volume_layout = [
     {
       device_name = "xvde"
-      size        = 100
+      size        = local.environment == "production" ? 200 : 100
     },
     {
       device_name = "xvdf"
@@ -149,7 +149,7 @@ locals {
     },
     {
       device_name = "xvdg"
-      size        = 100
+      size        = local.environment == "production" ? 200 : 100
     },
     {
       device_name = "xvdh"

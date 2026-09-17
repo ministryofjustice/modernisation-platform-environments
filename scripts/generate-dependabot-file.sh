@@ -55,22 +55,45 @@ updates:
       - "ministryofjustice/devcontainer-community"
 EOL
 
-# Add Terraform ecosystem entries (dynamically only for top-level directories containing .tf files)
+# Add Terraform ecosystem entries, one per application directory under
+# terraform/environments (and one per top-level area elsewhere, e.g. terraform/modules).
+# Each entry groups all of its updates into a single pull request named after the
+# application, so teams can find their own updates instead of scanning hundreds of PRs.
 if [[ -n "$tf_dirs" ]]; then
-  echo "Generating Terraform ecosystem entry..."
-  echo "  - package-ecosystem: \"terraform\"" >> "$dependabot_file"
-  echo "    directories:" >> "$dependabot_file"
+  echo "Generating Terraform ecosystem entries..."
 
-  # Extract only top-level directories and ensure we don't add duplicates
-  echo "$tf_dirs" | awk -F/ '{print $1}' | sort -u | while IFS= read -r dir; do
-    echo "      - \"$dir/**/*\"" >> "$dependabot_file"
-  done
-  
-  echo "    schedule:" >> "$dependabot_file"
-  echo "      interval: \"daily\"" >> "$dependabot_file"
-  echo "    open-pull-requests-limit: 150" >> "$dependabot_file"
-  echo "    cooldown:" >> "$dependabot_file"
-  echo "      default-days: ${dependabot_cooldown_default_days}" >> "$dependabot_file"
+  tf_groups=$(echo "$tf_dirs" | awk -F/ '
+    $1 == "terraform" && $2 == "environments" && NF >= 3 { print $1"/"$2"/"$3; next }
+    NF >= 2 { print $1"/"$2; next }
+    { print $1 }
+  ' | sort -u)
+
+  while IFS= read -r dir; do
+    [[ -z "$dir" ]] && continue
+
+    # Group identifiers are used in branch names, so keep them to safe characters
+    group_name=$(basename "$dir" | sed 's/[^A-Za-z0-9_-]/-/g')
+
+    echo "  - package-ecosystem: \"terraform\"" >> "$dependabot_file"
+    echo "    directories:" >> "$dependabot_file"
+
+    # Directories are listed explicitly; Dependabot rejects wildcards it cannot prove are non-overlapping
+    echo "$tf_dirs" | grep -E "^${dir}(/|\$)" | while IFS= read -r tf_dir; do
+      echo "      - \"$tf_dir\"" >> "$dependabot_file"
+    done
+
+    cat >> "$dependabot_file" << EOL
+    schedule:
+      interval: "daily"
+    groups:
+      ${group_name}:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: ${dependabot_cooldown_default_days}
+EOL
+  done <<< "$tf_groups"
 fi
 
 # Add Go module ecosystem entries (dynamically only for top-level directories containing go.mod)
