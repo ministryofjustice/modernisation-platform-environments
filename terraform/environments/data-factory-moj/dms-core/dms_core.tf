@@ -6,7 +6,7 @@ moved {
 module "dms_source_ingestion" {
   count = local.dms_core_enabled ? 1 : 0
 
-  source = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service/modules/dms-source-ingestion?ref=567e18b4f637ef5935b370286b489cd3a0102cb9"
+  source = "github.com/ministryofjustice/terraform-aws-moj-data-factory-modules//modules/database-migration-service/modules/dms-source-ingestion?ref=4eb13e85327e4825b61d36ffe88fa821c3e86324"
 
   depends_on = [
     aws_iam_role_policy_attachment.dms_vpc,
