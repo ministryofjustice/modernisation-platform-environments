@@ -199,9 +199,11 @@
               fi
               endpoint=$(aws grafana describe-workspace --workspace-id "${ws_id}" \
                 --query 'workspace.endpoint' --output text)
-              # The plan role intentionally lacks CreateWorkspaceServiceAccountToken
-              # (only the apply role can mint). Do not fail the job if minting is
-              # denied; leave GRAFANA_AUTH unset and let Terraform surface it.
+              # Both the plan and apply roles can mint tokens (plan role granted
+              # grafana:CreateWorkspaceServiceAccountToken in
+              # ministryofjustice/modernisation-platform#14006). If minting still
+              # fails, don't fail this shared job — leave GRAFANA_AUTH unset and
+              # let Terraform surface the auth error against the Grafana provider.
               if ! token=$(aws grafana create-workspace-service-account-token \
                 --workspace-id "${ws_id}" --service-account-id "${sa_id}" \
                 --name "tf-${GITHUB_RUN_ID}-${GITHUB_JOB}" --seconds-to-live 3600 \
@@ -451,9 +453,11 @@
               fi
               endpoint=$(aws grafana describe-workspace --workspace-id "${ws_id}" \
                 --query 'workspace.endpoint' --output text)
-              # The plan role intentionally lacks CreateWorkspaceServiceAccountToken
-              # (only the apply role can mint). Do not fail the job if minting is
-              # denied; leave GRAFANA_AUTH unset and let Terraform surface it.
+              # Both the plan and apply roles can mint tokens (plan role granted
+              # grafana:CreateWorkspaceServiceAccountToken in
+              # ministryofjustice/modernisation-platform#14006). If minting still
+              # fails, don't fail this shared job — leave GRAFANA_AUTH unset and
+              # let Terraform surface the auth error against the Grafana provider.
               if ! token=$(aws grafana create-workspace-service-account-token \
                 --workspace-id "${ws_id}" --service-account-id "${sa_id}" \
                 --name "tf-${GITHUB_RUN_ID}-${GITHUB_JOB}" --seconds-to-live 3600 \
