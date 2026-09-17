@@ -62,7 +62,7 @@ resource "aws_db_instance" "tds_db" {
     update = "80m"
   }
   lifecycle {
-    ignore_changes = [engine_version]
+    ignore_changes = [engine_version, final_snapshot_identifier]
   }
 }
 
