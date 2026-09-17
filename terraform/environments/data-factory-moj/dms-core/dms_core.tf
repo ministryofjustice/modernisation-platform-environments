@@ -15,10 +15,10 @@ module "dms_source_ingestion" {
 
   name        = "${local.application_name}-${local.environment}-${local.component_name}"
   environment = local.environment
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = data.aws_vpc.shared[0].id
 
   network = {
-    subnet_ids = data.aws_subnets.shared-data.ids
+    subnet_ids = data.aws_subnets.shared-data[0].ids
 
     additional_security_group_ids = [
       module.dms_test_harness[0].dms_client_security_group_id
