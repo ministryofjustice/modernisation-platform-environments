@@ -3,19 +3,6 @@ moved {
   to   = module.dms_source_ingestion[0].module.dms_core
 }
 
-import {
-  for_each = local.dms_core_enabled && local.environment == "development" ? {
-    dms_task_logs = {
-      module_index    = 0
-      log_group_index = 0
-      name            = "dms-tasks-data-factory-moj-development-dms-core-dms-instance-development"
-    }
-  } : {}
-
-  to = module.dms_source_ingestion[each.value.module_index].module.dms_core.aws_cloudwatch_log_group.replication_tasks[each.value.log_group_index]
-  id = each.value.name
-}
-
 module "dms_source_ingestion" {
   count = local.dms_core_enabled ? 1 : 0
 
