@@ -134,9 +134,9 @@ data "aws_iam_policy_document" "lb_access_logs_policy" {
       identifiers = ["*"]
     }
     resources = flatten([
-      for bucket in values(module.s3_bucket) : [
-        "${bucket.arn}/*",
-        bucket.arn
+      for ftp_bucket in values(module.s3_bucket) : [
+        "${ftp_bucket.bucket.arn}/*",
+        ftp_bucket.bucket.arn
       ]
     ])
   }
