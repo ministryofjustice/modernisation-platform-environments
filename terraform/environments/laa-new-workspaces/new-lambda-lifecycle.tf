@@ -170,4 +170,5 @@ resource "aws_iam_role_policy" "user_lifecycle_lambda_policy" {
 output "user_lifecycle_lambda_function_name" {
   value       = local.environment == "development" ? aws_lambda_function.user_lifecycle.function_name : null
   description = "Lambda function name for user lifecycle management"
+  sensitive   = true
 }

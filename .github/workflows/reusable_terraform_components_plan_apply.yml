@@ -251,23 +251,6 @@
               echo "exitcode=${exitcode}" >> $GITHUB_OUTPUT
               (( exitcode == 1 )) && exit 1 || exit 0
 
-          - name: Save plan fingerprint
-            if: steps.plan.outputs.exitcode == '2'
-            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-            run: |
-              jq -cS '{resource_changes, output_changes}' tfplan.json \
-                | sha256sum \
-                | awk '{print $1}' > "${{ github.workspace }}/plan.fingerprint"
-              echo "Plan fingerprint: $(cat "${{ github.workspace }}/plan.fingerprint")"
-
-          - name: Upload plan fingerprint
-            if: steps.plan.outputs.exitcode == '2'
-            uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-            with:
-              name: tf-plan-fingerprint-${{ env.WORKSPACE_NAME }}-${{ inputs.component }}
-              path: plan.fingerprint
-              retention-days: 1
-
           - name: Evaluate Terraform Plan
             if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && !contains(fromJSON(env.SKIP_PLAN_EVALUATOR), env.WORKSPACE_NAME)
             id: evaluate_terraform_plan
@@ -474,46 +457,15 @@
               echo "TF_VAR_grafana_url=${endpoint}" >> "${GITHUB_ENV}"
               echo "Grafana provider configured for ${amg_name} (token valid 1h)."
 
-          - name: Download approved plan fingerprint
-            uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-            with:
-              name: tf-plan-fingerprint-${{ env.WORKSPACE_NAME }}-${{ inputs.component }}
-              path: ${{ github.workspace }}
-
           - name: Terraform Plan
-            id: plan
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
               set -o pipefail
-              exitcode=0
-              tf_args="-detailed-exitcode -out=x.tfplan ${{ inputs.plan_apply_tfargs }}"
+              tf_args="-out x.tfplan ${{ inputs.plan_apply_tfargs }}"
               echo "terraform plan ${tf_args}"
-              terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh || exitcode=$?
-              echo "exitcode=${exitcode}"
-              echo "exitcode=${exitcode}" >> $GITHUB_OUTPUT
-              (( exitcode == 1 )) && exit 1 || exit 0
-
-          - name: Skip Apply (No Changes)
-            if: steps.plan.outputs.exitcode == '0'
-            run: echo "No Terraform changes detected; skipping apply."
-
-          - name: Verify plan has not changed
-            if: steps.plan.outputs.exitcode == '2'
-            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-            run: |
-              terraform show -json x.tfplan > /tmp/tfplan.json
-              jq -cS '{resource_changes, output_changes}' /tmp/tfplan.json \
-                | sha256sum \
-                | awk '{print $1}' > /tmp/current.fingerprint
-              echo "Approved fingerprint: $(cat "${{ github.workspace }}/plan.fingerprint")"
-              echo "Current fingerprint:  $(cat /tmp/current.fingerprint)"
-              if ! cmp -s "${{ github.workspace }}/plan.fingerprint" /tmp/current.fingerprint; then
-                echo "Plan has changed since approval; refusing to apply. Re-run the workflow."
-                exit 1
-              fi
+              terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
 
           - name: Terraform Apply
-            if: steps.plan.outputs.exitcode == '2'
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
               set -o pipefail

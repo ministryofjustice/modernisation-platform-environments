@@ -40,9 +40,12 @@ module "iam_role" {
       resources = ["${module.s3_bucket[0].s3_bucket_arn}/*"]
     }
     SecretsManagerReadAccess = {
-      effect    = "Allow"
-      actions   = ["secretsmanager:GetSecretValue"]
-      resources = [module.github_app_secret[0].secret_arn]
+      effect  = "Allow"
+      actions = ["secretsmanager:GetSecretValue"]
+      resources = [
+        module.github_app_secret[0].secret_arn,
+        module.entra_id_secret[0].secret_arn
+      ]
     }
   }
 }
