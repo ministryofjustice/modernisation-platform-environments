@@ -201,15 +201,17 @@
                 --query 'workspace.endpoint' --output text)
               # Both the plan and apply roles can mint tokens (plan role granted
               # grafana:CreateWorkspaceServiceAccountToken in
-              # ministryofjustice/modernisation-platform#14006). If minting still
-              # fails, don't fail this shared job — leave GRAFANA_AUTH unset and
-              # let Terraform surface the auth error against the Grafana provider.
+              # ministryofjustice/modernisation-platform#14006). The workspace and
+              # the iac-grafana-objects service account both exist at this point,
+              # so a mint failure here is a real error (API/permissions/throttling),
+              # not an expected no-op — fail loudly rather than plan/apply with the
+              # Grafana provider silently unauthenticated.
               if ! token=$(aws grafana create-workspace-service-account-token \
                 --workspace-id "${ws_id}" --service-account-id "${sa_id}" \
                 --name "tf-${GITHUB_RUN_ID}-${GITHUB_JOB}" --seconds-to-live 3600 \
                 --query 'serviceAccountToken.key' --output text 2>&1); then
-                echo "Could not mint an AMG token (${token}); skipping Grafana provider auth."
-                exit 0
+                echo "::error::Failed to mint AMG token for ${amg_name}: ${token}"
+                exit 1
               fi
               echo "::add-mask::${token}"
               echo "GRAFANA_AUTH=${token}" >> "${GITHUB_ENV}"
@@ -455,15 +457,17 @@
                 --query 'workspace.endpoint' --output text)
               # Both the plan and apply roles can mint tokens (plan role granted
               # grafana:CreateWorkspaceServiceAccountToken in
-              # ministryofjustice/modernisation-platform#14006). If minting still
-              # fails, don't fail this shared job — leave GRAFANA_AUTH unset and
-              # let Terraform surface the auth error against the Grafana provider.
+              # ministryofjustice/modernisation-platform#14006). The workspace and
+              # the iac-grafana-objects service account both exist at this point,
+              # so a mint failure here is a real error (API/permissions/throttling),
+              # not an expected no-op — fail loudly rather than plan/apply with the
+              # Grafana provider silently unauthenticated.
               if ! token=$(aws grafana create-workspace-service-account-token \
                 --workspace-id "${ws_id}" --service-account-id "${sa_id}" \
                 --name "tf-${GITHUB_RUN_ID}-${GITHUB_JOB}" --seconds-to-live 3600 \
                 --query 'serviceAccountToken.key' --output text 2>&1); then
-                echo "Could not mint an AMG token (${token}); skipping Grafana provider auth."
-                exit 0
+                echo "::error::Failed to mint AMG token for ${amg_name}: ${token}"
+                exit 1
               fi
               echo "::add-mask::${token}"
               echo "GRAFANA_AUTH=${token}" >> "${GITHUB_ENV}"
