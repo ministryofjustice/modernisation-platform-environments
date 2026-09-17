@@ -141,3 +141,8 @@ data "aws_iam_policy_document" "lb_access_logs_policy" {
     ])
   }
 }
+
+resource "aws_s3_bucket_policy" "lb_access_logs" {
+    bucket = module.s3-bucket-logging.bucket.id
+    policy = data.aws_iam_policy_document.lb_access_logs_policy.json
+}
