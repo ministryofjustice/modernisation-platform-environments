@@ -56,7 +56,7 @@ module "cortex_xsiam_role" {
       actions = ["sts:AssumeRoleWithWebIdentity"]
       principals = [{
         type        = "Federated"
-        identifiers = ["accounts.google.com"]
+        identifiers = [local.cortex_xsiam_oidc_principal]
       }]
       condition = [
         {
