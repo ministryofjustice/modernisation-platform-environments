@@ -123,7 +123,7 @@
       "ec2_instance_type": "m5.xlarge",
       "app_count": "2",
       "edrms_server_port": "8080",
-      "container_cpu": "4096",
+      "container_cpu": "2048",
       "container_memory": "6144",
       "jvm_args": "-Xms4g -Xmx4g  -XX:+HeapDumpOnOutOfMemoryError -XX:+PrintGCDetails -XX:+AlwaysPreTouch -XX:+PrintGCApplicationStoppedTime",
       "northgate_gateway_ip": "152.114.58.100",
