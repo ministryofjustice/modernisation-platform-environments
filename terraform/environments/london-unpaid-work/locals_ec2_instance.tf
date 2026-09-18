@@ -31,7 +31,7 @@ locals {
         instance_type                = "t3.medium"
         key_name                     = null
         metadata_options_http_tokens = "optional"
-        vpc_security_group_ids       = ["ec2-windows"]
+        vpc_security_group_ids       = ["london-unpaid-work-web"]
       }
 
       tags = {
@@ -75,7 +75,7 @@ locals {
         instance_type                = "t3.medium"
         key_name                     = null
         metadata_options_http_tokens = "required"
-        vpc_security_group_ids       = ["ec2-windows"]
+        vpc_security_group_ids       = ["london-unpaid-work-api"]
       }
 
       tags = {

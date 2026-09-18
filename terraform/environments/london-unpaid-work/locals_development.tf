@@ -7,7 +7,7 @@ locals {
 
   baseline_development = {
     ec2_instances = local.ec2_instances
-    
+
     lbs = {
       api-alb = local.lbs.api-alb,
       web-alb = local.lbs.web-alb
@@ -23,7 +23,7 @@ locals {
     }
 
     secretsmanager_secrets = {
-      "/london-unpaid-work-dev"             = local.secretsmanager_secrets.london_unpaid_work_dev_secrets
+      "/london-unpaid-work-dev" = local.secretsmanager_secrets.london_unpaid_work_dev_secrets
     }
 
     security_groups = local.security_groups
