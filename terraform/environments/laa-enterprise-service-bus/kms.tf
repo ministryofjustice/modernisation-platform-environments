@@ -36,7 +36,7 @@ resource "aws_kms_key_policy" "sns_sqs_key_policy" {
         Condition = {
           StringEquals = {
             "kms:ViaService"    = "sqs.eu-west-2.amazonaws.com",
-            "kms:CallerAccount" = "${data.aws_caller_identity.current.account_id}"
+            "kms:CallerAccount" = data.aws_caller_identity.current.account_id
           }
         }
       },
@@ -53,7 +53,7 @@ resource "aws_kms_key_policy" "sns_sqs_key_policy" {
         Resource = "*",
         Condition = {
           StringEquals = {
-            "aws:SourceAccount" = "${data.aws_caller_identity.current.account_id}"
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
           }
         }
       },
