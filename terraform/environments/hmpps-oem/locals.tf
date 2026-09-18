@@ -128,8 +128,7 @@ locals {
       patch_classifications = {
       }
       patch_classifications_cutoff_type = {
-        REDHAT_ENTERPRISE_LINUX = "date"
-        WINDOWS                 = "days"
+        ORACLE_LINUX = "date"
       }
     }
   }
