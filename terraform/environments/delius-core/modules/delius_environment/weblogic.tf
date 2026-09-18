@@ -278,9 +278,10 @@ resource "aws_acm_certificate" "legacy" {
   validation_method = "DNS"
   tags              = var.tags
 
-  subject_alternative_names = [
-    "interface.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"
-  ]
+  subject_alternative_names = concat(
+    ["interface.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"],
+    var.env_name == "test" ? ["testdata-api.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"] : []
+  )
 
   lifecycle {
     create_before_destroy = true
