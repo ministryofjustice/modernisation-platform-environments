@@ -1,5 +1,5 @@
 locals {
-  rds_paquet_export_bucket_lifecycle_rule = [
+  rds_parquet_export_bucket_lifecycle_rule = [
     {
       id      = "main"
       enabled = "Enabled"
