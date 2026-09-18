@@ -18,7 +18,7 @@ resource "aws_instance" "oem_db" {
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   user_data_replace_on_change = true
-  user_data_base64 = base64encode(templatefile("./templates/oem-user-data-db.sh", {
+  user_data = base64encode(templatefile("./templates/oem-user-data-db.sh", {
     efs_fqdn = aws_efs_file_system.oem_db_efs.dns_name
     env_fqdn = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
     hostname = "laa-oem-db"
