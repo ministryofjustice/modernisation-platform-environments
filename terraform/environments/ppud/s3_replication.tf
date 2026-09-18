@@ -45,6 +45,13 @@ locals {
         expiration_days         = 6
         replication_destination = "arn:aws:s3:::mojap-data-engineering-production-ppud-preprod"
         replication_rule_id     = "ppud-database-replication-rule-uat"
+        additional_replication_rules = [
+          {
+            destination = "arn:aws:s3:::ppud-bak-replication-preproduction-${local.environment_management.account_ids["digital-prison-reporting-preproduction"]}-eu-west-2-an"
+            rule_id     = "ppud-database-replication-rule-uat-mp"
+            priority    = 2
+          }
+        ]
         iam_role_key            = "database_source_uat"
         ec2_account             = "ppud-preproduction"
       }
@@ -69,6 +76,13 @@ locals {
         expiration_days         = 6
         replication_destination = "arn:aws:s3:::mojap-data-engineering-production-ppud-prod"
         replication_rule_id     = "ppud-report-replication-rule-prod"
+        additional_replication_rules = [
+          {
+            destination = "arn:aws:s3:::ppud-bak-replication-production-${local.environment_management.account_ids["digital-prison-reporting-production"]}-eu-west-2-an"
+            rule_id     = "ppud-database-replication-rule-prod-mp"
+            priority    = 2
+          }
+        ]
         iam_role_key            = "database_source_prod"
         ec2_account             = "ppud-production"
       }

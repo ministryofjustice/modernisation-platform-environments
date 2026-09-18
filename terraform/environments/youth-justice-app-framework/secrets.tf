@@ -200,6 +200,26 @@ resource "aws_secretsmanager_secret_version" "disparity_toolkit" {
   }
 }
 
+resource "aws_secretsmanager_secret_policy" "disparity_toolkit" {
+  secret_arn          = aws_secretsmanager_secret.disparity_toolkit.arn
+  block_public_policy = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowQuickSightAdminAccess"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/quicksight-admin-access"
+        }
+        Action   = "secretsmanager:GetSecretValue"
+        Resource = aws_secretsmanager_secret.disparity_toolkit.arn
+      }
+    ]
+  })
+}
+
 resource "aws_secretsmanager_secret" "Root_CA_secret" {
   #checkov:skip=CKV2_AWS_57:doesn't need rotation
   name        = "${local.project_name}/Root_CA"

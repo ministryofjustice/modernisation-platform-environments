@@ -22,10 +22,10 @@ resource "aws_db_instance" "wardship_db" {
   auto_minor_version_upgrade      = true
   allow_major_version_upgrade     = false
   ca_cert_identifier              = "rds-ca-rsa2048-g1"
-  apply_immediately               = true
+  apply_immediately               = local.is-production ? false : true
   copy_tags_to_snapshot           = true
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
-  maintenance_window              = local.is-production ? null : "tue:20:20-tue:20:50"
+  maintenance_window              = local.is-production ? "sun:04:00-sun:04:30" : "wed:19:20-wed:19:50"
 }
 
 resource "aws_db_subnet_group" "dbsubnetgroup" {

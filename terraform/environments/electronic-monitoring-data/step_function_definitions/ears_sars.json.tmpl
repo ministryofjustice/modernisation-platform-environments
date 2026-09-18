@@ -26,7 +26,8 @@
           },
           "isBase64Encoded": false,
           "body.$": "States.JsonToString($)"
-        },
+        }
+      },
       "Retry": [
           {
             "ErrorEquals": ["Lambda.AWSLambdaException"],
@@ -35,7 +36,6 @@
             "MaxAttempts": 2
           }
         ],
-      },
       "Next": "WriteToSharepoint"
     },
     "WriteToSharepoint": {
