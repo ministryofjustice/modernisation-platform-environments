@@ -43,7 +43,7 @@ resource "aws_iam_policy" "patch_ccms_provider_load_policy" {
           "s3:ListBucketVersions"
         ],
         Resource = [
-          "${aws_s3_bucket.patch_data[0].arn}",
+          aws_s3_bucket.patch_data[0].arn,
           "${aws_s3_bucket.patch_data[0].arn}/*"
         ]
       },
@@ -55,10 +55,10 @@ resource "aws_iam_policy" "patch_ccms_provider_load_policy" {
         Resource = "arn:aws:s3:::${local.application_name_short}-${local.environment}-lambda-files/*"
       },
       {
-        Effect = "Allow"
+        Effect = "Allow",
         Action = [
           "secretsmanager:GetSecretValue",
-        ]
+        ],
         Resource = [
           aws_secretsmanager_secret.patch_ccms_db_mp_credentials[0].arn,
           aws_secretsmanager_secret.patch_ccms_procedures_config[0].arn
@@ -74,13 +74,13 @@ resource "aws_iam_policy" "patch_ccms_provider_load_policy" {
         Resource = aws_sqs_queue.patch_ccms_provider_q[0].arn
       },
       {
-        Effect = "Allow"
+        Effect = "Allow",
         Action = [
           "sqs:SendMessage",
           "sqs:ReceiveMessage",
           "sqs:DeleteMessage",
           "sqs:GetQueueAttributes"
-        ]
+        ],
         Resource = aws_sqs_queue.patch_ccms_provider_dlq[0].arn
       },
       {
@@ -152,7 +152,7 @@ resource "aws_iam_policy" "patch_ccms_cross_account_s3_read_policy" {
           "s3:ListBucketVersions"
         ],
         Resource = [
-          "${aws_s3_bucket.patch_data[0].arn}",
+          aws_s3_bucket.patch_data[0].arn,
           "${aws_s3_bucket.patch_data[0].arn}/*"
         ]
       }
