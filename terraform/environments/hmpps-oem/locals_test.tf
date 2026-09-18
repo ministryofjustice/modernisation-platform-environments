@@ -1,5 +1,8 @@
 locals {
 
+  locals_test = {
+  }
+
   baseline_presets_test = {
     options = {
       cloudwatch_dashboard_default_widget_groups = [

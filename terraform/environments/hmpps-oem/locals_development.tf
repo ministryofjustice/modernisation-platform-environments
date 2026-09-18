@@ -1,5 +1,13 @@
 locals {
 
+  locals_development = {
+    patch_manager = {
+      patch_classifications = {
+        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
+      }
+    }
+  }
+
   baseline_presets_development = {
     options = {
       cloudwatch_dashboard_default_widget_groups = [

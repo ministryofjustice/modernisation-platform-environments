@@ -1,5 +1,8 @@
 locals {
 
+  locals_preproduction = {
+  }
+
   baseline_presets_preproduction = {
     options = {
       cloudwatch_dashboard_default_widget_groups = [
