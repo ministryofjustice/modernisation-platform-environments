@@ -1,19 +1,25 @@
-resource "aws_secretsmanager_secret" "guardrail_diagnostics_key" {
-  count = var.guardrail_diagnostics_enabled ? 1 : 0
+module "litellm_guardrail_diagnostics_key_secret" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
 
-  #checkov:skip=CKV2_AWS_57: Rotation uses the write-only version nonce and disabling diagnostics destroys the temporary secret
+  create = var.guardrail_diagnostics_enabled
+
   name                    = "${local.component_name}/guardrail-diagnostics-key"
   description             = "Temporary LiteLLM key for guardrail diagnostics"
-  kms_key_id              = module.ai_gateway_guardrail_diagnostics_kms_key[0].key_arn
+  kms_key_id              = var.guardrail_diagnostics_enabled ? module.ai_gateway_guardrail_diagnostics_kms_key[0].key_arn : null
   recovery_window_in_days = 0
+
+  secret_string_wo         = var.guardrail_diagnostics_key
+  secret_string_wo_version = tostring(var.guardrail_diagnostics_key_version)
 }
 
-resource "aws_secretsmanager_secret_version" "guardrail_diagnostics_key" {
-  count = var.guardrail_diagnostics_enabled ? 1 : 0
+moved {
+  from = aws_secretsmanager_secret.guardrail_diagnostics_key[0]
+  to   = module.litellm_guardrail_diagnostics_key_secret.aws_secretsmanager_secret.this[0]
+}
 
-  secret_id                = aws_secretsmanager_secret.guardrail_diagnostics_key[0].id
-  secret_string_wo         = var.guardrail_diagnostics_key
-  secret_string_wo_version = var.guardrail_diagnostics_key_version
+moved {
+  from = aws_secretsmanager_secret_version.guardrail_diagnostics_key[0]
+  to   = module.litellm_guardrail_diagnostics_key_secret.aws_secretsmanager_secret_version.this[0]
 }
 
 resource "litellm_key" "guardrail_diagnostics" {
