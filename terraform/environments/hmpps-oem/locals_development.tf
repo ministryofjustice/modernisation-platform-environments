@@ -3,7 +3,7 @@ locals {
   locals_development = {
     patch_manager = {
       patch_classifications = {
-        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
+        ORACLE_LINUX = ["Security", "Bugfix"]
       }
     }
   }
