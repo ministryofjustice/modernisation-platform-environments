@@ -56,6 +56,11 @@
             required: false
             default: false
             description: "Optional: set to true when the caller already fetched secrets and is passing them in via ENVIRONMENT_MANAGEMENT/GITHUB_CI_USER_ENVIRONMENTS_REPO_PAT secrets, to skip fetching them again here."
+          mint_grafana_token:
+            type: boolean
+            required: false
+            default: false
+            description: "Optional: set to true when the component manages Amazon Managed Grafana objects with the Grafana provider. Mints a short-lived AMG service account token into GRAFANA_AUTH and sets TF_VAR_grafana_url. No-op when the workspace has no AMG workspace."
         secrets:
           MODERNISATION_PLATFORM_ACCOUNT_ID:
             required: true
@@ -166,6 +171,19 @@
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
               terraform workspace select "${WORKSPACE_NAME}"
+
+          #
+          # Mint AMG Service Account Token (Optional)
+          #
+          # Components that manage Grafana-internal objects need the Grafana
+          # provider authenticated. AMG service account tokens are short-lived
+          # (max 30 days), so one is minted per run rather than stored. The AMG
+          # workspace is discovered by name, so no extra inputs are needed, and
+          # this no-ops where there is no AMG workspace or service account.
+          #
+          - name: Mint AMG Service Account Token (Optional)
+            if: inputs.mint_grafana_token == true
+            run: bash "${GITHUB_WORKSPACE}/scripts/mint-grafana-token.sh"
 
           #
           # Optional State Refresh
@@ -365,6 +383,13 @@
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
               terraform workspace select "${WORKSPACE_NAME}"
+
+          # See the equivalent step in the plan job for rationale. Runs before
+          # Terraform Plan so GRAFANA_AUTH/TF_VAR_grafana_url are set when the
+          # Grafana provider is evaluated.
+          - name: Mint AMG Service Account Token (Optional)
+            if: inputs.mint_grafana_token == true
+            run: bash "${GITHUB_WORKSPACE}/scripts/mint-grafana-token.sh"
 
           - name: Terraform Plan
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"

@@ -40,6 +40,11 @@ jobs:
       action: "plan_apply"
       component: "root"
       secrets_prefetched: true
+      # Root manages the centralised AMG workspace and its Grafana-internal
+      # objects (teams, data sources, permissions), so the Grafana provider needs
+      # a short-lived service account token. No-op on workspaces without AMG.
+      # Matches the root-terraform job in cloud-platform-reusable.yml.
+      mint_grafana_token: true
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
