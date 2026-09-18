@@ -3,8 +3,6 @@ resource "aws_s3_bucket" "laa_oem_shared" {
 }
 
 resource "aws_s3_bucket_logging" "laa_oem_shared" {
-  # Bucket is managed in a separate Terraform state. We can still apply logging by
-  # referencing the bucket name directly instead of a resource reference.
   bucket = aws_s3_bucket.laa_oem_shared.id
 
   target_bucket = module.laa_oem_logging.bucket.id
