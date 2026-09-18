@@ -1,5 +1,37 @@
 locals {
-  rds_export_bucket_lifecycle_rule = [
+  rds_paquet_export_bucket_lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "INTELLIGENT_TIERING"
+        }
+      ]
+      expiration = {
+        days = 730
+      }
+      noncurrent_version_expiration = {
+        days = 90
+      }
+    },
+    {
+      id      = "tidy-athena-results"
+      enabled = "Enabled"
+      prefix  = "athena-results/"
+      expiration = {
+        days = 5
+      }
+      noncurrent_version_expiration = {
+        days = 10
+      }
+    }
+  ]
+
+  rds_backup_uploads_bucket_lifecycle_rule = [
     {
       id      = "main"
       enabled = "Enabled"
@@ -31,6 +63,8 @@ locals {
     }
   ]
 }
+
+
 
 # Security group for the rds instance
 resource "aws_security_group" "ppud_db" {
@@ -84,8 +118,8 @@ module "ppud_rds_export" {
   db_name                        = "${local.short_name}_${local.short_name_environment}"
   get_views                      = true
   bucket_namespace               = "account-regional"
-  lifecycle_rule_backup_uploads  = local.rds_export_bucket_lifecycle_rule
-  lifecycle_rule_parquet_exports = local.rds_export_bucket_lifecycle_rule
+  lifecycle_rule_backup_uploads  = local.rds_backup_uploads_bucket_lifecycle_rule
+  lifecycle_rule_parquet_exports = local.rds_parquet_export_bucket_lifecycle_rule
   parquet_exports_bucket_policy  = (local.is-development || local.is-preproduction) ? [data.aws_iam_policy_document.batch_replication_destination[0].json] : ["{}"]
 
   tags = merge(
