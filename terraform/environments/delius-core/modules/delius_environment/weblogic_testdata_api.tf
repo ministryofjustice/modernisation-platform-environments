@@ -1,4 +1,10 @@
-module "weblogic_eis" {
+# weblogic-testdata-api is a semi-temporary service that the NDelius team use to create test data.
+# This config can be removed once there's no longer a need for it.
+# It is only required in the test environment.
+
+module "weblogic_testdata_api" {
+  count = var.env_name == "test" ? 1 : 0
+
   source = "../helpers/delius_microservice"
 
   providers = {
@@ -7,12 +13,12 @@ module "weblogic_eis" {
     aws.core-network-services = aws.core-network-services
   }
 
-  name              = "weblogic-eis"
+  name              = "weblogic-data"
   create_service    = "false"
   env_name          = var.env_name
   account_config    = var.account_config
   account_info      = var.account_info
-  capacity_provider = aws_ecs_capacity_provider.weblogic_eis.name
+  capacity_provider = aws_ecs_capacity_provider.weblogic_testdata_api[0].name
   asg_name          = aws_autoscaling_group.weblogic.name
 
   force_new_deployment = false
@@ -23,12 +29,12 @@ module "weblogic_eis" {
 
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   alb_health_check = {
-    path                 = "/NDelius-war/delius/javax.faces.resource/health/healthcheck.json"
+    path                 = "/"
     healthy_threshold    = 5
     interval             = 30
     protocol             = "HTTP"
     unhealthy_threshold  = 5
-    matcher              = "200"
+    matcher              = "200-499"
     timeout              = 10
     grace_period_seconds = 300
   }
@@ -71,11 +77,13 @@ module "weblogic_eis" {
   tags          = var.tags
 }
 
-resource "aws_launch_template" "weblogic_eis" {
+resource "aws_launch_template" "weblogic_testdata_api" {
   #checkov:skip=CKV_AWS_341: "To Do: Test required hop limit"
-  name_prefix   = "weblogic-eis-${var.env_name}-ecs-"
+  count = var.env_name == "test" ? 1 : 0
+
+  name_prefix   = "weblogic-testdata-api-${var.env_name}-ecs-"
   image_id      = data.aws_ami.ecs_ami.id
-  instance_type = var.delius_microservice_configs.weblogic_eis.ec2_instance_type
+  instance_type = var.delius_microservice_configs.weblogic_testdata_api.ec2_instance_type
 
   user_data = base64encode(templatefile("${path.module}/templates/ecs-host-userdata.tpl", { ecs_cluster_name = module.ecs.ecs_cluster_name }))
 
@@ -97,9 +105,10 @@ resource "aws_launch_template" "weblogic_eis" {
   }
 }
 
-resource "aws_autoscaling_group" "weblogic_eis" {
-  name = "weblogic-eis-${var.env_name}-ecs-asg"
+resource "aws_autoscaling_group" "weblogic_testdata_api" {
+  count = var.env_name == "test" ? 1 : 0
 
+  name                  = "weblogic-testdata-api-${var.env_name}-ecs-asg"
   max_size              = 1
   min_size              = 1
   protect_from_scale_in = true
@@ -111,22 +120,24 @@ resource "aws_autoscaling_group" "weblogic_eis" {
   }
 
   launch_template {
-    id      = aws_launch_template.weblogic_eis.id
+    id      = aws_launch_template.weblogic_testdata_api[0].id
     version = "$Latest"
   }
 
   tag {
     key                 = "Name"
-    value               = "weblogic-eis-${var.env_name}-ecs-asg"
+    value               = "weblogic-testdata-api-${var.env_name}-ecs-asg"
     propagate_at_launch = true
   }
 }
 
-resource "aws_ecs_capacity_provider" "weblogic_eis" {
-  name = "weblogic-eis-${var.env_name}-ec2-cp"
+resource "aws_ecs_capacity_provider" "weblogic_testdata_api" {
+  count = var.env_name == "test" ? 1 : 0
+
+  name = "weblogic-data-${var.env_name}-ec2-cp"
 
   auto_scaling_group_provider {
-    auto_scaling_group_arn = aws_autoscaling_group.weblogic_eis.arn
+    auto_scaling_group_arn = aws_autoscaling_group.weblogic_testdata_api[0].arn
 
     managed_scaling {
       status          = "ENABLED"
@@ -137,27 +148,28 @@ resource "aws_ecs_capacity_provider" "weblogic_eis" {
   }
 }
 
-resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_eis" {
+resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_testdata_api" {
+  count = var.env_name == "test" ? 1 : 0
+
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 31
+  priority     = 36
   condition {
     host_header {
       values = [
-        "interface.${var.env_name}.${var.account_config.dns_suffix}",
-        "interface.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
+        "testdata-api.${var.env_name}.${var.account_config.dns_suffix}",
+        "testdata-api.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
       ]
     }
   }
   condition {
     path_pattern {
       values = [
-        "/NDelius*",
-        "/jspellhtml/*"
+        "/*"
       ]
     }
   }
   action {
     type             = "forward"
-    target_group_arn = module.weblogic_eis.target_group_arn
+    target_group_arn = module.weblogic_testdata_api[0].target_group_arn
   }
 }

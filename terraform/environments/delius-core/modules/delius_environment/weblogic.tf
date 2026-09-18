@@ -207,33 +207,6 @@ resource "aws_ecs_capacity_provider" "weblogic" {
   }
 }
 
-resource "aws_lb_listener_rule" "blocked_paths_listener_rule" {
-  listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 51 # must be before ndelius_allowed_paths_rule
-  condition {
-    host_header {
-      values = [
-        "ndelius.${var.env_name}.${var.account_config.dns_suffix}",
-        "ndelius.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
-      ]
-    }
-  }
-  condition {
-    path_pattern {
-      values = [
-        "/NDelius*/delius/a4j/g/3_3_3.Final*DATA*", # mitigates CVE-2018-12533
-      ]
-    }
-  }
-  action {
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      status_code  = "404"
-    }
-  }
-}
-
 resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
   listener_arn = aws_lb_listener.listener_https.arn
   priority     = 61
@@ -257,7 +230,6 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
     type             = "forward"
     target_group_arn = module.weblogic.target_group_arn
   }
-  depends_on = [aws_lb_listener_rule.blocked_paths_listener_rule]
 }
 
 
@@ -278,9 +250,10 @@ resource "aws_acm_certificate" "legacy" {
   validation_method = "DNS"
   tags              = var.tags
 
-  subject_alternative_names = [
-    "interface.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"
-  ]
+  subject_alternative_names = concat(
+    ["interface.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"],
+    var.env_name == "test" ? ["testdata-api.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk"] : []
+  )
 
   lifecycle {
     create_before_destroy = true
