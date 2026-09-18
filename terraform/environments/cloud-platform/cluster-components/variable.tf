@@ -22,6 +22,6 @@ variable "enable_amp_adot" {
 
 variable "enable_cloudwatch_observability" {
   type        = bool
-  default     = true
+  default     = false
   description = "Deploy OTel Container Insights add-on (Option D). Must be explicitly enabled."
 }
