@@ -1,10 +1,9 @@
-# Retrigger
 # Combine the SSO role(s) with the cross-account role used by 
 # create a derived table (cadet)
 locals {
   lf_principals_not_admin = local.is-test ? toset([]) : toset(concat(
     [data.aws_iam_role.dataapi_cross_role[0].arn],
-    tolist(try(data.aws_iam_roles.data_engineering_roles.arns, toset([])))
+    tolist(try(data.aws_iam_roles.data_engineering_roles[0].arns, toset([])))
   ))
 }
 
@@ -66,4 +65,38 @@ resource "aws_lakeformation_permissions" "table_all_permissions" {
     database_name = each.value.database_name
     wildcard      = true
   }
+}
+
+# Give the ap share policy role Glue permissions on the share resources
+data "aws_iam_policy_document" "analytical_platform_share_policy_ppud" {
+  for_each = (local.is-development || local.is-preproduction) ? local.analytical_platform_share : {}
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetPartition",
+      "glue:GetTags",
+      "glue:DeleteDatabase",
+      "glue:TagResource",
+      "glue:UpdateDatabase"
+    ]
+    resources = flatten([
+      for resource in each.value.resource_shares : [
+        "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/${resource.glue_database}",
+        formatlist("arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${resource.glue_database}/%s", resource.glue_tables),
+        "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userDefinedFunction/${resource.glue_database}/*",
+        "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog"
+      ]
+    ])
+  }
+}
+
+resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment_ppud" {
+  for_each = (local.is-development || local.is-preproduction) ? local.analytical_platform_share : {}
+
+  name   = "${each.value.target_account_name}-share-policy-ppud"
+  role   = data.aws_iam_role.analytical_platform_share_role[each.key].name
+  policy = data.aws_iam_policy_document.analytical_platform_share_policy_ppud[each.key].json
 }
