@@ -1,7 +1,10 @@
 locals {
   environment_configuration = local.environment_configurations[local.environment]
 
-  litellm_master_key = "sk-${random_password.litellm_secret_key.result}" # "sk-" prefix is required by LiteLLM
+  litellm_master_key             = "sk-${random_password.litellm_secret_key.result}" # "sk-" prefix is required by LiteLLM
+  guardrail_diagnostics_enabled  = local.environment_configuration.guardrail_diagnostics_enabled
+  guardrail_diagnostics_hostname = "diagnostics.${local.environment_configuration.ai_gateway_hostname}"
+  guardrail_diagnostics_key      = local.guardrail_diagnostics_enabled ? "sk-${ephemeral.random_password.guardrail_diagnostics_key[0].result}" : null
   proxy_admin_emails = [
     "Muhammad.Ahmad@justice.gov.uk",
     "Jeremy.Collins@justice.gov.uk",

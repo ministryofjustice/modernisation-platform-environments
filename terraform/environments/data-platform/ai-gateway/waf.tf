@@ -4,6 +4,52 @@ locals {
     "/test",
     "/config/yaml",
   ]
+
+  restricted_ai_gateway_hostnames = concat(
+    ["admin.${local.environment_configuration.ai_gateway_hostname}"],
+    local.guardrail_diagnostics_enabled ? [local.guardrail_diagnostics_hostname] : []
+  )
+
+  restricted_ai_gateway_hostname_statement = merge(
+    local.guardrail_diagnostics_enabled ? {
+      or_statement = {
+        statements = [for hostname in local.restricted_ai_gateway_hostnames : {
+          byte_match_statement = {
+            field_to_match = {
+              single_header = {
+                name = "host"
+              }
+            }
+            positional_constraint = "EXACTLY"
+            search_string         = hostname
+            text_transformations = [
+              {
+                priority = 0
+                type     = "LOWERCASE"
+              }
+            ]
+          }
+        }]
+      }
+    } : {},
+    local.guardrail_diagnostics_enabled ? {} : {
+      byte_match_statement = {
+        field_to_match = {
+          single_header = {
+            name = "host"
+          }
+        }
+        positional_constraint = "EXACTLY"
+        search_string         = "admin.${local.environment_configuration.ai_gateway_hostname}"
+        text_transformations = [
+          {
+            priority = 0
+            type     = "LOWERCASE"
+          }
+        ]
+      }
+    }
+  )
 }
 
 data "aws_lb" "ai_gateway" {
@@ -142,23 +188,7 @@ module "waf_ai_gateway" {
       statement = {
         and_statement = {
           statements = [
-            {
-              byte_match_statement = {
-                field_to_match = {
-                  single_header = {
-                    name = "host"
-                  }
-                }
-                positional_constraint = "EXACTLY"
-                search_string         = "admin.${local.environment_configuration.ai_gateway_hostname}"
-                text_transformations = [
-                  {
-                    priority = 0
-                    type     = "LOWERCASE"
-                  }
-                ]
-              }
-            },
+            local.restricted_ai_gateway_hostname_statement,
             {
               ip_set_reference_statement = {
                 arn = module.waf_ip_set_ai_gateway_admin_allowlist[0].arn
@@ -179,23 +209,7 @@ module "waf_ai_gateway" {
       priority = 2
       action   = "block"
 
-      statement = {
-        byte_match_statement = {
-          field_to_match = {
-            single_header = {
-              name = "host"
-            }
-          }
-          positional_constraint = "EXACTLY"
-          search_string         = "admin.${local.environment_configuration.ai_gateway_hostname}"
-          text_transformations = [
-            {
-              priority = 0
-              type     = "LOWERCASE"
-            }
-          ]
-        }
-      }
+      statement = local.restricted_ai_gateway_hostname_statement
 
       visibility_config = {
         cloudwatch_metrics_enabled = true

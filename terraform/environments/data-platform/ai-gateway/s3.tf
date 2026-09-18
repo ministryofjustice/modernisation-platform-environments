@@ -1,6 +1,7 @@
 locals {
-  alb_access_logs_bucket_name = "mojdp-${local.environment}-${local.component_name}-alb-logs"
-  audit_logs_bucket_name      = "mojdp-${local.environment}-${local.component_name}-audit-logs"
+  alb_access_logs_bucket_name       = "mojdp-${local.environment}-${local.component_name}-alb-logs"
+  audit_logs_bucket_name            = "mojdp-${local.environment}-${local.component_name}-audit-logs"
+  guardrail_diagnostics_bucket_name = "mojdp-${local.environment}-${local.component_name}-guardrail-diagnostics"
 }
 
 data "aws_iam_policy_document" "alb_access_logs_bucket_policy" {
@@ -99,6 +100,43 @@ module "audit_logs" {
 
       expiration = {
         days = 365
+      }
+    }
+  ]
+}
+
+module "guardrail_diagnostics" {
+  count  = local.guardrail_diagnostics_enabled ? 1 : 0
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=af0286ff37a66c2b79faf360e6e2663744b8e5b5" # v5.13.0
+
+  bucket = local.guardrail_diagnostics_bucket_name
+
+  force_destroy = true
+
+  attach_deny_insecure_transport_policy = true
+  attach_require_latest_tls_policy      = true
+
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        sse_algorithm     = "aws:kms"
+        kms_master_key_id = module.ai_gateway_guardrail_diagnostics_kms_key[0].key_arn
+      }
+      bucket_key_enabled = true
+    }
+  }
+
+  versioning = {
+    status = "Disabled"
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "expire-guardrail-diagnostics"
+      enabled = true
+
+      expiration = {
+        days = var.guardrail_diagnostics_retention_days
       }
     }
   ]
