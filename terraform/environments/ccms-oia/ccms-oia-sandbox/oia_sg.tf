@@ -43,7 +43,7 @@ resource "aws_security_group" "first_cluster_ec2" {
 # EGRESS Rules
 
 resource "aws_vpc_security_group_egress_rule" "first_cluster_ec2_egress_vpce" {
-  for_each          = toset([
+  for_each = toset([
     data.aws_subnet.vpce_subnets_a.cidr_block,
     data.aws_subnet.vpce_subnets_b.cidr_block,
     data.aws_subnet.vpce_subnets_c.cidr_block,
@@ -66,7 +66,7 @@ resource "aws_vpc_security_group_egress_rule" "first_cluster_oia_ec2_egress_s3" 
 }
 
 resource "aws_vpc_security_group_egress_rule" "first_cluster_ec2_egress_443" {
-  for_each          = toset([
+  for_each = toset([
     data.aws_subnet.private_subnets_a.cidr_block,
     data.aws_subnet.private_subnets_b.cidr_block,
     data.aws_subnet.private_subnets_c.cidr_block,
@@ -147,7 +147,7 @@ resource "aws_security_group" "second_cluster_ec2" {
 # EGRESS Rules
 
 resource "aws_vpc_security_group_egress_rule" "second_cluster_ec2_egress_vpce" {
-  for_each          = toset([
+  for_each = toset([
     data.aws_subnet.vpce_subnets_a.cidr_block,
     data.aws_subnet.vpce_subnets_b.cidr_block,
     data.aws_subnet.vpce_subnets_c.cidr_block,
