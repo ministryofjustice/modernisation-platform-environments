@@ -19,8 +19,12 @@ resource "aws_sagemaker_endpoint_configuration" "elevenlabs_asr" {
   production_variants {
     variant_name           = "variant-1"
     model_name             = aws_sagemaker_model.elevenlabs_asr[0].name
-    initial_instance_count = 1
+    initial_instance_count = local.is-production ? 2 : 1
     instance_type          = local.elevenlabs_config["instance_type"]
+
+    routing_config {
+      routing_strategy = "LEAST_OUTSTANDING_REQUESTS"
+    }
   }
 
   lifecycle {
