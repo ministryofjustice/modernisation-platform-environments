@@ -143,6 +143,24 @@ locals {
     },
     yjsm-hub-svc-target-group-2 = {
       name = "yjsm-hub-svc-target-group-2"
+    },
+    yjsm-ui-target-group-1 = {
+      name = "yjsm-ui-target-group-1"
+    },
+    yjsm-ui-target-group-2 = {
+      name = "yjsm-ui-target-group-2"
+    },
+    yjsm-hub-target-group-1 = {
+      name = "yjsm-hub-target-group-1"
+    },
+    yjsm-hub-target-group-2 = {
+      name = "yjsm-hub-target-group-2"
+    },
+    yjsm-hub-admin-target-group-1 = {
+      name = "yjsm-hub-admin-target-group-1"
+    },
+    yjsm-hub-admin-target-group-2 = {
+      name = "yjsm-hub-admin-target-group-2"
     }
   }
 }

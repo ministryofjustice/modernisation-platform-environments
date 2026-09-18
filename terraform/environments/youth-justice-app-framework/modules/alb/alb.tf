@@ -69,6 +69,8 @@ module "alb_sg" {
 
   computed_ingress_with_source_security_group_id = var.alb_ingress_with_source_security_group_id_rules
   ingress_with_cidr_blocks                       = var.alb_ingress_with_cidr_blocks_rules
+  ingress_prefix_list_ids                        = var.alb_ingress_prefix_list_ids
+  ingress_with_prefix_list_ids                   = var.alb_ingress_with_prefix_list_ids_rules
 
 
   number_of_computed_ingress_with_source_security_group_id = var.count_alb_ingress_with_source_security_group_id_rules
