@@ -29,7 +29,7 @@ module "weblogic_testdata_api" {
 
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   alb_health_check = {
-    path                 = "/NDelius-war/delius/javax.faces.resource/health/healthcheck.json"
+    path                 = "/"
     healthy_threshold    = 5
     interval             = 30
     protocol             = "HTTP"
