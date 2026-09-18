@@ -20,10 +20,10 @@
 #   monitoring                  = true
 #   subnet_id                   = data.aws_subnet.data_subnets_a.id
 #   user_data_replace_on_change = true
-#   user_data_base64 = templatefile("./templates/oem-user-data-wl.sh", {
+#   user_data_base64 = base64encode(templatefile("./templates/oem-user-data-wl.sh", {
 #     env_fqdn = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
 #     hostname = "laa-oem-wl"
-#   })
+#   }))
 #   vpc_security_group_ids = [aws_security_group.oem_wl_security_group_1[count.index].id]
 
 #   root_block_device {
