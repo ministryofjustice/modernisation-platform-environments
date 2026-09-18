@@ -1043,6 +1043,7 @@ resource "aws_iam_role_policy_attachment" "standard_athena_access_api" {
 }
 
 resource "aws_iam_role_policy_attachment" "database_access_api" {
+  count      = local.is-development ? 1 :0 
   policy_arn = aws_iam_policy.em_data_api_permissions[0].arn
   role       = module.data_api_role.iam_role_name
 }
