@@ -12,16 +12,6 @@ module "litellm_guardrail_diagnostics_key_secret" {
   secret_string_wo_version = tostring(var.guardrail_diagnostics_key_version)
 }
 
-moved {
-  from = aws_secretsmanager_secret.guardrail_diagnostics_key[0]
-  to   = module.litellm_guardrail_diagnostics_key_secret.aws_secretsmanager_secret.this[0]
-}
-
-moved {
-  from = aws_secretsmanager_secret_version.guardrail_diagnostics_key[0]
-  to   = module.litellm_guardrail_diagnostics_key_secret.aws_secretsmanager_secret_version.this[0]
-}
-
 resource "litellm_key" "guardrail_diagnostics" {
   count = var.guardrail_diagnostics_enabled ? 1 : 0
 
