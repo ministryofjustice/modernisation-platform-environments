@@ -79,14 +79,17 @@ resource "aws_cloudwatch_log_group" "user_creation_lambda" {
 output "user_creation_lambda_function_name" {
   value       = local.environment == "development" ? aws_lambda_function.user_creation.function_name : null
   description = "Lambda function name for user creation"
+  sensitive   = true
 }
 
 output "user_creation_lambda_arn" {
   value       = local.environment == "development" ? aws_lambda_function.user_creation.arn : null
   description = "Lambda function ARN for user creation"
+  sensitive   = true
 }
 
 output "user_creation_invoke_command" {
   value       = local.environment == "development" ? "aws lambda invoke --function-name ${aws_lambda_function.user_creation.function_name} --payload '{\"Firstname\":\"John\",\"Lastname\":\"Doe\",\"Email\":\"john.doe@justice.gov.uk\"}' --region ${local.application_data.accounts[local.environment].region} output.txt --cli-binary-format raw-in-base64-out" : null
   description = "Example command to invoke user creation Lambda"
+  sensitive   = true
 }

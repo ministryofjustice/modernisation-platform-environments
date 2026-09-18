@@ -36,7 +36,7 @@ resource "aws_lb_target_group" "edrms_target_group" {
     healthy_threshold   = "5"
     interval            = "120"
     protocol            = "HTTP"
-    unhealthy_threshold = "5"
+    unhealthy_threshold = "2"
     matcher             = "200"
     timeout             = "5"
   }

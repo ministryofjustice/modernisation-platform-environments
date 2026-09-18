@@ -7,5 +7,6 @@ locals {
     audience        = ""
     service_account = ""
   }
-  cortex_xsiam_enabled = local.is-production && local.cortex_xsiam_workload_identity.issuer_url != ""
+  cortex_xsiam_oidc_principal = trimprefix(local.cortex_xsiam_workload_identity.issuer_url, "https://")
+  cortex_xsiam_enabled        = local.is-production && local.cortex_xsiam_workload_identity.issuer_url != ""
 }
