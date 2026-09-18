@@ -34,7 +34,7 @@ module "weblogic_testdata_api" {
     interval             = 30
     protocol             = "HTTP"
     unhealthy_threshold  = 5
-    matcher              = "200"
+    matcher              = "200-499"
     timeout              = 10
     grace_period_seconds = 300
   }
@@ -148,35 +148,6 @@ resource "aws_ecs_capacity_provider" "weblogic_testdata_api" {
   }
 }
 
-resource "aws_lb_listener_rule" "blocked_paths_listener_rule_weblogic_testdata_api" {
-  count = var.env_name == "test" ? 1 : 0
-
-  listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 35 # must be before ndelius_allowed_paths_rule
-  condition {
-    host_header {
-      values = [
-        "testdata-api.${var.env_name}.${var.account_config.dns_suffix}",
-        "testdata-api.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
-      ]
-    }
-  }
-  condition {
-    path_pattern {
-      values = [
-        "/NDelius*/delius/a4j/g/3_3_3.Final*DATA*", # mitigates CVE-2018-12533
-      ]
-    }
-  }
-  action {
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      status_code  = "404"
-    }
-  }
-}
-
 resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_testdata_api" {
   count = var.env_name == "test" ? 1 : 0
 
@@ -201,5 +172,4 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_testdata_a
     type             = "forward"
     target_group_arn = module.weblogic_testdata_api[0].target_group_arn
   }
-  depends_on = [aws_lb_listener_rule.blocked_paths_listener_rule]
 }
