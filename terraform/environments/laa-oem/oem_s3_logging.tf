@@ -94,7 +94,7 @@ resource "aws_s3_bucket_policy" "laa_oem_logging" {
         Principal = {
           AWS = "*"
         },
-        Action   = "s3:*",
+        Action = "s3:*",
         Resource = [
           "${module.laa_oem_logging.bucket.arn}/*",
           module.laa_oem_logging.bucket.arn
@@ -114,7 +114,7 @@ resource "aws_s3_bucket_policy" "laa_oem_logging" {
         Principal = {
           Service = "logging.s3.amazonaws.com"
         },
-        Action   = "s3:PutObject",
+        Action = "s3:PutObject",
         Resource = [
           "${module.laa_oem_logging.bucket.arn}/*",
           module.laa_oem_logging.bucket.arn
