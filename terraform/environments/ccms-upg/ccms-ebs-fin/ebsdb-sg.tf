@@ -83,7 +83,7 @@ resource "aws_vpc_security_group_egress_rule" "ebsdb_http" {
 
 resource "aws_vpc_security_group_egress_rule" "ebsdb_to_efs_nfs" {
   security_group_id            = aws_security_group.ebsdb.id
-  description                  = "NFS to shared /stage EFS mount target"
+  description                  = "EFS to shared /stage mount target"
   ip_protocol                  = "tcp"
   from_port                    = 2049
   to_port                      = 2049

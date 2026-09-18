@@ -73,7 +73,7 @@ resource "aws_vpc_security_group_egress_rule" "ebsapps_http" {
 
 resource "aws_vpc_security_group_egress_rule" "ebsapps_to_efs_nfs" {
   security_group_id            = aws_security_group.ebsapps.id
-  description                  = "NFS to shared /u01 and /stage EFS mount targets"
+  description                  = "EFS to shared /u01 and /stage mount targets"
   ip_protocol                  = "tcp"
   from_port                    = 2049
   to_port                      = 2049
