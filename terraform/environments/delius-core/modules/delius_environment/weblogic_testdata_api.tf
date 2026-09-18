@@ -152,12 +152,12 @@ resource "aws_lb_listener_rule" "blocked_paths_listener_rule_weblogic_testdata_a
   count = var.env_name == "test" ? 1 : 0
 
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 21 # must be before ndelius_allowed_paths_rule
+  priority     = 35 # must be before ndelius_allowed_paths_rule
   condition {
     host_header {
       values = [
-        "interface.${var.env_name}.${var.account_config.dns_suffix}",
-        "interface.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
+        "testdata-api.${var.env_name}.${var.account_config.dns_suffix}",
+        "testdata-api.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
       ]
     }
   }
@@ -181,20 +181,19 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_testdata_a
   count = var.env_name == "test" ? 1 : 0
 
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 31
+  priority     = 36
   condition {
     host_header {
       values = [
-        "interface.${var.env_name}.${var.account_config.dns_suffix}",
-        "interface.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
+        "testdata-api.${var.env_name}.${var.account_config.dns_suffix}",
+        "testdata-api.${var.environment_config.migration_environment_short_name}.probation.service.justice.gov.uk",
       ]
     }
   }
   condition {
     path_pattern {
       values = [
-        "/NDelius*",
-        "/jspellhtml/*"
+        "/*"
       ]
     }
   }
