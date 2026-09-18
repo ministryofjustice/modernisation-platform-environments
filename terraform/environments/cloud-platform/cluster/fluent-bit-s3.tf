@@ -10,7 +10,7 @@
 ## the name below is a placeholder derived from the workspace environment. Tom has
 ## confirmed the -fluentbit suffix is fine.
 locals {
-  log_archive_bucket_name = "container-platform-${local.workspace_environment}-fluentbit"
+  log_archive_bucket_name = "container-platform-${terraform.workspace}-fluentbit"
 }
 
 resource "aws_s3_bucket" "log_archive" {
