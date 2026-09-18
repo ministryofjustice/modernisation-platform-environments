@@ -134,7 +134,7 @@ resource "aws_autoscaling_group" "weblogic_testdata_api" {
 resource "aws_ecs_capacity_provider" "weblogic_testdata_api" {
   count = var.env_name == "test" ? 1 : 0
 
-  name = "weblogic-testdata-api-${var.env_name}-ec2-cp"
+  name = "weblogic-data-${var.env_name}-ec2-cp"
 
   auto_scaling_group_provider {
     auto_scaling_group_arn = aws_autoscaling_group.weblogic_testdata_api[0].arn
