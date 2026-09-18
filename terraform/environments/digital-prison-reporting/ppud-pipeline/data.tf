@@ -15,5 +15,20 @@ data "aws_iam_session_context" "current" {
 }
 
 data "aws_iam_roles" "data_engineering_roles" {
+  count = local.is-test ? 0 : 1
+
   name_regex = "AWSReservedSSO_modernisation-platform-data-eng.*"
+}
+
+data "aws_iam_role" "dataapi_cross_role" {
+  count = local.is-test ? 0 : 1
+
+  name = "dpr-data-api-cross-account-role"
+}
+
+# Update Analytical Platform Share Policy & Role
+data "aws_iam_role" "analytical_platform_share_role" {
+  for_each = (local.is-development || local.is-preproduction) ? local.analytical_platform_share : {}
+
+  name = "${each.value.target_account_name}-share-role"
 }
