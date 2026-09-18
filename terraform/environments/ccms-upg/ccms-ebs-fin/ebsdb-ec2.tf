@@ -38,23 +38,6 @@ resource "aws_volume_attachment" "ebsdb_swap" {
   instance_id = module.oracle_ebs_db.instance_id
 }
 
-resource "aws_ebs_volume" "ebsdb_export_home" {
-  lifecycle { ignore_changes = [kms_key_id] }
-  availability_zone = module.oracle_ebs_db.availability_zone
-  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_exhome
-  type              = "gp3"
-  iops              = 3000
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-export-home", device-name = "/dev/sdh" })
-}
-
-resource "aws_volume_attachment" "ebsdb_export_home" {
-  device_name = "/dev/sdh"
-  volume_id   = aws_ebs_volume.ebsdb_export_home.id
-  instance_id = module.oracle_ebs_db.instance_id
-}
-
 resource "aws_ebs_volume" "ebsdb_u01" {
   lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_db.availability_zone
@@ -86,23 +69,6 @@ resource "aws_ebs_volume" "ebsdb_arch" {
 resource "aws_volume_attachment" "ebsdb_arch" {
   device_name = "/dev/sdj"
   volume_id   = aws_ebs_volume.ebsdb_arch.id
-  instance_id = module.oracle_ebs_db.instance_id
-}
-
-resource "aws_ebs_volume" "ebsdb_dbf" {
-  lifecycle { ignore_changes = [kms_key_id] }
-  availability_zone = module.oracle_ebs_db.availability_zone
-  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf
-  type              = "gp3"
-  iops              = local.application_data.accounts[local.environment].ebs_default_iops
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-dbf", device-name = "/dev/sdk" })
-}
-
-resource "aws_volume_attachment" "ebsdb_dbf" {
-  device_name = "/dev/sdk"
-  volume_id   = aws_ebs_volume.ebsdb_dbf.id
   instance_id = module.oracle_ebs_db.instance_id
 }
 
@@ -239,23 +205,6 @@ resource "aws_ebs_volume" "ebsdb_diag" {
 resource "aws_volume_attachment" "ebsdb_diag" {
   device_name = "/dev/sdp"
   volume_id   = aws_ebs_volume.ebsdb_diag.id
-  instance_id = module.oracle_ebs_db.instance_id
-}
-
-resource "aws_ebs_volume" "ebsdb_appshare" {
-  lifecycle { ignore_changes = [kms_key_id] }
-  availability_zone = module.oracle_ebs_db.availability_zone
-  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_appshare
-  type              = "gp3"
-  iops              = 3000
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsdb-appshare", device-name = "/dev/sdq" })
-}
-
-resource "aws_volume_attachment" "ebsdb_appshare" {
-  device_name = "/dev/sdq"
-  volume_id   = aws_ebs_volume.ebsdb_appshare.id
   instance_id = module.oracle_ebs_db.instance_id
 }
 

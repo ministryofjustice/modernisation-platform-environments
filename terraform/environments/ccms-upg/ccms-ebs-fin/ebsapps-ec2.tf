@@ -63,7 +63,7 @@ resource "aws_ebs_volume" "ebsapps_home" {
   count = 2
   lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_apps[count.index].availability_zone
-  size              = 100
+  size              = 25
   type              = "gp3"
   iops              = 3000
   encrypted         = true
@@ -76,26 +76,6 @@ resource "aws_volume_attachment" "ebsapps_home" {
   depends_on  = [aws_ebs_volume.ebsapps_home]
   device_name = "/dev/sdd"
   volume_id   = aws_ebs_volume.ebsapps_home[count.index].id
-  instance_id = module.oracle_ebs_apps[count.index].instance_id
-}
-
-resource "aws_ebs_volume" "ebsapps_export_home" {
-  count = 2
-  lifecycle { ignore_changes = [kms_key_id] }
-  availability_zone = module.oracle_ebs_apps[count.index].availability_zone
-  size              = local.application_data.accounts[local.environment].ebsapps_exhome_size
-  type              = "gp3"
-  iops              = local.application_data.accounts[local.environment].ebsapps_default_iops
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags              = merge(local.tags, { Name = "${local.component_name}-${local.env_label}-ebsapps-${count.index + 1}-export-home", device-name = "/dev/sdh" })
-}
-
-resource "aws_volume_attachment" "ebsapps_export_home" {
-  count       = 2
-  depends_on  = [aws_ebs_volume.ebsapps_export_home]
-  device_name = "/dev/sdh"
-  volume_id   = aws_ebs_volume.ebsapps_export_home[count.index].id
   instance_id = module.oracle_ebs_apps[count.index].instance_id
 }
 

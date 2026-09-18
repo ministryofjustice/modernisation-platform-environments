@@ -80,3 +80,12 @@ resource "aws_vpc_security_group_egress_rule" "ebsdb_http" {
   to_port           = 80
   cidr_ipv4         = "0.0.0.0/0"
 }
+
+resource "aws_vpc_security_group_egress_rule" "ebsdb_to_efs_nfs" {
+  security_group_id            = aws_security_group.ebsdb.id
+  description                  = "NFS to shared /stage EFS mount target"
+  ip_protocol                  = "tcp"
+  from_port                    = 2049
+  to_port                      = 2049
+  referenced_security_group_id = aws_security_group.ebsapps_efs.id
+}
