@@ -180,7 +180,7 @@ jobs:
           ref: ${{ github.event.inputs.branch_name }}
 
       - name: Decrypt Secrets
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@2988728879704953e739f82ac926d37931c6d01b # v6.1.9
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@2cc1ba90676147f4ebf93b67a56463473af39f1e # v6.2.3
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
