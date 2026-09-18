@@ -8,25 +8,6 @@ variable "collaborator_access" {
   description = "Collaborators must specify which access level they are using, eg set an environment variable of export TF_VAR_collaborator_access=migration"
 }
 
-variable "guardrail_diagnostics_enabled" {
-  type        = bool
-  default     = false
-  description = "Provision the temporary guardrail diagnostics route, key and prompt capture storage"
-}
-
-variable "guardrail_diagnostics_key" {
-  type        = string
-  default     = null
-  sensitive   = true
-  ephemeral   = true
-  description = "Write-only LiteLLM key used exclusively for guardrail diagnostics"
-
-  validation {
-    condition     = !var.guardrail_diagnostics_enabled || can(regex("^sk-.{32,}$", var.guardrail_diagnostics_key))
-    error_message = "guardrail_diagnostics_key must start with sk- and contain at least 32 characters when diagnostics are enabled."
-  }
-}
-
 variable "guardrail_diagnostics_key_version" {
   type        = number
   default     = 1

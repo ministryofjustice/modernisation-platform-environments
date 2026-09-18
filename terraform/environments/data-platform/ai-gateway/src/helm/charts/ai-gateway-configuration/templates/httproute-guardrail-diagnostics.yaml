@@ -13,7 +13,7 @@ spec:
       sectionName: https-guardrail-diagnostics
   rules:
     - backendRefs:
-        - name: litellm
+        - name: litellm-guardrail-diagnostics
           port: 4000
 
 ---

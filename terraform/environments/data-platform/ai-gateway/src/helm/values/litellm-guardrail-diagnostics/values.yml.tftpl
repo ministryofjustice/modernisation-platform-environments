@@ -3,23 +3,22 @@ image:
   repository: ${imageRepository}
   tag: ${imageTag}
 
-nameOverride: "litellm"
+nameOverride: "litellm-guardrail-diagnostics"
+
+replicaCount: 1
 
 service:
   type: NodePort
 
 serviceMonitor:
-  enabled: true
+  enabled: false
 
 serviceAccount:
   create: false
   name: ${serviceAccountName}
 
 autoscaling:
-  enabled: true
-  minReplicas: ${minReplicas}
-  maxReplicas: ${maxReplicas}
-  targetCPUUtilizationPercentage: ${targetCPUUtilizationPercentage}
+  enabled: false
 
 resources:
   requests:
@@ -53,8 +52,7 @@ proxyConfigMap:
   create: true
 proxy_config:
   general_settings:
-    background_health_checks: true
-    health_check_interval: ${ai_background_health_check_interval}
+    background_health_checks: false
     allow_requests_on_db_unavailable: true
     litellm_license: os.environ/LITELLM_LICENSE
     master_key: os.environ/PROXY_MASTER_KEY
@@ -68,6 +66,15 @@ proxy_config:
     skip_system_message_in_guardrail: true
     request_timeout: 600
     json_logs: true
+    s3_callback_params:
+      s3_bucket_name: ${guardrailDiagnosticsBucket}
+      s3_region_name: ${guardrailDiagnosticsRegion}
+      s3_path: litellm-guardrail-diagnostics
+      s3_batch_size: 1
+      s3_flush_interval: 1
+      s3_strip_base64_files: true
+      s3_server_side_encryption: aws:kms
+      s3_sse_kms_key_id: ${guardrailDiagnosticsKmsKeyArn}
     cache: false
     cache_params:
       type: redis
@@ -139,7 +146,7 @@ volumes:
       defaultMode: 420
       sources:
         - serviceAccountToken:
-            path: google-identity-token
+          path: google-identity-token
             audience: ${googleWorkloadIdentityAudience}
             expirationSeconds: 3600
 
@@ -169,7 +176,7 @@ envVars: {
     DISABLE_ADMIN_UI: "True",
     DOCS_DESCRIPTION: "Contact us on Slack - #ask-data-platform",
     DOCS_FILTERED: "True",
-    DOCS_TITLE: "Justice AI Gateway",
+    DOCS_TITLE: "Justice AI Gateway diagnostics",
     DISABLE_SCHEMA_UPDATE: "True",
     LITELLM_LOG: "ERROR",
     LITELLM_MIGRATION_DIR: "/app/migrations",
@@ -184,7 +191,7 @@ envVars: {
     AZURE_TENANT_ID: "${microsoft_foundry_tenant_id}",
     AZURE_CLIENT_ID: "${microsoft_foundry_client_id}",
     AZURE_CREDENTIAL: "DefaultAzureCredential",
-    AZURE_FEDERATED_TOKEN_FILE: "/var/run/secrets/sts.windows.net/azure-identity-token", 
+    AZURE_FEDERATED_TOKEN_FILE: "/var/run/secrets/sts.windows.net/azure-identity-token",
     AZURE_AD_TOKEN: "oidc/azure/",
     GOOGLE_APPLICATION_CREDENTIALS: "/var/run/secrets/iamcredentials.googleapis.com/credentials/credentials.json"
 }

@@ -59,7 +59,7 @@ data "aws_iam_policy_document" "ai_gateway" {
   }
 
   dynamic "statement" {
-    for_each = var.guardrail_diagnostics_enabled ? [1] : []
+    for_each = local.guardrail_diagnostics_enabled ? [1] : []
 
     content {
       sid       = "GuardrailDiagnosticsWrite"
@@ -70,7 +70,7 @@ data "aws_iam_policy_document" "ai_gateway" {
   }
 
   dynamic "statement" {
-    for_each = var.guardrail_diagnostics_enabled ? [1] : []
+    for_each = local.guardrail_diagnostics_enabled ? [1] : []
 
     content {
       sid       = "GuardrailDiagnosticsKMSAccess"

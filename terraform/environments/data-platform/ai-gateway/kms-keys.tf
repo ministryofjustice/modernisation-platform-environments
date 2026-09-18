@@ -94,7 +94,7 @@ module "ai_gateway_audit_logs_kms_key" {
 }
 
 module "ai_gateway_guardrail_diagnostics_kms_key" {
-  count  = var.guardrail_diagnostics_enabled ? 1 : 0
+  count  = local.guardrail_diagnostics_enabled ? 1 : 0
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git?ref=407e3db34a65b384c20ef718f55d9ceacb97a846" # v4.2.0
 
   description           = "KMS key for temporary AI Gateway guardrail diagnostic captures"
