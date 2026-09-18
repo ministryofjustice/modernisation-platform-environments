@@ -2,6 +2,14 @@
 # define environment specific configuration in locals_development.tf, locals_test.tf etc.
 
 locals {
+  locals_environments_specific = {
+    development   = local.locals_development
+    test          = local.locals_test
+    preproduction = local.locals_preproduction
+    production    = local.locals_production
+  }
+  locals_environment_specific = local.locals_environments_specific[local.environment]
+
   baseline_presets_environments_specific = {
     development   = local.baseline_presets_development
     test          = local.baseline_presets_test
@@ -51,17 +59,33 @@ locals {
     }
 
     security_groups = local.security_groups
+  }
 
+
+  locals_all_environments = {
     patch_manager = {
+      approval_days = {
+        development   = 0
+        test          = 6
+        preproduction = 10
+        production    = 14
+      }
+      approval_date = {
+        development   = "2026-09-17"
+        test          = "2026-09-17"
+        preproduction = "2026-09-17"
+        production    = "2026-09-17"
+      }
       patch_schedules = {
+        # Linux = manual update along with DB patches
         Windows = "cron(10 06 ? * WED *)" # 06:10 for nomis windows clients we work around the overnight shutdown  
       }
-      patch_tag_key               = "os-type"
-      maintenance_window_duration = 4
-      maintenance_window_cutoff   = 2
       patch_classifications = {
-        # REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
         WINDOWS = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups", "ServicePacks", "Updates"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
+      }
+      patch_classifications_cutoff_type = {
+        REDHAT_ENTERPRISE_LINUX = "date"
+        WINDOWS                 = "days"
       }
     }
   }

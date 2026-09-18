@@ -5,6 +5,15 @@ locals {
     maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
   }
 
+  locals_development = {
+    patch_manager = {
+      patch_classifications = {
+        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"]                                                             # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
+        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates", "UpdateRollups", "ServicePacks", "Updates"] # Windows Options=CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades
+      }
+    }
+  }
+
   baseline_presets_development = {
     options = {
       sns_topics = {

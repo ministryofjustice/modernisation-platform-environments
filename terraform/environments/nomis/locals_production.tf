@@ -6,6 +6,9 @@ locals {
     maintenance_message = "Prison-NOMIS is currently unavailable due to planned maintenance. Please try again later"
   }
 
+  locals_production = {
+  }
+
   baseline_presets_production = {
     options = {
       db_backup_object_lock_days          = 14

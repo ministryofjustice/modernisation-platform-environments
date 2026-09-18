@@ -5,6 +5,9 @@ locals {
     maintenance_message = "Preprod is available during working hours 7am-7pm. Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpectedly down. See <a href=\"https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4978343956\">confluence</a> for more details"
   }
 
+  locals_preproduction = {
+  }
+
   baseline_presets_preproduction = {
     options = {
       db_backup_object_lock_days          = 14
