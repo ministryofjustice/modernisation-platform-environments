@@ -58,6 +58,28 @@ data "aws_iam_policy_document" "ai_gateway" {
     resources = [module.ai_gateway_audit_logs_kms_key.key_arn]
   }
 
+  dynamic "statement" {
+    for_each = var.guardrail_diagnostics_enabled ? [1] : []
+
+    content {
+      sid       = "GuardrailDiagnosticsWrite"
+      effect    = "Allow"
+      actions   = ["s3:PutObject"]
+      resources = ["${module.guardrail_diagnostics[0].s3_bucket_arn}/litellm-guardrail-diagnostics/*"]
+    }
+  }
+
+  dynamic "statement" {
+    for_each = var.guardrail_diagnostics_enabled ? [1] : []
+
+    content {
+      sid       = "GuardrailDiagnosticsKMSAccess"
+      effect    = "Allow"
+      actions   = ["kms:GenerateDataKey"]
+      resources = [module.ai_gateway_guardrail_diagnostics_kms_key[0].key_arn]
+    }
+  }
+
   statement {
     sid    = "RDSIAMConnect"
     effect = "Allow"

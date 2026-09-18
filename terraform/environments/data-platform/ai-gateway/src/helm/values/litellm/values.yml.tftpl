@@ -68,6 +68,17 @@ proxy_config:
     skip_system_message_in_guardrail: true
     request_timeout: 600
     json_logs: true
+%{ if guardrailDiagnosticsEnabled ~}
+    s3_callback_params:
+      s3_bucket_name: ${guardrailDiagnosticsBucket}
+      s3_region_name: eu-west-2
+      s3_path: litellm-guardrail-diagnostics
+      s3_batch_size: 1
+      s3_flush_interval: 1
+      s3_strip_base64_files: true
+      s3_server_side_encryption: aws:kms
+      s3_sse_kms_key_id: ${guardrailDiagnosticsKmsKeyArn}
+%{ endif ~}
     cache: false
     cache_params:
       type: redis

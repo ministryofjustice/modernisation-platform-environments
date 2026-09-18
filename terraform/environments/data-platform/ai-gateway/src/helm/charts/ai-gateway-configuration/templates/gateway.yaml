@@ -28,3 +28,13 @@ spec:
       protocol: HTTPS
       port: 443
       hostname: {{ .Values.adminHostname }}
+{{ if .Values.guardrailDiagnosticsEnabled }}
+    - name: http-guardrail-diagnostics
+      protocol: HTTP
+      port: 80
+      hostname: {{ .Values.guardrailDiagnosticsHostname }}
+    - name: https-guardrail-diagnostics
+      protocol: HTTPS
+      port: 443
+      hostname: {{ .Values.guardrailDiagnosticsHostname }}
+{{ end }}

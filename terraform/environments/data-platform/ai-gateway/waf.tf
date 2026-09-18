@@ -4,6 +4,11 @@ locals {
     "/test",
     "/config/yaml",
   ]
+
+  restricted_ai_gateway_hostnames = concat(
+    ["admin.${local.environment_configuration.ai_gateway_hostname}"],
+    var.guardrail_diagnostics_enabled ? [local.guardrail_diagnostics_hostname] : []
+  )
 }
 
 data "aws_lb" "ai_gateway" {
@@ -143,20 +148,24 @@ module "waf_ai_gateway" {
         and_statement = {
           statements = [
             {
-              byte_match_statement = {
-                field_to_match = {
-                  single_header = {
-                    name = "host"
+              or_statement = {
+                statements = [for hostname in local.restricted_ai_gateway_hostnames : {
+                  byte_match_statement = {
+                    field_to_match = {
+                      single_header = {
+                        name = "host"
+                      }
+                    }
+                    positional_constraint = "EXACTLY"
+                    search_string         = hostname
+                    text_transformations = [
+                      {
+                        priority = 0
+                        type     = "LOWERCASE"
+                      }
+                    ]
                   }
-                }
-                positional_constraint = "EXACTLY"
-                search_string         = "admin.${local.environment_configuration.ai_gateway_hostname}"
-                text_transformations = [
-                  {
-                    priority = 0
-                    type     = "LOWERCASE"
-                  }
-                ]
+                }]
               }
             },
             {
@@ -180,20 +189,24 @@ module "waf_ai_gateway" {
       action   = "block"
 
       statement = {
-        byte_match_statement = {
-          field_to_match = {
-            single_header = {
-              name = "host"
+        or_statement = {
+          statements = [for hostname in local.restricted_ai_gateway_hostnames : {
+            byte_match_statement = {
+              field_to_match = {
+                single_header = {
+                  name = "host"
+                }
+              }
+              positional_constraint = "EXACTLY"
+              search_string         = hostname
+              text_transformations = [
+                {
+                  priority = 0
+                  type     = "LOWERCASE"
+                }
+              ]
             }
-          }
-          positional_constraint = "EXACTLY"
-          search_string         = "admin.${local.environment_configuration.ai_gateway_hostname}"
-          text_transformations = [
-            {
-              priority = 0
-              type     = "LOWERCASE"
-            }
-          ]
+          }]
         }
       }
 

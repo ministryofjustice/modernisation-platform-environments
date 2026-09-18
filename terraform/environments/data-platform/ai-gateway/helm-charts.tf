@@ -1,18 +1,20 @@
 resource "helm_release" "ai_gateway_configuration" {
   name      = "${local.component_name}-configuration"
   chart     = "${path.module}/src/helm/charts/${local.component_name}-configuration"
-  version   = "1.6.0"
+  version   = "1.7.0"
   namespace = module.ai_gateway_namespace.name
 
   values = [
     templatefile(
       "${path.module}/src/helm/values/${local.component_name}-configuration/values.yml.tftpl",
       {
-        hostname          = local.environment_configuration.ai_gateway_hostname
-        admin_hostname    = "admin.${local.environment_configuration.ai_gateway_hostname}"
-        internal_hostname = "internal.${local.environment_configuration.ai_gateway_hostname}"
-        certificate_arn   = module.acm_ai_gateway.acm_certificate_arn
-        alb_logs_bucket   = module.alb_access_logs.s3_bucket_id
+        hostname                       = local.environment_configuration.ai_gateway_hostname
+        admin_hostname                 = "admin.${local.environment_configuration.ai_gateway_hostname}"
+        internal_hostname              = "internal.${local.environment_configuration.ai_gateway_hostname}"
+        guardrail_diagnostics_enabled  = var.guardrail_diagnostics_enabled
+        guardrail_diagnostics_hostname = local.guardrail_diagnostics_hostname
+        certificate_arn                = module.acm_ai_gateway.acm_certificate_arn
+        alb_logs_bucket                = module.alb_access_logs.s3_bucket_id
         # Default is 60s; large file uploads (e.g. audio transcription) can take longer to process.
         idle_timeout_seconds = try(local.environment_configuration.ai_gateway_alb_idle_timeout_seconds, 300)
       }
@@ -140,6 +142,10 @@ resource "helm_release" "litellm" {
         targetCPUUtilizationPercentage = local.environment_configuration.ai_gateway_autoscaling.target_cpu_utilization_percentage
 
         # LiteLLM models are stored in the database; no model list is templated here.
+        guardrailDiagnosticsEnabled   = var.guardrail_diagnostics_enabled
+        guardrailDiagnosticsBucket    = var.guardrail_diagnostics_enabled ? module.guardrail_diagnostics[0].s3_bucket_id : ""
+        guardrailDiagnosticsKmsKeyArn = var.guardrail_diagnostics_enabled ? module.ai_gateway_guardrail_diagnostics_kms_key[0].key_arn : ""
+
         # Admin
         proxyAdminEmail = join(", ", local.proxy_admin_emails)
 
