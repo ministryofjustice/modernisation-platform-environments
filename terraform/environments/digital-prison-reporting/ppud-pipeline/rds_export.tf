@@ -17,8 +17,19 @@ locals {
       noncurrent_version_expiration = {
         days = 90
       }
-  }]
-
+    },
+    {
+      id      = "tidy-athena-results"
+      enabled = "Enabled"
+      prefix  = "athena-results/"
+      expiration = {
+        days = 5
+      }
+      noncurrent_version_expiration = {
+        days = 10
+      }
+    }
+  ]
 }
 
 # Security group for the rds instance
