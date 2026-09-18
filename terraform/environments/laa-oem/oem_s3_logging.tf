@@ -121,7 +121,7 @@ resource "aws_s3_bucket_policy" "laa_oem_logging" {
         ],
         Condition = {
           ArnLike = {
-            "aws:SourceArn" = aws_s3_bucket.laa_oem_shared.bucket.arn
+            "aws:SourceArn" = aws_s3_bucket.laa_oem_shared.arn
           }
         }
       }
