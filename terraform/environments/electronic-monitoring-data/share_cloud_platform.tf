@@ -40,7 +40,7 @@ locals {
     "visit_details"
   ]
 
-  emd_api_role = local.is-development ? ["arn:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-746edf975eef164d-live"] : []
+  emd_api_role = local.is-development ? ["arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-746edf975eef164d-live"] : []
 
   table_filters = merge(
     {
