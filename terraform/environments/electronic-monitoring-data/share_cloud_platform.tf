@@ -482,6 +482,8 @@ data "aws_iam_policy_document" "em_data_api_permissions" {
     ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/datamart${local.dbt_suffix}",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/data_insights_${local.dbt_suffix}",
+
     ]
   }
 
@@ -495,6 +497,8 @@ data "aws_iam_policy_document" "em_data_api_permissions" {
     ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/datamart${local.dbt_suffix}/order_dim",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/data_insights_${local.dbt_suffix}/*",
+
     ]
   }
 }
