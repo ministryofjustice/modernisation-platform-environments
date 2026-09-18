@@ -26,8 +26,9 @@ module "yjsm_apps_alb" {
 
   # Only the NLB fronting this ALB (and, in turn, Juniper's account behind it)
   # should ever reach these listeners. Reuses the same managed prefix list
-  # ("YJB CUG RANGE 1") that already gates Juniper's traffic to yjsm-ui today
-  # (modules/yjsm/security-groups.tf), since it's the same network.
+  # ("YJB CUG RANGE 1") that already gates Juniper's traffic to yjsm-hub today
+  # (modules/yjsm/security-groups.tf; see locals_yjsm_apps.tf for how we
+  # confirmed it's yjsm-hub, not yjsm-ui), since it's the same network.
   alb_ingress_prefix_list_ids = [module.yjsm.juniper_cug_prefix_list_id]
 
   alb_ingress_with_prefix_list_ids_rules = [

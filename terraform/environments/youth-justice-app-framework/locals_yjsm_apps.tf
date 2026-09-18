@@ -1,13 +1,21 @@
 locals {
-  # Only yjsm-ui is reached by Juniper - confirmed against the existing EC2
-  # setup, where only port 80 has a CIDR/prefix-list rule
-  # (modules/yjsm/security-groups.tf). yjsm-hub and yjsm-hub-admin are
-  # internal-only dependencies of yjsm-ui (reached via nginx today) and are
-  # not exposed on yjsm_apps_alb / yjsm_apps_nlb. Their target groups still
-  # exist in locals_target_groups.tf for whatever internal routing ECS ends
-  # up using, they're just not wired into a listener here yet.
+  # Confirmed against yjsm-nginx-configs/{Production,Test}/nginx.conf: the
+  # primary/CUG-gated IP (the one with the prefix-list rule on port 80,
+  # modules/yjsm/security-groups.tf) has an nginx server block that catches
+  # everything and proxies straight to yjsm-hub on 127.0.0.1:9091. So Juniper
+  # actually talks to yjsm-hub, not yjsm-ui.
+  #
+  # yjsm-ui is served by a *different* nginx server block, bound to the
+  # secondary private IP on port 8400 - a port/IP combo the CUG prefix list
+  # doesn't cover at all, so it's internal-only (nginx there also proxies
+  # /cjse* to yjsm-hub-admin on 8401 and /yjs* to yjsm-hub on 9091, but that's
+  # a separate, internal entry point, not Juniper's).
+  #
+  # Juniper always dials port 80 externally regardless of which app answers,
+  # so the external listener port below stays 80; only the app behind it
+  # changes. yjsm-hub-admin stays excluded, matching the above.
   yjsm_juniper_facing_apps = {
-    yjsm-ui = {
+    yjsm-hub = {
       port = 80
     }
   }
