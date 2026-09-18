@@ -13,6 +13,10 @@ locals {
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
         ]
         subnet_name = "private"
+        user_data_raw = base64encode(templatefile(
+          "./templates/user-data-iis-web-pwsh.yaml.tftpl",
+          {}
+        ))
       }
 
       ebs_volumes = {
@@ -53,6 +57,10 @@ locals {
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
         ]
         subnet_name = "private"
+        user_data_raw = base64encode(templatefile(
+          "./templates/user-data-iis-api-pwsh.yaml.tftpl",
+          {}
+        ))
       }
 
       ebs_volumes = {
