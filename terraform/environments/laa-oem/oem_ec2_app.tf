@@ -18,11 +18,11 @@ resource "aws_instance" "oem_app" {
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   user_data_replace_on_change = true
-  user_data_base64 = templatefile("./templates/oem-user-data-app.sh", {
+  user_data_base64 = base64encode(templatefile("./templates/oem-user-data-app.sh", {
     efs_fqdn = aws_efs_file_system.oem_app_efs.dns_name
     env_fqdn = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
     hostname = "laa-oem-app"
-  })
+  }))
   vpc_security_group_ids = [aws_security_group.oem_app_security_group.id]
 
   root_block_device {
