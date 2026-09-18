@@ -14,7 +14,7 @@ locals {
         ]
         subnet_name = "private"
         user_data_raw = base64encode(templatefile(
-          "./templates/user-data-install-iis-pwsh.yaml.tftpl",
+          "./templates/user-data-iis-web-pwsh.yaml.tftpl",
           {}
         ))
       }
@@ -58,7 +58,7 @@ locals {
         ]
         subnet_name = "private"
         user_data_raw = base64encode(templatefile(
-          "./templates/user-data-install-iis-pwsh.yaml.tftpl",
+          "./templates/user-data-iis-api-pwsh.yaml.tftpl",
           {}
         ))
       }
