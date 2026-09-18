@@ -1,6 +1,6 @@
 module "dynamodb_transfer_clients" {
   source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "5.5.0"
+  version = "5.5.1"
 
   name         = "${local.application_name}-${local.component_name}-transfer-clients"
   billing_mode = "PAY_PER_REQUEST"
@@ -25,7 +25,7 @@ module "dynamodb_transfer_clients" {
 
 module "dynamodb_auth_roles" {
   source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "5.5.0"
+  version = "5.5.1"
 
   name         = "${local.application_name}-${local.component_name}-auth-roles"
   billing_mode = "PAY_PER_REQUEST"
@@ -50,7 +50,7 @@ module "dynamodb_auth_roles" {
 
 module "dynamodb_auth_principals" {
   source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "5.5.0"
+  version = "5.5.1"
 
   name         = "${local.application_name}-${local.component_name}-auth-principals"
   billing_mode = "PAY_PER_REQUEST"
@@ -75,7 +75,7 @@ module "dynamodb_auth_principals" {
 
 module "dynamodb_multipart_uploads" {
   source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "5.5.0"
+  version = "5.5.1"
 
   name         = "${local.application_name}-${local.component_name}-multipart-uploads"
   billing_mode = "PAY_PER_REQUEST"
