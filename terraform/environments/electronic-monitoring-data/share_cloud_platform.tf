@@ -551,20 +551,20 @@ resource "aws_iam_role_policy_attachment" "em_data_validation_permissions" {
 }
 
 resource "aws_iam_policy" "em_data_api_permissions" {
-  count       = local.is-development || local.is-test ? 1 : 0
+  count       = local.is-test ? 1 : 0
   name_prefix = "em_data_api_permissions"
   description = "Permissions for the Electronic Monitoring Data API."
   policy      = data.aws_iam_policy_document.em_data_api_permissions.json
 }
 
 resource "aws_iam_role_policy_attachment" "standard_athena_access_em_data_api" {
-  count      = local.is-development || local.is-test ? 1 : 0
+  count      = local.is-test ? 1 : 0
   policy_arn = aws_iam_policy.standard_athena_access.arn
   role       = module.emd_data_api_role[0].iam_role_name
 }
 
 resource "aws_iam_role_policy_attachment" "em_data_api_permissions" {
-  count      = local.is-development || local.is-test ? 1 : 0
+  count      = local.is-test ? 1 : 0
   policy_arn = aws_iam_policy.em_data_api_permissions[0].arn
   role       = module.emd_data_api_role[0].iam_role_name
 }
@@ -1041,6 +1041,12 @@ resource "aws_iam_role_policy_attachment" "standard_athena_access_api" {
   policy_arn = aws_iam_policy.standard_athena_access.arn
   role       = module.data_api_role.iam_role_name
 }
+
+resource "aws_iam_role_policy_attachment" "database_access_api" {
+  policy_arn = aws_iam_policy.em_data_api_permissions[0].arn
+  role       = module.data_api_role.iam_role_name
+}
+
 
 resource "aws_lakeformation_permissions" "em_api_db" {
   principal   = module.data_api_role.iam_role_arn
