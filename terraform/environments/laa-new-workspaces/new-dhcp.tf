@@ -28,11 +28,3 @@
 #   dhcp_options_id = aws_vpc_dhcp_options.ad_dhcp_options.id
 # }
 
-##############################################
-### Outputs
-##############################################
-
-output "ad_dns_servers" {
-  value       = local.environment == "development" ? aws_directory_service_directory.workspaces_ad.dns_ip_addresses : null
-  description = "AD DNS server IP addresses (10.200.1.245, 10.200.2.11)"
-}

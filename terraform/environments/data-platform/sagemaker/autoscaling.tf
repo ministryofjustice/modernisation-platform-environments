@@ -1,7 +1,7 @@
 resource "aws_appautoscaling_target" "elevenlabs_asr" {
   count = local.is-test ? 0 : 1
 
-  min_capacity       = 1
+  min_capacity       = local.is-production ? 2 : 1
   max_capacity       = 10
   resource_id        = "endpoint/${aws_sagemaker_endpoint.elevenlabs_asr[0].name}/variant/${aws_sagemaker_endpoint_configuration.elevenlabs_asr[0].production_variants[0].variant_name}"
   scalable_dimension = "sagemaker:variant:DesiredInstanceCount"
@@ -18,8 +18,8 @@ resource "aws_appautoscaling_policy" "elevenlabs_asr" {
   service_namespace  = aws_appautoscaling_target.elevenlabs_asr[0].service_namespace
 
   target_tracking_scaling_policy_configuration {
-    # ElevenLabs recommends six concurrent requests per replica for the -with-aligner model.
-    target_value = 6
+    # Scale out earlier while investigating GPU OOMs; this is not a hard concurrency limit.
+    target_value = 1
 
     predefined_metric_specification {
       predefined_metric_type = "SageMakerVariantConcurrentRequestsPerModelHighResolution"

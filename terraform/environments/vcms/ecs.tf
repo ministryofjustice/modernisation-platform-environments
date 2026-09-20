@@ -106,6 +106,38 @@ module "container_definition" {
     {
       name  = "APP_DEBUG"
       value = local.app_config.APP_DEBUG
+    },
+    {
+      name  = "DIR_DOCUMENTS"
+      value = "/mnt/s3fs"
+    },
+    {
+      name  = "SESSION_DRIVER"
+      value = "redis"
+    },
+    {
+      name  = "CACHE_DRIVER"
+      value = "redis"
+    },
+    {
+      name  = "EFS_SHARE_ID"
+      value = aws_efs_file_system.vcms.id
+    },
+    {
+      name  = "EFS_ACCESS_POINT"
+      value = aws_efs_access_point.vcms.id
+    },
+    {
+      name  = "EFS_DNS"
+      value = aws_efs_file_system.vcms.dns_name
+    },
+    {
+      name  = "S3_BUCKET"
+      value = "vcms-test-20260612133259586300000001"
+    },
+    {
+      name  = "S3_ENDPOINT_URL"
+      value = "https://s3.eu-west-2.amazonaws.com"
     }
   ]
 
@@ -126,7 +158,7 @@ module "container_definition" {
   mount_points = [
     {
       sourceVolume  = "vcms"
-      containerPath = "/mnt/vcmsdocs"
+      containerPath = "/mnt/s3fs"
       readOnly      = false
     }
   ]

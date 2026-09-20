@@ -52,6 +52,7 @@ jobs:
       component: "root"
       account_name: ${{ inputs.account_name }}
       secrets_prefetched: ${{ inputs.secrets_prefetched }}
+      runner: "octo-production"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -68,6 +69,7 @@ jobs:
       component: "network"
       account_name: ${{ inputs.account_name }}
       secrets_prefetched: ${{ inputs.secrets_prefetched }}
+      runner: "octo-production"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -85,6 +87,7 @@ jobs:
       component: "cluster"
       account_name: ${{ inputs.account_name }}
       secrets_prefetched: ${{ inputs.secrets_prefetched }}
+      runner: "octo-production"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -101,6 +104,7 @@ jobs:
       component: "cluster-base"
       account_name: ${{ inputs.account_name }}
       secrets_prefetched: ${{ inputs.secrets_prefetched }}
+      runner: "octo-production"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -117,6 +121,7 @@ jobs:
       component: "cluster-core"
       account_name: ${{ inputs.account_name }}
       secrets_prefetched: ${{ inputs.secrets_prefetched }}
+      runner: "octo-production"
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -133,6 +138,7 @@ jobs:
       component: "cluster-components"
       account_name: ${{ inputs.account_name }}
       secrets_prefetched: ${{ inputs.secrets_prefetched }}
+      runner: "octo-production" 
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}

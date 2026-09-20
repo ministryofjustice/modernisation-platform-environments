@@ -502,6 +502,8 @@ updates:
     directories:
       - "terraform/environments/data-factory-moj"
       - "terraform/environments/data-factory-moj/dms-core"
+      - "terraform/environments/data-factory-moj/dms-core/modules/dms-test-harness"
+      - "terraform/environments/data-factory-moj/genesys-data-ingestion"
       - "terraform/environments/data-factory-moj/streaming-poc"
       - "terraform/environments/data-factory-moj/streaming-poc-devops"
       - "terraform/environments/data-factory-moj/streaming-poc-maf"
@@ -905,6 +907,8 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/integration-hub-file-transfer"
+      - "terraform/environments/integration-hub-file-transfer/push-to-s3"
+      - "terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup"
     schedule:
       interval: "daily"
     groups:

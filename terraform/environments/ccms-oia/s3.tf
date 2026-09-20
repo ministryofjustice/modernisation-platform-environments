@@ -1,9 +1,20 @@
 module "s3_ccms_oia" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v9.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e"
 
   bucket_name        = "${local.application_name}-${local.environment}"
   versioning_enabled = true
   ownership_controls = "BucketOwnerEnforced"
+  sse_algorithm      = "AES256"
+  custom_kms_key     = ""
+
+  log_buckets = {
+    log_bucket_name = module.s3-bucket-logging.bucket.id
+    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+    log_bucket_policy = aws_s3_bucket_policy.lb_access_logs.policy
+     }
+  manage_log_bucket_policy = false
+  
+  log_prefix = "s3access/${local.application_name}-${local.environment}/${local.application_name}-${local.environment}"
 
   lifecycle_rule = [
     {
@@ -91,17 +102,14 @@ module "s3_ccms_oia" {
 
 # S3 Bucket - Logging
 module "s3-bucket-logging" {
-  # v9.0.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/9facf9fc8f8b8e3f93ffbda822028534b9a75399
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
+  # v11.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/81230d03816f140ae912454815ec531d7cbe2c8e
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e"
 
   bucket_name        = local.logging_bucket_name
   versioning_enabled = true
   bucket_policy      = [aws_s3_bucket_policy.lb_access_logs.policy]
   sse_algorithm      = "AES256"
   custom_kms_key     = ""
-
-  log_bucket = local.logging_bucket_name
-  log_prefix = "s3access/${local.logging_bucket_name}"
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
@@ -214,6 +222,34 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
           }
         }
+      },
+       {
+        Sid    = "AllowS3Logging OIA Bucket"
+        Effect = "Allow"
+        Principal = {
+          Service = "logging.s3.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "${module.s3-bucket-logging.bucket.arn}/*"
+        Condition = {
+          ArnLike = {
+           "aws:SourceArn" = module.s3_ccms_oia.bucket.arn
+          }
+       }
+      },
+      {
+        Sid    = "AllowS3Logging Shared Bucket"
+        Effect = "Allow"
+        Principal = {
+          Service = "logging.s3.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "${module.s3-bucket-logging.bucket.arn}/*"
+        Condition = {
+          ArnLike = {
+           "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
+          }
+       }
       }
     ]
   })
@@ -221,8 +257,8 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
 
 # S3 Bucket - Logging
 module "s3-bucket-shared" {
-  # v9.0.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/9facf9fc8f8b8e3f93ffbda822028534b9a75399
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=9facf9fc8f8b8e3f93ffbda822028534b9a75399"
+  # v11.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/81230d03816f140ae912454815ec531d7cbe2c8e
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e"
 
   bucket_name        = "${local.application_name}-${local.environment}-shared"
   versioning_enabled = true
@@ -230,8 +266,14 @@ module "s3-bucket-shared" {
   sse_algorithm      = "AES256"
   custom_kms_key     = ""
 
-  log_bucket = local.logging_bucket_name
-  log_prefix = "s3access/${local.application_name}-${local.environment}-shared"
+  log_buckets = {
+    log_bucket_name = module.s3-bucket-logging.bucket.id
+    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+    log_bucket_policy = aws_s3_bucket_policy.lb_access_logs.policy
+     }
+  manage_log_bucket_policy = false
+  
+  log_prefix = "s3access/${local.application_name}-${local.environment}-shared/${local.application_name}-${local.environment}-shared"
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false

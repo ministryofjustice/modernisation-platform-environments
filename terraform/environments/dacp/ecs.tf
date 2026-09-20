@@ -165,22 +165,36 @@ resource "aws_iam_role_policy" "app_execution" {
   name = "execution-${var.networking[0].application}"
   role = aws_iam_role.app_execution.id
 
-  policy = <<-EOF
-  {
-    "Version": "2012-10-17",
-    "Statement": [
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
       {
-           "Action": [
-              "ecr:*",
-              "logs:*",
-              "secretsmanager:GetSecretValue"
-           ],
-           "Resource": "*",
-           "Effect": "Allow"
+        Sid      = "EcrAuth"
+        Effect   = "Allow"
+        Action   = ["ecr:GetAuthorizationToken"]
+        Resource = "*"
+      },
+      {
+        Sid    = "EcrPull"
+        Effect = "Allow"
+        Action = [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:BatchGetImage",
+          "ecr:GetDownloadUrlForLayer"
+        ]
+        Resource = aws_ecr_repository.dacp_ecr_repo.arn
+      },
+      {
+        Sid    = "Logs"
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "${aws_cloudwatch_log_group.ecs_logs.arn}:*"
       }
     ]
-  }
-  EOF
+  })
 }
 
 resource "aws_iam_role" "app_task" {

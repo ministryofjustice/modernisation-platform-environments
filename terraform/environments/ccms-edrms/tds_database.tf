@@ -31,7 +31,8 @@ resource "aws_db_instance" "tds_db" {
   port                                = "1521"
   kms_key_id                          = data.aws_kms_key.rds_shared.arn
   storage_encrypted                   = true
-  skip_final_snapshot                 = true
+  skip_final_snapshot                 = false
+  final_snapshot_identifier            = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}tds-db-final-snapshot"
   iam_database_authentication_enabled = false
   vpc_security_group_ids = [
     aws_security_group.tds_db.id
@@ -60,7 +61,7 @@ resource "aws_db_instance" "tds_db" {
     update = "80m"
   }
   lifecycle {
-    ignore_changes = [engine_version]
+    ignore_changes = [engine_version, final_snapshot_identifier]
   }
 }
 

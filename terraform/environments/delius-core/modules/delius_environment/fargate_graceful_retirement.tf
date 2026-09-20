@@ -5,16 +5,20 @@ data "aws_lb_target_group" "ldap-target-group" {
 locals {
   # Restart schedules for envs, testing for dev only now
   fargate_restart_schedules = {
-    dev  = { day = "TUESDAY", time = "22:00" }
-    poc  = { day = "MONDAY", time = "20:00" }
-    test = { day = "TUESDAY", time = "22:00" }
+    dev     = { day = "TUESDAY", time = "22:00" }
+    poc     = { day = "MONDAY", time = "20:00" }
+    test    = { day = "TUESDAY", time = "22:00" }
+    stage   = { day = "THURSDAY", time = "22:00" }
+    preprod = { day = "FRIDAY", time = "22:00" }
   }
 
   # Debug logging control per environment
   fargate_debug_logging = {
-    dev  = true
-    poc  = true
-    test = true
+    dev     = true
+    poc     = true
+    test    = true
+    stage   = true
+    preprod = true
   }
 }
 module "fargate_graceful_retirement" {
