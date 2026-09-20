@@ -39,6 +39,11 @@ locals {
     litellm_deployment_latency_per_token_warn = 0.75 # seconds per output token, p99
     litellm_deployment_latency_per_token_crit = 1.5  # seconds per output token, p99
 
+    # Transcribe models (e.g. gemini-3.5-transcribe-preview): request latency tracks input audio
+    # duration rather than output token count, so the per-output-token ratio is inherently higher.
+    litellm_deployment_latency_per_token_transcribe_warn = 10 # seconds per output token, p99
+    litellm_deployment_latency_per_token_transcribe_crit = 20 # seconds per output token, p99
+
     # ── Deployment Health ────────────────────────────────────────────────────
     litellm_cooldown_events_warn  = 1 # raw count of cooldown events per 5m, per model
     litellm_cooldown_events_crit  = 5 # raw count of cooldown events per 5m, per model
@@ -159,8 +164,8 @@ locals {
     bedrock_guardrail_client_errors_crit = 5  # client errors per 5m window
     bedrock_guardrail_server_errors_warn = 1  # server errors per 5m window
     bedrock_guardrail_server_errors_crit = 5  # server errors per 5m window
-    bedrock_guardrail_throttles_warn     = 20  # throttled requests per 5m window
-    bedrock_guardrail_throttles_crit     = 25  # throttled requests per 5m window
+    bedrock_guardrail_throttles_warn     = 20 # throttled requests per 5m window
+    bedrock_guardrail_throttles_crit     = 25 # throttled requests per 5m window
 
   }
   # Per-account effective thresholds: defaults merged with any account-specific
