@@ -45,11 +45,9 @@ locals {
     litellm_failed_fallbacks_warn = 1 # raw count of failed fallback attempts per 5m
     litellm_failed_fallbacks_crit = 5 # raw count of failed fallback attempts per 5m
 
-    # ── Rate-Limit ──────────────────────────────────────────────────
-    litellm_remaining_requests_warn         = 20   # remaining requests before provider rate limit, per model/provider
-    litellm_remaining_requests_crit         = 5    # remaining requests before provider rate limit, per model/provider
-    litellm_remaining_tokens_warn           = 5000 # remaining tokens before provider rate limit, per model/provider
-    litellm_remaining_tokens_crit           = 1000 # remaining tokens before provider rate limit, per model/provider
+    # ── Rate-Limit (per virtual key) ────────────────────────────────────────
+    # These are LiteLLM's own per-key limits, so an absolute threshold is meaningful. Provider-side
+    # headroom is not alerted on — see the note in alerting-golden-signals.tf.
     litellm_api_key_remaining_requests_warn = 20   # remaining requests before per-key model rate limit
     litellm_api_key_remaining_requests_crit = 5    # remaining requests before per-key model rate limit
     litellm_api_key_remaining_tokens_warn   = 2000 # remaining tokens before per-key model rate limit
