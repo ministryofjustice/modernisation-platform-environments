@@ -155,7 +155,7 @@ resource "aws_s3_bucket_policy" "logging_bucket_policy" {
         ]
         Condition = {
           ArnLike = {
-            "s3:SourceArn" = module.bastion_linux.bastion_s3_bucket.arn
+            "s3:SourceArn" = module.bastion_linux.bastion_s3_bucket.bucket.arn
           }
         }
       },
