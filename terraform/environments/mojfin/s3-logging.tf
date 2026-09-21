@@ -141,24 +141,7 @@ resource "aws_s3_bucket_policy" "logging_bucket_policy" {
             "s3:SourceArn" = aws_s3_bucket.mojfin_rds_oracle.arn
           }
         }
-      },
-      {
-        Sid    = "AllowS3Logging Bastion"
-        Effect = "Allow",
-        Principal = {
-          Service = "logging.s3.amazonaws.com"
-        },
-        Action = "s3:PutObject",
-        Resource = [
-          module.s3-bucket-logging.bucket.arn,
-          "${module.s3-bucket-logging.bucket.arn}/*"
-        ]
-        Condition = {
-          ArnLike = {
-            "s3:SourceArn" = module.bastion_linux.bastion_s3_bucket.bucket.arn
-          }
-        }
-      },
+      }
     ]
   })
 }
