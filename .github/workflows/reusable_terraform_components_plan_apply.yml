@@ -327,6 +327,13 @@
                 Guidance on approving these PRs is available at https://user-guide.modernisation-platform.service.justice.gov.uk/runbooks/reviewing-mp-environments-prs.html#process-for-approving-prs`
                 });
 
+          # Runs even when earlier steps failed: AMG counts expired-but-undeleted
+          # tokens against the per-service-account quota, so a leaked token on a
+          # failed run still consumes quota. Never fails the job.
+          - name: Delete AMG Service Account Token (Optional)
+            if: always() && inputs.mint_grafana_token == true
+            run: bash "${GITHUB_WORKSPACE}/scripts/delete-grafana-token.sh"
+
       #
       # The "apply" job (only runs if plan_exitcode == 2 => changes present)
       #
@@ -406,3 +413,8 @@
               tf_args="${{ inputs.plan_apply_tfargs }} x.tfplan"
               echo "terraform apply ${tf_args}"
               terraform apply ${tf_args} 2>&1 | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+
+          # See the equivalent step in the plan job for rationale.
+          - name: Delete AMG Service Account Token (Optional)
+            if: always() && inputs.mint_grafana_token == true
+            run: bash "${GITHUB_WORKSPACE}/scripts/delete-grafana-token.sh"
