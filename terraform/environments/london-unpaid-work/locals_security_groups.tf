@@ -52,7 +52,7 @@ locals {
       }
     }
 
-# PO-38 : Leaving LB ingress for web and api commented out for now
+    # PO-38 : Leaving LB ingress for web and api commented out for now
     london-unpaid-work-web = {
       description = "London Unpaid Work web server security group"
       # ingress = {
