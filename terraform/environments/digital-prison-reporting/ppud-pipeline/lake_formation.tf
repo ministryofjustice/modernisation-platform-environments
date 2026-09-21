@@ -11,7 +11,7 @@ locals {
 # application_variables.json
 resource "aws_lakeformation_permissions" "share_dbs_all_permissions" {
   # one instance per (database × principal)
-  for_each = (local.is-development || local.is-preproduction) ? {
+  for_each = local.is-test ? {} : {
     for combo in flatten([
       for share_index, share in local.analytical_platform_share : [
         for resource_share in share.resource_shares : [
@@ -26,7 +26,7 @@ resource "aws_lakeformation_permissions" "share_dbs_all_permissions" {
         ]
       ]
     ]) : combo.key => combo
-  } : {}
+  }
 
   principal                     = each.value.principal
   permissions                   = ["ALL"]
@@ -40,7 +40,7 @@ resource "aws_lakeformation_permissions" "share_dbs_all_permissions" {
 # Grant 'ALL' on *all tables* within each shared database
 resource "aws_lakeformation_permissions" "table_all_permissions" {
   # reuse the same keying pattern
-  for_each = (local.is-development || local.is-preproduction) ? {
+  for_each = local.is-test ? {} : {
     for combo in flatten([
       for share_index, share in local.analytical_platform_share : [
         for resource_share in share.resource_shares : [
@@ -55,7 +55,7 @@ resource "aws_lakeformation_permissions" "table_all_permissions" {
         ]
       ]
     ]) : combo.key => combo
-  } : {}
+  }
 
   principal                     = each.value.principal
   permissions                   = ["ALL"]
@@ -69,7 +69,7 @@ resource "aws_lakeformation_permissions" "table_all_permissions" {
 
 # Give the ap share policy role Glue permissions on the share resources
 data "aws_iam_policy_document" "analytical_platform_share_policy_ppud" {
-  for_each = (local.is-development || local.is-preproduction) ? local.analytical_platform_share : {}
+  for_each = local.is-test ? {} : local.analytical_platform_share 
 
   statement {
     effect = "Allow"
@@ -94,7 +94,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy_ppud" {
 }
 
 resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment_ppud" {
-  for_each = (local.is-development || local.is-preproduction) ? local.analytical_platform_share : {}
+  for_each = local.is-test ? {} : local.analytical_platform_share 
 
   name   = "${each.value.target_account_name}-share-policy-ppud"
   role   = data.aws_iam_role.analytical_platform_share_role[each.key].name
