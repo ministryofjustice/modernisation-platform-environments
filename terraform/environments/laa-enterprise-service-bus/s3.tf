@@ -80,6 +80,48 @@ resource "aws_s3_bucket_versioning" "access_logs" {
   }
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+  rule {
+    id     = "log-retention"
+    status = "Disabled"
+    filter {
+      prefix = ""
+    }
+
+    # Current Version Lifecycle
+    expiration {
+      days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
+    }
+
+    transition {
+      days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_standard
+      storage_class = "STANDARD_IA"
+    }
+
+    transition {
+      days          = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_current_glacier
+      storage_class = "GLACIER"
+    }
+
+
+    # Noncurrent Version  LifecyclE
+    noncurrent_version_expiration {
+      noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
+    }
+    noncurrent_version_transition {
+      noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_standard
+      storage_class   = "STANDARD_IA"
+    }
+
+    noncurrent_version_transition {
+      noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_transition_noncurrent_glacier
+      storage_class   = "GLACIER"
+    }
+  }
+
+}
+
 
 #####################################################################################
 ################# Logging for Lambda Files S3 bucket ###############################
