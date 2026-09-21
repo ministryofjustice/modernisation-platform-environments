@@ -86,6 +86,125 @@ resource "aws_eks_addon" "cloudwatch_observability" {
     otelContainerInsights = {
       enabled = true
     }
+    agents = [
+      {
+        name = "cloudwatch-agent"
+      },
+      {
+        name = "cloudwatch-agent-cluster-scraper"
+        mode = "deployment"
+        otelConfig = {
+          receivers = {
+            "prometheus/kubernetes_services" = {
+              config = {
+                scrape_configs = [
+                  {
+                    job_name        = "kubernetes-service-endpoints"
+                    scrape_interval = "15s"
+                    metrics_path    = "/metrics"
+                    kubernetes_sd_configs = [
+                      {
+                        role = "endpoints"
+                      }
+                    ]
+                    relabel_configs = [
+                      {
+                        action = "keep"
+                        source_labels = [
+                          "__meta_kubernetes_service_annotation_prometheus_io_scrape"
+                        ]
+                        regex = "true"
+                      },
+                      {
+                        action = "keep"
+                        source_labels = [
+                          "__meta_kubernetes_endpoint_port_name"
+                        ]
+                        regex = "metrics"
+                      },
+                      {
+                        action = "replace"
+                        source_labels = [
+                          "__meta_kubernetes_service_annotation_prometheus_io_path"
+                        ]
+                        regex        = "(.+)"
+                        target_label = "__metrics_path__"
+                      },
+                      {
+                        action = "replace"
+                        source_labels = [
+                          "__meta_kubernetes_namespace"
+                        ]
+                        target_label = "namespace"
+                      },
+                      {
+                        action = "replace"
+                        source_labels = [
+                          "__meta_kubernetes_service_name"
+                        ]
+                        target_label = "service"
+                      },
+                      {
+                        action = "replace"
+                        source_labels = [
+                          "__meta_kubernetes_pod_name"
+                        ]
+                        target_label = "pod"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+          processors = {
+            "resource/kubernetes_services" = {
+              attributes = [
+                {
+                  action = "upsert"
+                  key    = "k8s.cluster.name"
+                  value  = local.cluster_name
+                }
+              ]
+            }
+            "batch/kubernetes_services" = {}
+          }
+          exporters = {
+            "otlphttp/kubernetes_services" = {
+              metrics_endpoint = "https://monitoring.${data.aws_region.current.region}.amazonaws.com/v1/metrics"
+              auth = {
+                authenticator = "sigv4auth/kubernetes_services"
+              }
+            }
+          }
+          extensions = {
+            "sigv4auth/kubernetes_services" = {
+              region  = data.aws_region.current.region
+              service = "monitoring"
+            }
+          }
+          service = {
+            extensions = [
+              "sigv4auth/kubernetes_services"
+            ]
+            pipelines = {
+              "metrics/kubernetes_services" = {
+                receivers = [
+                  "prometheus/kubernetes_services"
+                ]
+                processors = [
+                  "resource/kubernetes_services",
+                  "batch/kubernetes_services"
+                ]
+                exporters = [
+                  "otlphttp/kubernetes_services"
+                ]
+              }
+            }
+          }
+        }
+      }
+    ]
   })
 
   tags = merge(local.tags, {
