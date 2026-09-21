@@ -28,5 +28,10 @@ locals {
       running_mode                              = "AUTO_STOP"
       running_mode_auto_stop_timeout_in_minutes = 60
     }
+    dba_standard = {
+      bundle_id                                 = "wsb-jtxjs31rj"
+      running_mode                              = "AUTO_STOP"
+      running_mode_auto_stop_timeout_in_minutes = 60
+    }
   }
 }
