@@ -17,7 +17,7 @@ module "s3_bucket_efs_migration" {
       ]
       principals = {
         type        = "AWS"
-        identifiers = ["arn:aws:iam::${var.legacy_account_id}:role/vcms-legacy-datasync-role"]
+        identifiers = ["arn:aws:iam::${data.aws_ssm_parameter.legacy_account_id.value}:role/vcms-legacy-datasync-role"]
       }
     }
   ]
