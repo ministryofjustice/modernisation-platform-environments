@@ -23,8 +23,7 @@ module "s3_bucket_efs_migration" {
   ]
 
   providers = {
-    aws                    = aws
-    aws.bucket-replication = aws.bucket-replication
+    aws.bucket-replication = aws
   }
 
   tags = local.tags
