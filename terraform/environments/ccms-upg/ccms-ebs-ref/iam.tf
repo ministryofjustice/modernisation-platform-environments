@@ -59,8 +59,8 @@ resource "aws_iam_policy" "ebsdb_cw_logging" {
           "logs:PutLogEvents",
         ]
         Resource = [
-          "arn:aws:logs:*:*:log-group:/${local.component_name}/*",
-          "arn:aws:logs:*:*:log-group:/${local.component_name}/*:log-stream:*",
+          "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/${local.component_name}/*",
+          "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/${local.component_name}/*:log-stream:*",
         ]
       },
     ]
@@ -143,8 +143,8 @@ resource "aws_iam_policy" "ebsapps_cw_logging" {
           "logs:PutLogEvents",
         ]
         Resource = [
-          "arn:aws:logs:*:*:log-group:/${local.component_name}/*",
-          "arn:aws:logs:*:*:log-group:/${local.component_name}/*:log-stream:*",
+          "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/${local.component_name}/*",
+          "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/${local.component_name}/*:log-stream:*",
         ]
       },
     ]

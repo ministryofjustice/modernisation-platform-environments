@@ -20,20 +20,6 @@ module "s3_dbbackup" {
           Bool = { "aws:SecureTransport" = "false" }
         }
       },
-      {
-        Sid       = "RestrictToTLSRequestsOnly"
-        Effect    = "Deny"
-        Principal = "*"
-        Action    = "s3:*"
-        Resource = [
-          module.s3_dbbackup.bucket.arn,
-          "${module.s3_dbbackup.bucket.arn}/*",
-        ]
-        Condition = {
-          Bool            = { "aws:SecureTransport" = "false" }
-          NumericLessThan = { "aws:TLSVersion" = "1.2" }
-        }
-      },
     ]
   })]
 
