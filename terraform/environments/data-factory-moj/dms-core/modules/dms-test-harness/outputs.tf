@@ -42,3 +42,18 @@ output "bootstrap_lambda_function_name" {
   description = "Name of the Lambda function used to prepare the DMS integration test."
   value       = aws_lambda_function.bootstrap.function_name
 }
+
+output "credential_sync_lambda_function_arn" {
+  description = "ARN of the Lambda function that synchronises the RDS-managed credential into the DMS source secret."
+  value       = aws_lambda_function.bootstrap.arn
+}
+
+output "credential_sync_failure_queue" {
+  description = "SQS queue containing failed DMS source credential synchronisation events."
+
+  value = {
+    arn  = aws_sqs_queue.credential_sync_failures.arn
+    name = aws_sqs_queue.credential_sync_failures.name
+    url  = aws_sqs_queue.credential_sync_failures.url
+  }
+}
