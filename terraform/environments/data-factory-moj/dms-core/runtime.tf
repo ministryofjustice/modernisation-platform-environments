@@ -40,6 +40,7 @@ resource "aws_iam_role" "runtime_control" {
 }
 
 data "aws_iam_policy_document" "runtime_control" {
+  #checkov:skip=CKV_AWS_356: AWS DMS connection testing requires wildcard resource access. Mutating task execution remains restricted to the managed replication task.
   count = local.dms_core_enabled ? 1 : 0
 
   statement {

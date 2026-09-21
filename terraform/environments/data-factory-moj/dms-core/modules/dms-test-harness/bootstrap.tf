@@ -174,7 +174,7 @@ resource "aws_cloudwatch_event_rule" "rds_secret_rotation" {
 }
 
 resource "aws_sqs_queue" "credential_sync_failures" {
-  name_prefix = "${var.name}-credential-sync-failures-"
+  name = "${var.name}-credential-sync-failures"
 
   message_retention_seconds = 1209600
   sqs_managed_sse_enabled   = true
