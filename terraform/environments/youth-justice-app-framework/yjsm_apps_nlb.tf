@@ -12,7 +12,7 @@ module "yjsm_apps_nlb" {
   vpc_id       = data.aws_vpc.shared.id
   tags         = local.tags
 
-  nlb_name        = "yjaf-yjsm-apps"
+  nlb_name        = "yjaf-yjsm-apps-nlb"
   nlb_subnets_ids = local.private_subnet_list[*].id
 
   # AWS assigns the node IPs. Once known, pin them here (private_ipv4_addresses,

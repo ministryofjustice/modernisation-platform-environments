@@ -18,7 +18,7 @@ module "yjsm_apps_alb" {
   alb_subnets_ids = local.private_subnet_list[*].id
   tags            = local.tags
 
-  alb_name = "yjaf-yjsm-apps"
+  alb_name = "yjaf-yjsm-apps-alb"
   internal = true
 
   listeners              = local.yjsm_apps_listeners

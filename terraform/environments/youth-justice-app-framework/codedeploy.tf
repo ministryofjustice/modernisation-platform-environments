@@ -39,7 +39,7 @@ module "codedeploy" {
   external_alb_name     = "yjaf-ext-external"
   connectivity_alb_name = "yjaf-connectivity-internal"
   yjsm_hub_svc_alb_name = "yjsm-hub-svc-ext-external"
-  yjsm_apps_alb_name    = "yjaf-yjsm-apps-internal"
+  yjsm_apps_alb_name    = "yjaf-yjsm-apps-alb-internal"
   # each yjsm app has its own listener on the yjsm apps ALB
   yjsm_apps_listener_ports = { for name, app in merge(local.yjsm_juniper_facing_apps, local.yjsm_internal_apps) : name => app.port }
   depends_on = [

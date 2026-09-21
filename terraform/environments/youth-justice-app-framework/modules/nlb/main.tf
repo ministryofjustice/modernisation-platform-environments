@@ -9,7 +9,7 @@ module "nlb" {
   source  = "terraform-aws-modules/alb/aws"
   version = "9.9.0"
 
-  name               = "${var.nlb_name}-${var.environment}"
+  name               = var.nlb_name
   load_balancer_type = "network"
   internal           = true
 
