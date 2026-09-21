@@ -13,6 +13,10 @@ locals {
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
         ]
         subnet_name = "private"
+        user_data_raw = base64encode(templatefile(
+          "./templates/user-data-iis-web-pwsh.yaml.tftpl",
+          {}
+        ))
       }
 
       ebs_volumes = {
@@ -27,7 +31,7 @@ locals {
         instance_type                = "t3.medium"
         key_name                     = null
         metadata_options_http_tokens = "optional"
-        vpc_security_group_ids       = ["ec2-windows"]
+        vpc_security_group_ids       = ["london-unpaid-work-web"]
       }
 
       tags = {
@@ -53,6 +57,10 @@ locals {
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
         ]
         subnet_name = "private"
+        user_data_raw = base64encode(templatefile(
+          "./templates/user-data-iis-api-pwsh.yaml.tftpl",
+          {}
+        ))
       }
 
       ebs_volumes = {
@@ -67,7 +75,7 @@ locals {
         instance_type                = "t3.medium"
         key_name                     = null
         metadata_options_http_tokens = "required"
-        vpc_security_group_ids       = ["ec2-windows"]
+        vpc_security_group_ids       = ["london-unpaid-work-api"]
       }
 
       tags = {
