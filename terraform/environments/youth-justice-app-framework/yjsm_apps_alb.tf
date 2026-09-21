@@ -24,8 +24,8 @@ module "yjsm_apps_alb" {
   listeners              = local.yjsm_apps_listeners
   existing_target_groups = module.internal_alb.target_group_arns
 
-  # Only the NLB fronting this ALB (and, in turn, Juniper's account behind it)
-  # should ever reach these listeners. Reuses the same managed prefix list
+  # Juniper (via the NLB) reaches the hub listener through the prefix list below;
+  # ECS callers get their own rules in modules/ecs. Reuses the same managed prefix list
   # ("YJB CUG RANGE 1") that already gates Juniper's traffic to yjsm-hub today
   # (modules/yjsm/security-groups.tf; see locals_yjsm_apps.tf for how we
   # confirmed it's yjsm-hub, not yjsm-ui), since it's the same network.

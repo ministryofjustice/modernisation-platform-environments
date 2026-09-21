@@ -37,4 +37,8 @@ module "yjsm_apps_nlb" {
       target_port   = app.port
     }
   }
+
+  # alb_arn doesn't depend on the ALB's listeners, and the NLB's "alb" target
+  # needs a listener on the target port to exist.
+  depends_on = [module.yjsm_apps_alb]
 }

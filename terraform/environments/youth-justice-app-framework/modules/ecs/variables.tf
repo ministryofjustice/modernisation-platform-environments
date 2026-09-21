@@ -231,6 +231,11 @@ variable "yjsm_hub_svc_alb_security_group_id" {
   type        = string
 }
 
+variable "yjsm_apps_alb_security_group_id" {
+  description = "The security group ID for the yjsm apps (yjsm-ui, yjsm-hub, yjsm-hubadmin) ALB"
+  type        = string
+}
+
 variable "external_alb_security_group_id" {
   description = "The security group ID for the external ALB"
   type        = string
