@@ -74,16 +74,12 @@ resource "aws_s3_bucket_policy" "logging_bucket_policy" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      # Defaults - Deny insecure transport and enforce TLSv1.2 or higher
       {
         Sid    = "DenyInsecureTransport",
         Effect = "Deny",
         Principal = "*",
         Action = "s3:*",
-        Resource = [
-          "${module.s3-bucket-logging.bucket.arn}/*",
-          module.s3-bucket-logging.bucket.arn
-        ],
+        Resource = ["${module.s3-bucket-shared.bucket.arn}/*", module.s3-bucket-shared.bucket.arn],
         Condition = {
           Bool = {
             "aws:SecureTransport" = "false"
@@ -96,18 +92,14 @@ resource "aws_s3_bucket_policy" "logging_bucket_policy" {
         Principal = {
           AWS = "*"
         },
-        Action = "s3:*",
-        Resource = [
-          "${module.s3-bucket-logging.bucket.arn}/*",
-          module.s3-bucket-logging.bucket.arn
-        ],
+        Action   = "s3:*",
+        Resource = ["${module.s3-bucket-shared.bucket.arn}/*", module.s3-bucket-shared.bucket.arn],
         Condition = {
           NumericLessThan = {
             "s3:TlsVersion" = "1.2"
           }
         }
       },
-      # Per-Bucket Configurations
       {
         Sid    = "AllowS3Logging Shared Bucket",
         Effect = "Allow",
@@ -121,9 +113,9 @@ resource "aws_s3_bucket_policy" "logging_bucket_policy" {
         ],
         Condition = {
           ArnLike = {
-            "s3:SourceArn" = module.s3-bucket-shared.bucket.arn
+           "aws:SourceArn" = module.s3-bucket-shared.bucket.arn
           }
-        }
+       }
       },
       {
         Sid    = "AllowS3Logging Oracle RDS Bucket",
@@ -138,7 +130,7 @@ resource "aws_s3_bucket_policy" "logging_bucket_policy" {
         ],
         Condition = {
           ArnLike = {
-            "s3:SourceArn" = aws_s3_bucket.mojfin_rds_oracle.arn
+            "aws:SourceArn" = aws_s3_bucket.mojfin_rds_oracle.arn
           }
         }
       }
