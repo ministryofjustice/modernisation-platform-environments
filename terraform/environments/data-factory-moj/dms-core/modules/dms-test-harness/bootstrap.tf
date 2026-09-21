@@ -148,7 +148,7 @@ resource "aws_lambda_function" "bootstrap" {
 }
 
 resource "aws_cloudwatch_event_rule" "rds_secret_rotation" {
-  name_prefix = "${var.name}-rds-secret-rotation-"
+  name        = "${var.name}-rds-secret-rotation"
   description = "Synchronises the DMS source secret when the RDS-managed credential changes."
 
   event_pattern = jsonencode({
