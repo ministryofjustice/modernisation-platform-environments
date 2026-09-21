@@ -2,7 +2,7 @@
 
 resource "aws_efs_file_system" "ebsapps_u01" {
   encrypted  = true
-  kms_key_id = data.aws_kms_key.ebs_shared.key_id
+  kms_key_id = data.aws_kms_key.ebs_shared.arn
 
   tags = merge(local.tags, {
     Name = "${local.component_name}-${local.env_label}-ebsapps-u01"
@@ -18,7 +18,7 @@ resource "aws_efs_mount_target" "ebsapps_u01" {
 
 resource "aws_efs_file_system" "ebsapps_stage" {
   encrypted  = true
-  kms_key_id = data.aws_kms_key.ebs_shared.key_id
+  kms_key_id = data.aws_kms_key.ebs_shared.arn
 
   tags = merge(local.tags, {
     Name = "${local.component_name}-${local.env_label}-ebsapps-stage"
