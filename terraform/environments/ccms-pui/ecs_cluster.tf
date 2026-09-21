@@ -154,3 +154,29 @@ resource "aws_ecs_service" "pui" {
     aws_autoscaling_group.cluster-scaling-group
   ]
 }
+
+# Scale on CPU usage
+resource "aws_appautoscaling_target" "pui" {
+  max_capacity       = local.application_data.accounts[local.environment].app_count + 2
+  min_capacity       = local.application_data.accounts[local.environment].app_count
+  resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.pui.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+resource "aws_appautoscaling_policy" "pui" {
+  name               = "${local.application_name}-cpu-scaling-policy"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.pui.resource_id
+  scalable_dimension = aws_appautoscaling_target.pui.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.pui.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+    target_value       = 0.05
+    scale_in_cooldown  = 300
+    scale_out_cooldown = 300
+  }
+}
