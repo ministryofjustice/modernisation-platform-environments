@@ -3209,7 +3209,7 @@ data "aws_iam_policy_document" "fms_validation_reporter" {
     ]
 
     resources = [
-      module.s3-metadata-bucket.bucket.arn,
+      module.s3-create-a-derived-table-bucket.bucket.arn,
     ]
   }
 
@@ -3222,17 +3222,8 @@ data "aws_iam_policy_document" "fms_validation_reporter" {
     ]
 
     resources = [
-      module.s3-metadata-bucket.bucket.arn,
+      module.s3-create-a-derived-table-bucket.bucket.arn,
     ]
-
-    condition {
-      test     = "StringLike"
-      variable = "s3:prefix"
-
-      values = [
-        "fms_validation_audit/*",
-      ]
-    }
   }
 
   statement {
@@ -3244,12 +3235,12 @@ data "aws_iam_policy_document" "fms_validation_reporter" {
     ]
 
     resources = [
-      "${module.s3-metadata-bucket.bucket.arn}/fms_validation_audit/*",
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/*",
     ]
   }
 
   statement {
-    sid    = "AllowUseOfMetadataBucketKmsKey"
+    sid    = "AllowUseOfCadtBucketKmsKey"
     effect = "Allow"
 
     actions = [
@@ -3257,7 +3248,7 @@ data "aws_iam_policy_document" "fms_validation_reporter" {
     ]
 
     resources = [
-      module.kms_metadata_key.key_arn,
+      "arn:aws:kms:eu-west-2:${local.env_account_id}:key/alias/aws/s3",
     ]
   }
 
