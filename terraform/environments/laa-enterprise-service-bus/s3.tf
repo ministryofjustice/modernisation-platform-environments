@@ -89,6 +89,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
       prefix = ""
     }
 
+    abort_incomplete_multipart_upload {
+      days_after_initiation = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload
+    }
+
     # Current Version Lifecycle
     expiration {
       days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
