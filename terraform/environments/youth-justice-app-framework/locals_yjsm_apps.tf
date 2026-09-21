@@ -70,19 +70,4 @@ locals {
       }
     }
   }
-
-  # Static private IP for the yjsm apps NLB, one +1 above the existing yjsm
-  # EC2 host's IP (yjsm.tf) in the same subnet (eu-west-2a) so it doesn't
-  # clash with it. TODO(OPS-1202): sanity-check these are actually free
-  # before apply - Terraform/AWS will only catch a clash at apply time.
-  yjsm_apps_nlb_private_ip = lookup(
-    {
-      development   = "10.26.144.62"
-      test          = "10.26.152.173"
-      preproduction = "10.27.144.84"
-      production    = "10.27.152.22"
-    },
-    local.environment,
-    null
-  )
 }
