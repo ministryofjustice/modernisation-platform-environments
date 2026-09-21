@@ -69,7 +69,7 @@ resource "aws_lakeformation_permissions" "table_all_permissions" {
 
 # Give the ap share policy role Glue permissions on the share resources
 data "aws_iam_policy_document" "analytical_platform_share_policy_ppud" {
-  for_each = local.is-test ? {} : local.analytical_platform_share 
+  for_each = local.is-test ? {} : local.analytical_platform_share
 
   statement {
     effect = "Allow"
@@ -94,7 +94,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy_ppud" {
 }
 
 resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment_ppud" {
-  for_each = local.is-test ? {} : local.analytical_platform_share 
+  for_each = local.is-test ? {} : local.analytical_platform_share
 
   name   = "${each.value.target_account_name}-share-policy-ppud"
   role   = data.aws_iam_role.analytical_platform_share_role[each.key].name
