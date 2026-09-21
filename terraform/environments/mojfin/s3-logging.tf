@@ -138,7 +138,7 @@ resource "aws_s3_bucket_policy" "logging_bucket_policy" {
         ]
         Condition = {
           ArnLike = {
-            "s3:SourceArn" = aws_s3_bucket.mojfin_oracle_rds.bucket.arn
+            "s3:SourceArn" = aws_s3_bucket.mojfin_rds_oracle.arn
           }
         }
       },
