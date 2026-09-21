@@ -81,7 +81,8 @@ resource "aws_s3_bucket_policy" "laa_oem_logging" {
         "Action" : "s3:*",
         "Resource" : [
           "${module.laa_oem_logging.bucket.arn}/*",
-        module.laa_oem_logging.bucket.arn],
+          module.laa_oem_logging.bucket.arn
+        ],
         "Condition" : {
           "Bool" : {
             "aws:SecureTransport" : "false"
@@ -100,9 +101,6 @@ resource "aws_s3_bucket_policy" "laa_oem_logging" {
           module.laa_oem_logging.bucket.arn
         ],
         Condition = {
-          Bool = {
-            "aws:SecureTransport" = "false"
-          }
           NumericLessThan = {
             "s3:TlsVersion" = "1.2"
           }
