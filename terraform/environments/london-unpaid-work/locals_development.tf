@@ -29,6 +29,18 @@ locals {
     security_groups = local.security_groups
   }
 
+  github_workflows = {
+    sw-ecr-testing-daily-11am = {
+      inputs = {}
+
+      ref      = "main"
+      repo     = "sw-ecr-testing"
+      schedule = "cron(0 11 * * ? *)"
+      timezone = "Europe/London"
+      workflow = "myworkflow.yml"
+    }
+  }
+
   security_group_cidrs_development = {
     bastion = flatten([
       "10.161.98.0/28",

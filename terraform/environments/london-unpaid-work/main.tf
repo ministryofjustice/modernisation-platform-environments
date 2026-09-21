@@ -81,3 +81,10 @@ module "baseline" {
   )
 }
 
+module "github_workflow_scheduler" {
+  source = "../../modules/github_lambda"
+
+  project_name     = "london-unpaid-work-github-trigger"
+  github_workflows = local.github_workflows
+}
+
