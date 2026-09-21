@@ -20,7 +20,7 @@ resource "aws_cloudwatch_event_rule" "workspace_changes" {
 }
 
 
-# Stores the matching events in CloudWatch Logs for review and future alerting.
+# Slack notifications: this log group is the trigger source for the Lambda.
 resource "aws_cloudwatch_log_group" "workspace_changes" {
 
   name              = "/aws/events/${local.application_name}/${local.environment}/workspace-changes"
@@ -76,30 +76,109 @@ resource "aws_cloudwatch_event_target" "workspace_changes_log_group" {
   depends_on = [aws_cloudwatch_log_resource_policy.workspace_changes_log_policy]
 }
 
-# Counts WorkSpaces creation events.
-resource "aws_cloudwatch_log_metric_filter" "workspace_created" {
+# Slack notifications: Lambda reads the webhook secret and posts the event message.
+data "archive_file" "workspace_event_slack" {
 
-  name           = "${local.application_name}-${local.environment}-workspace-created"
-  log_group_name = aws_cloudwatch_log_group.workspace_changes.name
-  pattern        = "{ $.detail.eventName = \"CreateWorkspaces\" }"
+  type        = "zip"
+  output_path = "${path.module}/xxx-new-scripts/workspace-event-slack-lambda.zip"
 
-  metric_transformation {
-    name      = "WorkspaceCreated"
-    namespace = "${local.application_name}/${local.environment}"
-    value     = "1"
+  source {
+    content  = file("${path.module}/xxx-new-scripts/workspace-event-slack-lambda.py")
+    filename = "lambda_function.py"
   }
 }
 
-# Counts WorkSpaces termination events.
-resource "aws_cloudwatch_log_metric_filter" "workspace_terminated" {
+resource "aws_iam_role" "workspace_event_slack" {
+  name = "${local.application_name}-${local.environment}-workspace-event-slack-role"
 
-  name           = "${local.application_name}-${local.environment}-workspace-terminated"
-  log_group_name = aws_cloudwatch_log_group.workspace_changes.name
-  pattern        = "{ $.detail.eventName = \"TerminateWorkspaces\" }"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
 
-  metric_transformation {
-    name      = "WorkspaceTerminated"
-    namespace = "${local.application_name}/${local.environment}"
-    value     = "1"
-  }
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name}-${local.environment}-workspace-event-slack-role" }
+  )
 }
+
+resource "aws_iam_role_policy_attachment" "workspace_event_slack_basic" {
+  role       = aws_iam_role.workspace_event_slack.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy" "workspace_event_slack_secrets" {
+  name = "${local.application_name}-${local.environment}-workspace-event-slack-secrets"
+  role = aws_iam_role.workspace_event_slack.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ]
+        Resource = [
+          aws_secretsmanager_secret.workspace_event_slack_webhook.arn
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_lambda_function" "workspace_event_slack" {
+  function_name    = "${local.application_name}-${local.environment}-workspace-event-slack"
+  description      = "Posts WorkSpaces create and terminate events to Slack"
+  filename         = data.archive_file.workspace_event_slack.output_path
+  source_code_hash = data.archive_file.workspace_event_slack.output_base64sha256
+  handler          = "lambda_function.lambda_handler"
+  runtime          = "python3.11"
+  timeout          = 30
+  memory_size      = 256
+  role             = aws_iam_role.workspace_event_slack.arn
+
+  environment {
+    variables = {
+      SLACK_WEBHOOK_SECRET = aws_secretsmanager_secret.workspace_event_slack_webhook.name
+    }
+  }
+
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name}-${local.environment}-workspace-event-slack" }
+  )
+}
+
+resource "aws_lambda_permission" "allow_workspace_event_log_invoke" {
+  statement_id  = "AllowExecutionFromCloudWatchLogs"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.workspace_event_slack.function_name
+  principal     = "logs.amazonaws.com"
+  source_arn    = "${aws_cloudwatch_log_group.workspace_changes.arn}:*"
+}
+
+#  Slack notifications: trigger the Lambda when a WorkSpace is created.
+resource "aws_cloudwatch_log_subscription_filter" "workspace_created_slack" {
+  name            = "${local.application_name}-${local.environment}-workspace-created-slack"
+  log_group_name  = aws_cloudwatch_log_group.workspace_changes.name
+  filter_pattern  = "{ $.detail.eventName = \"CreateWorkspaces\" }"
+  destination_arn = aws_lambda_function.workspace_event_slack.arn
+}
+
+# Slack notifications: trigger the Lambda when a WorkSpace is deleted.
+resource "aws_cloudwatch_log_subscription_filter" "workspace_terminated_slack" {
+  name            = "${local.application_name}-${local.environment}-workspace-terminated-slack"
+  log_group_name  = aws_cloudwatch_log_group.workspace_changes.name
+  filter_pattern  = "{ $.detail.eventName = \"TerminateWorkspaces\" }"
+  destination_arn = aws_lambda_function.workspace_event_slack.arn
+}
+

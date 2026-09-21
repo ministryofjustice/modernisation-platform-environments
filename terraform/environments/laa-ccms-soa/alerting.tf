@@ -331,7 +331,7 @@ resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure_managed" {
 #--Alerts NLB (Admin)
 resource "aws_cloudwatch_metric_alarm" "Admin_UnHealthy_Hosts" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-${local.environment}-admin-unhealthy-hosts-alarm"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | There is an unhealthy host in the target group ${aws_lb_target_group.admin.name} for over 15 minutes, this likely means that an admin host has failed to boot correctly"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There is an unhealthy host in the target group ${aws_lb_target_group.admin_https.name} for over 15 minutes, this likely means that an admin host has failed to boot correctly"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "UnHealthyHostCount"
   statistic           = "Average"
@@ -342,7 +342,7 @@ resource "aws_cloudwatch_metric_alarm" "Admin_UnHealthy_Hosts" {
   treat_missing_data  = "breaching"
   dimensions = {
     LoadBalancer = aws_lb.admin.arn_suffix
-    TargetGroup  = aws_lb_target_group.admin.arn_suffix
+    TargetGroup  = aws_lb_target_group.admin_https.arn_suffix
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
   ok_actions    = [aws_sns_topic.alerts.arn]
@@ -351,7 +351,7 @@ resource "aws_cloudwatch_metric_alarm" "Admin_UnHealthy_Hosts" {
 #--Alerts NLB (Managed)
 resource "aws_cloudwatch_metric_alarm" "Managed_UnHealthy_Hosts" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-${local.environment}-managed-unhealthy-hosts-alarm"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | There is an unhealthy host in the target group ${aws_lb_target_group.managed.name} for over 15 minutes, this likely means that a managed host has failed to boot correctly"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There is an unhealthy host in the target group ${aws_lb_target_group.managed_https.name} for over 15 minutes, this likely means that a managed host has failed to boot correctly"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "UnHealthyHostCount"
   statistic           = "Average"
@@ -362,7 +362,7 @@ resource "aws_cloudwatch_metric_alarm" "Managed_UnHealthy_Hosts" {
   treat_missing_data  = "breaching"
   dimensions = {
     LoadBalancer = aws_lb.managed.arn_suffix
-    TargetGroup  = aws_lb_target_group.managed.arn_suffix
+    TargetGroup  = aws_lb_target_group.managed_https.arn_suffix
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
   ok_actions    = [aws_sns_topic.alerts.arn]
@@ -447,7 +447,7 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_test_paths" {
   namespace           = "CCMS-SOA-APP"
   period              = "300"
   evaluation_periods  = "1"
-  threshold           = "5"
+  threshold           = "1"
   datapoints_to_alarm = "1"
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.alerts.arn]

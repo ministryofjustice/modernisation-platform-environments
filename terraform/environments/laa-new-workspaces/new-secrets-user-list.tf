@@ -18,6 +18,18 @@ resource "aws_secretsmanager_secret" "user_list" {
   )
 }
 
+#  Slack notifications: keep the incoming webhook URL out of code and load it at runtime.
+resource "aws_secretsmanager_secret" "workspace_event_slack_webhook" {
+  name                    = "${local.application_name}/${local.environment}/workspace-event-slack-webhook"
+  description             = "Slack incoming webhook URL for WorkSpaces create and delete notifications"
+  recovery_window_in_days = 0
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}/${local.environment}/workspace-event-slack-webhook" }
+  )
+}
+
 # Initial empty user list — content managed manually, ignore_changes prevents Terraform overwriting it
 resource "aws_secretsmanager_secret_version" "user_list_initial" {
 
@@ -198,9 +210,11 @@ resource "aws_lambda_permission" "eventbridge_user_lifecycle" {
 output "user_list_secret_arn" {
   value       = local.environment == "development" ? aws_secretsmanager_secret.user_list.arn : null
   description = "ARN of the user list secret"
+  sensitive   = true
 }
 
 output "user_list_update_command" {
   value       = local.environment == "development" ? "aws secretsmanager put-secret-value --secret-id ${aws_secretsmanager_secret.user_list.arn} --secret-string '{\"users\":[{\"username\":\"Bob.Smith\",\"firstname\":\"Bob\",\"lastname\":\"Smith\",\"email\":\"bob.smith@justice.gov.uk\"}]}' --region ${local.application_data.accounts[local.environment].region}" : null
   description = "Example command to update the user list"
+  sensitive   = true
 }

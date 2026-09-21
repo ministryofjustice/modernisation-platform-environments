@@ -18,6 +18,10 @@
     "essential": true,
     "environment": [
       {
+        "name": "JAVA_TOOL_OPTIONS",
+        "value": "${jvm_args}"
+      },
+      {
         "name": "SPRING_PROFILES_ACTIVE",
         "value": "${spring_profiles_active}"
       },      
