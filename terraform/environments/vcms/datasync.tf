@@ -60,10 +60,10 @@ resource "aws_datasync_task" "import_s3_to_efs" {
   options {
     bytes_per_second       = -1
     posix_permissions      = "PRESERVE"
-    uid                    = "PRESERVE"
-    gid                    = "PRESERVE"
+    uid                    = "INT_VALUE"
+    gid                    = "INT_VALUE"
     preserve_deleted_files = "PRESERVE"
-    verify_mode            = "POINT_IN_TIME_CONSISTENCY"
+    verify_mode = "POINT_IN_TIME_CONSISTENT"
   }
 }
 
