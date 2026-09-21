@@ -76,17 +76,17 @@ resource "aws_s3_bucket_policy" "logging_bucket_policy" {
     Statement = [
       # Defaults - Deny insecure transport and enforce TLSv1.2 or higher
       {
-        "Sid" : "DenyInsecureTransport",
-        "Effect" : "Deny",
-        "Principal" : "*",
-        "Action" : "s3:*",
-        "Resource" : [
+        Sid    = "DenyInsecureTransport",
+        Effect = "Deny",
+        Principal = "*",
+        Action = "s3:*",
+        Resource = [
           "${module.s3-bucket-logging.bucket.arn}/*",
           module.s3-bucket-logging.bucket.arn
         ],
-        "Condition" : {
-          "Bool" : {
-            "aws:SecureTransport" : "false"
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
           }
         }
       },
@@ -109,7 +109,7 @@ resource "aws_s3_bucket_policy" "logging_bucket_policy" {
       },
       # Per-Bucket Configurations
       {
-        Sid    = "AllowS3Logging Shared Bucket"
+        Sid    = "AllowS3Logging Shared Bucket",
         Effect = "Allow",
         Principal = {
           Service = "logging.s3.amazonaws.com"
@@ -118,7 +118,7 @@ resource "aws_s3_bucket_policy" "logging_bucket_policy" {
         Resource = [
           module.s3-bucket-logging.bucket.arn,
           "${module.s3-bucket-logging.bucket.arn}/*"
-        ]
+        ],
         Condition = {
           ArnLike = {
             "s3:SourceArn" = module.s3-bucket-shared.bucket.arn
@@ -126,7 +126,7 @@ resource "aws_s3_bucket_policy" "logging_bucket_policy" {
         }
       },
       {
-        Sid    = "AllowS3Logging Oracle RDS Bucket"
+        Sid    = "AllowS3Logging Oracle RDS Bucket",
         Effect = "Allow",
         Principal = {
           Service = "logging.s3.amazonaws.com"
@@ -135,7 +135,7 @@ resource "aws_s3_bucket_policy" "logging_bucket_policy" {
         Resource = [
           module.s3-bucket-logging.bucket.arn,
           "${module.s3-bucket-logging.bucket.arn}/*"
-        ]
+        ],
         Condition = {
           ArnLike = {
             "s3:SourceArn" = aws_s3_bucket.mojfin_rds_oracle.arn
