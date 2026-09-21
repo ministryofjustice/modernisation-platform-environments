@@ -56,7 +56,7 @@ module "cortex_xsiam_role" {
       actions = ["sts:AssumeRoleWithWebIdentity"]
       principals = [{
         type        = "Federated"
-        identifiers = [module.cortex_xsiam_oidc_provider[0].arn]
+        identifiers = [local.cortex_xsiam_oidc_principal]
       }]
       condition = [
         {
@@ -92,6 +92,11 @@ module "cortex_xsiam_role" {
         "s3:GetObjectVersion"
       ]
       resources = ["${module.s3_bucket[0].s3_bucket_arn}/*"]
+    }
+    S3List = {
+      effect    = "Allow"
+      actions   = ["s3:ListBucket"]
+      resources = [module.s3_bucket[0].s3_bucket_arn]
     }
     KMSRead = {
       effect    = "Allow"

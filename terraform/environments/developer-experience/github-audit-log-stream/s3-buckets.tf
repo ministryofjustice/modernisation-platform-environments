@@ -16,13 +16,28 @@ data "aws_iam_policy_document" "s3_bucket" {
     for_each = local.cortex_xsiam_enabled ? [1] : []
 
     content {
-      sid    = "AllowCortexXSIAMRead"
+      sid    = "AllowCortexXSIAMObjectRead"
       effect = "Allow"
       actions = [
         "s3:GetObject",
         "s3:GetObjectVersion"
       ]
       resources = ["arn:aws:s3:::${local.bucket_name}/*"]
+      principals {
+        type        = "AWS"
+        identifiers = [module.cortex_xsiam_role[0].arn]
+      }
+    }
+  }
+
+  dynamic "statement" {
+    for_each = local.cortex_xsiam_enabled ? [1] : []
+
+    content {
+      sid       = "AllowCortexXSIAMBucketList"
+      effect    = "Allow"
+      actions   = ["s3:ListBucket"]
+      resources = ["arn:aws:s3:::${local.bucket_name}"]
       principals {
         type        = "AWS"
         identifiers = [module.cortex_xsiam_role[0].arn]

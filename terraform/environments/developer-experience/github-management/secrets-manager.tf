@@ -21,3 +21,25 @@ module "github_app_secret" {
     { "credential-expiration" = "none" }
   )
 }
+
+module "entra_id_secret" {
+  count = local.is-production ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-secrets-manager.git?ref=d03382d3ec9c12b849fbbe35b770eaa047f7bbea" # v2.1.0
+
+  name        = "${local.component_name}/entra-id/octo-access"
+  description = "https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/19a2121a-58f2-463a-b986-5c51113a29b7"
+
+  secret_string = jsonencode({
+    client_id     = "CHANGEME"
+    client_secret = "CHANGEME"
+    secret_id     = "CHANGEME"
+    tenant_id     = "CHANGEME"
+  })
+  ignore_secret_changes = true
+
+  tags = merge(
+    local.tags,
+    { "credential-expiration" = "2026-10-22" }
+  )
+}
