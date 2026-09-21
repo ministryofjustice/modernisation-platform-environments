@@ -68,15 +68,23 @@ resource "aws_launch_template" "ec2-launch-template" {
 }
 
 resource "aws_autoscaling_group" "cluster-scaling-group" {
-  name                = "${local.application_name}-auto-scaling-group"
-  vpc_zone_identifier = data.aws_subnets.shared-private.ids
-  desired_capacity    = 2
-  max_size            = 3
-  min_size            = 2
+  name                    = "${local.application_name}-auto-scaling-group"
+  vpc_zone_identifier     = data.aws_subnets.shared-private.ids
+  desired_capacity        = 2
+  max_size                = 3
+  min_size                = 2
+  protect_from_scale_in   = true
+  default_instance_warmup = 300
 
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id
     version = "$Latest"
   }
 
+  # ECS managed scaling owns desired capacity at runtime. If Terraform resets it,
+  # ECS never issues its own scale-in action and therefore never removes scale-in
+  # protection from idle instances, leaving them running indefinitely.
+  lifecycle {
+    ignore_changes = [desired_capacity]
+  }
 }
