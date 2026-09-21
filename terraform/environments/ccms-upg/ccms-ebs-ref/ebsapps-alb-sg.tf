@@ -26,6 +26,15 @@ resource "aws_vpc_security_group_ingress_rule" "alb_https_mojo_devices" {
   cidr_ipv4         = local.application_data.accounts[local.environment].mojo_devices
 }
 
+resource "aws_vpc_security_group_ingress_rule" "alb_https_lz_aws_workspace" {
+  security_group_id = aws_security_group.ebsapps_alb.id
+  description       = "HTTPS from LZ AWS Workspace"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
+}
+
 resource "aws_vpc_security_group_egress_rule" "alb_to_apps" {
   security_group_id            = aws_security_group.ebsapps_alb.id
   description                  = "Traffic to EBS apps on application port"
