@@ -226,8 +226,6 @@ resource "aws_db_instance" "oracle" {
 }
 
 resource "aws_secretsmanager_secret" "dms_source" {
-  #checkov:skip=CKV2_AWS_57: This is a temporary integration-test secret populated by the Oracle setup Lambda and does not have an independent rotation lifecycle.
-
   name_prefix = "${var.name}-oracle-dms-source-"
   kms_key_id  = var.kms_key_arn
 

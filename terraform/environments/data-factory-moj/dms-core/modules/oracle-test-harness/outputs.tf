@@ -42,3 +42,23 @@ output "rds_instance_identifier" {
   description = "Identifier of the temporary Oracle RDS instance."
   value       = aws_db_instance.oracle.identifier
 }
+
+output "rotation_lambda_function_name" {
+  description = "Name of the Lambda function that rotates the Oracle DMS source credential."
+  value       = aws_lambda_function.rotation.function_name
+}
+
+output "dms_source_secret_id" {
+  description = "ID of the Secrets Manager secret used for Oracle DMS authentication."
+  value       = aws_secretsmanager_secret.dms_source.id
+}
+
+output "dms_source_secret_name" {
+  description = "Name of the Secrets Manager secret used for Oracle DMS authentication."
+  value       = aws_secretsmanager_secret.dms_source.name
+}
+
+output "rotation_lambda_function_arn" {
+  description = "ARN of the Lambda function that rotates the Oracle DMS source credential."
+  value       = aws_lambda_function.rotation.arn
+}
