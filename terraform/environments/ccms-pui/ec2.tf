@@ -79,4 +79,10 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
     version = "$Latest"
   }
 
+  tag {
+    key = "AmazonECSManaged"
+    value = ""
+    propagate_at_launch = true
+  }
+
 }
