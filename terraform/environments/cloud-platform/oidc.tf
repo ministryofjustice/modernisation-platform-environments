@@ -230,7 +230,9 @@ data "aws_iam_policy_document" "github_actions_development_cluster_oidc_policy" 
     ]
     resources = [
       "arn:aws:s3:::container-platform-*-fluentbit",
-      "arn:aws:s3:::container-platform-*-fluentbit/*"
+      "arn:aws:s3:::container-platform-*-fluentbit/*",
+      "arn:aws:s3:::cp-*-fluentbit",
+      "arn:aws:s3:::cp-*-fluentbit/*"
     ]
   }
 
