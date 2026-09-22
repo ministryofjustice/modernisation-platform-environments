@@ -94,6 +94,12 @@ resource "aws_lb_listener" "listener" {
     type             = "forward"
   }
 
+  lifecycle {
+    ignore_changes = [
+      default_action[0].target_group_arn
+    ]
+  }
+
   tags = merge(
     local.tags,
     {
@@ -102,7 +108,6 @@ resource "aws_lb_listener" "listener" {
   )
 }
 
-# Default is blue but aws_ssm_parameter.active_deployment_colour.value will be whatever the actual parameter value is
 resource "aws_ssm_parameter" "active_deployment_colour" {
   name   = "/delius-jitbit/blue-green-active-colour"
   type   = "SecureString"

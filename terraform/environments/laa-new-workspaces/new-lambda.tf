@@ -32,15 +32,16 @@ resource "aws_lambda_function" "user_creation" {
   environment {
     variables = {
       # Must point to Windows EC2 instance for domain-joined PowerShell execution
-      EC2_INSTANCE_ID       = aws_instance.user_creation_ec2.id
-      DIRECTORY_ID          = aws_directory_service_directory.workspaces_ad.id
-      BUNDLE_ID_STANDARD    = local.workspace_types["standard"].bundle_id
-      BUNDLE_ID_PERFORMANCE = local.workspace_types["performance"].bundle_id
-      BUNDLE_ID_POWER       = local.workspace_types["power"].bundle_id
-      KMS_KEY_ID            = aws_kms_key.ebs.arn
-      REGION                = local.application_data.accounts[local.environment].region
-      SES_SENDER            = data.terraform_remote_state.workspace_components.outputs.ses_sender_email
-      SELFSERVICE_URL       = "${data.terraform_remote_state.workspace_components.outputs.radius_portal_url}/selfservice-legacy/login"
+      EC2_INSTANCE_ID        = aws_instance.user_creation_ec2.id
+      DIRECTORY_ID           = aws_directory_service_directory.workspaces_ad.id
+      BUNDLE_ID_STANDARD     = local.workspace_types["standard"].bundle_id
+      BUNDLE_ID_PERFORMANCE  = local.workspace_types["performance"].bundle_id
+      BUNDLE_ID_POWER        = local.workspace_types["power"].bundle_id
+      BUNDLE_ID_DBA_STANDARD = local.workspace_types["dba_standard"].bundle_id
+      KMS_KEY_ID             = aws_kms_key.ebs.arn
+      REGION                 = local.application_data.accounts[local.environment].region
+      SES_SENDER             = data.terraform_remote_state.workspace_components.outputs.ses_sender_email
+      SELFSERVICE_URL        = "${data.terraform_remote_state.workspace_components.outputs.radius_portal_url}/selfservice-legacy/login"
     }
   }
 
@@ -79,14 +80,17 @@ resource "aws_cloudwatch_log_group" "user_creation_lambda" {
 output "user_creation_lambda_function_name" {
   value       = local.environment == "development" ? aws_lambda_function.user_creation.function_name : null
   description = "Lambda function name for user creation"
+  sensitive   = true
 }
 
 output "user_creation_lambda_arn" {
   value       = local.environment == "development" ? aws_lambda_function.user_creation.arn : null
   description = "Lambda function ARN for user creation"
+  sensitive   = true
 }
 
 output "user_creation_invoke_command" {
   value       = local.environment == "development" ? "aws lambda invoke --function-name ${aws_lambda_function.user_creation.function_name} --payload '{\"Firstname\":\"John\",\"Lastname\":\"Doe\",\"Email\":\"john.doe@justice.gov.uk\"}' --region ${local.application_data.accounts[local.environment].region} output.txt --cli-binary-format raw-in-base64-out" : null
   description = "Example command to invoke user creation Lambda"
+  sensitive   = true
 }

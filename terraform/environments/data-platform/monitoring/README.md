@@ -292,4 +292,4 @@ Drop a dashboard JSON into the relevant subdirectory of `src/helm/dashboards/` (
 `grafana_dashboard_folders` in `locals.tf` and create the matching subdirectory.
 
 Dashboards (and alert rules) are only pushed to Grafana once `grafana_dashboards_enabled` is `true` for the environment and a valid
-Grafana service-account token has been populated in Secrets Manager — see the comments in `locals.tf` and `environment-configuration.tf`.
+Grafana service-account token has been populated in Secrets Manager — see the comments in `locals.tf` and `environment-configuration.tf`

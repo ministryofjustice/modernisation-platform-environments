@@ -44,8 +44,8 @@ resource "grafana_rule_group" "this" {
           ref_id         = data.value.refId
           datasource_uid = data.value.datasourceUid
 
-          model = sensitive(jsonencode(data.value.model))
-          query_type = try(data.value.model.queryType,null)
+          model      = sensitive(jsonencode(data.value.model))
+          query_type = try(data.value.model.queryType, null)
 
           relative_time_range {
             from = data.value.relativeTimeRange.from

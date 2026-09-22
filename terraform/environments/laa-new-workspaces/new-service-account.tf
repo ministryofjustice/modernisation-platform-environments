@@ -199,9 +199,11 @@ resource "terraform_data" "lambda_service_account_group_membership" {
 output "lambda_service_account_created" {
   value       = local.environment == "development" ? "lambda.workspace service account created and added to AWS Delegated Administrators group" : "Not in development environment"
   description = "Status of lambda.workspace service account creation"
+  sensitive   = true
 }
 
 output "lambda_service_account_manual_group_add" {
   value       = local.environment == "development" ? "If group membership failed, run: aws ds-data add-group-member --directory-id ${aws_directory_service_directory.workspaces_ad.id} --group-name 'AWS Delegated Administrators' --member-name lambda.workspace --region eu-west-2" : null
   description = "Manual command to add lambda.workspace to admin group if automated method fails"
+  sensitive   = true
 }
