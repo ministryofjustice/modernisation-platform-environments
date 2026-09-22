@@ -8,6 +8,8 @@ locals {
   baseline_development = {
     ec2_instances = local.ec2_instances
 
+    ec2_autoscaling_groups = local.ec2_autoscaling_groups
+
     lbs = {
       api-alb = local.lbs.api-alb,
       web-alb = local.lbs.web-alb

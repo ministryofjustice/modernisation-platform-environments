@@ -79,5 +79,10 @@ module "baseline" {
     lookup(local.baseline_all_environments, "iam_policies", {}),
     lookup(local.baseline_environment_specific, "iam_policies", {}),
   )
+
+  ec2_autoscaling_groups = merge(
+    lookup(local.baseline_all_environments, "ec2_autoscaling_groups", {}),
+    lookup(local.baseline_environment_specific, "ec2_autoscaling_groups", {}),
+  )
 }
 
