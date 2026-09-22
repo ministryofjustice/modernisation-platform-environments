@@ -74,9 +74,7 @@ resource "aws_ecs_service" "edrms" {
   desired_count   = local.application_data.accounts[local.environment].app_count
   launch_type     = "EC2"
 
-  # Temporary: dev/test state still has capacity_provider_strategy set from
-  # earlier testing. Required to converge the service back to launch_type.
-  # Safe to remove once dev/test have applied this successfully.
+
   force_new_deployment = true
 
   health_check_grace_period_seconds = 120
