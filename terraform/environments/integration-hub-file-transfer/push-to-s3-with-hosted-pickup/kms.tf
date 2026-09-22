@@ -88,5 +88,32 @@ module "kms_hosted_pickup" {
   key_administrators = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
   key_users          = [module.iam_role_mover[each.key].arn]
 
+  key_statements = [
+    {
+      sid = "AllowCustomerPickupDecryption"
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+      ]
+      resources = ["*"]
+      principals = [{
+        type        = "AWS"
+        identifiers = [module.iam_role_customer_pickup[each.key].arn]
+      }]
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["s3.eu-west-2.amazonaws.com"]
+        },
+        {
+          test     = "StringEquals"
+          variable = "kms:EncryptionContext:aws:s3:arn"
+          values   = ["arn:aws:s3:::${local.hosted_bucket_names[each.key]}"]
+        },
+      ]
+    },
+  ]
+
   tags = local.tags
 }

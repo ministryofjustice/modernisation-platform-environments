@@ -9,6 +9,7 @@ output "hosted_pickup_destinations" {
       retention_days     = local.hosted_pickup_entries[entry_id].action.push_to_s3_with_hosted_pickup.retention_days
       kms_key_arn        = module.kms_hosted_pickup[entry_id].key_arn
       mover_role_arn     = role.arn
+      pickup_role_arn    = module.iam_role_customer_pickup[entry_id].arn
     }
   }
 }

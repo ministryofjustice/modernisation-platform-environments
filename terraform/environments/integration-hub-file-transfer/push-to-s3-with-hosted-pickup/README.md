@@ -61,9 +61,12 @@ Each selected dispatch entry receives resources named from its stable 12-charact
 Bucket:     ihft-<environment>-hosted-pickup-<account-id>-<entry-id>
 KMS alias: alias/s3/ihft-<environment>-hosted-pickup-<account-id>-<entry-id>
 Mover role: ihft-<environment>-hosted-pickup-<entry-id>
+Customer role: ihft-<environment>-hosted-pickup-customer-<entry-id>
 ```
 
 The Lambda execution role cannot read the clean bucket or write hosted objects. It can read only selected dispatch secrets and assume only the mapped mover roles. Each mover role trusts only the predictable shared Lambda execution role, reads only its configured clean source prefix, copies the exact event `VersionId`, writes only its own destination prefix, and uses only the clean source key plus its dedicated hosted key. It has no permissions for another entry's hosted bucket or KMS key.
+
+Each customer role can list only its configured destination prefix, read current and versioned objects from that prefix, and decrypt them only through S3 using that bucket's dedicated KMS key. It cannot write, delete, or read another entry's files.
 
 Every hosted bucket is a general purpose S3 bucket with bucket-owner-enforced ownership, no ACLs, all public access blocked, versioning, SSE-KMS with an S3 Bucket Key, TLS enforcement, and denial of missing or incorrect encryption headers and KMS keys. Its lifecycle expires current and noncurrent versions after `retention_days` and aborts incomplete multipart uploads after one day.
 
@@ -71,9 +74,11 @@ Every hosted bucket is a general purpose S3 bucket with bucket-owner-enforced ow
 
 Each entry creates a dedicated S3 bucket, customer-managed KMS key, IAM role and policy. Costs include S3 storage and requests, KMS key and API usage, Lambda, EventBridge, SNS, SQS, DynamoDB and CloudWatch Logs. Versioning means overwritten or deleted objects remain billable as noncurrent versions until lifecycle expiry. Lifecycle expiration is asynchronous, so objects and charges can remain briefly after their configured expiry date. Longer retention periods directly increase stored byte-days; incomplete multipart uploads are limited by the one-day abort rule.
 
-## Deferred customer pickup role
+## Customer access
 
-No externally assumable customer pickup or read role is created. The trusted principal contract for the retrieving workload has not been agreed, so adding a trust policy now would require an unsafe permissive placeholder. Once the customer principal contract is agreed, add a dedicated read-only role per entry with trust restricted to that exact principal and permissions restricted to that entry's bucket, destination prefix and KMS key.
+A read-only customer role is created for each hosted pickup bucket, but its trust policy explicitly denies all role assumption. This gives us stable role ARNs to share during onboarding without making the files accessible before the customer identity has been agreed.
+
+To enable access, replace the deny-all trust statement with an allow statement for the customer's exact IAM role. For an account in our AWS organisation, also constrain the trust with `aws:PrincipalOrgID`. For an account outside the organisation, agree an opaque external ID with the customer and require it with `sts:ExternalId`. An external ID helps prevent confused-deputy attacks, but it is not treated as a password or stored as a secret.
 
 ## Deployment order
 
