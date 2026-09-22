@@ -80,6 +80,12 @@ module "baseline" {
     lookup(local.baseline_environment_specific, "iam_policies", {}),
   )
 
+  kms_grants = merge(
+    module.baseline_presets.kms_grants,
+    lookup(local.baseline_all_environments, "kms_grants", {}),
+    lookup(local.baseline_environment_specific, "kms_grants", {}),
+  )
+
   ec2_autoscaling_groups = merge(
     lookup(local.baseline_all_environments, "ec2_autoscaling_groups", {}),
     lookup(local.baseline_environment_specific, "ec2_autoscaling_groups", {}),
