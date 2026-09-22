@@ -64,6 +64,30 @@ data "aws_iam_policy_document" "bedrock_logs_kms" {
       values   = [data.aws_caller_identity.current.account_id]
     }
   }
+
+  statement {
+    sid    = "AllowCloudWatchLogs"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt*",
+      "kms:Decrypt*",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:Describe*",
+    ]
+    resources = ["*"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["logs.${local.bedrock_logging_region}.amazonaws.com"]
+    }
+
+    condition {
+      test     = "ArnLike"
+      variable = "kms:EncryptionContext:aws:logs:arn"
+      values   = ["arn:aws:logs:${local.bedrock_logging_region}:${data.aws_caller_identity.current.account_id}:log-group:*"]
+    }
+  }
 }
 
 resource "aws_kms_key" "bedrock_logs" {
@@ -168,6 +192,55 @@ resource "aws_s3_bucket_policy" "bedrock_logs" {
   policy = data.aws_iam_policy_document.bedrock_logs.json
 }
 
+resource "aws_cloudwatch_log_group" "bedrock_logs" {
+  #checkov:skip=CKV_AWS_338: "Records contain prompt and source code content, retained for 90 days to match the S3 lifecycle"
+  region            = local.bedrock_logging_region
+  name              = "/aws/bedrock/modelinvocations"
+  retention_in_days = local.bedrock_log_retention_days
+  kms_key_id        = aws_kms_key.bedrock_logs.arn
+}
+
+data "aws_iam_policy_document" "bedrock_logs_assume_role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["bedrock.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = ["arn:aws:bedrock:${local.bedrock_logging_region}:${data.aws_caller_identity.current.account_id}:*"]
+    }
+  }
+}
+
+resource "aws_iam_role" "bedrock_logs" {
+  name               = "BedrockInvocationLogging"
+  assume_role_policy = data.aws_iam_policy_document.bedrock_logs_assume_role.json
+}
+
+data "aws_iam_policy_document" "bedrock_logs_delivery" {
+  statement {
+    actions   = ["logs:CreateLogStream", "logs:PutLogEvents"]
+    resources = ["${aws_cloudwatch_log_group.bedrock_logs.arn}:log-stream:aws/bedrock/modelinvocations"]
+  }
+}
+
+resource "aws_iam_role_policy" "bedrock_logs" {
+  name   = "BedrockInvocationLogging"
+  role   = aws_iam_role.bedrock_logs.id
+  policy = data.aws_iam_policy_document.bedrock_logs_delivery.json
+}
+
 resource "aws_bedrock_model_invocation_logging_configuration" "this" {
   region = local.bedrock_logging_region
 
@@ -180,6 +253,17 @@ resource "aws_bedrock_model_invocation_logging_configuration" "this" {
     s3_config {
       bucket_name = aws_s3_bucket.bedrock_logs.id
       key_prefix  = "invocation-logs"
+    }
+
+    cloudwatch_config {
+      log_group_name = aws_cloudwatch_log_group.bedrock_logs.name
+      role_arn       = aws_iam_role.bedrock_logs.arn
+
+      # Bodies over 100KB are delivered here instead of inline in the log event
+      large_data_delivery_s3_config {
+        bucket_name = aws_s3_bucket.bedrock_logs.id
+        key_prefix  = "large-data"
+      }
     }
   }
 
