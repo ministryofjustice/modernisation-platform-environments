@@ -10,7 +10,7 @@ locals {
   }
 
   mover_role_arns_by_secret = {
-    for entry_id, secret in data.aws_secretsmanager_secret.file_dispatch :
-    secret.arn => module.iam_role_mover[entry_id].arn
+    for entry_id, secret_arn_prefix in local.hosted_pickup_secret_arn_prefixes :
+    secret_arn_prefix => module.iam_role_mover[entry_id].arn
   }
 }

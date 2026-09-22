@@ -31,7 +31,7 @@ locals {
     production    = {}
   }
 
-  entries = merge([
+  entries = merge({}, [
     for identity, prefixes in local.file_dispatch_prefixes[var.environment] : {
       for source_prefix, configuration in prefixes :
       substr(sha256("${identity}:${source_prefix}"), 0, 12) => {

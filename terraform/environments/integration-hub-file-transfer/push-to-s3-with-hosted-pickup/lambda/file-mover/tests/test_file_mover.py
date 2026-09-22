@@ -14,6 +14,7 @@ from file_mover import (
 )
 
 SECRET_ARN = "arn:aws:secretsmanager:eu-west-2:123456789012:secret:dispatch-AbCdEf"
+SECRET_ARN_PREFIX = "arn:aws:secretsmanager:eu-west-2:123456789012:secret:dispatch-"
 ROLE_ARN = "arn:aws:iam::123456789012:role/ihft-development-hosted-pickup-entry"
 KMS_KEY_ARN = "arn:aws:kms:eu-west-2:123456789012:key/hosted-key"
 
@@ -109,7 +110,7 @@ def mover(secrets=None):
         events=events,
         mover_client_factory=mover_factory,
         authorised_destination_map={
-            SECRET_ARN: {
+            SECRET_ARN_PREFIX: {
                 "bucket": "ihft-development-hosted-pickup-entry",
                 "region": "eu-west-2",
                 "destination_prefix": "pickup/",
@@ -117,8 +118,8 @@ def mover(secrets=None):
                 "kms_key_arn": KMS_KEY_ARN,
             }
         },
-        mover_role_map={SECRET_ARN: ROLE_ARN},
-        source_prefix_map={SECRET_ARN: "identity/"},
+        mover_role_map={SECRET_ARN_PREFIX: ROLE_ARN},
+        source_prefix_map={SECRET_ARN_PREFIX: "identity/"},
         event_bus_name="integration-hub-file-transfer",
         supported_region="eu-west-2",
     )
@@ -214,8 +215,8 @@ def test_rejects_mismatched_authorisation_maps():
             events=events,
             mover_client_factory=lambda **_: None,
             authorised_destination_map={},
-            mover_role_map={SECRET_ARN: ROLE_ARN},
-            source_prefix_map={SECRET_ARN: "identity/"},
+            mover_role_map={SECRET_ARN_PREFIX: ROLE_ARN},
+            source_prefix_map={SECRET_ARN_PREFIX: "identity/"},
             event_bus_name="integration-hub-file-transfer",
             supported_region="eu-west-2",
         )

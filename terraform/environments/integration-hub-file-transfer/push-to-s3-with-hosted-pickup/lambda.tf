@@ -67,7 +67,7 @@ module "lambda_file_mover" {
     read_dispatch_configuration = {
       effect    = "Allow"
       actions   = ["secretsmanager:GetSecretValue"]
-      resources = [for secret in data.aws_secretsmanager_secret.file_dispatch : secret.arn]
+      resources = [for secret_arn_prefix in values(local.hosted_pickup_secret_arn_prefixes) : "${secret_arn_prefix}??????"]
     }
     decrypt_dispatch_configuration = {
       effect    = "Allow"

@@ -17,9 +17,14 @@ locals {
     entry_id => "${local.file_dispatch_secret_name_prefix}${entry.identity}${entry.source_prefix}"
   }
 
+  push_to_s3_secret_arn_prefixes = {
+    for entry_id, secret_name in local.push_to_s3_secret_names :
+    entry_id => "arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:${secret_name}-"
+  }
+
   authorised_destinations_by_secret = {
-    for entry_id, secret in data.aws_secretsmanager_secret.file_dispatch :
-    secret.arn => {
+    for entry_id, secret_arn_prefix in local.push_to_s3_secret_arn_prefixes :
+    secret_arn_prefix => {
       bucket             = local.push_to_s3_entries[entry_id].action.push_to_s3.bucket_id
       region             = try(local.push_to_s3_entries[entry_id].action.push_to_s3.bucket_region, "eu-west-2")
       destination_prefix = local.push_to_s3_entries[entry_id].action.push_to_s3.destination_prefix
@@ -28,7 +33,7 @@ locals {
   }
 
   source_prefixes_by_secret = {
-    for entry_id, secret in data.aws_secretsmanager_secret.file_dispatch :
-    secret.arn => "${local.push_to_s3_entries[entry_id].identity}${local.push_to_s3_entries[entry_id].source_prefix}"
+    for entry_id, secret_arn_prefix in local.push_to_s3_secret_arn_prefixes :
+    secret_arn_prefix => "${local.push_to_s3_entries[entry_id].identity}${local.push_to_s3_entries[entry_id].source_prefix}"
   }
 }

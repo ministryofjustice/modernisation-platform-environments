@@ -1,4 +1,5 @@
 import json
+import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
@@ -188,6 +189,15 @@ def destination_key(source_key, source_prefix, destination_prefix):
     return f"{destination_prefix}{source_key[len(source_prefix):]}"
 
 
+def authorised_secret_prefix(secret_arn, authorised_prefixes):
+    matches = [
+        prefix
+        for prefix in authorised_prefixes
+        if re.fullmatch(rf"{re.escape(prefix)}[A-Za-z0-9]{{6}}", secret_arn)
+    ]
+    return matches[0] if len(matches) == 1 else None
+
+
 def _is_transient(error):
     if isinstance(error, BotoCoreError):
         return True
@@ -323,9 +333,12 @@ class FileMover:
         return detail["data"]["status"]
 
     def _deliver(self, request):
-        role_arn = self.mover_role_map.get(request.secret_arn)
-        source_prefix = self.source_prefix_map.get(request.secret_arn)
-        authorised_destination = self.authorised_destination_map.get(request.secret_arn)
+        secret_prefix = authorised_secret_prefix(
+            request.secret_arn, self.authorised_destination_map
+        )
+        role_arn = self.mover_role_map.get(secret_prefix)
+        source_prefix = self.source_prefix_map.get(secret_prefix)
+        authorised_destination = self.authorised_destination_map.get(secret_prefix)
         if role_arn is None or source_prefix is None or authorised_destination is None:
             raise TerminalFailure("UNAUTHORISED_CONFIGURATION", "The dispatch configuration is not authorised")
 

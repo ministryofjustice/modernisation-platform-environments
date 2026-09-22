@@ -17,9 +17,3 @@ data "aws_kms_key" "secrets" {
 data "aws_kms_key" "logs" {
   key_id = local.logs_kms_key_alias
 }
-
-data "aws_secretsmanager_secret" "file_dispatch" {
-  for_each = local.push_to_s3_secret_names
-
-  name = each.value
-}

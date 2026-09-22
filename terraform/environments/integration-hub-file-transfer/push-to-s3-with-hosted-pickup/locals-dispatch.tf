@@ -17,14 +17,19 @@ locals {
     entry_id => "${local.file_dispatch_secret_name_prefix}${entry.identity}${entry.source_prefix}"
   }
 
+  hosted_pickup_secret_arn_prefixes = {
+    for entry_id, secret_name in local.hosted_pickup_secret_names :
+    entry_id => "arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:${secret_name}-"
+  }
+
   source_prefixes_by_secret = {
-    for entry_id, secret in data.aws_secretsmanager_secret.file_dispatch :
-    secret.arn => "${local.hosted_pickup_entries[entry_id].identity}${local.hosted_pickup_entries[entry_id].source_prefix}"
+    for entry_id, secret_arn_prefix in local.hosted_pickup_secret_arn_prefixes :
+    secret_arn_prefix => "${local.hosted_pickup_entries[entry_id].identity}${local.hosted_pickup_entries[entry_id].source_prefix}"
   }
 
   authorised_destinations_by_secret = {
-    for entry_id, secret in data.aws_secretsmanager_secret.file_dispatch :
-    secret.arn => {
+    for entry_id, secret_arn_prefix in local.hosted_pickup_secret_arn_prefixes :
+    secret_arn_prefix => {
       bucket             = local.hosted_bucket_names[entry_id]
       region             = "eu-west-2"
       destination_prefix = local.hosted_pickup_entries[entry_id].action.push_to_s3_with_hosted_pickup.destination_prefix
