@@ -44,7 +44,8 @@ module "iam_role" {
       actions = ["secretsmanager:GetSecretValue"]
       resources = [
         module.github_app_secret[0].secret_arn,
-        module.entra_id_secret[0].secret_arn
+        module.octo_access_entra_id_secret[0].secret_arn,
+        module.octo_access_slack_secret[0].secret_arn
       ]
     }
   }
