@@ -86,9 +86,9 @@ locals {
   delius_microservices_configs_preprod = {
 
     weblogic = {
-      ec2_instance_type        = "r7i.xlarge"
-      asg_min_size             = 7
-      asg_max_size             = 7
+      ec2_instance_type = "r7i.xlarge"
+      asg_min_size      = 7
+      asg_max_size      = 7
     }
 
     weblogic_eis = {
