@@ -56,7 +56,7 @@ module "octo_access_iam_role" {
 
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=ba3fd6ded6911e0454092147fe3704171cc05e00" # v6.8.1
 
-  name            = local.component_name
+  name            = "octo-access"
   use_name_prefix = false
 
   enable_github_oidc = true
