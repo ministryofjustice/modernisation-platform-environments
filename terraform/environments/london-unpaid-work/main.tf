@@ -69,11 +69,6 @@ module "baseline" {
     lookup(local.baseline_environment_specific, "security_groups", {}),
   )
 
-  ec2_instances = merge(
-    lookup(local.baseline_all_environments, "ec2_instances", {}),
-    lookup(local.baseline_environment_specific, "ec2_instances", {}),
-  )
-
   iam_policies = merge(
     module.baseline_presets.iam_policies,
     lookup(local.baseline_all_environments, "iam_policies", {}),
