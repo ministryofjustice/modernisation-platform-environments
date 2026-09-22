@@ -13,12 +13,12 @@
       "bastion_bucket_suffix": "wrfsv5",
       "engine_version": "19.0.0.0.ru-2026-07.mrp-2026-07.r1",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
-      "s3_lifecycle_days_expiration_current": 730,
-      "s3_lifecycle_days_expiration_noncurrent": 730,
-      "s3_lifecycle_days_transition_current_glacier": 365,
-      "s3_lifecycle_days_transition_current_standard": 90,
-      "s3_lifecycle_days_transition_noncurrent_glacier": 365,
-      "s3_lifecycle_days_transition_noncurrent_standard": 90
+      "s3_lifecycle_days_expiration_current": 366,
+      "s3_lifecycle_days_expiration_noncurrent": 366,
+      "s3_lifecycle_days_transition_current_glacier": 31,
+      "s3_lifecycle_days_transition_current_standard": 1,
+      "s3_lifecycle_days_transition_noncurrent_glacier": 31,
+      "s3_lifecycle_days_transition_noncurrent_standard": 1
     },
     "test": {
       "landing_zone_vpc_cidr": "test-data",
@@ -37,12 +37,12 @@
       "bastion_bucket_suffix": "wzjars",
       "engine_version": "19.0.0.0.ru-2026-07.mrp-2026-07.r1",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
-      "s3_lifecycle_days_expiration_current": 730,
-      "s3_lifecycle_days_expiration_noncurrent": 730,
-      "s3_lifecycle_days_transition_current_glacier": 365,
-      "s3_lifecycle_days_transition_current_standard": 90,
-      "s3_lifecycle_days_transition_noncurrent_glacier": 365,
-      "s3_lifecycle_days_transition_noncurrent_standard": 90
+      "s3_lifecycle_days_expiration_current": 366,
+      "s3_lifecycle_days_expiration_noncurrent": 366,
+      "s3_lifecycle_days_transition_current_glacier": 31,
+      "s3_lifecycle_days_transition_current_standard": 1,
+      "s3_lifecycle_days_transition_noncurrent_glacier": 31,
+      "s3_lifecycle_days_transition_noncurrent_standard": 1
     },
     "production": {
       "landing_zone_vpc_cidr": "10.205.0.0/20",
@@ -56,12 +56,12 @@
       "bastion_bucket_suffix": "7mxtlk",
       "engine_version": "19.0.0.0.ru-2026-07.mrp-2026-07.r1",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
-      "s3_lifecycle_days_expiration_current": 730,
-      "s3_lifecycle_days_expiration_noncurrent": 730,
-      "s3_lifecycle_days_transition_current_glacier": 365,
-      "s3_lifecycle_days_transition_current_standard": 90,
-      "s3_lifecycle_days_transition_noncurrent_glacier": 365,
-      "s3_lifecycle_days_transition_noncurrent_standard": 90
+      "s3_lifecycle_days_expiration_current": 366,
+      "s3_lifecycle_days_expiration_noncurrent": 366,
+      "s3_lifecycle_days_transition_current_glacier": 31,
+      "s3_lifecycle_days_transition_current_standard": 1,
+      "s3_lifecycle_days_transition_noncurrent_glacier": 31,
+      "s3_lifecycle_days_transition_noncurrent_standard": 1
     }
   }
 }
