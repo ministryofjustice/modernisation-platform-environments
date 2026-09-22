@@ -243,6 +243,7 @@ resource "aws_secretsmanager_secret_rotation" "oracle_dms_source" {
 
   secret_id           = module.oracle_test_harness[0].dms_source_secret_id
   rotation_lambda_arn = module.oracle_test_harness[0].rotation_lambda_function_arn
+  rotate_immediately  = false
 
   rotation_rules {
     automatically_after_days = 7
