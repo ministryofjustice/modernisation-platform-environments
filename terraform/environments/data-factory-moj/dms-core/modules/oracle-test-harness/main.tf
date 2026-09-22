@@ -226,6 +226,8 @@ resource "aws_db_instance" "oracle" {
 }
 
 resource "aws_secretsmanager_secret" "dms_source" {
+  #checkov:skip=CKV2_AWS_57: Rotation is configured by the root dms-core component after the DMS endpoint and preflight event target exist.
+
   name_prefix = "${var.name}-oracle-dms-source-"
   kms_key_id  = var.kms_key_arn
 
