@@ -52,7 +52,7 @@ When no hosted pickup entries are configured, the shared pipeline still deploys 
 Shared pipeline resources use this base name:
 
 ```text
-ihft-<environment>-push-to-s3-hosted-pickup
+integration-hub-file-transfer-push-to-s3-with-hosted-pickup
 ```
 
 Each selected dispatch entry receives resources named from its stable 12-character entry ID:
