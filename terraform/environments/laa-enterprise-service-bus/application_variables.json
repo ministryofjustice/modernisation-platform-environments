@@ -12,12 +12,12 @@
       "cclf_rds_role_arn": "arn:aws:iam::754256621582:role/rds-hub20-s3-access",
       "ccr_rds_role_arn": "arn:aws:iam::754256621582:role/ccr-rds-hub20-s3-access",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
-      "s3_lifecycle_days_expiration_current": 730,
-      "s3_lifecycle_days_expiration_noncurrent": 730,
-      "s3_lifecycle_days_transition_current_glacier": 365,
-      "s3_lifecycle_days_transition_current_standard": 90,
-      "s3_lifecycle_days_transition_noncurrent_glacier": 365,
-      "s3_lifecycle_days_transition_noncurrent_standard": 90
+      "s3_lifecycle_days_expiration_current": 366,
+      "s3_lifecycle_days_expiration_noncurrent": 366,
+      "s3_lifecycle_days_transition_current_glacier": 31,
+      "s3_lifecycle_days_transition_current_standard": 1,
+      "s3_lifecycle_days_transition_noncurrent_glacier": 31,
+      "s3_lifecycle_days_transition_noncurrent_standard": 1
     },
     "test": {
       "cwa_database_ip": ["10.206.1.60/32"],
@@ -31,12 +31,12 @@
       "cclf_rds_role_arn": "arn:aws:iam::754256621582:role/cclf-rds-hub20-uat-s3-access",
       "ccr_rds_role_arn": "arn:aws:iam::754256621582:role/ccr-rds-hub20-uat-s3-access",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
-      "s3_lifecycle_days_expiration_current": 730,
-      "s3_lifecycle_days_expiration_noncurrent": 730,
-      "s3_lifecycle_days_transition_current_glacier": 365,
-      "s3_lifecycle_days_transition_current_standard": 90,
-      "s3_lifecycle_days_transition_noncurrent_glacier": 365,
-      "s3_lifecycle_days_transition_noncurrent_standard": 90
+      "s3_lifecycle_days_expiration_current": 366,
+      "s3_lifecycle_days_expiration_noncurrent": 366,
+      "s3_lifecycle_days_transition_current_glacier": 31,
+      "s3_lifecycle_days_transition_current_standard": 1,
+      "s3_lifecycle_days_transition_noncurrent_glacier": 31,
+      "s3_lifecycle_days_transition_noncurrent_standard": 1
     },
     "preproduction": {
       "example_var": "preproduction-data"
@@ -53,12 +53,12 @@
       "cclf_rds_role_arn": "arn:aws:iam::754256621582:role/cclf-rds-hub20-prod-s3-access",
       "ccr_rds_role_arn": "arn:aws:iam::754256621582:role/ccr-rds-hub20-prod-s3-access",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
-      "s3_lifecycle_days_expiration_current": 730,
-      "s3_lifecycle_days_expiration_noncurrent": 730,
-      "s3_lifecycle_days_transition_current_glacier": 365,
-      "s3_lifecycle_days_transition_current_standard": 90,
-      "s3_lifecycle_days_transition_noncurrent_glacier": 365,
-      "s3_lifecycle_days_transition_noncurrent_standard": 90
+      "s3_lifecycle_days_expiration_current": 366,
+      "s3_lifecycle_days_expiration_noncurrent": 366,
+      "s3_lifecycle_days_transition_current_glacier": 31,
+      "s3_lifecycle_days_transition_current_standard": 1,
+      "s3_lifecycle_days_transition_noncurrent_glacier": 31,
+      "s3_lifecycle_days_transition_noncurrent_standard": 1
     }
   }
 }
