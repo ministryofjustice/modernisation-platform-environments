@@ -4,7 +4,7 @@ locals {
 }
 
 resource "aws_db_instance" "mariadb" {
-  identifier             = "vcms"
+  identifier             = "vcms-${local.environment}"
   snapshot_identifier    = local.app_config.db_snapshot_identifier
   allocated_storage      = 200
   db_name                = local.db_name
@@ -19,7 +19,7 @@ resource "aws_db_instance" "mariadb" {
   skip_final_snapshot    = true
   storage_encrypted      = true
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
