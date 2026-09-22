@@ -1,4 +1,7 @@
-# Finds WorkSpaces create and terminate events from CloudTrail.
+######################################
+### EventBridge Rules
+######################################
+
 resource "aws_cloudwatch_event_rule" "workspace_changes" {
 
   name        = "${local.application_name}-${local.environment}-workspace-changes"
@@ -20,7 +23,11 @@ resource "aws_cloudwatch_event_rule" "workspace_changes" {
 }
 
 
-# Slack notifications: this log group is the trigger source for the Lambda.
+######################################
+### WorkSpaces CloudWatch Logs
+######################################
+
+# Stores WorkSpaces events and provides the source for the Slack subscription.
 resource "aws_cloudwatch_log_group" "workspace_changes" {
 
   name              = "/aws/events/${local.application_name}/${local.environment}/workspace-changes"
@@ -32,7 +39,7 @@ resource "aws_cloudwatch_log_group" "workspace_changes" {
   )
 }
 
-# Allows EventBridge to write events to the log group.
+# Allows EventBridge to write WorkSpaces events to the log group.
 data "aws_iam_policy_document" "workspace_changes_log_policy" {
 
   statement {
@@ -58,14 +65,12 @@ data "aws_iam_policy_document" "workspace_changes_log_policy" {
   }
 }
 
-# Applies the EventBridge-to-CloudWatch Logs permissions.
 resource "aws_cloudwatch_log_resource_policy" "workspace_changes_log_policy" {
 
   policy_document = data.aws_iam_policy_document.workspace_changes_log_policy.json
   policy_name     = "${local.application_name}-${local.environment}-workspace-changes"
 }
 
-# Sends matching WorkSpaces events to the log group.
 resource "aws_cloudwatch_event_target" "workspace_changes_log_group" {
 
   rule           = aws_cloudwatch_event_rule.workspace_changes.name
@@ -76,7 +81,165 @@ resource "aws_cloudwatch_event_target" "workspace_changes_log_group" {
   depends_on = [aws_cloudwatch_log_resource_policy.workspace_changes_log_policy]
 }
 
-# Slack notifications: Lambda reads the webhook secret and posts the event message.
+# Captures security-group API calls from CloudTrail.
+resource "aws_cloudwatch_event_rule" "security_group_changes" {
+  name        = "${local.application_name}-${local.environment}-security-group-changes"
+  description = "Capture security-group API calls"
+
+  event_pattern = jsonencode({
+    source      = ["aws.ec2"]
+    detail-type = ["AWS API Call via CloudTrail"]
+    detail = {
+      eventSource = ["ec2.amazonaws.com"]
+      eventName = [
+        "CreateSecurityGroup",
+        "DeleteSecurityGroup",
+        "ModifySecurityGroupRules"
+
+      ]
+    }
+  })
+
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name}-${local.environment}-security-group-changes" }
+  )
+}
+
+######################################
+### Security Group CloudWatch Logs
+######################################
+
+resource "aws_cloudwatch_log_group" "security_group_changes" {
+  name              = "/aws/events/${local.application_name}/${local.environment}/security-group-changes"
+  retention_in_days = 90
+
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name}-${local.environment}-security-group-change-events" }
+  )
+}
+
+# Allows EventBridge to write security-group events to the log group.
+data "aws_iam_policy_document" "security_group_changes_log_policy" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+
+    resources = ["${aws_cloudwatch_log_group.security_group_changes.arn}:*"]
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = [aws_cloudwatch_event_rule.security_group_changes.arn]
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_resource_policy" "security_group_changes_log_policy" {
+  policy_document = data.aws_iam_policy_document.security_group_changes_log_policy.json
+  policy_name     = "${local.application_name}-${local.environment}-security-group-changes"
+}
+
+resource "aws_cloudwatch_event_target" "security_group_changes_log_group" {
+  rule           = aws_cloudwatch_event_rule.security_group_changes.name
+  target_id      = "SecurityGroupChangesCloudWatchLogs"
+  arn            = aws_cloudwatch_log_group.security_group_changes.arn
+  event_bus_name = "default"
+
+  depends_on = [aws_cloudwatch_log_resource_policy.security_group_changes_log_policy]
+}
+
+# Captures IAM policy API calls from CloudTrail.
+resource "aws_cloudwatch_event_rule" "iam_policy_changes" {
+  name        = "${local.application_name}-${local.environment}-iam-policy-changes"
+  description = "Capture IAM policy API calls"
+
+  event_pattern = jsonencode({
+    source      = ["aws.iam"]
+    detail-type = ["AWS API Call via CloudTrail"]
+    detail = {
+      eventSource = ["iam.amazonaws.com"]
+      eventName = [
+        "CreatePolicy",
+        "DeletePolicy"
+      ]
+    }
+  })
+
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name}-${local.environment}-iam-policy-changes" }
+  )
+}
+
+######################################
+### IAM Policy CloudWatch Logs
+######################################
+
+resource "aws_cloudwatch_log_group" "iam_policy_changes" {
+  name              = "/aws/events/${local.application_name}/${local.environment}/iam-policy-changes"
+  retention_in_days = 90
+
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name}-${local.environment}-iam-policy-change-events" }
+  )
+}
+
+# Allows EventBridge to write IAM policy events to the log group.
+data "aws_iam_policy_document" "iam_policy_changes_log_policy" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+
+    resources = ["${aws_cloudwatch_log_group.iam_policy_changes.arn}:*"]
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = [aws_cloudwatch_event_rule.iam_policy_changes.arn]
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_resource_policy" "iam_policy_changes_log_policy" {
+  policy_document = data.aws_iam_policy_document.iam_policy_changes_log_policy.json
+  policy_name     = "${local.application_name}-${local.environment}-iam-policy-changes"
+}
+
+resource "aws_cloudwatch_event_target" "iam_policy_changes_log_group" {
+  rule           = aws_cloudwatch_event_rule.iam_policy_changes.name
+  target_id      = "IamPolicyChangesCloudWatchLogs"
+  arn            = aws_cloudwatch_log_group.iam_policy_changes.arn
+  event_bus_name = "default"
+
+  depends_on = [aws_cloudwatch_log_resource_policy.iam_policy_changes_log_policy]
+}
+
+######################################
+### Lambda Function
+######################################
+
+# Reads the Slack webhook secret and posts CloudTrail event messages.
 data "archive_file" "workspace_event_slack" {
 
   type        = "zip"
@@ -87,6 +250,10 @@ data "archive_file" "workspace_event_slack" {
     filename = "lambda_function.py"
   }
 }
+
+######################################
+### IAM Resources
+######################################
 
 resource "aws_iam_role" "workspace_event_slack" {
   name = "${local.application_name}-${local.environment}-workspace-event-slack-role"
@@ -158,6 +325,11 @@ resource "aws_lambda_function" "workspace_event_slack" {
   )
 }
 
+######################################
+### Lambda Permissions
+######################################
+
+# Allows each CloudWatch log group to invoke the shared Slack Lambda.
 resource "aws_lambda_permission" "allow_workspace_event_log_invoke" {
   statement_id  = "AllowExecutionFromCloudWatchLogs"
   action        = "lambda:InvokeFunction"
@@ -166,19 +338,45 @@ resource "aws_lambda_permission" "allow_workspace_event_log_invoke" {
   source_arn    = "${aws_cloudwatch_log_group.workspace_changes.arn}:*"
 }
 
-#  Slack notifications: trigger the Lambda when a WorkSpace is created.
-resource "aws_cloudwatch_log_subscription_filter" "workspace_created_slack" {
-  name            = "${local.application_name}-${local.environment}-workspace-created-slack"
+resource "aws_lambda_permission" "allow_security_group_event_log_invoke" {
+  statement_id  = "AllowExecutionFromSecurityGroupCloudWatchLogs"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.workspace_event_slack.function_name
+  principal     = "logs.amazonaws.com"
+  source_arn    = "${aws_cloudwatch_log_group.security_group_changes.arn}:*"
+}
+
+resource "aws_lambda_permission" "allow_iam_policy_event_log_invoke" {
+  statement_id  = "AllowExecutionFromIamPolicyCloudWatchLogs"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.workspace_event_slack.function_name
+  principal     = "logs.amazonaws.com"
+  source_arn    = "${aws_cloudwatch_log_group.iam_policy_changes.arn}:*"
+}
+
+######################################
+### CloudWatch Log Subscriptions
+######################################
+
+# Each dedicated log group forwards its events to the same Lambda and Slack channel.
+resource "aws_cloudwatch_log_subscription_filter" "workspace_changes_slack" {
+  name            = "${local.application_name}-${local.environment}-workspace-slack"
   log_group_name  = aws_cloudwatch_log_group.workspace_changes.name
-  filter_pattern  = "{ $.detail.eventName = \"CreateWorkspaces\" }"
+  filter_pattern  = ""
   destination_arn = aws_lambda_function.workspace_event_slack.arn
 }
 
-# Slack notifications: trigger the Lambda when a WorkSpace is deleted.
-resource "aws_cloudwatch_log_subscription_filter" "workspace_terminated_slack" {
-  name            = "${local.application_name}-${local.environment}-workspace-terminated-slack"
-  log_group_name  = aws_cloudwatch_log_group.workspace_changes.name
-  filter_pattern  = "{ $.detail.eventName = \"TerminateWorkspaces\" }"
+resource "aws_cloudwatch_log_subscription_filter" "security_group_changes_slack" {
+  name            = "${local.application_name}-${local.environment}-security-group-slack"
+  log_group_name  = aws_cloudwatch_log_group.security_group_changes.name
+  filter_pattern  = ""
+  destination_arn = aws_lambda_function.workspace_event_slack.arn
+}
+
+resource "aws_cloudwatch_log_subscription_filter" "iam_policy_changes_slack" {
+  name            = "${local.application_name}-${local.environment}-iam-policy-slack"
+  log_group_name  = aws_cloudwatch_log_group.iam_policy_changes.name
+  filter_pattern  = ""
   destination_arn = aws_lambda_function.workspace_event_slack.arn
 }
 
