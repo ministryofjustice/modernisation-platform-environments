@@ -13,6 +13,12 @@ module "s3-bucket-shared" {
   custom_kms_key      = ""
   bucket_policy       = [aws_s3_bucket_policy.shared_bucket_policy.policy]
 
+  manage_log_bucket_policy = false
+  log_buckets = {
+    log_bucket_name = module.s3-bucket-logging.bucket.id
+    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+  }
+
   providers = {
     aws.bucket-replication = aws
   }
