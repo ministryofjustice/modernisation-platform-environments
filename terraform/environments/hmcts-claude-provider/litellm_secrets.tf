@@ -7,10 +7,6 @@ resource "random_password" "litellm_master_key" {
 resource "random_password" "litellm_salt_key" {
   length  = 48
   special = false
-
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 resource "random_password" "litellm_db" {

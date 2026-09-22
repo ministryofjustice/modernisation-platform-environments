@@ -64,7 +64,6 @@ resource "aws_db_instance" "litellm" {
   auto_minor_version_upgrade      = true
   apply_immediately               = true
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
-  deletion_protection             = true
-  skip_final_snapshot             = false
-  final_snapshot_identifier       = "litellm-gateway-final"
+  deletion_protection             = false
+  skip_final_snapshot             = true
 }
