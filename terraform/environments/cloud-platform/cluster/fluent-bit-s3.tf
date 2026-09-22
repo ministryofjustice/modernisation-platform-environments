@@ -17,6 +17,8 @@ resource "aws_s3_bucket" "log_archive" {
   bucket = local.log_archive_bucket_name
 
   tags = merge(local.tags, { Name = local.log_archive_bucket_name })
+
+  force_destroy = local.cluster_environment == "development_cluster" ? "true" : "false"
 }
 
 resource "aws_s3_bucket_public_access_block" "log_archive" {
