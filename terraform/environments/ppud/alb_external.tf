@@ -17,7 +17,7 @@ resource "aws_lb" "PPUD-ALB" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.PPUD-ALB.id]
-  # security_groups    = [aws_security_group.all["PPUD-ALB-Load-Balancer-Security-Group"].id] # to be migrated over under a change maintenance window
+  # security_groups    = [aws_security_group.all["PPUD-ALB-Load-Balancer-Security-Group"].id] # prestaged new security group for CHG0125710 on 11 October
   subnets = [data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
 
   enable_deletion_protection = true
@@ -97,7 +97,7 @@ resource "aws_lb" "WAM-ALB" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.WAM-ALB.id]
-  # security_groups    = [aws_security_group.all["WAM-ALB-Load-Balancer-Security-Group"].id] # to be migrated over under a change maintenance window
+  # security_groups    = [aws_security_group.all["WAM-ALB-Load-Balancer-Security-Group"].id] # prestaged new security group for CHG0125710 on 11 October
   subnets = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id]
 
   enable_deletion_protection = true

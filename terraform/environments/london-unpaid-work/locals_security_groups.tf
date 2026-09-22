@@ -42,14 +42,83 @@ locals {
       }
       egress = {
         all = {
-          description = "Allow all egress"
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = ["0.0.0.0/0"]
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
           security_groups = []
         }
       }
     }
+
+    # PO-38 : Leaving LB ingress for web and api commented out for now
+    london-unpaid-work-web = {
+      description = "London Unpaid Work web server security group"
+      # ingress = {
+      #   http_alb = {
+      #     description = "Allow ALB access to the web server on HTTP"
+      #     from_port   = 80
+      #     to_port     = 80
+      #     protocol    = "tcp"
+      #     cidr_blocks = local.security_group_cidrs.alb
+      #   }
+      #   https_alb = {
+      #     description = "Allow ALB access to the web server on HTTPS"
+      #     from_port   = 443
+      #     to_port     = 443
+      #     protocol    = "tcp"
+      #     cidr_blocks = local.security_group_cidrs.alb
+      #   }
+      # }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
+    }
+    london-unpaid-work-api = {
+      description = "London Unpaid Work API server security group"
+      ingress = {
+        # http_alb = {
+        #   description = "Allow ALB access to the API server on HTTP"
+        #   from_port   = 80
+        #   to_port     = 80
+        #   protocol    = "tcp"
+        #   cidr_blocks = local.security_group_cidrs.alb
+        # }
+        # https_alb = {
+        #   description = "Allow ALB access to the API server on HTTPS"
+        #   from_port   = 443
+        #   to_port     = 443
+        #   protocol    = "tcp"
+        #   cidr_blocks = local.security_group_cidrs.alb
+        # }
+
+        http_web = {
+          description     = "Allow web server access to the API server on HTTP"
+          from_port       = 80
+          to_port         = 80
+          protocol        = "tcp"
+          security_groups = ["london-unpaid-work-web"]
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
+    }
+
   }
 }
