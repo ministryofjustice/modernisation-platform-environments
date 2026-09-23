@@ -94,8 +94,11 @@ resource "aws_cloudwatch_event_rule" "security_group_changes" {
       eventName = [
         "CreateSecurityGroup",
         "DeleteSecurityGroup",
+        "AuthorizeSecurityGroupIngress",
+        "AuthorizeSecurityGroupEgress",
+        "RevokeSecurityGroupIngress",
+        "RevokeSecurityGroupEgress",
         "ModifySecurityGroupRules"
-
       ]
     }
   })
@@ -171,7 +174,22 @@ resource "aws_cloudwatch_event_rule" "iam_policy_changes" {
       eventSource = ["iam.amazonaws.com"]
       eventName = [
         "CreatePolicy",
-        "DeletePolicy"
+        "DeletePolicy",
+        "CreatePolicyVersion",
+        "DeletePolicyVersion",
+        "SetDefaultPolicyVersion",
+        "AttachRolePolicy",
+        "DetachRolePolicy",
+        "PutRolePolicy",
+        "DeleteRolePolicy",
+        "AttachUserPolicy",
+        "DetachUserPolicy",
+        "PutUserPolicy",
+        "DeleteUserPolicy",
+        "AttachGroupPolicy",
+        "DetachGroupPolicy",
+        "PutGroupPolicy",
+        "DeleteGroupPolicy"
       ]
     }
   })
