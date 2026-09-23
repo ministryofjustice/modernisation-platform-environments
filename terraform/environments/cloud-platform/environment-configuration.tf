@@ -3,12 +3,19 @@ locals {
     cloud-platform-development = {
       account_subdomain_name = "development.${local.base_domain}"
       # Phase-2 gate for the Grafana provider (see local.grafana_objects_enabled).
-      # Set true only after a phase-1 apply has created the iac-grafana-objects
-      # service account, so the pipeline can mint a token. On a brand-new AMG
-      # workspace this must start false (or be omitted) for the first apply, then
-      # be flipped to true. Other AMG host workspaces (e.g. cloud-platform-live)
-      # add this key the same way when they are first brought up.
-      grafana_objects_enabled = true
+      #
+      # MUST stay false until a phase-1 apply has created the iac-grafana-objects
+      # service account (amg.tf). Only then can the pipeline mint a token; only
+      # then is it safe to flip this to true so the next apply (phase 2) creates
+      # the grafana_* objects. Setting it true before the service account exists
+      # reintroduces the bootstrap cycle: Terraform plans the service account and
+      # the Grafana objects in one pass, but the provider has no token yet and
+      # fails with "missing a configuration for the Grafana API".
+      #
+      # Sequence for this workspace: (1) apply with false to create the service
+      # account, (2) then set true and apply again. Other AMG host workspaces
+      # (e.g. cloud-platform-live) follow the same two-step bring-up.
+      grafana_objects_enabled = false
     }
     cloud-platform-preproduction = {
       account_subdomain_name = "preproduction.${local.base_domain}"
