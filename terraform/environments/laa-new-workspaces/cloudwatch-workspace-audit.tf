@@ -348,11 +348,12 @@ resource "aws_lambda_function" "workspace_event_slack" {
   )
 }
 
-# IAM policy events land on the us-east-1 default event bus, so this Lambda,
-# its role, and its secret access must also exist in us-east-1.
+# IAM policy events land on the us-east-1 default event bus, so the Lambda
+# runs there. The role is created via the default provider because the
+# us-east-1 provider role cannot call iam:CreateRole; IAM roles are global
+# so this role still works for a Lambda function running in us-east-1.
 resource "aws_iam_role" "iam_policy_event_slack" {
-  provider = aws.us-east-1
-  name     = "${local.application_name}-${local.environment}-iam-policy-event-slack-role"
+  name = "${local.application_name}-${local.environment}-iam-policy-event-slack-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -374,15 +375,14 @@ resource "aws_iam_role" "iam_policy_event_slack" {
 }
 
 resource "aws_iam_role_policy_attachment" "iam_policy_event_slack_basic" {
-  provider   = aws.us-east-1
   role       = aws_iam_role.iam_policy_event_slack.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+# Matches the secret in every region, since the us-east-1 replica has its own ARN suffix.
 resource "aws_iam_role_policy" "iam_policy_event_slack_secrets" {
-  provider = aws.us-east-1
-  name     = "${local.application_name}-${local.environment}-iam-policy-event-slack-secrets"
-  role     = aws_iam_role.iam_policy_event_slack.id
+  name = "${local.application_name}-${local.environment}-iam-policy-event-slack-secrets"
+  role = aws_iam_role.iam_policy_event_slack.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -393,7 +393,7 @@ resource "aws_iam_role_policy" "iam_policy_event_slack_secrets" {
           "secretsmanager:GetSecretValue"
         ]
         Resource = [
-          aws_secretsmanager_secret.workspace_event_slack_webhook.arn
+          "arn:aws:secretsmanager:*:${data.aws_caller_identity.current.account_id}:secret:${local.application_name}/${local.environment}/workspace-event-slack-webhook-*"
         ]
       }
     ]
