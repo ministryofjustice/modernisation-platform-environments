@@ -692,6 +692,17 @@ locals {
           retries      = 3
           start_period = 10
         }
+        # nginx.conf.template is envsubst'd on container start (see yjsm-ui's
+        # Dockerfile) to build the private-lb/yjsm-apps-lb hostnames, since it
+        # can't read Spring profile files like the Java apps do. The resolver
+        # nginx uses is the fixed, VPC-agnostic 169.254.169.253 address, not
+        # derived from the VPC CIDR, so it doesn't need passing in here.
+        additional_environment_variables = [
+          {
+            "name" : "YJAF_ENVIRONMENT"
+            "value" : local.environment
+          }
+        ]
         enable_postgres_secret = false
       }
     }
