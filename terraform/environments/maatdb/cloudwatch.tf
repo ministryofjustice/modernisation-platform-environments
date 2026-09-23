@@ -211,7 +211,7 @@ data "aws_iam_policy_document" "rds_publish_to_sns" {
       test     = "ArnLike"
       variable = "aws:SourceArn"
       values = [
-        "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:db:${module.rds.db_instance_identifier}"
+        "arn:aws:rds:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:db:${module.rds.db_instance_identifier}"
       ]
     }
   }
