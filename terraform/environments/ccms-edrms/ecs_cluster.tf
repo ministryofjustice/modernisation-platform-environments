@@ -1,16 +1,16 @@
 # Capacity Providers
 
-resource "aws_ecs_capacity_provider" "capacity-provider" {
-  name = "${local.application_name}-capacity-provider"
-
-  auto_scaling_group_provider {
-    auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
-  }
-
-  tags = merge(local.tags,
-    { Name = lower(format("%s-%s-cp", local.application_name, local.environment)) }
-  )
-}
+# resource "aws_ecs_capacity_provider" "capacity-provider" {
+#   name = "${local.application_name}-capacity-provider"
+#
+#   auto_scaling_group_provider {
+#     auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
+#   }
+#
+#   tags = merge(local.tags,
+#     { Name = lower(format("%s-%s-cp", local.application_name, local.environment)) }
+#   )
+# }
 
 
 # ECS Cluster
@@ -23,10 +23,10 @@ resource "aws_ecs_cluster" "main" {
   }
 }
 
-resource "aws_ecs_cluster_capacity_providers" "main" {
-  cluster_name       = aws_ecs_cluster.main.name
-  capacity_providers = []
-}
+# resource "aws_ecs_cluster_capacity_providers" "main" {
+#   cluster_name       = aws_ecs_cluster.main.name
+#   capacity_providers = []
+# }
 
 # ECS Task Definition
 
