@@ -209,6 +209,7 @@ resource "aws_autoscaling_schedule" "weblogic_scale_up" {
   scheduled_action_name  = "weblogic-${var.env_name}-scaleup"
   min_size               = var.delius_microservice_configs.weblogic.asg_min_size
   max_size               = var.delius_microservice_configs.weblogic.asg_max_size
+  desired_capacity       = var.delius_microservice_configs.weblogic.asg_min_size
   recurrence             = "0 19 * * Mon-Fri"
   autoscaling_group_name = aws_autoscaling_group.weblogic.name
 }
