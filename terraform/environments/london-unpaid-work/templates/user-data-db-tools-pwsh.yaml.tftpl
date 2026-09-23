@@ -1,0 +1,68 @@
+# EC2Launch V2 user data
+# https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html
+version: 1.0
+tasks:
+  - task: executeScript
+    inputs:
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |-
+          $ErrorActionPreference = "Stop"
+
+          if (Get-Command choco.exe -ErrorAction SilentlyContinue) {
+            Write-Output "Chocolatey already installed"
+          } else {
+            Write-Output "Installing Chocolatey"
+            Set-ExecutionPolicy Bypass -Scope Process -Force
+            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+            Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+          }
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |-
+          $ErrorActionPreference = "Stop"
+
+          Write-Output "Installing SQL Server Express"
+          choco install sql-server-express -y
+
+          Write-Output "Installing SQL Server command line tools (sqlcmd, bcp) and ODBC driver"
+          choco install sqlserver-odbcdriver -y
+          choco install sqlserver-cmdlnutils -y
+
+          Write-Output "Installing SQL Server Management Studio"
+          choco install sql-server-management-studio -y
+
+          # Adds Invoke-Sqlcmd / Restore-SqlDatabase cmdlets for restoring a .bak file from PowerShell
+          Write-Output "Installing SqlServer PowerShell module"
+          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+          Install-Module -Name SqlServer -Force -AllowClobber -Scope AllUsers
+
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |-
+          $ErrorActionPreference = "Stop"
+
+          $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine")
+
+          # sql-server-express choco package installs a default instance named SQLEXPRESS
+          $service = Get-Service -Name "MSSQL`$SQLEXPRESS" -ErrorAction SilentlyContinue
+          if (-not $service) {
+            throw "SQL Server Express verification failed - MSSQL`$SQLEXPRESS service not found"
+          }
+          if ($service.Status -ne "Running") {
+            Start-Service -Name "MSSQL`$SQLEXPRESS"
+          }
+
+          if (-not (Get-Command sqlcmd -ErrorAction SilentlyContinue)) {
+            throw "sqlcmd verification failed - command not found"
+          }
+          if (-not (Get-Module -ListAvailable -Name SqlServer)) {
+            throw "SqlServer PowerShell module verification failed - module not found"
+          }
+
+          Invoke-Sqlcmd -ServerInstance ".\SQLEXPRESS" -Query "SELECT @@VERSION" | Out-Null
+
+          Write-Output "SQL Server Express installation and verification completed"
