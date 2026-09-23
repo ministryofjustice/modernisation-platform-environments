@@ -920,6 +920,18 @@ updates:
       default-days: 7
   - package-ecosystem: "terraform"
     directories:
+      - "terraform/environments/laa-ai-enablement"
+    schedule:
+      interval: "daily"
+    groups:
+      laa-ai-enablement:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
       - "terraform/environments/laa-ccms-soa"
       - "terraform/environments/laa-ccms-soa/ccms-soa-sandbox"
     schedule:
