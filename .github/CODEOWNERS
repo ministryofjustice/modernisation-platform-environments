@@ -86,6 +86,7 @@
 /terraform/environments/integration-hub-api @ministryofjustice/integration-hub @ministryofjustice/modernisation-platform
 /terraform/environments/integration-hub-file-transfer @ministryofjustice/integration-hub @ministryofjustice/modernisation-platform
 /terraform/environments/integration-hub @ministryofjustice/integration-hub @ministryofjustice/modernisation-platform
+/terraform/environments/laa-ai-enablement @ministryofjustice/laa-ai-enablement-devops @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/laa-ccms-soa @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/laa-ccms-soa/ccms-soa-sandbox @ministryofjustice/laa-soa-developers
 laa-sre-admins @ministryofjustice/modernisation-platform
