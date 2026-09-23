@@ -1,7 +1,7 @@
 
 data "aws_iam_policy_document" "batch_replication_destination" {
 
-  count = local.is-development ? 1 : 0
+  count = local.is-test ? 0 : 1
 
   statement {
     sid    = "AllowBatchCopyToDestination"

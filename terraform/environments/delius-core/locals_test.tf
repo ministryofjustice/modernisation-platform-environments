@@ -92,6 +92,12 @@ locals {
       asg_max_size      = 1
     }
 
+    weblogic_testdata_api = {
+      ec2_instance_type = "r7i.large"
+      asg_min_size      = 1
+      asg_max_size      = 1
+    }
+
     pwm = {
       image_tag        = "8250538047-1"
       container_port   = 8080

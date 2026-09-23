@@ -40,6 +40,8 @@ locals {
     "visit_details"
   ]
 
+  emd_api_role = local.is-development ? ["arn:aws:iam::${local.account_ids["cloud-platform"]}:role/cloud-platform-irsa-746edf975eef164d-live"] : []
+
   table_filters = merge(
     {
       for table in local.tables_to_share : table => "specials_flag=0"
@@ -480,6 +482,7 @@ data "aws_iam_policy_document" "em_data_api_permissions" {
     ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/datamart${local.dbt_suffix}",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/data_insights${local.dbt_suffix}",
     ]
   }
 
@@ -493,6 +496,7 @@ data "aws_iam_policy_document" "em_data_api_permissions" {
     ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/datamart${local.dbt_suffix}/order_dim",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/data_insights${local.dbt_suffix}/*",
     ]
   }
 }
@@ -549,7 +553,7 @@ resource "aws_iam_role_policy_attachment" "em_data_validation_permissions" {
 }
 
 resource "aws_iam_policy" "em_data_api_permissions" {
-  count       = local.is-test ? 1 : 0
+  count       = local.is-development || local.is-test ? 1 : 0
   name_prefix = "em_data_api_permissions"
   description = "Permissions for the Electronic Monitoring Data API."
   policy      = data.aws_iam_policy_document.em_data_api_permissions.json
@@ -1014,4 +1018,60 @@ resource "aws_iam_role_policy_attachment" "standard_athena_access_ac" {
 resource "aws_iam_role_policy_attachment" "ac_specific_access" {
   policy_arn = aws_iam_policy.emac_di_permissions.arn
   role       = module.acquisitive_crime_assumable_role.iam_role_name
+}
+
+module "data_api_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.48.0"
+
+  trusted_role_arns = flatten([
+    data.aws_iam_roles.mod_plat_roles.arns,
+    local.emd_api_role,
+  ])
+
+  create_role       = true
+  role_requires_mfa = false
+
+  role_name = "em_read_emds_data_${local.environment_shorthand}"
+
+  tags = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "standard_athena_access_api" {
+  policy_arn = aws_iam_policy.standard_athena_access.arn
+  role       = module.data_api_role.iam_role_name
+}
+
+resource "aws_iam_role_policy_attachment" "database_access_api" {
+  count      = local.is-development ? 1 :0 
+  policy_arn = aws_iam_policy.em_data_api_permissions[0].arn
+  role       = module.data_api_role.iam_role_name
+}
+
+
+resource "aws_lakeformation_permissions" "em_api_db" {
+  principal   = module.data_api_role.iam_role_arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = "data_insights${local.dbt_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "em_api_tables" {
+  principal   = module.data_api_role.iam_role_arn
+  permissions = ["SELECT", "DESCRIBE"]
+  table {
+    database_name = "data_insights${local.dbt_suffix}"
+    wildcard      = true
+  }
+}
+
+resource "aws_lakeformation_permissions" "em_data_api_s3" {
+  principal   = module.data_api_role.iam_role_arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+  data_location {
+    arn = module.s3-create-a-derived-table-bucket.bucket.arn
+  }
 }
