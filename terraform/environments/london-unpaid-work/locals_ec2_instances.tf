@@ -9,7 +9,8 @@ locals {
         instance_profile_policies = [
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
-          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
+          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+          "LondonUnpaidWorkRDSAccessPolicy"
         ]
         subnet_name = "private"
         user_data_raw = base64encode(templatefile(

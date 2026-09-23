@@ -30,6 +30,36 @@ locals {
     }
 
     security_groups = local.security_groups
+
+    iam_policies = {
+    LondonUnpaidWorkRDSAccessPolicy = {
+      description = "Allow database tools server to discover RDS and read its managed credentials"
+
+      statements = [
+        {
+          sid    = "DescribeDatabase"
+          effect = "Allow"
+          actions = [
+            "rds:DescribeDBInstances",
+          ]
+          resources = [
+            "arn:aws:rds:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:db:${local.account_config.db_identifier}",
+          ]
+        },
+        {
+          sid    = "ReadRDSManagedCredentials"
+          effect = "Allow"
+          actions = [
+            "secretsmanager:GetSecretValue",
+            "secretsmanager:DescribeSecret",
+          ]
+          resources = [
+            "arn:aws:secretsmanager:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:secret:rds!db-*",
+          ]
+        }
+      ]
+    }
+  }
   }
 
   security_group_cidrs_development = {
