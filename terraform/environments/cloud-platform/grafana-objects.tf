@@ -49,15 +49,26 @@ locals {
     }
   }
 
-  # Only create Grafana objects where AMG exists and BUs are defined.
-  grafana_bus = local.enable_amg ? lookup(local.bus_by_workspace, terraform.workspace, {}) : {}
+  # Phase-2 gate. The Grafana provider authenticates with a token minted from
+  # the iac-grafana-objects service account (amg.tf). On the first apply of a
+  # fresh AMG host workspace that service account does not exist yet, so the
+  # mint no-ops and the provider is unauthenticated — creating any grafana_*
+  # resource in that same apply is the bootstrap cycle. We therefore only manage
+  # Grafana objects once AMG exists AND the operator has opted this workspace
+  # into phase 2 (local.grafana_objects_enabled, set per workspace in
+  # environment-configuration.tf), by which point the service account exists and
+  # the token can be minted.
+  manage_grafana_objects = local.enable_amg && local.grafana_objects_enabled
+
+  # Only create Grafana objects in phase 2, where BUs are defined.
+  grafana_bus = local.manage_grafana_objects ? lookup(local.bus_by_workspace, terraform.workspace, {}) : {}
 
   # Map of IdC group display name -> group ID, resolved via the read-only
   # Identity Center provider. Uses the plural aws_identitystore_groups data
   # source (ListGroups API); the singular data source's GetGroupId /
   # alternate_identifier path is denied for this role, and its filter{} block
   # was removed in AWS provider v6. Verified via spike (cloud-platform#8509).
-  idc_group_id_by_name = local.enable_amg ? {
+  idc_group_id_by_name = local.manage_grafana_objects ? {
     for g in data.aws_identitystore_groups.all[0].groups : g.display_name => g.group_id
   } : {}
 }
@@ -67,12 +78,12 @@ locals {
 #------------------------------------------------------------------------------
 
 data "aws_ssoadmin_instances" "this" {
-  count    = local.enable_amg ? 1 : 0
+  count    = local.manage_grafana_objects ? 1 : 0
   provider = aws.sso-readonly
 }
 
 data "aws_identitystore_groups" "all" {
-  count    = local.enable_amg ? 1 : 0
+  count    = local.manage_grafana_objects ? 1 : 0
   provider = aws.sso-readonly
 
   identity_store_id = tolist(data.aws_ssoadmin_instances.this[0].identity_store_ids)[0]
