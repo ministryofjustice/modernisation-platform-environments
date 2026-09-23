@@ -51,12 +51,12 @@
       "ftp_sftp_port": "22",
       "max_string_size": "EXTENDED",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
-      "s3_lifecycle_days_expiration_current": 730,
-      "s3_lifecycle_days_expiration_noncurrent": 730,
-      "s3_lifecycle_days_transition_current_glacier": 365,
-      "s3_lifecycle_days_transition_current_standard": 90,
-      "s3_lifecycle_days_transition_noncurrent_glacier": 365,
-      "s3_lifecycle_days_transition_noncurrent_standard": 90
+      "s3_lifecycle_days_expiration_current": 366,
+      "s3_lifecycle_days_expiration_noncurrent": 366,
+      "s3_lifecycle_days_transition_current_glacier": 31,
+      "s3_lifecycle_days_transition_current_standard": 1,
+      "s3_lifecycle_days_transition_noncurrent_glacier": 31,
+      "s3_lifecycle_days_transition_noncurrent_standard": 1
     },
 
     "test": {
@@ -110,12 +110,12 @@
       "ftp_sftp_port": "22",
       "max_string_size": "EXTENDED",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
-      "s3_lifecycle_days_expiration_current": 730,
-      "s3_lifecycle_days_expiration_noncurrent": 730,
-      "s3_lifecycle_days_transition_current_glacier": 365,
-      "s3_lifecycle_days_transition_current_standard": 90,
-      "s3_lifecycle_days_transition_noncurrent_glacier": 365,
-      "s3_lifecycle_days_transition_noncurrent_standard": 90
+      "s3_lifecycle_days_expiration_current": 366,
+      "s3_lifecycle_days_expiration_noncurrent": 366,
+      "s3_lifecycle_days_transition_current_glacier": 31,
+      "s3_lifecycle_days_transition_current_standard": 1,
+      "s3_lifecycle_days_transition_noncurrent_glacier": 31,
+      "s3_lifecycle_days_transition_noncurrent_standard": 1
     },
 
     "preproduction": {
@@ -169,12 +169,12 @@
       "ftp_sftp_port": "22",
       "max_string_size": "EXTENDED",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
-      "s3_lifecycle_days_expiration_current": 730,
-      "s3_lifecycle_days_expiration_noncurrent": 730,
-      "s3_lifecycle_days_transition_current_glacier": 365,
-      "s3_lifecycle_days_transition_current_standard": 90,
-      "s3_lifecycle_days_transition_noncurrent_glacier": 365,
-      "s3_lifecycle_days_transition_noncurrent_standard": 90
+      "s3_lifecycle_days_expiration_current": 366,
+      "s3_lifecycle_days_expiration_noncurrent": 366,
+      "s3_lifecycle_days_transition_current_glacier": 31,
+      "s3_lifecycle_days_transition_current_standard": 1,
+      "s3_lifecycle_days_transition_noncurrent_glacier": 31,
+      "s3_lifecycle_days_transition_noncurrent_standard": 1
     },
 
     "production": {
@@ -228,12 +228,12 @@
       "ftp_sftp_port": "22",
       "max_string_size": "STANDARD",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
-      "s3_lifecycle_days_expiration_current": 730,
-      "s3_lifecycle_days_expiration_noncurrent": 730,
-      "s3_lifecycle_days_transition_current_glacier": 365,
-      "s3_lifecycle_days_transition_current_standard": 90,
-      "s3_lifecycle_days_transition_noncurrent_glacier": 365,
-      "s3_lifecycle_days_transition_noncurrent_standard": 90
+      "s3_lifecycle_days_expiration_current": 366,
+      "s3_lifecycle_days_expiration_noncurrent": 366,
+      "s3_lifecycle_days_transition_current_glacier": 31,
+      "s3_lifecycle_days_transition_current_standard": 1,
+      "s3_lifecycle_days_transition_noncurrent_glacier": 31,
+      "s3_lifecycle_days_transition_noncurrent_standard": 1
     }
   }
 }
