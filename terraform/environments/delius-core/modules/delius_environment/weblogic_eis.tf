@@ -122,6 +122,27 @@ resource "aws_autoscaling_group" "weblogic_eis" {
   }
 }
 
+resource "aws_autoscaling_schedule" "weblogic_eis_scale_down" {
+  count = var.enable_autoscaling_schedule ? 1 : 0
+
+  scheduled_action_name  = "weblogic-eis-${var.env_name}-scaledown"
+  min_size               = 0
+  max_size               = 0
+  desired_capacity       = 0
+  recurrence             = "0 5 * * Mon-Fri"
+  autoscaling_group_name = aws_autoscaling_group.weblogic_eis.name
+}
+
+resource "aws_autoscaling_schedule" "weblogic_eis_scale_up" {
+  count = var.enable_autoscaling_schedule ? 1 : 0
+
+  scheduled_action_name  = "weblogic-eis-${var.env_name}-scaleup"
+  min_size               = var.delius_microservice_configs.weblogic_eis.asg_min_size
+  max_size               = var.delius_microservice_configs.weblogic_eis.asg_max_size
+  recurrence             = "0 19 * * Mon-Fri"
+  autoscaling_group_name = aws_autoscaling_group.weblogic_eis.name
+}
+
 resource "aws_ecs_capacity_provider" "weblogic_eis" {
   name = "weblogic-eis-${var.env_name}-ec2-cp"
 
@@ -161,3 +182,4 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_eis" {
     target_group_arn = module.weblogic_eis.target_group_arn
   }
 }
+
