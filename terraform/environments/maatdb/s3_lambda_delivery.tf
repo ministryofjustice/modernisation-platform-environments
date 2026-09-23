@@ -11,6 +11,14 @@ module "s3-bucket-shared" {
   replication_region  = "eu-west-2"
   sse_algorithm       = "AES256"
   custom_kms_key      = ""
+
+  manage_log_bucket_policy = false
+  log_buckets = {
+    log_bucket_name = module.s3-bucket-logging.bucket.id
+    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+  }
+
+  log_prefix = "s3access/${local.application_name}-${local.environment}-shared"
   bucket_policy = [jsonencode({
     Version = "2012-10-17",
     Statement = [
