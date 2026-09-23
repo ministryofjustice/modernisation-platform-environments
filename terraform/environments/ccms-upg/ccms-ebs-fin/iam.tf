@@ -157,7 +157,7 @@ resource "aws_iam_role_policy_attachment" "ebsapps_cw_logging" {
 }
 
 # Shared secret access for EBS DB and Apps instances
-# Covers secrets manually created (or created in future) under the ccms-ebs-ref- naming prefix
+# Covers secrets manually created (or created in future) under the ccms-ebs-fin- naming prefix
 
 resource "aws_iam_policy" "ebs_shared_secrets" {
   name        = "${local.component_name}-${local.env_label}-ebs-shared-secrets"
@@ -167,7 +167,7 @@ resource "aws_iam_policy" "ebs_shared_secrets" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid      = "ccmsebsrefupgsecret"
+        Sid      = "ccmsebsfinupgsecret"
         Effect   = "Allow"
         Action   = ["secretsmanager:GetSecretValue"]
         Resource = "arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:${local.component_name}-*"

@@ -15,9 +15,9 @@ locals {
     litellm_model_no_healthy_deployments_crit = 0 # any positive delta = model has zero healthy deployments (all cooled down)
 
     # ── Proxy Errors & Traffic ──────────────────────────────────────────────
-    litellm_proxy_failed_requests_warn          = 1    # % of all proxy requests failing
-    litellm_proxy_failed_requests_crit          = 5    # % of all proxy requests failing
-    litellm_proxy_failed_requests_by_model_crit = 10   # % — higher than global threshold; per-model traffic is noisier
+    litellm_proxy_failed_requests_warn          = 5    # % of all proxy requests failing
+    litellm_proxy_failed_requests_crit          = 10   # % of all proxy requests failing
+    litellm_proxy_failed_requests_by_model_crit = 20   # % — higher than global threshold; per-model traffic is noisier
     litellm_proxy_traffic_baseline_warn         = -50  # fire when traffic is 50% below 1h-ago rate
     litellm_proxy_traffic_baseline_crit         = -80  # fire when traffic is 80% below 1h-ago rate
     litellm_proxy_zero_traffic_crit             = 0.01 # req/s floor treated as effectively zero — pairs with ok_when_nodata=false
@@ -50,11 +50,9 @@ locals {
     litellm_failed_fallbacks_warn = 1 # raw count of failed fallback attempts per 5m
     litellm_failed_fallbacks_crit = 5 # raw count of failed fallback attempts per 5m
 
-    # ── Rate-Limit ──────────────────────────────────────────────────
-    litellm_remaining_requests_warn         = 20   # remaining requests before provider rate limit, per model/provider
-    litellm_remaining_requests_crit         = 5    # remaining requests before provider rate limit, per model/provider
-    litellm_remaining_tokens_warn           = 5000 # remaining tokens before provider rate limit, per model/provider
-    litellm_remaining_tokens_crit           = 1000 # remaining tokens before provider rate limit, per model/provider
+    # ── Rate-Limit (per virtual key) ────────────────────────────────────────
+    # These are LiteLLM's own per-key limits, so an absolute threshold is meaningful. Provider-side
+    # headroom is not alerted on — see the note in alerting-golden-signals.tf.
     litellm_api_key_remaining_requests_warn = 20   # remaining requests before per-key model rate limit
     litellm_api_key_remaining_requests_crit = 5    # remaining requests before per-key model rate limit
     litellm_api_key_remaining_tokens_warn   = 2000 # remaining tokens before per-key model rate limit
