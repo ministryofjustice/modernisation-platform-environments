@@ -24,11 +24,11 @@
 /terraform/environments/ccms-feasibility/ccms-oia @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-feasibility/ccms-soa @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-feasibility/ccms-edrms @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
-/terraform/environments/ccms-oia @ministryofjustice/laa-ccms-developers @ministryofjustice/laa-dba @ministryofjustice/laa-oia-developers @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-audit @ministryofjustice/octo-cyber-team @ministryofjustice/modernisation-platform
+/terraform/environments/ccms-oia @ministryofjustice/laa-ccms-developers @ministryofjustice/laa-ccms-security-testing-kpmg @ministryofjustice/laa-dba @ministryofjustice/laa-oia-developers @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-audit @ministryofjustice/octo-cyber-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-oia/ccms-oia-sandbox @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-pui-internal @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-pui-internal/workspaces-secure-browser @ministryofjustice/aws-root-account-admin-team @ministryofjustice/modernisation-platform
-/terraform/environments/ccms-pui @ministryofjustice/laa-ccms-developers @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-audit @ministryofjustice/octo-cyber-team @ministryofjustice/modernisation-platform
+/terraform/environments/ccms-pui @ministryofjustice/laa-ccms-developers @ministryofjustice/laa-ccms-security-testing-kpmg @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-audit @ministryofjustice/octo-cyber-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-upg @ministryofjustice/laa-ccms-feasibility @ministryofjustice/laa-dba @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-upg/ccms-ebs-ref @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-upg/ccms-ebs-fin @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform
