@@ -2,10 +2,10 @@
   "accounts": {
     "development": {
       "rds_enabled": true,
-      "db_identifier": "cp-oracle-native-backup-restore",
+      "db_identifier": "london-unpaid-work-database",
       "db_engine": "sqlserver-se",
       "db_engine_version": "15.00.4480.2.v1",
-      "db_instance_class": "db.t3.medium",
+      "db_instance_class": "db.m5.large",
       "db_user": "admin",
       "db_port": 1433,
       "db_allocated_storage": 20,
