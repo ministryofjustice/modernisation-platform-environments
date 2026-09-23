@@ -34,7 +34,7 @@ output "dms_client_security_group_id" {
 }
 
 output "seed_lambda_function_name" {
-  description = "Name of the Lambda function used to prepare and mutate the Oracle integration-test source."
+  description = "Name of the Lambda function used to reset, seed, mutate and read the Oracle integration-test source."
   value       = aws_lambda_function.seed.function_name
 }
 
