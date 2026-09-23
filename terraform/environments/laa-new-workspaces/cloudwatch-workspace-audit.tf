@@ -480,5 +480,7 @@ resource "aws_cloudwatch_log_subscription_filter" "iam_policy_changes_slack" {
   log_group_name  = aws_cloudwatch_log_group.iam_policy_changes.name
   filter_pattern  = ""
   destination_arn = aws_lambda_function.iam_policy_event_slack.arn
+
+  depends_on = [aws_cloudwatch_log_group.iam_policy_changes]
 }
 
