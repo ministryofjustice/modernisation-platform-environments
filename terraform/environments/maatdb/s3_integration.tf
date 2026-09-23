@@ -70,6 +70,14 @@ module "s3_bucket" {
     Name = "${local.application_name}-${local.environment}-ftp-${each.key}"
   })
 
+  manage_log_bucket_policy = false
+  log_buckets = {
+    log_bucket_name = module.s3-bucket-logging.bucket.id
+    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+  }
+
+  log_prefix = "s3access/${local.application_name}-${local.environment}-ftp-${each.key}"
+
   bucket_policy_v2 = [
     for stmt in [
 
