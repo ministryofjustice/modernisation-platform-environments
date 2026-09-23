@@ -162,8 +162,9 @@ resource "aws_cloudwatch_event_target" "security_group_changes_log_group" {
   depends_on = [aws_cloudwatch_log_resource_policy.security_group_changes_log_policy]
 }
 
-# Captures IAM policy API calls from CloudTrail.
+# IAM is a global service; its events only reach the default event bus in us-east-1.
 resource "aws_cloudwatch_event_rule" "iam_policy_changes" {
+  provider    = aws.us-east-1
   name        = "${local.application_name}-${local.environment}-iam-policy-changes"
   description = "Capture IAM policy API calls"
 
@@ -205,6 +206,7 @@ resource "aws_cloudwatch_event_rule" "iam_policy_changes" {
 ######################################
 
 resource "aws_cloudwatch_log_group" "iam_policy_changes" {
+  provider          = aws.us-east-1
   name              = "/aws/events/${local.application_name}/${local.environment}/iam-policy-changes"
   retention_in_days = 90
 
@@ -216,6 +218,7 @@ resource "aws_cloudwatch_log_group" "iam_policy_changes" {
 
 # Allows EventBridge to write IAM policy events to the log group.
 data "aws_iam_policy_document" "iam_policy_changes_log_policy" {
+  provider = aws.us-east-1
   statement {
     effect = "Allow"
 
@@ -240,11 +243,13 @@ data "aws_iam_policy_document" "iam_policy_changes_log_policy" {
 }
 
 resource "aws_cloudwatch_log_resource_policy" "iam_policy_changes_log_policy" {
+  provider        = aws.us-east-1
   policy_document = data.aws_iam_policy_document.iam_policy_changes_log_policy.json
   policy_name     = "${local.application_name}-${local.environment}-iam-policy-changes"
 }
 
 resource "aws_cloudwatch_event_target" "iam_policy_changes_log_group" {
+  provider       = aws.us-east-1
   rule           = aws_cloudwatch_event_rule.iam_policy_changes.name
   target_id      = "IamPolicyChangesCloudWatchLogs"
   arn            = aws_cloudwatch_log_group.iam_policy_changes.arn
@@ -343,6 +348,82 @@ resource "aws_lambda_function" "workspace_event_slack" {
   )
 }
 
+# IAM policy events land on the us-east-1 default event bus, so this Lambda,
+# its role, and its secret access must also exist in us-east-1.
+resource "aws_iam_role" "iam_policy_event_slack" {
+  provider = aws.us-east-1
+  name     = "${local.application_name}-${local.environment}-iam-policy-event-slack-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name}-${local.environment}-iam-policy-event-slack-role" }
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "iam_policy_event_slack_basic" {
+  provider   = aws.us-east-1
+  role       = aws_iam_role.iam_policy_event_slack.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy" "iam_policy_event_slack_secrets" {
+  provider = aws.us-east-1
+  name     = "${local.application_name}-${local.environment}-iam-policy-event-slack-secrets"
+  role     = aws_iam_role.iam_policy_event_slack.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ]
+        Resource = [
+          aws_secretsmanager_secret.workspace_event_slack_webhook.arn
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_lambda_function" "iam_policy_event_slack" {
+  provider         = aws.us-east-1
+  function_name    = "${local.application_name}-${local.environment}-iam-policy-event-slack"
+  description      = "Posts IAM policy change events to Slack"
+  filename         = data.archive_file.workspace_event_slack.output_path
+  source_code_hash = data.archive_file.workspace_event_slack.output_base64sha256
+  handler          = "lambda_function.lambda_handler"
+  runtime          = "python3.11"
+  timeout          = 30
+  memory_size      = 256
+  role             = aws_iam_role.iam_policy_event_slack.arn
+
+  environment {
+    variables = {
+      SLACK_WEBHOOK_SECRET = aws_secretsmanager_secret.workspace_event_slack_webhook.name
+    }
+  }
+
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name}-${local.environment}-iam-policy-event-slack" }
+  )
+}
+
 ######################################
 ### Lambda Permissions
 ######################################
@@ -364,10 +445,12 @@ resource "aws_lambda_permission" "allow_security_group_event_log_invoke" {
   source_arn    = "${aws_cloudwatch_log_group.security_group_changes.arn}:*"
 }
 
+# Its Lambda, role, and log subscription live in us-east-1 alongside the rule and log group.
 resource "aws_lambda_permission" "allow_iam_policy_event_log_invoke" {
+  provider      = aws.us-east-1
   statement_id  = "AllowExecutionFromIamPolicyCloudWatchLogs"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.workspace_event_slack.function_name
+  function_name = aws_lambda_function.iam_policy_event_slack.function_name
   principal     = "logs.amazonaws.com"
   source_arn    = "${aws_cloudwatch_log_group.iam_policy_changes.arn}:*"
 }
@@ -392,9 +475,10 @@ resource "aws_cloudwatch_log_subscription_filter" "security_group_changes_slack"
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "iam_policy_changes_slack" {
+  provider        = aws.us-east-1
   name            = "${local.application_name}-${local.environment}-iam-policy-slack"
   log_group_name  = aws_cloudwatch_log_group.iam_policy_changes.name
   filter_pattern  = ""
-  destination_arn = aws_lambda_function.workspace_event_slack.arn
+  destination_arn = aws_lambda_function.iam_policy_event_slack.arn
 }
 
