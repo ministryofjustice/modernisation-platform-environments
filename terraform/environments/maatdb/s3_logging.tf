@@ -119,9 +119,14 @@ data "aws_iam_policy_document" "lb_access_logs_policy" {
       identifiers = ["*"]
     }
     resources = [
-      "${module.s3-bucket-shared.bucket.arn}/*",
-      module.s3-bucket-shared.bucket.arn
+      "${module.s3-bucket-logging.bucket.arn}/*",
+      module.s3-bucket-logging.bucket.arn
     ]
+    condition {
+      test = "arnLike"
+      variable = "aws:SourceArn"
+      values   = [module.s3-bucket-shared.bucket.arn]
+    }
   }
 
   ## FTP Buckets
@@ -133,12 +138,21 @@ data "aws_iam_policy_document" "lb_access_logs_policy" {
       type        = "AWS"
       identifiers = ["*"]
     }
-    resources = flatten([
-      for ftp_bucket in values(module.s3_bucket) : [
-        "${ftp_bucket.bucket.arn}/*",
-        ftp_bucket.bucket.arn
-      ]
-    ])
+    resources = [
+      "${module.s3-bucket-logging.bucket.arn}/*",
+      module.s3-bucket-logging.bucket.arn
+    ]
+
+    condition {
+      test     = "arnLike"
+      variable = "aws:SourceArn"
+      values   = flatten([
+        for ftp_bucket in values(module.s3_bucket) : [
+          "${ftp_bucket.bucket.arn}/*",
+          ftp_bucket.bucket.arn
+        ]
+      ])
+    }
   }
 }
 
