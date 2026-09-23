@@ -25,7 +25,7 @@ resource "aws_ecs_cluster" "main" {
 
 resource "aws_ecs_cluster_capacity_providers" "main" {
   cluster_name       = aws_ecs_cluster.main.name
-  capacity_providers = [aws_ecs_capacity_provider.capacity-provider.name]
+  capacity_providers = []
 }
 
 # ECS Task Definition
@@ -73,9 +73,6 @@ resource "aws_ecs_service" "edrms" {
   task_definition = aws_ecs_task_definition.edrms.arn
   desired_count   = local.application_data.accounts[local.environment].app_count
   launch_type     = "EC2"
-
-
-  force_new_deployment = true
 
   health_check_grace_period_seconds = 120
   #   lifecycle {
