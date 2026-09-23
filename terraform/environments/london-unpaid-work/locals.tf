@@ -36,4 +36,6 @@ locals {
     production    = local.baseline_production
   }
   baseline_environment_specific = local.baseline_environments_specific[local.environment]
+
+  account_config = local.application_data.accounts[local.environment]
 }
