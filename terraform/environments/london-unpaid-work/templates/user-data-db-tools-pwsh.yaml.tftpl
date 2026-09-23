@@ -31,9 +31,6 @@ tasks:
           choco install sqlserver-odbcdriver -y
           choco install sqlserver-cmdlnutils -y
 
-          Write-Output "Installing SQL Server Management Studio"
-          choco install sql-server-management-studio -y
-
           # Adds Invoke-Sqlcmd / Restore-SqlDatabase cmdlets for restoring a .bak file from PowerShell
           Write-Output "Installing SqlServer PowerShell module"
           Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
