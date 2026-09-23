@@ -123,7 +123,7 @@ data "aws_iam_policy_document" "lb_access_logs_policy" {
       module.s3-bucket-logging.bucket.arn
     ]
     condition {
-      test = "arnLike"
+      test = "StringLike"
       variable = "aws:SourceArn"
       values   = [module.s3-bucket-shared.bucket.arn]
     }
@@ -144,7 +144,7 @@ data "aws_iam_policy_document" "lb_access_logs_policy" {
     ]
 
     condition {
-      test     = "arnLike"
+      test     = "StringLike"
       variable = "aws:SourceArn"
       values   = flatten([
         for ftp_bucket in values(module.s3_bucket) : [
