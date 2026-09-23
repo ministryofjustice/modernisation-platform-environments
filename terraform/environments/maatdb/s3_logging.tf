@@ -102,7 +102,7 @@ data "aws_iam_policy_document" "lb_access_logs_policy" {
       module.s3-bucket-logging.bucket.arn
     ]
     condition {
-      test     = "StringLessThan"
+      test     = "NumericLessThan"
       variable = "aws:TLSVersion"
       values   = ["1.2"]
     }
