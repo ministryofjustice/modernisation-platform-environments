@@ -148,6 +148,28 @@ resource "aws_ecs_capacity_provider" "weblogic_testdata_api" {
   }
 }
 
+resource "aws_autoscaling_schedule" "weblogic_data_scale_down" {
+  count = var.env_name == "test" && var.enable_autoscaling_schedule ? 1 : 0
+
+  scheduled_action_name  = "weblogic-data-${var.env_name}-scaledown"
+  min_size               = 0
+  max_size               = 0
+  desired_capacity       = 0
+  recurrence             = "0 5 * * Mon-Fri"
+  autoscaling_group_name = aws_autoscaling_group.weblogic_testdata_api[0].name
+}
+
+resource "aws_autoscaling_schedule" "weblogic_data_scale_up" {
+  count = var.env_name == "test" && var.enable_autoscaling_schedule ? 1 : 0
+
+  scheduled_action_name  = "weblogic-data-${var.env_name}-scaleup"
+  min_size               = var.delius_microservice_configs.weblogic_testdata_api.asg_min_size
+  max_size               = var.delius_microservice_configs.weblogic_testdata_api.asg_max_size
+  desired_capacity       = var.delius_microservice_configs.weblogic_testdata_api.asg_min_size
+  recurrence             = "0 19 * * Mon-Fri"
+  autoscaling_group_name = aws_autoscaling_group.weblogic_testdata_api[0].name
+}
+
 resource "aws_lb_listener_rule" "allowed_paths_listener_rule_weblogic_testdata_api" {
   count = var.env_name == "test" ? 1 : 0
 
