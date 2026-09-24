@@ -79,9 +79,3 @@ resource "aws_vpc_security_group_egress_rule" "ebsapps_http" {
   to_port           = 80
   cidr_ipv4         = "0.0.0.0/0"
 }
-
-# Renamed rules - keep until applied in all environments
-moved {
-  from = aws_vpc_security_group_egress_rule.ebsapps_to_db_oracle
-  to   = aws_vpc_security_group_egress_rule.ebsapps_to_db
-}

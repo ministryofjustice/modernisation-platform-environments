@@ -118,14 +118,3 @@ data "aws_security_group" "clamav" {
   vpc_id = data.aws_vpc.shared.id
   name   = "${local.application_name}-clamav-sg"
 }
-
-# Renamed rules - keep until applied in all environments
-moved {
-  from = aws_vpc_security_group_ingress_rule.ebsdb_from_apps_oracle
-  to   = aws_vpc_security_group_ingress_rule.ebsdb_from_apps
-}
-
-moved {
-  from = aws_vpc_security_group_ingress_rule.ebsdb_from_cloud_platform_oracle
-  to   = aws_vpc_security_group_ingress_rule.ebsdb_from_cloud_platform
-}
