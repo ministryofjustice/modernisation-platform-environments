@@ -69,6 +69,7 @@ def process_event(*, event):
 
 @logger.inject_lambda_context(clear_state=True, log_event=False)
 def lambda_handler(event, _context):
+    idempotency_config.register_lambda_context(_context)
     response = batch_response(event.get("Records", []), lambda item: process_event(event=item))
     logger.info(
         "Processed hosted pickup batch",

@@ -3,6 +3,6 @@ locals {
 
   hosted_bucket_names = {
     for entry_id, entry in local.hosted_pickup_entries :
-    entry_id => "ihft-${local.name_environment}-${data.aws_caller_identity.current.account_id}-${entry.name_suffix}"
+    entry_id => "integration-hub-${local.environment}-${entry.identity}-pickup"
   }
 }

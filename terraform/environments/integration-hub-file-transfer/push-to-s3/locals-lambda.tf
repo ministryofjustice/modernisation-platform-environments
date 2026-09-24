@@ -1,5 +1,5 @@
 locals {
-  pattern_name     = "${local.application_name}-${local.environment}-${local.component_name}"
+  pattern_name     = "${local.application_name}-${local.component_name}"
   lambda_role_name = local.pattern_name
 
   push_to_s3_dlq_arns = {

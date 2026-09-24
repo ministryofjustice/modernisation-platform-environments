@@ -97,6 +97,40 @@ class DispatcherTest(unittest.TestCase):
             ],
         )
 
+    def test_root_prefix_can_request_hosted_pickup(self):
+        secret_client = MagicMock()
+        self.event["detail"]["data"]["destinationObject"]["key"] = "dms1981/file.pdf"
+        self.secret_response["SecretString"] = json.dumps(
+            {
+                "action": {
+                    "name": "push-to-s3-with-hosted-pickup",
+                    "push_to_s3_with_hosted_pickup": {
+                        "destination_prefix": "pickup/",
+                        "retention_days": 7,
+                    },
+                },
+                "notifications": {"email": None, "slack": None, "teams": None},
+            }
+        )
+        secret_client.get_secret_value.side_effect = [
+            SecretNotFoundError(),
+            self.secret_response,
+        ]
+
+        configuration = find_dispatch_configuration(
+            secret_client,
+            "integration-hub-file-transfer/file-dispatch/",
+            "dms1981/file.pdf",
+        )
+        detail = build_requested_event_detail(parse_file_routed_event(self.event), configuration)
+
+        self.assertEqual(
+            secret_client.get_secret_value.call_args_list[-1].kwargs["SecretId"],
+            "integration-hub-file-transfer/file-dispatch/dms1981/",
+        )
+        self.assertEqual(detail["data"]["object"]["key"], "dms1981/file.pdf")
+        self.assertEqual(detail["data"]["action"]["name"], "push-to-s3-with-hosted-pickup")
+
     def test_returns_none_when_no_secret_matches(self):
         secret_client = MagicMock()
         secret_client.get_secret_value.side_effect = SecretNotFoundError()

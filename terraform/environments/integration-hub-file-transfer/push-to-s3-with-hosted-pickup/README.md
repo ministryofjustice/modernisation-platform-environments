@@ -45,6 +45,8 @@ The parent state creates predictable dispatch secrets. This state looks up only 
 
 The parent deliberately ignores secret-value changes. After changing an existing action in the shared Terraform configuration, update the corresponding secret value manually to match before sending files. A newly added entry receives its initial non-sensitive action value when the parent state first creates the secret.
 
+In development, the hosted pickup action now applies to the `dms1981/` root prefix. After deployment, update the existing `integration-hub-file-transfer/file-dispatch/dms1981/` secret value with the hosted pickup action (destination `pickup/`, retention seven days), preserving any configured notification destinations. Until that value is updated, root uploads continue to publish requests without an action and will not reach the mover.
+
 When no hosted pickup entries are configured, the shared pipeline still deploys but no buckets, hosted KMS keys, or mover roles are created. Any matching event is rejected as unauthorised rather than being delivered to a fallback destination.
 
 ## Names and isolation
@@ -55,13 +57,13 @@ Shared pipeline resources use this base name:
 integration-hub-file-transfer-push-to-s3-with-hosted-pickup
 ```
 
-Each selected dispatch entry receives resources named from its stable 12-character entry ID:
+For the development `dms1981/` entry, the resource names are:
 
 ```text
-Bucket:     ihft-<environment>-hosted-pickup-<account-id>-<entry-id>
-KMS alias: alias/s3/ihft-<environment>-hosted-pickup-<account-id>-<entry-id>
-Mover role: ihft-<environment>-hosted-pickup-<entry-id>
-Customer role: ihft-<environment>-hosted-pickup-customer-<entry-id>
+Bucket:     integration-hub-development-dms1981-pickup
+KMS alias: alias/s3/integration-hub-development-dms1981-pickup
+Mover role: ihft-dev-hosted-mover-dms1981
+Customer role: ihft-dev-pickup-reader-dms1981
 ```
 
 The Lambda execution role cannot read the clean bucket or write hosted objects. It can read only selected dispatch secrets and assume only the mapped mover roles. Each mover role trusts account root only when `aws:PrincipalArn` matches the exact Lambda execution role, reads only its configured clean source prefix, copies the exact event `VersionId`, writes only its own destination prefix, and uses only the clean source key plus its dedicated hosted key. It has no permissions for another entry's hosted bucket or KMS key.

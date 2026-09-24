@@ -128,10 +128,10 @@ module "lambda_dlq_reporter" {
   cloudwatch_logs_kms_key_id        = data.aws_kms_key.logs.arn
   cloudwatch_logs_retention_in_days = 90
   description                       = "Report terminal push-to-s3 pipeline delivery failures"
-  function_name                     = "ihft-${local.environment}-push-to-s3-dlq"
+  function_name                     = "${local.application_name}-${local.component_name}-dlq"
   handler                           = "reporter_handler.lambda_handler"
   memory_size                       = 256
-  role_name                         = "ihft-${local.environment}-push-to-s3-dlq"
+  role_name                         = "${local.application_name}-${local.component_name}-dlq"
   runtime                           = "python3.12"
   source_path                       = "lambda/file-mover"
   timeout                           = 60

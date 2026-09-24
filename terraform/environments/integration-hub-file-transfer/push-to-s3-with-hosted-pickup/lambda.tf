@@ -115,6 +115,11 @@ resource "aws_lambda_event_source_mapping" "hosted_pickup" {
     }
 
     precondition {
+      condition     = length(distinct(values(local.hosted_bucket_names))) == length(local.hosted_bucket_names)
+      error_message = "Hosted pickup bucket names must be unique per dispatch entry."
+    }
+
+    precondition {
       condition = alltrue([
         for entry in values(local.hosted_pickup_entries) :
         !startswith(entry.action.push_to_s3_with_hosted_pickup.destination_prefix, "/") &&
@@ -144,10 +149,10 @@ module "lambda_dlq_reporter" {
   cloudwatch_logs_kms_key_id        = data.aws_kms_key.logs.arn
   cloudwatch_logs_retention_in_days = 90
   description                       = "Report terminal hosted pickup pipeline failures"
-  function_name                     = "ihft-${local.environment}-hosted-dlq"
+  function_name                     = "${local.application_name}-${local.component_name}-dlq"
   handler                           = "reporter_handler.lambda_handler"
   memory_size                       = 256
-  role_name                         = "ihft-${local.environment}-hosted-dlq"
+  role_name                         = "${local.application_name}-${local.component_name}-dlq"
   runtime                           = "python3.12"
   source_path                       = "lambda/file-mover"
   timeout                           = 60
