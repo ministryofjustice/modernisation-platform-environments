@@ -498,6 +498,7 @@ locals {
       "/oracle/database/DRBISYS"  = local.secretsmanager_secrets.db
       "/oracle/database/DRBIAUD"  = local.secretsmanager_secrets.db
       "/sap/bip/pd"               = local.secretsmanager_secrets.bip
+      "/microsoft/sharepoint/1"   = local.secretsmanager_secrets.sharepoint
     }
   }
 }
