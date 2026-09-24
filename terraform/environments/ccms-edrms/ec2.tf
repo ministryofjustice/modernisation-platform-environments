@@ -74,7 +74,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   max_size                = 3
   min_size                = 2
   protect_from_scale_in   = true
-  default_instance_warmup = 0
+
 
 
   launch_template {
