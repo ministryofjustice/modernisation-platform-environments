@@ -71,7 +71,7 @@ data "aws_iam_policy_document" "sip_delivery_assistant_bedrock_assume_role" {
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:ministryofjustice/modernisation-platform-sip-delivery-assistant:environment:sip-generation"]
+      values   = ["repo:ministryofjustice@2203574/modernisation-platform-sip-delivery-assistant@1373350473:environment:sip-generation"]
     }
   }
 }
