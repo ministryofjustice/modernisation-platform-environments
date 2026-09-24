@@ -59,32 +59,50 @@ locals {
   # BU configuration — defines the spoke clusters and path within the monorepo
   # Each BU gets a nonlive and live AppProject + ApplicationSet pair
   # All BUs share the same source repo; isolation is via path prefix + AppProject destinations
+  #
+  # viewer_group is the BU's parent IAM Identity Center group (a child of the
+  # GitHub `business-units` team). It receives read-only ArgoCD UI access to
+  # this BU's Applications via the AppProject `roles` grant below — layer 2 of
+  # the BU-user access model (ADR-002, cloud-platform#8548). The paired layer-1
+  # VIEWER login mapping lives in the cluster component. Group NAMES are the
+  # source of truth; IDs are resolved from ListGroups (see data.tf).
+  # NOTE: octo→office-of-the-cto and cd→central-digital are inferred from
+  # child-team naming; hmpps/laa are exact (see ADR-002 "Groups in use").
   bu_configs = {
     octo = {
       clusters = {
         nonlive = "container-platform-octo-nonlive"
         live    = "container-platform-octo-live"
       }
+      viewer_group = "office-of-the-cto"
     }
     laa = {
       clusters = {
         nonlive = "container-platform-laa-nonlive"
         live    = "container-platform-laa-live"
       }
+      viewer_group = "laa"
     }
     hmpps = {
       clusters = {
         nonlive = "container-platform-hmpps-nonlive"
         live    = "container-platform-hmpps-live"
       }
+      viewer_group = "hmpps-developers"
     }
     cd = {
       clusters = {
         nonlive = "container-platform-cd-nonlive"
         live    = "container-platform-cd-live"
       }
+      viewer_group = "central-digital"
     }
   }
+
+  # Resolve BU parent group NAME -> IDC group ID (hub-only; see data.tf).
+  argocd_idc_group_id_by_name = local.is_argocd_hub ? {
+    for g in data.aws_identitystore_groups.all[0].groups : g.display_name => g.group_id
+  } : {}
 
   # Flatten BU configs into per-environment AppProject entries
   bu_appprojects = merge([
@@ -100,6 +118,10 @@ locals {
         # Cluster ARN constructed from account ID + cluster name
         cluster_arn = "arn:aws:eks:eu-west-2:${local.environment_management.account_ids[cluster_workspace]}:cluster/${cluster_workspace}"
         auto_sync   = env == "nonlive" ? true : false
+        # Read-only ArgoCD UI access (layer 2). Resolved BU parent group ID, or
+        # null if the group name does not resolve — the AppProject then simply
+        # gets no viewer role rather than failing the plan.
+        viewer_group_id = lookup(local.argocd_idc_group_id_by_name, bu_config.viewer_group, null)
       }
     }
   ]...)
@@ -142,6 +164,8 @@ locals {
       path_prefix       = "namespaces/ephemeral"
       cluster_arn       = "arn:aws:eks:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:cluster/${local.ephemeral_spoke_workspace}"
       auto_sync         = true
+      # Ephemeral dev spokes have no BU parent group, so no read-only viewer role.
+      viewer_group_id = null
     }
   } : {}
 
