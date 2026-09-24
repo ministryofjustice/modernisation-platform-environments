@@ -60,6 +60,15 @@ jobs:
       environment: "development"
       action: "plan_apply"
       plan_apply_tfargs: "-destroy"
+      state_rm_addresses: >-
+        module.cwa-poc2-environment.aws_lb.internal
+        module.cwa-poc2-environment.aws_lb_listener.internal
+        module.cwa-poc2-environment.aws_security_group.internal_lb
+        module.cwa-poc2-environment.aws_vpc_security_group_ingress_rule.internal_lb_inbound
+        module.cwa-poc2-environment.aws_vpc_security_group_egress_rule.internal_lb_outbound
+        aws_security_group.backup_lambda
+        aws_lambda_permission.allow_cloudwatch_to_call_check_mon_fri
+        aws_cloudwatch_event_target.deletesnapshotFunctioncheck_mon_fri
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}

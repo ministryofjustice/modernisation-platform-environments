@@ -27,6 +27,11 @@
             required: false
             description: "Any additional terraform arguments to be passed in to terraform plan/apply, e.g. -var 'foo=bar'"
             default: ""
+          state_rm_addresses:
+            type: string
+            required: false
+            description: "Optional space-separated Terraform state addresses to remove before apply"
+            default: ""
           do_state_refresh_on_plan:
             type: boolean
             required: false
@@ -365,6 +370,18 @@
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
             run: |
               terraform workspace select "${WORKSPACE_NAME}"
+
+          - name: Remove manually deleted resources from state
+            if: inputs.state_rm_addresses != ''
+            working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+            run: |
+              for address in ${{ inputs.state_rm_addresses }}; do
+                if terraform state list | grep -Fxq "${address}"; then
+                  terraform state rm "${address}"
+                else
+                  echo "${address} is not present in state; skipping"
+                fi
+              done
 
           - name: Terraform Plan
             working-directory: "${{ inputs.component != 'root' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
