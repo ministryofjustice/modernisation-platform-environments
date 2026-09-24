@@ -1,7 +1,7 @@
 locals {
   baseline_presets_test = {
     options = {
-      enable_ec2_session_manager_cloudwatch_logs  = true
+      enable_ec2_session_manager_cloudwatch_logs = true
     }
   }
 

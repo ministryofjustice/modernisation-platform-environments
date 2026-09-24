@@ -59,8 +59,8 @@ locals {
     ec2_autoscaling_groups = {
       t1-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_schedules = {
-          scale_up   = { recurrence = "0 5 * * Mon-Fri" }
-          scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
+          scale_up = { recurrence = "0 5 * * Mon-Fri" }
+          # scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
         }
         config = merge(local.ec2_autoscaling_groups.web.config, {
           ami_name                  = "oasys_webserver_release_*"
@@ -83,8 +83,8 @@ locals {
 
       t2-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_schedules = {
-          scale_up   = { recurrence = "0 5 * * Mon-Fri" }
-          scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
+          scale_up = { recurrence = "0 5 * * Mon-Fri" }
+          # scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
         }
         config = merge(local.ec2_autoscaling_groups.web.config, {
           ami_name                  = "oasys_webserver_release_*"
@@ -369,7 +369,7 @@ locals {
               "kms:Decrypt",
             ]
             resources = [
-              aws_kms_key.arns_integration[0].arn,
+              length(aws_kms_key.arns_integration) == 1 ? aws_kms_key.arns_integration[0].arn : null
             ]
             condition = {
               test     = "StringEquals"

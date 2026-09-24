@@ -89,3 +89,24 @@ module "cross_region_iam_role" {
     }
   }
 }
+
+data "aws_iam_policy_document" "eventbridge_firehose_kms" {
+  count = local.is-production ? 1 : 0
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+    ]
+    resources = [module.destination_kms_key[0].key_arn]
+  }
+}
+
+resource "aws_iam_role_policy" "eventbridge_firehose_kms" {
+  count = local.is-production ? 1 : 0
+
+  name   = "${local.component_name}-eventbridge-firehose-kms"
+  role   = module.destination_eventbridge[0].eventbridge_role_name
+  policy = data.aws_iam_policy_document.eventbridge_firehose_kms[0].json
+}

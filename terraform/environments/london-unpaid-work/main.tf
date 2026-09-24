@@ -51,6 +51,12 @@ module "baseline" {
     lookup(local.baseline_environment_specific, "lbs", {})
   )
 
+  s3_buckets = merge(
+    module.baseline_presets.s3_buckets,
+    lookup(local.baseline_all_environments, "s3_buckets", {}),
+    lookup(local.baseline_environment_specific, "s3_buckets", {}),
+  )
+
   secretsmanager_secrets = merge(
     module.baseline_presets.secretsmanager_secrets,
     lookup(local.baseline_all_environments, "secretsmanager_secrets", {}),
@@ -61,6 +67,23 @@ module "baseline" {
     module.baseline_presets.security_groups,
     lookup(local.baseline_all_environments, "security_groups", {}),
     lookup(local.baseline_environment_specific, "security_groups", {}),
+  )
+
+  iam_policies = merge(
+    module.baseline_presets.iam_policies,
+    lookup(local.baseline_all_environments, "iam_policies", {}),
+    lookup(local.baseline_environment_specific, "iam_policies", {}),
+  )
+
+  kms_grants = merge(
+    module.baseline_presets.kms_grants,
+    lookup(local.baseline_all_environments, "kms_grants", {}),
+    lookup(local.baseline_environment_specific, "kms_grants", {}),
+  )
+
+  ec2_autoscaling_groups = merge(
+    lookup(local.baseline_all_environments, "ec2_autoscaling_groups", {}),
+    lookup(local.baseline_environment_specific, "ec2_autoscaling_groups", {}),
   )
 }
 

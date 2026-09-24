@@ -11,7 +11,7 @@ module "rds" {
   identifier = local.component_name
 
   engine               = "postgres"
-  engine_version       = "17"
+  engine_version       = "17.11"
   family               = "postgres17"
   major_engine_version = "17"
   instance_class       = "db.t4g.small"

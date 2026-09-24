@@ -502,6 +502,9 @@ updates:
     directories:
       - "terraform/environments/data-factory-moj"
       - "terraform/environments/data-factory-moj/dms-core"
+      - "terraform/environments/data-factory-moj/dms-core/modules/dms-test-harness"
+      - "terraform/environments/data-factory-moj/dms-core/modules/oracle-test-harness"
+      - "terraform/environments/data-factory-moj/genesys-data-ingestion"
       - "terraform/environments/data-factory-moj/streaming-poc"
       - "terraform/environments/data-factory-moj/streaming-poc-devops"
       - "terraform/environments/data-factory-moj/streaming-poc-maf"
@@ -523,6 +526,7 @@ updates:
     directories:
       - "terraform/environments/data-platform"
       - "terraform/environments/data-platform/ai-gateway"
+      - "terraform/environments/data-platform/airflow"
       - "terraform/environments/data-platform/app"
       - "terraform/environments/data-platform/cluster"
       - "terraform/environments/data-platform/cluster/modules/kubernetes/namespace"
@@ -663,6 +667,7 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/digital-prison-reporting"
+      - "terraform/environments/digital-prison-reporting/cross-account-roles"
       - "terraform/environments/digital-prison-reporting/modules/apigateway/serverless-lambda-gw"
       - "terraform/environments/digital-prison-reporting/modules/athena_federated_query_connectors"
       - "terraform/environments/digital-prison-reporting/modules/athena_workgroups"
@@ -905,10 +910,24 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/integration-hub-file-transfer"
+      - "terraform/environments/integration-hub-file-transfer/push-to-s3"
+      - "terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup"
     schedule:
       interval: "daily"
     groups:
       integration-hub-file-transfer:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 50
+    cooldown:
+      default-days: 7
+  - package-ecosystem: "terraform"
+    directories:
+      - "terraform/environments/laa-ai-enablement"
+    schedule:
+      interval: "daily"
+    groups:
+      laa-ai-enablement:
         patterns:
           - "*"
     open-pull-requests-limit: 50

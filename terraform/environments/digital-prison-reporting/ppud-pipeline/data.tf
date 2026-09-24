@@ -9,3 +9,26 @@ data "aws_secretsmanager_secret_version" "ppud_slack_webhook" {
 
   secret_id = data.aws_secretsmanager_secret.ppud_slack_webhook[0].id
 }
+
+data "aws_iam_session_context" "current" {
+  arn = data.aws_caller_identity.current.arn
+}
+
+data "aws_iam_roles" "data_engineering_roles" {
+  count = local.is-test ? 0 : 1
+
+  name_regex = "AWSReservedSSO_modernisation-platform-data-eng.*"
+}
+
+data "aws_iam_role" "dataapi_cross_role" {
+  count = local.is-test ? 0 : 1
+
+  name = "dpr-data-api-cross-account-role"
+}
+
+# Update Analytical Platform Share Policy & Role
+data "aws_iam_role" "analytical_platform_share_role" {
+  for_each = (local.is-development || local.is-preproduction) ? local.analytical_platform_share : {}
+
+  name = "${each.value.target_account_name}-share-role"
+}

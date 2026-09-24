@@ -13,6 +13,15 @@ def get_username(event):
     # return f"{event['Firstname']}.{event['Lastname']}"
     return event.get('Username') or f"{event['Firstname']}.{event['Lastname']}"
 
+
+def get_boolean(value, default=True):
+    if value is None:
+        return default
+    if isinstance(value, str):
+        return value.strip().lower() in {'true', '1', 'yes'}
+    return bool(value)
+
+
 def wait_for_ssm_command(ssm_client, command_id, instance_id, max_wait=300):
     """Poll SSM command status until it reaches a terminal state."""
     terminal_statuses = {'Success', 'Failed', 'TimedOut', 'Cancelled', 'DeliveryTimedOut'}
@@ -185,13 +194,15 @@ def create_workspace(event):
     kms_key_id = os.environ['KMS_KEY_ID']
 
     workspace_type = event.get('WorkspaceType', 'standard').lower()
+    encrypted = get_boolean(event.get('encrypted', True))
     bundle_map = {
         'standard':    os.environ['BUNDLE_ID_STANDARD'],
         'performance': os.environ['BUNDLE_ID_PERFORMANCE'],
-        'power':       os.environ['BUNDLE_ID_POWER']
+        'power':       os.environ['BUNDLE_ID_POWER'],
+        'dba_standard': os.environ['BUNDLE_ID_DBA_STANDARD']
     }
     bundle_id = bundle_map.get(workspace_type, os.environ['BUNDLE_ID_STANDARD'])
-    print(f"Using workspace type: {workspace_type} (bundle: {bundle_id})")
+    print(f"Using workspace type: {workspace_type} (bundle: {bundle_id}), encrypted: {encrypted}")
 
     # Legacy behavior (for quick rollback):
     # firstname = event['Firstname']
@@ -200,37 +211,40 @@ def create_workspace(event):
     username = get_username(event)
     
     workspaces = boto3.client('workspaces', region_name=region)
+    workspace_request = {
+        'DirectoryId': directory_id,
+        'UserName': username,
+        'BundleId': bundle_id,
+        'WorkspaceProperties': {
+            'RunningMode': 'AUTO_STOP',
+            'RunningModeAutoStopTimeoutInMinutes': 60
+        },
+        'Tags': [
+            {
+                'Key': 'application',
+                'Value': 'laa-workspaces'
+            },
+            {
+                'Key': 'business-unit',
+                'Value': 'LAA'
+            },
+            {
+                'Key': 'infrastructure-support',
+                'Value': 'laa_ops@digital.justice.gov.uk'
+            }
+        ]
+    }
+
+    if encrypted:
+        workspace_request.update({
+            'UserVolumeEncryptionEnabled': True,
+            'RootVolumeEncryptionEnabled': True,
+            'VolumeEncryptionKey': kms_key_id
+        })
     
     try:
         response = workspaces.create_workspaces(
-            Workspaces=[
-                {
-                    'DirectoryId': directory_id,
-                    'UserName': username,
-                    'BundleId': bundle_id,
-                    'UserVolumeEncryptionEnabled': True,
-                    'RootVolumeEncryptionEnabled': True,
-                    'VolumeEncryptionKey': kms_key_id,
-                    'WorkspaceProperties': {
-                        'RunningMode': 'AUTO_STOP',
-                        'RunningModeAutoStopTimeoutInMinutes': 60
-                    },
-                    'Tags': [
-                        {
-                            'Key': 'application',
-                            'Value': 'laa-workspaces'
-                        },
-                        {
-                            'Key': 'business-unit',
-                            'Value': 'LAA'
-                        },
-                        {
-                            'Key': 'infrastructure-support',
-                            'Value': 'laa_ops@digital.justice.gov.uk'
-                        }
-                    ]
-                }
-            ]
+            Workspaces=[workspace_request]
         )
         
         if 'FailedRequests' in response:

@@ -154,9 +154,11 @@ ${file("${path.module}/xxx-new-scripts/user-creation.ps1")}
 output "user_creation_ec2_instance_id" {
   value       = local.environment == "development" ? aws_instance.user_creation_ec2.id : null
   description = "EC2 instance ID for user creation automation"
+  sensitive   = true
 }
 
 output "user_creation_ec2_private_ip" {
   value       = local.environment == "development" ? aws_instance.user_creation_ec2.private_ip : null
   description = "Private IP of user creation EC2 instance"
+  sensitive   = true
 }

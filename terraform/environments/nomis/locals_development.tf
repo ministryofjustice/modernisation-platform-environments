@@ -456,6 +456,29 @@ locals {
         })
       })
 
+      dev-nomis-web12-a = merge(local.ec2_instances.web_12, {
+        config = merge(local.ec2_instances.web_12.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.web_12.config.instance_profile_policies, [
+            "Ec2DevWeblogicPolicy",
+            "Ec2Dev19CWeblogicPolicy"
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_instances.web_12.user_data_cloud_init, {
+          args = merge(local.ec2_instances.web_12.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.web_12.tags, {
+          instance-scheduling     = "skip-scheduling"
+          nomis-environment       = "dev"
+          oracle-db-hostname-a    = "nomis-db19c-1-a"
+          oracle-db-hostname-b    = "none"
+          oracle-db-name          = "dev19c"
+          weblogic-config-target  = "dev"
+        })
+      })
+
       qa11r-nomis-web-a = merge(local.ec2_instances.web, {
         config = merge(local.ec2_instances.web.config, {
           availability_zone = "eu-west-2a"

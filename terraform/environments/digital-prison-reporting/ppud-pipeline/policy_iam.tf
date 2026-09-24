@@ -1,9 +1,4 @@
 # S3 Read Write Policy
-data "aws_iam_role" "dataapi_cross_role" {
-  count = local.is-test ? 0 : 1
-  name  = "dpr-data-api-cross-account-role"
-}
-
 resource "aws_iam_policy" "s3_read_write_ppud_policy" {
   count = local.is-test ? 0 : 1
 
@@ -35,12 +30,21 @@ resource "aws_iam_policy" "s3_read_write_ppud_policy" {
           "arn:aws:s3:::${local.short_name}-*/*",
           "arn:aws:s3:::${local.short_name}-*",
         ]
+      },
+      {
+        "Effect" : "Deny",
+        "Action" : [
+          "s3:DeleteObject",
+          "s3:PutObject",
+        ],
+        "Resource" : [
+          "arn:aws:s3:::${local.short_name}-*/*",
+          "arn:aws:s3:::${local.short_name}-*",
+        ]
       }
     ]
   })
 }
-
-
 
 resource "aws_iam_policy" "glue_catalog_ppud_read_only_policy" {
   count = local.is-test ? 0 : 1
@@ -57,20 +61,15 @@ resource "aws_iam_policy" "glue_catalog_ppud_read_only_policy" {
           "glue:CreateTable",
           "glue:DeleteTable",
           "glue:UpdateTable"
-
         ],
         "Resource" : [
-          "arn:aws:glue:${data.aws_region.current.region}:${local.modernisation_platform_account_id}:database/${local.short_name}_${local.short_name_environment}",
-          "arn:aws:glue:${data.aws_region.current.region}:${local.modernisation_platform_account_id}:table/${local.short_name}_${local.short_name_environment}/*"
-
+          "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/${local.short_name}_${local.short_name_environment}",
+          "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${local.short_name}_${local.short_name_environment}/*"
         ]
       },
     ]
   })
 }
-
-
-
 
 # S3 Read Write PPUD Policy attachment
 resource "aws_iam_role_policy_attachment" "s3_read_write_ppud" {
@@ -80,8 +79,6 @@ resource "aws_iam_role_policy_attachment" "s3_read_write_ppud" {
   role       = data.aws_iam_role.dataapi_cross_role[0].name
   policy_arn = aws_iam_policy.s3_read_write_ppud_policy[0].arn
 }
-
-
 
 # Glue Catalog Read-only attachment
 resource "aws_iam_role_policy_attachment" "glue_catalog_read_only_ppud" {

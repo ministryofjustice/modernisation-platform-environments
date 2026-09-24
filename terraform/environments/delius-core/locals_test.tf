@@ -80,6 +80,7 @@ locals {
   }
 
   delius_microservices_configs_test = {
+    # Weblogic/EIS ECS config managed here: https://github.com/ministryofjustice/delius-releases
     weblogic = {
       ec2_instance_type = "r7i.xlarge"
       asg_min_size      = 2
@@ -87,6 +88,12 @@ locals {
     }
 
     weblogic_eis = {
+      ec2_instance_type = "r7i.large"
+      asg_min_size      = 1
+      asg_max_size      = 1
+    }
+
+    weblogic_testdata_api = {
       ec2_instance_type = "r7i.large"
       asg_min_size      = 1
       asg_max_size      = 1

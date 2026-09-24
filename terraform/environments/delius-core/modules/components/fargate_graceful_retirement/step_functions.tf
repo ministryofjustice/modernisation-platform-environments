@@ -34,6 +34,22 @@ resource "aws_iam_policy" "step_function_policy" {
         ]
         Resource = "${aws_cloudwatch_log_group.log_group_for_sfn.arn}:*"
       },
+      {
+        Effect = "Allow"
+
+        Action = [
+          "logs:CreateLogDelivery",
+          "logs:GetLogDelivery",
+          "logs:UpdateLogDelivery",
+          "logs:DeleteLogDelivery",
+          "logs:ListLogDeliveries",
+          "logs:PutResourcePolicy",
+          "logs:DescribeResourcePolicies",
+          "logs:DescribeLogGroups"
+        ]
+
+        Resource = "*"
+      },
     ]
   })
 }
