@@ -24,7 +24,7 @@ module "flink_geofence" {
     parallelism           = 2
     parallelism_per_kpu   = 1
     auto_scaling_enabled  = true
-    log_retention_days    = 7
+    log_retention_days    = 365
     snapshots_enabled     = true
     checkpointing_enabled = true
     custom_property_group = {
@@ -110,7 +110,7 @@ module "flink_rules" {
     parallelism           = 2
     parallelism_per_kpu   = 1
     auto_scaling_enabled  = true
-    log_retention_days    = 7
+    log_retention_days    = 365
     snapshots_enabled     = true
     checkpointing_enabled = true
     custom_property_group = {
