@@ -32,11 +32,11 @@ module "laa_oem_logging" {
       }
 
       expiration = {
-        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
+        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current_logs
       }
 
       noncurrent_version_expiration = {
-        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
+        days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent_logs
       }
 
       abort_incomplete_multipart_upload_days = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
