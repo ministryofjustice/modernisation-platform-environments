@@ -60,12 +60,34 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_tasks_from_alb" {
   referenced_security_group_id = aws_security_group.alb.id
 }
 
-# PUI calls EBS DB, SOA, OPA, ClamAV and external services (Entra ID, postcode API, user management API)
-resource "aws_vpc_security_group_egress_rule" "ecs_tasks_egress_all" {
+
+resource "aws_vpc_security_group_egress_rule" "ecs_tasks_egress_https" {
   security_group_id = aws_security_group.ecs_tasks.id
-  description       = "Allow all outbound traffic"
-  ip_protocol       = "-1"
+  description       = "Allow outbound HTTPS"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
   cidr_ipv4         = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_egress_rule" "ecs_tasks_egress_db" {
+  for_each = { for pair in setproduct(local.db_ports, local.data_subnets_cidr_blocks) : "${pair[0]}-${pair[1]}" => pair }
+
+  security_group_id = aws_security_group.ecs_tasks.id
+  description       = "Allow outbound to EBS DB in the data subnets"
+  ip_protocol       = "tcp"
+  from_port         = each.value[0]
+  to_port           = each.value[0]
+  cidr_ipv4         = each.value[1]
+}
+
+resource "aws_vpc_security_group_egress_rule" "ecs_tasks_egress_clamav" {
+  security_group_id            = aws_security_group.ecs_tasks.id
+  description                  = "Allow outbound to ClamAV"
+  ip_protocol                  = "tcp"
+  from_port                    = 3310
+  to_port                      = 3310
+  referenced_security_group_id = data.aws_security_group.clamav.id
 }
 
 # ECS Cluster EC2 Security Group (the underlying hosts)
@@ -80,9 +102,38 @@ resource "aws_security_group" "cluster_ec2" {
   })
 }
 
-resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_all" {
+# ECS agent, ECR, SSM and CloudWatch over HTTPS
+resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_https" {
   security_group_id = aws_security_group.cluster_ec2.id
-  description       = "Allow all outbound traffic"
-  ip_protocol       = "-1"
+  description       = "Allow outbound HTTPS"
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
   cidr_ipv4         = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_db" {
+  for_each = { for pair in setproduct(local.db_ports, local.data_subnets_cidr_blocks) : "${pair[0]}-${pair[1]}" => pair }
+
+  security_group_id = aws_security_group.cluster_ec2.id
+  description       = "Allow outbound to EBS DB in the data subnets"
+  ip_protocol       = "tcp"
+  from_port         = each.value[0]
+  to_port           = each.value[0]
+  cidr_ipv4         = each.value[1]
+}
+
+resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_clamav" {
+  security_group_id            = aws_security_group.cluster_ec2.id
+  description                  = "Allow outbound to ClamAV"
+  ip_protocol                  = "tcp"
+  from_port                    = 3310
+  to_port                      = 3310
+  referenced_security_group_id = data.aws_security_group.clamav.id
+}
+
+# Shared ClamAV security group, managed in the ccms-feasibility root stack
+data "aws_security_group" "clamav" {
+  vpc_id = data.aws_vpc.shared.id
+  name   = "${local.application_name}-clamav-sg"
 }
