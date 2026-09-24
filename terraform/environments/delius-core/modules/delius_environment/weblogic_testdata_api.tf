@@ -111,7 +111,7 @@ resource "aws_autoscaling_group" "weblogic_testdata_api" {
   name                  = "weblogic-testdata-api-${var.env_name}-ecs-asg"
   max_size              = 1
   min_size              = 1
-  protect_from_scale_in = true
+  protect_from_scale_in = var.enable_autoscaling_schedule ? false : true
 
   vpc_zone_identifier = var.account_config.private_subnet_ids
 
@@ -165,6 +165,7 @@ resource "aws_autoscaling_schedule" "weblogic_data_scale_up" {
   scheduled_action_name  = "weblogic-data-${var.env_name}-scaleup"
   min_size               = var.delius_microservice_configs.weblogic_testdata_api.asg_min_size
   max_size               = var.delius_microservice_configs.weblogic_testdata_api.asg_max_size
+  desired_capacity       = var.delius_microservice_configs.weblogic_testdata_api.asg_min_size
   recurrence             = "0 19 * * Mon-Fri"
   autoscaling_group_name = aws_autoscaling_group.weblogic_testdata_api[0].name
 }

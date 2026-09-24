@@ -170,6 +170,25 @@ resource "kubectl_manifest" "argocd_project_bu" {
         { group = "rbac.authorization.k8s.io", kind = "ClusterRoleBinding" },
         { group = "apiextensions.k8s.io", kind = "CustomResourceDefinition" },
       ]
+      # Read-only project role (layer 2 of the BU-user access model — ADR-002,
+      # cloud-platform#8548). Global VIEWER (layer 1, cluster component) only
+      # grants UI login; a project role is what actually makes this BU's
+      # Applications visible, and scopes that visibility to this project alone.
+      # Bound to the BU's parent IAM Identity Center group. `clusters, get`
+      # lets the UI show the destination cluster name instead of "unknown".
+      # Omitted when the group did not resolve or there is no BU group
+      # (ephemeral dev spokes) — an empty list yields no role.
+      roles = each.value.viewer_group_id == null ? [] : [
+        {
+          name        = "bu-viewer"
+          description = "Read-only Application access for ${upper(each.value.bu_name)} (${each.value.environment})"
+          policies = [
+            "p, proj:${each.key}:bu-viewer, applications, get, ${each.key}/*, allow",
+            "p, proj:${each.key}:bu-viewer, clusters, get, *, allow",
+          ]
+          groups = [each.value.viewer_group_id]
+        }
+      ]
     }
   })
 }
