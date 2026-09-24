@@ -58,16 +58,6 @@ resource "aws_volume_attachment" "ebsdb_techst" {
   instance_id = module.oracle_ebs_db.instance_id
 }
 
-moved {
-  from = aws_ebs_volume.ebsdb_u01
-  to   = aws_ebs_volume.ebsdb_techst
-}
-
-moved {
-  from = aws_volume_attachment.ebsdb_u01
-  to   = aws_volume_attachment.ebsdb_techst
-}
-
 resource "aws_ebs_volume" "ebsdb_arch" {
   lifecycle { ignore_changes = [kms_key_id] }
   availability_zone = module.oracle_ebs_db.availability_zone
