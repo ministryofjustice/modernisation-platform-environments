@@ -35,7 +35,7 @@ resource "aws_vpc_security_group_ingress_rule" "ebsapps_ssh_workspace" {
   cidr_ipv4         = local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_prod
 }
 
-resource "aws_vpc_security_group_egress_rule" "ebsapps_to_db_oracle" {
+resource "aws_vpc_security_group_egress_rule" "ebsapps_to_db" {
   security_group_id            = aws_security_group.ebsapps.id
   description                  = "Oracle Net listener to DB tier"
   ip_protocol                  = "tcp"
@@ -78,4 +78,10 @@ resource "aws_vpc_security_group_egress_rule" "ebsapps_http" {
   from_port         = 80
   to_port           = 80
   cidr_ipv4         = "0.0.0.0/0"
+}
+
+# Renamed rules - keep until applied in all environments
+moved {
+  from = aws_vpc_security_group_egress_rule.ebsapps_to_db_oracle
+  to   = aws_vpc_security_group_egress_rule.ebsapps_to_db
 }

@@ -70,15 +70,13 @@ resource "aws_vpc_security_group_egress_rule" "ecs_tasks_egress_https" {
   cidr_ipv4         = "0.0.0.0/0"
 }
 
-resource "aws_vpc_security_group_egress_rule" "ecs_tasks_egress_db" {
-  for_each = { for pair in setproduct(local.db_ports, local.data_subnets_cidr_blocks) : "${pair[0]}-${pair[1]}" => pair }
-
-  security_group_id = aws_security_group.ecs_tasks.id
-  description       = "Allow outbound to EBS DB in the data subnets"
-  ip_protocol       = "tcp"
-  from_port         = each.value[0]
-  to_port           = each.value[0]
-  cidr_ipv4         = each.value[1]
+resource "aws_vpc_security_group_egress_rule" "ecs_tasks_egress_ebsdb" {
+  security_group_id            = aws_security_group.ecs_tasks.id
+  description                  = "Allow outbound to the EBS DB Oracle listener"
+  ip_protocol                  = "tcp"
+  from_port                    = 1521
+  to_port                      = 1522
+  referenced_security_group_id = data.aws_security_group.ebsdb.id
 }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_tasks_egress_clamav" {
@@ -112,15 +110,13 @@ resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_https" {
   cidr_ipv4         = "0.0.0.0/0"
 }
 
-resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_db" {
-  for_each = { for pair in setproduct(local.db_ports, local.data_subnets_cidr_blocks) : "${pair[0]}-${pair[1]}" => pair }
-
-  security_group_id = aws_security_group.cluster_ec2.id
-  description       = "Allow outbound to EBS DB in the data subnets"
-  ip_protocol       = "tcp"
-  from_port         = each.value[0]
-  to_port           = each.value[0]
-  cidr_ipv4         = each.value[1]
+resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_ebsdb" {
+  security_group_id            = aws_security_group.cluster_ec2.id
+  description                  = "Allow outbound to the EBS DB Oracle listener"
+  ip_protocol                  = "tcp"
+  from_port                    = 1521
+  to_port                      = 1522
+  referenced_security_group_id = data.aws_security_group.ebsdb.id
 }
 
 resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_clamav" {
@@ -136,4 +132,10 @@ resource "aws_vpc_security_group_egress_rule" "cluster_ec2_egress_clamav" {
 data "aws_security_group" "clamav" {
   vpc_id = data.aws_vpc.shared.id
   name   = "${local.application_name}-clamav-sg"
+}
+
+# EBS DB SG, managed in the ccms-feasibility/ccms-ebs stack
+data "aws_security_group" "ebsdb" {
+  vpc_id = data.aws_vpc.shared.id
+  name   = "ccms-ebs-${local.env_label}-ebsdb-sg"
 }
