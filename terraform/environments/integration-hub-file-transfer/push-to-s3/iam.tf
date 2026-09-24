@@ -62,7 +62,7 @@ module "iam_policy_delivery" {
 
   for_each = local.push_to_s3_entries
 
-  name        = "ihft-${local.environment}-push-to-s3-${each.key}"
+  name        = local.delivery_resource_names[each.key]
   description = "Deliver one configured Integration Hub prefix to its S3 destination"
   policy      = data.aws_iam_policy_document.delivery[each.key].json
 
@@ -78,7 +78,7 @@ module "iam_role_delivery" {
 
   create          = true
   use_name_prefix = false
-  name            = "ihft-${local.environment}-push-to-s3-${each.key}"
+  name            = local.delivery_resource_names[each.key]
 
   trust_policy_permissions = {
     AllowPushToS3Lambda = {

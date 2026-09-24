@@ -95,6 +95,11 @@ resource "aws_lambda_event_source_mapping" "push_to_s3" {
 
   lifecycle {
     precondition {
+      condition     = alltrue([for name in values(local.delivery_resource_names) : length(name) <= 64])
+      error_message = "Push-to-S3 delivery role names must be at most 64 characters."
+    }
+
+    precondition {
       condition = alltrue([
         for entry in values(local.push_to_s3_entries) :
         try(entry.action.push_to_s3.bucket_region, "eu-west-2") == "eu-west-2"

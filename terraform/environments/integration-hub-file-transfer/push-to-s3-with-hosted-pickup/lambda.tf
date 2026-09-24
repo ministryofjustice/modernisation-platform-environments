@@ -95,6 +95,13 @@ resource "aws_lambda_event_source_mapping" "hosted_pickup" {
 
   lifecycle {
     precondition {
+      condition = alltrue([
+        for name in concat(values(local.mover_role_names), values(local.customer_pickup_role_names)) : length(name) <= 64
+      ])
+      error_message = "Hosted pickup role names must be at most 64 characters."
+    }
+
+    precondition {
       condition     = data.aws_region.current.region == "eu-west-2"
       error_message = "push-to-s3-with-hosted-pickup supports only eu-west-2."
     }
