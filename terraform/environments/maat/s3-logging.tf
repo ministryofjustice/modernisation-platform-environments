@@ -143,7 +143,7 @@ data "aws_iam_policy_document" "s3_access_logs_policy" {
     condition {
       test = "StringLike"
       variable = "aws:SourceArn"
-      values   = [module.s3-bucket-artifacts.bucket.arn]
+      values   = [module.artifacts-s3.bucket.arn]
     }
   }
   ## Cloudfront Logging Bucket
@@ -181,7 +181,7 @@ data "aws_iam_policy_document" "s3_access_logs_policy" {
     condition {
       test = "StringLike"
       variable = "aws:SourceArn"
-      values   = [module.s3-bucket-lb-s3-access-logs.bucket.arn]
+      values   = [module.lb-s3-access-logs.bucket.arn]
     }
   }
 
