@@ -165,23 +165,28 @@ data "aws_iam_policy_document" "s3_access_logs_policy" {
       values   = [aws_s3_bucket.cloudfront.arn]
     }
   }
-  ## Loadbalancer Logging Bucket
-  statement {
-    sid     = "AllowS3Logging Loadbalancer Logging Bucket"
-    effect  = "Allow"
-    actions = ["s3:PutObject"]
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    resources = [
-      "${module.s3-bucket-logging.bucket.arn}/*",
-      module.s3-bucket-logging.bucket.arn
-    ]
-    condition {
-      test = "StringLike"
-      variable = "aws:SourceArn"
-      values   = [module.lb-s3-access-logs.bucket.arn]
+  ## Loadbalancer Logging Bucket - dynamic statement due to `local.existing_bucket_name` condition
+  dynamic "statement" {
+    for_each = local.existing_bucket_name == "" ? [1] : []
+    content {
+      sid = "AllowS3Logging Loadbalancer Logging Bucket"
+      effect = "Allow"
+      principals {
+        type        = "AWS"
+        identifiers = ["*"]
+      }
+      actions = ["s3:PutObject"]
+      resources = [
+        "${module.s3-bucket-logging.bucket.arn}/*",
+        module.s3-bucket-logging.bucket.arn
+      ]
+      condition {
+        test = "StringLike"
+        variable = "aws:SourceArn"
+        values   = [
+          module.lb-s3-access-logs[0].bucket.arn
+        ]
+      }
     }
   }
 
