@@ -46,7 +46,7 @@
 /terraform/environments/container-platform-laa @ministryofjustice/cloud-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/container-platform-octo @ministryofjustice/cloud-platform-engineers @ministryofjustice/container-platform-aws @ministryofjustice/modernisation-platform
 /terraform/environments/contract-work-administration @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-ccms-ebs-developers @ministryofjustice/laa-cwa-developer @ministryofjustice/laa-pcuam @ministryofjustice/laa-sre-admins @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
-/terraform/environments/cooker @ministryofjustice/modernisation-platform @ministryofjustice/octo-cyber @ministryofjustice/tvm-purple-team @ministryofjustice/modernisation-platform
+/terraform/environments/cooker @ministryofjustice/azure-aws-sso-modernisation-platform-new-starters @ministryofjustice/modernisation-platform @ministryofjustice/octo-cyber @ministryofjustice/tvm-purple-team @ministryofjustice/modernisation-platform
 /terraform/environments/corporate-staff-rostering @ministryofjustice/azure-aws-sso-csr-access @ministryofjustice/azure-aws-sso-csr-application-support @ministryofjustice/azure-aws-sso-digital-studio-operations @ministryofjustice/csr-application-support @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform-audit @ministryofjustice/studio-webops @ministryofjustice/syscon-devs @ministryofjustice/modernisation-platform
 /terraform/environments/dacp @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform-audit @ministryofjustice/modernisation-platform
 /terraform/environments/data-factory-corporate @ministryofjustice/corporate-data-factory-admins @ministryofjustice/modernisation-platform
@@ -129,7 +129,7 @@ laa-sre-admins @ministryofjustice/modernisation-platform
 /terraform/environments/prison-retail @ministryofjustice/azure-aws-sso-csr-application-support @ministryofjustice/azure-aws-sso-digital-studio-operations @ministryofjustice/csr-application-support @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/property-cafm-data-migration @ministryofjustice/property-datahub @ministryofjustice/modernisation-platform
 /terraform/environments/refer-monitor @ministryofjustice/hmpps-interventions-dashboard-access @ministryofjustice/hmpps-interventions-dev @ministryofjustice/modernisation-platform
-/terraform/environments/sprinkler @ministryofjustice/azure-aws-sso-modernisation-platform @ministryofjustice/modernisation-platform @ministryofjustice/octo-cyber @ministryofjustice/modernisation-platform
+/terraform/environments/sprinkler @ministryofjustice/azure-aws-sso-modernisation-platform @ministryofjustice/azure-aws-sso-modernisation-platform-new-starters @ministryofjustice/modernisation-platform @ministryofjustice/octo-cyber @ministryofjustice/modernisation-platform
 /terraform/environments/sprinkler/playground @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/testing @ministryofjustice/modernisation-platform @ministryofjustice/octo-cyber @ministryofjustice/modernisation-platform
 /terraform/environments/tipstaff @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
