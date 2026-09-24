@@ -269,6 +269,24 @@ def completion_detail(request, status, completed_at, destination=None, failure=N
     }
 
 
+def publish_completion(events, event_bus_name, request, detail):
+    response = events.put_events(
+        Entries=[
+            {
+                "Source": EVENT_SOURCE,
+                "DetailType": COMPLETED_DETAIL_TYPE,
+                "Detail": json.dumps(detail, separators=(",", ":")),
+                "EventBusName": event_bus_name,
+                "Resources": [
+                    f"arn:aws:s3:::{request.source_object['bucket']}/{request.source_object['key']}"
+                ],
+            }
+        ]
+    )
+    if response.get("FailedEntryCount", 0):
+        raise RuntimeError("EventBridge rejected the completion event")
+
+
 def batch_response(records, process_record):
     failures = []
     for record in records:
@@ -290,6 +308,7 @@ class FileMover:
         source_prefix_map,
         event_bus_name,
         supported_region,
+        outcomes=None,
     ):
         self.secrets = secrets
         self.events = events
@@ -298,6 +317,7 @@ class FileMover:
         self.source_prefix_map = source_prefix_map
         self.event_bus_name = event_bus_name
         self.supported_region = supported_region
+        self.outcomes = outcomes
 
         map_keys = set(authorised_destination_map)
         if map_keys != set(mover_role_map) or map_keys != set(source_prefix_map):
@@ -314,6 +334,11 @@ class FileMover:
 
     def process(self, event):
         request = parse_requested_action(event)
+        if self.outcomes is not None:
+            existing = self.outcomes.get(request)
+            if existing is not None:
+                self.outcomes.publish(request, existing, self._publish)
+                return json.loads(existing["detail"])["data"]["status"]
         try:
             destination = self._deliver(request)
             detail = completion_detail(
@@ -329,6 +354,10 @@ class FileMover:
                 datetime.now(timezone.utc),
                 failure=failure,
             )
+        if self.outcomes is not None:
+            item = self.outcomes.record(request, detail)
+            self.outcomes.publish(request, item, self._publish)
+            return json.loads(item["detail"])["data"]["status"]
         self._publish(request, detail)
         return detail["data"]["status"]
 
@@ -375,18 +404,4 @@ class FileMover:
         return {"bucket": authorised_destination.bucket, "key": target_key}
 
     def _publish(self, request, detail):
-        response = self.events.put_events(
-            Entries=[
-                {
-                    "Source": EVENT_SOURCE,
-                    "DetailType": COMPLETED_DETAIL_TYPE,
-                    "Detail": json.dumps(detail, separators=(",", ":")),
-                    "EventBusName": self.event_bus_name,
-                    "Resources": [
-                        f"arn:aws:s3:::{request.source_object['bucket']}/{request.source_object['key']}"
-                    ],
-                }
-            ]
-        )
-        if response.get("FailedEntryCount", 0):
-            raise RuntimeError("EventBridge rejected the completion event")
+        publish_completion(self.events, self.event_bus_name, request, detail)

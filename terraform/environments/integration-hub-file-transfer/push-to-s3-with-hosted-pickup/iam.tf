@@ -27,7 +27,10 @@ data "aws_iam_policy_document" "mover" {
     condition {
       test     = "ArnLike"
       variable = "kms:EncryptionContext:aws:s3:arn"
-      values   = ["${data.aws_s3_bucket.clean.arn}/${each.value.identity}${each.value.source_prefix}*"]
+      values = [
+        data.aws_s3_bucket.clean.arn,
+        "${data.aws_s3_bucket.clean.arn}/${each.value.identity}${each.value.source_prefix}*",
+      ]
     }
   }
 

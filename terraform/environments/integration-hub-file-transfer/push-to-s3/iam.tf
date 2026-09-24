@@ -2,6 +2,35 @@ data "aws_iam_policy_document" "delivery" {
   for_each = local.push_to_s3_entries
 
   statement {
+    sid       = "ReadConfiguredSourceVersion"
+    effect    = "Allow"
+    actions   = ["s3:GetObjectVersion"]
+    resources = ["${data.aws_s3_bucket.clean.arn}/${each.value.identity}${each.value.source_prefix}*"]
+  }
+
+  statement {
+    sid       = "DecryptConfiguredSource"
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
+    resources = [data.aws_kms_key.clean.arn]
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:ViaService"
+      values   = ["s3.eu-west-2.amazonaws.com"]
+    }
+
+    condition {
+      test     = "ArnLike"
+      variable = "kms:EncryptionContext:aws:s3:arn"
+      values = [
+        data.aws_s3_bucket.clean.arn,
+        "${data.aws_s3_bucket.clean.arn}/${each.value.identity}${each.value.source_prefix}*",
+      ]
+    }
+  }
+
+  statement {
     sid    = "WriteConfiguredDestination"
     effect = "Allow"
     actions = [
@@ -57,7 +86,12 @@ module "iam_role_delivery" {
       actions = ["sts:AssumeRole"]
       principals = [{
         type        = "AWS"
-        identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.lambda_role_name}"]
+        identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+      }]
+      condition = [{
+        test     = "ArnEquals"
+        variable = "aws:PrincipalArn"
+        values   = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.lambda_role_name}"]
       }]
     }
   }

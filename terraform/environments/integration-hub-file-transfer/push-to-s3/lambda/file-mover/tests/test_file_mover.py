@@ -1,4 +1,3 @@
-import io
 import json
 
 import pytest
@@ -81,21 +80,11 @@ class FakeSecrets:
         return self.response
 
 
-class FakeSourceS3:
-    def __init__(self):
-        self.calls = []
-        self.body = io.BytesIO(b"contents")
-
-    def get_object(self, **kwargs):
-        self.calls.append(kwargs)
-        return {"Body": self.body}
-
-
 class FakeDestinationS3:
     def __init__(self):
         self.calls = []
 
-    def upload_fileobj(self, **kwargs):
+    def copy(self, **kwargs):
         self.calls.append(kwargs)
 
 
@@ -109,7 +98,6 @@ class FakeEvents:
 
 
 def mover(secrets=None):
-    source = FakeSourceS3()
     destination = FakeDestinationS3()
     events = FakeEvents()
     role_calls = []
@@ -120,7 +108,6 @@ def mover(secrets=None):
 
     service = FileMover(
         secrets=secrets or FakeSecrets(),
-        source_s3=source,
         events=events,
         delivery_client_factory=delivery_factory,
         authorised_destination_map={
@@ -136,7 +123,7 @@ def mover(secrets=None):
         event_bus_name="integration-hub-file-transfer",
         supported_region="eu-west-2",
     )
-    return service, source, destination, events, role_calls
+    return service, destination, events, role_calls
 
 
 def test_parses_sqs_wrapped_sns_wrapped_event():
@@ -153,13 +140,13 @@ def test_replaces_only_the_configured_source_prefix():
 
 
 def test_role_mapping_isolated_by_exact_secret_arn():
-    service, source, _, events, role_calls = mover()
+    service, destination, events, role_calls = mover()
     event = requested_event()
     event["detail"]["data"]["configurationReference"]["secretArn"] = f"{SECRET_ARN}-other"
 
     assert service.process(event) == "failed"
     assert role_calls == []
-    assert source.calls == []
+    assert destination.calls == []
     failure = json.loads(events.calls[0]["Entries"][0]["Detail"])["data"]["failure"]
     assert failure == {
         "code": "UNAUTHORISED_CONFIGURATION",
@@ -168,7 +155,7 @@ def test_role_mapping_isolated_by_exact_secret_arn():
     }
 
 
-def test_copy_reads_exact_version_and_sets_destination_encryption():
+def test_copy_uses_exact_source_version_and_destination_encryption():
     request = RequestedAction(
         envelope_id="event-id",
         correlation_id="correlation-id",
@@ -184,13 +171,12 @@ def test_copy_reads_exact_version_and_sets_destination_encryption():
         "target/",
         "arn:aws:kms:eu-west-2:210987654321:key/key-id",
     )
-    source = FakeSourceS3()
     destination = FakeDestinationS3()
 
-    copy_version(source, destination, request, configuration, "target/file")
+    copy_version(destination, request, configuration, "target/file")
 
-    assert source.calls == [{"Bucket": "clean", "Key": "identity/file", "VersionId": "v1"}]
     call = destination.calls[0]
+    assert call["CopySource"] == {"Bucket": "clean", "Key": "identity/file", "VersionId": "v1"}
     assert call["Bucket"] == "customer-bucket"
     assert call["Key"] == "target/file"
     assert call["ExtraArgs"] == {
@@ -206,11 +192,10 @@ def test_rejects_destination_not_authorised_by_terraform():
     configuration = json.loads(response["SecretString"])
     configuration["action"]["push_to_s3"]["bucket_id"] = "different-customer-bucket"
     response["SecretString"] = json.dumps(configuration)
-    service, source, destination, events, role_calls = mover(FakeSecrets(response=response))
+    service, destination, events, role_calls = mover(FakeSecrets(response=response))
 
     assert service.process(requested_event()) == "failed"
 
-    assert source.calls == []
     assert destination.calls == []
     assert role_calls == []
     failure = json.loads(events.calls[0]["Entries"][0]["Detail"])["data"]["failure"]
@@ -222,11 +207,10 @@ def test_rejects_incomplete_kms_key_arn():
     configuration = json.loads(response["SecretString"])
     configuration["action"]["push_to_s3"]["kms_key_arn"] = "arn:aws:kms:eu-west-2:"
     response["SecretString"] = json.dumps(configuration)
-    service, source, destination, events, role_calls = mover(FakeSecrets(response=response))
+    service, destination, events, role_calls = mover(FakeSecrets(response=response))
 
     assert service.process(requested_event()) == "failed"
 
-    assert source.calls == []
     assert destination.calls == []
     assert role_calls == []
     failure = json.loads(events.calls[0]["Entries"][0]["Detail"])["data"]["failure"]
@@ -234,12 +218,11 @@ def test_rejects_incomplete_kms_key_arn():
 
 
 def test_rejects_mismatched_or_invalid_authorisation_maps():
-    service, source, _, events, _ = mover()
+    service, _, events, _ = mover()
 
     with pytest.raises(ValueError, match="same secret ARNs"):
         FileMover(
             secrets=service.secrets,
-            source_s3=source,
             events=events,
             delivery_client_factory=lambda **_: None,
             authorised_destination_map={},
@@ -252,7 +235,6 @@ def test_rejects_mismatched_or_invalid_authorisation_maps():
     with pytest.raises(ValueError, match="end with '/'"):
         FileMover(
             secrets=service.secrets,
-            source_s3=source,
             events=events,
             delivery_client_factory=lambda **_: None,
             authorised_destination_map={SECRET_ARN_PREFIX: {}},
@@ -264,7 +246,7 @@ def test_rejects_mismatched_or_invalid_authorisation_maps():
 
 
 def test_success_publishes_completion_with_destination():
-    service, source, destination, events, role_calls = mover()
+    service, destination, events, role_calls = mover()
 
     assert service.process(requested_event()) == "succeeded"
 
@@ -272,7 +254,7 @@ def test_success_publishes_completion_with_destination():
     assert service.secrets.calls == [
         {"SecretId": SECRET_ARN, "VersionId": "configuration-version"}
     ]
-    assert source.calls[0]["VersionId"] == "source-version"
+    assert destination.calls[0]["CopySource"]["VersionId"] == "source-version"
     assert destination.calls[0]["Key"] == "bag-end/reports/example.csv"
     entry = events.calls[0]["Entries"][0]
     detail = json.loads(entry["Detail"])
@@ -287,7 +269,7 @@ def test_success_publishes_completion_with_destination():
 def test_terminal_configuration_failure_emits_failed_completion():
     response = secret_response()
     response["SecretString"] = "{}"
-    service, _, _, events, _ = mover(FakeSecrets(response=response))
+    service, _, events, _ = mover(FakeSecrets(response=response))
 
     assert service.process(requested_event()) == "failed"
 
@@ -305,7 +287,7 @@ def test_transient_failure_is_raised_without_completion():
         },
         "GetSecretValue",
     )
-    service, _, _, events, _ = mover(FakeSecrets(error=error))
+    service, _, events, _ = mover(FakeSecrets(error=error))
 
     with pytest.raises(ClientError):
         service.process(requested_event())
@@ -313,18 +295,18 @@ def test_transient_failure_is_raised_without_completion():
 
 
 def test_wrapped_transient_copy_failure_is_raised_without_completion():
-    service, _, destination, events, _ = mover()
+    service, destination, events, _ = mover()
     transient = ClientError(
         {
             "Error": {"Code": "SlowDown", "Message": "retry"},
             "ResponseMetadata": {"HTTPStatusCode": 503},
         },
-        "UploadPart",
+        "UploadPartCopy",
     )
     try:
         raise RuntimeError("wrapped upload failure") from transient
     except RuntimeError as wrapped:
-        destination.upload_fileobj = lambda wrapped_error=wrapped, **_kwargs: (
+        destination.copy = lambda wrapped_error=wrapped, **_kwargs: (
             _ for _ in ()
         ).throw(wrapped_error)
 

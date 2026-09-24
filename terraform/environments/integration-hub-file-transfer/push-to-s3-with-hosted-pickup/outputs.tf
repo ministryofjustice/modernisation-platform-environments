@@ -21,5 +21,9 @@ output "pipeline" {
     sns_topic_arn        = module.sns_hosted_pickup.topic_arn
     sqs_queue_arn        = module.sqs_hosted_pickup.queue_arn
     sqs_dlq_arn          = module.sqs_hosted_pickup_dlq.queue_arn
+    eventbridge_dlq_arn  = module.sqs_hosted_pickup_eventbridge_dlq.queue_arn
+    sns_dlq_arn          = module.sqs_hosted_pickup_sns_dlq.queue_arn
+    processing_dlq_arn   = module.sqs_hosted_pickup_dlq.queue_arn
+    dlq_reporter_arn     = module.lambda_dlq_reporter.lambda_function_arn
   }
 }

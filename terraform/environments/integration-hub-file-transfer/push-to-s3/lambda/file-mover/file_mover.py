@@ -187,35 +187,27 @@ def _call_aws(function, terminal_code, terminal_message, **kwargs):
         raise TerminalFailure(terminal_code, terminal_message) from error
 
 
-def copy_version(source_s3, destination_s3, request, configuration, target_key):
-    response = _call_aws(
-        source_s3.get_object,
-        "SOURCE_UNAVAILABLE",
-        "The configured source object version is unavailable",
-        Bucket=request.source_object["bucket"],
-        Key=request.source_object["key"],
-        VersionId=request.source_object["versionId"],
+def copy_version(delivery_s3, request, configuration, target_key):
+    _call_aws(
+        delivery_s3.copy,
+        "DELIVERY_REJECTED",
+        "The destination rejected the file delivery",
+        CopySource={
+            "Bucket": request.source_object["bucket"],
+            "Key": request.source_object["key"],
+            "VersionId": request.source_object["versionId"],
+        },
+        Bucket=configuration.bucket,
+        Key=target_key,
+        ExtraArgs={
+            "ServerSideEncryption": "aws:kms",
+            "SSEKMSKeyId": configuration.kms_key_arn,
+        },
+        Config=TransferConfig(
+            multipart_threshold=MULTIPART_THRESHOLD,
+            multipart_chunksize=MULTIPART_CHUNK_SIZE,
+        ),
     )
-    body = response["Body"]
-    try:
-        _call_aws(
-            destination_s3.upload_fileobj,
-            "DELIVERY_REJECTED",
-            "The destination rejected the file delivery",
-            Fileobj=body,
-            Bucket=configuration.bucket,
-            Key=target_key,
-            ExtraArgs={
-                "ServerSideEncryption": "aws:kms",
-                "SSEKMSKeyId": configuration.kms_key_arn,
-            },
-            Config=TransferConfig(
-                multipart_threshold=MULTIPART_THRESHOLD,
-                multipart_chunksize=MULTIPART_CHUNK_SIZE,
-            ),
-        )
-    finally:
-        body.close()
 
 
 def completion_detail(request, status, completed_at, destination=None, failure=None):
@@ -245,6 +237,24 @@ def completion_detail(request, status, completed_at, destination=None, failure=N
     }
 
 
+def publish_completion(events, event_bus_name, request, detail):
+    response = events.put_events(
+        Entries=[
+            {
+                "Source": EVENT_SOURCE,
+                "DetailType": COMPLETED_DETAIL_TYPE,
+                "Detail": json.dumps(detail, separators=(",", ":")),
+                "EventBusName": event_bus_name,
+                "Resources": [
+                    f"arn:aws:s3:::{request.source_object['bucket']}/{request.source_object['key']}"
+                ],
+            }
+        ]
+    )
+    if response.get("FailedEntryCount", 0):
+        raise RuntimeError("EventBridge rejected the completion event")
+
+
 def batch_response(records, process_record):
     failures = []
     for record in records:
@@ -259,7 +269,6 @@ class FileMover:
     def __init__(
         self,
         secrets,
-        source_s3,
         events,
         delivery_client_factory,
         authorised_destination_map,
@@ -267,9 +276,9 @@ class FileMover:
         source_prefix_map,
         event_bus_name,
         supported_region,
+        outcomes=None,
     ):
         self.secrets = secrets
-        self.source_s3 = source_s3
         self.events = events
         self.delivery_client_factory = delivery_client_factory
         self.authorised_destination_map = authorised_destination_map
@@ -277,6 +286,7 @@ class FileMover:
         self.source_prefix_map = source_prefix_map
         self.event_bus_name = event_bus_name
         self.supported_region = supported_region
+        self.outcomes = outcomes
 
         if set(authorised_destination_map) != set(delivery_role_map) or set(
             authorised_destination_map
@@ -290,6 +300,11 @@ class FileMover:
 
     def process(self, event):
         request = parse_requested_action(event)
+        if self.outcomes is not None:
+            existing = self.outcomes.get(request)
+            if existing is not None:
+                self.outcomes.publish(request, existing, self._publish)
+                return json.loads(existing["detail"])["data"]["status"]
         try:
             destination = self._deliver(request)
             detail = completion_detail(
@@ -305,6 +320,10 @@ class FileMover:
                 datetime.now(timezone.utc),
                 failure=failure,
             )
+        if self.outcomes is not None:
+            item = self.outcomes.record(request, detail)
+            self.outcomes.publish(request, item, self._publish)
+            return json.loads(item["detail"])["data"]["status"]
         self._publish(request, detail)
         return detail["data"]["status"]
 
@@ -349,22 +368,8 @@ class FileMover:
             role_arn=role_arn,
             region=configuration.region,
         )
-        copy_version(self.source_s3, destination_s3, request, configuration, target_key)
+        copy_version(destination_s3, request, configuration, target_key)
         return {"bucket": configuration.bucket, "key": target_key}
 
     def _publish(self, request, detail):
-        response = self.events.put_events(
-            Entries=[
-                {
-                    "Source": EVENT_SOURCE,
-                    "DetailType": COMPLETED_DETAIL_TYPE,
-                    "Detail": json.dumps(detail, separators=(",", ":")),
-                    "EventBusName": self.event_bus_name,
-                    "Resources": [
-                        f"arn:aws:s3:::{request.source_object['bucket']}/{request.source_object['key']}"
-                    ],
-                }
-            ]
-        )
-        if response.get("FailedEntryCount", 0):
-            raise RuntimeError("EventBridge rejected the completion event")
+        publish_completion(self.events, self.event_bus_name, request, detail)

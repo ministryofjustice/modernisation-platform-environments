@@ -9,12 +9,16 @@ from aws_lambda_powertools.utilities.idempotency import (
     idempotent_function,
 )
 from file_mover import FileMover, batch_response
+from terminal_outcome import TerminalOutcomes
 
 logger = Logger()
 events = boto3.client("events")
 secrets = boto3.client("secretsmanager")
-source_s3 = boto3.client("s3")
 sts = boto3.client("sts")
+outcomes = TerminalOutcomes(
+    boto3.resource("dynamodb").Table(os.environ["IDEMPOTENCY_TABLE"]),
+    int(os.environ["IDEMPOTENCY_EXPIRY_SECONDS"]),
+)
 
 
 def delivery_client(role_arn, region):
@@ -35,7 +39,6 @@ def delivery_client(role_arn, region):
 
 file_mover = FileMover(
     secrets=secrets,
-    source_s3=source_s3,
     events=events,
     delivery_client_factory=delivery_client,
     authorised_destination_map=json.loads(os.environ["AUTHORISED_DESTINATION_MAP"]),
@@ -43,6 +46,7 @@ file_mover = FileMover(
     source_prefix_map=json.loads(os.environ["SOURCE_PREFIX_MAP"]),
     event_bus_name=os.environ["EVENT_BUS_NAME"],
     supported_region=os.environ["SUPPORTED_REGION"],
+    outcomes=outcomes,
 )
 persistence_layer = DynamoDBPersistenceLayer(table_name=os.environ["IDEMPOTENCY_TABLE"])
 idempotency_config = IdempotencyConfig(

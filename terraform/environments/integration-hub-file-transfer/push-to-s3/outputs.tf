@@ -18,5 +18,9 @@ output "pipeline" {
     sns_topic_arn        = module.sns_push_to_s3.topic_arn
     sqs_queue_arn        = module.sqs_push_to_s3.queue_arn
     sqs_dlq_arn          = module.sqs_push_to_s3_dlq.queue_arn
+    eventbridge_dlq_arn  = module.sqs_push_to_s3_eventbridge_dlq.queue_arn
+    sns_dlq_arn          = module.sqs_push_to_s3_sns_dlq.queue_arn
+    processing_dlq_arn   = module.sqs_push_to_s3_dlq.queue_arn
+    dlq_reporter_arn     = module.lambda_dlq_reporter.lambda_function_arn
   }
 }

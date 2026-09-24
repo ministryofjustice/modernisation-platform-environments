@@ -32,7 +32,7 @@ module "eventbridge_hosted_pickup" {
     "push-to-s3-with-hosted-pickup" = [{
       name            = "push-to-s3-with-hosted-pickup"
       arn             = module.sns_hosted_pickup.topic_arn
-      dead_letter_arn = module.sqs_hosted_pickup_dlq.queue_arn
+      dead_letter_arn = module.sqs_hosted_pickup_eventbridge_dlq.queue_arn
       retry_policy = {
         maximum_event_age_in_seconds = 21600
         maximum_retry_attempts       = 185

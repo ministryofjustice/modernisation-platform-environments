@@ -48,6 +48,6 @@ resource "aws_sns_topic_subscription" "push_to_s3" {
   endpoint             = module.sqs_push_to_s3.queue_arn
   raw_message_delivery = false
   redrive_policy = jsonencode({
-    deadLetterTargetArn = module.sqs_push_to_s3_dlq.queue_arn
+    deadLetterTargetArn = module.sqs_push_to_s3_sns_dlq.queue_arn
   })
 }

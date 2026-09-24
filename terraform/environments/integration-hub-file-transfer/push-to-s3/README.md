@@ -9,11 +9,11 @@ The component reads the shared `../modules/file-dispatch-configuration` module i
 One shared pipeline handles every selected entry:
 
 1. An EventBridge rule on the existing `integration-hub-file-transfer` custom bus selects `FileActionExecutionRequested.v1` events for `push-to-s3`.
-2. EventBridge publishes to an encrypted SNS topic, with an encrypted SQS dead-letter queue for exhausted EventBridge or SNS delivery attempts.
+2. EventBridge publishes to an encrypted SNS topic, with a dedicated encrypted SQS DLQ for exhausted EventBridge deliveries.
 3. SNS sends wrapped notifications to an encrypted SQS queue.
-4. The queue invokes one Lambda function with partial batch responses. Failed transient records are retried and eventually moved to the dead-letter queue.
-5. Lambda reads the exact clean-bucket object version, assumes the delivery role mapped to the immutable dispatch secret ARN, uploads to the configured customer bucket, and retains the source object.
-6. Lambda publishes `FileActionExecutionCompleted.v1` to the existing custom bus.
+4. SNS and the processing queue each have a separate encrypted SQS DLQ. The queue invokes one Lambda function with partial batch responses; exhausted transient records move to the processing DLQ. The SQS mapping caps concurrency at five; Lambda has no reserved concurrency.
+5. Lambda assumes the delivery role mapped to the validated dispatch secret ARN. That role reads only its clean-bucket source prefix and writes only its configured customer bucket prefix. S3 performs a managed multipart-capable server-side copy of the exact source `VersionId`; the source object is retained.
+6. Lambda publishes `FileActionExecutionCompleted.v1` to the existing custom bus. A separate reporter consumes the three DLQs, normalises their original request envelopes and emits one non-retryable failed completion when delivery exhausts retries. Both functions claim one terminal outcome per action execution in the existing DynamoDB table.
 
 The Lambda is not attached to a VPC because it uses public AWS service endpoints and does not need access to a private network.
 
@@ -55,7 +55,13 @@ ihft-<environment>-push-to-s3-<12-character-entry-id>
 
 The entry ID is the stable hash emitted by the shared module. The `delivery_roles` Terraform output maps each ID to its source and destination prefixes and role ARN.
 
-The Lambda execution role can read only configured clean-bucket prefixes and exact selected dispatch secrets. The environment contains ARN-keyed maps from each dispatch secret to its source prefix and delivery role. Each delivery role trusts only this component's Lambda role and can write only beneath its own destination bucket prefix using its own configured KMS key. It cannot read the clean bucket or write another entry's destination.
+The Lambda execution role can read only selected dispatch secrets and assume the configured delivery roles; it cannot read clean objects or write customer objects directly. The environment contains ARN-keyed maps from each dispatch secret to its source prefix and delivery role. Each delivery role trusts account root only when `aws:PrincipalArn` matches the exact component Lambda execution role; it can read only its configured clean source prefix and write only beneath its own destination prefix using the configured KMS keys. It cannot read another entry's source or write another entry's destination.
+
+## Dead-letter operations
+
+The `pipeline` output exposes `eventbridge_dlq_arn`, `sns_dlq_arn`, `processing_dlq_arn` and `dlq_reporter_arn`. The original `sqs_dlq_arn` and queue name are retained as the processing DLQ to avoid replacement. Before enabling the reporter, inspect and resolve any pre-existing messages on that formerly shared queue: older EventBridge messages may have a different envelope. Malformed or unrecognised requests remain in their DLQ for investigation.
+
+Each DLQ has a CloudWatch visible-message backlog alarm. These child states have no approved notification topic output, so alarms have no actions until operators connect them to the operational notification destination. Monitor oldest-message age and reporter failures as well: a reporter retry can keep a message in flight without a visible backlog. The terminal-outcome record expires after 90 days. Once a `FileActionExecutionCompleted.v1` failure has been emitted, never manually redrive that `actionExecutionId` to seek a successful completion; create a new request with a new action execution ID instead. An accepted EventBridge publication followed by a failed DynamoDB marker write may repeat the *same* completion detail; consumers must deduplicate using the completion idempotency key.
 
 ## Customer responsibilities
 
@@ -89,7 +95,10 @@ PYTHONPATH=terraform/environments/integration-hub-file-transfer/push-to-s3/lambd
   terraform/environments/integration-hub-file-transfer/push-to-s3/lambda/file-mover/tests
 python3 -m py_compile \
   terraform/environments/integration-hub-file-transfer/push-to-s3/lambda/file-mover/file_mover.py \
-  terraform/environments/integration-hub-file-transfer/push-to-s3/lambda/file-mover/handler.py
+  terraform/environments/integration-hub-file-transfer/push-to-s3/lambda/file-mover/handler.py \
+  terraform/environments/integration-hub-file-transfer/push-to-s3/lambda/file-mover/dlq_reporter.py \
+  terraform/environments/integration-hub-file-transfer/push-to-s3/lambda/file-mover/terminal_outcome.py \
+  terraform/environments/integration-hub-file-transfer/push-to-s3/lambda/file-mover/reporter_handler.py
 ```
 
 Do not run `terraform init`, `terraform plan`, or `terraform apply` as part of local component validation unless the deployment workflow explicitly requires it.

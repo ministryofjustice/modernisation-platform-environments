@@ -11,7 +11,6 @@ module "lambda_file_mover" {
   function_name                     = local.pattern_name
   handler                           = "handler.lambda_handler"
   memory_size                       = 512
-  reserved_concurrent_executions    = 5
   role_name                         = local.lambda_role_name
   runtime                           = "python3.12"
   source_path                       = "lambda/file-mover"
@@ -64,16 +63,6 @@ module "lambda_file_mover" {
       resources = [module.dynamodb_idempotency.dynamodb_table_arn]
     }
     }, length(local.push_to_s3_entries) == 0 ? {} : {
-    read_source_versions = {
-      effect    = "Allow"
-      actions   = ["s3:GetObjectVersion"]
-      resources = local.source_object_arns
-    }
-    decrypt_source = {
-      effect    = "Allow"
-      actions   = ["kms:Decrypt"]
-      resources = [data.aws_kms_key.clean.arn]
-    }
     read_dispatch_configuration = {
       effect    = "Allow"
       actions   = ["secretsmanager:GetSecretValue"]
@@ -121,5 +110,78 @@ resource "aws_lambda_event_source_mapping" "push_to_s3" {
       ])
       error_message = "push-to-s3 destination prefixes must be empty or end with '/', and must not start with '/'."
     }
+  }
+}
+
+module "lambda_dlq_reporter" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "8.8.0"
+
+  architectures                     = ["arm64"]
+  attach_tracing_policy             = true
+  cloudwatch_logs_kms_key_id        = data.aws_kms_key.logs.arn
+  cloudwatch_logs_retention_in_days = 90
+  description                       = "Report terminal push-to-s3 pipeline delivery failures"
+  function_name                     = "ihft-${local.environment}-push-to-s3-dlq"
+  handler                           = "reporter_handler.lambda_handler"
+  memory_size                       = 256
+  role_name                         = "ihft-${local.environment}-push-to-s3-dlq"
+  runtime                           = "python3.12"
+  source_path                       = "lambda/file-mover"
+  timeout                           = 60
+  tracing_mode                      = "Active"
+  trigger_on_package_timestamp      = false
+
+  environment_variables = {
+    DLQ_ARNS                   = jsonencode(local.push_to_s3_dlq_arns)
+    EVENT_BUS_NAME             = data.aws_cloudwatch_event_bus.file_transfer.name
+    IDEMPOTENCY_EXPIRY_SECONDS = tostring(90 * 24 * 60 * 60)
+    IDEMPOTENCY_TABLE          = module.dynamodb_idempotency.dynamodb_table_id
+    POWERTOOLS_LOG_LEVEL       = "INFO"
+    POWERTOOLS_SERVICE_NAME    = "${local.pattern_name}-dlq-reporter"
+  }
+
+  attach_policy_statements = true
+  policy_statements = {
+    consume_dlqs = {
+      effect = "Allow"
+      actions = [
+        "sqs:ChangeMessageVisibility",
+        "sqs:DeleteMessage",
+        "sqs:GetQueueAttributes",
+        "sqs:ReceiveMessage",
+      ]
+      resources = values(local.push_to_s3_dlq_arns)
+    }
+    decrypt_dlqs = {
+      effect    = "Allow"
+      actions   = ["kms:Decrypt"]
+      resources = [module.kms_push_to_s3.key_arn]
+    }
+    terminal_outcomes = {
+      effect    = "Allow"
+      actions   = ["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:UpdateItem"]
+      resources = [module.dynamodb_idempotency.dynamodb_table_arn]
+    }
+    publish_completion = {
+      effect    = "Allow"
+      actions   = ["events:PutEvents"]
+      resources = [data.aws_cloudwatch_event_bus.file_transfer.arn]
+    }
+  }
+
+  tags = local.tags
+}
+
+resource "aws_lambda_event_source_mapping" "push_to_s3_dlq_reporter" {
+  for_each                = local.push_to_s3_dlq_arns
+  event_source_arn        = each.value
+  function_name           = module.lambda_dlq_reporter.lambda_function_arn
+  batch_size              = 10
+  function_response_types = ["ReportBatchItemFailures"]
+
+  scaling_config {
+    maximum_concurrency = 2
   }
 }

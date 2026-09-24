@@ -48,6 +48,6 @@ resource "aws_sns_topic_subscription" "hosted_pickup" {
   endpoint             = module.sqs_hosted_pickup.queue_arn
   raw_message_delivery = false
   redrive_policy = jsonencode({
-    deadLetterTargetArn = module.sqs_hosted_pickup_dlq.queue_arn
+    deadLetterTargetArn = module.sqs_hosted_pickup_sns_dlq.queue_arn
   })
 }
