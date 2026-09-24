@@ -12,6 +12,11 @@ data "aws_iam_policy_document" "transfer_assume_role" {
       type        = "Service"
       identifiers = ["transfer.amazonaws.com"]
     }
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceAccount"
+      values   = ["${var.aws_account_id}"]
+    }
   }
 }
 

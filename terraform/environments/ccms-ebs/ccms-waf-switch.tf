@@ -149,6 +149,11 @@ resource "aws_iam_role" "scheduler_invoke_lambda_role" {
     Statement = [{
       Effect    = "Allow",
       Principal = { Service = "scheduler.amazonaws.com" },
+      Condition = {
+        StringEquals = {
+          "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+        }
+      },
       Action    = "sts:AssumeRole"
     }]
   })
