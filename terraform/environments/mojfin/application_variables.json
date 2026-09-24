@@ -15,10 +15,12 @@
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
       "s3_lifecycle_days_expiration_current": 366,
       "s3_lifecycle_days_expiration_noncurrent": 366,
-      "s3_lifecycle_days_transition_current_glacier": 31,
-      "s3_lifecycle_days_transition_current_standard": 1,
-      "s3_lifecycle_days_transition_noncurrent_glacier": 31,
-      "s3_lifecycle_days_transition_noncurrent_standard": 1
+      "s3_lifecycle_days_expiration_current_logs": 90,
+      "s3_lifecycle_days_expiration_noncurrent_logs": 90,
+      "s3_lifecycle_days_transition_current_glacier": 366,
+      "s3_lifecycle_days_transition_current_standard": 90,
+      "s3_lifecycle_days_transition_noncurrent_glacier": 366,
+      "s3_lifecycle_days_transition_noncurrent_standard": 90
     },
     "test": {
       "landing_zone_vpc_cidr": "test-data",
@@ -39,10 +41,12 @@
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
       "s3_lifecycle_days_expiration_current": 366,
       "s3_lifecycle_days_expiration_noncurrent": 366,
-      "s3_lifecycle_days_transition_current_glacier": 31,
-      "s3_lifecycle_days_transition_current_standard": 1,
-      "s3_lifecycle_days_transition_noncurrent_glacier": 31,
-      "s3_lifecycle_days_transition_noncurrent_standard": 1
+      "s3_lifecycle_days_expiration_current_logs": 90,
+      "s3_lifecycle_days_expiration_noncurrent_logs": 90,
+      "s3_lifecycle_days_transition_current_glacier": 366,
+      "s3_lifecycle_days_transition_current_standard": 90,
+      "s3_lifecycle_days_transition_noncurrent_glacier": 366,
+      "s3_lifecycle_days_transition_noncurrent_standard": 90
     },
     "production": {
       "landing_zone_vpc_cidr": "10.205.0.0/20",
@@ -58,10 +62,12 @@
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
       "s3_lifecycle_days_expiration_current": 366,
       "s3_lifecycle_days_expiration_noncurrent": 366,
-      "s3_lifecycle_days_transition_current_glacier": 31,
-      "s3_lifecycle_days_transition_current_standard": 1,
-      "s3_lifecycle_days_transition_noncurrent_glacier": 31,
-      "s3_lifecycle_days_transition_noncurrent_standard": 1
+      "s3_lifecycle_days_expiration_current_logs": 90,
+      "s3_lifecycle_days_expiration_noncurrent_logs": 90,
+      "s3_lifecycle_days_transition_current_glacier": 366,
+      "s3_lifecycle_days_transition_current_standard": 90,
+      "s3_lifecycle_days_transition_noncurrent_glacier": 366,
+      "s3_lifecycle_days_transition_noncurrent_standard": 90
     }
   }
 }
