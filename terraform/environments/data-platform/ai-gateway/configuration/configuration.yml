@@ -472,39 +472,39 @@ models:
       model_name: "OpenAI GPT 5.4 (EU)"
       model_provider: "azure"
       generally_available: false
-      environments_available: ["development", "test", "preproduction"]
+      environments_available: ["development", "test", "preproduction", "production"]
     gpt-5-4-mini:
       model_id: "gpt-5.4-mini"
       model_family: "OpenAI GPT"
       model_name: "OpenAI GPT 5.4 Mini (EU)"
       model_provider: "azure"
       generally_available: false
-      environments_available: ["development", "test", "preproduction"]
+      environments_available: ["development", "test", "preproduction", "production"]
     gpt-5-5:
       model_id: "gpt-5.5"
       model_family: "OpenAI GPT"
       model_name: "OpenAI GPT 5.5 (EU)"
       model_provider: "azure"
       generally_available: false
-      environments_available: ["development", "test", "preproduction"]
+      environments_available: ["development", "test", "preproduction", "production"]
     gpt-5-6-luna:
       model_id: "gpt-5.6-luna"
       model_family: "OpenAI GPT"
       model_name: "OpenAI GPT 5.6 Luna (EU)"
       model_provider: "azure"
       generally_available: false
-      environments_available: ["development", "test", "preproduction"]
+      environments_available: ["development", "test", "preproduction", "production"]
     gpt-5-6-sol:
       model_id: "gpt-5.6-sol"
       model_family: "OpenAI GPT"
       model_name: "OpenAI GPT 5.6 Sol (EU)"
       model_provider: "azure"
       generally_available: false
-      environments_available: ["development", "test", "preproduction"]
+      environments_available: ["development", "test", "preproduction", "production"]
     gpt-5-6-terra:
       model_id: "gpt-5.6-terra"
       model_family: "OpenAI GPT"
       model_name: "OpenAI GPT 5.6 Terra (EU)"
       model_provider: "azure"
       generally_available: false
-      environments_available: ["development", "test", "preproduction"]
+      environments_available: ["development", "test", "preproduction", "production"]
