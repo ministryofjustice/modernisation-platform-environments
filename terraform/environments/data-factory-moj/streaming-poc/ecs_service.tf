@@ -17,6 +17,7 @@ data "aws_iam_policy_document" "ecs_task_assume" {
 
 # Shared execution role policy - ECR pull and KMS decrypt
 data "aws_iam_policy_document" "ecs_task_exec" {
+  count = contains(local.deploy_to, local.environment) ? 1 : 0
   statement {
     effect = "Allow"
     actions = [
@@ -85,7 +86,7 @@ resource "aws_iam_role_policy" "sdg_task_exec_ecr" {
   count  = contains(local.deploy_to, local.environment) ? 1 : 0
   name   = "${local.sdg_prefix}-task-exec-ecr"
   role   = aws_iam_role.sdg_task_exec[0].name
-  policy = data.aws_iam_policy_document.ecs_task_exec.json
+  policy = data.aws_iam_policy_document.ecs_task_exec[0].json
 }
 
 data "aws_iam_policy_document" "sdg_task" {
@@ -172,7 +173,7 @@ resource "aws_iam_role_policy" "alerts_task_exec_ecr" {
   count  = contains(local.deploy_to, local.environment) ? 1 : 0
   name   = "${local.alerts_prefix}-task-exec-ecr"
   role   = aws_iam_role.alerts_task_exec[0].name
-  policy = data.aws_iam_policy_document.ecs_task_exec.json
+  policy = data.aws_iam_policy_document.ecs_task_exec[0].json
 }
 
 data "aws_iam_policy_document" "alerts_task" {
@@ -267,7 +268,7 @@ resource "aws_iam_role_policy" "kafka-ui_task_exec_ecr" {
   count  = contains(local.deploy_to, local.environment) ? 1 : 0
   name   = "${local.kafka_ui_prefix}-task-exec-ecr"
   role   = aws_iam_role.kafka_ui_task_exec[0].name
-  policy = data.aws_iam_policy_document.ecs_task_exec.json
+  policy = data.aws_iam_policy_document.ecs_task_exec[0].json
 }
 
 data "aws_iam_policy_document" "kafka_ui_task" {
