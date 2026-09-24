@@ -615,69 +615,6 @@ locals {
     # SERVER_PORT, which overrides the server.port in their packaged properties
     # (still used as-is by the legacy EC2 host).
     {
-      yjsm-hub = {
-        name                              = "yjsm-hub"
-        image                             = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:yjsm-hub-preprod"
-        task_cpu                          = 1024
-        task_memory                       = 3584
-        desired_count                     = 1
-        autoscaling_min_capacity          = 1
-        autoscaling_max_capacity          = 1
-        health_check_grace_period_seconds = 420
-        additional_port_mappings = [{
-          name          = "yjsm-hub-management"
-          containerPort = 9092
-          hostPort      = 9092
-          protocol      = "tcp"
-        }]
-        health_check = {
-          command      = ["CMD-SHELL", "curl -f http://localhost:9092/actuator/health || exit 1"]
-          interval     = 30
-          timeout      = 5
-          retries      = 10
-          start_period = 60
-        }
-        additional_environment_variables = [
-          {
-            "name" : "GATEWAY_SERVICE_URI"
-            "value" : "http://private-lb.${local.environment}.yjaf:8080"
-          },
-          {
-            "name" : "SERVER_PORT"
-            "value" : "8080"
-          },
-          {
-            "name" : "JAVA_OPTS",
-            "value" : "-Xmx2048m -Xms512m -Ddd.jmxfetch.enabled=true -Ddd.profiling.enabled=true -XX:FlightRecorderOptions=stackdepth=256 -Ddd.logs.injection=true -Ddd.trace.sample.rate=1 -Ddd.service=yjsm-hub -XX:-HeapDumpOnOutOfMemoryError"
-          }
-        ]
-        enable_postgres_secret = false
-      },
-      yjsm-hubadmin = {
-        name                              = "yjsm-hubadmin"
-        image                             = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:yjsm-hubadmin-preprod"
-        task_cpu                          = 1024
-        task_memory                       = 3072
-        desired_count                     = 1
-        autoscaling_min_capacity          = 1
-        autoscaling_max_capacity          = 1
-        health_check_grace_period_seconds = 420
-        additional_environment_variables = [
-          {
-            "name" : "GATEWAY_SERVICE_URI"
-            "value" : "http://private-lb.${local.environment}.yjaf:8080"
-          },
-          {
-            "name" : "SERVER_PORT"
-            "value" : "8080"
-          },
-          {
-            "name" : "JAVA_OPTS",
-            "value" : "-Xmx2048m -Xms1024m -Ddd.jmxfetch.enabled=true -Ddd.profiling.enabled=true -XX:FlightRecorderOptions=stackdepth=256 -Ddd.logs.injection=true -Ddd.trace.sample.rate=1 -Ddd.service=yjsm-hubadmin -XX:-HeapDumpOnOutOfMemoryError"
-          }
-        ]
-        enable_postgres_secret = false
-      },
       yjsm-ui = {
         name                              = "yjsm-ui"
         image                             = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/youth-justice-app-framework:yjsm-ui-preprod"

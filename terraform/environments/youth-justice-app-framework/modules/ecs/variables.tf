@@ -89,6 +89,7 @@ variable "ecs_services" {
     dependencies                   = optional(list(string), null)
     ecs_task_iam_role_name         = optional(string, null)
     load_balancer_target_group_arn = optional(string, null)
+    additional_security_group_ids  = optional(list(string), [])
     additional_container_definitions = optional(map(object({ #must define all the container def stuff again here otherwise terraform just wont pull it in and ignore it
       name          = string
       image         = string
