@@ -305,10 +305,9 @@ resource "aws_acm_certificate" "legacy_prod" {
   }
 }
 
-# Uncomment once cert is "ISSUED"
-# resource "aws_lb_listener_certificate" "legacy_prod" {
-#   count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name == "prod" ? 1 : 0
+resource "aws_lb_listener_certificate" "legacy_prod" {
+  count = contains(local.weblogic_cutover_envs, var.env_name) && var.env_name == "prod" ? 1 : 0
 
-#   listener_arn    = aws_lb_listener.listener_https.arn
-#   certificate_arn = aws_acm_certificate.legacy_prod[0].arn
-# }
+  listener_arn    = aws_lb_listener.listener_https.arn
+  certificate_arn = aws_acm_certificate.legacy_prod[0].arn
+}
