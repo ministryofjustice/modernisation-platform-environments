@@ -4,13 +4,16 @@ import time
 
 import boto3
 
+
 dms = boto3.client("dms")
 lambda_client = boto3.client("lambda")
 
-CREDENTIAL_SYNC_FUNCTION_ARN = os.environ["CREDENTIAL_SYNC_FUNCTION_ARN"]
+CREDENTIAL_SYNC_FUNCTION_ARN = os.environ.get(
+    "CREDENTIAL_SYNC_FUNCTION_ARN"
+)
 REPLICATION_INSTANCE_ARN = os.environ["REPLICATION_INSTANCE_ARN"]
 SOURCE_ENDPOINT_ARN = os.environ["SOURCE_ENDPOINT_ARN"]
-REPLICATION_TASK_ARN = os.environ["REPLICATION_TASK_ARN"]
+REPLICATION_TASK_ARN = os.environ.get("REPLICATION_TASK_ARN")
 
 POLL_INTERVAL_SECONDS = 10
 MAX_POLL_ATTEMPTS = 30
@@ -20,8 +23,16 @@ START_TYPES = {
     "resume": "resume-processing",
 }
 
+SUPPORTED_ACTIONS = {
+    "preflight",
+    *START_TYPES,
+}
+
 
 def synchronise_credentials():
+    if CREDENTIAL_SYNC_FUNCTION_ARN is None:
+        return False
+
     response = lambda_client.invoke(
         FunctionName=CREDENTIAL_SYNC_FUNCTION_ARN,
         InvocationType="RequestResponse",
@@ -31,12 +42,17 @@ def synchronise_credentials():
     payload = json.loads(response["Payload"].read() or b"{}")
 
     if response.get("FunctionError"):
-        raise RuntimeError("DMS source credential synchronisation failed.")
+        raise RuntimeError(
+            "DMS source credential synchronisation failed."
+        )
 
     if payload.get("statusCode") != 200:
         raise RuntimeError(
-            "DMS source credential synchronisation returned an unsuccessful response."
+            "DMS source credential synchronisation returned an "
+            "unsuccessful response."
         )
+
+    return True
 
 
 def get_connection():
@@ -54,9 +70,11 @@ def get_connection():
     )
 
     connections = response.get("Connections", [])
+
     if not connections:
         raise RuntimeError(
-            "AWS DMS did not return a connection test for the source endpoint."
+            "AWS DMS did not return a connection test for the source "
+            "endpoint."
         )
 
     return connections[0]
@@ -68,25 +86,31 @@ def test_source_connection():
         EndpointArn=SOURCE_ENDPOINT_ARN,
     )
 
-    for _ in range(MAX_POLL_ATTEMPTS):
+    for attempt in range(1, MAX_POLL_ATTEMPTS + 1):
         connection = get_connection()
         status = connection.get("Status")
 
         if status == "successful":
-            return
+            return {
+                "status": status,
+                "pollAttempts": attempt,
+            }
 
         if status == "failed":
             failure_message = connection.get(
                 "LastFailureMessage",
                 "AWS DMS did not provide a failure message.",
             )
+
             raise RuntimeError(
-                f"DMS source endpoint connection test failed: {failure_message}"
+                "DMS source endpoint connection test failed: "
+                f"{failure_message}"
             )
 
         if status != "testing":
             raise RuntimeError(
-                f"DMS source endpoint returned unexpected connection status: {status}"
+                "DMS source endpoint returned unexpected connection "
+                f"status: {status}"
             )
 
         time.sleep(POLL_INTERVAL_SECONDS)
@@ -96,29 +120,60 @@ def test_source_connection():
     )
 
 
-def lambda_handler(event, context):
-    action = event.get("action")
-
-    if action not in START_TYPES:
-        raise ValueError("action must be either 'start' or 'resume'.")
-
-    synchronise_credentials()
-    test_source_connection()
+def start_replication_task(action):
+    if REPLICATION_TASK_ARN is None:
+        raise RuntimeError(
+            "REPLICATION_TASK_ARN must be configured for start or resume."
+        )
 
     response = dms.start_replication_task(
         ReplicationTaskArn=REPLICATION_TASK_ARN,
         StartReplicationTaskType=START_TYPES[action],
     )
 
-    task = response["ReplicationTask"]
+    return response["ReplicationTask"]
+
+
+def lambda_handler(event, context):
+    action = event.get("action")
+
+    if action not in SUPPORTED_ACTIONS:
+        raise ValueError(
+            "action must be 'preflight', 'start' or 'resume'."
+        )
+
+    credentials_synchronised = synchronise_credentials()
+    connection = test_source_connection()
+
+    if action == "preflight":
+        return {
+            "statusCode": 200,
+            "action": action,
+            "credentialsSynchronised": credentials_synchronised,
+            "sourceEndpointArn": SOURCE_ENDPOINT_ARN,
+            "replicationInstanceArn": REPLICATION_INSTANCE_ARN,
+            "connectionStatus": connection["status"],
+            "pollAttempts": connection["pollAttempts"],
+            "message": (
+                "DMS source credential lifecycle completed and endpoint "
+                "preflight passed."
+            ),
+        }
+
+    task = start_replication_task(action)
 
     return {
         "statusCode": 200,
         "action": action,
+        "credentialsSynchronised": credentials_synchronised,
+        "sourceEndpointArn": SOURCE_ENDPOINT_ARN,
+        "replicationInstanceArn": REPLICATION_INSTANCE_ARN,
         "replicationTaskArn": task["ReplicationTaskArn"],
         "replicationTaskStatus": task["Status"],
+        "connectionStatus": connection["status"],
+        "pollAttempts": connection["pollAttempts"],
         "message": (
-            "DMS source credentials synchronised, endpoint preflight passed "
-            f"and replication task {action} was requested."
+            "DMS source credential lifecycle completed, endpoint "
+            f"preflight passed and replication task {action} was requested."
         ),
     }

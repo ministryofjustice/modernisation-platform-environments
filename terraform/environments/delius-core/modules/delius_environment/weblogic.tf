@@ -192,6 +192,28 @@ resource "aws_autoscaling_group" "weblogic" {
   }
 }
 
+resource "aws_autoscaling_schedule" "weblogic_scale_down" {
+  count = var.enable_autoscaling_schedule ? 1 : 0
+
+  scheduled_action_name  = "weblogic-${var.env_name}-scaledown"
+  min_size               = 0
+  max_size               = 0
+  desired_capacity       = 0
+  recurrence             = "0 5 * * Mon-Fri"
+  autoscaling_group_name = aws_autoscaling_group.weblogic.name
+}
+
+resource "aws_autoscaling_schedule" "weblogic_scale_up" {
+  count = var.enable_autoscaling_schedule ? 1 : 0
+
+  scheduled_action_name  = "weblogic-${var.env_name}-scaleup"
+  min_size               = var.delius_microservice_configs.weblogic.asg_min_size
+  max_size               = var.delius_microservice_configs.weblogic.asg_max_size
+  desired_capacity       = var.delius_microservice_configs.weblogic.asg_min_size
+  recurrence             = "0 19 * * Mon-Fri"
+  autoscaling_group_name = aws_autoscaling_group.weblogic.name
+}
+
 resource "aws_ecs_capacity_provider" "weblogic" {
   name = "weblogic-${var.env_name}-ec2-cp"
 
