@@ -68,25 +68,15 @@ resource "aws_launch_template" "ec2-launch-template" {
 }
 
 resource "aws_autoscaling_group" "cluster-scaling-group" {
-  name                    = "${local.application_name}-auto-scaling-group"
-  vpc_zone_identifier     = data.aws_subnets.shared-private.ids
-  desired_capacity        = 2
-  max_size                = 3
-  min_size                = 2
-  protect_from_scale_in   = true
-  default_instance_warmup = 300
+  name                = "${local.application_name}-auto-scaling-group"
+  vpc_zone_identifier = data.aws_subnets.shared-private.ids
+  desired_capacity    = 2
+  max_size            = 3
+  min_size            = 2
 
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id
     version = "$Latest"
   }
-
-  # ECS adds this tag automatically once the capacity provider is attached;
-  # declaring it here stops Terraform from stripping it back out on every apply.
-  # tag {
-  #   key                 = "AmazonECSManaged"
-  #   value               = ""
-  #   propagate_at_launch = true
-  # }
 
 }
