@@ -5,7 +5,7 @@ module "s3_bucket_efs_migration" {
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
-  custom_kms_key      = local.account_config.kms_keys.general_shared
+  sse_algorithm = "AES256"
 
   bucket_policy_v2 = [
     {
