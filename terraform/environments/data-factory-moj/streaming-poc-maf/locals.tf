@@ -3,7 +3,8 @@
 # ---------------------------------------------------------------------------------------------------------------------
 locals {
   name                  = "streaming-poc-maf"
-  deploy_to             = ["development"]
+  # POC resources destroyed but code retained; set back to ["development"] to redeploy
+  deploy_to             = []
   opensearch_host       = contains(local.deploy_to, local.environment) ? try(data.aws_opensearch_domain.opensearch["opensearch"].endpoint, null) : null
   msk_bootstrap_brokers = contains(local.deploy_to, local.environment) ? try(data.aws_msk_bootstrap_brokers.msk["msk"].bootstrap_brokers_sasl_iam, null) : null
   # TODO: uncomment if a sender ID is created and sms is out of sandbox mode.

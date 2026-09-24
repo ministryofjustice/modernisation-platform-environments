@@ -1,5 +1,5 @@
 resource "aws_msk_serverless_cluster" "cluster" {
-  count        = contains(["development"], local.environment) ? 1 : 0
+  count        = contains(local.deploy_to, local.environment) ? 1 : 0
   cluster_name = local.cluster_name
   region       = data.aws_region.current.region
 
@@ -24,7 +24,7 @@ resource "aws_msk_serverless_cluster" "cluster" {
 
 resource "aws_security_group" "msk" {
   #checkov:skip=CKV2_AWS_5:Skipping because this SG is attached via the MSK vpc_config block
-  count       = contains(["development"], local.environment) ? 1 : 0
+  count       = contains(local.deploy_to, local.environment) ? 1 : 0
   name_prefix = "${local.cluster_name}-sg"
   description = "Security group for MSK Serverless cluster"
   vpc_id      = data.aws_vpc.shared.id

@@ -7,7 +7,8 @@ locals {
   sdg_prefix        = "${local.ecs_prefix}-sdg"
   alerts_prefix     = "${local.ecs_prefix}-alerts"
   kafka_ui_prefix   = "${local.ecs_prefix}-kafka-ui"
-  deploy_to         = ["development"]
+  # POC resources destroyed but code retained; set back to ["development"] to redeploy
+  deploy_to         = []
   capacity_provider = contains(local.deploy_to, local.environment) ? "FARGATE_SPOT" : null
   secretsmanager_kms_key_arn = contains(local.deploy_to, local.environment) ? (
     try(aws_kms_key.secretsmanager[0].arn, "*")

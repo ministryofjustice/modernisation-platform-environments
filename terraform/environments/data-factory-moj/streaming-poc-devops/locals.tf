@@ -3,7 +3,8 @@
 # ---------------------------------------------------------------------------------------------------------------------
 locals {
   name      = "streaming-poc-devops"
-  deploy_to = ["development"]
+  # POC resources destroyed but code retained; set back to ["development"] to redeploy
+  deploy_to = []
 
   extended_tags = merge(local.tags, {
     component = local.name
