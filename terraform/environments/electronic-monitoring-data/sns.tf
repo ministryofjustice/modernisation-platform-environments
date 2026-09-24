@@ -43,6 +43,7 @@ data "aws_iam_policy_document" "emds_alerts_kms" {
     sid       = "AllowSNSUseOfKey"
     effect    = "Allow"
     resources = ["*"]
+
     actions = [
       "kms:Encrypt",
       "kms:Decrypt",
@@ -61,6 +62,7 @@ data "aws_iam_policy_document" "emds_alerts_kms" {
     sid       = "AllowCloudWatchUseOfKey"
     effect    = "Allow"
     resources = ["*"]
+
     actions = [
       "kms:Decrypt",
       "kms:GenerateDataKey",
@@ -131,8 +133,23 @@ data "aws_iam_policy_document" "emds_alerts_kms" {
       identifiers = [aws_iam_role.live_feed_incident_manager.arn]
     }
   }
-}
 
+  statement {
+    sid       = "AllowFmsValidationReporterUseOfKey"
+    effect    = "Allow"
+    resources = ["*"]
+
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.fms_validation_reporter.arn]
+    }
+  }
+}
 
 data "aws_iam_policy_document" "emds_alerts_topic_policy" {
   version = "2012-10-17"
@@ -236,6 +253,22 @@ data "aws_iam_policy_document" "emds_alerts_topic_policy" {
   }
 
   statement {
+    sid    = "AllowFmsValidationReporterLambdaToPublish"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [aws_sns_topic.emds_alerts.arn]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.fms_validation_reporter.arn]
+    }
+  }
+
+  statement {
     sid    = "AllowChatbotToConsume"
     effect = "Allow"
 
@@ -262,6 +295,7 @@ resource "aws_sns_topic_policy" "emds_alerts" {
   arn    = aws_sns_topic.emds_alerts.arn
   policy = data.aws_iam_policy_document.emds_alerts_topic_policy.json
 }
+
 data "aws_iam_policy_document" "operational_incident_updates_topic_policy" {
   version = "2012-10-17"
 
@@ -343,11 +377,13 @@ resource "aws_iam_role" "sns_delivery_logging" {
 data "aws_iam_policy_document" "sns_delivery_logging_policy" {
   statement {
     effect = "Allow"
+
     actions = [
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
-      "logs:PutLogEvents"
+      "logs:PutLogEvents",
     ]
+
     resources = ["*"]
   }
 }

@@ -1,12 +1,11 @@
 locals {
-  ec2_instances = {
-
+  ec2_autoscaling_groups = {
     web = {
       config = {
         ami_name                      = "hmpps_windows_server_2022_release_2026-09-14T16-17-24.564Z"
         availability_zone             = "eu-west-2a"
         ebs_volumes_copy_all_from_ami = false
-        iam_resource_names_prefix     = "ec2-london-unpaid-work"
+        iam_resource_names_prefix     = "ec2-asg-london-unpaid-work"
         instance_profile_policies = [
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
@@ -43,6 +42,12 @@ locals {
         os-type                = "Windows"
         server-type            = "london-unpaid-work-web"
       }
+
+      autoscaling_group = {
+        desired_capacity = 1
+        min_size         = 1
+        max_size         = 1
+      }
     }
 
     api = {
@@ -50,7 +55,7 @@ locals {
         ami_name                      = "hmpps_windows_server_2022_release_2026-09-14T16-17-24.564Z"
         availability_zone             = "eu-west-2a"
         ebs_volumes_copy_all_from_ami = false
-        iam_resource_names_prefix     = "ec2-london-unpaid-work"
+        iam_resource_names_prefix     = "ec2-asg-london-unpaid-work"
         instance_profile_policies = [
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
@@ -85,6 +90,12 @@ locals {
         instance-access-policy = "limited"
         os-type                = "Windows"
         server-type            = "london-unpaid-work-api"
+      }
+
+      autoscaling_group = {
+        desired_capacity = 1
+        min_size         = 1
+        max_size         = 1
       }
     }
   }
