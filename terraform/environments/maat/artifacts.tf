@@ -30,6 +30,14 @@ module "artifacts-s3" {
     }
   ]
 
+  manage_log_bucket_policy = false
+  log_buckets = {
+    log_bucket_name = module.s3-bucket-logging.bucket.id
+    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+  }
+
+  log_prefix = "s3access/${local.application_name}-build-artifacts"
+
   bucket_policy = [jsonencode({
     Version = "2012-10-17",
     Statement = [

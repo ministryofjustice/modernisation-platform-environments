@@ -164,6 +164,17 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
   }
 }
 
+resource "aws_s3_bucket_logging" "cloudfront" {
+  bucket = aws_s3_bucket.cloudfront.id
+  target_bucket = module.s3-bucket-logging.bucket.id
+  target_prefix = "s3access/${aws_s3_bucket.cloudfront.id}"
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
+}
+
 data "aws_iam_policy_document" "cloudfront_bucket_secure_transport" {
   statement {
     sid    = "DenyInsecureTransport"
