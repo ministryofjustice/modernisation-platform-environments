@@ -23,6 +23,8 @@
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
       "s3_lifecycle_days_expiration_current": 366,
       "s3_lifecycle_days_expiration_noncurrent": 366,
+      "s3_lifecycle_days_expiration_current_logs": 90,
+      "s3_lifecycle_days_expiration_noncurrent_logs": 90,
       "s3_lifecycle_days_transition_current_glacier": 366,
       "s3_lifecycle_days_transition_current_standard": 90,
       "s3_lifecycle_days_transition_noncurrent_glacier": 366,
