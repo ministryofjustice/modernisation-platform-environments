@@ -5,7 +5,7 @@ terraform {
       version = "~> 2.0"
     }
     aws = {
-      version = "~> 5.0, != 5.86.0"
+      version = "~> 6.0"
       source  = "hashicorp/aws"
     }
     http = {
