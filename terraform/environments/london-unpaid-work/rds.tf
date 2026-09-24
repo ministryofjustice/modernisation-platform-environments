@@ -52,6 +52,7 @@ resource "aws_db_instance" "database" {
   instance_class       = local.account_config.db_instance_class
   license_model        = "license-included"
   parameter_group_name = "default.sqlserver-se-15.0"
+  option_group_name    = aws_db_option_group.database[0].name
 
   username                    = local.account_config.db_user
   manage_master_user_password = true
@@ -83,4 +84,99 @@ resource "aws_db_instance" "database" {
       Name = local.account_config.db_identifier
     }
   )
+}
+
+data "aws_iam_policy_document" "rds_artifacts_assume_role" {
+  count = local.create_rds ? 1 : 0
+
+  statement {
+    sid    = "AllowRDSAssumeRole"
+    effect = "Allow"
+
+    actions = [
+      "sts:AssumeRole",
+    ]
+
+    principals {
+      type = "Service"
+
+      identifiers = [
+        "rds.amazonaws.com",
+      ]
+    }
+  }
+}
+
+resource "aws_iam_role" "rds_artifacts" {
+  count = local.create_rds ? 1 : 0
+
+  name               = "${local.application_name}-${local.environment}-rds-artifacts"
+  description        = "Allows London Unpaid Work RDS to read database backups from the artifacts bucket"
+  assume_role_policy = data.aws_iam_policy_document.rds_artifacts_assume_role[0].json
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "rds_artifacts" {
+  count = local.create_rds ? 1 : 0
+
+  statement {
+    sid    = "ListArtifactsBucket"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      module.baseline.s3_buckets["artifacts-bucket"].bucket.arn,
+    ]
+  }
+
+  statement {
+    sid    = "ReadDatabaseBackups"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+    ]
+
+    resources = [
+      "${module.baseline.s3_buckets["artifacts-bucket"].bucket.arn}/*",
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "rds_artifacts" {
+  count = local.create_rds ? 1 : 0
+
+  name   = "${local.application_name}-${local.environment}-rds-artifacts"
+  role   = aws_iam_role.rds_artifacts[0].id
+  policy = data.aws_iam_policy_document.rds_artifacts[0].json
+}
+
+resource "aws_db_option_group" "database" {
+  count = local.create_rds ? 1 : 0
+
+  name                     = "${local.application_name}-${local.environment}-database"
+  option_group_description = "SQL Server native backup and restore from the London Unpaid Work artifacts bucket"
+  engine_name              = "sqlserver-se"
+  major_engine_version     = "15.00"
+
+  option {
+    option_name = "SQLSERVER_BACKUP_RESTORE"
+
+    option_settings {
+      name  = "IAM_ROLE_ARN"
+      value = aws_iam_role.rds_artifacts[0].arn
+    }
+  }
+
+  tags = local.tags
+
+  depends_on = [
+    aws_iam_role_policy.rds_artifacts,
+  ]
 }
