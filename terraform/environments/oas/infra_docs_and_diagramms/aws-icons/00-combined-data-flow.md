@@ -13,10 +13,8 @@ flowchart LR
     ALB -->|"2 . HTTP/HTTPS 9500-9503<br/>/console /em /analytics /dv"| EC2["oas EC2<br/>WebLogic + Analytics"]
     EC2 -->|"3 . Oracle TNS 1521"| RDSOAS[("oas RDS Oracle 19c<br/>db.t3.medium")]
 
-    ADMIN["Administrator"] -->|"4a . SSH 22"| BASTION["Bastion host"]
-    BASTION -->|"5a . SSH 22"| EC2
-    ADMIN -->|"4b . Start-Session"| SSM["SSM Session<br/>Manager"]
-    SSM -.->|"5b . secure session"| EC2
+    ADMIN["Administrator"] -->|"4 . Start-Session"| SSM["SSM Session<br/>Manager"]
+    SSM -.->|"5 . secure session"| EC2
 
     WS["LZ Workspaces"] -.->|"6 . SQL Developer 1521<br/>(direct, bypasses app tier)"| RDSOAS
     WS -.->|"7 . SQL Developer 1521<br/>(troubleshooting only)"| RDSEDW[("edw-19c RDS Oracle 19c<br/>db.m6i.2xlarge")]
@@ -79,7 +77,7 @@ sequenceDiagram
 | **Only shared consumer** | LZ Workspaces, which connects independently to each RDS instance over SQL Developer 1521 |
 | **edw-19c automation** | None — no Lambdas, no CloudWatch alarms, no SNS topic; it's a passive RDS-only workload |
 | **Direct DB access** | LZ Workspaces reach both RDS instances without going through any app tier |
-| **Admin access (oas)** | Bastion (SSH) or SSM Session Manager only — edw-19c has no compute to administer |
+| **Admin access (oas)** | SSM Session Manager only (bastion and SSH removed) — edw-19c has no compute to administer |
 | **Password rotation** | oas: manual Lambda invoke only. edw-19c: generated once, never rotated |
 
 [← Back to index](README.md) · [See also: Combined General Infrastructure →](00-combined-general-infrastructure.md)
