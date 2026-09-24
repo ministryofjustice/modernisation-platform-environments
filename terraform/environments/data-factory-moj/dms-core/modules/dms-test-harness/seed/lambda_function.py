@@ -52,7 +52,9 @@ def lambda_handler(event, context):
     configuration = load_configuration()
     secret = get_secret(configuration["rds_secret_arn"])
 
-    with connect(configuration, secret) as connection:
+    connection = connect(configuration, secret)
+
+    try:
         handlers = {
             "reset": reset_database,
             "seed": seed_database,
@@ -61,6 +63,8 @@ def lambda_handler(event, context):
         }
 
         return handlers[action](connection)
+    finally:
+        connection.close()
 
 
 def load_configuration():
@@ -256,9 +260,10 @@ def mutate_database(connection):
 
 
 def read_database(connection):
-    with connection.cursor() as cursor:
-        ensure_test_table(cursor)
-        rows = fetch_rows(cursor)
+    with connection:
+        with connection.cursor() as cursor:
+            ensure_test_table(cursor)
+            rows = fetch_rows(cursor)
 
     return build_response(
         action="read",
