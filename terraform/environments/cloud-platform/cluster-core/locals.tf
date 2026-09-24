@@ -156,7 +156,7 @@ locals {
   # "<prefix>-spoke" derived from the hub's "<prefix>-hub" workspace name.
   ephemeral_spoke_workspace = replace(terraform.workspace, "-hub", "-spoke")
   ephemeral_spoke_registration = local.is_ephemeral_hub ? {
-    "${local.ephemeral_spoke_workspace}" = {
+    (local.ephemeral_spoke_workspace) = {
       bu_name           = "ephemeral"
       environment       = "nonlive"
       source_repo       = local.environments_repo
