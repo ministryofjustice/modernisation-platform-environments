@@ -667,6 +667,7 @@ updates:
   - package-ecosystem: "terraform"
     directories:
       - "terraform/environments/digital-prison-reporting"
+      - "terraform/environments/digital-prison-reporting/cross-account-roles"
       - "terraform/environments/digital-prison-reporting/modules/apigateway/serverless-lambda-gw"
       - "terraform/environments/digital-prison-reporting/modules/athena_federated_query_connectors"
       - "terraform/environments/digital-prison-reporting/modules/athena_workgroups"
