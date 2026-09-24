@@ -2,7 +2,7 @@
 # LOCALS
 # ---------------------------------------------------------------------------------------------------------------------
 locals {
-  name                  = "streaming-poc-maf"
+  name = "streaming-poc-maf"
   # POC resources destroyed but code retained; set back to ["development"] to redeploy
   deploy_to             = []
   opensearch_host       = contains(local.deploy_to, local.environment) ? try(data.aws_opensearch_domain.opensearch["opensearch"].endpoint, null) : null

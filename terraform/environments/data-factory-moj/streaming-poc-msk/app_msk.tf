@@ -4,7 +4,7 @@ resource "aws_msk_serverless_cluster" "cluster" {
   region       = data.aws_region.current.region
 
   vpc_config {
-    subnet_ids         = data.aws_subnets.shared-private.ids
+    subnet_ids         = data.aws_subnets.shared-private[0].ids
     security_group_ids = [aws_security_group.msk[0].id]
   }
 
@@ -27,7 +27,7 @@ resource "aws_security_group" "msk" {
   count       = contains(local.deploy_to, local.environment) ? 1 : 0
   name_prefix = "${local.cluster_name}-sg"
   description = "Security group for MSK Serverless cluster"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = data.aws_vpc.shared[0].id
 
   lifecycle {
     create_before_destroy = true

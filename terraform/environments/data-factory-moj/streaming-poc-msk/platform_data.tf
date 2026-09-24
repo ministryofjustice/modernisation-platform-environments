@@ -5,15 +5,17 @@ data "aws_caller_identity" "current" {}
 
 # VPC and subnet data
 data "aws_vpc" "shared" {
+  count = contains(local.deploy_to, local.environment) ? 1 : 0
   tags = {
     "Name" = "${var.networking[0].business-unit}-${local.environment}"
   }
 }
 
 data "aws_subnets" "shared-data" {
+  count = contains(local.deploy_to, local.environment) ? 1 : 0
   filter {
     name   = "vpc-id"
-    values = [data.aws_vpc.shared.id]
+    values = [data.aws_vpc.shared[0].id]
   }
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data*"
@@ -21,9 +23,10 @@ data "aws_subnets" "shared-data" {
 }
 
 data "aws_subnets" "shared-private" {
+  count = contains(local.deploy_to, local.environment) ? 1 : 0
   filter {
     name   = "vpc-id"
-    values = [data.aws_vpc.shared.id]
+    values = [data.aws_vpc.shared[0].id]
   }
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private*"
@@ -31,9 +34,10 @@ data "aws_subnets" "shared-private" {
 }
 
 data "aws_subnets" "shared-public" {
+  count = contains(local.deploy_to, local.environment) ? 1 : 0
   filter {
     name   = "vpc-id"
-    values = [data.aws_vpc.shared.id]
+    values = [data.aws_vpc.shared[0].id]
   }
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public*"
@@ -41,63 +45,72 @@ data "aws_subnets" "shared-public" {
 }
 
 data "aws_subnet" "data_subnets_a" {
-  vpc_id = data.aws_vpc.shared.id
+  count  = contains(local.deploy_to, local.environment) ? 1 : 0
+  vpc_id = data.aws_vpc.shared[0].id
   tags = {
     "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.region}a"
   }
 }
 
 data "aws_subnet" "data_subnets_b" {
-  vpc_id = data.aws_vpc.shared.id
+  count  = contains(local.deploy_to, local.environment) ? 1 : 0
+  vpc_id = data.aws_vpc.shared[0].id
   tags = {
     "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.region}b"
   }
 }
 
 data "aws_subnet" "data_subnets_c" {
-  vpc_id = data.aws_vpc.shared.id
+  count  = contains(local.deploy_to, local.environment) ? 1 : 0
+  vpc_id = data.aws_vpc.shared[0].id
   tags = {
     "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.region}c"
   }
 }
 
 data "aws_subnet" "private_subnets_a" {
-  vpc_id = data.aws_vpc.shared.id
+  count  = contains(local.deploy_to, local.environment) ? 1 : 0
+  vpc_id = data.aws_vpc.shared[0].id
   tags = {
     "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.region}a"
   }
 }
 
 data "aws_subnet" "private_subnets_b" {
-  vpc_id = data.aws_vpc.shared.id
+  count  = contains(local.deploy_to, local.environment) ? 1 : 0
+  vpc_id = data.aws_vpc.shared[0].id
   tags = {
     "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.region}b"
   }
 }
 
 data "aws_subnet" "private_subnets_c" {
-  vpc_id = data.aws_vpc.shared.id
+  count  = contains(local.deploy_to, local.environment) ? 1 : 0
+  vpc_id = data.aws_vpc.shared[0].id
   tags = {
     "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.region}c"
   }
 }
 
 data "aws_subnet" "public_subnets_a" {
-  vpc_id = data.aws_vpc.shared.id
+  count  = contains(local.deploy_to, local.environment) ? 1 : 0
+  vpc_id = data.aws_vpc.shared[0].id
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.region}a"
   }
 }
 
 data "aws_subnet" "public_subnets_b" {
-  vpc_id = data.aws_vpc.shared.id
+  count  = contains(local.deploy_to, local.environment) ? 1 : 0
+  vpc_id = data.aws_vpc.shared[0].id
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.region}b"
   }
 }
 
 data "aws_subnet" "public_subnets_c" {
-  vpc_id = data.aws_vpc.shared.id
+  count  = contains(local.deploy_to, local.environment) ? 1 : 0
+  vpc_id = data.aws_vpc.shared[0].id
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.region}c"
   }
@@ -105,6 +118,7 @@ data "aws_subnet" "public_subnets_c" {
 
 # Route53 DNS data
 data "aws_route53_zone" "external" {
+  count    = contains(local.deploy_to, local.environment) ? 1 : 0
   provider = aws.core-vpc
 
   name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
@@ -112,6 +126,7 @@ data "aws_route53_zone" "external" {
 }
 
 data "aws_route53_zone" "inner" {
+  count    = contains(local.deploy_to, local.environment) ? 1 : 0
   provider = aws.core-vpc
 
   name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.internal."

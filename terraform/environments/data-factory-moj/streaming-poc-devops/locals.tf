@@ -2,7 +2,7 @@
 # LOCALS
 # ---------------------------------------------------------------------------------------------------------------------
 locals {
-  name      = "streaming-poc-devops"
+  name = "streaming-poc-devops"
   # POC resources destroyed but code retained; set back to ["development"] to redeploy
   deploy_to = []
 
