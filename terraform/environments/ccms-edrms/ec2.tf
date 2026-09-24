@@ -73,6 +73,9 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   desired_capacity    = local.ecs_asg_desired_capacity
   max_size            = local.ecs_asg_max_size
   min_size            = local.ecs_asg_min_size
+  protect_from_scale_in   = true
+
+
 
   # validate min_size <= desired_capacity <= max_size
   lifecycle {
