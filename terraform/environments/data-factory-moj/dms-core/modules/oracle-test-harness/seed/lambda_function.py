@@ -620,7 +620,10 @@ def fetch_rows(cursor):
         SELECT
             ID,
             DESCRIPTION,
-            CREATED_AT
+            TO_CHAR(
+                CREATED_AT AT TIME ZONE 'UTC',
+                'YYYY-MM-DD"T"HH24:MI:SSTZH:TZM'
+            ) AS CREATED_AT
         FROM {TABLE_NAME}
         ORDER BY ID
         """
@@ -630,7 +633,7 @@ def fetch_rows(cursor):
         {
             "id": row[0],
             "description": row[1],
-            "createdAt": row[2].isoformat(),
+            "createdAt": row[2],
         }
         for row in cursor.fetchall()
     ]

@@ -11,7 +11,7 @@ module "oracle_test_harness" {
   kms_key_arn     = data.aws_kms_key.general_shared.arn
   rds_kms_key_arn = data.aws_kms_key.rds_shared.arn
 
-  seed_image_uri = "${aws_ecr_repository.dms_seed[0].repository_url}:oracle-seed-v3"
+  seed_image_uri = "${aws_ecr_repository.dms_seed[0].repository_url}:oracle-seed-v4"
 
   database_name     = "DMSTEST"
   database_username = "dms_admin"
