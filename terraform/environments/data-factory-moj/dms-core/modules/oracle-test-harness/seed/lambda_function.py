@@ -13,6 +13,33 @@ secretsmanager = boto3.client("secretsmanager")
 
 VALID_USERNAME = re.compile(r"^[A-Z][A-Z0-9_]{0,29}$")
 
+SUPPORTED_ACTIONS = {
+    "reset",
+    "seed",
+    "mutate",
+    "read",
+}
+
+TABLE_NAME = "DMS_INTEGRATION_TEST"
+
+INITIAL_ROWS = [
+    {
+        "id": 1,
+        "description": "First DMS integration test row",
+        "createdAt": "2026-09-10T09:00:00+00:00",
+    },
+    {
+        "id": 2,
+        "description": "Second DMS integration test row",
+        "createdAt": "2026-09-10T09:01:00+00:00",
+    },
+    {
+        "id": 3,
+        "description": "Third DMS integration test row",
+        "createdAt": "2026-09-10T09:02:00+00:00",
+    },
+]
+
 SYS_SELECT_OBJECTS = [
     "ALL_VIEWS",
     "ALL_TAB_PARTITIONS",
@@ -50,20 +77,29 @@ SYS_EXECUTE_OBJECTS = [
 
 
 def lambda_handler(event, context):
-    action = event.get("action", "seed")
+    action = (event or {}).get("action", "seed")
 
-    if action not in {"seed", "mutate"}:
+    if action not in SUPPORTED_ACTIONS:
         return {
             "statusCode": 400,
-            "message": f"Unsupported action: {action}",
+            "action": action,
+            "message": (
+                f"Unsupported action: {action}. Supported actions are: "
+                + ", ".join(sorted(SUPPORTED_ACTIONS))
+                + "."
+            ),
         }
 
     configuration = load_configuration()
 
-    if action == "seed":
-        return seed_database(configuration)
+    handlers = {
+        "reset": reset_database,
+        "seed": seed_database,
+        "mutate": mutate_database,
+        "read": read_database,
+    }
 
-    return mutate_database(configuration)
+    return handlers[action](configuration)
 
 
 def load_configuration():
@@ -115,17 +151,19 @@ def seed_database(configuration):
         configuration["dms_username"],
         dms_password,
     ) as dms_connection:
-        row_count = seed_test_table(dms_connection)
+        rows = seed_test_table(dms_connection)
 
-    return {
-        "statusCode": 200,
-        "action": "seed",
-        "message": (
+    return build_response(
+        action="seed",
+        message=(
             "Oracle source prepared and DMS integration-test data "
             "seeded successfully."
         ),
-        "rowCount": row_count,
-    }
+        rows=rows,
+        changes={
+            "inserted": [row["id"] for row in INITIAL_ROWS],
+        },
+    )
 
 
 def mutate_database(configuration):
@@ -138,12 +176,57 @@ def mutate_database(configuration):
     ) as connection:
         rows = mutate_test_table(connection)
 
-    return {
-        "statusCode": 200,
-        "action": "mutate",
-        "message": "Oracle DMS CDC test mutations applied successfully.",
-        "rows": rows,
-    }
+    return build_response(
+        action="mutate",
+        message="Oracle DMS CDC test mutations applied successfully.",
+        rows=rows,
+        changes={
+            "inserted": [4],
+            "updated": [2],
+            "deleted": [3],
+        },
+    )
+
+
+def reset_database(configuration):
+    dms_secret = get_secret(configuration["dms_secret_arn"])
+
+    with connect(
+        configuration,
+        dms_secret["username"],
+        dms_secret["password"],
+    ) as connection:
+        deleted_row_count, rows = reset_test_table(connection)
+
+    return build_response(
+        action="reset",
+        message=(
+            "Oracle DMS integration-test table reset successfully."
+        ),
+        rows=rows,
+        changes={
+            "deletedDuringReset": deleted_row_count,
+        },
+    )
+
+
+def read_database(configuration):
+    dms_secret = get_secret(configuration["dms_secret_arn"])
+
+    with connect(
+        configuration,
+        dms_secret["username"],
+        dms_secret["password"],
+    ) as connection:
+        rows = read_test_table(connection)
+
+    return build_response(
+        action="read",
+        message=(
+            "Oracle DMS integration-test table read successfully."
+        ),
+        rows=rows,
+    )
 
 
 def connect(configuration, username, password):
@@ -368,169 +451,230 @@ def grant_dms_privileges(cursor, dms_username):
         )
 
 
-def seed_test_table(connection):
+def reset_test_table(connection):
     with connection.cursor() as cursor:
+        ensure_test_table(cursor)
+
         cursor.execute(
-            """
-            SELECT COUNT(*)
-            FROM user_tables
-            WHERE table_name = 'DMS_INTEGRATION_TEST'
+            f"""
+            DELETE FROM {TABLE_NAME}
             """
         )
 
-        if cursor.fetchone()[0] == 0:
-            cursor.execute(
-                """
-                CREATE TABLE DMS_INTEGRATION_TEST (
-                    ID NUMBER(19) PRIMARY KEY,
-                    DESCRIPTION VARCHAR2(200) NOT NULL,
-                    CREATED_AT TIMESTAMP WITH TIME ZONE NOT NULL
-                )
-                """
-            )
-
-        seed_rows = [
-            (
-                1,
-                "First Oracle DMS integration test row",
-                "2026-09-22 09:00:00 +00:00",
-            ),
-            (
-                2,
-                "Second Oracle DMS integration test row",
-                "2026-09-22 09:01:00 +00:00",
-            ),
-            (
-                3,
-                "Third Oracle DMS integration test row",
-                "2026-09-22 09:02:00 +00:00",
-            ),
-        ]
-
-        for row_id, description, created_at in seed_rows:
-            cursor.execute(
-                """
-                MERGE INTO DMS_INTEGRATION_TEST target
-                USING (
-                    SELECT
-                        :row_id AS ID,
-                        :description AS DESCRIPTION,
-                        TO_TIMESTAMP_TZ(
-                            :created_at,
-                            'YYYY-MM-DD HH24:MI:SS TZH:TZM'
-                        ) AS CREATED_AT
-                    FROM dual
-                ) source
-                ON (target.ID = source.ID)
-                WHEN MATCHED THEN
-                    UPDATE SET
-                        target.DESCRIPTION = source.DESCRIPTION,
-                        target.CREATED_AT = source.CREATED_AT
-                WHEN NOT MATCHED THEN
-                    INSERT (
-                        ID,
-                        DESCRIPTION,
-                        CREATED_AT
-                    )
-                    VALUES (
-                        source.ID,
-                        source.DESCRIPTION,
-                        source.CREATED_AT
-                    )
-                """,
-                row_id=row_id,
-                description=description,
-                created_at=created_at,
-            )
-
-        cursor.execute(
-            """
-            DELETE FROM DMS_INTEGRATION_TEST
-            WHERE ID > 3
-            """
-        )
-
-        cursor.execute(
-            """
-            SELECT COUNT(*)
-            FROM DMS_INTEGRATION_TEST
-            """
-        )
-
-        row_count = cursor.fetchone()[0]
+        deleted_row_count = cursor.rowcount
+        rows = fetch_rows(cursor)
 
     connection.commit()
 
-    return row_count
+    return deleted_row_count, rows
 
 
-def mutate_test_table(connection):
+def seed_test_table(connection):
     with connection.cursor() as cursor:
+        ensure_test_table(cursor)
+
         cursor.execute(
+            f"""
+            DELETE FROM {TABLE_NAME}
             """
-            MERGE INTO DMS_INTEGRATION_TEST target
-            USING (
-                SELECT
-                    4 AS ID,
-                    'Fourth Oracle DMS integration test row - CDC insert'
-                        AS DESCRIPTION,
-                    TO_TIMESTAMP_TZ(
-                        '2026-09-22 10:00:00 +00:00',
-                        'YYYY-MM-DD HH24:MI:SS TZH:TZM'
-                    ) AS CREATED_AT
-                FROM dual
-            ) source
-            ON (target.ID = source.ID)
-            WHEN MATCHED THEN
-                UPDATE SET
-                    target.DESCRIPTION = source.DESCRIPTION,
-                    target.CREATED_AT = source.CREATED_AT
-            WHEN NOT MATCHED THEN
-                INSERT (
-                    ID,
-                    DESCRIPTION,
-                    CREATED_AT
+        )
+
+        cursor.executemany(
+            f"""
+            INSERT INTO {TABLE_NAME} (
+                ID,
+                DESCRIPTION,
+                CREATED_AT
+            )
+            VALUES (
+                :id,
+                :description,
+                TO_TIMESTAMP_TZ(
+                    :created_at,
+                    'YYYY-MM-DD"T"HH24:MI:SSTZH:TZM'
                 )
-                VALUES (
-                    source.ID,
-                    source.DESCRIPTION,
-                    source.CREATED_AT
-                )
-            """
+            )
+            """,
+            [
+                {
+                    "id": row["id"],
+                    "description": row["description"],
+                    "created_at": row["createdAt"],
+                }
+                for row in INITIAL_ROWS
+            ],
         )
 
-        cursor.execute(
-            """
-            UPDATE DMS_INTEGRATION_TEST
-            SET DESCRIPTION =
-                'Second Oracle DMS integration test row - CDC updated'
-            WHERE ID = 2
-            """
+        rows = fetch_rows(cursor)
+        assert_rows_match(
+            rows,
+            INITIAL_ROWS,
+            "Oracle seed",
         )
-
-        cursor.execute(
-            """
-            DELETE FROM DMS_INTEGRATION_TEST
-            WHERE ID = 3
-            """
-        )
-
-        cursor.execute(
-            """
-            SELECT ID, DESCRIPTION
-            FROM DMS_INTEGRATION_TEST
-            ORDER BY ID
-            """
-        )
-
-        rows = [
-            {
-                "id": row[0],
-                "description": row[1],
-            }
-            for row in cursor.fetchall()
-        ]
 
     connection.commit()
 
     return rows
+
+
+def mutate_test_table(connection):
+    with connection.cursor() as cursor:
+        ensure_test_table(cursor)
+
+        current_rows = fetch_rows(cursor)
+        assert_rows_match(
+            current_rows,
+            INITIAL_ROWS,
+            "Oracle mutation starting state",
+        )
+
+        cursor.execute(
+            f"""
+            INSERT INTO {TABLE_NAME} (
+                ID,
+                DESCRIPTION,
+                CREATED_AT
+            )
+            VALUES (
+                4,
+                'Fourth DMS integration test row - CDC insert',
+                TO_TIMESTAMP_TZ(
+                    '2026-09-10T10:00:00+00:00',
+                    'YYYY-MM-DD"T"HH24:MI:SSTZH:TZM'
+                )
+            )
+            """
+        )
+        require_affected_row_count(
+            cursor.rowcount,
+            expected=1,
+            operation="insert ID 4",
+        )
+
+        cursor.execute(
+            f"""
+            UPDATE {TABLE_NAME}
+            SET DESCRIPTION =
+                'Second DMS integration test row - CDC updated'
+            WHERE ID = 2
+            """
+        )
+        require_affected_row_count(
+            cursor.rowcount,
+            expected=1,
+            operation="update ID 2",
+        )
+
+        cursor.execute(
+            f"""
+            DELETE FROM {TABLE_NAME}
+            WHERE ID = 3
+            """
+        )
+        require_affected_row_count(
+            cursor.rowcount,
+            expected=1,
+            operation="delete ID 3",
+        )
+
+        rows = fetch_rows(cursor)
+
+    connection.commit()
+
+    return rows
+
+
+def read_test_table(connection):
+    with connection.cursor() as cursor:
+        ensure_test_table(cursor)
+        rows = fetch_rows(cursor)
+
+    return rows
+
+
+def ensure_test_table(cursor):
+    cursor.execute(
+        """
+        SELECT COUNT(*)
+        FROM user_tables
+        WHERE table_name = :table_name
+        """,
+        table_name=TABLE_NAME,
+    )
+
+    if cursor.fetchone()[0] == 0:
+        cursor.execute(
+            f"""
+            CREATE TABLE {TABLE_NAME} (
+                ID NUMBER(19) PRIMARY KEY,
+                DESCRIPTION VARCHAR2(200) NOT NULL,
+                CREATED_AT TIMESTAMP WITH TIME ZONE NOT NULL
+            )
+            """
+        )
+
+
+def fetch_rows(cursor):
+    cursor.execute(
+        f"""
+        SELECT
+            ID,
+            DESCRIPTION,
+            TO_CHAR(
+                CREATED_AT AT TIME ZONE 'UTC',
+                'YYYY-MM-DD"T"HH24:MI:SSTZH:TZM'
+            ) AS CREATED_AT
+        FROM {TABLE_NAME}
+        ORDER BY ID
+        """
+    )
+
+    return [
+        {
+            "id": row[0],
+            "description": row[1],
+            "createdAt": row[2],
+        }
+        for row in cursor.fetchall()
+    ]
+
+
+def assert_rows_match(actual_rows, expected_rows, operation):
+    if actual_rows != expected_rows:
+        raise RuntimeError(
+            f"{operation} produced or received an unexpected table state. "
+            f"Expected: {expected_rows}. Actual: {actual_rows}."
+        )
+
+
+def require_affected_row_count(
+    actual,
+    expected,
+    operation,
+):
+    if actual != expected:
+        raise RuntimeError(
+            f"Oracle mutation operation '{operation}' affected "
+            f"{actual} rows; expected {expected}."
+        )
+
+
+def build_response(
+    action,
+    message,
+    rows,
+    changes=None,
+):
+    response = {
+        "statusCode": 200,
+        "engine": "oracle",
+        "action": action,
+        "message": message,
+        "rowCount": len(rows),
+        "rows": rows,
+    }
+
+    if changes is not None:
+        response["changes"] = changes
+
+    return response
