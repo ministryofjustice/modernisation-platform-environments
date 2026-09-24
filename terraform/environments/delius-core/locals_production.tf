@@ -84,7 +84,7 @@ locals {
   }
 
   delius_microservices_configs_prod = {
-
+    # Weblogic/EIS ECS config managed here: https://github.com/ministryofjustice/delius-releases
     weblogic = {
       image_tag         = "6.2.0.3"
       container_port    = 8080
