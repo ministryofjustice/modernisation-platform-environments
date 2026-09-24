@@ -134,7 +134,7 @@ resource "aws_lb" "internal" {
   security_groups    = [aws_security_group.internal_lb.id]
   subnets            = [var.private_subnet_a_id, var.private_subnet_b_id, var.private_subnet_c_id]
 
-  enable_deletion_protection = true
+  enable_deletion_protection = local.lb_enable_deletion_protection
   idle_timeout               = 60
   enable_http2               = true
 
