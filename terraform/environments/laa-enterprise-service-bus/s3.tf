@@ -93,10 +93,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
       days_after_initiation = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
     }
     expiration {
-      days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current
+      days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current_logs
     }
     noncurrent_version_expiration {
-      noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent
+      noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent_logs
     }
   }
 
