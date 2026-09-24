@@ -9,7 +9,7 @@ module "sqs_push_to_s3_dlq" {
   create_queue_policy        = false
   kms_master_key_id          = module.kms_push_to_s3.key_arn
   message_retention_seconds  = 1209600
-  visibility_timeout_seconds = 300
+  visibility_timeout_seconds = 360
   receive_wait_time_seconds  = 20
 
   tags = local.tags
@@ -26,7 +26,7 @@ module "sqs_push_to_s3_eventbridge_dlq" {
   create_queue_policy        = false
   kms_master_key_id          = module.kms_push_to_s3.key_arn
   message_retention_seconds  = 1209600
-  visibility_timeout_seconds = 300
+  visibility_timeout_seconds = 360
   receive_wait_time_seconds  = 20
 
   tags = local.tags
@@ -43,7 +43,7 @@ module "sqs_push_to_s3_sns_dlq" {
   create_queue_policy        = false
   kms_master_key_id          = module.kms_push_to_s3.key_arn
   message_retention_seconds  = 1209600
-  visibility_timeout_seconds = 300
+  visibility_timeout_seconds = 360
   receive_wait_time_seconds  = 20
 
   tags = local.tags
