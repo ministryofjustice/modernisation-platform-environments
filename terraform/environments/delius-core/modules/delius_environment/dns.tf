@@ -27,8 +27,8 @@ resource "aws_route53_record" "alb_frontend_eis" {
 }
 
 resource "aws_route53_record" "alb_frontend_data" {
-  count   = var.env_name == "test" ? 1 : 0
-  
+  count = var.env_name == "test" ? 1 : 0
+
   provider = aws.core-vpc
 
   zone_id = var.account_config.route53_external_zone.zone_id
