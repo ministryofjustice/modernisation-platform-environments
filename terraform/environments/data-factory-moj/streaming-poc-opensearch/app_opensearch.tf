@@ -28,7 +28,7 @@ module "opensearch" {
   }
 
   vpc_options = {
-    subnet_ids         = slice(data.aws_subnets.shared-private.ids, 0, 2)
+    subnet_ids         = slice(data.aws_subnets.shared-private[0].ids, 0, 2)
     security_group_ids = [aws_security_group.opensearch[0].id]
   }
 
@@ -55,7 +55,7 @@ resource "aws_security_group" "opensearch" {
   count       = contains(local.deploy_to, local.environment) ? 1 : 0
   name_prefix = "${local.cluster_name}-sg"
   description = "Security group for OpenSearch domain access"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = data.aws_vpc.shared[0].id
 
   lifecycle {
     create_before_destroy = true

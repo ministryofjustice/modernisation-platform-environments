@@ -311,7 +311,7 @@ resource "aws_security_group" "sdg" {
   #checkov:skip=CKV2_AWS_5: Security group is attached to the SDG ECS service network configuration; Checkov cannot infer attachment through counted/dynamic references.
   count       = contains(local.deploy_to, local.environment) ? 1 : 0
   name_prefix = local.sdg_prefix
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = data.aws_vpc.shared[0].id
   description = "${local.sdg_prefix} SG"
 
   tags = merge(local.extended_tags, { Name = local.sdg_prefix })
@@ -348,14 +348,14 @@ resource "aws_vpc_security_group_egress_rule" "sdg_msk_out" {
   ip_protocol       = "tcp"
   from_port         = 9098
   to_port           = 9098
-  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  cidr_ipv4         = data.aws_vpc.shared[0].cidr_block
 }
 
 resource "aws_security_group" "alerts" {
   #checkov:skip=CKV2_AWS_5: Security group is attached to the alerts ECS service network configuration; Checkov cannot infer attachment through counted/dynamic references.
   count       = contains(local.deploy_to, local.environment) ? 1 : 0
   name_prefix = local.alerts_prefix
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = data.aws_vpc.shared[0].id
   description = "${local.alerts_prefix} SG"
 
   tags = merge(local.extended_tags, { Name = local.alerts_prefix })
@@ -382,14 +382,14 @@ resource "aws_vpc_security_group_egress_rule" "alerts_msk_out" {
   ip_protocol       = "tcp"
   from_port         = 9098
   to_port           = 9098
-  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  cidr_ipv4         = data.aws_vpc.shared[0].cidr_block
 }
 
 resource "aws_security_group" "kafka_ui" {
   #checkov:skip=CKV2_AWS_5: Security group is attached to the kafka-ui ECS service network configuration; Checkov cannot infer attachment through counted/dynamic references.
   count       = contains(local.deploy_to, local.environment) ? 1 : 0
   name_prefix = local.kafka_ui_prefix
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = data.aws_vpc.shared[0].id
   description = "${local.kafka_ui_prefix} SG"
 
   tags = merge(local.extended_tags, { Name = local.alerts_prefix })
@@ -406,7 +406,7 @@ resource "aws_vpc_security_group_egress_rule" "kafka_ui_msk_out" {
   ip_protocol       = "tcp"
   from_port         = 9098
   to_port           = 9098
-  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  cidr_ipv4         = data.aws_vpc.shared[0].cidr_block
 }
 
 resource "aws_vpc_security_group_egress_rule" "kafka_ui_https_out" {
@@ -426,7 +426,7 @@ resource "aws_vpc_security_group_ingress_rule" "kafka_ui_ingress" {
   ip_protocol       = "tcp"
   from_port         = 8080
   to_port           = 8080
-  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  cidr_ipv4         = data.aws_vpc.shared[0].cidr_block
 }
 
 # --- Synthetic Data Generator ---
@@ -477,7 +477,7 @@ module "ecs_service_sdg" {
 
   container_definitions = module.ecs_container_sdg[0].json_encoded_list
 
-  subnets         = data.aws_subnets.shared-private.ids
+  subnets         = data.aws_subnets.shared-private[0].ids
   security_groups = [aws_security_group.sdg[0].id]
 
   service_role_arn   = aws_iam_role.sdg_task[0].arn
@@ -561,7 +561,7 @@ module "ecs_service_alerts" {
 
   container_definitions = module.ecs_container_alerts[0].json_encoded_list
 
-  subnets         = data.aws_subnets.shared-private.ids
+  subnets         = data.aws_subnets.shared-private[0].ids
   security_groups = [aws_security_group.alerts[0].id]
 
   service_role_arn   = aws_iam_role.alerts_task[0].arn
@@ -649,7 +649,7 @@ module "ecs_service_kafka_ui" {
 
   container_definitions = module.ecs_container_kafka_ui[0].json_encoded_list
 
-  subnets         = data.aws_subnets.shared-private.ids
+  subnets         = data.aws_subnets.shared-private[0].ids
   security_groups = [aws_security_group.kafka_ui[0].id]
 
   service_role_arn   = aws_iam_role.kafka_ui_task[0].arn
