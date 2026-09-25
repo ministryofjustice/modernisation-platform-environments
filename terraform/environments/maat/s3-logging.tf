@@ -108,44 +108,44 @@ data "aws_iam_policy_document" "s3_access_logs_policy" {
       values   = [module.s3-bucket-shared.bucket.arn]
     }
   }
-  ## Athena Queries Bucket
-  # statement {
-  #   sid     = "AllowS3Logging Athena Queries Bucket"
-  #   effect  = "Allow"
-  #   actions = ["s3:PutObject"]
-  #   principals {
-  #     type        = "AWS"
-  #     identifiers = ["*"]
-  #   }
-  #   resources = [
-  #     "${module.s3-bucket-logging.bucket.arn}/*",
-  #     module.s3-bucket-logging.bucket.arn
-  #   ]
-  #   condition {
-  #     test = "StringLike"
-  #     variable = "aws:SourceArn"
-  #     values   = [module.s3-bucket-athena-queries-output.bucket.arn]
-  #   }
-  # }
-  ## Artifacts Bucket
-  # statement {
-  #   sid     = "AllowS3Logging Artifacts Bucket"
-  #   effect  = "Allow"
-  #   actions = ["s3:PutObject"]
-  #   principals {
-  #     type        = "AWS"
-  #     identifiers = ["*"]
-  #   }
-  #   resources = [
-  #     "${module.s3-bucket-logging.bucket.arn}/*",
-  #     module.s3-bucket-logging.bucket.arn
-  #   ]
-  #   condition {
-  #     test = "StringLike"
-  #     variable = "aws:SourceArn"
-  #     values   = [module.artifacts-s3.bucket.arn]
-  #   }
-  # }
+  # Athena Queries Bucket
+  statement {
+    sid     = "AllowS3Logging Athena Queries Bucket"
+    effect  = "Allow"
+    actions = ["s3:PutObject"]
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    resources = [
+      "${module.s3-bucket-logging.bucket.arn}/*",
+      module.s3-bucket-logging.bucket.arn
+    ]
+    condition {
+      test = "StringLike"
+      variable = "aws:SourceArn"
+      values   = [module.s3-bucket-athena-queries-output.bucket.arn]
+    }
+  }
+  # Artifacts Bucket
+  statement {
+    sid     = "AllowS3Logging Artifacts Bucket"
+    effect  = "Allow"
+    actions = ["s3:PutObject"]
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    resources = [
+      "${module.s3-bucket-logging.bucket.arn}/*",
+      module.s3-bucket-logging.bucket.arn
+    ]
+    condition {
+      test = "StringLike"
+      variable = "aws:SourceArn"
+      values   = [module.artifacts-s3.bucket.arn]
+    }
+  }
   ## Cloudfront Logging Bucket
   statement {
     sid     = "AllowS3Logging Cloudfront Logging Bucket"
@@ -166,29 +166,29 @@ data "aws_iam_policy_document" "s3_access_logs_policy" {
     }
   }
   ## Loadbalancer Logging Bucket - dynamic statement due to `local.existing_bucket_name` condition
-  # dynamic "statement" {
-  #   for_each = local.existing_bucket_name == "" ? [1] : []
-  #   content {
-  #     sid = "AllowS3Logging Loadbalancer Logging Bucket"
-  #     effect = "Allow"
-  #     principals {
-  #       type        = "AWS"
-  #       identifiers = ["*"]
-  #     }
-  #     actions = ["s3:PutObject"]
-  #     resources = [
-  #       "${module.s3-bucket-logging.bucket.arn}/*",
-  #       module.s3-bucket-logging.bucket.arn
-  #     ]
-  #     condition {
-  #       test = "StringLike"
-  #       variable = "aws:SourceArn"
-  #       values   = [
-  #         module.lb-s3-access-logs[0].bucket.arn
-  #       ]
-  #     }
-  #   }
-  # }
+  dynamic "statement" {
+    for_each = local.existing_bucket_name == "" ? [1] : []
+    content {
+      sid = "AllowS3Logging Loadbalancer Logging Bucket"
+      effect = "Allow"
+      principals {
+        type        = "AWS"
+        identifiers = ["*"]
+      }
+      actions = ["s3:PutObject"]
+      resources = [
+        "${module.s3-bucket-logging.bucket.arn}/*",
+        module.s3-bucket-logging.bucket.arn
+      ]
+      condition {
+        test = "StringLike"
+        variable = "aws:SourceArn"
+        values   = [
+          module.lb-s3-access-logs[0].bucket.arn
+        ]
+      }
+    }
+  }
 
 }
 
