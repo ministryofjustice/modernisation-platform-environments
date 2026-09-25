@@ -37,7 +37,9 @@ locals {
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
 
   # S3 Buckets for Access Logs
-  s3_access_logs_bucket_arns = [
-    aws_s3_bucket.laa_oem_shared.arn
-  ]
+  s3_access_logs_source_arns = compact(
+    [
+      aws_s3_bucket.laa_oem_shared.arn
+    ]
+  )
 }
