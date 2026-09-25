@@ -3,7 +3,7 @@ module "quicksight_sg" {
   # checkov:skip=CKV_TF_1
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "4.13.0"
+  version = "6.0.0"
 
   vpc_id      = var.vpc_id
   name        = "Quicksight"
