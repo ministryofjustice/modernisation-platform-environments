@@ -80,6 +80,28 @@ resource "aws_s3_bucket_versioning" "access_logs" {
   }
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+  rule {
+    id     = "log-retention"
+    status = "Enabled"
+    filter {
+      prefix = ""
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = local.application_data.accounts[local.environment].s3_lifecycle_days_abort_incomplete_multipart_upload_days
+    }
+    expiration {
+      days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_current_logs
+    }
+    noncurrent_version_expiration {
+      noncurrent_days = local.application_data.accounts[local.environment].s3_lifecycle_days_expiration_noncurrent_logs
+    }
+  }
+
+}
+
 
 #####################################################################################
 ################# Logging for Lambda Files S3 bucket ###############################
