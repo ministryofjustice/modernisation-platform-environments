@@ -572,3 +572,57 @@ resource "aws_scheduler_schedule" "fms_validation_reporter_catch_up" {
     })
   }
 }
+
+#-----------------------------------------------------------------------------------
+# Live feed specials remediation schedules
+# Automated cleanup runs only where downstream specials are excluded.
+#-----------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_event_rule" "specials_remediation_schedule" {
+  for_each = local.specials_remediation_active_consumers
+
+  name = (
+    "live_feed_specials_remediation_${each.key}_schedule"
+  )
+
+  description = (
+    "Checks ${each.value.consumer} position for downstream specials"
+  )
+
+  schedule_expression = each.value.schedule_expression
+}
+
+resource "aws_cloudwatch_event_target" "specials_remediation" {
+  for_each = local.specials_remediation_active_consumers
+
+  rule = aws_cloudwatch_event_rule.specials_remediation_schedule[
+    each.key
+  ].name
+
+  arn = module.live_feed_specials_remediator.lambda_function_arn
+
+  input = jsonencode({
+    consumer = each.value.consumer
+  })
+}
+
+resource "aws_lambda_permission" "allow_eventbridge_specials_remediation" {
+  for_each = local.specials_remediation_active_consumers
+
+  statement_id = format(
+    "AllowExecutionFromEventBridgeSpecialsRemediation%s",
+    title(each.key),
+  )
+
+  action = "lambda:InvokeFunction"
+
+  function_name = (
+    module.live_feed_specials_remediator.lambda_function_name
+  )
+
+  principal = "events.amazonaws.com"
+
+  source_arn = aws_cloudwatch_event_rule.specials_remediation_schedule[
+    each.key
+  ].arn
+}
