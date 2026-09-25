@@ -26,7 +26,7 @@ module "sqs_hosted_pickup_eventbridge_dlq" {
   create_queue_policy        = false
   kms_master_key_id          = module.kms_hosted_pickup_pipeline.key_arn
   message_retention_seconds  = 1209600
-  visibility_timeout_seconds = 300
+  visibility_timeout_seconds = 360
   receive_wait_time_seconds  = 20
 
   tags = local.tags
@@ -60,7 +60,7 @@ module "sqs_hosted_pickup" {
   create_queue_policy        = false
   kms_master_key_id          = module.kms_hosted_pickup_pipeline.key_arn
   message_retention_seconds  = 345600
-  visibility_timeout_seconds = 1800
+  visibility_timeout_seconds = 5400
   receive_wait_time_seconds  = 20
   redrive_policy = {
     deadLetterTargetArn = module.sqs_hosted_pickup_dlq.queue_arn

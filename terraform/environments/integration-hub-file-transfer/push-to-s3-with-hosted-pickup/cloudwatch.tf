@@ -9,6 +9,7 @@ module "cloudwatch_metric_alarms" {
   alarm_description   = each.value.alarm_description
   comparison_operator = each.value.comparison_operator
   dimensions          = each.value.dimensions
+  datapoints_to_alarm = try(each.value.datapoints_to_alarm, null)
   evaluation_periods  = each.value.evaluation_periods
   metric_name         = each.value.metric_name
   namespace           = each.value.namespace

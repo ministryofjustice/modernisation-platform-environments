@@ -13,21 +13,30 @@ module "lambda_file_mover" {
   memory_size                       = 512
   role_name                         = local.lambda_role_name
   runtime                           = "python3.12"
-  source_path                       = "lambda/file-mover"
-  timeout                           = 300
-  tracing_mode                      = "Active"
-  trigger_on_package_timestamp      = false
+  source_path = [{
+    path             = "${path.module}/../lambda/push-to-s3-writer"
+    pip_requirements = true
+    patterns = [
+      "!([^/]+/)*(tests|__pycache__|\\.pytest_cache)(/.*)?$",
+      "!(.*/)?[^/]+\\.pyc$",
+    ]
+  }]
+  timeout      = 900
+  tracing_mode = "Active"
 
   environment_variables = {
-    AUTHORISED_DESTINATION_MAP = jsonencode(local.authorised_destinations_by_secret)
-    DELIVERY_ROLE_MAP          = jsonencode(local.delivery_role_arns_by_secret)
-    EVENT_BUS_NAME             = data.aws_cloudwatch_event_bus.file_transfer.name
-    IDEMPOTENCY_EXPIRY_SECONDS = tostring(90 * 24 * 60 * 60)
-    IDEMPOTENCY_TABLE          = module.dynamodb_idempotency.dynamodb_table_id
-    POWERTOOLS_LOG_LEVEL       = "INFO"
-    POWERTOOLS_SERVICE_NAME    = local.pattern_name
-    SOURCE_PREFIX_MAP          = jsonencode(local.source_prefixes_by_secret)
-    SUPPORTED_REGION           = "eu-west-2"
+    ACTION_NAME                     = "push-to-s3"
+    AUTHORISED_DESTINATION_MAP      = jsonencode(local.authorised_destinations_by_secret)
+    DELIVERY_ROLE_MAP               = jsonencode(local.delivery_role_arns_by_secret)
+    EVENT_BUS_NAME                  = data.aws_cloudwatch_event_bus.file_transfer.name
+    IDEMPOTENCY_EXPIRY_SECONDS      = tostring(7 * 24 * 60 * 60)
+    IDEMPOTENCY_TABLE               = module.dynamodb_idempotency.dynamodb_table_id
+    POWERTOOLS_LOG_LEVEL            = "INFO"
+    POWERTOOLS_SERVICE_NAME         = local.pattern_name
+    SOURCE_BUCKET                   = data.aws_s3_bucket.clean.id
+    SOURCE_PREFIX_MAP               = jsonencode(local.source_prefixes_by_secret)
+    SUPPORTED_REGION                = "eu-west-2"
+    TERMINAL_OUTCOME_EXPIRY_SECONDS = tostring(90 * 24 * 60 * 60)
   }
 
   attach_policy_statements = true
@@ -86,7 +95,7 @@ module "lambda_file_mover" {
 resource "aws_lambda_event_source_mapping" "push_to_s3" {
   event_source_arn        = module.sqs_push_to_s3.queue_arn
   function_name           = module.lambda_file_mover.lambda_function_arn
-  batch_size              = 10
+  batch_size              = 1
   function_response_types = ["ReportBatchItemFailures"]
 
   scaling_config {
@@ -133,18 +142,31 @@ module "lambda_dlq_reporter" {
   memory_size                       = 256
   role_name                         = "${local.application_name}-${local.component_name}-dlq"
   runtime                           = "python3.12"
-  source_path                       = "lambda/file-mover"
-  timeout                           = 60
-  tracing_mode                      = "Active"
-  trigger_on_package_timestamp      = false
+  source_path = [{
+    path             = "${path.module}/../lambda/push-to-s3-writer"
+    pip_requirements = true
+    patterns = [
+      "!([^/]+/)*(tests|__pycache__|\\.pytest_cache)(/.*)?$",
+      "!(.*/)?[^/]+\\.pyc$",
+    ]
+  }]
+  timeout      = 60
+  tracing_mode = "Active"
 
   environment_variables = {
-    DLQ_ARNS                   = jsonencode(local.push_to_s3_dlq_arns)
-    EVENT_BUS_NAME             = data.aws_cloudwatch_event_bus.file_transfer.name
-    IDEMPOTENCY_EXPIRY_SECONDS = tostring(90 * 24 * 60 * 60)
-    IDEMPOTENCY_TABLE          = module.dynamodb_idempotency.dynamodb_table_id
-    POWERTOOLS_LOG_LEVEL       = "INFO"
-    POWERTOOLS_SERVICE_NAME    = "${local.pattern_name}-dlq-reporter"
+    ACTION_NAME                     = "push-to-s3"
+    AUTHORISED_DESTINATION_MAP      = jsonencode(local.authorised_destinations_by_secret)
+    DELIVERY_ROLE_MAP               = jsonencode(local.delivery_role_arns_by_secret)
+    DLQ_ARNS                        = jsonencode(local.push_to_s3_dlq_arns)
+    EVENT_BUS_NAME                  = data.aws_cloudwatch_event_bus.file_transfer.name
+    IDEMPOTENCY_EXPIRY_SECONDS      = tostring(7 * 24 * 60 * 60)
+    IDEMPOTENCY_TABLE               = module.dynamodb_idempotency.dynamodb_table_id
+    POWERTOOLS_LOG_LEVEL            = "INFO"
+    POWERTOOLS_SERVICE_NAME         = "${local.pattern_name}-dlq-reporter"
+    SOURCE_BUCKET                   = data.aws_s3_bucket.clean.id
+    SOURCE_PREFIX_MAP               = jsonencode(local.source_prefixes_by_secret)
+    SUPPORTED_REGION                = "eu-west-2"
+    TERMINAL_OUTCOME_EXPIRY_SECONDS = tostring(90 * 24 * 60 * 60)
   }
 
   attach_policy_statements = true

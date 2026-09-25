@@ -11,14 +11,28 @@ One shared pipeline handles every selected entry:
 1. An EventBridge rule on the existing `integration-hub-file-transfer` custom bus selects matching `FileActionExecutionRequested.v1` events.
 2. EventBridge publishes to an encrypted SNS topic and has its own encrypted SQS dead-letter queue for exhausted deliveries.
 3. SNS sends wrapped notifications to an encrypted SQS queue.
-4. SNS and the processing queue each have a separate encrypted SQS DLQ. The queue invokes one Lambda function with partial batch responses; exhausted transient records move to the processing DLQ. The SQS mapping caps concurrency at five; Lambda has no reserved concurrency.
+4. SNS and the processing queue each have a separate encrypted SQS DLQ. The queue invokes one Lambda function with partial batch responses, one record per invocation, a 900-second timeout, a 5,400-second visibility timeout and a maximum receive count of five; the mapping caps concurrency at five and has no batching window. Lambda has no reserved concurrency.
 5. Lambda fetches the exact dispatch secret version, validates it against Terraform-authorised configuration, and assumes the exact mover role mapped to that secret ARN.
 6. The mover role performs an S3-managed, multipart-capable copy of the exact clean object `VersionId` to its dedicated hosted bucket. The source object is retained.
 7. Lambda publishes `FileActionExecutionCompleted.v1` directly to the existing custom bus. A separate reporter consumes all three DLQs and emits a non-retryable failed completion for exhausted deliveries. Both functions claim one terminal outcome per action execution in the existing DynamoDB table.
 
+The reporter has a 60-second timeout and consumes batches of up to ten messages. Each DLQ visibility timeout is at least 360 seconds.
+
+Both Lambdas emit `WriterRecordFailed` or `ReporterRecordFailed` CloudWatch metrics when individual SQS records fail, even when Lambda returns HTTP 200 for partial batch responses. The child state alarms on these metrics as well as Lambda `Errors`, which remains useful for hard function failures. The alarms have no actions until an approved operational notification destination is connected.
+
 The parent schema registry already defines and accepts `FileActionExecutionCompleted.v1`, and the Lambda publishes that schema directly over EventBridge. A `file-action-execution-completed-adapter` would have no transport or schema conversion to perform, so this component does not add a redundant adapter.
 
 The Lambda is not attached to a VPC because it uses AWS service endpoints and does not require private-network access.
+
+## Delivery and retry contract
+
+The mover copies the exact source `VersionId` to the hosted key formed from the configured destination prefix and the source key relative to its authorised source prefix. The source object and its retention are unchanged. The mover does not read destination objects or lock keys for exclusive writing.
+
+Logical write deduplication lasts seven days; terminal-outcome evidence is retained for 90 days, covering the 14-day DLQ retention. This is not an exactly-once S3 write guarantee. If S3 accepts a copy but the SDK times out before receiving the result, a retry may overwrite the key or create another destination version. An unknown copy outcome does not establish that the destination object is absent. SDK timeouts and Lambda deadline failures follow the normal retry and DLQ path; no completion-latency guarantee is made.
+
+For completed events, `actionDefinitionId` is the request's `configurationReference.secretArn` (the dispatch `secretARN`); the request has no separate definition ID. A terminal record for that action and secret prevents a later retry from copying again after the seven-day deduplication window, while the record is retained for 90 days. An existing `IN_PROGRESS` record is logically expired after seven days; the reporter emits failure, and recovery requires a new action execution ID.
+
+Before enabling an entry, confirm the source and hosted-bucket policies and KMS key policies allow the required copy, decrypt, encrypt and data-key operations, and that destination encryption headers are accepted. Hosted bucket expiry remains governed by its configured lifecycle; this workflow does not configure or extend object-retention settings. For customer-owned destinations, configure cleanup of incomplete multipart uploads and set the required object-retention policy. Costs include S3 requests, storage and versions, KMS keys/API usage, Lambda duration, EventBridge, SNS, SQS, DynamoDB and CloudWatch Logs.
 
 ## Configuration contract
 
@@ -84,7 +98,7 @@ A read-only customer role is created for each hosted pickup bucket, but its trus
 
 The `pipeline` output exposes `eventbridge_dlq_arn`, `sns_dlq_arn`, `processing_dlq_arn` and `dlq_reporter_arn`. The original `sqs_dlq_arn` and queue name are retained as the processing DLQ to avoid replacement. Inspect and resolve any old messages before enabling the reporter: it previously received mixed transport and processing envelopes. Malformed or unrecognised messages remain in their DLQ for investigation.
 
-Each DLQ has a CloudWatch visible-message backlog alarm, but no alarm actions: these child states do not have an approved notification topic output. Operators must connect the alarms to the operational notification destination and monitor oldest-message age and reporter failures. A terminal-outcome record expires after 90 days. Once a `FileActionExecutionCompleted.v1` failure has been emitted, never manually redrive that `actionExecutionId` to seek success; submit a new request with a new action execution ID instead. If publication succeeds but its DynamoDB marker update fails, the same event detail may be published again; consumers must deduplicate with the completion idempotency key.
+Each DLQ has a CloudWatch visible-message backlog alarm. The component also alarms on mover/reporter errors and throttles, near-timeout duration, and processing-message age. These child states have no approved notification topic output, so alarms have no actions until operators connect them to the operational notification destination; this is a production notification gate. Monitor reporter failures as well: a retry can keep a message in flight without a visible backlog. A terminal-outcome record expires after 90 days. Once a `FileActionExecutionCompleted.v1` failure has been emitted, never manually redrive that `actionExecutionId` to seek success; submit a new request with a new action execution ID instead. If publication succeeds but its DynamoDB marker update fails, the same event detail may be published again; consumers must deduplicate with the completion idempotency key.
 
 To enable access, replace the deny-all trust statement with an allow statement for the customer's exact IAM role. For an account in our AWS organisation, also constrain the trust with `aws:PrincipalOrgID`. For an account outside the organisation, agree an opaque external ID with the customer and require it with `sts:ExternalId`. An external ID helps prevent confused-deputy attacks, but it is not treated as a password or stored as a secret.
 
@@ -100,19 +114,19 @@ Destroy or update this child state before removing parent resources. Removing th
 
 ## Local validation
 
+The Lambda package is built from the shared `lambda/push-to-s3-writer` directory. Its pinned `requirements.txt` is installed into the deployment package; `tests/requirements.txt` contains test-only dependencies and is used only by the local test command. Changes to this shared runtime or its tests select both `push-to-s3` and `push-to-s3-with-hosted-pickup` Terraform states in CI. Changes to this child state's own files continue to select only this state.
+
 Run from the repository root without contacting AWS:
 
 ```shell
 terraform fmt -check -recursive terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup
-PYTHONPATH=terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup/lambda/file-mover \
-  uv run --with pytest --with boto3 --with aws-lambda-powertools python -m pytest -q \
-  terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup/lambda/file-mover/tests
-python3 -m py_compile \
-  terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup/lambda/file-mover/file_mover.py \
-  terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup/lambda/file-mover/handler.py \
-  terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup/lambda/file-mover/dlq_reporter.py \
-  terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup/lambda/file-mover/terminal_outcome.py \
-  terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup/lambda/file-mover/reporter_handler.py
+env AWS_ACCESS_KEY_ID=dummy AWS_SECRET_ACCESS_KEY=dummy AWS_SESSION_TOKEN=dummy \
+  AWS_DEFAULT_REGION=eu-west-2 AWS_EC2_METADATA_DISABLED=true \
+  PYTHONPATH=terraform/environments/integration-hub-file-transfer/lambda/push-to-s3-writer \
+  uv run --no-project --python 3.12 \
+  --with-requirements terraform/environments/integration-hub-file-transfer/lambda/push-to-s3-writer/requirements.txt \
+  --with-requirements terraform/environments/integration-hub-file-transfer/lambda/push-to-s3-writer/tests/requirements.txt \
+  python -m pytest -q terraform/environments/integration-hub-file-transfer/lambda/push-to-s3-writer/tests
 ```
 
-Do not run `terraform init`, `terraform plan`, or `terraform apply` as part of local component validation.
+The test command uses dummy credentials and disables EC2 metadata lookup; it makes no AWS calls. Do not run `terraform init`, `terraform validate`, `terraform plan`, or `terraform apply` as part of local component validation.
