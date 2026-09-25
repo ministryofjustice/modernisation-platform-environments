@@ -28,7 +28,7 @@ data "aws_iam_role" "dataapi_cross_role" {
 
 # Update Analytical Platform Share Policy & Role
 data "aws_iam_role" "analytical_platform_share_role" {
-  for_each = local.is-test ? {} : local.analytical_platform_share 
+  for_each = local.is-test ? {} : local.analytical_platform_share
 
   name = "${each.value.target_account_name}-share-role"
 }
