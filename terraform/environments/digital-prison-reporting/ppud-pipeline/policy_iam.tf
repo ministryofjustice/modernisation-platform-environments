@@ -147,13 +147,12 @@ resource "aws_iam_policy" "airflow_assume_dataapi" {
   policy = data.aws_iam_policy_document.airflow_assume_dataapi[0].json
 }
 
-# S3 Read Write PPUD Policy attachment
 resource "aws_iam_role_policy_attachment" "airflow_cross_account" {
   #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy
   count = local.is-production ? 1 : 0
 
   role       = data.aws_iam_role.dataapi_cross_role[0].name
-  policy_arn = aws_iam_policy_document.dataapi_cross_assume_airflow[0].arn
+  policy_arn = aws_iam_policy_document.airflow_assume_dataapi[0].arn
 }
 
 
@@ -163,8 +162,8 @@ resource "aws_iam_role_policy_attachment" "s3_read_write_ppud" {
   #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy
   count = local.is-test ? 0 : 1
 
-  role       = data.aws_iam_role.dataapi_cross_role[0].name
-  policy_arn = aws_iam_policy.s3_read_write_ppud_policy[0].arn
+  role       = aws_iam_role.airflow_cross_account[0].name
+  policy_arn = aws_iam_policy.airflow_assume_dataapi[0].arn
 }
 
 # Glue Catalog Read-only attachment
