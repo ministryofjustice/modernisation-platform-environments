@@ -2,12 +2,13 @@
 # LOCALS
 # ---------------------------------------------------------------------------------------------------------------------
 locals {
-  name              = "streaming-pov"
-  ecs_prefix        = "${local.name}-ecs"
-  sdg_prefix        = "${local.ecs_prefix}-sdg"
-  alerts_prefix     = "${local.ecs_prefix}-alerts"
-  kafka_ui_prefix   = "${local.ecs_prefix}-kafka-ui"
-  deploy_to         = ["development"]
+  name            = "streaming-pov"
+  ecs_prefix      = "${local.name}-ecs"
+  sdg_prefix      = "${local.ecs_prefix}-sdg"
+  alerts_prefix   = "${local.ecs_prefix}-alerts"
+  kafka_ui_prefix = "${local.ecs_prefix}-kafka-ui"
+  # POC resources destroyed but code retained; set back to ["development"] to redeploy
+  deploy_to         = []
   capacity_provider = contains(local.deploy_to, local.environment) ? "FARGATE_SPOT" : null
   secretsmanager_kms_key_arn = contains(local.deploy_to, local.environment) ? (
     try(aws_kms_key.secretsmanager[0].arn, "*")
@@ -28,10 +29,10 @@ locals {
     format("%s/*", replace(try(data.external.msk_arn["msk"].result.arn, null), ":cluster/", ":topic/"))
   ] : null
 
-  ecr_repositories = {
+  ecr_repositories = contains(local.deploy_to, local.environment) ? {
     sdg    = "${local.name}-sdg"
     alerts = "${local.name}-alerts"
-  }
+  } : {}
 
   extended_tags = merge(local.tags, {
     component = local.name
