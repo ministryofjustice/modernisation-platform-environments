@@ -886,3 +886,57 @@ EOF
   )
 
 }
+
+#------------------
+# Apply sort order 
+#------------------
+
+resource "aws_glue_job" "rewrite_in_place" {
+  count = local.is-development ? 1 : 0
+
+  name              = "apply-sort-order"
+  description       = "Use Spark to apply sort order to Iceberg table."
+  role_arn          = aws_iam_role.apply_sort_order_iam_role.arn
+  glue_version      = "5.0"
+  worker_type       = "G.1X"
+  number_of_workers = 2
+  default_arguments = {
+    "--catalog"                          = "${local.env_account_id}"
+    "--database"                         = "staged_mdss${local.dbt_suffix}"
+    "--table"                            = "false"
+    "--order"                            = "DESC"
+    # Optional args set to false
+    "--order_cols"                       = "false"
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--datalake-formats"                 = "iceberg"
+    "--conf"                             = <<EOF
+spark.sql.extensions=org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions 
+--conf spark.sql.catalog.glue_catalog=org.apache.iceberg.spark.SparkCatalog 
+--conf spark.sql.catalog.glue_catalog.warehouse=s3:/${module.s3-create-a-derived-table-bucket.bucket.arn}/data/${local.environment_shorthand}/models
+--conf spark.sql.catalog.glue_catalog.catalog-impl=org.apache.iceberg.aws.glue.GlueCatalog
+--conf spark.sql.catalog.glue_catalog.io-impl=org.apache.iceberg.aws.s3.S3FileIO
+EOF
+
+  }
+  command {
+    python_version  = "3"
+    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/rewrite_in_place.py"
+  }
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration[0].name
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "Rewrite table with sort order in place.",
+    }
+  )
+
+}
+
+resource "aws_s3_object" "rewrite_in_place_script" {
+  count  = local.is-development ? 1 : 0
+  bucket = module.s3-glue-job-script-bucket.bucket.id
+  key    = "rewrite_in_place.py"
+  source = "glue-job/rewrite_in_place.py"
+  source_hash   = filemd5("glue-job/rewrite_in_place.py")
+}
