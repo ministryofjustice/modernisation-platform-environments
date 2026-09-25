@@ -3,7 +3,8 @@
 # See: https://dsdmoj.atlassian.net/wiki/spaces/LDD/pages/5975606239/Build+Layered+Function+for+Lambda
 
 module "s3-bucket-shared" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e" # v11.2.0
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=474f27a3f9bf542a8826c76fb049cc84b5cf136f" # v8.2.1
+  # source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e" # v11.2.0
 
   bucket_name         = "${local.application_name}-${local.environment}-shared"
   versioning_enabled  = true
@@ -13,13 +14,13 @@ module "s3-bucket-shared" {
   custom_kms_key      = ""
   bucket_policy       = [aws_s3_bucket_policy.shared_bucket_policy.policy]
 
-  manage_log_bucket_policy = false
-  log_buckets = {
-    log_bucket_name = module.s3-bucket-logging.bucket.id
-    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
-  }
+  # manage_log_bucket_policy = false
+  # log_buckets = {
+  #   log_bucket_name = module.s3-bucket-logging.bucket.id
+  #   log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+  # }
 
-  log_prefix = "s3access/${local.application_name}-${local.environment}-shared"
+  # log_prefix = "s3access/${local.application_name}-${local.environment}-shared"
 
   providers = {
     aws.bucket-replication = aws
