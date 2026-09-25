@@ -1,0 +1,87 @@
+# ccms-ssm-document-certificate-wallet-expiry-check.yaml
+---
+schemaVersion: "2.2"
+description: Check an Oracle wallet or Java keystore for certificates expiring within a threshold and alert via SNS.
+parameters:
+  certType:
+    type: String
+    allowedValues:
+      - orapki
+      - keytool
+    description: Type of keystore to check
+  keystorePath:
+    type: String
+    description: Full path to the wallet (orapki) or keystore (keytool) file
+  passwordParameterName:
+    type: String
+    description: Name of the SSM SecureString parameter holding the keystore password
+  snsTopicArn:
+    type: String
+    description: SNS topic ARN to publish expiry alerts to
+  thresholdDays:
+    type: String
+    default: "90"
+    description: Alert if a certificate expires within this many days
+mainSteps:
+  - name: CheckCertificateExpiry
+    action: aws:runShellScript
+    isEnd: true
+    precondition:
+      StringEquals:
+        - platformType
+        - Linux
+    inputs:
+      runCommand:
+        - |
+          set -euo pipefail
+          REGION="eu-west-2"
+          PASSWORD=$(aws ssm get-parameter --name "{{ passwordParameterName }}" --with-decryption --query Parameter.Value --output text --region "$REGION")
+          THRESHOLD_DAYS="{{ thresholdDays }}"
+          NOW_EPOCH=$(date +%s)
+          WORKDIR=$(mktemp -d)
+          trap 'rm -rf "$WORKDIR"' EXIT
+
+          alert() {
+            local subject="$1"
+            local message="$2"
+            aws sns publish --region "$REGION" --topic-arn "{{ snsTopicArn }}" --subject "$subject" --message "$message"
+          }
+
+          check_expiry() {
+            local label="$1"
+            local end_date="$2"
+            local end_epoch
+            end_epoch=$(date -d "$end_date" +%s 2>/dev/null) || { echo "Could not parse expiry date for $label: $end_date"; return; }
+            local days_left=$(( (end_epoch - NOW_EPOCH) / 86400 ))
+            echo "$label expires in $days_left days ($end_date)"
+            if [ "$days_left" -le "$THRESHOLD_DAYS" ]; then
+              alert "Certificate expiring soon: $label" "Certificate '$label' on $(hostname) ({{ keystorePath }}) expires in $days_left days ($end_date). Renew before it lapses."
+            fi
+          }
+
+          if [ "{{ certType }}" = "keytool" ]; then
+            KEYTOOL_OUT=$(keytool -list -v -keystore "{{ keystorePath }}" -storepass "$PASSWORD")
+            ALIAS=""
+            while IFS= read -r line; do
+              case "$line" in
+                "Alias name: "*) ALIAS="${line#Alias name: }" ;;
+                *"until: "*)
+                  END_DATE="${line##*until: }"
+                  check_expiry "$ALIAS" "$END_DATE"
+                  ;;
+              esac
+            done <<< "$KEYTOOL_OUT"
+          else
+            # orapki wallet display/export invocation is unverified against a live wallet - validate before relying on it
+            SUBJECTS=$(orapki wallet display -wallet "{{ keystorePath }}" -pwd "$PASSWORD" | awk -F'Subject:[[:space:]]*' '/Subject:/ {print $2}')
+            while IFS= read -r dn; do
+              [ -z "$dn" ] && continue
+              CERT_FILE="$WORKDIR/cert.pem"
+              if orapki wallet export -wallet "{{ keystorePath }}" -pwd "$PASSWORD" -dn "$dn" -cert "$CERT_FILE" >/dev/null 2>&1; then
+                END_DATE=$(openssl x509 -enddate -noout -in "$CERT_FILE" | cut -d= -f2)
+                check_expiry "$dn" "$END_DATE"
+              else
+                echo "Could not export certificate for $dn to check expiry"
+              fi
+            done <<< "$SUBJECTS"
+          fi
