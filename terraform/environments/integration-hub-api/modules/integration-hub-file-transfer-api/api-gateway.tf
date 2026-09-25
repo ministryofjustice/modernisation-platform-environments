@@ -1,6 +1,6 @@
 module "api_gateway" {
   source  = "terraform-aws-modules/apigateway-v2/aws"
-  version = "6.1.0"
+  version = "6.1.1"
 
   name          = local.resource_name_prefix
   protocol_type = "HTTP"
