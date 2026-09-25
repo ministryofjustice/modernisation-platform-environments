@@ -13,6 +13,7 @@ import runtime
 from boto3.dynamodb.types import TypeSerializer
 from botocore.exceptions import ClientError
 from botocore.stub import Stubber
+from mft_writer import copy as copy_module
 from runtime import (
     ActionStore,
     InvalidMessage,
@@ -694,8 +695,8 @@ def test_stale_in_progress_claim_can_be_recovered(monkeypatch):
 
 
 def test_multipart_copy_is_sequential_and_aborts_on_failure(monkeypatch):
-    monkeypatch.setattr(runtime, "MAX_COPY_OBJECT_BYTES", 1)
-    monkeypatch.setattr(runtime, "MULTIPART_PART_BYTES", 5 * 1024 * 1024)
+    monkeypatch.setattr(copy_module, "MAX_COPY_OBJECT_BYTES", 1)
+    monkeypatch.setattr(copy_module, "MULTIPART_PART_BYTES", 5 * 1024 * 1024)
     s3 = FakeS3(fail_part=2, head_size=11 * 1024 * 1024)
     source = {
         "bucket": "clean-bucket",
@@ -723,7 +724,7 @@ def test_multipart_copy_is_sequential_and_aborts_on_failure(monkeypatch):
 
 
 def test_multipart_copy_aborts_when_deadline_reserve_stops_part_work(monkeypatch):
-    monkeypatch.setattr(runtime, "MAX_COPY_OBJECT_BYTES", 1)
+    monkeypatch.setattr(copy_module, "MAX_COPY_OBJECT_BYTES", 1)
     s3 = FakeS3(head_size=11 * 1024 * 1024)
     source = {
         "bucket": "clean-bucket",
@@ -744,8 +745,8 @@ def test_multipart_copy_aborts_when_deadline_reserve_stops_part_work(monkeypatch
 
 
 def test_multipart_copy_preserves_source_metadata_without_copying_tags(monkeypatch):
-    monkeypatch.setattr(runtime, "MAX_COPY_OBJECT_BYTES", 1)
-    monkeypatch.setattr(runtime, "MULTIPART_PART_BYTES", 5 * 1024 * 1024)
+    monkeypatch.setattr(copy_module, "MAX_COPY_OBJECT_BYTES", 1)
+    monkeypatch.setattr(copy_module, "MULTIPART_PART_BYTES", 5 * 1024 * 1024)
     expires = datetime(2025, 1, 2, tzinfo=timezone.utc)
     metadata = {
         "CacheControl": "private, max-age=600",
@@ -908,6 +909,20 @@ def test_writer_returns_partial_batch_failures(monkeypatch):
 
     result = runtime.process_writer_event(
         {"Records": [record(), malformed]}, Context(), services
+    )
+
+    assert result == {"batchItemFailures": [{"itemIdentifier": "malformed-message"}]}
+
+
+def test_reporter_returns_partial_batch_failures(monkeypatch):
+    writer_config(monkeypatch, reporter=True)
+    services = FakeServices()
+    malformed = record(queue_arn=DLQ_ARN)
+    malformed["messageId"] = "malformed-message"
+    malformed["body"] = "not-json"
+
+    result = runtime.process_reporter_event(
+        {"Records": [record(queue_arn=DLQ_ARN), malformed]}, Context(), services
     )
 
     assert result == {"batchItemFailures": [{"itemIdentifier": "malformed-message"}]}
