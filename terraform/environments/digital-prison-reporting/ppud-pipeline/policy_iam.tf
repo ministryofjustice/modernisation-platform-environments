@@ -71,6 +71,90 @@ resource "aws_iam_policy" "glue_catalog_ppud_read_only_policy" {
   })
 }
 
+## Role
+## CrossAccount DataAPI Cross Account Role,
+# CrossAccount DataAPI Assume Policy
+data "aws_iam_policy_document" "airflow_assume" {
+  #checkov:skip=CKV_AWS_110:Ensure IAM policies does not allow privilege escalation
+  #checkov:skip=CKV_AWS_358:OIDC trust policies only allows actions from a specific known organization Already
+  #checkov:skip=CKV_AWS_107:Ensure IAM policies does not allow credentials exposure
+  #checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
+  #checkov:skip=CKV_AWS_356
+  #checkov:skip=CKV_AWS_109
+  #checkov:skip=CKV_AWS_1
+  #checkov:skip=CKV_AWS_283
+  #checkov:skip=CKV_AWS_49
+  #checkov:skip=CKV_AWS_108
+
+  count = local.is-production ? 1 : 0
+
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [data.aws_iam_openid_connect_provider.cluster[0].arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      values   = ["sts.amazonaws.com"]
+      variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.dbt_secrets.secret_string)["oidc_cluster_identifier"]}:aud"
+    }
+
+    condition {
+      test = "StringEquals"
+
+      values = [
+        "system:serviceaccount:mwaa:probation-ppud-derived"
+      ]
+
+      variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.dbt_secrets.secret_string)["oidc_cluster_identifier"]}:sub"
+    }
+  }
+}
+
+resource "aws_iam_role" "airflow_cross_account" {
+  count = local.is-production ? 1 : 0
+
+  name = "probation-ppud-derived-cross-account"
+
+  assume_role_policy = data.aws_iam_policy_document.airflow_assume[0].json
+}
+
+data "aws_iam_policy_document" "airflow_assume_dataapi" {
+  count = local.is-production ? 1 : 0
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "sts:AssumeRole"
+    ]
+
+    resources = [
+      data.aws_iam_role.dataapi_cross_role[0].arn
+    ]
+  }
+}
+
+resource "aws_iam_policy" "airflow_assume_dataapi" {
+  count = local.is-production ? 1 : 0
+
+  name = "probation-ppud-derived-assume-dataapi"
+
+  policy = data.aws_iam_policy_document.airflow_assume_dataapi[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "airflow_cross_account" {
+  #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy
+  count = local.is-production ? 1 : 0
+
+  role       = aws_iam_role.airflow_cross_account[0].name
+  policy_arn = aws_iam_policy.airflow_assume_dataapi[0].arn
+}
+
 # S3 Read Write PPUD Policy attachment
 resource "aws_iam_role_policy_attachment" "s3_read_write_ppud" {
   #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy

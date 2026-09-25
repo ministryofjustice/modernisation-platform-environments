@@ -171,3 +171,9 @@ data "aws_iam_session_context" "whoami" {
 data "http" "environments_file" {
   url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
 }
+
+data "aws_iam_openid_connect_provider" "cluster" {
+  count = local.is-production ? 1 : 0
+
+  url = "https://oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.dbt_secrets.secret_string)["oidc_cluster_identifier"]}"
+}
