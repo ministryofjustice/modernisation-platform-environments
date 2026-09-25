@@ -1,6 +1,6 @@
 module "opensearch" {
   #checkov:skip=CKV_TF_1:Skipping as have tagged major version
-  count   = contains(["development"], local.environment) ? 1 : 0
+  count   = contains(local.deploy_to, local.environment) ? 1 : 0
   source  = "terraform-aws-modules/opensearch/aws"
   version = "~> 2.0"
 
@@ -28,7 +28,7 @@ module "opensearch" {
   }
 
   vpc_options = {
-    subnet_ids         = slice(data.aws_subnets.shared-private.ids, 0, 2)
+    subnet_ids         = slice(data.aws_subnets.shared-private[0].ids, 0, 2)
     security_group_ids = [aws_security_group.opensearch[0].id]
   }
 
@@ -52,10 +52,10 @@ module "opensearch" {
 
 resource "aws_security_group" "opensearch" {
   #checkov:skip=CKV2_AWS_5:Skipping because this SG is attached via the opensearch vpc_options block
-  count       = contains(["development"], local.environment) ? 1 : 0
+  count       = contains(local.deploy_to, local.environment) ? 1 : 0
   name_prefix = "${local.cluster_name}-sg"
   description = "Security group for OpenSearch domain access"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = data.aws_vpc.shared[0].id
 
   lifecycle {
     create_before_destroy = true
