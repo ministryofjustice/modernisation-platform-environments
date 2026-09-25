@@ -87,7 +87,7 @@ resource "aws_s3_bucket_policy" "laa_oem_logging" {
         }
       },
       {
-        Sid    = "AllowS3Logging Shared Bucket",
+        Sid    = "AllowS3Logging for Environment Buckets",
         Effect = "Allow",
         Principal = {
           Service = "logging.s3.amazonaws.com"
@@ -99,7 +99,7 @@ resource "aws_s3_bucket_policy" "laa_oem_logging" {
         ],
         Condition = {
           ArnLike = {
-            "aws:SourceArn" = aws_s3_bucket.laa_oem_shared.arn
+            "aws:SourceArn" = [for arn in local.s3_access_logs_bucket_arns : arn]
           }
         }
       }

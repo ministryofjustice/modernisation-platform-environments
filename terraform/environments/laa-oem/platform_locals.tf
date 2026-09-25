@@ -35,4 +35,9 @@ locals {
   # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
+
+  # S3 Buckets for Access Logs
+  s3_access_logs_bucket_arns = [
+    aws_s3_bucket.laa_oem_shared.arn
+  ]
 }
