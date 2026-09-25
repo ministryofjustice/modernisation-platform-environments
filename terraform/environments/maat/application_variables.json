@@ -46,14 +46,8 @@
       "maat_ats_base_url": "https://laa-crime-application-tracking-service-dev.apps.live.cloud-platform.service.justice.gov.uk",
       "maatdb_rds_sec_group_id": "sg-0727aa271de73eb1d",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
-      "s3_lifecycle_days_expiration_current": 366,
-      "s3_lifecycle_days_expiration_noncurrent": 366,
       "s3_lifecycle_days_expiration_current_logs": 90,
-      "s3_lifecycle_days_expiration_noncurrent_logs": 90,
-      "s3_lifecycle_days_transition_current_glacier": 366,
-      "s3_lifecycle_days_transition_current_standard": 90,
-      "s3_lifecycle_days_transition_noncurrent_glacier": 366,
-      "s3_lifecycle_days_transition_noncurrent_standard": 90
+      "s3_lifecycle_days_expiration_noncurrent_logs": 90
     },
     "test": {
       "env_short_name": "test",
@@ -101,14 +95,8 @@
       "maat_ats_base_url": "https://laa-crime-application-tracking-service-test.apps.live.cloud-platform.service.justice.gov.uk",
       "maatdb_rds_sec_group_id": "sg-0c09051cb8543cc3e",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
-      "s3_lifecycle_days_expiration_current": 366,
-      "s3_lifecycle_days_expiration_noncurrent": 366,
       "s3_lifecycle_days_expiration_current_logs": 90,
-      "s3_lifecycle_days_expiration_noncurrent_logs": 90,
-      "s3_lifecycle_days_transition_current_glacier": 366,
-      "s3_lifecycle_days_transition_current_standard": 90,
-      "s3_lifecycle_days_transition_noncurrent_glacier": 366,
-      "s3_lifecycle_days_transition_noncurrent_standard": 90
+      "s3_lifecycle_days_expiration_noncurrent_logs": 90
     },
     "preproduction": {
       "env_short_name": "preproduction",
@@ -156,14 +144,8 @@
       "maat_ats_base_url": "https://laa-crime-application-tracking-service-uat.apps.live.cloud-platform.service.justice.gov.uk",
       "maatdb_rds_sec_group_id": "sg-0035b7b87fb83ba52",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
-      "s3_lifecycle_days_expiration_current": 366,
-      "s3_lifecycle_days_expiration_noncurrent": 366,
       "s3_lifecycle_days_expiration_current_logs": 90,
-      "s3_lifecycle_days_expiration_noncurrent_logs": 90,
-      "s3_lifecycle_days_transition_current_glacier": 366,
-      "s3_lifecycle_days_transition_current_standard": 90,
-      "s3_lifecycle_days_transition_noncurrent_glacier": 366,
-      "s3_lifecycle_days_transition_noncurrent_standard": 90
+      "s3_lifecycle_days_expiration_noncurrent_logs": 90
     },
     "production": {
       "env_short_name": "prod",
@@ -211,14 +193,8 @@
       "maat_ats_base_url": "https://laa-crime-application-tracking-service-prod.apps.live.cloud-platform.service.justice.gov.uk",
       "maatdb_rds_sec_group_id": "sg-031a88ae1c02b46a4",
       "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
-      "s3_lifecycle_days_expiration_current": 366,
-      "s3_lifecycle_days_expiration_noncurrent": 366,
       "s3_lifecycle_days_expiration_current_logs": 90,
-      "s3_lifecycle_days_expiration_noncurrent_logs": 90,
-      "s3_lifecycle_days_transition_current_glacier": 366,
-      "s3_lifecycle_days_transition_current_standard": 90,
-      "s3_lifecycle_days_transition_noncurrent_glacier": 366,
-      "s3_lifecycle_days_transition_noncurrent_standard": 90
+      "s3_lifecycle_days_expiration_noncurrent_logs": 90
     }
   }
 }
