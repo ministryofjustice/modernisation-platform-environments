@@ -44,7 +44,12 @@ locals {
       }
       bu2 = {
         amp_workspace_alias = "cp-1609-0059-bu2-metrics"
-        idc_group_names     = ["container-platform-aws"] # simulated BU B
+        # simulated BU B. Uses container-platform-user-testing, a Viewer group
+        # deliberately NOT granted workspace ADMIN (cf. amg.tf), so the isolation
+        # control can actually be tested: data-source permissions are default-deny
+        # for Viewers but bypassed for Admins. A member of this group (team
+        # bu-bu2) must be able to query amp-bu2 but denied amp-bu1.
+        idc_group_names = ["container-platform-user-testing"]
       }
     }
   }
