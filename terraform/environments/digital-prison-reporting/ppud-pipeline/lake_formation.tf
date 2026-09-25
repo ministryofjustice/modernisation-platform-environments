@@ -11,7 +11,7 @@ locals {
 # application_variables.json
 resource "aws_lakeformation_permissions" "share_dbs_all_permissions" {
   # one instance per (database × principal)
-  for_each = is-test ? {} : {
+  for_each = local.is-test ? {} : {
     for combo in flatten([
       for share_index, share in local.analytical_platform_share : [
         for resource_share in share.resource_shares : [
