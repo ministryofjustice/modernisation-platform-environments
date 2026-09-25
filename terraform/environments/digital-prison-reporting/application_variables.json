@@ -432,7 +432,7 @@
         "create_replica": true,
         "engine": "postgres",
         "engine_version": "16",
-        "replica_engine_version": "16",
+        "replica_engine_version": "16.15",
         "init_size": "158",
         "max_size": "1000",
         "name": "testdatabase",
