@@ -36,6 +36,7 @@ permissions:
   contents: read  # This is required for actions/checkout
 
 jobs:
+
   strategy:
     uses: ./.github/workflows/reusable_terraform_components_strategy.yml
     if: inputs.action != 'destroy'
@@ -43,7 +44,7 @@ jobs:
       application: "${{ github.workflow }}"
 
   terraform:
-    needs: strategy
+    needs: [strategy]
     if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
     strategy:
       fail-fast: false

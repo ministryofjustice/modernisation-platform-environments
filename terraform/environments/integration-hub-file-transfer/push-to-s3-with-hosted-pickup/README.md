@@ -1,0 +1,132 @@
+# Push to S3 with hosted pickup
+
+This component implements the Integration Hub `push-to-s3-with-hosted-pickup` supported pattern in a separate Terraform state in the same AWS account as the parent file-transfer component. It operates only in `eu-west-2`.
+
+## Architecture
+
+The component independently consumes `../modules/file-dispatch-configuration` with `environment = local.environment` and selects entries whose action name is `push-to-s3-with-hosted-pickup`. All maps and per-entry resources support an empty selection, so the component works with zero configured entries.
+
+One shared pipeline handles every selected entry:
+
+1. An EventBridge rule on the existing `integration-hub-file-transfer` custom bus selects matching `FileActionExecutionRequested.v1` events.
+2. EventBridge publishes to an encrypted SNS topic and has its own encrypted SQS dead-letter queue for exhausted deliveries.
+3. SNS sends wrapped notifications to an encrypted SQS queue.
+4. SNS and the processing queue each have a separate encrypted SQS DLQ. The queue invokes one Lambda function with partial batch responses, one record per invocation, a 900-second timeout, a 5,400-second visibility timeout and a maximum receive count of five; the mapping caps concurrency at five and has no batching window. Lambda has no reserved concurrency.
+5. Lambda fetches the exact dispatch secret version, validates it against Terraform-authorised configuration, and assumes the exact mover role mapped to that secret ARN.
+6. The mover role performs an S3-managed, multipart-capable copy of the exact clean object `VersionId` to its dedicated hosted bucket. The source object is retained.
+7. Lambda publishes `FileActionExecutionCompleted.v1` directly to the existing custom bus. A separate reporter consumes all three DLQs and emits a non-retryable failed completion for exhausted deliveries. Both functions claim one terminal outcome per action execution in the existing DynamoDB table.
+
+The reporter has a 60-second timeout and consumes batches of up to ten messages. Each DLQ visibility timeout is at least 360 seconds.
+
+Both Lambdas emit `WriterRecordFailed` or `ReporterRecordFailed` CloudWatch metrics when individual SQS records fail, even when Lambda returns HTTP 200 for partial batch responses. The child state alarms on these metrics as well as Lambda `Errors`, which remains useful for hard function failures. The alarms have no actions until an approved operational notification destination is connected.
+
+The parent schema registry already defines and accepts `FileActionExecutionCompleted.v1`, and the Lambda publishes that schema directly over EventBridge. A `file-action-execution-completed-adapter` would have no transport or schema conversion to perform, so this component does not add a redundant adapter.
+
+The Lambda is not attached to a VPC because it uses AWS service endpoints and does not require private-network access.
+
+## Delivery and retry contract
+
+The mover copies the exact source `VersionId` to the hosted key formed from the configured destination prefix and the source key relative to its authorised source prefix. The source object and its retention are unchanged. The mover does not read destination objects or lock keys for exclusive writing.
+
+The parent clean bucket has a one-day current-version expiry and a one-day noncurrent-version expiry in both environments. A version can therefore remain after its current-version expiry until it ages out as noncurrent; S3 lifecycle removal is asynchronous. The seven-day lifecycle in production belongs to the quarantine and investigation buckets, not clean. Initial `IN_PROGRESS` claims have a seven-day DynamoDB TTL, and terminal records expire seven days after their last outcome update. A pending retry does not restart its seven-day TTL. TTL removal is asynchronous, and records no longer protect against duplicate copies once removed. This is not an exactly-once S3 write guarantee. If S3 accepts a copy but the SDK times out before receiving the result, a retry may overwrite the key or create another destination version. An unknown copy outcome does not establish that the destination object is absent. SDK timeouts and Lambda deadline failures follow the normal retry and DLQ path; no completion-latency guarantee is made.
+
+For completed events, `actionDefinitionId` is the request's `configurationReference.secretArn` (the dispatch `secretARN`); the request has no separate definition ID. A terminal record for that action and secret prevents a later retry from copying while it exists. An existing `IN_PROGRESS` record is logically expired after seven days; the reporter emits failure when its request reaches a DLQ, and recovery requires a new action execution ID.
+
+Before enabling an entry, confirm the source and hosted-bucket policies and KMS key policies allow the required copy, decrypt, encrypt and data-key operations, and that destination encryption headers are accepted. Hosted bucket expiry remains governed by its configured lifecycle; this workflow does not configure or extend object-retention settings. For customer-owned destinations, configure cleanup of incomplete multipart uploads and set the required object-retention policy. Costs include S3 requests, storage and versions, KMS keys/API usage, Lambda duration, EventBridge, SNS, SQS, DynamoDB and CloudWatch Logs.
+
+## Configuration contract
+
+Configuration belongs in the shared file-dispatch configuration module. Do not add entries in this component. The exact secret shape is:
+
+```hcl
+action = {
+  name = "push-to-s3-with-hosted-pickup"
+  push_to_s3_with_hosted_pickup = {
+    destination_prefix = "pickup/"
+    retention_days     = 30
+  }
+}
+notifications = {
+  email = null
+  slack = null
+  teams = null
+}
+```
+
+`destination_prefix` may be empty or must end with `/`; it must not start with `/`. `retention_days` must be a positive whole number.
+
+The parent state creates predictable dispatch secrets. This state looks up only secret metadata and never reads secret values. At runtime, Lambda requests the exact `secretVersionId` carried by the event. ARN-keyed environment mappings bind that secret to one mover role, one clean source prefix, and one Terraform-authorised hosted destination. A secret is rejected if its destination prefix or retention period differs from Terraform. The bucket name, Region and KMS key are supplied only by Terraform and cannot be redirected through secret content.
+
+The parent deliberately ignores secret-value changes. After changing an existing action in the shared Terraform configuration, update the corresponding secret value manually to match before sending files. A newly added entry receives its initial non-sensitive action value when the parent state first creates the secret.
+
+In development, the hosted pickup action now applies to the `dms1981/` root prefix. After deployment, update the existing `integration-hub-file-transfer/file-dispatch/dms1981/` secret value with the hosted pickup action (destination `pickup/`, retention seven days), preserving any configured notification destinations. Until that value is updated, root uploads continue to publish requests without an action and will not reach the mover.
+
+When no hosted pickup entries are configured, the shared pipeline still deploys but no buckets, hosted KMS keys, or mover roles are created. Any matching event is rejected as unauthorised rather than being delivered to a fallback destination.
+
+## Names and isolation
+
+Shared pipeline resources use this base name:
+
+```text
+integration-hub-file-transfer-push-to-s3-with-hosted-pickup
+```
+
+For the development `dms1981/` entry, the resource names are:
+
+```text
+Bucket:     integration-hub-development-dms1981-pickup
+KMS alias: alias/s3/integration-hub-development-dms1981-pickup
+Mover role: ihft-dev-hosted-mover-dms1981
+Customer role: ihft-dev-pickup-reader-dms1981
+```
+
+The Lambda execution role cannot read the clean bucket or write hosted objects. It can read only selected dispatch secrets and assume only the mapped mover roles. Each mover role trusts account root only when `aws:PrincipalArn` matches the exact Lambda execution role, reads only its configured clean source prefix, copies the exact event `VersionId`, writes only its own destination prefix, and uses only the clean source key plus its dedicated hosted key. It has no permissions for another entry's hosted bucket or KMS key.
+
+Each customer role can list only its configured destination prefix, read current and versioned objects from that prefix, and decrypt them only through S3 using that bucket's dedicated KMS key. It cannot write, delete, or read another entry's files.
+
+Every hosted bucket is a general purpose S3 bucket with bucket-owner-enforced ownership, no ACLs, all public access blocked, versioning, SSE-KMS with an S3 Bucket Key, TLS enforcement, and denial of missing or incorrect encryption headers and KMS keys. Its lifecycle expires current and noncurrent versions after `retention_days` and aborts incomplete multipart uploads after one day.
+
+## Retention and costs
+
+Each entry creates a dedicated S3 bucket, customer-managed KMS key, IAM role and policy. Costs include S3 storage and requests, KMS key and API usage, Lambda, EventBridge, SNS, SQS, DynamoDB and CloudWatch Logs. Versioning means overwritten or deleted objects remain billable as noncurrent versions until lifecycle expiry. Lifecycle expiration is asynchronous, so objects and charges can remain briefly after their configured expiry date. Longer retention periods directly increase stored byte-days; incomplete multipart uploads are limited by the one-day abort rule.
+
+## Customer access
+
+A read-only customer role is created for each hosted pickup bucket, but its trust policy explicitly denies all role assumption. No GitHub OIDC or customer trust is implemented yet. This gives us stable role ARNs to share during onboarding without making the files accessible before the customer identity has been agreed.
+
+## Dead-letter operations
+
+The `pipeline` output exposes `eventbridge_dlq_arn`, `sns_dlq_arn`, `processing_dlq_arn` and `dlq_reporter_arn`. The original `sqs_dlq_arn` and queue name are retained as the processing DLQ to avoid replacement. Inspect and resolve any old messages before enabling the reporter: it previously received mixed transport and processing envelopes. Malformed or unrecognised messages remain in their DLQ for investigation.
+
+Each DLQ has a CloudWatch visible-message backlog alarm. The component also alarms on mover/reporter errors and throttles, near-timeout duration, and processing-message age. These child states have no approved notification topic output, so alarms have no actions until operators connect them to the operational notification destination; this is a production notification gate. Monitor reporter failures as well: a retry can keep a message in flight without a visible backlog. DLQs retain messages for 14 days, longer than DynamoDB's seven-day markers; a late reporter may create a new failure record after the original marker has been removed. Inspect old messages rather than redriving them: once a `FileActionExecutionCompleted.v1` failure has been emitted, never manually redrive that `actionExecutionId` to seek success; submit a new request with a new action execution ID instead. If publication succeeds but its DynamoDB marker update fails, the same event detail may be published again; consumers must deduplicate with the completion idempotency key.
+
+To enable access, replace the deny-all trust statement with an allow statement for the customer's exact IAM role. For an account in our AWS organisation, also constrain the trust with `aws:PrincipalOrgID`. For an account outside the organisation, agree an opaque external ID with the customer and require it with `sts:ExternalId`. An external ID helps prevent confused-deputy attacks, but it is not treated as a password or stored as a secret.
+
+## Deployment order
+
+1. Update and deploy the parent `integration-hub-file-transfer` state. It creates the custom bus, clean bucket and key, and predictable dispatch secrets.
+2. Populate any deferred notification values through the approved Secrets Manager process without changing the Terraform-authorised hosted prefix or retention period.
+3. Deploy this `push-to-s3-with-hosted-pickup` state. It resolves parent resources by predictable AWS metadata lookups and does not consume parent Terraform state.
+4. Confirm the `hosted_pickup_destinations` output and validate delivery with a non-sensitive test file.
+5. Confirm the exact source version remains present, the hosted object uses the dedicated key, and a completion event is emitted.
+
+Destroy or update this child state before removing parent resources. Removing the parent bus, clean bucket, keys or dispatch secrets first will make metadata lookups fail.
+
+## Local validation
+
+The Lambda package is built from this component's `lambda/push-to-s3-writer` directory. Its pinned `requirements.txt` is installed into the deployment package; `tests/requirements.txt` contains test-only dependencies. Each component has its own writer copy and tests; CI tests both copies, while a change under this component selects only this Terraform state.
+
+Run from the repository root without contacting AWS:
+
+```shell
+terraform fmt -check -recursive terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup
+env AWS_ACCESS_KEY_ID=dummy AWS_SECRET_ACCESS_KEY=dummy AWS_SESSION_TOKEN=dummy \
+  AWS_DEFAULT_REGION=eu-west-2 AWS_EC2_METADATA_DISABLED=true \
+  PYTHONPATH=terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup/lambda/push-to-s3-writer \
+  uv run --no-project --python 3.12 \
+  --with-requirements terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup/lambda/push-to-s3-writer/requirements.txt \
+  --with-requirements terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup/lambda/push-to-s3-writer/tests/requirements.txt \
+  python -m pytest -q terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup/lambda/push-to-s3-writer/tests
+```
+
+The test command uses dummy credentials and disables EC2 metadata lookup; it makes no AWS calls. Do not run `terraform init`, `terraform validate`, `terraform plan`, or `terraform apply` as part of local component validation.
