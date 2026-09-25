@@ -154,6 +154,5 @@ resource "aws_iam_role_policy" "datasync_import_permissions" {
 resource "aws_cloudwatch_log_group" "datasync_import" {
   name              = "/aws/datasync/vcms-import-s3-to-efs-${local.environment}"
   retention_in_days = 30
-  kms_key_id        = local.account_config.kms_keys.general_shared
   tags              = local.tags
 }
