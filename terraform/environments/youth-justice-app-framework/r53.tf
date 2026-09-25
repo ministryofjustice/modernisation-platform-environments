@@ -73,6 +73,16 @@ resource "aws_route53_record" "connectivity_alb" {
   records = [module.connectivity_alb.dns_name]
 }
 
+resource "aws_route53_record" "yjsm_apps_alb" {
+  provider = aws.core-network-services
+
+  zone_id = data.aws_route53_zone.yjaf-inner.id
+  name    = "yjsm-apps-lb"
+  type    = "CNAME"
+  ttl     = 300
+  records = [module.yjsm_apps_alb.dns_name]
+}
+
 
 
 /*
