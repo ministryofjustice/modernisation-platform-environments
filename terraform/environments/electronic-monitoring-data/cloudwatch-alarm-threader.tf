@@ -60,6 +60,22 @@ resource "aws_cloudwatch_event_rule" "alarm_state_change_threader" {
             for _, alarm in aws_cloudwatch_metric_alarm.merge_lambdas_long_queue :
             alarm.alarm_name
           ],
+          [
+            for _, alarm in aws_cloudwatch_metric_alarm.specials_guard_detected :
+            alarm.alarm_name
+          ],
+          [
+            for _, alarm in aws_cloudwatch_metric_alarm.specials_guard_cleanup_failed :
+            alarm.alarm_name
+          ],
+          [
+            for _, alarm in aws_cloudwatch_metric_alarm.specials_guard_heartbeat_missing :
+            alarm.alarm_name
+          ],
+          [
+            for alarm in aws_cloudwatch_metric_alarm.specials_guard_lambda_errors :
+            alarm.alarm_name
+          ],
         )
       }
     }

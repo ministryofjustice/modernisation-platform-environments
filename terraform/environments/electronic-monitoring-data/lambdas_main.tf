@@ -1368,3 +1368,44 @@ module "fms_validation_reporter" {
     POWERTOOLS_SERVICE_NAME     = "fms-validation-reporter"
   }
 }
+
+#-----------------------------------------------------------------------------------
+# Live feed specials remediator
+#-----------------------------------------------------------------------------------
+
+module "live_feed_specials_remediator" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "live_feed_specials_remediator"
+  role_name                      = aws_iam_role.specials_remediation.name
+  role_arn                       = aws_iam_role.specials_remediation.arn
+  handler                        = "live_feed_specials_remediator.handler"
+  memory_size                    = 2048
+  timeout                        = 900
+  reserved_concurrent_executions = 1
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.env_name
+
+  security_group_ids = [
+    aws_security_group.lambda_generic.id,
+  ]
+
+  subnet_ids = data.aws_subnets.shared-private.ids
+
+  cloudwatch_retention_days = 7
+
+  environment_variables = {
+    ACCOUNT_NUMBER         = data.aws_caller_identity.current.account_id
+    ATHENA_RESULTS_BUCKET  = module.s3-athena-bucket.bucket.id
+    ATHENA_WORKGROUP       = aws_athena_workgroup.default.name
+    ENVIRONMENT_NAME       = local.environment_shorthand
+    MAX_ARCHIVE_ROWS       = "100000"
+    POWERTOOLS_LOG_LEVEL   = "INFO"
+    REMEDIATION_BUCKET     = module.s3-logging-bucket.bucket.id
+    REMEDIATION_PREFIX     = local.specials_remediation_prefix
+  }
+}
