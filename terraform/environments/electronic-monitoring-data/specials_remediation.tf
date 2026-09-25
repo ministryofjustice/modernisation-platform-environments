@@ -1,56 +1,38 @@
+# ------------------------------------------------------------------------------
+# Downstream specials remediation
+# ------------------------------------------------------------------------------
+
 locals {
-  specials_remediation_prefix = "specials-remediation/${local.environment_shorthand}"
-}
+  specials_remediation_enabled = (
+    local.is-preproduction || local.is-production
+  )
 
-resource "aws_iam_role" "specials_remediation" {
-  name               = "specials_remediation_lambda_role"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
-}
+  specials_remediation_prefix = (
+    "specials-remediation/${local.environment_shorthand}"
+  )
 
-data "aws_iam_policy_document" "specials_remediation" {
-  statement {
-    sid    = "SpecialsRemediationObjectAccess"
-    effect = "Allow"
+  specials_remediation_consumers = {
+    ac = {
+      consumer            = "AC"
+      database            = "acquisitive_crime${local.dbt_suffix}"
+      schedule_expression = "cron(0/6 * * * ? *)"
+    }
 
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-    ]
-
-    resources = [
-      "${module.s3-logging-bucket.bucket.arn}/${local.specials_remediation_prefix}/*",
-    ]
-  }
-
-  statement {
-    sid    = "SpecialsRemediationListAccess"
-    effect = "Allow"
-
-    actions = [
-      "s3:ListBucket",
-    ]
-
-    resources = [
-      module.s3-logging-bucket.bucket.arn,
-    ]
-
-    condition {
-      test     = "StringLike"
-      variable = "s3:prefix"
-
-      values = [
-        "${local.specials_remediation_prefix}/*",
-      ]
+    emdi = {
+      consumer            = "EMDI"
+      database            = "data_insights${local.dbt_suffix}"
+      schedule_expression = "cron(3/6 * * * ? *)"
     }
   }
-}
 
-resource "aws_iam_policy" "specials_remediation" {
-  name   = "specials_remediation_lambda_policy"
-  policy = data.aws_iam_policy_document.specials_remediation.json
-}
+  specials_remediation_active_consumers = {
+    for key, config in local.specials_remediation_consumers :
+    key => config
+    if local.specials_remediation_enabled
+  }
 
-resource "aws_iam_role_policy_attachment" "specials_remediation" {
-  role       = aws_iam_role.specials_remediation.name
-  policy_arn = aws_iam_policy.specials_remediation.arn
+  specials_remediation_databases = toset([
+    for config in values(local.specials_remediation_consumers) :
+    config.database
+  ])
 }
