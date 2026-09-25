@@ -5,19 +5,29 @@ module "s3_bucket_efs_migration" {
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
   replication_enabled = false
-  sse_algorithm = "AES256"
+  sse_algorithm       = "AES256"
 
   bucket_policy_v2 = [
     {
       effect  = "Allow"
-      actions = ["s3:PutObject", "s3:GetObject", "s3:ListBucket", "s3:GetBucketLocation"]
+      actions = [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:GetBucketLocation",
+        "s3:ListBucketMultipartUploads",
+        "s3:ListMultipartUploadParts"
+      ]
       resources = [
         "arn:aws:s3:::vcms-${local.environment}-efs-migration-landing",
         "arn:aws:s3:::vcms-${local.environment}-efs-migration-landing/*"
       ]
       principals = {
-        type        = "AWS"
-        identifiers = ["arn:aws:iam::${aws_ssm_parameter.legacy_account_id.value}:role/vcms-legacy-datasync-role"]
+        type = "AWS"
+        identifiers = [
+          "arn:aws:iam::${aws_ssm_parameter.legacy_account_id.value}:role/vcms-legacy-datasync-role",
+          aws_iam_role.datasync_import_role.arn
+        ]
       }
     }
   ]
@@ -39,6 +49,11 @@ resource "aws_datasync_location_s3" "migration_s3_source" {
   }
 
   s3_storage_class = "STANDARD"
+
+  depends_on = [
+    aws_iam_role_policy.datasync_import_permissions,
+    module.s3_bucket_efs_migration
+  ]
 }
 
 resource "aws_datasync_location_efs" "vcms_efs_target" {
