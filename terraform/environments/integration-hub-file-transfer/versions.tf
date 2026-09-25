@@ -6,7 +6,7 @@ terraform {
     }
     # Retained until the Lambda resources have been removed from state.
     external = {
-      version = "2.4.1"
+      version = "2.4.2"
       source  = "hashicorp/external"
     }
     http = {
@@ -14,11 +14,11 @@ terraform {
       source  = "hashicorp/http"
     }
     local = {
-      version = "2.9.0"
+      version = "2.9.1"
       source  = "hashicorp/local"
     }
     null = {
-      version = "3.3.1"
+      version = "3.3.2"
       source  = "hashicorp/null"
     }
   }
