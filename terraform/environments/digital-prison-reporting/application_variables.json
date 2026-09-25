@@ -431,7 +431,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "postgres",
-        "engine_version": "16",
+        "engine_version": "16.15",
         "replica_engine_version": "16.15",
         "init_size": "158",
         "max_size": "1000",
