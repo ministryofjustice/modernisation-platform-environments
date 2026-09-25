@@ -129,6 +129,17 @@ module "justice_transcribe_backend_iam_role" {
       ]
       resources = ["${module.async_transcription[0].s3_bucket_arn}/output/*"]
     }
+    # Async failures are written to a separate prefix from successful output. Without
+    # read access here a failed transcription gives the caller no way to see why.
+    S3AsyncTranscriptionFailure = {
+      sid    = "S3AsyncTranscriptionFailure"
+      effect = "Allow"
+      actions = [
+        "s3:DeleteObject",
+        "s3:GetObject",
+      ]
+      resources = ["${module.async_transcription[0].s3_bucket_arn}/failure/*"]
+    }
     AsyncTranscriptionKMSAccess = {
       sid    = "AsyncTranscriptionKMSAccess"
       effect = "Allow"
