@@ -152,7 +152,7 @@ resource "aws_iam_role_policy_attachment" "airflow_cross_account" {
   count = local.is-production ? 1 : 0
 
   role       = data.aws_iam_role.dataapi_cross_role[0].name
-  policy_arn = aws_iam_policy_document.airflow_assume_dataapi[0].arn
+  policy_arn = data.aws_iam_policy_document.airflow_assume_dataapi[0].arn
 }
 
 
