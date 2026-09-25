@@ -16,7 +16,7 @@ locals {
 
 module "s3_bucket" {
   for_each = local.build_s3 ? toset(local.ftp_directions) : toset([])
-  source   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=c8889e65f4d8a3d53d2cbd93b7be714e990020b7" # v10.2.1
+  source   = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e" # v11.2.0
 
   bucket_prefix       = "${local.application_name}-${local.environment}-ftp-${each.key}"
   versioning_enabled  = false
@@ -69,6 +69,14 @@ module "s3_bucket" {
   tags = merge(local.tags, {
     Name = "${local.application_name}-${local.environment}-ftp-${each.key}"
   })
+
+  manage_log_bucket_policy = false
+  log_buckets = {
+    log_bucket_name = module.s3-bucket-logging.bucket.id
+    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+  }
+
+  log_prefix = "s3access/${local.application_name}-${local.environment}-ftp-${each.key}"
 
   bucket_policy_v2 = [
     for stmt in [

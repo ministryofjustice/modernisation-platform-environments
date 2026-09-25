@@ -49,7 +49,10 @@
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? 2999)",
       "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)",
       "ftp_sftp_port": "22",
-      "max_string_size": "EXTENDED"
+      "max_string_size": "EXTENDED",
+      "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
+      "s3_lifecycle_days_expiration_current_logs": 90,
+      "s3_lifecycle_days_expiration_noncurrent_logs": 90
     },
 
     "test": {
@@ -101,7 +104,10 @@
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? 2999)",
       "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)",
       "ftp_sftp_port": "22",
-      "max_string_size": "EXTENDED"
+      "max_string_size": "EXTENDED",
+      "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
+      "s3_lifecycle_days_expiration_current_logs": 90,
+      "s3_lifecycle_days_expiration_noncurrent_logs": 90
     },
 
     "preproduction": {
@@ -153,7 +159,10 @@
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? 2999)",
       "zip_lambda_eventbridge_cron": "cron(45 6 * * ? 2999)",
       "ftp_sftp_port": "22",
-      "max_string_size": "EXTENDED"
+      "max_string_size": "EXTENDED",
+      "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
+      "s3_lifecycle_days_expiration_current_logs": 90,
+      "s3_lifecycle_days_expiration_noncurrent_logs": 90
     },
 
     "production": {
@@ -205,7 +214,12 @@
       "ftp_lambda_eventbridge_cron": "cron(0 * * * ? *)",
       "zip_lambda_eventbridge_cron": "cron(45 6 * * ? *)",
       "ftp_sftp_port": "22",
-      "max_string_size": "STANDARD"
+      "max_string_size": "STANDARD",
+      "s3_lifecycle_days_abort_incomplete_multipart_upload_days": 6,
+      "s3_lifecycle_days_expiration_current": 366,
+      "s3_lifecycle_days_expiration_noncurrent": 366,
+      "s3_lifecycle_days_expiration_current_logs": 90,
+      "s3_lifecycle_days_expiration_noncurrent_logs": 90
     }
   }
 }
