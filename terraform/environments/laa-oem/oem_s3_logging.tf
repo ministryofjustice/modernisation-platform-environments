@@ -99,7 +99,7 @@ resource "aws_s3_bucket_policy" "laa_oem_logging" {
         ],
         Condition = {
           ArnLike = {
-            "aws:SourceArn" = [for arn in local.s3_access_logs_bucket_arns : arn]
+            "aws:SourceArn" = local.s3_access_logs_source_arns
           }
         }
       }
