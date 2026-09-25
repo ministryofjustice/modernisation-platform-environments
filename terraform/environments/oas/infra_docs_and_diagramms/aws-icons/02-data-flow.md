@@ -12,10 +12,8 @@ flowchart LR
     ALB -->|"2 . HTTP/HTTPS 9500-9503<br/>/console /em /analytics /dv"| EC2["EC2<br/>WebLogic + Analytics"]
     EC2 -->|"3 . Oracle TNS 1521"| RDS[("RDS Oracle 19c<br/>db.t3.medium")]
 
-    ADMIN["Administrator"] -->|"4a . SSH 22"| BASTION["Bastion host"]
-    BASTION -->|"5a . SSH 22"| EC2
-    ADMIN -->|"4b . Start-Session"| SSM["SSM Session<br/>Manager"]
-    SSM -.->|"5b . secure session"| EC2
+    ADMIN["Administrator"] -->|"4 . Start-Session"| SSM["SSM Session<br/>Manager"]
+    SSM -.->|"5 . secure session"| EC2
 
     WS["LZ Workspaces"] -.->|"6 . SQL Developer 1521<br/>(direct, bypasses app tier)"| RDS
     ALB -.->|"7 . access logs"| S3LOGS[("S3<br/>ALB access logs")]
@@ -65,7 +63,7 @@ sequenceDiagram
 | **Console/EM ports** | 9500 (HTTP) / 9501 (HTTPS) |
 | **Analytics/DV ports** | 9502 (HTTP) / 9503 (HTTPS) |
 | **Direct DB access** | LZ Workspaces reach RDS on 1521 without going through the ALB or EC2 — allowed by a dedicated RDS security group rule for the management CIDR |
-| **Admin access** | Bastion (SSH) or SSM Session Manager only — no other inbound to the EC2 security group |
+| **Admin access** | SSM Session Manager only — no inbound to the EC2 security group (bastion and SSH removed) |
 | **Password rotation trigger** | Manual only — no schedule, no automatic Secrets Manager rotation |
 | **Alerting path** | CloudWatch Alarm → SNS → Lambda → Slack webhook (URL stored in Secrets Manager) |
 

@@ -10,9 +10,10 @@ direct connection between them.
 
 ## How to read this diagram
 
-- **Left/centre (`oas` cluster):** ALB → EC2 → RDS application tier, plus bastion, WAF,
-  ACM, Route53, Secrets Manager, S3 logging, and the two automation Lambdas. Full detail
-  in the [oas-only diagram](01-general-infrastructure.md).
+- **Left/centre (`oas` cluster):** ALB → EC2 → RDS application tier, plus WAF, ACM,
+  Route53, Secrets Manager, S3 logging, and the two automation Lambdas. Admin access is
+  SSM Session Manager only — the bastion has been removed. Full detail in the
+  [oas-only diagram](01-general-infrastructure.md).
 - **Right (`edw-19c` cluster):** the standalone RDS instance, its `S3_INTEGRATION` IAM
   role, the cross-account replication bucket, and its own Secrets Manager entry. Full
   detail in the [edw-19c-only diagram](../../../edw-19c/infra_docs_and_diagramms/aws-icons/01-general-infrastructure.md).
@@ -31,7 +32,7 @@ direct connection between them.
 |---|---|
 | **Shared VPC** | Both apps sit in the same Modernisation Platform shared VPC, `eu-west-2` |
 | **Only real link today** | None — the OAS↔EDW security group rules exist in Terraform but are commented out on both sides |
-| **oas compute** | EC2 r5a.large (WebLogic + Analytics), ALB, bastion |
+| **oas compute** | EC2 r5a.large (WebLogic + Analytics), ALB |
 | **edw-19c compute** | None — RDS-only, `preproduction` environment only |
 | **Both use** | Oracle 19c EE RDS, KMS encryption, Secrets Manager for master passwords, LZ Workspaces SQL Developer access on 1521 |
 | **oas-only** | ALB/WAF/ACM/Route53, EBS volumes, password-rotation Lambda, Slack security alerting |
