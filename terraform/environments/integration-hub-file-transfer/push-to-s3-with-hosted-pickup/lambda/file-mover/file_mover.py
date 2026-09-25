@@ -3,8 +3,11 @@ import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
+from aws_lambda_powertools import Logger
 from boto3.s3.transfer import TransferConfig
 from botocore.exceptions import BotoCoreError, ClientError
+
+logger = Logger()
 
 EVENT_SOURCE = "uk.gov.justice.service.managed-file-transfer"
 REQUESTED_DETAIL_TYPE = "FileActionExecutionRequested.v1"
@@ -210,6 +213,19 @@ def _is_transient(error):
     return chained_error is not None and _is_transient(chained_error)
 
 
+def _aws_error_context(error):
+    while error is not None and not isinstance(error, ClientError):
+        error = error.__cause__ or error.__context__
+    if error is None:
+        return {}
+    return {
+        "aws_error_code": error.response.get("Error", {}).get("Code"),
+        "aws_operation": error.operation_name,
+        "aws_http_status": error.response.get("ResponseMetadata", {}).get("HTTPStatusCode"),
+        "aws_request_id": error.response.get("ResponseMetadata", {}).get("RequestId"),
+    }
+
+
 def _call_aws(function, terminal_code, terminal_message, **kwargs):
     try:
         return function(**kwargs)
@@ -290,9 +306,22 @@ def publish_completion(events, event_bus_name, request, detail):
 def batch_response(records, process_record):
     failures = []
     for record in records:
+        event = None
         try:
-            process_record(parse_sqs_record(record))
-        except Exception:  # noqa: BLE001 - every record failure must be reported to SQS
+            event = parse_sqs_record(record)
+            process_record(event)
+        except Exception as error:  # noqa: BLE001 - every record failure must be reported to SQS
+            log_context = {
+                "message_id": record["messageId"],
+                "error_type": type(error).__name__,
+                **_aws_error_context(error),
+            }
+            if event is not None:
+                detail = event.get("detail")
+                data = detail.get("data") if isinstance(detail, dict) else None
+                if isinstance(data, dict):
+                    log_context["action_execution_id"] = data.get("actionExecutionId")
+            logger.warning("Hosted pickup record failed processing", extra=log_context)
             failures.append({"itemIdentifier": record["messageId"]})
     return {"batchItemFailures": failures}
 
@@ -348,6 +377,13 @@ class FileMover:
                 destination=destination,
             )
         except TerminalFailure as failure:
+            log_context = {
+                "action_execution_id": request.action_execution_id,
+                "correlation_id": request.correlation_id,
+                "failure_code": failure.code,
+            }
+            log_context.update(_aws_error_context(failure))
+            logger.warning("Hosted pickup action failed", extra=log_context)
             detail = completion_detail(
                 request,
                 "failed",

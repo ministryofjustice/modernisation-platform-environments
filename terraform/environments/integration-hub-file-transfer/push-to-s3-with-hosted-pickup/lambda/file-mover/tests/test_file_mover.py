@@ -1,4 +1,5 @@
 import json
+from unittest.mock import patch
 
 import pytest
 from botocore.exceptions import ClientError
@@ -262,6 +263,38 @@ def test_terminal_configuration_failure_emits_failed_completion():
     }
 
 
+def test_rejected_copy_logs_safe_aws_details_without_exposing_error_message():
+    service, mover_s3, events, _ = mover()
+    error = ClientError(
+        {
+            "Error": {"Code": "AccessDenied", "Message": "sensitive object details"},
+            "ResponseMetadata": {"HTTPStatusCode": 403, "RequestId": "s3-request-id"},
+        },
+        "CopyObject",
+    )
+
+    def reject_copy(**_kwargs):
+        raise error
+
+    mover_s3.copy = reject_copy
+    with patch("file_mover.logger.warning") as warning:
+        assert service.process(requested_event()) == "failed"
+
+    assert warning.call_args.args == ("Hosted pickup action failed",)
+    assert warning.call_args.kwargs["extra"] == {
+        "action_execution_id": "b1d4e7c2-f073-4ed4-9565-a4c31c54bd7f",
+        "correlation_id": "7d9f4e4c-0e0f-4a5b-8b4e-4ab1f28fd1d1",
+        "failure_code": "DELIVERY_REJECTED",
+        "aws_error_code": "AccessDenied",
+        "aws_operation": "CopyObject",
+        "aws_http_status": 403,
+        "aws_request_id": "s3-request-id",
+    }
+    assert "sensitive object details" not in repr(warning.call_args)
+    detail = json.loads(events.calls[0]["Entries"][0]["Detail"])
+    assert detail["data"]["failure"]["code"] == "DELIVERY_REJECTED"
+
+
 def test_transient_failure_is_raised_without_completion():
     error = ClientError(
         {
@@ -311,3 +344,37 @@ def test_partial_batch_response_reports_only_retryable_records():
     assert batch_response(records, process) == {
         "batchItemFailures": [{"itemIdentifier": "retry"}]
     }
+
+
+def test_retryable_copy_error_logs_safe_aws_details_and_action_id():
+    error = ClientError(
+        {
+            "Error": {"Code": "SlowDown", "Message": "sensitive object details"},
+            "ResponseMetadata": {"HTTPStatusCode": 503, "RequestId": "s3-request-id"},
+        },
+        "CopyObject",
+    )
+    record = {
+        "messageId": "retry",
+        "body": json.dumps({"Message": json.dumps(requested_event())}),
+    }
+
+    def fail_copy(_event):
+        raise error
+
+    with patch("file_mover.logger.warning") as warning:
+        assert batch_response([record], fail_copy) == {
+            "batchItemFailures": [{"itemIdentifier": "retry"}]
+        }
+
+    assert warning.call_args.args == ("Hosted pickup record failed processing",)
+    assert warning.call_args.kwargs["extra"] == {
+        "message_id": "retry",
+        "error_type": "ClientError",
+        "aws_error_code": "SlowDown",
+        "aws_operation": "CopyObject",
+        "aws_http_status": 503,
+        "aws_request_id": "s3-request-id",
+        "action_execution_id": "b1d4e7c2-f073-4ed4-9565-a4c31c54bd7f",
+    }
+    assert "sensitive object details" not in repr(warning.call_args)
