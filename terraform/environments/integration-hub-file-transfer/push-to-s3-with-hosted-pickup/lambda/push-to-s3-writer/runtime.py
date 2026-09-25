@@ -25,8 +25,7 @@ from botocore.exceptions import ClientError
 
 SUPPORTED_REGION = "eu-west-2"
 IDEMPOTENCY_SECONDS = 7 * 24 * 60 * 60
-TERMINAL_SECONDS = 90 * 24 * 60 * 60
-SQS_RETENTION_SECONDS = 14 * 24 * 60 * 60
+TERMINAL_SECONDS = 7 * 24 * 60 * 60
 MAX_COPY_OBJECT_BYTES = 5 * 1000**3
 MULTIPART_PART_BYTES = 512 * 1024**2
 MIN_MULTIPART_PART_BYTES = 5 * 1024**2
@@ -502,7 +501,7 @@ class ActionStore:
                 "ownerToken": owner_token,
                 "leaseUntil": now + lease_seconds,
                 "deduplicationExpiresAt": now + idempotency_seconds,
-                "expiration": now + max(idempotency_seconds, SQS_RETENTION_SECONDS + idempotency_seconds),
+                "expiration": now + idempotency_seconds,
             }
         )
         try:
@@ -531,10 +530,10 @@ class ActionStore:
         if int(existing.get("leaseUntil", 0)) > now:
             return "active", existing, None
 
-        expiry = now + (
-            terminal_seconds
+        expiry = (
+            now + terminal_seconds
             if state == "COPIED"
-            else max(idempotency_seconds, SQS_RETENTION_SECONDS + idempotency_seconds)
+            else max(int(existing.get("deduplicationExpiresAt", existing.get("expiration", 0))), now + lease_seconds)
         )
         try:
             result = self.table.update_item(

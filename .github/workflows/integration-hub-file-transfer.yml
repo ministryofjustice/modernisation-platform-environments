@@ -37,7 +37,7 @@ permissions:
 
 jobs:
   writer-unit-tests:
-    name: Test shared push-to-S3 writer
+    name: Test component push-to-S3 writers
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -47,7 +47,6 @@ jobs:
       AWS_SESSION_TOKEN: dummy
       AWS_DEFAULT_REGION: eu-west-2
       AWS_EC2_METADATA_DISABLED: "true"
-      PYTHONPATH: terraform/environments/integration-hub-file-transfer/lambda/push-to-s3-writer
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
@@ -59,12 +58,15 @@ jobs:
         with:
           activate-environment: true
 
-      - name: Run shared writer tests
+      - name: Run both component writer tests
         run: |
-          uv run --no-project --python 3.12 \
-            --with-requirements terraform/environments/integration-hub-file-transfer/lambda/push-to-s3-writer/requirements.txt \
-            --with-requirements terraform/environments/integration-hub-file-transfer/lambda/push-to-s3-writer/tests/requirements.txt \
-            python -m pytest -q terraform/environments/integration-hub-file-transfer/lambda/push-to-s3-writer/tests
+          for component in push-to-s3 push-to-s3-with-hosted-pickup; do
+            writer="terraform/environments/integration-hub-file-transfer/$component/lambda/push-to-s3-writer"
+            PYTHONPATH="$writer" uv run --no-project --python 3.12 \
+              --with-requirements "$writer/requirements.txt" \
+              --with-requirements "$writer/tests/requirements.txt" \
+              python -m pytest -q "$writer/tests"
+          done
 
   strategy:
     uses: ./.github/workflows/reusable_terraform_components_strategy.yml

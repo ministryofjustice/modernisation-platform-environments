@@ -28,9 +28,9 @@ The Lambda is not attached to a VPC because it uses AWS service endpoints and do
 
 The mover copies the exact source `VersionId` to the hosted key formed from the configured destination prefix and the source key relative to its authorised source prefix. The source object and its retention are unchanged. The mover does not read destination objects or lock keys for exclusive writing.
 
-Logical write deduplication lasts seven days; terminal-outcome evidence is retained for 90 days, covering the 14-day DLQ retention. This is not an exactly-once S3 write guarantee. If S3 accepts a copy but the SDK times out before receiving the result, a retry may overwrite the key or create another destination version. An unknown copy outcome does not establish that the destination object is absent. SDK timeouts and Lambda deadline failures follow the normal retry and DLQ path; no completion-latency guarantee is made.
+The parent clean bucket has a one-day current-version expiry and a one-day noncurrent-version expiry in both environments. A version can therefore remain after its current-version expiry until it ages out as noncurrent; S3 lifecycle removal is asynchronous. The seven-day lifecycle in production belongs to the quarantine and investigation buckets, not clean. Initial `IN_PROGRESS` claims have a seven-day DynamoDB TTL, and terminal records expire seven days after their last outcome update. A pending retry does not restart its seven-day TTL. TTL removal is asynchronous, and records no longer protect against duplicate copies once removed. This is not an exactly-once S3 write guarantee. If S3 accepts a copy but the SDK times out before receiving the result, a retry may overwrite the key or create another destination version. An unknown copy outcome does not establish that the destination object is absent. SDK timeouts and Lambda deadline failures follow the normal retry and DLQ path; no completion-latency guarantee is made.
 
-For completed events, `actionDefinitionId` is the request's `configurationReference.secretArn` (the dispatch `secretARN`); the request has no separate definition ID. A terminal record for that action and secret prevents a later retry from copying again after the seven-day deduplication window, while the record is retained for 90 days. An existing `IN_PROGRESS` record is logically expired after seven days; the reporter emits failure, and recovery requires a new action execution ID.
+For completed events, `actionDefinitionId` is the request's `configurationReference.secretArn` (the dispatch `secretARN`); the request has no separate definition ID. A terminal record for that action and secret prevents a later retry from copying while it exists. An existing `IN_PROGRESS` record is logically expired after seven days; the reporter emits failure when its request reaches a DLQ, and recovery requires a new action execution ID.
 
 Before enabling an entry, confirm the source and hosted-bucket policies and KMS key policies allow the required copy, decrypt, encrypt and data-key operations, and that destination encryption headers are accepted. Hosted bucket expiry remains governed by its configured lifecycle; this workflow does not configure or extend object-retention settings. For customer-owned destinations, configure cleanup of incomplete multipart uploads and set the required object-retention policy. Costs include S3 requests, storage and versions, KMS keys/API usage, Lambda duration, EventBridge, SNS, SQS, DynamoDB and CloudWatch Logs.
 
@@ -98,7 +98,7 @@ A read-only customer role is created for each hosted pickup bucket, but its trus
 
 The `pipeline` output exposes `eventbridge_dlq_arn`, `sns_dlq_arn`, `processing_dlq_arn` and `dlq_reporter_arn`. The original `sqs_dlq_arn` and queue name are retained as the processing DLQ to avoid replacement. Inspect and resolve any old messages before enabling the reporter: it previously received mixed transport and processing envelopes. Malformed or unrecognised messages remain in their DLQ for investigation.
 
-Each DLQ has a CloudWatch visible-message backlog alarm. The component also alarms on mover/reporter errors and throttles, near-timeout duration, and processing-message age. These child states have no approved notification topic output, so alarms have no actions until operators connect them to the operational notification destination; this is a production notification gate. Monitor reporter failures as well: a retry can keep a message in flight without a visible backlog. A terminal-outcome record expires after 90 days. Once a `FileActionExecutionCompleted.v1` failure has been emitted, never manually redrive that `actionExecutionId` to seek success; submit a new request with a new action execution ID instead. If publication succeeds but its DynamoDB marker update fails, the same event detail may be published again; consumers must deduplicate with the completion idempotency key.
+Each DLQ has a CloudWatch visible-message backlog alarm. The component also alarms on mover/reporter errors and throttles, near-timeout duration, and processing-message age. These child states have no approved notification topic output, so alarms have no actions until operators connect them to the operational notification destination; this is a production notification gate. Monitor reporter failures as well: a retry can keep a message in flight without a visible backlog. DLQs retain messages for 14 days, longer than DynamoDB's seven-day markers; a late reporter may create a new failure record after the original marker has been removed. Inspect old messages rather than redriving them: once a `FileActionExecutionCompleted.v1` failure has been emitted, never manually redrive that `actionExecutionId` to seek success; submit a new request with a new action execution ID instead. If publication succeeds but its DynamoDB marker update fails, the same event detail may be published again; consumers must deduplicate with the completion idempotency key.
 
 To enable access, replace the deny-all trust statement with an allow statement for the customer's exact IAM role. For an account in our AWS organisation, also constrain the trust with `aws:PrincipalOrgID`. For an account outside the organisation, agree an opaque external ID with the customer and require it with `sts:ExternalId`. An external ID helps prevent confused-deputy attacks, but it is not treated as a password or stored as a secret.
 
@@ -114,7 +114,7 @@ Destroy or update this child state before removing parent resources. Removing th
 
 ## Local validation
 
-The Lambda package is built from the shared `lambda/push-to-s3-writer` directory. Its pinned `requirements.txt` is installed into the deployment package; `tests/requirements.txt` contains test-only dependencies and is used only by the local test command. Changes to this shared runtime or its tests select both `push-to-s3` and `push-to-s3-with-hosted-pickup` Terraform states in CI. Changes to this child state's own files continue to select only this state.
+The Lambda package is built from this component's `lambda/push-to-s3-writer` directory. Its pinned `requirements.txt` is installed into the deployment package; `tests/requirements.txt` contains test-only dependencies. Each component has its own writer copy and tests; CI tests both copies, while a change under this component selects only this Terraform state.
 
 Run from the repository root without contacting AWS:
 
@@ -122,11 +122,11 @@ Run from the repository root without contacting AWS:
 terraform fmt -check -recursive terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup
 env AWS_ACCESS_KEY_ID=dummy AWS_SECRET_ACCESS_KEY=dummy AWS_SESSION_TOKEN=dummy \
   AWS_DEFAULT_REGION=eu-west-2 AWS_EC2_METADATA_DISABLED=true \
-  PYTHONPATH=terraform/environments/integration-hub-file-transfer/lambda/push-to-s3-writer \
+  PYTHONPATH=terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup/lambda/push-to-s3-writer \
   uv run --no-project --python 3.12 \
-  --with-requirements terraform/environments/integration-hub-file-transfer/lambda/push-to-s3-writer/requirements.txt \
-  --with-requirements terraform/environments/integration-hub-file-transfer/lambda/push-to-s3-writer/tests/requirements.txt \
-  python -m pytest -q terraform/environments/integration-hub-file-transfer/lambda/push-to-s3-writer/tests
+  --with-requirements terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup/lambda/push-to-s3-writer/requirements.txt \
+  --with-requirements terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup/lambda/push-to-s3-writer/tests/requirements.txt \
+  python -m pytest -q terraform/environments/integration-hub-file-transfer/push-to-s3-with-hosted-pickup/lambda/push-to-s3-writer/tests
 ```
 
 The test command uses dummy credentials and disables EC2 metadata lookup; it makes no AWS calls. Do not run `terraform init`, `terraform validate`, `terraform plan`, or `terraform apply` as part of local component validation.

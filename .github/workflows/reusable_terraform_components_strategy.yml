@@ -129,21 +129,13 @@ jobs:
                 if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
                   merge_base=$(git merge-base origin/main "$head_commit")
                   if git diff --quiet "$merge_base" "$head_commit" -- "$folder"; then
-                    if [[ "${{ inputs.application }}" == "integration-hub-file-transfer" && ( "$comp" == "push-to-s3" || "$comp" == "push-to-s3-with-hosted-pickup" ) ]] && ! git diff --quiet "$merge_base" "$head_commit" -- "$app_dir/lambda/push-to-s3-writer"; then
-                      echo "Including '$comp' due to shared writer changes."
-                    else
-                      echo "No changes in '$folder' (branch compared to merge base); skipping '$comp'"
-                      continue
-                    fi
+                    echo "No changes in '$folder' (branch compared to merge base); skipping '$comp'"
+                    continue
                   fi
                 else
                   if git diff --quiet HEAD~1 HEAD -- "$folder"; then
-                    if [[ "${{ inputs.application }}" == "integration-hub-file-transfer" && ( "$comp" == "push-to-s3" || "$comp" == "push-to-s3-with-hosted-pickup" ) ]] && ! git diff --quiet HEAD~1 HEAD -- "$app_dir/lambda/push-to-s3-writer"; then
-                      echo "Including '$comp' due to shared writer changes."
-                    else
-                      echo "No changes in '$folder' (main branch); skipping '$comp'"
-                      continue
-                    fi
+                    echo "No changes in '$folder' (main branch); skipping '$comp'"
+                    continue
                   fi
                 fi
               fi

@@ -86,7 +86,7 @@ def environment(action_name="push-to-s3", *, reporter=False):
         "SOURCE_PREFIX_MAP": json.dumps({SECRET_PREFIX: "identity/"}),
         action_key: json.dumps({SECRET_PREFIX: ROLE_ARN}),
         "IDEMPOTENCY_EXPIRY_SECONDS": "604800",
-        "TERMINAL_OUTCOME_EXPIRY_SECONDS": "7776000",
+        "TERMINAL_OUTCOME_EXPIRY_SECONDS": "604800",
     }
     if action_name == "push-to-s3-with-hosted-pickup":
         destination["retention_days"] = 7
@@ -559,17 +559,17 @@ def test_terminal_duplicate_is_acknowledged_without_copy(monkeypatch):
     assert sum(operation == "copy_object" for operation, _ in services.s3.calls) == 1
 
 
-def test_pending_claim_expiry_covers_dlq_retention(monkeypatch):
+def test_terminal_claim_expires_after_seven_days(monkeypatch):
     config = writer_config(monkeypatch)
     services = FakeServices()
 
     process_writer_record(record(), config, services, Context())
 
-    pending_expiry = services.table.items[requested_event()["detail"]["data"]["actionExecutionId"]]["expiration"]
-    assert pending_expiry >= int(datetime.now(timezone.utc).timestamp()) + 21 * 24 * 60 * 60 - 2
+    terminal_expiry = services.table.items[requested_event()["detail"]["data"]["actionExecutionId"]]["expiration"]
+    assert terminal_expiry == pytest.approx(int(datetime.now(timezone.utc).timestamp()) + 7 * 24 * 60 * 60, abs=2)
 
 
-def test_claim_tracks_seven_day_dedup_separately_from_terminal_ttl(monkeypatch):
+def test_claim_expires_with_seven_day_deduplication_window(monkeypatch):
     config = writer_config(monkeypatch)
     _, _, item = make_snapshot(config)
     store = ActionStore(FakeTable())
@@ -584,7 +584,7 @@ def test_claim_tracks_seven_day_dedup_separately_from_terminal_ttl(monkeypatch):
 
     assert state == "claimed"
     assert stored["deduplicationExpiresAt"] == 1_000 + 7 * 24 * 60 * 60
-    assert stored["expiration"] >= 1_000 + 21 * 24 * 60 * 60
+    assert stored["expiration"] == stored["deduplicationExpiresAt"]
 
 
 def test_writer_does_not_reclaim_expired_nonterminal_marker(monkeypatch):
@@ -690,6 +690,7 @@ def test_stale_in_progress_claim_can_be_recovered(monkeypatch):
     assert state == "claimed"
     assert first_owner != second_owner
     assert recovered["ownerToken"] == second_owner
+    assert recovered["expiration"] == now + config.idempotency_seconds
 
 
 def test_multipart_copy_is_sequential_and_aborts_on_failure(monkeypatch):
@@ -1046,7 +1047,7 @@ def test_completion_details_match_eventbridge_schema(status, monkeypatch):
     item["failureCode"] = "DeliveryAttemptsExhausted"
     item["failureMessage"] = "Delivery attempts exhausted."
     detail = runtime.build_completion_detail(item, status)
-    schema_path = Path(__file__).resolve().parents[3] / "schemas" / "FileActionExecutionCompleted.v1.json"
+    schema_path = Path(__file__).resolve().parents[4] / "schemas" / "FileActionExecutionCompleted.v1.json"
     schema = json.loads(schema_path.read_text())
     envelope = {
         "version": "0",

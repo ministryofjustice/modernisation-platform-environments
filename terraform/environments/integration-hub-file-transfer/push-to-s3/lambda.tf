@@ -14,7 +14,7 @@ module "lambda_file_mover" {
   role_name                         = local.lambda_role_name
   runtime                           = "python3.12"
   source_path = [{
-    path             = "${path.module}/../lambda/push-to-s3-writer"
+    path             = "${path.module}/lambda/push-to-s3-writer"
     pip_requirements = true
     patterns = [
       "!([^/]+/)*(tests|__pycache__|\\.pytest_cache)(/.*)?$",
@@ -36,7 +36,7 @@ module "lambda_file_mover" {
     SOURCE_BUCKET                   = data.aws_s3_bucket.clean.id
     SOURCE_PREFIX_MAP               = jsonencode(local.source_prefixes_by_secret)
     SUPPORTED_REGION                = "eu-west-2"
-    TERMINAL_OUTCOME_EXPIRY_SECONDS = tostring(90 * 24 * 60 * 60)
+    TERMINAL_OUTCOME_EXPIRY_SECONDS = tostring(7 * 24 * 60 * 60)
   }
 
   attach_policy_statements = true
@@ -143,7 +143,7 @@ module "lambda_dlq_reporter" {
   role_name                         = "${local.application_name}-${local.component_name}-dlq"
   runtime                           = "python3.12"
   source_path = [{
-    path             = "${path.module}/../lambda/push-to-s3-writer"
+    path             = "${path.module}/lambda/push-to-s3-writer"
     pip_requirements = true
     patterns = [
       "!([^/]+/)*(tests|__pycache__|\\.pytest_cache)(/.*)?$",
@@ -166,7 +166,7 @@ module "lambda_dlq_reporter" {
     SOURCE_BUCKET                   = data.aws_s3_bucket.clean.id
     SOURCE_PREFIX_MAP               = jsonencode(local.source_prefixes_by_secret)
     SUPPORTED_REGION                = "eu-west-2"
-    TERMINAL_OUTCOME_EXPIRY_SECONDS = tostring(90 * 24 * 60 * 60)
+    TERMINAL_OUTCOME_EXPIRY_SECONDS = tostring(7 * 24 * 60 * 60)
   }
 
   attach_policy_statements = true
