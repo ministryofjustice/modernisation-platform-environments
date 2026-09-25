@@ -175,7 +175,14 @@ resource "aws_grafana_role_association" "platform_admin" {
   role = "ADMIN"
   group_ids = [
     local.cloud_platform_engineers_group_id,
-    local.container_platform_aws_group_id,
+    # TEMPORARY (cloud-platform#8509 isolation testing): container-platform-aws
+    # is removed from ADMIN so a member of it who is also in
+    # container-platform-user-testing (simulated BU B) logs in as a pure Viewer
+    # on team bu-bu2 — Grafana Admins bypass data-source permissions, so admin
+    # membership makes the isolation test inconclusive. cloud-platform-engineers
+    # stays ADMIN for platform administration. RESTORE this line once the
+    # BU-B-viewer-cannot-query-amp-bu1 test is validated.
+    # local.container_platform_aws_group_id,
   ]
   workspace_id = aws_grafana_workspace.this[0].id
 }
