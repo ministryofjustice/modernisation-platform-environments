@@ -1,5 +1,5 @@
 module "artifacts-s3" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=474f27a3f9bf542a8826c76fb049cc84b5cf136f"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e" # v11.2.0
 
   providers = {
     aws.bucket-replication = aws
@@ -29,6 +29,17 @@ module "artifacts-s3" {
       }
     }
   ]
+
+  # sse_algorithm      = "AES256"
+  # custom_kms_key     = ""
+
+  manage_log_bucket_policy = false
+  log_buckets = {
+    log_bucket_name = module.s3-bucket-logging.bucket.id
+    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+  }
+
+  log_prefix = "s3access/${local.application_name}-build-artifacts"
 
   bucket_policy = [jsonencode({
     Version = "2012-10-17",

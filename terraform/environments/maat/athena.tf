@@ -5,11 +5,13 @@ locals {
 
 ### Setup S3 Bucket for Athena Queries ###
 module "s3-bucket-athena-queries-output" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=474f27a3f9bf542a8826c76fb049cc84b5cf136f"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=81230d03816f140ae912454815ec531d7cbe2c8e" # v11.2.0
 
   bucket_prefix      = "athena-query-s3-bucket"
   versioning_enabled = false
   bucket_policy      = [data.aws_iam_policy_document.athena_bucket_policy.json]
+  # sse_algorithm      = "AES256"
+  # custom_kms_key     = ""
   # Enable bucket to be destroyed when not empty
   force_destroy = true
   # Refer to the below section "Replication" before enabling replication
@@ -23,6 +25,14 @@ module "s3-bucket-athena-queries-output" {
     # Platform team to add a new provider for the additional Region.
     aws.bucket-replication = aws
   }
+
+  manage_log_bucket_policy = false
+  log_buckets = {
+    log_bucket_name = module.s3-bucket-logging.bucket.id
+    log_bucket_arn  = module.s3-bucket-logging.bucket.arn
+  }
+
+  log_prefix = "s3access/athena-query-s3-bucket"
 
   lifecycle_rule = [
     {
