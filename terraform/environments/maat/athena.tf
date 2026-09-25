@@ -10,6 +10,8 @@ module "s3-bucket-athena-queries-output" {
   bucket_prefix      = "athena-query-s3-bucket"
   versioning_enabled = false
   bucket_policy      = [data.aws_iam_policy_document.athena_bucket_policy.json]
+  sse_algorithm      = "AES256"
+  custom_kms_key     = ""
   # Enable bucket to be destroyed when not empty
   force_destroy = true
   # Refer to the below section "Replication" before enabling replication

@@ -21,6 +21,8 @@ module "lb-s3-access-logs" {
 
   bucket_prefix       = "${local.application_name}-lb-access-logs"
   bucket_policy       = [data.aws_iam_policy_document.bucket_policy.json]
+  sse_algorithm      = "AES256"
+  custom_kms_key     = ""
   manage_log_bucket_policy = false
   log_buckets = {
     log_bucket_name = module.s3-bucket-logging.bucket.id
