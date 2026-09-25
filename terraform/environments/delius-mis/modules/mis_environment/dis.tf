@@ -62,7 +62,7 @@ resource "aws_vpc_security_group_egress_rule" "dis_ec2_to_dc" {
 }
 
 module "dis_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v4.2.2"
 
   # allow environment not to have this var set and still work
   count = var.dis_config != null ? var.dis_config.instance_count : 0
