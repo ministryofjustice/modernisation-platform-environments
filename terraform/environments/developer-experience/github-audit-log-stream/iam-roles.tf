@@ -43,6 +43,90 @@ module "iam_role" {
   }
 }
 
+module "athena_query_role" {
+  count = local.is-production ? 1 : 0
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-role?ref=ba3fd6ded6911e0454092147fe3704171cc05e00" # v6.8.1
+
+  name            = "${local.component_name}-query"
+  use_name_prefix = false
+
+  trust_policy_permissions = {
+    AccountAccess = {
+      actions = ["sts:AssumeRole"]
+      principals = [{
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+      }]
+    }
+  }
+
+  create_inline_policy = true
+  inline_policy_permissions = {
+    AthenaQuery = {
+      effect = "Allow"
+      actions = [
+        "athena:GetQueryExecution",
+        "athena:GetQueryResults",
+        "athena:GetWorkGroup",
+        "athena:StartQueryExecution",
+        "athena:StopQueryExecution"
+      ]
+      resources = [aws_athena_workgroup.github_audit_logs[0].arn]
+    }
+    GlueCatalogRead = {
+      effect = "Allow"
+      actions = [
+        "glue:GetDatabase",
+        "glue:GetTable",
+        "glue:GetTables"
+      ]
+      resources = [
+        "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+        "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:database/${aws_glue_catalog_database.github_audit_logs[0].name}",
+        "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${aws_glue_catalog_database.github_audit_logs[0].name}/*"
+      ]
+    }
+    SourceBucketRead = {
+      effect = "Allow"
+      actions = [
+        "s3:GetBucketLocation",
+        "s3:GetObject",
+        "s3:GetObjectVersion",
+        "s3:ListBucket"
+      ]
+      resources = [
+        module.s3_bucket[0].s3_bucket_arn,
+        "${module.s3_bucket[0].s3_bucket_arn}/*"
+      ]
+    }
+    ResultsBucketAccess = {
+      effect = "Allow"
+      actions = [
+        "s3:GetBucketLocation",
+        "s3:GetObject",
+        "s3:GetObjectVersion",
+        "s3:ListBucket",
+        "s3:PutObject"
+      ]
+      resources = [
+        module.athena_results_bucket[0].s3_bucket_arn,
+        "${module.athena_results_bucket[0].s3_bucket_arn}/*"
+      ]
+    }
+    KMSAccess = {
+      effect = "Allow"
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:GenerateDataKey"
+      ]
+      resources = [module.kms_key[0].key_arn]
+    }
+  }
+}
+
 module "cortex_xsiam_role" {
   count = local.cortex_xsiam_enabled ? 1 : 0
 
