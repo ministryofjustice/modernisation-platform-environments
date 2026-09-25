@@ -32,3 +32,11 @@ data "aws_iam_role" "analytical_platform_share_role" {
 
   name = "${each.value.target_account_name}-share-role"
 }
+
+data "aws_secretsmanager_secret" "dbt_secrets" {
+  name = "external/analytics_platform/k8s_dbt_auth"
+}
+
+data "aws_secretsmanager_secret_version" "dbt_secrets" {
+  secret_id = data.aws_secretsmanager_secret.dbt_secrets.id
+}
