@@ -11,7 +11,7 @@
       "db_ca_cert_identifier": "rds-ca-rsa2048-g1",
       "db_retention_period": "15",
       "db_maintenance_window": "mon:00:00-mon:03:00",
-      "db_instance_class": "db.t3.xlarge",
+      "db_instance_class": "db.m6i.2xlarge",
       "db_user": "admin",
       "db_allocated_storage": "100",
       "db_max_allocated_storage": "200",
