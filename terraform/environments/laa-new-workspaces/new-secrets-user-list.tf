@@ -19,10 +19,15 @@ resource "aws_secretsmanager_secret" "user_list" {
 }
 
 #  Slack notifications: keep the incoming webhook URL out of code and load it at runtime.
+# Replicated to us-east-1 because IAM (a global service) delivers events to that region only.
 resource "aws_secretsmanager_secret" "workspace_event_slack_webhook" {
   name                    = "${local.application_name}/${local.environment}/workspace-event-slack-webhook"
   description             = "Slack incoming webhook URL for WorkSpaces create and delete notifications"
   recovery_window_in_days = 0
+
+  replica {
+    region = "us-east-1"
+  }
 
   tags = merge(
     local.tags,
