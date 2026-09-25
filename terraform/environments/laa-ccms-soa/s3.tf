@@ -67,7 +67,7 @@ module "s3-bucket-logging" {
   ]
 
   tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-logging", "${local.application_data.accounts[local.environment].app_name}", local.environment)) }
+    { Name = lower(format("s3-%s-%s-logging", local.application_data.accounts[local.environment].app_name, local.environment)) }
   )
 }
 
@@ -84,7 +84,7 @@ resource "aws_s3_bucket_policy" "lb_access_logs" {
           AWS = "*"
         },
         Action   = "s3:*",
-        Resource = ["${module.s3-bucket-logging.bucket.arn}/*", "${module.s3-bucket-logging.bucket.arn}"],
+        Resource = ["${module.s3-bucket-logging.bucket.arn}/*", module.s3-bucket-logging.bucket.arn],
         Condition = {
           NumericLessThan = {
             "s3:TlsVersion" = "1.2"
