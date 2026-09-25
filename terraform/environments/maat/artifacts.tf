@@ -30,8 +30,8 @@ module "artifacts-s3" {
     }
   ]
 
-  sse_algorithm      = "AES256"
-  custom_kms_key     = ""
+  # sse_algorithm      = "AES256"
+  # custom_kms_key     = ""
 
   manage_log_bucket_policy = false
   log_buckets = {
