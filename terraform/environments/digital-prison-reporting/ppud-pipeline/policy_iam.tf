@@ -94,7 +94,7 @@ data "aws_iam_policy_document" "airflow_assume" {
 
     principals {
       type        = "Federated"
-      identifiers = [aws_iam_openid_connect_provider.cluster.arn]
+      identifiers = [aws_iam_openid_connect_provider.cluster[0].arn]
     }
 
     condition {
