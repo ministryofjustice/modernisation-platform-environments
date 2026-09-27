@@ -4,12 +4,12 @@ locals {
 }
 
 resource "aws_db_instance" "mariadb" {
-  identifier             = "vcms"
+  identifier             = "vcms-${local.environment}"
   snapshot_identifier    = local.app_config.db_snapshot_identifier
   allocated_storage      = 200
   db_name                = local.db_name
   engine                 = "mariadb"
-  engine_version         = "10.5.27"
+  engine_version         = "10.5.29"
   instance_class         = "db.t4g.medium"
   username               = local.db_root_user
   password               = random_id.db_password.b64_url

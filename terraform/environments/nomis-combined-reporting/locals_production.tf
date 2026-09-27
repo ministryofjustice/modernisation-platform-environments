@@ -155,6 +155,7 @@ locals {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
             "Ec2PDReportingPolicy",
+            "Ec2PDSharepointPolicy",
           ])
         })
         tags = merge(local.ec2_instances.bip_cms.tags, {
@@ -168,6 +169,7 @@ locals {
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
             "Ec2PDReportingPolicy",
+            "Ec2PDSharepointPolicy",
           ])
         })
         tags = merge(local.ec2_instances.bip_cms.tags, {
@@ -325,6 +327,20 @@ locals {
               "arn:aws:elasticloadbalancing:*:*:listener-rule/app/public-lb/*",
             ]
           }
+        ]
+      }
+      Ec2PDSharepointPolicy = {
+        description = "Permissions required for syncing files to sharepoint"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/microsoft/sharepoint/*",
+            ]
+          },
         ]
       }
     }
@@ -498,6 +514,7 @@ locals {
       "/oracle/database/DRBISYS"  = local.secretsmanager_secrets.db
       "/oracle/database/DRBIAUD"  = local.secretsmanager_secrets.db
       "/sap/bip/pd"               = local.secretsmanager_secrets.bip
+      "/microsoft/sharepoint/1"   = local.secretsmanager_secrets.sharepoint
     }
   }
 }

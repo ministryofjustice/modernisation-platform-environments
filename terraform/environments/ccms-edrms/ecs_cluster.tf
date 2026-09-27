@@ -1,29 +1,16 @@
-# # Capacity Providers
+# Capacity Providers
 
-# resource "aws_ecs_capacity_provider" "capacity-provider" {
-#   name = "${local.application_name}-capacity-provider"
+resource "aws_ecs_capacity_provider" "capacity-provider" {
+  name = "${local.application_name}-capacity-provider"
 
-#   auto_scaling_group_provider {
-#     auto_scaling_group_arn         = aws_autoscaling_group.cluster-scaling-group.arn
-#     managed_termination_protection = "ENABLED"
+  auto_scaling_group_provider {
+    auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
+  }
 
-#     # Drain tasks off an instance before the ASG terminates it during scale-in.
-#     managed_draining = "ENABLED"
-
-#     # Lets ECS automatically scale the ASG out/in as task placement changes,
-#     managed_scaling {
-#       status                    = "ENABLED"
-#       target_capacity           = 100
-#       minimum_scaling_step_size = 1
-#       maximum_scaling_step_size = 3
-#       instance_warmup_period    = 300
-#     }
-#   }
-
-#   tags = merge(local.tags,
-#     { Name = lower(format("%s-%s-cp", local.application_name, local.environment)) }
-#   )
-# }
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-cp", local.application_name, local.environment)) }
+  )
+}
 
 
 # ECS Cluster
@@ -36,16 +23,10 @@ resource "aws_ecs_cluster" "main" {
   }
 }
 
-# resource "aws_ecs_cluster_capacity_providers" "main" {
-#   cluster_name       = aws_ecs_cluster.main.name
-#   capacity_providers = [aws_ecs_capacity_provider.capacity-provider.name]
-
-#   default_capacity_provider_strategy {
-#     capacity_provider = aws_ecs_capacity_provider.capacity-provider.name
-#     weight            = 1
-#     base              = 1
-#   }
-# }
+resource "aws_ecs_cluster_capacity_providers" "main" {
+  cluster_name       = aws_ecs_cluster.main.name
+  capacity_providers = [aws_ecs_capacity_provider.capacity-provider.name]
+}
 
 # ECS Task Definition
 
@@ -91,20 +72,7 @@ resource "aws_ecs_service" "edrms" {
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.edrms.arn
   desired_count   = local.application_data.accounts[local.environment].app_count
-  launch_type = "EC2"
-
-  # Required by the AWS provider whenever a service switches between
-  # launch_type and capacity_provider_strategy.
-  # force_new_deployment = true
-
-  # # Use the cluster's capacity provider (with managed scaling enabled) instead
-  # # of a bare EC2 launch type, so ECS can grow/shrink the ASG automatically
-  # # based on actual task placement instead of a static desired_capacity.
-  # capacity_provider_strategy {
-  #   capacity_provider = aws_ecs_capacity_provider.capacity-provider.name
-  #   weight            = 1
-  #   base              = 1
-  # }
+  launch_type     = "EC2"
 
   health_check_grace_period_seconds = 120
   #   lifecycle {
