@@ -58,6 +58,11 @@ module "athena_query_role" {
         type        = "AWS"
         identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
       }]
+      condition = [{
+        test     = "ArnEquals"
+        variable = "aws:PrincipalArn"
+        values   = var.athena_query_principal_arns
+      }]
     }
   }
 
@@ -104,15 +109,21 @@ module "athena_query_role" {
       effect = "Allow"
       actions = [
         "s3:GetBucketLocation",
+        "s3:ListBucket",
+        "s3:ListBucketMultipartUploads"
+      ]
+      resources = [module.athena_results_bucket[0].s3_bucket_arn]
+    }
+    ResultsObjectAccess = {
+      effect = "Allow"
+      actions = [
         "s3:GetObject",
         "s3:GetObjectVersion",
-        "s3:ListBucket",
+        "s3:ListMultipartUploadParts",
+        "s3:AbortMultipartUpload",
         "s3:PutObject"
       ]
-      resources = [
-        module.athena_results_bucket[0].s3_bucket_arn,
-        "${module.athena_results_bucket[0].s3_bucket_arn}/*"
-      ]
+      resources = ["${module.athena_results_bucket[0].s3_bucket_arn}/results/*"]
     }
     KMSAccess = {
       effect = "Allow"
