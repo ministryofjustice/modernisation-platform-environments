@@ -5,6 +5,21 @@ component layout. This is new infrastructure in `integration-hub-api-development
 with isolated state at `environments/members/integration-hub-api/file-transfer-api`.
 The old root and legacy state remain untouched. No production accounts are added.
 
+## Test before merge after a conflicting deployment
+
+Run the `integration-hub-api` workflow on the recovery branch with action `deploy`
+and `test_upload_recovery=true`. This uses the normal development approval gates:
+
+1. Target only the incoming KMS key and incoming bucket policy to restore API access.
+   Inspect the plan: it must not change dispatcher Lambdas, dispatch secrets or delivery
+   components. Terraform includes target dependencies, so verify the actual plan.
+2. After that apply succeeds, plan/apply the isolated file-transfer API component.
+3. Deploy the application packages if needed, then test the authenticated upload API.
+
+This exceptional targeted recovery enables testing without applying unrelated MFT
+branch differences. It does not reconcile those differences; agree a combined source
+of truth before subsequent full MFT deployments, which could remove these grants again.
+
 ## Deployment order
 
 1. Merge the Modernisation Platform component registration. Wait for generated

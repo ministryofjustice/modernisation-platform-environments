@@ -17,6 +17,11 @@ on:
 
   workflow_dispatch:
     inputs:
+      test_upload_recovery:
+        description: 'Development only: restore upload policies, then deploy file-transfer-api for testing.'
+        required: false
+        default: false
+        type: boolean
       action:
         description: 'Set either [deploy|destroy].'
         default: 'deploy'
@@ -38,13 +43,13 @@ permissions:
 jobs:
   strategy:
     uses: ./.github/workflows/reusable_terraform_components_strategy.yml
-    if: inputs.action != 'destroy'
+    if: inputs.action != 'destroy' && inputs.test_upload_recovery != true
     with:
       application: "${{ github.workflow }}"
 
   terraform:
     needs: strategy
-    if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
+    if: inputs.action != 'destroy' && inputs.test_upload_recovery != true && join(fromJson(needs.strategy.outputs.matrix).include) != ''
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
@@ -55,6 +60,38 @@ jobs:
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
       component: "${{ matrix.component }}"     # If your strategy workflow also outputs "matrix.component"
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+  restore-development-upload-policies:
+    if: github.event_name == 'workflow_dispatch' && inputs.test_upload_recovery == true && inputs.action == 'deploy'
+    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+    with:
+      application: integration-hub-file-transfer
+      account_name: integration-hub-file-transfer-development
+      environment: development
+      component: root
+      action: plan_apply
+      # Exceptional recovery only: preserve other branches' dispatcher deployments.
+      # Terraform includes dependencies; inspect the plan before approving apply.
+      plan_apply_tfargs: >-
+        -target=module.kms_s3_bucket[\"incoming\"].aws_kms_key.this[0]
+        -target=module.s3_bucket[\"incoming\"].aws_s3_bucket_policy.this[0]
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+  deploy-development-upload-api:
+    needs: restore-development-upload-policies
+    if: github.event_name == 'workflow_dispatch' && inputs.test_upload_recovery == true && inputs.action == 'deploy'
+    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+    with:
+      application: integration-hub-api
+      account_name: integration-hub-api-development
+      environment: development
+      component: file-transfer-api
+      action: plan_apply
     secrets:
       MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
       PASSPHRASE: ${{ secrets.PASSPHRASE }}
