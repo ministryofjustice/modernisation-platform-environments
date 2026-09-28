@@ -1,6 +1,4 @@
 data "aws_iam_policy_document" "glue_catalog_delete_table_versions" {
-  count = local.is-test ? 0 : 1
-
   statement {
     effect = "Allow"
     actions = [
@@ -37,19 +35,14 @@ data "aws_iam_policy_document" "glue_catalog_delete_table_versions" {
   }
 }
 
-# Athena API Policy
 resource "aws_iam_policy" "glue_catalog_delete_table_versions" {
-  count = local.is-test ? 0 : 1
-
   name        = "${local.short_name}-glue-catalog-delete-table-versions"
   description = "Glue Catalog Delete Table Versions Policy"
-  policy      = data.aws_iam_policy_document.glue_catalog_delete_table_versions[0].json
+  policy      = data.aws_iam_policy_document.glue_catalog_delete_table_versions.json
 }
-# Glue Catalog Delete Table Versions attachment
+
 resource "aws_iam_role_policy_attachment" "glue_catalog_delete_table_versions" {
   #checkov:skip=CKV_AWS_274:Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy
-  count = local.is-test ? 0 : 1
-
-  role       = data.aws_iam_role.dataapi_cross_role[0].name
-  policy_arn = aws_iam_policy.glue_catalog_delete_table_versions[0].arn
+  role       = data.aws_iam_role.dataapi_cross_role.name
+  policy_arn = aws_iam_policy.glue_catalog_delete_table_versions.arn
 }
