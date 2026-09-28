@@ -1409,3 +1409,87 @@ module "live_feed_specials_remediator" {
     REMEDIATION_PREFIX     = local.specials_remediation_prefix
   }
 }
+
+# ------------------------------------------------------------------------------
+# Downstream position reconciliation
+# ------------------------------------------------------------------------------
+
+module "merge_redrive_planner" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "merge_redrive_planner"
+  image_name                     = "merge_redrive_planner"
+  role_name                      = aws_iam_role.merge_redrive_planner.name
+  role_arn                       = aws_iam_role.merge_redrive_planner.arn
+  handler                        = "merge_redrive_planner.handler"
+  memory_size                    = 1024
+  timeout                        = 900
+  reserved_concurrent_executions = 2
+  cloudwatch_retention_days      = 7
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    POWERTOOLS_LOG_LEVEL = "INFO"
+
+    ENVIRONMENT_NAME            = local.environment_shorthand
+    ATHENA_RESULTS_BUCKET       = module.s3-athena-bucket.bucket.id
+    ATHENA_WORKGROUP            = aws_athena_workgroup.downstream_reconciliation.name
+    RECONCILIATION_STATE_BUCKET = module.s3-logging-bucket.bucket.id
+    RECONCILIATION_STATE_PREFIX = "downstream-reconciliation"
+    SNS_TOPIC_ARN               = aws_sns_topic.emds_alerts.arn
+
+    POSITION_LOOKBACK_HOURS     = "24"
+    ACTIVATION_LOOKBACK_HOURS   = "24"
+    MAX_REPLAY_ROWS_PER_CHUNK   = "50000"
+    MAX_AUTOMATIC_REPLAY_ROWS   = "250000"
+    MAX_AUTOMATIC_REPLAY_CHUNKS = "20"
+    ATHENA_MAX_POLL_SECONDS      = "840"
+  }
+}
+
+module "merge_redrive_approval" {
+  source                         = "./modules/lambdas"
+  is_image                       = true
+  function_name                  = "merge_redrive_approval"
+  image_name                     = "merge_redrive_approval"
+  role_name                      = aws_iam_role.merge_redrive_approval.name
+  role_arn                       = aws_iam_role.merge_redrive_approval.arn
+  handler                        = "merge_redrive_approval.handler"
+  memory_size                    = 512
+  timeout                        = 60
+  reserved_concurrent_executions = 2
+  cloudwatch_retention_days      = 7
+
+  core_shared_services_id = local.environment_management.account_ids[
+    "core-shared-services-production"
+  ]
+
+  production_dev = local.is-production ? "prod" : (
+    local.is-preproduction ? "preprod" : (
+      local.is-test ? "test" : "dev"
+    )
+  )
+
+  security_group_ids = [aws_security_group.lambda_generic.id]
+  subnet_ids         = data.aws_subnets.shared-private.ids
+
+  environment_variables = {
+    POWERTOOLS_LOG_LEVEL = "INFO"
+
+    ENVIRONMENT_NAME            = local.environment_shorthand
+    RECONCILIATION_STATE_BUCKET = module.s3-logging-bucket.bucket.id
+    RECONCILIATION_STATE_PREFIX = "downstream-reconciliation"
+  }
+}

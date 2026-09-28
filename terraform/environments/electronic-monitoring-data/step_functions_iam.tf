@@ -301,3 +301,61 @@ resource "aws_iam_policy" "trigger_cadt_step_function_policy" {
   name   = "trigger_cadt_step_function_role"
   policy = data.aws_iam_policy_document.trigger_cadt_step_function_policy_document.json
 }
+
+# ------------------------------------------------------------------------------
+# Downstream position reconciliation Step Function
+# ------------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "downstream_reconciliation_sfn_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["states.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "downstream_reconciliation_state_machine" {
+  name = "downstream_reconciliation_state_machine_role"
+
+  assume_role_policy = (
+    data.aws_iam_policy_document.downstream_reconciliation_sfn_assume.json
+  )
+}
+
+resource "aws_iam_role_policy" "downstream_reconciliation_state_machine" {
+  name = "downstream_reconciliation_state_machine_invoke_policy"
+  role = aws_iam_role.downstream_reconciliation_state_machine.id
+
+  policy = jsonencode(
+    {
+      Version = "2012-10-17"
+      Statement = [
+        {
+          Sid    = "AllowInvokeReconciliationPlanner"
+          Effect = "Allow"
+          Action = [
+            "lambda:InvokeFunction"
+          ]
+          Resource = [
+            module.merge_redrive_planner.lambda_function_arn
+          ]
+        },
+        {
+          Sid    = "AllowInvokeAcAndEmdiMergeLambdas"
+          Effect = "Allow"
+          Action = [
+            "lambda:InvokeFunction"
+          ]
+          Resource = [
+            module.merge_ac_position[0].lambda_function_arn,
+            module.merge_emdi_position[0].lambda_function_arn
+          ]
+        }
+      ]
+    }
+  )
+}

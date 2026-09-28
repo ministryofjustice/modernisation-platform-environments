@@ -446,6 +446,105 @@ resource "aws_lambda_permission" "allow_eventbridge_emdi_position" {
   source_arn    = aws_cloudwatch_event_rule.merge_load_schedule[0].arn
 }
 
+# ------------------------------------------------------------------------------
+# Rolling downstream position reconciliation
+# ------------------------------------------------------------------------------
+
+locals {
+  downstream_reconciliation_rolling_schedules = (
+    local.is-preproduction || local.is-production
+    ? {
+      ac = {
+        consumer            = "AC"
+        schedule_expression = "cron(0,30 * * * ? *)"
+      }
+      emdi = {
+        consumer            = "EMDI"
+        schedule_expression = "cron(15,45 * * * ? *)"
+      }
+    }
+    : {}
+  )
+}
+
+resource "aws_iam_role" "downstream_reconciliation_scheduler" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  name = "downstream_reconciliation_scheduler_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+
+        Principal = {
+          Service = "scheduler.amazonaws.com"
+        }
+
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "downstream_reconciliation_scheduler" {
+  count = (
+    local.is-preproduction || local.is-production ? 1 : 0
+  )
+
+  name = "downstream_reconciliation_scheduler_start_policy"
+  role = aws_iam_role.downstream_reconciliation_scheduler[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+
+        Action = [
+          "states:StartExecution",
+        ]
+
+        Resource = [
+          aws_sfn_state_machine.downstream_reconciliation.arn,
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_scheduler_schedule" "downstream_reconciliation_rolling" {
+  for_each = local.downstream_reconciliation_rolling_schedules
+
+  name = "downstream_reconciliation_${each.key}_rolling"
+
+  description = (
+    "Runs ${each.value.consumer} downstream position reconciliation every "
+    "30 minutes"
+  )
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression = each.value.schedule_expression
+
+  target {
+    arn      = aws_sfn_state_machine.downstream_reconciliation.arn
+    role_arn = aws_iam_role.downstream_reconciliation_scheduler[0].arn
+
+    input = jsonencode({
+      consumer = each.value.consumer
+      mode     = "rolling"
+    })
+  }
+}
+
 # --------------------------------------------------------
 # update_p1_export
 # --------------------------------------------------------
@@ -571,58 +670,4 @@ resource "aws_scheduler_schedule" "fms_validation_reporter_catch_up" {
       run_type = "catch_up"
     })
   }
-}
-
-#-----------------------------------------------------------------------------------
-# Live feed specials remediation schedules
-# Automated cleanup runs only where downstream specials are excluded.
-#-----------------------------------------------------------------------------------
-
-resource "aws_cloudwatch_event_rule" "specials_remediation_schedule" {
-  for_each = local.specials_remediation_active_consumers
-
-  name = (
-    "live_feed_specials_remediation_${each.key}_schedule"
-  )
-
-  description = (
-    "Checks ${each.value.consumer} position for downstream specials"
-  )
-
-  schedule_expression = each.value.schedule_expression
-}
-
-resource "aws_cloudwatch_event_target" "specials_remediation" {
-  for_each = local.specials_remediation_active_consumers
-
-  rule = aws_cloudwatch_event_rule.specials_remediation_schedule[
-    each.key
-  ].name
-
-  arn = module.live_feed_specials_remediator.lambda_function_arn
-
-  input = jsonencode({
-    consumer = each.value.consumer
-  })
-}
-
-resource "aws_lambda_permission" "allow_eventbridge_specials_remediation" {
-  for_each = local.specials_remediation_active_consumers
-
-  statement_id = format(
-    "AllowExecutionFromEventBridgeSpecialsRemediation%s",
-    title(each.key),
-  )
-
-  action = "lambda:InvokeFunction"
-
-  function_name = (
-    module.live_feed_specials_remediator.lambda_function_name
-  )
-
-  principal = "events.amazonaws.com"
-
-  source_arn = aws_cloudwatch_event_rule.specials_remediation_schedule[
-    each.key
-  ].arn
 }

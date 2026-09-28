@@ -391,6 +391,740 @@ resource "aws_sfn_state_machine" "landing_dlq_redriver" {
   })
 }
 
+# ------------------------------------------------------------------------------
+# Downstream position reconciliation Step Function
+# ------------------------------------------------------------------------------
+
+resource "aws_sfn_state_machine" "downstream_reconciliation" {
+  name     = "downstream_position_reconciliation"
+  role_arn = aws_iam_role.downstream_reconciliation_state_machine.arn
+
+  definition = jsonencode(
+    {
+      Comment = "Plans, approves, replays and verifies AC and EMDI position reconciliation."
+      StartAt = "SelectInputMode"
+      States = {
+        SelectInputMode = {
+          Type = "Choice"
+          Choices = [
+            {
+              Variable     = "$.mode"
+              StringEquals = "rolling"
+              Next         = "StartRollingReconciliation"
+            },
+            {
+              Variable     = "$.mode"
+              StringEquals = "historical"
+              Next         = "StartRangedReconciliation"
+            },
+            {
+              Variable     = "$.mode"
+              StringEquals = "verify"
+              Next         = "StartRangedReconciliation"
+            },
+          ]
+          Default = "UnsupportedMode"
+        }
+
+        StartRollingReconciliation = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+            Payload = {
+              action        = "start"
+              "consumer.$" = "$.consumer"
+              "mode.$"     = "$.mode"
+            }
+          }
+          OutputPath = "$.Payload"
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+          Next = "DiscoverRolling"
+        }
+
+        StartRangedReconciliation = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+            Payload = {
+              action                    = "start"
+              "consumer.$"             = "$.consumer"
+              "mode.$"                 = "$.mode"
+              "requested_range.$"      = "$.requested_range"
+            }
+          }
+          OutputPath = "$.Payload"
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+          Next = "PrepareHistoricalPlan"
+        }
+
+        DiscoverRolling = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+            Payload = {
+              action        = "discover_rolling"
+              "consumer.$" = "$.consumer"
+              "mode.$"     = "$.mode"
+            }
+          }
+          ResultSelector = {
+            "result.$" = "$.Payload"
+          }
+          ResultPath = "$.discovery"
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+          Next = "PrepareRollingPlan"
+        }
+
+        PrepareRollingPlan = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+            Payload = {
+              action           = "prepare_plan"
+              "consumer.$"    = "$.consumer"
+              "mode.$"        = "$.mode"
+              "execution_id.$" = "$.execution_id"
+              "dates.$"       = "$.discovery.result.dates"
+            }
+          }
+          ResultSelector = {
+            "result.$" = "$.Payload"
+          }
+          ResultPath = "$.planning"
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+          Next = "CheckPreparedPlan"
+        }
+
+        PrepareHistoricalPlan = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+            Payload = {
+              action                    = "prepare_plan"
+              "consumer.$"             = "$.consumer"
+              "mode.$"                 = "$.mode"
+              "execution_id.$"         = "$.execution_id"
+              "requested_range.$"      = "$.requested_range"
+            }
+          }
+          ResultSelector = {
+            "result.$" = "$.Payload"
+          }
+          ResultPath = "$.planning"
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+          Next = "CheckPreparedPlan"
+        }
+
+        CheckPreparedPlan = {
+          Type = "Choice"
+          Choices = [
+            {
+              Variable     = "$.planning.result.status"
+              StringEquals = "nothing_to_do"
+              Next         = "CompleteExecution"
+            },
+            {
+              Variable     = "$.planning.result.status"
+              StringEquals = "planning"
+              Next         = "PlanNextScope"
+            },
+          ]
+          Default = "UnexpectedPlanningResult"
+        }
+
+        PlanNextScope = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+            Payload = {
+              action            = "plan_next"
+              "consumer.$"     = "$.consumer"
+              "mode.$"         = "$.mode"
+              "execution_id.$" = "$.execution_id"
+            }
+          }
+          ResultSelector = {
+            "result.$" = "$.Payload"
+          }
+          ResultPath = "$.plan_step"
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+          Next = "CheckPlanningStatus"
+        }
+
+        CheckPlanningStatus = {
+          Type = "Choice"
+          Choices = [
+            {
+              Variable     = "$.plan_step.result.status"
+              StringEquals = "planning"
+              Next         = "WaitBeforePlanningNextScope"
+            },
+            {
+              Variable     = "$.plan_step.result.status"
+              StringEquals = "nothing_to_do"
+              Next         = "CompleteExecution"
+            },
+            {
+              Variable     = "$.plan_step.result.status"
+              StringEquals = "plan_ready"
+              Next         = "CheckVerifyOnly"
+            },
+          ]
+          Default = "UnexpectedPlanningResult"
+        }
+
+        WaitBeforePlanningNextScope = {
+          Type    = "Wait"
+          Seconds = 1
+          Next    = "PlanNextScope"
+        }
+
+        CheckVerifyOnly = {
+          Type = "Choice"
+          Choices = [
+            {
+              Variable     = "$.mode"
+              StringEquals = "verify"
+              Next         = "CompleteExecution"
+            },
+          ]
+          Default = "CheckApprovalRequired"
+        }
+
+        CheckApprovalRequired = {
+          Type = "Choice"
+          Choices = [
+            {
+              Variable      = "$.plan_step.result.approval_required"
+              BooleanEquals = true
+              Next          = "WaitForApproval"
+            },
+          ]
+          Default = "SaveAutomaticApproval"
+        }
+
+        SaveAutomaticApproval = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+            Payload = {
+              action            = "save_plan"
+              "consumer.$"     = "$.consumer"
+              "mode.$"         = "$.mode"
+              "execution_id.$" = "$.execution_id"
+            }
+          }
+          ResultSelector = {
+            "result.$" = "$.Payload"
+          }
+          ResultPath = "$.approval_state"
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+          Next = "NextReplayChunk"
+        }
+
+        WaitForApproval = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke.waitForTaskToken"
+          TimeoutSeconds = 86400
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+            Payload = {
+              action            = "save_plan"
+              "consumer.$"     = "$.consumer"
+              "mode.$"         = "$.mode"
+              "execution_id.$" = "$.execution_id"
+              "task_token.$"   = "$$.Task.Token"
+            }
+          }
+          ResultPath = "$.approval"
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+          Catch = [
+            {
+              ErrorEquals = ["States.Timeout"]
+              ResultPath  = "$.approval_error"
+              Next        = "ExpireApproval"
+            }
+          ]
+          Next = "RecordApprovalDecision"
+        }
+
+        RecordApprovalDecision = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+            Payload = {
+              action            = "record_approval"
+              "consumer.$"     = "$.consumer"
+              "mode.$"         = "$.mode"
+              "execution_id.$" = "$.execution_id"
+              "decision.$"     = "$.approval.decision"
+            }
+          }
+          ResultSelector = {
+            "result.$" = "$.Payload"
+          }
+          ResultPath = "$.approval_state"
+          Next       = "CheckApprovalDecision"
+        }
+
+        CheckApprovalDecision = {
+          Type = "Choice"
+          Choices = [
+            {
+              Variable     = "$.approval.decision"
+              StringEquals = "approved"
+              Next         = "NextReplayChunk"
+            },
+            {
+              Variable     = "$.approval.decision"
+              StringEquals = "rejected"
+              Next         = "Rejected"
+            },
+          ]
+          Default = "UnexpectedApprovalDecision"
+        }
+
+        ExpireApproval = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+            Payload = {
+              action            = "expire_approval"
+              "consumer.$"     = "$.consumer"
+              "mode.$"         = "$.mode"
+              "execution_id.$" = "$.execution_id"
+            }
+          }
+          OutputPath = "$.Payload"
+          Next       = "ApprovalExpired"
+        }
+
+        NextReplayChunk = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+            Payload = {
+              action            = "next_chunk"
+              "consumer.$"     = "$.consumer"
+              "mode.$"         = "$.mode"
+              "execution_id.$" = "$.execution_id"
+            }
+          }
+          ResultSelector = {
+            "result.$" = "$.Payload"
+          }
+          ResultPath = "$.chunk"
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+          Next = "CheckReplayStatus"
+        }
+
+        CheckReplayStatus = {
+          Type = "Choice"
+          Choices = [
+            {
+              Variable     = "$.chunk.result.status"
+              StringEquals = "complete"
+              Next         = "CompleteExecution"
+            },
+            {
+              Variable     = "$.chunk.result.status"
+              StringEquals = "chunk_ready"
+              Next         = "RecheckReplayChunk"
+            },
+          ]
+          Default = "UnexpectedReplayResult"
+        }
+
+        RecheckReplayChunk = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+            Payload = {
+              action            = "inspect_scope"
+              "consumer.$"     = "$.consumer"
+              "mode.$"         = "$.mode"
+              "execution_id.$" = "$.execution_id"
+              "scope.$"        = "$.chunk.result.scope"
+            }
+          }
+          ResultSelector = {
+            "result.$" = "$.Payload"
+          }
+          ResultPath = "$.recheck"
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+          Next = "CheckRecheckedScope"
+        }
+
+        CheckRecheckedScope = {
+          Type = "Choice"
+          Choices = [
+            {
+              Variable     = "$.recheck.result.status"
+              StringEquals = "scope_clean"
+              Next         = "CheckpointChunk"
+            },
+            {
+              Variable     = "$.recheck.result.status"
+              StringEquals = "scope_ready"
+              Next         = "SelectMergeConsumer"
+            },
+            {
+              Variable     = "$.recheck.result.status"
+              StringEquals = "scope_split"
+              Next         = "ReplayPlanDrift"
+            },
+          ]
+          Default = "UnexpectedReplayResult"
+        }
+
+        SelectMergeConsumer = {
+          Type = "Choice"
+          Choices = [
+            {
+              Variable     = "$.consumer"
+              StringEquals = "AC"
+              Next         = "ReplayAcPosition"
+            },
+            {
+              Variable     = "$.consumer"
+              StringEquals = "EMDI"
+              Next         = "ReplayEmdiPosition"
+            },
+          ]
+          Default = "UnsupportedConsumer"
+        }
+
+        ReplayAcPosition = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+          Parameters = {
+            FunctionName = module.merge_ac_position[0].lambda_function_arn
+            "Payload.$" = "$.recheck.result.replay_input"
+          }
+          ResultPath = "$.merge_result"
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+              IntervalSeconds = 5
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+          Next = "VerifyReplayChunk"
+        }
+
+        ReplayEmdiPosition = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+          Parameters = {
+            FunctionName = module.merge_emdi_position[0].lambda_function_arn
+            "Payload.$" = "$.recheck.result.replay_input"
+          }
+          ResultPath = "$.merge_result"
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+              IntervalSeconds = 5
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+          Next = "VerifyReplayChunk"
+        }
+
+        VerifyReplayChunk = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+            Payload = {
+              action            = "verify_scope"
+              "consumer.$"     = "$.consumer"
+              "mode.$"         = "$.mode"
+              "execution_id.$" = "$.execution_id"
+              "scope.$"        = "$.recheck.result.scope"
+            }
+          }
+          ResultSelector = {
+            "result.$" = "$.Payload"
+          }
+          ResultPath = "$.verification"
+          Retry = [
+            {
+              ErrorEquals = [
+                "Lambda.ServiceException",
+                "Lambda.AWSLambdaException",
+                "Lambda.SdkClientException",
+                "Lambda.TooManyRequestsException",
+              ]
+              IntervalSeconds = 2
+              BackoffRate     = 2
+              MaxAttempts     = 3
+            }
+          ]
+          Next = "CheckVerification"
+        }
+
+        CheckVerification = {
+          Type = "Choice"
+          Choices = [
+            {
+              Variable     = "$.verification.result.status"
+              StringEquals = "verified"
+              Next         = "CheckpointChunk"
+            },
+            {
+              Variable     = "$.verification.result.status"
+              StringEquals = "verification_failed"
+              Next         = "VerificationFailed"
+            },
+          ]
+          Default = "UnexpectedVerificationResult"
+        }
+
+        CheckpointChunk = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+            Payload = {
+              action             = "checkpoint"
+              "consumer.$"      = "$.consumer"
+              "mode.$"          = "$.mode"
+              "execution_id.$"  = "$.execution_id"
+              "chunk_index.$"   = "$.chunk.result.chunk_index"
+              "recovered.$"     = "$.recheck.result.missing_rows"
+            }
+          }
+          ResultSelector = {
+            "result.$" = "$.Payload"
+          }
+          ResultPath = "$.checkpoint"
+          Next       = "NextReplayChunk"
+        }
+
+        CompleteExecution = {
+          Type     = "Task"
+          Resource = "arn:aws:states:::lambda:invoke"
+          Parameters = {
+            FunctionName = module.merge_redrive_planner.lambda_function_arn
+            Payload = {
+              action            = "complete"
+              "consumer.$"     = "$.consumer"
+              "mode.$"         = "$.mode"
+              "execution_id.$" = "$.execution_id"
+            }
+          }
+          OutputPath = "$.Payload"
+          Next       = "Complete"
+        }
+
+        Complete = {
+          Type = "Succeed"
+        }
+
+        Rejected = {
+          Type = "Succeed"
+        }
+
+        ApprovalExpired = {
+          Type = "Succeed"
+        }
+
+        UnsupportedMode = {
+          Type  = "Fail"
+          Error = "UnsupportedReconciliationMode"
+          Cause = "The reconciliation mode is not supported."
+        }
+
+        UnsupportedConsumer = {
+          Type  = "Fail"
+          Error = "UnsupportedReconciliationConsumer"
+          Cause = "The reconciliation consumer is not supported."
+        }
+
+        ReplayPlanDrift = {
+          Type  = "Fail"
+          Error = "ReconciliationPlanDrift"
+          Cause = "A replay chunk exceeded its approved scope before execution."
+        }
+
+        VerificationFailed = {
+          Type  = "Fail"
+          Error = "ReconciliationVerificationFailed"
+          Cause = "Eligible positions remain after bounded replay."
+        }
+
+        UnexpectedPlanningResult = {
+          Type  = "Fail"
+          Error = "UnexpectedReconciliationPlanningResult"
+          Cause = "The planner returned an unexpected planning status."
+        }
+
+        UnexpectedApprovalDecision = {
+          Type  = "Fail"
+          Error = "UnexpectedReconciliationApprovalDecision"
+          Cause = "The approval callback returned an unexpected decision."
+        }
+
+        UnexpectedReplayResult = {
+          Type  = "Fail"
+          Error = "UnexpectedReconciliationReplayResult"
+          Cause = "The planner returned an unexpected replay status."
+        }
+
+        UnexpectedVerificationResult = {
+          Type  = "Fail"
+          Error = "UnexpectedReconciliationVerificationResult"
+          Cause = "The planner returned an unexpected verification status."
+        }
+      }
+    }
+  )
+}
+
+
 # ------------------------------------------
 # Trigger cadt Step funtion
 # ------------------------------------------
@@ -408,3 +1142,5 @@ module "trigger_cadt_step_function" {
   )
   type = "STANDARD"
 }
+
+
