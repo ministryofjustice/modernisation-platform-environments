@@ -1,4 +1,5 @@
 module "dynamodb_transfer_clients" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/dynamodb-table/aws"
   version = "5.5.0"
 
@@ -12,6 +13,7 @@ module "dynamodb_transfer_clients" {
 }
 
 module "dynamodb_auth_roles" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/dynamodb-table/aws"
   version = "5.5.0"
 
@@ -25,6 +27,7 @@ module "dynamodb_auth_roles" {
 }
 
 module "dynamodb_auth_principals" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/dynamodb-table/aws"
   version = "5.5.0"
 
@@ -38,6 +41,7 @@ module "dynamodb_auth_principals" {
 }
 
 module "dynamodb_multipart_uploads" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/dynamodb-table/aws"
   version = "5.5.0"
 

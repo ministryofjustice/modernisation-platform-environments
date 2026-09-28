@@ -1,4 +1,5 @@
 module "lambda_upload_ticket" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.8.0"
 
@@ -67,6 +68,7 @@ module "lambda_upload_ticket" {
 }
 
 module "lambda_api_authorizer" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.8.0"
 
@@ -118,6 +120,7 @@ module "lambda_api_authorizer" {
 }
 
 module "lambda_api_docs" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/lambda/aws"
   version = "8.8.0"
 

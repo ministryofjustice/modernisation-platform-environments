@@ -1,4 +1,5 @@
 module "api_user_credentials_secret" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   for_each = local.auth_users
 
   source  = "terraform-aws-modules/secrets-manager/aws"
@@ -22,6 +23,7 @@ module "api_user_credentials_secret" {
 }
 
 module "api_system_bearer_token_secret" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   for_each = local.auth_system_principals
 
   source  = "terraform-aws-modules/secrets-manager/aws"
@@ -45,6 +47,7 @@ module "api_system_bearer_token_secret" {
 }
 
 module "api_docs_basic_auth_secret" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "2.1.0"
 

@@ -1,4 +1,5 @@
 module "kms_cloudwatch_logs" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/kms/aws"
   version = "4.2.0"
 

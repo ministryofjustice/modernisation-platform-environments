@@ -1,4 +1,5 @@
 module "api_access_log_group" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
   version = "5.7.2"
 
@@ -9,6 +10,7 @@ module "api_access_log_group" {
 }
 
 module "cloudwatch_api_gateway_5xx" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
   version = "5.7.2"
 
@@ -34,6 +36,7 @@ module "cloudwatch_api_gateway_5xx" {
 }
 
 module "cloudwatch_api_gateway_latency" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
   version = "5.7.2"
 
@@ -59,6 +62,7 @@ module "cloudwatch_api_gateway_latency" {
 }
 
 module "cloudwatch_lambda_errors" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   for_each = local.cloudwatch_lambda_alarms
 
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
@@ -81,6 +85,7 @@ module "cloudwatch_lambda_errors" {
 }
 
 module "cloudwatch_lambda_throttles" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   for_each = local.cloudwatch_lambda_alarms
 
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
@@ -103,6 +108,7 @@ module "cloudwatch_lambda_throttles" {
 }
 
 module "cloudwatch_lambda_duration" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   for_each = local.cloudwatch_lambda_alarms
 
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"

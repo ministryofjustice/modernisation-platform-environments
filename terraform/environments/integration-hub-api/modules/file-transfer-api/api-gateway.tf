@@ -1,4 +1,5 @@
 module "api_gateway" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for pinned versions
   source  = "terraform-aws-modules/apigateway-v2/aws"
   version = "6.1.0"
 
@@ -81,15 +82,19 @@ resource "aws_apigatewayv2_route" "transfer_ticket_abort" {
 }
 
 resource "aws_apigatewayv2_route" "api_docs" {
-  api_id    = module.api_gateway.api_id
-  route_key = "GET /docs"
-  target    = "integrations/${aws_apigatewayv2_integration.api_docs.id}"
+  #checkov:skip=CKV_AWS_309:The docs Lambda enforces Secrets Manager-backed Basic auth on both docs routes
+  authorization_type = "NONE"
+  api_id             = module.api_gateway.api_id
+  route_key          = "GET /docs"
+  target             = "integrations/${aws_apigatewayv2_integration.api_docs.id}"
 }
 
 resource "aws_apigatewayv2_route" "api_openapi_contract" {
-  api_id    = module.api_gateway.api_id
-  route_key = "GET /openapi.yaml"
-  target    = "integrations/${aws_apigatewayv2_integration.api_docs.id}"
+  #checkov:skip=CKV_AWS_309:The docs Lambda enforces Secrets Manager-backed Basic auth on both docs routes
+  authorization_type = "NONE"
+  api_id             = module.api_gateway.api_id
+  route_key          = "GET /openapi.yaml"
+  target             = "integrations/${aws_apigatewayv2_integration.api_docs.id}"
 }
 
 resource "aws_apigatewayv2_stage" "default" {
