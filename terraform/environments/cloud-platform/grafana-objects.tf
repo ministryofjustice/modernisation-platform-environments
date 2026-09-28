@@ -44,7 +44,12 @@ locals {
       }
       bu2 = {
         amp_workspace_alias = "cp-1609-0059-bu2-metrics"
-        idc_group_names     = ["container-platform-aws"] # simulated BU B
+        # simulated BU B. Uses container-platform-user-testing, a Viewer group
+        # deliberately NOT granted workspace ADMIN (cf. amg.tf), so the isolation
+        # control can actually be tested: data-source permissions are default-deny
+        # for Viewers but bypassed for Admins. A member of this group (team
+        # bu-bu2) must be able to query amp-bu2 but denied amp-bu1.
+        idc_group_names = ["container-platform-user-testing"]
       }
     }
   }
@@ -188,4 +193,57 @@ resource "grafana_folder_permission" "bu" {
     team_id    = grafana_team.bu[each.key].id
     permission = "View"
   }
+}
+
+#------------------------------------------------------------------------------
+# Per-BU dashboard — one minimal dashboard in each BU folder
+#
+# Exists to make the isolation acceptance test exercisable end to end
+# (cloud-platform#8509): the test is "a BU-A viewer cannot see or query BU-B
+# metrics in a dashboard or in Explore", and that needs a dashboard to look at.
+#
+# Each dashboard lives in its own BU folder and queries ONLY that BU's data
+# source (grafana_data_source.bu_amp[each.key]). Because the data-source
+# permission grants Query to that BU's team alone, a user from another BU
+# opening this dashboard sees the panel but the query is denied — the same
+# default-deny control validated in Explore, surfaced in a dashboard.
+#
+# Deliberately minimal: a single panel on `up`, which every AMP scrape target
+# emits, so the panel also doubles as a "are metrics reaching this BU's AMP
+# workspace?" signal. Rich dashboards-as-code is tracked separately (#8510).
+#------------------------------------------------------------------------------
+
+resource "grafana_dashboard" "bu" {
+  for_each = local.grafana_bus
+
+  folder = grafana_folder.bu[each.key].uid
+
+  config_json = jsonencode({
+    title         = "BU ${each.key} — metrics"
+    uid           = "bu-${each.key}-metrics"
+    schemaVersion = 39
+    time          = { from = "now-6h", to = "now" }
+    panels = [
+      {
+        id      = 1
+        type    = "timeseries"
+        title   = "Scrape target up (${each.key})"
+        gridPos = { h = 8, w = 24, x = 0, y = 0 }
+        datasource = {
+          type = "grafana-amazonprometheus-datasource"
+          uid  = grafana_data_source.bu_amp[each.key].uid
+        }
+        targets = [
+          {
+            refId = "A"
+            expr  = "up"
+            datasource = {
+              type = "grafana-amazonprometheus-datasource"
+              uid  = grafana_data_source.bu_amp[each.key].uid
+            }
+          }
+        ]
+      }
+    ]
+  })
 }
