@@ -1,5 +1,7 @@
 """Compatibility entry point for the writer and DLQ reporter Lambdas."""
 
+# ruff: noqa: F401
+
 import boto3
 from mft_writer.completion import build_completion_detail, publish_completion
 from mft_writer.config import (

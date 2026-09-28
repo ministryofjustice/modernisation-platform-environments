@@ -52,6 +52,21 @@ data "aws_iam_policy_document" "delivery" {
       "kms:GenerateDataKey*",
     ]
     resources = [each.value.action.push_to_s3.kms_key_arn]
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:ViaService"
+      values   = ["s3.eu-west-2.amazonaws.com"]
+    }
+
+    condition {
+      test     = "ArnLike"
+      variable = "kms:EncryptionContext:aws:s3:arn"
+      values = [
+        "arn:aws:s3:::${each.value.action.push_to_s3.bucket_id}",
+        "arn:aws:s3:::${each.value.action.push_to_s3.bucket_id}/${each.value.action.push_to_s3.destination_prefix}*",
+      ]
+    }
   }
 }
 
