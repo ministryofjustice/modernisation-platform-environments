@@ -102,7 +102,8 @@ resource "aws_autoscaling_group" "weblogic_eis" {
 
   max_size              = 1
   min_size              = 1
-  protect_from_scale_in = true
+  protect_from_scale_in = var.enable_autoscaling_schedule ? false : true
+
 
   vpc_zone_identifier = var.account_config.private_subnet_ids
 
@@ -139,6 +140,7 @@ resource "aws_autoscaling_schedule" "weblogic_eis_scale_up" {
   scheduled_action_name  = "weblogic-eis-${var.env_name}-scaleup"
   min_size               = var.delius_microservice_configs.weblogic_eis.asg_min_size
   max_size               = var.delius_microservice_configs.weblogic_eis.asg_max_size
+  desired_capacity       = var.delius_microservice_configs.weblogic_eis.asg_min_size
   recurrence             = "0 19 * * Mon-Fri"
   autoscaling_group_name = aws_autoscaling_group.weblogic_eis.name
 }

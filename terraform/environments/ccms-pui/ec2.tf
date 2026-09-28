@@ -79,4 +79,11 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
     version = "$Latest"
   }
 
+  # AWS Automatically applies this tag but if you don't add it here, members running pipeline can destroy that.
+  tag {
+    key = "AmazonECSManaged"
+    value = ""
+    propagate_at_launch = true
+  }
+
 }
