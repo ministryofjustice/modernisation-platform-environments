@@ -62,6 +62,19 @@ locals {
   }
   }
 
+  github_workflows = {
+    sw-ecr-testing-daily = {
+      identity  = "hello-world-trigger"
+      inputs    = {}
+
+      ref      = "main"
+      repo     = "sw-ecr-testing"
+      schedule = "cron(15 13 * * ? *)"
+      timezone = "Europe/London"
+      workflow = "hello-world.yml"
+    }
+  }
+
   security_group_cidrs_development = {
     bastion = flatten([
       "10.161.98.0/28",
