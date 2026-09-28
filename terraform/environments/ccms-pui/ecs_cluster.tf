@@ -162,6 +162,8 @@ resource "aws_appautoscaling_target" "pui" {
   resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.pui.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
+
+  tags = local.tags
 }
 
 resource "aws_appautoscaling_policy" "pui" {
@@ -179,4 +181,6 @@ resource "aws_appautoscaling_policy" "pui" {
     scale_in_cooldown  = 300
     scale_out_cooldown = 300
   }
+
+  tags = local.tags
 }
