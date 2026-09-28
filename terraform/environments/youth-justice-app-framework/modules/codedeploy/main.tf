@@ -49,6 +49,16 @@ data "aws_lb_listener" "yjsm_hub_svc" {
 }
 
 
+data "aws_lb" "yjsm_apps" {
+  name = var.yjsm_apps_alb_name
+}
+
+data "aws_lb_listener" "yjsm_apps" {
+  for_each          = var.yjsm_apps_listener_ports
+  load_balancer_arn = data.aws_lb.yjsm_apps.arn
+  port              = each.value
+}
+
 data "aws_lb_target_group" "one" {
   for_each = { for pair in var.services : join("", keys(pair)) => pair }
 
@@ -155,7 +165,8 @@ resource "aws_codedeploy_deployment_group" "this" {
               "external"     = data.aws_lb_listener.external.arn
               "connectivity" = data.aws_lb_listener.connectivity.arn
             },
-            var.create_svc_pilot ? { "yjsm-hub-svc" = data.aws_lb_listener.yjsm_hub_svc[0].arn } : {}
+            var.create_svc_pilot ? { "yjsm-hub-svc" = data.aws_lb_listener.yjsm_hub_svc[0].arn } : {},
+            { for name, listener in data.aws_lb_listener.yjsm_apps : name => listener.arn }
           ),
           each.value[join("", keys(each.value))],
           data.aws_lb_listener.internal.arn

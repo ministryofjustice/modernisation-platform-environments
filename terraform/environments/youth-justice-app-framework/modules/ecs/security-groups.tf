@@ -142,6 +142,35 @@ resource "aws_security_group_rule" "yjsm_hub_svc_alb_to_ecs_external_rule" {
 }
 
 
+#yjsm apps alb to ecs internal: all three apps on 8080, plus yjsm-hub's actuator health check on 9092
+resource "aws_security_group_rule" "yjsm_apps_alb_to_ecs_internal_rule" {
+  for_each                 = toset(["8080", "9092"])
+  type                     = "ingress"
+  from_port                = each.value
+  to_port                  = each.value
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.common_ecs_service_internal.id
+  source_security_group_id = var.yjsm_apps_alb_security_group_id
+  description              = "yjsm apps ALB to ECS service communication (${each.value})"
+}
+
+#ecs services calling the yjsm apps through the alb: yjsm-hub listener 80 (yjaf-assets, yjaf-connectivity, yjsm-hub-svc, yjsm-ui) and yjsm-hubadmin listener 8401 (yjsm-hub-svc, yjsm-ui)
+resource "aws_security_group_rule" "ecs_to_yjsm_apps_alb_rule" {
+  for_each = {
+    for pair in setproduct(["internal", "external"], ["80", "8401"]) : "${pair[0]}-${pair[1]}" => {
+      source_sg_id = pair[0] == "internal" ? aws_security_group.common_ecs_service_internal.id : aws_security_group.common_ecs_service_external.id
+      port         = pair[1]
+    }
+  }
+  type                     = "ingress"
+  from_port                = each.value.port
+  to_port                  = each.value.port
+  protocol                 = "tcp"
+  security_group_id        = var.yjsm_apps_alb_security_group_id
+  source_security_group_id = each.value.source_sg_id
+  description              = "ECS ${split("-", each.key)[0]} services to yjsm apps ALB (${each.value.port})"
+}
+
 #allow each ecs sg to talk to eachother
 resource "aws_security_group_rule" "ecsext_to_ecsint_rule" {
   type                     = "ingress"

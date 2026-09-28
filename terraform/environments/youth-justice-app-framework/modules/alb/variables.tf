@@ -59,6 +59,18 @@ variable "alb_ingress_with_cidr_blocks_rules" {
   default     = []
 }
 
+variable "alb_ingress_prefix_list_ids" {
+  description = "List of prefix list IDs used by every rule in alb_ingress_with_prefix_list_ids_rules"
+  type        = list(string)
+  default     = []
+}
+
+variable "alb_ingress_with_prefix_list_ids_rules" {
+  description = "List of ingress rules for the ALB security group where only prefix_list_ids is used (see alb_ingress_prefix_list_ids)"
+  type        = list(map(string))
+  default     = []
+}
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)
